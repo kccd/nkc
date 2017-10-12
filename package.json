@@ -1,0 +1,29 @@
+{
+  "name": "nkc2",
+  "version": "2.1.0",
+  "description": "source of [www.kechuang.com]",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/lovetheory/nkc2.git"
+  },
+  "keywords": [
+    "koa2",
+    "mongoose",
+    "restful"
+  ],
+  "author": "nkc",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-compress": "^2.0.0",
+    "koa-router": "^7.2.1",
+    "koa-static": "^4.0.1",
+    "mongoose": "^4.12.1",
+    "pug": "^2.0.0-rc.4"
+  }
+}
