@@ -15,7 +15,7 @@ postRouter
   })
   .get('/:pid/postHistory', async (ctx, next) => {
     const pid = ctx.params.pid;
-    ctx.body = `历史修改记录页面   pid：${pid}`;
+    ctx.body = `历史修改记录 页面   pid：${pid}`;
     next();
   })
   .get('/:pid/editor', async (ctx, next) => {
