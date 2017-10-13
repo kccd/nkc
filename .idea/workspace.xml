@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8ffd4834-0f5e-47f3-8cf1-a88c15580ba4" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tools/mongoDB.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/tools/mongoDB.js" afterPath="" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -48,7 +48,7 @@
         </entry>
       </file>
       <file leaf-file-name="mongoDB.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/tools/mongoDB.js">
+        <entry file="file://$PROJECT_DIR$/settings/mongoDB.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="68" lean-forward="false" selection-start-line="0" selection-start-column="68" selection-end-line="0" selection-end-column="68" />
@@ -131,8 +131,8 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/settings/mongoDB.js" />
         <option value="$PROJECT_DIR$/tools/mongoDB.js" />
+        <option value="$PROJECT_DIR$/settings/mongoDB.js" />
       </list>
     </option>
   </component>
@@ -265,12 +265,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1507798658549</updated>
-      <workItem from="1507798660099" duration="6322000" />
+      <workItem from="1507798660099" duration="6408000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6322000" />
+    <option name="totallyTimeSpent" value="6408000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="24" width="960" height="1056" extended-state="4" />
@@ -357,14 +357,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/settings/mongoDB.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="67" lean-forward="false" selection-start-line="0" selection-start-column="67" selection-end-line="0" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
@@ -382,6 +374,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tools/mongoDB.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="45" lean-forward="false" selection-start-line="0" selection-start-column="45" selection-end-line="0" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings/mongoDB.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="68" lean-forward="false" selection-start-line="0" selection-start-column="68" selection-end-line="0" selection-end-column="68" />
