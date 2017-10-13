@@ -1,1 +1,1 @@
-module.exports = 'mongodb://localhost/rescue';
+module.exports = 'mongodb://lzszone:Lz852369@localhost:27017/admin';
