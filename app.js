@@ -10,6 +10,7 @@ const app = new Koa();
 const logger = nkcModules.logger;
 
 app.use(async (ctx, next) => {
+  const start = Date.now();
   try {
     await next();
   } catch (err) {
@@ -17,10 +18,13 @@ app.use(async (ctx, next) => {
     ctx.body = {
       message: err.message
     };
+  } finally {
+    const passed = Date.now() - start;
+    ctx.set('X-Response-Time', passed);
+    logger.info(ctx.method + ': ' + ctx.req.url);
   }
 });
 app.use(async (ctx, next) => {
-  logger.log(ctx.path);
   await next()
 });
 app.use(async (ctx, next) => {
