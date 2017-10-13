@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js | ./node_modules/.bin/bunyan --color -l info"
+    "start": "node server.js | bunyan --color -l info"
   },
   "repository": {
     "type": "git",
