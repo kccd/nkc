@@ -23,7 +23,7 @@ postRouter
     ctx.body = `编辑post页面   pid：${pid}`;
     next();
   })
-  .post('/:pid', async (ctx, next) => {
+  .put('/:pid', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.body = `更新post   pid：${pid}`;
     next();

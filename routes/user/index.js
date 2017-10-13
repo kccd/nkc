@@ -14,13 +14,34 @@ userRouter
   .get('/:uid', async (ctx, next) => {
     const uid = ctx.params.uid;
     ctx.body = `用户: ${uid}  的资料`;
-    next()
+    next();
+  })
+  .del('/:uid', async (ctx, next) => {
+    const uid = ctx.params.uid;
+    ctx.body = `封禁用户: ${uid}`;
+    next();
+  })
+  .put('/:uid', async (ctx, next) => {
+    const uid = ctx.params.uid;
+    ctx.body = `解封用户: ${uid}`;
+    next();
   })
   .get('/:uid/column', async (ctx, next) => {
     const uid = ctx.params.uid;
     ctx.body = `用户: ${uid}  的专栏`;
-    next()
+    next();
   })
+  .get('/:uid/collection', async (ctx, next) => {
+    const uid = ctx.params.uid;
+    ctx.body = `用户: ${uid}  的收藏`;
+    next();
+  })
+  .post('/:uid/pop', async (ctx, next) => {
+    const uid = ctx.params.uid;
+    ctx.body = `推送/取消热门 用户: ${uid}`;
+    next();
+  })
+  
   /* .post('/', async (ctx, next) => {
     ctx.body = JSON.stringify(ctx.query) + JSON.stringify(ctx.request.body);
     next()

@@ -42,4 +42,19 @@ operationRouter
     ctx.body = `移动帖子到个人版   tid：${tid}`;
     next();
   })
+  .post('/switchVInPersonalForum', async (ctx, next) => {
+    const tid = ctx.params.tid;
+    ctx.body = `在专栏显示隐藏   tid：${tid}`;
+    next();
+  })
+  .post('/switchDInPersonalForum', async (ctx, next) => {
+    const tid = ctx.params.tid;
+    ctx.body = `在专栏加精   tid：${tid}`;
+    next();
+  })
+  .post('/switchTInPersonalForum', async (ctx, next) => {
+    const tid = ctx.params.tid;
+    ctx.body = `在专栏顶置   tid：${tid}`;
+    next();
+  });
 module.exports = operationRouter;

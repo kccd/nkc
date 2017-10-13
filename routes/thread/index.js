@@ -14,5 +14,5 @@ threadRouter
     ctx.body = `加载帖子   tid：${tid}`;
     next();
   })
-  .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods())
+  .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;
