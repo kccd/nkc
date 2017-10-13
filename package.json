@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "supervisor server.js | bunyan --color -l info"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
-    "bunyan": "^1.8.12",
+    "colors": "^1.1.2",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-compress": "^2.0.0",

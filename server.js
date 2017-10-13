@@ -18,10 +18,10 @@ if(useHttps) {
     .listen(
       serverSettings.httpsPort,
       listenAddr,
-      () => logger.info(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.httpsPort}`)
+      () => console.log(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.httpsPort}`.green)
     );
 
-  redirectServer = http.createServer((req, res) => {
+  redirectServer = http.createServer((req, res) => {``
     const host = req.headers['host'];
     res.writeHead(301, {
       'Location': 'https://' + host + req.url
@@ -33,6 +33,6 @@ if(useHttps) {
   server = http.createServer(app).listen(
     serverSettings.port,
     listenAddr,
-    () => logger.info(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.port}`)
+    () => console.log(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.port}`.green)
   );
 }

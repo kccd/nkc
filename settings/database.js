@@ -11,10 +11,10 @@ const options = {
 mongoose.Promise = Promise;
 mongoose.connect(mongoDB, options)
   .then(() => {
-    logger.info('database connected.')
+    console.log('database connected.'.green)
   })
   .catch(e => {
-    logger.error(e.stack)
+    console.error(e.stack.red)
   });
 
 module.exports = mongoose;

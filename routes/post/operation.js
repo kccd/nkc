@@ -21,6 +21,6 @@ operationRouter
     const pid = ctx.params.pid;
     ctx.body = `评学术分   pid：${pid}`;
     next();
-  })
+  });
 
 module.exports = operationRouter;
