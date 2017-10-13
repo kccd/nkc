@@ -11,7 +11,7 @@ const options = {
 mongoose.Promise = Promise;
 mongoose.connect(mongoDB, options)
   .then(() => {
-    logger.log('database connected.')
+    logger.info('database connected.')
   })
   .catch(e => {
     logger.error(e.stack)

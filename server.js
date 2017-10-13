@@ -18,7 +18,7 @@ if(useHttps) {
     .listen(
       serverSettings.httpsPort,
       listenAddr,
-      () => logger.log(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.httpsPort}`)
+      () => logger.info(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.httpsPort}`)
     );
 
   redirectServer = http.createServer((req, res) => {
@@ -33,6 +33,6 @@ if(useHttps) {
   server = http.createServer(app).listen(
     serverSettings.port,
     listenAddr,
-    () => logger.log(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.port}`)
+    () => logger.info(`${serverSettings.name} listening on ${listenAddr}:${serverSettings.port}`)
   );
 }
