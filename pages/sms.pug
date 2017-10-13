@@ -15,8 +15,8 @@ html(lang="en")
           content: $('#content').val()
         }
         $.ajax({
-          url: '/p/123132/',
-          type: 'delete',
+          url: '/me/set/username',
+          type: 'post',
           data: dataObj
         })
         .done(function(data){
@@ -25,4 +25,4 @@ html(lang="en")
         .fail(function(){
           console.log('失败');
         })
-      })
+      });

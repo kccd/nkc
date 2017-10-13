@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const operationRouter = require('./operation');
 const postRouter = new Router();
 
 postRouter
@@ -12,15 +13,23 @@ postRouter
     ctx.body = `屏蔽post   pid：${pid}`;
     next();
   })
+  .get('/:pid/postHistory', async (ctx, next) => {
+    const pid = ctx.params.pid;
+    ctx.body = `历史修改记录页面   pid：${pid}`;
+    next();
+  })
+  .get('/:pid/editor', async (ctx, next) => {
+    const pid = ctx.params.pid;
+    ctx.body = `编辑post页面   pid：${pid}`;
+    next();
+  })
   .post('/:pid', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.body = `更新post   pid：${pid}`;
     next();
   })
-  .post('/:pid/recommend', async (ctx, next) => {
-    const pid = ctx.params.pid;
-    ctx.body = `修改post   pid：${pid}`;
-    next();
-  })
+  .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods())
+
+
 
 module.exports = postRouter;
