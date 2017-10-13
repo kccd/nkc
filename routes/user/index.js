@@ -18,6 +18,5 @@ userRouter
   })
   .use('/:uid', idRouter.routes(), idRouter.allowedMethods())
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
-  .use('/:uid')
   .use('/:uid/sms', smsRouter.routes(), smsRouter.allowedMethods())
 module.exports = userRouter;
