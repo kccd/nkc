@@ -20,10 +20,6 @@ setRouter
   .put('/personalsetting', async (ctx, next) => {
     ctx.body = '修改帖子签名color等';
     next();
-  })
-  .put('/personalsetting', async (ctx, next) => {
-    ctx.body = '修改帖子签名color等';
-    next();
   });
 
 module.exports = setRouter;

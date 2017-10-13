@@ -3,6 +3,7 @@ const settings = require('./settings');
 const nkcModules = require('./nkcModules');
 const mainRouter = require('./routes');
 const Koa = require('koa');
+require('colors');
 const bodyParser = require('koa-bodyparser');
 const staticServe = require('koa-static');
 const db = require('./dataModels');
@@ -10,28 +11,25 @@ const app = new Koa();
 const logger = nkcModules.logger;
 
 app.use(async (ctx, next) => {
-  const start = Date.now();
-  try {
-    await next();
-  } catch (err) {
-    ctx.status = err.statusCode || err.status || 500;
-    ctx.body = {
-      message: err.message
-    };
-  } finally {
-    const passed = Date.now() - start;
-    ctx.set('X-Response-Time', passed);
-    logger.info(ctx.method + ': ' + ctx.req.url);
-  }
-});
-app.use(async (ctx, next) => {
-  await next()
-});
-app.use(async (ctx, next) => {
+  ctx.reqTime = new Date();
   ctx.db = db;
   ctx.nkcModules = nkcModules;
-  await next();
-})
+  try {
+    await next();
+  }
+  catch (err) {
+    ctx.error = err;
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = {
+      message: err.stack
+    };
+  }
+  finally {
+    const passed = Date.now() - ctx.reqTime;
+    ctx.set('X-Response-Time', String(passed));
+    await logger(ctx);
+  }
+});
 app.use(staticServe('./pages'));
 app.use(bodyParser());
 app.use(mainRouter.routes());
