@@ -8,7 +8,7 @@ const otherRouter = new Router();
 
 otherRouter
   .get('/', async (ctx, next) => {
-    ctx.body = `网站首页`;
+    ctx.data = `网站首页`;
     next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())

@@ -6,6 +6,6 @@ experimentalRouter
   .get('/', async (ctx, next) => {
     ctx.body = `管`;
     next();
-  })
+  });
   // .use('/set', setRouter.routes(), setRouter.allowedMethods())
 module.exports = experimentalRouter;

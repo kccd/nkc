@@ -6,7 +6,7 @@ const meRouter = new Router();
 
 meRouter
   .get('/', async (ctx, next) => {
-    ctx.body = `个人资料`;
+    ctx.data = `个人资料`;
     next();
   })
   .use('/set', setRouter.routes(), setRouter.allowedMethods())
