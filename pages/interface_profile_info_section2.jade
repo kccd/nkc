@@ -1,0 +1,23 @@
+.UserProfileSection2
+  -var user= user
+    a(href='/m/#{user._key}') 专栏
+    a(href='/user_collection/#{user._key}') 收藏夹
+    a(href='/sms?&tab=messages&conversation=#{user._key}') 发私信
+
+    if data.permittedOperations.banUser
+      a(href='javascript:void(0)' onclick="nkcAPI('banUser',{uid:'#{user._key}'}).then(jalert).catch(jwarning)") 一键封禁此人
+      a(href='javascript:void(0)' onclick="nkcAPI('unbanUser',{uid:'#{user._key}'}).then(jalert).catch(jwarning)") 解除封禁
+
+    br
+    span 学术分 #{user.xsf||0}
+    span 科创币 #{user.kcb||0}
+
+
+    span 总主题 #{user.threadCount||0} 帖
+    span 总回复 #{user.postCount||0} 楼
+
+    -var listCertText = getUserDescription(user).split('\n').pop()
+    span 拥有证书：#{listCertText}
+    br
+    span 注册于 #{dateTimeString(user.toc)}
+    span 最后登陆 #{dateTimeString(user.tlv||user.toc)}

@@ -1,0 +1,93 @@
+//refer to forum object as f, count as index..
+if (forum!==null)
+  if 1
+    if index%4==0
+      .clearfix.visible-lg-block
+    if index%4==0
+      .clearfix.visible-md-block
+    if index%2==0
+      .clearfix.visible-sm-block
+    if index%1==0
+      .clearfix.visible-xs-block
+    //above are necessary when some columns are shorter than others
+  - var f = forum
+  - var p = parent
+  //.col-lg-3.col-md-4.col-sm-6.col-xs-12
+  //.col-xs-12(style='margin-bottom:6px')
+  .col-xs-12.col-sm-6.col-md-3(style='margin-bottom:6px')    
+    .kb
+      .HomeForumContainer
+      
+        //.col-xs-12.col-sm-6.col-md-3
+        .kb
+          .HomeForumTitle
+            - var forumcolor = f.color||p.color||'#eee'
+            - var url = '/f/'+f._key; //url = seo_reverse_rewrite(url)
+            
+            //colored circle
+            .HomeForumTitleCircle(style='background-color:#{forumcolor}')
+            
+              //if icon file set
+              if f.icon_filename
+                - f.icon_filename = f.icon_filename
+                  //image if present
+                  img(src='/resources/site_specific/forum_icon/#{f.icon_filename}.svg')
+              
+            a.HomeForumTitlePrimary(href='#{url}') #{f.display_name}
+              
+            .HomeForumTitleSecondary
+              if f.count_posts_today > 0
+                span.HomeForumTitlePostCountToday #{f.count_posts_today||""}/ 
+                
+              span.HomeForumTitleThreadCount #{f.count_threads}/ 
+              span.HomeForumTitlePostCount #{f.count_posts}
+              
+          .HomeForumDescription
+            span #{f.description}
+    
+
+    
+        //hr.hrNarrowSpace
+        each thread,index in f.threads
+          if (index+1)%2==0
+            //.clearfix.visible-sm-block
+          //.col-xs-12.col-sm-6.col-md-3
+          .kb
+            .HomeThreadItem
+              -var count = (thread.count_remain||thread.count)-1
+              if count || true
+                span.HomeThreadReplyCount #{count||""}
+              //span.lighttext.rightalign #{fromNow(thread.lm.toc)}
+              
+              - var uid = thread.oc.uid
+              - var avatar = '/avatar_small/' + uid
+              
+              if 0 
+                .HomeThreadAvatarPosition
+                  a(href='/user_threads/#{uid}')
+                    img.HomeThreadAvatar(src='#{avatar}')
+              
+              - var oc = thread.oc
+              - var brief = de_hide(oc.c).replace(/\[.*?]/g,'').trim().slice(0,100)
+              
+              - var url='/t/'+thread._key// = '/f/'+f._key+'/'+thread._key; //url = seo_reverse_rewrite(url)
+              if !thread.digest
+                a.HomeThreadText(href='#{url}' title="#{brief}") #{thread.oc.t}  
+              else
+                a.HomeThreadTextDigest.HomeThreadText(href='#{url}' title="#{brief}") #{thread.oc.t}
+                
+              .HomeThreadTextRightAlign
+                if Date.now()-thread.tlm<86400000
+                  span.reddish #{fromNowAbbr(thread.tlm)} 
+                else
+              
+              .HomeThreadInfo
+                span #{shortDateTimeString(thread.tlm)}&nbsp;
+                a.HomeThreadInfoUsername(href='/m/#{thread.lm.uid}') #{thread.lm.username}
+                
+
+        if children && children.length
+          .HomeChildrenArea
+            -for(i in children)
+              -var cf = children[i]
+              a(href='/f/#{cf._key}' style='color:#{"white"};background-color:#{cf.color||forumcolor}') #{cf.abbr||cf.display_name}

@@ -1,0 +1,124 @@
+extends bootstrap_base.jade
+
+
+block title
+  link(href='/interface_experimental.css' rel='stylesheet')
+  title #{data.targetUser.username}的关注/粉丝
+block content
+  -var targetUser = data.targetUser;
+  -var users = data.users;
+  -var subscribeUsersClass = '';
+  -var subscribersClass = '';
+  -var subscribe = '';
+  -if(users.list && users.list != '')
+    -subscribeUsersClass = 'active';
+    -subscribe = '&list='+users.list;
+  -else
+    -subscribersClass = 'active';
+  .container
+    .row
+      .col-xs-12.col-md-12
+        .media
+          .media-left
+            a(href='/m/#{targetUser._key}')
+              img.media-object.img-rounded(src="/avatar/#{targetUser._key}",alt="#{targetUser.username}",style="height:5em;width:5em;")
+          .media-body
+            h4.media-heading
+              a(href='/m/#{targetUser._key}') #{targetUser.username}
+            :markdown
+              #{targetUser.description || '个人简介暂未填写'}
+      .col-xs-12.col-md-12
+        hr
+      .col-xs-12.col-md-12 
+        ul.nav.nav-tabs
+          li(class="#{subscribeUsersClass}",role="presentation")
+            a(href='/subscribe?&uid=#{data.targetUser._key}&list=subscribeUsers') 关注
+          li(class="#{subscribersClass}",role="presentation")
+            a(href='/subscribe?&uid=#{data.targetUser._key}') 粉丝
+      .col-xs-12.col-md-12
+        nav(aria-label='navigation')
+          ul.pagination
+            -if(users.page.pagecount > 1)
+              //- 当前页数若大于4则显示首页按钮
+              //- 若总的分页数小于7则不需要显示首页和尾页按钮
+              -if(users.page.page > 4 && users.page.pagecount > 7)
+                li
+                  a(href='/subscribe?&uid=#{targetUser._key}#{subscribe}') 首
+              //- n为总共需要显示的分页按钮个数
+              //- i为循环中当前生成的页数
+              -var n = 7;
+              -var min = users.page.pagecount - 3;
+              -if(users.page.page > min)
+                -min = users.page.pagecount - 6;
+              -else
+                -min = users.page.page - 3;
+              -for(var i = min ; 1 ; i++)
+                -if(n == 0)
+                  -break;
+                -if(i <= 0)
+                  -continue;
+                -if(i > users.page.pagecount)
+                  -break;
+                //- 生成当前所在分页按钮时，有蓝色背景，不可点击
+                -if(i == users.page.page)
+                  li.active
+                    a(href='javscript:void(0)') #{i}
+                -else
+                  li
+                    a(href='/subscribe?&uid=#{targetUser._key}#{subscribe}&page=#{i}') #{i}
+                -n--;
+              //- 当前页数若小于最大分页数-3 则显示尾页按钮
+              -if(users.page.page < users.page.pagecount - 3 && users.page.pagecount > 7)
+                li
+                  a(href='/subscribe?&uid=#{targetUser._key}#{subscribe}&page=#{users.page.pagecount}') 末 
+      -var usersList = users.userslist;
+      .col-xs-12.col-md-12
+        -for(var i = 0; i < usersList.length; i++)
+          -if(usersList[i])
+            .col-xs-12.col-sm-4.col-md-3
+              ul.media-list
+                li.media
+                  .media-left
+                    a(href="/m/#{usersList[i]._key}")
+                      img.media-object.img-rounded(src="/avatar/#{usersList[i]._key}",alt="#{usersList[i].username}",style="height:3em;width:3em;")
+                  .media-body
+                    h4.media-heading
+                      a(href="/m/#{usersList[i]._key}") #{usersList[i].username}
+                    span(style='color:#555;') 主题:#{usersList[i].threadCount || 0} 回复:#{usersList[i].postCount || 0}
+      .col-xs-12.col-md-12
+        nav(aria-label='navigation')
+          ul.pagination
+            -if(users.page.pagecount > 1)
+              //- 当前页数若大于4则显示首页按钮
+              //- 若总的分页数小于7则不需要显示首页和尾页按钮
+              -if(users.page.page > 4 && users.page.pagecount > 7)
+                li
+                  a(href='/subscribe?&uid=#{targetUser._key}#{subscribe}') 首
+              //- n为总共需要显示的分页按钮个数
+              //- i为循环中当前生成的页数
+              -var n = 7;
+              -var min = users.page.pagecount - 3;
+              -if(users.page.page > min)
+                -min = users.page.pagecount - 6;
+              -else
+                -min = users.page.page - 3;
+              -for(var i = min ; 1 ; i++)
+                -if(n == 0)
+                  -break;
+                -if(i <= 0)
+                  -continue;
+                -if(i > users.page.pagecount)
+                  -break;
+                //- 生成当前所在分页按钮时，有蓝色背景，不可点击
+                -if(i == users.page.page)
+                  li.active
+                    a(href='javscript:void(0)') #{i}
+                -else
+                  li
+                    a(href='/subscribe?&uid=#{targetUser._key}#{subscribe}&page=#{i}') #{i}
+                -n--;
+              //- 当前页数若小于 最大分页数-3 则显示尾页按钮
+              -if(users.page.page < users.page.pagecount - 3 && users.page.pagecount > 7)
+                li
+                  a(href='/subscribe?&uid=#{targetUser._key}#{subscribe}&page=#{users.page.pagecount}') 末
+

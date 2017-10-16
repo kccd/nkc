@@ -1,0 +1,81 @@
+//nav.navbar.navbar-default
+
+
+div
+  - var navbar = data.navbar || {}
+  .container-fluid
+    .row(style='min-height:43px;background-color:#f3f3f3;margin-bottom: 18px; padding-bottom: 4px;border-bottom-color: rgb(221, 221, 221); border-bottom-width: 1px; border-bottom-style: solid;').nkcshade
+      .col-xs-4.col-sm-2
+      
+        div.text-center(style='margin-top:5px; margin-bottom:0px')
+          a.f16(href='/' style='text-decoration: none; display:inline-block;') #{data.site.name}
+      
+      .col-xs-8.col-sm-4
+        -var navbar_highlight = data.navbar_highlight||navbar.highlight
+        -var isActive = function(label){return (navbar_highlight==label)?'active':''}
+        ul.pagination(style='margin-top:4px; margin-bottom:0px')
+          if 0
+            li(class="#{isActive('tool')}")
+              a(href='/static/tools/index.htm' title='由论坛朋友贡献的工具箱') 工具
+            
+          li(class="#{isActive('home')}")
+            a(href='/' title='扫一眼') 首页
+            
+          if data.user&&data.user._key
+            li(class="#{isActive('self')}")
+              a(href='/self' title='个人动态') 我的
+            
+        if 0
+          li(class="#{navbar.highlight=='editor'?'active':''}")
+            a(href='/e') 著
+          
+        if 0
+          li(class="#{navbar.highlight=='uploader'?'active':''}")
+            a(href='#') 传
+      
+      .col-xs-7.col-sm-3
+        .input-group(style='margin-top:4px;')
+          input#SearchBox.form-control(type='text' placeholder='关键词、文号、用户')
+          span.input-group-btn
+            button#SearchButton.btn.btn-default(type='button') 搜索
+          
+        if 0
+          .row(style='margin-top:4px;')
+            .col-xs-9(style='padding-right:0px')
+              input#SearchBox.form-control(type='text',placeholder='搜索' style='')
+            .col-xs-3(style='padding-left:4px;')
+              button#SearchButton.btn.btn-default(style='float:left') 搜索
+      
+      .col-xs-5.col-sm-3
+        .NavBarLinkArea.f12.text-center
+          if data.user
+            - var user = data.user
+            a(href='/me' title='#{getUserDescription(user)}') #{user.username}
+            
+            
+            
+            if data.permittedOperations.viewSMS
+              a(href='/sms')
+                span 信
+              
+                if data.user.new_message
+                  -var new_message = data.user.new_message
+                  -var messageSum = (new_message.messages || 0) + (new_message.system || 0) + (new_message.at || 0) + (new_message.replies || 0);
+                  -if(messageSum > 0)
+                    span.reddish (#{messageSum})
+            
+            if data.permittedOperations
+              if data.permittedOperations.viewExperimental
+                a(href='/experimental' title='管理界面') 管
+            
+            a(href='/user_collection/#{data.user._key}' title='我的珍藏') 藏
+            
+            a(href='/logout?hash=#{data.lastlogin||""}' title='不，不要走！') 退
+            
+          else
+            a(href='/login' title='还记得密码吗？') 登录
+            a(href='/register' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+          
+
+    
+                

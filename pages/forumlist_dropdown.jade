@@ -1,0 +1,12 @@
+select#TargetForum
+  each fg in data.forumlist
+    if listParent
+      option #{fg.parentforum._key}:#{fg.parentforum.display_name} ====
+    else
+      option ----
+    each f in fg.forumgroup
+      -var selected = (data.forum&&data.forum._key&&data.forum._key===f._key)||(data.doc&&data.doc._key===f._key)
+      if selected
+        option(selected) #{f._key}:#{f.display_name}
+      else
+        option #{f._key}:#{f.display_name}

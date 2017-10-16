@@ -55,7 +55,7 @@ app.use(async (ctx, next) => {
     default:
       ctx.type = 'html';
       try {
-        ctx.body = ctx.nkcModules.render(ctx.template, {data: ctx.data});
+        ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
       } catch(e) {
         ctx.throw(500, e)
       }

@@ -1,0 +1,323 @@
+extends bootstrap_base.jade
+
+block title
+  title 短消息
+  meta#replytarget(value='#{data.replytarget}')
+
+block content
+  -function changeTime(value)
+    -var add_0 = function(value)
+      -if(value <= 9)
+        -return '0' + value;
+      -else
+        -return value;
+    -var time = new Date(parseInt(value));
+    -var out = time.getFullYear() + '-' + add_0(time.getMonth()+1) + '-' + add_0(time.getDate()) + ' ' + add_0(time.getHours()) + ':' + add_0(time.getMinutes()) + ':' + add_0(time.getSeconds());
+    -return out;
+  //-拿到data里面的数据
+  -var nowAt = data.tab;
+  -if(data.paging)
+    -var page = data.paging.page + 1;
+    -var pageCount = data.paging.pagecount;
+  -else
+    -var page = 1;
+    -var pageCount = 1;
+  -var obj = {replies: '回复', at: '@', messages: '短消息', system: '系统'};
+  -var docs = data.docs;
+  .container
+    .row
+      .panel.panel-default(style='overflow:hidden;')
+        .col-xs-12.col-md-12
+          ul.nav.nav-tabs(style='margin-top: 0.5em;')
+            li(class='#{nowAt === "replies"? "active": ""}')
+              a(style="cursor: pointer;",href='/sms?&tab=replies') 回复提醒
+                if(data.user.new_message.replies && data.user.new_message.replies > 0)
+                  span.reddish(style="font-size:1em;") (#{data.user.new_message.replies})
+            li(class='#{nowAt === "at"? "active": ""}')
+              a(style="cursor: pointer;",href='/sms?&tab=at') @我的
+                if(data.user.new_message.at && data.user.new_message.at > 0)
+                  span.reddish(style="font-size:1em;") (#{data.user.new_message.at})
+            li(class='#{nowAt === "messages"? "active": ""}')
+              a(style="cursor: pointer;",href='/sms?&tab=messages') 短消息
+                if(data.user.new_message.messages && data.user.new_message.messages > 0)
+                  span.reddish(style="font-size:1em;") (#{data.user.new_message.messages})
+            li(class='#{nowAt === "system"? "active": ""}')
+              a(style="cursor: pointer;",href='/sms?&tab=system') 系统通知
+                if(data.user.new_message.system && data.user.new_message.system > 0)
+                  span.reddish(style="font-size:1em;") (#{data.user.new_message.system})
+        -var conversation = '';
+        -if(nowAt === 'messages' && data.conversation)
+          -conversation = '&conversation=' + data.conversation;
+        -if(pageCount > 1)
+          .col-xs-12.col-md-6(style="margin:0.4em 0 0 0")
+            nav(aria-label='navigation')
+              ul.pagination(style="margin:0")
+                //- 当前页数若大于4则显示首页按钮
+                //- 若总的分页数小于7则不需要显示首页和尾页按钮
+                -if(page > 4 && pageCount > 7)
+                  li
+                    a(href='/sms?&page=0&tab=#{nowAt}#{conversation}') 首
+                //- n为总共需要显示的分页按钮个数
+                //- i为循环中当前生成的页数
+                -var n = 7;
+                -var min = pageCount - 3;
+                -if(page > min)
+                  -min = pageCount - 6;
+                -else
+                  -min = page - 3;
+                -for(var i = min ; 1 ; i++)
+                  -if(n == 0)
+                    -break;
+                  -if(i <= 0)
+                    -continue;
+                  -if(i > pageCount)
+                    -break;
+                  //- 生成当前所在也输得按钮时，有蓝色背景，不可点击
+                  -if(i == page)
+                    li.active
+                      a(href='###') #{i}
+                  -else
+                    li
+                      a(href='/sms?&page=#{i-1}&tab=#{nowAt}#{conversation}') #{i}
+                  -n--;
+                //- 当前页数若小于 最大分页数-3 则显示尾页按钮
+                -if(page < pageCount - 3 && pageCount > 7)
+                  li
+                    a(href='/sms?&page=#{pageCount-1}&tab=#{nowAt}#{conversation}') 末
+        -if(nowAt === 'replies')
+          .col-xs-12.col-md-12
+            -var reNum = data.user.new_message.replies;
+            -for(var i = 0 ; i < docs.length; i++)
+              hr(style='margin:0.5em 0;')
+              .media(style='margin:0;')
+                -if(reNum > 0)
+                  -reNum--;
+                  span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                span #{changeTime(docs[i].fromPost.toc)}
+                .media-left.media-top
+                  a(href='/m/#{docs[i].fromPost.uid}')
+                    img.media-object.img-rounded(src='/avatar/#{docs[i].fromPost.uid}',style='height:3em;width:3em;')
+                .media-body
+                  h4.media-heading
+                    a(href='/m/#{docs[i].fromPost.uid}') #{docs[i].fromPost.username}
+                    span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
+                    a(href='/t/#{docs[i].fromPost.tid}##{docs[i].fromPost._key}') #{docs[i].toPost.t||docs[i].toPost.tid}
+                    span(style="font-size:0.8em;") &nbsp;下回复了你：
+                    p(style="font-size:0.8em; word-break:break-all;") #{docs[i].fromPost.c}
+            hr(style='margin:0.5em 0;')
+
+        -if(nowAt === 'at')
+          .col-xs-12.col-md-12
+            -var atNum = data.user.new_message.at;
+            -for(var i = 0 ; i < docs.length; i++)
+              hr(style='margin:0.5em 0;')
+              .media(style='margin:0;')
+                -if(atNum > 0 )
+                  -atNum--;
+                  span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                span #{changeTime(docs[i].post.toc)}
+                .media-left.media-top
+                  a(href='/m/#{docs[i].post.uid}')
+                    img.media-object.img-rounded(src='/avatar/#{docs[i].post.uid}',style='height:3em;width:3em;')
+                .media-body
+                  h4.media-heading
+                    a(href='/m/#{docs[i].post.uid}') #{docs[i].post.username}
+                    span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
+                    a(href='/t/#{docs[i].post.tid}##{docs[i].post._key}') #{docs[i].oc.t||docs[i].oc.tid}
+                    span(style="font-size:0.8em;") &nbsp;下@了你：
+                    p(style="font-size:0.8em; word-break:break-all;") #{docs[i].post.c}
+            hr(style='margin:0.5em 0;')
+
+        -if(nowAt === 'messages')
+          -if(!data.conversation)
+            .col-xs-12.col-md-12(style="margin:0.4em 0 0 0")
+              button.btn.btn-primary(type="button",data-toggle="collapse",data-target="#collapseExample",aria-expanded="false",aria-controls="collapseExample") 发信息
+              .collapse#collapseExample(style='margin-top:0.5em;')
+                .form-group
+                  label 用户名
+                  input.form-control#inputUsername(type="text",placeholder="请输入用户名")
+                .form-group
+                  textarea.form-control#inputContent(rows="3",style="min-height:13em;",placeholder="请输入信息内容")
+                .form-group(style="overflow:hidden;margin-bottom:0;")
+                  button.btn.btn-default#sendMes(onclick='sendMes()',type="submit",style='float:right') 发送
+            .col-xs-12.col-md-12
+              -var allNewMesNum = 0;
+              -for(var i = 0 ; i < docs.length; i++)
+                -var newMesNum = 0;
+                -for(var j = 0; j < docs[i].group.length; j++)
+                  -if(!docs[i].group[j].viewed && docs[i].group[j].r == data.user._key)
+                    -newMesNum++;
+                  -else
+                    -continue;
+                -allNewMesNum += newMesNum;
+                hr(style='margin:0.5em 0;')
+                .media(style='margin:0;')
+                  span #{changeTime(docs[i].group[0].toc)}
+                  .media-left.media-top
+                    a(href='/m/#{docs[i].conversation._key}')
+                      img.media-object.img-rounded(src='/avatar/#{docs[i].conversation._key}',style='height:3em;width:3em;')
+                  .media-body
+                    h4.media-heading
+                      a(href='/sms?&tab=messages&conversation=#{docs[i].conversation._key}') #{docs[i].conversation.username}
+                      -if(newMesNum > 0)
+                        span.reddish (#{newMesNum})
+                      span :
+                      a(style='font-size:0.85em;float:right;',href='/sms?&tab=messages&conversation=#{docs[i].conversation._key}') 查看聊天信息
+                      p(style="font-size:0.8em; word-break:break-all;") #{docs[i].group[0].c}
+              hr(style='margin:0.5em 0;')
+          -else
+            .col-xs-12.col-md-12(style="margin:0.4em 0 0 0")
+              h4
+                span 与
+                a(href="/m/#{data.targetUser._key}") #{data.targetUser.username}
+                span 聊天中
+              .form-group
+                textarea.form-control#inputContent(conversation='#{data.conversation}',rows="3",style="min-height:13em;",placeholder="请输入信息内容")
+              .form-group(style="overflow:hidden;margin-bottom:0;")
+                button.btn.btn-default#sendMes(onclick='sendMes()',type="submit",style='float:right') 发送
+            .col-xs-12.col-md-12
+              -for(var i = 0 ; i < docs.length; i++)
+                hr(style='margin:0.5em 0;')
+                .media(style='margin:0;')
+                  -if(!docs[i].viewed && docs[i].r._key == data.user._key)
+                    span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                  span #{changeTime(docs[i].toc)}
+                  .media-left.media-top
+                    a(href='/m/#{docs[i].s._key}')
+                      img.media-object.img-rounded(src='/avatar/#{docs[i].s._key}',style='height:3em;width:3em;')
+                  .media-body
+                    h4.media-heading
+                      a(href='/m/#{docs[i].s._key}') #{docs[i].s.username} 
+                      span(style="font-size:1em;") :
+                    p(style="font-size:1em;word-break:break-all;") #{docs[i].c}
+              hr(style='margin:0.5em 0;')
+
+        -if(nowAt === 'system')
+          -if(data.paging)
+            .col-xs-12.col-md-12
+              -for(var i = 0 ; i < docs.length; i++)
+                hr(style='margin:0.5em 0;')
+                .media(style='margin:0;')
+                  -if(docs[i].viewed.indexOf(data.user._key) == -1)
+                    span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                  span #{changeTime(docs[i].toc)}
+                  .media-body
+                    h4.media-heading
+                      a(href='/sms?&tab=system&key=#{docs[i]._key}') #{docs[i].c.title}
+              hr(style='margin:0.5em 0;')
+          -else
+            .col-xs-12.col-md-12
+              -var c = docs.c.content
+              -var t = docs.c.title
+              span #{changeTime(docs.toc)}
+              h2 #{t}
+              p(style='line-height: 2em;word-break:break-all;')!= experimental_render({c, l: 'bbcode'})
+
+
+
+        .col-xs-12.col-md-12(style="margin:0.4em 0 0 0")
+          nav(aria-label='navigation')
+            -if(pageCount > 1)
+              ul.pagination(style="margin:0")
+                //- 当前页数若大于4则显示首页按钮
+                //- 若总的分页数小于7则不需要显示首页和尾页按钮
+                -if(page > 4 && pageCount > 7)
+                  li
+                    a(href='/sms?&page=0&tab=#{nowAt}#{conversation}') 首
+                //- n为总共需要显示的分页按钮个数
+                //- i为循环中当前生成的页数
+                -var n = 7;
+                -var min = pageCount - 3;
+                -if(page > min)
+                  -min = pageCount - 6;
+                -else
+                  -min = page - 3;
+                -for(var i = min ; 1 ; i++)
+                  -if(n == 0)
+                    -break;
+                  -if(i <= 0)
+                    -continue;
+                  -if(i > pageCount)
+                    -break;
+                  //- 生成当前所在也输得按钮时，有蓝色背景，不可点击
+                  -if(i == page)
+                    li.active
+                      a(href='###') #{i}
+                  -else
+                    li
+                      a(href='/sms?&page=#{i-1}&tab=#{nowAt}#{conversation}') #{i}
+                  -n--;
+                //- 当前页数若小于 最大分页数-3 则显示尾页按钮
+                -if(page < pageCount - 3 && pageCount > 7)
+                  li
+                    a(href='/sms?&page=#{pageCount-1}&tab=#{nowAt}#{conversation}') 末
+
+
+
+
+
+
+
+
+
+
+                
+        
+  include debug_output.jade
+
+block scripts
+  script(src='/interface_common.js')
+  //-script(src='/interface_messages.js')
+  script.
+    function sendMes(){
+      if(!document.getElementById("inputUsername")){
+        var mesObj = {
+          content: $("#inputContent").val(),
+          conversation: $("#inputContent").attr('conversation')
+        };
+      }else{
+        var mesObj = {
+          username: $("#inputUsername").val(),
+          content: $("#inputContent").val()
+        };
+      }
+      if(mesObj.username == ''){
+        return screenTopWarning('请输入用户名!');
+      }
+      if(mesObj.content == ''){
+        return screenTopWarning('请输入消息内容!');
+      }
+      geid('sendMes').disabled = true;
+      nkcAPI('postNewMessage',mesObj)
+      .then(function(){
+        screenTopWarning('信息发送成功！');
+        $("#inputContent").val('');
+        geid('sendMes').disabled = false;
+      })
+      .catch(function(err){
+        screenTopWarning('信息发送失败！' + JSON.stringify(err));
+        geid('sendMes').disabled = false;
+      });
+    }
+
+
+
+ //-          -var obj = {replies: '回复', at: '@', messages: '短消息', system: '系统'}
+ //-            h4 #{obj[nowAt]}
+ //-            for doc in data.docs = data.docs;
+
+ //- docs.length           if(nowAt === 'replies')
+ //-                div #{doc.fromPost.c}
+ //-              if(nowAt === 'at')
+ //-                div #{doc.user}
+ //-              if(nowAt === 'messages')
+ //-                if(!data.conversation)
+ //-                  div
+ //-                    a(href='/sms?&tab=messages&conversation=#{doc.conversation._key}') #{doc.conversation.username + '说' + doc.group[0].c}
+ //-                else
+ //-                  div #{doc.s} #{doc.c}
+ //-              if(nowAt === 'system')
+ //-                div #{doc.c}
+
+          //nav
+          //  include interface_navigation_paging.jade

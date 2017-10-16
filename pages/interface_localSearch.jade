@@ -1,0 +1,167 @@
+extends bootstrap_base.jade
+
+block title
+  title 搜索结果 - 科创论坛
+  
+block content  
+  
+  -var sr = data.searchresult
+  -if(data.match_one_user[0])
+    -var oneUser = data.match_one_user[0]
+  -if(data.match_users.length > 0)
+    -var Users = data.match_users
+
+
+  .container
+    .row      
+      .col-xs-12
+        .SearchStatistics
+          span 搜索用户的结果：
+        ul(class="nav nav-tabs")
+          li(class="active")
+            a(href="#SearchOneUser" data-toggle="tab") 搜索到的用户
+          li
+            a(href="#SearchUsers" data-toggle="tab") 相似的用户
+        
+        div(class="tab-content")
+          if oneUser
+            div#SearchOneUser(class="tab-pane fade in active" style="margin-top:2%;margin-bottom:5%;")
+              a(href='/m/#{oneUser._key}')
+                img.ForumThreadAvatar2(src='/avatar/#{oneUser._key}')
+              
+              div(style="display:inline-block;vertical-align:top;margin-left:1%;")
+                div
+                  a(href='/m/#{oneUser._key}' style="font-size:34px;") #{oneUser.username}
+                div
+                  if oneUser.description
+                    div!=markdown_safe(oneUser.description)
+                  else
+                    span (暂无简介...)
+              hr
+          else
+            div#SearchOneUser(class="tab-pane fade in active" style="margin-top:2%;margin-bottom:5%;")
+              p 暂无完全匹配的用户...
+        
+          if Users
+            div#SearchUsers(class="tab-pane fade" style="margin-top:2%;margin-bottom:5%;") 
+              each user in Users
+                div#UsersList
+                  a(href='/m/#{user._key}')
+                    img.ForumThreadAvatar3(src='/avatar/#{user._key}')
+                  
+                  div(style="display:inline-block;vertical-align:top;margin-left:1%;")
+                    div
+                      a(href='/m/#{user._key}' style="font-size:22px;") #{user.username}
+                    div
+                      if user.description
+                        div!=markdown_safe(user.description)
+                      else
+                        span (暂无简介...)
+                hr
+              if Users.length == 10
+                button#SearchUsersBtn.btn.btn-success 下一页
+          else
+            div#SearchUsers(class="tab-pane fade" style="margin-top:2%;margin-bottom:5%;") 
+              p 暂无相似的结果...
+              
+          
+            
+        .SearchStatistics
+          span 搜索字符串
+            span #{data.searchstring}
+          span 共耗时
+            span #{sr.took}
+            | 毫秒，
+            
+          span 得到结果
+            span #{sr.hits.total}
+            | 个，
+          
+          span 显示第
+            span #{data.start+1} - #{Math.min(sr.hits.total,data.start+sr.hits.hits.length)}
+            | 个，
+          span 以下是帖子列表：
+          
+        .ForumThreadList
+          each thread,index in data.threads
+            if data.toppedThreads && (data.toppedThreads.map(item=>item._key).indexOf(thread._key)>=0)
+              //exclude threads that are shown in topped area.
+            else
+              include interface_forum_singlethread.jade
+        
+        if 0
+          .SearchResultList
+            each doc,index in sr.hits.hits
+              .SearchResultItem
+                - doc = doc._source
+                
+                a(href='/t/#{doc.tid}') #{doc.t}
+                br
+                span.lighttext #{dateTimeString(doc.toc)}
+                //span 作者: #{doc.username||doc.uid}
+                span.lighttext #{doc.count}个回复
+        br
+        //.form-inline
+        - var next_button_useful = Math.min(sr.hits.total,data.start+sr.hits.hits.length) !== sr.hits.total
+          .form-group(style='#{next_button_useful?"":"display:none"}')
+            button#nextPageResult.btn.btn-success() 下一页
+        
+        .form-inline
+          .form-group
+            input#stringToSearch.form-control(type='text' value='#{data.searchstring}')
+          .form-group
+            button#research.btn.btn-primary() 搜索
+  
+  include debug_output.jade
+  
+  
+block scripts
+  script(src='/interface_common.js')
+  script.
+    (function(){
+      function getss(){
+        var ss = geid('stringToSearch').value.trim()
+        if(ss.length<2){throw 'too short'}
+        else 
+        {return ss}
+      }
+      geid('nextPageResult').addEventListener('click',function(){
+        window.location.href = '/api/operation?operation=viewLocalSearch'
+        +'&start=#{data.start+data.count}&count=#{data.count}&searchstring='+getss()
+      })
+      geid('research').addEventListener('click',function(){
+        nkcAPI('useSearch',{searchstring:getss()})
+        .catch(function(err){
+          console.error(err)
+        })
+        
+        window.location.href = '/api/operation?operation=viewLocalSearch'
+        +'&searchstring='+getss()
+      })
+      geid('SearchBox').value = getss();
+      
+      function onkeypress(){
+        e = event ? event :(window.event ? window.event : null);
+        if(e.keyCode===13||e.which===13){
+          geid('research').click()
+        }
+      }
+      geid('stringToSearch').addEventListener('keypress', onkeypress);
+    })()
+    
+  script.
+    $(document).ready(function(){
+      $("#SearchUsersBtn").click(function(){
+        var ss = $('#stringToSearch').val().trim();
+        window.location.href = '/api/operation?operation=viewLocalSearch'
+          +'&users_start=#{data.users_start+data.users_count}&users_count=#{data.users_count}&searchstring='+ss
+      });
+      
+    })
+  
+  //script.
+    nkcAPI('localSearch')
+    .then(function(a){
+      console.log(a)
+    })
+    

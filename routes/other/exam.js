@@ -5,10 +5,11 @@ examRouter
     ctx.data = '选择考试科目页面';
     next();
   })
-  .get('/:type', async (ctx, next) => {
-    const type = ctx.params.type;
-    let data = await ctx.db.questionModel.find({type: type}).limit(10);
+  .get('/:category', async (ctx, next) => {
+    const category = ctx.params.category;
+    let data = await ctx.db.questionModel.find({category: 'mix'}).limit(10);
     ctx.data = JSON.stringify(data);
+    ctx.template = 'user.pug';
     next();
   })
   .post('/', async (ctx, next) => {

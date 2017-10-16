@@ -1,0 +1,321 @@
+extends bootstrap_base.jade
+
+block title
+  - var user = data.user
+  title #{user.username} - #{data.site.name}
+  meta#replytarget(value='#{data.replytarget}')
+
+block content
+  -var user = data.user;
+  .container
+    .row
+      .col-md-12
+        if data.examinated
+          p.f12.reddish 如果没猜错的话，你刚刚通过了一次考试，并获得了证书。
+        include exam_notification.jade
+    .row
+      .col-xs-12.col-md-12
+        .h3(style='font-weight:300;') 个人基本信息
+        hr
+        .col-xs-12.col-md-6
+          .rom
+            .col-xs-5.col-md-5
+              .col-xs-12.col-md-12
+                img.img-rounded(src='/avatar/#{user._key}',style='width:100%;')
+              #btnDiv(style='display:none;')
+                .col-xs-12.col-md-12
+                  input#select-file(style='height:0;width:0;',type="file",target="avatar",accept="image/*")
+                  button.btn.btn-default.center-block#updateBnt(style='margin:1em auto 0.5em auto;',onclick='updateBnt()') 选择图片
+                .col-xs-6.col-md-6
+                  button.btn.btn-default.center-block(onclick='uploadfile_click();') 保存
+                .col-xs-6.col-md-6
+                  button.btn.btn-default.center-block(onclick='hideBtn()') 取消
+              .col-xs-12.col-md-12
+                  button.btn.btn-default.center-block#btnSwitch(onclick='showBtn()',style='margin:1em auto;') 修改头像
+            .col-xs-7.col-md-7
+              .col-xs-12.col-md-12
+                div.f12!= plain(getUserDescription(user))
+              .col-xs-12.col-md-6
+                a.btn.btn-default.left-block(href='/m/#{user._key}?tab=own',role="button",style='margin:0.5em auto;') 查看个人专栏
+              .col-xs-12.col-md-6
+                a.btn.btn-default.left-block(href="/user_collection/#{user._key}",role="button",style='margin:0.5em auto;') 查看个人收藏
+      .col-xs-12.col-md-12
+        hr
+        .h3(style='font-weight:300;margin-top:2em;') 账号安全设置
+        hr
+        .rom(style='margin:1em 0;')
+          .col-xs-12.col-md-10
+            .col-xs-12.col-md-4
+              .form-group
+                label(for="name")
+                  .h5(style='font-weight:300;') 旧密码
+                input.form-control#oldpassword(type='password', placeholder='旧密码', onclick='select()')
+            .col-xs-12.col-md-4
+              .form-group
+                label(for="name")
+                  .h5(style='font-weight:300;') 新密码，至少6位
+                input.form-control#newpassword(type='password', placeholder='新密码，至少6位', onclick='select()')
+            .col-xs-12.col-md-4
+              .form-group
+                label(for="name")
+                  .h5(style='font-weight:300;') 重复一次
+                input.form-control#newpassword2(type='password', placeholder='重复一次', onclick='select()')
+          .col-xs-12.col-md-2
+            .col-xs-12.col-md-5
+              .form-group
+                .col-xs-12.col-md-12.hidden-label
+                    label(for="name")
+                      .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
+                button.btn.btn-default#submitnewpassword(onclick='submitnewpassword()') 修改密码
+          .col-xs-12.col-md-10
+            .col-xs-12.col-md-3(style="display:none")
+              label(for="name")
+                .h5(style='font-weight:300;') 选择国际区号
+              -var optionArray=[{num:'+86',country:'中国'},{num:'+852',country:'中国香港'},{num:'+853',country:'中国澳门'},{num:'+886',country:'中国台湾'},{num:'+81',country:'日本'},{num:'+82',country:'韩国'},{num:'+65',country:'新加坡'},{num:'+66',country:'泰国'},{num:'+60',country:'马来西亚'},{num:'+1',country:'美国'},{num:'+1',country:'加拿大'},{num:'+61',country:'澳大利亚'},{num:'+44',country:'英国'},{num:'+49',country:'德国'},{num:'+33',country:'法国'},{num:'+7',country:'俄罗斯'},{num:'+91',country:'印度'},{num:'+64',country:'新西兰'},{num:'+39',country:'意大利'},{num:'+31',country:'荷兰'},{num:'+34',country:'西班牙'},{num:'+46',country:'瑞典'},{num:'+43',country:'奥地利'},{num:'+41',country:'瑞士'},{num:'+370',country:'立陶宛'},{num:'+63',country:'菲律宾'},{num:'+62',country:'印度尼西亚'},{num:'+84',country:'越南'},{num:'+971',country:'阿联酋'}];
+              select.form-control(onchange='chooseCountryNum(this.value)')
+                -for(var i = 0; i < optionArray.length; i++)
+                  option #{optionArray[i].num}&nbsp;&nbsp;#{optionArray[i].country}
+            .col-xs-12.col-md-5
+              .form-group
+                label(for="name")
+                  .h5(style='font-weight:300;') 电话号码
+                input.form-control#phoneNumber(type='text', placeholder='电话号码', onclick='select()')
+            .col-xs-12.col-md-2
+              .form-group
+                label(for="name")
+                  .h5(style='font-weight:300;') 短息验证码
+                input.form-control#mCode(type='text', placeholder='短信验证码', onclick='select()')
+            .col-xs-12.col-md-2
+              .form-group
+                .col-xs-12.col-md-12.hidden-label
+                    label(for="name")
+                      .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
+                button.btn.btn-default#submitSendMcode(onclick='submitSendMcode()') 获取验证码
+            .col-xs-12.col-md-2
+              .form-group
+                  .col-xs-12.col-md-12.hidden-label
+                      label(for="name")
+                        .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
+                  button.btn.btn-default.center-block#submitPhoneNumber(onclick='submitPhoneNumber()') 提交
+      .col-xs-12.col-md-12
+        hr
+        .h3(style='font-weight:300;margin-top:2em;') 个人资料修改
+        hr
+        .rom(style='margin:1em 0;')
+          .col-xs-12.col-md-6
+            .col-xs-12.col-md-12
+              .h4(style='font-weight:300;') 帖子签名
+            .col-xs-12.col-md-10
+              textarea#post_sign.form-control(style='resize: none;',placeholder='帖子签名',rows="10") #{user.post_sign||''}
+          .col-xs-12.col-md-6
+            .col-xs-12.col-md-12
+              .h4(style='font-weight:300;') 个人简介
+            .col-xs-12.col-md-10
+              textarea#description.form-control(style='resize: none;',placeholder='个人简介',rows="10") #{user.description||''}
+          .col-xs-12.col-md-6
+            br
+            .col-xs-12.col-md-12
+              .h4(style='font-weight:300;') Colorcode
+                span(style='font-size:0.8em;') （作为页面背景的颜色，有时显示在用户名的左侧成一个小圆圈。）
+            .col-xs-12.col-md-5
+              .form-group
+                input.form-control#color(type='text', placeholder='例如草木绿：#97b45a', name='colorCode', onclick='select()',value='#{user.color||""}')
+          .col-xs-12.col-md-6
+            br
+            .col-xs-12.col-md-12
+              .h4(style='font-weight:300;') 关注板块id
+                span(style='font-size:0.8em;') （原本只能用半角逗号分隔，后来我发现有的同学非要用全角逗号，所以我只好写了兼容代码。）
+            .col-xs-12.col-md-5
+              .form-group
+                input.form-control#focus_forums(type='text', placeholder='例如：81,373', name='colorCode', onclick='select()',value='#{user.focus_forums||""}')
+            .col-xs-12.col-md-5
+              button.btn.btn-default#changeFocusDiv(onclick='changeFocusDiv()') 板块id示例
+                span.caret
+          #focusDiv(style='display:none;')
+            .col-xs-12.col-md-12
+              .col-xs-12.col-md-12
+                .h4(style='font-weight:300;') 板块id示例
+                   span(style='font-size:0.8em;') （点击可自动输入。）
+                -var forumlist = data.forumlist;
+                -for (var i = 0; i < forumlist.length; i++)
+                  .col-xs-12.col-md-12
+                    ul.list-inline(style='padding:0;')
+                      li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].parentforum.display_name}
+                      -for (var j = 0; j < forumlist[i].forumgroup.length; j++)
+                        li(style='list-style:none;padding-left:0.5em;')
+                          a(href='###',onclick='fillFocusId("#{forumlist[i].forumgroup[j]._key}")',style='color:#666;font-size:1em;') #{forumlist[i].forumgroup[j]._key + '：' + forumlist[i].forumgroup[j].display_name}
+          .col-xs-12.col-md-12
+            br
+            br
+            button.btn.btn-default.center-block#submitpersonalsetting(onclick='submitpersonalsetting()') 提交个人资料修改
+            br
+            br
+  include debug_output.jade
+    
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_uploader_one.js')
+  script.
+    var interval_time = 59;
+    var areaCode = '+86';
+    //隐藏图片上传的按钮
+    function hideBtn() {
+      $('#btnDiv').hide();
+      $('#btnSwitch').show();
+    }
+    //显示图片上传的按钮
+    function showBtn() {
+      $('#btnDiv').show();
+      $('#btnSwitch').hide();
+    }
+    function changeFocusDiv() {
+      if($('#focusDiv').css('display') == 'none'){
+        $('#focusDiv').fadeIn();
+        $('#changeFocusDiv').addClass('dropup');
+      }else{
+        $('#focusDiv').fadeOut();
+        $('#changeFocusDiv').removeClass('dropup');
+      }
+    }
+    //选择国际区号
+    function chooseCountryNum(num){
+      areaCode = parseInt(num);
+    }
+    //自动填充板块id
+    function fillFocusId(num) {
+      if($('#focus_forums').val() == ''){
+        $('#focus_forums').val(num);
+      }else{
+        $('#focus_forums').val($('#focus_forums').val() + ',' + num);
+        
+      }
+    }
+    //头像上传
+    function updateBnt(){
+      $('#select-file').click();
+    }
+    //提交密码
+    function submitnewpassword() {
+      var passwordObj = {
+        oldpassword:geid('oldpassword').value,
+        newpassword:geid('newpassword').value,
+        newpassword2:geid('newpassword2').value
+      };
+      if(passwordObj.oldpassword == ''){
+        jwarning('旧密码不能为空！');
+        return;
+      }
+      if(passwordObj.newpassword == '' || passwordObj.newpassword2 == ''){
+        jwarning('新密码不能为空！');
+        return;
+      }
+      if(passwordObj.newpassword != passwordObj.newpassword2){
+        jwarning('两次输入的密码不一致！请重新输入');
+        return;
+      }
+      geid('submitnewpassword').disabled = true;
+      nkcAPI('changePassword',passwordObj)
+      .then(function(){
+        jwarning('密码修改成功！');
+        geid('submitnewpassword').disabled = false;
+      })
+      .catch(function(err){
+        jwarning(err);
+        geid('submitnewpassword').disabled = false;
+      })
+    }
+    //提交个人信息
+    function submitpersonalsetting() {
+      var settingObj = {
+        post_sign:geid('post_sign').value,
+        description:geid('description').value,
+        color:geid('color').value,
+        focus_forums:geid('focus_forums').value,
+      };
+      geid('submitpersonalsetting').disabled = true;
+      nkcAPI('submitPersonalSetting',settingObj)
+      .then(function(){
+        jwarning('个人资料修改成功！');
+        geid('submitpersonalsetting').disabled = false;
+      })
+      .catch(function(err){
+        jwarning(err);
+        geid('submitpersonalsetting').disabled = false;
+      })
+    }
+    //提交手机号码和验证码
+    function submitPhoneNumber() {
+      var mobileObj={
+        phone:geid('phoneNumber').value,
+        code:geid('mCode').value,
+        areaCode:areaCode
+      };
+      if(mobileObj.phone == ''){
+        jwarning('手机号码不能为空！');
+        return;
+      }
+      if(!(/(^[1-9]\d*$)/.test(mobileObj.phone))){
+        jwarning('手机号码格式不正确！');
+        return;
+      }
+      if(mobileObj.code == ''){
+        jwarning('手机短信验证码不能为空！');
+        return;
+      }
+      geid('submitPhoneNumber').disabled = true;
+      nkcAPI('bindMobile',mobileObj)
+      .then(function(){
+        geid('submitPhoneNumber').disabled = false;
+        geid('submitSendMcode').disabled = false;
+        clearTimeout(stopTime);
+        geid('submitSendMcode').innerHTML = '获取验证码';
+        jwarning('手机号码绑定成功！');
+      })
+      .catch(function(err){
+        jwarning(err);
+        geid('submitPhoneNumber').disabled = false;
+      })
+    }
+    //发送验证码
+    function submitSendMcode() {
+      var codeObj = {
+        phone:geid('phoneNumber').value,
+        areaCode:areaCode
+      };
+      if(codeObj.phone == ''){
+        jwarning('手机号码不能为空！');
+        return;
+      }
+      if(!(/(^[1-9]\d*$)/.test(codeObj.phone))){
+        jwarning('手机号码格式不正确！');
+        return;
+      }
+      geid('submitSendMcode').disabled = true;
+      nkcAPI('getMcode3',codeObj)
+      .then(function(){
+        jwarning('手机短信验证码发送成功！');
+        setTimeout(timeOut_60,1000);
+      })
+      .catch(function(err){
+        jwarning(err);
+        geid('submitSendMcode').disabled = false;
+      })
+    }
+    //定时60
+    function timeOut_60() {
+      interval_time--;
+      if(interval_time > 0) {
+        geid('submitSendMcode').innerHTML = '重新发送 ' + interval_time;
+        stopTime = setTimeout(timeOut_60,1000);
+        return;
+      }
+      geid('submitSendMcode').innerHTML = '获取验证码';
+      interval_time = 59;
+      geid('submitSendMcode').disabled = false;
+    }
+  script.
+    function upload_success(){
+      location.reload();
+    }
+      
+      

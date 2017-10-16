@@ -1,0 +1,38 @@
+extends scratch.jade
+
+block head
+  include styles.jade
+  title #{server.name}
+block body
+  div
+    div.intpad
+      div.intpad
+        h1 #{server.name}
+        p Your IP is #{data.address}. #[a.grey(href='#{server.github}') #{server.github}]
+        if data.user
+          :markdown
+            You are logged in as **#{data.user.username}** on **#{dateString(data.userinfo.lastlogin)}**. Your UID is **#{data.user._key}**.
+            
+            The time is now **#{dateString()}** on server.
+            
+        else
+          :markdown
+            You are not logged in.
+  div
+    div.halfpane.intpad
+      div.intpad.zipline
+        //include as markdown
+        include:markdown ../../README.md
+      br
+      if 1
+        div.intpad.zipline
+          h1 Schema.js
+          pre
+            code
+              include:plain ../../doc/Schema.js
+
+    div.halfpane.intpad
+      div.intpad.zipline
+        h1 Server Status
+        pre
+          code #{data.osinfo}

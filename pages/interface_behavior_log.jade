@@ -1,0 +1,210 @@
+extends bootstrap_base.jade
+
+
+block title
+  link(href='/interface_experimental.css' rel='stylesheet')
+  title 积分变动查询
+
+block content
+  -function changeTime(value)
+    -var add_0 = function(value)
+      if(value <= 9)
+        -return '0' + value;
+      else
+        -return value;
+    -var time = new Date(parseInt(value));
+    -var out = time.getFullYear() + '-' + add_0(time.getMonth()+1) + '-' + add_0(time.getDate()) + ' ' + add_0(time.getHours()) + ':' + add_0(time.getMinutes()) + ':' + add_0(time.getSeconds());
+    -return out;
+  -var fromAndTo = '';
+  -var input_from = '';
+  -var input_to = '';
+  if(data.from != '' && data.from)
+    -fromAndTo = fromAndTo + '&from='+ data.from;
+    -input_from = data.from;
+  if(data.to != '' && data.to)
+    -fromAndTo = fromAndTo + '&to=' + data.to;
+    -input_to = data.to;
+  -var sort = '';
+  if(data.sort == 'asc')
+    -sort = '&sort=asc';
+  -var ip = '';
+  -var input_ip = '';
+  if(data.ip && data.ip != '')
+    -ip = '&ip=' + data.ip;
+    -input_ip = data.ip;
+  .container
+    .row
+      .col-xs-12.col-md-12
+        h4 这是积分变动查询界面
+    br
+    br
+    .rom
+      .col-xs-12.col-md-12
+        .col-xs-12.col-md-10
+          input(type='hidden', value='1', name='page')
+          input(type='hidden', value='desc', name='sort')
+          input(type='hidden', value='all', name='type')
+          .row
+            .col-xs-12.col-md-4
+              .form-group
+                input.form-control(type='text', placeholder='from', name='from', onclick='select()', value='#{input_from}')
+            .col-xs-12.col-md-4
+              .form-group
+                input.form-control(type='text', placeholder='to', name='to', onclick='select()', value='#{input_to}')
+            .col-xs-12.col-md-4
+              .form-group
+                input.form-control(type='text', placeholder='ip', name='ip', onclick='select()', value='#{input_ip}')
+        .col-xs-12.col-md-1
+          button.btn.btn-default#submit 查询
+        .col-xs-12.col-md-1
+          a(href='/behaviors?&page=1&type=all')
+            button.btn.btn-default 重置所有
+      .col-xs-12.col-md-3
+        nav(aria-label= 'navigation')
+          ul.pagination
+            -var all_class = '', management_class = '', normal_class = '';
+            case data.type
+              when 'all'
+                -all_class = 'active';
+              when 'management'
+                -management_class = 'active';
+              default
+                -normal_class = 'active';
+            li(class='#{all_class}')
+              a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=all') 全部
+            li(class='#{management_class}')
+              a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=management') 管理
+            li(class='#{normal_class}')
+              a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=normal') 常规
+      .col-xs-12.col-md-2
+        nav(aria-label='navigation')
+          ul.pagination
+            -if(data.sort == 'desc' || !data.sort)
+              li.active
+                a(href='javascript:vold(0)') 正序
+              li
+                a(href='/behaviors?&page=1#{fromAndTo}#{ip}&sort=asc&type=#{data.type}') 倒序
+            -else
+              li
+                a(href='/behaviors?&page=1#{fromAndTo}#{ip}&sort=desc&type=#{data.type}') 正序
+              li.active
+                a(href='javascript:vold(0)') 倒序
+    .rom
+      .col-xs-12.col-md-12
+        nav(aria-label='navigation')
+          -if(data.page.pagecount > 1)
+            ul.pagination
+              //- 当前页数若大于4则显示首页按钮
+              //- 若总的分页数小于7则不需要显示首页和尾页按钮
+              -if(data.page.page > 4 && data.page.pagecount > 7)
+                li
+                  a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=#{data.type}') 首
+              //- n为总共需要显示的分页按钮个数
+              //- i为循环中当前生成的页数
+              -var n = 7;
+              -var min = data.page.pagecount - 3;
+              -if(data.page.page > min)
+                -min = data.page.pagecount - 6;
+              -else
+                -min = data.page.page - 3;
+              -for(var i = min ; 1 ; i++)
+                -if(n == 0)
+                  -break;
+                -if(i <= 0)
+                  -continue;
+                -if(i > data.page.pagecount)
+                  -break;
+                //- 生成当前所在分页按钮时，有蓝色背景，不可点击
+                -if(i == data.page.page)
+                  li.active
+                    a(href='javscript:void(0)') #{i}
+                -else
+                  li
+                    a(href='/behaviors?&page=#{i}#{fromAndTo}#{sort}#{ip}&type=#{data.type}') #{i}
+                -n--;
+              //- 当前页数若小于 最大分页数-3 则显示尾页按钮
+              -if(data.page.page < data.page.pagecount - 3 && data.page.pagecount > 7)
+                li
+                  a(href='/behaviors?&page=#{data.page.pagecount}#{fromAndTo}#{sort}#{ip}&type=#{data.type}') 末
+    .rom
+      .col-xs-12.col-md-12
+        table.table.table-bordered
+          thead
+            tr
+              th #
+              th 时间
+              th (id)操作者
+              th (id)被操作者
+              th ip
+              th 操作
+              th 详情
+          tbody
+          -var operationArr = [{en: 'postToPost', ch: '编辑帖子'},{en: 'changeXSF', ch: '学术分'},{en: 'subscribeUser', ch: '关注'},{en: 'unsubscribeUser', ch: '取消关注'},{en: 'postToThread', ch: '回帖'},{en: 'postToForum', ch: '发帖'},{en: 'disablePost', ch: '屏蔽'},{en: 'enablePost', ch: '撤销屏蔽'},{en: 'moveToRecycle', ch: '移至回收站'},{en: 'recommendPost', ch: '推荐'},{en: 'unrecommendPost', ch: '取消推荐'},{en: 'setDigest', ch: '加精'},{en: 'cancelDigest', ch: '撤销精华'},{en: 'setTopped', ch: '置顶'},{en: 'cancelTopped', ch: '撤销置顶'}, {en: 'dailyLogin', ch: '日常登陆'}];
+          -for(var i = 0 ; i < data.behaviorLogs.length ; i++)
+            -var operationCH = '竟然还有这种操作?';
+            -for (var j = 0; j < operationArr.length; j++)
+              -if(operationArr[j].en == data.behaviorLogs[i].operation)
+                -operationCH = operationArr[j].ch;
+                -if(operationArr[j].en == 'changeXSF')
+                  -var number = data.behaviorLogs[i].number || '';
+                  -operationCH = operationCH + ' ' + number;
+                -break;
+            //- 判断是否为管理员，表格背景颜色区分
+            -if(data.behaviorLogs[i].isManageOp)
+              -var color = '#aaa';
+            -else
+              -var color = '';
+            tr(style='background-color:#{color}')
+              th(scope='row') #{i + 1}
+              td #{changeTime(data.behaviorLogs[i].timeStamp)}
+              td
+                a(href='/m/#{data.behaviorLogs[i].from._key}') (#{data.behaviorLogs[i].from._key}) #{data.behaviorLogs[i].from.username}
+              td
+                a(href='/m/#{data.behaviorLogs[i].to._key}') (#{data.behaviorLogs[i].to._key}) #{data.behaviorLogs[i].to.username}
+              td #{data.behaviorLogs[i].address}:#{data.behaviorLogs[i].port}
+              td #{operationCH}
+              td
+                -var parameters = data.behaviorLogs[i].parameters || '';
+                -if(parameters != '')
+                  -var pid = data.behaviorLogs[i].parameters.pid || '';
+                  a(href='#{data.behaviorLogs[i].parameters.targetKey + "#" + pid}') 查看详情
+    .rom
+      .col-xs-12.col-md-12
+        nav(aria-label='navigation')
+          -if(data.page.pagecount > 1)
+            ul.pagination
+              //- 当前页数若大于4则显示首页按钮
+              //- 若总的分页数小于7则不需要显示首页和尾页按钮
+              -if(data.page.page > 4 && data.page.pagecount > 7)
+                li
+                  a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=#{data.type}') 首
+              //- n为总共需要显示的分页按钮个数
+              //- i为循环中当前生成的页数
+              -var n = 7;
+              -var min = data.page.pagecount - 3;
+              -if(data.page.page > min)
+                -min = data.page.pagecount - 6;
+              -else
+                -min = data.page.page - 3;
+              -for(var i = min ; 1 ; i++)
+                -if(n == 0)
+                  -break;
+                -if(i <= 0)
+                  -continue;
+                -if(i > data.page.pagecount)
+                  -break;
+                //- 生成当前所在也输得按钮时，有蓝色背景，不可点击
+                -if(i == data.page.page)
+                  li.active
+                    a(href='javscript:void(0)') #{i}
+                -else
+                  li
+                    a(href='/behaviors?&page=#{i}#{fromAndTo}#{sort}#{ip}&type=#{data.type}') #{i}
+                -n--;
+              //- 当前页数若小于 最大分页数-3 则显示尾页按钮
+              -if(data.page.page < data.page.pagecount - 3 && data.page.pagecount > 7)
+                li
+                  a(href='/behaviors?&page=#{data.page.pagecount}#{fromAndTo}#{sort}#{ip}&type=#{data.type}') 末
+  script(src='/jquery/jquery-1.11.1.js')
+  script(src='/interface_behavior_log.js')
+  include debug_output.jade

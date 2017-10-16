@@ -1,0 +1,27 @@
+extends bootstrap_base.jade
+
+block title
+  title #{data.post.t} - 科创论坛
+  
+block content
+  
+  .container
+    .row
+      .col-xs-12
+        -var post = data.post
+        .panel.panel-default
+          .panel-heading
+            .f16 #{post.t}
+                
+            .lighttext by #{post.user.username} 
+              if data.contentClasses.classified
+                a(href='/t/#{post.tid}##{post._key}') 原文
+          .panel-body
+            div.ThreadPostBody!= experimental_render(post)
+      
+    
+  
+  include debug_output.jade
+block scripts
+  
+  script(src='/interface_common.js')

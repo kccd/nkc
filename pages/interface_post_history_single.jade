@@ -1,0 +1,17 @@
+-var p = p
+.panel.panel-default
+  .panel-body
+    p.reddish #{dateTimeString(p.tlm)} 
+    p 作者(修改者)：
+      -var uid = p.uidlm||p.uid
+      a(href='/m/#{uid}') #{uid}
+    
+    p 语言：#{p.l}
+    
+    hr.hrNarrowSpace
+      
+    if formerPost
+      div!=htmlDiff(formerPost.c,p.c)
+    else
+      div!=plain(p.c)
+  

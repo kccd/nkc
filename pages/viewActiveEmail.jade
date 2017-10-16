@@ -1,0 +1,19 @@
+extends bootstrap_base.jade
+
+block title
+  title 激活
+
+block content
+  if data.user && data.user.username
+    script.
+      location.href='/'
+  
+  else
+    .container
+      .row
+        .col-sm-12
+          if data.activeInfo1
+            h3 #{data.activeInfo1} 
+          if data.activeInfo2
+            h3 #{data.activeInfo2} 
+    

@@ -1,0 +1,25 @@
+extends bootstrap_base.jade
+
+block title
+  title 编辑器 - 科创论坛
+block content
+  .container-fluid(style='max-width:1400px;')
+    .row
+      if !data.user
+        .col-sm-12.col-md-9.col-lg-9
+          .row
+            .col-xs-12.f12
+              h1 尚未登录
+              span 请先
+              a(href='/login') 登陆
+      else
+        #editor
+        script(type='text')#data #{JSON.stringify({target: data.replytarget, post: data.original_post, threadTypeList: data.threadtypes})}
+
+block scripts
+  script(type='text/javascript') document.getElementById('body').style.backgroundColor = 'rgb(228, 228, 228)'
+  script(src='/interface_common.js')
+  script(src='/nkcEditor.js')
+//Created by lz on 2017/7/5.
+
+

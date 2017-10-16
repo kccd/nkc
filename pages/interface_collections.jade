@@ -1,0 +1,88 @@
+extends bootstrap_base.jade
+
+block title
+  title #{data.category} - #{data.thisuser.username}的收藏 - 科创论坛
+  
+block content
+  -var ownership = data.thisuser._key == (data.user?data.user._key:null)
+  if (data.user == undefined)
+    h2(style="margin-left:8%;") 请先登录后查看，谢谢~
+  else
+    .container
+      .row
+        .col-xs-12
+          .nkcpanel
+            -var uid = data.thisuser._key
+            include interface_profile_avatar.jade
+            .ForumName #{data.category} - #{data.thisuser.username} 的个人收藏
+        
+        if ownership
+          .col-xs-12
+
+            .form-inline(style='margin-bottom:12px')
+          
+              .form-group
+                .input-group
+                  input#category.form-control(type='text' placeholder='输入分类名称' value='')
+                  span.input-group-btn
+                    button#movebtn.btn.btn-default(onclick='movebtn()') 移动
+            
+              if data.categoryNames.length
+                .form-group
+                  .btn-group
+                    button.btn.btn-default.dropdown-toggle(data-toggle='dropdown' type='button') 移动到
+                      span.caret
+                    ul.dropdown-menu
+                      each cat in data.categoryNames
+                        if cat
+                          li
+                            a(href="javascript:moveTo('#{cat||'null'}')") #{cat||'null'}
+
+                  button#deletebutton.btn.btn-danger(onclick='deletebtn()') 删除
+                  button.btn.btn-default(onclick='selectbtn()') 全选/不选
+                  //hr.hrNarrowSpace
+        else
+          
+            
+        -if(!data.categoryNames.length){data.categoryNames=[null]}
+
+        .col-xs-12
+          ul.nav.nav-tabs
+            each cat in data.categoryNames
+              li(role='presentation' class="#{(cat==data.category)?'active':''}")
+                a(href='#{cat?"?category="+cat:"?nocategory"}') #{cat||'null'}
+          
+          br
+          
+          .CollectionCategoryThreads
+            each item in data.categoryThreads
+              
+              .CollectionCategoryThreadItem
+                -var thread = item.thread
+                if thread
+                  -var showTicks = ownership
+                  include interface_forum_singlethread.jade
+
+        .col-xs-12
+          
+          :markdown
+            ### 收藏使用说明
+            
+            1. 浏览帖子的时候 标题处有“收藏”按钮，点击可将帖子加入收藏夹。可以重复加入多次。
+            2. 在收藏夹中，可以通过帖子右侧的选框选中帖子。
+            3. 在“输入分类名称”中填写新的分类名称，然后点“移动”便可将选中的帖子移动到新的分类。
+            4. 也可以点“移动到”下拉菜单，选择已有的分类。
+            5. “删除”按钮会将选中的收藏项删除。
+            
+            ### 收藏夹的意义
+            
+            1. 整理论坛资料，方便个人日后取用。
+            2. 整理一整个系列的作品/著述，方便他人直接浏览。
+        
+    include debug_output.jade
+    
+    
+block scripts
+  
+  script(src='/interface_common.js')
+  script(src='/interface_collections.js')

@@ -1,0 +1,85 @@
+extends bootstrap_base.jade
+
+block title
+  title 注册
+
+block content
+  .container
+    .row
+      .col-sm-12
+        if data.user && data.user.username
+          script.
+            location.href='/'
+            
+        else
+          h1 注册
+          p 欲于科创论坛交流，请先用邮箱注册一个账号。
+          p 注册之前，请务必通读  
+            a(href='/t/66350') 禁止事项
+            |  以及下方的注册协议。
+          br
+          img(src='/resources/site_specific/kclogo_umaru1_nc.png')
+
+          
+          hr
+          .form-horizontal.f12
+            .form-group
+              label.control-label.col-sm-3
+                span 注册码(可通过
+                a(href='/register?getcode=true') 考试
+                span 获得)
+              .col-sm-4
+                input#regCode.form-control(type='text' placeholder='请输入注册码' value='#{data.regCode || ""}')
+
+            .form-group
+              label.control-label.col-sm-3 用户名
+              .col-sm-4
+                input#username.form-control(type='text' placeholder='字母、数字、汉字，不区分大小写')
+
+            .form-group
+              label.control-label.col-sm-3 邮箱
+              .col-sm-4
+                input#email.form-control(type='email' placeholder='john@example.com')
+                
+            .form-group
+              label.control-label.col-sm-3 密码
+              .col-sm-4
+                input#password.form-control(type='password' placeholder='至少8位')
+              
+            .form-group
+              label.control-label.col-sm-3 再次输入密码
+              .col-sm-4
+                input#password2.form-control(type='password' placeholder='重复一次')
+                  
+            //.form-group
+            //  label.control-label.col-sm-3 图片验证码
+            //  .col-sm-2
+            //    input#icode.form-control(type='text' placeholder='验证码不分大小写')
+            //  .col-sm-3
+            //    img#icodeImg(src="/static/captcha/captcha.svg" style="width:120px;height:40px;"
+            //    type="image/svg+xml" title="点击图片可刷新")
+                
+                      
+            .form-group
+              .col-sm-offset-3.col-sm-10
+                //offset 2 grids
+                button.btn.btn-primary(onclick='register_submit()') 提交
+              .col-sm-offset-3.col-sm-10(style="margin-top:1%;")
+                a(href="/register#{data.regCode? '?code=' + data.regCode : ''}").lighttext 遇到问题？
+                
+            .form-group
+              .col-sm-offset-3.col-sm-6
+                #error_info_panel.panel.panel-default(style='display:none;')
+                  .panel-body
+                    div#error_info.d-inline.lighttext() 
+
+          hr
+          
+          div.f12(style='line-height: 1.8;')
+            include:markdown EULA.md
+            
+  include debug_output.jade
+    
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_register2.js')

@@ -1,0 +1,80 @@
+extends scratch.jade
+
+block head
+  script.
+    var $buoop = {vs:{i:8,f:25,o:15,s:7,c:29},reminder:0,
+    text_zh:'您的浏览器(%s)可能太老或者不兼容，所以不太适合浏览科创，建议您更换或者升级。<a%s>您可以考虑使用 Google Chrome</a>。',
+    url:'http://www.google.cn/chrome/browser/desktop/index.html'}; 
+    function $buo_f(){ 
+    var e = document.createElement("script"); 
+    e.src = "/external_pkgs/browserupdate/update.min.js"; 
+    document.body.appendChild(e);
+    };
+    try {document.addEventListener("DOMContentLoaded", $buo_f,false)}
+    catch(e){window.attachEvent("onload", $buo_f)}
+  
+  script.
+    (function() {
+    var method;
+    var methods = [
+        'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
+        'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log',
+        'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd',
+        'timeline', 'timelineEnd', 'timeStamp', 'trace', 'warn'
+    ];
+    var length = methods.length;
+    var console = (window.console = window.console || {});
+    while (length--) {
+        method = methods[length];
+        // Only stub undefined methods.
+        if (!console[method]) {
+            console[method] = function () {};
+        }
+    }
+    }());
+
+  meta(charset='utf-8')
+  meta(http-equiv="X-UA-Compatible" content="IE=edge")
+  //meta(http-equiv="Content-Security-Policy" content="upgrade-insecure-requests")  
+  meta(name="viewport" content="width=device-width, initial-scale=1")
+  
+  link(href="/bootstrap/css/bootstrap.css" rel='stylesheet' type='text/css')
+  link(rel='stylesheet' href='/Draft.css')
+  link(rel='stylesheet' href='/katex.min.css')
+  link(href='/nkc_styles.css' rel='stylesheet' type='text/css')
+
+  link(rel='shortcut icon' href='/favicon.ico')
+  
+  meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+
+  block title
+    title bootstrap_base
+  
+block body
+  
+  block navbar
+    include nkc_navbar.jade
+
+  block content
+    h1 hello world!
+  
+  block footer
+    include nkc_footer.jade
+    
+  script(src='/jquery/jquery-1.11.1.js')
+  script(src='/bootstrap/js/bootstrap.min.js')
+  script(src='/twemoji/2/twemoji.min.js')
+  script(src='/promise/promise.min.js')
+  
+  block scripts 
+  
+  :thru
+    <link rel="stylesheet" href="/external_pkgs/highlight/styles/tomorrow.css">
+    <script src="/external_pkgs/highlight/highlight.pack.js"></script>
+  script.
+    if(window.HighlightEverything){window.HighlightEverything()}
+  
+  script.
+    console.log('(c)2016 成都科创科学文化研究院/广东爱理论科技有限公司')
+    console.log('Project Repository: https://github.com/lovetheory/nkc2')
+    

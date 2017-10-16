@@ -1,0 +1,165 @@
+extends bootstrap_base.jade
+
+block title
+  title 编辑器 - 科创论坛
+  
+  include MathJax.jade
+  
+block content
+  
+  -var mainContainer1400 = true
+  #forumID(style='display: none;') #{data.forumID}
+  #ife.container-fluid(style='max-width:1400px')
+    if !data.user
+      .row
+        .col-xs-12.f12
+          h1 尚未登录
+          :markdown
+            请先[登录](/login)。
+    else
+      .row
+        .col-md-12
+          include exam_notification.jade
+          
+      .row
+        .col-xs-12.col-sm-7.col-md-6
+          h4 编辑内容
+          .form-group
+            input#title.form-control(type='text' placeholder='标题' value="#{data.original_post?data.original_post.t||'':''}")
+
+          //.form-group#btnGroup
+            a.btn.btn-default(href='javascript:;') 黑体
+            a.btn.btn-default(href='javascript:;') 链接
+            a.btn.btn-default(href='javascript:;') 公式
+            a.btn.btn-default(href='javascript:;') 颜色
+
+
+          .form-group
+            textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;') #{data.original_post?data.original_post.c:''}
+          
+          .form-group
+            if data.threadtypes
+                if data.threadtypes.length > 0
+                  .div1(style="display:table;")
+                    .div2(style="display:table-cell;")
+                      label 请选择帖子的分类：
+                    .div3(style="display:table-cell;")
+                      select#cat.form-control 
+                        each t in data.threadtypes
+                          option(value='#{t._key}') #{t.name}
+                else
+                  input(type='hidden')#cat
+            else
+              input(type='hidden')#cat
+          
+          .form-inline(style='margin-bottom:5px;')
+            .form-group 发表在
+            .form-group
+              if(data.replytarget != "")
+                input#target.form-control(placeholder='分区ID' value='#{(data.replytarget ? data.replytarget : "")}' disabled)
+              else
+                input#target.form-control(placeholder='分区ID' value='#{(data.replytarget?data.replytarget:"")}')
+            .form-group 发表
+            .form-group
+              select#lang.form-control
+                if data.original_post&&data.original_post.l
+                  option #{data.original_post.l}
+                
+                option bbcode
+                option markdown
+                option plain
+                option html
+
+            .checkbox-inline
+              label
+                input#ParseURL(type='checkbox' checked)
+                |处理URL
+
+            include twemoji
+
+            .form-group
+              button#post.btn.btn-primary(type='submit' style='') 发表
+          
+          .nkcpanel(id='file-uploading' target='resources/')
+            //uploader section
+            include interface_attachment_uploader_uploader.jade
+              
+          .panel.panel-default
+            .panel-heading 我的附件（点击插入帖子）
+            .panel-body(id='list-container')
+                  
+        .col-xs-12.col-sm-5.col-md-6
+          h4 预览
+          .nkcpanel#fullwidthpanel(style="max-height: 800px;overflow-y: scroll;resize:vertical;")
+            div
+              h4#parsedtitle
+            div#parsedcontent
+          
+          .form-group
+            button#mathfresh.btn.btn-sm.btn-default(onclick='mathfresh()') 渲染代码/数学公式
+            button.btn.btn-default.btn-sm(onclick='fitscreen()') 适配屏幕
+          
+          .form-group.hidden-xs
+            .ThreadPostBody.lighttext
+              :markdown
+                插入flash视频播放：
+                1. 从视频网站复制“flash地址”
+                2. 确保语言为bbcode(pwbb)，然后 [flash]flash地址[/flash]
+                
+                Markdown语法小课堂：
+                  1. \*\***强调（加粗）**\*\*
+                  2. \**特别（斜体）*\*
+                  3. ### \#\#\# 标题(记得中间有空格)
+                  4. > \> 引用(接着下面要换两行)
+                  5. [\[科创论坛\]](//bbs.kechuang.org)(//bbs.kechuang.org)  （站外链接即便不加http://也要加双斜线哟！！！）
+                  
+                  ```c
+                    // 6. 
+                    
+                    `int i = 0; //用backtick包含一行代码`
+                  ```
+                  
+                  ```c
+                    // 7. 
+                    
+                    ```c
+                    int i = 0; //用三个backtick包含一段代码
+                    ```
+                  ```
+                  
+                如果想用bbcode：
+                  1. 选择语言为pwbb
+                  2. <font color=green>[color=green]这样指定颜色[/color]</font>
+                  3. [cf]K2SO4&Al2(SO4)3&24H2O中的Al^3+会发生水解。离子方程式如下：
+                      Al^3++3H2O<=>Al(OH)3+3OH^- 这是一种输入化学式的简便方法。[/cf]
+                
+                TeX：在Markdown语法下，请用`\\(`和`\\)`包含inline公式，用`$$`和`$$`包含display公式。
+                
+                在bbcode语法下，请用单反斜杠，即`\(`和`\)` 及 `$$`。
+      
+  
+  include debug_output.jade
+block scripts
+
+  script(src='/commonmark/commonmark.js')
+  script(src='/plain_escaper.js')
+  script(src='/xbbcode/xbbcode.js')
+  script(src='/xss/xss.js')
+  
+  script(src='/react.min.js')
+  script(src='/JSXTransformer.js')
+  
+  script(src='/interface_common.js')
+  script(src='/nkc_render.js')
+  script(src='/interface_editor.js')
+  
+  script(src='/interface_attachment_uploader.js')
+  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display.js')
+  
+  if data.replytarget.indexOf('f/')>=0
+    script.
+      geid('title').focus();
+  else
+    script.
+      geid('content').focus();
+  

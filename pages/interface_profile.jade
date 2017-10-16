@@ -1,0 +1,36 @@
+extends bootstrap_base.jade
+
+block title
+  title #{data.thatuser.username} - 科创论坛
+  
+block content
+  
+  -var thatuser = data.thatuser
+  -var thatuid = thatuser._key
+  -var isViewingSelf = data.user && data.user._key===thatuser._key //lazy evaluation
+  
+  .container
+    if (data.user == undefined)
+      .row
+        .col-sm-12
+          span 个人信息暂时不对游客公开,请先
+          a.alert-info(href="/login") 登录
+          span 或
+          a.alert-info(href="/register") 注册
+          span 以继续浏览
+    else
+      if isViewingSelf
+        include interface_profile_recent.jade
+        hr
+        include interface_profile_info.jade
+      else
+        include interface_profile_info.jade
+        hr
+        include interface_profile_recent.jade
+    
+      include debug_output.jade
+    
+  
+  
+block scripts
+  script(src='/interface_common.js')

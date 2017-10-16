@@ -1,0 +1,298 @@
+extends bootstrap_base.jade
+
+block title
+  title #{data.forum.display_name} - #{data.site.name}
+  
+  -var forum  = data.forum
+
+  if forum.description
+    -var processed=forum.description.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  else
+    -var processed = forum.display_name
+    
+  meta(name='description' content='#{processed}')
+  
+  meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  meta(property='og:title' content='#{forum.display_name}')
+  meta(property='og:site_name' content='科创论坛')
+  meta(property='og:description' content='#{processed}')
+  
+  if data.threads.length>0
+    meta(property='article:modified_time' content='#{(new Date(data.threads[0].toc)).toISOString()}')
+  
+  style.
+    .marginless {
+      margin-top:7px;
+      margin-bottom:7px;
+      margin-right:15px;
+    }
+
+block content   
+  -var isModerator = data.permittedOperations.moveThread
+  -var forumIsParent = data.forum.type&&data.forum.type=='category'
+  -var hasChildren = data.forum.type&&data.forum.type=='category'&&data.forums&&data.forums.length
+  
+  if (data.user == undefined && data.forum.type == undefined)
+    h2(style="margin-left:8%;") 请先登录后查看，谢谢~
+  else
+    .container-fluid(style='max-width:1400px;')
+      .row
+
+        .col-md-9
+        
+          //split 10/12 for post area
+          .panel
+            if !forumIsParent
+              //if forum is not category
+              .row
+                .col-xs-12
+                  //img(src='http://bbs.kechuang.org/themes/site/dingzhi/images/logo.png')
+                  if(data.forum._key)
+                    .ForumNavigation1(style='margin-bottom:5px;')
+                      each group,index in data.forumlist
+
+                        -var gpf = group.parentforum
+                        if gpf._key == data.forum.parentid
+                        
+                          -var gpf = group.parentforum
+                          -var name = gpf.display_name
+                          -gpf.color = gpf.color||'#aaa'
+                          -var url = '/f/'+gpf._key
+                          
+                          -var stylestr = 'color:'+gpf.color
+                          
+                          a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
+
+                          each f,findex in group.forumgroup
+                            -var backcolor=f.color||gpf.color
+                            -var name = f.display_name
+                            -var url = '/f/'+f._key
+                            
+                            -var active = f._key==data.forum._key
+                            -var stylestr = active?'background-color:'+backcolor:''
+                            a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
+                      
+                  
+                  -var forum = data.forum
+                  .ForumTitleCircle(style='background-color:#{forum.color}')
+                  .ForumName #{forum.display_name}
+
+                  if data.forum.description
+                    div!=markdown_safe(data.forum.description)
+                
+                
+                  div
+                    span(style='margin-right:20px;') 今日: #{data.forum.count_posts_today||0} 主题: #{data.forum.count_threads||0} 回复: #{data.forum.count_posts||0}
+          
+                    if data.moderators && data.moderators.length
+                      span 版主：
+                        - var moderators = data.moderators
+                        each k in moderators
+                          a.d-inline.margin-right(href='/m/#{k._key}') #{k.username}
+                        
+                  if data.forumthreadtypes && data.forumthreadtypes.length
+                    .ForumNavigation1
+                      hr.hrNarrowSpace
+                      span 分类: 
+                      a(href='/f/#{data.forum._key}' class='#{data.cat?"":"active"}') 所有帖子
+                      each ftt in data.forumthreadtypes
+                        -var active = ftt._key==data.cat
+                        a(href='/f/#{data.forum._key}?cat=#{ftt._key}' class='#{active?"active":""}' ) #{ftt.name}
+                      hr.hrNarrowSpace
+                  else
+                    .ForumNavigation1
+                      hr.hrNarrowSpace
+                      span 分类: (暂无分类)
+                      hr.hrNarrowSpace
+                      
+            if forumIsParent
+              //if forum is category
+              .ForumNavigation1(style='margin-bottom:5px;')
+                a(href='/latest?&content=forum' style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部
+                span(style='font-size: 18px; color: grey;') /&nbsp;
+                each group,index in data.forumlist
+                  -var gpf = group.parentforum
+                  -var name = gpf.display_name
+                  -var url = '/f/'+gpf._key
+                  
+                  -var color = gpf.color||'#aaa'
+                  -var active = gpf._key==data.forum._key
+                  
+                  -var stylestr = active?'background-color:'+color:''
+                  a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
+              .ForumNavigation2.row
+                //增加大板介绍
+                .col-xs-12
+                  hr.hrNarrowSpace
+                  -var f = data.forum
+                  -var p = data.forum
+                  include interface_forumprofile2.jade
+                  hr.hrNarrowSpace
+                  //.panel(style='height: 310px; border: none; box-shadow: none;')
+                    //-var target = 'index'
+                    //-include gallery
+                    //-var threadlist = data.newestDigestThreads
+                    //-var listtitle = '推荐阅读'
+                    //-include interface_recommend_thread
+                  //.clearfix
+                  div(style='width: 100%; margin-bottom: 13px;')
+                    p(style='color: orange; padding: 5px 5px;')
+                      span(style='font-size: 17px;') 专业分区
+                      span(style='color: grey;') (发帖请进入对应分区)
+                    for cForum in data.forums
+                      a(style='margin: 2px 5px;' href='/f/#{cForum._key}') #{cForum.display_name}
+                  hr.hrNarrowSpace
+            .panel
+              .row
+                .col-xs-12
+                  .form-group(style='margin-top:0px;margin-bottom:6px')
+                    include interface_easy_post.jade
+                    if data.replytarget && !hasChildren
+
+                      a.btn.btn-default(href='/editor?target=#{data.replytarget}') 新帖
+                    if isModerator&&!forumIsParent
+                      button#enterManagementMode.btn.btn-default(onclick='enterManagementMode()') 管理
+
+                  .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
+
+                    .form-inline(style='margin-top:10px')
+
+                      if data.permittedOperations.addThreadToCollection
+                        .form-group
+                          button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
+
+                      .form-group
+                        button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
+                      .form-group
+                        include forumlist_dropdown.jade
+                        button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+
+                      .form-group
+                        button#recyclebtn.btn.btn-xs.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
+
+                      if data.permittedOperations.modifyThreadType
+                        -var ffid = data.forum._key
+                        button(onclick="renameForumCategory('#{ffid}')") 重命名分类
+                        button(onclick="addForumCategory('#{ffid}')") 增加分类
+                        button(onclick="deleteForumCategory('#{ffid}')") 删除分类
+
+
+
+                .col-xs-12
+                  nav
+                    include interface_navigation_paging.jade
+
+                    - var paging = data.paging
+                    - var digest = data.digest
+                    - var class_str_all = digest?'':'active'
+                    - var class_str_digest = digest?'active':''
+
+                    - var cat = data.cat
+                    - var sortby = data.sortby
+                    - var class_str_sortby_toc = sortby?'active':''
+                    - var class_str_sortby_tlm = sortby?'':'active'
+
+                    ul.pagination.NavigationPaging
+                      - var page = paging?paging.page:null
+                      li(class="#{class_str_all}")
+                        a(href='#{toQueryString({cat})}') 俱
+
+                      li(class="#{class_str_digest}")
+                        a(href='#{toQueryString({cat, digest: true})}') 精
+
+                    ul.pagination.NavigationPaging
+                      li(class='#{class_str_sortby_tlm}')
+                        a(href='#{toQueryString({cat, digest})}') 复序
+                      li(class='#{class_str_sortby_toc}')
+                        a(href='#{toQueryString({cat, digest, sortby: "toc"})}') 帖序
+
+
+                  hr.hrNarrowSpace
+
+              if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
+                .ForumThreadList
+                  each thread,index in data.toppedThreads
+                    include interface_forum_singlethread.jade
+                //hr.hrNarrowSpace
+                .ForumToppedSplitter - 以上是置顶 -
+
+              .ForumThreadList
+                each thread,index in data.threads
+                  if data.toppedThreads && (data.toppedThreads.map(item => item._key).indexOf(thread._key) >= 0)
+                    //exclude threads that are shown in topped area.
+                  else
+                    include interface_forum_singlethread.jade
+
+              .row
+                .col-md-12
+                  nav
+                    include interface_navigation_paging.jade
+
+                  if data.replytarget && !hasChildren
+                    a.btn.btn-default(style="margin-top:13px" href='/editor?target=#{data.replytarget}') 发表新帖
+              .div#bm
+
+
+                
+        .col-md-3.hidden-xs.hidden-sm
+          .nkcpanel
+            include forum_logo_wisdom.jade
+          -var user = data.user
+          if user
+            include interface_thread_userpatch.jade
+          //-var active_user_title = '学院活跃用户'
+          //include interface_active_users
+          if hasChildren
+            for forum in data.forums
+              .nkcpanel
+                -var f = forum
+                -var p = forum
+                -var type = 'f'
+                include interface_forumprofile2.jade
+                hr.hrNarrowSpace
+                //  div
+                //    a.btn.btn-default(href='/editor?target=f/#{forum._key}') 新帖
+                //if forum.moderators && forum.moderators.length
+                //  div(style='height: 20px;text-align:right; width: 20%; display: inline-block') 版主:
+                -var moderators = data.moderators || []
+                  span 版主:
+                for moderator in moderators
+                  a(href='/m/#{moderator._key}')  #{moderator,username}
+                //hr.hrNarrowSpace
+                //.ForumThreadList
+                //  each thread,index in forum.threads
+                //    include interface_forum_singlethread.jade
+          if data.user
+            .nkcpanel
+              a(href='/m/#{data.user._key}') 我的主题
+              br
+              br
+              for thread in data.userThreads
+                include interface_users_latest_threads
+
+          .nkcpanel
+            ul.HomeFriendlyLink
+              include nkc_footer_links.jade
+
+          .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+            button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+            br
+            button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
+
+
+          if !forumIsParent
+            //include interface_forums_list.jade
+            
+    include debug_output.jade
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_collections.js')
+  script(src='/interface_forum.js')
+  script(src='/interface_easy_post.js')
+  //script(src='/gallery.js')
+  
+
+  if isModerator&&!forumIsParent
+    script.
+      enterManagementMode()

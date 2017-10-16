@@ -9,6 +9,7 @@ const otherRouter = new Router();
 otherRouter
   .get('/', async (ctx, next) => {
     ctx.data = `网站首页`;
+    ctx.template = 'user.pug';
     next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())

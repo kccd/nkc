@@ -1,0 +1,13 @@
+if debug_output
+  if data
+    hr
+    .container
+      .row
+        .col-md-12
+        
+          h2 debug_output.jade
+          p 这是用于渲染 Jade 模板的 res.data 对象的 JSON 表示，其中包含敏感内容。 正式上线的版本不会输出这些内容。
+          //- var ttreq = data.req;var ttres = data.res;
+          //- data.req = null; data.res = null;
+          div!= plain(JSON.stringify(data,null,4))
+          //- data.req = ttreq; data.res = ttres;

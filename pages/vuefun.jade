@@ -1,0 +1,20 @@
+extends bootstrap_base.jade
+
+block title
+  title vuefun
+  
+block content
+  h1 somefun
+  #app
+    p {{message}}
+    input(v-model='message')
+  
+block scripts
+  
+  script.
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue.js!'
+      }
+    })

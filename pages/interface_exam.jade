@@ -1,0 +1,87 @@
+extends bootstrap_base.jade
+
+block title
+  meta#category(category-string='#{data.category?data.category:""}')
+  include MathJax.jade
+  title 注册测试 - 科创论坛
+  
+block content
+  
+  .container
+    .row
+      if data.result
+        .col-xs-12
+          h1 测试完成
+          if data.result.length>10
+            //if success
+            .f12
+              text 恭喜你通过测试。你的注册码是:
+              a(href='/register?code=#{data.result}') #{data.result}
+              text &nbsp←点击跳转到注册页面。
+          else
+            //if failed
+            .f12
+              :markdown
+                很遗憾，你没有通过测试啦……不如休息一下，或者去
+                [科学公园](http://scipark.net/) 或者 [果壳网](http://guokr.com)
+                逛逛。
+
+                如果你还想再测一次，请点[这里](/register?getcode=true)，而不要按浏览器的“退后”。
+
+                ----
+                来自服务器的反馈：
+                ```
+                #{data.detail}
+                ```
+
+      if data.exam
+        .col-xs-12
+          h1 欢迎参加科创会员专业知识测验
+          hr
+
+        .col-sm-8
+          div.f12
+            p
+              span.reddish 注：新科创论坛支持最新版本的IE、Chrome、Safari。浏览器版本过低、使用“兼容”模式，或使用360等贴牌浏览器会导致公式显示不正常，或者答卷无法提交。
+
+            :markdown
+              本测试主要考察逻辑思维与解决问题能力，所涉及的绝大多数知识性内容位于公共领域。请认真思考及动手搜索后再回答。
+
+              不过，如果45分钟内未提交答案，当前题目会失效，遇到这种情况请刷新页面后再测。
+
+        .col-sm-4
+          img(src='/resources/site_specific/holy_exam.gif' height='200')
+        br
+        .col-xs-12
+          .panel.panel-default.f12
+            .panel-body
+              meta(id='number_of_questions' value='#{data.exam.qarr.length}')
+              each q,index in data.exam.qarr
+                div
+                  span #{index+1}.
+                  span.question!= markdown_safe(q.question)
+
+                case q.type
+                  when 'ans'
+                    input(type='text' id='answer#{index}')
+                  when 'ch4'
+                    - var prefixes = ['A','B','C','D']
+                    each c,cindex in q.choices
+                      meta(id='answer#{index}')
+                      //set value when chosen
+                      p
+                        input(type='radio' name='answer#{index}' value='#{cindex}' onclick='geid("answer#{index}").value=#{cindex}')
+                        text #{prefixes[cindex]}.  #{c}
+
+                hr
+              button#submit.btn.btn-default 交卷
+
+            meta(id='exam' exam-object='#{encodeURI(JSON.stringify(data.exam))}')
+      
+    
+  
+  include debug_output.jade
+block scripts
+  
+  script(src='/interface_common.js')
+  script(src='/interface_exam.js')

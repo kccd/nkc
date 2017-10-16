@@ -1,0 +1,25 @@
+extends bootstrap_base.jade
+
+block title
+  title 登出
+  
+block content
+  
+  .container
+    .row
+      .col-sm-12.col-md-9
+        h1 登出
+        p 如无意外，您已登出。
+        //go back in history
+        a(href='javascript:location.href = document.referrer') 回到之前
+        p
+        a(href='javascript:window.close();') 关闭页面
+    
+  include debug_output.jade
+    
+block scripts
+
+
+
+      
+                

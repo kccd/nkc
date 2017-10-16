@@ -1,0 +1,54 @@
+.ItemContainer {
+  border-width: 1px;
+  /* border: black; */
+  border-color: #eee;
+  border-style: solid;
+  padding:2px;
+  margin-bottom: 2px;
+
+  font-size: 14px;
+}
+
+.ItemContainerSelected {
+  background-color:#eee;
+}
+
+.MyList {
+  border-width: 1px;
+  border-color: #ccc;
+  border-style: solid;
+  padding:2px;
+  margin-bottom: 5px;
+
+  max-height: 400px;
+  min-height: 100px;
+  overflow-y: scroll;
+}
+
+.MyButton {
+  margin-right: 5px;
+}
+
+.ItemTypeText{
+  display: inline-block;
+  color:#080;
+  width:30%;
+  max-width: 80px;
+  margin-right: 10px;
+}
+.ItemMeta {
+  color: #c20;
+  max-width: 250px;
+  width:30%;
+  margin-right: 10px;
+  display: inline-block;
+}
+.ItemText {
+  display: inline;
+}
+.invisible {
+  display: none;
+}
+.now-at {
+  background-color: silver;
+}

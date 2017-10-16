@@ -1,0 +1,17 @@
+extends bootstrap_base.jade
+
+block title
+  title 500 Int Serv Err 服务器错误
+block content
+  .container
+    .row
+      .col-sm-12
+        h1 Sorry! 抱歉
+        :markdown
+          request to path `#{data.url}` encountered an error. If you think this shouldn't happen, please contact the Site Admin.
+
+          请求的网址 `#{data.url}` 出错。如果您认为这个错误不应该发生，请通知网站管理员。
+        hr
+        p 信息 message:
+        pre.intpad.zipline(style='background-color:#dceeff;') #{data.err.toString()}
+        p(style="color:#999;") #{server.name}

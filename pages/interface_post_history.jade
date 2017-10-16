@@ -1,0 +1,29 @@
+extends bootstrap_base.jade
+
+block title
+  title 楼历史 - 科创论坛
+  
+block content
+  
+  .container
+    .row
+      .col-xs-12
+        h3 目前版本
+
+        
+        -var p = data.post
+        -var formerPost = data.histories[0]
+        include interface_post_history_single.jade
+        
+        h3 过去版本
+
+        each post,index in data.histories
+          -var p = post
+          -var formerPost = data.histories[index+1]
+          include interface_post_history_single.jade
+    
+  
+  include debug_output.jade
+block scripts
+  
+  script(src='/interface_common.js')

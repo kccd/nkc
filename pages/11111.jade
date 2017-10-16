@@ -1,0 +1,268 @@
+doctype html
+-var users = {};
+- users.page = {};
+- users.page.pagecount = 100;
+- users.page.page = 20;
+html(lang='zh-CN')
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		link(rel='stylesheet',href='style.css')
+		link(rel='stylesheet', href='https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css')
+		link(rel='stylesheet',href='./bootstrap-3.3.6-dist/css/bootstrap.css')
+		link(rel='stylesheet',href='col-xs-hidden.css')
+		link(rel='stylesheet',href='nkc_styles.css')
+		meta(charset="utf-8")
+	body
+		.container
+			.row
+				.col-xs-12.col-md-12
+					img.center-block(src="3.jpg",style="border-radius:5em;height:10em;width:10em;margin-top:3em;")
+				.col-xs-12.col-md-2
+				.col-xs-12.col-md-8(style="text-align:center")
+					h2(style="color:#337ab7") 硝酸钾当盐吃
+          :markdown
+            ### 123
+				.col-xs-12.col-md-2
+				.col-xs-12.col-md-12
+					hr.hrNarrowSpace
+
+				.col-xs-12.col-md-3.border-left.border-right(style="float:right")
+					.col-xs-12.col-md-12(style="margin:0.5em 0;")
+						a.btn.btn-default.btn-block(href="#",role="button") 发私信
+					.col-xs-12.col-md-12(style="margin:0.5em 0;")
+						a.btn.btn-default.btn-block(href="#",role="button") 修改资料
+					.col-xs-12.col-md-6(style="margin:0.5em 0;")
+						a.btn.btn-default.btn-block(href="#",role="button") 个人专栏
+					.col-xs-12.col-md-6(style="margin:0.5em 0;")
+						a.btn.btn-default.btn-block(href="#",role="button") 个人收藏
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					.col-xs-12.col-md-12.text-align-center
+						h5 拥有的证书
+						h4
+							strong 会员 机友 进士
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					.col-xs-6.col-md-6.text-align-center 
+						h5 粉丝
+						h4
+							a(href="###") 4562
+					.col-xs-6.col-md-6.text-align-center.border-left
+						h5 关注
+						h4
+							a(href="###") 12
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					.col-xs-6.col-md-6.text-align-center 
+						h5 总主题
+						h4
+							a(href="###") 4562
+					.col-xs-6.col-md-6.text-align-center.border-left
+						h5 总回复
+						h4
+							a(href="###") 12
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					.col-xs-6.col-md-6.text-align-center
+						h5 学术分
+						h4 22
+					.col-xs-6.col-md-6.text-align-center.border-left
+						h5 科创币
+						h4 1546
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					.col-xs-6.col-md-6.text-align-center
+						h5 最近登陆
+						h4 2017-9-13 12:45:12
+					.col-xs-6.col-md-6.text-align-center.border-left
+						h5 注册时间
+						h4 2017-8-24 08:12:04
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+				.col-xs-12.col-md-9.border-left(style="float:left")
+					.col-xs-12.col-md-12
+						ul.nav.nav-tabs
+							li.active(role="presentation")
+								a(href="#") 最新动态
+							li(role="presentation")
+								a(href="#") 发帖
+							li(role="presentation")
+								a(href="#") 讨论
+							li(role="presentation")
+								a(href="#") 回复
+							li(role="presentation")
+								a(href="#") 推介
+							li(role="presentation")
+								a(href="#") 关注
+					//-分页
+					-if(users.page.pagecount > 1)
+						.col-xs-12.col-md-6(style="margin:0.4em 0 0 0")
+							nav(aria-label='navigation')
+								ul.pagination(style="margin:0")
+									//- 当前页数若大于4则显示首页按钮
+									//- 若总的分页数小于7则不需要显示首页和尾页按钮
+									//-临时
+									-if(users.page.page > 4 && users.page.pagecount > 7)
+										li
+											a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=#{users.type}') 首
+									//- n为总共需要显示的分页按钮个数
+									//- i为循环中当前生成的页数
+									-var n = 7;
+									-var min = users.page.pagecount - 3;
+									-if(users.page.page > min)
+										-min = users.page.pagecount - 6;
+									-else
+										-min = users.page.page - 3;
+									-for(var i = min ; 1 ; i++)
+										-if(n == 0)
+											-break;
+										-if(i <= 0)
+											-continue;
+										-if(i > users.page.pagecount)
+											-break;
+										//- 生成当前所在也输得按钮时，有蓝色背景，不可点击
+										-if(i == users.page.page)
+											li.active
+												a(href='javscript:void(0)') #{i}
+										-else
+											li
+												a(href='/behaviors?&page=#{i}#{fromAndTo}#{sort}#{ip}&type=#{users.type}') #{i}
+										-n--;
+									//- 当前页数若小于 最大分页数-3 则显示尾页按钮
+									-if(users.page.page < users.page.pagecount - 3 && users.page.pagecount > 7)
+										li
+											a(href='/behaviors?&page=#{users.page.pagecount}#{fromAndTo}#{sort}#{ip}&type=#{users.type}') 末
+					.col-xs-12.col-md-2(style="margin:0.4em 0 0 0")
+						ul.pagination.NavigationPaging
+							li(class="active")
+								a(href='###') 俱
+							li(class="")
+								a(href='###') 精
+					.col-xs-12.col-md-3(style="margin:0.4em 0 0 0")
+						ul.pagination.NavigationPaging
+							li(class="active")
+								a(href='###') 复序
+							li(class="")
+								a(href='###') 贴序
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					//-贴子标题列表
+					.col-xs-12.col-md-12
+						.ForumThreadList
+							.ForumThreadItem(style="background-color:#fff;")
+								.parent.clearfix
+									.avatar-left
+										.a(href="/m/10",title="虎哥\n学术分 40\n科创币 332793\n会员 编辑 学者 ")
+											img.ForumThreadAvatar(src="https://bbs.kechuang.org/avatar/71493")
+									.content-right
+										.ForumThreadTitle
+											.ForumThreadTitle1(style="float:left;width:77%;")
+												a.ForumThreadHasImage(style="background-color:#6ec4dc;",href="/f/81") 茶话
+												a.ForumThreadNormal(href="/t/81678",title="就发个图，如何办在后面慢慢说#{r=274922}") 参观一下如何遵章守纪的采购硫酸盐酸
+												span.ForumThreadHasImage 图
+											.ForumThreadTitle2(style="float:right;width:21%;")
+												.ForumThreadTitle22(style="float:right")
+													.ForumThreadStat(style="font-size:7px;margin-right:0.4em;")
+														span.ThreadHits 浏览:1236
+													.ForumThreadStat(style="font-size:7px")
+														span.ThreadCount 回复:25
+													div.ForumThreadTitle3(style="display:inline-block;")
+										.ForumThreadCreatorInfo(style="width:50%!important;")
+											span.hidden-xs.lighttext.ForumThreadItemCreationTime 2017-04-16 from
+											a.ForumThreadItemUsername(href="https://bbs.kechuang.org/avatar/71493") 虎哥
+											span.lighttext 3 个月前
+											span.lighttext(style="margin-right:7px;")  by
+											a.ForumThreadItemUsername(href="https://bbs.kechuang.org/avatar/71493") westwarded
+							.ForumThreadItem(style="background-color:#fff;")
+								.parent.clearfix
+									.avatar-left
+										.a(href="/m/10",title="虎哥\n学术分 40\n科创币 332793\n会员 编辑 学者 ")
+											img.ForumThreadAvatar(src="https://bbs.kechuang.org/avatar/71493")
+									.content-right
+										.ForumThreadTitle
+											.ForumThreadTitle1(style="float:left;width:77%;")
+												a.ForumThreadHasImage(style="background-color:#6ec4dc;",href="/f/81") 茶话
+												a.ForumThreadNormal(href="/t/81678",title="就发个图，如何办在后面慢慢说#{r=274922}") 参观一下如何遵章守纪的采购硫酸盐酸
+												span.ForumThreadHasImage 图
+											.ForumThreadTitle2(style="float:right;width:21%;")
+												.ForumThreadTitle22(style="float:right")
+													.ForumThreadStat(style="font-size:7px;margin-right:0.4em;")
+														span.ThreadHits 浏览:1236
+													.ForumThreadStat(style="font-size:7px")
+														span.ThreadCount 回复:25
+													div.ForumThreadTitle3(style="display:inline-block;")
+										.ForumThreadCreatorInfo(style="width:50%!important;")
+											span.hidden-xs.lighttext.ForumThreadItemCreationTime 2017-04-16 from
+											a.ForumThreadItemUsername(href="https://bbs.kechuang.org/avatar/71493") 虎哥
+											span.lighttext 3 个月前
+											span.lighttext(style="margin-right:7px;")  by
+											a.ForumThreadItemUsername(href="https://bbs.kechuang.org/avatar/71493") westwarded
+							.ForumThreadItem(style="background-color:#fff;")
+								.parent.clearfix
+									.avatar-left
+										.a(href="/m/10",title="虎哥\n学术分 40\n科创币 332793\n会员 编辑 学者 ")
+											img.ForumThreadAvatar(src="https://bbs.kechuang.org/avatar/71493")
+									.content-right
+										.ForumThreadTitle
+											.ForumThreadTitle1(style="float:left;width:77%;")
+												a.ForumThreadHasImage(style="background-color:#6ec4dc;",href="/f/81") 茶话
+												a.ForumThreadNormal(href="/t/81678",title="就发个图，如何办在后面慢慢说#{r=274922}") 参观一下如何遵章守纪的采购硫酸盐酸
+												span.ForumThreadHasImage 图
+											.ForumThreadTitle2(style="float:right;width:21%;")
+												.ForumThreadTitle22(style="float:right")
+													.ForumThreadStat(style="font-size:7px;margin-right:0.4em;")
+														span.ThreadHits 浏览:1236
+													.ForumThreadStat(style="font-size:7px")
+														span.ThreadCount 回复:25
+													div.ForumThreadTitle3(style="display:inline-block;")
+										.ForumThreadCreatorInfo(style="width:50%!important;")
+											span.hidden-xs.lighttext.ForumThreadItemCreationTime 2017-04-16 from
+											a.ForumThreadItemUsername(href="https://bbs.kechuang.org/avatar/71493") 虎哥
+											span.lighttext 3 个月前
+											span.lighttext(style="margin-right:7px;")  by
+											a.ForumThreadItemUsername(href="https://bbs.kechuang.org/avatar/71493") westwarded	
+					.col-xs-12.col-md-12
+						hr.hrNarrowSpace
+					//-分页
+					.col-xs-12.col-md-12
+						nav(aria-label='navigation')
+							ul.pagination(style="margin:0.4em 0 0 0")
+								-if(users.page.pagecount > 1)
+									//- 当前页数若大于4则显示首页按钮
+									//- 若总的分页数小于7则不需要显示首页和尾页按钮
+									//-临时
+									-if(users.page.page > 4 && users.page.pagecount > 7)
+										li
+											a(href='/behaviors?&page=1#{fromAndTo}#{sort}#{ip}&type=#{users.type}') 首
+									//- n为总共需要显示的分页按钮个数
+									//- i为循环中当前生成的页数
+									-var n = 7;
+									-var min = users.page.pagecount - 3;
+									-if(users.page.page > min)
+										-min = users.page.pagecount - 6;
+									-else
+										-min = users.page.page - 3;
+									-for(var i = min ; 1 ; i++)
+										-if(n == 0)
+											-break;
+										-if(i <= 0)
+											-continue;
+										-if(i > users.page.pagecount)
+											-break;
+										//- 生成当前所在也输得按钮时，有蓝色背景，不可点击
+										-if(i == users.page.page)
+											li.active
+												a(href='javscript:void(0)') #{i}
+										-else
+											li
+												a(href='/behaviors?&page=#{i}#{fromAndTo}#{sort}#{ip}&type=#{users.type}') #{i}
+										-n--;
+									//- 当前页数若小于 最大分页数-3 则显示尾页按钮
+									-if(users.page.page < users.page.pagecount - 3 && users.page.pagecount > 7)
+										li
+											a(href='/behaviors?&page=#{users.page.pagecount}#{fromAndTo}#{sort}#{ip}&type=#{users.type}') 末
+					
+
+

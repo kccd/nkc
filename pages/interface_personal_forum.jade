@@ -1,0 +1,249 @@
+extends bootstrap_base.jade
+
+block title
+  title #{data.forum.display_name} - #{data.site.name}
+
+  -var forum  = data.forum
+
+  if forum.description
+    -var processed=forum.description.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  else
+    -var processed = forum.display_name
+
+  meta(name='description' content='#{processed}')
+
+  meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  meta(property='og:title' content='#{forum.display_name}')
+  meta(property='og:site_name' content='科创论坛')
+  meta(property='og:description' content='#{processed}')
+
+
+
+block content
+  -var isModerator = user? (forum.moderators.indexOf(user._key) > -1) : false
+
+  .container-fluid(style='max-width:1400px;')
+    .row
+      .col-md-9
+        .panel
+            .row
+              .col-xs-12
+                form(role='form')
+                  - var description = data.forum.description
+                  - var announcement = data.forum.announcement
+                  - var display_name = data.forum.display_name
+                  div(style='width: 100%;')
+                    .displayShit
+                      div
+                        img.pfBanner(style='width: 100%;' src='/pfb/#{data.forum._key}')
+                      div(style='position: relative;')
+                        div(style='width: 19%; margin-top: -14%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
+                          div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
+                            img(src='/pfa/#{forum._key}' width='100%' style='border-radius: 5%;')
+                        div(style='display: inline-block;')
+                          div
+                            div(style='display: inline-block;')
+                              span.forum-name #{display_name}&nbsp;&nbsp;&nbsp;&nbsp;
+                            div(style='display: inline-block; vertical-align: top; font-size: 16px;')
+                              if description
+                                span #{description}
+                          div
+                            - var moderators = data.forum.ms
+                            if moderators && moderators.length
+                              span 版主：
+                                each k in moderators
+                                  a.d-inline.margin-right(href='/m/#{k._key}') #{k.username}    
+                              -var subscribeUsersNum = (data.targetUser.subscribeUsers)?data.targetUser.subscribeUsers : [];
+                              -var subscribersNum = (data.targetUser.subscribers)?data.targetUser.subscribers : [];
+                              span 关注：
+                                a(class='d-inline margin-right',href='/subscribe?&uid=#{data.targetUser._key}&list=subscribeUsers') #{subscribeUsersNum.length}
+                              span 粉丝：
+                                a(class='d-inline margin-right',href='/subscribe?&uid=#{data.targetUser._key}') #{subscribersNum.length}
+                        div(style='position: absolute; right: 0; top: 0;')
+                          if isModerator
+                            div
+                              a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
+                          - var user = data.targetUser
+                          if(data.user)
+                            if(user._key != data.user._key)
+                              -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
+                              if(subscribeUsers.indexOf(user._key) > -1)
+                                div
+                                  a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick='subscribeUserSwitch("#{user._key}");' style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
+                              else
+                                div
+                                  a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick='subscribeUserSwitch("#{user._key}");' style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
+                        hr.hrNarrowSpace
+                        div
+                          if announcement && announcement != ''
+                            div #{'公告: ' + announcement}
+
+                    .configShit(style='display: none; position: relative;')
+                      div(style='position: relative;')
+                        a(href='javascript:;' onclick='uploadForumBanner();' style='display: block; position: relative;')
+                          div(style='background-image: url(/default/banner_setting.jpg); background-position: center; background-size: contain; position: relative; width: 100%;')
+                            img.pfBanner(style='width: 100%; opacity: 0.2;' src='/pfb/#{data.forum._key}')
+                            input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange="bannerOnChange(#{data.forum._key})")
+                      div(style='z-index: 1; position: relative;')
+                        div(style='width: 19%; margin-top: -10%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
+                          div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
+                            a(href='javascript:;' onclick='uploadForumAvatar();')
+                              div(style='background-image: url(/default/icon_setting.jpg); background-position: center; background-size: contain; border-radius: 5%;')
+                                img(src='/pfa/#{forum._key}' width='100%' style='border-radius: 5%; opacity: 0.2;')
+                                input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange="avatarOnChange(#{data.forum._key})")
+                        div(style='display: inline-block;')
+                          div
+                            div(style='display: inline-block;')
+                              input#forumName(style='font-size: 16px; width: 180px;' value='#{forum.display_name}' name='forumName' placeholder='请输入专栏名称')
+                            div(style='display: inline-block;')
+                              input#description(style='width: 360px;' value='#{description}' name='description' placeholder='请输入专栏介绍')
+                          div
+                            -const str = moderators.length === 1? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
+                            span 版主：
+                            span #{moderators[0].username},
+                            input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value='#{str}')
+                        div(style='float: right; vertical-align: top;')
+                          if isModerator
+                            div
+                              a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
+                            div
+                              a.btn.btn-default(href='javascript:;' onclick='submitConfig("#{data.forum._key}")') 保存
+                        div
+                          textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
+
+                    if data.permittedOperations.banUser
+                      if data.targetUser.certs.indexOf('banned') > -1
+                        a(href='javascript:;' onclick='nkcAPI("unbanUser", {uid: "#{data.targetUser._key}"}).then(jalert).catch(jwarning)') 解除封禁
+                      else
+                        a(href='javascript:;' onclick='nkcAPI("banUser", {uid: "#{data.targetUser._key}"}).then(jalert).catch(jwarning)') &nbsp;封禁此人&nbsp;
+                    if data.permittedOperations['popPFSwitch']
+                      -var isPopular = data.popPersonalForums.indexOf(forum._key) > -1
+                      a#ppfBtn(href='javascript:;' onclick="popPFSwitch('#{data.forum._key}')") #{isPopular ? '取消热门' : '推至热门'}
+
+        include interface_easy_post
+
+        ul.nav.nav-tabs
+          li(class='#{data.tab == "own"? "active" : ""}')
+            a(href='?&tab=own') 版主
+          li(class='#{data.tab == "all"? "active" : ""}')
+            a(href='?&tab=all') 全部
+          li(class='#{data.tab == "discuss" ? "active" : ""}')
+            a(href='?&tab=discuss') 讨论
+          li(class='#{data.tab == "reply"? "active" : ""}')
+            a(href='?&tab=reply') 回复
+          li(class='#{data.tab == "recommend"? "active" : ""}')
+            a(href='?&tab=recommend') 推荐
+          li(class='#{data.tab == "subscribe" ? "active" : ""}')
+            a(href='?&tab=subscribe') 关注
+          li
+            a(href='/activities/#{data.forum._key}') 动态
+        .panel
+          .row
+            .col-xs-12
+              .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
+
+                .form-inline(style='margin-top:10px')
+
+                  if data.permittedOperations.addThreadToCollection
+                    .form-group
+                      button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
+                  .form-group
+                    button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
+                  if data.permittedOperations.moveAllThreads
+                    .form-group
+                      include forumlist_dropdown.jade
+                      button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+
+                    .form-group
+                      button#recyclebtn.btn.btn-xs.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
+
+            .col-xs-12
+              nav
+                include interface_navigation_paging.jade
+
+                - var paging = data.paging
+                - var digest = data.digest
+                - var class_str_all = digest?'':'active'
+                - var class_str_digest = digest?'active':''
+
+                - var cat = data.cat
+                - var sortby = data.sortby
+                - var class_str_sortby_toc = sortby?'active':''
+                - var class_str_sortby_tlm = sortby?'':'active'
+
+
+                ul.pagination.NavigationPaging
+                  - var page = paging?paging.page:null;
+                  li(class="#{class_str_all}")
+                    a(href='?&tab=#{data.tab}#{data.sortby? "&sortby=toc": ""}') 俱
+
+                  li(class="#{class_str_digest}")
+                    a(href='?&tab=#{data.tab}&digest=true#{data.sortby? "&sortby=toc": ""}') 精
+
+                ul.pagination.NavigationPaging
+                  li(class='#{class_str_sortby_tlm}')
+                    a(href='?&tab=#{data.tab}#{data.digest? "&digest=true": ""}') 复序
+                  li(class='#{class_str_sortby_toc}')
+                    a(href='?&tab=#{data.tab}&sortby=toc#{data.digest? "&digest=true": ""}') 帖序
+
+
+              hr.hrNarrowSpace
+
+          if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
+            .ForumThreadList
+              each thread,index in data.toppedThreads
+                include interface_personal_forum_single_thread
+            //hr.hrNarrowSpace
+            .ForumToppedSplitter - 以上是置顶 -
+
+          .ForumThreadList
+            each thread,index in data.threads
+              if data.toppedThreads && (data.toppedThreads.map(item => item._key).indexOf(thread._key) >= 0)
+                //exclude threads that are shown in topped area.
+              else
+                include interface_personal_forum_single_thread
+
+          .row
+            .col-md-12
+              nav
+                include interface_navigation_paging.jade
+
+
+
+          .div#bm
+
+
+      .col-md-3.hidden-xs.hidden-sm
+        .nkcpanel
+          include forum_logo_wisdom.jade
+        -var user = data.targetUser
+        if user
+          include interface_thread_userpatch.jade
+        //-var active_user_title = '学院活跃用户'
+        //include interface_active_users
+
+        if data.user && data.user._key !== data.targetUser._key
+          .nkcpanel
+            a(href='/m/#{data.user._key}') 我的主题
+            br
+            br
+            for thread in data.userThreads
+              include interface_users_latest_threads
+
+        .nkcpanel
+          ul.HomeFriendlyLink
+            include nkc_footer_links.jade
+
+        .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+          button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+          br
+          button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
+
+
+    include debug_output.jade
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_collections.js')
+  script(src='/interface_personal_forum.js')
+  script(src='/interface_easy_post.js')

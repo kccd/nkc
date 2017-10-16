@@ -1,0 +1,143 @@
+extends bootstrap_base.jade
+
+block title
+  include MathJax.jade
+  title 提交问题 - 科创论坛
+  
+block content
+
+  -var categories = {'null':'未分类','chem':'化学','bio':'生物','math':'数学','phys':'物理','cs':'计算机科学','dev':'软件开发','english':'英文','common':'科学基础','mix':'简单题大杂烩','earth':'地球科学','ee':'电子技术','electrical':'电气工程','med':'医药卫生','agri':'农业技术','space':'航天','aviation':'民航','hedc':'高能材料','mech':'机械','3dp':'三维打印','ham':'业余无线电','kchv':'高压技术'}
+
+  style.
+    .red {
+      color:red;
+    }
+    .green {
+      color:#226622;
+    }
+    .Qzone {
+      font-size:13px;
+    }
+    .yellow {
+      color:#da9900;
+    }
+  .container
+    .row
+      .col-xs-12.col-sm-6
+        h3 向科创题库提交您的题目
+        p 您可以在这里为题库撰写题目，以帮助科创扩充完善测试类目。某个题目最终是否收录入正式题库，将由论坛学术委员会决定。
+      
+        if data.user
+          h3 撰写题目
+          p.
+            请按照下面列出的格式提交题目。用钱号($)分隔问题和答案或选项。
+          p.green.
+            问答题：
+            问题$答案
+          p.green.
+            单项选择题（4）：
+            问题$正确答案$错误项1$错误项2$错误项3
+          p.red.
+            不支持其他未声明的格式，因为程序员比较懒。
+          p 请注意：每道问答题只允许有一种回答方式。请通过在题目中提示格式，避免答题时出现诸如“到底写1/2还是0.5”的问题。
+          
+          p.reddish 如果你希望增设某个类别的题目，但现有类别中没有，请先添加题目，并在题目的开头用括号标明“（题目类别）”，待管理员看到之后进行增设。
+          
+          :markdown
+            指导意见：
+            
+              1. 不要出作业练习题。不要出炫技计算题。
+              2. 对于专业题，请确保：学习过该专业知识/在该行业工作的人士应能在30秒内得出答案，而一般人通过搜索等方法很难在5分钟内得到答案。
+          
+          :markdown
+            问题支持Markdown, TeX请用`\\(`,`\\)`以及`\\[`,`\\]`，不要用钱号。答案(包括选择和填空题)只能为纯文本。
+        
+          br
+          
+          .form-group
+            input#qid.form-control(placeholder='qid，请勿填写')
+            
+          .form-group.row
+            .col-xs-7
+              select#category.form-control()
+                if data.permittedOperations.listAllQuestions
+                  //if user is administrative
+                  each c in data.bycategory
+                    option #{c.category||'null'}
+                else
+                  option null
+                
+            .col-xs-5
+              div(style='display:inline-block; vertical-align:middle;') 类别(请不要管此项)
+              
+              
+          .form-group
+            textarea#content.form-control(rows='8' placeholder='问题和答案，请参考上面提到的格式')
+
+          button#post.btn.btn-default(type='submit') 提交问题
+          
+                  
+        
+          h4 我最近提交的问题
+          .panel.panel-default
+            .panel-body.post-body
+              each q,index in data.questions
+                include questions_single.jade
+                
+        else
+          h4 你还没有登录
+          p 登录后才可以提交。
+
+      .col-xs-12.col-sm-6  
+        if data.user
+          -console.log(data)
+          if data.questions_all
+              
+            h4 类目 (显示最近5题)
+            span(style='margin:5px')
+              |[
+              a(href='?operation=viewQuestions') all
+              -var total = data.bycategory.map(el=>el.number||0).reduce((pre,cur)=>{return pre+cur})
+              | : #{total}]
+            
+            each i in data.bycategory
+              -var category = i.category||'undefined';var number=i.number;
+              span(style='margin:5px')
+                |[
+                a(href='?operation=viewQuestions&category=#{category}') #{category}
+                | : #{number}]
+            
+              
+            //a(href='/api/questions?all=true' target='_blank') 下载JSON格式
+            .panel.panel-default
+              .panel-body.post-body
+                each q,index in data.questions_all
+
+                  include questions_single.jade
+                  
+      .col-xs-12.col-sm-6
+        .panel.panel-default
+          .panel-body
+            h1 统计
+            hr
+            h4 专家
+            each i in data.byuser
+              -var username = i.username;var number = i.number;
+              div(style='margin:5px')
+                a(href='/user_activities_byname/#{username}') #{username}
+                | : #{number}
+            
+            hr
+            h4 类目
+            each i in data.bycategory
+              -var category = i.category||'undefined';var number=i.number;
+              div(style='margin:5px')
+                a(href='?operation=viewQuestions&category=#{category}') #{category}
+                | : #{number}
+          
+  
+  include debug_output.jade
+block scripts
+
+  script(src='/interface_common.js')
+  script(src='/questions_edit.js')

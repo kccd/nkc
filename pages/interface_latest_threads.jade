@@ -1,0 +1,96 @@
+extends bootstrap_base
+
+block title
+  meta(name='description' content='每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
+
+  meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  meta(property='og:title' content='科创论坛')
+  meta(property='og:site_name' content='科创论坛')
+  meta(property='og:description' content='华语世界最优秀的极客和创客社群，我们的宗旨是：发展科技爱好，倡导科学理性。Since 2001.')
+
+  title #{data.site.name} - #{data.site.description}
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-md-9
+        .panel
+          span(style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部&nbsp;
+          span(style='color: grey; font-size: 18px;') /
+          for cForum in data.indexForumList
+            a(style='margin: 2px 5px; color: #909090;' href='/f/#{cForum._key}') #{cForum.display_name}
+
+        .panel
+          include interface_easy_post
+
+        .panel
+          nav
+            include interface_navigation_paging.jade
+
+            - var paging = data.paging
+            - var digest = data.digest
+            - var class_str_all = digest?'':'active'
+            - var class_str_digest = digest?'active':''
+            - var cat = data.cat
+            - var sortby = data.sortby
+            - var class_str_sortby_toc = sortby?'active':''
+            - var class_str_sortby_tlm = sortby?'':'active'
+
+            ul.pagination.NavigationPaging
+              li(class='#{data.content == "all" ? "active" : ""}')
+                a(href='?&content=all#{data.digeset ? "&digest=true" : ""}#{data.sortby ? "&sortby=toc" : ""}') 所有
+              li(class='#{data.content == "forum"? "active" : ""}')
+                a(href='?&content=forum#{data.digest? "&digest=true":""}#{data.sortby? "&sortby=toc":""}') 板块
+              li(class='#{data.content == "personal"? "active" : ""}')
+                a(href='?&content=personal#{data.digeset? "&digest=true": ""}#{data.sortby? "&sortby=toc":""}') 专栏
+
+            ul.pagination.NavigationPaging
+              - var page = paging?paging.page:null
+              li(class="#{class_str_all}")
+                a(href='?&content=#{data.content}#{data.sortby? "&sortby=toc": ""}') 全部
+
+              li(class="#{class_str_digest}")
+                a(href='?&content=#{data.content}&digest=true#{data.sortby? "&sortby=toc":""}') 精华
+
+            ul.pagination.NavigationPaging
+              li(class='#{class_str_sortby_tlm}')
+                a(href='?&content=#{data.content}#{data.digest? "&digest=true":""}') 复序
+              li(class='#{class_str_sortby_toc}')
+                a(href='?&content=#{data.content}#{data.digest? "&digest=true":""}&sortby=toc') 帖序
+
+          hr.hrNarrowSpace
+          for thread in data.indexThreads
+            include interface_index_singlethread
+          nav
+            include interface_navigation_paging.jade
+
+      .col-md-3.hidden-xs.hidden-sm
+        .nkcpanel
+          include forum_logo_wisdom
+
+        -var user = data.user
+        if user
+          include interface_thread_userpatch.jade
+        if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
+          .nkcpanel
+            if !data.permittedOperations.getLatestPosts
+              :markdown
+                普通会员不能进入特种技术板块，请点击这里[参加考试](/register?getcode=true)，升级高级会员
+            if data.permittedOperations.viewQuestions
+              :markdown
+                科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/api/operation?&operation=viewQuestions)吧！
+
+        if data.user
+          .nkcpanel
+            a(href='/m/#{data.user._key}') 我的主题
+            br
+            br
+            for thread in data.userThreads
+              include interface_users_latest_threads
+      .row
+        .col-md-12
+          include nkc_friendlies.jade
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_easy_post.js')
+  script(type='text/javascript') $(document).ready(function () {if ($(window).width() < 900) {$('.ForumThreadStat').css('font-size', '7px');}});

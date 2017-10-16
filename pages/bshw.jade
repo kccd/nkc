@@ -1,0 +1,86 @@
+extends bootstrap_base.jade
+
+block title
+  title meh!
+  
+block styles
+  include nkc_styles.jade
+  
+  style.
+    .marginless {
+      margin-top:7px;
+      margin-bottom:7px;
+      margin-right:15px;
+    }
+
+block content
+        
+  .container
+    .row
+      .col-md-9
+        //split 9/12 for post area
+          
+        .panel.panel-default
+          .panel-body(style='padding-bottom:0px;')
+            .row
+              .col-md-12
+                h4 固体火箭
+            .row
+              .col-md-8
+                p.
+                  火箭理论，DIY与实验技术，全球火箭爱好者最新动态、民营航天领域新动向交流。涉及燃料的内容请发在火箭燃料版。
+                  
+              .col-md-4
+                p.
+                  今日：43 主题：3563 总帖：66652
+                p.
+                  版主：#[a 彩虹之巅，法式油炸薯条]
+                
+            .row
+              .col-md-12
+                nav
+                  ul.pagination.marginless
+                    each val,index in [1,2,3,4,5,6,'>>']
+                      if index==0
+                        li.active
+                          a(href='#')=val
+                      else
+                        li
+                          a(href='#')=val
+                  ul.pagination.marginless
+                    each val,index in ['所有','精华']
+                      if index==0
+                        li.active
+                          a(href='#')=val
+                      else
+                        li
+                          a(href='#')=val
+              
+                  ul.pagination.marginless
+                    each val,index in ['回复序','发布序']
+                      if index==0
+                        li.active
+                          a(href='#')=val
+                      else
+                        li
+                          a(href='#')=val
+
+          ul.list-group
+            li.list-group-item(style='padding:8px;padding-left:15px;')
+              .media
+                .media-left.media-middle
+                  a(href='#')
+                    img.media-object.avatar(src='http://bbs.kechuang.org/windid/attachment/avatar/000/00/00/10_small.jpg' style='width:45px;height:45px;')
+                .media-body.media-middle
+                  .row
+                    .col-xs-8
+                      p #[b 超级民科高能】论创新的规律] 
+                      p.lighttext 01-21 07:15 虎哥
+                    
+                    .col-xs-4
+                      p.lighttext 01-29 08:33 novakon
+                      
+      .col-md-3
+        .panel.panel-default
+          .panel-body
+            h1 hello world!

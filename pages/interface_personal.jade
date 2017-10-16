@@ -1,0 +1,97 @@
+extends bootstrap_base.jade
+
+block title
+  title 个人设置 - 科创论坛
+  
+block content
+  
+  .container
+    .row
+      .col-xs-12
+        .PasswordSettingZone
+          h4 修改密码
+          
+          input#oldpassword(type='password' placeholder='旧密码')
+          input#newpassword(type='password' placeholder='新密码，至少6位' )
+          input#newpassword2(type='password' placeholder='重复一次')
+          br
+          br
+          button.btn.btn-default#submitnewpassword(onclick='submitnewpassword()') 修改密码
+          hr
+    .row
+      .col-xs-12
+        .PersonalSettingZone
+          h4 修改个人资料
+          
+          :markdown
+            关于帖子签名：新KC取消了帖子签名在帖子中的显示，但保留了数据。
+            
+            个人简介显示于个人页面和帖子页面，支持markdown语法。
+            
+            帖子签名显示于个人帖子列表。
+            
+            ----
+            
+          -var user = data.user
+          p 帖子签名
+          textarea#post_sign(placeholder='帖子签名') #{user.post_sign}
+          br
+          p 个人简介
+          textarea#description(placeholder='个人简介') #{user.description}
+          br
+          p Colorcode，作为页面背景的颜色，有时显示在用户名的左侧成一个小圆圈。
+          input#color(placeholder='例如：#159' value='#{user.color||""}')
+          hr
+          p 关注板块id（用半角逗号分隔）（后来我发现有的同学非要用全角逗号，所以我只好写了兼容代码）
+          .form-group
+            input#focus_forums(placeholder='例如：81,373' value='#{user.focus_forums||""}')
+          
+          if data.forumlist
+            p 板块id可参考这个列表：
+            .form-group
+              include forumlist_dropdown.jade
+            p 被关注的板块会显示在“板块”页的顶部，无需向下翻动。
+          
+          hr
+          .form-group
+            button.btn.btn-default#submitpersonalsetting(onclick='submitpersonalsetting()') 提交个人资料修改
+          
+  include debug_output.jade
+block scripts
+  
+  script(src='/interface_common.js')
+  script.
+    function submitnewpassword(){
+      geid('submitnewpassword').disabled = true
+      
+      nkcAPI('changePassword',{
+        oldpassword:geid('oldpassword').value,
+        newpassword:geid('newpassword').value,
+        newpassword2:geid('newpassword2').value,
+      })
+      .then(function(){
+        window.location.reload()
+      })
+      .catch(function(err){
+        jwarning(err)
+        
+        geid('submitnewpassword').disabled = false
+      })
+    }
+    
+    function submitpersonalsetting(){
+      geid('submitpersonalsetting').disabled = true
+      nkcAPI('submitPersonalSetting',{
+        post_sign:geid('post_sign').value,
+        description:geid('description').value,
+        color:geid('color').value,
+        focus_forums:geid('focus_forums').value,
+      })
+      .then(function(){
+        window.location.reload()
+      })
+      .catch(function(err){
+        jwarning(err)
+              geid('submitpersonalsetting').disabled = false
+      })
+    }

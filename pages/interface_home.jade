@@ -1,0 +1,94 @@
+extends bootstrap_base
+
+block title
+  meta(name='description' content='每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
+
+  meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  meta(property='og:title' content='科创论坛')
+  meta(property='og:site_name' content='科创论坛')
+  meta(property='og:description' content='华语世界最优秀的极客和创客社群，我们的宗旨是：发展科技爱好，倡导科学理性。Since 2001.')
+
+  title #{data.site.name} - #{data.site.description}
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-md-9
+        .panel(style='width: 100%;')
+          -var ads = data.ads
+            include interface_ads
+
+        .panel
+          div.hidden-sm.hidden-md.hidden-lg
+            span(style='color: silver;') 学院&nbsp;&nbsp;&nbsp;
+            button#FLVS.btn.btn-default.btn-sm(onclick='forumListVisibilitySwitch();' style='float: right;') 显示学院
+            .clearfix
+          -var forums = data.indexForumList
+            div#indexForumList
+              include interface_forum_list
+
+        .panel
+          include interface_easy_post
+
+        .panel
+          div
+            span(style='color: silver;') 最新帖&nbsp;&nbsp;&nbsp;
+            a(style='float: right;' href='/latest?&content=forum') 更多>>>>
+            .clearfix
+          for thread in data.latestThreads
+            include interface_index_singlethread
+
+        .panel
+          -var newestDigestThreads = data.newestDigestThreads
+            include interface_digest_threads
+        //.panel
+        //  div
+        //    span(style='color: silver;') 最新专栏&nbsp;&nbsp;&nbsp;
+        //    a(style='float: right;' href='/latest?&content=personal') 更多>>>>
+        //    .clearfix
+        //  for thread in data.latestPFThreads
+        //    include interface_index_singlethread
+        //
+        //.panel
+        //  -var popPersonalForums = data.popPersonalForums
+        //    include interface_pop_pfs
+
+        div#bm
+
+      .col-md-3.hidden-xs.hidden-sm
+        .nkcpanel
+          include forum_logo_wisdom
+
+        -var user = data.user
+        if user
+          include interface_thread_userpatch.jade
+        if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
+          .nkcpanel
+            if !data.permittedOperations.getLatestPosts
+              :markdown
+                普通会员不能进入特种技术板块，请点击这里[参加考试](/register?getcode=true)，升级高级会员
+            if data.permittedOperations.viewQuestions
+              :markdown
+                科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/api/operation?&operation=viewQuestions)吧！
+        -var active_user_title = '一周活跃用户'
+        include interface_active_users
+
+        if data.user
+          .nkcpanel
+            a(href='/m/#{data.user._key}') 我的主题
+            br
+            br
+            for thread in data.userThreads
+              include interface_users_latest_threads
+
+        .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+          button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+          br
+          button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
+
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(type='text/javascript') $(document).ready(function () {if($(window).width() < 900){$('.ForumThreadStat').css('font-size','7px');}});
+  script(src='/interface_easy_post.js')

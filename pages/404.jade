@@ -1,0 +1,12 @@
+extends scratch.jade
+
+block head
+  include styles.jade
+  title 404 Not Found
+block  body
+  h1 Sorry
+  :markdown
+    path `#{data.url}` does not exist | can not be listed | is not available.
+  br
+  img(src='/resources/site_specific/owl_bath.jpg')
+  p(style="color:#999;") #{server.name}

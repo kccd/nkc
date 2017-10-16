@@ -1,0 +1,23 @@
+extends ../bootstrap_base.jade
+
+block title
+  title 统计数据 - 科创论坛
+  
+block content
+  
+  .container
+    .row
+      .col-xs-12
+        h4 按日统计
+        div
+          canvas#dailyStat(width='1024' height='500')
+  
+      
+    
+  
+  include ../debug_output.jade
+block scripts
+  
+  script(src='/interface_common.js')
+  script(src='/external_pkgs/ChartJS/Chart.js')
+  script(src='/stats/stats.js')

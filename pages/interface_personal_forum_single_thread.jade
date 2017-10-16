@@ -1,0 +1,99 @@
+if thread
+  - var url = '/t/' + thread._key
+  - var ocuser = thread.ocuser||{}
+  - var lmuser = thread.lmuser||{}
+  - var oc = thread.oc
+  - var avatar = '/avatar_small/' + oc.uid
+  - var uid = oc.uid
+  - var digest = thread.digest || (data.tab === 'own' && thread.digestInMid) || (data.tab === 'discuss' && thread.digestInToMid)
+  -var hide = (data.tab === 'own' && thread.hideInMid) || (data.tab === 'discuss' && thread.hideInToMid)
+  -var has_file = thread.has_file
+  -var has_image = thread.has_image
+  -var topped = thread.topped
+  -var belong_forum = null; var pf=null
+  -if(data.forum&&data.forum.type!='forum'&&data.forumlist)
+  -data.forumlist.map(group=>{group.forumgroup.map(f=>{if(f._key==thread.fid){belong_forum=f;pf=group.parentforum;}})})
+  -var forumcolor = (belong_forum?belong_forum.color:null)||(pf?pf.color:null)||'#aaa'
+
+  -if(data.forumlistkv)
+    -var v = data.forumlistkv[thread.fid]||{}
+    -belong_forum = v.belong_forum;pf = v.pf; var forumcolor = v.color;
+  //span #{belong_forum._key}
+  //span #{thread.fid}
+
+  -var threadtype = data.threadtypes?data.threadtypes.filter(k=>k._key==thread.cid)[0]:null;
+
+  .ForumThreadItem(style='background-color: #{hide? "#cfd2da" : "white"}')
+    .parent.clearfix(id='')
+      .avatar-left
+        - var user = ocuser
+        - var title = user?getUserDescription(user):''
+        a(href='/m/#{uid}' title='#{title}')
+          img.ForumThreadAvatar(src='/avatar/#{uid}')
+
+      .content-right
+        .ForumThreadTitle
+          .ForumThreadTitle1(style="float:left;width:77%;")
+            - var brief = oc.c.replace(/\[.*?]/g,'').trim().slice(0,100)
+            //span.f12.ForumThreadDigestText [精]
+            if belong_forum && (belong_forum._key!==(data.forum?data.forum._key:null))
+              a.ForumThreadHasImage(style='background-color:#{forumcolor};' href='/f/#{belong_forum._key}')
+                | #{belong_forum.abbr||belong_forum.display_name}
+
+            if threadtype
+              a.ForumThreadHasImage(href='/f/#{thread.fid}?cat=#{threadtype._key}' style='background-color:#{forumcolor};') #{threadtype.name}
+
+            a(class='#{digest?"ForumThreadDigestText":"ForumThreadNormal"}' href="#{url}" title="#{brief}") #{oc.t}
+
+            if topped
+              span.ForumThreadHasImage.ForumThreadTopped 顶
+            if has_image
+              span.ForumThreadHasImage 图
+            if has_file
+              span.ForumThreadHasImage.ForumThreadHasFile 附
+
+          .ForumThreadTitle2(style="float:right;width:21%;")
+            .ForumThreadTitle22(style="float:right;")
+              -var count = (thread.count_remain||thread.count)-1
+              -var hits = thread.hits
+              if hits
+                .ForumThreadStat
+                  span.ThreadHits 浏览:#{thread.hits}
+              if count
+                .ForumThreadStat
+                  span.ThreadCount 回复:#{count}
+              else
+                .ForumThreadStat
+                  span.ThreadCount 回复:0
+
+              .ForumThreadTitle3(style="display:inline-block;")
+                input.ThreadCheckboxes(id='#{(item?item._key:null)||thread._key}' type='checkbox' style="#{showTicks?'':'display:none;'}")
+
+
+
+
+            //span.lighttext cat#{thread.category}
+
+            //帖子标题链接
+            //span.hidden-xs.lighttext (#{oc.c.length} 字节，#{thread.hits} 点击)
+
+
+        .ForumThreadCreatorInfo(style="width:50%!important;")
+
+          if 1
+            span.hidden-xs.lighttext.ForumThreadItemCreationTime #{dateTimeString(thread.toc).split(' ')[0]} from
+
+          a.ForumThreadItemUsername(href='/m/#{ocuser._key}') #{ocuser.username}
+
+          if Date.now()-thread.tlm<86400000
+            span.lighttext.reddish #{fromNow(thread.tlm)}
+          else
+            span.lighttext #{fromNow(thread.tlm)}
+            //帖子最后回复时间和回复者
+
+          span.lighttext(style='margin-right:7px;')   by
+          a.ForumThreadItemUsername(href='/m/#{lmuser._key}') #{lmuser.username}
+
+  //
+     Created by lzszo on 2017/5/2.
+

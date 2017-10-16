@@ -1,0 +1,7 @@
+div
+  - var forumname = data.forum.display_name
+  a.f12(href='/f/#{fid}') #{forumname} 
+
+hr.hrNarrowSpace
+
+div!=markdown(data.forum.description||'')

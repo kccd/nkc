@@ -1,0 +1,32 @@
+.DigestThreadList
+  .row
+    each t,index in digestThreads
+      
+      if 1
+        if index%3==0
+          .clearfix.visible-lg-block
+        if index%2==0
+          .clearfix.visible-md-block
+        if index%2==0
+          .clearfix.visible-sm-block
+        if index%2==0
+          //.clearfix.visible-xs-block
+      .col-lg-4.col-md-6.col-sm-6
+        - var url = '/t/' + t._key
+        - var avatar = '/avatar_small/' + t.oc.uid
+        - var oc = t.oc
+        - var user = t.ocuser
+        
+        .DigestThreadListItem(href='#{url}')
+          a(href='#{url}')
+            .DigestThreadAvatarPlace
+              
+              img.DigestThreadAvatar(src='#{avatar}')
+            .DigestThreadBody
+              span.DigestThreadTitle #{t.oc.t}
+              .DigestThreadMeta
+                span #{user.username}
+                //span #{fromNow(t.toc)} - #{dateTimeString(t.toc)}
+                span #{t.hits} 点击 #{t.count} 回复
+                
+              .DigestThreadContent #{t.oc.c.replace(/\[.*?]/g,'').trim().slice(0,100)}

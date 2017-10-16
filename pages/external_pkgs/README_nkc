@@ -1,0 +1,6 @@
+For those who pull from this repository:
+
+The ZIP file is a copy of MathJax-2.6-latest,
+with files sufficient for displaying LaTeX math on mainstream browsers.
+
+Please UNZIP it to external_pkgs/MathJax-2.6-latest. nkc will load them from this location.

@@ -1,0 +1,128 @@
+extends bootstrap_base.jade
+
+block title
+  link(href='/interface_experimental.css' rel='stylesheet')
+  title 管理界面测试
+  
+block content
+  
+  .container
+    .row
+      .col-xs-12
+        h4 这是管理界面
+        
+    hr
+    .row
+      .col-xs-12
+        .panel.panel-default.f12
+          .panel-body
+            #Root
+
+      .col-xs-12.col-md-6
+        .panel.panel-default
+          .panel-body
+            p 将选中帖子移动到：
+            .form-group
+              include forumlist_dropdown.jade
+              
+            .form-group
+              button.btn.btn-default(onclick="directedMove()") 走起
+          
+            hr
+            h4 特殊操作 [ 请没事不要点击 ]
+            button.btn.btn-default(onclick="nkcAPI('updateAllThreads').then(jalert).catch(jalert)") 更新全部帖子数据
+            button.btn.btn-default(onclick="nkcAPI('updateAllForums').then(jalert).catch(jalert)") 更新全部板块数据
+            button.btn.btn-default(onclick="nkcAPI('updateAllUsers').then(jalert).catch(jalert)") 更新全部用户数据
+            button.btn.btn-default(onclick="nkcAPI('updateAllPostsFromCreditLog').then(jalert).catch(jalert)") 从积分表向帖子更新数据
+            h4 危险操作 [ 通常你也没有权限点击 ]
+            button.btn.btn-default(onclick="nkcAPI('gitpull').then(jalert).catch(jalert)") git pull
+            button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze
+            button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") npm install
+            hr
+            
+            a.btn.btn-default(href="/danger") 危险
+            a.btn.btn-default(href="/f/recycle") 进入回收站
+            a.btn.btn-default(href="/f/draft") 进入草稿版
+            a.btn.btn-default(href='/api/operation?operation=viewTemplate&template=stats/stats.jade') 看统计
+            a.btn.btn-default(href='/newusers') 最新用户
+            a.btn.btn-default(href='/newsysteminfo') 发新通知
+      .col-xs-12.col-md-6
+        .panel.panel-default.f12
+          .panel-body
+            h4 这里是回显
+            pre#logger
+      //积分管理
+      .col-xs-12.col-md-6
+        .panel.panel-default.f12
+          .panel-body
+            p 积分变动查询
+            a.btn.btn-default(href='/behaviors') 入口
+    hr
+    .row
+      .col-md-9
+        .panel.panel-default 操作说明：按钮显示的内容为即将执行的操作，如对用户隐藏，表示当前板块用户是可见的，按下此按钮，板块属性变为用户不可见
+        .col-md-6
+          .panel.panel-default
+            ui.list-group#cForum
+              -for(var i = 0; i < data.forumTree.length; i++)
+                -var cForum = data.forumTree[i]
+                -var buttonVSInfo = cForum.visibility? '对用户隐藏' : '对用户可见'
+                -var buttonIVInfo = cForum.isVisibleForNCC? '无权限不可见' : '无权限可见'
+                li.list-group-item
+                  span.col-md-3 #{data.forumTree[i].display_name}
+                  a.btn.btn-default.btn-sm(href='javascript:;' onclick='listForumBranch(event,#{i})') 显示子版
+                  a.btn.btn-default.btn-sm(href='javascript:;' onclick='forumVisibilitySwitch(event, "#{data.forumTree[i]._key}")') #{buttonVSInfo}
+                  a.btn.btn-default.btn-sm(href='javascript:;' onclick='forumIsVisibleForNCCSwitch(event, "#{data.forumTree[i]._key}")') #{buttonIVInfo}
+
+        .col-md-6
+          .panel.panel-default#branch-forum
+            -for(var i = 0; i < data.forumTree.length; i++)
+              ul.list-group.invisible
+                -for(var j = 0; j < data.forumTree[i].children.length; j++)
+                  -var cForum = data.forumTree[i]
+                  -var buttonVSInfo = cForum.visibility? '对用户隐藏' : '对用户可见'
+                  -var buttonIVInfo = cForum.isVisibleForNCC? '无权限不可见' : '无权限可见'
+                  li.list-group-item
+                    span.col-md-3 #{data.forumTree[i].children[j].display_name}
+                    a.btn.btn-default.btn-sm(href='javascript:;' onclick='forumVisibilitySwitch(event, "#{data.forumTree[i].children[j]._key}")') #{buttonVSInfo}
+                    a.btn.btn-default.btn-sm(href='javascript:;' onclick='forumIsVisibleForNCCSwitch(event, "#{data.forumTree[i].children[j]._key}")') #{buttonIVInfo}
+
+
+    hr    
+    .row
+      .col-md-9
+        
+        .panel.panel-default.f12
+          .panel-body
+            :markdown
+              ## 使用手册
+              
+              据说一个好的管理面板，是不需要使用手册的。
+              
+              ## 楼操作
+              
+              对楼(post)可以进行两种操作：**编辑**与**屏蔽**。
+              
+              屏蔽(设为删除)会导致楼层对一般用户不可见。屏蔽没有时间限制。
+              
+              编辑时限因权限级别而异，若需编辑久远的楼层，直接联系论坛运维调高限制。
+              
+              编辑与屏蔽操作可直接在论坛界面进行，一般**不需要进管理界面**。
+              
+              ## 帖操作
+              
+              对单个帖子(thread)可以进行多种操作，其中加精可以在论坛界面直接进行。删除和移动，需要在管理界面进行。
+              
+              1. 浏览论坛时，**将需要操作的帖子添加到管理车**。管理车最大容量30
+              2. **打开管理界面**的时候，列表会自动从管理车加载。未来还将增加其他加载方式，方便批量操作。
+              3. **按“全选/反选”按钮**，选择列表中的所有项。也可以用鼠标单独点选。
+              4. 如果要**删除**该帖子，点“移动到回收站”。如果要**移动**到其他版块，下方有个“将选中帖子移动到”。
+              5. 操作完之后，管理车不会清空。请点“**清空我的管理车**”。
+              
+    
+  include debug_output.jade
+block scripts
+  script(src='/react.js')
+  script(src='/JSXTransformer.js')
+  script(src='/interface_common.js')
+  script(type='text/jsx;harmony=true' src='/interface_experimental.js')

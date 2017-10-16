@@ -1,0 +1,37 @@
+.nkcpanel
+  
+  - var cindex = 0
+  each group,gindex in data.forumlist
+    - var groupcolor = Math.floor(Math.random()*16777216).toString('16')
+    - var parent = group.parentforum
+    
+    -var skip = (skipOtherParent&&(parent._key!=data.forum.parentid&&parent._key!=data.forum._key))
+    
+    if !skip
+      .ForumsListBody.ForumsListGroupItem
+        
+        a.f12.reddish(href='/f/#{parent._key}') #{parent?parent.display_name:''}
+      
+      each f,findex in group.forumgroup 
+        - var index = cindex + findex
+        
+        .ForumsListBody.ForumsListForumItem
+          - var marker = false
+          if data.forum
+            if f._key == data.forum._key
+              - marker = true
+              span.reddish > 
+          a(href='/f/#{f._key}')
+            if marker
+              span.reddish #{f.display_name} 
+            else
+              span #{f.display_name} 
+          .ForumsListCountNumber(style='color:brown;') #{f.count_posts_today||""}
+        
+      if !skipOtherParent
+        hr.hrNarrowSpace
+      - cindex += group.forumgroup.length
+    
+    
+
+          

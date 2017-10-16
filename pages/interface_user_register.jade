@@ -1,0 +1,148 @@
+extends bootstrap_base.jade
+
+
+block title
+  title 注册
+
+block content
+  if data.getcode
+    .container
+      .row
+        .col-sm-12
+          img(src='/resources/site_specific/kclogo_misaka1.png' style='max-width:100%')
+          
+        .col-sm-6
+          div.f12(style='line-height:1.8;')
+            :markdown
+              # 参与考试获得证书
+  
+              ### 说明
+              - 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
+              - 通过B卷考试可获得高级证书，可参与特种科技爱好话题的交流。
+              - 通过A卷考试的用户将来可以再参加B卷考试获取高级证书。
+
+      hr
+      .row
+        .col-sm-6
+          div.f12(style='line-height:1.8;')
+            :markdown
+              # 参加测试
+              
+              请在下面选择你最擅长的题目类别。
+              
+              ----
+          -if(!data.user)
+            h2 A卷
+              small （试题简单，可以参加普通话题交流，注册后还可以参加B卷考试）
+            p.f14
+              a(href='/exam?category=mix') 参加 【基础题】 测试
+            hr
+          h2 B卷
+            small （可直接获得高级证书，可参与特种科技爱好话题交流）
+          -var categories = {'chem':'化学','phys':'物理学','bio':'生物学','english':'英语','aviation':'民航知识','agri':'农业技术','hedc':'高能材料','cs':'计算机科学','ml':'机器学习','3dp':'3D打印','ham':'业余无线电','ee':'电子技术','electrical':'电气工程','dev':'软件开发'}
+          -for(k in categories)
+            p.f14
+              a(href='/exam?category=#{k}') 参加 【#{categories[k]}】 测试
+              
+          hr
+          p 测试题目来自论坛专家们的集体贡献。试题版权归科创研究院所有，请勿转载。
+          
+        
+  
+  if !data.getcode
+    .container
+      .row
+        .col-sm-12
+          if data.user && data.user.username
+            script.
+              location.href='/'
+          else
+            h1 注册
+            p 欲于科创论坛交流，请先用手机注册一个账号。
+            p 注册之前，请务必通读  
+              a(href='/t/66350') 禁止事项
+              |  以及下方的注册协议。
+            br
+            img(src='/resources/site_specific/kclogo_umaru1_nc.png')
+
+            hr
+            .form-horizontal.f12
+              .form-group
+                label.control-label.col-sm-3
+                  span 注册码(可通过
+                  a(href='/register?getcode=true') 考试
+                  span 获得)
+                .col-sm-4
+                  input#regCode.form-control(type='text' placeholder='请输入注册码' value='#{data.regCode || ""}')
+
+              .form-group
+                label.control-label.col-sm-3 用户名
+                .col-sm-4
+                  input#username.form-control(type='text' placeholder='字母、数字、汉字，不区分大小写')
+      
+              .form-group
+                label.control-label.col-sm-3 密码
+                .col-sm-4
+                  input#password.form-control(type='password' placeholder='至少8位')
+                
+              .form-group
+                label.control-label.col-sm-3 再次输入密码
+                .col-sm-4
+                  input#password2.form-control(type='password' placeholder='重复一次')
+
+              .form-group(style="display:none")
+                label.control-label.col-sm-3 国际区号
+                .col-sm-4
+                  -var optionArray=[{num:'+86',country:'中国'},{num:'+852',country:'中国香港'},{num:'+853',country:'中国澳门'},{num:'+886',country:'中国台湾'},{num:'+81',country:'日本'},{num:'+82',country:'韩国'},{num:'+65',country:'新加坡'},{num:'+66',country:'泰国'},{num:'+60',country:'马来西亚'},{num:'+1',country:'美国'},{num:'+1',country:'加拿大'},{num:'+61',country:'澳大利亚'},{num:'+44',country:'英国'},{num:'+49',country:'德国'},{num:'+33',country:'法国'},{num:'+7',country:'俄罗斯'},{num:'+91',country:'印度'},{num:'+64',country:'新西兰'},{num:'+39',country:'意大利'},{num:'+31',country:'荷兰'},{num:'+34',country:'西班牙'},{num:'+46',country:'瑞典'},{num:'+43',country:'奥地利'},{num:'+41',country:'瑞士'},{num:'+370',country:'立陶宛'},{num:'+63',country:'菲律宾'},{num:'+62',country:'印度尼西亚'},{num:'+84',country:'越南'},{num:'+971',country:'阿联酋'}];
+                  select.form-control(onchange='chooseCountryNum(this.value)')
+                    -for(var i = 0; i < optionArray.length; i++)
+                      option #{optionArray[i].num}&nbsp;&nbsp;#{optionArray[i].country}
+
+              .form-group
+                label.control-label.col-sm-3 手机号码
+                .col-sm-4
+                  input#phone.form-control(type='text' placeholder='请输入手机号码')
+                  
+              .form-group
+                label.control-label.col-sm-3 短信验证码
+                .col-sm-2
+                  input#mcode.form-control(type='text' placeholder='请输入短信验证码') 
+                .col-sm-2
+                  button#getMcode.btn.btn-default(onclick="getMcode()") 获取手机验证码
+                    
+              //.form-group
+              //  label.control-label.col-sm-3 图片验证码
+              //  .col-sm-2
+              //    input#icode.form-control(type='text' placeholder='验证码不分大小写')
+              //  .col-sm-3
+              //    img#icodeImg(src="/static/captcha/captcha.svg" style="width:120px;height:40px;"
+              //    type="image/svg+xml" title="点击图片可刷新")
+                  
+              .form-group
+                .col-sm-offset-3.col-sm-10
+                  //offset 2 grids
+                  button.btn.btn-primary(onclick='register_submit()') 提交
+                .col-sm-offset-3.col-sm-10(style="margin-top:1%;")
+                  a(href="/register2#{data.regCode? '?code=' + data.regCode : ''}").lighttext 遇到问题？
+            
+              
+              .form-group
+                .col-sm-offset-3.col-sm-6
+                  #error_info_panel.panel.panel-default(style='display:none;')
+                    .panel-body
+                      div#error_info.d-inline.lighttext() 
+
+            hr
+            
+            div.f12(style='line-height: 1.8;')
+              include:markdown EULA.md
+            
+            
+  include debug_output.jade
+
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/nkc_regex_validation.js')
+  script(src='/interface_user_register.js')
