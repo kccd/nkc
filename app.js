@@ -27,9 +27,14 @@ app.use(async (ctx, next) => {
   } catch(err) {
     ctx.error = err;
     ctx.status = err.statusCode || err.status || 500;
-    ctx.body = {
-      message: err.message
-    };
+    if(process.ENV === 'production')
+      ctx.body = {
+        message: err.message
+      };
+    else
+      ctx.body = {
+        err
+      }
   }
   finally {
     ctx.status = ctx.response.status;
