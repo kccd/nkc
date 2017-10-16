@@ -1,5 +1,6 @@
 module.exports = async ctx => {
   const logModel = ctx.db.logModel;
+  const processTime = ctx.processTime;
   const log = {
     error: ctx.error,
     method: ctx.method,
@@ -9,7 +10,7 @@ module.exports = async ctx => {
     ip: ctx.ip,
     port: ctx.request.host.split(':')[1],
     reqTime: ctx.reqTime,
-    resTime: ctx.get('X-Response-Time')
+    processTime
   };
   if(ctx.user) {
     log.uid = user.uid;
@@ -20,12 +21,12 @@ module.exports = async ctx => {
 
   if(ctx.error) {
     console.error(
-      ' Error '.bgRed + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} => ${String(log.status).red}`
+      ' Error '.bgRed + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}> ${String(log.status).red}`
     )
   }
   else {
     console.log(
-      ' Info '.bgGreen + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} => ${String(log.status).green}`
+      ' Info '.bgGreen + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}> ${String(log.status).green}`
     )
   }
 };
