@@ -20,12 +20,12 @@ module.exports = async ctx => {
 
   if(ctx.error) {
     console.error(
-      ' Error '.bgRed + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} => ${log.status.red}`
+      ' Error '.bgRed + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} => ${String(log.status).red}`
     )
   }
   else {
     console.log(
-      ' Info '.bgGreen + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} => ${log.status.green}`
+      ' Info '.bgGreen + ` ${log.reqTime.toLocaleString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} => ${String(log.status).green}`
     )
   }
 };
