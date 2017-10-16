@@ -2,24 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8ffd4834-0f5e-47f3-8cf1-a88c15580ba4" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/experimental/index.js" afterPath="$PROJECT_DIR$/routes/experimental/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/forum/index.js" afterPath="$PROJECT_DIR$/routes/forum/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/me/index.js" afterPath="$PROJECT_DIR$/routes/me/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/me/set.js" afterPath="$PROJECT_DIR$/routes/me/set.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/me/sms.js" afterPath="$PROJECT_DIR$/routes/me/sms.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/other/exam.js" afterPath="$PROJECT_DIR$/routes/other/exam.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/other/forgotPassword.js" afterPath="$PROJECT_DIR$/routes/other/forgotPassword.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/other/index.js" afterPath="$PROJECT_DIR$/routes/other/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/other/login.js" afterPath="$PROJECT_DIR$/routes/other/login.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/other/register.js" afterPath="$PROJECT_DIR$/routes/other/register.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/other/sendMessage.js" afterPath="$PROJECT_DIR$/routes/other/sendMessage.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/post/index.js" afterPath="$PROJECT_DIR$/routes/post/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/post/operation.js" afterPath="$PROJECT_DIR$/routes/post/operation.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/thread/index.js" afterPath="$PROJECT_DIR$/routes/thread/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/thread/operation.js" afterPath="$PROJECT_DIR$/routes/thread/operation.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/user/index.js" afterPath="$PROJECT_DIR$/routes/user/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/user/sms.js" afterPath="$PROJECT_DIR$/routes/user/sms.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/user/subscribe.js" afterPath="$PROJECT_DIR$/routes/user/subscribe.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -37,8 +21,8 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="412">
-              <caret line="23" column="12" lean-forward="false" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
+            <state relative-caret-position="650">
+              <caret line="48" column="26" lean-forward="false" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -142,9 +126,11 @@
       <find>logger.lo</find>
       <find>logger.info</find>
       <find>ctx.body</find>
+      <find>ctx.data</find>
     </findStrings>
     <replaceStrings>
       <replace>ctx.data</replace>
+      <replace>ctx.body</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/nkcModules</dir>
@@ -342,12 +328,12 @@
       <workItem from="1507798660099" duration="11515000" />
       <workItem from="1507883616021" duration="184000" />
       <workItem from="1507883813983" duration="6600000" />
-      <workItem from="1508121067508" duration="835000" />
+      <workItem from="1508121067508" duration="2567000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19134000" />
+    <option name="totallyTimeSpent" value="20866000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="24" width="960" height="1056" extended-state="4" />
@@ -356,7 +342,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32947367" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947367" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -788,8 +774,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="23" column="12" lean-forward="false" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
+        <state relative-caret-position="650">
+          <caret line="48" column="26" lean-forward="false" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
           <folding />
         </state>
       </provider>
