@@ -14,6 +14,7 @@ userRouter
   .get('/:uid', async (ctx, next) => {
     const uid = ctx.params.uid;
     ctx.data = `用户: ${uid}  的资料`;
+    ctx.template = 'user.pug';
     next();
   })
   .del('/:uid', async (ctx, next) => {

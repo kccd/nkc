@@ -15,14 +15,15 @@ app.use(async (ctx, next) => {
   ctx.db = db;
   ctx.nkcModules = nkcModules;
   Object.defineProperty(ctx, 'template', {
-    template: {
-      get: () => './pages/' + this.__templateFile,
-      set: fileName => this.__templateFile = fileName
+    get: function() {
+      return './pages/' + this.__templateFile
+    },
+    set: function(fileName) {
+      this.__templateFile = fileName
     }
   });
   try {
     await next();
-    ctx.status = ctx.response.status
   }
   catch (err) {
     ctx.error = err;
@@ -32,6 +33,7 @@ app.use(async (ctx, next) => {
     };
   }
   finally {
+    ctx.status = ctx.response.status
     const passed = Date.now() - ctx.reqTime;
     ctx.set('X-Response-Time', String(passed));
     await logger(ctx);
@@ -40,14 +42,22 @@ app.use(async (ctx, next) => {
 app.use(staticServe('./pages'));
 app.use(bodyParser());
 app.use(mainRouter.routes());
-app.use(async (ctx, next) => {
-  switch(ctx.type) {
-    case 'text/html':
+app.use((ctx, next) => {
+  const type = ctx.accepts('html', 'json');
+  console.log(ctx.template);
+  console.log(ctx.data);
+  switch(type) {
+    case 'html':
+      ctx.type = 'html';
       ctx.body = ctx.nkcModules.render(ctx.template, {data: ctx.data});
       break;
-    case 'application/json':
+    case 'json':
+      ctx.type = 'json';
       ctx.body = ctx.data;
       break;
+    default:
+      ctx.type = 'text';
+      ctx.body = ctx.status + ctx.data;
   }
   next();
 });
