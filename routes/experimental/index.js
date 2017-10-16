@@ -1,9 +1,11 @@
 const Router = require('koa-router');
 const experimentalRouter = new Router();
+
+
 experimentalRouter
   .get('/', async (ctx, next) => {
-    ctx.body = '管理 页面';
+    ctx.body = `管`;
     next();
   })
-
+  // .use('/set', setRouter.routes(), setRouter.allowedMethods())
 module.exports = experimentalRouter;
