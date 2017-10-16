@@ -32,9 +32,7 @@ app.use(async (ctx, next) => {
         message: err.message
       };
     else
-      ctx.body = {
-        err
-      }
+      ctx.body = err.toString().replace(/\|/g, '<br />')
   }
   finally {
     ctx.status = ctx.response.status;
