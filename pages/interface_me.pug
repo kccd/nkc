@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   - var user = data.user
@@ -12,7 +12,7 @@ block content
       .col-md-12
         if data.examinated
           p.f12.reddish 如果没猜错的话，你刚刚通过了一次考试，并获得了证书。
-        include exam_notification.jade
+        include exam_notification.pug
     .row
       .col-xs-12.col-md-12
         .h3(style='font-weight:300;') 个人基本信息
@@ -150,7 +150,7 @@ block content
             button.btn.btn-default.center-block#submitpersonalsetting(onclick='submitpersonalsetting()') 提交个人资料修改
             br
             br
-  include debug_output.jade
+  include debug_output.pug
     
 block scripts
   script(src='/interface_common.js')

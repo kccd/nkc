@@ -1,11 +1,11 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   - var thread = data.thread
   title #{thread.oc.t} - 科创论坛
   meta#replytarget(value='#{data.replytarget}')
   
-  include MathJax.jade
+  include MathJax.pug
   
   if (thread.oc&&thread.oc.c)
     -var processed=thread.oc.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
@@ -104,7 +104,7 @@ block content
                 if po.moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
                   .form-inline
                     .form-group
-                      include forumlist_dropdown.jade
+                      include forumlist_dropdown.pug
                       button(onclick="javascript:moveThreadTo('#{thread._key}')") #{po.moveThread? '移动' : '转发'}
                     if po.moveThread
                       .form-group
@@ -201,16 +201,16 @@ block content
                     canvas#qrcode
 
           
-          include interface_navigation_paging.jade      
+          include interface_navigation_paging.pug
           //hr.ThreadTitleHr
           .ThreadPostList
             each post,index in data.posts
-              include interface_thread_singlepost.jade
+              include interface_thread_singlepost.pug
               if index == data.posts.length-3
                 #bottom
             
           br
-          include interface_navigation_paging.jade
+          include interface_navigation_paging.pug
           
           - var forumname = data.forum.display_name
           - var forumType = data.thread.fid? 'f' : 'm'
@@ -253,7 +253,7 @@ block content
                   .form-group
                     button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
 
-          include exam_notification.jade
+          include exam_notification.pug
           
           if !data.user
             :markdown
@@ -265,17 +265,17 @@ block content
         //user_profile section
         -var user = data.ocuser
         if user
-          include interface_thread_userpatch.jade
+          include interface_thread_userpatch.pug
         
         -var skipOtherParent = true
-        include interface_forums_list.jade
+        include interface_forums_list.pug
         -skipOtherParent=false          
         
         //forum profile section
         .nkcpanel
           -var f = data.forum
           -var p = data.forum
-          include interface_forumprofile2.jade
+          include interface_forumprofile2.pug
 
         if data.user
           .nkcpanel
@@ -287,7 +287,7 @@ block content
         
         .nkcpanel
           ul.HomeFriendlyLink
-            include nkc_footer_links.jade
+            include nkc_footer_links.pug
         
         .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
           button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
@@ -295,9 +295,9 @@ block content
           button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
         
               
-        //include interface_forums_list.jade
+        //include interface_forums_list.pug
 
-  include debug_output.jade
+  include debug_output.pug
     
 block scripts
   script(src='/interface_common.js')

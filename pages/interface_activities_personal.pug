@@ -64,15 +64,15 @@ block content
 
       .col-md-3.hidden-xs.hidden-sm
         .nkcpanel
-          include forum_logo_wisdom.jade
+          include forum_logo_wisdom.pug
         -var user = data.targetUser
         if user
-          include interface_thread_userpatch.jade
+          include interface_thread_userpatch.pug
         .nkcpanel
           ul.HomeFriendlyLink
-            include nkc_footer_links.jade
+            include nkc_footer_links.pug
 
-      include debug_output.jade
+      include debug_output.pug
 block scripts
   script(src='/moment-with-locales.js')
   script(src='/interface_common.js')

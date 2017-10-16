@@ -5,8 +5,8 @@ div(class=`${classString}` style=`${styleString}`)
   .row
     .col-md-12
       ul.HomeFriendlyLink
-        include nkc_footer_links.jade
-        include nkc_friendlies.jade
+        include nkc_footer_links.pug
+        include nkc_friendlies.pug
       //hr.hrNarrowSpace
       //- p #{server.name} #[a(href='#{server.github}') #{server.github}] 
       p #{data?data.site?data.site.copyright:'':''} 

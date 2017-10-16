@@ -1,9 +1,9 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 编辑器 - 科创论坛
   
-  include MathJax.jade
+  include MathJax.pug
   
 block content
   
@@ -19,7 +19,7 @@ block content
     else
       .row
         .col-md-12
-          include exam_notification.jade
+          include exam_notification.pug
           
       .row
         .col-xs-12.col-sm-7.col-md-6
@@ -82,7 +82,7 @@ block content
           
           .nkcpanel(id='file-uploading' target='resources/')
             //uploader section
-            include interface_attachment_uploader_uploader.jade
+            include interface_attachment_uploader_uploader.pug
               
           .panel.panel-default
             .panel-heading 我的附件（点击插入帖子）
@@ -138,7 +138,7 @@ block content
                 在bbcode语法下，请用单反斜杠，即`\(`和`\)` 及 `$$`。
       
   
-  include debug_output.jade
+  include debug_output.pug
 block scripts
 
   script(src='/commonmark/commonmark.js')

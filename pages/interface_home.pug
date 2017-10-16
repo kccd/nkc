@@ -61,7 +61,7 @@ block content
 
         -var user = data.user
         if user
-          include interface_thread_userpatch.jade
+          include interface_thread_userpatch.pug
         if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
           .nkcpanel
             if !data.permittedOperations.getLatestPosts

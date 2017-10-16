@@ -2,7 +2,7 @@
 .nkcpanel
 
   .UserProfileSection1
-    include interface_profile_avatar.jade
+    include interface_profile_avatar.pug
     
     div(style='display:inline-block;margin-top:8px;')
       //.ForumTitleCircle(style='background-color:#{user.color||"#bbb"}')
@@ -16,7 +16,7 @@
               a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick='subscribeUserSwitch("#{uid}");')#subscribeButton 关注
       
   -user.hidelastlogin = true
-  include interface_profile_info_section2.jade
+  include interface_profile_info_section2.pug
   
   hr
   

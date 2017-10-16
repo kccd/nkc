@@ -59,7 +59,7 @@ forumRouter
           "refreshicode3": true,
           "viewActiveEmail": true
       },
-      "template": "/home/lz/projects/nkc2/nkc_modules/jade/interface_forum.jade",
+      "template": "/home/lz/projects/nkc2/nkc_modules/jade/interface_forum.pug",
       "forum": {
           "class": null,
           "visibility": true,
@@ -9642,7 +9642,7 @@ forumRouter
       "userThreads": [],
       "moderators": []
   }
-    ctx.template = 'interface_forum.jade';
+    ctx.template = 'interface_forum.pug';
     next();
   })
   // .use('/set', setRouter.routes(), setRouter.allowedMethods())

@@ -61,9 +61,9 @@ loginRouter
           "refreshicode3": true,
           "viewActiveEmail": true
       },
-      "template": "/home/lz/projects/nkc2/nkc_modules/jade/interface_user_login.jade"
+      "template": "/home/lz/projects/nkc2/nkc_modules/jade/interface_user_login.pug"
     };
-    ctx.template = 'interface_user_login.jade';
+    ctx.template = 'interface_user_login.pug';
     next();
   })
   .post('/', async (ctx, next) => {

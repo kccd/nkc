@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   link(href='/interface_experimental.css' rel='stylesheet')
@@ -23,7 +23,7 @@ block content
           .panel-body
             p 将选中帖子移动到：
             .form-group
-              include forumlist_dropdown.jade
+              include forumlist_dropdown.pug
               
             .form-group
               button.btn.btn-default(onclick="directedMove()") 走起
@@ -43,7 +43,7 @@ block content
             a.btn.btn-default(href="/danger") 危险
             a.btn.btn-default(href="/f/recycle") 进入回收站
             a.btn.btn-default(href="/f/draft") 进入草稿版
-            a.btn.btn-default(href='/api/operation?operation=viewTemplate&template=stats/stats.jade') 看统计
+            a.btn.btn-default(href='/api/operation?operation=viewTemplate&template=stats/stats.pug') 看统计
             a.btn.btn-default(href='/newusers') 最新用户
             a.btn.btn-default(href='/newsysteminfo') 发新通知
       .col-xs-12.col-md-6
@@ -120,7 +120,7 @@ block content
               5. 操作完之后，管理车不会清空。请点“**清空我的管理车**”。
               
     
-  include debug_output.jade
+  include debug_output.pug
 block scripts
   script(src='/react.js')
   script(src='/JSXTransformer.js')

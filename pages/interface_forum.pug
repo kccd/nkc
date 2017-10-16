@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title #{data.forum.display_name} - #{data.site.name}
@@ -126,7 +126,7 @@ block content
                   hr.hrNarrowSpace
                   -var f = data.forum
                   -var p = data.forum
-                  include interface_forumprofile2.jade
+                  include interface_forumprofile2.pug
                   hr.hrNarrowSpace
                   //.panel(style='height: 310px; border: none; box-shadow: none;')
                     //-var target = 'index'
@@ -146,7 +146,7 @@ block content
               .row
                 .col-xs-12
                   .form-group(style='margin-top:0px;margin-bottom:6px')
-                    include interface_easy_post.jade
+                    include interface_easy_post.pug
                     if data.replytarget && !hasChildren
 
                       a.btn.btn-default(href='/editor?target=#{data.replytarget}') 新帖
@@ -164,7 +164,7 @@ block content
                       .form-group
                         button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
                       .form-group
-                        include forumlist_dropdown.jade
+                        include forumlist_dropdown.pug
                         button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
 
                       .form-group
@@ -180,7 +180,7 @@ block content
 
                 .col-xs-12
                   nav
-                    include interface_navigation_paging.jade
+                    include interface_navigation_paging.pug
 
                     - var paging = data.paging
                     - var digest = data.digest
@@ -212,7 +212,7 @@ block content
               if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
                 .ForumThreadList
                   each thread,index in data.toppedThreads
-                    include interface_forum_singlethread.jade
+                    include interface_forum_singlethread.pug
                 //hr.hrNarrowSpace
                 .ForumToppedSplitter - 以上是置顶 -
 
@@ -221,12 +221,12 @@ block content
                   if data.toppedThreads && (data.toppedThreads.map(item => item._key).indexOf(thread._key) >= 0)
                     //exclude threads that are shown in topped area.
                   else
-                    include interface_forum_singlethread.jade
+                    include interface_forum_singlethread.pug
 
               .row
                 .col-md-12
                   nav
-                    include interface_navigation_paging.jade
+                    include interface_navigation_paging.pug
 
                   if data.replytarget && !hasChildren
                     a.btn.btn-default(style="margin-top:13px" href='/editor?target=#{data.replytarget}') 发表新帖
@@ -236,10 +236,10 @@ block content
                 
         .col-md-3.hidden-xs.hidden-sm
           .nkcpanel
-            include forum_logo_wisdom.jade
+            include forum_logo_wisdom.pug
           -var user = data.user
           if user
-            include interface_thread_userpatch.jade
+            include interface_thread_userpatch.pug
           //-var active_user_title = '学院活跃用户'
           //include interface_active_users
           if hasChildren
@@ -248,7 +248,7 @@ block content
                 -var f = forum
                 -var p = forum
                 -var type = 'f'
-                include interface_forumprofile2.jade
+                include interface_forumprofile2.pug
                 hr.hrNarrowSpace
                 //  div
                 //    a.btn.btn-default(href='/editor?target=f/#{forum._key}') 新帖
@@ -261,7 +261,7 @@ block content
                 //hr.hrNarrowSpace
                 //.ForumThreadList
                 //  each thread,index in forum.threads
-                //    include interface_forum_singlethread.jade
+                //    include interface_forum_singlethread.pug
           if data.user
             .nkcpanel
               a(href='/m/#{data.user._key}') 我的主题
@@ -272,7 +272,7 @@ block content
 
           .nkcpanel
             ul.HomeFriendlyLink
-              include nkc_footer_links.jade
+              include nkc_footer_links.pug
 
           .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
             button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
@@ -281,9 +281,9 @@ block content
 
 
           if !forumIsParent
-            //include interface_forums_list.jade
+            //include interface_forums_list.pug
             
-    include debug_output.jade
+    include debug_output.pug
 
 block scripts
   script(src='/interface_common.js')

@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title #{data.forum.display_name} - #{data.site.name}
@@ -151,7 +151,7 @@ block content
                     button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
                   if data.permittedOperations.moveAllThreads
                     .form-group
-                      include forumlist_dropdown.jade
+                      include forumlist_dropdown.pug
                       button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
 
                     .form-group
@@ -159,7 +159,7 @@ block content
 
             .col-xs-12
               nav
-                include interface_navigation_paging.jade
+                include interface_navigation_paging.pug
 
                 - var paging = data.paging
                 - var digest = data.digest
@@ -206,7 +206,7 @@ block content
           .row
             .col-md-12
               nav
-                include interface_navigation_paging.jade
+                include interface_navigation_paging.pug
 
 
 
@@ -215,10 +215,10 @@ block content
 
       .col-md-3.hidden-xs.hidden-sm
         .nkcpanel
-          include forum_logo_wisdom.jade
+          include forum_logo_wisdom.pug
         -var user = data.targetUser
         if user
-          include interface_thread_userpatch.jade
+          include interface_thread_userpatch.pug
         //-var active_user_title = '学院活跃用户'
         //include interface_active_users
 
@@ -232,7 +232,7 @@ block content
 
         .nkcpanel
           ul.HomeFriendlyLink
-            include nkc_footer_links.jade
+            include nkc_footer_links.pug
 
         .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
           button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
@@ -240,7 +240,7 @@ block content
           button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
 
 
-    include debug_output.jade
+    include debug_output.pug
 
 block scripts
   script(src='/interface_common.js')
