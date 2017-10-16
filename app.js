@@ -24,42 +24,40 @@ app.use(async (ctx, next) => {
   });
   try {
     await next();
-  }
-  catch (err) {
+  } catch(err) {
     ctx.error = err;
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
-      message: err.stack
+      message: err.message
     };
   }
   finally {
-    ctx.status = ctx.response.status
+    ctx.status = ctx.response.status;
     const passed = Date.now() - ctx.reqTime;
-    ctx.set('X-Response-Time', String(passed));
+    ctx.set('X-Response-Time', passed);
+    ctx.processTime = passed.toString();
     await logger(ctx);
   }
 });
 app.use(staticServe('./pages'));
 app.use(bodyParser());
-app.use(mainRouter.routes());
-app.use((ctx, next) => {
-  const type = ctx.accepts('html', 'json');
-  console.log(ctx.template);
-  console.log(ctx.data);
+app.use(async (ctx, next) => {
+  await next();
+  const type = ctx.accepts('json', 'html');
   switch(type) {
-    case 'html':
-      ctx.type = 'html';
-      ctx.body = ctx.nkcModules.render(ctx.template, {data: ctx.data});
-      break;
     case 'json':
       ctx.type = 'json';
       ctx.body = ctx.data;
       break;
     default:
-      ctx.type = 'text';
-      ctx.body = ctx.status + ctx.data;
+      ctx.type = 'html';
+      try {
+        ctx.body = ctx.nkcModules.render(ctx.template, {data: ctx.data});
+      } catch(e) {
+        ctx.throw(500, e)
+      }
   }
-  next();
 });
+app.use(mainRouter.routes());
 
 module.exports = app.callback();
