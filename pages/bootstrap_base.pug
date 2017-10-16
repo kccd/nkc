@@ -1,4 +1,4 @@
-extends scratch.jade
+extends scratch.pug
 
 block head
   script.
@@ -53,13 +53,13 @@ block head
 block body
   
   block navbar
-    include nkc_navbar.jade
+    include nkc_navbar.pug
 
   block content
     h1 hello world!
   
   block footer
-    include nkc_footer.jade
+    include nkc_footer.pug
     
   script(src='/jquery/jquery-1.11.1.js')
   script(src='/bootstrap/js/bootstrap.min.js')

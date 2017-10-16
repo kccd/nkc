@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 登录
@@ -61,7 +61,7 @@ block content
             :markdown
               忘记密码？可以尝试通过[邮件找回](/forgotPassword)或者[手机找回](/forgotPassword2)
 
-  include debug_output.jade
+  include debug_output.pug
     
 block scripts
   script(src='/interface_common.js')
