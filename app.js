@@ -16,6 +16,7 @@ app.use(async (ctx, next) => {
   ctx.nkcModules = nkcModules;
   try {
     await next();
+    ctx.status = ctx.response.status
   }
   catch (err) {
     ctx.error = err;
