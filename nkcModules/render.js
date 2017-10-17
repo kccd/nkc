@@ -8,17 +8,17 @@ let filters = {
   thru: function(k){return k}
 };
 let getCertsInText = (user) => {
-  let perm = require('./permissions.js')
+  let perm = require('./permissions.js');
 
-  let certs =  perm.calculateThenConcatCerts(user)
+  let certs =  perm.calculateThenConcatCerts(user);
 
-  let s = ''
+  let s = '';
   for(i in certs){
-    let cname = perm.getDisplayNameOfCert(certs[i])
+    let cname = perm.getDisplayNameOfCert(certs[i]);
     s+=cname+' '
   }
   return s
-}
+};
 let getUserDescription = (user) => {
   return `${user.username}\n`+
     `学术分 ${user.xsf||0}\n`+
@@ -30,7 +30,7 @@ let dateTimeString = (t) => {
 };
 let fromNow = (time) => {
   return moment(time).fromNow();
-}
+};
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
@@ -45,4 +45,3 @@ let pugRender = (template, data) => {
   return pug.renderFile(template, options);
 };
 module.exports = pugRender;
-//module.exports = require('pug').renderFile;

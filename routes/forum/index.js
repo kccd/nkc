@@ -59,8 +59,7 @@ forumRouter
           "refreshicode3": true,
           "viewActiveEmail": true
       },
-      "template": "/home/lz/projects/nkc2/nkc_modules/jade/interface_forum.pug",
-      "forum": {
+      /*"forum": {
           "class": null,
           "visibility": true,
           "count_posts_today": 14,
@@ -80,7 +79,7 @@ forumRouter
           "_id": "forums/205",
           "_rev": "46887095642403",
           "_key": "205"
-      },
+      },*/
       "threads": [
           {
               "has_file": null,
@@ -9641,9 +9640,25 @@ forumRouter
       "newestDigestThreads": [],
       "userThreads": [],
       "moderators": []
-  }
+    };
+    let forum = await ctx.db.forumModel.findOne({fid: fid});
+    if(!forum) {
+      throw '板块不存在';
+    }
+
+    let o = {};
+    o.map = function() {
+      emit(this.displayName, 1);
+    };
+    o.reduce = function(key, value) {
+      return value.length;
+    };
+    ctx.db.forumModel.mapReduce(o, function(err, results){
+      console.log(results);
+    });
+    ctx.data.forum = forum;
     ctx.template = 'interface_forum.pug';
     next();
-  })
+  });
   // .use('/set', setRouter.routes(), setRouter.allowedMethods())
 module.exports = forumRouter;
