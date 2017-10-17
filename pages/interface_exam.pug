@@ -1,8 +1,8 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   meta#category(category-string='#{data.category?data.category:""}')
-  include MathJax.jade
+  include MathJax.pug
   title 注册测试 - 科创论坛
   
 block content
@@ -80,7 +80,7 @@ block content
       
     
   
-  include debug_output.jade
+  include debug_output.pug
 block scripts
   
   script(src='/interface_common.js')

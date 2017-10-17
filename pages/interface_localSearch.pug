@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 搜索结果 - 科创论坛
@@ -87,7 +87,7 @@ block content
             if data.toppedThreads && (data.toppedThreads.map(item=>item._key).indexOf(thread._key)>=0)
               //exclude threads that are shown in topped area.
             else
-              include interface_forum_singlethread.jade
+              include interface_forum_singlethread.pug
         
         if 0
           .SearchResultList
@@ -112,7 +112,7 @@ block content
           .form-group
             button#research.btn.btn-primary() 搜索
   
-  include debug_output.jade
+  include debug_output.pug
   
   
 block scripts

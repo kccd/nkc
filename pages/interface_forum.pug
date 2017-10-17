@@ -78,7 +78,7 @@ block content
                   .ForumName #{forum.display_name}
 
                   if data.forum.description
-                    div!=markdown_safe(data.forum.description)
+                    div!= markdown_safe(data.forum.description)
                 
                 
                   div

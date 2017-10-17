@@ -25,7 +25,7 @@ block content
 
         .panel
           nav
-            include interface_navigation_paging.jade
+            include interface_navigation_paging.pug
 
             - var paging = data.paging
             - var digest = data.digest
@@ -62,7 +62,7 @@ block content
           for thread in data.indexThreads
             include interface_index_singlethread
           nav
-            include interface_navigation_paging.jade
+            include interface_navigation_paging.pug
 
       .col-md-3.hidden-xs.hidden-sm
         .nkcpanel
@@ -70,7 +70,7 @@ block content
 
         -var user = data.user
         if user
-          include interface_thread_userpatch.jade
+          include interface_thread_userpatch.pug
         if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
           .nkcpanel
             if !data.permittedOperations.getLatestPosts
@@ -89,7 +89,7 @@ block content
               include interface_users_latest_threads
       .row
         .col-md-12
-          include nkc_friendlies.jade
+          include nkc_friendlies.pug
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_easy_post.js')

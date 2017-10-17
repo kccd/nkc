@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title #{data.category} - #{data.thisuser.username}的收藏 - 科创论坛
@@ -13,7 +13,7 @@ block content
         .col-xs-12
           .nkcpanel
             -var uid = data.thisuser._key
-            include interface_profile_avatar.jade
+            include interface_profile_avatar.pug
             .ForumName #{data.category} - #{data.thisuser.username} 的个人收藏
         
         if ownership
@@ -61,7 +61,7 @@ block content
                 -var thread = item.thread
                 if thread
                   -var showTicks = ownership
-                  include interface_forum_singlethread.jade
+                  include interface_forum_singlethread.pug
 
         .col-xs-12
           
@@ -79,7 +79,7 @@ block content
             1. 整理论坛资料，方便个人日后取用。
             2. 整理一整个系列的作品/著述，方便他人直接浏览。
         
-    include debug_output.jade
+    include debug_output.pug
     
     
 block scripts

@@ -1,7 +1,7 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
-  include MathJax.jade
+  include MathJax.pug
   title 提交问题 - 科创论坛
   
 block content
@@ -82,7 +82,7 @@ block content
           .panel.panel-default
             .panel-body.post-body
               each q,index in data.questions
-                include questions_single.jade
+                include questions_single.pug
                 
         else
           h4 你还没有登录
@@ -113,7 +113,7 @@ block content
               .panel-body.post-body
                 each q,index in data.questions_all
 
-                  include questions_single.jade
+                  include questions_single.pug
                   
       .col-xs-12.col-sm-6
         .panel.panel-default
@@ -136,7 +136,7 @@ block content
                 | : #{number}
           
   
-  include debug_output.jade
+  include debug_output.pug
 block scripts
 
   script(src='/interface_common.js')

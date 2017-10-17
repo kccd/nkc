@@ -1,7 +1,7 @@
 .row
   .col-xs-12.col-sm-6
     .UserProfileSection1
-      include interface_profile_avatar.jade
+      include interface_profile_avatar.pug
       -var user = thatuser
       -var uid = thatuser._key
       div(style='display:inline-block;margin-top:8px;')
@@ -12,7 +12,7 @@
               a.btn.btn-sm.btn-danger(href='javascript:;' onclick='subscribeUserSwitch("#{uid}")')#subscribeButton 取关
             else
               a.btn.btn-sm.btn-info(href='javascript:;' onclick='subscribeUserSwitch("#{uid}")')#subscribeButton 关注
-    include interface_profile_info_section2.jade
+    include interface_profile_info_section2.pug
           
   .col-xs-12.col-sm-6
     .UserProfileSection1(style='text-align:left')

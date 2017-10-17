@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 科创维修
@@ -21,7 +21,7 @@ block content
       .col-md-6    
         .form-group
           -var listParent = true
-          include forumlist_dropdown.jade
+          include forumlist_dropdown.pug
         .form-group
           button#LoadDocFromSelection.btn.btn-default(type='submit') 拉取板块
         
