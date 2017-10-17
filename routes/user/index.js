@@ -6,7 +6,7 @@ const userRouter = new Router();
 
 userRouter
   .get('/', async (ctx, next) => {
-    const users = await ctx.db.userModel.find({}).sort({toc: -1}).limit(10);
+    const users = await ctx.db.UserModel.find({}).sort({toc: -1}).limit(10);
     const data = {users};
     ctx.data = data;
     next();

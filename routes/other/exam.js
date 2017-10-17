@@ -7,7 +7,7 @@ examRouter
   })
   .get('/:category', async (ctx, next) => {
     const category = ctx.params.category;
-    let data = await ctx.db.questionModel.find({category: 'mix'}).limit(10);
+    let data = await ctx.db.QuestionModel.find({category: 'mix'}).limit(10);
     ctx.data = JSON.stringify(data);
     ctx.template = 'user.pug';
     next();

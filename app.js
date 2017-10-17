@@ -14,6 +14,7 @@ app.use(async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.db = db;
   ctx.nkcModules = nkcModules;
+  ctx.tools = tools;
   Object.defineProperty(ctx, 'template', {
     get: function() {
       return './pages/' + this.__templateFile

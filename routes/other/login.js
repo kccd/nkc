@@ -67,8 +67,14 @@ loginRouter
     next();
   })
   .post('/', async (ctx, next) => {
-    ctx.data = '提交登陆信息';
-    next();
-  })
+    const {username, password} = ctx.body;
+    const {
+      encryptInMD5WithSalt,
+      encryptInSHA256HMACWithSalt
+    } = ctx.tools.encryption;
+    const {UserModel, UsersPersonalModel} = ctx.db;
+    const
+    next()
+  });
 
 module.exports = loginRouter;

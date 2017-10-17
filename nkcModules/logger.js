@@ -1,5 +1,5 @@
 module.exports = async ctx => {
-  const logModel = ctx.db.logModel;
+  const {LogModel} = ctx.db;
   const processTime = ctx.processTime;
   const log = {
     error: ctx.error,
