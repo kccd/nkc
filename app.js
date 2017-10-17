@@ -15,6 +15,61 @@ app.use(async (ctx, next) => {
   ctx.db = db;
   ctx.nkcModules = nkcModules;
   ctx.tools = tools;
+  ctx.data = {
+    "site": settings.site
+  };
+  ctx.data.contentClasses = {
+    "null": true,
+    "images": true,
+    "non_images": false,
+    "non_public": false,
+    "": true
+  };
+  ctx.data.permittedOperations = {
+    "viewLatest": true,
+    "viewPersonalActivities": true,
+    "viewEditor": true,
+    "viewThread": true,
+    "viewForum": true,
+    "viewHome": true,
+    "viewUser": true,
+    "viewPersonalForum": true,
+    "useSearch": true,
+    "viewLocalSearch": true,
+    "viewExam": true,
+    "submitExam": true,
+    "viewRegister": true,
+    "viewRegister2": true,
+    "userRegister": true,
+    "userLogin": true,
+    "viewLogin": true,
+    "viewLogout": true,
+    "viewPanorama": true,
+    "viewCollectionOfUser": true,
+    "getResourceThumbnail": true,
+    "getResource": true,
+    "exampleOperation": true,
+    "getGalleryRecent": true,
+    "getForumsList": true,
+    "viewPage": true,
+    "viewTemplate": true,
+    "receiveMobileMessage": true,
+    "getRegcodeFromMobile": true,
+    "forgotPassword": true,
+    "newPasswordWithToken": true,
+    "pchangePassword": true,
+    "viewForgotPassword": true,
+    "viewForgotPassword2": true,
+    "getMcode": true,
+    "getMcode2": true,
+    "userPhoneRegister": true,
+    "userMailRegister": true,
+    "refreshicode": true,
+    "refreshicode3": true,
+    "viewActiveEmail": true
+  };
+  ctx.data.getcode = false;
+
   Object.defineProperty(ctx, 'template', {
     get: function() {
       return './pages/' + this.__templateFile

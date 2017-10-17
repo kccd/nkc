@@ -1,11 +1,12 @@
 const render = require('./nkc_render');
 const moment = require('moment');
 const pug = require('pug');
+const settings = require('../settings');
 let filters = {
   markdown:render.commonmark_render,
   markdown_safe:render.commonmark_safe,
   bbcode:render.bbcode_render,
-  thru: function(k){return k}
+  thru: function(k){return k},
 };
 let getCertsInText = (user) => {
   let perm = require('./permissions.js');
@@ -37,7 +38,8 @@ let pugRender = (template, data) => {
     markdown: render.commonmark_render,
     getUserDescription: getUserDescription,
     dateTimeString: dateTimeString,
-    fromNow: fromNow
+    fromNow: fromNow,
+    server: settings.server
 
   };
   options.data = data;

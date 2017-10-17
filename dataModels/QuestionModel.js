@@ -3,6 +3,11 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
+  qid:{
+    type: String,
+    unique: true,
+    required: true
+  },
   tlm: {
     type: Number,
   },
@@ -43,6 +48,6 @@ questionSchema.pre('save', function(next){
     this.tlm = this.toc;
   }
   next();
-})
+});
 
 module.exports = mongoose.model('questions', questionSchema);
