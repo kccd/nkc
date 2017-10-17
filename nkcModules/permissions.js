@@ -1,8 +1,8 @@
 
 
-var operations = require('./api_operations');
-var table = operations.table;
-
+//var operations = require('./api_operations');
+//var table = operations.table;
+var table = {};
 var permissions = {};
 
 var timeHour = 3600*1000;

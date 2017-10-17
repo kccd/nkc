@@ -1,4 +1,5 @@
 const render = require('./nkc_render');
+const moment = require('moment');
 const pug = require('pug');
 let filters = {
   markdown:render.commonmark_render,
@@ -24,11 +25,19 @@ let getUserDescription = (user) => {
     `科创币 ${user.kcb||0}\n`+
     `${getCertsInText(user)}`
 };
+let dateTimeString = (t) => {
+  return moment(t).format('YYYY-MM-DD HH:mm')
+};
+let fromNow = (time) => {
+  return moment(time).fromNow();
+}
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
     markdown: render.commonmark_render,
     getUserDescription: getUserDescription,
+    dateTimeString: dateTimeString,
+    fromNow: fromNow
 
   };
   options.data = data;

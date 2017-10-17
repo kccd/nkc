@@ -2,43 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4121526f-0be9-49aa-9a17-cbbf7d7c291b" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/preferred-vcs.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/kc.iml" afterPath="$PROJECT_DIR$/.idea/kc.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/watcherTasks.xml" afterPath="$PROJECT_DIR$/.idea/watcherTasks.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nkcModules/permissions.js" afterPath="$PROJECT_DIR$/nkcModules/permissions.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nkcModules/render.js" afterPath="$PROJECT_DIR$/nkcModules/render.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/404.pug" afterPath="$PROJECT_DIR$/pages/404.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/500.pug" afterPath="$PROJECT_DIR$/pages/500.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/bshw.pug" afterPath="$PROJECT_DIR$/pages/bshw.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/debug_output.pug" afterPath="$PROJECT_DIR$/pages/debug_output.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/index.pug" afterPath="$PROJECT_DIR$/pages/index.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_attachment_uploader.pug" afterPath="$PROJECT_DIR$/pages/interface_attachment_uploader.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_collections.pug" afterPath="$PROJECT_DIR$/pages/interface_collections.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_danger.pug" afterPath="$PROJECT_DIR$/pages/interface_danger.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_exam.pug" afterPath="$PROJECT_DIR$/pages/interface_exam.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_forum.pug" afterPath="$PROJECT_DIR$/pages/interface_forum.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_latest_threads.pug" afterPath="$PROJECT_DIR$/pages/interface_latest_threads.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_localSearch.pug" afterPath="$PROJECT_DIR$/pages/interface_localSearch.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_page.pug" afterPath="$PROJECT_DIR$/pages/interface_page.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_panorama.pug" afterPath="$PROJECT_DIR$/pages/interface_panorama.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_personal.pug" afterPath="$PROJECT_DIR$/pages/interface_personal.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_post_history.pug" afterPath="$PROJECT_DIR$/pages/interface_post_history.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_profile.pug" afterPath="$PROJECT_DIR$/pages/interface_profile.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_profile_info.pug" afterPath="$PROJECT_DIR$/pages/interface_profile_info.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_template.pug" afterPath="$PROJECT_DIR$/pages/interface_template.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_user_logout.pug" afterPath="$PROJECT_DIR$/pages/interface_user_logout.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_user_register2.pug" afterPath="$PROJECT_DIR$/pages/interface_user_register2.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_viewForgotPassword.pug" afterPath="$PROJECT_DIR$/pages/interface_viewForgotPassword.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/interface_viewForgotPassword2.pug" afterPath="$PROJECT_DIR$/pages/interface_viewForgotPassword2.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/questions_edit.pug" afterPath="$PROJECT_DIR$/pages/questions_edit.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/readthread.pug" afterPath="$PROJECT_DIR$/pages/readthread.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/viewActiveEmail.pug" afterPath="$PROJECT_DIR$/pages/viewActiveEmail.pug" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pages/vuefun.pug" afterPath="$PROJECT_DIR$/pages/vuefun.pug" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -72,21 +37,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="render.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="render.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nkcModules/render.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
-              <caret line="28" column="31" lean-forward="false" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="31" />
+            <state relative-caret-position="721">
+              <caret line="43" column="25" lean-forward="false" selection-start-line="43" selection-start-column="25" selection-end-line="43" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="permissions.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="permissions.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nkcModules/permissions.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="38">
-              <caret line="2" column="35" lean-forward="false" selection-start-line="2" selection-start-column="35" selection-end-line="2" selection-end-column="35" />
+            <state relative-caret-position="665">
+              <caret line="35" column="26" lean-forward="true" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -105,8 +70,8 @@
       <file leaf-file-name="interface_forum_singlethread.pug" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pages/interface_forum_singlethread.pug">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="228">
-              <caret line="27" column="32" lean-forward="false" selection-start-line="27" selection-start-column="32" selection-end-line="27" selection-end-column="32" />
+            <state relative-caret-position="527">
+              <caret line="81" column="72" lean-forward="true" selection-start-line="81" selection-start-column="72" selection-end-line="81" selection-end-column="72" />
               <folding />
             </state>
           </provider>
@@ -135,6 +100,7 @@
       <find>.pug</find>
       <find>markc</find>
       <find>require</find>
+      <find>date</find>
     </findStrings>
     <replaceStrings>
       <replace>.pug</replace>
@@ -152,6 +118,7 @@
       <list>
         <option value="$PROJECT_DIR$/pages/404.pug" />
         <option value="$PROJECT_DIR$/pages/interface_forum.pug" />
+        <option value="$PROJECT_DIR$/nkcModules/permissions.js" />
         <option value="$PROJECT_DIR$/nkcModules/render.js" />
       </list>
     </option>
@@ -180,10 +147,10 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
+    <option name="x" value="240" />
+    <option name="y" value="130" />
+    <option name="width" value="1440" />
+    <option name="height" value="780" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -262,12 +229,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1508204181089</updated>
-      <workItem from="1508204182287" duration="2711000" />
+      <workItem from="1508204182287" duration="3146000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2711000" />
+    <option name="totallyTimeSpent" value="3146000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -332,14 +299,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/interface_forum_singlethread.pug">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="27" column="32" lean-forward="false" selection-start-line="27" selection-start-column="32" selection-end-line="27" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
@@ -348,18 +307,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nkcModules/render.js">
+    <entry file="file://$PROJECT_DIR$/nkcModules/api_operations.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="28" column="31" lean-forward="false" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="31" />
+        <state relative-caret-position="380">
+          <caret line="20" column="35" lean-forward="false" selection-start-line="20" selection-start-column="35" selection-end-line="20" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nkcModules/permissions.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="2" column="35" lean-forward="false" selection-start-line="2" selection-start-column="35" selection-end-line="2" selection-end-column="35" />
+        <state relative-caret-position="665">
+          <caret line="35" column="26" lean-forward="true" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/interface_forum_singlethread.pug">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="81" column="72" lean-forward="true" selection-start-line="81" selection-start-column="72" selection-end-line="81" selection-end-column="72" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nkcModules/render.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="721">
+          <caret line="43" column="25" lean-forward="false" selection-start-line="43" selection-start-column="25" selection-end-line="43" selection-end-column="25" />
           <folding />
         </state>
       </provider>
