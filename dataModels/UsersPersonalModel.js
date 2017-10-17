@@ -22,7 +22,7 @@ const usersPersonalSchema = new Schema({
     type: String,
     default: ''
   },
-  lasttry: {
+  lastTry: {
     type: Number,
     default: 0
   },
