@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 附件上传(测试版) - #{data.site.name}
@@ -21,7 +21,7 @@ block content
         .panel.panel-default(id='file-uploading' target='resources/')
           .panel-body
             //uploader section
-            include interface_attachment_uploader_uploader.jade
+            include interface_attachment_uploader_uploader.pug
         
 
       .col-xs-6.col-sm-7
@@ -32,7 +32,7 @@ block content
           .panel-body(id='list-container')
 
             
-  include debug_output.jade
+  include debug_output.pug
 
 
 block scripts

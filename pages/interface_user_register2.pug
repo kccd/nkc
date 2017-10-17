@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 注册
@@ -78,7 +78,7 @@ block content
           div.f12(style='line-height: 1.8;')
             include:markdown EULA.md
             
-  include debug_output.jade
+  include debug_output.pug
     
 block scripts
   script(src='/interface_common.js')

@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 日常 - 科创论坛
@@ -26,18 +26,18 @@ block content
       
       -var threadlist = data.newestThreads
       -var listtitle = '全站新帖'
-      include interface_home_newest.jade
+      include interface_home_newest.pug
 
       
     .row
       -var threadlist = data.latestThreads
       -var listtitle = '最新回复'
-      include interface_home_newest.jade
+      include interface_home_newest.pug
       
       if 1
         -var threadlist = data.newestDigestThreads
         -var listtitle = '近期精华'
-        include interface_home_newest.jade
+        include interface_home_newest.pug
   
     br
     if 0
@@ -46,7 +46,7 @@ block content
       .row
         .col-lg-12
           -var digestThreads = data.newestDigestThreads
-          include interface_panorama_single_digest.jade
+          include interface_panorama_single_digest.pug
     
     if data.latestReplies
       h4 回复展开
@@ -63,7 +63,7 @@ block content
               |  的帖子 
               a(href='/t/#{p.thread._key}') #{title}
               //a(href='/user_profile/#{p.thread.ocuser._key}') #{p.thread.ocuser.username}
-            include interface_thread_singlepost.jade
+            include interface_thread_singlepost.pug
             
     if data.latestReplies2
       h4 最新动态
@@ -82,7 +82,7 @@ block content
       .col-lg-12
         //digest part
         - var digestThreads = data.digestThreads
-        include interface_panorama_single_digest.jade
+        include interface_panorama_single_digest.pug
             
     .row
       .col-md-12
@@ -96,7 +96,7 @@ block content
               img.HomeThreadAvatar(src='#{avatar}')
               span #{u.username}
         
-  include debug_output.jade
+  include debug_output.pug
 block scripts
   script(src='/interface_common.js')
   script(src='/gallery.js')

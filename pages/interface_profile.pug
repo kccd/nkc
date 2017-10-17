@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title #{data.thatuser.username} - 科创论坛
@@ -20,15 +20,15 @@ block content
           span 以继续浏览
     else
       if isViewingSelf
-        include interface_profile_recent.jade
+        include interface_profile_recent.pug
         hr
-        include interface_profile_info.jade
+        include interface_profile_info.pug
       else
-        include interface_profile_info.jade
+        include interface_profile_info.pug
         hr
-        include interface_profile_recent.jade
+        include interface_profile_recent.pug
     
-      include debug_output.jade
+      include debug_output.pug
     
   
   

@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 楼历史 - 科创论坛
@@ -13,17 +13,17 @@ block content
         
         -var p = data.post
         -var formerPost = data.histories[0]
-        include interface_post_history_single.jade
+        include interface_post_history_single.pug
         
         h3 过去版本
 
         each post,index in data.histories
           -var p = post
           -var formerPost = data.histories[index+1]
-          include interface_post_history_single.jade
+          include interface_post_history_single.pug
     
   
-  include debug_output.jade
+  include debug_output.pug
 block scripts
   
   script(src='/interface_common.js')

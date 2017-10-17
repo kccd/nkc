@@ -1,4 +1,4 @@
-extends bootstrap_base.jade
+extends bootstrap_base.pug
 
 block title
   title 个人设置 - 科创论坛
@@ -49,14 +49,14 @@ block content
           if data.forumlist
             p 板块id可参考这个列表：
             .form-group
-              include forumlist_dropdown.jade
+              include forumlist_dropdown.pug
             p 被关注的板块会显示在“板块”页的顶部，无需向下翻动。
           
           hr
           .form-group
             button.btn.btn-default#submitpersonalsetting(onclick='submitpersonalsetting()') 提交个人资料修改
           
-  include debug_output.jade
+  include debug_output.pug
 block scripts
   
   script(src='/interface_common.js')
