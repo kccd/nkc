@@ -20,7 +20,7 @@ const usersPersonalSchema = new Schema({
   },
   hashType: {
     type: String,
-    default: ''
+    required: true
   },
   lasttry: {
     type: Number,
