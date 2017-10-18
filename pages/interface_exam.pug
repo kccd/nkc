@@ -1,7 +1,7 @@
 extends bootstrap_base.pug
 
 block title
-  meta#category(category-string='#{data.category?data.category:""}')
+  meta#category(category-string=`${data.category?data.category:""}`)
   include MathJax.pug
   title 注册测试 - 科创论坛
   
@@ -16,7 +16,7 @@ block content
             //if success
             .f12
               text 恭喜你通过测试。你的注册码是:
-              a(href='/register?code=#{data.result}') #{data.result}
+              a(href=`/register/mobile?code=${data.result}`) #{data.result}
               text &nbsp←点击跳转到注册页面。
           else
             //if failed
@@ -76,10 +76,10 @@ block content
                 hr
               button#submit.btn.btn-default 交卷
 
-            meta(id='exam' exam-object='#{encodeURI(JSON.stringify(data.exam))}')
+            meta(id='exam' exam-object=`${encodeURI(JSON.stringify(data.exam))}`)
       
     
-  
+    p!= JSON.stringify(data)
   include debug_output.pug
 block scripts
   
