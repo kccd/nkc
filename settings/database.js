@@ -15,4 +15,8 @@ mongoose.connect(mongoDB, options)
     console.error(e.stack.red)
   });
 
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(reason + '\n' + promise)
+});
+
 module.exports = mongoose;

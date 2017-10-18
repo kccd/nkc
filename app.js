@@ -10,14 +10,15 @@ const db = require('./dataModels');
 const app = new Koa();
 const logger = nkcModules.logger;
 
+app.keys = [settings.cookie.secret];
 app.use(async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.db = db;
   ctx.nkcModules = nkcModules;
   ctx.tools = tools;
-  ctx.data = {
-    "site": settings.site
-  };
+  ctx.settings = settings;
+  ctx.data = Object.create(null);
+  ctx.data.site = settings.site;
   ctx.data.contentClasses = {
     "null": true,
     "images": true,
@@ -107,14 +108,12 @@ app.use(async (ctx, next) => {
 });
 app.use(async (ctx, next) => {
   //cookie identification
-  const {unsign} = tools.encryption;
-  const {secret} = settings.cookie;
   const userInfo = ctx.cookies.get('userInfo');
   if(!userInfo) {
     await next();
   } else {
-    const {username, uid} = JSON.parse(unsign(userInfo, secret));
-    const user = await db.UsersModel.findOne({uid});
+    const {username, uid} = JSON.parse(userInfo);
+    const user = await db.UserModel.findOne({uid});
     if (user.username !== username) {
       ctx.cookie.set('userInfo', '');
       ctx.redirect(401, '/login')
@@ -123,8 +122,8 @@ app.use(async (ctx, next) => {
     await next();
   }
 });
+app.use(mainRouter.routes());
 app.use(async (ctx, next) => {
-  await next();
   const type = ctx.accepts('json', 'html');
   switch(type) {
     case 'json':
@@ -139,7 +138,7 @@ app.use(async (ctx, next) => {
         ctx.throw(500, e)
       }
   }
+  await next();
 });
-app.use(mainRouter.routes());
 
 module.exports = app.callback();

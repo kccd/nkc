@@ -6,40 +6,38 @@ const userRouter = new Router();
 
 userRouter
   .get('/', async (ctx, next) => {
-    const users = await ctx.db.UserModel.find({}).sort({toc: -1}).limit(10);
-    const data = {users};
-    ctx.data = data;
+    ctx.data.users = await ctx.db.UserModel.find({}).sort({toc: -1}).limit(10);
     next();
   })
   .get('/:uid', async (ctx, next) => {
     const uid = ctx.params.uid;
-    ctx.data = `用户: ${uid}  的资料`;
+    ctx.data.message = `用户: ${uid}  的资料`;
     ctx.template = 'user.pug';
     next();
   })
   .del('/:uid', async (ctx, next) => {
     const uid = ctx.params.uid;
-    ctx.data = `封禁用户: ${uid}`;
+    ctx.data.message = `封禁用户: ${uid}`;
     next();
   })
   .put('/:uid', async (ctx, next) => {
     const uid = ctx.params.uid;
-    ctx.data = `解封用户: ${uid}`;
+    ctx.data.message = `解封用户: ${uid}`;
     next();
   })
   .get('/:uid/column', async (ctx, next) => {
     const uid = ctx.params.uid;
-    ctx.data = `用户: ${uid}  的专栏`;
+    ctx.data.message = `用户: ${uid}  的专栏`;
     next();
   })
   .get('/:uid/collection', async (ctx, next) => {
     const uid = ctx.params.uid;
-    ctx.data = `用户: ${uid}  的收藏`;
+    ctx.data.message = `用户: ${uid}  的收藏`;
     next();
   })
   .post('/:uid/pop', async (ctx, next) => {
     const uid = ctx.params.uid;
-    ctx.data = `推送/取消热门 用户: ${uid}`;
+    ctx.data.message = `推送/取消热门 用户: ${uid}`;
     next();
   })
   

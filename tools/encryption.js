@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const {sign, unsign} = require('cookie-signature');
 
 module.exports = {
   encryptInMD5WithSalt: (password, salt) => {
@@ -13,7 +12,5 @@ module.exports = {
     const hmac = crypto.createHmac('sha256', salt);
     hmac.update(password);
     return hmac.digest('hex')
-  },
-  sign,
-  unsign
+  }
 };

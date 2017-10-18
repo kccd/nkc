@@ -1,10 +1,9 @@
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
-mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://lzszone:Lz852369@localhost:27017/admin', {useMongoClient: true});
+mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')();
-db.useDatabase('rescue');
+db = require('arangojs')({url: 'http://root:@192.168.11.10',databaseName: 'rescue'});
 
 let users_personalSchema = new Schema({
   uid: {
@@ -26,7 +25,7 @@ let users_personalSchema = new Schema({
     type: String,
     required: true
   },
-  lasttry: {
+  lastTry: {
     type: Number,
     default: 0
   },
@@ -40,7 +39,7 @@ let users_personalSchema = new Schema({
       required: true
     }
   },
-  new_message: {
+  newMessage: {
     replies: {
       type: Number,
       default: 0
@@ -58,11 +57,11 @@ let users_personalSchema = new Schema({
       default: 0
     }
   },
-  regcode: {
+  regCode: {
     type: String,
     default: ''
   },
-  regip: {
+  regIP: {
     type: String,
     default: '0.0.0.0'
   },
@@ -100,12 +99,19 @@ db.query(`
         salt: salt,
         hash: hash
       };
+      res[i].hashType = 'sha256HMAC';
     }
     if(res[i].new_message.replies == null){
       res[i].new_message.replies = 0;
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
+    res[i].regIP = res[i].regip;
+    res[i].newMessage = res[i].new_message;
+    res[i].lastTry = res[i].lasttry;
+    res[i].regCode = res[i].regcode;
+    if(res[i].hashtype)
+      res[i].hashType = res[i].hashtype;
   }
   console.log('开始写入数据');
   let n = 0;
