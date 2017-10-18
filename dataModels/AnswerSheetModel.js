@@ -43,12 +43,12 @@ const answersheetsSchema = new Schema({
 });
 answersheetsSchema.pre('save', function(next) {
   let num = 0;
-  for (let answer in this.records) {
+  for (let answer of this.records) {
     if (answer.correct) {
       num++;
     }
   }
   this.score = num;
   next();
-})
+});
 module.exports = mongoose.model('answersheets', answersheetsSchema);

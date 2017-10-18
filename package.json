@@ -23,6 +23,10 @@
     "colors": "^1.1.2",
     "commonmark": "^0.28.1",
     "cookie-signature": "^1.0.6",
+<<<<<<< HEAD
+=======
+    "crypto": "^1.0.1",
+>>>>>>> dffe8109d5ac07bb35d15bac13a228e8d3c67eca
     "jstransformer-markdown-it": "^2.0.0",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",

@@ -69,8 +69,8 @@ function generalRequest(obj,opt,callback){
 function nkcOperationAPI(obj){
   return new Promise(function(resolve,reject){
     generalRequest(obj,{
-      method:'POST',
-      url:'/login'
+      method:obj.method,
+      url:obj.url
     },function(err,back){
       if(err)return reject(err);
       resolve(back);
@@ -211,11 +211,12 @@ function redirect(url){
   }
 }
 
-function nkcAPI(operationName,remainingParams){  //操作名，参数
+function nkcAPI(operationName,method,remainingParams){  //操作名，参数
   if(!remainingParams){
     var remainingParams={}
   }
-  remainingParams.operation = operationName;
+  remainingParams.url = operationName;
+  remainingParams.method = method;
   return nkcOperationAPI(remainingParams)
 }
 
