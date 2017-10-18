@@ -2,7 +2,12 @@ const Router = require('koa-router');
 const registerRouter = new Router();
 registerRouter
   .get('/mobile', async (ctx, next) => {
-    ctx.data = '手机注册页面';
+    let code = ctx.query.code;
+    if(code) {
+      ctx.data.regCode = code;
+    }
+    ctx.data.getcode = false;
+    ctx.template = 'interface_user_register.pug';
     next();
   })
   .post('/mobile', async (ctx, next) => {
@@ -10,11 +15,15 @@ registerRouter
     next();
   })
   .get('/email', async (ctx, next) => {
-    ctx.data = '邮箱注册页面';
+    let code = ctx.query.code;
+    if(code) {
+      ctx.data.regCode = code;
+    }
+    ctx.template = 'interface_user_register2.pug';
     next();
   })
   .post('/email', async (ctx, next) => {
     ctx.data = '邮箱提交注册信息';
     next();
-  })
+  });
 module.exports = registerRouter;
