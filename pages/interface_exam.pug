@@ -26,13 +26,14 @@ block content
                 [科学公园](http://scipark.net/) 或者 [果壳网](http://guokr.com)
                 逛逛。
 
-                如果你还想再测一次，请点[这里](/register?getcode=true)，而不要按浏览器的“退后”。
+                如果你还想再测一次，请点[这里](/exam/subject)，而不要按浏览器的“退后”。
 
                 ----
                 来自服务器的反馈：
-                ```
-                #{data.detail}
-                ```
+              pre
+                -data.detail='测试测试';
+                code.hljs.bash(data-sourcepos="9:1-11:14")
+                  span.hljs-variable!= data.detail
 
       if data.exam
         .col-xs-12
@@ -55,7 +56,7 @@ block content
         .col-xs-12
           .panel.panel-default.f12
             .panel-body
-              meta(id='number_of_questions' value='#{data.exam.qarr.length}')
+              meta(id='number_of_questions' value=`${data.exam.qarr.length}`)
               each q,index in data.exam.qarr
                 div
                   span #{index+1}.
@@ -63,14 +64,14 @@ block content
 
                 case q.type
                   when 'ans'
-                    input(type='text' id='answer#{index}')
+                    input(type='text' id=`answer${index}`)
                   when 'ch4'
                     - var prefixes = ['A','B','C','D']
                     each c,cindex in q.choices
-                      meta(id='answer#{index}')
+                      meta(id=`answer${index}`)
                       //set value when chosen
                       p
-                        input(type='radio' name='answer#{index}' value='#{cindex}' onclick='geid("answer#{index}").value=#{cindex}')
+                        input(type='radio' name=`answer${index}` value=`${cindex}` onclick=`geid("answer${index}").value=${cindex}`)
                         text #{prefixes[cindex]}.  #{c}
 
                 hr
@@ -79,7 +80,6 @@ block content
             meta(id='exam' exam-object=`${encodeURI(JSON.stringify(data.exam))}`)
       
     
-    p!= JSON.stringify(data)
   include debug_output.pug
 block scripts
   

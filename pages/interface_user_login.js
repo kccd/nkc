@@ -9,7 +9,7 @@ function login_submit(){
   if(userobj.password=='')
   return screenTopWarning('请填写密码，下次不要忘了哦');
 
-  nkcAPI('userLogin',userobj)
+  nkcAPI('/login','post',userobj)
   .then(function(res){
     //geid('error_info').innerHTML = JSON.stringify(res);
     //display('error_info_panel')  登录成功不用提示
