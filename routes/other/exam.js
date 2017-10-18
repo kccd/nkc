@@ -108,6 +108,7 @@ examRouter
   })
   //获得激活码
   .post('/subject', async (ctx, next) => {
+    throw 'sadf'
     let ip = ctx.ip;
     let params = ctx.body;
     console.log(params);
@@ -193,9 +194,9 @@ examRouter
         }
       }
     }
-    let regCode = async () => {
+    let regCode = () => {
       try{
-        let buffer = await crypto.randomBytes(16);
+        let buffer = crypto.randomBytes(16);
         return buffer.toString('hex');
       }catch(err){
         throw `生成注册码失败。`;
@@ -218,12 +219,12 @@ examRouter
         if(user){
           await nkcModules.function.addCertToUser(user.uid, 'examinated');
         }
-        await ctx.db.AnswerSheetModel.save(answerSheet);
+        answerSheet = await new ctx.db.AnswerSheetModel(answerSheet).save();
       }catch(err) {
         throw `生成注册码出错， error: ${err}`;
       }
     };
-    saveData(answerSheet, ctx.data.user);
+    await saveData(answerSheet, ctx.data.user);
     ctx.data.result = key;
     next();
   })
