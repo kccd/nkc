@@ -115,7 +115,7 @@ app.use(async (ctx, next) => {
     const {username, uid} = JSON.parse(userInfo);
     const user = await db.UserModel.findOne({uid});
     if (user.username !== username) {
-      ctx.cookie.set('userInfo', '');
+      ctx.cookies.set('userInfo', '');
       ctx.redirect(401, '/login')
     }
     ctx.data.user = user;

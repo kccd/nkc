@@ -114,7 +114,7 @@ loginRouter
     await usersPersonal.update({tries});
     //sign the cookie
     const cookieStr = JSON.stringify({
-      username: username,
+      username: user.username,
       uid: user.uid,
       lastLogin: Date.now()
     });
