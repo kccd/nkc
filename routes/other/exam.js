@@ -1,9 +1,10 @@
 const Router = require('koa-router');
+const cookieSignature = require('cookie-signature');
 const settings = require('../../settings');
 const examRouter = new Router();
 examRouter
   //选择考试科目页面
-  .get('/', async (ctx, next) => {
+  .get('/subject', async (ctx, next) => {
     ctx.data.getcode = true;
     ctx.template = 'interface_user_register.pug';
     next();
@@ -20,14 +21,17 @@ examRouter
     }
     let commonCount = await ctx.db.QuestionModel.count({category: 'common'});
     let subjectCount = await ctx.db.QuestionModel.count({category: category});
-    if(subjectCount == 0) {
+    if(subjectCount === 0) {
       throw `科目 “${category}” 不存在，请选择正确的考试科目。`;
     }
     let questions = [];
+
+    // 生成指定元素数量的数组，且数组元素不重复
     let arrOfDifferentValue = (arrValueCount, max) => {
-      // 题库中该科目的总数必须满足不小于需要的题目数量
+      // 题库中该科目的总数必须满足不小于需要的题目数量,否则会陷入死循环
       if(arrValueCount > max) {
-        throw `该科目题目数量太少，根本不能组成一套试卷，请更换科目。`;
+        throw `该科目下题的数量太少了，无法构成一张试卷，请更换考试科目。`;
+        //arrValueCount = max;
       }
       let skipArr = [];
       let random = (num) => {
@@ -46,20 +50,30 @@ examRouter
       }
       return skipArr;
     };
+
+    //数组元素位置随机交换
+    let exchangeIndex = (arr) => {
+      let arrCount = arr.length;
+      let arrCopy = [];
+      let arrIndex = arrOfDifferentValue(arrCount, arrCount);
+      for(let j = 0; j < arrIndex.length; j++) {
+        arrCopy[j] = arr[arrIndex[j]];
+      }
+      return arrCopy;
+    };
+
+    //判断答案类型
     let exchangeAnswer = (question) => {
-      if(question.type !== 'ch4') {
-        return {
-          question: question.question,
-          type: question.type,
-          qid: question.qid
-        }
-      }
-      return {
+      let outQustion = {
         question: question.question,
-        choices: question.answer,
         type: question.type,
-        qid: question.qid
+        qid: question.qid,
+      };
+      if(question.type === 'ch4') {
+        //交换答案顺序
+        outQustion.choices = exchangeIndex(question.answer);
       }
+      return outQustion;
     };
     let skipArrOfCommon = arrOfDifferentValue(numberOfCommon, commonCount);
     let skipArrOfSubject = arrOfDifferentValue(numberOfSubject, subjectCount);
@@ -71,9 +85,20 @@ examRouter
       let question = await ctx.db.QuestionModel.findOne({category: category}).skip(skipArrOfSubject[i]);
       questions.push(exchangeAnswer(question));
     }
+    //交换题目顺序
+    questions = exchangeIndex(questions);
     let exam = {};
+    exam.toc = Date.now();
     exam.qarr = questions;
+    let signature = '';
+    for (let i = 0; i < questions.length; i++) {
+      signature += questions[i].qid;
+    }
+    signature += exam.toc.toString();
+    signature = cookieSignature.sign(signature,settings.cookie.secret);
+    exam.signature = signature;
     ctx.data.exam = exam;
+    ctx.data.category = category;
     ctx.template = 'interface_exam.pug';
     next();
   })
