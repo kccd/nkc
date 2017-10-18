@@ -22,11 +22,13 @@ module.exports = async ctx => {
   if(ctx.error) {
     console.error(
       ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red}`
-    )
+    );
+    if(process.env !== 'production')
+      console.error(log.error);
   }
   else {
     console.log(
       ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green}`
-    )
+    );
   }
 };

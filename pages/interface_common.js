@@ -70,7 +70,7 @@ function nkcOperationAPI(obj){
   return new Promise(function(resolve,reject){
     generalRequest(obj,{
       method:'POST',
-      url:'/api/operation'
+      url:'/login'
     },function(err,back){
       if(err)return reject(err);
       resolve(back);

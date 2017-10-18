@@ -69,7 +69,7 @@ app.use(async (ctx, next) => {
     "viewActiveEmail": true
   };
   ctx.data.getcode = false;
-
+  //template file path prefix
   Object.defineProperty(ctx, 'template', {
     get: function() {
       return './pages/' + this.__templateFile
@@ -78,6 +78,7 @@ app.use(async (ctx, next) => {
       this.__templateFile = fileName
     }
   });
+  //error handling
   try {
     await next();
   } catch(err) {
@@ -100,6 +101,28 @@ app.use(async (ctx, next) => {
 });
 app.use(staticServe('./pages'));
 app.use(bodyParser());
+app.use(async (ctx, next) => {
+  ctx.body = ctx.request.body;
+  await next()
+});
+app.use(async (ctx, next) => {
+  //cookie identification
+  const {unsign} = tools.encryption;
+  const {secret} = settings.cookie;
+  const userInfo = ctx.cookies.get('userInfo');
+  if(!userInfo) {
+    await next();
+  } else {
+    const {username, uid} = JSON.parse(unsign(userInfo, secret));
+    const user = await db.UsersModel.findOne({uid});
+    if (user.username !== username) {
+      ctx.cookie.set('userInfo', '');
+      ctx.redirect(401, '/login')
+    }
+    ctx.data.user = user;
+    await next();
+  }
+});
 app.use(async (ctx, next) => {
   await next();
   const type = ctx.accepts('json', 'html');

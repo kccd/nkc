@@ -71,7 +71,8 @@ loginRouter
     const {username, password} = ctx.body;
     const {
       encryptInMD5WithSalt,
-      encryptInSHA256HMACWithSalt
+      encryptInSHA256HMACWithSalt,
+      sign
     } = ctx.tools.encryption;
     const {UserModel, UsersPersonalModel} = ctx.db;
     const users = await UserModel.find({usernameLowerCase: username.toLowerCase()});
@@ -81,8 +82,13 @@ loginRouter
       /*历史原因, 数据库中可能出现同名或者用户名小写重复的用户, which导致一些奇怪的问题, 兼容代码*/
       throw '数据库异常, 请报告: bbs@kc.ac.cn';
     const user = users[0];
+    console.log(user);
     const usersPersonal = await UsersPersonalModel.findOne({uid: user.uid});
-    let {tries = 1, lastTry = Date.now(), hashType} = usersPersonal;
+    let {
+      tries = 1,
+      lastTry = Date.now(),
+      hashType
+    } = usersPersonal;
     const {hash, salt} = usersPersonal.password;
     if(tries > 10 && Date.now() - usersPersonal.lastTry < 3600000)
       throw '密码错误次数过多, 请在一小时后再试';
@@ -108,11 +114,12 @@ loginRouter
     }
     tries = 0;
     await usersPersonal.update({tries});
-    const cookieStr = JSON.stringify({
+    //sign the cookie
+    const cookieStr = sign(JSON.stringify({
       username,
       uid: user.uid,
       lastLogin: Date.now()
-    });
+    }), ctx.settings.cookie.secret);
     ctx.cookie.set('userInfo', cookieStr, {
       signed: true,
       maxAge: ctx.settings.cookie.life,
