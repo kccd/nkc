@@ -70,10 +70,10 @@ block content
               .form-group
                 label.control-label.col-sm-3
                   span 注册码(可通过
-                  a(href='/register?getcode=true') 考试
+                  a(href='/exam') 考试
                   span 获得)
                 .col-sm-4
-                  input#regCode.form-control(type='text' placeholder='请输入注册码' value='#{data.regCode || ""}')
+                  input#regCode.form-control(type='text' placeholder='请输入注册码' value=`${data.regCode || ""}`)
 
               .form-group
                 label.control-label.col-sm-3 用户名
@@ -123,7 +123,7 @@ block content
                   //offset 2 grids
                   button.btn.btn-primary(onclick='register_submit()') 提交
                 .col-sm-offset-3.col-sm-10(style="margin-top:1%;")
-                  a(href="/register2#{data.regCode? '?code=' + data.regCode : ''}").lighttext 遇到问题？
+                  a(href=`/register/email${data.regCode? '?code=' + data.regCode : ''}`).lighttext 遇到问题？
             
               
               .form-group

@@ -11,6 +11,7 @@ examRouter
   //答题界面
   .get('/subject/:category', async (ctx, next) => {
     const category = ctx.params.category;
+    const ip = ctx.ip;
     let numberOfSubject = settings.exam.numberOfSubject;
     let numberOfCommon = settings.exam.numberOfCommon;
     if(category === 'mix') {
@@ -19,8 +20,15 @@ examRouter
     }
     let commonCount = await ctx.db.QuestionModel.count({category: 'common'});
     let subjectCount = await ctx.db.QuestionModel.count({category: category});
+    if(subjectCount == 0) {
+      throw `科目 “${category}” 不存在，请选择正确的考试科目。`;
+    }
     let questions = [];
     let arrOfDifferentValue = (arrValueCount, max) => {
+      // 题库中该科目的总数必须满足不小于需要的题目数量
+      if(arrValueCount > max) {
+        throw `该科目题目数量太少，根本不能组成一套试卷，请更换科目。`;
+      }
       let skipArr = [];
       let random = (num) => {
         return Math.round(Math.random()*(num-1));
@@ -30,12 +38,7 @@ examRouter
         while(repeat){
           let num = random(max);
           let equal = false;
-          for (let j = 0; j < skipArr.length; j++) {
-            if(skipArr[j] === num) {
-              equal = true;
-            }
-          }
-          if(!equal) {
+          if(skipArr.indexOf(num) < 0) {
             repeat = false;
             skipArr.push(num);
           }
@@ -74,8 +77,10 @@ examRouter
     ctx.template = 'interface_exam.pug';
     next();
   })
+  //获得激活码
   .post('/subject', async (ctx, next) => {
-    ctx.data = '提交试卷';
+    ctx.data.result = 'asdfasdfasdf';
+    ctx.template = 'interface_exam.pug';
     next();
   })
   .get('/viewQuestion', async (ctx, next) => {

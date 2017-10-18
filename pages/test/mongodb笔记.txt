@@ -1,0 +1,133 @@
+查看所有数据库 
+# show dbs
+
+链接数据库
+# use dbName
+
+删除数据库
+# use dbName
+# db.dropDatabase()
+
+删除数据库中的集合
+# use dbName
+# db.collection.drop()
+
+向集合中插入文档
+# db.collection.insert({...})
+# db.collection.save({...}) 若指定_id字段则为更新
+# db.collection.insertOne({...}) 插入一条文档
+# db.collection.insertMany([{...},{...},..]) 插入多条文档
+
+更新文档
+# db.collection.update({条件},{键值},{
+	upsert: Boolean, 若文档不存在是否插入文档，默认不
+	multi: Boolean, 是否更新所有符合条件的文档，默认不
+	writeConcern: document 抛出异常的级别
+})
+# db.collection.replaceOne()
+
+删除文档
+# db.collection.removeOne({})
+# db.collection.removeMany({})
+# db.collection.remove({条件}, {
+	justOne: Boolean, 是否删除全部符合条件的文档，默认是
+	writeConcern 抛出异常的级别
+})
+# db.collection.deleteMany({})
+# db.collection.deleteOne({})
+
+查询文档
+# db.collection.find({条件}, {指定返回哪些字段}) 加上pretty()以易读格式返回
+db.collection.findOne({}, {})
+        { field: { $exists: <boolean> } } 查询包含/不包含该字段的文档
+        { results: { $elemMatch: { $gte: 80, $lt: 85 } } } 查询数组中有元素符合条件的文档
+        { comments: { $slice: [5,8] } } 返回数组第5到第8的元素
+        
+
+
+条件语句 
+{key: value} 等于
+{key: {$lt: value}} 小于
+{key: {$lte: value}} 小于等于
+{key: {$gt: value}} 大于
+{key: {$gte: value}} 大于等于
+{key: {$ne: value}} 不等于
+
+and / or
+# db.find({a:1,b:2}) 查找a=1且b=2的文档
+# db.find($or:[{a:1}, {a:2}]) 查找a=1或a=2的文档
+
+按数据类型查询
+# db.collection.find({key: {$type: 2}}) 2表示字符串
+
+查询指定数量
+# db.collection.find().limit(number)
+
+跳过指定数量
+# db.collection.find().skip(number)
+
+按指定参数排序
+# db.collection.find().sort(key: 1) 按key的值升序排列，-1为降序
+
+创建索引
+# db.collection.ensureIndex({key1: 1, key2: 1, ...})
+
+原子操作
+{$set: {key: value}} 指定一个键并更新键值，若不存在则创建
+{$unset: {key: value}} 删除一个键值
+{$inc: {key: num}} 数字型键值的加减num
+{$push: {key: value}} 针对数组
+{$pushAll: {key: value_arr}} 多个值
+{$pull: {key: value}} 从数组删除value
+{$addToSet: {key: value}} 若数组没有这个值，增加该值数组
+{$pop: {key: num}} 若num=1则删除数组最后一个，若num=2则删除数组第一个
+{$rename: {oldname: newname}} 修改字段名称
+{$bit : {key: {and: 5}}} 位操作 
+
+批量惭怍
+# db.collection.bulkWrite([{操作},{操作},{操作})
+  支持的操作有
+    insertOne
+    updateOne
+    updateMany
+    replaceOne
+    deleteOne
+    deletemany
+
+
+$isolated：隔离，这涉及到mongodb lock机制，mongodb允许同时有多个read、write操作交错执行，当write操作影响到多条记录时，我们可以使用"$islolated"避免这种情况，此时write操作将持有全局锁，直到此操作涉及到的所有的document都变更完毕，此期间其他client将不会看到变更的数据，直到此write操作结束或者error退出。isolated将会较长时间的持有lock，会对整体的并发能力带来负面影响；此外，它并不表达事务中的“all-or-nothing”语义，即如果write操作更新一部分数据之后，其他document失败了，并不会“回滚”操作，那些成功的document将仍会被保留。isolated在sharded集群中不生效。
+写到筛选条件中 1
+
+----------------------------------------------------------------------------------
+Aggregation Pipeline
+
+db.collection.aggregate([
+  {$match: {uid: 5}},//过滤数据，向下一个管道输出uid为5的数据
+  {$group: {_id: null, count: {$sum: 1}}}
+])
+
+聚合表达式
+$sum 计算总和
+$avg 计算平均值
+$min 获取集合中多所有文档对应值的最小值
+$max 获取集合中所有文档对应的最大值
+$push 在结果文档中插入值到一个数组中
+$addToSet 在结果中插入值到一个数组中，不创建副本
+$first 根据资源文档的排序获取第一个文档数据
+$last 根据资源文档的排序获取最后一个文档数据
+
+管道
+$project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+$match：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
+$limit：用来限制MongoDB聚合管道返回的文档数。
+$skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+$unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+$group：将集合中的文档分组，可用于统计结果。
+$sort：将输入文档排序后输出。
+$geoNear：输出接近某一地理位置的有序文档。
+
+统计
+
+# db.collection.count({}) 统计数目
+# db.collection.distinct(key) 统计出现过的值
+
