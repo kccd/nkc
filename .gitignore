@@ -2,3 +2,4 @@
 /settings/mongoDB.js
 /.idea
 /secret.txt
+/package-lock.json

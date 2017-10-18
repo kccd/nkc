@@ -116,14 +116,16 @@ app.use(async (ctx, next) => {
     const user = await db.UserModel.findOne({uid});
     if (user.username !== username) {
       ctx.cookies.set('userInfo', '');
-      ctx.redirect(401, '/login')
+      ctx.status = 401;
+      ctx.error = new Error('缓存验证失败');
+      ctx.redirect('/login')
     }
     ctx.data.user = user;
     await next();
   }
 });
-app.use(mainRouter.routes());
 app.use(async (ctx, next) => {
+  await next();
   const type = ctx.accepts('json', 'html');
   switch(type) {
     case 'json':
@@ -138,7 +140,7 @@ app.use(async (ctx, next) => {
         ctx.throw(500, e)
       }
   }
-  await next();
 });
+app.use(mainRouter.routes());
 
 module.exports = app.callback();
