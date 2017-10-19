@@ -27,6 +27,7 @@ app.use(async (ctx, next) => {
     "": true
   };
   ctx.data.permittedOperations = {
+    "listAllQuestions": true,
     "deleteElseQuestions": true,
     "viewLatest": true,
     "viewPersonalActivities": true,

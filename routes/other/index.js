@@ -4,7 +4,6 @@ const registerRouter = require('./register');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
 const forgotPasswordRouter = require('./forgotPassword');
-const questionRouter = require('./question');
 const otherRouter = new Router();
 
 otherRouter
@@ -18,5 +17,4 @@ otherRouter
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('exam', examRouter.routes(), examRouter.allowedMethods())
   .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
-  .use('question', questionRouter.routes(), questionRouter.allowedMethods());
 module.exports = otherRouter;

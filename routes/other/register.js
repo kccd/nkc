@@ -25,5 +25,11 @@ registerRouter
   .post('/email', async (ctx, next) => {
     ctx.data = '邮箱提交注册信息';
     next();
+  })
+  .get('/', async (ctx, next) => {
+    console.log('sdfa');
+    console.log(ctx.redirect)
+    ctx.redirect('/', '/register/mobile');
+    next();
   });
 module.exports = registerRouter;
