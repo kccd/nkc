@@ -22,14 +22,14 @@ function submit(){
   //console.log('haha:'+examobj);
   return nkcAPI('/exam/subject','post',examobj)
   .then(function(result){
-    if(result.taken_by_user){
-      window.location = '/me?examinated=true';
+    if(result.takenByUser){
+      window.location = '/m?examinated=true';
       return
     }
     window.location = '/exam?result=' + result.result;
   })
   .catch(function(err){   //测试没通过
-    window.location = '/exam?result=fail&detail=' + encodeURI(err.detail);
+    window.location = '/exam?result=fail&detail=' + (err.detail);
   })
 }
 
