@@ -60,7 +60,6 @@ block content
           .form-group.row
             .col-xs-7
               select#category.form-control()
-                -console.log(data.permittedOperations);
                 if data.permittedOperations.listAllQuestions
                   //if user is administrative
                   each c in data.numberByCategory
@@ -96,7 +95,7 @@ block content
             h4 类目 (显示最近5题)
             span(style='margin:5px')
               |[
-              a(href='/q/category') all
+              a(href='/q') all
               -var total = data.numberByCategory.map(el=>el.number||0).reduce((pre,cur)=>{return pre+cur})
               | : #{total}]
             
@@ -104,7 +103,7 @@ block content
               -var category = i.category||'undefined';var number=i.number;
               span(style='margin:5px')
                 |[
-                a(href=`/q/category/${category}`) #{category}
+                a(href=`/q/${category}`) #{category}
                 | : #{number}]
             
               

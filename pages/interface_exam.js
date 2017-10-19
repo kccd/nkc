@@ -26,10 +26,10 @@ function submit(){
       window.location = '/m?examinated=true';
       return
     }
-    window.location = '/exam?result=' + result.result;
+    window.location = '/exam/'+examobj.category+'?result=' + result.result;
   })
   .catch(function(err){   //测试没通过
-    window.location = '/exam?result=fail&detail=' + (err.detail);
+    window.location = '/exam/'+examobj.category+'?result=fail&detail=' + (err.detail);
   })
 }
 

@@ -30,8 +30,8 @@
             
           
   if q.uid == data.user.qid || data.permittedOperations.deleteElseQuestions
-    button(onclick=`remove_question('${q.qid}')`) 删掉
+    button(onclick=`remove_question('/q/${q.category}/${q.qid}')`) 删掉
 
-  button(onclick=`load_question('${q.qid}')`) 修改
+  button(onclick=`load_question('/q/${q.category}/${q.qid}')`) 修改
 
   hr.hrNarrowSpace

@@ -35,14 +35,14 @@ block content
             h2 A卷
               small （试题简单，可以参加普通话题交流，注册后还可以参加B卷考试）
             p.f14
-              a(href='/exam/subject/mix') 参加 【基础题】 测试
+              a(href='/exam/mix') 参加 【基础题】 测试
             hr
           h2 B卷
             small （可直接获得高级证书，可参与特种科技爱好话题交流）
           -var categories = {'chem':'化学','phys':'物理学','bio':'生物学','english':'英语','aviation':'民航知识','agri':'农业技术','hedc':'高能材料','cs':'计算机科学','ml':'机器学习','3dp':'3D打印','ham':'业余无线电','ee':'电子技术','electrical':'电气工程','dev':'软件开发'}
           -for(k in categories)
             p.f14
-              a(href=`/exam/subject/${k}`) 参加 【#{categories[k]}】 测试
+              a(href=`/exam/${k}`) 参加 【#{categories[k]}】 测试
               
           hr
           p 测试题目来自论坛专家们的集体贡献。试题版权归科创研究院所有，请勿转载。
@@ -70,7 +70,7 @@ block content
               .form-group
                 label.control-label.col-sm-3
                   span 注册码(可通过
-                  a(href='/exam/subject') 考试
+                  a(href='/exam') 考试
                   span 获得)
                 .col-sm-4
                   input#regCode.form-control(type='text' placeholder='请输入注册码' value=`${data.regCode || ""}`)
