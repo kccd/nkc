@@ -1,6 +1,11 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
 registerRouter
+  .get('/', async (ctx, next) => {
+    ctx.redirect('/register/mobile');
+    ctx.template = 'interface_user_register.pug';
+    next();
+  })
   .get('/mobile', async (ctx, next) => {
     let code = ctx.query.code;
     if(code) {
@@ -24,12 +29,6 @@ registerRouter
   })
   .post('/email', async (ctx, next) => {
     ctx.data = '邮箱提交注册信息';
-    next();
-  })
-  .get('/', async (ctx, next) => {
-    console.log('sdfa');
-    console.log(ctx.redirect)
-    ctx.redirect('/', '/register/mobile');
     next();
   });
 module.exports = registerRouter;
