@@ -23,7 +23,7 @@ examRouter
     let commonCount = await ctx.db.QuestionModel.count({category: 'common'});
     let subjectCount = await ctx.db.QuestionModel.count({category: category});
     if(subjectCount === 0) {
-      throw `科目 “${category}” 不存在，请选择正确的考试科目。`;
+      ctx.throw(404, `科目 “${category}” 不存在，请选择正确的考试科目。`);
     }
     let questions = [];
 
@@ -31,8 +31,8 @@ examRouter
     let arrOfDifferentValue = (arrValueCount, max) => {
       // 题库中该科目的总数必须满足大于需要的题目数量,否则会陷入死循环
       if(arrValueCount > max) {
-        throw `该科目下题的数量太少了，无法构成一张试卷，请更换考试科目。`;
         //arrValueCount = max;
+        ctx.throw(404, `该科目下题的数量太少了，无法构成一张试卷，请更换考试科目。`);
       }
       let skipArr = [];
       let random = (num) => {
@@ -110,10 +110,11 @@ examRouter
   .post('/subject', async (ctx, next) => {
     let ip = ctx.ip;
     let params = ctx.body;
-    console.log(params);
     let exam = params.exam;
     if(!exam) {
-      throw '小明！你的试卷呢？';
+      ctx.data.detail = '小明！你的试卷呢？';
+      ctx.status = 404;
+      return;
     }
     let signature = '';
     for (let i = 0; i < exam.qarr.length; i++) {
@@ -122,28 +123,37 @@ examRouter
     signature += exam.toc.toString();
     let unsignedSignature = cookieSignature.unsign(exam.signature, settings.cookie.secret);
     if(unsignedSignature === false) {
-      throw('signature invalid. consider re-attend the exam.');
+      ctx.data.detail = 'signature invalid. consider re-attend the exam.';
+      ctx.status = 404;
+      return;
     }
     if(unsignedSignature !== signature) {
       //sb's spoofing!!
-      throw('signature problematic');
+      ctx.data.detail = 'signature problematic';
+      ctx.status = 404;
+      return;
     }
     if(Date.now() - exam.toc > settings.exam.timeLimit) {
-      throw 'overtime. please refresh';
+      ctx.data.detail = 'overtime. please refresh';
+      ctx.status = 404;
+      return;
     }
     let sheet = params.sheet;
     if(!sheet) {
-      throw '小明，你怎么能交白卷！';
+      ctx.data.detail = '小明，你怎么能交白卷！';
+      ctx.status = 404;
+      return;
     }
     if(sheet.length !== exam.qarr.length) {
-      throw '小明，看清楚你有多少道题再作答好吗？';
+      ctx.data.detail = '小明，看清楚你有多少道题再作答好吗？';
+      ctx.status = 404;
+      return;
     }
     let qidList = [];
     for (let i = 0; i < exam.qarr.length; i++) {
       qidList.push({
         qid: exam.qarr[i].qid
       });
-      console.log(exam.qarr[i].qid);
     }
     let questionsOfDBRandom = await ctx.db.QuestionModel.find({}).or(qidList);
     let questionsOfDB = [];
@@ -177,28 +187,32 @@ examRouter
         }
       }
       records.push({
-        qid:qidList[i],
+        qid:qidList[i].qid,
         correct: correctness
       });
       score += correctness? 1:0;
     }
     if(score < settings.exam.passScore) {
-      throw '测试没有通过哦，别气馁，请继续努力！';
+      ctx.data.detail = '测试没有通过哦，别气馁，请继续努力！';
+      ctx.status = 404;
+      return;
     }
-    let ipLog = await ctx.db.AnswerSheetModel.find({ip: ip}).sort({toc: 1});
+    let ipLog = await ctx.db.AnswerSheetModel.find({ip: ip}).sort({toc: -1});
     if(ipLog.length > 0) {
       if(!ipLog[0].isA){
         if(Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) {
-          throw '您之前测试通过的次数有点多哦，不应该再进行测试了！';
+          ctx.data.detail = '您之前测试通过的次数有点多哦，不应该再进行测试了！';
+          ctx.status = 404;
+          return;
         }
       }
     }
-    let regCode = async () => {
+    let regCode = () => {
       try{
-        let buffer = await crypto.randomBytes(16);
+        let buffer = crypto.randomBytes(16);
         return buffer.toString('hex');
       }catch(err){
-        throw `生成注册码失败。`;
+        ctx.throw (404, `生成注册码失败。`) ;
       }
     };
     let key = regCode();
@@ -216,37 +230,24 @@ examRouter
     let saveData = async (answerSheet, user) => {
       try{
         if(user){
-          await nkcModules.function.addCertToUser(user.uid, 'examinated');
+          await nkcModules.apiFunction.addCertToUser(user.uid, 'examinated');
+          ctx.data.takenByUser = true;
+        }else{
+          await new ctx.db.AnswerSheetModel(answerSheet).save();
+          ctx.data.result = key;
         }
-        await ctx.db.AnswerSheetModel.save(answerSheet);
       }catch(err) {
-        throw `生成注册码出错， error: ${err}`;
+        ctx.throw(404, `生成注册码出错， error: ${err}`);
       }
     };
-    saveData(answerSheet, ctx.data.user);
-    ctx.data.result = key;
+    await saveData(answerSheet, ctx.data.user);
     next();
   })
   // 获取激活码 成功/失败 页面
   .get('/', async (ctx, next) => {
     ctx.data.result = ctx.query.result;
+    ctx.data.detail = ctx.query.detail;
     ctx.template = 'interface_exam.pug';
-    next();
-  })
-  .get('/viewQuestion', async (ctx, next) => {
-    ctx.data = '添加试题页面';
-    next();
-  })
-  .post('/viewQuestion', async (ctx, next) => {
-    ctx.data = '提交添加的试题';
-    next();
-  })
-  .del('/viewQuestion', async (ctx, next) =>{
-    ctx.data = '删除某题';
-    next();
-  })
-  .put('/viewQuestion', async (ctx, next) => {
-    ctx.data = '修改某题';
     next();
   });
 module.exports = examRouter;
