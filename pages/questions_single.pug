@@ -30,8 +30,8 @@
             
           
   if q.uid == data.user._key || data.permittedOperations.deleteElseQuestions
-    button(onclick="remove_question('#{q._key}')") 删掉
+    button(onclick=`remove_question('${q._key}')`) 删掉
 
-  button(onclick="load_question('#{q._key}')") 修改
+  button(onclick=`load_question('${q._key}')`) 修改
 
   hr.hrNarrowSpace

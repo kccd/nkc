@@ -249,21 +249,5 @@ examRouter
     ctx.data.detail = ctx.query.detail;
     ctx.template = 'interface_exam.pug';
     next();
-  })
-  .get('/viewQuestion', async (ctx, next) => {
-    ctx.data = '添加试题页面';
-    next();
-  })
-  .post('/viewQuestion', async (ctx, next) => {
-    ctx.data = '提交添加的试题';
-    next();
-  })
-  .del('/viewQuestion', async (ctx, next) =>{
-    ctx.data = '删除某题';
-    next();
-  })
-  .put('/viewQuestion', async (ctx, next) => {
-    ctx.data = '修改某题';
-    next();
   });
 module.exports = examRouter;
