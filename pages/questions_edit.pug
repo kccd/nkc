@@ -62,7 +62,7 @@ block content
               select#category.form-control()
                 if data.permittedOperations.listAllQuestions
                   //if user is administrative
-                  each c in data.questionNumberByCategory
+                  each c in data.numberByCategory
                     option #{c.category||'null'}
                 else
                   option null
@@ -87,23 +87,41 @@ block content
         else
           h4 你还没有登录
           p 登录后才可以提交。
+        .panel.panel-default
+          .panel-body
+            h1 统计
+            hr
+            h4 专家
+            each i in data.numberByUser
+              -var username = i.username;var number = i.number;
+              div(style='margin:5px')
+                a(href=`/user_activities_byname/${username}`) #{username}
+                | : #{number}
+
+            hr
+            h4 类目
+            each i in data.numberByCategory
+              -var category = i.category||'undefined';var number=i.number;
+              div(style='margin:5px')
+                a(href=`/q/${category}`) #{category}
+                | : #{number}
 
       .col-xs-12.col-sm-6  
         if data.user
           if data.questions
               
-            h4 类目 (显示最近5题)
+            h4 类目
             span(style='margin:5px')
               |[
-              a(href='?operation=viewQuestions') all
-              -var total = data.questionNumberByCategory.map(el=>el.number||0).reduce((pre,cur)=>{return pre+cur})
+              a(href='/q') all
+              -var total = data.numberByCategory.map(el=>el.number||0).reduce((pre,cur)=>{return pre+cur})
               | : #{total}]
             
-            each i in data.questionNumberByCategory
+            each i in data.numberByCategory
               -var category = i.category||'undefined';var number=i.number;
               span(style='margin:5px')
                 |[
-                a(href=`?operation=viewQuestions&category=${category}`) #{category}
+                a(href=`/q/${category}`) #{category}
                 | : #{number}]
             
               
@@ -113,26 +131,7 @@ block content
                 each q,index in data.questions
 
                   include questions_single.pug
-                  
-      .col-xs-12.col-sm-6
-        .panel.panel-default
-          .panel-body
-            h1 统计
-            hr
-            h4 专家
-            each i in data.questionNumberByUser
-              -var username = i.username;var number = i.number;
-              div(style='margin:5px')
-                a(href=`/user_activities_byname/${username}`) #{username}
-                | : #{number}
-            
-            hr
-            h4 类目
-            each i in data.questionNumberByCategory
-              -var category = i.category||'undefined';var number=i.number;
-              div(style='margin:5px')
-                a(href=`?operation=viewQuestions&category=${category}`) #{category}
-                | : #{number}
+
           
   
   include debug_output.pug

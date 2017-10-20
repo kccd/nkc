@@ -69,7 +69,7 @@ return;
 
 let t1 = Date.now();
 console.log('开始修复数据');
-db.query(`
+/*db.query(`
   for q in questions
     filter !q.username
     let u = document(users, q.uid) || {username: ''}
@@ -93,7 +93,11 @@ db.query(`
     filter i.category && i.type && i.uid && i.question && i.answer
     return i
   `);
-})
+})*/
+db.query(`
+  for q in questions
+  return q
+`)
 .then(curtor => curtor.all())
 .then((res) => {
   console.log('数据读取完成，开始写入数据');
@@ -104,12 +108,12 @@ db.query(`
       qid: data._key,
       toc: data.toc,
       tlm: data.tlm,
-      category: data.category,
+      category: (!data.category || data.category=="null")?'undefined': data.category,
       type: data.type,
       question: data.question,
       answer: data.answer,
       uid: data.uid,
-      username: data.username
+      username: data.username? data.username: 'undefined'
     });
     question.save()
     .then(() => {

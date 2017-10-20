@@ -6,13 +6,22 @@ const settings = require('../../settings');
 const examRouter = new Router();
 examRouter
   //选择考试科目页面
-  .get('/subject', async (ctx, next) => {
+  .get('/', async (ctx, next) => {
     ctx.data.getcode = true;
     ctx.template = 'interface_user_register.pug';
     next();
   })
   //答题界面
-  .get('/subject/:category', async (ctx, next) => {
+  .get('/:category', async (ctx, next) => {
+    let result = ctx.query.result;
+    let detail = ctx.query.detail;
+    if(result) {
+      ctx.data.result = result;
+      ctx.data.detail = detail;
+      ctx.template = 'interface_exam.pug';
+      next();
+      return;
+    }
     const category = ctx.params.category;
     let numberOfSubject = settings.exam.numberOfSubject;
     let numberOfCommon = settings.exam.numberOfCommon;
@@ -242,12 +251,6 @@ examRouter
     };
     await saveData(answerSheet, ctx.data.user);
     next();
-  })
-  // 获取激活码 成功/失败 页面
-  .get('/', async (ctx, next) => {
-    ctx.data.result = ctx.query.result;
-    ctx.data.detail = ctx.query.detail;
-    ctx.template = 'interface_exam.pug';
-    next();
   });
+
 module.exports = examRouter;

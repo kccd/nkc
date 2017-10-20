@@ -61,6 +61,7 @@ let forumsSchema = new Schema({
   },
   fid: {
     type: String,
+    unique: true,
     required: true
   },
   tCount: {
@@ -102,10 +103,10 @@ return db.query(`
     res[i].countPosts = res[i].count_posts;
     res[i].countPostsToday = res[i].count_posts_today;
     res[i].countThreads = res[i].count_threads;
-    res[i].parentId = res[i].parentid;
+    res[i].parentId = (!res[i].parentid || res[i].parentid == '0')?'':res[i].parentid;
     res[i].iconFileName = res[i].icon_filename;
     res[i].displayName = res[i].display_name;
-    if(res[i].class || res[i].class == 'null'){
+    if(!res[i].class || res[i].class == 'null'){
       res[i].class = '';
     }
     if(typeof(res[i].displayName) != 'string'){

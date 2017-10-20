@@ -3,7 +3,7 @@ extends bootstrap_base.pug
 block title
   - var user = data.user
   title #{user.username} - #{data.site.name}
-  meta#replytarget(value='#{data.replytarget}')
+  meta#replytarget(value=`${data.replyTarget}`)
 
 block content
   -var user = data.user;
@@ -21,7 +21,7 @@ block content
           .rom
             .col-xs-5.col-md-5
               .col-xs-12.col-md-12
-                img.img-rounded(src='/avatar/#{user._key}',style='width:100%;')
+                img.img-rounded(src=`/avatar/${user.uid}`,style='width:100%;')
               #btnDiv(style='display:none;')
                 .col-xs-12.col-md-12
                   input#select-file(style='height:0;width:0;',type="file",target="avatar",accept="image/*")
@@ -36,9 +36,9 @@ block content
               .col-xs-12.col-md-12
                 div.f12!= plain(getUserDescription(user))
               .col-xs-12.col-md-6
-                a.btn.btn-default.left-block(href='/m/#{user._key}?tab=own',role="button",style='margin:0.5em auto;') 查看个人专栏
+                a.btn.btn-default.left-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.5em auto;') 查看个人专栏
               .col-xs-12.col-md-6
-                a.btn.btn-default.left-block(href="/user_collection/#{user._key}",role="button",style='margin:0.5em auto;') 查看个人收藏
+                a.btn.btn-default.left-block(href=`/user_collection/${user.uid}`,role="button",style='margin:0.5em auto;') 查看个人收藏
       .col-xs-12.col-md-12
         hr
         .h3(style='font-weight:300;margin-top:2em;') 账号安全设置
@@ -119,7 +119,7 @@ block content
                 span(style='font-size:0.8em;') （作为页面背景的颜色，有时显示在用户名的左侧成一个小圆圈。）
             .col-xs-12.col-md-5
               .form-group
-                input.form-control#color(type='text', placeholder='例如草木绿：#97b45a', name='colorCode', onclick='select()',value='#{user.color||""}')
+                input.form-control#color(type='text', placeholder='例如草木绿：#97b45a', name='colorCode', onclick='select()',value=`${user.color||""}`)
           .col-xs-12.col-md-6
             br
             .col-xs-12.col-md-12
@@ -127,7 +127,7 @@ block content
                 span(style='font-size:0.8em;') （原本只能用半角逗号分隔，后来我发现有的同学非要用全角逗号，所以我只好写了兼容代码。）
             .col-xs-12.col-md-5
               .form-group
-                input.form-control#focus_forums(type='text', placeholder='例如：81,373', name='colorCode', onclick='select()',value='#{user.focus_forums||""}')
+                input.form-control#focus_forums(type='text', placeholder='例如：81,373', name='colorCode', onclick='select()',value=`${user.focus_forums||""}`)
             .col-xs-12.col-md-5
               button.btn.btn-default#changeFocusDiv(onclick='changeFocusDiv()') 板块id示例
                 span.caret
@@ -136,14 +136,15 @@ block content
               .col-xs-12.col-md-12
                 .h4(style='font-weight:300;') 板块id示例
                    span(style='font-size:0.8em;') （点击可自动输入。）
-                -var forumlist = data.forumlist;
+                -var forumlist = data.forumList;
                 -for (var i = 0; i < forumlist.length; i++)
                   .col-xs-12.col-md-12
                     ul.list-inline(style='padding:0;')
-                      li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].parentforum.display_name}
-                      -for (var j = 0; j < forumlist[i].forumgroup.length; j++)
-                        li(style='list-style:none;padding-left:0.5em;')
-                          a(href='###',onclick='fillFocusId("#{forumlist[i].forumgroup[j]._key}")',style='color:#666;font-size:1em;') #{forumlist[i].forumgroup[j]._key + '：' + forumlist[i].forumgroup[j].display_name}
+                      -if(forumlist[i].forumGroup.length != 0)
+                        li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].parentForum.displayName}
+                        -for (var j = 0; j < forumlist[i].forumGroup.length; j++)
+                          li(style='list-style:none;padding-left:0.5em;')
+                            a(href='###',onclick=`fillFocusId("${forumlist[i].forumGroup[j].fid}")`,style='color:#666;font-size:1em;') #{forumlist[i].forumGroup[j].fid + '：' + forumlist[i].forumGroup[j].displayName}
           .col-xs-12.col-md-12
             br
             br
@@ -197,9 +198,9 @@ block scripts
     //提交密码
     function submitnewpassword() {
       var passwordObj = {
-        oldpassword:geid('oldpassword').value,
-        newpassword:geid('newpassword').value,
-        newpassword2:geid('newpassword2').value
+        oldPassword:geid('oldpassword').value,
+        newPassword:geid('newpassword').value,
+        newPassword2:geid('newpassword2').value
       };
       if(passwordObj.oldpassword == ''){
         jwarning('旧密码不能为空！');
@@ -214,13 +215,16 @@ block scripts
         return;
       }
       geid('submitnewpassword').disabled = true;
-      nkcAPI('changePassword',passwordObj)
+      nkcAPI('/m/set/password','put',passwordObj)
       .then(function(){
         jwarning('密码修改成功！');
+        geid('oldpassword').value = '';
+        geid('newpassword').value = '';
+        geid('newpassword2').value = '';
         geid('submitnewpassword').disabled = false;
       })
       .catch(function(err){
-        jwarning(err);
+        jwarning(err.err);
         geid('submitnewpassword').disabled = false;
       })
     }
@@ -270,6 +274,8 @@ block scripts
         clearTimeout(stopTime);
         geid('submitSendMcode').innerHTML = '获取验证码';
         jwarning('手机号码绑定成功！');
+        geid('phoneNumber').value = '';
+        geid('mCode').value = '';
       })
       .catch(function(err){
         jwarning(err);

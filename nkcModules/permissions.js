@@ -282,4 +282,3 @@ module.exports = async (ctx, next) => {
     ctx.throw(401, e)
   }
   await next();
-};

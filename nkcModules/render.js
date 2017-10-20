@@ -16,9 +16,9 @@ let getCertsInText = (user) => {
   let s = '';
   for(i in certs){
     let cname = perm.getDisplayNameOfCert(certs[i]);
-    s+=cname+' '
+    s+=cname+' ';
   }
-  return s
+  return s;
 };
 let getUserDescription = (user) => {
   return `${user.username}\n`+
@@ -39,7 +39,8 @@ let pugRender = (template, data) => {
     getUserDescription: getUserDescription,
     dateTimeString: dateTimeString,
     fromNow: fromNow,
-    server: settings.server
+    server: settings.server,
+    plain:render.plain_render,
 
   };
   options.data = data;

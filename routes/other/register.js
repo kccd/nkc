@@ -1,6 +1,11 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
 registerRouter
+  .get('/', async (ctx, next) => {
+    ctx.redirect('/register/mobile');
+    ctx.template = 'interface_user_register.pug';
+    next();
+  })
   .get('/mobile', async (ctx, next) => {
     let code = ctx.query.code;
     if(code) {
