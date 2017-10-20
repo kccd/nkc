@@ -9,6 +9,7 @@ const staticServe = require('koa-static');
 const db = require('./dataModels');
 const app = new Koa();
 const logger = nkcModules.logger;
+const permissions = nkcModules.permissions;
 
 app.keys = [settings.cookie.secret];
 app.use(async (ctx, next) => {
@@ -125,7 +126,9 @@ app.use(async (ctx, next) => {
     await next();
   }
 });
+app.use(permissions);
 app.use(async (ctx, next) => {
+  //ctx.redirect('/register/mobile');
   await next();
   const type = ctx.accepts('json', 'html');
   switch(type) {

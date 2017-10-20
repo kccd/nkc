@@ -25,5 +25,9 @@ registerRouter
   .post('/email', async (ctx, next) => {
     ctx.data = '邮箱提交注册信息';
     next();
-  });
+  })
+  .all('/', async (ctx, next) => {
+    ctx.response.redirect('/register/mobile');
+    next()
+  })
 module.exports = registerRouter;
