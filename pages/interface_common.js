@@ -45,13 +45,12 @@ function generalRequest(obj,opt,callback){
   xhr.onreadystatechange=function(){
     if (xhr.readyState==4){
       try{
-        var res;
-        res = JSON.parse(xhr.responseText);
+        var res = xhr.responseText;
         if(xhr.status==0||xhr.status>=400)throw res;
         if(res.error)throw res;
-
         callback(null,res);
       }catch(err){
+        console.log(xhr)
         callback(err);
       }
     }
@@ -60,7 +59,7 @@ function generalRequest(obj,opt,callback){
   try{
     xhr.open(opt.method,opt.url,true);
     xhr.setRequestHeader("Content-type","application/json");
-    xhr.send(JSON.stringify(obj));
+    xhr.send(obj);
   }catch(err){
     callback(err);
   }
