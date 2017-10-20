@@ -15,7 +15,7 @@ examRouter
   .get('/:category', async (ctx, next) => {
     let result = ctx.query.result;
     let detail = ctx.query.detail;
-    if(result === 'fail') {
+    if(result) {
       ctx.data.result = result;
       ctx.data.detail = detail;
       ctx.template = 'interface_exam.pug';

@@ -16,9 +16,9 @@ let getCertsInText = (user) => {
   let s = '';
   for(i in certs){
     let cname = perm.getDisplayNameOfCert(certs[i]);
-    s+=cname+' '
+    s+=cname+' ';
   }
-  return s
+  return s;
 };
 let getUserDescription = (user) => {
   return `${user.username}\n`+

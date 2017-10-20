@@ -133,3 +133,21 @@ const certificates ={
     }
   }
 };
+
+module.exports = {
+  calculateThenConcatCerts: (user) => {
+    if(!user)return ['visitor'];
+    if(!user.certs){
+      user.certs =  []
+    }
+    let certs = ['default'].concat(user.certs)
+    //-----------------------below are calculated permissions
+    if(user.xsf > 0){
+      certs.push('scholar')
+    }
+    return certs
+  },
+  getDisplayNameOfCert: (cert) => {
+  return (certificates[cert]?certificates[cert].display_name:'');
+  }
+};
