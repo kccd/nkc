@@ -148,6 +148,6 @@ module.exports = {
     return certs
   },
   getDisplayNameOfCert: (cert) => {
-  return (certificates[cert]?certificates[cert].display_name:'');
+  return (certificates[cert]?certificates[cert].displayName:'');
   }
 };

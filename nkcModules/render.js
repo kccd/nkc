@@ -39,7 +39,8 @@ let pugRender = (template, data) => {
     getUserDescription: getUserDescription,
     dateTimeString: dateTimeString,
     fromNow: fromNow,
-    server: settings.server
+    server: settings.server,
+    plain:render.plain_render,
 
   };
   options.data = data;
