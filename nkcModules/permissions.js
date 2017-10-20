@@ -260,7 +260,6 @@ function ensurePermission(certs, path, method) {
 module.exports = async (ctx, next) => {
   const certs = ctx.data.user ? ctx.data.user.certs : ['visitor'];
   const cs = getPermitTree(certs);
-  console.log(cs);
   ctx.data.certificates = cs;
   const methodEnum = {
     GET,
