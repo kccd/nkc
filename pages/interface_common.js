@@ -43,23 +43,25 @@ function post_api(target,body,callback){
 function generalRequest(obj,opt,callback){
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange=function(){
+    var res;
     if (xhr.readyState==4){
-      try{
-        var res = xhr.responseText;
-        if(xhr.status==0||xhr.status>=400)throw res;
-        if(res.error)throw res;
-        callback(null,res);
-      }catch(err){
-        console.log(xhr)
-        callback(err);
+      try {
+        res = JSON.parse(xhr.responseText);
+      } catch(e) {
+        res = xhr.responseText
+      }
+      if(xhr.status==0||xhr.status>=400)
+        callback(res);
+      if(res.error || res instanceof Error)
+        callback(res);
+      callback(null,res);
       }
     }
-  }
 
   try{
     xhr.open(opt.method,opt.url,true);
     xhr.setRequestHeader("Content-type","application/json");
-    xhr.send(obj);
+    xhr.send(JSON.stringify(obj));
   }catch(err){
     callback(err);
   }

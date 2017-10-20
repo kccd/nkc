@@ -74,11 +74,10 @@ loginRouter
       encryptInSHA256HMACWithSalt
     } = ctx.tools.encryption;
     const {UserModel, UsersPersonalModel} = ctx.db;
-    console.log(username)
     const users = await UserModel.find({usernameLowerCase: username.toLowerCase()});
     if(users.length === 0) {
       ctx.throw(400, '用户名不存在, 请检查用户名');
-      return next();
+      await next();
     }
     if(users.length > 1) {
       /*历史原因, 数据库中可能出现同名或者用户名小写重复的用户, which导致一些奇怪的问题, 兼容代码*/
