@@ -10,7 +10,16 @@ setRouter
     }
     ctx.data.replyTarget = 'me';
     ctx.data.personal = await ctx.db.UsersPersonalModel.findOne({uid: user.uid});
+    let subscribe = await ctx.db.UserSubscribeModel.findOne({uid: user.uid});
+    let subscribeForums = '';
+    if(subscribe.subscribeForums) {
+      subscribeForums = subscribe.subscribeForums.join(',');
+    }else {
+      subscribeForums = '';
+    }
+    ctx.data.user.subscribeForums = subscribeForums;
     ctx.data.forumList = await nkcModules.apiFunction.forumList();
+    ctx.data.user.mobile = '18582301901';
     ctx.template = 'interface_me.pug';
     next();
   })
@@ -36,12 +45,26 @@ setRouter
     await ctx.db.UsersPersonalModel.updateOne({uid: user.uid}, {$set:newPasswordObj});
     next();
   })
-  .put('/mobile', async (ctx, next) => {
-    ctx.data = '修改电话号码';
+  .put('/personalsetting', async (ctx, next) => {
+    let params = ctx.body;
+    let user = ctx.data.user;
+    let settingObj = {};
+    settingObj.postSign = params.post_sign.toString().trim();
+    settingObj.description = params.description.toString().trim();
+    settingObj.color = params.color.toString().trim();
+    let subscribeForums = params.focus_forums.toString().trim() || '';
+    subscribeForums = subscribeForums.split(',');
+    if(settingObj.postSign.length>300||settingObj.description.length>300||settingObj.color.length>10) {
+      ctx.status = 400;
+      ctx.data.err = 'section too long.';
+      return;
+    }
+    await ctx.db.UserModel.update({uid: user.uid}, {$set: settingObj});
+    await ctx.db.UserSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: subscribeForums}});
     next();
   })
-  .put('/personalsetting', async (ctx, next) => {
-    ctx.data = '修改帖子签名color等';
+  .put('/mobile', async (ctx, next) => {
+    ctx.data = '修改电话号码';
     next();
   });
 
