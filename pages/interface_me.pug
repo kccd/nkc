@@ -78,7 +78,7 @@ block content
             .col-xs-12.col-md-5
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 电话号码
+                  .h5(style='font-weight:300;') 电话号码 ( 已绑定号码： #{data.user.mobile} )
                 input.form-control#phoneNumber(type='text', placeholder='电话号码', onclick='select()')
             .col-xs-12.col-md-2
               .form-group
@@ -106,7 +106,7 @@ block content
             .col-xs-12.col-md-12
               .h4(style='font-weight:300;') 帖子签名
             .col-xs-12.col-md-10
-              textarea#post_sign.form-control(style='resize: none;',placeholder='帖子签名',rows="10") #{user.post_sign||''}
+              textarea#post_sign.form-control(style='resize: none;',placeholder='帖子签名',rows="10") #{user.postSign||''}
           .col-xs-12.col-md-6
             .col-xs-12.col-md-12
               .h4(style='font-weight:300;') 个人简介
@@ -127,7 +127,7 @@ block content
                 span(style='font-size:0.8em;') （原本只能用半角逗号分隔，后来我发现有的同学非要用全角逗号，所以我只好写了兼容代码。）
             .col-xs-12.col-md-5
               .form-group
-                input.form-control#focus_forums(type='text', placeholder='例如：81,373', name='colorCode', onclick='select()',value=`${user.focus_forums||""}`)
+                input.form-control#focus_forums(type='text', placeholder='例如：81,373', name='colorCode', onclick='select()',value=`${user.subscribeForums||""}`)
             .col-xs-12.col-md-5
               button.btn.btn-default#changeFocusDiv(onclick='changeFocusDiv()') 板块id示例
                 span.caret
@@ -237,13 +237,13 @@ block scripts
         focus_forums:geid('focus_forums').value,
       };
       geid('submitpersonalsetting').disabled = true;
-      nkcAPI('submitPersonalSetting',settingObj)
+      nkcAPI('/m/set/personalsetting','put',settingObj)
       .then(function(){
         jwarning('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
       })
       .catch(function(err){
-        jwarning(err);
+        jwarning(err.err);
         geid('submitpersonalsetting').disabled = false;
       })
     }

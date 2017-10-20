@@ -52,10 +52,6 @@ let usersSchema = new Schema({
     type: Number,
     default: 0
   },
-  focus_forums: {
-    type: String,
-    default: ''
-  },
   kcb: {
     type: Number,
     default: 0
@@ -64,7 +60,7 @@ let usersSchema = new Schema({
     type: Number,
     default: Date.now
   },
-  post_sign: {
+  postSign: {
     type: String,
     default: ''
   },
@@ -102,7 +98,7 @@ let usersSchema = new Schema({
     required: true,
     index: 1
   },
-  username_lowercase: {
+  usernameLowercase: {
     type: String,
     required: true,
     index: 1
@@ -131,6 +127,8 @@ db.query(`
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
+    res[i].usernameLowercase = res[i].username_lowercase;
+    res[i].postSign = res[i].post_sign;
   }
   console.log('开始写入数据');
   let n = 0;

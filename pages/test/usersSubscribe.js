@@ -9,7 +9,8 @@ db.useDatabase('rescue');
 let usersSubscribeSchema = new Schema({
 	uid: {
 		type: String,
-		unique: true
+		unique: true,
+    required: true
 	},
 	subscribeForums: {
 		type: [String],
@@ -39,12 +40,23 @@ return db.query(`
 
 .then(cursor => cursor.all())
 .then((res) => {
+  console.log('users.focus_forums > usersSubscribe.subscribeForums')
+  let sub = async () =>{
+    for(let i in res) {
+      console.log(i);
+      let str = await db.collection('users').document(res[i]._key);
+      if(str.focus_forums) {
+        res[i].subscribeForums = str.focus_forums.split(',');
+      }
+    }
+    return res;
+  };
+  return sub();
+})
+.then((res) => {
   for(var i = 0; i < res.length; i++){
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
-    if(res[i].subscribeForums && res[i].subscribeForums.length == 1 && res[i].subscribeForums[0] === null){
-    	res[i].subscribeForums[0] = undefined;
-    }
   }
   console.log('开始写入数据');
   let n = 0;

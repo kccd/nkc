@@ -89,11 +89,10 @@ const userSchema = new Schema({
     type: [String],
     index: 1
   },
-  intro_text: String,
-  post_sign: String,
+  introText: String,
+  postSign: String,
   regIP: String,
-  regPort: String,
-  subForums: [String]
+  regPort: String
 });
 userSchema.pre('save', function(next) {
   if(!this.usernameLowerCase)

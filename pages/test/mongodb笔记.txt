@@ -85,7 +85,7 @@ and / or
 {$bit : {key: {and: 5}}} 位操作 
 
 批量惭怍
-# db.collection.bulkWrite([{操作},{操作},{操作})
+# db.collection.bulkWrite([{操作},{操作},{操作}])
   支持的操作有
     insertOne
     updateOne
