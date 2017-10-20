@@ -11,7 +11,7 @@ otherRouter
   .get('/', async (ctx, next) => {
     ctx.data = `网站首页`;
     ctx.template = 'user.pug';
-    next();
+    await next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())

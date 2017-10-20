@@ -21,11 +21,11 @@ setRouter
     ctx.data.forumList = await nkcModules.apiFunction.forumList();
     ctx.data.user.mobile = '18582301901';
     ctx.template = 'interface_me.pug';
-    next();
+    await next();
   })
   .put('/username', async (ctx, next) => {
     //ctx.data = '修改用户名';
-    next();
+    await next();
   })
   .put('/password', async (ctx, next) => {
     let params = ctx.body;
@@ -43,7 +43,7 @@ setRouter
     }
     let newPasswordObj = nkcModules.apiFunction.newPasswordObject(params.newPassword);
     await ctx.db.UsersPersonalModel.updateOne({uid: user.uid}, {$set:newPasswordObj});
-    next();
+    await next();
   })
   .put('/personalsetting', async (ctx, next) => {
     let params = ctx.body;
@@ -61,11 +61,11 @@ setRouter
     }
     await ctx.db.UserModel.update({uid: user.uid}, {$set: settingObj});
     await ctx.db.UserSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: subscribeForums}});
-    next();
+    await next();
   })
   .put('/mobile', async (ctx, next) => {
     ctx.data = '修改电话号码';
-    next();
+    await next();
   });
 
 module.exports = setRouter;

@@ -38,7 +38,7 @@ questionRouter
     ctx.data.numberByCategory = defaultDate.numberByCategory;
     ctx.data.numberByUser = defaultDate.numberByUser;
     ctx.template = 'questions_edit.pug';
-    next();
+    await next();
   })
   .get('/:category', async (ctx, next) => {
     let user = ctx.data.user;
@@ -49,7 +49,7 @@ questionRouter
     ctx.data.numberByCategory = defaultDate.numberByCategory;
     ctx.data.numberByUser = defaultDate.numberByUser;
     ctx.template = 'questions_edit.pug';
-    next();
+    await next();
   })
   .post('/:category', async (ctx, next) => {
     let params = ctx.body;

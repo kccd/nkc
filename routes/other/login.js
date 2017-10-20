@@ -64,7 +64,7 @@ loginRouter
       "template": "/home/lz/projects/nkc2/nkc_modules/jade/interface_user_login.pug"
     };
     ctx.template = 'interface_user_login.pug';
-    next();
+    await next();
   })
   .post('/', async (ctx, next) => {
     //用户登录
@@ -143,7 +143,7 @@ loginRouter
       cookie: ctx.cookies.get('userInfo'),
       introduction: 'put the cookie in req-header when using for api'
     };
-    next()
+    await next()
   });
 
 module.exports = loginRouter;

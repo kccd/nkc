@@ -7,6 +7,6 @@ logoutRouter
     }
     ctx.data.logout = true;
     ctx.template = 'interface_user_logout.pug';
-    next();
+    await next();
   });
 module.exports = logoutRouter;

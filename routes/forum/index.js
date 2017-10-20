@@ -9658,7 +9658,7 @@ forumRouter
     });
     ctx.data.forum = forum;
     ctx.template = 'interface_forum.pug';
-    next();
+    await next();
   });
   // .use('/set', setRouter.routes(), setRouter.allowedMethods())
 module.exports = forumRouter;

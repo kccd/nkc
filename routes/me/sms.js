@@ -3,7 +3,7 @@ const smsRouter = new Router();
 smsRouter
   .get('/', async (ctx, next) => {
     ctx.data = '消息列表';
-    next();
+    await next();
   });
 
 module.exports = smsRouter;

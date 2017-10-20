@@ -3,14 +3,14 @@ const sendMessageRouter = new Router();
 sendMessageRouter
 .post('/1', async (ctx, next) => {
   ctx.data = '发短信1';
-  next();
+  await next();
 })
 .post('/2', async (ctx, next) => {
   ctx.data = '发短信2';
-  next();
+  await next();
 })
 .post('/3', async (ctx, next) => {
   ctx.data = '发短信3';
-  next();
+  await next();
 })
 module.exports = sendMessageRouter;

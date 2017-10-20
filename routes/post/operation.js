@@ -5,22 +5,22 @@ operationRouter
   .post('/recommend', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.data = `推荐post   pid：${pid}`;
-    next();
+    await next();
   })
   .post('/quote', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.data = `引用post   pid：${pid}`;
-    next();
+    await next();
   })
   .post('/cartPost', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.data = `加入管理车   pid：${pid}`;
-    next();
+    await next();
   })
   .post('/addCredit', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.data = `评学术分   pid：${pid}`;
-    next();
+    await next();
   });
 
 module.exports = operationRouter;

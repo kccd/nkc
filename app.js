@@ -128,9 +128,9 @@ app.use(async (ctx, next) => {
   }
 });
 app.use(permissions);
+app.use(mainRouter.routes());
 app.use(async (ctx, next) => {
   //ctx.redirect('/register/mobile');
-  await next();
   const type = ctx.accepts('json', 'html');
   switch(type) {
     case 'json':
@@ -145,7 +145,7 @@ app.use(async (ctx, next) => {
         ctx.throw(500, e)
       }
   }
+  await next();
 });
-app.use(mainRouter.routes());
 
 module.exports = app.callback();

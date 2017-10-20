@@ -7,7 +7,7 @@ threadRouter
     const tid = ctx.params.tid;
     const messageObj = ctx.request.body;
     ctx.data = `回复帖子   tid：${tid}，回帖信息：${JSON.stringify(messageObj)}`;
-    next();
+    await next();
   })
   .get('/:tid', async (ctx, next) => {
     const tid = ctx.params.tid;
@@ -1671,7 +1671,7 @@ threadRouter
       ],
       "userThreads": []
     };
-    next();
+    await next();
   })
   .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

@@ -9,7 +9,7 @@ examRouter
   .get('/', async (ctx, next) => {
     ctx.data.getcode = true;
     ctx.template = 'interface_user_register.pug';
-    next();
+    await next();
   })
   //答题界面
   .get('/:category', async (ctx, next) => {
@@ -19,7 +19,7 @@ examRouter
       ctx.data.result = result;
       ctx.data.detail = detail;
       ctx.template = 'interface_exam.pug';
-      next();
+      await next();
       return;
     }
     const category = ctx.params.category;
@@ -113,7 +113,7 @@ examRouter
     ctx.data.exam = exam;
     ctx.data.category = category;
     ctx.template = 'interface_exam.pug';
-    next();
+    await next();
   })
   //获得激活码
   .post('/subject', async (ctx, next) => {
@@ -250,7 +250,7 @@ examRouter
       }
     };
     await saveData(answerSheet, ctx.data.user);
-    next();
+    await next();
   });
 
 module.exports = examRouter;
