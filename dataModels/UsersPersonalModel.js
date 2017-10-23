@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 const usersPersonalSchema = new Schema({
   uid: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    required: true
   },
   email: {
     type: String,
@@ -36,7 +36,7 @@ const usersPersonalSchema = new Schema({
       required: true
     }
   },
-  new_message: {
+  newMessage: {
     replies: {
       type: Number,
       default: 0
@@ -54,11 +54,11 @@ const usersPersonalSchema = new Schema({
       default: 0
     }
   },
-  regcode: {
+  regCode: {
     type: String,
     default: ''
   },
-  regip: {
+  regIp: {
     type: String,
     default: ''
   },

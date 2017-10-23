@@ -127,7 +127,7 @@ app.use(async (ctx, next) => {
     await next();
   }
 });
-app.use(permissions);
+// app.use(permissions);
 app.use(mainRouter.routes());
 app.use(async (ctx, next) => {
   //ctx.redirect('/register/mobile');

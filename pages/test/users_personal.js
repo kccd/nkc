@@ -1,12 +1,12 @@
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://lzszone:Lz852369@localhost:27017/admin', {useMongoClient: true});
+mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
 db = require('arangojs')({url: 'http://root:@192.168.11.10',databaseName: 'rescue'});
 
 let users_personalSchema = new Schema({
-  uid: {
+  /*uid: {
     type: String,
     required: true,
     index: 1
@@ -68,6 +68,69 @@ let users_personalSchema = new Schema({
   tries: {
     type: Number,
     default: 0
+  }*/
+  uid: {
+    type: String,
+    unique: true,
+    required: true
+  },
+  email: {
+    type: String,
+    default: '',
+    match: /.*@.*/
+  },
+  mobile: {
+    type: String,
+    default:'',
+    index: 1
+  },
+  hashType: {
+    type: String,
+    required: true
+  },
+  lastTry: {
+    type: Number,
+    default: 0
+  },
+  password: {
+    salt: {
+      type: String,
+      required: true
+    },
+    hash: {
+      type: String,
+      required: true
+    }
+  },
+  newMessage: {
+    replies: {
+      type: Number,
+      default: 0
+    },
+    message: {
+      type: Number,
+      default: 0
+    },
+    system: {
+      type: Number,
+      default: 0
+    },
+    at: {
+      type: Number,
+      default: 0
+    }
+  },
+  regCode: {
+    type: String,
+    default: ''
+  },
+  regIp: {
+    type: String,
+    default: ''
+  },
+  tries: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -102,7 +165,7 @@ db.query(`
       res[i].hashType = 'sha256HMAC';
     }
     if(res[i].new_message.replies == null){
-      res[i].new_message.replies = 0;
+      res[i].newMessage.replies = 0;
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
@@ -110,16 +173,23 @@ db.query(`
     res[i].newMessage = res[i].new_message;
     res[i].lastTry = res[i].lasttry;
     res[i].regCode = res[i].regcode;
-    if(res[i].hashtype)
+    if(res[i].hashtype) {
       res[i].hashType = res[i].hashtype;
+    }
+    if(res[i].email && res[i].email.indexOf('@') == -1) {
+      res[i].email = undefined;
+    }
   }
   console.log('开始写入数据');
   let n = 0;
   let toMongo = () => {
+
     let data = res[n];
     let usersPersonal = new UsersPersonal(data);
+    console.log(n);
     usersPersonal.save()
     .then(() => {
+
       n++;
       if(n >= res.length) {
         let t2 = Date.now();
@@ -131,14 +201,15 @@ db.query(`
       }
     })
     .catch((err) => {
+      console.log(data);
       console.log(`存数据出错:${err}`)
     });
-  }
+  };
   toMongo();
 }) 
 .catch((err) => {
   console.log(err);
-})
+});
 
 function sha256HMAC(password,salt){
   const crypto = require('crypto')

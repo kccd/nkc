@@ -27,7 +27,7 @@ function register_submit(){
       password : gv('password'),
       password2 : gv('password2'),
       regCode: gv('regCode'),
-      phone:gv('phone'),
+      mobile:gv('phone'),
       mcode:gv('mcode'),
       areaCode: areaCode
       /*,
@@ -95,7 +95,7 @@ function register_submit(){
       throw({detail:'请填写图片验证码！'})
       return;
     }*/
-    return nkcAPI('userPhoneRegister',userobj)
+    return nkcAPI('/register/mobile','post',userobj)
   })
   .then(function(result){
     info_report('注册成功！5s后跳转到登录页面')
@@ -179,7 +179,7 @@ function getMcode(){
   }
 
   else{
-    nkcAPI('getMcode',{phone:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode})
+    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode})
     .then(function(res){
       var count = 120;
       var countdown = setInterval(CountDown, 1000);
@@ -195,7 +195,7 @@ function getMcode(){
       }
     })
     .catch(function(err){
-      if(err.detail == '手机验证码不正确，请检查'){
+      if(err == '手机验证码不正确，请检查'){
         //refreshICode();
         getFocus("#mcode")
       }
@@ -203,19 +203,19 @@ function getMcode(){
         //refreshICode();
         getFocus("#icode")
       }*/
-      if(err.detail == '此号码已经用于其他用户注册，请检查或更换'){
+      if(err == '此号码已经用于其他用户注册，请检查或更换'){
         //refreshICode()
         getFocus("#phone")
       }
-      if(err.detail === '验证注册码失败，请检查！'){
+      if(err === '验证注册码失败，请检查！'){
         //refreshICode()
         getFocus("#regCode")
       }
-      if(err.detail === '答卷的注册码过期，可能要重新参加考试') {
+      if(err === '答卷的注册码过期，可能要重新参加考试') {
         //refreshICode();
         getFocus('#regCode')
       }
-      error_report(err.detail);
+      error_report(err);
     })
   }
 }

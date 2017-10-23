@@ -12,7 +12,7 @@ let smsCodeSchema = new Schema({
     default: Date.now
   },
   type: {
-    type: Number,
+    type: String,
     required: true
   },
   code: {
@@ -27,7 +27,7 @@ let smsCodeSchema = new Schema({
   }
 });
 
-let SmsCode = mongoose.model('smsCodes', smsCodeSchema);
+let SmsCode = mongoose.model('smsCodes', smsCodeSchema, 'smsCodes');
 
 
 let t1 = Date.now();
@@ -43,7 +43,14 @@ return db.query(`
   for(var i = 0; i < res.length; i++){
     res[i]._id = undefined;
     res[i].mobile = res[i].phone;
-    res[i].type = res[i].type?res[i].type:1;
+    var type = res[i].type;
+    type = type?type:4;
+    switch (type){
+      case 1: res[i].type = 'register';
+      case 2: res[i].type = 'reset';
+      case 3: res[i].type = 'bindMobile';
+      default: res[i].type = '未知'
+    }
   }
   console.log('开始写入数据');
   let n = 0;

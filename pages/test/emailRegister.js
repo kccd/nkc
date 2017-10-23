@@ -34,6 +34,10 @@ let emailRegiserSchema = new Schema({
       type: String,
       required: true
     }
+  },
+  hashType: {
+    type: String,
+    required: true
   }
 });
 
@@ -57,8 +61,10 @@ db.query(`
       res[i].password = {
         salt: salt,
         hash: hash
-      };  
+      };
+      res[i].hashtype = 'sha256HMAC';
     }
+    res[i].hashType = res[i].hashtype;
   }
   return res;
 })
@@ -81,6 +87,7 @@ db.query(`
       }
     })
     .catch((err) => {
+      console.log(data);
       console.log(`存数据出错:${err}`)
     });
   }

@@ -19,6 +19,7 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
+    "alidayu-node": "^1.0.3",
     "arangojs": "^5.7.0",
     "colors": "^1.1.2",
     "commonmark": "^0.28.1",
@@ -31,6 +32,7 @@
     "koa-static": "^4.0.1",
     "moment": "^2.19.1",
     "mongoose": "^4.12.1",
+    "nodemailer": "^4.3.0",
     "pug": "^2.0.0-rc.4",
     "twemoji": "^2.5.0",
     "xbbcode-parser": "^0.1.2",

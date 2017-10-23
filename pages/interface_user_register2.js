@@ -84,7 +84,7 @@ function register_submit(){
       return
     }
 
-    return nkcAPI('userMailRegister',userobj)
+    return nkcAPI('/register/email','post',userobj)
 
   })
   .then(function(result){

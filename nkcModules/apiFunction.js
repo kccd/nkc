@@ -1,3 +1,4 @@
+const settings = require('../settings');
 let db = require('../dataModels');
 let fn = {};
 fn.addCertToUser = async (uid, cert) => {
@@ -57,13 +58,80 @@ fn.testPassword = (input,hashtype,storedPassword) => {
 fn.newPasswordObject = (plain) => {
   let salt = Math.floor((Math.random()*65536)).toString(16)
   let hash = fn.sha256HMAC(plain,salt)
-  let pwobj = {
+  return {
     hashtype:'sha256HMAC',
     password:{
       hash:hash,
       salt:salt,
-    },
+    }
   };
-  return pwobj
+};
+fn.contentLength =  (content) => {
+  const zhCN = content.match(/[^\x00-\xff]/g);
+  const other = content.match(/[\x00-\xff]/g);
+  const length1 = zhCN? zhCN.length * 2 : 0;
+  const length2 = other? other.length : 0;
+  return length1 + length2
+};
+
+fn.random = (n) => {
+  let Num = "";
+  for(let i = 0; i < n; i++) {
+    Num += Math.floor(Math.random()*10);
+  }
+  return Num;
+};
+
+fn.checkRigsterCode = async (regCode) => {
+  let regCodeOfDB = await db.AnswerSheetModel.find({key: regCode});
+  if(regCodeOfDB.length === 0) throw '验证注册码失败，请检查！';
+  if (regCodeOfDB.uid) throw '答卷的注册码过期，可能要重新参加考试';
+  if (Date.now() - regCodeOfDB.tsm > settings.exam.timeBeforeRegister) throw '答卷的注册码过期，可能要重新参加考试';
+  return regCodeOfDB;
+};
+fn.createUser = async (userObj) => {
+  let userCount = await db.CounterModel.findOne({type: 'users'});
+  let time = Date.now();
+  userObj.toc = time;
+  userObj.tlv = time;
+  userObj.uid = userCount.Count;
+  if(userObj.mobile) userObj.certs = ['mobile'];
+  if(userObj.email) userObj.certs = ['email'];
+  if(!userObj.isA) {
+    userObj.certs.push('examinated');
+  }
+  let salt = Math.floor((Math.random() * 65536)).toString(16);
+  let hash = fn.sha256HMAC(userObj.password, salt);
+  userObj.password = {
+    salt: salt,
+    hash: hash
+  };
+  userObj.newMessage = {
+    messages: 0,
+    at: 0,
+    replies: 0,
+    system: 0
+  };
+  userObj.abbr = userObj.username.slice(0, 6);
+  userObj.displayName = userObj.username + '的专栏';
+  userObj.description = userObj.username + '的专栏';
+  userObj.hashType = 'sha256HMAC';
+
+  let users = new db.UserModel(userObj);
+  let usersPersonal = new db.UsersPersonalModel(userObj);
+  let personalForums = new db.PersonalForumModel(userObj);
+  let usersSubscribe = new db.UserSubscribeModel(userObj);
+  try{
+    await users.save();
+    await usersPersonal.save();
+    await personalForums.save();
+    await usersSubscribe.save();
+  }catch(err) {
+    await db.UsersPersonalModel.findOneAndRemove({uid: userObj.uid});
+    await db.PersonalForumModel.findOneAndRemove({uid: userObj.uid});
+    await db.UserSubscribeModel.findOneAndRemove({uid: userObj.uid});
+    throw `新建用户出错！err: ${err}`;
+  }
+  return userObj;
 };
 module.exports = fn;
