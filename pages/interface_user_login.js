@@ -31,8 +31,7 @@ function login_submit(){
     }
   })
   .catch(function(err){
-    console.error(err);
-    geid('error_info').innerHTML = '<strong style="color:red;">'+err.detail+'</strong>';
+    geid('error_info').innerHTML = '<strong style="color:red;">'+err+'</strong>';
     display('error_info_panel');
     geid('password').focus();
     //console.log(JSON.stringify(err));
