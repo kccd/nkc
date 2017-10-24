@@ -179,7 +179,7 @@ function getMcode(){
   }
 
   else{
-    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode})
+    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode, username: username})
     .then(function(res){
       var count = 120;
       var countdown = setInterval(CountDown, 1000);

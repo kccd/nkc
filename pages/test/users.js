@@ -44,11 +44,11 @@ let usersSchema = new Schema({
     type: Number,
     default: 0
   },
-  disabledPostCount: {
+  disabledPostsCount: {
     type: Number,
     default: 0
   },
-  disabledThreadCount: {
+  disabledThreadsCount: {
     type: Number,
     default: 0
   },
@@ -98,7 +98,7 @@ let usersSchema = new Schema({
     required: true,
     index: 1
   },
-  usernameLowercase: {
+  usernameLowerCase: {
     type: String,
     required: true,
     index: 1
@@ -127,7 +127,7 @@ db.query(`
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
-    res[i].usernameLowercase = res[i].username_lowercase;
+    res[i].usernameLowerCase = res[i].username_lowercase;
     res[i].postSign = res[i].post_sign;
   }
   console.log('开始写入数据');

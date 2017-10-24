@@ -48,7 +48,8 @@ div
       
       .col-xs-5.col-sm-3
         .NavBarLinkArea.f12.text-center
-          if (data.user && !data.logout)
+          // -if (data.user && !data.logout)
+          if(0)
             - var user = data.user
             a(href='/m/set' title=`${getUserDescription(user)}`) #{user.username}
             

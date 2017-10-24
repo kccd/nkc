@@ -7,17 +7,20 @@ const sendMessageRouter = new Router();
 sendMessageRouter
   // 手机号码注册
   .post('/register', async (ctx, next) => {
+    let db = ctx.db;
     let params = ctx.body;
     let regCode = params.regCode;
     let areaCode = params.areaCode;
+    let username = params.username;
     let mobile = (params.areaCode + params.mobile).replace('+', '00');
     if(!mobile) ctx.throw(400, '手机号码不能为空');
     if(!regCode) ctx.throw(400, '注册码不能为空');
     if(!areaCode) ctx.throw(400, '国际区号不能为空');
+    let usernameOfDB = await db.UserModel.find({usernameLowerCase: username.toLowerCase()});
+    if(usernameOfDB.length !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     let code = fn.random(6);
     let time = new Date().getTime();
     let time2 = Date.now()-24*60*60*1000;
-    let db = ctx.db;
     try{
       await fn.checkRigsterCode(regCode);
     }catch (err) {

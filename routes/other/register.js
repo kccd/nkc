@@ -2,18 +2,7 @@ const Router = require('koa-router');
 const nkcModules = require('../../nkcModules');
 let fn = nkcModules.apiFunction;
 let settings = require('../../settings');
-let mailSecrets = settings.mailSecrets;
-let nm = require('nodemailer');
-let transporter = nm.createTransport(mailSecrets.smtpConfig);
-let sendMail = async (mailOptions) => {
-  return await transporter.sendMail(mailOptions);
-};
-let exampleMailOptions = {
-  from: mailSecrets.senderString,
-  to: 'redacted@noop.com',
-  subject: 'noop',
-  text: 'redacted',
-};
+
 
 const registerRouter = new Router();
 registerRouter
@@ -46,6 +35,8 @@ registerRouter
       mcode:params.mcode,
       isA: false
     };
+    let usernameOfDB = await db.UserModel.find({usernameLowerCase: userObj.username.toLowerCase()});
+    if(usernameOfDB.length !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     if(contentLength(userObj.username) > 30) {
       ctx.throw(400, '用于名不能大于30字节(ASCII)');
     }
@@ -60,7 +51,8 @@ registerRouter
     userObj.isA = regCodeFoDB.isA;
     let smsCode = await db.SmsCodeModel.find({mobile: userObj.mobile, code: userObj.mcode, toc: {$lte: time}});
     if(smsCode.length === 0) ctx.throw(404, '手机验证码错误或过期，请检查');
-    await fn.createUser(userObj);
+    let newUser = await fn.createUser(userObj);
+    await db.AswerSheetModel.replaceOne({key: userObj.regCode}, {uid: newUser.uid});
     await next();
   })
   .get('/email', async (ctx, next) => {
@@ -84,6 +76,8 @@ registerRouter
       //regPort: ctx.connection.remotePort,
       isA: false
     };
+    let usernameOfDB = await db.UserModel.find({usernameLowerCase: userObj.username.toLowerCase()});
+    if(usernameOfDB.length !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     if(userObj.email.indexOf('@') === -1) ctx.throw(400, '用于名不能大于30字节(ASCII)');
     if(fn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
     const regCode = params.regCode;
@@ -95,7 +89,8 @@ registerRouter
     }
     userObj.isA = regCodeFoDB.isA;
     let time = Date.now() - 24 * 60 * 60 * 1000;
-    let email = await db.EmailRegisterModel.find({email: userObj.email, time: time});
+    let email = await db.EmailRegisterModel.find({email: userObj.email, toc: {$gt: time}});
+    console.log(email.length);
     if(email.length >= 5) ctx.throw('404', '邮件发送次数已达上限，请隔天再试');
     let userPersonal = await db.UsersPersonalModel.find({email: userObj.email});
     if(userPersonal.length > 0) ctx.throw('404', '此邮箱已注册过，请检查或更换');
@@ -113,8 +108,8 @@ registerRouter
     let text = '欢迎注册科创论坛，点击以下链接就可以激活您的账户：';
     let href = `http://bbs.kechuang.org/register/email/${userObj.email}/${ecode}`;
     let link = `<a href="${href}">${href}</a>`;
-    await sendMail({
-      from: exampleMailOptions.from,
+    await nkcModules.sendEmail({
+      from: settings.mailSecrets.exampleMailOptions.from,
       to: params.email,
       subject: '注册账户',
       text: text + href,
@@ -123,6 +118,16 @@ registerRouter
     await next();
   })
   .get('/email/:email/:ecode', async (ctx, next) => {
+    let db = ctx.db;
+    let email = ctx.params.email;
+    let ecode = ctx.params.ecode;
+    let time = Date.now() - settings.sendMessage.emailCodeTime;
+    let emailRegister = await db.EmailRegisterModel.findOne({email: email, ecode: ecode, toc: {$gt: time}});
+    if(!emailRegister) ctx.throw(404, '邮箱链接已失效，请重新注册！');
+    emailRegister._id = undefined;
+    let newUser = fn.createUser(emailRegister);
+    await db.AnswerSheetModel.replaceOne({key: emailRegister.regCode}, {uid: newUser.uid});
+    ctx.data.activeInfo1 = '邮箱注册成功，赶紧登录吧~';
     ctx.template = 'interface_user_login.pug';
     await next();
   });

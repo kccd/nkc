@@ -5,7 +5,6 @@ const mainRouter = require('./routes');
 const Koa = require('koa');
 require('colors');
 const bodyParser = require('koa-bodyparser');
-const koaBody = require('koa-body');
 const staticServe = require('koa-static');
 const db = require('./dataModels');
 const app = new Koa();
@@ -105,7 +104,6 @@ app.use(async (ctx, next) => {
   }
 });
 app.use(staticServe('./pages'));
-app.use(koaBody({multipart: true}));
 app.use(bodyParser());
 app.use(async (ctx, next) => {
   ctx.body = ctx.request.body;
@@ -119,6 +117,7 @@ app.use(async (ctx, next) => {
   } else {
     const {username, uid} = JSON.parse(userInfo);
     const user = await db.UserModel.findOne({uid});
+    //ctx.cookies.set('userInfo', '');
     if (user.username !== username) {
       ctx.cookies.set('userInfo', '');
       ctx.status = 401;
