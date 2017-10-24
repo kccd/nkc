@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title test
+  body
+    input#value2(type='test')
+    input#submit(type='submit')
+    script(src='jquery/jquery-1.11.1.js')
+    script.
+      $('#submit').on('click', function() {
+        var data = {
+          regCode: $('#value2').val(),
+          areaCode: '+86',
+          username: '测试测试测试',
+          email: 'p_xigui@163.com',
+          password: '123123123',
+          password2: '123123123'
+        };
+        $.ajax({
+          url: '/register/email',
+          type: 'post',
+          data: data
+        })
+          .done(function (data) {
+            console.log('success: ' + JSON.stringify(data));
+          })
+          .fail(function (err) {
+            console.log('fail: ' + JSON.stringify(err));
+          });
+      })

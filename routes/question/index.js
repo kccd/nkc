@@ -80,8 +80,7 @@ questionRouter
   })
   .get('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;
-    let question = await ctx.db.QuestionModel.findOne({qid: qid});
-    ctx.data.question = question;
+    ctx.data.question = await ctx.db.QuestionModel.findOne({qid: qid});
   })
   .del('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;

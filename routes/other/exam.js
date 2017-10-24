@@ -32,7 +32,7 @@ examRouter
     let commonCount = await ctx.db.QuestionModel.count({category: 'common'});
     let subjectCount = await ctx.db.QuestionModel.count({category: category});
     if(subjectCount === 0) {
-      ctx.throw(404, `科目 “${category}” 不存在，请选择正确的考试科目。`);
+      ctx.throw(400, `科目 “${category}” 不存在，请选择正确的考试科目。`);
     }
     let questions = [];
 
@@ -41,7 +41,7 @@ examRouter
       // 题库中该科目的总数必须满足大于需要的题目数量,否则会陷入死循环
       if(arrValueCount > max) {
         //arrValueCount = max;
-        ctx.throw(404, `该科目下题的数量太少了，无法构成一张试卷，请更换考试科目。`);
+        ctx.throw(400, `该科目下题的数量太少了，无法构成一张试卷，请更换考试科目。`);
       }
       let skipArr = [];
       let random = (num) => {
@@ -120,44 +120,22 @@ examRouter
     let ip = ctx.ip;
     let params = ctx.body;
     let exam = params.exam;
-    if(!exam) {
-      ctx.data.detail = '小明！你的试卷呢？';
-      ctx.status = 404;
-      return;
-    }
+    if(!exam) ctx.throw(400, '小明！你的试卷呢？');
     let signature = '';
     for (let i = 0; i < exam.qarr.length; i++) {
       signature += exam.qarr[i].qid;
     }
     signature += exam.toc.toString();
     let unsignedSignature = cookieSignature.unsign(exam.signature, settings.cookie.secret);
-    if(unsignedSignature === false) {
-      ctx.data.detail = 'signature invalid. consider re-attend the exam.';
-      ctx.status = 404;
-      return;
-    }
+    if(unsignedSignature === false) ctx.throw (404, 'signature invalid. consider re-attend the exam.');
     if(unsignedSignature !== signature) {
       //sb's spoofing!!
-      ctx.data.detail = 'signature problematic';
-      ctx.status = 404;
-      return;
+      ctx.throw(404, 'signature problematic');
     }
-    if(Date.now() - exam.toc > settings.exam.timeLimit) {
-      ctx.data.detail = 'overtime. please refresh';
-      ctx.status = 404;
-      return;
-    }
+    if(Date.now() - exam.toc > settings.exam.timeLimit) ctx.throw(404, 'overtime. please refresh');
     let sheet = params.sheet;
-    if(!sheet) {
-      ctx.data.detail = '小明，你怎么能交白卷！';
-      ctx.status = 404;
-      return;
-    }
-    if(sheet.length !== exam.qarr.length) {
-      ctx.data.detail = '小明，看清楚你有多少道题再作答好吗？';
-      ctx.status = 404;
-      return;
-    }
+    if(!sheet) ctx.throw(404, '小明，你怎么能交白卷！');
+    if(sheet.length !== exam.qarr.length) ctx.throw(404, '小明，看清楚你有多少道题再作答好吗？');
     let qidList = [];
     for (let i = 0; i < exam.qarr.length; i++) {
       qidList.push({
@@ -201,19 +179,11 @@ examRouter
       });
       score += correctness? 1:0;
     }
-    if(score < settings.exam.passScore) {
-      ctx.data.detail = '测试没有通过哦，别气馁，请继续努力！';
-      ctx.status = 404;
-      return;
-    }
+    if(score < settings.exam.passScore) ctx.throw(404, '测试没有通过哦，别气馁，请继续努力！');
     let ipLog = await ctx.db.AnswerSheetModel.find({ip: ip}).sort({toc: -1});
     if(ipLog.length > 0) {
       if(!ipLog[0].isA){
-        if(Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) {
-          ctx.data.detail = '您之前测试通过的次数有点多哦，不应该再进行测试了！';
-          ctx.status = 404;
-          return;
-        }
+        if(Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) ctx.throw(404, '您之前测试通过的次数有点多哦，不应该再进行测试了！');
       }
     }
     let regCode = () => {

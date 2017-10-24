@@ -77,13 +77,10 @@ loginRouter
     const users = await UserModel.find({usernameLowerCase: username.toLowerCase()});
     if(users.length === 0) {
       ctx.throw(400, '用户名不存在, 请检查用户名');
-      await next();
     }
     if(users.length > 1) {
       /*历史原因, 数据库中可能出现同名或者用户名小写重复的用户, which导致一些奇怪的问题, 兼容代码*/
-      ctx.status = 404;
-      ctx.data.detail = '用户名不存在, 请检查用户名';
-      throw '数据库异常, 请报告: bbs@kc.ac.cn';
+      ctx.throw(400, '数据库异常, 请报告: bbs@kc.ac.cn');
     }
     const user = users[0];
     const usersPersonal = await UsersPersonalModel.findOne({uid: user.uid});
@@ -94,14 +91,10 @@ loginRouter
     } = usersPersonal;
     const {hash, salt} = usersPersonal.password;
     if(tries > 10 && Date.now() - usersPersonal.lastTry < 3600000) {
-      ctx.status = 404;
-      ctx.data.detail = '密码错误次数过多, 请在一小时后再试';
-      return;
+      ctx.throw(400, '密码错误次数过多, 请在一小时后再试');
     }
     if(/brucezz|zzy2|3131986|1986313|19.+wjs|wjs.+86/.test(password)) {
-      ctx.status = 404;
-      ctx.data.detail = '注册码已过期, 请重新考试';
-      return;
+      ctx.throw(400, '注册码已过期, 请重新考试');
     }
     switch(hashType) {
       case 'pw9':
@@ -109,9 +102,7 @@ loginRouter
           tries++;
           lastTry = Date.now();
           await usersPersonal.update({tries, lastTry});
-          ctx.status = 404;
-          ctx.data.detail = '密码错误, 请重新输入';
-          return;
+          ctx.throw(404, '密码错误, 请重新输入');
         }
         break;
       case 'sha256HMAC':
@@ -119,9 +110,7 @@ loginRouter
           tries++;
           lastTry = Date.now();
           await usersPersonal.update({tries, lastTry});
-          ctx.status = 404;
-          ctx.data.detail = '密码错误, 请重新输入';
-          return;
+          ctx.throw(404, '密码错误, 请重新输入');
         }
         break;
     }

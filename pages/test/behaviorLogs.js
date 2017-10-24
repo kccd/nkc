@@ -19,7 +19,7 @@ let behaviorLogsSchema = new Schema({
   },
   port: {
     type: Number,
-    default: 0000
+    default: '0000'
   },
   address: {
     type: String,
