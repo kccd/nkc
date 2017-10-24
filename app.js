@@ -5,6 +5,7 @@ const mainRouter = require('./routes');
 const Koa = require('koa');
 require('colors');
 const bodyParser = require('koa-bodyparser');
+const koaBody = require('koa-body');
 const staticServe = require('koa-static');
 const db = require('./dataModels');
 const app = new Koa();
@@ -104,6 +105,7 @@ app.use(async (ctx, next) => {
   }
 });
 app.use(staticServe('./pages'));
+app.use(koaBody({multipart: true}));
 app.use(bodyParser());
 app.use(async (ctx, next) => {
   ctx.body = ctx.request.body;

@@ -139,7 +139,10 @@ loginRouter
       httpOnly: true
     });
     ctx.data = {
-      cookie: ctx.cookies.get('userInfo'),
+      cookie: {
+        "userInfo": ctx.cookies.get('userInfo'),
+        "userinfo.sig": ctx.cookies.get('userInfo.sig')
+      },
       introduction: 'put the cookie in req-header when using for api'
     };
     await next()
