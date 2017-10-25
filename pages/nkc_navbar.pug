@@ -51,7 +51,7 @@ div
           // -if (data.user && !data.logout)
           if(0)
             - var user = data.user
-            a(href='/m/set' title=`${getUserDescription(user)}`) #{user.username}
+            a(href='/m/set' title=`${data.user.navbarDesc}`) #{user.username}
             
             
             

@@ -27,6 +27,7 @@ app.use(async (ctx, next) => {
     "non_public": false,
     "": true
   };
+  ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.permittedOperations = {
     "listAllQuestions": true,
     "deleteElseQuestions": true,
@@ -103,7 +104,7 @@ app.use(async (ctx, next) => {
     await logger(ctx);
   }
 });
-app.use(staticServe('./pages'));
+app.use(koaBody({multipart: true}));
 app.use(bodyParser());
 app.use(async (ctx, next) => {
   ctx.body = ctx.request.body;
@@ -128,6 +129,7 @@ app.use(async (ctx, next) => {
     await next();
   }
 });
+app.use(staticServe('./pages'));
 // app.use(permissions);
 app.use(mainRouter.routes());
 app.use(async (ctx, next) => {

@@ -9,7 +9,7 @@ resourceRouter
     await next()
   })
   .post('/', async (ctx, next) => {
-    const rid = await ctx.db.SettingModel.getSystemID('resources');
+    const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     console.log(rid);
   });
 

@@ -9,6 +9,11 @@ const forumRouter = routers.forum;
 const otherRouter = routers.other;
 const experimentalRouter = routers.experimental;
 const questionRouter = routers.question;
+<<<<<<< HEAD
+const resourceRouter = routers.resource;
+const editorRouter = routers.editor;
+=======
+>>>>>>> 4d950fc8f98ad25d162a6889784443602778ca40
 
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
