@@ -50,7 +50,7 @@ div
         .NavBarLinkArea.f12.text-center
           if (data.user && !data.logout)
             - var user = data.user
-            a(href='/m/set' title=`${getUserDescription(user)}`) #{user.username}
+            a(href='/m/set' title=`${data.user.navbarDesc}`) #{user.username}
             
             
             

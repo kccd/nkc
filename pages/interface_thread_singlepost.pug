@@ -12,7 +12,7 @@ if !post.disabled || (post.disabled && po.enablePost)
     .threadOneLine
       div.fixThread
         div(style='float: left;')
-          - var title = user?getUserDescription(user):''
+          - var title = user?data.user.navbarDesc:''
           a(href='/m/#{uid}' title='#{title}')
             img.ThreadPostAvatar(src='/avatar/#{post.uid}')
         div(style='margin-left: 60px;')

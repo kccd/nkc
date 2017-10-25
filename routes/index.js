@@ -10,6 +10,7 @@ const otherRouter = routers.other;
 const experimentalRouter = routers.experimental;
 const questionRouter = routers.question;
 const resourceRouter = routers.resource;
+const editorRouter = routers.editor;
 
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());

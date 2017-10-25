@@ -23,19 +23,22 @@ const settingSchema = new Schema({
   }
 });
 
-async function getSystemID(type) {
+async function operateSystemID(type, op) {
+  if(op !== 1 && op !== -1)
+    throw 'invalid operation. a operation should be one of [-1, 1]';
   let setting;
   const counterType = "counters." + type;
-  const queryObj = {};
-  queryObj[counterType] = 1;
+  const attrObj = {};
+  queryObj[counterType] = op;
   try {
-    setting = await this.findOneAndUpdate({uid: 'system'}, {$inc: queryObj});
+    setting = await this.findOneAndUpdate({uid: 'system'}, {$inc: attrObj});
   } catch(e) {
     throw 'invalid id type, a type should be one of these [resources, users, posts, threadTypes, threads].'
   }
-  return setting.counters[type] + 1;
+  return setting.counters[type] + op;
 }
 
-settingSchema.statics.getSystemID = getSystemID;
+
+settingSchema.statics.operateSystemID = operateSystemID;
 
 module.exports = mongoose.model('settings', settingSchema);
