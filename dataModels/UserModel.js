@@ -92,8 +92,6 @@ const userSchema = new Schema({
   },
   introText: String,
   postSign: String,
-  regIP: String,
-  regPort: String
 });
 userSchema.pre('save', function(next) {
   if(!this.usernameLowerCase)

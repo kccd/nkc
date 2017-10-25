@@ -67,11 +67,7 @@ fn.checkRigsterCode = async (regCode) => {
 
 fn.createUser = async (data) => {
   let userObj = Object.assign({}, data);
-  console.log(`data: `);
-  console.log(data);
-  console.log(`userObj: `);
-  console.log(userObj);
-  let userCount = 73327;//await db.SettingModel.getSystemID('users');
+  let userCount = 73327;//await db.SettingModel.operateSystemID('users', 1);
   let time = Date.now();
   userObj.toc = time;
   userObj.tlv = time;

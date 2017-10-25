@@ -68,14 +68,6 @@ let usersSchema = new Schema({
     type: Number,
     default: 0
   },
-  regIP: {
-    type: String,
-    default: '0.0.0.0'
-  },
-  regPort: {
-    type: Number,
-    default: 0
-  },
   score: {
     type: Number,
     default: 0

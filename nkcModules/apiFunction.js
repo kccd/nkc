@@ -16,22 +16,22 @@ fn.testPassword = (input,hashtype,storedPassword) => {
   let hashed = '';
   switch (hashtype) {
     case 'pw9':
-      pass = input
-      hash = storedPassword.hash
-      salt = storedPassword.salt
+      pass = input;
+      hash = storedPassword.hash;
+      salt = storedPassword.salt;
 
-      hashed = md5(md5(pass)+salt)
+      hashed = md5(md5(pass)+salt);
       if(hashed!==hash){
         return false;
       }
       break;
 
     case 'sha256HMAC':
-      pass = input
-      hash = storedPassword.hash
-      salt = storedPassword.salt
+      pass = input;
+      hash = storedPassword.hash;
+      salt = storedPassword.salt;
 
-      hashed = fn.sha256HMAC(pass,salt)
+      hashed = fn.sha256HMAC(pass,salt);
       if(hashed!==hash){
         return false;
       }
@@ -45,8 +45,8 @@ fn.testPassword = (input,hashtype,storedPassword) => {
   return true;
 };
 fn.newPasswordObject = (plain) => {
-  let salt = Math.floor((Math.random()*65536)).toString(16)
-  let hash = fn.sha256HMAC(plain,salt)
+  let salt = Math.floor((Math.random()*65536)).toString(16);
+  let hash = fn.sha256HMAC(plain,salt);
   return {
     hashtype:'sha256HMAC',
     password:{
