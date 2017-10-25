@@ -5,6 +5,7 @@ const mainRouter = require('./routes');
 const Koa = require('koa');
 require('colors');
 const bodyParser = require('koa-bodyparser');
+const koaBody = require('koa-body');
 const staticServe = require('koa-static');
 const db = require('./dataModels');
 const app = new Koa();
@@ -27,7 +28,6 @@ app.use(async (ctx, next) => {
     "non_public": false,
     "": true
   };
-  ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.permittedOperations = {
     "listAllQuestions": true,
     "deleteElseQuestions": true,
@@ -104,6 +104,7 @@ app.use(async (ctx, next) => {
     await logger(ctx);
   }
 });
+app.use(staticServe('./pages'));
 app.use(koaBody({multipart: true}));
 app.use(bodyParser());
 app.use(async (ctx, next) => {
@@ -118,7 +119,6 @@ app.use(async (ctx, next) => {
   } else {
     const {username, uid} = JSON.parse(userInfo);
     const user = await db.UserModel.findOne({uid});
-    //ctx.cookies.set('userInfo', '');
     if (user.username !== username) {
       ctx.cookies.set('userInfo', '');
       ctx.status = 401;
@@ -129,7 +129,6 @@ app.use(async (ctx, next) => {
     await next();
   }
 });
-app.use(staticServe('./pages'));
 // app.use(permissions);
 app.use(mainRouter.routes());
 app.use(async (ctx, next) => {
