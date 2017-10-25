@@ -61,7 +61,7 @@ setRouter
     await next();
   })
   .put('/mobile', async (ctx, next) => {
-    ctx.data = '修改电话号码';
+    // ctx.data = '修改电话号码';
     await next();
   });
 
