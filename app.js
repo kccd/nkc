@@ -21,6 +21,7 @@ app.use(async (ctx, next) => {
   ctx.settings = settings;
   ctx.data = Object.create(null);
   ctx.data.site = settings.site;
+  ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.contentClasses = {
     "null": true,
     "images": true,
@@ -104,7 +105,6 @@ app.use(async (ctx, next) => {
     await logger(ctx);
   }
 });
-app.use(staticServe('./pages'));
 app.use(koaBody({multipart: true}));
 app.use(bodyParser());
 app.use(async (ctx, next) => {
@@ -129,6 +129,7 @@ app.use(async (ctx, next) => {
     await next();
   }
 });
+app.use(staticServe('./pages'));
 // app.use(permissions);
 app.use(mainRouter.routes());
 app.use(async (ctx, next) => {

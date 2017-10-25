@@ -48,8 +48,7 @@ div
       
       .col-xs-5.col-sm-3
         .NavBarLinkArea.f12.text-center
-          // -if (data.user && !data.logout)
-          if(0)
+          if (data.user && !data.logout)
             - var user = data.user
             a(href='/m/set' title=`${data.user.navbarDesc}`) #{user.username}
             
@@ -62,7 +61,7 @@ div
                 if data.user.new_message
                   -var new_message = data.user.new_message
                   -var messageSum = (new_message.messages || 0) + (new_message.system || 0) + (new_message.at || 0) + (new_message.replies || 0);
-                  -if(messageSum > 0)
+                  if(messageSum > 0)
                     span.reddish (#{messageSum})
             
             if data.permittedOperations

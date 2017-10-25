@@ -25,7 +25,7 @@ const settingSchema = new Schema({
 
 async function operateSystemID(type, op) {
   if(op !== 1 && op !== -1)
-    throw 'invalid operation. a operation should be one of [-1, 1]';
+    throw 'invalid operation. a operation should be -1 or 1';
   let setting;
   const counterType = "counters." + type;
   const attrObj = {};
