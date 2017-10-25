@@ -83,29 +83,34 @@ fn.random = (n) => {
 };
 
 fn.checkRigsterCode = async (regCode) => {
-  let regCodeOfDB = await db.AnswerSheetModel.find({key: regCode});
-  if(regCodeOfDB.length === 0) throw '验证注册码失败，请检查！';
+  let regCodeOfDB = await db.AnswerSheetModel.findOne({key: regCode});
+  if(!regCodeOfDB) throw '验证注册码失败，请检查！';
   if (regCodeOfDB.uid) throw '答卷的注册码过期，可能要重新参加考试';
   if (Date.now() - regCodeOfDB.tsm > settings.exam.timeBeforeRegister) throw '答卷的注册码过期，可能要重新参加考试';
   return regCodeOfDB;
 };
-fn.createUser = async (userObj) => {
-  let userCount = await db.CounterModel.findOne({type: 'users'});
+fn.createUser = async (data) => {
+  let userObj = Object.assign({}, data)._doc;
+  let userCount = await db.SettingModel.getSystemID('users');
   let time = Date.now();
   userObj.toc = time;
   userObj.tlv = time;
-  userObj.uid = userCount.Count;
+  userObj.uid = parseInt(userCount);
+  userObj.certs = [];
   if(userObj.mobile) userObj.certs = ['mobile'];
   if(userObj.email) userObj.certs = ['email'];
   if(!userObj.isA) {
     userObj.certs.push('examinated');
   }
-  let salt = Math.floor((Math.random() * 65536)).toString(16);
-  let hash = fn.sha256HMAC(userObj.password, salt);
-  userObj.password = {
-    salt: salt,
-    hash: hash
-  };
+  if(typeof(userObj.password) === 'string') {
+    let salt = Math.floor((Math.random() * 65536)).toString(16);
+    let hash = fn.sha256HMAC(userObj.password, salt);
+    userObj.password = {
+      salt: salt,
+      hash: hash
+    };
+    userObj.hashType = 'sha256HMAC';
+  }
   userObj.newMessage = {
     messages: 0,
     at: 0,
@@ -115,8 +120,6 @@ fn.createUser = async (userObj) => {
   userObj.abbr = userObj.username.slice(0, 6);
   userObj.displayName = userObj.username + '的专栏';
   userObj.description = userObj.username + '的专栏';
-  userObj.hashType = 'sha256HMAC';
-
   let users = new db.UserModel(userObj);
   let usersPersonal = new db.UsersPersonalModel(userObj);
   let personalForums = new db.PersonalForumModel(userObj);
@@ -127,9 +130,11 @@ fn.createUser = async (userObj) => {
     await personalForums.save();
     await usersSubscribe.save();
   }catch(err) {
-    await db.UsersPersonalModel.findOneAndRemove({uid: userObj.uid});
-    await db.PersonalForumModel.findOneAndRemove({uid: userObj.uid});
-    await db.UserSubscribeModel.findOneAndRemove({uid: userObj.uid});
+    await db.UserModel.deleteMany({uid: userObj.uid});
+    await db.UsersPersonalModel.deleteMany({uid: userObj.uid});
+    await db.PersonalForumModel.deleteMany({uid: userObj.uid});
+    await db.UserSubscribeModel.deleteMany({uid: userObj.uid});
+    await db.CounterModel.replaceOne({type: 'users'},{$inc: {count: -1}});
     throw `新建用户出错！err: ${err}`;
   }
   return userObj;

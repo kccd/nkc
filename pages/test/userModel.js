@@ -21,11 +21,11 @@ const userSchema = new Schema({
     default: Date.now,
     required: true
   },
-  disabledPostsCount: {
+  disabledPostCount: {
     type: Number,
     default: 0
   },
-  disabledThreadsCount: {
+  disabledThreadCount: {
     type: Number,
     default: 0
   },
@@ -45,11 +45,11 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
-  toppedThreadsCount: {
+  toppedThreadCount: {
     type: Number,
     default: 0
   },
-  digestThreadsCount: {
+  digestThreadCount: {
     type: Number,
     default: 0,
   },

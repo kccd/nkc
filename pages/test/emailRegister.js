@@ -38,6 +38,14 @@ let emailRegiserSchema = new Schema({
   hashType: {
     type: String,
     required: true
+  },
+  isA: {
+    type: Boolean,
+    default: false
+  },
+  regCode: {
+    type: String,
+    required: true
   }
 });
 
@@ -65,6 +73,9 @@ db.query(`
       res[i].hashtype = 'sha256HMAC';
     }
     res[i].hashType = res[i].hashtype;
+    if(!res[i].regCode) {
+      res[i].regCode = 'none';
+    }
   }
   return res;
 })

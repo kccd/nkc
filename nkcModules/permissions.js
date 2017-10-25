@@ -237,7 +237,7 @@ function getPermitTree(certs) {
   for(const cert of certs) {
     let certificate = certificates[cert];
     if(certificate.inheritFrom)
-      tree = getPermitTree(certificate.inheritFrom);
+      certificate = getPermitTree(certificate.inheritFrom);
     tree = mergeTree(tree, certificate)
   }
   return tree
@@ -302,4 +302,4 @@ module.exports = async (ctx, next) => {
     ctx.throw(401, e)
   }
   await next();
-};
+}

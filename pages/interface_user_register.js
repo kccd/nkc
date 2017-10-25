@@ -74,7 +74,7 @@ function register_submit(){
       throw({detail:'请填写手机号码！'})
       return;
     }
-    if(!(/(^[1-9]\d*$)/.test(userobj.phone))){
+    if(!(/(^[1-9]\d*$)/.test(userobj.mobile))){
       getFocus("#phone")
       throw({detail:'手机号码格式不正确！'})
       return;
@@ -130,7 +130,7 @@ function register_submit(){
       //refreshICode();
       getFocus("#phone")
     }
-    error_report(err.detail);
+    error_report(err);
   })
 
 }
@@ -179,7 +179,7 @@ function getMcode(){
   }
 
   else{
-    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode})
+    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode, username: username})
     .then(function(res){
       var count = 120;
       var countdown = setInterval(CountDown, 1000);

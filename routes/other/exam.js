@@ -7,7 +7,7 @@ const examRouter = new Router();
 examRouter
   //选择考试科目页面
   .get('/', async (ctx, next) => {
-    ctx.data.getcode = true;
+    ctx.data.getCode = true;
     ctx.template = 'interface_user_register.pug';
     await next();
   })

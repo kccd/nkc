@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')({url: 'http://root:@192.168.11.10',databaseName: 'rescue'});
+db = require('arangojs')({url: 'http://root:@192.168.11.3',databaseName: 'rescue'});
 
 let users_personalSchema = new Schema({
   /*uid: {
@@ -143,6 +143,27 @@ db.query(`
   return u
 `)
 .then(cursor => cursor.all())
+.then(res => {
+  return db.query(`
+    for m in mobilecodes
+    return m
+  `)
+    .then(cursor => cursor.all())
+    .then(res2 => {
+      console.log('开始转移电话号码');
+      let count = 0;
+      for (let m of res2){
+        count++;
+        console.log(count);
+        for (let n of res){
+          if(m.uid == n._key){
+            n.mobile = m.mobile;
+          }
+        }
+      }
+      return res
+    })
+})
 .then((res) => {
   for(var i = 0; i < res.length; i++){
     if(!res[i].password.hasOwnProperty('hash')){
