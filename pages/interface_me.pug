@@ -104,12 +104,12 @@ block content
         .rom(style='margin:1em 0;')
           .col-xs-12.col-md-6
             .col-xs-12.col-md-12
-              .h4(style='font-weight:300;') 帖子签名
+              .h4(style='font-weight:300;') 帖子签名 (300字节)
             .col-xs-12.col-md-10
               textarea#post_sign.form-control(style='resize: none;',placeholder='帖子签名',rows="10") #{user.postSign||''}
           .col-xs-12.col-md-6
             .col-xs-12.col-md-12
-              .h4(style='font-weight:300;') 个人简介
+              .h4(style='font-weight:300;') 个人简介(300字节)
             .col-xs-12.col-md-10
               textarea#description.form-control(style='resize: none;',placeholder='个人简介',rows="10") #{user.description||''}
           .col-xs-12.col-md-6

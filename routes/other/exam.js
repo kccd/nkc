@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const cookieSignature = require('cookie-signature');
 const nkcModules = require('../../nkcModules');
+let dbFn = nkcModules.dbFunction;
 const crypto = require('crypto');
 const settings = require('../../settings');
 const examRouter = new Router();
@@ -209,7 +210,7 @@ examRouter
     let saveData = async (answerSheet, user) => {
       try{
         if(user){
-          await nkcModules.apiFunction.addCertToUser(user.uid, 'examinated');
+          await dbFn.addCertToUser(user.uid, 'examinated');
           ctx.data.takenByUser = true;
         }else{
           await new ctx.db.AnswerSheetModel(answerSheet).save();

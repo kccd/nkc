@@ -11,8 +11,7 @@ const testRouter = require('./test');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
-    ctx.data = `网站首页`;
-    ctx.template = 'user.pug';
+    ctx.template = 'test.pug';
     await next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())

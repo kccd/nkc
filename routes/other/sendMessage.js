@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const settings = require('../../settings');
 const nkcModules = require('../../nkcModules');
-let fn = nkcModules.apiFunction;
+let apiFn = nkcModules.apiFunction;
+let dbFn = nkcModules.dbFunction;
 const sendMessageRouter = new Router();
 
 sendMessageRouter
@@ -17,21 +18,19 @@ sendMessageRouter
     if(!mobile) ctx.throw(400, '手机号码不能为空');
     if(!regCode) ctx.throw(400, '注册码不能为空');
     if(!areaCode) ctx.throw(400, '国际区号不能为空');
-    let usernameOfDB = await db.UserModel.find({usernameLowerCase: username.toLowerCase()});
-    if(usernameOfDB.length !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
-    let code = fn.random(6);
-    let time = new Date().getTime();
-    let time2 = Date.now()-24*60*60*1000;
+    let code = apiFn.random(6);
     try{
-      await fn.checkRigsterCode(regCode);
+      await dbFn.checkRigsterCode(regCode);
     }catch (err) {
       ctx.throw('404', err);
     }
-    let smsCodes = await db.SmsCodeModel.find({mobile: mobile, toc: {$gt: time2}, type: 'register'});
-    if(smsCodes.length >= 5) ctx.throw(404, '短信发送次数已达上限，请隔天再试');
+    let usernameOfDBNumber = await dbFn.checkUsername(username);
+    if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     //以往的手机号码没有加国际区号，避免老用户用同一个手机号重复注册
-    let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
-    if(mobileCodes.length > 0) ctx.throw(404, '此号码已经用于其他用户注册，请检查或更换');
+    let mobileCodesNumber = await dbFn.checkMobile(mobile, oldMobile);
+    if(mobileCodesNumber > 0) ctx.throw(404, '此号码已经用于其他用户注册，请检查或更换');
+    let smsCodesNumber = await dbFn.checkNumberOfSendMessage(mobile, 'register');
+    if(smsCodesNumber >= settings.sendMessage.sendMobileCodeCount) ctx.throw(404, '短信发送次数已达上限，请隔天再试');
     await settings.mailSecrets.sendSMS(mobile, code , 'register');
     let smsCode = new db.SmsCodeModel({
       mobile: mobile,
