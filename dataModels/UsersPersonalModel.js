@@ -68,4 +68,5 @@ const usersPersonalSchema = new Schema({
   }
 });
 
+
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

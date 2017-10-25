@@ -76,4 +76,5 @@ fn.checkEmailFormat = (email) => {
   return email.search(path);
 };
 
+
 module.exports = fn;

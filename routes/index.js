@@ -21,4 +21,5 @@ router.use('/p', postRouter.routes(), postRouter.allowedMethods());
 router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());
 router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods());
 router.use('/q', questionRouter.routes(), questionRouter.allowedMethods());
+router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 module.exports = router;

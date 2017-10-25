@@ -3,6 +3,7 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
+
 fn.checkMobile = async (mobile, oldMobile) => {
   let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
   return mobileCodes.length;

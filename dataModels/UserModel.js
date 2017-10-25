@@ -2,6 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
+
 const userSchema = new Schema({
   kcb: {
     type: Number,

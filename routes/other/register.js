@@ -4,7 +4,6 @@ let apiFn = nkcModules.apiFunction;
 let dbFn = nkcModules.dbFunction;
 let settings = require('../../settings');
 
-
 const registerRouter = new Router();
 registerRouter
   .get('/', async (ctx, next) => {
