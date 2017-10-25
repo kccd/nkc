@@ -3,6 +3,10 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
+// 查询目标用户的个人搜藏
+fn.foundCollection = async (data) => {
+  let collection = await db.CollectionModel.find(data).sort({toc: -1});
+};
 
 fn.checkMobile = async (mobile, oldMobile) => {
   let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);

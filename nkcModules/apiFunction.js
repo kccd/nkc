@@ -1,5 +1,4 @@
 const settings = require('../settings');
-let db = require('../dataModels');
 let fn = {};
 
 

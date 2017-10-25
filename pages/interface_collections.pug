@@ -1,10 +1,10 @@
 extends bootstrap_base.pug
 
 block title
-  title #{data.category} - #{data.thisuser.username}的收藏 - 科创论坛
+  title #{data.category} - #{data.targetUser.username}的收藏 - 科创论坛
   
 block content
-  -var ownership = data.thisuser._key == (data.user?data.user._key:null)
+  -var ownership = data.targetUser._key == (data.user?data.user._key:null)
   if (data.user == undefined)
     h2(style="margin-left:8%;") 请先登录后查看，谢谢~
   else
@@ -12,9 +12,9 @@ block content
       .row
         .col-xs-12
           .nkcpanel
-            -var uid = data.thisuser._key
+            -var uid = data.targetUser._key
             include interface_profile_avatar.pug
-            .ForumName #{data.category} - #{data.thisuser.username} 的个人收藏
+            .ForumName #{data.category} - #{data.targetUser.username} 的个人收藏
         
         if ownership
           .col-xs-12
@@ -44,7 +44,7 @@ block content
         else
           
             
-        -if(!data.categoryNames.length){data.categoryNames=[null]}
+        -if(!data.categoryNames.length){data.categoryNames=['未分类']}
 
         .col-xs-12
           ul.nav.nav-tabs
