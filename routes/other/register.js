@@ -37,7 +37,7 @@ registerRouter
     };
     let usernameOfDB = await db.UserModel.find({usernameLowerCase: userObj.username.toLowerCase()});
     if(usernameOfDB.length !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
-    if(contentLength(userObj.username) > 30) {
+    if(fn.contentLength(userObj.username) > 30) {
       ctx.throw(400, '用于名不能大于30字节(ASCII)');
     }
     const time = Date.now() - settings.sendMessage.mobileCodeTime;  //15分钟之内的验证码
@@ -49,7 +49,7 @@ registerRouter
       ctx.throw('404', err);
     }
     userObj.isA = regCodeFoDB.isA;
-    let smsCode = await db.SmsCodeModel.find({mobile: userObj.mobile, code: userObj.mcode, toc: {$lte: time}});
+    let smsCode = await db.SmsCodeModel.find({mobile: userObj.mobile, code: userObj.mcode, toc: {$gt: time}});
     if(smsCode.length === 0) ctx.throw(404, '手机验证码错误或过期，请检查');
     let newUser = await fn.createUser(userObj);
     await db.AswerSheetModel.replaceOne({key: userObj.regCode}, {uid: newUser.uid});

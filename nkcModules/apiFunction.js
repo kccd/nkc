@@ -91,11 +91,11 @@ fn.checkRigsterCode = async (regCode) => {
 };
 fn.createUser = async (data) => {
   let userObj = Object.assign({}, data)._doc;
-  let userCount = await db.CounterModel.findOneAndUpdate({type: 'users'},{$inc: {count: 1}});
+  let userCount = await db.SettingModel.getSystemID('users');
   let time = Date.now();
   userObj.toc = time;
   userObj.tlv = time;
-  userObj.uid = parseInt(userCount.count+1);
+  userObj.uid = parseInt(userCount);
   userObj.certs = [];
   if(userObj.mobile) userObj.certs = ['mobile'];
   if(userObj.email) userObj.certs = ['email'];

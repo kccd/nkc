@@ -12,6 +12,7 @@ sendMessageRouter
     let regCode = params.regCode;
     let areaCode = params.areaCode;
     let username = params.username;
+    let oldMobile = params.mobile;
     let mobile = (params.areaCode + params.mobile).replace('+', '00');
     if(!mobile) ctx.throw(400, '手机号码不能为空');
     if(!regCode) ctx.throw(400, '注册码不能为空');
@@ -28,7 +29,8 @@ sendMessageRouter
     }
     let smsCodes = await db.SmsCodeModel.find({mobile: mobile, toc: {$gt: time2}, type: 'register'});
     if(smsCodes.length >= 5) ctx.throw(404, '短信发送次数已达上限，请隔天再试');
-    let mobileCodes = await db.MobileCodeModel.find({mobile: mobile});
+    //以往的手机号码没有加国际区号，避免老用户用同一个手机号重复注册
+    let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
     if(mobileCodes.length > 0) ctx.throw(404, '此号码已经用于其他用户注册，请检查或更换');
     await settings.mailSecrets.sendSMS(mobile, code , 'register');
     let smsCode = new db.SmsCodeModel({

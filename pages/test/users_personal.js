@@ -143,6 +143,27 @@ db.query(`
   return u
 `)
 .then(cursor => cursor.all())
+.then(res => {
+  return db.query(`
+    for m in mobilecodes
+    return m
+  `)
+    .then(cursor => cursor.all())
+    .then(res2 => {
+      console.log('开始转移电话号码');
+      let count = 0;
+      for (let m of res2){
+        count++;
+        console.log(count);
+        for (let n of res){
+          if(m.uid == n._key){
+            n.mobile = m.mobile;
+          }
+        }
+      }
+      return res
+    })
+})
 .then((res) => {
   for(var i = 0; i < res.length; i++){
     if(!res[i].password.hasOwnProperty('hash')){
