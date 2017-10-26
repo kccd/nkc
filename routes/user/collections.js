@@ -8,7 +8,7 @@ collectionsRouter
     let db = ctx.db;
     let user = ctx.data.user;
     let targetUserUid = ctx.params.uid;
-    let category = ctx.params.category;
+    let category = (ctx.params.category === 'null')? '': ctx.params.category;
     let targetUser = {};
     if(user.uid !== targetUserUid) {
       targetUser = await db.UserModel.findOne({uid: targetUserUid});
@@ -21,7 +21,6 @@ collectionsRouter
       category: category
     };
     let categoryThreads = await dbFn.foundCollection(queryDate);
-    console.log(categoryThreads);
     ctx.template = 'interface_collections.pug';
     await next();
   });

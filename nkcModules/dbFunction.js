@@ -5,7 +5,17 @@ let fn = {};
 
 // 查询目标用户的个人搜藏
 fn.foundCollection = async (data) => {
-  let collection = await db.CollectionModel.find(data).sort({toc: -1});
+  let collections = await db.CollectionModel.find(data).sort({toc: -1});
+  for (let collection of collections) {
+    let thread = await db.ThreadModel.findOne({tid: collection.tid});
+    let postOc = await db.PostModel.findOne({pid: thread.oc});
+    console.log(`thread.lm: ${thread.lm}`);
+    let postLm = await db.PostModel.findOne({pid: thread.lm});
+    console.log(`postLm: ${postLm}`);
+    let userLm = await db.UserModel.findOne({uid: postLm.uid});
+    let userOc = await db.UserModel.findOne({uid: postOc.uid});
+
+  }
 };
 
 fn.checkMobile = async (mobile, oldMobile) => {
