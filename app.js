@@ -150,4 +150,4 @@ app.use(async (ctx, next) => {
   await next();
 });
 
-module.exports = app.callback();
+
