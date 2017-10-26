@@ -25,7 +25,7 @@ block content
         .col-xs-12.col-sm-7.col-md-6
           h4 编辑内容
           .form-group
-            input#title.form-control(type='text' placeholder='标题' value="#{data.original_post?data.original_post.t||'':''}")
+            input#title.form-control(type='text' placeholder='标题' value=`${data.original_post?data.original_post.t||'':''}`)
 
           //.form-group#btnGroup
             a.btn.btn-default(href='javascript:;') 黑体
@@ -46,7 +46,7 @@ block content
                     .div3(style="display:table-cell;")
                       select#cat.form-control 
                         each t in data.threadtypes
-                          option(value='#{t._key}') #{t.name}
+                          option(value=`${t._key}`) #{t.name}
                 else
                   input(type='hidden')#cat
             else
@@ -55,10 +55,10 @@ block content
           .form-inline(style='margin-bottom:5px;')
             .form-group 发表在
             .form-group
-              if(data.replytarget != "")
-                input#target.form-control(placeholder='分区ID' value='#{(data.replytarget ? data.replytarget : "")}' disabled)
+              if(data.replytarget !=="")
+                input#target.form-control(placeholder='分区ID' value=`${(data.replytarget ? data.replytarget : "")}` disabled)
               else
-                input#target.form-control(placeholder='分区ID' value='#{(data.replytarget?data.replytarget:"")}')
+                input#target.form-control(placeholder='分区ID' value=`${(data.replytarget?data.replytarget:"")}`)
             .form-group 发表
             .form-group
               select#lang.form-control
@@ -80,7 +80,7 @@ block content
             .form-group
               button#post.btn.btn-primary(type='submit' style='') 发表
           
-          .nkcpanel(id='file-uploading' target='resources/')
+          .nkcpanel(id='file-uploading' target='/r')
             //uploader section
             include interface_attachment_uploader_uploader.pug
               
@@ -141,13 +141,13 @@ block content
   include debug_output.pug
 block scripts
 
-  script(src='/commonmark/commonmark.js')
+  script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
-  script(src='/xbbcode/xbbcode.js')
-  script(src='/xss/xss.js')
+  script(src='/xbbcode-parser/xbbcode.js')
+  script(src='/xss/dist/xss.js')
   
-  script(src='/react.min.js')
-  script(src='/JSXTransformer.js')
+  script(src='/external_pkgs/react/react.min.js')
+  script(src='/external_pkgs/react/JSXTransformer.js')
   
   script(src='/interface_common.js')
   script(src='/nkc_render.js')

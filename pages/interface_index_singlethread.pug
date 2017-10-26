@@ -20,7 +20,7 @@
   .parent.clearfix(id='')
     .avatar-left
       - var user = ocuser
-      - var title = user?getUserDescription(user):''
+      - var title = user?data.user.navbarDesc:''
       a(href='/m/#{uid}' title='#{title}')
         img.ForumThreadAvatar(src='/avatar/#{uid}')
 
@@ -60,7 +60,7 @@
                 span.ThreadCount 回复:0
 
             .ForumThreadTitle3(style="display:inline-block;")
-              input.ThreadCheckboxes(id='#{(item?item._key:null)||thread._key}' type='checkbox' style="#{showTicks?'':'display:none;'}")
+              input.ThreadCheckboxes(id=`#{(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
 
 
 
@@ -97,7 +97,7 @@ if 0
   .ForumThreadItem
     .CollectionCategoryThreadActions
 
-      input.ThreadCheckboxes(id='#{(item?item._key:null)||thread._key}' type='checkbox' style="#{showTicks?'':'display:none;'}")
+      input.ThreadCheckboxes(id=`#{(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
 
 
     if 0

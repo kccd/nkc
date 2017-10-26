@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')({url: 'http://root:@192.168.11.10',databaseName: 'rescue'});
+db = require('arangojs')({url: 'http://root:@127.0.0.1:8529',databaseName: 'rescue'});
 
 let users_personalSchema = new Schema({
   /*uid: {
@@ -120,13 +120,13 @@ let users_personalSchema = new Schema({
       default: 0
     }
   },
-  regCode: {
-    type: String,
-    default: ''
-  },
   regIp: {
     type: String,
-    default: ''
+    default: '0.0.0.0'
+  },
+  regPort: {
+    type: Number,
+    default: '0'
   },
   tries: {
     type: Number,
@@ -143,6 +143,27 @@ db.query(`
   return u
 `)
 .then(cursor => cursor.all())
+.then(res => {
+  return db.query(`
+    for m in mobilecodes
+    return m
+  `)
+    .then(cursor => cursor.all())
+    .then(res2 => {
+      console.log('开始转移电话号码');
+      let count = 0;
+      for (let m of res2){
+        count++;
+        console.log('电话号码: '+count);
+        for (let n of res){
+          if(m.uid == n._key){
+            n.mobile = m.mobile;
+          }
+        }
+      }
+      return res
+    })
+})
 .then((res) => {
   for(var i = 0; i < res.length; i++){
     if(!res[i].password.hasOwnProperty('hash')){
@@ -169,10 +190,9 @@ db.query(`
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
-    res[i].regIP = res[i].regip;
+    res[i].regIp = res[i].regip;
     res[i].newMessage = res[i].new_message;
     res[i].lastTry = res[i].lasttry;
-    res[i].regCode = res[i].regcode;
     if(res[i].hashtype) {
       res[i].hashType = res[i].hashtype;
     }

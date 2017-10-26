@@ -21,7 +21,7 @@ var attachment_uploader = function(options){
       }
     }
 
-    xhr.open("POST","/api/"+target.toString().toLowerCase(),true);
+    xhr.open("POST",target.toString().toLowerCase(),true);
     //xhr.setRequestHeader("Content-type","application/json");
     xhr.send(data);
 

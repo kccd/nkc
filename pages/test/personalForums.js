@@ -24,7 +24,7 @@ let personalForumsSchema = new Schema({
     type: String,
     required: true
   },
-  description: {
+  descriptionOfForum: {
     type: String,
     required: true
   },
@@ -60,6 +60,7 @@ db.query(`
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
     res[i].displayName = res[i].display_name;
+    res[i].descriptionOfForum = res[i].description
   }
   console.log('开始写入数据');
   let n = 0;

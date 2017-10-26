@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const subscribeRouter = require('./subscribe');
 const smsRouter = require('./sms');
+const collectionsRouter = require('./collections');
 const userRouter = new Router();
 
 
@@ -47,4 +48,5 @@ userRouter
   }) */
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/:uid/sms', smsRouter.routes(), smsRouter.allowedMethods())
+  .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods());
 module.exports = userRouter;

@@ -160,6 +160,9 @@ const certificates ={
       },
       r: {
         [POST]: true
+      },
+      editor: {
+        [GET]: true
       }
     }
   }
@@ -234,7 +237,7 @@ function getPermitTree(certs) {
   for(const cert of certs) {
     let certificate = certificates[cert];
     if(certificate.inheritFrom)
-      tree = getPermitTree(certificate.inheritFrom);
+      certificate = getPermitTree(certificate.inheritFrom);
     tree = mergeTree(tree, certificate)
   }
   return tree
@@ -253,15 +256,32 @@ function ensurePermission(certs, path, method) {
       obj = obj[parameter]
     }
     else {
-      throw `路径/${route}权限不足`
+      throw `对路径/${route}的操作[${method}]权限不足`
     }
   }
   if(!obj[method])
     throw `权限不足`
 }
 
+function getUserDescription(user) {
+  const {certs, username, xsf = 0, kcb = 0} = user;
+  let cs = '';
+  for(const cert of certs) {
+    cs.concat(certificates[cert].displayName + ', ')
+  }
+  cs.slice(0, -1);
+  return `${username}\n`+
+    `学术分 ${xsf}\n`+
+    `科创币 ${kcb}\n`+
+    `${cs}`
+}
+
 module.exports = async (ctx, next) => {
-  const certs = ctx.data.user ? ctx.data.user.certs : ['visitor'];
+  let certs = ['visitor'];
+  if(ctx.data.user) {
+    certs = ctx.data.user.certs;
+    ctx.data.user.navbarDesc = getUserDescription(ctx.data.user);
+  }
   const cs = getPermitTree(certs);
   ctx.data.certificates = cs;
   const methodEnum = {
@@ -282,4 +302,4 @@ module.exports = async (ctx, next) => {
     ctx.throw(401, e)
   }
   await next();
-};
+}

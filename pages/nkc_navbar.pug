@@ -50,7 +50,7 @@ div
         .NavBarLinkArea.f12.text-center
           if (data.user && !data.logout)
             - var user = data.user
-            a(href='/m/set' title=`${getUserDescription(user)}`) #{user.username}
+            a(href='/m/set' title=`${data.user.navbarDesc}`) #{user.username}
             
             
             
@@ -61,14 +61,14 @@ div
                 if data.user.new_message
                   -var new_message = data.user.new_message
                   -var messageSum = (new_message.messages || 0) + (new_message.system || 0) + (new_message.at || 0) + (new_message.replies || 0);
-                  -if(messageSum > 0)
+                  if(messageSum > 0)
                     span.reddish (#{messageSum})
             
             if data.permittedOperations
               if data.permittedOperations.viewExperimental
                 a(href='/experimental' title='管理界面') 管
             
-            a(href=`/user_collection/${data.user.uid}` title='我的珍藏') 藏
+            a(href=`/u/${data.user.uid}/collections/null` title='我的珍藏') 藏
             
             a(href=`/logout` title='不，不要走！') 退
             

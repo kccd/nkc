@@ -1,6 +1,5 @@
-let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
-mongoose.Promise = global.Promise;
+const settings = require('../settings');
+const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -75,8 +74,8 @@ const userSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    required: true
   },
   bday: String,
   cart: [String],
@@ -90,11 +89,8 @@ const userSchema = new Schema({
     type: [String],
     index: 1
   },
-  intro_text: String,
-  post_sign: String,
-  regIP: String,
-  regPort: String,
-  subForums: [String]
+  introText: String,
+  postSign: String,
 });
 userSchema.pre('save', function(next) {
   if(!this.usernameLowerCase)
@@ -102,12 +98,4 @@ userSchema.pre('save', function(next) {
   next()
 });
 
-let User = mongoose.model('users', userSchema);
-
-User.find({}).limit(1)
-.then(res => {
-  console.log(res);
-})
-.catch(err => {
-  console.log(err);
-})
+module.exports = mongoose.model('users', userSchema);

@@ -107,7 +107,7 @@ function register_submit(){
       //refreshICode();
       getFocus("#icode")
     }*/
-    error_report(err.detail);
+    error_report(err);
   })
 
 }

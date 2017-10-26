@@ -2,6 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
+
 const userSchema = new Schema({
   kcb: {
     type: Number,
@@ -21,11 +22,11 @@ const userSchema = new Schema({
     default: Date.now,
     required: true
   },
-  disabledPostCount: {
+  disabledPostsCount: {
     type: Number,
     default: 0
   },
-  disabledThreadCount: {
+  disabledThreadsCount: {
     type: Number,
     default: 0
   },
@@ -45,11 +46,11 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
-  toppedThreadCount: {
+  toppedThreadsCount: {
     type: Number,
     default: 0
   },
-  digestThreadCount: {
+  digestThreadsCount: {
     type: Number,
     default: 0,
   },
@@ -74,8 +75,8 @@ const userSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    required: true
   },
   bday: String,
   cart: [String],
@@ -91,8 +92,6 @@ const userSchema = new Schema({
   },
   introText: String,
   postSign: String,
-  regIP: String,
-  regPort: String
 });
 userSchema.pre('save', function(next) {
   if(!this.usernameLowerCase)

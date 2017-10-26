@@ -19,7 +19,7 @@ let personalForumsSchema = new Schema({
     type: String,
     required: true
   },
-  description: {
+  descriptionOfForum: {
     type: String,
     required: true
   },

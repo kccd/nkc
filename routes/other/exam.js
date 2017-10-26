@@ -1,13 +1,14 @@
 const Router = require('koa-router');
 const cookieSignature = require('cookie-signature');
 const nkcModules = require('../../nkcModules');
+let dbFn = nkcModules.dbFunction;
 const crypto = require('crypto');
 const settings = require('../../settings');
 const examRouter = new Router();
 examRouter
   //选择考试科目页面
   .get('/', async (ctx, next) => {
-    ctx.data.getcode = true;
+    ctx.data.getCode = true;
     ctx.template = 'interface_user_register.pug';
     await next();
   })
@@ -118,6 +119,7 @@ examRouter
   //获得激活码
   .post('/subject', async (ctx, next) => {
     let ip = ctx.ip;
+    let db = ctx.db;
     let params = ctx.body;
     let exam = params.exam;
     if(!exam) ctx.throw(400, '小明！你的试卷呢？');
@@ -194,7 +196,12 @@ examRouter
         ctx.throw (404, `生成注册码失败。`) ;
       }
     };
-    let key = regCode();
+    let keyOfDB = 1;
+    let key = '';
+    while (keyOfDB !== 0){
+      key = regCode();
+      keyOfDB = (await ctx.db.AnswerSheetModel.find({key: key})).length;
+    }
     let answerSheet = {
       uid: ctx.data.user?ctx.data.user.uid:null,
       records:records,
@@ -206,10 +213,11 @@ examRouter
       key: key,
       isA: isA
     };
+
     let saveData = async (answerSheet, user) => {
       try{
         if(user){
-          await nkcModules.apiFunction.addCertToUser(user.uid, 'examinated');
+          await dbFn.addCertToUser(user.uid, 'examinated');
           ctx.data.takenByUser = true;
         }else{
           await new ctx.db.AnswerSheetModel(answerSheet).save();

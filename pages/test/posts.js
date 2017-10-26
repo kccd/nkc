@@ -9,9 +9,8 @@ db.useDatabase('rescue');
 let postsSchema = new Schema({
   pid: {
     type: String,
-    required: true,
-    index: 1,
-    unique: true
+    unique: true,
+    required: true
   },
   atUsers: {
     type: Array,

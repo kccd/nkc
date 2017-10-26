@@ -30,6 +30,18 @@ let EmailRegisterSchema = new Schema({
       type: String,
       required: true
     }
+  },
+  isA: {
+    type: Boolean,
+    default: false
+  },
+  hashType: {
+    type: String,
+    required: true
+  },
+  regCode: {
+    type: String,
+    required: true
   }
 });
 
