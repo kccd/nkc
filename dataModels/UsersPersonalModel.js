@@ -54,13 +54,13 @@ const usersPersonalSchema = new Schema({
       default: 0
     }
   },
-  regCode: {
-    type: String,
-    default: ''
-  },
   regIp: {
     type: String,
-    default: ''
+    default: '0.0.0.0'
+  },
+  regPort: {
+    type: String,
+    default: '0'
   },
   tries: {
     type: Number,

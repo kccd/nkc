@@ -3,6 +3,33 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
+// 查询目标用户的个人搜藏
+fn.foundCollection = async (data) => {
+  let collections = await db.CollectionModel.find(data).sort({toc: 1});
+  for (let i = 0; i < collections.length; i++) {
+    collections[i] = Object.assign({}, collections[i])._doc;
+    let thread = {}, postOc = {}, postLm = {}, lmUser = {}, ocUser = {};
+    thread = await db.ThreadModel.findOne({tid: collections[i].tid});
+    thread = Object.assign({}, thread)._doc;
+    if(!thread) {
+      categoryThreads.splice(i, 1);
+      continue;
+    }
+    postOc = await db.PostModel.findOne({pid: thread.oc});
+    postLm = await db.PostModel.findOne({pid: thread.lm});
+    if(!postOc || !postLm) {
+      continue;
+    }
+    lmUser = await db.UserModel.findOne({uid: postLm.uid});
+    ocUser = await db.UserModel.findOne({uid: postOc.uid});
+    thread.oc = postOc;
+    thread.lm = postLm;
+    thread.ocUser = ocUser;
+    thread.lmUser = lmUser;
+    collections[i].thread = thread;
+  }
+  return collections;
+};
 
 fn.checkMobile = async (mobile, oldMobile) => {
   let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
@@ -67,11 +94,7 @@ fn.checkRigsterCode = async (regCode) => {
 
 fn.createUser = async (data) => {
   let userObj = Object.assign({}, data);
-  console.log(`data: `);
-  console.log(data);
-  console.log(`userObj: `);
-  console.log(userObj);
-  let userCount = 73327;//await db.SettingModel.getSystemID('users');
+  let userCount = await db.SettingModel.operateSystemID('users', 1);
   let time = Date.now();
   userObj.toc = time;
   userObj.tlv = time;
@@ -97,6 +120,7 @@ fn.createUser = async (data) => {
     replies: 0,
     system: 0
   };
+  console.log(userObj.username)
   userObj.abbr = userObj.username.slice(0, 6);
   userObj.displayName = userObj.username + '的专栏';
   userObj.descriptionOfForum = userObj.username + '的专栏';
@@ -114,9 +138,13 @@ fn.createUser = async (data) => {
     await db.UsersPersonalModel.deleteMany({uid: userObj.uid});
     await db.PersonalForumModel.deleteMany({uid: userObj.uid});
     await db.UserSubscribeModel.deleteMany({uid: userObj.uid});
-    await db.CounterModel.replaceOne({type: 'users'},{$inc: {count: -1}});
+    await db.SettingModel.operateSystemID('users', -1);
     throw `新建用户出错！err: ${err}`;
   }
   return userObj;
 };
+
+
+
+
 module.exports = fn;

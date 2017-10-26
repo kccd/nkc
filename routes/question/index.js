@@ -64,6 +64,7 @@ questionRouter
       };
       return await ctx.db.QuestionModel.updateOne({qid: params.qid},{$set: question});
     }else {
+
       let qid = Date.now()*10;
       let question = new ctx.db.QuestionModel({
         uid: user.uid,

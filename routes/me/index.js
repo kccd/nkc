@@ -10,5 +10,5 @@ meRouter
     await next();
   })
   .use('/set', setRouter.routes(), setRouter.allowedMethods())
-  .use('/sms', smsRouter.routes(), smsRouter.allowedMethods())
+  .use('/sms', smsRouter.routes(), smsRouter.allowedMethods());
 module.exports = meRouter;

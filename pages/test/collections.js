@@ -5,8 +5,13 @@ let Schema = mongoose.Schema;
 
 db = require('arangojs')();
 db.useDatabase('rescue');
-
+let number = 1;
 let collectionsSchema = new Schema({
+  cid: {
+    type: Number,
+    unique: true,
+    required: true
+  },
   toc: {
     type: Number,
     default: Date.now,
@@ -44,11 +49,13 @@ return a
   let toMongo = () => {
     let data = res[n];
     let collection = new Collection({
+      cid: number,
       toc: data.toc,
       tid: data.tid,
       uid: data.uid,
       category: data.category
     });
+    number++;
     collection.save()
     .then(() => {
       n++;

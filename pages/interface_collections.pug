@@ -1,10 +1,11 @@
 extends bootstrap_base.pug
 
 block title
-  title #{data.category} - #{data.thisuser.username}的收藏 - 科创论坛
+  title #{data.category} - #{data.targetUser.username}的收藏 - 科创论坛
   
 block content
-  -var ownership = data.thisuser._key == (data.user?data.user._key:null)
+  //-var ownership = data.targetUser.uid == (data.user?data.user.uid:null)
+  - var ownership = true;
   if (data.user == undefined)
     h2(style="margin-left:8%;") 请先登录后查看，谢谢~
   else
@@ -12,9 +13,9 @@ block content
       .row
         .col-xs-12
           .nkcpanel
-            -var uid = data.thisuser._key
+            -var uid = data.targetUser._key
             include interface_profile_avatar.pug
-            .ForumName #{data.category} - #{data.thisuser.username} 的个人收藏
+            .ForumName #{data.category} - #{data.targetUser.username} 的个人收藏
         
         if ownership
           .col-xs-12
@@ -25,7 +26,7 @@ block content
                 .input-group
                   input#category.form-control(type='text' placeholder='输入分类名称' value='')
                   span.input-group-btn
-                    button#movebtn.btn.btn-default(onclick='movebtn()') 移动
+                    button#movebtn.btn.btn-default(onclick=`movebtn("${data.targetUser.uid}")`) 移动
             
               if data.categoryNames.length
                 .form-group
@@ -36,21 +37,21 @@ block content
                       each cat in data.categoryNames
                         if cat
                           li
-                            a(href="javascript:moveTo('#{cat||'null'}')") #{cat||'null'}
+                            a(href=`javascript:moveTo('${cat||'null'}')`) #{cat||'null'}
 
-                  button#deletebutton.btn.btn-danger(onclick='deletebtn()') 删除
+                  button#deletebutton.btn.btn-danger(onclick=`deletebtn("${data.targetUser.uid}")`) 删除
                   button.btn.btn-default(onclick='selectbtn()') 全选/不选
                   //hr.hrNarrowSpace
         else
           
             
-        -if(!data.categoryNames.length){data.categoryNames=[null]}
+        -if(!data.categoryNames.length){data.categoryNames=['null']}
 
         .col-xs-12
           ul.nav.nav-tabs
             each cat in data.categoryNames
-              li(role='presentation' class="#{(cat==data.category)?'active':''}")
-                a(href='#{cat?"?category="+cat:"?nocategory"}') #{cat||'null'}
+              li(role='presentation' class=`${(cat==data.category)?'active':''}`)
+                a(href=`/u/${data.targetUser.uid}/collections/${cat}`) #{cat}
           
           br
           

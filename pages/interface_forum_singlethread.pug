@@ -1,12 +1,12 @@
-- var url = '/t/' + thread._key
-- var ocuser = thread.ocuser||{}
-- var lmuser = thread.lmuser||{}
+- var url = '/t/' + thread.tid
+- var ocUser = thread.ocUser||{}
+- var lmUser = thread.lmUser||{}
 - var oc = thread.oc
 - var avatar = '/avatar_small/' + oc.uid
 - var uid = oc.uid
 - var digest = thread.digest
--var has_file = thread.has_file
--var has_image = thread.has_image
+-var hasFile = thread.hasFile
+-var hasImage = thread.hasImage
 -var topped = thread.topped
 -var belong_forum = null; var pf=null
 -if(data.forum&&data.forum.type!='forum'&&data.forumlist)
@@ -24,7 +24,7 @@
 .ForumThreadItem
   .parent.clearfix(id='')
     .avatar-left
-      - var user = ocuser
+      - var user = ocUser
       - var title = user?data.user.navbarDesc:''
       a(href='/m/#{uid}' title='#{title}')
         img.ForumThreadAvatar(src='/avatar/#{uid}')
@@ -34,20 +34,20 @@
         .ForumThreadTitle1(style="float:left;width:77%;")
           - var brief = oc.c.replace(/\[.*?]/g,'').trim().slice(0,100)
           //span.f12.ForumThreadDigestText [精]
-          if belong_forum && (belong_forum._key!==(data.forum?data.forum._key:null))
-            a.ForumThreadHasImage(style='background-color:#{forumcolor};' href='/f/#{belong_forum._key}')
+          if belong_forum && (belong_forum.fid!==(data.forum?data.forum.fid:null))
+            a.ForumThreadHasImage(style=`background-color:${forumcolor};` href=`/f/${belong_forum.fid}`)
               | #{belong_forum.abbr||belong_forum.display_name}
 
           if threadtype
-            a.ForumThreadHasImage(href='/f/#{thread.fid}?cat=#{threadtype._key}' style='background-color:#{forumcolor};') #{threadtype.name}
+            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=#{threadtype._key}` style=`background-color:${forumcolor};`) #{threadtype.name}
             
-          a(class='#{digest?"ForumThreadDigestText":"ForumThreadNormal"}' href="#{url}" title="#{brief}") #{oc.t}
+          a(class='#{digest?"ForumThreadDigestText":"ForumThreadNormal"}' href=`${url}` title=`${brief}`) #{oc.t}
           
           if topped
             span.ForumThreadHasImage.ForumThreadTopped 顶
-          if has_image
+          if hasImage
             span.ForumThreadHasImage 图
-          if has_file
+          if hasFile
             span.ForumThreadHasImage.ForumThreadHasFile 附
             
         .ForumThreadTitle2(style="float:right;width:21%;")
@@ -65,7 +65,7 @@
                 span.ThreadCount 回复:0
           
             .ForumThreadTitle3(style="display:inline-block;")
-              input.ThreadCheckboxes(id='#{(item?item._key:null)||thread._key}' type='checkbox' style="#{showTicks?'':'display:none;'}")
+              input.ThreadCheckboxes(id=`${item.cid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
         
           
           
@@ -81,7 +81,7 @@
         if 1
           span.hidden-xs.lighttext.ForumThreadItemCreationTime #{dateTimeString(thread.toc).split(' ')[0]} from
         
-        a.ForumThreadItemUsername(href='/m/#{ocuser._key}') #{ocuser.username}
+        a.ForumThreadItemUsername(href=`/u/${ocUser.uid}`) #{ocUser.username}
         
         if Date.now()-thread.tlm<86400000
           span.lighttext.reddish #{fromNow(thread.tlm)} 
@@ -90,5 +90,5 @@
           //帖子最后回复时间和回复者
 
         span.lighttext(style='margin-right:7px;')   by
-        a.ForumThreadItemUsername(href='/m/#{lmuser._key}') #{lmuser.username}
+        a.ForumThreadItemUsername(href=`/u/${lmUser.uid}`) #{lmUser.username}
         

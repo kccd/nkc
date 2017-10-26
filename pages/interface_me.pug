@@ -34,7 +34,8 @@ block content
                   button.btn.btn-default.center-block#btnSwitch(onclick='showBtn()',style='margin:1em auto;') 修改头像
             .col-xs-7.col-md-7
               .col-xs-12.col-md-12
-                div.f12!= plain(data.user.navbarDesc)
+                -console.log(user)
+                div.f12!= data.user.navbarDesc
               .col-xs-12.col-md-6
                 a.btn.btn-default.left-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.5em auto;') 查看个人专栏
               .col-xs-12.col-md-6
@@ -78,7 +79,10 @@ block content
             .col-xs-12.col-md-5
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 电话号码 ( 已绑定号码： #{data.user.mobile} )
+                  -if(data.user.mobile)
+                    .h5(style='font-weight:300;') 电话号码 ( 已绑定手机号码： #{data.user.mobile} )
+                  -else
+                    .h5(style='font-weight:300;') 电话号码 ( 暂未绑定手机号码 )
                 input.form-control#phoneNumber(type='text', placeholder='电话号码', onclick='select()')
             .col-xs-12.col-md-2
               .form-group
