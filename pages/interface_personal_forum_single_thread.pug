@@ -67,7 +67,7 @@ if thread
                   span.ThreadCount 回复:0
 
               .ForumThreadTitle3(style="display:inline-block;")
-                input.ThreadCheckboxes(id='#{(item?item._key:null)||thread._key}' type='checkbox' style="#{showTicks?'':'display:none;'}")
+                input.ThreadCheckboxes(id=`#{(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
 
 
 

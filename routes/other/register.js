@@ -120,16 +120,7 @@ registerRouter
     let ecode = ctx.params.ecode;
     let emailRegister = await dbFn.checkEmailCode(email, ecode);
     if(!emailRegister) ctx.throw(404, '邮箱链接已失效，请重新注册！');
-    let userObj = {
-      username: emailRegister.username,
-      email: emailRegister.email,
-      regCode: emailRegister.regCode,
-      hashType: emailRegister.hashType,
-      isA: emailRegister.isA,
-      password: emailRegister.password,
-      regIp: ctx.ip
-    };
-    let newUser = await dbFn.createUser(userObj);
+    let newUser = await dbFn.createUser(emailRegister.toObject());
     await dbFn.useRegCode(emailRegister.regCode, newUser.uid);
     ctx.data.activeInfo1 = '邮箱注册成功，赶紧登录吧~';
     ctx.template = 'interface_user_login.pug';

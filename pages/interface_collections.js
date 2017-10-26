@@ -32,7 +32,7 @@ function selectbtn(){
 
 var movebutton = geid('movebtn')
 //移动按钮
-function movebtn(){
+function movebtn(uid){
   var targetCategory = categorybox.value.trim()
   if(targetCategory.length==0){
     screenTopWarning('请填写分类')
@@ -42,16 +42,18 @@ function movebtn(){
   movebutton.disabled = true
 
   common.mapWithPromise(extractSelectedCheckboxArrayOfID(),function(item){
-    return nkcAPI('moveCollectionItemToCategory',{cid:item,category:targetCategory})
+    return nkcAPI('/u/'+uid+'/collections','put',{cid:item,category:targetCategory})
     .then(function(){
       screenTopAlert(item + '移动到' +targetCategory)
     })
-    .catch(function(){
-      screenTopWarning(item+ '移动失败')
+    .catch(function(err){
+      screenTopWarning(item + '移动失败' + err)
     })
   })
   .then(function(){
-    window.location.reload()
+    setTimeout(function(){
+      window.location.reload()
+    },1500)
   })
 }
 
@@ -60,21 +62,20 @@ function moveTo(targetCategory){
   movebtn()
 }
 
-function deletebtn(){
+function deletebtn(uid){
   geid('deletebutton').disabled = true
   common.mapWithPromise(extractSelectedCheckboxArrayOfID(),function(item){
-
-    return nkcAPI('removeCollectionItem',{
-      cid:item
-    })
+    return nkcAPI('/u/'+uid+'/collections/'+item, 'delete', {})
     .then(function(){
       screenTopAlert(item + '已删除')
     })
-    .catch(function(){
-      screenTopWarning(item+ '删除失败')
+    .catch(function(err){
+      screenTopWarning(item+ '删除失败' + err)
     })
   })
   .then(function(){
-    window.location.reload()
+    setTimeout(function(){
+      window.location.reload()
+    },1500)
   })
 }

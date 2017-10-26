@@ -2,4 +2,5 @@
 /settings/mongoDB.js
 /.idea
 /secret.txt
+/dataModels/secret.txt
 /package-lock.json

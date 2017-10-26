@@ -2,6 +2,11 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 let CollectionSchema = new Schema({
+  cid: {
+    type: Number,
+    unique: true,
+    required: true
+  },
   toc: {
     type: Number,
     default: Date.now,

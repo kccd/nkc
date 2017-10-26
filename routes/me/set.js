@@ -22,7 +22,6 @@ setRouter
     }
     ctx.data.user.subscribeForums = subscribeForums;
     ctx.data.forumList = await dbFn.forumList();
-    ctx.data.user.mobile = '18582301901';
     ctx.template = 'interface_me.pug';
     await next();
   })

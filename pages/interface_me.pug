@@ -79,7 +79,10 @@ block content
             .col-xs-12.col-md-5
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 电话号码 ( 已绑定号码： #{data.user.mobile} )
+                  -if(data.user.mobile)
+                    .h5(style='font-weight:300;') 电话号码 ( 已绑定手机号码： #{data.user.mobile} )
+                  -else
+                    .h5(style='font-weight:300;') 电话号码 ( 暂未绑定手机号码 )
                 input.form-control#phoneNumber(type='text', placeholder='电话号码', onclick='select()')
             .col-xs-12.col-md-2
               .form-group
