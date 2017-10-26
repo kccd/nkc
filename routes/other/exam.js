@@ -119,6 +119,7 @@ examRouter
   //获得激活码
   .post('/subject', async (ctx, next) => {
     let ip = ctx.ip;
+    let db = ctx.db;
     let params = ctx.body;
     let exam = params.exam;
     if(!exam) ctx.throw(400, '小明！你的试卷呢？');
@@ -195,7 +196,12 @@ examRouter
         ctx.throw (404, `生成注册码失败。`) ;
       }
     };
-    let key = regCode();
+    let keyOfDB = 1;
+    let key = '';
+    while (keyOfDB !== 0){
+      key = regCode();
+      keyOfDB = (await ctx.db.AnswerSheetModel.find({key: key})).length;
+    }
     let answerSheet = {
       uid: ctx.data.user?ctx.data.user.uid:null,
       records:records,
