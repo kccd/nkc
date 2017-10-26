@@ -29,7 +29,7 @@ async function operateSystemID(type, op) {
   let setting;
   const counterType = "counters." + type;
   const attrObj = {};
-  queryObj[counterType] = op;
+  attrObj[counterType] = op;
   try {
     setting = await this.findOneAndUpdate({uid: 'system'}, {$inc: attrObj});
   } catch(e) {

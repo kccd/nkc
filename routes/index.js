@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
-const routers = require('../tools').requireFolder(__dirname);
+const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
 const meRouter = routers.me;
 const threadRouter = routers.thread;

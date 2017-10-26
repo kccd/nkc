@@ -1,1 +1,1 @@
-module.exports = require('../tools').requireFolder(__dirname);
+module.exports = require('../requireFolder')(__dirname);
