@@ -17,18 +17,6 @@ const methodEnum = {
 };
 
 const certificates ={
-  banned: {
-    displayName: '开除学籍',
-    contentClasses: {
-      non_public: false,
-      non_images: false
-    },
-    permittedOperations: {
-      me: {
-        [GET]: true
-      }
-    }
-  },
   visitor: {
     displayName: '陆游',
     inheritFrom: ['banned'],
@@ -126,7 +114,18 @@ const certificates ={
       }
     }
   },
-
+  banned: {
+    displayName: '开除学籍',
+    contentClasses: {
+      non_public: false,
+      non_images: false
+    },
+    permittedOperations: {
+      me: {
+        [GET]: true
+      }
+    }
+  },
   default: {
     displayName: '会员',
     inheritFrom: ['visitor'],
@@ -475,7 +474,7 @@ function getPermitTree(certs) {
   for(const cert of certs) {
     let certificate = certificates[cert];
     if(certificate.inheritFrom)
-      certificate = getPermitTree(certificate.inheritFrom);
+      tree = getPermitTree(certificate.inheritFrom);
     tree = mergeTree(tree, certificate)
   }
   return tree
@@ -487,6 +486,8 @@ function ensurePermission(certs, path, method) {
   const routes = path.match(/\/([^\/]*)/g)
     .map(e => e.replace('/', ''))
     .filter(e => e !== '');
+  if(routes.length === 0)
+    return;
   for(const route of routes) {
     if(obj[route]) {
       obj = obj[route]
@@ -521,9 +522,7 @@ module.exports = async (ctx, next) => {
     certs = ctx.data.user.certs;
     ctx.data.user.navbarDesc = getUserDescription(ctx.data.user);
   }
-  console.log(certs);
   const cs = getPermitTree(certs);
-  console.log(cs);
   ctx.data.certificates = cs;
 
   ctx.data.methodEnum = methodEnum;
