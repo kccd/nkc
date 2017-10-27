@@ -4,12 +4,26 @@ const POST = Symbol('POST');
 const DELETE = Symbol('DELETE');
 const PATCH = Symbol('PATCH');
 const OPTIONS = Symbol('OPTIONS');
-const PUT = Symbol('[PUT]');
+const PUT = Symbol('PUT');
+const name = Symbol('name');
 
 
 const certificates ={
+  banned: {
+    displayName: '开除学籍',
+    contentClasses: {
+      non_public: false,
+      non_images: false
+    },
+    permittedOperations: {
+      me: {
+        [GET]: true
+      }
+    }
+  },
   visitor: {
     displayName: '陆游',
+    inheritFrom: ['banned'],
     contentClasses: {
       null: true,
       images: true,
@@ -18,83 +32,86 @@ const certificates ={
     },
     permittedOperations: {
       login: {
-        name: '登录',
+        [name]: '登录',
         [GET]: true,
         [POST]: true,
         [DELETE]: true
       },
       latest: {
-        name: '最近',
+        [name]: '最近',
         [GET]: true
       },
       activities: {
-        name: '动态',
+        [name]: '动态',
         [parameter]: {
           [GET]: true
         }
       },
-      editor: {
-        name: '编辑器',
-        [GET]: true
-      },
       t: {
-        name: '贴子',
+        [name]: '贴子',
         [parameter]: {
           [GET]: true
         }
       },
       f: {
-        name: '板块',
+        [name]: '板块',
         [GET]: true,
         [parameter]: {
-          [GET]: true
+          [GET]: true,
+          c: {
+            [name]: '标签',
+            [GET]: true,
+            [parameter]: {
+              [GET]: true
+            }
+          }
         }
       },
       u: {
-        name: '用户',
+        [name]: '用户',
         [parameter]: {
           [GET]: true
         }
       },
       m: {
-        name: '专栏',
+        [name]: '专栏',
         [parameter]: {
           [GET]: true
         }
       },
       search: {
-        name: '搜索',
+        [name]: '搜索',
         [GET]: true,
         [POST]: true,
       },
       exam: {
-        name: '考试',
+        [name]: '考试',
         [parameter]: {
           [GET]: true,
           [POST]: true,
         }
       },
       register: {
-        name: '注册',
+        [name]: '注册',
         [parameter]: {
           [GET]: true,
           [POST]: true,
         }
       },
       r: {
-        name: '附件',
+        [name]: '附件',
         [parameter]: {
           [GET]: true,
         }
       },
       rt: {
-        name: '附件',
+        [name]: '附件',
         [parameter]: {
           [GET]: true
         }
       },
       p: {
-        name: '推文',
+        [name]: '推文',
         [parameter]: {
           [GET]: true,
         }
@@ -115,17 +132,24 @@ const certificates ={
       f: {
         [parameter]: {
           [POST]: true,
+          subscribe: {
+            [POST]: true,
+            [DELETE]: true
+          }
         }
       },
       sms: {
-        name: '信息',
+        [name]: '信息',
         at: {
+          [name]: '@',
           [GET]: true
         },
         replies: {
+          [name]: '回复',
           [GET]: true
         },
         message: {
+          [name]: '消息',
           [GET]: true,
           [parameter]: {
             [POST]: true,
@@ -133,6 +157,7 @@ const certificates ={
           }
         },
         system: {
+          [name]: '系统',
           [GET]: true
         }
       },
@@ -145,24 +170,159 @@ const certificates ={
         [parameter]: {
           [POST]: true,
           topInPF: {
+            [name]: '专栏置顶',
             [POST]: true,
             [DELETE]: true
           },
           digestInPF: {
+            [name]: '专栏加精',
             [POST]: true,
             [DELETE]: true
           },
           invisibleInPF: {
+            [name]: '专栏隐藏',
             [POST]: true,
             [DELETE]: true
           }
         }
       },
       r: {
-        [POST]: true
+        [POST]: true,
+        [GET]: true
       },
       editor: {
+        [name]: '编辑器',
         [GET]: true
+      },
+      p: {
+        [parameter]: {
+          [PUT]: true,
+          recommend: {
+            [name]: '推荐',
+            [POST]: true,
+            [DELETE]: true
+          }
+        }
+      },
+      u: {
+        [parameter]: {
+          subscribe: {
+            [name]: '订阅',
+            [GET]: true,
+            [POST]: true,
+            [DELETE]: true
+          },
+          collections: {
+            [name]: '收藏',
+            [GET]: true,
+            [POST]: true,
+            [DELETE]: true,
+            [parameter]: {
+              [GET]: true,
+              [PATCH]: true,
+              [DELETE]: true
+            }
+          }
+        }
+      },
+      me: {
+        [PUT]: true,
+        [GET]: true,
+        personalsetting: {
+          [name]: '个人信息',
+          [PUT]: true
+        },
+        password: {
+          [name]: '密码',
+          [PUT]: true
+        },
+        username: {
+          [name]: '用户名',
+          [PUT]: true
+        },
+        mobile: {
+          [name]: '手机',
+          [PUT]: true
+        }
+      }
+    }
+  },
+  mail: {
+    displayName: '笔友',
+    inheritFrom: ['default'],
+  },
+  mobile: {
+    displayName: '机友',
+    inheritFrom: ['default'],
+  },
+  examinated: {
+    displayName: '进士',
+    inheritFrom: ['default'],
+    contentClasses: {
+      professional: true
+    }
+  },
+  qc: {
+    displayName: '题委',
+    permittedOperations: {
+      q: {
+        [GET]: true,
+        [parameter]: {
+          [GET]: true,
+          [POST]: true,
+          [parameter]: {
+            [GET]: true,
+            [PUT]: true
+          }
+        }
+      }
+    }
+  },
+  scholar: {
+    displayName: '学者',
+    inheritFrom: ['examinated', 'qc'],
+    contentClasses: {
+      sensitive: true
+    },
+    permittedOperations: {
+      history: {
+        [GET]: true
+      }
+    }
+  },
+  moderator: {
+    displayName: '版主',
+    inheritFrom: ['scholar'],
+    contentClasses: {
+      classified: true
+    },
+    permittedOperations: {
+      experimental: {
+        name: '管理页面',
+        [GET]: true,
+        behavior: {
+          name: '行为日志',
+          [GET]: true
+        },
+        cart: {
+          [name]: '管理车',
+          [GET]: true,
+          [POST]: true
+        }
+      },
+      u: {
+        [GET]: true,
+        [parameter]: {
+          [DELETE]: true
+        }
+      },
+      t: {
+        [parameter]: {
+          digest: {
+            [POST]: true,
+            []
+          }
+        }
       }
     }
   }
