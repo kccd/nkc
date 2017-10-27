@@ -6,12 +6,7 @@ let settings = require('../../settings');
 
 const registerRouter = new Router();
 registerRouter
-  .get('/', async (ctx, next) => {
-    ctx.redirect('/register/mobile');
-    ctx.template = 'interface_user_register.pug';
-    await next();
-  })
-  .get('/mobile', async (ctx, next) => {
+  .get(['/','/mobile'], async (ctx, next) => {
     let code = ctx.query.code;
     if(code) {
       ctx.data.regCode = code;

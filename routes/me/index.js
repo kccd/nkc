@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const setRouter = require('./set');
-const smsRouter = require('./sms');
 const meRouter = new Router();
 
 
@@ -9,6 +8,5 @@ meRouter
     ctx.data = `个人资料`;
     await next();
   })
-  .use('/set', setRouter.routes(), setRouter.allowedMethods())
-  .use('/sms', smsRouter.routes(), smsRouter.allowedMethods());
+  .use('/set', setRouter.routes(), setRouter.allowedMethods());
 module.exports = meRouter;

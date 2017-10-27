@@ -22,6 +22,8 @@ setRouter
     }
     ctx.data.user.subscribeForums = subscribeForums;
     ctx.data.forumList = await dbFn.forumList();
+    let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
+    if(userPersonal.mobile) ctx.data.user.mobile = userPersonal.mobile;
     ctx.template = 'interface_me.pug';
     await next();
   })

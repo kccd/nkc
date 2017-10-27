@@ -7,7 +7,7 @@ db = require('arangojs')();
 db.useDatabase('rescue');
 
 let repliesSchema = new Schema({
-  frompid: {
+  fromPid: {
     type: String,
     required: true
   },
@@ -16,11 +16,11 @@ let repliesSchema = new Schema({
     default: Date.now,
     index: 1
   },
-  topid: {
+  toPid: {
     type: String,
     required: true
   },
-  touid: {
+  toUid: {
     type: String,
     required: true,
     index: 1
@@ -41,6 +41,9 @@ return db.query(`
 .then((res) => {
   for(var i = 0; i < res.length; i++){
     res[i]._id = undefined;
+    res[i].fromPid = res[i].frompid;
+    res[i].toPid = res[i].topid;
+    res[i].toUid = res[i].touid;
   }
   console.log('开始写入数据');
   let n = 0;

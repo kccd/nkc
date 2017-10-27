@@ -5,6 +5,7 @@ const registerRouter = require('./register');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
 const forgotPasswordRouter = require('./forgotPassword');
+const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
 // 用于测试的路由----------------------
@@ -23,5 +24,6 @@ otherRouter
   .use('exam', examRouter.routes(), examRouter.allowedMethods())
   .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
-  .use('test', testRouter.routes(), testRouter.allowedMethods());
+  .use('test', testRouter.routes(), testRouter.allowedMethods())
+  .use('sms', smsRouter.routes(), smsRouter.allowedMethods());
 module.exports = otherRouter;

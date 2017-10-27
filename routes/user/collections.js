@@ -53,6 +53,7 @@ collectionsRouter
     let collection = await db.CollectionModel.findOne({cid: cid});
     if(user.uid !== collection.uid) ctx.throw(400, '抱歉，你没有资格删除别人的收藏');
     await db.CollectionModel.deleteOne({cid: cid});
+    await next();
   });
 
 module.exports = collectionsRouter;
