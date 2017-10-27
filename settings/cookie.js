@@ -1,8 +1,8 @@
 const {readFileSync, writeFileSync} = require('fs');
 const {randomBytes} = require('crypto');
-
+const path = require('path');
 let secret = '';
-const secretFile = 'secret.txt';
+const secretFile = path.resolve('../', 'secret.txt');
 try {
   secret = readFileSync(secretFile, 'utf8');
 } catch(e) {
