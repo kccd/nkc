@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const smsRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const settings = require('../../settings');
+let {paging} = settings;
 let dbFn = nkcModules.dbFunction;
 
 smsRouter
@@ -9,7 +10,7 @@ smsRouter
     let {db} = ctx;
     let {user} = ctx.data;
     let {page} = ctx.query;
-    let allReplies = await db.RepliesModel.find({toUid: user.uid}).sort({toc: -1});
+    let allReplies = await db.RepliesModel.find({toUid: user.uid}).sort({toc: -1}).skip(page*settings.perpage).limit(paging.perpage);
     let replieArr = [];
     for (let replie of allReplies) {
       let fromUser = {};
@@ -26,7 +27,7 @@ smsRouter
       });
     }
     let replieArrLength = replieArr.length;
-    
+
 
     await next();
   });
