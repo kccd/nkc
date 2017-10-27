@@ -42,7 +42,7 @@ async function operateSystemID(type, op) {
 
 
 settingSchema.statics.operateSystemID = operateSystemID;
-let Setting = mongoose.model('settings', settingSchema);
+/*let Setting = mongoose.model('settings', settingSchema);
 new Setting({uid: 'system',ads: [
   '82312',
   '82340',
@@ -58,5 +58,5 @@ new Setting({uid: 'system',ads: [
   threads: 90000,
   questions: 300,
   collections: 4000
-}}).save();
-//module.exports = mongoose.model('settings', settingSchema);
+}}).save();*/
+module.exports = mongoose.model('settings', settingSchema);
