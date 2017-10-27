@@ -5,10 +5,10 @@ let Schema = mongoose.Schema;
 
 db = require('arangojs')('http://192.168.11.11');
 db.useDatabase('rescue');
-
+let number = 0;
 let questionsSchema = new Schema({
   qid:{
-    type: String,
+    type: Number,
     unique: true,
     required: true
   },
@@ -103,9 +103,10 @@ db.query(`
   console.log('数据读取完成，开始写入数据');
   let n = 0;
   let toMongo = () => {
+    number++;
     let data = res[n];
     let question = new Question({
-      qid: data._key,
+      qid: number,
       toc: data.toc,
       tlm: data.tlm,
       category: (!data.category || data.category=="null")?'undefined': data.category,
