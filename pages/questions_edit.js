@@ -47,8 +47,13 @@ function validate_and_submit(){
   {
     question_object.qid = boxqid.value==''?undefined:boxqid.value.trim()
     question_object.category = boxcategory.value==''?null:boxcategory.value.trim()
-
-    nkcAPI('/q/'+question_object.category, 'post', question_object)
+    var method  = 'post';
+    var url = '/q/'+question_object.category;
+    if(question_object.qid) {
+      method = 'put';
+      url = '/q/' + question_object.category + '/' + question_object.qid;
+    }
+    nkcAPI(url, method, question_object)
     .then(function(res){
       location.reload()
     })
@@ -65,6 +70,7 @@ function content_keypress(){
 
 geid('post').addEventListener('click', validate_and_submit);
 geid('content').addEventListener('keyup', content_keypress);
+geid('clear').addEventListener('click', clearContent);
 
 function remove_question(url){
   nkcAPI(url,'delete',{})
@@ -101,4 +107,9 @@ function load_question(url){
     boxqid.focus()
   })
   .catch(jwarning)
+}
+
+function clearContent() {
+  $('#qid').val('');
+  $('#content').val('');
 }

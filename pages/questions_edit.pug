@@ -55,7 +55,7 @@ block content
           br
           
           .form-group
-            input#qid.form-control(placeholder='qid，请勿填写')
+            input#qid.form-control(placeholder='qid，请勿填写' disabled)
             
           .form-group.row
             .col-xs-7
@@ -75,6 +75,8 @@ block content
             textarea#content.form-control(rows='8' placeholder='问题和答案，请参考上面提到的格式')
 
           button#post.btn.btn-default(type='submit') 提交问题
+          span
+          button#clear.btn.btn-default 清空
           
                   
         
