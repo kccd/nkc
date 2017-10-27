@@ -15,12 +15,12 @@ fn.decrementPsnl = async (uid, type) => {
 fn.foundCollection = async (data) => {
   let collections = await db.CollectionModel.find(data).sort({toc: 1});
   for (let i = 0; i < collections.length; i++) {
-    collections[i] = Object.assign({}, collections[i])._doc;
+    collections[i] = collections[i].toObject();
     let thread = {}, postOc = {}, postLm = {}, lmUser = {}, ocUser = {};
     thread = await db.ThreadModel.findOne({tid: collections[i].tid});
     thread = Object.assign({}, thread)._doc;
     if(!thread) {
-      categoryThreads.splice(i, 1);
+      collections.splice(i, 1);
       continue;
     }
     postOc = await db.PostModel.findOne({pid: thread.oc});
