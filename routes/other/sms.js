@@ -54,7 +54,7 @@ smsRouter
     let atsLength = ats.length;
     let atsArr = [];
     for (let at of ats) {
-      
+
     }
   });
 
