@@ -5,9 +5,11 @@ module.exports = async (ctx, next) => {
   const type = ctx.accepts('json', 'html');
   switch(type) {
     case 'json':
+      ctx.type = 'json';
       ctx.body = ctx.data;
       break;
-    case '':
+    case 'html':
+      ctx.type = 'html';
       ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
       break;
     default:
