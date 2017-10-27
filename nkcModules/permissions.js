@@ -7,6 +7,14 @@ const OPTIONS = Symbol('OPTIONS');
 const PUT = Symbol('PUT');
 const name = Symbol('name');
 
+const methodEnum = {
+  GET,
+  POST,
+  PUT,
+  PATCH,
+  DELETE,
+  OPTIONS
+};
 
 const certificates ={
   banned: {
@@ -271,8 +279,7 @@ const certificates ={
           [GET]: true,
           [POST]: true,
           [parameter]: {
-            [GET]: true,
-            [PUT]: true
+            [GET]: true
           }
         }
       }
@@ -298,10 +305,10 @@ const certificates ={
     },
     permittedOperations: {
       experimental: {
-        name: '管理页面',
+        [name]: '管理页面',
         [GET]: true,
         behavior: {
-          name: '行为日志',
+          [name]: '行为日志',
           [GET]: true
         },
         cart: {
@@ -313,15 +320,86 @@ const certificates ={
       u: {
         [GET]: true,
         [parameter]: {
-          [DELETE]: true
+          ban: {
+            [POST]: true,
+            [DELETE]: true
+          }
         }
       },
       t: {
         [parameter]: {
           digest: {
+            [name]: '精华',
             [POST]: true,
-            []
+            [DELETE]: true
+          },
+          topped: {
+            [name]: '精华',
+            [POST]: true,
+            [DELETE]: true
           }
+        },
+        [PATCH]: true
+      },
+      p: {
+        [GET]: true,
+        [parameter]: {
+          [DELETE]: true,
+          credit: {
+            [name]: '学术分',
+            [PUT]: true
+          }
+        }
+      },
+    }
+  },
+  senior_moderator: {
+    displayName: '责任版主',
+    inheritFrom: ['moderator'],
+  },
+  editor: {
+    displayName: '编辑',
+    inheritFrom: ['senior_moderator', 'qc'],
+    contentClasses: {
+      administractive: true
+    },
+    permittedOperations: {
+      q: {
+        [parameter]: {
+          [parameter]: {
+            [PUT]: true,
+            [DELETE]: true
+          }
+        }
+      },
+      m: {
+        [parameter]: {
+          pop: {
+            [name]: '专栏推荐',
+            [POST]: true,
+            [DELETE]: true
+          },
+        }
+      },
+      t: {
+        [parameter]: {
+          ad: {
+            [name]: '首页置顶',
+            [POST]: true,
+            [DELETE]: true
+          }
+        }
+      }
+    }
+  },
+  dev: {
+    displayName: '运维',
+    inheritFrom: ['editor'],
+    permittedOperations: {
+      experimental: {
+        sysinfo: {
+          [name]: '系统通知',
+          [POST]: true
         }
       }
     }
@@ -329,7 +407,7 @@ const certificates ={
 };
 
 function filterKeys(e) {
-  return e !== 'inheritFrom' && e !== 'displayName' && e !== 'name'
+  return e !== 'inheritFrom' && e !== 'displayName'
 }
 
 function deepCopy(obj) {
@@ -405,6 +483,7 @@ function getPermitTree(certs) {
 
 function ensurePermission(certs, path, method) {
   let obj = certs;
+  const m = methodEnum[method];
   const routes = path.match(/\/([^\/]*)/g)
     .map(e => e.replace('/', ''))
     .filter(e => e !== '');
@@ -416,10 +495,10 @@ function ensurePermission(certs, path, method) {
       obj = obj[parameter]
     }
     else {
-      throw `对路径/${route}的操作[${method}]权限不足`
+      throw `[${method}]/${route}权限不足`
     }
   }
-  if(!obj[method])
+  if(!obj[m])
     throw `权限不足`
 }
 
@@ -442,22 +521,16 @@ module.exports = async (ctx, next) => {
     certs = ctx.data.user.certs;
     ctx.data.user.navbarDesc = getUserDescription(ctx.data.user);
   }
+  console.log(certs);
   const cs = getPermitTree(certs);
+  console.log(cs);
   ctx.data.certificates = cs;
-  const methodEnum = {
-    GET,
-    POST,
-    PUT,
-    PATCH,
-    DELETE,
-    OPTIONS
-  };
+
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
   const method = ctx.method;
-  const m = methodEnum[method];
   try {
-    ensurePermission(cs.permittedOperations, ctx.path, m);
+    ensurePermission(cs.permittedOperations, ctx.path, method);
   } catch (e) {
     ctx.throw(401, e)
   }
