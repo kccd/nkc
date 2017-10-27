@@ -82,6 +82,7 @@ const certificates ={
       },
       exam: {
         [name]: '考试',
+        [GET]: true,
         [parameter]: {
           [GET]: true,
           [POST]: true,
