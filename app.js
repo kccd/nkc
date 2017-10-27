@@ -33,4 +33,4 @@ app.use(favicon(__dirname + '/resources/site_specific/favicon.ico'));
 app.use(mainRouter.routes());
 app.use(body);
 
-
+module.exports = app.callback();
