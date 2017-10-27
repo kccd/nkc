@@ -68,6 +68,7 @@ function content_keypress(){
 
 geid('post').addEventListener('click', validate_and_submit);
 geid('content').addEventListener('keyup', content_keypress);
+geid('clear').addEventListener('click', clearContent);
 
 function remove_question(url){
   nkcAPI(url,'delete',{})
@@ -106,7 +107,7 @@ function load_question(url){
   .catch(jwarning)
 }
 
-function clear() {
+function clearContent() {
   $('#pid').val('');
   $('#content').val('');
 }
