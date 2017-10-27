@@ -4,7 +4,7 @@ mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
 db = require('arangojs')('http://192.168.11.11');
-
+db.useDatabase('rescue');
 let users_personalSchema = new Schema({
   /*uid: {
     type: String,
