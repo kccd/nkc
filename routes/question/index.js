@@ -78,14 +78,17 @@ questionRouter
       });
       return await question.save();
     }
+    await next();
   })
   .get('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;
     ctx.data.question = await ctx.db.QuestionModel.findOne({qid: qid});
+    await next();
   })
   .del('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;
     return await ctx.db.QuestionModel.deleteOne({qid: qid});
+    await next();
   });
 
 
