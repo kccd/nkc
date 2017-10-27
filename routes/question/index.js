@@ -42,6 +42,9 @@ questionRouter
   })
   .get('/:category', async (ctx, next) => {
     let user = ctx.data.user;
+    if(!user) {
+      ctx.throw(401, '你还没有登陆，请登录后再试。');
+    }
     let category = ctx.params.category;
     ctx.data.questions = await findQuestion(ctx.db, {}, {category: category});
     ctx.data.userQuestions = await findQuestion(ctx.db, {uid: user.uid}, {});
