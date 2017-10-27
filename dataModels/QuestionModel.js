@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
   qid:{
-    type: String,
+    type: Number,
     unique: true,
     required: true
   },

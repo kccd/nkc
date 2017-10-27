@@ -54,31 +54,35 @@ questionRouter
   .post('/:category', async (ctx, next) => {
     let params = ctx.body;
     let user = ctx.data.user;
-    if(params.qid) {
-      let question = {
-        question: params.question,
-        answer: params.answer,
-        type: params.type,
-        category: params.category,
-        tlm: Date.now()
-      };
-      return await ctx.db.QuestionModel.updateOne({qid: params.qid},{$set: question});
-    }else {
-
-      let qid = Date.now()*10;
-      let question = new ctx.db.QuestionModel({
-        uid: user.uid,
-        username: user.username,
-        question: params.question,
-        answer: params.answer,
-        type: params.type,
-        category: params.category,
-        tlm: Date.now(),
-        qid: qid.toString()
-      });
-      return await question.save();
+    let qid = await ctx.db.SettingModel.operateSystemID('questions', 1);
+    let question = new ctx.db.QuestionModel({
+      uid: user.uid,
+      username: user.username,
+      question: params.question,
+      answer: params.answer,
+      type: params.type,
+      category: params.category,
+      tlm: Date.now(),
+      qid: qid
+    });
+    try{
+      await question.save();
+    }catch(err) {
+      await ctx.db.SettingModel.operateSystemID('questions', -1);
+      ctx.throw(500, `添加考试题失败！ ${err}`);
     }
     await next();
+  })
+  .put('/:category/:qid', async (ctx, next) => {
+    let params = ctx.body;
+    let question = {
+      question: params.question,
+      answer: params.answer,
+      type: params.type,
+      category: params.category,
+      tlm: Date.now()
+    };
+    return await ctx.db.QuestionModel.updateOne({qid: params.qid},{$set: question});
   })
   .get('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;

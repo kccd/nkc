@@ -47,8 +47,11 @@ function validate_and_submit(){
   {
     question_object.qid = boxqid.value==''?undefined:boxqid.value.trim()
     question_object.category = boxcategory.value==''?null:boxcategory.value.trim()
-
-    nkcAPI('/q/'+question_object.category, 'post', question_object)
+    var method  = 'put';
+    if(!question_object.qid) {
+      method = 'post';
+    }
+    nkcAPI('/q/'+question_object.category, method, question_object)
     .then(function(res){
       location.reload()
     })
@@ -101,4 +104,9 @@ function load_question(url){
     boxqid.focus()
   })
   .catch(jwarning)
+}
+
+function clear() {
+  $('#pid').val('');
+  $('#content').val('');
 }
