@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')({url: 'http://root:@127.0.0.1:8529',databaseName: 'rescue'});
+db = require('arangojs')('http://192.168.11.11');
 
 let users_personalSchema = new Schema({
   /*uid: {
