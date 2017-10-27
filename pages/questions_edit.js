@@ -47,11 +47,13 @@ function validate_and_submit(){
   {
     question_object.qid = boxqid.value==''?undefined:boxqid.value.trim()
     question_object.category = boxcategory.value==''?null:boxcategory.value.trim()
-    var method  = 'put';
-    if(!question_object.qid) {
-      method = 'post';
+    var method  = 'post';
+    var url = '/q/'+question_object.category;
+    if(question_object.qid) {
+      method = 'put';
+      url = '/q/' + question_object.category + '/' + question_object.qid;
     }
-    nkcAPI('/q/'+question_object.category, method, question_object)
+    nkcAPI(url, method, question_object)
     .then(function(res){
       location.reload()
     })
