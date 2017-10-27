@@ -31,6 +31,6 @@ app.use(staticServe('./nkcModules'));
 app.use(favicon(__dirname + '/resources/site_specific/favicon.ico'));
 // app.use(permissions);
 app.use(mainRouter.routes());
-app.use(body);aasdasddasdasdsaddfdsfasdasdasd
+app.use(body);aasdasddasdasdsaddfdsfasdasdasdsdfsdf
 /asdfasdfdsafasdfdsaf/
 module.exports = app.callback();
