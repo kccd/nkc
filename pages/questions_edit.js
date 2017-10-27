@@ -110,6 +110,6 @@ function load_question(url){
 }
 
 function clearContent() {
-  $('#pid').val('');
+  $('#qid').val('');
   $('#content').val('');
 }
