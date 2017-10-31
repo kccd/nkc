@@ -1,5 +1,5 @@
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
+mongoose.connect('mongodb://lzszone:Lz852369@localhost:27017/admin', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
@@ -13,7 +13,7 @@ let forumsSchema = new Schema({
   },
   class: {
     type: String,
-    default: ''
+    default: 'none'
   },
   color: {
     type: String,
@@ -106,9 +106,6 @@ return db.query(`
     res[i].parentId = (!res[i].parentid || res[i].parentid == '0')?'':res[i].parentid;
     res[i].iconFileName = res[i].icon_filename;
     res[i].displayName = res[i].display_name;
-    if(!res[i].class || res[i].class == 'null'){
-      res[i].class = '';
-    }
     if(typeof(res[i].displayName) != 'string'){
       res[i].displayName = res[i].displayName.toString();
     }

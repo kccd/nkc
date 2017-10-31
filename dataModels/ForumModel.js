@@ -81,4 +81,9 @@ const forumSchema = new Schema({
   }
 });
 
+forumSchema.methods.getThreadsByQuery = async function(query) {
+  const {digest, cat, sortby, page} = query;
+  const threads = await this.collection.find({fid: this.fid})
+};
+
 module.exports = mongoose.model('forums', forumSchema);

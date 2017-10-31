@@ -117,10 +117,6 @@ const certificates ={
   },
   banned: {
     displayName: '开除学籍',
-    contentClasses: {
-      non_public: false,
-      non_images: false
-    },
     permittedOperations: {
       me: {
         [GET]: true
@@ -524,6 +520,7 @@ module.exports = async (ctx, next) => {
     ctx.data.user.navbarDesc = getUserDescription(ctx.data.user);
   }
   const cs = getPermitTree(certs);
+  cs.contentClasses = Object.keys(cs.contentClasses);
   ctx.data.certificates = cs;
 
   ctx.data.methodEnum = methodEnum;

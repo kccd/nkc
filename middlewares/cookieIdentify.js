@@ -6,7 +6,7 @@ module.exports = async (ctx, next) => {
   if(!userInfo) {
     await next();
   } else {
-    const {username, uid} = JSON.parse(userInfo);
+    const {username, uid} = JSON.parse(decodeURI(userInfo));
     const user = await db.UserModel.findOne({uid});
     if (user.username !== username) {
       ctx.cookies.set('userInfo', '');

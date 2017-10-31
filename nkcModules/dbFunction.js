@@ -152,7 +152,26 @@ fn.createUser = async (data) => {
   return userObj;
 };
 
-
+fn.getAvailableForums = async ctx => {
+  const forums = await ctx.db.ForumModel.aggregate([
+    {$match: {
+      class: {$in: ctx.data.certificates.contentClasses}
+    }},
+    {$group: {
+      _id: {parentId: '$parentId'},
+      children: {$push: '$$ROOT'}
+    }}
+  ]);
+  const result = forums.filter(e => e._id.parentId === '')[0].children;
+  result.map(e => {
+    for(const f of forums) {
+      if(e.fid === f._id.parentId) {
+        e.children = f.children
+      }
+    }
+  });
+  return result;
+};
 
 
 module.exports = fn;
