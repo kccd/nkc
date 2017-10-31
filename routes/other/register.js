@@ -25,8 +25,8 @@ registerRouter
       password:params.password,
       regCode: params.regCode,
       mobile:(params.areaCode + params.mobile).replace('+', '00'),
-      regIP: ctx.ip,
-      //regPort: ctx.connection.remotePort,
+      regIP: ctx.request.socket._peername.address,
+      regPort: ctx.request.socket._peername.port,
       mcode:params.mcode,
       isA: false
     };
@@ -66,8 +66,8 @@ registerRouter
       password:params.password,
       regCode: params.regCode,
       email:params.email,
-      regIP: ctx.ip,
-      //regPort: ctx.connection.remotePort,
+      regIP: ctx.request.socket._peername.address,
+      regPort: ctx.request.socket._peername.port,
       isA: false
     };
     const regCode = params.regCode;

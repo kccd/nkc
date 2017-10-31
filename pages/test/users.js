@@ -57,7 +57,7 @@ let usersSchema = new Schema({
     default: 0
   },
   lastVisitSelf: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   postSign: {
@@ -72,14 +72,13 @@ let usersSchema = new Schema({
     type: Number,
     default: 0
   },
-  tlv: {
-    type: Number,
-    default: Date.now,
-    index: 1
-  },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now
+  },
+  tlv: {
+    type: Date,
+    default: Date.now,
   },
   toppedThreadsCount: {
     type: Number,
@@ -98,7 +97,7 @@ let usersSchema = new Schema({
   xsf: {
     type: Number,
     default: 0
-  }
+  },
 });
 
 let User = mongoose.model('users', usersSchema);
