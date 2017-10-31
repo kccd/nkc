@@ -46,7 +46,7 @@ let personalForumsSchema = new Schema({
   }
 });
 
-let PersonalForums = mongoose.model('personalForums', personalForumsSchema);
+let PersonalForums = mongoose.model('personalForums', personalForumsSchema,'personalForums');
 
 let t1 = Date.now();
 console.log('开始读取数据');

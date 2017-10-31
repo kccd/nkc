@@ -4,8 +4,8 @@ block title
   title #{data.category} - #{data.targetUser.username}的收藏 - 科创论坛
   
 block content
-  //-var ownership = data.targetUser.uid == (data.user?data.user.uid:null)
-  - var ownership = true;
+  -var ownership = data.targetUser.uid == (data.user?data.user.uid:null)
+  //- var ownership = true;
   if (data.user == undefined)
     h2(style="margin-left:8%;") 请先登录后查看，谢谢~
   else

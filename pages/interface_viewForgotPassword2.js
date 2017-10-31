@@ -32,7 +32,7 @@ function submit(){
   .then(function(){
     var userobj={
       username : gv('username'),
-      phone:gv('phone'),
+      mobile:gv('phone'),
       mcode:gv('mcode')//,
       //icode:gv('icode')
     }
@@ -42,65 +42,68 @@ function submit(){
       throw({detail:'请填写用户名！'})
       return
     }
-    if(userobj.phone == ''){
+    if(userobj.mobile == ''){
       getFocus("#phone")
       throw({detail:'请填写手机号码！'})
       return;
     }
-    if(userobj.phone.length < 11){
+    if(userobj.mobile.length < 11){
       //refreshICode();
       getFocus("#phone")
       throw({detail:'手机号码格式不正确！'})
       return;
     }
-    /*if(userobj.mcode == ''){
+    if(userobj.mcode == ''){
       //refreshICode();
       getFocus("#mcode")
       throw({detail:'请填写手机验证码！'})
       return;
-    }*/
-
-    window.location = '/forgotPassword2?phone='+userobj.phone+'&mcode='+userobj.mcode
+    }
+    return nkcAPI('/forgotPassword/mobile', 'post', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode});
   })
-  .catch(function(err){
-    error_report(err.detail);
-  })
+    .then(function(data){
+      console.log(data);
+      window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode;
+    })
+    .catch(function(err){
+      error_report(err);
+    })
 }
 
 
 
 function submit2(){
-  var phone = $('#phone2').val();
+  var mobile = $('#phone2').val();
   var mcode = $('#mcode2').val();
   var password = $('#password').val();
   var password2 = $('#password2').val();
 
   return Promise.resolve()
   .then(function(){
-    if(!phone.match(/^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/)) {
-      throw ({detail: '非法的手机号码'})
+    if(!mobile.match(/^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/)) {
+      throw ('非法的手机号码')
     }
     if(password == ''){
       getFocus("#password")
-      throw({detail:'请填写密码！'})
+      throw('请填写密码！')
       return;
     }
     if(password.length < 8){
       getFocus("#password")
-      throw({detail:'密码长度要大于8位！'})
+      throw('密码长度要大于8位！')
       return;
     }
     if(checkPass(password) < 2){
       getFocus("#password")
-      throw({detail:'密码要具有数字、字母和符号三者中的至少两者'})
+      throw('密码要具有数字、字母和符号三者中的至少两者')
       return;
     }
     if(password != password2){
       getFocus("#password2")
-      throw({detail:'两遍密码不一致'})
+      throw('两遍密码不一致')
       return;
     }
-    return nkcAPI('pchangePassword',{phone:phone, mcode:mcode, password:password})
+    return nkcAPI('/forgotPassword/mobile', 'put',{mobile:mobile, mcode:mcode, password:password})
   })
   .then(function(res){
     info_report2('修改密码成功！5s后跳转到登录页面')
@@ -109,7 +112,7 @@ function submit2(){
     },5000)
   })
   .catch(function(err){
-    error_report2(err.detail);
+    error_report2(JSON.stringify(err));
   })
 
 }
@@ -137,7 +140,7 @@ function getMcode(){
   }*/
 
   else{
-    nkcAPI('getMcode2',{phone:phone, username:username/*, icode:icode */})
+    nkcAPI('/sendMessage/reset','post' ,{mobile:phone, username:username/*, icode:icode */})
     .then(function(res){
       var count = 120;
       var countdown = setInterval(CountDown, 1000);
@@ -159,7 +162,7 @@ function getMcode(){
       else if(err.detail === '用户名和手机号码不对应，请检查') {
         ////refreshICode3();
       }
-      error_report(err.detail);
+      error_report(err);
     })
   }
 }

@@ -144,7 +144,7 @@ examRouter
         qid: exam.qarr[i].qid
       });
     }
-    let questionsOfDBRandom = await ctx.db.QuestionModel.find({}).or(qidList);
+    let questionsOfDBRandom = await db.QuestionModel.find({}).or(qidList);
     let questionsOfDB = [];
     for (let i = 0 ; i < questionsOfDBRandom.length; i++) {
       for (let j = 0; j < questionsOfDBRandom.length; j++) {

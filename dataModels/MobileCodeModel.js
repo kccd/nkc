@@ -18,4 +18,4 @@ mobileCodeSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('mobileCodes', mobileCodeSchema);
+module.exports = mongoose.model('mobileCodes', mobileCodeSchema, 'mobileCodes');

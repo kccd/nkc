@@ -269,11 +269,10 @@ block scripts
   script(src='/interface_common.js')
   //-script(src='/interface_messages.js')
   script.
-    function sendMes(){
+    function sendMes(uid){
       if(!document.getElementById("inputUsername")){
         var mesObj = {
           content: $("#inputContent").val(),
-          conversation: $("#inputContent").attr('conversation')
         };
       }else{
         var mesObj = {
@@ -288,7 +287,7 @@ block scripts
         return screenTopWarning('请输入消息内容!');
       }
       geid('sendMes').disabled = true;
-      nkcAPI('postNewMessage',mesObj)
+      nkcAPI('/u/'+uid+'/sms','post',mesObj)
       .then(function(){
         screenTopWarning('信息发送成功！');
         $("#inputContent").val('');
@@ -299,25 +298,3 @@ block scripts
         geid('sendMes').disabled = false;
       });
     }
-
-
-
- //-          -var obj = {replies: '回复', at: '@', messages: '短消息', system: '系统'}
- //-            h4 #{obj[nowAt]}
- //-            for doc in data.docs = data.docs;
-
- //- docs.length           if(nowAt === 'replies')
- //-                div #{doc.fromPost.c}
- //-              if(nowAt === 'at')
- //-                div #{doc.user}
- //-              if(nowAt === 'messages')
- //-                if(!data.conversation)
- //-                  div
- //-                    a(href='/sms?&tab=messages&conversation=#{doc.conversation._key}') #{doc.conversation.username + '说' + doc.group[0].c}
- //-                else
- //-                  div #{doc.s} #{doc.c}
- //-              if(nowAt === 'system')
- //-                div #{doc.c}
-
-          //nav
-          //  include interface_navigation_paging.pug

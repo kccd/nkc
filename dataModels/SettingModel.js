@@ -43,20 +43,13 @@ async function operateSystemID(type, op) {
 
 settingSchema.statics.operateSystemID = operateSystemID;
 /*let Setting = mongoose.model('settings', settingSchema);
-new Setting({uid: 'system',ads: [
-  '82312',
-  '82340',
-  '82333',
-  '82282',
-  '80787',
-  '65452'
-], popPersonalForums:['10','74185','73327','74156','74856','78451'],counters:{
+new Setting({uid: 'system',ads: [1], popPersonalForums:[1],counters:{
   resources: 1,
   users: 80000,
-  posts: 840234,
+  posts: 850000,
   threadTypes: 315,
-  threads: 82375,
-  questions: 252,
-  collections: 3392
+  threads: 83000,
+  questions: 300,
+  collections: 4000
 }}).save();*/
 module.exports = mongoose.model('settings', settingSchema);

@@ -22,7 +22,7 @@ meRouter
     ctx.data.user.subscribeForums = subscribeForums;
     ctx.data.forumList = await dbFn.forumList();
     let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-    if(userPersonal.mobile) ctx.data.user.mobile = userPersonal.mobile;
+    if(userPersonal.mobile) ctx.data.user.mobile = (userPersonal.mobile).replace('00', '+');
     ctx.template = 'interface_me.pug';
     await next();
   })
@@ -60,8 +60,21 @@ meRouter
     await db.UserSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: subscribeForums}});
     await next();
   })
-  .put('/mobile', async (ctx, next) => {
-    // ctx.data = '修改电话号码';
+  .post('/mobile', async (ctx, next) => {
+    let {db} = ctx;
+    let {user} = ctx.data;
+    let {mobile, areaCode, code} = ctx.body;
+    if(!mobile) ctx.throw(400, '电话号码不能为空！');
+    if(!areaCode) ctx.throw(400, '国际区号不能为空！');
+    if(!code) ctx.throw(400, '手机短信验证码不能为空！');
+    let newMobile = (areaCode + mobile).replace('+', '00');
+    let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
+    if(userPersonal.mobile) ctx.throw(404, `此账号已绑定手机号码： ${userPersonal.mobile}`);
+    let mobileCodesNumber = await dbFn.checkMobile(newMobile, mobile);
+    if(mobileCodesNumber > 0) ctx.throw(404, '此号码已经用于其他用户注册，请检查或更换');
+    let smsCode = await dbFn.checkMobileCode(newMobile, code);
+    if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
+    await db.UsersPersonalModel.replaceOne({uid: user.uid}, {$set: {mobile: newMobile}});
     await next();
   });
 module.exports = meRouter;

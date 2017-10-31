@@ -41,4 +41,4 @@ let personalForumsSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('personalForums', personalForumsSchema);
+module.exports = mongoose.model('personalForums', personalForumsSchema, 'personalForums');

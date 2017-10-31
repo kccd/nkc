@@ -34,12 +34,11 @@ block content
                   button.btn.btn-default.center-block#btnSwitch(onclick='showBtn()',style='margin:1em auto;') 修改头像
             .col-xs-7.col-md-7
               .col-xs-12.col-md-12
-                -console.log(user)
                 div.f12!= data.user.navbarDesc
               .col-xs-12.col-md-6
                 a.btn.btn-default.left-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.5em auto;') 查看个人专栏
               .col-xs-12.col-md-6
-                a.btn.btn-default.left-block(href=`/user_collection/${user.uid}`,role="button",style='margin:0.5em auto;') 查看个人收藏
+                a.btn.btn-default.left-block(href=`/u/${user.uid}/collections/null`,role="button",style='margin:0.5em auto;') 查看个人收藏
       .col-xs-12.col-md-12
         hr
         .h3(style='font-weight:300;margin-top:2em;') 账号安全设置
@@ -219,7 +218,7 @@ block scripts
         return;
       }
       geid('submitnewpassword').disabled = true;
-      nkcAPI('/m/set/password','put',passwordObj)
+      nkcAPI('/m/password','put',passwordObj)
       .then(function(){
         jwarning('密码修改成功！');
         geid('oldpassword').value = '';
@@ -228,7 +227,7 @@ block scripts
         geid('submitnewpassword').disabled = false;
       })
       .catch(function(err){
-        jwarning(err.err);
+        jwarning(err);
         geid('submitnewpassword').disabled = false;
       })
     }
@@ -241,28 +240,28 @@ block scripts
         focus_forums:geid('focus_forums').value,
       };
       geid('submitpersonalsetting').disabled = true;
-      nkcAPI('/m/set/personalsetting','put',settingObj)
+      nkcAPI('/m/personalsetting','put',settingObj)
       .then(function(){
         jwarning('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
       })
       .catch(function(err){
-        jwarning(err.err);
+        jwarning(err);
         geid('submitpersonalsetting').disabled = false;
       })
     }
     //提交手机号码和验证码
     function submitPhoneNumber() {
       var mobileObj={
-        phone:geid('phoneNumber').value,
+        mobile:geid('phoneNumber').value,
         code:geid('mCode').value,
         areaCode:areaCode
       };
-      if(mobileObj.phone == ''){
+      if(mobileObj.mobile == ''){
         jwarning('手机号码不能为空！');
         return;
       }
-      if(!(/(^[1-9]\d*$)/.test(mobileObj.phone))){
+      if(!(/(^[1-9]\d*$)/.test(mobileObj.mobile))){
         jwarning('手机号码格式不正确！');
         return;
       }
@@ -271,7 +270,7 @@ block scripts
         return;
       }
       geid('submitPhoneNumber').disabled = true;
-      nkcAPI('bindMobile',mobileObj)
+      nkcAPI('/m/mobile', 'post',mobileObj)
       .then(function(){
         geid('submitPhoneNumber').disabled = false;
         geid('submitSendMcode').disabled = false;
@@ -289,19 +288,19 @@ block scripts
     //发送验证码
     function submitSendMcode() {
       var codeObj = {
-        phone:geid('phoneNumber').value,
+        mobile:geid('phoneNumber').value,
         areaCode:areaCode
       };
-      if(codeObj.phone == ''){
+      if(codeObj.mobile == ''){
         jwarning('手机号码不能为空！');
         return;
       }
-      if(!(/(^[1-9]\d*$)/.test(codeObj.phone))){
+      if(!(/(^[1-9]\d*$)/.test(codeObj.mobile))){
         jwarning('手机号码格式不正确！');
         return;
       }
       geid('submitSendMcode').disabled = true;
-      nkcAPI('getMcode3',codeObj)
+      nkcAPI('/sendMessage/bindMobile', 'post',codeObj)
       .then(function(){
         jwarning('手机短信验证码发送成功！');
         setTimeout(timeOut_60,1000);

@@ -15,12 +15,12 @@ fn.decrementPsnl = async (uid, type) => {
 fn.foundCollection = async (data) => {
   let collections = await db.CollectionModel.find(data).sort({toc: 1});
   for (let i = 0; i < collections.length; i++) {
-    collections[i] = Object.assign({}, collections[i])._doc;
+    collections[i] = collections[i].toObject();
     let thread = {}, postOc = {}, postLm = {}, lmUser = {}, ocUser = {};
     thread = await db.ThreadModel.findOne({tid: collections[i].tid});
     thread = Object.assign({}, thread)._doc;
     if(!thread) {
-      categoryThreads.splice(i, 1);
+      collections.splice(i, 1);
       continue;
     }
     postOc = await db.PostModel.findOne({pid: thread.oc});
@@ -52,6 +52,11 @@ fn.checkNumberOfSendMessage = async (mobile, type) => {
 fn.checkNumberOfSendEmail = async (email) => {
   let time = Date.now() - 24 * 60 * 60 * 1000;
   let emailOfDB = await db.EmailRegisterModel.find({email: email, toc: {$gt: time}});
+  return emailOfDB.length;
+};
+fn.checkNumberOfSendEmailReset = async (email) => {
+  let time = Date.now() - 24 * 60 * 60 * 1000;
+  let emailOfDB = await db.EmailCodeModel.find({email: email, toc: {$gt: time}});
   return emailOfDB.length;
 };
 fn.checkUsername = async (username) => {
@@ -114,13 +119,9 @@ fn.createUser = async (data) => {
     userObj.certs.push('examinated');
   }
   if(typeof(userObj.password) === 'string') {
-    let salt = Math.floor((Math.random() * 65536)).toString(16);
-    let hash = apiFn.sha256HMAC(userObj.password, salt);
-    userObj.password = {
-      salt: salt,
-      hash: hash
-    };
-    userObj.hashType = 'sha256HMAC';
+    let passwordObj = apiFn.newPasswordObject(userObj.password);
+    userObj.password = passwordObj.password;
+    userObj.hashType = passwordObj.hashType;
   }
   userObj.newMessage = {
     messages: 0,
@@ -128,7 +129,6 @@ fn.createUser = async (data) => {
     replies: 0,
     system: 0
   };
-  console.log(userObj.username)
   userObj.abbr = userObj.username.slice(0, 6);
   userObj.displayName = userObj.username + '的专栏';
   userObj.descriptionOfForum = userObj.username + '的专栏';
