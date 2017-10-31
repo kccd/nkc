@@ -61,7 +61,6 @@ loginRouter
       username: user.username,
       lastLogin: Date.now()
     }));
-    console.log('hhh');
     ctx.cookies.set('userInfo', cookieStr, {
       signed: true,
       maxAge: ctx.settings.cookie.life,

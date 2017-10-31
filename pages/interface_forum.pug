@@ -53,21 +53,21 @@ block content
 
                         -var gpf = group.parentforum
                         if gpf._key == data.forum.parentid
-                        
+
                           -var gpf = group.parentforum
                           -var name = gpf.display_name
                           -gpf.color = gpf.color||'#aaa'
                           -var url = '/f/'+gpf._key
-                          
+
                           -var stylestr = 'color:'+gpf.color
-                          
+
                           a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
 
                           each f,findex in group.forumgroup
                             -var backcolor=f.color||gpf.color
                             -var name = f.display_name
                             -var url = '/f/'+f._key
-                            
+
                             -var active = f._key==data.forum.fid
                             -var stylestr = active?'background-color:'+backcolor:''
                             a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}

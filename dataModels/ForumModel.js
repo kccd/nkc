@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const {getQueryObj} = require('../nkcModules/apiFunction');
 
 const forumSchema = new Schema({
 	abbr: {
@@ -81,9 +82,44 @@ const forumSchema = new Schema({
   }
 });
 
-forumSchema.methods.getThreadsByQuery = async function(query) {
-  const {digest, cat, sortby, page} = query;
-  const threads = await this.collection.find({fid: this.fid})
+forumSchema.methods.getThreadsByQuery = function(query) {
+  const {$match, $sort, $skip, $limit} = getQueryObj(query);
+  return mongoose.connection.db.collection('threads').aggregate([
+    {$match},
+    {$sort},
+    {$skip},
+    {$limit},
+    {$lookup: {
+      from: 'posts',
+      localField: 'oc',
+      foreignField: 'pid',
+      as: 'oc'
+    }},
+    {$lookup: {
+      from: 'posts',
+      localField: 'lm',
+      foreignField: 'pid',
+      as: 'lm'
+    }},
+    {$lookup: {
+      from: 'users',
+      localField: 'uid',
+      foreignField: 'uid',
+      as: 'user'
+    }},
+    {$lookup: {
+      from: 'users',
+      localField: 'oc.uid',
+      foreignField: 'uid',
+      as: 'oc.user'
+    }},
+    {$lookup: {
+      from: 'users',
+      localField: 'lm.uid',
+      foreignField: 'uid',
+      as: 'lm.user'
+    }}
+  ])
 };
 
 module.exports = mongoose.model('forums', forumSchema);

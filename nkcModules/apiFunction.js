@@ -11,6 +11,32 @@ fn.paging = (page, arrLength) => {
     pageCount: Math.ceil(arrLength/perpage)
   }
 };
+
+fn.getQueryObj = (query, match) => {
+  const {digest, cat, sortby, page} = query;
+  const $match = Object.assign({}, match);
+  if(cat)
+    $match.cid = cat;
+  if(digest)
+    $match.digest = digest;
+  const $sort = {};
+  if(sortby)
+    $sort.toc = -1;
+  else
+    $sort.tlm = -1;
+  let $skip, $limit;
+  if(page) {
+    $skip = page * perpage;
+    $limit = perpage;
+  }
+  return {
+    $match,
+    $sort,
+    $skip,
+    $limit
+  }
+};
+
 fn.sha256HMAC = (password,salt) => {
   const crypto = require('crypto');
   let hmac = crypto.createHmac('sha256',salt);

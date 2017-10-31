@@ -8,11 +8,16 @@ forumRouter
   })
   .get('/:fid', async (ctx, next) => {
     const data = ctx.data;
-    data.template = 'interface_forum.pug';
+    ctx.template = 'interface_forum.pug';
     const {fid} = ctx.params;
-    const {ForumModel} = ctx.dataModels;
+    const {ForumModel} = ctx.db;
     const {query} = ctx;
     const forum = await ForumModel.findOne({fid});
+    const threads = await forum.getThreadsByQuery(query);
+    data.forum = forum;
+    data.threads = threads;
+    console.log(threads[0]);
+    await next()
   });
 
 module.exports = forumRouter;
