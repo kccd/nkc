@@ -44,7 +44,7 @@ registerRouter
     let mobileCodesNumber = await dbFn.checkMobile(userObj.mobile, params.mobile);
     if(mobileCodesNumber > 0) ctx.throw(404, '此号码已经用于其他用户注册，请检查或更换');
     let smsCode = await dbFn.checkMobileCode(userObj.mobile, userObj.mcode);
-    if(!smsCode) ctx.throw(404, '手机验证码错误或过期，请检查');
+    if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
     let newUser = await dbFn.createUser(userObj);
     await dbFn.useRegCode(userObj.regCode, newUser.uid);
     await next();
@@ -87,13 +87,9 @@ registerRouter
     let emailOfDBNumber = await dbFn.checkNumberOfSendEmail(userObj.email);
     if(emailOfDBNumber >= settings.sendMessage.sendEmailCount) ctx.throw('404', '邮件发送次数已达上限，请隔天再试');
     let ecode = apiFn.random(14);
-    let salt = Math.floor(Math.random() * 65536).toString(16);
-    let hash = apiFn.sha256HMAC(userObj.password, salt);
-    userObj.password = {
-      salt: salt,
-      hash: hash
-    };
-    userObj.hashType = 'sha256HMAC';
+    let passwordObj = apiFn.newPasswordObject(userObj.password);
+    userObj.password = passwordObj.password;
+    userObj.hashType = passwordObj.hashType;
     userObj.ecode = ecode;
     let emailRegister = new db.EmailRegisterModel(userObj);
     await emailRegister.save();
@@ -113,8 +109,12 @@ registerRouter
     let db = ctx.db;
     let email = ctx.params.email;
     let ecode = ctx.params.ecode;
+    let userPersonal = await dbFn.checkEmail(email);
+    if(userPersonal > 0) ctx.throw('404', '此邮箱已注册过，请检查或更换');
     let emailRegister = await dbFn.checkEmailCode(email, ecode);
     if(!emailRegister) ctx.throw(404, '邮箱链接已失效，请重新注册！');
+    let usernameOfDBNumber = await dbFn.checkUsername(emailRegister.username);
+    if(usernameOfDBNumber !== 0) ctx.throw('404', '抱歉！该用户名在你激活账户前已经被别人注册了，请更换用户名再试！');
     let newUser = await dbFn.createUser(emailRegister.toObject());
     await dbFn.useRegCode(emailRegister.regCode, newUser.uid);
     ctx.data.activeInfo1 = '邮箱注册成功，赶紧登录吧~';

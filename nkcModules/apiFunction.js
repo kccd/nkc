@@ -1,7 +1,16 @@
 const settings = require('../settings');
+let {perpage} = settings.paging;
 let fn = {};
 
-
+fn.paging = (page, arrLength) => {
+  return {
+    page: page,
+    perpage: perpage,
+    start: page*perpage,
+    count: 65,
+    pageCount: Math.ceil(arrLength/perpage)
+  }
+};
 fn.sha256HMAC = (password,salt) => {
   const crypto = require('crypto');
   let hmac = crypto.createHmac('sha256',salt);
@@ -47,7 +56,7 @@ fn.newPasswordObject = (plain) => {
   let salt = Math.floor((Math.random()*65536)).toString(16);
   let hash = fn.sha256HMAC(plain,salt);
   return {
-    hashtype:'sha256HMAC',
+    hashType:'sha256HMAC',
     password:{
       hash:hash,
       salt:salt,

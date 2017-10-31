@@ -122,7 +122,6 @@ examRouter
     let db = ctx.db;
     let params = ctx.body;
     let exam = params.exam;
-    console.log(exam);
     if(!exam) ctx.throw(400, '小明！你的试卷呢？');
     let signature = '';
     for (let i = 0; i < exam.qarr.length; i++) {
@@ -145,7 +144,7 @@ examRouter
         qid: exam.qarr[i].qid
       });
     }
-    let questionsOfDBRandom = await ctx.db.QuestionModel.find({}).or(qidList);
+    let questionsOfDBRandom = await db.QuestionModel.find({}).or(qidList);
     let questionsOfDB = [];
     for (let i = 0 ; i < questionsOfDBRandom.length; i++) {
       for (let j = 0; j < questionsOfDBRandom.length; j++) {
