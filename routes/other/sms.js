@@ -19,7 +19,7 @@ smsRouter
     let replieArr = [];
     for (let replie of replies) {
       let fromUser = {};
-      let fromPost = await db.PostModel.findOne({pid: replie.fromPid, disabled: false});
+      let fromPost = await db.PostModel.findOnly({pid: replie.fromPid, disabled: false});
       if(!fromPost) continue;
       fromUser = await db.UserModel.findOne({uid: fromPost.uid});
       let toUser = await db.UserModel.findOne({uid: user.uid});

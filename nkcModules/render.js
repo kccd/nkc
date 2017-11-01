@@ -32,6 +32,25 @@ function toQueryString(object) {
   return '?' + qs
 }
 
+function testModifyTimeLimit(cs, ownership, toc){
+
+  let smtl = cs.selfModifyTimeLimit;
+  let emtl = cs.elseModifyTimeLimit;
+
+  // if you can modify others in 1y,
+  // you should be able to do that to yourself,
+  // regardless of settings. // wtf r u talking about   wtf r u talking about!!!! --lzszone
+  if(smtl<emtl){
+    smtl = emtl
+  }
+  //who dat fuck wrote these fucking codes,
+  //--test ownership--
+  if(ownership)
+    // if he own the post
+    return Date.now() < toc + smtl;
+  return Date.now() < toc + emtl
+}
+
 let getUserDescription = (user) => {
   return `${user.username}\n`+
     `学术分 ${user.xsf||0}\n`+
@@ -41,6 +60,20 @@ let getUserDescription = (user) => {
 let dateTimeString = (t) => {
   return moment(t).format('YYYY-MM-DD HH:mm')
 };
+
+function dateString(date){
+  var dateformat="YYYY-MM-DD HH:mm:ss";
+
+  if(date)//if input contains date
+  {
+    return moment(date).format(dateformat);
+  }
+  else
+  {
+    return moment().format(dateformat);
+  }
+}
+
 let fromNow = (time) => {
   return moment(time).fromNow();
 };
@@ -55,6 +88,8 @@ let pugRender = (template, data) => {
     plain:render.plain_render,
     experimental_render:render.experimental_render,
     toQueryString,
+    testModifyTimeLimit,
+    dateString
   };
   options.data = data;
   options.filters = filters;

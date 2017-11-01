@@ -1,5 +1,5 @@
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
+mongoose.connect('mongodb://lzszone:Lz852369@localhost:27017/admin', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 

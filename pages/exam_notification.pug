@@ -6,7 +6,7 @@ if data.user
   - for(var i =0; i < userCerts.length; i++)
     if(userCerts[i] === 'mobile')
       - hasMobile = true;
-  - if(!data.permittedOperations.viewExam && !data.permittedOperations.postTo)
+  - if(!data.ensurePermission('GET', '/exam') && !data.ensurePermission('POST', '/f/x'))
     p.f12.reddish 根据系统记录，你的账号已经被封禁，请重新注册。
   - else
     if(!hasMobile)

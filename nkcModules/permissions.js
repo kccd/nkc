@@ -7,6 +7,11 @@ const OPTIONS = Symbol('OPTIONS');
 const PUT = Symbol('PUT');
 const name = Symbol('name');
 
+const _hour = 3600*1000;
+const _day = _hour*24;
+const _month = _day*30;
+const _year = _month*12;
+
 const methodEnum = {
   GET,
   POST,
@@ -113,7 +118,9 @@ const certificates ={
           [GET]: true,
         }
       }
-    }
+    },
+    elseModifyTimeLimit: 0,
+    selfModifyTimeLimit: 0
   },
   banned: {
     displayName: '开除学籍',
@@ -254,22 +261,27 @@ const certificates ={
           [PUT]: true
         }
       }
-    }
+    },
+    elseModifyTimeLimit: 0,
+    selfModifyTimeLimit: 0.5*_hour
   },
   mail: {
     displayName: '笔友',
     inheritFrom: ['default'],
+    selfModifyTimeLimit: _hour
   },
   mobile: {
     displayName: '机友',
     inheritFrom: ['default'],
+    selfModifyTimeLimit: _hour
   },
   examinated: {
     displayName: '进士',
     inheritFrom: ['default'],
     contentClasses: {
       professional: true
-    }
+    },
+    selfModifyTimeLimit: 3*_month
   },
   qc: {
     displayName: '题委',
@@ -293,10 +305,15 @@ const certificates ={
       sensitive: true
     },
     permittedOperations: {
-      history: {
-        [GET]: true
+      p: {
+        [parameter]: {
+          history: {
+            [GET]: true
+          }
+        }
       }
-    }
+    },
+    selfModifyTimeLimit: 3*_year
   },
   moderator: {
     displayName: '版主',
@@ -352,7 +369,9 @@ const certificates ={
           }
         }
       },
-    }
+    },
+    elseModifyTimeLimit: 20*_year,
+    selfModifyTimeLimit: 20*_year
   },
   senior_moderator: {
     displayName: '责任版主',
