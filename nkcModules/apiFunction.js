@@ -13,7 +13,7 @@ fn.paging = (page, arrLength) => {
 };
 
 fn.getQueryObj = (query, match) => {
-  const {digest, cat, sortby, page} = query;
+  const {digest, cat, sortby, page = 0} = query;
   const $match = Object.assign({}, match);
   if(cat)
     $match.cid = cat;
@@ -25,10 +25,8 @@ fn.getQueryObj = (query, match) => {
   else
     $sort.tlm = -1;
   let $skip, $limit;
-  if(page) {
-    $skip = page * perpage;
-    $limit = perpage;
-  }
+  $skip = page * perpage;
+  $limit = perpage;
   return {
     $match,
     $sort,

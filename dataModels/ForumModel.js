@@ -95,31 +95,36 @@ forumSchema.methods.getThreadsByQuery = function(query) {
       foreignField: 'pid',
       as: 'oc'
     }},
+    {$unwind: "$oc"},
     {$lookup: {
       from: 'posts',
       localField: 'lm',
       foreignField: 'pid',
       as: 'lm'
     }},
+    {$unwind: "$lm"},
     {$lookup: {
       from: 'users',
       localField: 'uid',
       foreignField: 'uid',
       as: 'user'
     }},
+    {$unwind: '$user'},
     {$lookup: {
       from: 'users',
       localField: 'oc.uid',
       foreignField: 'uid',
       as: 'oc.user'
     }},
+    {$unwind: '$oc.user'},
     {$lookup: {
       from: 'users',
       localField: 'lm.uid',
       foreignField: 'uid',
       as: 'lm.user'
-    }}
-  ])
+    }},
+    {$unwind: '$lm.user'}
+  ]).toArray()
 };
 
 module.exports = mongoose.model('forums', forumSchema);

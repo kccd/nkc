@@ -28,7 +28,7 @@ block title
     }
 
 block content   
-  -var isModerator = data.permittedOperations.moveThread
+  -var isModerator = data.ensurePermission('PATCH', '/t/x')
   -var forumIsParent = data.forum.type&&data.forum.type=='category'
   -var hasChildren = data.forum.type&&data.forum.type=='category'&&data.forums&&data.forums.length
   
@@ -49,28 +49,28 @@ block content
                   //img(src='http://bbs.kechuang.org/themes/site/dingzhi/images/logo.png')
                   if(data.forum.fid)
                     .ForumNavigation1(style='margin-bottom:5px;')
-                      each group,index in data.forumlist
-
-                        -var gpf = group.parentforum
-                        if gpf._key == data.forum.parentid
-
-                          -var gpf = group.parentforum
-                          -var name = gpf.display_name
-                          -gpf.color = gpf.color||'#aaa'
-                          -var url = '/f/'+gpf._key
-
-                          -var stylestr = 'color:'+gpf.color
-
-                          a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
-
-                          each f,findex in group.forumgroup
-                            -var backcolor=f.color||gpf.color
-                            -var name = f.display_name
-                            -var url = '/f/'+f._key
-
-                            -var active = f._key==data.forum.fid
-                            -var stylestr = active?'background-color:'+backcolor:''
-                            a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
+                      //each group,index in data.forumlist
+                      //
+                      //  -var gpf = group.parentforum
+                      //  if gpf._key == data.forum.parentid
+                      //
+                      //    -var gpf = group.parentforum
+                      //    -var name = gpf.display_name
+                      //    -gpf.color = gpf.color||'#aaa'
+                      //    -var url = '/f/'+gpf._key
+                      //
+                      //    -var stylestr = 'color:'+gpf.color
+                      //
+                      //    a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
+                      //
+                      //    each f,findex in group.forumgroup
+                      //      -var backcolor=f.color||gpf.color
+                      //      -var name = f.display_name
+                      //      -var url = '/f/'+f._key
+                      //
+                      //      -var active = f._key==data.forum.fid
+                      //      -var stylestr = active?'background-color:'+backcolor:''
+                      //      a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
                       
                   
                   -var forum = data.forum
@@ -164,7 +164,7 @@ block content
                       .form-group
                         button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
                       .form-group
-                        include forumlist_dropdown.pug
+                        //include forumlist_dropdown.pug
                         button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
 
                       .form-group
@@ -209,19 +209,19 @@ block content
 
                   hr.hrNarrowSpace
 
-              if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
-                .ForumThreadList
-                  each thread,index in data.toppedThreads
-                    include interface_forum_singlethread.pug
-                //hr.hrNarrowSpace
-                .ForumToppedSplitter - 以上是置顶 -
+              //if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
+              //  .ForumThreadList
+              //    each thread,index in data.toppedThreads
+              //      include interface_forum_singlethread.pug
+              //  //hr.hrNarrowSpace
+              //  .ForumToppedSplitter - 以上是置顶 -
 
-              .ForumThreadList
-                each thread,index in data.threads
-                  if data.toppedThreads && (data.toppedThreads.map(item => item._key).indexOf(thread._key) >= 0)
-                    //exclude threads that are shown in topped area.
-                  else
-                    include interface_forum_singlethread.pug
+              //.ForumThreadList
+              //  each thread,index in data.threads
+              //    if data.toppedThreads && (data.toppedThreads.map(item => item._key).indexOf(thread._key) >= 0)
+              //      //exclude threads that are shown in topped area.
+              //    else
+              //      include interface_forum_singlethread.pug
 
               .row
                 .col-md-12

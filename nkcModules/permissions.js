@@ -333,9 +333,9 @@ const certificates ={
             [name]: '精华',
             [POST]: true,
             [DELETE]: true
-          }
+          },
+          [PATCH]: true
         },
-        [PATCH]: true
       },
       p: {
         [GET]: true,
@@ -477,29 +477,6 @@ function getPermitTree(certs) {
   return tree
 }
 
-function ensurePermission(certs, path, method) {
-  let obj = certs;
-  const m = methodEnum[method];
-  const routes = path.match(/\/([^\/]*)/g)
-    .map(e => e.replace('/', ''))
-    .filter(e => e !== '');
-  if(routes.length === 0)
-    return;
-  for(const route of routes) {
-    if(obj[route]) {
-      obj = obj[route]
-    }
-    else if(obj[parameter]) {
-      obj = obj[parameter]
-    }
-    else {
-      throw `[${method}]/${route}权限不足`
-    }
-  }
-  if(!obj[m])
-    throw `权限不足`
-}
-
 function getUserDescription(user) {
   const {certs, username, xsf = 0, kcb = 0} = user;
   let cs = '';
@@ -525,11 +502,28 @@ module.exports = async (ctx, next) => {
 
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
-  const method = ctx.method;
-  try {
-    ensurePermission(cs.permittedOperations, ctx.path, method);
-  } catch (e) {
-    ctx.throw(401, e)
-  }
+  ctx.data.ensurePermission = function(method = this.method, path = this.path) {
+    let obj = this.data.certificates.permittedOperations;
+    const m = methodEnum[method];
+    const routes = path.match(/\/([^\/]*)/g)
+      .map(e => e.replace('/', ''))
+      .filter(e => e !== '');
+    if(routes.length === 0)
+      return true;
+    for(const route of routes) {
+      if(obj[route]) {
+        obj = obj[route]
+      }
+      else if(obj[parameter]) {
+        obj = obj[parameter]
+      }
+      else {
+        return false
+      }
+    }
+    return obj[m]
+  }.bind(ctx);
+  if(!ctx.data.ensurePermission())
+    ctx.throw(401, `权限不足`);
   await next();
-}
+};

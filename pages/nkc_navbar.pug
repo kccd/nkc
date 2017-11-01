@@ -1,6 +1,5 @@
 //nav.navbar.navbar-default
 
-
 div
   - var navbar = data.navbar || {}
   .container-fluid
@@ -52,17 +51,16 @@ div
             - var user = data.user
             a(href='/m' title=`${data.user.navbarDesc}`) #{user.username}
             
-            
-            
-            if data.permittedOperations.viewSMS
-              a(href='/sms')
-                span 信
-              
-                if data.user.new_message
-                  -var new_message = data.user.new_message
-                  -var messageSum = (new_message.messages || 0) + (new_message.system || 0) + (new_message.at || 0) + (new_message.replies || 0);
-                  if(messageSum > 0)
-                    span.reddish (#{messageSum})
+            -const sms = '/sms'
+              if data.ensurePermission('GET', sms)
+                a(href=sms)
+                  span 信
+
+                  if data.user.new_message
+                    -var new_message = data.user.new_message
+                    -var messageSum = (new_message.messages || 0) + (new_message.system || 0) + (new_message.at || 0) + (new_message.replies || 0);
+                    if(messageSum > 0)
+                      span.reddish (#{messageSum})
             
             if data.permittedOperations
               if data.permittedOperations.viewExperimental

@@ -4,62 +4,58 @@ block title
   title 登录
 
 block content
-  if data.user && data.user.username
-    script.
-      location.href='/'
-  
-  else
-    .container
-      .row
-        .col-sm-12
-          h1 登录
-          p 
-            span 还记得用户名吗？ 如果还没有账号，现在就 
-            a(href='register/mobile') 注册
-            span 。
-          
-          hr
-      
-      .row
-        
-        .col-lg-4.col-md-5.col-sm-6
-          .form-horizontal()
-            .form-group
-              label.control-label.col-sm-3 用户名
-              .col-sm-9
-                input#username.form-control(type='text' placeholder='不区分大小写' onkeydown='username_keypress()')
-                
-            .form-group
-              label.control-label.col-sm-3 密码
-              .col-sm-9
-                input#password.form-control(type='password' placeholder='旁边没人吧？' onkeydown='password_keypress()')
-          
-            .form-group
-              .col-sm-offset-3.col-sm-3
-                //offset 2 grids
-                button.btn.btn-default(onclick='login_submit()') 提交
-                
-            .form-group
-              .col-sm-12
-                if data.activeInfo1
-                  .panel.panel-default
-                    .panel-body
-                      div.d-inline(style="color:#4169E1;") #{data.activeInfo1} 
-                if data.activeInfo2
-                  .panel.panel-default
-                    .panel-body
-                      div.d-inline(style="color:red;") #{data.activeInfo2} 
-                #error_info_panel.panel.panel-default(style='display:none;')
-                  .panel-body
-                    div#error_info.d-inline.lighttext
-        
-        .col-lg-4.col-md-5.col-sm-6
-          img(src='/resources/site_specific/owl_reverse.jpg' style='max-width:100%;border-radius:5px;')
 
-        .col-xs-12
-          div(style='color:gray;')
-            :markdown
-              忘记密码？可以尝试通过[邮件找回](/forgotPassword/email)或者[手机找回](/forgotPassword/mobile)
+  .container
+    .row
+      .col-sm-12
+        h1 登录
+        p
+          span 还记得用户名吗？ 如果还没有账号，现在就
+          a(href='register/mobile') 注册
+          span 。
+
+        hr
+
+    .row
+
+      .col-lg-4.col-md-5.col-sm-6
+        .form-horizontal()
+          .form-group
+            label.control-label.col-sm-3 用户名
+            .col-sm-9
+              input#username.form-control(type='text' placeholder='不区分大小写' onkeydown='username_keypress()')
+
+          .form-group
+            label.control-label.col-sm-3 密码
+            .col-sm-9
+              input#password.form-control(type='password' placeholder='旁边没人吧？' onkeydown='password_keypress()')
+
+          .form-group
+            .col-sm-offset-3.col-sm-3
+              //offset 2 grids
+              button.btn.btn-default(onclick='login_submit()') 提交
+
+          .form-group
+            .col-sm-12
+              if data.activeInfo1
+                .panel.panel-default
+                  .panel-body
+                    div.d-inline(style="color:#4169E1;") #{data.activeInfo1}
+              if data.activeInfo2
+                .panel.panel-default
+                  .panel-body
+                    div.d-inline(style="color:red;") #{data.activeInfo2}
+              #error_info_panel.panel.panel-default(style='display:none;')
+                .panel-body
+                  div#error_info.d-inline.lighttext
+
+      .col-lg-4.col-md-5.col-sm-6
+        img(src='/resources/site_specific/owl_reverse.jpg' style='max-width:100%;border-radius:5px;')
+
+      .col-xs-12
+        div(style='color:gray;')
+          :markdown
+            忘记密码？可以尝试通过[邮件找回](/forgotPassword/email)或者[手机找回](/forgotPassword/mobile)
 
   include debug_output.pug
     
