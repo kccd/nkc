@@ -156,8 +156,8 @@ const certificates ={
         message: {
           [name]: '消息',
           [GET]: true,
+          [POST]: true,
           [parameter]: {
-            [POST]: true,
             [GET]: true
           }
         },
@@ -170,8 +170,9 @@ const certificates ={
         }
       },
       m: {
+        [GET]: true,
         [parameter]: {
-          [POST]: true
+          [POST]: true,
         }
       },
       t: {

@@ -20,7 +20,7 @@ meRouter
       subscribeForums = '';
     }
     ctx.data.user.subscribeForums = subscribeForums;
-    ctx.data.forumList = await dbFn.forumList();
+    ctx.data.forumList = await dbFn.getAvailableForums(ctx);
     let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
     if(userPersonal.mobile) ctx.data.user.mobile = (userPersonal.mobile).replace('00', '+');
     ctx.template = 'interface_me.pug';

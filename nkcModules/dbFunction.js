@@ -3,12 +3,22 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
-fn.decrementPsnl = async (uid, type) => {
-  let userPersonal = (await db.UsersPersonalModel.findOne({uid: uid})).toObject();
+fn.decrementPsnl = async (uid, type, number) => {
+  let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
   let {newMessage} = userPersonal;
-  newMessage[type] = 0;
-  await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
-  return (await db.UsersPersonalModel.findOne({uid: uid})).toObject().newMessage;
+  if(number || number === 0) {
+    newMessage[type] -= number;
+  } else {
+    newMessage[type] = 0;
+  }
+  return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
+};
+
+fn.addValueOfMessage = async (uid, type) => {
+  let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
+  let {newMessage} = userPersonal;
+  newMessage[type]++;
+  return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
 };
 
 // 查询目标用户的个人搜藏

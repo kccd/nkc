@@ -15,7 +15,7 @@ collectionsRouter
     }else {
       targetUser = await db.UserModel.findOne({uid: targetUserUid});
     }
-    ctx.data.forumList = await dbFn.forumList;
+    ctx.data.forumList = await dbFn.getAvailableForums(ctx);
     ctx.data.targetUser = targetUser;
     ctx.data.category = category || 'null';
     let categoryNames = await db.CollectionModel.aggregate([
