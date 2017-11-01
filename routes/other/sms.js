@@ -90,13 +90,14 @@ smsRouter
         fromUser.group = [];
         fromUser.group.push(smsList[i]);
         docs.push(fromUser);
+        continue;
       }
       for (let j = 0; j < docs.length; j++) {
         if(docs[j].uid === targetUid) {
           docs[j].group.push(smsList[i]);
           break;
         }
-        if(j === docs.length) {
+        if(j === docs.length - 1) {
           fromUser = (await db.UserModel.findOne({uid: targetUid})).toObject();
           fromUser.group = [];
           fromUser.group.push(smsList[i]);
@@ -104,7 +105,23 @@ smsRouter
         }
       }
     }
-    console.log(docs);
+    for (let i = 0; i < docs.length; i++) {
+      let groupLength = docs[i].group.length;
+      for (let j = 0; j < groupLength; j++) {
+        if(!docs[i].group[j].viewed) {
+          let Obj = docs.splice(i,1);
+          docs.unshift(Obj[0]);
+          break;
+        }
+      }
+    }
+    let paging = await apiFn.paging(page, docs.length);
+    let start = paging.start;
+    docs = docs.slice(start, start + perpage);
+    ctx.data.paging = paging;
+    ctx.data.docs = docs;
+    ctx.template = 'interface_messages.pug';
+    ctx.data.tab = 'message';
     await next();
   })
   .get('/message/:uid', async (ctx, next) => {

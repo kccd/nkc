@@ -253,6 +253,9 @@ const certificates ={
           [name]: '手机',
           [PUT]: true
         }
+      },
+      logout: {
+        [GET]: true
       }
     }
   },
