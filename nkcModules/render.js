@@ -20,6 +20,18 @@ let getCertsInText = (user) => {
   }
   return s;
 };
+
+function toQueryString(object) {
+  let qs = '';
+  for(const key in Object.keys(object)) {
+    const value = object[key];
+    if(value){
+      qs += '&' + key.toString() + '=' + value.toString()
+    }
+  }
+  return '?' + qs
+}
+
 let getUserDescription = (user) => {
   return `${user.username}\n`+
     `学术分 ${user.xsf||0}\n`+
@@ -42,7 +54,7 @@ let pugRender = (template, data) => {
     server: settings.server,
     plain:render.plain_render,
     experimental_render:render.experimental_render,
-
+    toQueryString,
   };
   options.data = data;
   options.filters = filters;

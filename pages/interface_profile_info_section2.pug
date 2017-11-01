@@ -4,7 +4,7 @@
     a(href='/user_collection/#{user._key}') 收藏夹
     a(href='/sms?&tab=messages&conversation=#{user._key}') 发私信
 
-    if data.permittedOperations.banUser
+    if data.ensurePermission('DELETE', '/u/x')
       a(href='javascript:void(0)' onclick="nkcAPI('banUser',{uid:'#{user._key}'}).then(jalert).catch(jwarning)") 一键封禁此人
       a(href='javascript:void(0)' onclick="nkcAPI('unbanUser',{uid:'#{user._key}'}).then(jalert).catch(jwarning)") 解除封禁
 
