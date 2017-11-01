@@ -75,7 +75,54 @@ smsRouter
     let {user} = ctx.data;
     let {db} = ctx;
     let page = ctx.query.page || 0;
-
+    let smsList = await db.SmsModel.find().and([{fromSystem: false, },{$or: [{s: user.uid}, {r: user.uid}]}]).sort({toc: -1});
+    let docs = [];
+    for (let i = 0; i < smsList.length; i++) {
+      let fromUser = {};
+      let targetUid = '';
+      if(smsList[i].r === user.uid) {
+        targetUid = smsList[i].s;
+      } else {
+        targetUid = smsList[i].r;
+      }
+      if(docs.length === 0) {
+        fromUser = (await db.UserModel.findOne({uid: targetUid})).toObject();
+        fromUser.group = [];
+        fromUser.group.push(smsList[i]);
+        docs.push(fromUser);
+        continue;
+      }
+      for (let j = 0; j < docs.length; j++) {
+        if(docs[j].uid === targetUid) {
+          docs[j].group.push(smsList[i]);
+          break;
+        }
+        if(j === docs.length - 1) {
+          fromUser = (await db.UserModel.findOne({uid: targetUid})).toObject();
+          fromUser.group = [];
+          fromUser.group.push(smsList[i]);
+          docs.push(fromUser);
+        }
+      }
+    }
+    for (let i = 0; i < docs.length; i++) {
+      let groupLength = docs[i].group.length;
+      for (let j = 0; j < groupLength; j++) {
+        if(!docs[i].group[j].viewed) {
+          let Obj = docs.splice(i,1);
+          docs.unshift(Obj[0]);
+          break;
+        }
+      }
+    }
+    let paging = await apiFn.paging(page, docs.length);
+    let start = paging.start;
+    docs = docs.slice(start, start + perpage);
+    ctx.data.paging = paging;
+    ctx.data.docs = docs;
+    ctx.template = 'interface_messages.pug';
+    ctx.data.tab = 'message';
+    await next();
   })
   .get('/message/:uid', async (ctx, next) => {
     let {user} = ctx.data;
@@ -113,7 +160,7 @@ smsRouter
     let {db} = ctx;
     let {username, content} = ctx.body;
     if(!username || !content) ctx.throw(400, '参数不完整。');
-    let targetUser = await db.UserModel.findOne({username: username});
+    let targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     if(!targetUser) ctx.throw(400, '该用户不存在，请检查用户名是否输入正确');
     let newSms = new db.SmsModel({
       sid: await db.SettingModel.operateSystemID('sms', 1),
