@@ -47,6 +47,41 @@ experimentalRouter
   .get('/newSysinfo', async (ctx, next) => {
     ctx.template = 'interface_new_sysinfo.pug';
     await next();
+  })
+  .post('/newSysinfo', async (ctx, next) => {
+    let t1 = Date.now();
+    let {title, content} = ctx.body;
+    if(!title) ctx.throw(400, '标题不能为空！');
+    if(!content) ctx.throw(400, '内容不能为空！');
+    let {db} = ctx;
+    let newSysinfo = new db.SmsModel({
+      fromSystem: true,
+      sid: await db.SettingModel.operateSystemID('sms', 1),
+      ip: ctx.request.socket._peername.address,
+      port: ctx.request.socket._peername.port,
+      systemContent: {
+        title: title,
+        content: content
+      }
+    });
+    try{
+      await newSysinfo.save();
+      let allUsers = await db.UsersPersonalModel.find({}, {_id: 0, uid: 1, newMessage: 1});
+      for (let i  =0; i < allUsers.length; i++) {
+        let newMessage = allUsers[i].newMessage;
+        newMessage.system++;
+        await db.UsersPersonalModel.replaceOne({uid: allUsers[i].uid}, {$set: {newMessage: newMessage}});
+        console.log(i);
+      }
+      console.log('over');
+    } catch(err) {
+      let t = Date.now() - t1;
+      console.log(`耗时： ${t}`);
+      // await db.SettingModel.operateSystemID('sms', -1);
+      ctx.throw(500, `发送系统通知出错: ${err}`);
+    }
+    let t = Date.now() - t1;
+    console.log(`耗时： ${t}`);
+    await next();
   });
-  // .use('/set', setRouter.routes(), setRouter.allowedMethods())
 module.exports = experimentalRouter;

@@ -197,7 +197,12 @@ smsRouter
     let {user} = ctx.data;
     let {db} = ctx;
     let {sid} = ctx.params;
-    ctx.data.docs = await db.SmsModel.findOneAndUpdate({sid: sid}, {$addToSet: {viewedUsers: user.uid}});
+    let systemMessage = await db.SmsModel.findOneAndUpdate({sid: sid}, {$addToSet: {viewedUsers: user.uid}});
+    ctx.data.docs = systemMessage;
+    // 若用户没有查看过该系统信息，则让用户的newMessage.system--
+    if(systemMessage.viewedUsers.indexOf(user.uid) === -1) {
+      await dbFn.decrementPsnl(user.uid, 'system', 1);
+    }
     ctx.data.tab = 'system';
     ctx.template = 'interface_messages.pug';
     await next();

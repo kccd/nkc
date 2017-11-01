@@ -29,9 +29,9 @@ $(document).ready(function() {
       .then(function(){
         return screenTopWarning('发送成功！');
       })
-      .catch(fucntion(){
-
-    })
+      .then(function(err){
+        return screenTopWarning('发送失败： ' + err);
+      })
   })
 });
 
