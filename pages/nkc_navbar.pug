@@ -57,7 +57,7 @@ div
             if data.permittedOperations.viewSMS
               a(href='/sms')
                 span 信
-              
+
                 if data.user.new_message
                   -var new_message = data.user.new_message
                   -var messageSum = (new_message.messages || 0) + (new_message.system || 0) + (new_message.at || 0) + (new_message.replies || 0);

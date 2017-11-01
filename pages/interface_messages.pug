@@ -149,7 +149,7 @@ block content
               -for(var i = 0 ; i < docs.length; i++)
                 -var newMesNum = 0;
                 -for(var j = 0; j < docs[i].group.length; j++)
-                  -if(!docs[i].group[j].viewed && docs[i].group[j].r == data.user._key)
+                  -if(!docs[i].group[j].viewed && docs[i].group[j].r == data.user.uid)
                     -newMesNum++;
                   -else
                     -continue;
@@ -158,15 +158,15 @@ block content
                 .media(style='margin:0;')
                   span #{docs[i].group[0].toc.toLocaleString()}
                   .media-left.media-top
-                    a(href=`/m/${docs[i].conversation.uid}`)
-                      img.media-object.img-rounded(src=`/avatar/${docs[i].conversation.uid}`,style='height:3em;width:3em;')
+                    a(href=`/m/${docs[i].targetUser.uid}`)
+                      img.media-object.img-rounded(src=`/avatar/${docs[i].targetUser.uid}`,style='height:3em;width:3em;')
                   .media-body
                     h4.media-heading
-                      a(href=`/sms?&tab=messages&conversation=${docs[i].conversation.uid}`) #{docs[i].conversation.username}
+                      a(href=`/sms?&tab=messages&targetUser=${docs[i].targetUser.uid}`) #{docs[i].targetUser.username}
                       -if(newMesNum > 0)
                         span.reddish (#{newMesNum})
                       span :
-                      a(style='font-size:0.85em;float:right;',href=`/sms?&tab=messages&conversation=${docs[i].conversation.uid}`) 查看聊天信息
+                      a(style='font-size:0.85em;float:right;',href=`/sms?&tab=messages&targetUser=${docs[i].targetUser.uid}`) 查看聊天信息
                       p(style="font-size:0.8em; word-break:break-all;") #{docs[i].group[0].c}
               hr(style='margin:0.5em 0;')
           -else
