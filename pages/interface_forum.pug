@@ -28,7 +28,7 @@ block title
     }
 
 block content   
-  -var isModerator = data.permittedOperations.moveThread
+  -var isModerator = data.ensurePermission('PATCH', '/t/x')
   -var forumIsParent = data.forum.type&&data.forum.type=='category'
   -var hasChildren = data.forum.type&&data.forum.type=='category'&&data.forums&&data.forums.length
   
@@ -49,28 +49,28 @@ block content
                   //img(src='http://bbs.kechuang.org/themes/site/dingzhi/images/logo.png')
                   if(data.forum.fid)
                     .ForumNavigation1(style='margin-bottom:5px;')
-                      each group,index in data.forumlist
-
-                        -var gpf = group.parentforum
-                        if gpf._key == data.forum.parentid
-
-                          -var gpf = group.parentforum
-                          -var name = gpf.display_name
-                          -gpf.color = gpf.color||'#aaa'
-                          -var url = '/f/'+gpf._key
-
-                          -var stylestr = 'color:'+gpf.color
-
-                          a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
-
-                          each f,findex in group.forumgroup
-                            -var backcolor=f.color||gpf.color
-                            -var name = f.display_name
-                            -var url = '/f/'+f._key
-
-                            -var active = f._key==data.forum.fid
-                            -var stylestr = active?'background-color:'+backcolor:''
-                            a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
+                      //each group,index in data.forumlist
+                      //
+                      //  -var gpf = group.parentforum
+                      //  if gpf._key == data.forum.parentid
+                      //
+                      //    -var gpf = group.parentforum
+                      //    -var name = gpf.display_name
+                      //    -gpf.color = gpf.color||'#aaa'
+                      //    -var url = '/f/'+gpf._key
+                      //
+                      //    -var stylestr = 'color:'+gpf.color
+                      //
+                      //    a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
+                      //
+                      //    each f,findex in group.forumgroup
+                      //      -var backcolor=f.color||gpf.color
+                      //      -var name = f.display_name
+                      //      -var url = '/f/'+f._key
+                      //
+                      //      -var active = f._key==data.forum.fid
+                      //      -var stylestr = active?'background-color:'+backcolor:''
+                      //      a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
                       
                   
                   -var forum = data.forum
@@ -157,20 +157,20 @@ block content
 
                     .form-inline(style='margin-top:10px')
 
-                      if data.permittedOperations.addThreadToCollection
+                      if data.ensurePermission('POST', '/u/*/collections')
                         .form-group
                           button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
 
                       .form-group
                         button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
                       .form-group
-                        include forumlist_dropdown.pug
+                        //include forumlist_dropdown.pug
                         button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
 
                       .form-group
                         button#recyclebtn.btn.btn-xs.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
 
-                      if data.permittedOperations.modifyThreadType
+                      if data.ensurePermission('PATCH', '/t/x')
                         -var ffid = data.forum.fid
                         button(onclick="renameForumCategory('#{ffid}')") 重命名分类
                         button(onclick="addForumCategory('#{ffid}')") 增加分类
@@ -194,27 +194,27 @@ block content
 
                     ul.pagination.NavigationPaging
                       - var page = paging?paging.page:null
-                      li(class="#{class_str_all}")
-                        a(href='#{toQueryString({cat})}') 俱
+                      li(class=`${class_str_all}`)
+                        a(href=`${toQueryString({cat})}`) 俱
 
-                      li(class="#{class_str_digest}")
-                        a(href='#{toQueryString({cat, digest: true})}') 精
+                      li(class=`${class_str_digest}`)
+                        a(href=`${toQueryString({cat, digest: true})}`) 精
 
                     ul.pagination.NavigationPaging
-                      li(class='#{class_str_sortby_tlm}')
-                        a(href='#{toQueryString({cat, digest})}') 复序
-                      li(class='#{class_str_sortby_toc}')
-                        a(href='#{toQueryString({cat, digest, sortby: "toc"})}') 帖序
+                      li(class=`${class_str_sortby_tlm}`)
+                        a(href=`${toQueryString({cat, digest})}`) 复序
+                      li(class=`${class_str_sortby_toc}`)
+                        a(href=`${toQueryString({cat, digest, sortby: "toc"})}`) 帖序
 
 
                   hr.hrNarrowSpace
 
-              if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
-                .ForumThreadList
-                  each thread,index in data.toppedThreads
-                    include interface_forum_singlethread.pug
-                //hr.hrNarrowSpace
-                .ForumToppedSplitter - 以上是置顶 -
+              //if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
+              //  .ForumThreadList
+              //    each thread,index in data.toppedThreads
+              //      include interface_forum_singlethread.pug
+              //  //hr.hrNarrowSpace
+              //  .ForumToppedSplitter - 以上是置顶 -
 
               .ForumThreadList
                 each thread,index in data.threads
@@ -267,8 +267,8 @@ block content
               a(href='/m/#{data.user._key}') 我的主题
               br
               br
-              for thread in data.userThreads
-                include interface_users_latest_threads
+              //for thread in data.userThreads
+              //  include interface_users_latest_threads
 
           .nkcpanel
             ul.HomeFriendlyLink

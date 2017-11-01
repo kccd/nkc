@@ -16,7 +16,6 @@ forumRouter
     const threads = await forum.getThreadsByQuery(query);
     data.forum = forum;
     data.threads = threads;
-    console.log(threads);
     await next()
   });
 

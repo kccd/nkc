@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const {getQueryObj} = require('../nkcModules/apiFunction');
 
 const threadSchema = new Schema({
   tid: {
@@ -106,4 +107,15 @@ threadSchema.pre('save', function (next) {
   }
   next();
 });
+
+threadSchema.methods.getPostsByQuery = function(query) {
+  const {$match, $sort, $skip, $limit} = getQueryObj(query);
+  return mongoose.connection.db.collection('posts').aggregate([
+    {$match},
+    {$sort},
+    {$skip},
+    {$limit},
+  ]).toArray()
+};
+
 module.exports = mongoose.model('threads', threadSchema);
