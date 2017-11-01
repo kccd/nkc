@@ -30,7 +30,7 @@ $(document).ready(function() {
         return screenTopWarning('发送成功！');
       })
       .catch(fucntion(){
-        
+
     })
   })
 });

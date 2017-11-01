@@ -10,17 +10,22 @@ threadRouter
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
     const {tid} = params;
-    const {ThreadModel, PersonalForumModel} = db;
+    const {ThreadModel, PersonalForumModel, ForumModel} = db;
     ctx.template = 'interface_thread.pug';
-    const thread = await ThreadModel.findOne({tid});
+    const thread = await ThreadModel.findOnly({tid});
     const {mid, toMid} = thread;
     data.posts = await thread.getPostsByQuery(query);
     data.thread = thread;
-    console.log(mid, toMid);
-    if(mid !== '')
-      data.myForum = await PersonalForumModel.findOne({uid: mid});
-    if(toMid !== '')
-      data.OthersForum = await PersonalForumModel.findOne({uid: toMid});
+    let myForum, othersForum;
+    if(mid !== '') {
+      myForum = await PersonalForumModel.findOnly({uid: mid});
+      data.myForum = myForum
+    }
+    if(toMid !== '') {
+      othersForum = await PersonalForumModel.findOnly({uid: toMid});
+      data.othersForum = othersForum
+    }
+    data.forum = await ForumModel.findOnly({fid: thread.fid});
     await next();
   })
   .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
