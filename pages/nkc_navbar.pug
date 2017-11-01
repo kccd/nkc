@@ -62,9 +62,10 @@ div
                     if(messageSum > 0)
                       span.reddish (#{messageSum})
             
-            if data.permittedOperations
-              if data.permittedOperations.viewExperimental
-                a(href='/experimental' title='管理界面') 管
+            //if data.permittedOperations
+            -const experimental = '/e'
+              if data.ensurePermission('GET', experimental)
+                a(href='/e' title='管理界面') 管
             
             a(href=`/u/${data.user.uid}/collections/null` title='我的珍藏') 藏
             

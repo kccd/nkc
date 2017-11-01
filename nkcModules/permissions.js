@@ -171,8 +171,17 @@ const certificates ={
       },
       m: {
         [GET]: true,
-        [parameter]: {
-          [POST]: true,
+        password: {
+          [name]: '修改密码',
+          [PUT]: true
+        },
+        personalsetting: {
+          [name]: '修改个人资料',
+          [PUT]: true
+        },
+        mobile: {
+          [name]: '绑定手机',
+          [POST]: true
         }
       },
       t: {
@@ -272,6 +281,9 @@ const certificates ={
     inheritFrom: ['default'],
     contentClasses: {
       professional: true
+    },
+    permittedOperations: {
+
     }
   },
   qc: {
@@ -308,7 +320,7 @@ const certificates ={
       classified: true
     },
     permittedOperations: {
-      experimental: {
+      e: {
         [name]: '管理页面',
         [GET]: true,
         behavior: {
@@ -319,6 +331,10 @@ const certificates ={
           [name]: '管理车',
           [GET]: true,
           [POST]: true
+        },
+        newUsers: {
+          [name]: '新注册用户',
+          [GET]: true
         }
       },
       u: {
@@ -400,9 +416,10 @@ const certificates ={
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
-      experimental: {
-        sysinfo: {
+      e: {
+        newSysinfo: {
           [name]: '系统通知',
+          [GET]: true,
           [POST]: true
         }
       }

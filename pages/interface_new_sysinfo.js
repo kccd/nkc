@@ -14,6 +14,25 @@ $(document).ready(function() {
     var parsedTitle = geid('parsedtitle');
     parsedTitle.innerHTML = title.value;
   })
+  $('#submit').on('click', function(){
+    var userObj = {
+      title: $('#title').val(),
+      content: $('#content').val()
+    };
+    if(!userObj.title) {
+      return screenTopWarning('标题不能为空！');
+    }
+    if(!userObj.content) {
+      return screenTopWarning('内容不能为空！');
+    }
+    nkcAPI('/e/newSysinfo','post',userObj)
+      .then(function(){
+        return screenTopWarning('发送成功！');
+      })
+      .catch(fucntion(){
+        
+    })
+  })
 });
 
 function get_selection(the_id)

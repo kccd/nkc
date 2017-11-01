@@ -7,7 +7,9 @@ const experimentalRouter = new Router();
 
 experimentalRouter
   .get('/', async (ctx, next) => {
-    ctx.data.forumList = await dbFn.forumList();
+    let forumList = await dbFn.getAvailableForums(ctx);
+    ctx.data.forumList = forumList;
+    ctx.data.forumTree = forumList;
     ctx.template = 'interface_experimental.pug';
     await next();
   })
@@ -40,6 +42,10 @@ experimentalRouter
     ctx.data.page = paging;
     ctx.data.users = userArr;
     ctx.template = 'interface_new_users.pug';
+    await next();
+  })
+  .get('/newSysinfo', async (ctx, next) => {
+    ctx.template = 'interface_new_sysinfo.pug';
     await next();
   });
   // .use('/set', setRouter.routes(), setRouter.allowedMethods())

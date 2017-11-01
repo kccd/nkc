@@ -34,7 +34,7 @@ block content
                   button.btn.btn-default.center-block#btnSwitch(onclick='showBtn()',style='margin:1em auto;') 修改头像
             .col-xs-7.col-md-7
               .col-xs-12.col-md-12
-                div.f12!= data.user.navbarDesc
+                div.f12!= data.user.navbarDesc.replace(/\n/g, '<br>')
               .col-xs-12.col-md-6
                 a.btn.btn-default.left-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.5em auto;') 查看个人专栏
               .col-xs-12.col-md-6
@@ -205,15 +205,15 @@ block scripts
         newPassword:geid('newpassword').value,
         newPassword2:geid('newpassword2').value
       };
-      if(passwordObj.oldpassword == ''){
+      if(passwordObj.oldPassword == ''){
         jwarning('旧密码不能为空！');
         return;
       }
-      if(passwordObj.newpassword == '' || passwordObj.newpassword2 == ''){
+      if(passwordObj.newPassword == '' || passwordObj.newPassword2 == ''){
         jwarning('新密码不能为空！');
         return;
       }
-      if(passwordObj.newpassword != passwordObj.newpassword2){
+      if(passwordObj.newPassword != passwordObj.newPassword2){
         jwarning('两次输入的密码不一致！请重新输入');
         return;
       }

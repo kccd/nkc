@@ -22,7 +22,7 @@ meRouter
     ctx.data.user.subscribeForums = subscribeForums;
     ctx.data.forumList = await dbFn.getAvailableForums(ctx);
     let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-    if(userPersonal.mobile) ctx.data.user.mobile = (userPersonal.mobile).replace('00', '+');
+    if(userPersonal.mobile) ctx.data.user.mobile = (userPersonal.mobile.slice(0,3) === '0086')? userPersonal.mobile.replace('0086', '+86'): userPersonal.mobile;
     ctx.template = 'interface_me.pug';
     await next();
   })
@@ -34,6 +34,8 @@ meRouter
     let db = ctx.db;
     let params = ctx.body;
     let user = ctx.data.user;
+    if(!params.oldPassword) ctx.throw(400, '旧密码不能为空');
+    if(!params.newPassword || !params.newPassword2) ctx.throw(400, '新密码不能为空');
     if(params.newPassword !== params.newPassword2) ctx.throw(400, '两次输入的密码不一致！请重新输入');
     let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
     if(!apiFn.testPassword(params.oldPassword, userPersonal.hashType, userPersonal.password)){
