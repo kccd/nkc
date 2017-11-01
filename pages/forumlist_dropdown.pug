@@ -1,12 +1,12 @@
 select#TargetForum
-  each fg in data.forumlist
+  each fg in data.forumList
     if listParent
-      option #{fg.parentforum._key}:#{fg.parentforum.display_name} ====
+      option #{fg.parentForum.fid}:#{fg.parentForum.displayName} ====
     else
       option ----
-    each f in fg.forumgroup
-      -var selected = (data.forum&&data.forum._key&&data.forum._key===f._key)||(data.doc&&data.doc._key===f._key)
+    each f in fg.forumGroup
+      -var selected = (data.forum&&data.forum.fid&&data.forum.fid===f.fid)||(data.doc&&data.doc._key===f.fid)
       if selected
-        option(selected) #{f._key}:#{f.display_name}
+        option(selected) #{f.fid}:#{f.displayName}
       else
-        option #{f._key}:#{f.display_name}
+        option #{f.fid}:#{f.displayName}

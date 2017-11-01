@@ -46,6 +46,14 @@ let emailRegiserSchema = new Schema({
   regCode: {
     type: String,
     required: true
+  },
+  regIP: {
+    type: String,
+    default: '0.0.0.0'
+  },
+  regPort: {
+    type: String,
+    default: '0'
   }
 });
 

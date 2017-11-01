@@ -41,6 +41,7 @@ let pugRender = (template, data) => {
     fromNow: fromNow,
     server: settings.server,
     plain:render.plain_render,
+    experimental_render:render.experimental_render,
 
   };
   options.data = data;

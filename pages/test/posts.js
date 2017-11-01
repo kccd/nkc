@@ -62,7 +62,7 @@ let postsSchema = new Schema({
     index: 1
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },

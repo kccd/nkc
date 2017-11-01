@@ -5,15 +5,22 @@ let Schema = mongoose.Schema;
 
 db = require('arangojs')('http://192.168.11.11');
 db.useDatabase('rescue');
-
 let smsSchema = new Schema({
+  sid: {
+    type: Number,
+    required: true
+  },
   c: {
     type: String,
-    required: true
+    default: ''
   },
   ip: {
     type: String,
     default: '0.0.0.0'
+  },
+  port: {
+    type: String,
+    default: '0'
   },
   r: {
     type: String,
@@ -22,16 +29,35 @@ let smsSchema = new Schema({
   },
   s: {
     type: String,
-    required: true,
+    default: '',
     index: 1
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   viewed: {
     type: Boolean,
     default: false
+  },
+  fromSystem: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  systemContent: {
+    title: {
+      type: String,
+      default: ''
+    },
+    content: {
+      type: String,
+      default: ''
+    }
+  },
+  viewedUsers: {
+    type: [String],
+    default: []
   }
 });
 
@@ -50,6 +76,18 @@ return db.query(`
 .then((res) => {
   for(var i = 0; i < res.length; i++){
     res[i]._id = undefined;
+    let sms = res[i];
+    res[i].sid = i+1;
+    if(sms.s === 'system' && typeof(sms.c) === 'object' && typeof(sms.viewed === 'array')) {
+      console.log(sms);
+      res[i].fromSystem = true;
+      res[i].systemContent = sms.c;
+      res[i].viewedUsers = sms.viewed;
+      res[i].s = '';
+      res[i].c = '';
+      res[i].viewed = false;
+      console.log(res[i]);
+    }
   }
   console.log('开始写入数据');
   let n = 0;

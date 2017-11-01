@@ -144,6 +144,7 @@ const certificates ={
       },
       sms: {
         [name]: '信息',
+        [GET]: true,
         at: {
           [name]: '@',
           [GET]: true
@@ -162,7 +163,10 @@ const certificates ={
         },
         system: {
           [name]: '系统',
-          [GET]: true
+          [GET]: true,
+          [parameter]: {
+            [GET]: true
+          }
         }
       },
       m: {

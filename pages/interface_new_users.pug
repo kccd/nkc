@@ -1,8 +1,7 @@
 extends bootstrap_base.pug
--console.log(data);
 block title
   title 最新用户
-  meta#replytarget(value='#{data.replytarget}')
+  meta#replytarget(value=`${data.replytarget}`)
 
 block content
   -function changeTime(value)
@@ -18,19 +17,19 @@ block content
     .rom
       .col-xs-12.col-md-12
         nav(aria-label='navigation')
-          -if(data.page.pagecount > 1)
+          -if(data.page.pageCount > 1)
             ul.pagination
               //- 当前页数若大于4则显示首页按钮
               //- 若总的分页数小于7则不需要显示首页和尾页按钮
-              -if(data.page.page > 4 && data.page.pagecount > 7)
+              -if(data.page.page > 4 && data.page.pageCount > 7)
                 li
-                  a(href='/newusers?&page=1') 首
+                  a(href='/e/newUsers?page=1') 首
               //- n为总共需要显示的分页按钮个数
               //- i为循环中当前生成的页数
               -var n = 7;
-              -var min = data.page.pagecount - 3;
+              -var min = data.page.pageCount - 3;
               -if(data.page.page > min)
-                -min = data.page.pagecount - 6;
+                -min = data.page.pageCount - 6;
               -else
                 -min = data.page.page - 3;
               -for(var i = min ; 1 ; i++)
@@ -38,7 +37,7 @@ block content
                   -break;
                 -if(i <= 0)
                   -continue;
-                -if(i > data.page.pagecount)
+                -if(i > data.page.pageCount)
                   -break;
                 //- 生成当前所在分页按钮时，有蓝色背景，不可点击
                 -if(i == data.page.page)
@@ -46,12 +45,12 @@ block content
                     a(href='javscript:void(0)') #{i}
                 -else
                   li
-                    a(href='/newusers?&page=#{i}') #{i}
+                    a(href=`/e/newUsers?page=${i}`) #{i}
                 -n--;
                 //- 当前页数若小于 最大分页数-3 则显示尾页按钮
-              -if(data.page.page < data.page.pagecount - 3 && data.page.pagecount > 7)
+              -if(data.page.page < data.page.pageCount - 3 && data.page.pageCount > 7)
                 li
-                  a(href='/newusers?&page=#{data.page.pagecount}') 末
+                  a(href=`/e/newUsers?page=${data.page.pageCount}`) 末
     .row
       .col-xs-12
         table.table.table-hover.table-condensed
@@ -69,11 +68,11 @@ block content
             for user in data.users
               tr
                 td
-                  a(href='/m/#{user._key}') #{user.username}
+                  a(href=`/u/${user.uid}`) #{user.username}
                 td #{user.certs.indexOf('mobile') > -1 ? '手机' : '邮箱'}
-                td #{changeTime(user.toc)}
-                td #{changeTime(user.tlv)}
-                -if(user.regIP && user.regPort)
+                td #{(user.toc).toLocaleString()}
+                td #{(user.tlv).toLocaleString()}
+                -if(user.regIP || user.regPort)
                   td #{user.regIP}:#{user.regPort}
                 -else
                   td 0.0.0.0:0000
@@ -82,19 +81,19 @@ block content
     .rom
       .col-xs-12.col-md-12
         nav(aria-label='navigation')
-          -if(data.page.pagecount > 1)
+          -if(data.page.pageCount > 1)
             ul.pagination
               //- 当前页数若大于4则显示首页按钮
               //- 若总的分页数小于7则不需要显示首页和尾页按钮
-              -if(data.page.page > 4 && data.page.pagecount > 7)
+              -if(data.page.page > 4 && data.page.pageCount > 7)
                 li
-                  a(href='/newusers?&page=1') 首
+                  a(href='/e/newUsers?page=1') 首
               //- n为总共需要显示的分页按钮个数
               //- i为循环中当前生成的页数
               -var n = 7;
-              -var min = data.page.pagecount - 3;
+              -var min = data.page.pageCount - 3;
               -if(data.page.page > min)
-                -min = data.page.pagecount - 6;
+                -min = data.page.pageCount - 6;
               -else
                 -min = data.page.page - 3;
               -for(var i = min ; 1 ; i++)
@@ -102,7 +101,7 @@ block content
                   -break;
                 -if(i <= 0)
                   -continue;
-                -if(i > data.page.pagecount)
+                -if(i > data.page.pageCount)
                   -break;
                 //- 生成当前所在分页按钮时，有蓝色背景，不可点击
                 -if(i == data.page.page)
@@ -110,9 +109,9 @@ block content
                     a(href='javscript:void(0)') #{i}
                 -else
                   li
-                    a(href='/newusers?&page=#{i}') #{i}
+                    a(href=`/e/newUsers?page=${i}`) #{i}
                 -n--;
                 //- 当前页数若小于 最大分页数-3 则显示尾页按钮
-              -if(data.page.page < data.page.pagecount - 3 && data.page.pagecount > 7)
+              -if(data.page.page < data.page.pageCount - 3 && data.page.pageCount > 7)
                 li
-                  a(href='/newusers?&page=#{data.page.pagecount}') 末
+                  a(href=`/e/newUsers?page=${data.page.pageCount}`) 末

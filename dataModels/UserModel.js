@@ -10,7 +10,6 @@ const userSchema = new Schema({
   },
   toc: {
     type: Date,
-    required: true,
     default: Date.now
   },
   xsf: {
@@ -18,9 +17,8 @@ const userSchema = new Schema({
     default: 0
   },
   tlv: {
-    type: Number,
+    type: Date,
     default: Date.now,
-    required: true
   },
   disabledPostsCount: {
     type: Number,

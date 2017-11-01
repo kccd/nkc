@@ -120,7 +120,7 @@ let users_personalSchema = new Schema({
       default: 0
     }
   },
-  regIp: {
+  regIP: {
     type: String,
     default: '0.0.0.0'
   },
@@ -165,6 +165,26 @@ db.query(`
     })
 })
 .then((res) => {
+  return db.query(`
+    for u in users
+    filter u.regIP
+    return u
+  `)
+    .then(cursor => cursor.all())
+    .then(data => {
+      for (let u of data) {
+        for (let per of res) {
+          if(u._key === per._key){
+            per.regip = u.regIP
+            per.regPort = u.regPort
+            console.log('ip: '+per.regip +'<<<'+ u.regIP);
+          }
+        }
+      }
+      return res;
+    })
+})
+.then((res) => {
   for(var i = 0; i < res.length; i++){
     if(!res[i].password.hasOwnProperty('hash')){
       var salt = Math.floor((Math.random() * 65536)).toString(16);
@@ -190,7 +210,7 @@ db.query(`
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
-    res[i].regIp = res[i].regip;
+    res[i].regIP = res[i].regip;
     res[i].newMessage = res[i].new_message;
     res[i].lastTry = res[i].lasttry;
     if(res[i].hashtype) {

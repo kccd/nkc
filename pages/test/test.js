@@ -9,8 +9,18 @@ let ASchema = new Schema({
   },
   age: {
     type: Number
+  },
+  time: {
+    type:Date,
+    default: Date.now
   }
 });
+ASchema.methods.getTime = function(){
+  let time = this.time;
+  let newTime = new Date(time);
+  return newTime.getTime();
+}
+
 
 let a = mongoose.model('mongoose', ASchema, 'mongoose');
 
@@ -18,8 +28,9 @@ let a = mongoose.model('mongoose', ASchema, 'mongoose');
 
 
 (async function() {
-  let Obj = await a.findOneAndRemove({name: '1'});
-  console.log(JSON.stringify(Obj));
+  await a.replaceOne({name: '1'}, {$set: {time: new Date()}})
+  /*let Obj = await a.findOneAndRemove({name: '1'});
+  console.log(JSON.stringify(Obj));*/
   /*for (let i = 0; i < 100; i++) {
     new a({
       name: i.toString(),
@@ -27,4 +38,8 @@ let a = mongoose.model('mongoose', ASchema, 'mongoose');
     })
       .save();
   }*/
+  let aaa = await a.findOne({name: "1"});
+  //let time = aaa.getTime();
+  console.log(aaa.time);
+  console.log(new Date(new Date(aaa.time).getTime()))
 })();

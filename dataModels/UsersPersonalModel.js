@@ -54,7 +54,7 @@ const usersPersonalSchema = new Schema({
       default: 0
     }
   },
-  regIp: {
+  regIP: {
     type: String,
     default: '0.0.0.0'
   },
