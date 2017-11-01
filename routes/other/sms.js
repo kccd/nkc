@@ -15,7 +15,7 @@ smsRouter
     let repliesLength = replies.length;
     let paging = apiFn.paging(page, repliesLength);
     let start = paging.start;
-    replies = replies.slice(start, start+perpage);
+    replies = replies.slice(start, start + perpage);
     let replieArr = [];
     for (let replie of replies) {
       let fromUser = {};
@@ -32,7 +32,6 @@ smsRouter
         toPost
       });
     }
-    console.log(replieArr)
     ctx.data.docs = replieArr;
     let pageCount = Math.ceil(repliesLength/perpage);
     ctx.data.paging = paging;
@@ -49,7 +48,7 @@ smsRouter
     let atsLength = ats.length;
     let paging = apiFn.paging(page, atsLength);
     let start = paging.start;
-    ats = ats.slice(start, start+perpage);
+    ats = ats.slice(start, start + perpage);
     let atsArr = [];
     for (let at of ats) {
       let post = await db.PostModel.findOne({pid: at.pid});
@@ -74,7 +73,7 @@ smsRouter
   })
   .get('/message', async (ctx, next) => {
     //conversation
-    /*let {user} = ctx.data;
+    let {user} = ctx.data;
     let {db} = ctx;
     let page = ctx.query.page || 0;
     let rUser = await SmsModel.aggregate([
@@ -82,21 +81,65 @@ smsRouter
       {$group: {_id: '$r', r: {$push: {}}}}
     ]);
     console.log(rUser);
-    let messages = await SmsModel.find().or([{r: user.uid}, {s: user.uid}]).sort({toc: -1});
+    let messages = await db.SmsModel.find().or([{r: user.uid}, {s: user.uid}]).sort({toc: -1});
     let docs = [];
     for (let i of messages) {
       let uid = (i.r === user.uid)? i.s: i.r;
-      let targetUser = await UserModel.findOne({uid: uid});
-      for
+      let targetUser = await db.UserModel.findOne({uid: uid});
+
     }
     let messagesLength = messages.length;
     let paging = apiFn.paging(page, messagesLength);
     let start = paging.start;
-    messages = messages.slice(start, start+perpage);
+    messages = messages.slice(start, start + perpage);
     let messagesArr = {};
     for (let i of messages) {
-      let
-    }*/
+
+    }
+  })
+  .get('/message/:uid', async (ctx, next) => {
+    let {user} = ctx.data;
+    let {uid} = ctx.params;
+    let {db} = ctx;
+    let page = ctx.query.page || 0;
+    let targetUser = await db.UserModel.findOne({uid: uid});
+    let messageOfUser = await db.SmsModel.find().and([{fromSystem: false, }, {$or: [{s: user.uid, r: targetUser.uid}, {s: targetUser.uid, r: user.uid}]}]).sort({toc: -1});
+    let paging = apiFn.paging(page, messageOfUser.length);
+    let start = paging.start;
+    let messageArr = messageOfUser.slice(start, start + perpage);
+    let findUserByUid = (uid) => {
+      if(uid === user.uid) return user;
+      if(uid === targetUser.uid) return targetUser;
+      ctx.throw(500, '服务器查询聊天记录出错。');
+    };
+    for (let i = 0; i < messageArr.length; i++) {
+      messageArr[i] = messageArr[i].toObject();
+      messageArr[i].s = findUserByUid(messageArr[i].s);
+      messageArr[i].r = findUserByUid(messageArr[i].r);
+    }
+    ctx.data.paging = paging;
+    ctx.data.docs = messageArr;
+    ctx.data.targetUser = targetUser;
+    ctx.template = 'interface_messages.pug';
+    ctx.data.tab = 'message';
+    for (let m of messageOfUser) {
+      //console.log(m);
+    }
+    await next();
+  })
+  .post('/message', async (ctx, next) => {
+    let {user} = ctx.data;
+    let {db} = ctx;
+    let {username, content} = ctx.body;
+    if(!username || !content) ctx.throw(400, '参数不完整。');
+    let targetUser = await db.UserModel.findOne({username: username});
+    if(!targetUser) ctx.throw(400, '该用户不存在，请检查用户名是否输入正确');
+    let newSms = new SmsModel({
+      s: user.uid,
+      r: targetUser.uid,
+      c: content,
+      // port:
+    });
   })
   .get('/system', async (ctx, next) => {
     let {user} = ctx.data;
@@ -105,7 +148,7 @@ smsRouter
     let systemMessages = await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
     let paging = apiFn.paging(page, systemMessages.length);
     let start = paging.start;
-    systemMessageArr = systemMessages.slice(start, start+perpage);
+    systemMessageArr = systemMessages.slice(start, start + perpage);
     ctx.data.docs = systemMessageArr;
     ctx.data.paging = paging;
     ctx.data.tab = 'system';
