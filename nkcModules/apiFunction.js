@@ -4,7 +4,7 @@ let fn = {};
 
 fn.paging = (page, arrLength) => {
   return {
-    page: page,
+    page: parseInt(page),
     perpage: perpage,
     start: page*perpage,
     count: 65,

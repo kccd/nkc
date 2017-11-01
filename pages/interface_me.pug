@@ -143,11 +143,11 @@ block content
                 -for (var i = 0; i < forumlist.length; i++)
                   .col-xs-12.col-md-12
                     ul.list-inline(style='padding:0;')
-                      -if(forumlist[i].forumGroup.length != 0)
-                        li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].parentForum.displayName}
-                        -for (var j = 0; j < forumlist[i].forumGroup.length; j++)
+                      -if(forumlist[i].length != 0)
+                        li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].displayName}
+                        -for (var j = 0; j < forumlist[i].children.length; j++)
                           li(style='list-style:none;padding-left:0.5em;')
-                            a(href='###',onclick=`fillFocusId("${forumlist[i].forumGroup[j].fid}")`,style='color:#666;font-size:1em;') #{forumlist[i].forumGroup[j].fid + '：' + forumlist[i].forumGroup[j].displayName}
+                            a(href='###',onclick=`fillFocusId("${forumlist[i].children[j].fid}")`,style='color:#666;font-size:1em;') #{forumlist[i].children[j].fid + '：' + forumlist[i].children[j].displayName}
           .col-xs-12.col-md-12
             br
             br
