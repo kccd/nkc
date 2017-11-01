@@ -8,7 +8,7 @@ const repliesSchema = new Schema({
     required: true
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },
@@ -22,6 +22,5 @@ const repliesSchema = new Schema({
     index: 1
   }
 });
-
 
 module.exports = mongoose.model('replies', repliesSchema);

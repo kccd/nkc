@@ -21,6 +21,7 @@
   "dependencies": {
     "alidayu-node": "^1.0.3",
     "arangojs": "^5.7.0",
+    "cheerio": "^1.0.0-rc.2",
     "colors": "^1.1.2",
     "commonmark": "^0.28.1",
     "cookie-signature": "^1.0.6",

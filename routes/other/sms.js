@@ -20,7 +20,8 @@ smsRouter
     for (let replie of replies) {
       let fromUser = {};
       let fromPost = await db.PostModel.findOne({pid: replie.fromPid, disabled: false});
-      if(fromPost) fromUser = await db.UserModel.findOne({uid: fromPost.uid});
+      if(!fromPost) continue;
+      fromUser = await db.UserModel.findOne({uid: fromPost.uid});
       let toUser = await db.UserModel.findOne({uid: user.uid});
       let toPost = await db.PostModel.findOne({pid: replie.toPid});
       replieArr.push({
@@ -31,13 +32,13 @@ smsRouter
         toPost
       });
     }
+    console.log(replieArr)
     ctx.data.docs = replieArr;
     let pageCount = Math.ceil(repliesLength/perpage);
     ctx.data.paging = paging;
     ctx.data.tab = 'replies';
     ctx.template = 'interface_messages.pug';
     await dbFn.decrementPsnl(user.uid, 'replies');
-    console.log(ctx.data);
     await next();
   })
   .get('/at', async (ctx, next) => {
@@ -52,6 +53,7 @@ smsRouter
     let atsArr = [];
     for (let at of ats) {
       let post = await db.PostModel.findOne({pid: at.pid});
+      if(!post) continue;
       let user = await db.UserModel.findOne({uid: at.inviter});
       let thread = await db.ThreadModel.findOne({tid: post.tid});
       let oc = await db.PostModel.findOne({pid: thread.oc});
@@ -71,6 +73,7 @@ smsRouter
     await next();
   })
   .get('/message', async (ctx, next) => {
+    //conversation
     /*let {user} = ctx.data;
     let {db} = ctx;
     let page = ctx.query.page || 0;
@@ -94,6 +97,29 @@ smsRouter
     for (let i of messages) {
       let
     }*/
+  })
+  .get('/system', async (ctx, next) => {
+    let {user} = ctx.data;
+    let {db} = ctx;
+    let page = ctx.query.page || 0;
+    let systemMessages = await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
+    let paging = apiFn.paging(page, systemMessages.length);
+    let start = paging.start;
+    systemMessageArr = systemMessages.slice(start, start+perpage);
+    ctx.data.docs = systemMessageArr;
+    ctx.data.paging = paging;
+    ctx.data.tab = 'system';
+    ctx.template = 'interface_messages.pug';
+    await next();
+  })
+  .get('/system/:sid', async (ctx, next) => {
+    let {user} = ctx.data;
+    let {db} = ctx;
+    let {sid} = ctx.params;
+    ctx.data.docs = await db.SmsModel.findOneAndUpdate({sid: sid}, {$addToSet: {viewedUsers: user.uid}});
+    ctx.data.tab = 'system';
+    ctx.template = 'interface_messages.pug';
+    await next();
   });
 
 module.exports = smsRouter;

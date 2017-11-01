@@ -21,7 +21,8 @@ const settingSchema = new Schema({
     threadTypes: Number,
     threads: Number,
     questions:Number,
-    collections: Number
+    collections: Number,
+    sms: Number
   }
 });
 
