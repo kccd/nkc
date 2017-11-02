@@ -23,13 +23,27 @@ subscribeRouter
     ctx.data = data;
     await next()
   })
+  // 关注该用户
   .post('/', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data = `关注${uid}`;
+    let {uid} = ctx.params;
+    if(!uid) ctx.throw(400, '参数不正确');
+    let {db} = ctx;
+    let {user} = ctx.data;
+    await db.UserSubscribeModel.replaceOne({uid: uid}, {$addToSet: {subscribers: user.uid}});
+    await db.UserSubscribeModel.replaceOne({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
+    ctx.data.message = `关注 uid:${uid} 成功`;
+    await next();
   })
+  // 取消关注该用户
   .del('/', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data = `取消关注${uid}`;
+    let {uid} = ctx.params;
+    if(!uid) ctx.throw(400, '参数不正确');
+    let {db} = ctx;
+    let {user} = ctx.data;
+    await db.UserSubscribeModel.replaceOne({uid: uid}, {$pull: {subscribers: user.uid}});
+    await db.UserSubscribeModel.replaceOne({uid: user.uid}, {$pull: {subscribeUsers: uid}});
+    ctx.data.message = `取消关注 uid:${uid} 成功`;
+    await next();
   });
 
 module.exports = subscribeRouter;

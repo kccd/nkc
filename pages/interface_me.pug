@@ -145,9 +145,10 @@ block content
                     ul.list-inline(style='padding:0;')
                       -if(forumlist[i].length != 0)
                         li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].displayName}
-                        -for (var j = 0; j < forumlist[i].children.length; j++)
-                          li(style='list-style:none;padding-left:0.5em;')
-                            a(href='###',onclick=`fillFocusId("${forumlist[i].children[j].fid}")`,style='color:#666;font-size:1em;') #{forumlist[i].children[j].fid + '：' + forumlist[i].children[j].displayName}
+                        -if(forumlist[i].children)
+                          -for (var j = 0; j < forumlist[i].children.length; j++)
+                            li(style='list-style:none;padding-left:0.5em;')
+                              a(href='###',onclick=`fillFocusId("${forumlist[i].children[j].fid}")`,style='color:#666;font-size:1em;') #{forumlist[i].children[j].fid + '：' + forumlist[i].children[j].displayName}
           .col-xs-12.col-md-12
             br
             br

@@ -178,18 +178,7 @@ const certificates ={
         }
       },
       m: {
-        password: {
-          [name]: '修改密码',
-          [PUT]: true
-        },
-        personalsetting: {
-          [name]: '修改个人资料',
-          [PUT]: true
-        },
-        mobile: {
-          [name]: '绑定手机',
-          [POST]: true
-        }
+        [GET]: true
       },
       t: {
         [parameter]: {
@@ -230,12 +219,13 @@ const certificates ={
         }
       },
       u: {
+        [GET]: true, // 查看用户资料
         [parameter]: {
           subscribe: {
             [name]: '订阅',
             [GET]: true,
-            [POST]: true,
-            [DELETE]: true
+            [POST]: true, // 订阅该用户
+            [DELETE]: true // 取消订阅该用户
           },
           collections: {
             [name]: '收藏',
@@ -353,15 +343,12 @@ const certificates ={
         stats: {
           [name]: '统计',
           [GET]: true
-        }
+        },
       },
       u: {
-        [GET]: true,
         [parameter]: {
-          ban: {
-            [POST]: true,
-            [DELETE]: true
-          }
+          [DELETE]: true, // 封禁用户
+          [PUT]: true // 解封用户
         }
       },
       t: {

@@ -438,7 +438,7 @@ function subscribeUserSwitch(targetUid) {
     button[i].className = 'subscribeButton btn btn-sm disabled';
   }
   if(button[0].innerHTML === '关注') {
-    nkcAPI('subscribeUser', {targetUid: targetUid})
+    nkcAPI('/u/'+targetUid+'/subscribe', 'post', {})
       .then(function() {
         screenTopAlert('关注成功');
         for(var i = 0; i < button.length; i++){
@@ -453,7 +453,7 @@ function subscribeUserSwitch(targetUid) {
       })
   }
   else if(button[0].innerHTML === '取关') {
-    nkcAPI('unsubscribeUser', {targetUid: targetUid})
+    nkcAPI('/u/'+targetUid+'/subscribe', 'delete', {})
       .then(function() {
         screenTopAlert('成功取消关注');
         for(var i = 0; i < button.length; i++){

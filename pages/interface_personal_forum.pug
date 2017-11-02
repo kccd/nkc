@@ -113,9 +113,9 @@ block content
 
                     if data.permittedOperations.banUser
                       if data.targetUser.certs.indexOf('banned') > -1
-                        a(href='javascript:;' onclick='nkcAPI("unbanUser", {uid: "#{data.targetUser._key}"}).then(jalert).catch(jwarning)') 解除封禁
+                        a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'put', {}).then(jalert).catch(jwarning)`) 解除封禁
                       else
-                        a(href='javascript:;' onclick='nkcAPI("banUser", {uid: "#{data.targetUser._key}"}).then(jalert).catch(jwarning)') &nbsp;封禁此人&nbsp;
+                        a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(jalert).catch(jwarning)`) &nbsp;封禁此人&nbsp;
                     if data.permittedOperations['popPFSwitch']
                       -var isPopular = data.popPersonalForums.indexOf(forum._key) > -1
                       a#ppfBtn(href='javascript:;' onclick="popPFSwitch('#{data.forum._key}')") #{isPopular ? '取消热门' : '推至热门'}

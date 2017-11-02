@@ -11,29 +11,41 @@ userRouter
     await next();
   })
   .get('/:uid', async (ctx, next) => {
+    let {db} = ctx;
     const uid = ctx.params.uid;
-    ctx.data.message = `用户: ${uid}  的资料`;
+    ctx.data.message = await db.UserModel.findOne({uid: uid});
     ctx.template = 'user.pug';
     await next();
   })
   .del('/:uid', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data.message = `封禁用户: ${uid}`;
+    let {uid} = ctx.params;
+    let {db} = ctx;
+    let {user} = ctx.data;
+    let targetUser = await db.UserModel.findOnly({uid: uid});
+    let certs = targetUser.certs;
+    if(certs.indexOf('banned') > -1) ctx.throw(404, '该用户在你操作之前已经被封禁了，请刷新');
+    if(
+      certs.indexOf('moderator') >= 0 ||
+      certs.indexOf('editor') >= 0 ||
+      certs.indexOf('dev') >= 0 ||
+      certs.indexOf('scholar') >= 0 ||
+      targetUser.xsf > 0
+    ){
+      ctx.throw(404, '为什么？你为何要封禁此用户？你是怎么了？');
+    }
+    await db.UserModel.replaceOne({uid: targetUser.uid}, {$addToSet: {certs: 'banned'}});
+    ctx.data.message = `封禁用户 uid:${targetUser.uid}, username:${targetUser.username} 成功`;
     await next();
   })
   .put('/:uid', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data.message = `解封用户: ${uid}`;
-    await next();
-  })
-  .get('/:uid/column', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data.message = `用户: ${uid}  的专栏`;
-    await next();
-  })
-  .get('/:uid/collection', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data.message = `用户: ${uid}  的收藏`;
+    let {uid} = ctx.params;
+    let {db} = ctx;
+    let {user} = ctx.data;
+    let targetUser = await db.UserModel.findOnly({uid: uid});
+    let certs = targetUser.certs;
+    if(certs.indexOf('banned') === -1) ctx.throw(404, '该用户在你操作之前已经被解封了，请刷新');
+    await db.UserModel.replaceOne({uid: targetUser.uid}, {$pull: {certs: 'banned'}});
+    ctx.data.message = `解封用户 uid:${targetUser.uid}, username:${targetUser.username} 成功`;
     await next();
   })
   .post('/:uid/pop', async (ctx, next) => {
