@@ -180,6 +180,7 @@ fn.getAvailableForums = async ctx => {
       }
     }
   });
+  console.log(result)
   return result;
 };
 

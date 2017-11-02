@@ -13,7 +13,7 @@ let forumsSchema = new Schema({
   },
   class: {
     type: String,
-    default: 'none'
+    default: 'null'
   },
   color: {
     type: String,

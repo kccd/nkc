@@ -3,15 +3,15 @@
     .UserProfileSection1
       include interface_profile_avatar.pug
       -var user = thatuser
-      -var uid = thatuser._key
+      -var uid = thatuser.uid
       div(style='display:inline-block;margin-top:8px;')
         //.ForumTitleCircle(style='background-color:#{user.color||"#bbb"}')
         .ForumName #{user.username}&nbsp;&nbsp;&nbsp;
-          if(user._key != data.user._key)
-            if(data.user.subscribeUsers.indexOf(user._key) > -1)
-              a.btn.btn-sm.btn-danger(href='javascript:;' onclick='subscribeUserSwitch("#{uid}")')#subscribeButton 取关
+          if(user.uid != data.user.uid)
+            if(data.user.subscribeUsers.indexOf(user.uid) > -1)
+              a.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUserSwitch("${uid}")`)#subscribeButton 取关
             else
-              a.btn.btn-sm.btn-info(href='javascript:;' onclick='subscribeUserSwitch("#{uid}")')#subscribeButton 关注
+              a.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUserSwitch("${uid}")`)#subscribeButton 关注
     include interface_profile_info_section2.pug
           
   .col-xs-12.col-sm-6

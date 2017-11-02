@@ -3,8 +3,11 @@ html
   head
     title test
   body
-    input#value2(type='test')
-    input#submit(type='submit')
+    input#value2(type='test' placeholder='uid')
+    input#submit(type='submit' value='封禁')
+    input#submit2(type='submit' value='解封')
+    input#submit3(type='submit' value='关注')
+    input#submit4(type='submit' value='取消关注')
     br
     br
     br
@@ -41,22 +44,49 @@ html
     br
     script(src='jquery/jquery-1.11.1.js')
     script.
-      $('#submit').on('click', function() {
-        var data = {
-          regCode: $('#value2').val(),
-          areaCode: '+86',
-          username: '测试测试测试',
-          email: 'p_xigui@163.com',
-          password: '123123123',
-          password2: '123123123'
-        };
+      $('#submit').on('click', function () {
         $.ajax({
-          url: '/register/email',
-          type: 'post',
-          data: data
+          url: '/u/' + $('#value2').val(),
+          type: 'delete'
         })
           .done(function (data) {
-            console.log('success: ' + JSON.stringify(data));
+            console.log(data.message);
+          })
+          .fail(function (err) {
+            console.log('fail: ' + JSON.stringify(err));
+          });
+      })
+      $('#submit2').on('click', function () {
+        $.ajax({
+          url: '/u/' + $('#value2').val(),
+          type: 'put'
+        })
+          .done(function (data) {
+            console.log(data.message);
+          })
+          .fail(function (err) {
+            console.log('fail: ' + JSON.stringify(err));
+          });
+      })
+      $('#submit3').on('click', function () {
+        $.ajax({
+          url: '/u/' + $('#value2').val() + '/subscribe',
+          type: 'post'
+        })
+          .done(function (data) {
+            console.log(data.message);
+          })
+          .fail(function (err) {
+            console.log('fail: ' + JSON.stringify(err));
+          });
+      })
+      $('#submit4').on('click', function () {
+        $.ajax({
+          url: '/u/' + $('#value2').val() + '/subscribe',
+          type: 'delete'
+        })
+          .done(function (data) {
+            console.log(data.message);
           })
           .fail(function (err) {
             console.log('fail: ' + JSON.stringify(err));
