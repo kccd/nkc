@@ -14,22 +14,22 @@ div
         -var isActive = function(label){return (navbar_highlight==label)?'active':''}
         ul.pagination(style='margin-top:4px; margin-bottom:0px')
           if 0
-            li(class="#{isActive('tool')}")
+            li(class=`${isActive('tool')}`)
               a(href='/static/tools/index.htm' title='由论坛朋友贡献的工具箱') 工具
             
-          li(class="#{isActive('home')}")
+          li(class=`${isActive('home')}`)
             a(href='/' title='扫一眼') 首页
             
-          if data.user&&data.user._key
-            li(class="#{isActive('self')}")
+          if data.user&&data.user.uid
+            li(class=`${isActive('self')}`)
               a(href='/self' title='个人动态') 我的
             
         if 0
-          li(class="#{navbar.highlight=='editor'?'active':''}")
+          li(class=`${navbar.highlight=='editor'?'active':''}`)
             a(href='/e') 著
           
         if 0
-          li(class="#{navbar.highlight=='uploader'?'active':''}")
+          li(class=`${navbar.highlight=='uploader'?'active':''}`)
             a(href='#') 传
       
       .col-xs-7.col-sm-3

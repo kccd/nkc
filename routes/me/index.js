@@ -7,6 +7,7 @@ meRouter
   .get('/', async (ctx, next) => {
     let db = ctx.db;
     let user = ctx.data.user;
+    ctx.data.examinated = ctx.query.examinated;
     if(!user) {
       ctx.throw(401, '您还没有登陆，请登录后再试。');
     }

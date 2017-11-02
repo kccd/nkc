@@ -95,6 +95,7 @@ const certificates ={
       },
       register: {
         [name]: '注册',
+        [GET]: true,
         [parameter]: {
           [GET]: true,
           [POST]: true,
@@ -348,6 +349,10 @@ const certificates ={
         },
         newUsers: {
           [name]: '新注册用户',
+          [GET]: true
+        },
+        stats: {
+          [name]: '统计',
           [GET]: true
         }
       },

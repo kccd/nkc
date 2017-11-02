@@ -4,6 +4,8 @@ let dbFn = nkcModules.dbFunction;
 let apiFn = nkcModules.apiFunction;
 const experimentalRouter = new Router();
 
+let tlv = 0;
+let buffer = [];
 
 experimentalRouter
   .get('/', async (ctx, next) => {
@@ -82,6 +84,56 @@ experimentalRouter
     }
     let t = Date.now() - t1;
     console.log(`耗时： ${t}`);
+    await next();
+  })
+  .get('/stats', async (ctx, next) => {
+    let {json} = ctx.query;
+    if(!json) {
+      ctx.template = 'stats.pug';
+      return await next();
+    }
+    let {db} = ctx;
+    let {user} = ctx.data;
+    let dayStamps = [];
+    let today = Date.now();
+    dayStamps.push(today);
+    today = today - today % 86400000;
+    for (let i = 0; i < 240; i++) {
+      dayStamps.push(today - i*86400000)
+    }
+    if(tlv>Date.now()-10000)//within 10s
+    {
+      ctx.data.stats = buffer;
+      return await next();
+    }
+    dayStamps = dayStamps.sort((i1, i2) => i1 - i2);
+    let dayRanges = [];
+    for (let i = 0; i < dayStamps.length; i++) {
+      dayRanges.push({
+        start: dayStamps[i],
+        end: dayStamps[i+1]
+      });
+    }
+    let list = [];
+    for (let i = 0; i < dayRanges.length; i++) {
+      console.log(i);
+      let postCount = await db.PostModel.count({toc: {$gt: dayRanges[i].start, $lt: dayRanges[i].end}});
+      let postCountDisabled = await db.PostModel.count({toc: {$gt: dayRanges[i].start, $lt: dayRanges[i].end}, disabled: true});
+      let userRegistered = await db.UserModel.count({toc: {$gt: dayRanges[i].start, $lt: dayRanges[i].end}});
+      list.push({
+        start: dayRanges[i].start,
+        postCount,
+        postCountDisabled,
+        userRegistered
+      });
+    }
+    ctx.data.stats = list;
+    await next();
+  })
+  .get('/behaviors', async (ctx, next) => {
+    let {db} = ctx;
+
+    ctx.template = 'interface_behavior_log.pug';
     await next();
   });
 module.exports = experimentalRouter;
