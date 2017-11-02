@@ -219,6 +219,7 @@ const certificates ={
         }
       },
       u: {
+        [GET]: true, // 查看用户资料
         [parameter]: {
           subscribe: {
             [name]: '订阅',
@@ -345,7 +346,6 @@ const certificates ={
         },
       },
       u: {
-        [GET]: true,
         [parameter]: {
           [DELETE]: true, // 封禁用户
           [PUT]: true // 解封用户

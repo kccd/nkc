@@ -44,6 +44,18 @@ html
     br
     script(src='jquery/jquery-1.11.1.js')
     script.
+      function httpReq(url, type) {
+        $.ajax({
+          url: '/u/' + $('#value2').val(),
+          type: 'delete'
+        })
+          .done(function (data) {
+            console.log(data.message);
+          })
+          .fail(function (err) {
+            console.log('fail: ' + JSON.stringify(err));
+          });
+      }
       $('#submit').on('click', function () {
         $.ajax({
           url: '/u/' + $('#value2').val(),
