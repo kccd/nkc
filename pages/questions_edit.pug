@@ -21,6 +21,9 @@ block content
     .yellow {
       color:#da9900;
     }
+    .imgWidth100 .Qzone p img {
+      width: 100%;
+    }
   .container
     .row
       .col-xs-12.col-sm-6
@@ -60,7 +63,7 @@ block content
           .form-group.row
             .col-xs-7
               select#category.form-control()
-                if data.permittedOperations.listAllQuestions
+                if data.ensurePermission('GET', '/q')
                   //if user is administrative
                   each c in data.numberByCategory
                     option #{c.category||'null'}
@@ -129,7 +132,7 @@ block content
               
             //a(href='/api/questions?all=true' target='_blank') 下载JSON格式
             .panel.panel-default
-              .panel-body.post-body
+              .panel-body.post-body.imgWidth100
                 each q,index in data.questions
 
                   include questions_single.pug
