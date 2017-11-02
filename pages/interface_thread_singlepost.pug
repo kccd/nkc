@@ -8,8 +8,8 @@
 
   if !post.disabled || (post.disabled && po.enablePost)
     //horizontal line
-    hr(id='#{post._key}').ThreadSinglePostHr
-    //meta(id='#{post._key}')
+    hr(id=`${post._key}`).ThreadSinglePostHr
+    //meta(id=`${post._key}'`)
     - var uid = post.uid
     - var user = post.user
     //post itself
@@ -18,7 +18,7 @@
         div.fixThread
           div(style='float: left;')
             - var title = user?data.user.navbarDesc:''
-            a(href='/m/#{uid}' title='#{title}')
+            a(href='/m/#{uid}' title=`${title}`)
               img.ThreadPostAvatar(src='/avatar/#{post.uid}')
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
@@ -34,24 +34,24 @@
               -var recUsers = post.recUsers || []
               if data.user && post.uid != data.user._key
                 if recUsers.indexOf(data.user._key) > -1
-                  a(href='javascript:;' onclick='recommendPostSwitch(event, "#{post._key}")') 取消推荐
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post._key})`) 取消推荐
                 else
-                  a(href='javascript:;' onclick='recommendPostSwitch(event, "#{post._key}")') 推荐(#{recUsers.length})
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post._key})`) 推荐(#{recUsers.length})
 
               - if(postTo)
-                a(href="javascript:quotePost('#{post._key}')") 引用
+                a(href=`javascript:quotePost(${post._key})`) 引用
 
               - if(addPostToCart)
-                a(href="javascript:cartPost('#{post._key}')") 加入管理车
+                a(href=`javascript:cartPost(${post._key})`) 加入管理车
 
               - if(addCredit)
-                a(href="javascript:addCredit('#{post._key}')") 评学术分
+                a(href=`javascript:addCredit(${post._key})`) 评学术分
 
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user._key) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user._key))
-                a(href="javascript:disablePost('#{post._key}')") 屏蔽
+                a(href=`javascript:disablePost(${post._key})`) 屏蔽
 
               - if(post.tlm>post.toc && ensurePermission('GET', '/p/x/history'))
-                a(href="/post_history/#{post._key}") 历史
+                a(href=`/post_history/${post._key}`) 历史
 
               if data.user
                 - var user = data.user
@@ -65,17 +65,17 @@
 
                   if ipoc
                     - var queryforip = 'http://ip138.com/ips138.asp?ip='+ipoc.toString()+'&action=2'
-                    a.lighttext(href='#{queryforip}') #{ipoc}
+                    a.lighttext(href=`${queryforip}`) #{ipoc}
 
               span.floornum(style='float:right;')
                 if data.paging
                   -var floornumber = data.paging.start+index
                   //a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post._key}').lighttext /#{floornumber}
-                  a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post._key}').lighttext #{floornumber}阶
+                  a(href=`/t/${data.thread._key}${page?"?&page="+data.paging.page.toString():""}#${post._key}`).lighttext #{floornumber}阶
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-      div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= post
+      div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
 
         if post.toc!=post.tlm
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
@@ -90,7 +90,7 @@
               span.TPCQ #{(c.q>0?'+':'-')}#{c.q} &nbsp;
               span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
               span.TPCIA
-                a(href='#{profile}')
+                a(href=`${profile}`)
                   img.TPCIAI(src='/avatar_small/#{c.uid}')
               span.TPCIssuer #{username} &nbsp;&nbsp;
               span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
@@ -99,4 +99,4 @@
   if post.disabled
 
     - if(disablePost)
-      a(href="javascript:enablePost('#{post._key}')") [此楼已屏蔽，点击解除]
+      a(href="javascript:enablePost(`${post._key}'`)") [此楼已屏蔽，点击解除]

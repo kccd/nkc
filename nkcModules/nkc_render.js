@@ -293,7 +293,8 @@ function nkc_render(options){
     var filesize = r.size
 
     var k = function(number){
-      return number.toPrecision(3)
+
+      return (number || 0).toPrecision(3)
     }
 
     var hits = r.hits?r.hits.toString()+'次':'';
