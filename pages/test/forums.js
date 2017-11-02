@@ -109,6 +109,8 @@ return db.query(`
     if(typeof(res[i].displayName) != 'string'){
       res[i].displayName = res[i].displayName.toString();
     }
+    if(!res[i].class)
+      res[i].class = undefined
   }
   console.log('开始写入数据');
   let n = 0;
