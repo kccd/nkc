@@ -113,7 +113,22 @@ userSchema.methods.getUsersThreads = function() {
       localField: 'oc',
       foreignField: 'pid',
       as: 'oc'
-    }}
+    }},
+    {$unwind: '$oc'},
+    {$lookup: {
+      from: 'posts',
+      localField: 'lm',
+      foreignField: 'pid',
+      as: 'lm'
+    }},
+    {$unwind: '$lm'},
+    {$lookup: {
+      from: 'users',
+      localField: 'lm.uid',
+      foreignField: 'uid',
+      as: 'lm.user'
+    }},
+    {$unwind: '$lm.user'}
   ]).toArray()
 };
 

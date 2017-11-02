@@ -77,10 +77,6 @@ let postsSchema = new Schema({
   },
   uidlm: {
     type: String
-  },
-  username: {
-    type: String,
-    default: ''
   }
 });
 

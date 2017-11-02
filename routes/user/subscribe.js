@@ -27,6 +27,7 @@ subscribeRouter
   .post('/', async (ctx, next) => {
     let {uid} = ctx.params;
     if(!uid) ctx.throw(400, '参数不正确');
+    if(user.uid === uid) ctx.throw(404, '关注自己干嘛？');
     let {db} = ctx;
     let {user} = ctx.data;
     await db.UserSubscribeModel.replaceOne({uid: uid}, {$addToSet: {subscribers: user.uid}});

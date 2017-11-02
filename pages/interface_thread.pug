@@ -279,7 +279,7 @@ block content
 
           if data.user
             .nkcpanel
-              a(href='/m/#{data.user._key}') 我的主题
+              a(href=`/u/${data.user.uid}`) 我的主题
               br
               br
               for thread in data.usersThreads
