@@ -29,7 +29,7 @@
             text #{index+1}. #{a} 
             
           
-  if q.uid == data.user.qid || data.permittedOperations.deleteElseQuestions
+  if q.uid == data.user.qid || data.ensurePermission('GET', '/q')
     button(onclick=`remove_question('/q/${q.category}/${q.qid}')`) 删掉
 
   button(onclick=`load_question('/q/${q.category}/${q.qid}')`) 修改
