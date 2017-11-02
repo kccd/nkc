@@ -15,7 +15,7 @@ const editorRouter = routers.editor;
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
-router.use('/m', meRouter.routes(), meRouter.allowedMethods());
+router.use('/me', meRouter.routes(), meRouter.allowedMethods());
 router.use('/t', threadRouter.routes(), threadRouter.allowedMethods());
 router.use('/p', postRouter.routes(), postRouter.allowedMethods());
 router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());

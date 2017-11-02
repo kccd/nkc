@@ -282,8 +282,8 @@ block content
               a(href='/m/#{data.user._key}') 我的主题
               br
               br
-              //for thread in data.userThreads
-              //  include interface_users_latest_threads
+              for thread in data.usersThreads
+                include interface_users_latest_threads
 
           .nkcpanel
             ul.HomeFriendlyLink

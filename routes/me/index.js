@@ -11,8 +11,8 @@ meRouter
       ctx.throw(401, '您还没有登陆，请登录后再试。');
     }
     ctx.data.replyTarget = 'me';
-    ctx.data.personal = await db.UsersPersonalModel.findOne({uid: user.uid});
-    let subscribe = await db.UserSubscribeModel.findOne({uid: user.uid});
+    ctx.data.personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    let subscribe = await db.UserSubscribeModel.findOnly({uid: user.uid});
     let subscribeForums = '';
     if(subscribe.subscribeForums) {
       subscribeForums = subscribe.subscribeForums.join(',');

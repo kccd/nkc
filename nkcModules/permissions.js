@@ -177,7 +177,6 @@ const certificates ={
         }
       },
       m: {
-        [GET]: true,
         password: {
           [name]: '修改密码',
           [PUT]: true

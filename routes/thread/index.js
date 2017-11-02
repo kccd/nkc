@@ -10,11 +10,19 @@ threadRouter
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
     const {tid} = params;
-    const {ThreadModel, PersonalForumModel, ForumModel} = db;
+    const {
+      ThreadModel,
+      PersonalForumModel,
+      ForumModel,
+      UserModel
+    } = db;
     ctx.template = 'interface_thread.pug';
     const thread = await ThreadModel.findOnly({tid});
     const {mid, toMid} = thread;
-    data.posts = await thread.getPostsByQuery(query);
+    data.posts = await thread.getPostsByQuery(query, {tid});
+    data.ocuser = await UserModel.findOnly({uid: data.posts[0].uid});
+    if(data.user)
+      data.usersThreads = await data.user.getUsersThreads();
     data.thread = thread;
     let myForum, othersForum;
     if(mid !== '') {

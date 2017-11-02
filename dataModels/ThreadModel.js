@@ -108,8 +108,8 @@ threadSchema.pre('save', function (next) {
   next();
 });
 
-threadSchema.methods.getPostsByQuery = function(query) {
-  const {$match, $sort, $skip, $limit} = getQueryObj(query);
+threadSchema.methods.getPostsByQuery = function(query, match) {
+  const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
   return mongoose.connection.db.collection('posts').aggregate([
     {$match},
     {$sort},

@@ -96,5 +96,25 @@ userSchema.pre('save', function(next) {
     this.usernameLowerCase = this.username.toLowerCase();
   next()
 });
+userSchema.methods.getUsersThreads = function() {
+  return mongoose.connection.db.collection('threads').aggregate([
+    {$match: {
+      uid: this.uid,
+      fid: {$not: {$eq: 'recycle'}}
+    }},
+    {$sort: {
+      toc: 1
+    }},
+    {
+      $limit: 8
+    },
+    {$lookup: {
+      from: 'posts',
+      localField: 'oc',
+      foreignField: 'pid',
+      as: 'oc'
+    }}
+  ]).toArray()
+};
 
 module.exports = mongoose.model('users', userSchema);
