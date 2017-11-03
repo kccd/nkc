@@ -4,7 +4,7 @@ select#TargetForum
       option #{fg.fid}:#{fg.displayName} ====
     else
       option ----
-    each f in fg.children
+    each f in fg.children || []
       -var selected = (data.forum&&data.forum.fid&&data.forum.fid===f.fid)||(data.doc&&data.doc._key===f.fid)
       if selected
         option(selected) #{f.fid}:#{f.displayName}

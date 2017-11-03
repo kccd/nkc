@@ -117,12 +117,20 @@ function cartPost(pid){
   .catch(jwarning)
 }
 
-function setDigest(tid){
-  nkcAPI('setDigest',{tid:tid})
+function setDigest(tid, type){
+  var setDigest = '设置精华';
+  var unSetDigest = '撤销精华';
+  var method = '';
+  if(type === setDigest) method = 'post';
+  else if(type === unSetDigest) method = 'delete';
+  else jwarning('到底是要设置精华还是撤销精华？');
+  nkcAPI('/t/'+tid+'/setDigest', method,{})
   .then(function(back){
-    return screenTopAlert(tid+ back.message.toString())
+    return screenTopAlert(tid + '撤销精华成功');
   })
-  .catch(jwarning)
+  .catch(function(err){
+    jwarning('操作失败： ' + err);
+  })
 }
 
 function setTopped(tid){
@@ -531,14 +539,22 @@ function adSwitch(tid) {
   var btn = geid('adBtn');
   var nowIsAd = '取消首页置顶';
   var nowNormal = '首页置顶';
-  nkcAPI('adSwitch', {tid: tid})
+  var method = 'post';
+  if(btn.innerHTML === nowIsAd) method = 'delete';
+  else if(btn.innerHTML === nowNormal) method = 'post';
+  else screenTopWarning('到底是顶置还是不顶置？');
+  nkcAPI('/t/'+tid+'/adSwitch', method, {})
     .then(function() {
       if(btn.innerHTML === nowIsAd) {
+        screenTopWarning('取消首页置顶成功');
         btn.innerHTML = nowNormal;
         return
       }
+      screenTopWarning('首页置顶成功');
       btn.innerHTML = nowIsAd;
     })
-    .catch(screenTopWarning)
+    .catch(function(err){
+      screenTopWarning('操作失败： ' + err);
+    })
 }
 

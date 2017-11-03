@@ -526,18 +526,21 @@ function getVisibleFid() {
 
 module.exports = async (ctx, next) => {
   let certs = ['visitor'];
-  ctx.getUserDescription = (user = this.data.user) => {
+  ctx.getUserDescription = function(user = this.data.user) {
     const {certs, username, xsf = 0, kcb = 0} = user;
     let cs = ['会员'];
     for(const cert of certs) {
       cs.push(certificates[cert].displayName);
     }
     cs = cs.join(' ');
-    return `${username}\n`+
+    return {
+      string: `${username}\n`+
       `学术分 ${xsf}\n`+
       `科创币 ${kcb}\n`+
-      `${cs}`
-  };
+      `${cs}`,
+      certs: cs
+    }
+  }.bind(ctx);
   if(ctx.data.user) {
     certs = ctx.data.user.certs;
     ctx.data.user.navbarDesc = ctx.getUserDescription();

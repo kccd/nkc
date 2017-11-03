@@ -21,17 +21,30 @@ operationRouter
     }
     await next();
   })
-  .post('/cartThread', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `加入管理车   tid：${tid}`;
+  // 首页置顶
+  .post('/adSwitch', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
+    let setting = await db.SettingMode.findOneAndUpdate({uid: 'system'}, {$addToSet: {ads: tid}});
+    if(setting.ads.indexOf(tid) !== -1) ctx.throw(404, '该贴子已经在首页置顶了，不需要重复操作');
     await next();
   })
-  .post('/adSwitch', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `首页顶置   tid：${tid}`;
+  // 取消首页置顶
+  .del('/adSwitch', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
     await next();
   })
   .post('/setDigest', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
+    let t = await db.Threa
+    await next();
+  })
+  .del('/setDigest', async (ctx, next) => {
     const tid = ctx.params.tid;
     ctx.data = `设置精华   tid：${tid}`;
     await next();

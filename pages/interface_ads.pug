@@ -1,6 +1,6 @@
 for thread in ads
-  a.nkc-figure.figure-16-9(href='/t/#{thread._key}')
+  a.nkc-figure.figure-16-9(href='/t/#{thread.tid}')
     div(style='width: 100%;height: 100%; position: absolute; border-radius: 5px; padding: 1px;')
       div(style='position: relative; width: 100%; height: 100%; overflow: hidden;')
-        img(src='/ad/#{thread._key}' style='width: 100%; height: 100%; border-radius: 5px;')
+        img(src='/ad/#{thread.tid}' style='width: 100%; height: 100%; border-radius: 5px;')
         div.nkc-figure-text &nbsp;#{thread.post.t}
