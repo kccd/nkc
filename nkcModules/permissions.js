@@ -185,6 +185,10 @@ const certificates ={
       t: {
         [parameter]: {
           [POST]: true,
+          addColl: {
+            [name]: '收藏',
+            [POST]: true
+          },
           topInPF: {
             [name]: '专栏置顶',
             [POST]: true,
@@ -234,6 +238,7 @@ const certificates ={
             [GET]: true,
             [POST]: true,
             [DELETE]: true,
+            [PUT]: true,
             [parameter]: {
               [GET]: true,
               [PATCH]: true,
@@ -521,13 +526,6 @@ function getVisibleFid() {
 
 module.exports = async (ctx, next) => {
   let certs = ['visitor'];
-  if(ctx.data.user) {
-    certs = ctx.data.user.certs;
-    ctx.data.user.navbarDesc = getUserDescription();
-  }
-  const cs = getPermitTree(certs);
-  cs.contentClasses = Object.keys(cs.contentClasses);
-  ctx.data.certificates = cs;
   ctx.getUserDescription = (user = this.data.user) => {
     const {certs, username, xsf = 0, kcb = 0} = user;
     let cs = ['会员'];
@@ -540,6 +538,13 @@ module.exports = async (ctx, next) => {
       `科创币 ${kcb}\n`+
       `${cs}`
   };
+  if(ctx.data.user) {
+    certs = ctx.data.user.certs;
+    ctx.data.user.navbarDesc = ctx.getUserDescription();
+  }
+  const cs = getPermitTree(certs);
+  cs.contentClasses = Object.keys(cs.contentClasses);
+  ctx.data.certificates = cs;
 
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;

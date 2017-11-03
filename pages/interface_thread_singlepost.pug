@@ -17,12 +17,12 @@
       .threadOneLine
         div.fixThread
           div(style='float: left;')
-            - var title = user?data.user.navbarDesc:''
-            a(href=`/m/${uid}` title=`${title}`)
+            - var title = user && data.user?data.user.navbarDesc:''
+            a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
-              a.ThreadPostTitleUsername(href=`/m/${uid}`) #{user?user.username:''}
+              a.ThreadPostTitleUsername(href=`/u/${uid}`) #{user?user.username:''}
 
               span.lighttext #{fromNow(post.toc)} -
               span.lighttext #{dateTimeString(post.toc)}
@@ -71,17 +71,16 @@
                 if data.paging
                   -var floornumber = data.paging.start+index
                   //a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post.pid}').lighttext /#{floornumber}
-                  a(href=`/t/${data.thread._key}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
+                  a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
-
-        if post.toc!=post.tlm
+        if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
       //span #{post.user?post.user.post_sign:''}
-
-      if post.credits
+      if post.credits && post.credits.length > 0
+        -console.log(post.credits)
         .nkcpanel.ThreadPostCredits
           each c,index in post.credits
             -var username = c.username||c.uid

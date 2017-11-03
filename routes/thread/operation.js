@@ -1,10 +1,24 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
-
 operationRouter
+  // 收藏帖子
   .post('/addColl', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `收藏帖子   tid：${tid}`;
+    const {tid} = ctx.params;
+    const {user} = ctx.data;
+    const {db} = ctx;
+    let collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
+    if(collection) ctx.throw(404, '该贴子已经存在于您的收藏中，没有必要重复收藏');
+    let newCollection = new db.CollectionModel({
+      cid: await db.SettingModel.operateSystemID('collections', 1),
+      tid: tid,
+      uid: user.uid
+    });
+    try{
+      await newCollection.save();
+    } catch (err) {
+      await db.SettingModel.operateSystemID('collections', -1);
+      ctx.throw(404, `收藏失败: ${err}`);
+    }
     await next();
   })
   .post('/cartThread', async (ctx, next) => {

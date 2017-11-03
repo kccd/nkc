@@ -1,7 +1,7 @@
 .UserProfileSection2
   -var user= user
     a(href=`/m/${user.uid}`) 专栏
-    a(href=`/u/${user.uid}/collections/null`) 收藏夹
+    a(href=`/u/${user.uid}/collections/unclassified`) 收藏夹
     a(href=`/sms/message/${user.uid}`) 发私信
 
     if data.ensurePermission('DELETE', '/u/x')
@@ -16,7 +16,7 @@
     span 总主题 #{user.threadCount||0} 帖
     span 总回复 #{user.postCount||0} 楼
 
-    -var listCertText = data.user.navbarDesc.split('\n').pop()
+    -var listCertText = user.navbarDesc
     span 拥有证书：#{listCertText}
     br
     span 注册于 #{dateTimeString(user.toc)}

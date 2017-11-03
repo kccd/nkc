@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.11');
+db = require('arangojs')('http://192.168.11.15');
 db.useDatabase('rescue');
 
 let postsSchema = new Schema({
@@ -67,7 +67,8 @@ let postsSchema = new Schema({
     index: 1
   },
   tlm: {
-    type: Number,
+    type: Date,
+    default: Date.now,
     index: 1
   },
   uid: {

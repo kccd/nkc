@@ -63,7 +63,8 @@ const postSchema = new Schema({
     index: 1
   },
   tlm: {
-    type: Number,
+    type: Date,
+    default: Date.now,
     index: 1
   },
   uid: {

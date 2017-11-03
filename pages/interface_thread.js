@@ -229,7 +229,7 @@ function goEditor(){
 }
 
 function addColl(tid){
-  nkcAPI('addThreadToCollection',{tid:tid})
+  nkcAPI('/t/'+tid+'/addColl', 'post',{})
   .then(function(res){
     screenTopAlert('已收藏 '+tid)
   })

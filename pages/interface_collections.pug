@@ -13,7 +13,7 @@ block content
       .row
         .col-xs-12
           .nkcpanel
-            -var uid = data.targetUser._key
+            -var uid = data.targetUser.uid
             include interface_profile_avatar.pug
             .ForumName #{data.category} - #{data.targetUser.username} 的个人收藏
         
