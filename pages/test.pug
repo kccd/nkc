@@ -46,8 +46,8 @@ html
     script.
       function httpReq(url, type) {
         $.ajax({
-          url: '/u/' + $('#value2').val(),
-          type: 'delete'
+          url: url,
+          type: type
         })
           .done(function (data) {
             console.log(data.message);
@@ -57,50 +57,14 @@ html
           });
       }
       $('#submit').on('click', function () {
-        $.ajax({
-          url: '/u/' + $('#value2').val(),
-          type: 'delete'
-        })
-          .done(function (data) {
-            console.log(data.message);
-          })
-          .fail(function (err) {
-            console.log('fail: ' + JSON.stringify(err));
-          });
+       httpReq('/u/'+$('#value2').val(), 'delete');
       })
       $('#submit2').on('click', function () {
-        $.ajax({
-          url: '/u/' + $('#value2').val(),
-          type: 'put'
-        })
-          .done(function (data) {
-            console.log(data.message);
-          })
-          .fail(function (err) {
-            console.log('fail: ' + JSON.stringify(err));
-          });
+        httpReq('/u/' + $('#value2').val(), 'put');
       })
       $('#submit3').on('click', function () {
-        $.ajax({
-          url: '/u/' + $('#value2').val() + '/subscribe',
-          type: 'post'
-        })
-          .done(function (data) {
-            console.log(data.message);
-          })
-          .fail(function (err) {
-            console.log('fail: ' + JSON.stringify(err));
-          });
+        httpReq('/u/' + $('#value2').val() + '/subscribe', 'post');
       })
       $('#submit4').on('click', function () {
-        $.ajax({
-          url: '/u/' + $('#value2').val() + '/subscribe',
-          type: 'delete'
-        })
-          .done(function (data) {
-            console.log(data.message);
-          })
-          .fail(function (err) {
-            console.log('fail: ' + JSON.stringify(err));
-          });
+        httpReq('/u/' + $('#value2').val() + '/subscribe', 'delete');
       })

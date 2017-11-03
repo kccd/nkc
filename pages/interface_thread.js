@@ -1,11 +1,14 @@
 $(document).ready(function(){
   if($(window).width()<750){
     $('.ThreadTitleText').css('font-size','20px');
-    $('.ThreadTitle1').css('width','80%');
-    $('.ThreadTitle2').css('width','18%');
+    /*$('.ThreadTitle1').css('width','80%');
+    $('.ThreadTitle2').css('width','18%');*/
     $('#airnum1').css('font-size','16px');
     $('#airnum2').css('font-size','16px');
     $('#airnum3').css('font-size','10px');
+  }
+  if($(window).width()<433){
+    $('.ThreadTitle1').css('width','65%');
   }
   var qrcode = geid('qrcode');
   if(qrcode) {

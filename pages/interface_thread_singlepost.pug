@@ -8,21 +8,21 @@
 
   if !post.disabled || (post.disabled && po.enablePost)
     //horizontal line
-    hr(id=`${post._key}`).ThreadSinglePostHr
-    //meta(id=`${post._key}'`)
+    hr(id=`${post.pid}`).ThreadSinglePostHr
+    //meta(id=`${post.pid}'`)
     - var uid = post.uid
     - var user = post.user
     //post itself
-    .parent.clearfix(id='p#{post._key}')
+    .parent.clearfix(id=`p${post.pid}`)
       .threadOneLine
         div.fixThread
           div(style='float: left;')
             - var title = user?data.user.navbarDesc:''
-            a(href='/m/#{uid}' title=`${title}`)
-              img.ThreadPostAvatar(src='/avatar/#{post.uid}')
+            a(href=`/m/${uid}` title=`${title}`)
+              img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
-              a.ThreadPostTitleUsername(href='/m/#{uid}') #{user?user.username:''}
+              a.ThreadPostTitleUsername(href=`/m/${uid}`) #{user?user.username:''}
 
               span.lighttext #{fromNow(post.toc)} -
               span.lighttext #{dateTimeString(post.toc)}
@@ -32,32 +32,32 @@
 
             span.ThreadTitleAuxillaryLink.PostTitleAuxillaryLink
               -var recUsers = post.recUsers || []
-              if data.user && post.uid != data.user._key
-                if recUsers.indexOf(data.user._key) > -1
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post._key})`) 取消推荐
+              if data.user && post.uid != data.user.uid
+                if recUsers.indexOf(data.user.uid) > -1
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post.pid})`) 取消推荐
                 else
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post._key})`) 推荐(#{recUsers.length})
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post.pid})`) 推荐(#{recUsers.length})
 
               - if(postTo)
-                a(href=`javascript:quotePost(${post._key})`) 引用
+                a(href=`javascript:quotePost(${post.pid})`) 引用
 
               - if(addPostToCart)
-                a(href=`javascript:cartPost(${post._key})`) 加入管理车
+                a(href=`javascript:cartPost(${post.pid})`) 加入管理车
 
               - if(addCredit)
-                a(href=`javascript:addCredit(${post._key})`) 评学术分
+                a(href=`javascript:addCredit(${post.pid})`) 评学术分
 
-              - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user._key) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user._key))
-                a(href=`javascript:disablePost(${post._key})`) 屏蔽
+              - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
+                a(href=`javascript:disablePost(${post.pid})`) 屏蔽
 
               - if(post.tlm>post.toc && ensurePermission('GET', '/p/x/history'))
-                a(href=`/post_history/${post._key}`) 历史
+                a(href=`/post_history/${post.pid}`) 历史
 
               if data.user
                 - var user = data.user
-                - var ownership = user._key===uid
+                - var ownership = user.uid===uid
                 - if(testModifyTimeLimit(data.certificates,ownership,post.toc))
-                  a(href='/editor?target=post/#{post._key}') 编辑
+                  a(href=`/editor?target=post/${post.pid}`) 编辑
 
                 - var cc = data.certificates.contentClasses
                 - if(cc.classified)
@@ -70,8 +70,8 @@
               span.floornum(style='float:right;')
                 if data.paging
                   -var floornumber = data.paging.start+index
-                  //a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post._key}').lighttext /#{floornumber}
-                  a(href=`/t/${data.thread._key}${page?"?&page="+data.paging.page.toString():""}#${post._key}`).lighttext #{floornumber}阶
+                  //a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post.pid}').lighttext /#{floornumber}
+                  a(href=`/t/${data.thread._key}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
@@ -91,7 +91,7 @@
               span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
               span.TPCIA
                 a(href=`${profile}`)
-                  img.TPCIAI(src='/avatar_small/#{c.uid}')
+                  img.TPCIAI(src=`/avatar_small/${c.uid}`)
               span.TPCIssuer #{username} &nbsp;&nbsp;
               span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
               span.TPCReason #{c.reason}
@@ -99,4 +99,4 @@
   if post.disabled
 
     - if(disablePost)
-      a(href="javascript:enablePost(`${post._key}'`)") [此楼已屏蔽，点击解除]
+      a(href="javascript:enablePost(`${post.pid}'`)") [此楼已屏蔽，点击解除]

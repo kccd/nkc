@@ -29,6 +29,7 @@ subscribeRouter
     if(!uid) ctx.throw(400, '参数不正确');
     let {db} = ctx;
     let {user} = ctx.data;
+    if(user.uid === uid) ctx.throw(404, '关注自己干嘛？');
     await db.UserSubscribeModel.replaceOne({uid: uid}, {$addToSet: {subscribers: user.uid}});
     await db.UserSubscribeModel.replaceOne({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
     ctx.data.message = `关注 uid:${uid} 成功`;

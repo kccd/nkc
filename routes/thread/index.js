@@ -1,6 +1,9 @@
 const Router = require('koa-router');
 const operationRouter = require('./operation');
 const threadRouter = new Router();
+const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
+
 
 threadRouter
   .post('/:tid', async (ctx, next) => {
@@ -14,13 +17,17 @@ threadRouter
       ThreadModel,
       PersonalForumModel,
       ForumModel,
-      UserModel
+      UserModel,
+      PostModel
     } = db;
     ctx.template = 'interface_thread.pug';
-    const thread = await ThreadModel.findOnly({tid});
+    let thread = await ThreadModel.findOnly({tid});
     const {mid, toMid} = thread;
     data.posts = await thread.getPostsByQuery(query, {tid});
+    thread = thread.toObject();
+    thread.oc = await PostModel.findOnly({pid: thread.oc});
     data.ocuser = await UserModel.findOnly({uid: data.posts[0].uid});
+    data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user)
       data.usersThreads = await data.user.getUsersThreads();
     data.thread = thread;

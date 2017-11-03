@@ -511,11 +511,12 @@ function getPermitTree(certs) {
 
 function getUserDescription(user) {
   const {certs, username, xsf = 0, kcb = 0} = user;
-  let cs = '';
+  let cs = ['会员'];
   for(const cert of certs) {
-    cs.concat(certificates[cert].displayName + ', ')
+    // cs.concat(certificates[cert].displayName + ', ')
+    cs.push(certificates[cert].displayName);
   }
-  cs.slice(0, -1);
+  cs = cs.join(' ');
   return `${username}\n`+
     `学术分 ${xsf}\n`+
     `科创币 ${kcb}\n`+
