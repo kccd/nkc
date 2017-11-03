@@ -2,6 +2,7 @@ const render = require('./nkc_render');
 const moment = require('moment');
 const pug = require('pug');
 const settings = require('../settings');
+moment.locale('zh-cn');
 let filters = {
   markdown:render.commonmark_render,
   markdown_safe:render.commonmark_safe,
@@ -73,6 +74,18 @@ function dateString(date){
     return moment().format(dateformat);
   }
 }
+let creditString = (t) => {
+  switch (t) {
+    case 'xsf':
+      return '学术分';
+      break;
+    case 'kcb':
+      return '科创币';
+      break;
+    default:
+      return '[未定义积分]'
+  }
+};
 
 let fromNow = (time) => {
   return moment(time).fromNow();
@@ -89,7 +102,8 @@ let pugRender = (template, data) => {
     experimental_render:render.experimental_render,
     toQueryString,
     testModifyTimeLimit,
-    dateString
+    dateString,
+    creditString
   };
   options.data = data;
   options.filters = filters;

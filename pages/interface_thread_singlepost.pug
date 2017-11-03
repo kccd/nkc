@@ -18,11 +18,11 @@
         div.fixThread
           div(style='float: left;')
             - var title = user?data.user.navbarDesc:''
-            a(href=`/m/${uid}` title=`${title}`)
+            a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
-              a.ThreadPostTitleUsername(href=`/m/${uid}`) #{user?user.username:''}
+              a.ThreadPostTitleUsername(href=`/u/${uid}`) #{user?user.username:''}
 
               span.lighttext #{fromNow(post.toc)} -
               span.lighttext #{dateTimeString(post.toc)}
@@ -71,7 +71,7 @@
                 if data.paging
                   -var floornumber = data.paging.start+index
                   //a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post.pid}').lighttext /#{floornumber}
-                  a(href=`/t/${data.thread._key}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
+                  a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}

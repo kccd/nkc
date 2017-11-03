@@ -112,9 +112,18 @@ threadSchema.methods.getPostsByQuery = function(query, match) {
   const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
   return mongoose.connection.db.collection('posts').aggregate([
     {$match},
-    {$sort},
+    {$sort: {
+      toc: 1
+    }},
     {$skip},
     {$limit},
+    {$lookup: {
+      from: 'users',
+      localField: 'uid',
+      foreignField: 'uid',
+      as: 'user'
+    }},
+    {$unwind: '$user'},
   ]).toArray()
 };
 
