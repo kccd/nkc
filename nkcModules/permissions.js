@@ -12,6 +12,8 @@ const _day = _hour*24;
 const _month = _day*30;
 const _year = _month*12;
 
+const mongoose = require('../settings').database;
+
 const methodEnum = {
   GET,
   POST,
@@ -509,29 +511,35 @@ function getPermitTree(certs) {
   return tree
 }
 
-function getUserDescription(user) {
-  const {certs, username, xsf = 0, kcb = 0} = user;
-  let cs = ['会员'];
-  for(const cert of certs) {
-    // cs.concat(certificates[cert].displayName + ', ')
-    cs.push(certificates[cert].displayName);
-  }
-  cs = cs.join(' ');
-  return `${username}\n`+
-    `学术分 ${xsf}\n`+
-    `科创币 ${kcb}\n`+
-    `${cs}`
+function getVisibleFid() {
+  const cc = this.data.certificates.contentClasses;
+  return mongoose.connection.db.collection('forums').aggregate([
+    {$match: {class: {$in: cc}}},
+    {$replaceRoot: {newRoot: '$fid'}}
+  ])
 }
 
 module.exports = async (ctx, next) => {
   let certs = ['visitor'];
   if(ctx.data.user) {
     certs = ctx.data.user.certs;
-    ctx.data.user.navbarDesc = getUserDescription(ctx.data.user);
+    ctx.data.user.navbarDesc = getUserDescription();
   }
   const cs = getPermitTree(certs);
   cs.contentClasses = Object.keys(cs.contentClasses);
   ctx.data.certificates = cs;
+  ctx.getUserDescription = (user = this.data.user) => {
+    const {certs, username, xsf = 0, kcb = 0} = user;
+    let cs = ['会员'];
+    for(const cert of certs) {
+      cs.push(certificates[cert].displayName);
+    }
+    cs = cs.join(' ');
+    return `${username}\n`+
+      `学术分 ${xsf}\n`+
+      `科创币 ${kcb}\n`+
+      `${cs}`
+  };
 
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
@@ -556,6 +564,14 @@ module.exports = async (ctx, next) => {
     }
     return obj[m]
   }.bind(ctx);
+  ctx.getVisibleFid = getVisibleFid;
+  ctx.generateMatchBase = (base = {}) => {
+    if(!this.ensurePermission('POST', '/t/x/digest'))
+      //if someone wasn't able to modify a thread, then he wasn't able to view
+      //threads or posts which were disabled.
+      base.disabled = false;
+    return base
+  };
   if(!ctx.data.ensurePermission())
     ctx.throw(401, `权限不足`);
   await next();

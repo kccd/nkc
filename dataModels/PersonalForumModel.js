@@ -42,9 +42,10 @@ let personalForumsSchema = new Schema({
   }
 });
 
-personalForumsSchema.methods.getThreadsByQuery = function(query, match) {
-  const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
-  return mongoose.connection.db.collection('')
-}
+personalForumsSchema.methods.extendModerator = function() {
+  const {collection} = mongoose.connection.db;
+  this.moderators = collection('users').find({uid: {$in: this.moderators}})
+};
+
 
 module.exports = mongoose.model('personalForums', personalForumsSchema, 'personalForums');
