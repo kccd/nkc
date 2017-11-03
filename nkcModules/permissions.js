@@ -518,7 +518,6 @@ function getUserDescription(user) {
   const {certs, username, xsf = 0, kcb = 0} = user;
   let cs = ['会员'];
   for(const cert of certs) {
-    // cs.concat(certificates[cert].displayName + ', ')
     cs.push(certificates[cert].displayName);
   }
   cs = cs.join(' ');
