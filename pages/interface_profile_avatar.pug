@@ -1,3 +1,3 @@
 div(style='display:inline-block;margin-right:10px')
-  a(href='/m/#{uid || thatuser._key}')
-    img(src='/avatar/#{uid || thatuser._key}' style='width:72px;height:72px;border-radius:6px;')
+  a(href=`/m/${uid || thatuser.uid}`)
+    img(src=`/avatar/${uid || thatuser.uid}` style='width:72px;height:72px;border-radius:6px;')
