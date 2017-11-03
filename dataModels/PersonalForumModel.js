@@ -1,5 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
+const {getQueryObj} = require('../nkcModules/apiFunction');
 const Schema = mongoose.Schema;
 let personalForumsSchema = new Schema({
   uid: {
@@ -40,5 +41,10 @@ let personalForumsSchema = new Schema({
     default: ''
   }
 });
+
+personalForumsSchema.methods.getThreadsByQuery = function(query, match) {
+  const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
+  return mongoose.connection.db.collection('')
+}
 
 module.exports = mongoose.model('personalForums', personalForumsSchema, 'personalForums');
