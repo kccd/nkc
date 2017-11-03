@@ -516,7 +516,7 @@ function getUserDescription(user) {
     // cs.concat(certificates[cert].displayName + ', ')
     cs.push(certificates[cert].displayName);
   }
-  cs.slice(0, -1);
+  cs = cs.join(' ');
   return `${username}\n`+
     `学术分 ${xsf}\n`+
     `科创币 ${kcb}\n`+
