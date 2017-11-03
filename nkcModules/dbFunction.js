@@ -3,6 +3,16 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
+fn.setNumberOfDigestThread = async (fid, number) => {
+  let forum = await db.ForumModel.findOnly({fid});
+  let threadCount = forum.tCount;
+  threadCount = {
+    digest: threadCount.digest + number,
+    normal: threadCount.normal - number
+  };
+  return await db.ForumModel.replaceOne({fid}, {$set: {tCount: threadCount}});
+};
+
 fn.decrementPsnl = async (uid, type, number) => {
   let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
   let {newMessage} = userPersonal;

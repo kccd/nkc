@@ -117,16 +117,24 @@ function cartPost(pid){
   .catch(jwarning)
 }
 
-function setDigest(tid, type){
+function setDigest(tid){
   var setDigest = '设置精华';
   var unSetDigest = '撤销精华';
   var method = '';
-  if(type === setDigest) method = 'post';
-  else if(type === unSetDigest) method = 'delete';
-  else jwarning('到底是要设置精华还是撤销精华？');
-  nkcAPI('/t/'+tid+'/setDigest', method,{})
+  var status = geid('threadDigest');
+  if(status.innerHTML === setDigest) method = 'post';
+  else if(status.innerHTML === unSetDigest) method = 'delete';
+  else return jwarning('到底是要设置精华还是撤销精华？');
+  nkcAPI('/t/'+tid+'/digest', method,{})
   .then(function(back){
-    return screenTopAlert(tid + '撤销精华成功');
+    var oldStatus = status.innerHTML;
+    if(status.innerHTML === setDigest) {
+      status.innerHTML = unSetDigest;
+    } else {
+      status.innerHTML = setDigest;
+    }
+    $(this).text()
+    return screenTopAlert(tid + oldStatus + '成功');
   })
   .catch(function(err){
     jwarning('操作失败： ' + err);
@@ -134,11 +142,26 @@ function setDigest(tid, type){
 }
 
 function setTopped(tid){
-  nkcAPI('setTopped',{tid:tid})
+  var method = '';
+  var setTop = '设置置顶';
+  var unSetTop = '撤销置顶';
+  var status = geid('threadTop');
+  if(status.innerHTML === setTop) method = 'post';
+  else if(status.innerHTML === unSetTop) method = 'delete';
+  else return jwarning('到底是要设置置顶还是撤销置顶？');
+  nkcAPI('/t/'+tid+'/topped', method,{tid:tid})
   .then(function(back){
-    return screenTopAlert(tid+back.message.toString())
+    var oldStatus = status.innerHTML;
+    if(oldStatus === setTop) {
+      status.innerHTML = unSetTop;
+    } else {
+      status.innerHTML = setTop;
+    }
+    return screenTopAlert(tid + oldStatus + '成功');
   })
-  .catch(jwarning)
+  .catch(function(err){
+    return jwarning('操作失败： ' + err);
+  })
 }
 
 function assemblePostObject(){  //bbcode , markdown
@@ -542,7 +565,7 @@ function adSwitch(tid) {
   var method = 'post';
   if(btn.innerHTML === nowIsAd) method = 'delete';
   else if(btn.innerHTML === nowNormal) method = 'post';
-  else screenTopWarning('到底是顶置还是不顶置？');
+  else return screenTopWarning('到底是顶置还是不顶置？');
   nkcAPI('/t/'+tid+'/adSwitch', method, {})
     .then(function() {
       if(btn.innerHTML === nowIsAd) {
