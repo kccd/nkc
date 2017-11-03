@@ -76,12 +76,12 @@
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
-
-        if post.toc!=post.tlm
+        if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
       //span #{post.user?post.user.post_sign:''}
-
-      if post.credits
+      -console.log(post);
+      if post.credits && post.credits.length > 0
+        -console.log(post.credits)
         .nkcpanel.ThreadPostCredits
           each c,index in post.credits
             -var username = c.username||c.uid
