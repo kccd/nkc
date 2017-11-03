@@ -17,7 +17,7 @@
       .threadOneLine
         div.fixThread
           div(style='float: left;')
-            - var title = user?data.user.navbarDesc:''
+            - var title = user && data.user?data.user.navbarDesc:''
             a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
@@ -79,7 +79,6 @@
         if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
       //span #{post.user?post.user.post_sign:''}
-      -console.log(post);
       if post.credits && post.credits.length > 0
         -console.log(post.credits)
         .nkcpanel.ThreadPostCredits

@@ -26,7 +26,8 @@ threadRouter
     data.posts = await thread.getPostsByQuery(query, {tid});
     thread = thread.toObject();
     thread.oc = await PostModel.findOnly({pid: thread.oc});
-    data.ocuser = await UserModel.findOnly({uid: data.posts[0].uid});
+    let ocuser = (await UserModel.findOnly({uid: data.posts[0].uid})).toObject();
+    ocuser.navbarDesc = nkcModules.permissions.get
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user)
       data.usersThreads = await data.user.getUsersThreads();

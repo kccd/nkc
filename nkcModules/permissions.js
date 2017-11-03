@@ -183,6 +183,10 @@ const certificates ={
       t: {
         [parameter]: {
           [POST]: true,
+          addColl: {
+            [name]: '收藏',
+            [POST]: true
+          },
           topInPF: {
             [name]: '专栏置顶',
             [POST]: true,
@@ -232,6 +236,7 @@ const certificates ={
             [GET]: true,
             [POST]: true,
             [DELETE]: true,
+            [PUT]: true,
             [parameter]: {
               [GET]: true,
               [PATCH]: true,

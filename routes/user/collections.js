@@ -6,9 +6,9 @@ let dbFn = nkcModules.dbFunction;
 collectionsRouter
   .get('/:category', async (ctx, next) => {
     let db = ctx.db;
+    let category = ctx.params.category;
     let user = ctx.data.user;
     let targetUserUid = ctx.params.uid;
-    let category = (ctx.params.category === 'null')? '': ctx.params.category;
     let targetUser = {};
     if(user && user.uid === targetUserUid) {
       targetUser = user;
@@ -17,7 +17,7 @@ collectionsRouter
     }
     ctx.data.forumList = await dbFn.getAvailableForums(ctx);
     ctx.data.targetUser = targetUser;
-    ctx.data.category = category || 'null';
+    ctx.data.category = category;
     let categoryNames = await db.CollectionModel.aggregate([
       {$match: {uid: targetUserUid}},
       {$sort: {toc: 1}},
@@ -25,7 +25,7 @@ collectionsRouter
     ]);
     for (let i =0; i < categoryNames.length; i++) {
       categoryNames[i] = categoryNames[i]._id;
-      if(!categoryNames[i]) categoryNames[i] = 'null';
+      if(!categoryNames[i]) categoryNames[i] = 'unclassified';
     }
     ctx.data.categoryNames = categoryNames;
     let queryDate = {
