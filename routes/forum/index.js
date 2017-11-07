@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const operationRouter = require('./operation');
+const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
 const forumRouter = new Router();
 
 forumRouter
@@ -17,6 +19,7 @@ forumRouter
     const threads = await forum.getThreadsByQuery(query);
     data.forum = forum;
     data.threads = threads;
+    data.forumList = await dbFn.getAvailableForums(ctx);
     await next()
   })
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());

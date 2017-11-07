@@ -10,15 +10,15 @@ block title
   else
     -var processed = forum.displayName
     
-  meta(name='description' content='#{processed}')
+  meta(name='description' content=`${processed}`)
   
   meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content='#{forum.displayName}')
+  meta(property='og:title' content=`${forum.displayName}`)
   meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content='#{processed}')
+  meta(property='og:description' content=`${processed}`)
   
   if data.threads.length>0
-    meta(property='article:modified_time' content='#{(new Date(data.threads[0].toc)).toISOString()}')
+    meta(property='article:modified_time' content=`${(new Date(data.threads[0].toc)).toISOString()}`)
   
   style.
     .marginless {
@@ -49,7 +49,7 @@ block content
                   //img(src='http://bbs.kechuang.org/themes/site/dingzhi/images/logo.png')
                   if(data.forum.fid)
                     .ForumNavigation1(style='margin-bottom:5px;')
-                      //each group,index in data.forumlist
+                      //each group,index in data.forumList
                       //
                       //  -var gpf = group.parentforum
                       //  if gpf._key == data.forum.parentid
@@ -74,7 +74,7 @@ block content
                       
                   
                   -var forum = data.forum
-                  .ForumTitleCircle(style='background-color:#{forum.color}')
+                  .ForumTitleCircle(style=`background-color:${forum.color}`)
                   .ForumName #{forum.displayName}
 
                   if data.forum.description
@@ -84,20 +84,20 @@ block content
                   div
                     span(style='margin-right:20px;') 今日: #{data.forum.countPostsToday||0} 主题: #{data.forum.countThreads||0} 回复: #{data.forum.countPosts||0}
           
-                    if data.moderators && data.moderators.length
+                    if data.forum.moderators && data.forum.moderators.length
                       span 版主：
-                        - var moderators = data.moderators
+                        - var moderators = data.forum.moderators
                         each k in moderators
-                          a.d-inline.margin-right(href='/m/#{k._key}') #{k.username}
+                          a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
                         
                   if data.forumthreadtypes && data.forumthreadtypes.length
                     .ForumNavigation1
                       hr.hrNarrowSpace
                       span 分类: 
-                      a(href='/f/#{data.forum.fid}' class='#{data.cat?"":"active"}') 所有帖子
+                      a(href=`/f/${data.forum.fid}` class=`${data.cat?"":"active"}`) 所有帖子
                       each ftt in data.forumthreadtypes
-                        -var active = ftt._key==data.cat
-                        a(href='/f/#{data.forum.fid}?cat=#{ftt._key}' class='#{active?"active":""}' ) #{ftt.name}
+                        -var active = ftt.fid==data.cat
+                        a(href=`/f/${data.forum.fid}?cat=${ftt.fid}` class=`${active?"active":""}` ) #{ftt.name}
                       hr.hrNarrowSpace
                   else
                     .ForumNavigation1
@@ -110,16 +110,16 @@ block content
               .ForumNavigation1(style='margin-bottom:5px;')
                 a(href='/latest?&content=forum' style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部
                 span(style='font-size: 18px; color: grey;') /&nbsp;
-                each group,index in data.forumlist
-                  -var gpf = group.parentforum
-                  -var name = gpf.display_name
-                  -var url = '/f/'+gpf._key
+                each group,index in data.forumList
+                  -var gpf = group
+                  -var name = gpf.displaName
+                  -var url = '/f/'+gpf.fid
                   
                   -var color = gpf.color||'#aaa'
-                  -var active = gpf._key==data.forum.fid
+                  -var active = gpf.fid==data.forum.fid
                   
                   -var stylestr = active?'background-color:'+color:''
-                  a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
+                  a(href=`${url}` style=`${stylestr}` class=`${active?"active":""}`) #{name}
               .ForumNavigation2.row
                 //增加大板介绍
                 .col-xs-12
@@ -140,7 +140,7 @@ block content
                       span(style='font-size: 17px;') 专业分区
                       span(style='color: grey;') (发帖请进入对应分区)
                     for cForum in data.forums
-                      a(style='margin: 2px 5px;' href='/f/#{cForum._key}') #{cForum.display_name}
+                      a(style='margin: 2px 5px;' href=`/f/${cForum.fid}`) #{cForum.displaName}
                   hr.hrNarrowSpace
             .panel
               .row
@@ -149,7 +149,7 @@ block content
                     include interface_easy_post.pug
                     if data.replytarget && !hasChildren
 
-                      a.btn.btn-default(href='/editor?target=#{data.replytarget}') 新帖
+                      a.btn.btn-default(href=`/editor?target=${data.replytarget}`) 新帖
                     if isModerator&&!forumIsParent
                       button#enterManagementMode.btn.btn-default(onclick='enterManagementMode()') 管理
 
@@ -172,9 +172,9 @@ block content
 
                       if data.ensurePermission('PATCH', '/t/x')
                         -var ffid = data.forum.fid
-                        button(onclick="renameForumCategory('#{ffid}')") 重命名分类
-                        button(onclick="addForumCategory('#{ffid}')") 增加分类
-                        button(onclick="deleteForumCategory('#{ffid}')") 删除分类
+                        button(onclick=`renameForumCategory('${ffid}')`) 重命名分类
+                        button(onclick=`addForumCategory('${ffid}')`) 增加分类
+                        button(onclick=`deleteForumCategory('${ffid}')`) 删除分类
 
 
 
@@ -229,7 +229,7 @@ block content
                     include interface_navigation_paging.pug
 
                   if data.replytarget && !hasChildren
-                    a.btn.btn-default(style="margin-top:13px" href='/editor?target=#{data.replytarget}') 发表新帖
+                    a.btn.btn-default(style="margin-top:13px" href=`/editor?target=${data.replytarget}`) 发表新帖
               .div#bm
 
 
@@ -257,14 +257,14 @@ block content
                 -var moderators = data.moderators || []
                   span 版主:
                 for moderator in moderators
-                  a(href='/m/#{moderator._key}')  #{moderator,username}
+                  a(href=`/m/${moderator.uid}`)  #{moderator,username}
                 //hr.hrNarrowSpace
                 //.ForumThreadList
                 //  each thread,index in forum.threads
                 //    include interface_forum_singlethread.pug
           if data.user
             .nkcpanel
-              a(href='/m/#{data.user._key}') 我的主题
+              a(href=`/m/${data.user.uid}`) 我的主题
               br
               br
               //for thread in data.userThreads

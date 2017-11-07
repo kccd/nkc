@@ -99,7 +99,7 @@ fn.checkEmailCode = async (email, code) => {
 };
 
 fn.useRegCode = async (regCode, uid) => {
-  return await db.AnswerSheetModel.replaceOne({key: regCode}, {uid: uid});
+  return await db.AnswerSheetModel.replaceOne({key: regCode}, {$set: {uid: uid}});
 };
 
 fn.forumList = async () => {

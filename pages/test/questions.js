@@ -16,7 +16,7 @@ let questionsSchema = new Schema({
     type: Number,
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },
