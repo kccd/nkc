@@ -1,36 +1,36 @@
 .nkcpanel
   
   - var cindex = 0
-  each group,gindex in data.forumlist
+  each group,gindex in data.forumList
     - var groupcolor = Math.floor(Math.random()*16777216).toString('16')
-    - var parent = group.parentforum
+    - var parent = group
     
-    -var skip = (skipOtherParent&&(parent._key!=data.forum.parentid&&parent._key!=data.forum._key))
+    -var skip = (skipOtherParent&&(parent.fid!=data.forum.parentId&&parent.fid!=data.forum.fid))
     
     if !skip
       .ForumsListBody.ForumsListGroupItem
         
-        a.f12.reddish(href='/f/#{parent._key}') #{parent?parent.display_name:''}
+        a.f12.reddish(href=`/f/${parent.fid}`) #{parent?parent.displayName:''}
       
-      each f,findex in group.forumgroup 
+      each f,findex in group.children
         - var index = cindex + findex
         
         .ForumsListBody.ForumsListForumItem
           - var marker = false
           if data.forum
-            if f._key == data.forum._key
+            if f.fid == data.forum.fid
               - marker = true
               span.reddish > 
-          a(href='/f/#{f._key}')
+          a(href=`/f/${f.fid}`)
             if marker
-              span.reddish #{f.display_name} 
+              span.reddish #{f.displayName}
             else
-              span #{f.display_name} 
-          .ForumsListCountNumber(style='color:brown;') #{f.count_posts_today||""}
+              span #{f.displayName}
+          .ForumsListCountNumber(style='color:brown;') #{f.countPostsToday||""}
         
       if !skipOtherParent
         hr.hrNarrowSpace
-      - cindex += group.forumgroup.length
+      - cindex += group.children.length
     
     
 

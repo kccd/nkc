@@ -101,7 +101,7 @@ return db.query(`
     res[i]._id = undefined;
     res[i].fid = res[i]._key;
     res[i].countPosts = res[i].count_posts;
-    res[i].countPostsToday = res[i].count_posts_today;
+    res[i].countPostsToday = res[i].countPostsToday;
     res[i].countThreads = res[i].count_threads;
     res[i].parentId = (!res[i].parentid || res[i].parentid == '0')?'':res[i].parentid;
     res[i].iconFileName = res[i].icon_filename;

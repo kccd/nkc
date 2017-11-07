@@ -25,6 +25,7 @@
     "colors": "^1.1.2",
     "commonmark": "^0.28.1",
     "cookie-signature": "^1.0.6",
+    "diff": "^3.4.0",
     "immutable": "^3.8.2",
     "koa": "^2.3.0",
     "koa-body": "^2.5.0",

@@ -1,45 +1,76 @@
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test', {useMongoClient: true});
-mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
+mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
-let ASchema = new Schema({
-  name:{
-    type: String
+db = require('arangojs')('http://192.168.11.15');
+db.useDatabase('rescue');
+let users_personalSchema = new Schema({
+  uid: {
+    type: String,
+    unique: true,
+    required: true
   },
-  age: {
-    type: Number
+  email: {
+    type: String,
+    default: '',
+    match: /.*@.*/
   },
-  time: {
-    type:Date,
-    default: Date.now
+  mobile: {
+    type: String,
+    default:'',
+    index: 1
+  },
+  hashType: {
+    type: String,
+    required: true
+  },
+  lastTry: {
+    type: Number,
+    default: 0
+  },
+  password: {
+    salt: {
+      type: String,
+      required: true
+    },
+    hash: {
+      type: String,
+      required: true
+    }
+  },
+  newMessage: {
+    replies: {
+      type: Number,
+      default: 0
+    },
+    message: {
+      type: Number,
+      default: 0
+    },
+    system: {
+      type: Number,
+      default: 0
+    },
+    at: {
+      type: Number,
+      default: 0
+    }
+  },
+  regIP: {
+    type: String,
+    default: '0.0.0.0'
+  },
+  regPort: {
+    type: Number,
+    default: '0'
+  },
+  tries: {
+    type: Number,
+    default: 0
   }
 });
-ASchema.methods.getTime = function(){
-  let time = this.time;
-  let newTime = new Date(time);
-  return newTime.getTime();
-}
 
-
-let a = mongoose.model('mongoose', ASchema, 'mongoose');
-
-
-
-
-(async function() {
-  await a.replaceOne({name: '1'}, {$set: {time: new Date()}})
-  /*let Obj = await a.findOneAndRemove({name: '1'});
-  console.log(JSON.stringify(Obj));*/
-  /*for (let i = 0; i < 100; i++) {
-    new a({
-      name: i.toString(),
-      age: i
-    })
-      .save();
-  }*/
-  let aaa = await a.findOne({name: "1"});
-  //let time = aaa.getTime();
-  console.log(aaa.time);
-  console.log(new Date(new Date(aaa.time).getTime()))
-})();
+let UsersPersonal = mongoose.model('usersPersonal', users_personalSchema, 'usersPersonal');
+let a = 'newMessage.system';
+UsersPersonal.updateOne({uid: "74185"}, {$set: {: 1000}});

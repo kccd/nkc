@@ -16,7 +16,7 @@
         div(style='display: table-cell;')
           for cForum in forum.children
             a.ForumThreadHasImage(href='/f/#{cForum._key}' title='#{cForum.description}' style='color: black;background-color: white; font-size: 14px; margin-top: -6px;')
-              span.nkc-bubble(style='background-color: #{cForum.color? cForum.color: defaultColor}') &nbsp;#{cForum.count_posts_today}&nbsp;
+              span.nkc-bubble(style='background-color: #{cForum.color? cForum.color: defaultColor}') &nbsp;#{cForum.countPostsToday}&nbsp;
               span #{cForum.display_name}
 
 .nkc-transform-box
@@ -33,5 +33,5 @@
         div(style='display: table-cell;')
           for cForum in forum.children
             a.ForumThreadHasImage(href='/f/#{cForum._key}' title='#{cForum.description}' style='color: black; background-color: white; font-size: 14px; margin-top: -6px;')
-              span.nkc-bubble(style='background-color: #{cForum.color? cForum.color: defaultColor}') &nbsp;#{cForum.count_posts_today}&nbsp;
+              span.nkc-bubble(style='background-color: #{cForum.color? cForum.color: defaultColor}') &nbsp;#{cForum.countPostsToday}&nbsp;
               span #{cForum.display_name}

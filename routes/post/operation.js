@@ -73,6 +73,15 @@ operationRouter
     updateObj[type] = q;
     await db.UserModel.replaceOne({uid: post.user.uid}, {$inc: updateObj});
     await next();
+  })
+  .get('/history', async(ctx, next) => {
+    const {pid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
+    ctx.data.post = await db.PostModel.findOnly({pid});
+    ctx.data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});
+    ctx.template = 'interface_post_history.pug';
+    await next();
   });
 
 module.exports = operationRouter;
