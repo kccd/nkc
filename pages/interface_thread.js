@@ -118,19 +118,50 @@ function cartPost(pid){
 }
 
 function setDigest(tid){
-  nkcAPI('setDigest',{tid:tid})
+  var setDigest = '设置精华';
+  var unSetDigest = '撤销精华';
+  var method = '';
+  var status = geid('threadDigest');
+  if(status.innerHTML === setDigest) method = 'post';
+  else if(status.innerHTML === unSetDigest) method = 'delete';
+  else return jwarning('到底是要设置精华还是撤销精华？');
+  nkcAPI('/t/'+tid+'/digest', method,{})
   .then(function(back){
-    return screenTopAlert(tid+ back.message.toString())
+    var oldStatus = status.innerHTML;
+    if(status.innerHTML === setDigest) {
+      status.innerHTML = unSetDigest;
+    } else {
+      status.innerHTML = setDigest;
+    }
+    $(this).text()
+    return screenTopAlert(tid + oldStatus + '成功');
   })
-  .catch(jwarning)
+  .catch(function(err){
+    jwarning('操作失败： ' + err);
+  })
 }
 
 function setTopped(tid){
-  nkcAPI('setTopped',{tid:tid})
+  var method = '';
+  var setTop = '设置置顶';
+  var unSetTop = '撤销置顶';
+  var status = geid('threadTop');
+  if(status.innerHTML === setTop) method = 'post';
+  else if(status.innerHTML === unSetTop) method = 'delete';
+  else return jwarning('到底是要设置置顶还是撤销置顶？');
+  nkcAPI('/t/'+tid+'/topped', method,{tid:tid})
   .then(function(back){
-    return screenTopAlert(tid+back.message.toString())
+    var oldStatus = status.innerHTML;
+    if(oldStatus === setTop) {
+      status.innerHTML = unSetTop;
+    } else {
+      status.innerHTML = setTop;
+    }
+    return screenTopAlert(tid + oldStatus + '成功');
   })
-  .catch(jwarning)
+  .catch(function(err){
+    return jwarning('操作失败： ' + err);
+  })
 }
 
 function assemblePostObject(){  //bbcode , markdown
@@ -156,7 +187,7 @@ function assemblePostObject(){  //bbcode , markdown
 }
 
 function disablePost(pid){
-  nkcAPI('disablePost',{pid:pid})
+  nkcAPI('/p/'+pid, 'delete',{})
   .then(function(res){
     screenTopAlert(pid+' 已屏蔽，请刷新')
     //location.reload()
@@ -165,7 +196,7 @@ function disablePost(pid){
 }
 
 function enablePost(pid){
-  nkcAPI('enablePost',{pid:pid})
+  nkcAPI('/p/'+pid, 'post',{})
   .then(function(res){
     location.reload()
   })
@@ -195,8 +226,10 @@ function submit(){
 }
 
 function quotePost(pid){
-  nkcAPI('getPostContent',{pid:pid})
+  nkcAPI('/p/'+pid+'/quote', 'post',{})
   .then(function(pc){
+    pc = pc.message;
+    console.log(pc);
     length_limit = 100;
     var content = pc.c;
     var replaceArr = [
@@ -216,8 +249,7 @@ function quotePost(pid){
       return str
     });
     if(str.length==length_limit)str+='……'
-
-    str = '[quote='+pc.username+','+pc._key+']'+ str + '[/quote]'
+    str = '[quote='+pc.user.username+','+pc.pid+']'+ str + '[/quote]'
 
     geid('ReplyContent').value += str
     window.location.href='#ReplyContent'
@@ -239,7 +271,7 @@ function addColl(tid){
 function addCredit(pid){
   var cobj = promptCredit(pid)
   if(cobj){
-    return nkcAPI('addCredit',cobj)
+    return nkcAPI('/p/'+pid+'/credit', 'put',cobj)
     .then(function(){
       window.location.reload()
     })
@@ -531,14 +563,22 @@ function adSwitch(tid) {
   var btn = geid('adBtn');
   var nowIsAd = '取消首页置顶';
   var nowNormal = '首页置顶';
-  nkcAPI('adSwitch', {tid: tid})
+  var method = 'post';
+  if(btn.innerHTML === nowIsAd) method = 'delete';
+  else if(btn.innerHTML === nowNormal) method = 'post';
+  else return screenTopWarning('到底是顶置还是不顶置？');
+  nkcAPI('/t/'+tid+'/adSwitch', method, {})
     .then(function() {
       if(btn.innerHTML === nowIsAd) {
+        screenTopWarning('取消首页置顶成功');
         btn.innerHTML = nowNormal;
         return
       }
+      screenTopWarning('首页置顶成功');
       btn.innerHTML = nowIsAd;
     })
-    .catch(screenTopWarning)
+    .catch(function(err){
+      screenTopWarning('操作失败： ' + err);
+    })
 }
 

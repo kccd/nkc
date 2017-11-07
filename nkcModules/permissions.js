@@ -180,9 +180,6 @@ const certificates ={
           }
         }
       },
-      m: {
-        [GET]: true
-      },
       t: {
         [parameter]: {
           [POST]: true,
@@ -266,6 +263,10 @@ const certificates ={
         mobile: {
           [name]: '手机',
           [PUT]: true
+        },
+        resource: {
+          [name]: '上传的资源',
+          [GET]: true
         }
       },
       logout: {
@@ -278,11 +279,29 @@ const certificates ={
   mail: {
     displayName: '笔友',
     inheritFrom: ['default'],
+    permittedOperations: {
+      p: {
+        [parameter]: {
+          quote: {
+            [POST]: true
+          }
+        }
+      }
+    },
     selfModifyTimeLimit: _hour
   },
   mobile: {
     displayName: '机友',
     inheritFrom: ['default'],
+    permittedOperations: {
+      p: {
+        [parameter]: {
+          quote: {
+            [POST]: true
+          }
+        }
+      }
+    },
     selfModifyTimeLimit: _hour
   },
   examinated: {
@@ -290,6 +309,15 @@ const certificates ={
     inheritFrom: ['default'],
     contentClasses: {
       professional: true
+    },
+    permittedOperations: {
+      p: {
+        [parameter]: {
+          quote: {
+            [POST]: true
+          }
+        }
+      }
     },
     selfModifyTimeLimit: 3*_month
   },
@@ -377,7 +405,9 @@ const certificates ={
       p: {
         [GET]: true,
         [parameter]: {
-          [DELETE]: true,
+          [GET]: true,
+          [DELETE]: true, //屏蔽post
+          [POST]: true, // 解封post
           credit: {
             [name]: '学术分',
             [PUT]: true
@@ -422,6 +452,20 @@ const certificates ={
             [name]: '首页置顶',
             [POST]: true,
             [DELETE]: true
+          }
+        }
+      },
+      f: {
+        [parameter]: {
+          forUsers: {
+            [name]: '对用户可见',
+            [DELETE]: true, // 对用户可见
+            [PUT]: true // 对用户不可见
+          },
+          forUsersByCerts: {
+            [name]: '无权可见',
+            [DELETE]: true, // 无权不可见
+            [PUT]: true // 无权可见
           }
         }
       }
@@ -527,18 +571,21 @@ function getVisibleFid() {
 
 module.exports = async (ctx, next) => {
   let certs = ['visitor'];
-  ctx.getUserDescription = (user = this.data.user) => {
+  ctx.getUserDescription = function(user = this.data.user) {
     const {certs, username, xsf = 0, kcb = 0} = user;
     let cs = ['会员'];
     for(const cert of certs) {
       cs.push(certificates[cert].displayName);
     }
     cs = cs.join(' ');
-    return `${username}\n`+
+    return {
+      string: `${username}\n`+
       `学术分 ${xsf}\n`+
       `科创币 ${kcb}\n`+
-      `${cs}`
-  };
+      `${cs}`,
+      certs: cs
+    }
+  }.bind(ctx);
   if(ctx.data.user) {
     certs = ctx.data.user.certs;
     ctx.data.user.navbarDesc = ctx.getUserDescription();

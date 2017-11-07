@@ -79,5 +79,14 @@ meRouter
     if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
     await db.UsersPersonalModel.replaceOne({uid: user.uid}, {$set: {mobile: newMobile}});
     await next();
+  })
+  .get('/resource', async (ctx, next) => {
+    const {user} = ctx.data;
+    const {db} = ctx;
+    const quota = parseInt(ctx.query.quota);
+    let resources = await db.ResourceModel.find({uid: user.uid}).sort({toc: -1}).limit(quota);
+    console.log(resources);
+    ctx.data.resources = resources;
+    await next();
   });
 module.exports = meRouter;

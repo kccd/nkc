@@ -16,7 +16,7 @@
     span 总主题 #{user.threadCount||0} 帖
     span 总回复 #{user.postCount||0} 楼
 
-    -var listCertText = user.navbarDesc
+    -var listCertText = user.navbarDesc.certs
     span 拥有证书：#{listCertText}
     br
     span 注册于 #{dateTimeString(user.toc)}

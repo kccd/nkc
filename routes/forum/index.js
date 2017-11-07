@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const operationRouter = require('./operation');
 const forumRouter = new Router();
 
 forumRouter
@@ -17,6 +18,7 @@ forumRouter
     data.forum = forum;
     data.threads = threads;
     await next()
-  });
+  })
+  .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
 
 module.exports = forumRouter;

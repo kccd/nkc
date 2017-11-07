@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
+const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
 operationRouter
   // 收藏帖子
   .post('/addColl', async (ctx, next) => {
@@ -21,24 +23,56 @@ operationRouter
     }
     await next();
   })
-  .post('/cartThread', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `加入管理车   tid：${tid}`;
-    await next();
-  })
+  // 首页置顶
   .post('/adSwitch', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `首页顶置   tid：${tid}`;
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
+    let setting = await db.SettingMode.findOneAndUpdate({uid: 'system'}, {$addToSet: {ads: tid}});
+    if(setting.ads.indexOf(tid) !== -1) ctx.throw(404, '该贴子已经在首页置顶了，不需要重复操作');
     await next();
   })
-  .post('/setDigest', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `设置精华   tid：${tid}`;
+  // 取消首页置顶
+  .del('/adSwitch', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
     await next();
   })
-  .post('/setTopped', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `设置置顶   tid：${tid}`;
+  .post('/digest', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
+    let thread = await db.ThreadModel.findOnly({tid});
+    if(thread.digest) ctx.throw(404, '该贴子已经被设置成精华了，不需要重复设置');
+    await db.ThreadModel.replaceOne({tid}, {$set: {digest: true}});
+    await dbFn.setNumberOfDigestThread(thread.fid, 1);
+    await next();
+  })
+  .del('/digest', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    const {user} = ctx.data;
+    let thread = await db.ThreadModel.findOnly({tid});
+    if(!thread.digest) ctx.throw(404, '该贴子已经被撤销精华了，不需要重复撤销');
+    await db.ThreadModel.replaceOne({tid}, {$set: {digest: false}});
+    await dbFn.setNumberOfDigestThread(thread.fid, -1);
+    await next();
+  })
+  .post('/topped', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    let thread = await db.ThreadModel.findOnly({tid});
+    if(thread.topped) ctx.throw(404, '该帖子已经被置顶了，不需要重复操作');
+    await db.ThreadModel.replaceOne({tid}, {$set: {topped: true}});
+    await next();
+  })
+  .del('/topped', async (ctx, next) => {
+    const {tid} = ctx.params;
+    const {db} = ctx;
+    let thread = await db.ThreadModel.findOnly({tid});
+    if(!thread.topped) ctx.throw(404, '该帖子已经被取消置顶了，不需要重复操作');
+    await db.ThreadModel.replaceOne({tid}, {$set: {topped: false}});
     await next();
   })
   .post('/moveThread', async (ctx, next) => {

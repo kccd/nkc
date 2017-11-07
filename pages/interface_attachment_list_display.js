@@ -1,12 +1,12 @@
 var ResourceListItem = React.createClass({
   click:function(event){
     event.index = this.props.index;
-    event.rid = this.props.robject._key
+    event.rid = this.props.robject.rid
     this.props.click(event);
   },
   render:function(){
     var robject = this.props.robject;
-    var rid = robject._key
+    var rid = robject.rid
     var oname = robject.oname
 
     //附件名太长的处理
@@ -44,7 +44,7 @@ var ResourceList = React.createClass({
       var robject = list[i]
 
       renderedNodes.push(
-        <ResourceListItem click={this.props.itemclick} key={robject._key} index={i} robject={robject}/>
+        <ResourceListItem click={this.props.itemclick} key={robject.rid} index={i} robject={robject}/>
       )
     }
     return(
@@ -67,8 +67,9 @@ var list_display = function(options){
   list_display.quota = 30;
   list_display.refresh = function(){
     //obtain rlist here
-    nkcAPI('getResourceOfCurrentUser',{quota:list_display.quota})
+    nkcAPI('/me/resource?quota='+list_display.quota, 'get',{})
     .then(rarr=>{
+      rarr = rarr.resources;
       list_display.rlist = rarr;
       React.render(
         <ResourceList itemclick={content_insert_resource} list={rarr}/>,

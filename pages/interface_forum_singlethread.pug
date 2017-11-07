@@ -25,7 +25,7 @@
   .parent.clearfix(id='')
     .avatar-left
       - var user = ocUser
-      - var title = user?data.user.navbarDesc:''
+      - var title = user?data.user.navbarDesc.info:''
       a(href='/m/#{uid}' title='#{title}')
         img.ForumThreadAvatar(src='/avatar/#{uid}')
     

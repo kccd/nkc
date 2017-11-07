@@ -18,7 +18,8 @@ threadRouter
       PersonalForumModel,
       ForumModel,
       UserModel,
-      PostModel
+      PostModel,
+      SettingModel
     } = db;
     ctx.template = 'interface_thread.pug';
     let thread = await ThreadModel.findOnly({tid});
@@ -27,11 +28,13 @@ threadRouter
     thread = thread.toObject();
     thread.oc = await PostModel.findOnly({pid: thread.oc});
     let ocuser = (await UserModel.findOnly({uid: data.posts[0].uid})).toObject();
-    ocuser.navbarDesc = ctx.
+    ocuser.navbarDesc = ctx.getUserDescription(ocuser);
+    data.ocuser = ocuser;
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user)
       data.usersThreads = await data.user.getUsersThreads();
     data.thread = thread;
+    data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
     let myForum, othersForum;
     if(mid !== '') {
       myForum = await PersonalForumModel.findOnly({uid: mid});

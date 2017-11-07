@@ -3,6 +3,16 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
+fn.setNumberOfDigestThread = async (fid, number) => {
+  let forum = await db.ForumModel.findOnly({fid});
+  let threadCount = forum.tCount;
+  threadCount = {
+    digest: threadCount.digest + number,
+    normal: threadCount.normal - number
+  };
+  return await db.ForumModel.replaceOne({fid}, {$set: {tCount: threadCount}});
+};
+
 fn.decrementPsnl = async (uid, type, number) => {
   let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
   let {newMessage} = userPersonal;
@@ -183,5 +193,54 @@ fn.getAvailableForums = async ctx => {
   return result;
 };
 
+fn.updateThread = async (tid) => {
+  let thread = await db.ThreadModel.findOnly({tid});
+  let posts = await db.PostModel.find({tid}).sort({toc: -1});
+  let count = posts.length;
+  if(count === 0) return;
+  let timeToNow = new Date();
+  let time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
+  let countToday = 0;
+  let countRemain = 0;
+  for (let i = 0; i < posts.length; i++) {
+    if(posts[i].toc > time) countToday++;
+    if(!posts[i].disabled) countRemain++;
+  }
+  let lastPost = posts[0];
+  let firstPost = posts[posts.length-1];
+  console.log(`firstPost-toc: ${firstPost.toc.getTime()},  nowTime: ${Date.now()}`);
+  let updateObj = {
+    hasImage: thread.hasImage,
+    hasFile: thread.hasFile,
+    tlm: lastPost.toc.getTime(),
+    count: count,
+    countRemain: countRemain,
+    countToday: countToday,
+    oc: firstPost.pid,
+    lm: lastPost.pid,
+    toc: firstPost.toc.getTime(),
+    uid: firstPost.uid
+  };
+  if(firstPost.r) {
+    let r = firstPost.r;
+    let extArr = ['jpg', 'png', 'svg', 'jpeg'];
+    let imageNum = 0;
+    for (let i = 0; i < r.length; r++) {
+      let rFromDB = await db.ResourceModel.findOne({rid: r});
+      if(extArr.indexOf(rFromDB.ext) !== -1) {
+        imageNum++;
+        updateObj.hasImage = true;
+      }
+    }
+    if(r.length > imageNum) updateObj.hasFile = true;
+  }
+  return await db.ThreadModel.replaceOne({tid}, {
+    $set: updateObj
+  })
+};
+
+fn.updatePost = async (pid) => {
+  
+};
 
 module.exports = fn;

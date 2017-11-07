@@ -477,7 +477,7 @@ function recommendPostSwitch(e, targetPid) {
   var button = e.target;
   var content = button.innerHTML.replace(/\(.*\)/, '');
   if(content === '推荐') {
-    nkcAPI('recommendPost', {targetPid: targetPid})
+    nkcAPI('/p/'+targetPid+'/recommend', 'post', {})
       .then(function() {
         screenTopAlert('推荐成功');
         button.innerHTML = '取消推荐';
@@ -487,7 +487,7 @@ function recommendPostSwitch(e, targetPid) {
       })
   }
   else if(content === '取消推荐') {
-    nkcAPI('unrecommendPost', {targetPid: targetPid})
+    nkcAPI('/p/'+targetPid+'/recommend', 'delete', {})
       .then(function(msg) {
         screenTopAlert('成功取消推荐');
         button.innerHTML = '推荐(' + msg.message + ')';

@@ -1,12 +1,11 @@
 //do sth with the post variable here
-- var po = data.permittedOperations
 -const {ensurePermission} = data
 -const postTo = ensurePermission('POST', '/f/x')
 -const addPostToCart = ensurePermission('POST', '/u/x/cart')
--const addCredit = ensurePermission('POST', '/t/x/credit')
+-const addCredit = ensurePermission('PUT', '/p/x/credit')
 -const disablePost = ensurePermission('DELETE', '/p/x')
 
-  if !post.disabled || (post.disabled && po.enablePost)
+  if (!post.disabled || disablePost)
     //horizontal line
     hr(id=`${post.pid}`).ThreadSinglePostHr
     //meta(id=`${post.pid}'`)
@@ -17,7 +16,7 @@
       .threadOneLine
         div.fixThread
           div(style='float: left;')
-            - var title = user && data.user?data.user.navbarDesc:''
+            - var title = user && data.user?data.user.navbarDesc.info:''
             a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
@@ -34,21 +33,21 @@
               -var recUsers = post.recUsers || []
               if data.user && post.uid != data.user.uid
                 if recUsers.indexOf(data.user.uid) > -1
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post.pid})`) 取消推荐
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}')`) 取消推荐
                 else
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, ${post.pid})`) 推荐(#{recUsers.length})
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}')`) 推荐(#{recUsers.length})
 
               - if(postTo)
-                a(href=`javascript:quotePost(${post.pid})`) 引用
+                a(href=`javascript:quotePost('${post.pid}')`) 引用
 
               - if(addPostToCart)
-                a(href=`javascript:cartPost(${post.pid})`) 加入管理车
+                a(href=`javascript:cartPost('${post.pid}')`) 加入管理车
 
               - if(addCredit)
-                a(href=`javascript:addCredit(${post.pid})`) 评学术分
+                a(href=`javascript:addCredit('${post.pid}')`) 评学术分
 
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
-                a(href=`javascript:disablePost(${post.pid})`) 屏蔽
+                a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
 
               - if(post.tlm>post.toc && ensurePermission('GET', '/p/x/history'))
                 a(href=`/post_history/${post.pid}`) 历史
@@ -59,9 +58,9 @@
                 - if(testModifyTimeLimit(data.certificates,ownership,post.toc))
                   a(href=`/editor?target=post/${post.pid}`) 编辑
 
-                - var cc = data.certificates.contentClasses
-                - if(cc.classified)
-                  - var ipoc = post.ipoc||post.ip||post.ocip||null
+                - var cc = disablePost;
+                - if(cc)
+                  - var ipoc = post.iplm || null
 
                   if ipoc
                     - var queryforip = 'http://ip138.com/ips138.asp?ip='+ipoc.toString()+'&action=2'
@@ -94,8 +93,5 @@
               span.TPCIssuer #{username} &nbsp;&nbsp;
               span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
               span.TPCReason #{c.reason}
-  - var po = data.permittedOperations
-  if post.disabled
-
-    - if(disablePost)
-      a(href="javascript:enablePost(`${post.pid}'`)") [此楼已屏蔽，点击解除]
+    if post.disabled && disablePost
+      a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
