@@ -13,6 +13,7 @@ const _month = _day*30;
 const _year = _month*12;
 
 const mongoose = require('../settings').database;
+const {Map} = require('immutable');
 
 const methodEnum = {
   GET,
@@ -575,7 +576,7 @@ module.exports = async (ctx, next) => {
       //if someone wasn't able to modify a thread, then he wasn't able to view
       //threads or posts which were disabled.
       base.disabled = false;
-    return base
+    return Map(base)
   };
   if(!ctx.data.ensurePermission())
     ctx.throw(401, `权限不足`);
