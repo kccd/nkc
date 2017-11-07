@@ -187,7 +187,7 @@ function assemblePostObject(){  //bbcode , markdown
 }
 
 function disablePost(pid){
-  nkcAPI('disablePost',{pid:pid})
+  nkcAPI('/p/'+pid, 'delete',{})
   .then(function(res){
     screenTopAlert(pid+' 已屏蔽，请刷新')
     //location.reload()
@@ -196,7 +196,7 @@ function disablePost(pid){
 }
 
 function enablePost(pid){
-  nkcAPI('enablePost',{pid:pid})
+  nkcAPI('/p/'+pid, 'post',{})
   .then(function(res){
     location.reload()
   })
@@ -226,8 +226,10 @@ function submit(){
 }
 
 function quotePost(pid){
-  nkcAPI('getPostContent',{pid:pid})
+  nkcAPI('/p/'+pid+'/quote', 'post',{})
   .then(function(pc){
+    pc = pc.message;
+    console.log(pc);
     length_limit = 100;
     var content = pc.c;
     var replaceArr = [
@@ -247,8 +249,7 @@ function quotePost(pid){
       return str
     });
     if(str.length==length_limit)str+='……'
-
-    str = '[quote='+pc.username+','+pc._key+']'+ str + '[/quote]'
+    str = '[quote='+pc.user.username+','+pc.pid+']'+ str + '[/quote]'
 
     geid('ReplyContent').value += str
     window.location.href='#ReplyContent'
@@ -270,7 +271,7 @@ function addColl(tid){
 function addCredit(pid){
   var cobj = promptCredit(pid)
   if(cobj){
-    return nkcAPI('addCredit',cobj)
+    return nkcAPI('/p/'+pid+'/credit', 'put',cobj)
     .then(function(){
       window.location.reload()
     })

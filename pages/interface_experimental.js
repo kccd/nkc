@@ -356,32 +356,40 @@ function listForumBranch(event, index) {
 
 function forumVisibilitySwitch(event, fid){
   $(event.target).addClass('disabled');
-  nkcAPI('forumVisibilitySwitch', {fid: fid})
+  var method = 'put';
+  if(event.target.innerHTML === '已对用户可见'){
+    method = 'delete';
+  }
+  nkcAPI('/f/'+fid+'/forUsers', method, {})
     .then(function(res) {
       console.log(res.visibility);
-      if(res.visibility) {
-        event.target.innerHTML = '对用户隐藏';
+      if(event.target.innerHTML === '已对用户可见') {
+        event.target.innerHTML = '已对用户隐藏';
         $(event.target).removeClass('disabled');
-        screenTopAlert(fid + ' 已对用户可见');
+        screenTopAlert(fid + ' 已对用户隐藏');
         return;
       }
-      event.target.innerHTML = '对用户可见';
+      event.target.innerHTML = '已对用户可见';
       $(event.target).removeClass('disabled');
-      screenTopAlert(fid + ' 已对用户隐藏');
+      screenTopAlert(fid + ' 已对用户可见');
       return;
     })
     .catch(jwarning)
 }
 
 function forumIsVisibleForNCCSwitch(event, fid) {
-  nkcAPI('forumIsVisibleForNCCSwitch', {fid: fid})
+  var method = 'put';
+  if(event.target.innerHTML === '已对无权限用户隐藏') {
+    method = 'delete';
+  }
+  nkcAPI('/f/'+fid+'/forUsersByCerts', method, {fid: fid})
     .then(function(res) {
-      if(res.isVisibleForNCC) {
-        event.target.innerHTML = '对无权限隐藏';
+      if(event.target.innerHTML === '已对无权限用户隐藏') {
+        event.target.innerHTML = '已对无权限用户可见';
         $(event.target).removeClass('disabled');
         return screenTopAlert(fid + ' 已对无权限用户可见');
       }
-      event.target.innerHTML = '对无权限可见';
+      event.target.innerHTML = '已对无权限用户隐藏';
       $(event.target).removeClass('disabled');
       return screenTopAlert(fid + ' 已对无权限用户隐藏');
     })

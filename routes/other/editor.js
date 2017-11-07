@@ -12,11 +12,11 @@ editorRouter
     if(target.indexOf('post/') === 0) {
       const pid = target.slice(5);
       data.original_post = await ctx.db.PostModel.findOne({pid});
-      await next()
+      return await next();
     }
     data.original_post = content? decodeURI(content) : '';
     const a = target.split('/')[1];
-    await next()
+    await next();
   });
 
 module.exports = editorRouter;

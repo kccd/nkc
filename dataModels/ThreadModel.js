@@ -78,10 +78,10 @@ const threadSchema = new Schema({
     default: ''
   },
   tlm: {
-    type: Number,
+    type: Date,
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   toMid: {

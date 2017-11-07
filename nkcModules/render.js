@@ -48,8 +48,8 @@ function testModifyTimeLimit(cs, ownership, toc){
   //--test ownership--
   if(ownership)
     // if he own the post
-    return Date.now() < toc + smtl;
-  return Date.now() < toc + emtl
+    return Date.now() < toc.getTime() + smtl;
+  return Date.now() < toc.getTime() + emtl
 }
 
 let getUserDescription = (user) => {
