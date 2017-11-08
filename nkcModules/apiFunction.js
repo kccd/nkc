@@ -11,7 +11,8 @@ fn.paging = (page, arrLength) => {
     pageCount: Math.ceil(arrLength/perpage)
   }
 };
-
+{fid: {$in: [11,12,13]}}
+{fid: 11}
 fn.getQueryObj = (query, match) => {
   const {digest, cat, sortby, page = 0} = query;
   const $match = Object.assign({}, match);

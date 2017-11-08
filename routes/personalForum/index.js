@@ -213,4 +213,12 @@ router
         }},
       ])
     }
+    else if(tab === 'all') {
+      const $post1 = matchBase.set('uid', uid);
+      const {recPosts} = personalForum;
+      const $post2 = matchBase.set('pid', {$in: recPosts});
+      data.threads = await mongoose.connection.db.collection('threads').aggregate([
+
+      ])
+    }
   });

@@ -12,7 +12,8 @@ const _day = _hour*24;
 const _month = _day*30;
 const _year = _month*12;
 
-const mongoose = require('../settings').database;
+const settings = require('../settings');
+const mongoose = settings.database;
 const {Map} = require('immutable');
 
 const methodEnum = {
@@ -42,11 +43,11 @@ const certificates ={
         [DELETE]: true
       },
       latest: {
-        [name]: '最近',
+        [name]: '最近帖子',
         [GET]: true
       },
       activities: {
-        [name]: '动态',
+        [name]: '个人动态',
         [parameter]: {
           [GET]: true
         }
@@ -214,7 +215,7 @@ const certificates ={
       },
       p: {
         [parameter]: {
-          [PUT]: true,
+          [PATCH]: true,
           recommend: {
             [name]: '推荐',
             [POST]: true,
@@ -389,16 +390,6 @@ const certificates ={
       },
       t: {
         [parameter]: {
-          digest: {
-            [name]: '精华',
-            [POST]: true,
-            [DELETE]: true
-          },
-          topped: {
-            [name]: '精华',
-            [POST]: true,
-            [DELETE]: true
-          },
           [PATCH]: true
         },
       },
@@ -457,16 +448,7 @@ const certificates ={
       },
       f: {
         [parameter]: {
-          forUsers: {
-            [name]: '对用户可见',
-            [DELETE]: true, // 对用户可见
-            [PUT]: true // 对用户不可见
-          },
-          forUsersByCerts: {
-            [name]: '无权可见',
-            [DELETE]: true, // 无权不可见
-            [PUT]: true // 无权可见
-          }
+          [PATCH]: true
         }
       }
     }
@@ -619,7 +601,7 @@ module.exports = async (ctx, next) => {
   }.bind(ctx);
   ctx.getVisibleFid = getVisibleFid;
   ctx.generateMatchBase = (base = {}) => {
-    if(!this.ensurePermission('POST', '/t/x/digest'))
+    if(!this.ensurePermission('PATCH', '/t/x'))
       //if someone wasn't able to modify a thread, then he wasn't able to view
       //threads or posts which were disabled.
       base.disabled = false;

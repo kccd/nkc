@@ -4,6 +4,21 @@ const threadRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 
+// const {
+//   postToThread,
+//   postToForum,
+//   disablePost,
+//   enablePost,
+//   recommendPost,
+//   unrecommendPost,
+//   subscribeUser,
+//   unsubscribeUser,
+//   setDigest,
+//   cancelDigest,
+//   setTopped,
+//   cancelTopped
+// } = settings.user.scoreMap;
+
 
 threadRouter
   .post('/:tid', async (ctx, next) => {
