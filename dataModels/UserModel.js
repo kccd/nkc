@@ -103,7 +103,7 @@ userSchema.methods.getUsersThreads = function() {
       fid: {$not: {$eq: 'recycle'}}
     }},
     {$sort: {
-      toc: 1
+      toc: -1
     }},
     {
       $limit: 8
