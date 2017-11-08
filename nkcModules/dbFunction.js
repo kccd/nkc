@@ -240,7 +240,7 @@ fn.updatePost = async (pid) => {
 fn.getToppedThreads = async (fid) => {
   return await db.ThreadModel.aggregate([
     {$match: {fid: fid, topped: true}},
-    {$sort: {toc: -1}},
+    {$sort: {toc: 1}},
     {$lookup: {
       from: 'posts',
       localField: 'lm',
@@ -259,16 +259,16 @@ fn.getToppedThreads = async (fid) => {
       from: 'users',
       localField: 'oc.uid',
       foreignField: 'uid',
-      as: 'ocuser'
+      as: 'oc.user'
     }},
-    {$unwind: "$ocuser"},
+    {$unwind: "$oc.user"},
     {$lookup: {
       from: 'users',
       localField: 'lm.uid',
       foreignField: 'uid',
-      as: 'lmuser'
+      as: 'lm.user'
     }},
-    {$unwind: "$lmuser"}
+    {$unwind: "$lm.user"}
   ]);
 };
 

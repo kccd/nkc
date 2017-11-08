@@ -83,7 +83,6 @@ block content
                 
                   div
                     span(style='margin-right:20px;') 今日: #{data.forum.countPostsToday||0} 主题: #{data.forum.countThreads||0} 回复: #{data.forum.countPosts||0}
-                    -console.log(moderators)
                     if data.moderators && data.moderators.length
                       span 版主：
                         - var moderators = data.moderators
@@ -163,6 +162,9 @@ block content
 
                       .form-group
                         button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
+
+
+
                       .form-group
                         include forumlist_dropdown.pug
                         button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
@@ -209,12 +211,12 @@ block content
 
                   hr.hrNarrowSpace
 
-              //if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
-              //  .ForumThreadList
-              //    each thread,index in data.toppedThreads
-              //      include interface_forum_singlethread.pug
-              //  //hr.hrNarrowSpace
-              //  .ForumToppedSplitter - 以上是置顶 -
+              if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
+                .ForumThreadList
+                  each thread,index in data.toppedThreads
+                    include interface_forum_singlethread.pug
+                //hr.hrNarrowSpace
+                .ForumToppedSplitter - 以上是置顶 -
 
               .ForumThreadList
                 each thread,index in data.threads

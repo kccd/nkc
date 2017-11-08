@@ -85,6 +85,7 @@ const forumSchema = new Schema({
 forumSchema.methods.getThreadsByQuery = function(query) {
   const {$match, $sort, $skip, $limit} = getQueryObj(query);
   return mongoose.connection.db.collection('threads').aggregate([
+    {$match: {fid: this.fid}},
     {$match},
     {$sort},
     {$skip},
