@@ -177,6 +177,7 @@ fn.getAvailableForums = async ctx => {
   ]);
   const result = forums.filter(e => e._id.parentId === '')[0].children;
   result.map(e => {
+    e.children = [];
     for(const f of forums) {
       if(e.fid === f._id.parentId) {
         e.children = f.children
@@ -234,6 +235,41 @@ fn.updateThread = async (tid) => {
 
 fn.updatePost = async (pid) => {
   
+};
+
+fn.getToppedThreads = async (fid) => {
+  return await db.ThreadModel.aggregate([
+    {$match: {fid: fid, topped: true}},
+    {$sort: {toc: -1}},
+    {$lookup: {
+      from: 'posts',
+      localField: 'lm',
+      foreignField: 'pid',
+      as: 'lm'
+    }},
+    {$unwind: "$lm"},
+    {$lookup: {
+      from: 'posts',
+      localField: 'oc',
+      foreignField: 'pid',
+      as: 'oc'
+    }},
+    {$unwind: "$oc"},
+    {$lookup: {
+      from: 'users',
+      localField: 'oc.uid',
+      foreignField: 'uid',
+      as: 'ocuser'
+    }},
+    {$unwind: "$ocuser"},
+    {$lookup: {
+      from: 'users',
+      localField: 'lm.uid',
+      foreignField: 'uid',
+      as: 'lmuser'
+    }},
+    {$unwind: "$lmuser"}
+  ]);
 };
 
 module.exports = fn;

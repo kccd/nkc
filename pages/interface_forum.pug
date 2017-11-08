@@ -49,28 +49,28 @@ block content
                   //img(src='http://bbs.kechuang.org/themes/site/dingzhi/images/logo.png')
                   if(data.forum.fid)
                     .ForumNavigation1(style='margin-bottom:5px;')
-                      //each group,index in data.forumList
-                      //
-                      //  -var gpf = group.parentforum
-                      //  if gpf._key == data.forum.parentid
-                      //
-                      //    -var gpf = group.parentforum
-                      //    -var name = gpf.display_name
-                      //    -gpf.color = gpf.color||'#aaa'
-                      //    -var url = '/f/'+gpf._key
-                      //
-                      //    -var stylestr = 'color:'+gpf.color
-                      //
-                      //    a(href='#{url}' class='parentforum' style='#{stylestr}') #{name} /
-                      //
-                      //    each f,findex in group.forumgroup
-                      //      -var backcolor=f.color||gpf.color
-                      //      -var name = f.display_name
-                      //      -var url = '/f/'+f._key
-                      //
-                      //      -var active = f._key==data.forum.fid
-                      //      -var stylestr = active?'background-color:'+backcolor:''
-                      //      a(href='#{url}' style='#{stylestr}' class='#{active?"active":""}') #{name}
+                      each group,index in data.forumList
+
+                        -var gpf = group
+                        if gpf.fid == data.forum.parentId
+
+                          -var gpf = group
+                          -var name = gpf.displayName
+                          -gpf.color = gpf.color||'#aaa'
+                          -var url = '/f/'+gpf.fid
+
+                          -var stylestr = 'color:'+gpf.color
+
+                          a(href=`${url}` class='parentforum' style=`#{stylestr}`) #{name} /
+
+                          each f,findex in group.children
+                            -var backcolor=f.color||gpf.color
+                            -var name = f.displayName
+                            -var url = '/f/'+f.fid
+
+                            -var active = f.fid==data.forum.fid
+                            -var stylestr = active?'background-color:'+backcolor:''
+                            a(href=`${url}` style=`${stylestr}` class=`${active?"active":""}`) #{name}
                       
                   
                   -var forum = data.forum
@@ -83,19 +83,19 @@ block content
                 
                   div
                     span(style='margin-right:20px;') 今日: #{data.forum.countPostsToday||0} 主题: #{data.forum.countThreads||0} 回复: #{data.forum.countPosts||0}
-          
-                    if data.forum.moderators && data.forum.moderators.length
+                    -console.log(moderators)
+                    if data.moderators && data.moderators.length
                       span 版主：
-                        - var moderators = data.forum.moderators
+                        - var moderators = data.moderators
                         each k in moderators
                           a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
                         
-                  if data.forumthreadtypes && data.forumthreadtypes.length
+                  if data.forumThreadTypes && data.forumThreadTypes.length
                     .ForumNavigation1
                       hr.hrNarrowSpace
                       span 分类: 
                       a(href=`/f/${data.forum.fid}` class=`${data.cat?"":"active"}`) 所有帖子
-                      each ftt in data.forumthreadtypes
+                      each ftt in data.forumThreadTypes
                         -var active = ftt.fid==data.cat
                         a(href=`/f/${data.forum.fid}?cat=${ftt.fid}` class=`${active?"active":""}` ) #{ftt.name}
                       hr.hrNarrowSpace
@@ -112,7 +112,7 @@ block content
                 span(style='font-size: 18px; color: grey;') /&nbsp;
                 each group,index in data.forumList
                   -var gpf = group
-                  -var name = gpf.displaName
+                  -var name = gpf.displayName
                   -var url = '/f/'+gpf.fid
                   
                   -var color = gpf.color||'#aaa'
@@ -140,16 +140,16 @@ block content
                       span(style='font-size: 17px;') 专业分区
                       span(style='color: grey;') (发帖请进入对应分区)
                     for cForum in data.forums
-                      a(style='margin: 2px 5px;' href=`/f/${cForum.fid}`) #{cForum.displaName}
+                      a(style='margin: 2px 5px;' href=`/f/${cForum.fid}`) #{cForum.displayName}
                   hr.hrNarrowSpace
             .panel
               .row
                 .col-xs-12
                   .form-group(style='margin-top:0px;margin-bottom:6px')
                     include interface_easy_post.pug
-                    if data.replytarget && !hasChildren
+                    if data.replyTarget && !hasChildren
 
-                      a.btn.btn-default(href=`/editor?target=${data.replytarget}`) 新帖
+                      a.btn.btn-default(href=`/editor?target=${data.replyTarget}`) 新帖
                     if isModerator&&!forumIsParent
                       button#enterManagementMode.btn.btn-default(onclick='enterManagementMode()') 管理
 
@@ -164,7 +164,7 @@ block content
                       .form-group
                         button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
                       .form-group
-                        //include forumlist_dropdown.pug
+                        include forumlist_dropdown.pug
                         button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
 
                       .form-group
@@ -228,8 +228,8 @@ block content
                   nav
                     include interface_navigation_paging.pug
 
-                  if data.replytarget && !hasChildren
-                    a.btn.btn-default(style="margin-top:13px" href=`/editor?target=${data.replytarget}`) 发表新帖
+                  if data.replyTarget && !hasChildren
+                    a.btn.btn-default(style="margin-top:13px" href=`/editor?target=${data.replyTarget}`) 发表新帖
               .div#bm
 
 
@@ -267,8 +267,8 @@ block content
               a(href=`/m/${data.user.uid}`) 我的主题
               br
               br
-              //for thread in data.userThreads
-              //  include interface_users_latest_threads
+              for thread in data.userThreads
+                include interface_users_latest_threads
 
           .nkcpanel
             ul.HomeFriendlyLink
