@@ -17,17 +17,10 @@ fn.decrementPsnl = async (uid, type, number) => {
   let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
   let {newMessage} = userPersonal;
   if(number || number === 0) {
-    newMessage[type] -= number;
+    newMessage[type] += number;
   } else {
     newMessage[type] = 0;
   }
-  return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
-};
-
-fn.addValueOfMessage = async (uid, type) => {
-  let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
-  let {newMessage} = userPersonal;
-  newMessage[type]++;
   return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
 };
 

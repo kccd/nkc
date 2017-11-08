@@ -43,7 +43,6 @@ postRouter
   .put('/:pid', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.data = `更新post   pid：${pid}`;
-    lksdjlfjdslfk();
     await next();
   })
   .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods());

@@ -12,7 +12,10 @@ forumRouter
   .get('/:fid', async (ctx, next) => {
     const data = ctx.data;
     ctx.template = 'interface_forum.pug';
-    const {fid} = ctx.params;
+    const {fid, digest, cat, sortby} = ctx.params;
+    if(digest) data.digest = true;
+    data.cat = cat;
+    data.sortby = sortby;
     const {ForumModel} = ctx.db;
     const {query} = ctx;
     const forum = await ForumModel.findOne({fid});

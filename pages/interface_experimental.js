@@ -1,3 +1,5 @@
+$('button').addClass('MyButton');
+$('.container a').addClass('MyButton');
 var ItemContainer = React.createClass({
   click:function(event){
     event.index = this.props.index;
@@ -60,7 +62,6 @@ var ButtonList = React.createClass({
     )
   }
 })
-
 var ListControl = React.createClass({
   render:function(){
     var pc = this.props.pc
@@ -263,6 +264,7 @@ function InitThreadControl(options){
 
   return pc;
 }
+/*
 
 var pc = InitThreadControl({
   rootnode:geid('Root'),
@@ -270,6 +272,7 @@ var pc = InitThreadControl({
 
 pc.render()
 pc.actions.refresh();
+*/
 
 function moveSelectedThread(fid){
   var parr=[]

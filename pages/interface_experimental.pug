@@ -10,25 +10,11 @@ block content
     .row
       .col-xs-12
         h4 这是管理界面
-        
-    hr
-    .row
-      .col-xs-12
-        .panel.panel-default.f12
-          .panel-body
-            #Root
 
+    .row
       .col-xs-12.col-md-6
         .panel.panel-default
           .panel-body
-            p 将选中帖子移动到：
-            .form-group
-              include forumlist_dropdown.pug
-              
-            .form-group
-              button.btn.btn-default(onclick="directedMove()") 走起
-          
-            hr
             h4 特殊操作 [ 请没事不要点击 ]
             button.btn.btn-default(onclick="nkcAPI('updateAllThreads').then(jalert).catch(jalert)") 更新全部帖子数据
             button.btn.btn-default(onclick="nkcAPI('updateAllForums').then(jalert).catch(jalert)") 更新全部板块数据

@@ -13,7 +13,7 @@ let questionsSchema = new Schema({
     required: true
   },
   tlm: {
-    type: Number,
+    type: Date,
   },
   toc: {
     type: Date,

@@ -121,6 +121,13 @@ const certificates ={
         [parameter]: {
           [GET]: true,
         }
+      },
+      sendMessage: {
+        [name]: '发短信',
+        register: {
+          [name]: '注册短信',
+          [POST]: true
+        }
       }
     },
     elseModifyTimeLimit: 0,
