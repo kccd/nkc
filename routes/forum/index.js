@@ -30,7 +30,6 @@ forumRouter
     }
     if(uidObj.length > 0) data.moderators = await UserModel.find().or(uidObj);
     const threads = await forum.getThreadsByQuery(query);
-    console.log(threads);
     if(data.paging.page === 0 && data.forum.type === 'forum') {
       data.toppedThreads = await dbFn.getToppedThreads(fid);
     }
