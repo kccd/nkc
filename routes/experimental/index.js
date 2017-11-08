@@ -68,18 +68,8 @@ experimentalRouter
     });
     try{
       await newSysinfo.save();
-      let allUsers = await db.UsersPersonalModel.find({}, {_id: 0, uid: 1, newMessage: 1});
-      for (let i  =0; i < allUsers.length; i++) {
-        let newMessage = allUsers[i].newMessage;
-        newMessage.system++;
-        await db.UsersPersonalModel.replaceOne({uid: allUsers[i].uid}, {$set: {newMessage: newMessage}});
-        console.log(i);
-      }
-      console.log('over');
+      await db.UsersPersonalModel.updateMany({}, {$inc: {'newMessage.system': 1}});
     } catch(err) {
-      let t = Date.now() - t1;
-      console.log(`耗时： ${t}`);
-      // await db.SettingModel.operateSystemID('sms', -1);
       ctx.throw(500, `发送系统通知出错: ${err}`);
     }
     let t = Date.now() - t1;

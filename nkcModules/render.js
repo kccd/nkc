@@ -1,6 +1,7 @@
 const render = require('./nkc_render');
 const moment = require('moment');
 const pug = require('pug');
+const jsdiff = require('diff');
 const settings = require('../settings');
 moment.locale('zh-cn');
 let filters = {
@@ -31,6 +32,19 @@ function toQueryString(object) {
     }
   }
   return '?' + qs
+}
+
+function htmlDiff(earlier,later){
+  let diff = jsdiff.diffChars(earlier,later);
+  let outputHTML = '';
+
+  diff.forEach(function(part){
+    let stylestr = part.added?'DiffAdded':part.removed?'DiffRemoved':null;
+    part.value = render.plain_render(part.value);
+    outputHTML += (stylestr?`<span class="${stylestr}">${part.value}</span>`:part.value)
+  });
+
+  return outputHTML
 }
 
 function testModifyTimeLimit(cs, ownership, toc){
@@ -103,7 +117,8 @@ let pugRender = (template, data) => {
     toQueryString,
     testModifyTimeLimit,
     dateString,
-    creditString
+    creditString,
+    htmlDiff
   };
   options.data = data;
   options.filters = filters;

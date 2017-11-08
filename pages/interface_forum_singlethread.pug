@@ -1,6 +1,6 @@
 - var url = '/t/' + thread.tid
-- var ocUser = thread.ocUser||{}
-- var lmUser = thread.lmUser||{}
+- var ocUser = thread.oc.user||{}
+- var lmUser = thread.lm.user||{}
 - var oc = thread.oc
 - var avatar = '/avatar_small/' + oc.uid
 - var uid = oc.uid
@@ -9,25 +9,25 @@
 -var hasImage = thread.hasImage
 -var topped = thread.topped
 -var belong_forum = null; var pf=null
--if(data.forum&&data.forum.type!='forum'&&data.forumlist)
-  -data.forumlist.map(group=>{group.forumgroup.map(f=>{if(f._key==thread.fid){belong_forum=f;pf=group.parentforum;}})})
+-if(data.forum&&data.forum.type!='forum'&&data.forumList)
+  -data.forumList.map(group=>{group.children.map(f=>{if(f.fid==thread.fid){belong_forum=f;pf=group;}})})
   -var forumcolor = (belong_forum?belong_forum.color:null)||(pf?pf.color:null)||'#aaa'
 
--if(data.forumlistkv)
-  -var v = data.forumlistkv[thread.fid]||{}
+-if(data.forumListkv)
+  -var v = data.forumListkv[thread.fid]||{}
   -belong_forum = v.belong_forum;pf = v.pf; var forumcolor = v.color;
   //span #{belong_forum._key}
   //span #{thread.fid}
 
--var threadtype = data.threadtypes?data.threadtypes.filter(k=>k._key==thread.cid)[0]:null;
+-var threadtype = data.threadTypes?data.threadTypes.filter(k=>k.threadTypeId==thread.cid)[0]:null;
 
 .ForumThreadItem
   .parent.clearfix(id='')
     .avatar-left
       - var user = ocUser
-      - var title = user?data.user.navbarDesc.info:''
-      a(href='/m/#{uid}' title='#{title}')
-        img.ForumThreadAvatar(src='/avatar/#{uid}')
+      - var title = user?data.user.navbarDesc.string:''
+      a(href=`/m/${uid}` title=`${title}`)
+        img.ForumThreadAvatar(src=`/avatar/${uid}`)
     
     .content-right
       .ForumThreadTitle
@@ -36,12 +36,12 @@
           //span.f12.ForumThreadDigestText [精]
           if belong_forum && (belong_forum.fid!==(data.forum?data.forum.fid:null))
             a.ForumThreadHasImage(style=`background-color:${forumcolor};` href=`/f/${belong_forum.fid}`)
-              | #{belong_forum.abbr||belong_forum.display_name}
+              | #{belong_forum.abbr||belong_forum.displayName}
 
           if threadtype
-            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=#{threadtype._key}` style=`background-color:${forumcolor};`) #{threadtype.name}
+            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=#{threadtype.threadTypeId}` style=`background-color:${forumcolor};`) #{threadtype.name}
             
-          a(class='#{digest?"ForumThreadDigestText":"ForumThreadNormal"}' href=`${url}` title=`${brief}`) #{oc.t}
+          a(class=`${digest?"ForumThreadDigestText":"ForumThreadNormal"}` href=`${url}` title=`${brief}`) #{oc.t}
           
           if topped
             span.ForumThreadHasImage.ForumThreadTopped 顶
@@ -65,7 +65,7 @@
                 span.ThreadCount 回复:0
           
             .ForumThreadTitle3(style="display:inline-block;")
-              input.ThreadCheckboxes(id=`${item.cid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
+              input.ThreadCheckboxes(id=`${(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
         
           
           

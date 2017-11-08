@@ -49,7 +49,7 @@ div
         .NavBarLinkArea.f12.text-center
           if (data.user && !data.logout)
             - var user = data.user
-            a(href='/me' title=`${data.user.navbarDesc.info}`) #{user.username}
+            a(href='/me' title=`${data.user.navbarDesc.string}`) #{user.username}
 
             -const sms = '/sms'
               if data.ensurePermission('GET', sms)

@@ -25,5 +25,5 @@ otherRouter
   .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods())
-  .use('sms', smsRouter.routes(), smsRouter.allowedMethods());
+  .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
 module.exports = otherRouter;

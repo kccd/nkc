@@ -152,7 +152,7 @@ smsRouter
     ctx.data.targetUser = targetUser;
     ctx.template = 'interface_messages.pug';
     ctx.data.tab = 'message';
-    await dbFn.decrementPsnl(user.uid, 'message', viewedFalseNumber);
+    await dbFn.decrementPsnl(user.uid, 'message', viewedFalseNumber*-1);
     await next();
   })
   .post('/message', async (ctx, next) => {
@@ -172,7 +172,7 @@ smsRouter
     });
     try{
       await newSms.save();
-      await dbFn.addValueOfMessage(targetUser.uid, 'message');
+      await dbFn.decrementPsnl(targetUser.uid, 'message', 1);
     }catch (err) {
       await db.SettingModel.operateSystemID('sms', -1);
       ctx.throw(500, `存入聊天记录出错: ${err}`);
@@ -201,7 +201,7 @@ smsRouter
     ctx.data.docs = systemMessage;
     // 若用户没有查看过该系统信息，则让用户的newMessage.system--
     if(systemMessage.viewedUsers.indexOf(user.uid) === -1) {
-      await dbFn.decrementPsnl(user.uid, 'system', 1);
+      await dbFn.decrementPsnl(user.uid, 'system', -1);
     }
     ctx.data.tab = 'system';
     ctx.template = 'interface_messages.pug';

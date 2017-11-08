@@ -17,17 +17,10 @@ fn.decrementPsnl = async (uid, type, number) => {
   let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
   let {newMessage} = userPersonal;
   if(number || number === 0) {
-    newMessage[type] -= number;
+    newMessage[type] += number;
   } else {
     newMessage[type] = 0;
   }
-  return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
-};
-
-fn.addValueOfMessage = async (uid, type) => {
-  let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
-  let {newMessage} = userPersonal;
-  newMessage[type]++;
   return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
 };
 
@@ -99,7 +92,7 @@ fn.checkEmailCode = async (email, code) => {
 };
 
 fn.useRegCode = async (regCode, uid) => {
-  return await db.AnswerSheetModel.replaceOne({key: regCode}, {uid: uid});
+  return await db.AnswerSheetModel.replaceOne({key: regCode}, {$set: {uid: uid}});
 };
 
 fn.forumList = async () => {
@@ -184,6 +177,7 @@ fn.getAvailableForums = async ctx => {
   ]);
   const result = forums.filter(e => e._id.parentId === '')[0].children;
   result.map(e => {
+    e.children = [];
     for(const f of forums) {
       if(e.fid === f._id.parentId) {
         e.children = f.children
@@ -241,6 +235,41 @@ fn.updateThread = async (tid) => {
 
 fn.updatePost = async (pid) => {
   
+};
+
+fn.getToppedThreads = async (fid) => {
+  return await db.ThreadModel.aggregate([
+    {$match: {fid: fid, topped: true}},
+    {$sort: {toc: 1}},
+    {$lookup: {
+      from: 'posts',
+      localField: 'lm',
+      foreignField: 'pid',
+      as: 'lm'
+    }},
+    {$unwind: "$lm"},
+    {$lookup: {
+      from: 'posts',
+      localField: 'oc',
+      foreignField: 'pid',
+      as: 'oc'
+    }},
+    {$unwind: "$oc"},
+    {$lookup: {
+      from: 'users',
+      localField: 'oc.uid',
+      foreignField: 'uid',
+      as: 'oc.user'
+    }},
+    {$unwind: "$oc.user"},
+    {$lookup: {
+      from: 'users',
+      localField: 'lm.uid',
+      foreignField: 'uid',
+      as: 'lm.user'
+    }},
+    {$unwind: "$lm.user"}
+  ]);
 };
 
 module.exports = fn;

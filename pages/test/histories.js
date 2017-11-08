@@ -43,11 +43,10 @@ let historiesSchema = new Schema({
     required: true
   },
   tlm: {
-    type: String,
-    default: Date.now
+    type: Date
   },
   toc: {
-    type: String,
+    type: Date,
     default: Date.now
   },
   uid: {
@@ -56,10 +55,6 @@ let historiesSchema = new Schema({
   },
   uidlm: {
     type: String
-  },
-  username: {
-    type: String,
-    default: ''
   },
   l: {
     type: String,
@@ -79,6 +74,9 @@ historiesSchema.pre('save', function(next) {
   if(!this.uidlm){
     this.uidlm = this.uid;
   }
+  if(!this.tlm) {
+    this.tlm = this.toc
+  }
   next();
 });
 
@@ -86,27 +84,11 @@ let Histories = mongoose.model('histories', historiesSchema);
 
 
 let t1 = Date.now();
-console.log('开始修复username字段');
+console.log('开始读取数据');
 db.query(`
-  for h in histories
-    filter !h.username
-      let u = document('users', h.uid)
-      update h with {username: u.username || ''} in histories
-`)
-.then(() => {
-  return db.query(`
-    for h in histories
-      filter !h.credits || h.credits == null
-      update h with {credits: []} in histories
-  `)
-})
-.then((res) => {
-  console.log('开始读取数据');
-  return db.query(`
     for h in histories
     return h
-  `)  
-})
+`)
 .then(cursor => cursor.all())
 .then((res) => {
   for(var i = 0; i < res.length; i++){
@@ -120,6 +102,7 @@ db.query(`
     histories.save()
     .then(() => {
       n++;
+      console.log(n);
       if(n >= res.length) {
         let t2 = Date.now();
         console.log(`${res.length}条数据写入完成，耗时：${t2-t1}ms`);

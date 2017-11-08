@@ -84,9 +84,7 @@ meRouter
     const {user} = ctx.data;
     const {db} = ctx;
     const quota = parseInt(ctx.query.quota);
-    let resources = await db.ResourceModel.find({uid: user.uid}).sort({toc: -1}).limit(quota);
-    console.log(resources);
-    ctx.data.resources = resources;
+    ctx.data.resources = await db.ResourceModel.find({uid: user.uid}).sort({toc: -1}).limit(quota);
     await next();
   });
 module.exports = meRouter;

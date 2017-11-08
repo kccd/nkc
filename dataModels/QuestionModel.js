@@ -9,10 +9,10 @@ const questionSchema = new Schema({
     required: true
   },
   tlm: {
-    type: Number,
+    type: Date,
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },

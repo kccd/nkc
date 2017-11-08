@@ -36,8 +36,8 @@ if (forum!==null)
             a.HomeForumTitlePrimary(href='#{url}') #{f.display_name}
               
             .HomeForumTitleSecondary
-              if f.count_posts_today > 0
-                span.HomeForumTitlePostCountToday #{f.count_posts_today||""}/ 
+              if f.countPostsToday > 0
+                span.HomeForumTitlePostCountToday #{f.countPostsToday||""}/
                 
               span.HomeForumTitleThreadCount #{f.count_threads}/ 
               span.HomeForumTitlePostCount #{f.count_posts}

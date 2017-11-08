@@ -16,7 +16,7 @@
       .threadOneLine
         div.fixThread
           div(style='float: left;')
-            - var title = user && data.user?data.user.navbarDesc.info:''
+            - var title = user && data.user?data.user.navbarDesc.string:''
             a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
@@ -50,7 +50,7 @@
                 a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
 
               - if(post.tlm>post.toc && ensurePermission('GET', '/p/x/history'))
-                a(href=`/post_history/${post.pid}`) 历史
+                a(href=`/p/${post.pid}/history`) 历史
 
               if data.user
                 - var user = data.user

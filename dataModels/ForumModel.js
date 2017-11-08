@@ -82,9 +82,20 @@ const forumSchema = new Schema({
   }
 });
 
-forumSchema.methods.getThreadsByQuery = function(query) {
+forumSchema.methods.getThreadsByQuery = async function(query) {
   const {$match, $sort, $skip, $limit} = getQueryObj(query);
+  const fid = this.fid;
+  let childFid = [];
+  if(this.type === 'category') {
+    let fidArr = await mongoose.connection.db.collection('forums').find({parentId: fid}, {_id: 0, fid: 1}).toArray();
+    for (let i of fidArr) {
+      childFid.push(i.fid);
+    }
+  } else {
+    childFid.push(this.fid);
+  }
   return mongoose.connection.db.collection('threads').aggregate([
+    {$match: {fid: {$in: childFid}}},
     {$match},
     {$sort},
     {$skip},
