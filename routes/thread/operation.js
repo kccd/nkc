@@ -24,7 +24,7 @@ operationRouter
     await next();
   })
   // 首页置顶
-  .post('/adSwitch', async (ctx, next) => {
+  .patch('/adSwitch', async (ctx, next) => {
     const {tid} = ctx.params;
     const {db} = ctx;
     const {user} = ctx.data;
@@ -32,14 +32,7 @@ operationRouter
     if(setting.ads.indexOf(tid) !== -1) ctx.throw(404, '该贴子已经在首页置顶了，不需要重复操作');
     await next();
   })
-  // 取消首页置顶
-  .del('/adSwitch', async (ctx, next) => {
-    const {tid} = ctx.params;
-    const {db} = ctx;
-    const {user} = ctx.data;
-    await next();
-  })
-  // 设置取消精华
+  // 精华
   .patch('/digest', async (ctx, next) => {
     const {tid} = ctx.params;
     const {digest} = ctx.body;
@@ -109,4 +102,5 @@ operationRouter
     ctx.data = `在专栏顶置   tid：${tid}`;
     await next();
   });
+
 module.exports = operationRouter;

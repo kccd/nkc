@@ -224,7 +224,8 @@ fn.updateThread = async (tid) => {
     let extArr = ['jpg', 'png', 'svg', 'jpeg'];
     let imageNum = 0;
     for (let i = 0; i < r.length; r++) {
-      let rFromDB = await db.ResourceModel.findOne({rid: r});
+      let rFromDB = await db.ResourceModel.findOne({rid: r[i]});
+      console.log(`r[i]: ${r[i]} ,  rFromDB: ${rFromDB}`);
       if(extArr.indexOf(rFromDB.ext) !== -1) {
         imageNum++;
         updateObj.hasImage = true;

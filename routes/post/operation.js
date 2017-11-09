@@ -5,7 +5,6 @@ const dbFn = nkcModules.dbFunction;
 const {xsflimit} = nkcModules;
 
 operationRouter
-  // 推介
   .post('/recommend', async (ctx, next) => {
     const {pid} = ctx.params;
     const {db} = ctx;
@@ -17,7 +16,6 @@ operationRouter
     if(personal.recPosts.indexOf(pid) > -1 && post.recUsers.indexOf(user.uid) > -1) ctx.throw(404, '您已经推介过该post了,没有必要重复推介');
     await next();
   })
-  // 取消推介
   .del('/recommend', async (ctx, next) => {
     const {pid} = ctx.params;
     const {db} = ctx;
@@ -29,7 +27,6 @@ operationRouter
     ctx.data.message = (post.recUsers.length > 0)?post.recUsers.length - 1: 0;
     await next();
   })
-  // 引用post
   .get('/quote', async (ctx, next) => {
     const {pid} = ctx.params;
     const {user} = ctx.data;

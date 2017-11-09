@@ -6,10 +6,11 @@ const postSchema = new Schema({
   pid: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    index: 1
   },
   atUsers: {
-    type: [String],
+    type: Array,
     default: []
   },
   c: {
@@ -46,7 +47,7 @@ const postSchema = new Schema({
   },
   rpid: {
     type: [String],
-    default: ''
+    default: []
   },
   t: {
     type: String,
@@ -73,7 +74,8 @@ const postSchema = new Schema({
     index: 1
   },
   uidlm: {
-    type: String
+    type: String,
+    index: 1
   }
 });
 

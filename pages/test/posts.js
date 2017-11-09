@@ -10,7 +10,8 @@ let postsSchema = new Schema({
   pid: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    index: 1
   },
   atUsers: {
     type: Array,
@@ -21,7 +22,7 @@ let postsSchema = new Schema({
     default: ''
   },
   credits: {
-    type: Array,
+    type: [String],
     default: []
   },
   disabled: {
@@ -41,16 +42,16 @@ let postsSchema = new Schema({
     required: true
   },
   r: {
-    type: Array,
+    type: [String],
     default: []
   },
   recUsers: {
-    type: Array,
+    type: [String],
     default: []
   },
   rpid: {
-    type: String,
-    default: ''
+    type: [String],
+    default: []
   },
   t: {
     type: String,
@@ -77,7 +78,8 @@ let postsSchema = new Schema({
     index: 1
   },
   uidlm: {
-    type: String
+    type: String,
+    index: 1
   }
 });
 
@@ -111,6 +113,14 @@ return db.query(`
     res[i]._id = undefined;
     res[i].pid = res[i]._key;
     res[i].c = res[i].c.toString();
+    /*if(res[i].atUsers) {
+      for (let j = 0; j < res[i].atUsers.length; j++) {
+        if (typeof(res[i].atUsers[j]) === 'object' && res[i].atUsers[j].uid) {
+          console.log(res[i].atUsers);
+          res[i].atUsers[j] = res[i].atUsers[j].uid;
+        }
+      }
+    }*/
   }
   console.log('开始写入数据');
   let n = 0;

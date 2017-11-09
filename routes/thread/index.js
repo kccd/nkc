@@ -37,15 +37,23 @@ threadRouter
       ForumModel,
       UserModel,
       PostModel,
-      SettingModel
+      SettingModel,
     } = db;
-    let countOfTid = await PostModel.count({tid});
-    data.paging = apiFn.paging(page, countOfTid);
+    let t;
+    t = Date.now();
+    let postLength = await PostModel.count({tid});
+    data.paging = apiFn.paging(page, postLength);
+    console.log(`查找总数耗时: ${Date.now()-t} ms`);
     ctx.template = 'interface_thread.pug';
+    t = Date.now();
     let thread = await ThreadModel.findOnly({tid});
+    console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
     const {mid, toMid} = thread;
+    t = Date.now();
     data.posts = await thread.getPostsByQuery(query, {tid});
+    console.log(`查找目标post耗时: ${Date.now()-t} ms`);
     thread = thread.toObject();
+    t = Date.now();
     thread.oc = await PostModel.findOnly({pid: thread.oc});
     let ocuser = (await UserModel.findOnly({uid: data.posts[0].uid})).toObject();
     ocuser.navbarDesc = ctx.getUserDescription(ocuser);
@@ -65,6 +73,7 @@ threadRouter
       data.othersForum = othersForum
     }
     data.forum = await ForumModel.findOnly({fid: thread.fid});
+    console.log(`其他耗时: ${Date.now()-t} ms`);
     await next();
   })
   .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
