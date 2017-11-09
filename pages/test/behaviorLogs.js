@@ -106,7 +106,12 @@ async function import1() {
     if(!toMid)
       toMid = undefined;
     if(!mid) {
-      const thread = await db.collection('threads').document(tid);
+      let thread;
+      try {
+        thread = await db.collection('threads').document(tid);
+      } catch(e) {
+        console.log(tid)
+      }
       mid = thread.uid
     }
     const newDoc = new UsersBehaviorModel({
