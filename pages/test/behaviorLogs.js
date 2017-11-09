@@ -131,8 +131,7 @@ async function import1() {
     try {
       await newDoc.save()
     } catch(e) {
-      e.data = doc;
-      errors.push(e)
+      console.log(e)
     }
   }
   console.log('save 1');
