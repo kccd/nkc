@@ -69,11 +69,10 @@ const UsersBehaviorModel = mongoose.model('usersBehavior', usersBehaviorSchema);
 const errors = [];
 
 async function import1() {
-  console.log('qqq')
   const cursor = await db.collection('usersBehavior').all();
   const docs = await cursor.all();
-  console.log(docs);
   for(const doc of docs) {
+    let toUid;
     let {
       toMid,
       time,
@@ -87,20 +86,27 @@ async function import1() {
     switch(type) {
       case 1:
         type = 'postToForum';
+        toUid = uid;
         break;
       case 2:
         type = 'postToThread';
+        toUid = uid;
         break;
       case 3:
         type = 'postToPost';
+        toUid = uid;
         break;
       case 4:
         type = 'recommendPost';
+        const toUser = await db.collection('posts').document(pid);
+        toUid = toUser.uid;
         break;
       case 5:
         type = 'unrecommendPost';
+        toUid = uid;
         break;
       default:
+        toUid = uid;
         type = undefined
     }
     if(!toMid)
