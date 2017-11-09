@@ -98,12 +98,13 @@ async function import1() {
         break;
       case 4:
         type = 'recommendPost';
-        const toUser = await db.collection('posts').document(pid);
-        toUid = toUser.uid;
+        const post = await db.collection('posts').document(pid);
+        toUid = post.uid;
         break;
       case 5:
         type = 'unrecommendPost';
-        toUid = uid;
+        const a1 = await db.collection('posts').document(pid);
+        toUid = a1.uid;
         break;
       default:
         toUid = uid;
