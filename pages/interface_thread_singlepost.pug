@@ -2,7 +2,7 @@
 -const {ensurePermission} = data
 -const postTo = ensurePermission('POST', '/f/x')
 -const addPostToCart = ensurePermission('POST', '/u/x/cart')
--const addCredit = ensurePermission('PUT', '/p/x/credit')
+-const addCredit = ensurePermission('PATCH', '/p/x/credit')
 -const disablePost = ensurePermission('PATCH', '/p/x')
 
   if (!post.disabled || disablePost)

@@ -401,6 +401,11 @@ const certificates ={
             [name]: '精华',
             [PATCH]: true
           },
+          topped: {
+            [name]: '顶置',
+            [PATCH]: true,
+            [POST]: true
+          },
           [PATCH]: true
         },
       },
@@ -408,9 +413,13 @@ const certificates ={
         [GET]: true,
         [parameter]: {
           [GET]: true,
-          [PATCH]: true, //屏蔽或解除post
+          [PATCH]: true,
           credit: {
             [name]: '学术分',
+            [PATCH]: true
+          },
+          disabled: {
+            [name]: '屏蔽',
             [PATCH]: true
           }
         }

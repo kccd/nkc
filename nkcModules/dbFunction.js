@@ -26,31 +26,47 @@ fn.decrementPsnl = async (uid, type, number) => {
 
 // 查询目标用户的个人搜藏
 fn.foundCollection = async (data) => {
-  let collections = await db.CollectionModel.find(data).sort({toc: 1});
-  for (let i = 0; i < collections.length; i++) {
-    collections[i] = collections[i].toObject();
-    let thread = {}, postOc = {}, postLm = {}, lmUser = {}, ocUser = {};
-    thread = await db.ThreadModel.findOne({tid: collections[i].tid});
-    thread = Object.assign({}, thread)._doc;
-    if(!thread) {
-      collections.splice(i, 1);
-      continue;
-    }
-    postOc = await db.PostModel.findOne({pid: thread.oc});
-    postLm = await db.PostModel.findOne({pid: thread.lm});
-    if(!postOc || !postLm) {
-      continue;
-    }
-    lmUser = await db.UserModel.findOne({uid: postLm.uid});
-    ocUser = await db.UserModel.findOne({uid: postOc.uid});
-    thread.oc = postOc;
-    thread.lm = postLm;
-    thread.ocUser = ocUser;
-    thread.lmUser = lmUser;
-    collections[i].thread = thread;
-  }
-  return collections;
+  return await db.CollectionModel.aggregate([
+    {$match: data},
+    {$sort: {toc: 1}},
+    {$lookup: {
+      from: 'threads',
+      localField: 'tid',
+      foreignField: 'tid',
+      as: 'thread'
+    }},
+    {$unwind: '$thread'},
+    {$lookup: {
+      from: 'posts',
+      localField: 'thread.oc',
+      foreignField: 'pid',
+      as: 'thread.oc'
+    }},
+    {$unwind: '$thread.oc'},
+    {$lookup: {
+      from: 'posts',
+      localField: 'thread.lm',
+      foreignField: 'pid',
+      as: 'thread.lm'
+    }},
+    {$unwind: '$thread.lm'},
+    {$lookup: {
+      from: 'users',
+      localField: 'thread.oc.uid',
+      foreignField: 'uid',
+      as: 'thread.ocUser'
+    }},
+    {$unwind: '$thread.ocUser'},
+    {$lookup: {
+      from: 'users',
+      localField: 'thread.lm.uid',
+      foreignField: 'uid',
+      as: 'thread.lmUser'
+    }},
+    {$unwind: '$thread.lmUser'},
+  ]);
 };
+
 
 fn.checkMobile = async (mobile, oldMobile) => {
   let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
@@ -93,17 +109,6 @@ fn.checkEmailCode = async (email, code) => {
 
 fn.useRegCode = async (regCode, uid) => {
   return await db.AnswerSheetModel.replaceOne({key: regCode}, {$set: {uid: uid}});
-};
-
-fn.forumList = async () => {
-  let list = [];
-  let parentForums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
-  for (let i = 0; i <  parentForums.length; i++) {
-    list[i] = {};
-    list[i].parentForum = parentForums[i];
-    list[i].forumGroup = await db.ForumModel.find({parentId: parentForums[i].fid}).sort({order: 1});
-  }
-  return list;
 };
 
 fn.addCertToUser = async (uid, cert) => {

@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
 const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
 const {xsflimit} = nkcModules;
 
 operationRouter
@@ -69,9 +70,10 @@ operationRouter
       }},
       {$unwind: '$user'}
     ]))[0];
-    let updateObj = {};
-    updateObj[type] = q;
-    await db.UserModel.replaceOne({uid: post.user.uid}, {$inc: updateObj});
+    let updateObjForUser = {};
+    updateObjForUser[type] = q;
+    let updateObjForPost = user.toObject();
+    await db.UserModel.replaceOne({uid: post.user.uid}, {$inc: updateObjForUser});
     await next();
   })
   .get('/history', async(ctx, next) => {
@@ -82,6 +84,24 @@ operationRouter
     ctx.data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});
     ctx.template = 'interface_post_history.pug';
     await next();
+  })
+  .patch('/disabled', async (ctx, next) => {
+    const {disabled} = ctx.body;
+    const {pid} = ctx.params;
+    const {db, data} = ctx;
+    if(disabled === undefined) ctx.throw(400, '参数不正确');
+    let targetPost = {};
+    if(disabled) {
+      targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: true}});
+    } else {
+      targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: false}});
+    }
+    if(targetPost.disabled === disabled) {
+      if(!disabled) ctx.throw(404, '操作失败！该回复未被屏蔽，请刷新');
+      if(disabled) ctx.throw(404, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
+    }
+    data.targetUser = await dbFn.findUserByPid(pid);
+    await dbFn.updateThread(targetPost.tid);
+    await next();
   });
-
 module.exports = operationRouter;

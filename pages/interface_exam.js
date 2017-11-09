@@ -23,7 +23,7 @@ function submit(){
   return nkcAPI('/exam/subject','post',examobj)
   .then(function(result){
     if(result.takenByUser){
-      window.location = '/m?examinated=true';
+      window.location = '/me?examinated=true';
       return
     }
     window.location = '/exam/'+examobj.category+'?result=' + result.result;

@@ -87,13 +87,13 @@ block content
                     -var isAd = data.ads.indexOf(thread.tid) > -1
                     a#adBtn(href='javascript:;' onclick=`adSwitch('${thread.tid}')`) #{isAd ? '取消首页置顶' : '首页置顶'}
 
-                  if ensurePermission('POST', '/t/x/digest')
+                  if ensurePermission('PATCH', '/t/x/digest')
                     if thread.digest
                       a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 撤销精华
                     else
                       a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
 
-                  if ensurePermission('POST', '/t/x/topped')
+                  if ensurePermission('PATCH', '/t/x/topped')
                     if thread.topped
                       a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 撤销置顶
                     else
