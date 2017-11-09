@@ -39,7 +39,7 @@ operationRouter
     const {user} = ctx.data;
     await next();
   })
-  .post('/digest', async (ctx, next) => {
+  .patch('/digest', async (ctx, next) => {
     const {tid} = ctx.params;
     const {db} = ctx;
     const {user} = ctx.data;

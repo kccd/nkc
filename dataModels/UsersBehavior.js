@@ -1,3 +1,4 @@
+/*
 const settings = require('../settings');
 const {mongoose} = settings;
 const {Schema} = mongoose;
@@ -38,4 +39,4 @@ const usersBehaviorSchema = new Schema({
     },
     name: String
   }
-});
+});*/

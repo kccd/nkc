@@ -29,7 +29,7 @@ operationRouter
     await next();
   })
   // 引用post
-  .post('/quote', async (ctx, next) => {
+  .get('/quote', async (ctx, next) => {
     const {pid} = ctx.params;
     const {user} = ctx.data;
     const {db} = ctx;
@@ -46,18 +46,18 @@ operationRouter
     ctx.data.message = xsflimit(post);
     await next();
   })
-  .put('/credit', async (ctx, next) => {
+  .patch('/credit', async (ctx, next) => {
     const {pid} = ctx.params;
     const {user} = ctx.data;
     const {type, q, reason} = ctx.body;
     const {db} = ctx;
-    if(q < -10000 || q > 10000) ctx.throw(400, '分数无效，不在范围（-10000, 10000）');
+    if(q < -10000 || q > 10000) ctx.throw(400, '数字无效，不在范围（-10000, 10000）');
     if(reason.length < 2) ctx.throw(400, '理由写得太少了，请认真对待');
     switch (type) {
       case 'xsf':
       case 'kcb':
         break;
-      default: ctx.throw(400, '未知的分数类型，请检查');
+      default: ctx.throw(400, '未知的数字类型，请检查');
     }
     let post = (await db.PostModel.aggregate([
       {$match: {pid}},

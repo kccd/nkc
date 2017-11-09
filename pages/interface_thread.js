@@ -187,7 +187,7 @@ function assemblePostObject(){  //bbcode , markdown
 }
 
 function disablePost(pid){
-  nkcAPI('/p/'+pid, 'delete',{})
+  nkcAPI('/p/'+pid, 'PATCH',{disabled: true})
   .then(function(res){
     screenTopAlert(pid+' 已屏蔽，请刷新')
     //location.reload()
@@ -196,7 +196,7 @@ function disablePost(pid){
 }
 
 function enablePost(pid){
-  nkcAPI('/p/'+pid, 'post',{})
+  nkcAPI('/p/'+pid, 'PATCH',{disabled: false})
   .then(function(res){
     location.reload()
   })
@@ -226,10 +226,9 @@ function submit(){
 }
 
 function quotePost(pid){
-  nkcAPI('/p/'+pid+'/quote', 'post',{})
+  nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
     pc = pc.message;
-    console.log(pc);
     length_limit = 100;
     var content = pc.c;
     var replaceArr = [
@@ -271,7 +270,7 @@ function addColl(tid){
 function addCredit(pid){
   var cobj = promptCredit(pid)
   if(cobj){
-    return nkcAPI('/p/'+pid+'/credit', 'put',cobj)
+    return nkcAPI('/p/'+pid+'/credit', 'PATCH',cobj)
     .then(function(){
       window.location.reload()
     })

@@ -10,37 +10,23 @@ postRouter
     ctx.data = `加载post   pid：${pid}`;
     await next();
   })
-  .del('/:pid', async (ctx, next) => {
+  .patch('/:pid', async (ctx, next) => {
+    const {disabled} = ctx.body;
     const {pid} = ctx.params;
     const {db} = ctx;
-    const {user} = ctx.data;
-    let targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: true}});
-    console.log(`pid: ${pid}`);
-    console.log(targetPost);
-    if(targetPost.disabled) ctx.throw(404, '该post在您操作之前已经被屏蔽了，请刷新');
+    let targetPost = {};
+    if(disabled) {
+      targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: true}});
+      if(targetPost.disabled) ctx.throw(404, '该post在您操作之前已经被屏蔽了，请刷新');
+    } else{
+      targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: false}});
+      if(!targetPost.disabled) ctx.throw(404, '该post在你操作之前已经被解除屏蔽了，请刷新');
+    }
     await dbFn.updateThread(targetPost.tid);
+    ctx.data.targetUser = await dbFn.findUserByPid(pid);
     await next();
   })
-  .post('/:pid', async (ctx, next) => {
-    const {pid} = ctx.params;
-    const {db} = ctx;
-    const {user} = ctx.data;
-    let targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: false}});
-    if(!targetPost.disabled) ctx.throw(404, '该post在你操作之前已经被解除屏蔽了，请刷新');
-    await dbFn.updateThread(targetPost.tid);
-    await next();
-  })
-  .get('/:pid/postHistory', async (ctx, next) => {
-    const pid = ctx.params.pid;
-    ctx.data = `历史修改记录 页面   pid：${pid}`;
-    await next();
-  })
-  .get('/:pid/editor', async (ctx, next) => {
-    const pid = ctx.params.pid;
-    ctx.data = `编辑post页面   pid：${pid}`;
-    await next();
-  })
-  .put('/:pid', async (ctx, next) => {
+  .patch('/:pid', async (ctx, next) => {
     const pid = ctx.params.pid;
     ctx.data = `更新post   pid：${pid}`;
     await next();

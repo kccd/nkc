@@ -202,7 +202,6 @@ fn.updateThread = async (tid) => {
   }
   let lastPost = posts[0];
   let firstPost = posts[posts.length-1];
-  console.log(`firstPost-toc: ${firstPost.toc.getTime()},  nowTime: ${Date.now()}`);
   let updateObj = {
     hasImage: thread.hasImage,
     hasFile: thread.hasFile,
@@ -270,6 +269,16 @@ fn.getToppedThreads = async (fid) => {
     }},
     {$unwind: "$lm.user"}
   ]);
+};
+
+fn.findUserByPid = async (pid) => {
+  const post = await db.PostModel.findOne({pid});
+  if(post) return await db.UserModel.findOne({uid: post.uid});
+};
+
+fn.findUserByTid = async (tid) => {
+  const thread = await db.ThreadModel.findOne({tid});
+  if(thread) return await db.UserModel.findOne({uid: thread.uid});
 };
 
 module.exports = fn;

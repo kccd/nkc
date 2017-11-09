@@ -8,6 +8,7 @@ html
     input#submit2(type='submit' value='解封')
     input#submit3(type='submit' value='关注')
     input#submit4(type='submit' value='取消关注')
+    input#submit5(type='submit' value='测试')
     br
     br
     br
@@ -68,3 +69,7 @@ html
       $('#submit4').on('click', function () {
         httpReq('/u/' + $('#value2').val() + '/subscribe', 'delete');
       })
+      $('#submit5').on('click', function () {
+        httpReq('/p/' + $('#value2').val(), 'patch');
+      })
+
