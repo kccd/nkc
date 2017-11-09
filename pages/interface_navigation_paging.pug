@@ -7,32 +7,32 @@
 if paging
     
   - var pagingarray = []
-  - var pagecount = paging.pagecount||1000
+  - var pageCount = paging.pageCount
   - var page = paging.page
   - var disp_length = 7, half_disp_length = 3,start=0,end=1
   
-  - if(page<half_disp_length){start=0,end=Math.min(disp_length,pagecount)}
-  - else if(page>pagecount - half_disp_length - 1){end=pagecount,start = Math.max(0,pagecount-disp_length)}
+  - if(page<half_disp_length){start=0,end=Math.min(disp_length,pageCount)}
+  - else if(page>pageCount - half_disp_length - 1){end=pageCount,start = Math.max(0,pageCount-disp_length)}
   - else {start = page-half_disp_length,end = page+half_disp_length+1} 
   
   //- var start = Math.min(0,page>half_disp_length?page-half_disp_length:0)
-  //- var end = Math.max(pagecount, page<pagecount-half_disp_length?page+half_disp_length:pagecount)
+  //- var end = Math.max(pageCount, page<pageCount-half_disp_length?page+half_disp_length:pageCount)
   
   - for(i = start; i < end ; i++){pagingarray.push(i)}
   
-  if pagecount==1
+  if pageCount==1
     //ignore navigation, 1 page only
   else
     ul.pagination.NavigationPaging
       if start>0
         li()
-          a(href='#{toQueryString({page:0,cat,digest,sortby,tab, content})}') 始
+          a(href=`${toQueryString({page:0,cat,digest,sortby,tab, content})}`) 始
     
       each pagenum,index in pagingarray
         - var class_str = pagenum==paging.page?'active':''
         
-        li(class='#{class_str}')
-          a(href='#{toQueryString({page:pagenum,cat,digest,sortby,tab, content})}') #{pagenum + 1}
-      if end<pagecount
+        li(class=`${class_str}`)
+          a(href=`${toQueryString({page:pagenum,cat,digest,sortby,tab, content})}`) #{pagenum + 1}
+      if end<pageCount
         li()
-          a(href='#{toQueryString({page:pagecount-1,cat,digest,sortby,tab, content})}') 末
+          a(href=`${toQueryString({page:pageCount-1,cat,digest,sortby,tab, content})}`) 末

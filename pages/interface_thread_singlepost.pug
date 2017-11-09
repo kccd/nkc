@@ -2,8 +2,8 @@
 -const {ensurePermission} = data
 -const postTo = ensurePermission('POST', '/f/x')
 -const addPostToCart = ensurePermission('POST', '/u/x/cart')
--const addCredit = ensurePermission('PUT', '/p/x/credit')
--const disablePost = ensurePermission('DELETE', '/p/x')
+-const addCredit = ensurePermission('PATCH', '/p/x/credit')
+-const disablePost = ensurePermission('PATCH', '/p/x')
 
   if (!post.disabled || disablePost)
     //horizontal line
@@ -79,7 +79,6 @@
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
       //span #{post.user?post.user.post_sign:''}
       if post.credits && post.credits.length > 0
-        -console.log(post.credits)
         .nkcpanel.ThreadPostCredits
           each c,index in post.credits
             -var username = c.username||c.uid

@@ -39,40 +39,44 @@ operationRouter
     const {user} = ctx.data;
     await next();
   })
-  .post('/digest', async (ctx, next) => {
+  // 设置取消精华
+  .patch('/digest', async (ctx, next) => {
     const {tid} = ctx.params;
-    const {db} = ctx;
-    const {user} = ctx.data;
-    let thread = await db.ThreadModel.findOnly({tid});
-    if(thread.digest) ctx.throw(404, '该贴子已经被设置成精华了，不需要重复设置');
-    await db.ThreadModel.replaceOne({tid}, {$set: {digest: true}});
-    await dbFn.setNumberOfDigestThread(thread.fid, 1);
+    const {digest} = ctx.body;
+    const {db, data} = ctx;
+    if(digest === undefined) ctx.throw(400, '参数不正确');
+    let targetThread = {}, number;
+    if(digest) {
+      targetThread = await db.ThreadModel.findOneAndUpdate({tid}, {$set: {digest: true}});
+      number = 1;
+    } else {
+      targetThread = await db.ThreadModel.findOneAndUpdate({tid}, {$set: {digest: false}});
+      number = -1;
+    }
+    if(targetThread.digest === digest) {
+      if(!digest) ctx.throw(404, '该贴子在您操作前已经被撤销精华了，请刷新');
+      if(digest) ctx.throw(404, '该贴子在您操作前已经被设置成精华了，请刷新');
+    }
+    data.targetUser = await dbFn.findUserByTid(tid);
+    await dbFn.setNumberOfDigestThread(targetThread.fid, number);
     await next();
   })
-  .del('/digest', async (ctx, next) => {
+  .patch('/topped', async (ctx, next) => {
     const {tid} = ctx.params;
-    const {db} = ctx;
-    const {user} = ctx.data;
-    let thread = await db.ThreadModel.findOnly({tid});
-    if(!thread.digest) ctx.throw(404, '该贴子已经被撤销精华了，不需要重复撤销');
-    await db.ThreadModel.replaceOne({tid}, {$set: {digest: false}});
-    await dbFn.setNumberOfDigestThread(thread.fid, -1);
-    await next();
-  })
-  .post('/topped', async (ctx, next) => {
-    const {tid} = ctx.params;
-    const {db} = ctx;
-    let thread = await db.ThreadModel.findOnly({tid});
-    if(thread.topped) ctx.throw(404, '该帖子已经被置顶了，不需要重复操作');
-    await db.ThreadModel.replaceOne({tid}, {$set: {topped: true}});
-    await next();
-  })
-  .del('/topped', async (ctx, next) => {
-    const {tid} = ctx.params;
-    const {db} = ctx;
-    let thread = await db.ThreadModel.findOnly({tid});
-    if(!thread.topped) ctx.throw(404, '该帖子已经被取消置顶了，不需要重复操作');
-    await db.ThreadModel.replaceOne({tid}, {$set: {topped: false}});
+    const {db, data} = ctx;
+    const {topped} = ctx.body;
+    if(topped === undefined) ctx.throw(400, '参数不正确');
+    let targetThread = {};
+    if(topped) {
+      targetThread = await db.ThreadModel.findOneAndUpdate({tid}, {$set: {topped: true}});
+    } else {
+      targetThread = await db.ThreadModel.findOneAndUpdate({tid}, {$set: {topped: false}});
+    }
+    if(targetThread.topped === topped) {
+      if(topped) ctx.throw(404, '该帖子在您操作前已经被置顶了，请刷新');
+      if(!topped) ctx.throw(404, '该帖子在您操作前已经被取消置顶了，请刷新');
+    }
+    data.targetUser = await dbFn.findUserByTid(tid);
     await next();
   })
   .post('/moveThread', async (ctx, next) => {

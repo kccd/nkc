@@ -65,7 +65,10 @@
                 span.ThreadCount 回复:0
           
             .ForumThreadTitle3(style="display:inline-block;")
-              input.ThreadCheckboxes(id=`${(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
+              if(item && item.cid)
+                input.ThreadCheckboxes(id=`${item.cid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
+              else
+                input.ThreadCheckboxes(id=`${(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
         
           
           

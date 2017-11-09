@@ -113,6 +113,11 @@ var nkc_editor = function(){
 
     //alert(JSON.stringify(post) )
     geid('post').disabled = true
+    console.log({
+      target:target,
+      post:post,
+      forumID: geid('forumID').innerHTML
+    });
     return nkcAPI('postTo',{
       target:target,
       post:post,

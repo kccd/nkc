@@ -11,16 +11,17 @@ forumRouter
     await next()
   })
   .get('/:fid', async (ctx, next) => {
+    const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;
+    const {fid, digest, cat, sortby} = ctx.params;
     const data = ctx.data;
     let page = ctx.query.page || 0;
+    let countOfThread = await ThreadTypeModel.count({fid});
     let paging = apiFn.paging(page, 1000);
     ctx.template = 'interface_forum.pug';
-    const {fid, digest, cat, sortby} = ctx.params;
     if(digest) data.digest = true;
     data.cat = cat;
     data.sortby = sortby;
     data.paging = paging;
-    const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;
     const {query} = ctx;
     const forum = await ForumModel.findOne({fid});
     data.forum = forum;

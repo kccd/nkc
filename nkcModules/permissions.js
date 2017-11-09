@@ -291,7 +291,7 @@ const certificates ={
       p: {
         [parameter]: {
           quote: {
-            [POST]: true
+            [GET]: true
           }
         }
       }
@@ -305,7 +305,7 @@ const certificates ={
       p: {
         [parameter]: {
           quote: {
-            [POST]: true
+            [GET]: true
           }
         }
       }
@@ -322,7 +322,7 @@ const certificates ={
       p: {
         [parameter]: {
           quote: {
-            [POST]: true
+            [GET]: true
           }
         }
       }
@@ -397,6 +397,15 @@ const certificates ={
       },
       t: {
         [parameter]: {
+          digest: {
+            [name]: '精华',
+            [PATCH]: true
+          },
+          topped: {
+            [name]: '顶置',
+            [PATCH]: true,
+            [POST]: true
+          },
           [PATCH]: true
         },
       },
@@ -404,11 +413,14 @@ const certificates ={
         [GET]: true,
         [parameter]: {
           [GET]: true,
-          [DELETE]: true, //屏蔽post
-          [POST]: true, // 解封post
+          [PATCH]: true,
           credit: {
             [name]: '学术分',
-            [PUT]: true
+            [PATCH]: true
+          },
+          disabled: {
+            [name]: '屏蔽',
+            [PATCH]: true
           }
         }
       },

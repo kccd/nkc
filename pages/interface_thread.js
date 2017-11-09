@@ -120,12 +120,12 @@ function cartPost(pid){
 function setDigest(tid){
   var setDigest = '设置精华';
   var unSetDigest = '撤销精华';
-  var method = '';
+  var dateObj = {};
   var status = geid('threadDigest');
-  if(status.innerHTML === setDigest) method = 'post';
-  else if(status.innerHTML === unSetDigest) method = 'delete';
+  if(status.innerHTML === setDigest) dateObj = {digest: true};
+  else if(status.innerHTML === unSetDigest) dateObj = {digest: false};
   else return jwarning('到底是要设置精华还是撤销精华？');
-  nkcAPI('/t/'+tid+'/digest', method,{})
+  nkcAPI('/t/'+tid+'/digest', 'PATCH',dateObj)
   .then(function(back){
     var oldStatus = status.innerHTML;
     if(status.innerHTML === setDigest) {
@@ -133,7 +133,7 @@ function setDigest(tid){
     } else {
       status.innerHTML = setDigest;
     }
-    $(this).text()
+    $(this).text();
     return screenTopAlert(tid + oldStatus + '成功');
   })
   .catch(function(err){
@@ -142,14 +142,14 @@ function setDigest(tid){
 }
 
 function setTopped(tid){
-  var method = '';
+  var dataObj = {};
   var setTop = '设置置顶';
   var unSetTop = '撤销置顶';
   var status = geid('threadTop');
-  if(status.innerHTML === setTop) method = 'post';
-  else if(status.innerHTML === unSetTop) method = 'delete';
+  if(status.innerHTML === setTop) dataObj = {topped: true};
+  else if(status.innerHTML === unSetTop) dataObj = {topped: false};
   else return jwarning('到底是要设置置顶还是撤销置顶？');
-  nkcAPI('/t/'+tid+'/topped', method,{tid:tid})
+  nkcAPI('/t/'+tid+'/topped', 'PATCH',dataObj)
   .then(function(back){
     var oldStatus = status.innerHTML;
     if(oldStatus === setTop) {
@@ -187,7 +187,7 @@ function assemblePostObject(){  //bbcode , markdown
 }
 
 function disablePost(pid){
-  nkcAPI('/p/'+pid, 'delete',{})
+  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true})
   .then(function(res){
     screenTopAlert(pid+' 已屏蔽，请刷新')
     //location.reload()
@@ -196,7 +196,7 @@ function disablePost(pid){
 }
 
 function enablePost(pid){
-  nkcAPI('/p/'+pid, 'post',{})
+  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: false})
   .then(function(res){
     location.reload()
   })
@@ -226,10 +226,9 @@ function submit(){
 }
 
 function quotePost(pid){
-  nkcAPI('/p/'+pid+'/quote', 'post',{})
+  nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
     pc = pc.message;
-    console.log(pc);
     length_limit = 100;
     var content = pc.c;
     var replaceArr = [
@@ -271,7 +270,7 @@ function addColl(tid){
 function addCredit(pid){
   var cobj = promptCredit(pid)
   if(cobj){
-    return nkcAPI('/p/'+pid+'/credit', 'put',cobj)
+    return nkcAPI('/p/'+pid+'/credit', 'PATCH',cobj)
     .then(function(){
       window.location.reload()
     })

@@ -3,6 +3,8 @@ const operationRouter = require('./operation');
 const threadRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
+const apiFn = nkcModules.apiFunction;
+
 
 // const {
 //   postToThread,
@@ -27,6 +29,7 @@ threadRouter
   })
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
+    let page = query.page || 0;
     const {tid} = params;
     const {
       ThreadModel,
@@ -36,6 +39,8 @@ threadRouter
       PostModel,
       SettingModel
     } = db;
+    let countOfTid = await PostModel.count({tid});
+    data.paging = apiFn.paging(page, countOfTid);
     ctx.template = 'interface_thread.pug';
     let thread = await ThreadModel.findOnly({tid});
     const {mid, toMid} = thread;
