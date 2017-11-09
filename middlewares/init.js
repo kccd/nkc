@@ -5,6 +5,7 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 
 module.exports = async (ctx, next) => {
+  ctx.port = ctx.request.socket._peername.port;
   ctx.reqTime = new Date();
   ctx.db = db;
   ctx.nkcModules = nkcModules;

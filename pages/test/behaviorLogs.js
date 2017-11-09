@@ -1,129 +1,138 @@
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
+mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true, promiseLibrary: Promise});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
+const {scoreMap, scoreCoefficientMap} = require('../../settings').user;
 
-db = require('arangojs')('http://192.168.11.15');
+const arango = require('arangojs');
+const db = arango('http://192.168.11.15');
+const aql = arango.aql;
 
 db.useDatabase('rescue');
 
-let behaviorLogsSchema = new Schema({
-  isManageOp: {
-    type: Boolean,
-    required: true,
-    index: 1
-  },
+const usersBehaviorSchema = new Schema({
   timeStamp: {
-    type: Number,
-    default: Date.now,
-    index: 1
+    type: String,
+    default: Date.now
+  },
+  uid: {
+    type: String,
+    required: true
+  },
+  toUid: {
+    type: String,
+    required: true
+  },
+  pid: {
+    type: String,
+    required: true,
+  },
+  tid: {
+    type: String,
+    required: true
+  },
+  fid: {
+    type: String,
+    required: true
+  },
+  mid: {
+    type: String,
+    required: true
+  },
+  toMid: String,
+  ip: {
+    type: String,
+    required: true
   },
   port: {
+    type: String,
+    required: true
+  },
+  score: {
     type: Number,
-    default: '0000'
+    default: 0,
   },
-  address: {
-    type: String,
-    default: '0.0.0.0'
-  },
-  scoreChange: {
-    type: Number,
-    default: 0
-  },
-  from: {
-    type: String,
-    required: true,
-    index: 1
-  },
-  to: {
-    type: String,
-    required: true,
-    index: 1
+  isManageOp: {
+    type: Boolean,
+    default: false
   },
   operation: {
     type: String,
     required: true
   },
-  attrChange: {
-    change: {
-      type: Number,
-      default: 0
-    },
-    name: {
-      type: String,
-      default: ''
-    }
-  },
-  parameters: {
-    targetKey: {
-      type: String,
-      require: true
-    }
+  type: {
+    type: String,
+    default: 'unclassified'
   }
 });
 
-let BehaviorLog = mongoose.model('behaviorLogs', behaviorLogsSchema);
+const UsersBehaviorModel = mongoose.model('usersBehavior', usersBehaviorSchema);
 
-console.log('开始读取数据');
-let t1 = Date.now();
-db.query(`
-  for b in behaviorLogs
-  return b
-`)
-.then(curtor => curtor.all())
-.then((res) => {
-  console.log('数据读取完成，开始写入数据');
-  let n = 0;
-  let toMongo = () => {
-    let data = res[n];
-    data.attrChange = data.attrChange?data.attrChange:{};
-    let behaviorLog = new BehaviorLog({
-      isManageOp: data.isManageOp,
-      timeStamp: data.timeStamp,
-      from: data.from,
-      to:data.to,
-      scoreChange: data.scoreChange,
-      operation: data.operation,
-      port: data.port,
-      address: data.address,
-      attrChange:{
-        change: data.attrChange.change,
-        name: data.attrChange.name
-      },
-      parameters: {
-        targetKey: data.parameters.targetKey
-      }
+async function import1() {
+  const cursor = await db.collection('usersBehavior').all();
+  const docs = await cursor.all();
+  const errors = [];
+  for(const doc of docs) {
+    let {
+      toMid,
+      time,
+      type,
+      uid,
+      fid,
+      tid,
+      pid,
+      mid,
+    } = doc;
+    switch(type) {
+      case 1:
+        type = 'postToForum';
+        break;
+      case 2:
+        type = 'postToThread';
+        break;
+      case 3:
+        type = 'postToPost';
+        break;
+      case 4:
+        type = 'recommendPost';
+        break;
+      case 5:
+        type = 'unrecommendPost';
+        break;
+      default:
+        type = undefined
+    }
+    if(!toMid)
+      toMid = undefined;
+    if(!mid) {
+      const thread = await db.collection('threads').document(tid);
+      mid = thread.uid
+    }
+    const newDoc = new UsersBehaviorModel({
+      uid,
+      fid,
+      tid,
+      pid,
+      timeStamp: time,
+      operation: type,
+      mid,
+      toMid,
+      ip: '0.0.0.0',
+      port: '000',
+      score: scoreCoefficientMap[type]
     });
-    behaviorLog.save()
-    .then(() => {
-      n++;
-      if(n >= res.length) {
-        let t2 = Date.now();
-        console.log(`${res.length}条数据写入完成，耗时：${t2-t1}ms`);
-        return;
-      }else{
-        toMongo();
-        return;
-      }
-    })
-    .catch((err) => {
-      console.log(`存数据出错:${err}`)
-    });
+    try {
+      await newDoc.save()
+    } catch(e) {
+      e.data = doc;
+      errors.push(e)
+    }
   }
-  toMongo();
-})
-
-/* let a = new BehaviorLog({
-  isManageOp: true,
-  from: '73327',
-  to: '73327',
-  operation: 'viewHome',
-  attrChange:{
-    name: 'threadCount'
-  },
-  parameters: {
-    targetKey: 'm/73327'
+  if(errors.length > 0) {
+    for(const e of errors) {
+      console.log(e)
+    }
   }
-});
+}
 
-console.log(a); */
+import1();

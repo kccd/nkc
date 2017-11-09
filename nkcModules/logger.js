@@ -1,14 +1,14 @@
 module.exports = async (ctx) => {
   const {LogModel} = ctx.db;
   const processTime = ctx.processTime;
-  const {address, port} = ctx.request.socket._peername;
+  const {ip, port} = ctx;
   const log = {
     error: ctx.error,
     method: ctx.method,
     path: ctx.path,
     query: ctx.query,
     status: ctx.status,
-    ip: address,
+    ip,
     port,
     reqTime: ctx.reqTime,
     processTime,
