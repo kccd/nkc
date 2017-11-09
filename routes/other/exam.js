@@ -39,7 +39,7 @@ examRouter
 
     // 生成指定元素数量的数组，且数组元素不重复
     let arrOfDifferentValue = (arrValueCount, max) => {
-      // 题库中该科目的总数必须满足大于需要的题目数量,否则会陷入死循环
+      // 题库中该科目的总数必须大于需要的题目数量,否则会陷入死循环
       if(arrValueCount > max) {
         //arrValueCount = max;
         ctx.throw(400, `该科目下题的数量太少了，无法构成一张试卷，请更换考试科目。`);

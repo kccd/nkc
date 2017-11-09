@@ -18,7 +18,7 @@ postRouter
     let targetPost = await db.PostModel.findOnly({pid});
     if(data.user.uid !== targetPost && data.ensurePermission('GET', '/e'))
       ctx.throw(400, '您没有权限修改别人的回复');
-
+    console.log(data.user);
 
     await next();
   })
