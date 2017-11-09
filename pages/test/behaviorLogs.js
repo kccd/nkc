@@ -6,7 +6,6 @@ const {scoreMap, scoreCoefficientMap} = require('../../settings').user;
 
 const arango = require('arangojs');
 const db = arango('http://192.168.11.15');
-const aql = arango.aql;
 
 db.useDatabase('rescue');
 
@@ -67,11 +66,13 @@ const usersBehaviorSchema = new Schema({
 });
 
 const UsersBehaviorModel = mongoose.model('usersBehavior', usersBehaviorSchema);
+const errors = [];
 
 async function import1() {
+  console.log('qqq')
   const cursor = await db.collection('usersBehavior').all();
   const docs = await cursor.all();
-  const errors = [];
+  console.log(docs);
   for(const doc of docs) {
     let {
       toMid,
@@ -128,11 +129,13 @@ async function import1() {
       errors.push(e)
     }
   }
+  return errors
+}
+
+import1().then(errors => {
   if(errors.length > 0) {
     for(const e of errors) {
       console.log(e)
     }
   }
-}
-
-import1();
+});
