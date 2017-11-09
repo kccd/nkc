@@ -127,6 +127,7 @@ async function import1() {
       fid,
       tid,
       pid,
+      toUid,
       timeStamp: time,
       operation: type,
       mid,
