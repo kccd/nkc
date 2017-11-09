@@ -109,10 +109,11 @@ async function import1() {
       let thread;
       try {
         thread = await db.collection('threads').document(tid);
+        mid = thread.uid
       } catch(e) {
         console.log(tid)
+        mid = '0'
       }
-      mid = thread.uid
     }
     const newDoc = new UsersBehaviorModel({
       uid,
@@ -134,6 +135,7 @@ async function import1() {
       errors.push(e)
     }
   }
+  console.log('save 1');
   return errors
 }
 
