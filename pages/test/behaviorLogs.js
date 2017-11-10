@@ -123,7 +123,7 @@ async function import1() {
       }
     }
     if(!fid) {
-      let thread, fid;
+      let thread;
       try {
         thread = await db.collection('threads').document(tid);
         fid = thread.fid;
