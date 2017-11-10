@@ -122,6 +122,16 @@ async function import1() {
         mid = '0'
       }
     }
+    if(!fid) {
+      let thread;
+      try {
+        thread = await db.collection('threads').document(tid);
+        fid = thread.fid;
+      } catch(e) {
+        console.log(thread);
+        fid = 'hw'
+      }
+    }
     const newDoc = new UsersBehaviorModel({
       uid,
       fid,
@@ -133,12 +143,13 @@ async function import1() {
       mid,
       toMid,
       ip: '0.0.0.0',
-      port: '000',
+      port: '0',
       score: scoreCoefficientMap[type]
     });
     try {
       await newDoc.save()
     } catch(e) {
+      console.log(fid);
       console.log(e)
     }
   }
