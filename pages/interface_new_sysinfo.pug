@@ -8,10 +8,13 @@ block content
       .col-xs-12.col-sm-7.col-md-6
         form(role='form' action='postsysinfo' method='post')
           .form-group
-            label 标题
-            input.form-control type="email" class="" id="exampleInputEmail1" placeholder="Email">
-          input#title(type='text' placeholder='标题' name='title').form-control
-          textarea#content(placeholder='内容,bbcode格式' name='content' style='height: 500px;').form-control
+            label
+              h4 标题
+            input#title(type='text' placeholder='标题' name='title').form-control
+          .form-group
+            label
+              h4 通知内容
+            textarea#content(placeholder='内容,bbcode格式' name='content' style='height: 500px;').form-control
         input.btn.btn-default#submit(type='submit' value='send')
         include twemoji
       .col-xs-12.col-sm-5.col-md-6
@@ -23,13 +26,11 @@ block content
 
 block scripts
   script(src='/interface_common.js')
-  script(src='/commonmark/commonmark.js')
+  script(src='/commonmark/dist/commonmark.min.js')
   script(src='/plain_escaper.js')
-  script(src='/xss/xss.js')
-  script(src='/react.min.js')
-  script(src='/JSXTransformer.js')
-  script(src='/xbbcode/xbbcode.js')
+  script(src='/xss/dist/xss.min.js')
+  script(src='/react/react.min.js')
+  script(src='/react/JSXTransformer.js')
+  script(src='/xbbcode-parser/xbbcode.js')
   script(src='/nkc_render.js')
-  script.
-    console.log(render);
   script(src='/interface_new_sysinfo.js')
