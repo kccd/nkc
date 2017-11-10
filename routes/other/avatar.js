@@ -9,7 +9,7 @@ router
   })
   .get('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
-    ctx.type = 'image';
+    ctx.request.type = 'image/*';
     try {
       const path = `../../resources/avatar/${uid}`;
       accessSync(path);

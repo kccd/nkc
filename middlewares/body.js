@@ -3,6 +3,7 @@ const fs = require('fs');
 
 module.exports = async (ctx, next) => {
   const type = ctx.accepts('json', 'html');
+
   console.log(type);
   switch(type) {
     case 'json':
