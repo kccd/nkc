@@ -14,7 +14,7 @@ router
       accessSync(path);
       ctx.filePath = path;
     } catch(e) {
-      ctx.filePath = '../../resources/default/default_avatar_small.gif'
+      ctx.filePath = '../../resources/default_things/default_avatar_small.gif'
     }
     await next()
   });
