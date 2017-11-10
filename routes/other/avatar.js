@@ -8,6 +8,7 @@ router
     await next()
   })
   .get('/:uid', async (ctx, next) => {
+    console.log('aaa');
     const {uid} = ctx.params;
     console.log(ctx.request.type);
     ctx.request.type = 'image/*';
