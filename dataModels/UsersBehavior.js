@@ -53,6 +53,6 @@ const usersBehaviorSchema = new Schema({
   }
 });
 
-const UsersBehaviorModel = mongoose.model('usersBehaviors', usersBehaviorSchema);
+const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema);
 
 module.exports = UsersBehaviorModel;
