@@ -25,11 +25,18 @@ $(document).ready(function() {
     if(!userObj.content) {
       return screenTopWarning('内容不能为空！');
     }
+    geid('submit').disabled = true;
     nkcAPI('/e/newSysinfo','post',userObj)
       .then(function(){
+        $('#title').val('');
+        $('#content').val('');
+        geid('submit').disabled = false;
         return screenTopWarning('发送成功！');
       })
       .catch(function(err){
+        $('#title').val('');
+        $('#content').val('');
+        geid('submit').disabled = false;
         return screenTopWarning('发送失败： ' + err);
       })
   })
