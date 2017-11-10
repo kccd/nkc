@@ -3,6 +3,7 @@ const fs = require('fs');
 
 module.exports = async (ctx, next) => {
   if(ctx.filePath) {
+    console.log(ctx.filePath);
     ctx.body = fs.createReadStream(ctx.filePath);
     await next();
   } else {
@@ -19,5 +20,6 @@ module.exports = async (ctx, next) => {
       default:
         ctx.throw(406, 'type not accectable')
     }
-    await next();}
+    await next();
+  }
 };
