@@ -4,6 +4,7 @@ const fs = require('fs');
 module.exports = async (ctx, next) => {
   if(ctx.filePath) {
     console.log(ctx.filePath);
+    ctx.type = 'image/*';
     ctx.body = fs.createReadStream(ctx.filePath);
     await next();
   } else {
