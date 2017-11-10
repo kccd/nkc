@@ -9,6 +9,7 @@ router
   })
   .get('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
+    ctx.type = 'image';
     try {
       const path = `../../resources/avatar/${uid}`;
       accessSync(path);
@@ -17,6 +18,6 @@ router
       ctx.filePath = '../../resources/default/default_avatar_small.gif'
     }
     await next()
-  })
+  });
 
 module.exports = router;
