@@ -11,7 +11,7 @@ router
     console.log('aaa');
     const {uid} = ctx.params;
     console.log(ctx.type);
-    ctx.type = 'image';
+    ctx.type = 'image/png';
     console.log(ctx.type);
     try {
       const path = `../../resources/avatar/${uid}`;
