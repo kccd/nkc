@@ -12,11 +12,13 @@ router
     const {uid} = ctx.params;
     try {
       const url = path.resolve(__dirname, `../../resources/avatar/${uid}.jpg`);
+      console.log(url);
       accessSync(path);
       ctx.filePath = url;
     } catch(e) {
       ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_avatar_small.gif')
     }
+    console.log(ctx.filePath);
     await next()
   });
 

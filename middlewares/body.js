@@ -6,7 +6,6 @@ module.exports = async (ctx, next) => {
     console.log(ctx.type);
     ctx.type = 'image/jpg';
     console.log(ctx.type);
-    console.log(ctx.filePath);
     ctx.body = fs.createReadStream(ctx.filePath);
     await next();
   } else {
