@@ -12,9 +12,7 @@ router
     const {uid} = ctx.params;
     try {
       const url = String(path.resolve(__dirname, `../../resources/avatar/${uid}.jpg`));
-      console.log(url instanceof String);
-      console.log(url);
-      accessSync(path);
+      accessSync(url);
       ctx.filePath = url;
     } catch(e) {
       console.error(e);
