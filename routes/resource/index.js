@@ -6,7 +6,7 @@ const fs = require('fs');
 
 resourceRouter
   .get('/', async (ctx, next) => {
-    ctx.throw(400, 'a resource ID is required.');
+    ctx.throw(501, 'a resource ID is required.');
     await next()
   })
   .post('/', async (ctx, next) => {

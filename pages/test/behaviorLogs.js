@@ -119,7 +119,7 @@ async function import1() {
         mid = thread.uid
       } catch(e) {
         console.log(tid)
-        mid = '0'
+        mid = '49683'
       }
     }
     if(!fid) {
@@ -129,7 +129,7 @@ async function import1() {
         fid = thread.fid;
       } catch(e) {
         console.log(thread);
-        fid = 'hw'
+        fid = 'recycle'
       }
     }
     const newDoc = new UsersBehaviorModel({
@@ -157,10 +157,8 @@ async function import1() {
   return errors
 }
 
-import1().then(errors => {
-  if(errors.length > 0) {
-    for(const e of errors) {
-      console.log(e)
-    }
-  }
-});
+async function import2() {
+
+}
+
+import1();
