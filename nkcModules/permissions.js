@@ -141,7 +141,8 @@ const certificates ={
       avatar: {
         [parameter]: {
           [GET]: true
-        }
+        },
+        [GET]: true
       }
     },
     elseModifyTimeLimit: 0,
