@@ -22,7 +22,7 @@ let postsSchema = new Schema({
     default: ''
   },
   credits: {
-    type: [String],
+    type: Array,
     default: []
   },
   disabled: {

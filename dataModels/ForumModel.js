@@ -94,6 +94,7 @@ forumSchema.methods.getThreadsByQuery = async function(query) {
   } else {
     childFid.push(this.fid);
   }
+  console.log($match)
   return mongoose.connection.db.collection('threads').aggregate([
     {$match: {fid: {$in: childFid}}},
     {$match},

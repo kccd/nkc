@@ -18,7 +18,7 @@ fn.getQueryObj = (query, match) => {
   if(cat)
     $match.cid = cat;
   if(digest)
-    $match.digest = digest;
+    $match.digest = true;
   const $sort = {};
   if(sortby)
     $sort.toc = -1;

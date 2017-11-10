@@ -32,7 +32,7 @@ function toQueryString(object) {
       else qs += '&' + key.toString() + '=' + value.toString();
     }
   }
-  return '?' + qs
+  return '?' + qs;
 }
 
 function htmlDiff(earlier,later){

@@ -19,9 +19,16 @@ let defaultData = async (db) => {
     {$project: {_id: 0, category: '$_id', number: 1}}
   ]);
   data.numberByUser = await db.QuestionModel.aggregate([
-    {$group: {_id: '$username', number: {$sum: 1}}},
+    {$group: {_id: '$uid', number: {$sum: 1}}},
     {$sort:{number: -1}},
-    {$project: {_id: 0, username: '$_id', number: 1}},
+    {$project: {_id: 0, user: '$_id', number: 1, }},
+    {$lookup: {
+      from: 'users',
+      localField: 'user',
+      foreignField: 'uid',
+      as: 'user'
+    }},
+    {$unwind: '$user'}
   ]);
   return data;
 };

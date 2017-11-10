@@ -238,8 +238,25 @@ fn.updateThread = async (tid) => {
   })
 };
 
+fn.deleteEqualValue = (arr) => {
+  let newArr = [];
+  for (let i = 0; i < arr.length; i++) {
+    if(!newArr.includes(arr[i])) newArr.push(arr[i]);
+  }
+  return newArr;
+};
+
 fn.updatePost = async (pid) => {
-  
+  const targetPost = await db.PostModel.findOnly(pid);
+  const content = post.c;
+  let resourcesDeclared = content.match(/\{r=[0-9]{1,20}}/g);
+  if(!resourcesDeclared) resourcesDeclared = [];
+  for (let i = 0; i < resourcesDeclared; i++) {
+    resourcesDeclared[i] = resourcesDeclared[i].replace(/\{r=([0-9]{1,20})}/,'$1');
+  }
+  resourcesDeclared = fn.deleteEqualValue(resourcesDeclared);
+  await db.PostModel.replaceOne({pid}, {$set: {r: resourcesDeclared}});
+
 };
 
 fn.getToppedThreads = async (fid) => {

@@ -121,11 +121,7 @@ var nkc_editor = function(){
         url= '/p/'+targetArr[1];
       }
     }
-    console.log(targetArr)
-    console.log(post)
-    console.log(url)
-    console.log(method)
-    return nkcAPI(url, method,{post})
+    return nkcAPI(url, method,{post: {t: post.title, c: post.content}})
     .then(function(result){
       var redirectTarget = result.redirect;
       redirect(redirectTarget?redirectTarget:'/'+target)

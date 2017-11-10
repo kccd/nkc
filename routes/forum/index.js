@@ -12,11 +12,12 @@ forumRouter
   })
   .get('/:fid', async (ctx, next) => {
     const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;
-    const {fid, digest, cat, sortby} = ctx.params;
+    const {fid} = ctx.params;
+    const {digest, cat, sortby} = ctx.query;
     const data = ctx.data;
     let page = ctx.query.page || 0;
     let countOfThread = await ThreadTypeModel.count({fid});
-    let paging = apiFn.paging(page, 1000);
+    let paging = apiFn.paging(page, countOfThread);
     ctx.template = 'interface_forum.pug';
     if(digest) data.digest = true;
     data.cat = cat;
@@ -25,11 +26,7 @@ forumRouter
     const {query} = ctx;
     const forum = await ForumModel.findOne({fid});
     data.forum = forum;
-    let uidObj = [];
-    for (let uid of forum.moderators) {
-      uidObj.push({uid});
-    }
-    if(uidObj.length > 0) data.moderators = await UserModel.find().or(uidObj);
+    if(forum.moderators.length > 0) data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
     const threads = await forum.getThreadsByQuery(query);
     if(data.paging.page === 0 && data.forum.type === 'forum') {
       data.toppedThreads = await dbFn.getToppedThreads(fid);
