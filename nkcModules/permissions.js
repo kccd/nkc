@@ -129,6 +129,11 @@ const certificates ={
           [name]: '注册短信',
           [POST]: true
         }
+      },
+      avatar: {
+        [parameter]: {
+          [GET]: true
+        }
       }
     },
     elseModifyTimeLimit: 0,
