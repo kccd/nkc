@@ -26,20 +26,30 @@ experimentalRouter
     }
     let userLength = await db.UserModel.count();
     let paging = apiFn.paging(page, userLength);
-    /*let userArr = await db.UserModel.aggregate([
+    let userArr = await db.UserModel.aggregate([
       {$sort: {toc: -1}},
       {$skip: paging.start},
-      {$limit: paging.perpage}
-    ]);*/
-    let userArr = await db.UserModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    for (let i = 0; i < userArr.length; i++) {
-      userArr[i] = userArr[i].toObject();
-      let userPersonal = await db.UsersPersonalModel.findOne({uid: userArr[i].uid});
-      if(userPersonal){
-        userArr[i].regIP = userPersonal.regIP;
-        userArr[i].regPort = userPersonal.regPort;
-      }
-    }
+      {$limit: paging.perpage},
+      {$lookup: {
+        from: 'usersPersonal',
+        localField: 'uid',
+        foreignField: 'uid',
+        as: 'userPersonal'
+      }},
+      {$unwind: '$userPersonal'},
+      {$project: {
+        uid: 1,
+        username: 1,
+        toc: 1,
+        tlv: 1,
+        postCount: 1,
+        threadCount: 1,
+        regPort: '$userPersonal.regPort',
+        regIP: '$userPersonal.regIP',
+        mobile: '$userPersonal.mobile',
+        email: '$userPersonal.email'
+      }}
+    ]);
     paging.page++;
     ctx.data.page = paging;
     ctx.data.users = userArr;

@@ -17,7 +17,6 @@ collectionsRouter
     }
     ctx.data.forumList = await dbFn.getAvailableForums(ctx);
     ctx.data.targetUser = targetUser;
-    ctx.data.category = category;
     let categoryNames = await db.CollectionModel.aggregate([
       {$match: {uid: targetUserUid}},
       {$sort: {toc: 1}},
@@ -32,8 +31,15 @@ collectionsRouter
       uid: targetUserUid,
       category: category
     };
-    ctx.data.categoryThreads = await dbFn.foundCollection(queryDate);
+    let categoryThreads = [];
+    let collectionCount = await db.CollectionModel.count(queryDate);
+    if(collectionCount <= 0) {
+      queryDate.category = categoryNames[0];
+    }
+    categoryThreads = await dbFn.foundCollection(queryDate);
     ctx.template = 'interface_collections.pug';
+    ctx.data.category = queryDate.category;
+    ctx.data.categoryThreads = categoryThreads;
     await next();
   })
   .put('/', async (ctx, next) => {
@@ -42,7 +48,7 @@ collectionsRouter
     let {cid, category} = ctx.body;
     if(category === 'null') category = '';
     let collection = await db.CollectionModel.findOne({cid: cid});
-    if(user.uid !== collection.uid) ctx.throw(400, '抱歉，你没有资格修改别人的收藏');
+    if(user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格修改别人的收藏');
     await db.CollectionModel.replaceOne({uid: user.uid, cid: cid},{$set: {category: category}});
     await next();
   })
@@ -51,7 +57,7 @@ collectionsRouter
     const {user} = ctx.data;
     let {cid} = ctx.params;
     let collection = await db.CollectionModel.findOne({cid: cid});
-    if(user.uid !== collection.uid) ctx.throw(400, '抱歉，你没有资格删除别人的收藏');
+    if(user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格删除别人的收藏');
     await db.CollectionModel.deleteOne({cid: cid});
     await next();
   });

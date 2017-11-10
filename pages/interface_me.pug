@@ -34,7 +34,6 @@ block content
                   button.btn.btn-default.center-block#btnSwitch(onclick='showBtn()',style='margin:1em auto;') 修改头像
             .col-xs-7.col-md-7
               .col-xs-12.col-md-12
-                -console.log(data.user.navbarDesc)
                 div.f12!= data.user.navbarDesc.string.replace(/\n/g, '<br>')
               .col-xs-12.col-md-6
                 a.btn.btn-default.left-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.5em auto;') 查看个人专栏
@@ -220,7 +219,7 @@ block scripts
         return;
       }
       geid('submitnewpassword').disabled = true;
-      nkcAPI('/m/password','put',passwordObj)
+      nkcAPI('/me/password','PATCH',passwordObj)
       .then(function(){
         jwarning('密码修改成功！');
         geid('oldpassword').value = '';
@@ -242,7 +241,7 @@ block scripts
         focus_forums:geid('focus_forums').value,
       };
       geid('submitpersonalsetting').disabled = true;
-      nkcAPI('/m/personalsetting','put',settingObj)
+      nkcAPI('/me/personalsetting','PATCH',settingObj)
       .then(function(){
         jwarning('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
@@ -272,7 +271,7 @@ block scripts
         return;
       }
       geid('submitPhoneNumber').disabled = true;
-      nkcAPI('/m/mobile', 'post',mobileObj)
+      nkcAPI('/me/mobile', 'post',mobileObj)
       .then(function(){
         geid('submitPhoneNumber').disabled = false;
         geid('submitSendMcode').disabled = false;

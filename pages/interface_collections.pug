@@ -37,7 +37,7 @@ block content
                       each cat in data.categoryNames
                         if cat
                           li
-                            a(href=`javascript:moveTo('${cat||'null'}')`) #{cat||'null'}
+                            a(href=`javascript:moveTo('${cat}')`) #{cat}
 
                   button#deletebutton.btn.btn-danger(onclick=`deletebtn("${data.targetUser.uid}")`) 删除
                   button.btn.btn-default(onclick='selectbtn()') 全选/不选

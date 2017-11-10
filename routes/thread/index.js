@@ -73,6 +73,7 @@ threadRouter
       data.othersForum = othersForum
     }
     data.forum = await ForumModel.findOnly({fid: thread.fid});
+    data.targetUser = dbFn.findUserByTid(tid);
     console.log(`其他耗时: ${Date.now()-t} ms`);
     await next();
   })

@@ -10,10 +10,11 @@ operationRouter
     const {db} = ctx;
     const {user} = ctx.data;
     let targerPost = await db.PostModel.findOnly({pid});
-    if(targerPost.disabled) ctx.throw(404, '无法推荐已经被禁用的post');
+    if(targerPost.disabled) ctx.throw(400, '无法推荐已经被禁用的post');
     let personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {recPosts: pid}});
     let post = await db.PostModel.findOneAndUpdate({pid}, {$addToSet: {recUsers: user.uid}});
-    if(personal.recPosts.indexOf(pid) > -1 && post.recUsers.indexOf(user.uid) > -1) ctx.throw(404, '您已经推介过该post了,没有必要重复推介');
+    if(personal.recPosts.indexOf(pid) > -1 && post.recUsers.indexOf(user.uid) > -1) ctx.throw(400, '您已经推介过该post了,没有必要重复推介');
+    ctx.data.targetUser = await dbFn.findUserByPid(pid);
     await next();
   })
   .del('/recommend', async (ctx, next) => {
@@ -23,8 +24,9 @@ operationRouter
     await db.PostModel.findOnly({pid});
     let personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$pull: {recPosts: pid}});
     let post = await db.PostModel.findOneAndUpdate({pid}, {$pull: {recUsers: user.uid}});
-    if(personal.recPosts.indexOf(pid) === -1 && post.recUsers.indexOf(user.uid) === -1) ctx.throw(404, '您没有推介过该post了,没有必要取消推介');
+    if(personal.recPosts.indexOf(pid) === -1 && post.recUsers.indexOf(user.uid) === -1) ctx.throw(400, '您没有推介过该post了,没有必要取消推介');
     ctx.data.message = (post.recUsers.length > 0)?post.recUsers.length - 1: 0;
+    ctx.data.targetUser = await dbFn.findUserByPid(pid);
     await next();
   })
   .get('/quote', async (ctx, next) => {
@@ -42,6 +44,7 @@ operationRouter
       {$unwind: '$user'}
     ]))[0];
     ctx.data.message = xsflimit(post);
+    ctx.data.targetUser = await dbFn.findUserByPid(pid);
     await next();
   })
   .patch('/credit', async (ctx, next) => {
@@ -71,6 +74,7 @@ operationRouter
     updateObjForUser[type] = q;
     let updateObjForPost = user.toObject();
     await db.UserModel.replaceOne({uid: post.user.uid}, {$inc: updateObjForUser});
+    ctx.data.targetUser = await dbFn.findUserByPid(pid);
     await next();
   })
   .get('/history', async(ctx, next) => {
@@ -80,6 +84,7 @@ operationRouter
     ctx.data.post = await db.PostModel.findOnly({pid});
     ctx.data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});
     ctx.template = 'interface_post_history.pug';
+    ctx.data.targetUser = await dbFn.findUserByPid(pid);
     await next();
   })
   .patch('/disabled', async (ctx, next) => {
@@ -94,8 +99,8 @@ operationRouter
       targetPost = await db.PostModel.findOneAndUpdate({pid}, {$set: {disabled: false}});
     }
     if(targetPost.disabled === disabled) {
-      if(!disabled) ctx.throw(404, '操作失败！该回复未被屏蔽，请刷新');
-      if(disabled) ctx.throw(404, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
+      if(!disabled) ctx.throw(400, '操作失败！该回复未被屏蔽，请刷新');
+      if(disabled) ctx.throw(400, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
     }
     data.targetUser = await dbFn.findUserByPid(pid);
     await dbFn.updateThread(targetPost.tid);

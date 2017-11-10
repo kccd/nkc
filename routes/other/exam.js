@@ -136,8 +136,8 @@ examRouter
     }
     if(Date.now() - exam.toc > settings.exam.timeLimit) ctx.throw(404, 'overtime. please refresh');
     let sheet = params.sheet;
-    if(!sheet) ctx.throw(404, '小明，你怎么能交白卷！');
-    if(sheet.length !== exam.qarr.length) ctx.throw(404, '小明，看清楚你有多少道题再作答好吗？');
+    if(!sheet) ctx.throw(400, '小明，你怎么能交白卷！');
+    if(sheet.length !== exam.qarr.length) ctx.throw(400, '小明，看清楚你有多少道题再作答好吗？');
     let qidList = [];
     for (let i = 0; i < exam.qarr.length; i++) {
       qidList.push({
@@ -181,11 +181,11 @@ examRouter
       });
       score += correctness? 1:0;
     }
-    if(score < settings.exam.passScore) ctx.throw(404, '测试没有通过哦，别气馁，请继续努力！');
+    if(score < settings.exam.passScore) ctx.throw(400, '测试没有通过哦，别气馁，请继续努力！');
     let ipLog = await ctx.db.AnswerSheetModel.find({ip: ip}).sort({toc: -1});
     if(ipLog.length > 0) {
       if(!ipLog[0].isA){
-        if(Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) ctx.throw(404, '您之前测试通过的次数有点多哦，不应该再进行测试了！');
+        if(Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) ctx.throw(400, '您之前测试通过的次数有点多哦，不应该再进行测试了！');
       }
     }
     let regCode = () => {
@@ -224,7 +224,7 @@ examRouter
           ctx.data.result = key;
         }
       }catch(err) {
-        ctx.throw(404, `生成注册码出错， error: ${err}`);
+        ctx.throw(500, `生成注册码出错， error: ${err}`);
       }
     };
     await saveData(answerSheet, ctx.data.user);

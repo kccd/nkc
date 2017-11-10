@@ -22,11 +22,11 @@ forgotPasswordRouter
   let user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
   if(!user) ctx.throw(400, `用户名不存在，请重新输入`);
   let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-  if(!userPersonal.mobile) ctx.throw(404, '账号未绑定手机号，请通过其他方式找回密码');
+  if(!userPersonal.mobile) ctx.throw(400, '账号未绑定手机号，请通过其他方式找回密码');
   let newMobile = '0086' + mobile; // 使用国际区号后， 0086 换成客户端发送的区号
   if(newMobile !== userPersonal.mobile && mobile !== userPersonal.mobile) ctx.throw(400, '账号与手机号无法对应，请重新输入');
   let smsCode = await dbFn.checkMobileCode(newMobile, mcode);
-  if(!smsCode) ctx.throw(404, '手机验证码错误或过期，请检查');
+  if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
   ctx.data.mobile = mobile;
   ctx.data.mcode = mcode;
   await next();
@@ -39,7 +39,7 @@ forgotPasswordRouter
   if(!mcode) ctx.throw(400, '手机验证码不能为空！');
   let newMobile = '0086' + mobile;
   let smsCode = await dbFn.checkMobileCode(newMobile, mcode);
-  if(!smsCode) ctx.throw(404, '手机验证码错误或过期，请检查');
+  if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
   passwordAndType = apiFn.newPasswordObject(password);
   await db.UsersPersonalModel.replaceOne({$or: [{mobile: newMobile}, {mobile: mobile}]}, {$set: {password: passwordAndType.password, hashType: passwordAndType.hashType}});
   await next();
@@ -61,7 +61,7 @@ forgotPasswordRouter
   let user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
   if(!user) ctx.throw(400, '用户名不存在，请重新输入');
   let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-  if(!userPersonal.email) ctx.throw(404, '账号未绑定邮箱，请通过其他方式找回密码');
+  if(!userPersonal.email) ctx.throw(400, '账号未绑定邮箱，请通过其他方式找回密码');
   if(email !== userPersonal.email) ctx.throw(400, '账号与邮箱地址无法对应，请重新输入');
   let emailOfDBNumber = await dbFn.checkNumberOfSendEmailReset(email);
   if(emailOfDBNumber >= settings.sendMessage.sendEmailCount) ctx.throw('404', '邮件发送次数已达上限，请隔天再试');
@@ -93,7 +93,7 @@ forgotPasswordRouter
   if(!password) ctx.throw(400, '新密码不能为空！');
   let time = Date.now() - settings.sendMessage.emailCodeTime;
   let emailCode = await db.EmailCodeModel.findOne({used: false, email: email, token: token, toc: {$gt: time}});
-  if(!emailCode) ctx.throw(404, '邮件已失效，请尝试重新发送邮件');
+  if(!emailCode) ctx.throw(400, '邮件已失效，请尝试重新发送邮件');
   passwordAndType = apiFn.newPasswordObject(password);
   await db.UsersPersonalModel.replaceOne({email: email}, {$set: {password: passwordAndType.password, hashType: passwordAndType.hashType}});
   await db.EmailCodeModel.replaceOne({used: false, email: email, token: token}, {$set: {used: true}});

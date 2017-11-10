@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const editorRouter = new Router();
-
+const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
 editorRouter
   .get('/', async (ctx, next) => {
     const {target = '', forumID, content} = ctx.query;
@@ -12,6 +13,7 @@ editorRouter
     if(target.indexOf('post/') === 0) {
       const pid = target.slice(5);
       data.original_post = await ctx.db.PostModel.findOne({pid});
+      data.targetUser = await dbFn.findUserByPid(pid);
       return await next();
     }
     data.original_post = content? decodeURI(content) : '';

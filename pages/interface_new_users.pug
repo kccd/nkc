@@ -69,7 +69,12 @@ block content
               tr
                 td
                   a(href=`/u/${user.uid}`) #{user.username}
-                td #{user.certs.indexOf('mobile') > -1 ? '手机' : '邮箱'}
+                -if(user.email)
+                  td 邮箱
+                -else if(user.mobile)
+                  td 手机
+                -else
+                  td 未知
                 td #{(user.toc).toLocaleString()}
                 td #{(user.tlv).toLocaleString()}
                 -if(user.regIP || user.regPort)

@@ -42,7 +42,7 @@ registerRouter
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     let mobileCodesNumber = await dbFn.checkMobile(userObj.mobile, params.mobile);
-    if(mobileCodesNumber > 0) ctx.throw(404, '此号码已经用于其他用户注册，请检查或更换');
+    if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
     let smsCode = await dbFn.checkMobileCode(userObj.mobile, userObj.mcode);
     if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
     let newUser = await dbFn.createUser(userObj);
@@ -112,7 +112,7 @@ registerRouter
     let userPersonal = await dbFn.checkEmail(email);
     if(userPersonal > 0) ctx.throw('404', '此邮箱已注册过，请检查或更换');
     let emailRegister = await dbFn.checkEmailCode(email, ecode);
-    if(!emailRegister) ctx.throw(404, '邮箱链接已失效，请重新注册！');
+    if(!emailRegister) ctx.throw(400, '邮箱链接已失效，请重新注册！');
     let usernameOfDBNumber = await dbFn.checkUsername(emailRegister.username);
     if(usernameOfDBNumber !== 0) ctx.throw('404', '抱歉！该用户名在你激活账户前已经被别人注册了，请更换用户名再试！');
     let newUser = await dbFn.createUser(emailRegister.toObject());

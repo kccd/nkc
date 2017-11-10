@@ -41,7 +41,7 @@ loginRouter
           tries++;
           lastTry = Date.now();
           await usersPersonal.update({tries, lastTry});
-          ctx.throw(404, '密码错误, 请重新输入');
+          ctx.throw(400, '密码错误, 请重新输入');
         }
         break;
       case 'sha256HMAC':
@@ -49,7 +49,7 @@ loginRouter
           tries++;
           lastTry = Date.now();
           await usersPersonal.update({tries, lastTry});
-          ctx.throw(404, '密码错误, 请重新输入');
+          ctx.throw(400, '密码错误, 请重新输入');
         }
         break;
     }

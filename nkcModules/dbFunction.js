@@ -175,6 +175,7 @@ fn.getAvailableForums = async ctx => {
     {$match: {
       class: {$in: ctx.data.certificates.contentClasses}
     }},
+    {$sort: {order: 1}},
     {$group: {
       _id: {parentId: '$parentId'},
       children: {$push: '$$ROOT'}
@@ -189,6 +190,11 @@ fn.getAvailableForums = async ctx => {
       }
     }
   });
+  for (let i = 0; i < result.length; i++) {
+    if(result[i].children.length === 0) {
+      result.splice(i, 1);
+    }
+  }
   return result;
 };
 
@@ -302,6 +308,11 @@ fn.findUserByPid = async (pid) => {
 fn.findUserByTid = async (tid) => {
   const thread = await db.ThreadModel.findOne({tid});
   if(thread) return await db.UserModel.findOne({uid: thread.uid});
+};
+
+fn.findUserByQid = async (qid) => {
+  const question = await db.QuestionModel.findOnly({qid});
+  if(question) return await db.UserModel.findOne({uid: question.uid});
 };
 
 module.exports = fn;

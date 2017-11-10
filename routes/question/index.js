@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const questionRouter = new Router();
+const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
 // 通过uid和category查询
 let findQuestion = async (db, uidObj, categoryObj) => {
   let questions = await db.QuestionModel.find().and([uidObj, categoryObj]).sort({toc:-1});
@@ -92,16 +94,20 @@ questionRouter
       category: params.category,
       tlm: Date.now()
     };
-    return await ctx.db.QuestionModel.updateOne({qid: params.qid},{$set: question});
+    await ctx.db.QuestionModel.updateOne({qid: params.qid},{$set: question});
+    ctx.data.targetUser = await dbFn.findUserByQid(qid);
+    await next();
   })
   .get('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;
     ctx.data.question = await ctx.db.QuestionModel.findOne({qid: qid});
+    ctx.data.targetUser = await dbFn.findUserByQid(qid);
     await next();
   })
   .del('/:category/:qid', async (ctx, next) => {
     let qid = ctx.params.qid;
-    return await ctx.db.QuestionModel.deleteOne({qid: qid});
+    await ctx.db.QuestionModel.deleteOne({qid: qid});
+    ctx.data.targetUser = await dbFn.findUserByQid(qid);
     await next();
   });
 

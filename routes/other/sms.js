@@ -162,6 +162,7 @@ smsRouter
     if(!username || !content) ctx.throw(400, '参数不完整。');
     let targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     if(!targetUser) ctx.throw(400, '该用户不存在，请检查用户名是否输入正确');
+    ctx.data.targetUser = targetUser;
     let newSms = new db.SmsModel({
       sid: await db.SettingModel.operateSystemID('sms', 1),
       s: user.uid,

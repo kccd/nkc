@@ -128,6 +128,14 @@ const certificates ={
         register: {
           [name]: '注册短信',
           [POST]: true
+        },
+        bindMobile: {
+          [name]: '绑定手机号',
+          [POST]: true
+        },
+        reset: {
+          [name]: '找回密码',
+          [POST]: true
         }
       },
       avatar: {
@@ -259,23 +267,23 @@ const certificates ={
         }
       },
       me: {
-        [PUT]: true,
+        [PATCH]: true,
         [GET]: true,
         personalsetting: {
           [name]: '个人信息',
-          [PUT]: true
+          [PATCH]: true
         },
         password: {
           [name]: '密码',
-          [PUT]: true
+          [PATCH]: true
         },
         username: {
           [name]: '用户名',
-          [PUT]: true
+          [PATCH]: true
         },
         mobile: {
           [name]: '手机',
-          [PUT]: true
+          [POST]: true
         },
         resource: {
           [name]: '上传的资源',
