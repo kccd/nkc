@@ -1,6 +1,6 @@
 const settings = require('../settings');
-const {mongoose} = settings;
-const {Schema} = mongoose;
+const {database} = settings;
+const {Schema} = database;
 
 const usersBehaviorSchema = new Schema({
   timeStamp: {
