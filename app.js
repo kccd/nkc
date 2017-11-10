@@ -25,7 +25,6 @@ app.use(async (ctx, next) => {
   await next()
 });
 app.use(cookieIdentify);
-app.use(staticServe('./resources'));
 app.use(staticServe('./pages'));
 app.use(staticServe('./node_modules'));
 app.use(staticServe('./nkcModules'));

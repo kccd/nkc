@@ -8,6 +8,7 @@ const forgotPasswordRouter = require('./forgotPassword');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
+const avatar = require('./avatar');
 // 用于测试的路由----------------------
 const testRouter = require('./test');
 
@@ -26,4 +27,5 @@ otherRouter
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
+  .use('avatar', avatar.routes(), avatar.allowedMethods());
 module.exports = otherRouter;
