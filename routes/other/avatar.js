@@ -10,11 +10,11 @@ router
   .get('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
     try {
-      const path = `../../resources/avatar/${uid}`;
+      const path = `../resources/avatar/${uid}`;
       accessSync(path);
       ctx.filePath = path;
     } catch(e) {
-      ctx.filePath = '../../resources/default_things/default_avatar_small.gif'
+      ctx.filePath = '../resources/default_things/default_avatar_small.gif'
     }
     await next()
   });
