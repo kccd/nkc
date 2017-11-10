@@ -25,10 +25,11 @@ let getCertsInText = (user) => {
 
 function toQueryString(object) {
   let qs = '';
-  for(const key in Object.keys(object)) {
+  for(const key of Object.keys(object)) {
     const value = object[key];
     if(value){
-      qs += '&' + key.toString() + '=' + value.toString()
+      if(qs === '') qs += key.toString() + '=' + value.toString();
+      else qs += '&' + key.toString() + '=' + value.toString();
     }
   }
   return '?' + qs

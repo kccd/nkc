@@ -82,14 +82,14 @@ var nkc_editor = function(){
 
   editor.assemblePostObject = function(){
     var post = {
-      t:gv('title').trim(),
-      c:gv('content'),
+      title:gv('title').trim(),
+      content:gv('content'),
       l:gv('lang').toLowerCase().trim(),
       cat:gv('cat').trim()
     }
 
 
-    if(post.t=='')post.t=undefined
+    if(post.title=='')post.title=undefined
 
     return post
   }
@@ -99,30 +99,33 @@ var nkc_editor = function(){
 
     var target = gv('target').trim();
 
-    if(post.c==''){screenTopWarning('请填写内容。');return;}
+    if(post.content==''){screenTopWarning('请填写内容。');return;}
     if(target==''){screenTopWarning('请填写发表至的目标。');return;}
 
     if(geid('ParseURL').checked){
       if(post.l=='markdown'){
-        post.c = common.URLifyMarkdown(post.c)
+        post.content = common.URLifyMarkdown(post.content)
       }
       if(post.l=='bbcode'||post.l=='pwbb'){
-        post.c = common.URLifyBBcode(post.c)
+        post.content = common.URLifyBBcode(post.content)
       }
     }
 
     //alert(JSON.stringify(post) )
     geid('post').disabled = true
-    console.log({
-      target:target,
-      post:post,
-      forumID: geid('forumID').innerHTML
-    });
-    return nkcAPI('postTo',{
-      target:target,
-      post:post,
-      forumID: geid('forumID').innerHTML
-    })
+    targetArr = target.split('/');
+    var method = '', url = '';
+    switch (targetArr[0]) {
+      case 'post': {
+        method= 'PATCH';
+        url= '/p/'+targetArr[1];
+      }
+    }
+    console.log(targetArr)
+    console.log(post)
+    console.log(url)
+    console.log(method)
+    return nkcAPI(url, method,{post})
     .then(function(result){
       var redirectTarget = result.redirect;
       redirect(redirectTarget?redirectTarget:'/'+target)
@@ -179,9 +182,9 @@ var nkc_editor = function(){
   editor.update = function(){
 
     var post = editor.assemblePostObject()
-    post.r = extract_resource_from_tag(post.c)
+    post.r = extract_resource_from_tag(post.content)
 
-    var title = post.t||""
+    var title = post.title||""
     if(!title.length){
       title='标题为空'
       geid('parsedtitle').style.color='#ccc'
@@ -192,7 +195,7 @@ var nkc_editor = function(){
 
     hset('parsedtitle',title); //XSS prone.
 
-    var content = post.c
+    var content = post.content
     var parsedcontent = '';
 
     parsedcontent = render.experimental_render(post)
