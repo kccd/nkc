@@ -7,12 +7,12 @@
 
   if (!post.disabled || disablePost)
     //horizontal line
-    hr(id=`${post.pid}`).ThreadSinglePostHr
+    hr(id=`p${post.pid}`).ThreadSinglePostHr
     //meta(id=`${post.pid}'`)
     - var uid = post.uid
     - var user = post.user
     //post itself
-    .parent.clearfix(id=`p${post.pid}`)
+    .parent.clearfix(id=`${post.pid}`)
       .threadOneLine
         div.fixThread
           div(style='float: left;')

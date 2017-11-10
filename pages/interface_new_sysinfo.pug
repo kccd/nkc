@@ -7,6 +7,9 @@ block content
     .row
       .col-xs-12.col-sm-7.col-md-6
         form(role='form' action='postsysinfo' method='post')
+          .form-group
+            label 标题
+            input.form-control type="email" class="" id="exampleInputEmail1" placeholder="Email">
           input#title(type='text' placeholder='标题' name='title').form-control
           textarea#content(placeholder='内容,bbcode格式' name='content' style='height: 500px;').form-control
         input.btn.btn-default#submit(type='submit' value='send')

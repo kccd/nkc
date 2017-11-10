@@ -98,9 +98,9 @@ block content
             hr
             h4 专家
             each i in data.numberByUser
-              -var username = i.username;var number = i.number;
+              -var user = i.user || {};var number = i.number;
               div(style='margin:5px')
-                a(href=`/user_activities_byname/${username}`) #{username}
+                a(href=`/m/${user.uid || ''}`) #{user.username || 'undefined'}
                 | : #{number}
 
             hr
