@@ -11,7 +11,7 @@ const otherRouter = routers.other;
 const experimentalRouter = routers.experimental;
 const questionRouter = routers.question;
 const resourceRouter = routers.resource;
-
+console.log('bbb')
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());

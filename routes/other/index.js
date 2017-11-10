@@ -11,7 +11,7 @@ const editorRouter = require('./editor');
 const avatar = require('./avatar');
 // 用于测试的路由----------------------
 const testRouter = require('./test');
-
+console.log('aaa')
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
