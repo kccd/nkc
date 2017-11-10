@@ -2,8 +2,6 @@ const Router = require('koa-router');
 const router = new Router();
 const {accessSync} = require('fs');
 
-console.log('aaaa')
-
 router
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a uid is required.');
