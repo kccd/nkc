@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
 const {accessSync} = require('fs');
+const path = require('path');
 
 router
   .get('/', async (ctx, next) => {
@@ -10,11 +11,11 @@ router
   .get('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
     try {
-      const path = `../resources/avatar/${uid}`;
+      const url = path.resolve(__dirname, `../../resources/avatar/${uid}`);
       accessSync(path);
-      ctx.filePath = path;
+      ctx.filePath = url;
     } catch(e) {
-      ctx.filePath = '../resources/default_things/default_avatar_small.gif'
+      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_avatar_small.gif')
     }
     await next()
   });
