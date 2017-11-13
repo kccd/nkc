@@ -29,7 +29,8 @@ let collectionsSchema = new Schema({
   },
   category: {
     type: String,
-    default: 'unclassified'
+    default: 'unclassified',
+    required: true
   }
 });
 
@@ -48,6 +49,7 @@ return a
   let n = 0;
   let toMongo = () => {
     let data = res[n];
+    if(!data.category || data.category == '') data.category = 'unclassified';
     let collection = new Collection({
       cid: number,
       toc: data.toc,
