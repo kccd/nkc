@@ -81,9 +81,8 @@ const bannerify = async path => execute(`
 `);
 
 const removeFile = async path => {
-  await fs.unlink(path);
+  return await fs.unlink(path);
 };
-
 module.exports = {
   avatarify,
   attachify,
