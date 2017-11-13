@@ -143,6 +143,12 @@ const certificates ={
           [GET]: true
         },
         [GET]: true
+      },
+      default: {
+        [parameter]: {
+          [GET]: true
+        },
+        [GET]: true
       }
     },
     elseModifyTimeLimit: 0,
