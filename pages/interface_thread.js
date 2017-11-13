@@ -563,11 +563,7 @@ function adSwitch(tid) {
   var btn = geid('adBtn');
   var nowIsAd = '取消首页置顶';
   var nowNormal = '首页置顶';
-  var method = 'post';
-  if(btn.innerHTML === nowIsAd) method = 'delete';
-  else if(btn.innerHTML === nowNormal) method = 'post';
-  else return screenTopWarning('到底是顶置还是不顶置？');
-  nkcAPI('/t/'+tid+'/adSwitch', method, {})
+  nkcAPI('/t/'+tid+'/ad', 'PATCH', {})
     .then(function() {
       if(btn.innerHTML === nowIsAd) {
         screenTopWarning('取消首页置顶成功');

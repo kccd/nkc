@@ -474,8 +474,7 @@ const certificates ={
         [parameter]: {
           ad: {
             [name]: '首页置顶',
-            [POST]: true,
-            [DELETE]: true
+            [PATCH]: true
           }
         }
       },

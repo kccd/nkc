@@ -83,7 +83,7 @@ block content
                   if ensurePermission('POST', '/u/x/cart')
                     a(href=`javascript:cartThread('${data.thread.tid}')`) 帖入管理车
 
-                  if ensurePermission('POST', '/t/x/ad')
+                  if ensurePermission('PATCH', '/t/x/ad')
                     -var isAd = data.ads.indexOf(thread.tid) > -1
                     a#adBtn(href='javascript:;' onclick=`adSwitch('${thread.tid}')`) #{isAd ? '取消首页置顶' : '首页置顶'}
 

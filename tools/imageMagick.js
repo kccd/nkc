@@ -4,7 +4,8 @@ const {avatarSize, sizeLimit} = settings.upload;
 const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
-const {stat} = require('fs');
+const fs = require('fs');
+const {stat} = fs;
 
 const execute = promisify(exec);
 const os = platform();
@@ -79,6 +80,10 @@ const bannerify = async path => execute(`
   ${convert} ${path} -resize ${banner}^ -gravity Center -quality 90 -crop ${banner}+0+0 ${path}
 `);
 
+const removeFile = async path => {
+  return await fs.unlink(path);
+};
+
 module.exports = {
   avatarify,
   attachify,
@@ -86,7 +91,8 @@ module.exports = {
   info,
   thumbnailify,
   generateAdPost,
-  bannerify
+  bannerify,
+  removeFile
 };
 
 
