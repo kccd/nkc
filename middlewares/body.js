@@ -23,8 +23,8 @@ module.exports = async (ctx, next) => {
         ctx.type = 'html';
         ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
         break;
-      case 'image':
-        ctx.type = 'image/*';
+      case 'image/*':
+        ctx.type = 'image';
         ctx.body = fs.createReadStream(ctx.filePath);
         break;
       default:
