@@ -109,6 +109,7 @@ return db.query(`
 
 .then(cursor => cursor.all())
 .then((res) => {
+  console.log('处理数据');
   for(var i = 0; i < res.length; i++){
     res[i]._id = undefined;
     res[i].pid = res[i]._key;
