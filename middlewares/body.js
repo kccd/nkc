@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
   if(filePath) {
     ctx.body = fs.createReadStream(ctx.filePath);
   } else {
-    const type = ctx.request.accepts('json', 'html', 'image/*');
+    const type = ctx.request.accepts('json', 'html');
     switch(type) {
       case 'json':
         ctx.type = 'json';
@@ -16,10 +16,6 @@ module.exports = async (ctx, next) => {
       case 'html':
         ctx.type = 'html';
         ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
-        break;
-      case 'image/*':
-        ctx.type = 'image';
-        ctx.body = fs.createReadStream(ctx.filePath);
         break;
       default:
         ctx.throw(406, 'type not accectable')
