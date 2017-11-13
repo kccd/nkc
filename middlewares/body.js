@@ -12,7 +12,7 @@ module.exports = async (ctx, next) => {
   //   await next();
   // } else {
   console.log(ctx.request.get('Accept'));
-    const type = ctx.request.accepts('json', 'html', 'image');
+    const type = ctx.request.accepts('json', 'html', 'image/*');
     console.log(type);
     switch(type) {
       case 'json':
@@ -24,7 +24,7 @@ module.exports = async (ctx, next) => {
         ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
         break;
       case 'image':
-        ctx.type = 'image';
+        ctx.type = 'image/*';
         ctx.body = fs.createReadStream(ctx.filePath);
         break;
       default:
