@@ -49,6 +49,7 @@ resourceRouter
     await next()
   })
   .get('/:rid', async (ctx, next) => {
+    console.log(ctx.type);
     const {rid} = ctx.params;
     const resource = await ctx.db.ResourceModel.findOne({rid});
     const {path, ext} = resource;
