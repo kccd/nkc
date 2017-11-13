@@ -2,6 +2,8 @@ const Router = require('koa-router');
 const operationRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
+const tools = require('../../tools');
+const {imageMagick} = tools;
 operationRouter
   // 收藏帖子
   .post('/addColl', async (ctx, next) => {
@@ -25,12 +27,49 @@ operationRouter
     await next();
   })
   // 首页置顶
-  .patch('/adSwitch', async (ctx, next) => {
+  .patch('/ad', async (ctx, next) => {
     const {tid} = ctx.params;
-    const {db} = ctx;
-    const {user} = ctx.data;
-    let setting = await db.SettingMode.findOneAndUpdate({uid: 'system'}, {$addToSet: {ads: tid}});
-    if(setting.ads.indexOf(tid) !== -1) ctx.throw(400, '该贴子已经在首页置顶了，不需要重复操作');
+    const {db, data} = ctx;
+    const {user} = data;
+    const setting = await db.SettingModel.findOnly({uid: 'system'});
+    const ads = setting.ads;
+    const index = ads.findIndex((elem, i, arr) => elem === tid);
+    let targetUser = await dbFn.findUserByTid(tid);
+    if(index > -1) {
+      ads.splice(index, 1);
+      await imageMagick.removeFile(`./resources/ad_posts/${tid}.jpg`);
+    } else {
+      if(ads.length === 6) {
+        ads.shift();
+      }
+      ads.push(tid);
+      let result = await db.ThreadModel.aggregate([
+        {$match: {tid}},
+        {$lookup: {
+          from: 'posts',
+          localField: 'oc',
+          foreignField: 'pid',
+          as: 'oc'
+        }},
+        {$unwind: '$oc'},
+        {$project: {'targetPost': '$oc'}},
+      ]);
+      let resourceArr = result.r || [];
+      let resource = (await db.ResourceModel.aggregate([
+        {$match:{rid: {$in: resourceArr}}},
+        {$match: {ext: {$in: ['jpg', 'png', 'svg', 'jpeg']}}},
+      ]))[0];
+      if(resource) {
+        const name = `./resources/ad_posts/${tid}.jpg`;
+        const path = `./resources/upload${resource.path}`;
+        await imageMagick.generateAdPost(path, name);
+      } else {
+        const path = `./resources/newavatar/${targetUser.uid}.jpg`;
+        const name = `./resources/ad_posts/${tid}.jpg`;
+        await imageMagick.generateAdPost(path, name);
+      }
+    }
+    await db.SettingModel.replaceOne({uid: 'system'}, {$set: {ads}});
     await next();
   })
   // 精华
