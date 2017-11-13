@@ -2,15 +2,15 @@ const path = require('path');
 const fs = require('fs');
 
 module.exports = async (ctx, next) => {
-  if(ctx.filePath) {
-    console.log(ctx.type);
-    ctx.type = 'image/jpg';
-    console.log(ctx.response.type);
-    console.log(ctx.type);
-    console.log(JSON.stringify(ctx.is('image')));
-    ctx.body = fs.createReadStream(ctx.filePath);
-    await next();
-  } else {
+  // if(ctx.filePath) {
+  //   console.log(ctx.type);
+  //   ctx.type = 'image/jpg';
+  //   console.log(ctx.response.type);
+  //   console.log(ctx.type);
+  //   console.log(JSON.stringify(ctx.is('image')));
+  //   ctx.body = fs.createReadStream(ctx.filePath);
+  //   await next();
+  // } else {
     const type = ctx.accepts('json', 'html');
     switch(type) {
       case 'json':
@@ -25,5 +25,5 @@ module.exports = async (ctx, next) => {
         ctx.throw(406, 'type not accectable')
     }
     await next();
-  }
+  // }
 };
