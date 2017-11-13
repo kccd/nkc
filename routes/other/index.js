@@ -11,6 +11,7 @@ const editorRouter = require('./editor');
 const avatar = require('./avatar');
 // 用于测试的路由----------------------
 const testRouter = require('./test');
+const defaultRouter = require('./default');
 
 // -----------------------------------
 otherRouter
@@ -27,5 +28,6 @@ otherRouter
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
-  .use('avatar', avatar.routes(), avatar.allowedMethods());
+  .use('avatar', avatar.routes(), avatar.allowedMethods())
+  .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

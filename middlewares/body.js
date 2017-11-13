@@ -3,7 +3,6 @@ const fs = require('fs');
 
 module.exports = async (ctx, next) => {
   const {filePath} = ctx;
-  console.log(filePath);
   if(filePath) {
     ctx.body = fs.createReadStream(ctx.filePath);
   } else {
