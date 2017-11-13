@@ -226,6 +226,7 @@ function submit(){
 }
 
 function quotePost(pid){
+  if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
   nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
     pc = pc.message;
