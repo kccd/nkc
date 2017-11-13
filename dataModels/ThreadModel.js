@@ -124,6 +124,14 @@ threadSchema.methods.getPostsByQuery = function(query, match) {
       as: 'user'
     }},
     {$unwind: '$user'},
+    {$unwind: '$r'},
+    {$lookup: {
+      from: 'resources',
+      localField: 'r',
+      foreignField: 'rid',
+      as: 'r'
+    }},
+    {$unwind: '$r'}
   ]).toArray()
 };
 
