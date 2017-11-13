@@ -12,7 +12,7 @@ module.exports = async (ctx, next) => {
   //   await next();
   // } else {
   console.log(ctx.request.get('Accept'));
-    const type = ctx.accepts('json', 'html');
+    const type = ctx.request.accepts('json', 'html');
     switch(type) {
       case 'json':
         ctx.type = 'json';
