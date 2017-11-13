@@ -54,7 +54,7 @@ resourceRouter
     const resource = await ctx.db.ResourceModel.findOne({rid});
     const {path, ext} = resource;
     ctx.filePath = ctx.settings.upload.uploadPath + path;
-    ctx.type = ext;
+    ctx.type = ctx.request.type = ext;
     await next()
   });
 
