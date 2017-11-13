@@ -15,10 +15,8 @@ router
       accessSync(url);
       ctx.filePath = url;
     } catch(e) {
-      console.error(e);
       ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_avatar_small.gif')
     }
-    console.log(ctx.filePath);
     await next()
   });
 
