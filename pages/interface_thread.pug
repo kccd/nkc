@@ -3,7 +3,7 @@ extends bootstrap_base.pug
 block title
   - var thread = data.thread
   title #{thread.oc.t} - 科创论坛
-  meta#replytarget(value=`${data.replytarget}`)
+  meta#replytarget(value=`${data.replyTarget}`)
   
   include MathJax.pug
   
