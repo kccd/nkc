@@ -13,6 +13,7 @@ module.exports = async (ctx, next) => {
   // } else {
   console.log(ctx.request.get('Accept'));
     const type = ctx.request.accepts('json', 'html', 'image');
+    console.log(type);
     switch(type) {
       case 'json':
         ctx.type = 'json';
