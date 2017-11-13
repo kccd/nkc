@@ -11,7 +11,7 @@ module.exports = async (ctx, next) => {
   //   ctx.body = fs.createReadStream(ctx.filePath);
   //   await next();
   // } else {
-  console.log(ctx.type);
+  console.log(ctx.request.get('Accept'));
     const type = ctx.accepts('json', 'html');
     switch(type) {
       case 'json':
