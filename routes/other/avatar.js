@@ -11,7 +11,7 @@ router
   .get('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
     try {
-      const url = String(path.resolve(__dirname, `../../resources/avatar/${uid}.jpg`));
+      const url = path.resolve(__dirname, `../../resources/avatar/${uid}.jpg`);
       accessSync(url);
       ctx.filePath = url;
     } catch(e) {
