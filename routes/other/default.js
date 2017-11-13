@@ -8,10 +8,10 @@ router
     ctx.throw(501, 'a filename is required.');
     await next()
   })
-  .get('/:fileName', async (ctx, next) => {
-    const {fileName} = ctx.params;
-    console.log(fileName);
-    ctx.filePath = path.resolve(__dirname, `../../resources/default/${fileName}`);
+  .get('/:file', async (ctx, next) => {
+    const {file} = ctx.params;
+    console.log(file);
+    ctx.filePath = path.resolve(__dirname, `../../resources/default/${file}`);
     await next()
   });
 
