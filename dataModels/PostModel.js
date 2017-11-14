@@ -94,7 +94,8 @@ postSchema.pre('save' , function(next) {
 });
 
 postSchema.methods.extendUser = async function() {
-  this.set({user: await UserModel.findOnly({uid:this.uid})});
+  const user = await UserModel.findOnly({uid:this.uid});
+  this.set({user});
   console.log(this.toObject())
 };
 
