@@ -27,11 +27,11 @@ meRouter
     ctx.template = 'interface_me.pug';
     await next();
   })
-  .put('/username', async (ctx, next) => {
+  .patch('/username', async (ctx, next) => {
     //ctx.data = '修改用户名';
     await next();
   })
-  .put('/password', async (ctx, next) => {
+  .patch('/password', async (ctx, next) => {
     let db = ctx.db;
     let params = ctx.body;
     let user = ctx.data.user;
@@ -46,7 +46,7 @@ meRouter
     await db.UsersPersonalModel.updateOne({uid: user.uid}, {$set:newPasswordObj});
     await next();
   })
-  .put('/personalsetting', async (ctx, next) => {
+  .patch('/personalsetting', async (ctx, next) => {
     let db = ctx.db;
     let params = ctx.body;
     let user = ctx.data.user;

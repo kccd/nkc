@@ -476,18 +476,25 @@ function subscribeUserSwitch(targetUid) {
 function recommendPostSwitch(e, targetPid, number) {
   var button = e.target;
   var content = button.innerHTML.replace(/\(.*\)/, '');
-  if(content === '点赞') {
+  if(content === '推介') {
     nkcAPI('/p/'+targetPid+'/recommend', 'post', {})
       .then(function() {
-        screenTopAlert('点赞成功');
-        button.innerHTML = '已点赞('+(number+1)+')';
+        screenTopAlert('推介成功');
+        button.innerHTML = '已推介('+(number+1)+')';
       })
       .catch(function(e) {
         screenTopWarning(e);
       })
   }
-  else if(content === '已点赞') {
-    return screenTopWarning('在此之前您已经点过赞了！');
+  else if(content === '已推介') {
+    nkcAPI('/p/'+targetPid+'/recommend', 'delete', {})
+      .then(function() {
+        screenTopAlert('成功取消推介');
+        button.innerHTML = '推介('+(number-1)+')';
+      })
+      .catch(function(e) {
+        screenTopWarning(e);
+      })
   }
   else {
     screenTopWarning('未定义的操作.')
