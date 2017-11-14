@@ -63,8 +63,11 @@ block content
             include interface_index_singlethread
           nav
             include interface_navigation_paging.pug
-
       .col-md-3.hidden-xs.hidden-sm
+        .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+          button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+          br
+          button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
         .nkcpanel
           include forum_logo_wisdom
 
@@ -91,6 +94,7 @@ block content
       .row
         .col-md-12
           include nkc_friendlies.pug
+      div#bm
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_easy_post.js')
