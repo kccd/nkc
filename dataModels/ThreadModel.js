@@ -130,8 +130,7 @@ threadSchema.methods.getPostsByQuery = function(query, match) {
       localField: 'r',
       foreignField: 'rid',
       as: 'r'
-    }},
-    {$unwind: '$r'}
+    }}
   ]).toArray()
 };
 
