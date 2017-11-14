@@ -16,7 +16,7 @@ forumRouter
     const {digest, cat, sortby} = ctx.query;
     const data = ctx.data;
     let page = ctx.query.page || 0;
-    let countOfThread = await ThreadTypeModel.count({fid});
+    let countOfThread = await dbFn.getCountOfThreadByFid(fid);
     let paging = apiFn.paging(page, countOfThread);
     ctx.template = 'interface_forum.pug';
     if(digest) data.digest = true;
@@ -30,8 +30,6 @@ forumRouter
     let threads = await forum.getThreadsByQuery(query);
     for (let i = 0; i < threads.length; i++) {
       threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
-      console.log(`-------------${threads[i].oc.user.uid}-------------------`);
-      console.log(threads[i].oc.user.navbarDesc);
     }
     let toppedThreads = [];
     if(data.paging.page === 0 && data.forum.type === 'forum') {

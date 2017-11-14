@@ -24,8 +24,6 @@
 .ForumThreadItem
   .parent.clearfix(id='')
     .avatar-left
-      - console.log(`----------------------------------------------------`);
-      - console.log(ocUser);
       - var title = ocUser && ocUser.navbarDesc?ocUser.navbarDesc.string:''
       a(href=`/m/${uid}` title=`${title}`)
         img.ForumThreadAvatar(src=`/avatar/${uid}`)
