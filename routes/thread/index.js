@@ -50,7 +50,8 @@ threadRouter
     console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
     const {mid, toMid} = thread;
     t = Date.now();
-    let posts = thread.getPostsByQuery(query, {tid});
+    let posts = await thread.getPostsByQuery(query, {tid});
+    console.log(posts);
     console.log(`查找目标post耗时: ${Date.now()-t} ms`);
     t = Date.now();
     let indexArr = [];
