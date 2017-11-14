@@ -55,7 +55,7 @@
               if data.user
                 - var user = data.user
                 - var ownership = user.uid===uid
-                -try{testModifyTimeLimit(data.certificates,ownership,post.toc)} catch(err) {console.log(post)}
+                -console.log(post)
                 - if(testModifyTimeLimit(data.certificates,ownership,post.toc))
                   a(href=`/editor?target=post/${post.pid}`) 编辑
 
