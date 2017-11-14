@@ -17,6 +17,8 @@ mongoose.connect(mongoDB, options)
 
 mongoose.plugin(function(schema) {
   schema.statics.findOnly = async function(query) {
+    if(JSON.stringify(query) === '{}')
+      throw new Error('param not specify');
     const doc = await this.findOne(query);
     if(!doc)
       throw `${JSON.stringify(query)} document not found`;
