@@ -28,7 +28,7 @@ app.use(cookieIdentify);
 app.use(staticServe('./pages'));
 app.use(staticServe('./node_modules'));
 app.use(staticServe('./nkcModules'));
-app.use(favicon(__dirname + '/site_specific/favicon.ico'));
+app.use(favicon(__dirname + 'resources/site_specific/favicon.ico'));
 app.use(permissions);
 app.use(mainRouter.routes());
 app.use(body);
