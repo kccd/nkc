@@ -30,10 +30,17 @@ forumRouter
     let threads = await forum.getThreadsByQuery(query);
     for (let i = 0; i < threads.length; i++) {
       threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
+      console.log(`-------------${threads[i].oc.user.uid}-------------------`);
+      console.log(threads[i].oc.user.navbarDesc);
     }
+    let toppedThreads = [];
     if(data.paging.page === 0 && data.forum.type === 'forum') {
-      data.toppedThreads = await dbFn.getToppedThreads(fid);
+      toppedThreads = await dbFn.getToppedThreads(fid);
+      for(let i = 0; i < toppedThreads.length; i++) {
+        toppedThreads[i].oc.user.navbarDesc = ctx.getUserDescription(toppedThreads[i].oc.user);
+      }
     }
+    data.toppedThreads = toppedThreads;
     data.threads = threads;
     let forumList = await dbFn.getAvailableForums(ctx);
     data.forumList = forumList;
