@@ -308,7 +308,7 @@ function nkc_render(options){
 
 
   var getHTMLForResource = function(r,allthumbnail){
-    var rid = r._key
+    var rid = r.rid
     var oname_safe = plain_escape(r.oname)
     var filesize = r.size
 
