@@ -95,9 +95,7 @@ postSchema.pre('save' , function(next) {
 
 postSchema.methods.extendUser = async function() {
   const user = await UserModel.findOnly({uid:this.uid});
-  console.log(user);
-  this.set({user});
-  console.log(this.toObject())
+  return Object.assign(this.toObject(), {user})
 };
 
 module.exports = mongoose.model('posts', postSchema);
