@@ -478,9 +478,9 @@ function recommendPostSwitch(e, targetPid, number) {
   var content = button.innerHTML.replace(/\(.*\)/, '');
   if(content === '推介') {
     nkcAPI('/p/'+targetPid+'/recommend', 'post', {})
-      .then(function() {
+      .then(function(data) {
         screenTopAlert('推介成功');
-        button.innerHTML = '已推介('+(number+1)+')';
+        button.innerHTML = '已推介('+(data.message)+')';
       })
       .catch(function(e) {
         screenTopWarning(e);
@@ -488,9 +488,9 @@ function recommendPostSwitch(e, targetPid, number) {
   }
   else if(content === '已推介') {
     nkcAPI('/p/'+targetPid+'/recommend', 'delete', {})
-      .then(function() {
+      .then(function(data) {
         screenTopAlert('成功取消推介');
-        button.innerHTML = '推介('+(number-1)+')';
+        button.innerHTML = '推介('+(data.message)+')';
       })
       .catch(function(e) {
         screenTopWarning(e);

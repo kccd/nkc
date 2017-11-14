@@ -15,6 +15,8 @@ operationRouter
     let post = await db.PostModel.findOneAndUpdate({pid}, {$addToSet: {recUsers: user.uid}});
     if(personal.recPosts.indexOf(pid) > -1 && post.recUsers.indexOf(user.uid) > -1) ctx.throw(400, '您已经推介过该post了,没有必要重复推介');
     ctx.data.targetUser = await dbFn.findUserByPid(pid);
+    ctx.data.numberOfRecUser = post.recUsers;
+    ctx.data.message = post.recUsers.length + 1;
     await next();
   })
   .del('/recommend', async (ctx, next) => {

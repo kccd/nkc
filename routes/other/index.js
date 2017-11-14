@@ -10,6 +10,7 @@ const otherRouter = new Router();
 const editorRouter = require('./editor');
 const avatar = require('./avatar');
 const avatarSmall = require('./avatar_small');
+const siteSpecific = require('./site_specific');
 // 用于测试的路由----------------------
 const testRouter = require('./test');
 const defaultRouter = require('./default');
@@ -31,5 +32,6 @@ otherRouter
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('avatar', avatar.routes(), avatar.allowedMethods())
   .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
+  .use('site_specific', siteSpecific.routes(), siteSpecific.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;
