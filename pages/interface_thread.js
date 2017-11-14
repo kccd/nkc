@@ -225,7 +225,7 @@ function submit(){
   })
 }
 
-function quotePost(pid){
+function quotePost(pid, number){
   if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
   nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
@@ -249,8 +249,7 @@ function quotePost(pid){
       return str
     });
     if(str.length==length_limit)str+='……'
-    str = '[quote='+pc.user.username+','+pc.pid+']'+ str + '[/quote]'
-
+    str = '[quote='+pc.user.username+','+pc.pid+'][/quote]'
     geid('ReplyContent').value += str
     window.location.href='#ReplyContent'
   })

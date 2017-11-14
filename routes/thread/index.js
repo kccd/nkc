@@ -42,7 +42,8 @@ threadRouter
     let t;
     t = Date.now();
     let postLength = await PostModel.count({tid});
-    data.paging = apiFn.paging(page, postLength);
+    let paging = apiFn.paging(page, postLength);
+    data.paging = paging;
     console.log(`查找总数耗时: ${Date.now()-t} ms`);
     ctx.template = 'interface_thread.pug';
     t = Date.now();
@@ -50,7 +51,42 @@ threadRouter
     console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
     const {mid, toMid} = thread;
     t = Date.now();
-    data.posts = await thread.getPostsByQuery(query, {tid});
+    let posts = await PostModel.aggregate([
+      {$match: {tid}},
+      {$sort: {toc: 1}},
+      {$lookup: {
+        from: 'users',
+        localField: 'uid',
+        foreignField: 'uid',
+        as: 'user'
+      }},
+      {$unwind: '$user'}
+    ]);
+    let indexArr = [];
+    for (let i = 0; i < posts.length; i++) {
+      indexArr.push(posts[i].pid);
+    }
+    posts = posts.slice(paging.start, paging.start + paging.perpage);
+    for (let i = 0; i < posts.length; i++) {
+      let postContent = posts[i].c;
+      let index = postContent.indexOf('[quote=');
+      if(index !== -1){
+        let targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
+        let step = indexArr.indexOf(targetPid);
+        posts[i].c = postContent.replace(/=/, `=${step},`);
+      }
+    }
+    data.posts = posts;
+    /*let indexArr = await PostModel.find({tid}, {pid: 1, id: 0}).sort({toc: 1});
+    let posts = await thread.getPostsByQuery(query, {tid});
+    for (let i = 0; i < posts.length; i++) {
+      posts[i] = posts[i].toObject();
+      let postContent = posts[i].c;
+      if(postContent.indexOf('[quote=') !== -1){
+        let targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
+
+      }
+    }*/
     console.log(`查找目标post耗时: ${Date.now()-t} ms`);
     thread = thread.toObject();
     t = Date.now();

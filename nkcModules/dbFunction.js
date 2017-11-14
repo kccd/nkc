@@ -231,7 +231,6 @@ fn.updateThread = async (tid) => {
     let imageNum = 0;
     for (let i = 0; i < r.length; r++) {
       let rFromDB = await db.ResourceModel.findOne({rid: r[i]});
-      console.log(`r[i]: ${r[i]} ,  rFromDB: ${rFromDB}`);
       if(extArr.indexOf(rFromDB.ext) !== -1) {
         imageNum++;
         updateObj.hasImage = true;
@@ -298,6 +297,20 @@ fn.getToppedThreads = async (fid) => {
     }},
     {$unwind: "$lm.user"}
   ]);
+};
+
+fn.getCountOfThreadByFid = async (fid) => {
+  let forum = await db.ForumModel.findOnly({fid});
+  let childFid = [];
+  if(forum.type === 'category') {
+    let fidArr = await db.ForumModel.find({parentId: fid}, {_id: 0, fid: 1});
+    for (let i of fidArr) {
+      childFid.push(i.fid);
+    }
+  } else {
+    childFid.push(fid);
+  }
+  return await db.ThreadModel.count({fid: {$in: childFid}});
 };
 
 fn.findUserByPid = async (pid) => {
