@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const UserModel = require('./UserModel');
 
 const postSchema = new Schema({
   pid: {
@@ -91,5 +92,10 @@ postSchema.pre('save' , function(next) {
   }
   next();
 });
+
+postSchema.methods.extendUser = function() {
+  this.user = UserModel.findOnly(this.uid);
+  return this
+};
 
 module.exports = mongoose.model('posts', postSchema);

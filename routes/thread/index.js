@@ -50,17 +50,19 @@ threadRouter
     console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
     const {mid, toMid} = thread;
     t = Date.now();
-    let posts = await PostModel.aggregate([
-      {$match: {tid}},
-      {$sort: {toc: 1}},
-      {$lookup: {
-        from: 'users',
-        localField: 'uid',
-        foreignField: 'uid',
-        as: 'user'
-      }},
-      {$unwind: '$user'}
-    ]);
+    // let posts = await PostModel.aggregate([
+    //   {$match: {tid}},
+    //   {$sort: {toc: 1}},
+    //   {$lookup: {
+    //     from: 'users',
+    //     localField: 'uid',
+    //     foreignField: 'uid',
+    //     as: 'user'
+    //   }},
+    //   {$unwind: '$user'}
+    // ]);
+    let posts = await PostModel.find({tid});
+    posts = posts.map(p => p.extendUser());
     console.log(posts);
     console.log(`查找目标post耗时: ${Date.now()-t} ms`);
     t = Date.now();
