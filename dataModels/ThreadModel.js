@@ -130,7 +130,7 @@ threadSchema.methods.getPostsByQuery = function(query, match) {
       foreignField: 'pid',
       as: 'r'
     }}
-  ], {explain: true}).toArray()
+  ]/*, {explain: true}*/).toArray()
 };
 
 module.exports = mongoose.model('threads', threadSchema);
