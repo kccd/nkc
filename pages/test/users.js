@@ -6,11 +6,12 @@ let Schema = mongoose.Schema;
 db = require('arangojs')('http://192.168.11.15');
 db.useDatabase('rescue');
 
-let usersSchema = new Schema({
+/*let usersSchema = new Schema({
   uid: {
     type: String,
+    unique: true,
     required: true,
-    index: 1
+    index: true
   },
   bday: {
     type: String,
@@ -98,9 +99,99 @@ let usersSchema = new Schema({
     type: Number,
     default: 0
   },
+});*/
+
+const userSchema = new Schema({
+  kcb: {
+    type: Number,
+    default: 0
+  },
+  toc: {
+    type: Date,
+    default: Date.now
+  },
+  xsf: {
+    type: Number,
+    default: 0
+  },
+  tlv: {
+    type: Date,
+    default: Date.now,
+  },
+  disabledPostsCount: {
+    type: Number,
+    default: 0
+  },
+  disabledThreadsCount: {
+    type: Number,
+    default: 0
+  },
+  postCount: {
+    type: Number,
+    default: 0
+  },
+  threadCount: {
+    type: Number,
+    default: 0
+  },
+  subs: {
+    type: Number,
+    default: 0
+  },
+  recCount: {
+    type: Number,
+    default: 0
+  },
+  toppedThreadsCount: {
+    type: Number,
+    default: 0
+  },
+  digestThreadsCount: {
+    type: Number,
+    default: 0,
+  },
+  score: {
+    default: 0,
+    type: Number
+  },
+  lastVisitSelf: {
+    type: Date,
+    default: Date.now
+  },
+  username: {
+    type: String,
+    required: true,
+    minlength: 1,
+    maxlength: 30,
+    unique: true
+  },
+  usernameLowerCase: {
+    type: String,
+    unique: true
+  },
+  uid: {
+    type: String,
+    unique: true,
+    required: true,
+    index: true
+  },
+  bday: String,
+  cart: [String],
+  email: {
+    type: String,
+    match: /.*@.*/
+  },
+  description: String,
+  color: String,
+  certs: {
+    type: [String],
+    index: 1
+  },
+  introText: String,
+  postSign: String,
 });
 
-let User = mongoose.model('users', usersSchema);
+let User = mongoose.model('users', userSchema);
 
 
 
@@ -118,7 +209,8 @@ db.query(`
     }
     res[i]._id = undefined;
     res[i].uid = res[i]._key;
-    res[i].usernameLowerCase = res[i].username_lowercase;
+    if(res[i].username.length >= 30) res[i].username = res[i].username.slice(0,30);
+    res[i].usernameLowerCase = res[i].username.toLowerCase();
     res[i].postSign = res[i].post_sign;
   }
   console.log('开始写入数据');

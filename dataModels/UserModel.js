@@ -74,7 +74,8 @@ const userSchema = new Schema({
   uid: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    index: true
   },
   bday: String,
   cart: [String],

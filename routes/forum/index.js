@@ -27,7 +27,10 @@ forumRouter
     const forum = await ForumModel.findOne({fid});
     data.forum = forum;
     if(forum.moderators.length > 0) data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
-    const threads = await forum.getThreadsByQuery(query);
+    let threads = await forum.getThreadsByQuery(query);
+    for (let i = 0; i < threads.length; i++) {
+      threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
+    }
     if(data.paging.page === 0 && data.forum.type === 'forum') {
       data.toppedThreads = await dbFn.getToppedThreads(fid);
     }

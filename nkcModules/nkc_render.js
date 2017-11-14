@@ -136,11 +136,31 @@ function nkc_render(options){
       },
     },
 
-    quote:{
+    /*quote:{
       openTag: function(params,content) {
         var username = params?(params.length?'引用 ' + params.slice(1).split(',')[0]+':<br>':''):''
 
         return '<blockquote class="xbbcode-blockquote">'+username;
+      },
+      closeTag: function(params,content) {
+        return '</blockquote>';
+      },
+    },*/
+    quote:{
+      openTag: function(params,content) {
+        var username = '';
+        if(!params || params.length === 0) {
+          username = '数据不严谨';
+        } else {
+          var arr = params.slice(1).split(',');
+          var username = '';
+          if(arr[0] !== '-1') {
+            username = params?(arr? '回复 '+arr[1]+' 在 '+arr[0]+' 阶的发言\n':''):'';
+          } else {
+            username = params?(arr? '回复 '+arr[1]+' 的发言\n':''):'';
+          }
+        }
+        return '<blockquote class="xbbcode-blockquote">' + username;
       },
       closeTag: function(params,content) {
         return '</blockquote>';

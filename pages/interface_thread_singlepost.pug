@@ -33,12 +33,12 @@
               -var recUsers = post.recUsers || []
               if data.user && post.uid != data.user.uid
                 if recUsers.indexOf(data.user.uid) > -1
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}')`) 取消推荐
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}')`) 已点赞(#{recUsers.length})
                 else
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}')`) 推荐(#{recUsers.length})
+                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}', ${recUsers.length})`) 点赞(#{recUsers.length})
 
               - if(postTo)
-                a(href=`javascript:quotePost('${post.pid}')`) 引用
+                a(href=`javascript:quotePost('${post.pid}', '${data.paging.start+index}')`) 引用
 
               - if(addPostToCart)
                 a(href=`javascript:cartPost('${post.pid}')`) 加入管理车
@@ -74,7 +74,14 @@
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-      div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+      -var targetPost = Object.assign({}, post);
+      -var end = targetPost.c.lastIndexOf('[/quote]')
+      -if(end !== -1)
+        -var postContent = targetPost.c.slice(end+8);
+        -var quoteBegin = targetPost.c.match(/\[.*?\]/)[0];
+        -targetPost.c = quoteBegin + '[/quote]' + postContent;
+      -console.log(targetPost);
+      div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(targetPost)
         if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
       //span #{post.user?post.user.post_sign:''}
