@@ -124,11 +124,10 @@ threadSchema.methods.getPostsByQuery = function(query, match) {
       as: 'user'
     }},
     {$unwind: '$user'},
-    {$unwind: '$r'},
     {$lookup: {
       from: 'resources',
-      localField: 'r',
-      foreignField: 'rid',
+      localField: 'pid',
+      foreignField: 'pid',
       as: 'r'
     }}
   ]).toArray()
