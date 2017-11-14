@@ -144,6 +144,12 @@ const certificates ={
         },
         [GET]: true
       },
+      avatar_small: {
+        [parameter]: {
+          [GET]: true
+        },
+        [GET]: true
+      },
       default: {
         [parameter]: {
           [GET]: true
