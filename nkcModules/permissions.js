@@ -339,6 +339,7 @@ const certificates ={
       professional: true
     },
     permittedOperations: {
+      [GET]: true,
       p: {
         [parameter]: {
           quote: {

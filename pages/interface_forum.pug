@@ -61,7 +61,7 @@ block content
 
                           -var stylestr = 'color:'+gpf.color
 
-                          a(href=`${url}` class='parentforum' style=`#{stylestr}`) #{name} /
+                          a(href=`${url}` class='parentforum' style=`${stylestr}`) #{name} /
 
                           each f,findex in group.children
                             -var backcolor=f.color||gpf.color
@@ -107,7 +107,7 @@ block content
             if forumIsParent
               //if forum is category
               .ForumNavigation1(style='margin-bottom:5px;')
-                a(href='/latest?&content=forum' style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部
+                a(href='/f' style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部
                 span(style='font-size: 18px; color: grey;') /&nbsp;
                 each group,index in data.forumList
                   -var gpf = group

@@ -18,7 +18,7 @@ block content
           span(style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部&nbsp;
           span(style='color: grey; font-size: 18px;') /
           for cForum in data.indexForumList
-            a(style='margin: 2px 5px; color: #909090;' href='/f/#{cForum._key}') #{cForum.display_name}
+            a(style='margin: 2px 5px; color: #909090;' href=`/f/${cForum.fid}`) #{cForum.displayName}
 
         .panel
           include interface_easy_post
@@ -37,52 +37,56 @@ block content
             - var class_str_sortby_tlm = sortby?'':'active'
 
             ul.pagination.NavigationPaging
-              li(class='#{data.content == "all" ? "active" : ""}')
-                a(href='?&content=all#{data.digeset ? "&digest=true" : ""}#{data.sortby ? "&sortby=toc" : ""}') 所有
-              li(class='#{data.content == "forum"? "active" : ""}')
-                a(href='?&content=forum#{data.digest? "&digest=true":""}#{data.sortby? "&sortby=toc":""}') 板块
-              li(class='#{data.content == "personal"? "active" : ""}')
-                a(href='?&content=personal#{data.digeset? "&digest=true": ""}#{data.sortby? "&sortby=toc":""}') 专栏
+              li(class=`${data.content == "all" ? "active" : ""}`)
+                a(href=`?&content=all${data.digeset ? "&digest=true" : ""}${data.sortby ? "&sortby=toc" : ""}`) 所有
+              li(class=`${data.content == "forum"? "active" : ""}`)
+                a(href=`?&content=forum${data.digest? "&digest=true":""}${data.sortby? "&sortby=toc":""}`) 板块
+              li(class=`${data.content == "personal"? "active" : ""}`)
+                a(href=`?&content=personal${data.digeset? "&digest=true": ""}${data.sortby? "&sortby=toc":""}`) 专栏
 
             ul.pagination.NavigationPaging
               - var page = paging?paging.page:null
-              li(class="#{class_str_all}")
-                a(href='?&content=#{data.content}#{data.sortby? "&sortby=toc": ""}') 全部
+              li(class=`${class_str_all}`)
+                a(href=`?&content=${data.content}${data.sortby? "&sortby=toc": ""}`) 全部
 
-              li(class="#{class_str_digest}")
-                a(href='?&content=#{data.content}&digest=true#{data.sortby? "&sortby=toc":""}') 精华
+              li(class=`${class_str_digest}`)
+                a(href=`?&content=${data.content}&digest=true${data.sortby? "&sortby=toc":""}`) 精华
 
             ul.pagination.NavigationPaging
-              li(class='#{class_str_sortby_tlm}')
-                a(href='?&content=#{data.content}#{data.digest? "&digest=true":""}') 复序
-              li(class='#{class_str_sortby_toc}')
-                a(href='?&content=#{data.content}#{data.digest? "&digest=true":""}&sortby=toc') 帖序
+              li(class=`${class_str_sortby_tlm}`)
+                a(href=`?&content=${data.content}${data.digest? "&digest=true":""}`) 复序
+              li(class=`${class_str_sortby_toc}`)
+                a(href=`?&content=${data.content}${data.digest? "&digest=true":""}&sortby=toc`) 帖序
 
           hr.hrNarrowSpace
           for thread in data.indexThreads
             include interface_index_singlethread
           nav
             include interface_navigation_paging.pug
-
       .col-md-3.hidden-xs.hidden-sm
+        .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+          button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+          br
+          button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
         .nkcpanel
           include forum_logo_wisdom
 
         -var user = data.user
         if user
           include interface_thread_userpatch.pug
-        if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
+        //if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
+        if !data.ensurePermission('GET', '/e') || data.ensurePermission('GET', '/q')
           .nkcpanel
-            if !data.permittedOperations.getLatestPosts
+            if !data.ensurePermission('GET', '/e')
               :markdown
                 普通会员不能进入特种技术板块，请点击这里[参加考试](/register?getcode=true)，升级高级会员
-            if data.permittedOperations.viewQuestions
+            if data.ensurePermission('GET', '/q')
               :markdown
                 科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/api/operation?&operation=viewQuestions)吧！
 
         if data.user
           .nkcpanel
-            a(href='/m/#{data.user._key}') 我的主题
+            a(href=`/m/${data.user.uid}`) 我的主题
             br
             br
             for thread in data.userThreads
@@ -90,7 +94,8 @@ block content
       .row
         .col-md-12
           include nkc_friendlies.pug
+      div#bm
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_easy_post.js')
-  script(type='text/javascript') $(document).ready(function () {if ($(window).width() < 900) {$('.ForumThreadStat').css('font-size', '7px');}});
+  script(type='text/javascript')!= `$(document).ready(function () {if ($(window).width() < 900) {$('.ForumThreadStat').css('font-size', '7px');}}))`

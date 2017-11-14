@@ -22,25 +22,25 @@ if (forum!==null)
         .kb
           .HomeForumTitle
             - var forumcolor = f.color||p.color||'#eee'
-            - var url = '/f/'+f._key; //url = seo_reverse_rewrite(url)
+            - var url = '/f/'+f.fid; //url = seo_reverse_rewrite(url)
             
             //colored circle
-            .HomeForumTitleCircle(style='background-color:#{forumcolor}')
+            .HomeForumTitleCircle(style=`background-color:${forumcolor}`)
             
               //if icon file set
-              if f.icon_filename
-                - f.icon_filename = f.icon_filename
+              if f.iconFileName
+                - f.iconFileName = f.iconFileName
                   //image if present
-                  img(src='/resources/site_specific/forum_icon/#{f.icon_filename}.svg')
+                  img(src=`/resources/site_specific/forum_icon/${f.iconFileName}.svg`)
               
-            a.HomeForumTitlePrimary(href='#{url}') #{f.display_name}
+            a.HomeForumTitlePrimary(href=`${url}`) #{f.displayName}
               
             .HomeForumTitleSecondary
               if f.countPostsToday > 0
                 span.HomeForumTitlePostCountToday #{f.countPostsToday||""}/
                 
-              span.HomeForumTitleThreadCount #{f.count_threads}/ 
-              span.HomeForumTitlePostCount #{f.count_posts}
+              span.HomeForumTitleThreadCount #{f.countThreads}/
+              span.HomeForumTitlePostCount #{f.countPosts}
               
           .HomeForumDescription
             span #{f.description}
@@ -64,17 +64,17 @@ if (forum!==null)
               
               if 0 
                 .HomeThreadAvatarPosition
-                  a(href='/user_threads/#{uid}')
-                    img.HomeThreadAvatar(src='#{avatar}')
+                  a(href=`/user_threads/${uid}`)
+                    img.HomeThreadAvatar(src=`${avatar}`)
               
               - var oc = thread.oc
               - var brief = de_hide(oc.c).replace(/\[.*?]/g,'').trim().slice(0,100)
               
-              - var url='/t/'+thread._key// = '/f/'+f._key+'/'+thread._key; //url = seo_reverse_rewrite(url)
+              - var url='/t/'+thread.tid// = '/f/'+f._key+'/'+thread._key; //url = seo_reverse_rewrite(url)
               if !thread.digest
-                a.HomeThreadText(href='#{url}' title="#{brief}") #{thread.oc.t}  
+                a.HomeThreadText(href=`${url}` title=`${brief}`) #{thread.oc.t}
               else
-                a.HomeThreadTextDigest.HomeThreadText(href='#{url}' title="#{brief}") #{thread.oc.t}
+                a.HomeThreadTextDigest.HomeThreadText(href=`${url}` title=`${brief}`) #{thread.oc.t}
                 
               .HomeThreadTextRightAlign
                 if Date.now()-thread.tlm<86400000
@@ -83,11 +83,11 @@ if (forum!==null)
               
               .HomeThreadInfo
                 span #{shortDateTimeString(thread.tlm)}&nbsp;
-                a.HomeThreadInfoUsername(href='/m/#{thread.lm.uid}') #{thread.lm.username}
+                a.HomeThreadInfoUsername(href=`/m/${thread.lm.uid}`) #{thread.lm.username}
                 
 
         if children && children.length
           .HomeChildrenArea
             -for(i in children)
               -var cf = children[i]
-              a(href='/f/#{cf._key}' style='color:#{"white"};background-color:#{cf.color||forumcolor}') #{cf.abbr||cf.display_name}
+              a(href=`/f/${cf.fid}` style=`color:${"white"};background-color:${cf.color||forumcolor}`) #{cf.abbr||cf.displayName}

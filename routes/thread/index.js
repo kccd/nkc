@@ -41,9 +41,8 @@ threadRouter
     } = db;
     let t;
     t = Date.now();
-    let postLength = await PostModel.count({tid});
-    let paging = apiFn.paging(page, postLength);
-    data.paging = paging;
+    let postOfTargetThread = await PostModel.find({tid}, {pid: 1}).sort({toc: 1});
+    data.paging = apiFn.paging(page, postOfTargetThread.length);
     console.log(`查找总数耗时: ${Date.now()-t} ms`);
     ctx.template = 'interface_thread.pug';
     t = Date.now();
@@ -52,11 +51,12 @@ threadRouter
     const {mid, toMid} = thread;
     t = Date.now();
     let posts = await thread.getPostsByQuery(query, {tid});
+    console.log(`查找目标post耗时: ${Date.now()-t} ms`);
+    t = Date.now();
     let indexArr = [];
-    for (let i = 0; i < posts.length; i++) {
-      indexArr.push(posts[i].pid);
+    for (let i = 0; i < postOfTargetThread.length; i++) {
+      indexArr.push(postOfTargetThread[i].pid);
     }
-    posts = posts.slice(paging.start, paging.start + paging.perpage);
     for (let i = 0; i < posts.length; i++) {
       let postContent = posts[i].c;
       let index = postContent.indexOf('[quote=');
@@ -66,6 +66,7 @@ threadRouter
         posts[i].c = postContent.replace(/=/, `=${step},`);
       }
     }
+    console.log(`算回复楼层: ${Date.now()-t} ms`);
     data.posts = posts;
     /*let indexArr = await PostModel.find({tid}, {pid: 1, id: 0}).sort({toc: 1});
     let posts = await thread.getPostsByQuery(query, {tid});
@@ -77,7 +78,6 @@ threadRouter
 
       }
     }*/
-    console.log(`查找目标post耗时: ${Date.now()-t} ms`);
     thread = thread.toObject();
     t = Date.now();
     thread.oc = await PostModel.findOnly({pid: thread.oc});
