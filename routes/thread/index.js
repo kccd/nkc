@@ -58,7 +58,7 @@ threadRouter
       indexArr.push(postOfTargetThread[i].pid);
     }
     for (let i = 0; i < posts.length; i++) {
-      let postContent = posts[i].c;
+      let postContent = posts[i].c || '';
       let index = postContent.indexOf('[quote=');
       if(index !== -1){
         let targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
