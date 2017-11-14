@@ -81,7 +81,7 @@ threadRouter
     thread = thread.toObject();
     t = Date.now();
     thread.oc = await PostModel.findOnly({pid: thread.oc});
-    let ocuser = (await UserModel.findOnly({uid: data.posts[0].uid})).toObject();
+    let ocuser = (await UserModel.findOnly({uid: thread.uid})).toObject();
     ocuser.navbarDesc = ctx.getUserDescription(ocuser);
     data.ocuser = ocuser;
     data.forumList = await dbFn.getAvailableForums(ctx);
