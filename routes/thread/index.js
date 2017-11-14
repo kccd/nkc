@@ -61,7 +61,7 @@ threadRouter
     //   }},
     //   {$unwind: '$user'}
     // ]);
-    let posts = await PostModel.find({tid});
+    let posts = await PostModel.find({tid}).sort({toc: 1});
     posts = await Promise.all(posts.map(p => p.extendUser()));
     console.log(posts);
     console.log(`查找目标post耗时: ${Date.now()-t} ms`);
