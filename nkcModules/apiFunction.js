@@ -3,6 +3,7 @@ let {perpage} = settings.paging;
 let fn = {};
 
 fn.paging = (page, arrLength) => {
+  if(page === undefined) page = 0;
   return {
     page: parseInt(page),
     perpage: perpage,

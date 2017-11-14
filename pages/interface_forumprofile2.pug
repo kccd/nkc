@@ -3,7 +3,7 @@ div
   - var forumcolor = f.color||p.color||'#eee'
 
   .HomeForumTitleCircle(style=`background-color:${forumcolor}`)
-  a.HomeForumTitlePrimary(href=`../${type}/${f.fid}`) #{f.displayName}
+  a.HomeForumTitlePrimary(href=`/f/${f.fid}`) #{f.displayName}
   if f.countPostsToday
     span.reddish  (今日 #{f.countPostsToday}
 

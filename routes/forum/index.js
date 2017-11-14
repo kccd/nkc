@@ -7,7 +7,62 @@ const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
-    ctx.data.forums = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
+    const {data, db, query} = ctx;
+    const {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query);
+    const digest = query.digest || false;
+    let forums = await db.ForumModel.find({class: {$in: data.certificates.contentClasses}});
+    let fidArr = [];
+    for (let i = 0; i < forums.length; i++) {
+      fidArr.push(forums[i].fid);
+    }
+    let countOfThread = await db.ThreadModel.count({fid: {$in: fidArr}, digest: digest});
+    data.paging = apiFn.paging(query.page, countOfThread);
+    let threads = await db.ThreadModel.aggregate([
+      {$match: {fid: {$in: fidArr}}},
+      {$match},
+      {$sort},
+      {$skip},
+      {$limit},
+      {$lookup:{
+        from: 'posts',
+        localField: 'oc',
+        foreignField: 'pid',
+        as: 'oc'
+      }},
+      {$unwind: '$oc'},
+      {$lookup: {
+        from: 'posts',
+        localField: 'lm',
+        foreignField: 'pid',
+        as: 'lm'
+      }},
+      {$unwind: '$lm'},
+      {$lookup: {
+        from: 'users',
+        localField: 'lm.uid',
+        foreignField: 'uid',
+        as: 'lm.user'
+      }},
+      {$unwind: '$lm.user'},
+      {$lookup: {
+        from: 'users',
+        localField: 'oc.uid',
+        foreignField: 'uid',
+        as: 'oc.user'
+      }},
+      {$unwind: '$oc.user'}
+    ]);
+    for (let i = 0; i < threads.length; i++) {
+      threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
+    }
+    data.indexThreads = threads;
+    data.indexForumList = await dbFn.getAvailableForums(ctx);
+    data.digest = query.digest;
+    data.sortby = query.sortby;
+    data.content = 'forum';
+    if(data.user)
+      data.userThreads = await data.user.getUsersThreads();
+    ctx.template = 'interface_latest_threads.pug';
     await next()
   })
   .get('/:fid', async (ctx, next) => {
