@@ -51,17 +51,7 @@ threadRouter
     console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
     const {mid, toMid} = thread;
     t = Date.now();
-    let posts = await PostModel.aggregate([
-      {$match: {tid}},
-      {$sort: {toc: 1}},
-      {$lookup: {
-        from: 'users',
-        localField: 'uid',
-        foreignField: 'uid',
-        as: 'user'
-      }},
-      {$unwind: '$user'}
-    ]);
+    let posts = await ThreadModel.getPostsByQuery(query, {tid});
     let indexArr = [];
     for (let i = 0; i < posts.length; i++) {
       indexArr.push(posts[i].pid);
