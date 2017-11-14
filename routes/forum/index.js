@@ -23,6 +23,13 @@ forumRouter
       {$sort},
       {$skip},
       {$limit},
+      {$lookup: {
+        from: 'forums',
+        localField: 'fid',
+        foreignField: 'fid',
+        as:'forum'
+      }},
+      {$unwind: '$forum'},
       {$lookup:{
         from: 'posts',
         localField: 'oc',
