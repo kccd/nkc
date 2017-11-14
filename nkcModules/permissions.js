@@ -150,6 +150,12 @@ const certificates ={
         },
         [GET]: true
       },
+      site_specific: {
+        [GET]:true,
+        [parameter]: {
+          [GET]: true
+        }
+      },
       default: {
         [parameter]: {
           [GET]: true
