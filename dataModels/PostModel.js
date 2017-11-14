@@ -94,7 +94,7 @@ postSchema.pre('save' , function(next) {
 });
 
 postSchema.methods.extendUser = function() {
-  this.user = UserModel.findOnly(this.uid);
+  this.user = UserModel.findOnly({uid:this.uid});
   return this
 };
 
