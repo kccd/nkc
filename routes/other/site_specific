@@ -11,7 +11,7 @@ router
   .get('/:fileName', async (ctx, next) => {
     const {fileName} = ctx.params;
     try {
-      const url = path.resolve(__dirname, `../../resources/site_specific/${fileName}`);
+      const url = path.resolve(__dirname, `../../site_specific/${fileName}`);
       accessSync(url);
       ctx.filePath = url;
     } catch(e) {
