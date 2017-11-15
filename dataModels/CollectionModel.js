@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const ThreadModel = require('./ThreadModel');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 let CollectionSchema = new Schema({
@@ -28,5 +29,10 @@ let CollectionSchema = new Schema({
     required: true
   }
 });
+
+CollectionSchema.methods.extendThread = async function(){
+  const thread = await ThreadModel.findOnly({tid: this.tid});
+  return Object.assign(thread.toObject(), {thread});
+};
 
 module.exports = mongoose.model('collections', CollectionSchema);

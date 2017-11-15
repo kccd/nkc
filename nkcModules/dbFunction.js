@@ -24,49 +24,37 @@ fn.decrementPsnl = async (uid, type, number) => {
   return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
 };
 
-// 查询目标用户的个人搜藏
-fn.foundCollection = async (data) => {
-  return await db.CollectionModel.aggregate([
-    {$match: data},
-    {$sort: {toc: 1}},
-    {$lookup: {
-      from: 'threads',
-      localField: 'tid',
-      foreignField: 'tid',
-      as: 'thread'
-    }},
-    {$unwind: '$thread'},
-    {$lookup: {
-      from: 'posts',
-      localField: 'thread.oc',
-      foreignField: 'pid',
-      as: 'thread.oc'
-    }},
-    {$unwind: '$thread.oc'},
-    {$lookup: {
-      from: 'posts',
-      localField: 'thread.lm',
-      foreignField: 'pid',
-      as: 'thread.lm'
-    }},
-    {$unwind: '$thread.lm'},
-    {$lookup: {
-      from: 'users',
-      localField: 'thread.oc.uid',
-      foreignField: 'uid',
-      as: 'thread.ocUser'
-    }},
-    {$unwind: '$thread.ocUser'},
-    {$lookup: {
-      from: 'users',
-      localField: 'thread.lm.uid',
-      foreignField: 'uid',
-      as: 'thread.lmUser'
-    }},
-    {$unwind: '$thread.lmUser'},
-  ]);
+fn.extendPostAndUserByPid = async (pid) =>{
+  let post = await db.PostModel.findOnly({pid});
+  post = post.toObject();
+  if(post.uid) {
+    post.user = await db.UserModel.findOnly({uid: post.uid});
+  }
+  return post;
 };
 
+fn.extendThreadPostAndUserByTid = async (tid) => {
+  let thread = await db.ThreadModel.findOnly({tid});
+  thread = thread.toObject();
+  if(thread.oc) {
+    thread.oc = await fn.extendPostAndUserByPid(thread.oc);
+  }
+  if(thread.lm) {
+    thread.lm = await fn.extendPostAndUserByPid(thread.lm);
+  }
+  return thread;
+};
+
+// 查询目标用户的个人搜藏
+fn.getCollectionByQuery = async (query) => {
+  let collections = await db.CollectionModel.find(query).sort({toc: 1});
+  collections = await Promise.all(collections.map(async c => {
+    c = c.toObject();
+    c.thread = await fn.extendThreadPostAndUserByTid(c.tid);
+    return c;
+  }));
+  return collections;
+};
 
 fn.checkMobile = async (mobile, oldMobile) => {
   let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);

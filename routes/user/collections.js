@@ -36,7 +36,7 @@ collectionsRouter
     if(collectionCount <= 0) {
       queryDate.category = categoryNames[0];
     }
-    categoryThreads = await dbFn.foundCollection(queryDate);
+    categoryThreads = await dbFn.getCollectionByQuery(queryDate);
     ctx.template = 'interface_collections.pug';
     ctx.data.category = queryDate.category;
     ctx.data.categoryThreads = categoryThreads;
