@@ -95,8 +95,8 @@ block content
                       span 分类: 
                       a(href=`/f/${data.forum.fid}` class=`${data.cat?"":"active"}`) 所有帖子
                       each ftt in data.forumThreadTypes
-                        -var active = ftt.fid==data.cat
-                        a(href=`/f/${data.forum.fid}?cat=${ftt.fid}` class=`${active?"active":""}` ) #{ftt.name}
+                        -var active = ftt.threadTypeId==data.cat
+                        a(href=`/f/${data.forum.fid}?cat=${ftt.threadTypeId}` class=`${active?"active":""}` ) #{ftt.name}
                       hr.hrNarrowSpace
                   else
                     .ForumNavigation1

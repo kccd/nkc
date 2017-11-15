@@ -96,13 +96,13 @@ forumRouter
     let toppedThreads = [];
     let t1 = Date.now();
     if(data.paging.page === 0 && data.forum.type === 'forum') {
-      toppedThreads = await dbFn.getToppedThreads(fid);
+      toppedThreads = await dbFn.getToppedThreads({fid, topped: true});
       for(let i = 0; i < toppedThreads.length; i++) {
         toppedThreads[i].oc.user.navbarDesc = ctx.getUserDescription(toppedThreads[i].oc.user);
       }
     }
     data.toppedThreads = toppedThreads;
-    console.log(`--------------${Date.now()-t1}------------------`)
+    console.log(`--------------加载置顶的帖子耗时： ${Date.now()-t1}------------------`)
     data.threads = threads;
     let forumList = await dbFn.getAvailableForums(ctx);
     data.forumList = forumList;

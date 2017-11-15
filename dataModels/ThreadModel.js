@@ -2,7 +2,8 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const {getQueryObj} = require('../nkcModules/apiFunction');
-
+const UserModel = require('./UserModel');
+const PostModel = require('./PostModel');
 const threadSchema = new Schema({
   tid: {
     type: String,
@@ -131,6 +132,19 @@ threadSchema.methods.getPostsByQuery = function(query, match) {
       as: 'r'
     }}
   ]/*, {explain: true}*/).toArray()
+};
+
+threadSchema.methods.extend = async function (){
+  let obj = this.toObject();
+  let oc = await PostModel.findOnly({pid: this.oc});
+  let lm = await PostModel.findOnly({pid: this.lm});
+  oc = oc.toObject();
+  lm = lm.toObject();
+  oc.user = await UserModel.findOnly({uid: oc.uid});
+  lm.user = await UserModel.findOnly({uid: lm.uid});
+  obj.oc = oc;
+  obj.lm = lm;
+  return obj;
 };
 
 module.exports = mongoose.model('threads', threadSchema);
