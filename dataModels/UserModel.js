@@ -1,8 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-
-
 const userSchema = new Schema({
   kcb: {
     type: Number,
@@ -97,47 +95,11 @@ userSchema.pre('save', function(next) {
     this.usernameLowerCase = this.username.toLowerCase();
   next()
 });
-userSchema.methods.getUsersThreads = function() {
-  return mongoose.connection.db.collection('threads').aggregate([
-    {$match: {
-      uid: this.uid,
-      fid: {$not: {$eq: 'recycle'}}
-    }},
-    {$sort: {
-      toc: -1
-    }},
-    {
-      $limit: 8
-    },
-    {$lookup: {
-      from: 'posts',
-      localField: 'oc',
-      foreignField: 'pid',
-      as: 'oc'
-    }},
-    {$unwind: '$oc'},
-    {$lookup: {
-      from: 'forums',
-      localField: 'fid',
-      foreignField: 'fid',
-      as: 'forum'
-    }},
-    {$unwind: '$forum'},
-    {$lookup: {
-      from: 'posts',
-      localField: 'lm',
-      foreignField: 'pid',
-      as: 'lm'
-    }},
-    {$unwind: '$lm'},
-    {$lookup: {
-      from: 'users',
-      localField: 'lm.uid',
-      foreignField: 'uid',
-      as: 'lm.user'
-    }},
-    {$unwind: '$lm.user'}
-  ]).toArray()
+userSchema.methods.getUsersThreads = async function() {
+  const ThreadModel = require('./ThreadModel');
+  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
+  threads = await Promise.all(threads.map(t => t.extend()));
+  return threads;
 };
 
 module.exports = mongoose.model('users', userSchema);

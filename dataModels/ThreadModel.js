@@ -2,8 +2,8 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const {getQueryObj} = require('../nkcModules/apiFunction');
-const UserModel = require('./UserModel');
 const PostModel = require('./PostModel');
+const ForumModel = require('./ForumModel');
 const threadSchema = new Schema({
   tid: {
     type: String,
@@ -113,8 +113,10 @@ threadSchema.methods.extend = async function (){
   let obj = this.toObject();
   let oc = await PostModel.findOnly({pid: this.oc});
   let lm = await PostModel.findOnly({pid: this.lm});
+  let forum = await ForumModel.findOnly({fid: this.fid});
   obj.oc = await oc.extend();
   obj.lm = await lm.extend();
+  obj.forum = forum;
   return obj;
 };
 

@@ -72,9 +72,13 @@ threadRouter
     t = Date.now();
     targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
     data.forumList = await dbFn.getAvailableForums(ctx);
+    console.log(`板块列表：${Date.now()-t} ms`);
+    t = Date.now();
     if(data.user)
       data.usersThreads = await data.user.getUsersThreads();
     data.thread = targetThread;
+    console.log(`加载用户发过的帖子: ${Date.now()-t}`);
+    t = Date.now();
     data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
     let myForum, othersForum;
     if(mid !== '') {
