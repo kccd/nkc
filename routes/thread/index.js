@@ -50,19 +50,7 @@ threadRouter
     console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
     const {mid, toMid} = thread;
     t = Date.now();
-    // let posts = await PostModel.aggregate([
-    //   {$match: {tid}},
-    //   {$sort: {toc: 1}},
-    //   {$lookup: {
-    //     from: 'users',
-    //     localField: 'uid',
-    //     foreignField: 'uid',
-    //     as: 'user'
-    //   }},
-    //   {$unwind: '$user'}
-    // ]);
-    let posts = await PostModel.find({tid}).sort({toc: 1});
-    posts = await Promise.all(posts.map(p => p.extend()));
+    let posts = await thread.getPostByQuery(query);
     console.log(`查找目标post耗时: ${Date.now()-t} ms`);
     t = Date.now();
     let indexArr = [];
@@ -80,26 +68,13 @@ threadRouter
     }
     console.log(`算回复楼层: ${Date.now()-t} ms`);
     data.posts = posts;
-    /*let indexArr = await PostModel.find({tid}, {pid: 1, id: 0}).sort({toc: 1});
-    let posts = await thread.getPostsByQuery(query, {tid});
-    for (let i = 0; i < posts.length; i++) {
-      posts[i] = posts[i].toObject();
-      let postContent = posts[i].c;
-      if(postContent.indexOf('[quote=') !== -1){
-        let targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
-
-      }
-    }*/
-    thread = thread.toObject();
+    let targetThread = await thread.extend();
     t = Date.now();
-    thread.oc = await PostModel.findOnly({pid: thread.oc});
-    let ocuser = (await UserModel.findOnly({uid: thread.uid})).toObject();
-    ocuser.navbarDesc = ctx.getUserDescription(ocuser);
-    data.ocuser = ocuser;
+    targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user)
       data.usersThreads = await data.user.getUsersThreads();
-    data.thread = thread;
+    data.thread = targetThread;
     data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
     let myForum, othersForum;
     if(mid !== '') {

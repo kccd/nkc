@@ -3,6 +3,10 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
+fn.getCountOfModelByQuery = async (model, match) => {
+  return model.count(match);
+};
+
 fn.setNumberOfDigestThread = async (fid, number) => {
   let forum = await db.ForumModel.findOnly({fid});
   let threadCount = forum.tCount;

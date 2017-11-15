@@ -18,7 +18,7 @@ block title
     meta(property='og:description' content=`${processed}`)
     
     meta(property='article:published_time' content=`${(new Date(thread.oc.toc)).toISOString()}`)
-    meta(property='article:author' content=`${data.ocuser?data.ocuser.username:""}`)
+    meta(property='article:author' content=`${data.thread.oc.user?data.thread.oc.user.username:""}`)
   
   
 block content
@@ -262,7 +262,7 @@ block content
         .col-md-3.col-lg-3.hidden-xs.hidden-sm
 
           //user_profile section
-          -var user = data.ocuser
+          -var user = data.thread.oc.user
           if user
             include interface_thread_userpatch.pug
 

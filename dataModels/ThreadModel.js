@@ -109,42 +109,20 @@ threadSchema.pre('save', function (next) {
   next();
 });
 
-threadSchema.methods.getPostsByQuery = function(query, match) {
-  const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
-  return mongoose.connection.db.collection('posts').aggregate([
-    {$match},
-    {$sort: {
-      toc: 1
-    }},
-    {$skip},
-    {$limit},
-    {$lookup: {
-      from: 'users',
-      localField: 'uid',
-      foreignField: 'uid',
-      as: 'user'
-    }},
-    {$unwind: '$user'},
-    {$lookup: {
-      from: 'resources',
-      localField: 'pid',
-      foreignField: 'pid',
-      as: 'r'
-    }}
-  ]/*, {explain: true}*/).toArray()
-};
-
 threadSchema.methods.extend = async function (){
   let obj = this.toObject();
   let oc = await PostModel.findOnly({pid: this.oc});
   let lm = await PostModel.findOnly({pid: this.lm});
-  oc = oc.toObject();
-  lm = lm.toObject();
-  oc.user = await UserModel.findOnly({uid: oc.uid});
-  lm.user = await UserModel.findOnly({uid: lm.uid});
-  obj.oc = oc;
-  obj.lm = lm;
+  obj.oc = await oc.extend();
+  obj.lm = await lm.extend();
   return obj;
+};
+
+threadSchema.methods.getPostByQuery = async function (query) {
+  const {$match, $sort, $skip, $limit} = getQueryObj(query, {tid: this.tid});
+  let posts = await PostModel.find($match).sort({toc: 1}).skip($skip).limit($limit);
+  posts = await Promise.all(posts.map(p => p.extend()));
+  return posts;
 };
 
 module.exports = mongoose.model('threads', threadSchema);
