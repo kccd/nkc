@@ -253,7 +253,12 @@ fn.updatePost = async (pid) => {
 };
 
 fn.getToppedThreads = async (fid) => {
-  return await db.ThreadModel.aggregate([
+  let threads = await db.ThreadModel.find({fid, topped: true});
+  threads = await Promise.all(threads.map(async t => {
+    return await fn.extendThreadPostAndUserByTid(t.tid);
+  }));
+  return threads;
+  /*return await db.ThreadModel.aggregate([
     {$match: {fid: fid, topped: true}},
     {$sort: {toc: 1}},
     {$lookup: {
@@ -284,7 +289,7 @@ fn.getToppedThreads = async (fid) => {
       as: 'lm.user'
     }},
     {$unwind: "$lm.user"}
-  ]);
+  ]);*/
 };
 
 fn.getCountOfThreadByFid = async (fid) => {

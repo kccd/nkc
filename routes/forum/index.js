@@ -94,6 +94,7 @@ forumRouter
       threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
     }
     let toppedThreads = [];
+    let t1 = Date.now();
     if(data.paging.page === 0 && data.forum.type === 'forum') {
       toppedThreads = await dbFn.getToppedThreads(fid);
       for(let i = 0; i < toppedThreads.length; i++) {
@@ -101,6 +102,7 @@ forumRouter
       }
     }
     data.toppedThreads = toppedThreads;
+    console.log(`--------------${Date.now()-t1}------------------`)
     data.threads = threads;
     let forumList = await dbFn.getAvailableForums(ctx);
     data.forumList = forumList;
