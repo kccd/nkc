@@ -97,7 +97,7 @@ postSchema.pre('save' , function(next) {
 postSchema.methods.extend = async function() {
   const user = await UserModel.findOnly({uid:this.uid});
   let obj = this.toObject();
-  const r = await Promise.all(this.r.map(r => ResourceModel.findOnly(r)));
+  const r = await Promise.all(this.r.map(r => ResourceModel.findOnly({rid: r})));
   obj = Object.assign(obj, {user});
   obj = Object.assign(obj, {r});
   return obj
