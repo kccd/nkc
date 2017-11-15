@@ -118,7 +118,6 @@ async function import1() {
         thread = await db.collection('threads').document(tid);
         mid = thread.uid
       } catch(e) {
-        console.log(tid)
         mid = '49683'
       }
     }
@@ -128,7 +127,6 @@ async function import1() {
         thread = await db.collection('threads').document(tid);
         fid = thread.fid;
       } catch(e) {
-        console.log(thread);
         fid = 'recycle'
       }
     }
@@ -158,7 +156,27 @@ async function import1() {
 }
 
 async function import2() {
-
+  const cursor = await db.collection('behaviorLogs').all();
+  const bls = await cursor.all();
+  for(const bl of bls) {
+    const {
+      isManageOp,
+      port,
+      scoreChange,
+      timeStamp,
+      from,
+      to,
+      operation,
+      address,
+      attrChange,
+      parameters
+    } = bl;
+    let tid, pid;
+    tid = parameters.targetKey.split('/')[1];
+    if(parameters.pid)
+      pid = parameters.pid;
+    console.log(tid, pid);
+  }
 }
 
-import1();
+import2();
