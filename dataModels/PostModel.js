@@ -2,6 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const UserModel = require('./UserModel');
+const ResourceModel = require('./ResourceModel');
 
 const postSchema = new Schema({
   pid: {
@@ -93,9 +94,13 @@ postSchema.pre('save' , function(next) {
   next();
 });
 
-postSchema.methods.extendUser = async function() {
+postSchema.methods.extend = async function() {
   const user = await UserModel.findOnly({uid:this.uid});
-  return Object.assign(this.toObject(), {user})
+  let obj = this.toObject();
+  const r = await Promise.all(this.r.map(r => ResourceModel.findOnly(r)));
+  obj = Object.assign(obj, {user});
+  obj = Object.assign(obj, {r});
+  return obj
 };
 
 module.exports = mongoose.model('posts', postSchema);
