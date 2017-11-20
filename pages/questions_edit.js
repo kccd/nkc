@@ -50,7 +50,7 @@ function validate_and_submit(){
     var method  = 'post';
     var url = '/q/'+question_object.category;
     if(question_object.qid) {
-      method = 'put';
+      method = 'PATCH';
       url = '/q/' + question_object.category + '/' + question_object.qid;
     }
     nkcAPI(url, method, question_object)

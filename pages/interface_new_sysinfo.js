@@ -28,14 +28,10 @@ $(document).ready(function() {
     geid('submit').disabled = true;
     nkcAPI('/e/newSysinfo','post',userObj)
       .then(function(){
-        $('#title').val('');
-        $('#content').val('');
         geid('submit').disabled = false;
-        return screenTopWarning('发送成功！');
+        return screenTopWarning('发送成功！请刷新');
       })
       .catch(function(err){
-        $('#title').val('');
-        $('#content').val('');
         geid('submit').disabled = false;
         return screenTopWarning('发送失败： ' + err);
       })

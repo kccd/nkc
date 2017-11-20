@@ -5,60 +5,56 @@ let dbFn = nkcModules.dbFunction;
 
 collectionsRouter
   .get('/:category', async (ctx, next) => {
-    let db = ctx.db;
-    let category = ctx.params.category;
-    let user = ctx.data.user;
-    let targetUserUid = ctx.params.uid;
+    const {db, data} = ctx;
+    const {category} = ctx.params;
+    const user = data;
+    const targetUserUid = ctx.params.uid;
     let targetUser = {};
     if(user && user.uid === targetUserUid) {
       targetUser = user;
     }else {
-      targetUser = await db.UserModel.findOne({uid: targetUserUid});
+      targetUser = await db.UserModel.findOnly({uid: targetUserUid});
     }
-    ctx.data.forumList = await dbFn.getAvailableForums(ctx);
-    ctx.data.targetUser = targetUser;
+    data.forumList = await dbFn.getAvailableForums(ctx);
+    data.targetUser = targetUser;
     let categoryNames = await db.CollectionModel.aggregate([
       {$match: {uid: targetUserUid}},
       {$sort: {toc: 1}},
       {$group: {_id: '$category'}},
     ]);
-    for (let i =0; i < categoryNames.length; i++) {
-      categoryNames[i] = categoryNames[i]._id;
-      if(!categoryNames[i]) categoryNames[i] = 'unclassified';
-    }
-    ctx.data.categoryNames = categoryNames;
+    categoryNames = categoryNames.map(n => {
+      return (n._id? n._id: 'unclassified');
+    });
+    data.categoryNames = categoryNames;
     let queryDate = {
       uid: targetUserUid,
       category: category
     };
-    let categoryThreads = [];
     let collectionCount = await db.CollectionModel.count(queryDate);
-    if(collectionCount <= 0) {
-      queryDate.category = categoryNames[0];
-    }
-    categoryThreads = await dbFn.getCollectionByQuery(queryDate);
+    if(collectionCount <= 0) queryDate.category = categoryNames[0];
+    let categoryCollection = await db.CollectionModel.find(queryDate).sort({toc: 1});
+    categoryCollection = await Promise.all(categoryCollection.map(c => c.extend()));
+    data.category = queryDate.category;
+    data.categoryCollection = categoryCollection;
     ctx.template = 'interface_collections.pug';
-    ctx.data.category = queryDate.category;
-    ctx.data.categoryThreads = categoryThreads;
     await next();
   })
-  .put('/', async (ctx, next) => {
-    const {db} = ctx;
-    const {user} = ctx.data;
-    let {cid, category} = ctx.body;
-    if(category === 'null') category = '';
-    let collection = await db.CollectionModel.findOne({cid: cid});
-    if(user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格修改别人的收藏');
-    await db.CollectionModel.replaceOne({uid: user.uid, cid: cid},{$set: {category: category}});
+  .patch('/:cid', async (ctx, next) => {
+    const {db,data} = ctx;
+    const {cid, category} = ctx.body;
+    const obj = {};
+    if(category) obj.category = category;
+    const collection = await db.CollectionModel.findOne({cid: cid});
+    if(data.user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格修改别人的收藏');
+    await collection.update(obj);
     await next();
   })
   .del('/:cid', async (ctx, next) => {
-    const {db} = ctx;
-    const {user} = ctx.data;
-    let {cid} = ctx.params;
-    let collection = await db.CollectionModel.findOne({cid: cid});
-    if(user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格删除别人的收藏');
-    await db.CollectionModel.deleteOne({cid: cid});
+    const {db, data} = ctx;
+    const {cid} = ctx.params;
+    const collection = await db.CollectionModel.findOne({cid: cid});
+    if(data.user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格删除别人的收藏');
+    await collection.delete();
     await next();
   });
 

@@ -54,6 +54,10 @@ let emailRegiserSchema = new Schema({
   regPort: {
     type: String,
     default: '0'
+  },
+  used: {
+    type: Boolean,
+    default: false
   }
 });
 

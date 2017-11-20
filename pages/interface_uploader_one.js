@@ -67,5 +67,5 @@ function paste_handler(e) {
 
 //enable Ctrl + V paste
 window.onload = function() {
-  geid("paste_target").addEventListener("paste", paste_handler);
+  //geid("paste_target").addEventListener("paste", paste_handler);
 };

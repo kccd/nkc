@@ -92,7 +92,7 @@ var EasyPost = function() {
 };
 EasyPost.prototype.init = function() {
   var self = this;
-  nkcAPI('getForumsList', {})
+  nkcAPI('/f?operation=getForumsList','GET', {})
     .then(function(result) {
       var path = window.location.pathname.match(/^\/(.)\/(\w+)/);
       if(path && path[1] === 'm') {
@@ -112,20 +112,22 @@ EasyPost.prototype.init = function() {
     .then(function() {
       var parents = self.parents;
       var forumsList = self.forumsList;
+      console.log(parents);
+      console.log(forumsList);
       for(var i in forumsList) {
-        parents.appendChild(createOption(forumsList[i].display_name));
+        parents.appendChild(createOption(forumsList[i].displayName));
       }
       for(var i in forumsList) {
-        if(forumsList[i]._key === self.id) {
-          parents.value = forumsList[i].display_name;
+        if(forumsList[i].fid === self.id) {
+          parents.value = forumsList[i].displayName;
           parentsOnChange(self)();
           return
         }
         for(var j in forumsList[i].children) {
-          if(forumsList[i].children[j]._key == self.id) {
-            parents.value = forumsList[i].display_name;
+          if(forumsList[i].children[j].fid == self.id) {
+            parents.value = forumsList[i].displayName;
             parentsOnChange(self)();
-            return forumsList[i].children[j].display_name
+            return forumsList[i].children[j].displayName
           }
         }
       }
@@ -177,13 +179,13 @@ var childrenOnChange = function(that) {
   return function() {
     var result;
     var forumsList = that.forumsList;
-    var chosenParent = that.parents.value;
+    var chosenParent = that.value;
     var chosenChild = that.children.value;
     for(var i in forumsList) {
-      if(forumsList[i].display_name === chosenParent) {
+      if(forumsList[i].displayName === chosenParent) {
         var parent = forumsList[i];
         for(var j in parent.children) {
-          if(parent.children[j].display_name === chosenChild) result = parent.children[j]._key;
+          if(parent.children[j].displayName === chosenChild) result = parent.children[j].fid;
         }
       }
     }
@@ -200,11 +202,11 @@ var childrenOnChange = function(that) {
 
 var parentsOnChange = function(that) {
   return function() {
-    var value = that.parents.value;
+    var value = that.value;
     var forumsList = that.forumsList;
     var children = that.children;
     for(var i in forumsList) {
-      if(forumsList[i].display_name === value) {
+      if(forumsList[i].displayName === value) {
         var childNodes = children.childNodes;
         //remove all childNodes except the first one '请选择一个专业'
         for(; childNodes.length > 3;) { //node.childNodes is a live collection.
@@ -217,7 +219,7 @@ var parentsOnChange = function(that) {
         var last = children.lastChild;
         for(var j in forumsList[i].children) {
           //console.log('add -> ' +
-          children.insertBefore(createOption(forumsList[i].children[j].display_name), last)
+          children.insertBefore(createOption(forumsList[i].children[j].displayName), last)
           //.innerHTML);
         }
       }
@@ -342,8 +344,21 @@ var onGoEditor = function(that) {
 };
 
 var groupingForums = function(forumsList, that) {
-  var group1;
-  var group2;
+  that.formsList = forumsList;
+  console.log(that.formsList);
+  that.forumsList.sort(function(a, b) {
+    console.log('========='+a);
+    return a.order - b.order;
+  });
+  for(var i in that.forumsList) {
+    if (that.forumsList[i].children){
+      that.forumsList[i].children.sort(function (a, b) {
+        return a.order - b.order;
+      })
+    }
+  }
+  /*var group1 = [];
+  var group2 = [];
   for(var index in forumsList) {
     var group = forumsList[index];
     if(group.parent == null) {
@@ -356,8 +371,8 @@ var groupingForums = function(forumsList, that) {
   that.forumsList = group1.concat(group2);
   for(var index in forumsList) {
     for(var i in that.forumsList) {
-      if(forumsList[index].parent === that.forumsList[i]._key) {
-        that.forumsList[i].children = forumsList[index].group;
+      if(forumsList[index].fid === that.forumsList[i].fid) {
+        that.forumsList[i].children = forumsList[index].children;
       }
     }
   }
@@ -369,7 +384,7 @@ var groupingForums = function(forumsList, that) {
     that.forumsList[i].children.sort(function(a, b) {
       return a.order - b.order;
     })
-  }
+  }*/
 };
 
 var createOption = function(text) {

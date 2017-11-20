@@ -13,7 +13,8 @@ const userSchema = new Schema({
   },
   toc: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: 1
   },
   xsf: {
     type: Number,
@@ -101,11 +102,19 @@ let User = mongoose.model('users', userSchema);
 
 
 let t1 = Date.now();
-console.log('开始读取数据');
+console.log(`删除错误账号： 74190 74191`);
 db.query(`
   for u in users
-  return u
+    filter !document(users, u._key)
+      remove u in users
 `)
+  .then(() => {
+    console.log('开始读取数据');
+    return db.query(`
+      for u in users
+      return u
+    `)
+  })
 .then(cursor => cursor.all())
 .then((res) => {
   for(var i = 0; i < res.length; i++){
@@ -117,6 +126,10 @@ db.query(`
     if(res[i].username.length >= 30) res[i].username = res[i].username.slice(0,30);
     res[i].usernameLowerCase = res[i].username.toLowerCase();
     res[i].postSign = res[i].post_sign;
+    res[i].certs = res[i].certs || [];
+    if(res[i].certs.indexOf('mail') !== -1) {
+      res[i].certs.splice(res[i].certs.indexOf('mail'), 1, 'email');
+    }
   }
   console.log('开始写入数据');
   let n = 0;

@@ -9,9 +9,9 @@ block content
     .row
       .col-xs-12
         h4 按日统计
-        div
+        div(style="position: relative;")
+          p.text-align-center#loading(style='position: absolute;font-size: 5rem; color: #ddd;top: 10rem;bottom: 0; left: 0; right: 0;margin:auto;') Loading...
           canvas#dailyStat(width='1024' height='500')
-  
       
     
   

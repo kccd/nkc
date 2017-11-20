@@ -38,7 +38,7 @@ let resourcesSchema = new Schema({
     default: 0
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   tpath: {

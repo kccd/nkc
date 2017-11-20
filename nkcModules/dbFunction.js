@@ -3,62 +3,36 @@ const apiFn = require('./apiFunction');
 let db = require('../dataModels');
 let fn = {};
 
-fn.getCountOfModelByQuery = async (model, match) => {
-  return model.count(match);
+fn.getQuestionsByQuery = async (query) => {
+  let questions =  await db.QuestionModel.find(query).sort({toc: -1});
+  questions = await Promise.all(questions.map(q => q.extend()));
+  return questions;
 };
 
-fn.setNumberOfDigestThread = async (fid, number) => {
-  let forum = await db.ForumModel.findOnly({fid});
-  let threadCount = forum.tCount;
-  threadCount = {
-    digest: threadCount.digest + number,
-    normal: threadCount.normal - number
-  };
-  return await db.ForumModel.replaceOne({fid}, {$set: {tCount: threadCount}});
+fn.questionCountOfCategory = async () => {
+  return await db.QuestionModel.aggregate([
+    {$group: {_id: '$category', number: {$sum: 1}}},
+    {$sort: {number: -1}},
+    {$project: {_id: 0, category: '$_id', number: 1}}
+  ]);
 };
 
-fn.decrementPsnl = async (uid, type, number) => {
-  let userPersonal = await db.UsersPersonalModel.findOne({uid: uid});
-  let {newMessage} = userPersonal;
-  if(number || number === 0) {
-    newMessage[type] += number;
-  } else {
-    newMessage[type] = 0;
-  }
-  return await db.UsersPersonalModel.replaceOne({uid: uid}, {$set: {newMessage: newMessage}});
+fn.questionCountOfUser = async () => {
+  return await db.QuestionModel.aggregate([
+    {$group: {_id: '$uid', number: {$sum: 1}}},
+    {$sort:{number: -1}},
+    {$project: {_id: 0, user: '$_id', number: 1, }},
+    {$lookup: {
+      from: 'users',
+      localField: 'user',
+      foreignField: 'uid',
+      as: 'user'
+    }},
+    {$unwind: '$user'}
+  ]);
 };
 
-fn.extendPostAndUserByPid = async (pid) =>{
-  let post = await db.PostModel.findOnly({pid});
-  post = post.toObject();
-  if(post.uid) {
-    post.user = await db.UserModel.findOnly({uid: post.uid});
-  }
-  return post;
-};
 
-fn.extendThreadPostAndUserByTid = async (tid) => {
-  let thread = await db.ThreadModel.findOnly({tid});
-  thread = thread.toObject();
-  if(thread.oc) {
-    thread.oc = await fn.extendPostAndUserByPid(thread.oc);
-  }
-  if(thread.lm) {
-    thread.lm = await fn.extendPostAndUserByPid(thread.lm);
-  }
-  return thread;
-};
-
-// 查询目标用户的个人搜藏
-fn.getCollectionByQuery = async (query) => {
-  let collections = await db.CollectionModel.find(query).sort({toc: 1});
-  collections = await Promise.all(collections.map(async c => {
-    c = c.toObject();
-    c.thread = await fn.extendThreadPostAndUserByTid(c.tid);
-    return c;
-  }));
-  return collections;
-};
 
 fn.checkMobile = async (mobile, oldMobile) => {
   let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
@@ -92,11 +66,11 @@ fn.checkEmail = async (email) => {
 
 fn.checkMobileCode = async (mobile, code) => {
   let time = Date.now() - settings.sendMessage.mobileCodeTime;  //验证码有效时间
-  return await db.SmsCodeModel.findOne({mobile: mobile, code: code, toc: {$gt: time}});
+  return await db.SmsCodeModel.findOne({mobile: mobile, code: code, toc: {$gt: time}, used: false});
 };
 fn.checkEmailCode = async (email, code) => {
   let time = Date.now() - settings.sendMessage.emailCodeTime;   //邮件链接有效时间
-  return await db.EmailRegisterModel.findOne({email: email, ecode: code, toc: {$gt: time}});
+  return await db.EmailRegisterModel.findOne({email: email, ecode: code, toc: {$gt: time}, used: false});
 };
 
 fn.useRegCode = async (regCode, uid) => {
@@ -133,11 +107,12 @@ fn.createUser = async (data) => {
     userObj.password = passwordObj.password;
     userObj.hashType = passwordObj.hashType;
   }
+  const countOfSystemMessages = await db.SmsModel.count({fromSystem: true});
   userObj.newMessage = {
     messages: 0,
     at: 0,
     replies: 0,
-    system: 0
+    system: countOfSystemMessages
   };
   userObj.abbr = userObj.username.slice(0, 6);
   userObj.displayName = userObj.username + '的专栏';
@@ -187,52 +162,8 @@ fn.getAvailableForums = async ctx => {
       result.splice(i, 1);
     }
   }
+  console.log(result);
   return result;
-};
-
-fn.updateThread = async (tid) => {
-  let thread = await db.ThreadModel.findOnly({tid});
-  let posts = await db.PostModel.find({tid}).sort({toc: -1});
-  let count = posts.length;
-  if(count === 0) return;
-  let timeToNow = new Date();
-  let time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
-  let countToday = 0;
-  let countRemain = 0;
-  for (let i = 0; i < posts.length; i++) {
-    if(posts[i].toc > time) countToday++;
-    if(!posts[i].disabled) countRemain++;
-  }
-  let lastPost = posts[0];
-  let firstPost = posts[posts.length-1];
-  let updateObj = {
-    hasImage: thread.hasImage,
-    hasFile: thread.hasFile,
-    tlm: lastPost.toc.getTime(),
-    count: count,
-    countRemain: countRemain,
-    countToday: countToday,
-    oc: firstPost.pid,
-    lm: lastPost.pid,
-    toc: firstPost.toc.getTime(),
-    uid: firstPost.uid
-  };
-  if(firstPost.r) {
-    let r = firstPost.r;
-    let extArr = ['jpg', 'png', 'svg', 'jpeg'];
-    let imageNum = 0;
-    for (let i = 0; i < r.length; r++) {
-      let rFromDB = await db.ResourceModel.findOne({rid: r[i]});
-      if(extArr.indexOf(rFromDB.ext) !== -1) {
-        imageNum++;
-        updateObj.hasImage = true;
-      }
-    }
-    if(r.length > imageNum) updateObj.hasFile = true;
-  }
-  return await db.ThreadModel.replaceOne({tid}, {
-    $set: updateObj
-  })
 };
 
 fn.deleteEqualValue = (arr) => {
@@ -256,39 +187,5 @@ fn.updatePost = async (pid) => {
 
 };
 
-fn.getToppedThreads = async (query) => {
-  let threads = await db.ThreadModel.find(query);
-  threads = await Promise.all(threads.map( t => t.extend()));
-  return threads;
-};
-
-fn.getCountOfThreadByFid = async (fid) => {
-  let forum = await db.ForumModel.findOnly({fid});
-  let childFid = [];
-  if(forum.type === 'category') {
-    let fidArr = await db.ForumModel.find({parentId: fid}, {_id: 0, fid: 1});
-    for (let i of fidArr) {
-      childFid.push(i.fid);
-    }
-  } else {
-    childFid.push(fid);
-  }
-  return await db.ThreadModel.count({fid: {$in: childFid}});
-};
-
-fn.findUserByPid = async (pid) => {
-  const post = await db.PostModel.findOne({pid});
-  if(post) return await db.UserModel.findOne({uid: post.uid});
-};
-
-fn.findUserByTid = async (tid) => {
-  const thread = await db.ThreadModel.findOne({tid});
-  if(thread) return await db.UserModel.findOne({uid: thread.uid});
-};
-
-fn.findUserByQid = async (qid) => {
-  const question = await db.QuestionModel.findOnly({qid});
-  if(question) return await db.UserModel.findOne({uid: question.uid});
-};
 
 module.exports = fn;

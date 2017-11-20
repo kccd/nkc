@@ -5,80 +5,46 @@ const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 
-
-// const {
-//   postToThread,
-//   postToForum,
-//   disablePost,
-//   enablePost,
-//   recommendPost,
-//   unrecommendPost,
-//   subscribeUser,
-//   unsubscribeUser,
-//   setDigest,
-//   cancelDigest,
-//   setTopped,
-//   cancelTopped
-// } = settings.user.scoreMap;
-
-
 threadRouter
-  .post('/:tid', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    await next();
-  })
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
-    let page = query.page || 0;
+    const page = query.page || 0;
     const {tid} = params;
     const {
       ThreadModel,
       PersonalForumModel,
-      ForumModel,
-      UserModel,
       PostModel,
       SettingModel,
+      ForumModel
     } = db;
-    let t;
-    t = Date.now();
-    let postOfTargetThread = await PostModel.find({tid}, {pid: 1}).sort({toc: 1});
-    data.paging = apiFn.paging(page, postOfTargetThread.length);
-    console.log(`查找总数耗时: ${Date.now()-t} ms`);
-    ctx.template = 'interface_thread.pug';
-    t = Date.now();
-    let thread = await ThreadModel.findOnly({tid});
-    console.log(`查找目标帖子耗时: ${Date.now()-t} ms`);
+    const thread = await ThreadModel.findOnly({tid});
+    const visibleFid = await ctx.getVisibleFid();
+    const indexOfPostId = await thread.getIndexOfPostId();
+    const indexArr = indexOfPostId.map(p => p.pid);
+    data.paging = apiFn.paging(page, indexOfPostId.length);
+    const forum = await ForumModel.findOnly({fid: thread.fid});
     const {mid, toMid} = thread;
-    t = Date.now();
+    if(!thread.ensurePermission(visibleFid)) ctx.throw('401', '权限不足');
+    if(thread.disabled && !data.ensurePermission('GET', '/e')) ctx.throw('401', '您没有权限查看已被屏蔽的帖子');
     let posts = await thread.getPostByQuery(query);
-    console.log(`查找目标post耗时: ${Date.now()-t} ms`);
-    t = Date.now();
-    let indexArr = [];
-    for (let i = 0; i < postOfTargetThread.length; i++) {
-      indexArr.push(postOfTargetThread[i].pid);
-    }
-    for (let i = 0; i < posts.length; i++) {
-      let postContent = posts[i].c || '';
-      let index = postContent.indexOf('[quote=');
-      if(index !== -1){
-        let targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
-        let step = indexArr.indexOf(targetPid);
-        posts[i].c = postContent.replace(/=/, `=${step},`);
+    posts.map(post => {
+      post.user = post.user.toObject();
+      post.user.navbarDesc = ctx.getUserDescription(post.user);
+      const postContent = post.c || '';
+      const index = postContent.indexOf('[quote=');
+      if(index !== -1) {
+        const targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
+        const step = indexArr.indexOf(targetPid);
+        post.c = postContent.replace(/=/, `=${step},`);
       }
-    }
-    console.log(`算回复楼层: ${Date.now()-t} ms`);
+    });
     data.posts = posts;
     let targetThread = await thread.extend();
-    t = Date.now();
     targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
     data.forumList = await dbFn.getAvailableForums(ctx);
-    console.log(`板块列表：${Date.now()-t} ms`);
-    t = Date.now();
-    if(data.user)
+    if(data.user) {
       data.usersThreads = await data.user.getUsersThreads();
-    data.thread = targetThread;
-    console.log(`加载用户发过的帖子: ${Date.now()-t}`);
-    t = Date.now();
+    }
     data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
     let myForum, othersForum;
     if(mid !== '') {
@@ -89,11 +55,12 @@ threadRouter
       othersForum = await PersonalForumModel.findOnly({uid: toMid});
       data.othersForum = othersForum
     }
-    data.forum = await ForumModel.findOnly({fid: thread.fid});
-    data.targetUser = dbFn.findUserByTid(tid);
+    data.targetUser = await thread.getUser();
+    data.thread = targetThread;
+    data.forum = forum;
     data.replyTarget = `t/${tid}`;
-    console.log(`其他耗时: ${Date.now()-t} ms`);
+    ctx.template = 'interface_thread.pug';
     await next();
   })
-  .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
+.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

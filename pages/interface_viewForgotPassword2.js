@@ -62,7 +62,6 @@ function submit(){
     return nkcAPI('/forgotPassword/mobile', 'post', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode});
   })
     .then(function(data){
-      console.log(data);
       window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode;
     })
     .catch(function(err){

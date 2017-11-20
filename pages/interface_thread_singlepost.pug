@@ -16,7 +16,7 @@
       .threadOneLine
         div.fixThread
           div(style='float: left;')
-            - var title = user && data.user?data.user.navbarDesc.string:''
+            - var title = post && post.user && post.user.navbarDesc? post.user.navbarDesc.string:''
             a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')

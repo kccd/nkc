@@ -24,6 +24,10 @@ let smsCodeSchema = new Schema({
     type: String,
     required: true,
     index: 1
+  },
+  used: {
+    type: Boolean,
+    default: false
   }
 });
 

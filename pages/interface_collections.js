@@ -42,7 +42,7 @@ function movebtn(uid){
   movebutton.disabled = true
 
   common.mapWithPromise(extractSelectedCheckboxArrayOfID(),function(item){
-    return nkcAPI('/u/'+uid+'/collections','put',{cid:item,category:targetCategory})
+    return nkcAPI('/u/'+uid+'/collections/'+item,'PATCH',{cid:item,category:targetCategory})
     .then(function(){
       screenTopAlert(item + '移动到' +targetCategory)
     })

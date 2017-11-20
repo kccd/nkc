@@ -39,12 +39,14 @@ registerRouter
     }
     userObj.isA = regCodeFoDB.isA;
     if(apiFn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
+    if(userObj.password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     let mobileCodesNumber = await dbFn.checkMobile(userObj.mobile, params.mobile);
     if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
     let smsCode = await dbFn.checkMobileCode(userObj.mobile, userObj.mcode);
     if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
+    await smsCode.update({used: true});
     let newUser = await dbFn.createUser(userObj);
     await dbFn.useRegCode(userObj.regCode, newUser.uid);
     await next();
@@ -79,6 +81,7 @@ registerRouter
     }
     userObj.isA = regCodeFoDB.isA;
     if(apiFn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
+    if(userObj.password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
     if(apiFn.checkEmailFormat(userObj.email) === -1) ctx.throw(400, '邮箱格式不正确，请检查');
@@ -94,7 +97,7 @@ registerRouter
     let emailRegister = new db.EmailRegisterModel(userObj);
     await emailRegister.save();
     let text = '欢迎注册科创论坛，点击以下链接就可以激活您的账户：';
-    let href = `http://bbs.kechuang.org/register/email/${userObj.email}/${ecode}`;
+    let href = `http://bbs.kechuang.org/register/email/verify?email=${userObj.email}&ecode=${ecode}`;
     let link = `<a href="${href}">${href}</a>`;
     await nkcModules.sendEmail({
       from: settings.mailSecrets.exampleMailOptions.from,
@@ -105,10 +108,9 @@ registerRouter
     });
     await next();
   })
-  .get('/email/:email/:ecode', async (ctx, next) => {
-    let db = ctx.db;
-    let email = ctx.params.email;
-    let ecode = ctx.params.ecode;
+  .get('/email/verify', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {email, ecode} = ctx.query;
     let userPersonal = await dbFn.checkEmail(email);
     if(userPersonal > 0) ctx.throw('404', '此邮箱已注册过，请检查或更换');
     let emailRegister = await dbFn.checkEmailCode(email, ecode);
@@ -117,7 +119,8 @@ registerRouter
     if(usernameOfDBNumber !== 0) ctx.throw('404', '抱歉！该用户名在你激活账户前已经被别人注册了，请更换用户名再试！');
     let newUser = await dbFn.createUser(emailRegister.toObject());
     await dbFn.useRegCode(emailRegister.regCode, newUser.uid);
-    ctx.data.activeInfo1 = '邮箱注册成功，赶紧登录吧~';
+    await emailRegister.update({used: true});
+    data.activeInfo1 = '邮箱注册成功，赶紧登录吧~';
     ctx.template = 'interface_user_login.pug';
     await next();
   });

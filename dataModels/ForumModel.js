@@ -81,62 +81,51 @@ const forumSchema = new Schema({
     default: false
   }
 });
+// 验证是否有权限进入此版块
+forumSchema.methods.ensurePermission = function (visibleFid) {
+  return visibleFid.includes(this.fid);
+};
+// 若是父板块则返回有权限访问的子版块的fid
+forumSchema.methods.getFidOfChildForum = async function (visibleFid) {
+  const ForumModel = require('./ForumModel');
+  let fidArr = [];
+  fidArr.push(this.fid);
+  if(this.type === 'category') {
+    let forums = await ForumModel.find({parentId: this.fid});
+    forums.map(forum => {
+      if(forum.ensurePermission(visibleFid))
+        fidArr.push(forum.fid);
+    });
+  }
+  return fidArr;
+};
 
 forumSchema.methods.getThreadsByQuery = async function(query, match) {
+  const ThreadModel = require('./ThreadModel');
   const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
-  const fid = this.fid;
-  console.log($match);
-  let childFid = [];
-  if(this.type === 'category') {
-    let fidArr = await mongoose.connection.db.collection('forums').find({parentId: fid}, {_id: 0, fid: 1}).toArray();
-    for (let i of fidArr) {
-      childFid.push(i.fid);
-    }
-  } else {
-    childFid.push(this.fid);
-  }
-  return mongoose.connection.db.collection('threads').aggregate([
-    {$match: {fid: {$in: childFid}}},
-    {$match},
-    {$sort},
-    {$skip},
-    {$limit},
-    {$lookup: {
-      from: 'posts',
-      localField: 'oc',
-      foreignField: 'pid',
-      as: 'oc'
-    }},
-    {$unwind: "$oc"},
-    {$lookup: {
-      from: 'posts',
-      localField: 'lm',
-      foreignField: 'pid',
-      as: 'lm'
-    }},
-    {$unwind: "$lm"},
-    {$lookup: {
-      from: 'users',
-      localField: 'uid',
-      foreignField: 'uid',
-      as: 'user'
-    }},
-    {$unwind: '$user'},
-    {$lookup: {
-      from: 'users',
-      localField: 'oc.uid',
-      foreignField: 'uid',
-      as: 'oc.user'
-    }},
-    {$unwind: '$oc.user'},
-    {$lookup: {
-      from: 'users',
-      localField: 'lm.uid',
-      foreignField: 'uid',
-      as: 'lm.user'
-    }},
-    {$unwind: '$lm.user'}
-  ]).toArray()
+  let threads = await ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
+  threads = await Promise.all(threads.map(t => t.extend()));
+  return threads;
+};
+
+forumSchema.methods.getThreadCountByQuery = async function(query) {
+  const ThreadModel = require('./ThreadModel');
+  return await ThreadModel.count(query);
+};
+
+forumSchema.methods.getToppedThreads = async function(visibleFid) {
+  const ThreadModel = require('./ThreadModel');
+  const fidArr = await this.getFidOfChildForum(visibleFid);
+  let threads = await ThreadModel.find({fid: {$in: fidArr}, topped: true});
+  threads = await Promise.all(threads.map(t => t.extend()));
+  return threads;
+};
+
+forumSchema.methods.setCountOfDigestThread = async function(number) {
+  const obj = {tCount: this.tCount};
+  obj.tCount.digest = obj.tCount.digest + number;
+  obj.tCount.normal = obj.tCount.digest - number;
+  return await this.update(obj);
 };
 
 module.exports = mongoose.model('forums', forumSchema);

@@ -30,7 +30,6 @@ threadTypesSchema.pre('save',async function(next){
   if(!this.order && this.order !== 0) {
     let number = await findMaxNumber(this.fid);
     this.order = number + 1;
-    console.log(this.order);
   }
   await next();
 });

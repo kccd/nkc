@@ -30,10 +30,6 @@ const questionSchema = new Schema({
     type: String,
     required: true,
   },
-  username: {
-    type: String,
-    default: ''
-  },
   question: {
     type: String,
     required: true
@@ -49,5 +45,22 @@ questionSchema.pre('save', function(next){
   }
   next();
 });
+
+questionSchema.methods.getUser = async function () {
+  const UserModel = require('./UserModel');
+  return await UserModel.findOnly({uid: this.uid});
+};
+
+questionSchema.methods.delete = async function () {
+  const QuestionModel = require('./QuestionModel');
+  return await QuestionModel.deleteOne({qid: this.qid});
+};
+
+questionSchema.methods.extend = async function () {
+  const UserModel = require('./UserModel');
+  const user = await UserModel.findOnly({uid: this.uid});
+  return Object.assign(this.toObject(), {user});
+};
+
 
 module.exports = mongoose.model('questions', questionSchema);

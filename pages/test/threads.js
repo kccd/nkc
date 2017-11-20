@@ -18,10 +18,7 @@ const threadSchema = new Schema({
     type: String,
     default: ''
   },
-  cid: {
-    type: String,
-    default:''
-  },
+  cid: String,
   count: {
     type: Number,
     default: 0
@@ -116,13 +113,18 @@ let Thread = mongoose.model('threads', threadSchema);
 
 
 let t1 = Date.now();
-
-console.log('开始读取数据');
-return db.query(`
-  for s in threads
-  return s
+console.log('将已删除用户的thread转移到uid: 74365');
+db.query(`
+  for t in threads
+  filter !document(users, t.uid)
+  update t with {uid: '74365'} in threads
 `)
-
+  .then(() => {
+    console.log('开始读取数据');
+    return db.query(`
+    for t in threads
+    return t
+`)})
 .then(cursor => cursor.all())
 .then((res) => {
   for(var i = 0; i < res.length; i++){

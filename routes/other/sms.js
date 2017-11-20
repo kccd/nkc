@@ -8,73 +8,52 @@ let apiFn = nkcModules.apiFunction;
 
 smsRouter
   .get(['/','/replies'], async (ctx, next) => {
-    let {db} = ctx;
-    let {user} = ctx.data;
-    let page = ctx.query.page || 0;
+    const {data, db} = ctx;
+    const {user} = data;
+    const page = ctx.query.page || 0;
     let replies = await db.RepliesModel.find({toUid: user.uid}).sort({toc: -1});
-    let repliesLength = replies.length;
-    let paging = apiFn.paging(page, repliesLength);
-    let start = paging.start;
+    const repliesLength = replies.length;
+    const paging = apiFn.paging(page, repliesLength);
+    const start = paging.start;
     replies = replies.slice(start, start + perpage);
-    let replieArr = [];
-    for (let replie of replies) {
-      let fromUser = {};
-      let fromPost = await db.PostModel.findOnly({pid: replie.fromPid, disabled: false});
-      if(!fromPost) continue;
-      fromUser = await db.UserModel.findOne({uid: fromPost.uid});
-      let toUser = await db.UserModel.findOne({uid: user.uid});
-      let toPost = await db.PostModel.findOne({pid: replie.toPid});
-      replieArr.push({
-        replie,
-        fromPost,
-        fromUser,
-        toUser,
-        toPost
-      });
-    }
-    ctx.data.docs = replieArr;
-    let pageCount = Math.ceil(repliesLength/perpage);
-    ctx.data.paging = paging;
-    ctx.data.tab = 'replies';
+    // let countOfNewReplies = 0;
+    replies = await Promise.all(replies.map(async replie => {
+      /*if(!replie.viewed) {
+        countOfNewReplies++;
+        await replie.view();
+      }*/
+      return await replie.extend();
+    }));
+    data.docs = replies;
+    data.paging = paging;
+    data.tab = 'replies';
     ctx.template = 'interface_messages.pug';
-    await dbFn.decrementPsnl(user.uid, 'replies');
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    await userPersonal.decrementPsnl('replies');
     await next();
   })
   .get('/at', async (ctx, next) => {
-    let {user} = ctx.data;
-    let {db} = ctx;
-    let page = ctx.query.page || 0;
+    const {data, db} = ctx;
+    const {user} = data;
+    const page = ctx.query.page || 0;
     let ats = await db.InviteModel.find({invitee: user.uid}).sort({toc: -1});
     let atsLength = ats.length;
-    let paging = apiFn.paging(page, atsLength);
-    let start = paging.start;
+    const paging = apiFn.paging(page, atsLength);
+    const start = paging.start;
     ats = ats.slice(start, start + perpage);
-    let atsArr = [];
-    for (let at of ats) {
-      let post = await db.PostModel.findOne({pid: at.pid});
-      if(!post) continue;
-      let user = await db.UserModel.findOne({uid: at.inviter});
-      let thread = await db.ThreadModel.findOne({tid: post.tid});
-      let oc = await db.PostModel.findOne({pid: thread.oc});
-      atsArr.push({
-        at,
-        post,
-        user,
-        thread,
-        oc
-      });
-    }
-    ctx.data.docs = atsArr;
-    ctx.data.paging = paging;
-    ctx.data.tab = 'at';
+    ats = await Promise.all(ats.map(at => at.extend()));
+    data.docs = ats;
+    data.paging = paging;
+    data.tab = 'at';
     ctx.template = 'interface_messages.pug';
-    await dbFn.decrementPsnl(user.uid, 'at');
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    await userPersonal.decrementPsnl('at');
     await next();
   })
   .get('/message', async (ctx, next) => {
-    let {user} = ctx.data;
-    let {db} = ctx;
-    let page = ctx.query.page || 0;
+    const {data, db} = ctx;
+    const {user} = data;
+    const page = ctx.query.page || 0;
     let smsList = await db.SmsModel.find().and([{fromSystem: false, },{$or: [{s: user.uid}, {r: user.uid}]}]).sort({toc: -1});
     let docs = [];
     for (let i = 0; i < smsList.length; i++) {
@@ -115,55 +94,60 @@ smsRouter
         }
       }
     }
-    let paging = await apiFn.paging(page, docs.length);
-    let start = paging.start;
+    const paging = await apiFn.paging(page, docs.length);
+    const start = paging.start;
     docs = docs.slice(start, start + perpage);
-    ctx.data.paging = paging;
-    ctx.data.docs = docs;
+    data.paging = paging;
+    data.docs = docs;
+    data.tab = 'message';
     ctx.template = 'interface_messages.pug';
-    ctx.data.tab = 'message';
     await next();
   })
   .get('/message/:uid', async (ctx, next) => {
-    let {user} = ctx.data;
-    let {uid} = ctx.params;
-    let {db} = ctx;
-    let page = ctx.query.page || 0;
-    let targetUser = await db.UserModel.findOne({uid: uid});
-    let messageOfUser = await db.SmsModel.find().and([{fromSystem: false, }, {$or: [{s: user.uid, r: targetUser.uid}, {s: targetUser.uid, r: user.uid}]}]).sort({toc: -1});
-    let paging = apiFn.paging(page, messageOfUser.length);
-    let start = paging.start;
+    const {data, db} = ctx;
+    const {user} = data;
+    const {uid} = ctx.params;
+    const page = ctx.query.page || 0;
+    const targetUser = await db.UserModel.findOne({uid: uid});
+    const messageOfUser = await db.SmsModel.find().and([{fromSystem: false, }, {$or: [{s: user.uid, r: targetUser.uid}, {s: targetUser.uid, r: user.uid}]}]).sort({toc: -1});
+    const paging = apiFn.paging(page, messageOfUser.length);
+    const start = paging.start;
     let messageArr = messageOfUser.slice(start, start + perpage);
-    let findUserByUid = (uid) => {
+    const findUserByUid = (uid) => {
       if(uid === user.uid) return user;
       if(uid === targetUser.uid) return targetUser;
       ctx.throw(500, '服务器查询聊天记录出错。');
     };
     let viewedFalseNumber = 0;
-    for (let i = 0; i < messageArr.length; i++) {
-      messageArr[i] = messageArr[i].toObject();
-      messageArr[i].s = findUserByUid(messageArr[i].s);
-      messageArr[i].r = findUserByUid(messageArr[i].r);
-      if(!messageArr[i].viewed) viewedFalseNumber++;
-      await db.SmsModel.replaceOne({sid: messageArr[i].sid}, {$set: {viewed: true}});
-    }
-    ctx.data.paging = paging;
-    ctx.data.docs = messageArr;
-    ctx.data.targetUser = targetUser;
+    messageArr = await Promise.all(messageArr.map(async (message, n) => {
+      const targetMessage = message.toObject();
+      targetMessage.s = findUserByUid(targetMessage.s);
+      targetMessage.r = findUserByUid(targetMessage.r);
+      if(!message.viewed && message.r === user.uid) {
+        viewedFalseNumber++;
+        await message.update({viewed: true});
+      }
+      return targetMessage;
+    }));
+    data.paging = paging;
+    data.docs = messageArr;
+    data.targetUser = targetUser;
+    data.tab = 'message';
     ctx.template = 'interface_messages.pug';
-    ctx.data.tab = 'message';
-    await dbFn.decrementPsnl(user.uid, 'message', viewedFalseNumber*-1);
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    await userPersonal.decrementPsnl('message', viewedFalseNumber*-1);
     await next();
   })
   .post('/message', async (ctx, next) => {
-    let {user} = ctx.data;
-    let {db} = ctx;
-    let {username, content} = ctx.body;
+    const {data, db} = ctx;
+    const {user} = data;
+    const {username, content} = ctx.body;
     if(!username || !content) ctx.throw(400, '参数不完整。');
-    let targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+    const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     if(!targetUser) ctx.throw(400, '该用户不存在，请检查用户名是否输入正确');
-    ctx.data.targetUser = targetUser;
-    let newSms = new db.SmsModel({
+    data.targetUser = targetUser;
+    const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
+    const newSms = new db.SmsModel({
       sid: await db.SettingModel.operateSystemID('sms', 1),
       s: user.uid,
       r: targetUser.uid,
@@ -173,38 +157,39 @@ smsRouter
     });
     try{
       await newSms.save();
-      await dbFn.decrementPsnl(targetUser.uid, 'message', 1);
+      await targetUserPersonal.decrementPsnl('message', 1);
     }catch (err) {
       await db.SettingModel.operateSystemID('sms', -1);
-      ctx.throw(500, `存入聊天记录出错: ${err}`);
+      ctx.throw(500, `发送信息出错: ${err}`);
     }
     await next();
   })
   .get('/system', async (ctx, next) => {
-    let {user} = ctx.data;
-    let {db} = ctx;
-    let page = ctx.query.page || 0;
-    let systemMessages = await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
-    let paging = apiFn.paging(page, systemMessages.length);
-    let start = paging.start;
+    const {data, db} = ctx;
+    const page = ctx.query.page || 0;
+    const systemMessages = await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
+    const paging = apiFn.paging(page, systemMessages.length);
+    const start = paging.start;
     systemMessageArr = systemMessages.slice(start, start + perpage);
-    ctx.data.docs = systemMessageArr;
-    ctx.data.paging = paging;
-    ctx.data.tab = 'system';
+    data.docs = systemMessageArr;
+    data.paging = paging;
+    data.tab = 'system';
     ctx.template = 'interface_messages.pug';
     await next();
   })
   .get('/system/:sid', async (ctx, next) => {
-    let {user} = ctx.data;
-    let {db} = ctx;
-    let {sid} = ctx.params;
-    let systemMessage = await db.SmsModel.findOneAndUpdate({sid: sid}, {$addToSet: {viewedUsers: user.uid}});
-    ctx.data.docs = systemMessage;
+    const {data, db} = ctx;
+    const {user} = data;
+    const {sid} = ctx.params;
+    const systemMessage = await db.SmsModel.findOnly({sid});
+    await systemMessage.update({$addToSet: {viewedUsers: user.uid}});
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     // 若用户没有查看过该系统信息，则让用户的newMessage.system--
-    if(systemMessage.viewedUsers.indexOf(user.uid) === -1) {
-      await dbFn.decrementPsnl(user.uid, 'system', -1);
+    if(!systemMessage.viewedUsers.includes(user.uid)) {
+      await userPersonal.decrementPsnl('system', -1);
     }
-    ctx.data.tab = 'system';
+    data.docs = systemMessage;
+    data.tab = 'system';
     ctx.template = 'interface_messages.pug';
     await next();
   });

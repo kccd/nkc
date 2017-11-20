@@ -68,5 +68,13 @@ const usersPersonalSchema = new Schema({
   }
 });
 
+usersPersonalSchema.methods.decrementPsnl = async function(type, number) {
+  const UsersPersonalModel = require('./UsersPersonalModel');
+  const userPersonal = await UsersPersonalModel.findOne({uid: this.uid});
+  const {newMessage} = userPersonal;
+  if(number === undefined) newMessage[type] = 0;
+  else newMessage[type] += number;
+  return await this.update({newMessage: newMessage});
+};
 
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

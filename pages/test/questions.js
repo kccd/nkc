@@ -34,10 +34,6 @@ let questionsSchema = new Schema({
     required: true,
     index: 1
   },
-  username: {
-    type: String,
-    default: ''
-  },
   question: {
     type: String,
     required: true
@@ -96,8 +92,15 @@ console.log('开始修复数据');
 })*/
 db.query(`
   for q in questions
-  return q
+  filter !document(users, q.uid)
+  update q with {uid: '74365'} in questions
 `)
+  .then(() => {
+  return db.query(`
+    for q in questions
+    return q
+  `)
+  })
 .then(curtor => curtor.all())
 .then((res) => {
   console.log('数据读取完成，开始写入数据');
@@ -114,7 +117,6 @@ db.query(`
       question: data.question,
       answer: data.answer,
       uid: data.uid,
-      username: data.username? data.username: 'undefined'
     });
     question.save()
     .then(() => {

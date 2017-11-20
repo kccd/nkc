@@ -1,8 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const UserModel = require('./UserModel');
-const ResourceModel = require('./ResourceModel');
 
 const postSchema = new Schema({
   pid: {
@@ -95,12 +93,29 @@ postSchema.pre('save' , function(next) {
 });
 
 postSchema.methods.extend = async function() {
+  const ResourceModel = require('./ResourceModel');
+  const UserModel = require('./UserModel');
   const user = await UserModel.findOnly({uid:this.uid});
   let obj = this.toObject();
-  const r = await Promise.all(this.r.map(r => ResourceModel.findOnly({rid: r})));
+  const resources = [];
+  await Promise.all(this.r.map(async r => {
+    const resourceOfDB = await ResourceModel.findOne({rid: r});
+    if(resourceOfDB) resources.push(resourceOfDB);
+  }));
   obj = Object.assign(obj, {user});
-  obj = Object.assign(obj, {r});
+  obj = Object.assign(obj, {resources});
   return obj
+};
+
+postSchema.methods.getUser = async function() {
+  const UserModel = require('./UserModel');
+  return await UserModel.findOnly({uid: this.uid});
+};
+
+postSchema.methods.ensurePermission = async function(visibleFid) {
+  const ThreadModel = require('./ThreadModel');
+  const thread = await ThreadModel.findOnly({tid: this.tid});
+  return visibleFid.includes(thread.fid);
 };
 
 module.exports = mongoose.model('posts', postSchema);

@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const cookieSignature = require('cookie-signature');
 const nkcModules = require('../../nkcModules');
-let dbFn = nkcModules.dbFunction;
+const dbFn = nkcModules.dbFunction;
 const crypto = require('crypto');
 const settings = require('../../settings');
 const examRouter = new Router();
@@ -50,6 +50,7 @@ examRouter
       };
       for (let i = 0; i < arrValueCount; i++) {
         let repeat = true;
+        const time = Date.now();
         while(repeat){
           let num = random(max);
           let equal = false;
@@ -57,6 +58,7 @@ examRouter
             repeat = false;
             skipArr.push(num);
           }
+          if(Date.now() - time > 1000*30) ctx.throw(500, '加载考试题超时，可能是在加载试题的过程中试题被删，导致该科目现有考试题无法组成一套试卷。');
         }
       }
       return skipArr;
@@ -118,7 +120,7 @@ examRouter
   })
   //获得激活码
   .post('/subject', async (ctx, next) => {
-    let ip = ctx.ip;
+    let ip = ctx.request.socket._peername.address;
     let db = ctx.db;
     let params = ctx.body;
     let exam = params.exam;

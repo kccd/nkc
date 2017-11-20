@@ -21,9 +21,11 @@ $(document).ready(function(){
   }
   var editor = geid('ReplyContent');
   var proxy = geid('proxy');
-  proxy.addEventListener('click', function(e) {
-    replace_selection(editor, e.target.getAttribute('data-unicode'), true)
-  })
+  if(proxy){
+    proxy.addEventListener('click', function(e) {
+      replace_selection(editor, e.target.getAttribute('data-unicode'), true)
+    })
+  }
 });
 
 function get_selection(the_id)

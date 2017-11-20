@@ -8,7 +8,8 @@ const userSchema = new Schema({
   },
   toc: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: 1
   },
   xsf: {
     type: Number,
@@ -90,16 +91,29 @@ const userSchema = new Schema({
   introText: String,
   postSign: String,
 });
+
 userSchema.pre('save', function(next) {
   if(!this.usernameLowerCase)
     this.usernameLowerCase = this.username.toLowerCase();
   next()
 });
+
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = require('./ThreadModel');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
   threads = await Promise.all(threads.map(t => t.extend()));
   return threads;
+};
+
+userSchema.methods.extend = async function() {
+  const UsersPersonalModel = require('./UsersPersonalModel');
+  const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
+  const user = this.toObject();
+  user.regPort = userPersonal.regPort;
+  user.regIP = userPersonal.regIP;
+  user.mobile = userPersonal.mobile;
+  user.email = userPersonal.email;
+  return user;
 };
 
 module.exports = mongoose.model('users', userSchema);

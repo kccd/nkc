@@ -2,40 +2,31 @@ const Router = require('koa-router');
 const operationRouter = new Router();
 
 operationRouter
-  // 对用户可见
-  .put('/forUsers', async (ctx, next) => {
+  .patch('/', async (ctx, next) => {
     const {db} = ctx;
+    const {switchStatus, switchStatusOfCert} = ctx.body;
     const {fid} = ctx.params;
-    let targetForum = await db.ForumModel.findOneAndUpdate({fid}, {$set: {visibility: true}});
-    if(targetForum.visibility) ctx.throw(400, '该板块在您操作之前已经被设置成对用户可见了，请刷新');
-    ctx.data.visibility = !targetForum.visibility;
-    await next();
-  })
-  // 对用户不可见
-  .del('/forUsers', async (ctx, next) => {
-    const {db} = ctx;
-    const {fid} = ctx.params;
-    let targetForum = await db.ForumModel.findOneAndUpdate({fid}, {$set: {visibility: false}});
-    if(!targetForum.visibility) ctx.throw(400, '该板块在您操作之前已经被设置成对用户不可见了，请刷新');
-    ctx.data.visibility = !targetForum.visibility;
-    await next();
-  })
-  // 无权限可见
-  .del('/forUsersByCerts', async (ctx, next) => {
-    const {db} = ctx;
-    const {fid} = ctx.params;
-    let targetForum = await db.ForumModel.findOneAndUpdate({fid}, {$set: {isVisibleForNCC: false}});
-    if(!targetForum.isVisibleForNCC) ctx.throw(400, '该板块在您操作之前已经被设置成无权限可见了，请刷新');
-    ctx.data.isVisibleForNCC = !targetForum.isVisibleForNCC;
-    await next();
-  })
-  // 无权限不可见
-  .put('/forUsersByCerts', async (ctx, next) => {
-    const {db} = ctx;
-    const {fid} = ctx.params;
-    let targetForum = await db.ForumModel.findOneAndUpdate({fid}, {$set: {isVisibleForNCC: true}});
-    if(targetForum.isVisibleForNCC) ctx.throw(400, '该板块在您操作之前已经被设置成无权限不可见了，请刷新');
-    ctx.data.isVisibleForNCC = !targetForum.isVisibleForNCC;
+    const form = await db.ForumModel.findOnly({fid});
+    if(switchStatus !== undefined) {
+      if(form.visibility === switchStatus && switchStatus)
+        ctx.throw(400, '该板块在您操作之前已经被设置成对用户可见了，请刷新');
+      if(form.visibility === switchStatus && !switchStatus)
+        ctx.throw(400, '该板块在您操作之前已经被设置成对用户不可见了，请刷新');
+      const obj = {visibility: false};
+      if(switchStatus) obj.visibility = true;
+      await form.update(obj);
+    } else if (switchStatusOfCert !== undefined) {
+      if(form.isVisibleForNCC === switchStatusOfCert && switchStatusOfCert)
+        ctx.throw(400, '该板块在您操作之前已经被设置成无权限不可见了，请刷新');
+      if(form.isVisibleForNCC === switchStatusOfCert && !switchStatusOfCert)
+        ctx.throw(400, '该板块在您操作之前已经被设置成无权限可见了，请刷新');
+      const obj = {isVisibleForNCC: false};
+      if(switchStatusOfCert) obj.isVisibleForNCC = true;
+      await form.update(obj);
+    } else {
+      ctx.throw(400, '参数不正确');
+    }
     await next();
   });
+
 module.exports = operationRouter;

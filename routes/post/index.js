@@ -18,10 +18,18 @@ postRouter
     if(!t && !c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-    const targetUser = await dbFn.findUserByPid(pid);
-    if(data.user.uid !== targetPost && !data.ensurePermission('GET', '/e'))
+    const targetUser = await targetPost.getUser();
+    if(data.user.uid !== targetPost.uid && !data.ensurePermission('GET', '/e'))
       ctx.throw(401, '您没有权限修改别人的回复');
-    // 修改post
+    const obj = {
+      uidlm: data.user.uid,
+      iplm: ctx.request.socket._peername.address,
+      t: t,
+      c: c,
+      tlm: Date.now()
+    };
+    targetPost.updata(obj);
+    //更新post
 
 
 
@@ -29,20 +37,15 @@ postRouter
 
 
 
-
-    let posts = await db.PostModel.find({tid: targetThread.tid},{pid: 1}).sort({toc: 1});
+    const indexOfPostId = await targetThread.getIndexOfPostId();
     let page = '';
     let postId = `#${pid}`;
-    for (let i = 0; i < posts.length; i++) {
-      if(posts[i].pid === pid) {
-        page = Math.ceil(i/perpage);
-        if(page <= 1){
-          page = `?`;
-        } else {
-          page = `?page=${page-1}`;
-        }
-      }
-    }
+    indexOfPostId.map(post => {
+      if(post.pid !== pid) return;
+      page = Math.ceil(i/perpage);
+      if(page <= 1) page = `?`;
+      else page = `?page=${page - 1}`;
+    });
     data.redirect = `/t/${targetThread.tid + page + postId}`;
     data.targetUser = targetUser;
     await next();

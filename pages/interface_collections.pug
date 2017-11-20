@@ -45,7 +45,7 @@ block content
         else
           
             
-        -if(!data.categoryNames.length){data.categoryNames=['null']}
+        -if(!data.categoryNames.length){data.categoryNames=['null'];data.category = 'null'}
 
         .col-xs-12
           ul.nav.nav-tabs
@@ -56,7 +56,7 @@ block content
           br
           
           .CollectionCategoryThreads
-            each item in data.categoryThreads
+            each item in data.categoryCollection
               
               .CollectionCategoryThreadItem
                 -var thread = item.thread

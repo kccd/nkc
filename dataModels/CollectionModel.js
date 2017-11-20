@@ -30,9 +30,15 @@ let CollectionSchema = new Schema({
   }
 });
 
-CollectionSchema.methods.extendThread = async function(){
-  const thread = await ThreadModel.findOnly({tid: this.tid});
-  return Object.assign(thread.toObject(), {thread});
+CollectionSchema.methods.extend = async function() {
+  const targetThread = await ThreadModel.findOnly({tid: this.tid});
+  const thread = await targetThread.extend();
+  return Object.assign(this.toObject(), {thread});
+};
+
+CollectionSchema.methods.delete = async function() {
+  const CollectionModel = require('./CollectionModel');
+  return await CollectionModel.deleteOne({cid: this.cid});
 };
 
 module.exports = mongoose.model('collections', CollectionSchema);

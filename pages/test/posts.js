@@ -100,28 +100,29 @@ let Posts = mongoose.model('posts', postsSchema);
 
 
 let t1 = Date.now();
-
-console.log('开始读取数据');
-return db.query(`
+console.log('将已删除用户的post转移到uid: 74365');
+db.query(`
   for p in posts
-  return p
+  filter !document(users, p.uid)
+  update p with{uid: '74365'} in posts
 `)
-
+  .then(() => {
+    console.log('开始读取数据');
+    return db.query(`
+      for p in posts
+      return p
+  `)
+  })
 .then(cursor => cursor.all())
 .then((res) => {
   console.log('处理数据');
-  for(var i = 0; i < res.length; i++){
+  for(let i = 0; i < res.length; i++){
     res[i]._id = undefined;
     res[i].pid = res[i]._key;
     res[i].c = res[i].c.toString();
-    /*if(res[i].atUsers) {
-      for (let j = 0; j < res[i].atUsers.length; j++) {
-        if (typeof(res[i].atUsers[j]) === 'object' && res[i].atUsers[j].uid) {
-          console.log(res[i].atUsers);
-          res[i].atUsers[j] = res[i].atUsers[j].uid;
-        }
-      }
-    }*/
+    if(!res[i].credits || res[i].credits === null || res[i].credits === 'null'){
+      res[i].credits = [];
+    }
   }
   console.log('开始写入数据');
   let n = 0;

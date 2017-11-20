@@ -8,64 +8,33 @@ const forumRouter = new Router();
 forumRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
-    const {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query);
-    const digest = query.digest || false;
-    let forums = await db.ForumModel.find({class: {$in: data.certificates.contentClasses}});
-    let fidArr = [];
-    for (let i = 0; i < forums.length; i++) {
-      fidArr.push(forums[i].fid);
+    const visibleFid = await ctx.getVisibleFid();
+    const {digest, sortby, operation} = query;
+    const {user} = data;
+    if(operation === 'getForumsList') {
+      if(!user) ctx.throw(401, '未登录用户不能发帖');
+      data.forumsList = await dbFn.getAvailableForums(ctx);
+      data.uid = user.uid;
+      return await next();
     }
-    let countOfThread = await db.ThreadModel.count({fid: {$in: fidArr}, digest: digest});
-    data.paging = apiFn.paging(query.page, countOfThread);
-    let threads = await db.ThreadModel.aggregate([
-      {$match: {fid: {$in: fidArr}}},
-      {$match},
-      {$sort},
-      {$skip},
-      {$limit},
-      {$lookup: {
-        from: 'forums',
-        localField: 'fid',
-        foreignField: 'fid',
-        as:'forum'
-      }},
-      {$unwind: '$forum'},
-      {$lookup:{
-        from: 'posts',
-        localField: 'oc',
-        foreignField: 'pid',
-        as: 'oc'
-      }},
-      {$unwind: '$oc'},
-      {$lookup: {
-        from: 'posts',
-        localField: 'lm',
-        foreignField: 'pid',
-        as: 'lm'
-      }},
-      {$unwind: '$lm'},
-      {$lookup: {
-        from: 'users',
-        localField: 'lm.uid',
-        foreignField: 'uid',
-        as: 'lm.user'
-      }},
-      {$unwind: '$lm.user'},
-      {$lookup: {
-        from: 'users',
-        localField: 'oc.uid',
-        foreignField: 'uid',
-        as: 'oc.user'
-      }},
-      {$unwind: '$oc.user'}
-    ]);
-    for (let i = 0; i < threads.length; i++) {
-      threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
-    }
+    const page = query.page || 0;
+    const q = {
+      fid: {$in: visibleFid}
+    };
+    if(digest === 'true') q.digest = true;
+    const threadCount = await db.ThreadModel.count(q);
+    const {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query, q);
+    data.paging = apiFn.paging(page, threadCount);
+    let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
+    threads = await Promise.all(threads.map(async t => {
+      const targetThread = await t.extend();
+      targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
+      return targetThread;
+    }));
     data.indexThreads = threads;
     data.indexForumList = await dbFn.getAvailableForums(ctx);
-    data.digest = query.digest;
-    data.sortby = query.sortby;
+    data.digest = digest;
+    data.sortby = sortby;
     data.content = 'forum';
     if(data.user)
       data.userThreads = await data.user.getUsersThreads();
@@ -75,36 +44,40 @@ forumRouter
   .get('/:fid', async (ctx, next) => {
     const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;
     const {fid} = ctx.params;
-    const {digest, cat, sortby} = ctx.query;
-    const data = ctx.data;
-    let page = ctx.query.page || 0;
-    let countOfThread = await dbFn.getCountOfThreadByFid(fid);
-    let paging = apiFn.paging(page, countOfThread);
-    ctx.template = 'interface_forum.pug';
+    const {data, query} = ctx;
+    const {digest, cat, sortby} = query;
+    const page = query.page || 0;
+    const visibleFid = await ctx.getVisibleFid();
+    const forum = await ForumModel.findOnly({fid});
+    if(!forum.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
+    const fidOfChildForum = await forum.getFidOfChildForum(visibleFid);
+    let q = {
+      fid: {$in: fidOfChildForum}
+    };
+    if(cat) q.cid = cat;
+    if(digest === 'true') q.digest = true;
+    const countOfThread = await forum.getThreadCountByQuery(q);
+    const paging = apiFn.paging(page, countOfThread);
     if(digest) data.digest = true;
     data.cat = cat;
     data.sortby = sortby;
     data.paging = paging;
-    const {query} = ctx;
-    const forum = await ForumModel.findOne({fid});
     data.forum = forum;
     if(forum.moderators.length > 0) data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
-    let threads = await forum.getThreadsByQuery(query);
-    for (let i = 0; i < threads.length; i++) {
-      threads[i].oc.user.navbarDesc = ctx.getUserDescription(threads[i].oc.user);
-    }
+    let threads = await forum.getThreadsByQuery(query, q);
+    threads.map(thread => {
+      thread.oc.user.navbarDesc = ctx.getUserDescription(thread.oc.user);
+    });
     let toppedThreads = [];
-    let t1 = Date.now();
     if(data.paging.page === 0 && data.forum.type === 'forum') {
-      toppedThreads = await dbFn.getToppedThreads({fid, topped: true});
-      for(let i = 0; i < toppedThreads.length; i++) {
-        toppedThreads[i].oc.user.navbarDesc = ctx.getUserDescription(toppedThreads[i].oc.user);
-      }
+      toppedThreads = await forum.getToppedThreads(visibleFid);
+      toppedThreads.map(toppedThread => {
+        toppedThread.oc.user.navbarDesc = ctx.getUserDescription(toppedThread.oc.user);
+      });
     }
-    data.toppedThreads = toppedThreads;
-    console.log(`--------------加载置顶的帖子耗时： ${Date.now()-t1}------------------`)
-    data.threads = threads;
     let forumList = await dbFn.getAvailableForums(ctx);
+    data.toppedThreads = toppedThreads;
+    data.threads = threads;
     data.forumList = forumList;
     data.forums = [];
     for (let i = 0; i < forumList.length; i++) {
@@ -122,9 +95,11 @@ forumRouter
     data.threadTypes = thredTypes;
     data.forumThreadTypes = forumThreadTypes;
     data.fTarget = fid;
-    if(data.user)
+    if(data.user) {
       data.userThreads = await data.user.getUsersThreads();
-    await next()
+    }
+    ctx.template = 'interface_forum.pug';
+    await next();
   })
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
 

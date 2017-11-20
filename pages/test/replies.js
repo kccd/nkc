@@ -24,7 +24,11 @@ let repliesSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  }
+  },
+/*  viewed: {
+    type: Boolean,
+    default: false,
+  }*/
 });
 
 let Replies = mongoose.model('replies', repliesSchema);
@@ -44,6 +48,7 @@ return db.query(`
     res[i].fromPid = res[i].frompid;
     res[i].toPid = res[i].topid;
     res[i].toUid = res[i].touid;
+    // res[i].viewed = true;
   }
   console.log('开始写入数据');
   let n = 0;

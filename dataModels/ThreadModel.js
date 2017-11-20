@@ -2,8 +2,6 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const {getQueryObj} = require('../nkcModules/apiFunction');
-const PostModel = require('./PostModel');
-const ForumModel = require('./ForumModel');
 const threadSchema = new Schema({
   tid: {
     type: String,
@@ -110,6 +108,8 @@ threadSchema.pre('save', function (next) {
 });
 
 threadSchema.methods.extend = async function (){
+  const PostModel = require('./PostModel');
+  const ForumModel = require('./ForumModel');
   let obj = this.toObject();
   let oc = await PostModel.findOnly({pid: this.oc});
   let lm = await PostModel.findOnly({pid: this.lm});
@@ -120,11 +120,70 @@ threadSchema.methods.extend = async function (){
   return obj;
 };
 
+threadSchema.methods.ensurePermission = function (visibleFid) {
+  return visibleFid.includes(this.fid);
+};
+
 threadSchema.methods.getPostByQuery = async function (query) {
+  const PostModel = require('./PostModel');
   const {$match, $sort, $skip, $limit} = getQueryObj(query, {tid: this.tid});
   let posts = await PostModel.find($match).sort({toc: 1}).skip($skip).limit($limit);
   posts = await Promise.all(posts.map(p => p.extend()));
   return posts;
+};
+
+threadSchema.methods.getUser = async function() {
+  const Usermodel = require('./UserModel');
+  return await Usermodel.findOnly({uid: this.uid});
+};
+
+threadSchema.methods.updateMessage = async function() {
+  const PostModel = require('./PostModel');
+  const ResourceModel = require('./ResourceModel');
+  const posts = await PostModel.find({tid: this.tid}).sort({toc: -1});
+  const count = posts.length;
+  if(count === 0) return;
+  const timeToNow = new Date();
+  const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
+  let countToday = 0;
+  let countRemain = 0;
+  posts.map(post => {
+    if(post.toc > time) countToday++;
+    if(!post.disabled) countRemain++;
+  });
+  const lastPost = posts[0];
+  const firstPost = posts[posts.length-1];
+  const updateObj = {
+    hasImage: this.hasImage,
+    hasFile: this.hasFile,
+    tlm: lastPost.toc.getTime(),
+    count: count,
+    countRemain: countRemain,
+    countToday: countToday,
+    oc: firstPost.pid,
+    lm: lastPost.pid,
+    toc: firstPost.toc.getTime(),
+    uid: firstPost.uid
+  };
+  if(firstPost.r) {
+    let r = firstPost.r;
+    const extArr = ['jpg', 'png', 'svg', 'jpeg'];
+    let imageNum = 0;
+    for (let i = 0; i < r.length; r++) {
+      const rFromDB = await ResourceModel.findOne({rid: r[i]});
+      if(extArr.includes(rFromDB.ext)) {
+        imageNum++;
+        updateObj.hasImage = true;
+      }
+    }
+    if(r.length > imageNum) updateObj.hasFile = true;
+  }
+  return await this.update(updateObj);
+};
+
+threadSchema.methods.getIndexOfPostId = async function () {
+  const PostModel = require('./PostModel');
+  return await PostModel.find({tid: this.tid}, {pid: 1}).sort({toc: 1});
 };
 
 module.exports = mongoose.model('threads', threadSchema);

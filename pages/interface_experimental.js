@@ -359,13 +359,12 @@ function listForumBranch(event, index) {
 
 function forumVisibilitySwitch(event, fid){
   $(event.target).addClass('disabled');
-  var method = 'put';
+  var obj = {switchStatus: true};
   if(event.target.innerHTML === '已对用户可见'){
-    method = 'delete';
+    obj.switchStatus = false;
   }
-  nkcAPI('/f/'+fid+'/forUsers', method, {})
+  nkcAPI('/f/'+fid, 'PATCH', obj)
     .then(function(res) {
-      console.log(res.visibility);
       if(event.target.innerHTML === '已对用户可见') {
         event.target.innerHTML = '已对用户隐藏';
         $(event.target).removeClass('disabled');
@@ -381,11 +380,12 @@ function forumVisibilitySwitch(event, fid){
 }
 
 function forumIsVisibleForNCCSwitch(event, fid) {
-  var method = 'put';
+  $(event.target).addClass('disabled');
+  var obj = {switchStatusOfCert: true};
   if(event.target.innerHTML === '已对无权限用户隐藏') {
-    method = 'delete';
+    obj.switchStatusOfCert = false;
   }
-  nkcAPI('/f/'+fid+'/forUsersByCerts', method, {fid: fid})
+  nkcAPI('/f/'+fid, 'PATCH', obj)
     .then(function(res) {
       if(event.target.innerHTML === '已对无权限用户隐藏') {
         event.target.innerHTML = '已对无权限用户可见';

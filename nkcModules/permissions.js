@@ -100,9 +100,16 @@ const certificates ={
       register: {
         [name]: '注册',
         [GET]: true,
-        [parameter]: {
+        email: {
           [GET]: true,
           [POST]: true,
+          verify: {
+            [GET]: true
+          }
+        },
+        mobile: {
+          [GET]: true,
+          [POST]: true
         }
       },
       r: {
@@ -161,6 +168,26 @@ const certificates ={
           [GET]: true
         },
         [GET]: true
+      },
+      forgotPassword: {
+        [name]: '找回密码',
+        [GET]: true,
+        mobile: {
+          [name]: '通过手机号找回',
+          [GET]: true,
+          [POST]: true,
+          [PUT]: true
+        },
+        email: {
+          [name]: '通过邮箱找回',
+          [GET]: true,
+          [POST]: true,
+          [PUT]: true,
+          verify: {
+            [name]: "验证邮件",
+            [GET]: true
+          }
+        }
       }
     },
     elseModifyTimeLimit: 0,
@@ -259,6 +286,10 @@ const certificates ={
             [name]: '推荐',
             [POST]: true,
             [DELETE]: true
+          },
+          quote: {
+            [name]: '引用',
+            [GET]: true
           }
         }
       },
@@ -316,7 +347,7 @@ const certificates ={
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
   },
-  mail: {
+  email: {
     displayName: '笔友',
     inheritFrom: ['default'],
     permittedOperations: {
@@ -408,11 +439,6 @@ const certificates ={
           [name]: '行为日志',
           [GET]: true
         },
-        cart: {
-          [name]: '管理车',
-          [GET]: true,
-          [POST]: true
-        },
         newUsers: {
           [name]: '新注册用户',
           [GET]: true
@@ -475,7 +501,7 @@ const certificates ={
       q: {
         [parameter]: {
           [parameter]: {
-            [PUT]: true,
+            [PATCH]: true,
             [DELETE]: true
           }
         }
@@ -594,12 +620,14 @@ function getPermitTree(certs) {
   return tree
 }
 
-function getVisibleFid() {
+async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
-  return mongoose.connection.db.collection('forums').aggregate([
-    {$match: {class: {$in: cc}}},
-    {$replaceRoot: {newRoot: '$fid'}}
-  ])
+  const fs = await mongoose.connection.db.collection('forums').find(
+    {
+      class: {$in: cc}
+    }
+  ).toArray();
+  return fs.map(e => e.fid);
 }
 
 module.exports = async (ctx, next) => {

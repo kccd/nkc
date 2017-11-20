@@ -292,7 +292,7 @@ block scripts
       geid('sendMes').disabled = true;
       nkcAPI('/sms/message','post',mesObj)
       .then(function(){
-        screenTopWarning('信息发送成功！');
+        screenTopWarning('信息发送成功！请刷新');
         $("#inputContent").val('');
         geid('sendMes').disabled = false;
       })
