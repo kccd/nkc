@@ -11,7 +11,7 @@ router
     const personalForum = PersonalForumModel.findOnly({uid});
     await personalForum.extendModerator();
     data.forum = personalForum;
-    const {sortby, digest, tab, page} = query;
+    const {sortby, digest, tab, page = 0} = query;
     const matchBase = generateMatchBase();
     const $sort = {};
     if(sortby)
@@ -214,11 +214,56 @@ router
       ])
     }
     else if(tab === 'all') {
-      const $post1 = matchBase.set('uid', uid);
-      const {recPosts} = personalForum;
-      const $post2 = matchBase.set('pid', {$in: recPosts});
-      data.threads = await mongoose.connection.db.collection('threads').aggregate([
-
+      data.threads = await mongoose.connection.db.collection('usersBehavior').aggregate([
+        {$match: {
+          uid,
+          operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
+          fid: {$in: visibleFid}
+        }},
+        {$lookup: {
+          from: 'threads',
+          localField: 'tid',
+          foreignField: 'tid',
+          as: 'thread'
+        }},
+        {$match: {
+          'thread.disabled': base.disabled
+        }},
+        {$lookup: {
+          from: 'posts',
+          localField: 'thread.oc',
+          foreignField: 'pid',
+          as: 'thread.oc'
+        }},
+        {$lookup: {
+          from: 'posts',
+          localField: 'pid',
+          foreignField: 'pid',
+          as: 'thread.lm'
+        }},
+        {$match: {
+          'thread.lm.disabled': base.disabled
+        }},
+        {$sort: {
+          timeStamp: 1
+        }},
+        {$skip: page * perpage},
+        {$limit: perpage},
+        {$lookup: {
+          from: 'users',
+          localField: 'thread.oc.uid',
+          foreignField: 'uid',
+          as: 'thread.oc.user'
+        }},
+        {$lookup: {
+          from: 'users',
+          localField: 'thread.lm.uid',
+          foreignField: 'uid',
+          as: 'thread.lm.user'
+        }},
+        {$replaceRoot: {
+          newRoot: '$thread'
+        }}
       ])
     }
   });
