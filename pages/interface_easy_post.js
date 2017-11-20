@@ -92,7 +92,7 @@ var EasyPost = function() {
 };
 EasyPost.prototype.init = function() {
   var self = this;
-  nkcAPI('/f?operation=getForumsList','GET', {})
+  nkcAPI('/f','GET', {})
     .then(function(result) {
       var path = window.location.pathname.match(/^\/(.)\/(\w+)/);
       if(path && path[1] === 'm') {
@@ -112,8 +112,6 @@ EasyPost.prototype.init = function() {
     .then(function() {
       var parents = self.parents;
       var forumsList = self.forumsList;
-      console.log(parents);
-      console.log(forumsList);
       for(var i in forumsList) {
         parents.appendChild(createOption(forumsList[i].displayName));
       }
@@ -179,7 +177,7 @@ var childrenOnChange = function(that) {
   return function() {
     var result;
     var forumsList = that.forumsList;
-    var chosenParent = that.value;
+    var chosenParent = that.parents.value;
     var chosenChild = that.children.value;
     for(var i in forumsList) {
       if(forumsList[i].displayName === chosenParent) {
@@ -202,17 +200,18 @@ var childrenOnChange = function(that) {
 
 var parentsOnChange = function(that) {
   return function() {
-    var value = that.value;
+    var value = that.parents.value;
     var forumsList = that.forumsList;
     var children = that.children;
     for(var i in forumsList) {
       if(forumsList[i].displayName === value) {
         var childNodes = children.childNodes;
+        console.log(childNodes);
         //remove all childNodes except the first one '请选择一个专业'
-        for(; childNodes.length > 3;) { //node.childNodes is a live collection.
+        for(; childNodes.length > 1;) { //node.childNodes is a live collection.
           //keep the first two & last one elements
           //console.log('del -> ' + childNodes.length +
-          children.removeChild(childNodes[childNodes.length - 2])
+          children.removeChild(childNodes[childNodes.length - 1])
           //.innerHTML);
         }
         //append new
@@ -222,6 +221,8 @@ var parentsOnChange = function(that) {
           children.insertBefore(createOption(forumsList[i].children[j].displayName), last)
           //.innerHTML);
         }
+        //把选项 ‘请选择一个专业’ 提到最前面
+        children.insertBefore(children.lastChild, children[0]);
       }
     }
   }
@@ -344,10 +345,8 @@ var onGoEditor = function(that) {
 };
 
 var groupingForums = function(forumsList, that) {
-  that.formsList = forumsList;
-  console.log(that.formsList);
+  that.forumsList = forumsList;
   that.forumsList.sort(function(a, b) {
-    console.log('========='+a);
     return a.order - b.order;
   });
   for(var i in that.forumsList) {
@@ -357,8 +356,9 @@ var groupingForums = function(forumsList, that) {
       })
     }
   }
-  /*var group1 = [];
-  var group2 = [];
+
+  /*var group1;
+  var group2;
   for(var index in forumsList) {
     var group = forumsList[index];
     if(group.parent == null) {
@@ -371,8 +371,8 @@ var groupingForums = function(forumsList, that) {
   that.forumsList = group1.concat(group2);
   for(var index in forumsList) {
     for(var i in that.forumsList) {
-      if(forumsList[index].fid === that.forumsList[i].fid) {
-        that.forumsList[i].children = forumsList[index].children;
+      if(forumsList[index].parent === that.forumsList[i].fid) {
+        that.forumsList[i].children = forumsList[index].group;
       }
     }
   }

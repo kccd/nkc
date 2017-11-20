@@ -16,10 +16,10 @@ block content
         .panel.panel-default
           .panel-body
             h4 特殊操作 [ 请没事不要点击 ]
-            button.btn.btn-default(onclick="nkcAPI('updateAllThreads').then(jalert).catch(jalert)") 更新全部帖子数据
-            button.btn.btn-default(onclick="nkcAPI('updateAllForums').then(jalert).catch(jalert)") 更新全部板块数据
-            button.btn.btn-default(onclick="nkcAPI('updateAllUsers').then(jalert).catch(jalert)") 更新全部用户数据
-            button.btn.btn-default(onclick="nkcAPI('updateAllPostsFromCreditLog').then(jalert).catch(jalert)") 从积分表向帖子更新数据
+            button.btn.btn-default(onclick="nkcAPI('/e/updateAllThreads', 'POST', {}).then(jalert).catch(jalert)") 更新全部帖子数据
+            button.btn.btn-default(onclick="nkcAPI('/e/updateAllForums', 'POST', {}).then(jalert).catch(jalert)") 更新全部板块数据
+            button.btn.btn-default(onclick="nkcAPI('/e/updateAllUsers', 'POST', {}).then(jalert).catch(jalert)") 更新全部用户数据
+            button.btn.btn-default(onclick="nkcAPI('/e/updateAllPostsFromCreditLog', 'POST', {}).then(jalert).catch(jalert)") 从积分表向帖子更新数据
             h4 危险操作 [ 通常你也没有权限点击 ]
             button.btn.btn-default(onclick="nkcAPI('gitpull').then(jalert).catch(jalert)") git pull
             button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze

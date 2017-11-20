@@ -41,7 +41,7 @@ registerRouter
     if(apiFn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
     if(userObj.password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
-    if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
+    if(usernameOfDBNumber !== 0) ctx.throw(400, '用户名已存在，请更换用户名再试！');
     let mobileCodesNumber = await dbFn.checkMobile(userObj.mobile, params.mobile);
     if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
     let smsCode = await dbFn.checkMobileCode(userObj.mobile, userObj.mcode);
@@ -83,12 +83,12 @@ registerRouter
     if(apiFn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
     if(userObj.password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
-    if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
+    if(usernameOfDBNumber !== 0) ctx.throw(404, '用户名已存在，请更换用户名再试！');
     if(apiFn.checkEmailFormat(userObj.email) === -1) ctx.throw(400, '邮箱格式不正确，请检查');
     let userPersonal = await dbFn.checkEmail(userObj.email);
-    if(userPersonal > 0) ctx.throw('404', '此邮箱已注册过，请检查或更换');
+    if(userPersonal > 0) ctx.throw(404, '此邮箱已注册过，请检查或更换');
     let emailOfDBNumber = await dbFn.checkNumberOfSendEmail(userObj.email);
-    if(emailOfDBNumber >= settings.sendMessage.sendEmailCount) ctx.throw('404', '邮件发送次数已达上限，请隔天再试');
+    if(emailOfDBNumber >= settings.sendMessage.sendEmailCount) ctx.throw(404, '邮件发送次数已达上限，请隔天再试');
     let ecode = apiFn.random(14);
     let passwordObj = apiFn.newPasswordObject(userObj.password);
     userObj.password = passwordObj.password;

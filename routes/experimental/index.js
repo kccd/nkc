@@ -57,8 +57,8 @@ experimentalRouter
     await next();
   })
   .get('/stats', async (ctx, next) => {
-    const {json} = ctx.query;
-    if(!json) {
+    const type = ctx.request.accepts('json', 'html');
+    if(type !== 'json') {
       ctx.template = 'stats.pug';
       return await next();
     }
@@ -104,6 +104,10 @@ experimentalRouter
   .get('/behaviors', async (ctx, next) => {
     let {data, db} = ctx;
     ctx.template = 'interface_behavior_log.pug';
+    await next();
+  })
+  .post('/updateAllUsers', async (ctx, next) => {
+    // 根据 uid 找出所有post， 再判断有多少被禁
     await next();
   });
 module.exports = experimentalRouter;
