@@ -47,7 +47,7 @@ var loadChart = function(){
     },opt)
   }
 
-  nkcAPI('/e/stats?json=true', 'get', {})
+  nkcAPI('/e/stats', 'get', {})
   .then(function(list){
     $('#loading').css('display',' none');
     var list = list.stats;

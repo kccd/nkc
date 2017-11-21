@@ -539,6 +539,10 @@ const certificates ={
           [name]: '系统通知',
           [GET]: true,
           [POST]: true
+        },
+        updateAllUsers: {
+          [name]: '更新用户数据',
+          [POST]: true
         }
       }
     }

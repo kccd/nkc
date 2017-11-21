@@ -42,6 +42,21 @@ async function operateSystemID(type, op) {
 }
 
 settingSchema.statics.operateSystemID = operateSystemID;
+
+settingSchema.methods.extend = async function() {
+  const ThreadModel = require('./ThreadModel');
+  const PostModel = require('./PostModel');
+  let ads = this.ads;
+  for (let i = 0; i < ads.length; i++) {
+    const thread = await ThreadModel.findOnly({tid: ads[i]});
+    const post = await PostModel.findOnly({pid: thread.oc});
+    ads[i] = Object.assign(thread, {post});
+  }
+  const targetSetting = this.toObject();
+  targetSetting.ads = ads;
+  return targetSetting;
+};
+
 /*let Setting = mongoose.model('settings', settingSchema);
 new Setting({uid: 'system',ads: [1], popPersonalForums:[1],counters:{
   resources: 1,

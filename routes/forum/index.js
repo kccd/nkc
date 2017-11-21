@@ -7,11 +7,12 @@ const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
+    const type = ctx.request.accepts('json', 'html');
     const {data, db, query} = ctx;
     const visibleFid = await ctx.getVisibleFid();
     const {digest, sortby, operation} = query;
     const {user} = data;
-    if(operation === 'getForumsList') {
+    if(type === 'json') {
       if(!user) ctx.throw(401, '未登录用户不能发帖');
       data.forumsList = await dbFn.getAvailableForums(ctx);
       data.uid = user.uid;
