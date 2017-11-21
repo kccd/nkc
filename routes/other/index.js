@@ -67,7 +67,9 @@ otherRouter
 
     let t2 = Date.now();
 
-    data.activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    let activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    activeUsers = await Promise.all(activeUsers.map(activeUser => activeUser.extend()));
+    data.activeUsers = activeUsers;
     data.indexForumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
