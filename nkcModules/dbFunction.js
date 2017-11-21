@@ -169,9 +169,6 @@ fn.getAvailableForums = async ctx => {
       result.splice(i, 1);
     }
   }
-  for(let i of result) {
-    console.log(i.displayName);
-  }
   return result;
 };
 

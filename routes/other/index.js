@@ -27,19 +27,25 @@ otherRouter
     let t = Date.now();
 
     const visibleFid = await ctx.getVisibleFid();
-    let tidArr = await db.ThreadModel.find({
+    let threads = await db.ThreadModel.find({
       disabled: false,
       digest: true,
-      fid: {$in: visibleFid, $ne: '97', $ne: 'recycle'}
-    },{
-      _id: 0,
-      tid: 1
-    }).sort({toc: -1});
-    let number = 0;
-    const targetThreads = [];
+      fid: {$in: visibleFid, $ne: '97', $ne: 'recycle'},
+      hasImage: true
+    }).sort({toc: -1}).limit(200);
     const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
-    for (let tid of tidArr) {
-      const thread = await db.ThreadModel.findOnly({tid: tid.tid});
+    threads = await Promise.all(threads.map(async thread => {
+      const targetThread = await thread.extend();
+      for (let r of targetThread.oc.resources) {
+        targetThread.src = 'moren';
+        if(imgArr.includes(r.ext)){
+          targetThread.src = r.rid;
+          break;
+        }
+      }
+      return targetThread;
+    }));/*
+    for (let thread of threads) {
       const targetThread = await thread.extend();
       for (let r of targetThread.oc.resources) {
         if(imgArr.includes(r.ext)){
@@ -50,13 +56,13 @@ otherRouter
         }
       }
       if(number >= 200) break;
-    }
+    }*/
     const temp = [];
     for (let i = 0; i < 6; i++) {
       let j = 200 - i;
       let index = Math.floor(Math.random() * j);
-      temp.push(targetThreads[index]);
-      targetThreads.splice(index, 1);
+      temp.push(threads[index]);
+      threads.splice(index, 1);
     }
     data.newestDigestThreads = temp;
 
