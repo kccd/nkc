@@ -62,12 +62,14 @@ block content
         -var user = data.user
         if user
           include interface_thread_userpatch.pug
-        if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
+        -var addQuestions = data.ensurePermission('GET', '/q');
+        -var examinated = true//data.ensurePermission('GET', '/')
+        if !examinated || addQuestions
           .nkcpanel
-            if !data.permittedOperations.getLatestPosts
+            if !examinated
               :markdown
                 普通会员不能进入特种技术板块，请点击这里[参加考试](/register?getcode=true)，升级高级会员
-            if data.permittedOperations.viewQuestions
+            if addQuestions
               :markdown
                 科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！
         -var active_user_title = '一周活跃用户'

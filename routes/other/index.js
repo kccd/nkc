@@ -65,7 +65,7 @@ otherRouter
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
     data.ads = (await systemSetting.extend()).ads;
-    data.usersThreads = await data.user.getUsersThreads();
+    data.userThreads = await data.user.getUsersThreads();
     ctx.template = 'interface_home.pug';
     await next();
   })
