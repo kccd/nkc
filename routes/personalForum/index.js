@@ -223,32 +223,33 @@ router
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
           fid: {$in: visibleFid}
         }},
+        {$group: {_id: '$tid'}},
         {$lookup: {
           from: 'threads',
           localField: 'tid',
           foreignField: 'tid',
           as: 'thread'
         }},
-        {$match: {
-          'thread.disabled': base.disabled
-        }},
+        {$unwind: '$thread'},
         {$lookup: {
           from: 'posts',
           localField: 'thread.oc',
           foreignField: 'pid',
           as: 'thread.oc'
         }},
+        {$unwind: '$thread.oc'},
         {$lookup: {
           from: 'posts',
           localField: 'pid',
           foreignField: 'pid',
           as: 'thread.lm'
         }},
-        {$match: {
-          'thread.lm.disabled': base.disabled
-        }},
+        {$unwind: '$thread.lm'},
+        // {$match: {
+        //   'thread.lm.disabled': base.disabled
+        // }},
         {$sort: {
-          timeStamp: 1
+          timeStamp: -1
         }},
         {$skip: page * perpage},
         {$limit: perpage},
@@ -258,12 +259,14 @@ router
           foreignField: 'uid',
           as: 'thread.oc.user'
         }},
+        {$unwind: '$thread.oc.user'},
         {$lookup: {
           from: 'users',
           localField: 'thread.lm.uid',
           foreignField: 'uid',
           as: 'thread.lm.user'
         }},
+        {$unwind: '$thread.lm.user'},
         {$replaceRoot: {
           newRoot: '$thread'
         }}
@@ -271,6 +274,8 @@ router
     }
     ctx.template = 'interface_personal_forum.pug';
     ctx.data.userThreads = await ctx.data.user.getUsersThreads();
+    ctx.data.forumlist = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
+    console.log(ctx.data.forumlist)
     await next()
   });
 
