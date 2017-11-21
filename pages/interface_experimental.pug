@@ -67,7 +67,7 @@ block content
               -if(data.forumTree[i].children)
                 ul.list-group.invisible
                   -for(var j = 0; j < data.forumTree[i].children.length; j++)
-                    -var cForum = data.forumTree[i]
+                    -var cForum = data.forumTree[i].children[j]
                     -var buttonVSInfo = cForum.visibility? '已对用户可见' : '已对用户隐藏'
                     -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户可见' : '已对无权限用户隐藏'
                     li.list-group-item
