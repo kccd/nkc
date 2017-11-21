@@ -25,7 +25,7 @@ const activeUserSchema = new Schema({
 activeUserSchema.methods.extend = async function() {
   const UserModel = require('./UserModel');
   const user = await UserModel.findOnly({uid: this.uid});
-  //this.set(username, user.username)
+  return Object.assign(this.toObject(), {username: user.username});
 };
 
 module.exports = mongoose.model('activeUsers', activeUserSchema, 'activeUsers');

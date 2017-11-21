@@ -36,13 +36,13 @@ block content
             - var class_str_sortby_toc = sortby?'active':''
             - var class_str_sortby_tlm = sortby?'':'active'
 
-            ul.pagination.NavigationPaging
-              li(class=`${data.content == "all" ? "active" : ""}`)
-                a(href=`?&content=all${data.digeset ? "&digest=true" : ""}${data.sortby ? "&sortby=toc" : ""}`) 所有
-              li(class=`${data.content == "forum"? "active" : ""}`)
-                a(href=`?&content=forum${data.digest? "&digest=true":""}${data.sortby? "&sortby=toc":""}`) 板块
-              li(class=`${data.content == "personal"? "active" : ""}`)
-                a(href=`?&content=personal${data.digeset? "&digest=true": ""}${data.sortby? "&sortby=toc":""}`) 专栏
+            //ul.pagination.NavigationPaging
+            //  li(class=`${data.content == "all" ? "active" : ""}`)
+            //    a(href=`?&content=all${data.digeset ? "&digest=true" : ""}${data.sortby ? "&sortby=toc" : ""}`) 所有
+            //  li(class=`${data.content == "forum"? "active" : ""}`)
+            //    a(href=`?&content=forum${data.digest? "&digest=true":""}${data.sortby? "&sortby=toc":""}`) 板块
+            //  li(class=`${data.content == "personal"? "active" : ""}`)
+            //    a(href=`?&content=personal${data.digeset? "&digest=true": ""}${data.sortby? "&sortby=toc":""}`) 专栏
 
             ul.pagination.NavigationPaging
               - var page = paging?paging.page:null

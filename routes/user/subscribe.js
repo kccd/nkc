@@ -1,27 +1,31 @@
 const Router = require('koa-router');
 const subscribeRouter = new Router();
-
+const nkcModules = require('../../nkcModules');
+const apiFn = nkcModules.apiFunction;
 subscribeRouter
-  .get('/follow', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    const user = await ctx.db.subscribeModel.find({uid},{subscribeUsers: 1});
-    const data = {user};
-    ctx.data = data;
-    await next()
-  })
-  .get('/fans', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    const user = await ctx.db.subscribeModel.find({uid},{subscribers: 1});
-    const data = {user};
-    data;
-    await next()
-  })
-  .get('/forums', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    const user = await ctx.db.subscribeModel.find({uid},{subscribeForums: 1});
-    const data = {user};
-    ctx.data = data;
-    await next()
+  .get('/', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    let {fans, page} = ctx.query;
+    page = page || 0;
+    const {uid} = ctx.params;
+    const targetUser = await db.UserModel.findOnly({uid});
+    const targetUserSubscribe = await db.UserSubscribeModel.findOnly({uid});
+    let targetUid = [];
+    if(fans) {
+      targetUid = targetUserSubscribe.subscribers;
+      data.fans = true;
+    }
+    else targetUid = targetUserSubscribe.subscribeUsers;
+    const paging = apiFn.paging(page, targetUid.length);
+    targetUid = targetUid.slice(paging.start, paging.perpage);
+    let targetUsers = await Promise.all(targetUid.map(async uid => await db.UserModel.findOnly({uid})));
+    data.targetUser = targetUser;
+    data.targetUsers = targetUsers;
+    console.log(data.targetUsers);
+    data.paging = paging;
+    ctx.template = 'interface_subscribe.pug';
+    await next();
   })
   // 关注该用户
   .post('/', async (ctx, next) => {

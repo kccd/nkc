@@ -5,6 +5,7 @@ const registerRouter = require('./register');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
 const forgotPasswordRouter = require('./forgotPassword');
+const latestRouter = require('./latest');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
@@ -68,7 +69,9 @@ otherRouter
 
     let t2 = Date.now();
 
-    data.activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    let activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    activeUsers = await Promise.all(activeUsers.map(activeUser => activeUser.extend()));
+    data.activeUsers = activeUsers;
     data.indexForumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
@@ -96,5 +99,6 @@ otherRouter
   .use('site_specific', siteSpecific.routes(), siteSpecific.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
+  .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

@@ -8,39 +8,16 @@ const forumRouter = new Router();
 forumRouter
   .get('/', async (ctx, next) => {
     const type = ctx.request.accepts('json', 'html');
-    const {data, db, query} = ctx;
-    const visibleFid = await ctx.getVisibleFid();
-    const {digest, sortby, operation} = query;
+    const {data} = ctx;
     const {user} = data;
     if(type === 'json') {
       if(!user) ctx.throw(401, '未登录用户不能发帖');
       data.forumsList = await dbFn.getAvailableForums(ctx);
       data.uid = user.uid;
-      return await next();
+    } else {
+      ctx.throw(404);
     }
-    const page = query.page || 0;
-    const q = {
-      fid: {$in: visibleFid}
-    };
-    if(digest === 'true') q.digest = true;
-    const threadCount = await db.ThreadModel.count(q);
-    const {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query, q);
-    data.paging = apiFn.paging(page, threadCount);
-    let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
-    threads = await Promise.all(threads.map(async t => {
-      const targetThread = await t.extend();
-      targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
-      return targetThread;
-    }));
-    data.indexThreads = threads;
-    data.indexForumList = await dbFn.getAvailableForums(ctx);
-    data.digest = digest;
-    data.sortby = sortby;
-    data.content = 'forum';
-    if(data.user)
-      data.userThreads = await data.user.getUsersThreads();
-    ctx.template = 'interface_latest_threads.pug';
-    await next()
+    await next();
   })
   .get('/:fid', async (ctx, next) => {
     const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;

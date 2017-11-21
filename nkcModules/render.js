@@ -123,6 +123,7 @@ let pugRender = (template, data) => {
   };
   options.data = data;
   options.filters = filters;
+  options.pretty = true; // 保留换行
   return pug.renderFile(template, options);
 };
 module.exports = pugRender;
