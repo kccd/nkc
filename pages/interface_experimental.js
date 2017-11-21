@@ -381,9 +381,9 @@ function forumVisibilitySwitch(event, fid){
 
 function forumIsVisibleForNCCSwitch(event, fid) {
   $(event.target).addClass('disabled');
-  var obj = {switchStatusOfCert: true};
+  var obj = {switchStatusOfCert: false};
   if(event.target.innerHTML === '已对无权限用户隐藏') {
-    obj.switchStatusOfCert = false;
+    obj.switchStatusOfCert = true;
   }
   nkcAPI('/f/'+fid, 'PATCH', obj)
     .then(function(res) {

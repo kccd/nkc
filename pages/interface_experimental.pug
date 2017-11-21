@@ -54,7 +54,7 @@ block content
               -for(var i = 0; i < data.forumTree.length; i++)
                 -var cForum = data.forumTree[i]
                 -var buttonVSInfo = cForum.visibility? '已对用户可见' : '已对用户隐藏'
-                -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户隐藏' : '已对无权限用户可见'
+                -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户可见' : '已对无权限用户隐藏'
                 li.list-group-item
                   span.col-md-3 #{data.forumTree[i].displayName}
                   a.btn.btn-default.btn-sm(href='javascript:;' onclick=`listForumBranch(event,"${i}")`) 显示子版
@@ -69,7 +69,7 @@ block content
                   -for(var j = 0; j < data.forumTree[i].children.length; j++)
                     -var cForum = data.forumTree[i]
                     -var buttonVSInfo = cForum.visibility? '已对用户可见' : '已对用户隐藏'
-                    -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户隐藏' : '已对无权限用户可见'
+                    -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户可见' : '已对无权限用户隐藏'
                     li.list-group-item
                       span.col-md-3 #{data.forumTree[i].children[j].displayName}
                       a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumVisibilitySwitch(event, "${data.forumTree[i].children[j].fid}")`) #{buttonVSInfo}

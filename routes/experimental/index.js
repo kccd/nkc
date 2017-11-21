@@ -9,9 +9,8 @@ let buffer = [];
 
 experimentalRouter
   .get('/', async (ctx, next) => {
-    const forumList = await dbFn.getAvailableForums(ctx);
-    ctx.data.forumList = forumList;
-    ctx.data.forumTree = forumList;
+    ctx.data.forumList = await dbFn.getAvailableForums(ctx);
+    ctx.data.forumTree = await dbFn.getForums(ctx);
     ctx.template = 'interface_experimental.pug';
     await next();
   })

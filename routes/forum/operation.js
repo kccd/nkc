@@ -17,9 +17,9 @@ operationRouter
       await form.update(obj);
     } else if (switchStatusOfCert !== undefined) {
       if(form.isVisibleForNCC === switchStatusOfCert && switchStatusOfCert)
-        ctx.throw(400, '该板块在您操作之前已经被设置成无权限不可见了，请刷新');
-      if(form.isVisibleForNCC === switchStatusOfCert && !switchStatusOfCert)
         ctx.throw(400, '该板块在您操作之前已经被设置成无权限可见了，请刷新');
+      if(form.isVisibleForNCC === switchStatusOfCert && !switchStatusOfCert)
+        ctx.throw(400, '该板块在您操作之前已经被设置成无权限不可见了，请刷新');
       const obj = {isVisibleForNCC: false};
       if(switchStatusOfCert) obj.isVisibleForNCC = true;
       await form.update(obj);

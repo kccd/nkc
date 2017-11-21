@@ -23,16 +23,23 @@ otherRouter
     const {user} = data;
     const {content} = ctx.query;
     data.content = content || 'all';
+
+    let t = Date.now();
+
     const visibleFid = await ctx.getVisibleFid();
-    let threads = await db.ThreadModel.find({
+    let tidArr = await db.ThreadModel.find({
       disabled: false,
       digest: true,
       fid: {$in: visibleFid, $ne: '97', $ne: 'recycle'}
+    },{
+      _id: 0,
+      tid: 1
     }).sort({toc: -1});
     let number = 0;
     const targetThreads = [];
     const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
-    for (let thread of threads) {
+    for (let tid of tidArr) {
+      const thread = await db.ThreadModel.findOnly({tid: tid.tid});
       const targetThread = await thread.extend();
       for (let r of targetThread.oc.resources) {
         if(imgArr.includes(r.ext)){
@@ -52,15 +59,27 @@ otherRouter
       targetThreads.splice(index, 1);
     }
     data.newestDigestThreads = temp;
+
+    let t1 = Date.now();
+
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
     latestThreads = await Promise.all(latestThreads.map(thread => thread.extend()));
     data.latestThreads = latestThreads;
+
+    let t2 = Date.now();
+
     data.activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
     data.indexForumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
     data.ads = (await systemSetting.extend()).ads;
-    data.userThreads = await data.user.getUsersThreads();
+
+    let t3 = Date.now();
+    if(data.user) data.userThreads = await data.user.getUsersThreads();
+
+    let t4 = Date.now();
+    console.log(`随机加精帖子6： ${t1-t}ms, 最新帖子20： ${t2-t1}ms, 活跃用户、板块列表、ads： ${t3-t2}ms, 加载用户发过的帖子： ${t4-t3}ms`)
+
     ctx.template = 'interface_home.pug';
     await next();
   })
