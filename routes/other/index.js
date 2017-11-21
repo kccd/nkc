@@ -11,17 +11,18 @@ const editorRouter = require('./editor');
 const avatar = require('./avatar');
 const avatarSmall = require('./avatar_small');
 const siteSpecific = require('./site_specific');
-// 用于测试的路由----------------------
-const testRouter = require('./test');
 const defaultRouter = require('./default');
-
+const settings = require('../../settings');
+const {home} = settings;
+const nkcModules = require('../../nkcModules');
+const dbFn = nkcModules.dbFunction;
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
     const {user} = data;
     const {content} = ctx.query;
-    data.content = content || 'add';
+    data.content = content || 'all';
     const visibleFid = await ctx.getVisibleFid();
     let threads = await db.ThreadModel.find({
       disabled: false,
@@ -51,7 +52,7 @@ otherRouter
       targetThreads.splice(index, 1);
     }
     data.newestDigestThreads = temp;
-    let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1});
+    let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
     latestThreads = await Promise.all(latestThreads.map(async thread => {
       const targetThread = await thread.extend();
       targetThread.ocUser = targetThread.oc.user;
@@ -59,8 +60,13 @@ otherRouter
       return targetThread;
     }));
     data.latestThreads = latestThreads;
-    const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(12);
-    ctx.template = 'test.pug';
+    data.activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    data.indexForumList = await dbFn.getAvailableForums(ctx);
+    data.fTarget = 'home';
+    const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
+    data.ads = (await systemSetting.extend()).ads;
+    data.usersThreads = await data.user.getUsersThreads();
+    ctx.template = 'interface_home.pug';
     await next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())
@@ -70,7 +76,6 @@ otherRouter
   .use('exam', examRouter.routes(), examRouter.allowedMethods())
   .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
-  .use('test', testRouter.routes(), testRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('avatar', avatar.routes(), avatar.allowedMethods())
   .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
