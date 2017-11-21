@@ -42,10 +42,13 @@ let personalForumsSchema = new Schema({
   }
 });
 
-personalForumsSchema.methods.extendModerator = function() {
-  const {collection} = mongoose.connection.db;
-  this.moderators = collection('users').find({uid: {$in: this.moderators}})
+personalForumsSchema.methods.extendModerator = async function() {
+  this.set(
+    'moderators',
+    await mongoose.connection.db.collection('users')
+      .find({uid: {$in: this.moderators}}),
+    {strict: true}
+  );
 };
-
 
 module.exports = mongoose.model('personalForums', personalForumsSchema, 'personalForums');

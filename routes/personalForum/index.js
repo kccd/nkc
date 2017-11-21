@@ -2,24 +2,26 @@ const Router = require('koa-router');
 const router = new Router();
 
 router
-  .get('/:uid', async () => {
-    const {data, params, db, query, getVisibleFid, settings, generateMatchBase} = ctx;
+  .get('/:uid', async (ctx, next) => {
+    const {data, params, db, query, settings, generateMatchBase} = ctx;
     const mongoose = settings.database;
     const perpage = settings.paging.perpage;
     const {uid} = params;
-    const {PersonalForumModel, UserModel, UsersSubscribeModel} = db;
-    const personalForum = PersonalForumModel.findOnly({uid});
+    const {PersonalForumModel, UserModel, UsersSubscribeModel, SettingModel} = db;
+    const personalForum = await PersonalForumModel.findOnly({uid});
     await personalForum.extendModerator();
     data.forum = personalForum;
-    const {sortby, digest, tab, page = 0} = query;
+    const setting = await SettingModel.findOnly({uid: 'system'});
+    data.popPersonalForums = setting.popPersonalForums;
+    const {sortby, digest, tab = 'all', page = 0} = query;
     const matchBase = generateMatchBase();
     const $sort = {};
     if(sortby)
       $sort.toc = 1;
     else
       $sort.tlm = 1;
-    const targetUser = await UserModel.findOnly({uid});
-    const visibleFid = await getVisibleFid();
+    data.targetUser = await UserModel.findOnly({uid});
+    const visibleFid = await ctx.getVisibleFid();
     const $groupWithCount = {
       _id: null,
       threads: {$push: '$$root'},
@@ -214,6 +216,7 @@ router
       ])
     }
     else if(tab === 'all') {
+      const base = matchBase.toJS();
       data.threads = await mongoose.connection.db.collection('usersBehavior').aggregate([
         {$match: {
           uid,
@@ -264,6 +267,11 @@ router
         {$replaceRoot: {
           newRoot: '$thread'
         }}
-      ])
+      ]).toArray()
     }
+    ctx.template = 'interface_personal_forum.pug';
+    ctx.data.userThreads = await ctx.data.user.getUsersThreads();
+    await next()
   });
+
+module.exports = router;

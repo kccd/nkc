@@ -34,7 +34,7 @@ module.exports = async (ctx, next) => {
         message: err.message
       };
     else
-      ctx.body = err.toString().replace(/\|/g, '<br />')
+      ctx.body = String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')
   }
   finally {
     ctx.status = ctx.response.status;

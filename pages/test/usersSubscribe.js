@@ -44,9 +44,15 @@ return db.query(`
   let sub = async () =>{
     for(let i in res) {
       console.log(i);
-      let str = await db.collection('users').document(res[i]._key);
-      if(str.focus_forums) {
-        res[i].subscribeForums = str.focus_forums.split(',');
+      let str;
+      try {
+        str = await db.collection('users').document(res[i]._key);
+        if(str.focus_forums) {
+          res[i].subscribeForums = str.focus_forums.split(',');
+        }
+      } catch(e) {
+        console.log(res[i]._key);
+        res.splice(i, 1)
       }
     }
     return res;
