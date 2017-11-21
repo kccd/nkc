@@ -37,9 +37,9 @@ otherRouter
       for (let r of targetThread.oc.resources) {
         if(imgArr.includes(r.ext)){
           number++;
-          targetThread.ocUser = targetThread.oc.user;
-          targetThread.src = targetThread.oc.resources[0].rid;
+          targetThread.src = r.rid;
           targetThreads.push(targetThread);
+          break;
         }
       }
       if(number >= 200) break;
@@ -53,12 +53,7 @@ otherRouter
     }
     data.newestDigestThreads = temp;
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
-    latestThreads = await Promise.all(latestThreads.map(async thread => {
-      const targetThread = await thread.extend();
-      targetThread.ocUser = targetThread.oc.user;
-      targetThread.lmUser = targetThread.lm.user;
-      return targetThread;
-    }));
+    latestThreads = await Promise.all(latestThreads.map(thread => thread.extend()));
     data.latestThreads = latestThreads;
     data.activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
     data.indexForumList = await dbFn.getAvailableForums(ctx);
