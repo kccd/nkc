@@ -1,5 +1,4 @@
 if thread
-  - console.log(thread)
   - var url = '/t/' + thread._key
   - var ocuser = thread.ocuser||{}
   - var lmuser = thread.lmuser||{}
@@ -13,7 +12,7 @@ if thread
   -var topped = thread.topped
   -var belong_forum = null; var pf=null
   -if(data.forum&&data.forum.type!='forum'&&data.forumlist)
-  -data.forumlist.map(group=>{group.forumgroup.map(f=>{if(f._key==thread.fid){belong_forum=f;pf=group.parentforum;}})})
+  -data.forumlist.map(group=>{group.children.map(f=>{if(f._key==thread.fid){belong_forum=f;pf=group.parentforum;}})})
   -var forumcolor = (belong_forum?belong_forum.color:null)||(pf?pf.color:null)||'#aaa'
 
   -if(data.forumlistkv)

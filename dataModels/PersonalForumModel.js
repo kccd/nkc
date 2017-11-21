@@ -47,7 +47,7 @@ personalForumsSchema.methods.extendModerator = async function() {
     'moderators',
     await mongoose.connection.db.collection('users')
       .find({uid: {$in: this.moderators}}),
-    {strict: true}
+    {strict: false}
   );
 };
 
