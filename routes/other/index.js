@@ -16,6 +16,8 @@ const settings = require('../../settings');
 const {home} = settings;
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
+const pfAvatar = require('./pfAvatar');
+const pfBanner = require('./pfBanner');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
@@ -92,5 +94,7 @@ otherRouter
   .use('avatar', avatar.routes(), avatar.allowedMethods())
   .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
   .use('site_specific', siteSpecific.routes(), siteSpecific.allowedMethods())
+  .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
+  .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

@@ -36,11 +36,11 @@ block content
                   div(style='width: 100%;')
                     .displayShit
                       div
-                        img.pfBanner(style='width: 100%;' src='/pfb/#{data.forum.fid}')
+                        img.pfBanner(style='width: 100%;' src=`/pfb/${data.forum.uid}`)
                       div(style='position: relative;')
                         div(style='width: 19%; margin-top: -14%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
                           div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
-                            img(src='/pfa/#{forum.fid}' width='100%' style='border-radius: 5%;')
+                            img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%;')
                         div(style='display: inline-block;')
                           div
                             div(style='display: inline-block;')
@@ -83,15 +83,15 @@ block content
                       div(style='position: relative;')
                         a(href='javascript:;' onclick='uploadForumBanner();' style='display: block; position: relative;')
                           div(style='background-image: url(/default/banner_setting.jpg); background-position: center; background-size: contain; position: relative; width: 100%;')
-                            img.pfBanner(style='width: 100%; opacity: 0.2;' src='/pfb/#{data.forum.fid}')
-                            input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange="bannerOnChange(#{data.forum.fid})")
+                            img.pfBanner(style='width: 100%; opacity: 0.2;' src=`/pfb/${data.forum.uid}`)
+                            input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`bannerOnChange(${data.forum.uid})`)
                       div(style='z-index: 1; position: relative;')
                         div(style='width: 19%; margin-top: -10%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
                           div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
                             a(href='javascript:;' onclick='uploadForumAvatar();')
                               div(style='background-image: url(/default/icon_setting.jpg); background-position: center; background-size: contain; border-radius: 5%;')
-                                img(src='/pfa/#{forum.fid}' width='100%' style='border-radius: 5%; opacity: 0.2;')
-                                input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange="avatarOnChange(#{data.forum.fid})")
+                                img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%; opacity: 0.2;')
+                                input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`avatarOnChange(${data.forum.uid})`)
                         div(style='display: inline-block;')
                           div
                             div(style='display: inline-block;')
@@ -108,7 +108,7 @@ block content
                             div
                               a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
                             div
-                              a.btn.btn-default(href='javascript:;' onclick='submitConfig("#{data.forum.fid}")') 保存
+                              a.btn.btn-default(href='javascript:;' onclick=`submitConfig("${data.forum.uid}")`) 保存
                         div
                           textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
 
@@ -118,8 +118,8 @@ block content
                       else
                         a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(jalert).catch(jwarning)`) &nbsp;封禁此人&nbsp;
                     if data.ensurePermission('PATCH', '/t/x/ad')
-                      -var isPopular = data.popPersonalForums.indexOf(forum.fid) > -1
-                      a#ppfBtn(href='javascript:;' onclick="popPFSwitch('#{data.forum.fid}')") #{isPopular ? '取消热门' : '推至热门'}
+                      -var isPopular = data.popPersonalForums.indexOf(forum.uid) > -1
+                      a#ppfBtn(href='javascript:;' onclick=`popPFSwitch('${data.forum.uid}')`) #{isPopular ? '取消热门' : '推至热门'}
 
         include interface_easy_post
 
@@ -137,7 +137,7 @@ block content
           li(class='#{data.tab == "subscribe" ? "active" : ""}')
             a(href='?&tab=subscribe') 关注
           li
-            a(href='/activities/#{data.forum.fid}') 动态
+            a(href=`/activities/${data.forum.uid}`) 动态
         .panel
           .row
             .col-xs-12

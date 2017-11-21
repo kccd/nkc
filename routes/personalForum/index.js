@@ -9,8 +9,7 @@ router
     const {uid} = params;
     const {PersonalForumModel, UserModel, UsersSubscribeModel, SettingModel} = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
-    await personalForum.extendModerator();
-    data.forum = personalForum;
+    data.forum = await personalForum.extendModerator();
     const setting = await SettingModel.findOnly({uid: 'system'});
     data.popPersonalForums = setting.popPersonalForums;
     const {sortby, digest, tab = 'all', page = 0} = query;
@@ -218,12 +217,21 @@ router
     else if(tab === 'all') {
       const base = matchBase.toJS();
       data.threads = await mongoose.connection.db.collection('usersBehavior').aggregate([
+        {$sort: {
+          timeStamp: -1
+        }},
         {$match: {
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-          fid: {$in: visibleFid}
+          fid: {$in: visibleFid},
         }},
-        {$group: {_id: '$tid'}},
+        {$skip: page * perpage},
+        {$limit: perpage},
+        // {$group: {
+        //   _id: '$tid',
+        //   lastPost: {$first: '$$ROOT'}
+        // }},
+        // {$replaceRoot: {newRoot: '$lastPost'}},
         {$lookup: {
           from: 'threads',
           localField: 'tid',
@@ -248,11 +256,6 @@ router
         // {$match: {
         //   'thread.lm.disabled': base.disabled
         // }},
-        {$sort: {
-          timeStamp: -1
-        }},
-        {$skip: page * perpage},
-        {$limit: perpage},
         {$lookup: {
           from: 'users',
           localField: 'thread.oc.uid',
@@ -275,7 +278,7 @@ router
     ctx.template = 'interface_personal_forum.pug';
     ctx.data.userThreads = await ctx.data.user.getUsersThreads();
     ctx.data.forumlist = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
-    console.log(ctx.data.forumlist)
+    console.log(visibleFid);
     await next()
   });
 

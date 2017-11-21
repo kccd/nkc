@@ -46,6 +46,18 @@ const certificates ={
         [name]: '最近帖子',
         [GET]: true
       },
+      pfa: {
+        [name]: '个人版头像',
+        [parameter]: {
+          [GET]: true
+        }
+      },
+      pfb: {
+        [name]: '个人版banner',
+        [parameter]: {
+          [GET]: true
+        }
+      },
       activities: {
         [name]: '个人动态',
         [parameter]: {
