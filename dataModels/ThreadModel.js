@@ -30,7 +30,8 @@ const threadSchema = new Schema({
   },
   digest: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   digestInMid: {
     type: Boolean,
@@ -38,7 +39,8 @@ const threadSchema = new Schema({
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   esi: {
     type: Boolean,
@@ -46,7 +48,8 @@ const threadSchema = new Schema({
   },
   fid: {
     type: String,
-    required: true
+    required: true,
+    index: 1
   },
   hasFile: {
     type: Boolean,
@@ -54,7 +57,8 @@ const threadSchema = new Schema({
   },
   hasImage: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   hideInMid: {
     type: Boolean,
@@ -78,10 +82,12 @@ const threadSchema = new Schema({
   },
   tlm: {
     type: Date,
+    index: 1
   },
   toc: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: 1
   },
   toMid: {
     type: String,
@@ -97,7 +103,8 @@ const threadSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true
+    required: true,
+    index: 1
   }
 });
 threadSchema.pre('save', function (next) {

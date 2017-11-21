@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.7');
+db = require('arangojs')('http://192.168.11.8');
 
 db.useDatabase('rescue');
 
@@ -18,7 +18,10 @@ const threadSchema = new Schema({
     type: String,
     default: ''
   },
-  cid: String,
+  cid: {
+    type: String,
+    default:''
+  },
   count: {
     type: Number,
     default: 0
@@ -33,7 +36,8 @@ const threadSchema = new Schema({
   },
   digest: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   digestInMid: {
     type: Boolean,
@@ -41,7 +45,8 @@ const threadSchema = new Schema({
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   esi: {
     type: Boolean,
@@ -49,7 +54,8 @@ const threadSchema = new Schema({
   },
   fid: {
     type: String,
-    required: true
+    required: true,
+    index: 1
   },
   hasFile: {
     type: Boolean,
@@ -57,7 +63,8 @@ const threadSchema = new Schema({
   },
   hasImage: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   hideInMid: {
     type: Boolean,
@@ -81,10 +88,12 @@ const threadSchema = new Schema({
   },
   tlm: {
     type: Date,
+    index: 1
   },
   toc: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: 1
   },
   toMid: {
     type: String,
@@ -100,7 +109,8 @@ const threadSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true
+    required: true,
+    index: 1
   }
 });
 threadSchema.pre('save', function (next) {
