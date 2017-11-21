@@ -14,7 +14,10 @@ module.exports = async (ctx, next) => {
         break;
       case 'html':
         ctx.type = 'html';
+        let t = Date.now();
         ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
+        console.log(`================`)
+        console.log(Date.now() - t);
         break;
       default:
         ctx.throw(406, 'type not accectable')

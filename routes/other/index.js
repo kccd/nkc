@@ -5,6 +5,7 @@ const registerRouter = require('./register');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
 const forgotPasswordRouter = require('./forgotPassword');
+const latestRouter = require('./latest');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
@@ -92,5 +93,6 @@ otherRouter
   .use('avatar', avatar.routes(), avatar.allowedMethods())
   .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
   .use('site_specific', siteSpecific.routes(), siteSpecific.allowedMethods())
+  .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

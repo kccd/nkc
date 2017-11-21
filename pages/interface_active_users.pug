@@ -2,8 +2,8 @@
   div
     for user in data.activeUsers
       div(style='padding: 5px; width: 90px; display: inline-block;position: relative;text-align: center;')
-        a(href='/m/#{user.uid}')
-          img(src='/avatar/#{user.uid}' style='width:80px;height:80px;border-radius:6px;')
+        a(href=`/m/${user.uid}`)
+          img(src=`/avatar/${user.uid}` style='width:80px;height:80px;border-radius:6px;')
         div
           a(href='/activities/'+ user.uid style='display: inline-block;overflow: hidden;height: 1.2em;') #{user.username}
         span(style='color: #d6571c; margin-right: 0; display: inline-block;overflow: hidden;') 帖:#{user.lWThreadCount} 复:#{user.lWPostCount}
