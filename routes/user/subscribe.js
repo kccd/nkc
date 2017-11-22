@@ -18,11 +18,10 @@ subscribeRouter
     }
     else targetUid = targetUserSubscribe.subscribeUsers;
     const paging = apiFn.paging(page, targetUid.length);
-    targetUid = targetUid.slice(paging.start, paging.perpage);
+    targetUid = targetUid.slice(paging.start, paging.start + paging.perpage);
     let targetUsers = await Promise.all(targetUid.map(async uid => await db.UserModel.findOnly({uid})));
     data.targetUser = targetUser;
     data.targetUsers = targetUsers;
-    console.log(data.targetUsers);
     data.paging = paging;
     ctx.template = 'interface_subscribe.pug';
     await next();

@@ -63,12 +63,12 @@ block content
         if user
           include interface_thread_userpatch.pug
         -var addQuestions = data.ensurePermission('GET', '/q');
-        -var examinated = true//data.ensurePermission('GET', '/')
+        -var examinated = data.certificates.contentClasses.includes('professional');
         if !examinated || addQuestions
           .nkcpanel
             if !examinated
               :markdown
-                普通会员不能进入特种技术板块，请点击这里[参加考试](/register?getcode=true)，升级高级会员
+                普通会员不能进入特种技术板块，请点击这里[参加考试](/exam)，升级高级会员
             if addQuestions
               :markdown
                 科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！

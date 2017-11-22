@@ -208,7 +208,7 @@ var parentsOnChange = function(that) {
         var childNodes = children.childNodes;
         console.log(childNodes);
         //remove all childNodes except the first one '请选择一个专业'
-        for(; childNodes.length > 1;) { //node.childNodes is a live collection.
+        for(; childNodes.length > 2;) { //node.childNodes is a live collection.
           //keep the first two & last one elements
           //console.log('del -> ' + childNodes.length +
           children.removeChild(childNodes[childNodes.length - 1])
@@ -223,6 +223,7 @@ var parentsOnChange = function(that) {
         }
         //把选项 ‘请选择一个专业’ 提到最前面
         children.insertBefore(children.lastChild, children[0]);
+        console.log(children);
       }
     }
   }
