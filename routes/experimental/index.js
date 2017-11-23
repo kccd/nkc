@@ -108,11 +108,15 @@ experimentalRouter
   .post('/updateAllUsers', async (ctx, next) => {
     const {data, db} = ctx;
     const t = Date.now();
-    const usersCount = await db.UserModel.count();
-    for (let i = 0;1; i++) {
-      if(i >= usersCount) break;
-      const user = await db.UserModel.findOne().skip(i);
-      await user.updateUserMessage();
+    const userArr = await db.UserModel.find({}, {_id: 0, uid: 1});
+    console.log(`查找所有用户uid: ${Date.now()-t}ms`);
+    let i = 0;
+    for (let user of userArr) {
+      i++;
+      const t3 = Date.now();
+      const targetUser = await db.UserModel.findOne({uid: user.uid});
+      await targetUser.updateUserMessage();
+      console.log(`总数: ${userArr.length} - 现在: ${i} - uid: ${user.uid} - time: ${Date.now() - t3}ms`);
     }
     console.log(`总耗时: ${Date.now() - t}ms`);
     data.message = '更新所有用户数据成功';

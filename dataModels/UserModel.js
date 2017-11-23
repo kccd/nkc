@@ -116,10 +116,10 @@ userSchema.methods.extend = async function() {
   return user;
 };
 
-userSchema.methods.updateAllMessage = async function() {
+userSchema.methods.updateUserMessage = async function() {
   const PostModel = require('./PostModel');
   const ThreadModel = require('./ThreadModel');
-  const UserSubscribeModel = require('./UserSubscribeModel');
+  const UsersSubscribeModel = require('./UsersSubscribeModel');
   const posts = await PostModel.find({uid: this.uid}, {_id: 0, disabled: 1, recUsers: 1});
   const postCount = posts.length;
   let disabledPostCount = 0;
@@ -142,7 +142,7 @@ userSchema.methods.updateAllMessage = async function() {
     if(thread.digest) digestThreadsCount++;
     if(thread.topped) toppedThreadsCount++;
   }
-  const userSubscribe = await UserSubscribeModel.findOnly({uid: this.uid});
+  const userSubscribe = await UsersSubscribeModel.findOnly({uid: this.uid});
   const subs = userSubscribe.subscribers.length;
   await this.update({
     postCount,

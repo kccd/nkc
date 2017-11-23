@@ -10,7 +10,7 @@ subscribeRouter
     page = page || 0;
     const {uid} = ctx.params;
     const targetUser = await db.UserModel.findOnly({uid});
-    const targetUserSubscribe = await db.UserSubscribeModel.findOnly({uid});
+    const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
     let targetUid = [];
     if(fans) {
       targetUid = targetUserSubscribe.subscribers;
@@ -33,8 +33,8 @@ subscribeRouter
     let {db} = ctx;
     let {user} = ctx.data;
     if(user.uid === uid) ctx.throw(400, '关注自己干嘛？');
-    let subscribersOfDB = await db.UserSubscribeModel.findOneAndUpdate({uid: uid}, {$addToSet: {subscribers: user.uid}});
-    let subscribeUsersOfDB = await db.UserSubscribeModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
+    let subscribersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: uid}, {$addToSet: {subscribers: user.uid}});
+    let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
     if(subscribersOfDB.subscribers.indexOf(user.uid) > -1 && subscribeUsersOfDB.subscribeUsers.indexOf(uid) > -1) ctx.throw(400, '您之前已经关注过该用户了，没有必要重新关注');
     ctx.data.message = `关注 uid:${uid} 成功`;
     await next();
@@ -45,8 +45,8 @@ subscribeRouter
     if(!uid) ctx.throw(400, '参数不正确');
     let {db} = ctx;
     let {user} = ctx.data;
-    let subscribersOfDB = await db.UserSubscribeModel.findOneAndUpdate({uid: uid}, {$pull: {subscribers: user.uid}});
-    let subscribeUsersOfDB = await db.UserSubscribeModel.findOneAndUpdate({uid: user.uid}, {$pull: {subscribeUsers: uid}});
+    let subscribersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: uid}, {$pull: {subscribers: user.uid}});
+    let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$pull: {subscribeUsers: uid}});
     if(subscribersOfDB.subscribers.indexOf(user.uid) === -1 && subscribeUsersOfDB.subscribers.indexOf(uid) === -1) ctx.throw(400, '您之前没有关注过该用户，操作无效');
     ctx.data.message = `取消关注 uid:${uid} 成功`;
     await next();

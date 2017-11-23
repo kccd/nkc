@@ -13,7 +13,7 @@ meRouter
     }
     ctx.data.replyTarget = 'me';
     ctx.data.personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    let subscribe = await db.UserSubscribeModel.findOnly({uid: user.uid});
+    let subscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
     let subscribeForums = '';
     if(subscribe.subscribeForums) {
       subscribeForums = subscribe.subscribeForums.join(',');
@@ -60,7 +60,7 @@ meRouter
       ctx.throw(400, '提交的内容字数超出限制，请检查');
     }
     await db.UserModel.update({uid: user.uid}, {$set: settingObj});
-    await db.UserSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: subscribeForums}});
+    await db.UsersSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: subscribeForums}});
     await next();
   })
   .post('/mobile', async (ctx, next) => {
