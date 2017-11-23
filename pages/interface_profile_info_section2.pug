@@ -3,7 +3,7 @@
     a(href=`/u/${user.uid}/collections/unclassified`) 收藏夹
     a(href=`/sms/message/${user.uid}`) 发私信
 
-    if data.ensurePermission('DELETE', '/u/x')
+    if data.userLevel >= 4
       a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}', 'delete',{}).then(jalert).catch(jwarning)`) 一键封禁此人
       a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}', 'put',{}).then(jalert).catch(jwarning)`) 解除封禁
 

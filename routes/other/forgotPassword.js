@@ -36,6 +36,8 @@ forgotPasswordRouter
   const {db} = ctx;
   const {password, mcode, mobile} = ctx.body;
   if(!password) ctx.throw(400, '密码不能为空！');
+  if(password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
+  if(!apiFn.checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
   if(!mobile) ctx.throw(400, '电话号码不能为空！');
   if(!mcode) ctx.throw(400, '手机验证码不能为空！');
   const newMobile = '0086' + mobile;
@@ -94,6 +96,8 @@ forgotPasswordRouter
   if(!email) ctx.throw(400, '邮箱地址不能为空！');
   if(!token) ctx.throw(400, 'token不能为空！');
   if(!password) ctx.throw(400, '新密码不能为空！');
+  if(password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
+  if(!apiFn.checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
   const time = Date.now() - settings.sendMessage.emailCodeTime;
   const emailCode = await db.EmailCodeModel.findOne({used: false, email: email, token: token, toc: {$gt: time}});
   if(!emailCode) ctx.throw(400, '邮件已失效，请尝试重新发送邮件');

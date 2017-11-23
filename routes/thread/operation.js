@@ -13,7 +13,7 @@ operationRouter
     const thread = await db.ThreadModel.findOnly({tid});
     const visibleFid = await ctx.getVisibleFid();
     if(!thread.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
-    if(thread.disabled && !data.ensurePermission('GET', '/e')) ctx.throw(401, '您没有权限收藏已被屏蔽的帖子');
+    if(thread.disabled && data.userLevel < 4) ctx.throw(401, '您没有权限收藏已被屏蔽的帖子');
     const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
     if(collection) ctx.throw(400, '该贴子已经存在于您的收藏中，没有必要重复收藏');
     const newCollection = new db.CollectionModel({

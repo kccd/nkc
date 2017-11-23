@@ -29,18 +29,19 @@ const levelOrder = {
   banned: -1,
   visitor: 0,
   default: 1,
-  email: 2,
-  mobile: 2,
-  examinated: 3,
-  qc: 4,
-  scholar: 5,
-  moderator: 6,
-  senior_moderator: 7,
-  editor: 8,
-  dev: 9
+  email: 1,
+  mobile: 1,
+  examinated: 2,
+  qc: 1,
+  scholar: 3,
+  moderator: 4,
+  senior_moderator: 5,
+  editor: 6,
+  dev: 7
 };
 
 function excuteLevel(user) {
+  if(!user) return 0;
   const {certs} = user;
   let level = -1;
   for(const cert of certs) {
@@ -530,7 +531,7 @@ const certificates ={
   },
   editor: {
     displayName: '编辑',
-    inheritFrom: ['senior_moderator', 'qc'],
+    inheritFrom: ['senior_moderator'],
     contentClasses: {
       administractive: true
     },

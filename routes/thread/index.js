@@ -25,7 +25,7 @@ threadRouter
     const forum = await ForumModel.findOnly({fid: thread.fid});
     const {mid, toMid} = thread;
     if(!thread.ensurePermission(visibleFid)) ctx.throw('401', '权限不足');
-    if(thread.disabled && !data.ensurePermission('GET', '/e')) ctx.throw('401', '您没有权限查看已被屏蔽的帖子');
+    if(thread.disabled && data.userLevel < 4) ctx.throw('401', '您没有权限查看已被屏蔽的帖子');
     let posts = await thread.getPostByQuery(query);
     posts.map(post => {
       post.user = post.user.toObject();

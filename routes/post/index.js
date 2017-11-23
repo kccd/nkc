@@ -19,7 +19,7 @@ postRouter
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     const targetUser = await targetPost.getUser();
-    if(data.user.uid !== targetPost.uid && !data.ensurePermission('GET', '/e'))
+    if(data.user.uid !== targetPost.uid && data.userLevel < 4)
       ctx.throw(401, '您没有权限修改别人的回复');
     const obj = {
       uidlm: data.user.uid,

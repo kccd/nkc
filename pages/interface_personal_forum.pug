@@ -21,8 +21,8 @@ block title
 
 block content
   -var isModerator = user? (forum.moderators.indexOf(user.uid) > -1) : false
-  -const isAdmin = data.ensurePermission('PATCH', 't/x/digest')
-  -const isNormalUser = data.ensurePermission('POST', 'f/x')
+  -const isAdmin = data.userLevel >= 4
+  -const isNormalUser = data.userLevel >= 1
   .container-fluid(style='max-width:1400px;')
     .row
       .col-md-9
@@ -117,7 +117,7 @@ block content
                         a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'put', {}).then(jalert).catch(jwarning)`) 解除封禁
                       else
                         a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(jalert).catch(jwarning)`) &nbsp;封禁此人&nbsp;
-                    if data.ensurePermission('PATCH', '/t/x/ad')
+                    if data.userLevel >= 6
                       -var isPopular = data.popPersonalForums.indexOf(forum.uid) > -1
                       a#ppfBtn(href='javascript:;' onclick=`popPFSwitch('${data.forum.uid}')`) #{isPopular ? '取消热门' : '推至热门'}
 
@@ -150,7 +150,7 @@ block content
                       button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
                   .form-group
                     button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
-                  if data.ensurePermission('PATCH', 't/x')
+                  if data.userLevel >= 5
                     .form-group
                       include forumlist_dropdown.pug
                       button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动

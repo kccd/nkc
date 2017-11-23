@@ -27,7 +27,6 @@ block content
           -var forums = data.indexForumList
             div#indexForumList
               include interface_forum_list
-
         .panel
           include interface_easy_post
 
@@ -38,7 +37,6 @@ block content
             .clearfix
           for thread in data.latestThreads
             include interface_index_singlethread
-
         .panel
           -var newestDigestThreads = data.newestDigestThreads
             include interface_digest_threads
@@ -55,16 +53,16 @@ block content
         //    include interface_pop_pfs
 
         div#bm
-
       .col-md-3.hidden-xs.hidden-sm
         .nkcpanel
           include forum_logo_wisdom
 
         -var user = data.user
         if user
+
           include interface_thread_userpatch.pug
-        -var addQuestions = data.ensurePermission('GET', '/q');
-        -var examinated = data.certificates.contentClasses.includes('professional');
+        -var addQuestions = data.user? data.user.certs.includes('qc'): false;
+        -var examinated = (data.userLevel >= 2)
         if !examinated || addQuestions
           .nkcpanel
             if !examinated
@@ -88,7 +86,6 @@ block content
           button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
           br
           button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
-
 
 
 block scripts

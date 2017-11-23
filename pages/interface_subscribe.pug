@@ -26,7 +26,7 @@ block content
           .media-body
             h4.media-heading
               a(href=`/m/${targetUser.uid}`) #{targetUser.username}
-            :markdown!= targetUser.description || '个人简介暂未填写'
+            div!= markdown_safe(targetUser.description || '个人简介暂未填写')
       .col-xs-12.col-md-12
         hr
       .col-xs-12.col-md-12 

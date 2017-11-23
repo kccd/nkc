@@ -94,10 +94,15 @@ postsSchema.pre('save' , function(next) {
 });
 
 let PostModel = mongoose.model('posts', postsSchema);
-
+let t = 0;
 (async function(){
+  t = Date.now();
   const pidArr = await PostModel.find({}, {_id: 0, pid: 1});
-  for (let pid of pidArr) {
-    
+  console.log(`加载所有pid: ${Date.now() - t}ms`);
+  for (let p of pidArr) {
+    const post = await PostModel.findOne({pid: p.pid});
+    if(post.c && post.c.indexOf('[quote=') === 0) {
+      console.log(post.c);
+    }
   }
 })();

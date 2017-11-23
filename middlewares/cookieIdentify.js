@@ -8,14 +8,16 @@ module.exports = async (ctx, next) => {
   } else {
     const {username, uid} = JSON.parse(decodeURI(userInfo));
     const user = await db.UserModel.findOne({uid});
-    user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
-    user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     if (user.username !== username) {
       ctx.cookies.set('userInfo', '');
       ctx.status = 401;
       ctx.error = new Error('缓存验证失败');
       ctx.redirect('/login')
     }
+    if(user.xsf > 0) user.certs.push('qc');
+    await user.update({tlv: Date.now()});
+    user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
+    user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     ctx.data.user = user;
     await next();
   }

@@ -63,7 +63,7 @@ block content
           .form-group.row
             .col-xs-7
               select#category.form-control()
-                if data.ensurePermission('GET', '/q')
+                if data.userLevel >= 6
                   //if user is administrative
                   each c in data.numberByCategory
                     option #{c.category||'null'}

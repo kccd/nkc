@@ -20,7 +20,7 @@
   //span #{thread.fid}
 
 -var threadtype = data.threadTypes?data.threadTypes.filter(k=>k.threadTypeId==thread.cid)[0]:null;
--var viewDisabled = data.ensurePermission('GET', '/e');
+-var viewDisabled = data.userLevel >= 4
 -if(!thread.disabled || viewDisabled)
   .ForumThreadItem
     .parent.clearfix(id='')

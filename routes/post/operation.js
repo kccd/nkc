@@ -73,7 +73,7 @@ operationRouter
     const visibleFid = await ctx.getVisibleFid();
     const targetPost = await db.PostModel.findOnly({pid});
     if(!(await targetPost.ensurePermission(visibleFid))) ctx.throw(401, '权限不足');
-    if(!data.ensurePermission('GET', '/e') && targetPost.disabled) ctx.throw(401, '权限不足');
+    if(data.userLevel < 3 && targetPost.disabled) ctx.throw(401, '权限不足');
     data.post = targetPost;
     data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});
     data.targetUser = await targetPost.getUser();
@@ -88,7 +88,7 @@ operationRouter
     const visibleFid = await ctx.getVisibleFid();
     const targetPost = await db.PostModel.findOnly({pid});
     if(!(await targetPost.ensurePermission(visibleFid))) ctx.throw(401, '权限不足');
-    if(!data.ensurePermission('GET', '/e')) ctx.throw(401, '权限不足');
+    if(data.userLevel < 4) ctx.throw(401, '权限不足');
     const obj = {disabled: false};
     if(disabled) obj.disabled = true;
     await targetPost.update(obj);

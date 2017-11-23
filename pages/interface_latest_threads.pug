@@ -75,12 +75,14 @@ block content
         if user
           include interface_thread_userpatch.pug
         //if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
-        if !data.ensurePermission('GET', '/e') || data.ensurePermission('GET', '/q')
+        -var addQuestions = data.user? data.user.certs.includes('qc'): false;
+        -var examinated = (data.userLevel >= 2)
+        if !examinated || addQuestions
           .nkcpanel
-            if !data.ensurePermission('GET', '/e')
+            if !examinated
               :markdown
-                普通会员不能进入特种技术板块，请点击这里[参加考试](/register?getcode=true)，升级高级会员
-            if data.ensurePermission('GET', '/q')
+                普通会员不能进入特种技术板块，请点击这里[参加考试](/exam)，升级高级会员
+            if addQuestions
               :markdown
                 科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！
 

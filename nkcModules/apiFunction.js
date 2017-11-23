@@ -109,5 +109,18 @@ fn.checkEmailFormat = (email) => {
   return email.search(path);
 };
 
+fn.checkPass = (s) => {
+  let ls = 0;
+  if(s.match(/([a-zA-Z])+/)){
+    ls++;
+  }
+  if(s.match(/([0-9])+/)){
+    ls++;
+  }
+  if(s.match(/[^a-zA-Z0-9]+/)){
+    ls++;
+  }
+  return (ls >= 2);
+};
 
 module.exports = fn;

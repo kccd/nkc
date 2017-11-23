@@ -1,9 +1,6 @@
-//do sth with the post variable here
--const {ensurePermission} = data
--const postTo = ensurePermission('POST', '/f/x')
--const addPostToCart = ensurePermission('POST', '/u/x/cart')
--const addCredit = ensurePermission('PATCH', '/p/x/credit')
--const disablePost = ensurePermission('PATCH', '/p/x')
+-const postTo = data.userLevel >= 1
+-const addCredit = data.userLevel >= 4
+-const disablePost = data.userLevel >= 4
 
   if (!post.disabled || disablePost)
     //horizontal line
@@ -43,16 +40,13 @@
               - if(postTo)
                 a(href=`javascript:quotePost('${post.pid}', '${data.paging.start+index}')`) 引用
 
-              - if(addPostToCart)
-                a(href=`javascript:cartPost('${post.pid}')`) 加入管理车
-
               - if(addCredit)
                 a(href=`javascript:addCredit('${post.pid}')`) 评学术分
 
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
                 a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
 
-              - if(post.tlm>post.toc && ensurePermission('GET', '/p/x/history'))
+              - if(post.tlm>post.toc && data.userLevel >= 3)
                 a(href=`/p/${post.pid}/history`) 历史
 
               if data.user

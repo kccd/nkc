@@ -28,7 +28,7 @@ block title
     }
 
 block content   
-  -var isModerator = data.ensurePermission('PATCH', '/t/x')
+  -var isModerator = data.userLevel >= 4
   -var forumIsParent = data.forum.type&&data.forum.type=='category'
   -var hasChildren = data.forum.type&&data.forum.type=='category'&&data.forums&&data.forums.length
   
@@ -156,7 +156,7 @@ block content
 
                     .form-inline(style='margin-top:10px')
 
-                      if data.ensurePermission('POST', '/u/*/collections')
+                      if data.userLevel >= 1
                         .form-group
                           button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
 
@@ -172,7 +172,7 @@ block content
                       .form-group
                         button#recyclebtn.btn.btn-xs.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
 
-                      if data.ensurePermission('PATCH', '/t/x')
+                      if data.userLevel >= 6
                         -var ffid = data.forum.fid
                         button(onclick=`renameForumCategory('${ffid}')`) 重命名分类
                         button(onclick=`addForumCategory('${ffid}')`) 增加分类

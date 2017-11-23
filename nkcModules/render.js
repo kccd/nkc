@@ -67,12 +67,6 @@ function testModifyTimeLimit(cs, ownership, toc){
   return Date.now() < toc.getTime() + emtl
 }
 
-let getUserDescription = (user) => {
-  return `${user.username}\n`+
-    `学术分 ${user.xsf||0}\n`+
-    `科创币 ${user.kcb||0}\n`+
-    `${getCertsInText(user)}`
-};
 let dateTimeString = (t) => {
   return moment(t).format('YYYY-MM-DD HH:mm')
 };
@@ -109,7 +103,6 @@ let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
     markdown: render.commonmark_render,
-    getUserDescription: getUserDescription,
     dateTimeString: dateTimeString,
     fromNow: fromNow,
     server: settings.server,
@@ -124,6 +117,7 @@ let pugRender = (template, data) => {
   options.data = data;
   options.filters = filters;
   options.pretty = true; // 保留换行
+  //options.self = true;
   return pug.renderFile(template, options);
 };
 module.exports = pugRender;

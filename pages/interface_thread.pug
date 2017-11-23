@@ -23,8 +23,7 @@ block title
   
 block content
   -var mainContainer1400 = true
-  -const {ensurePermission} = data
-  -const moveThread = ensurePermission('PATCH', '/t/x')
+  -const moveThread = data.userLevel >= 4
 
     div.container-fluid(style="max-width:1400px;")
       .row
@@ -76,25 +75,20 @@ block content
                 .ThreadTitleAuxillaryLink
                   a(href='#bottom') 本页底部
 
-                  if ensurePermission('POST', '/u/x/collections')
+                  if data.userLevel >= 1
                     a(href=`javascript:addColl('${thread.tid}')`) 收藏
 
-
-
-                  if ensurePermission('POST', '/u/x/cart')
-                    a(href=`javascript:cartThread('${data.thread.tid}')`) 帖入管理车
-
-                  if ensurePermission('PATCH', '/t/x/ad')
-                    -var isAd = data.ads.indexOf(thread.tid) > -1
+                  if data.userLevel >= 6
+                    -var isAd = data.userLevel >= 6
                     a#adBtn(href='javascript:;' onclick=`adSwitch('${thread.tid}')`) #{isAd ? '取消首页置顶' : '首页置顶'}
 
-                  if ensurePermission('PATCH', '/t/x/digest')
+                  if data.userLevel >= 4
                     if thread.digest
                       a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 撤销精华
                     else
                       a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
 
-                  if ensurePermission('PATCH', '/t/x/topped')
+                  if data.userLevel >= 4
                     if thread.topped
                       a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 撤销置顶
                     else
@@ -230,7 +224,7 @@ block content
               - for(var i =0; i < userCerts.length; i++)
                 - if(userCerts[i] === 'mobile')
                   - hasMobile = true;
-              if (ensurePermission('POST','/f/x') && hasMobile)
+              if (data.userLevel >= 1 && hasMobile)
                 //.form-group
                   //a.f12(href='/editor?target=#{data.replytarget}') 回复（去编辑器）
 
