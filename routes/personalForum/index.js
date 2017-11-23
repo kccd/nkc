@@ -13,7 +13,8 @@ router
       UsersSubscribeModel,
       SettingModel,
       UsersBehavior,
-      ThreadModel
+      ThreadModel,
+      PostModel,
     } = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
     data.forum = await personalForum.extendModerator();
@@ -45,47 +46,35 @@ router
       }
     };
     if(tab === 'reply') {
-      const $matchPost = matchBase.set('uid', uid);
-      let $matchThread = matchBase;
-      $matchThread = $matchThread.set('fid', {$in: visibleFid});
+      let $matchPost = matchBase
+        .set('uid', uid)
+        .set('fid', {$in: visibleFid});
       if(digest)
-        $matchThread = $matchThread.set('digest', true);
-      data.threads = await mongoose.connection.db.collection('posts').aggregate([
+        $matchPost = $matchPost.set('digest', true);
+      data.threads = await PostModel.aggregate([
+        {$sort: $sort},
         {$match: $matchPost.toJS()},
-        {$group: {
-          _id: '$tid',
-          posts: {$push: '$$root'}
-        }},
+        {$skip: page * perpage},
+        {$limit: perpage},
         {$lookup: {
           from: 'threads',
           localField: 'tid',
           foreignField: 'tid',
-          as: 't'
+          as: 'thread'
         }},
-        {$project: {t: {lastPost: '$posts[0]'}}},
-        {$replaceRoot: {newRoot: '$t'}},
-        {$match: $matchThread.toJS()},
-        {$sort},
+        {$unwind: '$thread'},
         {$lookup: {
           from: 'posts',
-          localField: 'oc',
+          localField: 'thread.oc',
           foreignField: 'pid',
-          as: 'oc'
+          as: 'thread.oc'
         }},
-        {$lookup: {
-          from: 'users',
-          localField: 'oc.uid',
-          foreignField: 'uid',
-          as: 'oc.user'
-        }},
-        {$lookup: {
-          from: 'users',
-          localField: 'oc',
-          foreignField: 'pid',
-          as: 'oc'
-        }},
-        {$group: $groupWithCount},
-        {$project: $returnCount}
+        {$unwind: '$thread.oc'}
+      ]);
+      const {length} = await PostModel.aggregate([
+        {$sort: $sort},
+        {$match: $matchPost.toJS()},
+        {$count: 'length'}
       ]);
     }
     else if(tab === 'own') {
