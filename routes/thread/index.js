@@ -13,20 +13,21 @@ threadRouter
     const {
       ThreadModel,
       PersonalForumModel,
-      PostModel,
       SettingModel,
       ForumModel
     } = db;
     const thread = await ThreadModel.findOnly({tid});
-    const visibleFid = await ctx.getVisibleFid();
-    const indexOfPostId = await thread.getIndexOfPostId();
+    if(!await thread.ensurePermission(ctx)) ctx.throw('401', '权限不足');
+    const q = {
+      tid: tid
+    };
+    if(!await thread.ensurePermissionOfModerators(ctx)) q.disabled = false;
+    const indexOfPostId = await db.PostModel.find(q, {pid: 1}).sort({toc: 1});
     const indexArr = indexOfPostId.map(p => p.pid);
     data.paging = apiFn.paging(page, indexOfPostId.length);
     const forum = await ForumModel.findOnly({fid: thread.fid});
     const {mid, toMid} = thread;
-    if(!thread.ensurePermission(visibleFid)) ctx.throw('401', '权限不足');
-    if(thread.disabled && data.userLevel < 4) ctx.throw('401', '您没有权限查看已被屏蔽的帖子');
-    let posts = await thread.getPostByQuery(query);
+    let posts = await thread.getPostByQuery(query, q);
     posts.map(post => {
       post.user = post.user.toObject();
       post.user.navbarDesc = ctx.getUserDescription(post.user);

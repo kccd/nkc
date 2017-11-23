@@ -127,13 +127,33 @@ threadSchema.methods.extend = async function (){
   return obj;
 };
 
-threadSchema.methods.ensurePermission = function (visibleFid) {
-  return visibleFid.includes(this.fid);
+// 1、判断能否进入所在板块
+// 2、判断所在帖子是否被禁
+// 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限
+threadSchema.methods.ensurePermission = async function (ctx) {
+  const {db, data} = ctx;
+  const visibleFid = await ctx.getVisibleFid();
+  if(!visibleFid.includes(this.fid)) return false;
+  if(this.disabled) {
+    return await this.ensurePermissionOfModerators(ctx);
+  } else {
+    return true;
+  }
 };
 
-threadSchema.methods.getPostByQuery = async function (query) {
+// 判断用户是否是该板块的版主或拥有比版主更高的权限
+threadSchema.methods.ensurePermissionOfModerators = async function(ctx) {
+  if(ctx.data.userLevel > 4) {
+    return true;
+  } else {
+    const forum = await ctx.db.ForumModel.findOnly({fid: this.fid});
+    return forum.moderators.includes(ctx.data.user.uid);
+  }
+};
+
+threadSchema.methods.getPostByQuery = async function (query, macth) {
   const PostModel = require('./PostModel');
-  const {$match, $sort, $skip, $limit} = getQueryObj(query, {tid: this.tid});
+  const {$match, $sort, $skip, $limit} = getQueryObj(query, macth);
   let posts = await PostModel.find($match).sort({toc: 1}).skip($skip).limit($limit);
   posts = await Promise.all(posts.map(p => p.extend()));
   return posts;
@@ -188,9 +208,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   return await this.update(updateObj);
 };
 
-threadSchema.methods.getIndexOfPostId = async function () {
-  const PostModel = require('./PostModel');
-  return await PostModel.find({tid: this.tid}, {pid: 1}).sort({toc: 1});
-};
+
 
 module.exports = mongoose.model('threads', threadSchema);

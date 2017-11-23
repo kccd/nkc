@@ -5,6 +5,7 @@ const dbFn = nkcModules.dbFunction;
 editorRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
+    const {user} = data;
     const {target = '', forumID, content} = ctx.query;
     ctx.template = 'interface_editor.pug';
     data.replytarget = target;
@@ -13,6 +14,8 @@ editorRouter
     if(target.indexOf('post/') === 0) {
       const pid = target.slice(5);
       const targetPost = await db.PostModel.findOnly({pid});
+      const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
+      if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
       data.original_post = targetPost;
       data.targetUser = await targetPost.getUser();
       return await next();

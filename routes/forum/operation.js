@@ -3,10 +3,11 @@ const operationRouter = new Router();
 
 operationRouter
   .patch('/', async (ctx, next) => {
-    const {db} = ctx;
+    const {db, data} = ctx;
     const {switchStatus, switchStatusOfCert} = ctx.body;
     const {fid} = ctx.params;
     const form = await db.ForumModel.findOnly({fid});
+    if(data.userLevel < 6) ctx.throw(401, '权限不足');
     if(switchStatus !== undefined) {
       if(form.visibility === switchStatus && switchStatus)
         ctx.throw(400, '该板块在您操作之前已经被设置成对用户可见了，请刷新');

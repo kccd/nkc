@@ -11,9 +11,8 @@ operationRouter
     const {db, data} = ctx;
     const {user} = data;
     const thread = await db.ThreadModel.findOnly({tid});
-    const visibleFid = await ctx.getVisibleFid();
-    if(!thread.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
-    if(thread.disabled && data.userLevel < 4) ctx.throw(401, '您没有权限收藏已被屏蔽的帖子');
+    if(thread.disabled) ctx.throw(401, '不能收藏已被封禁的帖子');
+    if(!await thread.ensurePermission(ctx)) ctx.throw(401, '权限不足');
     const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
     if(collection) ctx.throw(400, '该贴子已经存在于您的收藏中，没有必要重复收藏');
     const newCollection = new db.CollectionModel({
@@ -34,10 +33,8 @@ operationRouter
   .patch('/ad', async (ctx, next) => {
     const {tid} = ctx.params;
     const {db, data} = ctx;
-    const {user} = data;
-    const visibleFid = await ctx.getVisibleFid();
     const thread = await db.ThreadModel.findOnly({tid});
-    if(!thread.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
+    if(data.userLevel < 6) ctx.throw(401, '权限不足');
     if(thread.disabled) ctx.throw(404, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
     const setting = await db.SettingModel.findOnly({uid: 'system'});
     const ads = setting.ads;
@@ -75,10 +72,10 @@ operationRouter
     const {tid} = ctx.params;
     const {digest} = ctx.body;
     const {db, data} = ctx;
+    const {user} = data;
     if(digest === undefined) ctx.throw(400, '参数不正确');
-    const visibleFid = await ctx.getVisibleFid();
     const thread = await db.ThreadModel.findOnly({tid});
-    if(!thread.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
+    if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
     if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
     const obj = {digest: false};
     let number = -1;
@@ -100,10 +97,10 @@ operationRouter
     const {tid} = ctx.params;
     const {db, data} = ctx;
     const {topped} = ctx.body;
+    const {user} = data;
     if(topped === undefined) ctx.throw(400, '参数不正确');
-    const visibleFid = await ctx.getVisibleFid();
     const thread = await db.ThreadModel.findOnly({tid});
-    if(!thread.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
+    if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
     if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
     const obj = {topped: false};
     if(topped) obj.topped = true;

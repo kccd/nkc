@@ -728,7 +728,7 @@ module.exports = async (ctx, next) => {
   }.bind(ctx);
   ctx.getVisibleFid = getVisibleFid;
   ctx.generateMatchBase = (base = {}) => {
-    if(!ctx.data.ensurePermission('PATCH', '/t/x'))
+    if(ctx.data.userLevel < 4)
       //if someone wasn't able to modify a thread, then he wasn't able to view
       //threads or posts which were disabled.
       base.disabled = false;
