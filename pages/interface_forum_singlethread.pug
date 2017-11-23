@@ -25,7 +25,10 @@
   .ForumThreadItem
     .parent.clearfix(id='')
       .avatar-left
-        - var title = ocUser && ocUser.navbarDesc?ocUser.navbarDesc.string:''
+        - var title = '';
+        -if(ocUser && ocUser.navbarDesc)
+          - var navbarDesc = ocUser.navbarDesc;
+          -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
         a(href=`/m/${uid}` title=`${title}`)
           img.ForumThreadAvatar(src=`/avatar/${uid}`)
 

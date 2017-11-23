@@ -1,5 +1,4 @@
 .UserProfileSection2
-  -var user= data.user
     a(href=`/m/${user.uid}`) 专栏
     a(href=`/u/${user.uid}/collections/unclassified`) 收藏夹
     a(href=`/sms/message/${user.uid}`) 发私信
@@ -16,7 +15,7 @@
     span 总主题 #{user.threadCount||0} 帖
     span 总回复 #{user.postCount||0} 楼
 
-    -var listCertText = user.navbarDesc.certs
+    -var listCertText = user.navbarDesc.cs
     span 拥有证书：#{listCertText}
     br
     span 注册于 #{dateTimeString(user.toc)}

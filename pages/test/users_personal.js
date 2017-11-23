@@ -3,72 +3,9 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.7');
+db = require('arangojs')('http://127.0.0.1:8529');
 db.useDatabase('rescue');
 let users_personalSchema = new Schema({
-  /*uid: {
-    type: String,
-    required: true,
-    index: 1
-  },
-  email: {
-    type: String,
-    default: '',
-    index: 1
-  },
-  mobile: {
-    type: String,
-    default:'',
-    index: 1
-  },
-  hashType: {
-    type: String,
-    required: true
-  },
-  lastTry: {
-    type: Number,
-    default: 0
-  },
-  password: {
-    salt: {
-      type: String,
-      required: true
-    },
-    hash: {
-      type: String,
-      required: true
-    }
-  },
-  newMessage: {
-    replies: {
-      type: Number,
-      default: 0
-    },
-    message: {
-      type: Number,
-      default: 0
-    },
-    system: {
-      type: Number,
-      default: 0
-    },
-    at: {
-      type: Number,
-      default: 0
-    }
-  },
-  regCode: {
-    type: String,
-    default: ''
-  },
-  regIP: {
-    type: String,
-    default: '0.0.0.0'
-  },
-  tries: {
-    type: Number,
-    default: 0
-  }*/
   uid: {
     type: String,
     unique: true,

@@ -4,7 +4,11 @@ block title
   - var user = data.user
   title #{user.username} - #{data.site.name}
   meta#replytarget(value=`${data.replyTarget}`)
-
+  style.
+    .colorOfNumber{
+      color: #555;
+      font-weight: 600;
+    }
 block content
   -var user = data.user;
   .container
@@ -17,34 +21,39 @@ block content
       .col-xs-12.col-md-12
         .h3(style='font-weight:300;') 个人基本信息
         hr
-        .col-xs-12.col-md-6
-          .rom
-            .col-xs-5.col-md-5
-              .col-xs-12.col-md-12
-                img.img-rounded(src=`/avatar/${user.uid}`,style='width:100%;')
-              #btnDiv(style='display:none;')
-                .col-xs-12.col-md-12
+        .rom
+          .col-xs-12.col-md-2(style='padding: 0')
+            div(style='width: 10rem;margin: auto')
+              img.img-rounded(src=`/avatar/${user.uid}`,style='width:100%;')
+              .col-xs-12.col-md-12(style='padding: 0')
                   input#select-file(style='height:0;width:0;',type="file",target="avatar",accept="image/*")
-                  button.btn.btn-default.center-block#updateBnt(style='margin:1em auto 0.5em auto;',onclick='updateBnt()') 选择图片
-                .col-xs-6.col-md-6
-                  button.btn.btn-default.center-block(onclick='uploadfile_click();') 保存
-                .col-xs-6.col-md-6
-                  button.btn.btn-default.center-block(onclick='hideBtn()') 取消
-              .col-xs-12.col-md-12
-                  button.btn.btn-default.center-block#btnSwitch(onclick='showBtn()',style='margin:1em auto;') 修改头像
-            .col-xs-7.col-md-7
-              .col-xs-12.col-md-12
-                div.f12!= data.user.navbarDesc.string.replace(/\n/g, '<br>')
-              .col-xs-12.col-md-6
-                a.btn.btn-default.left-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.5em auto;') 查看个人专栏
-              .col-xs-12.col-md-6
-                a.btn.btn-default.left-block(href=`/u/${user.uid}/collections/unclassified`,role="button",style='margin:0.5em auto;') 查看个人收藏
+                  button#uploadFile.btn.btn-default.center-block(style='display: none;margin:1em auto 0.5em auto;', onclick='uploadfile_click();$("#uploadFile").css("display", "none")') 点击上传
+                  button#chooseFile.btn.btn-default.center-block(onclick='updateBnt()',style='margin:1em auto;') 修改头像
+          .col-xs-12.col-md-3(style='padding: 0')
+            //.col-xs-12.col-md-12
+            //  div.f12!= data.user.navbarDesc.string.replace(/\n/g, '<br>')
+            -var navbarDesc = data.user.navbarDesc;
+            .col-xs-12.col-md-12
+              h3.text-center(style='margin-top: 0;')= data.user.username
+            .col-xs-12.col-md-12
+              p(style='font-size:1.5rem').text-center 学术分：
+                span.colorOfNumber= navbarDesc.xsf
+            .col-xs-12.col-md-12
+              p(style='font-size:1.5rem').text-center 科创币：
+                span.colorOfNumber= navbarDesc.kcb
+            .col-xs-12.col-md-12
+              p(style='font-size:1.5rem').text-center 证书：
+                span.colorOfNumber= navbarDesc.cs
+            .col-xs-6.col-md-10.col-md-offset-1
+              a.btn.btn-default.center-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.1em auto;') 个人专栏
+            .col-xs-6.col-md-10.col-md-offset-1
+              a.btn.btn-default.center-block(href=`/u/${user.uid}/collections/unclassified`,role="button",style='margin:0.1em auto;') 个人收藏
       .col-xs-12.col-md-12
         hr
         .h3(style='font-weight:300;margin-top:2em;') 账号安全设置
         hr
         .rom(style='margin:1em 0;')
-          .col-xs-12.col-md-10
+          .col-xs-12.col-md-10(style='padding: 0')
             .col-xs-12.col-md-4
               .form-group
                 label(for="name")
@@ -60,14 +69,14 @@ block content
                 label(for="name")
                   .h5(style='font-weight:300;') 重复一次
                 input.form-control#newpassword2(type='password', placeholder='重复一次', onclick='select()')
-          .col-xs-12.col-md-2
+          .col-xs-12.col-md-2(style='padding: 0')
             .col-xs-12.col-md-5
               .form-group
                 .col-xs-12.col-md-12.hidden-label
                     label(for="name")
                       .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
                 button.btn.btn-default#submitnewpassword(onclick='submitnewpassword()') 修改密码
-          .col-xs-12.col-md-10
+          .col-xs-12.col-md-10(style='padding: 0')
             .col-xs-12.col-md-3(style="display:none")
               label(for="name")
                 .h5(style='font-weight:300;') 选择国际区号
@@ -105,17 +114,17 @@ block content
         .h3(style='font-weight:300;margin-top:2em;') 个人资料修改
         hr
         .rom(style='margin:1em 0;')
-          .col-xs-12.col-md-6
+          .col-xs-12.col-md-6(style='padding: 0')
             .col-xs-12.col-md-12
               .h4(style='font-weight:300;') 帖子签名 (300字节)
             .col-xs-12.col-md-10
               textarea#post_sign.form-control(style='resize: none;',placeholder='帖子签名',rows="10") #{user.postSign||''}
-          .col-xs-12.col-md-6
+          .col-xs-12.col-md-6(style='padding: 0')
             .col-xs-12.col-md-12
               .h4(style='font-weight:300;') 个人简介(300字节)
             .col-xs-12.col-md-10
               textarea#description.form-control(style='resize: none;',placeholder='个人简介',rows="10") #{user.description||''}
-          .col-xs-12.col-md-6
+          .col-xs-12.col-md-6(style='padding: 0')
             br
             .col-xs-12.col-md-12
               .h4(style='font-weight:300;') Colorcode
@@ -123,7 +132,7 @@ block content
             .col-xs-12.col-md-5
               .form-group
                 input.form-control#color(type='text', placeholder='例如草木绿：#97b45a', name='colorCode', onclick='select()',value=`${user.color||""}`)
-          .col-xs-12.col-md-6
+          .col-xs-12.col-md-6(style='padding: 0')
             br
             .col-xs-12.col-md-12
               .h4(style='font-weight:300;') 关注板块id
@@ -135,7 +144,7 @@ block content
               button.btn.btn-default#changeFocusDiv(onclick='changeFocusDiv()') 板块id示例
                 span.caret
           #focusDiv(style='display:none;')
-            .col-xs-12.col-md-12
+            .col-xs-12.col-md-12(style='padding: 0')
               .col-xs-12.col-md-12
                 .h4(style='font-weight:300;') 板块id示例
                    span(style='font-size:0.8em;') （点击可自动输入。）
@@ -163,16 +172,6 @@ block scripts
   script.
     var interval_time = 59;
     var areaCode = '+86';
-    //隐藏图片上传的按钮
-    function hideBtn() {
-      $('#btnDiv').hide();
-      $('#btnSwitch').show();
-    }
-    //显示图片上传的按钮
-    function showBtn() {
-      $('#btnDiv').show();
-      $('#btnSwitch').hide();
-    }
     function changeFocusDiv() {
       if($('#focusDiv').css('display') == 'none'){
         $('#focusDiv').fadeIn();
@@ -198,6 +197,7 @@ block scripts
     //头像上传
     function updateBnt(){
       $('#select-file').click();
+      $('#uploadFile').css('display', 'block');
     }
     //提交密码
     function submitnewpassword() {

@@ -116,4 +116,44 @@ userSchema.methods.extend = async function() {
   return user;
 };
 
+userSchema.methods.updateAllMessage = async function() {
+  const PostModel = require('./PostModel');
+  const ThreadModel = require('./ThreadModel');
+  const UserSubscribeModel = require('./UserSubscribeModel');
+  const posts = await PostModel.find({uid: this.uid}, {_id: 0, disabled: 1, recUsers: 1});
+  const postCount = posts.length;
+  let disabledPostCount = 0;
+  let recCount = 0;
+  for (let post of posts) {
+    try{
+      recCount += post.recUsers.length;
+    } catch(err) {
+      return console.log(post);
+    }
+    if(post.disabled) disabledPostCount++;
+  }
+  const threads = await ThreadModel.find({uid: this.uid}, {_id: 0, disabled: 1, digest: 1, topped: 1});
+  const threadCount = threads.length;
+  let disabledThreadCount = 0;
+  let digestThreadsCount = 0;
+  let toppedThreadsCount = 0;
+  for (let thread of threads) {
+    if(thread.disabled) disabledThreadCount++;
+    if(thread.digest) digestThreadsCount++;
+    if(thread.topped) toppedThreadsCount++;
+  }
+  const userSubscribe = await UserSubscribeModel.findOnly({uid: this.uid});
+  const subs = userSubscribe.subscribers.length;
+  await this.update({
+    postCount,
+    disabledPostCount,
+    threadCount,
+    disabledThreadCount,
+    digestThreadsCount,
+    toppedThreadsCount,
+    subs,
+    recCount
+  });
+};
+
 module.exports = mongoose.model('users', userSchema);

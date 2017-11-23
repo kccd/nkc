@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.7');
+db = require('arangojs')('http://192.168.11.8');
 db.useDatabase('rescue');
 let number = 1;
 let collectionsSchema = new Schema({
@@ -30,7 +30,8 @@ let collectionsSchema = new Schema({
   category: {
     type: String,
     default: 'unclassified',
-    required: true
+    required: true,
+    index: 1
   }
 });
 

@@ -27,9 +27,11 @@ if thread
     .parent.clearfix(id='')
       .avatar-left
         - var user = ocuser
-        - var title = user?data.user.navbarDesc.string:''
-        a(href='/m/#{uid}' title='#{title}')
-          img.ForumThreadAvatar(src='/avatar/#{uid}')
+        -var title = '';
+        -if(user)
+          -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+        a(href=`/m/${uid}` title=`${title}`)
+          img.ForumThreadAvatar(src=`/avatar/${uid}`)
 
       .content-right
         .ForumThreadTitle

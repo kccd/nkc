@@ -39,7 +39,7 @@ function recyclebtn(){
 }
 
 function addColl(tid){
-  return nkcAPI('addThreadToCollection',{tid:tid})
+  return nkcAPI('/t/'+tid+'/addColl', 'POST',{})
   .then(function(res){
     screenTopAlert('已收藏 '+tid)
   })

@@ -101,12 +101,40 @@ experimentalRouter
     await next();
   })
   .get('/behaviors', async (ctx, next) => {
-    let {data, db} = ctx;
+    const {data, db} = ctx;
     ctx.template = 'interface_behavior_log.pug';
     await next();
   })
   .post('/updateAllUsers', async (ctx, next) => {
-    // 根据 uid 找出所有post， 再判断有多少被禁
+    const {data, db} = ctx;
+    const t = Date.now();
+    const usersCount = await db.UserModel.count();
+    for (let i = 0;1; i++) {
+      if(i >= usersCount) break;
+      const user = await db.UserModel.findOne().skip(i);
+      await user.updateUserMessage();
+    }
+    console.log(`总耗时: ${Date.now() - t}ms`);
+    data.message = '更新所有用户数据成功';
+    await next();
+  })
+  .post('/updateAllForums', async (ctx, next) => {
+    const {data, db} = ctx;
+    const forums = await db.ForumModel.find({type: 'forum'});
+    await Promise.all(forums.map(forum => forum.updateForumMessage()));
+    data.message = '更新所有板块数据成功';
+    await next();
+  })
+  .post('/updateAllThreads', async (ctx, next) => {
+    const {data, db} = ctx;
+    const threadsCount = await db.ThreadModel.count();
+    for (let i = 0; 1; i++) {
+      if(i >= threadsCount) break;
+      const thread = await db.ThreadModel.findOne().skip(i);
+      await thread.updateThreadMessage();
+      console.log(`${i} - ${thread.tid} - ${threadsCount}`);
+    }
+    data.message = '更新所有帖子数据成功';
     await next();
   });
 

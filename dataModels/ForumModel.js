@@ -128,4 +128,28 @@ forumSchema.methods.setCountOfDigestThread = async function(number) {
   return await this.update(obj);
 };
 
+forumSchema.methods.updateForumMessage = async function() {
+  const ThreadModel = require('./ThreadModel');
+  const threads = await ThreadModel.find({fid: this.fid}, {_id: 0, count: 1, countToday: 1, digest: 1});
+  const countThreads = threads.length;
+  let countPosts = 0;
+  let countPostsToday = 0;
+  let digest = 0;
+  for (let thread of threads) {
+    countPosts += thread.count;
+    countPostsToday += thread.countToday;
+    if(thread.digest) digest++;
+  }
+  const normal = countThreads - digest;
+  await this.update({
+    countPosts,
+    countPostsToday,
+    countThreads,
+    tCount: {
+      digest,
+      normal
+    }
+  });
+};
+
 module.exports = mongoose.model('forums', forumSchema);

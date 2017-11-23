@@ -164,11 +164,6 @@ fn.getAvailableForums = async ctx => {
       }
     }
   });
-  for (let i = 0; i < result.length; i++) {
-    if(result[i].children.length === 0) {
-      result.splice(i, 1);
-    }
-  }
   return result;
 };
 
@@ -189,11 +184,6 @@ fn.getForums = async ctx => {
       }
     }
   });
-  for (let i = 0; i < result.length; i++) {
-    if(result[i].children.length === 0) {
-      result.splice(i, 1);
-    }
-  }
   return result;
 };
 

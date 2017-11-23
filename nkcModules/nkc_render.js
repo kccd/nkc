@@ -150,7 +150,7 @@ function nkc_render(options){
       openTag: function(params,content) {
         var username = '';
         if(!params || params.length === 0) {
-          username = '数据不严谨';
+          username = '。。。';
         } else {
           var arr = params.slice(1).split(',');
           var username = '';

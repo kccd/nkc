@@ -64,7 +64,11 @@ otherRouter
     let t1 = Date.now();
 
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
-    latestThreads = await Promise.all(latestThreads.map(thread => thread.extend()));
+    latestThreads = await Promise.all(latestThreads.map(async thread => {
+      const targetThread = await thread.extend();
+      targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
+      return targetThread;
+    }));
     data.latestThreads = latestThreads;
 
     let t2 = Date.now();

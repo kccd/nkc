@@ -98,7 +98,7 @@ operationRouter
     }
     data.targetUser = await targetPost.getUser();
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-    await targetThread.updateMessage();
+    await targetThread.updateThreadMessage();
     await next();
   });
 module.exports = operationRouter;

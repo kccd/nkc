@@ -4,7 +4,7 @@ block title
   title #{data.forum.displayName} - #{data.site.name}
   
   -var forum  = data.forum
-
+  -var mainContainer1400 = true
   if forum.description
     -var processed=forum.description.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
   else

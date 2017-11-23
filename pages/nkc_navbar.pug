@@ -49,7 +49,9 @@ div
         .NavBarLinkArea.f12.text-center
           if (data.user && !data.logout)
             - var user = data.user
-            a(href='/me' title=`${data.user.navbarDesc.string}`) #{user.username}
+            - var navbarDesc = user.navbarDesc;
+            - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+            a(href='/me' title=`${title}`) #{user.username}
 
             -const sms = '/sms'
               if data.ensurePermission('GET', sms)

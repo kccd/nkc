@@ -26,7 +26,8 @@ let CollectionSchema = new Schema({
   category: {
     type: String,
     default: 'unclassified',
-    required: true
+    required: true,
+    index: 1
   }
 });
 

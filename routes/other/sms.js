@@ -71,7 +71,8 @@ smsRouter
         docs.push(fromUser);
         continue;
       }
-      for (let j = 0; j < docs.length; j++) {
+      const docsLength = docs.length;
+      for (let j = 0; j < docsLength; j++) {
         if(docs[j].uid === targetUid) {
           docs[j].group.push(smsList[i]);
           break;
@@ -84,15 +85,19 @@ smsRouter
         }
       }
     }
+    const notViewed = [];
     for (let i = 0; i < docs.length; i++) {
       let groupLength = docs[i].group.length;
       for (let j = 0; j < groupLength; j++) {
-        if(!docs[i].group[j].viewed) {
+        if(!docs[i].group[j].viewed && docs[i].group[j].r === user.uid) {
           let Obj = docs.splice(i,1);
-          docs.unshift(Obj[0]);
+          notViewed.unshift(Obj[0]);
           break;
         }
       }
+    }
+    for (let i in notViewed) {
+      docs.unshift(notViewed[i])
     }
     const paging = await apiFn.paging(page, docs.length);
     const start = paging.start;

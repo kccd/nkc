@@ -16,7 +16,10 @@
       .threadOneLine
         div.fixThread
           div(style='float: left;')
-            - var title = post && post.user && post.user.navbarDesc? post.user.navbarDesc.string:''
+            - var title = '';
+            -if(post && post.user && post.user.navbarDesc)
+              -var navbarDesc = post.user.navbarDesc;
+              -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`
             a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')

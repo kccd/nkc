@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.7');
+db = require('arangojs')('http://127.0.0.1:8529');
 db.useDatabase('rescue');
 
 let usersSubscribeSchema = new Schema({
@@ -31,13 +31,20 @@ let UsersSubscribe = mongoose.model('usersSubscribe', usersSubscribeSchema, 'use
 
 
 let t1 = Date.now();
-
-console.log('开始读取数据');
-return db.query(`
-  for u in usersSubscribe
-  return u
+// 修复在usersSubscribe里没数据的用户
+console.log(`通过users在usersSubscribe生成数据`);
+db.query(`
+  for u in users
+  filter !document(usersSubscribe, u._key)
+  insert {_key: u._key, subscribeForums: [], subscribeUsers: [], subscribers: []} in usersSubscribe
 `)
-
+  .then(()=> {
+    console.log('开始读取数据');
+    return db.query(`
+      for u in usersSubscribe
+      return u
+  `)
+  })
 .then(cursor => cursor.all())
 .then((res) => {
   console.log('users.focus_forums > usersSubscribe.subscribeForums')

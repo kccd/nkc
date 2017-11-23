@@ -144,7 +144,7 @@ threadSchema.methods.getUser = async function() {
   return await Usermodel.findOnly({uid: this.uid});
 };
 
-threadSchema.methods.updateMessage = async function() {
+threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = require('./PostModel');
   const ResourceModel = require('./ResourceModel');
   const posts = await PostModel.find({tid: this.tid}).sort({toc: -1});

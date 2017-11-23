@@ -553,7 +553,15 @@ const certificates ={
           [POST]: true
         },
         updateAllUsers: {
-          [name]: '更新用户数据',
+          [name]: '更新所有用户数据',
+          [POST]: true
+        },
+        updateAllForums: {
+          [name]: '更新所有板块数据',
+          [POST]: true
+        },
+        updateAllThreads: {
+          [name]: '更新所有帖子数据',
           [POST]: true
         }
       }
@@ -656,11 +664,10 @@ module.exports = async (ctx, next) => {
     }
     cs = cs.join(' ');
     return {
-      string: `${username}\n`+
-      `学术分 ${xsf}\n`+
-      `科创币 ${kcb}\n`+
-      `${cs}`,
-      certs: cs
+      username: username,
+      xsf: xsf,
+      kcb: kcb,
+      cs: cs
     }
   }.bind(ctx);
   if(ctx.data.user) {
