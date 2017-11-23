@@ -45,7 +45,7 @@ function excuteLevel(user) {
   let level = -1;
   for(const cert of certs) {
     if(levelOrder[cert] > level)
-      level = levelorder[cert]
+      level = levelOrder[cert]
   }
   return level
 }
