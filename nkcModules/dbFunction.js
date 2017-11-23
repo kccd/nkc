@@ -120,7 +120,7 @@ fn.createUser = async (data) => {
   let users = new db.UserModel(userObj);
   let usersPersonal = new db.UsersPersonalModel(userObj);
   let personalForums = new db.PersonalForumModel(userObj);
-  let usersSubscribe = new db.UserSubscribeModel(userObj);
+  let usersSubscribe = new db.UsersSubscribeModel(userObj);
   try{
     await users.save();
     await usersPersonal.save();
@@ -130,7 +130,7 @@ fn.createUser = async (data) => {
     await db.UserModel.deleteMany({uid: userObj.uid});
     await db.UsersPersonalModel.deleteMany({uid: userObj.uid});
     await db.PersonalForumModel.deleteMany({uid: userObj.uid});
-    await db.UserSubscribeModel.deleteMany({uid: userObj.uid});
+    await db.UsersSubscribeModel.deleteMany({uid: userObj.uid});
     await db.SettingModel.operateSystemID('users', -1);
     throw `新建用户出错！err: ${err}`;
   }
