@@ -25,6 +25,31 @@ const methodEnum = {
   OPTIONS
 };
 
+const levelOrder = {
+  banned: -1,
+  visitor: 0,
+  default: 1,
+  email: 2,
+  mobile: 2,
+  examinated: 3,
+  qc: 4,
+  scholar: 5,
+  moderator: 6,
+  senior_moderator: 7,
+  editor: 8,
+  dev: 9
+};
+
+function excuteLevel(user) {
+  const {certs} = user;
+  let level = -1;
+  for(const cert of certs) {
+    if(levelOrder[cert] > level)
+      level = levelorder[cert]
+  }
+  return level
+}
+
 const certificates ={
   visitor: {
     displayName: '陆游',
@@ -677,7 +702,6 @@ module.exports = async (ctx, next) => {
   const cs = getPermitTree(certs);
   cs.contentClasses = Object.keys(cs.contentClasses);
   ctx.data.certificates = cs;
-
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
   ctx.data.ensurePermission = function(method = this.method, path = this.path) {
@@ -709,6 +733,7 @@ module.exports = async (ctx, next) => {
       base.disabled = false;
     return Map(base)
   };
+  ctx.data.userLevel = excuteLevel(ctx.data.user);
   if(!ctx.data.ensurePermission())
     ctx.throw(401, `权限不足`);
   await next();

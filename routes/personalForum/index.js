@@ -12,7 +12,8 @@ router
       UserModel,
       UsersSubscribeModel,
       SettingModel,
-      UsersBehavior
+      UsersBehavior,
+      ThreadModel
     } = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
     data.forum = await personalForum.extendModerator();
@@ -141,68 +142,25 @@ router
         {$project: $returnCount}
       ])
     }
-    else if(tab === 'discuss') {
-      $matchThread = $matchThread.set('toMid', uid);
-      $matchThread = $matchThread.set('fid', {$in: visibleFid});
-      if(
-        !user || personalForum.moderators.indexOf(user._key) === -1
-        || !ctx.ensurePermission('POST', '/t/x/digest')
-      ) {
-        $matchThread = $matchThread.set('hideInToMid', false);
-      }
-      if(digest)
-        $matchThread = $matchThread.set('digest', true);
-      data.threads = await mongoose.connection.db.collection('threads').aggregate([
-        {$match: $matchThread},
-        {$sort},
-        {$group: $groupWithCount},
-        {$project: $returnCount},
-        {$unwind: '$threads'},
-        {$lookup: {
-          from: 'posts',
-          localField: 'threads.oc',
-          foreignField: 'pid',
-          as: 'threads.oc'
-        }},
-        {$lookup: {
-          from: 'users',
-          localField: 'threads.oc.uid',
-          foreignField: 'uid',
-          as: 'threads.oc.user'
-        }},
-        {$lookup: {
-          from: 'posts',
-          localField: 'threads.lm',
-          foreignField: 'pid',
-          as: 'threads.lm'
-        }},
-        {$lookup: {
-          from: 'users',
-          localField: 'threads.lm.uid',
-          foreignField: 'uid',
-          as: 'threads.lm.user'
-        }},
-      ])
-    }
     else if(tab === 'subscribe') {
       const {subscribeUsers, subscribeForums} = await UsersSubscribeModel.findOnly({uid});
-      let $matchThread = matchBase.set('uid', {$in: subscribeUsers});
-      $matchThread = $matchThread.set('fid', {$in: visibleFid});
-      data.threads = await UsersBehavior.aggregate([
+      data.threads = await ThreadModel.aggregate([
         {$sort},
         {$match: {
-          $or: [
-            {
-              uid: {$in: subscribeUsers},
-            },
-            {
-              fid: {$in: subscribeForums}
-            }
+          $and: [
+            {$or: [
+              {
+                uid: {$in: subscribeUsers},
+              },
+              {
+                fid: {$in: subscribeForums}
+              }
+            ]},
+            {$in: visibleFid}
           ]
         }},
-        {$group: $groupWithCount},
-        {$project: $returnCount},
-        {$unwind: '$threads'},
+        {$skip: page * perpage},
+        {$limit: perpage},
         {$lookup: {
           from: 'posts',
           localField: 'threads.oc',
