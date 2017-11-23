@@ -9,7 +9,7 @@ module.exports = async (ctx, next) => {
     const {username, uid} = JSON.parse(decodeURI(userInfo));
     const user = await db.UserModel.findOne({uid});
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
-    user.subscribeUsers = (await db.UserSubscribeModel.findOne({uid})).subscribeUsers;
+    user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     if (user.username !== username) {
       ctx.cookies.set('userInfo', '');
       ctx.status = 401;

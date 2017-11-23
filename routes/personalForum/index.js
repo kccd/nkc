@@ -7,7 +7,13 @@ router
     const mongoose = settings.database;
     const perpage = settings.paging.perpage;
     const {uid} = params;
-    const {PersonalForumModel, UserModel, UsersSubscribeModel, SettingModel} = db;
+    const {
+      PersonalForumModel,
+      UserModel,
+      UsersSubscribeModel,
+      SettingModel,
+      UsersBehavior
+    } = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
     data.forum = await personalForum.extendModerator();
     const setting = await SettingModel.findOnly({uid: 'system'});
@@ -179,12 +185,21 @@ router
       ])
     }
     else if(tab === 'subscribe') {
-      const {subscribeUsers} = await UsersSubscribeModel.findOnly(uid);
+      const {subscribeUsers, subscribeForums} = await UsersSubscribeModel.findOnly({uid});
       let $matchThread = matchBase.set('uid', {$in: subscribeUsers});
       $matchThread = $matchThread.set('fid', {$in: visibleFid});
-      data.threads = await mongoose.connection.db.collection('threads').aggregate([
-        {$match: $matchThread},
+      data.threads = await UsersBehavior.aggregate([
         {$sort},
+        {$match: {
+          $or: [
+            {
+              uid: {$in: subscribeUsers},
+            },
+            {
+              fid: {$in: subscribeForums}
+            }
+          ]
+        }},
         {$group: $groupWithCount},
         {$project: $returnCount},
         {$unwind: '$threads'},
@@ -215,7 +230,6 @@ router
       ])
     }
     else if(tab === 'all') {
-      const base = matchBase.toJS();
       data.threads = await mongoose.connection.db.collection('usersBehavior').aggregate([
         {$sort: {
           timeStamp: -1
@@ -227,11 +241,11 @@ router
         }},
         {$skip: page * perpage},
         {$limit: perpage},
-        // {$group: {
-        //   _id: '$tid',
-        //   lastPost: {$first: '$$ROOT'}
-        // }},
-        // {$replaceRoot: {newRoot: '$lastPost'}},
+        {$group: {
+          _id: '$tid',
+          lastPost: {$first: '$$ROOT'}
+        }},
+        {$replaceRoot: {newRoot: '$lastPost'}},
         {$lookup: {
           from: 'threads',
           localField: 'tid',
@@ -278,7 +292,6 @@ router
     ctx.template = 'interface_personal_forum.pug';
     ctx.data.userThreads = await ctx.data.user.getUsersThreads();
     ctx.data.forumlist = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
-    console.log(visibleFid);
     await next()
   });
 

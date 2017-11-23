@@ -53,6 +53,10 @@ const postSchema = new Schema({
     type: String,
     default: ''
   },
+  fid: {
+    type: String,
+    required: true
+  },
   tid: {
     type: String,
     required: true,
