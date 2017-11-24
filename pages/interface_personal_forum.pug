@@ -10,12 +10,12 @@ block title
   else
     -var processed = forum.display_name
 
-  meta(name='description' content='#{processed}')
+  meta(name='description' content=`${processed}`)
 
   meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content='#{forum.display_name}')
+  meta(property='og:title' content=`${forum.display_name}`)
   meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content='#{processed}')
+  meta(property='og:description' content=`${processed}`)
 
 
 
@@ -53,7 +53,7 @@ block content
                             if moderators && moderators.length
                               span 版主：
                                 each k in moderators
-                                  a.d-inline.margin-right(href='/m/#{k._key}') #{k.username}    
+                                  a.d-inline.margin-right(href=`/m/${k._key}`) #{k.username}
                               -var subscribeUsersNum = (data.targetUser.subscribeUsers)?data.targetUser.subscribeUsers : [];
                               -var subscribersNum = (data.targetUser.subscribers)?data.targetUser.subscribers : [];
                               span 关注：
@@ -70,10 +70,10 @@ block content
                               -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
                               if(subscribeUsers.indexOf(user.uid) > -1)
                                 div
-                                  a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick='subscribeUserSwitch("#{user.uid}");' style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
+                                  a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
                               else
                                 div
-                                  a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick='subscribeUserSwitch("#{user.uid}");' style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
+                                  a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
                         hr.hrNarrowSpace
                         div
                           if announcement && announcement != ''
@@ -95,14 +95,14 @@ block content
                         div(style='display: inline-block;')
                           div
                             div(style='display: inline-block;')
-                              input#forumName(style='font-size: 16px; width: 180px;' value='#{forum.display_name}' name='forumName' placeholder='请输入专栏名称')
+                              input#forumName(style='font-size: 16px; width: 180px;' value=`${forum.display_name}` name='forumName' placeholder='请输入专栏名称')
                             div(style='display: inline-block;')
-                              input#description(style='width: 360px;' value='#{description}' name='description' placeholder='请输入专栏介绍')
+                              input#description(style='width: 360px;' value=`${description}` name='description' placeholder='请输入专栏介绍')
                           div
                             -const str = moderators.length === 1? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
                             span 版主：
                             span #{moderators[0].username},
-                            input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value='#{str}')
+                            input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str}`)
                         div(style='float: right; vertical-align: top;')
                           if isModerator
                             div
@@ -124,17 +124,17 @@ block content
         include interface_easy_post
 
         ul.nav.nav-tabs
-          li(class='#{data.tab == "own"? "active" : ""}')
+          li(class=`${data.tab === "own"? "active" : ""}`)
             a(href='?&tab=own') 版主
-          li(class='#{data.tab == "all"? "active" : ""}')
+          li(class=`${data.tab === "all"? "active" : ""}`)
             a(href='?&tab=all') 全部
-          li(class='#{data.tab == "discuss" ? "active" : ""}')
+          li(class=`${data.tab === "discuss" ? "active" : ""}`)
             a(href='?&tab=discuss') 讨论
-          li(class='#{data.tab == "reply"? "active" : ""}')
+          li(class=`${data.tab === "reply"? "active" : ""}`)
             a(href='?&tab=reply') 回复
-          li(class='#{data.tab == "recommend"? "active" : ""}')
+          li(class=`${data.tab === "recommend"? "active" : ""}`)
             a(href='?&tab=recommend') 推荐
-          li(class='#{data.tab == "subscribe" ? "active" : ""}')
+          li(class=`${data.tab === "subscribe" ? "active" : ""}`)
             a(href='?&tab=subscribe') 关注
           li
             a(href=`/activities/${data.forum.uid}`) 动态
@@ -169,23 +169,23 @@ block content
 
                 - var cat = data.cat
                 - var sortby = data.sortby
-                - var class_str_sortby_toc = sortby?'active':''
-                - var class_str_sortby_tlm = sortby?'':'active'
+                - var class_str_sortby_toc = sortby === 'toc'?'active':''
+                - var class_str_sortby_tlm = sortby === 'tlm'?'active':''
 
 
                 ul.pagination.NavigationPaging
                   - var page = paging?paging.page:null;
-                  li(class="#{class_str_all}")
-                    a(href='?&tab=#{data.tab}#{data.sortby? "&sortby=toc": ""}') 俱
+                  li(class=`${class_str_all}`)
+                    a(href=`?&tab=${data.tab}${data.sortby? "&sortby=toc": ""}`) 俱
 
-                  li(class="#{class_str_digest}")
-                    a(href='?&tab=#{data.tab}&digest=true#{data.sortby? "&sortby=toc": ""}') 精
+                  li(class=`${class_str_digest}`)
+                    a(href=`?&tab=${data.tab}&digest=true${data.sortby? "&sortby=toc": ""}`) 精
 
                 ul.pagination.NavigationPaging
-                  li(class='#{class_str_sortby_tlm}')
-                    a(href='?&tab=#{data.tab}#{data.digest? "&digest=true": ""}') 复序
-                  li(class='#{class_str_sortby_toc}')
-                    a(href='?&tab=#{data.tab}&sortby=toc#{data.digest? "&digest=true": ""}') 帖序
+                  li(class=`${class_str_sortby_tlm}`)
+                    a(href=`?&tab=${data.tab}${data.digest? "&digest=true": ""}`) 复序
+                  li(class=`${class_str_sortby_toc}`)
+                    a(href=`?&tab=${data.tab}&sortby=toc${data.digest? "&digest=true": ""}`) 帖序
 
 
               hr.hrNarrowSpace

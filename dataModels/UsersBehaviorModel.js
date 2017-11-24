@@ -71,8 +71,8 @@ const usersBehaviorSchema = new Schema({
     name: String,
     change: Number
   }
-});
+}, {collection: 'usersBehaviors'});
 
-const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema);
+const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 
 module.exports = UsersBehaviorModel;

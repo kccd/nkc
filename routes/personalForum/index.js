@@ -3,16 +3,17 @@ const router = new Router();
 
 router
   .get('/:uid', async (ctx, next) => {
-    const {data, params, db, query, settings, generateMatchBase} = ctx;
-    const mongoose = settings.database;
+    const {data, params, db, query, settings, generateMatchBase, nkcModules} = ctx;
+    const {paging} = nkcModules.apiFunction;
     const perpage = settings.paging.perpage;
     const {uid} = params;
+    const {user} = data;
     const {
       PersonalForumModel,
       UserModel,
       UsersSubscribeModel,
       SettingModel,
-      UsersBehavior,
+      UsersBehaviorModel,
       ThreadModel,
       PostModel,
     } = db;
@@ -20,31 +21,24 @@ router
     data.forum = await personalForum.extendModerator();
     const setting = await SettingModel.findOnly({uid: 'system'});
     data.popPersonalForums = setting.popPersonalForums;
-    const {sortby, digest, tab = 'all', page = 0} = query;
+    let {
+      sortby = 'tlm',
+      digest = false,
+      tab = 'all',
+      page = 0
+    } = query;
     const matchBase = generateMatchBase();
     const $sort = {};
-    if(sortby)
+    if(sortby === 'toc') {
       $sort.toc = 1;
-    else
+      sortby = 'toc'
+    }
+    else {
       $sort.tlm = 1;
+    }
     data.targetUser = await UserModel.findOnly({uid});
+    data.targetUser.navbarDesc = ctx.getUserDescription(data.targetUser);
     const visibleFid = await ctx.getVisibleFid();
-    const $groupWithCount = {
-      _id: null,
-      threads: {$push: '$$root'},
-      count: {$sum: 1}
-    };
-    const $returnCount = {
-      _id: 0,
-      count: 1,
-      threads: {
-        $slice: [
-          '$threads',
-          page ? (page - 1) * perpage : 0,
-          perpage
-        ]
-      }
-    };
     if(tab === 'reply') {
       let $matchPost = matchBase
         .set('uid', uid)
@@ -76,42 +70,77 @@ router
         {$match: $matchPost.toJS()},
         {$count: 'length'}
       ]);
+      data.paging = paging(page, length)
     }
     else if(tab === 'own') {
       let $matchThread = matchBase.set('fid', {$in: visibleFid});
-      $matchThread = $matchThread.set('uid', uid);
+      $matchThread = $matchThread.set('$or', [
+        {uid},
+        {mid: uid}
+      ]);
       if(
-        !user || personalForum.moderators.indexOf(user._key) === -1
-        || !ctx.ensurePermission('POST', '/t/x/digest')
+        !user || personalForum.moderators.indexOf(user.uid) === -1
+        || !ctx.data.userLevel > 4
       ) {
         //if u r not the forum-moderator/moderator, u can't access hide threads
         $matchThread = $matchThread.set('hideInMid', false);
       }
       if(digest)
         $matchThread = $matchThread.set('digest', true);
-      data.threads = await mongoose.connection.db.collection('threads').aggregate([
-        {$match: $matchThread.toJS()},
+      data.threads = await ThreadModel.aggregate([
         {$sort},
-        {$group: {
-          _id: '$tid',
-          threads: {$push: '$$root'}
-        }},
+        {$match: $matchThread.toJS()},
+        {$skip: page * perpage},
+        {$limit: perpage},
         {$lookup: {
           from: 'posts',
           localField: 'oc',
           foreignField: 'pid',
           as: 'oc'
         }},
-        {$group: $groupWithCount},
-        {$project: $returnCount}
-      ])
+        {$unwind: '$oc'},
+        {$lookup: {
+          from: 'users',
+          localField: 'oc.uid',
+          foreignField: 'uid',
+          as: 'oc.user'
+        }},
+        {$unwind: '$oc.user'}
+      ]);
+      const {length} = await await ThreadModel.aggregate([
+        {$sort},
+        {$match: $matchThread.toJS()},
+        {$count: 'length'}
+      ]);
+      data.paging = paging(page, length)
     }
     else if(tab === 'recommend') {
       let $postMatch = matchBase.set('pid', {$in: personalForum.recPosts});
       let $matchThread = matchBase.set('fid', {$in: visibleFid});
       if(digest)
         $matchThread = $matchThread.set('digest', true);
-      data.threads = await mongoose.connection.db.collection('posts').aggregate([
+      data.threads = await PostModel.aggregate([
+        {$match: $postMatch},
+        {$lookup: {
+          from: 'threads',
+          localField: 'tid',
+          foreignField: 'tid',
+          as: 'thread'
+        }},
+        {$unwind: '$thread'},
+        {$match: $matchThread},
+        {$skip: page * perpage},
+        {$limit: perpage},
+        {$sort},
+        {$lookup: {
+          from: 'posts',
+          localField: 'thread.oc',
+          foreignField: 'pid',
+          as: 'thread.oc'
+        }},
+        {$unwind: 'thread.oc'}
+      ]);
+      const length = await PostModel.aggregate([
         {$match: $postMatch},
         {$lookup: {
           from: 'threads',
@@ -120,74 +149,79 @@ router
           as: 'thread'
         }},
         {$match: $matchThread},
-        {$sort},
-        {$lookup: {
-          from: 'posts',
-          localField: 'thread.oc',
-          foreignField: 'pid',
-          as: 'thread.oc'
-        }},
-        {$group: $groupWithCount},
-        {$project: $returnCount}
-      ])
+        {$count: 'length'}
+      ]);
+      data.paging = paging(page, length)
     }
     else if(tab === 'subscribe') {
       const {subscribeUsers, subscribeForums} = await UsersSubscribeModel.findOnly({uid});
+      const $and = [
+        {$or: [
+          {
+            uid: {$in: subscribeUsers},
+          },
+          {
+            fid: {$in: subscribeForums}
+          }
+        ]},
+        {$in: visibleFid}
+      ];
+      if(digest)
+        $and.splice(0, 0, {digest});
+      const $USM = matchBase.set('$and', $and);
       data.threads = await ThreadModel.aggregate([
         {$sort},
-        {$match: {
-          $and: [
-            {$or: [
-              {
-                uid: {$in: subscribeUsers},
-              },
-              {
-                fid: {$in: subscribeForums}
-              }
-            ]},
-            {$in: visibleFid}
-          ]
-        }},
+        {$match: $USM},
         {$skip: page * perpage},
         {$limit: perpage},
         {$lookup: {
           from: 'posts',
-          localField: 'threads.oc',
+          localField: 'oc',
           foreignField: 'pid',
-          as: 'threads.oc'
+          as: 'oc'
         }},
+        {$unwind: 'oc'},
         {$lookup: {
           from: 'users',
-          localField: 'threads.oc.uid',
+          localField: 'oc.uid',
           foreignField: 'uid',
-          as: 'threads.oc.user'
+          as: 'oc.user'
         }},
+        {$unwind: 'oc.user'},
         {$lookup: {
           from: 'posts',
-          localField: 'threads.lm',
+          localField: 'lm',
           foreignField: 'pid',
-          as: 'threads.lm'
+          as: 'lm'
         }},
+        {$unwind: 'lm'},
         {$lookup: {
           from: 'users',
-          localField: 'threads.lm.uid',
+          localField: 'lm.uid',
           foreignField: 'uid',
-          as: 'threads.lm.user'
+          as: 'lm.user'
         }},
-      ])
+        {$unwind: 'lm.user'}
+      ]);
+      const length = await ThreadModel.count({$USM});
+      data.paging = paging(page, length)
     }
     else if(tab === 'all') {
-      data.threads = await mongoose.connection.db.collection('usersBehavior').aggregate([
+      const $digest = digest? {'thread.digest': true}: {};
+      let $sort = {};
+      if(sortby === 'tlm')
+        $sort = {'thread.tlm': -1};
+      else
+        $sort = {'thread.toc': -1};
+      data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
-          timeStamp: -1
+          timeStamp: 1
         }},
         {$match: {
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
           fid: {$in: visibleFid},
         }},
-        {$skip: page * perpage},
-        {$limit: perpage},
         {$group: {
           _id: '$tid',
           lastPost: {$first: '$$ROOT'}
@@ -199,6 +233,10 @@ router
           foreignField: 'tid',
           as: 'thread'
         }},
+        {$match: $digest},
+        {$sort},
+        {$skip: page * perpage},
+        {$limit: perpage},
         {$unwind: '$thread'},
         {$lookup: {
           from: 'posts',
@@ -214,9 +252,6 @@ router
           as: 'thread.lm'
         }},
         {$unwind: '$thread.lm'},
-        // {$match: {
-        //   'thread.lm.disabled': base.disabled
-        // }},
         {$lookup: {
           from: 'users',
           localField: 'thread.oc.uid',
@@ -234,11 +269,20 @@ router
         {$replaceRoot: {
           newRoot: '$thread'
         }}
-      ]).toArray()
+      ]);
+      const length = await UsersBehaviorModel.count({
+          uid,
+          operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
+          fid: {$in: visibleFid},
+        });
+      data.paging = paging(page, length)
     }
     ctx.template = 'interface_personal_forum.pug';
     ctx.data.userThreads = await ctx.data.user.getUsersThreads();
-    ctx.data.forumlist = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
+    ctx.data.forumList = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
+    ctx.data.digest = digest;
+    ctx.data.tab = tab;
+    ctx.data.sortby = sortby;
     await next()
   });
 
