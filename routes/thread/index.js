@@ -22,12 +22,12 @@ threadRouter
       tid: tid
     };
     if(!await thread.ensurePermissionOfModerators(ctx)) q.disabled = false;
-    const indexOfPostId = await db.PostModel.find(q, {pid: 1}).sort({toc: 1});
+    const indexOfPostId = await db.PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
     const indexArr = indexOfPostId.map(p => p.pid);
     data.paging = apiFn.paging(page, indexOfPostId.length);
     const forum = await ForumModel.findOnly({fid: thread.fid});
     const {mid, toMid} = thread;
-    let posts = await thread.getPostByQuery(query, q);
+    const posts = await thread.getPostByQuery(query, q);
     posts.map(post => {
       post.user = post.user.toObject();
       post.user.navbarDesc = ctx.getUserDescription(post.user);

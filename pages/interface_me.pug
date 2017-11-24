@@ -19,7 +19,7 @@ block content
         include exam_notification.pug
     .row
       .col-xs-12.col-md-12
-        .h3(style='font-weight:300;') 个人基本信息
+        .h4 个人基本信息
         hr
         .rom
           .col-xs-12.col-md-2(style='padding: 0')
@@ -34,7 +34,7 @@ block content
             //  div.f12!= data.user.navbarDesc.string.replace(/\n/g, '<br>')
             -var navbarDesc = data.user.navbarDesc;
             .col-xs-12.col-md-12
-              h3.text-center(style='margin-top: 0;')= data.user.username
+              h4.text-center(style='margin-top: 0;')= data.user.username
             .col-xs-12.col-md-12
               p(style='font-size:1.5rem').text-center 学术分：
                 span.colorOfNumber= navbarDesc.xsf
@@ -45,41 +45,41 @@ block content
               p(style='font-size:1.5rem').text-center 证书：
                 span.colorOfNumber= navbarDesc.cs
             .col-xs-6.col-md-10.col-md-offset-1
-              a.btn.btn-default.center-block(href=`/m/${user.uid}?tab=own`,role="button",style='margin:0.1em auto;') 个人专栏
+              a.btn.btn-default.center-block(href=`/m/${user.uid}?tab=all`,role="button",style='margin:0.1em auto;') 个人专栏
             .col-xs-6.col-md-10.col-md-offset-1
               a.btn.btn-default.center-block(href=`/u/${user.uid}/collections/unclassified`,role="button",style='margin:0.1em auto;') 个人收藏
       .col-xs-12.col-md-12
         hr
-        .h3(style='font-weight:300;margin-top:2em;') 账号安全设置
+        .h4(style='margin-top:2em;') 账号安全设置
         hr
         .rom(style='margin:1em 0;')
           .col-xs-12.col-md-10(style='padding: 0')
             .col-xs-12.col-md-4
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 旧密码
-                input.form-control#oldpassword(type='password', placeholder='旧密码', onclick='select()')
+                  .h5 旧密码
+                input.form-control#oldpassword(type='password', placeholder='请输入旧密码', onclick='select()')
             .col-xs-12.col-md-4
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 新密码，至少6位
-                input.form-control#newpassword(type='password', placeholder='新密码，至少6位', onclick='select()')
+                  .h5 新密码（至少8位）
+                input.form-control#newpassword(type='password', placeholder='请输入新密码', onclick='select()')
             .col-xs-12.col-md-4
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 重复一次
-                input.form-control#newpassword2(type='password', placeholder='重复一次', onclick='select()')
+                  .h5 重复输入新密码
+                input.form-control#newpassword2(type='password', placeholder='请输入新密码', onclick='select()')
           .col-xs-12.col-md-2(style='padding: 0')
             .col-xs-12.col-md-5
               .form-group
                 .col-xs-12.col-md-12.hidden-label
                     label(for="name")
                       .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
-                button.btn.btn-default#submitnewpassword(onclick='submitnewpassword()') 修改密码
+                button.btn.btn-default#submitnewpassword(onclick='submitnewpassword()') 提交
           .col-xs-12.col-md-10(style='padding: 0')
             .col-xs-12.col-md-3(style="display:none")
               label(for="name")
-                .h5(style='font-weight:300;') 选择国际区号
+                .h5 选择国际区号
               -var optionArray=[{num:'+86',country:'中国'},{num:'+852',country:'中国香港'},{num:'+853',country:'中国澳门'},{num:'+886',country:'中国台湾'},{num:'+81',country:'日本'},{num:'+82',country:'韩国'},{num:'+65',country:'新加坡'},{num:'+66',country:'泰国'},{num:'+60',country:'马来西亚'},{num:'+1',country:'美国'},{num:'+1',country:'加拿大'},{num:'+61',country:'澳大利亚'},{num:'+44',country:'英国'},{num:'+49',country:'德国'},{num:'+33',country:'法国'},{num:'+7',country:'俄罗斯'},{num:'+91',country:'印度'},{num:'+64',country:'新西兰'},{num:'+39',country:'意大利'},{num:'+31',country:'荷兰'},{num:'+34',country:'西班牙'},{num:'+46',country:'瑞典'},{num:'+43',country:'奥地利'},{num:'+41',country:'瑞士'},{num:'+370',country:'立陶宛'},{num:'+63',country:'菲律宾'},{num:'+62',country:'印度尼西亚'},{num:'+84',country:'越南'},{num:'+971',country:'阿联酋'}];
               select.form-control(onchange='chooseCountryNum(this.value)')
                 -for(var i = 0; i < optionArray.length; i++)
@@ -88,15 +88,15 @@ block content
               .form-group
                 label(for="name")
                   -if(data.user.mobile)
-                    .h5(style='font-weight:300;') 电话号码 ( 已绑定手机号码： #{data.user.mobile} )
+                    .h5 手机号码 ( 已绑定手机号码： #{data.user.mobile} )
                   -else
-                    .h5(style='font-weight:300;') 电话号码 ( 暂未绑定手机号码 )
+                    .h5 手机号码 ( 暂未绑定手机号码 )
                 input.form-control#phoneNumber(type='text', placeholder='电话号码', onclick='select()')
             .col-xs-12.col-md-2
               .form-group
                 label(for="name")
-                  .h5(style='font-weight:300;') 短息验证码
-                input.form-control#mCode(type='text', placeholder='短信验证码', onclick='select()')
+                  .h5 短息验证码
+                input.form-control#mCode(type='text', placeholder='输入验证码', onclick='select()')
             .col-xs-12.col-md-2
               .form-group
                 .col-xs-12.col-md-12.hidden-label
@@ -111,32 +111,33 @@ block content
                   button.btn.btn-default.center-block#submitPhoneNumber(onclick='submitPhoneNumber()') 提交
       .col-xs-12.col-md-12
         hr
-        .h3(style='font-weight:300;margin-top:2em;') 个人资料修改
+        .h4(style='margin-top:2em;') 个人资料修改
         hr
         .rom(style='margin:1em 0;')
           .col-xs-12.col-md-6(style='padding: 0')
             .col-xs-12.col-md-12
-              .h4(style='font-weight:300;') 帖子签名 (300字节)
+              .h5 帖子签名
+                span(style='color: #aaa; font-size: 0.9rem') &nbsp300字节限制
             .col-xs-12.col-md-10
-              textarea#post_sign.form-control(style='resize: none;',placeholder='帖子签名',rows="10") #{user.postSign||''}
+              textarea#post_sign.form-control(style='resize: none;',placeholder='300字节限制',rows="10") #{user.postSign||''}
           .col-xs-12.col-md-6(style='padding: 0')
             .col-xs-12.col-md-12
-              .h4(style='font-weight:300;') 个人简介(300字节)
+              .h5 个人简介
+                span(style='color: #aaa; font-size: 0.9rem') &nbsp300字节限制
             .col-xs-12.col-md-10
-              textarea#description.form-control(style='resize: none;',placeholder='个人简介',rows="10") #{user.description||''}
+              textarea#description.form-control(style='resize: none;',placeholder='300字节限制',rows="10") #{user.description||''}
           .col-xs-12.col-md-6(style='padding: 0')
             br
             .col-xs-12.col-md-12
-              .h4(style='font-weight:300;') Colorcode
-                span(style='font-size:0.8em;') （作为页面背景的颜色，有时显示在用户名的左侧成一个小圆圈。）
+              .h5 页面背景颜色
             .col-xs-12.col-md-5
               .form-group
                 input.form-control#color(type='text', placeholder='例如草木绿：#97b45a', name='colorCode', onclick='select()',value=`${user.color||""}`)
           .col-xs-12.col-md-6(style='padding: 0')
             br
             .col-xs-12.col-md-12
-              .h4(style='font-weight:300;') 关注板块id
-                span(style='font-size:0.8em;') （原本只能用半角逗号分隔，后来我发现有的同学非要用全角逗号，所以我只好写了兼容代码。）
+              .h5 关注的板块
+                span(style='font-size:0.8em;')
             .col-xs-12.col-md-5
               .form-group
                 input.form-control#focus_forums(type='text', placeholder='例如：81,373', name='colorCode', onclick='select()',value=`${user.subscribeForums||""}`)
@@ -146,7 +147,7 @@ block content
           #focusDiv(style='display:none;')
             .col-xs-12.col-md-12(style='padding: 0')
               .col-xs-12.col-md-12
-                .h4(style='font-weight:300;') 板块id示例
+                .h4 板块id示例
                    span(style='font-size:0.8em;') （点击可自动输入。）
                 -var forumlist = data.forumList;
                 -for (var i = 0; i < forumlist.length; i++)

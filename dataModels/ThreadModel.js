@@ -131,7 +131,6 @@ threadSchema.methods.extend = async function (){
 // 2、判断所在帖子是否被禁
 // 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限
 threadSchema.methods.ensurePermission = async function (ctx) {
-  const {db, data} = ctx;
   const visibleFid = await ctx.getVisibleFid();
   if(!visibleFid.includes(this.fid)) return false;
   if(this.disabled) {
@@ -147,7 +146,7 @@ threadSchema.methods.ensurePermissionOfModerators = async function(ctx) {
     return true;
   } else {
     const forum = await ctx.db.ForumModel.findOnly({fid: this.fid});
-    return forum.moderators.includes(ctx.data.user.uid);
+    return ctx.data.user && forum.moderators.includes(ctx.data.user.uid);
   }
 };
 

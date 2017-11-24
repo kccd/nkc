@@ -22,7 +22,8 @@
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
               a.ThreadPostTitleUsername(href=`/u/${uid}`) #{user?user.username:''}
-
+              if(user && user.uid === data.targetUser.uid)
+                span(style='color: #ccc') (楼主)&nbsp
               span.lighttext #{fromNow(post.toc)} -
               span.lighttext #{dateTimeString(post.toc)}
               -var postid = post.pid
@@ -63,12 +64,9 @@
                   if ipoc
                     - var queryforip = 'http://ip138.com/ips138.asp?ip='+ipoc.toString()+'&action=2'
                     a.lighttext(href=`${queryforip}`) #{ipoc}
-
-              span.floornum(style='float:right;')
-                if data.paging
-                  -var floornumber = data.paging.start+index
-                  //a(href='/t/#{data.thread._key}#{page?"?&page="+data.paging.page.toString():""}##{post.pid}').lighttext /#{floornumber}
-                  a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
+              if data.paging
+                -var floornumber = data.paging.start+index
+                a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}

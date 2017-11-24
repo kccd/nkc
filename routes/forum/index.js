@@ -33,10 +33,12 @@ forumRouter
       fid: {$in: fidOfChildForum}
     };
     if(cat) q.cid = cat;
-    if(digest === 'true') q.digest = true;
+    if(digest) {
+      q.digest = true;
+      data.digest = true;
+    }
     const countOfThread = await forum.getThreadCountByQuery(q);
     const paging = apiFn.paging(page, countOfThread);
-    if(digest) data.digest = true;
     data.cat = cat;
     data.sortby = sortby;
     data.paging = paging;
@@ -48,12 +50,12 @@ forumRouter
     });
     let toppedThreads = [];
     if(data.paging.page === 0 && data.forum.type === 'forum') {
-      toppedThreads = await forum.getToppedThreads(visibleFid);
+      toppedThreads = await forum.getToppedThreads(fidOfChildForum);
       toppedThreads.map(toppedThread => {
         toppedThread.oc.user.navbarDesc = ctx.getUserDescription(toppedThread.oc.user);
       });
     }
-    let forumList = await dbFn.getAvailableForums(ctx);
+    const forumList = await dbFn.getAvailableForums(ctx);
     data.toppedThreads = toppedThreads;
     data.threads = threads;
     data.forumList = forumList;
@@ -65,7 +67,7 @@ forumRouter
       }
     }
     data.replyTarget = `f/${fid}`;
-    const thredTypes = await ThreadTypeModel.find();
+    const thredTypes = await ThreadTypeModel.find().sort({order: 1});
     let forumThreadTypes = [];
     for (let i = 0; i < thredTypes.length; i++) {
       if(thredTypes[i].fid === fid) forumThreadTypes.push(thredTypes[i]);

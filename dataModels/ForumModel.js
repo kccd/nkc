@@ -113,10 +113,9 @@ forumSchema.methods.getThreadCountByQuery = async function(query) {
   return await ThreadModel.count(query);
 };
 
-forumSchema.methods.getToppedThreads = async function(visibleFid) {
+forumSchema.methods.getToppedThreads = async function(fidOfChildForum) {
   const ThreadModel = require('./ThreadModel');
-  const fidArr = await this.getFidOfChildForum(visibleFid);
-  let threads = await ThreadModel.find({fid: {$in: fidArr}, topped: true});
+  let threads = await ThreadModel.find({fid: {$in: fidOfChildForum}, topped: true});
   threads = await Promise.all(threads.map(t => t.extend()));
   return threads;
 };

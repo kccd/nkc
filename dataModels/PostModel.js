@@ -116,10 +116,13 @@ postSchema.methods.getUser = async function() {
   return await UserModel.findOnly({uid: this.uid});
 };
 
-postSchema.methods.ensurePermission = async function(visibleFid) {
-  const ThreadModel = require('./ThreadModel');
+postSchema.methods.ensurePermission = async function(ctx) {
+  const {ThreadModel} = ctx.db;
   const thread = await ThreadModel.findOnly({tid: this.tid});
-  return visibleFid.includes(thread.fid);
+  // 同时满足以下条件返回true
+  // 1、能浏览所在帖子
+  // 2、帖子没有被禁 或 用户为该板块的版主 或 具有比版主更高的权限
+  return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
 };
 
 module.exports = mongoose.model('posts', postSchema);

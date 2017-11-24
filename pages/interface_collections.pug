@@ -15,7 +15,9 @@ block content
           .nkcpanel
             -var uid = data.targetUser.uid
             include interface_profile_avatar.pug
-            .ForumName #{data.category} - #{data.targetUser.username} 的个人收藏
+            .ForumName
+              a(href=`/u/${data.targetUser.uid}`) #{data.targetUser.username}
+              span &nbsp的个人收藏
         
         if ownership
           .col-xs-12
@@ -69,11 +71,10 @@ block content
           :markdown
             ### 收藏使用说明
             
-            1. 浏览帖子的时候 标题处有“收藏”按钮，点击可将帖子加入收藏夹。可以重复加入多次。
-            2. 在收藏夹中，可以通过帖子右侧的选框选中帖子。
-            3. 在“输入分类名称”中填写新的分类名称，然后点“移动”便可将选中的帖子移动到新的分类。
-            4. 也可以点“移动到”下拉菜单，选择已有的分类。
-            5. “删除”按钮会将选中的收藏项删除。
+            1. 在收藏夹中，可以通过帖子右侧的选框选中帖子。
+            2. 在“输入分类名称”中填写新的分类名称，然后点“移动”便可将选中的帖子移动到新的分类。
+            3. 也可以点“移动到”下拉菜单，选择已有的分类。
+            4. “删除”按钮会将选中的收藏项删除。
             
             ### 收藏夹的意义
             

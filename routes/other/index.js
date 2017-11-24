@@ -26,7 +26,7 @@ otherRouter
     const {user} = data;
     const {content} = ctx.query;
     data.content = content || 'all';
-
+    data.navbar = {highlight: 'home'};
     let t = Date.now();
 
     const visibleFid = await ctx.getVisibleFid();

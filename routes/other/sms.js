@@ -16,12 +16,7 @@ smsRouter
     const paging = apiFn.paging(page, repliesLength);
     const start = paging.start;
     replies = replies.slice(start, start + perpage);
-    // let countOfNewReplies = 0;
     replies = await Promise.all(replies.map(async replie => {
-      /*if(!replie.viewed) {
-        countOfNewReplies++;
-        await replie.view();
-      }*/
       return await replie.extend();
     }));
     data.docs = replies;
@@ -128,6 +123,7 @@ smsRouter
       const targetMessage = message.toObject();
       targetMessage.s = findUserByUid(targetMessage.s);
       targetMessage.r = findUserByUid(targetMessage.r);
+      // 该信息未读&&信息的接收者为自己，则将信息标记为已读且记录此次加载标记了多少条信息为已读(用于减少信息通知数)
       if(!message.viewed && message.r === user.uid) {
         viewedFalseNumber++;
         await message.update({viewed: true});
@@ -189,8 +185,8 @@ smsRouter
     const systemMessage = await db.SmsModel.findOnly({sid});
     await systemMessage.update({$addToSet: {viewedUsers: user.uid}});
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    // 若用户没有查看过该系统信息，则让用户的newMessage.system--
-    if(!systemMessage.viewedUsers.includes(user.uid)) {
+    // 若用户没有查看过该系统信息&&用户的系统通知数不为0 (防止出现出现负数的情况)，则让用户的newMessage.system - 1
+    if(!systemMessage.viewedUsers.includes(user.uid) && userPersonal.newMessage.system > 0) {
       await userPersonal.decrementPsnl('system', -1);
     }
     data.docs = systemMessage;

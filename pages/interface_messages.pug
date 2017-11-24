@@ -32,19 +32,19 @@ block content
             li(class=`${nowAt === "replies"? "active": ""}`)
               a(style="cursor: pointer;",href='/sms/replies') 回复提醒
                 if(data.user.newMessage.replies && data.user.newMessage.replies > 0)
-                  span.reddish(style="font-size:1em;")!= `(${data.user.newMessage.replies})`
+                  span.messageNumber(style="font-size:1em;")!= `${data.user.newMessage.replies}`
             li(class=`${nowAt === "at"? "active": ""}`)
               a(style="cursor: pointer;",href='/sms/at') @我的
                 if(data.user.newMessage.at && data.user.newMessage.at > 0)
-                  span.reddish(style="font-size:1em;")!= `(${data.user.newMessage.at})`
+                  span.messageNumber(style="font-size:1em;")!= `${data.user.newMessage.at}`
             li(class=`${nowAt === "message"? "active": ""}`)
               a(style="cursor: pointer;",href='/sms/message') 短消息
                 if(data.user.newMessage.message && data.user.newMessage.message > 0)
-                  span.reddish(style="font-size:1em;")!= `(${data.user.newMessage.message})`
+                  span.messageNumber(style="font-size:1em;")!= `${data.user.newMessage.message}`
             li(class=`${nowAt === "system"? "active": ""}`)
               a(style="cursor: pointer;",href='/sms/system') 系统通知
                 if(data.user.newMessage.system && data.user.newMessage.system > 0)
-                  span.reddish(style="font-size:1em;")!= `(${data.user.newMessage.system})`
+                  span.messageNumber(style="font-size:1em;")!= `${data.user.newMessage.system}`
         -var targetUserUid = '';
         -if(nowAt === 'message' && data.targetUser)
           -targetUserUid = '/' + data.targetUser.uid;
@@ -154,14 +154,14 @@ block content
                 hr(style='margin:0.5em 0;')
                 .media(style='margin:0;')
                   span #{docs[i].group[0].toc.toLocaleString()}
-                  .media-left.media-top
+                  .media-left.media-top(style='position: relative')
+                    -if(newMesNum > 0)
+                      span.messageNumber.messageNumberOfImg(style='line-height: 20px') #{newMesNum}
                     a(href=`/u/${docs[i].uid}`)
                       img.media-object.img-rounded(src=`/avatar/${docs[i].uid}`,style='height:3em;width:3em;')
                   .media-body
                     h4.media-heading
                       a(href=`/sms/message/${docs[i].uid}`) #{docs[i].username}
-                      -if(newMesNum > 0)
-                        span.reddish (#{newMesNum})
                       span :
                       a(style='font-size:0.85em;float:right;',href=`/sms/message/${docs[i].uid}`) 查看聊天信息
                       p(style="font-size:0.8em; word-break:break-all;") #{docs[i].group[0].c}

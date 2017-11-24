@@ -474,7 +474,21 @@ padding: 1px 7px 1px 7px; */
 
   margin-right: 7px;
 }
-
+.messageNumber{
+  display: inline-block;
+  height:1.48rem;
+  width:1.48rem;
+  border-radius: 0.74rem;
+  background-color: #e99;
+  color: #fff;
+  font-size: 1rem;
+  text-align: center;
+}
+.messageNumberOfImg{
+  position: absolute;
+  right: 0.5rem;
+  top: -0.1rem;
+}
 .reddish {
   color: #e99;
 }
@@ -1741,4 +1755,27 @@ img.emoji {
   #changeDisNone{
     display: none;
   }
+}
+.panel {
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0);
+}
+.nav-bnt{
+  margin: 8px 0;
+}
+.nav-font-color{
+  font-size: 1.6rem;
+}
+
+@media screen and (max-width: 768px) {
+  .nav-font-color li{
+    border-top: 1px solid #eee;
+  }
+}
+
+.ForumThreadHasImage:hover{
+  text-decoration: none;
+}
+.ForumThreadHasImage .forumDisplayName:hover{
+  text-decoration: underline;
 }

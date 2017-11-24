@@ -12,12 +12,13 @@
               img(src=`/resources/site_specific/forum_icon/${forum.iconFileName}.png' width='100%`)
             else
               div(style=`width: 100%;height: 100%;background-color: ${forum.color? forum.color: defaultColor}`)
-          a(href=`/f/${forum.fid}` title=`${forum.description}` style='font-size: 18px; color: black;') &nbsp;#{forum.displayName}
+          span &nbsp;
+          a(href=`/f/${forum.fid}` title=`${forum.description}` style='font-size: 18px; color: black;') #{forum.displayName}
         div(style='display: table-cell;')
           for cForum in forum.children
             a.ForumThreadHasImage(href=`/f/${cForum.fid}` title=`${cForum.description}` style='color: black;background-color: white; font-size: 14px; margin-top: -6px;')
               span.nkc-bubble(style=`background-color: ${cForum.color? cForum.color: defaultColor}`) &nbsp;#{cForum.countPostsToday}&nbsp;
-              span #{cForum.displayName}
+              span.forumDisplayName #{cForum.displayName}
 
 .nkc-transform-box
   .nkc-inline-table
@@ -29,9 +30,10 @@
               img(src=`/resources/site_specific/forum_icon/${forum.iconFileName}.png' width='100%`)
             else
               div(style=`width: 100%;height: 100%;background-color: ${forum.color ? forum.color : defaultColor}`)
-          a(href=`/f/${forum.fid}` title=`${forum.description}` style='font-size: 18px; color: black;') &nbsp;#{forum.displayName}
+          span &nbsp
+          a(href=`/f/${forum.fid}` title=`${forum.description}` style='font-size: 18px; color: black;') #{forum.displayName}
         div(style='display: table-cell;')
           for cForum in forum.children
             a.ForumThreadHasImage(href=`/f/${cForum.fid}` title=`${cForum.description}` style='color: black; background-color: white; font-size: 14px; margin-top: -6px;')
               span.nkc-bubble(style=`background-color: ${cForum.color? cForum.color: defaultColor}`) &nbsp;#{cForum.countPostsToday}&nbsp;
-              span #{cForum.displayName}
+              span.forumDisplayName #{cForum.displayName}
