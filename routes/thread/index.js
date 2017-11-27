@@ -30,7 +30,6 @@ threadRouter
     const posts = await thread.getPostByQuery(query, q);
     posts.map(post => {
       post.user = post.user.toObject();
-      post.user.navbarDesc = ctx.getUserDescription(post.user);
       const postContent = post.c || '';
       const index = postContent.indexOf('[quote=');
       if(index !== -1) {
@@ -41,7 +40,6 @@ threadRouter
     });
     data.posts = posts;
     let targetThread = await thread.extend();
-    targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user) {
       data.usersThreads = await data.user.getUsersThreads();

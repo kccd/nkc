@@ -35,7 +35,6 @@ collectionsRouter
     let categoryCollection = await db.CollectionModel.find(queryDate).sort({toc: -1});
     categoryCollection = await Promise.all(categoryCollection.map(async c => {
       const collect = await c.extend();
-      collect.thread.oc.user.navbarDesc = ctx.getUserDescription(collect.thread.oc.user);
       return collect;
     }));
     data.category = queryDate.category;

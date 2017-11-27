@@ -37,7 +37,6 @@ router
       $sort.tlm = 1;
     }
     data.targetUser = await UserModel.findOnly({uid});
-    data.targetUser.navbarDesc = ctx.getUserDescription(data.targetUser);
     const visibleFid = await ctx.getVisibleFid();
     if(tab === 'reply') {
       let $matchPost = matchBase
@@ -274,7 +273,6 @@ router
         data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
           let thread = await ThreadModel.findOnly({tid});
           thread = await thread.extend();
-          thread.oc.user.navbarDesc = ctx.getUserDescription(thread.oc.user);
           return thread;
         }));
       const length = await UsersBehaviorModel.count({

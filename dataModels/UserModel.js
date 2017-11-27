@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const {certificates} = settings.permission;
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
@@ -156,6 +157,19 @@ userSchema.methods.updateUserMessage = async function() {
   });
 };
 
-userSchema.virtual('navbarDesc').get(function() {})
+userSchema.virtual('navbarDesc').get(function() {
+  const {certs, username, xsf = 0, kcb = 0} = this;
+  let cs = ['会员'];
+  for(const cert of certs) {
+    cs.push(certificates[cert].displayName);
+  }
+  cs = cs.join(' ');
+  return {
+    username: username,
+    xsf: xsf,
+    kcb: kcb,
+    cs: cs
+  }
+});
 
 module.exports = mongoose.model('users', userSchema);

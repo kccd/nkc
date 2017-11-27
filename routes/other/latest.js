@@ -20,7 +20,6 @@ latestRouter
     let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
     threads = await Promise.all(threads.map(async t => {
       const targetThread = await t.extend();
-      targetThread.oc.user.navbarDesc = ctx.getUserDescription(targetThread.oc.user);
       return targetThread;
     }));
     data.indexThreads = threads;

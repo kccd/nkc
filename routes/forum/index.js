@@ -45,15 +45,9 @@ forumRouter
     data.forum = forum;
     if(forum.moderators.length > 0) data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
     let threads = await forum.getThreadsByQuery(query, q);
-    threads.map(thread => {
-      thread.oc.user.navbarDesc = ctx.getUserDescription(thread.oc.user);
-    });
     let toppedThreads = [];
     if(data.paging.page === 0 && data.forum.type === 'forum') {
       toppedThreads = await forum.getToppedThreads(fidOfChildForum);
-      toppedThreads.map(toppedThread => {
-        toppedThread.oc.user.navbarDesc = ctx.getUserDescription(toppedThread.oc.user);
-      });
     }
     const forumList = await dbFn.getAvailableForums(ctx);
     data.toppedThreads = toppedThreads;
