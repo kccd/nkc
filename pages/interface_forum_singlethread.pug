@@ -85,7 +85,7 @@
         if 1
           span.hidden-xs.lighttext.ForumThreadItemCreationTime #{dateTimeString(thread.toc).split(' ')[0]} from
 
-        a.ForumThreadItemUsername(href=`/u/${ocUser.uid}`) #{ocUser.username}
+        a.ForumThreadItemUsername(href=`/m/${ocUser.uid}`) #{ocUser.username}
 
         if Date.now()-thread.tlm<86400000
           span.lighttext.reddish #{fromNow(thread.tlm)}
@@ -94,5 +94,5 @@
           //帖子最后回复时间和回复者
 
         span.lighttext(style='margin-right:7px;')   by
-        a.ForumThreadItemUsername(href=`/u/${lmUser.uid}`) #{lmUser.username}
+        a.ForumThreadItemUsername(href=`/m/${lmUser.uid}`) #{lmUser.username}
 
