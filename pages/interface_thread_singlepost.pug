@@ -37,6 +37,7 @@
                   a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}', ${recUsers.length})`) 已推介(#{recUsers.length})
                 else
                   a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}', ${recUsers.length})`) 推介(#{recUsers.length})
+                a(href=`javascript:at('${post.user.username}')`) @该用户
 
               - if(postTo)
                 a(href=`javascript:quotePost('${post.pid}', '${data.paging.start+index}')`) 引用

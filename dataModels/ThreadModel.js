@@ -127,6 +127,7 @@ threadSchema.methods.extend = async function (){
   return obj;
 };
 
+
 // 1、判断能否进入所在板块
 // 2、判断所在帖子是否被禁
 // 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限

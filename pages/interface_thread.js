@@ -257,6 +257,12 @@ function quotePost(pid, number){
   })
 }
 
+function at(username) {
+  if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
+  geid('ReplyContent').value += '@'+username+' ';
+  window.location.href='#ReplyContent';
+}
+
 function goEditor(){
   window.location = '/editor?target='+replyTarget.trim()+'&content='+encodeURI(assemblePostObject().c)
 }

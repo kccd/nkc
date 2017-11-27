@@ -130,6 +130,9 @@ async function getVisibleFid() {
 
 module.exports = async (ctx, next) => {
   let certs = ['visitor'];
+  if(ctx.data.user) {
+    certs = ctx.data.user.certs;
+  }
   const cs = getPermitTree(certs);
   cs.contentClasses = Object.keys(cs.contentClasses);
   ctx.data.certificates = cs;

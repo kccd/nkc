@@ -29,7 +29,7 @@ postRouter
       c: c,
       tlm: Date.now()
     };
-    targetPost.updata(obj);
+    await targetPost.update(obj);
     //更新post
 
 
@@ -38,17 +38,22 @@ postRouter
 
 
 
-    const indexOfPostId = await targetThread.getIndexOfPostId();
-    let page = '';
+    const q = {
+      tid: targetThread.tid
+    };
+    if(!await targetThread.ensurePermissionOfModerators(ctx)) q.disabled = false;
+    const indexOfPostId = await db.PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
+    let page = 0;
     let postId = `#${pid}`;
-    indexOfPostId.map(post => {
-      if(post.pid !== pid) return;
+    for (let i in indexOfPostId) {
+      if(indexOfPostId[i].pid !== pid) continue;
       page = Math.ceil(i/perpage);
       if(page <= 1) page = `?`;
       else page = `?page=${page - 1}`;
-    });
+    }
     data.redirect = `/t/${targetThread.tid + page + postId}`;
     data.targetUser = targetUser;
+    console.log(`=============================`);
     await next();
   })
   .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods());
