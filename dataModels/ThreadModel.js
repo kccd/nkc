@@ -159,11 +159,6 @@ threadSchema.methods.extendForum = async function() {
   this.forum = await ForumModel.findOnly({fid: this.fid})
 };
 
-threadSchema.methods.extend = function(fn) {
-  fn(this);
-};
-
-
 // 1、判断能否进入所在板块
 // 2、判断所在帖子是否被禁
 // 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限
@@ -190,14 +185,15 @@ threadSchema.methods.ensurePermissionOfModerators = async function(ctx) {
 threadSchema.methods.getPostByQuery = async function (query, macth) {
   const PostModel = require('./PostModel');
   const {$match, $sort, $skip, $limit} = getQueryObj(query, macth);
-  let posts = await PostModel.find($match).sort({toc: 1}).skip($skip).limit($limit);
-  posts = await Promise.all(posts.map(p => p.extend(async function(doc) {
+  let posts = await PostModel.find($match)
+    .sort({toc: 1}).skip($skip).limit($limit);
+  posts = await Promise.all(posts.map(async doc => {
     await doc.extendForum();
     await doc.extendUser();
     await doc.extendFirstPost().then(post => post.extendUser());
     await doc.extendLastPost().then(post => post.extendUser());
     return doc
-  })));
+  }));
   return posts;
 };
 

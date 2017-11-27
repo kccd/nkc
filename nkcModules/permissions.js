@@ -162,6 +162,7 @@ module.exports = async (ctx, next) => {
   ctx.getVisibleFid = getVisibleFid;
   ctx.generateMatchBase = (base = {}) => {
     if(ctx.data.userLevel < 4)
+
       base.disabled = false;
     return Map(base)
   };
