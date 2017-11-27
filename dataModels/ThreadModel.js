@@ -114,17 +114,53 @@ threadSchema.pre('save', function (next) {
   next();
 });
 
-threadSchema.methods.extend = async function (){
+threadSchema.virtual('firstPost')
+  .get(function() {
+    if(!this._firstPost)
+      throw new Error('firstPost is not initialized.');
+    return this._firstPost
+  })
+  .set(function(p) {
+    this._firstPost = p
+  });
+
+threadSchema.virtual('lastPost')
+  .get(function() {
+    if(!this._lastPost)
+      throw new Error('lastPost is not initialized.');
+    return this._lastPost
+  })
+  .set(function(p) {
+    this._lastPost = p
+  });
+
+threadSchema.virtual('forum')
+  .get(function() {
+    if(!this._forum)
+      throw new Error('forum is not initialized.');
+    return this._forum
+  })
+  .set(function(f) {
+    this._forum = f
+  });
+
+threadSchema.methods.extendFirstPost = async function() {
   const PostModel = require('./PostModel');
+  this.firstPost = await PostModel.findOnly({pid: this.oc})
+};
+
+threadSchema.methods.extendLastPost = async function() {
+  const PostModel = require('./PostModel');
+  this.lastPost = await PostModel.findOnly({pid: this.lm})
+};
+
+threadSchema.methods.extendForum = async function() {
   const ForumModel = require('./ForumModel');
-  let obj = this.toObject();
-  let oc = await PostModel.findOnly({pid: this.oc});
-  let lm = await PostModel.findOnly({pid: this.lm});
-  let forum = await ForumModel.findOnly({fid: this.fid});
-  obj.oc = await oc.extend();
-  obj.lm = await lm.extend();
-  obj.forum = forum;
-  return obj;
+  this.forum = await ForumModel.findOnly({fid: this.fid})
+};
+
+threadSchema.methods.extend = function(fn) {
+  fn(this);
 };
 
 
@@ -155,7 +191,13 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
   const PostModel = require('./PostModel');
   const {$match, $sort, $skip, $limit} = getQueryObj(query, macth);
   let posts = await PostModel.find($match).sort({toc: 1}).skip($skip).limit($limit);
-  posts = await Promise.all(posts.map(p => p.extend()));
+  posts = await Promise.all(posts.map(p => p.extend(async function(doc) {
+    await doc.extendForum();
+    await doc.extendUser();
+    await doc.extendFirstPost().then(post => post.extendUser());
+    await doc.extendLastPost().then(post => post.extendUser());
+    return doc
+  })));
   return posts;
 };
 

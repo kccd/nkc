@@ -96,24 +96,55 @@ postSchema.pre('save' , function(next) {
   next();
 });
 
-postSchema.methods.extend = async function() {
-  const ResourceModel = require('./ResourceModel');
-  const UserModel = require('./UserModel');
-  const user = await UserModel.findOnly({uid:this.uid});
-  let obj = this.toObject();
-  const resources = [];
-  await Promise.all(this.r.map(async r => {
-    const resourceOfDB = await ResourceModel.findOne({rid: r});
-    if(resourceOfDB) resources.push(resourceOfDB);
-  }));
-  obj = Object.assign(obj, {user});
-  obj = Object.assign(obj, {resources});
-  return obj
+postSchema.virtual('user')
+  .get(function() {
+    if(!this._user)
+      throw new Error('user is not initialized.');
+    return this._user
+  })
+  .set(function(u) {
+    this._user = u
+  });
+
+postSchema.virtual('resources')
+  .get(function() {
+    if(!this._resources)
+      throw new Error('resources is not initialized.');
+    return this._resources
+  })
+  .set(function(rs) {
+    this._resources = rs
+  });
+
+postSchema.virtual('thread')
+  .get(function() {
+    if(!this._thread)
+      throw new Error('thread is not initialized.');
+    return this._thread
+  })
+  .set(function(t) {
+    this._thread = t
+  });
+
+postSchema.methods.extendThread = async function() {
+  const ThreadModel = require('./ThreadModel');
+  return this.thread = await ThreadModel.findOnly({tid: this.tid})
 };
 
-postSchema.methods.getUser = async function() {
+postSchema.methods.extendResources = async function() {
+  const ResourceModel = require('./ResourceModel');
+  return this.resources = await Promise.all(
+    this.r.map(async r => await ResourceModel.findOnly({rid: r}))
+  );
+};
+
+postSchema.methods.extendUser = async function() {
   const UserModel = require('./UserModel');
-  return await UserModel.findOnly({uid: this.uid});
+  return this.user = await UserModel.findOnly({uid: this.uid});
+};
+
+postSchema.methods.extend = function(fn) {
+  fn(this)
 };
 
 postSchema.methods.ensurePermission = async function(ctx) {
