@@ -29,6 +29,8 @@ if thread
         - var user = ocuser
         -var title = '';
         -if(user)
+          -var navbarDesc = user.navbarDesc;
+          -console.log(user)
           -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
         a(href=`/m/${uid}` title=`${title}`)
           img.ForumThreadAvatar(src=`/avatar/${uid}`)

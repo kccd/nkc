@@ -199,7 +199,7 @@ block content
 
           .ForumThreadList
             each thread,index in data.threads
-              if data.toppedThreads && (data.toppedThreads.map(item => item._key).indexOf(thread.tid) >= 0)
+              if data.toppedThreads && (data.toppedThreads.map(item => item.tid).indexOf(thread.tid) >= 0)
                 //exclude threads that are shown in topped area.
               else
                 include interface_personal_forum_single_thread

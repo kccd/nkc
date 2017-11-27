@@ -156,4 +156,6 @@ userSchema.methods.updateUserMessage = async function() {
   });
 };
 
+userSchema.virtual('navbarDesc').get(function() {})
+
 module.exports = mongoose.model('users', userSchema);

@@ -270,6 +270,13 @@ router
           newRoot: '$thread'
         }}
       ]);
+      if(tab === ('all' || 'own' || 'discuss'))
+        data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
+          let thread = await ThreadModel.findOnly({tid});
+          thread = await thread.extend();
+          thread.oc.user.navbarDesc = ctx.getUserDescription(thread.oc.user);
+          return thread;
+        }));
       const length = await UsersBehaviorModel.count({
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
