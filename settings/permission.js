@@ -165,11 +165,17 @@ const certificates ={
         },
         [GET]: true
       },
-      site_specific: {
-        [GET]:true,
-        [parameter]: {
-          [GET]: true
-        }
+      resources: {
+        site_specific: {
+          forum_icon: {
+            [parameter]: {
+              [GET]: true,
+            },
+          },
+          [parameter]: {
+            [GET]: true
+          }
+        },
       },
       default: {
         [parameter]: {

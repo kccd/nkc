@@ -11,7 +11,7 @@ const otherRouter = new Router();
 const editorRouter = require('./editor');
 const avatar = require('./avatar');
 const avatarSmall = require('./avatar_small');
-const siteSpecific = require('./site_specific');
+const resourcesRouter = require('./resources');
 const defaultRouter = require('./default');
 const settings = require('../../settings');
 const {home} = settings;
@@ -64,10 +64,7 @@ otherRouter
     let t1 = Date.now();
 
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
-    latestThreads = await Promise.all(latestThreads.map(async thread => {
-      const targetThread = await thread.extend();
-      return targetThread;
-    }));
+    latestThreads = await Promise.all(latestThreads.map(thread => thread.extend()));
     data.latestThreads = latestThreads;
 
     let t2 = Date.now();
@@ -99,7 +96,7 @@ otherRouter
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('avatar', avatar.routes(), avatar.allowedMethods())
   .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
-  .use('site_specific', siteSpecific.routes(), siteSpecific.allowedMethods())
+  .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
   .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
