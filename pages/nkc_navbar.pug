@@ -1,9 +1,14 @@
 //nav.navbar.navbar-default
 - var navbar = data.navbar || {}
+if data.user
+  -var newMessage = data.user.newMessage;
+  -var messageSum = (newMessage.message || 0) + (newMessage.system || 0) + (newMessage.at || 0) + (newMessage.replies || 0);
 nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;')
   .container-fluid(style='max-width: 1400px')
     .navbar-header
       button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
+        if messageSum > 0
+          span(style="color: red;font-size: 0.5em;position: absolute;top: -0.5rem; right: -0.2rem;") ●
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -11,7 +16,7 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;')
       a.navbar-brand(href="/" style='color: #337ab7; font-size: 2.2rem')= data.site.name
       -var navbar_highlight = data.navbar_highlight||navbar.highlight
       -var isActive = function(label){return (navbar_highlight==label)?'background-color: #337ab7;color: #fff;':''}
-      ul.pagination.nav.navbar-nav.navbar-left.nav-bnt(style='padding:0 0 0 2rem')
+      ul.pagination.nav.navbar-nav.navbar-left.nav-btn(style='padding:0 0 0 2rem')
         li
           a(href='/' title='扫一眼' style=`${isActive('home')}`) 首页
 
@@ -38,8 +43,6 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;')
           li
 
             a(style='color: #337ab7;padding-right: 0.2rem' href='/sms') 信
-              -var newMessage = data.user.newMessage
-              -var messageSum = (newMessage.message || 0) + (newMessage.system || 0) + (newMessage.at || 0) + (newMessage.replies || 0);
               if(messageSum > 0)
                 -if(messageSum >= 100){messageSum='99+'}
                   span.messageNumber #{messageSum}
@@ -50,82 +53,3 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;')
             a(style='color: #337ab7;padding-right: 0.2rem' href=`/u/${data.user.uid}/collections/unclassified` title='我的收藏') 藏
           li
             a(style='color: #337ab7;padding-right: 0.2rem' href=`/logout` title='不，不要走！') 退
-//
-//div
-//  - var navbar = data.navbar || {}
-//  .container-fluid
-//    .row(style='min-height:43px;background-color:#f3f3f3;margin-bottom: 18px; padding-bottom: 4px;border-bottom-color: rgb(221, 221, 221); border-bottom-width: 1px; border-bottom-style: solid;').nkcshade
-//      .col-xs-4.col-sm-2
-//
-//        div.text-center(style='margin-top:5px; margin-bottom:0px')
-//          a.f16(href='/' style='text-decoration: none; display:inline-block;') #{data.site.name}
-//
-//      .col-xs-8.col-sm-4
-//        -var navbar_highlight = data.navbar_highlight||navbar.highlight
-//        -var isActive = function(label){return (navbar_highlight==label)?'active':''}
-//        ul.pagination(style='margin-top:4px; margin-bottom:0px')
-//          if 0
-//            li(class=`${isActive('tool')}`)
-//              a(href='/static/tools/index.htm' title='由论坛朋友贡献的工具箱') 工具
-//
-//          li(class=`${isActive('home')}`)
-//            a(href='/' title='扫一眼') 首页
-//
-//          if data.user&&data.user.uid
-//            li(class=`${isActive('self')}`)
-//              a(href='/self' title='个人动态') 我的
-//
-//        if 0
-//          li(class=`${navbar.highlight=='editor'?'active':''}`)
-//            a(href='/e') 著
-//
-//        if 0
-//          li(class=`${navbar.highlight=='uploader'?'active':''}`)
-//            a(href='#') 传
-//
-//      .col-xs-7.col-sm-3
-//        .input-group(style='margin-top:4px;')
-//          input#SearchBox.form-control(type='text' placeholder='关键词、文号、用户')
-//          span.input-group-btn
-//            button#SearchButton.btn.btn-default(type='button') 搜索
-//
-//        if 0
-//          .row(style='margin-top:4px;')
-//            .col-xs-9(style='padding-right:0px')
-//              input#SearchBox.form-control(type='text',placeholder='搜索' style='')
-//            .col-xs-3(style='padding-left:4px;')
-//              button#SearchButton.btn.btn-default(style='float:left') 搜索
-//
-//      .col-xs-5.col-sm-3
-//        .NavBarLinkArea.f12.text-center
-//          if (data.user && !data.logout)
-//            - var user = data.user
-//            - var navbarDesc = user.navbarDesc;
-//            - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-//            a(href='/me' title=`${title}`) #{user.username}
-//
-//            -const sms = '/sms'
-//              if data.userLevel >= 1
-//                a(href=sms)
-//                  span 信
-//
-//                  if data.user.newMessage
-//                    -var newMessage = data.user.newMessage
-//                    -var messageSum = (newMessage.message || 0) + (newMessage.system || 0) + (newMessage.at || 0) + (newMessage.replies || 0);
-//                    if(messageSum > 0)
-//                      span.reddish (#{messageSum})
-//
-//              if data.userLevel >= 4
-//                a(href='/e' title='管理界面') 管
-//
-//            a(href=`/u/${data.user.uid}/collections/unclassified` title='我的珍藏') 藏
-//
-//            a(href=`/logout` title='不，不要走！') 退
-//
-//          else
-//            a(href='/login' title='还记得密码吗？') 登录
-//            a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
-//
-//
-//
-//

@@ -477,7 +477,7 @@ padding: 1px 7px 1px 7px; */
 .messageNumber{
   display: inline-block;
   height:1.48rem;
-  width:1.48rem;
+  width:1.5rem;
   border-radius: 0.74rem;
   background-color: #e99;
   color: #fff;
@@ -1760,7 +1760,7 @@ img.emoji {
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0);
 }
-.nav-bnt{
+.nav-btn{
   margin: 8px 0;
 }
 .nav-font-color{

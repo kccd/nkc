@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.8');
+db = require('arangojs')('http://192.168.11.16');
 db.useDatabase('rescue');
 let number = 1;
 let collectionsSchema = new Schema({
@@ -29,7 +29,7 @@ let collectionsSchema = new Schema({
   },
   category: {
     type: String,
-    default: 'unclassified',
+    default: '未分类',
     required: true,
     index: 1
   }
@@ -50,7 +50,7 @@ return a
   let n = 0;
   let toMongo = () => {
     let data = res[n];
-    if(!data.category || data.category === '') data.category = 'unclassified';
+    if(!data.category || data.category === '') data.category = '未分类';
     let collection = new Collection({
       cid: number,
       toc: data.toc,

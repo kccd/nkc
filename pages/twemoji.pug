@@ -4,5 +4,5 @@
       for tmj in data.twemoji
         a(style='display: inline-block; padding: 3px 3px;cursor: pointer;')
           img.emoji(src=`/twemoji/2/svg/${tmj}.svg` data-unicode=`${String.fromCodePoint(parseInt(tmj, 16))}`)
-  button.btn.dropdown-toggle#twemoji(type='button' data-toggle="dropdown") 表情
+  button.btn.btn-default.dropdown-toggle#twemoji(type='button' data-toggle="dropdown") 表情
     span.caret

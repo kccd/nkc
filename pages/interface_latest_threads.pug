@@ -1,5 +1,4 @@
 extends bootstrap_base
-
 block title
   meta(name='description' content='每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
 
@@ -11,6 +10,7 @@ block title
   title #{data.site.name} - #{data.site.description}
 
 block content
+  -var mainContainer1400 = true;
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-md-9
@@ -93,9 +93,9 @@ block content
             br
             for thread in data.userThreads
               include interface_users_latest_threads
-      .row
-        .col-md-12
-          include nkc_friendlies.pug
+      //.row
+      //  .col-md-12
+      //    include nkc_friendlies.pug
       div#bm
 block scripts
   script(src='/interface_common.js')

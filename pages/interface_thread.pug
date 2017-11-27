@@ -96,24 +96,23 @@ block content
 
                   a(href=`/t/${data.thread.tid}`) 本帖地址
                 if user
+                  - var visibilityMF //MF=my forum
+                  - var digestMF
+                  - var topMF
+                  - var visibilityOF // of=others forum
+                  - var digestOF
+                  - var topOF
                   if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
                     .form-inline
-                      .form-group
+                      .form-group.form-group-sm
                         include forumlist_dropdown.pug
-                        button(onclick=`javascript:moveThreadTo('${thread.tid}')`) #{moveThread? '移动' : '转发'}
+                        button.btn.btn-default.btn-sm(onclick=`javascript:moveThreadTo('${thread.tid}')`) #{moveThread? '移动' : '转发'}
+                      if(thread.fid && moveThread)
+                        .form-group
+                          a.btn.btn-default.btn-sm#moveToPersonal(href='javascript:;' onclick=`moveToPersonalForum("${thread.tid}")`) 移至个人版
                       if moveThread
                         .form-group
-                          button#recyclebtn.btn.btn-xs.btn-danger(onclick=`recycleThread('${data.thread.tid}')`) 送回收站
-
-                  if user
-                    - var visibilityMF //MF=my forum
-                    - var digestMF
-                    - var topMF
-                    - var visibilityOF // of=others forum
-                    - var digestOF
-                    - var topOF
-                    if(thread.fid && moveThread)
-                      a#moveToPersonal(href='javascript:;' onclick=`moveToPersonalForum("${thread.tid}")`) 移至个人版
+                          button#recyclebtn.btn.btn-sm.btn-danger(onclick=`recycleThread('${data.thread.tid}')`) 送回收站
                     if thread.toMid === user.uid || thread.mid === user.uid
                       -var text
                       if data.thread.toMid === data.user.uid && data.thread.hideInToMid || data.thread.mid === data.user.uid && data.thread.hideInMid

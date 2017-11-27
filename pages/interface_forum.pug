@@ -146,37 +146,34 @@ block content
                 .col-xs-12
                   .form-group(style='margin-top:0px;margin-bottom:6px')
                     include interface_easy_post.pug
-                    if data.replyTarget && !hasChildren
-
-                      a.btn.btn-default(href=`/editor?target=${data.replyTarget}`) 新帖
-                    if isModerator&&!forumIsParent
-                      button#enterManagementMode.btn.btn-default(onclick='enterManagementMode()') 管理
+                    //if data.replyTarget && !hasChildren
+                    //
+                    //  a.btn.btn-default(href=`/editor?target=${data.replyTarget}`) 发表新帖
+                    //if isModerator&&!forumIsParent
+                    //  button#enterManagementMode.btn.btn-default(onclick='enterManagementMode()') 管理
 
                   .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
 
                     .form-inline(style='margin-top:10px')
 
-                      if data.userLevel >= 1
-                        .form-group
-                          button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
-
                       .form-group
-                        button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
+                        button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
 
-
-
-                      .form-group
+                      .form-group.form-group-sm
                         include forumlist_dropdown.pug
-                        button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+                        button.btn.btn-default.btn-sm#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+
+                      if data.userLevel >= 1
+                        button.btn.btn-default.btn-sm#addSelectedToMyCollection(onclick='addSelectedToMyCollection()') 添加到个人收藏
 
                       .form-group
-                        button#recyclebtn.btn.btn-xs.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
+                        button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
 
                       if data.userLevel >= 6
                         -var ffid = data.forum.fid
-                        button(onclick=`renameForumCategory('${ffid}')`) 重命名分类
-                        button(onclick=`addForumCategory('${ffid}')`) 增加分类
-                        button(onclick=`deleteForumCategory('${ffid}')`) 删除分类
+                        button.btn.btn-default.btn-sm(onclick=`renameForumCategory('${ffid}')`) 重命名分类
+                        button.btn.btn-default.btn-sm(onclick=`addForumCategory('${ffid}')`) 增加分类
+                        button.btn.btn-default.btn-sm(onclick=`deleteForumCategory('${ffid}')`) 删除分类
 
 
 
@@ -291,7 +288,7 @@ block scripts
   script(src='/interface_forum.js')
   script(src='/interface_easy_post.js')
   //script(src='/gallery.js')
-  
+
 
   if isModerator&&!forumIsParent
     script.

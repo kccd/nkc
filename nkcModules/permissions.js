@@ -674,7 +674,14 @@ async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
   const fs = await mongoose.connection.db.collection('forums').find(
     {
-      class: {$in: cc}
+      $or: [{
+        class: {$in: cc},
+        visibility: true
+      },
+      {
+        isVisibleForNCC: true,
+        visibility: true
+      }]
     }
   ).toArray();
   return fs.map(e => e.fid);

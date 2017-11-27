@@ -1,5 +1,6 @@
 extends bootstrap_base.pug
 
+
 block title
   - var user = data.user
   title #{user.username} - #{data.site.name}
@@ -42,7 +43,7 @@ block content
               p(style='font-size:1.5rem').text-center 科创币：
                 span.colorOfNumber= navbarDesc.kcb
             .col-xs-12.col-md-12
-              p(style='font-size:1.5rem').text-center 证书：
+              p(style='font-size:1.5rem').text-center
                 span.colorOfNumber= navbarDesc.cs
             .col-xs-6.col-md-10.col-md-offset-1
               a.btn.btn-default.center-block(href=`/m/${user.uid}?tab=all`,role="button",style='margin:0.1em auto;') 个人专栏
@@ -62,7 +63,8 @@ block content
             .col-xs-12.col-md-4
               .form-group
                 label(for="name")
-                  .h5 新密码（至少8位）
+                  .h5 新密码
+                    span(style='color: #888; font-size: 1.2rem') &nbsp至少8位
                 input.form-control#newpassword(type='password', placeholder='请输入新密码', onclick='select()')
             .col-xs-12.col-md-4
               .form-group
@@ -88,9 +90,11 @@ block content
               .form-group
                 label(for="name")
                   -if(data.user.mobile)
-                    .h5 手机号码 ( 已绑定手机号码： #{data.user.mobile} )
+                    .h5 手机号码
+                      span(style='color: #888; font-size: 1.2rem') &nbsp已绑定手机号码：#{data.user.mobile}
                   -else
-                    .h5 手机号码 ( 暂未绑定手机号码 )
+                    .h5 手机号码
+                      span(style='color: #888; font-size: 1.2rem') &nbsp未绑定手机号码
                 input.form-control#phoneNumber(type='text', placeholder='电话号码', onclick='select()')
             .col-xs-12.col-md-2
               .form-group
@@ -117,13 +121,13 @@ block content
           .col-xs-12.col-md-6(style='padding: 0')
             .col-xs-12.col-md-12
               .h5 帖子签名
-                span(style='color: #aaa; font-size: 0.9rem') &nbsp300字节限制
+                span(style='color: #888; font-size: 1.2rem') &nbsp300字节限制
             .col-xs-12.col-md-10
               textarea#post_sign.form-control(style='resize: none;',placeholder='300字节限制',rows="10") #{user.postSign||''}
           .col-xs-12.col-md-6(style='padding: 0')
             .col-xs-12.col-md-12
               .h5 个人简介
-                span(style='color: #aaa; font-size: 0.9rem') &nbsp300字节限制
+                span(style='color: #888; font-size: 1.2rem') &nbsp300字节限制
             .col-xs-12.col-md-10
               textarea#description.form-control(style='resize: none;',placeholder='300字节限制',rows="10") #{user.description||''}
           .col-xs-12.col-md-6(style='padding: 0')
@@ -148,10 +152,10 @@ block content
             .col-xs-12.col-md-12(style='padding: 0')
               .col-xs-12.col-md-12
                 .h4 板块id示例
-                   span(style='font-size:0.8em;') （点击可自动输入。）
+                  span(style='color: #888; font-size: 1.2rem') &nbsp点击可自动输入
                 -var forumlist = data.forumList;
                 -for (var i = 0; i < forumlist.length; i++)
-                  .col-xs-12.col-md-12
+                  .col-xs-12.col-md-12(style='padding: 0')
                     ul.list-inline(style='padding:0;')
                       -if(forumlist[i].length != 0)
                         li(style='list-style:none;font-size:1.2em;padding-bottom:0.5em;') #{forumlist[i].displayName}

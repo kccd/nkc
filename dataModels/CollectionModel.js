@@ -25,7 +25,7 @@ let CollectionSchema = new Schema({
   },
   category: {
     type: String,
-    default: 'unclassified',
+    default: '未分类',
     required: true,
     index: 1
   }

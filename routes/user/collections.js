@@ -23,7 +23,7 @@ collectionsRouter
       {$group: {_id: '$category'}},
     ]);
     categoryNames = categoryNames.map(n => {
-      return (n._id? n._id: 'unclassified');
+      return (n._id? n._id: '未分类');
     });
     data.categoryNames = categoryNames;
     let queryDate = {

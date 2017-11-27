@@ -23,17 +23,17 @@ block content
           .col-xs-12
 
             .form-inline(style='margin-bottom:12px')
-          
-              .form-group
-                .input-group
-                  input#category.form-control(type='text' placeholder='输入分类名称' value='')
-                  span.input-group-btn
-                    button#movebtn.btn.btn-default(onclick=`movebtn("${data.targetUser.uid}")`) 移动
-            
               if data.categoryNames.length
+                .form-group.form-group-sm
+                  button.btn.btn-default.btn-sm(onclick='selectbtn()') 全选/不选
+                  .input-group
+                    input#category.form-control(type='text' placeholder='输入分类名称' value='')
+                    span.input-group-btn
+                      button#movebtn.btn.btn-default.btn-sm(onclick=`movebtn("${data.targetUser.uid}")`) 移动
+            
                 .form-group
                   .btn-group
-                    button.btn.btn-default.dropdown-toggle(data-toggle='dropdown' type='button') 移动到
+                    button.btn.btn-default.btn-sm.dropdown-toggle(data-toggle='dropdown' type='button') 移动到
                       span.caret
                     ul.dropdown-menu
                       each cat in data.categoryNames
@@ -41,8 +41,7 @@ block content
                           li
                             a(href=`javascript:moveTo('${cat}')`) #{cat}
 
-                  button#deletebutton.btn.btn-danger(onclick=`deletebtn("${data.targetUser.uid}")`) 删除
-                  button.btn.btn-default(onclick='selectbtn()') 全选/不选
+                  button#deletebutton.btn.btn-danger.btn-sm(onclick=`deletebtn("${data.targetUser.uid}")`) 删除
                   //hr.hrNarrowSpace
         else
           

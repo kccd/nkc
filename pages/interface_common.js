@@ -221,7 +221,7 @@ function nkcAPI(operationName,method,remainingParams){  //操作名，参数
   return nkcOperationAPI(remainingParams)
 }
 
-var NavBarSearch = {
+/*var NavBarSearch = {
   box:geid('SearchBox'),
   btn:geid('SearchButton'),
 
@@ -278,7 +278,7 @@ var NavBarSearch = {
 };
 
 NavBarSearch.init()
-
+*/
 window.ReHighlightEverything = function(){
   $('pre code').each(function(i, block) {
     hljs.highlightBlock(block);
