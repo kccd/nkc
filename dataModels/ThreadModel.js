@@ -146,17 +146,17 @@ threadSchema.virtual('forum')
 
 threadSchema.methods.extendFirstPost = async function() {
   const PostModel = require('./PostModel');
-  this.firstPost = await PostModel.findOnly({pid: this.oc})
+  return this.firstPost = await PostModel.findOnly({pid: this.oc})
 };
 
 threadSchema.methods.extendLastPost = async function() {
   const PostModel = require('./PostModel');
-  this.lastPost = await PostModel.findOnly({pid: this.lm})
+  return this.lastPost = await PostModel.findOnly({pid: this.lm})
 };
 
 threadSchema.methods.extendForum = async function() {
   const ForumModel = require('./ForumModel');
-  this.forum = await ForumModel.findOnly({fid: this.fid})
+  return this.forum = await ForumModel.findOnly({fid: this.fid})
 };
 
 // 1、判断能否进入所在板块
@@ -188,10 +188,8 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
   let posts = await PostModel.find($match)
     .sort({toc: 1}).skip($skip).limit($limit);
   posts = await Promise.all(posts.map(async doc => {
-    await doc.extendForum();
     await doc.extendUser();
-    await doc.extendFirstPost().then(post => post.extendUser());
-    await doc.extendLastPost().then(post => post.extendUser());
+    await doc.extendResources();
     return doc
   }));
   return posts;

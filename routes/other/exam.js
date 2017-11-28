@@ -36,7 +36,7 @@ examRouter
       ctx.throw(400, `科目 “${category}” 不存在，请选择正确的考试科目。`);
     }
     let questions = [];
-
+    console.log(`number of subject: ${subjectCount} - ${numberOfSubject}`);
     // 生成指定元素数量的数组，且数组元素不重复
     let arrOfDifferentValue = (arrValueCount, max) => {
       // 题库中该科目的总数必须大于需要的题目数量,否则会陷入死循环

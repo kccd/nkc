@@ -143,9 +143,6 @@ postSchema.methods.extendUser = async function() {
   return this.user = await UserModel.findOnly({uid: this.uid});
 };
 
-postSchema.methods.extend = function(fn) {
-  fn(this)
-};
 
 postSchema.methods.ensurePermission = async function(ctx) {
   const {ThreadModel} = ctx.db;

@@ -1,7 +1,7 @@
 - var url = '/t/' + thread.tid
-- var ocUser = thread.oc.user||{}
-- var lmUser = thread.lm.user||{}
-- var oc = thread.oc
+- var ocUser = thread.firstPost.user||{}
+- var lmUser = thread.lastPost.user||{}
+- var oc = thread.firstPost
 - var avatar = '/avatar_small/' + oc.uid
 - var uid = oc.uid
 - var digest = thread.digest

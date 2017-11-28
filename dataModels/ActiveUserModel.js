@@ -22,10 +22,21 @@ const activeUserSchema = new Schema({
   }
 });
 
-activeUserSchema.methods.extend = async function() {
+activeUserSchema.virtual('user')
+  .get(function() {
+    if(!this._user) {
+      throw new Error('user is not initialized.');
+    }
+    return this._user;
+  })
+  .set(function(u) {
+    this._user = u;
+  });
+
+activeUserSchema.methods.extendUser = async function() {
   const UserModel = require('./UserModel');
   const user = await UserModel.findOnly({uid: this.uid});
-  return Object.assign(this.toObject(), {username: user.username});
+  return this.user = user;
 };
 
 module.exports = mongoose.model('activeUsers', activeUserSchema, 'activeUsers');

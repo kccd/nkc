@@ -59,7 +59,7 @@ block content
                     -var type = thread.fid? 'f' : 'm'
                     a.active(href=`/${type}/${target}` style=`background-color:${forumcolor}`) #{forumname}
 
-                  span.ThreadTitleText(style="margin-right:3%;" href=`/t/${data.thread.tid}`) #{thread.oc.t}
+                  span.ThreadTitleText(style="margin-right:3%;" href=`/t/${data.thread.tid}`) #{thread.firstPost.t}
 
                     //span(style='display:inline-block;') #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits} 浏览
 
@@ -103,7 +103,7 @@ block content
                   - var digestOF
                   - var topOF
                   if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
-                    .form-inline
+                    .form-inline(style='margin-bottom: 0.5rem')
                       .form-group.form-group-sm
                         include forumlist_dropdown.pug
                         button.btn.btn-default.btn-sm(onclick=`javascript:moveThreadTo('${thread.tid}')`) #{moveThread? '移动' : '转发'}
@@ -112,7 +112,7 @@ block content
                           a.btn.btn-default.btn-sm#moveToPersonal(href='javascript:;' onclick=`moveToPersonalForum("${thread.tid}")`) 移至个人版
                       if moveThread
                         .form-group
-                          button#recyclebtn.btn.btn-sm.btn-danger(onclick=`recycleThread('${data.thread.tid}')`) 送回收站
+                            button#recyclebtn.btn.btn-sm.btn-danger(onclick=`recycleThread('${data.thread.tid}')`) 送回收站
                     if thread.toMid === user.uid || thread.mid === user.uid
                       -var text
                       if data.thread.toMid === data.user.uid && data.thread.hideInToMid || data.thread.mid === data.user.uid && data.thread.hideInMid
@@ -187,7 +187,7 @@ block content
                     div#changeDis(style="max-width: 180px;")
                       p.lighttext#airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
                       .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                      -var tpid = thread.oc.pid
+                      -var tpid = thread.firstPost.pid
                       p.lighttext#airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
                       .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
                       p.lighttext#airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits} 浏览
@@ -208,6 +208,7 @@ block content
 
             - var forumname = data.forum.displayName
             - var forumType = data.thread.fid? 'f' : 'm'
+            br
             span.lighttext 返回
               a(href=`/${forumType}/${target}`) #{forumname}
               //link back to forum

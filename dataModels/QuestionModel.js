@@ -39,6 +39,18 @@ const questionSchema = new Schema({
     required: true
   }
 });
+
+questionSchema.virtual('user')
+  .get(function() {
+    if(!this._user) {
+      throw new Error('user is not initialized.');
+    }
+    return this._user;
+  })
+  .set(function(u) {
+    this._user = u;
+  });
+
 questionSchema.pre('save', function(next){
   if(!this.tlm) {
     this.tlm = this.toc;
@@ -46,20 +58,16 @@ questionSchema.pre('save', function(next){
   next();
 });
 
-questionSchema.methods.getUser = async function () {
-  const UserModel = require('./UserModel');
-  return await UserModel.findOnly({uid: this.uid});
-};
 
 questionSchema.methods.delete = async function () {
   const QuestionModel = require('./QuestionModel');
   return await QuestionModel.deleteOne({qid: this.qid});
 };
 
-questionSchema.methods.extend = async function () {
+questionSchema.methods.extendUser = async function () {
   const UserModel = require('./UserModel');
   const user = await UserModel.findOnly({uid: this.uid});
-  return Object.assign(this.toObject(), {user});
+  return this.user = user;
 };
 
 

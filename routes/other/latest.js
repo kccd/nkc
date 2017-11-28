@@ -19,8 +19,10 @@ latestRouter
     data.paging = apiFn.paging(page, threadCount);
     let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
     threads = await Promise.all(threads.map(async t => {
-      const targetThread = await t.extend();
-      return targetThread;
+      await t.extendFirstPost().then(p => p.extendUser());
+      await t.extendLastPost().then(p => p.extendUser());
+      await t.extendForum();
+      return t;
     }));
     data.indexThreads = threads;
     data.indexForumList = await dbFn.getAvailableForums(ctx);

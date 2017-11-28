@@ -31,10 +31,22 @@ let CollectionSchema = new Schema({
   }
 });
 
-CollectionSchema.methods.extend = async function() {
+CollectionSchema.virtual('thread')
+  .get(function() {
+    if(!this._thread) {
+      throw new Error('thread is not initialized.');
+    }
+    return this._thread;
+  })
+  .set(function(t) {
+    this._thread = t;
+  });
+
+CollectionSchema.methods.extendThread = async function() {
   const targetThread = await ThreadModel.findOnly({tid: this.tid});
-  const thread = await targetThread.extend();
-  return Object.assign(this.toObject(), {thread});
+  await targetThread.extendFirstPost().then(p => p.extendUser());
+  await targetThread.extendLastPost().then(p => p.extendUser());
+  return this.thread = targetThread;
 };
 
 CollectionSchema.methods.delete = async function() {

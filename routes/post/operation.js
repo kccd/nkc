@@ -11,6 +11,9 @@ operationRouter
     const {user} = data;
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
+    const targetForum = await db.ForumModel.findOnly({fid: targetThread.fid});
+    // if(!data.certificates.contentClasses.includes(targetForum.type)) ctx.throw(401, '权限不足');
+    // if((targetThread.disabled || targetPost.disabled) && (!targetForum.moderators.includes(user.uid)) && ctx.userLevel <= 4) ctx.throw(401, '权限不足');
     if(!(await targetThread.ensurePermission(ctx))) ctx.throw(401, '权限不足');
     if(targetPost.disabled) ctx.throw(400, '无法推荐已经被禁用的回复');
     const personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {recPosts: pid}});

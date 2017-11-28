@@ -16,7 +16,7 @@ block content
             -var uid = data.targetUser.uid
             include interface_profile_avatar.pug
             .ForumName
-              a(href=`/u/${data.targetUser.uid}`) #{data.targetUser.username}
+              a(href=`/m/${data.targetUser.uid}`) #{data.targetUser.username}
               span &nbsp的个人收藏
         
         if ownership

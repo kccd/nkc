@@ -49,8 +49,12 @@ otherRouter
     for (let i = 0; i < 6; i++) {
       let j = 200 - i;
       let index = Math.floor(Math.random() * j);
-      const targetThread = await threads[index].extend();
-      for (let r of targetThread.oc.resources) {
+      const targetThread = threads[index];
+      await targetThread.extendFirstPost().then(async p => {
+        await p.extendUser();
+        await p.extendResources();
+      });
+      for (let r of targetThread.firstPost.resources) {
         if(imgArr.includes(r.ext)){
           targetThread.src = r.rid;
           break;
@@ -64,13 +68,18 @@ otherRouter
     let t1 = Date.now();
 
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
-    latestThreads = await Promise.all(latestThreads.map(thread => thread.extend()));
+    latestThreads = await Promise.all(latestThreads.map(async thread => {
+      await thread.extendFirstPost().then(p => p.extendUser());
+      await thread.extendLastPost().then(p => p.extendUser());
+      await thread.extendForum();
+      return thread;
+    }));
     data.latestThreads = latestThreads;
 
     let t2 = Date.now();
 
-    let activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
-    activeUsers = await Promise.all(activeUsers.map(activeUser => activeUser.extend()));
+    const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
     data.activeUsers = activeUsers;
     data.indexForumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
@@ -84,6 +93,7 @@ otherRouter
     console.log(`随机加精帖子6： ${t1-t}ms, 最新帖子20： ${t2-t1}ms, 活跃用户、板块列表、ads： ${t3-t2}ms, 加载用户发过的帖子： ${t4-t3}ms`)
 
     ctx.template = 'interface_home.pug';
+
     await next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())

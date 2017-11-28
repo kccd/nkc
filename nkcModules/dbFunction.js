@@ -1,11 +1,11 @@
 const settings = require('../settings');
 const apiFn = require('./apiFunction');
-let db = require('../dataModels');
-let fn = {};
+const db = require('../dataModels');
+const fn = {};
 
 fn.getQuestionsByQuery = async (query) => {
-  let questions =  await db.QuestionModel.find(query).sort({toc: -1});
-  questions = await Promise.all(questions.map(q => q.extend()));
+  const questions =  await db.QuestionModel.find(query).sort({toc: -1});
+  await Promise.all(questions.map(q => q.extendUser()));
   return questions;
 };
 

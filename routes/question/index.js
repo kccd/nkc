@@ -64,7 +64,7 @@ questionRouter
     };
     const targetQuestion = await db.QuestionModel.findOnly({qid});
     await targetQuestion.update(question);
-    data.targetUser = await targetQuestion.getUser();
+    data.targetUser = await targetQuestion.extendUser();
     await next();
   })
   .get('/:category/:qid', async (ctx, next) => {
@@ -72,7 +72,7 @@ questionRouter
     const {data, db} = ctx;
     const targetQuestion = await db.QuestionModel.findOnly({qid});
     data.question = targetQuestion;
-    data.targetUser = await targetQuestion.getUser();
+    data.targetUser = await targetQuestion.extendUser();
     await next();
   })
   .del('/:category/:qid', async (ctx, next) => {
@@ -80,7 +80,7 @@ questionRouter
     const {db, data} = ctx;
     const targetQuestion = await db.QuestionModel.findOnly({qid});
     await targetQuestion.delete();
-    data.targetUser = await targetQuestion.getUser();
+    data.targetUser = await targetQuestion.extendUser();
     await next();
   });
 

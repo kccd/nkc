@@ -29,7 +29,6 @@ threadRouter
     const {mid, toMid} = thread;
     const posts = await thread.getPostByQuery(query, q);
     posts.map(post => {
-      post.user = post.user.toObject();
       const postContent = post.c || '';
       const index = postContent.indexOf('[quote=');
       if(index !== -1) {
@@ -39,7 +38,8 @@ threadRouter
       }
     });
     data.posts = posts;
-    let targetThread = await thread.extend();
+    await thread.extendFirstPost();
+    await thread.extendLastPost();
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user) {
       data.usersThreads = await data.user.getUsersThreads();
@@ -55,7 +55,7 @@ threadRouter
       data.othersForum = othersForum
     }
     data.targetUser = await thread.getUser();
-    data.thread = targetThread;
+    data.thread = thread;
     data.forum = forum;
     data.replyTarget = `t/${tid}`;
     ctx.template = 'interface_thread.pug';
