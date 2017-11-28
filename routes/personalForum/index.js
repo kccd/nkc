@@ -18,7 +18,8 @@ router
       PostModel,
     } = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
-    data.forum = await personalForum.extendModerator();
+    await personalForum.extendModerator();
+    data.forum = personalForum;
     const setting = await SettingModel.findOnly({uid: 'system'});
     data.popPersonalForums = setting.popPersonalForums;
     let {

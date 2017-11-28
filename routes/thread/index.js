@@ -38,7 +38,7 @@ threadRouter
       }
     });
     data.posts = posts;
-    await thread.extendFirstPost();
+    await thread.extendFirstPost().then(p => p.extendUser());
     await thread.extendLastPost();
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user) {

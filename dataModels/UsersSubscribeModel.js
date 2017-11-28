@@ -21,14 +21,40 @@ const usersSubscribeSchema = new Schema({
 	}
 });
 
-usersSubscribeSchema.methods.extend = async function() {
-	const UserModel = require('./UserModel');
-	let subscribers = [];
-	let subscribUsers = [];
-	subscribers = await Promise.all(this.subscribers.map(async uid => await UserModel.findOnly({uid})));
-	subscribUsers = await Promise.all(this.subscribeUsers.map(async uid => await UserModel.findOnly({uid})));
-  return Object.assign(this.toObject(), {subscribers, subscribeUsers});
+usersSubscribeSchema.virtual('subscribersObj')
+  .get(function() {
+    if(!this._subscribersObj) {
+      throw new Error('subscribersObj is not initialized.');
+    }
+    return this._subscribersObj;
+  })
+  .set(function(s) {
+    this._subscribersObj = s;
+  });
+
+usersSubscribeSchema.virtual('subscribeUsersObj')
+  .get(function() {
+    if(!this._subscribeUsersObj) {
+      throw new Error('subscribeUsersObj is not initialized.');
+    }
+    return this._subscribeUsersObj;
+  })
+  .set(function(s) {
+    this._subscribeUsersObj = s;
+  });
+
+usersSubscribeSchema.methods.extendSubscribers = async function() {
+  const UserModel = require('./UserModel');
+  const subscribers = await Promise.all(this.subscribers.map(async uid => await UserModel.findOnly({uid})));
+  return this.subscribersObj = subscribers;
 };
+
+usersSubscribeSchema.methods.extendSubscribeUsers = async function() {
+  const UserModel = require('./UserModel');
+  const subscribeUsers = await Promise.all(this.subscribers.map(async uid => await UserModel.findOnly({uid})));
+  return this.subscribersObj = subscribeUsers;
+};
+
 
 
 module.exports = mongoose.model('usersSubscribe', usersSubscribeSchema, 'usersSubscribe');

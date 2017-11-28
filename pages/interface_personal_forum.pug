@@ -1,26 +1,28 @@
 extends bootstrap_base.pug
 
 block title
-  title #{data.forum.display_name} - #{data.site.name}
+  title #{data.forum.displayName} - #{data.site.name}
 
   -var forum  = data.forum
 
   if forum.description
     -var processed=forum.description.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
   else
-    -var processed = forum.display_name
+    -var processed = forum.displayName
 
   meta(name='description' content=`${processed}`)
 
   meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content=`${forum.display_name}`)
+  meta(property='og:title' content=`${forum.displayName}`)
   meta(property='og:site_name' content='科创论坛')
   meta(property='og:description' content=`${processed}`)
 
 
 
 block content
-  -var isModerator = user? (forum.moderators.indexOf(user.uid) > -1) : false
+  -console.log(`======================================`)
+  -console.log(forum)
+  -var isModerator = data.user? (forum.moderators.indexOf(data.user.uid) > -1) : false
   -const isAdmin = data.userLevel >= 4
   -const isNormalUser = data.userLevel >= 1
   .container-fluid(style='max-width:1400px;')
@@ -32,7 +34,7 @@ block content
                 form(role='form')
                   - var description = data.forum.description
                   - var announcement = data.forum.announcement
-                  - var display_name = data.forum.display_name
+                  - var display_name = data.forum.displayName
                   div(style='width: 100%;')
                     .displayShit
                       div
@@ -49,7 +51,7 @@ block content
                               if description
                                 span #{description}
                           div
-                            - var moderators = data.forum.moderators
+                            - var moderators = data.forum.moderatorsObj
                             if moderators && moderators.length
                               span 版主：
                                 each k in moderators

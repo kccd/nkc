@@ -20,7 +20,7 @@ operationRouter
     const post = await db.PostModel.findOneAndUpdate({pid}, {$addToSet: {recUsers: user.uid}});
     if(personal.recPosts.includes(pid) && post.recUsers.includes(user.uid))
       ctx.throw(400, '您已经推介过该post了,没有必要重复推介');
-    data.targetUser = await post.getUser();
+    data.targetUser = await post.extendUser();
     data.message = post.recUsers.length + 1;
     await next();
   })
@@ -33,7 +33,7 @@ operationRouter
     if(!personal.recPosts.includes(pid) && !post.recUsers.includes(user.uid))
       ctx.throw(400, '您没有推介过该post了,没有必要取消推介');
     data.message = (post.recUsers.length > 0)?post.recUsers.length - 1: 0;
-    data.targetUser = await post.getUser();
+    data.targetUser = await post.extendUser();
     await next();
   })
   .get('/quote', async (ctx, next) => {
@@ -43,9 +43,9 @@ operationRouter
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     if(!(await targetThread.ensurePermission(ctx))) ctx.throw(401, '权限不足');
     if(targetPost.disabled) ctx.throw(400, '无法引用已经被禁用的回复');
-    const post = await targetPost.extend();
-    data.message = xsflimit(post);
-    data.targetUser = await targetPost.getUser();
+    await targetPost.extendUser();
+    data.targetUser = targetPost.user;
+    data.message = targetPost;
     await next();
   })
   .patch('/credit', async (ctx, next) => {
@@ -79,7 +79,7 @@ operationRouter
     if(data.userLevel < 3) ctx.throw(401, '权限不足');
     data.post = targetPost;
     data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});
-    data.targetUser = await targetPost.getUser();
+    data.targetUser = await targetPost.extendUser();
     ctx.template = 'interface_post_history.pug';
     await next();
   })
@@ -99,7 +99,7 @@ operationRouter
       if(!disabled) ctx.throw(400, '操作失败！该回复未被屏蔽，请刷新');
       if(disabled) ctx.throw(400, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
     }
-    data.targetUser = await targetPost.getUser();
+    data.targetUser = await targetPost.extendUser();
     await targetThread.updateThreadMessage();
     await next();
   });

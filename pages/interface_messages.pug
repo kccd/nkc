@@ -99,7 +99,7 @@ block content
                     img.media-object.img-rounded(src=`/avatar/${docs[i].fromPost.uid}`,style='height:3em;width:3em;')
                 .media-body
                   h4.media-heading
-                    a(href=`/u/${docs[i].fromPost.uid}`) #{docs[i].fromUser.username}
+                    a(href=`/u/${docs[i].fromPost.uid}`) #{docs[i].fromPost.username}
                     span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
                     a(href=`/t/${docs[i].fromPost.tid}#${docs[i].fromPost.pid}`) #{docs[i].toPost.t||docs[i].toPost.tid}
                     span(style="font-size:0.8em;") &nbsp;下回复了你：
@@ -123,7 +123,7 @@ block content
                   h4.media-heading
                     a(href=`/u/${docs[i].post.uid}`) #{docs[i].user.username}
                     span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
-                    a(href=`/t/${docs[i].post.tid}#${docs[i].post.pid}`) #{docs[i].oc.t||docs[i].oc.tid}
+                    a(href=`/t/${docs[i].post.tid}#${docs[i].post.pid}`) #{docs[i].post.thread.firstPost.t||docs[i].post.thread.firstPost.tid}
                     span(style="font-size:0.8em;") &nbsp;下@了你：
                     p(style="font-size:0.8em; word-break:break-all;") #{docs[i].post.c}
             hr(style='margin:0.5em 0;')
