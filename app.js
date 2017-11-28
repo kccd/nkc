@@ -7,7 +7,7 @@ const app = new Koa();
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
 const {permissions} = require('./nkcModules');
-const {init, cookieIdentify, body} = require('./middlewares');
+const {init, cookieIdentify, body, scoreHandler} = require('./middlewares');
 const settings = require('./settings');
 
 try {
@@ -32,4 +32,5 @@ app.use(favicon(__dirname + '/resources/site_specific/favicon.ico'));
 app.use(permissions);
 app.use(mainRouter.routes());
 app.use(body);
+app.use(scoreHandler);
 module.exports = app.callback();

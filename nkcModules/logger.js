@@ -26,4 +26,5 @@ module.exports = async (ctx) => {
       ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green}`
     );
   }
+  await new LogModel(log).save()
 };
