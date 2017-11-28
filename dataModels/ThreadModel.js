@@ -188,7 +188,6 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
     await doc.extendUser();
     await doc.extendResources();
   }));
-  console.log(posts);
   return posts;
 };
 
