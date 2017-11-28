@@ -383,8 +383,8 @@ function nkc_render(options){
     //console.log(stringToFilter);
     return stringToFilter.replace(render.resource_extractor,function(match,p1,offset,string){
       var rid = p1
-      for(i in post.r){
-        var r = post.r[i]
+      for(var i in post.resources){
+        var r = post.resources[i]
         if(r.rid===rid){
           r._used = true;
           return getHTMLForResource(r)
@@ -431,8 +431,8 @@ function nkc_render(options){
     html = render.hiddenReplaceHTML(html)
     // fix for older posts where they forgot to inject attachments.
     var count = 0
-    for(i in post.r){
-      var r = post.r[i]
+    for(var i in post.resources){
+      var r = post.resources[i]
       if(!r._used){
         var allthumbnail = true
         if(count==0){
