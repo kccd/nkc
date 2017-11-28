@@ -101,8 +101,6 @@ postSchema.pre('save' , function(next) {
 
 postSchema.virtual('user')
   .get(function() {
-    if(!this._user)
-      throw new Error('user is not initialized.');
     return this._user
   })
   .set(function(u) {
@@ -111,8 +109,6 @@ postSchema.virtual('user')
 
 postSchema.virtual('resources')
   .get(function() {
-    if(!this._resources)
-      throw new Error('resources is not initialized.');
     return this._resources
   })
   .set(function(rs) {
@@ -121,8 +117,6 @@ postSchema.virtual('resources')
 
 postSchema.virtual('thread')
   .get(function() {
-    if(!this._thread)
-      throw new Error('thread is not initialized.');
     return this._thread
   })
   .set(function(t) {
@@ -137,7 +131,7 @@ postSchema.methods.extendThread = async function() {
 postSchema.methods.extendResources = async function() {
   const ResourceModel = require('./ResourceModel');
   return this.resources = await Promise.all(
-    this.r.map(async r => await ResourceModel.findOnly({rid: r}))
+    this.r.map(r => ResourceModel.findOnly({rid: r}))
   );
 };
 

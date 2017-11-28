@@ -119,8 +119,6 @@ threadSchema.pre('save', function (next) {
 
 threadSchema.virtual('firstPost')
   .get(function() {
-    if(!this._firstPost)
-      throw new Error('firstPost is not initialized.');
     return this._firstPost
   })
   .set(function(p) {
@@ -129,8 +127,6 @@ threadSchema.virtual('firstPost')
 
 threadSchema.virtual('lastPost')
   .get(function() {
-    if(!this._lastPost)
-      throw new Error('lastPost is not initialized.');
     return this._lastPost
   })
   .set(function(p) {
@@ -139,8 +135,6 @@ threadSchema.virtual('lastPost')
 
 threadSchema.virtual('forum')
   .get(function() {
-    if(!this._forum)
-      throw new Error('forum is not initialized.');
     return this._forum
   })
   .set(function(f) {
@@ -194,6 +188,7 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
     await doc.extendUser();
     await doc.extendResources();
   }));
+  console.log(posts);
   return posts;
 };
 

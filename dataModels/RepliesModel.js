@@ -25,9 +25,6 @@ const repliesSchema = new Schema({
 
 repliesSchema.virtual('fromPost')
   .get(function() {
-    if(!this._fromPost) {
-      throw new Error('fromPost is not initialized.');
-    }
     return this._fromPost;
   })
   .set(function(p) {
@@ -36,9 +33,6 @@ repliesSchema.virtual('fromPost')
 
 repliesSchema.virtual('toPost')
   .get(function() {
-    if(!this._toPost) {
-      throw new Error('toPost is not initialized.');
-    }
     return this._toPost;
   })
   .set(function(p) {

@@ -44,9 +44,6 @@ let personalForumsSchema = new Schema({
 
 personalForumsSchema.virtual('moderatorsObj')
   .get(function() {
-    if(!this._moderatorsObj) {
-      throw new Error('moderatorsObj is not initialized.');
-    }
     return this._moderatorsObj;
   })
   .set(function(m) {

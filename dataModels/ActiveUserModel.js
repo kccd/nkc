@@ -24,9 +24,6 @@ const activeUserSchema = new Schema({
 
 activeUserSchema.virtual('user')
   .get(function() {
-    if(!this._user) {
-      throw new Error('user is not initialized.');
-    }
     return this._user;
   })
   .set(function(u) {

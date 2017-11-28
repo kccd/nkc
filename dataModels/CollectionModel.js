@@ -33,9 +33,6 @@ let CollectionSchema = new Schema({
 
 CollectionSchema.virtual('thread')
   .get(function() {
-    if(!this._thread) {
-      throw new Error('thread is not initialized.');
-    }
     return this._thread;
   })
   .set(function(t) {

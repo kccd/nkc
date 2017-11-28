@@ -26,9 +26,6 @@ let inviteSchema = new Schema({
 
 inviteSchema.virtual('post')
   .get(function() {
-    if(!this._post) {
-      throw new Error('post is not initialized.');
-    }
     return this._post;
   })
   .set(function(t) {
@@ -37,9 +34,6 @@ inviteSchema.virtual('post')
 
 inviteSchema.virtual('user')
   .get(function() {
-    if(!this._user) {
-      throw new Error('user is not initialized.');
-    }
     return this._user;
   })
   .set(function(u) {

@@ -23,9 +23,6 @@ const usersSubscribeSchema = new Schema({
 
 usersSubscribeSchema.virtual('subscribersObj')
   .get(function() {
-    if(!this._subscribersObj) {
-      throw new Error('subscribersObj is not initialized.');
-    }
     return this._subscribersObj;
   })
   .set(function(s) {
@@ -34,9 +31,6 @@ usersSubscribeSchema.virtual('subscribersObj')
 
 usersSubscribeSchema.virtual('subscribeUsersObj')
   .get(function() {
-    if(!this._subscribeUsersObj) {
-      throw new Error('subscribeUsersObj is not initialized.');
-    }
     return this._subscribeUsersObj;
   })
   .set(function(s) {
