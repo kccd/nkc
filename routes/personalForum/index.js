@@ -45,7 +45,14 @@ router
         .set('fid', {$in: visibleFid});
       if(digest)
         $matchPost = $matchPost.set('digest', true);
-      data.threads = await PostModel.aggregate([
+      const posts = await PostModel.find($matchPost.toJS(), {_id: 0, tid: 1}).sort($sort).skip(page*perpage).limit(perpage);
+      data.threads = await Promise.all(posts.map(async post => {
+        const thread = await ThreadModel.findOnly({tid: post.tid});
+        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendLastPost().then(p => p.extendUser());
+        return thread;
+      }));
+      /*data.threads = await PostModel.aggregate([
         {$sort: $sort},
         {$match: $matchPost.toJS()},
         {$skip: page * perpage},
@@ -64,12 +71,13 @@ router
           as: 'thread.oc'
         }},
         {$unwind: '$thread.oc'}
-      ]);
-      const {length} = await PostModel.aggregate([
+      ]);*/
+      const length = await PostModel.count($matchPost.toJS());
+      /*const {length} = await PostModel.aggregate([
         {$sort: $sort},
         {$match: $matchPost.toJS()},
         {$count: 'length'}
-      ]);
+      ]);*/
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {
@@ -87,7 +95,13 @@ router
       }
       if(digest)
         $matchThread = $matchThread.set('digest', true);
-      data.threads = await ThreadModel.aggregate([
+      const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
+      data.threads = await Promise.all(threads.map(async thread => {
+        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendLastPost().then(p => p.extendUser());
+        return thread;
+      }));
+      /*data.threads = await ThreadModel.aggregate([
         {$sort},
         {$match: $matchThread.toJS()},
         {$skip: page * perpage},
@@ -106,20 +120,30 @@ router
           as: 'oc.user'
         }},
         {$unwind: '$oc.user'}
-      ]);
-      const {length} = await await ThreadModel.aggregate([
+      ]);*/
+      const length = await ThreadModel.count($matchThread.toJS());
+      /*const {length} = await await ThreadModel.aggregate([
         {$sort},
         {$match: $matchThread.toJS()},
         {$count: 'length'}
-      ]);
+      ]);*/
       data.paging = paging(page, length)
     }
     else if(tab === 'recommend') {
-      let $postMatch = matchBase.set('pid', {$in: personalForum.recPosts});
-      let $matchThread = matchBase.set('fid', {$in: visibleFid});
+      let $postMatch = matchBase.set('pid', {$in: personalForum.recPosts}).toJS();
+      let $matchThread = matchBase.set('fid', {$in: visibleFid}).toJS();
       if(digest)
         $matchThread = $matchThread.set('digest', true);
-      data.threads = await PostModel.aggregate([
+      let t = Date.now();
+      const posts = await PostModel.find($postMatch, {_id: 0, tid: 1});
+      const tidArr = posts.map(post => post.tid);
+      const threads = await ThreadModel.find({$and: [$matchThread, {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
+      data.threads = await Promise.all(threads.map(async thread => {
+        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendLastPost().then(p => p.extendUser());
+        return thread;
+      }));
+      /*data.threads = await PostModel.aggregate([
         {$match: $postMatch},
         {$lookup: {
           from: 'threads',
@@ -136,10 +160,12 @@ router
           from: 'posts',
           localField: 'thread.oc',
           foreignField: 'pid',
-          as: 'thread.oc'
+          as: 'thread.firstPost'
         }},
-        {$unwind: 'thread.oc'}
+        {$unwind: '$thread.firstPost'}
       ]);
+      console.log(`耗时： ${Date.now() - t}`)
+
       const length = await PostModel.aggregate([
         {$match: $postMatch},
         {$lookup: {
@@ -150,7 +176,8 @@ router
         }},
         {$match: $matchThread},
         {$count: 'length'}
-      ]);
+      ]);*/
+      const length = await ThreadModel.count({$and: [$matchThread, {tid: {$in: tidArr}}]});
       data.paging = paging(page, length)
     }
     else if(tab === 'subscribe') {
@@ -164,12 +191,18 @@ router
             fid: {$in: subscribeForums}
           }
         ]},
-        {$in: visibleFid}
+        {fid: {$in: visibleFid}}
       ];
       if(digest)
         $and.splice(0, 0, {digest});
-      const $USM = matchBase.set('$and', $and);
-      data.threads = await ThreadModel.aggregate([
+      const $USM = matchBase.set('$and', $and).toJS();
+      const threads = await ThreadModel.find($USM).sort($sort).skip(page*perpage).limit(perpage);
+      data.threads = await Promise.all(threads.map(async thread => {
+        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendLastPost().then(p => p.extendUser());
+        return thread;
+      }));
+      /*data.threads = await ThreadModel.aggregate([
         {$sort},
         {$match: $USM},
         {$skip: page * perpage},
@@ -202,8 +235,8 @@ router
           as: 'lm.user'
         }},
         {$unwind: 'lm.user'}
-      ]);
-      const length = await ThreadModel.count({$USM});
+      ]);*/
+      const length = await ThreadModel.count($USM);
       data.paging = paging(page, length)
     }
     else if(tab === 'all') {
@@ -213,6 +246,13 @@ router
         $sort = {'thread.tlm': -1};
       else
         $sort = {'thread.toc': -1};
+      /*const userBehavaior = await UsersBehaviorModel.find({
+        uid,
+        operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
+        fid: {$in: visibleFid},
+      }).sort({timeStamp: 1});
+      const tidArr = [];*/
+
       data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
           timeStamp: 1
@@ -242,40 +282,42 @@ router
           from: 'posts',
           localField: 'thread.oc',
           foreignField: 'pid',
-          as: 'thread.oc'
+          as: 'thread.firstPost'
         }},
-        {$unwind: '$thread.oc'},
+        {$unwind: '$thread.firstPost'},
         {$lookup: {
           from: 'posts',
           localField: 'pid',
           foreignField: 'pid',
-          as: 'thread.lm'
+          as: 'thread.lastPost'
         }},
-        {$unwind: '$thread.lm'},
+        {$unwind: '$thread.lastPost'},
         {$lookup: {
           from: 'users',
-          localField: 'thread.oc.uid',
+          localField: 'thread.firstPost.uid',
           foreignField: 'uid',
-          as: 'thread.oc.user'
+          as: 'thread.firstPost.user'
         }},
-        {$unwind: '$thread.oc.user'},
+        {$unwind: '$thread.firstPost.user'},
         {$lookup: {
           from: 'users',
-          localField: 'thread.lm.uid',
+          localField: 'thread.lastPost.uid',
           foreignField: 'uid',
-          as: 'thread.lm.user'
+          as: 'thread.lastPost.user'
         }},
-        {$unwind: '$thread.lm.user'},
+        {$unwind: '$thread.lastPost.user'},
         {$replaceRoot: {
           newRoot: '$thread'
         }}
       ]);
-      if(tab === ('all' || 'own' || 'discuss'))
+      if(tab === ('all' || 'own' || 'discuss')) {
         data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
-          let thread = await ThreadModel.findOnly({tid});
-          thread = await thread.extend();
+          const thread = await ThreadModel.findOnly({tid});
+          await thread.extendFirstPost().then(p => p.extendUser());
+          await thread.extendLastPost().then(p => p.extendUser());
           return thread;
         }));
+      }
       const length = await UsersBehaviorModel.count({
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
@@ -284,7 +326,8 @@ router
       data.paging = paging(page, length)
     }
     ctx.template = 'interface_personal_forum.pug';
-    ctx.data.userThreads = await ctx.data.user.getUsersThreads();
+    if(ctx.data.user)
+      ctx.data.userThreads = await ctx.data.user.getUsersThreads();
     ctx.data.forumList = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
     ctx.data.digest = digest;
     ctx.data.tab = tab;

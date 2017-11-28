@@ -45,7 +45,7 @@ operationRouter
     if(targetPost.disabled) ctx.throw(400, '无法引用已经被禁用的回复');
     await targetPost.extendUser();
     data.targetUser = targetPost.user;
-    data.message = targetPost;
+    data.message = xsflimit(targetPost.toObject());
     await next();
   })
   .patch('/credit', async (ctx, next) => {

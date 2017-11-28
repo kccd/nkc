@@ -1,8 +1,9 @@
 if thread
+  -console.log('2');
   - var url = '/t/' + thread.tid
-  - var ocuser = thread.oc.user||{}
-  - var lmuser = thread.lm.user||{}
-  - var oc = thread.oc
+  - var ocuser = thread.firstPost.user||{}
+  - var lmuser = thread.lastPost.user||{}
+  - var oc = thread.firstPost
   - var avatar = '/avatar_small/' + oc.uid
   - var uid = oc.uid
   - var digest = thread.digest || (data.tab === 'own' && thread.digestInMid) || (data.tab === 'discuss' && thread.digestInToMid)
@@ -28,7 +29,7 @@ if thread
       .avatar-left
         - var user = ocuser
         -var title = '';
-        -if(user)
+        -if(user && user.navbarDesc)
           -var navbarDesc = user.navbarDesc;
           -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
         a(href=`/m/${uid}` title=`${title}`)
