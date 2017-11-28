@@ -106,7 +106,10 @@ const threadSchema = new Schema({
     required: true,
     index: 1
   }
-});
+}, {toObject: {
+  getters: true,
+  virtuals: true
+}});
 threadSchema.pre('save', function (next) {
   if(!this.tlm) {
     this.tlm = this.toc;
@@ -187,10 +190,9 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
   const {$match, $sort, $skip, $limit} = getQueryObj(query, macth);
   let posts = await PostModel.find($match)
     .sort({toc: 1}).skip($skip).limit($limit);
-  posts = await Promise.all(posts.map(async doc => {
+  await Promise.all(posts.map(async doc => {
     await doc.extendUser();
     await doc.extendResources();
-    return doc
   }));
   return posts;
 };
