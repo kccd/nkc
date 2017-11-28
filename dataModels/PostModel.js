@@ -81,7 +81,10 @@ const postSchema = new Schema({
     type: String,
     index: 1
   }
-});
+}, {toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 postSchema.pre('save' , function(next) {
   if(!this.iplm) {

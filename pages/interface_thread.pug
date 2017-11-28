@@ -2,23 +2,23 @@ extends bootstrap_base.pug
 
 block title
   - var thread = data.thread
-  title #{thread.oc.t} - 科创论坛
+  title #{thread.firstPost.t} - 科创论坛
   meta#replytarget(value=`${data.replyTarget}`)
   
   include MathJax.pug
   
-  if (thread.oc&&thread.oc.c)
-    -var processed=thread.oc.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  if (thread.firstPost&&thread.firstPost.c)
+    -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
     
     meta(name='description' content=`${processed}`)
     
     meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-    meta(property='og:title' content=`${thread.oc.t}`)
+    meta(property='og:title' content=`${thread.firstPost.t}`)
     meta(property='og:site_name' content='科创论坛')
     meta(property='og:description' content=`${processed}`)
     
-    meta(property='article:published_time' content=`${(new Date(thread.oc.toc)).toISOString()}`)
-    meta(property='article:author' content=`${data.thread.oc.user?data.thread.oc.user.username:""}`)
+    meta(property='article:published_time' content=`${(new Date(thread.firstPost.toc)).toISOString()}`)
+    meta(property='article:author' content=`${data.thread.firstPost.user?data.thread.firstPost.user.username:""}`)
   
   
 block content
@@ -257,7 +257,7 @@ block content
         .col-md-3.col-lg-3.hidden-xs.hidden-sm
 
           //user_profile section
-          -var user = data.thread.oc.user
+          -var user = data.thread.firstPost.user
           if user
             include interface_thread_userpatch.pug
 

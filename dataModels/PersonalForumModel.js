@@ -42,12 +42,21 @@ let personalForumsSchema = new Schema({
   }
 });
 
+personalForumsSchema.virtual('moderatorsObj')
+  .get(function() {
+    if(!this._moderatorsObj) {
+      throw new Error('moderatorsObj is not initialized.');
+    }
+    return this._moderatorsObj;
+  })
+  .set(function(m) {
+    this._moderatorsObj = m;
+  });
+
 personalForumsSchema.methods.extendModerator = async function() {
   const u = await mongoose.connection.db.collection('users')
       .find({uid: {$in: this.moderators}}).toArray();
-  const doc = this.toObject();
-  doc.moderators = u;
-  return doc
+  return this.moderatorsObj = u;
 };
 
 module.exports = mongoose.model('personalForums', personalForumsSchema, 'personalForums');

@@ -30,7 +30,6 @@ if thread
         -var title = '';
         -if(user)
           -var navbarDesc = user.navbarDesc;
-          -console.log(user)
           -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
         a(href=`/m/${uid}` title=`${title}`)
           img.ForumThreadAvatar(src=`/avatar/${uid}`)
@@ -42,7 +41,7 @@ if thread
             //span.f12.ForumThreadDigestText [精]
             if belong_forum && (belong_forum.fid!==(data.forum?data.forum.fid:null))
               a.ForumThreadHasImage(style=`background-color:${forumcolor};` href=`/f/${belong_forum.fid}`)
-                | #{belong_forum.abbr||belong_forum.display_name}
+                | #{belong_forum.abbr||belong_forum.displayName}
 
             if threadtype
               a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.threadTypeId}` style='background-color:#{forumcolor};') #{threadtype.name}

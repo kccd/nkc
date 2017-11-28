@@ -71,7 +71,7 @@
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-      -var targetPost = post.toObject();
+      -var targetPost = post;
       -var end = targetPost.c.lastIndexOf('[/quote]')
       -if(end !== -1)
         -var postContent = targetPost.c.slice(end+8);

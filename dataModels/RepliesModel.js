@@ -20,21 +20,45 @@ const repliesSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  },
-  /*viewed: {
-    type: Boolean,
-    default: false,
-  }*/
+  }
 });
 
-repliesSchema.methods.extend = async function() {
-  const UserModel = require('./UserModel');
+repliesSchema.virtual('fromPost')
+  .get(function() {
+    if(!this._fromPost) {
+      throw new Error('fromPost is not initialized.');
+    }
+    return this._fromPost;
+  })
+  .set(function(p) {
+    this._fromPost = p;
+  });
+
+repliesSchema.virtual('toPost')
+  .get(function() {
+    if(!this._toPost) {
+      throw new Error('toPost is not initialized.');
+    }
+    return this._toPost;
+  })
+  .set(function(p) {
+    this._toPost = p;
+  });
+
+repliesSchema.methods.extendFromPost = async function() {
   const PostModel = require('./PostModel');
   const fromPost = await PostModel.findOnly({pid: this.fromPid});
-  const toPost = await PostModel.findOnly({pid: this.toPid});
-  const fromUser = await UserModel.findOnly({uid: fromPost.uid});
-  return Object.assign(this.toObject(), {fromPost, toPost, fromUser});
+  await fromPost.extendUser();
+  return this.fromPost = fromPost;
 };
+
+repliesSchema.methods.extendToPost = async function() {
+  const PostModel = require('./PostModel');
+  const toPost = await PostModel.findOnly({pid: this.toPid});
+  await toPost.extendUser();
+  return this.toPost = toPost;
+};
+
 
 repliesSchema.methods.view = async function() {
   return await this.update({viewed: true});

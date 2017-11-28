@@ -17,7 +17,9 @@ smsRouter
     const start = paging.start;
     replies = replies.slice(start, start + perpage);
     replies = await Promise.all(replies.map(async replie => {
-      return await replie.extend();
+      await replie.extendFromPost();
+      await replie.extendToPost();
+      return replie;
     }));
     data.docs = replies;
     data.paging = paging;
@@ -36,7 +38,11 @@ smsRouter
     const paging = apiFn.paging(page, atsLength);
     const start = paging.start;
     ats = ats.slice(start, start + perpage);
-    ats = await Promise.all(ats.map(at => at.extend()));
+    ats = await Promise.all(ats.map(async at => {
+      await at.extendUser();
+      await at.extendPost();
+      return at;
+    }));
     data.docs = ats;
     data.paging = paging;
     data.tab = 'at';
