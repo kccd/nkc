@@ -61,5 +61,9 @@ threadRouter
     ctx.template = 'interface_thread.pug';
     await next();
   })
-.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
+  .post('/:tid', async (ctx, next) => {
+    const {data, params, db, query} = ctx;
+
+  })
+  .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;
