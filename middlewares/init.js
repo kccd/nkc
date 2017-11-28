@@ -27,7 +27,7 @@ module.exports = async (ctx, next) => {
   try {
     await next();
   } catch(err) {
-    ctx.error = err;
+    ctx.error = err.stack;
     ctx.status = err.statusCode || err.status || 500;
     if(process.ENV === 'production')
       ctx.body = {

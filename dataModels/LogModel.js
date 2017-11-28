@@ -31,7 +31,7 @@ const logSchema = new Schema({
     index: 1
   },
   reqTime: Date,
-  processTime: Date,
+  processTime: Number,
   uid: {
     type: String,
     index: 1,
