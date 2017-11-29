@@ -2,7 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 let threadTypesSchema = new Schema({
-  threadTypeId: {
+  cid: {
     type: Number,
     required: true
   },

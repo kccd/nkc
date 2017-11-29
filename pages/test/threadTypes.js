@@ -6,7 +6,7 @@ let Schema = mongoose.Schema;
 db = require('arangojs')('http://192.168.11.23');
 db.useDatabase('rescue');
 let threadTypesSchema = new Schema({
-  threadTypeId: {
+  cid: {
     type: Number,
     required: true
   },
@@ -53,7 +53,7 @@ return db.query(`
   .then((res) => {
     for(var i = 0; i < res.length; i++){
       res[i]._id = undefined;
-      res[i].threadTypeId = res[i]._key;
+      res[i].cid = res[i]._key;
     }
     console.log('开始写入数据');
     let n = 0;

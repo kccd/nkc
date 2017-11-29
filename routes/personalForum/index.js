@@ -15,7 +15,7 @@ router
       SettingModel,
       UsersBehaviorModel,
       ThreadModel,
-      PostModel,
+      PostModel
     } = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
     await personalForum.extendModerator();
@@ -25,7 +25,7 @@ router
     let {
       sortby = 'tlm',
       digest = false,
-      tab = 'all',
+      tab = 'own',
       page = 0
     } = query;
     const matchBase = generateMatchBase();
@@ -38,6 +38,11 @@ router
       $sort.tlm = -1;
     }
     data.targetUser = await UserModel.findOnly({uid});
+    const userSubscribe = await UsersSubscribeModel.findOnly({uid});
+    data.userSubscribe = {
+      subscribeUsers: userSubscribe.subscribeUsers,
+      subscribers: userSubscribe.subscribers
+    };
     const visibleFid = await ctx.getVisibleFid();
     if(tab === 'reply') {
       let $matchPost = matchBase
@@ -119,7 +124,7 @@ router
         }},
         {$unwind: '$thread.firstPost'}
       ]);
-      console.log(`耗时： ${Date.now() - t}`)
+
 
       const length = await PostModel.aggregate([
         {$match: $postMatch},
@@ -132,7 +137,6 @@ router
         {$match: $matchThread},
         {$count: 'length'}
       ]);*/
-      console.log(`耗时： ${Date.now() - t}`);
       const length = await ThreadModel.count({$and: [$matchThread, {tid: {$in: tidArr}}]});
       data.paging = paging(page, length)
     }
@@ -208,8 +212,6 @@ router
         operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
         fid: {$in: visibleFid}
       }, {_id: 0, tid: 1}).sort({timeStamp: 1});
-      console.log(`userBehaviors: ${Date.now() - t2}ms`);
-      console.log(userBehaviors.length)
       const tidArr = [];
       for (let userBehavior of userBehaviors) {
         if(!tidArr.includes(userBehavior.tid)) tidArr.push(userBehavior.tid);

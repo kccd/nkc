@@ -231,6 +231,10 @@ const certificates ={
           subscribe: {
             [POST]: true,
             [DELETE]: true
+          },
+          category: {
+            [name]: '分类',
+            [GET]: true
           }
         }
       },
@@ -539,7 +543,17 @@ const certificates ={
       },
       f: {
         [parameter]: {
-          [PATCH]: true
+          [PATCH]: true,
+          category: {
+            [name]: '帖子分类',
+            [POST]: true,
+            [PATCH]: true,
+            [parameter]: {
+              [name]: 'cid',
+              [DELETE]: true
+            }
+          }
+
         }
       }
     }

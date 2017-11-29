@@ -95,8 +95,9 @@ fn.createUser = async (data) => {
   let time = Date.now();
   userObj.toc = time;
   userObj.tlv = time;
-  userObj.uid = parseInt(userCount);
+  userObj.uid = userCount;
   userObj.certs = [];
+  userObj.moderators = [userCount];
   if(userObj.mobile) userObj.certs = ['mobile'];
   if(userObj.email) userObj.certs = ['email'];
   if(!userObj.isA) {

@@ -21,7 +21,7 @@
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
-              a.ThreadPostTitleUsername(href=`/u/${uid}`) #{user?user.username:''}
+              a.ThreadPostTitleUsername(href=`/m/${uid}`) #{user?user.username:''}
               if(user && user.uid === data.targetUser.uid)
                 span(style='color: #ccc') (楼主)&nbsp
               span.lighttext #{fromNow(post.toc)} -

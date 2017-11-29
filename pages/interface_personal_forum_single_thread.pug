@@ -21,7 +21,7 @@ if thread
   //span #{belong_forum._key}
   //span #{thread.fid}
 
-  -var threadtype = data.threadtypes?data.threadtypes.filter(k=>k.threadTypeId==thread.cid)[0]:null;
+  -var threadtype = data.threadtypes?data.threadtypes.filter(k=>k.cid==thread.cid)[0]:null;
 
   .ForumThreadItem(style=`background-color: ${hide? "#cfd2da" : "white"}`)
     .parent.clearfix(id='')
@@ -44,7 +44,7 @@ if thread
                 | #{belong_forum.abbr||belong_forum.displayName}
 
             if threadtype
-              a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.threadTypeId}` style='background-color:#{forumcolor};') #{threadtype.name}
+              a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.cid}` style='background-color:#{forumcolor};') #{threadtype.name}
 
             a(class=`${digest?"ForumThreadDigestText":"ForumThreadNormal"}` href=`${url}` title=`${brief}`) #{oc.t}
 

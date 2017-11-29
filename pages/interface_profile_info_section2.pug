@@ -4,8 +4,10 @@
     a(href=`/sms/message/${user.uid}`) 发私信
 
     if data.userLevel >= 4
-      a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}', 'delete',{}).then(jalert).catch(jwarning)`) 一键封禁此人
-      a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}', 'put',{}).then(jalert).catch(jwarning)`) 解除封禁
+      if(!user.certs.includes('banned'))
+        a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}', 'delete',{}).then(jalert).catch(jwarning)`) 一键封禁此人
+      else
+        a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}', 'put',{}).then(jalert).catch(jwarning)`) 解除封禁
 
     br
     span 学术分 #{user.xsf||0}

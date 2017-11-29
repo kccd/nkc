@@ -62,10 +62,11 @@ function moveThreadTo(){
 
 function askCategoryOfForum(fid){
   fid = fid.toString()
-  return nkcAPI('getForumCategories',{fid:fid})
+  return nkcAPI('/f/'+fid+'/category', 'GET',{})
   .then(function(arr){
+    arr = arr.categorys;
     if(!arr.length)return null
-    return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i._key+':'+i.name})))
+    return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i.cid+':'+i.name})))
   })
   .then(function(str){
     //console.log('selected:',str.split(':')[0]);
@@ -109,7 +110,7 @@ function renameForumCategory(fid){
       return
     }
     else{
-      return nkcAPI('modifyThreadType',{op:'rename',cid:cid,name:newname})
+      return nkcAPI('/f/'+fid+'/category', 'PATCH',{cid:cid,name:newname})
       .then(function(){
         screenTopAlert('修改成功')
         location.reload();
@@ -126,7 +127,7 @@ function deleteForumCategory(fid){
       return
     }
     else{
-      return nkcAPI('modifyThreadType',{op:'remove',cid:cid})
+      return nkcAPI('/f/'+fid+'/category/'+cid, 'DELETE',{})
       .then(function(){
         screenTopAlert('已经删除。')
         location.reload();
@@ -136,12 +137,12 @@ function deleteForumCategory(fid){
 }
 
 function addForumCategory(fid){
-  var newcatname = prompt('请输入新的分类的名称：')
-  if(!newcatname){
+  var newCatName = prompt('请输入新的分类的名称：')
+  if(!newCatName){
     return
   }
   else{
-    return nkcAPI('modifyThreadType',{op:'add',name:newcatname,fid:fid})
+    return nkcAPI('/f/'+fid+'/category', 'POST',{name:newCatName})
     .then(function(){
       location.reload()
     })

@@ -28,6 +28,50 @@ operationRouter
       ctx.throw(400, '参数不正确');
     }
     await next();
+  })
+  .get('/category', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {fid} = ctx.params;
+    data.categorys = await db.ThreadTypeModel.find({fid}).sort({order: 1});
+    await next();
+  })
+  .post('/category', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {fid} = ctx.params;
+    const {name} = ctx.body;
+    if(!name) ctx.throw(400, '名字不能位空');
+    let order = 0;
+    const category = await db.ThreadTypeModel.findOne({fid}).sort({order: -1});
+    if(category) order = category.order + 1;
+    const cid = await db.SettingModel.operateSystemID('threadTypes', 1);
+    const newCategory = new db.ThreadTypeModel({
+      cid,
+      order,
+      fid,
+      name
+    });
+    try{
+      await newCategory.save();
+    } catch (err) {
+      await db.SettingModel.operateSystemID('threadTypes', -1);
+      ctx.throw(500, `增加分类出错: ${err}`);
+    }
+    await next();
+  })
+  .patch('/category', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {cid, name} = ctx.body;
+    if(!name) ctx.throw(400, '名字不能位空');
+    const category = await db.ThreadTypeModel.findOnly({cid});
+    await category.update({name});
+    await next();
+  })
+  .del('/category/:cid', async (ctx, next) => {
+    const {db} = ctx;
+    const {cid} = ctx.params;
+    await db.ThreadModel.updateMany({cid}, {$set: {cid: 0}});
+    await db.ThreadTypeModel.deleteOne({cid});
+    await next();
   });
 
 module.exports = operationRouter;
