@@ -1,4 +1,4 @@
-db = require('arangojs')('http://192.168.11.7');
+db = require('arangojs')('http://192.168.11.23');
 db.useDatabase('rescue');
 db.query(`
   for m in mobilecodes

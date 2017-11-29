@@ -43,16 +43,21 @@ router
       let $matchPost = matchBase
         .set('uid', uid)
         .set('fid', {$in: visibleFid});
+      let $matchThread = matchBase;
       if(digest)
-        $matchPost = $matchPost.set('digest', true);
-      const posts = await PostModel.find($matchPost.toJS(), {_id: 0, tid: 1}).sort($sort).skip(page*perpage).limit(perpage);
-      data.threads = await Promise.all(posts.map(async post => {
-        const thread = await ThreadModel.findOnly({tid: post.tid});
+        $matchThread = $matchThread.set('digest', true);
+      const tidArr = [];
+      const posts = await PostModel.find($matchPost.toJS(), {_id: 0, tid: 1});
+      for (let post of posts) {
+        if(!tidArr.includes(post.tid)) tidArr.push(post.tid);
+      }
+      const threads = await ThreadModel.find({$and: [$matchThread.toJS(), {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
+      data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(p => p.extendUser());
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      const length = await PostModel.count($matchPost.toJS());
+      const length = await ThreadModel.count({$and: [$matchThread.toJS(), {tid: {$in: tidArr}}]});
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {
@@ -191,13 +196,33 @@ router
       data.paging = paging(page, length)
     }
     else if(tab === 'all') {
-      const $digest = digest? {'thread.digest': true}: {};
+      const $digest = digest? {digest: true}: {digest: false};
       let $sort = {};
       if(sortby === 'tlm')
-        $sort = {'thread.tlm': -1};
+        $sort = {'tlm': -1};
       else
-        $sort = {'thread.toc': -1};
-      data.threads = await UsersBehaviorModel.aggregate([
+        $sort = {'toc': -1};
+      let t2 = Date.now();
+      const userBehaviors = await UsersBehaviorModel.find({
+        uid,
+        operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
+        fid: {$in: visibleFid}
+      }, {_id: 0, tid: 1}).sort({timeStamp: 1});
+      console.log(`userBehaviors: ${Date.now() - t2}ms`);
+      console.log(userBehaviors)
+      const tidArr = [];
+      let t = Date.now();
+      for (let userBehavior of userBehaviors) {
+        if(!tidArr.includes(userBehavior.tid)) tidArr.push(userBehavior.tid);
+      }
+      console.log(`time :  ${Date.now() - t}`)
+      const threads = await ThreadModel.find({$and: [$digest, {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
+      data.threads = await Promise.all(threads.map(async thread => {
+        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendLastPost().then(p => p.extendUser());
+        return thread;
+      }));
+      /*data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
           timeStamp: 1
         }},
@@ -253,12 +278,8 @@ router
         {$replaceRoot: {
           newRoot: '$thread'
         }}
-      ]);
-      const length = await UsersBehaviorModel.count({
-          uid,
-          operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-          fid: {$in: visibleFid},
-        });
+      ]);*/
+      const length = await ThreadModel.count({$and: [$digest, {tid: {$in: tidArr}}]});
       data.paging = paging(page, length)
     }
     if(tab === 'all' || tab === 'own' || tab === 'discuss') {

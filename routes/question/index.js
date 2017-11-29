@@ -8,7 +8,6 @@ questionRouter
     const {data} = ctx;
     const {user} = data;
     if(!user) ctx.throw(401, '你还没有登陆，请登录后再试。');
-    console.log(user);
     data.questions = await dbFn.getQuestionsByQuery();
     data.userQuestions = await dbFn.getQuestionsByQuery({uid: user.uid});
     data.numberByCategory = await dbFn.questionCountOfCategory();
