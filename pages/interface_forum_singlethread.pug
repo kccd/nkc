@@ -19,7 +19,7 @@
   //span #{belong_forum._key}
   //span #{thread.fid}
 
--var threadtype = data.threadTypes?data.threadTypes.filter(k=>k.threadTypeId==thread.cid)[0]:null;
+-var threadtype = data.threadTypes?data.threadTypes.filter(k=>k.cid==thread.cid)[0]:null;
 .ForumThreadItem
   .parent.clearfix(id='')
     .avatar-left
@@ -40,7 +40,7 @@
               | #{belong_forum.abbr||belong_forum.displayName}
 
           if threadtype
-            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=#{threadtype.threadTypeId}` style=`background-color:${forumcolor};`) #{threadtype.name}
+            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=#{threadtype.cid}` style=`background-color:${forumcolor};`) #{threadtype.name}
 
           a(class=`${digest?"ForumThreadDigestText":"ForumThreadNormal"}` href=`${url}` title=`${brief}`) #{oc.t}
 

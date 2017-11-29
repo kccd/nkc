@@ -53,13 +53,13 @@ block content
                             if moderators && moderators.length
                               span 版主：
                                 each k in moderators
-                                  a.d-inline.margin-right(href=`/m/${k._key}`) #{k.username}
-                              -var subscribeUsersNum = (data.targetUser.subscribeUsers)?data.targetUser.subscribeUsers : [];
-                              -var subscribersNum = (data.targetUser.subscribers)?data.targetUser.subscribers : [];
+                                  a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
+                              -var subscribeUsersNum = (data.userSubscribe.subscribeUsers)?data.userSubscribe.subscribeUsers.length : 0;
+                              -var subscribersNum = (data.userSubscribe.subscribers)?data.userSubscribe.subscribers.length : 0;
                               span 关注：
-                                a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe`) #{subscribeUsersNum.length}
+                                a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe`) #{subscribeUsersNum}
                               span 粉丝：
-                                a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe?fans=true`) #{subscribersNum.length}
+                                a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe?fans=true`) #{subscribersNum}
                         div(style='position: absolute; right: 0; top: 0;')
                           if isModerator
                             div
@@ -99,7 +99,7 @@ block content
                             div(style='display: inline-block;')
                               input#description(style='width: 360px;' value=`${description}` name='description' placeholder='请输入专栏介绍')
                           div
-                            -const str = moderators.length === 1? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
+                            -const str = moderators.length <= 0? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
                             span 版主：
                             span #{moderators[0].username},
                             input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str}`)
@@ -117,27 +117,20 @@ block content
                         a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'put', {}).then(jalert).catch(jwarning)`) 解除封禁
                       else
                         a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(jalert).catch(jwarning)`) &nbsp;封禁此人&nbsp;
-                    if data.userLevel >= 6
-                      -var isPopular = data.popPersonalForums.indexOf(forum.uid) > -1
-                      a#ppfBtn(href='javascript:;' onclick=`popPFSwitch('${data.forum.uid}')`) #{isPopular ? '取消热门' : '推至热门'}
 
         include interface_easy_post
 
-        ul.nav.nav-tabs
-          li(class=`${data.tab === "own"? "active" : ""}`)
+        ul.nav.nav-tabs(style='margin-top: 0.4rem;')
+          li(class=`${data.tab === "own" ? "active" : ""}`)
             a(href='?&tab=own') 版主
-          li(class=`${data.tab === "all"? "active" : ""}`)
+          li(class=`${data.tab === "all" ? "active" : ""}`)
             a(href='?&tab=all') 全部
-          li(class=`${data.tab === "discuss" ? "active" : ""}`)
-            a(href='?&tab=discuss') 讨论
           li(class=`${data.tab === "reply"? "active" : ""}`)
             a(href='?&tab=reply') 回复
           li(class=`${data.tab === "recommend"? "active" : ""}`)
             a(href='?&tab=recommend') 推荐
           li(class=`${data.tab === "subscribe" ? "active" : ""}`)
             a(href='?&tab=subscribe') 关注
-          li
-            a(href=`/activities/${data.forum.uid}`) 动态
         .panel
           .row
             .col-xs-12
@@ -173,7 +166,7 @@ block content
                 - var class_str_sortby_tlm = sortby === 'tlm'?'active':''
 
 
-                ul.pagination.NavigationPaging
+                ul.pagination.NavigationPaging(style='margin-top: 0.4rem')
                   - var page = paging?paging.page:null;
                   li(class=`${class_str_all}`)
                     a(href=`?&tab=${data.tab}${data.sortby? "&sortby=toc": ""}`) 俱
@@ -223,7 +216,7 @@ block content
         //-var active_user_title = '学院活跃用户'
         //include interface_active_users
 
-        if data.user && data.user.uid !== data.targetUser._key
+        if data.user && data.user.uid !== data.targetUser.uid
           .nkcpanel
             a(href=`/m/${data.user.uid}`) 我的主题
             br

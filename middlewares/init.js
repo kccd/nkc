@@ -15,6 +15,11 @@ module.exports = async (ctx, next) => {
   ctx.data.site = settings.site;
   ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.getcode = false;
+  ctx.print = (key, value) => {
+    console.log(`==================== ${key} ====================`);
+    console.log(value);
+    console.log(`----------------------------------------------`);
+  };
   Object.defineProperty(ctx, 'template', {
     get: function() {
       return './pages/' + this.__templateFile
