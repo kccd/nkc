@@ -3,13 +3,18 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.20');
+db = require('arangojs')('http://127.0.0.1:8529');
 db.useDatabase('rescue');
 
 let postsSchema = new Schema({
   pid: {
     type: String,
     unique: true,
+    required: true,
+    index: 1
+  },
+  fid: {
+    type: String,
     required: true,
     index: 1
   },
@@ -107,9 +112,19 @@ db.query(`
   update p with{uid: '74365'} in posts
 `)
   .then(() => {
+  console.log('添加fid字段');
+    return db.query(`
+      for p in posts
+      let thread = document(threads, p.tid)
+      filter thread
+      update p with {fid: thread.fid} in posts
+    `)
+  })
+  .then(() => {
     console.log('开始读取数据');
     return db.query(`
       for p in posts
+      filter document(threads, p.tid)
       return p
   `)
   })

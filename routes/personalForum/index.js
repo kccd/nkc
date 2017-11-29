@@ -31,11 +31,11 @@ router
     const matchBase = generateMatchBase();
     const $sort = {};
     if(sortby === 'toc') {
-      $sort.toc = 1;
+      $sort.toc = -1;
       sortby = 'toc'
     }
     else {
-      $sort.tlm = 1;
+      $sort.tlm = -1;
     }
     data.targetUser = await UserModel.findOnly({uid});
     const visibleFid = await ctx.getVisibleFid();
@@ -52,32 +52,7 @@ router
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      /*data.threads = await PostModel.aggregate([
-        {$sort: $sort},
-        {$match: $matchPost.toJS()},
-        {$skip: page * perpage},
-        {$limit: perpage},
-        {$lookup: {
-          from: 'threads',
-          localField: 'tid',
-          foreignField: 'tid',
-          as: 'thread'
-        }},
-        {$unwind: '$thread'},
-        {$lookup: {
-          from: 'posts',
-          localField: 'thread.oc',
-          foreignField: 'pid',
-          as: 'thread.oc'
-        }},
-        {$unwind: '$thread.oc'}
-      ]);*/
       const length = await PostModel.count($matchPost.toJS());
-      /*const {length} = await PostModel.aggregate([
-        {$sort: $sort},
-        {$match: $matchPost.toJS()},
-        {$count: 'length'}
-      ]);*/
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {
@@ -101,32 +76,7 @@ router
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      /*data.threads = await ThreadModel.aggregate([
-        {$sort},
-        {$match: $matchThread.toJS()},
-        {$skip: page * perpage},
-        {$limit: perpage},
-        {$lookup: {
-          from: 'posts',
-          localField: 'oc',
-          foreignField: 'pid',
-          as: 'oc'
-        }},
-        {$unwind: '$oc'},
-        {$lookup: {
-          from: 'users',
-          localField: 'oc.uid',
-          foreignField: 'uid',
-          as: 'oc.user'
-        }},
-        {$unwind: '$oc.user'}
-      ]);*/
       const length = await ThreadModel.count($matchThread.toJS());
-      /*const {length} = await await ThreadModel.aggregate([
-        {$sort},
-        {$match: $matchThread.toJS()},
-        {$count: 'length'}
-      ]);*/
       data.paging = paging(page, length)
     }
     else if(tab === 'recommend') {
@@ -177,6 +127,7 @@ router
         {$match: $matchThread},
         {$count: 'length'}
       ]);*/
+      console.log(`耗时： ${Date.now() - t}`);
       const length = await ThreadModel.count({$and: [$matchThread, {tid: {$in: tidArr}}]});
       data.paging = paging(page, length)
     }
@@ -246,13 +197,6 @@ router
         $sort = {'thread.tlm': -1};
       else
         $sort = {'thread.toc': -1};
-      /*const userBehavaior = await UsersBehaviorModel.find({
-        uid,
-        operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-        fid: {$in: visibleFid},
-      }).sort({timeStamp: 1});
-      const tidArr = [];*/
-
       data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
           timeStamp: 1
@@ -310,20 +254,20 @@ router
           newRoot: '$thread'
         }}
       ]);
-      if(tab === ('all' || 'own' || 'discuss')) {
-        data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
-          const thread = await ThreadModel.findOnly({tid});
-          await thread.extendFirstPost().then(p => p.extendUser());
-          await thread.extendLastPost().then(p => p.extendUser());
-          return thread;
-        }));
-      }
       const length = await UsersBehaviorModel.count({
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
           fid: {$in: visibleFid},
         });
       data.paging = paging(page, length)
+    }
+    if(tab === 'all' || tab === 'own' || tab === 'discuss') {
+      data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
+        const thread = await ThreadModel.findOnly({tid});
+        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendLastPost().then(p => p.extendUser());
+        return thread;
+      }));
     }
     ctx.template = 'interface_personal_forum.pug';
     if(ctx.data.user)
