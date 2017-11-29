@@ -196,7 +196,7 @@ router
       data.paging = paging(page, length)
     }
     else if(tab === 'all') {
-      const $digest = digest? {digest: true}: {digest: false};
+      const $digest = digest? {'digest': true}: {'digest': false};
       let $sort = {};
       if(sortby === 'tlm')
         $sort = {'tlm': -1};
@@ -209,19 +209,18 @@ router
         fid: {$in: visibleFid}
       }, {_id: 0, tid: 1}).sort({timeStamp: 1});
       console.log(`userBehaviors: ${Date.now() - t2}ms`);
-      console.log(userBehaviors)
+      console.log(userBehaviors.length)
       const tidArr = [];
-      let t = Date.now();
       for (let userBehavior of userBehaviors) {
         if(!tidArr.includes(userBehavior.tid)) tidArr.push(userBehavior.tid);
       }
-      console.log(`time :  ${Date.now() - t}`)
       const threads = await ThreadModel.find({$and: [$digest, {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(p => p.extendUser());
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
+      const length = await ThreadModel.count({$and: [$digest, {tid: {$in: tidArr}}]});
       /*data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
           timeStamp: 1
@@ -278,8 +277,22 @@ router
         {$replaceRoot: {
           newRoot: '$thread'
         }}
-      ]);*/
-      const length = await ThreadModel.count({$and: [$digest, {tid: {$in: tidArr}}]});
+      ]);
+      const {length} = await UsersBehaviorModel.aggregate([
+        {$sort: {
+          timeStamp: 1
+        }},
+        {$match: {
+          uid,
+          operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
+          fid: {$in: visibleFid},
+        }},
+        {$group: {
+          _id: '$tid',
+          lastPost: {$first: '$$ROOT'}
+        }},
+        {$count: 'length'}
+        ]);*/
       data.paging = paging(page, length)
     }
     if(tab === 'all' || tab === 'own' || tab === 'discuss') {

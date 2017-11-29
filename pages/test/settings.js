@@ -7,23 +7,39 @@ db = require('arangojs')('http://192.168.11.23');
 db.useDatabase('rescue');
 
 let settingsSchema = new Schema({
-  type: {
+  uid: {
     type: String,
-    required: true,
-    index: 1
+    unique: true,
+    required: true
   },
   ads: {
-    type: Array,
-    default: []
+    type: [String]
   },
   popPersonalForums: {
-    type: Array,
-    default: []
+    type: [String]
+  },
+  counters: {
+    resources: Number,
+    users: Number,
+    posts: Number,
+    threadTypes: Number,
+    threads: Number,
+    questions:Number,
+    collections: Number,
+    sms: Number
   }
 });
 
 let Settings = mongoose.model('settings', settingsSchema);
 
+let returnMax = (arr) => {
+  let max = 0;
+  for (let i in arr) {
+    console.log(arr[i]);
+    if(max < parseFloat(arr[i])) max = parseFloat(arr[i])
+  }
+  return max;
+};
 
 let t1 = Date.now();
 
@@ -35,9 +51,54 @@ return db.query(`
 
 .then(cursor => cursor.all())
 .then((res) => {
+  console.log(`计算最大值`);
+  let t = Date.now();
+  return db.query(`
+    let rArr = (for r in resources
+      return r._key)
+    let uArr = (for u in users
+      return u._key)
+    let pArr = (for p in posts
+      filter document(threads, p._key)
+      return p._key)
+    let ttArr = (for t in threadtypes
+      return t._key)
+    let tArr = (for t in threads
+      return t._key)
+    let question = length(questions)
+    let sms = length(sms)
+    let collection = length(collections)
+    return {
+      rArr,
+      uArr,
+      pArr,
+      ttArr,
+      tArr,
+      question,
+      sms,
+      collection
+    }          
+  `)
+    .then(a => a.all())
+    .then(arr => {
+      arr = arr[0];
+      res[0].counters = {};
+      res[0].counters.resources = returnMax(arr.rArr);
+      res[0].counters.users = returnMax(arr.uArr);
+      res[0].counters.threads = returnMax(arr.tArr);
+      res[0].counters.posts = returnMax(arr.pArr);
+      res[0].counters.threadTypes = returnMax(arr.ttArr);
+      res[0].counters.questions = arr.question;
+      res[0].counters.sms = arr.sms;
+      res[0].counters.collections = arr.collection;
+      console.log(`计算完成: ${Date.now() - t}`);
+      return res;
+    })
+})
+.then(res => {
   for(var i = 0; i < res.length; i++){
+    res[i].uid = res[i]._key;
     res[i]._id = undefined;
-    res[i].type = res[i]._key;
   }
   console.log('开始写入数据');
   let n = 0;
