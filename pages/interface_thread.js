@@ -205,21 +205,17 @@ function enablePost(pid){
   .catch(jwarning)
 }
 
-function submit(){
+function submit(tid){
   var post = assemblePostObject()
-  var target = replyTarget.trim();
 
   if(post.c==''){screenTopWarning('请填写内容。');return;}
-  if(target==''){screenTopWarning('请填写发表至的目标。');return;}
 
   geid('ButtonReply').disabled=true
-  return nkcAPI('postTo',{
-    target:target,
+  return nkcAPI('/t/' + tid, 'POST', {
     post:post,
   })
-  .then(function(result){
-    var redirectTarget = result.redirect;
-    redirect(redirectTarget?redirectTarget:'/'+target);
+  .then(function(){
+    redirect('/t/'+tid);
   })
   .catch(function(err){
     jwarning(err.detail);

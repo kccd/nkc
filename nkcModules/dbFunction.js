@@ -208,5 +208,4 @@ fn.updatePost = async (pid) => {
 
 };
 
-
 module.exports = fn;

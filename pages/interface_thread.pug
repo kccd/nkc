@@ -233,7 +233,7 @@ block content
 
                 .form-inline
                   .form-group
-                    button#ButtonReply.btn.btn-primary(onclick='submit()') 回复
+                    button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
 
                   .checkbox-inline
                     label

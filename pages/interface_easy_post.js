@@ -306,7 +306,7 @@ var onPost = function(that) {
       }
     //}
     that.post.className = 'btn btn-primary disabled';
-    return nkcAPI('postTo', postObj)
+    return nkcAPI('/' + target, 'POST', post)
       .then(function (result) {
         var redirectTarget = result.redirect;
         redirect(redirectTarget ? redirectTarget : '/' + target);

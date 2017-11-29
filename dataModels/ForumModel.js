@@ -159,4 +159,23 @@ forumSchema.methods.updateForumMessage = async function() {
   });
 };
 
+forumSchema.methods.newPost = async function(post, user, ip, cid) {
+  const ThreadModel = require('./ThreadModel');
+  const tid = await SettingModel.operateSystemID('threads', 1);
+  const thread = await new ThreadModel({
+    tid,
+    cid,
+    fid: this.fid,
+    mid: user.uid,
+    uid: user.uid,
+  }).save();
+  const _post = await thread.newPost(post, user, ip, cid);
+  await this.update({$inc: {
+    'tCount.normal': 1,
+    'countPosts': 1,
+    'countThreads': 1
+  }});
+  return _post;
+};
+
 module.exports = mongoose.model('forums', forumSchema);

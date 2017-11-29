@@ -8,10 +8,6 @@ const threadSchema = new Schema({
     unique: true,
     required:true
   },
-  category: {
-    type: String,
-    default: ''
-  },
   cid: {
     type: String,
     default:''
@@ -42,22 +38,9 @@ const threadSchema = new Schema({
     default: false,
     index: 1
   },
-  esi: {
-    type: Boolean,
-    default: false
-  },
   fid: {
     type: String,
     required: true,
-    index: 1
-  },
-  hasFile: {
-    type: Boolean,
-    default: false
-  },
-  hasImage: {
-    type: Boolean,
-    default: false,
     index: 1
   },
   hideInMid: {
@@ -151,9 +134,9 @@ threadSchema.methods.extendLastPost = async function() {
   return this.lastPost = await PostModel.findOnly({pid: this.lm})
 };
 
-threadSchema.methods.extendForum = async function() {
+threadSchema.methods.extendForum = function() {
   const ForumModel = require('./ForumModel');
-  return this.forum = await ForumModel.findOnly({fid: this.fid})
+  return this.forum = ForumModel.findOnly({fid: this.fid})
 };
 
 // 1、判断能否进入所在板块
@@ -240,6 +223,65 @@ threadSchema.methods.updateThreadMessage = async function() {
   return await this.update(updateObj);
 };
 
-
+threadSchema.methods.newPost = async function(post, user, ip) {
+  const SettingModel = require('./SettingModel');
+  const UsersPersonalModel = require('./UsersPersonalModel');
+  const PostModel = require('./PostModel');
+  const UserModel = require('./UserModel');
+  const InviteModel = require('./InviteModel');
+  const pid = await SettingModel.operateSystemID('posts', 1);
+  const {c, t, l} = post;
+  //handle at someone
+  const atUsers = []; //user info {username, uid}
+  const existedUsers = []; //real User mongoose data model
+  const r = (c.match(/{r=[0-9]{1,20}}/g) || [])
+    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
+  const matchedUsernames = c.match(/@([^@\s]*)\s/g);
+  if(matchedUsernames) {
+    await Promise.all(matchedUsernames.map(async str => {
+      const username = str.slice(1, -1); //slice the @ and [\s] in reg
+      const users = await UserModel.findOne({username});
+      if(users.length !== 0) {
+        const user = users[0];
+        const {username, uid} = user;
+        let flag = true; //which means this user does not in existedUsers[]
+        for(const u of atUsers) {
+          if(u.username === username)
+            flag = false;
+        }
+        if(flag) {
+          atUsers.push({username, uid});
+          existedUsers.push(user)
+        }
+      }
+    }))
+  }
+  await Promise.all(atUsers.map(foundUser => new InviteModel({
+    pid,
+    invitee: foundUser.uid,
+    inviter: user.uid,
+  })));
+  const _post = await new PostModel({
+    pid,
+    atUsers,
+    c,
+    t,
+    ipoc: ip,
+    iplm: ip,
+    l,
+    r,
+    fid: this.fid,
+    tid: this.tid,
+    uid: user.uid,
+    uidlm: user.uid
+  });
+  await _post.save();
+  await Promise.all(existedUsers.map(async u => {
+    const up = await UsersPersonalModel.findOnly({uid: u.uid});
+    await up.increasePsnl('at');
+  }));
+  await this.update({lm: pid});
+  return _post
+};
 
 module.exports = mongoose.model('threads', threadSchema);
