@@ -59,7 +59,6 @@ return db.query(`
     let uArr = (for u in users
       return u._key)
     let pArr = (for p in posts
-      filter document(threads, p._key)
       return p._key)
     let ttArr = (for t in threadtypes
       return t._key)
@@ -96,7 +95,7 @@ return db.query(`
     })
 })
 .then(res => {
-  for(var i = 0; i < res.length; i++){
+  for(let i = 0; i < res.length; i++){
     res[i].uid = res[i]._key;
     res[i]._id = undefined;
   }
@@ -108,7 +107,7 @@ return db.query(`
     let settings = new Settings(data);
     settings.save()
     .then(() => {
-      if(m+1000 == n){
+      if(m+1000 === n){
         m = n;
         console.log(n);
       }
