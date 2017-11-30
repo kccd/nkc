@@ -266,9 +266,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(matchedUsernames) {
     await Promise.all(matchedUsernames.map(async str => {
       const username = str.slice(1, -1); //slice the @ and [\s] in reg
-      const users = await UserModel.findOne({username});
-      if(users.length !== 0) {
-        const user = users[0];
+      const user = await UserModel.findOne({username});
+      if(user) {
         const {username, uid} = user;
         let flag = true; //which means this user does not in existedUsers[]
         for(const u of atUsers) {

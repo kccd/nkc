@@ -162,6 +162,7 @@ forumSchema.methods.updateForumMessage = async function() {
 forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
   const SettingModel = require('./SettingModel');
   const ThreadModel = require('./ThreadModel');
+  const PersonalForumModel = require('./PersonalForumModel');
   const tid = await SettingModel.operateSystemID('threads', 1);
   const t = {
     tid,
@@ -170,8 +171,13 @@ forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
     mid: user.uid,
     uid: user.uid,
   };
-  if(toMid && toMid !== user.uid)
-    t.toMid = toMid;
+  if(toMid && toMid !== user.uid) {
+    const targetPF = PersonalForumModel.findOnly({toMid});
+    if(targetPF.moderators.indexOf(user.uid) > -1)
+      t.toMid = toMid;
+    else
+      throw new Error(`only personal forum's moderator is able to post`)
+  }
   const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip, cid);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1}});

@@ -73,7 +73,7 @@ threadRouter
     } = db;
     const {post} = body;
     const thread = await ThreadModel.findOnly({tid});
-    const _post = thread.newPost(post, user, ip);
+    const _post = await thread.newPost(post, user, ip);
     await generateUsersBehavior({
       operation: 'postToThread',
       pid: _post.pid,
