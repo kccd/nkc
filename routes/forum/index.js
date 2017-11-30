@@ -82,13 +82,13 @@ forumRouter
     } = ctx;
     const {user} = data;
     const {fid} = params;
-    const {cat} = query;
+    const {cat, mid} = query;
     const {
       ForumModel,
     } = db;
     const {post} = body;
     const forum = await ForumModel.findOnly({fid});
-    const _post = forum.newPost(post, user, ip, cat);
+    const _post = forum.newPost(post, user, ip, cat, mid);
     await generateUsersBehavior({
       operation: 'postToForum',
       pid: _post.pid,

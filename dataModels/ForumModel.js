@@ -159,17 +159,22 @@ forumSchema.methods.updateForumMessage = async function() {
   });
 };
 
-forumSchema.methods.newPost = async function(post, user, ip, cid) {
+forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
+  const SettingModel = require('./SettingModel');
   const ThreadModel = require('./ThreadModel');
   const tid = await SettingModel.operateSystemID('threads', 1);
-  const thread = await new ThreadModel({
+  const t = {
     tid,
     cid,
     fid: this.fid,
     mid: user.uid,
     uid: user.uid,
-  }).save();
+  };
+  if(toMid && toMid !== user.uid)
+    t.toMid = toMid;
+  const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip, cid);
+  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1}});
   await this.update({$inc: {
     'tCount.normal': 1,
     'countPosts': 1,

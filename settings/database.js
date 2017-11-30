@@ -21,7 +21,7 @@ mongoose.plugin(function(schema) {
       throw new Error('param not specify');
     const doc = await this.findOne(query);
     if(!doc)
-      throw `${JSON.stringify(query)} document not found`;
+      throw new Error(`${JSON.stringify(query)} document not found`);
     return doc
   }
 });

@@ -251,8 +251,10 @@ var onPost = function(that) {
     var content = that.content.value;
     var title = that.title.value.trim();
     var target;
+    var mid = that.mid;
     if(that.type === 'm') {
-      target = that.type + '/' + that.mid;
+      //target = that.type + '/' + that.mid;
+      target = 'f/' + that.forumID
     }
     else {
       target = that.type + '/' + that.key;
@@ -306,7 +308,10 @@ var onPost = function(that) {
       }
     //}
     that.post.className = 'btn btn-primary disabled';
-    return nkcAPI('/' + target, 'POST', post)
+    var query = '';
+    if(mid)
+      query = '?&mid=' + mid;
+    return nkcAPI('/' + target + query, 'POST', {post})
       .then(function (result) {
         var redirectTarget = result.redirect;
         redirect(redirectTarget ? redirectTarget : '/' + target);

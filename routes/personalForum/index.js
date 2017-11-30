@@ -69,7 +69,7 @@ router
       let $matchThread = matchBase.set('fid', {$in: visibleFid});
       $matchThread = $matchThread.set('$or', [
         {uid},
-        {mid: uid}
+        {toMid: uid}
       ]);
       if(
         !user || personalForum.moderators.indexOf(user.uid) === -1
