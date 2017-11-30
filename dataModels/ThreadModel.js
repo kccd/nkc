@@ -150,9 +150,9 @@ threadSchema.methods.extendLastPost = async function() {
   return this.lastPost = await PostModel.findOnly({pid: this.lm})
 };
 
-threadSchema.methods.extendForum = function() {
+threadSchema.methods.extendForum = async function() {
   const ForumModel = require('./ForumModel');
-  return this.forum = ForumModel.findOnly({fid: this.fid})
+  return this.forum = await ForumModel.findOnly({fid: this.fid})
 };
 
 threadSchema.methods.extendCategory = async function() {

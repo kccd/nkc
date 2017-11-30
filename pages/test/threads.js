@@ -15,8 +15,12 @@ const threadSchema = new Schema({
     required:true
   },
   cid: {
-    type: String,
-    default:''
+    type: Number,
+    default: 0
+  },
+  hasImage: {
+    type: Boolean,
+    default: false
   },
   count: {
     type: Number,

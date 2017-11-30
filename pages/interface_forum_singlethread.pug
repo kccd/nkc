@@ -40,7 +40,7 @@
               | #{belong_forum.abbr||belong_forum.displayName}
 
           if threadtype
-            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=#{threadtype.cid}` style=`background-color:${forumcolor};`) #{threadtype.name}
+            a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.cid}` style=`background-color:${forumcolor};`) #{threadtype.name}
 
           a(class=`${digest?"ForumThreadDigestText":"ForumThreadNormal"}` href=`${url}` title=`${brief}`) #{oc.t}
 
