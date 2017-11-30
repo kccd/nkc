@@ -18,10 +18,6 @@ const threadSchema = new Schema({
     type: Number,
     default: 0
   },
-  hasImage: {
-    type: Boolean,
-    default: false
-  },
   count: {
     type: Number,
     default: 0
@@ -128,8 +124,8 @@ db.query(`
   for(var i = 0; i < res.length; i++){
     res[i]._id = undefined;
     res[i].tid = res[i]._key
-    res[i].hasFile = res[i].has_file;
-    res[i].hasImage = res[i].has_image;
+    /*res[i].hasFile = res[i].has_file;
+    res[i].hasImage = res[i].has_image;*/
     res[i].countRemain = res[i].count_remain;
     res[i].countToday = res[i].count_today;
   }

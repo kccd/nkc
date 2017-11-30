@@ -31,7 +31,64 @@ otherRouter
 
     const visibleFid = await ctx.getVisibleFid();
 
-    let threads = await db.ThreadModel.find(
+    let tidArr = await db.ThreadModel.aggregate([
+      {$sort: {toc: -1}},
+      {
+        $match: {
+          fid: {$in: visibleFid},
+          disabled: false,
+          digest: true
+        }
+      },
+      {
+        $project: {tid: 1, _id: 0, oc: 1},
+      },
+      {
+        $lookup: {
+          from: 'posts',
+          localField: 'oc',
+          foreignField: 'pid',
+          as: 'firstPost'
+        }
+      },
+      {
+        $unwind: '$firstPost'
+      },
+      {
+        $unwind: '$firstPost.r'
+      },
+      {
+        $lookup: {
+          from: 'resources',
+          localField: 'firstPost.r',
+          foreignField: 'rid',
+          as: 'firstPost.resource'
+        }
+      },
+      {
+        $match: {'firstPost.resource': {$elemMatch: {ext: {$in: ['jpg', 'png', 'svg', 'jpeg']}}}}
+      },
+      {$group: {_id: '$tid'}},
+      {$limit: 200},
+      {$sample: {size: 6}}
+    ]);
+    const temp = [];
+    const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
+    for (let i = 0; i < 6; i++) {
+      const targetThread = await db.ThreadModel.findOnly({tid: tidArr[i]});
+      await targetThread.extendFirstPost().then(async p => {
+        await p.extendUser();
+        await p.extendResources();
+      });
+      for (let r of targetThread.firstPost.resources) {
+        if(imgArr.includes(r.ext)){
+          targetThread.src = r.rid;
+          break;
+        }
+      }
+      temp.push(targetThread);
+    }
+    /*let threads = await db.ThreadModel.find(
       {
         fid: {$in: visibleFid},
         hasImage: true,
@@ -62,7 +119,7 @@ otherRouter
       }
       temp.push(targetThread);
       threads.splice(index, 1);
-    }
+    }*/
     data.newestDigestThreads = temp;
 
     let t1 = Date.now();
