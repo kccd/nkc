@@ -253,39 +253,20 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = require('./SettingModel');
   const UsersPersonalModel = require('./UsersPersonalModel');
   const PostModel = require('./PostModel');
-  const UserModel = require('./UserModel');
   const InviteModel = require('./InviteModel');
+  const dbFn = require('../nkcModules/dbFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {c, t, l} = post;
   //handle at someone
-  const atUsers = []; //user info {username, uid}
-  const existedUsers = []; //real User mongoose data model
-  const r = (c.match(/{r=[0-9]{1,20}}/g) || [])
-    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
-  const matchedUsernames = c.match(/@([^@\s]*)\s/g);
-  if(matchedUsernames) {
-    await Promise.all(matchedUsernames.map(async str => {
-      const username = str.slice(1, -1); //slice the @ and [\s] in reg
-      const user = await UserModel.findOne({username});
-      if(user) {
-        const {username, uid} = user;
-        let flag = true; //which means this user does not in existedUsers[]
-        for(const u of atUsers) {
-          if(u.username === username)
-            flag = false;
-        }
-        if(flag) {
-          atUsers.push({username, uid});
-          existedUsers.push(user)
-        }
-      }
-    }))
-  }
-  await Promise.all(atUsers.map(foundUser => new InviteModel({
-    pid,
-    invitee: foundUser.uid,
-    inviter: user.uid,
-  })));
+  const {atUsers, existedUsers, r} = await dbFn.getArrayForAtResourceAndQuote(c);
+  await Promise.all(atUsers.map(foundUser => {
+    const at = new InviteModel({
+      pid,
+      invitee: foundUser.uid,
+      inviter: user.uid,
+    });
+    return at.save();
+  }));
   const _post = await new PostModel({
     pid,
     atUsers,
@@ -303,7 +284,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   await _post.save();
   await Promise.all(existedUsers.map(async u => {
     const up = await UsersPersonalModel.findOnly({uid: u.uid});
-    await up.increasePsnl('at');
+    await up.increasePsnl('at', 1);
   }));
   await this.update({lm: pid});
   return _post

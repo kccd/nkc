@@ -62,32 +62,34 @@ otherRouter
           from: 'resources',
           localField: 'firstPost.r',
           foreignField: 'rid',
-          as: 'firstPost.resource'
+          as: 'resource'
         }
       },
       {
-        $match: {'firstPost.resource': {$elemMatch: {ext: {$in: ['jpg', 'png', 'svg', 'jpeg']}}}}
+        $project: {tid: 1, resource: 1}
+      },
+      {
+        $match: {'resource': {$elemMatch: {ext: {$in: ['jpg', 'png', 'svg', 'jpeg']}}}}
       },
       {$group: {_id: '$tid'}},
       {$limit: 200},
       {$sample: {size: 6}}
     ]);
-    const temp = [];
     const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
-    for (let i = 0; i < 6; i++) {
-      const targetThread = await db.ThreadModel.findOnly({tid: tidArr[i]});
-      await targetThread.extendFirstPost().then(async p => {
+    const threads = await db.ThreadModel.find({tid: {$in: tidArr}});
+    data.newestDigestThreads = await Promise.all(threads.map(async thread => {
+      await thread.extendFirstPost().then(async p => {
         await p.extendUser();
         await p.extendResources();
       });
-      for (let r of targetThread.firstPost.resources) {
-        if(imgArr.includes(r.ext)){
-          targetThread.src = r.rid;
+      for (let r of thread.firstPost.resources) {
+        if(imgArr.includes(r.ext)) {
+          thread.src = r.rid;
           break;
         }
       }
-      temp.push(targetThread);
-    }
+      return thread;
+    }));
     /*let threads = await db.ThreadModel.find(
       {
         fid: {$in: visibleFid},
@@ -120,7 +122,6 @@ otherRouter
       temp.push(targetThread);
       threads.splice(index, 1);
     }*/
-    data.newestDigestThreads = temp;
 
     let t1 = Date.now();
 

@@ -26,7 +26,7 @@ smsRouter
     data.tab = 'replies';
     ctx.template = 'interface_messages.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    await userPersonal.decrementPsnl('replies');
+    await userPersonal.increasePsnl('replies');
     await next();
   })
   .get('/at', async (ctx, next) => {
@@ -48,7 +48,7 @@ smsRouter
     data.tab = 'at';
     ctx.template = 'interface_messages.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    await userPersonal.decrementPsnl('at');
+    await userPersonal.increasePsnl('at');
     await next();
   })
   .get('/message', async (ctx, next) => {
@@ -142,7 +142,7 @@ smsRouter
     data.tab = 'message';
     ctx.template = 'interface_messages.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    await userPersonal.decrementPsnl('message', viewedFalseNumber*-1);
+    await userPersonal.increasePsnl('message', viewedFalseNumber*-1);
     await next();
   })
   .post('/message', async (ctx, next) => {
@@ -165,7 +165,7 @@ smsRouter
     });
     try{
       await newSms.save();
-      await targetUserPersonal.decrementPsnl('message', 1);
+      await targetUserPersonal.increasePsnl('message', 1);
     }catch (err) {
       await db.SettingModel.operateSystemID('sms', -1);
       ctx.throw(500, `发送信息出错: ${err}`);
@@ -194,7 +194,7 @@ smsRouter
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     // 若用户没有查看过该系统信息&&用户的系统通知数不为0 (防止出现出现负数的情况)，则让用户的newMessage.system - 1
     if(!systemMessage.viewedUsers.includes(user.uid) && userPersonal.newMessage.system > 0) {
-      await userPersonal.decrementPsnl('system', -1);
+      await userPersonal.increasePsnl('system', -1);
     }
     data.docs = systemMessage;
     data.tab = 'system';

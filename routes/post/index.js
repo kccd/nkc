@@ -16,31 +16,46 @@ postRouter
     const {pid} = ctx.params;
     const {data, db} = ctx;
     const {user} = data;
-    if(!t && !c) ctx.throw(400, '参数不正确');
+    if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-    const targetUser = await targetPost.getUser();
-    if(data.user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
+    const targetUser = await targetPost.extendUser();
+    if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
       ctx.throw(401, '您没有权限修改别人的回复');
+    const {atUsers, existedUsers, r} = await dbFn.getArrayForAtResourceAndQuote(c);
+    const oldAtUsers = targetPost.atUsers;
+    atUsers.map(async atUser => {
+      let flag = false;
+      for (let oldAtUser of oldAtUsers) {
+        if(atUser.uid === oldAtUser.uid) {
+          flag = true;
+          break;
+        }
+      }
+      if(!flag) {
+        const at = new db.InviteModel({
+          pid,
+          invitee: atUser.uid,
+          inviter: user.uid
+        });
+        await at.save();
+        const userPersonal = await db.UsersPersonalModel.findOnly({uid: atUser.uid});
+        await userPersonal.increasePsnl('at', 1);
+      }
+    });
     const obj = {
-      uidlm: data.user.uid,
+      uidlm: user.uid,
       iplm: ctx.request.socket._peername.address,
       t: t,
       c: c,
-      tlm: Date.now()
+      tlm: Date.now(),
+      atUsers,
+      r
     };
-    await targetPost.update(obj);
-    //更新post
-
-
-
-
-
-
-
     const q = {
       tid: targetThread.tid
     };
+    await targetPost.update(obj);
     if(!await targetThread.ensurePermissionOfModerators(ctx)) q.disabled = false;
     const indexOfPostId = await db.PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
     let page = 0;
@@ -53,7 +68,6 @@ postRouter
     }
     data.redirect = `/t/${targetThread.tid + page + postId}`;
     data.targetUser = targetUser;
-    console.log(`=============================`);
     await next();
   })
   .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods());

@@ -188,25 +188,37 @@ fn.getForums = async ctx => {
   return result;
 };
 
-fn.deleteEqualValue = (arr) => {
-  let newArr = [];
-  for (let i = 0; i < arr.length; i++) {
-    if(!newArr.includes(arr[i])) newArr.push(arr[i]);
+fn.getArrayForAtResourceAndQuote = async function(c) {
+  const atUsers = []; //user info {username, uid}
+  const existedUsers = []; //real User mongoose data model
+  const r = (c.match(/{r=[0-9]{1,20}}/g) || [])
+    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
+  const matchedUsernames = c.match(/@([^@\s]*)\s/g);
+  if(matchedUsernames) {
+    await Promise.all(matchedUsernames.map(async str => {
+      const username = str.slice(1, -1); //slice the @ and [\s] in reg
+      const user = await db.UserModel.findOne({username});
+      if(user) {
+        const {username, uid} = user;
+        let flag = true; //which means this user does not in existedUsers[]
+        for(const u of atUsers) {
+          if(u.username === username)
+            flag = false;
+        }
+        if(flag) {
+          atUsers.push({username, uid});
+          existedUsers.push(user)
+        }
+      }
+    }))
   }
-  return newArr;
+  return {
+    r,
+    atUsers,
+    existedUsers
+  }
 };
 
-fn.updatePost = async (pid) => {
-  const targetPost = await db.PostModel.findOnly(pid);
-  const content = post.c;
-  let resourcesDeclared = content.match(/\{r=[0-9]{1,20}}/g);
-  if(!resourcesDeclared) resourcesDeclared = [];
-  for (let i = 0; i < resourcesDeclared; i++) {
-    resourcesDeclared[i] = resourcesDeclared[i].replace(/\{r=([0-9]{1,20})}/,'$1');
-  }
-  resourcesDeclared = fn.deleteEqualValue(resourcesDeclared);
-  await db.PostModel.replaceOne({pid}, {$set: {r: resourcesDeclared}});
-
-};
+fn.getArrayForAtResourceAndQuote('s');
 
 module.exports = fn;

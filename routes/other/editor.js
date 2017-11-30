@@ -17,7 +17,7 @@ editorRouter
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
       if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
       data.original_post = targetPost;
-      data.targetUser = await targetPost.getUser();
+      data.targetUser = await targetPost.extendUser();
       return await next();
     }
     data.original_post = content? decodeURI(content) : '';

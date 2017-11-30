@@ -77,11 +77,16 @@ usersPersonalSchema.methods.decrementPsnl = async function(type, number) {
   return await this.update({newMessage: newMessage});
 };
 
-usersPersonalSchema.methods.increasePsnl = async function(type) {
+usersPersonalSchema.methods.increasePsnl = async function(type, number) {
   const counterType = "newMessage." + type;
+  if(number === undefined) {
+    const attrObj = {};
+    attrObj[counterType] = 0;
+    return await this.update(attrObj);
+  }
   const attrObj = {};
-  attrObj[counterType] = 1;
-  await this.update({$inc: attrObj});
+  attrObj[counterType] = number;
+  return await this.update({$inc: attrObj});
 };
 
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

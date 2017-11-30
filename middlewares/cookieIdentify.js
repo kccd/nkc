@@ -14,8 +14,8 @@ module.exports = async (ctx, next) => {
       ctx.error = new Error('缓存验证失败');
       ctx.redirect('/login')
     }
-    if(user.xsf > 0) user.certs.push('qc');
     await user.update({tlv: Date.now()});
+    if(user.xsf > 0) user.certs.push('qc');
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     ctx.data.user = user;

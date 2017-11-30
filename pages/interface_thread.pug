@@ -79,7 +79,7 @@ block content
                     a(href=`javascript:addColl('${thread.tid}')`) 收藏
 
                   if data.userLevel >= 6
-                    -var isAd = data.userLevel >= 6
+                    -var isAd = data.ads.includes(thread.tid)
                     a#adBtn(href='javascript:;' onclick=`adSwitch('${thread.tid}')`) #{isAd ? '取消首页置顶' : '首页置顶'}
 
                   if data.userLevel >= 4
