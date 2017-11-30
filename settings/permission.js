@@ -483,6 +483,10 @@ const certificates ={
             [PATCH]: true,
             [POST]: true
           },
+          moveThread: {
+            [name]: '移动贴子',
+            [PATCH]: true
+          },
           [PATCH]: true
         },
       },

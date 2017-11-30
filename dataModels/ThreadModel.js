@@ -8,10 +8,6 @@ const threadSchema = new Schema({
     unique: true,
     required:true
   },
-  category: {
-    type: String,
-    default: ''
-  },
   cid: {
     type: String,
     default:''
@@ -141,6 +137,22 @@ threadSchema.virtual('forum')
     this._forum = f
   });
 
+threadSchema.virtual('category')
+  .get(function() {
+    return this._category
+  })
+  .set(function(c) {
+    this._category = c;
+  });
+
+threadSchema.virtual('user')
+  .get(function() {
+    return this._user
+  })
+  .set(function(u) {
+    this._user = u;
+  });
+
 threadSchema.methods.extendFirstPost = async function() {
   const PostModel = require('./PostModel');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})
@@ -154,6 +166,16 @@ threadSchema.methods.extendLastPost = async function() {
 threadSchema.methods.extendForum = async function() {
   const ForumModel = require('./ForumModel');
   return this.forum = await ForumModel.findOnly({fid: this.fid})
+};
+
+threadSchema.methods.extendCategory = async function() {
+  const ThreadTypeModel = require('./ThreadTypeModel');
+  return this.category = await ThreadTypeModel.findOnly({cid: this.cid});
+};
+
+threadSchema.methods.extendUser = async function() {
+  const UserModel = require('./UserModel');
+  return this.user = await UserModel.findOnly({uid: this.uid});
 };
 
 // 1、判断能否进入所在板块

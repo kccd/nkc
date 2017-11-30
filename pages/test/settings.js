@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.23');
+db = require('arangojs')('http://192.168.11.111');
 db.useDatabase('rescue');
 
 let settingsSchema = new Schema({

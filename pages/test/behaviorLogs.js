@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 const {scoreMap, scoreCoefficientMap} = require('../../settings').user;
 
 const arango = require('arangojs');
-const db = arango('http://192.168.11.23');
+const db = arango('http://192.168.11.111');
 const aql = arango.aql;
 
 db.useDatabase('rescue');

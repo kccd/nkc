@@ -152,6 +152,7 @@ smsRouter
     if(!username || !content) ctx.throw(400, '参数不完整。');
     const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     if(!targetUser) ctx.throw(400, '该用户不存在，请检查用户名是否输入正确');
+    if(targetUser.uid === user.uid) ctx.throw(400, '为什么要跟自己发送信息？');
     data.targetUser = targetUser;
     const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
     const newSms = new db.SmsModel({

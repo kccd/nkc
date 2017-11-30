@@ -112,9 +112,59 @@ operationRouter
     data.targetUser = await thread.getUser();
     await next();
   })
-  .post('/moveThread', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `移动帖子到   tid：${tid}`;
+  .patch('/moveThread', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    const {tid} = ctx.params;
+    let {fid, cid} = ctx.body;
+    if(fid === undefined) ctx.throw(400, '参数不正确');
+    if(cid === undefined) cid = 0;
+    const targetForum = await db.ForumModel.findOne({fid});
+    const targetCategory = await db.ThreadTypeModel.findOne({cid});
+    if(!targetCategory) cid = 0;
+    if(!targetForum || (targetCategory && targetForum.fid !== targetCategory.fid)) ctx.throw(400, '参数不正确');
+    const targetThread = await db.ThreadModel.findOnly({tid});
+    data.targetUser = await targetThread.extendUser();
+    const oldForum = await targetThread.extendForum();
+    const oldCid = targetThread.cid;
+    // 版主只能改变帖子的分类，不能移动帖子到其他板块
+    if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(401, '权限不足');
+    const tCount = {
+      digest: 0,
+      normal: 0
+    };
+    if(targetThread.digest) {
+      tCount.digest = 1;
+    } else {
+      tCount.normal = 1;
+    }
+    let status = 0;
+    try {
+      await targetThread.update({
+        cid,
+        fid
+      });
+      status++;
+      await db.PostModel.updateMany({tid}, {$set: {fid}});
+      status++;
+      await oldForum.update({$inc: {'tCount.digest': -1*tCount.digest, 'tCount.normal': -1*tCount.normal}});
+      status++;
+      await targetForum.update({$inc: {'tCount.digest': tCount.digest, 'tCount.normal': tCount.normal}});
+    } catch (err) {
+      if(status >= 0) {
+        await targetThread.update({cid: oldCid, fid: oldForum.fid});
+      }
+      if(status >= 1) {
+        await db.PostModel.updateMany({tid}, {$set: {fid: oldForum.fid}});
+      }
+      if(status >= 2) {
+        await oldForum.update({$inc: {'tCount.digest': tCount.digest, 'tCount.normal': tCount.normal}});
+      }
+      if(status === 3) {
+        await targetForum.update({$inc: {'tCount.digest': -1*tCount.digest, 'tCount.normal': -1*tCount.normal}});
+      }
+      ctx.throw(500, `移动帖子失败： ${err}`);
+    }
     await next();
   })
   .post('/recycleThread', async (ctx, next) => {

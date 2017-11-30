@@ -329,34 +329,35 @@ function moveThreadTo(tid){
 
 function askCategoryOfForum(fid){
   fid = fid.toString()
-  return nkcAPI('getForumCategories',{fid:fid})
+  return nkcAPI('/f/'+fid+'/category','GET',{})
   .then(function(arr){
+    arr = arr.categorys;
     if(!arr.length)return null
-    return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i._key+':'+i.name})))
+    return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i.cid+':'+i.name})))
   })
   .then(function(str){
     //console.log('selected:',str.split(':')[0]);
-    if(!str)return null
+    if(!str)return 0;
     return str.split(':')[0]
   })
 }
 
 function moveThread(tid,fid,cid){
-  return nkcAPI('moveThread',{
+  return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
     tid:tid,
     fid:fid,
     cid:cid,
   })
   .then(function(){
-    screenTopAlert(tid + ' 已送 ' + fid + (cid?' 的 '+cid:''))
+    screenTopAlert('已将帖子 '+tid+' 移动至板块 '+fid+' 分类 '+cid+'下');
   })
-  .catch(function(){
-    screenTopWarning(tid+ ' 无法送 ' + fid+ (cid?' 的 '+cid:''))
+  .catch(function(err){
+    screenTopWarning('移动失败：'+err);
   })
 }
 
 function recycleThread(tid){
-  moveThread(tid,'recycle')
+  moveThread(tid,'recycle', 0)
 }
 
 function widerArea(){
