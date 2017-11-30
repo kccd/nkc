@@ -44,22 +44,10 @@ const threadSchema = new Schema({
     default: false,
     index: 1
   },
-  esi: {
-    type: Boolean,
-    default: false
-  },
+
   fid: {
     type: String,
     required: true,
-    index: 1
-  },
-  hasFile: {
-    type: Boolean,
-    default: false
-  },
-  hasImage: {
-    type: Boolean,
-    default: false,
     index: 1
   },
   hideInMid: {

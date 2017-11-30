@@ -62,8 +62,30 @@ threadRouter
     await next();
   })
   .post('/:tid', async (ctx, next) => {
-    const {data, params, db, query} = ctx;
-
+    const {
+      data, params, db, body, ip,
+      generateUsersBehavior
+    } = ctx;
+    const {user} = data;
+    const {tid} = params;
+    const {
+      ThreadModel,
+    } = db;
+    const {post} = body;
+    const thread = await ThreadModel.findOnly({tid});
+    const _post = thread.newPost(post, user, ip);
+    await generateUsersBehavior({
+      operation: 'postToThread',
+      pid: _post.pid,
+      tid: thread.tid,
+      fid: thread.fid,
+      mid: user.uid,
+      toMid: user.uid,
+    });
+    const type = ctx.request.accepts('json', 'html');
+    if(type === 'html')
+      ctx.redirect(`/t/${tid}`, 303);
+    await next();
   })
   .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

@@ -75,6 +75,33 @@ forumRouter
     ctx.template = 'interface_forum.pug';
     await next();
   })
+  .post('/:fid', async (ctx, next) => {
+    const {
+      data, params, db, body, ip, query,
+      generateUsersBehavior
+    } = ctx;
+    const {user} = data;
+    const {fid} = params;
+    const {cat} = query;
+    const {
+      ForumModel,
+    } = db;
+    const {post} = body;
+    const forum = await ForumModel.findOnly({fid});
+    const _post = forum.newPost(post, user, ip, cat);
+    await generateUsersBehavior({
+      operation: 'postToForum',
+      pid: _post.pid,
+      tid: _post.tid,
+      fid: forum.fid,
+      mid: user.uid,
+      toMid: user.uid,
+    });
+    const type = ctx.request.accepts('json', 'html');
+    if(type === 'html')
+      ctx.redirect(`/t/${_post.tid}`, 303);
+    await next();
+  })
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
 
 module.exports = forumRouter;

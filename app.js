@@ -30,7 +30,7 @@ app.use(staticServe('./node_modules'));
 app.use(staticServe('./nkcModules'));
 app.use(favicon(__dirname + '/resources/site_specific/favicon.ico'));
 app.use(permissions);
+app.use(scoreHandler);
 app.use(mainRouter.routes());
 app.use(body);
-app.use(scoreHandler);
 module.exports = app.callback();
