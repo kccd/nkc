@@ -303,17 +303,17 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   }));
   if(quote && quote[2] !== this.oc) {
     const username = quote[1];
-    const targetPid = quote[2];
-    const targetUser = await UserModel.findOnly({username});
-    const targetPost = await PostModel.findOnly({pid: targetPid});
-    const targetUserPersonal = await UsersPersonalModel.findOnly({uid: targetUser.uid});
+    const quPid = quote[2];
+    const quUser = await UserModel.findOnly({username});
+    const quPost = await PostModel.findOnly({pid: quPid});
+    const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
     const reply = new RepliesModel({
       fromPid: pid,
-      toPid: targetPid,
-      toUid: targetUser.uid
+      toPid: quPid,
+      toUid: quUser.uid
     });
     await reply.save();
-    await targetUserPersonal.increasePsnl('replies', 1);
+    await quUserPersonal.increasePsnl('replies', 1);
   }
   await this.update({lm: pid});
   return _post

@@ -24,7 +24,7 @@ let repliesSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  },
+  }
 /*  viewed: {
     type: Boolean,
     default: false,
@@ -39,6 +39,8 @@ let t1 = Date.now();
 console.log('开始读取数据');
 return db.query(`
   for r in replies
+  let post = document(posts, r.topid)
+  filter document(threads, post.tid)
   return r
 `)
 .then(cursor => cursor.all())

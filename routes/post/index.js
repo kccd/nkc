@@ -50,6 +50,18 @@ postRouter
     let rpid = '';
     if(quote && quote[2]) {
       rpid = quote[2];
+      const username = quote[1];
+      if(rpid !== targetPost.pid) {
+        const quoteUser = await db.UserModel.find({username: username});
+        const quoteUserPersonal = await db.UsersPersonalModel.findOnly({uid: quoteUser.uid});
+        const newReplies = new db.RepliesModel({
+          fromPid: pid,
+          toPid: rpid,
+          toUid: quoteUser.uid
+        });
+        await newReplies.save();
+        await quoteUserPersonal.increasePsnl('replies', 1);
+      }
     }
     const obj = {
       uidlm: user.uid,
