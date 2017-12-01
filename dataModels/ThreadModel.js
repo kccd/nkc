@@ -269,14 +269,17 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     });
     return at.save();
   }));
-  const replyWriteOfThread = new RepliesModel({
-    fromPid: pid,
-    toPid: this.oc,
-    toUid: this.uid
-  });
-  const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-  await userPersonal.increasePsnl('replies', 1);
-  await replyWriteOfThread.save();
+  // 如果回复别人的帖子则提醒
+  if(this.uid !== user.uid) {
+    const replyWriteOfThread = new RepliesModel({
+      fromPid: pid,
+      toPid: this.oc,
+      toUid: this.uid
+    });
+    const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
+    await userPersonal.increasePsnl('replies', 1);
+    await replyWriteOfThread.save();
+  }
   let rpid = '';
   if(quote && quote[2]) {
     rpid = quote[2];
