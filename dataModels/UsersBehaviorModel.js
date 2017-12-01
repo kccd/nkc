@@ -76,3 +76,4 @@ const usersBehaviorSchema = new Schema({
 const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 
 module.exports = UsersBehaviorModel;
+

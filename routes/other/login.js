@@ -70,6 +70,9 @@ loginRouter
       cookie: ctx.cookies.get('userInfo'),
       introduction: 'put the cookie in req-header when using for api'
     };
+    await ctx.generateUsersBehavior({
+      operation: 'dailyLogin'
+    });
     await next()
   });
 

@@ -22,6 +22,12 @@ operationRouter
       ctx.throw(400, '您已经推介过该post了,没有必要重复推介');
     data.targetUser = await post.extendUser();
     data.message = post.recUsers.length + 1;
+    await ctx.generateUsersBehavior({
+      operation: 'recommendPost',
+      pid,
+      tid: targetThread.tid,
+      fid: targetThread.fid,
+    });
     await next();
   })
   .del('/recommend', async (ctx, next) => {
@@ -30,10 +36,17 @@ operationRouter
     const {user} = data;
     const personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$pull: {recPosts: pid}});
     const post = await db.PostModel.findOneAndUpdate({pid}, {$pull: {recUsers: user.uid}});
+    const targetThread = await post.extendThread();
     if(!personal.recPosts.includes(pid) && !post.recUsers.includes(user.uid))
       ctx.throw(400, '您没有推介过该post了,没有必要取消推介');
     data.message = (post.recUsers.length > 0)?post.recUsers.length - 1: 0;
     data.targetUser = await post.extendUser();
+    await ctx.generateUsersBehavior({
+      operation: 'unrecommendPost',
+      pid,
+      tid: targetThread.tid,
+      fid: targetThread.fid,
+    });
     await next();
   })
   .get('/quote', async (ctx, next) => {
@@ -111,6 +124,15 @@ operationRouter
       if(disabled) ctx.throw(400, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
     }
     data.targetUser = await targetPost.extendUser();
+    let operation = 'disablePost';
+    if(!disabled) operation = 'enablePost';
+    await ctx.generateUsersBehavior({
+      operation,
+      pid,
+      tid: targetThread.tid,
+      fid: targetThread.fid,
+      isManageOp: true
+    });
     await targetThread.updateThreadMessage();
     await next();
   });

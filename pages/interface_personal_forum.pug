@@ -28,96 +28,96 @@ block content
     .row
       .col-md-9
         .panel
-            .row
-              .col-xs-12
-                form(role='form')
-                  - var description = data.forum.description
-                  - var announcement = data.forum.announcement
-                  - var display_name = data.forum.displayName
-                  div(style='width: 100%;')
-                    .displayShit
-                      div
-                        img.pfBanner(style='width: 100%;' src=`/pfb/${data.forum.uid}`)
-                      div(style='position: relative;')
-                        div(style='width: 19%; margin-top: -14%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
-                          div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
-                            img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%;')
-                        div(style='display: inline-block;')
-                          div
-                            div(style='display: inline-block;')
-                              span.forum-name #{display_name}&nbsp;&nbsp;&nbsp;&nbsp;
-                            div(style='display: inline-block; vertical-align: top; font-size: 16px;')
-                              if description
-                                span #{description}
-                          div
-                            - var moderators = data.forum.moderatorsObj
-                            if moderators && moderators.length
-                              span 版主：
-                                each k in moderators
-                                  a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
-                              -var subscribeUsersNum = (data.userSubscribe.subscribeUsers)?data.userSubscribe.subscribeUsers.length : 0;
-                              -var subscribersNum = (data.userSubscribe.subscribers)?data.userSubscribe.subscribers.length : 0;
-                              span 关注：
-                                a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe`) #{subscribeUsersNum}
-                              span 粉丝：
-                                a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe?fans=true`) #{subscribersNum}
-                        div(style='position: absolute; right: 0; top: 0;')
-                          if isModerator
-                            div
-                              a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
-                          - var user = data.targetUser
-                          if(data.user)
-                            if(user.uid != data.user.uid)
-                              -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
-                              if(subscribeUsers.indexOf(user.uid) > -1)
-                                div
-                                  a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
-                              else
-                                div
-                                  a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
-                        hr.hrNarrowSpace
+          .row
+            .col-xs-12
+              form(role='form')
+                - var description = data.forum.description
+                - var announcement = data.forum.announcement
+                - var display_name = data.forum.displayName
+                div(style='width: 100%;')
+                  .displayShit
+                    div
+                      img.pfBanner(style='width: 100%;' src=`/pfb/${data.forum.uid}`)
+                    div(style='position: relative;')
+                      div(style='width: 19%; margin-top: -14%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
+                        div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
+                          img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%;')
+                      div(style='display: inline-block;')
                         div
-                          if announcement && announcement != ''
-                            div #{'公告: ' + announcement}
-
-                    .configShit(style='display: none; position: relative;')
-                      div(style='position: relative;')
-                        a(href='javascript:;' onclick='uploadForumBanner();' style='display: block; position: relative;')
-                          div(style='background-image: url(/default/banner_setting.jpg); background-position: center; background-size: contain; position: relative; width: 100%;')
-                            img.pfBanner(style='width: 100%; opacity: 0.2;' src=`/pfb/${data.forum.uid}`)
-                            input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`bannerOnChange(${data.forum.uid})`)
-                      div(style='z-index: 1; position: relative;')
-                        div(style='width: 19%; margin-top: -10%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
-                          div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
-                            a(href='javascript:;' onclick='uploadForumAvatar();')
-                              div(style='background-image: url(/default/icon_setting.jpg); background-position: center; background-size: contain; border-radius: 5%;')
-                                img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%; opacity: 0.2;')
-                                input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`avatarOnChange(${data.forum.uid})`)
-                        div(style='display: inline-block;')
-                          div
-                            div(style='display: inline-block;')
-                              input#forumName(style='font-size: 16px; width: 180px;' value=`${forum.displayName}` name='forumName' placeholder='请输入专栏名称')
-                            div(style='display: inline-block;')
-                              input#description(style='width: 360px;' value=`${description || ''}` name='description' placeholder='请输入专栏介绍')
-                          div
-                            -const str = moderators.length <= 0? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
+                          div(style='display: inline-block;')
+                            span.forum-name #{display_name}&nbsp;&nbsp;&nbsp;&nbsp;
+                          div(style='display: inline-block; vertical-align: top; font-size: 16px;')
+                            if description
+                              span #{description}
+                        div
+                          - var moderators = data.forum.moderatorsObj
+                          if moderators && moderators.length
                             span 版主：
-                            span #{moderators[0].username},
-                            input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str.username}`)
-                        div(style='float: right; vertical-align: top;')
-                          if isModerator
-                            div
-                              a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
-                            div
-                              a.btn.btn-default(href='javascript:;' onclick=`submitConfig("${data.forum.uid}")`) 保存
-                        div
-                          textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
+                              each k in moderators
+                                a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
+                            -var subscribeUsersNum = (data.userSubscribe.subscribeUsers)?data.userSubscribe.subscribeUsers.length : 0;
+                            -var subscribersNum = (data.userSubscribe.subscribers)?data.userSubscribe.subscribers.length : 0;
+                            span 关注：
+                              a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe`) #{subscribeUsersNum}
+                            span 粉丝：
+                              a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe?fans=true`) #{subscribersNum}
+                      div(style='position: absolute; right: 0; top: 0;')
+                        if isModerator
+                          div
+                            a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
+                        - var user = data.targetUser
+                        if(data.user)
+                          if(user.uid != data.user.uid)
+                            -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
+                            if(subscribeUsers.indexOf(user.uid) > -1)
+                              div
+                                a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
+                            else
+                              div
+                                a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
+                      hr.hrNarrowSpace
+                      div
+                        if announcement && announcement != ''
+                          div #{'公告: ' + announcement}
 
-                    if isAdmin
-                      if data.targetUser.certs.indexOf('banned') > -1
-                        a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'put', {}).then(jalert).catch(jwarning)`) 解除封禁
-                      else
-                        a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(jalert).catch(jwarning)`) &nbsp;封禁此人&nbsp;
+                  .configShit(style='display: none; position: relative;')
+                    div(style='position: relative;')
+                      a(href='javascript:;' onclick='uploadForumBanner();' style='display: block; position: relative;')
+                        div(style='background-image: url(/default/banner_setting.jpg); background-position: center; background-size: contain; position: relative; width: 100%;')
+                          img.pfBanner(style='width: 100%; opacity: 0.2;' src=`/pfb/${data.forum.uid}`)
+                          input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`bannerOnChange(${data.forum.uid})`)
+                    div(style='z-index: 1; position: relative;')
+                      div(style='width: 19%; margin-top: -10%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
+                        div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
+                          a(href='javascript:;' onclick='uploadForumAvatar();')
+                            div(style='background-image: url(/default/icon_setting.jpg); background-position: center; background-size: contain; border-radius: 5%;')
+                              img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%; opacity: 0.2;')
+                              input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`avatarOnChange(${data.forum.uid})`)
+                      div(style='display: inline-block;')
+                        div
+                          div(style='display: inline-block;')
+                            input#forumName(style='font-size: 16px; width: 180px;' value=`${forum.displayName}` name='forumName' placeholder='请输入专栏名称')
+                          div(style='display: inline-block;')
+                            input#description(style='width: 360px;' value=`${description || ''}` name='description' placeholder='请输入专栏介绍')
+                        div
+                          -const str = moderators.length <= 0? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
+                          span 版主：
+                          span #{moderators[0].username},
+                          input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str.username}`)
+                      div(style='float: right; vertical-align: top;')
+                        if isModerator
+                          div
+                            a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
+                          div
+                            a.btn.btn-default(href='javascript:;' onclick=`submitConfig("${data.forum.uid}")`) 保存
+                      div
+                        textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
+
+                  if isAdmin
+                    if data.targetUser.certs.indexOf('banned') > -1
+                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'put', {}).then(jalert).catch(jwarning)`) 解除封禁
+                    else
+                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(jalert).catch(jwarning)`) &nbsp;封禁此人&nbsp;
 
         include interface_easy_post
 

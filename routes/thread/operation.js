@@ -91,6 +91,14 @@ operationRouter
     data.targetUser = await thread.getUser;
     const targetForum = await db.ForumModel.findOnly({fid: thread.fid});
     await targetForum.setCountOfDigestThread(number);
+    let operation = 'setDigest';
+    if(!digest) operation = 'cancelDigest';
+    await ctx.generateUsersBehavior({
+      operation,
+      tid,
+      fid: thread.fid,
+      isManageOp: true
+    });
     await next();
   })
   .patch('/topped', async (ctx, next) => {
@@ -110,6 +118,14 @@ operationRouter
       if(!topped) ctx.throw(400, '该帖子在您操作前已经被取消置顶了，请刷新');
     }
     data.targetUser = await thread.getUser();
+    let operation = 'setTopped';
+    if(!digest) operation = 'cancelTopped';
+    await ctx.generateUsersBehavior({
+      operation,
+      tid,
+      fid: thread.fid,
+      isManageOp: true
+    });
     await next();
   })
   .patch('/moveThread', async (ctx, next) => {
@@ -164,6 +180,14 @@ operationRouter
         await targetForum.update({$inc: {'tCount.digest': -1*tCount.digest, 'tCount.normal': -1*tCount.normal}});
       }
       ctx.throw(500, `移动帖子失败： ${err}`);
+    }
+    if(fid === 'recycle') {
+      await ctx.generateUsersBehavior({
+        operation: moveToRecycle,
+        tid,
+        fid: targetThread.fid,
+        isManageOp: true
+      });
     }
     await next();
   })
