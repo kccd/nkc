@@ -95,13 +95,13 @@ block content
                   span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
                 span #{docs[i].fromPost.toc.toLocaleString()}
                 .media-left.media-top
-                  a(href=`/u/${docs[i].fromPost.uid}`)
+                  a(href=`/m/${docs[i].fromPost.uid}`)
                     img.media-object.img-rounded(src=`/avatar/${docs[i].fromPost.uid}`,style='height:3em;width:3em;')
                 .media-body
                   h4.media-heading
-                    a(href=`/u/${docs[i].fromPost.uid}`) #{docs[i].fromPost.username}
+                    a(href=`/m/${docs[i].fromPost.user.uid}`) #{docs[i].fromPost.user.username}
                     span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
-                    a(href=`/t/${docs[i].fromPost.tid}#${docs[i].fromPost.pid}`) #{docs[i].toPost.t||docs[i].toPost.tid}
+                    a(href=`/t/${docs[i].fromPost.tid}#${docs[i].fromPost.pid}`) #{docs[i].toPost.thread.firstPost.t||docs[i].toPost.tid}
                     span(style="font-size:0.8em;") &nbsp;下回复了你：
                     p(style="font-size:0.8em; word-break:break-all;") #{docs[i].fromPost.c}
             hr(style='margin:0.5em 0;')
@@ -117,11 +117,11 @@ block content
                   span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
                 span #{docs[i].post.toc.toLocaleString()}
                 .media-left.media-top
-                  a(href=`/u/${docs[i].post.uid}`)
+                  a(href=`/m/${docs[i].post.uid}`)
                     img.media-object.img-rounded(src=`/avatar/${docs[i].post.uid}`,style='height:3em;width:3em;')
                 .media-body
                   h4.media-heading
-                    a(href=`/u/${docs[i].post.uid}`) #{docs[i].user.username}
+                    a(href=`/m/${docs[i].post.uid}`) #{docs[i].user.username}
                     span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
                     a(href=`/t/${docs[i].post.tid}#${docs[i].post.pid}`) #{docs[i].post.thread.firstPost.t||docs[i].post.thread.firstPost.tid}
                     span(style="font-size:0.8em;") &nbsp;下@了你：
@@ -157,11 +157,11 @@ block content
                   .media-left.media-top(style='position: relative')
                     -if(newMesNum > 0)
                       span.messageNumber.messageNumberOfImg(style='line-height: 20px') #{newMesNum}
-                    a(href=`/u/${docs[i].uid}`)
+                    a(href=`/m/${docs[i].uid}`)
                       img.media-object.img-rounded(src=`/avatar/${docs[i].uid}`,style='height:3em;width:3em;')
                   .media-body
                     h4.media-heading
-                      a(href=`/sms/message/${docs[i].uid}`) #{docs[i].username}
+                      a(href=`/m/${docs[i].uid}`) #{docs[i].username}
                       span :
                       a(style='font-size:0.85em;float:right;',href=`/sms/message/${docs[i].uid}`) 查看聊天信息
                       p(style="font-size:0.8em; word-break:break-all;") #{docs[i].group[0].c}
@@ -184,11 +184,11 @@ block content
                     span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
                   span #{docs[i].toc.toLocaleString()}
                   .media-left.media-top
-                    a(href=`/u/${docs[i].s.uid}`)
-                      img.media-object.img-rounded(src='/u/#{docs[i].s.uid}',style='height:3em;width:3em;')
+                    a(href=`/m/${docs[i].s.uid}`)
+                      img.media-object.img-rounded(src=`/m/${docs[i].s.uid}`, style='height:3em;width:3em;')
                   .media-body
                     h4.media-heading
-                      a(href=`/u/${docs[i].s.uid}`) #{docs[i].s.username}
+                      a(href=`/m/${docs[i].s.uid}`) #{docs[i].s.username}
                       span(style="font-size:1em;") :
                     p(style="font-size:1em;word-break:break-all;") #{docs[i].c}
               hr(style='margin:0.5em 0;')

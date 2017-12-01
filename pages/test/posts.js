@@ -55,8 +55,8 @@ let postsSchema = new Schema({
     default: []
   },
   rpid: {
-    type: [String],
-    default: []
+    type: String,
+    default: ''
   },
   t: {
     type: String,
@@ -135,6 +135,9 @@ db.query(`
     res[i]._id = undefined;
     res[i].pid = res[i]._key;
     res[i].c = res[i].c.toString();
+    if(res[i].rpid) {
+      res[i].rpid = res[i].rpid[0];
+    }
     if(!res[i].credits || res[i].credits === null || res[i].credits === 'null'){
       res[i].credits = [];
     }

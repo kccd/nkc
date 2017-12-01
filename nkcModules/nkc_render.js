@@ -155,7 +155,7 @@ function nkc_render(options){
           var arr = params.slice(1).split(',');
           var username = '';
           if(arr[0] !== '-1') {
-            username = params?(arr? '回复 '+arr[1]+' 在 '+arr[0]+' 阶的发言\n':''):'';
+            username = params?(arr? '回复 '+arr[1]+' 在 '+arr[0]+' 楼的发言\n':''):'';
           } else {
             username = params?(arr? '回复 '+arr[1]+' 的发言\n':''):'';
           }

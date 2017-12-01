@@ -42,14 +42,12 @@ repliesSchema.virtual('toPost')
 repliesSchema.methods.extendFromPost = async function() {
   const PostModel = require('./PostModel');
   const fromPost = await PostModel.findOnly({pid: this.fromPid});
-  await fromPost.extendUser();
   return this.fromPost = fromPost;
 };
 
 repliesSchema.methods.extendToPost = async function() {
   const PostModel = require('./PostModel');
   const toPost = await PostModel.findOnly({pid: this.toPid});
-  await toPost.extendUser();
   return this.toPost = toPost;
 };
 

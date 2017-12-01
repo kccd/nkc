@@ -94,8 +94,15 @@ const userSchema = new Schema({
 });
 
 userSchema.pre('save', function(next) {
-  if(!this.usernameLowerCase)
+  if(!this.usernameLowerCase){
     this.usernameLowerCase = this.username.toLowerCase();
+  }
+  const certs = this.certs;
+  const c = [];
+  for (let cert in certs) {
+    if(cert !== 'qc') c.push(cert);
+  }
+  this.certs = c;
   next()
 });
 

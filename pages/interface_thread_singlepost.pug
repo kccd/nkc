@@ -67,7 +67,7 @@
                     a.lighttext(href=`${queryforip}`) #{ipoc}
               if data.paging
                 -var floornumber = data.paging.start+index
-                a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}阶
+                a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}楼
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}

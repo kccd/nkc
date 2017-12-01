@@ -22,7 +22,11 @@ postRouter
     const targetUser = await targetPost.extendUser();
     if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
       ctx.throw(401, '您没有权限修改别人的回复');
-    const {atUsers, existedUsers, r} = await dbFn.getArrayForAtResourceAndQuote(c);
+    const objOfPost = Object.assign(targetPost, {}).toObject();
+    objOfPost._id = undefined;
+    const histories = await db.HistoriesModel(objOfPost);
+    await histories.save();
+    const {atUsers, quote, r} = await dbFn.getArrayForAtResourceAndQuote(c);
     const oldAtUsers = targetPost.atUsers;
     atUsers.map(async atUser => {
       let flag = false;
@@ -43,6 +47,10 @@ postRouter
         await userPersonal.increasePsnl('at', 1);
       }
     });
+    let rpid = '';
+    if(quote && quote[2]) {
+      rpid = quote[2];
+    }
     const obj = {
       uidlm: user.uid,
       iplm: ctx.request.socket._peername.address,
@@ -50,7 +58,8 @@ postRouter
       c: c,
       tlm: Date.now(),
       atUsers,
-      r
+      r,
+      rpid
     };
     const q = {
       tid: targetThread.tid

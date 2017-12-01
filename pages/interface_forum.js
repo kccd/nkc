@@ -21,7 +21,7 @@ function applyAll(f){
 }
 
 function moveThread(tid,fid,cid){
-  return nkcAPI('t/'+tid+'/moveThread','PATCH',{
+  return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
     tid:tid,
     fid:fid,
     cid:cid,

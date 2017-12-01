@@ -29,9 +29,8 @@
             text #{index+1}. #{a} 
             
           
-  if q.uid == data.user.qid || data.user.certs.includes('qc')
+  if q.uid == data.user.qid || data.userLevel >= 6
     button(onclick=`remove_question('/q/${q.category}/${q.qid}')`) 删掉
-
-  button(onclick=`load_question('/q/${q.category}/${q.qid}')`) 修改
+    button(onclick=`load_question('/q/${q.category}/${q.qid}')`) 修改
 
   hr.hrNarrowSpace

@@ -253,12 +253,14 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = require('./SettingModel');
   const UsersPersonalModel = require('./UsersPersonalModel');
   const PostModel = require('./PostModel');
+  const UserModel = require('./UserModel');
   const InviteModel = require('./InviteModel');
+  const RepliesModel = require('./RepliesModel');
   const dbFn = require('../nkcModules/dbFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {c, t, l} = post;
   //handle at someone
-  const {atUsers, existedUsers, r} = await dbFn.getArrayForAtResourceAndQuote(c);
+  const {atUsers, existedUsers, r, quote} = await dbFn.getArrayForAtResourceAndQuote(c);
   await Promise.all(atUsers.map(foundUser => {
     const at = new InviteModel({
       pid,
@@ -267,6 +269,18 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     });
     return at.save();
   }));
+  const replyWriteOfThread = new RepliesModel({
+    fromPid: pid,
+    toPid: this.oc,
+    toUid: this.uid
+  });
+  const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
+  await userPersonal.increasePsnl('replies', 1);
+  await replyWriteOfThread.save();
+  let rpid = '';
+  if(quote && quote[2]) {
+    rpid = quote[2];
+  }
   const _post = await new PostModel({
     pid,
     atUsers,
@@ -279,13 +293,28 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     fid: this.fid,
     tid: this.tid,
     uid: user.uid,
-    uidlm: user.uid
+    uidlm: user.uid,
+    rpid
   });
   await _post.save();
   await Promise.all(existedUsers.map(async u => {
     const up = await UsersPersonalModel.findOnly({uid: u.uid});
     await up.increasePsnl('at', 1);
   }));
+  if(quote && quote[2] !== this.oc) {
+    const username = quote[1];
+    const targetPid = quote[2];
+    const targetUser = await UserModel.findOnly({username});
+    const targetPost = await PostModel.findOnly({pid: targetPid});
+    const targetUserPersonal = await UsersPersonalModel.findOnly({uid: targetUser.uid});
+    const reply = new RepliesModel({
+      fromPid: pid,
+      toPid: targetPid,
+      toUid: targetUser.uid
+    });
+    await reply.save();
+    await targetUserPersonal.increasePsnl('replies', 1);
+  }
   await this.update({lm: pid});
   return _post
 };

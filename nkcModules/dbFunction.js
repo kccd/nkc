@@ -191,9 +191,10 @@ fn.getForums = async ctx => {
 fn.getArrayForAtResourceAndQuote = async function(c) {
   const atUsers = []; //user info {username, uid}
   const existedUsers = []; //real User mongoose data model
-  const r = (c.match(/{r=[0-9]{1,20}}/g) || [])
+  const resources = (c.match(/{r=[0-9]{1,20}}/g) || [])
     .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
   const matchedUsernames = c.match(/@([^@\s]*)\s/g);
+  const quote = c.match(/\[quote=(.*?),(.*?)]/);
   if(matchedUsernames) {
     await Promise.all(matchedUsernames.map(async str => {
       const username = str.slice(1, -1); //slice the @ and [\s] in reg
@@ -212,10 +213,15 @@ fn.getArrayForAtResourceAndQuote = async function(c) {
       }
     }))
   }
+  const r = [];
+  for (let i of resources) {
+    if(!r.includes(i)) r.push(i);
+  }
   return {
     r,
     atUsers,
-    existedUsers
+    existedUsers,
+    quote
   }
 };
 

@@ -17,8 +17,11 @@ smsRouter
     const start = paging.start;
     replies = replies.slice(start, start + perpage);
     replies = await Promise.all(replies.map(async replie => {
-      await replie.extendFromPost();
-      await replie.extendToPost();
+      await replie.extendFromPost().then(p => p.extendUser());
+      await replie.extendToPost().then(async p => {
+        await p.extendUser();
+        await p.extendThread().then(t => t.extendFirstPost());
+      });
       return replie;
     }));
     data.docs = replies;

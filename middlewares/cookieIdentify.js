@@ -15,7 +15,7 @@ module.exports = async (ctx, next) => {
       ctx.redirect('/login')
     }
     await user.update({tlv: Date.now()});
-    if(user.xsf > 0) user.certs.push('qc');
+    if(user.xsf > 0 && !user.certs.includes('qc')) user.certs.push('qc');
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     ctx.data.user = user;
