@@ -35,6 +35,7 @@ block content
 
 
           .form-group
+            -console.log(data.original_post)
             textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;') #{data.original_post?data.original_post.c:''}
           
           .form-group
@@ -46,7 +47,7 @@ block content
                     .div3(style="display:table-cell;")
                       select#cat.form-control 
                         each t in data.threadtypes
-                          option(value=`${t._key}`) #{t.name}
+                          option(value=`${t.cid}`) #{t.name}
                 else
                   input(type='hidden')#cat
             else

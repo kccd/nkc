@@ -300,6 +300,10 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     rpid
   });
   await _post.save();
+  await this.update({
+    lm: pid,
+    tlm: Date.now()
+  });
   await Promise.all(existedUsers.map(async u => {
     const up = await UsersPersonalModel.findOnly({uid: u.uid});
     await up.increasePsnl('at', 1);

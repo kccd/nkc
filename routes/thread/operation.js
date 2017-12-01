@@ -167,29 +167,37 @@ operationRouter
     }
     await next();
   })
-  .post('/recycleThread', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `移动帖子到回收站   tid：${tid}`;
-    await next();
-  })
-  .post('/moveToPersonalForum', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `移动帖子到个人版   tid：${tid}`;
-    await next();
-  })
-  .post('/switchVInPersonalForum', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `在专栏显示隐藏   tid：${tid}`;
-    await next();
-  })
-  .post('/switchDInPersonalForum', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `在专栏加精   tid：${tid}`;
-    await next();
-  })
-  .post('/switchTInPersonalForum', async (ctx, next) => {
-    const tid = ctx.params.tid;
-    ctx.data = `在专栏顶置   tid：${tid}`;
+  .patch('/switchInPersonalForum', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    const {tid} = ctx.params;
+    const {hideInMid, toppedInMid, digestInMid} = ctx.body;
+    const targetThread = await db.ThreadModel.findOnly({tid});
+    const {mid, toMid} = targetThread;
+    let targetPersonalForum = {};
+    let targetUser = {};
+    if(mid) {
+      targetPersonalForum = await db.PersonalForumModel.findOnly({uid: mid});
+      targetUser = await db.UserModel.findOnly({uid: mid});
+    } else if(toMid) {
+      targetPersonalForum = await db.PersonalForumModel.findOnly({uid: toMid});
+      targetUser = await db.UserModel.findOnly({uid: toMid});
+    } else {
+      ctx.throw(400, '该贴子不在任何人的专栏');
+    }
+    if(targetUser.uid !== user.uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
+    const obj = {};
+    if(hideInMid !== undefined) obj.hideInMid = !!hideInMid;
+    if(digestInMid !== undefined) obj.digestInMid = !!digestInMid;
+    if(toppedInMid !== undefined) {
+      if(toppedInMid){
+        obj.$addToSet = {toppedUsers: user.uid}
+      } else {
+        obj.$pull = {toppedUsers: user.uid}
+      }
+    }
+    await targetThread.update(obj);
+    data.targetuser = targetUser;
     await next();
   });
 

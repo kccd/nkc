@@ -63,7 +63,7 @@ operationRouter
   .patch('/category', async (ctx, next) => {
     const {data, db} = ctx;
     const {cid, name} = ctx.body;
-    if(!name) ctx.throw(400, '名字不能位空');
+    if(!name) ctx.throw(400, '名字不能为空');
     const category = await db.ThreadTypeModel.findOnly({cid});
     await category.update({name});
     await next();

@@ -20,6 +20,7 @@ block title
 
 
 block content
+  -var mainContainer1400 = true
   -var isModerator = data.user? (forum.moderators.indexOf(data.user.uid) > -1) : false
   -const isAdmin = data.userLevel >= 4
   -const isNormalUser = data.userLevel >= 1
@@ -95,14 +96,14 @@ block content
                         div(style='display: inline-block;')
                           div
                             div(style='display: inline-block;')
-                              input#forumName(style='font-size: 16px; width: 180px;' value=`${forum.display_name}` name='forumName' placeholder='请输入专栏名称')
+                              input#forumName(style='font-size: 16px; width: 180px;' value=`${forum.displayName}` name='forumName' placeholder='请输入专栏名称')
                             div(style='display: inline-block;')
-                              input#description(style='width: 360px;' value=`${description}` name='description' placeholder='请输入专栏介绍')
+                              input#description(style='width: 360px;' value=`${description || ''}` name='description' placeholder='请输入专栏介绍')
                           div
                             -const str = moderators.length <= 0? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
                             span 版主：
                             span #{moderators[0].username},
-                            input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str}`)
+                            input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str.username}`)
                         div(style='float: right; vertical-align: top;')
                           if isModerator
                             div

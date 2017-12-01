@@ -272,20 +272,9 @@ const certificates ={
             [name]: '收藏',
             [POST]: true
           },
-          topInPF: {
-            [name]: '专栏置顶',
-            [POST]: true,
-            [DELETE]: true
-          },
-          digestInPF: {
-            [name]: '专栏加精',
-            [POST]: true,
-            [DELETE]: true
-          },
-          invisibleInPF: {
-            [name]: '专栏隐藏',
-            [POST]: true,
-            [DELETE]: true
+          switchInPersonalForum: {
+            [name]: '在专栏加精、顶置、隐藏显示',
+            [PATCH]: true
           }
         }
       },

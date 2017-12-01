@@ -327,6 +327,7 @@ var onPost = function(that) {
 var onGoEditor = function(that) {
   return function() {
     var url;
+    var title = that.title.value;
     var content = that.content.value;
     var type = that.type;
     var key;
@@ -336,7 +337,7 @@ var onGoEditor = function(that) {
         screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
         return
       }
-      url = '/editor?content=' + content + '&target=' + type + '/' + key + '&forumID=' + that.forumID;
+      url = '/editor?title='+title+'&content=' + content + '&target=' + type + '/' + key + '&forumID=' + that.forumID;
       window.location.href = url;
     }
     else {
@@ -345,7 +346,7 @@ var onGoEditor = function(that) {
         screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
         return;
       }
-      url = '/editor?content=' + content + '&target=' + type + '/' + key;
+      url = '/editor?title='+title+'&content=' + content + '&target=' + type + '/' + key;
       window.location.href = url;
     }
   }

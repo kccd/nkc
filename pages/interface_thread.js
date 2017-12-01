@@ -371,7 +371,9 @@ function switchVInPersonalForum(tid, name, type) {
     hidden = '恢复专栏显示';
     visible = '在专栏隐藏';
     target = geid('visibility');
-    nkcAPI('switchVInPersonalForum',{tid: tid})
+    var hideInMid = false;
+    if(target.innerHTML === visible) hideInMid = true;
+    nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH',{hideInMid})
       .then(function() {
         if(target.innerHTML === hidden) {
           target.innerHTML = visible;
@@ -446,7 +448,9 @@ function switchDInPersonalForum(tid, name, type) {
     digest = '取消专栏加精';
     normal = '在专栏加精';
     target = geid('digest');
-    nkcAPI('switchDInPersonalForum', {tid: tid})
+    var digestInMid = false;
+    if(target.innerHTML === normal) digestInMid = true;
+    nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH',{digestInMid})
       .then(function() {
         if(target.innerHTML === normal) {
           screenTopWarning('已将该帖在个人专栏加精');
@@ -509,7 +513,9 @@ function switchTInPersonalForum(tid, name, type) {
     topped = '取消专栏置顶';
     normal = '在专栏置顶';
     target = geid('topped');
-    nkcAPI('switchTInPersonalForum', {tid: tid, type: type})
+    var toppedInMid = false;
+    if(target.innerHTML === normal) toppedInMid = true;
+    nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH', {toppedInMid})
       .then(function() {
         if(target.innerHTML === normal) {
           screenTopWarning('已将该帖在个人专栏置顶');

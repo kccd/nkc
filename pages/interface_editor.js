@@ -82,46 +82,59 @@ var nkc_editor = function(){
 
   editor.assemblePostObject = function(){
     var post = {
-      title:gv('title').trim(),
-      content:gv('content'),
+      t:gv('title').trim(),
+      c:gv('content'),
       l:gv('lang').toLowerCase().trim(),
       cat:gv('cat').trim()
     }
 
 
-    if(post.title=='')post.title=undefined
+    if(post.t=='')post.t=undefined
 
     return post
   }
 
   editor.submit = function(){
     var post = editor.assemblePostObject()
-
+    var forumID = geid('forumID').innerHTML;
     var target = gv('target').trim();
 
-    if(post.content==''){screenTopWarning('请填写内容。');return;}
+    if(post.c==''){screenTopWarning('请填写内容。');return;}
     if(target==''){screenTopWarning('请填写发表至的目标。');return;}
 
     if(geid('ParseURL').checked){
       if(post.l=='markdown'){
-        post.content = common.URLifyMarkdown(post.content)
+        post.c = common.URLifyMarkdown(post.c)
       }
       if(post.l=='bbcode'||post.l=='pwbb'){
-        post.content = common.URLifyBBcode(post.content)
+        post.c = common.URLifyBBcode(post.c)
       }
     }
 
     //alert(JSON.stringify(post) )
     geid('post').disabled = true
     targetArr = target.split('/');
-    var method = '', url = '';
-    switch (targetArr[0]) {
-      case 'post': {
-        method= 'PATCH';
-        url= '/p/'+targetArr[1];
-      }
+    var method, url, data;
+    console.log('targetArr: '+targetArr);
+    if(targetArr[0] === 'post') {
+      method = 'PATCH';
+      url = '/p/'+targetArr[1];
+      data = {post};
+    } else if(targetArr[0] === 'f') {
+      method = 'POST';
+      url = '/f/'+targetArr[1];
+      data = {post};
+    } else if(targetArr[0] === 'm') {
+      method = 'POST';
+      url = '/f/'+forumID+'?mid='+targetArr[1];
+      data = {post};
+    } else {
+      jwarning('未知的请求类型： '+target);
     }
-    return nkcAPI(url, method,{post: {t: post.title, c: post.content}})
+    console.log(target);
+    console.log('forum: '+forumID);
+    console.log(post);
+    return nkcAPI(url, method,data)
     .then(function(result){
       var redirectTarget = result.redirect;
       redirect(redirectTarget?redirectTarget:'/'+target)
@@ -178,9 +191,9 @@ var nkc_editor = function(){
   editor.update = function(){
 
     var post = editor.assemblePostObject()
-    post.r = extract_resource_from_tag(post.content)
+    post.r = extract_resource_from_tag(post.c)
 
-    var title = post.title||""
+    var title = post.t||""
     if(!title.length){
       title='标题为空'
       geid('parsedtitle').style.color='#ccc'
@@ -191,7 +204,7 @@ var nkc_editor = function(){
 
     hset('parsedtitle',title); //XSS prone.
 
-    var content = post.content
+    var content = post.c
     var parsedcontent = '';
 
     parsedcontent = render.experimental_render(post)

@@ -102,14 +102,13 @@ block content
                   - var visibilityOF // of=others forum
                   - var digestOF
                   - var topOF
+                  if(data.userLevel >= 1 && thread.uid === data.user.uid)
+
                   if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
                     .form-inline(style='margin-bottom: 0.5rem')
                       .form-group.form-group-sm
                         include forumlist_dropdown.pug
                         button.btn.btn-default.btn-sm(onclick=`javascript:moveThreadTo('${thread.tid}')`) #{moveThread? '移动' : '转发'}
-                      if(thread.fid && moveThread)
-                        .form-group
-                          a.btn.btn-default.btn-sm#moveToPersonal(href='javascript:;' onclick=`moveToPersonalForum("${thread.tid}")`) 移至个人版
                       if moveThread
                         .form-group
                             button#recyclebtn.btn.btn-sm.btn-danger(onclick=`recycleThread('${data.thread.tid}')`) 送回收站
