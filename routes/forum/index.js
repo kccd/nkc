@@ -88,7 +88,7 @@ forumRouter
     } = db;
     const {post} = body;
     const forum = await ForumModel.findOnly({fid});
-    const _post = forum.newPost(post, user, ip, cat, mid);
+    const _post = await forum.newPost(post, user, ip, cat, mid);
     await generateUsersBehavior({
       operation: 'postToForum',
       pid: _post.pid,

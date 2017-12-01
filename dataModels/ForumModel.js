@@ -172,11 +172,11 @@ forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
     uid: user.uid,
   };
   if(toMid && toMid !== user.uid) {
-    const targetPF = PersonalForumModel.findOnly({toMid});
+    const targetPF = await PersonalForumModel.findOnly({uid: toMid});
     if(targetPF.moderators.indexOf(user.uid) > -1)
       t.toMid = toMid;
     else
-      throw new Error(`only personal forum's moderator is able to post`)
+      throw (new Error("only personal forum's moderator is able to post"))
   }
   const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip, cid);

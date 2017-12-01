@@ -35,11 +35,9 @@ module.exports = async (ctx, next) => {
     ctx.error = err.stack;
     ctx.status = err.statusCode || err.status || 500;
     if(process.ENV === 'production')
-      ctx.body = {
-        message: err.message
-      };
+      ctx.body = err.message;
     else
-      ctx.body = String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')
+      ctx.body = err.message//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')
   }
   finally {
     ctx.status = ctx.response.status;

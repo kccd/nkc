@@ -317,7 +317,8 @@ var onPost = function(that) {
         redirect(redirectTarget ? redirectTarget : '/' + target);
       })
       .catch(function (err) {
-        jwarning(err.detail);
+        jwarning(err);
+        console.error(err);
         that.post.className = 'btn btn-primary';
       })
   }
