@@ -18,7 +18,7 @@ let EmailRegisterSchema = new Schema({
   },
   username: {
     type: String,
-    unique: true,
+    index: 1,
     required: true
   },
   password:{
