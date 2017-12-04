@@ -4,6 +4,7 @@ const {mkdirSync} = require('fs');
 
 const uploadDir = path.resolve('tmp');
 const uploadPath = path.resolve('resources/upload');
+const pfBannerPath = path.resolve('resources/pf_banners');
 
 function generateFolderName() {
   const name = moment().format('/YYYY/MM/');
@@ -36,5 +37,6 @@ module.exports = {
     banner: '1050x260'
   },
   uploadPath,
+  pfBannerPath,
   avatarSize: 192,
 };

@@ -23,7 +23,7 @@ if thread
 
   -var threadtype = data.threadtypes?data.threadtypes.filter(k=>k.cid==thread.cid)[0]:null;
 
-  .ForumThreadItem(style=`background-color: ${hide? "#cfd2da" : "white"}`)
+  .ForumThreadItem(style=`background-color: ${hide? "#eee" : "white"}`)
     .parent.clearfix(id='')
       .avatar-left
         - var user = ocuser

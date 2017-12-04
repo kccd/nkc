@@ -10,7 +10,6 @@ router
   })
   .get('/:file', async (ctx, next) => {
     const {file} = ctx.params;
-    console.log(JSON.stringify(file));
     ctx.filePath = path.resolve(__dirname, `../../resources/default_things/${file}`);
     await next()
   });

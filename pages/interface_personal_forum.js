@@ -41,7 +41,7 @@ function applyAll(f){
 }
 
 function moveThread(tid,fid,cid){
-  return nkcAPI('moveThread',{
+  return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
     tid:tid,
     fid:fid,
     cid:cid,
@@ -59,7 +59,7 @@ function recyclebtn(){
 }
 
 function addColl(tid){
-  return nkcAPI('addThreadToCollection',{tid:tid})
+  return nkcAPI('/t/'+tid+'/addColl', 'POST',{})
     .then(function(res){
       screenTopAlert('已收藏 '+tid)
     })
@@ -82,10 +82,11 @@ function moveThreadTo(){
 
 function askCategoryOfForum(fid){
   fid = fid.toString()
-  return nkcAPI('getForumCategories',{fid:fid})
+  return nkcAPI('/f/'+fid+'/category', 'GET',{})
     .then(function(arr){
+      arr = arr.categorys;
       if(!arr.length)return null
-      return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i._key+':'+i.name})))
+      return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i.cid+':'+i.name})))
     })
     .then(function(str){
       //console.log('selected:',str.split(':')[0]);
@@ -228,14 +229,13 @@ var submitConfig = function(key) {
     forumName: gv('forumName').trim(),
     description: gv('description').trim(),
     announcement: gv('announcement').trim(),
-    moderators: arr,
-    key: key
+    moderators: arr
   };
   if(!config.description || !config.forumName) {
     screenTopWarning('请完善信息.');
     return;
   }
-  return nkcAPI('configPersonalForum', config)
+  return nkcAPI('/m/' + key + '/config', 'PATCH', config)
     .then(function() {
       location.reload();
     })
@@ -280,7 +280,7 @@ function post_upload(target,data,callback)
       }
     }
   }
-  xhr.open("POST","/api/"+target.toString().toLowerCase(),true);
+  xhr.open("POST","/r" + target,true);
   //xhr.setRequestHeader("Content-type","application/json");
   xhr.send(data);
 }
@@ -303,7 +303,7 @@ function avatarOnChange(id) {
   if(!ele.files[0])return screenTopWarning('pick one, okay?');
   var formData = new FormData();
   formData.append('file', ele.files[0]);
-  post_upload('/personalForumAvatar?id=' + id, formData,upload_callback);
+  post_upload('/personalForumAvatar?uid=' + id, formData,upload_callback);
 }
 
 function bannerOnChange(id) {
@@ -311,7 +311,7 @@ function bannerOnChange(id) {
   if(!ele.files[0])return screenTopWarning('pick one, okay?');
   var formData = new FormData();
   formData.append('file', ele.files[0]);
-  post_upload('/personalForumBanner?id=' + id, formData,upload_callback);
+  post_upload('/personalForumBanner?uid=' + id, formData,upload_callback);
 }
 
 function uploadForumBanner() {

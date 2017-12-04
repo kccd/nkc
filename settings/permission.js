@@ -225,6 +225,14 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+      m: {
+        [parameter]: {
+          config: {
+            [name]: '个人板块信息',
+            [PATCH]: true
+          }
+        }
+      },
       f: {
         [parameter]: {
           [POST]: true,
@@ -280,7 +288,13 @@ const certificates ={
       },
       r: {
         [POST]: true,
-        [GET]: true
+        [GET]: true,
+        personalForumAvatar: {
+          [POST]: true
+        },
+        personalForumBanner: {
+          [POST]: true
+        }
       },
       editor: {
         [name]: '编辑器',

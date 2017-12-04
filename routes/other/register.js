@@ -3,6 +3,7 @@ const nkcModules = require('../../nkcModules');
 let apiFn = nkcModules.apiFunction;
 let dbFn = nkcModules.dbFunction;
 let settings = require('../../settings');
+const checkString = require('../../tools/checkString');
 
 const registerRouter = new Router();
 registerRouter
@@ -38,9 +39,9 @@ registerRouter
       ctx.throw('404', err);
     }
     userObj.isA = regCodeFoDB.isA;
-    if(apiFn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
-    if(userObj.password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
-    if(!apiFn.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
+    if(checkString.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
+    if(checkString.contentLength(userObj.password) <= 8) ctx.throw(400, '密码长度至少要大于8位');
+    if(!checkString.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw(400, '用户名已存在，请更换用户名再试！');
     let mobileCodesNumber = await dbFn.checkMobile(userObj.mobile, params.mobile);
@@ -81,9 +82,9 @@ registerRouter
       ctx.throw('404', err);
     }
     userObj.isA = regCodeFoDB.isA;
-    if(apiFn.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
-    if(userObj.password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
-    if(!apiFn.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
+    if(checkString.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
+    if(checkString.contentLength(userObj.password) <= 8) ctx.throw(400, '密码长度至少要大于8位');
+    if(!checkString.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw(404, '用户名已存在，请更换用户名再试！');
     if(apiFn.checkEmailFormat(userObj.email) === -1) ctx.throw(400, '邮箱格式不正确，请检查');

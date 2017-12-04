@@ -9,6 +9,16 @@ resourceRouter
     ctx.throw(501, 'a resource ID is required.');
     await next()
   })
+  .get('/:rid', async (ctx, next) => {
+    console.log(ctx.type);
+    const {rid} = ctx.params;
+    const resource = await ctx.db.ResourceModel.findOne({rid});
+    const {path, ext} = resource;
+    ctx.filePath = ctx.settings.upload.uploadPath + path;
+    ctx.type = ext;
+    ctx.set('Accept', 'application/*');
+    await next()
+  })
   .post('/', async (ctx, next) => {
     const {imageMagick} = ctx.tools;
     const settings = ctx.settings;
@@ -48,15 +58,23 @@ resourceRouter
     ctx.data.r = await r.save();
     await next()
   })
-  .get('/:rid', async (ctx, next) => {
-    console.log(ctx.type);
-    const {rid} = ctx.params;
-    const resource = await ctx.db.ResourceModel.findOne({rid});
-    const {path, ext} = resource;
-    ctx.filePath = ctx.settings.upload.uploadPath + path;
-    ctx.type = ext;
-    ctx.set('Accept', 'application/*');
-    await next()
+  .post('/personalForumBanner', async (ctx, next) => {
+    const {uid} = ctx.query;
+    const {imageMagick} = ctx.tools;
+    const settings = ctx.settings;
+    const file = ctx.body.files.file;
+    if(!file) ctx.throw(400, 'no file uploaded');
+    const {name, size, path, type} = file;
+    const extension = mime.getExtension(type);
+    const {banner} = settings.upload.sizeLimit;
+    if(!['jpg', 'png', 'jpeg'].includes(extension)) {
+      ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.')
+    }
+    imageMagick.bannerify(path);
+    const saveName = uid + '.' + extension;
+    const {pfBannerPath} = settings.upload;
+    const targetFile = pfBannerPath +'/'+ saveName;
+    await promisify(fs.rename)(path, targetFile);
+    await next();
   });
-
 module.exports = resourceRouter;

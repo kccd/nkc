@@ -150,14 +150,14 @@ function nkc_render(options){
       openTag: function(params,content) {
         var username = '';
         if(!params || params.length === 0) {
-          username = '。。。';
+          username = '未支持的引用类型'
         } else {
           var arr = params.slice(1).split(',');
           var username = '';
-          if(arr[0] !== '-1') {
-            username = params?(arr? '回复 '+arr[1]+' 在 '+arr[0]+' 楼的发言\n':''):'';
+          if(arr[1] !== '-1') {
+            username = params?(arr? '回复 '+arr[2]+' 在 <a href="'+ arr[0] + '#' + arr[3] +'">'+arr[1]+'楼</a> 的发言\n':''):'';
           } else {
-            username = params?(arr? '回复 '+arr[1]+' 的发言\n':''):'';
+            username = params?(arr? '回复 '+arr[2]+' 的发言\n':''):'';
           }
         }
         return '<blockquote class="xbbcode-blockquote">' + username;

@@ -215,9 +215,11 @@ operationRouter
     if(digestInMid !== undefined) obj.digestInMid = !!digestInMid;
     if(toppedInMid !== undefined) {
       if(toppedInMid){
-        obj.$addToSet = {toppedUsers: user.uid}
+        obj.$addToSet = {toppedUsers: user.uid};
+        await targetPersonalForum.update({$addToSet: {toppedThreads: tid}});
       } else {
-        obj.$pull = {toppedUsers: user.uid}
+        obj.$pull = {toppedUsers: user.uid};
+        await targetPersonalForum.update({$pull: {toppedThreads: tid}});
       }
     }
     await targetThread.update(obj);

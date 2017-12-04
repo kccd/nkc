@@ -5,8 +5,8 @@ block title
 
   -var forum  = data.forum
 
-  if forum.description
-    -var processed=forum.description.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  if forum.descriptionOfForum
+    -var processed=forum.descriptionOfForum.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
   else
     -var processed = forum.displayName
 
@@ -31,7 +31,7 @@ block content
           .row
             .col-xs-12
               form(role='form')
-                - var description = data.forum.description
+                - var description = data.forum.descriptionOfForum
                 - var announcement = data.forum.announcement
                 - var display_name = data.forum.displayName
                 div(style='width: 100%;')
@@ -78,7 +78,7 @@ block content
                       hr.hrNarrowSpace
                       div
                         if announcement && announcement != ''
-                          div #{'公告: ' + announcement}
+                          div!= '公告: ' + announcement
 
                   .configShit(style='display: none; position: relative;')
                     div(style='position: relative;')
@@ -100,10 +100,15 @@ block content
                           div(style='display: inline-block;')
                             input#description(style='width: 360px;' value=`${description || ''}` name='description' placeholder='请输入专栏介绍')
                         div
-                          -const str = moderators.length <= 0? '' : moderators.reduce((pv, cv, ci, arr) => {return ci === 0? {username: ''} : pv.username + cv.username + ','}, '')
+                          -let str = '';
+                          -let n = '';
+                          -for(let i in moderators)
+                            if data.targetUser.uid !== moderators[i].uid
+                              -str += n + moderators[i].username
+                              -n = ','
                           span 版主：
                           span #{moderators[0].username},
-                          input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str.username}`)
+                          input#moderators(placeholder='输入用户名，用,分隔' name='moderators' value=`${str}`)
                       div(style='float: right; vertical-align: top;')
                         if isModerator
                           div
@@ -137,20 +142,22 @@ block content
             .col-xs-12
               .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
 
-                .form-inline(style='margin-top:10px')
+                .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
 
-                  if isNormalUser
+                  .form-inline(style='margin-top:10px')
+
                     .form-group
-                      button#addSelectedToMyCollection.btn-xs.btn.btn-default(onclick='addSelectedToMyCollection()') 添加到个人收藏
-                  .form-group
-                    button.btn.btn-xs.btn-default(onclick='selectbtn()') 全选/不选
-                  if data.userLevel >= 5
-                    .form-group
+                      button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
+
+                    .form-group.form-group-sm
                       include forumlist_dropdown.pug
-                      button#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+                      button.btn.btn-default.btn-sm#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+
+                    if data.userLevel >= 1
+                      button.btn.btn-default.btn-sm#addSelectedToMyCollection(onclick='addSelectedToMyCollection()') 添加到个人收藏
 
                     .form-group
-                      button#recyclebtn.btn.btn-xs.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
+                      button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
 
             .col-xs-12
               nav
@@ -170,10 +177,10 @@ block content
                 ul.pagination.NavigationPaging(style='margin-top: 0.4rem')
                   - var page = paging?paging.page:null;
                   li(class=`${class_str_all}`)
-                    a(href=`?&tab=${data.tab}${data.sortby? "&sortby=toc": ""}`) 俱
+                    a(href=`?&tab=${data.tab}${data.sortby === 'toc'? "&sortby=toc": ""}`) 俱
 
                   li(class=`${class_str_digest}`)
-                    a(href=`?&tab=${data.tab}&digest=true${data.sortby? "&sortby=toc": ""}`) 精
+                    a(href=`?&tab=${data.tab}&digest=true${data.sortby === 'toc'? "&sortby=toc": ""}`) 精
 
                 ul.pagination.NavigationPaging
                   li(class=`${class_str_sortby_tlm}`)

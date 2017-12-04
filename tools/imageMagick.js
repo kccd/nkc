@@ -76,9 +76,10 @@ const generateAdPost = async (path, name) => {
   `)
 };
 
-const bannerify = async path => execute(`
-  ${convert} ${path} -resize ${banner}^ -gravity Center -quality 90 -crop ${banner}+0+0 ${path}
+const bannerify = path => execute(`
+  ${convert} ${path} -resize ${sizeLimit.banner}^ -gravity Center -quality 90 -crop ${sizeLimit.banner}+0+0 ${path}
 `);
+
 
 const removeFile = async path => {
   return fs.unlinkSync(path);

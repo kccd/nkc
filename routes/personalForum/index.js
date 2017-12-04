@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
+const operationRouter = require('./operation');
 
 router
   .get('/:uid', async (ctx, next) => {
@@ -49,8 +50,9 @@ router
         .set('uid', uid)
         .set('fid', {$in: visibleFid});
       let $matchThread = matchBase;
-      if(digest)
-        $matchThread = $matchThread.set('digest', true);
+      if(digest){
+        $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
+      }
       const tidArr = [];
       const posts = await PostModel.find($matchPost.toJS(), {_id: 0, tid: 1});
       for (let post of posts) {
@@ -67,10 +69,17 @@ router
     }
     else if(tab === 'own') {
       let $matchThread = matchBase.set('fid', {$in: visibleFid});
-      $matchThread = $matchThread.set('$or', [
+      const $or = [
         {uid},
         {toMid: uid}
-      ]);
+      ];
+      const $and = [{$or: $or}];
+      if(digest) {
+        $and.push({
+          $or: [{digest: true}, {digestInMid: true}]
+        });
+      }
+      $matchThread = $matchThread.set('$and', $and);
       if(
         !user || personalForum.moderators.indexOf(user.uid) === -1
         || !ctx.data.userLevel > 4
@@ -78,8 +87,6 @@ router
         //if u r not the forum-moderator/moderator, u can't access hide threads
         $matchThread = $matchThread.set('hideInMid', false);
       }
-      if(digest)
-        $matchThread = $matchThread.set('digest', true);
       const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(p => p.extendUser());
@@ -92,8 +99,9 @@ router
     else if(tab === 'recommend') {
       let $postMatch = matchBase.set('pid', {$in: personalForum.recPosts}).toJS();
       let $matchThread = matchBase.set('fid', {$in: visibleFid}).toJS();
-      if(digest)
-        $matchThread = $matchThread.set('digest', true);
+      if(digest){
+        $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
+      }
       let t = Date.now();
       const posts = await PostModel.find($postMatch, {_id: 0, tid: 1});
       const tidArr = posts.map(post => post.tid);
@@ -153,8 +161,9 @@ router
         ]},
         {fid: {$in: visibleFid}}
       ];
-      if(digest)
-        $and.splice(0, 0, {digest});
+      if(digest) {
+        $and.splice(0, 0, {$or: [{digest: true}, {digestInMid: true}]});
+      }
       const $USM = matchBase.set('$and', $and).toJS();
       const threads = await ThreadModel.find($USM).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
@@ -200,7 +209,6 @@ router
       data.paging = paging(page, length)
     }
     else if(tab === 'all') {
-      const $digest = digest? {'digest': true}: {'digest': false};
       let $sort = {};
       if(sortby === 'tlm')
         $sort = {'tlm': -1};
@@ -216,13 +224,17 @@ router
       for (let userBehavior of userBehaviors) {
         if(!tidArr.includes(userBehavior.tid)) tidArr.push(userBehavior.tid);
       }
-      const threads = await ThreadModel.find({$and: [$digest, {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
+      let $matchThread = matchBase.set('tid', {$in: tidArr});
+      if(digest) {
+        $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
+      }
+      const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(p => p.extendUser());
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      const length = await ThreadModel.count({$and: [$digest, {tid: {$in: tidArr}}]});
+      const length = await ThreadModel.count($matchThread.toJS());
       /*data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
           timeStamp: 1
@@ -313,6 +325,7 @@ router
     ctx.data.tab = tab;
     ctx.data.sortby = sortby;
     await next()
-  });
+  })
+  .use('/:uid', operationRouter.routes(), operationRouter.allowedMethods());
 
 module.exports = router;

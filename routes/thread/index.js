@@ -24,7 +24,8 @@ threadRouter
     if(!await thread.ensurePermissionOfModerators(ctx)) q.disabled = false;
     const indexOfPostId = await db.PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
     const indexArr = indexOfPostId.map(p => p.pid);
-    data.paging = apiFn.paging(page, indexOfPostId.length);
+    const paging = apiFn.paging(page, indexOfPostId.length);
+    data.paging = paging;
     const forum = await ForumModel.findOnly({fid: thread.fid});
     const {mid, toMid} = thread;
     const posts = await thread.getPostByQuery(query, q);
@@ -34,7 +35,12 @@ threadRouter
       if(index !== -1) {
         const targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
         const step = indexArr.indexOf(targetPid);
-        post.c = postContent.replace(/=/, `=${step},`);
+        const postIndex = indexArr.indexOf(targetPid);
+        let page = Math.ceil(postIndex/paging.perpage);
+        if(page <= 1) page = `?`;
+        else page = `?page=${page - 1}`;
+        const postLink = `/t/${tid + page}`;
+        post.c = postContent.replace(/=/, `=${postLink}, ${step},`);
       }
     });
     data.posts = posts;
