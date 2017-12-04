@@ -14,9 +14,19 @@ router
       const url = path.resolve(__dirname, `../../resources/pf_banners/${uid}.jpg`);
       accessSync(url);
       ctx.filePath = url;
-    } catch(e) {
-      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_pf_banner.jpg')
-    }
+    } catch(e) {}
+    try {
+      const url = path.resolve(__dirname, `../../resources/pf_banners/${uid}.jpeg`);
+      accessSync(url);
+      ctx.filePath = url;
+    } catch(e) {}
+    try {
+      const url = path.resolve(__dirname, `../../resources/pf_banners/${uid}.png`);
+      accessSync(url);
+      ctx.filePath = url;
+    } catch(e) {}
+    if(!ctx.filePath)
+      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_pf_banner.jpg');
     await next()
   });
 

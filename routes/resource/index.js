@@ -70,7 +70,7 @@ resourceRouter
     if(!['jpg', 'png', 'jpeg'].includes(extension)) {
       ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.')
     }
-    imageMagick.bannerify(path);
+    await imageMagick.bannerify(path);
     const saveName = uid + '.' + extension;
     const {pfBannerPath} = settings.upload;
     const targetFile = pfBannerPath +'/'+ saveName;
