@@ -288,13 +288,7 @@ const certificates ={
       },
       r: {
         [POST]: true,
-        [GET]: true,
-        personalForumAvatar: {
-          [POST]: true
-        },
-        personalForumBanner: {
-          [POST]: true
-        }
+        [GET]: true
       },
       editor: {
         [name]: '编辑器',
@@ -363,6 +357,18 @@ const certificates ={
       },
       logout: {
         [GET]: true
+      },
+      pfb: {
+        [name]: '专栏背景图',
+        [parameter]: {
+          [POST]: true
+        }
+      },
+      pfa: {
+        [name]: '专栏头像',
+        [parameter]: {
+          [POST]: true
+        }
       }
     },
     elseModifyTimeLimit: 0,

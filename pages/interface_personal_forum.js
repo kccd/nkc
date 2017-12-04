@@ -280,7 +280,7 @@ function post_upload(target,data,callback)
       }
     }
   }
-  xhr.open("POST","/r" + target,true);
+  xhr.open("POST",target,true);
   //xhr.setRequestHeader("Content-type","application/json");
   xhr.send(data);
 }
@@ -303,7 +303,7 @@ function avatarOnChange(id) {
   if(!ele.files[0])return screenTopWarning('pick one, okay?');
   var formData = new FormData();
   formData.append('file', ele.files[0]);
-  post_upload('/personalForumAvatar?uid=' + id, formData,upload_callback);
+  post_upload('/pfa/' + id, formData,upload_callback);
 }
 
 function bannerOnChange(id) {
@@ -311,7 +311,7 @@ function bannerOnChange(id) {
   if(!ele.files[0])return screenTopWarning('pick one, okay?');
   var formData = new FormData();
   formData.append('file', ele.files[0]);
-  post_upload('/personalForumBanner?uid=' + id, formData,upload_callback);
+  post_upload('/pfb/' + id, formData,upload_callback);
 }
 
 function uploadForumBanner() {
