@@ -75,9 +75,13 @@ const bannerify = path => execute(`
   ${convert} ${path} -resize ${sizeLimit.banner}^ -gravity Center -quality 90 -crop ${sizeLimit.banner}+0+0 ${path}
 `);
 
-const avatarify = path => execute(
+const avatarify = path => execute(`
+  ${convert} ${path} -strip -thumbnail -resize ${avatarSize}x${avatarSize}^ -gravity Center -quality 90 -crop ${avatarSize}x${avatarSize}+0+0 ${path}
+`);
+
+/*const avatarify = path => execute(
   `${convert} ${path} -strip -thumbnail ${avatarSize}x${avatarSize}^> -gravity Center -qulity 90 -crop ${avatarSize}x${avatarSize}+0+0 ${path}`
-);
+);*/
 
 const removeFile = async path => {
   return fs.unlinkSync(path);

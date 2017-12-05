@@ -61,6 +61,7 @@ threadRouter
       data.othersForum = othersForum
     }
     data.targetUser = await thread.getUser();
+    await thread.update({$inc: {hits: 1}});
     data.thread = thread;
     data.forum = forum;
     data.replyTarget = `t/${tid}`;
@@ -88,6 +89,7 @@ threadRouter
       mid: user.uid,
       toMid: user.uid,
     });
+    await thread.update({$inc: {count: 1}});
     const type = ctx.request.accepts('json', 'html');
     if(type === 'html')
       ctx.redirect(`/t/${tid}`, 303);

@@ -189,7 +189,7 @@ block content
                       -var tpid = thread.firstPost.pid
                       p.lighttext#airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
                       .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                      p.lighttext#airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits} 浏览
+                      p.lighttext#airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
                     div#changeDisNone
                       canvas#qrcode
 

@@ -34,13 +34,12 @@ router
   })
   .post('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
-    const {data, db} = ctx;
+    const {data, db, settings} = ctx;
     const {user} = data;
     const targetPersonalForum = await db.PersonalForumModel.findOnly({uid});
     if(user.uid !== uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
     const extArr = ['jpg', 'png', 'jpeg'];
     const {imageMagick} = ctx.tools;
-    const settings = ctx.settings;
     const file = ctx.body.files.file;
     if(!file) ctx.throw(400, 'no file uploaded');
     const {path, type} = file;

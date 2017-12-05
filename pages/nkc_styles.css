@@ -1779,3 +1779,7 @@ img.emoji {
 .ForumThreadHasImage .forumDisplayName:hover{
   text-decoration: underline;
 }
+
+.navbar-default {
+  border-color: transparent;
+}

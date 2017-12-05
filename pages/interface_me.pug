@@ -27,8 +27,7 @@ block content
             div(style='width: 10rem;margin: auto')
               img.img-rounded(src=`/avatar/${user.uid}`,style='width:100%;')
               .col-xs-12.col-md-12(style='padding: 0')
-                  input#select-file(style='height:0;width:0;',type="file",target="avatar",accept="image/*")
-                  button#uploadFile.btn.btn-default.center-block(style='display: none;margin:1em auto 0.5em auto;', onclick='uploadfile_click();$("#uploadFile").css("display", "none")') 点击上传
+                  input#select-file(style='height:0;width:0;',type="file",target="avatar",accept="image/*" onchange=`uploadfile_click("${data.user.uid}")`)
                   button#chooseFile.btn.btn-default.center-block(onclick='updateBnt()',style='margin:1em auto;') 修改头像
           .col-xs-12.col-md-3(style='padding: 0')
             //.col-xs-12.col-md-12
@@ -202,7 +201,6 @@ block scripts
     //头像上传
     function updateBnt(){
       $('#select-file').click();
-      $('#uploadFile').css('display', 'block');
     }
     //提交密码
     function submitnewpassword() {

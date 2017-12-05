@@ -16,20 +16,30 @@ router
       const url = path.resolve(__dirname, `../../resources/pf_avatars/${uid}.jpg`);
       accessSync(url);
       ctx.filePath = url;
-    } catch(e) {
+    } catch(e) {}
+    try {
+      const url = path.resolve(__dirname, `../../resources/pf_avatars/${uid}.jpeg`);
+      accessSync(url);
+      ctx.filePath = url;
+    } catch(e) {}
+    try {
+      const url = path.resolve(__dirname, `../../resources/pf_avatars/${uid}.png`);
+      accessSync(url);
+      ctx.filePath = url;
+    } catch(e) {}
+    if(!ctx.filePath){
       ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_pf_avatar.jpg')
     }
     await next()
   })
   .post('/:uid',async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, settings} = ctx;
     const {user} = data;
     const {uid} = ctx.params;
     const targetPersonalForum = await db.PersonalForumModel.findOne({uid});
     if(user.uid !== uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
     const extArr = ['jpg', 'png', 'jpeg'];
     const {imageMagick} = ctx.tools;
-    const settings = ctx.settings;
     const file = ctx.body.files.file;
     if(!file) ctx.throw(400, 'no file uploaded');
     const {path, type} = file;

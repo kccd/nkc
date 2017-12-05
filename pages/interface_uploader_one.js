@@ -1,6 +1,6 @@
 //multi-part uploader.
 //data should be a FormData object
-function post_upload(target,data,callback)
+function post_upload(uid,data,callback)
 {
   var xhr = new XMLHttpRequest();
 
@@ -20,7 +20,7 @@ function post_upload(target,data,callback)
       }
     }
   }
-  xhr.open("POST","/api/"+target.toString().toLowerCase(),true);
+  xhr.open("POST","/avatar/"+uid,true);
   //xhr.setRequestHeader("Content-type","application/json");
   xhr.send(data);
 }
@@ -29,13 +29,13 @@ function post_upload(target,data,callback)
 var upload_target = ga('select-file','target');
 
 //on click of the upload button
-function uploadfile_click(){
+function uploadfile_click(uid){
   if(!geid('select-file').files[0])return screenTopWarning('pick one, okay?');
 
   var formData = new FormData();
 
   formData.append('file', geid('select-file').files[0]);
-  post_upload(upload_target,formData,upload_callback);
+  post_upload(uid,formData,upload_callback);
 }
 
 //after uploading of a file, back is response from server

@@ -369,6 +369,12 @@ const certificates ={
         [parameter]: {
           [POST]: true
         }
+      },
+      avatar: {
+        [name]: '头像',
+        [parameter]: {
+          [POST]: true
+        }
       }
     },
     elseModifyTimeLimit: 0,

@@ -128,6 +128,10 @@ var nkc_editor = function(){
       method = 'POST';
       url = '/f/'+forumID+'?mid='+targetArr[1];
       data = {post};
+    } else if(targetArr[0] === 't') {
+      method = 'POST';
+      url = '/t/'+targetArr[1];
+      data = {post};
     } else {
       jwarning('未知的请求类型： '+target);
     }
