@@ -9,9 +9,9 @@ const {stat} = fs;
 
 const execute = promisify(exec);
 const os = platform();
-let convert = 'imagemagick convert',
-  identify = 'imagemagick identify',
-  composite = 'imagemagick composite';
+let convert = 'magick convert',
+  identify = 'magick identify',
+  composite = 'magick composite';
 if(os === 'linux') {
   convert = 'convert';
   identify = 'identify';
@@ -21,10 +21,18 @@ if(os === 'linux') {
 const attachify = async path => {
   const {width, height} = sizeLimit.attachment;
   await execute(
-    `${command} ${path} -gravity southeast -resize ${width}x${height}> 
-    ${watermark} -compose dissoleve -define compose:args=50 -composite -quality 90 ${path}`
+    `${convert} ${path} -gravity southeast -resize ${width}x${height}> 
+    ${watermark} -compose dissolve -define compose:args=50 -composite -quality 90 ${path}`
   )
 };
+
+/*const attachify = async path => {
+  const {width, height} = sizeLimit.attachment;
+  await execute(
+    `${command} ${path} -gravity southeast -resize ${width}x${height}>
+    ${watermark} -compose dissoleve -define compose:args=50 -composite -quality 90 ${path}`
+  )
+};*/
 
 const watermarkify = async path => await execute(
   `${composite} -dissolve 50 -gravity southeast ${watermark} ${path} ${path}`
@@ -86,6 +94,15 @@ const avatarify = path => execute(`
 const removeFile = async path => {
   return fs.unlinkSync(path);
 };
+
+
+/*(async () => {
+  const path1 = require('path').resolve('../1.jpg');
+  const path2 = require('path').resolve('../2.jpg');
+  await thumbnailify(path1, path2);
+})();*/
+
+
 module.exports = {
   avatarify,
   attachify,

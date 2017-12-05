@@ -6,6 +6,9 @@ module.exports = {
     const length2 = other? other.length : 0;
     return length1 + length2
   },
+  contentFilter: (content) => {
+    return content.replace(/\[quote=.*][\s\S]+\[\/quote]/g, '')
+  },
   checkPass: (s) => {
     let ls = 0;
     if(s.match(/([a-zA-Z])+/)){

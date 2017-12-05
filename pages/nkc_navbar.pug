@@ -3,12 +3,12 @@
 if data.user
   -var newMessage = data.user.newMessage;
   -var messageSum = (newMessage.message || 0) + (newMessage.system || 0) + (newMessage.at || 0) + (newMessage.replies || 0);
-nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;')
+nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;line-height: 0;')
   .container-fluid(style='max-width: 1400px')
     .navbar-header
       button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
         if messageSum > 0
-          span(style="color: red;font-size: 0.5em;position: absolute;top: -0.5rem; right: -0.2rem;") ●
+          span(style="position: absolute;top: 0px; right: 0px;height: 0.5rem;width: 0.5rem;border-radius: 0.25rem;background-color: red")
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -22,7 +22,7 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;')
 
         if data.user && data.user.uid
           li
-            a(href='/self' title='个人动态' style=`${isActive('self')}`) 我的
+            a(href='/me/activities' title='个人动态' style=`${isActive('activities')}`) 我的
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       form.navbar-form.navbar-left(style='border: none;')
         .form-group(style='overflow: hidden;width: 100%')

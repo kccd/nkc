@@ -290,6 +290,9 @@ const certificates ={
         [POST]: true,
         [GET]: true
       },
+      rt: {
+        [GET]: true
+      },
       editor: {
         [name]: '编辑器',
         [GET]: true
@@ -353,7 +356,11 @@ const certificates ={
         resource: {
           [name]: '上传的资源',
           [GET]: true
-        }
+        },
+        activities: {
+          [name]: '个人动态',
+          [GET]: true
+        },
       },
       logout: {
         [GET]: true

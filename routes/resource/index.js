@@ -28,6 +28,7 @@ resourceRouter
     const {name, size, path, type} = file;
     const extension = mime.getExtension(type);
     const {largeImage} = settings.upload.sizeLimit;
+    ctx.print('path', path);
     if(['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension) > -1) {
       if(size > largeImage) {
         await imageMagick.attachify(path)
@@ -40,16 +41,18 @@ resourceRouter
     }
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     const saveName = rid + '.' + extension;
-    const {uploadPath, generateFolderName} = settings.upload;
-    const relPath = generateFolderName();
-    const destPath = uploadPath + relPath;
-    const destFile = destPath + saveName;
-    await promisify(fs.rename)(path, destFile);
+    const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
+    const descPath = generateFolderName(uploadPath);
+    const descFile = descPath + saveName;
+    await promisify(fs.rename)(path, descFile);
     const {ResourceModel} = ctx.db;
+    const descPathOfThumbnail = generateFolderName(thumbnailPath);
+    const thumbnailFilePath = descPathOfThumbnail + saveName;
+    await imageMagick.thumbnailify(descFile, thumbnailFilePath);
     const r = new ResourceModel({
       rid,
       oname: name,
-      path: relPath + saveName,
+      path: descPath + saveName,
       ext: extension,
       size,
       uid: ctx.data.user.uid,

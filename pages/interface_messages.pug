@@ -92,7 +92,7 @@ block content
               .media(style='margin:0;')
                 -if(reNum > 0)
                   -reNum--;
-                  span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                  span.redPoint
                 span #{docs[i].fromPost.toc.toLocaleString()}
                 .media-left.media-top
                   a(href=`/m/${docs[i].fromPost.uid}`)
@@ -114,7 +114,7 @@ block content
               .media(style='margin:0;')
                 -if(atNum > 0 )
                   -atNum--;
-                  span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                  span.redPoint
                 span #{docs[i].post.toc.toLocaleString()}
                 .media-left.media-top
                   a(href=`/m/${docs[i].post.uid}`)
@@ -181,7 +181,7 @@ block content
                 hr(style='margin:0.5em 0;')
                 .media(style='margin:0;')
                   -if(!docs[i].viewed && docs[i].r.uid == data.user.uid)
-                    span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                    span.redPoint
                   span #{docs[i].toc.toLocaleString()}
                   .media-left.media-top
                     a(href=`/m/${docs[i].s.uid}`)
@@ -200,7 +200,7 @@ block content
                 hr(style='margin:0.5em 0;')
                 .media(style='margin:0;')
                   -if(docs[i].viewedUsers.indexOf(data.user.uid) == -1)
-                    span(style="color: red;font-size: 1em;margin-right: 0.3em;") ●
+                    span.redPoint
                   span #{docs[i].toc.toLocaleString()}
                   .media-body
                     h4.media-heading

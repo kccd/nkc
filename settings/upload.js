@@ -7,17 +7,24 @@ const uploadPath = path.resolve('resources/upload');
 const pfBannerPath = path.resolve('resources/pf_banners');
 const pfAvatarPath = path.resolve('resources/pf_avatars');
 const avatarPath = path.resolve('resources/avatars');
+const thumbnailPath = path.resolve('resources/thumbnails');
 
-function generateFolderName() {
-  const name = moment().format('/YYYY/MM/');
-  const dir = uploadPath + name;
+function generateFolderName(basePath) {
+  const year = basePath + moment().format('/YYYY/');
+  const full = basePath + moment().format('/YYYY/MM/')
   try {
-    mkdirSync(dir);
+    mkdirSync(year);
   } catch(e) {
     if(e.code !== 'EEXIST')
       throw e
   }
-  return name;
+  try {
+    mkdirSync(full);
+  } catch(e) {
+    if(e.code !== 'EEXIST')
+      throw e
+  }
+  return full;
 }
 
 module.exports = {
@@ -42,5 +49,6 @@ module.exports = {
   pfBannerPath,
   pfAvatarPath,
   avatarPath,
+  thumbnailPath,
   avatarSize: 192,
 };

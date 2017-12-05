@@ -1,27 +1,27 @@
 if obj.actInThread
   div(style='border-bottom: 1px solid #eee;')
     div
-      a(href='/f/#{obj.forum._key}')
-        span.activity-title-forum(style='background-color: #{obj.forum.color || "orange"};') &nbsp;#{obj.forum.display_name}&nbsp;
+      a(href=`/f/${obj.forum.fid}`)
+        span.activity-title-forum(style=`background-color: ${obj.forum.color || "orange"};`) &nbsp;#{obj.forum.displayName}&nbsp;
       span 下的帖子
-      a(href='/t/#{obj.thread._key}') #{obj.oc.t}
+      a(href=`/t/${obj.thread.tid}`) #{obj.oc.t}
       span 有#{obj.actInThread}个动态...去
-      a(href='/t/#{obj.thread._key}') 看看吧
+      a(href=`/t/${obj.thread.tid}`) 看看吧
     div(style='padding: 10px 10px;')
       span(style='display: inline-block;') 最新回复
       .activity-user
-        a(href='/activities/#{obj.uid}')
-          img.activity-user-avatar(src='/avatar/#{obj.uid}')
-        a(href='/activities/#{obj.user._key}') #{obj.user.username}
-      a(style='height: 30px; color: grey;' href='/t/#{obj.thread._key}##{obj.post._key}') #{obj.post.c}
+        a(href=`/activities/${obj.uid}`)
+          img.activity-user-avatar(src=`/avatar/${obj.uid}`)
+        a(href=`/activities/${obj.user.uid}`) #{obj.user.username}
+      a(style='height: 30px; color: grey;' href=`/t/${obj.thread.tid}#${obj.post.pid}`) #{obj.post.c}
 else
   if(obj.oc != null)
     -var type
-      if obj.type == 1
+      if obj.type === 1
         -type = 'Po'
-      else if obj.type == 2
+      else if obj.type === 2
         -type = 'Re'
-      else if obj.type == 4
+      else if obj.type === 4
         -type = 'Rc'
       else
         -type = 'X'
@@ -30,24 +30,24 @@ else
           div.activity-type-text #{type}
           div.activity-type-date #{fromNow(obj.time)}
         .activity-user
-          a(href='/activities/#{obj.uid}')
-            img.activity-user-avatar(src='/avatar/#{obj.uid}')
-          a(href='/activities/#{obj.user._key}') #{obj.user.username}
+          a(href=`/activities/${obj.uid}`)
+            img.activity-user-avatar(src=`/avatar/${obj.uid}`)
+          a(href=`/activities/${obj.user.uid}`) #{obj.user.username}
         .activity-info
           .activity-title
             if(obj.forum)
               -var color = obj.forum.color || 'orange'
-              a(href='/f/#{obj.fid}')
-                span.activity-title-forum(style='background-color: #{color};') &nbsp;#{obj.forum.abbr}&nbsp;
+              a(href=`/f/${obj.fid}`)
+                span.activity-title-forum(style=`background-color: ${color};`) &nbsp;#{obj.forum.abbr}&nbsp;
             if(obj.toMyForum)
               -var color = obj.toMyForum.color || 'orange'
-              a(href='/m/#{obj.toMyForum._key}')
-                span.activity-title-forum(style='background-color: #{color};') &nbsp;#{obj.toMyForum.abbr}&nbsp;
+              a(href=`/m/${obj.toMyForum._key}`)
+                span.activity-title-forum(style=`background-color: ${color};`) &nbsp;#{obj.toMyForum.abbr}&nbsp;
             if(obj.myForum)
               -var color = obj.myForum.color || 'orange'
-              a(href='/m/#{obj.myForum._key}')
-                span.activity-title-forum(style='background-color: #{color};') &nbsp;#{obj.myForum.abbr}&nbsp;
-            a(href='/t/#{obj.tid}')
+              a(href=`/m/${obj.myForum.uid}`)
+                span.activity-title-forum(style=`background-color: ${color};`) &nbsp;#{obj.myForum.abbr}&nbsp;
+            a(href=`/t/${obj.tid}`)
               span(style='overflow: hidden;') #{obj.oc.t}
-          a.activity-content(href='/t/#{obj.tid}##{obj.pid}' style='overflow: hidden;') #{obj.post.c}
+          a.activity-content(href=`/t/${obj.tid}#${obj.pid}' style='overflow: hidden;`) #{obj.post.c}
 

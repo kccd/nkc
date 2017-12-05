@@ -19,6 +19,7 @@ const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
+const rtRouter = require('./rt');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
@@ -168,5 +169,6 @@ otherRouter
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
   .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
+  .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

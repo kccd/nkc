@@ -475,13 +475,12 @@ padding: 1px 7px 1px 7px; */
   margin-right: 7px;
 }
 .messageNumber{
+  margin-left: 0.2rem;
   display: inline-block;
   height:1.48rem;
   width:1.5rem;
   border-radius: 0.74rem;
-  background-color: #e99;
-  color: #fff;
-  font-size: 1rem;
+  color: #e99;
   text-align: center;
 }
 .messageNumberOfImg{
@@ -1782,4 +1781,12 @@ img.emoji {
 
 .navbar-default {
   border-color: transparent;
+}
+.redPoint{
+  background-color: red;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 0.25rem;
+  display: inline-block;
+  margin-right: 0.2rem;
 }
