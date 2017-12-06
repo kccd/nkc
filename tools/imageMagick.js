@@ -21,8 +21,7 @@ if(os === 'linux') {
 const attachify = async path => {
   const {width, height} = sizeLimit.attachment;
   await execute(
-    `${convert} ${path} -gravity southeast -resize ${width}x${height}> 
-    ${watermark} -compose dissolve -define compose:args=50 -composite -quality 90 ${path}`
+    `${convert} ${path} -gravity southeast -resize ${width}x${height}> ${watermark} -compose dissolve -define compose:args=50 -composite -quality 90 ${path}`
   )
 };
 

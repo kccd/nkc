@@ -40,6 +40,8 @@ resourceRouter
       await imageMagick.thumbnailify(path, thumbnailFilePath);
       // 添加水印
       if(size > largeImage) {
+        console.log(path);
+        fs.existsSync(path);
         await imageMagick.attachify(path)
       } else {
         const {width, height} = await imageMagick.info(path);
