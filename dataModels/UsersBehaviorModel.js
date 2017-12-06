@@ -71,7 +71,13 @@ const usersBehaviorSchema = new Schema({
     name: String,
     change: Number
   }
-}, {collection: 'usersBehaviors'});
+},
+  {
+    toObject: {
+      getters: true,
+      virtuals: true
+    },
+    collection: 'usersBehaviors'});
 
 usersBehaviorSchema.virtual('actInThread')
   .get(function() {

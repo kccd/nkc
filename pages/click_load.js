@@ -98,29 +98,32 @@ function Activity(obj) {
 }
 function loadNextPage() {
   var path = location.pathname.match(/\/([^0~9&^\/]*)/);
-  var operation;
+  var url;
   var parameter;
   var username;
   if(path[1] === 'activities') {
-    operation = 'viewPersonalActivities';
+    url = 'viewPersonalActivities';
     parameter = location.pathname.match(/\/([^0~9&^\/]*)\/(\d*)/)[2];
   }
-  else if(path[1] === 'self'){
-    operation = 'viewSelf';
+  else if(path.input === '/me/activities'){
+    url = path.input + '?page=' + _nowAtPage;
   }
   else if(path[1] === 'user_activities_byname') {
-    operation = 'viewPersonalActivities';
+    url = 'viewPersonalActivities';
     username = location.pathname.replace(/\/user_activities_byname\//, '');
   }
   else {
     throw new Error('unknown operation type.')
   }
-  nkcAPI(operation, {
+  /*nkcAPI(url, 'GET',{
     uid: parameter,
     username: username,
     page: _nowAtPage ++
-  })
+  })*/
+  return nkcAPI(url, 'GET', {})
     .then(function(res) {
+      res = res.activities;
+      console.log(res);
       var activities = geid('activities');
       var oldButton = geid('loadNextPage');
       activities.removeChild(oldButton.parentNode);
@@ -142,6 +145,7 @@ function loadNextPage() {
       activities.appendChild(div);
     })
     .catch(function(e) {
+      console.log(e);
       screenTopWarning(e);
     })
 }

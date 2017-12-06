@@ -172,7 +172,7 @@ async function import1() {
           const newDoc = new UsersBehaviorModel({
             uid,
             fid,
-            tid,
+            tid: tid === '0'? '': tid,
             pid,
             toUid,
             timeStamp: time,

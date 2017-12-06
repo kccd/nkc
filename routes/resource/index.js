@@ -10,7 +10,6 @@ resourceRouter
     await next()
   })
   .get('/:rid', async (ctx, next) => {
-    console.log(ctx.type);
     const {rid} = ctx.params;
     const resource = await ctx.db.ResourceModel.findOne({rid});
     const {path, ext} = resource;
@@ -28,8 +27,18 @@ resourceRouter
     const {name, size, path, type} = file;
     const extension = mime.getExtension(type);
     const {largeImage} = settings.upload.sizeLimit;
-    ctx.print('path', path);
+    const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
+    const saveName = rid + '.' + extension;
+    const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
+    const relPath = generateFolderName(uploadPath);
+    const descPath = uploadPath + relPath;
+    const descFile = descPath + saveName;
     if(['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension) > -1) {
+      // 如果格式满足则生成缩略图
+      const descPathOfThumbnail = generateFolderName(thumbnailPath);
+      const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName;
+      await imageMagick.thumbnailify(path, thumbnailFilePath);
+      // 添加水印
       if(size > largeImage) {
         await imageMagick.attachify(path)
       } else {
@@ -39,20 +48,12 @@ resourceRouter
         }
       }
     }
-    const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
-    const saveName = rid + '.' + extension;
-    const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
-    const descPath = generateFolderName(uploadPath);
-    const descFile = descPath + saveName;
     await promisify(fs.rename)(path, descFile);
-    const {ResourceModel} = ctx.db;
-    const descPathOfThumbnail = generateFolderName(thumbnailPath);
-    const thumbnailFilePath = descPathOfThumbnail + saveName;
-    await imageMagick.thumbnailify(descFile, thumbnailFilePath);
-    const r = new ResourceModel({
+    const r = new ctx.db.ResourceModel({
       rid,
       oname: name,
-      path: descPath + saveName,
+      path: relPath + saveName,
+      tpath: relPath + saveName,
       ext: extension,
       size,
       uid: ctx.data.user.uid,

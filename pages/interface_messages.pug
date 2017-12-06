@@ -156,7 +156,7 @@ block content
                   span #{docs[i].group[0].toc.toLocaleString()}
                   .media-left.media-top(style='position: relative')
                     -if(newMesNum > 0)
-                      span.messageNumber.messageNumberOfImg(style='line-height: 20px') #{newMesNum}
+                      span.messageNumber.messageNumberOfImg #{newMesNum}
                     a(href=`/m/${docs[i].uid}`)
                       img.media-object.img-rounded(src=`/avatar/${docs[i].uid}`,style='height:3em;width:3em;')
                   .media-body

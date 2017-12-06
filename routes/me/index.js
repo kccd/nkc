@@ -34,52 +34,57 @@ meRouter
     ctx.template = 'self.pug';
     data.navbar = {highlight: 'activities'};
     const page = ctx.query.page || 0;
-    ctx.print('user', user);
+    ctx.print('page', page);
     const lastTime = user.lastVisitSelf;
     const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
     const {subscribeUsers, subscribeForums} = userSubscribe;
-    const userBehaviors = await db.UsersBehaviorModel.find(
-      {
-        $or: [
-          {uid: user.uid},
-          {mid: user.uid},
-          {toMid: user.uid},
-          {uid: {$in: subscribeUsers}}
-        ]
-      }
-    ).sort({timeStamp: -1}).limit(30);
-    ctx.print('a', userBehaviors);
-    const subscribeForumBehaviors = await db.UsersBehaviorModel.aggregate([
-      {
-        $match: {
-          timeStamp: {$gt: lastTime},
-          fid: {$in: subscribeForums}
+    const q = {
+      $or: [
+        {uid: user.uid},
+        {mid: user.uid},
+        {toMid: user.uid},
+        {uid: {$in: subscribeUsers}}
+      ],
+      tid: {$ne: null}
+    };
+    const length = await db.UsersBehaviorModel.count(q);
+    const paging = apiFn.paging(page, length);
+    const userBehaviors = await db.UsersBehaviorModel.find(q).sort({timeStamp: -1}).skip(paging.start).limit(paging.perpage);
+    let targetBH = [];
+    if(page === 0) {
+      const subscribeForumBehaviors = await db.UsersBehaviorModel.aggregate([
+        {
+          $match: {
+            timeStamp: {$gt: lastTime},
+            fid: {$in: subscribeForums},
+            tid: {$ne: null}
+          }
+        },
+        {
+          $group: {
+            _id: '$tid',
+            threadsInGroup: {$push: '$$ROOT'}
+          }
+        },
+        {
+          $project: {
+            tid: '$_id',
+            threadsInGroup: 1
+          }
+        },
+        {
+          $match: {
+            'threadsInGroup.5': {$exists: 1}
+          }
         }
-      },
-      {
-        $group: {
-          _id: '$tid',
-          threadsInGroup: {$push: '$$ROOT'}
-        }
-      },
-      {
-        $project: {
-          tid: '$_id',
-          threadsInGroup: 1
-        }
-      },
-      {
-        $match: {
-          'threadsInGroup.5': {$exists: 1}
-        }
-      }
-    ]);
-    const targetBH = await Promise.all(subscribeForumBehaviors.map(b => {
-      const length = b.threadsInGroup.length;
-      const lastBH = b.threadsInGroup.pop();
-      lastBH.actInThread = length;
-      return lastBH;
-    }));
+      ]);
+      targetBH = await Promise.all(subscribeForumBehaviors.map(b => {
+        const length = b.threadsInGroup.length;
+        const lastBH = b.threadsInGroup.pop();
+        lastBH.actInThread = length;
+        return lastBH;
+      }));
+    }
     const activities = userBehaviors.concat(targetBH);
     data.activities = await Promise.all(activities.map(async activity => {
       activity.thread = await db.ThreadModel.findOnly({tid: activity.tid});
@@ -90,8 +95,9 @@ meRouter
       activity.myForum = activity.mid ? await db.PersonalForumModel.findOnly({uid: activity.mid}): {};
       activity.toMyForum = activity.toMid ? await db.PersonalForumModel.findOnly({uid: activity.toMid}): {};
       activity.user = await db.UserModel.findOnly({uid: activity.uid});
-      return activity;
+      return activity.toObject();
     }));
+    await user.update({lastVisitSelf: Date.now()});
     await next();
   })
   .patch('/username', async (ctx, next) => {

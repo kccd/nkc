@@ -455,7 +455,7 @@ background-color: #f3834c;
 
 color: white;
 
-padding: 1px 7px 1px 7px; */
+padding: 1px 7px 1px 7px;
 }
 .ForumNavigation1 .parentforum{
     color: #f3834c;
@@ -477,16 +477,19 @@ padding: 1px 7px 1px 7px; */
 .messageNumber{
   margin-left: 0.2rem;
   display: inline-block;
-  height:1.48rem;
+  height:1.5rem;
   width:1.5rem;
-  border-radius: 0.74rem;
+  line-height: 1.5rem;
+  border-radius: 50%;
   color: #e99;
   text-align: center;
 }
 .messageNumberOfImg{
   position: absolute;
-  right: 0.5rem;
-  top: -0.1rem;
+  background-color: #e99;
+  right: 0.35rem;
+  top: -0.3rem;
+  color: #fff
 }
 .reddish {
   color: #e99;

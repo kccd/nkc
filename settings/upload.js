@@ -10,16 +10,17 @@ const avatarPath = path.resolve('resources/avatars');
 const thumbnailPath = path.resolve('resources/thumbnails');
 
 function generateFolderName(basePath) {
-  const year = basePath + moment().format('/YYYY/');
-  const full = basePath + moment().format('/YYYY/MM/')
+  const year = moment().format('/YYYY/');
+  const full = moment().format('/YYYY/MM/');
+
   try {
-    mkdirSync(year);
+    mkdirSync(basePath + year);
   } catch(e) {
     if(e.code !== 'EEXIST')
       throw e
   }
   try {
-    mkdirSync(full);
+    mkdirSync(basePath + full);
   } catch(e) {
     if(e.code !== 'EEXIST')
       throw e
