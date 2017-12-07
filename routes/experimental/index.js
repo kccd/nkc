@@ -102,16 +102,18 @@ experimentalRouter
   })
   .get('/behavior', async (ctx, next) => {
     const {data, db} = ctx;
-    const {from, to, type, sort} = ctx.query;
+    const {from, ip, to, type, sort} = ctx.query;
     data.from = from;
     data.to = to;
     data.type = type;
     data.sort = sort;
+    data.ip = ip
     const q = [];
     const s = {timeStamp: -1};
     const page = ctx.query.page || 0;
     if(from) q.push({uid: from});
     if(to) q.push({toUid: to});
+    if(ip) q.push({ip});
     if(type === 'management') {
       q.push({isManageOp: true});
     } else if(type === 'normal') {
@@ -158,7 +160,7 @@ experimentalRouter
       const t3 = Date.now();
       const targetUser = await db.UserModel.findOne({uid: user.uid});
       await targetUser.updateUserMessage();
-      console.log(`总数: ${userArr.length} - 现在: ${i} - uid: ${user.uid} - time: ${Date.now() - t3}ms`);
+      console.log(`总数: ${userArr.length} - 第: ${i} - uid: ${user.uid} - time: ${Date.now() - t3}ms`);
     }
     console.log(`总耗时: ${Date.now() - t}ms`);
     data.message = '更新所有用户数据成功';
@@ -178,7 +180,7 @@ experimentalRouter
       if(i >= threadsCount) break;
       const thread = await db.ThreadModel.findOne().skip(i);
       await thread.updateThreadMessage();
-      console.log(`${i} - ${thread.tid} - ${threadsCount}`);
+      console.log(`总数：${threadsCount} - 第：${i} - tid: ${thread.tid}`);
     }
     data.message = '更新所有帖子数据成功';
     await next();

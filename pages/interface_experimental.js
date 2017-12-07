@@ -1,5 +1,5 @@
-$('.container button').addClass('MyButton');
-$('.container a').addClass('MyButton');
+/*$('.container button').addClass('MyButton');
+$('.container a').addClass('MyButton');*/
 var ItemContainer = React.createClass({
   click:function(event){
     event.index = this.props.index;

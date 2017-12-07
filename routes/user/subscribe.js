@@ -54,7 +54,6 @@ subscribeRouter
     if(subscribersOfDB.subscribers.indexOf(user.uid) === -1 && subscribeUsersOfDB.subscribers.indexOf(uid) === -1) ctx.throw(400, '您之前没有关注过该用户，操作无效');
     ctx.data.message = `取消关注 uid:${uid} 成功`;
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
-
     await ctx.generateUsersBehavior({
       operation: 'unsubscribeUser'
     });

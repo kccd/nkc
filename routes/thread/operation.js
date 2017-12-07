@@ -26,7 +26,7 @@ operationRouter
       await db.SettingModel.operateSystemID('collections', -1);
       ctx.throw(500, `收藏失败: ${err}`);
     }
-    data.targetUser = await thread.getUser();
+    data.targetUser = await thread.extendUser();
     await next();
   })
   // 首页置顶
@@ -39,7 +39,7 @@ operationRouter
     const setting = await db.SettingModel.findOnly({uid: 'system'});
     const ads = setting.ads;
     const index = ads.findIndex((elem, i, arr) => elem === tid);
-    const targetUser = await thread.getUser();
+    const targetUser = await thread.extendUser();
     if(index > -1) {
       ads.splice(index, 1);
       await imageMagick.removeFile(`./resources/ad_posts/${tid}.jpg`);

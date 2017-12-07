@@ -13,7 +13,7 @@ if obj.actInThread
         a(href=`/u/${obj.uid}/activities`)
           img.activity-user-avatar(src=`/avatar/${obj.uid}`)
         a(href=`/u/${obj.user.uid}/activities`) #{obj.user.username}
-      a(style='height: 30px; color: grey;' href=`/t/${obj.thread.tid}#${obj.post.pid}`) #{obj.post.c}
+      a(style='height: 30px; color: grey;' href=`/t/${obj.thread.tid}#${obj.post?obj.post.pid: ''}`) #{obj.post? obj.post.c: ''}
 else
   if(obj.oc != null)
     -var type
@@ -49,5 +49,5 @@ else
                 span.activity-title-forum(style=`background-color: ${color};`) &nbsp;#{obj.myForum.abbr}&nbsp;
             a(href=`/t/${obj.tid}`)
               span(style='overflow: hidden;') #{obj.oc.t}
-          a.activity-content(href=`/t/${obj.tid}#${obj.pid}' style='overflow: hidden;`) #{obj.post.c}
+          a.activity-content(href=`/t/${obj.tid}#${obj.pid}' style='overflow: hidden;`) #{obj.post?obj.post.c: ''}
 

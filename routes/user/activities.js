@@ -6,7 +6,7 @@ activitiesRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
-    const {uid} = ctx.params;
+    const {uid} = ctx.p         arams;
     const targetUser = await db.UserModel.findOnly({uid});
     data.targetUser = targetUser;
     if(user.uid === uid) {
@@ -67,14 +67,15 @@ activitiesRouter
         return lastBH;
       }));
       await user.update({lastVisitSelf: Date.now()});
-      ctx.print('targetBH', targetBH);
     }
     const activities = userBehaviors.concat(targetBH);
     data.activities = await Promise.all(activities.map(async activity => {
       activity.thread = await db.ThreadModel.findOnly({tid: activity.tid});
       activity.oc = await db.PostModel.findOnly({pid: activity.thread.oc});
-      activity.post = await db.PostModel.findOnly({pid: activity.pid});
-      activity.post.c = contentFilter(activity.post.c);
+      if(activity.pid) {
+        activity.post = await db.PostModel.findOnly({pid: activity.pid});
+        activity.post.c = contentFilter(activity.post.c);
+      }
       activity.forum = await db.ForumModel.findOnly({fid: activity.fid});
       activity.myForum = activity.mid ? await db.PersonalForumModel.findOnly({uid: activity.mid}): {};
       activity.toMyForum = activity.toMid ? await db.PersonalForumModel.findOnly({uid: activity.toMid}): {};

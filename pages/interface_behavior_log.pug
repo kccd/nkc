@@ -26,66 +26,35 @@ block content
   .container
     .row
       .col-xs-12.col-md-12
-        h4 这是积分变动查询界面
+        h4 积分变动查询
     br
     br
     .rom
       .col-xs-12.col-md-12
-        .col-xs-12.col-md-10
           input(type='hidden', value='1', name='page')
           input(type='hidden', value='desc', name='sort')
           input(type='hidden', value='all', name='type')
-          .row
-            .col-xs-12.col-md-4
+          .col-xs-12.col-md-8
+            .form-inline
               .form-group
+                label from
                 input.form-control(type='text', placeholder='from', name='from', onclick='select()', value=`${input_from}`)
-            .col-xs-12.col-md-4
               .form-group
+                label to
                 input.form-control(type='text', placeholder='to', name='to', onclick='select()', value=`${input_to}`)
-            .col-xs-12.col-md-4
               .form-group
+                label ip
                 input.form-control(type='text', placeholder='ip', name='ip', onclick='select()', value=`${input_ip}`)
-        .col-xs-12.col-md-1
-          button.btn.btn-default#submit 查询
-        .col-xs-12.col-md-1
-          a(href='/e/behavior?&page=0&type=all')
-            button.btn.btn-default 重置所有
-      .col-xs-12.col-md-3
-        nav(aria-label= 'navigation')
-          ul.pagination
-            -var all_class = '', management_class = '', normal_class = '';
-            case data.type
-              when 'all'
-                -all_class = 'active';
-              when 'management'
-                -management_class = 'active';
-              default
-                -normal_class = 'active';
-            li(class=`${all_class}`)
-              a(href=`/e/behavior?&page=1${fromAndTo}${sort}${ip}&type=all`) 全部
-            li(class=`${management_class}`)
-              a(href=`/e/behavior?&page=1${fromAndTo}${sort}${ip}&type=management`) 管理
-            li(class=`${normal_class}`)
-              a(href=`/e/behavior?&page=1${fromAndTo}${sort}${ip}&type=normal`) 常规
-      .col-xs-12.col-md-2
-        nav(aria-label='navigation')
-          ul.pagination
-            -if(data.sort == 'desc' || !data.sort)
-              li.active
-                a(href='javascript:###') 正序
-              li
-                a(href=`/e/behavior?&page=1${fromAndTo}${ip}&sort=asc&type=${data.type}`) 倒序
-            -else
-              li
-                a(href=`/e/behavior?&page=1${fromAndTo}${ip}&sort=desc&type=${data.type}`) 正序
-              li.active
-                a(href='javascript:###') 倒序
+          .col-xs-12.col-md-4
+            button.btn.btn-default#submit 查询
+            span &nbsp;
+            a.btn.btn-default(href='/e/behavior?&page=0&type=all') 重置所有
     .rom
-      .col-xs-12.col-md-12
-        nav(aria-label='navigation')
-          -var pageCount = data.paging.pageCount;
-          -var page = data.paging.page;
-          -if(pageCount > 1)
+      -var pageCount = data.paging.pageCount;
+      -var page = data.paging.page;
+      -if(pageCount > 1)
+        .col-xs-12.col-md-4
+          nav(aria-label='navigation')
             ul.pagination
               //- 当前页数若大于4则显示首页按钮
               //- 若总的分页数小于7则不需要显示首页和尾页按钮
@@ -119,6 +88,36 @@ block content
               -if(page < pageCount - 3 && pageCount > 6)
                 li
                   a(href=`/e/behavior?&page=${pageCount-1}${fromAndTo}${sort}${ip}&type=${data.type}`) 末
+      .col-xs-12.col-md-2
+        nav(aria-label= 'navigation')
+          ul.pagination
+            -var all_class = '', management_class = '', normal_class = '';
+            case data.type
+              when 'all'
+                -all_class = 'active';
+              when 'management'
+                -management_class = 'active';
+              default
+                -normal_class = 'active';
+            li(class=`${all_class}`)
+              a(href=`/e/behavior?&page=0${fromAndTo}${sort}${ip}&type=all`) 全部
+            li(class=`${management_class}`)
+              a(href=`/e/behavior?&page=0${fromAndTo}${sort}${ip}&type=management`) 管理
+            li(class=`${normal_class}`)
+              a(href=`/e/behavior?&page=0${fromAndTo}${sort}${ip}&type=normal`) 常规
+      .col-xs-12.col-md-3
+        nav(aria-label='navigation')
+          ul.pagination
+            -if(data.sort == 'desc' || !data.sort)
+              li.active
+                a(href='javascript:###') 正序
+              li
+                a(href=`/e/behavior?&page=0${fromAndTo}${ip}&sort=asc&type=${data.type}`) 倒序
+            -else
+              li
+                a(href=`/e/behavior?&page=0${fromAndTo}${ip}&sort=desc&type=${data.type}`) 正序
+              li.active
+                a(href='javascript:###') 倒序
     .rom
       .col-xs-12.col-md-12
         table.table.table-bordered
@@ -161,11 +160,11 @@ block content
                 -if(link)
                   a(href=`${link}`) 查看详情
     .rom
-      .col-xs-12.col-md-12
-        nav(aria-label='navigation')
-          -var pageCount = data.paging.pageCount;
-          -var page = data.paging.page;
-          -if(pageCount > 1)
+      -var pageCount = data.paging.pageCount;
+      -var page = data.paging.page;
+      -if(pageCount > 1)
+        .col-xs-12.col-md-12
+          nav(aria-label='navigation')
             ul.pagination
               //- 当前页数若大于4则显示首页按钮
               //- 若总的分页数小于7则不需要显示首页和尾页按钮
