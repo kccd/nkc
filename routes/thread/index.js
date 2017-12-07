@@ -60,7 +60,7 @@ threadRouter
       othersForum = await PersonalForumModel.findOnly({uid: toMid});
       data.othersForum = othersForum
     }
-    data.targetUser = await thread.getUser();
+    data.targetUser = await thread.extendUser();
     await thread.update({$inc: {hits: 1}});
     data.thread = thread;
     data.forum = forum;
@@ -81,13 +81,14 @@ threadRouter
     const {post} = body;
     const thread = await ThreadModel.findOnly({tid});
     const _post = await thread.newPost(post, user, ip);
+    data.targetUser = await thread.extendUser();
     await generateUsersBehavior({
       operation: 'postToThread',
       pid: _post.pid,
       tid: thread.tid,
       fid: thread.fid,
-      mid: user.uid,
-      toMid: user.uid,
+      mid: thread.uid,
+      toMid: thread.uid,
     });
     await thread.update({$inc: {count: 1}});
     const type = ctx.request.accepts('json', 'html');

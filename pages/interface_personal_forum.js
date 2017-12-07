@@ -241,7 +241,7 @@ var submitConfig = function(key) {
     })
     .catch(function(e) {
       console.log(e)
-      screenTopWarning(e.detail);
+      screenTopWarning(e);
     })
 };
 

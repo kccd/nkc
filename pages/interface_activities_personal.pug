@@ -1,19 +1,19 @@
 extends bootstrap_base
 
 block title
-  title #{data.forum.display_name} - #{data.site.name}
+  title #{data.forum.displayName} - #{data.site.name}
 
     -var forum  = data.forum
 
     if forum.description
       -var processed=forum.description.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
     else
-      -var processed = forum.display_name
-  meta(name='description' content='#{processed}')
+      -var processed = forum.displayName
+  meta(name='description' content=`${processed}`)
   meta(property='og:image' content='http://bbs.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content='#{forum.display_name}')
+  meta(property='og:title' content=`${forum.displayName}`)
   meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content='#{processed}')
+  meta(property='og:description' content=`${processed}`)
 
 block content
   -var isModerator = data.user? (data.forum.moderators.indexOf(data.user.username) > -1) : false
@@ -25,14 +25,14 @@ block content
             .col-xs-12
               form(role='form')
                 .form-group
-                  img(src='/avatar/#{data.forum._key}' style='height: 70px; width: 70px; border-radius: 6px; float: right;')
-                  .displayShit.ForumName #{forum.display_name}
-                  input.configShit#forumName(style='font-size: 16px; display: none;' value='#{forum.display_name}' name='forumName' placeholder='请输入专栏名称')
+                  img(src=`/avatar/${data.forum.uid}` style='height: 70px; width: 70px; border-radius: 6px; float: right;')
+                  .displayShit.ForumName #{forum.displayName}
+                  input.configShit#forumName(style='font-size: 16px; display: none;' value=`${forum.displayName}` name='forumName' placeholder='请输入专栏名称')
                 .form-group
                   if data.forum.description
                     span 介绍:&nbsp;
                     span.displayShit #{data.forum.description}
-                    input.configShit#description(value='#{forum.description}' style='display: none;' name='description' placeholder='请输入专栏介绍')
+                    input.configShit#description(value=`${forum.description}` style='display: none;' name='description' placeholder='请输入专栏介绍')
                 .form-group
                   a.btn.configShit.btn-default(style='display: none;' href='javascript:;' onclick='submitConfig()') 保存
 
@@ -40,23 +40,21 @@ block content
                   span 版主：
                     - var moderators = data.forum.moderators
                     each k in moderators
-                      a.d-inline.margin-right(href='/user_activities_byname/#{k}') #{k}
+                      a.d-inline.margin-right(href=`/user_activities_byname/${k}`) #{k}
 
         ul.nav.nav-tabs
           li
-            a(href='/m/#{data.targetUser._key}?&tab=own') 版主
+            a(href=`/m/${data.targetUser.uid}?&tab=own`) 版主
           li
-            a(href='/m/#{data.targetUser._key}?&tab=all') 全部
+            a(href=`/m/${data.targetUser.uid}?&tab=all`) 全部
           li
-            a(href='/m/#{data.targetUser._key}?&tab=discuss') 讨论
+            a(href=`/m/${data.targetUser.uid}?&tab=reply`) 回复
           li
-            a(href='/m/#{data.targetUser._key}?&tab=reply') 回复
+            a(href=`/m/${data.targetUser.uid}?&tab=recommend`) 推荐
           li
-            a(href='/m/#{data.targetUser._key}?&tab=recommend') 推荐
-          li
-            a(href='/m/#{data.targetUser._key}?&tab=subscribe') 关注
+            a(href=`/m/${data.targetUser.uid}?&tab=subscribe`) 关注
           li.active
-            a(href='/activities/#{data.forum._key}') 动态
+            a(href=`/u/${data.forum.uid}/activities`) 动态
         .panel#activities
           for obj in data.activities
             include interface_single_activity
@@ -80,5 +78,4 @@ block scripts
 
 
 
-//Created by lzszo on 2017/4/26.
 

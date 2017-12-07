@@ -5,7 +5,8 @@ block title
 
 block content
   .container
-    -var thatuser = data.user
+    -var thatuser = data.targetUser
+    #pageCount(style='display: none;')!= data.paging.pageCount
     if data.user === undefined
       .row
         .col-sm-12
@@ -28,3 +29,4 @@ block scripts
     script(src='/moment-with-locales.js')
     script(src='/interface_common.js')
     script(src='/click_load.js')
+

@@ -7,6 +7,7 @@ const uploadPath = path.resolve('resources/upload');
 const pfBannerPath = path.resolve('resources/pf_banners');
 const pfAvatarPath = path.resolve('resources/pf_avatars');
 const avatarPath = path.resolve('resources/avatars');
+const avatarSmallPath = path.resolve('resources/avatars_small');
 const thumbnailPath = path.resolve('resources/thumbnails');
 
 function generateFolderName(basePath) {
@@ -35,7 +36,8 @@ module.exports = {
     formidable: {
       maxFields: 20,
       uploadDir,
-      hash: 'md5'
+      hash: 'md5',
+      keepExtensions: true
     }
   },
   sizeLimit: {
@@ -44,12 +46,17 @@ module.exports = {
       height: 16384,
       width: 1920
     },
-    banner: '1050x260'
+    banner: {
+      width: 1050,
+      height: 260
+    }
   },
   uploadPath,
   pfBannerPath,
   pfAvatarPath,
   avatarPath,
+  avatarSmallPath,
   thumbnailPath,
   avatarSize: 192,
+  avatarSmallSize: 48
 };

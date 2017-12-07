@@ -143,6 +143,21 @@ usersBehaviorSchema.virtual('user')
     this._user= n;
   });
 
+usersBehaviorSchema.virtual('toUser')
+  .get(function() {
+    return this._toUser;
+  })
+  .set(function(u) {
+    this._toUser = u;
+  });
+
+usersBehaviorSchema.virtual('link')
+  .get(function() {
+    return this._link;
+  })
+  .set(function(u) {
+    this._link = u;
+  });
 
 const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 

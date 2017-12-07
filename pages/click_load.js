@@ -1,4 +1,4 @@
-window._nowAtPage = 1;
+window._nowAtPage = 0;
 moment.locale('zh-cn');
 function Activity(obj) {
   var activityContent = document.createElement('a');
@@ -55,25 +55,25 @@ function Activity(obj) {
   var activityUser = document.createElement('div');
   activityUser.className = 'activity-user';
   activityUserA = document.createElement('a');
-  activityUserA.href = '/activities/'+obj.uid;
+  activityUserA.href = '/u/'+obj.uid+'/activities';
   var activityUserAvatar = document.createElement('img');
   activityUserAvatar.className = 'activity-user-avatar';
   activityUserAvatar.src = '/avatar/'+ obj.uid;
   activityUserA.appendChild(activityUserAvatar);
   var username = document.createElement('a');
-  username.href = '/activities/'+obj.uid;
+  username.href = '/u/'+obj.uid+'/activities';
   username.innerHTML = obj.user.username;
   activityUser.appendChild(activityUserA);
   activityUser.appendChild(username);
   var type;
-  switch (obj.type) {
-    case 1:
+  switch (obj.operation) {
+    case 'postToForum':
       type = 'Po';
       break;
-    case 2:
+    case 'postToThread':
       type = 'Re';
       break;
-    case 4:
+    case 'recommendPost':
       type = 'Rc';
       break;
     default:
@@ -86,7 +86,7 @@ function Activity(obj) {
   activityTypeText.innerHTML = type;
   var activityTypeDate = document.createElement('div');
   activityTypeDate.className = 'activity-type-date';
-  activityTypeDate.innerHTML = moment(obj.time).fromNow();
+  activityTypeDate.innerHTML = moment(obj.timeStamp).fromNow();
   activityType.appendChild(activityTypeText);
   activityType.appendChild(activityTypeDate);
   var activity = document.createElement('div');
@@ -101,12 +101,13 @@ function loadNextPage() {
   var url;
   var parameter;
   var username;
+  var parameter_activities = location.pathname.match(/\/([^0~9&^\/]*)\/(\d*)/);
   if(path[1] === 'activities') {
     url = 'viewPersonalActivities';
     parameter = location.pathname.match(/\/([^0~9&^\/]*)\/(\d*)/)[2];
   }
-  else if(path.input === '/me/activities'){
-    url = path.input + '?page=' + _nowAtPage;
+  else if(parameter_activities.input === '/u/'+parameter_activities[2]+'/activities'){
+    url = parameter_activities.input + '?page=' + (++_nowAtPage);
   }
   else if(path[1] === 'user_activities_byname') {
     url = 'viewPersonalActivities';
@@ -123,7 +124,6 @@ function loadNextPage() {
   return nkcAPI(url, 'GET', {})
     .then(function(res) {
       res = res.activities;
-      console.log(res);
       var activities = geid('activities');
       var oldButton = geid('loadNextPage');
       activities.removeChild(oldButton.parentNode);

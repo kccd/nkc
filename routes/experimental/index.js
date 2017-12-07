@@ -100,8 +100,50 @@ experimentalRouter
     }));
     await next();
   })
-  .get('/behaviors', async (ctx, next) => {
+  .get('/behavior', async (ctx, next) => {
     const {data, db} = ctx;
+    const {from, to, type, sort} = ctx.query;
+    data.from = from;
+    data.to = to;
+    data.type = type;
+    data.sort = sort;
+    const q = [];
+    const s = {timeStamp: -1};
+    const page = ctx.query.page || 0;
+    if(from) q.push({uid: from});
+    if(to) q.push({toUid: to});
+    if(type === 'management') {
+      q.push({isManageOp: true});
+    } else if(type === 'normal') {
+      q.push({isManageOp: false});
+    } else {
+      q.push({timeStamp: {$ne: null}})
+    }
+    if(sort) s.timeStamp = 1;
+    const length = await db.UsersBehaviorModel.count({$and: q});
+    const paging = apiFn.paging(page, length);
+    data.paging = paging;
+    const usersBehavior = await db.UsersBehaviorModel.find({$and: q}).sort(s).skip(paging.start).limit(paging.perpage);
+    data.behaviorLogs = await Promise.all(usersBehavior.map(async log => {
+      log.user = await db.UserModel.findOnly({uid: log.uid});
+      log.toUser = await db.UserModel.findOnly({uid: log.toUid});
+      if(log.tid) {
+        log.thread = await db.ThreadModel.findOnly({tid: log.tid});
+        log.link = `/t/${log.tid}`;
+      }
+      if(log.pid) {
+        const {pid} = log;
+        log.post = await db.PostModel.findOnly({pid: pid});
+        let pidArr = await db.PostModel.find({tid: log.tid}, {_id: 0, pid: 1}).sort({toc: 1});
+        pidArr = pidArr.map(p => p.pid);
+        const postIndex = pidArr.indexOf(pid);
+        let page = Math.ceil(postIndex/paging.perpage);
+        if(page <= 1) page = `?`;
+        else page = `?page=${page - 1}`;
+        log.link += `${page}#${pid}`;
+      }
+      return log;
+    }));
     ctx.template = 'interface_behavior_log.pug';
     await next();
   })

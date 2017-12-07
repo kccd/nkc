@@ -1,6 +1,6 @@
 const {exec} = require('child_process');
 const settings = require('../settings');
-const {avatarSize, sizeLimit} = settings.upload;
+const {avatarSize, sizeLimit, avatarSmallSize} = settings.upload;
 const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
@@ -20,18 +20,11 @@ if(os === 'linux') {
 
 const attachify = async path => {
   const {width, height} = sizeLimit.attachment;
-  await execute(
-    `${convert} ${path} -gravity southeast -resize ${width}x${height}> ${watermark} -compose dissolve -define compose:args=50 -composite -quality 90 ${path}`
+  return execute(
+    `${convert} ${path} -gravity southeast -resize ${width}x${height} ${path}`
   )
 };
 
-/*const attachify = async path => {
-  const {width, height} = sizeLimit.attachment;
-  await execute(
-    `${command} ${path} -gravity southeast -resize ${width}x${height}>
-    ${watermark} -compose dissoleve -define compose:args=50 -composite -quality 90 ${path}`
-  )
-};*/
 
 const watermarkify = async path => await execute(
   `${composite} -dissolve 50 -gravity southeast ${watermark} ${path} ${path}`
@@ -78,28 +71,23 @@ const generateAdPost = async (path, name) => {
   `)
 };
 
-const bannerify = path => execute(`
-  ${convert} ${path} -resize ${sizeLimit.banner}^ -gravity Center -quality 90 -crop ${sizeLimit.banner}+0+0 ${path}
-`);
+const bannerify = path => {
+  const {banner} = sizeLimit;
+  console.log(banner);
+  return execute(
+    `${convert} ${path} -resize ${banner.width} -gravity Center -quality 90 -crop ${banner.width}x${banner.height}+0+0 ${path}`);
+};
 
-const avatarify = path => execute(`
-  ${convert} ${path} -strip -thumbnail -resize ${avatarSize}x${avatarSize}^ -gravity Center -quality 90 -crop ${avatarSize}x${avatarSize}+0+0 ${path}
-`);
+const avatarify = path => execute(
+  `${convert} ${path} -strip -thumbnail x${1000} -gravity Center -crop ${1000}x${1000}+0+0 -strip -thumbnail ${1000} -gravity Center -quality 90 -crop ${1000}x${1000}+0+0 -strip -thumbnail ${avatarSize}x${avatarSize} ${path}`);
 
-/*const avatarify = path => execute(
-  `${convert} ${path} -strip -thumbnail ${avatarSize}x${avatarSize}^> -gravity Center -qulity 90 -crop ${avatarSize}x${avatarSize}+0+0 ${path}`
-);*/
+const avatarSmallIfy = (path, dest) => execute(
+  `${convert} ${path} -thumbnail ${avatarSmallSize}x${avatarSmallSize} -strip -background wheat -alpha remove ${dest}`
+);
 
 const removeFile = async path => {
   return fs.unlinkSync(path);
 };
-
-
-/*(async () => {
-  const path1 = require('path').resolve('../1.jpg');
-  const path2 = require('path').resolve('../2.jpg');
-  await thumbnailify(path1, path2);
-})();*/
 
 
 module.exports = {
@@ -109,6 +97,7 @@ module.exports = {
   info,
   thumbnailify,
   generateAdPost,
+  avatarSmallIfy,
   bannerify,
   removeFile
 };

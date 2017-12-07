@@ -200,10 +200,6 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
   return posts;
 };
 
-threadSchema.methods.getUser = async function() {
-  const Usermodel = require('./UserModel');
-  return await Usermodel.findOnly({uid: this.uid});
-};
 
 threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = require('./PostModel');

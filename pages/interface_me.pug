@@ -244,7 +244,7 @@ block scripts
         focus_forums:geid('focus_forums').value,
       };
       geid('submitpersonalsetting').disabled = true;
-      nkcAPI('/me/personalsetting','PATCH',settingObj)
+      nkcAPI('/me/settings','PATCH',settingObj)
       .then(function(){
         jwarning('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
@@ -281,6 +281,7 @@ block scripts
         clearTimeout(stopTime);
         geid('submitSendMcode').innerHTML = '获取验证码';
         jwarning('手机号码绑定成功！');
+        window.location.reload();
         geid('phoneNumber').value = '';
         geid('mCode').value = '';
       })

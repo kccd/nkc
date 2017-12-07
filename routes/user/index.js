@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const subscribeRouter = require('./subscribe');
 const collectionsRouter = require('./collections');
+const activitiesRouter = require('./activities');
 const userRouter = new Router();
 
 
@@ -54,5 +55,6 @@ userRouter
   })
 
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
-  .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods());
+  .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
+  .use('/:uid/activities', activitiesRouter.routes(), activitiesRouter.allowedMethods());
 module.exports = userRouter;

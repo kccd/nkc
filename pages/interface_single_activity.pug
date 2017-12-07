@@ -10,29 +10,29 @@ if obj.actInThread
     div(style='padding: 10px 10px;')
       span(style='display: inline-block;') 最新回复
       .activity-user
-        a(href=`/activities/${obj.uid}`)
+        a(href=`/u/${obj.uid}/activities`)
           img.activity-user-avatar(src=`/avatar/${obj.uid}`)
-        a(href=`/activities/${obj.user.uid}`) #{obj.user.username}
+        a(href=`/u/${obj.user.uid}/activities`) #{obj.user.username}
       a(style='height: 30px; color: grey;' href=`/t/${obj.thread.tid}#${obj.post.pid}`) #{obj.post.c}
 else
   if(obj.oc != null)
     -var type
-      if obj.type === 1
+      if obj.operation === 'postToForum'
         -type = 'Po'
-      else if obj.type === 2
+      else if obj.operation === 'postToThread'
         -type = 'Re'
-      else if obj.type === 4
+      else if obj.operation === 'recommendPost'
         -type = 'Rc'
       else
         -type = 'X'
       .activity
         .activity-type
           div.activity-type-text #{type}
-          div.activity-type-date #{fromNow(obj.time)}
+          div.activity-type-date #{fromNow(obj.timeStamp)}
         .activity-user
-          a(href=`/activities/${obj.uid}`)
+          a(href=`/u/${obj.uid}/activities`)
             img.activity-user-avatar(src=`/avatar/${obj.uid}`)
-          a(href=`/activities/${obj.user.uid}`) #{obj.user.username}
+          a(href=`/u/${obj.user.uid}/activities`) #{obj.user.username}
         .activity-info
           .activity-title
             if(obj.forum)
@@ -41,7 +41,7 @@ else
                 span.activity-title-forum(style=`background-color: ${color};`) &nbsp;#{obj.forum.abbr}&nbsp;
             if(obj.toMyForum)
               -var color = obj.toMyForum.color || 'orange'
-              a(href=`/m/${obj.toMyForum._key}`)
+              a(href=`/m/${obj.toMyForum.uid}`)
                 span.activity-title-forum(style=`background-color: ${color};`) &nbsp;#{obj.toMyForum.abbr}&nbsp;
             if(obj.myForum)
               -var color = obj.myForum.color || 'orange'

@@ -137,6 +137,8 @@ block content
             a(href='?&tab=recommend') 推荐
           li(class=`${data.tab === "subscribe" ? "active" : ""}`)
             a(href='?&tab=subscribe') 关注
+          li
+            a(href=`/u/${data.forum.uid}/activities`) 动态
         .panel
           .row
             .col-xs-12

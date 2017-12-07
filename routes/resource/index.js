@@ -25,7 +25,7 @@ resourceRouter
     if(!file)
       ctx.throw(400, 'no file uploaded');
     const {name, size, path, type} = file;
-    const extension = mime.getExtension(type);
+    const extension = name.slice(name.lastIndexOf('.') + 1, name.length);
     const {largeImage} = settings.upload.sizeLimit;
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     const saveName = rid + '.' + extension;
@@ -40,13 +40,12 @@ resourceRouter
       await imageMagick.thumbnailify(path, thumbnailFilePath);
       // 添加水印
       if(size > largeImage) {
-        console.log(path);
-        fs.existsSync(path);
-        await imageMagick.attachify(path)
+        await imageMagick.attachify(path);
+        await imageMagick.watermarkify(path);
       } else {
         const {width, height} = await imageMagick.info(path);
         if(height > 400 || width > 300) {
-          await imageMagick.watermarkify(path)
+          await imageMagick.watermarkify(path);
         }
       }
     }

@@ -49,15 +49,23 @@ router
     }
     await imageMagick.avatarify(path);
     const saveName = uid + '.' + extension;
-    const {avatarPath} = settings.upload;
+    const {avatarPath, avatarSmallPath} = settings.upload;
     const targetFile = avatarPath + '/' + saveName;
+    const targetSmallFile = avatarSmallPath + '/' + saveName;
     for(let e of extArr) {
       const path = `${avatarPath}/${uid}.${e}`;
       try{
         fs.unlinkSync(path);
       } catch(e){}
     }
+    for(let e of extArr) {
+      const path = `${avatarSmallPath}/${uid}.${e}`;
+      try{
+        fs.unlinkSync(path);
+      } catch(e){}
+    }
     await promisify(fs.rename)(path, targetFile);
+    await imageMagick.avatarSmallIfy(targetFile, targetSmallFile);
     await next();
   });
 

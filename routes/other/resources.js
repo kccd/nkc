@@ -15,7 +15,7 @@ router
       accessSync(url);
       ctx.filePath = url;
     } catch(e) {
-      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_avatar_small.gif');
+      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_site_specific.gif');
     }
     await next()
   })
@@ -26,7 +26,7 @@ router
       accessSync(url);
       ctx.filePath = url;
     } catch (e) {
-      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_avatar_small.gif');
+      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_forum_icon.gif');
     }
     await next();
   });

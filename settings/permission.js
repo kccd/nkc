@@ -83,7 +83,11 @@ const certificates ={
       u: {
         [name]: '用户',
         [parameter]: {
-          [GET]: true
+          [GET]: true,
+          activities: {
+            [name]: '个人动态',
+            [GET]: true
+          }
         }
       },
       m: {
