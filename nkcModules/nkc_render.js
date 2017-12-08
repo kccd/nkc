@@ -148,16 +148,17 @@ function nkc_render(options){
     },*/
     quote:{
       openTag: function(params,content) {
+        params = params? params.slice(1).split(','): '';
         var username = '';
-        if(!params || params.length === 0) {
-          username = '未支持的引用类型'
+        console.log(params);
+        if(!params || params.length !== 4) {
+          username = params?(params.length?'引用 ' + params[2]+':<br>':''):''
         } else {
-          var arr = params.slice(1).split(',');
-          var username = '';
-          if(arr[1] !== '-1') {
-            username = params?(arr? '回复 '+arr[2]+' 在 <a href="'+ arr[0] + '#' + arr[3] +'">'+arr[1]+'楼</a> 的发言\n':''):'';
+          username = '';
+          if(params[1] !== '-1') {
+            username = params?(params? '回复 '+params[2]+' 在 <a href="'+ params[0] + '#' + params[3] +'">'+params[1]+'楼</a> 的发言\n':''):'';
           } else {
-            username = params?(arr? '回复 '+arr[2]+' 的发言\n':''):'';
+            username = params?(params? '回复 '+params[2]+' 的发言\n':''):'';
           }
         }
         return '<blockquote class="xbbcode-blockquote">' + username;
