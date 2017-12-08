@@ -34,7 +34,7 @@ userRouter
       ctx.throw(400, '为什么？你为何要封禁此用户？你是怎么了？');
     }
     await db.UserModel.replaceOne({uid: targetUser.uid}, {$addToSet: {certs: 'banned'}});
-    ctx.data.message = `封禁用户 uid:${targetUser.uid}, username:${targetUser.username} 成功`;
+    ctx.data.message = `封禁用户成功`;
     await next();
   })
   .put('/:uid', async (ctx, next) => {
@@ -45,7 +45,7 @@ userRouter
     let certs = targetUser.certs;
     if(certs.indexOf('banned') === -1) ctx.throw(400, '该用户未被封禁，请刷新');
     await db.UserModel.replaceOne({uid: targetUser.uid}, {$pull: {certs: 'banned'}});
-    ctx.data.message = `解封用户 uid:${targetUser.uid}, username:${targetUser.username} 成功`;
+    ctx.data.message = `解封用户成功`;
     await next();
   })
   .post('/:uid/pop', async (ctx, next) => {

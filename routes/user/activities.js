@@ -6,7 +6,7 @@ activitiesRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
-    const {uid} = ctx.p         arams;
+    const {uid} = ctx.params;
     const targetUser = await db.UserModel.findOnly({uid});
     data.targetUser = targetUser;
     if(user.uid === uid) {

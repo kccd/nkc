@@ -101,5 +101,3 @@ module.exports = {
   bannerify,
   removeFile
 };
-
-
