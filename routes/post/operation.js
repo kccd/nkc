@@ -27,6 +27,8 @@ operationRouter
       pid,
       tid: targetThread.tid,
       fid: targetThread.fid,
+      toMid: targetThread.toMid,
+      mid: targetThread.mid
     });
     await next();
   })
@@ -46,6 +48,8 @@ operationRouter
       pid,
       tid: targetThread.tid,
       fid: targetThread.fid,
+      toMid: targetThread.toMid,
+      mid: targetThread.mid
     });
     await next();
   })
@@ -131,7 +135,9 @@ operationRouter
       pid,
       tid: targetThread.tid,
       fid: targetThread.fid,
-      isManageOp: true
+      isManageOp: true,
+      toMid: targetThread.toMid,
+      mid: targetThread.mid
     });
     await targetThread.updateThreadMessage();
     await next();

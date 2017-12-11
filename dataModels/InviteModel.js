@@ -22,7 +22,11 @@ let inviteSchema = new Schema({
     required: true,
     index: 1
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 inviteSchema.virtual('post')
   .get(function() {

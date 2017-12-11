@@ -75,14 +75,9 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     required: true,
-    index: true
   },
   bday: String,
   cart: [String],
-  email: {
-    type: String,
-    match: /.*@.*/
-  },
   description: String,
   color: String,
   certs: {
@@ -91,7 +86,11 @@ const userSchema = new Schema({
   },
   introText: String,
   postSign: String,
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 userSchema.pre('save', function(next) {
   if(!this.usernameLowerCase){
@@ -105,6 +104,39 @@ userSchema.pre('save', function(next) {
   this.certs = c;
   next()
 });
+
+userSchema.virtual('regPort')
+  .get(function() {
+    return this._regPort;
+  })
+  .set(function(p) {
+    this._regPort = p;
+  });
+
+userSchema.virtual('regIP')
+  .get(function() {
+    return this._regIP;
+  })
+  .set(function(ip) {
+    this._regIP = ip;
+  });
+
+userSchema.virtual('mobile')
+  .get(function() {
+    return this._mobile;
+  })
+  .set(function(m) {
+    this._mobile = m;
+  });
+
+userSchema.virtual('email')
+  .get(function() {
+    return this._email;
+  })  
+  .set(function(e) {
+    this._email = e;
+  });
+
 
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = require('./ThreadModel');
@@ -121,12 +153,10 @@ userSchema.methods.getUsersThreads = async function() {
 userSchema.methods.extend = async function() {
   const UsersPersonalModel = require('./UsersPersonalModel');
   const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-  const user = this.toObject();
-  user.regPort = userPersonal.regPort;
-  user.regIP = userPersonal.regIP;
-  user.mobile = userPersonal.mobile;
-  user.email = userPersonal.email;
-  return user;
+  this.regPort = userPersonal.regPort;
+  this.regIP = userPersonal.regIP;
+  this.mobile = userPersonal.mobile;
+  this.email = userPersonal.email;
 };
 
 userSchema.methods.updateUserMessage = async function() {

@@ -28,78 +28,6 @@ meRouter
     ctx.template = 'interface_me.pug';
     await next();
   })
-  .get('/activities', async (ctx, next) => {
-    const {data, db} = ctx;
-    const {user} = data;
-    ctx.template = 'self.pug';
-    data.navbar = {highlight: 'activities'};
-    const page = ctx.query.page || 0;
-    ctx.print('page', page);
-    const lastTime = user.lastVisitSelf;
-    const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
-    const {subscribeUsers, subscribeForums} = userSubscribe;
-    const q = {
-      $or: [
-        {uid: user.uid},
-        {mid: user.uid},
-        {toMid: user.uid},
-        {uid: {$in: subscribeUsers}}
-      ],
-      tid: {$ne: null}
-    };
-    const length = await db.UsersBehaviorModel.count(q);
-    const paging = apiFn.paging(page, length);
-    const userBehaviors = await db.UsersBehaviorModel.find(q).sort({timeStamp: -1}).skip(paging.start).limit(paging.perpage);
-    let targetBH = [];
-    if(page === 0) {
-      const subscribeForumBehaviors = await db.UsersBehaviorModel.aggregate([
-        {
-          $match: {
-            timeStamp: {$gt: lastTime},
-            fid: {$in: subscribeForums},
-            tid: {$ne: null}
-          }
-        },
-        {
-          $group: {
-            _id: '$tid',
-            threadsInGroup: {$push: '$$ROOT'}
-          }
-        },
-        {
-          $project: {
-            tid: '$_id',
-            threadsInGroup: 1
-          }
-        },
-        {
-          $match: {
-            'threadsInGroup.5': {$exists: 1}
-          }
-        }
-      ]);
-      targetBH = await Promise.all(subscribeForumBehaviors.map(b => {
-        const length = b.threadsInGroup.length;
-        const lastBH = b.threadsInGroup.pop();
-        lastBH.actInThread = length;
-        return lastBH;
-      }));
-    }
-    const activities = userBehaviors.concat(targetBH);
-    data.activities = await Promise.all(activities.map(async activity => {
-      activity.thread = await db.ThreadModel.findOnly({tid: activity.tid});
-      activity.oc = await db.PostModel.findOnly({pid: activity.thread.oc});
-      activity.post = await db.PostModel.findOnly({pid: activity.pid});
-      activity.post.c = contentFilter(activity.post.c);
-      activity.forum = await db.ForumModel.findOnly({fid: activity.fid});
-      activity.myForum = activity.mid ? await db.PersonalForumModel.findOnly({uid: activity.mid}): {};
-      activity.toMyForum = activity.toMid ? await db.PersonalForumModel.findOnly({uid: activity.toMid}): {};
-      activity.user = await db.UserModel.findOnly({uid: activity.uid});
-      return activity.toObject();
-    }));
-    await user.update({lastVisitSelf: Date.now()});
-    await next();
-  })
   .patch('/username', async (ctx, next) => {
     //data = '修改用户名';
     await next();
@@ -119,7 +47,7 @@ meRouter
     await db.UsersPersonalModel.updateOne({uid: user.uid}, {$set:newPasswordObj});
     await next();
   })
-  .patch('/personalsetting', async (ctx, next) => {
+  .patch('/settings', async (ctx, next) => {
     const db = ctx.db;
     const params = ctx.body;
     const user = ctx.data.user;
@@ -156,6 +84,8 @@ meRouter
     const smsCode = await dbFn.checkMobileCode(newMobile, code);
     if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
     await db.UsersPersonalModel.replaceOne({uid: user.uid}, {$set: {mobile: newMobile}});
+    await user.update({$addToSet: {certs: 'mobile'}});
+    await smsCode.update({used: true});
     await next();
   })
   .get('/resource', async (ctx, next) => {

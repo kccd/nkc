@@ -3,7 +3,11 @@ extends bootstrap_base.pug
 block title
   link(href='/interface_experimental.css' rel='stylesheet')
   title 管理界面
-  
+  style.
+    .marginOfA{
+      margin:0 5px 5px 0;
+    }
+
 block content
   
   .container
@@ -15,34 +19,32 @@ block content
       .col-xs-12.col-md-6
         .panel.panel-default
           .panel-body
-            h4 特殊操作 [ 请没事不要点击 ]
+            h4 更新数据 [ 没事请不要点击 ]
             button.btn.btn-default(onclick="nkcAPI('/e/updateAllThreads', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部帖子数据
             button.btn.btn-default(onclick="nkcAPI('/e/updateAllForums', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部板块数据
             button.btn.btn-default(onclick="nkcAPI('/e/updateAllUsers', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部用户数据
-            button.btn.btn-default(onclick="nkcAPI('/e/updateAllPostsFromCreditLog', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 从积分表向帖子更新数据
-            h4 危险操作 [ 通常你也没有权限点击 ]
-            button.btn.btn-default(onclick="nkcAPI('gitpull').then(jalert).catch(jalert)") git pull
-            button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze
-            button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") npm install
             hr
-            
+            h4 危险操作 [ 通常你也没有权限点击 ]
+            button.btn.btn-default(onclick="nkcAPI('/e/gitPull', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") git pull
+            button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze
+            button.btn.btn-default(onclick="nkcAPI('/e/npmInstall', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") npm install
+            span &nbsp;
             a.btn.btn-default(href="/danger") 危险
-            a.btn.btn-default(href="/f/recycle") 进入回收站
-            a.btn.btn-default(href="/f/draft") 进入草稿版
-            a.btn.btn-default(href='/e/stats') 看统计
-            a.btn.btn-default(href='/e/newUsers') 最新用户
-            a.btn.btn-default(href='/e/newSysinfo') 发新通知
+            hr
+            h4 查看
+            a.marginOfA.btn.btn-default(href="/f/recycle") 回收站
+            a.marginOfA.btn.btn-default(href="/f/draft") 草稿版
+            a.marginOfA.btn.btn-default(href='/e/stats') 统计
+            a.marginOfA.btn.btn-default(href='/e/newUsers') 新用户
+            a.marginOfA.btn.btn-default(href='/e/behavior') 积分变动
+            hr
+            h4 系统
+            a.marginOfA.btn.btn-default(href='/e/newSysinfo') 发新通知
       .col-xs-12.col-md-6
         .panel.panel-default.f12
           .panel-body
             h4 这里是回显
             pre#logger
-      //积分管理
-      .col-xs-12.col-md-6
-        .panel.panel-default.f12
-          .panel-body
-            p 积分变动查询
-            a.btn.btn-default(href='/behaviors') 入口
     hr
     .row
       .col-md-12(style='padding-left:0;padding-left:0;')

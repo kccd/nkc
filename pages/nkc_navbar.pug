@@ -22,7 +22,7 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;line-height: 
 
         if data.user && data.user.uid
           li
-            a(href='/me/activities' title='个人动态' style=`${isActive('activities')}`) 我的
+            a(href=`/u/${data.user.uid}/activities` title='个人动态' style=`${isActive('activities')}`) 我的
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       form.navbar-form.navbar-left(style='border: none;')
         .form-group(style='overflow: hidden;width: 100%')

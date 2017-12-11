@@ -40,7 +40,11 @@ let personalForumsSchema = new Schema({
     type: String,
     default: ''
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 personalForumsSchema.virtual('moderatorsObj')
   .get(function() {

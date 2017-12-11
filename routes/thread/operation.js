@@ -26,7 +26,7 @@ operationRouter
       await db.SettingModel.operateSystemID('collections', -1);
       ctx.throw(500, `收藏失败: ${err}`);
     }
-    data.targetUser = await thread.getUser();
+    data.targetUser = await thread.extendUser();
     await next();
   })
   // 首页置顶
@@ -39,7 +39,7 @@ operationRouter
     const setting = await db.SettingModel.findOnly({uid: 'system'});
     const ads = setting.ads;
     const index = ads.findIndex((elem, i, arr) => elem === tid);
-    const targetUser = await thread.getUser();
+    const targetUser = await thread.extendUser();
     if(index > -1) {
       ads.splice(index, 1);
       await imageMagick.removeFile(`./resources/ad_posts/${tid}.jpg`);
@@ -88,7 +88,7 @@ operationRouter
       if(!digest) ctx.throw(400, '该贴子在您操作前已经被撤销精华了，请刷新');
       if(digest) ctx.throw(400, '该贴子在您操作前已经被设置成精华了，请刷新');
     }
-    data.targetUser = await thread.getUser;
+    data.targetUser = await thread.extendUser();
     const targetForum = await db.ForumModel.findOnly({fid: thread.fid});
     await targetForum.setCountOfDigestThread(number);
     let operation = 'setDigest';
@@ -97,7 +97,9 @@ operationRouter
       operation,
       tid,
       fid: thread.fid,
-      isManageOp: true
+      isManageOp: true,
+      toMid: thread.toMid,
+      mid: thread.mid
     });
     await next();
   })
@@ -117,14 +119,16 @@ operationRouter
       if(topped) ctx.throw(400, '该帖子在您操作前已经被置顶了，请刷新');
       if(!topped) ctx.throw(400, '该帖子在您操作前已经被取消置顶了，请刷新');
     }
-    data.targetUser = await thread.getUser();
+    data.targetUser = await thread.extendUser();
     let operation = 'setTopped';
-    if(!digest) operation = 'cancelTopped';
+    if(!topped) operation = 'cancelTopped';
     await ctx.generateUsersBehavior({
       operation,
       tid,
       fid: thread.fid,
-      isManageOp: true
+      isManageOp: true,
+      toMid: thread.toMid,
+      mid: thread.mid
     });
     await next();
   })
@@ -183,10 +187,12 @@ operationRouter
     }
     if(fid === 'recycle') {
       await ctx.generateUsersBehavior({
-        operation: moveToRecycle,
+        operation: 'moveToRecycle',
         tid,
         fid: targetThread.fid,
-        isManageOp: true
+        isManageOp: true,
+        toMid: targetThread.toMid,
+        mid: targetThread.mid
       });
     }
     await next();

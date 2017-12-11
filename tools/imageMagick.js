@@ -1,55 +1,75 @@
-const {exec} = require('child_process');
+const {spawn, exec} = require('child_process');
 const settings = require('../settings');
-const {avatarSize, sizeLimit} = settings.upload;
+const {avatarSize, sizeLimit, avatarSmallSize} = settings.upload;
 const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
 const fs = require('fs');
 const {stat} = fs;
-
-const execute = promisify(exec);
-const os = platform();
-let convert = 'magick convert',
-  identify = 'magick identify',
-  composite = 'magick composite';
-if(os === 'linux') {
-  convert = 'convert';
-  identify = 'identify';
-  composite = 'composite'
-}
-
-const attachify = async path => {
-  const {width, height} = sizeLimit.attachment;
-  await execute(
-    `${convert} ${path} -gravity southeast -resize ${width}x${height}> ${watermark} -compose dissolve -define compose:args=50 -composite -quality 90 ${path}`
-  )
+const path = require('path');
+const __projectRoot = path.resolve(__dirname, `../`);
+const execProcess = promisify(exec);
+const spawnProcess = (pathName, args, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const bat = spawn(pathName, args, options);
+    let data = '';
+    let err = '';
+    bat.stdout.on('data', (d) => {
+      data += `${d}\n`;
+    });
+    bat.stderr.on('data', (e) => {
+      err += `${e}\n`;
+    });
+    bat.on('close', (code) => {
+      if(code !== 0) {
+        reject(err);
+      }
+      resolve(data);
+    });
+    bat.on('error', (e) => {
+      reject(e);
+    })
+  })
 };
 
-/*const attachify = async path => {
-  const {width, height} = sizeLimit.attachment;
-  await execute(
-    `${command} ${path} -gravity southeast -resize ${width}x${height}>
-    ${watermark} -compose dissoleve -define compose:args=50 -composite -quality 90 ${path}`
-  )
-};*/
+const os = platform();
+const linux = (os === 'linux');
 
-const watermarkify = async path => await execute(
-  `${composite} -dissolve 50 -gravity southeast ${watermark} ${path} ${path}`
-);
+const attachify = path => {
+  const {width, height} = sizeLimit.attachment;
+  if(linux) {
+    return spawnProcess('convert', [path, '-gravity', 'southeast', '-resize', `${width}x${height}>`, path]);
+  }
+  return spawnProcess('magick', ['convert', path, '-gravity', 'southeast', '-resize', `${width}x${height}>`, path]);
+};
+
+
+const watermarkify = path => {
+  if(linux) {
+    return spawnProcess('composite', ['-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
+  }
+  return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
+}
 
 const info = async path => {
-  const back = await execute(
-    `${identify} -format %wx%h ${path}`
-  );
-  const {stdout} = back;
-  const sizeInfo = stdout.match(/^(.*)x(.*)$/);
+  let back;
+  if(linux) {
+    back = await spawnProcess('identify', ['-format', '%wx%h', path]);
+  } else {
+    back = await spawnProcess('magick', ['identify', '-format', '%wx%h', path]);
+  }
+  back = back.replace('\n', '');
+  const sizeInfo = back.split('x');
   const [width, height] = sizeInfo;
   return {width, height}
 };
 
-const thumbnailify = async (path, dest) => await execute(
-  `${convert} ${path} -thumbnail 64x64 -strip -background wheat -alpha remove ${dest}`
-);
+const thumbnailify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '64x64', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '64x64', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+};
 
 const generateAdPost = async (path, name) => {
   let stats;
@@ -58,48 +78,67 @@ const generateAdPost = async (path, name) => {
   } catch(e) {
     stats = null
   }
+  let url;
   if(stats) {
-    await execute(
-      `${convert} ${path} -resize 640 ${name}`
-    );
+    url = path;
   } else {
-    await execute(
-      `${convert} ${banner} -resize 640 ${name}`
-    )
+    url = banner;
   }
-  const size = await execute(`${identify} -format %G ${name}`)
-  const arr = size.stdout.split('x');
-  const height = arr[1];
-  await execute(`
-    ${convert} ${name} -crop 640x360+0+${Math.round(height/2 - 180)} ${name}
-  `);
-  await execute(`
-    ${convert} ${name} -resize 640x360 ${name}
-  `)
+  if(linux) {
+    await spawnProcess('convert', [url, '-resize', '640', name]);
+    const size = await spawnProcess('identify', ['-format', '%G', name]);
+    const arr = size.stdout.split('x');
+    const height = arr[1];
+    await spawnProcess('convert',[name, '-crop', `640x360+0+${Math.round(height/2 - 180)}`, name]);
+    await spawnProcess('convert', [name, '-resize', '640x360', name]);
+  } else {
+    await spawnProcess('magick', ['convert', url, '-resize', '640', name]);
+    const size = await spawnProcess('magick', ['identify', '-format', '%G', name]);
+    const arr = size.stdout.split('x');
+    const height = arr[1];
+    await spawnProcess('magick',['convert', name, '-crop', `640x360+0+${Math.round(height/2 - 180)}`, name]);
+    await spawnProcess('magick', ['convert', name, '-resize', '640x360', name]);
+  }
 };
 
-const bannerify = path => execute(`
-  ${convert} ${path} -resize ${sizeLimit.banner}^ -gravity Center -quality 90 -crop ${sizeLimit.banner}+0+0 ${path}
-`);
+const bannerify = path => {
+  const {banner} = sizeLimit;
+  if(linux) {
+    return spawnProcess('convert', [
+      path, '-resize', `${banner.width}x${banner.height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${banner.width}x${banner.height}+0+0`, path]);
+  }
+  return spawnProcess('magick', ['convert', path, '-resize', `${banner.width}x${banner.height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${banner.width}x${banner.height}+0+0`, path]);
+};
 
-const avatarify = path => execute(`
-  ${convert} ${path} -strip -thumbnail -resize ${avatarSize}x${avatarSize}^ -gravity Center -quality 90 -crop ${avatarSize}x${avatarSize}+0+0 ${path}
-`);
+const avatarify = path => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-gravity', 'Center', '-crop', `${avatarSize}x${avatarSize}+0+0`, path]);
+  }
+  return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-gravity', 'Center', '-crop', `${avatarSize}x${avatarSize}+0+0`, path]);
+};
 
-/*const avatarify = path => execute(
-  `${convert} ${path} -strip -thumbnail ${avatarSize}x${avatarSize}^> -gravity Center -qulity 90 -crop ${avatarSize}x${avatarSize}+0+0 ${path}`
-);*/
+const avatarSmallify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', `${avatarSmallSize}x${avatarSmallSize}`, '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', `${avatarSmallSize}x${avatarSmallSize}`, '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+};
+
+const npmInstallify = () => {
+  return spawnProcess('npm', ['install'], {
+    cwd: __projectRoot
+  });
+};
+
+const gitify = () => {
+  return spawnProcess('git', ['pull'], {
+    cwd: __projectRoot
+  });
+};
 
 const removeFile = async path => {
   return fs.unlinkSync(path);
 };
-
-
-/*(async () => {
-  const path1 = require('path').resolve('../1.jpg');
-  const path2 = require('path').resolve('../2.jpg');
-  await thumbnailify(path1, path2);
-})();*/
 
 
 module.exports = {
@@ -109,7 +148,10 @@ module.exports = {
   info,
   thumbnailify,
   generateAdPost,
+  avatarSmallify,
   bannerify,
+  npmInstallify,
+  gitify,
   removeFile
 };
 

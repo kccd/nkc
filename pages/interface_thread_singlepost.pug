@@ -76,7 +76,9 @@
       -if(end !== -1)
         -var postContent = targetPost.c.slice(end+8);
         -var quoteBegin = targetPost.c.match(/\[.*?\]/)[0];
-        -targetPost.c = quoteBegin + '[/quote]' + postContent;
+        -if (quoteBegin.length === 4)
+          -targetPost.c = quoteBegin + '[/quote]' + postContent;
+        -else targetPost.c = post.c
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(targetPost)
         if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]

@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const usersSubscribeSchema = new Schema({
 	uid: {
 		type: String,
-		unique: true
+		unique: true,
+    required: true
 	},
 	subscribeForums: {
 		type: [String],
@@ -19,7 +20,11 @@ const usersSubscribeSchema = new Schema({
 		type: [String],
 		default: []
 	}
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 usersSubscribeSchema.virtual('subscribersObj')
   .get(function() {

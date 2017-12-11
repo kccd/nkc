@@ -81,7 +81,7 @@ const usersBehaviorSchema = new Schema({
   }
 });
 
-const UsersBehaviorModel = mongoose.model('usersBehavior', usersBehaviorSchema, 'usersBehavior');
+const UsersBehaviorModel = mongoose.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 
 let skip = 0;
 const limit = 1000;

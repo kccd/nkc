@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const nkcModules = require('../../nkcModules');
-let dbFn = nkcModules.dbFunction;
-let apiFn = nkcModules.apiFunction;
+const dbFn = nkcModules.dbFunction;
+const apiFn = nkcModules.apiFunction;
+const {npmInstallify, gitify} = require('../../tools/imageMagick');
 const experimentalRouter = new Router();
 
 let tlv = 0;
@@ -21,7 +22,7 @@ experimentalRouter
     const userLength = await db.UserModel.count();
     const paging = apiFn.paging(page, userLength);
     let users = await db.UserModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    users = await Promise.all(users.map(user => user.extend()));
+    await Promise.all(users.map(user => user.extend()));
     data.page = paging;
     data.users = users;
     ctx.template = 'interface_new_users.pug';
@@ -100,8 +101,52 @@ experimentalRouter
     }));
     await next();
   })
-  .get('/behaviors', async (ctx, next) => {
+  .get('/behavior', async (ctx, next) => {
     const {data, db} = ctx;
+    const {from, ip, to, type, sort} = ctx.query;
+    data.from = from;
+    data.to = to;
+    data.type = type;
+    data.sort = sort;
+    data.ip = ip
+    const q = [];
+    const s = {timeStamp: -1};
+    const page = ctx.query.page || 0;
+    if(from) q.push({uid: from});
+    if(to) q.push({toUid: to});
+    if(ip) q.push({ip});
+    if(type === 'management') {
+      q.push({isManageOp: true});
+    } else if(type === 'normal') {
+      q.push({isManageOp: false});
+    } else {
+      q.push({timeStamp: {$ne: null}})
+    }
+    if(sort) s.timeStamp = 1;
+    const length = await db.UsersBehaviorModel.count({$and: q});
+    const paging = apiFn.paging(page, length);
+    data.paging = paging;
+    const usersBehavior = await db.UsersBehaviorModel.find({$and: q}).sort(s).skip(paging.start).limit(paging.perpage);
+    data.behaviorLogs = await Promise.all(usersBehavior.map(async log => {
+      log.user = await db.UserModel.findOnly({uid: log.uid});
+      log.toUser = await db.UserModel.findOnly({uid: log.toUid});
+      if(log.tid) {
+        log.thread = await db.ThreadModel.findOnly({tid: log.tid});
+        log.link = `/t/${log.tid}`;
+      }
+      if(log.pid) {
+        const {pid} = log;
+        log.post = await db.PostModel.findOnly({pid: pid});
+        let pidArr = await db.PostModel.find({tid: log.tid}, {_id: 0, pid: 1}).sort({toc: 1});
+        pidArr = pidArr.map(p => p.pid);
+        const postIndex = pidArr.indexOf(pid);
+        let page = Math.ceil(postIndex/paging.perpage);
+        if(page <= 1) page = `?`;
+        else page = `?page=${page - 1}`;
+        log.link += `${page}#${pid}`;
+      }
+      return log;
+    }));
     ctx.template = 'interface_behavior_log.pug';
     await next();
   })
@@ -116,7 +161,7 @@ experimentalRouter
       const t3 = Date.now();
       const targetUser = await db.UserModel.findOne({uid: user.uid});
       await targetUser.updateUserMessage();
-      console.log(`总数: ${userArr.length} - 现在: ${i} - uid: ${user.uid} - time: ${Date.now() - t3}ms`);
+      console.log(`总数: ${userArr.length} - 第: ${i} - uid: ${user.uid} - time: ${Date.now() - t3}ms`);
     }
     console.log(`总耗时: ${Date.now() - t}ms`);
     data.message = '更新所有用户数据成功';
@@ -136,9 +181,17 @@ experimentalRouter
       if(i >= threadsCount) break;
       const thread = await db.ThreadModel.findOne().skip(i);
       await thread.updateThreadMessage();
-      console.log(`${i} - ${thread.tid} - ${threadsCount}`);
+      console.log(`总数：${threadsCount} - 第：${i} - tid: ${thread.tid}`);
     }
     data.message = '更新所有帖子数据成功';
+    await next();
+  })
+  .patch('/npmInstall', async (ctx, next) => {
+    ctx.data.message = await npmInstallify();
+    await next();
+  })
+  .patch('/gitPull', async (ctx, next) => {
+    ctx.data.message = await gitify();
     await next();
   });
 

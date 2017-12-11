@@ -2,8 +2,9 @@ module.exports = async (ctx, next) => {
   const {port, ip, settings} = ctx;
   const {UsersBehaviorModel} = ctx.db;
   const {scoreMap} = settings.user;
-  ctx.generateUsersBehavior = async function(obj, targetUser) {
-    let {user} = ctx.data;
+  ctx.generateUsersBehavior = async function(obj) {
+    let {user, targetUser} = ctx.data;
+    ctx.print('targetUser', targetUser)
     if(!targetUser)
       targetUser = user;
     const attributeChange = scoreMap[obj.operation];
