@@ -60,7 +60,6 @@ const info = async path => {
   }
   back = back.replace('\n', '');
   const sizeInfo = back.split('x');
-  console.log(sizeInfo)
   const [width, height] = sizeInfo;
   return {width, height}
 };
