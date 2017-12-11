@@ -19,6 +19,7 @@ const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
+const adRouter = require('./ad');
 const rtRouter = require('./rt');
 const qrCodeRouter = require('./qrcode');
 // -----------------------------------
@@ -32,7 +33,7 @@ otherRouter
     let t = Date.now();
 
     const visibleFid = await ctx.getVisibleFid();
-
+    const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
     let tidArr = await db.ThreadModel.aggregate([
       {$sort: {toc: -1}},
       {
@@ -71,13 +72,12 @@ otherRouter
         $project: {tid: 1, resource: 1}
       },
       {
-        $match: {'resource': {$elemMatch: {ext: {$in: ['jpg', 'png', 'svg', 'jpeg']}}}}
+        $match: {'resource': {$elemMatch: {ext: {$in: imgArr}}}}
       },
       {$group: {_id: '$tid'}},
       {$limit: 200},
       {$sample: {size: 6}}
     ]);
-    const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
     const threads = await db.ThreadModel.find({tid: {$in: tidArr}});
     data.newestDigestThreads = await Promise.all(threads.map(async thread => {
       await thread.extendFirstPost().then(async p => {
@@ -92,39 +92,6 @@ otherRouter
       }
       return thread;
     }));
-    /*let threads = await db.ThreadModel.find(
-      {
-        fid: {$in: visibleFid},
-        hasImage: true,
-        disabled: false,
-        digest: true
-      }
-    ).sort(
-      {
-        toc: -1
-      }
-    ).limit(200);
-
-    const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
-    const temp = [];
-    for (let i = 0; i < 6; i++) {
-      let j = 200 - i;
-      let index = Math.floor(Math.random() * j);
-      const targetThread = threads[index];
-      await targetThread.extendFirstPost().then(async p => {
-        await p.extendUser();
-        await p.extendResources();
-      });
-      for (let r of targetThread.firstPost.resources) {
-        if(imgArr.includes(r.ext)){
-          targetThread.src = r.rid;
-          break;
-        }
-      }
-      temp.push(targetThread);
-      threads.splice(index, 1);
-    }*/
-
     let t1 = Date.now();
 
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
@@ -172,5 +139,6 @@ otherRouter
   .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
+  .use('ad', adRouter.routes(), adRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

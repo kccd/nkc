@@ -71,7 +71,6 @@ settingSchema.methods.extend = async function() {
 
 settingSchema.methods.extendAds = async function() {
   const ThreadModel = require('./ThreadModel');
-  const PostModel = require('./PostModel');
   const adThreads = await Promise.all(this.ads.map(async tid => {
     const thread = await ThreadModel.findOnly({tid});
     await thread.extendFirstPost();

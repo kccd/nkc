@@ -169,6 +169,11 @@ const certificates ={
         },
         [GET]: true
       },
+      ad: {
+        [parameter]: {
+          [GET]: true
+        }
+      },
       avatar_small: {
         [parameter]: {
           [GET]: true

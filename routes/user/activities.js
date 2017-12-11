@@ -23,11 +23,13 @@ activitiesRouter
       $or: [
         {uid: targetUser.uid},
         {mid: targetUser.uid},
-        {toMid: targetUser.uid},
-        {uid: {$in: subscribeUsers}}
+        {toMid: targetUser.uid}
       ],
       tid: {$ne: null}
     };
+    if(user.uid === uid) {
+      q.$or.push({uid: {$in: subscribeUsers}});
+    }
     const length = await db.UsersBehaviorModel.count(q);
     const paging = apiFn.paging(page, length);
     data.paging = paging;

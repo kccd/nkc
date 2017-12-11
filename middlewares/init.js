@@ -16,12 +16,13 @@ module.exports = async (ctx, next) => {
   ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.getcode = false;
   ctx.print = (value1, value2) => {
-    if(value2){
-      console.log(`---------------------${value2}-------------------------`);
+    if(value2 !== undefined){
+      console.log(`---------------------${value1}-------------------------`);
+      console.log(value2);
     } else {
       console.log(`--------------------------------------------------------`);
+      console.log(value1);
     }
-    console.log(value1);
   };
   Object.defineProperty(ctx, 'template', {
     get: function() {

@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const operationRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
+const path = require('path');
 const tools = require('../../tools');
 const {imageMagick} = tools;
 operationRouter
@@ -40,9 +41,10 @@ operationRouter
     const ads = setting.ads;
     const index = ads.findIndex((elem, i, arr) => elem === tid);
     const targetUser = await thread.extendUser();
+    const targetAdPath = path.resolve(__dirname, `../../resources/ad_posts/${tid}.jpg`);
     if(index > -1) {
       ads.splice(index, 1);
-      await imageMagick.removeFile(`./resources/ad_posts/${tid}.jpg`);
+      await imageMagick.removeFile(targetAdPath);
     } else {
       if(ads.length === 6) {
         ads.shift();
@@ -54,15 +56,13 @@ operationRouter
         {$match:{rid: {$in: resourceArr}}},
         {$match: {ext: {$in: ['jpg', 'png', 'svg', 'jpeg']}}},
       ]))[0];
+      let filePath;
       if(resource) {
-        const name = `./resources/ad_posts/${tid}.jpg`;
-        const path = `./resources/upload${resource.path}`;
-        await imageMagick.generateAdPost(path, name);
+        filePath = path.resolve(__dirname, `../../resources/upload${resource.path}`);
       } else {
-        const path = `./resources/newavatar/${targetUser.uid}.jpg`;
-        const name = `./resources/ad_posts/${tid}.jpg`;
-        await imageMagick.generateAdPost(path, name);
+        filePath = path.resolve(__dirname, `../../resources/avatars/${targetUser.uid}.jpg`);
       }
+      await imageMagick.generateAdPost(filePath, targetAdPath);
     }
     await setting.update({ads});
     await next();

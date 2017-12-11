@@ -11,9 +11,13 @@ resourceRouter
   })
   .get('/:rid', async (ctx, next) => {
     const {rid} = ctx.params;
-    const resource = await ctx.db.ResourceModel.findOne({rid});
+    const {data, db} = ctx;
+    const resource = await db.ResourceModel.findOnly({rid});
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
+    if(!extArr.includes(resource.ext) && data.userLevel < 1) ctx.throw(401, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
     ctx.filePath = ctx.settings.upload.uploadPath + path;
+    ctx.resource = resource;
     ctx.type = ext;
     ctx.set('Accept', 'application/*');
     await next()

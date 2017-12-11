@@ -48,7 +48,7 @@ router
       ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.')
     }
     await imageMagick.avatarify(path);
-    const saveName = uid + '.' + extension;
+    const saveName = uid + '.jpg';
     const {avatarPath, avatarSmallPath} = settings.upload;
     const targetFile = avatarPath + '/' + saveName;
     const targetSmallFile = avatarSmallPath + '/' + saveName;

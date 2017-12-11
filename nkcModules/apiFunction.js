@@ -123,4 +123,15 @@ fn.checkPass = (s) => {
   return (ls >= 2);
 };
 
+fn.encodeRFC5987ValueChars = (str) => {
+  return encodeURIComponent(str).
+  // 注意，仅管 RFC3986 保留 "!"，但 RFC5987 并没有
+  // 所以我们并不需要过滤它
+  replace(/['()]/g, escape). // i.e., %27 %28 %29
+  replace(/\*/g, '%2A').
+  // 下面的并不是 RFC5987 中 URI 编码必须的
+  // 所以对于 |`^ 这3个字符我们可以稍稍提高一点可读性
+  replace(/%(?:7C|60|5E)/g, unescape);
+};
+
 module.exports = fn;
