@@ -150,7 +150,6 @@ function nkc_render(options){
       openTag: function(params,content) {
         params = params? params.slice(1).split(','): '';
         var username = '';
-        console.log(params);
         if(!params || params.length !== 4) {
           username = params?(params.length?'引用 ' + params[2]+':<br>':''):''
         } else {
@@ -334,7 +333,6 @@ function nkc_render(options){
       case 'svg':
 
       case 'bmp': //for S.D.P's post
-
       if(!allthumbnail)replaced =
       '<a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>'
 
@@ -371,7 +369,7 @@ function nkc_render(options){
       +'<a class="PostResourceDownloadLink" href="/r/'+rid+'" >'
       +'<img class="PostResourceDownloadThumbnail" src="/default/default_thumbnail.png"/>'+oname_safe+'</a>'
       +'<span class="PostResourceFileSize">'+fileSizeString+'</span>' + '<span class="PostResourceCounter">'+hits+'</span>'
-      +'</div>'
+      +'</div>';
     }
 
     return replaced
@@ -388,6 +386,7 @@ function nkc_render(options){
         var r = post.resources[i]
         if(r.rid===rid){
           r._used = true;
+          console.log(r);
           return getHTMLForResource(r)
         }
       }
@@ -397,7 +396,7 @@ function nkc_render(options){
 
   var pwbb_experimental = function(post,isHTML){
     var content = post.c||''
-
+    
     var html = ''
 
     if(!isHTML){  //bbcode
@@ -465,7 +464,6 @@ function nkc_render(options){
     var content = post.c||''
     var lang = post.l||''
     var renderedHTML = ''
-
     switch (lang) {
       case 'html':
       renderedHTML = pwbb_experimental(post,true) //straight thru html

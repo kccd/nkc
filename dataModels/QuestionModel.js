@@ -38,7 +38,11 @@ const questionSchema = new Schema({
     type: [String],
     required: true
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 questionSchema.virtual('user')
   .get(function() {

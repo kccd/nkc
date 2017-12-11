@@ -54,6 +54,12 @@ const certificates ={
           [GET]: true
         }
       },
+      qr: {
+        [name]: '二维码',
+        [parameter]: {
+          [GET]: true
+        }
+      },
       activities: {
         [name]: '个人动态',
         [parameter]: {
@@ -593,6 +599,14 @@ const certificates ={
     inheritFrom: ['editor'],
     permittedOperations: {
       e: {
+        gitPull: {
+          [name]: 'git pull',
+          [PATCH]: true
+        },
+        npmInstall: {
+          [name]: 'npm install',
+          [PATCH]: true
+        },
         newSysinfo: {
           [name]: '系统通知',
           [GET]: true,

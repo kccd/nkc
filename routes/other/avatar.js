@@ -65,7 +65,7 @@ router
       } catch(e){}
     }
     await promisify(fs.rename)(path, targetFile);
-    await imageMagick.avatarSmallIfy(targetFile, targetSmallFile);
+    await imageMagick.avatarSmallify(targetFile, targetSmallFile);
     await next();
   });
 

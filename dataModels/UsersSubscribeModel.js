@@ -19,7 +19,11 @@ const usersSubscribeSchema = new Schema({
 		type: [String],
 		default: []
 	}
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 usersSubscribeSchema.virtual('subscribersObj')
   .get(function() {

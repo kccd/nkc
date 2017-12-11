@@ -192,7 +192,8 @@ block content
                       p.lighttext#airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
                     div#changeDisNone
                       canvas#qrcode
-
+                      // 生成二维码图片
+                      //img(src=`/qr/${data.thread.tid}` style='height: 93px; width: 93px;opacity:0.35;filter:Alpha(opacity=35)')
 
             include interface_navigation_paging.pug
             //hr.ThreadTitleHr

@@ -24,7 +24,19 @@ const settingSchema = new Schema({
     collections: Number,
     sms: Number
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
+
+settingSchema.virtual('adThreads')
+  .get(function() {
+    return this._adThreads;
+  })
+  .set(function(ads) {
+    this._adThreads = ads;
+  })
 
 async function operateSystemID(type, op) {
   if(op !== 1 && op !== -1)
@@ -56,6 +68,17 @@ settingSchema.methods.extend = async function() {
   targetSetting.ads = ads;
   return targetSetting;
 };
+
+settingSchema.methods.extendAds = async function() {
+  const ThreadModel = require('./ThreadModel');
+  const PostModel = require('./PostModel');
+  const adThreads = await Promise.all(this.ads.map(async tid => {
+    const thread = await ThreadModel.findOnly({tid});
+    await thread.extendFirstPost();
+    return thread;
+  }));
+  return this.adThreads = adThreads;
+}
 
 /*let Setting = mongoose.model('settings', settingSchema);
 new Setting({uid: 'system',ads: [1], popPersonalForums:[1],counters:{

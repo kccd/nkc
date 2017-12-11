@@ -187,7 +187,7 @@ operationRouter
     }
     if(fid === 'recycle') {
       await ctx.generateUsersBehavior({
-        operation: moveToRecycle,
+        operation: 'moveToRecycle',
         tid,
         fid: targetThread.fid,
         isManageOp: true,

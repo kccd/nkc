@@ -9,6 +9,7 @@ const pfAvatarPath = path.resolve('resources/pf_avatars');
 const avatarPath = path.resolve('resources/avatars');
 const avatarSmallPath = path.resolve('resources/avatars_small');
 const thumbnailPath = path.resolve('resources/thumbnails');
+const qrCodePath = path.resolve('resources/qr');
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -57,6 +58,7 @@ module.exports = {
   avatarPath,
   avatarSmallPath,
   thumbnailPath,
+  qrCodePath,
   avatarSize: 192,
   avatarSmallSize: 48
 };

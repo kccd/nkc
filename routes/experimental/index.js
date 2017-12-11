@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const nkcModules = require('../../nkcModules');
-let dbFn = nkcModules.dbFunction;
-let apiFn = nkcModules.apiFunction;
+const dbFn = nkcModules.dbFunction;
+const apiFn = nkcModules.apiFunction;
+const {npmInstallify, gitify} = require('../../tools/imageMagick');
 const experimentalRouter = new Router();
 
 let tlv = 0;
@@ -21,7 +22,7 @@ experimentalRouter
     const userLength = await db.UserModel.count();
     const paging = apiFn.paging(page, userLength);
     let users = await db.UserModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    users = await Promise.all(users.map(user => user.extend()));
+    await Promise.all(users.map(user => user.extend()));
     data.page = paging;
     data.users = users;
     ctx.template = 'interface_new_users.pug';
@@ -183,6 +184,14 @@ experimentalRouter
       console.log(`总数：${threadsCount} - 第：${i} - tid: ${thread.tid}`);
     }
     data.message = '更新所有帖子数据成功';
+    await next();
+  })
+  .patch('/npmInstall', async (ctx, next) => {
+    ctx.data.message = await npmInstallify();
+    await next();
+  })
+  .patch('/gitPull', async (ctx, next) => {
+    ctx.data.message = await gitify();
     await next();
   });
 

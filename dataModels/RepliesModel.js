@@ -21,7 +21,11 @@ const repliesSchema = new Schema({
     required: true,
     index: 1
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 repliesSchema.virtual('fromPost')
   .get(function() {

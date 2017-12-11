@@ -20,6 +20,7 @@ const dbFn = nkcModules.dbFunction;
 const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
 const rtRouter = require('./rt');
+const qrCodeRouter = require('./qrcode');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
@@ -143,7 +144,7 @@ otherRouter
     data.indexForumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
-    data.ads = (await systemSetting.extend()).ads;
+    data.ads = await systemSetting.extendAds();
 
     let t3 = Date.now();
     if(data.user) data.userThreads = await data.user.getUsersThreads();
@@ -170,5 +171,6 @@ otherRouter
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
   .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
+  .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
 module.exports = otherRouter;

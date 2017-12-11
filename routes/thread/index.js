@@ -87,8 +87,8 @@ threadRouter
       pid: _post.pid,
       tid: thread.tid,
       fid: thread.fid,
-      mid: thread.uid,
-      toMid: thread.uid,
+      mid: thread.mid,
+      toMid: thread.toMid,
     });
     await thread.update({$inc: {count: 1}});
     const type = ctx.request.accepts('json', 'html');

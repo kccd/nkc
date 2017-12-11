@@ -166,15 +166,13 @@ var nkc_editor = function(){
 
     if(!render||!render.resource_extractor)return undefined;
     if(!list||!list.rlist)return undefined;
-
     var arr = text.match(render.resource_extractor)
     if(!arr)return undefined
-
-    var rarr = []
+    var rarr = [];
     arr.map(function(item){
       var reskey = item.replace(render.resource_extractor,'$1')
       list.rlist.map(function(item){
-        if(item._key==reskey){
+        if(item.rid==reskey){
           rarr.push(item)
         }
       })
@@ -188,14 +186,13 @@ var nkc_editor = function(){
     //     }
     //   }
     // }
-
     return rarr
   }
 
   editor.update = function(){
 
     var post = editor.assemblePostObject()
-    post.r = extract_resource_from_tag(post.c)
+    post.resources = extract_resource_from_tag(post.c)
 
     var title = post.t||""
     if(!title.length){
@@ -210,9 +207,7 @@ var nkc_editor = function(){
 
     var content = post.c
     var parsedcontent = '';
-
     parsedcontent = render.experimental_render(post)
-
     hset('parsedcontent',parsedcontent);
   }
 

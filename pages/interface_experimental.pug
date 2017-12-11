@@ -25,9 +25,9 @@ block content
             button.btn.btn-default(onclick="nkcAPI('/e/updateAllUsers', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部用户数据
             hr
             h4 危险操作 [ 通常你也没有权限点击 ]
-            button.btn.btn-default(onclick="nkcAPI('gitpull').then(jalert).catch(jalert)") git pull
+            button.btn.btn-default(onclick="nkcAPI('/e/gitPull', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") git pull
             button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze
-            button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") npm install
+            button.btn.btn-default(onclick="nkcAPI('/e/npmInstall', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") npm install
             span &nbsp;
             a.btn.btn-default(href="/danger") 危险
             hr

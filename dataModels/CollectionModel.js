@@ -29,7 +29,11 @@ let CollectionSchema = new Schema({
     required: true,
     index: 1
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
 
 CollectionSchema.virtual('thread')
   .get(function() {
