@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const usersSubscribeSchema = new Schema({
 	uid: {
 		type: String,
-		unique: true
+		unique: true,
+    required: true
 	},
 	subscribeForums: {
 		type: [String],
