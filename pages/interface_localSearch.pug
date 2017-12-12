@@ -15,13 +15,18 @@ block content
   .container
     .row      
       .col-xs-12
+        .form-inline
+          .form-group
+            input#stringToSearch.form-control(type='text' value='#{data.searchstring}')
+          .form-group
+            button#research.btn.btn-primary() 搜索
         .SearchStatistics
           span 搜索用户的结果：
         ul(class="nav nav-tabs")
           li(class="active")
-            a(href="#SearchOneUser" data-toggle="tab") 搜索到的用户
+            a(href="#SearchOneUser" data-toggle="tab") 内容
           li
-            a(href="#SearchUsers" data-toggle="tab") 相似的用户
+            a(href="#SearchUsers" data-toggle="tab") 用户
         
         div(class="tab-content")
           if oneUser
@@ -105,12 +110,8 @@ block content
         - var next_button_useful = Math.min(sr.hits.total,data.start+sr.hits.hits.length) !== sr.hits.total
           .form-group(style='#{next_button_useful?"":"display:none"}')
             button#nextPageResult.btn.btn-success() 下一页
-        
-        .form-inline
-          .form-group
-            input#stringToSearch.form-control(type='text' value='#{data.searchstring}')
-          .form-group
-            button#research.btn.btn-primary() 搜索
+
+
   
   include debug_output.pug
   

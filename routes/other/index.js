@@ -21,6 +21,7 @@ const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
 const rtRouter = require('./rt');
 const qrCodeRouter = require('./qrcode');
+const searchRouter = require('./search');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
@@ -172,5 +173,6 @@ otherRouter
   .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
-  .use('default', defaultRouter.routes(), defaultRouter.allowedMethods());
+  .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
+  .use('search', searchRouter.routes(), searchRouter.allowedMethods());
 module.exports = otherRouter;

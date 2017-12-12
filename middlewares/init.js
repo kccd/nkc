@@ -1,6 +1,7 @@
 const tools = require('../tools');
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
+const {client} = settings.elastic;
 const db = require('../dataModels');
 const {logger} = nkcModules;
 
@@ -15,6 +16,8 @@ module.exports = async (ctx, next) => {
   ctx.data.site = settings.site;
   ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.getcode = false;
+  ctx.es = client;
+
   ctx.print = (value1, value2) => {
     if(value2){
       console.log(`---------------------${value2}-------------------------`);
