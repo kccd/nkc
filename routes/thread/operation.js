@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
 const nkcModules = require('../../nkcModules');
-const dbFn = nkcModules.dbFunction;
 const path = require('path');
 const tools = require('../../tools');
 const {imageMagick} = tools;
@@ -78,10 +77,8 @@ operationRouter
     if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
     if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
     const obj = {digest: false};
-    let number = -1;
     if(digest) {
       obj.digest = true;
-      number = 1;
     }
     await thread.update(obj);
     if(thread.digest === digest) {
@@ -89,8 +86,6 @@ operationRouter
       if(digest) ctx.throw(400, '该贴子在您操作前已经被设置成精华了，请刷新');
     }
     data.targetUser = await thread.extendUser();
-    const targetForum = await db.ForumModel.findOnly({fid: thread.fid});
-    await targetForum.setCountOfDigestThread(number);
     let operation = 'setDigest';
     if(!digest) operation = 'cancelDigest';
     await ctx.generateUsersBehavior({
@@ -101,6 +96,7 @@ operationRouter
       toMid: thread.toMid,
       mid: thread.mid
     });
+    await thread.updateThreadMessage();
     await next();
   })
   .patch('/topped', async (ctx, next) => {
@@ -130,6 +126,7 @@ operationRouter
       toMid: thread.toMid,
       mid: thread.mid
     });
+    await thread.updateThreadMessage();
     await next();
   })
   .patch('/moveThread', async (ctx, next) => {
@@ -160,10 +157,9 @@ operationRouter
     }
     let status = 0;
     try {
-      await targetThread.update({
-        cid,
-        fid
-      });
+      const q = {cid, fid};
+      q.disabled = (q.fid === 'recycle');
+      await targetThread.update(q);
       status++;
       await db.PostModel.updateMany({tid}, {$set: {fid}});
       status++;
@@ -185,6 +181,9 @@ operationRouter
       }
       ctx.throw(500, `移动帖子失败： ${err}`);
     }
+    ctx.print('t', targetThread);
+    await targetThread.updateThreadMessage();
+    await targetForum.updateForumMessage();
     if(fid === 'recycle') {
       await ctx.generateUsersBehavior({
         operation: 'moveToRecycle',

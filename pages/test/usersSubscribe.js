@@ -7,23 +7,23 @@ db = require('arangojs')('http://127.0.0.1:8529');
 db.useDatabase('rescue');
 
 let usersSubscribeSchema = new Schema({
-	uid: {
-		type: String,
-		unique: true,
+  uid: {
+    type: String,
+    unique: true,
     required: true
-	},
-	subscribeForums: {
-		type: [String],
-		default: []
-	},
-	subscribeUsers: {
-		type: [String],
-		default: []
-	},
-	subscribers: {
-		type: [String],
-		default: []
-	}
+  },
+  subscribeForums: {
+    type: [String],
+    default: []
+  },
+  subscribeUsers: {
+    type: [String],
+    default: []
+  },
+  subscribers: {
+    type: [String],
+    default: []
+  }
 });
 
 let UsersSubscribe = mongoose.model('usersSubscribe', usersSubscribeSchema, 'usersSubscribe');

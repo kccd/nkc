@@ -68,24 +68,28 @@ smsRouter
       } else {
         targetUid = smsList[i].r;
       }
-      if(docs.length === 0) {
-        fromUser = (await db.UserModel.findOne({uid: targetUid})).toObject();
-        fromUser.group = [];
-        fromUser.group.push(smsList[i]);
-        docs.push(fromUser);
+      const docsLength = docs.length;
+      if(docsLength === 0) {
+        fromUser = await db.UserModel.findOne({uid: targetUid});
+        if(fromUser){
+          fromUser.group = [];
+          fromUser.group.push(smsList[i]);
+          docs.push(fromUser);
+        }
         continue;
       }
-      const docsLength = docs.length;
       for (let j = 0; j < docsLength; j++) {
         if(docs[j].uid === targetUid) {
           docs[j].group.push(smsList[i]);
           break;
         }
         if(j === docs.length - 1) {
-          fromUser = (await db.UserModel.findOne({uid: targetUid})).toObject();
-          fromUser.group = [];
-          fromUser.group.push(smsList[i]);
-          docs.push(fromUser);
+          fromUser = await db.UserModel.findOne({uid: targetUid});
+          if(fromUser){
+            fromUser.group = [];
+            fromUser.group.push(smsList[i]);
+            docs.push(fromUser);
+          }
         }
       }
     }

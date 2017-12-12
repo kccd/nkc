@@ -16,14 +16,9 @@ block content
         h4 这是管理界面
 
     .row
-      .col-xs-12.col-md-6
+      .col-xs-12.col-md-12
         .panel.panel-default
           .panel-body
-            h4 更新数据 [ 没事请不要点击 ]
-            button.btn.btn-default(onclick="nkcAPI('/e/updateAllThreads', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部帖子数据
-            button.btn.btn-default(onclick="nkcAPI('/e/updateAllForums', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部板块数据
-            button.btn.btn-default(onclick="nkcAPI('/e/updateAllUsers', 'POST', {}).then(function(data){jalert(data.message)}).catch(jalert)") 更新全部用户数据
-            hr
             h4 危险操作 [ 通常你也没有权限点击 ]
             button.btn.btn-default(onclick="nkcAPI('/e/gitPull', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") git pull
             button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze
@@ -40,11 +35,6 @@ block content
             hr
             h4 系统
             a.marginOfA.btn.btn-default(href='/e/newSysinfo') 发新通知
-      .col-xs-12.col-md-6
-        .panel.panel-default.f12
-          .panel-body
-            h4 这里是回显
-            pre#logger
     hr
     .row
       .col-md-12(style='padding-left:0;padding-left:0;')
@@ -76,38 +66,6 @@ block content
                       span.col-md-3 #{data.forumTree[i].children[j].displayName}
                       a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumVisibilitySwitch(event, "${data.forumTree[i].children[j].fid}")`) #{buttonVSInfo}
                       a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumIsVisibleForNCCSwitch(event, "${data.forumTree[i].children[j].fid}")`) #{buttonIVInfo}
-
-
-    hr    
-    .row
-      .col-md-9
-        
-        .panel.panel-default.f12
-          .panel-body
-            :markdown
-              ## 使用手册
-              
-              据说一个好的管理面板，是不需要使用手册的。
-              
-              ## 楼操作
-              
-              对楼(post)可以进行两种操作：**编辑**与**屏蔽**。
-              
-              屏蔽(设为删除)会导致楼层对一般用户不可见。屏蔽没有时间限制。
-              
-              编辑时限因权限级别而异，若需编辑久远的楼层，直接联系论坛运维调高限制。
-              
-              编辑与屏蔽操作可直接在论坛界面进行，一般**不需要进管理界面**。
-              
-              ## 帖操作
-              
-              对单个帖子(thread)可以进行多种操作，其中加精可以在论坛界面直接进行。删除和移动，需要在管理界面进行。
-              
-              1. 浏览论坛时，**将需要操作的帖子添加到管理车**。管理车最大容量30
-              2. **打开管理界面**的时候，列表会自动从管理车加载。未来还将增加其他加载方式，方便批量操作。
-              3. **按“全选/反选”按钮**，选择列表中的所有项。也可以用鼠标单独点选。
-              4. 如果要**删除**该帖子，点“移动到回收站”。如果要**移动**到其他版块，下方有个“将选中帖子移动到”。
-              5. 操作完之后，管理车不会清空。请点“**清空我的管理车**”。
               
     
   include debug_output.pug

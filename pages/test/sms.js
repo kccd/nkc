@@ -69,6 +69,7 @@ let t1 = Date.now();
 console.log('开始读取数据');
 return db.query(`
   for s in sms
+  filter document(users, s.r) && document(users, s.s)
   return s
 `)
 

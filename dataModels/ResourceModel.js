@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 
 const resourceSchema = new Schema({
 	rid: {
-    unique: true,
     type: String,
+    unique: true,
     required: true
   },
   ext: {

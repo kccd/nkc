@@ -9,9 +9,8 @@ db.useDatabase('rescue');
 let resourcesSchema = new Schema({
   rid: {
     type: String,
-    required: true,
-    index: 1,
-    unique: true
+    unique: true,
+    required: true
   },
   ext: {
     type: String,

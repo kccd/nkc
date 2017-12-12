@@ -128,12 +128,6 @@ forumSchema.methods.getToppedThreads = async function(fidOfChildForum) {
   return threads;
 };
 
-forumSchema.methods.setCountOfDigestThread = async function(number) {
-  const obj = {tCount: this.tCount};
-  obj.tCount.digest = obj.tCount.digest + number;
-  obj.tCount.normal = obj.tCount.digest - number;
-  return await this.update(obj);
-};
 
 forumSchema.methods.updateForumMessage = async function() {
   const ThreadModel = require('./ThreadModel');

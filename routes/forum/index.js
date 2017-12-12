@@ -98,6 +98,9 @@ forumRouter
       toMid: user.uid,
     });
     const type = ctx.request.accepts('json', 'html');
+    await forum.update({$inc: {'tCount.normal': 1}});
+    await forum.updateForumMessage();
+    await user.updateUserMessage();
     if(type === 'html')
       ctx.redirect(`/t/${_post.tid}`, 303);
     await next();

@@ -352,7 +352,7 @@ const certificates ={
       me: {
         [PATCH]: true,
         [GET]: true,
-        personalsetting: {
+        settings: {
           [name]: '个人信息',
           [PATCH]: true
         },

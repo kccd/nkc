@@ -150,42 +150,6 @@ experimentalRouter
     ctx.template = 'interface_behavior_log.pug';
     await next();
   })
-  .post('/updateAllUsers', async (ctx, next) => {
-    const {data, db} = ctx;
-    const t = Date.now();
-    const userArr = await db.UserModel.find({}, {_id: 0, uid: 1});
-    console.log(`查找所有用户uid: ${Date.now()-t}ms`);
-    let i = 0;
-    for (let user of userArr) {
-      i++;
-      const t3 = Date.now();
-      const targetUser = await db.UserModel.findOne({uid: user.uid});
-      await targetUser.updateUserMessage();
-      console.log(`总数: ${userArr.length} - 第: ${i} - uid: ${user.uid} - time: ${Date.now() - t3}ms`);
-    }
-    console.log(`总耗时: ${Date.now() - t}ms`);
-    data.message = '更新所有用户数据成功';
-    await next();
-  })
-  .post('/updateAllForums', async (ctx, next) => {
-    const {data, db} = ctx;
-    const forums = await db.ForumModel.find({type: 'forum'});
-    await Promise.all(forums.map(forum => forum.updateForumMessage()));
-    data.message = '更新所有板块数据成功';
-    await next();
-  })
-  .post('/updateAllThreads', async (ctx, next) => {
-    const {data, db} = ctx;
-    const threadsCount = await db.ThreadModel.count();
-    for (let i = 0; 1; i++) {
-      if(i >= threadsCount) break;
-      const thread = await db.ThreadModel.findOne().skip(i);
-      await thread.updateThreadMessage();
-      console.log(`总数：${threadsCount} - 第：${i} - tid: ${thread.tid}`);
-    }
-    data.message = '更新所有帖子数据成功';
-    await next();
-  })
   .patch('/npmInstall', async (ctx, next) => {
     ctx.data.message = await npmInstallify();
     await next();
