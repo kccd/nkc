@@ -120,9 +120,9 @@ block content
 
                   if isAdmin
                     if data.targetUser.certs.indexOf('banned') > -1
-                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'put', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) 解除封禁
+                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'PUT', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) 解除封禁
                     else
-                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}", 'delete', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) &nbsp;封禁此人&nbsp;
+                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) &nbsp;封禁此人&nbsp;
 
         include interface_easy_post
 

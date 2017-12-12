@@ -213,6 +213,9 @@ userSchema.virtual('navbarDesc').get(function() {
     cs.push(certificates[cert].displayName);
   }
   cs = cs.join(' ');
+  if(certs.includes('banned')){
+    cs = '开除学籍';
+  }
   return {
     username: username,
     xsf: xsf,
