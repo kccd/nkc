@@ -1,15 +1,16 @@
 const Router = require('koa-router');
 const adRouter = new Router();
-const path = require('path');
-const fs = require('fs');
+const {upload} = require('../../settings');
+const {adPath, defaultAdPath} = upload;
 adRouter
   .get('/:tid', async (ctx, next) => {
+    const {fs} = ctx;
     const {tid} = ctx.params;
-    let url = path.resolve(__dirname, `../../resources/ad_posts/${tid}.jpg`);
+    let url = `${adPath}/${tid}.jpg`;
     try{
-      fs.accessSync(url);
+      await fs.access(url);
     } catch(e) {
-      url = path.resolve(__dirname, `../../resources/default_things/default_ad.jpg`);
+      url = defaultAdPath;
     }
     ctx.filePath = url;
     await next()

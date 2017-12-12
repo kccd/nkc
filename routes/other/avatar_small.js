@@ -1,21 +1,21 @@
 const Router = require('koa-router');
 const router = new Router();
-const {accessSync} = require('fs');
-const path = require('path');
-
+const {upload} = require('../../settings');
+const {avatarSmallPath, defaultAvatarSmallPath} = upload;
 router
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a uid is required.');
     await next()
   })
   .get('/:uid', async (ctx, next) => {
+    const {fs} = ctx;
     const {uid} = ctx.params;
     try {
-      const url = path.resolve(__dirname, `../../resources/avatar_small/${uid}.jpg`);
-      accessSync(url);
+      const url = `${avatarSmallPath}/${uid}.jpg`;
+      await fs.access(url);
       ctx.filePath = url;
     } catch(e) {
-      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_avatar_small.gif')
+      ctx.filePath = defaultAvatarSmallPath;
     }
     await next()
   });

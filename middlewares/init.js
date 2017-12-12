@@ -3,6 +3,8 @@ const settings = require('../settings');
 const nkcModules = require('../nkcModules');
 const db = require('../dataModels');
 const {logger} = nkcModules;
+const fs = require('fs');
+const {promisify} = require('util');
 
 module.exports = async (ctx, next) => {
   ctx.port = ctx.request.socket._peername.port;
@@ -15,6 +17,16 @@ module.exports = async (ctx, next) => {
   ctx.data.site = settings.site;
   ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.getcode = false;
+  ctx.fs = {
+    access: promisify(fs.access),
+    unlink: promisify(fs.unlink),
+    rename: promisify(fs.rename),
+    writeFile: promisify(fs.writeFile),
+    mkdir: promisify(fs.mkdir),
+    exists: promisify(fs.exists),
+    createReadStream: fs.createReadStream
+  };
+
   ctx.print = (value1, value2) => {
     if(value2 !== undefined){
       console.log(`---------------------${value1}-------------------------`);

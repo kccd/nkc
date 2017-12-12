@@ -1,15 +1,15 @@
-const path = require('path');
-const fs = require('fs');
 const apiFn = require('../nkcModules').apiFunction;
 const {encodeRFC5987ValueChars} = apiFn;
+const path = require('path');
 module.exports = async (ctx, next) => {
-  const {filePath, resource} = ctx;
+  const {filePath, resource, fs} = ctx;
   if(filePath) {
     const basename = path.basename(ctx.filePath);
     let mtime;
     try{
-      mtime = fs.statSync(filePath).mtime;
+      mtime = (await fs.stat(filePath)).mtime;
     } catch (e) {
+      ctx.print(`读取图片最后修改时间失败`, filePath);
       mtime = new Date();
     }
     let ext = path.extname(ctx.filePath);

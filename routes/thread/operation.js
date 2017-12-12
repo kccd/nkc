@@ -33,7 +33,7 @@ operationRouter
   // 首页置顶
   .patch('/ad', async (ctx, next) => {
     const {tid} = ctx.params;
-    const {db, data} = ctx;
+    const {db, data, fs} = ctx;
     const thread = await db.ThreadModel.findOnly({tid});
     if(data.userLevel < 6) ctx.throw(401, '权限不足');
     if(thread.disabled) ctx.throw(404, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
@@ -44,7 +44,7 @@ operationRouter
     const targetAdPath = path.resolve(__dirname, `../../resources/ad_posts/${tid}.jpg`);
     if(index > -1) {
       ads.splice(index, 1);
-      await imageMagick.removeFile(targetAdPath);
+      await fs.unlink(targetAdPath);
     } else {
       if(ads.length === 6) {
         ads.shift();
