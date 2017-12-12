@@ -80,13 +80,16 @@ forumRouter
       data, params, db, body, ip, query,
       generateUsersBehavior
     } = ctx;
+    const {post} = body;
+    const {c, t} = post;
+    if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
+    if(t === '') ctx.throw(400, '标题不能为空！');
     const {user} = data;
     const {fid} = params;
     const {cat, mid} = query;
     const {
       ForumModel,
     } = db;
-    const {post} = body;
     const forum = await ForumModel.findOnly({fid});
     const _post = await forum.newPost(post, user, ip, cat, mid);
     await generateUsersBehavior({

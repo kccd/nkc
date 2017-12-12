@@ -174,7 +174,7 @@ forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
   }
   const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip, cid);
-  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1}});
+  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
   await this.update({$inc: {
     'tCount.normal': 1,
     'countPosts': 1,
