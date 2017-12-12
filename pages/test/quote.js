@@ -7,8 +7,7 @@ let postsSchema = new Schema({
   pid: {
     type: String,
     unique: true,
-    required: true,
-    index: 1
+    required: true
   },
   atUsers: {
     type: Array,

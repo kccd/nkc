@@ -3,89 +3,89 @@ const {certificates} = settings.permission;
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
-  kcb: {
-    type: Number,
-    default: 0
-  },
-  toc: {
-    type: Date,
-    default: Date.now,
-    index: 1
-  },
-  xsf: {
-    type: Number,
-    default: 0
-  },
-  tlv: {
-    type: Date,
-    default: Date.now,
-  },
-  disabledPostsCount: {
-    type: Number,
-    default: 0
-  },
-  disabledThreadsCount: {
-    type: Number,
-    default: 0
-  },
-  postCount: {
-    type: Number,
-    default: 0
-  },
-  threadCount: {
-    type: Number,
-    default: 0
-  },
-  subs: {
-    type: Number,
-    default: 0
-  },
-  recCount: {
-    type: Number,
-    default: 0
-  },
-  toppedThreadsCount: {
-    type: Number,
-    default: 0
-  },
-  digestThreadsCount: {
-    type: Number,
-    default: 0,
-  },
-  score: {
-    default: 0,
-    type: Number
-  },
-  lastVisitSelf: {
-    type: Date,
-    default: Date.now
-  },
-  username: {
-    type: String,
-    required: true,
-    minlength: 1,
-    maxlength: 30,
-    unique: true
-  },
-  usernameLowerCase: {
-    type: String,
-    unique: true
-  },
-  uid: {
-    type: String,
-    unique: true,
-    required: true,
-  },
-  bday: String,
-  cart: [String],
-  description: String,
-  color: String,
-  certs: {
-    type: [String],
-    index: 1
-  },
-  introText: String,
-  postSign: String,
+    kcb: {
+      type: Number,
+      default: 0
+    },
+    toc: {
+      type: Date,
+      default: Date.now,
+      index: 1
+    },
+    xsf: {
+      type: Number,
+      default: 0
+    },
+    tlv: {
+      type: Date,
+      default: Date.now,
+    },
+    disabledPostsCount: {
+      type: Number,
+      default: 0
+    },
+    disabledThreadsCount: {
+      type: Number,
+      default: 0
+    },
+    postCount: {
+      type: Number,
+      default: 0
+    },
+    threadCount: {
+      type: Number,
+      default: 0
+    },
+    subs: {
+      type: Number,
+      default: 0
+    },
+    recCount: {
+      type: Number,
+      default: 0
+    },
+    toppedThreadsCount: {
+      type: Number,
+      default: 0
+    },
+    digestThreadsCount: {
+      type: Number,
+      default: 0,
+    },
+    score: {
+      default: 0,
+      type: Number
+    },
+    lastVisitSelf: {
+      type: Date,
+      default: Date.now
+    },
+    username: {
+      type: String,
+      required: true,
+      minlength: 1,
+      maxlength: 30,
+      unique: true
+    },
+    usernameLowerCase: {
+      type: String,
+      unique: true
+    },
+    uid: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    bday: String,
+    cart: [String],
+    description: String,
+    color: String,
+    certs: {
+      type: [String],
+      index: 1
+    },
+    introText: String,
+    postSign: String,
 },
 {toObject: {
   getters: true,
@@ -137,6 +137,13 @@ userSchema.virtual('email')
     this._email = e;
   });
 
+userSchema.virtual('group')
+  .get(function() {
+    return this._group;
+  })
+  .set(function(g) {
+    this._group = g;
+  });
 
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = require('./ThreadModel');
@@ -165,7 +172,7 @@ userSchema.methods.updateUserMessage = async function() {
   const UsersSubscribeModel = require('./UsersSubscribeModel');
   const posts = await PostModel.find({uid: this.uid}, {_id: 0, disabled: 1, recUsers: 1});
   const postCount = posts.length;
-  let disabledPostCount = 0;
+  let disabledPostsCount = 0;
   let recCount = 0;
   for (let post of posts) {
     try{
@@ -173,25 +180,25 @@ userSchema.methods.updateUserMessage = async function() {
     } catch(err) {
       return console.log(post);
     }
-    if(post.disabled) disabledPostCount++;
+    if(post.disabled) disabledPostsCount++;
   }
   const threads = await ThreadModel.find({uid: this.uid}, {_id: 0, disabled: 1, digest: 1, topped: 1});
   const threadCount = threads.length;
-  let disabledThreadCount = 0;
+  let disabledThreadsCount = 0;
   let digestThreadsCount = 0;
   let toppedThreadsCount = 0;
   for (let thread of threads) {
-    if(thread.disabled) disabledThreadCount++;
+    if(thread.disabled || thread.fid === 'recycle') disabledThreadsCount++;
     if(thread.digest) digestThreadsCount++;
     if(thread.topped) toppedThreadsCount++;
   }
   const userSubscribe = await UsersSubscribeModel.findOnly({uid: this.uid});
   const subs = userSubscribe.subscribers.length;
-  await this.update({
+  return await this.update({
     postCount,
-    disabledPostCount,
+    disabledPostsCount,
     threadCount,
-    disabledThreadCount,
+    disabledThreadsCount,
     digestThreadsCount,
     toppedThreadsCount,
     subs,

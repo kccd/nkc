@@ -169,6 +169,11 @@ const certificates ={
         },
         [GET]: true
       },
+      ad: {
+        [parameter]: {
+          [GET]: true
+        }
+      },
       avatar_small: {
         [parameter]: {
           [GET]: true
@@ -347,7 +352,7 @@ const certificates ={
       me: {
         [PATCH]: true,
         [GET]: true,
-        personalsetting: {
+        settings: {
           [name]: '个人信息',
           [PATCH]: true
         },

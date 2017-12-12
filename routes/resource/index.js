@@ -1,9 +1,6 @@
 const Router = require('koa-router');
 const resourceRouter = new Router();
-const mime = require('mime');
-const {promisify} = require('util');
-const fs = require('fs');
-
+const pathModule = require('path');
 resourceRouter
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a resource ID is required.');
@@ -11,21 +8,27 @@ resourceRouter
   })
   .get('/:rid', async (ctx, next) => {
     const {rid} = ctx.params;
-    const resource = await ctx.db.ResourceModel.findOne({rid});
+    const {data, db} = ctx;
+    const resource = await db.ResourceModel.findOnly({rid});
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
+    if(!extArr.includes(resource.ext) && data.userLevel < 1) ctx.throw(401, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
     ctx.filePath = ctx.settings.upload.uploadPath + path;
+    ctx.resource = resource;
     ctx.type = ext;
     ctx.set('Accept', 'application/*');
     await next()
   })
   .post('/', async (ctx, next) => {
+    const {fs} = ctx;
     const {imageMagick} = ctx.tools;
     const settings = ctx.settings;
     const file = ctx.body.files.file;
     if(!file)
       ctx.throw(400, 'no file uploaded');
-    const {name, size, path, type} = file;
-    const extension = name.slice(name.lastIndexOf('.') + 1, name.length);
+    const {name, size, path} = file;
+    const extension = pathModule.extname(name).replace('.', '');
+    ctx.print('ext', extension);
     const {largeImage} = settings.upload.sizeLimit;
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     const saveName = rid + '.' + extension;
@@ -49,7 +52,7 @@ resourceRouter
         }
       }
     }
-    await promisify(fs.rename)(path, descFile);
+    await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
       oname: name,

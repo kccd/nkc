@@ -5,7 +5,7 @@ const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
 const fs = require('fs');
-const {stat} = fs;
+const {stat, unlink} = fs;
 const path = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const execProcess = promisify(exec);
@@ -49,7 +49,7 @@ const watermarkify = path => {
     return spawnProcess('composite', ['-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
   }
   return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
-}
+};
 
 const info = async path => {
   let back;
@@ -86,15 +86,17 @@ const generateAdPost = async (path, name) => {
   }
   if(linux) {
     await spawnProcess('convert', [url, '-resize', '640', name]);
-    const size = await spawnProcess('identify', ['-format', '%G', name]);
-    const arr = size.stdout.split('x');
+    let size = await spawnProcess('identify', ['-format', '%G', name]);
+    size = size.replace('\n', '');
+    const arr = size.split('x');
     const height = arr[1];
     await spawnProcess('convert',[name, '-crop', `640x360+0+${Math.round(height/2 - 180)}`, name]);
     await spawnProcess('convert', [name, '-resize', '640x360', name]);
   } else {
     await spawnProcess('magick', ['convert', url, '-resize', '640', name]);
-    const size = await spawnProcess('magick', ['identify', '-format', '%G', name]);
-    const arr = size.stdout.split('x');
+    let size = await spawnProcess('magick', ['identify', '-format', '%G', name]);
+    size = size.replace('\n', '');
+    const arr = size.split('x');
     const height = arr[1];
     await spawnProcess('magick',['convert', name, '-crop', `640x360+0+${Math.round(height/2 - 180)}`, name]);
     await spawnProcess('magick', ['convert', name, '-resize', '640x360', name]);
@@ -137,7 +139,7 @@ const gitify = () => {
 };
 
 const removeFile = async path => {
-  return fs.unlinkSync(path);
+  return promisify(unlink)(path);
 };
 
 

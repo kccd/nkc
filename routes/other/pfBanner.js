@@ -1,10 +1,8 @@
 const Router = require('koa-router');
 const router = new Router();
-const fs = require('fs');
-const {accessSync} = fs;
-const path = require('path');
 const mime = require('mime');
-const {promisify} = require('util');
+const {upload} = require('../../settings');
+const {pfBannerPath, defaultPfBannerPath} = upload;
 
 router
   .get('/', async (ctx, next) => {
@@ -12,29 +10,20 @@ router
     await next()
   })
   .get('/:uid', async (ctx, next) => {
+    const {fs} = ctx;
     const {uid} = ctx.params;
     try {
-      const url = path.resolve(__dirname, `../../resources/pf_banners/${uid}.jpg`);
-      accessSync(url);
+      const url = `${pfBannerPath}/${uid}.jpg`;
+      await fs.access(url);
       ctx.filePath = url;
-    } catch(e) {}
-    try {
-      const url = path.resolve(__dirname, `../../resources/pf_banners/${uid}.jpeg`);
-      accessSync(url);
-      ctx.filePath = url;
-    } catch(e) {}
-    try {
-      const url = path.resolve(__dirname, `../../resources/pf_banners/${uid}.png`);
-      accessSync(url);
-      ctx.filePath = url;
-    } catch(e) {}
-    if(!ctx.filePath)
-      ctx.filePath = path.resolve(__dirname, '../../resources/default_things/default_pf_banner.jpg');
+    } catch(e) {
+      ctx.filePath = defaultPfBannerPath;
+    }
     await next()
   })
   .post('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
-    const {data, db, settings} = ctx;
+    const {data, db, settings, fs} = ctx;
     const {user} = data;
     const targetPersonalForum = await db.PersonalForumModel.findOnly({uid});
     if(user.uid !== uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
@@ -48,16 +37,10 @@ router
       ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.')
     }
     await imageMagick.bannerify(path);
-    const saveName = uid + '.' + extension;
+    const saveName = uid + '.jpg';
     const {pfBannerPath} = settings.upload;
     const targetFile = pfBannerPath +'/'+ saveName;
-    for(let e of extArr) {
-      const path = `${pfBannerPath}/${uid}.${e}`;
-      try{
-        fs.unlinkSync(path);
-      } catch(e){}
-    }
-    await promisify(fs.rename)(path, targetFile);
+    await fs.rename(path, targetFile);
     await next();
 });
 

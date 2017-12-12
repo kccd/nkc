@@ -62,7 +62,7 @@ let users_personalSchema = new Schema({
     default: '0.0.0.0'
   },
   regPort: {
-    type: Number,
+    type: String,
     default: '0'
   },
   tries: {

@@ -4,7 +4,6 @@ module.exports = async (ctx, next) => {
   const {scoreMap} = settings.user;
   ctx.generateUsersBehavior = async function(obj) {
     let {user, targetUser} = ctx.data;
-    ctx.print('targetUser', targetUser)
     if(!targetUser)
       targetUser = user;
     const attributeChange = scoreMap[obj.operation];

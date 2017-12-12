@@ -10,7 +10,7 @@ let answersheetsSchema = new Schema({
   key: {
     type: String,
     required: true,
-    index: 1
+    unique: true
   },
   uid: {
     type: String,

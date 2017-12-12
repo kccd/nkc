@@ -1,8 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
-const {accessSync} = require('fs');
-const path = require('path');
-
+const {upload} = require('../../settings');
+const {defaultPath} = upload;
 router
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a filename is required.');
@@ -10,7 +9,7 @@ router
   })
   .get('/:file', async (ctx, next) => {
     const {file} = ctx.params;
-    ctx.filePath = path.resolve(__dirname, `../../resources/default_things/${file}`);
+    ctx.filePath = `${defaultPath}/${file}`;
     await next()
   });
 

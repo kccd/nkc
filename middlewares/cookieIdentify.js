@@ -8,11 +8,11 @@ module.exports = async (ctx, next) => {
   } else {
     const {username, uid} = JSON.parse(decodeURI(userInfo));
     const user = await db.UserModel.findOne({uid});
-    if (user && user.username !== username) {
+    if (!user || user.username !== username) {
       ctx.cookies.set('userInfo', '');
       ctx.status = 401;
       ctx.error = new Error('缓存验证失败');
-      ctx.redirect('/login')
+      return ctx.redirect('/login')
     }
     await user.update({tlv: Date.now()});
     if(user.xsf > 0 && !user.certs.includes('qc')) user.certs.push('qc');

@@ -203,7 +203,6 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
 
 threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = require('./PostModel');
-  const ResourceModel = require('./ResourceModel');
   const posts = await PostModel.find({tid: this.tid}).sort({toc: -1});
   const count = posts.length;
   if(count === 0) return;
@@ -218,8 +217,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   const lastPost = posts[0];
   const firstPost = posts[posts.length-1];
   const updateObj = {
-    hasImage: this.hasImage,
-    hasFile: this.hasFile,
     tlm: lastPost.toc.getTime(),
     count: count,
     countRemain: countRemain,
@@ -229,20 +226,11 @@ threadSchema.methods.updateThreadMessage = async function() {
     toc: firstPost.toc.getTime(),
     uid: firstPost.uid
   };
-  if(firstPost.r) {
-    let r = firstPost.r;
-    const extArr = ['jpg', 'png', 'svg', 'jpeg'];
-    let imageNum = 0;
-    for (let i = 0; i < r.length; r++) {
-      const rFromDB = await ResourceModel.findOne({rid: r[i]});
-      if(extArr.includes(rFromDB.ext)) {
-        imageNum++;
-        updateObj.hasImage = true;
-      }
-    }
-    if(r.length > imageNum) updateObj.hasFile = true;
-  }
-  return await this.update(updateObj);
+  await this.update(updateObj);
+  const forum = await this.extendForum();
+  await forum.updateForumMessage();
+  const user = await this.extendUser();
+  await user.updateUserMessage();
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
@@ -308,7 +296,6 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     const username = quote[1];
     const quPid = quote[2];
     const quUser = await UserModel.findOnly({username});
-    const quPost = await PostModel.findOnly({pid: quPid});
     const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
     const reply = new RepliesModel({
       fromPid: pid,

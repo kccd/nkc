@@ -79,14 +79,9 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     required: true,
-    index: true
   },
   bday: String,
   cart: [String],
-  email: {
-    type: String,
-    match: /.*@.*/
-  },
   description: String,
   color: String,
   certs: {

@@ -30,6 +30,7 @@ operationRouter
       toMid: targetThread.toMid,
       mid: targetThread.mid
     });
+    await targetThread.updateThreadMessage();
     await next();
   })
   .del('/recommend', async (ctx, next) => {
@@ -51,6 +52,7 @@ operationRouter
       toMid: targetThread.toMid,
       mid: targetThread.mid
     });
+    await targetThread.updateThreadMessage();
     await next();
   })
   .get('/quote', async (ctx, next) => {

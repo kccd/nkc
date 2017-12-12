@@ -39,7 +39,7 @@ let questionsSchema = new Schema({
     required: true
   },
   answer: {
-    type: Array,
+    type: [String],
     required: true
   }
 });
@@ -108,16 +108,23 @@ db.query(`
   let toMongo = () => {
     number++;
     let data = res[n];
-    let question = new Question({
-      qid: number,
-      toc: data.toc,
-      tlm: data.tlm,
-      category: (!data.category || data.category=="null")?'undefined': data.category,
-      type: data.type,
-      question: data.question,
-      answer: data.answer,
-      uid: data.uid,
-    });
+    let question;
+    try{
+      question = new Question({
+        qid: number,
+        toc: data.toc,
+        tlm: data.tlm,
+        category: (!data.category || data.category=="null")?'undefined': data.category,
+        type: data.type,
+        question: data.question,
+        answer: data.answer,
+        uid: data.uid,
+      });
+    }catch(e) {
+      console.log('新建实例出错');
+      console.log(e);
+    }
+
     question.save()
     .then(() => {
       n++;

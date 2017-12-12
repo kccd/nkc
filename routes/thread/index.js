@@ -90,8 +90,9 @@ threadRouter
       mid: thread.mid,
       toMid: thread.toMid,
     });
-    await thread.update({$inc: {count: 1}});
+    await thread.update({$inc: [{count: 1}, {hits: 1}]});
     const type = ctx.request.accepts('json', 'html');
+    await thread.updateThreadMessage();
     if(type === 'html')
       ctx.redirect(`/t/${tid}`, 303);
     await next();

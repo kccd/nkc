@@ -377,11 +377,11 @@ function switchVInPersonalForum(tid, name, type) {
       .then(function() {
         if(target.innerHTML === hidden) {
           target.innerHTML = visible;
-          screenTopWarning('已恢复该帖在专栏的显示');
+          screenTopAlert('已恢复该帖在专栏的显示');
           return
         }
         target.innerHTML = hidden;
-        screenTopWarning('已在专栏屏蔽该帖');
+        screenTopAlert('已在专栏屏蔽该帖');
         return
       })
       .catch(function(e) {
@@ -396,11 +396,11 @@ function switchVInPersonalForum(tid, name, type) {
       .then(function() {
         if(target.innerHTML === hidden) {
           target.innerHTML = visible;
-          screenTopWarning('已恢复该帖在' + name + '的显示');
+          screenTopAlert('已恢复该帖在' + name + '的显示');
           return
         }
         target.innerHTML = hidden;
-        screenTopWarning('已在' + name + '屏蔽该帖');
+        screenTopAlert('已在' + name + '屏蔽该帖');
         return
       })
       .catch(function(e) {
@@ -415,11 +415,11 @@ function switchVInPersonalForum(tid, name, type) {
       .then(function() {
         if(target.innerHTML === hidden) {
           target.innerHTML = visible;
-          screenTopWarning('已恢复该帖在' + name + '的显示');
+          screenTopAlert('已恢复该帖在' + name + '的显示');
           return
         }
         target.innerHTML = hidden;
-        screenTopWarning('已在' + name + '屏蔽该帖');
+        screenTopAlert('已在' + name + '屏蔽该帖');
         return
       })
       .catch(function(e) {
@@ -432,7 +432,7 @@ function moveToPersonalForum(tid) {
   var target = geid('moveToPersonal')
   nkcAPI('moveToPersonalForum', {tid: tid})
     .then(function() {
-      screenTopWarning('已将该帖送回个人专栏')
+      screenTopAlert('已将该帖送回个人专栏')
       target.innerHTML = '';
     })
       .catch(function(e) {
@@ -453,11 +453,11 @@ function switchDInPersonalForum(tid, name, type) {
     nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH',{digestInMid})
       .then(function() {
         if(target.innerHTML === normal) {
-          screenTopWarning('已将该帖在个人专栏加精');
+          screenTopAlert('已将该帖在个人专栏加精');
           target.innerHTML = digest;
           return
         }
-        screenTopWarning('已取消专栏加精');
+        screenTopAlert('已取消专栏加精');
         target.innerHTML = normal;
         return
       })
@@ -472,11 +472,11 @@ function switchDInPersonalForum(tid, name, type) {
     nkcAPI('switchDInPersonalForum', {tid: tid})
       .then(function() {
         if(target.innerHTML === normal) {
-          screenTopWarning('已将该帖在' + name + '加精');
+          screenTopAlert('已将该帖在' + name + '加精');
           target.innerHTML = digest;
           return
         }
-        screenTopWarning('已取消在' + name + '的加精');
+        screenTopAlert('已取消在' + name + '的加精');
         target.innerHTML = normal;
         return
       })
@@ -491,11 +491,11 @@ function switchDInPersonalForum(tid, name, type) {
     nkcAPI('switchDInPersonalForum', {tid: tid})
       .then(function() {
         if(target.innerHTML === normal) {
-          screenTopWarning('已将该帖在' + name + '加精');
+          screenTopAlert('已将该帖在' + name + '加精');
           target.innerHTML = digest;
           return
         }
-        screenTopWarning('已取消在' + name + '的加精');
+        screenTopAlert('已取消在' + name + '的加精');
         target.innerHTML = normal;
         return
       })
@@ -518,11 +518,11 @@ function switchTInPersonalForum(tid, name, type) {
     nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH', {toppedInMid})
       .then(function() {
         if(target.innerHTML === normal) {
-          screenTopWarning('已将该帖在个人专栏置顶');
+          screenTopAlert('已将该帖在个人专栏置顶');
           target.innerHTML = topped;
           return
         }
-        screenTopWarning('已取消专栏置顶');
+        screenTopAlert('已取消专栏置顶');
         target.innerHTML = normal;
         return
       })
@@ -537,11 +537,11 @@ function switchTInPersonalForum(tid, name, type) {
     nkcAPI('switchTInPersonalForum', {tid: tid, type: type})
       .then(function() {
         if(target.innerHTML === normal) {
-          screenTopWarning('已将该帖在' + name + '置顶');
+          screenTopAlert('已将该帖在' + name + '置顶');
           target.innerHTML = topped;
           return
         }
-        screenTopWarning('已取消该贴在' + name + '的置顶');
+        screenTopAlert('已取消该贴在' + name + '的置顶');
         target.innerHTML = normal;
         return
       })
@@ -556,11 +556,11 @@ function switchTInPersonalForum(tid, name, type) {
     nkcAPI('switchTInPersonalForum', {tid: tid, type: type})
       .then(function() {
         if(target.innerHTML === normal) {
-          screenTopWarning('已将该帖在' + name + '置顶');
+          screenTopAlert('已将该帖在' + name + '置顶');
           target.innerHTML = topped;
           return
         }
-        screenTopWarning('已取消该贴在' + name + '的置顶');
+        screenTopAlert('已取消该贴在' + name + '的置顶');
         target.innerHTML = normal;
         return
       })
@@ -577,11 +577,11 @@ function adSwitch(tid) {
   nkcAPI('/t/'+tid+'/ad', 'PATCH', {})
     .then(function() {
       if(btn.innerHTML === nowIsAd) {
-        screenTopWarning('取消首页置顶成功');
+        screenTopAlert('取消首页置顶成功');
         btn.innerHTML = nowNormal;
         return
       }
-      screenTopWarning('首页置顶成功');
+      screenTopAlert('首页置顶成功');
       btn.innerHTML = nowIsAd;
     })
     .catch(function(err){

@@ -26,9 +26,9 @@ const questionSchema = new Schema({
     required: true
   },
   uid: {
-    unique: true,
     type: String,
     required: true,
+    index: 1
   },
   question: {
     type: String,

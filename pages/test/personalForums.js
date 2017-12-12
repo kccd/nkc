@@ -9,8 +9,8 @@ db.useDatabase('rescue');
 let personalForumsSchema = new Schema({
   uid: {
     type: String,
-    required: true,
-    index: 1
+    unique: true,
+    required: true
   },
   type: {
     type: String,
@@ -29,15 +29,15 @@ let personalForumsSchema = new Schema({
     required: true
   },
   moderators: {
-    type: Array,
+    type: [String],
     default: []
   },
   recPosts: {
-    type: Array,
+    type: [String],
     default: []
   },
   toppedThreads: {
-    type: Array,
+    type: [String],
     default: []
   },
   announcement: {
@@ -45,7 +45,7 @@ let personalForumsSchema = new Schema({
     default: ''
   }
 });
-
+let n = 0;
 let PersonalForums = mongoose.model('personalForums', personalForumsSchema,'personalForums');
 
 let t1 = Date.now();
@@ -65,6 +65,8 @@ db.query(`
   console.log('开始写入数据');
   let n = 0;
   let toMongo = () => {
+    n++;
+    console.log(n);
     let data = res[n];
     let personalForums = new PersonalForums(data);
     personalForums.save()
