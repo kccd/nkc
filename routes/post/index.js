@@ -18,6 +18,7 @@ postRouter
     const {user} = data;
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
+    const _post = targetPost.toObject();
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     const targetUser = await targetPost.extendUser();
     if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
