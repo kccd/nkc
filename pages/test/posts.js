@@ -3,7 +3,7 @@ mongoose.connect('mongodb://localhost/rescue', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 let Schema = mongoose.Schema;
 
-db = require('arangojs')('http://192.168.11.111');
+db = require('arangojs')('http://127.0.0.1:8529');
 db.useDatabase('rescue');
 
 let postsSchema = new Schema({
@@ -47,7 +47,8 @@ let postsSchema = new Schema({
   },
   r: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   recUsers: {
     type: [String],
@@ -107,10 +108,12 @@ let flag = 0;
 let total = 0;
 
 const fn = function() {
+  let t1 = Date.now();
   console.log('开始读取数据');
   return db.query(`
       for p in posts
-      filter document(threads, p.tid)
+      let thread = document(threads, p.tid)
+      filter thread && thread.fid
       limit ${flag}, 1000
       return p
   `)
@@ -134,7 +137,7 @@ const fn = function() {
       let toMongo = () => {
         let data = res[n];
         let post = new Posts(data);
-        post.save()
+        return post.save()
           .then(() => {
             if (m + 1000 == n) {
               m = n;
@@ -144,10 +147,10 @@ const fn = function() {
             if (n >= res.length) {
               let t2 = Date.now();
               console.log(`${res.length}条数据写入完成，耗时：${t2 - t1}ms`);
-              return;
+              flag += 1000;
+              return flag
             } else {
-              toMongo();
-              return;
+              return toMongo();
             }
           })
           .catch((err) => {
@@ -155,11 +158,10 @@ const fn = function() {
             console.log(`存数据出错:${err}`)
           });
       };
-      toMongo();
-      flag += 1000;
-      return flag
+      return toMongo();
     })
     .then(f => {
+      console.log(total + '-' + f);
       if(f < total) {
         return fn()
       } else {
@@ -169,26 +171,27 @@ const fn = function() {
 };
 db.query(`
   for p in posts
-    filter document(threads, p.tid)
+    let thread = document(threads, p.tid)
+    filter thread && thread.fid
     collect with count into length 
     return length 
 `)
   .then(c => c.next())
-  .then(length => total = length);
-
-let t1 = Date.now();
-console.log('将已删除用户的post转移到uid: 74365');
-db.query(`
-  for p in posts
-  filter !document(users, p.uid)
-  update p with{uid: '74365'} in posts
-`)
+  .then(length => total = length)
+  .then(() => {
+    console.log('将已删除用户的post转移到uid: 74365');
+    return db.query(`
+      for p in posts
+      filter !document(users, p.uid)
+      update p with{uid: '74365'} in posts
+    `)
+  })
   .then(() => {
   console.log('添加fid字段');
     return db.query(`
       for p in posts
       let thread = document(threads, p.tid)
-      filter thread
+      filter thread && thread.fid
       update p with {fid: thread.fid} in posts
     `)
   })

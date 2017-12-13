@@ -117,6 +117,7 @@ db.query(`
     console.log('开始读取数据');
     return db.query(`
     for t in threads
+    filter t.fid
     return t
 `)})
 .then(cursor => cursor.all())

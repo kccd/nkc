@@ -79,7 +79,47 @@ otherRouter
       {$limit: 200},
       {$sample: {size: 6}}
     ]);
-    const threads = await db.ThreadModel.find({tid: {$in: tidArr}});
+    const [newestDigestThreads, latestThreads, activeUsers, ads] = await Promise.all([
+      async () => {
+        const threads = await db.ThreadModel.find({tid: {$in: tidArr}});
+        return await Promise.all(threads.map(async thread => {
+          await thread.extendFirstPost().then(async p => {
+            await p.extendUser();
+            await p.extendResources();
+          });
+          for (let r of thread.firstPost.resources) {
+            if(imgArr.includes(r.ext)) {
+              thread.src = r.rid;
+              break;
+            }
+          }
+          return thread;
+        }));
+      },
+      async () => {
+        const latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
+        return await Promise.all(latestThreads.map(async thread => {
+          await thread.extendFirstPost().then(p => p.extendUser());
+          await thread.extendLastPost().then(p => p.extendUser());
+          await thread.extendForum();
+          return thread;
+        }));
+      },
+      async () => {
+        const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+        await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
+        return activeUsers;
+      },
+      async () => {
+        const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
+        return await systemSetting.extendAds();
+      }
+    ]);
+    data.newestDigestThreads = newestDigestThreads;
+    data.latestThreads = latestThreads;
+    data.activeUsers = activeUsers;
+    data.ads = ads;
+    /*const threads = await db.ThreadModel.find({tid: {$in: tidArr}});
     data.newestDigestThreads = await Promise.all(threads.map(async thread => {
       await thread.extendFirstPost().then(async p => {
         await p.extendUser();
@@ -92,10 +132,10 @@ otherRouter
         }
       }
       return thread;
-    }));
+    }));*/
     let t1 = Date.now();
 
-    let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
+    /*let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
     latestThreads = await Promise.all(latestThreads.map(async thread => {
       await thread.extendFirstPost().then(p => p.extendUser());
       await thread.extendLastPost().then(p => p.extendUser());
@@ -103,16 +143,16 @@ otherRouter
       return thread;
     }));
     data.latestThreads = latestThreads;
-
+*/
     let t2 = Date.now();
 
-    const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
+    /*const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
     await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
-    data.activeUsers = activeUsers;
+    data.activeUsers = activeUsers;*/
     data.indexForumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
-    const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
-    data.ads = await systemSetting.extendAds();
+    /*const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
+    data.ads = await systemSetting.extendAds();*/
 
     let t3 = Date.now();
     if(data.user) data.userThreads = await data.user.getUsersThreads();
