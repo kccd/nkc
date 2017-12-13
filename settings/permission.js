@@ -505,8 +505,11 @@ const certificates ={
       },
       u: {
         [parameter]: {
-          [DELETE]: true, // 封禁用户
-          [PUT]: true // 解封用户
+          ban: {
+            [name]: '封禁/解封用户',
+            [GET]: true,// 封禁用户 
+            [PUT]: true // 解封用户
+          }
         }
       },
       t: {

@@ -218,7 +218,7 @@ function submit(tid){
     redirect('/t/'+tid);
   })
   .catch(function(err){
-    jwarning(err.detail);
+    jwarning(err);
     geid('ButtonReply').disabled=false;
   })
 }
@@ -462,7 +462,7 @@ function switchDInPersonalForum(tid, name, type) {
         return
       })
       .catch(function(e) {
-        screenTopWarning(e.detail)
+        screenTopWarning(e)
       })
   }
   if(type === 'MF') {
@@ -481,7 +481,7 @@ function switchDInPersonalForum(tid, name, type) {
         return
       })
       .catch(function(e) {
-        screenTopWarning(e.detail)
+        screenTopWarning(e)
       })
   }
   if(type === 'OF') {
@@ -500,7 +500,7 @@ function switchDInPersonalForum(tid, name, type) {
         return
       })
       .catch(function(e) {
-        screenTopWarning(e.detail)
+        screenTopWarning(e)
       })
   }
 }
@@ -527,7 +527,7 @@ function switchTInPersonalForum(tid, name, type) {
         return
       })
       .catch(function(e) {
-        screenTopWarning(e.detail)
+        screenTopWarning(e)
       })
   }
   if(type === 'MF') {
@@ -546,7 +546,7 @@ function switchTInPersonalForum(tid, name, type) {
         return
       })
       .catch(function(e) {
-        screenTopWarning(e.detail)
+        screenTopWarning(e)
       })
   }
   if(type === 'OF') {
@@ -565,7 +565,7 @@ function switchTInPersonalForum(tid, name, type) {
         return
       })
       .catch(function(e) {
-        screenTopWarning(e.detail)
+        screenTopWarning(e)
       })
   }
 }

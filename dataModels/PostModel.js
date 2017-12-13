@@ -39,7 +39,8 @@ const postSchema = new Schema({
   },
   r: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   recUsers: {
     type: [String],

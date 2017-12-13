@@ -79,6 +79,7 @@ threadRouter
       ThreadModel,
     } = db;
     const {post} = body;
+    if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const thread = await ThreadModel.findOnly({tid});
     const _post = await thread.newPost(post, user, ip);
     data.targetUser = await thread.extendUser();

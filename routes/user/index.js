@@ -17,10 +17,9 @@ userRouter
     ctx.template = 'user.pug';
     await next();
   })
-  .del('/:uid', async (ctx, next) => {
+  .get('/:uid/ban', async (ctx, next) => {
     let {uid} = ctx.params;
     let {db} = ctx;
-    let {user} = ctx.data;
     let targetUser = await db.UserModel.findOnly({uid: uid});
     let certs = targetUser.certs;
     if(certs.indexOf('banned') > -1) ctx.throw(400, '该用户在你操作之前已经被封禁了，请刷新');
@@ -37,10 +36,9 @@ userRouter
     ctx.data.message = `封禁用户成功`;
     await next();
   })
-  .put('/:uid', async (ctx, next) => {
+  .put('/:uid/put', async (ctx, next) => {
     let {uid} = ctx.params;
     let {db} = ctx;
-    let {user} = ctx.data;
     let targetUser = await db.UserModel.findOnly({uid: uid});
     let certs = targetUser.certs;
     if(certs.indexOf('banned') === -1) ctx.throw(400, '该用户未被封禁，请刷新');

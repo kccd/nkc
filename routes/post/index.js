@@ -13,6 +13,7 @@ postRouter
   })
   .patch('/:pid', async (ctx, next) => {
     const {t, c} = ctx.body.post;
+    if(c.lenght < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db} = ctx;
     const {user} = data;
@@ -20,6 +21,7 @@ postRouter
     const targetPost = await db.PostModel.findOnly({pid});
     const _post = targetPost.toObject();
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
+    if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
     if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
       ctx.throw(401, '您没有权限修改别人的回复');
