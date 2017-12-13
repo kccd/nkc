@@ -19,6 +19,7 @@ postRouter
     const {user} = data;
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
+    const _post = targetPost.toObject();
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();

@@ -11,4 +11,18 @@ const client = new ES.Client({
   host: ESSettings.host
 });
 
+const es = {};
+
+es.indexPost = function(post) {
+  const {c, t, pid} = post;
+};
+
+es.indexThread = function(thread) {
+
+};
+
+es.indexUser = function(user) {
+
+};
+
 module.exports = {...ESSettings, client};

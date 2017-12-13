@@ -80,11 +80,11 @@ operationRouter
     if(digest) {
       obj.digest = true;
     }
-    await thread.update(obj);
     if(thread.digest === digest) {
       if(!digest) ctx.throw(400, '该贴子在您操作前已经被撤销精华了，请刷新');
       if(digest) ctx.throw(400, '该贴子在您操作前已经被设置成精华了，请刷新');
     }
+    await thread.update(obj);
     data.targetUser = await thread.extendUser();
     let operation = 'setDigest';
     if(!digest) operation = 'cancelDigest';
