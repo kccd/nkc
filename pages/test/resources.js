@@ -30,7 +30,8 @@ let resourcesSchema = new Schema({
   },
   pid: {
     type: String,
-    default: '' 
+    default: '',
+    index: 1
   },
   size: {
     type: Number,
@@ -38,7 +39,8 @@ let resourcesSchema = new Schema({
   },
   toc: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: 1
   },
   tpath: {
     type: String,
@@ -46,7 +48,8 @@ let resourcesSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true
+    required: true,
+    index: 1
   }
 });
 

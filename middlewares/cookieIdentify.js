@@ -16,6 +16,7 @@ module.exports = async (ctx, next) => {
     }
     await user.update({tlv: Date.now()});
     if(user.xsf > 0 && !user.certs.includes('qc')) user.certs.push('qc');
+    if(user.certs.includes('banned')) user.certs = ['banned'];
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     ctx.data.user = user;

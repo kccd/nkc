@@ -104,6 +104,7 @@ function nkc_render(options){
 
   render.commonmark_render = function(md){
     var parsed = commonreader.parse(md)
+    console.log('md', md)
     var rendered = commonwriter.render(parsed)
 
     return rendered;

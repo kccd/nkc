@@ -134,7 +134,7 @@ module.exports = async (ctx, next) => {
     certs = ctx.data.user.certs;
   }
   const cs = getPermitTree(certs);
-  cs.contentClasses = Object.keys(cs.contentClasses);
+  cs.contentClasses = Object.keys(cs.contentClasses || {});
   ctx.data.certificates = cs;
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
@@ -167,7 +167,12 @@ module.exports = async (ctx, next) => {
     return Map(base)
   };
   ctx.data.userLevel = excuteLevel(ctx.data.user);
-  if(!ctx.data.ensurePermission())
-    ctx.throw(401, `权限不足`);
+  if(!ctx.data.ensurePermission()) {
+    if(ctx.data.userLevel < 0){
+      ctx.throw(401, '你的账号已经被封禁。');
+    }else {
+      ctx.throw(401, `权限不足`);
+    }
+  }
   await next();
 };

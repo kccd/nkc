@@ -227,6 +227,9 @@ const certificates ={
     permittedOperations: {
       me: {
         [GET]: true
+      },
+      logout: {
+        [GET]: true
       }
     }
   },

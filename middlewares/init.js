@@ -50,12 +50,21 @@ module.exports = async (ctx, next) => {
   try {
     await next();
   } catch(err) {
+    const body = require('./body');
     ctx.error = err.stack;
     ctx.status = err.statusCode || err.status || 500;
+    ctx.data.url = ctx.url;
     if(process.ENV === 'production')
-      ctx.body = err.message;
+      ctx.data.err = err.message;
     else
-      ctx.body = err.message//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')
+      ctx.data.err = err.message;//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')
+    if(ctx.status === 404) {
+      ctx.template = '404.pug';
+    } else {
+      ctx.template = '500.pug';
+    }
+    const text = function(){};
+    await body(ctx, text);
   }
   finally {
     ctx.status = ctx.response.status;
