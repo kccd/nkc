@@ -156,7 +156,8 @@ fn.getAvailableForums = async ctx => {
       children: {$push: '$$ROOT'}
     }}
   ]);
-  const result = forums.filter(e => e._id.parentId === '')[0].children;
+  const forum = forums.filter(e => e._id.parentId === '')[0];
+  const result = forum?forum.children: [];
   result.map(e => {
     e.children = [];
     for(const f of forums) {

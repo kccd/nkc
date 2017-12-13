@@ -133,7 +133,7 @@ db.query(`
       res[i].hashType = 'sha256HMAC';  
     }
     if(res[i].password.hash == '' || res[i].password.salt == ''){
-      let pw = '0123456789a';
+      let pw = '123456789a';
       var salt = Math.floor((Math.random() * 65536)).toString(16);
       var hash = sha256HMAC(pw, salt);
       res[i].password = {

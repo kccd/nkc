@@ -53,11 +53,16 @@ module.exports = async (ctx, next) => {
     const body = require('./body');
     ctx.error = err.stack;
     ctx.status = err.statusCode || err.status || 500;
-    ctx.data.url = ctx.url;
-    if(process.ENV === 'production')
-      ctx.data.err = err.message;
+/*    if(process.ENV === 'production')
+      ctx.data.message = err.message;
     else
-      ctx.data.err = err.message;//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')
+      ctx.data.message = err.message;//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')*/
+    const type = ctx.request.accepts('json', 'html');
+    if(type === 'html') {
+      ctx.data.message = err.message;
+    } else {
+      ctx.data = err.message;
+    }
     if(ctx.status === 404) {
       ctx.template = '404.pug';
     } else {

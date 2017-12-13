@@ -169,7 +169,7 @@ module.exports = async (ctx, next) => {
   ctx.data.userLevel = excuteLevel(ctx.data.user);
   if(!ctx.data.ensurePermission()) {
     if(ctx.data.userLevel < 0){
-      ctx.throw(401, '你的账号已经被封禁。');
+      ctx.throw(401, '根据系统记录，你的账号已经被封禁，请重新注册。');
     }else {
       ctx.throw(401, `权限不足`);
     }
