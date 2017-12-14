@@ -60,7 +60,12 @@ let HistoriesSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  }
+  },
+  fid: {
+    type: String,
+    default: '',
+    index: 1
+  },
 });
 
 HistoriesSchema.pre('save', function(next) {

@@ -58,12 +58,15 @@ module.exports = async (ctx, next) => {
     else
       ctx.data.message = err.message;//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')*/
     const type = ctx.request.accepts('json', 'html');
-    if(type === 'html') {
-      ctx.data.message = err.message;
-    } else {
-      ctx.data = err;
+    let error = err;
+    if(typeof err === 'object'){
+      error = err.message;
     }
-    ctx.print('error', err);
+    if(type === 'html') {
+      ctx.data.message = err;
+    } else {
+      ctx.data = error;
+    }
     if(ctx.status === 404) {
       ctx.template = '404.pug';
     } else {
