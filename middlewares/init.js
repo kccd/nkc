@@ -61,8 +61,9 @@ module.exports = async (ctx, next) => {
     if(type === 'html') {
       ctx.data.message = err.message;
     } else {
-      ctx.data = err.message;
+      ctx.data = err;
     }
+    ctx.print('error', err);
     if(ctx.status === 404) {
       ctx.template = '404.pug';
     } else {

@@ -4,7 +4,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 let CollectionSchema = new Schema({
   cid: {
-    type: Number,
+    type: String,
     unique: true,
     required: true
   },

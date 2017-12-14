@@ -152,4 +152,5 @@ postSchema.methods.ensurePermission = async function(ctx) {
   return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
 };
 
+
 module.exports = mongoose.model('posts', postSchema);

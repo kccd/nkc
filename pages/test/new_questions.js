@@ -1,60 +1,48 @@
-const {PostModel} = require('../../dataModels');
+const {QuestionModel} = require('../../dataModels');
 const db = require('./arangodb');
 const begin = require('./begin');
 
 const t = Date.now();
 
 const init = async () => {
+  console.log('将已删除用户的数据转移到用户74165 ...');
+  await db.query(`
+    for q in questions
+    filter !document(users, q.uid)
+    update q with{uid: '74365'} in questions
+  `);
   let total = await db.query(`
-    for p in posts 
-    filter document(threads, p.tid)
+    for q in questions
     collect with count into length
     return length
   `);
   total = await total.all();
-  console.log(`总数：${total}`);
-  console.log('将已删除用户的post转移到uid: 74365');
-  await db.query(`
-    for p in posts
-    filter !document(users, p.uid)
-    update p with {uid: '74365'} in posts
-  `);
-  console.log('添加fid');
-  await db.query(`
-    for p in posts 
-    let thread = document(threads, p.tid)
-    filter thread
-    update p with {fid: thread.fid} in posts
-  `);
   return total;
 };
 const moveData = async (total, begin, count) => {
   let t1 = Date.now();
+  let number = 0;
   console.log(`开始读取数据（${begin} - ${begin + count}）`);
   let data = await db.query(`
-    for p in posts
-    filter document(threads, p.tid)
+    for q in questions
     limit ${begin}, ${count}
-    return p
+    return q
   `);
   data = await data.all();
   console.log('开始写入...');
   let n = 0;
-
   for (let d of data){
-
+    number++;
     // 处理数据=================
     n++;
     d._id = undefined;
-    d.pid = d._key;
-    d.c = d.c.toString();
-    if(d.rpid) d.rpid = d.rpid[0];
-    if(!d.credits || d.credits === null || d.credits === 'null') d.credits = [];
+    d.qid = number;
+    d.category = (!d.category || d.category === 'null' || d.category === null)? 'undefined': d.category;
     //=========================
 
-    const newPost = new PostModel(d);
+    const newQuestion = new QuestionModel(d);
     try {
-      await newPost.save();
+      await newQuestion.save();
       console.log(`总数：${total}, 第${begin+n}条数据写入成功！当前${count}条耗时：${Date.now() - t1}ms， 累计耗时：${Date.now() - t}ms`);
     }catch (e) {
       return {e, d};

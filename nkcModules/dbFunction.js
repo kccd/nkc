@@ -218,6 +218,7 @@ fn.getArrayForAtResourceAndQuote = async function(c) {
   for (let i of resources) {
     if(!r.includes(i)) r.push(i);
   }
+
   return {
     r,
     atUsers,
@@ -226,6 +227,5 @@ fn.getArrayForAtResourceAndQuote = async function(c) {
   }
 };
 
-fn.getArrayForAtResourceAndQuote('s');
 
 module.exports = fn;

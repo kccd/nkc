@@ -3,7 +3,6 @@ const db = require('./arangodb');
 const begin = require('./begin');
 const apiFn = require('../../nkcModules/apiFunction');
 const t = Date.now();
-const errData = [];
 
 const init = async () => {
   console.log('转移电话...');
@@ -69,12 +68,9 @@ const moveData = async (total,begin, count) => {
       await newUser.save();
       console.log(`总数：${total}, 第${begin+n}条数据写入成功！当前${count}条耗时：${Date.now() - t1}ms， 累计耗时：${Date.now() - t}ms`);
     }catch(e) {
-      errData.push({e, d});
-      console.log(`==================该条数据写入失败！====================`);
-      console.log(d);
-      console.log(`======================================================`);
+      return {e, d};
     }
   }
 };
 
-begin(init, moveData, errData);
+begin(init, moveData);

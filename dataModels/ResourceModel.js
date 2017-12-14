@@ -24,11 +24,6 @@ const resourceSchema = new Schema({
     type: String,
     required: true
   },
-  pid: {
-    type: String,
-    default: '',
-    index: 1
-  },
   size: {
     type: Number,
     default: 0
