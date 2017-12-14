@@ -1,4 +1,6 @@
 users > usersSubscribe, usersPersonal, personalForums
 forums > threads > posts
 
-更新post
+更新用户活跃度
+
+toc字段改为Date类型
