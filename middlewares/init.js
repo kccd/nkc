@@ -1,7 +1,7 @@
 const tools = require('../tools');
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
-const {client} = settings.elastic;
+const es = settings.elastic;
 const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
@@ -18,7 +18,7 @@ module.exports = async (ctx, next) => {
   ctx.data.site = settings.site;
   ctx.data.twemoji = settings.editor.twemoji;
   ctx.data.getcode = false;
-  ctx.es = client;
+  ctx.es = es;
   ctx.fs = {
     access: promisify(fs.access),
     unlink: promisify(fs.unlink),

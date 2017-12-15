@@ -12,74 +12,17 @@ router.get('/', async(ctx, next) => {
   } = ctx;
   const {q, type = 'content', page = 0} = query;
   const {perpage} = settings.paging;
-  const {searchIndex} = settings.elastic;
+  const {searchPost, searchUser} = es;
   data.type = type;
   data.q = q;
+  const nowAt = page * perpage;
   if(type === 'content') {
-    data.result = await es.search({
-      index: searchIndex,
-      type: 'posts',
-      body: {
-        form: page * perpage,
-        size: perpage,
-        query: {
-          function_score: {
-            query: {
-              dis_max: {
-                p_breaker: 0.3,
-                queries: [
-                  simpleQuery('t', q, '50%', 3),
-                  simpleQuery('c', q, '90%', 1),
-                  simpleQuery('pid', q, '50%', 6)
-                ]
-              }
-            },
-            score_mode: 'sum',
-            functions: [
-              {field_value_factor: {
-                field: 'count',
-                factor: 0.03,
-                modifier: 'none',
-                missing: 0
-              }},
-              {field_value_factor: {
-                field: 'creditvalue',
-                factor: 0.002,
-                modifier: 'none',
-                missing: 0
-              }}
-            ],
-            boost_mode: 'sum'
-          }
-        },
-        highlight: {
-          pre_tags:['<span style="background-color:red;">'],
-          post_tags:['</span>'],
-          fields:{
-            t:{},
-            c:{},
-            username:{}
-          }
-        }
-      }
-    });
-    console.log(data.result)
+    data.result = await searchPost('lzszone', nowAt, perpage);
+    console.log(data.result);
+    return next()
   }
-
-
+  data.result = await searchUser('lzszone', nowAt, perpage);
+  return next()
 });
-
-function simpleQuery(field, query, minimum_should_match = '25%', boost = 1) {
-  //generate queries with different term weight
-  return {
-    simple_query_string: {
-      fields: [field],
-      query,
-      boost: boost || 1,
-      default_operator: 'AND',
-      minimum_should_match
-    }
-  }
-}
 
 module.exports = router;

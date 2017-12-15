@@ -1,7 +1,8 @@
 const settings = require('./settings');
 // initialize the elasticsearch client
 const {elastic} = settings;
-const {postIndex, ChineseAnalyzer, userIndex, client} = elastic;
+const {ESSettings, client} = elastic;
+const {postIndex, ChineseAnalyzer, userIndex} = ESSettings;
 
 module.exports = async function() {
   let posts, users;
