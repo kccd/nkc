@@ -42,13 +42,9 @@ operationRouter
     const {fid} = ctx.params;
     const {name} = ctx.body;
     if(!name) ctx.throw(400, '名字不能位空');
-    let order = 0;
-    const category = await db.ThreadTypeModel.findOne({fid}).sort({order: -1});
-    if(category) order = category.order + 1;
     const cid = await db.SettingModel.operateSystemID('threadTypes', 1);
     const newCategory = new db.ThreadTypeModel({
       cid,
-      order,
       fid,
       name
     });

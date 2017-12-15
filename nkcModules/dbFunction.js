@@ -156,7 +156,8 @@ fn.getAvailableForums = async ctx => {
       children: {$push: '$$ROOT'}
     }}
   ]);
-  const result = forums.filter(e => e._id.parentId === '')[0].children;
+  const forum = forums.filter(e => e._id.parentId === '')[0];
+  const result = forum?forum.children: [];
   result.map(e => {
     e.children = [];
     for(const f of forums) {
@@ -217,6 +218,7 @@ fn.getArrayForAtResourceAndQuote = async function(c) {
   for (let i of resources) {
     if(!r.includes(i)) r.push(i);
   }
+
   return {
     r,
     atUsers,
@@ -225,6 +227,5 @@ fn.getArrayForAtResourceAndQuote = async function(c) {
   }
 };
 
-fn.getArrayForAtResourceAndQuote('s');
 
 module.exports = fn;

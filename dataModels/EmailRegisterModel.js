@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 let EmailRegisterSchema = new Schema({
   toc: {
     type: Number,
-    default: Date.now
+    default: Date.now,
+    index: 1
   },
   ecode: {
     type: String,

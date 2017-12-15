@@ -9,6 +9,7 @@ const {stat, unlink} = fs;
 const path = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const execProcess = promisify(exec);
+const {upload} = require('../settings');
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
     const bat = spawn(pathName, args, options);
@@ -38,9 +39,9 @@ const linux = (os === 'linux');
 const attachify = path => {
   const {width, height} = sizeLimit.attachment;
   if(linux) {
-    return spawnProcess('convert', [path, '-gravity', 'southeast', '-resize', `${width}x${height}>`, path]);
+    return spawnProcess('convert', [path, '-gravity', 'southeast', '-resize', `${width}x${height}>`, watermark, '-compose', 'dissolve', '-define', 'compose:args=50', '-composite', '-quality', '90', path]);
   }
-  return spawnProcess('magick', ['convert', path, '-gravity', 'southeast', '-resize', `${width}x${height}>`, path]);
+  return spawnProcess('magick', ['convert', path, '-gravity', 'southeast', '-resize', `${width}x${height}>`, watermark, '-compose', 'dissolve', '-define', 'compose:args=50', '-composite', '-quality', '90', path]);
 };
 
 
@@ -79,6 +80,7 @@ const generateAdPost = async (path, name) => {
     stats = null
   }
   let url;
+  console.log(path);
   if(stats) {
     url = path;
   } else {

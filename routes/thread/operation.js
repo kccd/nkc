@@ -3,6 +3,7 @@ const operationRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const path = require('path');
 const tools = require('../../tools');
+const {adPath, defaultAdPath, avatarPath, uploadPath} = require('../../settings').upload;
 const {imageMagick} = tools;
 operationRouter
   // 收藏帖子
@@ -40,10 +41,12 @@ operationRouter
     const ads = setting.ads;
     const index = ads.findIndex((elem, i, arr) => elem === tid);
     const targetUser = await thread.extendUser();
-    const targetAdPath = path.resolve(__dirname, `../../resources/ad_posts/${tid}.jpg`);
+    const targetAdPath = `${adPath}/${tid}.jpg`;
     if(index > -1) {
       ads.splice(index, 1);
-      await fs.unlink(targetAdPath);
+      try{
+        await fs.unlink(targetAdPath);
+      } catch(e){}
     } else {
       if(ads.length === 6) {
         ads.shift();
@@ -57,9 +60,9 @@ operationRouter
       ]))[0];
       let filePath;
       if(resource) {
-        filePath = path.resolve(__dirname, `../../resources/upload${resource.path}`);
+        filePath = `${uploadPath}${resource.path}`;
       } else {
-        filePath = path.resolve(__dirname, `../../resources/avatars/${targetUser.uid}.jpg`);
+        filePath = `${avatarPath}/${targetUser.uid}.jpg`;
       }
       await imageMagick.generateAdPost(filePath, targetAdPath);
     }

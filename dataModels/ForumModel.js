@@ -10,7 +10,7 @@ const forumSchema = new Schema({
   },
   class: {
     type: String,
-    default: ''
+    default: 'null'
   },
   color: {
     type: String,

@@ -2,35 +2,40 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
-const answersheetsSchema = new Schema({
+const answerSheetsSchema = new Schema({
 	key: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    required: true
   },
   uid: {
     type: String,
-    default: ''
+    default: '',
+    index: 1
   },
   score: {
     type: Number,
+    required: true
   },
   toc: {
     type: Number,
     default: Date.now,
+    index: true
   },
   tsm: {
     type: Number,
     default: Date.now,
+    index: 1
   },
   ip: {
     type: String,
     default: '0.0.0.0',
-    index: 1
+    index: 1,
   },
   isA: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   records: {
     type: Array,
@@ -38,10 +43,10 @@ const answersheetsSchema = new Schema({
   },
   category: {
     type: String,
-    default: 'undefined'
+    default: ''
   }
 });
-answersheetsSchema.pre('save', function(next) {
+answerSheetsSchema.pre('save', function(next) {
   let num = 0;
   for (let answer of this.records) {
     if (answer.correct) {
@@ -51,4 +56,4 @@ answersheetsSchema.pre('save', function(next) {
   this.score = num;
   next();
 });
-module.exports = mongoose.model('answersheets', answersheetsSchema);
+module.exports = mongoose.model('answerSheets', answerSheetsSchema);

@@ -21,6 +21,10 @@ const emailCodeSchema = new Schema({
   used: {
     type: Boolean,
     default: false
+  },
+  uid: {
+    type: String,
+    required: true
   }
 });
 module.exports = mongoose.model('emailCodes', emailCodeSchema, 'emailCodes');

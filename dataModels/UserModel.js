@@ -62,10 +62,10 @@ const userSchema = new Schema({
     },
     username: {
       type: String,
+      unique: true,
       required: true,
       minlength: 1,
-      maxlength: 30,
-      unique: true
+      maxlength: 30
     },
     usernameLowerCase: {
       type: String,
@@ -76,7 +76,6 @@ const userSchema = new Schema({
       unique: true,
       required: true,
     },
-    bday: String,
     cart: [String],
     description: String,
     color: String,
@@ -84,7 +83,6 @@ const userSchema = new Schema({
       type: [String],
       index: 1
     },
-    introText: String,
     postSign: String,
 },
 {toObject: {

@@ -73,7 +73,8 @@ forgotPasswordRouter
   const token = Math.floor((Math.random()*(65536*65536))).toString(16);
   const emailCode = new db.EmailCodeModel({
     email: email,
-    token: token
+    token: token,
+    uid: user.uid
   });
   await emailCode.save();
   const text = `有人在 ${(new Date).toLocaleString()} 请求重置账户密码。如果这不是你的操作，请忽略。 `;

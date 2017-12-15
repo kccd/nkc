@@ -596,7 +596,7 @@ const certificates ={
             [POST]: true,
             [PATCH]: true,
             [parameter]: {
-              [name]: 'cid',
+              [name]: '删除分类',
               [DELETE]: true
             }
           }

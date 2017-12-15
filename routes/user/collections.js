@@ -44,6 +44,7 @@ collectionsRouter
     const {cid, category} = ctx.body;
     const obj = {};
     if(category) obj.category = category;
+    ctx.print('cid', cid);
     const collection = await db.CollectionModel.findOne({cid: cid});
     if(data.user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格修改别人的收藏');
     await collection.update(obj);

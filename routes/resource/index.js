@@ -44,7 +44,6 @@ resourceRouter
       // 添加水印
       if(size > largeImage) {
         await imageMagick.attachify(path);
-        await imageMagick.watermarkify(path);
       } else {
         const {width, height} = await imageMagick.info(path);
         if(height > 400 || width > 300) {

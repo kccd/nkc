@@ -4,7 +4,7 @@ const https = require('https');
 const app = require('./app');
 const searchInit = require('./searchInit');
 const settings = require('./settings');
-const {useHttps} = settings;
+const {useHttps, updateDate} = settings;
 const serverSettings = settings.server;
 const listenAddr = '0.0.0.0';
 
@@ -14,7 +14,8 @@ let redirectServer;
 searchInit()
   .then(() => {
     console.log('ElasticSearch is ready...'.green);
-    require('./scheduleJob');
+    const jobs = require('./scheduleJob');
+    jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
     if(useHttps) {
       const httpsOptions = settings.httpsOptions();
       server = https.Server(httpsOptions, app)
