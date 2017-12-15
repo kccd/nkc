@@ -26,7 +26,8 @@ module.exports = async (ctx, next) => {
     writeFile: promisify(fs.writeFile),
     mkdir: promisify(fs.mkdir),
     exists: promisify(fs.exists),
-    createReadStream: fs.createReadStream
+    createReadStream: fs.createReadStream,
+    stat: promisify(fs.stat)
   };
 
   ctx.print = (value1, value2) => {

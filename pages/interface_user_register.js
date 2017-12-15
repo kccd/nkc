@@ -36,48 +36,39 @@ function register_submit(){
 
     if(userobj.username == ''){
       getFocus("#username")
-      throw({detail:'请填写用户名！'})
-      return
+      throw('请填写用户名！')
     }
     if(userobj.password == ''){
       getFocus("#password")
-      throw({detail:'请填写密码！'})
-      return;
+      throw('请填写密码！')
     }
     if(userobj.password2 == ''){
       getFocus("#password2")
-      throw({detail:'请再次填写密码！'})
-      return;
+      throw('请再次填写密码！')
     }
     if(userobj.password.length < 8){
       getFocus("#password")
-      throw({detail:'密码长度要大于8位，请重新填写！'})
-      return;
+      throw('密码长度要大于8位，请重新填写！')
     }
     if(checkPass(userobj.password) < 2){
       getFocus("#password")
-      throw({detail:'密码要具有数字、字母和符号三者中的至少两者！'})
-      return;
+      throw('密码要具有数字、字母和符号三者中的至少两者！')
     }
     if(userobj.password2!==userobj.password){
       getFocus("#password2")
-      throw({detail:'两遍密码不一致！'})
-      return;
+      throw('两遍密码不一致！')
     }
     if(userobj.regCode === '') {
       getFocus('#regCode');
-      throw({detail: '请输入注册码'});
-      return
+      throw('请输入注册码')
     }
     if(userobj.phone == ''){
       getFocus("#phone")
-      throw({detail:'请填写手机号码！'})
-      return;
+      throw('请填写手机号码！')
     }
     if(!(/(^[1-9]\d*$)/.test(userobj.mobile))){
       getFocus("#phone")
-      throw({detail:'手机号码格式不正确！'})
-      return;
+      throw('手机号码格式不正确！')
     }
     /*if(userobj.phone.length !== 11)
     {
@@ -87,8 +78,7 @@ function register_submit(){
     }*/
     if(userobj.mcode == ''){
       getFocus("#mcode")
-      throw({detail:'请填写手机验证码！'})
-      return;
+      throw('请填写手机验证码！')
     }
    /* if(userobj.icode == ''){
       getFocus("#icode")
@@ -106,27 +96,27 @@ function register_submit(){
   })
   .catch(function(err){
     console.log(err)
-    if(err.detail == '用户名已存在，请输入其他用户名'){
+    if(err == '用户名已存在，请输入其他用户名'){
       //refreshICode();
       getFocus("#username")
     }
-    if(err.detail == '验证注册码失败，请检查！'){
+    if(err == '验证注册码失败，请检查！'){
       //refreshICode();
       getFocus("#regCode")
     }
-    if(err.detail === '答卷的注册码过期，可能要重新参加考试') {
+    if(err === '答卷的注册码过期，可能要重新参加考试') {
       //refreshICode();
       getFocus('#regCode')
     }
-    if(err.detail == '手机验证码不正确，请检查'){
+    if(err == '手机验证码不正确，请检查'){
       //refreshICode();
       getFocus("#mcode")
     }
-   /* if(err.detail == '图片验证码不正确，请检查'){
+   /* if(err == '图片验证码不正确，请检查'){
       //refreshICode();
       getFocus("#icode")
     }*/
-    if(err.detail == '此号码已经用于其他用户注册，请检查或更换'){
+    if(err == '此号码已经用于其他用户注册，请检查或更换'){
       //refreshICode();
       getFocus("#phone")
     }

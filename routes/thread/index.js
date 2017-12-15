@@ -40,7 +40,7 @@ threadRouter
         if(page <= 1) page = `?`;
         else page = `?page=${page - 1}`;
         const postLink = `/t/${tid + page}`;
-        post.c = postContent.replace(/=/, `=${postLink}, ${step},`);
+        post.c = postContent.replace(/=/,`=${postLink},${step},`);
       }
     });
     data.posts = posts;

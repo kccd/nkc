@@ -63,7 +63,6 @@ router.get('/', async(ctx, next) => {
         }
       }
     });
-    console.log(data.result)
   }
 
 

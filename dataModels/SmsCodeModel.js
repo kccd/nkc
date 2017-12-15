@@ -3,7 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 smsCodeSchema = new Schema({
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   type: {

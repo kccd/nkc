@@ -76,7 +76,10 @@
       -if(end !== -1)
         -var postContent = targetPost.c.slice(end+8);
         -var quoteBegin = targetPost.c.match(/\[.*?\]/)[0];
-        -if (quoteBegin.length === 4)
+        -var arr = quoteBegin.replace('[quote=', '');
+        -arr = arr.replace(']', '');
+        -arr = arr.split(',');
+        -if (arr.length === 4)
           -targetPost.c = quoteBegin + '[/quote]' + postContent;
         -else targetPost.c = post.c
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(targetPost)

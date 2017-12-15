@@ -3,7 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 let EmailRegisterSchema = new Schema({
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },

@@ -18,7 +18,7 @@ const init = async () => {
     filter u.regIP
     let up = document(users_personal, u._key)
     filter up
-    update up with{regip: u.regIP} in users_personal
+    update up with{regip: u.regIP, regPort: u.regPort} in users_personal
   `);
   let total = await db.query(`
     for u in users_personal

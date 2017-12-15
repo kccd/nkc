@@ -10,7 +10,8 @@ const threadSchema = new Schema({
   },
   cid: {
     type: String,
-    default:''
+    default:'',
+    index: 1
   },
   count: {
     type: Number,
@@ -53,7 +54,8 @@ const threadSchema = new Schema({
   },
   lm: {
     type: String,
-    default: ''
+    default: '',
+    index: 1
   },
   mid: {
     type: String,
@@ -61,7 +63,8 @@ const threadSchema = new Schema({
   },
   oc: {
     type: String,
-    default: ''
+    default: '',
+    index: 1
   },
   tlm: {
     type: Date,
@@ -217,20 +220,24 @@ threadSchema.methods.updateThreadMessage = async function() {
   const lastPost = posts[0];
   const firstPost = posts[posts.length-1];
   const updateObj = {
-    tlm: lastPost.toc.getTime(),
+    tlm: lastPost.toc,
     count: count,
     countRemain: countRemain,
     countToday: countToday,
     oc: firstPost.pid,
     lm: lastPost.pid,
-    toc: firstPost.toc.getTime(),
+    toc: firstPost.toc,
     uid: firstPost.uid
   };
+  const t1 = Date.now();
   await this.update(updateObj);
+  const t2 = Date.now();
   const forum = await this.extendForum();
   await forum.updateForumMessage();
+  const t3 = Date.now();
   const user = await this.extendUser();
   await user.updateUserMessage();
+  console.log(`更新帖子：${t2-t1}ms, 更新板块：${t3-t2}ms, 更新用户：${Date.now()-t3}ms`);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
@@ -295,15 +302,18 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(quote && quote[2] !== this.oc) {
     const username = quote[1];
     const quPid = quote[2];
-    const quUser = await UserModel.findOnly({username});
-    const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
-    const reply = new RepliesModel({
-      fromPid: pid,
-      toPid: quPid,
-      toUid: quUser.uid
-    });
-    await reply.save();
-    await quUserPersonal.increasePsnl('replies', 1);
+    const quUser = await UserModel.findOne({username});
+    const quPost = await PostModel.findOne({pid: quPid});
+    if(quUser && quPost) {
+      const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
+      const reply = new RepliesModel({
+        fromPid: pid,
+        toPid: quPid,
+        toUid: quUser.uid
+      });
+      await reply.save();
+      await quUserPersonal.increasePsnl('replies', 1);
+    }
   }
   await this.update({lm: pid});
   return _post

@@ -18,12 +18,12 @@ const answerSheetsSchema = new Schema({
     required: true
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: true
   },
   tsm: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },
