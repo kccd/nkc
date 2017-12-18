@@ -386,7 +386,6 @@ function nkc_render(options){
         var r = post.resources[i]
         if(r.rid===rid){
           r._used = true;
-          console.log(r);
           return getHTMLForResource(r)
         }
       }

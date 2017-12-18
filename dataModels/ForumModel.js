@@ -45,7 +45,7 @@ const forumSchema = new Schema({
     default: false
   },
   moderators: {
-    type: Array,
+    type: [String],
     default: []
   },
   order: {
@@ -131,27 +131,58 @@ forumSchema.methods.getToppedThreads = async function(fidOfChildForum) {
 
 forumSchema.methods.updateForumMessage = async function() {
   const ThreadModel = require('./ThreadModel');
-  const threads = await ThreadModel.find({fid: this.fid}, {_id: 0, count: 1, countToday: 1, digest: 1});
-  const countThreads = threads.length;
-  let countPosts = 0;
-  let countPostsToday = 0;
-  let digest = 0;
-  for (let thread of threads) {
-    countPosts += thread.count;
-    countPostsToday += thread.countToday;
-    if(thread.digest) digest++;
-  }
-  const normal = countThreads - digest;
-  await this.update({
-    countPosts,
-    countPostsToday,
-    countThreads,
-    tCount: {
-      digest,
-      normal
+  const ForumModel = require('./ForumModel');
+  let forumData = await ThreadModel.aggregate([
+    {
+      $match: {
+        fid: this.fid
+      }
+    },
+    {
+      $group: {
+        _id: '$fid',
+        countPosts: {$sum: '$count'},
+        countPostsToday: {$sum: '$countToday'},
+        countThreads: {$sum: 1}
+      }
+    },
+    {
+      $project: {
+        _id: 0
+      }
     }
-  });
+  ]);
+  forumData = forumData[0];
+  const tCount = {
+    digest: 0,
+    normal: 0
+  };
+  tCount.digest = await ThreadModel.count({fid: this.fid, digest: true});
+  tCount.normal = forumData.countThreads - tCount.digest;
+  forumData.tCount = tCount;
+  await this.update(forumData);
+  if(!this.parentId) return;
+  const parentForum = await ForumModel.findOnly({fid: this.parentId});
+  const childForum = await ForumModel.find({parentId: this.parentId});
+  const obj = {
+    countPosts: 0,
+    countPostsToday: 0,
+    countThreads: 0,
+    tCount: {
+      digest: 0,
+      normal: 0
+    }
+  };
+  for (let forum of childForum) {
+    obj.countPosts += forum.countPosts;
+    obj.countPostsToday += forum.countPostsToday;
+    obj.tCount.digest += forum.tCount.digest;
+    obj.countThreads += forum.countThreads;
+  }
+  obj.tCount.normal = obj.countThreads - obj.tCount.digest;
+  await parentForum.update(obj);
 };
+
 
 forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
   const SettingModel = require('./SettingModel');

@@ -36,10 +36,6 @@ const userSchema = new Schema({
       type: Number,
       default: 0
     },
-    subs: {
-      type: Number,
-      default: 0
-    },
     recCount: {
       type: Number,
       default: 0
@@ -167,41 +163,30 @@ userSchema.methods.extend = async function() {
 userSchema.methods.updateUserMessage = async function() {
   const PostModel = require('./PostModel');
   const ThreadModel = require('./ThreadModel');
-  const UsersSubscribeModel = require('./UsersSubscribeModel');
-  const posts = await PostModel.find({uid: this.uid}, {_id: 0, disabled: 1, recUsers: 1});
-  const postCount = posts.length;
-  let disabledPostsCount = 0;
-  let recCount = 0;
-  for (let post of posts) {
-    try{
-      recCount += post.recUsers.length;
-    } catch(err) {
-      return console.log(post);
+  const uid = this.uid;
+  const updateObj = {};
+  updateObj.postCount = await PostModel.count({uid});
+  updateObj.disabledPostsCount = await PostModel.count({uid, disabled: true});
+  updateObj.threadCount = await ThreadModel.count({uid});
+  updateObj.disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
+  updateObj.digestThreadsCount = await ThreadModel.count({uid, digest: true});
+  updateObj.toppedThreadsCount = await ThreadModel.count({uid, topped: true});
+  const recCount = await PostModel.aggregate([
+    {
+      $match: {
+        uid,
+        'recUsers.0': {$exists: 1}
+      }
+    },
+    {
+      $unwind: '$recUsers'
+    },
+    {
+      $count: 'recCount'
     }
-    if(post.disabled) disabledPostsCount++;
-  }
-  const threads = await ThreadModel.find({uid: this.uid}, {_id: 0, disabled: 1, digest: 1, topped: 1});
-  const threadCount = threads.length;
-  let disabledThreadsCount = 0;
-  let digestThreadsCount = 0;
-  let toppedThreadsCount = 0;
-  for (let thread of threads) {
-    if(thread.disabled || thread.fid === 'recycle') disabledThreadsCount++;
-    if(thread.digest) digestThreadsCount++;
-    if(thread.topped) toppedThreadsCount++;
-  }
-  const userSubscribe = await UsersSubscribeModel.findOnly({uid: this.uid});
-  const subs = userSubscribe.subscribers.length;
-  return await this.update({
-    postCount,
-    disabledPostsCount,
-    threadCount,
-    disabledThreadsCount,
-    digestThreadsCount,
-    toppedThreadsCount,
-    subs,
-    recCount
-  });
+  ]);
+  updateObj.recCount = recCount.length !== 0? recCount[0].recCount: 0;
+  await this.update(updateObj);
 };
 
 userSchema.virtual('navbarDesc').get(function() {

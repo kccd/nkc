@@ -18,12 +18,12 @@ const answerSheetsSchema = new Schema({
     required: true
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: true
   },
   tsm: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },
@@ -38,7 +38,7 @@ const answerSheetsSchema = new Schema({
     index: 1
   },
   records: {
-    type: Array,
+    type: [Schema.Types.Mixed],
     required: true
   },
   category: {
@@ -56,4 +56,4 @@ answerSheetsSchema.pre('save', function(next) {
   this.score = num;
   next();
 });
-module.exports = mongoose.model('answerSheets', answerSheetsSchema);
+module.exports = mongoose.model('answerSheets', answerSheetsSchema, 'answerSheets');

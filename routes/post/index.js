@@ -27,7 +27,7 @@ postRouter
       ctx.throw(401, '您没有权限修改别人的回复');
     const objOfPost = Object.assign(targetPost, {}).toObject();
     objOfPost._id = undefined;
-    const histories = await db.HistoriesModel(objOfPost);
+    const histories = new db.HistoriesModel(objOfPost);
     await histories.save();
     const {atUsers, quote, r} = await dbFn.getArrayForAtResourceAndQuote(c);
     const oldAtUsers = targetPost.atUsers;
@@ -92,6 +92,7 @@ postRouter
     }
     data.redirect = `/t/${targetThread.tid + page + postId}`;
     data.targetUser = targetUser;
+    await targetUser.updateUserMessage();
     await next();
   })
   .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods());

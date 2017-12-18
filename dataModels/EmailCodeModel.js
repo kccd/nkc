@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const emailCodeSchema = new Schema({
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now
   },
   email: {

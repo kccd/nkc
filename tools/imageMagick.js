@@ -80,7 +80,6 @@ const generateAdPost = async (path, name) => {
     stats = null
   }
   let url;
-  console.log(path);
   if(stats) {
     url = path;
   } else {

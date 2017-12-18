@@ -40,7 +40,7 @@ threadRouter
         if(page <= 1) page = `?`;
         else page = `?page=${page - 1}`;
         const postLink = `/t/${tid + page}`;
-        post.c = postContent.replace(/=/, `=${postLink}, ${step},`);
+        post.c = postContent.replace(/=/,`=${postLink},${step},`);
       }
     });
     data.posts = posts;
@@ -94,6 +94,7 @@ threadRouter
     await thread.update({$inc: [{count: 1}, {hits: 1}]});
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
+    await user.updateUserMessage();
     if(type === 'html')
       ctx.redirect(`/t/${tid}`, 303);
     await next();

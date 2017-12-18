@@ -53,7 +53,6 @@ examRouter
         const time = Date.now();
         while(repeat){
           let num = random(max);
-          let equal = false;
           if(skipArr.indexOf(num) < 0) {
             repeat = false;
             skipArr.push(num);
@@ -185,10 +184,8 @@ examRouter
     }
     if(score < settings.exam.passScore) ctx.throw(400, '测试没有通过哦，别气馁，请继续努力！');
     let ipLog = await ctx.db.AnswerSheetModel.find({ip: ip}).sort({toc: -1});
-    if(ipLog.length > 0) {
-      if(!ipLog[0].isA){
-        if(Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) ctx.throw(400, '您之前测试通过的次数有点多哦，不应该再进行测试了！');
-      }
+    if(ipLog.length > 0 && !ipLog[0].isA && Date.now() - ipLog[0].tsm < settings.exam.succeedInterval) {
+      ctx.throw(400, '您之前测试通过的次数有点多哦，不应该再进行测试了！');
     }
     let regCode = () => {
       try{

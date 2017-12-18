@@ -10,7 +10,8 @@ const threadSchema = new Schema({
   },
   cid: {
     type: String,
-    default:''
+    default:'',
+    index: 1
   },
   count: {
     type: Number,
@@ -53,7 +54,8 @@ const threadSchema = new Schema({
   },
   lm: {
     type: String,
-    default: ''
+    default: '',
+    index: 1
   },
   mid: {
     type: String,
@@ -61,7 +63,8 @@ const threadSchema = new Schema({
   },
   oc: {
     type: String,
-    default: ''
+    default: '',
+    index: 1
   },
   tlm: {
     type: Date,
@@ -203,34 +206,28 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
 
 threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = require('./PostModel');
-  const posts = await PostModel.find({tid: this.tid}).sort({toc: -1});
-  const count = posts.length;
-  if(count === 0) return;
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
-  let countToday = 0;
-  let countRemain = 0;
-  posts.map(post => {
-    if(post.toc > time) countToday++;
-    if(!post.disabled) countRemain++;
-  });
-  const lastPost = posts[0];
-  const firstPost = posts[posts.length-1];
-  const updateObj = {
-    tlm: lastPost.toc.getTime(),
-    count: count,
-    countRemain: countRemain,
-    countToday: countToday,
-    oc: firstPost.pid,
-    lm: lastPost.pid,
-    toc: firstPost.toc.getTime(),
-    uid: firstPost.uid
-  };
+  const t2 = Date.now();
+  const updateObj = {};
+  const lm = await PostModel.findOne({tid: this.tid}).sort({toc: -1});
+  const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
+  updateObj.tlm = lm.toc;
+  updateObj.toc = oc.toc;
+  updateObj.lm = lm.pid;
+  updateObj.oc = oc.pid;
+  updateObj.count = await PostModel.count({tid: this.tid});
+  updateObj.countToday = await PostModel.count({tid: this.tid, toc: {$gt: time}});
+  updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
+  updateObj.uid = oc.uid;
   await this.update(updateObj);
+  const t25 = Date.now();
   const forum = await this.extendForum();
   await forum.updateForumMessage();
+  const t3 = Date.now();
   const user = await this.extendUser();
   await user.updateUserMessage();
+  console.log(`更新帖子：${t25-t2}ms, 更新板块：${t3-t25}ms, 更新用户：${Date.now()-t3}ms`);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
@@ -295,15 +292,18 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(quote && quote[2] !== this.oc) {
     const username = quote[1];
     const quPid = quote[2];
-    const quUser = await UserModel.findOnly({username});
-    const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
-    const reply = new RepliesModel({
-      fromPid: pid,
-      toPid: quPid,
-      toUid: quUser.uid
-    });
-    await reply.save();
-    await quUserPersonal.increasePsnl('replies', 1);
+    const quUser = await UserModel.findOne({username});
+    const quPost = await PostModel.findOne({pid: quPid});
+    if(quUser && quPost) {
+      const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
+      const reply = new RepliesModel({
+        fromPid: pid,
+        toPid: quPid,
+        toUid: quUser.uid
+      });
+      await reply.save();
+      await quUserPersonal.increasePsnl('replies', 1);
+    }
   }
   await this.update({lm: pid});
   return _post

@@ -6,11 +6,10 @@ const postSchema = new Schema({
   pid: {
     type: String,
     unique: true,
-    required: true,
-    index: 1
+    required: true
   },
   atUsers: {
-    type: Array,
+    type: [Schema.Types.Mixed],
     default: []
   },
   c: {
@@ -18,7 +17,7 @@ const postSchema = new Schema({
     default: ''
   },
   credits: {
-    type: Array,
+    type: [Schema.Types.Mixed],
     default: []
   },
   disabled: {

@@ -41,6 +41,7 @@
     "nodemailer": "^4.3.0",
     "pug": "^2.0.0-rc.4",
     "qr-image": "^3.2.0",
+    "qrcode": "^1.0.0",
     "twemoji": "^2.5.0",
     "xbbcode-parser": "^0.1.2",
     "xss": "^0.3.4"

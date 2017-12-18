@@ -3,25 +3,26 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
 let HistoriesSchema = new Schema({
-  atUsers: {
-    type: Array,
-    default: []
-  },
-  t: {
-    type: String,
-    default: ''
-  },
-  c: {
+  pid: {
     type: String,
     required: true
   },
+  atUsers: {
+    type: [Schema.Types.Mixed],
+    default: []
+  },
+  c: {
+    type: String,
+    default: ''
+  },
   credits: {
-    type: Array,
+    type: [Schema.Types.Mixed],
     default: []
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
+    index: 1
   },
   ipoc: {
     type: String,
@@ -30,42 +31,54 @@ let HistoriesSchema = new Schema({
   iplm: {
     type: String,
   },
-  r: {
-    type: Array,
-    default: []
-  },
-  tid: {
-    type: String,
-    required: true
-  },
-  tlm: {
-    type: Date
-  },
-  toc: {
-    type: Date,
-    default: Date.now
-  },
-  uid: {
-    type: String,
-    required: true
-  },
-  uidlm: {
+  l: {
     type: String
   },
-  l: {
+  r: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  recUsers: {
+    type: [String],
+    default: []
+  },
+  rpid: {
+    type: [String],
+    default: []
+  },
+  t: {
     type: String,
     default: ''
   },
-  pid: {
+  fid: {
+    type: String,
+    index: 1
+  },
+  tid: {
     type: String,
     required: true,
     index: 1
   },
-  fid: {
-    type: String,
-    default: '',
+  toc: {
+    type: Date,
+    default: Date.now,
     index: 1
   },
+  tlm: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
+  uid: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  uidlm: {
+    type: String,
+    index: 1
+  }
 });
 
 HistoriesSchema.pre('save', function(next) {

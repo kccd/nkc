@@ -36,7 +36,7 @@ userRouter
     ctx.data.message = `封禁用户成功`;
     await next();
   })
-  .put('/:uid/put', async (ctx, next) => {
+  .put('/:uid/ban', async (ctx, next) => {
     let {uid} = ctx.params;
     let {db} = ctx;
     let targetUser = await db.UserModel.findOnly({uid: uid});

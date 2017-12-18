@@ -7,9 +7,9 @@ module.exports = async (ctx, next) => {
     const basename = path.basename(ctx.filePath);
     let mtime;
     try{
-      mtime = (await fs.stat(filePath)).mtime;
+      const fileMessage = await fs.stat(filePath);
+      mtime = fileMessage.mtime;
     } catch (e) {
-      ctx.print(`读取图片最后修改时间失败`, filePath);
       mtime = new Date();
     }
     let ext = path.extname(ctx.filePath);

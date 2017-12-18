@@ -9,7 +9,7 @@ let CollectionSchema = new Schema({
     required: true
   },
   toc: {
-    type: Number,
+    type: Date,
     default: Date.now,
     index: 1
   },
