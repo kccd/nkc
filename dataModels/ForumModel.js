@@ -45,7 +45,7 @@ const forumSchema = new Schema({
     default: false
   },
   moderators: {
-    type: Array,
+    type: [String],
     default: []
   },
   order: {

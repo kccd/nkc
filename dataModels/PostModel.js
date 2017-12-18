@@ -9,7 +9,7 @@ const postSchema = new Schema({
     required: true
   },
   atUsers: {
-    type: Array,
+    type: [Schema.Types.Mixed],
     default: []
   },
   c: {
@@ -17,7 +17,7 @@ const postSchema = new Schema({
     default: ''
   },
   credits: {
-    type: Array,
+    type: [Schema.Types.Mixed],
     default: []
   },
   disabled: {
