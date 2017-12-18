@@ -92,6 +92,7 @@ postRouter
     }
     data.redirect = `/t/${targetThread.tid + page + postId}`;
     data.targetUser = targetUser;
+    await targetUser.updateUserMessage();
     await next();
   })
   .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods());

@@ -163,102 +163,30 @@ userSchema.methods.extend = async function() {
 userSchema.methods.updateUserMessage = async function() {
   const PostModel = require('./PostModel');
   const ThreadModel = require('./ThreadModel');
-  const t1 = Date.now();
-  const posts = await PostModel.find({uid: this.uid}, {_id: 0, disabled: 1, recUsers: 1});
-  const postCount = posts.length;
-  let recCount = 0;
-  for (let post of posts) {
-    try{
-      recCount += post.recUsers.length;
-    } catch(err) {
-      return console.log(post);
-    }
-  }
-  const t2 = Date.now();
-  const threads = await ThreadModel.find({uid: this.uid}, {_id: 0,count: 1, countRemain: 1,  disabled: 1, digest: 1, topped: 1});
-  const threadCount = threads.length;
-  let disabledThreadsCount = 0;
-  let digestThreadsCount = 0;
-  let toppedThreadsCount = 0;
-  let disabledPostsCount = 0;
-  for (let thread of threads) {
-    if(thread.disabled || thread.fid === 'recycle') disabledThreadsCount++;
-    if(thread.digest) digestThreadsCount++;
-    if(thread.topped) toppedThreadsCount++;
-    disabledPostsCount += (thread.count - thread.countRemain);
-  }
-  const oldDate = {
-    postCount,
-    disabledPostsCount: disabledPostsCount,
-    threadCount,
-    disabledThreadsCount,
-    digestThreadsCount,
-    toppedThreadsCount,
-    recCount
-  };
-  console.log(oldDate)
-  await this.update(oldDate);
-  const t3 = Date.now();
-  console.log(`posts: ${t2-t1}ms, thread: ${t3-t2}`);
+  const uid = this.uid;
   const updateObj = {};
-  const dataObj = await PostModel.aggregate([
+  updateObj.postCount = await PostModel.count({uid});
+  updateObj.disabledPostsCount = await PostModel.count({uid, disabled: true});
+  updateObj.threadCount = await ThreadModel.count({uid});
+  updateObj.disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
+  updateObj.digestThreadsCount = await ThreadModel.count({uid, digest: true});
+  updateObj.toppedThreadsCount = await ThreadModel.count({uid, topped: true});
+  const recCount = await PostModel.aggregate([
     {
       $match: {
-        uid: this.uid
+        uid,
+        'recUsers.0': {$exists: 1}
       }
     },
     {
-      $group: {
-        _id: '$uid',
-        postCount: {$sum: 1},
-        child: {$push: '$$ROOT'},
-        recCount: {$sum: {$size: '$recUsers'}}
-      }
+      $unwind: '$recUsers'
     },
     {
-      $unwind: '$child'
-    },
-    {
-      $match: {
-        'child.disabled': true
-      }
-    },
-    {
-      $group: {
-        _id: '$child.disable',
-        postCount: {$push: '$postCount'},
-        recCount: {$push: '$recCount'},
-        disabledPostsCount: {$sum: 1}
-      }
-    },
-    {
-      $unwind: '$postCount'
-    },
-    {
-      $limit: 1
-    },
-    {
-      $unwind: '$recCount'
-    },
-    {
-      $limit: 1
-    },
+      $count: 'recCount'
+    }
   ]);
-  updateObj.postCount = dataObj[0].postCount;
-  updateObj.disabledPostsCount = dataObj[0].disabledPostsCount;
-  updateObj.recCount = dataObj[0].recCount;
-  const t4 = Date.now();
-  updateObj.postCount = await PostModel.count({uid: this.uid});
-  updateObj.disabledPostsCount = await PostModel.count({uid: this.uid, disabled: true});
-  updateObj.threadCount = await ThreadModel.count({uid: this.uid});
-  updateObj.disabledThreadsCount = await ThreadModel.count({uid: this.uid, disabled: true});
-  updateObj.digestThreadsCount = await ThreadModel.count({uid: this.uid, digest: true});
-  updateObj.toppedThreadsCount = await ThreadModel.count({uid: this.uid, topped: true});
-  const t5 = Date.now();
-  console.log(updateObj);
+  updateObj.recCount = recCount.length !== 0? recCount[0].recCount: 0;
   await this.update(updateObj);
-  console.log(`all: ${t4-t3}ms`);
-  console.log(t5-t4 + 'ms');
 };
 
 userSchema.virtual('navbarDesc').get(function() {

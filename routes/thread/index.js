@@ -94,6 +94,7 @@ threadRouter
     await thread.update({$inc: [{count: 1}, {hits: 1}]});
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
+    await user.updateUserMessage();
     if(type === 'html')
       ctx.redirect(`/t/${tid}`, 303);
     await next();
