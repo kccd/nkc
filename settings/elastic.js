@@ -25,8 +25,8 @@ es.indexPost = function(post) {
   const esData = {
     c,
     t,
-    credits: credits.length,
-    recUsers: recUsers.length
+    credits: credits? credits.length: 0,
+    recUsers: recUsers? recUsers.length: 0
   };
   return client.create({
     index: postIndex,
