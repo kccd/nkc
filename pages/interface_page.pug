@@ -13,9 +13,11 @@ block content
           .panel-heading
             .f16 #{post.t}
                 
-            .lighttext by #{post.user.username} 
-              if data.contentClasses.classified
-                a(href=`/t/${post.tid}#${post.pid}`) 原文
+            .lighttext
+              span by&nbsp;
+              a(href=`/m/${post.uid}`) #{post.user.username}
+              span &nbsp;
+              a(href=`/t/${post.tid}#${post.pid}`) 原文
           .panel-body
             div.ThreadPostBody!= experimental_render(post)
       

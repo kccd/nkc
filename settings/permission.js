@@ -32,6 +32,9 @@ const certificates ={
       non_images: false
     },
     permittedOperations: {
+      test: {
+        [GET]: true
+      },
       login: {
         [name]: '登录',
         [GET]: true,

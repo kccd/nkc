@@ -147,7 +147,7 @@ postSchema.methods.ensurePermission = async function(ctx) {
   const thread = await ThreadModel.findOnly({tid: this.tid});
   // 同时满足以下条件返回true
   // 1、能浏览所在帖子
-  // 2、帖子没有被禁 或 用户为该板块的版主 或 具有比版主更高的权限
+  // 2、post没有被禁 或 用户为该板块的版主 或 具有比版主更高的权限
   return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
 };
 

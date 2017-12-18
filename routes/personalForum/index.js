@@ -230,7 +230,10 @@ router
       }
       const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
-        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendFirstPost().then(async p => {
+          await p.extendUser();
+          await p.extendResources();
+        });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));

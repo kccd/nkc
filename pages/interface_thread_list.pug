@@ -1,0 +1,29 @@
+-const {t, c, resources, toc, tid} = post;
+-const targetUser = post.user;
+.new-content(style='overflow: hidden')
+  .new-content-info
+    span
+      a(href=`/m/${targetUser.uid}`)
+        img(src=`/avatar_small/${targetUser.uid}`)
+    span
+      a(href=`/m/${targetUser.uid}`)= targetUser.username
+    span!=toc.toLocaleDateString()
+  .new-content-title
+    a.ForumThreadNormal(href=`/t/${tid}`)!= t
+  .new-content-body
+    -let klassOfDiv = 'div-noImg';
+    -let klassOfP = 'p-noImg';
+    -let imgId;
+    -const imgArr = ['jpg', 'png', 'jpeg'];
+    -for(let r of resources)
+      if(imgArr.includes(r.ext))
+        -imgId = r.rid;
+        -break;
+    if imgId
+      .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
+      .new-content-right.div-img.fixed-height
+        p.p-img!= c
+    else
+      .new-content-right.div-noImg
+        p.p-noImg!= c
+hr

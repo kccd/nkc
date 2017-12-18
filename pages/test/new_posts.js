@@ -48,7 +48,7 @@ const moveData = async (total, begin, count) => {
     d._id = undefined;
     d.pid = d._key;
     d.c = d.c.toString();
-    if(d.rpid) d.rpid = d.rpid[0];
+    // if(d.rpid) d.rpid = d.rpid[0];
     if(!d.credits || d.credits === null || d.credits === 'null') d.credits = [];
     //=========================
 

@@ -308,5 +308,29 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   await this.update({lm: pid});
   return _post
 };
+ // 算post所在楼层
+threadSchema.methods.getStep = async function(obj) {
+  const PostModel = require('./PostModel');
+  const {perpage} = require('../settings').paging;
+  const pid = obj.pid;
+  const q = {
+    tid: this.tid
+  };
+  if(obj.disabled === false) q.disabled = false;
+  const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
+  let page, step;
+  for (let i = 0; i < posts.length; i++) {
+    if(posts[i].pid !== pid) continue;
+    page = Math.ceil(i/perpage) - 1;
+    if(page < 0) page = 0;
+    step = i;
+    break;
+  }
+  console.log(page);
+  return {
+    page,// 页数
+    step // 楼层
+  }
+};
 
 module.exports = mongoose.model('threads', threadSchema);
