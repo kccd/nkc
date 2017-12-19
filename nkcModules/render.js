@@ -32,7 +32,11 @@ const replaceContent = (c) => {
   temp = temp.replace(/\[align=[a-zA-Z]/ig, '');
   temp = temp.replace(/\[color=#?[a-zA-Z0-9]+]/ig, ' ');
   temp = temp.replace(/\[\/align]/ig, ' ');
-  temp =temp.replace(/\[\/color]/ig, ' ');
+  temp = temp.replace(/\[\/color]/ig, ' ');
+  temp = temp.replace(/#{r=[0-9]+}/ig, ' <图> ');
+  temp = temp.replace(/\[url]/ig, '');
+  temp = temp.replace(/\[\/url]/ig, '');
+  temp = temp.replace(/\[em[0-9]+]/ig, '');
   return temp;
 };
 
