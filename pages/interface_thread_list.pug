@@ -11,8 +11,6 @@
   .new-content-title
     a.ForumThreadNormal(href=`/t/${tid}`)!= t
   .new-content-body
-    -let klassOfDiv = 'div-noImg';
-    -let klassOfP = 'p-noImg';
     -let imgId;
     -const imgArr = ['jpg', 'png', 'jpeg'];
     -for(let r of resources)
@@ -22,8 +20,8 @@
     if imgId
       .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
       .new-content-right.div-img.fixed-height
-        p.p-img!= c
+        p.p-img!= experimental_render(post)
     else
       .new-content-right.div-noImg
-        p.p-noImg!= c
+        p.p-noImg!= experimental_render(post)
 hr
