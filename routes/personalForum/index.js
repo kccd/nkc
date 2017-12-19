@@ -60,7 +60,10 @@ router
       }
       const threads = await ThreadModel.find({$and: [$matchThread.toJS(), {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
-        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendFirstPost().then(async p => {
+          await p.extendUser();
+          await p.extendResources();
+        });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
@@ -89,7 +92,10 @@ router
       }
       const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
-        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendFirstPost().then(async p => {
+          await p.extendUser();
+          await p.extendResources();
+        });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
@@ -107,7 +113,10 @@ router
       const tidArr = posts.map(post => post.tid);
       const threads = await ThreadModel.find({$and: [$matchThread, {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
-        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendFirstPost().then(async p => {
+          await p.extendUser();
+          await p.extendResources();
+        });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
@@ -167,7 +176,10 @@ router
       const $USM = matchBase.set('$and', $and).toJS();
       const threads = await ThreadModel.find($USM).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
-        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendFirstPost().then(async p => {
+          await p.extendUser();
+          await p.extendResources();
+        });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
@@ -315,7 +327,10 @@ router
     if(tab === 'all' || tab === 'own' || tab === 'discuss') {
       data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
         const thread = await ThreadModel.findOnly({tid});
-        await thread.extendFirstPost().then(p => p.extendUser());
+        await thread.extendFirstPost().then(async p => {
+          await p.extendUser();
+          await p.extendResources();
+        });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));

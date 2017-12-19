@@ -326,7 +326,6 @@ threadSchema.methods.getStep = async function(obj) {
     step = i;
     break;
   }
-  console.log(page);
   return {
     page,// 页数
     step // 楼层
