@@ -4,8 +4,23 @@ const begin = require('./begin');
 const t = Date.now();
 
 const init = async () => {
+  console.log('添加fid ...');
+  await db.query(`
+    for h in histories
+    let p = document(posts, h.pid)
+    filter p && p.fid
+    update h with {fid: p.fid} in histories
+  `);
+  console.log('修复l字段...');
+  await db.query(`
+    for h in histories
+    filter h.fid && !h.l
+    let p = document(posts, h.pid)
+    update h with {l: p.l} in histories
+  `);
   let total = await db.query(`
     for h in histories
+    filter h.fid
     collect with count into length
     return length
   `);
@@ -17,6 +32,7 @@ const moveData = async (total,begin, count) => {
   console.log(`开始读取数据（${begin} - ${begin + count}）`);
   let data = await db.query(`
     for h in histories
+    filter h.fid
     limit ${begin}, ${count}
     return h
   `);

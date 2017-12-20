@@ -137,12 +137,8 @@ experimentalRouter
       if(log.pid) {
         const {pid} = log;
         log.post = await db.PostModel.findOnly({pid: pid});
-        let pidArr = await db.PostModel.find({tid: log.tid}, {_id: 0, pid: 1}).sort({toc: 1});
-        pidArr = pidArr.map(p => p.pid);
-        const postIndex = pidArr.indexOf(pid);
-        let page = Math.ceil(postIndex/paging.perpage);
-        if(page <= 1) page = `?`;
-        else page = `?page=${page - 1}`;
+        let {page} = await log.thread.getStep({pid});
+        page = `?page=${page}`;
         log.link += `${page}#${pid}`;
       }
       return log;

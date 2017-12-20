@@ -1793,3 +1793,107 @@ img.emoji {
   display: inline-block;
   margin-right: 0.2rem;
 }
+
+.new-content-left{
+  float: left;
+  width: 12rem;
+  background-position: center center;
+  background-size: cover;
+  border-radius: 0.3rem;
+}
+.new-content-right{
+  float: left;
+  overflow: hidden;
+  max-height: 8.7rem;
+  position: relative;
+}
+.new-content-right > p{
+  color: #444;
+  font-size: 1.5rem;
+}
+.div-noImg{
+  width: 100%;
+}
+.div-img{
+  width: calc(100% - 12rem)
+}
+.p-noImg{
+  padding: 0;
+  margin: 0
+}
+.p-img{
+  padding: 0 0.5rem 0 0.5rem;
+  margin: 0 0 0 0;
+}
+.new-content-title > a{
+  vertical-align: middle;
+  letter-spacing: 0.4px;
+  font-size: 2rem;
+  font-weight: 600;
+  /*color: #337ab7;*/
+  text-decoration: none;
+  color: #444;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+.new-content-title > a:hover{
+  color: #000;
+  border-bottom: 1px solid #333;
+}
+.new-content-info > span{
+  margin-right: 0.5rem;
+}
+.new-content-info > span img{
+  width: 1.5rem;
+  border-radius: 0.3rem;
+}
+.fixed-height{
+  height: 8.7rem;
+}
+
+.new-content-body{
+  overflow: hidden;
+}
+.new-content-title{
+  margin: 0.5rem 0;
+}
+.new-content-forumAbbr{
+  height: 1.5rem;
+  border-radius: 0.2rem;
+  overflow: hidden;
+  padding: 1px 0;
+}
+.new-content .new-content-forumAbbr > a{
+  padding-right: 5px;
+  padding-left: 5px;
+  color: #fff;
+  text-align: center;
+}
+.new-content-info .icon{
+  margin-right: 0.2rem;
+  color: #ccc;
+}
+
+.icon-font{
+  color: #ccc;
+}
+.new-content-title > .digest-thread-title{
+  color: #d48900;
+}
+@media screen and (max-width: 768px) {
+  .new-content-left{
+    min-height:20rem;
+    width: 100%;
+  }
+  .new-content-right{
+    width: 100%;
+  }
+}
+@media screen and (max-width: 450px) {
+  .new-content-left{
+    min-height:13rem;
+  }
+  .p-img{
+    padding: 0;
+  }
+}

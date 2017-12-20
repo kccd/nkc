@@ -19,6 +19,7 @@ const adPath = path.resolve('resources/ad_posts');
 const siteSpecificPath = path.resolve('resources/site_specific');
 const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const qrCodePath = path.resolve('resources/qr');
+const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -77,6 +78,7 @@ module.exports = {
   siteSpecificPath,
   defaultAdPath,
   qrCodePath,
+  defaultImageResourcePath,
   avatarSize: 192,
   avatarSmallSize: 48
 };

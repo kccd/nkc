@@ -89,6 +89,7 @@ forumRouter
     const {cat, mid} = query;
     const {
       ForumModel,
+      ThreadModel
     } = db;
     const forum = await ForumModel.findOnly({fid});
     const _post = await forum.newPost(post, user, ip, cat, mid);
@@ -102,8 +103,8 @@ forumRouter
     });
     const type = ctx.request.accepts('json', 'html');
     await forum.update({$inc: {'tCount.normal': 1}});
-    await forum.updateForumMessage();
-    await user.updateUserMessage();
+    const thread = await ThreadModel.findOnly({tid: _post.tid});
+    await thread.updateThreadMessage();
     if(type === 'html')
       ctx.redirect(`/t/${_post.tid}`, 303);
     await next();

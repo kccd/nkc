@@ -125,20 +125,21 @@ block content
                       a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) &nbsp;封禁此人&nbsp;
 
         include interface_easy_post
+        //include interface_new_forumsList
 
         ul.nav.nav-tabs(style='margin-top: 0.4rem;')
-          li(class=`${data.tab === "own" ? "active" : ""}`)
-            a(href='?&tab=own') 版主
           li(class=`${data.tab === "all" ? "active" : ""}`)
             a(href='?&tab=all') 全部
+          li(class=`${data.tab === "own" ? "active" : ""}`)
+            a(href='?&tab=own') 文章
           li(class=`${data.tab === "reply"? "active" : ""}`)
             a(href='?&tab=reply') 回复
-          li(class=`${data.tab === "recommend"? "active" : ""}`)
-            a(href='?&tab=recommend') 推荐
-          li(class=`${data.tab === "subscribe" ? "active" : ""}`)
-            a(href='?&tab=subscribe') 关注
-          li
-            a(href=`/u/${data.forum.uid}/activities`) 动态
+          //li(class=`${data.tab === "recommend"? "active" : ""}`)
+          //  a(href='?&tab=recommend') 推荐
+          //li(class=`${data.tab === "subscribe" ? "active" : ""}`)
+          //  a(href='?&tab=subscribe') 关注
+          //li
+          //  a(href=`/u/${data.forum.uid}/activities`) 动态
         .panel
           .row
             .col-xs-12
@@ -196,7 +197,9 @@ block content
           if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
             .ForumThreadList
               each thread,index in data.toppedThreads
-                include interface_personal_forum_single_thread
+                //include interface_personal_forum_single_thread
+                -const firstPost = thread.firstPost
+                include interface_new_postsList
             //hr.hrNarrowSpace
             .ForumToppedSplitter - 以上是置顶 -
 
@@ -205,8 +208,9 @@ block content
               if data.toppedThreads && (data.toppedThreads.map(item => item.tid).indexOf(thread.tid) >= 0)
                 //exclude threads that are shown in topped area.
               else
-                include interface_personal_forum_single_thread
-
+                //include interface_personal_forum_single_thread
+                -const firstPost = thread.firstPost
+                include interface_new_postsList
           .row
             .col-md-12
               nav

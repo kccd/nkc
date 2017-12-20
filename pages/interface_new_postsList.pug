@@ -1,0 +1,45 @@
+-const {t, c, resources, toc, tid} = firstPost;
+-const targetUser = firstPost.user;
+-let childrenForum;
+-let parentForum;
+-data.forumList.map(p => {if(p.children){p.children.map(c => {if (c.fid === firstPost.fid) {childrenForum = c;parentForum = p}})}});
+.new-content(style='overflow: hidden')
+  .new-content-info
+    span
+      a(href=`/m/${targetUser.uid}`)
+        img(src=`/avatar_small/${targetUser.uid}`)
+    span
+      a(href=`/m/${targetUser.uid}`)= targetUser.username
+    span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
+      a(href=`/f/${parentForum.fid}` title='<font color=#ff4e22 size=7><em>爽！</em></font>')= parentForum.displayName
+    span.new-content-forumAbbr(style=`background-color:${childrenForum.color};`)
+      a(href=`/f/${childrenForum.fid}`)= childrenForum.abbr
+    span.icon-font=fromNow(toc)
+    if thread
+      span(title=`${thread.hits}次浏览`)
+        span.glyphicon.glyphicon-eye-open.icon
+        span.icon-font=thread.hits
+      span(title=`${thread.count}条回复`)
+        span.glyphicon.glyphicon-comment.icon
+        span.icon-font=(thread.count-1)
+    else
+      span(title=`${firstPost.recUsers.length}次点赞`)
+        span.glyphicon.glyphicon-heart.icon
+        span.icon-font=firstPost.recUsers.length
+  .new-content-title
+    -let digest = '';
+    if thread && thread.digest
+      -digest = 'digest-thread-title';
+    a.ForumThreadNormal(class=digest href=`/t/${tid}`)= t
+  .new-content-body
+    -let imgId;
+    -const imgArr = ['jpg', 'png', 'jpeg'];
+    -for(let r of resources)
+      if(imgArr.includes(r.ext))
+        -imgId = r.rid;
+        -break;
+    if imgId
+      .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
+    .new-content-right(class=imgId?'div-img fixed-height': 'div-noImg')
+      p(class=imgId?'p-img': 'p-noImg')= replaceContent(c)
+hr

@@ -32,7 +32,8 @@ let HistoriesSchema = new Schema({
     type: String,
   },
   l: {
-    type: String
+    type: String,
+    required: true
   },
   r: {
     type: [String],
@@ -53,6 +54,7 @@ let HistoriesSchema = new Schema({
   },
   fid: {
     type: String,
+    required: true,
     index: 1
   },
   tid: {

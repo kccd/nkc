@@ -8,7 +8,14 @@ const postRouter = new Router();
 
 postRouter
   .get('/:pid', async (ctx, next) => {
+    const {data, db} = ctx;
     const {pid} = ctx.params;
+    const post = await db.PostModel.findOnly({pid});
+    if(!await post.ensurePermission(ctx)) ctx.throw(401, '权限不足');
+    await post.extendUser();
+    await post.extendResources();
+    data.post = post;
+    ctx.template = 'interface_page.pug';
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
@@ -19,7 +26,6 @@ postRouter
     const {user} = data;
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
-    const _post = targetPost.toObject();
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
@@ -81,15 +87,9 @@ postRouter
     };
     await targetPost.update(obj);
     if(!await targetThread.ensurePermissionOfModerators(ctx)) q.disabled = false;
-    const indexOfPostId = await db.PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
-    let page = 0;
+    let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;
-    for (let i in indexOfPostId) {
-      if(indexOfPostId[i].pid !== pid) continue;
-      page = Math.ceil(i/perpage);
-      if(page <= 1) page = `?`;
-      else page = `?page=${page - 1}`;
-    }
+    page = `?page=${page}`;
     data.redirect = `/t/${targetThread.tid + page + postId}`;
     data.targetUser = targetUser;
     await targetUser.updateUserMessage();

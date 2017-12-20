@@ -8,12 +8,20 @@ resourceRouter
   })
   .get('/:rid', async (ctx, next) => {
     const {rid} = ctx.params;
-    const {data, db} = ctx;
+    const {data, db, fs} = ctx;
     const resource = await db.ResourceModel.findOnly({rid});
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
     if(!extArr.includes(resource.ext) && data.userLevel < 1) ctx.throw(401, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
-    ctx.filePath = ctx.settings.upload.uploadPath + path;
+    let filePath = ctx.settings.upload.uploadPath + path;
+    if(extArr.includes(resource.ext)) {
+      try{
+        await fs.access(filePath);
+      } catch(e){
+        filePath = ctx.settings.upload.defaultImageResourcePath;
+      }
+    }
+    ctx.filePath = filePath;
     ctx.resource = resource;
     ctx.type = ext;
     ctx.set('Accept', 'application/*');

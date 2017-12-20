@@ -23,6 +23,23 @@ let getCertsInText = (user) => {
   return s;
 };
 
+const replaceContent = (c) => {
+  let temp = c;
+  temp = temp.replace(/<[a-zA-Z]+.*?>/ig, ' ');
+  temp = temp.replace(/<\/[a-zA-Z]+>/ig, ' ');
+  temp = temp.replace(/\[hide=[0-9]+]/ig, ' ');
+  temp = temp.replace(/\[\/hide]/ig, ' ');
+  temp = temp.replace(/\[align=[a-zA-Z]/ig, '');
+  temp = temp.replace(/\[color=#?[a-zA-Z0-9]+]/ig, ' ');
+  temp = temp.replace(/\[\/align]/ig, ' ');
+  temp = temp.replace(/\[\/color]/ig, ' ');
+  temp = temp.replace(/#{r=[0-9]+}/ig, ' <图> ');
+  temp = temp.replace(/\[url]/ig, '');
+  temp = temp.replace(/\[\/url]/ig, '');
+  temp = temp.replace(/\[em[0-9]+]/ig, '');
+  return temp;
+};
+
 function toQueryString(object) {
   let qs = '';
   for(const key of Object.keys(object)) {
@@ -108,6 +125,7 @@ let pugRender = (template, data) => {
     server: settings.server,
     plain:render.plain_render,
     experimental_render:render.experimental_render,
+    replaceContent: replaceContent,
     toQueryString,
     testModifyTimeLimit,
     dateString,
