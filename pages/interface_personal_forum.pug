@@ -125,7 +125,7 @@ block content
                       a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) &nbsp;封禁此人&nbsp;
 
         include interface_easy_post
-        include interface_new_forumsList
+        //include interface_new_forumsList
 
         ul.nav.nav-tabs(style='margin-top: 0.4rem;')
           li(class=`${data.tab === "all" ? "active" : ""}`)
@@ -197,7 +197,9 @@ block content
           if data.toppedThreads && data.toppedThreads.length > 0 && !data.cat
             .ForumThreadList
               each thread,index in data.toppedThreads
-                include interface_personal_forum_single_thread
+                //include interface_personal_forum_single_thread
+                -const firstPost = thread.firstPost
+                include interface_new_postsList
             //hr.hrNarrowSpace
             .ForumToppedSplitter - 以上是置顶 -
 

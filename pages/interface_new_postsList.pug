@@ -27,7 +27,10 @@
         span.glyphicon.glyphicon-heart.icon
         span.icon-font=firstPost.recUsers.length
   .new-content-title
-    a.ForumThreadNormal(href=`/t/${tid}`)= t
+    -let digest = '';
+    if thread && thread.digest
+      -digest = 'digest-thread-title';
+    a.ForumThreadNormal(class=digest href=`/t/${tid}`)= t
   .new-content-body
     -let imgId;
     -const imgArr = ['jpg', 'png', 'jpeg'];

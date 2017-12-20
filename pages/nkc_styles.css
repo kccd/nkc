@@ -1877,7 +1877,9 @@ img.emoji {
 .icon-font{
   color: #ccc;
 }
-
+.new-content-title > .digest-thread-title{
+  color: #d48900;
+}
 @media screen and (max-width: 768px) {
   .new-content-left{
     min-height:20rem;
