@@ -69,4 +69,16 @@ inviteSchema.methods.extend = async function() {
   return {at: this, post, user, thread, oc}
 };
 
+inviteSchema.post('save', async function(doc, next) {
+  // should increase the invitee's un-read notification
+
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+
+  const uid = doc.invitee;
+  console.log(doc);
+  const inviteePersonal = await UsersPersonalModel.findOnly({uid});
+  await inviteePersonal.increasePsnl('at', 1);
+  return next()
+});
+
 module.exports = mongoose.model('invites', inviteSchema);

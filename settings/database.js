@@ -49,8 +49,8 @@ mongoose.plugin(function(schema) {
   })
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error(reason + '\n' + promise)
+process.on('unhandledRejection', (e, promise) => {
+  console.error(e.stack + '\n' + promise)
 });
 
 module.exports = mongoose;

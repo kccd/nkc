@@ -11,7 +11,7 @@ smsRouter
     const {data, db} = ctx;
     const {user} = data;
     const page = ctx.query.page || 0;
-    let replies = await db.RepliesModel.find({toUid: user.uid}).sort({toc: -1});
+    let replies = await db.ReplyModel.find({toUid: user.uid}).sort({toc: -1});
     const repliesLength = replies.length;
     const paging = apiFn.paging(page, repliesLength);
     const start = paging.start;

@@ -1,6 +1,7 @@
 for thread in newestDigestThreads
-  a.nkc-figure.figure-4-3(href=`/t/${thread.tid}`)
-    div(style='width: 100%;height: 100%; position: absolute; border-radius: 5px; padding: 1px;')
-      div(style='position: relative; width: 100%; height: 100%; overflow: hidden;')
-        img(src=`/r/${thread.src}` style='width: 100%; height: 100%; border-radius: 5px;')
-        div.nkc-figure-text &nbsp;#{thread.firstPost.t}
+  -const src = (thread.firstPost.resources.find(e => ['jpg', 'png', 'svg', 'jpeg', 'bmp'].indexOf(e.ext) > -1)).rid
+    a.nkc-figure.figure-4-3(href=`/t/${thread.tid}`)
+      div(style='width: 100%;height: 100%; position: absolute; border-radius: 5px; padding: 1px;')
+        div(style='position: relative; width: 100%; height: 100%; overflow: hidden;')
+          img(src=`/r/${src}` style='width: 100%; height: 100%; border-radius: 5px;')
+          div.nkc-figure-text &nbsp;#{thread.firstPost.t}
