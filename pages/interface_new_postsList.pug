@@ -41,5 +41,5 @@
     if imgId
       .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
     .new-content-right(class=imgId?'div-img fixed-height': 'div-noImg')
-      p(class=imgId?'p-img': 'p-noImg')= replaceContent(c)
+      p(class=imgId?'p-img': 'p-noImg')!= replaceContent(experimental_render(firstPost))
 hr
