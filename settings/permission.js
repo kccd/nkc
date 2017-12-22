@@ -403,6 +403,22 @@ const certificates ={
         [parameter]: {
           [POST]: true
         }
+      },
+      fund: {
+        [name]: '基金',
+        [GET]: true,
+        add: {
+          [GET]: true,
+          [POST]: true
+        },
+        management: {
+          [GET]: true,
+          [parameter]: {
+            [GET]: true,
+            [DELETE]: true,
+            [PATCH]: true
+          }
+        }
       }
     },
     elseModifyTimeLimit: 0,

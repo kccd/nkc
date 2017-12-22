@@ -22,7 +22,8 @@ const settingSchema = new Schema({
     threads: Number,
     questions:Number,
     collections: Number,
-    sms: Number
+    sms: Number,
+    funds: Number
   }
 },
 {toObject: {

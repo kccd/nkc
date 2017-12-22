@@ -1,0 +1,104 @@
+body{
+  /*background-color: #efefef;*/
+}
+.fund-list{
+  margin: 15px 0;
+}
+.fund-list > a{
+  display: inline-block;
+  background-color: #fff;
+  text-align: center;
+  width: 100%;
+  height: 20rem;
+  text-decoration: none;
+  box-shadow: 0 2px 15px #efefef;
+  transition: box-shadow 0.3s;
+  position: relative;
+}
+.fund-list > a:hover{
+  box-shadow: 0 4px 15px #ccc;
+}
+.fund-name{
+  height: 12rem;
+  background-color: #7f9eb2;
+  color: #fff;
+  font-size: 3rem;
+  line-height: 10rem;
+}
+.fund-money{
+  color: #ff7979;
+  font-size: 3rem;
+  line-height: 8rem;
+}
+.fund-add{
+  color: #ddd;
+  font-size: 10rem;
+  font-weight: 100;
+  line-height: 20rem;
+  text-align: center;
+}
+.fund-h3{
+  font-size: 1.8rem;
+  color: #555;
+}
+.fund-h1{
+  font-size: 3rem;
+  color: #333;
+}
+.fund-h2{
+  font-size: 2.2rem;
+  color: #444;
+}
+.fund-setting-list{
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+input[type="radio"], input[type="checkbox"]{
+  margin-top: 0.9rem;
+}
+.redFontColor{
+  color: red;
+}
+.greenColor{
+  color: green;
+}
+#fundColorDisplay{
+  height: 2.6rem;
+  width: 6rem;
+  background-color: #7f9eb2;
+  border: 1px solid #000;
+}
+.fund-mask{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  padding-top: 8rem;
+  transition: background-color 0.3s;
+}
+.fund-mask:hover{
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.fund-mask:hover div{
+  border: 1px solid rgba(255,255,255,0.8);
+  color: rgba(255,255,255,1);
+}
+.fund-mask > div{
+  background-color: rgba(0,0,0,0);
+  border: 1px solid rgba(255,255,255,0);
+  height: 3rem;
+  text-align: center;
+  line-height: 3rem;
+  margin: 1rem auto;
+  color: rgba(255,255,255,0);
+  width: 10rem;
+  margin-top: 0.5rem;
+  transition: border 0.3s,color 0.3s ;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.fund-mask > div:hover{
+  background-color: rgba(0,0,0,0);
+  border-color: #337ab7;
+  color: #337ab7;
+}

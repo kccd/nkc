@@ -1,0 +1,5 @@
+-const {id, name, color, money} = fund;
+.col-xs-6.col-sm-4.col-md-3.fund-list
+  a(href=`/fund/${id}`)
+    .fund-name(style=`background-color: ${color}`)= name
+    .fund-money!= `￥${money}&nbsp`
