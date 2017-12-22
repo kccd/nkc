@@ -15,14 +15,17 @@ router.get('/', async(ctx, next) => {
   const {searchPost, searchUser} = es;
   data.type = type;
   data.q = q;
+  data.page = page;
   const nowAt = page * perpage;
   if(type === 'content') {
-    data.result = await searchPost('lzszone', nowAt, perpage);
-    console.log(data.result);
+    data.result = await searchPost('光标', nowAt, perpage);
+    console.log(data.result.hits.hits.map(usr => usr.highlight));
+    return next()
+  } else if(type === 'user') {
+    data.result = await searchUser('lzszone', nowAt, perpage);
     return next()
   }
-  data.result = await searchUser('lzszone', nowAt, perpage);
-  return next()
+  ctx.throw(404, 'unknown type..')
 });
 
 module.exports = router;

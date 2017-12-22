@@ -1,6 +1,7 @@
-const {ResourceModel} = require('../../dataModels');
+const {ResourceModel, PostModel} = require('../../dataModels');
 const db = require('./arangodb');
 const begin = require('./begin');
+const aql = require('arangojs').aql;
 
 const t = Date.now();
 
@@ -29,6 +30,15 @@ const moveData = async (total, begin, count) => {
     // 处理数据=================
     n++;
     d.rid = d._key;
+    const cursor = await db.query(aql`
+      for p in posts
+        filter ${d._key} in p.r[*]
+      return p._key
+    `);
+    d.references = await cursor.all();
+    if(['jpg', 'png', 'jpeg', 'bmp', 'svg'].indexOf(d.ext) > -1) {
+      await Promise.all(d.references.map(ref => PostModel.findOneAndUpdate({pid: ref}, {hasImage: true})))
+    }
     d._id = undefined;
     //=========================
 

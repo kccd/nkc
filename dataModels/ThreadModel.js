@@ -235,30 +235,17 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const UsersPersonalModel = require('./UsersPersonalModel');
   const PostModel = require('./PostModel');
   const UserModel = require('./UserModel');
-  const InviteModel = require('./InviteModel');
-  const RepliesModel = require('./RepliesModel');
+  const ReplyModel = require('./ReplyModel');
   const dbFn = require('../nkcModules/dbFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {c, t, l} = post;
-  //handle at someone
-  const {atUsers, existedUsers, r, quote} = await dbFn.getArrayForAtResourceAndQuote(c);
-  await Promise.all(atUsers.map(foundUser => {
-    const at = new InviteModel({
-      pid,
-      invitee: foundUser.uid,
-      inviter: user.uid,
-    });
-    return at.save();
-  }));
-  // 如果回复别人的帖子则提醒
+  const quote = await dbFn.getQuote(c);
   if(this.uid !== user.uid) {
-    const replyWriteOfThread = new RepliesModel({
+    const replyWriteOfThread = new ReplyModel({
       fromPid: pid,
       toPid: this.oc,
       toUid: this.uid
     });
-    const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-    await userPersonal.increasePsnl('replies', 1);
     await replyWriteOfThread.save();
   }
   let rpid = '';
@@ -267,13 +254,11 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   }
   const _post = await new PostModel({
     pid,
-    atUsers,
     c,
     t,
     ipoc: ip,
     iplm: ip,
     l,
-    r,
     fid: this.fid,
     tid: this.tid,
     uid: user.uid,
@@ -285,24 +270,18 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     lm: pid,
     tlm: Date.now()
   });
-  await Promise.all(existedUsers.map(async u => {
-    const up = await UsersPersonalModel.findOnly({uid: u.uid});
-    await up.increasePsnl('at', 1);
-  }));
   if(quote && quote[2] !== this.oc) {
     const username = quote[1];
     const quPid = quote[2];
     const quUser = await UserModel.findOne({username});
     const quPost = await PostModel.findOne({pid: quPid});
     if(quUser && quPost) {
-      const quUserPersonal = await UsersPersonalModel.findOnly({uid: quUser.uid});
-      const reply = new RepliesModel({
+      const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
         toUid: quUser.uid
       });
       await reply.save();
-      await quUserPersonal.increasePsnl('replies', 1);
     }
   }
   await this.update({lm: pid});

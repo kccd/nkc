@@ -1,4 +1,4 @@
-const {RepliesModel} = require('../../dataModels');
+const {ReplyModel} = require('../../dataModels');
 const db = require('./arangodb');
 const begin = require('./begin');
 const t = Date.now();
@@ -37,7 +37,7 @@ const moveData = async (total,begin, count) => {
     d.toPid = d.topid;
     d.toUid = d.touid;
 
-    const newReplies = new RepliesModel(d);
+    const newReplies = new ReplyModel(d);
     try{
       await newReplies.save();
       console.log(`总数：${total}, 第${begin+n}条数据写入成功！当前${count}条耗时：${Date.now() - t1}ms， 累计耗时：${Date.now() - t}ms`);

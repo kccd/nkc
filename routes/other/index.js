@@ -33,11 +33,11 @@ otherRouter
     const {content} = ctx.query;
     data.content = content || 'all';
     data.navbar = {highlight: 'home'};
+    const {ThreadModel} = ctx.db;
     let t = Date.now();
 
     const visibleFid = await ctx.getVisibleFid();
-    const imgArr = ['jpg', 'png', 'svg', 'jpeg'];
-    let tidArr = await db.ThreadModel.aggregate([
+    data.newestDigestThreads = await ThreadModel.aggregate([
       {$sort: {toc: -1}},
       {
         $match: {
@@ -45,9 +45,6 @@ otherRouter
           disabled: false,
           digest: true
         }
-      },
-      {
-        $project: {tid: 1, _id: 0, oc: 1},
       },
       {
         $lookup: {
@@ -61,40 +58,36 @@ otherRouter
         $unwind: '$firstPost'
       },
       {
-        $unwind: '$firstPost.r'
+        $match: {'firstPost.hasImage': true}
       },
-      {
-        $lookup: {
-          from: 'resources',
-          localField: 'firstPost.r',
-          foreignField: 'rid',
-          as: 'resource'
-        }
-      },
-      {
-        $project: {tid: 1, resource: 1}
-      },
-      {
-        $match: {'resource': {$elemMatch: {ext: {$in: imgArr}}}}
-      },
-      {$group: {_id: '$tid'}},
+      {$lookup: {
+        from: 'users',
+        localField: 'firstPost.uid',
+        foreignField: 'uid',
+        as: 'firstPost.user'
+      }},
+      {$lookup: {
+        from: 'resources',
+        localField: 'firstPost.pid',
+        foreignField: 'references',
+        as: 'firstPost.resources'
+      }},
       {$limit: 200},
       {$sample: {size: 6}}
     ]);
-    const threads = await db.ThreadModel.find({tid: {$in: tidArr}});
-    data.newestDigestThreads = await Promise.all(threads.map(async thread => {
-      await thread.extendFirstPost().then(async p => {
-        await p.extendUser();
-        await p.extendResources();
-      });
-      for (let r of thread.firstPost.resources) {
-        if(imgArr.includes(r.ext)) {
-          thread.src = r.rid;
-          break;
-        }
-      }
-      return thread;
-    }));
+    // data.newestDigestThreads = await Promise.all(tidArr.map(async thread => {
+    //   await thread.extendFirstPost().then(async p => {
+    //     await p.extendUser();
+    //     await p.extendResources();
+    //   });
+    //   for (let r of thread.firstPost.resources) {
+    //     if(imgArr.includes(r.ext)) {
+    //       thread.src = r.rid;
+    //       break;
+    //     }
+    //   }
+    //   return thread;
+    // }));
     let t1 = Date.now();
 
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);

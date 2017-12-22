@@ -189,42 +189,8 @@ fn.getForums = async ctx => {
   return result;
 };
 
-fn.getArrayForAtResourceAndQuote = async function(c) {
-  const atUsers = []; //user info {username, uid}
-  const existedUsers = []; //real User mongoose data model
-  const resources = (c.match(/{r=[0-9]{1,20}}/g) || [])
-    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
-  const matchedUsernames = c.match(/@([^@\s]*)\s/g);
-  const quote = c.match(/\[quote=(.*?),(.*?)]/);
-  if(matchedUsernames) {
-    await Promise.all(matchedUsernames.map(async str => {
-      const username = str.slice(1, -1); //slice the @ and [\s] in reg
-      const user = await db.UserModel.findOne({username});
-      if(user) {
-        const {username, uid} = user;
-        let flag = true; //which means this user does not in existedUsers[]
-        for(const u of atUsers) {
-          if(u.username === username)
-            flag = false;
-        }
-        if(flag) {
-          atUsers.push({username, uid});
-          existedUsers.push(user)
-        }
-      }
-    }))
-  }
-  const r = [];
-  for (let i of resources) {
-    if(!r.includes(i)) r.push(i);
-  }
-
-  return {
-    r,
-    atUsers,
-    existedUsers,
-    quote
-  }
+fn.getQuote = async function(c) {
+  return c.match(/\[quote=(.*?),(.*?)]/);
 };
 
 

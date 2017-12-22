@@ -2,7 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
-const repliesSchema = new Schema({
+const replySchema = new Schema({
   fromPid: {
     type: String,
     required: true
@@ -27,7 +27,7 @@ const repliesSchema = new Schema({
   virtuals: true
 }});
 
-repliesSchema.virtual('fromPost')
+replySchema.virtual('fromPost')
   .get(function() {
     return this._fromPost;
   })
@@ -35,7 +35,7 @@ repliesSchema.virtual('fromPost')
     this._fromPost = p;
   });
 
-repliesSchema.virtual('toPost')
+replySchema.virtual('toPost')
   .get(function() {
     return this._toPost;
   })
@@ -43,22 +43,30 @@ repliesSchema.virtual('toPost')
     this._toPost = p;
   });
 
-repliesSchema.methods.extendFromPost = async function() {
+replySchema.methods.extendFromPost = async function() {
   const PostModel = require('./PostModel');
   const fromPost = await PostModel.findOnly({pid: this.fromPid});
   return this.fromPost = fromPost;
 };
 
-repliesSchema.methods.extendToPost = async function() {
+replySchema.methods.extendToPost = async function() {
   const PostModel = require('./PostModel');
   const toPost = await PostModel.findOnly({pid: this.toPid});
   return this.toPost = toPost;
 };
 
 
-repliesSchema.methods.view = async function() {
+replySchema.methods.view = async function() {
   return await this.update({viewed: true});
 };
 
+replySchema.post('save', async function(doc, next) {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
 
-module.exports = mongoose.model('replies', repliesSchema);
+  const uid = doc.toUid;
+  const toUser = await UsersPersonalModel.findOnly({uid});
+  await toUser.increasePsnl('replies', 1);
+  return next()
+});
+
+module.exports = mongoose.model('replies', replySchema);
