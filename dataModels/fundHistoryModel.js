@@ -1,7 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const fundApplicationSchema = new Schema({
+const fundHistorySchema = new Schema({
   _id: Number,
   fundId: {
     type: Number,
@@ -66,13 +66,32 @@ const fundApplicationSchema = new Schema({
       type: String,
       required: true
     }
+  },
+  status: {
+    checkProject: {
+      type: Boolean,
+      default: false
+    },
+    checkUsersMessages: {
+      type: Boolean,
+      default: false
+    },
+    transfer: {
+      type: Boolean,
+      default: false
+    }
+  },
+  reviseCount: {
+    type: Number,
+    required: true
+  },
+  refuseReason: {
+    type: String,
+    default: ''
   }
-
-
-
 }, {
-  collection: 'fundApplications'
+  collection: 'fundHistories'
 });
 
-const FundApplicationModel = mongoose.model('fundApplications', fundApplicationSchema);
+const FundApplicationModel = mongoose.model('fundHistories', fundHistorySchema);
 module.exports = FundApplicationModel;

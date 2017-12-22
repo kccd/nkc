@@ -411,14 +411,6 @@ const certificates ={
           [GET]: true,
           [POST]: true
         },
-        management: {
-          [GET]: true,
-          [parameter]: {
-            [GET]: true,
-            [DELETE]: true,
-            [PATCH]: true
-          }
-        }
       }
     },
     elseModifyTimeLimit: 0,
@@ -653,6 +645,16 @@ const certificates ={
         updateAllThreads: {
           [name]: '更新所有帖子数据',
           [POST]: true
+        }
+      },
+      fund: {
+        management: {
+          [GET]: true,
+          [parameter]: {
+            [GET]: true,
+            [DELETE]: true,
+            [PATCH]: true
+          }
         }
       }
     }

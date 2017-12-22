@@ -3,56 +3,13 @@ const fundRouter = new Router();
 fundRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
-    data.fundList = [
-      {
-        id: 1,
-        name: '科创基金',
-        color: '#e85a71',
-        money: 50
-      },
-      {
-        id: 2,
-        name: '科创基金',
-        color: '#4ea1d3',
-        money: 100
-      },
-      {
-        id: 3,
-        name: '科创基金',
-        color: '#d8e9ef',
-        money: 500
-      },
-      {
-        id: 4,
-        name: '科创基金',
-        color: '#e85a71',
-        money: 1000
-      },{
-        id: 5,
-        name: '科创基金',
-        color: '#e85a71',
-        money: 5000
-      }
-      ,{
-        id: 6,
-        name: '科创基金',
-        color: '#d8e9ef',
-        money: 10000
-      }
-      ,{
-        id: 7,
-        name: '科创基金',
-        color: '#4ea1d3',
-        money: 50000
-      }
-    ];
+    data.fundList = await db.FundModel.find({}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';
     await next();
   })
   .get('/management', async (ctx, next) => {
     const {data, db} = ctx;
     data.fundList = await db.FundModel.find({}).sort({toc: 1});
-    console.log(data.fundList);
     ctx.template = 'interface_fund_management.pug';
     await next();
   })
