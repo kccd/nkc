@@ -10,6 +10,10 @@ block content
   -const authentication = preconditions? preconditions.authentication: '';
   .container-fluid(style='max-width: 1400px;')
     .row
+      if !fund
+        h2.text-center 新建基金
+      else
+        h2.text-center 基金设置
       .col-xs-12.col-md-12
         h4 基本信息
         hr

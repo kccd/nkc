@@ -139,6 +139,20 @@ userSchema.virtual('group')
     this._group = g;
   });
 
+userSchema.virtual('threads')
+  .get(function() {
+    return this._threads;
+  })
+  .set(function(t) {
+    this._threads = t;
+  });
+
+userSchema.methods.extendThreads = async function() {
+  const ThreadModel = require('./ThreadModel');
+  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
+  return this.threads = threads;
+};
+
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = require('./ThreadModel');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);

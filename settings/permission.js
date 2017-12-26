@@ -382,6 +382,10 @@ const certificates ={
           [name]: '个人动态',
           [GET]: true
         },
+        threads: {
+          [name]: '获取帖子',
+          [GET]: true
+        }
       },
       logout: {
         [GET]: true
@@ -407,10 +411,12 @@ const certificates ={
       fund: {
         [name]: '基金',
         [GET]: true,
-        add: {
-          [GET]: true,
-          [POST]: true
-        },
+        [parameter]: {
+          application: {
+            [GET]: true,
+            [POST]: true
+          }
+        }
       }
     },
     elseModifyTimeLimit: 0,
@@ -648,12 +654,13 @@ const certificates ={
         }
       },
       fund: {
-        management: {
-          [GET]: true,
-          [parameter]: {
-            [GET]: true,
-            [DELETE]: true,
-            [PATCH]: true
+        [POST]: true,
+        [parameter]: {
+          [DELETE]: true,
+          [POST]: true,
+          [PATCH]: true,
+          settings: {
+            [GET]: true
           }
         }
       }

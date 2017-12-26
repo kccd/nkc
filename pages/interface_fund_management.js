@@ -1,9 +1,9 @@
 $(function(){
 
 });
-function deleteFund(id){
-  if(confirm('删除基金'+ id) === true) {
-    nkcAPI('/fund/management/'+id, 'DELETE')
+function deleteFund(name, money, id){
+  if(confirm('确定要删除 ' + name+ '￥' + money + ' ？') === true) {
+    nkcAPI('/fund/'+id, 'DELETE')
       .then(function() {
         window.location.reload();
       })

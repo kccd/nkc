@@ -94,5 +94,38 @@ meRouter
     const quota = parseInt(ctx.query.quota);
     ctx.data.resources = await db.ResourceModel.find({uid: user.uid}).sort({toc: -1}).limit(quota);
     await next();
+  })
+  .get('/threads', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    const {pid} = ctx.query;
+    const page = ctx.query.page?parseInt(ctx.query.page): 0;
+    if(pid){
+      const thread = await db.ThreadModel.findOne({oc: pid, disabled: false});
+      if(!thread) ctx.throw(400, '没有与之匹配的帖子');
+      await thread.extendFirstPost();
+      data.threads=[thread.toObject()];
+      console.log(data.threads)
+    } else {
+      const q = {
+        uid: user.uid,
+        fid: {$ne: 'recycle'}
+      };
+      const length = await db.ThreadModel.count(q);
+      let start;
+      const perpage = 20;
+      start  = page*perpage;
+      data.paging = {
+        page: page,
+        pageCount: Math.ceil(length/perpage),
+        perpage: perpage
+      };
+      const threads = await db.ThreadModel.find(q).skip(start).limit(perpage);
+      data.threads = await Promise.all(threads.map(async t => {
+        await t.extendFirstPost();
+        return t.toObject();
+      }));
+    }
+    await next();
   });
 module.exports = meRouter;

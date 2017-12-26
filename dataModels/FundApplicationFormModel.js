@@ -5,7 +5,8 @@ const fundApplicationFormSchema = new Schema({
   _id: Number,
   fundId: {
     type: Number,
-    required: true
+    required: true,
+    index: 1
   },
   uid: {
     type: String,
@@ -26,11 +27,25 @@ const fundApplicationFormSchema = new Schema({
     type: Number,
     required: true
   },
+  postpone: {
+    type: [Number],
+    default: []
+  },
   members: {
     type: [Schema.Types.Mixed],
     default: []
   },
   /*
+  {
+    uid: ****,
+    info: {
+      name: ****
+      idCard: ****
+      ...
+    }
+
+  }
+
   {
     uid: String,
     name: String,
@@ -41,11 +56,11 @@ const fundApplicationFormSchema = new Schema({
     certPhotoPath: [String]
   }
   */
-  thread: {
+  threads: {
     type: [String],
     default:[]
   },
-  paper: {
+  papers: {
     type: [String],
     default: []
   },
@@ -60,7 +75,7 @@ const fundApplicationFormSchema = new Schema({
     }
   },
   project: {
-    name: {
+    title: {
       type: String,
       required: true
     },
@@ -71,6 +86,10 @@ const fundApplicationFormSchema = new Schema({
     content: {
       type: String,
       required: true
+    },
+    supplementary: {
+      type: [String],
+      default: []
     }
   },
   reviseCount: {
@@ -78,28 +97,50 @@ const fundApplicationFormSchema = new Schema({
     required: true
   },
   applicationStatus: {
-    type: Number,
-    default: 0
-    /*0000001 1   通过好友支持
-    * 0000011 3   通过项目审核（等待用户信息审核）
-    * 0000111 4   通过用户信息审核（等待放款）
-    * 0001111 15   放款成功（等待结项）
-    * 0011111 31  已结项
-    * 0111111 63  研发成功（等待评优）
-    * 1111111 127 优秀项目（完成）
-    */
+    usersSupport: {
+      type: Boolean,
+      default: false
+    },
+    projectPassed: {
+      type:Boolean,
+      default: false
+    },
+    usersMessagesPassed: {
+      type: Boolean,
+      default: false
+    },
+    remittance: {
+      type: Boolean,
+      default: false
+    },
+    complete: {
+      type: Boolean,
+      default: false
+    },
+    successful: {
+      type: Boolean,
+      default: false
+    },
+    excellent: {
+      type: Boolean,
+      default: false
+    }
   },
-  auditStatus: {
-    type: Number,
-    default: 0
-    /*
-    * 0001 1  提交审核（等待审核）
-    * 0011 3  正在审核（锁定，等待审核结果）
-    * 0111 7  审核完成
-    * 1111 15 审核通过
-    * */
-  },
-  lock: {
+  projectLock: {
+    status: {
+      submitted: {
+        type: Boolean,
+        default: false
+      },
+      beingReviewed: {
+        type: Boolean,
+        default: false
+      },
+      complete: {
+        type: Boolean,
+        default: false
+      }
+    },
     uid: {
       type: String,
       default: ''
@@ -117,7 +158,43 @@ const fundApplicationFormSchema = new Schema({
       default: ''
     }
   },
-  supportUsers: {
+  usersMessagesLock: {
+    status: {
+      submitted: {
+        type: Boolean,
+        default: false
+      },
+      beingReviewed: {
+        type: Boolean,
+        default: false
+      },
+      complete: {
+        type: Boolean,
+        default: false
+      }
+    },
+    uid: {
+      type: String,
+      default: ''
+    },
+    timeToOpen: {
+      type: Date,
+      default: Date.now
+    },
+    timeToClose: {
+      type: Date,
+      default: Date.now
+    },
+    reason: {
+      type: String,
+      default: ''
+    }
+  },
+  supporter: {
+    type: [String],
+    default: []
+  },
+  objector: {
     type: [String],
     default: []
   },
@@ -134,6 +211,10 @@ const fundApplicationFormSchema = new Schema({
       type: [String],
       default: []
     }
+  },
+  comments: {
+    type: [String],
+    default: []
   }
 }, {
   collection: 'fundApplicationForms'

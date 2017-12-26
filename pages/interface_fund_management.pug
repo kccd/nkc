@@ -12,12 +12,12 @@ block content
           .col-xs-6.col-sm-4.col-md-3.fund-list
             a(href=`###`)
               .fund-mask
-                .div(onclick=`window.location.href="/fund/management/${id}"`) 修改
-                .div(onclick=`deleteFund(${id})`) 删除
+                .div(onclick=`window.location.href="/fund/${id}/settings"`) 修改
+                .div(onclick=`deleteFund("${name}",${money}, ${id})`) 删除
               .fund-name(style=`background-color: ${color}`)= name
               .fund-money!= `￥${money}&nbsp`
         .col-xs-6.col-sm-4.col-md-3.fund-list
-          a(href=`/fund/add`)
+          a(href=`/fund?add=true`)
             .fund-add +
 block scripts
   script(src='/interface_common.js')

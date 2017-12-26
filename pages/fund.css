@@ -102,3 +102,35 @@ input[type="radio"], input[type="checkbox"]{
   border-color: #337ab7;
   color: #337ab7;
 }
+#threadList{
+  padding: 1rem 0;
+}
+.thread-list-title{
+  padding: 0;
+  font-size: 1.5rem;
+}
+.thread-list-title > span{
+  font-size: 1.5rem;
+}
+.thread-list-body{
+  overflow: hidden;
+}
+.thread-list-body .glyphicon{
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.thread-list-body .glyphicon-plus-sign{
+  color: green;
+}
+.thread-list-body .glyphicon-minus-sign{
+  color: red;
+}
+.thread-list-page{
+  padding-left: 0;
+}
+.thread-list-page > ul > li {
+  float: left;
+  list-style: none;
+  margin: 0 0.5rem;
+  margin-left: 0;
+}

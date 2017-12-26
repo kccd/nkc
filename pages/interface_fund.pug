@@ -9,4 +9,8 @@ block content
       .col-xs-12.col-md-12
         h2.text-center 科创基金
         -for (let fund of data.fundList)
-          include interface_fund_list
+          -const {id, name, color, money} = fund;
+          .col-xs-6.col-sm-4.col-md-3.fund-list
+            a(href=`/fund/${id}/application`)
+              .fund-name(style=`background-color: ${color}`)= name
+              .fund-money!= `￥${money}&nbsp`

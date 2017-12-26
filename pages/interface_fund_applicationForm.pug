@@ -1,0 +1,141 @@
+extends bootstrap_base
+block title
+  -const fund = data.fund;
+  title= `${fund.name}申请表`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const preconditions = fund.preconditions;
+  -const authentication = preconditions.authentication;
+  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      h2.text-center=`${fund.name}申请表`
+      .col-xs-12.col-md-12
+        ul.nav.nav-tabs
+          li(role="presentation" class=data.team?'': 'active')
+            a(href=`/fund/${fund._id}/application`) 个人申请
+          li(role="presentation" class=data.team ? 'active' : '')
+            a(href=`/fund/${fund._id}/application?team=true`) 团体申请
+        br
+        br
+        if(idCard || lifePhoto || idCardPhoto || handheldIdCardPhoto)
+          h4 个人信息
+          hr
+          if authentication.idCard
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 真实姓名
+              .col-xs-12.col-md-2
+                input.form-control(type="text" placeholder='请输入真实姓名')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 身份证号码
+              .col-xs-12.col-md-3
+                input.form-control(type="text" placeholder='请输入身份证号码')
+          if(idCardPhoto)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 上传身份证照片
+              .col-xs-12.col-md-2
+                if data.user.idCardPhoto
+                  h5(style='color: green') 已上传&nbsp;
+                    span.glyphicon.glyphicon-ok
+                    span &nbsp;&nbsp;
+                      a(href='###') 查看
+                else
+                  input#uploadFile(type='file' accept='.jpg, .png, .jpeg' uid!=user.uid multiple='multiple')
+          if(lifePhoto)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 上传生活照片
+              .col-xs-12.col-md-10(style='padding: 0')
+                .col-xs-12.col-md-2
+                  button.btn.btn-default 从已上传照中选择
+                .col-xs-12.col-md-10
+                  input#uploadFile(type='file' accept='.jpg, .png, .jpeg' uid!=user.uid multiple='multiple')
+                .col-xs-12.col-md-12
+                  #lifePhoto
+                    .photo
+
+          hr
+        if data.team
+          h4 成员身份信息
+          hr
+          .fund-setting-list
+            .col-xs-12.col-md-2
+              h5 添加成员
+            .col-xs-12.col-md-2
+              input.form-control(type="text" placeholder='请输入真实姓名')
+          .fund-setting-list
+            .col-xs-12.col-md-2
+              h5 身份证号码
+            .col-xs-12.col-md-3
+              input.form-control(type="text" placeholder='请输入身份证号码')
+          hr
+        h4 项目信息
+        hr
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 课题名称
+          .col-xs-12.col-md-8
+            input.form-control#projecTitle(type="text" placeholder='请输入项目名称')
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 研究目标
+          .col-xs-12.col-md-8
+            textarea.form-control#projectAim(type="text" placeholder='请输入研究目标' rows=4)
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 研究内容
+          .col-xs-12.col-md-8
+            textarea.form-control#projectContent(type="text" placeholder='请输入研究内容' rows=10)
+        -const threadCount = fund.preconditions.attachments.threadCount;
+        if threadCount > 0
+          .fund-setting-list
+            .col-xs-12.col-md-2
+              h5=`附带帖子（至少${threadCount}篇）`
+            .col-xs-12.col-md-10
+              .col-xs-12.col-md-6(style='padding: 0')
+                .col-xs-12.col-md-6(style='padding: 0')
+                  .input-group
+                    input#pid.form-control(type='text' placeholder='输入文号进行搜索')
+                    span.input-group-btn
+                      button#submitOfSearch.btn.btn-default(type='button') 搜索
+                .col-xs-12.col-md-2
+                  button(onclick='loadThreads()').btn.btn-default 所有帖子
+                .col-xs-12.col-md-4
+                  button(onclick='clearThreads()').btn.btn-default 清空
+                .col-xs-12.col-md-12#threadList
+                .col-xs-12.col-md-12.thread-list-page
+                  ul(style='overflow: hidden; padding-left: 0')#threadListPage
+              .col-xs-12.col-md-6(style='padding: 0')
+                h5 已选择帖子
+                  span#choseThread &nbsp;0 篇
+                #threadListChose
+        -const paperCount = fund.preconditions.attachments.paper.count;
+        //if paperCount > 0
+        //  .fund-setting-list
+        //    .col-xs-12.col-md-2
+        //      h5=`附带论文（至少${threadCount}篇）`
+        //    .col-xs-12.col-md-10
+        //      .col-xs-12.col-md-6(style='padding: 0')
+        //        .col-xs-12.col-md-6(style='padding: 0')
+        //          .input-group
+        //            input#paperId.form-control(type='text' placeholder='输入文号进行搜索')
+        //            span.input-group-btn
+        //              button#submitOfSearchPaper.btn.btn-default(type='button') 搜索
+        //        .col-xs-12.col-md-2
+        //          button(onclick='loadPapers()').btn.btn-default 所有帖子
+        //        .col-xs-12.col-md-4
+        //          button(onclick='clearPapers()').btn.btn-default 清空
+        //        .col-xs-12.col-md-12#parperList
+        //        .col-xs-12.col-md-12.thread-list-page
+        //          ul(style='overflow: hidden; padding-left: 0')#paperListPage
+        //      .col-xs-12.col-md-6(style='padding: 0')
+        //        h5 已选择论文
+        //          span#chosePaper &nbsp;0 篇
+        //        #paperListChose
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_applicationForm.js')

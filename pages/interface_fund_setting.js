@@ -162,26 +162,28 @@ function color(){
 function submit(id) {
   if(!checkMoney()) return window.location.href = '#fundMoney';
   fundObj.money = $('#fundMoney').val();
-  if($('#userLevel').val() >= 0) preconditions.userLevel = $('#userLevel').val();
-  if($('#threadCount').val() >= 0) preconditions.threadCount = $('#threadCount').val();
-  if($('#postCount').val() >= 0) preconditions.postCount = $('#postCount').val();
-  if($('#timeToRegister').val() >= 0) preconditions.timeToRegister = $('#timeToRegister').val();
-  if($('#supportCount').val() >= 0) preconditions.supportCount = $('#supportCount').val();
-  if($('#attachmentsThreads').val() >= 0) preconditions.attachments.threadCount = $('#attachmentsThreads').val();
-  if($('#attachmentsPapers').val() >= 0) preconditions.attachments.paper.count = $('#attachmentsPapers').val();
-  if($('#timeOfPublicity').val() >= 0) fundObj.timeOfPublicity = $('#timeOfPublicity').val();
-  if($('#reviseCount').val() >= 0) fundObj.reviseCount = $('#reviseCount').val();
+  console.log(preconditions.userLevel)
+  if($('#userLevel').val() > 0) preconditions.userLevel = $('#userLevel').val();
+  console.log(preconditions.userLevel)
+  if($('#threadCount').val() > 0) preconditions.threadCount = $('#threadCount').val();
+  if($('#postCount').val() > 0) preconditions.postCount = $('#postCount').val();
+  if($('#timeToRegister').val() > 0) preconditions.timeToRegister = $('#timeToRegister').val();
+  if($('#supportCount').val() > 0) preconditions.supportCount = $('#supportCount').val();
+  if($('#attachmentsThreads').val() > 0) preconditions.attachments.threadCount = $('#attachmentsThreads').val();
+  if($('#attachmentsPapers').val() > 0) preconditions.attachments.paper.count = $('#attachmentsPapers').val();
+  if($('#timeOfPublicity').val() > 0) fundObj.timeOfPublicity = $('#timeOfPublicity').val();
+  if($('#reviseCount').val() > 0) fundObj.reviseCount = $('#reviseCount').val();
   fundObj.description = $('#fundDescription').val();
   if($('#fundName').val()) fundObj.name = $('#fundName').val();
-  var url = '/fund/add';
+  var url = '/fund';
   var method = 'POST';
   if(id !== undefined) {
-    url = '/fund/management/'+ id;
+    url = '/fund/'+ id;
     method = 'PATCH';
   }
   nkcAPI(url, method, {fundObj})
     .then(function(data){
-      window.location.href = '/fund/management'
+      window.location.href = '/fund?management=true'
     })
     .catch(function(err){
       jwarning(err);
