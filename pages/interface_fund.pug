@@ -7,10 +7,31 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-xs-12.col-md-12
-        h2.text-center 科创基金
-        -for (let fund of data.fundList)
-          -const {id, name, color, money} = fund;
-          .col-xs-6.col-sm-4.col-md-3.fund-list
-            a(href=`/fund/${id}/application`)
-              .fund-name(style=`background-color: ${color}`)= name
-              .fund-money!= `￥${money}&nbsp`
+        h1.text-center 科创基金
+        hr
+        .row
+          -for (let fund of data.fundList)
+            -const {id, name, color, money} = fund;
+            .col-xs-6.col-sm-4.col-md-3.fund-list
+              a(href=`/fund/${id}/application`)
+                .fund-name(style=`background-color: ${color}`)= name
+                .fund-money!= `￥${money}&nbsp`
+        hr
+        h1.text-center 正在申请
+        hr
+        .row
+          .col-xs-12.col-md-12
+
+        hr
+        h1.text-center 资助中
+        hr
+        hr
+        h1.text-center 优秀项目
+        hr
+        hr
+        h1.text-center 捐款
+        hr
+        hr
+        h1.text-center 捐款人
+        hr
+

@@ -88,10 +88,79 @@ function clearThreads(){
   $('#threadList').html('');
 }
 
+function postUpload(data, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.upload.onprogress = function(e) {
+    var percentComplete = (e.loaded / e.total) * 100;
+    console.log("Uploaded " + percentComplete + "%");
+  };
+  xhr.onreadystatechange=function()
+  {
+    if (xhr.readyState==4)
+    {
+      if(xhr.status>=200&&xhr.status<300){
+        callback(JSON.parse(xhr.responseText));
+      }else {
+        jwarning(xhr.status.toString()+' '+xhr.responseText);
+      }
+    }
+  };
+  xhr.open("POST","/idPhotos",true);
+  //xhr.setRequestHeader("Content-type","application/json");
+  xhr.send(data);
+}
+
+function uploadPhoto(id, type) {
+  $(id).on('change', function() {
+    var inputFile = $(id).get(0);
+    var file;
+    if(inputFile.files.length > 0){
+      file = inputFile.files[0];
+    }else {
+      return jwarning('未选择图片');
+    }
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('photoType', type);
+    postUpload(formData, uploadSuccess);
+  });
+}
+
+function uploadSuccess(obj){
+  var photoType = obj.photoType;
+  if(photoType === 'idCardA') {
+    alert('上传的是身份证A面');
+  } else if(photoType === 'idCardB') {
+    alert('上传的是身份证B面');
+  } else if(photoType === 'HandheldIdCard') {
+    alert('上传的是手持身份证照片');
+  } else if(photoType === 'life') {
+    alert('上传的是生活照');
+  } else {
+    alert('未知的证件类型');
+  }
+}
+
 function init() {
   $('#submitOfSearch').on('click', function() {
     var pid = $('#pid').val();
     if(pid === '') return jwarning('输入不能为空');
     loadThreads(0,pid);
   });
+  $('#idCardPhotoA').on('click', function(){
+    $('#uploadIdCardA').click();
+  });
+  $('#idCardPhotoB').on('click', function(){
+    $('#uploadIdCardB').click();
+  });
+  $('#idCardPhotoHandheld').on('click', function() {
+    $('#uploadIdCardHandheld').click();
+  });
+  $('#lifePhoto').on('click', function() {
+    $('#uploadLife').click();
+  });
+  uploadPhoto('#uploadIdCardA', 'idCardA');
+  uploadPhoto('#uploadIdCardB', 'idCardB');
+  uploadPhoto('#uploadIdCardHandheld', 'HandheldIdCard');
+  uploadPhoto('#uploadLife', 'life');
 }

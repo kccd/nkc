@@ -4,6 +4,7 @@ var noClass = 'redFontColor glyphicon glyphicon-remove';
 var fundObj = {
   name: '科创基金',
   money: 0,
+  description: '',
   display: true,
   censor: {
     certs: []
@@ -34,6 +35,11 @@ var fundObj = {
 };
 var preconditions = fundObj.preconditions;
 $(function(){
+  UserAuthenticationSet();
+  fundDisplaySet();
+  censorSet();
+  passedPaperSet();
+  colorSet();
   censor();
   // fundName();
   fundMoney();
@@ -53,17 +59,20 @@ function fail(id, text) {
 }
 
 // 审查方式
+function censorSet() {
+  if($('input[name="censor"]').eq(0).is(':checked')) {
+    $('#certsCheckBox label').removeClass('disabled');
+    $('#certsCheckBox input').attr('disabled', false);
+    fundCensor('read');
+  } else {
+    $('#certsCheckBox label').addClass('disabled');
+    $('#certsCheckBox input').attr('disabled', true);
+    fundCensor('clear');
+  }
+}
 function censor() {
   $('.censor').on('click', function(){
-    if($('input[name="censor"]').eq(0).is(':checked')) {
-      $('#certsCheckBox label').removeClass('disabled');
-      $('#certsCheckBox input').attr('disabled', false);
-      fundCensor('read');
-    } else {
-      $('#certsCheckBox label').addClass('disabled');
-      $('#certsCheckBox input').attr('disabled', true);
-      fundCensor('clear');
-    }
+    censorSet();
   });
 }
 
@@ -102,12 +111,16 @@ function checkMoney() {
 
 function fundDisplay() {
   $('input[name="display"]').on('click', function() {
-    if($('input[name="display"]').eq(0).is(':checked')) {
-      fundObj.display = true;
-    } else {
-      fundObj.display = false;
-    }
+    fundDisplaySet();
   })
+}
+
+function fundDisplaySet() {
+  if($('input[name="display"]').eq(0).is(':checked')) {
+    fundObj.display = true;
+  } else {
+    fundObj.display = false;
+  }
 }
 
 function fundCensor(options) {
@@ -133,38 +146,47 @@ function fundCensor(options) {
 
 function UserAuthentication() {
   $('.authentication').on('click', function() {
-    var authenticationArr = $('.authentication');
-    var length = authenticationArr.length;
-    for(var i = 0; i < length; i++){
-      if(authenticationArr.eq(i).is(':checked')) {
-        preconditions.authentication[authenticationArr.eq(i).attr('name')] = true;
-      } else {
-        preconditions.authentication[authenticationArr.eq(i).attr('name')] = false;
-      }
-    }
+    UserAuthenticationSet();
   });
+}
+function UserAuthenticationSet() {
+  var authenticationArr = $('.authentication');
+  var length = authenticationArr.length;
+  for(var i = 0; i < length; i++){
+    if(authenticationArr.eq(i).is(':checked')) {
+      preconditions.authentication[authenticationArr.eq(i).attr('name')] = true;
+    } else {
+      preconditions.authentication[authenticationArr.eq(i).attr('name')] = false;
+    }
+  }
+}
+
+function passedPaperSet() {
+  preconditions.attachments.paper.passed = $('#passed').is(':checked');
 }
 
 function passedPaper(){
   $('input[name="passed"]').on('click', function() {
-    preconditions.attachments.paper.passed = $('#passed').is(':checked');
+    passedPaperSet();
   });
+}
+
+function colorSet() {
+  var color = $('#fundColor').val() || '#7f9eb2';
+  $('#fundColorDisplay').css('background-color', color);
+  fundObj.color = color;
 }
 
 function color(){
   $('#fundColor').on('blur', function () {
-    var color = $('#fundColor').val() || '#7f9eb2';
-    $('#fundColorDisplay').css('background-color', color);
-    fundObj.color = color;
+    colorSet();
   })
 }
 
 function submit(id) {
   if(!checkMoney()) return window.location.href = '#fundMoney';
   fundObj.money = $('#fundMoney').val();
-  console.log(preconditions.userLevel)
   if($('#userLevel').val() > 0) preconditions.userLevel = $('#userLevel').val();
-  console.log(preconditions.userLevel)
   if($('#threadCount').val() > 0) preconditions.threadCount = $('#threadCount').val();
   if($('#postCount').val() > 0) preconditions.postCount = $('#postCount').val();
   if($('#timeToRegister').val() > 0) preconditions.timeToRegister = $('#timeToRegister').val();

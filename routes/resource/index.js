@@ -18,7 +18,7 @@ resourceRouter
       try{
         await fs.access(filePath);
       } catch(e){
-        filePath = ctx.settings.upload.defaultImageResourcePath;
+        filePath = ctx.settings.statics.defaultImageResourcePath;
       }
     }
     ctx.filePath = filePath;

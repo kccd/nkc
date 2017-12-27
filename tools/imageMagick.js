@@ -139,6 +139,13 @@ const gitify = () => {
   });
 };
 
+const idPhotoify = (filePath, targetPath) => {
+  if(linux) {
+    return spawnProcess('convert', [filePath, targetPath]);
+  }
+  return spawnProcess('magick', ['convert', filePath, targetPath]);
+};
+
 const removeFile = async path => {
   return promisify(unlink)(path);
 };
@@ -155,6 +162,7 @@ module.exports = {
   bannerify,
   npmInstallify,
   gitify,
+  idPhotoify,
   removeFile
 };
 

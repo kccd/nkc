@@ -1,6 +1,7 @@
 extends bootstrap_base
 block title
   -const fund = data.fund;
+  -const photos = data.photos;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
 block content
@@ -11,15 +12,15 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       h2.text-center=`${fund.name}申请表`
+      br
       .col-xs-12.col-md-12
         ul.nav.nav-tabs
           li(role="presentation" class=data.team?'': 'active')
             a(href=`/fund/${fund._id}/application`) 个人申请
           li(role="presentation" class=data.team ? 'active' : '')
             a(href=`/fund/${fund._id}/application?team=true`) 团体申请
-        br
-        br
         if(idCard || lifePhoto || idCardPhoto || handheldIdCardPhoto)
+          br
           h4 个人信息
           hr
           if authentication.idCard
@@ -36,27 +37,69 @@ block content
           if(idCardPhoto)
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 上传身份证照片
+                h5 身份证照片
+              .col-xs-12.col-md-10(style='padding: 0')
+                .col-xs-12.col-md-4
+                  input#uploadIdCardA(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
+                  input#uploadIdCardB(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
+                  input#uploadIdCardHandheld(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
+                  if photos.idCardA
+                    h5.text-center 身份证正面&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok
+                    .idCardPhoto#idCardPhotoA
+                      img(src=`/idPhotos/${photos.idCardA}`)
+                  else
+                    h5.text-center 身份证正面&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#idCardPhotoA
+                      img(src='/default/idCard_setting.jpg')
+                .col-xs-12.col-md-4
+                  if photos.idCardB
+                    h5.text-center 身份证反面&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok
+                    .idCardPhoto#idCardPhotoB
+                      img(src=`/idPhotos/${photos.idCardB}`)
+                  else
+                    h5.text-center 身份证反面&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#idCardPhotoB
+                      img(src='/default/idCard_setting.jpg')
+          if(handheldIdCardPhoto)
+            .fund-setting-list
               .col-xs-12.col-md-2
-                if data.user.idCardPhoto
-                  h5(style='color: green') 已上传&nbsp;
-                    span.glyphicon.glyphicon-ok
-                    span &nbsp;&nbsp;
-                      a(href='###') 查看
-                else
-                  input#uploadFile(type='file' accept='.jpg, .png, .jpeg' uid!=user.uid multiple='multiple')
+                h5 手持身份证照片
+              .col-xs-12.col-md-10(style='padding: 0')
+                .col-xs-12.col-md-4
+                  input#uploadIdCardHandheld( style='display: none' type='file' accept='.jpg, .png, .jpeg' multiple='multiple')
+                  if photos.handheldIdCard
+                    h5.text-center 手持身份证照片&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok
+                    .idCardPhoto#idCardPhotoHandheld
+                      img(src=`/idPhotos/${photos.handheldIdCard}`)
+                  else
+                    h5.text-center 手持身份证照片&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#idCardPhotoHandheld
+                      img(src='/default/idCard_setting.jpg')
           if(lifePhoto)
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 上传生活照片
+                h5 生活照
               .col-xs-12.col-md-10(style='padding: 0')
-                .col-xs-12.col-md-2
-                  button.btn.btn-default 从已上传照中选择
-                .col-xs-12.col-md-10
-                  input#uploadFile(type='file' accept='.jpg, .png, .jpeg' uid!=user.uid multiple='multiple')
-                .col-xs-12.col-md-12
-                  #lifePhoto
-                    .photo
+                input#uploadLife(style='display: none;' type='file' accept='.jpg, .png, .jpeg' multiple='multiple')
+                .col-xs-12.col-md-4
+                  if 0
+                    h5.text-center 生活照&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok
+                    .idCardPhoto#idCardPhotoB
+                      img(src='/r/278312')
+                  else
+                    h5.text-center 生活照&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#lifePhoto
+                      img(src='/default/idCard_setting.jpg')
+                .col-xs-12.col-md-8
+                  button.btn.btn-default.center-block 从已上传照片中选择
 
           hr
         if data.team

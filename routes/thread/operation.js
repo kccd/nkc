@@ -3,7 +3,9 @@ const operationRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const path = require('path');
 const tools = require('../../tools');
-const {adPath, defaultAdPath, avatarPath, uploadPath} = require('../../settings').upload;
+const {upload, statics} = require('../../settings');
+const {adPath, avatarPath, uploadPath} = upload;
+const {defaultAdPath} = statics;
 const {imageMagick} = tools;
 operationRouter
   // 收藏帖子

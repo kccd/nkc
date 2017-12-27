@@ -78,7 +78,7 @@ questionRouter
     const qid = ctx.params.qid;
     const {db, data} = ctx;
     const targetQuestion = await db.QuestionModel.findOnly({qid});
-    await targetQuestion.delete();
+    await targetQuestion.remove();
     data.targetUser = await targetQuestion.extendUser();
     await next();
   });

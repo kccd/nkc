@@ -134,3 +134,17 @@ input[type="radio"], input[type="checkbox"]{
   margin: 0 0.5rem;
   margin-left: 0;
 }
+.idCardPhoto{
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+.idCardPhoto > img {
+  width: 100%;
+}
+.glyphicon-ok{
+  color: green;
+}
+.glyphicon-remove{
+  color: red;
+}

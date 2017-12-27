@@ -100,7 +100,7 @@ const fundSchema = new Schema({
         type: Boolean,
         default: false
       },
-      HandheldIdCardPhoto: {
+      handheldIdCardPhoto: {
         type: Boolean,
         default: false
       }

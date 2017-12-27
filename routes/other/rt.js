@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const RtRouter = new Router();
-const {thumbnailPath, defaultThumbnailPath} = require('../../settings/upload');
-const path = require('path');
+const {upload, statics} = require('../../settings');
+const {thumbnailPath} = upload;
+const {defaultThumbnailPath} = statics;
 RtRouter
   .get('/:rid', async (ctx, next) => {
     const {rid} = ctx.params;

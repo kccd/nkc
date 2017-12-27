@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
-const {upload} = require('../../settings');
-const {defaultPath} = upload;
+const {statics} = require('../../settings');
+const {defaultPath} = statics;
 router
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a filename is required.');

@@ -55,7 +55,7 @@ collectionsRouter
     const {cid} = ctx.params;
     const collection = await db.CollectionModel.findOne({cid: cid});
     if(data.user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格删除别人的收藏');
-    await collection.delete();
+    await collection.remove();
     await next();
   });
 
