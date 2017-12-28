@@ -36,7 +36,7 @@ const fundApplicationFormSchema = new Schema({
   },
   budgetMoney: {
     type: [Schema.Types.Mixed],
-    required: true
+    default: []
     /*
     {
       purpose: [String],
@@ -46,7 +46,7 @@ const fundApplicationFormSchema = new Schema({
   },
   projectCycle: {
     type: Number,
-    required: true
+    default: null
   },
   // 延期
   postpone: {
@@ -58,6 +58,10 @@ const fundApplicationFormSchema = new Schema({
     type: [Schema.Types.Mixed],
     default: []
   },
+	lifePhoto: {
+  	type: [Number],
+		default: []
+	},
   /*
   {
     uid: ****,
@@ -90,26 +94,23 @@ const fundApplicationFormSchema = new Schema({
   account: {
     paymentMethod: {
       type: String,
-      required: true
+      default: ''
     },
     number: {
       type: Number,
-      required: true
+      default: null
     }
   },
   project: {
     title: {
       type: String,
-      required: true,
       index: 1
     },
     aim: {
       type: String,
-      required: true
     },
     content: {
       type: String,
-      required: true,
       index: 1
     },
     supplementary: {
@@ -118,7 +119,11 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-  applicationStatus: {
+  status: {
+  	inputStatus: {
+			type: Number,
+		  default: 1
+	  },
     usersSupport: {
       type: Boolean,
       default: null,
@@ -252,8 +257,20 @@ const fundApplicationFormSchema = new Schema({
     index: 1
   }
 }, {
-  collection: 'fundApplicationForms'
+  collection: 'fundApplicationForms',
+	toObject: {
+		getters: true,
+		virtuals: true
+	}
 });
+
+fundApplicationFormSchema.virtual('user')
+	.get(function() {
+		return this._user;
+	})
+	.set(function(user) {
+		this._user = user
+	});
 
 const match = (obj) => {
   const {
@@ -267,18 +284,20 @@ const match = (obj) => {
     complete,
     successful,
     excellent,
+	  inputStatus,
   } = obj;
   const query = {};
   if(pStatus !== undefined) query['projectLock.status'] = pStatus;
   if(uStatus !== undefined) query['usersMessagesLock.status'] = uStatus;
-  if(usersSupport !== undefined) query['applicationStatus.usersSupport'] = usersSupport;
-  if(projectPassed !== undefined) query['applicationStatus.projectPassed'] = projectPassed;
-  if(usersMessagesPassed !== undefined) query['applicationStatus.usersMessagesPassed'] = usersMessagesPassed;
-  if(adminSupport !== undefined) query['applicationStatus.adminSupport'] = adminSupport;
-  if(remittance !== undefined) query['applicationStatus.remittance'] = remittance;
-  if(complete !== undefined) query['applicationStatus.complete'] = complete;
-  if(successful !== undefined) query['applicationStatus.successful'] = successful;
-  if(excellent !== undefined) query['applicationStatus.excellent'] = excellent;
+  if(usersSupport !== undefined) query['status.usersSupport'] = usersSupport;
+  if(projectPassed !== undefined) query['status.projectPassed'] = projectPassed;
+  if(usersMessagesPassed !== undefined) query['status.usersMessagesPassed'] = usersMessagesPassed;
+  if(adminSupport !== undefined) query['status.adminSupport'] = adminSupport;
+  if(remittance !== undefined) query['status.remittance'] = remittance;
+  if(complete !== undefined) query['status.complete'] = complete;
+  if(successful !== undefined) query['status.successful'] = successful;
+  if(excellent !== undefined) query['status.excellent'] = excellent;
+  if(inputStatus !== undefined) query['status.inputStatus'] = inputStatus;
   return query;
 };
 
@@ -290,6 +309,12 @@ fundApplicationFormSchema.pre('save', function(next) {
   }
   next();
 });
+
+fundApplicationFormSchema.methods.extendUser = async function() {
+	const UserModel = require('./UserModel');
+	const user = await UserModel.findOnly({uid: this.uid});
+	return this.user = user;
+};
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

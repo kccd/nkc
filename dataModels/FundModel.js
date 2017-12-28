@@ -114,11 +114,28 @@ const fundSchema = new Schema({
     type: Number,
     default: 0
   },
-
+}, {
+	toObject: {
+		getters: true,
+		virtuals: true
+	}
 });
+
+
 fundSchema.pre('save', function(next){
   if(!this.timeOfLastRevise) this.timeOfLastRevise = this.timeToCreate;
   next();
 });
+
+fundSchema.methods.ensurePermission = function(user) {
+	const {preconditions} = this;
+	const {userLevel, postCount, threadCount, timeToRegister} = preconditions;
+	// if(user.userLevel < userLevel) throw '账号等级未满足条件';
+	if(user.postCount < postCount) throw '回帖量未满足条件';
+	if(user.threadCount < threadCount) throw '发帖量未满足条件';
+	if(user.toc > Date.now() - timeToRegister*24*60*60*1000) throw '注册时间未满足条件';
+};
+
+
 const FundModel = mongoose.model('funds', fundSchema);
 module.exports = FundModel;

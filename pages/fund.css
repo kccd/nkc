@@ -1,6 +1,7 @@
 body{
   /*background-color: #efefef;*/
 }
+a:focus{text-decoration: none}
 .fund-list{
   margin: 15px 0;
 }
@@ -142,9 +143,70 @@ input[type="radio"], input[type="checkbox"]{
 .idCardPhoto > img {
   width: 100%;
 }
-.glyphicon-ok{
+.glyphicon-ok-circle{
   color: green;
 }
-.glyphicon-remove{
+.glyphicon-remove-circle{
   color: red;
+}
+.back-next {
+  height: 3rem;
+  width: 14rem;
+  text-align: center;
+  line-height: 3rem;
+  color: #fff;
+  margin: 0 auto;
+}
+.back-next > div{
+  width: 6rem;
+  float: left;
+  background-color: #2aabd2;
+  cursor: pointer;
+}
+.back-next > .next{
+  margin-left: 2rem;
+}
+.back-next > div > a{
+  color: #fff;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.back-next > div > a:hover{
+  text-decoration: none;
+}
+.back-next > .disagree{
+  background-color: #aaa;
+}
+.back-next > .disabled{
+  background-color: #aaa;
+  cursor: auto;
+}
+.fund-nav{
+  overflow: hidden;
+}
+.fund-nav > ul{
+  overflow: hidden;
+  padding: 0;
+}
+.fund-nav > ul > li{
+  float: left;
+  list-style: none;
+  margin-right: 1rem;
+  font-size: 1.6rem;
+  color: #555;
+}
+.fund-nav > ul > li > a{
+  color: #7f9eb2;
+  border-bottom: 2px solid rgba(0,0,0,0);
+  transition: border-bottom 0.3s;
+}
+.fund-nav > ul > li .active{
+  border-bottom: 2px solid #7f9eb2bf;
+}
+.fund-nav > ul > li > a:hover{
+  text-decoration: none;
+  border-bottom: 2px solid #7f9eb2bf;
+}
+.fund-nav > ul > li:first-child a{
 }

@@ -77,19 +77,19 @@ const usersPersonalSchema = new Schema({
     },
     photos: {
       idCardA: {
-        type: String,
-        default: ''
+        type: Number,
+        default: null
       },
       idCardB: {
-        type: String,
-        default: ''
+        type: Number,
+        default: null
       },
       handheldIdCard: {
-        type: String,
-        default: ''
+        type: Number,
+        default: null
       },
       certs: {
-        type: [String],
+        type: [Number],
         default: []
       }
     }

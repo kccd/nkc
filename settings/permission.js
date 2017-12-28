@@ -424,7 +424,16 @@ const certificates ={
       fund: {
         [name]: '基金',
         [GET]: true,
+	      list: {
+        	[name]: 'list',
+		      [GET]: true
+	      },
+	      management: {
+        	[name]:'基金管理',
+		      [GET]: true,
+	      },
         [parameter]: {
+        	[GET]: true,
           application: {
             [GET]: true,
             [POST]: true

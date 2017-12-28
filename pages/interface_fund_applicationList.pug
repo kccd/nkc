@@ -1,0 +1,23 @@
+-console.log(data.applications)
+table.table.table-striped
+  thead
+    tr
+      th 申请时间
+      th 基金类型
+      th 用户名
+      th 申请金额
+      th 项目ID
+      th 项目名称
+      th 链接
+  tbody
+    -for (let application of applications)
+      -const {timeToCreate, fundId, name, money, user, _id, project} = application
+      tr
+          th= timeToCreate.toLocaleString()
+          th= name
+          th= user.username
+          th=`￥${money}`
+          th= _id
+          th= project.post.t
+          th
+            a(href=`/fund/list/${fundId}/a/${_id}`) 查看详情

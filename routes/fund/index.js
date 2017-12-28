@@ -6,6 +6,7 @@ fundRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {add, management, list} = ctx.query;
+	  data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
     if(add === 'true') {
       const fundCerts = [];
       for (let cert in certificates) {
@@ -20,8 +21,12 @@ fundRouter
     }
     if(management === 'true') {
       data.fundList = await db.FundModel.find({}).sort({toc: 1});
+      data.management = management;
       ctx.template = 'interface_fund_management.pug';
       return await next();
+    }
+    if(list === 'all') {
+
     }
     const queryOfApplying = db.FundApplicationFormModel.match({
       pStatus: {$ne: 0},
@@ -45,7 +50,7 @@ fundRouter
     applications.beingFunded = await db.FundApplicationFormModel.find(queryOfBeingFunded);
     applications.excellent = await db.FundApplicationFormModel.find(queryOfExcellent);
     data.applications = applications;
-
+		data.home = true;
     data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';
     await next();
@@ -86,6 +91,16 @@ fundRouter
     await newApplicationForm.save();
     await next();
   })
+	.get('/:fundId', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {fundId} = ctx.params;
+		data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
+		const fund = await db.FundModel.findOnly({_id: fundId});
+		data.fund = fund;
+		data.applications = await fund.extendApplications();
+		ctx.template = 'interface_fund_messages.pug';
+		await next();
+	})
   .get('/:fundId/settings', async (ctx, next) => {
     const {data, db} = ctx;
     const {fundId} = ctx.params;

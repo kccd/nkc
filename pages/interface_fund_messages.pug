@@ -1,0 +1,24 @@
+extends bootstrap_base
+block title
+  -const fund = data.fund;
+  title= fund.name
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const preconditions = fund.preconditions;
+  -const authentication = preconditions.authentication;
+  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            h1.text-center=fund.name
+            p.text-center= fund.description
+            hr
+            .col-xs-12.col-md-12
+              h3 正在申请
+              -const applications = data.applications;
+              include interface_fund_applicationList
+

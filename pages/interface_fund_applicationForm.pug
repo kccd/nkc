@@ -1,184 +1,117 @@
 extends bootstrap_base
 block title
+
   -const fund = data.fund;
   -const photos = data.photos;
-  title= `${fund.name}申请表`
-  link(rel='stylesheet' href='/fund.css')
-block content
+  -const {application} = data;
+  -const status = application? application.status.inputStatus: 0;
+
   -const mainContainer1400 = true
   -const preconditions = fund.preconditions;
   -const authentication = preconditions.authentication;
   -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
-  .container-fluid(style='max-width: 1400px;')
-    .row
-      h2.text-center=`${fund.name}申请表`
-      br
-      .col-xs-12.col-md-12
-        ul.nav.nav-tabs
-          li(role="presentation" class=data.team?'': 'active')
-            a(href=`/fund/${fund._id}/application`) 个人申请
-          li(role="presentation" class=data.team ? 'active' : '')
-            a(href=`/fund/${fund._id}/application?team=true`) 团体申请
-        if(idCard || lifePhoto || idCardPhoto || handheldIdCardPhoto)
-          br
-          h4 个人信息
-          hr
-          if authentication.idCard
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 真实姓名
-              .col-xs-12.col-md-2
-                input.form-control(type="text" placeholder='请输入真实姓名')
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 身份证号码
-              .col-xs-12.col-md-3
-                input.form-control(type="text" placeholder='请输入身份证号码')
-          if(idCardPhoto)
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 身份证照片
-              .col-xs-12.col-md-10(style='padding: 0')
-                .col-xs-12.col-md-4
-                  input#uploadIdCardA(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
-                  input#uploadIdCardB(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
-                  input#uploadIdCardHandheld(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
-                  if photos.idCardA
-                    h5.text-center 身份证正面&nbsp;&nbsp;
-                      span.glyphicon.glyphicon-ok
-                    .idCardPhoto#idCardPhotoA
-                      img(src=`/idPhoto_small/${photos.idCardA}`)
-                  else
-                    h5.text-center 身份证正面&nbsp;&nbsp;
-                      span
-                    .idCardPhoto#idCardPhotoA
-                      img(src='/default/idCard_setting.jpg')
-                .col-xs-12.col-md-4
-                  if photos.idCardB
-                    h5.text-center 身份证反面&nbsp;&nbsp;
-                      span.glyphicon.glyphicon-ok
-                    .idCardPhoto#idCardPhotoB
-                      img(src=`/idPhoto_small/${photos.idCardB}`)
-                  else
-                    h5.text-center 身份证反面&nbsp;&nbsp;
-                      span
-                    .idCardPhoto#idCardPhotoB
-                      img(src='/default/idCard_setting.jpg')
-          if(handheldIdCardPhoto)
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 手持身份证照片
-              .col-xs-12.col-md-10(style='padding: 0')
-                .col-xs-12.col-md-4
-                  input#uploadIdCardHandheld( style='display: none' type='file' accept='.jpg, .png, .jpeg' multiple='multiple')
-                  if photos.handheldIdCard
-                    h5.text-center 手持身份证照片&nbsp;&nbsp;
-                      span.glyphicon.glyphicon-ok
-                    .idCardPhoto#idCardPhotoHandheld
-                      img(src=`/idPhoto_small/${photos.handheldIdCard}`)
-                  else
-                    h5.text-center 手持身份证照片&nbsp;&nbsp;
-                      span
-                    .idCardPhoto#idCardPhotoHandheld
-                      img(src='/default/idCard_setting.jpg')
-          if(lifePhoto)
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 生活照
-              .col-xs-12.col-md-10(style='padding: 0')
-                input#uploadLife(style='display: none;' type='file' accept='.jpg, .png, .jpeg' multiple='multiple')
-                .col-xs-12.col-md-4
-                  if 0
-                    h5.text-center 生活照&nbsp;&nbsp;
-                      span.glyphicon.glyphicon-ok
-                    .idCardPhoto#idCardPhotoB
-                      img(src='/r/278312')
-                  else
-                    h5.text-center 生活照&nbsp;&nbsp;
-                      span
-                    .idCardPhoto#lifePhoto
-                      img(src='/default/idCard_setting.jpg')
-                .col-xs-12.col-md-8
-                  button.btn.btn-default.center-block 从已上传照片中选择
+  title= `${fund.name}申请表`
+  link(rel='stylesheet' href='/fund.css')
+  style.
+    .nav-link{
+      padding-left: 0;
+      padding-right: 0;
+      overflow: hidden;
+    }
+    .nav-link > ul > li{
+      float: left;
+      list-style: none;
 
-          hr
-        if data.team
-          h4 成员身份信息
-          hr
-          .fund-setting-list
-            .col-xs-12.col-md-2
-              h5 添加成员
-            .col-xs-12.col-md-2
-              input.form-control(type="text" placeholder='请输入真实姓名')
-          .fund-setting-list
-            .col-xs-12.col-md-2
-              h5 身份证号码
-            .col-xs-12.col-md-3
-              input.form-control(type="text" placeholder='请输入身份证号码')
-          hr
-        h4 项目信息
-        hr
-        .fund-setting-list
-          .col-xs-12.col-md-2
-            h5 课题名称
-          .col-xs-12.col-md-8
-            input.form-control#projecTitle(type="text" placeholder='请输入项目名称')
-        .fund-setting-list
-          .col-xs-12.col-md-2
-            h5 研究目标
-          .col-xs-12.col-md-8
-            textarea.form-control#projectAim(type="text" placeholder='请输入研究目标' rows=4)
-        .fund-setting-list
-          .col-xs-12.col-md-2
-            h5 研究内容
-          .col-xs-12.col-md-8
-            textarea.form-control#projectContent(type="text" placeholder='请输入研究内容' rows=10)
-        -const threadCount = fund.preconditions.attachments.threadCount;
-        if threadCount > 0
-          .fund-setting-list
-            .col-xs-12.col-md-2
-              h5=`附带帖子（至少${threadCount}篇）`
-            .col-xs-12.col-md-10
-              .col-xs-12.col-md-6(style='padding: 0')
-                .col-xs-12.col-md-6(style='padding: 0')
-                  .input-group
-                    input#pid.form-control(type='text' placeholder='输入文号进行搜索')
-                    span.input-group-btn
-                      button#submitOfSearch.btn.btn-default(type='button') 搜索
-                .col-xs-12.col-md-2
-                  button(onclick='loadThreads()').btn.btn-default 所有帖子
-                .col-xs-12.col-md-4
-                  button(onclick='clearThreads()').btn.btn-default 清空
-                .col-xs-12.col-md-12#threadList
-                .col-xs-12.col-md-12.thread-list-page
-                  ul(style='overflow: hidden; padding-left: 0')#threadListPage
-              .col-xs-12.col-md-6(style='padding: 0')
-                h5 已选择帖子
-                  span#choseThread &nbsp;0 篇
-                #threadListChose
-        -const paperCount = fund.preconditions.attachments.paper.count;
-        //if paperCount > 0
-        //  .fund-setting-list
-        //    .col-xs-12.col-md-2
-        //      h5=`附带论文（至少${threadCount}篇）`
-        //    .col-xs-12.col-md-10
-        //      .col-xs-12.col-md-6(style='padding: 0')
-        //        .col-xs-12.col-md-6(style='padding: 0')
-        //          .input-group
-        //            input#paperId.form-control(type='text' placeholder='输入文号进行搜索')
-        //            span.input-group-btn
-        //              button#submitOfSearchPaper.btn.btn-default(type='button') 搜索
-        //        .col-xs-12.col-md-2
-        //          button(onclick='loadPapers()').btn.btn-default 所有帖子
-        //        .col-xs-12.col-md-4
-        //          button(onclick='clearPapers()').btn.btn-default 清空
-        //        .col-xs-12.col-md-12#parperList
-        //        .col-xs-12.col-md-12.thread-list-page
-        //          ul(style='overflow: hidden; padding-left: 0')#paperListPage
-        //      .col-xs-12.col-md-6(style='padding: 0')
-        //        h5 已选择论文
-        //          span#chosePaper &nbsp;0 篇
-        //        #paperListChose
+
+    }
+    .nav-link > ul{
+      padding: 0;
+      overflow: hidden;
+    }
+    .nav-link > ul > li > a{
+      color: #fff;
+      display: block;
+      font-size: 1.5rem;
+      height: 4rem;
+      line-height: 4rem;
+      text-align: center;
+      width: 15rem;
+      background-color: #aaa;
+      margin: 0 0.5rem;
+      transition: background-color 0.2s;
+    }
+    .nav-link > ul > li > a.active{
+      background-color: #337ab7aa;
+    }
+    .nav-link > ul > li > a:hover{
+      text-decoration: none;
+      background-color: #337ab7aa;
+    }
+    .application-content{
+      width: 48rem;
+      height: 20rem;
+      margin: 20rem auto;
+    }
+    .choose-content-div{
+      width: 20rem;
+      height: 20rem;
+      background-color: #fff;
+      float: left;
+      margin: 0 2rem;
+      cursor: pointer;
+      text-align: center;
+      line-height: 20rem;
+      font-size: 4rem;
+      font-weight: 100;
+      color: #999;
+      border: 1px solid #ccc;
+      transition: background-color 0.2s;
+
+    }
+    .choose-content-div:hover{
+      background-color: #eee;
+    }
+    .choose-content-div > span{
+      color: #aaa;
+    }
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    if status > 0
+      .nav-link.center-block
+        ul
+          li
+            a.active(href='###') 1、选择申请方式&nbsp;
+          li
+            a(href='###') 2、填写身份信息
+          li
+            a(href='###') 3、上传证件照
+          li
+            a(href='###') 4、填写项目目标
+          li
+            a(href='###') 5、填写项目信息
+          li
+            a(href='###') 6、提交申请
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            if status === 0
+              include interfece_fund_terms
+            if status === 1
+              .center-block.application-content
+                .choose-content-div#personal(chosed=``) 个人申请
+                  span.glyphicon.glyphicon-ok
+                .choose-content-div#team 团队申请
+              .back-next
+                if status > 1
+                  .back 上一步
+                else
+                  .back.disabled 上一步
+                if status < 6
+                  .next 下一步
+
+
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_applicationForm.js')

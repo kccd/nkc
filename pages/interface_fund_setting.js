@@ -1,5 +1,5 @@
-var yesClass = 'greenColor glyphicon glyphicon-ok';
-var noClass = 'redFontColor glyphicon glyphicon-remove';
+var yesClass = 'greenColor glyphicon glyphicon-ok-circle';
+var noClass = 'redFontColor glyphicon glyphicon-remove-circle';
 
 var fundObj = {
   name: '科创基金',
@@ -200,7 +200,7 @@ function submit(id) {
   var url = '/fund';
   var method = 'POST';
   if(id !== undefined) {
-    url = '/fund/'+ id;
+    url = '/fund/list/'+ id;
     method = 'PATCH';
   }
   nkcAPI(url, method, {fundObj})
