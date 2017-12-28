@@ -408,13 +408,19 @@ const certificates ={
           [POST]: true
         }
       },
-      idPhotos: {
+      idPhoto: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
           [GET]: true
         }
       },
+	    idPhoto_small: {
+		    [name]: '证件照缩略图',
+		    [parameter]: {
+			    [GET]: true
+		    }
+	    },
       fund: {
         [name]: '基金',
         [GET]: true,

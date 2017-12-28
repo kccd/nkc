@@ -1,8 +1,8 @@
 const Router = require('koa-router');
-const idPhotosRouter = new Router();
-const {idPhotoPath} = require('../../settings/index').upload;
-const {idPhotoify} = require('../../tools').imageMagick;
-idPhotosRouter
+const idPhotoRouter = new Router();
+const {idPhotoPath, idPhotoSmallPath} = require('../../settings/index').upload;
+const {idPhotoify, idPhotoSmallify} = require('../../tools').imageMagick;
+idPhotoRouter
 	.get('/:photoId', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user, userLevel} = data;
@@ -13,7 +13,7 @@ idPhotosRouter
 		await next();
 	})
   .post('/', async (ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, body, fs} = ctx;
     const {user} = data;
     const {files, fields} = body;
     const {photoType} = fields;
@@ -22,7 +22,10 @@ idPhotosRouter
     const photoId = await db.SettingModel.operateSystemID('idPhotos', 1);
     const filePath = '/' + photoId + '.jpg';
     const targetPath = idPhotoPath + filePath;
+    const smallTagetPath = idPhotoSmallPath +filePath;
     await idPhotoify(path, targetPath);
+    await idPhotoSmallify(path, smallTagetPath);
+    await fs.unlink(path);
     const newIdPhoto = db.IdPhotoModel({
 	    _id: photoId,
 			uid: user.uid,
@@ -35,4 +38,4 @@ idPhotosRouter
 		data.photoId = photoId;
 	  await next();
   });
-module.exports = idPhotosRouter;
+module.exports = idPhotoRouter;

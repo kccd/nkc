@@ -146,6 +146,14 @@ const idPhotoify = (filePath, targetPath) => {
   return spawnProcess('magick', ['convert', filePath, targetPath]);
 };
 
+const idPhotoSmallify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.idPhotoSmall;
+	if(linux) {
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+	}
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+};
+
 const removeFile = async path => {
   return promisify(unlink)(path);
 };
@@ -163,6 +171,7 @@ module.exports = {
   npmInstallify,
   gitify,
   idPhotoify,
+	idPhotoSmallify,
   removeFile
 };
 

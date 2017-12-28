@@ -12,7 +12,8 @@ const thumbnailPath = path.resolve('resources/thumbnails');
 const adPath = path.resolve('resources/ad_posts');
 const siteSpecificPath = path.resolve('resources/site_specific');
 const qrCodePath = path.resolve('resources/qr');
-const idPhotoPath = path.resolve('resources/idPhotos');
+const idPhotoPath = path.resolve('resources/idPhoto');
+const idPhotoSmallPath = path.resolve('resources/idPhoto_small');
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -53,7 +54,11 @@ module.exports = {
     banner: {
       width: 1050,
       height: 260
-    }
+    },
+	  idPhotoSmall: {
+    	width: 350,
+		  height: 230
+	  }
   },
   uploadPath,
   pfBannerPath,
@@ -65,6 +70,7 @@ module.exports = {
   idPhotoPath,
   siteSpecificPath,
   qrCodePath,
+	idPhotoSmallPath,
   avatarSize: 192,
   avatarSmallSize: 48
 };

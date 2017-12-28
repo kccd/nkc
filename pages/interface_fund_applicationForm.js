@@ -105,7 +105,7 @@ function postUpload(data, callback) {
       }
     }
   };
-  xhr.open("POST","/idPhotos",true);
+  xhr.open("POST","/idPhoto",true);
   //xhr.setRequestHeader("Content-type","application/json");
   xhr.send(data);
 }
@@ -128,8 +128,9 @@ function uploadPhoto(id, type) {
 
 function uploadSuccess(obj){
   var photoType = obj.photoType;
+  var photoId = obj.photoId;
   if(photoType === 'idCardA') {
-    alert('上传的是身份证A面');
+    $('#idCardPhotoA img').attr('src', '/idPhoto_small/'+photoId);
   } else if(photoType === 'idCardB') {
     alert('上传的是身份证B面');
   } else if(photoType === 'HandheldIdCard') {
