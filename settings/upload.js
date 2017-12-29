@@ -5,21 +5,15 @@ const {mkdirSync} = require('fs');
 const uploadDir = path.resolve('tmp');
 const uploadPath = path.resolve('resources/upload');
 const pfBannerPath = path.resolve('resources/pf_banners');
-const defaultPath = path.resolve('resources/default_things');
-const defaultPfBannerPath = defaultPath + '/default_pf_banner.jpg';
 const pfAvatarPath = path.resolve('resources/pf_avatars');
-const defaultPfAvatarPath = defaultPath + '/default_pf_avatar.jpg';
 const avatarPath = path.resolve('resources/newavatar');
-const defaultAvatarPath = defaultPath + '/default_avatar.gif';
 const avatarSmallPath = path.resolve('resources/newavatar_small');
-const defaultAvatarSmallPath = defaultPath + '/default_avatar_small.gif';
 const thumbnailPath = path.resolve('resources/thumbnails');
-const defaultThumbnailPath = path.resolve('resources/default_tings/default_thumbnail.png');
 const adPath = path.resolve('resources/ad_posts');
 const siteSpecificPath = path.resolve('resources/site_specific');
-const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const qrCodePath = path.resolve('resources/qr');
-const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
+const idPhotoPath = path.resolve('resources/idPhoto');
+const idPhotoSmallPath = path.resolve('resources/idPhoto_small');
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -60,25 +54,23 @@ module.exports = {
     banner: {
       width: 1050,
       height: 260
-    }
+    },
+	  idPhotoSmall: {
+    	width: 350,
+		  height: 230
+	  }
   },
   uploadPath,
   pfBannerPath,
-  defaultPfBannerPath,
   pfAvatarPath,
-  defaultPfAvatarPath,
   avatarPath,
-  defaultAvatarPath,
   avatarSmallPath,
-  defaultAvatarSmallPath,
   thumbnailPath,
-  defaultThumbnailPath,
   adPath,
-  defaultPath,
+  idPhotoPath,
   siteSpecificPath,
-  defaultAdPath,
   qrCodePath,
-  defaultImageResourcePath,
+	idPhotoSmallPath,
   avatarSize: 192,
   avatarSmallSize: 48
 };

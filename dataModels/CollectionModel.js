@@ -50,9 +50,5 @@ CollectionSchema.methods.extendThread = async function() {
   return this.thread = targetThread;
 };
 
-CollectionSchema.methods.delete = async function() {
-  const CollectionModel = require('./CollectionModel');
-  return await CollectionModel.deleteOne({cid: this.cid});
-};
 
 module.exports = mongoose.model('collections', CollectionSchema);

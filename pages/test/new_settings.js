@@ -68,6 +68,7 @@ const moveData = async (total, begin, count) => {
   data[0].counters.questions = arr.question;
   data[0].counters.sms = arr.sms;
   data[0].counters.collections = arr.collection;
+  data[0].counters.funds = 0;
   console.log('开始写入...');
   let n = 0;
   for (let d of data){

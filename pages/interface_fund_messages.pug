@@ -1,0 +1,87 @@
+extends bootstrap_base
+block title
+  -const fund = data.fund;
+  -let applications;
+  title= fund.name
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const preconditions = fund.preconditions;
+  -const authentication = preconditions.authentication;
+  -const {postCount, threadCount, userLevel, timeToRegister, supportCount} = preconditions
+  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12(style='margin-bottom: 1rem')
+        .fund-panel
+          .fund-panel-title(style=`background-color: ${fund?fund.color:''};background-image: url(/r/278316)`)
+            .col-xs-12.col-md-12
+              h1.fund-name=fund.name
+              p= fund.description
+
+      .col-xs-12.col-md-9
+        .panel.panel-default
+          .panel-body
+            ul.nav.nav-pills
+              -const {type} = data;
+              li(role="presentation" class=type === undefined ? 'active' : '')
+                a(href=`/fund/list/${fund._id}`) 全部项目
+              li(role="presentation" class=type === 'excellent' ? 'active' : '')
+                a(href=`/fund/list/${fund._id}?type=excellent`) 优秀项目
+              li(role="presentation" class=type === 'complete' ? 'active' : '')
+                a(href=`/fund/list/${fund._id}?type=complete`) 已完成
+              li(role="presentation" class=type === 'passed'? 'active': '')
+                a(href=`/fund/list/${fund._id}?type=passed`) 资助中
+              li(role="presentation" class=type === 'inReview'? 'active': '')
+                a(href=`/fund/list/${fund._id}?type=inReview`) 正在申请
+            hr
+            -applications = data.applications;
+            include interface_fund_applicationList
+      .col-xs-12.col-md-3
+        .row
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-body.fund-preconditions
+                h3 申请条件
+                hr
+                table.table.table-condensed
+                  thead
+                    tr
+                     th &nbsp;
+                     th 最低要求
+                     th 我的
+                  tbody
+                    tr
+                      th 发帖量
+                      th= threadCount
+                      th= user.threadCount
+                        //if threadCount <= user.threadCount
+                        //  span.glyphicon.glyphicon-ok
+                    tr
+                      th 回帖量
+                      th= postCount
+                      th= user.postCount
+                    tr
+                      th 账号等级
+                      th= 0
+                      th= data.userLevel
+                    tr
+                      th 注册天数
+                      th= timeToRegister
+                      th= Math.ceil((Date.now() - user.toc)/(1000*60*60*24))
+                -let btnDisabled = false, link=`/fund/list/${fund._id}/add`;
+                if data.userApplication
+                  -btnDisabled = true;
+                  -link = '';
+                  p 您还有未完成的基金项目，
+                    a(href=`/fund/a/${data.userApplication._id}`) 去查看
+                a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-body.fund-description
+                h3 其他说明
+                hr
+                div!= markdown_safe(fund.explain)
+
+

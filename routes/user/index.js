@@ -51,7 +51,6 @@ userRouter
     ctx.data.message = `推送/取消热门 用户: ${uid}`;
     await next();
   })
-
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
   .use('/:uid/activities', activitiesRouter.routes(), activitiesRouter.allowedMethods());

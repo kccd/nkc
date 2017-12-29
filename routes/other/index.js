@@ -24,6 +24,8 @@ const rtRouter = require('./rt');
 const qrCodeRouter = require('./qrcode');
 const searchRouter = require('./search');
 const testRouter = require('./test');
+const idPhotoRouter = require('./idPhoto');
+const idPhotoSmallRouter = require('./idPhoto_small');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
@@ -139,5 +141,7 @@ otherRouter
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
+	.use('idPhoto', idPhotoRouter.routes(), idPhotoRouter.allowedMethods())
+	.use('idPhoto_small', idPhotoSmallRouter.routes(), idPhotoSmallRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());
 module.exports = otherRouter;

@@ -382,6 +382,10 @@ const certificates ={
           [name]: '个人动态',
           [GET]: true
         },
+        threads: {
+          [name]: '获取帖子',
+          [GET]: true
+        }
       },
       logout: {
         [GET]: true
@@ -403,6 +407,52 @@ const certificates ={
         [parameter]: {
           [POST]: true
         }
+      },
+      idPhoto: {
+        [name]: '证件照',
+	      [POST]: true,
+        [parameter]: {
+          [GET]: true
+        }
+      },
+	    idPhoto_small: {
+		    [name]: '证件照缩略图',
+		    [parameter]: {
+			    [GET]: true
+		    }
+	    },
+      fund: {
+        [name]: '基金',
+        [GET]: true,
+	      list: {
+        	[name]: '基金项目列表',
+		      [GET]: true, // 所有基金项目
+		      [parameter]: {
+			      [GET]: true, // 具体到某一个基金项目
+			      [POST]: true, // 申请该基金
+			      add: {
+				      [GET]: true // 填写申请信息页面
+			      },
+			      a: {
+			      	[name]: '基金申请列表',
+				      [GET]: true
+			      }
+		      }
+	      },
+	      a: {
+        	[name]: '所有基金申请',
+		      [GET]: true,
+		      [parameter]: {
+        		[name]: '基金申请表',
+			      [GET]: true,
+			      [PATCH]: true,
+			      [DELETE]: true
+		      }
+	      },
+	      me: {
+        	[name]: '与我有关的基金',
+		      [GET]: true
+	      }
       }
     },
     elseModifyTimeLimit: 0,
@@ -638,6 +688,29 @@ const certificates ={
           [name]: '更新所有帖子数据',
           [POST]: true
         }
+      },
+      fund: {
+        [POST]: true,
+	      m: {
+		      [name]:'基金管理页面',
+		      [GET]: true,
+	      },
+	      add: {
+					[name]: '新建基金项目页面',
+		      [GET]: true
+	      },
+	      list:{
+        	[name]: '基金项目列表',
+		      [POST]: true, // 添加基金项目
+		      [parameter]: {
+			      [DELETE]: true,// 删除基金项目
+			      [PATCH]: true, // 修改基金项目
+			      settings: {
+				      [GET]: true // 基金设置
+			      }
+		      }
+	      }
+
       }
     }
   }

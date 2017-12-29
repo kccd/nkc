@@ -11,6 +11,7 @@ const otherRouter = routers.other;
 const experimentalRouter = routers.experimental;
 const questionRouter = routers.question;
 const resourceRouter = routers.resource;
+const fundRouter = routers.fund;
 const personalForumRouter = routers.personalForum;
 
 
@@ -25,4 +26,5 @@ router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods(
 router.use('/q', questionRouter.routes(), questionRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
+router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 module.exports = router;

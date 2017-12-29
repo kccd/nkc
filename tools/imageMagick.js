@@ -139,6 +139,21 @@ const gitify = () => {
   });
 };
 
+const idPhotoify = (filePath, targetPath) => {
+  if(linux) {
+    return spawnProcess('convert', [filePath, targetPath]);
+  }
+  return spawnProcess('magick', ['convert', filePath, targetPath]);
+};
+
+const idPhotoSmallify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.idPhotoSmall;
+	if(linux) {
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+	}
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+};
+
 const removeFile = async path => {
   return promisify(unlink)(path);
 };
@@ -155,6 +170,8 @@ module.exports = {
   bannerify,
   npmInstallify,
   gitify,
+  idPhotoify,
+	idPhotoSmallify,
   removeFile
 };
 

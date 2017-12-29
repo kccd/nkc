@@ -18,7 +18,7 @@ resourceRouter
       try{
         await fs.access(filePath);
       } catch(e){
-        filePath = ctx.settings.upload.defaultImageResourcePath;
+        filePath = ctx.settings.statics.defaultImageResourcePath;
       }
     }
     ctx.filePath = filePath;
@@ -36,7 +36,6 @@ resourceRouter
       ctx.throw(400, 'no file uploaded');
     const {name, size, path} = file;
     const extension = pathModule.extname(name).replace('.', '');
-    ctx.print('ext', extension);
     const {largeImage} = settings.upload.sizeLimit;
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     const saveName = rid + '.' + extension;

@@ -1,0 +1,27 @@
+-const {fundList} = data;
+.fund-nav
+  ul
+    -let homeClass = '', managementClass = '', listAllClass = '', censorPClass = '', censorUClass = '';
+    if data.home
+      -homeClass = 'active';
+    if data.management
+      -managementClass = 'active';
+    if data.list === 'all'
+      -listAllClass = 'active'
+    li
+      a(href='/fund' class=homeClass) 科创基金
+    li
+      a(href='/fund/m' class=managementClass) 基金项目管理
+    li
+      a(href='/fund/a' class=listAllClass) 所有申请
+    li
+      a(href='/fund/censor/p' class=censorPClass) 项目审核
+    li
+      a(href='/fund/censor/u' class=censorUClass) 申请人信息审核
+    li /
+    -for (let f of fundList)
+      li
+        -let fundClass = ''
+        if data.fund && data.fund._id === f._id
+          -fundClass = 'active';
+        a(href=`/fund/list/${f._id}` class=fundClass)= f.name

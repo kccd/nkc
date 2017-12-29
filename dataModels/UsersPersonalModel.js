@@ -65,6 +65,34 @@ const usersPersonalSchema = new Schema({
   tries: {
     type: Number,
     default: 0
+  },
+  privateInformation: {
+    name: {
+      type: String,
+      default: ''
+    },
+    idCardNumber: {
+      type: String,
+      default: ''
+    },
+    photos: {
+      idCardA: {
+        type: Number,
+        default: null
+      },
+      idCardB: {
+        type: Number,
+        default: null
+      },
+      handheldIdCard: {
+        type: Number,
+        default: null
+      },
+      certs: {
+        type: [Number],
+        default: []
+      }
+    }
   }
 });
 

@@ -1,9 +1,9 @@
 const Router = require('koa-router');
 const router = new Router();
 const mime = require('mime');
-const {upload} = require('../../settings');
-const {pfBannerPath, defaultPfBannerPath} = upload;
-
+const {upload, statics} = require('../../settings');
+const {pfBannerPath} = upload;
+const {defaultPfBannerPath} = statics;
 router
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a uid is required.');

@@ -60,11 +60,6 @@ questionSchema.pre('save', function(next){
 });
 
 
-questionSchema.methods.delete = async function () {
-  const QuestionModel = require('./QuestionModel');
-  return await QuestionModel.deleteOne({qid: this.qid});
-};
-
 questionSchema.methods.extendUser = async function () {
   const UserModel = require('./UserModel');
   const user = await UserModel.findOnly({uid: this.uid});
