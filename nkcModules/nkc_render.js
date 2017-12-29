@@ -384,6 +384,7 @@ function nkc_render(options){
       var rid = p1
       for(var i in post.resources){
         var r = post.resources[i]
+        console.log(r)
         if(r.rid===rid){
           r._used = true;
           return getHTMLForResource(r)

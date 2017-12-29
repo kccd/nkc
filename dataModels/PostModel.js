@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const {Schema} = mongoose;
+const {indexPost, updatePost} = settings.elastic;
 
 const postSchema = new Schema({
   pid: {
@@ -131,7 +132,7 @@ postSchema.methods.extendThread = async function() {
 
 postSchema.methods.extendResources = async function() {
   const ResourceModel = require('./ResourceModel');
-  return this.resources = await ResourceModel.find({pid: this.pid})
+  return this.resources = await ResourceModel.find({references: this.pid})
 };
 
 postSchema.methods.extendUser = async function() {
@@ -206,6 +207,22 @@ postSchema.pre('save', async function(next) {
   }));
   this.hasImage = hasImage;
   return next()
+});
+
+postSchema.pre('save', async function(next) {
+  // handle the ElasticSearch index
+  const {_initial_state_: initialState} = this;
+  if(!initialState) {
+    // if the initial state is undefined , this is a new post, index it
+    await indexPost(this);
+    return next()
+  } else if(initialState.t !== this.t || initialState.c !== this.c) {
+    // this is a old post, and we should check if its title or content has changed,
+    // update the doc in elasticsearch when the attribute has changed
+    await updatePost(this);
+    return next()
+  } else
+    return next()
 });
 
 postSchema.post('save', async function(doc, next) {

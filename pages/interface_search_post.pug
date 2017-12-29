@@ -1,0 +1,21 @@
+- let {c, user, tid, toc, pid, thread} = post
+- const {firstPost, forum} = thread
+- if(!t) t = firstPost.t
+  .new-content(style='overflow: hidden')
+    .new-content-info
+      span
+        a(href=`/m/${user.uid}`)
+          img(src=`/avatar_small/${user.uid}`)
+      span
+        a(href=`/m/${user.uid}`)= user.username
+      span.new-content-forumAbbr(style=`background-color:${forum.color};`)
+        a(href=`/f/${forum.fid}`)= forum.abbr
+      span.icon-font=fromNow(toc)
+    if(t)
+      .new-content-title
+          a.ForumThreadNormal(href=`/t/${tid}`)!= t
+    if(c)
+      .new-content-body
+        .new-content-right
+          a.div-noImg(href=`/t/${thread.tid}?&pid=${pid}` style='text-decoration: none; color: inherit;')!= highlightString(replaceContent(experimental_render(post)), data.queryToCharRef)
+  hr

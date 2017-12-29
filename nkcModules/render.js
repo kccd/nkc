@@ -27,16 +27,15 @@ const replaceContent = (c) => {
   let temp = c;
   temp = temp.replace(/<[a-zA-Z]+.*?>/ig, ' ');
   temp = temp.replace(/<\/[a-zA-Z]+>/ig, ' ');
-  temp = temp.replace(/\[hide=[0-9]+]/ig, ' ');
-  temp = temp.replace(/\[\/hide]/ig, ' ');
-  temp = temp.replace(/\[align=[a-zA-Z]/ig, '');
-  temp = temp.replace(/\[color=#?[a-zA-Z0-9]+]/ig, ' ');
-  temp = temp.replace(/\[\/align]/ig, ' ');
-  temp = temp.replace(/\[\/color]/ig, ' ');
-  temp = temp.replace(/#{r=[0-9]+}/ig, ' <图> ');
-  temp = temp.replace(/\[url]/ig, '');
-  temp = temp.replace(/\[\/url]/ig, '');
-  temp = temp.replace(/\[em[0-9]+]/ig, '');
+  temp = temp.replace(/\[hide=[0-9]+][^[]*\[\/hide]/ig, '<span style="background-color: red">学术分限制内容</span>');
+  // temp = temp.replace(/\[align=[a-zA-Z]/ig, '');
+  // temp = temp.replace(/\[color=#?[a-zA-Z0-9]+]/ig, ' ');
+  // temp = temp.replace(/\[\/align]/ig, ' ');
+  // temp = temp.replace(/\[\/color]/ig, ' ');
+  // temp = temp.replace(/#{r=[0-9]+}/ig, ' <图> ');
+  // temp = temp.replace(/\[url]/ig, '');
+  // temp = temp.replace(/\[\/url]/ig, '');
+  // temp = temp.replace(/\[em[0-9]+]/ig, '');
   return temp;
 };
 
@@ -116,6 +115,16 @@ let creditString = (t) => {
 let fromNow = (time) => {
   return moment(time).fromNow();
 };
+
+function highlightString(content, str) {
+  let result = content;
+  const keyWords = str.split(' ');
+  for(const word of keyWords) {
+    result = result.replace(word, `<span style="color: orange">${word}</span>`)
+  }
+  return result
+}
+
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
@@ -126,6 +135,7 @@ let pugRender = (template, data) => {
     plain:render.plain_render,
     experimental_render:render.experimental_render,
     replaceContent: replaceContent,
+    highlightString,
     toQueryString,
     testModifyTimeLimit,
     dateString,

@@ -93,6 +93,7 @@ otherRouter
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
     latestThreads = await Promise.all(latestThreads.map(async thread => {
       await thread.extendFirstPost().then(p => p.extendUser());
+      await thread.firstPost.extendResources();
       await thread.extendLastPost().then(p => p.extendUser());
       await thread.extendForum();
       return thread;
@@ -104,7 +105,7 @@ otherRouter
     const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
     await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
     data.activeUsers = activeUsers;
-    data.indexForumList = await dbFn.getAvailableForums(ctx);
+    data.forumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
     data.ads = await systemSetting.extendAds();

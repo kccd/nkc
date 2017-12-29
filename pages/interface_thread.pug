@@ -24,6 +24,7 @@ block title
 block content
   -var mainContainer1400 = true
   -const moveThread = data.userLevel >= 4
+  -const {exactPost} = data
 
     div.container-fluid(style="max-width:1400px;")
       .row
@@ -204,7 +205,13 @@ block content
                   #bottom
 
             br
-            include interface_navigation_paging.pug
+            if(exactPost)
+              hr
+              div(style='width: 100%; text-align: center;')
+                a(href=`/t/${thread.tid}`) 查看更多
+              hr
+            else
+              include interface_navigation_paging.pug
 
             - var forumname = data.forum.displayName
             - var forumType = data.thread.fid? 'f' : 'm'

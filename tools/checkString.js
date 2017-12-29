@@ -1,10 +1,7 @@
 module.exports = {
   contentLength: (content) => {
     const zhCN = content.match(/[^\x00-\xff]/g);
-    const other = content.match(/[\x00-\xff]/g);
-    const length1 = zhCN? zhCN.length * 2 : 0;
-    const length2 = other? other.length : 0;
-    return length1 + length2
+    return length2 = content.length + zhCN.length;
   },
   contentFilter: (content) => {
     return content.replace(/\[quote=.*][\s\S]+\[\/quote]/g, '')
@@ -21,5 +18,18 @@ module.exports = {
       ls++;
     }
     return (ls >= 2);
+  },
+  replaceChineseToCharRef: content => {
+    const chars = content.split('');
+    if(chars.length > 0)
+      return chars
+        .map(char => {
+          const flag = char.match(/[^\x00-\xff]/);
+          if (flag) {
+            return '&#x' + char.charCodeAt(0).toString(16).toUpperCase() + ';';
+          }
+          return char
+        })
+        .reduce((pre, cur) => pre + cur)
   }
 };

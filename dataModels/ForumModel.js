@@ -106,6 +106,7 @@ forumSchema.methods.getThreadsByQuery = async function(query, match) {
   let threads = await ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
   threads = await Promise.all(threads.map(async t => {
     await t.extendFirstPost().then(p => p.extendUser());
+    await t.firstPost.extendResources();
     await t.extendLastPost().then(p => p.extendUser());
     return t;
   }));
@@ -122,7 +123,9 @@ forumSchema.methods.getToppedThreads = async function(fidOfChildForum) {
   let threads = await ThreadModel.find({fid: {$in: fidOfChildForum}, topped: true});
   threads = await Promise.all(threads.map(async t => {
     await t.extendFirstPost().then(p => p.extendUser());
+    await t.firstPost.extendResources();
     await t.extendLastPost().then(p => p.extendUser());
+    await t.lastPost.extendUser();
     return t;
   }));
   return threads;

@@ -8,38 +8,24 @@ const apiFn = nkcModules.apiFunction;
 threadRouter
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
-    const page = query.page || 0;
+    let {page = 0, pid, last_page} = query;
     const {tid} = params;
     const {
       ThreadModel,
       PersonalForumModel,
       SettingModel,
-      ForumModel
+      ForumModel,
+      PostModel
     } = db;
     const thread = await ThreadModel.findOnly({tid});
     if(!await thread.ensurePermission(ctx)) ctx.throw('401', '权限不足');
-    const q = {
+    let q = {
       tid: tid
     };
     if(!await thread.ensurePermissionOfModerators(ctx)) q.disabled = false;
     data.paging = apiFn.paging(page, thread.count);
     const forum = await ForumModel.findOnly({fid: thread.fid});
     const {mid, toMid} = thread;
-    const posts = await thread.getPostByQuery(query, q);
-    posts.map(async post => {
-      const postContent = post.c || '';
-      const index = postContent.indexOf('[quote=');
-      if(index !== -1) {
-        const targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
-        let {page, step} = await thread.getStep({pid: targetPid, disabled: q.disabled});
-        page = `?page=${page}`;
-        const postLink = `/t/${tid + page}`;
-        post.c = postContent.replace(/=/,`=${postLink},${step},`);
-      }
-    });
-    data.posts = posts;
-    await thread.extendFirstPost().then(p => p.extendUser());
-    await thread.extendLastPost();
     data.forumList = await dbFn.getAvailableForums(ctx);
     if(data.user) {
       data.usersThreads = await data.user.getUsersThreads();
@@ -60,6 +46,48 @@ threadRouter
     data.forum = forum;
     data.replyTarget = `t/${tid}`;
     ctx.template = 'interface_thread.pug';
+    let posts;
+    if(pid) {
+      data.exactPost = true;
+      const {toc} = await PostModel.findOnly({pid});
+      posts = await PostModel.aggregate([
+        {$match: {
+          tid,
+          toc: {$lte: toc}
+        }},
+        {$sort: {
+          toc: 1
+        }},
+        {$limit: 60},
+        {$sort: {toc: -1}}
+      ]);
+      posts = posts.map(p => new PostModel(p));
+      await Promise.all(posts.map(post => post
+        .extendUser()
+        .then(() => post.extendResources())
+      ));
+    } else if(last_page) {
+      query.page = data.paging.pageCount - 1;
+      data.paging.page = data.paging.pageCount - 1;
+      posts = await thread.getPostByQuery(query, q);
+    } else {
+      posts = await thread.getPostByQuery(query, q);
+    }
+    console.log(posts);
+    posts.map(async post => {
+      const postContent = post.c || '';
+      const index = postContent.indexOf('[quote=');
+      if(index !== -1) {
+        const targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
+        let {page, step} = await thread.getStep({pid: targetPid, disabled: q.disabled});
+        page = `?page=${page}`;
+        const postLink = `/t/${tid + page}`;
+        post.c = postContent.replace(/=/,`=${postLink},${step},`);
+      }
+    });
+    data.posts = posts;
+    await thread.extendFirstPost().then(p => p.extendUser());
+    await thread.extendLastPost();
     await next();
   })
   .post('/:tid', async (ctx, next) => {

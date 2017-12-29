@@ -11,7 +11,7 @@
     span
       a(href=`/m/${targetUser.uid}`)= targetUser.username
     span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
-      a(href=`/f/${parentForum.fid}` title='<font color=#ff4e22 size=7><em>爽！</em></font>')= parentForum.displayName
+      a(href=`/f/${parentForum.fid}`)= parentForum.displayName
     span.new-content-forumAbbr(style=`background-color:${childrenForum.color};`)
       a(href=`/f/${childrenForum.fid}`)= childrenForum.abbr
     span.icon-font=fromNow(toc)

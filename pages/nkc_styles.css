@@ -1811,6 +1811,10 @@ img.emoji {
   color: #444;
   font-size: 1.5rem;
 }
+.new-content-right > a{
+  color: #444;
+  font-size: 1.5rem;
+}
 .div-noImg{
   width: 100%;
 }

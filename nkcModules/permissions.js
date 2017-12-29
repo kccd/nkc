@@ -113,7 +113,7 @@ function getPermitTree(certs) {
 
 async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
-  const fs = await mongoose.connection.db.collection('forums').find(
+  const cursor = await mongoose.connection.db.collection('forums').find(
     {
       $or: [{
         class: {$in: cc},
@@ -124,7 +124,8 @@ async function getVisibleFid() {
         visibility: true
       }]
     }
-  ).toArray();
+  );
+  const fs = await cursor.toArray();
   return fs.map(e => e.fid);
 }
 

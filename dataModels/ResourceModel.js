@@ -44,7 +44,8 @@ const resourceSchema = new Schema({
   },
   references: {
 	  type: [String],
-    index: true
+    index: 1,
+    default: []
   }
 });
 

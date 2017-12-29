@@ -5,7 +5,7 @@ block title
   
 block content  
   
-  - const {type, q, page} = data
+  - const {type, q = '', _page, result} = data
 
 
     .container
@@ -13,98 +13,27 @@ block content
         .col-xs-12
           .form-inline
             .form-group
-              input#stringToSearch.form-control(type='text' value='#{data.searchstring}')
+              input#stringToSearch.form-control(type='text' value=`${q}`)
             .form-group
               button#research.btn.btn-primary() 搜索
           ul(class="nav nav-tabs")
             li(class=`${type === 'content'? 'active': ''}`)
-              a(href=`/search?&q=${q}&type=content&page=${page}` data-toggle="tab") 内容
+              a(href=`/search?&q=${q}&type=content&page=${_page}`) 内容
             li(class=`${type === 'user'? 'active': ''}`)
-              a(href=`/search?&q=${q}&type=user&page=${page}` data-toggle="tab") 用户
+              a(href=`/search?&q=${q}&type=user&page=${_page}`) 用户
+          if(type === 'content')
+            for post in result
+              if(post)
+                .ForumThreadList
+                  include interface_search_post
 
-          div(class="tab-content")
-            if type === 'user'
-              div#SearchOneUser(class="tab-pane fade in active" style="margin-top:2%;margin-bottom:5%;")
-                a(href='/m/#{oneUser._key}')
-                  img.ForumThreadAvatar2(src='/avatar/#{oneUser._key}')
+          else if(type === 'user')
+            for user in result
+              if(user)
+                include interface_thread_userpatch
 
-                div(style="display:inline-block;vertical-align:top;margin-left:1%;")
-                  div
-                    a(href='/m/#{oneUser._key}' style="font-size:34px;") #{oneUser.username}
-                  div
-                    if oneUser.description
-                      div!=markdown_safe(oneUser.description)
-                    else
-                      span (暂无简介...)
-                hr
-            else
-              div#SearchOneUser(class="tab-pane fade in active" style="margin-top:2%;margin-bottom:5%;")
-                p 暂无完全匹配的用户...
-
-            if Users
-              div#SearchUsers(class="tab-pane fade" style="margin-top:2%;margin-bottom:5%;")
-                each user in Users
-                  div#UsersList
-                    a(href='/m/#{user._key}')
-                      img.ForumThreadAvatar3(src='/avatar/#{user._key}')
-
-                    div(style="display:inline-block;vertical-align:top;margin-left:1%;")
-                      div
-                        a(href='/m/#{user._key}' style="font-size:22px;") #{user.username}
-                      div
-                        if user.description
-                          div!=markdown_safe(user.description)
-                        else
-                          span (暂无简介...)
-                  hr
-                if Users.length == 10
-                  button#SearchUsersBtn.btn.btn-success 下一页
-            else
-              div#SearchUsers(class="tab-pane fade" style="margin-top:2%;margin-bottom:5%;")
-                p 暂无相似的结果...
-
-
-
-          .SearchStatistics
-            span 搜索字符串
-              span #{data.searchstring}
-            span 共耗时
-              span #{sr.took}
-              | 毫秒，
-
-            span 得到结果
-              span #{sr.hits.total}
-              | 个，
-
-            span 显示第
-              span #{data.start+1} - #{Math.min(sr.hits.total,data.start+sr.hits.hits.length)}
-              | 个，
-            span 以下是帖子列表：
-
-          .ForumThreadList
-            each thread,index in data.threads
-              if data.toppedThreads && (data.toppedThreads.map(item=>item._key).indexOf(thread._key)>=0)
-                //exclude threads that are shown in topped area.
-              else
-                include interface_forum_singlethread.pug
-
-          if 0
-            .SearchResultList
-              each doc,index in sr.hits.hits
-                .SearchResultItem
-                  - doc = doc._source
-
-                  a(href='/t/#{doc.tid}') #{doc.t}
-                  br
-                  span.lighttext #{dateTimeString(doc.toc)}
-                  //span 作者: #{doc.username||doc.uid}
-                  span.lighttext #{doc.count}个回复
+          include interface_navigation_paging
           br
-          //.form-inline
-          - var next_button_useful = Math.min(sr.hits.total,data.start+sr.hits.hits.length) !== sr.hits.total
-            .form-group(style='#{next_button_useful?"":"display:none"}')
-              button#nextPageResult.btn.btn-success() 下一页
-
 
 
     include debug_output.pug
@@ -120,18 +49,13 @@ block scripts
         else
         {return ss}
       }
-      geid('nextPageResult').addEventListener('click',function(){
-        window.location.href = '/api/operation?operation=viewLocalSearch'
-        +'&start=#{data.start+data.count}&count=#{data.count}&searchstring='+getss()
-      })
+      // geid('nextPageResult').addEventListener('click',function(){
+      //   window.location.href = '/api/operation?operation=viewLocalSearch'
+      //   +'&start=#{data.start+data.count}&count=#{data.count}&searchstring='+getss()
+      // })
       geid('research').addEventListener('click',function(){
-        nkcAPI('useSearch',{searchstring:getss()})
-        .catch(function(err){
-          console.error(err)
-        })
-
-        window.location.href = '/api/operation?operation=viewLocalSearch'
-        +'&searchstring='+getss()
+        var q = getss()
+        window.location.href = '/search?&q=' + q
       })
       geid('SearchBox').value = getss();
 

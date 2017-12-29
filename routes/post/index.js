@@ -35,57 +35,31 @@ postRouter
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);
     await histories.save();
-    const {atUsers, quote, r} = await dbFn.getArrayForAtResourceAndQuote(c);
-    const oldAtUsers = targetPost.atUsers;
-    atUsers.map(async atUser => {
-      let flag = false;
-      for (let oldAtUser of oldAtUsers) {
-        if(atUser.uid === oldAtUser.uid) {
-          flag = true;
-          break;
-        }
-      }
-      if(!flag) {
-        const at = new db.InviteModel({
-          pid,
-          invitee: atUser.uid,
-          inviter: user.uid
-        });
-        await at.save();
-        const userPersonal = await db.UsersPersonalModel.findOnly({uid: atUser.uid});
-        await userPersonal.increasePsnl('at', 1);
-      }
-    });
+    const quote = await dbFn.getQuote(c);
     let rpid = '';
     if(quote && quote[2]) {
       rpid = quote[2];
       const username = quote[1];
       if(rpid !== targetPost.pid) {
         const quoteUser = await db.UserModel.find({username: username});
-        const quoteUserPersonal = await db.UsersPersonalModel.findOnly({uid: quoteUser.uid});
         const newReplies = new db.ReplyModel({
           fromPid: pid,
           toPid: rpid,
           toUid: quoteUser.uid
         });
         await newReplies.save();
-        await quoteUserPersonal.increasePsnl('replies', 1);
       }
     }
-    const obj = {
-      uidlm: user.uid,
-      iplm: ctx.request.socket._peername.address,
-      t: t,
-      c: c,
-      tlm: Date.now(),
-      atUsers,
-      r,
-      rpid
-    };
+    targetPost.uidlm = user.uid;
+    targetPost.iplm = ctx.request.socket._peername.address;
+    targetPost.t = t;
+    targetPost.c = c;
+    targetPost.tlm = Date.now();
+    targetPost.rpid = rpid;
     const q = {
       tid: targetThread.tid
     };
-    await targetPost.update(obj);
+    await targetPost.save();
     if(!await targetThread.ensurePermissionOfModerators(ctx)) q.disabled = false;
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;

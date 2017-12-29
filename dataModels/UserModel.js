@@ -2,6 +2,8 @@ const settings = require('../settings');
 const {certificates} = settings.permission;
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const {indexUser, updateUser} = settings.elastic;
+
 const userSchema = new Schema({
     kcb: {
       type: Number,
@@ -96,7 +98,7 @@ userSchema.pre('save', function(next) {
     if(cert !== 'qc') c.push(cert);
   }
   this.certs = c;
-  next()
+  return next()
 });
 
 userSchema.virtual('regPort')
@@ -204,6 +206,21 @@ userSchema.virtual('navbarDesc').get(function() {
     xsf: xsf,
     kcb: kcb,
     cs: cs
+  }
+});
+
+userSchema.pre('save', async function(next) {
+  // handle the ElasticSearch index
+  const {_initial_state_: initialState} = this;
+  if(!initialState) { //this is a new user
+    await indexUser(this);
+    return next()
+  } else if(initialState.description !== this.description) {
+    // description has changed , update it in the es
+    await updateUser(this);
+    return next()
+  } else {
+    return next()
   }
 });
 

@@ -60,24 +60,34 @@ es.indexUser = function(user) {
   })
 };
 
-es.updatePost = function(id, properties) {
+es.updateUser = function(user) {
+  const {uid, description, username} = user;
+  console.log(description)
+  console.log(username)
   return client.update({
-    index: postIndex,
-    type: postIndex,
-    id,
+    index: userIndex,
+    type: userIndex,
+    id: uid,
     body: {
-      doc: properties
+      doc: {
+        description,
+        username: username
+      }
     }
   })
 };
 
-es.updateUser = function(id, properties) {
+es.updatePost = function(post) {
+  const {pid, t, c} = post;
   return client.update({
-    index: userIndex,
-    type: userIndex,
-    id,
+    index: postIndex,
+    type: postIndex,
+    id: pid,
     body: {
-      doc: properties
+      doc: {
+        t,
+        c
+      }
     }
   })
 };
@@ -85,6 +95,8 @@ es.updateUser = function(id, properties) {
 es.ESSettings = ESSettings;
 
 es.searchUser = function(str, page, perpage) {
+  if(!str)
+    return {hits: {hits: []}};
   return client.search({
     index: userIndex,
     type: userIndex,
@@ -133,7 +145,7 @@ es.searchUser = function(str, page, perpage) {
         }
       },
       highlight: {
-        pre_tags: ['<span style="background-color:red;">'],
+        pre_tags: ['<span style="background-color: orange;">'],
         post_tags: ['</span>'],
         fields: {
           description: {},
@@ -145,55 +157,67 @@ es.searchUser = function(str, page, perpage) {
 };
 
 es.searchPost = function(str, page, perpage) {
-  return client.search({
+  if(!str)
+    return {hits: {hits: []}};
+  return client.get({
     index: postIndex,
     type: postIndex,
-    body: {
-      from: page * perpage,
-      size: perpage,
-      query: {
-        function_score: {
+    id: str
+  })
+    .then(post => {
+      post._source._id = post._id;
+      return {hits: {hits: [post._source]}}
+    })
+    .catch(e => {
+      return client.search({
+        index: postIndex,
+        type: postIndex,
+        body: {
+          from: page * perpage,
+          size: perpage,
           query: {
-            dis_max: {
-              tie_breaker: 0.3,
-              queries: [
-                simpleQuery('t', str, '50%', 3),
-                simpleQuery('c', str, '90%', 1),
-              ]
+            function_score: {
+              query: {
+                dis_max: {
+                  tie_breaker: 0.3,
+                  queries: [
+                    simpleQuery('t', str, '50%', 3),
+                    simpleQuery('c', str, '90%', 1),
+                  ]
+                }
+              },
+              score_mode: 'sum',
+              functions: [
+                {
+                  field_value_factor: {
+                    field: 'recUsers',
+                    factor: 0.03,
+                    modifier: 'none',
+                    missing: 0
+                  }
+                },
+                {
+                  field_value_factor: {
+                    field: 'credits',
+                    factor: 0.03,
+                    modifier: 'none',
+                    missing: 0
+                  }
+                }
+              ],
+              boost_mode: 'sum'
             }
           },
-          score_mode: 'sum',
-          functions: [
-            {
-              field_value_factor: {
-                field: 'recUsers',
-                factor: 0.03,
-                modifier: 'none',
-                missing: 0
-              }
-            },
-            {
-              field_value_factor: {
-                field: 'credits',
-                factor: 0.03,
-                modifier: 'none',
-                missing: 0
-              }
+          highlight: {
+            pre_tags: ['<span style="color: orange;">'],
+            post_tags: ['</span>'],
+            fields: {
+              t: {},
             }
-          ],
-          boost_mode: 'sum'
+          }
         }
-      },
-      highlight: {
-        pre_tags: ['<span style="background-color:red;">'],
-        post_tags: ['</span>'],
-        fields: {
-          t: {},
-          c: {}
-        }
-      }
-    }
-  })
+      })
+    })
 };
 
 function simpleQuery(field, query, minimum_should_match = '25%', boost = 1) {

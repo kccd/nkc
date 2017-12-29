@@ -24,7 +24,7 @@ block content
             span(style='color: silver;') 学院&nbsp;&nbsp;&nbsp;
             button#FLVS.btn.btn-default.btn-sm(onclick='forumListVisibilitySwitch();' style='float: right;') 显示学院
             .clearfix
-          -var forums = data.indexForumList
+          -var forums = data.forumList
             div#indexForumList
               include interface_forum_list
         .panel
@@ -36,7 +36,7 @@ block content
             a(style='float: right;' href='/latest') 更多>>>>
             .clearfix
           for thread in data.latestThreads
-            include interface_index_singlethread
+            include interface_forum_singlethread
         .panel
           -var newestDigestThreads = data.newestDigestThreads
             include interface_digest_threads

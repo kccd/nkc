@@ -51,10 +51,9 @@ meRouter
     const db = ctx.db;
     const params = ctx.body;
     const user = ctx.data.user;
-    const settingObj = {};
-    settingObj.postSign = params.post_sign.toString().trim();
-    settingObj.description = params.description.toString().trim();
-    settingObj.color = params.color.toString().trim();
+    user.postSign = params.post_sign.toString().trim();
+    user.description = params.description.toString().trim();
+    user.color = params.color.toString().trim();
     let subscribeForums = params.focus_forums.toString().trim() || '';
     subscribeForums = subscribeForums.split(',');
     const relFid = [];
@@ -62,10 +61,10 @@ meRouter
       const forum = await db.ForumModel.findOne({fid});
       if(forum && !relFid.includes(fid)) relFid.push(fid);
     }
-    if(settingObj.postSign.length>300||settingObj.description.length>300||settingObj.color.length>10) {
+    if(user.postSign.length>300||user.description.length>300||user.color.length>10) {
       ctx.throw(400, '提交的内容字数超出限制，请检查');
     }
-    await db.UserModel.update({uid: user.uid}, {$set: settingObj});
+    await user.save();
     await db.UsersSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: relFid}});
     await next();
   })
