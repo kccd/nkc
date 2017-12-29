@@ -5,6 +5,7 @@ var fundObj = {
   name: '科创基金',
   money: 0,
   description: '',
+	explain: '',
   display: true,
   censor: {
     certs: []
@@ -196,8 +197,12 @@ function submit(id) {
   if($('#timeOfPublicity').val() > 0) fundObj.timeOfPublicity = $('#timeOfPublicity').val();
   if($('#reviseCount').val() > 0) fundObj.reviseCount = $('#reviseCount').val();
   fundObj.description = $('#fundDescription').val();
+  fundObj.explain = $('#fundExplain').val();
+  fundObj._id = $('#fundId').val();
+  if(fundObj._id === '') return jwarning('基金编号不能为空！');
+  if(!fundObj._id.match(/[A-Z]+/g)) return jwarning('基金编号只能由大写字母组成！');
   if($('#fundName').val()) fundObj.name = $('#fundName').val();
-  var url = '/fund';
+  var url = '/fund/list';
   var method = 'POST';
   if(id !== undefined) {
     url = '/fund/list/'+ id;
@@ -205,7 +210,7 @@ function submit(id) {
   }
   nkcAPI(url, method, {fundObj})
     .then(function(data){
-      window.location.href = '/fund?management=true'
+      window.location.href = '/fund/m'
     })
     .catch(function(err){
       jwarning(err);

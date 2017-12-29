@@ -14,7 +14,7 @@ block content
             a(href=`###`)
               .fund-mask
                 .div(onclick=`window.location.href="/fund/list/${id}/settings"`) 修改
-                .div(onclick=`deleteFund("${name}",${money}, ${id})`) 删除
+                .div(onclick=`deleteFund("${name}",${money}, "${id}")`) 删除
               .fund-name(style=`background-color: ${color}`)= name
               .fund-money!= `￥${money}&nbsp`
         .col-xs-6.col-sm-4.col-md-3.fund-list

@@ -186,7 +186,6 @@ operationRouter
       }
       ctx.throw(500, `移动帖子失败： ${err}`);
     }
-    ctx.print('t', targetThread);
     await targetThread.updateThreadMessage();
     await targetForum.updateForumMessage();
     if(fid === 'recycle') {

@@ -19,6 +19,11 @@ block content
         hr
         .fund-setting-list
           .col-xs-12.col-md-2
+            h5 基金编号
+          .col-xs-12.col-md-3
+            input.form-control#fundId(type="text" placeholder='大写字母' value=fund ? fund._id : '' disabled=!!fund)
+        .fund-setting-list
+          .col-xs-12.col-md-2
             h5 基金名
           .col-xs-12.col-md-3
             input.form-control#fundName(type="text" placeholder='默认为 "科创基金"' value=fund?fund.name: '')
@@ -35,7 +40,12 @@ block content
           .col-xs-12.col-md-2
             h5 基金介绍
           .col-xs-12.col-md-5
-            textarea.form-control#fundDescription(type="text" placeholder="介绍" rows=6)=fund?fund.description: ''
+            textarea.form-control#fundDescription(type="text" placeholder="介绍一下该基金" rows=5)=fund ? fund.description : ''
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 其他说明
+          .col-xs-12.col-md-5
+            textarea.form-control#fundExplain(type="text" placeholder="其他说明" rows=15)=fund ? fund.explain : ''
         .fund-setting-list
           .col-xs-12.col-md-2
             h5 背景颜色
@@ -169,7 +179,7 @@ block content
           .col-xs-12.col-md-2.col-md-offset-5
             br
             if fund
-              button.btn.btn-default(style='width: 100%' onclick=`submit(${fund.id})`) 提交
+              button.btn.btn-default(style='width: 100%' onclick=`submit("${fund.id}")`) 提交
             else
               button.btn.btn-default(style='width: 100%' onclick='submit()') 提交
 

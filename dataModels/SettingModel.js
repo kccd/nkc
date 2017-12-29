@@ -23,8 +23,7 @@ const settingSchema = new Schema({
     questions:Number,
     collections: Number,
     sms: Number,
-    funds: Number,
-    fundApplications: Number,
+    fundApplicationForms: Number,
 	  idPhotos: Number
   }
 },

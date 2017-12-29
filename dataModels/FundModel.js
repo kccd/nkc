@@ -2,7 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundSchema = new Schema({
-  _id: Number,
+  _id: String,
   timeToCreate: {
     type: Date,
     default: Date.now,
@@ -30,10 +30,15 @@ const fundSchema = new Schema({
     type: String,
     default: ''
   },
-  display: {
+	explain: {
+  	type: String,
+		default: ''
+	},
+	display: {
     type: Boolean,
     default: true
   },
+
   censor: {
     userLevel: {
       type: Number,

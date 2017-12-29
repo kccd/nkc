@@ -1,5 +1,5 @@
 body{
-  /*background-color: #efefef;*/
+  /*background-color: #f3f3f3;*/
 }
 a:focus{text-decoration: none}
 .fund-list{
@@ -143,7 +143,7 @@ input[type="radio"], input[type="checkbox"]{
 .idCardPhoto > img {
   width: 100%;
 }
-.glyphicon-ok-circle{
+.glyphicon-ok, .glyphicon-ok-circle{
   color: green;
 }
 .glyphicon-remove-circle{
@@ -209,4 +209,38 @@ input[type="radio"], input[type="checkbox"]{
   border-bottom: 2px solid #7f9eb2bf;
 }
 .fund-nav > ul > li:first-child a{
+}
+.info{
+  height: 20rem;
+  width: 100%;
+  font-size: 2rem;
+  line-height: 20rem;
+  text-align: center;
+  color: #ddd;
+}
+.fund-panel > div{
+  overflow: hidden;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+}
+.fund-panel-title{
+  overflow: hidden;
+  width: 100%;
+  color: #fff;
+  padding: 3rem 2rem;
+}
+.fund-panel-title .fund-name{
+  font-size: 5rem;
+  height: auto;
+  line-height: 5rem;
+  background-color: rgba(0,0,0,0);
+}
+.fund-preconditions > span{
+  margin: 0 0.5rem;
+  font-size: 2rem;
+  color: #aaa;
+}
+.fund-preconditions h5{
+  font-size: 1.5rem;
 }

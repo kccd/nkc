@@ -2,9 +2,9 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
-  _id: Number,
+  _id: String,
   fundId: {
-    type: Number,
+    type: String,
     required: true,
     index: 1
   },
@@ -235,11 +235,15 @@ const fundApplicationFormSchema = new Schema({
     default: [],
     index: 1
   },
-  reason: {
-    type: String,
-    default: ''
-  },
   result: {
+  	successful: {
+  		type: Boolean,
+		  default: null
+	  },
+	  reason: {
+		  type: String,
+		  default: ''
+	  },
     thread: {
       type: [String],
       default: [],
@@ -285,6 +289,7 @@ const match = (obj) => {
     successful,
     excellent,
 	  inputStatus,
+	  resultSuccessful
   } = obj;
   const query = {};
   if(pStatus !== undefined) query['projectLock.status'] = pStatus;
@@ -298,6 +303,7 @@ const match = (obj) => {
   if(successful !== undefined) query['status.successful'] = successful;
   if(excellent !== undefined) query['status.excellent'] = excellent;
   if(inputStatus !== undefined) query['status.inputStatus'] = inputStatus;
+  if(resultSuccessful !== undefined) query['result.successful'] = resultSuccessful;
   return query;
 };
 
