@@ -52,6 +52,10 @@ block content
                      th 最低要求
                      th 我的
                   tbody
+                    -let allowed = true;
+                    -const toc =   Math.ceil((Date.now() - user.toc)/(1000*60*60*24));
+                    if threadCount > user.threadCount || postCount > user.postCount || timeToRegister > toc
+                      -allowed = false;
                     tr
                       th 发帖量
                       th= threadCount
@@ -69,13 +73,24 @@ block content
                     tr
                       th 注册天数
                       th= timeToRegister
-                      th= Math.ceil((Date.now() - user.toc)/(1000*60*60*24))
+                      th= toc
                 -let btnDisabled = false, link=`/fund/list/${fund._id}/add`;
-                if data.userApplication
+                if !allowed
+                  p 您的账号未达到最低要求，无法申请该基金。
                   -btnDisabled = true;
-                  -link = '';
-                  p 您还有未完成的基金项目，
-                    a(href=`/fund/a/${data.userApplication._id}`) 去查看
+                  -link = '###';
+                -const userApplication = data.userApplication;
+                if userApplication
+                  if userApplication.usersMessagesLock.status === 0 && userApplication.projectLock.status === 0
+                    -btnDisabled = true;
+                    -link = '###';
+                    p 您还有未提交的基金项目，
+                      a(href=`/fund/a/${data.userApplication._id}/settings`) 查看
+                  else if userApplication.status.complete === null
+                    -btnDisabled = true;
+                    -link = '###';
+                    p 您还有未完成的基金项目，
+                      a(href=`/fund/a/${data.userApplication._id}`) 查看
                 a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
           .col-xs-12.col-md-12
             .panel.panel-default

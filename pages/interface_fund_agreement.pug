@@ -3,13 +3,9 @@ block title
 
   -const fund = data.fund;
   -const photos = data.photos;
-  -const {application} = data;
-  -const status = application? application.status.inputStatus: 0;
-
+  -const {applicationForm} = data;
+  -const notAllow = data.notAllow;
   -const mainContainer1400 = true
-  -const preconditions = fund.preconditions;
-  -const authentication = preconditions.authentication;
-  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
   style.
@@ -77,39 +73,15 @@ block title
 
 block content
   .container-fluid(style='max-width: 1400px;')
-    if status > 0
-      .nav-link.center-block
-        ul
-          li
-            a.active(href='###') 1、选择申请方式&nbsp;
-          li
-            a(href='###') 2、填写身份信息
-          li
-            a(href='###') 3、上传证件照
-          li
-            a(href='###') 4、填写项目目标
-          li
-            a(href='###') 5、填写项目信息
-          li
-            a(href='###') 6、提交申请
     .row
       .col-xs-12.col-md-12
         .panel.panel-default
           .panel-body
-            if status === 0
+            if notAllow
+              p 您还有未完成的项目，
+                a(href=`/fund/a/${applicationForm._id}`) 去查看
+            if applicationForm === undefined
               include interfece_fund_terms
-            if status === 1
-              .center-block.application-content
-                .choose-content-div#personal(chosed=``) 个人申请
-                  span.glyphicon.glyphicon-ok
-                .choose-content-div#team 团队申请
-              .back-next
-                if status > 1
-                  .back 上一步
-                else
-                  .back.disabled 上一步
-                if status < 6
-                  .next 下一步
 
 
 block scripts

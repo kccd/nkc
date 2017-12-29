@@ -3,6 +3,19 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
   _id: String,
+	order: {
+  	type: Number,
+		default: '',
+		index: 1
+	},
+	year: {
+  	type:String,
+		default: ''
+	},
+	code: {
+		type: String,
+		default: ''
+	},
   fundId: {
     type: String,
     required: true,
@@ -120,9 +133,29 @@ const fundApplicationFormSchema = new Schema({
     }
   },
   status: {
-  	inputStatus: {
-			type: Number,
-		  default: 1
+  	chooseType: {
+  		type: Boolean,
+		  default: false
+	  },
+	  inputUsersMessages: {
+			type: Boolean,
+		  default: false
+	  },
+	  ensureUsersMessages: {
+  		type: Boolean,
+		  default: false
+	  },
+	  inputProjectMessages: {
+			type: Boolean,
+		  default: false
+	  },
+		inputProjectContent: {
+  		type: Boolean,
+			default: false
+		},
+	  submit: {
+			type: Boolean,
+		  default: false
 	  },
     usersSupport: {
       type: Boolean,
@@ -139,7 +172,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    adminSupport: {
+    adminAgree: {
       type: Boolean,
       default: null,
       index: 1
@@ -276,8 +309,22 @@ fundApplicationFormSchema.virtual('user')
 		this._user = user
 	});
 
+fundApplicationFormSchema.virtual('fund')
+	.get(function() {
+		return this._fund;
+	})
+	.set(function(fund) {
+		this._fund = fund
+	});
+
 const match = (obj) => {
   const {
+  	chooseType,
+	  inputUsersMessages,
+	  ensureUsersMessages,
+	  inputProjectMessages,
+	  inputProjectContent,
+	  submit,
     pStatus,
     uStatus,
     usersSupport,
@@ -303,7 +350,13 @@ const match = (obj) => {
   if(successful !== undefined) query['status.successful'] = successful;
   if(excellent !== undefined) query['status.excellent'] = excellent;
   if(inputStatus !== undefined) query['status.inputStatus'] = inputStatus;
-  if(resultSuccessful !== undefined) query['result.successful'] = resultSuccessful;
+	if(chooseType !== undefined) query['status.chooseType'] = chooseType;
+	if(inputUsersMessages !== undefined) query['status.inputUsersMessages'] = inputUsersMessages;
+	if(ensureUsersMessages !== undefined) query['status.ensureUsersMessages'] = ensureUsersMessages;
+	if(inputProjectMessages !== undefined) query['status.inputProjectMessages'] = inputProjectMessages;
+	if(inputProjectContent !== undefined) query['status.inputProjectContent'] = inputProjectContent;
+	if(submit !== undefined) query['status.submit'] = submit;
+	if(resultSuccessful !== undefined) query['result.successful'] = resultSuccessful;
   return query;
 };
 
@@ -320,6 +373,12 @@ fundApplicationFormSchema.methods.extendUser = async function() {
 	const UserModel = require('./UserModel');
 	const user = await UserModel.findOnly({uid: this.uid});
 	return this.user = user;
+};
+
+fundApplicationFormSchema.methods.extendFund = async function() {
+	const FundModel = require('./FundModel');
+	const fund = await FundModel.findOnly({_id: this.fundId});
+	return this.fund = fund;
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

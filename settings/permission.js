@@ -446,7 +446,10 @@ const certificates ={
         		[name]: '基金申请表',
 			      [GET]: true,
 			      [PATCH]: true,
-			      [DELETE]: true
+			      [DELETE]: true,
+			      settings: {
+							[GET]: true
+			      }
 		      }
 	      },
 	      me: {

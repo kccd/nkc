@@ -1,0 +1,108 @@
+extends bootstrap_base
+block title
+
+  -const fund = data.fund;
+  -const photos = data.photos;
+  -const {applicationForm} = data;
+  -const mainContainer1400 = true
+  -const preconditions = fund.preconditions;
+  -const authentication = preconditions.authentication;
+  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  -const {chooseType, inputUsersMessages, inputProjectMessages, ensureUsersMessages, inputProjectContent, submit} = applicationForm.status;
+  title= `${fund.name}申请表`
+  link(rel='stylesheet' href='/fund.css')
+  style.
+    .nav-link{
+      padding-left: 0;
+      padding-right: 0;
+      overflow: hidden;
+    }
+    .nav-link > ul > li{
+      float: left;
+      list-style: none;
+
+
+    }
+    .nav-link > ul{
+      padding: 0;
+      overflow: hidden;
+    }
+    .nav-link > ul > li > a{
+      color: #fff;
+      display: block;
+      font-size: 1.5rem;
+      height: 4rem;
+      line-height: 4rem;
+      text-align: center;
+      width: 15rem;
+      background-color: #aaa;
+      margin: 0 0.5rem;
+      transition: background-color 0.2s;
+    }
+    .nav-link > ul > li > a.active{
+      background-color: #337ab7aa;
+    }
+    .nav-link > ul > li > a:hover{
+      text-decoration: none;
+      background-color: #337ab7aa;
+    }
+    .application-content{
+      width: 48rem;
+      height: 20rem;
+      margin: 20rem auto;
+    }
+    .choose-content-div{
+      width: 20rem;
+      height: 20rem;
+      background-color: #fff;
+      float: left;
+      margin: 0 2rem;
+      cursor: pointer;
+      text-align: center;
+      line-height: 20rem;
+      font-size: 4rem;
+      font-weight: 100;
+      color: #999;
+      border: 1px solid #ccc;
+      transition: background-color 0.2s;
+
+    }
+    .choose-content-div:hover{
+      background-color: #eee;
+    }
+    .choose-content-div > span{
+      color: #aaa;
+    }
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            .nav-link.center-block
+              ul
+                li
+                  a(href='###' class=chooseType?'active': '') 1、选择申请方式&nbsp;
+                li
+                  a(href='###' class=inputUsersMessages?'active': '') 2、填写身份信息
+                li
+                  a(href='###' class=ensureUsersMessages?'active': '') 3、用户信息确认
+                li
+                  a(href='###' class=inputProjectMessages?'active': '') 4、填写项目基本信息
+                li
+                  a(href='###' class=inputProjectContent?'active': '') 5、填写项目内容
+                li
+                  a(href='###' class=submit?'active': '') 6、提交申请
+            .center-block.application-content
+              .choose-content-div#personal(chosed=``) 个人申请
+                span.glyphicon.glyphicon-ok
+              .choose-content-div#team 团队申请
+            .back-next
+              .next 下一步
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_applicationForm.js')
