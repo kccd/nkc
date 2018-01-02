@@ -17,6 +17,10 @@ const fundSchema = new Schema({
     default: '科创基金',
     index: 1
   },
+	image: {
+  	type: Boolean,
+		default: false
+	},
   money: {
     type: Number,
     required: true,

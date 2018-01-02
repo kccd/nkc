@@ -182,6 +182,15 @@ input[type="radio"], input[type="checkbox"]{
   background-color: #aaa;
   cursor: auto;
 }
+.back-next > .apply-next{
+  width: 100%;
+  background-color: #2aabd2;
+  height: 100%;
+  transition: background-color 0.2s;
+}
+.back-next > .apply-next:hover{
+  background-color: #1b7995;
+}
 .fund-nav{
   overflow: hidden;
 }
@@ -228,7 +237,9 @@ input[type="radio"], input[type="checkbox"]{
   overflow: hidden;
   width: 100%;
   color: #fff;
-  padding: 3rem 2rem;
+  padding: 3rem 0rem;
+  background-position: center center;
+  background-size: cover;
 }
 .fund-panel-title .fund-name{
   font-size: 5rem;
@@ -243,4 +254,7 @@ input[type="radio"], input[type="checkbox"]{
 }
 .fund-preconditions h5{
   font-size: 1.5rem;
+}
+#fundImageDisplay{
+  background-repeat: no-repeat;
 }

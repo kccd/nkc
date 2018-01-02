@@ -2,6 +2,7 @@ extends bootstrap_base
 block title
 
   -const fund = data.fund;
+  -console.log(fund);
   -const photos = data.photos;
   -const {applicationForm} = data;
   -const mainContainer1400 = true
@@ -20,8 +21,10 @@ block title
     .nav-link > ul > li{
       float: left;
       list-style: none;
-
-
+    }
+    .choose-content-div{
+      text-align: center;
+      font-size: 2rem;
     }
     .nav-link > ul{
       padding: 0;
@@ -46,33 +49,6 @@ block title
       text-decoration: none;
       background-color: #337ab7aa;
     }
-    .application-content{
-      width: 48rem;
-      height: 20rem;
-      margin: 20rem auto;
-    }
-    .choose-content-div{
-      width: 20rem;
-      height: 20rem;
-      background-color: #fff;
-      float: left;
-      margin: 0 2rem;
-      cursor: pointer;
-      text-align: center;
-      line-height: 20rem;
-      font-size: 4rem;
-      font-weight: 100;
-      color: #999;
-      border: 1px solid #ccc;
-      transition: background-color 0.2s;
-
-    }
-    .choose-content-div:hover{
-      background-color: #eee;
-    }
-    .choose-content-div > span{
-      color: #aaa;
-    }
 
 block content
   .container-fluid(style='max-width: 1400px;')
@@ -88,19 +64,27 @@ block content
                 li
                   a(href='###' class=inputUsersMessages?'active': '') 2、填写身份信息
                 li
-                  a(href='###' class=ensureUsersMessages?'active': '') 3、用户信息确认
+                  a(href='###' class=ensureUsersMessages?'active': '') 3、身份信息确认
                 li
                   a(href='###' class=inputProjectMessages?'active': '') 4、填写项目基本信息
                 li
                   a(href='###' class=inputProjectContent?'active': '') 5、填写项目内容
                 li
                   a(href='###' class=submit?'active': '') 6、提交申请
-            .center-block.application-content
-              .choose-content-div#personal(chosed=``) 个人申请
-                span.glyphicon.glyphicon-ok
-              .choose-content-div#team 团队申请
+            .row
+              .col-xs-12.col-md-6
+                ul.nav.nav-pills
+                  li(role="presentation" class=applicationForm.members.length === 0? 'active': '')
+                    a#personal 个人申请
+                  li(role="presentation" class=applicationForm.members.length !== 0? 'active': '')
+                    a#team 团队申请
+            .row
+              .col-xs-12.col-md-2.col-md-offset-4
+                .choose-content-div 个人申请
+              .col-xs-12.col-md-2
+                .choose-content-div 团队申请
             .back-next
-              .next 下一步
+              .apply-next 下一步
 
 
 block scripts

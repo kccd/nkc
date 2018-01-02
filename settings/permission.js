@@ -714,7 +714,21 @@ const certificates ={
 		      }
 	      }
 
-      }
+      },
+	    fundBGI: {
+		    [name]: '基金项目背景图片',
+		    [parameter]: {
+			    [GET]: true,
+			    [POST]: true
+		    }
+	    },
+	    fundBGI_small: {
+		    [name]: '基金项目背景图片',
+		    [parameter]: {
+			    [GET]: true,
+			    [POST]: true
+		    }
+	    }
     }
   }
 };

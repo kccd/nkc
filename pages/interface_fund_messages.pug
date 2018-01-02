@@ -15,7 +15,7 @@ block content
     .row
       .col-xs-12.col-md-12(style='margin-bottom: 1rem')
         .fund-panel
-          .fund-panel-title(style=`background-color: ${fund?fund.color:''};background-image: url(/r/278316)`)
+          .fund-panel-title(style=`background-color: ${fund?fund.color:''};background-image: ${fund && fund.image? `url(/fundBGI/${fund._id})`: ''}`)
             .col-xs-12.col-md-12
               h1.fund-name=fund.name
               p= fund.description

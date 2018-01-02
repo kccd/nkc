@@ -67,14 +67,14 @@ const fundApplicationFormSchema = new Schema({
     default: [],
     index: 1
   },
+	lifePhoto: {
+		type: [Number],
+		default: []
+	},
   members: {
     type: [Schema.Types.Mixed],
     default: []
   },
-	lifePhoto: {
-  	type: [Number],
-		default: []
-	},
   /*
   {
     uid: ****,

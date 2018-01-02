@@ -17,6 +17,7 @@ listRouter
 		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
+		data.fund = newFund;
 		await next();
 	})
 	// 删除基金项目
@@ -34,6 +35,7 @@ listRouter
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		await fund.update(fundObj);
+		data.fund = fund;
 		await next();
 	})
 	// 具体基金项目信息页面

@@ -53,7 +53,13 @@ block content
             input.form-control#fundColor(type="text" placeholder="默认为 #7f9eb2" value=fund?fund.color: '')
           .col-xs-12.col-md-2
             #fundColorDisplay(style=`background-color: ${fund?fund.color: '#7f9eb2'};`)
-
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 背景图片
+          .col-xs-12.col-md-2
+            input#fundImage(type="file" style='display: ')
+          .col-xs-12.col-md-2
+            #fundImageDisplay(style=fund? `width: 100%;min-height: 10rem;background-image: url(/fundBGI_small/${fund._id});`: '')
         .fund-setting-list
           .col-xs-12.col-md-2
             h5 对用户显示
@@ -187,4 +193,5 @@ block content
     br
 block scripts
   script(src='/interface_common.js')
+  script(src='/interface_fund_common.js')
   script(src='/interface_fund_setting.js')
