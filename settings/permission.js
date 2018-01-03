@@ -446,7 +446,11 @@ const certificates ={
         		[name]: '基金申请表',
 			      [GET]: true,
 			      [PATCH]: true,
-			      [DELETE]: true
+			      [POST]: true,
+			      [DELETE]: true,
+			      settings: {
+							[GET]: true
+			      }
 		      }
 	      },
 	      me: {
@@ -711,7 +715,21 @@ const certificates ={
 		      }
 	      }
 
-      }
+      },
+	    fundBGI: {
+		    [name]: '基金项目背景图片',
+		    [parameter]: {
+			    [GET]: true,
+			    [POST]: true
+		    }
+	    },
+	    fundBGI_small: {
+		    [name]: '基金项目背景图片',
+		    [parameter]: {
+			    [GET]: true,
+			    [POST]: true
+		    }
+	    }
     }
   }
 };

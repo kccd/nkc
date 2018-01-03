@@ -1,59 +1,78 @@
 const Router = require('koa-router');
 const applicationRouter = new Router();
 applicationRouter
-  .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
-    const {user} = data;
-    const {fundId} = ctx.params;
-    const {agree} = ctx.query;
-    const fund = await db.FundModel.findOnly({_id: fundId});
-    data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
-	  data.fund = fund;
-	  const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-	  const {photos} = userPersonal.privateInformation;
-	  data.photos = photos;
-	  ctx.template = 'interface_fund_applicationForm.pug';
-    //查寻是否还有未结项的申请
-    const query = db.FundApplicationFormModel.match({
-	    complete: null
-    });
-    query.uid = user.uid;
-    const applications = await db.FundApplicationFormModel.find(query);
-    if(applications.length < 1) {
-    	//权限判断
-	    try {
-	    	fund.ensurePermission(user);
-	    } catch(err) {
-	    	ctx.throw(401, err);
-	    }
-    	if(agree === 'true') {
-    		// 同意条款
-		    const newId = await db.SettingModel.operateSystemID('fundApplications', 1);
-		    const newApplication = db.FundApplicationFormModel({
-			    _id: newId,
-			    uid: user.uid,
-			    fundId: fundId
-		    });
-		    await newApplication.save();
-		    data.application = newApplication;
-	    }
-    }
-    if(applications.length === 1) {
-	    data.application = applications[0];
-	    data.info = '您还有未完成的基金申请，请'
-    }
-    if(applications.length > 1){
-    	ctx.throw(500, '基金申请表数据异常，请与管理员联系');
-    }
-	  return await next();
+	.use('/:_id', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {_id} = ctx.params;
+		const applicationForm = await db.FundApplicationFormModel.findOnly({_id});
+		await applicationForm.extendMembers();
+		const fund = await applicationForm.extendFund();
+		data.applicationForm = applicationForm;
+		data.fund = fund;
+		await next();
+	})
+  .get('/:_id/settings', async (ctx, next) => {
+  	const {data, db} = ctx;
+  	const {user, applicationForm, fund} = data;
+		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		ctx.template = 'interface_fund_apply.pug';
+  	await next();
   })
-  .post('/:applicationFormId', async (ctx, next) => {
-    const {data, db} = ctx;
-    const {user} = data;
-    const {updateObj} = ctx.body;
-    const {applicationFormId} = ctx.params;
-    const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId, uid: user.uid});
-    await applicationForm.update(updateObj);
-    await next();
-  });
+	.patch('/:_id', async (ctx, next) => {
+		const {data, db, body, params} = ctx;
+		const {selectedUsers, account, userMessages, inputStatus} = body;
+		const {user} = data;
+		const {_id} = params;
+		const applicationForm = await db.FundApplicationFormModel.findOnly({_id});
+		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		let updateObj;
+		if(inputStatus === 1) {
+			for(let u of selectedUsers) {
+				const user = await db.UserModel.findOnly({username: u.username, uid: u.uid});
+				const newApplicationUser = db.FundApplicationUserModel({
+					uid: user.uid,
+					username: user.username,
+					applicationId: _id
+				});
+				await newApplicationUser.save();
+			}
+			/*const members = await Promise.all(selectedUsers.map(async u => {
+				const user = await db.UserModel.findOnly({username: u.username, uid: u.uid});
+				const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+				const {name, idCardNumber, photos} = userPersonal.privateInformation;
+				const {idCardA, idCardB, handheldIdCard, certs} = photos;
+				const member = {
+					uid: u.uid,
+					username: u.username
+				};
+				if (name && idCardNumber) {
+					member.name = name;
+					member.idCardNumber = idCardNumber;
+				}
+				const info = {};
+				info.idCardA = idCardA || undefined;
+				info.idCardB = idCardB || undefined;
+				info.handheldIdCard = handheldIdCard || undefined;
+				info.certs = certs || undefined;
+				member.info = info;
+				return member;
+			}));*/
+			updateObj = {
+				'status.chooseType': true
+			}
+		}
+		if(inputStatus === 2) {
+			const newUserMessages = applicationForm.userMessages;
+			for (let key in userMessages) {
+				newUserMessages[key] = userMessages[key];
+			}
+			updateObj = {
+				account,
+				newUserMessages,
+				'status.inputUserMessages': true
+			}
+		}
+		await applicationForm.update(updateObj);
+		await next();
+	});
 module.exports = applicationRouter;

@@ -26,6 +26,8 @@ const searchRouter = require('./search');
 const testRouter = require('./test');
 const idPhotoRouter = require('./idPhoto');
 const idPhotoSmallRouter = require('./idPhoto_small');
+const fundBGIRouter = require('./fundBGI');
+const fundBGISmallRouter = require('./fundBGI_small');
 // -----------------------------------
 otherRouter
   .get('/', async (ctx, next) => {
@@ -143,5 +145,7 @@ otherRouter
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
 	.use('idPhoto', idPhotoRouter.routes(), idPhotoRouter.allowedMethods())
 	.use('idPhoto_small', idPhotoSmallRouter.routes(), idPhotoSmallRouter.allowedMethods())
+	.use('fundBGI', fundBGIRouter.routes(), fundBGIRouter.allowedMethods())
+	.use('fundBGI_small', fundBGISmallRouter.routes(), fundBGISmallRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());
 module.exports = otherRouter;

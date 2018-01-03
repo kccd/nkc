@@ -3,6 +3,19 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
   _id: String,
+	order: {
+  	type: Number,
+		default: '',
+		index: 1
+	},
+	year: {
+  	type:String,
+		default: ''
+	},
+	code: {
+		type: String,
+		default: ''
+	},
   fundId: {
     type: String,
     required: true,
@@ -54,35 +67,17 @@ const fundApplicationFormSchema = new Schema({
     default: [],
     index: 1
   },
-  members: {
-    type: [Schema.Types.Mixed],
-    default: []
-  },
-	lifePhoto: {
-  	type: [Number],
-		default: []
+	userMessages: {
+		name: String,
+		idCardNumber: String,
+		mobile: String,
+		description: String,
+		idCardA: Number,
+		idCardB: Number,
+		handheldIdCard: Number,
+		life: [String],
+		certs: [Number]
 	},
-  /*
-  {
-    uid: ****,
-    info: {
-      name: ****
-      idCard: ****
-      ...
-    }
-
-  }
-
-  {
-    uid: String,
-    name: String,
-    idCard: String,
-    idCardPhotoPath: [String],
-    lifePhotoPath: [String],
-    handheldIdCartPath: [String],
-    certPhotoPath: [String]
-  }
-  */
   threads: {
     type: [String],
     default:[]
@@ -120,9 +115,29 @@ const fundApplicationFormSchema = new Schema({
     }
   },
   status: {
-  	inputStatus: {
-			type: Number,
-		  default: 1
+  	chooseType: {
+  		type: Boolean,
+		  default: false
+	  },
+	  inputUserMessages: {
+			type: Boolean,
+		  default: false
+	  },
+	  ensureUsersMessages: {
+  		type: Boolean,
+		  default: false
+	  },
+	  inputProjectMessages: {
+			type: Boolean,
+		  default: false
+	  },
+		inputProjectContent: {
+  		type: Boolean,
+			default: false
+		},
+	  submit: {
+			type: Boolean,
+		  default: false
 	  },
     usersSupport: {
       type: Boolean,
@@ -139,7 +154,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    adminSupport: {
+    adminAgree: {
       type: Boolean,
       default: null,
       index: 1
@@ -276,8 +291,30 @@ fundApplicationFormSchema.virtual('user')
 		this._user = user
 	});
 
+fundApplicationFormSchema.virtual('fund')
+	.get(function() {
+		return this._fund;
+	})
+	.set(function(fund) {
+		this._fund = fund
+	});
+
+fundApplicationFormSchema.virtual('members')
+	.get(function() {
+		return this._members;
+	})
+	.set(function(members) {
+		this._members = members
+	});
+
 const match = (obj) => {
   const {
+  	chooseType,
+	  inputUsersMessages,
+	  ensureUsersMessages,
+	  inputProjectMessages,
+	  inputProjectContent,
+	  submit,
     pStatus,
     uStatus,
     usersSupport,
@@ -303,7 +340,13 @@ const match = (obj) => {
   if(successful !== undefined) query['status.successful'] = successful;
   if(excellent !== undefined) query['status.excellent'] = excellent;
   if(inputStatus !== undefined) query['status.inputStatus'] = inputStatus;
-  if(resultSuccessful !== undefined) query['result.successful'] = resultSuccessful;
+	if(chooseType !== undefined) query['status.chooseType'] = chooseType;
+	if(inputUsersMessages !== undefined) query['status.inputUsersMessages'] = inputUsersMessages;
+	if(ensureUsersMessages !== undefined) query['status.ensureUsersMessages'] = ensureUsersMessages;
+	if(inputProjectMessages !== undefined) query['status.inputProjectMessages'] = inputProjectMessages;
+	if(inputProjectContent !== undefined) query['status.inputProjectContent'] = inputProjectContent;
+	if(submit !== undefined) query['status.submit'] = submit;
+	if(resultSuccessful !== undefined) query['result.successful'] = resultSuccessful;
   return query;
 };
 
@@ -320,6 +363,18 @@ fundApplicationFormSchema.methods.extendUser = async function() {
 	const UserModel = require('./UserModel');
 	const user = await UserModel.findOnly({uid: this.uid});
 	return this.user = user;
+};
+
+fundApplicationFormSchema.methods.extendMembers = async function() {
+	const FundApplicationUserModel = require('./FundApplicationUserModel');
+	const applicationUsers = await FundApplicationUserModel.find({applicationId: this._id}).sort({toc: 1});
+	return this.members = applicationUsers;
+};
+
+fundApplicationFormSchema.methods.extendFund = async function() {
+	const FundModel = require('./FundModel');
+	const fund = await FundModel.findOnly({_id: this.fundId});
+	return this.fund = fund;
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

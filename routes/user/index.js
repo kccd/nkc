@@ -7,13 +7,25 @@ const userRouter = new Router();
 
 userRouter
   .get('/', async (ctx, next) => {
-    ctx.data.users = await ctx.db.UserModel.find({}).sort({toc: -1}).limit(10);
+    const {data, db, query} = ctx;
+    const {username, uid} = query;
+    const targetUsers = [];
+    if(username !== undefined) {
+    	const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+    	if(user) targetUsers.push(user);
+    }
+    if(uid !== undefined) {
+    	const user = await db.UserModel.findOne({uid});
+    	if(user) targetUsers.push(user);
+    }
+    data.targetUsers = targetUsers;
+    console.log(data);
     await next();
   })
   .get('/:uid', async (ctx, next) => {
     let {db} = ctx;
     const uid = ctx.params.uid;
-    ctx.data.message = await db.UserModel.findOne({uid: uid});
+    ctx.data.targetUser = await db.UserModel.findOne({uid: uid});
     ctx.template = 'user.pug';
     await next();
   })

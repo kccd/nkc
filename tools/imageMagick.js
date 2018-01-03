@@ -154,6 +154,22 @@ const idPhotoSmallify = (filePath, targetPath) => {
 	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 };
 
+const fundBGIify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.fundBGI;
+	if(linux) {
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+	}
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+};
+
+const fundBGISmallify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.fundBGISmall;
+	if(linux) {
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+	}
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+};
+
 const removeFile = async path => {
   return promisify(unlink)(path);
 };
@@ -172,6 +188,8 @@ module.exports = {
   gitify,
   idPhotoify,
 	idPhotoSmallify,
+	fundBGIify,
+	fundBGISmallify,
   removeFile
 };
 

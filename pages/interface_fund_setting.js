@@ -184,6 +184,7 @@ function color(){
   })
 }
 
+
 function submit(id) {
   if(!checkMoney()) return window.location.href = '#fundMoney';
   fundObj.money = $('#fundMoney').val();
@@ -210,7 +211,17 @@ function submit(id) {
   }
   nkcAPI(url, method, {fundObj})
     .then(function(data){
-      window.location.href = '/fund/m'
+	    var inputFile = $('#fundImage').get(0);
+	    var file;
+	    if(inputFile.files.length > 0){
+		    file = inputFile.files[0];
+	    }else {
+		    return window.location.href = '/fund/list/'+id;
+	    }
+	    var formData = new FormData();
+	    formData.append('file', file);
+	    jalert('背景图片上传中...');
+	    postUpload('/fundBGI/'+data.fund._id, formData, function(){window.location.href='/fund/m'});
     })
     .catch(function(err){
       jwarning(err);

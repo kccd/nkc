@@ -1,0 +1,184 @@
+extends bootstrap_base
+block title
+
+  -const fund = data.fund.toObject();
+  -const photos = data.photos;
+  -const {applicationForm} = data;
+  -const mainContainer1400 = true
+  -const preconditions = fund.preconditions;
+  -const authentication = preconditions.authentication;
+  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  -const {chooseType, inputUserMessages, inputProjectMessages, ensureUsersMessages, inputProjectContent, submit} = applicationForm.status;
+  title= `${fund.name}申请表`
+  link(rel='stylesheet' href='/fund.css')
+  style.
+
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            .nav-link.center-block
+              ul
+                li
+                  a(href='###' class=chooseType?'active': '') 1、选择申请方式
+                li
+                  a(href='###' class=inputUserMessages?'active': '') 2、填写身份信息
+                li
+                  a(href='###' class=ensureUsersMessages?'active': '') 3、身份信息确认
+                li
+                  a(href='###' class=inputProjectMessages?'active': '') 4、填写项目基本信息
+                li
+                  a(href='###' class=inputProjectContent?'active': '') 5、填写项目内容
+                li
+                  a(href='###' class=submit?'active': '') 6、提交申请
+            hr
+            -const {userMessages, members} = applicationForm;
+            if !chooseType
+              .fund-apply-head 选择申请方式
+              .row(style='padding: 3rem 0;')
+                .col-xs-6.col-md-2.col-md-offset-4
+                  .choose-content-div#personal(class=applicationForm.members.length === 0? 'active': '') 个人申请
+                .col-xs-6.col-md-2
+                  .choose-content-div#team(class=applicationForm.members.length !== 0? 'active': '') 团队申请
+              .row#teamDiv
+                .col-xs-12.col-md-4.col-md-offset-4
+                  .row
+                    .col-xs-12.col-md-12
+                      #selectedUsersDiv
+                        if applicationForm.members.length === 0
+                          h4 暂未添加组员
+                        else
+                          h4 已选择组员：
+                          -for(let user of applicationForm.members)
+                            span.fund-span.selectedUser.selected(uid=user.uid onclick=`deleteUser(${user.uid})`)= user.username
+                              span.fund-span.delete.glyphicon.glyphicon-remove
+                      hr
+                      h4(style='margin-bottom: 0.5rem;') 添加组员:
+                      .form
+                        input.fund-input#username(style='width: 78%;' type='text' placeholder='输入用户名或uid')
+                        input.fund-submit(onclick='getUser()' type='submit' value='搜索')
+                      span.fund-span.transparent(onclick=`getSubscribeUsers('${user.uid}')`) 我的关注
+                      span.fund-span.transparent(onclick=`getSubscribers('${user.uid}')`) 我的粉丝
+                  .row
+                    .col-xs-12.col-md-12
+                      #usersList
+                        .blank 暂无数据
+              hr
+              .back-next
+                .apply-next(onclick=`submit(${applicationForm._id})`) 下一步
+            else if !inputUserMessages
+              .fund-apply-head 填写身份信息
+              -const options = {name: userMessages.name, idCardNumber: userMessages.idCardNumber, description: userMessages.description, mobile: userMessages.mobile, members: false, account: applicationForm.account};
+              include interface_fund_userMessagesForm
+              hr
+              .back-next
+                .apply-next(onclick=`submitUserMessages(${applicationForm._id})`) 下一步
+            else if !ensureUsersMessages
+              -const {authentication} = fund.preconditions;
+              -const arr = [];
+              -for(let key in authentication){if(authentication[key]){arr.push(key)}}
+              mixin toChinese(obj, arr, type)
+                -const result = [];
+                -let disabled;
+                -const {uid, username, info} = obj;
+                if type === 'other'
+                  span.h4
+                    a(href=`/m/${uid}` target='_blank')= username
+                  span ：
+                  -obj = info
+                if arr.includes('idCard')
+                  -disabled = '';
+                  if !obj.idCard && (!obj.name || !obj.idCardNumber)
+                    -disabled = 'disabled';
+                    -result.push('身份证信息');
+                  span.fund-span(class=disabled) 身份证信息
+                if arr.includes('idCardPhoto')
+                  -disabled = '';
+                  if !obj.idCardPhoto && (!obj.idCardA || !obj.idCardB)
+                    -disabled = 'disabled';
+                    -result.push('身份证照片');
+                  span.fund-span(class=disabled) 身份证照片
+                if arr.includes('handheldIdCardPhoto')
+                  -disabled = '';
+                  if !obj.handheldIdCardPhoto && !obj.handheldIdCard
+                    -disabled = 'disabled';
+                    -result.push('手持身份证照片');
+                  span.fund-span(class=disabled) 手持身份证照片
+                if arr.includes('lifePhoto')
+                  -disabled = '';
+                  if !obj.lifePhoto && (!obj.life || obj.life.length === 0)
+                    -disabled = 'disabled';
+                    -result.push('生活照');
+                  span.fund-span(class=disabled) 生活照
+                if result.length !== 0 && type !== 'fund'
+                  if type === 'me'
+                    p= `您的${result.join('、')}未完善，`
+                      a(href='###' target='_blank' style='cursor: pointer') 去完善
+                  else
+                    p!= `该组员的${result.join('、')}未完善，`
+                      a(href=link target='_blank' style='cursor: pointer') 去通知
+              .fund-apply-head 身份信息确认
+              .row
+                -let agreeFalse, agreeNull, agreeTrue;
+                -for (let member of members)
+                  if member.agree === false
+                    -agreeFalse = true
+                  if member.agree === true
+                    -agreeTure = true
+                  if member.agree === null
+                    -agreeNull = true
+                .col-xs-12.col-md-6.col-md-offset-3
+                  .row
+                    .col-xs-12.col-md-12
+                      h3 认证方式
+                      hr
+                      +toChinese(authentication, arr, 'fund')
+                      hr
+                    .col-xs-12.col-md-12
+                      span 我的:
+                      +toChinese(userMessages, arr, 'me')
+                      hr
+                    .col-xs-12.col-md-12
+                      h3 已同意用户
+                      hr
+                      -let n = 0;
+                      -for (let member of members)
+                        if member.agree
+                          -n++;
+                          +toChinese(member, arr, 'other')
+                          hr
+                      if n === 0
+                        div(style='height: 5rem;line-height: 5rem;width: 100%;text-align: center;color: #ddd;font-size: 2rem;') 暂无用户同意
+                        hr
+                    if agreeNull
+                      .col-xs-12.col-md-12
+                        h3 以下用户暂未同意，请耐心等待
+                        hr
+                        -for (let member of members)
+                          if member.agree === null
+                            span.fund-span.transparent= member.username
+                        hr
+                    if agreeFalse
+                      .col-xs-12.col-md-12
+                        h3 以下用户已拒绝您的邀请
+                        hr
+                        -for (let member of members)
+                          if member.agree === false
+                            span.fund-span.disabled= member.username
+                            -break;
+                if agreeNull
+                  .col-xs-12.col-md-12
+                    hr
+                    .back-next
+                      .apply-next(onclick=`submit(${applicationForm._id})`) 下一步
+
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_common.js')
+  script(src='/interface_fund_apply.js')

@@ -17,6 +17,10 @@ const fundSchema = new Schema({
     default: '科创基金',
     index: 1
   },
+	image: {
+  	type: Boolean,
+		default: false
+	},
   money: {
     type: Number,
     required: true,
@@ -138,7 +142,8 @@ fundSchema.methods.ensurePermission = function(user) {
 	// if(user.userLevel < userLevel) throw '账号等级未满足条件';
 	if(user.postCount < postCount) throw '回帖量未满足条件';
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
-	if(user.toc > Date.now() - timeToRegister*24*60*60*1000) throw '注册时间未满足条件';
+	// if(user.toc > Date.now() - timeToRegister*24*60*60*1000) throw '注册时间未满足条件';
+	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
 };
 
 

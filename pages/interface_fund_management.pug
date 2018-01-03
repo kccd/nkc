@@ -15,7 +15,7 @@ block content
               .fund-mask
                 .div(onclick=`window.location.href="/fund/list/${id}/settings"`) 修改
                 .div(onclick=`deleteFund("${name}",${money}, "${id}")`) 删除
-              .fund-name(style=`background-color: ${color}`)= name
+              .fund-name(style=`background-color: ${color};background-image:${fund && fund.image? `url(/fundBGI_small/${fund._id})`: ''}`)= name
               .fund-money!= `￥${money}&nbsp`
         .col-xs-6.col-sm-4.col-md-3.fund-list
           a(href=`/fund/add`)

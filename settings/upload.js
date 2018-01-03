@@ -14,6 +14,9 @@ const siteSpecificPath = path.resolve('resources/site_specific');
 const qrCodePath = path.resolve('resources/qr');
 const idPhotoPath = path.resolve('resources/idPhoto');
 const idPhotoSmallPath = path.resolve('resources/idPhoto_small');
+const fundBGIPath = path.resolve('resources/fundBGI');
+const fundBGISmallPath = path.resolve('resources/fundBGI_small');
+
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -58,6 +61,14 @@ module.exports = {
 	  idPhotoSmall: {
     	width: 350,
 		  height: 230
+	  },
+	  fundBGI: {
+    	width: 1370,
+		  height: 189
+	  },
+	  fundBGISmall: {
+    	width: 320,
+		  height: 144
 	  }
   },
   uploadPath,
@@ -71,6 +82,8 @@ module.exports = {
   siteSpecificPath,
   qrCodePath,
 	idPhotoSmallPath,
+	fundBGIPath,
+	fundBGISmallPath,
   avatarSize: 192,
   avatarSmallSize: 48
 };
