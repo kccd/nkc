@@ -34,3 +34,43 @@ function uploadFile(url, id, callback) {
 		postUpload(url, formData, callback);
 	});
 }
+
+function userMessagesForm() {
+	var obj = {
+		name: $('#name').val(),
+		idCardNumber: $('#idCardNumber').val(),
+		mobile: $('#mobile').val(),
+		description: $('#description').val()
+	};
+	if(obj.name === '') {
+		throw '请输入真实姓名！';
+	}
+	if(obj.idCardNumber === '') {
+		throw '请输入身份证号码！';
+	}
+	if(obj.mobile === '') {
+		throw '请输入联系电话！';
+	}
+	/*if(!obj.idCardNumber.match(/[0-9]{17}[0-9]?|X|x/) || obj.idCardNumber.length > 18) {
+		throw '身份证号码格式不正确！';
+	}
+	*/
+
+	if($('.wechat').length !== 0) {
+		if($('.wechat').hasClass('active')) {
+			obj.paymentMethod = 'wechat';
+		} else if($('.alipay').hasClass('active')){
+			obj.paymentMethod = 'alipay';
+		} else {
+			throw '请选择收款方式！';
+		}
+		obj.account = $('#account').val();
+		if(obj.account === '') {
+			throw '请输入收款账号！';
+		}
+	}
+	if(obj.description === '') {
+		throw '请输入自我介绍';
+	}
+	return obj;
+}

@@ -1,0 +1,39 @@
+// 若是组员需传入参数 members: true;
+// options = {
+//   name: String,
+//   idCardNumber: String,
+//   members: Boolean,
+//   account: {
+//     paymentMethod: String,
+//     number: String
+//   },
+//   description: String
+// }
+-let {name, members, idCardNumber, description, account, mobile} = options;
+.row(style='padding: 3rem 0;')
+  .col-xs-12.col-md-4.col-md-offset-4
+    span 真实姓名：
+    input.fund-input#name(placeholder='请输入您的真实姓名' autofocus='true' value=name || '')
+  .col-xs-12.col-md-4.col-md-offset-4
+    span 身份证号：
+    input.fund-input#idCardNumber(placeholder='请输入您的身份证号码' value=idCardNumber || '')
+  .col-xs-12.col-md-4.col-md-offset-4
+    span 联系电话：
+    input.fund-input#mobile(placeholder='请输入您的电话号码' value=mobile || '')
+  if !members
+    .col-xs-4.col-md-1.col-md-offset-4
+      span 收款方式：
+    .col-xs-4.col-md-1.text-center
+      span 微信
+      .pay.wechat.center-block(class=account.paymentMethod === 'wechat'? 'active': '')
+    .col-xs-4.col-md-1.text-center
+      span 支付宝
+      .pay.alipay.center-block(class=account.paymentMethod === 'alipay'? 'active': '')
+    .col-xs-12.col-md-4.col-md-offset-4
+      span 收款账号：
+      input.fund-input#account(placeholder='请输入收款账号' value=account.number || '')
+  .col-xs-12.col-md-4.col-md-offset-4
+    span 自我介绍：
+    p.fund-description 1、简要的介绍自己，重点是科技爱好活动的经历。如果您是学生，建议（不是必须）说明您的年级、专业。
+    p.fund-description 2、概述您的科技活动，让网友能够增长这方面的知识，并了解来龙去脉。
+    textarea.fund-textarea#description(placeholder='介绍一下自己')!= description || ''

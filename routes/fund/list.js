@@ -139,6 +139,18 @@ listRouter
 		applicationForm._id = await db.SettingModel.operateSystemID('fundApplicationForms', 1);
 		applicationForm.uid = user.uid;
 		applicationForm.fundId = fundId;
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const {name, idCardNumber, photos} = userPersonal.privateInformation;
+		const {idCardA, idCardB, handheldIdCard, certs} = photos;
+		applicationForm.userMessages = {
+			name,
+			idCardNumber,
+			mobile: userPersonal.mobile,
+			idCardA,
+			idCardB,
+			handheldIdCard,
+			certs
+		};
 		const newApplicationForm = db.FundApplicationFormModel(applicationForm);
 		await newApplicationForm.save();
 		ctx.redirect(`/fund/a/${applicationForm._id}/settings`);

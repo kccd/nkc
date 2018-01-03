@@ -446,6 +446,7 @@ const certificates ={
         		[name]: '基金申请表',
 			      [GET]: true,
 			      [PATCH]: true,
+			      [POST]: true,
 			      [DELETE]: true,
 			      settings: {
 							[GET]: true

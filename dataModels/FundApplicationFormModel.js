@@ -67,35 +67,17 @@ const fundApplicationFormSchema = new Schema({
     default: [],
     index: 1
   },
-	lifePhoto: {
-		type: [Number],
-		default: []
+	userMessages: {
+		name: String,
+		idCardNumber: String,
+		mobile: String,
+		description: String,
+		idCardA: Number,
+		idCardB: Number,
+		handheldIdCard: Number,
+		life: [String],
+		certs: [Number]
 	},
-  members: {
-    type: [Schema.Types.Mixed],
-    default: []
-  },
-  /*
-  {
-    uid: ****,
-    info: {
-      name: ****
-      idCard: ****
-      ...
-    }
-
-  }
-
-  {
-    uid: String,
-    name: String,
-    idCard: String,
-    idCardPhotoPath: [String],
-    lifePhotoPath: [String],
-    handheldIdCartPath: [String],
-    certPhotoPath: [String]
-  }
-  */
   threads: {
     type: [String],
     default:[]
@@ -137,7 +119,7 @@ const fundApplicationFormSchema = new Schema({
   		type: Boolean,
 		  default: false
 	  },
-	  inputUsersMessages: {
+	  inputUserMessages: {
 			type: Boolean,
 		  default: false
 	  },
@@ -317,6 +299,14 @@ fundApplicationFormSchema.virtual('fund')
 		this._fund = fund
 	});
 
+fundApplicationFormSchema.virtual('members')
+	.get(function() {
+		return this._members;
+	})
+	.set(function(members) {
+		this._members = members
+	});
+
 const match = (obj) => {
   const {
   	chooseType,
@@ -373,6 +363,12 @@ fundApplicationFormSchema.methods.extendUser = async function() {
 	const UserModel = require('./UserModel');
 	const user = await UserModel.findOnly({uid: this.uid});
 	return this.user = user;
+};
+
+fundApplicationFormSchema.methods.extendMembers = async function() {
+	const FundApplicationUserModel = require('./FundApplicationUserModel');
+	const applicationUsers = await FundApplicationUserModel.find({applicationId: this._id}).sort({toc: 1});
+	return this.members = applicationUsers;
 };
 
 fundApplicationFormSchema.methods.extendFund = async function() {

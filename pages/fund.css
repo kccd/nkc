@@ -1,6 +1,21 @@
 body{
   /*background-color: #f3f3f3;*/
 }
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+  color: #ddd;
+}
+
+input:-moz-placeholder, textarea:-moz-placeholder {
+  color:#ddd;
+}
+
+input::-moz-placeholder, textarea::-moz-placeholder {
+  color:#ddd;
+}
+
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+  color:#ddd;
+}
 a:focus{text-decoration: none}
 .fund-list{
   margin: 15px 0;
@@ -257,4 +272,224 @@ input[type="radio"], input[type="checkbox"]{
 }
 #fundImageDisplay{
   background-repeat: no-repeat;
+}
+
+.fund-input{
+  border: none;
+  border-bottom: 1px solid #aaa;
+  width: 100%;
+  outline:none;
+  font-size: 1.5rem;
+  color: #777;
+  margin: 1rem 0;
+}
+.fund-input.common{
+  border: none;
+  border-bottom: 1px solid #aaa;
+  outline:none;
+  width: auto;
+  font-size: 1.5rem;
+  color: #777;
+  margin: 1rem 0;
+}
+.fund-textarea{
+  border-bottom: 1px solid #aaa;
+  width: 100%;
+  height: 25rem;
+  outline:none;
+  font-size: 1.4rem;
+  color: #777;
+  margin: 1rem 0;
+  padding: 0.5rem
+}
+.fund-submit{
+  width: 20%;
+  background-color: #fff;
+  border: 1px solid #aaa;
+  height: 2.5rem;
+}
+.fund-span {
+  padding: 0 0.8rem;
+  background-color: #2aabd2;
+  display: inline-block;
+  color: #fff;
+  margin: 0.3rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative;
+  height: 2.5rem;
+  text-align: center;
+  line-height: 2.5rem;
+}
+.fund-span.delete{
+  position: absolute;
+  width: 100%;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+  top: -3px;
+  left: -3px;
+  text-align: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+.fund-span.add{
+  position: absolute;
+  width: 100%;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+  top: -3px;
+  left: -3px;
+  text-align: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+.fund-span.add:hover{
+  background-color:  rgba(0,0,0,0.5);
+  color: #fff;
+}
+.fund-span.delete:hover{
+  background-color:  rgba(0,0,0,0.5);
+  color: #fff;
+}
+.fund-span.disabled{
+  background-color: #aaa;
+}
+.fund-span.disabled:hover{
+  background-color: #aaa;
+}
+.fund-span.transparent{
+  background-color: #aaaaaa00;
+  color: #888;
+  border: 1px solid #aaa;
+  transition: color 0s;
+}
+.fund-span.transparent:hover{
+  background-color: #aaaaaa00;
+  color: #333;
+}
+.fund-span.green{
+  background-color: #5cb85c;
+  color: #fff;
+  border: 1px solid #aaa;
+  transition: color 0s;
+}
+.fund-span.green:hover{
+  background-color: #5cb85c;
+}
+
+.fund-span.red{
+  background-color: red;
+  color: #fff;
+  border: 1px solid #aaa;
+  transition: color 0s;
+}
+.fund-span.red:hover{
+  background-color: red;
+}
+
+.fund-span:hover{
+  background-color: #2aabd2;
+}
+#teamDiv{
+  display: none;
+}
+
+.nav-link{
+  padding-left: 0;
+  padding-right: 0;
+  overflow: hidden;
+}
+.nav-link > ul > li{
+  float: left;
+  list-style: none;
+}
+.choose-content-div{
+  text-align: center;
+  font-size: 2rem;
+  height: 5rem;
+  line-height: 5rem;
+  color: #bbb;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s, border 0.2s, color 0.2s;
+}
+.choose-content-div.active{
+  background-color: #2aabd2;
+  border: 1px solid #efefef;
+  color: #fff;
+}
+.choose-content-div:hover{
+  background-color: #2aabd2;
+  border: 1px solid #efefef;
+  color: #fff;
+}
+.nav-link > ul{
+  padding: 0;
+  overflow: hidden;
+}
+.nav-link > ul > li > a{
+  color: #fff;
+  display: block;
+  font-size: 1.5rem;
+  height: 4rem;
+  line-height: 4rem;
+  text-align: center;
+  width: 15rem;
+  background-color: #aaa;
+  margin: 0 0.5rem;
+  transition: background-color 0.2s;
+}
+.nav-link > ul > li > a.active{
+  background-color: #337ab7aa;
+}
+.nav-link > ul > li > a:hover{
+  text-decoration: none;
+  background-color: #337ab7aa;
+}
+.blank{
+  color: #eee;
+  text-align: center;
+  line-height: 15rem;
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+#usersList{
+  min-height: 16.5rem;
+  border: 1px solid #eee;
+  margin: 0.5rem 0;
+}
+.fund-red{
+  color: red;
+}
+.pay{
+  height: 4rem;
+  width: 4rem;
+  background-image: url('/default/fund_pay.jpg');
+  background-color: #aaa;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.wechat{
+  background-position: -48px;
+}
+.wechat:hover, .wechat.active{
+  background-position: 0;
+}
+.alipay{
+  background-position: -144px;
+}
+.alipay:hover, .alipay.active{
+  background-position: -96px;
+}
+.fund-description{
+  font-size: 1rem;
+  color: #999;
+}
+.fund-apply-head{
+  color: #aaa;
+  font-weight: 100;
+  font-size: 2rem;
 }

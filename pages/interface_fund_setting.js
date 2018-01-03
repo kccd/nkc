@@ -216,7 +216,7 @@ function submit(id) {
 	    if(inputFile.files.length > 0){
 		    file = inputFile.files[0];
 	    }else {
-		    return jwarning('未选择背景图片');
+		    return window.location.href = '/fund/list/'+id;
 	    }
 	    var formData = new FormData();
 	    formData.append('file', file);
