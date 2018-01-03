@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const adRouter = new Router();
-const {upload} = require('../../settings');
-const {adPath, defaultAdPath} = upload;
+const {upload, statics} = require('../../settings');
+const {defaultAdPath} = statics;
+const {adPath} = upload;
 adRouter
   .get('/:tid', async (ctx, next) => {
     const {fs} = ctx;

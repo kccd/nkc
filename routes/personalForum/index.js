@@ -53,21 +53,14 @@ router
       if(digest){
         $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
       }
-      const tidArr = [];
-      const posts = await PostModel.find($matchPost.toJS(), {_id: 0, tid: 1});
-      for (let post of posts) {
-        if(!tidArr.includes(post.tid)) tidArr.push(post.tid);
-      }
-      const threads = await ThreadModel.find({$and: [$matchThread.toJS(), {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
-      data.threads = await Promise.all(threads.map(async thread => {
-        await thread.extendFirstPost().then(async p => {
-          await p.extendUser();
-          await p.extendResources();
-        });
-        await thread.extendLastPost().then(p => p.extendUser());
-        return thread;
+      const posts = await PostModel.find($matchPost.toJS()).sort($sort).skip(page * perpage).limit(perpage);
+      await Promise.all(posts.map(async post => {
+        await post.extendThread();
+        await post.thread.extendUser();
+        await post.thread.extendFirstPost();
       }));
-      const length = await ThreadModel.count({$and: [$matchThread.toJS(), {tid: {$in: tidArr}}]});
+      data.threads = posts;
+      const length = await ThreadModel.count($matchThread.toJS());
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {
@@ -249,6 +242,7 @@ router
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
+      console.log('length is',data.threads.length)
       const length = await ThreadModel.count($matchThread.toJS());
       /*data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {

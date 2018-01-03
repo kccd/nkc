@@ -196,7 +196,7 @@ postSchema.pre('save', async function(next) {
     const resource = await ResourceModel.findOne({rid});
     if(resource) {
       if(!resource.references.includes(pid)) {
-        resources.references.push(pid);
+        resource.references.push(pid);
         await resource.save()
       }
       // post.hasImage depends on whether the resources has a img extension

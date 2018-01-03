@@ -228,7 +228,6 @@ function quotePost(pid, number){
   nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
     pc = pc.message;
-    console.log(pc);
     length_limit = 100;
     var content = pc.c;
     var replaceArr = [

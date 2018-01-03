@@ -73,7 +73,6 @@ threadRouter
     } else {
       posts = await thread.getPostByQuery(query, q);
     }
-    console.log(posts);
     posts.map(async post => {
       const postContent = post.c || '';
       const index = postContent.indexOf('[quote=');

@@ -30,6 +30,7 @@ module.exports = async (ctx, next) => {
     ctx.body = fs.createReadStream(ctx.filePath);
     await next();
   } else {
+    ctx.logIt = true; // if the request is request to a content, log it;
     const type = ctx.request.accepts('json', 'html');
     switch(type) {
       case 'json':

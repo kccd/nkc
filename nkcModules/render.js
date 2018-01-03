@@ -125,6 +125,10 @@ function highlightString(content, str) {
   return result
 }
 
+function filterQuote(content) {
+  return content.replace(/\[quote.*\/quote]/ig, '')
+}
+
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
@@ -140,7 +144,8 @@ let pugRender = (template, data) => {
     testModifyTimeLimit,
     dateString,
     creditString,
-    htmlDiff
+    htmlDiff,
+    filterQuote
   };
   options.data = data;
   options.filters = filters;
