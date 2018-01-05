@@ -7,9 +7,8 @@ block content
   -const fund = data.fund
   -const member = fund? fund.member: '';
   -const applicant = fund? fund.applicant: '';
-  -const preconditions = fund?fund.preconditions: '';
-  -const attachments = preconditions? preconditions.attachments: '';
-  -const authentication = preconditions? preconditions.authentication: '';
+  -const thread = fund? fund.thread: '';
+  -const paper = fund? fund.paper: '';
   .container-fluid(style='max-width: 1400px;')
     .row
       if !fund
@@ -122,7 +121,7 @@ block content
               .col-xs-12.col-md-5
                 h5 指定用户(英文逗号,分隔)
                 .form-group
-                  input#fundCensorAppointed.form-control(value=fund? fund.censor.appointed.join(','): '')
+                  input#fundCensorAppointed.form-control(value=fund? fund.censor.appointed.join(','): '' placeholder='填入uid')
         .fund-setting-list
           .col-xs-12.col-md-2
             label.radio-inline
@@ -169,10 +168,10 @@ block content
               input.authentication(type='checkbox' name='idCard' checked=applicant ? applicant.idCard : false)
               h5 实名认证
             label.checkbox-inline
-              input.authentication(type='checkbox' name='idCardPhoto' checked=applicant ? applicant.idCardPhoto : false)
+              input.authentication(type='checkbox' name='idCardPhotos' checked=applicant ? applicant.idCardPhotos : false)
               h5 身份证照片
             label.checkbox-inline
-              input.authentication(type='checkbox' name='lifePhoto' checked=applicant ? applicant.lifePhoto : false)
+              input.authentication(type='checkbox' name='lifePhotos' checked=applicant ? applicant.lifePhotos : false)
               h5 生活照
             label.checkbox-inline
               input.authentication(type='checkbox' name='handheldIdCardPhoto' checked=applicant ? applicant.handheldIdCardPhoto : false)
@@ -185,10 +184,10 @@ block content
               input.members(type='checkbox' name='idCard' checked=member ? member.idCard : false)
               h5 实名认证
             label.checkbox-inline
-              input.members(type='checkbox' name='idCardPhoto' checked=member ? member.idCardPhoto : false)
+              input.members(type='checkbox' name='idCardPhotos' checked=member ? member.idCardPhotos : false)
               h5 身份证照片
             label.checkbox-inline
-              input.members(type='checkbox' name='lifePhoto' checked=member ? member.lifePhoto : false)
+              input.members(type='checkbox' name='lifePhotos' checked=member ? member.lifePhotos : false)
               h5 生活照
             label.checkbox-inline
               input.members(type='checkbox' name='handheldIdCardPhoto' checked=member ? member.handheldIdCardPhoto : false)
@@ -197,12 +196,12 @@ block content
           .col-xs-12.col-md-2
             h5 附带帖子数目
           .col-xs-12.col-md-2
-            input.form-control#attachmentsThreads(type="number" placeholder="默认为0" value=attachments? attachments.threadCount: '')
+            input.form-control#attachmentsThreads(type="number" placeholder="默认为0" value=thread? thread.count: '')
         .fund-setting-list
           .col-xs-12.col-md-2
             h5 附带论文数目
           .col-xs-12.col-md-2
-            input.form-control#attachmentsPapers(type="number" placeholder="默认为0" value=attachments? attachments.paper.count: '')
+            input.form-control#attachmentsPapers(type="number" placeholder="默认为0" value=paper? paper.count: '')
           .col-xs-12.col-md-4
             span 是否已通过审核&nbsp;&nbsp;
             label.radio-inline

@@ -22,14 +22,14 @@ var fundObj = {
 	},
 	member: {
 		idCard: false,
-		idCardPhoto: false,
-		lifePhoto: false,
+		idCardPhotos: false,
+		lifePhotos: false,
 		handheldIdCardPhoto: false
 	},
 	applicant: {
 		idCard: false,
-		idCardPhoto: false,
-		lifePhoto: false,
+		idCardPhotos: false,
+		lifePhotos: false,
 		handheldIdCardPhoto: false,
 		userLevel: 0,
 		threadCount: 0,
@@ -261,7 +261,6 @@ function applicationMethodSet() {
 	} else {
 		fundObj.applicationMethod.group = false;
 	}
-	console.log(fundObj.applicationMethod);
 }
 
 function applicationMethod() {
@@ -281,7 +280,6 @@ function memberSet() {
 			fundObj.member[name] = false;
 		}
 	}
-	console.log(fundObj.member);
 }
 
 function member() {
@@ -308,7 +306,6 @@ function conflictSet() {
 	} else {
 		fundObj.conflict.other = false;
 	}
-	console.log(fundObj.conflict);
 }
 
 function submit(id) {

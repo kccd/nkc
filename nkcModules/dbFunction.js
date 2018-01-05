@@ -108,12 +108,11 @@ fn.createUser = async (data) => {
     userObj.password = passwordObj.password;
     userObj.hashType = passwordObj.hashType;
   }
-  const countOfSystemMessages = await db.SmsModel.count({fromSystem: true});
   userObj.newMessage = {
     messages: 0,
     at: 0,
     replies: 0,
-    system: countOfSystemMessages
+    system: 0
   };
   userObj.abbr = userObj.username.slice(0, 6);
   userObj.displayName = userObj.username + '的专栏';
@@ -127,6 +126,12 @@ fn.createUser = async (data) => {
     await usersPersonal.save();
     await personalForums.save();
     await usersSubscribe.save();
+    const allSystemMessages = await db.SmsModel.find({fromSystem: true});
+    for(let sms of allSystemMessages) {
+    	const viewedUsers = sms.viewedUsers;
+    	viewedUsers.push(userObj.uid);
+	    await sms.update({viewedUsers});
+    }
   }catch(err) {
     await db.UserModel.deleteMany({uid: userObj.uid});
     await db.UsersPersonalModel.deleteMany({uid: userObj.uid});
