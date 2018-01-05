@@ -12,6 +12,7 @@ listRouter
 	.post('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {fundObj} = ctx.body;
+		ctx.print('newFund', fundObj);
 		fundObj.name = fundObj.name || '科创基金';
 		const fund = await db.FundModel.findOne({_id: fundObj._id});
 		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');
@@ -41,6 +42,7 @@ listRouter
 	// 具体基金项目信息页面
 	.get('/:fundId', async (ctx, next) => {
 		const {data, db} = ctx;
+		const {user} = data;
 		const {fundId} = ctx.params;
 		const {type} = ctx.query;
 		const {FundApplicationFormModel} = db;
@@ -48,40 +50,37 @@ listRouter
 		page = page? parseInt(page): 0;
 		data.type = type;
 		data.page = page;
-		data.fund = await db.FundModel.findOnly({_id: fundId, display: true});
-		let query;
+		const fund = await db.FundModel.findOnly({_id: fundId, display: true});
+		data.fund = fund;
+		let query = {
+			disabled: false
+		};
 		if(type === 'excellent') { // 优秀的项目
 			query = {
-				excellent: true
+				'status.excellent': true
 			};
 		} else if(type === 'complete'){ // 已完成的项目
 			query = {
-				complete: true
+				'status.complete': true
 			};
 		} else if(type === 'passed') { // 资助中
 			query = {
-				remittance: true
+				'status.remittance': true
 			}
 		} else if(type === 'inReview') { // 正在申请
 			query = {
-				pStatus: {$ne: 0},
-				uStatus: {$ne: 0},
-				remittance: null
+				'lock.status': {$ne: 0},
+				'status.adminAgree': {$ne: true}
 			}
 		} else { // 全部
 			query = {
-				pStatus: {$ne: 0},
-				uStatus: {$ne: 0}
+				'lock.status': {$ne: 0},
 			};
 		}
 		const length = await FundApplicationFormModel.count(query);
 		const paging = apiFn.paging(page, length);
-		const q = FundApplicationFormModel.match(query);
-		data.applications = await FundApplicationFormModel.find(q).skip(paging.start).limit(paging.perpage);
-		const userQuery = FundApplicationFormModel.match({
-			resultSuccessful: null
-		});
-		data.userApplication = await FundApplicationFormModel.findOne(userQuery);
+		data.applications = await FundApplicationFormModel.find(query).skip(paging.start).limit(paging.perpage);
+		data.message = await user.getUnCompletedFundApplication();
 		ctx.template = 'interface_fund_messages.pug';
 		await next();
 	})
@@ -111,14 +110,9 @@ listRouter
 		const fund = await db.FundModel.findOnly({_id: fundId, display: true});
 		data.fund = fund;
 		ctx.template = 'interface_fund_agreement.pug';
-		let userQuery = db.FundApplicationFormModel.match({
-			resultSuccessful: null,
-		});
-		userQuery.uid = user.uid;
-		const notCompleteApplication = await db.FundApplicationFormModel.findOne(userQuery);
-		if(notCompleteApplication) {
-			data.notAllow = true;
-			data.applicationForm = notCompleteApplication;
+		const message = await user.getUnCompletedFundApplication();
+		if(message) {
+			data.message = message;
 			return await next();
 		}
 		if(agree !== 'true') {
@@ -129,28 +123,11 @@ listRouter
 		} catch(e) {
 			ctx.throw(401, e);
 		}
-		const moment = require('moment')();
+		console.log('asdf');
 		const applicationForm = {};
-		/*const year = moment.format('YYYY');
-		applicationForm.year = year;
-		const a = await db.FundApplicationFormModel.findOne({year, fundId}).sort({order: -1});
-		applicationForm.order = a? a.order+1: 1;
-		applicationForm._id = year + fundId + applicationForm.order;*/
 		applicationForm._id = await db.SettingModel.operateSystemID('fundApplicationForms', 1);
 		applicationForm.uid = user.uid;
 		applicationForm.fundId = fundId;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		const {name, idCardNumber, photos} = userPersonal.privateInformation;
-		const {idCardA, idCardB, handheldIdCard, certs} = photos;
-		applicationForm.userMessages = {
-			name,
-			idCardNumber,
-			mobile: userPersonal.mobile,
-			idCardA,
-			idCardB,
-			handheldIdCard,
-			certs
-		};
 		const newApplicationForm = db.FundApplicationFormModel(applicationForm);
 		await newApplicationForm.save();
 		ctx.redirect(`/fund/a/${applicationForm._id}/settings`);

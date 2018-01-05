@@ -21,12 +21,12 @@ const fundApplicationFormSchema = new Schema({
     required: true,
     index: 1
   },
-  timeToCreate: {
+  toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
-  timeOfLastRevise: {
+  tlm: {
     type: Date,
     index: 1
   },
@@ -58,33 +58,29 @@ const fundApplicationFormSchema = new Schema({
     */
   },
   projectCycle: {
-    type: Number,
-    default: null
+	  type: [Number],
+	  default: [],
+	  index: 1
   },
-  // 延期
-  postpone: {
-    type: [Number],
-    default: [],
-    index: 1
-  },
-	userMessages: {
-		name: String,
-		idCardNumber: String,
-		mobile: String,
-		description: String,
-		idCardA: Number,
-		idCardB: Number,
-		handheldIdCard: Number,
-		life: [String],
-		certs: [Number]
-	},
   threads: {
-    type: [String],
-    default:[]
+  	start: {// 申请时附带的帖子
+		  type: [String],
+		  default:[]
+	  },
+	  end: { // 结项时附带的帖子
+		  type: [String],
+		  default:[]
+	  }
   },
   papers: {
-    type: [String],
-    default: []
+	  start: {
+		  type: [String],
+		  default:[]
+	  },
+	  end: {
+		  type: [String],
+		  default:[]
+	  }
   },
   account: {
     paymentMethod: {
@@ -97,60 +93,47 @@ const fundApplicationFormSchema = new Schema({
     }
   },
   project: {
-    title: {
-      type: String,
-      index: 1
-    },
-    aim: {
-      type: String,
-    },
-    content: {
-      type: String,
-      index: 1
-    },
-    supplementary: {
-      type: [String],
-      default: [],
-      index: 1
-    }
+    type: Number,
+	  default: null,
+	  index: 1
   },
   status: {
   	chooseType: {
   		type: Boolean,
-		  default: false
+		  default: null
 	  },
-	  inputUserMessages: {
+	  inputApplicantMessages: {
 			type: Boolean,
-		  default: false
+		  default: null
 	  },
 	  ensureUsersMessages: {
   		type: Boolean,
-		  default: false
+		  default: null
 	  },
 	  inputProjectMessages: {
 			type: Boolean,
-		  default: false
+		  default: null
 	  },
 		inputProjectContent: {
   		type: Boolean,
-			default: false
+			default: null
 		},
 	  submit: {
 			type: Boolean,
-		  default: false
+		  default: null
 	  },
     usersSupport: {
       type: Boolean,
       default: null,
       index: 1
     },
+	  usersMessagesPassed: {
+		  type: Boolean,
+		  default: null,
+		  index: 1
+	  },
     projectPassed: {
       type:Boolean,
-      default: null,
-      index: 1
-    },
-    usersMessagesPassed: {
-      type: Boolean,
       default: null,
       index: 1
     },
@@ -178,45 +161,14 @@ const fundApplicationFormSchema = new Schema({
       type: Boolean,
       default: null,
       index: 1
-    }
+    },
+	  disabled: {
+		  type: Boolean,
+		  default: false,
+		  index: 1
+	  },
   },
-  projectLock: {
-    status: {
-      type: Number,
-      default: 0, // 0未提交， 1已提交， 2正在审批， 3审核完成
-      index: 1
-      /*submitted: {
-        type: Boolean,
-        default: false
-      },
-      beingReviewed: {
-        type: Boolean,
-        default: false
-      },
-      complete: {
-        type: Boolean,
-        default: false
-      }*/
-    },
-    uid: {
-      type: String,
-      default: '',
-      index: 1
-    },
-    timeToOpen: {
-      type: Date,
-      default: Date.now
-    },
-    timeToClose: {
-      type: Date,
-      default: Date.now
-    },
-    reason: {
-      type: String,
-      default: ''
-    }
-  },
-  usersMessagesLock: {
+  lock: {
     status: {
       type: Number,
       default: 0, // 0未提交， 1已提交， 2正在审批， 3审核完成
@@ -234,10 +186,6 @@ const fundApplicationFormSchema = new Schema({
     timeToClose: {
       type: Date,
       default: Date.now
-    },
-    reason: {
-      type: String,
-      default: ''
     }
   },
   supporter: {
@@ -246,31 +194,6 @@ const fundApplicationFormSchema = new Schema({
     index: 1
   },
   objector: {
-    type: [String],
-    default: [],
-    index: 1
-  },
-  result: {
-  	successful: {
-  		type: Boolean,
-		  default: null
-	  },
-	  reason: {
-		  type: String,
-		  default: ''
-	  },
-    thread: {
-      type: [String],
-      default: [],
-      index: 1
-    },
-    paper: {
-      type: [String],
-      default: [],
-      index: 1
-    }
-  },
-  comments: {
     type: [String],
     default: [],
     index: 1
@@ -296,7 +219,7 @@ fundApplicationFormSchema.virtual('fund')
 		return this._fund;
 	})
 	.set(function(fund) {
-		this._fund = fund
+		this._fund = fund;
 	});
 
 fundApplicationFormSchema.virtual('members')
@@ -304,53 +227,16 @@ fundApplicationFormSchema.virtual('members')
 		return this._members;
 	})
 	.set(function(members) {
-		this._members = members
+		this._members = members;
 	});
 
-const match = (obj) => {
-  const {
-  	chooseType,
-	  inputUsersMessages,
-	  ensureUsersMessages,
-	  inputProjectMessages,
-	  inputProjectContent,
-	  submit,
-    pStatus,
-    uStatus,
-    usersSupport,
-    projectPassed,
-    usersMessagesPassed,
-    adminSupport,
-    remittance,
-    complete,
-    successful,
-    excellent,
-	  inputStatus,
-	  resultSuccessful
-  } = obj;
-  const query = {};
-  if(pStatus !== undefined) query['projectLock.status'] = pStatus;
-  if(uStatus !== undefined) query['usersMessagesLock.status'] = uStatus;
-  if(usersSupport !== undefined) query['status.usersSupport'] = usersSupport;
-  if(projectPassed !== undefined) query['status.projectPassed'] = projectPassed;
-  if(usersMessagesPassed !== undefined) query['status.usersMessagesPassed'] = usersMessagesPassed;
-  if(adminSupport !== undefined) query['status.adminSupport'] = adminSupport;
-  if(remittance !== undefined) query['status.remittance'] = remittance;
-  if(complete !== undefined) query['status.complete'] = complete;
-  if(successful !== undefined) query['status.successful'] = successful;
-  if(excellent !== undefined) query['status.excellent'] = excellent;
-  if(inputStatus !== undefined) query['status.inputStatus'] = inputStatus;
-	if(chooseType !== undefined) query['status.chooseType'] = chooseType;
-	if(inputUsersMessages !== undefined) query['status.inputUsersMessages'] = inputUsersMessages;
-	if(ensureUsersMessages !== undefined) query['status.ensureUsersMessages'] = ensureUsersMessages;
-	if(inputProjectMessages !== undefined) query['status.inputProjectMessages'] = inputProjectMessages;
-	if(inputProjectContent !== undefined) query['status.inputProjectContent'] = inputProjectContent;
-	if(submit !== undefined) query['status.submit'] = submit;
-	if(resultSuccessful !== undefined) query['result.successful'] = resultSuccessful;
-  return query;
-};
-
-fundApplicationFormSchema.statics.match = match;
+fundApplicationFormSchema.virtual('applicant')
+	.get(function() {
+		return this._applicant;
+	})
+	.set(function(applicant) {
+		this._applicant = applicant;
+	});
 
 fundApplicationFormSchema.pre('save', function(next) {
   if(!this.timeOfLastRevise) {
@@ -365,15 +251,26 @@ fundApplicationFormSchema.methods.extendUser = async function() {
 	return this.user = user;
 };
 
+fundApplicationFormSchema.methods.extendApplicant = async function() {
+	const FundApplicationUserModel = require('./FundApplicationUserModel');
+	const applicant= await FundApplicationUserModel.findOne({applicationFormId: this._id, uid: this.uid});
+	if(applicant) await applicant.extendUser();
+	return this.applicant = applicant;
+};
+
 fundApplicationFormSchema.methods.extendMembers = async function() {
 	const FundApplicationUserModel = require('./FundApplicationUserModel');
-	const applicationUsers = await FundApplicationUserModel.find({applicationId: this._id}).sort({toc: 1});
-	return this.members = applicationUsers;
+	const applicationUsers = await FundApplicationUserModel.find({applicationFormId: this._id, uid: {$ne: this.uid}}).sort({toc: 1});
+
+	return this.members = await Promise.all(applicationUsers.map(async aUser => {
+		await aUser.extendUser();
+		return aUser;
+	}));
 };
 
 fundApplicationFormSchema.methods.extendFund = async function() {
 	const FundModel = require('./FundModel');
-	const fund = await FundModel.findOnly({_id: this.fundId});
+	const fund = await FundModel.findOnly({_id: this.fundId, display: true});
 	return this.fund = fund;
 };
 

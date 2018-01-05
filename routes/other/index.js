@@ -121,7 +121,6 @@ otherRouter
     console.log(`随机加精帖子6： ${t1-t}ms, 最新帖子20： ${t2-t1}ms, 活跃用户、板块列表、ads： ${t3-t2}ms, 加载用户发过的帖子： ${t4-t3}ms`)
 
     ctx.template = 'interface_home.pug';
-
     await next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())

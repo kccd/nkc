@@ -3,12 +3,12 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundSchema = new Schema({
   _id: String,
-  timeToCreate: {
+  toc: {
     type: Date,
     default: Date.now,
     index: 1 
   },
-  timeOfLastRevise: {
+  tlm: {
     type: Date,
     index: 1
   },
@@ -18,48 +18,74 @@ const fundSchema = new Schema({
     index: 1
   },
 	image: {
-  	type: Boolean,
-		default: false
+  	type: Number,
+		default: null,
+		index: 1
 	},
-  money: {
-    type: Number,
-    required: true,
-    index: 1
-  },
-  color: {
-    type: String,
-    default: '#7f9eb2'
-  },
+	color: {
+		type: String,
+		default: '#7f9eb2'
+	},
+	money: {
+  	initial: {
+  		type: Number,
+		  required: true,
+		  index: 1
+	  },
+		fixed: {
+  		type: Number,
+			default: null,
+			index: 1
+		},
+		max: {
+			type: Number,
+			default: null,
+			index: 1
+		}
+	},
   description: {
-    type: String,
-    default: ''
+    brief: {
+    	type: String,
+	    required: true
+    },
+	  detailed: {
+    	type: String,
+		  required: true,
+		  index: 1
+	  }
   },
-	explain: {
-  	type: String,
-		default: ''
-	},
 	display: {
     type: Boolean,
     default: true
   },
-
   censor: {
-    userLevel: {
-      type: Number,
-      default: 0,
-      index: 1
-    },
-    userCount: {
-      type: Number,
-      default: 0,
-      index: 1
-    },
     certs: {
       type: [String],
       default: []
-    }
+    },
+	  appointed: {
+    	type: [String],
+		  default: [],
+		  index: 1
+	  }
   },
-  preconditions: {
+	thread: {
+		count: {
+			type: Number,
+			default: 0
+		},
+	},
+	paper: {
+		passed: {
+			type: Boolean,
+			default: false
+		},
+		count: {
+			type: Number,
+			default: 0
+		}
+	},
+  applicant: {
     userLevel: {
       type: Number,
       default: 0
@@ -76,45 +102,57 @@ const fundSchema = new Schema({
       type: Number,
       default: 0
     },
-    supportCount: {
-      type: Number,
-      default: 0
-    },
-    attachments: {
-      threadCount: {
-        type: Number,
-        default: 0
-      },
-      paper: {
-        passed: {
-          type: Boolean,
-          default: false
-        },
-        count: {
-          type: Number,
-          default: 0
-        }
-      }
-    },
-    authentication: {
-      idCard: {
-        type: Boolean,
-        default: false
-      },
-      lifePhoto: {
-        type: Boolean,
-        default: false
-      },
-      idCardPhoto: {
-        type: Boolean,
-        default: false
-      },
-      handheldIdCardPhoto: {
-        type: Boolean,
-        default: false
-      }
-    }
+	  idCard: {
+		  type: Boolean,
+		  default: false
+	  },
+	  lifePhotos: {
+		  type: Boolean,
+		  default: false
+	  },
+	  idCardPhotos: {
+		  type: Boolean,
+		  default: false
+	  },
+	  handheldIdCardPhoto: {
+		  type: Boolean,
+		  default: false
+	  }
   },
+	member: {
+		idCard: {
+			type: Boolean,
+			default: false
+		},
+		lifePhotos: {
+			type: Boolean,
+			default: false
+		},
+		idCardPhotos: {
+			type: Boolean,
+			default: false
+		},
+		handheldIdCardPhoto: {
+			type: Boolean,
+			default: false
+		}
+	},
+	applicationMethod: {
+  	individual: {
+  		type: Boolean,
+		  default: null,
+		  index: 1
+	  },
+		group: {
+  		type: Boolean,
+			default: null,
+			index: 1
+		}
+	},
+	supportCount: {
+		type: Number,
+		default: 0
+	},
   timeOfPublicity: {
     type: Number,
     default: 0
@@ -123,6 +161,22 @@ const fundSchema = new Schema({
     type: Number,
     default: 0
   },
+	conflict: {
+  	self: {
+  		type: Boolean,
+		  default: false
+	  },
+		other: {
+  		type: Boolean,
+			default: false
+		}
+  	// all: 与所有conflict=all的互斥,
+		// self: 仅仅与自己互斥,
+		// null: 不存在互斥
+		// type: String,
+		// required: true,
+		// index: 1
+	}
 }, {
 	toObject: {
 		getters: true,
@@ -132,20 +186,17 @@ const fundSchema = new Schema({
 
 
 fundSchema.pre('save', function(next){
-  if(!this.timeOfLastRevise) this.timeOfLastRevise = this.timeToCreate;
+  if(!this.tlm) this.tlm= this.toc;
   next();
 });
 
 fundSchema.methods.ensurePermission = function(user) {
-	const {preconditions} = this;
-	const {userLevel, postCount, threadCount, timeToRegister} = preconditions;
+	const {userLevel, postCount, threadCount, timeToRegister} = this.applicant;
 	// if(user.userLevel < userLevel) throw '账号等级未满足条件';
 	if(user.postCount < postCount) throw '回帖量未满足条件';
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
-	// if(user.toc > Date.now() - timeToRegister*24*60*60*1000) throw '注册时间未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
 };
-
 
 const FundModel = mongoose.model('funds', fundSchema);
 module.exports = FundModel;

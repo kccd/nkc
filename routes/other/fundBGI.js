@@ -8,15 +8,15 @@ fundBGIRouter
 		ctx.filePath = fundBGIPath + '/' + fundId + '.jpg';
 		await next();
 	})
-	.post('/:fundId', async (ctx, next) => {
-		const {fs, db, settings, body} = ctx;
-		const {fundId} = ctx.params;
+	.post('/', async (ctx, next) => {
+		const {data, fs, db, settings, body} = ctx;
+		const imageId = Date.now();
 		const {fundBGIify, fundBGISmallify} = ctx.tools.imageMagick;
 		const {fundBGIPath, fundBGISmallPath} = settings.upload;
 		const {file} = body.files;
 		const {path} = file;
-		const targetFilePath = fundBGIPath + '/' + fundId + '.jpg';
-		const targetSmallFilePath = fundBGISmallPath + '/' + fundId + '.jpg';
+		const targetFilePath = fundBGIPath + '/' + imageId + '.jpg';
+		const targetSmallFilePath = fundBGISmallPath + '/' + imageId + '.jpg';
 		try {
 			await fundBGIify(path, targetFilePath);
 			await fundBGISmallify(path, targetSmallFilePath);
@@ -24,8 +24,7 @@ fundBGIRouter
 		} catch (err) {
 			ctx.throw(500, err);
 		}
-		const fund = await db.FundModel.findOnly({_id: fundId});
-		await fund.update({image: true});
+		data.imageId = imageId;
 		await next();
 	});
 module.exports = fundBGIRouter;

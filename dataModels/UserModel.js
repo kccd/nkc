@@ -205,6 +205,38 @@ userSchema.methods.updateUserMessage = async function() {
   await this.update(updateObj);
 };
 
+userSchema.methods.getUnCompletedFundApplication = async function() {
+	const message = {};
+	const FundApplicationFormModel = require('./FundApplicationFormModel');
+	const userQuery ={
+		uid: this.uid,
+		'status.disabled': false,
+		'status.complete': null
+	};
+	let userApplications = await FundApplicationFormModel.find(userQuery);
+	userApplications = await Promise.all(userApplications.map(async application => {
+		await application.extendFund();
+		return application;
+	}));
+	for(let application of userApplications) {
+		const {status, _id, targetFund} = application;
+		const {adminAgree, complete, submit} = status;
+		if(submit === null) {
+			message.unSubmit =_id;
+		} else if(adminAgree !== true) {
+			message.unPassed =application._id;
+		} else if(complete === null) {
+			if(fund._id === _id && fund.conflict.self === true) { // 申请相同的基金且未完成的基金项目设置了与自己互斥
+				message.unCompleted =_id;
+			} else if(fund.conflict.other === true && targetFund.conflict.other === true) { // 申请的基金项目与未完成的基金项目互斥
+				message.unCompleted= _id;
+			}
+		}
+	}
+	if(!message.unPassed && !message.unSubmit && !message.unCompleted) return false;
+	return message;
+};
+
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
   let cs = ['会员'];
