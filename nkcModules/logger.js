@@ -19,7 +19,7 @@ module.exports = async (ctx) => {
       console.error(
         ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red}`
       );
-      if(process.env !== 'production')
+      if(process.env.NODE_ENV !== 'production')
         console.error(log.error);
     }
     else {

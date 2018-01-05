@@ -1,7 +1,7 @@
 -var defaultColor = 'grey'
 -var length = Math.ceil(forums.length / 2)
--var forums1 = forums.splice(0, length)
--var forums2 = forums
+-var forums1 = forums.slice(0, length)
+-var forums2 = forums.slice(length, forums.length)
 .nkc-transform-box
   .nkc-inline-table
     for forum in forums1

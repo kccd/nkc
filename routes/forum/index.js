@@ -11,9 +11,8 @@ forumRouter
     const {data} = ctx;
     const {user} = data;
     if(type === 'json') {
-      if(!user) ctx.throw(401, '未登录用户不能发帖');
       data.forumsList = await dbFn.getAvailableForums(ctx);
-      data.uid = user.uid;
+      data.uid = user? user.uid: undefined;
     } else {
       ctx.throw(404);
     }

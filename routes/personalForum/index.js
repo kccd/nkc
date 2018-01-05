@@ -242,7 +242,6 @@ router
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      console.log('length is',data.threads.length)
       const length = await ThreadModel.count($matchThread.toJS());
       /*data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {

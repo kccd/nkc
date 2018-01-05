@@ -37,6 +37,9 @@ block content
             .clearfix
           for thread in data.latestThreads
             include interface_forum_singlethread
+          div(style='width: 100%; text-align: center;')
+            a(href=`/latest`) 查看更多
+          hr
         .panel
           -var newestDigestThreads = data.newestDigestThreads
             include interface_digest_threads

@@ -20,12 +20,13 @@ latestRouter
     let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
     threads = await Promise.all(threads.map(async t => {
       await t.extendFirstPost().then(p => p.extendUser());
+      await t.firstPost.extendResources();
       await t.extendLastPost().then(p => p.extendUser());
       await t.extendForum();
       return t;
     }));
     data.indexThreads = threads;
-    data.indexForumList = await dbFn.getAvailableForums(ctx);
+    data.forumList = await dbFn.getAvailableForums(ctx);
     data.digest = digest;
     data.sortby = sortby;
     data.content = 'forum';

@@ -227,7 +227,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   const t3 = Date.now();
   const user = await this.extendUser();
   await user.updateUserMessage();
-  console.log(`更新帖子：${t25-t2}ms, 更新板块：${t3-t25}ms, 更新用户：${Date.now()-t3}ms`);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
