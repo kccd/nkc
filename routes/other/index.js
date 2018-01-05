@@ -109,7 +109,6 @@ otherRouter
     data.ads = await systemSetting.extendAds();
     if(data.user) data.userThreads = await data.user.getUsersThreads();
     ctx.template = 'interface_home.pug';
-
     await next();
   })
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())

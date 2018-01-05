@@ -102,7 +102,7 @@ function displayResult() {
 function displaySelectedUsers() {
 	var usersList = '';
 	var blank = '<h4>暂未添加组员</h4>';
-	var head = '<h4>已添加成员：</h4>';
+	var head = '<h4>已添加组员：</h4>';
 	if(selectedUsers.length === 0) {
 		return $('#selectedUsersDiv').html(blank);
 	}
@@ -130,7 +130,6 @@ function selectUser(uid) {
 		uid,
 		username: username
 	});
-	console.log(selectedUsers)
 	displaySelectedUsers();
 }
 
@@ -164,18 +163,19 @@ function getUser() {
 
 function submit(id){
 	var obj = {
-		selectedUsers: [],
-		inputStatus: 1
+		newMembers: [],
+		s: 1
 	};
 	if ($('#team').hasClass('active')) {
 		if(selectedUsers.length === 0) {
 			return jwarning('团队申请必须要有组员，若没有组员请选择个人申请。');
 		}
-		obj.selectedUsers = selectedUsers;
+		obj.newMembers = selectedUsers;
 	}
 	nkcAPI('/fund/a/'+id, 'PATCH', obj)
-		.then(function(){
-			window.location.reload();
+		.then(function(data){
+			var s = data.s;
+			window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 		})
 		.catch(function(err) {
 			return jwarning(err);
@@ -212,19 +212,37 @@ function submitUserMessages(id) {
 				paymentMethod: obj.paymentMethod,
 				number: obj.account
 			},
-			userMessages: {
+			newApplicant: {
 				name: obj.name,
 				idCardNumber: obj.idCardNumber,
 				mobile: obj.mobile,
 				description: obj.description
 			},
-			inputStatus: 2
+			s: 2
 		};
 		nkcAPI('/fund/a/'+id, 'PATCH', data)
-			.then(function() {
-				window.location.reload();
+			.then(function(data) {
+				var s = data.s;
+				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 			})
 	} catch (err) {
 		jwarning(err);
+	}
+}
+
+function submitEnsureUsersMessages(id) {
+	if(id === undefined) {
+		setTimeout(function() {
+			jalert('保存成功！');
+		}, 300);
+	} else {
+		nkcAPI('/fund/a/'+id, 'PATCH', {s: 3})
+			.then(function(data) {
+				var s = data.s;
+				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
+			})
+			.catch(function(err) {
+				jwarning(err);
+			})
 	}
 }

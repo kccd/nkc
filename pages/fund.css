@@ -306,7 +306,6 @@ input[type="radio"], input[type="checkbox"]{
   width: 20%;
   background-color: #fff;
   border: 1px solid #aaa;
-  height: 2.5rem;
 }
 .fund-span {
   padding: 0 0.8rem;
@@ -443,21 +442,27 @@ input[type="radio"], input[type="checkbox"]{
   transition: background-color 0.2s;
 }
 .nav-link > ul > li > a.active{
-  background-color: #337ab7aa;
+  background-color: #2aabd2;
+}
+.nav-link > ul > li > a.disabled{
+  background-color: #aaa;
+}
+.nav-link > ul > li > a.disabled:hover{
+  background-color: #aaa;
 }
 .nav-link > ul > li > a:hover{
   text-decoration: none;
-  background-color: #337ab7aa;
+  background-color: #2aabd2;
 }
 .blank{
   color: #eee;
   text-align: center;
-  line-height: 15rem;
+  line-height: 10rem;
   font-size: 2rem;
   margin: 0.5rem 0;
 }
 #usersList{
-  min-height: 16.5rem;
+  min-height: 12rem;
   border: 1px solid #eee;
   margin: 0.5rem 0;
 }
@@ -489,7 +494,8 @@ input[type="radio"], input[type="checkbox"]{
   color: #999;
 }
 .fund-apply-head{
-  color: #aaa;
+  color: #444;
+  text-align: center;
   font-weight: 100;
-  font-size: 2rem;
+  font-size: 3rem;
 }

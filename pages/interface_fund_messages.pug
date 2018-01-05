@@ -6,10 +6,7 @@ block title
   link(rel='stylesheet' href='/fund.css')
 block content
   -const mainContainer1400 = true
-  -const preconditions = fund.preconditions;
-  -const authentication = preconditions.authentication;
-  -const {postCount, threadCount, userLevel, timeToRegister, supportCount} = preconditions
-  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  -const {postCount, threadCount, userLevel, timeToRegister, supportCount, idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = fund.applicant
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
@@ -18,7 +15,7 @@ block content
           .fund-panel-title(style=`background-color: ${fund?fund.color:''};background-image: ${fund && fund.image? `url(/fundBGI/${fund._id})`: ''}`)
             .col-xs-12.col-md-12
               h1.fund-name=fund.name
-              p= fund.description
+              p= fund.description.brief
 
       .col-xs-12.col-md-9
         .panel.panel-default
@@ -79,24 +76,28 @@ block content
                   p 您的账号未达到最低要求，无法申请该基金。
                   -btnDisabled = true;
                   -link = '###';
-                -const userApplication = data.userApplication;
-                if userApplication
-                  if userApplication.usersMessagesLock.status === 0 && userApplication.projectLock.status === 0
+                -const {unPassed, unCompleted, unSubmit} = data.message? data.message: {};
+                  if unSubmit
                     -btnDisabled = true;
                     -link = '###';
                     p 您还有未提交的基金项目，
-                      a(href=`/fund/a/${data.userApplication._id}/settings`) 查看
-                  else if userApplication.status.complete === null
+                      a(href=`/fund/a/${unSubmit}/settings`) 查看
+                  else if unPassed
                     -btnDisabled = true;
                     -link = '###';
-                    p 您还有未完成的基金项目，
-                      a(href=`/fund/a/${data.userApplication._id}`) 查看
+                    p 您还有未通过审核的基金项目，
+                      a(href=`/fund/a/${unPassed}`) 查看
+                  else if unCompleted
+                    -btnDisabled = true;
+                    -link = '###';
+                    p 您还有未完成的且与该基金不能同时申请的基金项目，
+                      a(href=`/fund/a/${unCompleted}`) 查看
                 a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
           .col-xs-12.col-md-12
             .panel.panel-default
               .panel-body.fund-description
                 h3 其他说明
                 hr
-                div!= markdown_safe(fund.explain)
+                div!= markdown_safe(fund.description.detailed)
 
 

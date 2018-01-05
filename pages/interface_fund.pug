@@ -18,7 +18,7 @@ block content
                 .col-xs-6.col-sm-4.col-md-3.fund-list
                   a(href=`/fund/list/${id}`)
                     .fund-name(style=`background-color: ${color};background-image:${fund && fund.image? `url(/fundBGI_small/${fund._id})`: ''}`)= name
-                    .fund-money!= `￥${money}&nbsp`
+                    .fund-money!= `￥${money.max || money.fixed}&nbsp`
             hr
             h1.text-center 正在申请
             hr

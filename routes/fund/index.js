@@ -10,22 +10,15 @@ fundRouter
 	})
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
-    const queryOfApplying = db.FundApplicationFormModel.match({
-      pStatus: {$ne: 0},
-      uStatus: {$ne: 0},
-      usersSupport: {$ne: false},
-      projectPassed: {$ne: false},
-      usersMessagesPassed: {$ne: false},
-      adminSupport: {$ne: false},
-      remittance: null
-    });
-    const queryOfBeingFunded = db.FundApplicationFormModel.match({
-      remittance: true,
-      complete: null
-    });
-    const queryOfExcellent = db.FundApplicationFormModel.match({
-      excellent: true
-    });
+    const queryOfApplying = {
+
+    };
+    const queryOfBeingFunded = {
+
+    };
+    const queryOfExcellent = {
+
+    };
 
     const applications = {};
     applications.applying = await db.FundApplicationFormModel.find(queryOfApplying);

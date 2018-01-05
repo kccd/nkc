@@ -66,33 +66,31 @@ const usersPersonalSchema = new Schema({
     type: Number,
     default: 0
   },
-  privateInformation: {
+  privateInfo: {
     name: {
       type: String,
-      default: ''
+      default: null
     },
     idCardNumber: {
       type: String,
-      default: ''
+      default: null
     },
-    photos: {
-      idCardA: {
-        type: Number,
-        default: null
-      },
-      idCardB: {
-        type: Number,
-        default: null
-      },
-      handheldIdCard: {
-        type: Number,
-        default: null
-      },
-      certs: {
-        type: [Number],
-        default: []
-      }
-    }
+	  idCardPhotos: {// [0]为正面, [1]为反面
+    	type: [Number],
+		  default: null
+	  },
+	  handheldIdCardPhoto: {
+		  type: Number,
+		  default: null
+	  },
+	  certsPhotos: {
+		  type: [Number],
+		  default: null
+	  },
+	  lifePhotos: {
+    	type: [Number],
+		  default: null
+	  }
   }
 });
 

@@ -77,10 +77,17 @@ block content
       .col-xs-12.col-md-12
         .panel.panel-default
           .panel-body
-            if notAllow
-              p 您还有未完成的项目，
-                a(href=`/fund/a/${applicationForm._id}`) 去查看
-            if applicationForm === undefined
+            -const {unPassed, unCompleted, unSubmit} = data.message? data.message: {};
+            if unSubmit
+              p 您还有未提交的基金项目，
+                a(href=`/fund/a/${unSubmit}/settings`) 查看
+            else if unPassed
+              p 您还有未通过审核的基金项目，
+                a(href=`/fund/a/${unPassed}`) 查看
+            else if unCompleted
+              p 您还有未完成的且与该基金不能同时申请的基金项目，
+                a(href=`/fund/a/${unCompleted}`) 查看
+            else if applicationForm === undefined
               include interfece_fund_terms
 
 
