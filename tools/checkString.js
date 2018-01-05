@@ -1,6 +1,6 @@
 module.exports = {
   contentLength: (content) => {
-    const zhCN = content.match(/[^\x00-\xff]/g);
+    const zhCN = content.match(/[^\x00-\xff]/g) || [];
     return length2 = content.length + zhCN.length;
   },
   contentFilter: (content) => {

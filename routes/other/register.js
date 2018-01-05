@@ -40,7 +40,7 @@ registerRouter
     }
     userObj.isA = regCodeFoDB.isA;
     if(checkString.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
-    if(checkString.contentLength(userObj.password) <= 8) ctx.throw(400, '密码长度至少要大于8位');
+    if(checkString.contentLength(userObj.password) < 8) ctx.throw(400, '密码长度至少要大于8位');
     if(!checkString.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw(400, '用户名已存在，请更换用户名再试！');
