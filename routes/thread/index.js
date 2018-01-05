@@ -50,18 +50,8 @@ threadRouter
     if(pid) {
       data.exactPost = true;
       const {toc} = await PostModel.findOnly({pid});
-      posts = await PostModel.aggregate([
-        {$match: {
-          tid,
-          toc: {$lte: toc}
-        }},
-        {$sort: {
-          toc: 1
-        }},
-        {$limit: 60},
-        {$sort: {toc: -1}}
-      ]);
-      posts = posts.map(p => new PostModel(p));
+      posts = await PostModel.find({tid, toc: {$lte: toc}}).sort({toc: -1}).limit(30);
+      posts.reverse();
       await Promise.all(posts.map(post => post
         .extendUser()
         .then(() => post.extendResources())

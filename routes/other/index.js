@@ -38,8 +38,6 @@ otherRouter
     data.content = content || 'all';
     data.navbar = {highlight: 'home'};
     const {ThreadModel} = ctx.db;
-    let t = Date.now();
-
     const visibleFid = await ctx.getVisibleFid();
     data.newestDigestThreads = await ThreadModel.aggregate([
       {$sort: {toc: -1}},
@@ -92,7 +90,6 @@ otherRouter
     //   }
     //   return thread;
     // }));
-    let t1 = Date.now();
 
     let latestThreads = await db.ThreadModel.find({fid: {$in: visibleFid}}).sort({tlm: -1}).limit(home.indexLatestThreadsLength);
     latestThreads = await Promise.all(latestThreads.map(async thread => {
@@ -103,9 +100,6 @@ otherRouter
       return thread;
     }));
     data.latestThreads = latestThreads;
-
-    let t2 = Date.now();
-
     const activeUsers = await db.ActiveUserModel.find().sort({vitality: -1}).limit(home.activeUsersLength);
     await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
     data.activeUsers = activeUsers;
@@ -113,13 +107,7 @@ otherRouter
     data.fTarget = 'home';
     const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
     data.ads = await systemSetting.extendAds();
-
-    let t3 = Date.now();
     if(data.user) data.userThreads = await data.user.getUsersThreads();
-
-    let t4 = Date.now();
-    console.log(`随机加精帖子6： ${t1-t}ms, 最新帖子20： ${t2-t1}ms, 活跃用户、板块列表、ads： ${t3-t2}ms, 加载用户发过的帖子： ${t4-t3}ms`)
-
     ctx.template = 'interface_home.pug';
     await next();
   })

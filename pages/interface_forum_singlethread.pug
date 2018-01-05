@@ -102,7 +102,7 @@
 -let childrenForum;
 -let parentForum;
 -const forum = data.forum || {fid: '_cannot_be_equal_'}
--data.forumList.map(p => {if(p.children){p.children.map(c => {if (c.fid === firstPost.fid) {childrenForum = c;parentForum = p}})}});
+-data.forumList.forEach(p => {if(p.children){p.children.forEach(c => {if (c.fid === firstPost.fid) {childrenForum = c;parentForum = p}})}});
 .new-content(style='overflow: hidden')
   .new-content-info
     span
@@ -157,10 +157,10 @@
         -lastPost.c = filterQuote(lastPost.c)
         a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))
   .new-content-info(style='float: right;')
-    span.icon-font=fromNow(toc)
-    span
-      a(href=`/m/${lastPost.user.uid}`)
-        img(src=`/avatar_small/${lastPost.user.uid}`)
+    //span
+    //  a(href=`/m/${lastPost.user.uid}`)
+    //    img(src=`/avatar_small/${lastPost.user.uid}`)
     span
       a(href=`/m/${lastPost.user.uid}`)= lastPost.user.username
-hr
+    span.icon-font=fromNow(toc)
+hr(style='margin: 2px 0 2px 0;')

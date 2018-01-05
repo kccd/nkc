@@ -1,5 +1,5 @@
-- let {c, user, tid, toc, pid, thread} = post
-- const {firstPost, forum} = thread
+- let {c, user, toc, pid, thread, t} = post
+- const {firstPost, forum, tid} = thread
 - if(!t) t = firstPost.t
   .new-content(style='overflow: hidden')
     .new-content-info
@@ -17,5 +17,5 @@
     if(c)
       .new-content-body
         .new-content-right
-          a.div-noImg(href=`/t/${thread.tid}?&pid=${pid}` style='text-decoration: none; color: inherit;')!= highlightString(replaceContent(experimental_render(post)), data.queryToCharRef)
+          a.div-noImg(href=`/t/${thread.tid}?&pid=${pid}#${pid}` style='text-decoration: none; color: inherit;')!= highlightString(replaceContent(experimental_render(post)), data.queryToCharRef)
   hr
