@@ -1,0 +1,82 @@
+extends bootstrap_base
+block title
+  title= `${data.user.username}的基金申请`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const {applicationForm, privateInfo, member} = data;
+  -const {_id, members, applicant, fund} = applicationForm;
+  -const {idCard, idCardPhotos, lifePhotos, handheldIdCardPhoto} = fund.member;
+  -const arr = [];
+  if idCard
+    -arr.push({en: 'idCard', ch: '实名认证'});
+  if idCardPhotos
+    -arr.push({en: 'idCardPhotos', ch: '身份证照片'});
+  if lifePhotos
+    -arr.push({en: 'lifePhotos', ch: '生活照'});
+  if handheldIdCardPhoto
+    -arr.push({en: 'handheldIdCardPhoto', ch: '手持身份证照片'});
+  -const mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-8(style='margin-bottom: 1rem')
+        .panel.panel-default
+          .panel-body
+            .row
+              .col-xs-12.col-md-12
+                h3.text-center 组队邀请
+                br
+                h4
+                  span 用户&nbsp;
+                  a(href=`/m/${applicant.uid}`)= applicant.user.username
+                  span &nbsp;正在申请
+                  a(href=`/fund/list/${fund._id}`)= ` 科创基金-${fund.name}`
+                  span ，想要添加您为小组成员
+                if member.agree === null
+                  h4
+                    a(href=`/fund/list/${fund._id}`)= ` 科创基金-${fund.name} `
+                    span 要求组员必须完成：
+                    -const passed = [], notPass = [];
+                    -for (let n of arr)
+                      if privateInfo[n.en]
+                        -passed.push(n);
+                      else
+                        -notPass.push(n);
+                      span!=`${n.ch}&nbsp;`
+                  if passed.length !== 0
+                    h4 您已通过：
+                      -for(let n of passed)
+                        span.greenColor!=`${n.ch}&nbsp;`
+                  if notPass.length !== 0
+                    h4 您未通过：
+                      -for(let n of notPass)
+                        span.redFontColor!=`${n.ch}&nbsp;`
+                    h4 您可以
+                      a(href='/me/privateInfo')= ` 点我 `
+                      span 去完成资料的上传，或
+                      a(href=`javascript: disagree(${_id})`)=` 点我 `
+                      span 拒绝
+                      a(href=`/m/${applicant.uid}`)= ` ${applicant.user.username} `
+                      span 的组队邀请
+                  else
+                    h4
+                      a(href=`/m/${applicant.uid}`)=`立即接受邀请`
+                else if member.agree === true
+                  h3.greenColor 您已同意
+                else
+                  h3.redFontColor 您已拒绝
+block scripts
+  script(src='/interface_common.js')
+  script.
+    function disagree(id) {
+      nkcAPI('/fund/a/'+id+'/member', 'PATCH', {})
+      .then(function() {
+        jalert('已拒绝用户的邀请');
+        setTimeout(function(){
+          window.location.href = '/fund/a/'+id+'/member';
+        }, 2000);
+      })
+      .catch(function(err) {
+        jwarning(err);
+      })
+    }

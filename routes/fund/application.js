@@ -26,6 +26,40 @@ applicationRouter
 		ctx.template = 'interface_fund_apply.pug';
   	await next();
   })
+	.get('/:_id/member', async (ctx, next) => {
+		const {data, db, params} = ctx;
+		const {_id} = params;
+		const {user, applicationForm, fund} = data;
+		const members = await applicationForm.extendMembers();
+		for (let u of members) {
+			if(u.uid === user.uid) {
+				data.member = u;
+			}
+		}
+		if(!data.member) ctx.throw(401, '权限不足');
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const {mobile, privateInfo} = userPersonal;
+		const {idCardPhotos, handheldIdCardPhoto, lifePhotos} = privateInfo;
+		data.privateInfo = {
+			idCard: !!mobile,
+			idCardPhotos: idCardPhotos.length === 2,
+			handheldIdCardPhoto: !!handheldIdCardPhoto,
+			lifePhotos: lifePhotos.length !== 0
+		};
+		ctx.template = 'interface_fund_member.pug';
+		await next();
+	})
+	.patch('/:_id/member', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {user, applicationForm} = data;
+		const {members} = applicationForm;
+		for (let u of members) {
+			if(user.uid === u.uid) {
+				await u.update({agree: false})
+			}
+		}
+		await next();
+	})
 	.patch('/:_id', async (ctx, next) => {
 		const {data, db, body, params} = ctx;
 		const {newMembers, account, newApplicant, s} = body;
@@ -89,6 +123,15 @@ applicationRouter
 			}
 		}
 		await applicationForm.update(updateObj);
+		await next();
+	})
+	.del('/:_id', async (ctx, next) => {
+		const {data} = ctx;
+		const {user, applicationForm} = data;
+		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		await applicationForm.applicant.remove();
+		await Promise.all(applicationForm.members.map(u => u.remove()));
+		await applicationForm.remove();
 		await next();
 	});
 module.exports = applicationRouter;

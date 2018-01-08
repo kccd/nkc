@@ -2,10 +2,12 @@ const Router = require('koa-router');
 const fundRouter = new Router();
 const applicationRouter = require('./application');
 const listRouter = require('./list');
+const meRouter = require('./me');
 fundRouter
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
+
 		await next();
 	})
   .get('/', async (ctx, next) => {
@@ -57,5 +59,6 @@ fundRouter
 		await next();
 	})
 	.use('/list', listRouter.routes(), listRouter.allowedMethods())
-  .use('/a', applicationRouter.routes(), applicationRouter.allowedMethods());
+  .use('/a', applicationRouter.routes(), applicationRouter.allowedMethods())
+	.use('/me', meRouter.routes(), meRouter.allowedMethods());
 module.exports = fundRouter;

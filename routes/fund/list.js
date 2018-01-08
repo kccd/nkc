@@ -60,15 +60,15 @@ listRouter
 			query = {
 				'status.excellent': true
 			};
-		} else if(type === 'complete'){ // 已完成的项目
+		} else if(type === 'completed'){ // 已完成的项目
 			query = {
-				'status.complete': true
+				'status.completed': true
 			};
 		} else if(type === 'passed') { // 资助中
 			query = {
 				'status.remittance': true
 			}
-		} else if(type === 'inReview') { // 正在申请
+		} else if(type === 'applying') { // 正在申请
 			query = {
 				'lock.status': {$ne: 0},
 				'status.adminAgree': {$ne: true}

@@ -30,7 +30,7 @@ const fundApplicationFormSchema = new Schema({
     type: Date,
     index: 1
   },
-  publicity: {
+  publicity: { // 示众
     timeOfBegin: {
       type: Date,
       default: null,
@@ -47,7 +47,7 @@ const fundApplicationFormSchema = new Schema({
     required: true,
     index: 1
   },
-  budgetMoney: {
+  budgetMoney: { // 预算
     type: [Schema.Types.Mixed],
     default: []
     /*
@@ -57,7 +57,7 @@ const fundApplicationFormSchema = new Schema({
     }
     */
   },
-  projectCycle: {
+  projectCycle: { // 预计周期
 	  type: [Number],
 	  default: [],
 	  index: 1
@@ -98,75 +98,85 @@ const fundApplicationFormSchema = new Schema({
 	  index: 1
   },
   status: {
-  	chooseType: {
+  	chooseType: { // 选择申请方式
   		type: Boolean,
 		  default: null
 	  },
-	  inputApplicantMessages: {
+	  inputApplicantMessages: { // 输入申请人信息
 			type: Boolean,
 		  default: null
 	  },
-	  ensureUsersMessages: {
+	  ensureUsersMessages: { // 申请人员确认
   		type: Boolean,
 		  default: null
 	  },
-	  inputProjectMessages: {
+	  inputProjectMessages: { // 输入项目基本信息
 			type: Boolean,
 		  default: null
 	  },
-		inputProjectContent: {
+		inputProjectContent: { // 输入项目具体内容
   		type: Boolean,
 			default: null
 		},
-	  submit: {
+	  submit: { // 已提交申请
 			type: Boolean,
 		  default: null
 	  },
-    usersSupport: {
+    usersSupport: { // 获得网友支持
       type: Boolean,
       default: null,
       index: 1
     },
-	  usersMessagesPassed: {
+	  usersMessagesPassed: { // 申请人信息审核通过
 		  type: Boolean,
 		  default: null,
 		  index: 1
 	  },
-    projectPassed: {
+    projectPassed: { // 项目审核通过
       type:Boolean,
       default: null,
       index: 1
     },
-    adminAgree: {
+    adminAgree: { // 管理员同意
       type: Boolean,
       default: null,
       index: 1
     },
-    remittance: {
+    remittance: { // 已打款
       type: Boolean,
       default: null,
       index: 1
     },
-    complete: {
+    completed: { // 项目已完成
       type: Boolean,
       default: null,
       index: 1
     },
-    successful: {
+    successful: { // 项目研究是否成功
       type: Boolean,
       default: null,
       index: 1
     },
-    excellent: {
+    excellent: { // 优秀项目
       type: Boolean,
       default: null,
       index: 1
     },
-	  disabled: {
+	  disabled: { // 被禁
 		  type: Boolean,
 		  default: false,
 		  index: 1
 	  },
+	  revoked: { // 撤销
+  		type: Boolean,
+			default: false,
+		  index: 1
+	  },
+	  exceededModifyCount: {
+  		type: Boolean,
+		  default: false,
+		  index: 1
+	  }
   },
   lock: {
     status: {
@@ -188,6 +198,10 @@ const fundApplicationFormSchema = new Schema({
       default: Date.now
     }
   },
+	modifyCount: {
+  	type: Number,
+		default: 0
+	},
   supporter: {
     type: [String],
     default: [],

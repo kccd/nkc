@@ -461,6 +461,12 @@ input[type="radio"], input[type="checkbox"]{
   font-size: 2rem;
   margin: 0.5rem 0;
 }
+.blank-lg{
+  text-align: center;
+  line-height: 20rem;
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
 #usersList{
   min-height: 12rem;
   border: 1px solid #eee;
@@ -498,4 +504,52 @@ input[type="radio"], input[type="checkbox"]{
   text-align: center;
   font-weight: 100;
   font-size: 3rem;
+}
+.fund-li{
+  padding: 0.8rem 0;
+  margin: 0.5rem 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+.fund-li > span {
+  margin: 0 0.5rem;
+}
+.fund-li-time{
+  font-size: 1.5rem;
+  color: #777;
+}
+.settings-header, .settings-content{
+  padding: 0.5rem;
+  border: 1px solid #eee;
+}
+.settings-header > ul{
+  padding: 0;
+  margin: 0;
+}
+.settings-header > ul > li {
+  list-style: none;
+  color: #777;
+  text-align: center;
+  font-size: 1.5rem;
+}
+.settings-header > ul > li > a{
+  color: #666;
+  text-decoration: none;
+  display: block;
+  background-color: #efefef;
+  padding: 1rem 0;
+  margin: 0.3rem 0;
+  transition: color 0.2s, background-color 0.2s;
+}
+.settings-header > ul > li > a:hover, .settings-header > ul > li > a.active{
+  color: #fff;
+  background-color: #2aabd2;
+}
+.settings-content{
+  overflow: hidden;
+  min-height: 10rem;
+}
+.settings-title{
+  font-size: 2.5rem;
+  color: #aaa;
 }

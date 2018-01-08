@@ -1,15 +1,19 @@
 -const {fundList} = data;
 .fund-nav
   ul
-    -let homeClass = '', managementClass = '', listAllClass = '', censorPClass = '', censorUClass = '';
+    -let meClass = '', homeClass = '', managementClass = '', listAllClass = '', censorPClass = '', censorUClass = '';
     if data.home
       -homeClass = 'active';
     if data.management
       -managementClass = 'active';
     if data.list === 'all'
-      -listAllClass = 'active'
+      -listAllClass = 'active';
+    if data.me
+      -meClass = 'active';
     li
       a(href='/fund' class=homeClass) 科创基金
+    li
+      a(href='/fund/me' class=meClass) 我的基金申请
     li
       a(href='/fund/m' class=managementClass) 基金项目管理
     li

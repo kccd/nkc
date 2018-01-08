@@ -12,7 +12,7 @@ block content
     .row
       .col-xs-12.col-md-12(style='margin-bottom: 1rem')
         .fund-panel
-          .fund-panel-title(style=`background-color: ${fund?fund.color:''};background-image: ${fund && fund.image? `url(/fundBGI/${fund._id})`: ''}`)
+          .fund-panel-title(style=`background-color: ${fund?fund.color:''};background-image: ${fund && fund.image? `url(/fundBGI/${fund.image})`: ''}`)
             .col-xs-12.col-md-12
               h1.fund-name=fund.name
               p= fund.description.brief
@@ -26,12 +26,12 @@ block content
                 a(href=`/fund/list/${fund._id}`) 全部项目
               li(role="presentation" class=type === 'excellent' ? 'active' : '')
                 a(href=`/fund/list/${fund._id}?type=excellent`) 优秀项目
-              li(role="presentation" class=type === 'complete' ? 'active' : '')
-                a(href=`/fund/list/${fund._id}?type=complete`) 已完成
+              li(role="presentation" class=type === 'completed' ? 'active' : '')
+                a(href=`/fund/list/${fund._id}?type=completed`) 已完成
               li(role="presentation" class=type === 'passed'? 'active': '')
                 a(href=`/fund/list/${fund._id}?type=passed`) 资助中
-              li(role="presentation" class=type === 'inReview'? 'active': '')
-                a(href=`/fund/list/${fund._id}?type=inReview`) 正在申请
+              li(role="presentation" class=type === 'applying'? 'active': '')
+                a(href=`/fund/list/${fund._id}?type=applying`) 正在申请
             hr
             -applications = data.applications;
             include interface_fund_applicationList

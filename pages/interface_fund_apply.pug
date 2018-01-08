@@ -21,7 +21,7 @@ block content
           .panel-body
             .nav-link.center-block
               ul
-                -const arr = [{en: 'chooseType', ch: '1、选择申请方式'},{en: 'inputApplicantMessages', ch: '2、填写身份信息'},{en: 'ensureUsersMessages', ch: '3、人员确认'},{en: 'inputProjectMessages', ch: '4、填写项目基本信息'},{en: 'inputProjectContent', ch: '5、填写项目内容'},{en: 'submit', ch: '6、提交申请'}];
+                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'ensureUsersMessages', ch: '第3步、人员确认'},{en: 'inputProjectMessages', ch: '第4步、填写项目基本信息'},{en: 'inputProjectContent', ch: '第5步、填写项目内容'},{en: 'submit', ch: '第6步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
                   if i === 0
                     li
@@ -88,7 +88,7 @@ block content
                 .col-xs-12.col-md-4.col-md-offset-4
                   if self
                     br
-                    h4 已同意的用户：
+                    h4 个人申请：
                     #usersList
                       span.fund-span=user.username
                   else
@@ -118,8 +118,10 @@ block content
                           span.fund-span.disabled= u.user.username
                     if agreeIsNull.length !== 0 && !self
                       span(style='color: red;') 等待用户确认中，若要关闭页面请点击保存按钮
-                    if agreeIsNull.length === 0 && !self
-                      span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击步骤1
+                    if agreeIsNull.length === 0 && !self && agreeIsFalse.length > 0
+                      span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击第1步
+                    if agreeIsNull.length === 0 && !self && agreeIsFalse.length === 0
+                      span(style='color: red;') 保存并下一步
               if self
                 hr
                 .back-next
@@ -131,7 +133,7 @@ block content
               else if agreeIsNull.length === 0
                 hr
                 .back-next
-                  .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存下一步
+                  .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
             else if s === 4 && ensureUsersMessages !== null
               .row
                 .col-xs-12.col-md-4.col-md-offset-4

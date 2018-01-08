@@ -1,0 +1,23 @@
+extends bootstrap_base
+block title
+  title= `${data.user.username}的基金申请`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-2
+            .settings-header
+              ul
+                li
+                  a(href='###') 基本资料
+                li
+                  a(href='###') 账号安全
+                li
+                  a(href='###').active 身份认证
+          .col-xs-12.col-md-10
+            .settings-content
+              if 1
+                h3.settings-title.text-center 身份认证

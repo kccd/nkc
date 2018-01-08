@@ -184,6 +184,7 @@ userSchema.methods.updateUserMessage = async function() {
   updateObj.postCount = await PostModel.count({uid});
   updateObj.disabledPostsCount = await PostModel.count({uid, disabled: true});
   updateObj.threadCount = await ThreadModel.count({uid});
+  updateObj.postCount = updateObj.postCount - updateObj.threadCount;
   updateObj.disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
   updateObj.digestThreadsCount = await ThreadModel.count({uid, digest: true});
   updateObj.toppedThreadsCount = await ThreadModel.count({uid, topped: true});

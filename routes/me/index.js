@@ -3,6 +3,7 @@ const nkcModules = require('../../nkcModules');
 const apiFn = nkcModules.apiFunction;
 const dbFn = nkcModules.dbFunction;
 const {contentFilter} = require('../../tools/checkString');
+const privateInfoRouter = require('./privateInfo');
 const meRouter = new Router();
 meRouter
   .get('/', async (ctx, next) => {
@@ -126,6 +127,7 @@ meRouter
       }));
     }
     await next();
-  });
+  })
+	.use('/privateInfo', privateInfoRouter.routes(), privateInfoRouter.allowedMethods());
 
 module.exports = meRouter;
