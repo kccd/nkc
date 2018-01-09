@@ -385,7 +385,11 @@ const certificates ={
         threads: {
           [name]: '获取帖子',
           [GET]: true
-        }
+        },
+	      privateInfo: {
+        	[name]: '个人信息',
+		      [GET]: true
+	      }
       },
       logout: {
         [GET]: true
@@ -450,14 +454,31 @@ const certificates ={
 			      [DELETE]: true,
 			      settings: {
 							[GET]: true
+			      },
+			      member: {
+        			[GET]: true,
+				      [PATCH]: true
 			      }
 		      }
 	      },
 	      me: {
-        	[name]: '与我有关的基金',
+        	[name]: '我的基金',
 		      [GET]: true
 	      }
-      }
+      },
+	    fundBGI: {
+		    [name]: '基金项目背景图片',
+		    [POST]: true,
+		    [parameter]: {
+			    [GET]: true,
+		    }
+	    },
+	    fundBGI_small: {
+		    [name]: '基金项目背景图片',
+		    [parameter]: {
+			    [GET]: true,
+		    }
+	    }
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -715,20 +736,7 @@ const certificates ={
 		      }
 	      }
 
-      },
-	    fundBGI: {
-		    [name]: '基金项目背景图片',
-		    [POST]: true,
-		    [parameter]: {
-			    [GET]: true,
-		    }
-	    },
-	    fundBGI_small: {
-		    [name]: '基金项目背景图片',
-		    [parameter]: {
-			    [GET]: true,
-		    }
-	    }
+      }
     }
   }
 };

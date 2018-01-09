@@ -225,6 +225,9 @@ function submitUserMessages(id) {
 				var s = data.s;
 				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 			})
+			.catch(function(err) {
+				jwarning(err);
+			})
 	} catch (err) {
 		jwarning(err);
 	}

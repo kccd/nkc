@@ -1,0 +1,141 @@
+extends bootstrap_base
+block title
+  title= `账号设置`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const {idCardPhotos, handheldIdCardPhoto, lifePhotos, certsPhotos} = data.privateInfo;
+  -const defaultImg = '/default/idCard_setting.jpg';
+  .container-fluid(style='max-width: 1400px;')
+    #uploadInfo 文件已上传&nbsp;
+      span
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-2
+            .settings-header
+              ul
+                li
+                  a(href='###') 基本资料
+                li
+                  a(href='###') 账号安全
+                li
+                  a(href='###').active 身份认证
+          .col-xs-12.col-md-10
+            .settings-content
+              .row
+                // 身份认证
+                if 1
+                  #privateInfo
+                    .col-xs-12.col-md-12
+                      h3.settings-title.text-center 身份认证
+                      br
+                    .col-xs-12.col-md-6
+                      h4.text-center 1、身份证正面
+                      .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+                        span.settings-link#watchIdCardAPhoto 查看实例
+                      .settings-panel
+                        .row
+                          //.col-xs-12.col-md-12
+                          //  .settings-panel-title.text-center 未选择任何图片
+                          .col-xs-12.col-md-9
+                            .settings-img
+                              if !idCardPhotos[0]
+                                img#idCardAPhotoDisplay(src=defaultImg)
+                              else
+                                .settings-img-mask
+
+                                img#idCardAPhotoDisplay(src=`/idPhoto_small/${idCardPhotos[0]}`)
+                          .col-xs-12.col-md-3
+                            input#idCardAPhoto(type='file' style='display: none;')
+                            .settings-btn(onclick='$("#idCardAPhoto").click()') 选择图片
+                            .settings-btn(onclick='uploadFile("#idCardAPhoto")') 上传
+                            #idCardAPhotoMessages.uploadFileInfo
+
+
+                    .col-xs-12.col-md-6
+                      h4.text-center 2、身份证背面
+                      .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+                          span.settings-link#watchIdCardBPhoto 查看实例
+                      .settings-panel
+                        .row
+                          .col-xs-12.col-md-9
+                            .settings-img
+                              if !idCardPhotos[1]
+                                img#idCardBPhotoDisplay(src=defaultImg)
+                              else
+                                img#idCardBPhotoDisplay(src=`/idPhoto_small/${idCardPhotos[1]}`)
+                          .col-xs-12.col-md-3
+                            input#idCardBPhoto(type='file' style='display: none;')
+                            .settings-btn(onclick='$("#idCardBPhoto").click()') 选择图片
+                            .settings-btn(onclick='uploadFile("#idCardBPhoto")') 上传
+                            #idCardBPhotoMessages.uploadFileInfo
+                    .col-xs-12.col-md-12
+                      br
+                      br
+                    .col-xs-12.col-md-6
+                      h4.text-center 3、手持身份证照片
+                      .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+                        span.settings-link#watchHandheldIdCardPhoto 查看实例
+                      .settings-panel
+                        .row
+                          .col-xs-12.col-md-9
+                            .settings-img
+                              if !handheldIdCardPhoto
+                                img#handheldIdCardPhotoDisplay(src=defaultImg)
+                              else
+                                img#handheldIdCardPhotoDisplay(src=`/idPhoto_small/${handheldIdCardPhoto}`)
+                          .col-xs-12.col-md-3
+                            input#handheldIdCardPhoto(type='file' style='display: none;')
+                            .settings-btn(onclick='$("#handheldIdCardPhoto").click()') 选择图片
+                            .settings-btn(onclick='uploadFile("#handheldIdCardPhoto")') 上传
+                            #handheldIdCardPhotoMessages.uploadFileInfo
+                    .col-xs-12.col-md-12
+                      br
+                      br
+                    .col-xs-12.col-md-12
+                      h4.text-center 4、生活照
+                      .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+                        span.settings-link#watchLifePhoto 查看实例
+                      .settings-panel
+                        .row
+                          .col-xs-12.col-md-10
+                            .settings-img#lifePhotoDisplay
+                              if lifePhotos.length === 0
+                                .blank(style='height: 20rem;line-height: 20rem') 暂无数据
+                              else
+                                -for(let id of lifePhotos)
+                                  .col-xs-12.col-md-4
+                                    img(photoId=id src=`/idPhoto_small/${id}`)
+                          .col-xs-12.col-md-2
+                            input#lifePhoto(type='file' style='display: none;' multiple=true)
+                            .settings-btn(onclick='$("#lifePhoto").click()') 选择图片
+                            .settings-btn(onclick='uploadFile("#lifePhoto")') 上传
+                            #lifePhotoMessages.uploadFileInfo
+                    .col-xs-12.col-md-12
+                      br
+                      br
+                    .col-xs-12.col-md-12
+                      h4.text-center 5、证书照片
+                      .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+                        span.settings-link#watchCertsPhoto 查看实例
+                      .settings-panel
+                        .row
+                          .col-xs-12.col-md-10
+                            .settings-img#certsPhotoDisplay
+                              if certsPhotos.length === 0
+                                .blank(style='height: 20rem;line-height: 20rem') 暂无数据
+                              else
+                                -for(let id of certsPhotos)
+                                  .col-xs-12.col-md-4
+                                    img(photoId=id src=`/idPhoto_small/${id}`)
+                          .col-xs-12.col-md-2
+                            input#certsPhoto(type='file' style='display: none;' multiple=true)
+                            .settings-btn(onclick='$("#certsPhoto").click()') 选择图片
+                            .settings-btn(onclick='uploadFile("#certsPhoto")') 上传
+                            #certsPhotoMessages.uploadFileInfo
+            br
+            br
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_privateInfo.js')

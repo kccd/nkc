@@ -1,0 +1,72 @@
+extends bootstrap_base
+block title
+  title= `${data.user.username}的基金申请`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const {applicationForms} = data;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-8(style='margin-bottom: 1rem')
+        .panel.panel-default
+          .panel-body
+            .row
+              .col-xs-12.col-md-12
+                .row
+                  .col-xs-12.col-md-12
+                    h4.text-center(style='color: #888;') 与我有关的基金申请
+                  .col-xs-12.col-md-12
+                    ul.nav.nav-tabs
+                      -const {type} = data;
+                      li(role="presentation" class=type === undefined? 'active': '')
+                        a(href="/fund/me") 已完成
+                      li(role="presentation" class=type === 'applying'? 'active': '')
+                        a(href="/fund/me?type=applying") 正在申请
+                      li(role="presentation" class=type === 'uncommitted' ? 'active' : '')
+                        a(href="/fund/me?type=uncommitted") 未提交
+                      li(role="presentation" class=type === 'invalid' ? 'active' : '')
+                        a(href="/fund/me?type=invalid") 无效的
+                      li(role="presentation" class=type === 'invitation'? 'active': '')
+                        a(href="/fund/me?type=invitation") 邀请
+                  if applicationForms.length === 0
+                    .col-xs-12.col-md-12
+                      .blank.blank-lg 暂无数据
+                  else
+                    .col-xs-12.col-md-12
+                      .fund-ul
+                        -for(let a of applicationForms)
+                          -const {toc, _id, members, applicant, fund} = a;
+                          .fund-li
+                            .row
+                              .col-xs-12.col-md-12
+                                span.fund-li-time= toc.toLocaleString()
+                              .col-xs-2.col-md-2
+                                span.h3(style='line-height: 3.4rem;')= fund.name
+                              .col-xs-8.col-md-8
+                                .row
+                                  .col-xs-12.col-md-12
+                                    span 申请人：
+                                    a(href=`/u/${applicant.user.uid}`)= applicant.user.username
+                                  .col-xs-12.col-md-12
+                                    span 组员：
+                                    -for(let u of members)
+                                      if u.agree === null
+                                      span(style='margin-right: 0.3rem;')
+                                        a(href=`/u/${u.user.uid}`)= u.user.username
+                              .col-xs-2.col-md-2
+                                .row
+                                  if applicant.uid === user.uid
+                                    .col-xs-12.col-md-12
+                                      span
+                                        a(href=`/fund/a/${_id}/settings`) 查看
+                                    .col-xs-12.col-md-12
+                                      span
+                                        a(href=`javascript: removeApplicationForm(${_id})`) 删除
+                                  else
+                                    .col-xs-12.col-md-12
+                                      span
+                                        a(href=`/fund/a/${_id}/member`) 查看
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_me.js')

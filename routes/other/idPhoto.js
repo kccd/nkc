@@ -16,15 +16,16 @@ idPhotoRouter
     const {data, db, body, fs} = ctx;
     const {user} = data;
     const {files, fields} = body;
+    ctx.print('body', body);
     const {photoType} = fields;
     const file = files.file;
     const {size, name, path} = file;
     const photoId = await db.SettingModel.operateSystemID('idPhotos', 1);
     const filePath = '/' + photoId + '.jpg';
     const targetPath = idPhotoPath + filePath;
-    const smallTagetPath = idPhotoSmallPath +filePath;
+    const smallTargetPath = idPhotoSmallPath +filePath;
     await idPhotoify(path, targetPath);
-    await idPhotoSmallify(path, smallTagetPath);
+    await idPhotoSmallify(path, smallTargetPath);
     await fs.unlink(path);
     const newIdPhoto = db.IdPhotoModel({
 	    _id: photoId,

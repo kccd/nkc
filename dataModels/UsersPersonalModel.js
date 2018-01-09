@@ -77,7 +77,7 @@ const usersPersonalSchema = new Schema({
     },
 	  idCardPhotos: {// [0]为正面, [1]为反面
     	type: [Number],
-		  default: null
+		  default: [null, null]
 	  },
 	  handheldIdCardPhoto: {
 		  type: Number,
