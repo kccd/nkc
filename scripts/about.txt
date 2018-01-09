@@ -33,8 +33,11 @@
 
 
 运行:
+
     根目录运行  run_as_production
 
 
-    
 
+更新:
+
+    根目录运行  update.bat
