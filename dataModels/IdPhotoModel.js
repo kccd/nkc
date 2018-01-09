@@ -33,25 +33,32 @@ const idPhotoSchema = new Schema({
 idPhotoSchema.post('save', async function(idPhoto) {
 	const UsersPersonalModel = require('./UsersPersonalModel');
 	const userPersonal = await UsersPersonalModel.findOnly({uid: idPhoto.uid});
-	const obj = {};
+	const {privateInfo} = userPersonal;
 	const {type, _id} = idPhoto;
 	switch (type) {
-		case 'idCardA':
-			obj['privateInformation.photos.idCardA'] = _id;
+		case '#idCardAPhoto':
+			privateInfo.idCardPhotos[0] = _id;
 			break;
-		case 'idCardB':
-			obj['privateInformation.photos.idCardB'] = _id;
+		case '#idCardBPhoto':
+			privateInfo.idCardPhotos[1] = _id;
 			break;
-		case 'HandheldIdCard':
-			obj['privateInformation.photos.handheldIdCard'] = _id;
+		case '#handheldIdCardPhoto':
+			privateInfo.handheldIdCardPhoto = _id;
 			break;
-		case 'cert':
-			obj['privateInformation.photos.certs'] = {$addToSet: _id};
+		case '#lifePhoto':
+			if(!privateInfo.lifePhotos.includes(_id)) {
+				privateInfo.lifePhotos.push(_id);
+			}
+			break;
+		case '#certsPhoto':
+			if(!privateInfo.certsPhotos.includes(_id)) {
+				privateInfo.certsPhotos.push(_id);
+			}
 			break;
 		default:
-			return console.log('未知的证件类型');
+			throw '未知的图片类型';
 	}
-	await userPersonal.update(obj);
+	await userPersonal.update({privateInfo});
 });
 
 

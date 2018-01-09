@@ -28,6 +28,10 @@ a:focus{text-decoration: none}
   height: 20rem;
   text-decoration: none;
   box-shadow: 0 2px 15px #efefef;
+  -webkit-transition: box-shadow 0.3s;
+  -moz-transition: box-shadow 0.3s;
+  -ms-transition: box-shadow 0.3s;
+  -o-transition: box-shadow 0.3s;
   transition: box-shadow 0.3s;
   position: relative;
 }
@@ -90,7 +94,12 @@ input[type="radio"], input[type="checkbox"]{
   width: 100%;
   background-color: rgba(0, 0, 0, 0);
   padding-top: 8rem;
+  -webkit-transition: background-color 0.3s;
+  -moz-transition: background-color 0.3s;
+  -ms-transition: background-color 0.3s;
+  -o-transition: background-color 0.3s;
   transition: background-color 0.3s;
+
 }
 .fund-mask:hover{
   background-color: rgba(0, 0, 0, 0.8);
@@ -109,7 +118,11 @@ input[type="radio"], input[type="checkbox"]{
   color: rgba(255,255,255,0);
   width: 10rem;
   margin-top: 0.5rem;
-  transition: border 0.3s,color 0.3s ;
+  -webkit-transition:border 0.3s,color 0.3s;
+  -moz-transition:border 0.3s,color 0.3s;
+  -ms-transition:border 0.3s,color 0.3s;
+  -o-transition:border 0.3s,color 0.3s;
+  transition:border 0.3s,color 0.3s;
   border-radius: 4px;
   text-decoration: none;
 }
@@ -201,7 +214,11 @@ input[type="radio"], input[type="checkbox"]{
   width: 100%;
   background-color: #2aabd2;
   height: 100%;
-  transition: background-color 0.2s;
+  -webkit-transition:background-color 0.2s;
+  -moz-transition:background-color 0.2s;
+  -ms-transition:background-color 0.2s;
+  -o-transition:background-color 0.2s;
+  transition:background-color 0.2s;
 }
 .back-next > .apply-next:hover{
   background-color: #1b7995;
@@ -223,6 +240,10 @@ input[type="radio"], input[type="checkbox"]{
 .fund-nav > ul > li > a{
   color: #7f9eb2;
   border-bottom: 2px solid rgba(0,0,0,0);
+  -webkit-transition: border-bottom 0.3s;
+  -moz-transition: border-bottom 0.3s;
+  -ms-transition: border-bottom 0.3s;
+  -o-transition: border-bottom 0.3s;
   transition: border-bottom 0.3s;
 }
 .fund-nav > ul > li .active{
@@ -314,6 +335,10 @@ input[type="radio"], input[type="checkbox"]{
   color: #fff;
   margin: 0.3rem;
   cursor: pointer;
+  -webkit-transition: background-color 0.3s;
+  -moz-transition: background-color 0.3s;
+  -ms-transition: background-color 0.3s;
+  -o-transition: background-color 0.3s;
   transition: background-color 0.3s;
   position: relative;
   height: 2.5rem;
@@ -330,6 +355,10 @@ input[type="radio"], input[type="checkbox"]{
   top: -3px;
   left: -3px;
   text-align: center;
+  -webkit-transition: color 0.2s, background-color 0.2s;
+  -moz-transition: color 0.2s, background-color 0.2s;
+  -ms-transition: color 0.2s, background-color 0.2s;
+  -o-transition: color 0.2s, background-color 0.2s;
   transition: color 0.2s, background-color 0.2s;
 }
 .fund-span.add{
@@ -342,6 +371,10 @@ input[type="radio"], input[type="checkbox"]{
   top: -3px;
   left: -3px;
   text-align: center;
+  -webkit-transition: color 0.2s, background-color 0.2s;
+  -moz-transition: color 0.2s, background-color 0.2s;
+  -ms-transition: color 0.2s, background-color 0.2s;
+  -o-transition: color 0.2s, background-color 0.2s;
   transition: color 0.2s, background-color 0.2s;
 }
 .fund-span.add:hover{
@@ -413,6 +446,10 @@ input[type="radio"], input[type="checkbox"]{
   background-color: #f9f9f9;
   border: 1px solid #eee;
   cursor: pointer;
+  -webkit-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -moz-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -ms-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -o-transition: background-color 0.2s, border 0.2s, color 0.2s;
   transition: background-color 0.2s, border 0.2s, color 0.2s;
 }
 .choose-content-div.active{
@@ -439,6 +476,10 @@ input[type="radio"], input[type="checkbox"]{
   width: 15rem;
   background-color: #aaa;
   margin: 0 0.5rem;
+  -webkit-transition: background-color 0.2s;
+  -moz-transition: background-color 0.2s;
+  -ms-transition: background-color 0.2s;
+  -o-transition: background-color 0.2s;
   transition: background-color 0.2s;
 }
 .nav-link > ul > li > a.active{
@@ -539,6 +580,10 @@ input[type="radio"], input[type="checkbox"]{
   background-color: #efefef;
   padding: 1rem 0;
   margin: 0.3rem 0;
+  -webkit-transition: color 0.2s, background-color 0.2s;
+  -moz-transition: color 0.2s, background-color 0.2s;
+  -ms-transition: color 0.2s, background-color 0.2s;
+  -o-transition: color 0.2s, background-color 0.2s;
   transition: color 0.2s, background-color 0.2s;
 }
 .settings-header > ul > li > a:hover, .settings-header > ul > li > a.active{
@@ -551,5 +596,96 @@ input[type="radio"], input[type="checkbox"]{
 }
 .settings-title{
   font-size: 2.5rem;
+  color: #777;
+  margin: 0;
+  margin-top: 0.3rem;
+  padding: 1rem 0.5rem;
+  background-color: #eee;
+}
+.settings-info{
   color: #aaa;
+  padding:1rem;
+}
+.settings-link{
+  color: #2aabd2;
+  cursor: pointer;
+}
+.settings-panel{
+  background-color: #eee;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+}
+.settings-btn{
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+  cursor: pointer;
+  -webkit-transition: background-color 0.2s, color 0.2s, border 0.2s;
+  -moz-transition: background-color 0.2s, color 0.2s, border 0.2s;
+  -ms-transition: background-color 0.2s, color 0.2s, border 0.2s;
+  -o-transition: background-color 0.2s, color 0.2s, border 0.2s;
+  transition: background-color 0.2s, color 0.2s, border 0.2s;
+}
+.settings-btn:hover{
+  background-color: #2aabd2;
+  color: #fff;
+  border: 1px solid #efefef;
+}
+.settings-img{
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+.settings-img > img {
+  width: 100%;
+}
+.settings-panel-title{
+  font-size: 1.5rem;
+  color: #aaa;
+  padding: 0rem 0;
+}
+.settings-img > div{
+  margin: 0.5rem 0;
+  padding: 0;
+  overflow: hidden;
+}
+.settings-img > div > img{
+  width: 100%;
+  padding: 0.5rem;
+}
+#uploadInfo{
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  color: #fff;
+  padding: 0.2rem 2rem;
+  background-color: rgba(0,0,0,0.7);
+  z-index:10 ;
+  display: none;
+  box-shadow: 3px 3px 8px #aaa;
+}
+.uploadFileInfo > span {
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow: hidden;
+  font-size: 1.2rem;
+}
+.uploadFileInfo{
+  font-size: 1rem;
+  color: #666;
+}
+.settings-img > .settings-img-mask{
+  height: 100%;
+  position: absolute;
+  background-color: rgba(0,0,0,0.7);
+  padding: 0;
+  margin: 0;
 }

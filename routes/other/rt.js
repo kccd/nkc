@@ -9,7 +9,7 @@ RtRouter
     const {db, fs} = ctx;
     const targetResource = await db.ResourceModel.findOnly({rid});
     const extension = targetResource.ext;
-    const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+    const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'];
     let url;
     if(extArr.includes(extension) && targetResource.tpath) {
       url = thumbnailPath + '/' + targetResource.tpath;
