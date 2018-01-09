@@ -1,10 +1,6 @@
 const ES = require('elasticsearch');
 
-
-const host = 'localhost:9200',
-  postIndex = 'posts',
-  userIndex = 'users',
-  ChineseAnalyzer = 'ik_max_word';
+const {host, ChineseAnalyzer, postIndex, userIndex} = require('./es');
 
 const ESSettings = {
   host,

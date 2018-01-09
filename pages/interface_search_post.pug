@@ -1,7 +1,7 @@
 - let {c, user, toc, pid, thread, t} = post
 - const {firstPost, forum, tid} = thread
 - if(!t) t = firstPost.t
-  .new-content(style='overflow: hidden')
+  div(style='overflow: hidden; max-height: 10.2em;')
     .new-content-info
       span
         a(href=`/m/${user.uid}`)

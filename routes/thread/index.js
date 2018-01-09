@@ -8,7 +8,7 @@ const apiFn = nkcModules.apiFunction;
 threadRouter
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
-    let {page = 0, pid, last_page} = query;
+    let {page = 0, pid, last_page, highlight} = query;
     const {tid} = params;
     const {
       ThreadModel,
@@ -22,6 +22,7 @@ threadRouter
     let q = {
       tid: tid
     };
+    data.highlight = highlight;
     if(!await thread.ensurePermissionOfModerators(ctx)) q.disabled = false;
     data.paging = apiFn.paging(page, thread.count);
     const forum = await ForumModel.findOnly({fid: thread.fid});
@@ -30,7 +31,6 @@ threadRouter
     if(data.user) {
       data.usersThreads = await data.user.getUsersThreads();
     }
-    data._pid = pid;
     data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
     let myForum, othersForum;
     if(mid !== '') {
@@ -49,14 +49,9 @@ threadRouter
     ctx.template = 'interface_thread.pug';
     let posts;
     if(pid) {
-      data.exactPost = true;
-      const {toc} = await PostModel.findOnly({pid});
-      posts = await PostModel.find({tid, toc: {$lte: toc}}).sort({toc: -1}).limit(30);
-      posts.reverse();
-      await Promise.all(posts.map(post => post
-        .extendUser()
-        .then(() => post.extendResources())
-      ));
+      const matchBase = ctx.generateMatchBase({pid}).toJS();
+      const {page, step} = await thread.getStep(matchBase);
+      return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`, 301)
     } else if(last_page) {
       query.page = data.paging.pageCount - 1;
       data.paging.page = data.paging.pageCount - 1;

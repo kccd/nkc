@@ -155,7 +155,7 @@ function nkc_render(options){
         } else {
           username = '';
           if(params[1] !== '-1') {
-            username = params?(params? '回复 '+params[2]+' 在 <a href="'+ params[0] + '#' + params[3] +'">'+params[1]+'楼</a> 的发言\n':''):'';
+            username = params?(params? '回复 '+params[2]+' 在 <a href="'+ params[0] + '&' + 'highlight=' + params[3] + '#' + params[3] +'">'+params[1]+'楼</a> 的发言\n':''):'';
           } else {
             username = params?(params? '回复 '+params[2]+' 的发言\n':''):'';
           }

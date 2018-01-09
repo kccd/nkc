@@ -1,7 +1,7 @@
 -const postTo = data.userLevel >= 1
 -const addCredit = data.userLevel >= 4
 -const disablePost = data.userLevel >= 4
--const _pid = data._pid;
+-const highlight = data.highlight;
 
 
   if (!post.disabled || disablePost)
@@ -11,7 +11,7 @@
     - var uid = post.uid
     - var user = post.user
     //post itself
-    .parent.clearfix(id=`${post.pid}` style=`${post.pid === _pid? 'background-color: #fffbdd': ''}`)
+    .parent.clearfix(id=`${post.pid}` style=`${post.pid === highlight? 'background-color: #fffbdd': ''}`)
       .threadOneLine
         div.fixThread
           div(style='float: left;')
