@@ -96,6 +96,8 @@
 //         span.lighttext(style='margin-right:7px;')   by
 //         a.ForumThreadItemUsername(href=`/m/${lmUser.uid}`) #{lmUser.username}
 //
+
+-const showTicks = data.userLevel > 4 && data.forum
 -const {firstPost, lastPost} = thread
 -const {t, resources, toc, tid} = firstPost;
 -const targetUser = firstPost.user;
@@ -143,6 +145,7 @@
       else if(!ellipsis)
         -ellipsis = true
         span(style='padding-left: 0.5rem; padding-right: 0.5rem; margin: 0.3rem; background-color: #04A5EA; color: white; border-radius: 0.4rem;') ...
+    input.ThreadCheckboxes(id=`${tid}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
   .new-content-body
     -let imgId;
     -const imgArr = ['jpg', 'png', 'jpeg'];

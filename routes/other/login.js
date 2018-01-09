@@ -7,7 +7,16 @@ loginRouter
   })
   .post('/', async (ctx, next) => {
     //用户登录
-    const {username, password} = ctx.body;
+    let {username, password} = ctx.body;
+    if(!username || !password) {
+      username = ctx.body.fields.username;
+      password = ctx.body.fields.password;
+    }
+
+    if(!username || !password || username.length === 0 || password.length === 0) {
+      ctx.throw('缺少用户名或密码')
+    }
+
     const {
       encryptInMD5WithSalt,
       encryptInSHA256HMACWithSalt

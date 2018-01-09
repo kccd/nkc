@@ -28,7 +28,7 @@ es.indexPost = function(post) {
     credits: credits? credits.length: 0,
     recUsers: recUsers? recUsers.length: 0
   };
-  return client.create({
+  return client.index({
     index: postIndex,
     type: postIndex,
     id: pid,
@@ -52,7 +52,7 @@ es.indexUser = function(user) {
     recCount,
     subs
   };
-  return client.create({
+  return client.index({
     index: userIndex,
     type: userIndex,
     id: uid,

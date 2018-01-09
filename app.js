@@ -19,12 +19,12 @@ try {
 
 app.keys = [settings.cookie.secret];
 app.use(init);
+app.use(cookieIdentify);
 app.use(koaBody(settings.upload.koaBodySetting));
 app.use(async (ctx, next) => {
   ctx.body = ctx.request.body;
   await next()
 });
-app.use(cookieIdentify);
 app.use(staticServe('./pages'));
 app.use(staticServe('./node_modules'));
 app.use(staticServe('./nkcModules'));
