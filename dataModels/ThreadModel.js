@@ -299,7 +299,7 @@ threadSchema.methods.getStep = async function(obj) {
   let page, step;
   for (let i = 0; i < posts.length; i++) {
     if(posts[i].pid !== pid) continue;
-    page = Math.ceil(i/perpage) - 1;
+    page = Math.ceil((i+1)/perpage) - 1;
     if(page < 0) page = 0;
     step = i;
     break;

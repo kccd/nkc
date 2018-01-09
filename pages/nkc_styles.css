@@ -1804,7 +1804,7 @@ img.emoji {
 .new-content-right{
   float: left;
   overflow: hidden;
-  max-height: 8.7rem;
+  max-height: 8.5rem;
   position: relative;
 }
 .new-content-right > p{
