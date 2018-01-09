@@ -87,6 +87,8 @@ function uploadSuccess(data) {
 	var photoType = data.photoType;
 	$(photoType).val('');
 	$(photoType+'Display').attr('src', '/idPhoto_small/'+id);
+	$(photoType+'Remove').attr('onclick', 'removePhoto('+id+')');
+	$(photoType+'Remove').removeClass('disabled');
 	$(photoType+'Messages').html($(photoType+'Messages').html() + '<h5>上传成功！</h5>');
 }
 
@@ -102,16 +104,24 @@ function initLifePhoto() {
 
 function displayCertsPhoto(){
 	var text = '';
-	for (let id of certsPhotoArr) {
-		text += '<div class="col-xs-12 col-md-4"><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+	if(certsPhotoArr.length === 0) {
+		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
+	} else {
+		for (let id of certsPhotoArr) {
+			text += '<div class="col-xs-12 col-md-4"><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+		}
 	}
 	$('#certsPhotoDisplay').html(text);
 }
 
 function displayLifePhoto() {
 	var text = '';
-	for (let id of lifePhotoArr) {
-		text += '<div class="col-xs-12 col-md-4"><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+	if(lifePhotoArr.length === 0) {
+		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
+	} else {
+		for (let id of lifePhotoArr) {
+			text += '<div class="col-xs-12 col-md-4"><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+		}
 	}
 	$('#lifePhotoDisplay').html(text);
 }
@@ -126,7 +136,13 @@ function initCertsPhoto() {
 	}
 }
 
-function removePhoto() {
-	var imgArr = $('#privateInfo img');
-	for ()
+
+function removePhoto(id) {
+	nkcAPI('/idPhoto/'+id, 'DELETE', {})
+		.then(function(data) {
+			window.location.reload();
+		})
+		.catch(function(err) {
+			jwarning(err);
+		});
 }

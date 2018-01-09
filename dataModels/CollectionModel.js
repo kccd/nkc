@@ -45,7 +45,10 @@ CollectionSchema.virtual('thread')
 
 CollectionSchema.methods.extendThread = async function() {
   const targetThread = await ThreadModel.findOnly({tid: this.tid});
-  await targetThread.extendFirstPost().then(p => p.extendUser());
+  await targetThread.extendFirstPost().then(async p => {
+  	await p.extendUser();
+  	await p.extendResources();
+  });
   await targetThread.extendLastPost().then(p => p.extendUser());
   return this.thread = targetThread;
 };

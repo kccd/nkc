@@ -65,7 +65,8 @@ meRouter
     if(user.postSign.length>300||user.description.length>300||user.color.length>10) {
       ctx.throw(400, '提交的内容字数超出限制，请检查');
     }
-    await user.save();
+    await user.update({postSign: user.postSign, description: user.description, color: user.color});
+	  // await user.save();
     await db.UsersSubscribeModel.replaceOne({uid: user.uid},{$set:{subscribeForums: relFid}});
     await next();
   })
