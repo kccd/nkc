@@ -1,0 +1,1 @@
+mongodump --out E:/mongodb/backup/ --db rescue

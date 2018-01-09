@@ -1,0 +1,1 @@
+mongorestore E:/mongodb/backup/

@@ -1,0 +1,40 @@
+运维:
+
+    备份运行  mongo_dump.bat
+    还原运行  mongo_restore.bat
+
+    默认备份文件目录为:   E:/mongodb/backup/
+    请及时转移文件, 下次备份会重写此目录
+
+    还原数据库默认以   E:/mongodb/backup/   下的文件进行还原
+    如需还原, 可清空此目录, 将已有的文件放入此目录, 运行脚本
+
+
+
+项目依赖:
+
+    node.js > 7.6
+    mongodb > 3.4.1
+    elasticsearch > 6.0.0
+    elasticsearch-analyzer-ik > 6.0.0(中文分词插件, 版本需与elasticsearch相符)
+    剩余依赖: 根目录 "npm install" 自动安装
+
+
+
+依赖安装:
+
+    上述软件除IK分词插件外, 官网下载对应操作系统二进制安装包,
+    根据需求安装即可
+      - elasticsearch-analyzer-ik: [https://github.com/medcl/elasticsearch-analysis-ik/releases]
+      - 下载后解压文件至: 你的elasticsearch目录/plugins/
+    mongodb: [https://www.mongodb.com/download-center?jmp=nav#community]
+    node.js: [https://www.nodejs.org]
+    elasticsearch: [https://www.elastic.co/cn/products]
+
+
+运行:
+    根目录运行  run_as_production
+
+
+    
+
