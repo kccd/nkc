@@ -309,7 +309,7 @@ var onPost = function(that) {
     var query = '';
     if(mid)
       query = '?&mid=' + mid;
-    return nkcAPI('/' + target + query, 'POST', {post})
+    return nkcAPI('/' + target + query, 'POST', {post:post})
       .then(function (result) {
         var redirectTarget = result.redirect;
         redirect(redirectTarget ? redirectTarget : '/' + target);

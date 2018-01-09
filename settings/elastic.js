@@ -95,6 +95,7 @@ es.updatePost = function(post) {
 es.ESSettings = ESSettings;
 
 es.searchUser = function(str, page, perpage) {
+  console.log(page, perpage)
   if(!str)
     return {hits: {hits: []}};
   return client.search({

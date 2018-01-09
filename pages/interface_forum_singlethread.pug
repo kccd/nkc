@@ -155,10 +155,15 @@
         -break;
     if imgId
       .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
-    .new-content-right(class=imgId?'div-img fixed-height': 'div-noImg')
-      p(class=imgId?'p-img': 'p-noImg')
-        -lastPost.c = filterQuote(lastPost.c)
-        a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))
+    .new-content-right(class=imgId?'div-img': 'div-noImg')
+      div(style='width: 100%; float: left;')
+        p(class=imgId ? 'p-img' : 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: left; max-height: 4.4em; overflow: hidden; margin-right: 5rem; margin-bottom: 0.2rem;')
+          -firstPost.c = filterQuote(firstPost.c)
+          a(href=`/t/${tid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(firstPost))
+      div(style='width: 100%; float: right;')
+        p(class=imgId?'p-img': 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: right; max-height: 3em; overflow: hidden; margin-left: 5rem; margin-top: 0.2rem; background-color: #f2f9ff;')
+          -lastPost.c = filterQuote(lastPost.c)
+          a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))
   .new-content-info(style='float: right;')
     //span
     //  a(href=`/m/${lastPost.user.uid}`)

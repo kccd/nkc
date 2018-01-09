@@ -30,6 +30,7 @@ threadRouter
     if(data.user) {
       data.usersThreads = await data.user.getUsersThreads();
     }
+    data._pid = pid;
     data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
     let myForum, othersForum;
     if(mid !== '') {
