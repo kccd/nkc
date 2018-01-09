@@ -41,10 +41,10 @@ block content
                           .col-xs-12.col-md-9
                             .settings-img
                               if !idCardPhotos[0]
+                                .settings-img-remove.glyphicon.glyphicon-remove.disabled
                                 img#idCardAPhotoDisplay(src=defaultImg)
                               else
-                                .settings-img-mask
-
+                                .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${idCardPhotos[0]})`)
                                 img#idCardAPhotoDisplay(src=`/idPhoto_small/${idCardPhotos[0]}`)
                           .col-xs-12.col-md-3
                             input#idCardAPhoto(type='file' style='display: none;')
@@ -62,8 +62,10 @@ block content
                           .col-xs-12.col-md-9
                             .settings-img
                               if !idCardPhotos[1]
+                                .settings-img-remove.glyphicon.glyphicon-remove.disabled
                                 img#idCardBPhotoDisplay(src=defaultImg)
                               else
+                                #idCardBPhotoRemove.settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${idCardPhotos[1]})`)
                                 img#idCardBPhotoDisplay(src=`/idPhoto_small/${idCardPhotos[1]}`)
                           .col-xs-12.col-md-3
                             input#idCardBPhoto(type='file' style='display: none;')
@@ -84,6 +86,7 @@ block content
                               if !handheldIdCardPhoto
                                 img#handheldIdCardPhotoDisplay(src=defaultImg)
                               else
+                                .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${handheldIdCardPhoto})`)
                                 img#handheldIdCardPhotoDisplay(src=`/idPhoto_small/${handheldIdCardPhoto}`)
                           .col-xs-12.col-md-3
                             input#handheldIdCardPhoto(type='file' style='display: none;')

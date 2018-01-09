@@ -416,7 +416,8 @@ const certificates ={
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
-          [GET]: true
+          [GET]: true,
+	        [DELETE]:true
         }
       },
 	    idPhoto_small: {
