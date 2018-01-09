@@ -386,10 +386,10 @@ const certificates ={
           [name]: '获取帖子',
           [GET]: true
         },
-	      privateInfo: {
+	      /*privateInfo: {
         	[name]: '个人信息',
 		      [GET]: true
-	      }
+	      }*/
       },
       logout: {
         [GET]: true
@@ -412,7 +412,7 @@ const certificates ={
           [POST]: true
         }
       },
-      idPhoto: {
+      /*idPhoto: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
@@ -425,8 +425,8 @@ const certificates ={
 		    [parameter]: {
 			    [GET]: true
 		    }
-	    },
-      fund: {
+	    },*/
+      /*fund: {
         [name]: '基金',
         [GET]: true,
 	      list: {
@@ -479,7 +479,7 @@ const certificates ={
 		    [parameter]: {
 			    [GET]: true,
 		    }
-	    }
+	    }*/
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -715,7 +715,7 @@ const certificates ={
           [POST]: true
         }
       },
-      fund: {
+      /*fund: {
         [POST]: true,
 	      m: {
 		      [name]:'基金管理页面',
@@ -737,7 +737,7 @@ const certificates ={
 		      }
 	      }
 
-      }
+      }*/
     }
   }
 };
