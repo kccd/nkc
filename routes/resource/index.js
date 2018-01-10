@@ -13,12 +13,17 @@ resourceRouter
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
     if(!extArr.includes(resource.ext) && data.userLevel < 1) ctx.throw(401, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
-    let filePath = ctx.settings.upload.uploadPath + path;
+    let filePath = ctx.settings.upload.uploadPath + '/' + path;
+    try {
+	    await fs.access(filePath);
+    } catch(e) {
+	    filePath = ctx.settings.upload.uploadPath + path;
+    }
     if(extArr.includes(resource.ext)) {
       try{
         await fs.access(filePath);
       } catch(e){
-        filePath = ctx.settings.statics.defaultImageResourcePath;
+      	filePath = ctx.settings.statics.defaultImageResourcePath;
       }
     }
     ctx.filePath = filePath;
