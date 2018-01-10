@@ -41,7 +41,7 @@ block content
                           .col-xs-12.col-md-9
                             .settings-img
                               if !idCardPhotos[0]
-                                .settings-img-remove.glyphicon.glyphicon-remove.disabled
+                                #idCardAPhotoRemove.settings-img-remove.glyphicon.glyphicon-remove.disabled
                                 img#idCardAPhotoDisplay(src=defaultImg)
                               else
                                 .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${idCardPhotos[0]})`)
@@ -62,7 +62,7 @@ block content
                           .col-xs-12.col-md-9
                             .settings-img
                               if !idCardPhotos[1]
-                                .settings-img-remove.glyphicon.glyphicon-remove.disabled
+                                #idCardBPhotoRemove.settings-img-remove.glyphicon.glyphicon-remove.disabled
                                 img#idCardBPhotoDisplay(src=defaultImg)
                               else
                                 #idCardBPhotoRemove.settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${idCardPhotos[1]})`)
@@ -84,6 +84,7 @@ block content
                           .col-xs-12.col-md-9
                             .settings-img
                               if !handheldIdCardPhoto
+                                #handheldIdCardPhotoRemove.settings-img-remove.glyphicon.glyphicon-remove.disabled
                                 img#handheldIdCardPhotoDisplay(src=defaultImg)
                               else
                                 .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${handheldIdCardPhoto})`)
@@ -108,7 +109,8 @@ block content
                                 .blank(style='height: 20rem;line-height: 20rem') 暂无数据
                               else
                                 -for(let id of lifePhotos)
-                                  .col-xs-12.col-md-4
+                                  .col-xs-12.col-md-4(style='position: relative;')
+                                    .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${id})`)
                                     img(photoId=id src=`/idPhoto_small/${id}`)
                           .col-xs-12.col-md-2
                             input#lifePhoto(type='file' style='display: none;' multiple=true)
@@ -131,6 +133,7 @@ block content
                               else
                                 -for(let id of certsPhotos)
                                   .col-xs-12.col-md-4
+                                    .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${id})`)
                                     img(photoId=id src=`/idPhoto_small/${id}`)
                           .col-xs-12.col-md-2
                             input#certsPhoto(type='file' style='display: none;' multiple=true)

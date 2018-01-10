@@ -16,7 +16,10 @@ block title
   meta(property='og:title' content=`${forum.displayName}`)
   meta(property='og:site_name' content='科创论坛')
   meta(property='og:description' content=`${processed}`)
-
+  style.
+    .ThreadCheckboxes{
+      display: none;
+    }
 
 
 block content
@@ -204,13 +207,25 @@ block content
             .ForumToppedSplitter - 以上是置顶 -
 
           .ForumThreadList
-            each thread,index in data.threads
-              if data.toppedThreads && (data.toppedThreads.map(item => item.tid).indexOf(thread.tid) >= 0)
-                //exclude threads that are shown in topped area.
-              else
-                //include interface_personal_forum_single_thread
-                -const firstPost = thread.firstPost
-                include interface_new_postsList
+            if data.threads !== undefined
+              each thread,index in data.threads
+                if data.toppedThreads && (data.toppedThreads.map(item => item.tid).indexOf(thread.tid) >= 0)
+                  //exclude threads that are shown in topped area.
+                else
+                  //include interface_personal_forum_single_thread
+                  //-const firstPost = thread.firstPost
+                  //include interface_new_postsList
+                  include interface_forum_singlethread
+            else if data.posts !== undefined
+              each post,index in data.posts
+                if data.toppedThreads && (data.toppedThreads.map(item => item.tid).indexOf(post.tid) >= 0)
+                  //exclude threads that are shown in topped area.
+                else
+                  //include interface_personal_forum_single_thread
+                  //-const firstPost = thread.firstPost
+                  //include interface_new_postsList
+                  -let thread = post.thread.toObject();
+                  include interface_forum_singlethread
           .row
             .col-md-12
               nav

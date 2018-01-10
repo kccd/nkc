@@ -100,6 +100,7 @@ function mergeTree(originalTree, treeToBeMerged) {
   return newTree
 }
 
+/* 只能取到最后一个证书所具有的权限
 function getPermitTree(certs) {
   let tree = {};
   for(const cert of certs) {
@@ -109,6 +110,19 @@ function getPermitTree(certs) {
     tree = mergeTree(tree, certificate)
   }
   return tree
+}
+*/
+
+function getPermitTree(certs) {
+	let tree = {};
+	for(const cert of certs) {
+		let inheritTree = {};
+		let certificate = certificates[cert];
+		if(certificate.inheritFrom)
+			inheritTree = getPermitTree(certificate.inheritFrom);
+		tree = mergeTree(tree, mergeTree(inheritTree, certificate));
+	}
+	return tree;
 }
 
 async function getVisibleFid() {

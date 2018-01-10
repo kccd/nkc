@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const nkcModules = require('../../nkcModules');
 const apiFn = nkcModules.apiFunction;
 const dbFn = nkcModules.dbFunction;
-const {contentFilter} = require('../../tools/checkString');
+const {encryption} = require('../../tools');
 const privateInfoRouter = require('./privateInfo');
 const meRouter = new Router();
 meRouter
@@ -34,6 +34,10 @@ meRouter
     await next();
   })
   .patch('/password', async (ctx, next) => {
+	  const {
+		  encryptInMD5WithSalt,
+		  encryptInSHA256HMACWithSalt
+	  } = ctx.tools.encryption;
     const db = ctx.db;
     const params = ctx.body;
     const user = ctx.data.user;
@@ -41,9 +45,26 @@ meRouter
     if(!params.newPassword || !params.newPassword2) ctx.throw(400, '新密码不能为空');
     if(params.newPassword !== params.newPassword2) ctx.throw(400, '两次输入的密码不一致！请重新输入');
     let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-    if(!apiFn.testPassword(params.oldPassword, userPersonal.hashType, userPersonal.password)){
+    const {hashType} = userPersonal;
+    const {hash, salt} = userPersonal.password;
+    const password = params.oldPassword;
+	  switch(hashType) {
+		  case 'pw9':
+			  if(encryptInMD5WithSalt(password, salt) !== hash) {
+				  ctx.throw(400, '旧密码错误, 请重新输入');
+			  }
+			  break;
+		  case 'sha256HMAC':
+			  if(encryptInSHA256HMACWithSalt(password, salt) !== hash) {
+				  ctx.throw(400, '旧密码错误, 请重新输入');
+			  }
+			  break;
+		  default:
+		  	ctx.throw(500, '数据库异常, 请报告: bbs@kc.ac.cn');
+	  }
+    /*if(!apiFn.testPassword(params.oldPassword, userPersonal.hashType, userPersonal.password)){
       ctx.throw(400, '密码不正确，请重新输入');
-    }
+    }*/
     const newPasswordObj = apiFn.newPasswordObject(params.newPassword);
     await db.UsersPersonalModel.updateOne({uid: user.uid}, {$set:newPasswordObj});
     await next();

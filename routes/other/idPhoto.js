@@ -16,7 +16,6 @@ idPhotoRouter
     const {data, db, body, fs} = ctx;
     const {user} = data;
     const {files, fields} = body;
-    ctx.print('body', body);
     const {photoType} = fields;
     const file = files.file;
     const {size, name, path} = file;
@@ -38,5 +37,14 @@ idPhotoRouter
 	  data.photoType = photoType;
 		data.photoId = photoId;
 	  await next();
-  });
+  })
+	.del('/:photoId', async (ctx, next) => {
+		const {data, db, params} = ctx;
+		const {photoId} = params;
+		const photo = await db.IdPhotoModel.findOnly({_id: photoId});
+		const {user} = data;
+		if(user.uid !== photo.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		await photo.remove();
+		await next();
+	});
 module.exports = idPhotoRouter;

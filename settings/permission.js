@@ -220,7 +220,15 @@ const certificates ={
             [GET]: true
           }
         }
-      }
+      },
+	    'index.php': {
+      	[name]: '兼容老版本',
+      	[GET]: true
+	    },
+	    'read.php': {
+		    [name]: '兼容老版本',
+		    [GET]: true
+	    }
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0
