@@ -48,17 +48,13 @@ resourceRouter
       const descPathOfThumbnail = generateFolderName(thumbnailPath);
       const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName;
       await imageMagick.thumbnailify(path, thumbnailFilePath);
-      console.log(1);
       // 添加水印
       if(size > largeImage) {
         await imageMagick.attachify(path);
-        console.log(2)
       } else {
         const {width, height} = await imageMagick.info(path);
-        console.log(3);
         if(height > 400 || width > 300) {
           await imageMagick.watermarkify(path);
-          console.log(4)
         }
       }
     }
