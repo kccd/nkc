@@ -41,7 +41,7 @@ postRouter
       rpid = quote[2];
       const username = quote[1];
       if(rpid !== targetPost.pid) {
-        const quoteUser = await db.UserModel.find({username: username});
+        const quoteUser = await db.UserModel.findOne({username: username});
         const newReplies = new db.ReplyModel({
           fromPid: pid,
           toPid: rpid,
