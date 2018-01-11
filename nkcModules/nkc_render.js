@@ -491,7 +491,8 @@ function nkc_render(options){
     renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
     var atUsers = post.atUsers;
     if(atUsers && atUsers.length > 0) {
-      for(var user of atUsers) {
+      for(var uid in atUsers) {
+        var user = atUsers[uid];
         var matchSpace = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + ' ';
         //双空格会产生奇怪转义
         var matchSpecial = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '&#xA0;';
