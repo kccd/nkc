@@ -7,7 +7,7 @@ idPhotoSmallRouter
 		const {user} = data;
 		const {id} = ctx.params;
 		const idPhoto = await db.IdPhotoModel.findOnly({_id: id});
-		if(idPhoto._id !== user.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(idPhoto.uid !== user.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		ctx.filePath = idPhotoSmallPath + '/' + idPhoto._id + '.jpg';
 		await next();
 	});

@@ -82,6 +82,15 @@ listRouter
 		const paging = apiFn.paging(page, length);
 		data.applications = await FundApplicationFormModel.find(query).skip(paging.start).limit(paging.perpage);
 		data.message = await user.getUnCompletedFundApplication();
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const {privateInfo, mobile} = userPersonal;
+		data.privateInfo = {
+			idCard: !!mobile,
+			idCardPhotos: (privateInfo.idCardPhotos[0] !== null && privateInfo.idCardPhotos[1] !== null),
+			handheldIdCardPhoto: !!privateInfo.handheldIdCardPhoto,
+			lifePhotos: privateInfo.lifePhotos.length !== 0,
+			certsPhotos: privateInfo.certsPhotos.length !== 0
+		};
 		ctx.template = 'interface_fund_messages.pug';
 		await next();
 	})

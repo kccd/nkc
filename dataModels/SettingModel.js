@@ -24,7 +24,8 @@ const settingSchema = new Schema({
     collections: Number,
     sms: Number,
     fundApplicationForms: Number,
-	  idPhotos: Number
+	  idPhotos: Number,
+	  documents: Number
   }
 },
 {toObject: {
@@ -52,7 +53,15 @@ async function operateSystemID(type, op) {
   } catch(e) {
     throw 'invalid id type, a type should be one of these [resources, users, posts, threadTypes, threads].'
   }
-  return setting.counters[type] + op;
+  let number = setting.counters[type];
+  if(isNaN(number)) {
+		number = 0;
+		const settings = await this.findOnly({uid: 'system'});
+		const {counters} = settings;
+		counters[type] = 1;
+		await settings.update({counters});
+  }
+  return number + op;
 }
 
 settingSchema.statics.operateSystemID = operateSystemID;

@@ -48,12 +48,25 @@ block content
                                   .col-xs-12.col-md-12
                                     span 申请人：
                                     a(href=`/u/${applicant.user.uid}`)= applicant.user.username
+                                  if members.length !== 0
+                                    .col-xs-12.col-md-12
+                                      span 组员：
+                                      -for(let u of members)
+                                        if u.agree === null
+                                        span(style='margin-right: 0.3rem;')
+                                          a(href=`/u/${u.user.uid}`)= u.user.username
                                   .col-xs-12.col-md-12
-                                    span 组员：
-                                    -for(let u of members)
-                                      if u.agree === null
-                                      span(style='margin-right: 0.3rem;')
-                                        a(href=`/u/${u.user.uid}`)= u.user.username
+                                    span 状态：
+                                      if type === 'invitation'
+                                        -for (let u of members)
+                                          if u.uid === user.uid
+                                            -let agree = u.agree;
+                                            if agree === null
+                                              span 暂未处理
+                                            else if agree === true
+                                              span 已同意
+                                            else
+                                              span 已拒绝
                               .col-xs-2.col-md-2
                                 .row
                                   if applicant.uid === user.uid

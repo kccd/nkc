@@ -5,7 +5,7 @@ block title
   -const {applicationForm, s} = data;
   -const mainContainer1400 = true
   -const {idCard, lifePhotos, idCardPhotos, handheldIdCardPhoto} = fund.applicant;
-  -const {status, members, applicant} = applicationForm;
+  -const {status, members, applicant, project} = applicationForm;
   -const {chooseType, inputApplicantMessages, inputProjectMessages, ensureUsersMessages, inputProjectContent, submit} = status;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
@@ -21,7 +21,7 @@ block content
           .panel-body
             .nav-link.center-block
               ul
-                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'ensureUsersMessages', ch: '第3步、人员确认'},{en: 'inputProjectMessages', ch: '第4步、填写项目基本信息'},{en: 'inputProjectContent', ch: '第5步、填写项目内容'},{en: 'submit', ch: '第6步、提交申请'}];
+                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'ensureUsersMessages', ch: '第3步、人员确认'},{en: 'inputProjectContent', ch: '第4步、填写项目内容'},{en: 'inputProjectMessages', ch: '第5步、填写项目基本信息'},{en: 'submit', ch: '第6步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
                   if i === 0
                     li
@@ -82,7 +82,8 @@ block content
                 else
                   -agreeIsFalse.push(u);
               -let self = false;
-              if agreeIsFalse.length === 0 && agreeIsNull.length === 0 && agreeIsTrue.length === 0
+              -const nullLength = agreeIsNull.length, trueLength = agreeIsTrue.length, falseLength = agreeIsFalse.length;
+              if falseLength === 0 && nullLength === 0 && trueLength === 0
                 -self = true;
               .row
                 .col-xs-12.col-md-4.col-md-offset-4
@@ -95,7 +96,7 @@ block content
                     br
                     h4 未处理的用户：
                     #usersList
-                      if agreeIsNull.length === 0
+                      if nullLength === 0
                         .blank 暂无数据
                       else
                         -for(let u of agreeIsNull)
@@ -103,7 +104,7 @@ block content
                     br
                     h4 已同意的用户：
                     #usersList
-                      if agreeIsTrue.length === 0
+                      if trueLength === 0
                         .blank 暂无数据
                       else
                         -for(let u of agreeIsTrue)
@@ -111,151 +112,50 @@ block content
                     br
                     h4 已拒绝的用户：
                     #usersList
-                      if agreeIsFalse.length === 0
+                      if falseLength === 0
                         .blank 暂无数据
                       else
                         -for(let u of agreeIsFalse)
                           span.fund-span.disabled= u.user.username
-                    if agreeIsNull.length !== 0 && !self
-                      span(style='color: red;') 等待用户确认中，若要关闭页面请点击保存按钮
-                    if agreeIsNull.length === 0 && !self && agreeIsFalse.length > 0
-                      span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击第1步
-                    if agreeIsNull.length === 0 && !self && agreeIsFalse.length === 0
-                      span(style='color: red;') 保存并下一步
+                    if !self
+                      if nullLength !== 0
+                        span(style='color: red;') 等待用户确认中，若要关闭页面请点击保存按钮
+                      else
+                        if trueLength === 0
+                          span(style='color: red;') 团队申请必须要有组员，请返回第一步添加组员或更改申请方式
+                        else
+                          if falseLength !== 0
+                            span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击第1步
+              hr
               if self
-                hr
                 .back-next
                   .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
-              else if agreeIsNull.length !== 0
-                hr
-                .back-next
-                  .apply-next(onclick=`submitEnsureUsersMessages()`) 保存
-              else if agreeIsNull.length === 0
-                hr
-                .back-next
-                  .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
+              else
+                if nullLength !== 0
+                  .back-next
+                    .apply-next(onclick=`submitEnsureUsersMessages()`) 保存
+                else
+                  if trueLength === 0
+                    .back-next
+                      .apply-next(onclick=`window.location.href="/fund/a/${applicationForm._id}/settings?s=1"`) 返回第1步
+                  else
+                    .back-next
+                      .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
             else if s === 4 && ensureUsersMessages !== null
               .row
-                .col-xs-12.col-md-4.col-md-offset-4
+                .col-xs-12.col-md-6.col-md-offset-3
+                  br
+                  h4 项目名称
+                  -let title = '', content = '';
+                  if project
+                    -title = project.t;
+                    -content = project.c;
+                  input#projectTitle.fund-input(style='font-size: 1.8rem;' value=title autofocus=true)
+                  h4 项目内容
+                  #projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
+                  button.btn.btn-default(onclick=`submitProject(${applicationForm._id})`) 提交
+                  button.btn.btn-default(onclick=`toEditor(${applicationForm._id})`) 去编辑器
 
-              // -const {authentication} = fund.preconditions;
-              // -const arr = [];
-              // -for(let key in authentication){if(authentication[key]){arr.push(key)}}
-              // mixin toChinese(obj, arr, type)
-              //   -const result = [];
-              //   -let disabled;
-              //   -const {uid, username, info} = obj;
-              //   if type === 'other'
-              //     span.h4
-              //       a(href=`/m/${uid}` target='_blank')= username
-              //     span ：
-              //     -obj = info
-              //   if arr.includes('idCard')
-              //     -disabled = '';
-              //     if !obj.idCard && (!obj.name || !obj.idCardNumber)
-              //       -disabled = 'disabled';
-              //       -result.push('实名认证');
-              //     span.fund-span(class=disabled) 实名认证
-              //   if arr.includes('idCardPhoto')
-              //     -disabled = '';
-              //     if !obj.idCardPhoto && (!obj.idCardA || !obj.idCardB)
-              //       -disabled = 'disabled';
-              //       -result.push('身份证照片');
-              //     span.fund-span(class=disabled) 身份证照片
-              //   if arr.includes('handheldIdCardPhoto')
-              //     -disabled = '';
-              //     if !obj.handheldIdCardPhoto && !obj.handheldIdCard
-              //       -disabled = 'disabled';
-              //       -result.push('手持身份证照片');
-              //     span.fund-span(class=disabled) 手持身份证照片
-              //   if arr.includes('lifePhoto')
-              //     -disabled = '';
-              //     if !obj.lifePhoto && (!obj.life || obj.life.length === 0)
-              //       -disabled = 'disabled';
-              //       -result.push('生活照');
-              //     span.fund-span(class=disabled) 生活照
-              //   if result.length !== 0 && type !== 'fund'
-              //     if type === 'me'
-              //       p= `您的${result.join('、')}未完善，`
-              //         a(href='###' target='_blank' style='cursor: pointer') 去完善
-              //     else
-              //       p!= `该组员的${result.join('、')}未完善，`
-              //         a(href=link target='_blank' style='cursor: pointer') 去通知
-              //   if result.length === 0 && type === 'other'
-              //     p 该组员信息完善
-              // .fund-apply-head 身份信息确认
-              // .row
-              //   -let agreeFalse, agreeNull, agreeTrue;
-              //   -for (let member of members)
-              //     if member.agree === false
-              //       -agreeFalse = true
-              //     if member.agree === true
-              //       -agreeTure = true
-              //     if member.agree === null
-              //       -agreeNull = true
-              //   .col-xs-12.col-md-6.col-md-offset-3
-              //     .row
-              //       .col-xs-12.col-md-12
-              //         h3 认证方式
-              //         hr
-              //         +toChinese(authentication, arr, 'fund')
-              //         hr
-              //       .col-xs-12.col-md-12
-              //         span 我的:
-              //         +toChinese(userMessages, arr, 'me')
-              //         hr
-              //       if agreeTure && members.length !== 0
-              //         .col-xs-12.col-md-12
-              //           h3 已同意用户
-              //           hr
-              //           -let n = 0;
-              //           -for (let member of members)
-              //             if member.agree
-              //               -n++;
-              //               +toChinese(member, arr, 'other')
-              //               hr
-              //           if n === 0
-              //             div(style='height: 5rem;line-height: 5rem;width: 100%;text-align: center;color: #ddd;font-size: 2rem;') 暂无用户同意
-              //             hr
-              //       if agreeNull
-              //         .col-xs-12.col-md-12
-              //           h3 以下用户暂未同意，请耐心等待
-              //           hr
-              //           -for (let member of members)
-              //             if member.agree === null
-              //               span.fund-span.transparent= member.username
-              //           hr
-              //       if agreeFalse
-              //         .col-xs-12.col-md-12
-              //           h3 以下用户已拒绝您的邀请
-              //           hr
-              //           -for (let member of members)
-              //             if member.agree === false
-              //               span.fund-span.disabled= member.username
-              //               -break;
-              //           hr
-              //       if !agreeNull && agreeFalse
-              //         .col-xs-12.col-md-12
-              //           h4(style='color: #aaa;font-size: 1.5rem') 有用户拒绝了您的邀请，若想要添加用户请点击
-              //             a(href='###') 去添加
-              //   if !agreeNull
-              //     -let flag = true;
-              //     -for (let member of members)
-              //       -const {info} = member;
-              //       -for(let key of arr)
-              //         if key === 'idCard' && (!info.name || !info.idCardNumber || !userMessages.name || !userMessages.idCardNumber)
-              //           -flag = false
-              //         if key === 'idCardPhoto' && (!info.idCardA || !info.idCardB || !userMessages.idCardA || !userMessages.idCardB)
-              //           -flag = false
-              //         if key === 'handheldIdCardPhoto' && (!info.handheldIdCard || !userMessages.handheldIdCard)
-              //           -flag = false
-              //         if key === 'lifePhoto' && (!info.life || info.life.length === 0 || !userMessages.life || userMessages.life.length === 0)
-              //           -flag = false
-              //     if flag
-              //       .col-xs-12.col-md-12
-              //         hr
-              //         .back-next
-              //           .apply-next(onclick=`submit(${applicationForm._id})`) 下一步
 
 
 

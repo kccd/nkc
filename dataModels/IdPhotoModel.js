@@ -8,7 +8,7 @@ const idPhotoSchema = new Schema({
     required: true,
     index: 1
   },
-  timeToCreate: {
+  toc: {
     type: Date,
     default: Date.now,
     index: 1

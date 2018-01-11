@@ -28,12 +28,13 @@ const documentSchema = new Schema({
 	},
 	userType: {// userCensor, projectCensor, common, self
 		type: String,
-		required: true,
+		default: null,
 		index: 1
 	},
-	passed: {
+	agree: {
 		type: Boolean,
-		default: null
+		default: null,
+		index: 1
 	},
 	l: {//pwbb
 		type: String,
@@ -46,7 +47,7 @@ const documentSchema = new Schema({
 	},
 	c: {
 		type: String,
-		required: true
+		default: null
 	},
 	disabled: {
 		type: Boolean,
@@ -67,3 +68,4 @@ documentSchema.pre('save', function(next) {
 });
 
 const DocumentModel = mongoose.model('documents', documentSchema);
+module.exports = DocumentModel;

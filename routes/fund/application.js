@@ -7,6 +7,7 @@ applicationRouter
 		const applicationForm = await db.FundApplicationFormModel.findOnly({_id});
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant();
+		await applicationForm.extendProject();
 		const fund = await applicationForm.extendFund();
 		data.applicationForm = applicationForm;
 		data.fund = fund;
@@ -22,6 +23,9 @@ applicationRouter
   		s = 1;
 	  }
 	  data.s = s;
+  	if(s === 4) {
+
+	  }
 	  if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		ctx.template = 'interface_fund_apply.pug';
   	await next();
@@ -30,47 +34,36 @@ applicationRouter
 		const {data, db, params} = ctx;
 		const {_id} = params;
 		const {user, applicationForm, fund} = data;
-		const members = await applicationForm.extendMembers();
+		const members = await applicationForm.members;
 		for (let u of members) {
 			if(u.uid === user.uid) {
 				data.member = u;
 			}
 		}
-		if(!data.member) ctx.throw(401, '权限不足');
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		const {mobile, privateInfo} = userPersonal;
-		const {idCardPhotos, handheldIdCardPhoto, lifePhotos} = privateInfo;
-		data.privateInfo = {
-			idCard: !!mobile,
-			idCardPhotos: idCardPhotos.length === 2,
-			handheldIdCardPhoto: !!handheldIdCardPhoto,
-			lifePhotos: lifePhotos.length !== 0
-		};
 		ctx.template = 'interface_fund_member.pug';
 		await next();
 	})
 	.patch('/:_id/member', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data, body} = ctx;
 		const {user, applicationForm} = data;
+		const {agree} = body;
 		const {members} = applicationForm;
 		for (let u of members) {
 			if(user.uid === u.uid) {
-				await u.update({agree: false})
+				await u.update({agree})
 			}
 		}
 		await next();
 	})
 	.patch('/:_id', async (ctx, next) => {
 		const {data, db, body, params} = ctx;
-		const {newMembers, account, newApplicant, s} = body;
+		const {newMembers, account, newApplicant, s, project} = body;
 		data.s = s;
-		const {user} = data;
+		const {user, applicationForm} = data;
 		const {_id} = params;
-		const applicationForm = await db.FundApplicationFormModel.findOnly({_id});
 		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		let updateObj;
-		const members = await applicationForm.extendMembers();
-		const applicant = await applicationForm.extendApplicant();
+		const {applicant, members} = applicationForm;
 		if(s === 1) {
 			// 判断申请人的信息是否存在，不存在则写入
 			if(!applicant) {
@@ -120,6 +113,17 @@ applicationRouter
 		if(s === 3) {
 			updateObj = {
 				'status.ensureUsersMessages': true
+			}
+		}
+		if(s === 4) {
+			if(applicationForm.project === null){
+				await applicationForm.newProject(project);
+				updateObj = {
+					'status.inputProjectContent': true,
+					projectId: applicationForm.project._id
+				}
+			} else {
+				await applicationForm.project.update({t: project.title, c: project.content})
 			}
 		}
 		await applicationForm.update(updateObj);
