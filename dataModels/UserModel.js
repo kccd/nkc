@@ -95,7 +95,7 @@ userSchema.pre('save', function(next) {
   const certs = this.certs;
   const c = [];
   for (let cert of certs) {
-    if(cert !== 'qc') c.push(cert);
+    if(cert !== 'scholar') c.push(cert);
   }
   this.certs = c;
   return next()

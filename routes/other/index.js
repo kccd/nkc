@@ -111,6 +111,20 @@ otherRouter
     ctx.template = 'interface_home.pug';
     await next();
   })
+	.get('index.php', async (ctx, next) => {
+		const {fid} = ctx.query;
+		if(fid) {
+			return ctx.redirect(`/f/${fid}`);
+		}
+		return ctx.redirect(`/`);
+	})
+	.get('read.php', async (ctx, next) => {
+		const {tid} = ctx.query;
+		if(tid) {
+			return ctx.redirect(`/t/${tid}`);
+		}
+		return ctx.redirect(`/`);
+	})
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('register', registerRouter.routes(), registerRouter.allowedMethods())

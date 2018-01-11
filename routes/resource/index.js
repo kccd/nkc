@@ -13,12 +13,17 @@ resourceRouter
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
     if(!extArr.includes(resource.ext) && data.userLevel < 1) ctx.throw(401, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
-    let filePath = ctx.settings.upload.uploadPath + path;
+    let filePath = ctx.settings.upload.uploadPath + '/' + path;
+    try {
+	    await fs.access(filePath);
+    } catch(e) {
+	    filePath = ctx.settings.upload.uploadPath + path;
+    }
     if(extArr.includes(resource.ext)) {
       try{
         await fs.access(filePath);
       } catch(e){
-        filePath = ctx.settings.statics.defaultImageResourcePath;
+      	filePath = ctx.settings.statics.defaultImageResourcePath;
       }
     }
     ctx.filePath = filePath;
@@ -48,17 +53,13 @@ resourceRouter
       const descPathOfThumbnail = generateFolderName(thumbnailPath);
       const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName;
       await imageMagick.thumbnailify(path, thumbnailFilePath);
-      console.log(1);
       // 添加水印
       if(size > largeImage) {
         await imageMagick.attachify(path);
-        console.log(2)
       } else {
         const {width, height} = await imageMagick.info(path);
-        console.log(3);
         if(height > 400 || width > 300) {
           await imageMagick.watermarkify(path);
-          console.log(4)
         }
       }
     }

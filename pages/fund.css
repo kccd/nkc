@@ -682,7 +682,7 @@ input[type="radio"], input[type="checkbox"]{
   font-size: 1rem;
   color: #666;
 }
-.settings-img > .settings-img-remove{
+.settings-img .settings-img-remove{
   height: 2.5rem;
   width: 2.5rem;
   border-radius: 50%;
@@ -703,10 +703,10 @@ input[type="radio"], input[type="checkbox"]{
   -o-transition: background-color 0.2s, color 0.2s;
   transition: background-color 0.2s, color 0.2s;
 }
-.settings-img > .settings-img-remove:hover{
+.settings-img .settings-img-remove:hover{
   color: #fff;
   background-color: rgba(0,0,0,0.6);
 }
-#idCardAPhotoRemove.disabled{
+.settings-img .settings-img-remove.disabled{
   display: none;
 }

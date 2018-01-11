@@ -108,7 +108,7 @@ function displayCertsPhoto(){
 		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
 	} else {
 		for (let id of certsPhotoArr) {
-			text += '<div class="col-xs-12 col-md-4"><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
 		}
 	}
 	$('#certsPhotoDisplay').html(text);
@@ -120,7 +120,7 @@ function displayLifePhoto() {
 		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
 	} else {
 		for (let id of lifePhotoArr) {
-			text += '<div class="col-xs-12 col-md-4"><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
 		}
 	}
 	$('#lifePhotoDisplay').html(text);

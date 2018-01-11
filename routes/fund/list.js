@@ -124,7 +124,6 @@ listRouter
 		} catch(e) {
 			ctx.throw(401, e);
 		}
-		console.log('asdf');
 		const applicationForm = {};
 		applicationForm._id = await db.SettingModel.operateSystemID('fundApplicationForms', 1);
 		applicationForm.uid = user.uid;

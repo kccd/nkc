@@ -55,11 +55,14 @@ router
       }
       const posts = await PostModel.find($matchPost.toJS()).sort($sort).skip(page * perpage).limit(perpage);
       await Promise.all(posts.map(async post => {
-        await post.extendThread();
-        await post.thread.extendUser();
-        await post.thread.extendFirstPost();
+      	const thread = await post.extendThread();
+        await thread.extendFirstPost();
+        await thread.extendLastPost();
+        await thread.lastPost.extendUser();
+	      await thread.firstPost.extendUser();
+	      await thread.firstPost.extendResources();
       }));
-      data.threads = posts;
+      data.posts = posts;
       const length = await ThreadModel.count($matchThread.toJS());
       data.paging = paging(page, length)
     }
