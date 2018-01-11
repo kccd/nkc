@@ -4,8 +4,8 @@ block title
   link(rel='stylesheet' href='/fund.css')
 block content
   -const mainContainer1400 = true
-  -const {idCardPhotos, handheldIdCardPhoto, lifePhotos, certsPhotos} = data.privateInfo;
-  -const defaultImg = '/default/idCard_setting.jpg';
+  -const defaultImg = '/default/idPhoto_setting.jpg';
+  -const {type} = data;
   .container-fluid(style='max-width: 1400px;')
     #uploadInfo 文件已上传&nbsp;
       span
@@ -25,7 +25,8 @@ block content
             .settings-content
               .row
                 // 身份认证
-                if 1
+                if type === 'idPhoto'
+                  -const {idCardPhotos, handheldIdCardPhoto, lifePhotos, certsPhotos} = data.privateInfo;
                   #privateInfo
                     .col-xs-12.col-md-12
                       h3.settings-title.text-center 身份认证
@@ -144,4 +145,4 @@ block content
             br
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_user_privateInfo.js')
+  script(src='/interface_user_settings.js')

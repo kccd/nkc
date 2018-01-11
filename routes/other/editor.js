@@ -20,6 +20,10 @@ editorRouter
       data.original_post = targetPost;
       data.targetUser = await targetPost.extendUser();
       return await next();
+    } else if(target.indexOf('application/p/') === 0) {
+    	const _id = parseInt(target.slice(14));
+	    data.original_post = await db.DocumentModel.findOnly({_id});
+	    return await next();
     }
     data.original_post = {
       c: content? decodeURI(content) : '',

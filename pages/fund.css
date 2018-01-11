@@ -710,3 +710,29 @@ input[type="radio"], input[type="checkbox"]{
 .settings-img .settings-img-remove.disabled{
   display: none;
 }
+.stamp{
+  margin: 1rem 0;
+  font-size: 3rem;
+  font-weight: 900;
+}
+.stamp.agree{
+  color: #5cb85c;
+}
+.stamp.disagree{
+  color: red
+}
+
+.editor-module{
+  width: 100%;
+  border: 1px solid #aaa;
+}
+.editor-module input{
+
+}
+.div-textarea{
+  border: 1px solid #aaa;
+  font-size: 1.4rem;
+  color: #777;
+  margin: 0.5rem 0;
+  padding: 0.5rem
+}

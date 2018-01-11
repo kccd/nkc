@@ -92,7 +92,7 @@ const fundApplicationFormSchema = new Schema({
       default: null
     }
   },
-  project: {
+  projectId: {
     type: Number,
 	  default: null,
 	  index: 1
@@ -252,6 +252,15 @@ fundApplicationFormSchema.virtual('applicant')
 		this._applicant = applicant;
 	});
 
+fundApplicationFormSchema.virtual('project')
+	.get(function() {
+		return this._project;
+	})
+	.set(function(project) {
+		this._project = project;
+	});
+
+
 fundApplicationFormSchema.pre('save', function(next) {
   if(!this.timeOfLastRevise) {
     this.timeOfLastRevise = this.timeToCreate;
@@ -286,6 +295,31 @@ fundApplicationFormSchema.methods.extendFund = async function() {
 	const FundModel = require('./FundModel');
 	const fund = await FundModel.findOnly({_id: this.fundId, display: true});
 	return this.fund = fund;
+};
+
+fundApplicationFormSchema.methods.extendProject = async function() {
+	const DocumentModel = require('./DocumentModel');
+	if(this.projectId === null) return null;
+	const project = await DocumentModel.findOne({_id: this.projectId});
+	return this.project = project;
+};
+
+fundApplicationFormSchema.methods.newProject = async function(project) {
+	const DocumentModel = require('./DocumentModel');
+	const SettingModel = require('./SettingModel');
+	const id = await SettingModel.operateSystemID('documents', 1);
+	const {title, content} = project;
+	const newDocument = new DocumentModel({
+		_id: id,
+		t: title,
+		c: content,
+		uid: this.uid,
+		applicationFormsId: this._id,
+		type: 'article',
+		l: 'pwbb'
+	});
+	await newDocument.save();
+	return this.project = newDocument;
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

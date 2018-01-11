@@ -249,3 +249,27 @@ function submitEnsureUsersMessages(id) {
 			})
 	}
 }
+
+function submitProject(id, callback) {
+	var project = {
+		title: $('#projectTitle').val(),
+		content: $('#projectContent').text()
+	};
+	nkcAPI('/fund/a/'+id, 'PATCH', {project, s: 4})
+		.then(function(data) {
+			if(callback === undefined){
+				window.location.reload();
+			} else {
+				callback(data);
+			}
+		})
+		.catch(function(err) {
+			jwarning(err);
+		})
+}
+
+function toEditor(id) {
+	submitProject(id, function(data){
+		window.location.href = '/editor?target=application/p/'+data.applicationForm.projectId;
+	});
+}
