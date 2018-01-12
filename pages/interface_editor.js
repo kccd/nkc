@@ -119,19 +119,19 @@ var nkc_editor = function(){
     if(targetArr[0] === 'post') {
       method = 'PATCH';
       url = '/p/'+targetArr[1];
-      data = {post};
+      data = {post:post};
     } else if(targetArr[0] === 'f') {
       method = 'POST';
       url = '/f/'+targetArr[1];
-      data = {post};
+      data = {post:post};
     } else if(targetArr[0] === 'm') {
       method = 'POST';
       url = '/f/'+forumID+'?mid='+targetArr[1];
-      data = {post};
+      data = {post:post};
     } else if(targetArr[0] === 't') {
 	    method = 'POST';
-	    url = '/t/' + targetArr[1];
-	    data = {post};
+	    url = '/t/'+targetArr[1];
+	    data = {post:post};
     } else if(targetArr[0] === 'application' && targetArr[2] === 'p') {
     	method = 'PATCH';
     	url = '/fund/a/'+targetArr[1];
