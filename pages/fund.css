@@ -17,6 +17,9 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
   color:#ddd;
 }
 a:focus{text-decoration: none}
+.div-textarea:focus{
+  outline: none;
+}
 .fund-list{
   margin: 15px 0;
 }

@@ -129,9 +129,13 @@ var nkc_editor = function(){
       url = '/f/'+forumID+'?mid='+targetArr[1];
       data = {post};
     } else if(targetArr[0] === 't') {
-      method = 'POST';
-      url = '/t/'+targetArr[1];
-      data = {post};
+	    method = 'POST';
+	    url = '/t/' + targetArr[1];
+	    data = {post};
+    } else if(targetArr[0] === 'application' && targetArr[2] === 'p') {
+    	method = 'PATCH';
+    	url = '/fund/a/'+targetArr[1];
+    	data = {project: post, s: 4}
     } else {
       jwarning('未知的请求类型： '+target);
     }

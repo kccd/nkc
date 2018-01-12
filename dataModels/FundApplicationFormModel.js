@@ -308,11 +308,11 @@ fundApplicationFormSchema.methods.newProject = async function(project) {
 	const DocumentModel = require('./DocumentModel');
 	const SettingModel = require('./SettingModel');
 	const id = await SettingModel.operateSystemID('documents', 1);
-	const {title, content} = project;
+	const {t, c} = project;
 	const newDocument = new DocumentModel({
 		_id: id,
-		t: title,
-		c: content,
+		t,
+		c,
 		uid: this.uid,
 		applicationFormsId: this._id,
 		type: 'article',

@@ -123,7 +123,8 @@ applicationRouter
 					projectId: applicationForm.project._id
 				}
 			} else {
-				await applicationForm.project.update({t: project.title, c: project.content})
+				await applicationForm.project.update(project);
+				data.redirect = `/fund/a/${applicationForm._id}/settings?s=4`;
 			}
 		}
 		await applicationForm.update(updateObj);

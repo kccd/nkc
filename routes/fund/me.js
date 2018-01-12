@@ -59,7 +59,6 @@ meRouter
 			const {start, perpage} = paging;
 			data.applicationForms = applicationForms.slice(start, start + perpage);
 		}
-		ctx.print('applicationForms', data.applicationForms);
 		await next();
 	});
 module.exports = meRouter;
