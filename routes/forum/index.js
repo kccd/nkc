@@ -31,7 +31,10 @@ forumRouter
     let q = {
       fid: {$in: fidOfChildForum}
     };
-    if(cat) q.cid = cat;
+    if(cat) {
+      q.cid = cat;
+      data._cid = cat
+    }
     if(digest) {
       q.digest = true;
       data.digest = true;

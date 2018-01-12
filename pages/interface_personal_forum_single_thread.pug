@@ -30,7 +30,7 @@ if thread
         -var title = '';
         -if(user && user.navbarDesc)
           -var navbarDesc = user.navbarDesc;
-          -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+          -title = `${navbarDesc.username}\n学术分 ${navbarDesc.xsf}\n科创币 ${navbarDesc.kcb}\n${navbarDesc.cs}` || `${user.description}`;
         a(href=`/m/${uid}` title=`${title}`)
           img.ForumThreadAvatar(src=`/avatar/${uid}`)
 
@@ -40,7 +40,7 @@ if thread
             - var brief = oc.c.replace(/\[.*?]/g,'').trim().slice(0,100)
             //span.f12.ForumThreadDigestText [精]
             if belong_forum && (belong_forum.fid!==(data.forum?data.forum.fid:null))
-              a.ForumThreadHasImage(style=`background-color:${forumcolor};` href=`/f/${belong_forum.fid}`)
+              a.ForumThreadHasImage(style=`background-color:${forumcolor};` href=`/f/${belong_forum.fid}` title=`${belong_forum.description}`)
                 | #{belong_forum.abbr||belong_forum.displayName}
 
             if threadtype
