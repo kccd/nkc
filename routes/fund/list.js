@@ -12,7 +12,6 @@ listRouter
 	.post('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {fundObj} = ctx.body;
-		ctx.print('newFund', fundObj);
 		fundObj.name = fundObj.name || '科创基金';
 		const fund = await db.FundModel.findOne({_id: fundObj._id});
 		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');

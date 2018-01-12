@@ -10,6 +10,9 @@ $(function() {
 	initTeam();
 	initSelectedUsers();
 	initFundPay();
+	var applicationFormId = $('#applicationFormId').text();
+	applicationFormId = parseInt(applicationFormId);
+	autoSaveProject(applicationFormId);
 });
 
 function init() {
@@ -250,15 +253,15 @@ function submitEnsureUsersMessages(id) {
 	}
 }
 
-function submitProject(id, callback) {
+function saveProject(id, callback) {
 	var project = {
-		title: $('#projectTitle').val(),
-		content: $('#projectContent').text()
+		t: $('#projectTitle').val(),
+		c: $('#projectContent').text()
 	};
 	nkcAPI('/fund/a/'+id, 'PATCH', {project, s: 4})
 		.then(function(data) {
 			if(callback === undefined){
-				window.location.reload();
+				jalert('保存成功！');
 			} else {
 				callback(data);
 			}
@@ -269,7 +272,22 @@ function submitProject(id, callback) {
 }
 
 function toEditor(id) {
-	submitProject(id, function(data){
-		window.location.href = '/editor?target=application/p/'+data.applicationForm.projectId;
+	saveProject(id, function(){
+		window.location.href = '/editor?target=application/'+id+'/p/';
 	});
+}
+
+function submitProject(id) {
+	saveProject(id, function(){
+		window.location.href = '/fund/a/'+id+'/settings?s=5';
+	});
+}
+
+function autoSaveProject(id) {
+	setTimeout(function (){
+		saveProject(id, function() {
+			jalert('自动保存成功！');
+			return autoSaveProject(id);
+		});
+	}, 10000)
 }

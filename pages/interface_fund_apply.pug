@@ -13,6 +13,7 @@ block title
 
 
 block content
+  #applicationFormId(style='display: none')= applicationForm._id
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
@@ -153,8 +154,13 @@ block content
                   input#projectTitle.fund-input(style='font-size: 1.8rem;' value=title autofocus=true)
                   h4 项目内容
                   #projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
-                  button.btn.btn-default(onclick=`submitProject(${applicationForm._id})`) 提交
-                  button.btn.btn-default(onclick=`toEditor(${applicationForm._id})`) 去编辑器
+                  span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
+                  span.fund-span.transparent(onclick=`toEditor(${applicationForm._id})`) 去强大的编辑器
+                .col-xs-12.col-md-3
+                  p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam, animi asperiores commodi corporis culpa cumque esse excepturi facere harum laborum officia perspiciatis rem repellendus saepe similique totam vitae voluptas voluptates!
+              hr
+              .back-next
+                .apply-next(onclick=`submitProject(${applicationForm._id})`) 下一步
 
 
 

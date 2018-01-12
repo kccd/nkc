@@ -20,9 +20,13 @@ editorRouter
       data.original_post = targetPost;
       data.targetUser = await targetPost.extendUser();
       return await next();
-    } else if(target.indexOf('application/p/') === 0) {
-    	const _id = parseInt(target.slice(14));
-	    data.original_post = await db.DocumentModel.findOnly({_id});
+    } else if(target.match(/application\/[0-9]+/)) {
+    	const arr = target.split('/');
+    	const applicationId = parseInt(arr[1]);
+    	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationId});
+    	if(arr[2] === 'p') {
+		    data.original_post = await applicationForm.extendProject();
+	    }
 	    return await next();
     }
     data.original_post = {
