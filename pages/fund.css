@@ -476,7 +476,7 @@ input[type="radio"], input[type="checkbox"]{
   height: 4rem;
   line-height: 4rem;
   text-align: center;
-  width: 15rem;
+  width: 16rem;
   background-color: #aaa;
   margin: 0 0.5rem;
   -webkit-transition: background-color 0.2s;
@@ -738,4 +738,61 @@ input[type="radio"], input[type="checkbox"]{
   color: #777;
   margin: 0.5rem 0;
   padding: 0.5rem
+}
+.autoSaveTime{
+  color: #aaa;
+  display: none;
+}
+#budgetMoney{
+  padding: 1rem 0;
+  background-color: #efefef;
+}
+.fund-money-list{
+  padding: 0.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.fund-money-list.head > div{
+  float: left;
+  width: 25%;
+  border: none;
+  padding: 0.5rem 0.5rem;
+  background-color: transparent;
+}
+.fund-money-list > div{
+  float: left;
+  padding: 0.5rem 0.5rem;
+  width: 25%;
+  border: 1px solid #dedede;
+  background-color: #fff;
+}
+.aggregate{
+  padding-left: 0.5rem;
+}
+.fund-money-list > .delete{
+  position: absolute;
+  height: 2.5rem;
+  width: 2.5rem;
+  padding: 0;
+  line-height: 2.5rem;
+  text-align: center;
+  right: 0.7rem;
+  top: 0.4rem;
+  border: none;
+  color: #fff;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-transition: color 0.2s, background-color 0.2s;
+  -moz-transition: color 0.2s, background-color 0.2s;
+  -ms-transition: color 0.2s, background-color 0.2s;
+  -o-transition: color 0.2s, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
+}
+.fund-money-list > .delete.disabled{
+  display: none;
+}
+.fund-money-list > .delete:hover{
+  color: #fff;
+  background-color: rgba(0,0,0,0.8);
 }

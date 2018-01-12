@@ -52,14 +52,16 @@ const fundApplicationFormSchema = new Schema({
     default: []
     /*
     {
-      purpose: [String],
-      money: [Number]
+      purpose: String,
+      money: Number,
+      count: Number,
+			total: Number
     }
     */
   },
   projectCycle: { // 预计周期
 	  type: [Number],
-	  default: [],
+	  default: [null],
 	  index: 1
   },
   threads: {

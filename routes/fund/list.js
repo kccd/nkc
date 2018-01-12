@@ -34,7 +34,6 @@ listRouter
 		const {fundId} = ctx.params;
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
-		console.log(fundObj);
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
