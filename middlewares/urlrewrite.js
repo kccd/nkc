@@ -1,6 +1,6 @@
 const rs = [
-  {map:/^\/read\.php\?.*tid=([0-9]{1,10})/,to:'/redirect_t/$1'},
-  {map:/^\/index\.php\?.*fid=([0-9]{1,10})/,to:'/redirect_f/$1'},
+  {map:/^\/read\.php\?.*tid=([0-9]{1,10})/,to:'/t/$1'},
+  {map:/^\/index\.php\?.*fid=([0-9]{1,10})/,to:'/f/$1'},
 
 ];
 
