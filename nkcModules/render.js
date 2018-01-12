@@ -150,7 +150,8 @@ let pugRender = (template, data) => {
   options.data = data;
   options.filters = filters;
   options.pretty = true; // 保留换行
-  options.cache = true;
+  if(process.env.NODE_ENV === 'production')
+    options.cache = true;
   //options.self = true;
   return pug.renderFile(template, options);
 };
