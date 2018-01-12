@@ -7,7 +7,7 @@ const app = new Koa();
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
 const {permissions} = require('./nkcModules');
-const {init, cookieIdentify, body, scoreHandler} = require('./middlewares');
+const {init, cookieIdentify, body, scoreHandler, urlrewrite} = require('./middlewares');
 const settings = require('./settings');
 
 try {
@@ -25,6 +25,7 @@ app.use(async (ctx, next) => {
   ctx.body = ctx.request.body;
   await next()
 });
+app.use(urlrewrite);
 app.use(staticServe('./pages'));
 app.use(staticServe('./node_modules'));
 app.use(staticServe('./nkcModules'));
