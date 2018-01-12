@@ -57,7 +57,7 @@ applicationRouter
 	})
 	.patch('/:_id', async (ctx, next) => {
 		const {data, db, body, params} = ctx;
-		const {newMembers, account, newApplicant, s, project} = body;
+		const {newMembers, account, newApplicant, s, project, projectCycle, budgetMoney} = body;
 		data.s = s;
 		const {user, applicationForm} = data;
 		const {_id} = params;
@@ -126,6 +126,9 @@ applicationRouter
 				await applicationForm.project.update(project);
 				data.redirect = `/fund/a/${applicationForm._id}/settings?s=4`;
 			}
+		}
+		if (s === 5) {
+			await applicationForm.update({projectCycle, budgetMoney});
 		}
 		await applicationForm.update(updateObj);
 		await next();

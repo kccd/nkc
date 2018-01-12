@@ -5,7 +5,7 @@ block title
   -const {applicationForm, s} = data;
   -const mainContainer1400 = true
   -const {idCard, lifePhotos, idCardPhotos, handheldIdCardPhoto} = fund.applicant;
-  -const {status, members, applicant, project} = applicationForm;
+  -const {status, members, applicant, project, budgetMoney, projectCycle} = applicationForm;
   -const {chooseType, inputApplicantMessages, inputProjectMessages, ensureUsersMessages, inputProjectContent, submit} = status;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
@@ -22,7 +22,7 @@ block content
           .panel-body
             .nav-link.center-block
               ul
-                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'ensureUsersMessages', ch: '第3步、人员确认'},{en: 'inputProjectContent', ch: '第4步、填写项目内容'},{en: 'inputProjectMessages', ch: '第5步、填写项目基本信息'},{en: 'submit', ch: '第6步、提交申请'}];
+                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'ensureUsersMessages', ch: '第3步、人员确认'},{en: 'inputProjectContent', ch: '第4步、填写项目内容'},{en: 'inputProjectMessages', ch: '第5步、填写项目其他信息'},{en: 'submit', ch: '第6步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
                   if i === 0
                     li
@@ -156,11 +156,58 @@ block content
                   #projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
                   span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
                   span.fund-span.transparent(onclick=`toEditor(${applicationForm._id})`) 去强大的编辑器
-                .col-xs-12.col-md-3
-                  p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam, animi asperiores commodi corporis culpa cumque esse excepturi facere harum laborum officia perspiciatis rem repellendus saepe similique totam vitae voluptas voluptates!
+                  span &nbsp;&nbsp;
+                  span.autoSaveTime#saveTime 0秒
+                  span.autoSaveTime 后自动保存
+
+
+
               hr
               .back-next
                 .apply-next(onclick=`submitProject(${applicationForm._id})`) 下一步
+            else if s === 5 && inputProjectContent !== null
+              .row
+                .col-xs-12.col-md-6.col-md-offset-3
+                  br
+                  h4 研究周期
+                    small （天）
+                  input.fund-input#projectCycle(value=projectCycle[0] !== null? projectCycle[0]: '' key=projectCycle.join(','))
+                  h4 资金用途
+                  if fund.money.fixed !== null
+                    span 常用：
+                    span.fund-span 购买电子元器件
+                    span.fund-span 印电路板
+                    textarea.fund-textarea(style='height: 20rem;')
+                  else
+                    #budgetMoney
+                      -let aggregate = 0;
+                      .fund-money-list.head
+                        .purpose 用途
+                        .count 数量
+                        .money 单价(元)
+                        .total 合计(元)
+                      .list
+                        if budgetMoney.length === 0
+                          .blank(style="color: #ccc;line-height: 4rem;") 暂无数据
+                        else
+                          -for (let i = 0; i < budgetMoney.length; i++)
+                            -let total = (budgetMoney[i].count*budgetMoney[i].money);
+                            -aggregate += total;
+                            .fund-money-list(num= i)
+                              .purpose(contenteditable=true num= i)= budgetMoney[i].purpose
+                              .count(contenteditable=true num= i)= budgetMoney[i].count
+                              .money(contenteditable=true num= i)= budgetMoney[i].money
+                              .total= total
+                              .delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteList(${i})`)
+                      #aggregate(style='margin-left: 0.5rem;')=budgetMoney.length !== 0? `总计：${aggregate}元`: ''
+                    .button
+                      span.fund-span.transparent(style='margin-left: 0;' onclick='addList()') 添加
+                      span.fund-span.transparent(onclick='editor()') 编辑
+                      span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
+
+
+
+
 
 
 

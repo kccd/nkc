@@ -1,10 +1,14 @@
 // 团队申请/个人申请
 var selectedUsers = [];
 var getUsers = [];
-
+// 项目其他信息
+var projectCycle = [];
+var budgetMoney = [];
 // 填写个人信息
 var payMethod = '';
 
+// 自动保存间隔
+var timeToAutoSave = 5*60; // 秒
 $(function() {
 	init();
 	initTeam();
@@ -13,6 +17,9 @@ $(function() {
 	var applicationFormId = $('#applicationFormId').text();
 	applicationFormId = parseInt(applicationFormId);
 	autoSaveProject(applicationFormId);
+	initProjectCycle();
+	initBudgetMoney();
+	onContentChange();
 });
 
 function init() {
@@ -258,7 +265,7 @@ function saveProject(id, callback) {
 		t: $('#projectTitle').val(),
 		c: $('#projectContent').text()
 	};
-	nkcAPI('/fund/a/'+id, 'PATCH', {project, s: 4})
+	nkcAPI('/fund/a/'+id, 'PATCH', {project: project, s: 4})
 		.then(function(data) {
 			if(callback === undefined){
 				jalert('保存成功！');
@@ -284,10 +291,163 @@ function submitProject(id) {
 }
 
 function autoSaveProject(id) {
-	setTimeout(function (){
-		saveProject(id, function() {
-			jalert('自动保存成功！');
-			return autoSaveProject(id);
-		});
-	}, 10000)
+	if($('.autoSaveTime').text() !== '') {
+		$('.autoSaveTime').css('display', 'inline');
+		var n = -1;
+		var loop = function() {
+			n++;
+			setTimeout(function() {
+				displayTimeToSave(timeToAutoSave-n);
+				if(n < timeToAutoSave) { // 时间未到
+					return loop();
+				} else { // 时间到
+					saveProject(id, function() {
+						jalert('自动保存成功！');
+						return autoSaveProject(id);
+					});
+				}
+			}, 1000)
+		};
+		loop();
+	}
+}
+
+function displayTimeToSave(time) {
+	$('#saveTime').text(time+'秒');
+}
+
+
+function initBudgetMoney() {
+	var length = $('.list .fund-money-list').length;
+	var newArr = [];
+	for (var i = 0; i < length; i++){
+		newArr.push({
+			purpose: getText('purpose', i),
+			count: getText('count', i),
+			money: getText('money', i)
+		})
+	}
+	budgetMoney = newArr;
+}
+
+function getText(klass, i) {
+	var text = $('.'+klass+'[num='+i+']').text();
+	if(klass !== 'purpose') {
+		return parseInt(text);
+	}
+	return text;
+}
+
+function initProjectCycle() {
+	var str = $('#projectCycle').attr('key');
+	if(str){
+		var arr = str.split(',');
+		for(var i = 0; i < arr.length; i++){
+			if(i === 0 && arr[0] === ''){
+				arr[0] = null;
+			} else {
+				arr[i] = parseInt(arr[i]);
+			}
+		}
+		projectCycle = arr;
+	}
+}
+
+function readProjectValue() {
+	var time = $('#projectCycle').val();
+	time = parseInt(time);
+	if(time <= 0) {
+		return jwarning('研究周期不能小于0天');
+	}
+	projectCycle[0] = time;
+}
+
+function displayPurpose(disabled) {
+	var html = '';
+	var aggregate = 0;
+	var length = budgetMoney.length;
+	if (length === 0) {
+		$('#aggregate').text('');
+		html = '<div class="blank" style="color: #ccc;line-height: 4rem;">暂无数据</div>';
+	} else {
+		for (var i = 0; i < length; i++) {
+			var m = budgetMoney[i];
+			m.i = i;
+			html += fundMoneyList(m, disabled);
+			aggregate += (m.count*m.money);
+			m.i = undefined;
+		}
+		$('#aggregate').text('总计：'+aggregate+'元');
+	}
+	$('#budgetMoney .list').html(html);
+}
+
+function editor() {
+	initBudgetMoney();
+	var arr = $('.fund-money-list .delete');
+	if(arr.length === 0) return;
+	if(arr.eq(0).hasClass('disabled')) {
+		$('.fund-money-list .delete').removeClass('disabled');
+	} else {
+		$('.fund-money-list .delete').addClass('disabled');
+	}
+}
+function deleteList(num) {
+	initBudgetMoney();
+	budgetMoney.splice(num, 1);
+	displayPurpose();
+}
+
+function addList() {
+	initBudgetMoney();
+	$('.delete').addClass('disabled');
+	var obj = {
+		money: 0,
+		count: 0,
+		purpose: '新建'+(budgetMoney.length+1)
+	};
+	budgetMoney.push(obj);
+	displayPurpose(true);
+	onContentChange();
+}
+
+function fundMoneyList(obj, disabled) {
+	var purpose = obj.purpose;
+	var count = obj.count;
+	var money = obj.money;
+	var total = count*money;
+	var i = obj.i;
+	var dis = '';
+	if(disabled === true) dis = 'disabled';
+	return '<div class="fund-money-list" num='+i+'><div class="purpose" contenteditable=true num='+i+'>'+purpose+'</div><div class="count" contenteditable=true num='+i+'>'+count+'</div><div class="money" contenteditable=true num='+i+'>'+money+'</div><div class="total" num='+i+'>'+total+'</div><div class="delete glyphicon glyphicon-remove '+dis+'" onclick="deleteList('+i+')"></div></div>';
+}
+
+function onContentChange() {
+	$('.purpose, .count, .money').unbind();
+	$('.purpose, .count, .money').one('blur', function(){
+		initBudgetMoney();
+		displayPurpose(true);
+		onContentChange();
+	})
+}
+
+function  saveBudgetMoney(id, callback) {
+	initBudgetMoney();
+	readProjectValue();
+	var obj = {
+		projectCycle: projectCycle,
+		budgetMoney: budgetMoney,
+		s: 5
+	};
+	nkcAPI('/fund/a/'+id, 'PATCH', obj)
+		.then(function(data) {
+			if(callback !== undefined) {
+				callback(data);
+			} else {
+				jalert('保存成功！');
+			}
+		})
+		.catch(function(err) {
+			jwarning(err);
+		})
 }

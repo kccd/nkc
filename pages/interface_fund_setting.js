@@ -347,7 +347,7 @@ function submit(id) {
     url = '/fund/list/'+ id;
     method = 'PATCH';
   }
-  nkcAPI(url, method, {fundObj})
+  nkcAPI(url, method, {fundObj: fundObj})
     .then(function(){
 	    window.location.href = '/fund/m';
     })
