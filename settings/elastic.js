@@ -58,8 +58,6 @@ es.indexUser = function(user) {
 
 es.updateUser = function(user) {
   const {uid, description, username} = user;
-  console.log(description)
-  console.log(username)
   return client.update({
     index: userIndex,
     type: userIndex,
@@ -74,8 +72,8 @@ es.updateUser = function(user) {
 };
 
 es.updatePost = function(post) {
-  const {pid, t, c} = post;
-  return client.update({
+	const {pid, t, c} = post;
+	return client.update({
     index: postIndex,
     type: postIndex,
     id: pid,

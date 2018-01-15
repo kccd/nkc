@@ -50,7 +50,7 @@ mongoose.plugin(function(schema) {
 });
 
 process.on('unhandledRejection', (e, promise) => {
-  console.error(e.stack + '\n' + promise)
+  console.error('unhandledRejection:\n' + e.stack + '\n' + promise)
 });
 
 module.exports = mongoose;

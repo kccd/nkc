@@ -114,9 +114,11 @@ otherRouter
 	.get('index.php', async (ctx, next) => {
 		const {fid} = ctx.query;
 		if(fid) {
-			return ctx.redirect(`/f/${fid}`);
+			ctx.redirect(`/f/${fid}`);
+			return next()
 		}
-		return ctx.redirect(`/`);
+		ctx.redirect(`/`);
+		return next()
 	})
 	.get('read.php', async (ctx, next) => {
 		const {tid} = ctx.query;

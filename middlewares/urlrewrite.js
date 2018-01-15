@@ -11,7 +11,8 @@ module.exports = (ctx, next) => {
   });
   if(res) {
     redirectUrl = url.replace(res.map, res.to);
-    return ctx.redirect(redirectUrl, 301)
+    ctx.redirect(redirectUrl, 301);
+    return next()
   }
   return next()
 };

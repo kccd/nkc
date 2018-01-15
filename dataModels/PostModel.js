@@ -243,7 +243,7 @@ postSchema.pre('save', async function(next) {
   }
 
   this.hasImage = hasImage;
-  return next()
+	return next()
 });
 
 postSchema.pre('save', async function(next) {
@@ -257,7 +257,7 @@ postSchema.pre('save', async function(next) {
     // this is a old post, and we should check if its title or content has changed,
     // update the doc in elasticsearch when the attribute has changed
     await updatePost(this);
-    return next()
+	  return next()
   } else
     return next()
 });
