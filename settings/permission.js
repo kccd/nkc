@@ -303,6 +303,7 @@ const certificates ={
         }
       },
       t: {
+      	// [GET]: true,
         [parameter]: {
           [POST]: true,
           addColl: {

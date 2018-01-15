@@ -2,7 +2,7 @@
 var selectedUsers = [];
 var getUsers = [];
 // 项目其他信息
-var projectCycle = [];
+var projectCycle = '';
 var budgetMoney = [];
 // 填写个人信息
 var payMethod = '';
@@ -17,11 +17,18 @@ $(function() {
 	var applicationFormId = $('#applicationFormId').text();
 	applicationFormId = parseInt(applicationFormId);
 	autoSaveProject(applicationFormId);
-	initProjectCycle();
 	initBudgetMoney();
 	onContentChange();
+	initAddPurpose();
+	initThreadsList();
 });
 
+//已选帖子
+var selectedThreads = [];
+// 临时存放加载的帖子
+var tempThreads = [];
+//禁止滚动
+var fixedFn;
 function init() {
 	$('#team').on('click', function() {
 		teamDisplay();
@@ -338,20 +345,6 @@ function getText(klass, i) {
 	return text;
 }
 
-function initProjectCycle() {
-	var str = $('#projectCycle').attr('key');
-	if(str){
-		var arr = str.split(',');
-		for(var i = 0; i < arr.length; i++){
-			if(i === 0 && arr[0] === ''){
-				arr[0] = null;
-			} else {
-				arr[i] = parseInt(arr[i]);
-			}
-		}
-		projectCycle = arr;
-	}
-}
 
 function readProjectValue() {
 	var time = $('#projectCycle').val();
@@ -359,7 +352,7 @@ function readProjectValue() {
 	if(time <= 0) {
 		return jwarning('研究周期不能小于0天');
 	}
-	projectCycle[0] = time;
+	projectCycle = time;
 }
 
 function displayPurpose(disabled) {
@@ -446,6 +439,169 @@ function  saveBudgetMoney(id, callback) {
 			} else {
 				jalert('保存成功！');
 			}
+		})
+		.catch(function(err) {
+			jwarning(err);
+		})
+}
+
+function initAddPurpose() {
+	$('.addPurpose').on('click', function() {
+		var text = $(this).text();
+		if($('#purpose').val() !== '') {
+			text = '，' + text;
+		}
+		$('#purpose').val($('#purpose').val() + text);
+	});
+}
+
+function savePurpose(id) {
+	readProjectValue();
+	var purpose = $('#purpose').val();
+	nkcAPI('/fund/a/'+ id, 'PATCH', {s: 5, projectCycle: projectCycle, budgetMoney: purpose})
+		.then(function(data) {
+			jalert('保存成功！');
+		})
+		.catch(function(err) {
+			jwarning(err);
+		})
+}
+
+function compute() {
+	initBudgetMoney();
+	displayPurpose(true);
+}
+
+//显示添加帖子的面板
+function displayPopupPanel() {
+	$('.popupPanel').removeClass('disabled');
+	var scrollTop = $(window).scrollTop();
+	fixedFn = disabledRolling;
+	$(window).scroll(function() {
+		fixedFn(scrollTop);
+	})
+}
+
+//隐藏添加帖子的面板
+function disappearPopupPanel() {
+	$('.popupPanel').addClass('disabled');
+	fixedFn = function(){};
+}
+
+// 生成帖子列表html字符串
+function createThreadsList(arr, type, disabled) {//add, remove
+	var functionName = '', iconClass = '';
+	if(disabled === true) {
+		disabled = 'disabled';
+	} else {
+		disabled = '';
+	}
+	if(type === 'add') {
+		functionName = 'addThread';
+		iconClass = 'glyphicon glyphicon-plus';
+	} else {
+		functionName = 'deleteThread';
+		iconClass = 'glyphicon glyphicon-remove';
+	}
+	var html = '';
+	for(var i = 0; i < arr.length; i++) {
+		var obj = arr[i];
+		var tid = obj.tid;
+		var uid = obj.uid;
+		var pid = obj.pid;
+		var username = obj.username;
+		var t = obj.t;
+		var toc = obj.toc;
+		var postString = JSON.stringify(obj);
+		var contentDiv = '<div class="col-xs-10 col-md-10"><div class="postString displayNone">'+postString+'</div><span>文号：</span><span class="threadNumber">'+pid+'&nbsp;&nbsp;</span><a href="/m/'+uid+'" target="_blank">'+username+'</a><span>&nbsp;发表于 '+ toc +'</span><br><a href="/t/'+tid+'" target="_blank">'+t+'</a></div>';
+		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+i+')"></div>'
+		html += '<div class="threadList">'+contentDiv+btnDiv+'</div>';
+	}
+	return html;
+}
+
+//禁止屏幕滚动
+function disabledRolling(num){
+	$(window).scrollTop(num);
+}
+//初始化已选帖子列表
+function initThreadsList() {
+	var arr = $('.selectedThreads .threadList .postString');
+	var length = arr.length;
+	for (var i = 0; i < length; i++) {
+		var text = arr.eq(i).text();
+		var obj = JSON.parse(text);
+		selectedThreads.push(obj);
+	}
+}
+// 渲染帖子列表
+function displayThreadsList(id, arr, disabled, type) {
+	var html;
+	if (type === 'add') {
+		html = createThreadsList(arr, 'add', disabled);
+	} else {
+		html = createThreadsList(arr, 'delete', disabled);
+	}
+	if(html === '') {
+		html = '<div class="blank blank-selectedThread">暂无数据</div>';
+		$(id).html();
+	}
+	$(id).html(html);
+}
+
+//显示帖子列表删除按钮
+function displayDeleteThreadBtn() {
+	if($('.selectedThreads .delete').eq(0).hasClass('disabled')) {
+		$('.selectedThreads .delete').removeClass('disabled');
+	} else {
+		$('.selectedThreads .delete').addClass('disabled');
+	}
+}
+
+//删除帖子
+function deleteThread(index) {
+	selectedThreads.splice(index, 1);
+	displayThreadsList('.selectedThreads', selectedThreads, false, 'delete');
+}
+
+//添加帖子
+function addThread(index) {
+	var thread = tempThreads[index];
+	var flag = false;
+	for (var i = 0; i < selectedThreads.length; i++) {
+		if(selectedThreads[i].tid === thread.tid) {
+			flag = true;
+			break;
+		}
+	}
+	if(!flag) {
+		selectedThreads.push(thread);
+		displayThreadsList('.selectedThreads', selectedThreads, true, 'delete');
+		return jalert('添加成功！');
+	} else {
+		return jwarning('该贴子已在已选列表中，不需要重复添加！');
+	}
+}
+
+//加载帖子
+function getThreads(applicationFormId,self) {
+	var url;
+	if(self === undefined) {
+		var keywords = $('#searchThread').val();
+		if(keywords === '') return jwarning('输入不能为空！');
+		url = '/t?from=applicationForm&applicationFormId='+applicationFormId+'&keywords='+keywords;
+	} else {
+		url = '/t?from=applicationForm&self=true';
+	}
+	var html = '<div class="blank blank-selectedThread">搜索中...</div>';
+	$('.unselectedThreads').html(html);
+	nkcAPI(url, 'GET', {})
+		.then(function(data) {
+			tempThreads = data.threads;
+			if(tempThreads.length === 0) {
+				return jalert('什么也没找到...');
+			}
+			displayThreadsList('.unselectedThreads', tempThreads, false, 'add');
 		})
 		.catch(function(err) {
 			jwarning(err);

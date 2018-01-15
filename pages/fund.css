@@ -20,6 +20,8 @@ a:focus{text-decoration: none}
 .div-textarea:focus{
   outline: none;
 }
+
+
 .fund-list{
   margin: 15px 0;
 }
@@ -133,38 +135,6 @@ input[type="radio"], input[type="checkbox"]{
   background-color: rgba(0,0,0,0);
   border-color: #337ab7;
   color: #337ab7;
-}
-#threadList{
-  padding: 1rem 0;
-}
-.thread-list-title{
-  padding: 0;
-  font-size: 1.5rem;
-}
-.thread-list-title > span{
-  font-size: 1.5rem;
-}
-.thread-list-body{
-  overflow: hidden;
-}
-.thread-list-body .glyphicon{
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-.thread-list-body .glyphicon-plus-sign{
-  color: green;
-}
-.thread-list-body .glyphicon-minus-sign{
-  color: red;
-}
-.thread-list-page{
-  padding-left: 0;
-}
-.thread-list-page > ul > li {
-  float: left;
-  list-style: none;
-  margin: 0 0.5rem;
-  margin-left: 0;
 }
 .idCardPhoto{
   width: 100%;
@@ -304,6 +274,7 @@ input[type="radio"], input[type="checkbox"]{
   width: 100%;
   outline:none;
   font-size: 1.5rem;
+  padding: 0.3rem;
   color: #777;
   margin: 1rem 0;
 }
@@ -330,6 +301,7 @@ input[type="radio"], input[type="checkbox"]{
   width: 20%;
   background-color: #fff;
   border: 1px solid #aaa;
+  padding: 0.3rem 0.5rem;
 }
 .fund-span {
   padding: 0 0.8rem;
@@ -743,7 +715,7 @@ input[type="radio"], input[type="checkbox"]{
   color: #aaa;
   display: none;
 }
-#budgetMoney{
+#budgetMoney, .selectedThreads, .unselectedThreads{
   padding: 1rem 0;
   background-color: #efefef;
 }
@@ -769,7 +741,7 @@ input[type="radio"], input[type="checkbox"]{
 .aggregate{
   padding-left: 0.5rem;
 }
-.fund-money-list > .delete{
+.fund-money-list > .delete, .threadList .delete{
   position: absolute;
   height: 2.5rem;
   width: 2.5rem;
@@ -780,7 +752,7 @@ input[type="radio"], input[type="checkbox"]{
   top: 0.4rem;
   border: none;
   color: #fff;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0,0,0,0.3);
   border-radius: 50%;
   cursor: pointer;
   -webkit-transition: color 0.2s, background-color 0.2s;
@@ -789,10 +761,104 @@ input[type="radio"], input[type="checkbox"]{
   -o-transition: color 0.2s, background-color 0.2s;
   transition: color 0.2s, background-color 0.2s;
 }
-.fund-money-list > .delete.disabled{
+.fund-money-list > .delete.disabled, .threadList .delete.disabled{
   display: none;
 }
-.fund-money-list > .delete:hover{
+.fund-money-list > .delete:hover, .threadList .delete:hover{
   color: #fff;
   background-color: rgba(0,0,0,0.8);
+}
+/*弹出框*/
+.popupPanel{
+  position: fixed;
+  background-color: rgba(0,0,0,0.2);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 11;
+  overflow: hidden;
+}
+.popupPanel.disabled{
+  display: none;
+}
+.popupPanel-title{
+  background-color: #fefefe;
+  height: 6rem;
+  overflow: hidden;
+  line-height: 6rem;
+  text-align: center;
+  font-size: 2rem;
+  color: #777;
+}
+.popupPanel-body{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 60rem;
+  height: 60rem;
+  background-color: #fff;
+  box-shadow: 0px 0px 20px #888;
+}
+.popupPanel-close{
+  height: 3rem;
+  width: 3rem;
+  font-size: 2rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #aaa;
+  line-height: 3rem;
+  text-align: center;
+  background-color: rgba(0,0,0,0);
+  cursor: pointer;
+  -webkit-transition: color 0.2s, background-color 0.2s;
+  -moz-transition: color 0.2s, background-color 0.2s;
+  -ms-transition: color 0.2s, background-color 0.2s;
+  -o-transition: color 0.2s, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.popupPanel-close:hover{
+  background-color: #000;
+  color: #fff;
+}
+
+.threadList{
+  overflow: hidden;
+  position: relative;
+}
+.threadList .threadNumber {
+  font-weight: 700;
+  color: #777;
+}
+.threadList a{
+  /*color: #555;*/
+  color: #2aabd2;
+  font-weight: 700;
+}
+.threadList{
+  background-color: #fff;
+  padding: 0.3rem 0;
+  margin: 0.5rem 0.4rem;
+  border: 1px solid #dedede;
+}
+
+.displayNone{
+  display: none;
+}
+
+.blank-selectedThread{
+  line-height: 4rem;
+  color: #ccc;
+}
+
+@media screen and (max-width: 768px) {
+  .popupPanel-body{
+    width: 100%;
+    height: 80%;
+  }
 }

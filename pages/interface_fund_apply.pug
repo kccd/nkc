@@ -5,7 +5,7 @@ block title
   -const {applicationForm, s} = data;
   -const mainContainer1400 = true
   -const {idCard, lifePhotos, idCardPhotos, handheldIdCardPhoto} = fund.applicant;
-  -const {status, members, applicant, project, budgetMoney, projectCycle} = applicationForm;
+  -const {status, members, applicant, project, budgetMoney, projectCycle, threads} = applicationForm;
   -const {chooseType, inputApplicantMessages, inputProjectMessages, ensureUsersMessages, inputProjectContent, submit} = status;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
@@ -171,13 +171,14 @@ block content
                   br
                   h4 研究周期
                     small （天）
-                  input.fund-input#projectCycle(value=projectCycle[0] !== null? projectCycle[0]: '' key=projectCycle.join(','))
+                  input.fund-input#projectCycle(value=projectCycle !== null? projectCycle: '' )
                   h4 资金用途
                   if fund.money.fixed !== null
                     span 常用：
-                    span.fund-span 购买电子元器件
-                    span.fund-span 印电路板
-                    textarea.fund-textarea(style='height: 20rem;')
+                    span.fund-span.addPurpose 购买电子元器件
+                    span.fund-span.addPurpose 印电路板
+                    textarea.fund-textarea#purpose(style='height: 20rem;margin-bottom: 0;')= typeof(budgetMoney[0]) === 'string'? budgetMoney: ''
+                    span.fund-span.transparent(onclick=`savePurpose(${applicationForm._id})` style='margin-left: 0;') 保存
                   else
                     #budgetMoney
                       -let aggregate = 0;
@@ -187,7 +188,7 @@ block content
                         .money 单价(元)
                         .total 合计(元)
                       .list
-                        if budgetMoney.length === 0
+                        if budgetMoney.length === 0 || typeof(budgetMoney[0]) === 'string'
                           .blank(style="color: #ccc;line-height: 4rem;") 暂无数据
                         else
                           -for (let i = 0; i < budgetMoney.length; i++)
@@ -199,11 +200,63 @@ block content
                               .money(contenteditable=true num= i)= budgetMoney[i].money
                               .total= total
                               .delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteList(${i})`)
-                      #aggregate(style='margin-left: 0.5rem;')=budgetMoney.length !== 0? `总计：${aggregate}元`: ''
+                      #aggregate(style='margin-left: 0.5rem;')=(budgetMoney.length !== 0 && typeof(budgetMoney[0]) !== 'string')? `总计：${aggregate}元`: ''
                     .button
                       span.fund-span.transparent(style='margin-left: 0;' onclick='addList()') 添加
                       span.fund-span.transparent(onclick='editor()') 编辑
+                      span.fund-span.transparent(onclick='compute()') 计算
                       span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
+                  if fund.thread.count > 0
+                    br
+                    h4 附带帖子
+                    .popupPanel.disabled
+                      .popupPanel-body
+                        .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
+                        .popupPanel-title 添加帖子
+                        .popupPanel-content
+                          .col-xs-12.col-md-12
+                            .form
+                              input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
+                              input.fund-submit(onclick=`getThreads(${applicationForm._id})` type='submit' value='搜索')
+                            span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(${applicationForm._id}, true)`) 我的帖子
+                            .unselectedThreads
+                              .blank.blank-selectedThread 暂无数据
+                            nav(aria-label='navigation')
+                              ul.pagination.pagination-sm
+                                li
+                                  a 1
+                                li
+                                  a 2
+                    h5 已选择的帖子
+                    .selectedThreads
+                      if threads.applying.length === 0
+                        .blank.blank-selectedThread 暂无数据
+                      else
+                        -for(let i = 0; i < threads.applying.length; i++)
+                          -const thread = threads.applying[i];
+                          -const firstPost = thread.firstPost;
+                          -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+                          -postString = JSON.stringify(postString);
+                          .threadList
+                            .col-xs-10.col-md-10
+                              .displayNone.postString= postString
+                              span 文号：
+                              span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                              a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                              span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                              br
+                              a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+                            .col-xs-2.col-md-2.delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteThread(${i})`)
+                    .span.fund-span.transparent(onclick='displayDeleteThreadBtn()') 编辑
+                    .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
+                    .span.fund-span.transparent 保存
+                    .unselectedThread
+                      .threadList
+
+
+
+
+
 
 
 

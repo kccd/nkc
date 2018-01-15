@@ -6,6 +6,52 @@ const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 
 threadRouter
+	.get('/', async (ctx, next) => {
+		const {data, db, query} = ctx;
+		const {user} = data;
+		const {from, keywords, applicationFormId, self} = query;
+		if(from === 'applicationForm') {
+			const outPostObj = (post) => {
+				return {
+					toc: post.toc.toLocaleString(),
+					tid: post.tid,
+					username: post.user.username,
+					uid: post.uid,
+					t: post.t,
+					pid: post.pid
+				}
+			};
+			const threads = [];
+			let targetThreads = [];
+			if(self === 'true') {
+				targetThreads = await db.ThreadModel.find({uid: user.uid, disabled: false}).sort({toc: -1});
+			} else {
+				const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
+				const users = await applicationForm.extendMembers();
+				const usersId = users.map(u => u.uid);
+				usersId.push(user.uid);
+				const post = await db.PostModel.findOne({pid: keywords, uid: {$in: usersId}, disabled: false});
+				if(post !== null) {
+					await post.extendThread();
+					if(post.pid === post.thread.oc) {
+						await post.extendUser();
+						threads.push(outPostObj(post));
+					}
+				}
+				const targetUser = await db.UserModel.findOne({usernameLowerCase: keywords.toLowerCase()});
+				if(targetUser !== null && usersId.includes(targetUser.uid)) {
+					targetThreads = await db.ThreadModel.find({uid: targetUser.uid, disabled: false}).sort({toc: -1});
+				}
+			}
+			await Promise.all(targetThreads.map(async t => {
+				const post = await t.extendFirstPost();
+				await post.extendUser();
+				threads.push(outPostObj(post));
+			}));
+			data.threads = threads;
+		}
+		await next();
+	})
   .get('/:tid', async (ctx, next) => {
     const {data, params, db, query} = ctx;
     let {page = 0, pid, last_page, highlight} = query;

@@ -8,6 +8,7 @@ applicationRouter
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant();
 		await applicationForm.extendProject();
+		await applicationForm.extendThreads();
 		const fund = await applicationForm.extendFund();
 		data.applicationForm = applicationForm;
 		data.fund = fund;

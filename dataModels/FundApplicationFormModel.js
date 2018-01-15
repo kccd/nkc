@@ -48,8 +48,8 @@ const fundApplicationFormSchema = new Schema({
     index: 1
   },
   budgetMoney: { // 预算
-    type: [Schema.Types.Mixed],
-    default: []
+    type: Schema.Types.Mixed,
+    default: null
     /*
     {
       purpose: String,
@@ -60,26 +60,26 @@ const fundApplicationFormSchema = new Schema({
     */
   },
   projectCycle: { // 预计周期
-	  type: [Number],
-	  default: [null],
+	  type: Number,
+	  default: null,
 	  index: 1
   },
-  threads: {
-  	start: {// 申请时附带的帖子
+  threadsId: {
+  	applying: {// 申请时附带的帖子
 		  type: [String],
 		  default:[]
 	  },
-	  end: { // 结项时附带的帖子
+	  completed: { // 结项时附带的帖子
 		  type: [String],
 		  default:[]
 	  }
   },
-  papers: {
-	  start: {
+  papersId: {
+	  applying: {
 		  type: [String],
 		  default:[]
 	  },
-	  end: {
+	  completed: {
 		  type: [String],
 		  default:[]
 	  }
@@ -262,6 +262,14 @@ fundApplicationFormSchema.virtual('project')
 		this._project = project;
 	});
 
+fundApplicationFormSchema.virtual('threads')
+	.get(function() {
+		return this._threads;
+	})
+	.set(function(threads) {
+		this._threads = threads;
+	});
+
 
 fundApplicationFormSchema.pre('save', function(next) {
   if(!this.timeOfLastRevise) {
@@ -304,6 +312,23 @@ fundApplicationFormSchema.methods.extendProject = async function() {
 	if(this.projectId === null) return null;
 	const project = await DocumentModel.findOne({_id: this.projectId});
 	return this.project = project;
+};
+
+fundApplicationFormSchema.methods.extendThreads = async function() {
+	const ThreadModel = require('./ThreadModel');
+	const {threadsId} = this;
+	const threads = {};
+	const applying = await ThreadModel.find({tid: {$in: threadsId.applying}});
+	const completed = await ThreadModel.find({tid: {$in: threadsId.completed}});
+	threads.applying = await Promise.all(applying.map(async t => {
+		await t.extendFirstPost().then(p => p.extendUser());
+		return t;
+	}));
+	threads.completed = await Promise.all(completed.map(async t => {
+		await t.extendFirstPost().then(p => p.extendUser());
+		return t;
+	}));
+	return this.threads = threads;
 };
 
 fundApplicationFormSchema.methods.newProject = async function(project) {
