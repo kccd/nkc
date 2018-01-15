@@ -101,6 +101,7 @@
 -const {firstPost, lastPost} = thread
 -const {t, resources, toc, tid} = firstPost;
 -const targetUser = firstPost.user;
+-const {_cid} = data;
 -let childrenForum;
 -let parentForum;
 -const forum = data.forum || {fid: '_cannot_be_equal_'}
@@ -108,17 +109,21 @@
 .new-content(style='overflow: hidden')
   .new-content-info
     span
-      a(href=`/m/${targetUser.uid}`)
+      a(href=`/m/${targetUser.uid}` title=`${targetUser.description || ''}`)
         img(src=`/avatar_small/${targetUser.uid}`)
     span
       a(href=`/m/${targetUser.uid}`)= targetUser.username
     if(parentForum && forum.fid === '_cannot_be_equal_')
       span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
-        a(href=`/f/${parentForum.fid}`)= parentForum.displayName
+        a(href=`/f/${parentForum.fid}` title=`${parentForum.description || ''}`)= parentForum.displayName
     if(childrenForum && childrenForum.fid !== forum.fid)
       span.new-content-forumAbbr(style=`background-color:${childrenForum.color};`)
-        a(href=`/f/${childrenForum.fid}`)= childrenForum.abbr
-    span.icon-font=fromNow(toc)
+        a(href=`/f/${childrenForum.fid}` title=`${childrenForum.description || ''}`)= childrenForum.abbr
+    if(thread.cid && !_cid && data.threadTypes)
+      -const threadtype = data.threadTypes.find(k=>k.cid==thread.cid)
+        if threadtype
+          a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.cid}` style=`background-color:${forumcolor};`) #{threadtype.name}
+    span.icon-font(title=`${Date(toc)}`)=fromNow(toc)
     if thread
       span(title=`${thread.hits}次浏览`)
         span.glyphicon.glyphicon-eye-open.icon
@@ -157,7 +162,7 @@
       .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
     .new-content-right(class=imgId?'div-img': 'div-noImg')
       div(style='width: 100%; float: left;')
-        p(class=imgId ? 'p-img' : 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: left; max-height: 4.4em; overflow: hidden; margin-right: 5rem; margin-bottom: 0.2rem;')
+        p(class=imgId ? 'p-img' : 'p-noImg' style='font-size: 16px; padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: left; max-height: 4.1em; overflow: hidden; margin-bottom: 0.2rem;')
           -firstPost.c = filterQuote(firstPost.c)
           a(href=`/t/${tid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(firstPost))
       div(style='width: 100%; float: right;')
