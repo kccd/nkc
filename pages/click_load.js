@@ -144,9 +144,9 @@ function loadNextPage() {
       div.appendChild(lButton);
       activities.appendChild(div);
     })
-    .catch(function(e) {
-      console.log(e);
-      screenTopWarning(e);
+    .catch(function(data) {
+      console.log(data.error);
+      screenTopWarning(data.error);
     })
 }
 

@@ -47,8 +47,8 @@ function loadThreads(page, pid) {
       $('#threadListPage').html(pagingListContent);
       $('#threadList').html(threadListContent);
     })
-    .catch(function(err){
-      jwarning(err);
+    .catch(function(data){
+      jwarning(data.error);
     })
 }
 function chooseThread(tid) {

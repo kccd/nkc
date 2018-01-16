@@ -9,12 +9,15 @@ var payMethod = '';
 
 // 自动保存间隔
 var timeToAutoSave = 5*60; // 秒
+
+//申请表id
+var applicationFormId;
 $(function() {
 	init();
 	initTeam();
 	initSelectedUsers();
 	initFundPay();
-	var applicationFormId = $('#applicationFormId').text();
+	applicationFormId = $('#applicationFormId').text();
 	applicationFormId = parseInt(applicationFormId);
 	autoSaveProject(applicationFormId);
 	initBudgetMoney();
@@ -88,8 +91,8 @@ function getSubscribeUsers(uid) {
 			getUsers = data.targetUsers;
 			displayResult();
 		})
-		.catch(function(err) {
-			return jwarning(err);
+		.catch(function(data) {
+			return jwarning(data.error);
 		})
 }
 
@@ -99,8 +102,8 @@ function getSubscribers(uid) {
 			getUsers = data.targetUsers;
 			displayResult();
 		})
-		.catch(function(err) {
-			return jwarning(err);
+		.catch(function(data) {
+			return jwarning(data.error);
 		})
 }
 
@@ -173,8 +176,8 @@ function getUser() {
 			getUsers = data.targetUsers;
 			displayResult();
 		})
-		.catch(function(err) {
-			return jwarning(err);
+		.catch(function(data) {
+			return jwarning(data.error);
 		})
 }
 
@@ -194,8 +197,8 @@ function submit(id){
 			var s = data.s;
 			window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 		})
-		.catch(function(err) {
-			return jwarning(err);
+		.catch(function(data) {
+			return jwarning(data.error);
 		})
 
 }
@@ -242,8 +245,8 @@ function submitUserMessages(id) {
 				var s = data.s;
 				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 			})
-			.catch(function(err) {
-				jwarning(err);
+			.catch(function(data) {
+				jwarning(data.error);
 			})
 	} catch (err) {
 		jwarning(err);
@@ -261,8 +264,8 @@ function submitEnsureUsersMessages(id) {
 				var s = data.s;
 				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 			})
-			.catch(function(err) {
-				jwarning(err);
+			.catch(function(data) {
+				jwarning(data.error);
 			})
 	}
 }
@@ -280,8 +283,8 @@ function saveProject(id, callback) {
 				callback(data);
 			}
 		})
-		.catch(function(err) {
-			jwarning(err);
+		.catch(function(data) {
+			jwarning(data.error);
 		})
 }
 
@@ -440,8 +443,8 @@ function  saveBudgetMoney(id, callback) {
 				jalert('保存成功！');
 			}
 		})
-		.catch(function(err) {
-			jwarning(err);
+		.catch(function(data) {
+			jwarning(data.error);
 		})
 }
 
@@ -462,8 +465,8 @@ function savePurpose(id) {
 		.then(function(data) {
 			jalert('保存成功！');
 		})
-		.catch(function(err) {
-			jwarning(err);
+		.catch(function(data) {
+			jwarning(data.error);
 		})
 }
 
@@ -583,27 +586,78 @@ function addThread(index) {
 	}
 }
 
+//生成分页按钮字符串
+function createPageList(paging, self) {
+	var page = paging.page || 0;
+	var pageCount = paging.pageCount || 1;
+	var html = '';
+	if(self === undefined) self = '';
+	for(var i = 0; i < pageCount; i++){
+		var active = '';
+		if(page === i) {
+			active = 'active';
+		}
+		html += '<li class="'+active+'"><a onclick="getThreads('+i+','+self+')">'+(i+1)+'</a></li>';
+	}
+	return html;
+}
+
+//渲染分页按钮
+function displayPageList(paging, self) {
+	var html = createPageList(paging, self);
+	$('#pageList').html(html);
+}
+
 //加载帖子
-function getThreads(applicationFormId,self) {
+function getThreads(page, self) {
 	var url;
+	if(page !== undefined) {
+		page = 'page='+page+'&';
+	} else {
+		page = '';
+	}
 	if(self === undefined) {
 		var keywords = $('#searchThread').val();
 		if(keywords === '') return jwarning('输入不能为空！');
-		url = '/t?from=applicationForm&applicationFormId='+applicationFormId+'&keywords='+keywords;
+		url = '/t?'+page+'from=applicationForm&applicationFormId='+applicationFormId+'&keywords='+keywords;
 	} else {
-		url = '/t?from=applicationForm&self=true';
+		url = '/t?'+page+'from=applicationForm&self=true';
 	}
 	var html = '<div class="blank blank-selectedThread">搜索中...</div>';
-	$('.unselectedThreads').html(html);
+	$('.unselectedThreads').html(html)
 	nkcAPI(url, 'GET', {})
 		.then(function(data) {
 			tempThreads = data.threads;
+			var paging = data.paging;
+			displayPageList(paging, self);
 			if(tempThreads.length === 0) {
-				return jalert('什么也没找到...');
+				jalert('什么也没找到...');
 			}
 			displayThreadsList('.unselectedThreads', tempThreads, false, 'add');
 		})
-		.catch(function(err) {
-			jwarning(err);
+		.catch(function(data) {
+			jwarning(data.error);
+			var html = '<div class="blank blank-selectedThread">error</div>';
+			$('.unselectedThreads').html(html);
+		})
+}
+
+//保存帖子列表
+function saveThreadsList(id) {
+	var threadsId = [];
+	for(var i = 0; i < selectedThreads.length; i++){
+		var t = selectedThreads[i];
+		threadsId.push(t.tid);
+	}
+	var obj = {
+		threadsId: threadsId,
+		s: 5
+	};
+	nkcAPI('/fund/a/'+id, 'PATCH', obj)
+		.then(function(data) {
+			jalert('保存成功！');
+		})
+		.catch(function(data) {
+			jwarning(data.error);
 		})
 }

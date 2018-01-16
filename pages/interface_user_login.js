@@ -30,12 +30,12 @@ function login_submit(){
       }
     }
   })
-  .catch(function(err){
-    geid('error_info').innerHTML = '<strong style="color:red;">'+err+'</strong>';
+  .catch(function(data){
+    geid('error_info').innerHTML = '<strong style="color:red;">'+data.error+'</strong>';
     display('error_info_panel');
     geid('password').focus();
     //console.log(JSON.stringify(err));
-    screenTopWarning(err);
+    screenTopWarning(data.error);
   })
 }
 

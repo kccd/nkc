@@ -88,8 +88,8 @@ block scripts
           window.location.href = '/fund/a/'+id+'/member';
         }, 2000);
       })
-      .catch(function(err) {
-        jwarning(err);
+      .catch(function(data) {
+        jwarning(data.error);
       })
     };
     function agree(id) {
@@ -100,7 +100,7 @@ block scripts
           window.location.href = '/fund/a/' + id + '/member';
         }, 2000);
       })
-      .catch(function (err) {
-        jwarning(err);
+      .catch(function (data) {
+        jwarning(data.error);
       })
     }

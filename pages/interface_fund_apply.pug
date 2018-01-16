@@ -217,16 +217,13 @@ block content
                           .col-xs-12.col-md-12
                             .form
                               input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
-                              input.fund-submit(onclick=`getThreads(${applicationForm._id})` type='submit' value='搜索')
-                            span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(${applicationForm._id}, true)`) 我的帖子
+                              input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
+                            span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
                             .unselectedThreads
                               .blank.blank-selectedThread 暂无数据
                             nav(aria-label='navigation')
-                              ul.pagination.pagination-sm
-                                li
-                                  a 1
-                                li
-                                  a 2
+                              ul.pagination.pagination-sm#pageList
+
                     h5 已选择的帖子
                     .selectedThreads
                       if threads.applying.length === 0
@@ -249,9 +246,8 @@ block content
                             .col-xs-2.col-md-2.delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteThread(${i})`)
                     .span.fund-span.transparent(onclick='displayDeleteThreadBtn()') 编辑
                     .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
-                    .span.fund-span.transparent 保存
-                    .unselectedThread
-                      .threadList
+                    .span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
+
 
 
 

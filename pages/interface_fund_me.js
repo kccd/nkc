@@ -7,8 +7,8 @@ function removeApplicationForm(aid) {
 					window.location.reload();
 				}, 2000)
 			})
-			.catch(function(err) {
-				jwarning(err);
+			.catch(function(data) {
+				jwarning(data.error);
 			})
 	}
 }

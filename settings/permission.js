@@ -303,7 +303,7 @@ const certificates ={
         }
       },
       t: {
-      	// [GET]: true,
+      	[GET]: true,
         [parameter]: {
           [POST]: true,
           addColl: {
@@ -369,7 +369,7 @@ const certificates ={
         [GET]: true,
         settings: {
           [name]: '个人信息',
-	        //[GET]: true,
+	        [GET]: true,
           [PATCH]: true
         },
         password: {
@@ -418,7 +418,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*idPhoto: {
+      idPhoto: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
@@ -485,7 +485,7 @@ const certificates ={
 		    [parameter]: {
 			    [GET]: true,
 		    }
-	    }*/
+	    }
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -721,7 +721,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*fund: {
+      fund: {
         [POST]: true,
 	      m: {
 		      [name]:'基金管理页面',
@@ -743,7 +743,7 @@ const certificates ={
 		      }
 	      }
 
-      }*/
+      }
     }
   }
 };

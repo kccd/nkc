@@ -142,7 +142,7 @@ function removePhoto(id) {
 		.then(function(data) {
 			window.location.reload();
 		})
-		.catch(function(err) {
-			jwarning(err);
+		.catch(function(data) {
+			jwarning(data.error);
 		});
 }

@@ -52,29 +52,27 @@ module.exports = async (ctx, next) => {
     await next();
   } catch(err) {
     const body = require('./body');
-    ctx.error = err.stack;
-    ctx.status = err.statusCode || err.status || 500;
+    ctx.error = err.stack || err;
+    let error = Object.assign({}, err);
+    ctx.status = error.statusCode || error.status || 500;
 /*    if(process.ENV === 'production')
       ctx.data.message = err.message;
     else
       ctx.data.message = err.message;//String(err.stack).replace(/(>?\s\d+\|)/g, '<br />$1')*/
     const type = ctx.request.accepts('json', 'html');
-    let error = err;
-    if(typeof err === 'object'){
-      error = err.message;
+    if(typeof error === 'object'){
+      error = error.message;
     }
-    if(type === 'html') {
-      ctx.data.message = err;
-    } else {
-      ctx.data = error;
+	  ctx.data.error = error;
+	  if(type === 'html') {
+	    if(ctx.status === 404) {
+		    ctx.template = '404.pug';
+		    ctx.data.url = ctx.url;
+	    } else {
+		    ctx.template = '500.pug';
+	    }
     }
-    if(ctx.status === 404) {
-      ctx.template = '404.pug';
-    } else {
-      ctx.template = '500.pug';
-    }
-    const text = function(){};
-    await body(ctx, text);
+	  await body(ctx, () => {});
   }
   finally {
     ctx.status = ctx.response.status;

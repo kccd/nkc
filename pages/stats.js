@@ -75,8 +75,8 @@ var loadChart = function(){
       datasetGen('发帖质量 (( 未屏蔽 / 总帖数 ) ^ 4 * 100% )',qualityFactor,{borderColor:'rgb(200,100,140)'})
     ])
   })
-    .catch(function(err){
-      screenTopWarning('加载失败： '+err);
+    .catch(function(data){
+      screenTopWarning('加载失败： '+data.error);
     })
 }
 //chart js 2.2.1

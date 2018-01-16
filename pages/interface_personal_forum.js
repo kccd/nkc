@@ -239,9 +239,9 @@ var submitConfig = function(key) {
     .then(function() {
       location.reload();
     })
-    .catch(function(e) {
-      console.log(e)
-      screenTopWarning(e);
+    .catch(function(data) {
+      console.log(data.error)
+      screenTopWarning(data.error);
     })
 };
 

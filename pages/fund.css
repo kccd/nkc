@@ -719,6 +719,10 @@ input[type="radio"], input[type="checkbox"]{
   padding: 1rem 0;
   background-color: #efefef;
 }
+/*.unselectedThreads{*/
+  /*overflow-y:scroll;*/
+  /*overflow-x:scroll;*/
+/*}*/
 .fund-money-list{
   padding: 0.25rem;
   position: relative;
@@ -854,6 +858,10 @@ input[type="radio"], input[type="checkbox"]{
 .blank-selectedThread{
   line-height: 4rem;
   color: #ccc;
+}
+
+#pageList a{
+  cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {

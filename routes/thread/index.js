@@ -21,10 +21,25 @@ threadRouter
 					pid: post.pid
 				}
 			};
+			const perpage = (page, length) => {
+				const perpage = 8;
+				const start = perpage*page;
+				return {
+					page,
+					start,
+					perpage,
+					pageCount: Math.ceil(length/perpage)
+				}
+			};
+			const page = query.page? parseInt(query.page): 0;
+			data.paging = {page: 0, pageCount: 1, perpage: 8};
 			const threads = [];
 			let targetThreads = [];
 			if(self === 'true') {
-				targetThreads = await db.ThreadModel.find({uid: user.uid, disabled: false}).sort({toc: -1});
+				const length = await db.ThreadModel.count({uid: user.uid, disabled: false});
+				const paging= perpage(page, length);
+				targetThreads = await db.ThreadModel.find({uid: user.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+				data.paging = paging;
 			} else {
 				const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
 				const users = await applicationForm.extendMembers();
@@ -40,7 +55,10 @@ threadRouter
 				}
 				const targetUser = await db.UserModel.findOne({usernameLowerCase: keywords.toLowerCase()});
 				if(targetUser !== null && usersId.includes(targetUser.uid)) {
-					targetThreads = await db.ThreadModel.find({uid: targetUser.uid, disabled: false}).sort({toc: -1});
+					const length = await db.ThreadModel.count({uid: targetUser.uid, disabled: false});
+					const paging = perpage(page, length);
+					targetThreads = await db.ThreadModel.find({uid: targetUser.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+					data.paging = paging;
 				}
 			}
 			await Promise.all(targetThreads.map(async t => {
@@ -53,7 +71,7 @@ threadRouter
 		await next();
 	})
   .get('/:tid', async (ctx, next) => {
-    const {data, params, db, query} = ctx;
+	  const {data, params, db, query} = ctx;
     let {page = 0, pid, last_page, highlight} = query;
     const {tid} = params;
     const {

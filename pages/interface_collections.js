@@ -46,8 +46,8 @@ function movebtn(uid){
     .then(function(){
       screenTopAlert(item + '移动到' +targetCategory)
     })
-    .catch(function(err){
-      screenTopWarning(item + '移动失败' + err)
+    .catch(function(data){
+      screenTopWarning(item + '移动失败' + data.error)
     })
   })
   .then(function(){
@@ -69,8 +69,8 @@ function deletebtn(uid){
     .then(function(){
       screenTopAlert(item + '已删除')
     })
-    .catch(function(err){
-      screenTopWarning(item+ '删除失败' + err)
+    .catch(function(data){
+      screenTopWarning(item+ '删除失败' + data.error)
     })
   })
   .then(function(){

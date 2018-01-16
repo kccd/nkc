@@ -351,8 +351,8 @@ function submit(id) {
     .then(function(){
 	    window.location.href = '/fund/m';
     })
-    .catch(function(err){
-      jwarning(err);
+    .catch(function(data){
+      jwarning(data.error);
     })
 }
 /*

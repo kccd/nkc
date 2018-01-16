@@ -147,8 +147,8 @@ var nkc_editor = function(){
       var redirectTarget = result.redirect;
       redirect(redirectTarget?redirectTarget:'/'+target)
     })
-    .catch(function(err){
-      jwarning(err)
+    .catch(function(data){
+      jwarning(data.error);
       geid('post').disabled = false
     })
   }

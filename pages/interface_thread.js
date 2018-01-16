@@ -108,7 +108,9 @@ function cartThread(tid){
   .then(function(){
     return screenTopAlert(tid + ' added to cart')
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	jwarning(data.error)
+  })
 }
 
 function cartPost(pid){
@@ -116,7 +118,9 @@ function cartPost(pid){
   .then(function(){
     return screenTopAlert(pid + ' added to cart')
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	jwarning(data.error)
+  })
 }
 
 function setDigest(tid){
@@ -138,8 +142,8 @@ function setDigest(tid){
     $(this).text();
     return screenTopAlert(tid + oldStatus + '成功');
   })
-  .catch(function(err){
-    jwarning('操作失败： ' + err);
+  .catch(function(data){
+    jwarning('操作失败： ' + data.error);
   })
 }
 
@@ -161,8 +165,8 @@ function setTopped(tid){
     }
     return screenTopAlert(tid + oldStatus + '成功');
   })
-  .catch(function(err){
-    return jwarning('操作失败： ' + err);
+  .catch(function(data){
+    return jwarning('操作失败： ' + data.error);
   })
 }
 
@@ -194,7 +198,10 @@ function disablePost(pid){
     screenTopAlert(pid+' 已屏蔽，请刷新')
     //location.reload()
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	console.log(data);
+  	jwarning(data.error)
+  })
 }
 
 function enablePost(pid){
@@ -202,7 +209,9 @@ function enablePost(pid){
   .then(function(res){
     location.reload()
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	jwarning(data.error)
+  })
 }
 
 function submit(tid){
@@ -217,8 +226,8 @@ function submit(tid){
   .then(function(){
     redirect('/t/'+tid);
   })
-  .catch(function(err){
-    jwarning(err);
+  .catch(function(data){
+    jwarning(data.error);
     geid('ButtonReply').disabled=false;
   })
 }
@@ -268,7 +277,9 @@ function addColl(tid){
   .then(function(res){
     screenTopAlert('已收藏 '+tid)
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	jwarning(data.error)
+  })
 }
 
 function addCredit(pid){
@@ -278,7 +289,9 @@ function addCredit(pid){
     .then(function(){
       window.location.reload()
     })
-    .catch(jwarning)
+    .catch(function(data) {
+    	jwarning(data.error)
+    })
   }
   else{
     screenTopWarning('取消评分。')
@@ -319,7 +332,9 @@ function moveThreadTo(tid){
   .then(function(){
     screenTopAlert('请刷新')
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	jwarning(data.error)
+  })
 }
 
 function askCategoryOfForum(fid){
@@ -346,8 +361,8 @@ function moveThread(tid,fid,cid){
   .then(function(){
     screenTopAlert('已将帖子 '+tid+' 移动至板块 '+fid+' 分类 '+cid+'下');
   })
-  .catch(function(err){
-    screenTopWarning('移动失败：'+err);
+  .catch(function(data){
+    screenTopWarning('移动失败：'+data.error);
   })
 }
 
@@ -383,8 +398,8 @@ function switchVInPersonalForum(tid, name, type) {
         screenTopAlert('已在专栏屏蔽该帖');
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
   if(type === 'MF') {
@@ -402,8 +417,8 @@ function switchVInPersonalForum(tid, name, type) {
         screenTopAlert('已在' + name + '屏蔽该帖');
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
   if(type === 'OF') {
@@ -421,8 +436,8 @@ function switchVInPersonalForum(tid, name, type) {
         screenTopAlert('已在' + name + '屏蔽该帖');
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
 }
@@ -434,8 +449,8 @@ function moveToPersonalForum(tid) {
       screenTopAlert('已将该帖送回个人专栏')
       target.innerHTML = '';
     })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
 }
 
@@ -460,8 +475,8 @@ function switchDInPersonalForum(tid, name, type) {
         target.innerHTML = normal;
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
   if(type === 'MF') {
@@ -479,8 +494,8 @@ function switchDInPersonalForum(tid, name, type) {
         target.innerHTML = normal;
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
   if(type === 'OF') {
@@ -498,8 +513,8 @@ function switchDInPersonalForum(tid, name, type) {
         target.innerHTML = normal;
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
 }
@@ -525,8 +540,8 @@ function switchTInPersonalForum(tid, name, type) {
         target.innerHTML = normal;
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
   if(type === 'MF') {
@@ -544,8 +559,8 @@ function switchTInPersonalForum(tid, name, type) {
         target.innerHTML = normal;
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
   if(type === 'OF') {
@@ -563,8 +578,8 @@ function switchTInPersonalForum(tid, name, type) {
         target.innerHTML = normal;
         return
       })
-      .catch(function(e) {
-        screenTopWarning(e)
+      .catch(function(data) {
+        screenTopWarning(data.error)
       })
   }
 }
@@ -583,8 +598,8 @@ function adSwitch(tid) {
       screenTopAlert('首页置顶成功');
       btn.innerHTML = nowIsAd;
     })
-    .catch(function(err){
-      screenTopWarning('操作失败： ' + err);
+    .catch(function(data){
+      screenTopWarning('操作失败： ' + date.error);
     })
 }
 

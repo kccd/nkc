@@ -230,8 +230,8 @@ block scripts
         geid('newpassword2').value = '';
         geid('submitnewpassword').disabled = false;
       })
-      .catch(function(err){
-        jwarning(err);
+      .catch(function(data){
+        jwarning(data.error);
         geid('submitnewpassword').disabled = false;
       })
     }
@@ -249,8 +249,8 @@ block scripts
         jwarning('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
       })
-      .catch(function(err){
-        jwarning(err);
+      .catch(function(data){
+        jwarning(data.error);
         geid('submitpersonalsetting').disabled = false;
       })
     }
@@ -285,8 +285,8 @@ block scripts
         geid('phoneNumber').value = '';
         geid('mCode').value = '';
       })
-      .catch(function(err){
-        jwarning(err);
+      .catch(function(data){
+        jwarning(data.error);
         geid('submitPhoneNumber').disabled = false;
       })
     }
@@ -310,8 +310,8 @@ block scripts
         jwarning('手机短信验证码发送成功！');
         setTimeout(timeOut_60,1000);
       })
-      .catch(function(err){
-        jwarning(err);
+      .catch(function(data){
+        jwarning(data.error);
         geid('submitSendMcode').disabled = false;
       })
     }

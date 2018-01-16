@@ -448,8 +448,8 @@ function subscribeUserSwitch(targetUid) {
         /*button.innerHTML = '取关';
         button.className = 'btn btn-sm btn-danger';*/
       })
-      .catch(function(e) {
-        screenTopWarning(e);
+      .catch(function(data) {
+        screenTopWarning(data.error);
       })
   }
   else if(button[0].innerHTML === '取关') {
@@ -463,8 +463,8 @@ function subscribeUserSwitch(targetUid) {
         /*button.innerHTML = '关注';
         button.className = 'btn btn-sm btn-info';*/
       })
-      .catch(function(e) {
-        screenTopWarning(e);
+      .catch(function(data) {
+        screenTopWarning(data.error);
       })
   }
   else {
@@ -482,8 +482,8 @@ function recommendPostSwitch(e, targetPid, number) {
         screenTopAlert('推介成功');
         button.innerHTML = '已推介('+(data.message)+')';
       })
-      .catch(function(e) {
-        screenTopWarning(e);
+      .catch(function(data) {
+        screenTopWarning(data.error);
       })
   }
   else if(content === '已推介') {
@@ -492,8 +492,8 @@ function recommendPostSwitch(e, targetPid, number) {
         screenTopAlert('成功取消推介');
         button.innerHTML = '推介('+(data.message)+')';
       })
-      .catch(function(e) {
-        screenTopWarning(e);
+      .catch(function(data) {
+        screenTopWarning(data.error);
       })
   }
   else {

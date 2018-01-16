@@ -96,8 +96,8 @@ var DangerEditor = (function(){
 
       me.aqlresult.innerHTML = '<pre><code>' + JSON.stringify(res,null,2) + '</code></pre>'
     })
-    .catch(function(err){
-      jwarning(err)
+    .catch(function(data){
+      jwarning(data.error)
     })
   }
   return me

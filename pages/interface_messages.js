@@ -17,8 +17,8 @@ var shortMessage = (function(){
     .then(function(res){
       location.reload()
     })
-    .catch(function(err){
-      jwarning(err);
+    .catch(function(data){
+      jwarning(data.error);
       me.btnsend.disabled = false;
     })
   }

@@ -314,9 +314,9 @@ var onPost = function(that) {
         var redirectTarget = result.redirect;
         redirect(redirectTarget ? redirectTarget : '/' + target);
       })
-      .catch(function (err) {
-        jwarning(err);
-        console.error(err);
+      .catch(function (data) {
+        jwarning(data.error);
+        console.error(data.error);
         that.post.className = 'btn btn-primary';
       })
   }

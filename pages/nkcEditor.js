@@ -43972,8 +43972,8 @@ var NkcEditor = function (_React$Component2) {
           isFetching: false,
           resourcesList: list
         }, _this2.render);
-      }).catch(function (e) {
-        return screenTopWarning(e.stack);
+      }).catch(function (data) {
+        return screenTopWarning(data.error);
       });
     };
 
@@ -44009,14 +44009,14 @@ var NkcEditor = function (_React$Component2) {
           hasMoreResource: true
         }, _this2._updateResourcesList);
         screenTopAlert('上传成功');
-      }).catch(function (e) {
+      }).catch(function (data) {
         _this2.setState({
           isUploading: false,
           uploadingFile: false,
           uploadPercentage: false,
           hasMoreResource: true
         }, _this2._updateResourcesList);
-        screenTopWarning(e);
+        screenTopWarning(data.error);
       });
     };
 

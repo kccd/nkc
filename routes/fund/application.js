@@ -58,7 +58,7 @@ applicationRouter
 	})
 	.patch('/:_id', async (ctx, next) => {
 		const {data, db, body, params} = ctx;
-		const {newMembers, account, newApplicant, s, project, projectCycle, budgetMoney} = body;
+		const {newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId} = body;
 		data.s = s;
 		const {user, applicationForm} = data;
 		const {_id} = params;
@@ -129,7 +129,11 @@ applicationRouter
 			}
 		}
 		if (s === 5) {
-			await applicationForm.update({projectCycle, budgetMoney});
+			const obj = {};
+			if(projectCycle) obj.projectCycle = projectCycle;
+			if(budgetMoney) obj.budgetMoney = budgetMoney;
+			if(threadsId) obj['threadsId.applying'] = threadsId;
+			await applicationForm.update(obj);
 		}
 		await applicationForm.update(updateObj);
 		await next();

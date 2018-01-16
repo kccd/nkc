@@ -72,8 +72,8 @@ block scripts
       .then(function(){
         window.location.reload()
       })
-      .catch(function(err){
-        jwarning(err)
+      .catch(function(data){
+        jwarning(data.error)
         
         geid('submitnewpassword').disabled = false
       })
@@ -90,8 +90,8 @@ block scripts
       .then(function(){
         window.location.reload()
       })
-      .catch(function(err){
-        jwarning(err)
-              geid('submitpersonalsetting').disabled = false
+      .catch(function(data){
+        jwarning(data.error)
+        geid('submitpersonalsetting').disabled = false
       })
     }
