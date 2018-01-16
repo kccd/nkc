@@ -330,9 +330,9 @@ function submit(id) {
   fundObj.description.brief = $('#briefDescription').val();
   fundObj.description.detailed = $('#detailedDescription').val();
   fundObj._id = $('#fundId').val();
-  if(fundObj._id === '') return jwarning('基金编号不能为空！');
-  if(!fundObj._id.match(/[A-Z]+/g)) return jwarning('基金编号只能由大写字母组成！');
-  if(fundObj._id.length > 4) return jwarning('基金编号不能超过四位！');
+  if(fundObj._id === '') return screenTopWarning('基金编号不能为空！');
+  if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成！');
+  if(fundObj._id.length > 4) return screenTopWarning('基金编号不能超过四位！');
   if($('#fundName').val()) fundObj.name = $('#fundName').val();
   var initial = $('#initial').val();
   if(initial) {
@@ -352,7 +352,7 @@ function submit(id) {
 	    window.location.href = '/fund/m';
     })
     .catch(function(data){
-      jwarning(data.error);
+      screenTopWarning(data.error);
     })
 }
 /*

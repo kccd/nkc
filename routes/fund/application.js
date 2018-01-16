@@ -129,11 +129,12 @@ applicationRouter
 			}
 		}
 		if (s === 5) {
-			const obj = {};
-			if(projectCycle) obj.projectCycle = projectCycle;
-			if(budgetMoney) obj.budgetMoney = budgetMoney;
-			if(threadsId) obj['threadsId.applying'] = threadsId;
-			await applicationForm.update(obj);
+			updateObj = {
+				'status.inputProjectMessages': true
+			};
+			if(projectCycle) updateObj.projectCycle = projectCycle;
+			if(budgetMoney) updateObj.budgetMoney = budgetMoney;
+			if(threadsId) updateObj['threadsId.applying'] = threadsId;
 		}
 		await applicationForm.update(updateObj);
 		await next();

@@ -12,7 +12,7 @@ function postUpload(url, data, callback) {
 				// jalert('上传成功！');
 				callback(JSON.parse(xhr.responseText));
 			}else {
-				jwarning(xhr.status.toString()+' '+xhr.responseText);
+				screenTopAlert(xhr.status.toString()+' '+xhr.responseText);
 			}
 		}
 	};
@@ -27,7 +27,7 @@ function uploadFile(url, id, callback) {
 		if(inputFile.files.length > 0){
 			file = inputFile.files[0];
 		}else {
-			return jwarning('未选择文件');
+			return screenTopAlert('未选择文件');
 		}
 		var formData = new FormData();
 		formData.append('file', file);

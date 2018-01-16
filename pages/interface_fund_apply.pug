@@ -22,7 +22,7 @@ block content
           .panel-body
             .nav-link.center-block
               ul
-                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'ensureUsersMessages', ch: '第3步、人员确认'},{en: 'inputProjectContent', ch: '第4步、填写项目内容'},{en: 'inputProjectMessages', ch: '第5步、填写项目其他信息'},{en: 'submit', ch: '第6步、提交申请'}];
+                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'inputProjectContent', ch: '第4步、填写项目内容'},{en: 'inputOtherMessages', ch: '第4步、填写项目内容'},{en: 'inputProjectMessages', ch: '第5步、填写项目其他信息'},{en: 'submit', ch: '第6步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
                   if i === 0
                     li
@@ -244,10 +244,13 @@ block content
                               br
                               a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
                             .col-xs-2.col-md-2.delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteThread(${i})`)
-                    .span.fund-span.transparent(onclick='displayDeleteThreadBtn()') 编辑
+                    .span.fund-span.transparent(onclick='displayDeleteThreadBtn()' style="margin-left: 0;") 编辑
                     .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
                     .span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
 
+              hr
+              .back-next
+                .apply-next(onclick=`submitThreadsList(${applicationForm._id})`) 下一步
 
 
 

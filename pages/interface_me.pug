@@ -246,7 +246,7 @@ block scripts
       geid('submitpersonalsetting').disabled = true;
       nkcAPI('/me/settings','PATCH',settingObj)
       .then(function(){
-        jwarning('个人资料修改成功！');
+        jalert('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
       })
       .catch(function(data){

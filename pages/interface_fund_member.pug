@@ -83,24 +83,24 @@ block scripts
     function disagree(id) {
       nkcAPI('/fund/a/'+id+'/member', 'PATCH', {agree: false})
       .then(function() {
-        jalert('您已拒绝用户的邀请');
+        screenTopAlert('您已拒绝用户的邀请');
         setTimeout(function(){
           window.location.href = '/fund/a/'+id+'/member';
         }, 2000);
       })
       .catch(function(data) {
-        jwarning(data.error);
+        screenTopWarning(data.error);
       })
     };
     function agree(id) {
       nkcAPI('/fund/a/'+id+'/member', 'PATCH', {agree: true})
       .then(function () {
-        jalert('您已同意用户的邀请');
+        screenTopAlert('您已同意用户的邀请');
         setTimeout(function () {
           window.location.href = '/fund/a/' + id + '/member';
         }, 2000);
       })
       .catch(function (data) {
-        jwarning(data.error);
+        screenTopWarning(data.error);
       })
     }

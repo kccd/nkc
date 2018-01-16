@@ -59,11 +59,7 @@ postRouter
     const q = {
       tid: targetThread.tid
     };
-    try{
-	    await targetPost.save();
-    } catch(err) {
-    	ctx.print('111111', err);
-    }
+	  await targetPost.save();
     if(!await targetThread.ensurePermissionOfModerators(ctx)) q.disabled = false;
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;

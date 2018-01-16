@@ -246,24 +246,21 @@ postSchema.pre('save', async function(next) {
 	return next()
 });
 
-postSchema.pre('save', function(next) {
+postSchema.pre('save', async function(next) {
   // handle the ElasticSearch index
   const {_initial_state_: initialState} = this;
   if(!initialState) {
     // if the initial state is undefined , this is a new post, index it
-    return indexPost(this)
-	    .then(() => next());
+    await indexPost(this);
+    return next()
   } else if(initialState.t !== this.t || initialState.c !== this.c) {
     // this is a old post, and we should check if its title or content has changed,
     // update the doc in elasticsearch when the attribute has changed
-    // try{
-	  return updatePost(this)
-		  .then(() => next());
-	  // } catch(err) {
-	  // 	console.log(`==============22222=============`);
-	  // 	console.log(err);
-	  // 	throw new Error(err);
-	  // }
+	  try{
+		  await updatePost(this);
+	  } catch(err) {
+		  return next(err)
+	  }
   } else
     return next()
 });

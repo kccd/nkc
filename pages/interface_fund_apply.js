@@ -62,13 +62,13 @@ function clearTeam() {
 }
 
 function teamDisplay() {
-	$('#teamDiv').css('display', 'block');
+	$('#teamDiv').fadeIn();
 	$('#team').addClass('active');
 	$('#personal').removeClass('active');
 }
 
 function teamDisappear() {
-	$('#teamDiv').css('display', 'none');
+	$('#teamDiv').fadeOut();
 	$('#team').removeClass('active');
 	$('#personal').addClass('active');
 }
@@ -92,7 +92,7 @@ function getSubscribeUsers(uid) {
 			displayResult();
 		})
 		.catch(function(data) {
-			return jwarning(data.error);
+			return screenTopWarning(data.error);
 		})
 }
 
@@ -103,7 +103,7 @@ function getSubscribers(uid) {
 			displayResult();
 		})
 		.catch(function(data) {
-			return jwarning(data.error);
+			return screenTopWarning(data.error);
 		})
 }
 
@@ -169,7 +169,7 @@ function getUser() {
 	$('#usersList').html(blank);
 	var text = $('#username').val();
 	if(text === '') {
-		return jwarning('输入不能为空！');
+		return screenTopWarning('输入不能为空！');
 	}
 	nkcAPI('/u'+'?username='+text+'&uid='+text, 'GET', {})
 		.then(function(data) {
@@ -177,7 +177,7 @@ function getUser() {
 			displayResult();
 		})
 		.catch(function(data) {
-			return jwarning(data.error);
+			return screenTopWarning(data.error);
 		})
 }
 
@@ -188,7 +188,7 @@ function submit(id){
 	};
 	if ($('#team').hasClass('active')) {
 		if(selectedUsers.length === 0) {
-			return jwarning('团队申请必须要有组员，若没有组员请选择个人申请。');
+			return screenTopWarning('团队申请必须要有组员，若没有组员请选择个人申请。');
 		}
 		obj.newMembers = selectedUsers;
 	}
@@ -198,7 +198,7 @@ function submit(id){
 			window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 		})
 		.catch(function(data) {
-			return jwarning(data.error);
+			return screenTopWarning(data.error);
 		})
 
 }
@@ -246,17 +246,17 @@ function submitUserMessages(id) {
 				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 			})
 			.catch(function(data) {
-				jwarning(data.error);
+				screenTopWarning(data.error);
 			})
 	} catch (err) {
-		jwarning(err);
+		screenTopWarning(err);
 	}
 }
 
 function submitEnsureUsersMessages(id) {
 	if(id === undefined) {
 		setTimeout(function() {
-			jalert('保存成功！');
+			screenTopAlert('保存成功！');
 		}, 300);
 	} else {
 		nkcAPI('/fund/a/'+id, 'PATCH', {s: 3})
@@ -265,7 +265,7 @@ function submitEnsureUsersMessages(id) {
 				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
 			})
 			.catch(function(data) {
-				jwarning(data.error);
+				screenTopWarning(data.error);
 			})
 	}
 }
@@ -278,13 +278,13 @@ function saveProject(id, callback) {
 	nkcAPI('/fund/a/'+id, 'PATCH', {project: project, s: 4})
 		.then(function(data) {
 			if(callback === undefined){
-				jalert('保存成功！');
+				screenTopAlert('保存成功！');
 			} else {
 				callback(data);
 			}
 		})
 		.catch(function(data) {
-			jwarning(data.error);
+			screenTopWarning(data.error);
 		})
 }
 
@@ -312,7 +312,7 @@ function autoSaveProject(id) {
 					return loop();
 				} else { // 时间到
 					saveProject(id, function() {
-						jalert('自动保存成功！');
+						screenTopAlert('自动保存成功！');
 						return autoSaveProject(id);
 					});
 				}
@@ -353,7 +353,7 @@ function readProjectValue() {
 	var time = $('#projectCycle').val();
 	time = parseInt(time);
 	if(time <= 0) {
-		return jwarning('研究周期不能小于0天');
+		return screenTopWarning('研究周期不能小于0天');
 	}
 	projectCycle = time;
 }
@@ -440,11 +440,11 @@ function  saveBudgetMoney(id, callback) {
 			if(callback !== undefined) {
 				callback(data);
 			} else {
-				jalert('保存成功！');
+				screenTopAlert('保存成功！');
 			}
 		})
 		.catch(function(data) {
-			jwarning(data.error);
+			screenTopWarning(data.error);
 		})
 }
 
@@ -458,18 +458,21 @@ function initAddPurpose() {
 	});
 }
 
-function savePurpose(id) {
+function savePurpose(id, callback) {
 	readProjectValue();
 	var purpose = $('#purpose').val();
 	nkcAPI('/fund/a/'+ id, 'PATCH', {s: 5, projectCycle: projectCycle, budgetMoney: purpose})
 		.then(function(data) {
-			jalert('保存成功！');
+			if(callback === undefined){
+				screenTopAlert('保存成功！');
+			} else {
+				callback(data);
+			}
 		})
 		.catch(function(data) {
-			jwarning(data.error);
+			screenTopWarning(data.error);
 		})
 }
-
 function compute() {
 	initBudgetMoney();
 	displayPurpose(true);
@@ -580,9 +583,9 @@ function addThread(index) {
 	if(!flag) {
 		selectedThreads.push(thread);
 		displayThreadsList('.selectedThreads', selectedThreads, true, 'delete');
-		return jalert('添加成功！');
+		return screenTopAlert('添加成功！');
 	} else {
-		return jwarning('该贴子已在已选列表中，不需要重复添加！');
+		return screenTopWarning('该贴子已在已选列表中，不需要重复添加！');
 	}
 }
 
@@ -618,7 +621,7 @@ function getThreads(page, self) {
 	}
 	if(self === undefined) {
 		var keywords = $('#searchThread').val();
-		if(keywords === '') return jwarning('输入不能为空！');
+		if(keywords === '') return screenTopWarning('输入不能为空！');
 		url = '/t?'+page+'from=applicationForm&applicationFormId='+applicationFormId+'&keywords='+keywords;
 	} else {
 		url = '/t?'+page+'from=applicationForm&self=true';
@@ -631,19 +634,19 @@ function getThreads(page, self) {
 			var paging = data.paging;
 			displayPageList(paging, self);
 			if(tempThreads.length === 0) {
-				jalert('什么也没找到...');
+				screenTopAlert('什么也没找到...');
 			}
 			displayThreadsList('.unselectedThreads', tempThreads, false, 'add');
 		})
 		.catch(function(data) {
-			jwarning(data.error);
+			screenTopWarning(data.error);
 			var html = '<div class="blank blank-selectedThread">error</div>';
 			$('.unselectedThreads').html(html);
 		})
 }
 
 //保存帖子列表
-function saveThreadsList(id) {
+function saveThreadsList(id, callback) {
 	var threadsId = [];
 	for(var i = 0; i < selectedThreads.length; i++){
 		var t = selectedThreads[i];
@@ -655,9 +658,25 @@ function saveThreadsList(id) {
 	};
 	nkcAPI('/fund/a/'+id, 'PATCH', obj)
 		.then(function(data) {
-			jalert('保存成功！');
+			if(callback === undefined) {
+				screenTopAlert('保存成功！');
+			} else {
+				callback(data);
+			}
 		})
 		.catch(function(data) {
-			jwarning(data.error);
+			console.log('=============');
+			console.log(data);
+			console.log('=============');
+			screenTopWarning(data.error);
 		})
+}
+
+//提交帖子列表、资金预算和研究周期
+function submitThreadsList(id) {
+	savePurpose(id, function(){
+		saveThreadsList(id, function(){
+			window.location.href='/fund/a/'+id+'/settings?s=6';
+		})
+	})
 }

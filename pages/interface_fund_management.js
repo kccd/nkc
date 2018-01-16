@@ -8,7 +8,7 @@ function deleteFund(name, money, id){
         window.location.reload();
       })
       .catch(function(data) {
-        jwarning(data.error);
+        screenTopWarning(data.error);
       })
   }
 }
