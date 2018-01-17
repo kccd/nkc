@@ -75,7 +75,7 @@
             -break;
           if imgId
             .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
-        .new-content-right(class=imgId ? 'div-img fixed-height' : 'div-noImg')
+        .new-content-right(class=imgId ? 'div-img fixed-height' : 'div-noImg' style='max-height: 3em; overflow: hidden;')
           -const content = replaceContent(experimental_render(firstPost))
           a(class=imgId ? 'p-img' : 'p-noImg' href=`/t/${tid}` style='text-decoration: none; color: inherit;')!= content
 

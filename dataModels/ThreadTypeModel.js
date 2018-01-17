@@ -22,16 +22,20 @@ let threadTypesSchema = new Schema({
 });
 
 threadTypesSchema.pre('save',async function(next){
-  if(!this.order && this.order !== 0) {
-    const ThreadTypeModel = require('./ThreadTypeModel');
-    const threadType = await ThreadTypeModel.findOne({fid: this.fid}).sort({order: -1});
-    if(!threadType || (!threadType.order && threadType.order !== 0)) {
-      this.order = 1;
-    } else {
-      this.order = threadType.order + 1;
+  try {
+    if (!this.order && this.order !== 0) {
+      const ThreadTypeModel = require('./ThreadTypeModel');
+      const threadType = await ThreadTypeModel.findOne({fid: this.fid}).sort({order: -1});
+      if (!threadType || (!threadType.order && threadType.order !== 0)) {
+        this.order = 1;
+      } else {
+        this.order = threadType.order + 1;
+      }
     }
+    return next()
+  } catch(e) {
+    return next(e)
   }
-  await next();
 });
 
 module.exports = mongoose.model('threadTypes', threadTypesSchema, 'threadTypes');

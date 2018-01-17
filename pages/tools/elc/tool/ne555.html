@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>NE555频率计算器</title>
+<SCRIPT language="javascript">
+function CalcAstable()
+{
+	var R1,R2,C,R1Scale,R2Scale,CScale,THigh,TLow,TTotal,Freq,Duty;
+
+	// get circuit parameters
+	R1=parseFloat(document.formAstable555.textR1.value);
+	R2=parseFloat(document.formAstable555.textR2.value);
+	C=parseFloat(document.formAstable555.textC.value);
+	R1Scale=parseFloat(document.formAstable555.selectR1Scale.value);
+	R2Scale=parseFloat(document.formAstable555.selectR2Scale.value);
+	CScale=parseFloat(document.formAstable555.selectCScale.value);
+	R1*=R1Scale;
+	R2*=R2Scale;
+	C/=CScale;
+
+	// test for out of range
+	if((R1>0)&&(R2>0)&&(C>0))
+	{
+		THigh=0.693*(R1+R2)*C;
+		TLow=0.693*R2*C;
+		TTotal=0.693*(R1+(2.0*R2))*C;
+		Freq=1.44/((R1+(2.0*R2))*C);
+		Duty=100.0-((100.0*R2)/(R1+(2.0*R2)));
+	}
+	else
+	{
+		THigh=0;
+		TLow=0;
+		TTotal=0;
+		Freq=0;
+		Duty=0;
+	}
+
+	// display results
+	document.formAstable555.textTHigh.value=THigh;
+	document.formAstable555.textTLow.value=TLow;
+	document.formAstable555.textTTotal.value=TTotal;
+	document.formAstable555.textFreq.value=Freq;
+	document.formAstable555.textDuty.value=Duty;
+}
+</SCRIPT>
+<SCRIPT language="javascript">
+function rechnen(form)
+				{
+
+				    var r1,r2,t1,t2,T;
+
+				    var f = form.f.value*1000;
+				    var duty = form.duty.value;
+				    var c1 = form.c1.value;
+
+					if (duty > 50) { alert("占空比值太大");};
+					if (f > 500000) { alert("频率值太高");};
+
+					T = 1 / f;
+
+				    t1 = T*duty/100;
+				    t2 = T-t1;
+
+					c1 = c1 * 1E-6 ;
+
+					r2 = t2/(0.693 * c1);
+					r1 = t1/(0.693 * c1) ;
+
+				    r1 = Math.round ( r1 );
+				    r1 = r1 / 1000 ;
+
+				    r2 = Math.round ( r2 );
+				    r2 = r2 / 1000 ;
+
+				    form.r1.value = r1;
+				    form.r2.value = r2;
+					form.th.value = t1;
+				    form.tl.value = t2;
+					form.t.value = T;
+				}
+
+
+
+
+
+
+</SCRIPT>
+<SCRIPT language="javascript">
+function Compute(form) {
+	with(Math) {
+		var Kilo= 1000;
+		var Meg= Kilo*Kilo;
+		var micro= 1/Meg;
+		var Pico= 1/(Meg*Meg);
+		var Nano= 1/(Meg*Kilo);
+		var Precision= 3;
+		var T;
+
+		var F= Number(form.f.value)*Kilo;
+		var Duty= Number(form.duty.value)/100;
+		var RA= Number(form.r1.value)*Kilo;
+		var RB= Number(form.r2.value)*Kilo;
+		var C= Number(form.c1.value)*micro;
+
+		T = 1 / F;
+		t1=Duty/F;
+		t2=T-t1;
+
+		if(C!=0  && F!=0 && Duty!=0) {
+			RA= 1.44*(2*Duty-1)/(F*C);
+			RB= 1.44*(1-Duty)/(F*C);
+		} else
+		if(F!=0 && Duty!=0) {
+			if(F>100*Kilo) C= .001*micro;
+			else if(F>10*Kilo) C= .01*micro;
+			else if(F>1*Kilo) C= .1*micro;
+			else if(F>100) C= 1*micro;
+			else if(F>10) C= 10*micro;
+			else if(F>1) C= 100*micro;
+			RA= 1.44*(2*Duty-1)/(F*C);
+			RB= 1.44*(1-Duty)/(F*C);
+		} else
+		if(RA!=0 && RB!=0 && C!=0) {
+			F= 1.44/((RA+RB*2)*C);
+			Duty=  (RA + RB)/((RA + RB*2));
+		} else {
+			alert("您必须输入RA与RB或F和占空比");
+			return false;
+		}
+
+
+
+		C= C/micro;
+		RA= RA/Kilo;
+		RB= RB/Kilo;
+		F= F/Kilo;
+		Duty= Duty*100;
+
+		form.c1.value= C.toPrecision(Precision);
+		form.r1.value= RA.toPrecision(Precision);
+		form.r2.value= RB.toPrecision(Precision);
+		form.f.value= F.toPrecision(Precision);
+		form.duty.value= Duty.toPrecision(Precision);
+		form.th.value = t1.toPrecision(Precision);
+		form.tl.value = t2.toPrecision(Precision);
+		form.t.value =T;
+	}
+}
+</SCRIPT>
+<SCRIPT language="javascript">
+function jisuan(form)
+{
+
+var dd=form.duty.value;
+
+if (dd<50)
+	{
+
+	document.images["ne555js"].src="ne555/555b.gif"
+	rechnen(form);
+
+	}
+else
+	{
+
+	document.images["ne555js"].src="ne555/555.gif"
+	Compute(form);
+	}
+
+}
+
+</SCRIPT>
+</head>
+
+<body>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<div align="center">
+  <h2>NE555频率计算器  </h2>
+  <form id="formAstable555" name="formAstable555" method="post" action="">
+    <table width="235" border="1">
+      <tr>
+        <td colspan="2"><img src="ne555/555.gif" alt="ne555" width="370" height="297" /></td>
+      </tr>
+      <tr>
+        <td colspan="2"><div align="center">根据电路求输出值</div></td>
+      </tr>
+      <tr>
+        <td width="74"><div align="center">R1:</div></td>
+        <td width="145" nowrap="nowrap"><label>
+          <div align="left">
+            <input name="textR1" type="text" id="textR1" size="10" />
+            <select name="selectR1Scale" id="selectR1Scale">
+              <option value="1">Ω</option>
+              <option value="1000" selected="selected">KΩ</option>
+              <option value="1000000">MΩ</option>
+            </select>
+          </div>
+        </label></td>
+      </tr>
+      <tr>
+        <td><div align="center">R2:</div></td>
+        <td nowrap="nowrap"><label>
+          <div align="left">
+            <input name="textR2" type="text" id="textR2" size="10" />
+            <select name="selectR2Scale" id="selectR2Scale">
+              <option value="1">Ω</option>
+              <option value="1000" selected="selected">KΩ</option>
+              <option value="1000000">MΩ</option>
+            </select>
+          </div>
+        </label></td>
+      </tr>
+      <tr>
+        <td><div align="center">C:</div></td>
+        <td nowrap="nowrap"><label>
+          <div align="left">
+            <input name="textC" type="text" id="textC" size="10" />
+            <select name="selectCScale" id="selectCScale">
+              <option value="1000000" selected="selected">uF</option>
+              <option value="1000000000">nF</option>
+              <option value="1000000000000">pF</option>
+            </select>
+          </div>
+        </label></td>
+      </tr>
+      <tr>
+        <td colspan="2"><div align="center">
+          <label>
+          <input type="button" name="Submit" value="计算" onClick="CalcAstable()" />
+          </label>
+          <label>
+          <input type="reset" name="Submit3" value="重置" />
+          </label>
+        </div></td>
+      </tr>
+      <tr>
+        <td><div align="center">T<sub>1</sub> 上升沿</div></td>
+        <td><label>
+          <div align="left">
+            <input name="textTHigh" type="text" id="textTHigh" size="10" />
+            秒</div>
+        </label></td>
+      </tr>
+      <tr>
+        <td><div align="center">T<sub>2</sub> 下降沿</div></td>
+        <td><label>
+          <div align="left">
+            <input name="textTLow" type="text" id="textTLow" size="10" />
+            秒</div>
+        </label></td>
+      </tr>
+      <tr>
+        <td><div align="center">T 总周</div></td>
+        <td><label>
+          <div align="left">
+            <input name="textTTotal" type="text" id="textTTotal" size="10" />
+            秒</div>
+        </label></td>
+      </tr>
+      <tr>
+        <td><div align="center"><font size="2">占空比</font></div></td>
+        <td><label>
+          <div align="left">
+            <input name="textDuty" type="text" id="textDuty" size="10" />
+            <font
+                        size="2">%</font></div>
+        </label></td>
+      </tr>
+      <tr>
+        <td><div align="center"><font
+                        size="2">频率</font></div></td>
+        <td><div align="left">
+          <input name="textFreq" type="text" id="textFreq" size="10" />
+        Hz</div></td>
+      </tr>
+      <tr>
+        <td colspan="2" nowrap="nowrap"><label>
+          <div align="left">计算公式：<br />
+            T2 (off-time) = 0.693 * R2 *
+            C1<br />
+            T = 0.693*( (R1 + 2R2) * C1)<br />
+            F = 1/ T<br />
+  &nbsp;&nbsp;= 1.44 / ( (R1 + 2R2) * C1)<br />
+            D = (T1
+            /(T1+T2))*100</div>
+        </label></td>
+      </tr>
+    </table>
+  </form>
+
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <form id="generator" name="generator" method="post" action="">
+    <table width="105" border="1">
+      <tr>
+        <td colspan="2"><img src="ne555/555.gif" alt="ne555js" width="370" height="297" name="ne555js"/></td>
+      </tr>
+      <tr>
+        <td colspan="2" nowrap="nowrap"><div align="center">根据输出条件求电阻阻值</div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center"><font face="Arial">频率</font></div></td>
+        <td nowrap="nowrap"><label>
+          <div align="left">
+            <input name="f" type="text" id="f" value="1" size="10" />
+          KHz</div>
+        </label></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center"><font face="Arial">占空比</font></div></td>
+        <td nowrap="nowrap"><label>
+          <div align="left">
+            <input name="duty" type="text" id="duty" value="20" size="10" />
+          % </div>
+        </label></td>
+      </tr>
+      <tr>
+        <td colspan="2" nowrap="nowrap"><label> </label>
+          <div align="center">
+              <input type="button" name="Submit2" value="计算" onClick="jisuan(document.generator);" />
+              <label>
+              <input type="reset" name="Submit4" value="重置" />
+              </label>
+          </div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center"><font face="Arial">C</font></div></td>
+        <td nowrap="nowrap"><div align="left">
+          <input name="c1" type="text" id="c1" value="0.01" size="10" />
+          <font
+                        size="2">μF</font></div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center"><font face="Arial">R1</font></div></td>
+        <td nowrap="nowrap"><label>
+          <div align="left">
+            <input name="r1" type="text" id="r1" size="10" />
+            <font
+                        size="2">kΩ</font></div>
+        </label></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center"><font face="Arial">R2</font></div></td>
+        <td nowrap="nowrap"><label>
+          <div align="left">
+            <input name="r2" type="text" id="r2" size="10" />
+            <font
+                        size="2">kΩ</font></div>
+        </label></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center">周期T</div></td>
+        <td nowrap="nowrap"><div align="left">
+          <label>
+          <input name="t" type="text" id="t" size="10" />
+          </label>
+        s</div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center">TH</div></td>
+        <td nowrap="nowrap"><div align="left">
+          <label>
+          <input name="th" type="text" id="th" size="10" />
+          </label>
+        s</div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center">TL</div></td>
+        <td nowrap="nowrap"><label></label>
+          <label>
+          <div align="left">
+            <input name="tl" type="text" id="tl" size="10" />
+          s</div>
+          </label>
+          <div align="left"></div>
+        <div align="left"></div></td>
+      </tr>
+    </table>
+  </form>
+  <p>&nbsp;</p>
+</div></body>
+</html>

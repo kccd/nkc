@@ -61,12 +61,16 @@ replySchema.methods.view = async function() {
 };
 
 replySchema.post('save', async function(doc, next) {
-  const UsersPersonalModel = mongoose.model('usersPersonal');
+  try {
+    const UsersPersonalModel = mongoose.model('usersPersonal');
 
-  const uid = doc.toUid;
-  const toUser = await UsersPersonalModel.findOnly({uid});
-  await toUser.increasePsnl('replies', 1);
-  return next()
+    const uid = doc.toUid;
+    const toUser = await UsersPersonalModel.findOnly({uid});
+    await toUser.increasePsnl('replies', 1);
+    return next()
+  } catch(e) {
+    return next(e)
+  }
 });
 
 module.exports = mongoose.model('replies', replySchema);

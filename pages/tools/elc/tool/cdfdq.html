@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML xmlns="http://www.w3.org/1999/xhtml"><HEAD><META content="IE=7.0000"
+http-equiv="X-UA-Compatible">
+<TITLE>差动放大器计算器</TITLE>
+<META content=IE=EmulateIE7 http-equiv=X-UA-Compatible>
+
+<META name=keywords content=差动放大器计算,差动放大器，差动放大器在线计算>
+<META name=description content=一款差动放大器计算器工具程序><LINK rel=stylesheet type=text/css
+href="cdfdq/skin.css"><LINK rel="shortcut icon" href="/favicon.ico">
+<META name=GENERATOR content="MSHTML 10.00.9200.16635"><style type="text/css">
+<!--
+body {
+	margin-top: 20px;
+}
+-->
+</style></HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<DIV class=w950>
+  <DIV class=knr>
+    <h2>差动放大器计算器</h2>
+    <DIV class=mobile_main>
+<SCRIPT type=text/javascript>
+function Compute(form) {
+	with(Math) {
+		var KILO= 1000;
+		var MEGA= KILO*KILO;
+		var PICO= 1/(MEGA*MEGA);
+
+		var PI= 3.1415926535897932384626433832795;
+
+		var R1= Number(form.R1.value)*KILO;
+		var R2= Number(form.R2.value)*KILO;
+		var RC= Number(form.RC.value)*KILO;
+		var RE= Number(form.RE.value)*KILO;
+
+		var Beta= Number(form.Beta.value);
+		var VBE= Number(form.VBE.value);
+		var VP= Number(form.VP.value);
+		var Ft= Number(form.Ft.value)*MEGA;
+		var Cbe= Number(form.Cbe.value)*PICO;
+		var Ccb= Number(form.Ccb.value)*PICO;
+		var RS= Number(form.RS.value);
+		var RL= Number(form.RL.value);
+
+		var Precision= 5;
+		var Rin;
+		var fp1;
+		var fp2;
+
+		VB= VP*R2/(R1+R2);
+		VE= VB-VBE;
+		IE= VE/RE;
+		Alpha= Beta/(1+Beta);
+		IC= Alpha*IE;
+		IB= IC/Beta;
+		VC= VP - IC*RC;
+
+		gm = IC/.025
+		Rpi= Beta/gm;
+		re= Alpha/gm;
+
+
+		Rb= (Beta+1)*(re+RE);
+		R12= R1*R2/(R1+R2);
+		Rin= Rb*R12/(Rb+R12);
+
+		RCL= RC*RL/(RC+RL);
+
+		A= (Alpha*Rpi*RCL)/((RS+2*Rpi)*re);
+
+		// Cpi is Cbe
+		// Cu   is Ccb
+
+		if( Ccb && Ft) { 		// we can find Cbe from Ft an Ccb
+			Cbe= gm/(Ft*2*PI)-Ccb;
+		}
+
+		Rspi= RS*2*Rpi/(RS+2*Rpi);
+
+
+
+		fp1= 1/(2*PI*(Rspi)*(Cbe/2+Ccb));
+		fp2= 1/(2*PI*RCL*Ccb);
+
+
+
+		Rin/= KILO;
+		fp1/= MEGA;
+		fp2/= MEGA;
+		Cbe/=PICO;
+
+		form.VB.value= VB.toPrecision(Precision);
+		form.VE.value= VE.toPrecision(Precision);
+		form.VC.value= VC.toPrecision(Precision);
+		form.IB.value=  IB.toPrecision(Precision)*KILO;
+		form.IC.value=  IC.toPrecision(Precision)*KILO;
+		form.IE.value=  IE.toPrecision(Precision)*KILO;
+		form.gm.value= gm.toPrecision(Precision);
+		form.A.value= A.toPrecision(Precision);
+		form.Rpi.value= Rpi.toPrecision(Precision);
+		form.re.value= re.toPrecision(Precision);
+		form.Rin.value= Rin.toPrecision(Precision);
+		form.fp1.value= fp1.toPrecision(Precision);
+		form.fp2.value= fp2.toPrecision(Precision);
+		form.Cbe.value= Cbe.toPrecision(Precision);
+
+
+
+	}
+}
+</SCRIPT>
+
+<FORM method=post name=ParamForm action="">
+<TABLE style="FONT-SIZE: 12px" height=573 border=1>
+  <TBODY>
+  <TR>
+    <TD><FONT size=3 face=Arial>R1</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=18 name=R1>
+  (KΩ)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>R2</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=3.9 name=R2> (KΩ)</FONT></TD></TR>
+  <TR>
+    <TD><FONT size=3 face=Arial>R<SUB>C</SUB> </FONT><FONT size=2
+      face=Arial>(Collector resistor)集电极电阻</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=3 name=RC>
+  (KΩ)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT size=3 face=Arial>R<SUB>E</SUB> </FONT><FONT size=2
+      face=Arial>(Emitter resistor)发射极电阻</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=3.4 name=RE>
+  (KΩ)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>VP<FONT size=2> (Supply Voltage)电源电压</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=25 name=VP> (V)</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>Beta <FONT size=2>(DC Current
+      Gain)直流电流增益</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=100 name=Beta></FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>V<SUB>BE </SUB><FONT size=2>(Base to emitter
+      drop)基极-发射极压降</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=0.6 name=VBE> (V)</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>R<SUB><FONT size=2>s</FONT></SUB> <FONT
+      size=2>(Source Resistance): 电源内阻</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=50 name=RS> (Ω)</FONT></TD></TR>
+  <TR>
+    <TD><FONT size=3 face=Arial>R</FONT><FONT size=2
+      face=Arial><SUB>L</SUB></FONT><FONT size=3 face=Arial> </FONT><FONT size=2
+      face=Arial>(Load resistor)负载电阻</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=470 name=RL>
+  (Ω)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>f<FONT size=1 face=Arial><SUB>T</SUB></FONT> <FONT
+      size=2>(Current Gain BW Product):电流增益带宽</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=400 name=Ft> (MHz)</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>C<FONT size=2><SUB>CB</SUB></FONT> <FONT size=2>(Cu
+      Collector-Base Cap.): 集电极与基极间电容</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 value=2 name=Ccb> (pF)</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>C<FONT size=2><SUB>BE</SUB></FONT> <FONT
+      size=2>(C</FONT></FONT><B><FONT size=2><SUB>π</SUB></FONT></B><FONT
+      size=2>, Base-Emitter Cap.):</FONT><FONT size=2
+      face=Arial>基极和发射极之间的电容(可选)</FONT><FONT size=2>&nbsp; </FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=Cbe> (pF)</FONT></TD></TR>
+  <TR>
+    <TD colSpan=2>
+      <P align=center><FONT face=Arial><INPUT onclick=Compute(document.ParamForm) type=button value=计算></FONT></P></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>V<FONT size=2><SUB>C</SUB></FONT> <FONT
+      size=2>(Collector Voltage)集电极电压</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=VC> (V)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>V<FONT size=2><SUB>E</SUB></FONT></FONT> <FONT size=2
+      face=Arial>(Emitter Voltage)发射极电压</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=VE> (V)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>V<FONT size=2><SUB>B</SUB> (Base
+      Voltage)基极电压</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=VB> (V)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>I<SUB>E</SUB><FONT size=2> (Emitter
+      Voltage)发射极电压</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=IE> (mA)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>I<SUB>C</SUB><FONT size=2> (Collector
+      Voltage)集电极电压</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=IC> (mA)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>I<SUB>B</SUB> <FONT size=2>(Base
+      Voltage)基极电压</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=IB> (mA)&nbsp;</FONT></TD></TR>
+  <TR>
+    <TD>g<SUB><I><FONT size=1>m </FONT></I></SUB><FONT
+      face=Arial>(Transconductance)跨导</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=gm> </FONT></TD></TR>
+  <TR>
+    <TD>r<B><FONT size=2><SUB>π</SUB></FONT></B><FONT size="2" face=Arial> (Input Resistance of BJT</FONT><FONT size=2> at low
+      freq)晶体管输入阻抗,低频率的</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=Rpi> (Ω) </FONT></TD></TR>
+  <TR>
+    <TD>r<B><FONT size=2><SUB>e</SUB></FONT></B><FONT face=Arial>&nbsp;
+    </FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=re> (Ω) </FONT></TD></TR>
+  <TR>
+    <TD>R<SUB>IN</SUB><FONT size="2" face=Arial> (Input
+      Resistance</FONT><FONT size=2> of Amp)放大器输入阻抗</FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=Rin> (KΩ)</FONT></TD></TR>
+  <TR>
+    <TD colSpan=2>
+      <P align=center>　</P></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>A<FONT size=2> (Amplifier Voltage
+      Gain)放大器的电压增益</FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=A> </FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>f<FONT size=1><SUB>P1</SUB></FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=fp1> (MHz)</FONT></TD></TR>
+  <TR>
+    <TD><FONT face=Arial>f<FONT size=1><SUB>P2</SUB></FONT></FONT></TD>
+    <TD><FONT face=Arial><INPUT size=17 name=fp2>
+(MHz)</FONT></TD></TR></TBODY></TABLE></FORM>
+<H4><FONT face=Arial>Equations</FONT></H4>
+<P><FONT face=Arial>V<SUB>B</SUB>=&nbsp; VP*R2/(R1+R2)</FONT></P>
+<P><FONT face=Arial>V<SUB>E</SUB>= V<SUB>B</SUB>-V<SUB>BE</SUB></FONT></P>
+<P><FONT face=Arial>I<SUB>E=</SUB>V<SUB>E</SUB>/R<SUB>E</SUB></FONT></P>
+<P><FONT face=Arial>Alpha= Beta/(Beta+1);</FONT></P>
+<P><FONT face=Arial>I<SUB>C= </SUB>Alpha*I<SUB>E</SUB></FONT></P>
+<P><FONT face=Arial>V<SUB>C</SUB>= VP -&nbsp;
+I<SUB>C</SUB>*R<SUB>C</SUB>/2</FONT></P>
+<P><FONT face=Arial>I<SUB>B</SUB>=I<SUB>C</SUB>/Beta</FONT></P>
+<P>　</P>
+<P>g<I><FONT size=1><SUB>m </SUB></FONT></I><FONT face=Arial>=
+Ic/25mA</FONT></P>
+<P>r<B><FONT size=2><SUB>e</SUB></FONT></B><FONT face=Arial>=
+Alpha/</FONT>g<I><FONT size=1><SUB>m </SUB></FONT></I></P>
+<P>r<B><FONT size=2><SUB>π</SUB></FONT></B><FONT face=Arial>=
+Beta/</FONT>g<I><FONT size=1><SUB>m </SUB></FONT></I></P>
+<P>A=<FONT face=Arial>Alpha*</FONT> r<B><FONT
+size=2><SUB>π</SUB></FONT></B>*<FONT size=3
+face=Arial>R<SUB>C</SUB></FONT>/(<FONT face=Arial>R<SUB><FONT
+size=2>s</FONT></SUB></FONT>+2*r<B><FONT
+size=2><SUB>π</SUB></FONT></B>)/r<B><FONT size=2><SUB>e</SUB></FONT></B></P>
+<P><FONT face=Arial>f<FONT size=1><SUB>P1</SUB></FONT></FONT>=1/(<FONT
+size=3>2*π*(</FONT><FONT face=Arial>R<FONT
+size=2><SUB>s</SUB></FONT></FONT>||2*r<B><FONT
+size=2><SUB>π</SUB></FONT></B>)*(<FONT size=3>C</FONT><FONT
+size=2><SUB>BE/2</SUB></FONT>+<FONT size=3>C</FONT><FONT
+size=2><SUB>BC</SUB></FONT>))</P>
+<P><FONT face=Arial>f<FONT size=1><SUB>P2</SUB></FONT></FONT>=1/(<FONT
+size=3>2*π*</FONT><FONT size=3 face=Arial>R<SUB>C</SUB></FONT><FONT
+size=3>*C</FONT><FONT size=2><SUB>BC</SUB></FONT>)</P>
+<P>　</P>
+<P><FONT face=Arial>f<FONT size=1 face=Arial><SUB>T</SUB></FONT></FONT><FONT
+size=3>= </FONT>g<I><FONT size=1><SUB>m</SUB></FONT></I><FONT
+size=3>/(2π*(C</FONT><FONT size=2><SUB>BE</SUB></FONT><FONT
+size=3>+C</FONT><FONT size=2><SUB>BC</SUB></FONT><FONT size=3>))</FONT></P>
+<P><FONT size=3>The lower pole is dominate:&nbsp;</FONT></P>
+<P>　</P>
+<P align=center><FONT size=1>. </FONT></P></TD></TR></TBODY></TABLE>
+<DIV style="HEIGHT: 10px"></DIV>
+<DIV class=mob_det>
+<P align=center>这个计算器计算偏置电压和电流，以及增益和频率响应。<BR><IMG
+src="cdfdq/1.gif" width="488" height="275"></P>
+</DIV></DIV></DIV>
+<DIV class=head3></DIV>
+</DIV>
+</BODY></HTML>

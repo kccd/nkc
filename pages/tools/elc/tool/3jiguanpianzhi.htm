@@ -1,0 +1,389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>三极管偏置电压计算器</TITLE>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY topmargin="0" leftmargin="0" style="text-align: center; font-size: 12px;">
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<SCRIPT language="JavaScript">
+
+
+function ShowBiasType(form) {
+	var type= Number(form.BiasType.value);
+	switch(type) {
+		case 2:
+			document.getElementById('a1').style.display= "none";
+			document.getElementById('a2').style.display= "none";
+			document.getElementById('b1').style.display= "none";
+			document.getElementById('b2').style.display= "none";
+
+			document.getElementById('c1').style.display= "block";
+			document.getElementById('c2').style.display= "block";
+			document.getElementById('d1').style.display= "block";
+			document.getElementById('d2').style.display= "block";
+
+			document.getElementById('i1').style.display= "block";
+			document.getElementById('i2').style.display= "none";
+		break;
+		case 1:
+			document.getElementById('a1').style.display= "block";
+			document.getElementById('a2').style.display= "block";
+			document.getElementById('b1').style.display= "block";
+			document.getElementById('b2').style.display= "block";
+
+			document.getElementById('c1').style.display= "none";
+			document.getElementById('c2').style.display= "none";
+			document.getElementById('d1').style.display= "none";
+			document.getElementById('d2').style.display= "none";
+
+			document.getElementById('i1').style.display= "none";
+			document.getElementById('i2').style.display= "block";
+		break;
+	}
+
+}
+
+
+function Compute(form) {
+	with(Math) {
+		var KILO= 1000;
+		var MEGA= KILO*KILO;
+		var PICO= 1/(MEGA*MEGA);
+		var RB= Number(form.RB.value)*KILO;
+		var RC= Number(form.RC.value)*KILO;
+		var RE1= Number(form.RE1.value)*KILO;
+		var RE2= Number(form.RE2.value)*KILO;
+		var R1= Number(form.R1.value)*KILO;
+		var R2= Number(form.R2.value)*KILO;
+		var Beta= Number(form.Beta.value);
+		var Vbe= Number(form.Vbe.value);
+		var VP= Number(form.VP.value);
+		var Vin= Number(form.Vin.value);
+		var Ft= Number(form.Ft.value)*MEGA;
+		var Cbe= Number(form.Cbe.value)*PICO;
+		var Ccb= Number(form.Ccb.value)*PICO;
+		var Rs= Number(form.Rs.value);
+		var RL= Number(form.RL.value);
+
+		var Precision= 5;
+		var Rin;
+		var RE= RE1+RE2;
+
+
+		if(R1) {
+				RB= R1*R2/(R1+R2);
+				Vin= VP*R2/(R1+R2);
+		}
+
+		Rout=  RL*RC/(RL+RC);
+
+		Ib= (Vin-Vbe)/(RB+Beta*RE);
+		Ic= Beta*Ib;
+		Ve= Ic*RE;
+		Vb= Ve+Vbe;
+		Vc= VP - Ic*RC;
+
+
+
+
+		if(Vc<Ve) {
+			form.Saturated.checked= true;
+			form.CutOff.checked= false;
+			// in saturation, VC=VE and we have a voltage divider
+			Ve= VP*RE/(RE+RC);
+			Vc= Ve;
+			Vb= Ve+Vbe;
+			Ic= VP/(RE+RC);
+		} else if(Vin<Vb) {
+			form.CutOff.checked= true;
+			form.Saturated.checked= false;
+			Vc= VP;
+			Ve= 0;
+			Vb= Vbe;
+			Ic= 0;
+			Ib= 0;
+
+		}else {
+			form.Saturated.checked= false;
+			form.CutOff.checked= false;
+		}
+
+		gm= Ic/.025;
+		rpi= Beta/gm;
+
+		Rin= RB*Rs/(RB+Rs);
+
+		if( Ccb && Ft) { 		// we can find Cbe from Ft an Ccb
+			Cbe= gm/(Ft*2*PI)-Ccb;
+		}
+
+		Cmce= Ccb*(1+gm*Rout);
+		BWce= 1/((Cbe+Cmce)*Rin)/(2*PI);
+
+
+
+		var Rcc= 1/( 1/Rs + 1/((1+gm*RE)*rpi) );
+		var BWcc= 1/((Ccb+ Cbe/(1+gm*RE))*Rcc)/(2*PI);
+
+
+
+		var Rincc= 1/( 1/((Beta+1)*((RE2*RL)/(RE2+RL))) + 1/RB);
+
+
+		if(RE2) {
+			Ace= Rout/RE2;
+		} else {
+			Ace= gm*Rout;
+		}
+
+		Acc= Rincc/(Rincc+Rs);
+
+
+		Rincc= Rincc/KILO; 	//convert to K欧姆
+
+		Ib*= KILO; // convert to mA
+		Ic*= KILO;
+
+		Cmce= Cmce/PICO;
+		Cbe= Cbe/PICO;
+		BWce= BWce/MEGA;
+		BWcc= BWcc/MEGA
+
+		form.Rincc.value= Rincc.toPrecision(Precision);
+		form.Ace.value= Ace.toPrecision(Precision);
+		form.Acc.value= Acc.toPrecision(Precision);
+		form.Cmce.value= Cmce.toPrecision(Precision);
+		form.Cbe.value= Cbe.toPrecision(Precision);
+		form.BWce.value= BWce.toPrecision(Precision);
+		form.BWcc.value= BWcc.toPrecision(Precision);
+		form.rpi.value= rpi.toPrecision(Precision);
+		form.gm.value= gm.toPrecision(Precision);
+		form.Ib.value= Ib.toPrecision(Precision);
+		form.Ic.value= Ic.toPrecision(Precision);
+		form.Ve.value= Ve.toPrecision(Precision);
+		form.Vb.value= Vb.toPrecision(Precision);
+		form.Vc.value= Vc.toPrecision(Precision);
+
+
+	}
+}
+
+
+</SCRIPT>
+
+<TABLE width="600" border="0">
+  <TBODY>
+  <TR>
+    <TD align="left" valign="top"><div align="center" class="STYLE1">三极管偏置电压计算器</div></TD>
+  </TR>
+  <TR>
+    <TD height="540" align="left" valign="top">
+      <P align="center"><IMG width="361" height="420" src="3jiguanpianzhi_files/48a9c9c9d59c56490ce9a02b68ebdd31.gif"
+      border="0"><BR><BR>晶体管偏置电阻系列 </P>
+      <FORM name="ParamForm" action="" method="post">
+      <DIV align="center">
+      <TABLE height="573" border="1">
+        <TBODY>
+        <TR>
+          <TD align="left">相应类型</TD>
+          <TD align="left"><SELECT name="BiasType" onChange="ShowBiasType(this.form);"
+            size="1"><OPTION value="1" selected="">系列电阻</OPTION>
+                                  <OPTION value="2">分压器型</OPTION>
+                             </SELECT></TD></TR>
+        <TR>
+          <TD align="left">
+            <DIV id="a1" style="display: block;"><FONT face="Arial"
+            size="3">R<SUB>B</SUB> </FONT><FONT face="Arial" size="2">(Base
+            resistor)基极电阻</FONT></DIV></TD>
+          <TD align="left">
+            <DIV id="a2" style="display: block;"><FONT face="Arial"><INPUT name="RB"
+            size="17">
+        (KΩ)&nbsp;</FONT></DIV></TD></TR>
+        <TR>
+          <TD align="left">
+            <DIV id="b1" style="display: block;"><FONT face="Arial">V<FONT face="Arial"
+            size="2"><SUB>B</SUB></FONT><FONT size="2"> (Bias
+                         Voltage)基极偏压</FONT></FONT></DIV></TD>
+          <TD align="left">
+            <DIV id="b2" style="display: block;"><FONT face="Arial"><INPUT name="Vin"
+            size="17">                                (V)</FONT></DIV></TD></TR>
+        <TR>
+          <TD align="left">
+            <DIV id="c1" style="display: none;"><FONT face="Arial" size="3">R1
+            上拉电阻</FONT></DIV></TD>
+          <TD align="left">
+            <DIV id="c2" style="display: none;"><FONT face="Arial"><INPUT name="R1"
+            size="17" value="10">
+            (KΩ)&nbsp;</FONT></DIV></TD></TR>
+        <TR>
+          <TD align="left">
+            <DIV id="d1" style="display: none;"><FONT face="Arial">R2
+            下</FONT><FONT face="Arial" size="3">拉电阻</FONT></DIV></TD>
+          <TD align="left">
+            <DIV id="d2" style="display: none;"><FONT face="Arial"><INPUT name="R2"
+            size="17" value="2">
+          (KΩ)</FONT></DIV></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial" size="3">R<SUB>C</SUB>
+            </FONT><FONT face="Arial" size="2">(Collector resistor)集电极电阻
+          </FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="RC" size="17"
+            value="1">                                (KΩ)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial" size="3">R<SUB>E1</SUB>
+            </FONT><FONT face="Arial" size="2">(Emitter resistor
+          1)发射极电阻</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="RE1" size="17"
+            value=".24">                                (KΩ)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left">
+            <P align="left"><FONT face="Arial" size="3">R<SUB>E2</SUB>
+            </FONT><FONT face="Arial" size="2">(Emitter resistor
+            2)发射极电阻</FONT></P></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="RE2" size="17"
+            value="0">                                (KΩ)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">VP<FONT size="2"> (Supply
+            Voltage)电源电压</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="VP" size="17"
+            value="10">                                (V)</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">Beta <FONT size="2">(DC Current
+            Gain)直流电流增益</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Beta" size="17"
+            value="100">                               </FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">V<SUB>BE </SUB><FONT
+            size="2">(Base to emitter
+            drop)基地发射下拉</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Vbe" size="17"
+            value="0.6">                                (V)</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">R<SUB><FONT
+            size="2">s</FONT></SUB> <FONT size="2">(Source
+                      Resistance): <A style="text-decoration: none;" href="http://www.838dz.com/"><FONT
+            color="#000000">信号源电阻</FONT></A></FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Rs" size="17"
+            value="50">                                (Ω)</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial" size="3">R</FONT><FONT face="Arial"
+            size="2"><SUB>L</SUB></FONT><FONT face="Arial" size="3">
+            </FONT><FONT face="Arial" size="2">(Load
+                resistor)负载电阻</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="RL" size="17"
+            value="50">                                (Ω)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">f<FONT face="Arial"
+            size="1"><SUB>T</SUB></FONT><FONT size="2">（电流增益带宽 ）:
+            </FONT></FONT><FONT size="2">可选</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Ft" size="17"
+            value="650">                                (MHz)</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">C<FONT
+            size="2"><SUB>CB</SUB></FONT> </FONT><FONT
+            size="2">集电极-基极电容（可选）</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Ccb" size="17"
+            value="1">                                (pF)</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">C<FONT
+            size="2"><SUB>BE</SUB></FONT> </FONT><FONT
+            size="2">基极-发射极电容（可选）</FONT><FONT face="Arial" size="2">
+            </FONT><FONT size="2">&nbsp;</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Cbe" size="17">
+                                       (pF)</FONT></TD></TR>
+        <TR>
+          <TD align="left" colspan="2">
+            <P align="center"><FONT face="Arial"><INPUT name="go" style="width: 50px; height: 22px;" onClick="Compute(document.ParamForm)" type="button" value="计算">
+                                          </FONT></P></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">Vc <FONT size="2">(Collector
+            Voltage)集电极电压 </FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Vc" size="17">
+                                      (V)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left">Ve <FONT face="Arial" size="2">(Emitter
+                                Voltage)发射极电压</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Ve" size="17">
+                                      (V)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left">Vb<FONT face="Arial" size="2"> (Base
+                             Voltage)基极电压</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Vb" size="17">
+                                      (V)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left">Ic<FONT face="Arial" size="2"> (Collector Voltage)
+            集电极电流</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Ic" size="17">
+                                      (mA)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">Ib <FONT size="2">(Base
+            Voltage)</FONT></FONT><FONT face="Arial" size="2"> 基极电流</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Ib" size="17">
+                                      (mA)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD align="left">g<SUB><I><FONT size="1">m </FONT></I></SUB><FONT
+            face="Arial">(Transconductance)跨导</FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="gm" size="17">
+                                     </FONT></TD></TR>
+        <TR>
+          <TD align="left">r<B><FONT size="2"><SUB>π</SUB></FONT></B><FONT size="2"
+            face="Arial"> (</FONT>晶体管输入电阻，在低频率)</TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="rpi" size="17">
+                                      </FONT></TD></TR>
+        <TR>
+          <TD align="left">&nbsp;</TD>
+          <TD align="left"><INPUT name="Saturated" type="checkbox" value="ON">
+                                            饱和</TD></TR>
+        <TR>
+          <TD align="left">&nbsp;</TD>
+          <TD align="left"><INPUT name="CutOff" type="checkbox" value="ON">
+                                         截止区</TD></TR>
+        <TR>
+          <TD align="left" colspan="2">
+            <P align="center"><B><FONT
+        face="Arial">CE</FONT></B>共发射极）配置参数</P></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">A<FONT size="2">
+            (放大器的电压增益)</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Ace" size="17">
+                                      </FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">C<FONT size="2"><SUB>MCE</SUB>
+            (Miller
+            Capacitance米勒电容)</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Cmce" size="17">
+                                        (pF) </FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">BW<FONT size="2"><SUB>CE</SUB>
+            (BW)</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="BWce" size="17">
+                                        (MHz)</FONT></TD></TR>
+        <TR>
+          <TD align="left" colspan="2">
+            <P align="center"><B><FONT face="Arial">CC
+                   （共集电极）配置参数</FONT></B></P></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">A<FONT size="2">
+            (放大器的电压增益)</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Acc" size="17">
+                                      </FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">R<SUB>in</SUB></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="Rincc" size="17">
+                                         (KΩ) </FONT></TD></TR>
+        <TR>
+          <TD align="left"><FONT face="Arial">BW<FONT size="2"><SUB>CC</SUB>
+            (BW)</FONT></FONT></TD>
+          <TD align="left"><FONT face="Arial"><INPUT name="BWcc" size="17">
+
+      (MHz)</FONT></TD></TR></TBODY></TABLE></DIV></FORM></TD></TR></TBODY></TABLE>
+</BODY></HTML>

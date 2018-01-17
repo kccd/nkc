@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>运放分频器计算器</title>
+<SCRIPT type="text/javascript">
+<!--
+// Original JavaScript December, 2000
+// Robert A. Booty
+// http://home.new.rr.com/trumpetb/audio/009js.html
+
+function doCalc() {
+  var freq = document.forms[0].F0.value
+  if (freq < 200) {
+    var R = 100;
+  }
+  else {
+    var R = 10;
+  }
+  document.forms[0].R.value = R;
+
+var C = (10/R)*50/(2*Math.PI*freq);
+  document.forms[0].C.value = Math.round(C*10000)/10000;
+
+var R2 = 407.4/(2*Math.PI*freq*C);
+  document.forms[0].R2.value = Math.round(R2*10)/10;
+
+var R4 = 474.2/(2*Math.PI*freq*C);
+  document.forms[0].R4.value = Math.round(R4*10)/10;
+
+var R7 = 5176.6/(2*Math.PI*freq*C);
+  document.forms[0].R7.value = Math.round(R7);
+
+var C2 = 2455.3/(2*Math.PI*freq*R);
+  document.forms[0].C2.value = Math.round(C2*10000)/10000;
+
+var C4 = 2108.9/(2*Math.PI*freq*R);
+  document.forms[0].C4.value = Math.round(C4*10000)/10000;
+
+var C7 = 193.1/(2*Math.PI*freq*R);
+  document.forms[0].C7.value = Math.round(C7*10000)/10000;
+}
+// -->
+</SCRIPT>
+<style type="text/css">
+<!--
+.STYLE1 {color: #000000}
+.STYLE2 {color: #FFFFFF}
+-->
+</style>
+</head>
+
+<body>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<div align="center">
+  <h2>运放分频器计算器</h2>
+  <p><img src="yffp/009schem.gif" width="514" height="352" /></p>
+  <form id="" name="" method="post" action="">
+    <table height="142" border="1">
+      <tr>
+        <td colspan="4" nowrap="nowrap"><div align="center"><span class="STYLE1">分频频率: Fol = Foh =
+          <label>
+          <input name="F0" type="text" id="F0" value="40" size="8" />
+          </label>
+        </span>Hz</div></td>
+      </tr>
+      <tr>
+        <td>R</td>
+        <td><label>
+          <input name="R" type="text" id="R" size="8" />
+        KΩ</label></td>
+        <td>C</td>
+        <td><label>
+          <input name="C" type="text" id="C" size="8" />
+        μF</label></td>
+      </tr>
+      <tr>
+        <td>R2</td>
+        <td><label>
+          <input name="R2" type="text" id="R2" size="8" />
+          KΩ</label></td>
+        <td>C2</td>
+        <td><label>
+          <input name="C2" type="text" id="C2" size="8" />
+        μF</label></td>
+      </tr>
+      <tr>
+        <td>R4</td>
+        <td><label>
+          <input name="R4" type="text" id="R4" size="8" />
+          KΩ</label></td>
+        <td>C4</td>
+        <td><label>
+          <input name="C4" type="text" id="C4" size="8" />
+        μF</label></td>
+      </tr>
+      <tr>
+        <td>R7</td>
+        <td><label>
+          <input name="R7" type="text" id="R7" size="8" />
+          KΩ</label></td>
+        <td>C7</td>
+        <td><label>
+          <input name="C7" type="text" id="C7" size="8" />
+        μF</label></td>
+      </tr>
+      <tr>
+        <td colspan="4"><label>
+          <input type="button" name="Submit" value="计算" onClick="doCalc()"/>
+        </label>
+          <label>
+          <input type="reset" name="Submit2" value="重置" />
+        </label></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </form>
+  <table bgcolor="#ffffff" border="0" cellspacing="0" cellpadding="3">
+    <tbody>
+      <tr>
+        <th bgcolor="#000080" colspan="11"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">计算方法: </span> </th>
+      </tr>
+      <tr>
+        <td bgcolor="#000080" colspan="11"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">R的理论值:</span><span class="STYLE2"><small><span
+            style="background-color: rgb(0, 0, 128);">(频率Fc < 200 Hz时，R = 100 KΩ，否则R = 10 KΩ)</span></small></span>
+                    <hr />        </td>
+      </tr>
+      <tr align="middle">
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">C
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);"> (10/R)*50</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π
+              F</span></small></span></td>
+        <td bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">C2
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2455.3</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π F
+              R</span></small></span></td>
+        <td bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">C4
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2108.9</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π F
+              R</span></small></span></td>
+        <td bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">C7
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">193.1</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π F
+              R</span></small></span></td>
+      </tr>
+      <tr>
+        <td height="23" bgcolor="#000080" colspan="11"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">&nbsp;</span></small></span></td>
+      </tr>
+      <tr align="middle">
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">R2
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">407.4</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π F
+              C</span></small></span></td>
+        <td bgcolor="#000080"><span class="STYLE2"></span></td>
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">R4
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">474.2</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π F
+              C</span></small></span></td>
+        <td bgcolor="#000080"><span class="STYLE2"></span></td>
+        <td align="right" bgcolor="#000080"><span class="STYLE2" style="background-color: rgb(0, 0, 128);">R7
+          =</span></td>
+        <td align="center" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">5176.6</span></small> </span>
+            <hr size="1" noshade="noshade" />
+            <span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">2 π F
+              C</span></small></span></td>
+        <td bgcolor="#000080"><span class="STYLE2"></span></td>
+        <td align="right" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">(C
+          in<br />
+          <br />
+          (R in</span></small></span></td>
+        <td align="left" bgcolor="#000080"><span class="STYLE2"><small><span style="background-color: rgb(0, 0, 128);">μF)<br />
+          <br />
+          KΩ)</span></small></span></td>
+      </tr>
+      <tr>
+        <td bgcolor="#000080" colspan="11"><hr />
+          <span class="STYLE2">&nbsp;</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p><img src="yffp/Fc40Hz.gif" width="432" height="203" /></p>
+</div>
+</body>
+</html>

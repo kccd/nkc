@@ -1,0 +1,423 @@
+<!doctype html>
+<html>
+<head>
+<title>火箭发动机内弹道</title>
+</head>
+<body>
+<h1 align="center">火箭发动机超音速喷管计算</h1>
+<table width="661" border="1" align="center">
+  <tr>
+    <td width="340" height="265" align="center" valign="top">喷管参数
+      <table width="353" border="0" align="center">
+        <tr>
+          <td width="171" height="22">燃烧室压强(Mpa)</td>
+          <td width="166"><input type="text" id="P" value=6.0 /></td>
+        </tr>
+        <tr>
+          <td>燃气温度(K)</td>
+          <td><input type="text" id="T" value=3600 /></td>
+        </tr>
+        <tr>
+          <td>燃气平均分子量</td>
+          <td><input type="text" id="M" value=30 /></td>
+        </tr>
+        <tr>
+          <td>燃气比热比</td>
+          <td><input type="text" id="K" value=1.25 /></td>
+        </tr>
+        <tr>
+          <td>大气压强(Kpa)</td>
+          <td><input type="text" id="atm" value=101.325 /></td>
+        </tr>
+        <tr>
+          <td>喷管收敛段长度(mm)</td>
+          <td><input type="text" id="L1" value=10 /></td>
+        </tr>
+        <tr>
+          <td>喷管入口直径(mm)</td>
+          <td><input type="text" id="D1" value=50 /></td>
+        </tr>
+        <tr>
+          <td>喷喉长度(mm)</td>
+          <td><input type="text" id="L2" value=3 /></td>
+        </tr>
+        <tr>
+          <td>喷喉直径(mm)</td>
+          <td><input type="text" id="D2" value=10 /></td>
+        </tr>
+        <tr>
+          <td>喷管扩张段长度(mm)</td>
+          <td><input type="text" id="L3" value=50 /></td>
+        </tr>
+        <tr>
+          <td>喷管出口直径(mm)</td>
+          <td><input type="text" id="D3" value=22 /></td>
+        </tr>
+        <tr>
+          <td>喷管扩张段形状</td>
+          <td><select name="xingzhuang" id="xingzhuang">
+            <option value="0">圆锥形</option>
+            <option value="1">抛物线</option>
+          </select></td>
+        </tr>
+      </table></td>
+    <td width="300" align="center" valign="top">喷管内壁形状
+      <canvas id="myCanvas" width="300" height="300" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+      <input type="submit" name="jisuan" id="jisuan" value="计算" onclick="jisuan();" ／></td>
+  </tr>
+  <tr>
+    <td height="374" align="center" valign="top"><table width="350" height="219" border="0">
+        <tr>
+          <td width="185">推力(kgf)</td>
+          <td width="155"><input type="text" id="A1" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>质量流量(kg/s)</td>
+          <td><input type="text" id="A2" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>特征速度(m/s)</td>
+          <td><input type="text" id="A3" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td width="185">比冲(s)</td>
+          <td><input type="text" id="A4" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>理想循环比冲(s)</td>
+          <td><input type="text" id="A5" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>比冲效率(%)</td>
+          <td><input type="text" id="A6" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>出口马赫数</td>
+          <td><input type="text" id="A7" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>出口速度(m/s)</td>
+          <td><input type="text" id="A8" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>出口压强(Kpa)</td>
+          <td><input type="text" id="A9" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>出口温度(K)</td>
+          <td><input type="text" id="A10" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>热效率(%)</td>
+          <td><input type="text" id="A11" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>理想热效率(%)</td>
+          <td><input type="text" id="A12" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>喷管效率(%)</td>
+          <td><input type="text" id="A13" readonly autocomplete="off" /></td>
+        </tr>
+        <tr>
+          <td>喉部热流密度(KJ/(mm2·s)</td>
+          <td><input type="text" id="A14" readonly autocomplete="off" /></td>
+        </tr>
+      </table></td>
+    <td align="center"><table width="300" border="0">
+        <tr>
+          <td align="center" valign="top"><canvas id="myCanvas1" width="140" height="100" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+            压强</td>
+          <td align="center" valign="top"><canvas id="myCanvas2" width="140" height="100" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+            温度</td>
+        </tr>
+        <tr>
+          <td align="center" valign="top"><canvas id="myCanvas3" width="140" height="100" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+            速度</td>
+          <td align="center" valign="top"><canvas id="myCanvas4" width="140" height="100" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+            热流密度</td>
+        </tr>
+        <tr>
+          <td height="120" align="center" valign="top"><canvas id="myCanvas5" width="140" height="100" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+            密度</td>
+          <td align="center" valign="top"><canvas id="myCanvas6" width="140" height="100" style="border:1px solid #d3d3d3;"> Your browser does not support the HTML5 canvas tag. </canvas>
+            马赫数 </td>
+        </tr>
+      </table></td>
+  </tr>
+</table>
+<p align="center"><a href="http://bbs.kechuang.org" target="_blank">科创论坛</a> 法式油炸薯条 编写 2015年11月 </p>
+<script>
+        var bianliang1=0;
+		jisuan();
+		function xiaoshu(yuanshuzi,n)
+		{
+		  var result=yuanshuzi.toFixed(n);
+		  return result;
+		}
+		function canvas2d(canvasname)
+		{
+			var canvas=document.getElementById(canvasname);
+			var canvasz=canvas.getContext("2d");
+			canvasz.clearRect(-1,-10,400,400);
+			if(bianliang1=0)
+			{
+			canvasz.translate(0.5,0.5);
+			}
+			canvasz.beginPath();
+			canvasz.lineWidth=2;
+	   	    canvasz.lineCap="round";
+			return canvas.getContext("2d");
+		}
+		function jisuan()
+			  {
+				  var tishi=0;
+				  var tishixinxi="";
+				  const pi=3.1415926535;
+				  var xtx=canvas2d("myCanvas");
+				  var atx=canvas2d("myCanvas1");
+				  var btx=canvas2d("myCanvas2");
+				  var ctx=canvas2d("myCanvas3");
+				  var dtx=canvas2d("myCanvas4");
+				  var etx=canvas2d("myCanvas5");
+				  var ftx=canvas2d("myCanvas6");
+				  bianliang1++;
+
+
+
+				  var L1=document.getElementById("L1").value*1;
+				  var L2=document.getElementById("L2").value*1;
+				  var L3=document.getElementById("L3").value*1;
+				  var D1=document.getElementById("D1").value*1;
+				  var D2=document.getElementById("D2").value*1;
+				  var D3=document.getElementById("D3").value*1;
+				  var xingzhuang=document.getElementById("xingzhuang").value*1;
+				  if(L3==0)
+				  {
+					  D3=D2;
+					  xingzhuang=0;
+					  tishi++;
+					  tishixinxi=tishixinxi+"已按照无扩张段计算\n";
+				  }
+				  var LS = L1*1+L2*1+L3*1;
+				  var BL = LS;
+				  if(Math.max(D1,D2,D3)>LS)
+				  {
+					  BL=Math.max(D1,D2,D3);
+				  }
+
+				  if(xingzhuang==0)
+				  {
+				  xtx.lineTo(150-135*LS/BL,150+135*D1/BL);
+				  xtx.lineTo(150+135*(2*L1-LS)/BL,150+135*D2/BL);
+				  xtx.lineTo(150+135*(L1*2+L2*2-LS)/BL,150+135*D2/BL);
+				  xtx.lineTo(150+135*LS/BL,150+135*D3/BL);
+				  xtx.moveTo(150-135*LS/BL,150-135*D1/BL);
+				  xtx.lineTo(150+135*(2*L1-LS)/BL,150-135*D2/BL);
+				  xtx.lineTo(150+135*(L1*2+L2*2-LS)/BL,150-135*D2/BL);
+				  xtx.lineTo(150+135*LS/BL,150-135*D3/BL);				  }
+				  else
+				  {
+					  xtx.lineTo(150-135*LS/BL,150+135*D1/BL);
+				      xtx.lineTo(150+135*(2*L1-LS)/BL,150+135*D2/BL);
+				      xtx.lineTo(150+135*(L1*2+L2*2-LS)/BL,150+135*D2/BL);
+					  for(var bianliang3=D2;bianliang3<=D3;bianliang3+=(D3-D2)/100)
+					  {
+						  xtx.lineTo(150+135*(L1*2+L2*2+2*L3*(bianliang3*bianliang3-D2*D2)/(D3*D3-D2*D2)-LS)/BL,150+135*bianliang3/BL);
+					  }
+					  xtx.moveTo(150-135*LS/BL,150-135*D1/BL);
+				      xtx.lineTo(150+135*(2*L1-LS)/BL,150-135*D2/BL);
+				      xtx.lineTo(150+135*(L1*2+L2*2-LS)/BL,150-135*D2/BL);
+					  for(var bianliang3=D2;bianliang3<=D3;bianliang3+=(D3-D2)/100)
+					  {
+						  xtx.lineTo(150+135*(L1*2+L2*2+2*L3*(bianliang3*bianliang3-D2*D2)/(D3*D3-D2*D2)-LS)/BL,150-135*bianliang3/BL);
+					  }
+
+				  }
+				  xtx.stroke();
+
+
+				  var P=document.getElementById("P").value*1000000;
+				  var T=document.getElementById("T").value;
+				  var M=document.getElementById("M").value;
+				  var K=document.getElementById("K").value;
+				  var atm=document.getElementById("atm").value*1000;
+				  var R=8314/M;
+				  var cp=R*K/(K-1);
+				  var c=Math.pow(R*T/(K*Math.pow(2/(K*1+1),(K*1+1)/(K-1))),0.5);
+				  document.getElementById("A3").value=xiaoshu(c,2);
+				  var mr=D2*D2*pi/4000000*P/c;
+				  document.getElementById("A2").value=xiaoshu(mr,4);
+				  var a12=1-Math.pow(atm/P,(K-1)/K);
+				  document.getElementById("A12").value=xiaoshu(a12*100,2)+"%";
+				  var ispmax=Math.pow(2*cp*T*a12,0.5);
+				  document.getElementById("A5").value=xiaoshu(ispmax/9.8,2);
+				  var rou0=P/(R*T);
+				  var T23=2*T/(1+K*1)
+				  var varT;
+				  vd=D2;
+
+				  for(var n=1;vd<=D3;n++)
+				  {
+					  varT=T23*(1-n/100000);
+					  vd=2*Math.pow(mr/(Math.pow(2*cp*(T-varT),0.5)*rou0*Math.pow(varT/T,1/(K-1))*pi),0.5)*1000;
+				  }
+
+				  document.getElementById("A10").value=varT.toFixed(2);
+				  var u3=Math.pow(2*cp*(T-varT),0.5);
+				  document.getElementById("A8").value=xiaoshu(u3,2);
+				  var p3=P*Math.pow(varT/T,K/(K-1));
+				  var rou3=rou0*Math.pow(varT/T,1/(K-1));
+				  document.getElementById("A9").value=xiaoshu(p3/1000,4);
+				  var tan=(D3-D2)/(2*L3);
+				  if(xingzhuang==1)
+				  {
+					  tan=(D3*D3-D2*D2)/(4*L3*D3);
+				  }
+
+				  var cos=Math.pow(1/(1+Math.pow(tan,2)),0.5);
+
+
+				  if(L3==0)
+				  {
+					  tan=0;
+					  cos=1;
+				  }
+				  var Tc=2*T/(1+K*1);
+				  var F=(cos+1)*((p3-atm)*Math.pow(D3/2000,2)*pi+u3*mr)/2;
+				  document.getElementById("A1").value=xiaoshu(F/9.8,4);
+				  var isp=F/(mr);
+				  document.getElementById("A4").value=xiaoshu(isp/9.8,2);
+				  document.getElementById("A6").value=xiaoshu(100*isp/ispmax,2)+"%";
+				  var Ma=u3/Math.pow(K*R*varT,0.5);
+				  document.getElementById("A7").value=xiaoshu(Ma,2);
+				  document.getElementById("A11").value=xiaoshu(100*isp*isp/(2*cp*T),2)+"%";
+				  document.getElementById("A13").value=xiaoshu(Math.pow(isp/ispmax,2)*100,2)+"%";
+				  var maxh=Tc*cp*mr/(Math.pow(D2/2,2)*pi);
+				  document.getElementById("A14").value=xiaoshu(maxh/1000,4);
+				  if(u3>2*Math.pow(K*R*T,0.5)/(cos*tan))
+				  {
+					  tishi+=1;
+					  tishixinxi=tishixinxi+"扩张角度过大，可能出现气流分离，使计算结果与实际不符\n";
+				  }
+				  if(atm>3*p3)
+				  {
+					  tishi+=1;
+					  tishixinxi=tishixinxi+"出口面积过大，喷管可能出现激波，使计算结果与实际不符\n";
+				  }
+				  if(atm>P*Math.pow(2/(K*1+1),K/(K-1)))
+				  {
+					  tishi+=1;
+					  tishixinxi="燃烧室压过低，喷管在亚音速工作，使计算结果与实际不符\n";
+				  }
+				  if(Math.min(D1*1,D2*1,D3*1)<D2*1)
+				  {
+					  tishi+=1;
+					  tishixinxi="请正确输入喷管形状参数\n";
+				  }
+
+
+
+
+
+				  var minT=varT;
+				  var deltaT=(Tc-minT)/1000;
+				  var deltau=u3;
+				  var vd=D3;
+				  var xx=140;
+				  var varu=u3;
+				  var varMa=Ma;
+				  var varh;
+
+				  if(L3==0)
+				  {
+				  atx.lineTo(xx,(1-Math.pow(varT/T,K/(K-1)))*100);
+				  btx.lineTo(xx,100*(1-varT/T));
+				  varu=Math.pow(2*(cp*(T-varT)),0.5);
+				  ctx.lineTo(xx,(1-varu/u3)*100);
+				  varh=varT*cp*mr/(Math.pow(vd/2,2)*pi);
+				  dtx.lineTo(xx,(1-varh/maxh)*100);
+				  etx.lineTo(xx,(1-Math.pow(varT/T,1/(K-1)))*100);
+				  varMa=varu/Math.pow(K*R*varT,0.5);
+				  ftx.lineTo(xx,100*(1-varMa/Ma));
+				  }
+
+				  if(xingzhuang==0)
+				  {
+				  for(var n=0;varT<=Tc;n++)
+				  {
+					  varT=minT*1+n*deltaT;
+					  vd=2*Math.pow(mr/(Math.pow(2*cp*(T-varT),0.5)*rou0*Math.pow(varT/T,1/(K-1))*pi),0.5)*1000;
+					  xx=140*(1-(D3-vd)/(LS*2*tan));
+					  atx.lineTo(xx,(1-Math.pow(varT/T,K/(K-1)))*100);
+					  btx.lineTo(xx,100*(1-varT/T));
+					  varu=Math.pow(2*(cp*(T-varT)),0.5);
+					  ctx.lineTo(xx,(1-varu/u3)*100);
+					  varh=varT*cp*mr/(Math.pow(vd/2,2)*pi);
+					  dtx.lineTo(xx,(1-varh/maxh)*100);
+					  etx.lineTo(xx,(1-Math.pow(varT/T,1/(K-1)))*100);
+					  varMa=varu/Math.pow(K*R*varT,0.5);
+					  ftx.lineTo(xx,100*(1-varMa/Ma));
+				  }
+				  }
+				  else
+				  {
+					   for(var n=0;varT<=Tc;n++)
+				  {
+					  varT=minT*1+n*deltaT;
+					  Ad=4*mr/(Math.pow(2*cp*(T-varT),0.5)*rou0*Math.pow(varT/T,1/(K-1))*pi)*1000000;
+					  xx=140*(1-(D3*D3-Ad)/((D3*D3-D2*D2)*LS/L3));
+					  atx.lineTo(xx,(1-Math.pow(varT/T,K/(K-1)))*100);
+					  btx.lineTo(xx,100*(1-varT/T));
+					  varu=Math.pow(2*(cp*(T-varT)),0.5);
+					  ctx.lineTo(xx,(1-varu/u3)*100);
+					  varh=varT*cp*mr/(Ad*pi/4);
+					  dtx.lineTo(xx,(1-varh/maxh)*100);
+					  etx.lineTo(xx,(1-Math.pow(varT/T,1/(K-1)))*100);
+					  varMa=varu/Math.pow(K*R*varT,0.5);
+					  ftx.lineTo(xx,100*(1-varMa/Ma));
+				  }
+				  }
+				  vd=D2;
+				  tan2=(D1-D2)/L1;
+				  for(var n=0;vd<D1;n++)
+				  {
+					  varT=Tc*1+n*0.0001*T;
+					  vd=2*Math.pow(mr/(Math.pow(2*cp*(T-varT),0.5)*rou0*Math.pow(varT/T,1/(K-1))*pi),0.5)*1000;
+					  xx=140*((D1-vd)/(LS*tan2));
+					  atx.lineTo(xx,(1-Math.pow(varT/T,K/(K-1)))*100);
+					  btx.lineTo(xx,100*(1-varT/T));
+					  varu=Math.pow(2*(cp*(T-varT)),0.5);
+					  ctx.lineTo(xx,(1-varu/u3)*100);
+					  varh=varT*cp*mr/(Math.pow(vd/2,2)*pi);
+					  dtx.lineTo(xx,(1-varh/maxh)*100);
+					  etx.lineTo(xx,(1-Math.pow(varT/T,1/(K-1)))*100);
+					  varMa=varu/Math.pow(K*R*varT,0.5);
+					  ftx.lineTo(xx,100*(1-varMa/Ma));
+				  }
+				  atx.stroke();
+				  btx.stroke();
+				  ctx.stroke();
+				  dtx.stroke();
+				  etx.stroke();
+				  ftx.stroke();
+
+
+
+
+				  if(tishi>0)
+				  {
+					  alert(tishixinxi);
+				  }
+
+				  return 0;
+			  }
+
+
+
+
+
+
+        </script>
+</body>
+</html>

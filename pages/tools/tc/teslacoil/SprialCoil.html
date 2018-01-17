@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0052)http://www.deepfriedneon.com/tesla_f_calcspiral.html -->
+<HTML><HEAD><TITLE>平板线圈电感-特斯拉线圈-科创在线-科技爱好综合社区</TITLE>
+
+<META name=GENERATOR content="MSHTML 8.00.7600.16671">
+<SCRIPT language=JavaScript1.2><!--
+var di=6, a=0, n=10, w = 0.30, s = 0.30, dout=6, i=0, u=1, wl=0, pi=3.14159;
+
+function gv() {
+di=document.helixcalc.diameter.value;
+n=document.helixcalc.turns.value;
+w=document.helixcalc.wirediameter.value;
+s=document.helixcalc.turnspacing.value;
+}
+
+function pv() {
+document.helixcalc.diameter.value=di;
+document.helixcalc.turns.value=n;
+document.helixcalc.wirediameter.value=w;
+document.helixcalc.turnspacing.value=s;
+calcinductance();
+document.helixcalc.height.value=dout;
+document.helixcalc.inductance.value=i;
+document.helixcalc.wirelength.value=wl;
+}
+
+function calcinductance() {
+dout=di*1+2*n*(w*1+s*1);
+//alert("Dout="+dout);
+dout=dout*1e+3;
+dout=parseInt(dout);
+dout=dout/1e+3;
+a=(di/u+n*(w/u+s/u))/2;
+i=(n*n*a*a)/(a*30-di/u*11);
+i=i*1e+3;
+i=parseInt(i);
+i=i/1e+3;
+wl=((dout-di)/2+di*1)*n*pi;
+if(u==25.4){wl=wl/1000};
+wl=wl*1e+3;
+wl=parseInt(wl);
+wl=wl/1e+3;
+
+}
+
+
+function changes() {
+gv();
+//alert("Di="+di+" n="+n+" w="+w+" s="+s);
+pv();
+}
+
+function selmm() {
+if (u==1)
+	{
+		u=25.4;
+		gv();
+		di=di*u;
+		di=di*1e+3;
+		di=parseInt(di+0.5);
+		di=di/1e+3;
+		w=w*u;
+		w=w*1e+3;
+		w=parseInt(w+0.5);
+		w=w/1e+3;
+		s=s*u;
+		s=s*1e+3;
+		s=parseInt(s+0.5);
+		s=s/1e+3;
+		pv();
+	}
+
+document.helixcalc.unit1.value="mm";
+document.helixcalc.unit2.value="mm";
+document.helixcalc.unit3.value="mm";
+document.helixcalc.unit4.value="mm";
+document.helixcalc.unit5.value="metre";
+}
+
+function selinches() {
+if (u==25.4)
+	{
+		gv();
+		di=di/u;
+di=di*1e+3;
+di=parseInt(di+0.5);
+di=di/1e+3;
+		w=w/u;
+w=w*1e+3;
+w=parseInt(w+0.5);
+w=w/1e+3;
+		s=s/u;
+s=s*1e+3;
+s=parseInt(s+0.5);
+s=s/1e+3;
+		u=1;
+		pv();
+	}
+document.helixcalc.unit1.value="inches";
+document.helixcalc.unit2.value="inches";
+document.helixcalc.unit3.value="inches";
+document.helixcalc.unit4.value="inches";
+document.helixcalc.unit5.value="inches";
+}
+// -->
+		</SCRIPT>
+</HEAD>
+<BODY onload=pv() bgColor=black text=white link=red>
+<table width="200" border="1" align="center" cellpadding="0" cellspacing="0" bordercolor="#9410CE">
+  <tr>
+    <td><CENTER>
+      <H3>
+      <FORM method=get name=helixcalc>
+        <TABLE border=0 cellSpacing=2 cellPadding=0 width=600>
+          <TBODY>
+            <TR>
+              <TD colSpan=4><DIV align=left>
+                  <H3><FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>平面螺旋线圈计算:</FONT></H3>
+              </DIV></TD>
+              <TD rowSpan=13 width=300><CENTER>
+                <IMG
+      src="../image/teslacoil/spiral_fig.gif" width="242" height="315">
+              </CENTER></TD>
+            </TR>
+            <TR>
+              <TD width=160><CENTER>
+                  <FONT size=4
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>单位:</FONT>
+              </CENTER></TD>
+              <TD><FONT size=4>
+                <INPUT onclick=selinches() CHECKED type=radio
+      name=units>
+                </FONT><FONT size=4
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>英寸<BR>
+                </FONT><FONT
+      size=4>
+                  <INPUT onclick=selmm() type=radio name=units>
+              </FONT><FONT size=4
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>毫米</FONT></TD>
+              <TD><font size="4">&nbsp;</font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3>
+                <FONT face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><HR>
+              </FONT></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>线圈内径(</FONT><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>DI</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+              <TD><font size="4">
+                <INPUT tabIndex=1 onchange=changes() size=10 name=diameter>
+              </font></TD>
+              <TD><font size="4">
+                <INPUT disabled value=Inches size=6 name=unit1>
+              </font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>线圈匝数(</FONT><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>N</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+              <TD><font size="4">
+                <INPUT tabIndex=2 onchange=changes() size=10 name=turns>
+              </font></TD>
+              <TD><font size="4">&nbsp;</font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4" face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>线经 (</FONT><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>W</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+              <TD><font size="4">
+                <INPUT tabIndex=3 onchange=changes() size=10 name=wirediameter>
+              </font></TD>
+              <TD><font size="4">
+                <INPUT disabled value=Inches size=6 name=unit2>
+              </font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4" face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>匝间距(</FONT><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>S</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+              <TD><font size="4">
+                <INPUT tabIndex=4 onchange=changes() size=10 name=turnspacing>
+              </font></TD>
+              <TD><font size="4">
+                <INPUT disabled value=Inches size=6 name=unit3>
+              </font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>              </TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><CENTER>
+                <FONT size=1
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>*将光标用TAB键移动到下一个字段，更新结果</B></FONT>
+              </CENTER></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>              </TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>线圈外径(</FONT><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>Do</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):*</FONT></TD>
+              <TD><font size="4">
+                <INPUT disabled size=10 name=height>
+              </font></TD>
+              <TD><font size="4">
+                <INPUT disabled value=Inches size=6 name=unit4>
+              </font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>电线长度:</FONT></TD>
+              <TD><font size="4">
+                <INPUT disabled size=10 name=wirelength>
+              </font></TD>
+              <TD><font size="4">
+                <INPUT disabled value=inches size=6 name=unit5>
+              </font></TD>
+              <TD></TD>
+            </TR>
+            <TR>
+              <TD width=160><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>电感量(</FONT><FONT
+      color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>L</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):*</FONT></TD>
+              <TD><font size="4">
+                <INPUT disabled size=10 name=inductance>
+              </font></TD>
+              <TD><FONT size="4" face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>uH</FONT></TD>
+              <TD></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <P>
+      </FORM>
+      </P>
+      <CENTER>
+        <P>
+        <TABLE width=500 border=1 cellPadding=0 cellSpacing=2 bordercolor="#9410CE">
+          <TBODY>
+            <TR>
+              <TD><FONT color=aqua face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>平面螺旋线圈的电感量计算以及绕线所需的电线长度.</FONT>
+                  <P><FONT color=aqua
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular></FONT>将光标用TAB键移动到下一个字段，更新结果</P></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <p>&nbsp;</p>
+      </CENTER>
+    </P></td>
+  </tr>
+</table>
+<p align="center"><font size="+2"><a href="../"><strong>返回首页</strong></a> &nbsp; <a href="../../../"><strong>科创论坛</strong></a></font></p>
+</BODY></HTML>

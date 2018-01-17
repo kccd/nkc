@@ -20,14 +20,6 @@ block content
             include interface_ads
 
         .panel
-          div.hidden-sm.hidden-md.hidden-lg
-            span(style='color: silver;') 学院&nbsp;&nbsp;&nbsp;
-            button#FLVS.btn.btn-default.btn-sm(onclick='forumListVisibilitySwitch();' style='float: right;') 显示学院
-            .clearfix
-          -var forums = data.forumList
-            div#indexForumList
-              include interface_forum_list
-        .panel
           include interface_easy_post
 
         .panel

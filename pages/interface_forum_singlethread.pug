@@ -110,7 +110,7 @@
   .new-content-info
     span
       a(href=`/m/${targetUser.uid}` title=`${targetUser.description || ''}`)
-        img(src=`/avatar_small/${targetUser.uid}`)
+        img(src=`/avatar_small/${targetUser.uid}` style='width: 30px;')
     span
       a(href=`/m/${targetUser.uid}`)= targetUser.username
     if(parentForum && forum.fid === '_cannot_be_equal_')

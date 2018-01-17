@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta content="IE=10.000" 
+http-equiv="X-UA-Compatible" />
+ 
+ 
+<title>运算放大器低通滤波器计算器-运放低通滤波器计算-截止频率</title> 
+
+ 
+<meta name="GENERATOR" content="MSHTML 10.00.9200.16578" />
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</head> 
+<body class="showpage news" topmargin="0" rightmargin="0" leftmargin="0" 
+marginheight="0" marginwidth="0"> 
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title; 
+</SCRIPT>
+
+<p align="center"><font color="#ffffff">.</font></p>
+<p></p>
+<table width="100%" border="0" cellpadding="0" cellspacing="10" bgcolor="#FFFFFF">
+  <tbody>
+  <tr valign="top">
+    <td class="main"><table width="100%" border="0" 
+cellpadding="0" cellspacing="0" bgcolor="#FF0000" class="box">
+        <tbody>
+        <tr>
+          <td bgcolor="#FFFFFF"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tbody>
+              <tr>
+                <td bgcolor="#FFFFFF" id="text">
+<script language="JavaScript" type="text/javascript">
+<!--
+var FM = 0;
+var RM = 0;
+var C1M = 0;
+var C2M = 0;
+
+function clearBoxes(form)
+{
+form.F.value = "";
+form.R.value = "";
+form.C1.value = "";
+form.C2.value = "";
+form.F.focus();
+}
+
+function solve(f){
+F = eval(f.F.value);
+R = eval(f.R.value);
+C1 = eval(f.C1.value);
+C2 = eval(f.C2.value);
+FM = eval(f.FM.value);
+RM = eval(f.RM.value);
+C1M = eval(f.C1M.value);
+C2M = eval(f.C2M.value);
+F = F*FM;
+R = R*RM;
+C1 = C1*C1M;
+C2 = C2*C2M;
+if (f.F.value==""){
+F = 1000;
+f.F.value = F/FM;
+}
+if (f.R.value==""){
+if (f.C1.value==""){
+if (f.C2.value==""){
+R = 10000;
+f.R.value = R/RM;
+C2 = 0.11253954/(F*R);
+f.C2.value = C2/C2M;
+C1 = C2*2;
+f.C1.value = C1/C1M;
+return;
+} else {f.C2.value = C2/C2M; C1 = C2*2; f.C1.value = C1/C1M; R = 0.11253954/(F*C2); f.R.value = R/RM; return;}
+
+} else {f.C1.value = C1/C1M; C2 = C1/2; f.C2.value = C2/C2M; R = 0.11253954/(F*C2); f.R.value = R/RM; return;}
+
+} else {f.R.value = R/RM; C2 = 0.11253954/(F*R); f.C2.value = C2/C2M; C1 = C2*2; f.C1.value = C1/C1M; return;}
+
+}
+
+-->
+</script>
+                   
+                  <div align="center"> 
+                    <table width="48%" border="0" cellspacing="0" 
+                    cellpadding="0"><tbody>
+                    <tr>
+                      <td width="48%" align="middle" bordercolor="#FFFFFF" bgcolor="#FFFFFF"><font face="Arial,Helvetcia,sans-serif" 
+                        size="2"><br />
+                        </font>
+                        <p align="center"><font face="Arial,Helvetcia,sans-serif"><span class="STYLE1">运算放大器低通滤波器计算</span></font><font size="2" face="Arial,Helvetcia,sans-serif"><br />
+                              <span 
+                        style="display: none;">Asc838电子-技术资料-电子元件-电路图-技术应用网站-基本知识-原理-维修-作用-参数-电子元器件符号-各种图纸</span></font></p>
+                        <font face="Arial,Helvetcia,sans-serif" 
+                        size="2">
+                        <form method="post">
+                          <table width="456" border="4" cellpadding="4" bgcolor="#FFFFFF">
+                            <tbody>
+                              <tr>
+                                <td align="middle" colspan="3"><img 
+                              src="ysfdq_dt/981ef8fb3aaacabde88fab3f38bbcc1d.gif" alt="Sallen-Key Low Pass Filter" width="462" height="175" 
+                              border="0" /></td>
+                            </tr>
+                              <tr bgcolor="#FFFFFF">
+                                <td width="288">截止频率(Fc):</td>
+                              <td width="75"><input name="F" size="8" /></td>
+                              <td width="75"><select name="FM" style="width: 64px;"><option 
+                                value="1">Hz</option><option value="1000" 
+                                selected="selected">KHz</option><option 
+                                value="1000000">MHz</option></select></td></tr>
+                              <tr>
+                                <td width="288">Filter Resistor Values 	 <font 
+                              face="Arial,Helvetcia,sans-serif" 
+                              size="2">滤波</font><a style="text-decoration: none;" 
+                              href="http://www.838dz.com/"><font 
+                              color="#000000">电阻</font></a>值(R1 			= R2)</td>
+                              <td width="75"><input name="R" size="8" /></td>
+                              <td width="75"><select name="RM" style="width: 64px;" 
+                              size="1"><option value="1">Ω</option><option value="1000" 
+                                selected="selected">KΩ</option><option 
+                              value="1000000">MΩ</option></select></td></tr>
+                              <tr>
+                                <td width="288">Filter Capacitor Value 
+                                  滤波电容器值(C1):</td>
+                              <td width="75"><input name="C1" size="8" /></td>
+                              <td width="75"><select name="C1M" style="width: 64px;"><option 
+                                value="0.000000000001">pF</option><option value="0.000000001" 
+                                selected="selected">nF</option><option value="0.000001">µF</option><option 
+                                value="0.001">mF</option><option 
+                              value="1">F</option></select></td></tr>
+                              <tr>
+                                <td width="288">滤波电容器值 (C2):</td>
+                              <td width="75"><input name="C2" size="8" /></td>
+                              <td width="75"><select name="C2M" style="width: 64px;"><option 
+                                value="0.000000000001">pF</option><option value="0.000000001" 
+                                selected="selected">nF</option><option value="0.000001">µF</option><option 
+                                value="0.001">mF</option><option 
+                              value="1">F</option></select></td></tr>
+                              <tr bgcolor="#ccffff">
+                                <td 
+colspan="2" align="middle" bgcolor="#FFFFFF"><input name="name" onclick="solve(this.form);" type="button" value="计算" /></td>
+                              <td width="75" align="middle" bgcolor="#FFFFFF"><input onclick="clearBoxes(this.form);" type="reset" value="清除" /></td></tr></tbody></table>
+                        </form>
+                        </font> 
+                        <p align="center" 
+                        class="pageLink">&nbsp;</p></td></tr>
+                    <tr>
+                      <td class="info_text">
+<script type="text/javascript"><!--
+google_ad_client = "pub-6997138602654220";
+/* 468x15, 创建于 09-10-31 */
+google_ad_slot = "0063865280";
+google_ad_width = 468;
+google_ad_height = 15;
+//-->
+</script>                  </td></tr></tbody></table></div></td></tr></tbody></table>
+            
+            <p></p></td>
+          </tr></tbody></table>  
+ </td>
+  </tr></tbody></table></body></html>

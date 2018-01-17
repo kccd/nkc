@@ -1,0 +1,407 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>带通滤波器设计计算器</TITLE>
+
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<SCRIPT language="JavaScript">
+
+   function MakeArray(j){
+      this.length = j;
+      var i;
+      for(i=1; i<=j; i++)
+         this[i] = "";
+   }
+
+   function cal(f){
+
+      var i;
+
+      n = eval(f.n.value);
+      c = eval(f.c.value);
+      bw = eval(f.bw.value);
+      r = eval(f.r.value);
+      z = eval(f.z.value);
+
+      if (n<1 || f.n.value==""){
+          n = 1;
+          f.n.value = n;
+      }
+      if (n>9){
+          n = 9;
+          f.n.value = n;
+      }
+      am = Math.round((n+0.1)/2)*2-1-n;
+      if (am<0){
+          n = n+1;
+          f.n.value = n;
+      }
+
+      if (c<1 || f.c.value==""){
+          c = 1000;
+          f.c.value = c;
+      }
+      if (bw<1 || f.bw.value==""){
+          bw = 1;
+          f.bw.value = bw;
+      }
+      if (r<0.01 || f.r.value==""){
+          r = 0.01;
+          f.r.value = r;
+      }
+      if (z<=0 || f.z.value==""){
+          z = 50;
+          f.z.value = z;
+      }
+
+      w = 2*Math.PI*c/1000;
+      wbw = 2*Math.PI*bw/1000;
+      w2 = Math.pow(w,2);
+
+      rr = r/17.37;
+      e2x = Math.exp(2*rr);
+      coth = (e2x+1)/(e2x-1);
+      bt = Math.log(coth);
+      btn = bt/(2*n);
+      gn = (Math.exp(btn)-Math.exp(-btn))/2;
+
+      var a = new MakeArray(10);
+      var b = new MakeArray(10);
+      var g = new MakeArray(10);
+      var srl = new MakeArray(10);
+      var src = new MakeArray(10);
+      var shl = new MakeArray(10);
+      var shc = new MakeArray(10);
+
+      for(i=1; i<=n; i++){
+         k = (2*i-1)*Math.PI/(2*n);
+         a[i] = Math.sin(k);
+         k2 = Math.PI*i/n;
+         k3 = Math.sin(k2);
+         b[i] = Math.pow(gn,2)+Math.pow(k3,2);
+      }
+
+      g[1] = 2*a[1]/gn;
+
+      for(i=2; i<=n; i++){
+         g[i] = (4*a[i-1]*a[i])/(b[i-1]*g[i-1]);
+      }
+
+      for(i=1; i<=n; i++){
+         srl[i] = g[i]*z/wbw;
+         src[i] = wbw*1000/(g[i]*z*w2);
+         shl[i] = wbw*z/(g[i]*w2);
+         shc[i] = g[i]*1000/(wbw*z);
+      }
+
+      f.x1.value = shl[1];
+      f.x2.value = srl[2];
+      f.x3.value = shl[3];
+      f.x4.value = srl[4];
+      f.x5.value = shl[5];
+      f.x6.value = srl[6];
+      f.x7.value = shl[7];
+      f.x8.value = srl[8];
+      f.x9.value = shl[9];
+
+      f.x11.value = shc[1];
+      f.x12.value = src[2];
+      f.x13.value = shc[3];
+      f.x14.value = src[4];
+      f.x15.value = shc[5];
+      f.x16.value = src[6];
+      f.x17.value = shc[7];
+      f.x18.value = src[8];
+      f.x19.value = shc[9];
+
+      f.y1.value = srl[1];
+      f.y2.value = shl[2];
+      f.y3.value = srl[3];
+      f.y4.value = shl[4];
+      f.y5.value = srl[5];
+      f.y6.value = shl[6];
+      f.y7.value = srl[7];
+      f.y8.value = shl[8];
+      f.y9.value = srl[9];
+
+      f.y11.value = src[1];
+      f.y12.value = shc[2];
+      f.y13.value = src[3];
+      f.y14.value = shc[4];
+      f.y15.value = src[5];
+      f.y16.value = shc[6];
+      f.y17.value = src[7];
+      f.y18.value = shc[8];
+      f.y19.value = src[9];
+   }
+
+</SCRIPT>
+ <style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+ </style>
+ </HEAD>
+<BODY style="margin: 0px auto; text-align: center;">
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<p class="STYLE1">带通滤波器设计计算器</p>
+<TABLE style="margin: 0px auto; width: 500px; text-align: center; font-size: 12px;"
+border="0" cellspacing="0" cellpadding="0">
+  <TBODY>
+  <TR>
+    <TD id="text"><IMG width="566" height="287" src="daitonglvboqi_files/bcb8da537d4b930077938873ae556041.gif"><FONT
+      size="3">
+      <FORM method="post">
+      <TABLE height="86" style="font-size: 12px;" border="0">
+        <TBODY>
+        <TR>
+          <TD width="85" height="45" bgcolor="#99ccff"><B>连接路数<BR></B>
+                        <INPUT name="n" size="2">                最多9个</TD>
+          <TD width="164" height="45" align="middle"
+            bgcolor="#99ccff"><B>截止频率fc<BR></B>                     <INPUT name="c"
+            size="5">[MHz]</TD>
+          <TD width="134" height="45" align="middle"
+            bgcolor="#99ccff"><B>通频带<BR></B>                       <INPUT name="bw"
+            size="5">                [MHz]</TD>
+          <TD width="119" height="45" align="middle"
+            bgcolor="#99ccff"><B>阻抗Zo<BR></B>                     <INPUT name="z"
+            size="4">                [Ω]</TD>
+          <TD width="120" height="45" align="middle"
+            bgcolor="#99ccff"><B>波纹ripple<BR></B>                     <INPUT
+            name="r" size="4">                [dB]</TD></TR>
+        <TR>
+          <TD height="35" bgcolor="#99ccff" colspan="5">
+            <P
+align="center"><INPUT name="button" onClick="cal(this.form)" type="button" value=" 计算  ">
+                  </P></TD></TR></TBODY></TABLE><FONT
+      size="2"><BR></FONT>
+                  <HR width="550" size="1" color="#008000">
+                  <FONT size="2"><BR>
+                  </FONT>
+                  <TABLE boder="0">
+                    <TBODY>
+                      <TR>
+                        <TD bgcolor="#990033" rowspan="4"><FONT color="#ffffff"
+            size="2"><B>Type1</B></FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L1</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L2</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L3</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L4</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L5</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L6</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L7</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L8</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L9</FONT></TD>
+                        <TD bgcolor="#990033"></TD>
+                      </TR>
+                      <TR>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x1" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x2" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x3" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x4" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x5" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x6" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x7" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x8" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x9" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff"
+        size="2">[nH]</FONT></TD>
+                      </TR>
+                      <TR>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C1</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C2</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C3</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C4</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C5</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C6</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C7</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C8</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C9</FONT></TD>
+                        <TD bgcolor="#990033"></TD>
+                      </TR>
+                      <TR>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x11" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x12" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x13" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x14" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x15" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x16" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x17" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x18" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="x19" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff"
+        size="2">[pF]</FONT></TD>
+                      </TR>
+                    </TBODY>
+                  </TABLE>
+                  <HR width="550" size="1" color="#99ccff">
+                  <FONT size="2"><BR>
+                  </FONT>
+                  <TABLE boder="0">
+                    <TBODY>
+                      <TR>
+                        <TD bgcolor="#990033" rowspan="4"><FONT color="#ffffff"
+            size="2"><B>Type2</B></FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L1</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L2</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L3</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L4</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L5</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L6</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L7</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L8</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">L9</FONT></TD>
+                        <TD bgcolor="#990033"></TD>
+                      </TR>
+                      <TR>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y1" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y2" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y3" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y4" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y5" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y6" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y7" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y8" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y9" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff"
+        size="2">[nH]</FONT></TD>
+                      </TR>
+                      <TR>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C1</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C2</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C3</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C4</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C5</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C6</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C7</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C8</FONT></TD>
+                        <TD align="middle" bgcolor="#990033"><FONT color="#ffffff"
+            size="2">C9</FONT></TD>
+                        <TD bgcolor="#990033"></TD>
+                      </TR>
+                      <TR>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y11" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y12" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y13" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y14" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y15" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y16" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y17" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y18" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff">
+                          <INPUT name="y19" size="5">
+                        </FONT></TD>
+                        <TD bgcolor="#990033"><FONT color="#ffffff"
+        size="2">[pF]</FONT></TD>
+                      </TR>
+                    </TBODY>
+                  </TABLE>
+      </FORM></FONT></TD></TR></TBODY></TABLE></BODY></HTML>

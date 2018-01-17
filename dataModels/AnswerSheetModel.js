@@ -47,13 +47,17 @@ const answerSheetsSchema = new Schema({
   }
 });
 answerSheetsSchema.pre('save', function(next) {
-  let num = 0;
-  for (let answer of this.records) {
-    if (answer.correct) {
-      num++;
+  try {
+    let num = 0;
+    for (let answer of this.records) {
+      if (answer.correct) {
+        num++;
+      }
     }
+    this.score = num;
+    return next()
+  } catch(e) {
+    return next(e)
   }
-  this.score = num;
-  next();
 });
 module.exports = mongoose.model('answerSheets', answerSheetsSchema, 'answerSheets');

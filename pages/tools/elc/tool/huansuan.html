@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>电容、电阻、电感单位换算</title>
+<SCRIPT language="javascript">
+function jsc()
+{
+	var xc=document.c.xf.value;
+	var inc=document.c.inc.value;
+	var outf=xc*inc;
+	var outmf=outf*1000;
+	var outuf=outf*1000000;
+	var outnf=outf*1000000000;
+	var outpf=outf*1000000000000;
+
+	document.c.outf.value=outf.toPrecision(5);
+	document.c.outmf.value=outmf.toPrecision(5);
+	document.c.outuf.value=outuf.toPrecision(5);
+	document.c.outnf.value=outnf.toPrecision(5);
+	document.c.outpf.value=outpf.toPrecision(5);
+
+}
+
+function jsr()
+{
+	var xr=document.r.xr.value;
+	var inr=document.r.inr.value;
+
+	var mr=xr*inr;
+	var kr=mr*1000;
+	var r=mr*1000000;
+	var mmr=mr*1000000000;
+
+	document.r.mr.value=mr.toPrecision(5);
+	document.r.kr.value=kr.toPrecision(5);
+	document.r.r.value=r.toPrecision(5);
+	document.r.mmr.value=mmr.toPrecision(5);
+
+}
+
+function jsh()
+{
+	var xh=document.h.xh.value;
+	var inh=document.h.inh.value;
+	var h=xh*inh;
+	var mh=h*1000;
+	var uh=h*1000000;
+	var nh=h*1000000000;
+	var ph=h*1000000000000;
+
+	document.h.h.value=h.toPrecision(5);
+	document.h.mh.value=mh.toPrecision(5);
+	document.h.uh.value=uh.toPrecision(5);
+	document.h.nh.value=nh.toPrecision(5);
+	document.h.ph.value=ph.toPrecision(5);
+
+}
+
+
+</SCRIPT>
+
+</head>
+
+<body>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<div align="center">
+  <h2>电容、电阻、电感单位换算</h2>
+  <form id="c" name="c" method="post" action="">
+    <table height="122" border="1">
+      <tr>
+        <td colspan="5" nowrap="nowrap"><div align="center">输入电容值
+            <label>
+          <input name="inc" type="text" id="inc" size="16" />
+          <select name="xf" id="xf">
+            <option value="1">F</option>
+            <option value="0.001">mF</option>
+            <option value="0.000001" selected="selected">μF</option>
+            <option value="0.000000001">nF</option>
+            <option value="0.000000000001">pF</option>
+          </select>
+          </label>
+          <label>
+          <input type="button" name="Submit" value="计算" onclick="jsc()"/>
+          </label>
+        </div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><label>
+          <div align="center">
+            <input name="outf" type="text" id="outf" size="16" />
+          F          </div>
+        </label></td>
+        <td nowrap="nowrap"><label>
+          <div align="center">
+            <input name="outmf" type="text" id="outmf" size="16" />
+            mF
+          </div>
+        </label></td>
+        <td nowrap="nowrap"><label>
+          <div align="center">
+            <input name="outuf" type="text" id="outuf" size="16" />
+          μF            </div>
+        </label></td>
+        <td nowrap="nowrap"><label>
+          <div align="center">
+            <input name="outnf" type="text" id="outnf" size="16" />
+            nF
+          </div>
+        </label></td>
+        <td nowrap="nowrap"><label>
+          <div align="center">
+            <input name="outpf" type="text" id="outpf" size="16" />
+            pF
+          </div>
+        </label></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </form>
+  <form id="r" name="r" method="post" action="">
+    <table height="122" border="1">
+      <tr>
+        <td colspan="4" nowrap="nowrap"><div align="center">输入电阻值
+          <label>
+          <input name="inr" type="text" id="inr" size="16" />
+          </label>
+          <label>
+          <select name="xr" id="xr">
+            <option value="1">MΩ</option>
+            <option value="0.001" selected="selected">KΩ</option>
+            <option value="0.000001">Ω</option>
+            <option value="0.000000001">mΩ</option>
+          </select>
+          </label>
+          <label>
+          <input type="button" name="Submit2" value="计算" onclick="jsr()"/>
+          </label>
+        </div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="mr" type="text" id="mr" size="16" />
+          MΩ
+          </label>
+        </div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="kr" type="text" id="kr" size="16" />
+          kΩ
+          </label>
+        </div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="r" type="text" id="r" size="16" />
+          Ω
+          </label>
+        </div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="mmr" type="text" id="mmr" size="16" />
+          mΩ
+          </label>
+        </div></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </form>
+  <form id="h" name="h" method="post" action="">
+    <table height="122" border="1">
+      <tr>
+        <td colspan="5" nowrap="nowrap"><div align="center">输入电感值
+          <label>
+          <input name="inh" type="text" id="inh" size="16" />
+          </label>
+          <label>
+          <select name="xh" id="xh">
+            <option value="1">H</option>
+            <option value="0.001">mH</option>
+            <option value="0.000001" selected="selected">μH</option>
+            <option value="0.000000001">nH</option>
+            <option value="0.000000000001">pH</option>
+          </select>
+          </label>
+          <label>
+          <input type="button" name="Submit3" value="计算" onclick="jsh()"/>
+          </label>
+        </div></td>
+      </tr>
+      <tr>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="h" type="text" id="h" size="16" />
+          H          </label>
+        </div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="mh" type="text" id="mh" size="16" />
+          mH          </label>
+        </div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="uh" type="text" id="uh" size="16" />
+            μH </label>
+        </div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="nh" type="text" id="nh" size="16" />
+          </label>
+        nH</div></td>
+        <td nowrap="nowrap"><div align="center">
+          <label>
+          <input name="ph" type="text" id="ph" size="16" />
+          </label>
+        pH</div></td>
+      </tr>
+    </table>
+  </form>
+  <p>&nbsp;</p>
+</div>
+</body>
+</html>

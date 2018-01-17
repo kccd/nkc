@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0059)http://www.deepfriedneon.com/tesla_f_calctranscapmatch.html -->
+<HTML><HEAD><TITLE>电容组与变压器匹配-特斯拉线圈-科创在线-科技爱好综合社区</TITLE>
+<META name=GENERATOR content="MSHTML 8.00.7600.16671">
+<SCRIPT language=JavaScript1.2><!--
+var e=10000, i=100, c=0, fl=50;
+function gv() {
+e=document.capmatchcalc.e.value;
+i=document.capmatchcalc.i.value;
+}
+function pv() {
+document.capmatchcalc.e.value=e;
+document.capmatchcalc.i.value=i;
+calccapacitance();
+document.capmatchcalc.c.value=c;
+}
+function calccapacitance() {
+c=1e+6/(6.2832*(e/(i/1000))*fl);
+c=c*1e+4;
+c=parseInt(c);
+c=c/1e+4;
+}
+function changes() {
+gv();
+pv();
+}
+function sel60() {
+fl=60;
+pv();
+}
+function sel50() {
+fl=50;
+pv();
+}
+// -->
+		</SCRIPT>
+</HEAD>
+<BODY onload=pv() bgColor=black text=white link=red>
+<table width="500" border="1" align="center" cellspacing="0" bordercolor="#9410CE">
+  <tr>
+    <td><CENTER>
+      <H3>
+      <FORM method=get name=capmatchcalc>
+        <TABLE border=0 cellSpacing=2 cellPadding=0 width=500>
+          <TBODY>
+            <TR>
+              <TD colSpan=4><DIV align=left>
+                  <H3><FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>电容组与变压器匹配:</FONT></H3>
+              </DIV></TD>
+              <TD rowSpan=10 width=300><div align="center"><IMG
+      src="../image/teslacoil/cap_match.gif" alt="" width="216" height="199"></div></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD width=90><CENTER>
+                  <b><font color="yellow" size="2" face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular">电源频率</font><font color="yellow" size="2" face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular">（F<font size="1">L</font>）</font></b><FONT
+      color=yellow size=2
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>:</B></FONT>
+              </CENTER></TD>
+              <TD colSpan=2><FONT size=2>
+                <INPUT tabIndex=0 onclick=sel50() CHECKED
+      type=radio name=units>
+                </FONT><FONT size=2
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>50 Hz<BR>
+                  </FONT><FONT
+      size=2>
+                    <INPUT onclick=sel60() type=radio name=units>
+                  </FONT><FONT size=2
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>60 Hz</FONT></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD width=90><DIV align=right><FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>电压
+                (E)</B></FONT><FONT face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B> :</B></FONT></DIV></TD>
+              <TD width=80><INPUT tabIndex=1 onchange=changes() size=9 name=e></TD>
+              <TD width=50><FONT
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>V</FONT></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD width=90><DIV align=right><FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>电流(I)
+                :</B></FONT></DIV></TD>
+              <TD width=80><INPUT tabIndex=2 onchange=changes() size=9 name=i></TD>
+              <TD width=50><FONT
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>mA</FONT></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><CENTER>
+                <FONT size=1
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>*将光标用TAB键移动到下一个字段，更新结果</B></FONT>
+              </CENTER></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><CENTER>
+                <FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>C =
+                  :</B></FONT>
+                <INPUT disabled readOnly size=6 name=c>
+                <FONT
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>uF</FONT>
+              </CENTER></TD>
+              <TD width=10></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <P>
+      </FORM>
+      </P>
+      <CENTER>
+        <P>
+        <TABLE width=500 border=1 cellPadding=0 cellSpacing=2 bordercolor="#9410CE">
+          <TBODY>
+            <TR>
+              <TD><font color="aqua" face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular">为了让电容组容量与变压器功率匹配，可以用半波将电容组充电充到最大值</font>
+                  <P><FONT color=aqua
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>将光标用TAB键移动到下一个字段，更新结</FONT></P></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+      </CENTER>
+    </P></td>
+  </tr>
+</table>
+<p align="center"><font size="+2"><a href="../"><strong>返回首页</strong></a> &nbsp; <a href="../../../"><strong>科创论坛</strong></a></font></p>
+</BODY></HTML>

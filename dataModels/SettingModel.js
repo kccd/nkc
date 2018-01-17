@@ -39,7 +39,7 @@ settingSchema.virtual('adThreads')
   })
   .set(function(ads) {
     this._adThreads = ads;
-  })
+  });
 
 async function operateSystemID(type, op) {
   if(op !== 1 && op !== -1)

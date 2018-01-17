@@ -1,0 +1,123 @@
+<html>
+<head>
+<title>高氯酸铵复合推进剂（APCP）用聚氨酯固化剂计算器-科创航天局</title>
+</head>
+
+<body align="center" >
+
+
+</div>
+
+<script>
+
+function comput()
+
+{
+	if( document.getElementById("A").value == 233 )
+	{
+		var a = document.getElementById("zidingyiA").value;
+	}
+	else
+	{
+		var a = document.getElementById("A").value;
+	}
+
+	if( document.getElementById("B").value == 233 )
+	{
+		var b = document.getElementById("zidingyiB").value;
+	}
+	else
+	{
+		var b = document.getElementById("B").value;
+	}
+
+	if( document.getElementById("C").value == 233 )
+	{
+		var c = document.getElementById("zidingyiC").value;
+	}
+	else
+	{
+		var c = document.getElementById("C").value;
+	}
+
+	if((document.getElementById("D").value >= 0 ) && (document.getElementById("E").value >= 0 ) && (document.getElementById("G").value >= 0 ))
+	{
+
+		document.getElementById("F").value = 4.2* ( a * document.getElementById("D").value + b * document.getElementById("E").value + 111.111111 * document.getElementById("G").value ) / c ;
+
+	}
+
+else
+
+{
+
+document.getElementById("F").value = "请正确输入数值";
+
+}
+
+}
+
+</script>
+
+<h2 align="center">高氯酸铵复合推进剂（APCP）用聚氨酯固化剂计算器</h2>
+<table width="807" border="1"
+align="center">
+  <tr>
+    <td width="183">粘合剂
+      <select name="A" id="A">
+        <option value="1">HTPB(羟值1.00)</option>
+        <option value="0.75">HTPB(羟值0.75)</option>
+        <option value="0.5">HTPB(羟值0.50)</option>
+        <option value="3.3333333">PEG 600</option>
+        <option value="2">PEG 1000</option>
+        <option value="1">PEG 2000</option>
+        <option value="0.5">PEG 4000</option>
+        <option value="233">自定义</option>
+    </select></td>
+    <td width="182"> 交联剂
+      <select name="B" id="B">
+        <option value="20.109">三乙醇胺</option>
+        <option value="2.9055">蓖麻油</option>
+        <option value="29.38">季戊四醇</option>
+        <option value="233">自定义</option>
+    </select></td>
+    <td width="182" align="center" >水</td>
+    <td width="45">&nbsp;</td>
+    <td width="181"> 固化剂
+      <select name="C" id="C">
+        <option value="33">MDI</option>
+        <option value="48">TDI</option>
+        <option value="49">HDI</option>
+        <option value="37.8">IPDI</option>
+        <option value="44">XDI</option>
+        <option value="233">自定义</option>
+    </select></td>
+  </tr>
+  <tr>
+    <td><input type="text" id="D" />
+    克</td>
+    <td><input type="text" id="E" />
+      克    </td>
+    <td><input type="text" id="G" />
+      克</td>
+    <td><input type="button" value="计算" onClick="comput();" /></td>
+    <td><input type="text" id="F" readonly autocomplete="off" />
+    克</td>
+  </tr>
+</table>
+<p align="center" >自定义</p>
+<table width="541" border="1" align="center" >
+  <tr>
+    <td width="170">粘合剂（mmol／g）</td>
+    <td width="170">交联剂（mmol／g）</td>
+    <td width="179">固化剂（NCO％）</td>
+  </tr>
+  <tr>
+    <td><input type="text" id="zidingyiA" /></td>
+    <td><input type="text" id="zidingyiB" /></td>
+    <td><input type="text" id="zidingyiC" />％</td>
+  </tr>
+</table>
+ <p><a href="http://bbs.kechuang.org" target="_blank">科创论坛</a> 法式油炸薯条 编写 2015年8月 </p>
+</body>
+</html>
