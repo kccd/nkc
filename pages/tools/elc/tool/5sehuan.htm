@@ -1,0 +1,699 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" ""><HTML><HEAD>
+ <TITLE>五色环电阻阻值在线计算器</TITLE>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY style="margin: 10px auto; text-align: center;">
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE style="margin: 0px auto; width: 600px; text-align: center;" border="0"
+cellspacing="0" cellpadding="0">
+  <TBODY>
+  <TR>
+    <TD id="text"><SCRIPT language="JavaScript1.2">
+<!-- start
+function calc1type1(first_band_selection)
+{
+if (first_band_selection == "white"){
+document.calc1.first_color_band.value = "90";
+}
+if (first_band_selection == "gray"){
+document.calc1.first_color_band.value = "80";
+}
+if (first_band_selection == "violet"){
+document.calc1.first_color_band.value = "70";
+}
+if (first_band_selection == "blue"){
+document.calc1.first_color_band.value = "60";
+}
+if (first_band_selection == "green"){
+document.calc1.first_color_band.value = "50";
+}
+if (first_band_selection == "yellow"){
+document.calc1.first_color_band.value = "40";
+}
+if (first_band_selection == "orange"){
+document.calc1.first_color_band.value = "30";
+}
+if (first_band_selection == "red"){
+document.calc1.first_color_band.value = "20";
+}
+if (first_band_selection == "brown"){
+document.calc1.first_color_band.value = "10";
+}
+if (first_band_selection == "black"){
+document.calc1.first_color_band.value = "0";
+}
+calculation_section()
+ }
+function calc1type2(second_band_selection)
+{
+ if (second_band_selection == "white"){
+document.calc1.second_color_band.value = "9";
+}
+if (second_band_selection == "gray"){
+document.calc1.second_color_band.value = "8";
+}
+if (second_band_selection == "violet"){
+document.calc1.second_color_band.value = "7";
+}
+if (second_band_selection == "blue"){
+document.calc1.second_color_band.value = "6";
+}
+if (second_band_selection == "green"){
+document.calc1.second_color_band.value = "5";
+}
+if (second_band_selection == "yellow"){
+document.calc1.second_color_band.value = "4";
+}
+if (second_band_selection == "orange"){
+document.calc1.second_color_band.value = "3";
+}
+if (second_band_selection == "red"){
+document.calc1.second_color_band.value = "2";
+}
+if (second_band_selection == "brown"){
+document.calc1.second_color_band.value = "1";
+}
+if (second_band_selection == "black"){
+document.calc1.second_color_band.value = "0";
+}
+calculation_section()
+ }
+function calc1type3(third_band_selection)
+{
+ if (third_band_selection == "white"){
+document.calc1.multiplier_color_band.value = 1000000000;
+}
+if (third_band_selection == "gray"){
+document.calc1.multiplier_color_band.value = 100000000;
+}
+if (third_band_selection == "violet"){
+document.calc1.multiplier_color_band.value = 10000000;
+}
+if (third_band_selection == "blue"){
+document.calc1.multiplier_color_band.value = 1000000;
+}
+if (third_band_selection == "green"){
+document.calc1.multiplier_color_band.value = 100000;
+}
+if (third_band_selection == "yellow"){
+document.calc1.multiplier_color_band.value = 10000;
+}
+if (third_band_selection == "orange"){
+document.calc1.multiplier_color_band.value = 1000;
+}
+if (third_band_selection == "red"){
+document.calc1.multiplier_color_band.value = 100;
+}
+if (third_band_selection == "brown"){
+document.calc1.multiplier_color_band.value = 10;
+}
+if (third_band_selection == "black"){
+document.calc1.multiplier_color_band.value = 1;
+}
+if (third_band_selection == "gold"){
+document.calc1.multiplier_color_band.value = 0.1;
+}
+if (third_band_selection == "silver"){
+document.calc1.multiplier_color_band.value = 0.01;
+}
+calculation_section()
+}
+function calc1type4(tolerance_band_selection)
+{
+ if (tolerance_band_selection == "gold"){
+document.calc1.tolerance_color_band.value = 0.05;
+}
+if (tolerance_band_selection == "silver"){
+document.calc1.tolerance_color_band.value = 0.1;
+}
+calculation_section()
+}
+function calculation_section()
+{
+first_color_band = eval(document.calc1.first_color_band.value);
+second_color_band = eval(document.calc1.second_color_band.value);
+multiplier_color_band = eval(document.calc1.multiplier_color_band.value);
+total_resistance = eval(document.calc1.total_resistance.value);
+tolerance_color_band = eval(document.calc1.tolerance_color_band.value);
+tolerance_color_total = eval(document.calc1.tolerance_color_total.value);
+if (document.calc1.first_color_band.value > eval(0))
+{
+document.calc1.total_resistance.value =
+((eval(document.calc1.first_color_band.value)+eval(document.calc1.second_color_band.value))*
+eval(document.calc1.multiplier_color_band.value));
+}
+if (document.calc1.first_color_band.value == eval(0))
+{
+document.calc1.total_resistance.value = 0;
+}
+document.calc1.tolerance_color_total.value = eval(document.calc1.total_resistance.value*document.calc1.tolerance_color_band.value);
+document.calc1.total_resistance.value = (document.calc1.total_resistance.value*100000);
+document.calc1.total_resistance.value = Math.round(document.calc1.total_resistance.value);
+document.calc1.total_resistance.value = (document.calc1.total_resistance.value/100000);
+document.calc1.tolerance_color_total.value = (document.calc1.tolerance_color_total.value*100000);
+document.calc1.tolerance_color_total.value = Math.round(document.calc1.tolerance_color_total.value);
+document.calc1.tolerance_color_total.value = (document.calc1.tolerance_color_total.value/100000);
+}
+// end Color code for resistors - 4 bands -->
+  </SCRIPT>
+<SCRIPT language="JavaScript1.2">
+<!-- start
+function calc2type1(first_band_selection)
+{
+if (first_band_selection == "white"){
+document.calc2.first_color_band.value = 9;
+}
+if (first_band_selection == "gray"){
+document.calc2.first_color_band.value = 8;
+}
+if (first_band_selection == "violet"){
+document.calc2.first_color_band.value = 7;
+}
+if (first_band_selection == "blue"){
+document.calc2.first_color_band.value = 6;
+}
+if (first_band_selection == "green"){
+document.calc2.first_color_band.value = 5;
+}
+if (first_band_selection == "yellow"){
+document.calc2.first_color_band.value = 4;
+}
+if (first_band_selection == "orange"){
+document.calc2.first_color_band.value = 3;
+}
+if (first_band_selection == "red"){
+document.calc2.first_color_band.value = 2;
+}
+if (first_band_selection == "brown"){
+document.calc2.first_color_band.value = 1;
+}
+if (first_band_selection == "black"){
+document.calc2.first_color_band.value = 0;
+}
+calculation_section_close_tolerance()
+ }
+function calc2type2(second_band_selection)
+{
+ if (second_band_selection == "white"){
+document.calc2.second_color_band.value = 9;
+}
+if (second_band_selection == "gray"){
+document.calc2.second_color_band.value = 8;
+}
+if (second_band_selection == "violet"){
+document.calc2.second_color_band.value = 7;
+}
+if (second_band_selection == "blue"){
+document.calc2.second_color_band.value = 6;
+}
+if (second_band_selection == "green"){
+document.calc2.second_color_band.value = 5;
+}
+if (second_band_selection == "yellow"){
+document.calc2.second_color_band.value = 4;
+}
+if (second_band_selection == "orange"){
+document.calc2.second_color_band.value = 3;
+}
+if (second_band_selection == "red"){
+document.calc2.second_color_band.value = 2;
+}
+if (second_band_selection == "brown"){
+document.calc2.second_color_band.value = 1;
+}
+if (second_band_selection == "black"){
+document.calc2.second_color_band.value = 0;
+}
+calculation_section_close_tolerance()
+ }
+function calc2type3(third_band_selection)
+{
+ if (third_band_selection == "white"){
+document.calc2.third_color_band.value = 9;
+}
+if (third_band_selection == "gray"){
+document.calc2.third_color_band.value = 8;
+}
+if (third_band_selection == "violet"){
+document.calc2.third_color_band.value = 7;
+}
+if (third_band_selection == "blue"){
+document.calc2.third_color_band.value = 6;
+}
+if (third_band_selection == "green"){
+document.calc2.third_color_band.value = 5;
+}
+if (third_band_selection == "yellow"){
+document.calc2.third_color_band.value = 4;
+}
+if (third_band_selection == "orange"){
+document.calc2.third_color_band.value = 3;
+}
+if (third_band_selection == "red"){
+document.calc2.third_color_band.value = 2;
+}
+if (third_band_selection == "brown"){
+document.calc2.third_color_band.value = 1;
+}
+if (third_band_selection == "black"){
+document.calc2.third_color_band.value = 0;
+}
+calculation_section_close_tolerance()
+ }
+function calc2type4(multiplier_band_selection)
+{
+if (multiplier_band_selection == "white"){
+document.calc2.multiplier_color_band.value = 1000000000;
+}
+if (multiplier_band_selection == "gray"){
+document.calc2.multiplier_color_band.value = 100000000;
+}
+if (multiplier_band_selection == "violet"){
+document.calc2.multiplier_color_band.value = 10000000;
+}
+if (multiplier_band_selection == "blue"){
+document.calc2.multiplier_color_band.value = 1000000;
+}
+if (multiplier_band_selection == "green"){
+document.calc2.multiplier_color_band.value = 100000;
+}
+if (multiplier_band_selection == "yellow"){
+document.calc2.multiplier_color_band.value = 10000;
+}
+if (multiplier_band_selection == "orange"){
+document.calc2.multiplier_color_band.value = 1000;
+}
+if (multiplier_band_selection == "red"){
+document.calc2.multiplier_color_band.value = 100;
+}
+if (multiplier_band_selection == "brown"){
+document.calc2.multiplier_color_band.value = 10;
+}
+if (multiplier_band_selection == "black"){
+document.calc2.multiplier_color_band.value = 1;
+}
+if (multiplier_band_selection == "gold"){
+document.calc2.multiplier_color_band.value = .1;
+}
+if (multiplier_band_selection == "silver"){
+document.calc2.multiplier_color_band.value = .01;
+}
+calculation_section_close_tolerance()
+}
+function calc2type5(tolerance_band_selection)
+{
+ if (tolerance_band_selection == "gold"){
+document.calc2.tolerance_color_band.value = .05;
+}
+if (tolerance_band_selection == "silver"){
+document.calc2.tolerance_color_band.value = .10;
+}
+if (tolerance_band_selection == "brown"){
+document.calc2.tolerance_color_band.value = .01;
+}
+if (tolerance_band_selection == "red"){
+document.calc2.tolerance_color_band.value = .02;
+}
+if (tolerance_band_selection == "orange"){
+document.calc2.tolerance_color_band.value = .03;
+}
+calculation_section_close_tolerance()
+}
+ function calculation_section_close_tolerance()
+{
+first_color_band = eval(document.calc2.first_color_band.value);
+second_color_band = eval(document.calc2.second_color_band.value);
+third_color_band = eval(document.calc2.third_color_band.value);
+multiplier_color_band = eval(document.calc2.multiplier_color_band.value);
+total_resistance = eval(document.calc2.total_resistance.value);
+tolerance_color_band = eval(document.calc2.tolerance_color_band.value);
+tolerance_color_total = eval(document.calc2.tolerance_color_total.value);
+if (document.calc2.first_color_band.value > eval(0))
+{
+document.calc2.total_resistance.value =
+((
+eval(document.calc2.first_color_band.value*100)+
+eval(document.calc2.second_color_band.value*10)+
+eval(document.calc2.third_color_band.value))*
+eval(document.calc2.multiplier_color_band.value
+));
+}
+if (document.calc2.first_color_band.value == eval(0))
+{
+document.calc2.total_resistance.value = 0;
+}
+document.calc2.tolerance_color_total.value = eval(document.calc2.total_resistance.value*document.calc2.tolerance_color_band.value);
+document.calc2.total_resistance.value = (document.calc2.total_resistance.value*100000);
+document.calc2.total_resistance.value = Math.round(document.calc2.total_resistance.value);
+document.calc2.total_resistance.value = (document.calc2.total_resistance.value/100000);
+document.calc2.tolerance_color_total.value = (document.calc2.tolerance_color_total.value*100000);
+document.calc2.tolerance_color_total.value = Math.round(document.calc2.tolerance_color_total.value);
+document.calc2.tolerance_color_total.value = (document.calc2.tolerance_color_total.value/100000);
+}
+// end Color code for resistors - 5 bands -->
+  </SCRIPT>
+
+      <FORM name="calc2" id="calc2">
+      <TABLE style="margin: 10px auto; width: 500px; text-align: center;"
+      border="0" cellspacing="0">
+        <TBODY>
+        <TR>
+          <TD colspan="5" valign="top"><span class="STYLE1">五色环电阻阻值在线计算器 </span></TD>
+          </TR>
+        <TR>
+          <TD width="52" valign="top">
+            <TABLE height="272" bgcolor="#162f2f" border="1" cellspacing="0"
+            cellpadding="0">
+              <TBODY>
+              <TR>
+                <TD height="18">
+                  <CENTER><FONT color="#ffffff" face="Arial" size="2">第1环</FONT>
+                          </CENTER></TD></TR>
+              <TR>
+                <TD height="19"><INPUT name="first_color_band" size="5" value="0"></TD></TR>
+              <TR>
+                <TD height="23" bgcolor="#000000"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="black">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">黑</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#804000"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="brown">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">棕</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ff0000"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="red">                                <FONT color="#ffffff"
+                  face="Arial" size="2">红</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffa000"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="orange">                                   <FONT color="#000000"
+                  face="Arial" size="2">橙</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffff00"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="yellow">                                   <FONT color="#000000"
+                  face="Arial" size="2">黄</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#348017"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="green">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">绿</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#0000ff"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="blue">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">兰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#cc3399"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="violet">                                   <FONT color="#000000"
+                  face="Arial" size="2">紫</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#b9b7b7"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="gray">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">灰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="24" bgcolor="#ffffff"><INPUT name="first_band_selection"
+                  onclick="calc2type1(this.value)" type="radio" value="white">                                  <FONT color="#000000"
+                  face="Arial" size="2">白</FONT></TD>
+              </TR></TBODY></TABLE></TD>
+          <TD width="57" valign="top">
+            <TABLE height="270" bgcolor="#162f2f" border="1" cellspacing="0"
+            cellpadding="0">
+              <TBODY>
+              <TR>
+                <TD height="16">
+                  <CENTER><FONT color="#ffffff" face="Arial" size="2">第2环</FONT>
+                          </CENTER></TD></TR>
+              <TR>
+                <TD height="19"><INPUT name="second_color_band" size="5"
+                  value="0"></TD></TR>
+              <TR>
+                <TD height="23" bgcolor="black"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="black">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">黑</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#804000"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="brown">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">棕</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ff0000"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="red">                                <FONT color="#ffffff"
+                  face="Arial" size="2">红</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffa000"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="orange">                                   <FONT color="#000000"
+                  face="Arial" size="2">橙</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffff00"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="yellow">                                   <FONT color="#000000"
+                  face="Arial" size="2">黄</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#348017"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="green">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">绿</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#0000ff"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="blue">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">兰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#cc3399"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="violet">                                   <FONT color="#000000"
+                  face="Arial" size="2">紫</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#b9b7b7"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="gray">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">灰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="24" bgcolor="#ffffff"><INPUT name="second_band_selection"
+                  onclick="calc2type2(this.value)" type="radio" value="white">                                  <FONT color="#000000"
+                  face="Arial" size="2">白</FONT></TD>
+              </TR></TBODY></TABLE></TD>
+          <TD width="52" valign="top">
+            <TABLE height="270" bgcolor="#162f2f" border="1" cellspacing="0"
+            cellpadding="0">
+              <TBODY>
+              <TR>
+                <TD height="16">
+                  <CENTER><FONT color="#ffffff" face="Arial" size="2"><A style="text-decoration: none;"
+                  >第3环</A></FONT>
+                          </CENTER></TD></TR>
+              <TR>
+                <TD height="19"><INPUT name="third_color_band" size="5" value="0"></TD></TR>
+              <TR>
+                <TD height="23" bgcolor="#000000"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="black">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">黑</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#804000"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="brown">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">棕</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ff0000"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="red">                                <FONT color="#ffffff"
+                  face="Arial" size="2">红</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffa000"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="orange">                                   <FONT color="#000000"
+                  face="Arial" size="2">橙</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffff00"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="yellow">                                   <FONT color="#000000"
+                  face="Arial" size="2">黄</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#348017"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="green">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">绿</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#0000ff"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="blue">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">兰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#cc3399"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="violet">                                   <FONT color="#000000"
+                  face="Arial" size="2">紫</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#b9b7b7"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="gray">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">灰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="24" bgcolor="#ffffff"><INPUT name="third_band_selection"
+                  onclick="calc2type3(this.value)" type="radio" value="white">                                  <FONT color="#000000"
+                  face="Arial" size="2">白</FONT></TD>
+              </TR></TBODY></TABLE></TD>
+          <TD width="100" valign="top">
+            <TABLE width="100" height="269" bgcolor="#162f2f" border="1"
+            cellspacing="0" cellpadding="0">
+              <TBODY>
+              <TR>
+                <TD height="16">
+                  <CENTER><FONT color="#ffffff" face="Arial" size="2">第4环
+                           乘数</FONT>             </CENTER></TD></TR>
+              <TR>
+                <TD height="19"><INPUT name="multiplier_color_band" size="9"
+                  value="0"></TD></TR>
+              <TR>
+                <TD height="23" bgcolor="#000000"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="black">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">黑</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#804000"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="brown">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">棕</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ff0000"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="red">                                <FONT color="#ffffff"
+                  face="Arial" size="2">红</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffa000"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="orange">                                   <FONT color="#000000"
+                  face="Arial" size="2">橙</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffff00"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="yellow">                                   <FONT color="#000000"
+                  face="Arial" size="2">黄</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#348017"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="green">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">绿</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#0000ff"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="blue">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">兰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#cc3399"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="violet">                                   <FONT color="#000000"
+                  face="Arial" size="2">紫</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#b9b7b7"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="gray">                                 <FONT color="#ffffff"
+                  face="Arial" size="2">灰</FONT></TD>
+              </TR>
+              <TR>
+                <TD height="23" bgcolor="#ffffff"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="white">                                  <FONT color="#000000"
+                  face="Arial" size="2">白</FONT></TD>
+              </TR></TBODY></TABLE></TD>
+          <TD width="215" valign="top">
+            <TABLE width="215" bgcolor="#162f2f" border="1" cellspacing="0"
+            cellpadding="0">
+              <TBODY>
+              <TR>
+                <TD>
+                  <CENTER><FONT color="#ffffff" face="Arial" size="2">第4环
+                           为</FONT><FONT color="#ffffff" size="2">金或银
+                         色时</FONT>             </CENTER></TD></TR>
+              <TR>
+                <TD align="left" bgcolor="#cc9900"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="gold">
+                                 <FONT size="2"> 金 </FONT><FONT color="#ffffff"
+                  face="Arial" size="2">第4环 </FONT><FONT
+                  color="#ffffff">×0.1</FONT></TD></TR>
+              <TR>
+                <TD align="left" bgcolor="#efefef"><INPUT name="multiplier_band_selection"
+                  onclick="calc2type4(this.value)" type="radio" value="silver">
+                                   <FONT size="2">银<FONT color="#ffffff" face="Arial">&nbsp;
+                  </FONT></FONT><FONT face="Arial" size="2">第4环
+              </FONT>×0.01</TD></TR>
+              <TR>
+                <TD align="left"><FONT color="#ffffff" face="Arial"
+                  size="2">第5环 误差率 </FONT>                   <INPUT name="tolerance_color_band"
+                  size="8" value="0">               <FONT color="#ffffff">
+                  %×100</FONT></TD></TR>
+              <TR>
+                <TD align="left" bgcolor="#804000"><INPUT name="tolerance_band_selection"
+                  onclick="calc2type5(this.value)" type="radio" value="brown">                                  <FONT color="#ffffff"
+                  face="Arial" size="2">棕 第5环 </FONT><FONT
+                  color="#ffffff">%1</FONT></TD>
+              </TR>
+              <TR>
+                <TD align="left" bgcolor="#ff0000"><INPUT name="tolerance_band_selection"
+                  onclick="calc2type5(this.value)" type="radio" value="red">                                <FONT color="#ffffff"
+                  face="Arial" size="2">红 第5环 </FONT><FONT
+                  color="#ffffff">%2</FONT></TD>
+              </TR>
+              <TR>
+                <TD align="left" bgcolor="#ffa000"><INPUT name="tolerance_band_selection"
+                  onclick="calc2type5(this.value)" type="radio" value="orange">
+                                   <FONT color="#000000" size="2" face="Arial">橙</FONT><FONT
+                  color="#ffffff" face="Arial" size="2">&nbsp; 第5环 </FONT><FONT
+                  color="#ffffff">%3</FONT></TD>
+              </TR>
+              <TR>
+                <TD align="left" bgcolor="#cc9900"><INPUT name="tolerance_band_selection"
+                  onclick="calc2type5(this.value)" type="radio" value="gold">
+                                 <FONT size="2">金</FONT><FONT color="#ffffff"
+                  face="Arial" size="2">&nbsp; 第5环</FONT><FONT color="#ffffff">
+                  %5</FONT></TD></TR>
+              <TR>
+                <TD align="left" bgcolor="#efefef"><INPUT name="tolerance_band_selection"
+                  onclick="calc2type5(this.value)" type="radio" value="silver">
+                                   <FONT size="2">银 </FONT><FONT face="Arial"
+                  size="2">第5环</FONT> %10</TD></TR>
+              <TR>
+                <TD align="right"><FONT color="#ffffff" face="Arial"
+                  size="2">电阻:</FONT>                   <INPUT name="total_resistance"
+                  size="12" value="0">               <FONT
+                  color="#ffffff" face="Arial" size="2">欧姆</FONT></TD>
+              </TR>
+              <TR>
+                <TD align="right"><FONT color="#ffffff" face="Arial"
+                  size="2">误差</FONT><FONT color="#ffffff">±</FONT><FONT color="#ffffff"
+                  face="Arial" size="2">:</FONT>                   <INPUT name="tolerance_color_total"
+                  size="12" value="0">               <FONT
+                  color="#ffffff" face="Arial" size="2">欧姆</FONT></TD>
+              </TR>
+              <TR>
+                <TD bgcolor="#162f2f">
+                  <CENTER><INPUT name="reset" type="reset" value="重置">
+                    </CENTER></TD></TR></TBODY></TABLE>　    </TR></TBODY></TABLE>
+      <TABLE style="margin: 0px auto; width: 600px; text-align: center;" border="0"
+      cellspacing="0" cellpadding="0">
+        <TBODY>
+        <TR>
+          <TD>
+            <P align="left"><FONT size="2"><B>读法</B>：</FONT>
+
+            <P align="left"><FONT size="2">例：5环电阻 依次为：红黄红黑金 读为242Ω
+                       误差为±0.5%<BR>例：5环电阻 依次为：橙白黄红银 读为39400Ω=39.4K
+                       误差为±10%<BR>例: 5环电阻 依次为：橙橙红金红 其中橙橙红为332Ω在乘上0.1=33.2Ω
+                               误差为±2%
+            <BR>从以上得知,读第四色环为金或银色一定要注意，因为它是乘的负数。<BR><BR>关于误差率：本软件误差率的得数须乘上100，如算出误差得数显示0.02在乘上100=2%</FONT></P></TR></TBODY></TABLE></FORM></TR></TBODY></TABLE></BODY></HTML>

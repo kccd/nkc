@@ -53,10 +53,14 @@ questionSchema.virtual('user')
   });
 
 questionSchema.pre('save', function(next){
-  if(!this.tlm) {
-    this.tlm = this.toc;
+  try {
+    if (!this.tlm) {
+      this.tlm = this.toc;
+    }
+    return next()
+  } catch(e) {
+    return next(e)
   }
-  next();
 });
 
 

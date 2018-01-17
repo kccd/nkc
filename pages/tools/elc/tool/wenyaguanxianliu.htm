@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>稳压管限流电阻计算器</TITLE>
+
+
+<SCRIPT>
+function calculate(zen) {
+   vinMin = parseFloat(zen.VinMin.value)
+   vinMax = parseFloat(zen.VinMax.value)
+   vOut = parseFloat(zen.Vout.value)
+   IL = parseFloat(zen.Iload.value)
+   if((vOut+0.8) > vinMin) {
+      alert("最小输入电压过低或输出电压选定过高!")
+      return
+   }
+   R = round(1000 * ((vinMin - vOut)/(IL + 10)))
+   Rp = round(Math.pow((vinMax - vOut), 2) / R)
+   zen.R.value = R;
+   zen.Rp.value = Rp;
+   //zen.res.value = "  " + R + " Ohms " +", "+ Rp + " Watts"
+   It = 1000 * ((vinMax - vOut) / R)
+   Zp = round((It * vOut) / 1000)
+    zen.vOut.value = vOut;
+   zen.Zp.value = Zp;
+   //zen.zen.value="  " + vOut + " Volts " +", "+ Zp + " Watts"
+}
+function round(n) {
+   return parseInt((n * 100) + 0.5) /100
+}
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE style="margin: 0px auto; width: 430px; text-align: center; font-size: 12px;">
+  <TBODY>
+  <TR>
+    <TD><span class="STYLE1">稳压管限流电阻计算器</span></TD>
+  </TR>
+  <TR>
+    <TD>
+      <P align="center"><IMG src="wenyaguanxianliu_files/ccebfe0707f4e5fbc72192e1cfba495b.jpg"
+      border="0"></P>
+      <FORM name="form">
+      <TABLE width="400" align="center">
+        <TBODY>
+        <TR>
+          <TD colspan="3">输入数值：</TD></TR>
+        <TR>
+          <TD height="7"></TD></TR>
+        <TR>
+          <TD>最大输入</TD>
+          <TD align="left"><INPUT name="VinMax" size="7" maxlength="15">
+                           V</TD></TR>
+        <TR>
+          <TD>最小输入电压:</TD>
+          <TD align="left"><INPUT name="VinMin" size="7" maxlength="15">
+                          V</TD></TR>
+        <TR>
+          <TD>输出电压:</TD>
+          <TD align="left"><INPUT name="Vout" size="7" maxlength="15">
+                        V</TD></TR>
+        <TR>
+          <TD>负载电流:</TD>
+          <TD align="left"><INPUT name="Iload" size="7" maxlength="15">
+                        MA </TD></TR>
+        <TR>
+          <TD height="10"></TD></TR>
+        <TR>
+          <TD
+colspan="3"><INPUT name="button" style="margin-left: 2cm;" onClick="calculate(this.form)" type="button" value="计算">
+
+<INPUT name="reset" style="margin-left: 1cm;" type="reset" value="清除"></TD></TR>
+        <TR>
+          <TD height="10"></TD></TR>
+        <TR>
+          <TD colspan="3">结果：</TD></TR>
+        <TR>
+          <TD>限流电阻:</TD>
+          <TD align="left"><FONT color="darkblue" face="verdana"
+            size="2"><B><INPUT name="R" size="10" maxlength="45">
+                 </B></FONT>Ω&nbsp;&nbsp;&nbsp;&nbsp; 功率：
+            <INPUT name="Rp" size="10" maxlength="45">                      W        </TD></TR>
+        <TR>
+          <TD>稳压二极管:</TD>
+          <TD align="left"><INPUT name="vOut" size="10" maxlength="45">
+                        V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 功率：
+        <INPUT name="Zp" size="10" maxlength="45">                    W        </TD></TR></TBODY></TABLE></FORM></TD></TR></TBODY></TABLE>
+</BODY></HTML>

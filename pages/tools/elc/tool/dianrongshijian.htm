@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><HTML 
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>电容时间常数计算器</TITLE>
+
+
+<SCRIPT type="text/javascript">
+function Compute(form) {
+	with(Math) {
+		var micro= 0.000001;
+		var Precision= 3;
+		var En;
+
+		var Vc= Number(form.Vc.value);
+		var C= Number(form.C.value)*micro;
+		var R= Number(form.R.value);
+
+		if(R) {
+			TC= R*C;
+			form.TC.value= TC.toPrecision(Precision);
+		}
+
+		En= 1*Vc*Vc*C/2;
+
+		form.En.value= En.toPrecision(Precision);
+
+		En1 = En * 0.00094781712;
+		form.En1.value = En1.toPrecision(Precision);
+	}
+}
+
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<FORM name="form" method="post">
+<TABLE style="margin: 0px auto; width: 420px; text-align: center; line-height: 22px; font-size: 12px;"
+border="1">
+  <TBODY>
+  <TR>
+    <TD colspan="3"><span class="STYLE1">电容时间常数计算器</span></TD>
+  </TR>
+  <TR>
+
+  </TR>
+  <TR>
+    <TD width="207" align="right"><FONT color="darkblue" face="verdana"><B
+      style="margin-left: 0.5cm;">电容器两端的电压:</B></FONT> </TD>
+    <TD width="197" align="left"><INPUT name="Vc" size="7" maxlength="15">
+        <FONT color="darkblue" face="verdana"><B>V</B></FONT> </TD></TR>
+  <TR>
+    <TD width="207" align="right"><FONT color="darkblue" face="verdana"><B
+      style="margin-left: 0.5cm;">Capacitance电容容量:</B></FONT> </TD>
+    <TD width="197" align="left"><INPUT name="C" size="7" maxlength="15">
+        <FONT color="darkblue" face="verdana"><B>uF</B></FONT> </TD></TR>
+  <TR>
+    <TD width="207" align="right"><FONT color="darkblue" face="verdana"><B
+      style="margin-left: 0.5cm;">Load         Resistance<FONT
+      color="#000000">负载</FONT>电阻:</B></FONT> </TD>
+    <TD width="197" align="left"><INPUT name="R" size="7" maxlength="15">
+        <FONT color="darkblue" face="verdana"><B>欧姆</B></FONT> </TD></TR>
+  <TR>
+    <TD colspan="3"><INPUT name="B1" style="margin-left: 1.5cm;" onClick="Compute(document.form);" type="button" value="计算">
+
+<INPUT name="reset" style="margin-left: 1cm;" type="reset" value="清除"></TD></TR>
+  <TR>
+    <TD colspan="3"><FONT color="red" face="verdana"><B>结果:</B></FONT> </TD></TR>
+  <TR>
+    <TD colspan="3"><FONT color="darkblue" face="verdana"><B style="margin-left: 0.5cm;">时间常数:
+              <INPUT name="TC" size="7" maxlength="15">         秒
+      seconds</B></FONT> </TD></TR>
+  <TR>
+    <TD colspan="3"><FONT color="darkblue" face="verdana"><B style="margin-left: 0.5cm;">Energy能量:</B></FONT>
+    </TD></TR>
+  <TR>
+    <TD colspan="3"><FONT color="darkblue" face="verdana"><B style="margin-left: 0.5cm;"><INPUT
+      name="En" style="margin-left: 1.4cm;" size="7" maxlength="15">         焦耳
+      Joules </B></FONT></TD></TR>
+  <TR>
+    <TD colspan="3"><FONT color="darkblue" face="verdana"><B style="margin-left: 0.5cm;"><INPUT
+      name="En1" style="margin-left: 1.4cm;" size="7" maxlength="15">
+      英制热量单位 BTU</B></FONT> </TD></TR></TBODY></TABLE><BR><BR></FORM></BODY></HTML>

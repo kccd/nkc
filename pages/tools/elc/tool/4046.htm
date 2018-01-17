@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>
+
+
+
+<title>74HC4046 CD4046中心频率在线计算器-锁相环-压控振荡器频率计算器</title>
+<meta name="Keywords" content="锁相环,压控振荡器,74HC4046,CD404620130528 003158" />
+<meta name="Description" content="74HC4046/74HCT9046A/CD4046 : 振荡器频率在线计算器 　						function rechnen()			{			    var r1,r2,c;			    			    r1 = document.generator.r1.value * 1;			    r2 = document.generator.r2.value * 1;			    c = (document.generator.c.value * 1);						    K2 = 7.18;			    Vt = 1.12;			    Tp = 11.73;			    Cs = c + 11;			    Ron = 0.047;			    Is = 5E-12;			    I2 = K2*(5-0.638)/r2;			    			    Umin = 1.5214号20130528 003158" />
+<meta name="GENERATOR" content="MSHTML 10.00.9200.16578" />
+<!--
+body {
+	background-color: #FFFFFF;
+}
+-->
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</head>
+<body class="showpage news">
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<table width="100%" border="0" cellpadding="0" cellspacing="10" bgcolor="#FFFFFF">
+  <tbody>
+    <tr align="center" valign="top">
+      <td height="812" valign="middle" class="main"><table width="100%" class="box" border="0" cellspacing="0"
+cellpadding="0">
+        <tbody>
+          <tr>
+            <td align="center"><table width="63%" border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+              <tbody>
+                <tr>
+                  <td id="text"><h2 align="center" class="STYLE1">4046中心频率在线计算器</h2>
+                          <h2 align="center"><img src="4046/757319e9124dac3caa6e19ec194aedba.jpg" alt="4046" width="497" height="315"
+                  align="middle" /></h2>
+                          <br />
+                          <br />
+                          <p style="clear: left;">　<br />
+                              <script type="text/javascript">
+
+			function rechnen()
+			{
+			    var r1,r2,c;
+
+			    r1 = document.generator.r1.value * 1;
+			    r2 = document.generator.r2.value * 1;
+			    c = (document.generator.c.value * 1);
+
+			    K2 = 7.18;
+			    Vt = 1.12;
+			    Tp = 11.73;
+			    Cs = c + 11;
+			    Ron = 0.047;
+			    Is = 5E-12;
+			    I2 = K2*(5-0.638)/r2;
+
+			    Umin = 1.1;
+			    Utyp = 2.5;
+			    Umax = 3.9;
+
+			    K1min = 5.85;
+			    K1typ = 6.25;
+			    K1max = 6.82;
+
+			    I1min = K1min * Umin / r1 ;
+			    I1typ = K1typ * Utyp / r1 ;
+			    I1max = K1max * Umax / r1 ;
+
+			    ILmin = I1min + I2 ;
+			    ILtyp = I1typ + I2 ;
+			    ILmax = I1max + I2 ;
+
+			    Vdmin = 0.026 * Math.log (ILmin / Is );
+			    Vdtyp = 0.026 * Math.log (ILtyp / Is );
+			    Vdmax = 0.026 * Math.log (ILmax / Is );
+
+			    VS1min = 2 * ( Vt - ILmin * Ron );
+			    VS1typ = 2 * ( Vt - ILtyp * Ron );
+			    VS1max = 2 * ( Vt - ILmax * Ron );
+
+				VS2min = Vdmin + Vt ;
+				VS2typ = Vdtyp + Vt ;
+				VS2max = Vdmax + Vt ;
+
+				Vsmin = Math.min ( VS1min, VS2min );
+				Vstyp = Math.min ( VS1typ, VS2typ );
+				Vsmax = Math.min ( VS1max, VS2max );
+
+				fmin = Math.round ( 500000000 / ( Tp + ( Cs * Vsmin / ILmin ))) / 1000;
+				ftyp = Math.round ( 500000000 / ( Tp + ( Cs * Vstyp / ILtyp ))) / 1000;
+				fmax = Math.round ( 500000000 / ( Tp + ( Cs * Vsmax / ILmax ))) / 1000;
+
+				kvco = Math.round(1000*(fmax-fmin)/(3.9 - 1.1))/1000;
+
+			    document.generator.f_min.value = fmin;
+			    document.generator.f_typ.value = ftyp;
+			    document.generator.f_max.value = fmax;
+			    document.generator.K_vco.value = kvco;
+
+			}
+
+			        </script>
+                          </p>
+                    <form name="generator" id="generator" action="#">
+                            <table width="439" align="center" id="table1">
+                              <tbody>
+                                <tr>
+                                  <td width="139" bgcolor="#e8faff"> R1
+                                    [kΩ]&nbsp;&nbsp;</td>
+                                  <td align="left" bgcolor="#e8faff"><input name="r1" size="6"
+                        maxlength="12"
+                        value="9.451" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;3kΩ&nbsp;&lt;&nbsp;R1&nbsp;&lt;&nbsp;300kΩ</td>
+                                </tr>
+                                <tr>
+                                  <td width="139" bgcolor="#e8faff">R2 [kΩ]&nbsp;&nbsp;</td>
+                                  <td align="left" bgcolor="#e8faff"><input name="r2" size="6"
+                        maxlength="12"
+                        value="8.2" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;3kΩ&nbsp;&lt;&nbsp;R2&nbsp;&lt;&nbsp;300kΩ</td>
+                                </tr>
+                                <tr>
+                                  <td width="139" bgcolor="#e8faff">C1 [pF]&nbsp;&nbsp;</td>
+                                  <td align="left" bgcolor="#e8faff"><input name="c" size="6"
+                        maxlength="12"
+                        value="100" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;40pF&nbsp;&lt;&nbsp;C</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <table width="436" align="center" id="table2">
+                              <tbody>
+                                <tr>
+                                  <td width="181" bgcolor="#e8faff"> 频率.最小&nbsp;[kHz]</td>
+                                  <td align="left" bgcolor="#e8faff"><input name="f_min" size="10"
+                        readonly="" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;V<sub>TUN&nbsp;</sub>=&nbsp;1.1V</td>
+                                </tr>
+                                <tr>
+                                  <td width="181" bgcolor="#e8faff">频率.典型&nbsp;[kHz]</td>
+                                  <td align="left" bgcolor="#e8faff"><input name="f_typ" size="10"
+                        readonly="" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;V<sub>TUN&nbsp;</sub>=&nbsp;2.5V</td>
+                                </tr>
+                                <tr>
+                                  <td width="181" bgcolor="#e8faff">频率.最大&nbsp;[kHz]</td>
+                                  <td align="left" bgcolor="#e8faff"><input name="f_max" size="10"
+                        readonly="" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;V<sub>TUN&nbsp;</sub>=&nbsp;3.9V</td>
+                                </tr>
+                                <tr>
+                                  <td width="181" bgcolor="#e8faff">压控振荡器增益
+                                    K<sub>VCO</sub></td>
+                                  <td align="left" bgcolor="#e8faff"><input name="K_vco" size="10"
+                        readonly="" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;kHz/V</td>
+                                </tr>
+                                <tr>
+                                  <td width="181"
+bgcolor="#e8faff"><input name="button" onclick="rechnen()" type="button" value="计算" /></td>
+                                  <td align="left" bgcolor="#e8faff">　</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          <p></p>
+                      </form>
+                    <p align="center"
+                  class="pageLink">&nbsp;</p></td>
+                </tr>
+                <tr>
+                  <td class="info_text"></td>
+                </tr>
+              </tbody>
+            </table></td>
+          </tr>
+        </tbody>
+      </table>
+      <p></p></td>
+    </tr>
+  </tbody>
+</table>
+<p align="center"><font color="#ffffff">.</font></p>
+<p></p>
+ 
+ 
+<script type="text/javascript">/*838DZ 悬120*270，创建于2011-5-7*/ var cpro_id = 'u469791';</script>
+
+<!--<SCRIPT src="74HC4046%20CD4046中心频率在线计算器-锁相环-压控振荡器频率计算器_files/f.js" type="text/javascript"></SCRIPT>
+
+<SCRIPT src="74HC4046%20CD4046中心频率在线计算器-锁相环-压控振荡器频率计算器_files/onclick.htm"></SCRIPT> -->
+</body></html>

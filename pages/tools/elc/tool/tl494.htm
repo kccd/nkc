@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "">
+<HTML><HEAD>
+ <META name="keywords" content="TL494频率计算器">
+ <meta name="description" content="科创论坛 cccyl 原创">
+
+<TITLE>TL494频率计算器</TITLE>
+
+<SCRIPT language="javascript">
+
+var f_out,f_o,r_t;
+var c_t;
+function calc()
+{
+r_t=document.tl_494.RT.value;
+c_t=document.tl_494.CT_pf.value;
+
+if (c_t=="data2")
+{
+c_t=document.tl_494.CT.value;
+}
+
+
+f_o=1/(r_t*(c_t/1000000));
+f_out=f_o/2;
+tl_494.FO.value=f_o;
+tl_494.FU.value=f_out;
+}
+
+function uncalc()
+
+{
+
+f_out=document.tl_494.FU.value;
+
+c_t=document.tl_494.CT_pf.value;
+
+if (f_out<1||f_out>300)
+{
+alert("TL494正常工作频率为1KHz-300KHz!");
+}
+if (c_t=="data2")
+{
+c_t=document.tl_494.CT.value;
+}
+
+
+r_t=500000/(f_out*c_t);
+tl_494.RT.value=r_t;
+
+
+ }
+
+function jiancha()
+{
+
+
+c_t=document.tl_494.CT_pf.value;
+
+if (c_t=="data2")
+{
+
+document.getElementById("CT").disabled=false;
+document.getElementById("CT").value='';
+
+}
+else
+{
+
+document.getElementById("CT").value="仅在选择手动输入时有效";
+document.getElementById("CT").disabled=true;
+
+}
+}
+</SCRIPT>
+
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 12px}
+.STYLE2 {font-size: 36px; }
+.STYLE3 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<BODY topmargin="0" leftmargin="0">
+<CENTER>
+  <TABLE width="900" border="0" cellspacing="0" cellpadding="0">
+    <TBODY>
+      <TR>
+        <TD><div align="center" class="STYLE3">TL494频率计算器</div></TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+  <FORM method="post" name="tl_494" id="tl_494">
+    <h1 class="STYLE2">&nbsp;</h1>
+    <p class="STYLE1"><img src="tl494/4d086e061d950a7b0af46f140ad162d9f3d3572c10dfd120.jpg" alt="tl494a" width="560" height="316"></p>
+    <p class="STYLE1"><img src="tl494/2_100926084349_1201105181900237436.jpg" alt="tl494b" width="300" height="300"></p>
+    <TABLE width="325" border="1" align="center" cellpadding="3" bordercolor="#000000">
+      <TBODY>
+        <TR>
+          <TD width="73" align="center" valign="middle" nowrap><input name="eval" onClick="calc()" type="button" value="计算频率"></TD>
+          <TD width="70" align="center" valign="middle">RT(kΩ)</TD>
+          <TD width="156" align="left" valign="middle"><INPUT name="RT" size="22" value="10"></TD>
+        </TR>
+        <TR>
+          <TD width="73" align="center" valign="middle" nowrap>&nbsp;</TD>
+          <TD align="center" valign="middle">CT(pf)</TD>
+          <TD align="left" valign="middle"><select name="CT_pf" id="CT_pf" onChange="jiancha()">
+              <option value="5">5</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="27">27</option>
+              <option value="30">30</option>
+              <option value="47">47</option>
+              <option value="68">68</option>
+              <option value="75">75</option>
+              <option value="82">82</option>
+              <option value="100">100</option>
+              <option value="470">470</option>
+              <option value="1000" selected>1000</option>
+              <option value="2200">2200</option>
+              <option value="3300">3300</option>
+              <option value="4700">4700</option>
+              <option value="10000">10000</option>
+              <option value="22000">22000</option>
+              <option value="33000">33000</option>
+              <option value="100000">100000</option>
+              <option value="220000">220000</option>
+              <option value="data2">手动输入...</option>
+          </select></TD>
+        </TR>
+        <TR>
+          <TD width="73" align="center" valign="middle" nowrap><input type="button" name="Submit" value="计算RT" onClick="uncalc()"></TD>
+          <TD align="center" valign="middle">CT(pf)</TD>
+          <TD align="left" valign="middle"><input name="CT" value="仅在选择手动输入时有效" size="22" disabled="disabled" onClick="jiancha()" id="CT"></TD>
+        </TR>
+        <TR>
+          <TD align="center" valign="middle" nowrap>&nbsp;</TD>
+          <TD align="center" valign="middle" nowrap>Fosc(kHZ) </TD>
+          <TD align="left" valign="middle"><INPUT name="FO" size="22" value= >
+          </TD>
+        </TR>
+        <TR>
+          <TD align="center" valign="middle" nowrap><input name="res" type="reset" value="复位"></TD>
+          <TD align="center" valign="middle" nowrap>Fout(kHZ)</TD>
+          <TD align="left" valign="middle"><input name="FU" size="22" value= ></TD>
+        </TR>
+        <TR>
+          <TD height="107" colspan="3" align="left" valign="top"><p>说明：</p>
+              <p>①输入RT的值，选择或输入CT的值，点击“计算频率”即可算出Fosc、Fout的值。</p>
+            <p>②输入Fout的值，选择或输入CT的值点击“计算RT”即可算出RT的值。</p></TD>
+        </TR>
+      </TBODY>
+    </TABLE>
+    <P>&nbsp;</P>
+  </FORM>
+</CENTER>
+</BODY></HTML>

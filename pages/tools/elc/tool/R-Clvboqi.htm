@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+<TITLE>R-C滤波器截止频率在线计算器</TITLE>
+
+
+<SCRIPT type="text/javascript">
+<!--
+function filter() {
+with (Math) {
+ x=document.Calc2.X1.value;
+ y=document.Calc2.X2.value;
+ Z = round(1000000/(6.28*x*y)*10)/10;
+ document.Calc2.Out.value = Z;
+}  }
+
+//-->
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE id="table4" style="margin: 0px auto; width: 550px; text-align: center; line-height: 22px; font-size: 12px;">
+  <TBODY>
+  <TR>
+    <TD>
+      <TABLE width="100%" id="table5">
+        <TBODY>
+        <TR>
+          <TD colspan="3"><div align="center" class="STYLE1">R-C滤波器截止频率在线计算器</div></TD>
+          </TR>
+        <TR>
+          <TD><IMG width="128" height="158" src="R-Clvboqi_files/64e785ae8d57359e1072475599368fe1.gif">          </TD>
+          <TD><IMG width="128" height="158" src="R-Clvboqi_files/2fa1efbbf08ad5b49d40fca4a78c28c2.gif">          </TD>
+          <TD align="left"
+            valign="top">RC滤波器推出了可计算出其单阶在下降率为6dB时的截止频率。试用于低通(Low
+            Pass)高通(Hih Pass)滤波。</TD></TR></TBODY></TABLE>
+      <FORM name="Calc2" style="margin: 0px; padding: 0px;" action="">
+      <TABLE width="100%" id="table6" border="1" cellspacing="0"
+cellpadding="2">
+        <TBODY>
+        <TR>
+          <TD height="105" align="middle" valign="top"><FONT face="verdana,arial,helvetica">电阻（欧姆）</FONT><FONT
+            face="verdana,arial,helvetica" size="-1">
+            <P><FONT size="3"><INPUT name="X2" size="10" value="10000"
+            cols="10">                         </FONT><BR></P></FONT></TD>
+          <TD align="middle" valign="top"><FONT
+            face="verdana,arial,helvetica">电容器(uF) </FONT><FONT face="verdana,arial,helvetica"
+            size="3">
+            <P>
+              <INPUT name="X1" size="10" value="0.1" cols="10">
+</P>
+          </FONT></TD>
+          <TD align="middle" valign="top"><FONT
+            face="verdana,arial,helvetica">截止频率 (Hz) </FONT><FONT face="verdana,arial,helvetica"
+            size="-1">
+            <P><FONT size="3"><INPUT name="Out" size="10">
+            </FONT>
+            <P><FONT
+size="3">
+            <INPUT name="button" onClick="filter()" type="button" value="现在计算">
+            </FONT></P>
+            </FONT></TD>
+        </TR></TBODY></TABLE></FORM></TD></TR></TBODY></TABLE></BODY></HTML>

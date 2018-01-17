@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>LED发光二极管限流电阻值计算</TITLE>
+
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY style="margin: 10px auto; text-align: center; font-size: 12px;">
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE width="100%" style="margin: 10px auto; width: 500px; text-align: center; line-height: 22px; font-size: 12px;"
+border="0" cellspacing="0" cellpadding="0">
+  <TBODY>
+  <TR>
+    <TD id="text"><span class="STYLE1">LED发光二极管限流电阻值计算器</span></TD>
+  </TR>
+  <TR>
+    <TD id="text">
+<SCRIPT type="text/javascript">
+function checkNumeric(objName,minval, maxval,comma,period,hyphen)
+{
+	var numberfield = objName;
+	if (chkNumeric(objName,minval,maxval,comma,period,hyphen) == false)
+	{
+		numberfield.select();
+		zyxf(numberfield)  ;
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+function chkNumeric(objName,minval,maxval,comma,period,hyphen)
+{
+var checkOK = "0123456789" + comma + period + hyphen;
+var checkStr = objName;
+var allValid = true;
+var decPoints = 0;
+var allNum = "";
+
+for (i = 0;  i < checkStr.value.length;  i++)
+{
+ch = checkStr.value.charAt(i);
+for (j = 0;  j < checkOK.length;  j++)
+if (ch == checkOK.charAt(j))
+break;
+if (j == checkOK.length)
+{
+allValid = false;
+break;
+}
+if (ch != ",")
+allNum += ch;
+}
+if (!allValid)
+{
+alertsay = "请只输入这些值 \""
+alertsay = alertsay + checkOK + "\" 这一范围."
+alert(alertsay);
+return (false);
+}
+
+var chkVal = allNum;
+var prsVal = parseInt(allNum);
+if (chkVal != "" && !(prsVal >= minval && prsVal <= maxval))
+{
+alertsay = "请输入一个值大于或"
+alertsay = alertsay + "等于\"" + minval + "\"并且小于或"
+alertsay = alertsay + "等于\"" + maxval + "\" 这一范围."
+alert(alertsay);
+return (false);
+}
+}
+
+function Round3Dec(InputVal)
+{
+  return Math.round(InputVal * 1000) / 1000;
+}
+
+function NextHigherStandardResistor(Resistor_Ohms)
+{
+  var	Power10;
+  var	Units;
+  Power10 = 1;
+  while (Resistor_Ohms > 8.2)
+  {
+    Power10 *= 10;
+    Resistor_Ohms /= 10;
+  }
+  if (Resistor_Ohms < 1.0)
+    Resistor_Ohms = 1.0;
+  else if (Resistor_Ohms < 1.2)
+    Resistor_Ohms = 1.2;
+  else if (Resistor_Ohms < 1.5)
+    Resistor_Ohms = 1.5;
+  else if (Resistor_Ohms < 1.8)
+    Resistor_Ohms = 1.8;
+  else if (Resistor_Ohms < 2.2)
+    Resistor_Ohms = 2.2;
+  else if (Resistor_Ohms < 2.7)
+    Resistor_Ohms = 2.7;
+  else if (Resistor_Ohms < 3.3)
+    Resistor_Ohms = 3.3;
+  else if (Resistor_Ohms < 3.9)
+    Resistor_Ohms = 3.9;
+  else if (Resistor_Ohms < 4.7)
+    Resistor_Ohms = 4.7;
+  else if (Resistor_Ohms < 5.6)
+    Resistor_Ohms = 5.6;
+  else if (Resistor_Ohms < 6.8)
+    Resistor_Ohms = 6.8;
+  else
+    Resistor_Ohms = 8.2;
+
+  if (Power10 >= 1000000)
+  {
+    Units = " MΩ";
+    Power10 /= 1000000;
+  }
+  else if (Power10 >= 1000)
+  {
+    Units = " KΩ";
+    Power10 /= 1000;
+  }
+  else
+  {
+    Units = " Ω";
+  }
+
+  Resistor_Ohms *= Power10;
+  return "" + Round3Dec(Resistor_Ohms) + Units;
+}
+
+function compute (obj) {
+with (Math) {
+
+var	ResultText = "";
+var bErrors;
+va1=eval(obj.voltagea1.value);
+va2=eval(obj.voltagea2.value);
+ia3=eval(obj.currenta3.value);
+
+if (obj.name!="single")
+  ledcount=eval(obj.leds.value);
+
+  if (isNaN(va1))
+  {
+    ResultText += "错误: 电源电压不能为空.\n";
+    bErrors = true;
+  }
+  if (isNaN(va2))
+  {
+    ResultText += "错误: 正向电压不能为空.\n";
+    bErrors = true;
+  }
+  if (isNaN(ia3))
+  {
+    ResultText += "错误: LED电流不能为空.\n";
+    bErrors = true;
+  }
+
+
+if (!bErrors)
+  {
+  if(obj.name=="series")
+    aa1 = (va1 - va2*ledcount) / (ia3 / 1000);
+  else if(obj.name=="parallel")
+    aa1 = (va1 - va2) / (ia3*ledcount / 1000);
+  else
+  	aa1 = (va1 - va2) / (ia3 / 1000);
+
+    obj.resistor.value =Round3Dec(aa1);
+
+    obj.match.value =NextHigherStandardResistor(aa1);
+
+  if(obj.name=="series")
+    aa2 = (va1 - va2*ledcount) * (ia3 / 1000);
+  else if(obj.name=="parallel")
+	aa2 = (va1 - va2) * (ia3*ledcount / 1000);
+  else
+    aa2 = (va1 - va2) * (ia3 / 1000);
+
+    obj.watts.value =Round3Dec(aa2);
+
+    obj.safe.value =Round3Dec(aa2*100/60);  //derate
+
+if(aa1<0)
+alert("电源电压应比发光二极管电压高，请确定LED的数量或检查给定电源电压.");
+
+  }
+else
+  {
+  alertsay = ResultText;
+  alert(alertsay);
+  return (false);
+  }
+}
+}
+
+//-->
+
+  </SCRIPT>
+
+      <TABLE width="460" border="0" cellspacing="0" cellpadding="0">
+        <TBODY>
+        <TR>
+          <TD colspan="2">单只LED电路</TD></TR>
+        <TR>
+          <TD width="319" height="112" bgcolor="#016bc2"><FONT
+            color="#ffffff">注：不同厂家，不同颜色压降是不一样的.</FONT>
+            <P><FONT color="#ffffff">红色：2.0-2.2v 黄色：1.8-2.0v </FONT></P>
+            <P><FONT color="#ffffff">白色：3.0-4v 蓝色：3.0-4v</FONT></P>
+            <P><FONT color="#ffffff">绿色：2.0-2.2v 3.0-3.2v
+            以上仅供参考</FONT></P></TD>
+          <TD width="141" align="left" style="padding-top: 5px; padding-left: 10px;"
+          bgcolor="#def4fe" rowspan="2">
+            <FORM name=single>                  电源电压 <BR>&nbsp;
+              <INPUT name=voltagea1 onBlur="checkNumeric(this,0,250,'','.','');"
+            size="5" cols="10">                   <STRONG> V</STRONG><BR>发光二极管压降
+            <BR>&nbsp;                  <INPUT name=voltagea2 onBlur="checkNumeric(this,0,150,'','.','');"
+            size="5" cols="10">                   <STRONG>
+            V</STRONG><BR>所需的LED电流 <BR>&nbsp;                  <INPUT name=currenta3
+            onblur="checkNumeric(this,1,500,'','.','');" size="5" cols="10">
+                          <STRONG> mA</STRONG><BR><BR><INPUT name=leds type="hidden"
+            size="2" maxlength="3" value="1" cols="2">
+<INPUT name="button" onClick=compute(this.form) type="button" value="点此计算">
+                              <BR><BR>计算限流电阻 <BR>&nbsp;                  <INPUT
+            name=resistor size="6" readonly="" cols="10">
+            <STRONG>Ω</STRONG><BR>最接近的标准电阻<BR>&nbsp;                  <INPUT
+            name=match size="10" readonly="" cols="10">
+            <BR>计算电阻功率<BR>&nbsp;                  <INPUT name=watts size="6"
+            readonly="" cols="10">                   <STRONG>
+            W</STRONG><BR>安全的电阻功率 <BR>&nbsp;                  <INPUT name=safe
+            size="6" readonly="" cols="10">                   <STRONG>
+            W</STRONG><BR></FORM></TD></TR>
+        <TR>
+          <TD width="319" align="center" bgcolor="#016bc2"><IMG width="299"
+            alt="Single led with single resistor" src="LEDfaguang_files/ba87089aca85ac38a254b92bcb7b3d2c.gif"></TD></TR>
+        <TR>
+          <TD colspan="2">LED串联电路</TD></TR>
+        <TR>
+          <TD width="319" align="center" bgcolor="#016bc2"><IMG width="238"
+            alt="Several leds in series with one resistor" src="LEDfaguang_files/abe1076c61832ebc19468a9c43bf84aa.gif">          </TD>
+          <TD width="141" align="left" style="padding-top: 5px; padding-left: 10px;"
+          bgcolor="#def4fe">
+            <FORM name=series>                  电源电压<BR><INPUT name=voltagea1
+            onblur="checkNumeric(this,0,250,'','.','');" size="5" cols="10">
+                          <STRONG> V</STRONG><BR>发光二极管压降 <BR>&nbsp;
+                <INPUT name=voltagea2 onBlur="checkNumeric(this,0,32,'','.','');"
+            size="5" cols="10">                   <STRONG>
+            V</STRONG><BR>所需的LED电流<BR>&nbsp;                  <INPUT name=currenta3
+            onblur="checkNumeric(this,1,500,'','.','');" size="5" cols="10">
+                          <STRONG> mA</STRONG><BR>连接LED的数量 <BR>&nbsp;
+                  <INPUT name=leds onBlur="checkNumeric(this,2,32,'','','');"
+            size="2" maxlength="3" value="2" cols="2">
+            <BR><BR><INPUT name=leds2 type="hidden" size="2" maxlength="3"
+            value="2" cols="2">                   <INPUT name="button1" onClick=compute(this.form) type="button" value="点此计算">
+                              <BR><BR>计算限流电阻 <BR>&nbsp;                  <INPUT
+            name=resistor size="6" readonly="" cols="10">
+            <STRONG>Ω</STRONG><BR>最接近的标准电阻 <BR>&nbsp;                  <INPUT
+            name=match size="10" readonly="" cols="10">
+            <BR>计算电阻功率 <BR>&nbsp;                  <INPUT name=watts size="6"
+            readonly="" cols="10">                   <STRONG>
+            W</STRONG><BR>安全的电阻功率 <BR>&nbsp;                  <INPUT name=safe
+            size="6" readonly="" cols="10">                   <STRONG>
+            W</STRONG>                 </FORM></TD></TR>
+        <TR>
+          <TD colspan="2">LED并联电路</TD></TR>
+        <TR>
+          <TD width="319" height="282" align="center" bgcolor="#016bc2"><IMG
+            width="310" alt="Several leds connected parallel with one resistor"
+            src="LEDfaguang_files/edd86d7ac18640db704716f342bdfdd1.gif"> </TD>
+          <TD width="141" align="left" style="padding-top: 5px; padding-left: 10px;"
+          bgcolor="#def4fe">
+            <FORM name=parallel>                  电源电压 <BR>&nbsp;
+                <INPUT onBlur="checkNumeric(this,0,250,'','.','');" size="5" cols="10" name=voltagea1>                   <STRONG> V</STRONG><BR>发光二极管压降
+            <BR>&nbsp;                  <INPUT name=voltagea2 onBlur="checkNumeric(this,0,32,'','.','');"
+            size="5" cols="10">                   <STRONG>
+            V</STRONG><BR>所需的LED电流<BR>&nbsp;                  <INPUT onblur="checkNumeric(this,1,500,'','.','');" size="5" cols="10" name=currenta3>
+                          <STRONG> mA</STRONG><BR>连接LED的数量 <BR>&nbsp;
+                  <INPUT onBlur="checkNumeric(this,2,500,'','','');" size="2" maxlength="3" value="2" cols="2" name=leds>
+            <BR><BR><INPUT name=leds2 type="hidden" size="2" maxlength="3"
+            value="3" cols="2">                   <INPUT onClick=compute(this.form) type=button value="点此计算">
+                              <BR><BR>计算限流电阻 <BR>&nbsp;                  <INPUT
+            name=resistor size="6" readonly cols="10">
+            <STRONG>Ω</STRONG><BR>最接近的标准电阻 <BR>&nbsp;                  <INPUT
+            name=match size="10" readonly cols="10">
+            <BR>计算电阻功率 <BR>&nbsp;                  <INPUT name=watts size="6"
+            readonly cols="10">                   <STRONG>
+            W</STRONG><BR>安全的电阻功率<BR>&nbsp;                  <INPUT name=safe
+            size="6" readonly cols="10">                   <STRONG>
+            W</STRONG>
+</FORM></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+</BODY></HTML>

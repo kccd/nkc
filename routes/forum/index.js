@@ -7,15 +7,12 @@ const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
-    const type = ctx.request.accepts('json', 'html');
     const {data} = ctx;
     const {user} = data;
-    if(type === 'json') {
-      data.forumsList = await dbFn.getAvailableForums(ctx);
-      data.uid = user? user.uid: undefined;
-    } else {
-      ctx.throw(404);
-    }
+    data.forums = await dbFn.getAvailableForums(ctx);
+    ctx.template = 'interface_forums.pug';
+    data.uid = user? user.uid: undefined;
+    data.navbar = {highlight: 'forums'};
     await next();
   })
   .get('/:fid', async (ctx, next) => {

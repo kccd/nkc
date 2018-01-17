@@ -1,0 +1,37 @@
+-const {iconFileName, color = defaultColor, displayName, tCount, countPostsToday, description, fid} = forum
+  div(style='display: table-row;')
+    a(href=`/f/${fid}` style='color: inherit; text-decoration: none;')
+      .nkc-cell-block(style='min-width: 20em;')
+        div(style='display: inline-block; width: 1.4em; height: 1.4em; border-radius: 1.2em; overflow: hidden; margin-bottom: -0.3em;')
+          if iconFileName
+            img(src=`/resources/site_specific/forum_icon/${iconFileName}.png` width='100%')
+          else
+            div(style=`width: 100%;height: 100%;background-color: ${color}`)
+        span &nbsp;
+        span(style=`font-size: 1.2em; background-color: ${color}; color: white; padding: 0 4px; 0 4px; border-radius: 4px;`) #{displayName}
+        span
+          span(style) 总(#{tCount.normal}) 精(#{tCount.digest}) 今(#{countPostsToday})
+      .nkc-cell-block
+        span(style='color: grey; font-size: 14px;') #{description}
+
+
+
+//.nkc-table-row
+//  .panel
+//    div(style='display: table-cell; width: 200px;')
+//      div(style='display: inline-block; width: 22px; height: 22px; border-radius: 11px; margin-bottom: -4px; overflow: hidden;')
+//        if forum.iconFileName
+//          img(src=`/resources/site_specific/forum_icon/${forum.iconFileName}.png` width='100%')
+//        else
+//          div(style=`width: 100%;height: 100%;background-color: ${forum.color || defaultColor}`)
+//      span &nbsp;
+//      a(href=`/f/${forum.fid}` title=`${forum.description}` style='font-size: 18px; color: black;') #{forum.displayName}
+//      div
+//        div #{forum.description}
+//        div 总(#{forum.tCount.normal}) 精(#{forum.tCount.digest}) 今日(#{forum.countPostsToday})
+//    div(style='display: table-cell;')
+//      for cForum in forum.children
+//        div(style='display: inline-block;')
+//          a.ForumThreadHasImage(href=`/f/${cForum.fid}` title=`${cForum.description}` style='color: black;background-color: white; font-size: 14px; margin-top: -6px;')
+//            span.nkc-bubble(style=`background-color: ${cForum.color? cForum.color: defaultColor}`) &nbsp;#{cForum.countPostsToday}&nbsp;
+//            span.forumDisplayName #{cForum.displayName}

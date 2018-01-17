@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0049)http://www.deepfriedneon.com/tesla_f_calccap.html -->
+<HTML><HEAD><TITLE>平行板电容设计-特斯拉线圈-科创在线-科技爱好综合社区</TITLE>
+
+<META name=GENERATOR content="MSHTML 8.00.7600.16671">
+<SCRIPT language=JavaScript1.2><!--
+function fieldcheck()
+
+{
+
+var ok=true, c=0 , a=0 , d=0 , n=0 , dc=0 , u=0
+
+	tempindex=document.CALC.units.selectedIndex
+
+	u=document.CALC.units.options[tempindex].value
+
+	if (
+
+		isNaN(document.CALC.DC.value) ||
+
+		isNaN(document.CALC.D.value) ||
+
+		isNaN(document.CALC.X.value) ||
+
+		isNaN(document.CALC.Y.value) ||
+
+		isNaN(document.CALC.N.value)
+
+		){
+
+			ok=false
+
+		}
+
+	if (
+
+		(document.CALC.DC.value == 0) ||
+
+		(document.CALC.D.value == 0) ||
+
+		(document.CALC.X.value == 0) ||
+
+		(document.CALC.Y.value == 0) ||
+
+		(document.CALC.N.value == 0)
+
+		){
+
+			ok=false
+
+		}
+
+
+
+        if (ok)
+
+		{	window.status="OK"
+
+			d=document.CALC.D.value * u
+
+			a=((document.CALC.X.value * u) * (document.CALC.Y.value * u))
+
+			n=document.CALC.N.value
+
+			dc=document.CALC.DC.value
+
+			c=((8.85e-12 * dc * a) / d) * (n -1)
+
+			c*=1e+12
+
+			c=parseInt(c) / 1e+6
+
+			document.CALC.C.value = c
+
+		}
+
+		else
+
+		{	window.status= "Unable to calculate. Invalid or missing parameters!"
+
+			document.CALC.C.value = "Error!"
+
+		}
+
+}
+
+function diag(testobject)
+
+{alert(testobject.value)}
+
+function message()
+
+	{
+
+	window.status= "Enter your parameters and press the Calculate button!"
+
+	document.CALC.C.value = ""
+
+
+
+}
+
+function setDC()
+
+	{
+
+	tempindex=document.CALC.DMAT.selectedIndex
+
+	document.CALC.DC.value = document.CALC.DMAT.options[tempindex].value
+
+	message()
+
+}
+
+function tidy()
+
+	{
+
+	window.status= ""
+
+	}
+// -->
+		</SCRIPT>
+
+<SCRIPT language=JavaScript>
+
+<!--
+
+
+//-->
+
+</SCRIPT>
+</HEAD>
+<BODY onunload=tidy onload=setDC() bgColor=black link=red>
+<table width="200" border="1" align="center" cellpadding="0" cellspacing="0" bordercolor="#9410CE">
+  <tr>
+    <td><FORM name=CALC>
+      <CENTER>
+        <H3>
+          <P>
+          <TABLE border=0 cellSpacing=2 cellPadding=0 width=640>
+            <TBODY>
+              <TR>
+                <TD colSpan=2 noWrap align=right><DIV align=left>
+                    <H4><FONT color=yellow face=Arial>平板电容器计算:</FONT></H4>
+                </DIV></TD>
+                <TD width=239></TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right>&nbsp;<FONT color=white
+      face=Arial>尺寸单位:</FONT></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <SELECT onchange=message()
+      size=1 name=units>
+                    <OPTION value=0.0254>英寸
+                      <OPTION
+        value=0.001 selected>毫米</OPTION>
+                  </SELECT>
+                </FONT></TD>
+                <TD rowSpan=9 width=239><DIV align=left><IMG
+      src="../image/teslacoil/PlateCap.gif" alt=""
+      width=310 height=298></DIV></TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right><FONT color=white face=Arial>电介质材料:</FONT></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <SELECT onchange=setDC() size=1
+      name=DMAT>
+                    <OPTION selected value=2.3>LDPE/HDPE
+                      <OPTION
+        value=7.5>GLASS
+                      <OPTION value=1.0>AIR
+                      <OPTION
+      value=4.6>PVC</OPTION>
+                  </SELECT>
+                  </FONT>&nbsp;<FONT color=yellow
+      face=Arial><B><BR>
+                    DC</B></FONT><FONT color=white face=Arial>=
+                      <INPUT
+      onchange=message() value=2.3 size=2 name=DC>
+                </FONT></TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right><FONT color=white face=Arial>电极板片数 (</FONT><FONT color=yellow face=Arial><B>N</B></FONT><FONT
+      color=white face=Arial>):</FONT></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <INPUT onchange=message()
+      size=6 name=N>
+                </FONT></TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right><FONT color=white face=Arial>电极板间距 (</FONT><FONT color=yellow face=Arial><B>D</B></FONT><FONT
+      color=white face=Arial>):</FONT></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <INPUT onchange=message()
+      size=6 name=D>
+                </FONT></TD>
+              </TR>
+              <TR>
+                <TD vAlign=bottom width=160 noWrap align=right>&nbsp;<B>&nbsp;&nbsp;<FONT
+      color=white face=Arial>电极板面积 </FONT></B><FONT color=white
+      face=Arial>(</FONT><FONT color=yellow face=Arial><B>A</B></FONT><FONT
+      color=white face=Arial>):</FONT></TD>
+                <TD width=190>&nbsp;</TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right>&nbsp;<FONT color=white face=Arial>重叠部分长度(</FONT><FONT color=yellow face=Arial><B>L</B></FONT><FONT
+      color=white face=Arial>):</FONT></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <INPUT onchange=message()
+      size=6 name=X>
+                </FONT>&nbsp;</TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right>&nbsp;<FONT color=white face=Arial>重叠部分宽度(</FONT><FONT color=yellow face=Arial><B>W</B></FONT><FONT
+      color=white face=Arial>):</FONT></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <INPUT onchange=message()
+      size=6 name=Y>
+                </FONT></TD>
+              </TR>
+              <TR>
+                <TD width=160 noWrap align=right></TD>
+                <TD width=190>&nbsp;
+                    <INPUT onclick=fieldcheck() value=计算 type=button name=EQUALS>
+                  &nbsp;
+                  <INPUT onclick=message() value=重置 type=reset name=name></TD>
+              </TR>
+              <TR>
+                <TD width=160><DIV align=right>&nbsp;&nbsp;&nbsp;<FONT color=white
+      face=Arial><B>电容量 :</B></FONT><FONT color=yellow
+      face=Arial><B>C</B></FONT><FONT color=white face=Arial>=</FONT></DIV></TD>
+                <TD width=190><FONT color=white face=Arial>
+                  <INPUT size=16
+    name=C>
+                  uF</FONT></TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+          </P>
+        </H3>
+      </CENTER>
+      <P>
+    </FORM>
+      </P>
+      <CENTER>
+        <P>
+        <TABLE width=500 border=1 cellPadding=0 cellSpacing=2 bordercolor="#9410CE">
+          <TBODY>
+            <TR>
+              <TD><div align="center"><FONT color=aqua face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>平行板电容器参数计算与制作. </FONT> </div>
+                  <P align="center"><FONT color=aqua
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>点击计算按钮，得到计算结果.</FONT></P></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <p>&nbsp;</p>
+      </CENTER>
+    </P></td>
+  </tr>
+</table>
+<p align="center"><font size="+2"><a href="../"><strong>返回首页</strong></a> &nbsp; <a href="../../../"><strong>科创论坛</strong></a></font></p>
+</BODY></HTML>

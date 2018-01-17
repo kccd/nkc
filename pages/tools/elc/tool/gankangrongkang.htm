@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>
+
+
+
+<title>感抗与容抗在线计算器</title>
+
+<script type="text/javascript">
+<!--
+// Original JavaScript February, 2001
+// http://home.new.rr.com/trumpetb/audio/fboxjs.html
+// by Robert A. Booty, trumpetb@new.rr.com
+
+function calcLC() {
+   var freq = document.forms[0].Fx.value
+   var reac = document.forms[0].Xx.value
+
+   var C = 1000000/(2*Math.PI*freq*reac);
+   var L = reac*1000 / (2*Math.PI*freq)
+
+   document.forms[0].cap.value = Math.round(C*10)/10;
+   document.forms[0].ind.value = Math.round(L*100)/100;
+}
+function calcXL() {
+   var freq1 = document.forms[1].Fx1.value
+   var ind1 = document.forms[1].ind1.value
+
+   var XL1 = 2*Math.PI*freq1*ind1 / 1000
+
+   document.forms[1].XL1.value = Math.round(XL1*100)/100;
+}
+function calcXC() {
+   var freq2 = document.forms[2].Fx2.value
+   var cap2 = document.forms[2].cap2.value
+
+   var XC2 = 1000000 / (2*Math.PI*freq2*cap2);
+
+   document.forms[2].XC2.value = Math.round(XC2*100)/100;
+}
+// -->
+</script>
+
+
+
+<meta name="GENERATOR" content="MSHTML 10.00.9200.16578" />
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</head>
+<body>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<div class="box" style="margin: 0px auto; width: 600px; text-align: center;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+  <tr>
+    <td valign="top"><div align="center" class="STYLE1">感抗与容抗在线计算器</div></td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <p>      </p>
+      <center>
+      <table bgcolor="#ffffff" border="1" cellspacing="0" cellpadding="6">
+        <tbody>
+        <tr>
+          <td><img
+      src="gankangrongkang_files/gan1.jpg" /></td></tr></tbody></table></center><a
+      name="calc" id="calc"></a>
+      <form action="">
+        <table width="590" bordercolor="#800080" bgcolor="#ecffff" border="1"
+      cellspacing="0">
+        <tbody>
+        <tr bgcolor="#ffffff">
+          <th width="585"><img width="188" height="42" src="gankangrongkang_files/gan2.jpg"
+            border="0" /></th></tr>
+        <tr>
+          <td height="26">        </td>
+        </tr>
+        <tr align="middle">
+          <td width="585">
+            <p align="center">工作频率：
+              <input name="Fx" size="6" value="35000" />
+            Hz，&nbsp; 							希望的电抗值：
+            <input name="Xx" size="6" value="13.5" /> Ohms
+            <br /><small>(eg: 							approx. 8 Ohms for first order crossover,
+            11.3 Ohms for second order 							crossover)</small> </p></td></tr>
+        <tr align="middle">
+          <td width="585" class="gan2" bgcolor="#3fa8f5">
+            <p align="center">需要的电感量 L =
+              <input name="ind" size="6" /> mH, &nbsp;
+            							 需要的电容量C =
+            							 <input name="cap" size="6" /> uF</p>
+            <p align="center">
+              <input onclick="calcLC()" type="button" value=" 计算 " />&nbsp;&nbsp;&nbsp;&nbsp;
+            				<input onclick="document.forms[0].Fx.focus(); document.forms[0].Fx.select();" type="reset" value=" 重置 " />
+		  </p></td></tr></tbody></table></form>
+
+
+      <form action="">
+      <table width="590" bordercolor="#800080" style="margin-top: 5px;" bgcolor="#ccffcc"
+      border="1" cellspacing="0">
+        <tbody>
+        <tr bgcolor="#ffffff">
+          <th width="569"><img width="78" height="21" src="gankangrongkang_files/gan3.jpg"
+            border="0" /></th></tr>
+        <tr align="middle">
+          <td width="569" bgcolor="#ecffff">
+            <p align="center">工作频率：
+              <input name="Fx1" size="6" value="35000" />
+            Hz，&nbsp; 							电感量：
+            <input name="ind1" size="6" value="1.4" />
+          mH</p></td></tr>
+        <tr align="middle">
+          <td width="569" class="gan2" bgcolor="#3fa8f5">
+            <p align="center">电抗值计算结果：X<sub>L</sub> =
+              <input name="XL1"
+            size="6" /> 							Ohms</p>
+            <p align="center">
+              <input onclick="calcXL()" type="button" value=" 计算 " />&nbsp;&nbsp;&nbsp;&nbsp;
+            				<input onclick="document.forms[1].Fx1.focus(); document.forms[1].Fx1.select();" type="reset" value=" 重置 " />
+		  </p></td></tr></tbody></table></form>
+
+
+      <form action="">
+      <table width="590" bordercolor="#800080" style="margin-top: 5px;" bgcolor="#ccffff"
+      border="1" cellspacing="0">
+        <tbody>
+        <tr bgcolor="#ffffff">
+          <th width="570"><img width="92" height="34" src="gankangrongkang_files/gan4.jpg"
+            border="0" /></th></tr>
+        <tr align="middle">
+          <td width="570" bgcolor="#ecffff">
+            <p align="center">工作频率：
+              <input name="Fx2" size="6" value="35000" />
+            Hz，&nbsp; 							电容量：
+            <input name="cap2" size="6" value="0.01" />
+            uF&nbsp;&nbsp; 							&nbsp;&nbsp;</p></td></tr>
+        <tr align="middle">
+          <td width="570" class="gan2" bgcolor="#3fa8f5">
+            <p align="center">电抗值计算结果：X<sub>C</sub> =
+              <input name="XC2"
+            size="6" /> 							Ohms</p>
+            <p align="center">
+              <input onclick="calcXC()" type="button" value=" 计算 " />&nbsp;&nbsp;&nbsp;&nbsp;
+            				<input onclick="document.forms[2].Fx2.focus(); document.forms[2].Fx2.select();" type="reset" value=" 重置 " />
+	  </p></td></tr></tbody></table></form></td></tr>
+  </tbody></table>
+</div></body></html>

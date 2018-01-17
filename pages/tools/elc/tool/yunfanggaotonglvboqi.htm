@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>运放高通滤波器计算器</TITLE>
+
+
+<SCRIPT language="JavaScript">
+<!--
+var FM = 0;
+var R1M = 0;
+var R2M = 0;
+var CM = 0;
+
+function clearBoxes(form)
+{
+form.F.value = "";
+form.R1.value = "";
+form.R2.value = "";
+form.C.value = "";
+form.F.focus();
+}
+
+function solve(f){
+F = eval(f.F.value);
+R1 = eval(f.R1.value);
+R2 = eval(f.R2.value);
+C = eval(f.C.value);
+FM = eval(f.FM.value);
+R1M = eval(f.R1M.value);
+R2M = eval(f.R2M.value);
+CM = eval(f.CM.value);
+F = F*FM;
+R1 = R1*R1M;
+R2 = R2*R2M;
+C = C*CM;
+if (f.F.value==""){
+F = 1000;
+f.F.value = F/FM;
+}
+if (f.R1.value==""){
+if (f.R2.value==""){
+if (f.C.value==""){
+R1 = 10000;
+f.R1.value = R1/R1M;
+R2 = R1*2;
+f.R2.value = R2/R2M;
+C = 0.11253954/(F*R1);
+f.C.value = C/CM;
+return;
+} else {f.C.value = C/CM; R1 = 0.11253954/(F*C); f.R1.value = R1/R1M; R2 = R1*2; f.R2.value = R2/R2M; return;}
+
+} else {f.R2.value = R2/R2M; R1 = R2/2; f.R1.value = R1/R1M; C = 0.11253954/(F*R1); f.C.value = C/CM; return;}
+
+} else {f.R1.value = R1/R1M; R2 = R1*2; f.R2.value = R2/R2M; C = 0.11253954/(F*R1); f.C.value = C/CM; return;}
+
+}
+
+-->
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE style="margin: 0px auto; width: 550px; text-align: center; font-size: 12px;"
+border="0" cellspacing="0" cellpadding="1">
+  <TBODY>
+  <TR valign="top">
+    <TD align="middle">
+      <FORM method="post">
+      <TABLE bordercolorlight="#ccffff" border="4" cellpadding="4">
+        <TBODY>
+        <TR bgcolor="#e0e0e0">
+          <TD colspan="3" bgcolor="#FFFFFF"><div align="center" class="STYLE1">运放高通滤波器计算器</div></TD>
+          </TR>
+        <TR bgcolor="#e0e0e0">
+          <TD bgcolor="#99ccff">截止<FONT color="#000000">频率</FONT>(Fc):</TD>
+          <TD bgcolor="#99ccff"><INPUT name="F" size="8"></TD>
+          <TD align="left" bgcolor="#99ccff"><IMG width="300" height="175"
+            alt="Sallen-Key High Pass Filter" src="yunfanggaotonglvboqi_files/bc0780edff1d3f5fd823f253a71e9f7b.gif"
+            border="0">                       <SELECT name="FM" style="width: 64px;"><OPTION
+              value="1">Hz                           <OPTION value="1000"
+              selected="">KHz                           <OPTION
+              value="1000000">MHz</OPTION>                     </SELECT></TD></TR>
+        <TR>
+          <TD>电阻值(R1):</TD>
+          <TD><INPUT name="R1" size="8"></TD>
+          <TD align="left"><SELECT name="R1M" size="1"><OPTION value="1">Ω
+                                  <OPTION value="1000" selected="">KΩ
+                         <OPTION value="1000000">MΩ</OPTION>
+            </SELECT></TD></TR>
+        <TR>
+          <TD><FONT face="Arial,Helvetcia,sans-serif"
+          size="2">电阻值</FONT>(R2):</TD>
+          <TD><INPUT name="R2" size="8"></TD>
+          <TD align="left"><SELECT name="R2M" style="width: 64px;"
+              size="1"><OPTION value="1">Ω                       <OPTION value="1000"
+              selected="">KΩ                       <OPTION
+              value="1000000">MΩ</OPTION>                     </SELECT></TD></TR>
+        <TR>
+          <TD>滤波电容值(C1=C2):</TD>
+          <TD><INPUT name="C" size="8"></TD>
+          <TD align="left"><SELECT name="CM" style="width: 64px;"><OPTION
+              value="0.000000000001">pF                       <OPTION value="0.000000001"
+              selected="">nF                       <OPTION value="0.000001">&micro;F
+                                  <OPTION value="0.001">mF
+              <OPTION value="1">F</OPTION>                     </SELECT></TD></TR>
+        <TR bgcolor="#ccffff">
+          <TD align="middle" colspan="2"><INPUT name="name" onClick="solve(this.form);" type="button" value="计算"></TD>
+        <TD align="left"><INPUT name="reset" onClick="clearBoxes(this.form);" type="reset" value="清除"></TD></TR></TBODY></TABLE>
+      </FORM>
+               </TD></TR></TBODY></TABLE></BODY></HTML>

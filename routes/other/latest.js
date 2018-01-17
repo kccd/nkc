@@ -29,6 +29,7 @@ latestRouter
     data.forumList = await dbFn.getAvailableForums(ctx);
     data.digest = digest;
     data.sortby = sortby;
+    data.navbar = {highlight: 'latest'};
     data.content = 'forum';
     if(data.user)
       data.userThreads = await data.user.getUsersThreads();

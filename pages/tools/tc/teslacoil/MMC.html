@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0050)http://www.deepfriedneon.com/tesla_f_calcmmc3.html -->
+<HTML><HEAD><TITLE>电容组设计-特斯拉线圈-科创在线-科技爱好综合社区</TITLE>
+
+<META name=GENERATOR content="MSHTML 8.00.7600.16671">
+<SCRIPT language=JavaScript1.2>
+<!--
+<!--
+var iCap=0.047, iVoltage=1600, perString=11, numOfStrings=3, totalNumOfCaps=0;
+function initialise(){
+	document.mmccalc.iCap.value=iCap;
+	document.mmccalc.iVoltage.value=iVoltage;
+	document.mmccalc.perString.value=perString;
+	document.mmccalc.numOfStrings.value=numOfStrings;
+	calc();
+}
+function calc(){
+	iCap=document.mmccalc.iCap.value;
+	iVoltage=document.mmccalc.iVoltage.value;
+	perString=document.mmccalc.perString.value;
+	numOfStrings=document.mmccalc.numOfStrings.value;
+	document.mmccalc.totalNumOfCaps.value=perString*numOfStrings;
+	mmcCapacitance=iCap/perString*numOfStrings;
+	mmcCapacitance=mmcCapacitance*10e+3;
+	mmcCapacitance=parseInt(mmcCapacitance);
+	mmcCapacitance=mmcCapacitance/10e+3;
+	document.mmccalc.mmcCapacitance.value=mmcCapacitance;
+	mmcVoltage=iVoltage*perString;
+	document.mmccalc.mmcVoltage.value=mmcVoltage;
+}
+function perStringUp(){
+		perString=document.mmccalc.perString.value;
+		perString=perString*1+1;
+		document.mmccalc.perString.value=perString;
+		calc();
+}
+function perStringDown(){
+		perString=document.mmccalc.perString.value;
+		perString=perString*1-1;
+		if (perString*1<1) perString=1;
+		document.mmccalc.perString.value=perString;
+		calc();
+}
+function numOfStringsUp(){
+		numOfStrings=document.mmccalc.numOfStrings.value;
+		numOfStrings=numOfStrings*1+1;
+		document.mmccalc.numOfStrings.value=numOfStrings;
+		calc();
+}
+function numOfStringsDown(){
+		numOfStrings=document.mmccalc.numOfStrings.value;
+		numOfStrings=numOfStrings*1-1;
+		if (numOfStrings*1<1) numOfStrings=1;
+		document.mmccalc.numOfStrings.value=numOfStrings;
+		calc();
+}
+
+
+</SCRIPT>
+</HEAD>
+<BODY onload=initialise() aLink=red link=yellow bgColor=black text=white
+vLink=red>
+<table width="200" border="1" align="center" cellpadding="0" cellspacing="0" bordercolor="#9410CE">
+  <tr>
+    <td><FORM method=get name=mmccalc>
+      <CENTER>
+        <TABLE border=0 width=654>
+          <TBODY>
+            <TR>
+              <TD colSpan=2><FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>电容组设计:</B></FONT></TD>
+              <TD width=31>&nbsp;</TD>
+              <TD rowSpan=13 width=362><DIV align=center><IMG
+      src="../image/teslacoil/fig_mmc3.gif" width=267
+      height=142></DIV></TD>
+            </TR>
+            <TR>
+              <TD colSpan=2><FONT face="Arial, Helvetica, sans-serif"><B>单个电容参数:</B></FONT></TD>
+              <TD width=31>&nbsp;</TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT
+    face="Arial, Helvetica, sans-serif">电容量:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT tabIndex=1 onchange=calc() size=6 name=iCap>
+              </DIV></TD>
+              <TD width=31><DIV align=center><FONT
+    face="Arial, Helvetica, sans-serif">uF</FONT></DIV></TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT face="Arial, Helvetica, sans-serif">耐压:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT tabIndex=2 onchange=calc() size=6 name=iVoltage>
+              </DIV></TD>
+              <TD width=31><DIV align=center><FONT
+    face="Arial, Helvetica, sans-serif">V</FONT></DIV></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT face="Arial, Helvetica, sans-serif"><B>电容组设计:</B></FONT></TD>
+              <TD width=68>&nbsp;</TD>
+              <TD width=31>&nbsp;</TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT face="Arial, Helvetica, sans-serif">串联数量:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT tabIndex=3 onchange=calc() size=3 name=perString>
+              </DIV></TD>
+              <TD width=31><DIV align=left><IMG border=0 align=middle
+      src="../image/teslacoil/spinner1.png" width=22
+      height=35 useMap=#Map></DIV></TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT face="Arial, Helvetica, sans-serif">并联数量:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT tabIndex=4 onchange=calc() size=3
+      name=numOfStrings>
+              </DIV></TD>
+              <TD width=31><DIV align=left><IMG border=0
+      src="../image/teslacoil/spinner1.png" width=22
+      height=35 useMap=#Map2></DIV></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT
+    face="Arial, Helvetica, sans-serif"><B>电容组参数:</B></FONT></TD>
+              <TD width=68>&nbsp;</TD>
+              <TD width=31>&nbsp;</TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT
+    face="Arial, Helvetica, sans-serif">电容量:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT disabled size=6 name=mmcCapacitance>
+              </DIV></TD>
+              <TD width=31><DIV align=center><FONT
+    face="Arial, Helvetica, sans-serif">uF</FONT></DIV></TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT face="Arial, Helvetica, sans-serif">耐压:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT disabled size=6 name=mmcVoltage>
+              </DIV></TD>
+              <TD width=31><DIV align=center><FONT
+    face="Arial, Helvetica, sans-serif">V</FONT></DIV></TD>
+            </TR>
+            <TR>
+              <TD width=175><FONT face="Arial, Helvetica, sans-serif">总电容个数:</FONT></TD>
+              <TD width=68><DIV align=center>
+                <INPUT disabled size=6 name=totalNumOfCaps>
+              </DIV></TD>
+              <TD width=31><DIV align=center></DIV></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <P>
+      </CENTER>
+    </FORM>
+      <CENTER>
+        <P align=center></P>
+        <P align=center>
+        <DIV align=center>
+          <TABLE width=500 border=1 cellPadding=0 cellSpacing=2 bordercolor="#9410CE">
+            <TBODY>
+              <TR>
+                <TD><FONT color=aqua face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>计算电容组的参数，设计电容组的时候，耐压最好取主变压器输出电压的3倍以上.</FONT>
+                    <P><FONT color=aqua
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>将光标用TAB键移动到下一个字段，显示结果.</FONT><FONT face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular> </FONT></P></TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+        </DIV>
+      </CENTER>
+      <MAP name=Map>
+        <AREA
+  title=Increase href="javascript:perStringUp()" shape=rect alt=Increase
+  coords=-1,0,20,17>
+        <AREA title=Decrease href="javascript:perStringDown()"
+  shape=rect alt=Decrease coords=-1,18,20,34>
+      </MAP>
+      <MAP name=Map2>
+        <AREA
+  title=Increase href="javascript:numOfStringsUp()" shape=rect alt=Increase
+  coords=0,0,21,17>
+        <AREA title=Decrease href="javascript:numOfStringsDown()"
+  shape=rect alt=Decrease coords=0,18,21,34>
+      </MAP>
+    </td>
+  </tr>
+</table>
+<p align="center"><font size="+2"><a href="../"><strong>返回首页</strong></a> &nbsp; <a href="../../../"><strong>科创论坛</strong></a></font></p>
+</BODY></HTML>

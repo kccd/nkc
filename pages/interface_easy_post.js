@@ -107,7 +107,7 @@ EasyPost.prototype.init = function() {
       if(path && path[1] === 'f') {
         self.id = path[2];
       }
-      return groupingForums(result.forumsList, self);
+      return groupingForums(result.forums, self);
     })
     .then(function() {
       var parents = self.parents;
@@ -137,7 +137,7 @@ EasyPost.prototype.init = function() {
       }
     })
     .catch(function(e) {
-      console.log(e);
+      console.error(e);
     });
   //geid('onlyM').onchange = onlyMOnChange(self);
   parents.onchange = parentsOnChange(self);

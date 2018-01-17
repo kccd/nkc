@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<meta name="Description" content="科创论坛 cccyl 原创" />
+<meta name="Keywords" content="lm2576 2596计算器" />
+<title>lm2576 2596计算器</title>
+<script language="JavaScript" type="text/javascript">
+function jisuandianzu()
+	{
+	 var vo1,r11,r21,dvv,dv,tem;
+	 vo1=document.getElementById("vo").value;
+
+
+		 if (vo1<36)
+		 {
+		 tem=((vo1/1.23)-1);
+
+		 dvv=1000000000;
+		 for (var r11a=1000;r11a<5000;r11a=r11a+10)
+			{
+
+			 for (var r21a=0;r21a<120000;r21a=r21a+40)
+				{
+
+				 dv=(r21a/r11a)-tem;
+
+				 if (Math.abs(dv)<dvv||dvv==Math.abs(dv))
+					{
+
+					 r21=r21a;
+					 r11=r11a;
+					 dvv=Math.abs(dv);
+					}
+				}
+			}
+
+			document.getElementById("r1").value=r11;
+			document.getElementById("r2").value=r21;
+		    if (dvv>0.00004)
+				{
+				alert("计算结果不准确!")
+				}
+		}
+		else
+		{
+		alert("输入电压应小于36V!")
+		}
+
+	}
+function jisuandianya()
+	{
+	 var vo1,r11,r21,
+	 r11=document.getElementById("r1").value;
+	 r21=document.getElementById("r2").value;
+	 vo1=1.23*((r21/r11)+1);
+	 document.getElementById("vo").value=vo1;
+
+	}
+</script>
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</head>
+
+<body>
+<script language="JavaScript" type="text/javascript">
+window.parent.document.title = document.title;
+</script>
+<form id="lm2576" name="lm2576" method="post" action="">
+  <table border="0" align="center">
+    <tr>
+      <td><div align="center" class="STYLE1">lm2576 2596计算器</div></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="lm2576/lm2576a.png" width="676" height="379" /></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="lm2576/lm2576b.png" width="458" height="232" /></td>
+    </tr>
+    <tr>
+      <td align="center"><table width="321" height="128" border="1">
+        <tr>
+          <td align="center"><label>
+            <input type="button" name="Submit" value="计算采样电阻" onclick="jisuandianzu()" />
+          </label></td>
+          <td align="left" valign="middle" nowrap="nowrap">Vout(v)</td>
+          <td align="center" valign="middle"><label>
+            <input name="vo" type="text" id="vo" value="5" size="16" />
+          </label></td>
+        </tr>
+        <tr>
+          <td align="center"><label>
+            <input type="button" name="Submit2" value="计算输出电压" onclick="jisuandianya()" />
+          </label></td>
+          <td align="left" valign="middle" nowrap="nowrap">R1(Ω)</td>
+          <td align="center" valign="middle"><label>
+            <input name="r1" type="text" id="r1" size="16" />
+          </label></td>
+        </tr>
+        <tr>
+          <td height="34" align="center"><input type="reset" name="Submit3" value="重置" /></td>
+          <td align="left" valign="middle" nowrap="nowrap">R2(Ω)</td>
+          <td align="center" valign="middle"><input name="r2" type="text" id="r2" size="16" /></td>
+        </tr>
+        <tr>
+          <td height="34" colspan="3" align="center"><label></label>
+            <div align="left">
+              <p>说明：</p>
+              <p>①输入Vout，点击计算采样电阻，可计算出R1、R2的值</p>
+              <p>②输入R1、R2的值，点击计算输出电压，可计算出Vout的值</p>
+            </div></td>
+          </tr>
+
+      </table></td>
+    </tr>
+  </table>
+  <p>&nbsp;</p>
+</form>
+
+</body>
+</html>

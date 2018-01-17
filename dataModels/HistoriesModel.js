@@ -84,16 +84,20 @@ let HistoriesSchema = new Schema({
 });
 
 HistoriesSchema.pre('save', function(next) {
-  if(!this.iplm){
-    this.iplm = this.ipoc;
+  try {
+    if (!this.iplm) {
+      this.iplm = this.ipoc;
+    }
+    if (!this.uidlm) {
+      this.uidlm = this.uid;
+    }
+    if (!this.tlm) {
+      this.tlm = this.toc
+    }
+    next()
+  } catch(e) {
+    return next(e)
   }
-  if(!this.uidlm){
-    this.uidlm = this.uid;
-  }
-  if(!this.tlm) {
-    this.tlm = this.toc
-  }
-  next();
 });
 
 module.exports = mongoose.model('histories', HistoriesSchema);

@@ -89,16 +89,20 @@ const userSchema = new Schema({
 }});
 
 userSchema.pre('save', function(next) {
-  if(!this.usernameLowerCase){
-    this.usernameLowerCase = this.username.toLowerCase();
+  try {
+    if (!this.usernameLowerCase) {
+      this.usernameLowerCase = this.username.toLowerCase();
+    }
+    const certs = this.certs;
+    const c = [];
+    for (let cert of certs) {
+      if (cert !== 'scholar') c.push(cert);
+    }
+    this.certs = c;
+    return next()
+  } catch(e) {
+    return next(e)
   }
-  const certs = this.certs;
-  const c = [];
-  for (let cert of certs) {
-    if(cert !== 'scholar') c.push(cert);
-  }
-  this.certs = c;
-  return next()
 });
 
 userSchema.virtual('regPort')
@@ -258,16 +262,20 @@ userSchema.virtual('navbarDesc').get(function() {
 
 userSchema.pre('save', async function(next) {
   // handle the ElasticSearch index
-  const {_initial_state_: initialState} = this;
-  if(!initialState) { //this is a new user
-    await indexUser(this);
-    return next()
-  } else if(initialState.description !== this.description) {
-    // description has changed , update it in the es
-    await updateUser(this);
-    return next()
-  } else {
-    return next()
+  try {
+    const {_initial_state_: initialState} = this;
+    if (!initialState) { //this is a new user
+      await indexUser(this);
+      return next()
+    } else if (initialState.description !== this.description) {
+      // description has changed , update it in the es
+      await updateUser(this);
+      return next()
+    } else {
+      return next()
+    }
+  } catch(e) {
+    return next(e)
   }
 });
 

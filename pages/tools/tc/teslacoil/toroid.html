@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0052)http://www.deepfriedneon.com/tesla_f_calctoroid.html -->
+<HTML><HEAD><TITLE>环形顶载的对地等效电容-特斯拉线圈-科创在线-科技爱好综合社区</TITLE>
+
+<META name=GENERATOR content="MSHTML 8.00.7600.16671">
+<SCRIPT language=JavaScript1.2><!--
+var d1=15, d2=4, c=0, u=1,pi=3.14159;
+function gv() {
+d1=document.toroidcalc.d1.value;
+d2=document.toroidcalc.d2.value;
+}
+function pv() {
+document.toroidcalc.d1.value=d1;
+document.toroidcalc.d2.value=d2;
+calccapacitance();
+document.toroidcalc.c.value=c;
+}
+function calccapacitance() {
+c=2.8*(1.2781-((d2/u)/(d1/u)))*Math.sqrt((2*pi*pi*((d1/u)-(d2/u))*((d2/u)/2))/(4*pi));
+c=c*1e+3;
+c=parseInt(c);
+c=c/1e+3;
+}
+function changes() {
+gv();
+pv();
+}
+function selmm() {
+if (u==1)
+	{
+		u=25.4;
+		gv();
+		d1=d1*u;
+		d1=d1*1e+3;
+		d1=parseInt(d1+0.5);
+		d1=d1/1e+3;
+		d2=d2*u;
+		d2=d2*1e+3;
+		d2=parseInt(d2+0.5);
+		d2=d2/1e+3;
+		pv();
+}
+document.toroidcalc.unit1.value="mm";
+document.toroidcalc.unit2.value="mm";
+}
+function selinches() {
+if (u==25.4)
+	{
+		gv();
+		d1=d1/u;
+		d1=d1*1e+3;
+		d1=parseInt(d1+0.5);
+		d1=d1/1e+3;
+		d2=d2/u;
+		d2=d2*1e+3;
+		d2=parseInt(d2+0.5);
+		d2=d2/1e+3;
+		u=1;
+		pv();
+	}
+document.toroidcalc.unit1.value="inches";
+document.toroidcalc.unit2.value="inches";
+}
+// -->
+		</SCRIPT>
+</HEAD>
+<BODY onload=pv() bgColor=black text=white link=red>
+<table width="200" border="1" align="center" cellpadding="0" cellspacing="0" bordercolor="#9410CE">
+  <tr>
+    <td><CENTER>
+      <H3>
+      <FORM method=get name=toroidcalc>
+        <TABLE border=0 cellSpacing=2 cellPadding=0 width=600>
+          <TBODY>
+            <TR>
+              <TD colSpan=4><DIV align=left>
+                  <H3><FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>环形电容器计算:</FONT></H3>
+              </DIV></TD>
+              <TD rowSpan=9 width=300><CENTER>
+                <IMG
+      src="../image/teslacoil/fig_toroid.gif" width="451" height="311">
+              </CENTER></TD>
+            </TR>
+            <TR>
+              <TD width=90><CENTER>
+                  <FONT size=4
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>单位:</FONT>
+              </CENTER></TD>
+              <TD colSpan=2><FONT size=4>
+                <INPUT tabIndex=0 onclick=selinches() CHECKED
+      type=radio name=units>
+                </FONT><FONT size=4
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>英寸<BR>
+                </FONT><FONT
+      size=4>
+                  <INPUT onclick=selmm() type=radio name=units>
+              </FONT><FONT size=4
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>毫米</FONT></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><FONT face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>
+                <HR>
+              </FONT></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD width=90><DIV align=right><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>D1</B></FONT><FONT size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B> :</B></FONT></DIV></TD>
+              <TD width=80><font size="4">
+                <INPUT tabIndex=1 onchange=changes() size=6 name=d1>
+              </font></TD>
+              <TD width=50><font size="4">
+                <INPUT disabled value=Inches readOnly size=6 name=unit1>
+              </font></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD width=90><DIV align=right><FONT color=yellow size="4"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>D2
+                :</B></FONT></DIV></TD>
+              <TD width=80><font size="4">
+                <INPUT tabIndex=2 onchange=changes() size=6 name=d2>
+              </font></TD>
+              <TD width=50><font size="4">
+                <INPUT disabled value=Inches readOnly size=6 name=unit2>
+              </font></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><CENTER>
+                <FONT size=1
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>*将光标用TAB键移动到下一个字段，更新结果</B></FONT>
+              </CENTER></TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><HR>
+              </TD>
+              <TD width=10></TD>
+            </TR>
+            <TR>
+              <TD colSpan=3><CENTER>
+                <FONT color=yellow
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>C =
+                  :</B></FONT>
+                <INPUT disabled readOnly size=6 name=c>
+                <FONT
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>pF</FONT>
+              </CENTER></TD>
+              <TD width=10></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <P>
+      </FORM>
+      </P>
+      <CENTER>
+        <P>
+        <TABLE width=500 border=1 cellPadding=0 cellSpacing=2 bordercolor="#9410CE">
+          <TBODY>
+            <TR>
+              <TD><FONT color=aqua face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>计算环形电容的容量</FONT>
+                  <P><FONT color=aqua
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>将光标用TAB键移动到下一个字段，更新结果.</FONT></P></TD>
+            </TR>
+          </TBODY>
+        </TABLE>
+        <p>&nbsp;</p>
+      </CENTER>
+    </P></td>
+  </tr>
+</table>
+<p align="center"><font size="+2"><a href="../"><strong>返回首页</strong></a> &nbsp; <a href="../../../"><strong>科创论坛</strong></a></font></p>
+</BODY></HTML>

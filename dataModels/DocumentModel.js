@@ -63,8 +63,12 @@ const documentSchema = new Schema({
 });
 
 documentSchema.pre('save', function(next) {
-	if(!this.tlm) this.tlm = this.toc;
-	next()
+  try {
+		if (!this.tlm) this.tlm = this.toc;
+  	return next()
+	} catch(e) {
+  	return next(e)
+	}
 });
 
 const DocumentModel = mongoose.model('documents', documentSchema);

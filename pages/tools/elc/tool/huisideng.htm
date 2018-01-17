@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>惠斯登电桥计算器</TITLE>
+
+
+<SCRIPT language="JavaScript">
+
+
+function Compute1(form) {
+	with(Math) {
+		var Precision= 3;
+		var Vb;
+
+		var Vin= Number(form.Vin.value);
+		var R1= Number(form.R1.value);
+		var R2= Number(form.R2.value);
+		var R3= Number(form.R3.value);
+		var Rx= Number(form.Rx.value);
+
+		Vb= Vin*(Rx/(R3+Rx)- R2/(R1+R2) );
+
+		form.Vb.value= Vb.toPrecision(Precision);
+	}
+}
+
+function Compute2(form) {
+	with(Math) {
+		var Precision= 3;
+		var Rx;
+
+		var Vin= Number(form.Vin.value);
+		var R1= Number(form.R1.value);
+		var R2= Number(form.R2.value);
+		var R3= Number(form.R3.value);
+		var Vb= Number(form.Vb.value);
+
+		Rx= (R2*R3 + R3*(R1+R2)*(Vb/Vin)) / (R1- (R1+R2)*(Vb/Vin));
+
+		form.Rx.value= Rx.toPrecision(Precision);
+	}
+}
+
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE style="margin: 0px auto; width: 450px; text-align: center; line-height: 22px; font-size: 12px;"
+border="0">
+  <TBODY>
+  <TR>
+    <TD valign="top"><span class="STYLE1">惠斯登电桥计算器</span></TD>
+  </TR>
+  <TR>
+    <TD width="435" height="540" valign="top">
+      <P
+      style="text-align: left;">惠斯通电桥是一个非常有用的电路。当桥完全平衡时，右边电阻相同，左侧电阻（R1=R3,<FONT
+      face="Arial">和</FONT>
+      R2=Rx），桥两端的电压为零。但是，由于电阻一个小的变化，桥变得不平衡，出现一个电压差。惠斯登电桥应用，例如应变计，压力计，传感器等各种设备.</P><IMG
+      width="266" height="372" align="center" src="huisideng_files/145639e41515cf4f9b85a0acab2733fa.gif"
+      border="0">
+      <P
+      style="text-align: left;">差分放大器可用于提取共模信号，同时拒绝了所有的共模噪声。作为一个非常小的信号变化可以从桥中提取，因为共模噪声很容易被拒绝.</P>
+      <FORM name="ParamForm" method="post">
+      <TABLE width="99%" border="1">
+        <TBODY>
+        <TR>
+          <TD height="16" bgcolor="#ccccff" colspan="2"><B><FONT face="Arial"
+            size="3">Inputs输入:</FONT></B></TD></TR>
+        <TR>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial"
+            size="3">V</FONT><FONT face="Arial"><SUB>in</SUB></FONT><FONT face="Arial"
+            size="3">: 输入电压:</FONT></TD>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial" size="3"><INPUT
+            name="Vin" size="17">                    (V)</FONT></TD></TR>
+        <TR>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial"
+            size="3">R1</FONT></TD>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial" size="3"><INPUT
+            name="R1" size="17">                    (Ω)</FONT></TD></TR>
+        <TR>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial"
+            size="3">R2</FONT></TD>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial" size="3"><INPUT
+            name="R2" size="17">                    (Ω)</FONT></TD></TR>
+        <TR>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial"
+            size="3">R3</FONT></TD>
+          <TD height="16" bgcolor="#ccccff"><FONT face="Arial" size="3"><INPUT
+            name="R3" size="17">                    (Ω)</FONT></TD></TR>
+        <TR>
+          <TD height="16" bgcolor="#ccccff" colspan="2"><B><FONT face="Arial"
+            size="3">结果:</FONT></B></TD></TR>
+        <TR>
+          <TD height="34" bgcolor="#ccccff"><FONT face="Arial"
+            size="3">Rx<BR><INPUT name="Rx" size="17">
+            (Ω)</FONT></TD>
+          <TD height="34" bgcolor="#ccccff"><FONT face="Arial"
+            size="3">V</FONT><FONT face="Arial"
+            size="2"><SUB>B</SUB>:</FONT><FONT face="Arial" size="3">&nbsp;
+            Bridge Voltage桥电压<BR><INPUT name="Vb" size="17">
+            (V)</FONT></TD></TR>
+        <TR>
+          <TD height="35" align="middle" bgcolor="#ccccff"><FONT face="Arial"
+            size="3"><INPUT name="B1" onClick="Compute1(document.ParamForm);" type="button" value="计算 ->">
+                              </FONT></TD>
+          <TD height="35" align="middle" bgcolor="#ccccff"><FONT face="Arial"
+            size="3"><INPUT name="B2" onClick="Compute2(document.ParamForm);" type="button" value="<- 计算">
+                              </FONT></TD></TR></TBODY></TABLE></FORM>
+      <P style="text-align: left;"><FONT face="Arial"
+      size="3">&nbsp;电桥电压的计算方法如下：</FONT></P>
+      <P style="text-align: left;"><FONT face="Arial" size="3">V</FONT><FONT
+      face="Arial" size="1"><SUB>B</SUB></FONT><FONT face="Arial"
+      size="3">=&nbsp; V</FONT><FONT face="Arial"
+      size="1"><SUB>in</SUB></FONT><FONT face="Arial" size="3">*[Rx/(R3+Rx)-
+      R2/(R1+R2)]</FONT></P>
+      <P style="text-align: left;"><FONT face="Arial">如果R3=R1, 和 Rx= R2+delta,
+               然后</FONT></P>
+      <P style="text-align: left;"><FONT face="Arial" size="3">V</FONT><FONT
+      face="Arial" size="1"><SUB>B</SUB></FONT><FONT face="Arial"
+      size="3">=&nbsp; V</FONT><FONT face="Arial"
+      size="1"><SUB>in</SUB></FONT><FONT face="Arial" size="3">*[
+      (R2+delta)/(R1+R2+delta)-R2/(R1+R2)]</FONT></P>
+      <P style="text-align: left;">现在，如果我们假设<FONT face="Arial"
+      size="3">delta</FONT>比R1 +           R2的小，那么</P>
+      <P style="text-align: left;"><FONT face="Arial" size="3">V</FONT><FONT
+      face="Arial" size="1"><SUB>B</SUB></FONT><FONT face="Arial" size="3">= ~
+              V</FONT><FONT face="Arial" size="1"><SUB>in</SUB></FONT><FONT
+      face="Arial" size="3">*[delta/(R1+R2)]</FONT></P>
+      <P style="text-align: left;"><FONT
+      face="Arial">因此，我们可以看到，桥电压约成正比错误</FONT><FONT face="Arial"
+      size="3">delta</FONT><FONT face="Arial">，由电阻总和除以一边。</FONT></P>
+      <P style="text-align: left;"><FONT
+      face="Arial">由于桥电压，我们可以计算为一个未知的电阻值。</FONT></P>
+      <P style="text-align: left;">(R1+R2)*(R3+Rx)*<FONT face="Arial"
+      size="3">V</FONT><FONT face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT
+      face="Arial" size="3">V</FONT><FONT face="Arial"
+      size="1"><SUB>in</SUB></FONT>= Rx*(R1+R2)+ R2*(R3+Rx)</P>
+      <P style="text-align: left;">Rx*(R1+R2)*<FONT face="Arial"
+      size="3">V</FONT><FONT face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT
+      face="Arial" size="3"> V</FONT><FONT face="Arial"
+      size="1"><SUB>in</SUB></FONT> +&nbsp; R3* (R1+R2)<FONT face="Arial" size="3">V</FONT><FONT
+      face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT face="Arial"
+      size="3">V</FONT><FONT face="Arial" size="1"><SUB>in</SUB></FONT>=
+      Rx*R1+Rx*R2 - R2*R3-           Rx*R2</P>
+      <P style="text-align: left;">Rx*R1 - Rx*(R1+R2)*<FONT face="Arial" size="3">V</FONT><FONT
+      face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT face="Arial" size="3">
+      V</FONT><FONT face="Arial" size="1"><SUB>in</SUB></FONT>&nbsp;&nbsp;=
+      R2*R3 + R3*           (R1+R2)<FONT face="Arial" size="3">V</FONT><FONT
+      face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT face="Arial"
+      size="3">V</FONT><FONT face="Arial" size="1"><SUB>in</SUB></FONT></P>
+      <P style="text-align: left;">Rx =&nbsp;(R2*R3 + R3* (R1+R2)<FONT face="Arial"
+      size="3">V</FONT><FONT face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT
+      face="Arial" size="3">V</FONT><SUB><FONT face="Arial"
+      size="1">in</FONT></SUB> )/ (R1- (R1+R2)*<FONT face="Arial"
+      size="3">V</FONT><FONT face="Arial" size="1"><SUB>B</SUB></FONT>/<FONT
+      face="Arial" size="3"> V</FONT><FONT face="Arial"
+      size="1"><SUB>in</SUB></FONT>)</P><BR></TD></TR></TBODY></TABLE>
+</BODY></HTML>

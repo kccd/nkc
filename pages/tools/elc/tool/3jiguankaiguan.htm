@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML
+xmlns="http://www.w3.org/1999/xhtml"><HEAD>
+ <TITLE>三极管开关饱和度计算器</TITLE>
+
+
+<SCRIPT language="JavaScript">
+
+
+
+function Compute(form) {
+	with(Math) {
+		var RC= Number(form.RC.value);
+		var Beta= Number(form.Beta.value);
+		var VBE= Number(form.VBE.value);
+		var VP= Number(form.VP.value);
+		var Precision= 2;
+
+
+		RB= (VP-VBE)*Beta*RC/VP;
+
+
+		form.RB.value= RB.toFixed(Precision);
+	}
+}
+
+
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY>
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<TABLE style="margin: 0px auto; width: 600px; text-align: center; line-height: 22px; font-size: 12px;"
+nborder="0">
+  <TBODY>
+  <TR>
+    <TD valign="top"><span class="STYLE1">三极管开关饱和度计算器</span></TD>
+  </TR>
+  <TR>
+    <TD valign="top"><FORM name="ParamForm" action="" method="post">
+      <DIV align="center">
+      <TABLE height="174" border="1">
+        <TBODY>
+        <TR>
+          <TD height="23" align="left"><FONT face="Arial" size="3">Rc
+                         (Collector resistor)集电极电阻</FONT></TD>
+          <TD height="23" align="left"><FONT face="Arial"><INPUT name="RC"
+            size="17">                    (KΩ)&nbsp;</FONT></TD></TR>
+        <TR>
+          <TD height="23" align="left"><FONT face="Arial">VP (Positive
+                          Voltage)<A style="text-decoration: none;" href="http://www.838dz.com/"><FONT
+            color="#000000">正电压</FONT></A></FONT></TD>
+          <TD height="23" align="left"><FONT face="Arial"><INPUT name="VP"
+            size="17">                    (V)</FONT></TD></TR>
+        <TR>
+          <TD height="23" align="left"><FONT face="Arial">Beta<SUB>(min)</SUB>
+            (Current                       gain)放大系数，电流增益</FONT></TD>
+          <TD height="23" align="left"><FONT face="Arial"><INPUT name="Beta"
+            size="17" value="150">                     </FONT></TD></TR>
+        <TR>
+          <TD height="23" align="left"><FONT face="Arial">V<SUB>BE </SUB>(Base
+            to emitter drop)基极-发射极电压降</FONT></TD>
+          <TD height="23" align="left"><FONT face="Arial"><INPUT name="VBE"
+            size="17" value="0.6">                    (V)</FONT></TD></TR>
+        <TR>
+          <TD height="25" colspan="2">
+            <P align="center"><FONT face="Arial"><INPUT name="button" onClick="Compute(document.ParamForm)" type="button" value="计算">
+                                </FONT></P></TD></TR>
+        <TR>
+          <TD height="23" align="left"><FONT face="Arial">Rb (Base
+                      resistor)基极电阻</FONT></TD>
+          <TD height="23" align="left"><FONT face="Arial"><INPUT name="RB"
+            size="17">
+      (KΩ)&nbsp;</FONT></TD></TR></TBODY></TABLE></DIV></FORM>
+      <P
+      style="text-align: left;">通过负载电流饱和，该基极电流必须Ib=Ic/Beta.。晶体管有不同的增益，因此我们要使用测试版的最低值，以确保饱和。</P>
+      <P style="text-align: left;"><FONT face="Arial">Rb=
+      (VP-V<SUB>BE</SUB>)/Ib=           (VP-V<SUB>BE</SUB>)*放大系数/Ic=
+      (VP-V<SUB>BE</SUB>)*放大系数*Rc/VP</FONT></P><BR><BR></TD></TR></TBODY></TABLE>
+</BODY></HTML>

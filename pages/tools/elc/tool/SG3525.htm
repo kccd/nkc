@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ""><HTML><HEAD><META
+content="IE=5.0000" http-equiv="X-UA-Compatible">
+
+
+<meta name="description" content="科创论坛 cccyl 原创">
+<META name="keywords" content="SG3525频率计算器">
+<TITLE>SG3525频率计算器</TITLE>
+
+
+<SCRIPT language="javascript">
+function jisuan()
+{
+var rtt;
+var rdd;
+var ctt;
+var foo;
+var fout;
+var fc_1,dv,dvv,aa,bb,cc;
+
+ctt=document.getElementById("CT").value;
+
+foo=document.getElementById("FO").value;
+fout=document.getElementById("FU").value;
+aa=document.getElementById("a").value;
+bb=document.getElementById("b").value;
+cc=document.getElementById("c").value;
+
+if (foo>400||foo<0.1)
+{
+alert("SG3525正常工作频率为0.1KHz-400KHz!");
+}
+
+fc_1=aa/(foo*(ctt/1000000));
+dvv=1000000000;
+
+for (var rti=2;rti<150;rti=rti+0.01)
+	{
+
+	 for (var rdi=0;rdi<0.5;rdi=rdi+0.01)
+	 	{
+
+		 dv=((bb*rti+cc*rdi)-fc_1);
+		 if (Math.abs(dv)<dvv||dvv==Math.abs(dv))
+		 	{
+
+			 rdd=rdi;
+			 rtt=rti;
+			 dvv=Math.abs(dv);
+			}
+		}
+	}
+
+document.getElementById("RT").value=rtt;
+document.getElementById("RD").value=rdd;
+
+if (dvv>0.000034)
+{
+alert("结果不准确!\n试试改变CT的值");
+}
+
+
+}
+
+function jsdz()
+	{
+	var cta,rta,rda,foa,fua,aa,bb,cc;
+	cta=document.getElementById("CT").value;
+	rda=document.getElementById("RD").value;
+	rta=document.getElementById("RT").value;
+	aa=document.getElementById("a").value;
+	bb=document.getElementById("b").value;
+	cc=document.getElementById("c").value;
+	foa=aa/((cta/1000000)*(bb*rta+cc*rda));
+	fua=foa/2;
+	document.getElementById("FO").value=foa;
+	document.getElementById("FU").value=fua;
+	}
+</SCRIPT>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16578">
+
+<style type="text/css">
+<!--
+.STYLE1 {font-size: 18px}
+-->
+</style>
+</HEAD>
+<BODY topmargin="0" leftmargin="0">
+<SCRIPT language="JavaScript">
+window.parent.document.title = document.title;
+</SCRIPT>
+<CENTER>
+  <TABLE width="900" border="0" cellspacing="0" cellpadding="0">
+    <TBODY>
+      <TR>
+        <TD><div align="center" class="STYLE1">SG3525频率计算器</div></TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+  <FORM method="post" name="sg_3525" id="sg_3525">
+    <h1 class="STYLE2">&nbsp;</h1>
+    <p class="STYLE1"><img src="sg3525/12440153974a262b259f6f6.jpg" alt="sg3525" width="368" height="408"></p>
+    <TABLE width="300" border="1" align="center" cellpadding="3" bordercolor="#000000">
+      <TBODY>
+        <TR>
+          <TD align="center" valign="middle"><input name="eval" onClick="jsdz()" type="button" value="计算频率"></TD>
+          <TD width="60" align="left" valign="middle" nowrap>RT(kΩ)</TD>
+          <TD width="102" align="left" valign="middle"><INPUT name="rt" size="16" value="10" id="RT"></TD>
+        </TR>
+        <TR>
+          <TD width="54" align="center" valign="middle">&nbsp;</TD>
+          <TD align="left" valign="middle" nowrap>CT(pf)</TD>
+          <TD align="left" valign="middle"><INPUT name="ct" size="16" value="1500" id="CT"></TD>
+        </TR>
+        <TR>
+          <TD width="54" align="center" valign="middle"><label>
+            <input type="button" name="RTRD" value="计算RT,RD" onClick="jisuan()">
+          </label></TD>
+          <TD align="left" valign="middle" nowrap>RD(kΩ) </TD>
+          <TD align="left" valign="middle"><INPUT name="rd" size="16" value="0.22" id="RD"></TD>
+        </TR>
+        <TR>
+          <TD align="center" valign="middle">&nbsp;</TD>
+          <TD align="left" valign="middle" nowrap>Fosc(kHZ) </TD>
+          <TD align="left" valign="middle"><INPUT name="fo" size="16" id="FO">
+          </TD>
+        </TR>
+        <TR>
+          <TD align="center" valign="middle"><input name="res" type="reset" value="复位"></TD>
+          <TD align="left" valign="middle" nowrap>Fout(kHZ) </TD>
+          <TD align="left" valign="middle"><INPUT name="fu" size="16" id="FU">
+          </TD>
+        </TR>
+        <TR align="center">
+          <td colspan="3" align="left"><p>说明：3525形成的控制脉冲信号频率f由下式决定：f=1/ CT*(0.7*RT+3*RD)；式中CT是5脚上的连接电容, RT是6脚上的连接电阻，RD 是5脚和7脚之间的连接电阻。</p>
+              <hr>
+              <p>①输入Fosc、CT的值点击&quot;计算RT,RD&quot;即可计算出RT、RD的值</p>
+            <p>②输入RT、RD、CT的值点击&quot;计算频率&quot;即可计算出Fosc、Fout的值</p>
+            <p>③由于计算公式在网上有多种，因此在此提供可修改系数的计算公式：</p>
+            <p>Fosc=</p>
+            <table width="250">
+              <tr>
+                <td width="23">&nbsp;</td>
+                <td width="7">&nbsp;</td>
+                <td width="46">&nbsp;</td>
+                <td colspan="2"><label>
+                  <div align="center">
+                    <input name="a" type="text" id="a" value="1" size="6">
+                    </div>
+                </label></td>
+                <td width="46">&nbsp;</td>
+                <td width="14">&nbsp;</td>
+                <td width="28">&nbsp;</td>
+              </tr>
+              <tr>
+                <td colspan="8"><hr></td>
+              </tr>
+              <tr>
+                <td height="15"><div align="right">CT</div></td>
+                <td>(</td>
+                <td><label>
+                  <input name="b" type="text" id="b" value="0.67" size="6">
+                </label></td>
+                <td width="33"><div align="center">RT</div></td>
+                <td width="17"><div align="center">+</div></td>
+                <td><label>
+                  <input name="c" type="text" id="c" value="1.3" size="6">
+                </label></td>
+                <td>RD</td>
+                <td>)</td>
+              </tr>
+            </table></td>
+        </TR>
+      </TBODY>
+    </TABLE>
+    <P> </P>
+  </FORM>
+</CENTER>
+</BODY></HTML>

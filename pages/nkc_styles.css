@@ -1884,20 +1884,30 @@ img.emoji {
 .new-content-title > .digest-thread-title{
   color: #d48900;
 }
+
+.nkc-cell-block {
+  display: table-cell;
+}
 @media screen and (max-width: 768px) {
   .new-content-left{
-    min-height:20rem;
+    min-height:25rem;
     width: 100%;
   }
   .new-content-right{
     width: 100%;
   }
+  .nkc-cell-block {
+    display: block;
+  }
 }
 @media screen and (max-width: 450px) {
   .new-content-left{
-    min-height:13rem;
+    min-height:25rem;
   }
   .p-img{
     padding: 0;
+  }
+  .nkc-cell-block {
+    display: block;
   }
 }

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0051)http://www.deepfriedneon.com/tesla_f_calclcres.html -->
+<HTML><HEAD><TITLE>LC振荡频率计算-特斯拉线圈-科创在线-科技爱好综合社区</TITLE>
+
+<META name=GENERATOR content="MSHTML 8.00.7600.16671">
+<SCRIPT language=JavaScript1.2><!--
+function calculatef() {
+var f=0;
+f=1/(2*3.14159*Math.sqrt(document.resfreq.L.value*document.resfreq.C.value*1e-9));
+
+f=parseInt(f);
+f=f/1e+3;
+document.resfreq.F.value=f;
+}
+// -->
+		</SCRIPT>
+</HEAD>
+<BODY onload=calculatef() aLink=red link=yellow bgColor=black text=white vLink=red>
+<table width="200" border="1" align="center" cellpadding="0" cellspacing="0" bordercolor="#9410CE">
+  <tr>
+    <td><FORM method=get name=resfreq>
+      <CENTER>
+      <P>
+      <TABLE border=0 cellSpacing=2 cellPadding=0 width=654>
+        <TBODY>
+          <TR>
+            <TD colSpan=2><H4><FONT color=yellow size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>LC谐振电路频率计算:</FONT></H4></TD>
+            <TD></TD>
+            <TD rowSpan=6 width=330><CENTER>
+              <IMG src="../image/teslacoil/fig_lc.gif"
+      width=300 height=254>
+            </CENTER></TD>
+          </TR>
+          <TR>
+            <TD><FONT size="5" face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>电感量
+              (</FONT><FONT color=yellow size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>L</B></FONT><FONT size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+            <TD><CENTER>
+                <font size="5">
+                <INPUT tabIndex=1 onchange=calculatef() value=0.028 size=8
+      name=L>
+                </font>
+            </CENTER></TD>
+            <TD><FONT size="5"
+face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>mH</FONT></TD>
+          </TR>
+          <TR>
+            <TD><FONT size="5" face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>电容量
+              (</FONT><FONT color=yellow size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>C</B></FONT><FONT size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+            <TD><CENTER>
+                <font size="5">
+                <INPUT tabIndex=2 onchange=calculatef() value=0.02 size=8
+      name=C>
+                </font>
+            </CENTER></TD>
+            <TD><FONT size="5"
+face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>uF</FONT></TD>
+          </TR>
+          <TR>
+            <TD colSpan=3><HR>
+            </TD>
+          </TR>
+          <TR>
+            <TD><FONT size="5" face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>谐振频率(</FONT><FONT color=yellow size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>F</B></FONT><FONT size="5"
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>):</FONT></TD>
+            <TD><CENTER>
+                <font size="5">
+                <INPUT size=8 name=F>
+                </font>
+            </CENTER></TD>
+            <TD><FONT size="5"
+  face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>kHz</FONT></TD>
+          </TR>
+          <TR>
+            <TD colSpan=2><CENTER>
+              <FONT size=1
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular><B>*将光标用TAB键移动到下一个字段，更新结果</B></FONT>
+            </CENTER></TD>
+            <TD></TD>
+          </TR>
+        </TBODY>
+      </TABLE>
+    </FORM>
+      </P>
+      <P>
+      <TABLE width=500 border=1 align="center" cellPadding=0 cellSpacing=2 bordercolor="#9410CE">
+        <TBODY>
+          <TR>
+            <TD><FONT color=aqua face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>LC谐振电路的频率，可通过电容量和电感量计算.</FONT>
+                <P><FONT color=aqua
+      face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular>将光标用TAB键移动到下一个字段，更新结果.</FONT><FONT face=Arial,Helvetica,Geneva,Swiss,SunSans-Regular> </FONT></P></TD>
+          </TR>
+        </TBODY>
+      </TABLE>
+      <p>&nbsp;</p>
+    </P></td>
+  </tr>
+</table>
+<p align="center"><font size="+2"><a href="../"><strong>返回首页</strong></a> &nbsp; <a href="../../../"><strong>科创论坛</strong></a></font></p>
+</BODY></HTML>
