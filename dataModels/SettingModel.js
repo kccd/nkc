@@ -24,7 +24,7 @@ const settingSchema = new Schema({
     collections: Number,
     sms: Number,
     fundApplicationForms: Number,
-	  idPhotos: Number,
+	  photos: Number,
 	  documents: Number
   }
 },

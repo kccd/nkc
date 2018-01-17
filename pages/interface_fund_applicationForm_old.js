@@ -105,7 +105,7 @@ function postUpload(data, callback) {
       }
     }
   };
-  xhr.open("POST","/idPhoto",true);
+  xhr.open("POST","/photo",true);
   //xhr.setRequestHeader("Content-type","application/json");
   xhr.send(data);
 }
@@ -130,11 +130,11 @@ function uploadSuccess(obj){
   var photoType = obj.photoType;
   var photoId = obj.photoId;
   if(photoType === 'idCardA') {
-    $('#idCardPhotoA img').attr('src', '/idPhoto_small/'+photoId);
+    $('#idCardPhotoA img').attr('src', '/photo_small/'+photoId);
   } else if(photoType === 'idCardB') {
-	  $('#idCardPhotoB img').attr('src', '/idPhoto_small/'+photoId);
+	  $('#idCardPhotoB img').attr('src', '/photo_small/'+photoId);
   } else if(photoType === 'HandheldIdCard') {
-	  $('#idCardPhotoHandheld img').attr('src', '/idPhoto_small/'+photoId);
+	  $('#idCardPhotoHandheld img').attr('src', '/photo_small/'+photoId);
   } else if(photoType === 'life') {
     alert('上传的是生活照');
   } else {

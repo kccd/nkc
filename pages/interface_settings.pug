@@ -1,0 +1,28 @@
+extends bootstrap_base
+block title
+  title= `设置`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const defaultImg = '/default/photo_setting.jpg';
+  -const disabledImg = '/default/disabled_photo.jpg';
+  -const {type} = data;
+  .container-fluid(style='max-width: 1400px;')
+    #uploadInfo 文件已上传&nbsp;
+      span
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-2
+            .settings-header
+              -const arr = [{en:'info',ch:'基本资料'},{en:'security',ch:'账号安全'},{en:'verify',ch:'身份认证'},{en:'cert',ch:'我的证书'},{en:'album',ch:'我的相册'}];
+              ul
+                -for(let obj of arr)
+                  -const active = obj.en === type?'active': '';
+                  li
+                    a(href=`/set/${obj.en}` class=active)= obj.ch
+          .col-xs-12.col-md-10
+            block settings_content
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_settings.js')

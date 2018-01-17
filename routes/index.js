@@ -13,6 +13,7 @@ const questionRouter = routers.question;
 const resourceRouter = routers.resource;
 const fundRouter = routers.fund;
 const personalForumRouter = routers.personalForum;
+const setRouter = routers.set;
 
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
@@ -27,4 +28,5 @@ router.use('/q', questionRouter.routes(), questionRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
+router.use('/set', setRouter.routes(), setRouter.allowedMethods());
 module.exports = router;

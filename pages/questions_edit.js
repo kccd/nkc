@@ -57,7 +57,9 @@ function validate_and_submit(){
     .then(function(res){
       location.reload()
     })
-    .catch(jwarning)
+    .catch(function(data) {
+    	screenTopWarning(data.error)
+    })
   }
 }
 
@@ -77,7 +79,9 @@ function remove_question(url){
   .then(function(){
     location.reload()
   })
-  .catch(jwarning)
+  .catch(function(data){
+  	screenTopWarning(data.error)
+  })
 }
 
 function load_question(url){
@@ -106,7 +110,9 @@ function load_question(url){
     boxqid.value = q.qid
     boxqid.focus()
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	screenTopWarning(data.error)
+  })
 }
 
 function clearContent() {

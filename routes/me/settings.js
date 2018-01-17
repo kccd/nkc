@@ -1,26 +1,6 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
 settingsRouter
-	.get('/', async (ctx, next) => {
-		const {query, data, db} = ctx;
-		const {user} = data;
-		const {type} = query;
-		data.type = type;
-		ctx.template = 'interface_user_settings.pug';
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		if(type === 'idPhoto') {
-			data.privateInfo = userPersonal.privateInfo;
-		} else if(type === 'account') {
-			const {mobile, email} = userPersonal;
-			data.userPersonal = {
-				mobile,
-				email
-			}
-		} else {
-
-		}
-		await next();
-	})
 	.patch('/', async (ctx, next) => {
 		const db = ctx.db;
 		const params = ctx.body;

@@ -12,8 +12,8 @@ const thumbnailPath = path.resolve('resources/thumbnails');
 const adPath = path.resolve('resources/ad_posts');
 const siteSpecificPath = path.resolve('resources/site_specific');
 const qrCodePath = path.resolve('resources/qr');
-const idPhotoPath = path.resolve('resources/idPhoto');
-const idPhotoSmallPath = path.resolve('resources/idPhoto_small');
+const photoPath = path.resolve('resources/photo');
+const photoSmallPath = path.resolve('resources/photo_small');
 const fundBGIPath = path.resolve('resources/fundBGI');
 const fundBGISmallPath = path.resolve('resources/fundBGI_small');
 
@@ -58,7 +58,8 @@ module.exports = {
       width: 1050,
       height: 260
     },
-	  idPhotoSmall: {
+	  photo: 3*1024*1024, // 证件照上传不能超过3M
+	  photoSmall: {
     	width: 350,
 		  height: 230
 	  },
@@ -78,10 +79,10 @@ module.exports = {
   avatarSmallPath,
   thumbnailPath,
   adPath,
-  idPhotoPath,
+  photoPath,
   siteSpecificPath,
   qrCodePath,
-	idPhotoSmallPath,
+	photoSmallPath,
 	fundBGIPath,
 	fundBGISmallPath,
   avatarSize: 192,

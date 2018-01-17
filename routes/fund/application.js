@@ -24,9 +24,6 @@ applicationRouter
   		s = 1;
 	  }
 	  data.s = s;
-  	if(s === 4) {
-
-	  }
 	  if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		ctx.template = 'interface_fund_apply.pug';
   	await next();
@@ -112,25 +109,20 @@ applicationRouter
 			};
 		}
 		if(s === 3) {
-			updateObj = {
-				'status.ensureUsersMessages': true
-			}
-		}
-		if(s === 4) {
 			if(applicationForm.project === null){
 				await applicationForm.newProject(project);
 				updateObj = {
-					'status.inputProjectContent': true,
+					'status.inputProjectMessages': true,
 					projectId: applicationForm.project._id
 				}
 			} else {
 				await applicationForm.project.update(project);
-				data.redirect = `/fund/a/${applicationForm._id}/settings?s=4`;
+				data.redirect = `/fund/a/${applicationForm._id}/settings?s=3`;
 			}
 		}
-		if (s === 5) {
+		if (s === 4) {
 			updateObj = {
-				'status.inputProjectMessages': true
+				'status.inputOtherMessages': true
 			};
 			if(projectCycle) updateObj.projectCycle = projectCycle;
 			if(budgetMoney) updateObj.budgetMoney = budgetMoney;

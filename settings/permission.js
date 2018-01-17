@@ -369,7 +369,7 @@ const certificates ={
         [GET]: true,
         settings: {
           [name]: '个人信息',
-	        [GET]: true,
+	        // [GET]: true,
           [PATCH]: true
         },
         password: {
@@ -418,7 +418,7 @@ const certificates ={
           [POST]: true
         }
       },
-      idPhoto: {
+      /*photo: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
@@ -426,7 +426,7 @@ const certificates ={
 	        [DELETE]:true
         }
       },
-	    idPhoto_small: {
+	    photo_small: {
 		    [name]: '证件照缩略图',
 		    [parameter]: {
 			    [GET]: true
@@ -485,7 +485,41 @@ const certificates ={
 		    [parameter]: {
 			    [GET]: true,
 		    }
-	    }
+	    },
+	    set: {
+      	[name]: '个人资料设置',
+		    [GET]: true,
+		    info: {
+      		[name]: '基本信息',
+			    [GET]: true,
+			    [POST]: true,
+			    [PATCH]: true
+		    },
+		    security: {
+					[name]: '账号安全',
+			    [GET]: true,
+			    [POST]: true,
+			    [PATCH]: true
+		    },
+		    verify: {
+      		[name]: '身份认证',
+			    [GET]: true,
+			    [POST]: true,
+			    [PATCH]: true
+		    },
+		    cert: {
+      		[name]: '我的证书',
+			    [GET]:true,
+			    [POST]: true,
+			    [PATCH]: true
+		    },
+		    album: {
+      		[name]: '我的相册',
+			    [GET]: true,
+			    [POST]: true,
+			    [PATCH]: true
+		    }
+	    }*/
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -721,7 +755,7 @@ const certificates ={
           [POST]: true
         }
       },
-      fund: {
+      /*fund: {
         [POST]: true,
 	      m: {
 		      [name]:'基金管理页面',
@@ -743,7 +777,7 @@ const certificates ={
 		      }
 	      }
 
-      }
+      }*/
     }
   }
 };

@@ -24,8 +24,8 @@ const rtRouter = require('./rt');
 const qrCodeRouter = require('./qrcode');
 const searchRouter = require('./search');
 const testRouter = require('./test');
-const idPhotoRouter = require('./idPhoto');
-const idPhotoSmallRouter = require('./idPhoto_small');
+const photoRouter = require('./photo');
+const photoSmallRouter = require('./photo_small');
 const fundBGIRouter = require('./fundBGI');
 const fundBGISmallRouter = require('./fundBGI_small');
 // -----------------------------------
@@ -146,8 +146,8 @@ otherRouter
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
-	.use('idPhoto', idPhotoRouter.routes(), idPhotoRouter.allowedMethods())
-	.use('idPhoto_small', idPhotoSmallRouter.routes(), idPhotoSmallRouter.allowedMethods())
+	.use('photo', photoRouter.routes(), photoRouter.allowedMethods())
+	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())
 	.use('fundBGI', fundBGIRouter.routes(), fundBGIRouter.allowedMethods())
 	.use('fundBGI_small', fundBGISmallRouter.routes(), fundBGISmallRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());
