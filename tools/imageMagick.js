@@ -139,15 +139,15 @@ const gitify = () => {
   });
 };
 
-const idPhotoify = (filePath, targetPath) => {
+const photoify = (filePath, targetPath) => {
   if(linux) {
     return spawnProcess('convert', [filePath, targetPath]);
   }
   return spawnProcess('magick', ['convert', filePath, targetPath]);
 };
 
-const idPhotoSmallify = (filePath, targetPath) => {
-	const {height, width} = sizeLimit.idPhotoSmall;
+const photoSmallify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.photoSmall;
 	if(linux) {
 		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 	}
@@ -186,8 +186,8 @@ module.exports = {
   bannerify,
   npmInstallify,
   gitify,
-  idPhotoify,
-	idPhotoSmallify,
+  photoify,
+	photoSmallify,
 	fundBGIify,
 	fundBGISmallify,
   removeFile

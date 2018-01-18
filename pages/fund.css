@@ -84,6 +84,9 @@ input[type="radio"], input[type="checkbox"]{
 .redFontColor{
   color: red;
 }
+.greenFontColor{
+  color: green;
+}
 .greenColor{
   color: green;
 }
@@ -864,9 +867,52 @@ input[type="radio"], input[type="checkbox"]{
   cursor: pointer;
 }
 
+.paymenMethods{
+  width: 100%;
+  overflow: hidden;
+}
+.paymenMethods > div{
+  height: 100%;
+  width: 4rem;
+  float: left;
+  margin: 0 1.9rem;
+  text-align: center;
+  color: #444;
+}
+
+.paymenMethods > div:first-child{
+  margin: 0 2rem;
+}
+
+.verify a{
+  display: block;
+  float: left;
+  padding: 1rem 2rem;
+  background-color: #eee;
+  margin:0 0.5rem 0.5rem 0;
+  text-decoration: none;
+  color: #666;
+  -webkit-transition: color 0.2s, background-color 0.2s;
+  -moz-transition: color 0.2s, background-color 0.2s;
+  -ms-transition: color 0.2s, background-color 0.2s;
+  -o-transition: color 0.2s, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
+}
+.verify a:hover, .verify a.active{
+  background-color: #2aabd2;
+  color: #fff;
+}
+
+.verify-info{
+  color: #444;
+}
+
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;
     height: 80%;
+  }
+  .paymenMethods > div{
+    margin: 0 1rem;
   }
 }

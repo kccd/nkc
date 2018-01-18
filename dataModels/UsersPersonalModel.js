@@ -67,7 +67,7 @@ const usersPersonalSchema = new Schema({
     default: 0
   },
   privateInfo: {
-    name: {
+    realName: {
       type: String,
       default: null
     },
@@ -89,6 +89,10 @@ const usersPersonalSchema = new Schema({
 	  },
 	  lifePhotos: {
     	type: [Number],
+		  default: null
+	  },
+	  level: {// 认证等级
+    	type: Number,
 		  default: null
 	  }
   }

@@ -108,15 +108,11 @@ const fundApplicationFormSchema = new Schema({
 			type: Boolean,
 		  default: null
 	  },
-	  ensureUsersMessages: { // 申请人员确认
-  		type: Boolean,
-		  default: null
-	  },
 	  inputProjectMessages: { // 输入项目基本信息
 			type: Boolean,
 		  default: null
 	  },
-		inputProjectContent: { // 输入项目具体内容
+		inputOtherMessages: { // 输入项目具体内容
   		type: Boolean,
 			default: null
 		},

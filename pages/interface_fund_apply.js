@@ -275,7 +275,7 @@ function saveProject(id, callback) {
 		t: $('#projectTitle').val(),
 		c: $('#projectContent').text()
 	};
-	nkcAPI('/fund/a/'+id, 'PATCH', {project: project, s: 4})
+	nkcAPI('/fund/a/'+id, 'PATCH', {project: project, s: 3})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -296,7 +296,7 @@ function toEditor(id) {
 
 function submitProject(id) {
 	saveProject(id, function(){
-		window.location.href = '/fund/a/'+id+'/settings?s=5';
+		window.location.href = '/fund/a/'+id+'/settings?s=4';
 	});
 }
 
@@ -433,7 +433,7 @@ function  saveBudgetMoney(id, callback) {
 	var obj = {
 		projectCycle: projectCycle,
 		budgetMoney: budgetMoney,
-		s: 5
+		s: 4
 	};
 	nkcAPI('/fund/a/'+id, 'PATCH', obj)
 		.then(function(data) {
@@ -461,7 +461,7 @@ function initAddPurpose() {
 function savePurpose(id, callback) {
 	readProjectValue();
 	var purpose = $('#purpose').val();
-	nkcAPI('/fund/a/'+ id, 'PATCH', {s: 5, projectCycle: projectCycle, budgetMoney: purpose})
+	nkcAPI('/fund/a/'+ id, 'PATCH', {s: 4, projectCycle: projectCycle, budgetMoney: purpose})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -676,7 +676,7 @@ function saveThreadsList(id, callback) {
 function submitThreadsList(id) {
 	savePurpose(id, function(){
 		saveThreadsList(id, function(){
-			window.location.href='/fund/a/'+id+'/settings?s=6';
+			window.location.href='/fund/a/'+id+'/settings?s=5';
 		})
 	})
 }

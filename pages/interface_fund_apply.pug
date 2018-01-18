@@ -22,7 +22,7 @@ block content
           .panel-body
             .nav-link.center-block
               ul
-                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'inputProjectContent', ch: '第4步、填写项目内容'},{en: 'inputOtherMessages', ch: '第4步、填写项目内容'},{en: 'inputProjectMessages', ch: '第5步、填写项目其他信息'},{en: 'submit', ch: '第6步、提交申请'}];
+                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'inputProjectMessages', ch: '第3步、填写项目内容'},{en: 'inputOtherMessages', ch: '第4步、填写其他信息'},{en: 'submit', ch: '第5步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
                   if i === 0
                     li
@@ -74,75 +74,6 @@ block content
               .back-next
                 .apply-next(onclick=`submitUserMessages(${applicationForm._id})`) 保存并下一步
             else if s === 3 && inputApplicantMessages !== null
-              -const agreeIsFalse = [], agreeIsTrue = [], agreeIsNull = [];
-              -for(let u of members)
-                if u.agree === null
-                  -agreeIsNull.push(u);
-                else if u.agree === true
-                  -agreeIsTrue.push(u);
-                else
-                  -agreeIsFalse.push(u);
-              -let self = false;
-              -const nullLength = agreeIsNull.length, trueLength = agreeIsTrue.length, falseLength = agreeIsFalse.length;
-              if falseLength === 0 && nullLength === 0 && trueLength === 0
-                -self = true;
-              .row
-                .col-xs-12.col-md-4.col-md-offset-4
-                  if self
-                    br
-                    h4 个人申请：
-                    #usersList
-                      span.fund-span=user.username
-                  else
-                    br
-                    h4 未处理的用户：
-                    #usersList
-                      if nullLength === 0
-                        .blank 暂无数据
-                      else
-                        -for(let u of agreeIsNull)
-                          span.fund-span.transparent= u.user.username
-                    br
-                    h4 已同意的用户：
-                    #usersList
-                      if trueLength === 0
-                        .blank 暂无数据
-                      else
-                        -for(let u of agreeIsTrue)
-                          span.fund-span= u.user.username
-                    br
-                    h4 已拒绝的用户：
-                    #usersList
-                      if falseLength === 0
-                        .blank 暂无数据
-                      else
-                        -for(let u of agreeIsFalse)
-                          span.fund-span.disabled= u.user.username
-                    if !self
-                      if nullLength !== 0
-                        span(style='color: red;') 等待用户确认中，若要关闭页面请点击保存按钮
-                      else
-                        if trueLength === 0
-                          span(style='color: red;') 团队申请必须要有组员，请返回第一步添加组员或更改申请方式
-                        else
-                          if falseLength !== 0
-                            span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击第1步
-              hr
-              if self
-                .back-next
-                  .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
-              else
-                if nullLength !== 0
-                  .back-next
-                    .apply-next(onclick=`submitEnsureUsersMessages()`) 保存
-                else
-                  if trueLength === 0
-                    .back-next
-                      .apply-next(onclick=`window.location.href="/fund/a/${applicationForm._id}/settings?s=1"`) 返回第1步
-                  else
-                    .back-next
-                      .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
-            else if s === 4 && ensureUsersMessages !== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
                   br
@@ -159,13 +90,10 @@ block content
                   span &nbsp;&nbsp;
                   span.autoSaveTime#saveTime 0秒
                   span.autoSaveTime 后自动保存
-
-
-
               hr
               .back-next
                 .apply-next(onclick=`submitProject(${applicationForm._id})`) 下一步
-            else if s === 5 && inputProjectContent !== null
+            else if s === 4 && inputProject!== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
                   br
@@ -251,7 +179,75 @@ block content
               hr
               .back-next
                 .apply-next(onclick=`submitThreadsList(${applicationForm._id})`) 下一步
-
+            else if s === 5 && inputApplicantMessages !== null
+              -const agreeIsFalse = [], agreeIsTrue = [], agreeIsNull = [];
+              -for(let u of members)
+                if u.agree === null
+                  -agreeIsNull.push(u);
+                else if u.agree === true
+                  -agreeIsTrue.push(u);
+                else
+                  -agreeIsFalse.push(u);
+              -let self = false;
+              -const nullLength = agreeIsNull.length, trueLength = agreeIsTrue.length, falseLength = agreeIsFalse.length;
+              if falseLength === 0 && nullLength === 0 && trueLength === 0
+                -self = true;
+              .row
+                .col-xs-12.col-md-4.col-md-offset-4
+                  if self
+                    br
+                    h4 个人申请：
+                    #usersList
+                      span.fund-span=user.username
+                  else
+                    br
+                    h4 未处理的用户：
+                    #usersList
+                      if nullLength === 0
+                        .blank 暂无数据
+                      else
+                        -for(let u of agreeIsNull)
+                          span.fund-span.transparent= u.user.username
+                    br
+                    h4 已同意的用户：
+                    #usersList
+                      if trueLength === 0
+                        .blank 暂无数据
+                      else
+                        -for(let u of agreeIsTrue)
+                          span.fund-span= u.user.username
+                    br
+                    h4 已拒绝的用户：
+                    #usersList
+                      if falseLength === 0
+                        .blank 暂无数据
+                      else
+                        -for(let u of agreeIsFalse)
+                          span.fund-span.disabled= u.user.username
+                    if !self
+                      if nullLength !== 0
+                        span(style='color: red;') 等待用户确认中，若要关闭页面请点击保存按钮
+                      else
+                        if trueLength === 0
+                          span(style='color: red;') 团队申请必须要有组员，请返回第一步添加组员或更改申请方式
+                        else
+                          if falseLength !== 0
+                            span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击第1步
+              hr
+              if self
+                .back-next
+                  .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
+              else
+                if nullLength !== 0
+                  .back-next
+                    .apply-next(onclick=`submitEnsureUsersMessages()`) 保存
+                else
+                  if trueLength === 0
+                    .back-next
+                      .apply-next(onclick=`window.location.href="/fund/a/${applicationForm._id}/settings?s=1"`) 返回第1步
+                  else
+                    .back-next
+                      .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
 
 
 

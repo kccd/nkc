@@ -540,7 +540,8 @@ function postUpload(url, data, callback) {
 				setTimeout(function(){
 					$('#uploadInfo').css('display', 'none');
 				}, 5000);
-				jwarning(xhr.status.toString()+' '+xhr.responseText);
+				var data = JSON.parse(xhr.responseText);
+				screenTopWarning(data.error);
 			}
 		}
 	};

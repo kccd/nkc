@@ -33,14 +33,14 @@ function uploadFile(id){
 	var files = $(id).get(0).files;
 	var length = files.length;
 	if(length === 0) {
-		return jalert('未选择任何图片！')
+		return screenTopAlert('未选择任何图片！')
 	}
 	if(length === 1 && (id === '#idCardAPhoto' || id === '#idCardBPhoto') || id === '#handheldIdCardPhoto') {
 		var file = files[0];
 		var formData = new FormData();
 		formData.append('file', file);
 		formData.append('photoType', id);
-		postUpload('/idPhoto', formData, uploadSuccess)
+		postUpload('/photo', formData, uploadSuccess)
 	} else {
 		var n = 1;
 		var funSuccess = function(data) {
@@ -64,7 +64,7 @@ function uploadFile(id){
 			var formData = new FormData();
 			formData.append('file', file);
 			formData.append('photoType', id);
-			postUpload('/idPhoto', formData, function(data){funSuccess(data);fun(files, (index+1))})
+			postUpload('/photo', formData, function(data){funSuccess(data);fun(files, (index+1))})
 		};
 		fun(files, 0);
 	}
@@ -83,13 +83,14 @@ function outSize(num) {
 }
 
 function uploadSuccess(data) {
-	var id = data.photoId;
+	window.location.reload();
+	/*var id = data.photoId;
 	var photoType = data.photoType;
 	$(photoType).val('');
-	$(photoType+'Display').attr('src', '/idPhoto_small/'+id);
+	$(photoType+'Display').attr('src', '/photo_small/'+id);
 	$(photoType+'Remove').attr('onclick', 'removePhoto('+id+')');
 	$(photoType+'Remove').removeClass('disabled');
-	$(photoType+'Messages').html($(photoType+'Messages').html() + '<h5>上传成功！</h5>');
+	$(photoType+'Messages').html($(photoType+'Messages').html() + '<h5>上传成功！</h5>');*/
 }
 
 function initLifePhoto() {
@@ -108,7 +109,7 @@ function displayCertsPhoto(){
 		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
 	} else {
 		for (let id of certsPhotoArr) {
-			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/photo_small/'+id+'" photoId="'+id+'"></div>';
 		}
 	}
 	$('#certsPhotoDisplay').html(text);
@@ -120,7 +121,7 @@ function displayLifePhoto() {
 		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
 	} else {
 		for (let id of lifePhotoArr) {
-			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/idPhoto_small/'+id+'" photoId="'+id+'"></div>';
+			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/photo_small/'+id+'" photoId="'+id+'"></div>';
 		}
 	}
 	$('#lifePhotoDisplay').html(text);
@@ -138,11 +139,11 @@ function initCertsPhoto() {
 
 
 function removePhoto(id) {
-	nkcAPI('/idPhoto/'+id, 'DELETE', {})
+	nkcAPI('/photo/'+id, 'DELETE', {})
 		.then(function(data) {
 			window.location.reload();
 		})
 		.catch(function(data) {
-			jwarning(data.error);
+			screenTopWarning(data.error);
 		});
 }

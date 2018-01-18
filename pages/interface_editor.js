@@ -135,7 +135,7 @@ var nkc_editor = function(){
     } else if(targetArr[0] === 'application' && targetArr[2] === 'p') {
     	method = 'PATCH';
     	url = '/fund/a/'+targetArr[1];
-    	data = {project: post, s: 4}
+    	data = {project: post, s: 3}
     } else {
       jwarning('未知的请求类型： '+target);
     }
