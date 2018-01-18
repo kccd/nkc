@@ -147,3 +147,25 @@ function removePhoto(id) {
 			screenTopWarning(data.error);
 		});
 }
+
+function submitAuth(number) {
+	nkcAPI('/auth', 'POST', {number: number})
+		.then(function(data) {
+			screenTopAlert('提交成功，请耐心等待审核。');
+			setTimeout(function(){window.location.reload()}, 2000)
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+function unSubmitAuth(uid, number) {
+	nkcAPI('/auth/'+uid+'?number='+number, 'DELETE',{})
+		.then(function(data) {
+			screenTopAlert('撤销成功！');
+			setTimeout(function(){window.location.reload()}, 2000)
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

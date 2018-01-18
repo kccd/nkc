@@ -74,6 +74,10 @@
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       -var targetPost = post
+      -var quoteIndex = targetPost.c.indexOf('[quote=');
+      -var text;
+      if quoteIndex !== -1
+        -text = targetPost.c.slice(0, quoteIndex);
       -var end = targetPost.c.lastIndexOf('[/quote]')
       -if(end !== -1)
         -var postContent = targetPost.c.slice(end+8);
@@ -82,7 +86,7 @@
         -arr = arr.replace(']', '');
         -arr = arr.split(',');
         -if (arr.length === 4)
-          -targetPost.c = quoteBegin + '[/quote]' + postContent;
+          -targetPost.c = text + quoteBegin + '[/quote]' + postContent;
         -else targetPost.c = post.c
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(targetPost)
         if post.toc.toLocaleString()!=post.tlm.toLocaleString()

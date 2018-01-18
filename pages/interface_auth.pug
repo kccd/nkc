@@ -1,0 +1,47 @@
+extends bootstrap_base
+block title
+  title= `身份认证申请列表`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        if data.type === 'list'
+          h3.text-center 身份认证申请列表
+          table.table.table-striped
+            thead
+              tr
+                th UID
+                th 用户名
+                th 认证类型
+                th 链接
+            tbody
+              -for(let auth of data.usersAuth)
+                -const {targetUser, authLevel, idCardPhotos} = auth;
+                tr
+                  th= targetUser.uid
+                  th
+                    a(href=`/m/${targetUser.uid}` target='_blank')=targetUser.username
+                  th= `身份认证${authLevel+1}`
+                  th
+                    a(href=`/auth/${targetUser.uid}`) 去处理
+        else
+          -const {authLevel, idCardPhotos, targetUser} = data;
+          -const {idCardA, idCardB, handheldIdCard} = idCardPhotos;
+          h4
+            a(href='/auth') <<返回申请列表
+          h5
+            span= `UID：`
+            strong= targetUser.uid
+            span &nbsp;&nbsp;
+            span= `用户名：`
+            a(href=`/m/${targetUser.uid}`)= targetUser.username
+            span &nbsp;&nbsp;
+            span= `申请类型：`
+            strong= `身份认证${authLevel+1}`
+          if authLevel === 1
+            h4 身份证正面
+            img(style='width: 100%;' src=`/photo/${idCardA}`)
+block scripts
+  script(src='/interface_common.js')

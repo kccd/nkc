@@ -1,4 +1,7 @@
 const settings = require('../settings');
+const fs = require('fs');
+const {promisify} = require('util');
+const unlink = promisify(fs.unlink);
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const photoSchema = new Schema({
@@ -35,7 +38,12 @@ const photoSchema = new Schema({
 	// notPassed: 未通过,
 	// outdated： 失效
 	// disabled: 封禁
+	// deleted: 已被删除的
 	status: {
+  	type: String,
+		default: null
+	},
+	description: {
   	type: String,
 		default: null
 	}
@@ -51,110 +59,72 @@ const ensureStatus = async (photo) => {
 };
 
 photoSchema.pre('find', async function(next) {
-	try{
-		await ensureStatus(this);
-		await next();
-	} catch(err) {
-		return next(err);
-	}
+	await ensureStatus(this);
+	await next();
 });
 
 photoSchema.pre('findOne', async function(next) {
-	try{
-		await ensureStatus(this);
-		await next();
-	} catch(err) {
-		return next(err);
-	}
+	await ensureStatus(this);
+	await next();
 });
 
 photoSchema.pre('save', async function(next) {
-	try{
-		const PhotoModel = mongoose.model('photos');
-		const UsersPersonalModel = require('./UsersPersonalModel');
-		const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-		const {privateInfo} = userPersonal;
-		const {type, _id} = this;
-		const isPassed = async (_id) => {
-			if(_id === null) return false;
-			const photo = await PhotoModel.findOnly({_id});
-			return photo.status === 'passed';
-		};
-		switch (type) {
-			case '#idCardAPhoto':
-				if(await isPassed(privateInfo.idCardPhotos[0])) throw '图片已经审核通过，没有必要再上传图片';
-				this.type = 'idCardA';
-				privateInfo.idCardPhotos[0] = _id;
-				break;
-			case '#idCardBPhoto':
-				if(await isPassed(privateInfo.idCardPhotos[1])) throw '图片已经审核通过，没有必要再上传图片';
-				this.type = 'idCardB';
-				privateInfo.idCardPhotos[1] = _id;
-				break;
-			case '#handheldIdCardPhoto':
-				if(await isPassed(privateInfo.handheldIdCardPhoto)) throw '图片已经审核通过，没有必要再上传图片';
-				this.type = 'handheldIdCard';
-				privateInfo.handheldIdCardPhoto = _id;
-				break;
-			case '#lifePhoto':
-				this.type = 'life';
-				if(!privateInfo.lifePhotos.includes(_id)) {
-					privateInfo.lifePhotos.push(_id);
-				}
-				break;
-			case '#certsPhoto':
-				this.type = 'cert';
-				if(!privateInfo.certsPhotos.includes(_id)) {
-					privateInfo.certsPhotos.push(_id);
-				}
-				break;
-			default:
-				throw '未知的图片类型';
-		}
-		await userPersonal.update({privateInfo});
-		await next();
-	} catch (err) {
-		await next(err);
+	const err = '该证件照已通过审核，请勿更改！';
+	const {type, uid} = this;
+	const UsersPersonalModel = require('./UsersPersonalModel');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	if(type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
+		await this.remove();
+		return next(new Error('正在等待审核，请勿修改图片！'));
 	}
+	const {idCardA, idCardB, handheldIdCard} = await userPersonal.extendIdPhotos();
+	if(type === 'idCardA' && idCardA && idCardA.status === 'passed') {
+		return next(new Error(err));
+	}
+	if(type === 'idCardB' && idCardB && idCardB.status === 'passed') {
+		return next(new Error(err));
+	}
+	if(type === 'handheldIdCard' && handheldIdCard && handheldIdCard.status === 'passed') {
+		return next(new Error(err));
+	}
+	await next();
 });
 
-photoSchema.post('remove', async function(photo) {
-	const removeByValue = (value, arr) => {
-		for (let i in arr) {
-			if(arr[i] === value) {
-				arr.splice(i, 1);
-				break;
-			}
-		}
-		return arr;
-	};
+photoSchema.methods.removeReference = async function() {
+	const err = '删除失败！不能删除已通过审核的证件照！';
 	const UsersPersonalModel = require('./UsersPersonalModel');
-	const userPersonal = await UsersPersonalModel.findOnly({uid: photo.uid});
-	const {idCardPhotos, lifePhotos, certsPhotos} = userPersonal.privateInfo;
-	const query = {};
-	const type = photo.type;
-	switch (type) {
-		case 'idCardA':
-			idCardPhotos[0] = null;
-			query['privateInfo.idCardPhotos'] = idCardPhotos;
-			break;
-		case 'idCardB':
-			idCardPhotos[1] = null;
-			query['privateInfo.idCardPhotos'] = idCardPhotos;
-			break;
-		case 'handheldIdCard':
-			query['privateInfo.handheldIdCardPhoto'] = null;
-			break;
-		case 'life':
-			query['privateInfo.lifePhotos'] = removeByValue(photo._id, lifePhotos);
-			break;
-		case 'cert':
-			query['privateInfo.certsPhotos'] = removeByValue(photo._id, certsPhotos);
-			break;
-		default:
-			throw '未知的照片类型';
+	const {type, uid} = this;
+	const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
+	if(type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
+		await this.remove();
+		return next(new Error('正在等待审核，请勿修改图片！'));
 	}
-	await userPersonal.update(query);
+	const {idCardA, idCardB, handheldIdCard} = userPersonal.extendIdPhotos();
+	if(type === 'idCardA' && idCardA && idCardA.uid === uid && idCardA.status === 'passed') {
+		return next(new Error(err));
+	}
+	if(type === 'idCardB' && idCardB && idCardB.uid === uid && idCardB.status === 'passed') {
+				return next(new Error(err));
+	}
+	if(type === 'handheldIdCard' && handheldIdCard && handheldIdCard.uid === uid && handheldIdCard.status === 'passed') {
+				return next(new Error(err));
+	}
+	// 没有真正的删除照片和数据
+	await this.update({status: 'deleted'});
+	/*
+	// 真正的删除照片和数据
+	if(type !== 'life' || type !== 'cert') {
+		await this.remove();
+	} else {
+		await this.update({status: 'deleted'});
+	}*/
+};
+
+photoSchema.post('remove', async function(photo) {
+	const {photoPath, photoSmallPath} = require('../settings/upload');
+	const {_id} = photo;
+	await unlink(photoPath+'/'+_id+'.jpg');
+	await unlink(photoSmallPath+'/'+_id+'.jpg');
 });
 
 const PhotoModel = mongoose.model('photos', photoSchema);

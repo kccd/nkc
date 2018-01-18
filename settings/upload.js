@@ -72,6 +72,9 @@ module.exports = {
 		  height: 144
 	  }
   },
+	count: {
+  	lifePhoto: 1000 //生活照最多1000张
+	},
   uploadPath,
   pfBannerPath,
   pfAvatarPath,
