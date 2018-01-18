@@ -264,11 +264,8 @@ postSchema.pre('save', async function(next) {
     } else if (initialState.t !== this.t || initialState.c !== this.c) {
       // this is a old post, and we should check if its title or content has changed,
       // update the doc in elasticsearch when the attribute has changed
-      try {
-        await updatePost(this);
-      } catch (err) {
-        return next(err)
-      }
+      await updatePost(this);
+      return next()
     } else
       return next()
   } catch(e) {
