@@ -219,7 +219,7 @@ var submitConfig = function(key) {
   var moderators = gv('moderators').trim();
   moderators = moderators.replace('，', ',');
   var arr = moderators.split(',');
-  for(var i in arr) {
+  for(var i =0; i < arr.length; i++) {
     var v = arr[i].trim();
     if(!v) {
       arr.splice(i, 1)
