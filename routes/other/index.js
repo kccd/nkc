@@ -31,7 +31,7 @@ const fundBGISmallRouter = require('./fundBGI_small');
 const authRouter = require('./auth');
 // -----------------------------------
 otherRouter
-  .get('/', async (ctx, next) => {
+  .get('/latest', async (ctx, next) => {
     const {db, data} = ctx;
     if(data.userLevel < 0) ctx.throw(401, '根据系统记录，你的账号已经被封禁，请重新注册。');
     const {user} = data;
@@ -141,7 +141,7 @@ otherRouter
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
-  .use('latest', latestRouter.routes(), latestRouter.allowedMethods())
+  .use('', latestRouter.routes(), latestRouter.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())

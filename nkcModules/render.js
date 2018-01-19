@@ -129,7 +129,7 @@ function filterQuote(content) {
   return content.replace(/\[quote.*\/quote]/ig, '')
 }
 
-function hideContentByUser(content, user, from) {
+function hideContentByUser(content, user={xsf: 0}, from) {
 	return content.replace(/\[hide=[0-9]+].*\[\/hide]/, function(c){
 		const indexStart = c.indexOf(']');
 		const number = c.slice(6, indexStart);
