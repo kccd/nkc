@@ -20,22 +20,13 @@ var fundObj = {
 		individual: null,
 		group: null
 	},
-	member: {
-		idCard: false,
-		idCardPhotos: false,
-		lifePhotos: false,
-		handheldIdCardPhoto: false
-	},
 	applicant: {
-		idCard: false,
-		idCardPhotos: false,
-		lifePhotos: false,
-		handheldIdCardPhoto: false,
 		userLevel: 0,
 		threadCount: 0,
 		postCount: 0,
 		timeToRegister: 0,
 	},
+	member:{},
 	thread: {},
 	paper: {},
   timeOfPublicity: 0,
@@ -49,7 +40,7 @@ var fundObj = {
 };
 
 $(function(){
-  UserAuthenticationSet();
+  // UserAuthenticationSet();
   fundDisplaySet();
   censorSet();
   passedPaperSet();
@@ -60,7 +51,7 @@ $(function(){
   fundDisplay();
   fundCensor();
   censorCheckBox();
-  UserAuthentication();
+  // UserAuthentication();
   passedPaper();
   color();
 	uploadFundImage();
@@ -68,8 +59,8 @@ $(function(){
 	moneyFixedSet();
 	applicationMethod();
 	applicationMethodSet();
-	memberSet();
-	member();
+	/*memberSet();
+	member();*/
 	conflict();
 	conflictSet();
 });
@@ -168,7 +159,7 @@ function fundCensor(options) {
     }
   }
 }
-
+/*
 function UserAuthentication() {
   $('.authentication').on('click', function() {
     UserAuthenticationSet();
@@ -184,7 +175,7 @@ function UserAuthenticationSet() {
       fundObj.applicant[authenticationArr.eq(i).attr('name')] = false;
     }
   }
-}
+}*/
 
 function passedPaperSet() {
   fundObj.paper.passed = $('#passed').is(':checked');
@@ -268,6 +259,7 @@ function applicationMethod() {
 		applicationMethodSet();
 	})
 }
+/*
 
 function memberSet() {
 	var arr = $('.members');
@@ -287,6 +279,7 @@ function member() {
 		memberSet();
 	})
 }
+*/
 
 function conflict() {
 	$('input[name="conflict"]').on('click', function () {
@@ -326,6 +319,8 @@ function submit(id) {
   if($('#attachmentsPapers').val() > 0) fundObj.paper.count = $('#attachmentsPapers').val();
   if($('#timeOfPublicity').val() > 0) fundObj.timeOfPublicity = $('#timeOfPublicity').val();
   if($('#reviseCount').val() > 0) fundObj.reviseCount = $('#reviseCount').val();
+  if($('#applicantAuthLevel').val() >= 0) fundObj.applicant.authLevel = $('#applicantAuthLevel').val();
+  if($('#memberAuthLevel').val() >= 0) fundObj.member.authLevel = $('#memberAuthLevel').val();
   fundObj.censor.appointed = $('#fundCensorAppointed').val();
   fundObj.description.brief = $('#briefDescription').val();
   fundObj.description.detailed = $('#detailedDescription').val();

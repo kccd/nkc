@@ -47,24 +47,21 @@ const fundApplicationUserSchema = new Schema({
 		default: null,
 		index: 1
 	},
-	idCardPhotos: {
-		type: [Number],
-		default: null,
-		index: 1
-	},
-	handheldIdCardPhoto: {
+	authLevel: {
 		type: Number,
-		default: null,
-		index: 1
+		default: null
 	},
 	lifePhotos: {
 		type: [Number],
-		default: null,
-		index: 1
+		default: []
 	},
 	certsPhotos: {
 		type: [Number],
-		default: null,
+		default: []
+	},
+	removed: {
+		type: Boolean,
+		default: false,
 		index: 1
 	}
 }, {collection: 'fundApplicationUsers'});

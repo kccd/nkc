@@ -97,7 +97,7 @@ function initLifePhoto() {
 	var imgArr = $('#lifePhotoDisplay div img');
 	for(let i = 0; i < imgArr.length; i++) {
 		var id = imgArr.eq(i).attr('photoId');
-		if(!lifePhotoArr.includes(id)) {
+		if(lifePhotoArr.indexOf(id) === -1) {
 			lifePhotoArr.push(id);
 		}
 	}
@@ -131,7 +131,7 @@ function initCertsPhoto() {
 	var imgArr = $('#certsPhotoDisplay div img');
 	for(let i = 0; i < imgArr.length; i++) {
 		var id = imgArr.eq(i).attr('photoId');
-		if(!certsPhotoArr.includes(id)) {
+		if(certsPhotoArr.indexOf(id) === -1) {
 			certsPhotoArr.push(id);
 		}
 	}
@@ -163,7 +163,7 @@ function unSubmitAuth(uid, number) {
 	nkcAPI('/auth/'+uid+'?number='+number, 'DELETE',{})
 		.then(function(data) {
 			screenTopAlert('撤销成功！');
-			setTimeout(function(){window.location.reload()}, 2000)
+			window.location.reload();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

@@ -6,8 +6,8 @@ block title
   link(rel='stylesheet' href='/fund.css')
 block content
   -const mainContainer1400 = true
-  -const {postCount, threadCount, userLevel, timeToRegister, supportCount, idCard, lifePhotos, idCardPhotos, handheldIdCardPhoto} = fund.applicant
-  -const privateInfo = data.privateInfo;
+  -const {authLevel, threadCount, userLevel, timeToRegister, supportCount, postCount} = fund.applicant
+  -const userAuthLevel = data.authLevel;
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
@@ -54,7 +54,7 @@ block content
                     -const toc =   Math.ceil((Date.now() - user.toc)/(1000*60*60*24));
                     if threadCount > user.threadCount || postCount > user.postCount || timeToRegister > toc
                       -allowed = false;
-                    if (idCard && !privateInfo.idCard) || (idCardPhotos && !privateInfo.idCardPhotos) || (handheldIdCardPhoto && !privateInfo.handheldIdCardPhoto) || (lifePhotos && !privateInfo.lifePhotos)
+                    if authLevel > userAuthLevel
                       -allowed = false;
                     tr
                       th 发帖量
@@ -75,21 +75,9 @@ block content
                       th= timeToRegister
                       th= toc
                     tr
-                      th 绑定手机号
-                      th= idCard? '需要': '不需要'
-                      th= privateInfo.idCard? '已绑定': '未绑定'
-                    tr
-                      th 身份证照片
-                      th= idCardPhotos? '需要': '不需要'
-                      th= privateInfo.idCardPhotos? '已上传': '未上传'
-                    tr
-                      th 手持身份证照片
-                      th= handheldIdCardPhoto? '需要': '不需要'
-                      th= privateInfo.handheldIdCardPhoto?'已上传': '未上传'
-                    tr
-                      th 生活照
-                      th= lifePhotos ? '需要' : '不需要'
-                      th= privateInfo.lifePhotos ? '已上传' : '未上传'
+                      th 身份认证等级
+                      th= authLevel
+                      th= userAuthLevel
                 -let btnDisabled = false, link=`/fund/list/${fund._id}/add`;
                 if !allowed
                   p 您的账号未达到最低要求，无法申请该基金。

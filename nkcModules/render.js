@@ -129,6 +129,27 @@ function filterQuote(content) {
   return content.replace(/\[quote.*\/quote]/ig, '')
 }
 
+function hideContentByUser(content, user, from) {
+	return content.replace(/\[hide=[0-9]+].*\[\/hide]/, function(c){
+		const indexStart = c.indexOf(']');
+		const number = c.slice(6, indexStart);
+		if(user.xsf < number) {
+			if(from === 'thread') {
+				return `[hide=${number}]内容已隐藏[/hide]`;
+			} else {
+				return '';
+			}
+		} else {
+			if(from === 'thread') {
+				return c;
+			} else {
+				const indexEnd = c.indexOf('[/hide]');
+				return c.slice(7+(''+number).length, indexEnd);
+			}
+		}
+	})
+}
+
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
@@ -145,7 +166,8 @@ let pugRender = (template, data) => {
     dateString,
     creditString,
     htmlDiff,
-    filterQuote
+    filterQuote,
+	  hideContentByUser
   };
   options.data = data;
   options.filters = filters;

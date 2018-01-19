@@ -787,9 +787,8 @@ const certificates ={
 	    auth: {
 		    [name]: '身份认证',
 		    [GET]: true,
-		    [POST]: true, // 提交认证申请
 		    [parameter]: {
-			    [GET]: true,
+		    	[GET]: true,
 			    [PATCH]: true,
 			    [DELETE]: true
 		    }

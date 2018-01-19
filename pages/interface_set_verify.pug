@@ -30,7 +30,11 @@ block settings_content
           -waitting = true;
           -status = '等待审核';
         else
-          -status = '未提交';
+          if passed
+            -status = '未通过';
+            -color = 'red';
+          else
+            -status = '未提交';
 
       mixin outStatus(photo)
         if photo === null
@@ -74,8 +78,8 @@ block settings_content
                 .settings-btn(onclick=`uploadFile("#${photoName}Photo")`) 上传
                 .uploadFileInfo(id=`${photoName}PhotoMessages`)
               if photoObj && photoObj.status === 'passed'
-                p= photoObj.expiryDate !== null?`有效期至：${photoObj.expiryDate.toLocaleString()}`: '未设置有效期'
-        if photoObj && photoObj.description
+                p!= photoObj.expiryDate !== null?`过期时间：<br>${photoObj.expiryDate.toLocaleDateString()}`: '未设置有效期'
+        if photoObj && photoObj.description && photoObj.status !== 'passed'
           span.redFontColor= `原因：${photoObj.description}`
       #privateInfo
         .col-xs-12.col-md-12

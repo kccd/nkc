@@ -73,7 +73,9 @@
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-      -var targetPost = post
+      -post.c = hideContentByUser(post.c, data.user, 'thread')
+      -var targetPost = post;
+      -var content = post.c;
       -var quoteIndex = targetPost.c.indexOf('[quote=');
       -var text;
       if quoteIndex !== -1
@@ -87,7 +89,7 @@
         -arr = arr.split(',');
         -if (arr.length === 4)
           -targetPost.c = text + quoteBegin + '[/quote]' + postContent;
-        -else targetPost.c = post.c
+        -else targetPost.c = content
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(targetPost)
         if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]

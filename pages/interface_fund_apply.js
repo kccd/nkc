@@ -46,6 +46,19 @@ function init() {
 	$('.alipay').on('click', function() {
 		chooseAlipay();
 	});
+	$('#account').on('click', function(){
+		initFundPay();
+		if(payMethod === '') {
+			$('#account').blur();
+			return alert('请先选择收款！');
+		}
+	}).on('focus', function(){
+		initFundPay();
+		if(payMethod === '') {
+			$('#account').blur();
+			return alert('请先选择收款！');
+		}
+	});
 }
 
 function initTeam() {

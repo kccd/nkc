@@ -6,9 +6,9 @@ block content
   -const mainContainer1400 = true
   .container-fluid(style='max-width: 1400px;')
     .row
-      .col-xs-12.col-md-8.col-md-offset-2
+      .col-xs-12.col-md-8.col-md-offset-0
         if data.type === 'list'
-          h3.text-center 身份认证申请列表
+          h3.text-center 身份认证申请
           table.table.table-striped
             thead
               tr
@@ -29,6 +29,34 @@ block content
         else
           -const {authLevel, idCardPhotos, targetUser} = data;
           -const {idCardA, idCardB, handheldIdCard} = idCardPhotos;
+          mixin choose(type, photoObj)
+            hr
+            div.photoType(name=photoObj.type targetUid= photoObj.uid)
+              h4= type
+              img(style='width: 100%;' src=`/photo/${photoObj._id}`)
+              label.radio-inline
+                input(type='radio' name=photoObj.type checked=photoObj.status === 'passed' ? true : false)
+                h5 通过
+              label.radio-inline
+                input(type='radio' name=photoObj.type checked=photoObj.status === 'notPassed' ? true : false)
+                h5 不通过
+              textarea.fund-textarea(style=`height: 10rem;display: ${photoObj.status==='notPassed'?'block':'none'};` placeholder='原因' id=`${photoObj.type}Reason`)= photoObj.status !== 'passed' ? photoObj.description : ''
+              .inputTime(id=photoObj.type+'Time' style=`display: ${photoObj.status === 'passed'?'block': 'none'}`)
+                h5 身份证过期年月日
+                -let year = '', month = '', day = '';
+                if(photoObj.status === 'passed')
+                  -let time = photoObj.expiryDate;
+                  -year = time.getFullYear();
+                  -month = time.getMonth() + 1;
+                  -day = time.getDate();
+                span 年
+                input(type='number' value= year)
+                span 月
+                input(type='number' value= month)
+                span 日
+                input(type='number' value= day)
+              br
+              button.btn.btn-default(id=`${photoObj.type}Submit`) 提交
           h4
             a(href='/auth') <<返回申请列表
           h5
@@ -38,10 +66,16 @@ block content
             span= `用户名：`
             a(href=`/m/${targetUser.uid}`)= targetUser.username
             span &nbsp;&nbsp;
-            span= `申请类型：`
-            strong= `身份认证${authLevel+1}`
-          if authLevel === 1
-            h4 身份证正面
-            img(style='width: 100%;' src=`/photo/${idCardA}`)
+          br
+          if idCardA
+            +choose('身份证正面', idCardA)
+          br
+          if idCardB
+            +choose('身份证背面', idCardB)
+          br
+          if handheldIdCard
+            +choose('手持身份证', handheldIdCard)
+
 block scripts
   script(src='/interface_common.js')
+  script(src='/interface_auth.js')

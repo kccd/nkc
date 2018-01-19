@@ -73,19 +73,29 @@ photoSchema.pre('save', async function(next) {
 	const {type, uid} = this;
 	const UsersPersonalModel = require('./UsersPersonalModel');
 	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	const authLevel = await userPersonal.getAuthLevel();
 	if(type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
 		await this.remove();
 		return next(new Error('正在等待审核，请勿修改图片！'));
 	}
 	const {idCardA, idCardB, handheldIdCard} = await userPersonal.extendIdPhotos();
-	if(type === 'idCardA' && idCardA && idCardA.status === 'passed') {
-		return next(new Error(err));
+	if(type === 'idCardA') {
+		if(authLevel < 1)
+			return next(new Error(`请先完成身份认证${authLevel+1}`));
+		if(idCardA && idCardA.status === 'passed')
+			return next(new Error(err));
 	}
-	if(type === 'idCardB' && idCardB && idCardB.status === 'passed') {
-		return next(new Error(err));
+	if(type === 'idCardB') {
+		if(authLevel < 1)
+			return next(new Error(`请先完成身份认证${authLevel+1}`));
+		if(idCardB && idCardB.status === 'passed')
+			return next(new Error(err));
 	}
-	if(type === 'handheldIdCard' && handheldIdCard && handheldIdCard.status === 'passed') {
-		return next(new Error(err));
+	if(type === 'handheldIdCard') {
+		if(authLevel < 2)
+			return next(new Error(`请先完成身份认证${authLevel+1}`));
+		if(handheldIdCard && handheldIdCard.status === 'passed')
+			return next(new Error(err));
 	}
 	await next();
 });
