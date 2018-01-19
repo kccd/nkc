@@ -127,8 +127,6 @@ block content
                     else
                       a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) &nbsp;封禁此人&nbsp;
 
-        include interface_easy_post
-        //include interface_new_forumsList
 
         ul.nav.nav-tabs(style='margin-top: 0.4rem;')
           li(class=`${data.tab === "all" ? "active" : ""}`)
@@ -166,6 +164,7 @@ block content
                       button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
 
             .col-xs-12
+              a.btn(href=`/editor?&mid=${data.targetUser.uid}` style='background-color: #337ab7; color: white;') 新帖
               nav
                 include interface_navigation_paging.pug
 

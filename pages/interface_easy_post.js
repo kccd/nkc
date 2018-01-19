@@ -198,6 +198,34 @@ var childrenOnChange = function(that) {
   }
 };
 
+var threadTypesOnChange = function(that) {
+  return function() {
+    var result;
+    var forumsList = that.forumsList;
+    var chosenParent = that.parents.value;
+    var chosenChild = that.children.value;
+    var chosenType = that.threadTypes.value;
+    for(var i in forumsList) {
+      if(forumsList[i].displayName === chosenParent) {
+        var parent = forumsList[i];
+        for(var j in parent.children) {
+          if(parent.children[j].displayName === chosenChild) {
+            var threadTypes = parent.children[j].threadTypes;
+            for(var k in threadTypes) {
+              if(threadTypes[k].name === chosenType)
+                result = threadTypes[k]
+            }
+          }
+        }
+      }
+    }
+    if(!result) {
+      that.key = undefined;
+      screenTopWarning('在当前学院下未找到所选专业,请重新选择.');
+    }
+  }
+};
+
 var parentsOnChange = function(that) {
   return function() {
     var value = that.parents.value;
@@ -362,35 +390,6 @@ var groupingForums = function(forumsList, that) {
       })
     }
   }
-
-  /*var group1;
-  var group2;
-  for(var index in forumsList) {
-    var group = forumsList[index];
-    if(group.parent == null) {
-      group1 = group.group;
-    }
-    if(group.parent === '0') {
-      group2 = group.group;
-    }
-  }
-  that.forumsList = group1.concat(group2);
-  for(var index in forumsList) {
-    for(var i in that.forumsList) {
-      if(forumsList[index].parent === that.forumsList[i].fid) {
-        that.forumsList[i].children = forumsList[index].group;
-      }
-    }
-  }
-  that.forumsList.sort(function(a, b) {
-    return a.order - b.order;
-  });
-  for(var i in that.forumsList) {
-    if(that.forumsList[i].children)
-    that.forumsList[i].children.sort(function(a, b) {
-      return a.order - b.order;
-    })
-  }*/
 };
 
 var createOption = function(text) {

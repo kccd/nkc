@@ -168,6 +168,8 @@ threadRouter
     await user.updateUserMessage();
     if(type === 'html')
       ctx.redirect(`/t/${tid}`, 303);
+    data.post = _post;
+    data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
     await next();
   })
   .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());

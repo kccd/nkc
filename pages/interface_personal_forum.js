@@ -198,7 +198,7 @@ function askForumOfZone(fid){
 function newPostDirector(fid){
   askForumOfZone(fid)
     .then(function(selectedfid){
-      redirect('/editor?target=f/'+selectedfid)
+      redirect('/editor?type=forum&id='+selectedfid)
     })
 }
 

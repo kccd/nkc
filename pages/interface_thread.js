@@ -269,7 +269,7 @@ function at(username) {
 }
 
 function goEditor(){
-  window.location = '/editor?target='+replyTarget.trim()+'&content='+encodeURI(assemblePostObject().c)
+  window.location = '/editor?&type=thread&id='+replyTarget.trim().split('/')[1]+'&content='+encodeURI(assemblePostObject().c)
 }
 
 function addColl(tid){

@@ -58,7 +58,7 @@
                 - var ownership = user.uid===uid
 
                 - if(testModifyTimeLimit(data.certificates,ownership,post.toc))
-                  a(href=`/editor?target=post/${post.pid}`) 编辑
+                  a(href=`/editor?type=post&id=${post.pid}`) 编辑
 
                 - var cc = disablePost;
                 - if(cc)

@@ -171,6 +171,13 @@ fn.getAvailableForums = async ctx => {
       }
     }
   });
+  await Promise.all(result.map(async r => {
+    return Promise.all(r.children.map(async f => {
+      const {fid} = f;
+      const {ThreadTypeModel} = db;
+      f.threadTypes = await ThreadTypeModel.find({fid})
+    }))
+  }));
   return result;
 };
 

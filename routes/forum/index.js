@@ -85,7 +85,7 @@ forumRouter
     if(t === '') ctx.throw(400, '标题不能为空！');
     const {user} = data;
     const {fid} = params;
-    const {cat, mid} = query;
+    const {cat, mid} = post;
     const {
       ForumModel,
       ThreadModel
@@ -106,6 +106,8 @@ forumRouter
     await thread.updateThreadMessage();
     if(type === 'html')
       ctx.redirect(`/t/${_post.tid}`, 303);
+    data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
+    data.post = _post;
     await next();
   })
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());

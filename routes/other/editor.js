@@ -4,36 +4,32 @@ const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 editorRouter
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, query} = ctx;
     const {user} = data;
-    const {target = '', forumID, content, title} = ctx.query;
+    const {type, id, cat, title, content} = query;
     ctx.template = 'interface_editor.pug';
-    data.replytarget = target;
+    data.type = type;
+    data.id = id;
+    data.cat = cat;
+    data.title = title;
+    data.content = content;
     data.navbar = {};
     data.navbar.highlight = 'editor';
-    data.forumID = forumID;
-    if(target.indexOf('post/') === 0) {
-      const pid = target.slice(5);
-      const targetPost = await db.PostModel.findOnly({pid});
+    if(type === 'post') {
+      const targetPost = await db.PostModel.findOnly({pid: id});
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
       if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
-      data.original_post = targetPost;
+      data.content = targetPost.c;
+      data.title = targetPost.t;
       data.targetUser = await targetPost.extendUser();
       return await next();
-    } else if(target.match(/application\/[0-9]+/)) {
-    	const arr = target.split('/');
-    	const applicationId = parseInt(arr[1]);
-    	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationId});
-    	if(arr[2] === 'p') {
+    } else if(type === 'application') {
+    	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: id});
+    	if(cat === 'p') {
 		    data.original_post = await applicationForm.extendProject();
 	    }
 	    return await next();
     }
-    data.original_post = {
-      c: content? decodeURI(content) : '',
-      t: title? decodeURI(title) : ''
-    };
-    const a = target.split('/')[1];
     await next();
   });
 

@@ -34,7 +34,7 @@
     "koa-compress": "^2.0.0",
     "koa-favicon": "^2.0.0",
     "koa-router": "^7.2.1",
-    "koa-static": "^4.0.1",
+    "koa-static": "^4.0.2",
     "mime": "^2.0.3",
     "moment": "^2.19.1",
     "mongoose": "^4.13.9",

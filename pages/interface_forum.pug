@@ -145,7 +145,7 @@ block content
               .row
                 .col-xs-12
                   .form-group(style='margin-top:0px;margin-bottom:6px')
-                    include interface_easy_post.pug
+                    a.btn(href=`/editor?&type=forum&id=${forum.fid}${data.cat? '&cid=' + data.cat: ''}` style='background-color: #337ab7; color: white;') 新帖
                     //if data.replyTarget && !hasChildren
                     //
                     //  a.btn.btn-default(href=`/editor?target=${data.replyTarget}`) 发表新帖
@@ -226,7 +226,7 @@ block content
                     include interface_navigation_paging.pug
 
                   if data.replyTarget && !hasChildren
-                    a.btn.btn-default(style="margin-top:13px" href=`/editor?target=${data.replyTarget}`) 发表新帖
+                    a.btn.btn-default(style="margin-top:13px" href=`/editor?type=forum&id=${forum.fid}`) 发表新帖
               .div#bm
 
 

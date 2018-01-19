@@ -88,6 +88,7 @@ activitiesRouter
         return activity;
       }
     }));
+    data.navbar_highlight = 'activities';
     data.forum = await db.PersonalForumModel.findOnly({uid});
     await next();
   });

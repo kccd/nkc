@@ -21,9 +21,7 @@ block content
             a(style='margin: 2px 5px; color: #909090;' href=`/f/${cForum.fid}`) #{cForum.displayName}
 
         .panel
-          include interface_easy_post
-
-        .panel
+          a.btn(href='/editor' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
           nav
             include interface_navigation_paging.pug
 

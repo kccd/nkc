@@ -18,11 +18,11 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;line-height: 
       -var isActive = function(label){return (navbar_highlight==label)?'background-color: #337ab7;color: #fff;':''}
       ul.pagination.nav.navbar-nav.navbar-left.nav-btn(style='padding:0 0 0 2rem')
         li
-          a(href='/' title='扫一眼' style=`${isActive('home')}`) 首页
+          a(href='/latest' title='扫一眼' style=`${isActive('latest')}`) 最新
         li
-          a(href=`/latest` title='最新内容' style=`${isActive('latest')}`) 新帖
+          a(href=`/f` title='最新内容' style=`${isActive('forums')}`) 分类
         li
-          a(href=`/f` title='板块学院' style=`${isActive('forums')}`) 导航
+          a(href=`/u/${data.user.uid}/activities` title='板块学院' style=`${isActive('activities')}`) 我的
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       form.navbar-form.navbar-left(style='border: none;' action='/search' method='GET')
         .form-group(style='overflow: hidden;width: 100%')

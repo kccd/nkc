@@ -64,7 +64,7 @@ postRouter
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;
     page = `?page=${page}`;
-    data.redirect = `/t/${targetThread.tid + page + postId}`;
+    data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
     data.targetUser = targetUser;
     await targetUser.updateUserMessage();
     await next();
