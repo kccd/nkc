@@ -162,36 +162,46 @@ block content
             h5#supportCountInfo
         .fund-setting-list
           .col-xs-12.col-md-2
-            h5 申请人身份认证
-          .col-xs-10.col-md-10
-            label.checkbox-inline
-              input.authentication(type='checkbox' name='idCard' checked=applicant ? applicant.idCard : false)
-              h5 实名认证
-            label.checkbox-inline
-              input.authentication(type='checkbox' name='idCardPhotos' checked=applicant ? applicant.idCardPhotos : false)
-              h5 身份证照片
-            label.checkbox-inline
-              input.authentication(type='checkbox' name='lifePhotos' checked=applicant ? applicant.lifePhotos : false)
-              h5 生活照
-            label.checkbox-inline
-              input.authentication(type='checkbox' name='handheldIdCardPhoto' checked=applicant ? applicant.handheldIdCardPhoto : false)
-              h5 手持身份证照片
+            h5 申请人身份认证等级
+          .col-xs-12.col-md-2
+            input.form-control#applicantAuthLevel(type='number' placeholder='默认1' value=applicant.authLevel?applicant.authLevel:'')
         .fund-setting-list
           .col-xs-12.col-md-2
-            h5 组员身份认证
-          .col-xs-10.col-md-10
-            label.checkbox-inline
-              input.members(type='checkbox' name='idCard' checked=member ? member.idCard : false)
-              h5 实名认证
-            label.checkbox-inline
-              input.members(type='checkbox' name='idCardPhotos' checked=member ? member.idCardPhotos : false)
-              h5 身份证照片
-            label.checkbox-inline
-              input.members(type='checkbox' name='lifePhotos' checked=member ? member.lifePhotos : false)
-              h5 生活照
-            label.checkbox-inline
-              input.members(type='checkbox' name='handheldIdCardPhoto' checked=member ? member.handheldIdCardPhoto : false)
-              h5 手持身份证照片
+            h5 组员身份认证等级
+          .col-xs-12.col-md-2
+            input.form-control#memberAuthLevel(type='number' placeholder='默认1' value=member.authLevel?member.authLevel:'')
+        //.fund-setting-list
+        //  .col-xs-12.col-md-2
+        //    h5 申请人身份认证
+        //  .col-xs-10.col-md-10
+        //    label.checkbox-inline
+        //      input.authentication(type='checkbox' name='idCard' checked=applicant ? applicant.idCard : false)
+        //      h5 实名认证
+        //    label.checkbox-inline
+        //      input.authentication(type='checkbox' name='idCardPhotos' checked=applicant ? applicant.idCardPhotos : false)
+        //      h5 身份证照片
+        //    label.checkbox-inline
+        //      input.authentication(type='checkbox' name='lifePhotos' checked=applicant ? applicant.lifePhotos : false)
+        //      h5 生活照
+        //    label.checkbox-inline
+        //      input.authentication(type='checkbox' name='handheldIdCardPhoto' checked=applicant ? applicant.handheldIdCardPhoto : false)
+        //      h5 手持身份证照片
+        //.fund-setting-list
+        //  .col-xs-12.col-md-2
+        //    h5 组员身份认证
+        //  .col-xs-10.col-md-10
+        //    label.checkbox-inline
+        //      input.members(type='checkbox' name='idCard' checked=member ? member.idCard : false)
+        //      h5 实名认证
+        //    label.checkbox-inline
+        //      input.members(type='checkbox' name='idCardPhotos' checked=member ? member.idCardPhotos : false)
+        //      h5 身份证照片
+        //    label.checkbox-inline
+        //      input.members(type='checkbox' name='lifePhotos' checked=member ? member.lifePhotos : false)
+        //      h5 生活照
+        //    label.checkbox-inline
+        //      input.members(type='checkbox' name='handheldIdCardPhoto' checked=member ? member.handheldIdCardPhoto : false)
+        //      h5 手持身份证照片
         .fund-setting-list
           .col-xs-12.col-md-2
             h5 附带帖子数目

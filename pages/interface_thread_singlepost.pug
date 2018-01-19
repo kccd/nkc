@@ -73,7 +73,13 @@
               .clearfix
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-      -var targetPost = post
+      -post.c = hideContentByUser(post.c, data.user, 'thread')
+      -var targetPost = post;
+      -var content = post.c;
+      -var quoteIndex = targetPost.c.indexOf('[quote=');
+      -var text;
+      if quoteIndex !== -1
+        -text = targetPost.c.slice(0, quoteIndex);
       -var end = targetPost.c.lastIndexOf('[/quote]')
       -if(end !== -1)
         -var postContent = targetPost.c.slice(end+8);
@@ -82,8 +88,8 @@
         -arr = arr.replace(']', '');
         -arr = arr.split(',');
         -if (arr.length === 4)
-          -targetPost.c = quoteBegin + '[/quote]' + postContent;
-        -else targetPost.c = post.c
+          -targetPost.c = text + quoteBegin + '[/quote]' + postContent;
+        -else targetPost.c = content
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(targetPost)
         if post.toc.toLocaleString()!=post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]

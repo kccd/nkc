@@ -2,17 +2,13 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
-  _id: String,
+  _id: Number,
 	order: {
   	type: Number,
 		default: '',
 		index: 1
 	},
-	year: {
-  	type:String,
-		default: ''
-	},
-	code: {
+	code: {// 申请编号 如：2017A02
 		type: String,
 		default: ''
 	},
@@ -100,22 +96,6 @@ const fundApplicationFormSchema = new Schema({
 	  index: 1
   },
   status: {
-  	chooseType: { // 选择申请方式
-  		type: Boolean,
-		  default: null
-	  },
-	  inputApplicantMessages: { // 输入申请人信息
-			type: Boolean,
-		  default: null
-	  },
-	  inputProjectMessages: { // 输入项目基本信息
-			type: Boolean,
-		  default: null
-	  },
-		inputOtherMessages: { // 输入项目具体内容
-  		type: Boolean,
-			default: null
-		},
 	  submit: { // 已提交申请
 			type: Boolean,
 		  default: null
@@ -159,23 +139,13 @@ const fundApplicationFormSchema = new Schema({
       type: Boolean,
       default: null,
       index: 1
-    },
-	  disabled: { // 被禁
-		  type: Boolean,
-		  default: false,
-		  index: 1
-	  },
-	  revoked: { // 撤销
-  		type: Boolean,
-			default: false,
-		  index: 1
-	  },
-	  exceededModifyCount: {
-  		type: Boolean,
-		  default: false,
-		  index: 1
-	  }
+    }
   },
+	useless: { //disabled: 被封禁，revoked: 被撤销，exceededModifyCount: 超过修改次数， null: 数据有效
+  	type: String,
+		default: null,
+		index: 1
+	},
   lock: {
     status: {
       type: Number,
@@ -196,16 +166,16 @@ const fundApplicationFormSchema = new Schema({
       default: Date.now
     }
   },
-	modifyCount: {
+	modifyCount: {// 已经修改的次数
   	type: Number,
 		default: 0
 	},
-  supporter: {
+  supporter: {// 支持的人
     type: [String],
     default: [],
     index: 1
   },
-  objector: {
+  objector: { // 反对的人
     type: [String],
     default: [],
     index: 1

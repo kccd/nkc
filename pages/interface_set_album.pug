@@ -1,2 +1,33 @@
 extends interface_settings
 block settings_content
+  .settings-content
+    .row
+      -const lifePhotos = data.lifePhotos;
+      -const g = data.g;
+      #privateInfo
+        .col-xs-12.col-md-12
+          h3.settings-title.text-center 我的相册
+          br
+        .col-xs-12.col-md-12.verify-info
+          span 认证说明：
+          span Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam, architecto beatae consequuntur cupiditate ea eligendi enim, excepturi facere harum, illum ipsum iusto minus nihil obcaecati odit pariatur recusandae reprehenderit suscipit?
+        .col-xs-12.col-md-12
+          h4.text-center 我的相册
+          .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+            span.settings-link#watchLifePhoto 查看实例
+          .settings-panel
+            .row
+              .col-xs-12.col-md-10
+                .settings-img#lifePhotoDisplay
+                  if lifePhotos.length === 0
+                    .blank(style='height: 20rem;line-height: 20rem') 暂无数据
+                  else
+                    -for(let photo of lifePhotos)
+                      .col-xs-12.col-md-4(style='position: relative;')
+                        .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${photo._id})`)
+                        img(photoId=photo._id src=`/photo_small/${photo._id}`)
+              .col-xs-12.col-md-2
+                input#lifePhoto(type='file' style='display: none;' multiple=true)
+                .settings-btn(onclick='$("#lifePhoto").click()') 选择图片
+                .settings-btn(onclick='uploadFile("#lifePhoto")') 上传
+                #lifePhotoMessages.uploadFileInfo

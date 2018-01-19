@@ -57,48 +57,46 @@ applicationRouter
 		const {data, db, body, params} = ctx;
 		const {newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId} = body;
 		data.s = s;
-		const {user, applicationForm} = data;
+		const {applicationForm} = data;
 		const {_id} = params;
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
-		let updateObj;
+		if(data.user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		const user = await db.UserModel.findOnly({uid: applicationForm.uid});
+		const fund = applicationForm.fund;
+		try {
+			await fund.ensurePermission(user);
+		} catch(e) {
+			ctx.throw(401, e);
+		}
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const {applicant, members} = applicationForm;
+		let updateObj;
 		if(s === 1) {
 			// 判断申请人的信息是否存在，不存在则写入
 			if(!applicant) {
 				newMembers.push({
 					uid: user.uid,
-					username: user.username
+					mobile: userPersonal.mobile || null
 				});
 			}
 			const membersUid = members.map(m => m.uid);
 			const selectedUserUid = newMembers.map(s => s.uid);
-			// 从数据库中删除未被选择的用户
+			// 从数据库中标记未被选择的用户
 			for(let u of members) {
-				if(!selectedUserUid.includes(u.uid)) await u.remove();
+				if(!selectedUserUid.includes(u.uid)) await u.update({removed: true});
 			}
 			// 写入新提交的数据库中不存在的用户信息
 			for(let u of newMembers) {
 				if(!membersUid.includes(u.uid)) {
-					const targetUser = await db.UserModel.findOnly({username: u.username, uid: u.uid});
+					const targetUser = await db.UserModel.findOnly({uid: u.uid});
 					const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
-					const {mobile, privateInfo} = targetUserPersonal;
-					const {name, idCardNumber, idCardPhotos, handheldIdCardPhoto, certsPhotos, lifePhotos} = privateInfo;
+					const {mobile} = targetUserPersonal;
 					const newApplicationUser = db.FundApplicationUserModel({
 						uid: targetUser.uid,
 						applicationFormId: _id,
-						name,
-						idCardNumber,
-						idCardPhotos,
-						handheldIdCardPhoto,
-						certsPhotos,
-						lifePhotos,
 						mobile
 					});
 					await newApplicationUser.save();
 				}
-			}
-			updateObj = {
-				'status.chooseType': true
 			}
 		}
 		if(s === 2) {
@@ -107,6 +105,7 @@ applicationRouter
 				account,
 				'status.inputApplicantMessages': true
 			};
+			await applicationForm.update(updateObj);
 		}
 		if(s === 3) {
 			if(applicationForm.project === null){
@@ -128,7 +127,6 @@ applicationRouter
 			if(budgetMoney) updateObj.budgetMoney = budgetMoney;
 			if(threadsId) updateObj['threadsId.applying'] = threadsId;
 		}
-		await applicationForm.update(updateObj);
 		await next();
 	})
 	.del('/:_id', async (ctx, next) => {

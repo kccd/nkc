@@ -369,7 +369,6 @@ const certificates ={
         [GET]: true,
         settings: {
           [name]: '个人信息',
-	        // [GET]: true,
           [PATCH]: true
         },
         password: {
@@ -518,6 +517,13 @@ const certificates ={
 			    [GET]: true,
 			    [POST]: true,
 			    [PATCH]: true
+		    }
+	    },
+	    auth: {
+		    [name]: '身份认证',
+		    [POST]: true, // 提交认证申请
+		    [parameter]: {
+			    [DELETE]: true
 		    }
 	    }*/
     },
@@ -777,7 +783,16 @@ const certificates ={
 		      }
 	      }
 
-      }*/
+      },
+	    auth: {
+		    [name]: '身份认证',
+		    [GET]: true,
+		    [parameter]: {
+		    	[GET]: true,
+			    [PATCH]: true,
+			    [DELETE]: true
+		    }
+	    }*/
     }
   }
 };

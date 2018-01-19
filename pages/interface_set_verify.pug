@@ -3,6 +3,39 @@ block settings_content
   .settings-content
     .row
       -const g = data.g;
+      -let passed = false;
+      -let number;
+      -const idCardA = data.idCardA;
+      -const idCardB = data.idCardB;
+      if g === 2 && idCardA && idCardA.status === 'passed' && idCardB && idCardB.status === 'passed'
+        -passed = true;
+      -const handheldIdCard = data.handheldIdCard;
+      if g === 3 && handheldIdCard && handheldIdCard.status === 'passed'
+        -passed = true;
+      if g === 1 && data.mobile
+        -passed = true;
+      //状态判断
+      -let status = '';
+      -let waiting = false;
+      -let color = '#555';
+      -const submittedAuth = data.submittedAuth;
+      -const authLevel = data.authLevel;
+      if g <= authLevel
+        -status = '已通过';
+        -color = 'green';
+      if(g > authLevel + 1)
+        -status = '未提交';
+      if(g === (authLevel + 1))
+        if submittedAuth
+          -waitting = true;
+          -status = '等待审核';
+        else
+          if passed
+            -status = '未通过';
+            -color = 'red';
+          else
+            -status = '未提交';
+
       mixin outStatus(photo)
         if photo === null
           .h5.text-center 未上传
@@ -25,7 +58,7 @@ block settings_content
           if !photoObj
             img(src=defaultImg id=`${photoName}PhotoDisplay`)
           else
-            if photoObj.status !== 'passed'
+            if photoObj.status !== 'passed' && submittedAuth !== true
               .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${photoObj._id})`)
             if photoObj.status === 'disabled'
               img(id=`${photoName}PhotoDisplay` src=disabledImg)
@@ -39,13 +72,15 @@ block settings_content
             .col-xs-12.col-md-9
               +settingsImg(photoName, photoObj)
             .col-xs-12.col-md-3
-              if !photoObj || photoObj.status !== 'passed'
+              if submittedAuth !== true && (!photoObj || photoObj.status !== 'passed')
                 input(id=`${photoName}Photo` type='file' style='display: none;')
                 .settings-btn.disabled(onclick=`$("#${photoName}Photo").click()`) 选择图片
                 .settings-btn(onclick=`uploadFile("#${photoName}Photo")`) 上传
                 .uploadFileInfo(id=`${photoName}PhotoMessages`)
               if photoObj && photoObj.status === 'passed'
-                p= photoObj.expiryDate !== null?`有效期至：${photoObj.expiryDate.toLocaleString()}`: '未设置有效期'
+                p!= photoObj.expiryDate !== null?`过期时间：<br>${photoObj.expiryDate.toLocaleDateString()}`: '未设置有效期'
+        if photoObj && photoObj.description && photoObj.status !== 'passed'
+          span.redFontColor= `原因：${photoObj.description}`
       #privateInfo
         .col-xs-12.col-md-12
           h3.settings-title.text-center 身份认证
@@ -64,10 +99,13 @@ block settings_content
           if g === 3
             span 身份认证3需上传手持身份证照片
         .col-xs-12.col-md-12
+          span 状态：
+          span(style=`color: ${color};font-size: 2rem;font-weight: 600;`)= status
+        .col-xs-12.col-md-12
           br
           br
         if g === 2
-          -const [idCardA, idCardB] = data.idCardPhotos;
+          -number = 2;
           .col-xs-12.col-md-6
             h4.text-center 身份证正面
             .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
@@ -81,7 +119,7 @@ block settings_content
               span.settings-link#watchIdCardBPhoto 查看实例
             +settingsPanel('idCardB', idCardB)
         if g === 3
-          -const handheldIdCard = data.handheldIdCardPhoto;
+          -number = 3;
           .col-xs-12.col-md-6
             h4.text-center 手持身份证照片
             .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
@@ -89,4 +127,11 @@ block settings_content
             +settingsPanel('handheldIdCard', handheldIdCard)
         .col-xs-12.col-md-12
           br
+          br
+          if !passed
+            .back-next
+              if !waitting
+                .apply-next(onclick=`submitAuth(${number})`) 提交审核
+              else
+                .apply-next(onclick=`unSubmitAuth(${user.uid},${number})`) 撤销提交
           br

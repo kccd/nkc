@@ -24,15 +24,8 @@ block content
               ul
                 -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'inputProjectMessages', ch: '第3步、填写项目内容'},{en: 'inputOtherMessages', ch: '第4步、填写其他信息'},{en: 'submit', ch: '第5步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
-                  if i === 0
-                    li
-                      a(href=`/fund/a/${applicationForm._id}/settings?s=${i+1}` class='active')= arr[i].ch
-                  else if status[arr[i-1].en]
-                    li
-                      a(href=`/fund/a/${applicationForm._id}/settings?s=${i+1}` class='active')= arr[i].ch
-                  else
-                    li
-                      a.disabled= arr[i].ch
+                  li
+                    a(href=`/fund/a/${applicationForm._id}/settings?s=${i + 1}` class='active')= arr[i].ch
             hr
             .fund-apply-head= arr[s-1].ch
             if s === 1

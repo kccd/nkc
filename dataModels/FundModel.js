@@ -102,39 +102,15 @@ const fundSchema = new Schema({
       type: Number,
       default: 0
     },
-	  idCard: {
-		  type: Boolean,
-		  default: false
-	  },
-	  lifePhotos: {
-		  type: Boolean,
-		  default: false
-	  },
-	  idCardPhotos: {
-		  type: Boolean,
-		  default: false
-	  },
-	  handheldIdCardPhoto: {
-		  type: Boolean,
-		  default: false
+	  authLevel: {
+    	type: Number,
+		  default: 1
 	  }
   },
 	member: {
-		idCard: {
-			type: Boolean,
-			default: false
-		},
-		lifePhotos: {
-			type: Boolean,
-			default: false
-		},
-		idCardPhotos: {
-			type: Boolean,
-			default: false
-		},
-		handheldIdCardPhoto: {
-			type: Boolean,
-			default: false
+		authLevel: {
+			type: Number,
+			default: 1
 		}
 	},
 	applicationMethod: {
@@ -190,12 +166,16 @@ fundSchema.pre('save', function(next){
   next();
 });
 
-fundSchema.methods.ensurePermission = function(user) {
-	const {userLevel, postCount, threadCount, timeToRegister} = this.applicant;
+fundSchema.methods.ensurePermission = async function(user) {
+	const UsersPersonalModel = require('./UsersPersonalModel');
+	const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
+	const userAuthLevel = await userPersonal.getAuthLevel();
+	const {authLevel, userLevel, postCount, threadCount, timeToRegister} = this.applicant;
 	// if(user.userLevel < userLevel) throw '账号等级未满足条件';
 	if(user.postCount < postCount) throw '回帖量未满足条件';
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
+	if(authLevel > userAuthLevel) throw '身份认证等级未满足最低要求';
 };
 
 const FundModel = mongoose.model('funds', fundSchema);

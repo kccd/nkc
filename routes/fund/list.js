@@ -34,6 +34,7 @@ listRouter
 		const {fundId} = ctx.params;
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
+		console.log(fund);
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
@@ -81,14 +82,7 @@ listRouter
 		data.applications = await FundApplicationFormModel.find(query).skip(paging.start).limit(paging.perpage);
 		data.message = await user.getUnCompletedFundApplication();
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		const {privateInfo, mobile} = userPersonal;
-		data.privateInfo = {
-			idCard: !!mobile,
-			idCardPhotos: (privateInfo.idCardPhotos[0] !== null && privateInfo.idCardPhotos[1] !== null),
-			handheldIdCardPhoto: !!privateInfo.handheldIdCardPhoto,
-			lifePhotos: privateInfo.lifePhotos.length !== 0,
-			certsPhotos: privateInfo.certsPhotos.length !== 0
-		};
+		data.authLevel = await userPersonal.getAuthLevel();
 		ctx.template = 'interface_fund_messages.pug';
 		await next();
 	})
@@ -127,7 +121,7 @@ listRouter
 			return await next();
 		}
 		try {
-			fund.ensurePermission(user);
+			await fund.ensurePermission(user);
 		} catch(e) {
 			ctx.throw(401, e);
 		}
