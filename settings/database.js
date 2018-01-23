@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const async_hooks = require('async_hooks');
 
 const mongoDB = require('./mongoDB');
 const options = {
@@ -20,11 +21,12 @@ mongoose.plugin(function(schema) {
   schema.statics.findOnly = async function(query) {
     // this method should be used when you need the query throws an error
     // instead of returning a [] or null when no document matching
+    const err = new Error(`${JSON.stringify(query)} document not found`);
     if(JSON.stringify(query) === '{}')
       throw new Error('param not specify');
     const doc = await this.findOne(query);
     if(!doc)
-      throw new Error(`${JSON.stringify(query)} document not found`);
+      throw err;
     return doc
   };
   schema.post('init', function(doc, next) {
