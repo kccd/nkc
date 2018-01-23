@@ -22,7 +22,7 @@ registerRouter
     let db = ctx.db;
     let params = ctx.body;
     let userObj = {
-      username:params.username,
+      username:params.username.trim(),
       password:params.password,
       regCode: params.regCode,
       mobile:(params.areaCode + params.mobile).replace('+', '00'),

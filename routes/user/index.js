@@ -19,7 +19,6 @@ userRouter
     	if(user) targetUsers.push(user);
     }
     data.targetUsers = targetUsers;
-    console.log(data);
     await next();
   })
   .get('/:uid', async (ctx, next) => {

@@ -21,10 +21,12 @@ const activeUserSchema = new Schema({
     required: true
   }
 },
-{toObject: {
-  getters: true,
-  virtuals: true
-}});
+{
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
+});
 
 activeUserSchema.virtual('user')
   .get(function() {
