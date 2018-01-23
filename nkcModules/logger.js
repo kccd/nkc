@@ -27,6 +27,5 @@ module.exports = async (ctx) => {
       );
     }
   }
-  log.port = undefined;
   await new LogModel(log).save()
 };
