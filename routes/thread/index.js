@@ -22,7 +22,7 @@ threadRouter
 				}
 			};
 			const perpage = (page, length) => {
-				const perpage = 8;
+				const perpage = 20;
 				const start = perpage*page;
 				return {
 					page,
@@ -82,7 +82,7 @@ threadRouter
       PostModel
     } = db;
     const thread = await ThreadModel.findOnly({tid});
-    if(!await thread.ensurePermission(ctx)) ctx.throw('401', '权限不足');
+    if(!await thread.ensurePermission(ctx)) ctx.throw(401, '权限不足');
     let q = {
       tid: tid
     };

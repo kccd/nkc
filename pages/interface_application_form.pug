@@ -1,0 +1,36 @@
+.row
+  .aForm
+    h3.text-center 科创基金申请表
+    br
+    .col-xs-12.col-md-12.aForm-body
+      .col-xs-3.col-md-3
+        .title= `项目名称：`
+      .col-xs-9.col-md-9(style='border-bottom: 1px solid #000;text-align: center')
+        .title=`${applicationForm.project.t}`
+    .col-xs-12.col-md-12.aForm-body
+      .col-xs-3.col-md-3
+        .title= `申请人：`
+      .col-xs-9.col-md-9(style='border-bottom: 1px solid #000;text-align: center')
+        .title=`${applicant.name}`
+    if applicationForm.from === 'team'
+      .col-xs-12.col-md-12.aForm-body
+        .col-xs-3.col-md-3
+          .title= `组员：`
+        .col-xs-9.col-md-9(style='border-bottom: 1px solid #000;text-align: center')
+          .title
+            -let names = '暂未有组员同意邀请';
+            -for (let i = 0; i < members.length; i++)
+              -const aUser = members[i];
+              if aUser.agree === 'true'
+                -const username = aUser.user.username;
+                if i === 0
+                  -names += username;
+                else
+                  -names += `, ${username}`;
+            .title=`${names}`
+    .col-xs-12.col-md-12.aForm-body
+      .col-xs-3.col-md-3
+        .title= `申请时间：`
+      .col-xs-9.col-md-9(style='border-bottom: 1px solid #000;text-align: center')
+        .title=`${applicationForm.toc.toLocaleDateString()}`
+    h4 申请人信息

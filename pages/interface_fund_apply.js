@@ -24,14 +24,16 @@ $(function() {
 	onContentChange();
 	initAddPurpose();
 	initThreadsList();
+	initLifePhoto();
 });
-
 //已选帖子
 var selectedThreads = [];
 // 临时存放加载的帖子
 var tempThreads = [];
 //禁止滚动
 var fixedFn;
+//生活照
+var lifePhotos = [];
 function init() {
 	$('#team').on('click', function() {
 		teamDisplay();
@@ -197,6 +199,7 @@ function getUser() {
 function submit(id){
 	var obj = {
 		newMembers: [],
+		from: 'personal',
 		s: 1
 	};
 	if ($('#team').hasClass('active')) {
@@ -204,6 +207,7 @@ function submit(id){
 			return screenTopWarning('团队申请必须要有组员，若没有组员请选择个人申请。');
 		}
 		obj.newMembers = selectedUsers;
+		obj.from = 'team';
 	}
 	nkcAPI('/fund/a/'+id, 'PATCH', obj)
 		.then(function(data){
@@ -216,6 +220,67 @@ function submit(id){
 
 }
 
+function selectLifePhoto(id){
+	var img = $('img[photoId="'+id+'"]');
+	if(img.hasClass('active')) {
+		var index = lifePhotos.indexOf(id);
+		if(index !== -1) {
+			lifePhotos.splice(index, 1);
+		}
+		screenTopAlert('已移除' + id);
+	} else {
+		var flag = false;
+		for(var i = 0; i < lifePhotos.length; i++) {
+			if(lifePhotos[i] === id) {
+				flag = true;
+			}
+		}
+		if(!flag) lifePhotos.push(id);
+		screenTopAlert('已选择' + id);
+	}
+	displayLifePhotos();
+	console.log(lifePhotos);
+}
+
+function initLifePhoto() {
+	var arr = $('.photo-selected img');
+	for (var i = 0; i < arr.length; i++) {
+		lifePhotos.push(parseInt(arr.eq(i).attr('photoId')));
+	}
+	displayLifePhotos();
+}
+
+function displayLifePhotos() {
+	var arr = $('.fund-photo-list img');
+	for (var i = 0; i < arr.length; i++) {
+		var flag = false;
+		for (var j = 0; j < lifePhotos.length; j++) {
+			if(parseInt(arr.eq(i).attr('photoId')) === lifePhotos[j]) {
+				flag = true;
+			}
+		}
+		if(flag) {
+			arr.eq(i).addClass('active');
+		} else {
+			arr.eq(i).removeClass('active');
+		}
+	}
+	var html = '';
+	for (var i = 0; i < lifePhotos.length; i++) {
+		html += '<div class="col-xs-12 col-md-4 photo-content"><div class=" glyphicon glyphicon-remove delete-photo" onclick="removePhoto('+lifePhotos[i]+')"></div><img src="/photo_small/'+lifePhotos[i]+'" photoId='+lifePhotos[i]+'/></div>';
+	}
+	$('.photo-selected .row').html(html);
+}
+
+function removePhoto(id) {
+	id = parseInt(id);
+	var index = lifePhotos.indexOf(id);
+	if(index !== -1) {
+		lifePhotos.splice(index, 1);
+		displayLifePhotos();
+	}
+}
+
 function initFundPay() {
 	if($('.wechat').hasClass('active')) {
 		payMethod = 'wechat';
@@ -225,6 +290,7 @@ function initFundPay() {
 		payMethod = '';
 	}
 }
+
 
 function chooseWechat() {
 	$('.wechat').addClass('active');
@@ -237,7 +303,15 @@ function chooseAlipay() {
 	initFundPay();
 }
 
-function submitUserMessages(id) {
+function submitApplicantMessages() {
+	saveApplicantMessages(function(data){
+		var s = data.s;
+		window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+	});
+}
+
+function saveApplicantMessages(callback){
+	// applicationFormId
 	try {
 		var obj = userMessagesForm();
 		var data = {
@@ -249,14 +323,17 @@ function submitUserMessages(id) {
 				name: obj.name,
 				idCardNumber: obj.idCardNumber,
 				mobile: obj.mobile,
-				description: obj.description
+				description: obj.description,
+				lifePhotos: lifePhotos
 			},
 			s: 2
 		};
-		nkcAPI('/fund/a/'+id, 'PATCH', data)
+		nkcAPI('/fund/a/'+applicationFormId, 'PATCH', data)
 			.then(function(data) {
-				var s = data.s;
-				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
+				if(callback !== undefined) {
+					return callback(data);
+				}
+				screenTopAlert('保存成功！');
 			})
 			.catch(function(data) {
 				screenTopWarning(data.error);
@@ -265,6 +342,7 @@ function submitUserMessages(id) {
 		screenTopWarning(err);
 	}
 }
+
 
 function submitEnsureUsersMessages(id) {
 	if(id === undefined) {
@@ -496,6 +574,7 @@ function displayPopupPanel() {
 	$('.popupPanel').removeClass('disabled');
 	var scrollTop = $(window).scrollTop();
 	fixedFn = disabledRolling;
+	$('html, body').css('overflow', 'hidden');
 	$(window).scroll(function() {
 		fixedFn(scrollTop);
 	})
@@ -504,6 +583,7 @@ function displayPopupPanel() {
 //隐藏添加帖子的面板
 function disappearPopupPanel() {
 	$('.popupPanel').addClass('disabled');
+	$('html, body').css('overflow', 'auto');
 	fixedFn = function(){};
 }
 
@@ -606,9 +686,39 @@ function addThread(index) {
 function createPageList(paging, self) {
 	var page = paging.page || 0;
 	var pageCount = paging.pageCount || 1;
+	if(pageCount <= 1) return '';
 	var html = '';
+	var arr = [];
+	var n = 7;
+	var reduce1 = page-3;
+	var reduce2 =  page+3;
+	var min, max;
+	if(reduce1 > 0) {
+		if(reduce2 > pageCount) {
+			max = pageCount;
+			if(reduce1-(reduce2 - pageCount) < 0) {
+				min = 0;
+			} else {
+				min = reduce1-(reduce2 - pageCount);
+			}
+		} else {
+			max = reduce2;
+			min = reduce1;
+		}
+	} else {
+		min = 0;
+		if(reduce2 < pageCount) {
+			if(pageCount < reduce2 - reduce1) {
+				max = pageCount;
+			} else {
+				max = reduce2-reduce1;
+			}
+		}
+	}
+	console.log(min, page, max);
 	if(self === undefined) self = '';
 	for(var i = 0; i < pageCount; i++){
+		if(i < min || i > max) continue;
 		var active = '';
 		if(page === i) {
 			active = 'active';
@@ -621,7 +731,7 @@ function createPageList(paging, self) {
 //渲染分页按钮
 function displayPageList(paging, self) {
 	var html = createPageList(paging, self);
-	$('#pageList').html(html);
+	$('.pageList').html(html);
 }
 
 //加载帖子
@@ -667,7 +777,7 @@ function saveThreadsList(id, callback) {
 	}
 	var obj = {
 		threadsId: threadsId,
-		s: 5
+		s: 4
 	};
 	nkcAPI('/fund/a/'+id, 'PATCH', obj)
 		.then(function(data) {
@@ -678,9 +788,6 @@ function saveThreadsList(id, callback) {
 			}
 		})
 		.catch(function(data) {
-			console.log('=============');
-			console.log(data);
-			console.log('=============');
 			screenTopWarning(data.error);
 		})
 }

@@ -38,8 +38,7 @@ const documentSchema = new Schema({
 	},
 	l: {//pwbb
 		type: String,
-		required: true,
-		index: 1
+		required: true
 	},
 	t: {
 		type: String,

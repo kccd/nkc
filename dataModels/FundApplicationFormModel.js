@@ -26,6 +26,10 @@ const fundApplicationFormSchema = new Schema({
     type: Date,
     index: 1
   },
+	from: {
+  	type: String,
+		default: 'personal',
+	},
   publicity: { // 示众
     timeOfBegin: {
       type: Date,
@@ -96,7 +100,7 @@ const fundApplicationFormSchema = new Schema({
 	  index: 1
   },
   status: {
-	  submit: { // 已提交申请
+	  submitted: { // 已提交申请
 			type: Boolean,
 		  default: null
 	  },
@@ -141,7 +145,7 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-	useless: { //disabled: 被封禁，revoked: 被撤销，exceededModifyCount: 超过修改次数， null: 数据有效
+	useless: { //disabled: 被封禁，revoked: 被永久撤销，exceededModifyCount: 超过修改次数， null: 数据有效
   	type: String,
 		default: null,
 		index: 1
@@ -259,7 +263,7 @@ fundApplicationFormSchema.methods.extendApplicant = async function() {
 
 fundApplicationFormSchema.methods.extendMembers = async function() {
 	const FundApplicationUserModel = require('./FundApplicationUserModel');
-	const applicationUsers = await FundApplicationUserModel.find({applicationFormId: this._id, uid: {$ne: this.uid}}).sort({toc: 1});
+	const applicationUsers = await FundApplicationUserModel.find({applicationFormId: this._id, uid: {$ne: this.uid}, removed: false}).sort({toc: 1});
 
 	return this.members = await Promise.all(applicationUsers.map(async aUser => {
 		await aUser.extendUser();
