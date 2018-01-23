@@ -141,7 +141,7 @@ threadRouter
   })
   .post('/:tid', async (ctx, next) => {
     const {
-      data, params, db, body, ip,
+      data, params, db, body, address: ip,
       generateUsersBehavior
     } = ctx;
     const {user} = data;

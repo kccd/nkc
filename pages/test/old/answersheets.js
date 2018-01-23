@@ -74,7 +74,7 @@ return a
     let answersheet = new AnswerSheet({
       key: data._key,
       category: data.category,
-      ip: data.ip,
+      ip: data.address,
       isA: data.isA,
       records: data.records,
       score: data.score,
