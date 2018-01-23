@@ -66,30 +66,6 @@ const fundApplicationUserSchema = new Schema({
 	}
 }, {collection: 'fundApplicationUsers'});
 
-
-const savePrivateInfo  = async (aUser) => {
-	const UserPersonalModel = require('./UsersPersonalModel');
-	const {uid} = aUser;
-	const userPersonal = await UserPersonalModel.findOnly({uid});
-	const {privateInfo} = userPersonal.toObject();
-	aUser.idCardPhotos = privateInfo.idCardPhotos;
-	aUser.handheldIdCardPhoto = privateInfo.handheldIdCardPhoto;
-	aUser.lifePhotos = privateInfo.lifePhotos;
-	aUser.certsPhotos = privateInfo.certsPhotos;
-	await aUser.save();
-};
-
-fundApplicationUserSchema.post('find', async function(applicationUsers) {
-	await Promise.all(applicationUsers.map(async aUser => {
-		await savePrivateInfo(aUser);
-	}));
-});
-
-fundApplicationUserSchema.post('findOne', async function(aUser) {
-	await savePrivateInfo(aUser);
-});
-
-
 fundApplicationUserSchema.virtual('user')
 	.get(function() {
 		return this._user;

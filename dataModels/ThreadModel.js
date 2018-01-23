@@ -172,8 +172,9 @@ threadSchema.methods.extendUser = async function() {
 // 2、判断所在帖子是否被禁
 // 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限
 threadSchema.methods.ensurePermission = async function (ctx) {
-  const visibleFid = await ctx.getVisibleFid();
-  if(!visibleFid.includes(this.fid)) return false;
+	const {contentClasses} = ctx.data.certificates;
+	const forum = await this.extendForum();
+	if(!contentClasses.includes(forum.class)) return false;
   if(this.disabled) {
     return await this.ensurePermissionOfModerators(ctx);
   } else {

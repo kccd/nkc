@@ -25,6 +25,8 @@ applicationRouter
 	  }
 	  data.s = s;
 	  if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+	  const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
+	  data.lifePhotos = await userPersonal.extendLifePhotos();
 		ctx.template = 'interface_fund_apply.pug';
   	await next();
   })
@@ -69,63 +71,73 @@ applicationRouter
 		}
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const {applicant, members} = applicationForm;
-		let updateObj;
+		let updateObj = {};
 		if(s === 1) {
-			// 判断申请人的信息是否存在，不存在则写入
-			if(!applicant) {
-				newMembers.push({
-					uid: user.uid,
-					mobile: userPersonal.mobile || null
-				});
-			}
-			const membersUid = members.map(m => m.uid);
-			const selectedUserUid = newMembers.map(s => s.uid);
-			// 从数据库中标记未被选择的用户
-			for(let u of members) {
-				if(!selectedUserUid.includes(u.uid)) await u.update({removed: true});
-			}
-			// 写入新提交的数据库中不存在的用户信息
-			for(let u of newMembers) {
-				if(!membersUid.includes(u.uid)) {
-					const targetUser = await db.UserModel.findOnly({uid: u.uid});
-					const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
-					const {mobile} = targetUserPersonal;
-					const newApplicationUser = db.FundApplicationUserModel({
-						uid: targetUser.uid,
-						applicationFormId: _id,
-						mobile
-					});
-					await newApplicationUser.save();
+			const {from} = body;
+			ctx.print('from', from)
+			if(from === 'personal') {
+				for (let aUser of members) {
+					await aUser.remove();
+					await applicationForm.update({from: 'personal'});
 				}
+			} else {
+				// 判断申请人的信息是否存在，不存在则写入
+				if(!applicant) {
+					newMembers.push({
+						uid: user.uid,
+						mobile: userPersonal.mobile || null
+					});
+				}
+				const membersUid = members.map(m => m.uid);
+				const selectedUserUid = newMembers.map(s => s.uid);
+				// 从数据库中标记未被选择的用户
+				for(let u of members) {
+					if(!selectedUserUid.includes(u.uid)) await u.update({removed: true});
+				}
+				// 写入新提交的数据库中不存在的用户信息
+				for(let u of newMembers) {
+					if(!membersUid.includes(u.uid)) {
+						const targetUser = await db.UserModel.findOnly({uid: u.uid});
+						const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
+						const {mobile} = targetUserPersonal;
+						const newApplicationUser = db.FundApplicationUserModel({
+							uid: targetUser.uid,
+							applicationFormId: _id,
+							mobile
+						});
+						await newApplicationUser.save();
+					}
+				}
+				await applicationForm.update({from: 'team'});
 			}
 		}
+		// 填写申请人信息
 		if(s === 2) {
 			await applicant.update(newApplicant);
 			updateObj = {
 				account,
-				'status.inputApplicantMessages': true
 			};
 			await applicationForm.update(updateObj);
 		}
+		// 填写项目信息
 		if(s === 3) {
-			if(applicationForm.project === null){
+			if(applicationForm.projectId === null){
 				await applicationForm.newProject(project);
 				updateObj = {
-					'status.inputProjectMessages': true,
 					projectId: applicationForm.project._id
-				}
+				};
+				await applicationForm.update(updateObj);
 			} else {
 				await applicationForm.project.update(project);
 				data.redirect = `/fund/a/${applicationForm._id}/settings?s=3`;
 			}
 		}
+		//填写其他信息
 		if (s === 4) {
-			updateObj = {
-				'status.inputOtherMessages': true
-			};
 			if(projectCycle) updateObj.projectCycle = projectCycle;
 			if(budgetMoney) updateObj.budgetMoney = budgetMoney;
 			if(threadsId) updateObj['threadsId.applying'] = threadsId;
+			await applicationForm.update(updateObj);
 		}
 		await next();
 	})

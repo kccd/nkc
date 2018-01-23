@@ -83,12 +83,12 @@ block content
                   p 您的账号未达到最低要求，无法申请该基金。
                   -btnDisabled = true;
                   -link = '###';
-                -const {unPassed, unCompleted, unSubmit} = data.message? data.message: {};
-                  if unSubmit
+                -const {unPassed, unCompleted, unSubmitted} = data.message? data.message: {};
+                  if unSubmitted
                     -btnDisabled = true;
                     -link = '###';
                     p 您还有未提交的基金项目，
-                      a(href=`/fund/a/${unSubmit}/settings`) 查看
+                      a(href=`/fund/a/${unSubmitted}/settings`) 查看
                   else if unPassed
                     -btnDisabled = true;
                     -link = '###';
