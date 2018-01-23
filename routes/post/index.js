@@ -51,7 +51,7 @@ postRouter
       }
     }
     targetPost.uidlm = user.uid;
-    targetPost.iplm = ctx.request.socket._peername.address;
+    targetPost.iplm = ctx.ip;
     targetPost.t = t;
     targetPost.c = c;
     targetPost.tlm = Date.now();

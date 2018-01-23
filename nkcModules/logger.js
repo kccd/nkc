@@ -14,18 +14,19 @@ module.exports = async (ctx) => {
     processTime,
     uid: ctx.data.user? ctx.data.user.uid : 'visitor'
   };
-  if(ctx.logIt)
-    if(ctx.error) {
+  if(ctx.logIt) {
+    if (ctx.error) {
       console.error(
         ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red}`
       );
-      if(process.env.NODE_ENV !== 'production')
+      if (process.env.NODE_ENV !== 'production')
         console.error(log.error);
-    }
-    else {
+    } else {
       console.log(
         ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green}`
       );
     }
+  }
+  log.port = undefined;
   await new LogModel(log).save()
 };

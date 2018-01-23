@@ -7,34 +7,28 @@ const logSchema = new Schema({
   method: {
     type: String,
     required: true,
-    index: 1
   },
   path: {
     type: String,
     required: true,
-    index: 1
   },
-  query: Object,
+  query: Schema.Types.Mixed,
   status: {
     type: Number,
     required: true,
-    index: 1
   },
   ip: {
     type: String,
     required: true,
-    index: 1
   },
   port: {
     type: String,
     required: true,
-    index: 1
   },
   reqTime: Date,
   processTime: Number,
   uid: {
     type: String,
-    index: 1,
     required: true
   }
 });

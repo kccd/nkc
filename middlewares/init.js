@@ -8,7 +8,13 @@ const fs = require('fs');
 const {promisify} = require('util');
 
 module.exports = async (ctx, next) => {
-  ctx.port = ctx.request.socket._peername.port;
+  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
+  const XFF = ctx.get('X-Forwarded-For');
+  if(XFF !== '')
+    [ip, port] = XFF.split(':');
+  console.log(ip + ':' + port);
+  ctx.ip = ip;
+  ctx.port = port;
   ctx.reqTime = new Date();
   ctx.db = db;
   ctx.nkcModules = nkcModules;

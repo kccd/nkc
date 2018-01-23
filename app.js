@@ -8,7 +8,6 @@ const staticServe = path => {
   return require('koa-static')(path, settings.cache);
 };
 const app = new Koa();
-app.proxy = true;
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
 const {permissions} = require('./nkcModules');
