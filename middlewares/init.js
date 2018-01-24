@@ -12,8 +12,7 @@ module.exports = async (ctx, next) => {
   const XFF = ctx.get('X-Forwarded-For');
   if(XFF !== '')
     [ip, port] = XFF.split(':');
-  console.log(ip + ':' + port);
-  ctx.ip = ip;
+  ctx.address = ip;
   ctx.port = port;
   ctx.reqTime = new Date();
   ctx.db = db;

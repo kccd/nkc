@@ -51,7 +51,7 @@ postRouter
       }
     }
     targetPost.uidlm = user.uid;
-    targetPost.iplm = ctx.ip;
+    targetPost.iplm = ctx.address;
     targetPost.t = t;
     targetPost.c = c;
     targetPost.tlm = Date.now();

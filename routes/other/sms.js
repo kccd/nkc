@@ -168,7 +168,7 @@ smsRouter
       r: targetUser.uid,
       c: content,
       port: ctx.port,
-      ip: ctx.ip
+      ip: ctx.address
     });
     try{
       await newSms.save();

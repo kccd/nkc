@@ -1,5 +1,5 @@
 module.exports = async (ctx, next) => {
-  const {port, ip, settings} = ctx;
+  const {port, address: ip, settings} = ctx;
   const {UsersBehaviorModel} = ctx.db;
   const {scoreMap} = settings.user;
   ctx.generateUsersBehavior = async function(obj) {

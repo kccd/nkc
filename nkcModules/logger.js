@@ -1,7 +1,7 @@
 module.exports = async (ctx) => {
   const {LogModel} = ctx.db;
   const processTime = ctx.processTime;
-  const {ip, port} = ctx;
+  const {address: ip, port} = ctx;
   const log = {
     error: ctx.error,
     method: ctx.method,

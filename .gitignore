@@ -6,3 +6,4 @@
 /package-lock.json
 /resources
 /tmp
+/settings/mailSecrets.js

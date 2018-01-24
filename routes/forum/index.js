@@ -76,7 +76,7 @@ forumRouter
   })
   .post('/:fid', async (ctx, next) => {
     const {
-      data, params, db, body, ip, query,
+      data, params, db, body, address: ip, query,
       generateUsersBehavior
     } = ctx;
     const {post} = body;

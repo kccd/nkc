@@ -40,7 +40,7 @@ experimentalRouter
     const newSysinfo = new db.SmsModel({
       fromSystem: true,
       sid: await db.SettingModel.operateSystemID('sms', 1),
-      ip: ctx.ip,
+      ip: ctx.address,
       port: ctx.port,
       systemContent: {
         title: title,

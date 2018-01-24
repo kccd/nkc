@@ -119,7 +119,7 @@ examRouter
   })
   //获得激活码
   .post('/subject', async (ctx, next) => {
-    let ip = ctx.ip;
+    let ip = ctx.address;
     let db = ctx.db;
     let params = ctx.body;
     let exam = params.exam;

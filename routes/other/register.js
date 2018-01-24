@@ -22,11 +22,11 @@ registerRouter
     let db = ctx.db;
     let params = ctx.body;
     let userObj = {
-      username:params.username,
+      username:params.username.trim(),
       password:params.password,
       regCode: params.regCode,
       mobile:(params.areaCode + params.mobile).replace('+', '00'),
-      regIP: ctx.ip,
+      regIP: ctx.address,
       regPort: ctx.port,
       mcode:params.mcode,
       isA: false
@@ -70,7 +70,7 @@ registerRouter
       password:params.password,
       regCode: params.regCode,
       email:params.email,
-      regIP: ctx.ip,
+      regIP: ctx.address,
       regPort: ctx.port,
       isA: false
     };
