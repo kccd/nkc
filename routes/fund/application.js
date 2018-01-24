@@ -74,7 +74,6 @@ applicationRouter
 		let updateObj = {};
 		if(s === 1) {
 			const {from} = body;
-			ctx.print('from', from)
 			if(from === 'personal') {
 				for (let aUser of members) {
 					await aUser.remove();
@@ -151,3 +150,41 @@ applicationRouter
 		await next();
 	});
 module.exports = applicationRouter;
+
+/*
+const oldLifePhotos = applicant.lifePhotos;
+const newLifePhotos = newApplicant.lifePhotos;
+await applicant.update(newApplicant);
+updateObj = {
+	account,
+};
+await applicationForm.update(updateObj);
+for(let newId of newLifePhotos) {
+	if(!oldLifePhotos.includes(newId)) {
+		const photo = await db.PhotoModel.findOnly({_id: newId, uid: user.uid, type: 'life',status: {$nin: ['disabled', 'deleted']}});
+		const _id = await db.SettingModel.operateSystemID('photos', 1);
+		const newApplicationPhoto = db.PhotoModel({
+			_id,
+			uid: photo.uid,
+			type: 'fund',
+			size: photo.size,
+			fileName: photo.fileName,
+			description: photo.description
+		});
+		await newApplicationPhoto.save();
+		const {photoPath, photoSmallPath} = ctx.settings.upload;
+		const oldPhotoPath = photoPath + '/' + photo._id + '.jpg';
+		const newPhotoPath = photoPath + '/' + _id + '.jpg';
+		const oldPhotoSmallPath = photoSmallPath + '/' + photo._id + '.jpg';
+		const newPhotoSmallPath = photoSmallPath + '/' + _id + '.jpg';
+		const {copyFile} = ctx.fs;
+		await copyFile(oldPhotoPath, newPhotoPath);
+		await copyFile(oldPhotoSmallPath, newPhotoSmallPath);
+	}
+}
+for(let oldId of oldLifePhotos) {
+	if(!newLifePhotos.includes(oldId)) {
+		const photo = await db.PhotoModel.findOnly({_id: oldId, uid: user.uid, type: 'life',status: {$nin: ['disabled', 'deleted']}});
+		await photo.remove();
+	}
+}*/

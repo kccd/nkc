@@ -45,7 +45,6 @@ const fundApplicationUserSchema = new Schema({
 	description: {
 		type: String,
 		default: null,
-		index: 1
 	},
 	authLevel: {
 		type: Number,

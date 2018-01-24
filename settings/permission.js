@@ -761,7 +761,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*fund: {
+     /* fund: {
         [POST]: true,
 	      m: {
 		      [name]:'基金管理页面',

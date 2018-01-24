@@ -964,12 +964,20 @@ input[type="radio"], input[type="checkbox"]{
   background-color: rgba(0,0,0,1);
   color: #fff;
 }
-
-.aForm .title{
-  font-size: 2rem;
-  color: #000;
+.aForm{
+  border: 1px solid #ccc;
+  background-color: #ffd79624;
+  overflow: hidden;
+  padding: 4rem;
+  color: #333;
 }
-
+.aForm .title{
+  font-size: 1.5rem;
+}
+.aForm .content{
+  border-bottom: 1px solid #000;
+  text-align: center;
+}
 .aForm-body{
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;

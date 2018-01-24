@@ -5,7 +5,7 @@ block title
   -const {applicationForm, s} = data;
   -const mainContainer1400 = true
   -const {authLevel} = fund.applicant;
-  -const {status, members, applicant, project, budgetMoney, projectCycle, threads} = applicationForm;
+  -const {status, members, project, budgetMoney, projectCycle, threads} = applicationForm;
   -const {submitted} = status;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
@@ -61,6 +61,7 @@ block content
               .back-next
                 .apply-next(onclick=`submit(${applicationForm._id})`) 保存并下一步
             else if s === 2 && chooseType !== null
+              -const applicant = applicationForm.applicant || {};
               -const options = {name: applicant.name, idCardNumber: applicant.idCardNumber, description: applicant.description, mobile: applicant.mobile, members: false, account: applicationForm.account};
               include interface_fund_userMessagesForm
               hr
@@ -190,7 +191,7 @@ block content
                   br
                   br
                 .col-xs-12.col-md-9
-                  .col-xs-12.col-md-8.col-md-offset-2
+                  .col-xs-12.col-md-10.col-md-offset-1
                     include interface_application_form
                 .col-xs-12.col-md-3
                   if applicationForm.from === 'team'
@@ -204,61 +205,10 @@ block content
                       -for(let u of agreeIsFalse)
                         a(href=`/m/${u.uid}`)= u.user.username
                         span &nbsp;&nbsp;&nbsp;
-
-                  //if self
-                  //  br
-                  //  h4 个人申请：
-                  //  #usersList
-                  //    span.fund-span=user.username
-                  //else
-                  //  br
-                  //  h4 未处理的用户：
-                  //  #usersList
-                  //    if nullLength === 0
-                  //      .blank 暂无数据
-                  //    else
-                  //      -for(let u of agreeIsNull)
-                  //        span.fund-span.transparent= u.user.username
-                  //  br
-                  //  h4 已同意的用户：
-                  //  #usersList
-                  //    if trueLength === 0
-                  //      .blank 暂无数据
-                  //    else
-                  //      -for(let u of agreeIsTrue)
-                  //        span.fund-span= u.user.username
-                  //  br
-                  //  h4 已拒绝的用户：
-                  //  #usersList
-                  //    if falseLength === 0
-                  //      .blank 暂无数据
-                  //    else
-                  //      -for(let u of agreeIsFalse)
-                  //        span.fund-span.disabled= u.user.username
-                  //  if !self
-                  //    if nullLength !== 0
-                  //      span(style='color: red;') 等待用户确认中，若要关闭页面请点击保存按钮
-                  //    else
-                  //      if trueLength === 0
-                  //        span(style='color: red;') 团队申请必须要有组员，请返回第一步添加组员或更改申请方式
-                  //      else
-                  //        if falseLength !== 0
-                  //          span(style='color: red;') 点击下一步将只保留已同意的用户，若要重新添加用户请点击第1步
               hr
-              if self
-                .back-next
-                  .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
-              else
-                if nullLength !== 0
-                  .back-next
-                    .apply-next(onclick=`submitEnsureUsersMessages()`) 保存
-                else
-                  if trueLength === 0
-                    .back-next
-                      .apply-next(onclick=`window.location.href="/fund/a/${applicationForm._id}/settings?s=1"`) 返回第1步
-                  else
-                    .back-next
-                      .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 保存并下一步
+              .back-next
+                .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 提交申请
+
 
 
 

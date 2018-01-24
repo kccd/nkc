@@ -33,7 +33,8 @@ module.exports = async (ctx, next) => {
     mkdir: promisify(fs.mkdir),
     exists: promisify(fs.exists),
     createReadStream: fs.createReadStream,
-    stat: promisify(fs.stat)
+    stat: promisify(fs.stat),
+	  copyFile: promisify(fs.copyFile)
   };
 
   ctx.print = (value1, value2) => {
