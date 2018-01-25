@@ -1,0 +1,48 @@
+extends bootstrap_base
+block title
+  -const mainContainer1400 = true
+  -const applicationForm = data.applicationForm;
+  -const fund = applicationForm.fund;
+  title= `科创基金-${fund.name}`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        .col-xs-12.col-md-8
+          include interface_fund_applicationForm_info
+        .col-xs-12.col-md-4
+          .row
+            .fund-apply-status
+              ul
+                mixin pointer(s1, s2 , text)
+                  -const passed = s1? 'passed': '';
+                  li(class=passed)= text
+                  if(s1 === true && s2 !== true)
+                    li.next
+                      sapn.glyphicon.glyphicon-menu-down
+                -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = applicationForm.status;
+                +pointer(submitted, usersSupport, '提交申请')
+                +pointer(usersSupport, projectPassed, '网友支持')
+                +pointer(projectPassed, adminSupport,'项目审核')
+                -const count = applicationForm.remittance.length;
+                if count > 0
+                  +pointer(adminSupport, applicationForm.remittance[0].status,'管理员审核')
+                  -for (let i = 0; i < applicationForm.remittance.length; i++)
+                    -const r = applicationForm.remittance[i];
+                    -const r2 = applicationForm.remittance[1+i];
+                    if r2
+                      +pointer(r.status, r2.status, `第${i+1}期放款（${r.money}元）`)
+                  -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
+                  +pointer(lastRemittance.status, completed, `第${count}期放款（${lastRemittance.money}元）`)
+                else
+                  +pointer(adminSupport, remittance, '放款')
+                if completed
+                  li.passed 完成
+                else
+                  li 完成
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_applicationForm.js')

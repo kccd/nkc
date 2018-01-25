@@ -69,7 +69,7 @@ listRouter
 		} else if(type === 'applying') { // 正在申请
 			query = {
 				'lock.status': {$ne: 0},
-				'status.adminAgree': {$ne: true}
+				'status.adminSupport': {$ne: true}
 			}
 		} else { // 全部
 			query = {

@@ -24,8 +24,8 @@ applicationRouter
 		await next();
 	})
 	.get('/:_id', async (ctx, next) => {
-		const {data, applicationForm} = ctx;
-		const {user} = data;
+		const {data} = ctx;
+		const {user, applicationForm} = data;
 		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
@@ -164,6 +164,7 @@ applicationRouter
 					_id: newId,
 					type: 'fund',
 					path: photoDir + filePath,
+					applicationFormId: applicationForm._id,
 					uid,
 					size,
 					fileName,
