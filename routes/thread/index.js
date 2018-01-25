@@ -123,7 +123,8 @@ threadRouter
     } else {
       posts = await thread.getPostByQuery(query, q);
     }
-    await Promise.all(posts.map(async post => {
+    //恢复旧版引用
+    /*await Promise.all(posts.map(async post => {
       const postContent = post.c || '';
       const index = postContent.indexOf('[quote=');
       if(index !== -1) {
@@ -133,7 +134,7 @@ threadRouter
         const postLink = `/t/${tid + page}`;
         post.c = postContent.replace(/=/,`=${postLink},${step},`);
       }
-    }));
+    }));*/
     data.posts = posts;
     await thread.extendFirstPost().then(p => p.extendUser());
     await thread.extendLastPost();

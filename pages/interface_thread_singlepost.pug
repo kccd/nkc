@@ -74,6 +74,7 @@
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       -post.c = hideContentByUser(post.c, data.user, 'thread')
+      //恢复旧版引用
       // -var targetPost = post;
       // -var content = post.c;
       // -var quoteIndex = targetPost.c.indexOf('[quote=');

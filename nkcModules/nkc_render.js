@@ -136,7 +136,7 @@ function nkc_render(options){
       },
     },
 
-    /*quote:{
+    quote:{
       openTag: function(params,content) {
         var username = params?(params.length?'引用 ' + params.slice(1).split(',')[0]+':<br>':''):''
 
@@ -145,8 +145,9 @@ function nkc_render(options){
       closeTag: function(params,content) {
         return '</blockquote>';
       },
-    },*/
-    quote:{
+    },
+	  //恢复旧版引用
+    /*quote:{
       openTag: function(params,content) {
         params = params? params.slice(1).split(','): '';
         var username = '';
@@ -165,7 +166,7 @@ function nkc_render(options){
       closeTag: function(params,content) {
         return '</blockquote>';
       },
-    },
+    },*/
 
     "code": {
       openTag: function(params,content) {
