@@ -1,6 +1,9 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const fs = require('fs');
+const {promisify} = require('util');
+const copyFile = promisify(fs.copyFile);
 const fundApplicationFormSchema = new Schema({
   _id: Number,
 	order: {
@@ -28,7 +31,7 @@ const fundApplicationFormSchema = new Schema({
   },
 	from: {
   	type: String,
-		default: 'personal',
+		required: true
 	},
   publicity: { // 示众
     timeOfBegin: {
@@ -87,7 +90,7 @@ const fundApplicationFormSchema = new Schema({
   account: {
     paymentMethod: {
       type: String,
-      default: ''
+      default: null
     },
     number: {
       type: Number,
@@ -288,15 +291,15 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	const ThreadModel = require('./ThreadModel');
 	const {threadsId} = this;
 	const threads = {};
-	const applying = await ThreadModel.find({tid: {$in: threadsId.applying}});
-	const completed = await ThreadModel.find({tid: {$in: threadsId.completed}});
-	threads.applying = await Promise.all(applying.map(async t => {
-		await t.extendFirstPost().then(p => p.extendUser());
-		return t;
+	threads.applying = await Promise.all(threadsId.applying.map(async tid => {
+		const thread = await ThreadModel.findOnly({tid});
+		await thread.extendFirstPost().then(p => p.extendUser());
+		return thread;
 	}));
-	threads.completed = await Promise.all(completed.map(async t => {
-		await t.extendFirstPost().then(p => p.extendUser());
-		return t;
+	threads.completed = await Promise.all(threadsId.completed.map(async tid => {
+		const thread = await ThreadModel.findOnly({tid});
+		await thread.extendFirstPost().then(p => p.extendUser());
+		return thread;
 	}));
 	return this.threads = threads;
 };
@@ -317,6 +320,116 @@ fundApplicationFormSchema.methods.newProject = async function(project) {
 	});
 	await newDocument.save();
 	return this.project = newDocument;
+};
+
+fundApplicationFormSchema.methods.ensureInformation = async function() {
+	const PhotoModel = require('./PhotoModel');
+	const FundApplicationForm = mongoose.model('fundApplicationForms');
+	const {
+		from,
+		members,
+		applicant,
+		fund,
+		budgetMoney,
+		projectCycle,
+		threadsId,
+		threads,
+		account,
+		projectId,
+		project,
+		status,
+		useless,
+		lock,
+		modifyCount,
+		supporter,
+		objector
+	} = this;
+	const {
+		money,
+		thread,
+		applicationMethod,
+	} = fund;
+
+	// 判断申请表有效性
+	if(useless !== null) throw '申请表已作废！';
+	// 申请人信息判断
+	if(!applicant.lifePhotosId || applicant.lifePhotosId.length === 0) {
+		throw '请至少添加一张生活照！';
+	}
+	if(!applicant.name) throw '请填写您的真实姓名！';
+	if(!applicant.idCardNumber) throw '请填写您的身份证号码！';
+	if(!applicant.mobile) throw '请填写您的联系电话！';
+	if(!account.paymentMethod) throw '请选择收款方式！';
+	if(!account.number) throw '请填写您的收款账号！';
+	if(!applicant.description) throw '请填写您的自我介绍！';
+
+	// 项目信息判断
+	if(!projectId) {
+		throw '请填写项目信息！';
+	} else {
+		if(!project.t) throw '请填写项目名称！';
+		if(!project.c) throw '请输入项目名称！';
+	}
+
+	//其他信息判断
+	if (projectCycle === null) throw '请填写研究周期！';
+	if(money.max === null) { // 定额基金
+		if(!budgetMoney) throw '请输入资金用途！';
+	} else { //不定额基金
+		if(!budgetMoney || budgetMoney.length === 0) {
+			throw '请输入资金用途！';
+		} else {
+			let aggregate = 0;
+			if(typeof budgetMoney === 'string') throw '请输入资金用途！';
+			for(let b of budgetMoney) {
+				aggregate += (b.count*b.money);
+			}
+			if(aggregate === 0) throw '资金预算不能为0！';
+			if(aggregate > money.max) throw '资金预算金额已超过该基金项目单笔申请的最大金额！';
+		}
+	}
+	if(thread.count > threadsId.applying.length) throw `附带的帖子数未达到最低要求(至少${thread.count}篇)`;
+	// 如果是个人申请，则删除所有组员已存到基金（type='fund'）的生活照，并标记所有组员为已删除
+	if(from === 'personal') {
+		if(!applicationMethod.individual) throw '该基金不允许个人申请！';
+		for(let u of members) {
+			const {lifePhotosId} = u;
+			for(let _id of lifePhotosId) {
+				const photo = await PhotoModel.findOnly({_id});
+				if(photo.type === 'fund') await photo.remove();
+			}
+			await u.update({removed: true});
+		}
+	} else {
+		if(!applicationMethod.group) throw '该基金不允许团队申请！';
+		if(members.length === 0) throw '团队申请必须要有组员，若没有组员请选择个人申请！';
+		let agreeUsers = [];
+		let disagreeUsers = [];
+		let notModifiedUsers = [];
+		for(let m of members) {
+			if(m.removed === true) continue;
+			if(m.agree === false) disagreeUsers.push(m.uid);
+			if(m.agree === true) agreeUsers.push(m.uid);
+			if(m.agree === null) notModifiedUsers.push(m.uid);
+		}
+		if(agreeUsers.length === 0) throw '没有好友接受邀请，暂不能提交团队申请！';
+
+		// 过滤掉暂未处理邀请的用户和拒绝邀请的用户，并且从附加帖子中过滤掉这些用户的帖子
+		for(let thread of threads.applying) {
+			if(notModifiedUsers.includes(thread.uid) || disagreeUsers.includes(thread.uid)) {
+				const index = threadsId.applying.indexOf(thread.tid);
+				threadsId.applying.splice(index, 1);
+			}
+		}
+		for(let m of members) {
+			if(disagreeUsers.includes(m.uid) || notModifiedUsers.includes(m.uid)) {
+				await m.update({removed: true});
+			}
+		}
+
+	}
+	this.status.submitted = true;
+	await this.save();
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

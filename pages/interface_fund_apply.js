@@ -19,7 +19,7 @@ $(function() {
 	initFundPay();
 	applicationFormId = $('#applicationFormId').text();
 	applicationFormId = parseInt(applicationFormId);
-	autoSaveProject(applicationFormId);
+	// autoSaveProject(applicationFormId);
 	initBudgetMoney();
 	onContentChange();
 	initAddPurpose();
@@ -196,7 +196,14 @@ function getUser() {
 		})
 }
 
-function submit(id){
+function submitApplicationMethod(){
+	saveApplicationMethod(function(data) {
+		var s = data.s;
+		window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+	})
+}
+
+function saveApplicationMethod(callback) {
 	var obj = {
 		newMembers: [],
 		from: 'personal',
@@ -209,15 +216,17 @@ function submit(id){
 		obj.newMembers = selectedUsers;
 		obj.from = 'team';
 	}
-	nkcAPI('/fund/a/'+id, 'PATCH', obj)
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
 		.then(function(data){
-			var s = data.s;
-			window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
+			if(callback === undefined) {
+				screenTopAlert('保存成功！');
+			} else {
+				callback(data)
+			}
 		})
 		.catch(function(data) {
 			return screenTopWarning(data.error);
 		})
-
 }
 
 function selectLifePhoto(id){
@@ -324,7 +333,7 @@ function saveApplicantMessages(callback){
 				idCardNumber: obj.idCardNumber,
 				mobile: obj.mobile,
 				description: obj.description,
-				lifePhotos: lifePhotos
+				lifePhotosId: lifePhotos
 			},
 			s: 2
 		};
@@ -361,12 +370,8 @@ function submitEnsureUsersMessages(id) {
 	}
 }
 
-function saveProject(id, callback) {
-	var project = {
-		t: $('#projectTitle').val(),
-		c: $('#projectContent').text()
-	};
-	nkcAPI('/fund/a/'+id, 'PATCH', {project: project, s: 3})
+function saveProject(callback) {
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: 3})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -379,19 +384,20 @@ function saveProject(id, callback) {
 		})
 }
 
-function toEditor(id) {
-	saveProject(id, function(){
-		window.location.href = '/editor?target=application/'+id+'/p/';
+function toEditor() {
+	saveProject(function(){
+		window.location.href = '/editor?type=application&id='+applicationFormId+'&cat=p';
 	});
 }
 
-function submitProject(id) {
-	saveProject(id, function(){
+function submitProject() {
+	window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+	/*saveProject(id, function(){
 		window.location.href = '/fund/a/'+id+'/settings?s=4';
-	});
+	});*/
 }
 
-function autoSaveProject(id) {
+/*function autoSaveProject(id) {
 	if($('.autoSaveTime').text() !== '') {
 		$('.autoSaveTime').css('display', 'inline');
 		var n = -1;
@@ -415,7 +421,7 @@ function autoSaveProject(id) {
 
 function displayTimeToSave(time) {
 	$('#saveTime').text(time+'秒');
-}
+}*/
 
 
 function initBudgetMoney() {
@@ -487,14 +493,14 @@ function deleteList(num) {
 
 function addList() {
 	initBudgetMoney();
-	$('.delete').addClass('disabled');
+	// $('.delete').addClass('disabled');
 	var obj = {
 		money: 0,
 		count: 0,
 		purpose: '新建'+(budgetMoney.length+1)
 	};
 	budgetMoney.push(obj);
-	displayPurpose(true);
+	displayPurpose();
 	onContentChange();
 }
 
@@ -513,7 +519,7 @@ function onContentChange() {
 	$('.purpose, .count, .money').unbind();
 	$('.purpose, .count, .money').one('blur', function(){
 		initBudgetMoney();
-		displayPurpose(true);
+		displayPurpose();
 		onContentChange();
 	})
 }
@@ -549,10 +555,19 @@ function initAddPurpose() {
 	});
 }
 
-function savePurpose(id, callback) {
+function savePurpose(callback) {
 	readProjectValue();
+	var obj = {
+		s: 4,
+		projectCycle: projectCycle
+	};
 	var purpose = $('#purpose').val();
-	nkcAPI('/fund/a/'+ id, 'PATCH', {s: 4, projectCycle: projectCycle, budgetMoney: purpose})
+	if($('#purpose').length === 0) {
+		obj.budgetMoney = budgetMoney;
+	} else {
+		obj.budgetMoney = purpose;
+	}
+	nkcAPI('/fund/a/'+ applicationFormId, 'PATCH', obj)
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -566,7 +581,7 @@ function savePurpose(id, callback) {
 }
 function compute() {
 	initBudgetMoney();
-	displayPurpose(true);
+	displayPurpose();
 }
 
 //显示添加帖子的面板
@@ -675,7 +690,7 @@ function addThread(index) {
 	}
 	if(!flag) {
 		selectedThreads.push(thread);
-		displayThreadsList('.selectedThreads', selectedThreads, true, 'delete');
+		displayThreadsList('.selectedThreads', selectedThreads, false, 'delete');
 		return screenTopAlert('添加成功！');
 	} else {
 		return screenTopWarning('该贴子已在已选列表中，不需要重复添加！');
@@ -769,7 +784,7 @@ function getThreads(page, self) {
 }
 
 //保存帖子列表
-function saveThreadsList(id, callback) {
+function saveThreadsList(callback) {
 	var threadsId = [];
 	for(var i = 0; i < selectedThreads.length; i++){
 		var t = selectedThreads[i];
@@ -779,7 +794,7 @@ function saveThreadsList(id, callback) {
 		threadsId: threadsId,
 		s: 4
 	};
-	nkcAPI('/fund/a/'+id, 'PATCH', obj)
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
 		.then(function(data) {
 			if(callback === undefined) {
 				screenTopAlert('保存成功！');
@@ -792,11 +807,32 @@ function saveThreadsList(id, callback) {
 		})
 }
 
-//提交帖子列表、资金预算和研究周期
-function submitThreadsList(id) {
-	savePurpose(id, function(){
-		saveThreadsList(id, function(){
-			window.location.href='/fund/a/'+id+'/settings?s=5';
+function saveOtherMessages() {
+	savePurpose(function(){
+		saveThreadsList(function(){
+			screenTopAlert('保存成功！');
 		})
 	})
+}
+
+//提交帖子列表、资金预算和研究周期
+function submitOtherMessages() {
+	savePurpose(function(){
+		saveThreadsList(function(){
+			window.location.href='/fund/a/'+applicationFormId+'/settings?s=5';
+		})
+	})
+}
+
+function submitApplicationForm() {
+	var obj = {
+		s: 5
+	};
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+		.then(function() {
+			screenTopAlert('提交成功！');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
 }

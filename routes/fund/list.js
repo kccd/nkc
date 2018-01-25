@@ -34,7 +34,6 @@ listRouter
 		const {fundId} = ctx.params;
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
-		console.log(fund);
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
@@ -113,6 +112,11 @@ listRouter
 		data.fund = fund;
 		ctx.template = 'interface_fund_agreement.pug';
 		const message = await user.getUnCompletedFundApplication();
+		try {
+			await fund.ensureUserPermission(user);
+		} catch(e) {
+			ctx.throw(401, e);
+		}
 		if(message) {
 			data.message = message;
 			return await next();
@@ -120,17 +124,28 @@ listRouter
 		if(agree !== 'true') {
 			return await next();
 		}
-		try {
-			await fund.ensurePermission(user);
-		} catch(e) {
-			ctx.throw(401, e);
-		}
 		const applicationForm = {};
 		applicationForm._id = await db.SettingModel.operateSystemID('fundApplicationForms', 1);
 		applicationForm.uid = user.uid;
 		applicationForm.fundId = fundId;
+		if(fund.applicationMethod.individual) {
+			applicationForm.from = 'personal';
+		} else if(fund.applicationMethod.group) {
+			applicationForm.from = 'team'
+		} else {
+			ctx.throw(401, '该基金设置中未勾选个人申请和团队申请！');
+		}
 		const newApplicationForm = db.FundApplicationFormModel(applicationForm);
 		await newApplicationForm.save();
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const authLevel = await userPersonal.getAuthLevel();
+		const newApplicationUser = db.FundApplicationUserModel({
+			applicationFormId: applicationForm._id,
+			mobile: userPersonal.mobile? userPersonal.mobile: null,
+			uid: user.uid,
+			authLevel
+		});
+		await newApplicationUser.save();
 		ctx.redirect(`/fund/a/${applicationForm._id}/settings`);
 		await next();
 	});

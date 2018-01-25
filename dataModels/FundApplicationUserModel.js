@@ -50,11 +50,11 @@ const fundApplicationUserSchema = new Schema({
 		type: Number,
 		default: null
 	},
-	lifePhotos: {
+	lifePhotosId: {
 		type: [Number],
 		default: []
 	},
-	certsPhotos: {
+	certsPhotosId: {
 		type: [Number],
 		default: []
 	},
@@ -73,10 +73,30 @@ fundApplicationUserSchema.virtual('user')
 		this._user = u;
 	});
 
+fundApplicationUserSchema.virtual('lifePhotos')
+	.get(function() {
+		return this._lifePhotos;
+	})
+	.set(function(p) {
+		this._lifePhotos = p;
+	});
+
+
 fundApplicationUserSchema.methods.extendUser = async function() {
 	const UserModel = require('./UserModel');
 	const user = await UserModel.findOnly({uid: this.uid});
 	return this.user = user;
 };
+
+fundApplicationUserSchema.methods.extendLifePhotos = async function() {
+	const PhotoModel = require('./PhotoModel');
+	const lifePhotos = [];
+	await Promise.all(this.lifePhotosId.map(async _id => {
+		const photo = await PhotoModel.findOne({_id, status: {$nin: ['disabled', 'deleted']}});
+		if(photo) lifePhotos.push(photo);
+	}));
+	return this.lifePhotos = lifePhotos;
+};
+
 const FundApplicationUserModel = mongoose.model('fundApplicationUsers', fundApplicationUserSchema);
 module.exports = FundApplicationUserModel;

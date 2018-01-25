@@ -7,6 +7,7 @@ block title
   -const {authLevel} = fund.applicant;
   -const {status, members, project, budgetMoney, projectCycle, threads} = applicationForm;
   -const {submitted} = status;
+  -let aggregate = 0;
   title= `${fund.name}申请表`
   link(rel='stylesheet' href='/fund.css')
   style.
@@ -31,9 +32,15 @@ block content
             if s === 1
               .row(style='padding: 3rem 0;')
                 .col-xs-6.col-md-2.col-md-offset-4
-                  .choose-content-div#personal(class=applicationForm.from === 'personal'? 'active': '') 个人申请
+                  if fund.applicationMethod.individual
+                    .choose-content-div#personal(class=applicationForm.from === 'personal'? 'active': '') 个人申请
+                  else
+                    .choose-content-div.disabled(class=applicationForm.from === 'personal'? 'active': '') 个人申请
                 .col-xs-6.col-md-2
-                  .choose-content-div#team(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
+                  if fund.applicationMethod.group
+                    .choose-content-div#team(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
+                  else
+                    .choose-content-div.disabled(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
               .row#teamDiv
                 .col-xs-12.col-md-4.col-md-offset-4
                   .row
@@ -57,36 +64,29 @@ block content
                     .col-xs-12.col-md-12
                       #usersList
                         .blank 暂无数据
-              hr
-              .back-next
-                .apply-next(onclick=`submit(${applicationForm._id})`) 保存并下一步
             else if s === 2 && chooseType !== null
               -const applicant = applicationForm.applicant || {};
               -const options = {name: applicant.name, idCardNumber: applicant.idCardNumber, description: applicant.description, mobile: applicant.mobile, members: false, account: applicationForm.account};
               include interface_fund_userMessagesForm
-              hr
-              .back-next
-                .apply-next(onclick=`submitApplicantMessages(${applicationForm._id})`) 下一步
             else if s === 3 && inputApplicantMessages !== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
                   br
-                  h4 项目名称
-                  -let title = '', content = '';
+                  h4 项目名称：
+                  -let title = '暂未填写', content = '暂未填写';
                   if project
                     -title = project.t;
                     -content = project.c;
-                  input#projectTitle.fund-input(style='font-size: 1.8rem;' value=title autofocus=true)
-                  h4 项目内容
-                  #projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
-                  span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
-                  span.fund-span.transparent(onclick=`toEditor(${applicationForm._id})`) 去强大的编辑器
-                  span &nbsp;&nbsp;
-                  span.autoSaveTime#saveTime 0秒
-                  span.autoSaveTime 后自动保存
-              hr
-              .back-next
-                .apply-next(onclick=`submitProject(${applicationForm._id})`) 下一步
+                  h3#projectTitle.text-center!= title
+                  br
+                  h4 项目内容：
+                  //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
+                  div#projectContent!= project && project.c? experimental_render(project): content
+                  //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
+                  span.fund-span.transparent(onclick=`toEditor()` style='margin-left: 0;') 去编辑器
+                  //span &nbsp;&nbsp;
+                  //span.autoSaveTime#saveTime 0秒
+                  //span.autoSaveTime 后自动保存
             else if s === 4 && inputProject!== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
@@ -100,17 +100,16 @@ block content
                     span.fund-span.addPurpose 购买电子元器件
                     span.fund-span.addPurpose 印电路板
                     textarea.fund-textarea#purpose(style='height: 20rem;margin-bottom: 0;')= typeof(budgetMoney) === 'string'? budgetMoney: ''
-                    span.fund-span.transparent(onclick=`savePurpose(${applicationForm._id})` style='margin-left: 0;') 保存
+                    //span.fund-span.transparent(onclick=`savePurpose(${applicationForm._id})` style='margin-left: 0;') 保存
                   else
                     #budgetMoney
-                      -let aggregate = 0;
                       .fund-money-list.head
                         .purpose 用途
                         .count 数量
                         .money 单价(元)
                         .total 合计(元)
                       .list
-                        if budgetMoney === null || budgetMoney === [] || budgetMoney === ''
+                        if budgetMoney === null || budgetMoney === [] || typeof budgetMoney === 'string'
                           .blank(style="color: #ccc;line-height: 4rem;") 暂无数据
                         else
                           -for (let i = 0; i < budgetMoney.length; i++)
@@ -121,13 +120,13 @@ block content
                               .count(contenteditable=true num= i)= budgetMoney[i].count
                               .money(contenteditable=true num= i)= budgetMoney[i].money
                               .total= total
-                              .delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteList(${i})`)
+                              .delete.glyphicon.glyphicon-remove(onclick=`deleteList(${i})`)
                       #aggregate(style='margin-left: 0.5rem;')=(budgetMoney !== null && budgetMoney.length !== 0 && typeof(budgetMoney) !== 'string')? `总计：${aggregate}元`: ''
                     .button
                       span.fund-span.transparent(style='margin-left: 0;' onclick='addList()') 添加
-                      span.fund-span.transparent(onclick='editor()') 编辑
+                      //span.fund-span.transparent(onclick='editor()') 编辑
                       span.fund-span.transparent(onclick='compute()') 计算
-                      span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
+                      //span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
                   if fund.thread.count > 0
                     br
                     h4 附带帖子
@@ -167,14 +166,11 @@ block content
                               span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
                               br
                               a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
-                            .col-xs-2.col-md-2.delete.glyphicon.glyphicon-remove.disabled(onclick=`deleteThread(${i})`)
-                    .span.fund-span.transparent(onclick='displayDeleteThreadBtn()' style="margin-left: 0;") 编辑
+                            .col-xs-2.col-md-2.delete.glyphicon.glyphicon-remove(onclick=`deleteThread(${i})`)
+                    //.span.fund-span.transparent(onclick='displayDeleteThreadBtn()' style="margin-left: 0;") 编辑
                     .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
-                    .span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
+                    //.span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
 
-              hr
-              .back-next
-                .apply-next(onclick=`submitThreadsList(${applicationForm._id})`) 下一步
             else if s === 5 && inputApplicantMessages !== null
               -const agreeIsFalse = [], agreeIsTrue = [], agreeIsNull = [];
               -for(let u of members)
@@ -192,8 +188,23 @@ block content
                   br
                 .col-xs-12.col-md-9
                   .col-xs-12.col-md-10.col-md-offset-1
-                    include interface_application_form
+                    include interface_fund_applicationForm_info
                 .col-xs-12.col-md-3
+                  h3 注意事项
+                  br
+                  h4 一、团队申请
+                  p 1、如果没有好友同意你的邀请你将无法提交申请表，您可以邀请其他好友或更改申请方式为个人申请。
+                  p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的帖子中移除这些好友的帖子。
+                  br
+                  br
+                  -let disabledSubmit = false;
+                  -let n = 0;
+
+                  mixin ds(text)
+                    -n++;
+                    -disabledSubmit = true;
+                    h5.redFontColor= `${n}、${text}`
+
                   if applicationForm.from === 'team'
                     if nullLength !== 0
                       h3 未处理的用户：
@@ -205,9 +216,81 @@ block content
                       -for(let u of agreeIsFalse)
                         a(href=`/m/${u.uid}`)= u.user.username
                         span &nbsp;&nbsp;&nbsp;
+                  if applicationForm.from === 'personal'
+                    if !fund.applicationMethod.individual
+                      +ds('该基金不允许个人申请')
+                  else
+                    if !fund.applicationMethod.group
+                      +ds('该基金不允许团队申请')
+                  if !applicationForm.applicant.lifePhotosId || applicationForm.applicant.lifePhotosId.length === 0
+                    +ds('请至少添加一张生活照')
+                  if !applicationForm.applicant.name
+                    +ds('请填写您的真实姓名')
+                  if !applicationForm.applicant.idCardNumber
+                    +ds('请填写您的身份证号码')
+                  if !applicationForm.applicant.mobile
+                    +ds('请填写您的联系电话')
+                  if !applicationForm.account.paymentMethod
+                    +ds('请选择收款方式')
+                  if !applicationForm.account.number
+                    +ds('请填写您的收款账号')
+                  if !applicationForm.applicant.description
+                    +ds('请填写您的自我介绍')
+                  if !project
+                    +ds('请填写项目信息')
+                  else
+                    if !project.t
+                      +ds('请填写项目名称')
+                    if !project.c
+                      +ds('请输入项目名称')
+                  if applicationForm.projectCycle === null
+                    +ds('请填写研究周期')
+                  if fund.money.max === null
+                    if !applicationForm.budgetMoney
+                      +ds('请输入资金用途')
+                  else
+                    if !applicationForm.budgetMoney || applicationForm.budgetMoney.length === 0
+                      +ds('请输入资金用途')
+                    else
+                      if typeof applicationForm.budgetMoney === 'string'
+                        +ds('请输入资金用途')
+                      else
+                        if aggregate === 0
+                          +ds('资金预算不能为0')
+
+                        if aggregate > fund.money.max
+                          +ds('资金预算金额已超过该基金项目单笔申请的最大金额')
+                  if fund.thread.count > applicationForm.threadsId.applying.length
+                    +ds(`附带的帖子数未达到最低要求(至少${fund.thread.count}篇)`)
+                  if !disabledSubmit
+                    h3.greenFontColor.text-center 信息录入完整,可提交申请！
               hr
               .back-next
-                .apply-next(onclick=`submitEnsureUsersMessages(${applicationForm._id})`) 提交申请
+                if disabledSubmit
+                  .apply-next.disabled(style='background-color: #aaa' onclick='screenTopWarning("请先完善申请表再点击提交！")') 提交申请
+                else
+                  .apply-next(onclick=`submitApplicationForm()`) 提交申请
+            -let funSave, funNext;
+            if s !== 5
+              if s === 1
+                -funSave = `saveApplicationMethod()`;
+                -funNext = `submitApplicationMethod()`;
+              if s === 2
+                -funSave = `saveApplicantMessages()`;
+                -funNext = `submitApplicantMessages()`;
+              if s === 3
+                -funSave = `saveProject()`;
+                -funNext = `toEditor()`;
+              if s === 4
+                -funSave = `saveOtherMessages()`;
+                -funNext = `submitOtherMessages()`;
+              hr
+              .back-next
+                .last
+                  .apply-next(onclick=funSave) 保存
+                .next
+                  .apply-next(onclick=funNext) 下一步
+
 
 
 

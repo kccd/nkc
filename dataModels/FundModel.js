@@ -125,6 +125,10 @@ const fundSchema = new Schema({
 			index: 1
 		}
 	},
+	applicationCountLimit: { // 年申请次数限制
+		type: Number,
+		default: 2
+	},
 	supportCount: {
 		type: Number,
 		default: 0
@@ -166,8 +170,10 @@ fundSchema.pre('save', function(next){
   next();
 });
 
-fundSchema.methods.ensurePermission = async function(user) {
+fundSchema.methods.ensureUserPermission = async function(user) {
 	const UsersPersonalModel = require('./UsersPersonalModel');
+	const FundApplicationFormModel = require('./FundApplicationFormModel');
+	const moment = require('moment');
 	const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
 	const userAuthLevel = await userPersonal.getAuthLevel();
 	const {authLevel, userLevel, postCount, threadCount, timeToRegister} = this.applicant;
@@ -176,6 +182,17 @@ fundSchema.methods.ensurePermission = async function(user) {
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
 	if(authLevel > userAuthLevel) throw '身份认证等级未满足最低要求';
+	const year = parseInt(moment().format('YYYY'));
+	const applicationForms = await FundApplicationFormModel.find({uid: user.uid, 'status.completed': true, fundId: this._id});
+	if(applicationForms.length !== 0) {
+		let n = 0;
+		for(let a of applicationForms) {
+			const time = new Date(a.toc).getFullYear();
+			if(time === year) n++;
+		}
+		if(n >= this.applicationCountLimit) throw '今年您申请该基金的次数已超过限制，欢迎明年再次申请！';
+	}
+	//display, conflict
 };
 
 const FundModel = mongoose.model('funds', fundSchema);

@@ -8,7 +8,7 @@ photoSmallRouter
 		const {id} = ctx.params;
 		const photo = await db.PhotoModel.findOnly({_id: id});
 		if(photo.uid !== user.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
-		ctx.filePath = photoSmallPath + '/' + photo._id + '.jpg';
+		ctx.filePath = photoSmallPath + photo.path;
 		await next();
 	});
 module.exports = photoSmallRouter;

@@ -39,23 +39,21 @@
         p.fund-description 2、概述您的科技活动，让网友能够增长这方面的知识，并了解来龙去脉。
         textarea.fund-textarea#description(placeholder='介绍一下自己')!= options.description || ''
       .col-xs-12.col-md-12
+        if data.lifePhotos.length === 0 && applicant.lifePhotos.length === 0
+          span.fund-span.transparent(style="margin-left: 0;" onclick='window.location.href="/set/album"') 未上传生活照，去上传
         span.fund-span.transparent(style="margin-left: 0;" onclick='displayPopupPanel()') 选择生活照
-        span.fund-span.transparent(style="margin-left: 0;" onclick='saveApplicantMessages()') 保存
       .col-xs-12.col-md-12
-        if data.lifePhotos.length === 0
-          span 暂未上传生活照，
-          a(href='/set/album' target='_blank') 去上传
+        if applicant.lifePhotos.length === 0
+          span 暂未选择生活照
         else
-          if applicant.lifePhotos.length === 0
-            span 暂未选择生活照
-          else
-            span 已选择生活照
-          .photo-selected
-            .row
-              -for(let i = 0; i < applicant.lifePhotos.length; i++)
-                .col-xs-12.col-md-4.photo-content
-                  .glyphicon.glyphicon-remove.delete-photo(onclick=`removePhoto(${applicant.lifePhotos[i]})`)
-                  img(src= `/photo_small/${applicant.lifePhotos[i]}` photoId=applicant.lifePhotos[i])
+          span 已选择生活照
+        .photo-selected
+          .row
+            -for(let i = 0; i < applicant.lifePhotos.length; i++)
+              -const photo = applicant.lifePhotos[i];
+              .col-xs-12.col-md-4.photo-content
+                .glyphicon.glyphicon-remove.delete-photo(onclick=`removePhoto(${photo._id})`)
+                img(src= `/photo_small/${photo._id}` photoId=photo._id )
       .popupPanel.disabled
         .popupPanel-body
           .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
@@ -63,7 +61,7 @@
           span 至少选择一张
           .popupPanel-content
             .fund-photo-list
-              if data.lifePhotos.lenght === 0
+              if data.lifePhotos.length === 0
                 br
                 h4.text-center 未上传任何照片
                   a(href="/set/album" target="_blank") 去上传

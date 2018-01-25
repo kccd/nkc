@@ -199,6 +199,9 @@ input[type="radio"], input[type="checkbox"]{
 .back-next > .apply-next:hover{
   background-color: #1b7995;
 }
+.back-next > .apply-next.disabled, .back-next > .apply-next.disabled:hover{
+  background-color: #aaa;
+}
 .fund-nav{
   overflow: hidden;
 }
@@ -439,6 +442,10 @@ input[type="radio"], input[type="checkbox"]{
   background-color: #2aabd2;
   border: 1px solid #efefef;
   color: #fff;
+}
+.choose-content-div.disabled, .choose-content-div.disabled:hover{
+  background-color: #aaa;
+  cursor: default;
 }
 .nav-link > ul{
   padding: 0;
@@ -972,17 +979,22 @@ input[type="radio"], input[type="checkbox"]{
   color: #333;
 }
 .aForm .title{
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 }
 .aForm .content{
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #999;
   text-align: center;
 }
 .aForm-body{
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
-
+#projectContent{
+  font-size: 1.6rem;
+}
+#projectTitle{
+  font-size: 2.4rem;
+}
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;

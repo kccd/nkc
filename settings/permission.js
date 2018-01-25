@@ -417,7 +417,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*photo: {
+      photo: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
@@ -525,7 +525,7 @@ const certificates ={
 		    [parameter]: {
 			    [DELETE]: true
 		    }
-	    }*/
+	    }
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -761,7 +761,7 @@ const certificates ={
           [POST]: true
         }
       },
-     /* fund: {
+      fund: {
         [POST]: true,
 	      m: {
 		      [name]:'基金管理页面',
@@ -792,7 +792,7 @@ const certificates ={
 			    [PATCH]: true,
 			    [DELETE]: true
 		    }
-	    }*/
+	    }
     }
   }
 };
