@@ -358,7 +358,6 @@ function onPost(that) {
     } else {
       jwarning('未知的请求类型： ');
     }
-    console.log(post);
     return nkcAPI(url, method, data)
       .then(function (result) {
         if(result.redirect) {

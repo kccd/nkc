@@ -21,6 +21,10 @@ const photoSchema = new Schema({
 		required: true,
 		index: 1
 	},
+	path: {
+		type: String,
+		required: true
+	},
   size: {
     type: Number,
     required: true
@@ -132,9 +136,8 @@ photoSchema.methods.removeReference = async function() {
 
 photoSchema.post('remove', async function(photo) {
 	const {photoPath, photoSmallPath} = require('../settings/upload');
-	const {_id} = photo;
-	await unlink(photoPath+'/'+_id+'.jpg');
-	await unlink(photoSmallPath+'/'+_id+'.jpg');
+	await unlink(photoPath + this.path);
+	await unlink(photoSmallPath + this.path);
 });
 
 const PhotoModel = mongoose.model('photos', photoSchema);

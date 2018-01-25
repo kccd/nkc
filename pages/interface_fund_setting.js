@@ -310,17 +310,18 @@ function submit(id) {
 		}
 	}
   if(!checkMoney()) return window.location.href = '#fundMoney';
-  if($('#userLevel').val() > 0) fundObj.applicant.userLevel = $('#userLevel').val();
-  if($('#threadCount').val() > 0) fundObj.applicant.threadCount = $('#threadCount').val();
-  if($('#postCount').val() > 0) fundObj.applicant.postCount = $('#postCount').val();
-  if($('#timeToRegister').val() > 0) fundObj.applicant.timeToRegister = $('#timeToRegister').val();
-  if($('#supportCount').val() > 0) fundObj.supportCount = $('#supportCount').val();
-  if($('#attachmentsThreads').val() > 0) fundObj.thread.count = $('#attachmentsThreads').val();
-  if($('#attachmentsPapers').val() > 0) fundObj.paper.count = $('#attachmentsPapers').val();
-  if($('#timeOfPublicity').val() > 0) fundObj.timeOfPublicity = $('#timeOfPublicity').val();
-  if($('#reviseCount').val() > 0) fundObj.reviseCount = $('#reviseCount').val();
-  if($('#applicantAuthLevel').val() >= 0) fundObj.applicant.authLevel = $('#applicantAuthLevel').val();
-  if($('#memberAuthLevel').val() >= 0) fundObj.member.authLevel = $('#memberAuthLevel').val();
+  fundObj.applicant.userLevel = $('#userLevel').val();
+  fundObj.applicant.threadCount = $('#threadCount').val();
+  fundObj.applicant.postCount = $('#postCount').val();
+  fundObj.applicant.timeToRegister = $('#timeToRegister').val();
+  fundObj.supportCount = $('#supportCount').val();
+  fundObj.thread.count = $('#attachmentsThreads').val();
+  fundObj.paper.count = $('#attachmentsPapers').val();
+  fundObj.timeOfPublicity = $('#timeOfPublicity').val();
+  fundObj.reviseCount = $('#reviseCount').val();
+  fundObj.applicant.authLevel = $('#applicantAuthLevel').val();
+  fundObj.member.authLevel = $('#memberAuthLevel').val();
+  fundObj.applicationCountLimit = $('#applicationCountLimit').val();
   fundObj.censor.appointed = $('#fundCensorAppointed').val();
   fundObj.description.brief = $('#briefDescription').val();
   fundObj.description.detailed = $('#detailedDescription').val();

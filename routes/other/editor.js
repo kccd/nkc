@@ -26,7 +26,9 @@ editorRouter
     } else if(type === 'application') {
     	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: id});
     	if(cat === 'p') {
-		    data.original_post = await applicationForm.extendProject();
+    		const project = await applicationForm.extendProject();
+    		data.title = project.t;
+    		data.content = project.c;
 	    }
 	    return await next();
     }
