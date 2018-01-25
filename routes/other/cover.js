@@ -25,7 +25,11 @@ router
       await thread.firstPost.extendResources();
       const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png'].indexOf(e.ext) > -1);
       if(cover) {
-        await coverify(path.join(uploadPath, cover.path), `${coverPath}/${tid}.jpg`);
+        await coverify(path.join(uploadPath, cover.path), `${coverPath}/${tid}.jpg`)
+          .catch(e => {
+            thread.hasCover = false;
+            return thread.save()
+          });
       } else {
         thread.hasCover = false;
         await thread.save();
