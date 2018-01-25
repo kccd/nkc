@@ -61,6 +61,10 @@ const threadSchema = new Schema({
     type: String,
     required: true
   },
+  hasCover: {
+    type: Boolean,
+    default: true
+  },
   oc: {
     type: String,
     default: '',

@@ -8,28 +8,24 @@ resourceRouter
   })
   .get('/:rid', async (ctx, next) => {
     const {rid} = ctx.params;
-    const {data, db, fs} = ctx;
+    const {data, db, fs, settings} = ctx;
+    const {cache} = settings;
     const resource = await db.ResourceModel.findOnly({rid});
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
     if(!extArr.includes(resource.ext) && data.userLevel < 1) ctx.throw(401, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
-    let filePath = ctx.settings.upload.uploadPath + '/' + path;
-    try {
-	    await fs.access(filePath);
-    } catch(e) {
-	    filePath = ctx.settings.upload.uploadPath + path;
-    }
+    let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
     if(extArr.includes(resource.ext)) {
       try{
         await fs.access(filePath);
-      } catch(e){
+      } catch(e) {
       	filePath = ctx.settings.statics.defaultImageResourcePath;
       }
+      ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
     }
     ctx.filePath = filePath;
     ctx.resource = resource;
     ctx.type = ext;
-    ctx.set('Accept', 'application/*');
     await next()
   })
   .post('/', async (ctx, next) => {

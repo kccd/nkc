@@ -1,7 +1,9 @@
 const Router = require('koa-router');
 const router = new Router();
-const {upload} = require('../../settings');
+const {upload, cache} = require('../../settings');
 const {siteSpecificPath} = upload;
+const {stat} = require('fs');
+const {promisify} = require('util');
 
 router
   .get('/site_specific/', async (ctx, next) => {
@@ -12,8 +14,11 @@ router
     const {fs} = ctx;
     const {fileName} = ctx.params;
     const url = `${siteSpecificPath}/${fileName}`;
-    await fs.access(url);
+    const stats = await promisify(stat)(url);
+    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
+    const [name, ext] = fileName.split('.');
     ctx.filePath = url;
+    ctx.type = ext;
     await next()
   })
   .get('/site_specific/forum_icon/:fileName', async (ctx, next) => {
@@ -21,7 +26,10 @@ router
     const {fileName} = ctx.params;
     const url = `${siteSpecificPath}/forum_icon/${fileName}`;
     await fs.access(url);
+    const [name, ext] = fileName;
+    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
     ctx.filePath = url;
+    ctx.type = ext;
     await next();
   });
 

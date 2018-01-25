@@ -4,6 +4,7 @@ const {mkdirSync} = require('fs');
 
 const uploadDir = path.resolve('tmp');
 const uploadPath = path.resolve('resources/upload');
+const coverPath = path.join(__dirname, '../resources/cover');
 const pfBannerPath = path.resolve('resources/pf_banners');
 const pfAvatarPath = path.resolve('resources/pf_avatars');
 const avatarPath = path.resolve('resources/newavatar');
@@ -70,11 +71,16 @@ module.exports = {
 	  fundBGISmall: {
     	width: 320,
 		  height: 144
-	  }
+	  },
+    cover: {
+      width: 640,
+      height: 480
+    }
   },
 	count: {
   	lifePhoto: 1000 //生活照最多1000张
 	},
+  coverPath,
   uploadPath,
   pfBannerPath,
   pfAvatarPath,

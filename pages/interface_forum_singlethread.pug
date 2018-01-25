@@ -98,8 +98,8 @@
 //
 
 -const showTicks = data.userLevel > 4 && data.forum
--const {firstPost, lastPost} = thread
--const {t, resources, toc, tid} = firstPost;
+-const {firstPost, lastPost, tid, hasCover} = thread
+-const {t, toc} = firstPost;
 -const targetUser = firstPost.user;
 -const {_cid} = data;
 -let childrenForum;
@@ -152,23 +152,18 @@
         span(style='padding-left: 0.5rem; padding-right: 0.5rem; margin: 0.3rem; background-color: #04A5EA; color: white; border-radius: 0.4rem;') ...
     input.ThreadCheckboxes(id=`${tid}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
   .new-content-body
-    -let imgId, heightType = 'max-height';
-    -const imgArr = ['jpg', 'png', 'jpeg'];
-    -for(let r of resources)
-      if(imgArr.includes(r.ext))
-        -imgId = r.rid;
-        -break;
-    if imgId
+    -let heightType = 'max-height';
+    if hasCover
       -heightType = 'height';
-      .new-content-left.fixed-height(style=`background-image: url(/r/${imgId})`)
-    .new-content-right(class=imgId?'div-img': 'div-noImg')
+      .new-content-left.fixed-height(style=`background-image: url(/cover/${tid})`)
+    .new-content-right(class=hasCover?'div-img': 'div-noImg')
       div(style='width: 100%; float: left;')
-        p(class=imgId ? 'p-img' : 'p-noImg' style=`font-size: 16px;padding: 0 0.5rem 0 0.5rem;border-radius:0.5rem;float:left;${heightType}:4.1em;overflow:hidden;margin-bottom:0.2rem;`)
+        p(class=hasCover ? 'p-img' : 'p-noImg' style=`font-size: 16px;padding: 0 0.5rem 0 0.5rem;border-radius:0.5rem;float:left;${heightType}:4.1em;overflow:hidden;margin-bottom:0.2rem;`)
           -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
           -firstPost.c = filterQuote(firstPost.c)
           a(href=`/t/${tid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(firstPost))
       div(style='width: 100%; float: right;')
-        p(class=imgId?'p-img': 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: right; max-height: 3em; overflow: hidden; margin-left: 5rem; margin-top: 0.2rem; background-color: #f2f9ff;')
+        p(class=hasCover?'p-img': 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: right; max-height: 3em; overflow: hidden; margin-left: 5rem; margin-top: 0.2rem; background-color: #f2f9ff;')
           -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
           -lastPost.c = filterQuote(lastPost.c)
           a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))

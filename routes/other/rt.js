@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const RtRouter = new Router();
-const {upload, statics} = require('../../settings');
+const {upload, statics, cache} = require('../../settings');
 const {thumbnailPath} = upload;
 const {defaultThumbnailPath} = statics;
 RtRouter
@@ -22,6 +22,8 @@ RtRouter
       url = defaultThumbnailPath;
     }
     ctx.filePath = url;
+    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
+    ctx.type = extension;
     await next();
   });
 module.exports = RtRouter;

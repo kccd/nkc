@@ -2,16 +2,13 @@ const apiFn = require('../nkcModules').apiFunction;
 const {encodeRFC5987ValueChars} = apiFn;
 const path = require('path');
 module.exports = async (ctx, next) => {
-  const {filePath, resource, fs} = ctx;
-  if(filePath) {
-    const basename = path.basename(ctx.filePath);
-    let mtime;
-    try{
-      const fileMessage = await fs.stat(filePath);
-      mtime = fileMessage.mtime;
-    } catch (e) {
-      mtime = new Date();
+  const {filePath, resource, fs, type} = ctx;
+  if(type !== 'application/json') {
+    if(ctx.lastModified && ctx.fresh) {
+      ctx.status = 304;
+      return
     }
+    const basename = path.basename(ctx.filePath);
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
@@ -21,13 +18,7 @@ module.exports = async (ctx, next) => {
     } else {
       ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
     }
-    ctx.response.lastModified = mtime.toUTCString();
-    ctx.set('Cache-Control', 'max-age=0');
-    if (ctx.fresh) {
-      ctx.status = 304;
-      return;
-    }
-    ctx.body = fs.createReadStream(ctx.filePath);
+    ctx.body = fs.createReadStream(filePath);
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;

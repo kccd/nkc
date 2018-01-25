@@ -18,7 +18,10 @@ router
       ctx.filePath = url;
     } catch(e) {
       ctx.filePath = defaultPfAvatarPath;
+      ctx.lastModified = new Date(1999, 9, 9).toUTCString()
     }
+    ctx.type = 'jpg';
+    ctx.set('Cache-Control', 'public, no-cache');
     await next()
   })
   .post('/:uid',async (ctx, next) => {

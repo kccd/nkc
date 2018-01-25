@@ -75,6 +75,12 @@ const certificates ={
           [GET]: true
         }
       },
+      cover: {
+        [name]: '帖子封面',
+        [parameter]: {
+          [GET]: true
+        }
+      },
       f: {
         [name]: '板块',
         [GET]: true,

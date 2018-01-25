@@ -174,6 +174,15 @@ const removeFile = async path => {
   return promisify(unlink)(path);
 };
 
+const coverify = (path, output) => {
+  const {width, height} = sizeLimit.cover;
+  if(linux) {
+    return spawnProcess('convert', [
+      path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, output]);
+  }
+  return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, output]);
+};
+
 
 module.exports = {
   avatarify,
@@ -186,6 +195,7 @@ module.exports = {
   bannerify,
   npmInstallify,
   gitify,
+  coverify,
   photoify,
 	photoSmallify,
 	fundBGIify,

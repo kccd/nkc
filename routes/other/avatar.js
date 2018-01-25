@@ -12,13 +12,19 @@ router
   .get('/:uid', async (ctx, next) => {
     const {uid} = ctx.params;
     const {fs} = ctx;
+    let stat;
     try {
       const url = `${avatarPath}/${uid}.jpg`;
-      await fs.access(url);
+      stat = await fs.stat(url);
+      ctx.response.lastModified = stat.mtime.toUTCString();
+      ctx.set('Cache-Control', 'public, no-cache');
       ctx.filePath = url;
     } catch(e) {
       ctx.filePath = defaultAvatarPath;
+      ctx.response.lastModified = new Date(1999, 9, 9);
+      ctx.set('Cache-Control', 'public, no-cache');
     }
+    ctx.type = 'jpg';
     await next()
   })
   .post('/:uid', async (ctx, next) => {

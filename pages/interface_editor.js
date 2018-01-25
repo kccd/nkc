@@ -1,6 +1,7 @@
 $(function() {
   var editor = new Editor();
   editor.init();
+  window.editor = editor;
   var c = geid('content');
   var proxy = geid('proxy');
   proxy.addEventListener('click', function(e) {

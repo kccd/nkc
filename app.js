@@ -5,7 +5,11 @@ const path = require('path');
 const koaBody = require('koa-body');
 const settings = require('./settings');
 const staticServe = path => {
-  return require('koa-static')(path, settings.cache);
+  return require('koa-static')(path, {
+    setHeaders: function(response, path, stats) {
+      response.setHeader('Cache-Control', 'public, no-cache')
+    }
+  });
 };
 const app = new Koa();
 const {mkdirSync} = require('fs');

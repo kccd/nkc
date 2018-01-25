@@ -29,6 +29,7 @@ const photoSmallRouter = require('./photo_small');
 const fundBGIRouter = require('./fundBGI');
 const fundBGISmallRouter = require('./fundBGI_small');
 const authRouter = require('./auth');
+const coverRouter = require('./cover');
 // -----------------------------------
 otherRouter
   .get('/latest', async (ctx, next) => {
@@ -152,5 +153,6 @@ otherRouter
 	.use('fundBGI', fundBGIRouter.routes(), fundBGIRouter.allowedMethods())
 	.use('fundBGI_small', fundBGISmallRouter.routes(), fundBGISmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
+  .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());
 module.exports = otherRouter;
