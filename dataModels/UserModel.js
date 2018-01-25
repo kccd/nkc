@@ -224,10 +224,10 @@ userSchema.methods.getUnCompletedFundApplication = async function() {
 	}));
 	for(let application of userApplications) {
 		const {status, _id, fund} = application;
-		const {adminAgree, complete, submitted} = status;
+		const {adminSupport, complete, submitted} = status;
 		if(submitted === null) {
 			message.unSubmitted =_id;
-		} else if(adminAgree !== true) {
+		} else if(adminSupport !== true) {
 			message.unPassed =application._id;
 		} else if(complete === null) {
 			if(fund.conflict.self === true) { // 申请相同的基金且未完成的基金项目设置了与自己互斥

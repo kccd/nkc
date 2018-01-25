@@ -112,17 +112,12 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-	  usersMessagesPassed: { // 申请人信息审核通过
-		  type: Boolean,
-		  default: null,
-		  index: 1
-	  },
     projectPassed: { // 项目审核通过
       type:Boolean,
       default: null,
       index: 1
     },
-    adminAgree: { // 管理员同意
+    adminSupport: { // 管理员同意
       type: Boolean,
       default: null,
       index: 1
@@ -186,7 +181,16 @@ const fundApplicationFormSchema = new Schema({
     type: [String],
     default: [],
     index: 1
-  }
+  },
+	remittance: {
+  	/*
+  	* status: null, true, false
+  	* money: number
+  	* article: id 阶段性报告
+  	* */
+  	type: [Schema.Types.Mixed],
+		default: []
+	}
 }, {
   collection: 'fundApplicationForms',
 	toObject: {

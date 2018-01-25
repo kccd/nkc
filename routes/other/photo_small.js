@@ -7,7 +7,11 @@ photoSmallRouter
 		const {user} = data;
 		const {id} = ctx.params;
 		const photo = await db.PhotoModel.findOnly({_id: id});
-		if(photo.uid !== user.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(photo.type === 'fund') {
+			// const applicationForm = db.FundApplicationFormModel.findOnly({_id: photo.applicationFormId});
+		} else if(photo.uid !== user.uid && userLevel < 7) {
+			ctx.throw(401, '权限不足');
+		}
 		ctx.filePath = photoSmallPath + photo.path;
 		await next();
 	});

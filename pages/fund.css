@@ -21,7 +21,6 @@ a:focus{text-decoration: none}
   outline: none;
 }
 
-
 .fund-list{
   margin: 15px 0;
 }
@@ -502,8 +501,8 @@ input[type="radio"], input[type="checkbox"]{
   color: red;
 }
 .pay{
-  height: 4rem;
-  width: 4rem;
+  height: 48px;
+  width: 48px;
   background-image: url('/default/fund_pay.jpg');
   background-color: #aaa;
   background-repeat: no-repeat;
@@ -530,6 +529,69 @@ input[type="radio"], input[type="checkbox"]{
   text-align: center;
   font-weight: 100;
   font-size: 3rem;
+}
+
+@keyframes myfirst
+{
+  0% {line-height: 1.5;}
+  50% {line-height: 3;}
+  100% {line-height: 1.5;}
+}
+
+@-moz-keyframes myfirst /* Firefox */
+{
+  0% {line-height: 1.5;}
+  50% {line-height: 3;}
+  100% {line-height: 1.5;}
+}
+
+@-webkit-keyframes myfirst /* Safari 和 Chrome */
+{
+  0% {line-height: 1.5;}
+  50% {line-height: 3;}
+  100% {line-height: 1.5;}
+}
+
+@-o-keyframes myfirst /* Opera */
+{
+  0% {line-height: 0;}
+  50% {line-height: 2}
+  100% {line-height: 0}
+}
+
+.fund-apply-status ul li.next{
+  background-color: rgba(0,0,0,0);
+  color: #aaa;
+  font-size: 3rem;
+  animation: myfirst 1s;
+  -moz-animation: myfirst 1s;	/* Firefox */
+  -webkit-animation: myfirst 1s;	/* Safari 和 Chrome */
+  -o-animation: myfirst 1s;	/* Opera */
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.fund-apply-status ul{
+  overflow: hidden;
+  padding: 0 5rem;
+  margin: 0;
+}
+.fund-apply-status ul li{
+  line-height: 3rem;
+  height: 3rem;
+  text-align: center;
+  width: 100%;
+  list-style: none;
+  background-color: rgba(0,0,0,0.1);
+  font-size: 1.7rem;
+  color: #777;
+  margin: 1rem 0;
+}
+.fund-apply-status ul li.passed{
+  background-color: #5cb85c;
+  color: #fff;
 }
 .fund-li{
   padding: 0.8rem 0;
@@ -885,7 +947,7 @@ input[type="radio"], input[type="checkbox"]{
 }
 .paymenMethods > div{
   height: 100%;
-  width: 4rem;
+  width: 48px;
   float: left;
   margin: 0 1.9rem;
   text-align: center;

@@ -21,6 +21,10 @@ const photoSchema = new Schema({
 		required: true,
 		index: 1
 	},
+	applicationFormId: {
+		type: Number,
+		default: null
+	},
 	path: {
 		type: String,
 		required: true

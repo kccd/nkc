@@ -216,6 +216,8 @@ block content
                       -for(let u of agreeIsFalse)
                         a(href=`/m/${u.uid}`)= u.user.username
                         span &nbsp;&nbsp;&nbsp;
+                    if agreeIsTrue.length === 0
+                      +ds('暂未有好友接受邀请')
                   if applicationForm.from === 'personal'
                     if !fund.applicationMethod.individual
                       +ds('该基金不允许个人申请')

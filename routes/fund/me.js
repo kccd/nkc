@@ -17,7 +17,7 @@ meRouter
 			'status.submit': true
 		};
 		if(type === 'applying') { // 正在申请的
-			q['status.adminAgree'] = {$ne: true};
+			q['status.adminSupport'] = {$ne: true};
 		} else if (type === 'invalid') { // 无效的
 			q = {
 				$or: [
