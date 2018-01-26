@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
-const {statics} = require('../../settings');
+const {statics, cache} = require('../../settings');
 const {defaultPath} = statics;
 router
   .get('/', async (ctx, next) => {

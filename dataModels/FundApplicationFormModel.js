@@ -149,15 +149,13 @@ const fundApplicationFormSchema = new Schema({
 		index: 1
 	},
   lock: {
-    status: {
-      type: Number,
-      default: 0, // 0未提交， 1已提交， 2正在审批， 3审核完成
-      index: 1
+    auditing: {
+      type: Boolean,
+      default: false,
     },
     uid: {
       type: String,
-      default: '',
-      index: 1
+      default: null,
     },
     timeToOpen: {
       type: Date,
@@ -172,12 +170,12 @@ const fundApplicationFormSchema = new Schema({
   	type: Number,
 		default: 0
 	},
-  supporter: {// 支持的人
+  supportersId: {// 支持的人
     type: [String],
     default: [],
     index: 1
   },
-  objector: { // 反对的人
+  objectorsId: { // 反对的人
     type: [String],
     default: [],
     index: 1
@@ -285,9 +283,9 @@ fundApplicationFormSchema.methods.extendFund = async function() {
 };
 
 fundApplicationFormSchema.methods.extendProject = async function() {
-	const DocumentModel = require('./DocumentModel');
+	const FundDocumentModel = require('./FundDocumentModel');
 	if(this.projectId === null) return null;
-	const project = await DocumentModel.findOne({_id: this.projectId});
+	const project = await FundDocumentModel.findOne({_id: this.projectId});
 	return this.project = project;
 };
 
@@ -309,11 +307,11 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 };
 
 fundApplicationFormSchema.methods.newProject = async function(project) {
-	const DocumentModel = require('./DocumentModel');
+	const FundDocumentModel = require('./FundDocumentModel');
 	const SettingModel = require('./SettingModel');
 	const id = await SettingModel.operateSystemID('documents', 1);
 	const {t, c} = project;
-	const newDocument = new DocumentModel({
+	const newDocument = new FundDocumentModel({
 		_id: id,
 		t,
 		c,
@@ -324,6 +322,26 @@ fundApplicationFormSchema.methods.newProject = async function(project) {
 	});
 	await newDocument.save();
 	return this.project = newDocument;
+};
+
+fundApplicationFormSchema.methods.newComment = async function(comment) {
+	const FundDocumentModel = require('./FundDocumentModel');
+	const SettingModel = require('./SettingModel');
+	const id = await SettingModel.operateSystemID('documents', 1);
+	const {t, c, userType, uid, support} = project;
+	const newDocument = new FundDocumentModel({
+		_id: id,
+		t,
+		c,
+		uid,
+		userType,
+		support,
+		applicationFormsId: this._id,
+		type: 'comment',
+		l: 'pwbb',
+	});
+	await newDocument.save();
+	return newDocument;
 };
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {

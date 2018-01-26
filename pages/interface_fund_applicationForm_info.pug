@@ -1,4 +1,12 @@
 -let aggregate = 0;
+-let identity;
+-const membersId = applicationForm.members.map(m => m.uid);
+if applicationForm.uid === user.uid || data.userLevel >= 7
+  -identity = 'selfOrAdmin';
+else if membersId.includes(user.uid)
+  -identity = 'member';
+else
+  -identity = 'ordinary';
 if fund.money.max === null
   -aggregate = fund.money.fixed;
 else
@@ -49,15 +57,18 @@ mixin head(value)
     +list('申请时间', applicationForm.toc.toLocaleDateString())
     +head('申请人信息')
     +list('真实姓名', applicationForm.applicant.name)
-    +list('电话号码', applicationForm.applicant.mobile)
-    +list('身份证号码', applicationForm.applicant.idCardNumber)
-    -let method;
-    if applicationForm.account.paymentMethod === 'alipay'
-      -method = '支付宝';
-    if applicationForm.account.paymentMethod === 'wechat'
-      -method = '微信';
-    +list('收款方式', method)
-    +list('收款账号', applicationForm.account.number)
+    if identity === 'selfOrAdmin'
+      +list('电话号码', applicationForm.applicant.mobile)
+      +list('身份证号码', applicationForm.applicant.idCardNumber)
+      -let method;
+      if applicationForm.account.paymentMethod === 'alipay'
+        -method = '支付宝';
+      else if applicationForm.account.paymentMethod === 'wechat'
+        -method = '微信';
+      else
+        -method = '暂未填写';
+      +list('收款方式', method)
+      +list('收款账号', applicationForm.account.number)
     .col-xs-12.col-md-12.aForm-body
       .col-xs-3.col-md-3
         .title= `自我介绍：`

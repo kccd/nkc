@@ -14,6 +14,10 @@ photoRouter
 			ctx.throw(401, '权限不足');
 		}
 		ctx.filePath = photoPath + photo.path;
+		ctx.set('Cache-Control', 'public, no-cache');
+		const tlm = await ctx.fs.stat(ctx.filePath);
+		ctx.lastModified = new Date(tlm.mtime).toUTCString();
+		ctx.type = 'jpg';
 		await next();
 	})
   .post('/', async (ctx, next) => {

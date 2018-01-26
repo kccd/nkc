@@ -26,12 +26,12 @@ const documentSchema = new Schema({
 		required: true,
 		index: 1
 	},
-	userType: {// userCensor, projectCensor, common, self
+	userType: {// userCensor, projectCensor, ordinary, self
 		type: String,
 		default: null,
 		index: 1
 	},
-	agree: {
+	support: {
 		type: Boolean,
 		default: null,
 		index: 1
@@ -57,8 +57,9 @@ const documentSchema = new Schema({
 		type: Number,
 		default: null,
 		index: 1
-	},
-
+	}
+}, {
+	collection: 'fundDocuments'
 });
 
 documentSchema.pre('save', function(next) {
@@ -70,5 +71,5 @@ documentSchema.pre('save', function(next) {
 	}
 });
 
-const DocumentModel = mongoose.model('documents', documentSchema);
-module.exports = DocumentModel;
+const FundDocumentModel = mongoose.model('fundDocuments', documentSchema);
+module.exports = FundDocumentModel;

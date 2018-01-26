@@ -12,7 +12,25 @@ block content
         .col-xs-12.col-md-8
           include interface_fund_applicationForm_info
         .col-xs-12.col-md-4
-          .row
+          if !applicationForm.status.submitted
+            -let flag = false;
+            -const membersId = applicationForm.members.map(m => m.uid) || [];
+            if membersId.includes(user.uid) && user.uid !== applicationForm._id
+              h4=`来自${applicationForm.applicant.user.username}的组队邀请：`
+              -for(let aUser of applicationForm.members)
+                if aUser.uid === user.uid
+                  case aUser.agree
+                    when false
+                      h3 您已拒绝邀请
+                    when true
+                      h3 您已接受邀请
+                    when null
+                      h4.text-center
+                        br
+                        a(href=`javascript: agree(${applicationForm._id})`)=`立即接受`
+                        span &nbsp;&nbsp;&nbsp;&nbsp;
+                        a(href=`javascript: disagree(${applicationForm._id})`)=`残忍拒绝`
+          else
             .fund-apply-status
               ul
                 mixin pointer(s1, s2 , text)
@@ -23,7 +41,7 @@ block content
                       sapn.glyphicon.glyphicon-menu-down
                 -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = applicationForm.status;
                 +pointer(submitted, usersSupport, '提交申请')
-                +pointer(usersSupport, projectPassed, '网友支持')
+                +pointer(usersSupport, projectPassed, `网友支持(${fund.supportCount})`)
                 +pointer(projectPassed, adminSupport,'项目审核')
                 -const count = applicationForm.remittance.length;
                 if count > 0
@@ -36,11 +54,16 @@ block content
                   -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
                   +pointer(lastRemittance.status, completed, `第${count}期放款（${lastRemittance.money}元）`)
                 else
-                  +pointer(adminSupport, remittance, '放款')
+                  +pointer(remittance, completed, '放款')
                 if completed
                   li.passed 完成
                 else
                   li 完成
+            h4.text-center
+              br
+              a(href=`javascript: support(${applicationForm._id})`)=`支持（${applicationForm.supportersId?applicationForm.supportersId.length: 0}）`
+              span &nbsp;&nbsp;&nbsp;&nbsp;
+              a(href=`javascript: against(${applicationForm._id})`)=`反对（${applicationForm.objectorsId?applicationForm.objectorsId.length: 0}）`
 
 
 block scripts

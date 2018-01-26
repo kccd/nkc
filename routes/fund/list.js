@@ -52,34 +52,33 @@ listRouter
 		const fund = await db.FundModel.findOnly({_id: fundId, display: true});
 		data.fund = fund;
 		let query = {
-			disabled: false
+			useless: {$ne: 'disabled'},
+			'status.submitted': true,
+			fundId: fund._id
 		};
-		if(type === 'excellent') { // 优秀的项目
-			query = {
-				'status.excellent': true
-			};
-		} else if(type === 'completed'){ // 已完成的项目
-			query = {
-				'status.completed': true
-			};
-		} else if(type === 'passed') { // 资助中
-			query = {
-				'status.remittance': true
-			}
-		} else if(type === 'applying') { // 正在申请
-			query = {
-				'lock.status': {$ne: 0},
-				'status.adminSupport': {$ne: true}
-			}
+		if(type === 'excellent') { // 优秀项目
+			query['status.excellent'] = true;
+		} else if(type === 'completed'){ // 已完成
+			query['status.completed'] = true;
+		} else if(type === 'funding') { // 资助中
+			query['status.complete'] = {$ne: true};
+			query['status.remittance'] = true;
+		} else if(type === 'applying') { // 审核中
+			query['status.remittance'] = {$ne: true};
 		} else { // 全部
-			query = {
-				'lock.status': {$ne: 0},
-			};
+
 		}
 		const length = await FundApplicationFormModel.count(query);
 		const paging = apiFn.paging(page, length);
-		data.applications = await FundApplicationFormModel.find(query).skip(paging.start).limit(paging.perpage);
-		data.message = await user.getUnCompletedFundApplication();
+		const applicationForms = await FundApplicationFormModel.find(query).skip(paging.start).limit(paging.perpage);
+		data.applicationForms = await Promise.all(applicationForms.map(async a => {
+			await a.extendApplicant();
+			await a.extendMembers();
+			await a.extendProject();
+			return a;
+		}));
+		//改由前端判断
+		data.message = await user.getConflictingApplicationForm();
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		data.authLevel = await userPersonal.getAuthLevel();
 		ctx.template = 'interface_fund_messages.pug';
@@ -111,15 +110,15 @@ listRouter
 		const fund = await db.FundModel.findOnly({_id: fundId, display: true});
 		data.fund = fund;
 		ctx.template = 'interface_fund_agreement.pug';
-		const message = await user.getUnCompletedFundApplication();
 		try {
 			await fund.ensureUserPermission(user);
 		} catch(e) {
 			ctx.throw(401, e);
 		}
-		if(message) {
-			data.message = message;
-			return await next();
+		const message = await user.getConflictingApplicationForm();
+		const {unSubmitted, unPassed, unCompleted} = message;
+		if(unSubmitted.length !== 0 || unPassed.length !== 0 || unCompleted.length !== 0) {
+			ctx.throw(401, '您还有未完成的基金申请！');
 		}
 		if(agree !== 'true') {
 			return await next();
@@ -146,7 +145,7 @@ listRouter
 			authLevel
 		});
 		await newApplicationUser.save();
-		ctx.redirect(`/fund/a/${applicationForm._id}/settings`);
+		ctx.redirect(`/fund/a/${applicationForm._id}/settings`, 301);
 		await next();
 	});
 module.exports = listRouter;
