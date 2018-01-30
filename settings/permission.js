@@ -468,8 +468,14 @@ const certificates ={
 							[GET]: true
 			      },
 			      member: {
-        			[GET]: true,
 				      [PATCH]: true
+			      },
+			      vote: {
+        			[POST]: true
+			      },
+			      audit: {
+				      [GET]: true,
+				      [POST]: true
 			      }
 		      }
 	      },

@@ -2,45 +2,100 @@ extends bootstrap_base
 block title
   -const mainContainer1400 = true
   -const applicationForm = data.applicationForm;
+  -const comments = applicationForm.comments;
   -const fund = applicationForm.fund;
   title= `科创基金-${fund.name}`
   link(rel='stylesheet' href='/fund.css')
 block content
   .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
     .row
       .col-xs-12.col-md-12
-        .col-xs-12.col-md-8
+        .col-xs-12.col-md-9
           include interface_fund_applicationForm_info
-        .col-xs-12.col-md-4
           .row
-            .fund-apply-status
-              ul
-                mixin pointer(s1, s2 , text)
-                  -const passed = s1? 'passed': '';
-                  li(class=passed)= text
-                  if(s1 === true && s2 !== true)
-                    li.next
-                      sapn.glyphicon.glyphicon-menu-down
-                -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = applicationForm.status;
-                +pointer(submitted, usersSupport, '提交申请')
-                +pointer(usersSupport, projectPassed, '网友支持')
-                +pointer(projectPassed, adminSupport,'项目审核')
-                -const count = applicationForm.remittance.length;
-                if count > 0
-                  +pointer(adminSupport, applicationForm.remittance[0].status,'管理员审核')
-                  -for (let i = 0; i < applicationForm.remittance.length; i++)
-                    -const r = applicationForm.remittance[i];
-                    -const r2 = applicationForm.remittance[1+i];
-                    if r2
-                      +pointer(r.status, r2.status, `第${i+1}期放款（${r.money}元）`)
-                  -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
-                  +pointer(lastRemittance.status, completed, `第${count}期放款（${lastRemittance.money}元）`)
+            a.btn.btn-default(href='###') 去编辑器评论
+            -for (let comment of comments)
+              hr
+              .fund-comment
+                .comment-info
+                  span= comment.toc.toLocaleString()
+                  span &nbsp;
+                    a(href=`/m/${comment.user.uid}`)= comment.user.username
+                .comment-content
+                  div!= experimental_render(comment)
+        .col-xs-12.col-md-3
+          -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = applicationForm.status;
+          //无效的申请表
+          -const {useless} = applicationForm;
+          if useless !== null
+            h3.redFontColor.text-center 无效的基金申请表
+            if useless === 'revoked'
+              h4.text-center 申请表已被永久撤销
+            else if useless === 'exceededModifyCount'
+              h4.text-center 申请表修改次数已超过限制
+            else
+              h4.text-center 申请表已被封禁
+          else
+            // 队员点击同意
+            if !applicationForm.status.submitted
+              -let flag = false;
+              -const membersId = applicationForm.members.map(m => m.uid) || [];
+              if membersId.includes(user.uid) && user.uid !== applicationForm._id
+                h4.text-center=`组队邀请`
+                -for(let aUser of applicationForm.members)
+                  if aUser.uid === user.uid
+                    case aUser.agree
+                      when false
+                        h3.redFontColor.text-center 已拒绝
+                      when true
+                        h3.greenFontColor.text-center 已接受
+                      when null
+                        a(href=`javascript: agree(${applicationForm._id})`).btn.btn-default.btn-block=`立即接受`
+                        a(href=`javascript: disagree(${applicationForm._id})`).btn.btn-default.btn-block=`残忍拒绝`
+            else
+              .fund-apply-status
+                ul
+                  mixin pointer(s1, s2 , text)
+                    -const passed = s1? 'passed': '';
+                    li(class=passed)= text
+                    if(s1 === true && s2 !== true)
+                      li.next
+                        sapn.glyphicon.glyphicon-menu-down
+                  +pointer(submitted, usersSupport, '提交申请')
+                  +pointer(usersSupport, projectPassed, `网友支持(${fund.supportCount})`)
+                  +pointer(projectPassed, adminSupport,'项目审核')
+                  -const count = applicationForm.remittance.length;
+                  if count > 0
+                    +pointer(adminSupport, applicationForm.remittance[0].status,'管理员审核')
+                    -for (let i = 0; i < applicationForm.remittance.length; i++)
+                      -const r = applicationForm.remittance[i];
+                      -const r2 = applicationForm.remittance[1+i];
+                      if r2
+                        +pointer(r.status, r2.status, `第${i+1}期放款（${r.money}元）`)
+                    -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
+                    +pointer(lastRemittance.status, completed, `第${count}期放款（${lastRemittance.money}元）`)
+                  else
+                    +pointer(adminSupport, remittance,'管理员审核')
+                    +pointer(remittance, completed, '放款')
+                  if completed
+                    li.passed 完成
+                  else
+                    li 完成
+              // 申请者控制面板
+              if data.user.uid === applicationForm.applicant.uid
+                if submitted
+                  button(href='#' onclick=`revoked("cancel", ${applicationForm._id})`).btn.btn-default.btn-block= `撤回`
                 else
-                  +pointer(adminSupport, remittance, '放款')
-                if completed
-                  li.passed 完成
-                else
-                  li 完成
+                  a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-default.btn-block 去编辑
+                button(href='#' onclick=`revoked("revoked", ${applicationForm._id})`).btn.btn-default.btn-block= `取消申请`
+              a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId?applicationForm.supportersId.length: 0}）`
+              a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId?applicationForm.objectorsId.length: 0}）`
+              if projectPassed === false
+                div.redFontColor
+                  h4.text-center 项目审核不通过，等待申请者修改
+                  h5.text-center 原因
+                  p.text-center= data.auditComments[0].c
 
 
 block scripts

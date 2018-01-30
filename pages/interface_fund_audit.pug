@@ -1,0 +1,45 @@
+extends bootstrap_base
+block title
+  -const mainContainer1400 = true
+  -const applicationForm = data.applicationForm;
+  -const fund = applicationForm.fund;
+  -const type = data.type;
+  title= `科创基金-${fund.name}`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-8
+            if type === 'project'
+              .panel.panel-default
+                .panel-body
+                  -const project = applicationForm.project
+                  h2.text-center#projectTitle= project.t
+                  div#projectContent!= experimental_render(project)
+            else if type === 'admin'
+              include interface_fund_applicationForm_info
+          .col-xs-12.col-md-4
+            if type === 'admin'
+              h3 分批拨款
+              h4#total(money= applicationForm.money)= `总：${applicationForm.money}元`
+              h4#remainder= `余：${applicationForm.money}元`
+              p 输入数字以英文逗号 , 分隔
+              .form-group
+                input#remittance.btn-block()
+              .remittance
+
+            textarea.form-control#comment(rows='12' placeholder='审核评语')
+            label.radio-inline
+              input(type='radio' name='audit' checked=true)
+              h5 通过
+            label.radio-inline
+              input(type='radio' name='audit' checked=false)
+              h5 不通过
+            br
+            button.btn.btn-info.btn-block(onclick=`submit(${applicationForm._id}, "${type}")`) 提交
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_audit.js')

@@ -1,7 +1,11 @@
 extends bootstrap_base
 block title
   -const fund = data.fund;
-  -let applications;
+  -let applicationForms;
+  -let isCensor = true;
+  -for (let cert of fund.censor.certs)
+    if !data.user.certs.includes(cert) && !fund.censor.appointed.includes(data.user.uid)
+      -isCensor = false;
   title= fund.name
   link(rel='stylesheet' href='/fund.css')
 block content
@@ -24,17 +28,17 @@ block content
             ul.nav.nav-pills
               -const {type} = data;
               li(role="presentation" class=type === undefined ? 'active' : '')
-                a(href=`/fund/list/${fund._id}`) 全部项目
+                a(href=`/fund/list/${fund._id}`) 全部
               li(role="presentation" class=type === 'excellent' ? 'active' : '')
                 a(href=`/fund/list/${fund._id}?type=excellent`) 优秀项目
               li(role="presentation" class=type === 'completed' ? 'active' : '')
                 a(href=`/fund/list/${fund._id}?type=completed`) 已完成
-              li(role="presentation" class=type === 'passed'? 'active': '')
-                a(href=`/fund/list/${fund._id}?type=passed`) 资助中
-              li(role="presentation" class=type === 'applying'? 'active': '')
-                a(href=`/fund/list/${fund._id}?type=applying`) 正在申请
+              li(role="presentation" class=type === 'funding'? 'active': '')
+                a(href=`/fund/list/${fund._id}?type=funding`) 资助中
+              li(role="presentation" class=type === 'auditing'? 'active': '')
+                a(href=`/fund/list/${fund._id}?type=auditing`) 审核中
             hr
-            -applications = data.applications;
+            -applicationForms = data.applicationForms;
             include interface_fund_applicationList
       .col-xs-12.col-md-3
         .row
@@ -84,21 +88,30 @@ block content
                   -btnDisabled = true;
                   -link = '###';
                 -const {unPassed, unCompleted, unSubmitted} = data.message? data.message: {};
-                  if unSubmitted
+                  if unSubmitted.length !== 0
                     -btnDisabled = true;
                     -link = '###';
                     p 您还有未提交的基金项目，
-                      a(href=`/fund/a/${unSubmitted}/settings`) 查看
-                  else if unPassed
+                      a(href=`/fund/a/${unSubmitted[0]._id}/settings`) 查看
+                  else if unPassed.length !== 0
                     -btnDisabled = true;
                     -link = '###';
                     p 您还有未通过审核的基金项目，
-                      a(href=`/fund/a/${unPassed}`) 查看
-                  else if unCompleted
-                    -btnDisabled = true;
-                    -link = '###';
-                    p 您还有未完成的且与该基金不能同时申请的基金项目，
-                      a(href=`/fund/a/${unCompleted}`) 查看
+                      a(href=`/fund/a/${unPassed[0]._id}`) 查看
+                  else if unCompleted.length !== 0
+                    -for(let a of unCompleted)
+                      if a.fund.conflict.self === true && a.fund._id === fund._id
+                        -btnDisabled = true;
+                        -link = '###';
+                        p 该基金不允许同时提交多个申请，
+                          a(href=`/fund/a/${a._id}`) 查看
+                        -break;
+                      if a.fund.conflict.other === true && fund.conflict.other === true
+                        -btnDisabled = true;
+                        -link = '###';
+                        p 您还有未完成的且与该基金不能同时申请的基金项目，
+                          a(href=`/fund/a/${a._id}`) 查看
+                        -break;
                 a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
           .col-xs-12.col-md-12
             .panel.panel-default

@@ -4,7 +4,7 @@
 //   idCardNumber: String,
 //   members: Boolean,
 //   account: {
-//     paymentMethod: String,
+//     paymentType: String,
 //     number: String
 //   },
 //   description: String
@@ -27,9 +27,9 @@
           .paymenMethods
             div &nbsp;
             div 微信
-              .pay.wechat(class=options.account.paymentMethod === 'wechat'? 'active': '')
+              .pay.wechat(class=options.account.paymentType === 'wechat'? 'active': '')
             div 支付宝
-              .pay.alipay(class=options.account.paymentMethod === 'alipay'? 'active': '')
+              .pay.alipay(class=options.account.paymentType === 'alipay'? 'active': '')
         .col-xs-12.col-md-12
           span 收款账号：
           input.fund-input#account(placeholder='请输入收款账号' value=options.account.number || '')

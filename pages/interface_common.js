@@ -587,9 +587,9 @@ function userMessagesForm() {
 
 	if($('.wechat').length !== 0) {
 		if($('.wechat').hasClass('active')) {
-			obj.paymentMethod = 'wechat';
+			obj.paymentType = 'wechat';
 		} else if($('.alipay').hasClass('active')){
-			obj.paymentMethod = 'alipay';
+			obj.paymentType = 'alipay';
 		} else {
 			throw '请选择收款方式！';
 		}

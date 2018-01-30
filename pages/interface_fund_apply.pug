@@ -28,6 +28,7 @@ block content
                   li
                     a(href=`/fund/a/${applicationForm._id}/settings?s=${i + 1}` class='active')= arr[i].ch
             hr
+
             .fund-apply-head= arr[s-1].ch
             if s === 1
               .row(style='padding: 3rem 0;')
@@ -232,7 +233,7 @@ block content
                     +ds('请填写您的身份证号码')
                   if !applicationForm.applicant.mobile
                     +ds('请填写您的联系电话')
-                  if !applicationForm.account.paymentMethod
+                  if !applicationForm.account.paymentType
                     +ds('请选择收款方式')
                   if !applicationForm.account.number
                     +ds('请填写您的收款账号')
@@ -259,13 +260,13 @@ block content
                       else
                         if aggregate === 0
                           +ds('资金预算不能为0')
-
                         if aggregate > fund.money.max
                           +ds('资金预算金额已超过该基金项目单笔申请的最大金额')
                   if fund.thread.count > applicationForm.threadsId.applying.length
                     +ds(`附带的帖子数未达到最低要求(至少${fund.thread.count}篇)`)
-                  if !disabledSubmit
-                    h3.greenFontColor.text-center 信息录入完整,可提交申请！
+                  if !applicationForm.status.submitted
+                    if !disabledSubmit
+                      h3.greenFontColor.text-center 信息录入完整,可提交申请！
               hr
               .back-next
                 if disabledSubmit
@@ -282,7 +283,7 @@ block content
                 -funNext = `submitApplicantMessages()`;
               if s === 3
                 -funSave = `saveProject()`;
-                -funNext = `toEditor()`;
+                -funNext = `submitProject()`;
               if s === 4
                 -funSave = `saveOtherMessages()`;
                 -funNext = `submitOtherMessages()`;

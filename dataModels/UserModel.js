@@ -210,8 +210,12 @@ userSchema.methods.updateUserMessage = async function() {
   await this.update(updateObj);
 };
 
-userSchema.methods.getUnCompletedFundApplication = async function() {
-	const message = {};
+userSchema.methods.getConflictingApplicationForm = async function() {
+	const message = {
+		unSubmitted: [],// 未提交
+		unPassed: [], // 未通过
+		unCompleted: []// 未完成且冲突的申请
+	};
 	const FundApplicationFormModel = require('./FundApplicationFormModel');
 	const userQuery ={
 		uid: this.uid,
@@ -224,16 +228,16 @@ userSchema.methods.getUnCompletedFundApplication = async function() {
 	}));
 	for(let application of userApplications) {
 		const {status, _id, fund} = application;
-		const {adminSupport, complete, submitted} = status;
+		const {adminSupport, completed, submitted} = status;
 		if(submitted === null) {
-			message.unSubmitted =_id;
+			message.unSubmitted.push(application);
 		} else if(adminSupport !== true) {
-			message.unPassed =application._id;
-		} else if(complete === null) {
+			message.unPassed.push(application);
+		} else if(completed === null) {
 			if(fund.conflict.self === true) { // 申请相同的基金且未完成的基金项目设置了与自己互斥
-				message.unCompleted =_id;
+				message.unCompleted.push(application);
 			} else if(fund.conflict.other === true) { // 申请的基金项目与未完成的基金项目互斥
-				message.unCompleted= _id;
+				message.unCompleted.push(application);
 			}
 		}
 	}

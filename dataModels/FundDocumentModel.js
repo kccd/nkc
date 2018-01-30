@@ -26,12 +26,12 @@ const documentSchema = new Schema({
 		required: true,
 		index: 1
 	},
-	userType: {// userCensor, projectCensor, common, self
+	userType: {// userCensor, projectCensor, ordinary, self
 		type: String,
 		default: null,
 		index: 1
 	},
-	agree: {
+	support: {
 		type: Boolean,
 		default: null,
 		index: 1
@@ -57,9 +57,22 @@ const documentSchema = new Schema({
 		type: Number,
 		default: null,
 		index: 1
-	},
-
+	}
+}, {
+	collection: 'fundDocuments',
+	toObject: {
+		getters: true,
+		virtuals: true
+	}
 });
+
+documentSchema.virtual('user')
+	.get(function() {
+		return this._user;
+	})
+	.set(function(user) {
+		this._user = user
+	});
 
 documentSchema.pre('save', function(next) {
   try {
@@ -70,5 +83,11 @@ documentSchema.pre('save', function(next) {
 	}
 });
 
-const DocumentModel = mongoose.model('documents', documentSchema);
-module.exports = DocumentModel;
+documentSchema.methods.extendUser = async function() {
+	const UserModel = require('./UserModel');
+	const user = await UserModel.findOnly({uid: this.uid});
+	return this.user = user;
+};
+
+const FundDocumentModel = mongoose.model('fundDocuments', documentSchema);
+module.exports = FundDocumentModel;

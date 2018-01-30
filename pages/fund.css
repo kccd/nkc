@@ -575,7 +575,7 @@ input[type="radio"], input[type="checkbox"]{
 
 .fund-apply-status ul{
   overflow: hidden;
-  padding: 0 5rem;
+  padding: 0;
   margin: 0;
 }
 .fund-apply-status ul li{
@@ -1034,8 +1034,8 @@ input[type="radio"], input[type="checkbox"]{
   color: #fff;
 }
 .aForm{
-  border: 1px solid #ccc;
-  background-color: #ffd79624;
+  /*border: 1px solid #ccc;
+  background-color: #ffd79624;*/
   overflow: hidden;
   padding: 4rem;
   color: #333;

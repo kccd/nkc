@@ -13,6 +13,10 @@ photoSmallRouter
 			ctx.throw(401, '权限不足');
 		}
 		ctx.filePath = photoSmallPath + photo.path;
+		ctx.type = 'jpg';
+		ctx.set('Cache-Control', 'public, no-cache');
+		const tlm = await ctx.fs.stat(ctx.filePath);
+		ctx.lastModified = new Date(tlm.mtime).toUTCString();
 		await next();
 	});
 module.exports = photoSmallRouter;
