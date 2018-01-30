@@ -115,15 +115,15 @@ otherRouter
   })
 	.get('index.php', async (ctx, next) => {
 		const {fid} = ctx.query;
+    ctx.status = 301;
 		if(fid) {
-			ctx.redirect(`/f/${fid}`);
-			return next()
+			return ctx.redirect(`/f/${fid}`);
 		}
-		ctx.redirect(`/`);
-		return next()
+		return ctx.redirect(`/`);
 	})
 	.get('read.php', async (ctx, next) => {
 		const {tid} = ctx.query;
+		ctx.status = 301;
 		if(tid) {
 			return ctx.redirect(`/t/${tid}`);
 		}

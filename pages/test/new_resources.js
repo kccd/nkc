@@ -36,7 +36,7 @@ const moveData = async (total, begin, count) => {
       return p._key
     `);
     d.references = await cursor.all();
-    if(['jpg', 'png', 'jpeg', 'bmp', 'svg'].indexOf(d.ext) > -1) {
+    if(['jpg', 'png', 'jpeg', 'bmp', 'svg'].indexOf(d.ext.toLowerCase()) > -1) {
       await Promise.all(d.references.map(ref => PostModel.findOneAndUpdate({pid: ref}, {hasImage: true})))
     }
     d._id = undefined;

@@ -3,7 +3,7 @@ const {encodeRFC5987ValueChars} = apiFn;
 const path = require('path');
 module.exports = async (ctx, next) => {
   const {filePath, resource, fs, type} = ctx;
-  if(type !== 'application/json') {
+  if(type !== 'application/json' && type !== 'text/html') {
     if(ctx.lastModified && ctx.fresh) {
       ctx.status = 304;
       return

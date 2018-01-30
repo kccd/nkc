@@ -213,7 +213,7 @@ postSchema.pre('save', async function(next) {
         const index = resource.references.findIndex(e => e === pid);
         if (index) {
           resource.references.splice(index, 1);
-          if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(resource.ext) > -1) {
+          if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(resource.ext.toLowerCase()) > -1) {
             hasImage = false
           }
           await resource.save()
@@ -229,7 +229,7 @@ postSchema.pre('save', async function(next) {
           await resource.save()
         }
         // post.hasImage depends on whether the resources has a img extension
-        if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(resource.ext) > -1) {
+        if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(resource.ext.toLowerCase()) > -1) {
           hasImage = true
         }
       }
@@ -240,7 +240,7 @@ postSchema.pre('save', async function(next) {
       // but after the above codes, it may not have any img, so check it
       const resources = await this.extendResources();
       if (resources.length) {
-        const img = resources.find(e => ['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(e.ext) > -1)
+        const img = resources.find(e => ['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(e.ext.toLowerCase()) > -1)
         if (img)
           hasImage = true
       }

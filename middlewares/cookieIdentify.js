@@ -12,7 +12,7 @@ module.exports = async (ctx, next) => {
       ctx.cookies.set('userInfo', '');
       ctx.status = 401;
       ctx.error = new Error('缓存验证失败');
-      return ctx.redirect('/login')
+      return redirect('/login')
     }
     await user.update({tlv: Date.now()});
     if(user.xsf > 0){

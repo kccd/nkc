@@ -115,7 +115,8 @@ threadRouter
     if(pid) {
       const matchBase = ctx.generateMatchBase({pid}).toJS();
       const {page, step} = await thread.getStep(matchBase);
-      return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`, 301)
+      ctx.status = 303;
+      return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`);
     } else if(last_page) {
       query.page = data.paging.pageCount - 1;
       data.paging.page = data.paging.pageCount - 1;
@@ -167,8 +168,10 @@ threadRouter
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
     await user.updateUserMessage();
-    if(type === 'html')
-      ctx.redirect(`/t/${tid}`, 303);
+    if(type === 'html') {
+      ctx.status = 303;
+      return ctx.redirect(`/t/${tid}`)
+    }
     data.post = _post;
     data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
     await next();

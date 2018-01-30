@@ -154,7 +154,9 @@ threadSchema.methods.extendFirstPost = async function() {
 
 threadSchema.methods.extendLastPost = async function() {
   const PostModel = require('./PostModel');
-  return this.lastPost = await PostModel.findOnly({pid: this.lm})
+  return this.lastPost = (await PostModel
+    .find({tid: this.tid, disabled: false})
+    .sort({toc: -1}).limit(1))[0]
 };
 
 threadSchema.methods.extendForum = async function() {
