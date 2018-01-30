@@ -56,7 +56,7 @@ operationRouter
       ads.push(tid);
       const oc = await db.PostModel.findOnly({pid: thread.oc});
       let resourceArr = await oc.extendResources();
-      let resource = resourceArr.find(elem => ['jpg', 'png', 'svg', 'jpeg'].indexOf(elem.ext) > -1);
+      let resource = resourceArr.find(elem => ['jpg', 'png', 'svg', 'jpeg'].indexOf(elem.ext.toLowerCase()) > -1);
       let filePath;
       if(resource) {
         filePath = `${uploadPath}${resource.path}`;

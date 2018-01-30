@@ -4,7 +4,8 @@ const async_hooks = require('async_hooks');
 const mongoDB = require('./mongoDB');
 const options = {
   promiseLibrary: Promise,
-  useMongoClient: true
+  useMongoClient: true,
+  autoIndex: false
 };
 
 mongoose.Promise = Promise;
@@ -37,12 +38,12 @@ mongoose.plugin(function(schema) {
     return next()
   });
   schema.post('save', function(doc, next) {
-    // same as when init
+    // same as when initializing..
     // do something before saving it
     //                    **IMPORTANT**
     // this middleware will be executed **AFTER** the execution of
-    // middlewares which is defined in each instance schema,
-    // which makes the _initial_state_ always refer to the current state
+    // middlewares which is defined in each instance schema.
+    // this is to make the _initial_state_ always refer to the current state
     // after all the middlewares's execution has done, but during the execution of
     // inner the middlewares, _initial_state_ always refer to the last state
 

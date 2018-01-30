@@ -106,8 +106,10 @@ forumRouter
     await forum.update({$inc: {'tCount.normal': 1}});
     const thread = await ThreadModel.findOnly({tid: _post.tid});
     await thread.updateThreadMessage();
-    if(type === 'html')
-      ctx.redirect(`/t/${_post.tid}`, 303);
+    if(type === 'html') {
+      ctx.status = 303;
+      return ctx.redirect(`/t/${_post.tid}`);
+    }
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     data.post = _post;
     await next();

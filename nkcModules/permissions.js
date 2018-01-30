@@ -129,14 +129,16 @@ async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
   const cursor = await mongoose.connection.db.collection('forums').find(
     {
-      $or: [{
-        class: {$in: cc},
-        visibility: true
-      },
-      {
-        isVisibleForNCC: true,
-        visibility: true
-      }]
+      $or: [
+        {
+          class: {$in: cc},
+          visibility: true
+        },
+        {
+          isVisibleForNCC: true,
+          visibility: true
+        }
+      ]
     }
   );
   const fs = await cursor.toArray();
@@ -149,7 +151,8 @@ module.exports = async (ctx, next) => {
     certs = ctx.data.user.certs;
   }
   const cs = getPermitTree(certs);
-  cs.contentClasses = Object.keys(cs.contentClasses || {});
+  cs.contentClasses = Object.keys(cs.contentClasses || {})
+    .filter(e => cs.contentClasses[e]);
   ctx.data.certificates = cs;
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
