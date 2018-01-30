@@ -23,7 +23,9 @@ forumRouter
     const page = query.page || 0;
     const visibleFid = await ctx.getVisibleFid();
     const forum = await ForumModel.findOnly({fid});
-    if(!forum.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
+    console.log(data.certificates.contentClasses)
+	  if(!data.certificates.contentClasses.includes(forum.class)) ctx.throw('权限不足');
+    //if(!forum.ensurePermission(visibleFid)) ctx.throw(401, '权限不足');
     const fidOfChildForum = await forum.getFidOfChildForum(visibleFid);
     let q = {
       fid: {$in: fidOfChildForum}
