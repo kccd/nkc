@@ -325,7 +325,7 @@ function saveApplicantMessages(callback){
 		var obj = userMessagesForm();
 		var data = {
 			account: {
-				paymentMethod: obj.paymentMethod,
+				paymentType: obj.paymentType,
 				number: obj.account
 			},
 			newApplicant: {
@@ -839,3 +839,4 @@ function submitApplicationForm() {
 			screenTopWarning(data.error);
 		})
 }
+

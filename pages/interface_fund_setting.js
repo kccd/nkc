@@ -30,7 +30,7 @@ var fundObj = {
 	thread: {},
 	paper: {},
   timeOfPublicity: 0,
-  reviseCount: 3,
+  modifyCount: 3,
 	supportCount: 0,
 	conflict: {
   	self: false,
@@ -318,7 +318,7 @@ function submit(id) {
   fundObj.thread.count = $('#attachmentsThreads').val();
   fundObj.paper.count = $('#attachmentsPapers').val();
   fundObj.timeOfPublicity = $('#timeOfPublicity').val();
-  fundObj.reviseCount = $('#reviseCount').val();
+  fundObj.modifyCount = $('#modifyCount').val();
   fundObj.applicant.authLevel = $('#applicantAuthLevel').val();
   fundObj.member.authLevel = $('#memberAuthLevel').val();
   fundObj.applicationCountLimit = $('#applicationCountLimit').val();

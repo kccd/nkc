@@ -137,7 +137,7 @@ const fundSchema = new Schema({
     type: Number,
     default: 0
   },
-  reviseCount: {
+  modifyCount: {
     type: Number,
     default: 0
   },

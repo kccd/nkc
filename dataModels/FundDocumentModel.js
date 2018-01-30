@@ -59,8 +59,20 @@ const documentSchema = new Schema({
 		index: 1
 	}
 }, {
-	collection: 'fundDocuments'
+	collection: 'fundDocuments',
+	toObject: {
+		getters: true,
+		virtuals: true
+	}
 });
+
+documentSchema.virtual('user')
+	.get(function() {
+		return this._user;
+	})
+	.set(function(user) {
+		this._user = user
+	});
 
 documentSchema.pre('save', function(next) {
   try {
@@ -70,6 +82,12 @@ documentSchema.pre('save', function(next) {
   	return next(e)
 	}
 });
+
+documentSchema.methods.extendUser = async function() {
+	const UserModel = require('./UserModel');
+	const user = await UserModel.findOnly({uid: this.uid});
+	return this.user = user;
+};
 
 const FundDocumentModel = mongoose.model('fundDocuments', documentSchema);
 module.exports = FundDocumentModel;

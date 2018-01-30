@@ -92,17 +92,26 @@ block content
                     -btnDisabled = true;
                     -link = '###';
                     p 您还有未提交的基金项目，
-                      a(href=`/fund/a/${unSubmitted[0]}/settings`) 查看
+                      a(href=`/fund/a/${unSubmitted[0]._id}/settings`) 查看
                   else if unPassed.length !== 0
                     -btnDisabled = true;
                     -link = '###';
                     p 您还有未通过审核的基金项目，
-                      a(href=`/fund/a/${unPassed[0]}`) 查看
+                      a(href=`/fund/a/${unPassed[0]._id}`) 查看
                   else if unCompleted.length !== 0
-                    -btnDisabled = true;
-                    -link = '###';
-                    p 您还有未完成的且与该基金不能同时申请的基金项目，
-                      a(href=`/fund/a/${unCompleted[0]}`) 查看
+                    -for(let a of unCompleted)
+                      if a.fund.conflict.self === true && a.fund._id === fund._id
+                        -btnDisabled = true;
+                        -link = '###';
+                        p 该基金不允许同时提交多个申请，
+                          a(href=`/fund/a/${a._id}`) 查看
+                        -break;
+                      if a.fund.conflict.other === true && fund.conflict.other === true
+                        -btnDisabled = true;
+                        -link = '###';
+                        p 您还有未完成的且与该基金不能同时申请的基金项目，
+                          a(href=`/fund/a/${a._id}`) 查看
+                        -break;
                 a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
           .col-xs-12.col-md-12
             .panel.panel-default

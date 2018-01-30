@@ -5,10 +5,11 @@ else
   table.table.table-striped
     thead
       tr
+        th ID
         th 状态
         th 申请时间
         th 基金类型
-        th 用户名
+        th 用户ID
         th 申请金额
         th 项目名称
         th 链接
@@ -16,24 +17,44 @@ else
     tbody
       mixin status(applicationForm)
         -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = applicationForm.status;
-        if excellent
-          th 优秀项目
-        else if completed
+        if !submitted
+          th 未提交
+        else if !usersSupport
+          th 等待网友支持
+        else if projectPassed === null
+          th 等待项目审核
+        else if projectPassed === false
+          th 项目审核不通过
+        else if adminSupport === null
+          th 等待管理员审核
+        else if adminSupport === false
+          th 管理员审核不通过
+        else if !remittance
+          th 等待打款
+        else if !completed
+          th 等待结项
+        else
           th 已完成
-        else if remittance
-          th 资助中
-        else if !adminSupport
-          th 审核中
+        //
+        //if excellent
+        //  th 优秀项目
+        //else if completed
+        //  th 已完成
+        //else if remittance
+        //  th 资助中
+        //else if !adminSupport
+        //  th 审核中
       -for (let applicationForm of applicationForms)
         -const {toc, name, budgetMoney, applicant, members, _id, project} = applicationForm;
         -let money = fund.money.fixed;
-
         if !money
           -money = 0;
-          if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length === 0
+          if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length !== 0
             -for(let b of budgetMoney)
               -money += (b.count*b.money);
+
         tr
+            th= applicationForm.code || '暂无'
             +status(applicationForm)
             th= toc.toLocaleString()
             th= fund.name
@@ -43,7 +64,7 @@ else
             th
               a(href=`/fund/a/${_id}`) 查看详情&nbsp;
               -const {status} = applicationForm;
-              if status.usersSupport && !status.projectPassed && isCensor
+              if status.usersSupport && status.projectPassed === null && isCensor
                 a(href=`/fund/a/${_id}/audit?type=project`) 项目审核&nbsp;
-              if !status.adminSupport && status.projectPassed && data.userLevel >= 7
+              if status.adminSupport === null && status.projectPassed && data.userLevel >= 7
                 a(href=`/fund/a/${_id}/audit?type=admin`) 管理员审核

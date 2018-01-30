@@ -58,4 +58,20 @@ secrets.exampleMailOptions = {
     subject: 'noop',
     text: 'redacted',
 };
+
+//转账
+secrets.transferAccounts = (option) => {
+	const {money, paymentType, number} = option;
+	return new Promise((resolve, reject) => {
+		console.log(`收款平台：${paymentType}, 收款账号：${number}, 转账金额：${money}`);
+		console.log('正在转账...');
+		if(1) {
+			resolve();
+		} else {
+			reject('这是错误信息。');
+		}
+	});
+};
+
+
 module.exports = secrets;

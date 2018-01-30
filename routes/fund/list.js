@@ -62,15 +62,15 @@ listRouter
 			query['status.completed'] = true;
 		} else if(type === 'funding') { // 资助中
 			query['status.complete'] = {$ne: true};
-			query['status.remittance'] = true;
-		} else if(type === 'applying') { // 审核中
-			query['status.remittance'] = {$ne: true};
+			query['status.adminSupport'] = true;
+		} else if(type === 'auditing') { // 审核中
+			query['status.adminSupport'] = {$ne: true};
 		} else { // 全部
 
 		}
 		const length = await FundApplicationFormModel.count(query);
 		const paging = apiFn.paging(page, length);
-		const applicationForms = await FundApplicationFormModel.find(query).skip(paging.start).limit(paging.perpage);
+		const applicationForms = await FundApplicationFormModel.find(query).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		data.applicationForms = await Promise.all(applicationForms.map(async a => {
 			await a.extendApplicant();
 			await a.extendMembers();
@@ -117,8 +117,16 @@ listRouter
 		}
 		const message = await user.getConflictingApplicationForm();
 		const {unSubmitted, unPassed, unCompleted} = message;
-		if(unSubmitted.length !== 0 || unPassed.length !== 0 || unCompleted.length !== 0) {
+		if(unPassed.length !== 0 || unSubmitted.length !== 0) {
 			ctx.throw(401, '您还有未完成的基金申请！');
+		}
+		for(let a of unCompleted) {
+			if(a.fund.conflict.self === true && fund.conflict.self === true) {
+				ctx.throw(400, '该基金不允许同时提交多个申请。');
+			}
+			if(a.fund.conflict.other === true && fund.conflict.other === true) {
+				ctx.throw(400, '您还有未完成的且与该基金不能同时申请的基金项目。');
+			}
 		}
 		if(agree !== 'true') {
 			return await next();

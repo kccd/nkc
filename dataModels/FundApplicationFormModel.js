@@ -6,9 +6,14 @@ const {promisify} = require('util');
 const copyFile = promisify(fs.copyFile);
 const fundApplicationFormSchema = new Schema({
   _id: Number,
+	year: {
+  	type: String,
+		default: null,
+		index: 1
+	},
 	order: {
   	type: Number,
-		default: '',
+		default: null,
 		index: 1
 	},
 	code: {// 申请编号 如：2017A02
@@ -88,7 +93,7 @@ const fundApplicationFormSchema = new Schema({
 	  }
   },
   account: {
-    paymentMethod: {
+    paymentType: {
       type: String,
       default: null
     },
@@ -205,6 +210,14 @@ fundApplicationFormSchema.virtual('user')
 		this._user = user
 	});
 
+fundApplicationFormSchema.virtual('money')
+	.get(function() {
+		return this._money;
+	})
+	.set(function(money) {
+		this._money = money
+	});
+
 fundApplicationFormSchema.virtual('fund')
 	.get(function() {
 		return this._fund;
@@ -245,6 +258,14 @@ fundApplicationFormSchema.virtual('threads')
 		this._threads = threads;
 	});
 
+fundApplicationFormSchema.virtual('comments')
+	.get(function() {
+		return this._comments;
+	})
+	.set(function(comments) {
+		this._comments = comments;
+	});
+
 
 fundApplicationFormSchema.pre('save', function(next) {
   if(!this.timeOfLastRevise) {
@@ -253,11 +274,53 @@ fundApplicationFormSchema.pre('save', function(next) {
   next();
 });
 
-fundApplicationFormSchema.methods.extendUser = async function() {
-	const UserModel = require('./UserModel');
-	const user = await UserModel.findOnly({uid: this.uid});
-	return this.user = user;
-};
+fundApplicationFormSchema.pre('save', async function(next) {
+	const {transferAccounts} = require('../settings/mailSecrets');
+	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+	const {fund, status, supportersId, account} = this;
+	const {adminSupport, remittance} = status;
+	// 网友支持
+	if(fund.supportCount <= supportersId.length) {
+		status.usersSupport = true;
+	}
+	// 管理员同意: 生成申请表ID、打款
+	if(adminSupport && !remittance && !this.code) {
+		const moment = require('moment');
+		const year = moment().format('YYYY');
+		const a = await FundApplicationFormModel.findOne({fundId: fund._id, year}).sort({order: -1});
+		let code, order;
+		if(a) {
+			order = a.order + 1;
+			code = year + fund._id + order;
+		} else {
+			order = 1;
+			code = year + fund._id + 1;
+		}
+		this.year = year;
+		this.code = code;
+		this.order = order;
+		let money;
+		if(this.remittance.length === 0) {
+			money = this.money;
+		} else {
+			money = this.remittance[0].money;
+			this.remittance[0].status = true;
+		}
+		try {
+			await transferAccounts({
+				money,
+				paymentType: account.paymentType,
+				number: account.number
+			});
+		} catch (err) {
+			const error = new Error(err);
+			return next(error);
+		}
+		status.remittance = true;
+	}
+	await next();
+});
+
 
 fundApplicationFormSchema.methods.extendApplicant = async function() {
 	const FundApplicationUserModel = require('./FundApplicationUserModel');
@@ -306,6 +369,7 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
+
 fundApplicationFormSchema.methods.newProject = async function(project) {
 	const FundDocumentModel = require('./FundDocumentModel');
 	const SettingModel = require('./SettingModel');
@@ -325,23 +389,30 @@ fundApplicationFormSchema.methods.newProject = async function(project) {
 };
 
 fundApplicationFormSchema.methods.newComment = async function(comment) {
+	const applicationFormId = this._id;
 	const FundDocumentModel = require('./FundDocumentModel');
 	const SettingModel = require('./SettingModel');
 	const id = await SettingModel.operateSystemID('documents', 1);
-	const {t, c, userType, uid, support} = project;
+	const {c, userType, uid, support} = comment;
 	const newDocument = new FundDocumentModel({
 		_id: id,
-		t,
 		c,
 		uid,
 		userType,
 		support,
-		applicationFormsId: this._id,
+		applicationFormId: applicationFormId,
 		type: 'comment',
 		l: 'pwbb',
 	});
 	await newDocument.save();
 	return newDocument;
+};
+
+fundApplicationFormSchema.methods.saveHistory = async function() {
+	const FundApplicationHistoryModel = require('./FundApplicationHistoryModel');
+	const newHistory = new FundApplicationHistoryModel({
+
+	});
 };
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
@@ -373,7 +444,14 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	} = fund;
 
 	// 判断申请表有效性
-	if(useless !== null) throw '申请表已作废！';
+	switch (useless) {
+		case 'disabled':
+			throw '申请表已被封禁。';
+		case 'revoked':
+			throw '申请表已被永久撤销。';
+		case 'exceededModifyCount':
+			throw '申请表已超过最大修改次数。';
+	}
 	// 申请人信息判断
 	if(!applicant.lifePhotosId || applicant.lifePhotosId.length === 0) {
 		throw '请至少添加一张生活照！';
@@ -381,7 +459,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	if(!applicant.name) throw '请填写您的真实姓名！';
 	if(!applicant.idCardNumber) throw '请填写您的身份证号码！';
 	if(!applicant.mobile) throw '请填写您的联系电话！';
-	if(!account.paymentMethod) throw '请选择收款方式！';
+	if(!account.paymentType) throw '请选择收款方式！';
 	if(!account.number) throw '请填写您的收款账号！';
 	if(!applicant.description) throw '请填写您的自我介绍！';
 
@@ -451,6 +529,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 
 	}
 	this.status.submitted = true;
+	this.modifyCount += 1;
 	await this.save();
 };
 

@@ -6,8 +6,6 @@
       -homeClass = 'active';
     if data.management
       -managementClass = 'active';
-    if data.list === 'all'
-      -listAllClass = 'active';
     if data.me
       -meClass = 'active';
     li
@@ -16,10 +14,6 @@
       a(href='/fund/me' class=meClass) 我的基金申请
     li
       a(href='/fund/m' class=managementClass) 基金项目管理
-    li
-      a(href='/fund/a' class=listAllClass) 所有申请
-    li
-      a(href='/fund/censor/p' class=censorPClass) 项目审核
     li /
     -for (let f of fundList)
       li

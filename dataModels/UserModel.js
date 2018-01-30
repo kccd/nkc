@@ -230,14 +230,14 @@ userSchema.methods.getConflictingApplicationForm = async function() {
 		const {status, _id, fund} = application;
 		const {adminSupport, completed, submitted} = status;
 		if(submitted === null) {
-			message.unSubmitted.push(_id);
+			message.unSubmitted.push(application);
 		} else if(adminSupport !== true) {
-			message.unPassed.push(_id);
+			message.unPassed.push(application);
 		} else if(completed === null) {
 			if(fund.conflict.self === true) { // 申请相同的基金且未完成的基金项目设置了与自己互斥
-				message.unCompleted.push(_id);
+				message.unCompleted.push(application);
 			} else if(fund.conflict.other === true) { // 申请的基金项目与未完成的基金项目互斥
-				message.unCompleted.push(_id);
+				message.unCompleted.push(application);
 			}
 		}
 	}

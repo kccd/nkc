@@ -37,3 +37,13 @@ function against(_id) {
 			screenTopWarning(data.error)
 		})
 }
+
+function revoked(type, _id) {
+	nkcAPI('/fund/a/'+_id+'?type='+type, 'DELETE', {})
+		.then(function(){
+			screenTopAlert('操作成功！');
+		})
+		.catch(function(data){
+			screenTopWarning(data.error);
+		})
+}

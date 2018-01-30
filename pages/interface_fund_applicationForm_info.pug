@@ -27,131 +27,136 @@ mixin head(value)
   .col-xs-12.col-md-12.aForm-body
     h3(style='color: #000;')= value
 .row
-  .aForm
-    .col-xs-12.col-md-12.aForm-body
-      h2.text-center 科创基金
-      br
-      br
-      br
-    +list('项目名称', applicationForm.project && applicationForm.project.t?applicationForm.project.t: '暂未填写')
-    +list('基金名称', `${fund.name}`)
-    +list('申请金额', `${aggregate}元`)
-    +list('申请方式', (applicationForm.from === 'team'?'团队': '个人'))
-    +list('申请人ID', applicationForm.applicant.user.username)
-    if applicationForm.from === 'team'
-      .col-xs-12.col-md-12.aForm-body
-        .col-xs-3.col-md-3
-          .title= `组员ID：`
-        .col-xs-9.col-md-9.content
-          .title
-            -let names = '';
-            -let n = 0;
-            -for (let aUser of applicationForm.members)
-              if aUser.agree === true
-                -const username = aUser.user.username;
-                if n === 0
-                  -names += username;
-                else
-                  -names += `, ${username}`;
-            .title=`${names || '暂未有组员接受邀请'}`
-    +list('申请时间', applicationForm.toc.toLocaleDateString())
-    +head('申请人信息')
-    +list('真实姓名', applicationForm.applicant.name)
-    if identity === 'selfOrAdmin'
-      +list('电话号码', applicationForm.applicant.mobile)
-      +list('身份证号码', applicationForm.applicant.idCardNumber)
-      -let method;
-      if applicationForm.account.paymentMethod === 'alipay'
-        -method = '支付宝';
-      else if applicationForm.account.paymentMethod === 'wechat'
-        -method = '微信';
-      else
-        -method = '暂未填写';
-      +list('收款方式', method)
-      +list('收款账号', applicationForm.account.number)
-    .col-xs-12.col-md-12.aForm-body
-      .col-xs-3.col-md-3
-        .title= `自我介绍：`
-      .col-xs-9.col-md-9
-        .row
-          p= applicationForm.applicant.description
-    .col-xs-12.col-md-12.aForm-body
-      .col-xs-3.col-md-3
-        .title= `申请人照片：`
-      .col-xs-9.col-md-9
-        .row
-          if applicationForm.applicant.lifePhotos.length === 0
-            p 未上传生活照
-          else
-            -for(let photo of applicationForm.applicant.lifePhotos)
-              a(href=`/photo/${photo._id}` target='_blank')
-                img(src=`/photo_small/${photo._id}` style='width: 50%; padding: 0.5rem')
-    +head('项目信息')
-    .col-xs-12.col-md-12.aForm-body
-      h3.text-center#projectTitle= applicationForm.project && applicationForm.project.t? applicationForm.project.t: '暂未填写'
-      div#projectContent!=applicationForm.project && applicationForm.project.c? experimental_render(applicationForm.project): '暂未填写'
-    +head('其他信息')
-    +list('研究周期', applicationForm.projectCycle?applicationForm.projectCycle+'（天）': '暂未填写')
-    .col-xs-12.col-md-12.aForm-body
-      .col-xs-3.col-md-3
-        .title= `资金用途`
-      .col-xs-12.col-md-12
-        br
-        if fund.money.max === null && typeof applicationForm.budgetMoney === 'string'
-          p= applicationForm.budgetMoney
-        else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
-          #budgetMoney
-            .fund-money-list.head
-              .purpose 用途
-              .count 数量
-              .money 单价(元)
-              .total 合计(元)
-            -for(let p of applicationForm.budgetMoney)
-              -const total = p.count*p.money;
-              .fund-money-list
-                .purpose= p.purpose
-                .count= p.count
-                .money= p.money
-                .total= total
-          h3.text-right=`总计：${aggregate}元`
-        else
-         p 暂未填写
-    if fund.thread.count > 0
-      .col-xs-12.col-md-12.aForm-body
-        .col-xs-3.col-md-3
-          .title= `附加帖子`
-        .col-xs-12.col-md-12
-          .col-xs-12.col-md-12
+  .panel.panel-default(style='background-color: #ffd79624;')
+    .panel-body
+      .row
+        .aForm
+          .col-xs-12.col-md-12.aForm-body
+            h2.text-center 科创基金
             br
-            if applicationForm.threads.applying.length === 0
-              span 暂未填写
+            br
+            br
+          if applicationForm.code
+            +list('ID', applicationForm.code)
+          +list('项目名称', applicationForm.project && applicationForm.project.t?applicationForm.project.t: '暂未填写')
+          +list('基金名称', `${fund.name}`)
+          +list('申请金额', `${aggregate}元`)
+          +list('申请方式', (applicationForm.from === 'team'?'团队': '个人'))
+          +list('申请人ID', applicationForm.applicant.user.username)
+          if applicationForm.from === 'team'
+            .col-xs-12.col-md-12.aForm-body
+              .col-xs-3.col-md-3
+                .title= `组员ID：`
+              .col-xs-9.col-md-9.content
+                .title
+                  -let names = '';
+                  -let n = 0;
+                  -for (let aUser of applicationForm.members)
+                    if aUser.agree === true
+                      -const username = aUser.user.username;
+                      if n === 0
+                        -names += username;
+                      else
+                        -names += `, ${username}`;
+                  .title=`${names || '暂未有组员接受邀请'}`
+          +list('申请时间', applicationForm.toc.toLocaleDateString())
+          +head('申请人信息')
+          +list('真实姓名', applicationForm.applicant.name)
+          if identity === 'selfOrAdmin'
+            +list('电话号码', applicationForm.applicant.mobile)
+            +list('身份证号码', applicationForm.applicant.idCardNumber)
+            -let method;
+            if applicationForm.account.paymentType === 'alipay'
+              -method = '支付宝';
+            else if applicationForm.account.paymentType === 'wechat'
+              -method = '微信';
             else
+              -method = '暂未填写';
+            +list('收款方式', method)
+            +list('收款账号', applicationForm.account.number)
+          .col-xs-12.col-md-12.aForm-body
+            .col-xs-3.col-md-3
+              .title= `自我介绍：`
+            .col-xs-9.col-md-9
               .row
-                .selectedThreads
-                  -const disagreeUsers = [];
-                  -const notModifiedUsers = [];
-                  -for(let u of applicationForm.members)
-                    if u.agree === false
-                      -disagreeUsers.push(u.uid);
-                    if u.agree === null
-                      -notModifiedUsers.push(u.uid);
-                  -for(let i = 0; i < applicationForm.threads.applying.length; i++)
-                    -const thread = applicationForm.threads.applying[i];
-                    -const firstPost = thread.firstPost;
-                    -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
-                    -postString = JSON.stringify(postString);
-                    .threadList
-                      .col-xs-10.col-md-10
-                        .displayNone.postString= postString
-                        span 文号：
-                        span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                        a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
-                        if notModifiedUsers.includes(thread.uid)
-                          span(style='color: #aaa;') （未处理邀请）
-                        if disagreeUsers.includes(thread.uid)
-                          span.redFontColor （已拒绝邀请）
-                        span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
-                        br
-                        a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+                p= applicationForm.applicant.description
+          .col-xs-12.col-md-12.aForm-body
+            .col-xs-3.col-md-3
+              .title= `申请人照片：`
+            .col-xs-9.col-md-9
+              .row
+                if applicationForm.applicant.lifePhotos.length === 0
+                  p 未上传生活照
+                else
+                  -for(let photo of applicationForm.applicant.lifePhotos)
+                    a(href=`/photo/${photo._id}` target='_blank')
+                      img(src=`/photo_small/${photo._id}` style='width: 50%; padding: 0.5rem')
+          +head('项目信息')
+          .col-xs-12.col-md-12.aForm-body
+            h3.text-center#projectTitle= applicationForm.project && applicationForm.project.t? applicationForm.project.t: '暂未填写'
+            div#projectContent!=applicationForm.project && applicationForm.project.c? experimental_render(applicationForm.project): '暂未填写'
+          +head('其他信息')
+          +list('研究周期', applicationForm.projectCycle?applicationForm.projectCycle+'（天）': '暂未填写')
+          .col-xs-12.col-md-12.aForm-body
+            .col-xs-3.col-md-3
+              .title= `资金用途`
+            .col-xs-12.col-md-12
+              br
+              if fund.money.max === null && typeof applicationForm.budgetMoney === 'string'
+                p= applicationForm.budgetMoney
+              else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
+                #budgetMoney
+                  .fund-money-list.head
+                    .purpose 用途
+                    .count 数量
+                    .money 单价(元)
+                    .total 合计(元)
+                  -for(let p of applicationForm.budgetMoney)
+                    -const total = p.count*p.money;
+                    .fund-money-list
+                      .purpose= p.purpose
+                      .count= p.count
+                      .money= p.money
+                      .total= total
+                h3.text-right=`总计：${aggregate}元`
+              else
+               p 暂未填写
+          if fund.thread.count > 0
+            .col-xs-12.col-md-12.aForm-body
+              .col-xs-3.col-md-3
+                .title= `附加帖子`
+              .col-xs-12.col-md-12
+                .col-xs-12.col-md-12
+                  br
+                  if applicationForm.threads.applying.length === 0
+                    span 暂未填写
+                  else
+                    .row
+                      .selectedThreads
+                        -const disagreeUsers = [];
+                        -const notModifiedUsers = [];
+                        -for(let u of applicationForm.members)
+                          if u.agree === false
+                            -disagreeUsers.push(u.uid);
+                          if u.agree === null
+                            -notModifiedUsers.push(u.uid);
+                        -for(let i = 0; i < applicationForm.threads.applying.length; i++)
+                          -const thread = applicationForm.threads.applying[i];
+                          -const firstPost = thread.firstPost;
+                          -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+                          -postString = JSON.stringify(postString);
+                          .threadList
+                            .col-xs-10.col-md-10
+                              .displayNone.postString= postString
+                              span 文号：
+                              span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                              a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                              if notModifiedUsers.includes(thread.uid)
+                                span(style='color: #aaa;') （未处理邀请）
+                              if disagreeUsers.includes(thread.uid)
+                                span.redFontColor （已拒绝邀请）
+                              span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                              br
+                              a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
 
 
