@@ -11,7 +11,7 @@ RtRouter
     const extension = targetResource.ext;
     const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'];
     let url;
-    if(extArr.includes(extension) && targetResource.tpath) {
+    if(extArr.includes(extension.toLowerCase()) && targetResource.tpath) {
       url = thumbnailPath + '/' + targetResource.tpath;
       try{
         await fs.access(url);

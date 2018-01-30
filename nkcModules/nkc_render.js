@@ -322,7 +322,7 @@ function nkc_render(options){
 
     var fileSizeString = (filesize>1024)?((filesize>1048576)?k(filesize/1048576)+'M':k(filesize/1024)+'k'):k(filesize)+'b'
 
-    var extension = r.ext
+    var extension = r.ext.toLowerCase();
 
     var replaced = ''
 

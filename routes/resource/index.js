@@ -44,7 +44,7 @@ resourceRouter
     const relPath = generateFolderName(uploadPath);
     const descPath = uploadPath + relPath;
     const descFile = descPath + saveName;
-    if(['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension) > -1) {
+    if(['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension.toLowerCase()) > -1) {
       // 如果格式满足则生成缩略图
       const descPathOfThumbnail = generateFolderName(thumbnailPath);
       const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName;
