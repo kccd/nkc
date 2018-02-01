@@ -46,7 +46,6 @@ meRouter
 			q._id = {$in: idArr};
 			q.uid = {$ne: user.uid};
 		}*/
-		console.log(q)
 		const length = await db.FundApplicationFormModel.count(q);
 		const paging = apiFn.paging(page, length);
 		const applicationForms = await db.FundApplicationFormModel.find(q).skip(paging.start).limit(paging.perpage);

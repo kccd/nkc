@@ -830,10 +830,11 @@ function submitApplicationForm() {
 	};
 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
 		.then(function() {
-			screenTopAlert('提交成功！2s后跳转到申请表详情页面');
-			setTimeout(function(){
-				window.location.href = '/fund/a/'+applicationFormId;
-			}, 2000)
+			window.location.href = '/fund/a/'+applicationFormId;
+			// screenTopAlert('提交成功！2s后跳转到申请表详情页面');
+			// setTimeout(function(){
+			// 	window.location.href = '/fund/a/'+applicationFormId;
+			// }, 2000)
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

@@ -30,8 +30,8 @@ block content
           -const {useless} = applicationForm;
           if useless !== null
             h3.redFontColor.text-center 无效的基金申请表
-            if useless === 'revoked'
-              h4.text-center 申请表已被永久撤销
+            if useless === 'giveUp'
+              h4.text-center 申请人已放弃申请
             else if useless === 'exceededModifyCount'
               h4.text-center 申请表修改次数已超过限制
             else
@@ -72,23 +72,21 @@ block content
                       -const r = applicationForm.remittance[i];
                       -const r2 = applicationForm.remittance[1+i];
                       if r2
-                        +pointer(r.status, r2.status, `第${i+1}期放款（${r.money}元）`)
+                        +pointer(r.status, r2.status, `第${i+1}期打款（${r.money}元）`)
                     -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
-                    +pointer(lastRemittance.status, completed, `第${count}期放款（${lastRemittance.money}元）`)
+                    +pointer(lastRemittance.status, completed, `第${count}期打款（${lastRemittance.money}元）`)
                   else
                     +pointer(adminSupport, remittance,'管理员审核')
-                    +pointer(remittance, completed, '放款')
+                    +pointer(remittance, completed, '打款')
                   if completed
                     li.passed 完成
                   else
                     li 完成
               // 申请者控制面板
               if data.user.uid === applicationForm.applicant.uid
-                if submitted
-                  button(href='#' onclick=`revoked("cancel", ${applicationForm._id})`).btn.btn-default.btn-block= `撤回`
-                else
-                  a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-default.btn-block 去编辑
-                button(href='#' onclick=`revoked("revoked", ${applicationForm._id})`).btn.btn-default.btn-block= `取消申请`
+                if !applicationForm.status.adminSupport
+                  a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-default.btn-block 编辑
+                button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-default.btn-block= `放弃申请`
               a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId?applicationForm.supportersId.length: 0}）`
               a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId?applicationForm.objectorsId.length: 0}）`
               if projectPassed === false

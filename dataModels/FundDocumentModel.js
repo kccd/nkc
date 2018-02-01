@@ -16,7 +16,9 @@ const documentSchema = new Schema({
 	tlm: {
 		type: Date
 	},
-	type: { // 内容、评论
+	type: {
+		// project, comment, userInfoAudit, projectAudit, moneyAudit, adminAudit, self
+		// project，comment，projectAudit，adminAudit, self
 		type: String,
 		required: true,
 		index: 1
@@ -26,11 +28,6 @@ const documentSchema = new Schema({
 		required: true,
 		index: 1
 	},
-	userType: {// userCensor, projectCensor, ordinary, self
-		type: String,
-		default: null,
-		index: 1
-	},
 	support: {
 		type: Boolean,
 		default: null,
@@ -38,7 +35,7 @@ const documentSchema = new Schema({
 	},
 	l: {//pwbb
 		type: String,
-		required: true
+		default: 'pwbb'
 	},
 	t: {
 		type: String,
