@@ -35,27 +35,27 @@ postRouter
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);
     await histories.save();
-    const quote = await dbFn.getQuote(c);
-    let rpid = '';
-    if(quote && quote[2]) {
-      rpid = quote[2];
-      const username = quote[1];
-      if(rpid !== targetPost.pid) {
-        const quoteUser = await db.UserModel.findOne({username: username});
-        const newReplies = new db.ReplyModel({
-          fromPid: pid,
-          toPid: rpid,
-          toUid: quoteUser.uid
-        });
-        await newReplies.save();
-      }
-    }
+    // const quote = await dbFn.getQuote(c);
+    // let rpid = '';
+    // if(quote && quote[2]) {
+    //   rpid = quote[2];
+    //   const username = quote[1];
+    //   if(rpid !== targetPost.pid) {
+    //     const quoteUser = await db.UserModel.findOne({username: username});
+    //     const newReplies = new db.ReplyModel({
+    //       fromPid: pid,
+    //       toPid: rpid,
+    //       toUid: quoteUser.uid
+    //     });
+    //     await newReplies.save();
+    //   }
+    // }
     targetPost.uidlm = user.uid;
     targetPost.iplm = ctx.address;
     targetPost.t = t;
     targetPost.c = c;
     targetPost.tlm = Date.now();
-    targetPost.rpid = rpid;
+    // targetPost.rpid = rpid;
     const q = {
       tid: targetThread.tid
     };
