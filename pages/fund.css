@@ -534,21 +534,21 @@ input[type="radio"], input[type="checkbox"]{
 @keyframes myfirst
 {
   0% {line-height: 1.5;}
-  50% {line-height: 3;}
+  50% {line-height: 2.5;}
   100% {line-height: 1.5;}
 }
 
 @-moz-keyframes myfirst /* Firefox */
 {
   0% {line-height: 1.5;}
-  50% {line-height: 3;}
+  50% {line-height: 2.5;}
   100% {line-height: 1.5;}
 }
 
 @-webkit-keyframes myfirst /* Safari 和 Chrome */
 {
   0% {line-height: 1.5;}
-  50% {line-height: 3;}
+  50% {line-height: 2.5;}
   100% {line-height: 1.5;}
 }
 
@@ -814,6 +814,14 @@ input[type="radio"], input[type="checkbox"]{
   border: 1px solid #dedede;
   background-color: #fff;
 }
+.fund-money-list.peojectAudit > div{
+  width: 20%;
+}
+
+.fund-money-list.adminAudit > div{
+  width: 16.6%;
+}
+
 .aggregate{
   padding-left: 0.5rem;
 }
@@ -1057,6 +1065,11 @@ input[type="radio"], input[type="checkbox"]{
 #projectTitle{
   font-size: 2.4rem;
 }
+
+#remittanceList > div{
+  margin: 0.5rem 0;
+}
+
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;

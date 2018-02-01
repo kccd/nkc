@@ -108,7 +108,7 @@ const fundApplicationFormSchema = new Schema({
 	  index: 1
   },
   status: {
-	  submitted: { // 已提交申请
+	  submitted: { // 判断是否是提交过的申请表，下边的lock.submitted作用是判断申请表当前是否提交。
 			type: Boolean,
 		  default: null
 	  },
@@ -148,12 +148,16 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-	useless: { //disabled: 被封禁，revoked: 被永久撤销，exceededModifyCount: 超过修改次数， null: 数据有效
+	useless: { //disabled: 被封禁，giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效
   	type: String,
 		default: null,
 		index: 1
 	},
   lock: {
+  	submitted: { // 用于判断用户当前申请表是否已提交
+  		type: Boolean,
+		  default: false
+	  },
     auditing: {
       type: Boolean,
       default: false,
@@ -268,23 +272,22 @@ fundApplicationFormSchema.virtual('comments')
 
 
 fundApplicationFormSchema.pre('save', function(next) {
-  if(!this.timeOfLastRevise) {
-    this.timeOfLastRevise = this.timeToCreate;
-  }
+  this.tlm = Date.now();
   next();
 });
 
 fundApplicationFormSchema.pre('save', async function(next) {
-	const {transferAccounts} = require('../settings/mailSecrets');
 	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
-	const {fund, status, supportersId, account} = this;
-	const {adminSupport, remittance} = status;
+	const fund = await this.extendFund();
+	console.log(fund);
+	const {code, status, supportersId} = this;
+	const {submitted} = status;
 	// 网友支持
 	if(fund.supportCount <= supportersId.length) {
 		status.usersSupport = true;
 	}
-	// 管理员同意: 生成申请表ID、打款
-	if(adminSupport && !remittance && !this.code) {
+	// 生成申请表编号
+	if(submitted && !code) {
 		const moment = require('moment');
 		const year = moment().format('YYYY');
 		const a = await FundApplicationFormModel.findOne({fundId: fund._id, year}).sort({order: -1});
@@ -296,27 +299,10 @@ fundApplicationFormSchema.pre('save', async function(next) {
 			order = 1;
 			code = year + fund._id + 1;
 		}
+		console.log(fund._id);
 		this.year = year;
 		this.code = code;
 		this.order = order;
-		let money;
-		if(this.remittance.length === 0) {
-			money = this.money;
-		} else {
-			money = this.remittance[0].money;
-			this.remittance[0].status = true;
-		}
-		try {
-			await transferAccounts({
-				money,
-				paymentType: account.paymentType,
-				number: account.number
-			});
-		} catch (err) {
-			const error = new Error(err);
-			return next(error);
-		}
-		status.remittance = true;
 	}
 	await next();
 });
@@ -369,31 +355,12 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
-
-fundApplicationFormSchema.methods.newProject = async function(project) {
-	const FundDocumentModel = require('./FundDocumentModel');
-	const SettingModel = require('./SettingModel');
-	const id = await SettingModel.operateSystemID('documents', 1);
-	const {t, c} = project;
-	const newDocument = new FundDocumentModel({
-		_id: id,
-		t,
-		c,
-		uid: this.uid,
-		applicationFormsId: this._id,
-		type: 'article',
-		l: 'pwbb'
-	});
-	await newDocument.save();
-	return this.project = newDocument;
-};
-
 fundApplicationFormSchema.methods.newComment = async function(comment) {
 	const applicationFormId = this._id;
 	const FundDocumentModel = require('./FundDocumentModel');
 	const SettingModel = require('./SettingModel');
 	const id = await SettingModel.operateSystemID('documents', 1);
-	const {c, userType, uid, support} = comment;
+	const {c, type, uid, support} = comment;
 	const newDocument = new FundDocumentModel({
 		_id: id,
 		c,
@@ -529,6 +496,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 
 	}
 	this.status.submitted = true;
+	this.lock.submitted = true;
 	this.modifyCount += 1;
 	await this.save();
 };

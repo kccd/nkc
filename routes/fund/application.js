@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const moment = require('moment');
+const auditRouter = require('./audit');
 const applicationRouter = new Router();
 const apiFn = require('../../nkcModules/apiFunction');
 applicationRouter
@@ -76,7 +76,6 @@ applicationRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		const apiFn = require('../../nkcModules/apiFunction');
 		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
@@ -86,8 +85,7 @@ applicationRouter
 		const q = {
 			applicationFormId: applicationForm._id,
 			type: 'comment',
-			disabled: false,
-			userType: 'ordinary'
+			disabled: false
 		};
 		const length = await db.FundDocumentModel.count(q);
 		const paging = apiFn.paging(page, length);
@@ -98,9 +96,8 @@ applicationRouter
 		applicationForm.comments = comments;
 		data.auditComments = await db.FundDocumentModel.find({
 			applicationFormId: applicationForm._id,
-			type: 'comment',
+			type: {$in: ['userInfoAudit', 'projectAudit', 'moneyAudit']},
 			disabled: false,
-			userType: {$in: ['admin', 'projectCensor']}
 		}).sort({toc: -1});
 		await next();
 	})
@@ -114,12 +111,11 @@ applicationRouter
 		const {applicationForm} = data;
 		if(useless === 'disabled') {
 			ctx.throw(400, '抱歉！申请表已封禁。');
-		} else if(useless === 'revoked') {
-			ctx.throw(400, '抱歉！申请表已被永久撤销。');
+		} else if(useless === 'giveUp') {
+			ctx.throw(400, '抱歉！您已放弃此次申请。');
 		} else if(useless === 'exceededModifyCount') {
 			ctx.throw(400, '抱歉！申请表已超出最大修改次数。');
 		}
-		if(applicationForm.status.submitted) ctx.throw(401, '无法修改已提交的申请表，若需要修该请先撤销申请！');
 		const {_id} = params;
 		if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
 		const fund = applicationForm.fund;
@@ -129,10 +125,12 @@ applicationRouter
 			ctx.throw(401, e);
 		}
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		const {applicant, members} = applicationForm;
+		const {applicant, members, status} = applicationForm;
 		let updateObj = {};
+		if(applicationForm.modifyCount >= fund.modifyCount) throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
 		if(s === 1) {
 			const {from} = body;
+			if(status.submitted) ctx.throw(400, '申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
 			if(from === 'personal') {
 				for (let aUser of members) {
 					await aUser.update({removed: true});
@@ -220,15 +218,19 @@ applicationRouter
 		// 填写项目信息
 		if(s === 3) {
 			if(applicationForm.status.projectPassed === true) {
-				ctx.throw(400, '不允许修改审核通过的项目信息，如需修改请先撤销申请。');
+				ctx.throw(400, '项目审核已通过，无法修改。');
 			}
 			if(applicationForm.projectId === null){
-				await applicationForm.newProject({
-					t: '',
-					c: ''
+				const documentId = await db.SettingModel.operateSystemID('documents', 1);
+				const newDocument = db.FundDocumentModel({
+					_id: documentId,
+					uid: user.uid,
+					applicationFormId: applicationForm._id,
+					type: 'project'
 				});
+				await newDocument.save();
 				updateObj = {
-					projectId: applicationForm.project._id
+					projectId: documentId
 				};
 				await applicationForm.update(updateObj);
 			} else {
@@ -265,17 +267,8 @@ applicationRouter
 			if(data.userLevel < 7){
 				ctx.throw(401, '您没有权限操作别人的基金申请！');
 			}
-		} else if(type === 'revoked'){
+		} else if(type === 'giveUp'){
 			if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足')
-
-		} else if(type === 'cancel') {// 普通撤销
-			if(adminSupport) {
-				ctx.throw(400, '抱歉！不能撤销已通过管理员批准的申请，如需撤销只能永久撤销。');
-			}
-			await applicationForm.update({
-				'status.submitted': false,
-			});
-			return await next();
 		} else {
 			ctx.throw(400, '未知的操作类型！');
 		}
@@ -287,19 +280,21 @@ applicationRouter
 	.get('/:_id/settings', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.status.submitted) ctx.throw(400, '申请表已提交，如需修改请先点击撤销。');
+		const {fund} = applicationForm;
+		// if(applicationForm.status.submitted) ctx.throw(400, '申请表已提交，如需修改请先点击撤销。');
 		let {s} = ctx.query;
 		if(s) {
 			s = parseInt(s);
 		} else {
 			s = 1;
 		}
-		// if(applicationForm.status.submitted) s = 5;
+		if(applicationForm.status.submitted && s === 1) s = 2;
 		data.s = s;
 		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
 		ctx.template = 'interface_fund_apply.pug';
+		await applicationForm.update({'lock.submitted': false});
 		await next();
 	})
 
@@ -340,112 +335,6 @@ applicationRouter
 		}
 		await next();
 	})
-
-	//审核页面
-	.get('/:_id/audit', async (ctx, next) => {
-		const {data, query} = ctx;
-		const {user, applicationForm} = data;
-		const {type} = query;
-		data.type = type;
-		const {fund, lock} = applicationForm;
-		if(type === 'project') {
-			const {certs, appointed} = fund.censor;
-			for(let cert of certs) { // 不合理的证书判断
-				if(!user.certs.includes(cert) && !appointed.includes(user.uid)) ctx.throw(401, '权限不足');
-			}
-			if(applicationForm.status.projectPassed !== null) ctx.throw(400, '抱歉！该申请表已被其他审查员审核了。');
-			if(!applicationForm.status.submitted) ctx.throw(400, '申请表暂未提交。');
-			const {auditing, uid, timeToOpen, timeToClose} = lock;
-			const {timeOfAudit} = ctx.settings.fund;
-			if(!auditing || (Date.now - timeToOpen) > timeOfAudit) { // 没有人正在审核或审核超时
-				lock.uid = user.uid;
-				lock.timeToOpen = Date.now();
-				lock.timeToClose = null;
-				lock.auditing = true;
-				await applicationForm.save();
-			} else { // 有人正在审核且未超时
-				//若审查员是自己则继续审核
-				if(user.uid !== uid) ctx.throw(400, '抱歉！该申请表正在被其他审查员审核。')
-			}
-		} else if(type === 'admin'){
-			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
-			if(applicationForm.status.adminSupport !== null) ctx.throw(400, '抱歉！该申请表已被其他管理员审核了。');
-			if(!applicationForm.status.projectPassed) ctx.throw(400, '项目审核暂未通过，请等待。');
-			const {auditing, uid, timeToOpen, timeToClose} = lock;
-			const {timeOfAudit} = ctx.settings.fund;
-			if(!auditing || (Date.now - timeToOpen) > timeOfAudit) { // 没有人正在审核或审核超时
-				lock.uid = user.uid;
-				lock.timeToOpen = Date.now();
-				lock.timeToClose = null;
-				lock.auditing = true;
-				await applicationForm.save();
-			} else { // 有人正在审核且未超时
-				//若审查员是自己则继续审核
-				if(user.uid !== uid) ctx.throw(400, '抱歉！该申请表正在被其他管理员审核。')
-			}
-		} else {
-			ctx.throw(400, '未知的type类型。');
-		}
-		ctx.template = 'interface_fund_audit.pug';
-		await next();
-	})
-	//审核提交
-	.post('/:_id/audit', async (ctx, next) => {
-		const {data, body, db} = ctx;
-		const {user, applicationForm} = data;
-		const {fund, lock} = applicationForm;
-		const {certs, appointed} = fund.censor;
-		const {comment, support, type} = body;
-		lock.timeToClose = Date.now();
-		lock.auditing = false;
-		let userType;
-		if(type === 'project') { // 项目审核
-			for(let cert of certs) { // 不合理的证书判断
-				if(!user.certs.includes(cert) && !appointed.includes(user.uid)) ctx.throw(401, '权限不足');
-			}
-			if(applicationForm.status.projectPassed !== null) ctx.throw(400, '抱歉！该申请表已被其他审查员审核了。');
-			if(!applicationForm.status.submitted) ctx.throw(400, '申请表暂未提交。');
-			const {uid} = lock;
-			if(user.uid !== uid) {
-				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他审查员审核。');
-			}
-			userType = 'projectCensor';
-			applicationForm.status.projectPassed = support;
-		} else if(type === 'admin') {// 最后管理员审核
-			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
-			if(!applicationForm.status.projectPassed) ctx.throw(400, '项目审核暂未通过，请等待。');
-			const {uid} = lock;
-			if(user.uid !== uid) {
-				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他管理员审核。');
-			}
-			const {remittance} = body;
-			for (let m of remittance) {
-				applicationForm.remittance.push({
-					money: m,
-					status: null,
-					report: null
-				});
-			}
-			userType = 'admin';
-			applicationForm.status.adminSupport = support;
-		} else {
-			ctx.throw(400, '未知的type类型。');
-		}
-		await applicationForm.newComment({
-			uid: user.uid,
-			userType: userType,
-			c: comment,
-			support,
-		});
-		if(!support) {
-			applicationForm.modifyCount += 1;
-			if(applicationForm.modifyCount > fund.modifyCount) {
-				applicationForm.useless = 'exceededModifyCount';
-			}
-		}
-		await applicationForm.save();
-		await next();
-	})
 	//评论
 	.post('/:_id/comment', async (ctx, next) => {
 		const {data, body} = ctx;
@@ -454,10 +343,10 @@ applicationRouter
 		if(!applicationForm.status.submitted) ctx.throw(400, '申请表未提交，暂不能评论。');
 		await applicationForm.newComment({
 			uid: user.uid,
-			userType: 'ordinary',
 			c: comment.c,
 			t: comment.t,
 		});
 		await next();
-	});
+	})
+	.use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods());
 module.exports = applicationRouter;

@@ -2,6 +2,7 @@ extends bootstrap_base
 block title
   -const mainContainer1400 = true
   -const applicationForm = data.applicationForm;
+  -const {applicant} = applicationForm;
   -const fund = applicationForm.fund;
   -const type = data.type;
   title= `科创基金-${fund.name}`
@@ -10,36 +11,190 @@ block content
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
-      .col-xs-12.col-md-12
-        .row
-          .col-xs-12.col-md-8
-            if type === 'project'
+      if type === 'project'
+        .col-xs-12.col-md-12
+          .row
+            // 身份审核
+            .col-xs-12.col-md-12
+              h3 申请人信息
+            .col-xs-12.col-md-8
+              .panel.panel-default
+                .panel-body
+                  span=`账号ID：`
+                    a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
+                  br
+                  span=`专栏：`
+                    a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
+                  br
+                  span=`真实姓名：${applicant.name}，身份证号码：${applicant.idCardNumber}，联系电话：${applicant.mobile}`
+                  br
+                  span=`生活照：`
+                  .row
+                    .col-xs-12.col-md-12
+                      -for(let photo of applicationForm.applicant.lifePhotos)
+                        a(href=`/photo/${photo._id}` target='_blank')
+                            img(src=`/photo_small/${photo._id}` style='width: 50%; padding: 0.5rem')
+            .col-xs-12.col-md-4
+              textarea.form-control#userInfoComment(rows='12' placeholder='审核评语')
+              label.radio-inline
+                input(type='radio' name='userInfo' checked=true)
+                h5 合格
+              label.radio-inline
+                input(type='radio' name='userInfo' checked=false)
+                h5 不合格
+            //项目信息审核
+            .col-xs-12.col-md-12
+              h3 项目内容
+            .col-xs-12.col-md-8
               .panel.panel-default
                 .panel-body
                   -const project = applicationForm.project
                   h2.text-center#projectTitle= project.t
                   div#projectContent!= experimental_render(project)
-            else if type === 'admin'
-              include interface_fund_applicationForm_info
-          .col-xs-12.col-md-4
-            if type === 'admin'
-              h3 分批拨款
-              h4#total(money= applicationForm.money)= `总：${applicationForm.money}元`
-              h4#remainder= `余：${applicationForm.money}元`
-              p 输入数字以英文逗号 , 分隔
-              .form-group
-                input#remittance.btn-block()
-              .remittance
+                  hr
+                  h4= `研究周期：${applicationForm.projectCycle}天`
+                  if applicationForm.threads.applying.length !== 0
+                    h4= `附带帖子：`
+                    .selectedThreads
+                      -const disagreeUsers = [];
+                      -const notModifiedUsers = [];
+                      -for(let u of applicationForm.members)
+                        if u.agree === false
+                          -disagreeUsers.push(u.uid);
+                        if u.agree === null
+                          -notModifiedUsers.push(u.uid);
+                      -for(let i = 0; i < applicationForm.threads.applying.length; i++)
+                        -const thread = applicationForm.threads.applying[i];
+                        -const firstPost = thread.firstPost;
+                        -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+                        -postString = JSON.stringify(postString);
+                        .threadList
+                          .col-xs-10.col-md-10
+                            .displayNone.postString= postString
+                            span 文号：
+                            span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                            a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                            if notModifiedUsers.includes(thread.uid)
+                              span(style='color: #aaa;') （未处理邀请）
+                            if disagreeUsers.includes(thread.uid)
+                              span.redFontColor （已拒绝邀请）
+                            span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                            br
+                            a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+            .col-xs-12.col-md-4
+              textarea.form-control#projectComment(rows='12' placeholder='审核评语')
+              label.radio-inline
+                input(type='radio' name='project' checked=true)
+                h5 合格
+              label.radio-inline
+                input(type='radio' name='project' checked=false)
+                h5 不合格
+            // 其他信息审核
+            .col-xs-12.col-md-12
+              h3 资金预算
+            .col-xs-12.col-md-8
+              .panel.panel-default
+                .panel-body
+                  if fund.money.max === null && typeof applicationForm.budgetMoney === 'string'
+                    p= applicationForm.budgetMoney
+                  else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
+                    -let aggregate = 0;
+                    #budgetMoney
+                      .fund-money-list.head.peojectAudit
+                        .purpose 用途
+                        .count 数量
+                        .money 单价(元)
+                        .total 合计(元)
+                        div 审查员建议(元)
+                        div 实际
+                      -for(let p of applicationForm.budgetMoney)
+                        -const total = p.count*p.money;
+                        -aggregate += total;
+                        .fund-money-list.peojectAudit
+                          .purpose= p.purpose
+                          .count= p.count
+                          .money= p.money
+                          .total= total
+                          div(contenteditable=true).suggestMoney= total
+                    h3=`总计：`
+                      span#total= `${aggregate}`
+                      span=`元`
+                    h3=`管理员建议：`
+                      span#suggestMoney=`${aggregate}`
+                      span=`元`
+                    p#projectAuditInfo.redFontColor
+            .col-xs-12.col-md-4
+              textarea.form-control#moneyComment(rows='12' placeholder='审核评语')
+              label.radio-inline
+                input(type='radio' name='otherMessages' checked=true)
+                h5 合格
+              label.radio-inline
+                input(type='radio' name='otherMessages' checked=false)
+                h5 不合格
+            .col-xs-12.col-md-12
+              br
+              button.btn.btn-info.center-block#submit(onclick=`submitProject(${applicationForm._id})`) 通过
 
-            textarea.form-control#comment(rows='12' placeholder='审核评语')
-            label.radio-inline
-              input(type='radio' name='audit' checked=true)
-              h5 通过
-            label.radio-inline
-              input(type='radio' name='audit' checked=false)
-              h5 不通过
-            br
-            button.btn.btn-info.btn-block(onclick=`submit(${applicationForm._id}, "${type}")`) 提交
+      else
+        .col-xs-12.col-md-12
+          h3 资金预算
+        .col-xs-12.col-md-8
+          .panel.panel-default
+            .panel-body
+              if fund.money.max === null && typeof applicationForm.budgetMoney === 'string'
+                p= applicationForm.budgetMoney
+              else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
+                -let aggregate = 0, suggest = 0;
+                #budgetMoney
+                  .fund-money-list.head.adminAudit
+                    .purpose 用途
+                    .count 数量
+                    .money 单价(元)
+                    .total 合计(元)
+                    div 审查员建议(元)
+                    div 实际
+                  -for(let p of applicationForm.budgetMoney)
+                    -const total = p.count*p.money;
+                    -aggregate += total;
+                    -suggest += p.suggest
+                    .fund-money-list.adminAudit
+                      .purpose= p.purpose
+                      .count= p.count
+                      .money= p.money
+                      .total= total
+                      div= p.suggest
+                      div.factMoney(contenteditable=true)= p.suggest
+                h3=`总计：`
+                  span#total= `${aggregate}`
+                  span=`元`
+                h3=`管理员建议：`
+                  span#suggestMoney=`${suggest}`
+                  span=`元`
+                h3=`实际：`
+                  span#factMoney=`${suggest}`
+                  span=`元`
+                p#adminAuditInfo.redFontColor
+        .col-xs-12.col-md-4
+          textarea.form-control#moneyComment(rows='12' placeholder='审核评语')
+          label.radio-inline
+            input(type='radio' name='otherMessages' checked=true)
+            h5 合格
+          label.radio-inline
+            input(type='radio' name='otherMessages' checked=false)
+            h5 不合格
+        .col-xs-12.col-md-12
+          h3 分期打款
+        .col-xs-12.col-md-8
+          .panel.panel-default
+            .panel-body
+              span 输入分期数：
+              input#remittanceCount(type="number")
+              button#enterBtn 确定
+              #remittanceList
+        .col-xs-12.col-md-12
+          br
+          button.btn.btn-info.center-block#submit(onclick=`submitAdmin(${applicationForm._id})`) 通过
+
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_audit.js')
