@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
-const async_hooks = require('async_hooks');
+const os = require('os');
 
 const mongoDB = require('./mongoDB');
 const options = {
   promiseLibrary: Promise,
   useMongoClient: true,
-  autoIndex: false
+  autoIndex: false,
+  poolSize: 50,
+  keepAlive: 120
 };
 
 mongoose.Promise = Promise;

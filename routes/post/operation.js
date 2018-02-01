@@ -119,6 +119,7 @@ operationRouter
     const {disabled} = ctx.body;
     const {pid} = ctx.params;
     const {db, data} = ctx;
+    const {PostModel} = db;
     const {user} = data;
     if(disabled === undefined) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});

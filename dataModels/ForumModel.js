@@ -82,20 +82,25 @@ const forumSchema = new Schema({
   }
 });
 // 验证是否有权限进入此版块
-forumSchema.methods.ensurePermission = function (visibleFid) {
+forumSchema.methods.ensurePermission = async function (ctx) {
+  const {data} = ctx;
+  const visibleFid = await ctx.getVisibleFid();
+  const {contentClasses} = data.certificates;
+  if(!this.visibility)
+    return contentClasses.includes(this.class);
   return visibleFid.includes(this.fid);
 };
 // 若是父板块则返回有权限访问的子版块的fid
-forumSchema.methods.getFidOfChildForum = async function (visibleFid) {
+forumSchema.methods.getFidOfChildForum = async function (ctx) {
   const ForumModel = require('./ForumModel');
   let fidArr = [];
   fidArr.push(this.fid);
   if(this.type === 'category') {
     let forums = await ForumModel.find({parentId: this.fid});
-    forums.map(forum => {
-      if(forum.ensurePermission(visibleFid))
+    await Promise.all(forums.map(async forum => {
+      if(await forum.ensurePermission(ctx))
         fidArr.push(forum.fid);
-    });
+    }));
   }
   return fidArr;
 };
