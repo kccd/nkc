@@ -48,6 +48,9 @@ function init() {
 	$('.alipay').on('click', function() {
 		chooseAlipay();
 	});
+	$('.bankCard').on('click', function() {
+		chooseBankCard();
+	});
 	$('#account').on('click', function(){
 		initFundPay();
 		if(payMethod === '') {
@@ -295,8 +298,8 @@ function initFundPay() {
 		payMethod = 'wechat';
 	} else if($('.alipay').hasClass('active')) {
 		payMethod = 'alipay';
-	} else {
-		payMethod = '';
+	} else if($('.bankCard').hasClass('active')){
+		payMethod = 'bankCard';
 	}
 }
 
@@ -304,11 +307,20 @@ function initFundPay() {
 function chooseWechat() {
 	$('.wechat').addClass('active');
 	$('.alipay').removeClass('active');
+	$('.bankCard').removeClass('active');
 	initFundPay();
 }
 function chooseAlipay() {
-	$('.wechat').removeClass('active');
+	$('.bankCard').removeClass('active');
 	$('.alipay').addClass('active');
+	$('.wechat').removeClass('active');
+	initFundPay();
+}
+
+function chooseBankCard() {
+	$('.bankCard').addClass('active');
+	$('.alipay').removeClass('active');
+	$('.wechat').removeClass('active');
 	initFundPay();
 }
 
@@ -841,3 +853,10 @@ function submitApplicationForm() {
 		})
 }
 
+function deleteApplicationForm(id) {
+	var msg = '删除申请表后所有填写的内容都将会被删除，确认要删除吗？';
+	if(confirm(msg) === true) {
+		nkcAPI('/fund/a/'+id, 'DELETE', {})
+			.then()
+	}
+};

@@ -449,9 +449,9 @@ const certificates ={
 			      add: {
 				      [GET]: true // 填写申请信息页面
 			      },
-			      a: {
-			      	[name]: '基金申请列表',
-				      [GET]: true
+			      bills: {// 基金项目的账单
+			      	[GET]: true,
+				      [POST]: true
 			      }
 		      }
 	      },
@@ -475,6 +475,11 @@ const certificates ={
 			      },
 			      audit: {
 				      [GET]: true,
+				      [POST]: true
+			      },
+			      report: {
+        			[name]: '报告进度',
+        			[GET]: true,
 				      [POST]: true
 			      }
 		      }
@@ -775,10 +780,6 @@ const certificates ={
       },
       /*fund: {
         [POST]: true,
-	      m: {
-		      [name]:'基金管理页面',
-		      [GET]: true,
-	      },
 	      add: {
 					[name]: '新建基金项目页面',
 		      [GET]: true
@@ -793,6 +794,14 @@ const certificates ={
 				      [GET]: true // 基金设置
 			      }
 		      }
+	      },
+	      a: {
+        	[parameter]: {
+        		remittance: {// 汇款
+        			[GET]: true,
+			        [POST]: true
+		        }
+	        }
 	      }
 
       },

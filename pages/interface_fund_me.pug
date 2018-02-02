@@ -1,6 +1,6 @@
 extends bootstrap_base
 block title
-  title= `${data.user.username}的基金申请`
+  title= `我的基金 - 科创基金`
   link(rel='stylesheet' href='/fund.css')
 block content
   -const mainContainer1400 = true
@@ -55,7 +55,7 @@ block content
                         else if adminSupport === false
                           span.redFontColor 管理员审核不通过
                         else if !remittance
-                          span 等待打款
+                          span 等待汇款
                         else if !completed
                           span 等待结项
                         else
@@ -95,7 +95,7 @@ block content
                                       -for(let u of a.members)
                                         a(href=`/m/${u.uid}`)= `${u.user.username} `
                                   br
-                                  span=`项目名称：${a.project.t}`
+                                  span=`项目名称：${a.project?a.project.t: '暂未填写'}`
                                   br
                                   span= `状态：`
                                   +status(a)

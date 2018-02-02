@@ -1,0 +1,34 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title= `科创基金-${data.fund.name}`
+block content
+  -const {fund, bills} = data;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      //.col-xs-12.col-md-12(style='margin-bottom: 1rem')
+      //  .fund-panel
+      //    .fund-panel-title(style=`background-color: ${fund ? fund.color : ''};background-image: ${fund && fund.image ? `url(/fundBGI/${fund.image})` : ''}`)
+      //      .col-xs-12.col-md-12
+      //        h1.fund-name=fund.name
+      //        p= fund.description.brief
+      .col-xs-12.col-md-9
+        .panel.panel-default
+          .panel-body
+            if bills.length === 0
+              .blank 暂无数据
+            else
+              include interface_fund_billList
+      .col-xs-12.col-md-3
+        .panel.panel-default
+          .panel-body
+            img(src=`/fundBGI_small/${fund.image}` style="width: 100%;")
+            h2.text-center(style='margin-top: -4rem;margin-bottom: 4rem;color: #fff;')= `科创基金-${fund.name}`
+            .row
+              .col-xs-12.col-md-12
+                h4.text-center 剩余金额
+                -let difference = 0;
+                -for(let b of bills)
+                  -difference += b.changed;
+                h2.text-center(style='color:#ff7979;')= `￥${fund.money.initial + difference}`

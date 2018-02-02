@@ -2,19 +2,16 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationHistorySchema = new Schema({
-	applicationFormId: {
-		type: Number,
-		required: true,
+	applicationFormId: Number,
+	year: {
+		type: String,
+		default: null,
 		index: 1
 	},
 	order: {
 		type: Number,
-		default: '',
+		default: null,
 		index: 1
-	},
-	year: {
-		type: String,
-		default: null
 	},
 	code: {// 申请编号 如：2017A02
 		type: String,
@@ -24,6 +21,10 @@ const fundApplicationHistorySchema = new Schema({
 		type: String,
 		required: true,
 		index: 1
+	},
+	fixedMoney: {
+		type: Boolean,
+		required: true
 	},
 	toc: {
 		type: Date,
@@ -112,12 +113,8 @@ const fundApplicationHistorySchema = new Schema({
 		default: null,
 		index: 1
 	},
-	project: {
-		type: Schema.Types.Mixed,
-		default: null
-	},
 	status: {
-		submitted: { // 已提交申请
+		submitted: { // 判断是否是提交过的申请表，下边的lock.submitted作用是判断申请表当前是否提交。
 			type: Boolean,
 			default: null
 		},
@@ -136,7 +133,7 @@ const fundApplicationHistorySchema = new Schema({
 			default: null,
 			index: 1
 		},
-		remittance: { // 已打款
+		remittance: { // 已汇款
 			type: Boolean,
 			default: null,
 			index: 1
@@ -157,12 +154,21 @@ const fundApplicationHistorySchema = new Schema({
 			index: 1
 		}
 	},
-	useless: { //disabled: 被封禁，revoked: 被永久撤销，exceededModifyCount: 超过修改次数， null: 数据有效
+	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效
 		type: String,
 		default: null,
 		index: 1
 	},
+	disabled: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
 	lock: {
+		submitted: { // 用于判断用户当前申请表是否已提交
+			type: Boolean,
+			default: false
+		},
 		auditing: {
 			type: Boolean,
 			default: false,

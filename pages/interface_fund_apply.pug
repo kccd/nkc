@@ -5,10 +5,10 @@ block title
   -const {applicationForm, s} = data;
   -const mainContainer1400 = true
   -const {authLevel} = fund.applicant;
-  -const {status, members, project, budgetMoney, projectCycle, threads} = applicationForm;
+  -const {status, members, project, budgetMoney, projectCycle, threads, fixedMoney} = applicationForm;
   -const {submitted} = status;
   -let aggregate = 0;
-  title= `${fund.name}申请表`
+  title= `${fund.name} - 科创基金`
   link(rel='stylesheet' href='/fund.css')
   style.
 
@@ -98,7 +98,7 @@ block content
                     small （天）
                   input.fund-input#projectCycle(value=projectCycle !== null? projectCycle: '' )
                   h4 资金用途
-                  if fund.money.fixed !== null
+                  if fixedMoney
                     span 常用：
                     span.fund-span.addPurpose 购买电子元器件
                     span.fund-span.addPurpose 印电路板
@@ -266,17 +266,21 @@ block content
                         if aggregate === 0
                           +ds('资金预算不能为0')
                         if aggregate > fund.money.max
-                          +ds('资金预算金额已超过该基金项目单笔申请的最大金额')
+                          +ds(`资金预算金额已超过该基金项目单笔申请的最大金额（${fund.money.max}元）`)
                   if fund.thread.count > applicationForm.threadsId.applying.length
                     +ds(`附带的帖子数未达到最低要求(至少${fund.thread.count}篇)`)
                   if !disabledSubmit
                     h3.greenFontColor 信息录入完整,可提交申请！
               hr
-              .back-next
+              .col-xs-12.col-md-2.col-md-offset-5
                 if disabledSubmit
-                  .apply-next.disabled(style='background-color: #aaa' onclick='screenTopWarning("条件不满足，无法提交")') 提交申请
+                  button.btn.btn-block(style='width: 100%;' onclick='screenTopWarning("条件不满足，无法提交")' disabled="disabled") 提交申请
                 else
-                  .apply-next(onclick=`submitApplicationForm()`) 提交申请
+                  button.btn.btn-block.btn-info(style='width: 100%;' onclick='submitApplicationForm()') 提交申请
+              if !applicationForm.status.submitted
+                .col-xs-12.col-md-2.col-md-offset-5
+                  br
+                  button.btn.btn-danger.btn-block(onclick=`deleteApplicationForm(${applicationForm._id})`) 删除申请表
             -let funSave, funNext;
             if s !== 5
               if s === 1
@@ -292,26 +296,11 @@ block content
                 -funSave = `saveOtherMessages()`;
                 -funNext = `submitOtherMessages()`;
               hr
-              .back-next
-                .last
-                  .apply-next(onclick=funSave) 保存
-                .next
-                  .apply-next(onclick=funNext) 下一步
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+              .col-xs-12.col-md-2.col-md-offset-5
+                button.btn.btn-info.btn-block(style='width: 100%;' onclick=funSave) 保存
+                br
+              .col-xs-12.col-md-2.col-md-offset-5
+                button.btn.btn-info.btn-block(style='width: 100%;' onclick=funNext) 下一步
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_fund_common.js')
   script(src='/interface_fund_apply.js')

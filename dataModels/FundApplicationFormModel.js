@@ -1,9 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const fs = require('fs');
-const {promisify} = require('util');
-const copyFile = promisify(fs.copyFile);
 const fundApplicationFormSchema = new Schema({
   _id: Number,
 	year: {
@@ -25,6 +22,10 @@ const fundApplicationFormSchema = new Schema({
     required: true,
     index: 1
   },
+	fixedMoney: {
+  	type: Boolean,
+		required: true
+	},
   toc: {
     type: Date,
     default: Date.now,
@@ -127,7 +128,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    remittance: { // 已打款
+    remittance: { // 已汇款
       type: Boolean,
       default: null,
       index: 1
@@ -148,9 +149,14 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-	useless: { //disabled: 被封禁，giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效
+	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效
   	type: String,
 		default: null,
+		index: 1
+	},
+	disabled: {
+  	type: Boolean,
+		default: false,
 		index: 1
 	},
   lock: {
@@ -279,7 +285,6 @@ fundApplicationFormSchema.pre('save', function(next) {
 fundApplicationFormSchema.pre('save', async function(next) {
 	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
 	const fund = await this.extendFund();
-	console.log(fund);
 	const {code, status, supportersId} = this;
 	const {submitted} = status;
 	// 网友支持
@@ -327,7 +332,8 @@ fundApplicationFormSchema.methods.extendMembers = async function() {
 
 fundApplicationFormSchema.methods.extendFund = async function() {
 	const FundModel = require('./FundModel');
-	const fund = await FundModel.findOnly({_id: this.fundId, display: true});
+	const fund = await FundModel.findOne({_id: this.fundId, disabled: false});
+	if(!fund) throw '抱歉！该基金项目已被屏蔽，所有基金申请表暂不能查看。';
 	return this.fund = fund;
 };
 
@@ -359,7 +365,7 @@ fundApplicationFormSchema.methods.newComment = async function(comment) {
 	const applicationFormId = this._id;
 	const FundDocumentModel = require('./FundDocumentModel');
 	const SettingModel = require('./SettingModel');
-	const id = await SettingModel.operateSystemID('documents', 1);
+	const id = await SettingModel.operateSystemID('fundDocuments', 1);
 	const {c, type, uid, support} = comment;
 	const newDocument = new FundDocumentModel({
 		_id: id,
@@ -498,6 +504,8 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.status.submitted = true;
 	this.lock.submitted = true;
 	this.modifyCount += 1;
+	if(this.status.projectPassed === false) this.status.projectPassed = null;
+	if(this.status.adminSupport === false) this.status.adminSupport = null;
 	await this.save();
 };
 

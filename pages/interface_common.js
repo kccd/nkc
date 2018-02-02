@@ -585,11 +585,13 @@ function userMessagesForm() {
 	}
 	*/
 
-	if($('.wechat').length !== 0) {
+	if($('.wechat, .alipay, .bankCard').length !== 0) {
 		if($('.wechat').hasClass('active')) {
 			obj.paymentType = 'wechat';
-		} else if($('.alipay').hasClass('active')){
+		} else if($('.alipay').hasClass('active')) {
 			obj.paymentType = 'alipay';
+		} else if($('.bankCard').hasClass('active')) {
+			obj.paymentType = 'bankCard';
 		} else {
 			throw '请选择收款方式！';
 		}

@@ -1,0 +1,57 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 科创基金
+block content
+  -const {applicationForm} = data;
+  -const {fund, remittance, status, project, applicant, members, code, _id} = applicationForm;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .panel.panel-default
+      .panel-body
+        .row
+          .col-xs-12.col-md-8
+            h4=`项目ID：`
+              a(href=`/fund/a/${code}` target="_blank")= `${code}`
+            h4=`项目名称：${project.t}`
+            h4=`申请人：`
+              a(href=`/m/${applicant.uid}` target="_blank")= `${applicant.user.username}`
+            if members.length > 0
+              h4=`组员：`
+                -for(let aUser of members)
+                  a(href=`/m/${aUser.uid}` target="_blank")= `${aUser.user.username}`
+                  span &nbsp;&nbsp;
+            hr
+            h3=`总共${remittance.length}期，总金额：${applicationForm.factMoney}元`
+            table.table
+              thead
+                tr
+                  th #
+                  th 金额
+                  th 状态
+                  th 汇款人ID
+                  th 汇款时间
+                  th 操作
+
+              tbody
+                -for(let i = 0; i < remittance.length; i++)
+                  -const r = remittance[i];
+                  tr
+                    th= `第${i+1}期`
+                    th= r.money + '元'
+                    th= r.status?'已汇款':'未汇款'
+                    th
+                      if r.user
+                        a(href=`/m/${r.uid}`)= r.user.username
+
+                    th= r.time?r.time.toLocaleString(): ''
+                    th
+                      if r.status
+                        span 已确认汇款
+                      else
+                        a(href=`##` target="_blank")= r.status ? '' : '去汇款界面'
+                        span &nbsp;&nbsp;
+                        button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已汇款'
+block scripts
+  script(src="/interface_common.js")
+  script(src="/interface_fund_remittance.js")

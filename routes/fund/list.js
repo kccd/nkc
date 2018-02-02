@@ -1,11 +1,13 @@
 const Router = require('koa-router');
 const listRouter = new Router();
 const apiFn = require('../../nkcModules').apiFunction;
+const billsRouter = require('./bills');
 listRouter
 	// 基金项目列表
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-
+		data.funds = await db.FundModel.find({display: true, disabled: false}).sort({toc: 1});
+		ctx.template = 'interface_fund_list.pug';
 		await next();
 	})
 	// 添加基金项目
@@ -20,20 +22,13 @@ listRouter
 		data.fund = newFund;
 		await next();
 	})
-	// 删除基金项目
-	.del('/:fundId', async (ctx, next) => {
-		const {data, db} = ctx;
-		const {fundId} = ctx.params;
-		const fund = await db.FundModel.findOnly({_id: fundId});
-		await fund.remove();
-		await next();
-	})
 	// 修改基金项目
 	.patch('/:fundId', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {fundId} = ctx.params;
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
+		console.log(fundObj)
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
@@ -49,10 +44,10 @@ listRouter
 		page = page? parseInt(page): 0;
 		data.type = type;
 		data.page = page;
-		const fund = await db.FundModel.findOnly({_id: fundId, display: true});
+		const fund = await db.FundModel.findOnly({_id: fundId, disabled: false});
 		data.fund = fund;
 		let query = {
-			useless: {$ne: 'disabled'},
+			disabled: false,
 			'status.submitted': true,
 			fundId: fund._id
 		};
@@ -98,16 +93,19 @@ listRouter
 		}
 		data.fundCerts = fundCerts;
 		data.fund = await db.FundModel.findOnly({_id: fundId});
+		data.nav = '基金设置';
 		ctx.template = 'interface_fund_setting.pug';
 		await next();
 	})
 	// 该基金项目下的基金申请
 	.get('/:fundId/add', async (ctx, next) => {
 		const {data, db} = ctx;
+		data.nav = '基金申请';
 		const {user} = data;
 		const {fundId} = ctx.params;
 		const {agree} = ctx.query;
-		const fund = await db.FundModel.findOnly({_id: fundId, display: true});
+		const fund = await db.FundModel.findOne({_id: fundId, canApply: true});
+		if(!fund) ctx.throw(400, '抱歉！该基金项目暂不能申请。');
 		data.fund = fund;
 		ctx.template = 'interface_fund_agreement.pug';
 		try {
@@ -135,6 +133,7 @@ listRouter
 		applicationForm._id = await db.SettingModel.operateSystemID('fundApplicationForms', 1);
 		applicationForm.uid = user.uid;
 		applicationForm.fundId = fundId;
+		applicationForm.fixedMoney = !!fund.money.fixed;
 		if(fund.applicationMethod.individual) {
 			applicationForm.from = 'personal';
 		} else if(fund.applicationMethod.group) {
@@ -150,10 +149,12 @@ listRouter
 			applicationFormId: applicationForm._id,
 			mobile: userPersonal.mobile? userPersonal.mobile: null,
 			uid: user.uid,
-			authLevel
+			authLevel,
+
 		});
 		await newApplicationUser.save();
 		ctx.redirect(`/fund/a/${applicationForm._id}/settings`, 301);
 		await next();
-	});
+	})
+	.use('/:fundId/bills', billsRouter.routes(), billsRouter.allowedMethods());
 module.exports = listRouter;
