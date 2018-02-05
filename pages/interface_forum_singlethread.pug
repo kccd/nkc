@@ -155,7 +155,7 @@
     -let heightType = 'max-height';
     if hasCover
       -heightType = 'height';
-      .new-content-left.fixed-height(style=`background-image: url(/cover/${tid})`)
+      a.new-content-left.fixed-height(style=`background-image: url(/cover/${tid})` href=`/t/${tid}`)
     .new-content-right(class=hasCover?'div-img': 'div-noImg')
       div(style='width: 100%; float: left;')
         p(class=hasCover ? 'p-img' : 'p-noImg' style=`font-size: 16px;padding: 0 0.5rem 0 0.5rem;border-radius:0.5rem;float:left;${heightType}:4.1em;overflow:hidden;margin-bottom:0.2rem;`)
@@ -167,11 +167,11 @@
           -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
           -lastPost.c = filterQuote(lastPost.c)
           a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))
-  .new-content-info(style='float: right;')
-    //span
-    //  a(href=`/m/${lastPost.user.uid}`)
-    //    img(src=`/avatar_small/${lastPost.user.uid}`)
-    span
-      a(href=`/m/${lastPost.user.uid}`)= lastPost.user.username
-    span.icon-font=fromNow(lastPost.toc)
+      .new-content-info(style='float: right;')
+        //span
+        //  a(href=`/m/${lastPost.user.uid}`)
+        //    img(src=`/avatar_small/${lastPost.user.uid}`)
+        span
+          a(href=`/m/${lastPost.user.uid}`)= lastPost.user.username
+        span.icon-font=fromNow(lastPost.toc)
 hr(style='margin: 2px 0 2px 0;')

@@ -11,7 +11,7 @@ photoRouter
 		if(photo.type === 'fund') {
 			// const applicationForm = db.FundApplicationFormModel.findOnly({_id: photo.applicationFormId});
 		} else if(photo.uid !== user.uid && userLevel < 7) {
-			ctx.throw(401, '权限不足');
+			ctx.throw(403, '权限不足');
 		}
 		ctx.filePath = photoPath + photo.path;
 		ctx.set('Cache-Control', 'public, no-cache');
@@ -75,7 +75,7 @@ photoRouter
 		const {photoId} = params;
 		const photo = await db.PhotoModel.findOnly({_id: photoId});
 		const {user} = data;
-		if(user.uid !== photo.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(user.uid !== photo.uid && data.userLevel < 7) ctx.throw(403, '权限不足');
 		await photo.removeReference();
 		await next();
 	});

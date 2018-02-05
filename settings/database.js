@@ -4,7 +4,6 @@ const os = require('os');
 const mongoDB = require('./mongoDB');
 const options = {
   promiseLibrary: Promise,
-  useMongoClient: true,
   autoIndex: false,
   poolSize: 50,
   keepAlive: 120
@@ -27,10 +26,10 @@ mongoose.plugin(function(schema) {
     const err = new Error(`${JSON.stringify(query)} document not found`);
     if(JSON.stringify(query) === '{}')
       throw new Error('param not specify');
-    const doc = await this.findOne(query);
-    if(!doc)
+    const docs = await this.find(query);
+    if(docs.length !== 1)
       throw err;
-    return doc
+    return docs[0]
   };
   schema.post('init', function(doc, next) {
     doc._initial_state_ = JSON.parse(JSON.stringify(doc._doc));

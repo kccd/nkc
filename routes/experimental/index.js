@@ -146,6 +146,14 @@ experimentalRouter
     ctx.template = 'interface_behavior_log.pug';
     await next();
   })
+  .get('/new_forum', async (ctx, next) => {
+    const {data, db, allContentClasses} = ctx;
+    const {ForumModel} = db;
+    data.allContentClasses = allContentClasses;
+    data.parentForums = await ForumModel.find({type: 'category'});
+    ctx.template = 'interface_new_forum.pug';
+    return next()
+  })
   .patch('/npmInstall', async (ctx, next) => {
     ctx.data.message = await npmInstallify();
     await next();

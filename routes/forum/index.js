@@ -15,6 +15,63 @@ forumRouter
     data.navbar = {highlight: 'forums'};
     await next();
   })
+	.post('/', async (ctx, next) => {
+		const {data, body, db} = ctx;
+		const {ForumModel, UserModel, SettingModel} = db;
+		const {userLevel} = data;
+		const {
+		  type,
+      description,
+      displayName,
+      visibility,
+      parentId,
+      order,
+      moderators,
+      isVisibleForNCC,
+      color,
+      contentClass,
+      abbr,
+		} = body;
+    if(userLevel < 6) {
+      ctx.throw(403, '权限不足');
+      return next()
+    }
+    const isDisplayNameExists = await ForumModel.findOne({displayName});
+    if(isDisplayNameExists) {
+      ctx.throw(409, `全名为 [${displayName}] 的板块已存在`);
+      return next()
+    }
+		switch(type) {
+      case 'category':
+        body.parentId = undefined;
+        break;
+      case 'forum':
+        if(parentId && await ForumModel.findOne({fid: parentId}))
+          break;
+        else {
+          ctx.throw(409, `父分区 [${parentId}] 不存在或未指定`);
+          return next()
+        }
+      default:
+        ctx.throw(409, `未知分区类型 [${type}] `);
+        return next()
+    }
+    body.class = contentClass;
+		const usernames = moderators.split(',').map(name => name.toLowerCase());
+    try {
+      body.moderators = await Promise.all(usernames.map(async name =>
+        await UserModel.findOnly({usernameLowerCase: name})
+          .then(user => user.uid)
+      ));
+    } catch(e) {
+      ctx.throw(409, '管理员中有不存在的用户名');
+      return next()
+    }
+    body.fid = await SettingModel.operateSystemID('forums', 1);
+    const newForum = new ForumModel(body);
+		await newForum.save();
+    return ctx.redirect(`/f/${body.fid}`, 303)
+	})
   .get('/:fid', async (ctx, next) => {
     const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;
     const {fid} = ctx.params;
@@ -22,7 +79,7 @@ forumRouter
     const {digest, cat, sortby} = query;
     const page = query.page || 0;
     const forum = await ForumModel.findOnly({fid});
-    if(!await forum.ensurePermission(ctx)) ctx.throw(401, '权限不足');
+    if(!await forum.ensurePermission(ctx)) ctx.throw(403, '权限不足');
     const fidOfChildForum = await forum.getFidOfChildForum(ctx);
     let q = {
       fid: {$in: fidOfChildForum}
@@ -110,6 +167,20 @@ forumRouter
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     data.post = _post;
     await next();
+  })
+  .del('/:fid', async (ctx, next) => {
+    const {params, db} = ctx;
+    const {fid} = params;
+    const {ThreadModel, ForumModel} = db;
+    const forum = ForumModel.findOnly({fid});
+    const count = await ThreadModel.count({fid});
+    if(count > 0) {
+      ctx.throw(409, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
+      return next()
+    } else {
+      await forum.remove()
+    }
+    return next()
   })
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
 

@@ -1,5 +1,9 @@
 const Router = require('koa-router');
-const operationRouter = require('./operation');
+const quote = require('./quote');
+const history = require('./history');
+const credit = require('./credit');
+const disabled = require('./credit');
+const recommend = require('./recommend');
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 const settings = require('../../settings');
@@ -69,5 +73,9 @@ postRouter
     await targetUser.updateUserMessage();
     await next();
   })
-  .use('/:pid', operationRouter.routes(), operationRouter.allowedMethods());
+  .use('/:pid/history', history.routes(), history.allowedMethods())
+  .use('/:pid/recommend', recommend.routes(), recommend.allowedMethods())
+  .use('/:pid/credit', credit.routes(), credit.allowedMethods())
+  .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
+  .use('/:pid/quote', quote.routes(), quote.allowedMethods());
 module.exports = postRouter;

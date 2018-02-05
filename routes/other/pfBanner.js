@@ -29,7 +29,7 @@ router
     const {data, db, settings, fs} = ctx;
     const {user} = data;
     const targetPersonalForum = await db.PersonalForumModel.findOnly({uid});
-    if(user.uid !== uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
+    if(user.uid !== uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(403, '权限不足');
     const extArr = ['jpg', 'png', 'jpeg'];
     const {imageMagick} = ctx.tools;
     const file = ctx.body.files.file;

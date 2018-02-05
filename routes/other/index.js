@@ -34,7 +34,7 @@ const coverRouter = require('./cover');
 otherRouter
   .get('/latest', async (ctx, next) => {
     const {db, data} = ctx;
-    if(data.userLevel < 0) ctx.throw(401, '根据系统记录，你的账号已经被封禁，请重新注册。');
+    if(data.userLevel < 0) ctx.throw(403, '根据系统记录，你的账号已经被封禁，请重新注册。');
     const {user} = data;
     const {content} = ctx.query;
     data.content = content || 'all';

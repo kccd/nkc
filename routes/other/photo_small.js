@@ -10,7 +10,7 @@ photoSmallRouter
 		if(photo.type === 'fund') {
 			// const applicationForm = db.FundApplicationFormModel.findOnly({_id: photo.applicationFormId});
 		} else if(photo.uid !== user.uid && userLevel < 7) {
-			ctx.throw(401, '权限不足');
+			ctx.throw(403, '权限不足');
 		}
 		ctx.filePath = photoSmallPath + photo.path;
 		ctx.type = 'jpg';

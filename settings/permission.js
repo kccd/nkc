@@ -682,6 +682,14 @@ const certificates ={
           disabled: {
             [name]: '屏蔽',
             [PATCH]: true
+          },
+          history: {
+            rollback: {
+              [GET]: true,
+              [parameter]: {
+                [GET]: true
+              }
+            }
           }
         }
       },
@@ -725,6 +733,11 @@ const certificates ={
           }
         }
       },
+      e: {
+        new_forum: {
+          [GET]: true,
+        }
+      },
       f: {
         [parameter]: {
           [PATCH]: true,
@@ -737,8 +750,8 @@ const certificates ={
               [DELETE]: true
             }
           }
-
-        }
+        },
+        [POST]: true
       }
     }
   },
@@ -809,6 +822,18 @@ const certificates ={
   }
 };
 
+const allContentClasses = [
+  'null',
+  'images',
+  'non_public',
+  'non_images',
+  'non_broadcast',
+  'professional',
+  'sensitive',
+  'classified',
+  'administractive'
+];
+
 module.exports = {
   methodEnum,
   time: {
@@ -819,5 +844,6 @@ module.exports = {
   },
   certificates,
   parameter,
-  name
+  name,
+  allContentClasses
 };

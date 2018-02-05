@@ -7,7 +7,7 @@ operationRouter
 		const {switchStatus, switchStatusOfCert} = ctx.body;
 		const {fid} = ctx.params;
 		const form = await db.ForumModel.findOnly({fid});
-		if(data.userLevel < 6) ctx.throw(401, '权限不足');
+		if(data.userLevel < 6) ctx.throw(403, '权限不足');
 		if(switchStatus !== undefined) {
 			if(form.visibility === switchStatus && switchStatus)
 				ctx.throw(400, '该板块在您操作之前已经被设置成对用户可见了，请刷新');
@@ -33,7 +33,7 @@ operationRouter
 		const {data, db} = ctx;
 		const {fid} = ctx.params;
 		const visibleFid = await ctx.getVisibleFid();
-		if(!visibleFid.includes(fid)) ctx.throw(401,'权限不足');
+		if(!visibleFid.includes(fid)) ctx.throw(403,'权限不足');
 		data.categorys = await db.ThreadTypeModel.find({fid}).sort({order: 1});
 		await next();
 	})

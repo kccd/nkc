@@ -82,7 +82,7 @@ threadRouter
 			PostModel
 		} = db;
 		const thread = await ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermission(ctx)) ctx.throw(401, '权限不足');
+		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
 		let q = {
 			tid: tid
 		};

@@ -6,7 +6,8 @@ const {
   certificates,
   parameter,
   name,
-  time
+  time,
+  allContentClasses
 } = settings.permission;
 const {_hour, _day, _month, _year} = time;
 
@@ -151,6 +152,7 @@ module.exports = async (ctx, next) => {
     certs = ctx.data.user.certs;
   }
   const cs = getPermitTree(certs);
+  ctx.allContentClasses = allContentClasses;
   cs.contentClasses = Object.keys(cs.contentClasses || {})
     .filter(e => cs.contentClasses[e]);
   ctx.data.certificates = cs;
@@ -187,9 +189,9 @@ module.exports = async (ctx, next) => {
   ctx.data.userLevel = excuteLevel(ctx.data.user);
   if(!ctx.data.ensurePermission()) {
     if(ctx.data.userLevel < 0){
-      ctx.throw(401, '根据系统记录，你的账号已经被封禁，请重新注册。');
+      ctx.throw(403, '根据系统记录，你的账号已经被封禁，请重新注册。');
     }else {
-      ctx.throw(401, `权限不足`);
+      ctx.throw(403, `权限不足`);
     }
   }
   await next();

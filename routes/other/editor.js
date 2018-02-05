@@ -18,7 +18,7 @@ editorRouter
     if(type === 'post') {
       const targetPost = await db.PostModel.findOnly({pid: id});
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-      if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
+      if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
       data.content = targetPost.c;
       data.title = targetPost.t;
       data.targetUser = await targetPost.extendUser();

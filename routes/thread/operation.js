@@ -14,8 +14,8 @@ operationRouter
 		const {db, data} = ctx;
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
-		if(thread.disabled) ctx.throw(401, '不能收藏已被封禁的帖子');
-		if(!await thread.ensurePermission(ctx)) ctx.throw(401, '权限不足');
+		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
+		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
 		if(collection) ctx.throw(400, '该贴子已经存在于您的收藏中，没有必要重复收藏');
 		const newCollection = new db.CollectionModel({
@@ -37,7 +37,7 @@ operationRouter
 		const {tid} = ctx.params;
 		const {db, data, fs} = ctx;
 		const thread = await db.ThreadModel.findOnly({tid});
-		if(data.userLevel < 6) ctx.throw(401, '权限不足');
+		if(data.userLevel < 6) ctx.throw(403, '权限不足');
 		if(thread.disabled) ctx.throw(404, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
 		const setting = await db.SettingModel.findOnly({uid: 'system'});
 		const ads = setting.ads;
@@ -76,7 +76,7 @@ operationRouter
 		const {user} = data;
 		if(digest === undefined) ctx.throw(400, '参数不正确');
 		const thread = await db.ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
+		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
 		if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
 		const obj = {digest: false};
 		if(digest) {
@@ -108,7 +108,7 @@ operationRouter
 		const {user} = data;
 		if(topped === undefined) ctx.throw(400, '参数不正确');
 		const thread = await db.ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
+		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
 		if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
 		const obj = {topped: false};
 		if(topped) obj.topped = true;
@@ -147,7 +147,7 @@ operationRouter
 		const oldForum = await targetThread.extendForum();
 		const oldCid = targetThread.cid;
 		// 版主只能改变帖子的分类，不能移动帖子到其他板块
-		if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(401, '权限不足');
+		if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(403, '权限不足');
 		const tCount = {
 			digest: 0,
 			normal: 0
@@ -215,7 +215,7 @@ operationRouter
 		} else {
 			ctx.throw(400, '该贴子不在任何人的专栏');
 		}
-		if(targetUser.uid !== user.uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
+		if(targetUser.uid !== user.uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(403, '权限不足');
 		const obj = {};
 		if(hideInMid !== undefined) obj.hideInMid = !!hideInMid;
 		if(digestInMid !== undefined) obj.digestInMid = !!digestInMid;

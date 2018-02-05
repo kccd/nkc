@@ -1796,7 +1796,7 @@ img.emoji {
 
 .new-content-left{
   float: left;
-  width: 12rem;
+  width: 15rem;
   background-position: center center;
   background-size: cover;
   border-radius: 0.3rem;
@@ -1819,7 +1819,7 @@ img.emoji {
   width: 100%;
 }
 .div-img{
-  width: calc(100% - 12rem)
+  width: calc(100% - 15rem)
 }
 .p-noImg{
   padding: 0;
@@ -1852,7 +1852,8 @@ img.emoji {
   border-radius: 0.3rem;
 }
 .fixed-height{
-  height: 8.7rem;
+  height: 10.3rem;
+  margin-bottom: 0.5rem;
 }
 
 .new-content-body{

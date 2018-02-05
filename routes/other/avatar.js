@@ -32,7 +32,7 @@ router
     const {fs} = ctx;
     const {settings, data} = ctx;
     const {user} = data;
-    if(uid !== user.uid) ctx.throw(401, '权限不足');
+    if(uid !== user.uid) ctx.throw(403, '权限不足');
     const extArr = ['jpg', 'png', 'jpeg'];
     const {imageMagick} = ctx.tools;
     const file = ctx.body.files.file;

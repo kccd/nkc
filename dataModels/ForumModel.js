@@ -6,7 +6,8 @@ const {getQueryObj} = require('../nkcModules/apiFunction');
 const forumSchema = new Schema({
 	abbr: {
     type: String,
-    default: ''
+    default: '',
+    max: [4, '简称必须小于等于4字']
   },
   class: {
     type: String,
@@ -30,11 +31,14 @@ const forumSchema = new Schema({
   },
   description: {
     type: String,
-    required: ''
+    required: '',
+    max: [300, '描述应少于300字']
   },
   displayName: {
     type: String,
     required: true,
+    min: [1, '板块名称必须大于等于1字'],
+    max: [6, '板块名称必须小于等于6字']
   },
   iconFileName: {
     type: String,

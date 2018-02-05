@@ -12,14 +12,14 @@ block content
 
         
         -var p = data.post
-        -var formerPost = data.histories[0]
         include interface_post_history_single.pug
         
         h3 过去版本
 
-        each post,index in data.histories
-          -var p = post
-          -var formerPost = data.histories[index+1]
+        each post, index in data.histories
+          -var i = index - 1
+          -var p = i > -1? data.histories[i]: data.post
+          -var formerPost = data.histories[index]
           include interface_post_history_single.pug
     
   

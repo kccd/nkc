@@ -25,7 +25,8 @@ const settingSchema = new Schema({
     sms: Number,
     fundApplicationForms: Number,
 	  photos: Number,
-	  documents: Number
+	  documents: Number,
+    forums: Number
   }
 },
 {toObject: {
@@ -58,7 +59,7 @@ async function operateSystemID(type, op) {
 		number = 0;
 		const settings = await this.findOnly({uid: 'system'});
 		const {counters} = settings;
-		counters[type] = 1;
+		counters[type] = op;
 		await settings.update({counters});
   }
   return number + op;

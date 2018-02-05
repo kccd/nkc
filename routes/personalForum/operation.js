@@ -8,7 +8,7 @@ operationRouter
     const {user} = data;
     const {uid} = ctx.params;
     const personalForum = await db.PersonalForumModel.findOnly({uid});
-    if(user.uid !== uid && !personalForum.moderators.includes(user.uid)) ctx.throw(401, '权限不足');
+    if(user.uid !== uid && !personalForum.moderators.includes(user.uid)) ctx.throw(403, '权限不足');
     const {forumName, description, announcement, moderators} = ctx.body;
     if(contentLength(forumName) > 20) ctx.throw(400, '专栏名称不能大于20个字节(ASCII)');
     if(contentLength(announcement) > 1000) ctx.throw(400, '公告内容不能大于1000字节(ASCII)');
