@@ -1,23 +1,20 @@
 -const {fundList} = data;
 .fund-nav
-  ul
-    -let meClass = '', homeClass = '', managementClass = '', listAllClass = '', censorPClass = '', censorUClass = '';
-    if data.home
-      -homeClass = 'active';
-    if data.management
-      -managementClass = 'active';
-    if data.me
-      -meClass = 'active';
+  ol.breadcrumb
     li
-      a(href='/fund' class=homeClass) 科创基金
+      a(href="/fund") 科创基金
+    span &nbsp;&nbsp;&nbsp;
+    span
+      a(href=`/fund/me`) 我的基金
+    span &nbsp;&nbsp;&nbsp;
     li
-      a(href='/fund/me' class=meClass) 我的基金申请
-    li
-      a(href='/fund/m' class=managementClass) 基金项目管理
-    li /
-    -for (let f of fundList)
+      a(href=`/fund/list`) 基金列表
+    if data.fund
       li
-        -let fundClass = ''
-        if data.fund && data.fund._id === f._id
-          -fundClass = 'active';
-        a(href=`/fund/list/${f._id}` class=fundClass)= f.name
+        a(href=`/fund/list/${data.fund._id}`)= data.fund.name
+    if data.applicationForm && data.applicationForm.code
+      li
+        a(href=`/fund/a/${data.applicationForm.code}`)= data.applicationForm.code
+    if data.nav
+      li= data.nav
+

@@ -4,7 +4,7 @@ block title
   -const applicationForm = data.applicationForm;
   -const comments = applicationForm.comments;
   -const fund = applicationForm.fund;
-  title= `科创基金-${fund.name}`
+  title= `${applicationForm.project.t} - ${fund.name} - 科创基金`
   link(rel='stylesheet' href='/fund.css')
 block content
   .container-fluid(style='max-width: 1400px;')
@@ -72,12 +72,12 @@ block content
                       -const r = applicationForm.remittance[i];
                       -const r2 = applicationForm.remittance[1+i];
                       if r2
-                        +pointer(r.status, r2.status, `第${i+1}期打款（${r.money}元）`)
+                        +pointer(r.status, r2.status, `第${i+1}期汇款（${r.money}元）`)
                     -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
-                    +pointer(lastRemittance.status, completed, `第${count}期打款（${lastRemittance.money}元）`)
+                    +pointer(lastRemittance.status, completed, `第${count}期汇款（${lastRemittance.money}元）`)
                   else
                     +pointer(adminSupport, remittance,'管理员审核')
-                    +pointer(remittance, completed, '打款')
+                    +pointer(remittance, completed, '汇款')
                   if completed
                     li.passed 完成
                   else
@@ -85,16 +85,46 @@ block content
               // 申请者控制面板
               if data.user.uid === applicationForm.applicant.uid
                 if !applicationForm.status.adminSupport
-                  a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-default.btn-block 编辑
-                button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-default.btn-block= `放弃申请`
+                  a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 编辑
+                if applicationForm.remittance
+                  a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 报告进度
+                button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
               a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId?applicationForm.supportersId.length: 0}）`
               a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId?applicationForm.objectorsId.length: 0}）`
               if projectPassed === false
                 div.redFontColor
                   h4.text-center 项目审核不通过，等待申请者修改
-                  h5.text-center 原因
-                  p.text-center= data.auditComments[0].c
-
+                  -let n = 0;
+                  -let userInfoAudit, projectAudit, moneyAudit;
+                  -for(let comment of data.auditComments)
+                    if n >= 3
+                      -break;
+                    if comment.type === 'userInfoAudit'
+                      -n++;
+                      -userInfoAudit = comment;
+                    if comment.type === 'projectAudit'
+                      -n++;
+                      -projectAudit = comment;
+                    if comment.type === 'moneyAudit'
+                      -n++;
+                      -moneyAudit = comment;
+                  if userInfoAudit
+                    p.text-center 身份信息
+                    p.text-center= userInfoAudit.c
+                  if projectAudit
+                    p.text-center 项目内容
+                    p.text-center= projectAudit.c
+                  if moneyAudit
+                    p.text-center 资金预算
+                    p.text-center= moneyAudit.c
+              else if adminSupport === false
+                div.redFontColor
+                  h4.text-center 管理员审核不通过，等待申请者修改
+                  -for(let comment of data.auditComments)
+                    if comment.type === 'adminAudit'
+                      p.text-center 审核意见
+                      p.text-center= comment.c
+                      -break;
 
 block scripts
   script(src='/interface_common.js')

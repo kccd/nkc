@@ -16,23 +16,26 @@ else
 
     tbody
       mixin status(applicationForm)
-        -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = applicationForm.status;
-        if !submitted
+        -const {lock, status} = applicationForm;
+        -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = status;
+        if !lock.submitted
           th 未提交
         else if !usersSupport
           th 等待网友支持
         else if projectPassed === null
           th 等待项目审核
         else if projectPassed === false
-          th 项目审核不通过
+          th 项目审核不通过，等待申请人处理
         else if adminSupport === null
           th 等待管理员审核
         else if adminSupport === false
-          th 管理员审核不通过
-        else if !remittance
-          th 等待打款
+          th 管理员审核不通过，等待申请人处理
+        else if remittance === null
+          th 等待汇款
+        else if remittance === false
+          th 汇款失败
         else if !completed
-          th 等待结项
+          th 资助中
         else
           th 已完成
         //
@@ -62,9 +65,20 @@ else
             th=`${money}元`
             th= project.t
             th
-              a(href=`/fund/a/${_id}`) 查看详情&nbsp;
+              a(href=`/fund/a/${_id}`) 查看详情
+              span &nbsp;
               -const {status} = applicationForm;
               if status.usersSupport && status.projectPassed === null && isCensor
-                a(href=`/fund/a/${_id}/audit?type=project`) 项目审核&nbsp;
+                a(href=`/fund/a/${_id}/audit?type=project`) 项目审核
+                span &nbsp;
               if status.adminSupport === null && status.projectPassed && data.userLevel >= 7
                 a(href=`/fund/a/${_id}/audit?type=admin`) 管理员审核
+                span &nbsp;
+              -let needRemittance = false;
+              if applicationForm.remittance.length !== 0
+                -for(let r of applicationForm.remittance)
+                  if !r.status
+                    -needRemittance = true;
+              if status.adminSupport && (!status.remittance || needRemittance) && data.userLevel >= 7
+                a(href=`/fund/a/${_id}/remittance`) 去汇款
+                span &nbsp;

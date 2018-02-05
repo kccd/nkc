@@ -24,12 +24,15 @@
       if !options.members
         .col-xs-12.col-md-12
           span 收款方式：
+          p(style='color:#aaa;') 推介使用支付宝，到账更快
           .paymenMethods
             div &nbsp;
-            div 微信
-              .pay.wechat(class=options.account.paymentType === 'wechat'? 'active': '')
+            //div 微信
+            //  .pay.wechat(class=options.account.paymentType === 'wechat'? 'active': '')
             div 支付宝
               .pay.alipay(class=options.account.paymentType === 'alipay'? 'active': '')
+            div 银行卡
+              .pay.bankCard(class=options.account.paymentType === 'bankCard' ? 'active' : '')
         .col-xs-12.col-md-12
           span 收款账号：
           input.fund-input#account(placeholder='请输入收款账号' value=options.account.number || '')

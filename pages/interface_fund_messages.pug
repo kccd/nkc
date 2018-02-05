@@ -6,7 +6,7 @@ block title
   -for (let cert of fund.censor.certs)
     if !data.user.certs.includes(cert) && !fund.censor.appointed.includes(data.user.uid)
       -isCensor = false;
-  title= fund.name
+  title= `科创基金 - ${fund.name}`
   link(rel='stylesheet' href='/fund.css')
 block content
   -const mainContainer1400 = true
@@ -43,6 +43,10 @@ block content
       .col-xs-12.col-md-3
         .row
           .col-xs-12.col-md-12
+            a.btn.btn-default.btn-block(href=`/fund/list/${fund._id}/bills`)= `基金账单`
+            if data.userLevel >= 6
+              a.btn.btn-default.btn-block(href=`/fund/list/${fund._id}/settings`)= `基金设置`
+            br
             .panel.panel-default
               .panel-body.fund-preconditions
                 h3 申请条件

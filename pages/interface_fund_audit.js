@@ -12,37 +12,15 @@ $(function() {
 });
 
 function init() {
-	$('input[name="audit"]').on('click', function() {
-		choose();
-	});
-	/*$('#remittance').on('input', function() {
-		var text = $('#remittance').val();
-		var arr = text.split(',');
-		$('.remittance').html('');
-		var html = '';
-		var total = 0;
-		remittance = [];
-		for(var i = 0; i < arr.length; i++) {
-			var num = parseInt(arr[i]);
-			if(num > 0) {
-				html += '<h4>第'+(i+1)+'期&nbsp;&nbsp;'+ num +'元</h4>';
-				total += num;
-				remittance.push(num);
-			}
-		}
-		$('.remittance').html(html);
-		$('#remainder').text('余：'+ (money-total) +'元');
-		if(money-total < 0) $('#remainder').css('color', 'red');
-	});*/
+	// $('input[name="audit"]').on('click', function() {
+	// 	choose();
+	// });
 
 	$('.suggestMoney').on('blur', function() {
 		initSuggestMoney();
 	});
 	$('.factMoney').on('blur', function() {
 		initFactMoney();
-	});
-	$('input[type="radio"]').on('click', function() {
-		displaySubmitButton();
 	});
 	$('#enterBtn').on('click', function () {
 		displayRemittance();
@@ -60,18 +38,20 @@ function initSuggestMoney() {
 		total += m;
 	}
 	$('#suggestMoney').text(total);
+	$('input[name="moneyAudit"]:first').click();
 	if(money*0.8 > total) {
 		$('#projectAuditInfo').text('建议的金额小于原金额的80%，只能选择不通过。');
+		$('input[name="moneyAudit"]:last').click();
 		moneyPassed = false;
 	} else {
 		$('#projectAuditInfo').text('');
 		moneyPassed = true;
 	}
-	pass();
 }
 
 function initFactMoney() {
 	var arr = $('.factMoney');
+	if(arr.length === 0) return;
 	factMoney = [];
 	var total = 0;
 	for(var i = 0; i < arr.length; i++) {
@@ -82,50 +62,26 @@ function initFactMoney() {
 	$('#factMoney').text(total);
 	if(money*0.8 > total) {
 		$('#adminAuditInfo').text('实际的金额小于原金额的80%，只能选择不通过。');
+		$('input[name="adminSupport"]:last').click();
 		moneyPassed = false;
 	}else {
 		$('#adminAuditInfo').text('');
+		$('input[name="adminSupport"]:first').click();
 		moneyPassed = true;
 	}
-	pass();
-}
-
-function pass() {
-	if(infoPassed && moneyPassed){
-		$('#submit').text('通过');
-		support = true;
-	} else {
-		$('#submit').text('不通过');
-		support = false;
-	}
-}
-
-function displaySubmitButton() {
-	var userInfo = $('input[name="userInfo"]');
-	var project = $('input[name="project"]');
-	var otherMessages = $('input[name="otherMessages"]');
-	if(userInfo.eq(0).is(':checked') && project.eq(0).is(':checked') && otherMessages.eq(0).is(':checked')) {
-		infoPassed = true;
-	} else {
-		infoPassed = false;
-	}
-	pass();
-}
-
-
-function choose() {
-	var arr = $('input[name="audit"]');
-	if(arr.eq(0).is(':checked')) {
-		support = true;
-	} else {
-		support = false;
-	}
+	displayRemittance();
 }
 
 function displayRemittance() {
 	var count = $('#remittanceCount').val();
 	count = parseInt(count);
-	createList(count);
+	if(count > 0) {
+		createList(count);
+	} else {
+		remittance = [];
+		$('#remittanceList').html('');
+		$('#remainder').text($('#factMoney').text());
+	}
 }
 
 function createList(count) {
@@ -142,43 +98,52 @@ function createList(count) {
 		if(i === count-1) {
 			average += remainder;
 		}
-		html += '<div><span>第'+(i+1)+'期：</span><input id="list'+i+'" value="'+average+'"></div>';
+		html += '<div><span>第'+(i+1)+'期：</span><input id="list'+i+'" value="'+average+'"><span>元</span></div>';
 	}
 	$('#remittanceList').html(html);
-	$('#remittanceList > div > input').on('blur', function() {
-		console.log($(this).val())
-	})
+	computeRemainder();
 }
 
 
-function submitProject(id) {
-	var userInfo = $('input[name="userInfo"]');
-	var project = $('input[name="project"]');
-	var otherMessages = $('input[name="otherMessages"]');
+function submitProjectAudit(id) {
+	var userInfoAudit = $('input[name="userInfoAudit"]').eq(0).is(':checked');
+	var projectAudit = $('input[name="projectAudit"]').eq(0).is(':checked');
+	var moneyAudit = $('input[name="moneyAudit"]').eq(0).is(':checked');
 
 	var userInfoComment = $('#userInfoComment').val();
 	var projectComment = $('#projectComment').val();
 	var moneyComment = $('#moneyComment').val();
 
-	var c = '';
-	if(!userInfo.eq(0).is(':checked') && !userInfoComment) {
-		return screenTopWarning('请输入申请人信息不通过的原因');
+	var comments = [];
+	if(!userInfoAudit && !userInfoComment) {
+		return screenTopWarning('请输入申请人信息不合格的原因');
 	} else {
-		c += userInfoComment+'\n';
+		comments.push({
+			type: 'userInfoAudit',
+			support: userInfoAudit,
+			c: userInfoComment
+		})
 	}
-	if(!project.eq(0).is(':checked') && !projectComment) {
-		return screenTopWarning('请输入项目内容不通过的原因');
+	if(!projectAudit && !projectComment) {
+		return screenTopWarning('请输入项目内容不合格的原因');
 	} else {
-		c += projectComment+'\n';
+		comments.push({
+			type: 'projectAudit',
+			support: projectAudit,
+			c: projectComment
+		})
 	}
-	if(!otherMessages.eq(0).is(':checked') && !moneyComment) {
-		return screenTopWarning('请输入资金预算不通过的原因');
+	if(!moneyAudit && !moneyComment) {
+		return screenTopWarning('请输入资金预算不合格的原因');
 	} else {
-		c += moneyComment;
+		comments.push({
+			type: 'moneyAudit',
+			support: moneyAudit,
+			c: moneyComment
+		})
 	}
 	var obj = {
-		support: support,
-		c: c,
+		comments: comments,
 		suggestMoney: suggestMoney,
 		type: 'project'
 	};
@@ -194,37 +159,74 @@ function submitProject(id) {
 		})
 }
 
+function computeRemainder() {
+	displayRemainder();
+	$('#remittanceList > div > input').on('input', function() {
+		displayRemainder();
+	});
+}
 
-
-
-/*
-function submit(id, type) {
-	var comment = $('#comment').val();
-	if(comment === '') {
-		return screenTopWarning('审核评语不能为空！');
-	}
-	var obj = {
-		comment: comment,
-		support: support,
-		type: type
-	};
-	var msg = '';
-	if(support === false) {
-		msg = '您选择的是“不通过”， 点击确定则提交。';
-	} else {
-		if(remittance.length === 0) {
-			msg ='您选择的是“通过”，没有设置分期打款，点击确认提交。'
-		} else {
-			msg = '您选择的是“通过”，打款分为'+ remittance.length +'期，分别为：';
-			for (let i = 0; i < remittance.length; i++) {
-				msg += ' ' + remittance[i] + '元';
-			}
+function displayRemainder() {
+	var total = parseFloat($('#factMoney').text());
+	$('#remainder').text(total).removeClass('redFontColor');
+	var arr = $('#remittanceList > div > input');
+	var inputMoney = 0;
+	remittance = [];
+	for(var i = 0; i < arr.length; i++) {
+		var m = parseFloat(arr.eq(i).val());
+		if(m > 0){
+			inputMoney += m;
+			remittance.push(m);
 		}
 	}
-	if(type === 'admin') {
-		obj.remittance = remittance;
-		if(confirm(msg)!==true) return;
+	var difference = total-inputMoney;
+	if(difference < 0) {
+		$('#remainder').text(total-inputMoney).addClass('redFontColor');
+	}else {
+		$('#remainder').text(total-inputMoney).removeClass('redFontColor');
 	}
+}
+
+
+function submitAdminAudit(id) {
+	var arr = $('input[name="adminSupport"]:first');
+	var needThreads = $('input[name="needThreads"]:first');
+
+	if(needThreads.is(':checked')) {
+		needThreads = true;
+	} else {
+		needThreads = false;
+	}
+	if(arr.is(':checked')) {
+		support = true;
+	} else {
+		support = false;
+	}
+	var c = $('#adminComment').val();
+	if(!support && c === '') {
+		return screenTopWarning('请输入不合格的原因');
+	}
+	if(support) {
+		var remittanceTotal = 0;
+		var factMoneyTotal = 0;
+		for(var i = 0; i < remittance.length; i++) {
+			remittanceTotal += remittance[i];
+		}
+		for(var i = 0; i < factMoney.length; i++) {
+			factMoneyTotal += factMoney[i];
+		}
+		if(remittanceTotal !== factMoneyTotal){
+			return screenTopWarning('分期的金钱总和与实际预算总和不想等，请检查。');
+		}
+	}
+	var obj = {
+		remittance: remittance,
+		factMoney: factMoney,
+		support: support,
+		needThreads: needThreads,
+		c: c,
+		type: 'admin'
+	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)
 		.then(function(data) {
 			screenTopAlert('提交成功！2s后跳转到基金列表。');
@@ -236,4 +238,4 @@ function submit(id, type) {
 			screenTopWarning(data.error);
 		})
 }
-*/
+

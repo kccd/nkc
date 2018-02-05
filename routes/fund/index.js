@@ -4,12 +4,6 @@ const applicationRouter = require('./application');
 const listRouter = require('./list');
 const meRouter = require('./me');
 fundRouter
-	.use('/', async (ctx, next) => {
-		const {data, db} = ctx;
-		data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
-
-		await next();
-	})
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const queryOfApplying = {
@@ -32,6 +26,7 @@ fundRouter
     ctx.template = 'interface_fund.pug';
     await next();
   })
+	// 新建基金
 	.get('/add', async (ctx, next) => {
 		const {data} = ctx;
 		const {certificates} = ctx.settings.permission;
@@ -44,18 +39,7 @@ fundRouter
 		}
 		data.fundCerts = fundCerts;
 		ctx.template = 'interface_fund_setting.pug';
-		await next();
-	})
-	.get('/m', async (ctx, next) => {
-		const {data, db} = ctx;
-		data.fundList = await db.FundModel.find({}).sort({toc: 1});
-		data.management = true;
-		ctx.template = 'interface_fund_management.pug';
-		await next();
-	})
-	.get('/me', async (ctx, next) => {
-		const {data, db} = ctx;
-
+		data.nav = '新建基金';
 		await next();
 	})
 	.use('/list', listRouter.routes(), listRouter.allowedMethods())

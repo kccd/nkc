@@ -10,6 +10,9 @@ var fundObj = {
   },
   description: {},
   display: true,
+	canApply: true,
+	history: false,
+	disabled: false,
   censor: {
     certs: [],
 	  appointed: []
@@ -41,7 +44,6 @@ var fundObj = {
 
 $(function(){
   // UserAuthenticationSet();
-  fundDisplaySet();
   censorSet();
   passedPaperSet();
   colorSet();
@@ -49,7 +51,14 @@ $(function(){
   // fundName();
   fundMoney();
   fundDisplay();
-  fundCensor();
+	fundDisplaySet();
+	fundCanApply();
+	fundCanApplySet();
+	fundDisabled();
+	fundDisabledSet();
+	fundHistory();
+	fundHistorySet();
+	fundCensor();
   censorCheckBox();
   // UserAuthentication();
   passedPaper();
@@ -136,6 +145,49 @@ function fundDisplaySet() {
     fundObj.display = false;
   }
 }
+
+function fundCanApply() {
+	$('input[name="canApply"]').on('click', function() {
+		fundCanApplySet();
+	})
+}
+
+function fundCanApplySet() {
+	if($('input[name="canApply"]').eq(0).is(':checked')) {
+		fundObj.canApply = true;
+	} else {
+		fundObj.canApply = false;
+	}
+}
+
+function fundDisabled() {
+	$('input[name="disabled"]').on('click', function() {
+		fundDisabledSet();
+	})
+}
+
+function fundDisabledSet() {
+	if($('input[name="disabled"]').eq(0).is(':checked')) {
+		fundObj.disabled = true;
+	} else {
+		fundObj.disabled = false;
+	}
+}
+
+function fundHistory() {
+	$('input[name="history"]').on('click', function() {
+		fundHistorySet();
+	})
+}
+
+function fundHistorySet() {
+	if($('input[name="history"]').eq(0).is(':checked')) {
+		fundObj.history = true;
+	} else {
+		fundObj.history = false;
+	}
+}
+
 
 function fundCensor(options) {
   if(options === 'read'){
@@ -310,22 +362,22 @@ function submit(id) {
 		}
 	}
   if(!checkMoney()) return window.location.href = '#fundMoney';
-  fundObj.applicant.userLevel = $('#userLevel').val();
-  fundObj.applicant.threadCount = $('#threadCount').val();
-  fundObj.applicant.postCount = $('#postCount').val();
-  fundObj.applicant.timeToRegister = $('#timeToRegister').val();
-  fundObj.supportCount = $('#supportCount').val();
-  fundObj.thread.count = $('#attachmentsThreads').val();
-  fundObj.paper.count = $('#attachmentsPapers').val();
-  fundObj.timeOfPublicity = $('#timeOfPublicity').val();
-  fundObj.modifyCount = $('#modifyCount').val();
-  fundObj.applicant.authLevel = $('#applicantAuthLevel').val();
-  fundObj.member.authLevel = $('#memberAuthLevel').val();
-  fundObj.applicationCountLimit = $('#applicationCountLimit').val();
-  fundObj.censor.appointed = $('#fundCensorAppointed').val();
-  fundObj.description.brief = $('#briefDescription').val();
-  fundObj.description.detailed = $('#detailedDescription').val();
-  fundObj._id = $('#fundId').val();
+  fundObj.applicant.userLevel = $('#userLevel').val() || undefined;
+  fundObj.applicant.threadCount = $('#threadCount').val() || undefined;
+  fundObj.applicant.postCount = $('#postCount').val() || undefined;
+  fundObj.applicant.timeToRegister = $('#timeToRegister').val() || undefined;
+  fundObj.supportCount = $('#supportCount').val() || undefined;
+  fundObj.thread.count = $('#attachmentsThreads').val() || undefined;
+  fundObj.paper.count = $('#attachmentsPapers').val() || undefined;
+  fundObj.timeOfPublicity = $('#timeOfPublicity').val() || undefined;
+  fundObj.modifyCount = $('#modifyCount').val() || undefined;
+  fundObj.applicant.authLevel = $('#applicantAuthLevel').val() || undefined;
+  fundObj.member.authLevel = $('#memberAuthLevel').val() || undefined;
+  fundObj.applicationCountLimit = $('#applicationCountLimit').val() || undefined;
+  fundObj.censor.appointed = $('#fundCensorAppointed').val() || undefined;
+  fundObj.description.brief = $('#briefDescription').val() || undefined;
+  fundObj.description.detailed = $('#detailedDescription').val() || undefined;
+  fundObj._id = $('#fundId').val() || undefined;
   if(fundObj._id === '') return screenTopWarning('基金编号不能为空！');
   if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成！');
   if(fundObj._id.length > 4) return screenTopWarning('基金编号不能超过四位！');
@@ -344,8 +396,15 @@ function submit(id) {
     method = 'PATCH';
   }
   nkcAPI(url, method, {fundObj: fundObj})
-    .then(function(){
-	    window.location.href = '/fund/m';
+    .then(function(data){
+    	var fund = data.fund;
+    	if(fundObj.disabled) {
+    		window.location.href = '/fund/list';
+	    } else if(fundObj.history) {
+    		window.location.href = '/fund/history';
+	    } else {
+		    window.location.href = '/fund/list/'+fund._id;
+	    }
     })
     .catch(function(data){
       screenTopWarning(data.error);
@@ -373,4 +432,18 @@ function threadCont() {
       done('#threadCountInfo');
     }
   })
+}*/
+
+
+/*
+function deleteFund(name, id){
+	if(confirm('确定要删除'+name+'？') === true) {
+		nkcAPI('/fund/list/'+id, 'DELETE')
+			.then(function() {
+				window.location.href='/fund/list';
+			})
+			.catch(function(data) {
+				screenTopWarning(data.error);
+			})
+	}
 }*/

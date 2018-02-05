@@ -26,7 +26,9 @@ const settingSchema = new Schema({
     fundApplicationForms: Number,
 	  photos: Number,
 	  documents: Number,
-    forums: Number
+    forums: Number,
+	  fundDocuments: Number,
+	  fundBills: Number
   }
 },
 {toObject: {
@@ -89,7 +91,7 @@ settingSchema.methods.extendAds = async function() {
     return thread;
   }));
   return this.adThreads = adThreads;
-}
+};
 
 /*let Setting = mongoose.model('settings', settingSchema);
 new Setting({uid: 'system',ads: [1], popPersonalForums:[1],counters:{

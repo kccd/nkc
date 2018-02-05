@@ -1,0 +1,100 @@
+extends bootstrap_base
+block title
+  -const mainContainer1400 = true
+  -const applicationForm = data.applicationForm;
+  -const {remittance, project, code} = applicationForm;
+  -const fund = applicationForm.fund;
+  title= `${fund.name}-${applicationForm.project.t}`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-6
+        .row
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-body
+                h3.text-center= `报告进度`
+                h4=`项目名称：${project.t}`
+                h4=`项目ID：${code}`
+                hr
+                textarea.form-control#content(rows=10 placeholder='项目的进展情况')
+                br
+                button.btn.btn-default(style='float: right; margin-left: 0.5rem;' onclick=`submit(${applicationForm._id})`) 提交
+                button.btn.btn-default(style='float: right; ' onclick=`toEditor(${applicationForm._id})`) 去编辑器
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-body
+                h3.text-center= `汇款详情`
+                table.table
+                  thead
+                    tr
+                      th #
+                      th 金额
+                      th 状态
+                  tbody
+                    -for(let i = 0; i < remittance.length; i++)
+                      -const r = remittance[i];
+                      tr
+                        th= `第${i+1}期`
+                        th= `${r.money}元`
+                        if r.status
+                          th= `已汇款`
+                        else
+                          th= `未汇款`
+          -let needRemittance = false;
+          -let number;
+          -for(let i = 0; i < remittance.length; i++)
+            -const r = remittance[i];
+            if !r.status
+              -needRemittance = true;
+              -number = i;
+              -break;
+          if needRemittance
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-body
+                  h3.text-center=`申请第${number+1}期汇款`
+                  if remittance[number].threads
+                    h4.greenFontColor 已提交申请，请等待管理员审核。
+                  else
+                    h4 提交阶段性报告
+                    span.redFontColor *提交的内容将会在最新进展中展示
+                    textarea.form-control#report(rows=10 placeholder='项目的进展情况')
+                    if remittance[0].needThreads
+                      br
+                      span.redFontColor *管理员要求提交汇款申请必须要附带代表中期报告的帖子
+                    h5 已选择帖子的文号：
+                    #selectedThread
+                      span 暂未选择
+                    br
+                    .form
+                      input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
+                      input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
+                    span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
+                    span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
+                    .unselectedThreads
+                      .blank(style='color: #aaa;') 暂无数据
+                    nav(aria-label='navigation')
+                      ul.pagination.pagination-sm.pageList
+                    button.btn.btn-default(style='float: right;' onclick=`submitReport(${applicationForm._id})`) 提交
+
+      .col-xs-12.col-md-6
+        .panel.panel-default
+          .panel-body
+            h3.text-center= `最新进展`
+            .timer-shaft
+              -for(let r of data.reports)
+                div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
+                  div(style='position: absolute;')
+                div.content
+                  h4.text-center= r.t
+                  div!= experimental_render(r)
+              div.time!= `${fromNow(applicationForm.toc)}&nbsp;&nbsp;&nbsp;${applicationForm.toc.toLocaleString()}`
+                div(style='position: absolute;')
+              div.content(style='border: none;')=`项目开始`
+block scripts
+  script(src="/interface_common.js")
+  script(src="/interface_fund_report.js")
+

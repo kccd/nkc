@@ -1,0 +1,23 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 基金列表 - 科创基金
+block content
+  -var mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            .row
+              -for (let fund of data.funds)
+                -const {id, name, color, money} = fund;
+                .col-xs-6.col-sm-4.col-md-3.fund-list
+                  a(href=`/fund/list/${id}`)
+                    .fund-name(style=`background-color: ${color};background-image:${fund && fund.image ? `url(/fundBGI_small/${fund.image})` : ''}`)= name
+                    .fund-money!= `￥${money.max || money.fixed}&nbsp`
+              if data.userLevel >= 6
+                .col-xs-6.col-sm-4.col-md-3.fund-list
+                  a(href=`/fund/add`)
+                    .fund-add +

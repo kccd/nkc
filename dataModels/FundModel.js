@@ -56,8 +56,25 @@ const fundSchema = new Schema({
   },
 	display: {
     type: Boolean,
-    default: true
+    default: true,
+		index: 1
   },
+	canApply: {
+		type: Boolean,
+		default: true,
+		index: 1
+	},
+	//设为历史基金
+	history: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
+	disabled: {
+  	type: Boolean,
+		default: false,
+		index: 1
+	},
   censor: {
     certs: {
       type: [String],

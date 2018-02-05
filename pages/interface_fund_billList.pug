@@ -1,0 +1,17 @@
+table.table.table-striped
+  thead
+    tr
+      th 时间
+      th 账单编号
+      th 资金变化（元）
+      th 操作者
+      th 备注
+  tbody
+    -for(let b of data.bills)
+      tr
+        th= b.toc.toLocaleString()
+        th= b._id
+        th= b.changed
+        th
+          a(href=`/m/${b.user.uid}`)= b.user.username
+        th= b.notes

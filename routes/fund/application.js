@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const auditRouter = require('./audit');
+const remittanceRouter= require('./remittance');
+const reportRouter = require('./report');
 const applicationRouter = new Router();
 const apiFn = require('../../nkcModules/apiFunction');
 applicationRouter
@@ -40,23 +42,31 @@ applicationRouter
 	.use('/:_id', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {_id} = ctx.params;
-		const applicationForm = await db.FundApplicationFormModel.findOnly({_id});
+		let applicationForm = await db.FundApplicationFormModel.findOne({code: _id});
+		if(!applicationForm) {
+			applicationForm = await db.FundApplicationFormModel.findOne({_id: _id});
+			if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
+		}
+		await applicationForm.extendFund();
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
 		await applicationForm.extendProject();
 		await applicationForm.extendThreads();
-		await applicationForm.extendFund();
 		const {fund, budgetMoney} = applicationForm;
 		if(fund.money.fixed) {
 			applicationForm.money = fund.money.fixed;
+			applicationForm.factMoney = fund.money.fixed;
 		} else {
 			let money = 0;
+			let factMoney = 0;
 			if(budgetMoney !== null && budgetMoney.length !== 0 && typeof budgetMoney !== 'string'){
 				for (let b of applicationForm.budgetMoney) {
 					money += (b.count*b.money);
+					factMoney += b.fact;
 				}
 			}
 			applicationForm.money = money;
+			applicationForm.factMoney = factMoney;
 		}
 		/*const {user} = data;
 		const {applicant} = applicationForm;
@@ -76,6 +86,7 @@ applicationRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
@@ -96,7 +107,7 @@ applicationRouter
 		applicationForm.comments = comments;
 		data.auditComments = await db.FundDocumentModel.find({
 			applicationFormId: applicationForm._id,
-			type: {$in: ['userInfoAudit', 'projectAudit', 'moneyAudit']},
+			type: {$in: ['userInfoAudit', 'projectAudit', 'moneyAudit', 'adminAudit']},
 			disabled: false,
 		}).sort({toc: -1});
 		await next();
@@ -109,9 +120,8 @@ applicationRouter
 		const {useless, newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId} = body;
 		data.s = s;
 		const {applicationForm} = data;
-		if(useless === 'disabled') {
-			ctx.throw(400, '抱歉！申请表已封禁。');
-		} else if(useless === 'giveUp') {
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(useless === 'giveUp') {
 			ctx.throw(400, '抱歉！您已放弃此次申请。');
 		} else if(useless === 'exceededModifyCount') {
 			ctx.throw(400, '抱歉！申请表已超出最大修改次数。');
@@ -126,16 +136,19 @@ applicationRouter
 		}
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const {applicant, members, status} = applicationForm;
-		let updateObj = {};
+		let updateObj = {
+			tlm: Date.now()
+		};
 		if(applicationForm.modifyCount >= fund.modifyCount) throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
 		if(s === 1) {
 			const {from} = body;
-			if(status.submitted) ctx.throw(400, '申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
+			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
 			if(from === 'personal') {
 				for (let aUser of members) {
 					await aUser.update({removed: true});
 				}
-				await applicationForm.update({from: 'personal'});
+				updateObj.from = 'personal';
+				await applicationForm.update(updateObj);
 			} else {
 				// 判断申请人的信息是否存在，不存在则写入
 				if(!applicant) {
@@ -166,7 +179,8 @@ applicationRouter
 						await newApplicationUser.save();
 					}
 				}
-				await applicationForm.update({from: 'team'});
+				updateObj.from = 'team';
+				await applicationForm.update(updateObj);
 			}
 		}
 		// 填写申请人信息
@@ -210,9 +224,7 @@ applicationRouter
 				newApplicant.lifePhotosId.splice(i, 1, newId);
 			}
 			await applicant.update(newApplicant);
-			updateObj = {
-				account,
-			};
+			updateObj.account = account;
 			await applicationForm.update(updateObj);
 		}
 		// 填写项目信息
@@ -221,7 +233,7 @@ applicationRouter
 				ctx.throw(400, '项目审核已通过，无法修改。');
 			}
 			if(applicationForm.projectId === null){
-				const documentId = await db.SettingModel.operateSystemID('documents', 1);
+				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newDocument = db.FundDocumentModel({
 					_id: documentId,
 					uid: user.uid,
@@ -229,9 +241,7 @@ applicationRouter
 					type: 'project'
 				});
 				await newDocument.save();
-				updateObj = {
-					projectId: documentId
-				};
+				updateObj.projectId = documentId;
 				await applicationForm.update(updateObj);
 			} else {
 				if(project !== undefined){
@@ -249,6 +259,7 @@ applicationRouter
 		}
 		//最后提交验证
 		if(s === 5) {
+			if(!fund.canApply) ctx.throw(400, `抱歉！科创基金-${fund.name}已禁止提交新的基金申请。`);
 			try{
 				await applicationForm.ensureInformation();
 			} catch(err) {
@@ -261,6 +272,7 @@ applicationRouter
 	.del('/:_id', async (ctx, next) => {
 		const {data, query} = ctx;
 		const {user, applicationForm} = data;
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {submitted, usersSupport, projectPassed, adminSupport, remittance} = applicationForm.status;
 		const {type} = query;
 		if(['disabled', 'null'].includes(type)) {
@@ -269,7 +281,9 @@ applicationRouter
 			}
 		} else if(type === 'giveUp'){
 			if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足')
-		} else {
+		} else if(type === 'delete'){
+			if(submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
+
 			ctx.throw(400, '未知的操作类型！');
 		}
 		await applicationForm.update({useless: type});
@@ -279,9 +293,12 @@ applicationRouter
 	//基金申请表修改页面
 	.get('/:_id/settings', async (ctx, next) => {
 		const {data, db} = ctx;
+		data.nav = '填写申请表';
 		const {user, applicationForm} = data;
-		const {fund} = applicationForm;
-		// if(applicationForm.status.submitted) ctx.throw(400, '申请表已提交，如需修改请先点击撤销。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		const {status} = applicationForm;
+		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(status.adminSupport) ctx.throw(400, '管理员审核已通过，无法修改申请表。');
 		let {s} = ctx.query;
 		if(s) {
 			s = parseInt(s);
@@ -290,7 +307,6 @@ applicationRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		data.s = s;
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
 		ctx.template = 'interface_fund_apply.pug';
@@ -317,6 +333,7 @@ applicationRouter
 		const {data, body} = ctx;
 		const {type} = body;
 		const {user, applicationForm} = data;
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {fund, members, supportersId, objectorsId} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		membersId.push(applicationForm.uid);
@@ -339,6 +356,7 @@ applicationRouter
 	.post('/:_id/comment', async (ctx, next) => {
 		const {data, body} = ctx;
 		const {applicationForm, user} = data;
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {comment} = body;
 		if(!applicationForm.status.submitted) ctx.throw(400, '申请表未提交，暂不能评论。');
 		await applicationForm.newComment({
@@ -348,5 +366,25 @@ applicationRouter
 		});
 		await next();
 	})
-	.use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods());
+	.use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods())
+	.use('/:_id/remittance', remittanceRouter.routes(), remittanceRouter.allowedMethods())
+	.use('/:_id/report', reportRouter.routes(), reportRouter.allowedMethods())
+
+	//屏蔽敏感信息
+	.use('/', async (ctx, next) => {
+		const {data} = ctx;
+		const {applicationForm} = data;
+		if(applicationForm && data.userLevel < 7) {
+			const {applicant, members} = applicationForm;
+			applicant.mobile = null;
+			applicant.idCardNumber = null;
+			applicationForm.account.paymentType = null;
+			applicationForm.account.number = null;
+			for(let m of members) {
+				m.mobile = null;
+				m.idCardNumber = null;
+			}
+		}
+		await next();
+	});
 module.exports = applicationRouter;

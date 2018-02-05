@@ -37,10 +37,10 @@ block content
             .col-xs-12.col-md-4
               textarea.form-control#userInfoComment(rows='12' placeholder='审核评语')
               label.radio-inline
-                input(type='radio' name='userInfo' checked=true)
+                input(type='radio' name='userInfoAudit' checked=true)
                 h5 合格
               label.radio-inline
-                input(type='radio' name='userInfo' checked=false)
+                input(type='radio' name='userInfoAudit' checked=false)
                 h5 不合格
             //项目信息审核
             .col-xs-12.col-md-12
@@ -84,10 +84,10 @@ block content
             .col-xs-12.col-md-4
               textarea.form-control#projectComment(rows='12' placeholder='审核评语')
               label.radio-inline
-                input(type='radio' name='project' checked=true)
+                input(type='radio' name='projectAudit' checked=true)
                 h5 合格
               label.radio-inline
-                input(type='radio' name='project' checked=false)
+                input(type='radio' name='projectAudit' checked=false)
                 h5 不合格
             // 其他信息审核
             .col-xs-12.col-md-12
@@ -126,14 +126,14 @@ block content
             .col-xs-12.col-md-4
               textarea.form-control#moneyComment(rows='12' placeholder='审核评语')
               label.radio-inline
-                input(type='radio' name='otherMessages' checked=true)
+                input(type='radio' name='moneyAudit' checked=true)
                 h5 合格
               label.radio-inline
-                input(type='radio' name='otherMessages' checked=false)
+                input(type='radio' name='moneyAudit' checked=false)
                 h5 不合格
             .col-xs-12.col-md-12
               br
-              button.btn.btn-info.center-block#submit(onclick=`submitProject(${applicationForm._id})`) 通过
+              button.btn.btn-info.center-block#submit(onclick=`submitProjectAudit(${applicationForm._id})`) 提交
 
       else
         .col-xs-12.col-md-12
@@ -175,25 +175,38 @@ block content
                   span=`元`
                 p#adminAuditInfo.redFontColor
         .col-xs-12.col-md-4
-          textarea.form-control#moneyComment(rows='12' placeholder='审核评语')
+          textarea.form-control#adminComment(rows='12' placeholder='审核评语')
           label.radio-inline
-            input(type='radio' name='otherMessages' checked=true)
+            input(type='radio' name='adminSupport' checked=true)
             h5 合格
           label.radio-inline
-            input(type='radio' name='otherMessages' checked=false)
+            input(type='radio' name='adminSupport' checked=false)
             h5 不合格
         .col-xs-12.col-md-12
-          h3 分期打款
+          h3 分期汇款
         .col-xs-12.col-md-8
           .panel.panel-default
             .panel-body
+              h4=`剩余：`
+                span#remainder
+                span=`元`
+              br
               span 输入分期数：
               input#remittanceCount(type="number")
               button#enterBtn 确定
               #remittanceList
+        .col-xs-12.col-md-4
+          h3 汇款依据
+          span 附带帖子
+          label.radio-inline
+            input(type='radio' name='needThreads' checked=true)
+            h5 是
+          label.radio-inline
+            input(type='radio' name='needThreads' checked=false)
+            h5 否
         .col-xs-12.col-md-12
           br
-          button.btn.btn-info.center-block#submit(onclick=`submitAdmin(${applicationForm._id})`) 通过
+          button.btn.btn-info.center-block#adminSubmit(onclick=`submitAdminAudit(${applicationForm._id})`) 提交
 
 block scripts
   script(src='/interface_common.js')
