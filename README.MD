@@ -29,9 +29,10 @@
 
 ```html
 <script src='/interface_common.js'/>
-<script>nkcAPI(`pathToYourTarget`, HTTP_Method, {someParameter:'someValue'})
-.then(jalert)
-.catch(jalert)
+<script>
+  nkcAPI(`pathToYourTarget`, HTTP_Method, {someParameter:'someValue'})
+    .then(jalert)
+    .catch(jalert)
 </script>
 ```
 
