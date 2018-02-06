@@ -20,8 +20,8 @@ var fundObj = {
   color: '#7f9eb2',
 	image: null,
 	applicationMethod: {
-		individual: null,
-		group: null
+		personal: null,
+		team: null
 	},
 	applicant: {
 		userLevel: 0,
@@ -295,14 +295,14 @@ function moneyFixed() {
 function applicationMethodSet() {
 	var arr = $('input[name="applicationMethod"]');
 	if(arr.eq(0).is(':checked')) {
-		fundObj.applicationMethod.individual = true;
+		fundObj.applicationMethod.personal = true;
 	}else {
-		fundObj.applicationMethod.individual = false;
+		fundObj.applicationMethod.personal = false;
 	}
 	if(arr.eq(1).is(':checked')) {
-		fundObj.applicationMethod.group = true;
+		fundObj.applicationMethod.team = true;
 	} else {
-		fundObj.applicationMethod.group = false;
+		fundObj.applicationMethod.team = false;
 	}
 }
 

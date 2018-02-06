@@ -39,6 +39,9 @@ function against(_id) {
 }
 
 function revoked(type, _id) {
+	if(type === 'giveUp') {
+		if(confirm('确定要放弃申请？') === false) return;
+	}
 	nkcAPI('/fund/a/'+_id+'?type='+type, 'DELETE', {})
 		.then(function(){
 			screenTopAlert('操作成功！');

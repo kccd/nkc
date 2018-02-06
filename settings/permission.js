@@ -480,6 +480,14 @@ const certificates ={
 			      report: {
         			[name]: '报告进度',
         			[GET]: true,
+				      [POST]: true,
+				      audit: { // 报告审核
+								[GET]: true,
+					      [POST]: true
+				      }
+			      },
+			      complete: { // 结项
+        			[GET]: true,
 				      [POST]: true
 			      }
 		      }

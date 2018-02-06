@@ -1,20 +1,5 @@
 var selectedThreads = [];
 
-function submit(id) {
-	var content = $('#content').val();
-	if(!content) return screenTopWarning('内容不能为空。');
-	var obj = {
-		c: content,
-	};
-	nkcAPI('/fund/a/'+id+'/report', 'POST', obj)
-		.then(function() {
-			window.location.reload();
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
-}
-
 
 
 function getThreads(page, self) {
@@ -164,7 +149,7 @@ function displayThreadsList(id, arr, disabled, type) {
 	$(id).html(html);
 }
 
-function deleteThread(tid, pid) {
+function deleteThread(tid) {
 	for(var i = 0; i < selectedThreads.length; i++) {
 		if(selectedThreads[i].tid === tid) {
 			selectedThreads.splice(i, 1);
@@ -185,7 +170,7 @@ function addThread(tid, pid) {
 		selectedThreads.push({
 			tid: tid,
 			pid: pid
-		})
+		});
 	}
 	displaySelectedThreads();
 }
@@ -206,51 +191,29 @@ function clearLog() {
 	$('.unselectedThreads').html(html);
 }
 
-function submitReport(id) {
-	var content = $('#report').val();
-	if(!content) {
-		return screenTopWarning('请输入中期报告。');
+
+function submit(id){
+	var arr = $('input[name="success"]');
+	var success = false;
+	var content = $('#content').val();
+	if(!content) return screenTopWarning('请输入项目结项报告。');
+	if(arr.eq(0).is(':checked')) {
+		success = true;
 	}
+	if(selectedThreads.length === 0) return screenTopWarning('请选择帖子。');
 	var obj = {
-		c: content,
-		type: 'applyRemittance',
-		selectedThreads: selectedThreads
+		successful: success,
+		selectedThreads: selectedThreads,
+		c: content
 	};
-	nkcAPI('/fund/a/'+id+'/report', 'POST', obj)
+	nkcAPI('/fund/a/'+id+'/complete', 'POST', obj)
 		.then(function() {
-			screenTopAlert('提交成功!');
-			setTimeout(function(){
-				window.location.reload();
+			screenTopAlert('提交成功。');
+			setTimeout(function() {
+				window.location.href = '/fund/a/'+id;
 			}, 1200)
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);
 		})
 }
-
-
-function submittedReportAudit(support, id) {
-	var content = $('#content').val();
-	var obj = {};
-	if(support === false) {
-		obj.support = false;
-		if(!content) return screenTopWarning('请输入审核意见。');
-	} else {
-		obj.support = true;
-	}
-	obj.c = content;
-	nkcAPI('/fund/a/'+id+'/report/audit', 'POST', obj)
-		.then(function() {
-			screenTopAlert('提交成功。');
-			if(obj.support) {
-				window.location.href = '/fund/a/'+id+'/remittance';
-			}else {
-				setTimeout(function() {
-					window.location.href = '/fund/a/'+id;
-				}, 1200)
-			}
-		})
-		.catch(function(data){
-			screenTopWarning(data.error);
-		})
-};

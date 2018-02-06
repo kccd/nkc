@@ -1099,6 +1099,14 @@ input[type="radio"], input[type="checkbox"]{
   padding-left: 1rem;
 }
 
+.applicationForm .h3, .applicationForm .h4{
+  font-weight: 600;
+  color: #333;
+}
+.applicationForm img{
+  max-width: 100%;
+}
+
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;

@@ -2,7 +2,7 @@ extends bootstrap_base
 block title
   -const mainContainer1400 = true
   -const applicationForm = data.applicationForm;
-  -const {applicant} = applicationForm;
+  -const {applicant, fixedMoney} = applicationForm;
   -const fund = applicationForm.fund;
   -const type = data.type;
   title= `科创基金-${fund.name}`
@@ -137,43 +137,89 @@ block content
 
       else
         .col-xs-12.col-md-12
-          h3 资金预算
+          h3 项目内容
         .col-xs-12.col-md-8
           .panel.panel-default
             .panel-body
-              if fund.money.max === null && typeof applicationForm.budgetMoney === 'string'
+              -const project = applicationForm.project
+              h2.text-center#projectTitle= project.t
+              div#projectContent!= experimental_render(project)
+              hr
+              h4= `研究周期：${applicationForm.projectCycle}天`
+              if applicationForm.threads.applying.length !== 0
+                h4= `附带帖子：`
+                .selectedThreads
+                  -const disagreeUsers = [];
+                  -const notModifiedUsers = [];
+                  -for(let u of applicationForm.members)
+                    if u.agree === false
+                      -disagreeUsers.push(u.uid);
+                    if u.agree === null
+                      -notModifiedUsers.push(u.uid);
+                  -for(let i = 0; i < applicationForm.threads.applying.length; i++)
+                    -const thread = applicationForm.threads.applying[i];
+                    -const firstPost = thread.firstPost;
+                    -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+                    -postString = JSON.stringify(postString);
+                    .threadList
+                      .col-xs-10.col-md-10
+                        .displayNone.postString= postString
+                        span 文号：
+                        span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                        a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                        if notModifiedUsers.includes(thread.uid)
+                          span(style='color: #aaa;') （未处理邀请）
+                        if disagreeUsers.includes(thread.uid)
+                          span.redFontColor （已拒绝邀请）
+                        span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                        br
+                        a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+        if fixedMoney
+          .col-xs-12.col-md-12
+            h3 资金用途
+          .col-xs-12.col-md-8
+            .panel.panel-default
+              .panel-body
                 p= applicationForm.budgetMoney
-              else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
-                -let aggregate = 0, suggest = 0;
-                #budgetMoney
-                  .fund-money-list.head.adminAudit
-                    .purpose 用途
-                    .count 数量
-                    .money 单价(元)
-                    .total 合计(元)
-                    div 审查员建议(元)
-                    div 实际
-                  -for(let p of applicationForm.budgetMoney)
-                    -const total = p.count*p.money;
-                    -aggregate += total;
-                    -suggest += p.suggest
-                    .fund-money-list.adminAudit
-                      .purpose= p.purpose
-                      .count= p.count
-                      .money= p.money
-                      .total= total
-                      div= p.suggest
-                      div.factMoney(contenteditable=true)= p.suggest
-                h3=`总计：`
-                  span#total= `${aggregate}`
-                  span=`元`
-                h3=`管理员建议：`
-                  span#suggestMoney=`${suggest}`
-                  span=`元`
-                h3=`实际：`
-                  span#factMoney=`${suggest}`
-                  span=`元`
-                p#adminAuditInfo.redFontColor
+        else
+          .col-xs-12.col-md-12
+            h3 资金预算
+          .col-xs-12.col-md-8
+            .panel.panel-default
+              .panel-body
+                if fund.money.max === null && typeof applicationForm.budgetMoney === 'string'
+                  p= applicationForm.budgetMoney
+                else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
+                  -let aggregate = 0, suggest = 0;
+                  #budgetMoney
+                    .fund-money-list.head.adminAudit
+                      .purpose 用途
+                      .count 数量
+                      .money 单价(元)
+                      .total 合计(元)
+                      div 审查员建议(元)
+                      div 实际
+                    -for(let p of applicationForm.budgetMoney)
+                      -const total = p.count*p.money;
+                      -aggregate += total;
+                      -suggest += p.suggest
+                      .fund-money-list.adminAudit
+                        .purpose= p.purpose
+                        .count= p.count
+                        .money= p.money
+                        .total= total
+                        div= p.suggest
+                        div.factMoney(contenteditable=true)= p.suggest
+                  h3=`总计：`
+                    span#total= `${aggregate}`
+                    span=`元`
+                  h3=`管理员建议：`
+                    span#suggestMoney=`${suggest}`
+                    span=`元`
+                  h3=`实际：`
+                    span#factMoney=`${suggest}`
+                    span=`元`
+                  p#adminAuditInfo.redFontColor
         .col-xs-12.col-md-4
           textarea.form-control#adminComment(rows='12' placeholder='审核评语')
           label.radio-inline
@@ -182,28 +228,29 @@ block content
           label.radio-inline
             input(type='radio' name='adminSupport' checked=false)
             h5 不合格
-        .col-xs-12.col-md-12
-          h3 分期汇款
-        .col-xs-12.col-md-8
-          .panel.panel-default
-            .panel-body
-              h4=`剩余：`
-                span#remainder
-                span=`元`
-              br
-              span 输入分期数：
-              input#remittanceCount(type="number")
-              button#enterBtn 确定
-              #remittanceList
-        .col-xs-12.col-md-4
-          h3 汇款依据
-          span 附带帖子
-          label.radio-inline
-            input(type='radio' name='needThreads' checked=true)
-            h5 是
-          label.radio-inline
-            input(type='radio' name='needThreads' checked=false)
-            h5 否
+        if !fixedMoney
+          .col-xs-12.col-md-12
+            h3 分期汇款
+          .col-xs-12.col-md-8
+            .panel.panel-default
+              .panel-body
+                h4=`剩余：`
+                  span#remainder
+                  span=`元`
+                br
+                span 输入分期数：
+                input#remittanceCount(type="number")
+                button#enterBtn 确定
+                #remittanceList
+          .col-xs-12.col-md-4
+            h3 汇款依据
+            span 附带帖子
+            label.radio-inline
+              input(type='radio' name='needThreads' checked=true)
+              h5 是
+            label.radio-inline
+              input(type='radio' name='needThreads' checked=false)
+              h5 否
         .col-xs-12.col-md-12
           br
           button.btn.btn-info.center-block#adminSubmit(onclick=`submitAdminAudit(${applicationForm._id})`) 提交

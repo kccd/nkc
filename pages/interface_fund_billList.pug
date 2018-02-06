@@ -2,9 +2,10 @@ table.table.table-striped
   thead
     tr
       th 时间
-      th 账单编号
+      th 交易编号
       th 资金变化（元）
       th 操作者
+      th 摘要
       th 备注
   tbody
     -for(let b of data.bills)
@@ -14,4 +15,5 @@ table.table.table-striped
         th= b.changed
         th
           a(href=`/m/${b.user.uid}`)= b.user.username
+        th= b.abstract
         th= b.notes

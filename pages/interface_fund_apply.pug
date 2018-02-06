@@ -33,14 +33,21 @@ block content
             if s === 1
               .row(style='padding: 3rem 0;')
                 .col-xs-12.col-md-4.col-md-offset-4
-                  h5 注意：申请方式选择后一旦提交将无法修改。
+                  if fund.applicationMethod.personal
+                    if fund.applicationMethod.team
+                      h5 注意：申请方式选择后一旦提交将无法修改。
+                    else
+                      h5.redFontColor 注意：该基金只限个人申请。
+                  else
+                    if fund.applicationMethod.team
+                      h5.redFontColor 注意：该基金只限团队申请。
                 .col-xs-6.col-md-2.col-md-offset-4
-                  if fund.applicationMethod.individual
+                  if fund.applicationMethod.personal
                     .choose-content-div#personal(class=applicationForm.from === 'personal'? 'active': '') 个人申请
                   else
                     .choose-content-div.disabled(class=applicationForm.from === 'personal'? 'active': '') 个人申请
                 .col-xs-6.col-md-2
-                  if fund.applicationMethod.group
+                  if fund.applicationMethod.team
                     .choose-content-div#team(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
                   else
                     .choose-content-div.disabled(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
@@ -225,10 +232,10 @@ block content
                     if agreeIsTrue.length === 0
                       +ds('暂未有好友接受邀请')
                   if applicationForm.from === 'personal'
-                    if !fund.applicationMethod.individual
+                    if !fund.applicationMethod.personal
                       +ds('该基金不允许个人申请')
                   else
-                    if !fund.applicationMethod.group
+                    if !fund.applicationMethod.team
                       +ds('该基金不允许团队申请')
                   if !applicationForm.applicant.lifePhotosId || applicationForm.applicant.lifePhotosId.length === 0
                     +ds('请至少添加一张生活照')

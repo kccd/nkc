@@ -17,7 +17,7 @@ const documentSchema = new Schema({
 		type: Date
 	},
 	type: {
-		// project, comment, userInfoAudit, projectAudit, moneyAudit, adminAudit, report
+		// project, comment, userInfoAudit, projectAudit, moneyAudit, adminAudit, report, vote
 		type: String,
 		required: true,
 		index: 1

@@ -131,12 +131,12 @@ const fundSchema = new Schema({
 		}
 	},
 	applicationMethod: {
-  	individual: {
+  	personal: {
   		type: Boolean,
 		  default: null,
 		  index: 1
 	  },
-		group: {
+		team: {
   		type: Boolean,
 			default: null,
 			index: 1

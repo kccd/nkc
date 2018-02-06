@@ -31,6 +31,14 @@ const fundApplicationFormSchema = new Schema({
     default: Date.now,
     index: 1
   },
+	timeToSubmit: {
+  	type: Date,
+		default: null
+	},
+	timeToPassed: {
+		type: Date,
+		default: null
+	},
   tlm: {
     type: Date,
     index: 1
@@ -158,6 +166,15 @@ const fundApplicationFormSchema = new Schema({
   	type: Boolean,
 		default: false,
 		index: 1
+	},
+	submittedReport: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
+	reportNeedThreads: {
+		type: Boolean,
+		default: false
 	},
   lock: {
   	submitted: { // 用于判断用户当前申请表是否已提交
@@ -291,6 +308,12 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	if(fund.supportCount <= supportersId.length) {
 		status.usersSupport = true;
 	}
+
+	//项目审核-机器审核
+	if(status.usersSupport && fund.censor.appointed.length === 0 && fund.censor.certs.length === 0) {
+		status.projectPassed = true;
+	}
+
 	// 生成申请表编号
 	if(submitted && !code) {
 		const moment = require('moment');
@@ -390,6 +413,8 @@ fundApplicationFormSchema.methods.saveHistory = async function() {
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
+	const FundDocumentModel = require('./FundDocumentModel');
+	const FundApplicationFormHistoryModel = require('./FundApplicationHistoryModel');
 	const FundApplicationForm = mongoose.model('fundApplicationForms');
 	const {
 		from,
@@ -464,7 +489,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	if(thread.count > threadsId.applying.length) throw `附带的帖子数未达到最低要求(至少${thread.count}篇)`;
 	// 如果是个人申请，则删除所有组员已存到基金（type='fund'）的生活照，并标记所有组员为已删除
 	if(from === 'personal') {
-		if(!applicationMethod.individual) throw '该基金不允许个人申请！';
+		if(!applicationMethod.personal) throw '该基金不允许个人申请！';
 		for(let u of members) {
 			const {lifePhotosId} = u;
 			for(let _id of lifePhotosId) {
@@ -474,7 +499,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 			await u.update({removed: true});
 		}
 	} else {
-		if(!applicationMethod.group) throw '该基金不允许团队申请！';
+		if(!applicationMethod.team) throw '该基金不允许团队申请！';
 		if(members.length === 0) throw '团队申请必须要有组员，若没有组员请选择个人申请！';
 		let agreeUsers = [];
 		let disagreeUsers = [];
@@ -506,7 +531,23 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.modifyCount += 1;
 	if(this.status.projectPassed === false) this.status.projectPassed = null;
 	if(this.status.adminSupport === false) this.status.adminSupport = null;
+	if(this.status.submitted === null) this.timeToSubmit = Date.now();
+	//存历史
+	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});
+	const newObj = oldApplicationForm.toObject();
+	newObj.applicationFormId = newObj._id;
+	newObj._id = undefined;
+	newObj.applicant = await this.extendApplicant();
+	newObj.members = await this.extendMembers();
+	newObj.project = await this.extendProject();
+	newObj.comments = await FundDocumentModel.find({applicationFormId: this._id, type: 'comment'});
+	newObj.adminAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'adminAudit'}).sort({toc: -1});
+	newObj.userInfoAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'userInfo'}).sort({toc: -1});
+	newObj.projectAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'projectAudit'}).sort({toc: -1});
+	newObj.moneyAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'moneyAudit'}).sort({toc: -1});
+	const newHistory = new FundApplicationFormHistoryModel(newObj);
 	await this.save();
+	await newHistory.save();
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

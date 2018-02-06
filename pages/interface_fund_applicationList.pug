@@ -16,7 +16,7 @@ else
 
     tbody
       mixin status(applicationForm)
-        -const {lock, status} = applicationForm;
+        -const {lock, status, submittedReport} = applicationForm;
         -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = status;
         if !lock.submitted
           th 未提交
@@ -34,6 +34,8 @@ else
           th 等待汇款
         else if remittance === false
           th 汇款失败
+        else if submittedReport
+          th 等待报告审核
         else if !completed
           th 资助中
         else
@@ -48,7 +50,7 @@ else
         //else if !adminSupport
         //  th 审核中
       -for (let applicationForm of applicationForms)
-        -const {toc, name, budgetMoney, applicant, members, _id, project} = applicationForm;
+        -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport} = applicationForm;
         -let money = fund.money.fixed;
         if !money
           -money = 0;
@@ -79,6 +81,10 @@ else
                 -for(let r of applicationForm.remittance)
                   if !r.status
                     -needRemittance = true;
+              if status.remittance && submittedReport
+                a(href=`/fund/a/${_id}/report/audit`) 报告审核
+                span &nbsp;
               if status.adminSupport && (!status.remittance || needRemittance) && data.userLevel >= 7
                 a(href=`/fund/a/${_id}/remittance`) 去汇款
                 span &nbsp;
+

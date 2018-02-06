@@ -17,6 +17,7 @@ listRouter
 		fundObj.name = fundObj.name || '科创基金';
 		const fund = await db.FundModel.findOne({_id: fundObj._id});
 		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');
+		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
 		data.fund = newFund;
@@ -28,7 +29,7 @@ listRouter
 		const {fundId} = ctx.params;
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
-		console.log(fundObj)
+		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
@@ -56,7 +57,7 @@ listRouter
 		} else if(type === 'completed'){ // 已完成
 			query['status.completed'] = true;
 		} else if(type === 'funding') { // 资助中
-			query['status.complete'] = {$ne: true};
+			query['status.completed'] = {$ne: true};
 			query['status.adminSupport'] = true;
 		} else if(type === 'auditing') { // 审核中
 			query['status.adminSupport'] = {$ne: true};
@@ -134,9 +135,9 @@ listRouter
 		applicationForm.uid = user.uid;
 		applicationForm.fundId = fundId;
 		applicationForm.fixedMoney = !!fund.money.fixed;
-		if(fund.applicationMethod.individual) {
+		if(fund.applicationMethod.personal) {
 			applicationForm.from = 'personal';
-		} else if(fund.applicationMethod.group) {
+		} else if(fund.applicationMethod.team) {
 			applicationForm.from = 'team'
 		} else {
 			ctx.throw(401, '该基金设置中未勾选个人申请和团队申请！');

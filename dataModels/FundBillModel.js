@@ -2,7 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundBillSchema = new Schema({
-	_id: Number,
+	_id: String,
 	fundId: {
 		type: String,
 		required: true,
@@ -28,6 +28,10 @@ const fundBillSchema = new Schema({
 		index: 1
 	},
 	notes: {
+		type: String,
+		required: true
+	},
+	abstract: {// 摘要
 		type: String,
 		required: true
 	}

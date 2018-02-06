@@ -2,6 +2,11 @@ const Router = require('koa-router');
 const auditRouter = require('./audit');
 const remittanceRouter= require('./remittance');
 const reportRouter = require('./report');
+const completeRouter = require('./complete');
+const voteRouter = require('./vote');
+const commentRouter = require('./comment');
+const settingsRouter = require('./settings');
+const memberRouter = require('./member');
 const applicationRouter = new Router();
 const apiFn = require('../../nkcModules/apiFunction');
 applicationRouter
@@ -144,12 +149,14 @@ applicationRouter
 			const {from} = body;
 			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
 			if(from === 'personal') {
+				if(!fund.applicationMethod.personal) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
 				for (let aUser of members) {
 					await aUser.update({removed: true});
 				}
 				updateObj.from = 'personal';
 				await applicationForm.update(updateObj);
-			} else {
+			} else if(from === 'team') {
+				if(!fund.applicationMethod.team) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
 				// 判断申请人的信息是否存在，不存在则写入
 				if(!applicant) {
 					newMembers.push({
@@ -181,6 +188,8 @@ applicationRouter
 				}
 				updateObj.from = 'team';
 				await applicationForm.update(updateObj);
+			} else {
+				ctx.throw(400, '未知的申请方式。');
 			}
 		}
 		// 填写申请人信息
@@ -290,86 +299,14 @@ applicationRouter
 		await next();
 	})
 
-	//基金申请表修改页面
-	.get('/:_id/settings', async (ctx, next) => {
-		const {data, db} = ctx;
-		data.nav = '填写申请表';
-		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
-		const {status} = applicationForm;
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
-		if(status.adminSupport) ctx.throw(400, '管理员审核已通过，无法修改申请表。');
-		let {s} = ctx.query;
-		if(s) {
-			s = parseInt(s);
-		} else {
-			s = 1;
-		}
-		if(applicationForm.status.submitted && s === 1) s = 2;
-		data.s = s;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
-		data.lifePhotos = await userPersonal.extendLifePhotos();
-		ctx.template = 'interface_fund_apply.pug';
-		await applicationForm.update({'lock.submitted': false});
-		await next();
-	})
-
-	// 组员处理组队邀请
-	.patch('/:_id/member', async (ctx, next) => {
-		const {data, body} = ctx;
-		const {user, applicationForm} = data;
-		const {agree} = body;
-		const {members} = applicationForm;
-		for (let u of members) {
-			if(u.agree === null && user.uid === u.uid) {
-				await u.update({agree})
-			}
-		}
-		await next();
-	})
-
-	//网友支持或反对
-	.post('/:_id/vote', async (ctx, next) => {
-		const {data, body} = ctx;
-		const {type} = body;
-		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
-		const {fund, members, supportersId, objectorsId} = applicationForm;
-		const membersId = members.map(m => m.uid);
-		membersId.push(applicationForm.uid);
-		if(membersId.includes(user.uid)) ctx.throw(401, '抱歉！您已参与该基金的申请，无法完成该操作！');
-		if(supportersId.includes(user.uid) || objectorsId.includes(user.uid)) ctx.throw(400, '抱歉！您已经投过票了。');
-		if(type === 'support') {
-			supportersId.push(user.uid);
-		} else if(type === 'against') {
-			objectorsId.push(user.uid);
-		}
-		await applicationForm.save();
-
-		//获得的网友
-		if(fund.supportCount <= supportersId.length) {
-			await applicationForm.update({'status.usersSupport': true});
-		}
-		await next();
-	})
-	//评论
-	.post('/:_id/comment', async (ctx, next) => {
-		const {data, body} = ctx;
-		const {applicationForm, user} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
-		const {comment} = body;
-		if(!applicationForm.status.submitted) ctx.throw(400, '申请表未提交，暂不能评论。');
-		await applicationForm.newComment({
-			uid: user.uid,
-			c: comment.c,
-			t: comment.t,
-		});
-		await next();
-	})
 	.use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods())
 	.use('/:_id/remittance', remittanceRouter.routes(), remittanceRouter.allowedMethods())
 	.use('/:_id/report', reportRouter.routes(), reportRouter.allowedMethods())
-
+	.use('/:_id/complete', completeRouter.routes(), completeRouter.allowedMethods())
+	.use('/:_id/vote', voteRouter.routes(), voteRouter.allowedMethods())
+	.use('/:_id/comment', commentRouter.routes(), commentRouter.allowedMethods())
+	.use('/:_id/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+	.use('/:_id/member', memberRouter.routes(), memberRouter.allowedMethods())
 	//屏蔽敏感信息
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;

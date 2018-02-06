@@ -55,7 +55,7 @@ auditRouter
 	.post('/', async (ctx, next) => {
 		const {data, body, db} = ctx;
 		const {user, applicationForm} = data;
-		const {budgetMoney, fund, lock} = applicationForm;
+		const {budgetMoney, fund, lock, fixedMoney} = applicationForm;
 		const {certs, appointed} = fund.censor;
 		const {type} = body;
 		lock.timeToClose = Date.now();
@@ -88,17 +88,19 @@ auditRouter
 			applicationForm.status.projectPassed = support;
 			if(support) {
 				//添加项目审查员的预算建议
-				if(budgetMoney.length !== suggestMoney.length) ctx.throw(400, '建议金额个数不匹配。');
-				let total = 0;
-				let suggest = 0;
-				for(let i = 0; i < suggestMoney.length; i++) { //就预算金额，项目审查员给管理员的建议
-					const m = suggestMoney[i];
-					total += budgetMoney[i].money;
-					suggest += m;
-					budgetMoney[i].suggest = m;
+				if(!fixedMoney) {
+					if(budgetMoney.length !== suggestMoney.length) ctx.throw(400, '建议金额个数不匹配。');
+					let total = 0;
+					let suggest = 0;
+					for(let i = 0; i < suggestMoney.length; i++) { //就预算金额，项目审查员给管理员的建议
+						const m = suggestMoney[i];
+						total += budgetMoney[i].money;
+						suggest += m;
+						budgetMoney[i].suggest = m;
+					}
+					if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
+					await applicationForm.update({budgetMoney});
 				}
-				if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
-				await applicationForm.update({budgetMoney});
 			}
 		} else if(type === 'admin') {// 最后管理员审核
 			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
@@ -120,23 +122,26 @@ auditRouter
 							money: m,
 							status: null,
 							report: null,
-							passed: null,
-							needThreads
+							passed: null
 						});
 					}
+					applicationForm.reportNeedThreads = needThreads;
 				}
 				//添加实际资金预算
-				if(budgetMoney.length !== factMoney.length) ctx.throw(400, '建议金额个数不匹配。');
-				let total = 0;
-				let fact = 0;
-				for(let i = 0; i < factMoney.length; i++) { //实际资金预算
-					const m = factMoney[i];
-					total += budgetMoney[i].money;
-					fact += m;
-					budgetMoney[i].fact = m;
+				if(!fixedMoney) {
+					if(budgetMoney.length !== factMoney.length) ctx.throw(400, '建议金额个数不匹配。');
+					let total = 0;
+					let fact = 0;
+					for(let i = 0; i < factMoney.length; i++) { //实际资金预算
+						const m = factMoney[i];
+						total += budgetMoney[i].money;
+						fact += m;
+						budgetMoney[i].fact = m;
+					}
+					if(total*0.8 > fact) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
+					await applicationForm.update({budgetMoney});
+					applicationForm.timeToPassed = Date.now();
 				}
-				if(total*0.8 > fact) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
-				await applicationForm.update({budgetMoney});
 			}
 			const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({

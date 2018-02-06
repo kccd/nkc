@@ -30,20 +30,20 @@ remittanceRouter
 			if(i < number && !r.status) ctx.throw(400, '请依次汇款！');
 			if(i === number) {
 				if(r.status) ctx.throw(400, '已经打过款了，请勿重复提交！');
-				if(!r.passed) ctx.throw(400, '该申请人的中期报告还未通过，请通过后在打款。');
+				if(!r.passed && i !== 0) ctx.throw(400, '该申请人的报告还未通过，请通过后再打款。');
 				r.status = true;
 				r.uid = user.uid;
 				const time = new Date();
 				r.time = time;
-				const newId = await db.SettingModel.operateSystemID('fundBills', 1);
 				const newFundBill = db.FundBillModel({
-					_id: newId,
+					_id: Date.now(),
 					uid: user.uid,
 					applicationFormId: applicationForm._id,
 					fundId: fund._id,
 					changed: -1*r.money,
 					toc: time,
-					notes: `项目${applicationForm.code}第${i+1}期汇款，汇款金额${r.money}元`
+					notes: `项目${applicationForm.code}第${i+1}期汇款，汇款金额${r.money}元`,
+					abstract: '汇款'
 				});
 				await newFundBill.save();
 				break;

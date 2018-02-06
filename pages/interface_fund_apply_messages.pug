@@ -1,0 +1,105 @@
+
+.row
+  .panel.panel-default
+    .panel-body.applicationForm
+      h4=`项目ID：${applicationForm.code || '暂无'}`
+
+      hr
+      .h4 申请人信息
+      br
+      .row
+        .col-xs-12.col-md-6
+          h5= `申请人ID：`
+            a(href=`/m/${applicationForm.applicant.uid}` target="_blank")= applicationForm.applicant.user.username
+          h5=`真实姓名：${applicationForm.applicant.name || '暂未输入'}`
+          if applicationForm.applicant.idCardNumber
+            h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
+            h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
+            -let paymentType;
+            if applicationForm.account.paymentType === 'alipay'
+              -paymentType = '支付宝';
+            else if applicationForm.account.paymentType === 'bankCard'
+              -paymentType = '银行卡';
+            else
+              -paymentType = '暂未选择';
+            h5= `收款方式：${paymentType}`
+            h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
+          h5= `自我介绍：${applicationForm.applicant.description || '暂未填写'}`
+          if applicationForm.from === 'team'
+            h5= `申请方式：团队`
+            h5= `组员ID：`
+              -for(let m of applicationForm.members)
+                span &nbsp;&nbsp;
+                a(href=`/m/${m.uid}` target='_blank')= m.user.username
+        .col-xs-12.col-md-6
+          p 申请人照片
+          if applicationForm.applicant.lifePhotos.length === 0
+            span 生活照暂未上传
+          -for (let p of applicationForm.applicant.lifePhotos)
+            img(src=`/photo_small/${p._id}`)
+      hr
+      .h4 项目信息
+      br
+      .h3.text-center= applicationForm.project?applicationForm.project.t: '项目标题暂未填写'
+      br
+      if !applicationForm.project
+        h4.text-center= `项目内容暂未填写`
+      else
+        div!= experimental_render(applicationForm.project)
+      hr
+      .h4 其他信息
+      br
+      h5= `研究周期：${applicationForm.projectCycle+"天" || '暂未填写'}`
+      if applicationForm.fixedMoney
+        h5= `资金用途：${applicationForm.budgetMoney}`
+      else
+        h5= `资金预算：`
+        -let aggregate = 0;
+        #budgetMoney
+          .fund-money-list.head
+            .purpose 用途
+            .count 数量
+            .money 单价(元)
+            .total 合计(元)
+          -for(let p of applicationForm.budgetMoney)
+            -const total = p.count*p.money;
+            -aggregate += total;
+            .fund-money-list
+              .purpose= p.purpose
+              .count= p.count
+              .money= p.money
+              .total= total
+        h3.text-right=`总计：${aggregate}元`
+      if fund.thread.count > 0
+        h5= `附加帖子：`
+        if applicationForm.threads.applying.length === 0
+          span 暂未填写
+        else
+          .selectedThreads
+            -const disagreeUsers = [];
+            -const notModifiedUsers = [];
+            -for(let u of applicationForm.members)
+              if u.agree === false
+                -disagreeUsers.push(u.uid);
+              if u.agree === null
+                -notModifiedUsers.push(u.uid);
+            -for(let i = 0; i < applicationForm.threads.applying.length; i++)
+              -const thread = applicationForm.threads.applying[i];
+              -const firstPost = thread.firstPost;
+              -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+              -postString = JSON.stringify(postString);
+              .threadList
+                .col-xs-10.col-md-10
+                  .displayNone.postString= postString
+                  span 文号：
+                  span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                  a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                  if notModifiedUsers.includes(thread.uid)
+                    span(style='color: #aaa;') （未处理邀请）
+                  if disagreeUsers.includes(thread.uid)
+                    span.redFontColor （已拒绝邀请）
+                  span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                  br
+                  a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+
+

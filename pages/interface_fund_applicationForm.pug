@@ -11,8 +11,8 @@ block content
     include interface_fund_nav
     .row
       .col-xs-12.col-md-12
-        .col-xs-12.col-md-9
-          include interface_fund_applicationForm_info
+        .col-xs-12.col-md-8
+          include interface_fund_apply_messages
           .row
             a.btn.btn-default(href='###') 去编辑器评论
             -for (let comment of comments)
@@ -88,6 +88,7 @@ block content
                   a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 编辑
                 if applicationForm.remittance
                   a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 报告进度
+                a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结项
                 button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
               a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId?applicationForm.supportersId.length: 0}）`
               a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId?applicationForm.objectorsId.length: 0}）`
