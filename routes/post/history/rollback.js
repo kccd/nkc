@@ -11,7 +11,7 @@ router
     let targetPost = await HistoriesModel.findOnly({_id});
     const targetThread = await ThreadModel.findOnly({tid: targetPost.tid});
     if(!(await targetThread.ensurePermission(ctx)))
-      ctx.throw(409, '权限不足');
+      ctx.throw(403, '权限不足');
     const _copy = Object.assign({}, originPost.toObject());
     _copy._id = undefined;
     const history = new HistoriesModel(_copy);

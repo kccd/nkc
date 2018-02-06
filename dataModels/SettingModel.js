@@ -25,7 +25,6 @@ const settingSchema = new Schema({
     sms: Number,
     fundApplicationForms: Number,
 	  photos: Number,
-	  documents: Number,
     forums: Number,
 	  fundDocuments: Number,
 	  fundBills: Number

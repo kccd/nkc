@@ -38,7 +38,7 @@ forumRouter
     }
     const isDisplayNameExists = await ForumModel.findOne({displayName});
     if(isDisplayNameExists) {
-      ctx.throw(409, `全名为 [${displayName}] 的板块已存在`);
+      ctx.throw(422, `全名为 [${displayName}] 的板块已存在`);
       return next()
     }
 		switch(type) {
@@ -49,11 +49,11 @@ forumRouter
         if(parentId && await ForumModel.findOne({fid: parentId}))
           break;
         else {
-          ctx.throw(409, `父分区 [${parentId}] 不存在或未指定`);
+          ctx.throw(422, `父分区 [${parentId}] 不存在或未指定`);
           return next()
         }
       default:
-        ctx.throw(409, `未知分区类型 [${type}] `);
+        ctx.throw(422, `未知分区类型 [${type}] `);
         return next()
     }
     body.class = contentClass;
@@ -64,7 +64,7 @@ forumRouter
           .then(user => user.uid)
       ));
     } catch(e) {
-      ctx.throw(409, '管理员中有不存在的用户名');
+      ctx.throw(422, '管理员中有不存在的用户名');
       return next()
     }
     body.fid = await SettingModel.operateSystemID('forums', 1);
@@ -175,7 +175,7 @@ forumRouter
     const forum = ForumModel.findOnly({fid});
     const count = await ThreadModel.count({fid});
     if(count > 0) {
-      ctx.throw(409, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
+      ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
       return next()
     } else {
       await forum.remove()
