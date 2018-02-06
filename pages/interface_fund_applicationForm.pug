@@ -4,7 +4,10 @@ block title
   -const applicationForm = data.applicationForm;
   -const comments = applicationForm.comments;
   -const fund = applicationForm.fund;
-  title= `${applicationForm.project.t} - ${fund.name} - 科创基金`
+  if applicationForm.project
+    title= `${applicationForm.project.t} - ${fund.name} - 科创基金`
+  else
+    title= `${fund.name} - 科创基金`
   link(rel='stylesheet' href='/fund.css')
 block content
   .container-fluid(style='max-width: 1400px;')

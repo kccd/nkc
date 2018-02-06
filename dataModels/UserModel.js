@@ -211,7 +211,7 @@ userSchema.methods.updateUserMessage = async function() {
 };
 
 userSchema.methods.getConflictingApplicationForm = async function() {
-	const message = {
+	const obj = {
 		unSubmitted: [],// 未提交
 		unPassed: [], // 未通过
 		unCompleted: []// 未完成且冲突的申请

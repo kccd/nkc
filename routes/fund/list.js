@@ -74,7 +74,7 @@ listRouter
 			return a;
 		}));
 		//改由前端判断
-		data.message = await user.getConflictingApplicationForm();
+		data.message = await fund.getConflictingByUser(user);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		data.authLevel = await userPersonal.getAuthLevel();
 		ctx.template = 'interface_fund_messages.pug';
@@ -114,19 +114,8 @@ listRouter
 		} catch(e) {
 			ctx.throw(401, e);
 		}
-		const message = await user.getConflictingApplicationForm();
-		const {unSubmitted, unPassed, unCompleted} = message;
-		if(unPassed.length !== 0 || unSubmitted.length !== 0) {
-			ctx.throw(401, '您还有未完成的基金申请！');
-		}
-		for(let a of unCompleted) {
-			if(a.fund.conflict.self === true && fund.conflict.self === true) {
-				ctx.throw(400, '该基金不允许同时提交多个申请。');
-			}
-			if(a.fund.conflict.other === true && fund.conflict.other === true) {
-				ctx.throw(400, '您还有未完成的且与该基金不能同时申请的基金项目。');
-			}
-		}
+		const message = await fund.getConflictingByUser(user);
+		if(message) ctx.throw(400, message);
 		if(agree !== 'true') {
 			return await next();
 		}

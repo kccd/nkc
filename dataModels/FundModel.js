@@ -189,8 +189,6 @@ fundSchema.pre('save', function(next){
 
 fundSchema.methods.ensureUserPermission = async function(user) {
 	const UsersPersonalModel = require('./UsersPersonalModel');
-	const FundApplicationFormModel = require('./FundApplicationFormModel');
-	const moment = require('moment');
 	const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
 	const userAuthLevel = await userPersonal.getAuthLevel();
 	const {authLevel, userLevel, postCount, threadCount, timeToRegister} = this.applicant;
@@ -199,17 +197,37 @@ fundSchema.methods.ensureUserPermission = async function(user) {
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
 	if(authLevel > userAuthLevel) throw '身份认证等级未满足最低要求';
-	const year = parseInt(moment().format('YYYY'));
-	const applicationForms = await FundApplicationFormModel.find({uid: user.uid, 'status.completed': true, fundId: this._id});
-	if(applicationForms.length !== 0) {
-		let n = 0;
-		for(let a of applicationForms) {
-			const time = new Date(a.toc).getFullYear();
-			if(time === year) n++;
-		}
-		if(n >= this.applicationCountLimit) throw '今年您申请该基金的次数已超过限制，欢迎明年再次申请！';
+};
+
+fundSchema.methods.getConflictingByUser = async function(user) {
+	const FundApplicationFormModel = require('./FundApplicationFormModel');
+	const {self, other} = this.conflict;
+	const q = {
+		uid: user.uid,
+		disabled: false,
+		useless: null,
+		'status.completed': {$ne: true}
+	};
+	// 与自己冲突
+	if(self) {
+		q.fundId = this._id;
+		const selfCount = await FundApplicationFormModel.count(q);
+		if(selfCount !== 0) return '您之前申请的该基金项目尚未完成，请完成后再申请。';
 	}
-	//display, conflict
+	//与其他基金冲突
+	if(other) {
+		q['conflict.other'] = true;
+		const selfCount = await FundApplicationFormModel.count(q);
+		if(selfCount !== 0) return '您之前申请的与该基金冲突的基金项目尚未完成 ，请完成后再申请。';
+	}
+	//年申请次数限制
+	const year = (new Date()).getFullYear();
+	const count = await FundApplicationFormModel.count({
+		uid: user.uid,
+		fundId: this._id,
+		year
+	});
+	if(count >= this.applicationCountLimit) return '今年您申请该基金的次数已超过限制，欢迎明年再次申请！'
 };
 
 const FundModel = mongoose.model('funds', fundSchema);
