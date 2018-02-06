@@ -29,6 +29,10 @@ editorRouter
     		const project = await applicationForm.extendProject();
     		data.title = project.t;
     		data.content = project.c;
+	    } else if(cat === 'c') {
+
+	    } else if(cat === 'r') {
+
 	    }
 	    return await next();
     }

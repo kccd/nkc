@@ -3,6 +3,7 @@ block title
   link(rel='stylesheet', href='/fund.css')
   title= `科创基金-${data.fund.name}`
 block content
+  -const mainContainer1400 = true
   -const {fund, bills} = data;
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav

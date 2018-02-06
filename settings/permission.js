@@ -423,7 +423,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*photo: {
+      photo: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
@@ -467,13 +467,20 @@ const certificates ={
 			      settings: {
 							[GET]: true
 			      },
+			      comment: {
+							[name]:'评论',
+				      [POST]: true
+			      },
 			      member: {
+        			[name]: '组员',
 				      [PATCH]: true
 			      },
 			      vote: {
+        			[name]: '投票',
         			[POST]: true
 			      },
 			      audit: {
+        			[name]: '审核',
 				      [GET]: true,
 				      [POST]: true
 			      },
@@ -487,6 +494,7 @@ const certificates ={
 				      }
 			      },
 			      complete: { // 结项
+				      [name]: '结项',
         			[GET]: true,
 				      [POST]: true
 			      }
@@ -550,7 +558,7 @@ const certificates ={
 		    [parameter]: {
 			    [DELETE]: true
 		    }
-	    }*/
+	    }
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -799,7 +807,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*fund: {
+      fund: {
         [POST]: true,
 	      add: {
 					[name]: '新建基金项目页面',
@@ -834,7 +842,7 @@ const certificates ={
 			    [PATCH]: true,
 			    [DELETE]: true
 		    }
-	    }*/
+	    }
     }
   }
 };

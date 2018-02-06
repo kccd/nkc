@@ -93,7 +93,7 @@ block content
                   //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
                   div#projectContent!= project && project.c? experimental_render(project): content
                   //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
-                  span.fund-span.transparent(onclick=`toEditor()` style='margin-left: 0;') 去编辑器
+                  button.btn.btn-default(onclick=`toEditor()` style='margin-left: 0;') 去编辑器
                   //span &nbsp;&nbsp;
                   //span.autoSaveTime#saveTime 0秒
                   //span.autoSaveTime 后自动保存
@@ -198,7 +198,8 @@ block content
                   br
                 .col-xs-12.col-md-9
                   .col-xs-12.col-md-10.col-md-offset-1
-                    include interface_fund_applicationForm_info
+                    //include interface_fund_applicationForm_info
+                    include interface_fund_apply_messages
                 .col-xs-12.col-md-3
                   h3 注意事项
                   br
@@ -222,13 +223,15 @@ block content
                     if nullLength !== 0
                       h3 未处理的用户：
                       -for(let u of agreeIsNull)
-                        a(href=`/m/${u.uid}`)= u.user.username
-                        span &nbsp;&nbsp;&nbsp;
+                        h4
+                          a(href=`/m/${u.uid}`)= u.user.username
+                          span &nbsp;&nbsp;&nbsp;
                     if falseLength !== 0
                       h3 拒绝的用户：
                       -for(let u of agreeIsFalse)
-                        a(href=`/m/${u.uid}`)= u.user.username
-                        span &nbsp;&nbsp;&nbsp;
+                        h4
+                          a(href=`/m/${u.uid}`)= u.user.username
+                          span &nbsp;&nbsp;&nbsp;
                     if agreeIsTrue.length === 0
                       +ds('暂未有好友接受邀请')
                   if applicationForm.from === 'personal'
@@ -267,9 +270,12 @@ block content
                     if !applicationForm.budgetMoney || applicationForm.budgetMoney.length === 0
                       +ds('请输入资金用途')
                     else
-                      if typeof applicationForm.budgetMoney === 'string'
+                      if !applicationForm.budgetMoney || typeof applicationForm.budgetMoney === 'string'
                         +ds('请输入资金用途')
                       else
+                        -let aggregate = 0;
+                        -for(let b of applicationForm.budgetMoney)
+                          -aggregate += b.count*b.money
                         if aggregate === 0
                           +ds('资金预算不能为0')
                         if aggregate > fund.money.max

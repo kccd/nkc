@@ -150,6 +150,64 @@ function hideContentByUser(content, user={xsf: 0}, from) {
 	})
 }
 
+function applicationFormStatus(a) {
+	let str, color = '#888';
+	const {submittedReport, status} = a;
+	const {submitted, projectPassed, adminSupport, remittance, completed, excellent, successful, usersSupport} = status;
+	let needRemittance = false;
+	for(let r of a.remittance) {
+		if(r.passed && !r.status) {
+			needRemittance = true;
+			break;
+		}
+	}
+	if(a.disabled) {
+		str = '已被封禁';
+		color = 'red';
+	} else if(a.useless === 'giveUp') {
+		str = '已被放弃';
+		color = 'red';
+	} else if(a.useless === 'delete') {
+		str = '已被删除';
+		color = 'red';
+	} else if(a.useless === 'exceededModifyCount') {
+		str = '修改次数超过限制';
+		color = 'red';
+	} else if(!submitted || !a.lock.submitted) {
+		str = '暂未提交';
+	} else if(!usersSupport) {
+		str = '等待网友支持';
+	} else if(projectPassed === null) {
+		str = '等待项目审查员审核';
+	} else if(projectPassed === false) {
+		str = '项目审核不通过，等待申请人修改';
+		color = 'red';
+	} else if(adminSupport === null) {
+		str = '等待管理员审核';
+	} else if(adminSupport === false) {
+		str = '管理员审核不通过，等待申请人修改';
+		color = 'red';
+	} else if(remittance === null) {
+		str = '等待汇款';
+	} else if(remittance === false) {
+		str = '汇款出现问题，等待管理员处理';
+		color = 'red';
+	} else if(submittedReport) {
+		str = '等待报告审核';
+	} else if(needRemittance) {
+		str = '等待汇款';
+	} else if(!completed) {
+		str = '资助中';
+	} else if(successful) {
+		str = '研发成功';
+	} else if(!successful) {
+		str = '研发失败';
+	} else if(excellent) {
+		str = '优秀项目';
+	}
+	return {str, color};
+}
+
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
@@ -167,7 +225,8 @@ let pugRender = (template, data) => {
     creditString,
     htmlDiff,
     filterQuote,
-	  hideContentByUser
+	  hideContentByUser,
+	  applicationFormStatus
   };
   options.data = data;
   options.filters = filters;

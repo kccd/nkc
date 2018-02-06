@@ -207,7 +207,7 @@ function clearLog() {
 }
 
 function submitReport(id) {
-	var content = $('#report').val();
+	var content = $('#reportContent').val();
 	if(!content) {
 		return screenTopWarning('请输入中期报告。');
 	}
@@ -229,9 +229,9 @@ function submitReport(id) {
 }
 
 
-function submittedReportAudit(support, id) {
+function submittedReportAudit(support, id, number) {
 	var content = $('#content').val();
-	var obj = {};
+	var obj = {number: number};
 	if(support === false) {
 		obj.support = false;
 		if(!content) return screenTopWarning('请输入审核意见。');

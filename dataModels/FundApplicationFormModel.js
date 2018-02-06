@@ -39,6 +39,10 @@ const fundApplicationFormSchema = new Schema({
 		type: Date,
 		default: null
 	},
+	timeOfCompleted: {
+  	type: Date,
+		default: null
+	},
   tlm: {
     type: Date,
     index: 1
@@ -384,26 +388,6 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
-fundApplicationFormSchema.methods.newComment = async function(comment) {
-	const applicationFormId = this._id;
-	const FundDocumentModel = require('./FundDocumentModel');
-	const SettingModel = require('./SettingModel');
-	const id = await SettingModel.operateSystemID('fundDocuments', 1);
-	const {c, type, uid, support} = comment;
-	const newDocument = new FundDocumentModel({
-		_id: id,
-		c,
-		uid,
-		userType,
-		support,
-		applicationFormId: applicationFormId,
-		type: 'comment',
-		l: 'pwbb',
-	});
-	await newDocument.save();
-	return newDocument;
-};
-
 fundApplicationFormSchema.methods.saveHistory = async function() {
 	const FundApplicationHistoryModel = require('./FundApplicationHistoryModel');
 	const newHistory = new FundApplicationHistoryModel({
@@ -529,9 +513,9 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.status.submitted = true;
 	this.lock.submitted = true;
 	this.modifyCount += 1;
+	this.timeToSubmit = Date.now();
 	if(this.status.projectPassed === false) this.status.projectPassed = null;
 	if(this.status.adminSupport === false) this.status.adminSupport = null;
-	if(this.status.submitted === null) this.timeToSubmit = Date.now();
 	//存历史
 	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});
 	const newObj = oldApplicationForm.toObject();

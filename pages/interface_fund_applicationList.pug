@@ -59,32 +59,32 @@ else
               -money += (b.count*b.money);
 
         tr
-            th= applicationForm.code || '暂无'
-            +status(applicationForm)
-            th= toc.toLocaleString()
-            th= fund.name
-            th= applicant.user.username
-            th=`${money}元`
-            th= project.t
-            th
-              a(href=`/fund/a/${_id}`) 查看详情
-              span &nbsp;
-              -const {status} = applicationForm;
-              if status.usersSupport && status.projectPassed === null && isCensor
-                a(href=`/fund/a/${_id}/audit?type=project`) 项目审核
-                span &nbsp;
-              if status.adminSupport === null && status.projectPassed && data.userLevel >= 7
-                a(href=`/fund/a/${_id}/audit?type=admin`) 管理员审核
-                span &nbsp;
-              -let needRemittance = false;
-              if applicationForm.remittance.length !== 0
-                -for(let r of applicationForm.remittance)
-                  if !r.status
-                    -needRemittance = true;
-              if status.remittance && submittedReport
-                a(href=`/fund/a/${_id}/report/audit`) 报告审核
-                span &nbsp;
-              if status.adminSupport && (!status.remittance || needRemittance) && data.userLevel >= 7
-                a(href=`/fund/a/${_id}/remittance`) 去汇款
-                span &nbsp;
+          th= applicationForm.code || '暂无'
+          th= applicationFormStatus(applicationForm).str
+          th= toc.toLocaleString()
+          th= fund.name
+          th= applicant.user.username
+          th=`${money}元`
+          th= project.t
+          th
+            a(href=`/fund/a/${_id}`) 查看详情
+            //span &nbsp;
+            //-const {status} = applicationForm;
+            //if status.usersSupport && status.projectPassed === null && isCensor
+            //  a(href=`/fund/a/${_id}/audit?type=project`) 项目审核
+            //  span &nbsp;
+            //if status.adminSupport === null && status.projectPassed && data.userLevel >= 7
+            //  a(href=`/fund/a/${_id}/audit?type=admin`) 管理员审核
+            //  span &nbsp;
+            //-let needRemittance = false;
+            //if applicationForm.remittance.length !== 0
+            //  -for(let r of applicationForm.remittance)
+            //    if !r.status
+            //      -needRemittance = true;
+            //if status.remittance && submittedReport
+            //  a(href=`/fund/a/${_id}/report/audit`) 报告审核
+            //  span &nbsp;
+            //if status.adminSupport && (!status.remittance || needRemittance) && data.userLevel >= 7
+            //  a(href=`/fund/a/${_id}/remittance`) 去汇款
+            //  span &nbsp;
 

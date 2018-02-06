@@ -98,7 +98,7 @@ block content
                                   span=`项目名称：${a.project?a.project.t: '暂未填写'}`
                                   br
                                   span= `状态：`
-                                  +status(a)
+                                  span= applicationFormStatus(a).str
                                 .col-xs-12.col-md-1
                                   a(href=`/fund/a/${a._id}`) 查看
                                   br

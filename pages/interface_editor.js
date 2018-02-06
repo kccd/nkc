@@ -305,6 +305,7 @@ function onPost(that) {
     var content = that.content.value;
     var title = that.title.value.trim();
     var type = that.query.type;
+    var cat = that.query.cat;
     var id = that.blocked ? that.query.id : that.childID;
     var language = that.language.value.toLowerCase().trim();
     if (content === '') {
@@ -351,12 +352,20 @@ function onPost(that) {
       method = 'POST';
       url = '/t/' + id;
       data = {post: post};
-    } else if (type === 'application' /*&& targetArr[2] === 'p'*/) {
-      method = 'PATCH';
-      url = '/fund/a/' + id;
-      data = {project: post, s: 3}
+    } else if (type === 'application' && cat === 'p') { // 编辑项目内容
+	    method = 'PATCH';
+	    url = '/fund/a/' + id;
+	    data = {project: post, s: 3}
+    } else if(type === 'application' && cat === 'c') { // 评论
+	    method = 'POST';
+	    url = '/fund/a/' + id + '/comment';
+	    data = {comment: post}
+    } else if(type === 'application' && cat === 'r') { // 报告
+	    method = 'POST';
+	    url = '/fund/a/' + id + '/report';
+	    data = {c: post.c, t: post.t}
     } else {
-      jwarning('未知的请求类型： ');
+      jwarning('未知的请求类型：'+type);
     }
     return nkcAPI(url, method, data)
       .then(function (result) {

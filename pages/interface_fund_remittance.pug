@@ -31,6 +31,7 @@ block content
                   th 状态
                   th 汇款人ID
                   th 汇款时间
+                  th 报告
                   th 操作
 
               tbody
@@ -45,6 +46,10 @@ block content
                         a(href=`/m/${r.uid}`)= r.user.username
 
                     th= r.time?r.time.toLocaleString(): ''
+                    if i === 0
+                      th= ''
+                    else
+                      th= r.passed? '已通过': '未通过'
                     th
                       if r.status
                         span 已确认汇款

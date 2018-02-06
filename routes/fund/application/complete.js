@@ -40,6 +40,7 @@ completeRouter
 		applicationForm.threadsId.completed = selectedThreads.map(t => t.tid);
 		applicationForm.status.completed = true;
 		applicationForm.status.successful = successful;
+		applicationForm.timeOfCompleted = Date.now();
 		await newDocument.save();
 		await applicationForm.save();
 		await next();

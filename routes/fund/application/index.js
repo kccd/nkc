@@ -5,10 +5,10 @@ const reportRouter = require('./report');
 const completeRouter = require('./complete');
 const voteRouter = require('./vote');
 const commentRouter = require('./comment');
-const settingsRouter = require('./settings');
+const settingsRouter = require('../settings');
 const memberRouter = require('./member');
 const applicationRouter = new Router();
-const apiFn = require('../../nkcModules/apiFunction');
+const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
@@ -110,11 +110,16 @@ applicationRouter
 			await comment.extendUser();
 		}));
 		applicationForm.comments = comments;
-		data.auditComments = await db.FundDocumentModel.find({
-			applicationFormId: applicationForm._id,
-			type: {$in: ['userInfoAudit', 'projectAudit', 'moneyAudit', 'adminAudit']},
-			disabled: false,
-		}).sort({toc: -1});
+		const auditComments = {};
+		if(!applicationForm.status.projectPassed) {
+			auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
+			auditComments.projectAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'projectAudit', disabled: false}).sort({toc: -1});
+			auditComments.moneyAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'moneyAudit', disabled: false}).sort({toc: -1});
+		}
+		if(!applicationForm.status.adminSupport) {
+			auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
+		}
+		data.auditComments = auditComments;
 		await next();
 	})
 
@@ -277,25 +282,35 @@ applicationRouter
 		}
 		await next();
 	})
-	// 取消申请
+
 	.del('/:_id', async (ctx, next) => {
 		const {data, query} = ctx;
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {submitted, usersSupport, projectPassed, adminSupport, remittance} = applicationForm.status;
 		const {type} = query;
-		if(['disabled', 'null'].includes(type)) {
-			if(data.userLevel < 7){
+		if(type === 'disabled') {
+			if (data.userLevel < 7) {
 				ctx.throw(401, '您没有权限操作别人的基金申请！');
 			}
+			applicationForm.disabled = true;
+		} else if(type === 'cancelDisabled') {
+			if (data.userLevel < 7) {
+				ctx.throw(401, '您没有权限操作别人的基金申请！');
+			}
+			applicationForm.disabled = false;
+			applicationForm.status.completed = true;
 		} else if(type === 'giveUp'){
 			if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足')
+			applicationForm.useless = 'giveUp';
+			applicationForm.status.completed = true;
 		} else if(type === 'delete'){
 			if(submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
-
-			ctx.throw(400, '未知的操作类型！');
+			applicationForm.useless = 'delete';
+		} else {
+			ctx.throw(400, '未知的操作类型。');
 		}
-		await applicationForm.update({useless: type});
+		await applicationForm.save();
 		await next();
 	})
 

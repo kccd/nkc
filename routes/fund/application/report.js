@@ -2,26 +2,25 @@ const Router = require('koa-router');
 const reportRouter = new Router();
 reportRouter
 	.use('/', async (ctx, next) => {
-		const {user, applicationForm} = ctx.data;
-		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
+		const {applicationForm} = ctx.data;
 		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员审核，请通过后再试。');
-		if(applicationForm.status.completed) ctx.throw(400, '该项目已结项。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
 		ctx.template = 'interface_fund_report.pug';
-		data.reports = await db.FundDocumentModel.find({uid: user.uid, type: 'report', applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
+		data.reports = await db.FundDocumentModel.find({type: 'report', applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
 		data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
 		await next();
 	})
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user, applicationForm} = data;
-		const {c, type, selectedThreads} = body;
+		const {c, t, type, selectedThreads} = body;
+		if(applicationForm.status.completed) ctx.throw(400, '该项目已结项。');
 		const obj = {};
+		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');
 		if(type === 'applyRemittance') {
 			const {timeToPassed, reportNeedThreads, remittance} = applicationForm;
 			for(let r of remittance) {
@@ -33,7 +32,6 @@ reportRouter
 						const thread = await db.ThreadModel.findOnly({tid: t.tid});
 						if(thread.toc < timeToPassed) ctx.throw(400, '请选择申请项目之后所发的帖子。')
 					}));
-
 
 					r.threads = selectedThreads.map(t => t.tid);
 					r.passed = null;
@@ -58,10 +56,12 @@ reportRouter
 				_id: newId,
 				uid: user.uid,
 				c: c,
+				t: t,
 				applicationFormId: applicationForm._id,
 				type: 'report'
 			});
 			await newDocument.save();
+			data.redirect = `/fund/a/${applicationForm._id}/report`;
 		}
 		await applicationForm.update(obj);
 		await next();
@@ -69,7 +69,7 @@ reportRouter
 	.get('/audit', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.type = 'reportAudit';
-		const {userLevel, applicationForm, user} = data;
+		const {userLevel, applicationForm} = data;
 		const {remittance, reportNeedThreads, submittedReport} = applicationForm;
 		if(userLevel < 7) ctx.throw('权限不足');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
@@ -93,8 +93,14 @@ reportRouter
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
 		const {submittedReport, remittance} = applicationForm;
-		const {support, c} = body;
+		const {number, support, c} = body;
+		if(!number) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
+		for(let i = 0; i < remittance.length; i++) {
+			const r = remittance[i];
+			if((i < number && !r.status) || (i > number && r.status)) ctx.throw(400, '参数错误。');
+			if(i === number && r.status) ctx.throw(400, '该报告已通过审核。');
+		}
 		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 		const newDocument = db.FundDocumentModel({
 			_id: newId,

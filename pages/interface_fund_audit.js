@@ -149,9 +149,9 @@ function submitProjectAudit(id) {
 	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)
 		.then(function(data) {
-			screenTopAlert('提交成功！2s后跳转到基金列表。');
+			screenTopAlert('提交成功！2s后跳转到申请表详情。');
 			setTimeout(function() {
-				window.location.href = '/fund/list/'+data.fund._id;
+				window.location.href = '/fund/a/'+id;
 			}, 2000)
 		})
 		.catch(function(data) {
@@ -229,9 +229,9 @@ function submitAdminAudit(id) {
 	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)
 		.then(function(data) {
-			screenTopAlert('提交成功！2s后跳转到基金列表。');
+			screenTopAlert('提交成功！2s后跳转到申请表详情。');
 			setTimeout(function() {
-				window.location.href = '/fund/list/'+data.fund._id;
+				window.location.href = '/fund/a/'+id;
 			}, 2000)
 		})
 		.catch(function(data) {

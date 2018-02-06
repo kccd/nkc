@@ -19,7 +19,12 @@ function disagree(_id) {
 }
 
 function support(_id) {
-	nkcAPI('/fund/a/'+_id+'/vote', 'POST', {type: 'support'})
+	var content = $('#content').val();
+	var obj = {
+		type: 'support',
+		c: content
+	};
+	nkcAPI('/fund/a/'+_id+'/vote', 'POST', obj)
 		.then(function(){
 			window.location.reload();
 		})
@@ -29,7 +34,13 @@ function support(_id) {
 }
 
 function against(_id) {
-	nkcAPI('/fund/a/'+_id+'/vote', 'POST', {type: 'against'})
+	var content = $('#content').val();
+	if(!content) return screenTopWarning('请输入反对的理由。');
+	var obj = {
+		type: 'against',
+		c: content
+	};
+	nkcAPI('/fund/a/'+_id+'/vote', 'POST', obj)
 		.then(function(){
 			window.location.reload();
 		})
@@ -47,6 +58,17 @@ function revoked(type, _id) {
 			screenTopAlert('操作成功！');
 		})
 		.catch(function(data){
+			screenTopWarning(data.error);
+		})
+}
+
+function disableApplicationForm(id) {
+	if(confirm('确定要封禁该基金申请？') === false) return;
+	nkcAPI('/fund/a/'+id+'?type=disabled', 'DELETE',{})
+		.then(function(data) {
+			window.location.href = '/fund/list/'+ data.fund._id;
+		})
+		.catch(function(data) {
 			screenTopWarning(data.error);
 		})
 }

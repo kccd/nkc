@@ -458,13 +458,15 @@ input[type="radio"], input[type="checkbox"]{
   line-height: 4rem;
   text-align: center;
   width: 16rem;
-  background-color: #aaa;
+  background-color: #2aabd2;
   margin: 0 0.5rem;
   -webkit-transition: background-color 0.2s;
   -moz-transition: background-color 0.2s;
   -ms-transition: background-color 0.2s;
   -o-transition: background-color 0.2s;
   transition: background-color 0.2s;
+  border: 1px solid #2aabd2;
+  border-radius: 4px;
 }
 .nav-link > ul > li > a.active{
   background-color: #2aabd2;
@@ -477,7 +479,7 @@ input[type="radio"], input[type="checkbox"]{
 }
 .nav-link > ul > li > a:hover{
   text-decoration: none;
-  background-color: #2aabd2;
+  background-color: #1387ab;
 }
 .blank{
   color: #eee;
@@ -539,44 +541,45 @@ input[type="radio"], input[type="checkbox"]{
 
 @keyframes myfirst
 {
-  0% {line-height: 1.5;}
-  50% {line-height: 2.5;}
-  100% {line-height: 1.5;}
+  0% {line-height: 1.8;}
+  50% {line-height: 2.4;}
+  100% {line-height: 1.8;}
 }
 
 @-moz-keyframes myfirst /* Firefox */
 {
-  0% {line-height: 1.5;}
-  50% {line-height: 2.5;}
-  100% {line-height: 1.5;}
+  0% {line-height: 1.8;}
+  50% {line-height: 2.4;}
+  100% {line-height: 1.8;}
 }
 
 @-webkit-keyframes myfirst /* Safari 和 Chrome */
 {
-  0% {line-height: 1.5;}
-  50% {line-height: 2.5;}
-  100% {line-height: 1.5;}
+  0% {line-height: 1.8;}
+  50% {line-height: 2.4;}
+  100% {line-height: 1.8;}
 }
 
 @-o-keyframes myfirst /* Opera */
 {
-  0% {line-height: 0;}
-  50% {line-height: 2}
-  100% {line-height: 0}
+  0% {line-height: 1.8;}
+  50% {line-height: 2.4;}
+  100% {line-height: 1.8;}
 }
 
 .fund-apply-status ul li.next{
   background-color: rgba(0,0,0,0);
+  height: 4rem;
   color: #aaa;
-  font-size: 3rem;
+  padding: 0;
+  margin: -1rem 0;
+  font-size: 2.6rem;
   animation: myfirst 1s;
   -moz-animation: myfirst 1s;	/* Firefox */
   -webkit-animation: myfirst 1s;	/* Safari 和 Chrome */
   -o-animation: myfirst 1s;	/* Opera */
   animation-iteration-count: infinite;
   -webkit-animation-iteration-count: infinite;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
 }
 
 .fund-apply-status ul{
@@ -591,13 +594,18 @@ input[type="radio"], input[type="checkbox"]{
   width: 100%;
   list-style: none;
   background-color: rgba(0,0,0,0.1);
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   color: #777;
   margin: 1rem 0;
+  border-radius: 4px;
+}
+.fund-apply-status ul li:first-child{
+  margin-top: 0;
 }
 .fund-apply-status ul li.passed{
   background-color: #5cb85c;
   color: #fff;
+  border: 1px solid #4cae4c;
 }
 .fund-li{
   padding: 0.8rem 0;
@@ -820,7 +828,7 @@ input[type="radio"], input[type="checkbox"]{
   border: 1px solid #dedede;
   background-color: #fff;
 }
-.fund-money-list.peojectAudit > div{
+.fund-money-list.projectAudit > div{
   width: 20%;
 }
 
@@ -1106,7 +1114,17 @@ input[type="radio"], input[type="checkbox"]{
 .applicationForm img{
   max-width: 100%;
 }
-
+.applicationForm .id{
+  font-size: 3rem;
+  font-weight: 600;
+  color: #555;
+}
+.applicationForm .status{
+  font-size: 2rem;
+  font-weight: 600;
+  color: #888;
+  text-align: center;
+}
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;

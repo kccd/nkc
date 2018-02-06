@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const fundRouter = new Router();
-const applicationRouter = require('./application');
+const applicationRouter = require('./application/index');
 const listRouter = require('./list');
 const meRouter = require('./me');
 fundRouter

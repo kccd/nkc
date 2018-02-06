@@ -100,7 +100,7 @@ block content
                   else if typeof applicationForm.budgetMoney !== 'string' && applicationForm.budgetMoney !== null
                     -let aggregate = 0;
                     #budgetMoney
-                      .fund-money-list.head.peojectAudit
+                      .fund-money-list.head.projectAudit
                         .purpose 用途
                         .count 数量
                         .money 单价(元)
@@ -110,7 +110,7 @@ block content
                       -for(let p of applicationForm.budgetMoney)
                         -const total = p.count*p.money;
                         -aggregate += total;
-                        .fund-money-list.peojectAudit
+                        .fund-money-list.projectAudit
                           .purpose= p.purpose
                           .count= p.count
                           .money= p.money
@@ -136,6 +136,25 @@ block content
               button.btn.btn-info.center-block#submit(onclick=`submitProjectAudit(${applicationForm._id})`) 提交
 
       else
+        .col-xs-12.col-md-12
+          h3 申请人信息
+        .col-xs-12.col-md-8
+          .panel.panel-default
+            .panel-body
+              span=`账号ID：`
+              a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
+              br
+              span=`专栏：`
+              a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
+              br
+              span=`真实姓名：${applicant.name}，身份证号码：${applicant.idCardNumber}，联系电话：${applicant.mobile}`
+              br
+              span=`生活照：`
+              .row
+                .col-xs-12.col-md-12
+                  -for(let photo of applicationForm.applicant.lifePhotos)
+                    a(href=`/photo/${photo._id}` target='_blank')
+                      img(src=`/photo_small/${photo._id}` style='width: 50%; padding: 0.5rem')
         .col-xs-12.col-md-12
           h3 项目内容
         .col-xs-12.col-md-8

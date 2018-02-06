@@ -2,7 +2,9 @@
 .row
   .panel.panel-default
     .panel-body.applicationForm
-      h4=`项目ID：${applicationForm.code || '暂无'}`
+      .row
+        .col-xs-12.col-md-12
+          .id.text-center=`科创基金 ${applicationForm.code?'- ' + applicationForm.code: ''}`
 
       hr
       .h4 申请人信息
@@ -31,12 +33,21 @@
               -for(let m of applicationForm.members)
                 span &nbsp;&nbsp;
                 a(href=`/m/${m.uid}` target='_blank')= m.user.username
-        .col-xs-12.col-md-6
-          p 申请人照片
-          if applicationForm.applicant.lifePhotos.length === 0
+        if applicationForm.applicant.lifePhotos.length === 0
+          .col-xs-12.col-md-6
+            p 申请人照片
             span 生活照暂未上传
-          -for (let p of applicationForm.applicant.lifePhotos)
-            img(src=`/photo_small/${p._id}`)
+        else if applicationForm.applicant.lifePhotos.length === 1
+          .col-xs-12.col-md-6
+            p 申请人照片
+            a(href=`/photo/${applicationForm.applicant.lifePhotos[0]._id}` target='_blank')
+              img(src=`/photo_small/${applicationForm.applicant.lifePhotos[0]._id}`)
+        else
+          .col-xs-12.col-md-12
+            p 申请人照片
+            -for (let p of applicationForm.applicant.lifePhotos)
+              a(href=`/photo/${p._id}` target='_blank')
+                img(src=`/photo_small/${p._id}` style='margin: 0.2rem;')
       hr
       .h4 项目信息
       br
@@ -49,27 +60,69 @@
       hr
       .h4 其他信息
       br
-      h5= `研究周期：${applicationForm.projectCycle+"天" || '暂未填写'}`
+      h5= `研究周期：${applicationForm.projectCycle?applicationForm.projectCycle+"天": '暂未填写'}`
       if applicationForm.fixedMoney
         h5= `资金用途：${applicationForm.budgetMoney}`
       else
         h5= `资金预算：`
-        -let aggregate = 0;
-        #budgetMoney
-          .fund-money-list.head
-            .purpose 用途
-            .count 数量
-            .money 单价(元)
-            .total 合计(元)
-          -for(let p of applicationForm.budgetMoney)
-            -const total = p.count*p.money;
-            -aggregate += total;
-            .fund-money-list
-              .purpose= p.purpose
-              .count= p.count
-              .money= p.money
-              .total= total
-        h3.text-right=`总计：${aggregate}元`
+        if applicationForm.budgetMoney === null || applicationForm.budgetMoney === ''
+          span 暂未填写
+        else
+          -let aggregate = 0, suggest = 0, fact = 0;
+          #budgetMoney
+            if applicationForm.budgetMoney[0].fact
+              .fund-money-list.head.adminAudit
+                .purpose 用途
+                .count 数量
+                .money 单价(元)
+                .total 合计(元)
+                .suggest 项目审查员建议(元)
+                .fact 管理员批准(元)
+              -for(let p of applicationForm.budgetMoney)
+                -const total = p.count*p.money;
+                -aggregate += total;
+                -suggest += p.suggest;
+                -fact += p.fact;
+                .fund-money-list.adminAudit
+                  .purpose= p.purpose
+                  .count= p.count
+                  .money= p.money
+                  .total= total
+                  .suggest= p.suggest
+                  .fact= p.fact
+            else if applicationForm.budgetMoney[0].suggest
+              .fund-money-list.head.projectAudit
+                .purpose 用途
+                .count 数量
+                .money 单价(元)
+                .total 合计(元)
+                .suggest 项目审查员建议(元)
+              -for(let p of applicationForm.budgetMoney)
+                -const total = p.count*p.money;
+                -aggregate += total;
+                -suggest += p.suggest;
+                .fund-money-list.projectAudit
+                  .purpose= p.purpose
+                  .count= p.count
+                  .money= p.money
+                  .total= total
+                  .suggest= p.suggest
+            else
+              .fund-money-list.head
+                .purpose 用途
+                .count 数量
+                .money 单价(元)
+                .total 合计(元)
+              -for(let p of applicationForm.budgetMoney)
+                -const total = p.count*p.money;
+                -aggregate += total;
+                -suggest += p.suggest;
+                .fund-money-list
+                  .purpose= p.purpose
+                  .count= p.count
+                  .money= p.money
+                  .total= total
+          h3.text-right=`申请金额：${aggregate}元，项目审查员建议：${suggest}元，管理员批准：${fact}元`
       if fund.thread.count > 0
         h5= `附加帖子：`
         if applicationForm.threads.applying.length === 0
