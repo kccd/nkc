@@ -62,7 +62,7 @@
       br
       h5= `研究周期：${applicationForm.projectCycle?applicationForm.projectCycle+"天": '暂未填写'}`
       if applicationForm.fixedMoney
-        h5= `资金用途：${applicationForm.budgetMoney || '暂未填写'}`
+        h5= `资金用途：${applicationForm.budgetMoney || '暂未填写'}` 
       else
         h5= `资金预算：`
         if applicationForm.budgetMoney === null || applicationForm.budgetMoney === ''
