@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
+const dbFn = require('../../../nkcModules/dbFunction');
 settingsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
@@ -8,7 +9,7 @@ settingsRouter
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {status} = applicationForm;
 		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
-		if(status.adminSupport) ctx.throw(400, '管理员审核已通过，无法修改申请表。');
+		if(status.adminSupport) ctx.throw(400, '管理员复核已通过，无法修改申请表。');
 		let {s} = ctx.query;
 		if(s) {
 			s = parseInt(s);
@@ -17,6 +18,9 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		data.s = s;
+		if(s === 4) {
+			data.forumList = await dbFn.getAvailableForums(ctx);
+		}
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
 		ctx.template = 'interface_fund_apply.pug';

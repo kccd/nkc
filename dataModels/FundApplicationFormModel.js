@@ -111,7 +111,7 @@ const fundApplicationFormSchema = new Schema({
       default: null
     },
     number: {
-      type: Number,
+      type: String,
       default: null
     }
   },
@@ -140,7 +140,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    remittance: { // 已汇款
+    remittance: { // 已拨款
       type: Boolean,
       default: null,
       index: 1
@@ -179,6 +179,11 @@ const fundApplicationFormSchema = new Schema({
 	reportNeedThreads: {
 		type: Boolean,
 		default: false
+	},
+	category: {
+		type: String,
+		default: null,
+		index: 1
 	},
   lock: {
   	submitted: { // 用于判断用户当前申请表是否已提交
@@ -297,6 +302,14 @@ fundApplicationFormSchema.virtual('comments')
 		this._comments = comments;
 	});
 
+fundApplicationFormSchema.virtual('forum')
+	.get(function() {
+		return this._forum;
+	})
+	.set(function(forum) {
+		this._forum = forum;
+	});
+
 
 fundApplicationFormSchema.pre('save', function(next) {
   this.tlm = Date.now();
@@ -355,6 +368,15 @@ fundApplicationFormSchema.methods.extendMembers = async function() {
 		await aUser.extendUser();
 		return aUser;
 	}));
+};
+
+fundApplicationFormSchema.methods.extendForum = async function() {
+	let forum;
+	if(this.category) {
+		const ForumModel = require('./ForumModel');
+		forum = await ForumModel.findOne({fid: this.category});
+	}
+	return this.forum = forum;
 };
 
 fundApplicationFormSchema.methods.extendFund = async function() {
@@ -417,7 +439,8 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		lock,
 		modifyCount,
 		supporter,
-		objector
+		objector,
+		category
 	} = this;
 	const {
 		money,
@@ -455,6 +478,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 
 	//其他信息判断
 	if (projectCycle === null) throw '请填写研究周期！';
+	if (!category) throw '请选择学术分类。';
 	if(money.max === null) { // 定额基金
 		if(!budgetMoney) throw '请输入资金用途！';
 	} else { //不定额基金

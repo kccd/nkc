@@ -29,9 +29,9 @@ auditRouter
 				if(user.uid !== uid) ctx.throw(400, '抱歉！该申请表正在被其他审查员审核。')
 			}
 		} else if(type === 'admin'){
-			data.nav = '管理员审核';
+			data.nav = '管理员复核';
 			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
-			if(applicationForm.status.adminSupport !== null) ctx.throw(400, '抱歉！该申请表已被其他管理员审核了。');
+			if(applicationForm.status.adminSupport !== null) ctx.throw(400, '抱歉！该申请表已被其他管理员复核了。');
 			if(!applicationForm.status.projectPassed) ctx.throw(400, '项目审核暂未通过，请等待。');
 			const {auditing, uid, timeToOpen, timeToClose} = lock;
 			const {timeOfAudit} = ctx.settings.fund;
@@ -43,7 +43,7 @@ auditRouter
 				await applicationForm.save();
 			} else { // 有人正在审核且未超时
 				//若审查员是自己则继续审核
-				if(user.uid !== uid) ctx.throw(400, '抱歉！该申请表正在被其他管理员审核。')
+				if(user.uid !== uid) ctx.throw(400, '抱歉！该申请表正在被其他管理员复核。')
 			}
 		} else {
 			ctx.throw(400, '未知的type类型。');
@@ -102,15 +102,16 @@ auditRouter
 					await applicationForm.update({budgetMoney});
 				}
 			}
-		} else if(type === 'admin') {// 最后管理员审核
+		} else if(type === 'admin') {// 最后管理员复核
 			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
 			if(!applicationForm.status.projectPassed) ctx.throw(400, '项目审核暂未通过，请等待。');
 			const {uid} = lock;
 			if(user.uid !== uid) {
-				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他管理员审核。');
+				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他管理员复核。');
 			}
 			const {c, support, factMoney, remittance, needThreads} = body;
 			if(support) {
+				applicationForm.timeToPassed = Date.now();
 				if(applicationForm.fixedMoney || remittance.length === 0) {
 					applicationForm.remittance = [{
 						money: applicationForm.factMoney,
@@ -140,7 +141,6 @@ auditRouter
 					}
 					if(total*0.8 > fact) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
 					await applicationForm.update({budgetMoney});
-					applicationForm.timeToPassed = Date.now();
 				}
 			}
 			const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);

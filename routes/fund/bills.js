@@ -9,7 +9,7 @@ billsRouter
 		const page = query.page? parseInt(query.page): 0;
 		const count = await db.FundBillModel.count({fundId});
 		const paging = apiFn.paging(page, count);
-		const bills = await db.FundBillModel.find({fundId}).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+		const bills = await db.FundBillModel.find({fundId}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(bills.map(async b => {
 			await b.extendApplicationForm();
 			await b.extendUser();
@@ -17,7 +17,20 @@ billsRouter
 		data.bills = bills;
 		data.fund = fund;
 		data.nav = '基金账单';
+		data.paging = paging;
 		ctx.template = 'interface_fund_bills.pug';
+		await next();
+	})
+	.post('/', async (ctx, next) => {
+		const {db, body, params} = ctx;
+		const {user} = ctx.data;
+		const {bill} = body;
+		const {fundId} = params;
+		bill._id = Date.now();
+		bill.uid = user.uid;
+		bill.fundId = fundId;
+		const newBill = db.FundBillModel(bill);
+		await newBill.save();
 		await next();
 	});
 module.exports = billsRouter;

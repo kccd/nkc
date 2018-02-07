@@ -93,7 +93,10 @@ block content
                   //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
                   div#projectContent!= project && project.c? experimental_render(project): content
                   //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
-                  button.btn.btn-default(onclick=`toEditor()` style='margin-left: 0;') 去编辑器
+                  br
+                  br
+                  br
+                  button.btn.btn-default.center-block(onclick=`toEditor()` style='width: ') 去编辑器填写
                   //span &nbsp;&nbsp;
                   //span.autoSaveTime#saveTime 0秒
                   //span.autoSaveTime 后自动保存
@@ -104,7 +107,7 @@ block content
                   h4 研究周期
                     small （天）
                   input.fund-input#projectCycle(value=projectCycle !== null? projectCycle: '' )
-                  h4 资金用途
+                  h4 资金用途（预算）
                   if fixedMoney
                     span 常用：
                     span.fund-span.addPurpose 购买电子元器件
@@ -139,7 +142,7 @@ block content
                       //span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
                   if fund.thread.count > 0
                     br
-                    h4 附带帖子
+                    h4 申请人曾今的技术帖（从论坛发帖中选择）
                     .popupPanel.disabled
                       .popupPanel-body
                         .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
@@ -180,6 +183,22 @@ block content
                     //.span.fund-span.transparent(onclick='displayDeleteThreadBtn()' style="margin-left: 0;") 编辑
                     .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
                     //.span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
+                  br
+                  br
+                  h4 学科分类
+                  h4 已选择：
+                    if applicationForm.forum
+                      span#category(fid=applicationForm.forum.fid)= applicationForm.forum.displayName
+                    else
+                      span#category= '暂未选择'
+                  br
+                  -for (let parentForum of data.forumList)
+                    strong= parentForum.displayName
+                    span ：
+                    -for (let childrenForum of parentForum.children)
+                      span(onclick=`chooseCategory(${childrenForum.fid}, '${childrenForum.displayName}')` style='cursor: pointer')= childrenForum.displayName
+                      span &nbsp;&nbsp;&nbsp;
+                    br
 
             else if s === 5 && inputApplicantMessages !== null
               -const agreeIsFalse = [], agreeIsTrue = [], agreeIsNull = [];
@@ -214,6 +233,9 @@ block content
                   mixin ds(text)
                     -n++;
                     -disabledSubmit = true;
+                    if n === 1
+                      br
+                      h4.text-center 存在下列问题，请补充完善。
                     h5.redFontColor= `${n}、${text}`
                   -const difference = fund.modifyCount - applicationForm.modifyCount;
                   h3= `当前剩余修改次数: ${difference}`
@@ -281,7 +303,9 @@ block content
                         if aggregate > fund.money.max
                           +ds(`资金预算金额已超过该基金项目单笔申请的最大金额（${fund.money.max}元）`)
                   if fund.thread.count > applicationForm.threadsId.applying.length
-                    +ds(`附带的帖子数未达到最低要求(至少${fund.thread.count}篇)`)
+                    +ds(`申请人曾今的技术帖数未达到最低要求(至少选择${fund.thread.count}篇)`)
+                  if !applicationForm.category
+                    +ds('未选择学科分类。')
                   if !disabledSubmit
                     h3.greenFontColor 信息录入完整,可提交申请！
               hr
@@ -310,7 +334,7 @@ block content
                 -funNext = `submitOtherMessages()`;
               hr
               .col-xs-12.col-md-2.col-md-offset-5
-                button.btn.btn-info.btn-block(style='width: 100%;' onclick=funSave) 保存
+                button.btn.btn-info.btn-block(style='width: 100%;' onclick=funSave) 暂存
                 br
               .col-xs-12.col-md-2.col-md-offset-5
                 button.btn.btn-info.btn-block(style='width: 100%;' onclick=funNext) 下一步

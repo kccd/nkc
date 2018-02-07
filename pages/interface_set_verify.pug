@@ -73,9 +73,9 @@ block settings_content
               +settingsImg(photoName, photoObj)
             .col-xs-12.col-md-3
               if submittedAuth !== true && (!photoObj || photoObj.status !== 'passed')
-                input(id=`${photoName}Photo` type='file' style='display: none;')
+                input(id=`${photoName}Photo` type='file' style='display: none;' accept='image/*')
                 .settings-btn.disabled(onclick=`$("#${photoName}Photo").click()`) 选择图片
-                .settings-btn(onclick=`uploadFile("#${photoName}Photo")`) 上传
+                //.settings-btn(onclick=`uploadFile("#${photoName}Photo")`) 上传
                 .uploadFileInfo(id=`${photoName}PhotoMessages`)
               if photoObj && photoObj.status === 'passed'
                 p!= photoObj.expiryDate !== null?`过期时间：<br>${photoObj.expiryDate.toLocaleDateString()}`: '未设置有效期'
@@ -108,21 +108,21 @@ block settings_content
           -number = 2;
           .col-xs-12.col-md-6
             h4.text-center 身份证正面
-            .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+            .settings-info.text-center 请在本地选择要上传图片，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
               span.settings-link#watchIdCardAPhoto 查看实例
             +settingsPanel('idCardA', idCardA)
 
 
           .col-xs-12.col-md-6
             h4.text-center 身份证背面
-            .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+            .settings-info.text-center 请在本地选择要上传图片，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
               span.settings-link#watchIdCardBPhoto 查看实例
             +settingsPanel('idCardB', idCardB)
         if g === 3
           -number = 3;
           .col-xs-12.col-md-6
             h4.text-center 手持身份证照片
-            .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+            .settings-info.text-center 请在本地选择要上传图片，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
               span.settings-link#watchHandheldIdCardPhoto 查看实例
             +settingsPanel('handheldIdCard', handheldIdCard)
         .col-xs-12.col-md-12

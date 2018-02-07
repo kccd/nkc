@@ -39,6 +39,7 @@ meRouter
 		}));
 		data.applicationForms = applicationForms;
 		data.newNotify = newNotify;
+		data.paging = paging;
 		await next();
 	});
 module.exports = meRouter;

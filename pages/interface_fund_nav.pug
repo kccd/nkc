@@ -5,7 +5,9 @@
       a(href="/fund") 科创基金
     span &nbsp;&nbsp;&nbsp;
     span
-      a(href=`/fund/me`) 我的基金
+      a(href=`/fund/me`) 我的基金&nbsp;
+      if data.fundNotify > 0
+        span.redFontColor= data.fundNotify
     span &nbsp;&nbsp;&nbsp;
     li
       a(href=`/fund/list`) 基金列表

@@ -141,7 +141,7 @@ const fundApplicationHistorySchema = new Schema({
 			type: Boolean,
 			default: null
 		},
-		remittance: { // 已汇款
+		remittance: { // 已拨款
 			type: Boolean,
 			default: null
 		},

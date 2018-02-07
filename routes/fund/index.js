@@ -4,6 +4,20 @@ const applicationRouter = require('./application/index');
 const listRouter = require('./list');
 const meRouter = require('./me');
 fundRouter
+	.use('/', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {user} = data;
+		let newNotify = 0;
+		const aUsers = await db.FundApplicationUserModel.find({uid: user.uid});
+		await Promise.all(aUsers.map(async a => {
+			if(a.agree === null) {
+				const applicationForm = await db.FundApplicationFormModel.findOnly({_id: a.applicationFormId});
+				if(user.uid !== applicationForm.uid) newNotify++;
+			}
+		}));
+		data.fundNotify = newNotify;
+		await next();
+	})
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const queryOfApplying = {

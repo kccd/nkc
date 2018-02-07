@@ -225,7 +225,8 @@ fundSchema.methods.getConflictingByUser = async function(user) {
 	const count = await FundApplicationFormModel.count({
 		uid: user.uid,
 		fundId: this._id,
-		year
+		year,
+		useless: {$ne: 'delete'}
 	});
 	if(count >= this.applicationCountLimit) return '今年您申请该基金的次数已超过限制，欢迎明年再次申请！'
 };

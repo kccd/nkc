@@ -73,6 +73,7 @@ listRouter
 			await a.extendProject();
 			return a;
 		}));
+		data.paging = paging;
 		//改由前端判断
 		data.message = await fund.getConflictingByUser(user);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});

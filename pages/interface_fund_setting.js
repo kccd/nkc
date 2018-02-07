@@ -274,12 +274,12 @@ function moneyFixedSet() {
 	} else {
 		money = null;
 	}
-	var placeholder = '固定金额';
+	var placeholder = '固定金额（人民币元，不能有小数点）';
 	if(arr.eq(0).is(':checked')) {
 		fundObj.money.max = null;
 		fundObj.money.fixed = money;
 	} else {
-		placeholder = '最大申请金额';
+		placeholder = '最大申请金额（人民币元，不能有小数点）';
 		fundObj.money.max = money;
 		fundObj.money.fixed = null;
 	}

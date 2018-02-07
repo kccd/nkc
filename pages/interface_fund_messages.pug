@@ -39,7 +39,10 @@ block content
                 a(href=`/fund/list/${fund._id}?type=auditing`) 审核中
             hr
             -applicationForms = data.applicationForms;
+            -const url = `/fund/list/${fund._id}`;
+            include interface_fund_page
             include interface_fund_applicationList
+            include interface_fund_page
       .col-xs-12.col-md-3
         .row
           .col-xs-12.col-md-12
@@ -124,7 +127,7 @@ block content
           .col-xs-12.col-md-12
             .panel.panel-default
               .panel-body.fund-description
-                h3 其他说明
+                h3 补充说明
                 hr
                 div!= markdown_safe(fund.description.detailed)
 

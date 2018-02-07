@@ -3,7 +3,7 @@ const reportRouter = new Router();
 reportRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
-		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员审核，请通过后再试。');
+		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员复核，请通过后再试。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -25,7 +25,7 @@ reportRouter
 			const {timeToPassed, reportNeedThreads, remittance} = applicationForm;
 			for(let r of remittance) {
 				if(!r.status) {
-					if(reportNeedThreads && selectedThreads.length === 0) ctx.throw(400, '管理员要求提交汇款申请必须要附带代表中期报告的帖子。');
+					if(reportNeedThreads && selectedThreads.length === 0) ctx.throw(400, '管理员要求提交拨款申请必须要附带代表中期报告的帖子。');
 
 					//验证帖子时间
 					await Promise.all(selectedThreads.map(async t => {

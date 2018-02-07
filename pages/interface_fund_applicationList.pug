@@ -27,13 +27,13 @@ else
         else if projectPassed === false
           th 项目审核不通过，等待申请人处理
         else if adminSupport === null
-          th 等待管理员审核
+          th 等待管理员复核
         else if adminSupport === false
-          th 管理员审核不通过，等待申请人处理
+          th 管理员复核不通过，等待申请人处理
         else if remittance === null
-          th 等待汇款
+          th 等待拨款
         else if remittance === false
-          th 汇款失败
+          th 拨款失败
         else if submittedReport
           th 等待报告审核
         else if !completed
@@ -68,23 +68,3 @@ else
           th= project.t
           th
             a(href=`/fund/a/${_id}`) 查看详情
-            //span &nbsp;
-            //-const {status} = applicationForm;
-            //if status.usersSupport && status.projectPassed === null && isCensor
-            //  a(href=`/fund/a/${_id}/audit?type=project`) 项目审核
-            //  span &nbsp;
-            //if status.adminSupport === null && status.projectPassed && data.userLevel >= 7
-            //  a(href=`/fund/a/${_id}/audit?type=admin`) 管理员审核
-            //  span &nbsp;
-            //-let needRemittance = false;
-            //if applicationForm.remittance.length !== 0
-            //  -for(let r of applicationForm.remittance)
-            //    if !r.status
-            //      -needRemittance = true;
-            //if status.remittance && submittedReport
-            //  a(href=`/fund/a/${_id}/report/audit`) 报告审核
-            //  span &nbsp;
-            //if status.adminSupport && (!status.remittance || needRemittance) && data.userLevel >= 7
-            //  a(href=`/fund/a/${_id}/remittance`) 去汇款
-            //  span &nbsp;
-

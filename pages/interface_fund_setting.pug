@@ -47,10 +47,10 @@ block content
                     label.radio-inline
                       input(type='radio' name='moneyFixed' checked=fund ? (!fund.money.fixed) : false)
                       h5 不定额
-                  .col-xs-12.col-md-3
-                    -let text = '固定金额';
+                  .col-xs-12.col-md-4
+                    -let text = '固定金额（人民币元，不能有小数点）';
                     if fund && !fund.money.fixed
-                      -text = '最大申请金额';
+                      -text = '最大申请金额（人民币元，不能有小数点）';
                     h5#fundMoneyText= text
                     input.form-control#fundMoney(type="number" placeholder=placeholder value=fund?fund.money.fixed || fund.money.max: '')
                   .col-xs-12.col-md-3
@@ -59,25 +59,25 @@ block content
               .col-xs-12.col-md-2
                 h5 基金简介
               .col-xs-12.col-md-5
-                textarea.form-control#briefDescription(type="text" placeholder="介绍一下该基金" rows=5)=fund ? fund.description.brief : ''
+                textarea.form-control#briefDescription(type="text" placeholder="介绍一下该基金（建议50字以内）" rows=5)=fund ? fund.description.brief : ''
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 基金详细说明
+                h5 基金补充说明
               .col-xs-12.col-md-5
-                textarea.form-control#detailedDescription(type="text" placeholder="其他说明" rows=15)=fund ? fund.description.detailed : ''
+                textarea.form-control#detailedDescription(type="text" placeholder="基金补充说明" rows=15)=fund ? fund.description.detailed : ''
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 背景颜色
+                h5 banner背景颜色
               .col-xs-12.col-md-2
                 input.form-control#fundColor(type="text" placeholder="默认为 #7f9eb2" value=fund?fund.color: '')
               .col-xs-12.col-md-2
                 #fundColorDisplay(style=`background-color: ${fund?fund.color: '#7f9eb2'};`)
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 背景图片
+                h5 banner图片
               .col-xs-12.col-md-2
                 input#fundImage(type="file" style='display: none')
-                button.btn.btn-default(onclick='$("#fundImage").click()') 上传背景图片
+                button.btn.btn-default(onclick='$("#fundImage").click()') 上传banner图片
               .col-xs-12.col-md-2
                 if fund && fund.image
                   img#fundImageDisplay(imageId= fund.image src=`/fundBGI_small/${fund.image}`)
@@ -264,7 +264,7 @@ block content
                   h5 团队申请
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 申请表修改次数
+                h5 允许退修次数
               .col-xs-12.col-md-2
                 input.form-control#modifyCount(type="number" placeholder="默认为3" value=fund? fund.modifyCount: '')
             .fund-setting-list
@@ -279,7 +279,7 @@ block content
                 input.form-control#timeOfPublicity(type="number" placeholder="默认为0" value=fund? fund.timeOfPublicity: '')
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 年申请次数
+                h5 年最大申请次数
               .col-xs-12.col-md-2
                 input.form-control#applicationCountLimit(type="" placeholder="默认为2" value=fund? fund.applicationCountLimit: '')
             .fund-setting-list

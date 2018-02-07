@@ -20,7 +20,10 @@ block content
             if bills.length === 0
               .blank 暂无数据
             else
+              -const url = `/fund/list/${fund._id}/bills`;
+              include interface_fund_page
               include interface_fund_billList
+              include interface_fund_page
       .col-xs-12.col-md-3
         .panel.panel-default
           .panel-body
@@ -33,3 +36,24 @@ block content
                 -for(let b of bills)
                   -difference += b.changed;
                 h2.text-center(style='color:#ff7979;')= `￥${fund.money.initial + difference}`
+        if data.userLevel >= 7
+          .panel.panel-default
+            .panel-body
+              h5.text-center 增加账单
+              hr
+              span 日期选择
+              input#time(type='datetime-local' style='width: 100%;').form-control
+              br
+              span 金额变动(元)
+              input#money(type='number' placeholder = '区分正负').form-control
+              br
+              span 摘要
+              input#abstract(type='text' placeholder = '').form-control
+              br
+              span 备注
+              textarea#notes.form-control(rows='5')
+              br
+              button.btn.btn-info.btn-block(onclick=`submit("${fund._id}")`) 提交
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_bills.js')

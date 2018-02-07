@@ -21,6 +21,14 @@ block content
                 -for(let aUser of members)
                   a(href=`/m/${aUser.uid}` target="_blank")= `${aUser.user.username}`
                   span &nbsp;&nbsp;
+            if applicationForm.account.paymentType === 'alipay'
+              h4 收款方式：支付宝
+            else if applicationForm.account.paymentType === 'bankCard'
+              h4 收款方式：银行卡
+            else
+              h4= `收款方式错误：${applicationForm.account.paymentType}`
+            h4= `收款账号：${applicationForm.account.number}`
+
             hr
             h3=`总共${remittance.length}期，总金额：${applicationForm.factMoney}元`
             table.table
@@ -29,8 +37,8 @@ block content
                   th #
                   th 金额
                   th 状态
-                  th 汇款人ID
-                  th 汇款时间
+                  th 拨款人ID
+                  th 拨款时间
                   th 报告
                   th 操作
 
@@ -40,7 +48,7 @@ block content
                   tr
                     th= `第${i+1}期`
                     th= r.money + '元'
-                    th= r.status?'已汇款':'未汇款'
+                    th= r.status?'已拨款':'未拨款'
                     th
                       if r.user
                         a(href=`/m/${r.uid}`)= r.user.username
@@ -52,11 +60,11 @@ block content
                       th= r.passed? '已通过': '未通过'
                     th
                       if r.status
-                        span 已确认汇款
+                        span 已确认拨款
                       else
-                        a(href=`##` target="_blank")= r.status ? '' : '去汇款界面'
-                        span &nbsp;&nbsp;
-                        button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已汇款'
+                        //a(href=`##` target="_blank")= r.status ? '' : '去拨款界面'
+                        //span &nbsp;&nbsp;
+                        button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已拨款'
 block scripts
   script(src="/interface_common.js")
   script(src="/interface_fund_remittance.js")

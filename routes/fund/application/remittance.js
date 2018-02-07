@@ -5,7 +5,7 @@ remittanceRouter
 		const {applicationForm} = ctx.data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
 		const {adminSupport} = applicationForm.status;
-		if(!adminSupport) ctx.throw(400, '管理员审核暂未通过无法进行汇款操作，请等待。');
+		if(!adminSupport) ctx.throw(400, '管理员复核暂未通过无法进行拨款操作，请等待。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -17,7 +17,7 @@ remittanceRouter
 				r.user = await db.UserModel.findOnly({uid: r.uid});
 			}
 		}));
-		data.nav = '汇款';
+		data.nav = '拨款';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -27,7 +27,7 @@ remittanceRouter
 		const {fund, remittance} = applicationForm;
 		for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
-			if(i < number && !r.status) ctx.throw(400, '请依次汇款！');
+			if(i < number && !r.status) ctx.throw(400, '请依次拨款！');
 			if(i === number) {
 				if(r.status) ctx.throw(400, '已经打过款了，请勿重复提交！');
 				if(!r.passed && i !== 0) ctx.throw(400, '该申请人的报告还未通过，请通过后再打款。');
@@ -42,8 +42,8 @@ remittanceRouter
 					fundId: fund._id,
 					changed: -1*r.money,
 					toc: time,
-					notes: `项目${applicationForm.code}第${i+1}期汇款，汇款金额${r.money}元`,
-					abstract: '汇款'
+					notes: `项目${applicationForm.code}第${i+1}期拨款，拨款金额${r.money}元`,
+					abstract: '拨款'
 				});
 				await newFundBill.save();
 				break;

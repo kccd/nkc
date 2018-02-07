@@ -579,6 +579,7 @@ function savePurpose(callback) {
 	} else {
 		obj.budgetMoney = purpose;
 	}
+	obj.category = $('#category').attr('fid');
 	nkcAPI('/fund/a/'+ applicationFormId, 'PATCH', obj)
 		.then(function(data) {
 			if(callback === undefined){
@@ -740,6 +741,8 @@ function createPageList(paging, self) {
 			} else {
 				max = reduce2-reduce1;
 			}
+		} else {
+			max = pageCount - 1;
 		}
 	}
 	console.log(min, page, max);
@@ -856,7 +859,17 @@ function submitApplicationForm() {
 function deleteApplicationForm(id) {
 	var msg = '删除申请表后所有填写的内容都将会被删除，确认要删除吗？';
 	if(confirm(msg) === true) {
-		nkcAPI('/fund/a/'+id, 'DELETE', {})
-			.then()
+		nkcAPI('/fund/a/'+id+'?type=delete', 'DELETE', {})
+			.then(function(data) {
+				window.location.href = '/fund/list/'+data.applicationForm.fund._id;
+			})
+			.catch(function(data) {
+				screenTopWarning(data.error);
+			})
 	}
-};
+}
+
+
+function chooseCategory(fid, displayName) {
+	$('#category').attr('fid', fid).text(displayName);
+}

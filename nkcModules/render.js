@@ -162,46 +162,46 @@ function applicationFormStatus(a) {
 		}
 	}
 	if(a.disabled) {
-		str = '已被封禁';
+		str = '已被屏蔽';
 		color = 'red';
 	} else if(a.useless === 'giveUp') {
-		str = '已被放弃';
+		str = '已被申请人放弃';
 		color = 'red';
 	} else if(a.useless === 'delete') {
-		str = '已被删除';
+		str = '已被申请人删除';
 		color = 'red';
 	} else if(a.useless === 'exceededModifyCount') {
-		str = '修改次数超过限制';
+		str = '退修次数超过限制';
 		color = 'red';
 	} else if(!submitted || !a.lock.submitted) {
 		str = '暂未提交';
 	} else if(!usersSupport) {
 		str = '等待网友支持';
 	} else if(projectPassed === null) {
-		str = '等待项目审查员审核';
+		str = '等待专家审核';
 	} else if(projectPassed === false) {
 		str = '项目审核不通过，等待申请人修改';
 		color = 'red';
 	} else if(adminSupport === null) {
-		str = '等待管理员审核';
+		str = '等待管理员复核';
 	} else if(adminSupport === false) {
-		str = '管理员审核不通过，等待申请人修改';
+		str = '管理员复核不通过，等待申请人修改';
 		color = 'red';
 	} else if(remittance === null) {
-		str = '等待汇款';
+		str = '等待拨款';
 	} else if(remittance === false) {
-		str = '汇款出现问题，等待管理员处理';
+		str = '拨款出现问题，等待管理员处理';
 		color = 'red';
 	} else if(submittedReport) {
 		str = '等待报告审核';
 	} else if(needRemittance) {
-		str = '等待汇款';
+		str = '等待拨款';
 	} else if(!completed) {
 		str = '资助中';
 	} else if(successful) {
-		str = '研发成功';
+		str = '正常结题';
 	} else if(!successful) {
-		str = '研发失败';
+		str = '失败结题';
 	} else if(excellent) {
 		str = '优秀项目';
 	}

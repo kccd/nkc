@@ -826,9 +826,22 @@ const certificates ={
 	      },
 	      a: {
         	[parameter]: {
-        		remittance: {// 汇款
+        		remittance: {// 拨款
         			[GET]: true,
 			        [POST]: true
+		        },
+		        excellent: {
+        			[name]: '评优',
+			        [PATCH]: true
+		        },
+		        disabled: {
+        			[name]: '封禁',
+			        [PATCH]: true
+		        },
+		        comment: {
+        			[parameter]: {
+        				[DELETE]: true, //封禁评论
+			        }
 		        }
 	        }
 	      }

@@ -82,6 +82,8 @@ function createPageList(paging, self) {
 			} else {
 				max = reduce2-reduce1;
 			}
+		} else {
+			max = pageCount - 1;
 		}
 	}
 	console.log(min, page, max);

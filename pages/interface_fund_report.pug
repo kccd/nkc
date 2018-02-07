@@ -21,6 +21,7 @@ block content
                     h4=`项目名称：${project.t}`
                     h4=`项目ID：${code}`
                     hr
+                    p 此处仅用于简要说明项目进展情况，分享项目成果请前往论坛发帖。
                     textarea.form-control#content(rows=10 placeholder='项目的进展情况')
                     br
                     button.btn.btn-default(style='float: right; margin-left: 0.5rem;' onclick=`submit(${applicationForm._id})`) 提交
@@ -28,7 +29,7 @@ block content
             .col-xs-12.col-md-12
               .panel.panel-default
                 .panel-body
-                  h3.text-center= `汇款详情`
+                  h3.text-center= `拨款详情`
                   table.table
                     thead
                       tr
@@ -42,9 +43,9 @@ block content
                           th= `第${i+1}期`
                           th= `${r.money}元`
                           if r.status
-                            th.greenFontColor= `已汇款`
+                            th.greenFontColor= `已拨款`
                           else
-                            th= `未汇款`
+                            th= `未拨款`
             -let needRemittance = false;
             -let number;
             -for(let i = 0; i < remittance.length; i++)
@@ -59,12 +60,12 @@ block content
               .col-xs-12.col-md-12
                 .panel.panel-default
                   .panel-body
-                    h3.text-center=`申请第${number+1}期汇款`
+                    h3.text-center=`申请第${number+1}期拨款`
 
                     if remittance[number].passed === true
                       h4.greenFontColor 已通过审核，等待打款。
                     else if submittedReport && remittance[number].passed === null
-                      h4.greenFontColor 已提交申请，请等待管理员审核。
+                      h4.greenFontColor 已提交申请，请等待管理员复核。
                     else if submittedReport === false
                       if remittance[number].passed === false
                         h4.redFontColor 审核不通过
@@ -76,7 +77,7 @@ block content
                       textarea.form-control#reportContent(rows=10 placeholder='项目的进展情况')
                       if remittance[0].needThreads
                         br
-                        span.redFontColor *管理员要求提交汇款申请必须要附带代表中期报告的帖子
+                        span.redFontColor *管理员要求提交拨款申请必须要附带代表中期报告的帖子
                       h5 已选择帖子的文号：
                       #selectedThread
                         span 暂未选择
@@ -100,7 +101,10 @@ block content
                 if status.completed
                   div.time!= `${fromNow(applicationForm.timeOfCompleted)}&nbsp;&nbsp;&nbsp;${applicationForm.timeOfCompleted.toLocaleString()}`
                     div(style='position: absolute;')
-                  div.content=`完成`
+                  if applicationForm.useless === 'giveUp'
+                    div.content=`申请人放弃`
+                  else
+                    div.content=`完成`
                 -for(let r of data.reports)
                   div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
                     div(style='position: absolute;')
@@ -132,7 +136,7 @@ block content
               h4=`申请人：`
                 a(href=`/m/${applicant.uid}` target='_blank')= applicant.user.username
               hr
-              h3.text-center=`申请第${number+1}期汇款`
+              h3.text-center=`申请第${number+1}期拨款`
               h4 提交的报告：
               div!= experimental_render(data.report)
               br
