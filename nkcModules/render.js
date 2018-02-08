@@ -174,10 +174,10 @@ function applicationFormStatus(a) {
 		str = '退修次数超过限制';
 		color = 'red';
 	} else if(!submitted || !a.lock.submitted) {
-		if(!projectPassed) {
+		if(projectPassed === false) {
 			str = '专家审核不通过，等待申请人修改';
 			color = 'red';
-		} else if(!adminSupport) {
+		} else if(adminSupport === false) {
 			str = '管理员复核不通过，等待申请人修改';
 			color = 'red';
 		} else {

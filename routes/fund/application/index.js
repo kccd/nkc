@@ -59,6 +59,9 @@ applicationRouter
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
 		await applicationForm.extendProject();
+		if(applicationForm.project) {
+			await applicationForm.project.extendResources();
+		}
 		await applicationForm.extendThreads();
 		await applicationForm.extendForum();
 		const {fund, budgetMoney} = applicationForm;
@@ -263,14 +266,20 @@ applicationRouter
 					_id: documentId,
 					uid: user.uid,
 					applicationFormId: applicationForm._id,
-					type: 'project'
+					type: 'project',
+					t: project.t,
+					abstract: project.abstract
 				});
 				await newDocument.save();
 				updateObj.projectId = documentId;
 				await applicationForm.update(updateObj);
 			} else {
 				if(project !== undefined){
-					await applicationForm.project.update(project);
+					if(project.t) applicationForm.project.t = project.t;
+					if(project.c) applicationForm.project.c = project.c;
+					if(project.l) applicationForm.project.l = project.l;
+					if(project.abstract) applicationForm.project.abstract = project.abstract;
+					await applicationForm.project.save();
 					data.redirect = `/fund/a/${applicationForm._id}/settings?s=3`;
 				}
 			}

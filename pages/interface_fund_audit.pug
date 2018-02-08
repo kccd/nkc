@@ -50,6 +50,9 @@ block content
                 .panel-body
                   -const project = applicationForm.project
                   h2.text-center#projectTitle= project.t
+                  br
+                  p= project.abstract
+                  br
                   div#projectContent!= experimental_render(project)
                   hr
                   h4= `学术分类：${applicationForm.forum.displayName}`
@@ -163,6 +166,9 @@ block content
             .panel-body
               -const project = applicationForm.project
               h2.text-center#projectTitle= project.t
+              br
+              p= project.abstract
+              br
               div#projectContent!= experimental_render(project)
               hr
               h4= `学术分类：${applicationForm.forum.displayName}`

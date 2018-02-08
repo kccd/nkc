@@ -390,7 +390,19 @@ function saveApplicantMessages(callback){
 
 
 function saveProject(callback) {
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: 3})
+	var title = $('#title').val();
+	var abstract = $('#abstract').val();
+	if(!title) {
+		return screenTopWarning('请输入项目标题。');
+	}
+	if(!abstract) {
+		return screenTopWarning('请输入项目摘要。');
+	}
+	var project = {
+		t: title,
+		abstract: abstract
+	};
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: 3, project: project})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -411,9 +423,13 @@ function toEditor() {
 
 function submitProject(last) {
 	if(last) {
-		window.location.href = '/fund/a/'+applicationFormId+'/settings?s=2';
+		saveProject(function() {
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s=2';
+		});
 	} else {
-		window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+		saveProject(function() {
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+		});
 	}
 	/*saveProject(id, function(){
 		window.location.href = '/fund/a/'+id+'/settings?s=4';

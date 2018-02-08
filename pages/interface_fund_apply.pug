@@ -27,7 +27,7 @@ block content
                 -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'inputProjectMessages', ch: '第3步、填写项目内容'},{en: 'inputOtherMessages', ch: '第4步、填写其他信息'},{en: 'submit', ch: '第5步、提交申请'}];
                 -for (let i = 0; i < arr.length; i++)
                   li
-                    a(href=`/fund/a/${applicationForm._id}/settings?s=${i + 1}` class='active')= arr[i].ch
+                    a(href=`###` class='active')= arr[i].ch
             hr
 
             .fund-apply-head= arr[s-1].ch
@@ -155,26 +155,23 @@ block content
                 .col-xs-12.col-md-6.col-md-offset-3
                   br
                   if project
-                    -title = project.t;
-                    -content = project.c;
-                    h4 项目名称：
-                    h3#projectTitle.text-center!= title
-                    br
-                    h4 项目内容：
-                    //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
-                    div#projectContent!= project && project.c? experimental_render(project): content
-                    //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
-                    br
-                    br
-                    br
-                    button.btn.btn-default.center-block(onclick=`toEditor()` style='width: ') 去编辑器填写
-                    //span &nbsp;&nbsp;
-                    //span.autoSaveTime#saveTime 0秒
-                    //span.autoSaveTime 后自动保存
-                  else
-                    br
-                    button.btn.btn-default.center-block(onclick=`toEditor()` style='width: ') 去编辑器填写
-                    br
+                    -projectTitle = project.t;
+                    -abstract = project.abstract;
+                  h4 项目名称：
+                    input.fund-input#title(value=projectTitle?projectTitle: '')
+                  h4 摘要：
+                  textarea.form-control#abstract(rows=6 placeholder='200字以内')= abstract?abstract: ''
+                  h4 项目内容：
+                  //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
+                  div#projectContent!= project && project.c? experimental_render(project): '暂未填写'
+                  //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
+                  br
+                  br
+                  br
+                  button.btn.btn-default.center-block(onclick=`toEditor()` ) 去编辑器填写
+                  //span &nbsp;&nbsp;
+                  //span.autoSaveTime#saveTime 0秒
+                  //span.autoSaveTime 后自动保存
             else if s === 4 && inputProject!== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
