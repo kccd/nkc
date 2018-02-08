@@ -1,0 +1,31 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title= `基金账单-${data.bill._id}`
+block content
+  -const mainContainer1400 = true
+  -const {bill} = data;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-4
+        .panel.panel-default
+          .panel-body
+            span 交易时间
+            input.form-control#time(value=data.bill.toc.getTime())
+            span 交易编号
+            input.form-control(value=data.bill._id disabled )
+            span 操作人
+            input.form-control#uid(value=data.bill.uid)
+            span 资金变动
+            input.form-control#changed(value=data.bill.changed)
+            span 摘要
+            input.form-control#abstract(value=data.bill.abstract)
+            span 备注
+            textarea.form-control#notes(rows=8)= data.bill.notes
+            br
+            button.btn.btn-info(onclick=`modify("${data.fund._id}", ${data.bill._id})`) 修改
+            button.btn.btn-danger(onclick=`deleteBill("${data.fund._id}", ${data.bill._id})`) 删除
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_bill.js')

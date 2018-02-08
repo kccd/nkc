@@ -9,12 +9,10 @@ block settings_content
           h3.settings-title.text-center 我的证书
           br
         .col-xs-12.col-md-12.verify-info
-          span 认证说明：
-          span Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam, architecto beatae consequuntur cupiditate ea eligendi enim, excepturi facere harum, illum ipsum iusto minus nihil obcaecati odit pariatur recusandae reprehenderit suscipit?
+
         .col-xs-12.col-md-12
-          h4.text-center 我的证书
-          .settings-info.text-center 请在本地选择要上传图片，大小不超过3M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
-            span.settings-link#watchCertsPhoto 查看实例
+          .settings-info.text-center 请在本地选择要上传图片，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。请确保图像清晰无遮挡。
+            //span.settings-link#watchCertsPhoto 查看实例
           .settings-panel
             .row
               .col-xs-12.col-md-10
@@ -27,7 +25,7 @@ block settings_content
                         .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${photo._id})`)
                         img(photoId=photo._id src=`/photo_small/${photo._id}`)
               .col-xs-12.col-md-2
-                input#certsPhoto(type='file' style='display: none;' multiple=true)
+                input#certsPhoto(type='file' style='display: none;' multiple=true accept='image/*')
                 .settings-btn(onclick='$("#certsPhoto").click()') 选择图片
-                .settings-btn(onclick='uploadFile("#certsPhoto")') 上传
+                //.settings-btn(onclick='uploadFile("#certsPhoto")') 上传
                 #certsPhotoMessages.uploadFileInfo

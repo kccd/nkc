@@ -6,70 +6,8 @@ block title
   -const {applicationForm} = data;
   -const notAllow = data.notAllow;
   -const mainContainer1400 = true
-  title= `${fund.name}申请表`
+  title= `科创基金-${fund.name}-条款`
   link(rel='stylesheet' href='/fund.css')
-  style.
-    .nav-link{
-      padding-left: 0;
-      padding-right: 0;
-      overflow: hidden;
-    }
-    .nav-link > ul > li{
-      float: left;
-      list-style: none;
-
-
-    }
-    .nav-link > ul{
-      padding: 0;
-      overflow: hidden;
-    }
-    .nav-link > ul > li > a{
-      color: #fff;
-      display: block;
-      font-size: 1.5rem;
-      height: 4rem;
-      line-height: 4rem;
-      text-align: center;
-      width: 15rem;
-      background-color: #aaa;
-      margin: 0 0.5rem;
-      transition: background-color 0.2s;
-    }
-    .nav-link > ul > li > a.active{
-      background-color: #337ab7aa;
-    }
-    .nav-link > ul > li > a:hover{
-      text-decoration: none;
-      background-color: #337ab7aa;
-    }
-    .application-content{
-      width: 48rem;
-      height: 20rem;
-      margin: 20rem auto;
-    }
-    .choose-content-div{
-      width: 20rem;
-      height: 20rem;
-      background-color: #fff;
-      float: left;
-      margin: 0 2rem;
-      cursor: pointer;
-      text-align: center;
-      line-height: 20rem;
-      font-size: 4rem;
-      font-weight: 100;
-      color: #999;
-      border: 1px solid #ccc;
-      transition: background-color 0.2s;
-
-    }
-    .choose-content-div:hover{
-      background-color: #eee;
-    }
-    .choose-content-div > span{
-      color: #aaa;
-    }
 
 block content
   .container-fluid(style='max-width: 1400px;')
@@ -78,20 +16,45 @@ block content
       .col-xs-12.col-md-12
         .panel.panel-default
           .panel-body
-            -const {unPassed, unCompleted, unSubmit} = data.message? data.message: {};
-            if unSubmit
-              p 您还有未提交的基金项目，
-                a(href=`/fund/a/${unSubmit}/settings`) 查看
-            else if unPassed
-              p 您还有未通过审核的基金项目，
-                a(href=`/fund/a/${unPassed}`) 查看
-            else if unCompleted
-              p 您还有未完成的且与该基金不能同时申请的基金项目，
-                a(href=`/fund/a/${unCompleted}`) 查看
-            else if applicationForm === undefined
-              include interfece_fund_terms
+            include interfece_fund_terms
+            br
+            br
+            .row
+              .col-xs-12.col-md-12
+                label.radio-inline
+                  input(type='radio' name='kcFund' checked=false)
+                  h5 同意
+                label.radio-inline
+                  input(type='radio' name='kcFund' checked=true)
+                  h5 不同意
+            br
+            hr
+            br
+            h2.text-center= `${fund.name}条款`
+            div!= markdown_safe(fund.description.terms)
+            br
+            br
+            .row
+              .col-xs-12.col-md-12
+                label.radio-inline
+                  input(type='radio' name='fund' checked=false)
+                  h5 同意
+                label.radio-inline
+                  input(type='radio' name='fund' checked=true)
+                  h5 不同意
+            br
+            hr
+            br
+            .row
+              .col-xs-12.col-md-2.col-md-offset-5
+                a.btn.btn-info.btn-block.disabled#submit(href=`/fund/list/${fund._id}/add?agree=true`) 提交
+            //.back-next
+            //  .back
+            //    a(href=`/fund/list/${fund._id}/add?agree=true`) 同意
+            //  .next.disagree
+            //    a(href=`/fund/list/${fund._id}`) 不同意
 
 
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_fund_applicationForm.js')
+  script(src='/interface_fund_agreement.js')

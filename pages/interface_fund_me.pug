@@ -40,26 +40,9 @@ block content
                       .blank.blank-lg 暂无数据
                   else
                     .col-xs-12.col-md-12
-                      mixin status(applicationForm)
-                        -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = applicationForm.status;
-                        if !submitted
-                          span 未提交
-                        else if !usersSupport
-                          span 等待网友支持
-                        else if projectPassed === null
-                          span 等待项目审核
-                        else if projectPassed === false
-                          span.redFontColor 项目审核不通过
-                        else if adminSupport === null
-                          span 等待管理员审核
-                        else if adminSupport === false
-                          span.redFontColor 管理员审核不通过
-                        else if !remittance
-                          span 等待汇款
-                        else if !completed
-                          span 等待结项
-                        else
-                          span 已完成
+                      br
+                      -const url = `/fund/me`;
+                      include interface_fund_page
                       .fund-ul
                         -for(let i = 0; i < applicationForms.length; i++)
                           -const a = applicationForms[i];
@@ -98,51 +81,13 @@ block content
                                   span=`项目名称：${a.project?a.project.t: '暂未填写'}`
                                   br
                                   span= `状态：`
-                                  +status(a)
+                                  span= applicationFormStatus(a).str
                                 .col-xs-12.col-md-1
                                   a(href=`/fund/a/${a._id}`) 查看
                                   br
-                                  a(href=`/fund/a/${a._id}/settings`) 编辑
-
-                                //.col-xs-2.col-md-2
-                                //  span.h3(style='line-height: 3.4rem;')= fund.name
-                                //.col-xs-8.col-md-8
-                                //  .row
-                                //    .col-xs-12.col-md-12
-                                //      span 申请人：
-                                //      a(href=`/u/${applicant.user.uid}`)= applicant.user.username
-                                //    if members.length !== 0
-                                //      .col-xs-12.col-md-12
-                                //        span 组员：
-                                //        -for(let u of members)
-                                //          if u.agree === null
-                                //          span(style='margin-right: 0.3rem;')
-                                //            a(href=`/u/${u.user.uid}`)= u.user.username
-                                //    .col-xs-12.col-md-12
-                                //      span 状态：
-                                //        if type === 'invitation'
-                                //          -for (let u of members)
-                                //            if u.uid === user.uid
-                                //              -let agree = u.agree;
-                                //              if agree === null
-                                //                span 暂未处理
-                                //              else if agree === true
-                                //                span 已同意
-                                //              else
-                                //                span 已拒绝
-                                //.col-xs-2.col-md-2
-                                //  .row
-                                //    if applicant.uid === user.uid
-                                //      .col-xs-12.col-md-12
-                                //        span
-                                //          a(href=`/fund/a/${_id}/settings`) 查看
-                                //      .col-xs-12.col-md-12
-                                //        span
-                                //          a(href=`javascript: removeApplicationForm(${_id})`) 编辑
-                                //    else
-                                //      .col-xs-12.col-md-12
-                                //        span
-                                //          a(href=`/fund/a/${_id}`) 查看
+                                  if !a.status.adminSupport && !a.disabled && a.useless === null
+                                    a(href=`/fund/a/${a._id}/settings`) 编辑
+                      include interface_fund_page
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_me.js')

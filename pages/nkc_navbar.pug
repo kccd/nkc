@@ -24,6 +24,8 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;line-height: 
         if(data.user)
           li
             a(href=`/u/${data.user.uid}/activities` title='板块学院' style=`${isActive('activities')}`) 我的
+        li
+          a(href=`/fund` title='科创基金' style=`${isActive('fund')}`) 基金
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       form.navbar-form.navbar-left(style='border: none;' action='/search' method='GET')
         .form-group(style='overflow: hidden;width: 100%')

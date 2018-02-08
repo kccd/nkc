@@ -1,0 +1,17 @@
+extends bootstrap_base
+block title
+
+  title= `科创基金-被屏蔽的基金`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-4
+        .panel.panel-default
+          .panel-body
+            h3.text-center 被屏蔽的基金
+            -for(let fund of data.funds)
+              h4= fund.name
+                span &nbsp;&nbsp;&nbsp;
+                a(href=`/fund/list/${fund._id}/settings`) 设置

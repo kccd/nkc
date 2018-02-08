@@ -16,9 +16,6 @@ function submit(id) {
 }
 
 
-function displayRemittancePanel() {
-
-}
 
 function getThreads(page, self) {
 	var url;
@@ -85,6 +82,8 @@ function createPageList(paging, self) {
 			} else {
 				max = reduce2-reduce1;
 			}
+		} else {
+			max = pageCount - 1;
 		}
 	}
 	console.log(min, page, max);
@@ -132,7 +131,7 @@ function createThreadsList(arr, type, disabled) {//add, remove
 		var toc = obj.toc;
 		var postString = JSON.stringify(obj);
 		var contentDiv = '<div class="col-xs-10 col-md-10"><div class="postString displayNone">'+postString+'</div><span>文号：</span><span class="threadNumber">'+pid+'&nbsp;&nbsp;</span><a href="/m/'+uid+'" target="_blank">'+username+'</a><span>&nbsp;发表于 '+ toc +'</span><br><a href="/t/'+tid+'" target="_blank">'+t+'</a></div>';
-		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+pid+')"></div>';
+		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+tid+','+pid+')"></div>';
 		html += '<div class="threadList">'+contentDiv+btnDiv+'</div>';
 	}
 	return html;
@@ -167,18 +166,28 @@ function displayThreadsList(id, arr, disabled, type) {
 	$(id).html(html);
 }
 
-function deleteThread(pid) {
+function deleteThread(tid, pid) {
 	for(var i = 0; i < selectedThreads.length; i++) {
-		if(selectedThreads[i] === pid) {
+		if(selectedThreads[i].tid === tid) {
 			selectedThreads.splice(i, 1);
 		}
 	}
 	displaySelectedThreads();
 }
 
-function addThread(pid) {
-	if(selectedThreads.indexOf(pid) === -1) {
-		selectedThreads.push(pid);
+function addThread(tid, pid) {
+	var flag = false;
+	for(var i = 0; i < selectedThreads.length; i++) {
+		if(selectedThreads[i].tid === tid) {
+			flag = true;
+			break;
+		}
+	}
+	if(!flag) {
+		selectedThreads.push({
+			tid: tid,
+			pid: pid
+		})
 	}
 	displaySelectedThreads();
 }
@@ -189,17 +198,18 @@ function displaySelectedThreads() {
 		html = '<span>暂未选择</span>';
 	}
 	for(var i = 0; i < selectedThreads.length; i++) {
-		html += '<span class="fund-span selectedUser selected" onclick="deleteThread('+selectedThreads[i]+')">'+selectedThreads[i]+'<span class="fund-span delete glyphicon glyphicon-remove"></span></span>';
+		html += '<span class="fund-span selectedUser selected" onclick="deleteThread('+selectedThreads[i].tid+')">'+selectedThreads[i].pid+'<span class="fund-span delete glyphicon glyphicon-remove"></span></span>';
 	}
 	$('#selectedThread').html(html);
 }
 
 function clearLog() {
-	$('.unselectedThreads').html('');
+	var html = '<div class="blank" style="color:#aaa;">暂无数据</div>';
+	$('.unselectedThreads').html(html);
 }
 
 function submitReport(id) {
-	var content = $('#report').val();
+	var content = $('#reportContent').val();
 	if(!content) {
 		return screenTopWarning('请输入中期报告。');
 	}
@@ -219,3 +229,30 @@ function submitReport(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+
+function submittedReportAudit(support, id, number) {
+	var content = $('#content').val();
+	var obj = {number: number};
+	if(support === false) {
+		obj.support = false;
+		if(!content) return screenTopWarning('请输入审核意见。');
+	} else {
+		obj.support = true;
+	}
+	obj.c = content;
+	nkcAPI('/fund/a/'+id+'/report/audit', 'POST', obj)
+		.then(function() {
+			screenTopAlert('提交成功。');
+			if(obj.support) {
+				window.location.href = '/fund/a/'+id;
+			}else {
+				setTimeout(function() {
+					window.location.href = '/fund/a/'+id;
+				}, 1200)
+			}
+		})
+		.catch(function(data){
+			screenTopWarning(data.error);
+		})
+};

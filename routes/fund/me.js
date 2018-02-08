@@ -28,35 +28,29 @@ meRouter
 			q._id = {$in: idArr};
 			q.uid = {$ne: user.uid};
 		}
-		/*let q = {
-			uid: user.uid
-		};
-		if(type === 'funding') { // 资助中
-			q['status.completed'] = {$ne: true};
-			q['status.adminSupport'] = true;
-		} else if(type === 'auditing') { // 审核中
-			q['status.submitted'] = true;
-			q['status.adminSupport'] = {$ne: true};
-		} else if (type === 'draft') { // 草稿
-			q['status.submitted'] = {$ne: true};
-		} else if (type === undefined) { // 已完成的
-			q['status.completed'] = true;
-		} else if(type === 'notify') {
-			const idArr = aUsers.map(a => a.applicationFormId);
-			q._id = {$in: idArr};
-			q.uid = {$ne: user.uid};
-		}*/
 		const length = await db.FundApplicationFormModel.count(q);
 		const paging = apiFn.paging(page, length);
-		const applicationForms = await db.FundApplicationFormModel.find(q).skip(paging.start).limit(paging.perpage);
+		const applicationForms = await db.FundApplicationFormModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(applicationForms.map(async a => {
 			await a.extendMembers();
 			await a.extendApplicant();
 			await a.extendFund();
 			await a.extendProject()
 		}));
+		for(let i = 0; i < applicationForms.length; i++) {
+			const a = applicationForms[i];
+			await a.extendFund();
+			if(!a.fund) {
+				applicationForms.splice(i, 1);
+				continue;
+			}
+			await a.extendMembers();
+			await a.extendApplicant();
+			await a.extendProject()
+		}
 		data.applicationForms = applicationForms;
 		data.newNotify = newNotify;
+		data.paging = paging;
 		await next();
 	});
 module.exports = meRouter;

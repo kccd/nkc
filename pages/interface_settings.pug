@@ -15,7 +15,8 @@ block content
         .row
           .col-xs-12.col-md-2
             .settings-header
-              -const arr = [{en:'info',ch:'基本资料'},{en:'security',ch:'账号安全'},{en:'verify',ch:'身份认证'},{en:'cert',ch:'我的证书'},{en:'album',ch:'我的相册'}];
+              // -const arr = [{en:'info',ch:'基本资料'},{en:'security',ch:'账号安全'},{en:'verify',ch:'身份认证'},{en:'cert',ch:'我的证书'},{en:'album',ch:'我的相册'}];
+              -const arr = [{en:'verify',ch:'身份认证'},{en:'cert',ch:'我的证书'},{en:'album',ch:'我的相册'}];
               ul
                 -for(let obj of arr)
                   -const active = obj.en === type?'active': '';

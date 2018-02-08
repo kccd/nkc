@@ -31,6 +31,18 @@ const fundApplicationFormSchema = new Schema({
     default: Date.now,
     index: 1
   },
+	timeToSubmit: {
+  	type: Date,
+		default: null
+	},
+	timeToPassed: {
+		type: Date,
+		default: null
+	},
+	timeOfCompleted: {
+  	type: Date,
+		default: null
+	},
   tlm: {
     type: Date,
     index: 1
@@ -71,7 +83,8 @@ const fundApplicationFormSchema = new Schema({
   projectCycle: { // 预计周期
 	  type: Number,
 	  default: null,
-	  index: 1
+	  index: 1,
+	  min: [1, '预计周期不能小于1']
   },
   threadsId: {
   	applying: {// 申请时附带的帖子
@@ -99,9 +112,20 @@ const fundApplicationFormSchema = new Schema({
       default: null
     },
     number: {
-      type: Number,
-      default: null
-    }
+      type: String,
+      default: null,
+	    maxlength: [30, '收款账号位数超过限制']
+    },
+	  name: {
+    	type: String,
+		  default: null,
+		  maxlength: [10, '户名字数超过限制']
+	  },
+	  bankName: {
+    	type: String,
+		  default: null,
+		  maxlength: [10, '银行全称字数超过限制']
+	  }
   },
   projectId: {
     type: Number,
@@ -118,7 +142,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    projectPassed: { // 项目审核通过
+    projectPassed: { // 专家审核通过
       type:Boolean,
       default: null,
       index: 1
@@ -128,7 +152,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    remittance: { // 已汇款
+    remittance: { // 已拨款
       type: Boolean,
       default: null,
       index: 1
@@ -157,6 +181,20 @@ const fundApplicationFormSchema = new Schema({
 	disabled: {
   	type: Boolean,
 		default: false,
+		index: 1
+	},
+	submittedReport: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
+	reportNeedThreads: {
+		type: Boolean,
+		default: false
+	},
+	category: {
+		type: String,
+		default: null,
 		index: 1
 	},
   lock: {
@@ -276,6 +314,14 @@ fundApplicationFormSchema.virtual('comments')
 		this._comments = comments;
 	});
 
+fundApplicationFormSchema.virtual('forum')
+	.get(function() {
+		return this._forum;
+	})
+	.set(function(forum) {
+		this._forum = forum;
+	});
+
 
 fundApplicationFormSchema.pre('save', function(next) {
   this.tlm = Date.now();
@@ -291,6 +337,12 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	if(fund.supportCount <= supportersId.length) {
 		status.usersSupport = true;
 	}
+
+	//专家审核-机器审核
+	if(status.usersSupport && fund.censor.appointed.length === 0 && fund.censor.certs.length === 0) {
+		status.projectPassed = true;
+	}
+
 	// 生成申请表编号
 	if(submitted && !code) {
 		const moment = require('moment');
@@ -330,10 +382,19 @@ fundApplicationFormSchema.methods.extendMembers = async function() {
 	}));
 };
 
+fundApplicationFormSchema.methods.extendForum = async function() {
+	let forum;
+	if(this.category) {
+		const ForumModel = require('./ForumModel');
+		forum = await ForumModel.findOne({fid: this.category});
+	}
+	return this.forum = forum;
+};
+
 fundApplicationFormSchema.methods.extendFund = async function() {
 	const FundModel = require('./FundModel');
 	const fund = await FundModel.findOne({_id: this.fundId, disabled: false});
-	if(!fund) throw '抱歉！该基金项目已被屏蔽，所有基金申请表暂不能查看。';
+	// if(!fund) throw '抱歉！该基金项目已被屏蔽，所有基金申请表暂不能查看。';
 	return this.fund = fund;
 };
 
@@ -361,26 +422,6 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
-fundApplicationFormSchema.methods.newComment = async function(comment) {
-	const applicationFormId = this._id;
-	const FundDocumentModel = require('./FundDocumentModel');
-	const SettingModel = require('./SettingModel');
-	const id = await SettingModel.operateSystemID('fundDocuments', 1);
-	const {c, type, uid, support} = comment;
-	const newDocument = new FundDocumentModel({
-		_id: id,
-		c,
-		uid,
-		userType,
-		support,
-		applicationFormId: applicationFormId,
-		type: 'comment',
-		l: 'pwbb',
-	});
-	await newDocument.save();
-	return newDocument;
-};
-
 fundApplicationFormSchema.methods.saveHistory = async function() {
 	const FundApplicationHistoryModel = require('./FundApplicationHistoryModel');
 	const newHistory = new FundApplicationHistoryModel({
@@ -390,6 +431,8 @@ fundApplicationFormSchema.methods.saveHistory = async function() {
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
+	const FundDocumentModel = require('./FundDocumentModel');
+	const FundApplicationFormHistoryModel = require('./FundApplicationHistoryModel');
 	const FundApplicationForm = mongoose.model('fundApplicationForms');
 	const {
 		from,
@@ -408,7 +451,8 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		lock,
 		modifyCount,
 		supporter,
-		objector
+		objector,
+		category
 	} = this;
 	const {
 		money,
@@ -419,7 +463,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	// 判断申请表有效性
 	switch (useless) {
 		case 'disabled':
-			throw '申请表已被封禁。';
+			throw '申请表已被屏蔽。';
 		case 'revoked':
 			throw '申请表已被永久撤销。';
 		case 'exceededModifyCount':
@@ -446,6 +490,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 
 	//其他信息判断
 	if (projectCycle === null) throw '请填写研究周期！';
+	if (!category) throw '请选择学术分类。';
 	if(money.max === null) { // 定额基金
 		if(!budgetMoney) throw '请输入资金用途！';
 	} else { //不定额基金
@@ -464,7 +509,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	if(thread.count > threadsId.applying.length) throw `附带的帖子数未达到最低要求(至少${thread.count}篇)`;
 	// 如果是个人申请，则删除所有组员已存到基金（type='fund'）的生活照，并标记所有组员为已删除
 	if(from === 'personal') {
-		if(!applicationMethod.individual) throw '该基金不允许个人申请！';
+		if(!applicationMethod.personal) throw '该基金不允许个人申请！';
 		for(let u of members) {
 			const {lifePhotosId} = u;
 			for(let _id of lifePhotosId) {
@@ -474,7 +519,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 			await u.update({removed: true});
 		}
 	} else {
-		if(!applicationMethod.group) throw '该基金不允许团队申请！';
+		if(!applicationMethod.team) throw '该基金不允许团队申请！';
 		if(members.length === 0) throw '团队申请必须要有组员，若没有组员请选择个人申请！';
 		let agreeUsers = [];
 		let disagreeUsers = [];
@@ -504,9 +549,25 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.status.submitted = true;
 	this.lock.submitted = true;
 	this.modifyCount += 1;
-	if(this.status.projectPassed === false) this.status.projectPassed = null;
-	if(this.status.adminSupport === false) this.status.adminSupport = null;
+	this.timeToSubmit = Date.now();
+	this.status.projectPassed = null;
+	this.status.adminSupport = null;
+	//存历史
+	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});
+	const newObj = oldApplicationForm.toObject();
+	newObj.applicationFormId = newObj._id;
+	newObj._id = undefined;
+	newObj.applicant = await this.extendApplicant();
+	newObj.members = await this.extendMembers();
+	newObj.project = await this.extendProject();
+	newObj.comments = await FundDocumentModel.find({applicationFormId: this._id, type: 'comment'});
+	newObj.adminAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'adminAudit'}).sort({toc: -1});
+	newObj.userInfoAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'userInfo'}).sort({toc: -1});
+	newObj.projectAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'projectAudit'}).sort({toc: -1});
+	newObj.moneyAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'moneyAudit'}).sort({toc: -1});
+	const newHistory = new FundApplicationFormHistoryModel(newObj);
 	await this.save();
+	await newHistory.save();
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

@@ -44,24 +44,32 @@ function init() {
 	});
 	$('.wechat').on('click', function() {
 		chooseWechat();
+		$('#bankCardName').css('display', 'none');
+		$('#bankName').css('display', 'none');
+
 	});
 	$('.alipay').on('click', function() {
 		chooseAlipay();
+		$('#bankCardName').css('display', 'none');
+		$('#bankName').css('display', 'none');
+
 	});
 	$('.bankCard').on('click', function() {
 		chooseBankCard();
+		$('#bankCardName').css('display', 'block');
+		$('#bankName').css('display', 'block');
 	});
 	$('#account').on('click', function(){
 		initFundPay();
 		if(payMethod === '') {
 			$('#account').blur();
-			return alert('请先选择收款！');
+			return alert('请先选择收款方式！');
 		}
 	}).on('focus', function(){
 		initFundPay();
 		if(payMethod === '') {
 			$('#account').blur();
-			return alert('请先选择收款！');
+			return alert('请先选择收款方式！');
 		}
 	});
 }
@@ -199,11 +207,18 @@ function getUser() {
 		})
 }
 
-function submitApplicationMethod(){
-	saveApplicationMethod(function(data) {
-		var s = data.s;
-		window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
-	})
+function submitApplicationMethod(last){
+	if(last) {
+		saveApplicationMethod(function(data) {
+			var s = data.s;
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+		})
+	} else {
+		saveApplicationMethod(function(data) {
+			var s = data.s;
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+		})
+	}
 }
 
 function saveApplicationMethod(callback) {
@@ -251,7 +266,6 @@ function selectLifePhoto(id){
 		screenTopAlert('已选择' + id);
 	}
 	displayLifePhotos();
-	console.log(lifePhotos);
 }
 
 function initLifePhoto() {
@@ -324,11 +338,18 @@ function chooseBankCard() {
 	initFundPay();
 }
 
-function submitApplicantMessages() {
-	saveApplicantMessages(function(data){
-		var s = data.s;
-		window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
-	});
+function submitApplicantMessages(last) {
+	if(last) {
+		saveApplicantMessages(function(data){
+			var s = data.s;
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+		});
+	} else {
+		saveApplicantMessages(function(data){
+			var s = data.s;
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+		});
+	}
 }
 
 function saveApplicantMessages(callback){
@@ -338,7 +359,9 @@ function saveApplicantMessages(callback){
 		var data = {
 			account: {
 				paymentType: obj.paymentType,
-				number: obj.account
+				number: obj.account,
+				name: obj.bankCardName,
+				bankName: obj.bankName
 			},
 			newApplicant: {
 				name: obj.name,
@@ -365,25 +388,21 @@ function saveApplicantMessages(callback){
 }
 
 
-function submitEnsureUsersMessages(id) {
-	if(id === undefined) {
-		setTimeout(function() {
-			screenTopAlert('保存成功！');
-		}, 300);
-	} else {
-		nkcAPI('/fund/a/'+id, 'PATCH', {s: 3})
-			.then(function(data) {
-				var s = data.s;
-				window.location.href = '/fund/a/'+id+'/settings?s='+(s+1);
-			})
-			.catch(function(data) {
-				screenTopWarning(data.error);
-			})
-	}
-}
 
 function saveProject(callback) {
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: 3})
+	var title = $('#title').val();
+	var abstract = $('#abstract').val();
+	if(!title) {
+		return screenTopWarning('请输入项目标题。');
+	}
+	if(!abstract) {
+		return screenTopWarning('请输入项目摘要。');
+	}
+	var project = {
+		t: title,
+		abstract: abstract
+	};
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: 3, project: project})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -402,8 +421,16 @@ function toEditor() {
 	});
 }
 
-function submitProject() {
-	window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+function submitProject(last) {
+	if(last) {
+		saveProject(function() {
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s=2';
+		});
+	} else {
+		saveProject(function() {
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+		});
+	}
 	/*saveProject(id, function(){
 		window.location.href = '/fund/a/'+id+'/settings?s=4';
 	});*/
@@ -579,6 +606,7 @@ function savePurpose(callback) {
 	} else {
 		obj.budgetMoney = purpose;
 	}
+	obj.category = $('#category').attr('fid');
 	nkcAPI('/fund/a/'+ applicationFormId, 'PATCH', obj)
 		.then(function(data) {
 			if(callback === undefined){
@@ -740,6 +768,8 @@ function createPageList(paging, self) {
 			} else {
 				max = reduce2-reduce1;
 			}
+		} else {
+			max = pageCount - 1;
 		}
 	}
 	console.log(min, page, max);
@@ -828,12 +858,21 @@ function saveOtherMessages() {
 }
 
 //提交帖子列表、资金预算和研究周期
-function submitOtherMessages() {
-	savePurpose(function(){
-		saveThreadsList(function(){
-			window.location.href='/fund/a/'+applicationFormId+'/settings?s=5';
+function submitOtherMessages(last) {
+	if(last) {
+		savePurpose(function(){
+			saveThreadsList(function(){
+				window.location.href='/fund/a/'+applicationFormId+'/settings?s=3';
+			})
 		})
-	})
+	} else {
+		savePurpose(function(){
+			saveThreadsList(function(){
+				window.location.href='/fund/a/'+applicationFormId+'/settings?s=5';
+			})
+		})
+	}
+
 }
 
 function submitApplicationForm() {
@@ -856,7 +895,92 @@ function submitApplicationForm() {
 function deleteApplicationForm(id) {
 	var msg = '删除申请表后所有填写的内容都将会被删除，确认要删除吗？';
 	if(confirm(msg) === true) {
-		nkcAPI('/fund/a/'+id, 'DELETE', {})
-			.then()
+		nkcAPI('/fund/a/'+id+'?type=delete', 'DELETE', {})
+			.then(function(data) {
+				window.location.href = '/fund/list/'+data.applicationForm.fund._id;
+			})
+			.catch(function(data) {
+				screenTopWarning(data.error);
+			})
 	}
-};
+}
+
+
+function chooseCategory(fid, displayName) {
+	$('#category').attr('fid', fid).text(displayName);
+}
+
+function back(){
+	window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+}
+
+
+function userMessagesForm() {
+	var obj = {
+		name: $('#name').val(),
+		idCardNumber: $('#idCardNumber').val(),
+		mobile: $('#mobile').val(),
+		description: $('#description').val()
+	};
+	if(obj.name === '') {
+		throw '请输入真实姓名！';
+	}
+	if(obj.idCardNumber === '') {
+		throw '请输入身份证号码！';
+	}
+	var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+	if(reg.test(obj.idCardNumber) === false) {
+		throw '身份证号码不合法！';
+	}
+	if(obj.mobile === '') {
+		throw '请输入联系电话！';
+	}
+	/*if(!obj.idCardNumber.match(/[0-9]{17}[0-9]?|X|x/) || obj.idCardNumber.length > 18) {
+		throw '身份证号码格式不正确！';
+	}
+	*/
+
+	if($('.wechat, .alipay, .bankCard').length !== 0) {
+		if($('.wechat').hasClass('active')) {
+			obj.paymentType = 'wechat';
+		} else if($('.alipay').hasClass('active')) {
+			obj.paymentType = 'alipay';
+		} else if($('.bankCard').hasClass('active')) {
+			obj.paymentType = 'bankCard';
+			if(!$('#bankCardName input').val()){
+				throw '请输入户名！';
+			}
+			if(!$('#bankName input').val()){
+				throw '请输入银行全称！';
+			}
+			obj.bankCardName = $('#bankCardName input').val();
+			obj.bankName = $('#bankName input').val();
+		} else {
+			throw '请选择收款方式！';
+		}
+		obj.account = $('#account').val();
+		if(obj.account === '') {
+			throw '请输入收款账号！';
+		}
+	}
+	if(obj.description === '') {
+		throw '请输入自我介绍';
+	}
+	return obj;
+}
+
+
+function submitModifyBudgetMoney() {
+	initBudgetMoney();
+	var obj = {
+		budgetMoney: budgetMoney,
+		s: 6
+	};
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+		.then(function() {
+			window.location.href = '/fund/a/'+id;
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

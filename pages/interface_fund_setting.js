@@ -20,8 +20,8 @@ var fundObj = {
   color: '#7f9eb2',
 	image: null,
 	applicationMethod: {
-		individual: null,
-		group: null
+		personal: null,
+		team: null
 	},
 	applicant: {
 		userLevel: 0,
@@ -274,12 +274,12 @@ function moneyFixedSet() {
 	} else {
 		money = null;
 	}
-	var placeholder = '固定金额';
+	var placeholder = '固定金额（人民币元，不能有小数点）';
 	if(arr.eq(0).is(':checked')) {
 		fundObj.money.max = null;
 		fundObj.money.fixed = money;
 	} else {
-		placeholder = '最大申请金额';
+		placeholder = '最大申请金额（人民币元，不能有小数点）';
 		fundObj.money.max = money;
 		fundObj.money.fixed = null;
 	}
@@ -295,14 +295,14 @@ function moneyFixed() {
 function applicationMethodSet() {
 	var arr = $('input[name="applicationMethod"]');
 	if(arr.eq(0).is(':checked')) {
-		fundObj.applicationMethod.individual = true;
+		fundObj.applicationMethod.personal = true;
 	}else {
-		fundObj.applicationMethod.individual = false;
+		fundObj.applicationMethod.personal = false;
 	}
 	if(arr.eq(1).is(':checked')) {
-		fundObj.applicationMethod.group = true;
+		fundObj.applicationMethod.team = true;
 	} else {
-		fundObj.applicationMethod.group = false;
+		fundObj.applicationMethod.team = false;
 	}
 }
 
@@ -377,6 +377,7 @@ function submit(id) {
   fundObj.censor.appointed = $('#fundCensorAppointed').val() || undefined;
   fundObj.description.brief = $('#briefDescription').val() || undefined;
   fundObj.description.detailed = $('#detailedDescription').val() || undefined;
+  fundObj.description.terms = $('#terms').val() || undefined;
   fundObj._id = $('#fundId').val() || undefined;
   if(fundObj._id === '') return screenTopWarning('基金编号不能为空！');
   if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成！');
