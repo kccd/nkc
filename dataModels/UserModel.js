@@ -90,9 +90,6 @@ const userSchema = new Schema({
 
 userSchema.pre('save', function(next) {
   try {
-    if (!this.usernameLowerCase) {
-      this.usernameLowerCase = this.username.toLowerCase();
-    }
     const certs = this.certs;
     const c = [];
     for (let cert of certs) {
