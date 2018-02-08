@@ -6,7 +6,8 @@ const options = {
   promiseLibrary: Promise,
   autoIndex: false,
   poolSize: 50,
-  keepAlive: 120
+  keepAlive: 120,
+  useMongoClient: true
 };
 
 mongoose.Promise = Promise;

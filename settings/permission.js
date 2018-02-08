@@ -401,6 +401,31 @@ const certificates ={
           [name]: '获取帖子',
           [GET]: true
         },
+        addresses: {
+          [name]: '地址管理',
+          [POST]: true,
+          [parameter]: {
+            [DELETE]: true
+          }
+        },
+        industries: {
+          [name]: '工作情况管理',
+          [POST]: true,
+          [parameter]: {
+            [DELETE]: true
+          }
+        },
+        education: {
+          [name]: '教育情况管理',
+          [POST]: true,
+          [parameter]: {
+            [DELETE]: true
+          }
+        },
+        personal_info: {
+          [name]: '详细设置',
+          [POST]: true
+        }
       },
       logout: {
         [GET]: true

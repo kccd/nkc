@@ -5,6 +5,11 @@ const dbFn = nkcModules.dbFunction;
 const {encryption} = require('../../tools');
 const settingsRouter = require('./settings');
 const meRouter = new Router();
+const education = require('./education');
+const industries = require('./industries');
+const addresses = require('./addresses');
+const personalInfo = require('./personalInfo');
+
 meRouter
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
@@ -105,7 +110,6 @@ meRouter
       if(!thread) ctx.throw(400, '没有与之匹配的帖子');
       await thread.extendFirstPost();
       data.threads=[thread.toObject()];
-      console.log(data.threads)
     } else {
       const q = {
         uid: user.uid,
@@ -128,6 +132,10 @@ meRouter
     }
     await next();
   })
-	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
+	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use('/personal_info', personalInfo.routes(), personalInfo.allowedMethods())
+  .use('/addresses', addresses.routes(), addresses.allowedMethods())
+  .use('/industries', industries.routes(), industries.allowedMethods())
+  .use('/education', education.routes(), education.allowedMethods());
 
 module.exports = meRouter;

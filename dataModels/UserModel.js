@@ -63,11 +63,14 @@ const userSchema = new Schema({
       unique: true,
       required: true,
       minlength: 1,
-      maxlength: 30
+      maxlength: 30,
+      trim: true
     },
     usernameLowerCase: {
       type: String,
-      unique: true
+      unique: true,
+      trim: true,
+      lowercase: true
     },
     uid: {
       type: String,
@@ -87,23 +90,6 @@ const userSchema = new Schema({
   getters: true,
   virtuals: true
 }});
-
-userSchema.pre('save', function(next) {
-  try {
-    if (!this.usernameLowerCase) {
-      this.usernameLowerCase = this.username.toLowerCase();
-    }
-    const certs = this.certs;
-    const c = [];
-    for (let cert of certs) {
-      if (cert !== 'scholar') c.push(cert);
-    }
-    this.certs = c;
-    return next()
-  } catch(e) {
-    return next(e)
-  }
-});
 
 userSchema.virtual('regPort')
   .get(function() {
