@@ -1,11 +1,10 @@
 const Router = require('koa-router');
-const historyRouter = new Router();
-historyRouter
+const disabledRouter = new Router();
+disabledRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.funds = await db.FundModel.find({history: true});
-		console.log(data.funds);
-		ctx.template = 'interface_fund_histories.pug';
+		data.funds = await db.FundModel.find({disabled: true});
+		ctx.template = 'interface_fund_disabled.pug';
 		await next();
 	});
-module.exports = historyRouter;
+module.exports = disabledRouter;

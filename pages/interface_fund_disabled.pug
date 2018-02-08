@@ -10,7 +10,8 @@ block content
       .col-xs-12.col-md-4
         .panel.panel-default
           .panel-body
+            h3.text-center 被屏蔽的基金
             -for(let fund of data.funds)
-              h3= fund.name
-                span &nbsp;
-                a(href=`/fund/list/${fund._id}/settings`) 基金设置
+              h4= fund.name
+                span &nbsp;&nbsp;&nbsp;
+                a(href=`/fund/list/${fund._id}/settings`) 设置

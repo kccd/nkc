@@ -860,7 +860,7 @@ const certificates ={
 		        }
 	        }
 	      },
-				history: {
+				histories: {
         	[name]: '历史基金',
 					[GET]: true
 				},

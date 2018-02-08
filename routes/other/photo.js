@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const photoRouter = new Router();
 const {photoPath, photoSmallPath, sizeLimit, generateFolderName} = require('../../settings/index').upload;
-const {photoify, photoSmallify} = require('../../tools').imageMagick;
+const {photoify, photoSmallify, lifePhotoify} = require('../../tools').imageMagick;
 photoRouter
 	.get('/:photoId', async (ctx, next) => {
 		const {data, db} = ctx;
@@ -55,6 +55,10 @@ photoRouter
     const targetPath = photoPath + photoDir + filePath;
     const smallTargetPath = photoSmallPath + photoSmallDir + filePath;
     await photoify(path, targetPath);
+    console.log(size);
+    if((photoType === 'lifePhoto' || photoType === 'certsPhoto' ) && size > 1024*500) {
+			await lifePhotoify(targetPath);
+    }
     await photoSmallify(path, smallTargetPath);
     await fs.unlink(path);
     const newPhoto = db.PhotoModel({
