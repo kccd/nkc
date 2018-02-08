@@ -1,3 +1,6 @@
+#### 整体结构
+![github.com/kccd/nkc/blob/master/document.png]()
+
 #### 规范
 
 1. api设计应遵循restful的思想, 层级明确划分, 动词准确一致
