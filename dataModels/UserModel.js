@@ -63,11 +63,14 @@ const userSchema = new Schema({
       unique: true,
       required: true,
       minlength: 1,
-      maxlength: 30
+      maxlength: 30,
+      trim: true
     },
     usernameLowerCase: {
       type: String,
-      unique: true
+      unique: true,
+      trim: true,
+      lowercase: true
     },
     uid: {
       type: String,

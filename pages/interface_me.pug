@@ -117,7 +117,7 @@ block content
                 a(href='/set/verify') 点我去身份认证
       .col-xs-12.col-md-12
         hr
-        .h4(style='margin-top:2em;') 个人资料修改
+        .h4(style='margin-top:2em;') 基本资料修改
         hr
         .rom(style='margin:1em 0;')
           .col-xs-12.col-md-6(style='padding: 0')
@@ -171,6 +171,117 @@ block content
             button.btn.btn-default.center-block#submitpersonalsetting(onclick='submitpersonalsetting()') 提交个人资料修改
             br
             br
+          .container
+            .row
+              hr
+              .col-xs-12.col-md-6
+                -const education = data.personal.education || []
+                table.table
+                  caption 教育情况
+                  thead
+                    tr
+                      th 学校
+                      th 专业
+                      th 学历
+                      th 毕业时间
+                      th 管理
+                  tbody
+                    for edu in education
+                      tr
+                        td #{edu.school}
+                        td #{edu.major}
+                        td #{edu.degree}
+                        td #{new Date(edu.graduationDate).toLocaleDateString()}
+                        td
+                          button.btn.btn-sm.btn-default(type='button' onclick=`delEdu(${edu.id})`) 删除
+                form(action='/me/education' method='POST')
+                  .form-group
+                    label(for='school') 学校
+                    input.form-control#school(type='text' name='school' placeholder='学校名称')
+                  .form-group
+                    label(for='major') 专业
+                    input.form-control#major(type='text' name='major' placeholder='专业名称')
+                  .form-group
+                    label(for='degree') 学历
+                    input.form-control#degree(type='text' name='degree' placeholder='学历信息')
+                  .form-group
+                    label(for='graduationDate') 毕业时间
+                    input#graduationDate.form-control(type='date' name='graduationDate')
+                  div
+                    button.btn.btn-default(type='submit') 增加
+              .col-xs-12.col-md-6
+                -const industries = data.personal.industries || []
+                table.table
+                  caption 职业资料
+                  thead
+                    th 行业
+                    th 职务
+                    th 组织
+                    th 管理
+                  tbody
+                    for ind in industries
+                      tr
+                        td #{ind.industry}
+                        td #{ind.duty}
+                        td #{ind.organization}
+                        td
+                          button.btn.btn-sm.btn-default(type='button' onclick=`delInd(${ind.id})`) 删除
+                form(action='/me/industries' method='POST')
+                  .form-group
+                    label(for='industry') 行业
+                    input#industry.form-control(type='text' name='industry' placeholder='从事行业')
+                  .form-group
+                    label(for='duty') 职务
+                    input#duty.form-control(type='text' name='duty' placeholder='具体职务')
+                  .form-group
+                    label(for='organization') 组织
+                    input#organization.form-control(type='text' name='organization' placeholder='所属单位或公司')
+                  div
+                    button.btn.btn-default(type='submit') 增加
+          .container
+            .row
+              hr
+              .col-xs-12.col-md-6
+                -const addresses = data.personal.addresses || []
+                table.table
+                  caption 地址信息
+                  thead
+                    th 支付宝
+                    th 地址
+                    th 管理
+                  tbody
+                    for addr in addresses
+                      tr
+                        td #{addr.alipay}
+                        td #{addr.address}
+                        td
+                          button.btn.btn-sm.btn-default(type='button' onclick=`delAddr(${addr.id})`) 删除
+                form(action='/me/addresses' method='POST')
+                  .form-group
+                    label(for='alipay') 支付宝
+                    input#alipay.form-control(name='alipay' type='text' placeholder='支付宝帐号')
+                  .form-group
+                    label(for='address') 地址
+                    input#address.form-control(name='address' type='text' placeholder='收货地址')
+                  div
+                    button.btn.btn-default(type='submit') 添加
+          .container
+            .row
+              hr
+              .col-xs-12.col-md-6
+                -const personalInfo = data.personal.personalInfo
+                form(action='/me/personal_info' method='POST')
+                  .form-group
+                    label(for='QQ') QQ
+                    input#QQ.form-control(name='QQ' type='text' placeholder='QQ号码' value=`${personalInfo.QQ || ''}`)
+                  .form-group
+                    label(for='wechat') 微信
+                    input#wechat.form-control(name='wechat' type='text' placeholder='微信' value=`${personalInfo.wechat || ''}`)
+                  .form-group
+                    label(for='birthday') 生日
+                    input#birthday.form-control(type='date' name='birthday' value=`${personalInfo.birthday || ''}`)
+                  div
+                    button.btn.btn-default(type='submit') 保存
   include debug_output.pug
     
 block scripts
@@ -330,6 +441,34 @@ block scripts
       interval_time = 59;
       geid('submitSendMcode').disabled = false;
     }
+    function delEdu(id) {
+      nkcAPI('/me/education/' + id, 'DELETE')
+        .then(function () {
+          window.location.reload()
+        })
+        .catch(function (e) {
+          screenTopWarning(e.message)
+        })
+    }
+    function delAddr(id) {
+      nkcAPI('/me/addresses/' + id, 'DELETE')
+        .then(function () {
+          window.location.reload()
+        })
+        .catch(function (e) {
+          screenTopWarning(e.message)
+        })
+    }
+    function delInd(id) {
+      nkcAPI('/me/industries/' + id, 'DELETE')
+        .then(function () {
+          window.location.reload()
+        })
+        .catch(function (e) {
+          screenTopWarning(e.message)
+        })
+    }
+
   script.
     function upload_success(){
       location.reload();

@@ -4,7 +4,8 @@ const router = new Router();
 router
   .get('/', async (ctx, next) => {
     const {pid} = ctx.params;
-    const {db, data} = ctx;
+    const {db, data, nkcModules} = ctx;
+    const {xsflimit} = nkcModules;
     let targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     if(!(await targetThread.ensurePermission(ctx))) ctx.throw(401, '权限不足');
