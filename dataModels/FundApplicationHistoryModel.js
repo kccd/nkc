@@ -2,16 +2,23 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationHistorySchema = new Schema({
-	applicationFormId: Number,
+	applicationFormId: {
+		type: Number,
+		required: true,
+		index: 1
+	},
+	timeToSave: {
+		type: Date,
+		default: Date.now,
+		index: 1
+	},
 	year: {
 		type: String,
-		default: null,
-		index: 1
+		default: null
 	},
 	order: {
 		type: Number,
-		default: null,
-		index: 1
+		default: null
 	},
 	code: {// 申请编号 如：2017A02
 		type: String,
@@ -28,17 +35,22 @@ const fundApplicationHistorySchema = new Schema({
 	},
 	toc: {
 		type: Date,
-		default: Date.now,
-		index: 1
+		default: Date.now
 	},
-	timeToSave: {
+	timeToSubmit: {
 		type: Date,
-		default: Date.now,
-		index: 1
+		default: null
+	},
+	timeToPassed: {
+		type: Date,
+		default: null
+	},
+	timeOfCompleted: {
+		type: Date,
+		default: null
 	},
 	tlm: {
-		type: Date,
-		index: 1
+		type: Date
 	},
 	from: {
 		type: String,
@@ -47,13 +59,11 @@ const fundApplicationHistorySchema = new Schema({
 	publicity: { // 示众
 		timeOfBegin: {
 			type: Date,
-			default: null,
-			index: 1
+			default: null
 		},
 		timeOfOver: {
 			type: Date,
-			default: null,
-			index: 1
+			default: null
 		}
 	},
 	uid: {
@@ -75,8 +85,7 @@ const fundApplicationHistorySchema = new Schema({
 	},
 	projectCycle: { // 预计周期
 		type: Number,
-		default: null,
-		index: 1
+		default: null
 	},
 	threadsId: {
 		applying: {// 申请时附带的帖子
@@ -104,15 +113,29 @@ const fundApplicationHistorySchema = new Schema({
 			default: null
 		},
 		number: {
-			type: Number,
+			type: String,
+			default: null
+		},
+		name: {
+			type: String,
+			default: null
+		},
+		bankName: {
+			type: String,
 			default: null
 		}
 	},
-	projectId: {
-		type: Number,
-		default: null,
-		index: 1
-	},
+
+	project: Schema.Types.Mixed,
+	members: Schema.Types.Mixed,
+	applicant: Schema.Types.Mixed,
+	adminAudit: Schema.Types.Mixed,
+	userInfoAudit: Schema.Types.Mixed,
+	projectAudit: Schema.Types.Mixed,
+	moneyAudit: Schema.Types.Mixed,
+	comments: Schema.Types.Mixed,
+	threads: Schema.Types.Mixed,
+
 	status: {
 		submitted: { // 判断是否是提交过的申请表，下边的lock.submitted作用是判断申请表当前是否提交。
 			type: Boolean,
@@ -120,48 +143,52 @@ const fundApplicationHistorySchema = new Schema({
 		},
 		usersSupport: { // 获得网友支持
 			type: Boolean,
-			default: null,
-			index: 1
+			default: null
 		},
-		projectPassed: { // 项目审核通过
+		projectPassed: { // 专家审核通过
 			type:Boolean,
-			default: null,
-			index: 1
+			default: null
 		},
 		adminSupport: { // 管理员同意
 			type: Boolean,
-			default: null,
-			index: 1
+			default: null
 		},
-		remittance: { // 已汇款
+		remittance: { // 已拨款
 			type: Boolean,
-			default: null,
-			index: 1
+			default: null
 		},
 		completed: { // 项目已完成
 			type: Boolean,
-			default: null,
-			index: 1
+			default: null
 		},
 		successful: { // 项目研究是否成功
 			type: Boolean,
-			default: null,
-			index: 1
+			default: null
 		},
 		excellent: { // 优秀项目
 			type: Boolean,
-			default: null,
-			index: 1
+			default: null
 		}
 	},
 	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效
 		type: String,
-		default: null,
-		index: 1
+		default: null
 	},
 	disabled: {
 		type: Boolean,
-		default: false,
+		default: false
+	},
+	submittedReport: {
+		type: Boolean,
+		default: false
+	},
+	reportNeedThreads: {
+		type: Boolean,
+		default: false
+	},
+	category: {
+		type: String,
+		default: null,
 		index: 1
 	},
 	lock: {
@@ -192,13 +219,11 @@ const fundApplicationHistorySchema = new Schema({
 	},
 	supportersId: {// 支持的人
 		type: [String],
-		default: [],
-		index: 1
+		default: []
 	},
 	objectorsId: { // 反对的人
 		type: [String],
-		default: [],
-		index: 1
+		default: []
 	},
 	remittance: {
 		/*

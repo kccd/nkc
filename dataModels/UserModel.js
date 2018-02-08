@@ -91,6 +91,20 @@ const userSchema = new Schema({
   virtuals: true
 }});
 
+userSchema.pre('save', function(next) {
+  try {
+    const certs = this.certs;
+    const c = [];
+    for (let cert of certs) {
+      if (cert !== 'scholar') c.push(cert);
+    }
+    this.certs = c;
+    return next()
+  } catch(e) {
+    return next(e)
+  }
+});
+
 userSchema.virtual('regPort')
   .get(function() {
     return this._regPort;
@@ -197,7 +211,7 @@ userSchema.methods.updateUserMessage = async function() {
 };
 
 userSchema.methods.getConflictingApplicationForm = async function() {
-	const message = {
+	const obj = {
 		unSubmitted: [],// 未提交
 		unPassed: [], // 未通过
 		unCompleted: []// 未完成且冲突的申请

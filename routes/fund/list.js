@@ -13,12 +13,22 @@ listRouter
 	// 添加基金项目
 	.post('/', async (ctx, next) => {
 		const {data, db} = ctx;
+		const {user} = data;
 		const {fundObj} = ctx.body;
 		fundObj.name = fundObj.name || '科创基金';
 		const fund = await db.FundModel.findOne({_id: fundObj._id});
 		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');
+		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
+		const newBill = db.FundBillModel({
+			fundId: newFund._id,
+			changed: newFund.money.initial,
+			uid: user.uid,
+			notes: '基金初始金额',
+			abstract: '初始'
+		});
+		await newBill.save();
 		data.fund = newFund;
 		await next();
 	})
@@ -28,7 +38,7 @@ listRouter
 		const {fundId} = ctx.params;
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
-		console.log(fundObj)
+		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
@@ -47,19 +57,22 @@ listRouter
 		const fund = await db.FundModel.findOnly({_id: fundId, disabled: false});
 		data.fund = fund;
 		let query = {
-			disabled: false,
 			'status.submitted': true,
 			fundId: fund._id
 		};
+		if(data.userLevel < 7) {
+			query.disabled = false;
+		}
 		if(type === 'excellent') { // 优秀项目
 			query['status.excellent'] = true;
 		} else if(type === 'completed'){ // 已完成
 			query['status.completed'] = true;
 		} else if(type === 'funding') { // 资助中
-			query['status.complete'] = {$ne: true};
+			query['status.completed'] = {$ne: true};
 			query['status.adminSupport'] = true;
 		} else if(type === 'auditing') { // 审核中
 			query['status.adminSupport'] = {$ne: true};
+			query.useless = null;
 		} else { // 全部
 
 		}
@@ -72,8 +85,9 @@ listRouter
 			await a.extendProject();
 			return a;
 		}));
+		data.paging = paging;
 		//改由前端判断
-		data.message = await user.getConflictingApplicationForm();
+		data.message = await fund.getConflictingByUser(user);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		data.authLevel = await userPersonal.getAuthLevel();
 		ctx.template = 'interface_fund_messages.pug';
@@ -113,19 +127,8 @@ listRouter
 		} catch(e) {
 			ctx.throw(401, e);
 		}
-		const message = await user.getConflictingApplicationForm();
-		const {unSubmitted, unPassed, unCompleted} = message;
-		if(unPassed.length !== 0 || unSubmitted.length !== 0) {
-			ctx.throw(401, '您还有未完成的基金申请！');
-		}
-		for(let a of unCompleted) {
-			if(a.fund.conflict.self === true && fund.conflict.self === true) {
-				ctx.throw(400, '该基金不允许同时提交多个申请。');
-			}
-			if(a.fund.conflict.other === true && fund.conflict.other === true) {
-				ctx.throw(400, '您还有未完成的且与该基金不能同时申请的基金项目。');
-			}
-		}
+		const message = await fund.getConflictingByUser(user);
+		if(message) ctx.throw(400, message);
 		if(agree !== 'true') {
 			return await next();
 		}
@@ -134,9 +137,9 @@ listRouter
 		applicationForm.uid = user.uid;
 		applicationForm.fundId = fundId;
 		applicationForm.fixedMoney = !!fund.money.fixed;
-		if(fund.applicationMethod.individual) {
+		if(fund.applicationMethod.personal) {
 			applicationForm.from = 'personal';
-		} else if(fund.applicationMethod.group) {
+		} else if(fund.applicationMethod.team) {
 			applicationForm.from = 'team'
 		} else {
 			ctx.throw(401, '该基金设置中未勾选个人申请和团队申请！');
@@ -150,7 +153,6 @@ listRouter
 			mobile: userPersonal.mobile? userPersonal.mobile: null,
 			uid: user.uid,
 			authLevel,
-
 		});
 		await newApplicationUser.save();
 		ctx.redirect(`/fund/a/${applicationForm._id}/settings`, 301);

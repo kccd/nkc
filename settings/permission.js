@@ -448,7 +448,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*photo: {
+      photo: {
         [name]: '证件照',
 	      [POST]: true,
         [parameter]: {
@@ -475,14 +475,13 @@ const certificates ={
 				      [GET]: true // 填写申请信息页面
 			      },
 			      bills: {// 基金项目的账单
-			      	[GET]: true,
-				      [POST]: true
+			      	[GET]: true
 			      }
 		      }
 	      },
 	      a: {
         	[name]: '所有基金申请',
-		      [GET]: true,
+		      // [GET]: true,
 		      [parameter]: {
         		[name]: '基金申请表',
 			      [GET]: true,
@@ -492,20 +491,43 @@ const certificates ={
 			      settings: {
 							[GET]: true
 			      },
+			      comment: {
+							[name]:'评论',
+				      [POST]: true
+			      },
 			      member: {
+        			[name]: '组员',
 				      [PATCH]: true
 			      },
 			      vote: {
+        			[name]: '投票',
         			[POST]: true
 			      },
 			      audit: {
+        			[name]: '审核',
 				      [GET]: true,
 				      [POST]: true
 			      },
 			      report: {
         			[name]: '报告进度',
         			[GET]: true,
+				      [POST]: true,
+				      audit: { // 报告审核
+								[GET]: true,
+					      [POST]: true
+				      }
+			      },
+			      complete: { // 结项
+				      [name]: '结项',
+        			[GET]: true,
 				      [POST]: true
+			      },
+			      remittance: {
+        			apply: {
+        				[name]: '申请拨款',
+				        [GET]: true,
+				        [POST]: true
+			        }
 			      }
 		      }
 	      },
@@ -567,7 +589,7 @@ const certificates ={
 		    [parameter]: {
 			    [DELETE]: true
 		    }
-	    }*/
+	    }
     },
     elseModifyTimeLimit: 0,
     selfModifyTimeLimit: 0.5*_hour
@@ -816,7 +838,7 @@ const certificates ={
           [POST]: true
         }
       },
-      /*fund: {
+      fund: {
         [POST]: true,
 	      add: {
 					[name]: '新建基金项目页面',
@@ -830,18 +852,47 @@ const certificates ={
 			      [PATCH]: true, // 修改基金项目
 			      settings: {
 				      [GET]: true // 基金设置
+			      },
+			      bills: {
+			      	[name]: '基金账单',
+				      [POST]: true,
+							[parameter]: {
+			      		[GET]: true,
+								[PATCH]: true,
+								[DELETE]: true
+							}
 			      }
 		      }
 	      },
 	      a: {
         	[parameter]: {
-        		remittance: {// 汇款
+        		remittance: {// 拨款
         			[GET]: true,
 			        [POST]: true
+		        },
+		        excellent: {
+        			[name]: '评优',
+			        [PATCH]: true
+		        },
+		        disabled: {
+        			[name]: '封禁',
+			        [PATCH]: true
+		        },
+		        comment: {
+        			[parameter]: {
+        				[DELETE]: true, //封禁评论
+			        }
 		        }
 	        }
+	      },
+				histories: {
+        	[name]: '历史基金',
+					[GET]: true
+				},
+	      disabled: {
+        	[name]: '被屏蔽的基金',
+		      [GET]: true
 	      }
-
       },
 	    auth: {
 		    [name]: '身份认证',
@@ -851,7 +902,7 @@ const certificates ={
 			    [PATCH]: true,
 			    [DELETE]: true
 		    }
-	    }*/
+	    }
     }
   }
 };

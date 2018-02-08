@@ -11,6 +11,15 @@ $(function() {
 	init();
 });
 
+
+function initNumber() {
+	var arr = $('div.suggestMoney, div.fact');
+	for (var i = 0; i < arr.length; i++) {
+		var text = arr.eq(i).text();
+		arr.eq(i).text(parseInt(text));
+	}
+}
+
 function init() {
 	// $('input[name="audit"]').on('click', function() {
 	// 	choose();
@@ -18,9 +27,11 @@ function init() {
 
 	$('.suggestMoney').on('blur', function() {
 		initSuggestMoney();
+		initNumber();
 	});
 	$('.factMoney').on('blur', function() {
 		initFactMoney();
+		initNumber();
 	});
 	$('#enterBtn').on('click', function () {
 		displayRemittance();
@@ -149,9 +160,9 @@ function submitProjectAudit(id) {
 	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)
 		.then(function(data) {
-			screenTopAlert('提交成功！2s后跳转到基金列表。');
+			screenTopAlert('提交成功！2s后跳转到申请表详情。');
 			setTimeout(function() {
-				window.location.href = '/fund/list/'+data.fund._id;
+				window.location.href = '/fund/a/'+id;
 			}, 2000)
 		})
 		.catch(function(data) {
@@ -167,7 +178,7 @@ function computeRemainder() {
 }
 
 function displayRemainder() {
-	var total = parseFloat($('#factMoney').text());
+	var total = parseInt($('#factMoney').text());
 	$('#remainder').text(total).removeClass('redFontColor');
 	var arr = $('#remittanceList > div > input');
 	var inputMoney = 0;
@@ -229,9 +240,9 @@ function submitAdminAudit(id) {
 	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)
 		.then(function(data) {
-			screenTopAlert('提交成功！2s后跳转到基金列表。');
+			screenTopAlert('提交成功！2s后跳转到申请表详情。');
 			setTimeout(function() {
-				window.location.href = '/fund/list/'+data.fund._id;
+				window.location.href = '/fund/a/'+id;
 			}, 2000)
 		})
 		.catch(function(data) {

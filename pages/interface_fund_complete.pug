@@ -1,0 +1,56 @@
+extends bootstrap_base
+block title
+  -const mainContainer1400 = true
+  -const {applicationForm} = data;
+  -const {fund, project, applicant, members, code} = applicationForm;
+  title= `${fund.name}-${project.t}`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-6
+            .panel.panel-default
+              .panel-body
+                h2.text-center 结项
+                h4=`项目名称：${project.t}`
+                h4=`项目ID：${code}`
+                if members && members.length !== 0
+                  h4=`组员：`
+                    -for(let m of members)
+                      a(href=`/m/${m.uid}`)= m.user.username
+                      span &nbsp;&nbsp;
+                hr
+                span= `温馨提示：`
+                p 请详细说明每个组员在团队中所做出的贡献。
+                p 我们会根据所有网友的评论和项目的所有报告来进行评优，优秀的项目将会展示在科创基金首页。
+                p
+                span 总体情况：
+                label.radio-inline
+                  input(type='radio' name='success' checked=true)
+                  h5 研究成功
+                label.radio-inline
+                  input(type='radio' name='success' checked=false)
+                  h5 研究失败
+                textarea.form-control#content(rows=10 placeholder='项目完成情况简介（建议500字左右）')
+                br
+                h3 结题报告（请在论坛发表，然后添加在下面）
+                h5 已选择帖子的文号：
+                  #selectedThread
+                    span 暂未选择
+                  br
+                  .form
+                    input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
+                    input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
+                  span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
+                  span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
+                  .unselectedThreads
+                    .blank(style='color: #aaa;') 暂无数据
+                  nav(aria-label='navigation')
+                    ul.pagination.pagination-sm.pageList
+                  button.btn.btn-default(style='float: right;' onclick=`submit(${applicationForm._id})`) 提交
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_complete.js')

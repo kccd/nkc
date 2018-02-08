@@ -26,6 +26,7 @@ function chooseFile(id) {
 			// text += '<h5>大小：'+outSize(file.size)+'</h5>'
 		}
 		$(id+'Messages').html(text);
+		uploadFile(id);
 	})
 }
 

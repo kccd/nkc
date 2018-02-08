@@ -27,7 +27,6 @@ const settingSchema = new Schema({
 	  photos: Number,
     forums: Number,
 	  fundDocuments: Number,
-	  fundBills: Number
   }
 },
 {toObject: {

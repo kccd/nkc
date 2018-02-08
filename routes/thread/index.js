@@ -61,11 +61,11 @@ threadRouter
 					data.paging = paging;
 				}
 			}
-			await Promise.all(targetThreads.map(async t => {
+			for(let t of targetThreads) {
 				const post = await t.extendFirstPost();
 				await post.extendUser();
-				threads.push(outPostObj(post));
-			}));
+				threads.push(outPostObj(post))
+			}
 			data.threads = threads;
 		}
 		await next();

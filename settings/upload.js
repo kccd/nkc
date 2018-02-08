@@ -75,7 +75,10 @@ module.exports = {
     cover: {
       width: 640,
       height: 480
-    }
+    },
+	  lifePhoto: {
+    	width: 1920
+	  }
   },
 	count: {
   	lifePhoto: 1000 //生活照最多1000张

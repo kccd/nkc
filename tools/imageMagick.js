@@ -183,6 +183,14 @@ const coverify = (path, output) => {
   return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, output]);
 };
 
+const lifePhotoify = async path => {
+	const {width} = sizeLimit.lifePhoto;
+	if(linux) {
+		return spawnProcess('convert', [
+			path, '-resize', `${width}x`, path]);
+	}
+	return spawnProcess('magick', ['convert', path, '-resize', `${width}x`, path]);
+};
 
 module.exports = {
   avatarify,
@@ -200,7 +208,8 @@ module.exports = {
 	photoSmallify,
 	fundBGIify,
 	fundBGISmallify,
-  removeFile
+  removeFile,
+	lifePhotoify
 };
 
 

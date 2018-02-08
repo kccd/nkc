@@ -16,7 +16,10 @@ block content
                 .col-xs-6.col-sm-4.col-md-3.fund-list
                   a(href=`/fund/list/${id}`)
                     .fund-name(style=`background-color: ${color};background-image:${fund && fund.image ? `url(/fundBGI_small/${fund.image})` : ''}`)= name
-                    .fund-money!= `￥${money.max || money.fixed}&nbsp`
+                    if fund.money.fixed
+                      .fund-money!= `定额${money.fixed}元`
+                    else
+                      .fund-money!= `单笔最高${money.max}元`
               if data.userLevel >= 6
                 .col-xs-6.col-sm-4.col-md-3.fund-list
                   a(href=`/fund/add`)

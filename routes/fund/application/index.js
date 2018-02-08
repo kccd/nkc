@@ -2,26 +2,34 @@ const Router = require('koa-router');
 const auditRouter = require('./audit');
 const remittanceRouter= require('./remittance');
 const reportRouter = require('./report');
+const completeRouter = require('./complete');
+const voteRouter = require('./vote');
+const commentRouter = require('./comment');
+const settingsRouter = require('./settings');
+const memberRouter = require('./member');
+const excellentRouter = require('./excellent');
+const disabledRouter = require('./disabled');
 const applicationRouter = new Router();
-const apiFn = require('../../nkcModules/apiFunction');
+const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
 		const page = query.page?parseInt(query.page): 0;
 		const {type} = query;
 		const q = {
-			useless: {$ne: 'disabled'},
+			disabled: false,
 			'status.submitted': true
 		};
-		if(type === excellent) { // 优秀项目
+		if(type === 'excellent') { // 优秀项目
 			q['status.excellent'] = true;
 		} else if(type === 'completed') { // 已完成
 			q['status.complete'] = true;
 		} else if(type === 'funding') { // 资助中
 			q['status.complete'] = {$ne: true};
-			q['status.remittance'] = true;
+			q['status.adminSupport'] = true;
 		} else if(type === 'auditing') { // 审核中
 			q['status.remittance'] = {$ne: true};
+			q.useless = null
 		} else { //所有
 
 		}
@@ -51,7 +59,11 @@ applicationRouter
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
 		await applicationForm.extendProject();
+		if(applicationForm.project) {
+			await applicationForm.project.extendResources();
+		}
 		await applicationForm.extendThreads();
+		await applicationForm.extendForum();
 		const {fund, budgetMoney} = applicationForm;
 		if(fund.money.fixed) {
 			applicationForm.money = fund.money.fixed;
@@ -86,7 +98,7 @@ applicationRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled && data.userLevel < 7) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
@@ -95,9 +107,9 @@ applicationRouter
 		const page = query.page? parseInt(query.page): 0;
 		const q = {
 			applicationFormId: applicationForm._id,
-			type: 'comment',
-			disabled: false
+			type: 'comment'
 		};
+		if(data.userLevel < 7) q.disabled = false;
 		const length = await db.FundDocumentModel.count(q);
 		const paging = apiFn.paging(page, length);
 		const comments = await db.FundDocumentModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
@@ -105,11 +117,20 @@ applicationRouter
 			await comment.extendUser();
 		}));
 		applicationForm.comments = comments;
-		data.auditComments = await db.FundDocumentModel.find({
-			applicationFormId: applicationForm._id,
-			type: {$in: ['userInfoAudit', 'projectAudit', 'moneyAudit', 'adminAudit']},
-			disabled: false,
-		}).sort({toc: -1});
+		const auditComments = {};
+		if(!applicationForm.status.projectPassed) {
+			auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
+			auditComments.projectAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'projectAudit', disabled: false}).sort({toc: -1});
+			auditComments.moneyAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'moneyAudit', disabled: false}).sort({toc: -1});
+		}
+		if(!applicationForm.status.adminSupport) {
+			auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
+		}
+		if(applicationForm.useless === 'giveUp') {
+			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
+		}
+		data.auditComments = auditComments;
+		data.paging = paging;
 		await next();
 	})
 
@@ -117,17 +138,20 @@ applicationRouter
 	.patch('/:_id', async (ctx, next) => {
 		const {data, db, body, params} = ctx;
 		const {user} = data;
-		const {useless, newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId} = body;
+		const {useless, newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId, category} = body;
 		data.s = s;
 		const {applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		if(useless === 'giveUp') {
 			ctx.throw(400, '抱歉！您已放弃此次申请。');
 		} else if(useless === 'exceededModifyCount') {
 			ctx.throw(400, '抱歉！申请表已超出最大修改次数。');
+		} else if(useless === 'delete') {
+			ctx.throw(401, '抱歉！该申请表已被删除。');
 		}
 		const {_id} = params;
 		if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
+		if(applicationForm.lock.submitted) ctx.throw(401, '抱歉！申请表已提交暂不能修改。');
 		const fund = applicationForm.fund;
 		try {
 			await fund.ensureUserPermission(user);
@@ -144,12 +168,14 @@ applicationRouter
 			const {from} = body;
 			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
 			if(from === 'personal') {
+				if(!fund.applicationMethod.personal) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
 				for (let aUser of members) {
 					await aUser.update({removed: true});
 				}
 				updateObj.from = 'personal';
 				await applicationForm.update(updateObj);
-			} else {
+			} else if(from === 'team') {
+				if(!fund.applicationMethod.team) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
 				// 判断申请人的信息是否存在，不存在则写入
 				if(!applicant) {
 					newMembers.push({
@@ -181,6 +207,8 @@ applicationRouter
 				}
 				updateObj.from = 'team';
 				await applicationForm.update(updateObj);
+			} else {
+				ctx.throw(400, '未知的申请方式。');
 			}
 		}
 		// 填写申请人信息
@@ -230,7 +258,7 @@ applicationRouter
 		// 填写项目信息
 		if(s === 3) {
 			if(applicationForm.status.projectPassed === true) {
-				ctx.throw(400, '项目审核已通过，无法修改。');
+				ctx.throw(400, '专家审核已通过，无法修改。');
 			}
 			if(applicationForm.projectId === null){
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
@@ -238,14 +266,20 @@ applicationRouter
 					_id: documentId,
 					uid: user.uid,
 					applicationFormId: applicationForm._id,
-					type: 'project'
+					type: 'project',
+					t: project.t,
+					abstract: project.abstract
 				});
 				await newDocument.save();
 				updateObj.projectId = documentId;
 				await applicationForm.update(updateObj);
 			} else {
 				if(project !== undefined){
-					await applicationForm.project.update(project);
+					if(project.t) applicationForm.project.t = project.t;
+					if(project.c) applicationForm.project.c = project.c;
+					if(project.l) applicationForm.project.l = project.l;
+					if(project.abstract) applicationForm.project.abstract = project.abstract;
+					await applicationForm.project.save();
 					data.redirect = `/fund/a/${applicationForm._id}/settings?s=3`;
 				}
 			}
@@ -255,6 +289,7 @@ applicationRouter
 			if(projectCycle) updateObj.projectCycle = projectCycle;
 			if(budgetMoney) updateObj.budgetMoney = budgetMoney;
 			if(threadsId) updateObj['threadsId.applying'] = threadsId;
+			if(category) updateObj.category = category;
 			await applicationForm.update(updateObj);
 		}
 		//最后提交验证
@@ -268,113 +303,62 @@ applicationRouter
 		}
 		await next();
 	})
-	// 取消申请
+
 	.del('/:_id', async (ctx, next) => {
-		const {data, query} = ctx;
+		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {submitted, usersSupport, projectPassed, adminSupport, remittance} = applicationForm.status;
-		const {type} = query;
-		if(['disabled', 'null'].includes(type)) {
-			if(data.userLevel < 7){
-				ctx.throw(401, '您没有权限操作别人的基金申请！');
-			}
-		} else if(type === 'giveUp'){
-			if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足')
+		const {type, c} = query;
+		if(type === 'giveUp'){
+			if(!c) ctx.throw(400, '请输入放弃的原因。');
+			if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+			const newDocument = db.FundDocumentModel({
+				_id: newId,
+				uid: user.uid,
+				applicationFormId: applicationForm._id,
+				type: 'report',
+				c: c
+			});
+			await newDocument.save();
+			applicationForm.useless = 'giveUp';
+			applicationForm.status.completed = true;
+			applicationForm.timeOfCompleted = Date.now();
 		} else if(type === 'delete'){
 			if(submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
-
-			ctx.throw(400, '未知的操作类型！');
-		}
-		await applicationForm.update({useless: type});
-		await next();
-	})
-
-	//基金申请表修改页面
-	.get('/:_id/settings', async (ctx, next) => {
-		const {data, db} = ctx;
-		data.nav = '填写申请表';
-		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
-		const {status} = applicationForm;
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
-		if(status.adminSupport) ctx.throw(400, '管理员审核已通过，无法修改申请表。');
-		let {s} = ctx.query;
-		if(s) {
-			s = parseInt(s);
+			applicationForm.useless = 'delete';
+			applicationForm.status.completed = true;
+			applicationForm.timeOfCompleted = Date.now();
 		} else {
-			s = 1;
-		}
-		if(applicationForm.status.submitted && s === 1) s = 2;
-		data.s = s;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
-		data.lifePhotos = await userPersonal.extendLifePhotos();
-		ctx.template = 'interface_fund_apply.pug';
-		await applicationForm.update({'lock.submitted': false});
-		await next();
-	})
-
-	// 组员处理组队邀请
-	.patch('/:_id/member', async (ctx, next) => {
-		const {data, body} = ctx;
-		const {user, applicationForm} = data;
-		const {agree} = body;
-		const {members} = applicationForm;
-		for (let u of members) {
-			if(u.agree === null && user.uid === u.uid) {
-				await u.update({agree})
-			}
-		}
-		await next();
-	})
-
-	//网友支持或反对
-	.post('/:_id/vote', async (ctx, next) => {
-		const {data, body} = ctx;
-		const {type} = body;
-		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
-		const {fund, members, supportersId, objectorsId} = applicationForm;
-		const membersId = members.map(m => m.uid);
-		membersId.push(applicationForm.uid);
-		if(membersId.includes(user.uid)) ctx.throw(401, '抱歉！您已参与该基金的申请，无法完成该操作！');
-		if(supportersId.includes(user.uid) || objectorsId.includes(user.uid)) ctx.throw(400, '抱歉！您已经投过票了。');
-		if(type === 'support') {
-			supportersId.push(user.uid);
-		} else if(type === 'against') {
-			objectorsId.push(user.uid);
+			ctx.throw(400, '未知的操作类型。');
 		}
 		await applicationForm.save();
+		await next();
+	})
 
-		//获得的网友
-		if(fund.supportCount <= supportersId.length) {
-			await applicationForm.update({'status.usersSupport': true});
-		}
-		await next();
-	})
-	//评论
-	.post('/:_id/comment', async (ctx, next) => {
-		const {data, body} = ctx;
-		const {applicationForm, user} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
-		const {comment} = body;
-		if(!applicationForm.status.submitted) ctx.throw(400, '申请表未提交，暂不能评论。');
-		await applicationForm.newComment({
-			uid: user.uid,
-			c: comment.c,
-			t: comment.t,
-		});
-		await next();
-	})
 	.use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods())
 	.use('/:_id/remittance', remittanceRouter.routes(), remittanceRouter.allowedMethods())
 	.use('/:_id/report', reportRouter.routes(), reportRouter.allowedMethods())
-
+	.use('/:_id/complete', completeRouter.routes(), completeRouter.allowedMethods())
+	.use('/:_id/vote', voteRouter.routes(), voteRouter.allowedMethods())
+	.use('/:_id/comment', commentRouter.routes(), commentRouter.allowedMethods())
+	.use('/:_id/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+	.use('/:_id/member', memberRouter.routes(), memberRouter.allowedMethods())
+	.use('/:_id/excellent', excellentRouter.routes(), excellentRouter.allowedMethods())
+	.use('/:_id/disabled', disabledRouter.routes(), disabledRouter.allowedMethods())
 	//屏蔽敏感信息
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
+		const {user} = data;
 		const {applicationForm} = data;
-		if(applicationForm && data.userLevel < 7) {
+		const {fund} = applicationForm;
+		let isCensor = false;
+		for(let c of fund.censor.certs) {
+			if(user.certs.includes(c)) isCensor = true;
+		}
+		if(fund.censor.appointed.includes(user.uid)) isCensor = true;
+		if(applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !isCensor) {
 			const {applicant, members} = applicationForm;
 			applicant.mobile = null;
 			applicant.idCardNumber = null;

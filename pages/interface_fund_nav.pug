@@ -5,8 +5,10 @@
       a(href="/fund") 科创基金
     span &nbsp;&nbsp;&nbsp;
     span
-      a(href=`/fund/me`) 我的基金
-    span &nbsp;&nbsp;&nbsp;
+      a(href=`/fund/me`) 我的基金&nbsp;
+      if data.fundNotify > 0
+        span.redFontColor= data.fundNotify
+    span &nbsp;&nbsp;
     li
       a(href=`/fund/list`) 基金列表
     if data.fund
@@ -15,6 +17,9 @@
     if data.applicationForm && data.applicationForm.code
       li
         a(href=`/fund/a/${data.applicationForm.code}`)= data.applicationForm.code
+    if data.bill
+      li
+        a(href=`/fund/list/${data.fund._id}/bills`)= `基金账单`
     if data.nav
       li= data.nav
 
