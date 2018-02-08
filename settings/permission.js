@@ -456,7 +456,7 @@ const certificates ={
 	      },
 	      a: {
         	[name]: '所有基金申请',
-		      [GET]: true,
+		      // [GET]: true,
 		      [parameter]: {
         		[name]: '基金申请表',
 			      [GET]: true,
