@@ -1,5 +1,5 @@
 const settings = require('../settings');
-const {mongoose} = settings.database;
+const mongoose = settings.database;
 const {Schema} = mongoose;
 const methodEnum = [
   'POST', 'GET', 'PATCH', 'PUT', 'DELETE'
@@ -15,7 +15,8 @@ const permissionSchema = new Schema({
   method: {
     type: String,
     enum: methodEnum,
-    required: true
+    required: true,
+    uppercase: true
   },
   path: {
     type: String,
@@ -34,15 +35,6 @@ const permissionSchema = new Schema({
     type: [String],
     index: 1
   }
-});
-
-permissionSchema.pre('validate', function(next) {
-  try {
-    this.method = this.method.toUpperCase();
-  } catch(e) {
-    next(e)
-  }
-  next()
 });
 
 module.exports = mongoose.model('permissions', permissionSchema);

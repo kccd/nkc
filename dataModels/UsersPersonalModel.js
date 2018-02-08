@@ -2,6 +2,32 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
+const educationSchema = new Schema({
+  school: {
+    type: String,
+    maxlength: [30, '学校长度应小于30'],
+    required: true
+  },
+  major: {
+    type: String,
+    maxlength: [30, '专业长度应小于30'],
+    required: true
+  },
+  degree: {
+    type: String,
+    maxlength: [15, '学历长度应小于15'],
+    required: true
+  },
+  graduationDate: {
+    type: Date,
+    required: true
+  },
+  id: {
+    type: Number,
+    required: true
+  }
+});
+
 const usersPersonalSchema = new Schema({
   uid: {
     type: String,
@@ -70,8 +96,105 @@ const usersPersonalSchema = new Schema({
 		type: Boolean,
 		default: false,
 		index: 1
-	}
-});
+	},
+  addresses: {
+    type: [
+      Schema.Types.Mixed
+      /*{
+      alipay: {
+        type: String,
+        max: [60, '支付宝帐号长度应小于60'],
+        required: true
+      },
+      address: {
+        type: String,
+        max: [60, '地址长度应小于60'],
+        required: true
+      },
+      id: {
+        type: Number,
+        required: true
+      }
+    }*/],
+    default: [],
+  },
+  industries: {
+    type: [
+      Schema.Types.Mixed
+      ,/*{
+      industry: {
+        type: String,
+        max: [30, '行业长度应小于30'],
+        required: true
+      },
+      duty: {
+        type: String,
+        max: [30, '职责长度应小于30'],
+        required: true
+      },
+      organization: {
+        type: String,
+        max: [30, '组织信息长度应小于30'],
+        required: true
+      },
+      id: {
+        type: Number,
+        required: true
+      }
+    }*/],
+    default: []
+  },
+  education: {
+    type: [
+      Schema.Types.Mixed
+      /*{
+      school: {
+        type: String,
+        max: [30, '学校长度应小于30'],
+        required: true
+      },
+      major: {
+        type: String,
+        max: [30, '专业长度应小于30'],
+        required: true
+      },
+      degree: {
+        type: String,
+        max: [15, '学历长度应小于15'],
+        required: true
+      },
+      graduationDate: {
+        type: Date,
+        required: true
+      },
+      id: {
+        type: Number,
+        required: true
+      }
+    }*/],
+    default: []
+  },
+  personalInfo: {
+    type: {
+      QQ: {
+        type: String,
+        max: [12, 'QQ号码长度小于12'],
+        required: true
+      },
+      wechat: {
+        type: String,
+        max: [15, '微信长度应小于15'],
+        required: true
+      },
+      birthday: {
+        type: Date,
+        required: true
+      }
+    },
+    default: {}
+  }
+},
+  {usePushEach: true});
 
 usersPersonalSchema.virtual('idPhotos')
 	.get(function() {
@@ -151,6 +274,5 @@ usersPersonalSchema.methods.increasePsnl = async function(type, number) {
   attrObj[counterType] = number;
   return await this.update({$inc: attrObj});
 };
-
 
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');
