@@ -354,11 +354,13 @@ applicationRouter
 		const {applicationForm} = data;
 		const {fund} = applicationForm;
 		let isCensor = false;
-		for(let c of fund.censor.certs) {
-			if(user.certs.includes(c)) isCensor = true;
+		if(user) {
+			for(let c of fund.censor.certs) {
+				if(user.certs.includes(c)) isCensor = true;
+			}
+			if(fund.censor.appointed.includes(user.uid)) isCensor = true;
 		}
-		if(fund.censor.appointed.includes(user.uid)) isCensor = true;
-		if(applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !isCensor) {
+		if(!user || (applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !isCensor)) {
 			const {applicant, members} = applicationForm;
 			applicant.mobile = null;
 			applicant.idCardNumber = null;

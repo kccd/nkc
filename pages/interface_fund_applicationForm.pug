@@ -153,11 +153,12 @@ block content
 
 
             -let isProjectCensor = false, isAdmin = false;
-            -for(let c of fund.censor.certs)
-              if data.user.certs.includes(c)
-                -isProjectCensor = true;
-            // 判断是否是项目审查员
-            if fund.censor.appointed.includes(data.user.uid)
+            if data.user
+              -for(let c of fund.censor.certs)
+                if data.user.certs.includes(c)
+                  -isProjectCensor = true;
+              // 判断是否是项目审查员
+              if fund.censor.appointed.includes(data.user.uid)
               -isProjectCensor = true;
             //判断是否是管理员
             if data.userLevel >= 7
@@ -189,15 +190,15 @@ block content
 
 
             // 申请者控制面板
-            if applicationForm.uid === data.user.uid || applicationForm.status.adminSupport
+            if (data.user && applicationForm.uid === data.user.uid) || applicationForm.status.adminSupport
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 控制面板
                   if applicationForm.status.adminSupport
                     a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
-                    if applicationForm.uid === data.user.uid
+                    if data.user && applicationForm.uid === data.user.uid
                       a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
-                  if data.user.uid === applicationForm.applicant.uid
+                  if data.user && data.user.uid === applicationForm.applicant.uid
                     if !applicationForm.lock.submitted && !adminSupport
                       a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
                     if !applicationForm.status.completed
