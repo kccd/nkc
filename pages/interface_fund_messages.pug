@@ -3,9 +3,10 @@ block title
   -const fund = data.fund;
   -let applicationForms;
   -let isCensor = true;
-  -for (let cert of fund.censor.certs)
-    if !data.user.certs.includes(cert) && !fund.censor.appointed.includes(data.user.uid)
-      -isCensor = false;
+  if data.user
+    -for (let cert of fund.censor.certs)
+      if !data.user.certs.includes(cert) && !fund.censor.appointed.includes(data.user.uid)
+        -isCensor = false;
   title= `科创基金 - ${fund.name}`
   link(rel='stylesheet' href='/fund.css')
 block content
@@ -52,78 +53,56 @@ block content
             br
             .panel.panel-default
               .panel-body.fund-preconditions
-                h3 申请条件
-                hr
-                table.table.table-condensed
-                  thead
-                    tr
-                     th &nbsp;
-                     th 最低要求
-                     th 我的
-                  tbody
-                    -let allowed = true;
-                    -const toc =   Math.ceil((Date.now() - user.toc)/(1000*60*60*24));
-                    if threadCount > user.threadCount || postCount > user.postCount || timeToRegister > toc
-                      -allowed = false;
-                    if authLevel > userAuthLevel
-                      -allowed = false;
-                    tr
-                      th 发帖量
-                      th= threadCount
-                      th= user.threadCount
-                        //if threadCount <= user.threadCount
-                        //  span.glyphicon.glyphicon-ok
-                    tr
-                      th 回帖量
-                      th= postCount
-                      th= user.postCount
-                    tr
-                      th 账号等级
-                      th= 0
-                      th= data.userLevel
-                    tr
-                      th 注册天数
-                      th= timeToRegister
-                      th= toc
-                    tr
-                      th 身份认证等级
-                      th= authLevel
-                      th= userAuthLevel
-                -let btnDisabled = false, link=`/fund/list/${fund._id}/add`;
-                if !allowed
-                  p 您的账号未达到最低要求，无法申请该基金。
-                  -btnDisabled = true;
-                  -link = '###';
-                if data.message
-                  p= data.message
-                  -btnDisabled = true;
-                  -link = '###';
-                // -const {unPassed, unCompleted, unSubmitted} = data.message? data.message: {};
-                //   if unSubmitted.length !== 0
-                //     -btnDisabled = true;
-                //     -link = '###';
-                //     p 您还有未提交的基金项目，
-                //       a(href=`/fund/a/${unSubmitted[0]._id}/settings`) 查看
-                //   else if unPassed.length !== 0
-                //     -btnDisabled = true;
-                //     -link = '###';
-                //     p 您还有未通过审核的基金项目，
-                //       a(href=`/fund/a/${unPassed[0]._id}`) 查看
-                //   else if unCompleted.length !== 0
-                //     -for(let a of unCompleted)
-                //       if a.fund.conflict.self === true && a.fund._id === fund._id
-                //         -btnDisabled = true;
-                //         -link = '###';
-                //         p 该基金不允许同时提交多个申请，
-                //           a(href=`/fund/a/${a._id}`) 查看
-                //         -break;
-                //       if a.fund.conflict.other === true && fund.conflict.other === true
-                //         -btnDisabled = true;
-                //         -link = '###';
-                //         p 您还有未完成的且与该基金不能同时申请的基金项目，
-                //           a(href=`/fund/a/${a._id}`) 查看
-                //         -break;
-                a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
+                if !data.user
+                  h3.text-center 未登录用户不能申请
+                else
+                  h3 申请条件
+                  hr
+                  table.table.table-condensed
+                    thead
+                      tr
+                       th &nbsp;
+                       th 最低要求
+                       th 我的
+                    tbody
+                      -let allowed = true;
+                      -const toc =   Math.ceil((Date.now() - user.toc)/(1000*60*60*24));
+                      if threadCount > user.threadCount || postCount > user.postCount || timeToRegister > toc
+                        -allowed = false;
+                      if authLevel > userAuthLevel
+                        -allowed = false;
+                      tr
+                        th 发帖量
+                        th= threadCount
+                        th= user.threadCount
+                          //if threadCount <= user.threadCount
+                          //  span.glyphicon.glyphicon-ok
+                      tr
+                        th 回帖量
+                        th= postCount
+                        th= user.postCount
+                      tr
+                        th 账号等级
+                        th= 0
+                        th= data.userLevel
+                      tr
+                        th 注册天数
+                        th= timeToRegister
+                        th= toc
+                      tr
+                        th 身份认证等级
+                        th= authLevel
+                        th= userAuthLevel
+                  -let btnDisabled = false, link=`/fund/list/${fund._id}/add`;
+                  if !allowed
+                    p 您的账号未达到最低要求，无法申请该基金。
+                    -btnDisabled = true;
+                    -link = '###';
+                  if data.message
+                    p= data.message
+                    -btnDisabled = true;
+                    -link = '###';
+                  a.btn.btn-info.btn-block(href=link disabled=btnDisabled) 申请该基金
           .col-xs-12.col-md-12
             .panel.panel-default
               .panel-body.fund-description

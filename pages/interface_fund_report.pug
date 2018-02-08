@@ -13,7 +13,7 @@ block content
       if data.type !== 'reportAudit'
         .col-xs-12.col-md-6
           .row
-            if data.user.uid === applicationForm.uid && !status.completed
+            if data.user && data.user.uid === applicationForm.uid && !status.completed
               .col-xs-12.col-md-12
                 .panel.panel-default
                   .panel-body

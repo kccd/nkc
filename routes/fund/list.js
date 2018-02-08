@@ -87,9 +87,11 @@ listRouter
 		}));
 		data.paging = paging;
 		//改由前端判断
-		data.message = await fund.getConflictingByUser(user);
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		data.authLevel = await userPersonal.getAuthLevel();
+		if(data.user) {
+			data.message = await fund.getConflictingByUser(user);
+			const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+			data.authLevel = await userPersonal.getAuthLevel();
+		}
 		ctx.template = 'interface_fund_messages.pug';
 		await next();
 	})

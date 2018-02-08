@@ -227,6 +227,57 @@ const certificates ={
           }
         }
       },
+	    fund: {
+		    [name]: '基金',
+		    [GET]: true,
+		    list: {
+			    [name]: '基金项目列表',
+			    [GET]: true, // 所有基金项目
+			    [parameter]: {
+				    [GET]: true, // 具体到某一个基金项目
+				    bills: {// 基金项目的账单
+					    [GET]: true
+				    }
+			    }
+		    },
+		    a: {
+			    [name]: '所有基金申请',
+			    // [GET]: true,
+			    [parameter]: {
+				    [name]: '基金申请表',
+				    [GET]: true,
+				    report: {
+					    [name]: '报告进度',
+					    [GET]: true
+				    }
+			    }
+		    }
+	    },
+	    fundBGI: {
+		    [name]: '基金项目背景图片',
+		    [POST]: true,
+		    [parameter]: {
+			    [GET]: true,
+		    }
+	    },
+	    fundBGI_small: {
+		    [name]: '基金项目背景图片',
+		    [parameter]: {
+			    [GET]: true,
+		    }
+	    },
+	    photo: {
+		    [name]: '证件照',
+		    [parameter]: {
+			    [GET]: true,
+		    }
+	    },
+	    photo_small: {
+		    [name]: '证件照缩略图',
+		    [parameter]: {
+			    [GET]: true
+		    }
+	    },
 	    'index.php': {
       	[name]: '兼容老版本',
       	[GET]: true
