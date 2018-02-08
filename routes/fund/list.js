@@ -72,6 +72,7 @@ listRouter
 			query['status.adminSupport'] = true;
 		} else if(type === 'auditing') { // 审核中
 			query['status.adminSupport'] = {$ne: true};
+			query.useless = null;
 		} else { // 全部
 
 		}

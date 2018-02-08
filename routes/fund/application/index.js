@@ -17,18 +17,19 @@ applicationRouter
 		const page = query.page?parseInt(query.page): 0;
 		const {type} = query;
 		const q = {
-			useless: {$ne: 'disabled'},
+			disabled: false,
 			'status.submitted': true
 		};
-		if(type === excellent) { // 优秀项目
+		if(type === 'excellent') { // 优秀项目
 			q['status.excellent'] = true;
 		} else if(type === 'completed') { // 已完成
 			q['status.complete'] = true;
 		} else if(type === 'funding') { // 资助中
 			q['status.complete'] = {$ne: true};
-			q['status.remittance'] = true;
+			q['status.adminSupport'] = true;
 		} else if(type === 'auditing') { // 审核中
 			q['status.remittance'] = {$ne: true};
+			q.useless = null
 		} else { //所有
 
 		}
