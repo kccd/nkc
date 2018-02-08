@@ -5,7 +5,7 @@ voteRouter
 		const {data, body, db} = ctx;
 		const {type, c} = body;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		if(!user.certs.includes('mobile')) ctx.throw('401', '您还没有通过实名认证，请前往资料设置页绑定手机号。');
 		const {fund, members, supportersId, objectorsId} = applicationForm;
 		const membersId = members.map(m => m.uid);

@@ -3,7 +3,7 @@ const remittanceRouter = new Router();
 remittanceRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {adminSupport} = applicationForm.status;
 		if(!adminSupport) ctx.throw(400, '管理员复核暂未通过无法进行拨款操作，请等待。');
 		await next();

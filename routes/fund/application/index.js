@@ -94,7 +94,7 @@ applicationRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled && data.userLevel < 7) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled && data.userLevel < 7) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
@@ -297,7 +297,7 @@ applicationRouter
 	.del('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {submitted, usersSupport, projectPassed, adminSupport, remittance} = applicationForm.status;
 		const {type, c} = query;
 		if(type === 'giveUp'){

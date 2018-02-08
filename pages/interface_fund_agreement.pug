@@ -22,10 +22,10 @@ block content
             .row
               .col-xs-12.col-md-12
                 label.radio-inline
-                  input(type='radio' name='kcFund' checked=fund ? (fund.money.fixed) : true)
+                  input(type='radio' name='kcFund' checked=false)
                   h5 同意
                 label.radio-inline
-                  input(type='radio' name='kcFund' checked=fund ? (!fund.money.fixed) : false)
+                  input(type='radio' name='kcFund' checked=true)
                   h5 不同意
             br
             hr
@@ -37,10 +37,10 @@ block content
             .row
               .col-xs-12.col-md-12
                 label.radio-inline
-                  input(type='radio' name='fund' checked=fund ? (fund.money.fixed) : true)
+                  input(type='radio' name='fund' checked=false)
                   h5 同意
                 label.radio-inline
-                  input(type='radio' name='fund' checked=fund ? (!fund.money.fixed) : false)
+                  input(type='radio' name='fund' checked=true)
                   h5 不同意
             br
             hr

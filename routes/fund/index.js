@@ -22,22 +22,44 @@ fundRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const queryOfApplying = {
-
+    	disabled: false,
+	    useless: null,
+			'status.submitted': true,
+	    'status.adminSupport': {$ne: true}
     };
-    const queryOfBeingFunded = {
-
+    const queryOfFunding = {
+	    disabled: false,
+			'status.adminSupport': true,
+	    'status.completed': {$ne: true}
     };
     const queryOfExcellent = {
-
+	    disabled: false,
+			'status.excellent': true
     };
 
-    const applications = {};
-    applications.applying = await db.FundApplicationFormModel.find(queryOfApplying);
-    applications.beingFunded = await db.FundApplicationFormModel.find(queryOfBeingFunded);
-    applications.excellent = await db.FundApplicationFormModel.find(queryOfExcellent);
-    data.applications = applications;
+    const applying = await db.FundApplicationFormModel.find(queryOfApplying).sort({toc: -1}).limit(10);
+    await Promise.all(applying.map(async a => {
+			await a.extendFund();
+			await a.extendApplicant();
+			await a.extendProject();
+    }));
+    const funding = await db.FundApplicationFormModel.find(queryOfFunding).sort({toc: -1}).limit(10);
+    await Promise.all(funding.map(async a => {
+			await a.extendFund();
+	    await a.extendApplicant();
+	    await a.extendProject();
+    }));
+    const excellent = await db.FundApplicationFormModel.find(queryOfExcellent).sort({toc: 1});
+    await Promise.all(excellent.map(async a => {
+    	await a.extendFund();
+	    await a.extendApplicant();
+	    await a.extendProject();
+    }));
+    data.applying = applying;
+    data.funding = funding;
+    data.excellent = excellent;
 		data.home = true;
-    data.fundList = await db.FundModel.find({display: true}).sort({toc: 1});
+    data.funds = await db.FundModel.find({display: true}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';
     await next();
   })

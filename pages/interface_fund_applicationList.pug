@@ -50,8 +50,8 @@ else
         //else if !adminSupport
         //  th 审核中
       -for (let applicationForm of applicationForms)
-        -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport} = applicationForm;
-        -let money = fund.money.fixed;
+        -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
+        -let money = fund?fund.money.fixed: data.fund.money.fixed;
         if !money
           -money = 0;
           if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length !== 0
@@ -62,7 +62,7 @@ else
           th= applicationForm.code || '暂无'
           th= applicationFormStatus(applicationForm).str
           th= toc.toLocaleString()
-          th= fund.name
+          th= fund?fund.name: data.fund.name
           th= applicant.user.username
           th=`${money}元`
           th= project.t

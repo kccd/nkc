@@ -11,9 +11,12 @@ auditRouter
 		if(type === 'project') {
 			data.nav = '项目审查员审核';
 			const {certs, appointed} = fund.censor;
-			for(let cert of certs) { // 不合理的证书判断
-				if(!user.certs.includes(cert) && !appointed.includes(user.uid)) ctx.throw(401, '权限不足');
+			let isCensor = false;
+			for(let cert of certs) {
+				if(user.certs.includes(cert)) isCensor = true;
 			}
+			if(appointed.includes(user.uid)) isCensor = true;
+			if(!isCensor) ctx.throw(401, '权限不足');
 			if(applicationForm.status.projectPassed !== null) ctx.throw(400, '抱歉！该申请表已被其他审查员审核了。');
 			if(!applicationForm.status.submitted || !applicationForm.lock.submitted) ctx.throw(400, '申请表暂未提交。');
 			const {auditing, uid, timeToOpen, timeToClose} = lock;
@@ -62,10 +65,12 @@ auditRouter
 		lock.auditing = false;
 		let support = true;
 		if(type === 'project') { // 专家审核
-			for(let cert of certs) { // 不合理的证书判断
-				if(!user.certs.includes(cert) && !appointed.includes(user.uid)) ctx.throw(401, '权限不足');
+			let isCensor = false;
+			for(let cert of certs) {
+				if(user.certs.includes(cert)) isCensor = true;
 			}
-			if(applicationForm.status.projectPassed !== null) ctx.throw(400, '抱歉！该申请表已被其他审查员审核了。');
+			if(appointed.includes(user.uid)) isCensor = true;
+			if(!isCensor) ctx.throw(401, '权限不足');
 			if(!applicationForm.status.submitted) ctx.throw(400, '申请表暂未提交。');
 			const {uid} = lock;
 			if(user.uid !== uid) {
