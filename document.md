@@ -1,5 +1,5 @@
 #### 整体结构
-![github.com/kccd/nkc/blob/master/document.png]()
+![github.com/kccd/nkc/raw/master/document.png]()
 
 #### 规范
 
