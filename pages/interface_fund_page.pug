@@ -27,7 +27,6 @@ if pageCount > 1
       -max = pageCount - 1;
   nav(aria-label='navigation')
     ul.pagination.pagination-sm(style='margin: 0')
-      -console.log(min, max)
       if min !== 0
         li
           a(href=`${url}?page=${0}${skipId}`)= `首`

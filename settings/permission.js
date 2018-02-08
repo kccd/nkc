@@ -450,8 +450,7 @@ const certificates ={
 				      [GET]: true // 填写申请信息页面
 			      },
 			      bills: {// 基金项目的账单
-			      	[GET]: true,
-				      [POST]: true
+			      	[GET]: true
 			      }
 		      }
 	      },
@@ -497,6 +496,13 @@ const certificates ={
 				      [name]: '结项',
         			[GET]: true,
 				      [POST]: true
+			      },
+			      remittance: {
+        			apply: {
+        				[name]: '申请拨款',
+				        [GET]: true,
+				        [POST]: true
+			        }
 			      }
 		      }
 	      },
@@ -821,6 +827,15 @@ const certificates ={
 			      [PATCH]: true, // 修改基金项目
 			      settings: {
 				      [GET]: true // 基金设置
+			      },
+			      bills: {
+			      	[name]: '基金账单',
+				      [POST]: true,
+							[parameter]: {
+			      		[GET]: true,
+								[PATCH]: true,
+								[DELETE]: true
+							}
 			      }
 		      }
 	      },
@@ -844,8 +859,15 @@ const certificates ={
 			        }
 		        }
 	        }
+	      },
+				history: {
+        	[name]: '历史基金',
+					[GET]: true
+				},
+	      disabled: {
+        	[name]: '被屏蔽的基金',
+		      [GET]: true
 	      }
-
       },
 	    auth: {
 		    [name]: '身份认证',

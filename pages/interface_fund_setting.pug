@@ -67,6 +67,11 @@ block content
                 textarea.form-control#detailedDescription(type="text" placeholder="基金补充说明" rows=15)=fund ? fund.description.detailed : ''
             .fund-setting-list
               .col-xs-12.col-md-2
+                h5 条款
+              .col-xs-12.col-md-5
+                textarea.form-control#terms(type="text" placeholder="基金条款" rows=15)=fund ? fund.description.terms : ''
+            .fund-setting-list
+              .col-xs-12.col-md-2
                 h5 banner背景颜色
               .col-xs-12.col-md-2
                 input.form-control#fundColor(type="text" placeholder="默认为 #7f9eb2" value=fund?fund.color: '')
@@ -304,5 +309,4 @@ block content
     br
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_fund_common.js')
   script(src='/interface_fund_setting.js')

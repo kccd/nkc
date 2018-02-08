@@ -37,6 +37,17 @@ meRouter
 			await a.extendFund();
 			await a.extendProject()
 		}));
+		for(let i = 0; i < applicationForms.length; i++) {
+			const a = applicationForms[i];
+			await a.extendFund();
+			if(!a.fund) {
+				applicationForms.splice(i, 1);
+				continue;
+			}
+			await a.extendMembers();
+			await a.extendApplicant();
+			await a.extendProject()
+		}
 		data.applicationForms = applicationForms;
 		data.newNotify = newNotify;
 		data.paging = paging;

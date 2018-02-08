@@ -13,6 +13,7 @@ listRouter
 	// 添加基金项目
 	.post('/', async (ctx, next) => {
 		const {data, db} = ctx;
+		const {user} = data;
 		const {fundObj} = ctx.body;
 		fundObj.name = fundObj.name || '科创基金';
 		const fund = await db.FundModel.findOne({_id: fundObj._id});
@@ -20,6 +21,14 @@ listRouter
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
+		const newBill = db.FundBillModel({
+			fundId: newFund._id,
+			changed: newFund.money.initial,
+			uid: user.uid,
+			notes: '基金初始金额',
+			abstract: '初始'
+		});
+		await newBill.save();
 		data.fund = newFund;
 		await next();
 	})
@@ -48,10 +57,12 @@ listRouter
 		const fund = await db.FundModel.findOnly({_id: fundId, disabled: false});
 		data.fund = fund;
 		let query = {
-			disabled: false,
 			'status.submitted': true,
 			fundId: fund._id
 		};
+		if(data.userLevel < 7) {
+			query.disabled = false;
+		}
 		if(type === 'excellent') { // 优秀项目
 			query['status.excellent'] = true;
 		} else if(type === 'completed'){ // 已完成
@@ -141,7 +152,6 @@ listRouter
 			mobile: userPersonal.mobile? userPersonal.mobile: null,
 			uid: user.uid,
 			authLevel,
-
 		});
 		await newApplicationUser.save();
 		ctx.redirect(`/fund/a/${applicationForm._id}/settings`, 301);

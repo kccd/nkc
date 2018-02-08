@@ -32,7 +32,7 @@ auditRouter
 			data.nav = '管理员复核';
 			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
 			if(applicationForm.status.adminSupport !== null) ctx.throw(400, '抱歉！该申请表已被其他管理员复核了。');
-			if(!applicationForm.status.projectPassed) ctx.throw(400, '项目审核暂未通过，请等待。');
+			if(!applicationForm.status.projectPassed) ctx.throw(400, '专家审核暂未通过，请等待。');
 			const {auditing, uid, timeToOpen, timeToClose} = lock;
 			const {timeOfAudit} = ctx.settings.fund;
 			if(!auditing || (Date.now - timeToOpen) > timeOfAudit) { // 没有人正在审核或审核超时
@@ -61,7 +61,7 @@ auditRouter
 		lock.timeToClose = Date.now();
 		lock.auditing = false;
 		let support = true;
-		if(type === 'project') { // 项目审核
+		if(type === 'project') { // 专家审核
 			for(let cert of certs) { // 不合理的证书判断
 				if(!user.certs.includes(cert) && !appointed.includes(user.uid)) ctx.throw(401, '权限不足');
 			}
@@ -86,25 +86,27 @@ auditRouter
 				await newDocument.save();
 			}));
 			applicationForm.status.projectPassed = support;
-			if(support) {
-				//添加项目审查员的预算建议
-				if(!fixedMoney) {
-					if(budgetMoney.length !== suggestMoney.length) ctx.throw(400, '建议金额个数不匹配。');
-					let total = 0;
-					let suggest = 0;
-					for(let i = 0; i < suggestMoney.length; i++) { //就预算金额，项目审查员给管理员的建议
-						const m = suggestMoney[i];
-						total += budgetMoney[i].money;
-						suggest += m;
-						budgetMoney[i].suggest = m;
-					}
-					if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
-					await applicationForm.update({budgetMoney});
+			//添加项目审查员的预算建议
+			if(!fixedMoney) {
+				if(budgetMoney.length !== suggestMoney.length) ctx.throw(400, '建议金额个数不匹配。');
+				let total = 0;
+				let suggest = 0;
+				for(let i = 0; i < suggestMoney.length; i++) { //就预算金额，项目审查员给管理员的建议
+					const m = suggestMoney[i];
+					total += budgetMoney[i].money;
+					suggest += m;
+					budgetMoney[i].suggest = m;
 				}
+				if(support) {
+					if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
+				} else {
+					applicationForm.lock.submitted = false;
+				}
+				await applicationForm.update({budgetMoney});
 			}
 		} else if(type === 'admin') {// 最后管理员复核
 			if(data.userLevel < 7) ctx.throw(401, '抱歉！您没有管理员的权限。');
-			if(!applicationForm.status.projectPassed) ctx.throw(400, '项目审核暂未通过，请等待。');
+			if(!applicationForm.status.projectPassed) ctx.throw(400, '专家审核暂未通过，请等待。');
 			const {uid} = lock;
 			if(user.uid !== uid) {
 				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他管理员复核。');
@@ -142,6 +144,8 @@ auditRouter
 					if(total*0.8 > fact) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
 					await applicationForm.update({budgetMoney});
 				}
+			} else {
+				applicationForm.lock.submitted = false;
 			}
 			const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({

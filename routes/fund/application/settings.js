@@ -7,6 +7,8 @@ settingsRouter
 		data.nav = '填写申请表';
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.useless === 'delete') ctx.throw(401, '抱歉！该申请表已被删除。');
+		if(applicationForm.lock.submitted) ctx.throw(401, '抱歉！申请表已提交暂不能修改。');
 		const {status} = applicationForm;
 		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
 		if(status.adminSupport) ctx.throw(400, '管理员复核已通过，无法修改申请表。');

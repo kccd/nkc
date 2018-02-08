@@ -83,7 +83,8 @@ const fundApplicationFormSchema = new Schema({
   projectCycle: { // 预计周期
 	  type: Number,
 	  default: null,
-	  index: 1
+	  index: 1,
+	  min: [1, '预计周期不能小于1']
   },
   threadsId: {
   	applying: {// 申请时附带的帖子
@@ -112,8 +113,19 @@ const fundApplicationFormSchema = new Schema({
     },
     number: {
       type: String,
-      default: null
-    }
+      default: null,
+	    maxlength: [30, '收款账号位数超过限制']
+    },
+	  name: {
+    	type: String,
+		  default: null,
+		  maxlength: [10, '户名字数超过限制']
+	  },
+	  bankName: {
+    	type: String,
+		  default: null,
+		  maxlength: [10, '银行全称字数超过限制']
+	  }
   },
   projectId: {
     type: Number,
@@ -130,7 +142,7 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
-    projectPassed: { // 项目审核通过
+    projectPassed: { // 专家审核通过
       type:Boolean,
       default: null,
       index: 1
@@ -326,7 +338,7 @@ fundApplicationFormSchema.pre('save', async function(next) {
 		status.usersSupport = true;
 	}
 
-	//项目审核-机器审核
+	//专家审核-机器审核
 	if(status.usersSupport && fund.censor.appointed.length === 0 && fund.censor.certs.length === 0) {
 		status.projectPassed = true;
 	}
@@ -382,7 +394,7 @@ fundApplicationFormSchema.methods.extendForum = async function() {
 fundApplicationFormSchema.methods.extendFund = async function() {
 	const FundModel = require('./FundModel');
 	const fund = await FundModel.findOne({_id: this.fundId, disabled: false});
-	if(!fund) throw '抱歉！该基金项目已被屏蔽，所有基金申请表暂不能查看。';
+	// if(!fund) throw '抱歉！该基金项目已被屏蔽，所有基金申请表暂不能查看。';
 	return this.fund = fund;
 };
 
@@ -451,7 +463,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	// 判断申请表有效性
 	switch (useless) {
 		case 'disabled':
-			throw '申请表已被封禁。';
+			throw '申请表已被屏蔽。';
 		case 'revoked':
 			throw '申请表已被永久撤销。';
 		case 'exceededModifyCount':
@@ -538,8 +550,8 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.lock.submitted = true;
 	this.modifyCount += 1;
 	this.timeToSubmit = Date.now();
-	if(this.status.projectPassed === false) this.status.projectPassed = null;
-	if(this.status.adminSupport === false) this.status.adminSupport = null;
+	this.status.projectPassed = null;
+	this.status.adminSupport = null;
 	//存历史
 	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});
 	const newObj = oldApplicationForm.toObject();

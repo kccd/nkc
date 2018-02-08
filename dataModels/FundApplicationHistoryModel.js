@@ -45,6 +45,10 @@ const fundApplicationHistorySchema = new Schema({
 		type: Date,
 		default: null
 	},
+	timeOfCompleted: {
+		type: Date,
+		default: null
+	},
 	tlm: {
 		type: Date
 	},
@@ -109,7 +113,15 @@ const fundApplicationHistorySchema = new Schema({
 			default: null
 		},
 		number: {
-			type: Number,
+			type: String,
+			default: null
+		},
+		name: {
+			type: String,
+			default: null
+		},
+		bankName: {
+			type: String,
 			default: null
 		}
 	},
@@ -133,7 +145,7 @@ const fundApplicationHistorySchema = new Schema({
 			type: Boolean,
 			default: null
 		},
-		projectPassed: { // 项目审核通过
+		projectPassed: { // 专家审核通过
 			type:Boolean,
 			default: null
 		},
@@ -173,6 +185,11 @@ const fundApplicationHistorySchema = new Schema({
 	reportNeedThreads: {
 		type: Boolean,
 		default: false
+	},
+	category: {
+		type: String,
+		default: null,
+		index: 1
 	},
 	lock: {
 		submitted: { // 用于判断用户当前申请表是否已提交

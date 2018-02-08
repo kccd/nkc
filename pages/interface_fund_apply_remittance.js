@@ -1,22 +1,4 @@
 var selectedThreads = [];
-
-function submit(id) {
-	var content = $('#content').val();
-	if(!content) return screenTopWarning('内容不能为空。');
-	var obj = {
-		c: content,
-	};
-	nkcAPI('/fund/a/'+id+'/report', 'POST', obj)
-		.then(function() {
-			window.location.reload();
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
-}
-
-
-
 function getThreads(page, self) {
 	var url;
 	if(page !== undefined) {
@@ -32,7 +14,7 @@ function getThreads(page, self) {
 		url = '/t?'+page+'from=applicationForm&self=true';
 	}
 	var html = '<div class="blank blank-selectedThread">搜索中...</div>';
-	$('.unselectedThreads').html(html)
+	$('.unselectedThreads').html(html);
 	nkcAPI(url, 'GET', {})
 		.then(function(data) {
 			tempThreads = data.threads;
@@ -229,30 +211,3 @@ function submitReport(id) {
 			screenTopWarning(data.error);
 		})
 }
-
-
-function submittedReportAudit(support, id, number) {
-	var content = $('#content').val();
-	var obj = {number: number};
-	if(support === false) {
-		obj.support = false;
-		if(!content) return screenTopWarning('请输入审核意见。');
-	} else {
-		obj.support = true;
-	}
-	obj.c = content;
-	nkcAPI('/fund/a/'+id+'/report/audit', 'POST', obj)
-		.then(function() {
-			screenTopAlert('提交成功。');
-			if(obj.support) {
-				window.location.href = '/fund/a/'+id;
-			}else {
-				setTimeout(function() {
-					window.location.href = '/fund/a/'+id;
-				}, 1200)
-			}
-		})
-		.catch(function(data){
-			screenTopWarning(data.error);
-		})
-};

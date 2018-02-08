@@ -16,6 +16,7 @@ fundRouter
 			}
 		}));
 		data.fundNotify = newNotify;
+		data.navbar_highlight = 'fund';
 		await next();
 	})
   .get('/', async (ctx, next) => {

@@ -377,6 +377,7 @@ function submit(id) {
   fundObj.censor.appointed = $('#fundCensorAppointed').val() || undefined;
   fundObj.description.brief = $('#briefDescription').val() || undefined;
   fundObj.description.detailed = $('#detailedDescription').val() || undefined;
+  fundObj.description.terms = $('#terms').val() || undefined;
   fundObj._id = $('#fundId').val() || undefined;
   if(fundObj._id === '') return screenTopWarning('基金编号不能为空！');
   if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成！');

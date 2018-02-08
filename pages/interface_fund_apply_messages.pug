@@ -8,6 +8,8 @@
 
       hr
       .h4 申请人信息
+      if applicationForm.status.projectPassed === false && data.auditComments
+        p.redFontColor= `审核意见：` + data.auditComments.userInfoAudit.c
       br
       .row
         .col-xs-12.col-md-6
@@ -15,17 +17,22 @@
             a(href=`/m/${applicationForm.applicant.uid}` target="_blank")= applicationForm.applicant.user.username
           h5=`真实姓名：${applicationForm.applicant.name || '暂未输入'}`
           if applicationForm.applicant.idCardNumber
-            h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
-            h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
-            -let paymentType;
-            if applicationForm.account.paymentType === 'alipay'
-              -paymentType = '支付宝';
-            else if applicationForm.account.paymentType === 'bankCard'
-              -paymentType = '银行卡';
-            else
-              -paymentType = '暂未选择';
-            h5= `收款方式：${paymentType}`
-            h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
+            div(style='border: 1px solid #ddd;padding: 0 0.5rem;background-color: #eee;')
+              p.text-center 仅自己和审查员可见
+              h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
+              h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
+              -let paymentType;
+              if applicationForm.account.paymentType === 'alipay'
+                -paymentType = '支付宝';
+              else if applicationForm.account.paymentType === 'bankCard'
+                -paymentType = '银行卡';
+              else
+                -paymentType = '暂未选择';
+              h5= `收款方式：${paymentType}`
+              if paymentType === '银行卡'
+                h5= `银行全称：${applicationForm.account.bankName || '暂未填写'}`
+                h5= `户名：${applicationForm.account.name || '暂未填写'}`
+              h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
           h5= `自我介绍：${applicationForm.applicant.description || '暂未填写'}`
           if applicationForm.from === 'team'
             h5= `申请方式：团队`
@@ -48,8 +55,42 @@
             -for (let p of applicationForm.applicant.lifePhotos)
               a(href=`/photo/${p._id}` target='_blank')
                 img(src=`/photo_small/${p._id}` style='margin: 0.2rem;')
+        .col-xs-12.col-md-12
+          if fund.thread.count > 0
+            h5= `申请人曾今的技术帖：`
+            if applicationForm.threads.applying.length === 0
+              span 暂未填写
+            else
+              .selectedThreads
+                -const disagreeUsers = [];
+                -const notModifiedUsers = [];
+                -for(let u of applicationForm.members)
+                  if u.agree === false
+                    -disagreeUsers.push(u.uid);
+                  if u.agree === null
+                    -notModifiedUsers.push(u.uid);
+                -for(let i = 0; i < applicationForm.threads.applying.length; i++)
+                  -const thread = applicationForm.threads.applying[i];
+                  -const firstPost = thread.firstPost;
+                  -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+                  -postString = JSON.stringify(postString);
+                  .threadList
+                    .col-xs-10.col-md-10
+                      .displayNone.postString= postString
+                      span 文号：
+                      span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                      a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                      if notModifiedUsers.includes(thread.uid)
+                        span(style='color: #aaa;') （未处理邀请）
+                      if disagreeUsers.includes(thread.uid)
+                        span.redFontColor （已拒绝邀请）
+                      span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                      br
+                      a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
       hr
       .h4 项目信息
+      if applicationForm.status.projectPassed === false && data.auditComments
+        p.redFontColor= `审核意见：` + data.auditComments.projectAudit.c
       br
       .h3.text-center= applicationForm.project?applicationForm.project.t: '项目标题暂未填写'
       br
@@ -59,6 +100,8 @@
         div!= experimental_render(applicationForm.project)
       hr
       .h4 其他信息
+      if applicationForm.status.projectPassed === false && data.auditComments
+        p.redFontColor= `审核意见：` + data.auditComments.moneyAudit.c
       br
       h5= `学术分类：${applicationForm.forum? applicationForm.forum.displayName: '暂未选择'}`
       h5= `研究周期：${applicationForm.projectCycle?applicationForm.projectCycle+"天": '暂未填写'}`
@@ -137,36 +180,5 @@
               span=`，项目审查员建议：${suggest}元`
             if fact
               span=`，管理员批准：${fact}元`
-      if fund.thread.count > 0
-        h5= `申请人曾今的科技活动帖：`
-        if applicationForm.threads.applying.length === 0
-          span 暂未填写
-        else
-          .selectedThreads
-            -const disagreeUsers = [];
-            -const notModifiedUsers = [];
-            -for(let u of applicationForm.members)
-              if u.agree === false
-                -disagreeUsers.push(u.uid);
-              if u.agree === null
-                -notModifiedUsers.push(u.uid);
-            -for(let i = 0; i < applicationForm.threads.applying.length; i++)
-              -const thread = applicationForm.threads.applying[i];
-              -const firstPost = thread.firstPost;
-              -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
-              -postString = JSON.stringify(postString);
-              .threadList
-                .col-xs-10.col-md-10
-                  .displayNone.postString= postString
-                  span 文号：
-                  span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                  a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
-                  if notModifiedUsers.includes(thread.uid)
-                    span(style='color: #aaa;') （未处理邀请）
-                  if disagreeUsers.includes(thread.uid)
-                    span.redFontColor （已拒绝邀请）
-                  span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
-                  br
-                  a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
 
 

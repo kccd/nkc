@@ -7,6 +7,9 @@ table.table.table-striped
       th 操作者
       th 摘要
       th 备注
+      th 基金剩余（元）
+      if data.userLevel >= 7
+        th 操作
   tbody
     -for(let b of data.bills)
       tr
@@ -17,3 +20,7 @@ table.table.table-striped
           a(href=`/m/${b.user.uid}`)= b.user.username
         th= b.abstract
         th= b.notes
+        th= b.balance
+        if data.userLevel >= 7
+          th
+            a(href=`/fund/list/${fund._id}/bills/${b._id}`) 编辑

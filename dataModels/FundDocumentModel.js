@@ -42,7 +42,8 @@ const documentSchema = new Schema({
 	},
 	c: {
 		type: String,
-		default: null
+		default: null,
+		maxlength: [20000, '字数不能超过2000万字。']
 	},
 	disabled: {
 		type: Boolean,

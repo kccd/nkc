@@ -7,6 +7,7 @@ block title
   -const {authLevel} = fund.applicant;
   -const {status, members, project, budgetMoney, projectCycle, threads, fixedMoney} = applicationForm;
   -const {submitted} = status;
+  -let disabledSubmit = false;
   -let aggregate = 0;
   title= `${fund.name} - 科创基金`
   link(rel='stylesheet' href='/fund.css')
@@ -77,29 +78,103 @@ block content
             else if s === 2 && chooseType !== null
               -const applicant = applicationForm.applicant || {};
               -const options = {name: applicant.name, idCardNumber: applicant.idCardNumber, description: applicant.description, mobile: applicant.mobile, members: false, account: applicationForm.account};
-              include interface_fund_userMessagesForm
+              //include interface_fund_userMessagesForm
+              .row(style='padding: 0.5rem 0;')
+                .col-xs-12.col-md-4.col-md-offset-4
+                  .row(style='padding: 3rem 0;')
+                    .col-xs-12.col-md-12
+                      span 真实姓名（将公开展示）：
+                      input.fund-input#name(placeholder='请输入您的真实姓名' autofocus='true' value=options.name || '')
+                    .col-xs-12.col-md-12
+                      span 身份证号（仅自己和审查员可见）：
+                      input.fund-input#idCardNumber(placeholder='请输入您的身份证号码' value=options.idCardNumber || '')
+                    .col-xs-12.col-md-12
+                      span 联系电话（仅自己和审查员可见）：
+                      input.fund-input#mobile(placeholder='请输入您的电话号码' value=options.mobile || '')
+                    if !options.members
+                      .col-xs-12.col-md-12
+                        span 收款方式（仅自己和审查员可见）：
+                        p(style='color:#aaa;') 推荐使用支付宝，到账更快
+                        .paymenMethods
+                          div &nbsp;
+                          //div 微信
+                          //  .pay.wechat(class=options.account.paymentType === 'wechat'? 'active': '')
+                          div 支付宝
+                            .pay.alipay(class=options.account.paymentType === 'alipay' ? 'active' : '')
+                          div 银行卡
+                            .pay.bankCard(class=options.account.paymentType === 'bankCard' ? 'active' : '')
+                      .col-xs-12.col-md-12#bankName(style=`display: ${options.account.paymentType === 'bankCard' ? 'block' : 'none'}`)
+                        span 银行全称（仅自己和审查员可见）：
+                        input.fund-input(placeholder='请输入银行全称' value=options.account.bankName || '')
+                      .col-xs-12.col-md-12#bankCardName(style=`display: ${options.account.paymentType === 'bankCard' ? 'block' : 'none'}`)
+                        span 户名（仅自己和审查员可见）：
+                        input.fund-input(placeholder='请输入户名' value=options.account.name || '')
+                      .col-xs-12.col-md-12
+                        span 收款账号（仅自己和审查员可见）：
+                        input.fund-input#account(placeholder='请输入收款账号' value=options.account.number || '')
+                    .col-xs-12.col-md-12
+                      span 自我介绍（将公开展示）：
+                      p.fund-description 1、简要的介绍自己，重点是科技爱好活动的经历。如果您是学生，建议说明您的年级、专业。
+                      p.fund-description 2、用自己的话简单介绍您的项目所属的科技领域，便于网友了解项目的背景知识。
+                      textarea.fund-textarea#description(placeholder='介绍一下自己')!= options.description || ''
+                    .col-xs-12.col-md-12
+                      h4 添加生活照（将公开展示）
+                      if data.lifePhotos.length === 0 && applicant.lifePhotos.length === 0
+                        span.fund-span.transparent(style="margin-left: 0;" onclick='window.location.href="/set/album"') 未上传生活照，去上传
+                      span.fund-span.transparent(style="margin-left: 0;" onclick='displayPopupPanel()') 选择生活照
+                    .col-xs-12.col-md-12
+                      if applicant.lifePhotos.length === 0
+                        span 暂未选择生活照
+                      else
+                        span 已选择生活照
+                      .photo-selected
+                        .row
+                          -for(let i = 0; i < applicant.lifePhotos.length; i++)
+                            -const photo = applicant.lifePhotos[i];
+                            .col-xs-12.col-md-4.photo-content
+                              .glyphicon.glyphicon-remove.delete-photo(onclick=`removePhoto(${photo._id})`)
+                              img(src= `/photo_small/${photo._id}` photoId=photo._id )
+                    .popupPanel.disabled
+                      .popupPanel-body
+                        .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
+                        .popupPanel-title 选择生活照
+                        span 至少选择一张
+                        .popupPanel-content
+                          .fund-photo-list
+                            if data.lifePhotos.length === 0
+                              br
+                              h4.text-center 未上传任何照片
+                                a(href="/set/album" target="_blank") 去上传
+                            else
+                              -for (let i = 0; i < data.lifePhotos.length; i++)
+                                -let photo = data.lifePhotos[i];
+                                .col-xs-12.col-md-4
+                                  img(photoId=photo._id src=`/photo_small/${photo._id}` onclick=`selectLifePhoto(${photo._id})`)
             else if s === 3 && inputApplicantMessages !== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
                   br
-                  h4 项目名称：
-                  -let title = '暂未填写', content = '暂未填写';
                   if project
                     -title = project.t;
                     -content = project.c;
-                  h3#projectTitle.text-center!= title
-                  br
-                  h4 项目内容：
-                  //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
-                  div#projectContent!= project && project.c? experimental_render(project): content
-                  //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
-                  br
-                  br
-                  br
-                  button.btn.btn-default.center-block(onclick=`toEditor()` style='width: ') 去编辑器填写
-                  //span &nbsp;&nbsp;
-                  //span.autoSaveTime#saveTime 0秒
-                  //span.autoSaveTime 后自动保存
+                    h4 项目名称：
+                    h3#projectTitle.text-center!= title
+                    br
+                    h4 项目内容：
+                    //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
+                    div#projectContent!= project && project.c? experimental_render(project): content
+                    //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
+                    br
+                    br
+                    br
+                    button.btn.btn-default.center-block(onclick=`toEditor()` style='width: ') 去编辑器填写
+                    //span &nbsp;&nbsp;
+                    //span.autoSaveTime#saveTime 0秒
+                    //span.autoSaveTime 后自动保存
+                  else
+                    br
+                    button.btn.btn-default.center-block(onclick=`toEditor()` style='width: ') 去编辑器填写
+                    br
             else if s === 4 && inputProject!== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
@@ -227,7 +302,6 @@ block content
                   p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的帖子中移除这些好友的帖子。
                   br
                   br
-                  -let disabledSubmit = false;
                   -let n = 0;
 
                   mixin ds(text)
@@ -235,7 +309,7 @@ block content
                     -disabledSubmit = true;
                     if n === 1
                       br
-                      h4.text-center 存在下列问题，请补充完善。
+                      h4 存在下列问题，请补充完善。
                     h5.redFontColor= `${n}、${text}`
                   -const difference = fund.modifyCount - applicationForm.modifyCount;
                   h3= `当前剩余修改次数: ${difference}`
@@ -308,36 +382,42 @@ block content
                     +ds('未选择学科分类。')
                   if !disabledSubmit
                     h3.greenFontColor 信息录入完整,可提交申请！
-              hr
-              .col-xs-12.col-md-2.col-md-offset-5
-                if disabledSubmit
-                  button.btn.btn-block(style='width: 100%;' onclick='screenTopWarning("条件不满足，无法提交")' disabled="disabled") 提交申请
-                else
-                  button.btn.btn-block.btn-info(style='width: 100%;' onclick='submitApplicationForm()') 提交申请
-              if !applicationForm.status.submitted
-                .col-xs-12.col-md-2.col-md-offset-5
-                  br
-                  button.btn.btn-danger.btn-block(onclick=`deleteApplicationForm(${applicationForm._id})`) 删除申请表
+
             -let funSave, funNext;
-            if s !== 5
-              if s === 1
-                -funSave = `saveApplicationMethod()`;
-                -funNext = `submitApplicationMethod()`;
-              if s === 2
-                -funSave = `saveApplicantMessages()`;
-                -funNext = `submitApplicantMessages()`;
-              if s === 3
-                -funSave = `saveProject()`;
-                -funNext = `submitProject()`;
-              if s === 4
-                -funSave = `saveOtherMessages()`;
-                -funNext = `submitOtherMessages()`;
-              hr
-              .col-xs-12.col-md-2.col-md-offset-5
-                button.btn.btn-info.btn-block(style='width: 100%;' onclick=funSave) 暂存
-                br
-              .col-xs-12.col-md-2.col-md-offset-5
-                button.btn.btn-info.btn-block(style='width: 100%;' onclick=funNext) 下一步
+            if s === 1
+              -funSave = `saveApplicationMethod()`;
+              -funNext = `submitApplicationMethod`;
+            if s === 2
+              -funSave = `saveApplicantMessages()`;
+              -funNext = `submitApplicantMessages`;
+            if s === 3
+              -funSave = `saveProject()`;
+              -funNext = `submitProject`;
+            if s === 4
+              -funSave = `saveOtherMessages()`;
+              -funNext = `submitOtherMessages`;
+            if s === 5
+              -funNext = `back`;
+            hr
+            //.col-xs-12.col-md-2.col-md-offset-5
+            //  button.btn.btn-info.btn-block(style='width: 100%;' onclick=funSave) 暂存
+            //  br
+            //.col-xs-12.col-md-2.col-md-offset-5
+            //  button.btn.btn-info.btn-block(style='width: 100%;' onclick=funNext) 下一步
+            .col-xs-12.col-md-4.col-md-offset-4.text-center
+              if s > 1
+                button.btn.btn-info(onclick=`${funNext}("last")`) &nbsp;&nbsp;上一步&nbsp;&nbsp;
+              if s < 5
+                button.btn.btn-info(onclick=`${funNext}()`) &nbsp;&nbsp;下一步&nbsp;&nbsp;
+              if s !== 5
+                button.btn.btn-info(onclick=funSave) &nbsp;&nbsp;暂存&nbsp;&nbsp;
+              else
+                if disabledSubmit
+                  button.btn.btn-info(onclick='screenTopWarning("条件不满足，无法提交")' disabled="disabled") 提交申请
+                else
+                  button.btn.btn-info(onclick='submitApplicationForm()') 提交申请
+              if !applicationForm.status.submitted
+                button.btn.btn-danger(onclick=`deleteApplicationForm(${applicationForm._id})`) &nbsp;&nbsp;删除&nbsp;&nbsp;
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_apply.js')

@@ -42,7 +42,7 @@ remittanceRouter
 					fundId: fund._id,
 					changed: -1*r.money,
 					toc: time,
-					notes: `项目${applicationForm.code}第${i+1}期拨款，拨款金额${r.money}元`,
+					notes: `项目${applicationForm.code}第${i+1}期拨款${r.money}元`,
 					abstract: '拨款'
 				});
 				await newFundBill.save();
@@ -54,7 +54,14 @@ remittanceRouter
 			obj['status.remittance'] = true;
 		}
 		await applicationForm.update(obj);
-		ctx.print('remittance', applicationForm.remittance);
+		await next();
+	})
+	.get('/apply', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {applicationForm, user} = data;
+		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
+		ctx.template = 'interface_fund_apply_remittance.pug';
+		data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
 		await next();
 	});
 module.exports = remittanceRouter;

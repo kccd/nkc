@@ -8,10 +8,10 @@ reportRouter
 	})
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		const {user, applicationForm} = data;
+		const {applicationForm} = data;
 		ctx.template = 'interface_fund_report.pug';
 		data.reports = await db.FundDocumentModel.find({type: 'report', applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
-		data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
+
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -69,9 +69,15 @@ reportRouter
 	.get('/audit', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.type = 'reportAudit';
-		const {userLevel, applicationForm} = data;
-		const {remittance, reportNeedThreads, submittedReport} = applicationForm;
-		if(userLevel < 7) ctx.throw('权限不足');
+		const {user, applicationForm} = data;
+		const {remittance, reportNeedThreads, submittedReport, fund} = applicationForm;
+		const {certs, appointed} = fund.censor;
+		let isCensor = false;
+		for(let c of certs) {
+			if(user.certs.includes(c)) isCensor = true;
+		}
+		if(appointed.includes(user.uid)) isCensor = true;
+		if(!isCensor) ctx.throw(401, '权限不足');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
 		if(reportNeedThreads) {
 			for(let r of remittance) {
@@ -92,7 +98,14 @@ reportRouter
 	.post('/audit', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
-		const {submittedReport, remittance} = applicationForm;
+		const {submittedReport, remittance, fund} = applicationForm;
+		const {certs, appointed} = fund.censor;
+		let isCensor = false;
+		for(let c of certs) {
+			if(user.certs.includes(c)) isCensor = true;
+		}
+		if(appointed.includes(user.uid)) isCensor = true;
+		if(!isCensor) ctx.throw(401, '权限不足');
 		const {number, support, c} = body;
 		if(!number) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');

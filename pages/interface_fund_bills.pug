@@ -32,10 +32,7 @@ block content
             .row
               .col-xs-12.col-md-12
                 h4.text-center 剩余金额
-                -let difference = 0;
-                -for(let b of bills)
-                  -difference += b.changed;
-                h2.text-center(style='color:#ff7979;')= `￥${fund.money.initial + difference}`
+                h2.text-center(style='color:#ff7979;')= `￥${data.balance}`
         if data.userLevel >= 7
           .panel.panel-default
             .panel-body

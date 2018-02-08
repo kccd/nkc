@@ -137,14 +137,17 @@ applicationRouter
 		const {useless, newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId, category} = body;
 		data.s = s;
 		const {applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被管理员封禁。');
+		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		if(useless === 'giveUp') {
 			ctx.throw(400, '抱歉！您已放弃此次申请。');
 		} else if(useless === 'exceededModifyCount') {
 			ctx.throw(400, '抱歉！申请表已超出最大修改次数。');
+		} else if(useless === 'delete') {
+			ctx.throw(401, '抱歉！该申请表已被删除。');
 		}
 		const {_id} = params;
 		if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
+		if(applicationForm.lock.submitted) ctx.throw(401, '抱歉！申请表已提交暂不能修改。');
 		const fund = applicationForm.fund;
 		try {
 			await fund.ensureUserPermission(user);
@@ -251,7 +254,7 @@ applicationRouter
 		// 填写项目信息
 		if(s === 3) {
 			if(applicationForm.status.projectPassed === true) {
-				ctx.throw(400, '项目审核已通过，无法修改。');
+				ctx.throw(400, '专家审核已通过，无法修改。');
 			}
 			if(applicationForm.projectId === null){
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
@@ -337,8 +340,15 @@ applicationRouter
 	//屏蔽敏感信息
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
+		const {user} = data;
 		const {applicationForm} = data;
-		if(applicationForm && data.userLevel < 7) {
+		const {fund} = applicationForm;
+		let isCensor = false;
+		for(let c of fund.censor.certs) {
+			if(user.certs.includes(c)) isCensor = true;
+		}
+		if(fund.censor.appointed.includes(user.uid)) isCensor = true;
+		if(applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !isCensor) {
 			const {applicant, members} = applicationForm;
 			applicant.mobile = null;
 			applicant.idCardNumber = null;

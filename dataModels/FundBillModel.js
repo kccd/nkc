@@ -2,7 +2,10 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundBillSchema = new Schema({
-	_id: String,
+	_id: {
+		type: String,
+		default: Date.now
+	},
 	fundId: {
 		type: String,
 		required: true,
@@ -29,11 +32,13 @@ const fundBillSchema = new Schema({
 	},
 	notes: {
 		type: String,
-		required: true
+		required: true,
+		maxlength: [200, '备注字数不能大于200']
 	},
 	abstract: {// 摘要
 		type: String,
-		required: true
+		required: true,
+		maxlength: [10, '摘要字数不能大于10']
 	}
 }, {
 	collection: 'fundBills',
@@ -58,6 +63,15 @@ fundBillSchema.virtual('user')
 	.set(function(user) {
 		this._user = user;
 	});
+
+fundBillSchema.virtual('balance')
+	.get(function() {
+		return this._balance;
+	})
+	.set(function(balance) {
+		this._balance = balance;
+	});
+
 
 fundBillSchema.methods.extendApplicationForm = async function() {
 	if(this.applicationFormId) {

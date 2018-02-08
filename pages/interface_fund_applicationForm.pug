@@ -43,11 +43,12 @@ block content
                       if data.userLevel >= 7
                         span &nbsp;&nbsp;
                         if comment.disabled
-                          a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除封禁
+                          a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除屏蔽
                         else
-                          a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},true)`) 封禁
+                          a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},true)`) 屏蔽
                       div!= experimental_render(comment)
-
+                br
+                include interface_fund_page
         .col-xs-12.col-md-3
           -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = applicationForm.status;
           //无效的申请表
@@ -58,7 +59,7 @@ block content
             .panel.panel-default
               .panel-body.applicationForm
                 h4.text-center 废弃的项目
-                h3.text-center.redFontColor 申请表已被封禁
+                h3.text-center.redFontColor 申请表已被屏蔽
           if useless === 'giveUp'
             -displayNext = false;
             .panel.panel-default
@@ -99,10 +100,7 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    p.text-center=`项目审核不通过，等待申请人修改`
-                    p.text-center= data.auditComments.userInfoAudit.c
-                    p.text-center= data.auditComments.projectAudit.c
-                    p.text-center= data.auditComments.moneyAudit.c
+                    p.text-center=`专家审核不通过，等待申请人修改`
             if adminSupport === false
               .panel.panel-default
                 .panel-body.applicationForm
@@ -118,6 +116,8 @@ block content
               .panel.panel-default
                 .panel-body.applicationForm
                   h1.text-center.redFontColor 研究失败
+            if applicationForm.status.completed
+              -displayNext = false;
             .panel.panel-default
               .panel-body.applicationForm
                 h5.text-center 状态
@@ -131,7 +131,7 @@ block content
                           sapn.glyphicon.glyphicon-menu-down
                     +pointer(submitted, usersSupport, '提交申请')
                     +pointer(usersSupport, projectPassed, `网友支持(${fund.supportCount})`)
-                    +pointer(projectPassed, adminSupport,'项目审核')
+                    +pointer(projectPassed, adminSupport,'专家审核')
                     -const count = applicationForm.remittance.length;
                     if count > 0
                       +pointer(adminSupport, applicationForm.remittance[0].status,'管理员复核')
@@ -163,7 +163,7 @@ block content
             if data.userLevel >= 7
               -isAdmin = true;
             -let needProjectAudit = false, needAdminAudit = false;
-            // 判断是否显示项目审核按钮
+            // 判断是否显示专家审核按钮
             if isProjectCensor && usersSupport && projectPassed === null
               -needProjectAudit = true;
             //判断是否显示管理员复核按钮
@@ -182,22 +182,24 @@ block content
                     -needRemittance = true;
 
             -let needReportAudit = false;
-            if applicationForm.submittedReport
+            if applicationForm.submittedReport && isProjectCensor
               -needReportAudit = true;
 
 
 
 
             // 申请者控制面板
-            if applicationForm.uid === data.user.uid || applicationForm.status.adminAudit
+            if applicationForm.uid === data.user.uid || applicationForm.status.adminSupport
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 控制面板
                   if applicationForm.status.adminSupport
                     a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
+                    if applicationForm.uid === data.user.uid
+                      a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
                   if data.user.uid === applicationForm.applicant.uid
-                    if !applicationForm.status.adminSupport
-                      a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 编辑
+                    if !applicationForm.lock.submitted && !adminSupport
+                      a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
                     if !applicationForm.status.completed
                       if applicationForm.status.remittance
                         a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结题
@@ -210,7 +212,7 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 管理
                   if needProjectAudit
-                    a(href=`/fund/a/${applicationForm._id}/audit?type=project`).btn.btn-info.btn-block 项目审核
+                    a(href=`/fund/a/${applicationForm._id}/audit?type=project`).btn.btn-info.btn-block 专家审核
                   if needAdminAudit
                     a(href=`/fund/a/${applicationForm._id}/audit?type=admin`).btn.btn-info.btn-block 管理员复核
                   if needRemittance

@@ -29,29 +29,30 @@ const fundSchema = new Schema({
 	money: {
   	initial: {
   		type: Number,
-		  required: true,
-		  index: 1
+		  required: true
 	  },
 		fixed: {
   		type: Number,
-			default: null,
-			index: 1
+			default: null
 		},
 		max: {
 			type: Number,
-			default: null,
-			index: 1
+			default: null
 		}
 	},
   description: {
     brief: {
     	type: String,
-	    required: true
+	    required: true,
+	    maxlength: [100, '基金简介字数不能大于100']
     },
 	  detailed: {
     	type: String,
-		  required: true,
-		  index: 1
+		  required: true
+	  },
+	  terms: {
+    	type: String,
+		  required: true
 	  }
   },
 	display: {

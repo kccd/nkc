@@ -174,13 +174,21 @@ function applicationFormStatus(a) {
 		str = '退修次数超过限制';
 		color = 'red';
 	} else if(!submitted || !a.lock.submitted) {
-		str = '暂未提交';
+		if(!projectPassed) {
+			str = '专家审核不通过，等待申请人修改';
+			color = 'red';
+		} else if(!adminSupport) {
+			str = '管理员复核不通过，等待申请人修改';
+			color = 'red';
+		} else {
+			str = '暂未提交';
+		}
 	} else if(!usersSupport) {
 		str = '等待网友支持';
 	} else if(projectPassed === null) {
 		str = '等待专家审核';
 	} else if(projectPassed === false) {
-		str = '项目审核不通过，等待申请人修改';
+		str = '专家审核不通过，等待申请人修改';
 		color = 'red';
 	} else if(adminSupport === null) {
 		str = '等待管理员复核';
@@ -198,12 +206,12 @@ function applicationFormStatus(a) {
 		str = '等待拨款';
 	} else if(!completed) {
 		str = '资助中';
+	} else if(excellent) {
+		str = '优秀项目';
 	} else if(successful) {
 		str = '正常结题';
 	} else if(!successful) {
 		str = '失败结题';
-	} else if(excellent) {
-		str = '优秀项目';
 	}
 	return {str, color};
 }
