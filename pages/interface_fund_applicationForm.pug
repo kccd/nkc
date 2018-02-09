@@ -19,15 +19,19 @@ block content
           .row
             .panel.panel-default
               .panel-body
-                textarea.form-control#commentContent(rows=8 placeholder='填写评论')
-                br
-                button.btn.btn-default(onclick=`submitComment(${applicationForm._id})`) 发表
-                span &nbsp;
-                a.btn.btn-default(href=`/editor?id=${applicationForm._id}&type=application&cat=c`) 去编辑器
+                h4 发表评论
+                if !data.user
+                  h4.redFontColor 您还没有登陆，请先登陆。
+                else
+                  textarea.form-control#commentContent(rows=8 placeholder='填写评论')
+                  br
+                  button.btn.btn-default(onclick=`submitComment(${applicationForm._id})`) 发表
+                  span &nbsp;
+                  a.btn.btn-default(href=`/editor?id=${applicationForm._id}&type=application&cat=c`) 去编辑器
+                  br
+                  br
                 -const url = `/fund/a/${applicationForm._id}`;
                 -const skipId = '#comment';
-                br
-                br
                 #comment
                 include interface_fund_page
                 -for (let comment of comments)
@@ -159,7 +163,7 @@ block content
                   -isProjectCensor = true;
               // 判断是否是项目审查员
               if fund.censor.appointed.includes(data.user.uid)
-              -isProjectCensor = true;
+                -isProjectCensor = true;
             //判断是否是管理员
             if data.userLevel >= 7
               -isAdmin = true;
@@ -172,7 +176,7 @@ block content
               -needAdminAudit = true;
             //判断是否显示打款按钮
             -let needRemittance = false;
-            if adminSupport
+            if adminSupport && !completed
               -for(let i = 0; i < applicationForm.remittance.length; i++)
                 -const r = applicationForm.remittance[i];
                 if i === 0
@@ -196,15 +200,16 @@ block content
                   h5.text-center 控制面板
                   if applicationForm.status.adminSupport
                     a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
-                    if data.user && applicationForm.uid === data.user.uid
+                    if data.user && applicationForm.uid === data.user.uid && !completed
                       a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
                   if data.user && data.user.uid === applicationForm.applicant.uid
                     if !applicationForm.lock.submitted && !adminSupport
                       a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
                     if !applicationForm.status.completed
-                      if applicationForm.status.remittance
+                      if applicationForm.status.adminSupport
                         a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结题
-                      button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
+                      else
+                        button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
 
 
             //审查员控制面板

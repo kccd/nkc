@@ -115,6 +115,7 @@ applicationRouter
 		const comments = await db.FundDocumentModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(comments.map(async comment => {
 			await comment.extendUser();
+			await comment.extendResources();
 		}));
 		applicationForm.comments = comments;
 		const auditComments = {};
@@ -257,9 +258,6 @@ applicationRouter
 		}
 		// 填写项目信息
 		if(s === 3) {
-			if(applicationForm.status.projectPassed === true) {
-				ctx.throw(400, '专家审核已通过，无法修改。');
-			}
 			if(applicationForm.projectId === null){
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newDocument = db.FundDocumentModel({
@@ -296,6 +294,7 @@ applicationRouter
 		if(s === 5) {
 			if(!fund.canApply) ctx.throw(400, `抱歉！科创基金-${fund.name}已禁止提交新的基金申请。`);
 			try{
+				applicationForm.lock.submitted = true;
 				await applicationForm.ensureInformation();
 			} catch(err) {
 				ctx.throw(400, err);
@@ -312,7 +311,8 @@ applicationRouter
 		const {type, c} = query;
 		if(type === 'giveUp'){
 			if(!c) ctx.throw(400, '请输入放弃的原因。');
-			if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+			if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
+			if(applicationForm.adminSupport) ctx.throw(401, '已经通过审核的申请不能放弃，您可以点击结题按钮提前结题。');
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({
 				_id: newId,

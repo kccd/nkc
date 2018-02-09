@@ -14,7 +14,7 @@ fundRouter
 			await Promise.all(aUsers.map(async a => {
 				if(a.agree === null) {
 					const applicationForm = await db.FundApplicationFormModel.findOnly({_id: a.applicationFormId});
-					if(user.uid !== applicationForm.uid) newNotify++;
+					if(user.uid !== applicationForm.uid && applicationForm.disabled === false && applicationForm.useless === null) newNotify++;
 				}
 			}));
 		}
@@ -39,7 +39,11 @@ fundRouter
 	    disabled: false,
 			'status.excellent': true
     };
-
+		const queryOfCompleted = {
+			disabled: false,
+			'status.completed': true,
+			useless: null
+		};
     const applying = await db.FundApplicationFormModel.find(queryOfApplying).sort({toc: -1}).limit(10);
     for(let i = 0; i < applying.length; i++) {
     	const a = applying[i];
@@ -73,9 +77,21 @@ fundRouter
 		  await a.extendApplicant();
 		  await a.extendProject();
 	  }
+	  const completed = await db.FundApplicationFormModel.find(queryOfCompleted).sort({toc:1});
+	  for(let i = 0; i < completed.length; i++) {
+	  	const a = completed[i];
+		  await a.extendFund();
+		  if(!a.fund) {
+			  applying.splice(i, 1);
+			  continue;
+		  }
+		  await a.extendApplicant();
+		  await a.extendProject();
+	  }
     data.applying = applying;
     data.funding = funding;
     data.excellent = excellent;
+    data.completed = completed;
 		data.home = true;
     data.funds = await db.FundModel.find({display: true}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';

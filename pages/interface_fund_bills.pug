@@ -16,11 +16,11 @@ block content
       //        p= fund.description.brief
       .col-xs-12.col-md-9
         .panel.panel-default
-          .panel-body
+          .panel-body.table-responsive
             if bills.length === 0
               .blank 暂无数据
             else
-              -const url = `/fund/list/${fund._id}/bills`;
+              -const url = `/fund/list/${fund._id.toLowerCase()}/bills`;
               include interface_fund_page
               include interface_fund_billList
               include interface_fund_page

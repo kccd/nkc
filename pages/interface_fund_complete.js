@@ -116,7 +116,7 @@ function createThreadsList(arr, type, disabled) {//add, remove
 		var toc = obj.toc;
 		var postString = JSON.stringify(obj);
 		var contentDiv = '<div class="col-xs-10 col-md-10"><div class="postString displayNone">'+postString+'</div><span>文号：</span><span class="threadNumber">'+pid+'&nbsp;&nbsp;</span><a href="/m/'+uid+'" target="_blank">'+username+'</a><span>&nbsp;发表于 '+ toc +'</span><br><a href="/t/'+tid+'" target="_blank">'+t+'</a></div>';
-		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+tid+','+pid+')"></div>';
+		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+tid+','+pid+');this.style.backgroundColor = '+'\'#2aabd2\''+';"></div>';
 		html += '<div class="threadList">'+contentDiv+btnDiv+'</div>';
 	}
 	return html;

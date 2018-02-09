@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/lovetheory/nkc2.git"
+    "url": "github.com/kccd/nkc.git"
   },
   "keywords": [
     "koa2",

@@ -17,8 +17,10 @@ $(function() {
 	initTeam();
 	initSelectedUsers();
 	initFundPay();
-	applicationFormId = $('#applicationFormId').text();
-	applicationFormId = parseInt(applicationFormId);
+	objString = $('#applicationFormId').text();
+	obj = JSON.parse(objString);
+	applicationFormId = parseInt(obj.id);
+	s = parseInt(obj.s);
 	// autoSaveProject(applicationFormId);
 	initBudgetMoney();
 	onContentChange();
@@ -139,7 +141,8 @@ function displayResult() {
 	if(getUsers.length === 0) {
 		return $('#usersList').html(blank);
 	}
-	for (var user of getUsers){
+	for (var i = 0; i < getUsers.length; i++){
+		var user = getUsers[i];
 		usersList += '<span class="fund-span disabled" uid="'+user.uid+'" onclick="selectUser('+user.uid+')">'+user.username+'<span class="fund-span add glyphicon glyphicon-ok"></span></span>';
 	}
 	$('#usersList').html(usersList);
@@ -153,7 +156,8 @@ function displaySelectedUsers() {
 		return $('#selectedUsersDiv').html(blank);
 	}
 	usersList += head;
-	for (var user of selectedUsers) {
+	for (var i = 0; i < selectedUsers.length; i++) {
+		var user = selectedUsers[i];
 		usersList += '<span class="fund-span selectedUser" uid="'+user.uid+'" onclick="deleteUser('+user.uid+')">'+user.username+'<span class="fund-span delete glyphicon glyphicon-remove"></span></span></span>';
 	}
 	$('#selectedUsersDiv').html(usersList);
@@ -162,18 +166,20 @@ function displaySelectedUsers() {
 function selectUser(uid) {
 	uid = '' + uid;
 	var username = '';
-	for(var user of getUsers) {
+	for(var i = 0; i < getUsers.length; i++) {
+		var user = getUsers[i];
 		if(user.uid === uid) {
 			username = user.username;
 		}
 	}
-	for(var user of selectedUsers) {
+	for(var i = 0; i < selectedUsers.length; i++) {
+		var user = selectedUsers[i];
 		if(user.uid === uid) {
 			return;
 		}
 	}
 	selectedUsers.push({
-		uid,
+		uid: uid,
 		username: username
 	});
 	displaySelectedUsers();
@@ -209,13 +215,11 @@ function getUser() {
 
 function submitApplicationMethod(last){
 	if(last) {
-		saveApplicationMethod(function(data) {
-			var s = data.s;
+		saveApplicationMethod(function() {
 			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
 		})
 	} else {
-		saveApplicationMethod(function(data) {
-			var s = data.s;
+		saveApplicationMethod(function() {
 			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
 		})
 	}
@@ -225,7 +229,7 @@ function saveApplicationMethod(callback) {
 	var obj = {
 		newMembers: [],
 		from: 'personal',
-		s: 1
+		s: s
 	};
 	if ($('#team').hasClass('active')) {
 		if(selectedUsers.length === 0) {
@@ -340,13 +344,11 @@ function chooseBankCard() {
 
 function submitApplicantMessages(last) {
 	if(last) {
-		saveApplicantMessages(function(data){
-			var s = data.s;
+		saveApplicantMessages(function(){
 			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
 		});
 	} else {
-		saveApplicantMessages(function(data){
-			var s = data.s;
+		saveApplicantMessages(function(){
 			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
 		});
 	}
@@ -370,7 +372,7 @@ function saveApplicantMessages(callback){
 				description: obj.description,
 				lifePhotosId: lifePhotos
 			},
-			s: 2
+			s: s
 		};
 		nkcAPI('/fund/a/'+applicationFormId, 'PATCH', data)
 			.then(function(data) {
@@ -402,7 +404,7 @@ function saveProject(callback) {
 		t: title,
 		abstract: abstract
 	};
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: 3, project: project})
+	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: s, project: project})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -424,11 +426,11 @@ function toEditor() {
 function submitProject(last) {
 	if(last) {
 		saveProject(function() {
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s=2';
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
 		});
 	} else {
 		saveProject(function() {
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
 		});
 	}
 	/*saveProject(id, function(){
@@ -489,7 +491,7 @@ function readProjectValue() {
 	var time = $('#projectCycle').val();
 	time = parseInt(time);
 	if(time <= 0) {
-		return screenTopWarning('研究周期不能小于0天');
+		throw '研究周期不能小于0天';
 	}
 	projectCycle = time;
 }
@@ -565,11 +567,15 @@ function onContentChange() {
 
 function  saveBudgetMoney(id, callback) {
 	initBudgetMoney();
-	readProjectValue();
+	try {
+		readProjectValue();
+	} catch(err) {
+		return screenTopWarning(err);
+	}
 	var obj = {
 		projectCycle: projectCycle,
 		budgetMoney: budgetMoney,
-		s: 4
+		s: s
 	};
 	nkcAPI('/fund/a/'+id, 'PATCH', obj)
 		.then(function(data) {
@@ -595,9 +601,13 @@ function initAddPurpose() {
 }
 
 function savePurpose(callback) {
-	readProjectValue();
+	try {
+		readProjectValue();
+	} catch(err) {
+		return screenTopWarning(err);
+	}
 	var obj = {
-		s: 4,
+		s: s,
 		projectCycle: projectCycle
 	};
 	var purpose = $('#purpose').val();
@@ -632,7 +642,29 @@ function displayPopupPanel() {
 	$('html, body').css('overflow', 'hidden');
 	$(window).scroll(function() {
 		fixedFn(scrollTop);
-	})
+	});
+	getLifePhotos();
+}
+
+function getLifePhotos() {
+	nkcAPI('/me/life_photos', 'GET', {})
+		.then(function(data) {
+			createLifePhotosHtml(data.lifePhotos);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+function createLifePhotosHtml(arr) {
+	if(arr.length !== 0) {
+		var html = '';
+		for (var i = 0; i < arr.length; i++) {
+			var photo = arr[i];
+			html += '<div class="col-xs-12 col-md-4"><img photoId=photo._id src="/photo_small/'+photo._id+'" onclick="selectLifePhoto('+photo._id+')")></div>';
+		}
+		$('.fund-photo-list').html(html);
+	}
 }
 
 //隐藏添加帖子的面板
@@ -668,7 +700,7 @@ function createThreadsList(arr, type, disabled) {//add, remove
 		var toc = obj.toc;
 		var postString = JSON.stringify(obj);
 		var contentDiv = '<div class="col-xs-10 col-md-10"><div class="postString displayNone">'+postString+'</div><span>文号：</span><span class="threadNumber">'+pid+'&nbsp;&nbsp;</span><a href="/m/'+uid+'" target="_blank">'+username+'</a><span>&nbsp;发表于 '+ toc +'</span><br><a href="/t/'+tid+'" target="_blank">'+t+'</a></div>';
-		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+i+')"></div>'
+		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+i+');this.style.backgroundColor = '+'\'#2aabd2\''+';"></div>'
 		html += '<div class="threadList">'+contentDiv+btnDiv+'</div>';
 	}
 	return html;
@@ -772,7 +804,6 @@ function createPageList(paging, self) {
 			max = pageCount - 1;
 		}
 	}
-	console.log(min, page, max);
 	if(self === undefined) self = '';
 	for(var i = 0; i < pageCount; i++){
 		if(i < min || i > max) continue;
@@ -834,7 +865,7 @@ function saveThreadsList(callback) {
 	}
 	var obj = {
 		threadsId: threadsId,
-		s: 4
+		s: s
 	};
 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
 		.then(function(data) {
@@ -862,13 +893,13 @@ function submitOtherMessages(last) {
 	if(last) {
 		savePurpose(function(){
 			saveThreadsList(function(){
-				window.location.href='/fund/a/'+applicationFormId+'/settings?s=3';
+				window.location.href='/fund/a/'+applicationFormId+'/settings?s='+(s-1);
 			})
 		})
 	} else {
 		savePurpose(function(){
 			saveThreadsList(function(){
-				window.location.href='/fund/a/'+applicationFormId+'/settings?s=5';
+				window.location.href='/fund/a/'+applicationFormId+'/settings?s='+(s+1);
 			})
 		})
 	}
@@ -877,7 +908,7 @@ function submitOtherMessages(last) {
 
 function submitApplicationForm() {
 	var obj = {
-		s: 5
+		s: s
 	};
 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
 		.then(function() {
@@ -897,9 +928,10 @@ function deleteApplicationForm(id) {
 	if(confirm(msg) === true) {
 		nkcAPI('/fund/a/'+id+'?type=delete', 'DELETE', {})
 			.then(function(data) {
-				window.location.href = '/fund/list/'+data.applicationForm.fund._id;
+				window.location.href = '/fund/list/'+data.applicationForm.fund._id.toLowerCase();
 			})
 			.catch(function(data) {
+				console.log(data);
 				screenTopWarning(data.error);
 			})
 	}
@@ -911,7 +943,7 @@ function chooseCategory(fid, displayName) {
 }
 
 function back(){
-	window.location.href = '/fund/a/'+applicationFormId+'/settings?s=4';
+	window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
 }
 
 
@@ -970,17 +1002,17 @@ function userMessagesForm() {
 }
 
 
-function submitModifyBudgetMoney() {
-	initBudgetMoney();
-	var obj = {
-		budgetMoney: budgetMoney,
-		s: 6
-	};
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
-		.then(function() {
-			window.location.href = '/fund/a/'+id;
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
-}
+// function submitModifyBudgetMoney() {
+// 	initBudgetMoney();
+// 	var obj = {
+// 		budgetMoney: budgetMoney,
+// 		s: 6
+// 	};
+// 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+// 		.then(function() {
+// 			window.location.href = '/fund/a/'+id;
+// 		})
+// 		.catch(function(data) {
+// 			screenTopWarning(data.error);
+// 		})
+// }

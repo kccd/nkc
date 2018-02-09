@@ -4,8 +4,9 @@ remittanceRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
-		const {adminSupport} = applicationForm.status;
+		const {adminSupport, completed} = applicationForm.status;
 		if(!adminSupport) ctx.throw(400, '管理员复核暂未通过无法进行拨款操作，请等待。');
+		if(completed) ctx.throw(400, '抱歉！该申请已经完结，不需要拨款。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -31,6 +32,12 @@ remittanceRouter
 			if(i === number) {
 				if(r.status) ctx.throw(400, '已经打过款了，请勿重复提交！');
 				if(!r.passed && i !== 0) ctx.throw(400, '该申请人的报告还未通过，请通过后再打款。');
+				const bills = await db.FundBillModel.find({fundId: fund._id});
+				let total = 0;
+				bills.map(b => {
+					total += b.changed;
+				});
+				if(r.money > total) ctx.throw(400, '该基金余额不足。');
 				r.status = true;
 				r.uid = user.uid;
 				const time = new Date();

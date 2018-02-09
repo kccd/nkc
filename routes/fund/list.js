@@ -35,7 +35,7 @@ listRouter
 	// 修改基金项目
 	.patch('/:fundId', async (ctx, next) => {
 		const {data, db} = ctx;
-		const {fundId} = ctx.params;
+		const fundId = ctx.params.fundId.toUpperCase();
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
@@ -54,7 +54,7 @@ listRouter
 		page = page? parseInt(page): 0;
 		data.type = type;
 		data.page = page;
-		const fund = await db.FundModel.findOnly({_id: fundId, disabled: false});
+		const fund = await db.FundModel.findOnly({_id: fundId.toUpperCase(), disabled: false});
 		data.fund = fund;
 		let query = {
 			'status.submitted': true,
@@ -108,7 +108,7 @@ listRouter
 			});
 		}
 		data.fundCerts = fundCerts;
-		data.fund = await db.FundModel.findOnly({_id: fundId});
+		data.fund = await db.FundModel.findOnly({_id: fundId.toUpperCase()});
 		data.nav = '基金设置';
 		ctx.template = 'interface_fund_setting.pug';
 		await next();
@@ -120,7 +120,7 @@ listRouter
 		const {user} = data;
 		const {fundId} = ctx.params;
 		const {agree} = ctx.query;
-		const fund = await db.FundModel.findOne({_id: fundId, canApply: true});
+		const fund = await db.FundModel.findOne({_id: fundId.toUpperCase(), canApply: true});
 		if(!fund) ctx.throw(400, '抱歉！该基金项目暂不能申请。');
 		data.fund = fund;
 		ctx.template = 'interface_fund_agreement.pug';
@@ -137,7 +137,7 @@ listRouter
 		const applicationForm = {};
 		applicationForm._id = await db.SettingModel.operateSystemID('fundApplicationForms', 1);
 		applicationForm.uid = user.uid;
-		applicationForm.fundId = fundId;
+		applicationForm.fundId = fundId.toUpperCase();
 		applicationForm.fixedMoney = !!fund.money.fixed;
 		if(fund.applicationMethod.personal) {
 			applicationForm.from = 'personal';

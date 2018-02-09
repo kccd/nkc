@@ -14,7 +14,7 @@ block content
               -for (let fund of data.funds)
                 -const {id, name, color, money} = fund;
                 .col-xs-6.col-sm-4.col-md-3.fund-list
-                  a(href=`/fund/list/${id}`)
+                  a(href=`/fund/list/${id.toLowerCase()}`)
                     .fund-name(style=`background-color: ${color};background-image:${fund && fund.image ? `url(/fundBGI_small/${fund.image})` : ''}`)= name
                     if fund.money.fixed
                       .fund-money!= `定额${money.fixed}元`

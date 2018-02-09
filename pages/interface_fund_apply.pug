@@ -15,7 +15,8 @@ block title
 
 
 block content
-  #applicationFormId(style='display: none')= applicationForm._id
+  -const obj = {id: applicationForm._id, s: s};
+  #applicationFormId(style='display: none')= JSON.stringify(obj)
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
@@ -119,9 +120,11 @@ block content
                       textarea.fund-textarea#description(placeholder='介绍一下自己')!= options.description || ''
                     .col-xs-12.col-md-12
                       h4 添加生活照（将公开展示）
-                      if data.lifePhotos.length === 0 && applicant.lifePhotos.length === 0
-                        span.fund-span.transparent(style="margin-left: 0;" onclick='window.location.href="/set/album"') 未上传生活照，去上传
-                      span.fund-span.transparent(style="margin-left: 0;" onclick='displayPopupPanel()') 选择生活照
+                      a.btn.btn-default(onclick='displayPopupPanel()') 选择生活照
+                      //if data.lifePhotos.length === 0 && applicant.lifePhotos.length === 0
+                      //  a.btn.btn-default(href="/set/album" target="_blank") 未上传生活照，去上传
+                      //else
+                      //  a.btn.btn-default(onclick='displayPopupPanel()') 选择生活照
                     .col-xs-12.col-md-12
                       if applicant.lifePhotos.length === 0
                         span 暂未选择生活照
@@ -138,18 +141,19 @@ block content
                       .popupPanel-body
                         .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
                         .popupPanel-title 选择生活照
-                        span 至少选择一张
+                        span 至少选择一张，如需显示新上传的图片，请点击
+                        button.btn.btn-default.btn-sm(onclick='getLifePhotos()') 刷新
                         .popupPanel-content
                           .fund-photo-list
                             if data.lifePhotos.length === 0
                               br
                               h4.text-center 未上传任何照片
                                 a(href="/set/album" target="_blank") 去上传
-                            else
-                              -for (let i = 0; i < data.lifePhotos.length; i++)
-                                -let photo = data.lifePhotos[i];
-                                .col-xs-12.col-md-4
-                                  img(photoId=photo._id src=`/photo_small/${photo._id}` onclick=`selectLifePhoto(${photo._id})`)
+                            //else
+                            //  -for (let i = 0; i < data.lifePhotos.length; i++)
+                            //    -let photo = data.lifePhotos[i];
+                            //    .col-xs-12.col-md-4
+                            //      img(photoId=photo._id src=`/photo_small/${photo._id}` onclick=`selectLifePhoto(${photo._id})`)
             else if s === 3 && inputApplicantMessages !== null
               .row
                 .col-xs-12.col-md-6.col-md-offset-3
@@ -161,14 +165,14 @@ block content
                     input.fund-input#title(value=projectTitle?projectTitle: '')
                   h4 摘要：
                   textarea.form-control#abstract(rows=6 placeholder='200字以内')= abstract?abstract: ''
-                  h4 项目内容：
+                  h4 项目内容（请在编辑器详细填写）：
                   //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
-                  div#projectContent!= project && project.c? experimental_render(project): '暂未填写'
+                  div#projectContent!= project && project.c? experimental_render(project): ''
                   //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
-                  br
-                  br
-                  br
-                  button.btn.btn-default.center-block(onclick=`toEditor()` ) 去编辑器填写
+                  if project && project.c
+                    button.btn.btn-default(onclick=`toEditor()` ) 去编辑器修改
+                  else
+                    button.btn.btn-default(onclick=`toEditor()` ) 去编辑器填写
                   //span &nbsp;&nbsp;
                   //span.autoSaveTime#saveTime 0秒
                   //span.autoSaveTime 后自动保存
@@ -179,14 +183,15 @@ block content
                   h4 研究周期
                     small （天）
                   input.fund-input#projectCycle(value=projectCycle !== null? projectCycle: '' )
-                  h4 资金用途（预算）
                   if fixedMoney
-                    span 常用：
-                    span.fund-span.addPurpose 购买电子元器件
-                    span.fund-span.addPurpose 印电路板
-                    textarea.fund-textarea#purpose(style='height: 20rem;margin-bottom: 0;')= typeof(budgetMoney) === 'string'? budgetMoney: ''
+                    h4 资金用途
+                    //span 常用：
+                    //span.fund-span.addPurpose 购买电子元器件
+                    //span.fund-span.addPurpose 印电路板
+                    textarea.fund-textarea#purpose(style='height: 20rem;margin-bottom: 0;' placeholder="详细说说资金用来做什么")= typeof(budgetMoney) === 'string'? budgetMoney: ''
                     //span.fund-span.transparent(onclick=`savePurpose(${applicationForm._id})` style='margin-left: 0;') 保存
                   else
+                    h4 资金预算
                     #budgetMoney
                       .fund-money-list.head
                         .purpose 用途
@@ -257,18 +262,19 @@ block content
                     //.span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
                   br
                   br
-                  h4 学科分类
+                  h4 学科分类（请在下方列表中点击）
+                  br
                   h4 已选择：
                     if applicationForm.forum
-                      span#category(fid=applicationForm.forum.fid)= applicationForm.forum.displayName
+                      strong#category(style='color: #ff8707;' fid=applicationForm.forum.fid)= applicationForm.forum.displayName
                     else
-                      span#category= '暂未选择'
+                      strong(style='color: #ff8707;')#category= '暂未选择'
                   br
                   -for (let parentForum of data.forumList)
                     strong= parentForum.displayName
                     span ：
                     -for (let childrenForum of parentForum.children)
-                      span(onclick=`chooseCategory(${childrenForum.fid}, '${childrenForum.displayName}')` style='cursor: pointer')= childrenForum.displayName
+                      span(onclick=`chooseCategory('${childrenForum.fid}', '${childrenForum.displayName}')` style='cursor: pointer')= childrenForum.displayName
                       span &nbsp;&nbsp;&nbsp;
                     br
 
@@ -292,13 +298,13 @@ block content
                     //include interface_fund_applicationForm_info
                     include interface_fund_apply_messages
                 .col-xs-12.col-md-3
-                  h3 注意事项
-                  br
-                  h4 一、团队申请
-                  p 1、如果没有好友同意你的邀请你将无法提交申请表，您可以邀请其他好友或更改申请方式为个人申请。
-                  p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的帖子中移除这些好友的帖子。
-                  br
-                  br
+                  if applicationForm.from === 'team'
+                    h3 注意事项
+                    br
+                    p 1、如果没有好友同意你的邀请你将无法提交申请表，您可以邀请其他好友或更改申请方式为个人申请。
+                    p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的帖子中移除这些好友的帖子。
+                    br
+                    br
                   -let n = 0;
 
                   mixin ds(text)
@@ -314,19 +320,19 @@ block content
                     +ds('申请表修改次数超出限制')
                   if applicationForm.from === 'team'
                     if nullLength !== 0
-                      h3 未处理的用户：
+                      h3 未处理的团队成员：
                       -for(let u of agreeIsNull)
                         h4
                           a(href=`/m/${u.uid}`)= u.user.username
                           span &nbsp;&nbsp;&nbsp;
                     if falseLength !== 0
-                      h3 拒绝的用户：
+                      h3 拒绝的团队成员：
                       -for(let u of agreeIsFalse)
                         h4
                           a(href=`/m/${u.uid}`)= u.user.username
                           span &nbsp;&nbsp;&nbsp;
                     if agreeIsTrue.length === 0
-                      +ds('暂未有好友接受邀请')
+                      +ds('暂未有团队成员接受邀请或所有成员都拒绝参加（可返回第一步修改团队成员）')
                   if applicationForm.from === 'personal'
                     if !fund.applicationMethod.personal
                       +ds('该基金不允许个人申请')
@@ -353,7 +359,7 @@ block content
                     if !project.t
                       +ds('请填写项目名称')
                     if !project.c
-                      +ds('请输入项目名称')
+                      +ds('请输入项目内容')
                   if applicationForm.projectCycle === null
                     +ds('请填写研究周期')
                   if fund.money.max === null
@@ -416,5 +422,5 @@ block content
               if !applicationForm.status.submitted
                 button.btn.btn-danger(onclick=`deleteApplicationForm(${applicationForm._id})`) &nbsp;&nbsp;删除&nbsp;&nbsp;
 block scripts
-  script(src='/interface_common.js')
-  script(src='/interface_fund_apply.js')
+  script(src='/interface_common.js' type='application/javascript')
+  script(src='/interface_fund_apply.js' type='application/javascript')

@@ -2,7 +2,7 @@
 .fund-nav
   ol.breadcrumb
     li
-      a(href="/fund") 科创基金
+      a(href="/fund") 首页
     span &nbsp;&nbsp;&nbsp;
     span
       a(href=`/fund/me`) 我的基金&nbsp;
@@ -13,13 +13,13 @@
       a(href=`/fund/list`) 基金列表
     if data.fund
       li
-        a(href=`/fund/list/${data.fund._id}`)= data.fund.name
+        a(href=`/fund/list/${data.fund._id.toLowerCase()}`)= data.fund.name
     if data.applicationForm && data.applicationForm.code
       li
         a(href=`/fund/a/${data.applicationForm.code}`)= data.applicationForm.code
     if data.bill
       li
-        a(href=`/fund/list/${data.fund._id}/bills`)= `基金账单`
+        a(href=`/fund/list/${data.fund._id.toLowerCase()}/bills`)= `基金账单`
     if data.nav
       li= data.nav
 
