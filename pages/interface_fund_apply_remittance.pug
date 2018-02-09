@@ -39,7 +39,7 @@ block content
                     hr
                   h4 提交阶段性报告
                   span.redFontColor *提交的内容将会在最新进展中展示
-                  textarea.form-control#reportContent(rows=10 placeholder='项目的进展情况')
+                  textarea.form-control#reportContent(rows=10 placeholder='项目的进展情况（建议200字左右）')
                   if remittance[0].needThreads
                     br
                     span.redFontColor *管理员要求提交拨款申请必须要附带代表中期报告的帖子
@@ -61,6 +61,7 @@ block content
         .panel.panel-default
           .panel-body
             h3.text-center= `拨款详情`
+            p 第一期拨款不用申请，请耐心等待。
             table.table
               thead
                 tr

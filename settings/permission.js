@@ -476,7 +476,11 @@ const certificates ={
         personal_info: {
           [name]: '详细设置',
           [POST]: true
-        }
+        },
+	      life_photos: {
+        	[name]: '生活照',
+		      [GET]: true
+	      }
       },
       logout: {
         [GET]: true

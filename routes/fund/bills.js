@@ -4,7 +4,7 @@ const billsRouter = new Router();
 billsRouter
 	.get('/', async (ctx, next) => {
 		const {query, data, db, params} = ctx;
-		const {fundId} = params;
+		const fundId = params.fundId.toUpperCase();
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		const page = query.page? parseInt(query.page): 0;
 		let bills = await db.FundBillModel.find({fundId}).sort({toc: 1});
@@ -34,7 +34,7 @@ billsRouter
 		const {db, body, params} = ctx;
 		const {user} = ctx.data;
 		const {bill} = body;
-		const {fundId} = params;
+		const fundId = params.fundId.toUpperCase();
 		bill._id = Date.now();
 		bill.uid = user.uid;
 		bill.fundId = fundId;

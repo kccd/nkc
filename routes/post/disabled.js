@@ -6,14 +6,18 @@ router
     const {disabled} = ctx.body;
     const {pid} = ctx.params;
     const {db, data} = ctx;
-    const {PostModel} = db;
-    const {user} = data;
     if(disabled === undefined) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     if(!await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(401, '权限不足');
     const obj = {disabled: false};
     if(disabled) obj.disabled = true;
+    if(obj.disabled) {
+    	const posts = await db.PostModel.find({tid: targetThread.tid, disabled: false}, {pid: 1});
+    	if(posts.length === 1 && posts[0].pid === pid) {
+		    ctx.throw(400, '无法屏蔽仅有一条post的帖子，请移动至回收站。');
+	    }
+    }
     await targetPost.update(obj);
     if(targetPost.disabled === disabled) {
       if(!disabled) ctx.throw(400, '操作失败！该回复未被屏蔽，请刷新');

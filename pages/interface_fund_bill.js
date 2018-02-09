@@ -16,7 +16,7 @@ function modify(fundId, id) {
 		abstract: abstract,
 		notes: notes
 	};
-	nkcAPI('/fund/list/'+fundId+'/bills/'+id, 'PATCH', {obj: obj})
+	nkcAPI('/fund/list/'+fundId.toLowerCase()+'/bills/'+id, 'PATCH', {obj: obj})
 		.then(function() {
 			screenTopAlert('修改成功。');
 		})
@@ -29,9 +29,9 @@ function deleteBill(fundId, id) {
 	if(confirm('确定要删除该记录？') === false) {
 		return;
 	}
-	nkcAPI('/fund/list/'+fundId+'/bills/'+id, 'DELETE', {})
+	nkcAPI('/fund/list/'+fundId.toLowerCase()+'/bills/'+id, 'DELETE', {})
 		.then(function() {
-			window.location.href = '/fund/list/'+fundId +'/bills';
+			window.location.href = '/fund/list/'+fundId.toLowerCase() +'/bills';
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

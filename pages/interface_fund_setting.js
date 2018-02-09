@@ -404,7 +404,7 @@ function submit(id) {
 	    } else if(fundObj.history) {
     		window.location.href = '/fund/history';
 	    } else {
-		    window.location.href = '/fund/list/'+fund._id;
+		    window.location.href = '/fund/list/'+fund._id.toLowerCase();
 	    }
     })
     .catch(function(data){

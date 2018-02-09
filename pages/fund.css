@@ -372,13 +372,13 @@ input[type="radio"], input[type="checkbox"]{
   background-color: #aaa;
 }
 .fund-span.transparent{
-  background-color: #aaaaaa00;
+  background-color: rgba(0,0,0,0);
   color: #888;
   border: 1px solid #aaa;
   transition: color 0s;
 }
 .fund-span.transparent:hover{
-  background-color: #aaaaaa00;
+  background-color: rgba(0,0,0,0);
   color: #333;
 }
 .fund-span.green{

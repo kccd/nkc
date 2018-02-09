@@ -36,10 +36,13 @@
           h5= `自我介绍：${applicationForm.applicant.description || '暂未填写'}`
           if applicationForm.from === 'team'
             h5= `申请方式：团队`
-            h5= `组员ID：`
+            h5= `组员ID（已确认的）：`
               -for(let m of applicationForm.members)
-                span &nbsp;&nbsp;
-                a(href=`/m/${m.uid}` target='_blank')= m.user.username
+                if m.agree
+                  span &nbsp;&nbsp;
+                  a(href=`/m/${m.uid}` target='_blank')= m.user.username
+          else
+            h5= `申请方式：个人`
         if applicationForm.applicant.lifePhotos.length === 0
           .col-xs-12.col-md-6
             p 申请人照片
@@ -127,8 +130,8 @@
                 .count 数量
                 .money 单价(元)
                 .total 合计(元)
-                .suggest 项目审查员建议(元)
-                .fact 管理员批准(元)
+                .suggest 专家建议(元)
+                .fact 实际批准(元)
               -for(let p of applicationForm.budgetMoney)
                 -const total = p.count*p.money;
                 -aggregate += total;
@@ -149,7 +152,7 @@
                 .count 数量
                 .money 单价(元)
                 .total 合计(元)
-                .suggest 项目审查员建议(元)
+                .suggest 专家建议(元)
               -for(let p of applicationForm.budgetMoney)
                 -const total = p.count*p.money;
                 -aggregate += total;
@@ -180,8 +183,8 @@
             if aggregate
               span=`申请金额：${aggregate}元`
             if suggest
-              span=`，项目审查员建议：${suggest}元`
+              span=`，专家建议：${suggest}元`
             if fact
-              span=`，管理员批准：${fact}元`
+              span=`，实际批准：${fact}元`
 
 

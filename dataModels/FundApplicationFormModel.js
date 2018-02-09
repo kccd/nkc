@@ -356,7 +356,6 @@ fundApplicationFormSchema.pre('save', async function(next) {
 			order = 1;
 			code = year + fund._id + 1;
 		}
-		console.log(fund._id);
 		this.year = year;
 		this.code = code;
 		this.order = order;
@@ -547,7 +546,6 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 
 	}
 	this.status.submitted = true;
-	this.lock.submitted = true;
 	this.modifyCount += 1;
 	this.timeToSubmit = Date.now();
 	this.status.projectPassed = null;

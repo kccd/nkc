@@ -14,4 +14,4 @@ block content
             -for(let fund of data.funds)
               h4= fund.name
                 span &nbsp;&nbsp;&nbsp;
-                a(href=`/fund/list/${fund._id}/settings`) 设置
+                a(href=`/fund/list/${fund._id.toLowerCase()}/settings`) 设置

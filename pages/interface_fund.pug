@@ -16,7 +16,7 @@ block content
               -for (let fund of data.funds)
                 -const {id, name, color, money} = fund;
                 .col-xs-6.col-sm-4.col-md-3.fund-list
-                  a(href=`/fund/list/${id}`)
+                  a(href=`/fund/list/${id.toLowerCase()}`)
                     .fund-name(style=`background-color: ${color};background-image:${fund && fund.image ? `url(/fundBGI_small/${fund.image})` : ''}`)= name
                     if fund.money.fixed
                       .fund-money!= `定额${money.fixed}元`
@@ -25,6 +25,12 @@ block content
             hr
             .row
               .col-xs-12.col-md-12
+                if data.excellent.length !== 0
+                  .panel.panel-default
+                    .panel-body
+                      h2.text-center 优秀项目
+                      -applicationForms = data.excellent;
+                      include interface_fund_applicationList
                 if data.applying.length !== 0
                   .panel.panel-default
                     .panel-body
@@ -40,8 +46,8 @@ block content
                 if data.excellent.length !== 0
                   .panel.panel-default
                     .panel-body
-                      h2.text-center 优秀项目
-                      -applicationForms = data.excellent;
+                      h2.text-center 已完成
+                      -applicationForms = data.completed;
                       include interface_fund_applicationList
               //.col-xs-12.col-md-4
               //  .panel.panel-default

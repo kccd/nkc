@@ -22,6 +22,7 @@ reportRouter
 		const obj = {};
 		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');
 		if(type === 'applyRemittance') {
+			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经完结。');
 			const {timeToPassed, reportNeedThreads, remittance} = applicationForm;
 			for(let r of remittance) {
 				if(!r.status) {

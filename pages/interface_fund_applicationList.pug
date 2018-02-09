@@ -2,69 +2,71 @@ if applicationForms.length === 0
   .info
     span 暂无数据
 else
-  table.table.table-striped
-    thead
-      tr
-        th ID
-        th 状态
-        th 申请时间
-        th 基金类型
-        th 用户ID
-        th 申请金额
-        th 项目名称
-        th 链接
-
-    tbody
-      mixin status(applicationForm)
-        -const {lock, status, submittedReport} = applicationForm;
-        -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = status;
-        if !lock.submitted
-          th 未提交
-        else if !usersSupport
-          th 等待网友支持
-        else if projectPassed === null
-          th 等待专家审核
-        else if projectPassed === false
-          th 专家审核不通过，等待申请人处理
-        else if adminSupport === null
-          th 等待管理员复核
-        else if adminSupport === false
-          th 管理员复核不通过，等待申请人处理
-        else if remittance === null
-          th 等待拨款
-        else if remittance === false
-          th 拨款失败
-        else if submittedReport
-          th 等待报告审核
-        else if !completed
-          th 资助中
-        else
-          th 已完成
-        //
-        //if excellent
-        //  th 优秀项目
-        //else if completed
-        //  th 已完成
-        //else if remittance
-        //  th 资助中
-        //else if !adminSupport
-        //  th 审核中
-      -for (let applicationForm of applicationForms)
-        -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
-        -let money = fund?fund.money.fixed: data.fund.money.fixed;
-        if !money
-          -money = 0;
-          if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length !== 0
-            -for(let b of budgetMoney)
-              -money += (b.count*b.money);
-
+  .table-responsive
+    table.table.table-striped
+      thead
         tr
-          th= applicationForm.code || '暂无'
-          th= applicationFormStatus(applicationForm).str
-          th= toc.toLocaleString()
-          th= fund?fund.name: data.fund.name
-          th= applicant.user.username
-          th=`${money}元`
-          th= project.t
-          th
-            a(href=`/fund/a/${_id}`) 查看详情
+          th ID
+          th 状态
+          th 申请时间
+          th 基金类型
+          th 用户ID
+          th 申请金额
+          th 项目名称
+          th 链接
+
+      tbody
+        mixin status(applicationForm)
+          -const {lock, status, submittedReport} = applicationForm;
+          -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, excellent} = status;
+          if !lock.submitted
+            th 未提交
+          else if !usersSupport
+            th 等待网友支持
+          else if projectPassed === null
+            th 等待专家审核
+          else if projectPassed === false
+            th 专家审核不通过，等待申请人处理
+          else if adminSupport === null
+            th 等待管理员复核
+          else if adminSupport === false
+            th 管理员复核不通过，等待申请人处理
+          else if remittance === null
+            th 等待拨款
+          else if remittance === false
+            th 拨款失败
+          else if submittedReport
+            th 等待报告审核
+          else if !completed
+            th 资助中
+          else
+            th 已完成
+          //
+          //if excellent
+          //  th 优秀项目
+          //else if completed
+          //  th 已完成
+          //else if remittance
+          //  th 资助中
+          //else if !adminSupport
+          //  th 审核中
+        -for (let applicationForm of applicationForms)
+          -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
+          -let money = fund?fund.money.fixed: data.fund.money.fixed;
+          if !money
+            -money = 0;
+            if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length !== 0
+              -for(let b of budgetMoney)
+                -money += (b.count*b.money);
+
+          tr
+            th= applicationForm.code || '暂无'
+            th= applicationFormStatus(applicationForm).str
+            th= toc.toLocaleString()
+            th= fund?fund.name: data.fund.name
+            th
+              a(href=`/m/${applicant.user.uid}`)= applicant.user.username
+            th=`${money}元`
+            th= project.t
+            th
+              a(href=`/fund/a/${_id}`) 查看详情

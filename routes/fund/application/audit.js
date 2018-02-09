@@ -104,8 +104,6 @@ auditRouter
 				}
 				if(support) {
 					if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
-				} else {
-					applicationForm.lock.submitted = false;
 				}
 				await applicationForm.update({budgetMoney});
 			}
@@ -168,6 +166,9 @@ auditRouter
 		}
 		if(!support && applicationForm.modifyCount >= fund.modifyCount) {
 			applicationForm.useless = 'exceededModifyCount';
+		}
+		if(!support) {
+			applicationForm.lock.submitted = false;
 		}
 		await applicationForm.save();
 		await next();

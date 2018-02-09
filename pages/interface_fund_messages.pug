@@ -29,27 +29,27 @@ block content
             ul.nav.nav-pills
               -const {type} = data;
               li(role="presentation" class=type === undefined ? 'active' : '')
-                a(href=`/fund/list/${fund._id}`) 全部
+                a(href=`/fund/list/${fund._id.toLowerCase()}`) 全部
               li(role="presentation" class=type === 'excellent' ? 'active' : '')
-                a(href=`/fund/list/${fund._id}?type=excellent`) 优秀项目
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=excellent`) 优秀项目
               li(role="presentation" class=type === 'completed' ? 'active' : '')
-                a(href=`/fund/list/${fund._id}?type=completed`) 已完成
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=completed`) 已完成
               li(role="presentation" class=type === 'funding'? 'active': '')
-                a(href=`/fund/list/${fund._id}?type=funding`) 资助中
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=funding`) 资助中
               li(role="presentation" class=type === 'auditing'? 'active': '')
-                a(href=`/fund/list/${fund._id}?type=auditing`) 审核中
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=auditing`) 审核中
             hr
             -applicationForms = data.applicationForms;
-            -const url = `/fund/list/${fund._id}`;
+            -const url = `/fund/list/${fund._id.toLowerCase()}`;
             include interface_fund_page
             include interface_fund_applicationList
             include interface_fund_page
       .col-xs-12.col-md-3
         .row
           .col-xs-12.col-md-12
-            a.btn.btn-default.btn-block(href=`/fund/list/${fund._id}/bills`)= `基金账单`
+            a.btn.btn-default.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/bills`)= `基金账单`
             if data.userLevel >= 6
-              a.btn.btn-default.btn-block(href=`/fund/list/${fund._id}/settings`)= `基金设置`
+              a.btn.btn-default.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/settings`)= `基金设置`
             br
             .panel.panel-default
               .panel-body.fund-preconditions
@@ -93,7 +93,7 @@ block content
                         th 身份认证等级
                         th= authLevel
                         th= userAuthLevel
-                  -let btnDisabled = false, link=`/fund/list/${fund._id}/add`;
+                  -let btnDisabled = false, link=`/fund/list/${fund._id.toLowerCase()}/add`;
                   if !allowed
                     p 您的账号未达到最低要求，无法申请该基金。
                     -btnDisabled = true;

@@ -16,9 +16,9 @@ block content
       .col-xs-12.col-md-12
         ul.nav.nav-tabs
           li(role="presentation" class=data.team?'': 'active')
-            a(href=`/fund/${fund._id}/application`) 个人申请
+            a(href=`/fund/${fund._id.toLowerCase()}/application`) 个人申请
           li(role="presentation" class=data.team ? 'active' : '')
-            a(href=`/fund/${fund._id}/application?team=true`) 团体申请
+            a(href=`/fund/${fund._id.toLowerCase()}/application?team=true`) 团体申请
         if(idCard || lifePhoto || idCardPhoto || handheldIdCardPhoto)
           br
           h4 个人信息

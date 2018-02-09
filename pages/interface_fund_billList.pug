@@ -23,4 +23,4 @@ table.table.table-striped
         th= b.balance
         if data.userLevel >= 7
           th
-            a(href=`/fund/list/${fund._id}/bills/${b._id}`) 编辑
+            a(href=`/fund/list/${fund._id.toLowerCase()}/bills/${b._id}`) 编辑

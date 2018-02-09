@@ -19,10 +19,11 @@ settingsRouter
 			s = 1;
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
-		data.s = s;
 		if(s === 4) {
 			data.forumList = await dbFn.getAvailableForums(ctx);
 		}
+		if(s > 5) ctx.throw(404, 'not found');
+		data.s = s;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
 		ctx.template = 'interface_fund_apply.pug';

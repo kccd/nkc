@@ -32,11 +32,11 @@ block content
                     span 用户&nbsp;
                     a(href=`/m/${applicant.uid}`)= applicant.user.username
                     span &nbsp;正在申请
-                    a(href=`/fund/list/${fund._id}`)= ` 科创基金-${fund.name}`
+                    a(href=`/fund/list/${fund._id.toLowerCase()}`)= ` 科创基金-${fund.name}`
                     span ，想要添加您为小组成员。
                   if member.agree === null
                     h4
-                      a(href=`/fund/list/${fund._id}`)= ` 科创基金-${fund.name} `
+                      a(href=`/fund/list/${fund._id.toLowerCase()}`)= ` 科创基金-${fund.name} `
                       span 要求组员必须完成：
                       -const passed = [], notPass = [];
                       -for (let n of arr)
@@ -75,7 +75,7 @@ block content
                   h4!=`非常抱歉！用户&nbsp;`
                     a(href=`/m/${applicant.uid}`)= applicant.user.username
                     span &nbsp;已将您从
-                    a(href=`/fund/list/${fund._id}`)= ` 科创基金-${fund.name}`
+                    a(href=`/fund/list/${fund._id.toLowerCase()}`)= ` 科创基金-${fund.name}`
                     span &nbsp;的申请表组员名单中移除。
 block scripts
   script(src='/interface_common.js')

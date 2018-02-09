@@ -210,41 +210,6 @@ userSchema.methods.updateUserMessage = async function() {
   await this.update(updateObj);
 };
 
-userSchema.methods.getConflictingApplicationForm = async function() {
-	const obj = {
-		unSubmitted: [],// 未提交
-		unPassed: [], // 未通过
-		unCompleted: []// 未完成且冲突的申请
-	};
-	const FundApplicationFormModel = require('./FundApplicationFormModel');
-	const userQuery ={
-		uid: this.uid,
-		useless: null
-	};
-	let userApplications = await FundApplicationFormModel.find(userQuery);
-	userApplications = await Promise.all(userApplications.map(async application => {
-		await application.extendFund();
-		return application;
-	}));
-	for(let application of userApplications) {
-		const {status, _id, fund} = application;
-		const {adminSupport, completed, submitted} = status;
-		if(submitted === null) {
-			message.unSubmitted.push(application);
-		} else if(adminSupport !== true) {
-			message.unPassed.push(application);
-		} else if(completed === null) {
-			if(fund.conflict.self === true) { // 申请相同的基金且未完成的基金项目设置了与自己互斥
-				message.unCompleted.push(application);
-			} else if(fund.conflict.other === true) { // 申请的基金项目与未完成的基金项目互斥
-				message.unCompleted.push(application);
-			}
-		}
-	}
-	if(!message.unPassed && !message.unSubmitted && !message.unCompleted) return false;
-	return message;
-};
-
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
   let cs = ['会员'];

@@ -132,6 +132,13 @@ meRouter
     }
     await next();
   })
+	.get('/life_photos', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {user} = data;
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		data.lifePhotos = await userPersonal.extendLifePhotos();
+		await next();
+	})
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
   .use('/personal_info', personalInfo.routes(), personalInfo.allowedMethods())
   .use('/addresses', addresses.routes(), addresses.allowedMethods())
