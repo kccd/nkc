@@ -83,6 +83,7 @@ block content
               .col-xs-12.col-md-2
                 input#fundImage(type="file" style='display: none')
                 button.btn.btn-default(onclick='$("#fundImage").click()') 上传banner图片
+                button.btn.btn-default(onclick='deleteBanner()') 删除banner图片
               .col-xs-12.col-md-2
                 if fund && fund.image
                   img#fundImageDisplay(imageId= fund.image src=`/fundBGI_small/${fund.image}`)

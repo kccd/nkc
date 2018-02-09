@@ -17,11 +17,12 @@ block content
                 -const {id, name, color, money} = fund;
                 .col-xs-6.col-sm-4.col-md-3.fund-list
                   a(href=`/fund/list/${id.toLowerCase()}`)
-                    .fund-name(style=`background-color: ${color};background-image:${fund && fund.image ? `url(/fundBGI_small/${fund.image})` : ''}`)= name
-                    if fund.money.fixed
-                      .fund-money!= `定额${money.fixed}元`
-                    else
-                      .fund-money!= `单笔最高${money.max}元`
+                    .fund-name(style=`background-color: ${color};background-image:${fund && fund.image ? `url(/fundBGI_small/${fund.image})` : ''}`)
+                      div= name
+                      if fund.money.fixed
+                        .fund-money!= `定额${money.fixed}元`
+                      else
+                        .fund-money!= `单笔最高${money.max}元`
             hr
             .row
               .col-xs-12.col-md-12
