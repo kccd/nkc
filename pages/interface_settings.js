@@ -2,8 +2,12 @@ var lifePhotoArr = [];
 var certsPhotoArr = [];
 $(function(){
 	init();
-	initLifePhoto();
-	initCertsPhoto();
+	try{
+		initLifePhoto();
+		initCertsPhoto();
+	} catch(err){
+		console.log(err);
+	}
 });
 function init() {
 	chooseFile('#idCardAPhoto');
@@ -109,7 +113,8 @@ function displayCertsPhoto(){
 	if(certsPhotoArr.length === 0) {
 		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
 	} else {
-		for (let id of certsPhotoArr) {
+		for (let i = 0; i < certsPhotoArr.length; i++) {
+			var id = certsPhotoArr[i];
 			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/photo_small/'+id+'" photoId="'+id+'"></div>';
 		}
 	}
@@ -121,7 +126,8 @@ function displayLifePhoto() {
 	if(lifePhotoArr.length === 0) {
 		text = '<div class="blank" style="height: 20rem;line-height: 20rem">暂无数据</div>'
 	} else {
-		for (let id of lifePhotoArr) {
+		for (let i = 0; i < lifePhotoArr.length; i++) {
+			var id = lifePhotoArr[i];
 			text += '<div class="col-xs-12 col-md-4"><div class="settings-img-remove glyphicon glyphicon-remove" onclick="removePhoto('+id+')")></div><img src="/photo_small/'+id+'" photoId="'+id+'"></div>';
 		}
 	}
