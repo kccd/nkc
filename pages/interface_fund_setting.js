@@ -1,6 +1,6 @@
 var yesClass = 'greenColor glyphicon glyphicon-ok-circle';
 var noClass = 'redFontColor glyphicon glyphicon-remove-circle';
-
+var deleteBannerPhoto = false;
 var fundObj = {
   name: '科创基金',
   money: {
@@ -355,10 +355,12 @@ function conflictSet() {
 
 function submit(id) {
 	moneyFixedSet();
-	if (!fundObj.image) {
-		var imageId = $('#fundImageDisplay').attr('imageId');
-		if(imageId) {
-			fundObj.image = parseInt(imageId);
+	if(!deleteBannerPhoto) {
+		if (!fundObj.image) {
+			var imageId = $('#fundImageDisplay').attr('imageId');
+			if(imageId) {
+				fundObj.image = parseInt(imageId);
+			}
 		}
 	}
   if(!checkMoney()) return window.location.href = '#fundMoney';
@@ -410,6 +412,11 @@ function submit(id) {
     .catch(function(data){
       screenTopWarning(data.error);
     })
+}
+
+function deleteBanner() {
+	deleteBannerPhoto = true;
+	$('#fundImageDisplay').css('display', 'none');
 }
 /*
 

@@ -928,10 +928,9 @@ function deleteApplicationForm(id) {
 	if(confirm(msg) === true) {
 		nkcAPI('/fund/a/'+id+'?type=delete', 'DELETE', {})
 			.then(function(data) {
-				window.location.href = '/fund/list/'+data.applicationForm.fund._id.toLowerCase();
+				window.location.href = '/fund/list/'+data.fund._id.toLowerCase();
 			})
 			.catch(function(data) {
-				console.log(data);
 				screenTopWarning(data.error);
 			})
 	}
