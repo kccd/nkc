@@ -39,7 +39,8 @@ meRouter
 			if(a.fund) {
 				await a.extendMembers();
 				await a.extendApplicant();
-				await a.extendProject()
+				await a.extendProject();
+				return a;
 			}
 		}));
 		data.newNotify = newNotify;

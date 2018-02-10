@@ -104,13 +104,21 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    p.text-center=`专家审核不通过，等待申请人修改`
+                    if data.user.uid !== applicationForm.uid
+                      p.text-center=`专家审核不通过，等待申请人修改`
+                    else
+                      p.text-center=`专家审核不通过，`
+                        a(href=`/fund/a/${applicationForm._id}/settings`) 去修改
             if adminSupport === false
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    p.text-center=`管理员复核不通过，等待申请人修改`
+                    if data.user.uid !== applicationForm.uid
+                      p.text-center=`管理员复核不通过，等待申请人修改`
+                    else
+                      p.text-center=`管理员复核不通过，`
+                        a(href=`/fund/a/${applicationForm._id}/settings`) 去修改
                     p.text-center= data.auditComments.adminAudit.c
             if excellent
               .panel.panel-default
