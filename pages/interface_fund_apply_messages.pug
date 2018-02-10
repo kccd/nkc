@@ -9,7 +9,7 @@
       hr
       .h4 申请人信息
       if applicationForm.status.projectPassed === false && data.auditComments
-        p.redFontColor= `审核意见：` + data.auditComments.userInfoAudit.c
+        p.redFontColor= `审核意见：${data.auditComments.userInfoAudit.c || '无'}`
       br
       .row
         .col-xs-12.col-md-6
@@ -93,7 +93,7 @@
       hr
       .h4 项目信息
       if applicationForm.status.projectPassed === false && data.auditComments
-        p.redFontColor= `审核意见：` + data.auditComments.projectAudit.c
+        p.redFontColor= `审核意见：${data.auditComments.projectAudit.c || '无'}`
       br
       .h3.text-center= applicationForm.project?applicationForm.project.t: '项目标题暂未填写'
       br
@@ -107,7 +107,7 @@
       hr
       .h4 其他信息
       if applicationForm.status.projectPassed === false && data.auditComments
-        p.redFontColor= `审核意见：` + data.auditComments.moneyAudit.c
+        p.redFontColor= `审核意见：${data.auditComments.moneyAudit.c || '无'}`
       br
       h5= `学术分类：${applicationForm.forum? applicationForm.forum.displayName: '暂未选择'}`
       h5= `研究周期：${applicationForm.projectCycle?applicationForm.projectCycle+"天": '暂未填写'}`
