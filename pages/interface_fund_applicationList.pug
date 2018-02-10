@@ -51,22 +51,27 @@ else
           //else if !adminSupport
           //  th 审核中
         -for (let applicationForm of applicationForms)
-          -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
-          -let money = fund?fund.money.fixed: data.fund.money.fixed;
-          if !money
-            -money = 0;
-            if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length !== 0
-              -for(let b of budgetMoney)
-                -money += (b.count*b.money);
+          if applicationForm
+            -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
+             -let money;
+             if fund
+               -money = fund.money.fixed;
+             else
+               -money = data.fund.money.fixed;
+             if !money
+               -money = 0;
+               if budgetMoney !== null && typeof budgetMoney !== 'string' && budgetMoney.length !== 0
+                 -for(let b of budgetMoney)
+                   -money += (b.count*b.money);
 
-          tr
-            th= applicationForm.code || '暂无'
-            th= applicationFormStatus(applicationForm).str
-            th= toc.toLocaleString()
-            th= fund?fund.name: data.fund.name
-            th
-              a(href=`/m/${applicant.user.uid}`)= applicant.user.username
-            th=`${money}元`
-            th= project.t
-            th
-              a(href=`/fund/a/${_id}`) 查看详情
+             tr
+               th= applicationForm.code || '暂无'
+               th= applicationFormStatus(applicationForm).str
+               th= toc.toLocaleString()
+               th= fund?fund.name: data.fund.name
+               th
+                 a(href=`/m/${applicant.user.uid}`)= applicant.user.username
+               th=`${money}元`
+               th= project.t
+               th
+                 a(href=`/fund/a/${_id}`) 查看详情

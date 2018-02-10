@@ -249,9 +249,10 @@ input[type="radio"], input[type="checkbox"]{
 }
 .fund-panel-title{
   overflow: hidden;
+  height: 15.7rem;
   width: 100%;
   color: #fff;
-  padding: 3rem 0rem;
+  padding: 0;
   background-position: center center;
   background-size: cover;
 }

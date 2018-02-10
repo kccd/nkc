@@ -45,55 +45,43 @@ fundRouter
 			useless: null
 		};
     const applying = await db.FundApplicationFormModel.find(queryOfApplying).sort({toc: -1}).limit(10);
-    for(let i = 0; i < applying.length; i++) {
-    	const a = applying[i];
-	    await a.extendFund();
-	    if(!a.fund) {
-	    	applying.splice(i, 1);
-	    	continue;
-	    }
-	    await a.extendApplicant();
-	    await a.extendProject();
-    }
+    data.applying = await Promise.all(applying.map(async a => {
+			await a.extendFund();
+			if(a.fund) {
+				await a.extendApplicant();
+				await a.extendProject();
+				return a;
+			}
+    }));
     const funding = await db.FundApplicationFormModel.find(queryOfFunding).sort({toc: -1}).limit(10);
-	  for(let i = 0; i < funding.length; i++) {
-	  	const a = funding[i];
+	  data.funding = await Promise.all(funding.map(async a => {
 		  await a.extendFund();
-		  if(!a.fund) {
-			  applying.splice(i, 1);
-			  continue;
+		  if(a.fund) {
+			  await a.extendApplicant();
+			  await a.extendProject();
+			  return a;
 		  }
-		  await a.extendApplicant();
-		  await a.extendProject();
-	  }
+	  }));
     const excellent = await db.FundApplicationFormModel.find(queryOfExcellent).sort({toc: 1});
-	  for(let i = 0; i < excellent.length; i++) {
-	  	const a = excellent[i];
+	  data.excellent = await Promise.all(excellent.map(async a => {
 		  await a.extendFund();
-		  if(!a.fund) {
-			  applying.splice(i, 1);
-			  continue;
+		  if(a.fund) {
+			  await a.extendApplicant();
+			  await a.extendProject();
+			  return a;
 		  }
-		  await a.extendApplicant();
-		  await a.extendProject();
-	  }
+	  }));
 	  const completed = await db.FundApplicationFormModel.find(queryOfCompleted).sort({toc:1});
-	  for(let i = 0; i < completed.length; i++) {
-	  	const a = completed[i];
+	  data.completed = await Promise.all(completed.map(async a => {
 		  await a.extendFund();
-		  if(!a.fund) {
-			  applying.splice(i, 1);
-			  continue;
+		  if(a.fund) {
+			  await a.extendApplicant();
+			  await a.extendProject();
+			  return a;
 		  }
-		  await a.extendApplicant();
-		  await a.extendProject();
-	  }
-    data.applying = applying;
-    data.funding = funding;
-    data.excellent = excellent;
-    data.completed = completed;
+	  }));
 		data.home = true;
-    data.funds = await db.FundModel.find({display: true}).sort({toc: 1});
+    data.funds = await db.FundModel.find({display: true, disabled: false}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';
     await next();
   })

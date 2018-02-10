@@ -123,6 +123,7 @@ auditRouter
 						status: null
 					}];
 				} else {
+					applicationForm.remittance = [];
 					for (let m of remittance) {
 						applicationForm.remittance.push({
 							money: m,

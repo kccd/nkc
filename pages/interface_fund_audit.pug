@@ -20,20 +20,42 @@ block content
             .col-xs-12.col-md-8
               .panel.panel-default
                 .panel-body
-                  span=`账号ID：`
+                  h5=`账号ID：`
                     a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
-                  br
-                  span=`专栏：`
+                  h5=`专栏：`
                     a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
-                  br
-                  span=`真实姓名：${applicant.name}，身份证号码：${applicant.idCardNumber}，联系电话：${applicant.mobile}`
-                  br
-                  span=`生活照：`
+                  h5=`真实姓名：${applicant.name}`
+                  h5=`联系电话：${applicant.mobile}`
+                  h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
+                  h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
+                  -let paymentType;
+                  if applicationForm.account.paymentType === 'alipay'
+                    -paymentType = '支付宝';
+                  else if applicationForm.account.paymentType === 'bankCard'
+                    -paymentType = '银行卡';
+                  else
+                    -paymentType = '暂未选择';
+                  h5= `收款方式：${paymentType}`
+                  if paymentType === '银行卡'
+                    h5= `银行全称：${applicationForm.account.bankName || '暂未填写'}`
+                    h5= `户名：${applicationForm.account.name || '暂未填写'}`
+                  h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
+                  h5=`生活照：`
                   .row
                     .col-xs-12.col-md-12
                       -for(let photo of applicationForm.applicant.lifePhotos)
                         a(href=`/photo/${photo._id}` target='_blank')
                             img(src=`/photo_small/${photo._id}` style='width: 50%; padding: 0.5rem')
+                  h5=`自我介绍：${applicant.description}`
+                  if applicationForm.from === 'team'
+                    h5= `申请方式：团队`
+                    h5= `组员ID（已确认的）：`
+                    -for(let m of applicationForm.members)
+                      if m.agree
+                        span &nbsp;&nbsp;
+                        a(href=`/m/${m.uid}` target='_blank')= m.user.username
+                  else
+                    h5= `申请方式：个人`
             .col-xs-12.col-md-4
               textarea.form-control#userInfoComment(rows='12' placeholder='审核评语')
               label.radio-inline
@@ -145,20 +167,42 @@ block content
         .col-xs-12.col-md-8
           .panel.panel-default
             .panel-body
-              span=`账号ID：`
-              a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
-              br
-              span=`专栏：`
-              a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
-              br
-              span=`真实姓名：${applicant.name}，身份证号码：${applicant.idCardNumber}，联系电话：${applicant.mobile}`
-              br
-              span=`生活照：`
+              h5=`账号ID：`
+                a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
+              h5=`专栏：`
+                a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
+              h5=`真实姓名：${applicant.name}`
+              h5=`联系电话：${applicant.mobile}`
+              h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
+              h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
+              -let paymentType;
+              if applicationForm.account.paymentType === 'alipay'
+                -paymentType = '支付宝';
+              else if applicationForm.account.paymentType === 'bankCard'
+                -paymentType = '银行卡';
+              else
+                -paymentType = '暂未选择';
+              h5= `收款方式：${paymentType}`
+              if paymentType === '银行卡'
+                h5= `银行全称：${applicationForm.account.bankName || '暂未填写'}`
+                h5= `户名：${applicationForm.account.name || '暂未填写'}`
+              h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
+              h5=`生活照：`
               .row
                 .col-xs-12.col-md-12
                   -for(let photo of applicationForm.applicant.lifePhotos)
                     a(href=`/photo/${photo._id}` target='_blank')
                       img(src=`/photo_small/${photo._id}` style='width: 50%; padding: 0.5rem')
+              h5=`自我介绍：${applicant.description}`
+              if applicationForm.from === 'team'
+                h5= `申请方式：团队`
+                h5= `组员ID（已确认的）：`
+                -for(let m of applicationForm.members)
+                  if m.agree
+                    h5 &nbsp;&nbsp;
+                    a(href=`/m/${m.uid}` target='_blank')= m.user.username
+              else
+                h5= `申请方式：个人`
         .col-xs-12.col-md-12
           h3 项目内容
         .col-xs-12.col-md-8
@@ -265,7 +309,7 @@ block content
                   span#remainder
                   span=`元`
                 br
-                span 输入分期数：
+                span 输入分期数（默认分为1期）：
                 input#remittanceCount(type="number")
                 button#enterBtn 确定
                 #remittanceList
