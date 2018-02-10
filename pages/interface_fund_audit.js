@@ -226,8 +226,12 @@ function submitAdminAudit(id) {
 		for(var i = 0; i < factMoney.length; i++) {
 			factMoneyTotal += factMoney[i];
 		}
-		if(remittanceTotal !== factMoneyTotal){
-			return screenTopWarning('分期的金钱总和与实际预算总和不想等，请检查。');
+		if(remittance.length === 0) {
+			remittance = [factMoneyTotal];
+		} else {
+			if(remittanceTotal !== factMoneyTotal){
+				return screenTopWarning('分期的金钱总和与实际预算总和不想等，请检查。');
+			}
 		}
 	}
 	var obj = {

@@ -27,8 +27,11 @@ block content
       .col-xs-12.col-md-3
         .panel.panel-default
           .panel-body
-            img(src=`/fundBGI_small/${fund.image}` style="width: 100%;")
-            h2.text-center(style='margin-top: -4rem;margin-bottom: 4rem;color: #fff;')= `科创基金-${fund.name}`
+            if !fund.image
+              h2.text-center(style='margin-bottom: 4rem;color: #000;')= `科创基金-${fund.name}`
+            else
+              img(src=`/fundBGI_small/${fund.image}` style="width: 100%;")
+              h2.text-center(style='margin-top: -4rem;margin-bottom: 4rem;color: #fff;')= `科创基金-${fund.name}`
             .row
               .col-xs-12.col-md-12
                 h4.text-center 剩余金额

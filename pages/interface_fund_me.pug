@@ -46,47 +46,48 @@ block content
                       .fund-ul
                         -for(let i = 0; i < applicationForms.length; i++)
                           -const a = applicationForms[i];
-                          -const {toc, _id, members, applicant, fund} = a;
-                          if type === 'notify'
-                            span=`来自 `
-                            a(href=`/m/${applicant.uid}`)= applicant.user.username
-                            span=` 的组队邀请，`
-                            a(href=`/fund/a/${a._id}`)= `查看`
-                            br
-                            span= `状态：`
-                            -for(let m of members)
-                              if m.uid === data.user.uid
-                                if m.agree === true
-                                  span.greenFontColor 已同意
-                                else if m.agree === null
-                                  span 未处理
-                                  //a(href=`/fund/a/${_id}`) 查看
-                                else
-                                  span.redFontColor 已拒绝
-                            hr
-                          else
-                            .fund-li
-                              .row
-                                .col-xs-12.col-md-12
-                                  span.fund-li-time= toc.toLocaleString()
-                                .col-xs-12.col-md-11
-                                  span= `申请人：`
-                                    a(href=`/m/${a.uid}`)= a.applicant.user.username
-                                  span &nbsp;&nbsp;
-                                  if a.from !== 'personal'
-                                    span= `组员：`
-                                      -for(let u of a.members)
-                                        a(href=`/m/${u.uid}`)= `${u.user.username} `
-                                  br
-                                  span=`项目名称：${a.project?a.project.t: '暂未填写'}`
-                                  br
-                                  span= `状态：`
-                                  span= applicationFormStatus(a).str
-                                .col-xs-12.col-md-1
-                                  a(href=`/fund/a/${a._id}`) 查看
-                                  br
-                                  if !a.status.adminSupport && !a.disabled && a.useless === null
-                                    a(href=`/fund/a/${a._id}/settings`) 编辑
+                          if a
+                            -const {toc, _id, members, applicant, fund} = a;
+                            if type === 'notify'
+                              span=`来自 `
+                              a(href=`/m/${applicant.uid}`)= applicant.user.username
+                              span=` 的组队邀请，`
+                              a(href=`/fund/a/${a._id}`)= `查看`
+                              br
+                              span= `状态：`
+                              -for(let m of members)
+                                if m.uid === data.user.uid
+                                  if m.agree === true
+                                    span.greenFontColor 已同意
+                                  else if m.agree === null
+                                    span 未处理
+                                    //a(href=`/fund/a/${_id}`) 查看
+                                  else
+                                    span.redFontColor 已拒绝
+                              hr
+                            else
+                              .fund-li
+                                .row
+                                  .col-xs-12.col-md-12
+                                    span.fund-li-time= toc.toLocaleString()
+                                  .col-xs-12.col-md-11
+                                    span= `申请人：`
+                                      a(href=`/m/${a.uid}`)= a.applicant.user.username
+                                    span &nbsp;&nbsp;
+                                    if a.from !== 'personal'
+                                      span= `组员：`
+                                        -for(let u of a.members)
+                                          a(href=`/m/${u.uid}`)= `${u.user.username} `
+                                    br
+                                    span=`项目名称：${a.project?a.project.t: '暂未填写'}`
+                                    br
+                                    span= `状态：`
+                                    span= applicationFormStatus(a).str
+                                  .col-xs-12.col-md-1
+                                    a(href=`/fund/a/${a._id}`) 查看
+                                    br
+                                    if !a.status.adminSupport && !a.disabled && a.useless === null
+                                      a(href=`/fund/a/${a._id}/settings`) 编辑
                       include interface_fund_page
 block scripts
   script(src='/interface_common.js')
