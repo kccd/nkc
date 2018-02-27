@@ -10,7 +10,7 @@ block content
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
-      if data.type !== 'reportAudit'
+      if !data.type
         .col-xs-12.col-md-6
           .row
             if data.user && data.user.uid === applicationForm.uid && !status.completed
@@ -68,6 +68,7 @@ block content
                   div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
                     div(style='position: absolute;')
                   div.content
+                    -r.c = hideContentByUser(r.c, data.user, 'thread')
                     div!= experimental_render(r)
                 div.time!= `${fromNow(applicationForm.timeToPassed)}&nbsp;&nbsp;&nbsp;${applicationForm.timeToPassed.toLocaleString()}`
                   div(style='position: absolute;')
@@ -78,7 +79,7 @@ block content
                 div.time!= `${fromNow(applicationForm.toc)}&nbsp;&nbsp;&nbsp;${applicationForm.toc.toLocaleString()}`
                   div(style='position: absolute;')
                 div.content(style='border: none;')=`填写申请表`
-      else
+      else if data.type === 'reportAudit'
         .col-xs-12.col-md-6
           .panel.panel-default
             .panel-body
@@ -97,6 +98,7 @@ block content
               hr
               h3.text-center=`申请第${number+1}期拨款`
               h4 提交的报告：
+              -data.report.c = hideContentByUser(data.report.c, data.user, 'thread')
               div!= experimental_render(data.report)
               br
               if reportNeedThreads
@@ -110,8 +112,6 @@ block content
 
               button.btn.btn-default(onclick=`submittedReportAudit(true, ${applicationForm._id}, ${number})`) 通过
               button.btn.btn-default(onclick=`submittedReportAudit(false, ${applicationForm._id}, ${number})`) 不通过
-
-
 block scripts
   script(src="/interface_common.js")
   script(src="/interface_fund_report.js")

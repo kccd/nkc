@@ -109,7 +109,7 @@ function cartThread(tid){
     return screenTopAlert(tid + ' added to cart')
   })
   .catch(function(data) {
-  	jwarning(data.error)
+  	screenTopWarning(data.error)
   })
 }
 
@@ -119,7 +119,7 @@ function cartPost(pid){
     return screenTopAlert(pid + ' added to cart')
   })
   .catch(function(data) {
-  	jwarning(data.error)
+  	screenTopWarning(data.error)
   })
 }
 
@@ -130,7 +130,7 @@ function setDigest(tid){
   var status = geid('threadDigest');
   if(status.innerHTML === setDigest) dateObj = {digest: true};
   else if(status.innerHTML === unSetDigest) dateObj = {digest: false};
-  else return jwarning('到底是要设置精华还是撤销精华？');
+  else return screenTopWarning('到底是要设置精华还是撤销精华？');
   nkcAPI('/t/'+tid+'/digest', 'PATCH',dateObj)
   .then(function(back){
     var oldStatus = status.innerHTML;
@@ -143,7 +143,7 @@ function setDigest(tid){
     return screenTopAlert(tid + oldStatus + '成功');
   })
   .catch(function(data){
-    jwarning('操作失败： ' + data.error);
+    screenTopWarning('操作失败： ' + data.error);
   })
 }
 
@@ -154,7 +154,7 @@ function setTopped(tid){
   var status = geid('threadTop');
   if(status.innerHTML === setTop) dataObj = {topped: true};
   else if(status.innerHTML === unSetTop) dataObj = {topped: false};
-  else return jwarning('到底是要设置置顶还是撤销置顶？');
+  else return screenTopWarning('到底是要设置置顶还是撤销置顶？');
   nkcAPI('/t/'+tid+'/topped', 'PATCH',dataObj)
   .then(function(back){
     var oldStatus = status.innerHTML;
@@ -166,7 +166,7 @@ function setTopped(tid){
     return screenTopAlert(tid + oldStatus + '成功');
   })
   .catch(function(data){
-    return jwarning('操作失败： ' + data.error);
+    return screenTopWarning('操作失败： ' + data.error);
   })
 }
 
@@ -199,8 +199,7 @@ function disablePost(pid){
     //location.reload()
   })
   .catch(function(data) {
-  	console.log(data);
-  	jwarning(data.error)
+  	screenTopWarning(data.error)
   })
 }
 
@@ -210,7 +209,7 @@ function enablePost(pid){
     location.reload()
   })
   .catch(function(data) {
-  	jwarning(data.error)
+  	screenTopWarning(data.error)
   })
 }
 
@@ -227,7 +226,7 @@ function submit(tid){
     redirect('/t/'+tid);
   })
   .catch(function(data){
-    jwarning(data.error);
+    screenTopWarning(data.error);
     geid('ButtonReply').disabled=false;
   })
 }
@@ -278,7 +277,7 @@ function addColl(tid){
     screenTopAlert('已收藏 '+tid)
   })
   .catch(function(data) {
-  	jwarning(data.error)
+  	screenTopWarning(data.error)
   })
 }
 
@@ -290,7 +289,7 @@ function addCredit(pid){
       window.location.reload()
     })
     .catch(function(data) {
-    	jwarning(data.error)
+    	screenTopWarning(data.error)
     })
   }
   else{
@@ -333,7 +332,7 @@ function moveThreadTo(tid){
     screenTopAlert('请刷新')
   })
   .catch(function(data) {
-  	jwarning(data.error)
+  	screenTopWarning(data.error)
   })
 }
 
@@ -599,7 +598,7 @@ function adSwitch(tid) {
       btn.innerHTML = nowIsAd;
     })
     .catch(function(data){
-      screenTopWarning('操作失败： ' + date.error);
+      screenTopWarning('操作失败： ' + data.error);
     })
 }
 

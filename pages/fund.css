@@ -837,6 +837,10 @@ input[type="radio"], input[type="checkbox"]{
   width: 16.6%;
 }
 
+.fund-money-list.reportOfKnotAudit > div{
+  width: 14.28%;
+}
+
 .aggregate{
   padding-left: 0.5rem;
 }

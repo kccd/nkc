@@ -10,7 +10,7 @@ reportRouter
 		const {data, db} = ctx;
 		const {applicationForm} = data;
 		ctx.template = 'interface_fund_report.pug';
-		data.reports = await db.FundDocumentModel.find({type: 'report', applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
+		data.reports = await db.FundDocumentModel.find({type: {$in: ['report', 'completedReport']}, applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
 
 		await next();
 	})
@@ -80,17 +80,17 @@ reportRouter
 		if(appointed.includes(user.uid)) isCensor = true;
 		if(!isCensor) ctx.throw(401, '权限不足');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
-		if(reportNeedThreads) {
-			for(let r of remittance) {
-				if(r.status === null && r.passed === null && r.threads && r.threads.length !== 0){
+		for(let r of remittance) {
+			if(r.status === null && r.passed === null){
+				if(reportNeedThreads && r.threads && r.threads.length !== 0) {
 					data.threads = await Promise.all(r.threads.map(async t => {
 						const thread = await db.ThreadModel.findOnly({tid: t});
-					  await thread.extendFirstPost().then(p => p.extendUser());
-					  return thread;
+						await thread.extendFirstPost().then(p => p.extendUser());
+						return thread;
 					}));
-					data.report = await db.FundDocumentModel.findOnly({_id: r.report});
-					break;
 				}
+				data.report = await db.FundDocumentModel.findOnly({_id: r.report});
+				break;
 			}
 		}
 		ctx.template = 'interface_fund_report.pug';

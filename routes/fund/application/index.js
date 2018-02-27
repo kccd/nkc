@@ -127,6 +127,9 @@ applicationRouter
 		if(!applicationForm.status.adminSupport) {
 			auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
 		}
+		if(applicationForm.status.completed === false) {
+			auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
+		}
 		if(applicationForm.useless === 'giveUp') {
 			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
 		}

@@ -34,7 +34,7 @@ registerRouter
     const regCode = params.regCode;
     let regCodeFoDB = {};
     try{
-      regCodeFoDB = await dbFn.checkRigsterCode(regCode);
+      regCodeFoDB = await dbFn.checkRegisterCode(regCode);
     }catch (err) {
       ctx.throw('404', err);
     }
@@ -77,7 +77,7 @@ registerRouter
     const regCode = params.regCode;
     let regCodeFoDB = {};
     try{
-      regCodeFoDB = await dbFn.checkRigsterCode(regCode);
+      regCodeFoDB = await dbFn.checkRegisterCode(regCode);
     }catch (err) {
       ctx.throw('404', err);
     }

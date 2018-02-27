@@ -3,26 +3,29 @@ const completeRouter = new Router();
 completeRouter
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
-		const {user, applicationForm} = data;
-		const {status, remittance} = applicationForm;
-		if(user.uid !== applicationForm.uid) ctx.throw('权限不足');
-		// if(!status.remittance) ctx.throw(400, '当前暂未拨款，暂不能结项。若想取消申请，请点击放弃申请按钮。');
-		// for(let r of remittance) {
-		// 	if(!r.status) ctx.throw(400, '当前还未全部拨款，暂不能结项。若想取消申请，请点击放弃申请按钮。');
-		// }
+		const {applicationForm} = data;
+		const {status} = applicationForm;
 		if(status.completed) ctx.throw('该项目已结项。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {user, applicationForm} = data;
+		if(user.uid !== applicationForm.uid) ctx.throw('权限不足');
 		ctx.template = 'interface_fund_complete.pug';
+		if(applicationForm.status.completed === false) {
+			data.auditComments = {};
+			data.auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
+			data.completedReport = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedReport', disabled: false}).sort({toc: -1});
+		}
 		await next();
 	})
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
-		const {c, selectedThreads, successful} = body;
-		const {timeToPassed} = applicationForm;
-
+		const {usedMoney, c, selectedThreads, successful} = body;
+		const {fixedMoney, timeToPassed, budgetMoney} = applicationForm;
+		if(user.uid !== applicationForm.uid) ctx.throw('权限不足');
 		//验证帖子的时间
 		await Promise.all(selectedThreads.map(async t => {
 			const thread = await db.ThreadModel.findOnly({tid: t.tid});
@@ -34,15 +37,78 @@ completeRouter
 			_id: newId,
 			uid: user.uid,
 			applicationFormId: applicationForm,
-			type: 'report',
+			type: 'completedReport',
 			c
 		});
+		if(!fixedMoney) {
+			if(budgetMoney.length !== usedMoney.length) ctx.throw(400, '请输入实际花费金额。');
+			for(let i = 0; i < budgetMoney.length; i++) {
+				budgetMoney[i].used = usedMoney[i];
+			}
+			await applicationForm.update({budgetMoney});
+		}
 		applicationForm.threadsId.completed = selectedThreads.map(t => t.tid);
-		applicationForm.status.completed = true;
 		applicationForm.status.successful = successful;
 		applicationForm.timeOfCompleted = Date.now();
+		applicationForm.completedAudit = true;
+		applicationForm.status.completed = null;
 		await newDocument.save();
 		await applicationForm.save();
+		await next();
+	})
+	.get('/audit', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {applicationForm, user} = data;
+		ctx.template = 'interface_fund_complete.pug';
+		data.type = 'reportAudit';
+
+		//结项审核  审查员权限判断
+		const {fund} = applicationForm;
+		let isProjectCensor = false;
+		for(let c of fund.censor.certs)
+			if(user.certs.includes(c)) {
+				isProjectCensor = true;
+			}
+		// 判断是否是项目审查员
+		if(fund.censor.appointed.includes(user.uid)) {
+			isProjectCensor = true;
+		}
+		if(!isProjectCensor) ctx.throw(401, '权限不足');
+		data.report = await db.FundDocumentModel.findOne({type: 'completedReport'}).sort({toc: -1}).limit(1);
+		await next();
+	})
+	.post('/audit', async (ctx, next) => {
+		const {data, db, body} = ctx;
+		const {applicationForm, user} = data;
+		const {c, type} = body;
+		//结项审核  审查员权限判断
+		const {fund} = applicationForm;
+		let isProjectCensor = false;
+		for(let c of fund.censor.certs)
+			if(user.certs.includes(c)) {
+				isProjectCensor = true;
+			}
+		// 判断是否是项目审查员
+		if(fund.censor.appointed.includes(user.uid)) {
+			isProjectCensor = true;
+		}
+		if(!isProjectCensor) ctx.throw(401, '权限不足');
+
+		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+		const newDocument = db.FundDocumentModel({
+			_id: newId,
+			c: c,
+			type: 'completedAudit',
+			support: (type === 'pass'),
+			applicationFormId: applicationForm._id,
+			uid: user.uid
+		});
+		if(type === 'pass') {
+			await applicationForm.update({'status.completed': true, completedAudit: false});
+		} else {
+			await applicationForm.update({'status.completed': false, completedAudit: false});
+		}
+		await newDocument.save();
 		await next();
 	});
 module.exports = completeRouter;

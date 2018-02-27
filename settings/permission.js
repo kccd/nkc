@@ -575,7 +575,12 @@ const certificates ={
 			      complete: { // 结项
 				      [name]: '结项',
         			[GET]: true,
-				      [POST]: true
+				      [POST]: true,
+				      audit: {
+				      	[name]: '结题审核',
+					      [GET]: true,
+					      [POST]: true
+				      }
 			      },
 			      remittance: {
         			apply: {

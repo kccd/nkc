@@ -50,6 +50,7 @@ block content
                           a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除屏蔽
                         else
                           a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},true)`) 屏蔽
+                      -comment.c = hideContentByUser(comment.c, data.user, 'thread')
                       div!= experimental_render(comment)
                 br
                 include interface_fund_page
@@ -104,7 +105,7 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    if data.user.uid !== applicationForm.uid
+                    if !data.user || data.user.uid !== applicationForm.uid
                       p.text-center=`专家审核不通过，等待申请人修改`
                     else
                       p.text-center=`专家审核不通过，`
@@ -114,21 +115,32 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    if data.user.uid !== applicationForm.uid
+                    if !data.user || data.user.uid !== applicationForm.uid
                       p.text-center=`管理员复核不通过，等待申请人修改`
                     else
                       p.text-center=`管理员复核不通过，`
                         a(href=`/fund/a/${applicationForm._id}/settings`) 去修改
                     p.text-center= data.auditComments.adminAudit.c
-            if excellent
+            if completed === false
               .panel.panel-default
                 .panel-body.applicationForm
-                  h1.text-center.greenFontColor 优秀项目
-            if successful === false
-              .panel.panel-default
-                .panel-body.applicationForm
-                  h1.text-center.redFontColor 研究失败
-            if applicationForm.status.completed
+                  h5.text-center 审核结果
+                  .redFontColor
+                    if !data.user || data.user.uid !== applicationForm.uid
+                      p.text-center=`结题审核不通过，等待申请人修改`
+                    else
+                      p.text-center=`结题审核不通过，`
+                       a(href=`/fund/a/${applicationForm._id}/complete`) 去修改
+                    p.text-center= data.auditComments.completedAudit.c
+            if completed
+              if excellent
+                .panel.panel-default
+                  .panel-body.applicationForm
+                    h1.text-center.greenFontColor 优秀项目
+              if successful === false
+                .panel.panel-default
+                  .panel-body.applicationForm
+                    h1.text-center.redFontColor 研究失败
               -displayNext = false;
             .panel.panel-default
               .panel-body.applicationForm
@@ -195,8 +207,11 @@ block content
                     -needRemittance = true;
 
             -let needReportAudit = false;
+            -let needCompletedAudit = false;
             if applicationForm.submittedReport && isProjectCensor
               -needReportAudit = true;
+            if applicationForm.completedAudit
+              -needCompletedAudit = true;
 
 
 
@@ -208,7 +223,7 @@ block content
                   h5.text-center 控制面板
                   if applicationForm.status.adminSupport
                     a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
-                    if data.user && applicationForm.uid === data.user.uid && !completed
+                    if data.user && applicationForm.uid === data.user.uid && needRemittance
                       a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
                   if data.user && data.user.uid === applicationForm.applicant.uid
                     if !applicationForm.lock.submitted && !adminSupport
@@ -233,6 +248,8 @@ block content
                     a(href=`/fund/a/${applicationForm._id}/remittance`).btn.btn-info.btn-block 拨款
                   if needReportAudit
                     a(href=`/fund/a/${applicationForm._id}/report/audit`).btn.btn-info.btn-block 报告审核
+                  if needCompletedAudit
+                    a(href=`/fund/a/${applicationForm._id}/complete/audit`).btn.btn-info.btn-block 结题审核
                   if isAdmin
                     if applicationForm.status.completed
                       if applicationForm.status.excellent
@@ -240,9 +257,9 @@ block content
                       else
                         button(onclick=`excellent(${applicationForm._id}, true)`).btn.btn-info.btn-block 评为优秀项目
                     if applicationForm.disabled
-                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 解除封禁
+                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
                     else
-                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 封禁
+                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
 
             //普通用户
             .panel.panel-default

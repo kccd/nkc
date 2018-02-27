@@ -312,7 +312,7 @@ function onPost(that) {
       screenTopWarning('请填写内容。');
       return;
     }
-    if (type !== 'thread' && type !== 'post' && title === '') {
+    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
       screenTopWarning('请填写标题。');
       return;
     }

@@ -167,7 +167,11 @@ block content
                   textarea.form-control#abstract(rows=6 placeholder='200字以内')= abstract?abstract: ''
                   h4 项目内容（请在编辑器详细填写）：
                   //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
-                  div#projectContent!= project && project.c? experimental_render(project): ''
+                  if(project && project.c)
+                    -project.c = hideContentByUser(project.c, data.user, 'thread');
+                    div#projectContent!= experimental_render(project)
+                  else
+                    div#projectContent!= ''
                   //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
                   if project && project.c
                     button.btn.btn-default(onclick=`toEditor()` ) 去编辑器修改

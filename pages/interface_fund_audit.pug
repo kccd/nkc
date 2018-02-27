@@ -75,6 +75,7 @@ block content
                   br
                   p= project.abstract
                   br
+                  -project.c = hideContentByUser(project.c, data.user, 'thread')
                   div#projectContent!= experimental_render(project)
                   hr
                   h4= `学术分类：${applicationForm.forum.displayName}`
@@ -213,6 +214,7 @@ block content
               br
               p= project.abstract
               br
+              -project.c = hideContentByUser(project.c, data.user, 'thread')
               div#projectContent!= experimental_render(project)
               hr
               h4= `学术分类：${applicationForm.forum.displayName}`

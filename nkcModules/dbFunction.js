@@ -81,7 +81,7 @@ fn.addCertToUser = async (uid, cert) => {
   await db.UserModel.updateOne({uid: uid},{$addToSet:{certs: cert}});
 };
 
-fn.checkRigsterCode = async (regCode) => {
+fn.checkRegisterCode = async (regCode) => {
   let regCodeOfDB = await db.AnswerSheetModel.findOne({key: regCode});
   if(!regCodeOfDB) throw '验证注册码失败，请检查！';
   if (regCodeOfDB.uid) throw '答卷的注册码过期，可能要重新参加考试';

@@ -29,7 +29,7 @@ $(document).ready(function() {
     nkcAPI('/e/newSysinfo','post',userObj)
       .then(function(){
         geid('submit').disabled = false;
-        return screenTopWarning('发送成功！请刷新');
+        return screenTopAlert('发送成功！请刷新');
       })
       .catch(function(data){
         geid('submit').disabled = false;

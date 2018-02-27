@@ -188,6 +188,11 @@ const fundApplicationFormSchema = new Schema({
 		default: false,
 		index: 1
 	},
+	completedAudit: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
 	reportNeedThreads: {
 		type: Boolean,
 		default: false

@@ -321,15 +321,17 @@ router
       data.paging = paging(page, length)
     }
     if(tab === 'all' || tab === 'own' || tab === 'discuss') {
-      data.toppedThreads = await Promise.all(personalForum.toppedThreads.map(async tid => {
-        const thread = await ThreadModel.findOnly({tid});
-        await thread.extendFirstPost().then(async p => {
-          await p.extendUser();
-          await p.extendResources();
-        });
-        await thread.extendLastPost().then(p => p.extendUser());
-        return thread;
-      }));
+    	data.toppedThreads = [];
+    	for(let tid of personalForum.toppedThreads) {
+    		const thread = await ThreadModel.findOnly({tid});
+    		if(thread.fid === 'recycle') continue;
+		    await thread.extendFirstPost().then(async p => {
+			    await p.extendUser();
+			    await p.extendResources();
+		    });
+		    await thread.extendLastPost().then(p => p.extendUser());
+				data.toppedThreads.push(thread);
+	    }
     }
     ctx.template = 'interface_personal_forum.pug';
     if(ctx.data.user)

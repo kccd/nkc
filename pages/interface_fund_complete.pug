@@ -1,8 +1,8 @@
 extends bootstrap_base
 block title
   -const mainContainer1400 = true
-  -const {applicationForm} = data;
-  -const {fund, project, applicant, members, code} = applicationForm;
+  -const {applicationForm, auditComments} = data;
+  -const {fund, project, applicant, members, code, threads, completedAudit, status} = applicationForm;
   title= `${fund.name}-${project.t}`
   link(rel='stylesheet' href='/fund.css')
 block content
@@ -11,46 +11,169 @@ block content
     .row
       .col-xs-12.col-md-12
         .row
-          .col-xs-12.col-md-6
-            .panel.panel-default
-              .panel-body
-                h2.text-center 结项
-                h4=`项目名称：${project.t}`
-                h4=`项目ID：${code}`
-                if members && members.length !== 0
-                  h4=`组员：`
+          if data.type === 'reportAudit'
+            .col-xs-12.col-md-8
+              .panel.panel-default
+                .panel-body
+                  h2.text-center 结项审核
+                  h4=`项目名称：${project.t}`
+                  h4=`项目ID：${code}`
+                  h4= `申请人：`
+                    a(href=`/m/${applicant.uid}` target='_blank')= applicant.user.username
+                  if members && members.length !== 0
+                    h4=`组员：`
                     -for(let m of members)
                       a(href=`/m/${m.uid}`)= m.user.username
                       span &nbsp;&nbsp;
-                hr
-                span= `温馨提示：`
-                p 请详细说明每个组员在团队中所做出的贡献。
-                p 我们会根据所有网友的评论和项目的所有报告来进行评优，优秀的项目将会展示在科创基金首页。
-                p
-                span 总体情况：
-                label.radio-inline
-                  input(type='radio' name='success' checked=true)
-                  h5 研究成功
-                label.radio-inline
-                  input(type='radio' name='success' checked=false)
-                  h5 研究失败
-                textarea.form-control#content(rows=10 placeholder='项目完成情况简介（建议500字左右）')
-                br
-                h3 结题报告（请在论坛发表，然后添加在下面）
-                h5 已选择帖子的文号：
-                  #selectedThread
-                    span 暂未选择
+                  hr
+                  h4 总体情况：
+                    if applicationForm.status.successful === true
+                      span.greenFontColor 研究成功
+                    else if applicationForm.status.successful === false
+                      span.redFontColor 研究失败
+                    else
+                      span.redFontColor (数据错误，请联系管理员)
                   br
-                  .form
-                    input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
-                    input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
-                  span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
-                  span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
-                  .unselectedThreads
-                    .blank(style='color: #aaa;') 暂无数据
-                  nav(aria-label='navigation')
-                    ul.pagination.pagination-sm.pageList
-                  button.btn.btn-default(style='float: right;' onclick=`submit(${applicationForm._id})`) 提交
+                  h4 结项报告：
+                  p= data.report.c
+                  br
+                  if !applicationForm.fixedMoney
+                    h3 资金预算
+                    -let aggregate, suggest, fact, used;
+                    #budgetMoney
+                      -aggregate=0;
+                      -suggest=0;
+                      -fact=0;
+                      -used=0;
+                      .fund-money-list.head.reportOfKnotAudit
+                        .purpose 用途
+                        .count 数量
+                        .money 单价(元)
+                        .total 合计(元)
+                        .suggest 专家建议(元)
+                        .fact 实际批准(元)
+                        div 实际花费（元）
+                      -for(let p of applicationForm.budgetMoney)
+                        -const total = p.count*p.money;
+                        -aggregate += total;
+                        -suggest += p.suggest;
+                        -fact += p.fact;
+                        -used += p.used;
+                        .fund-money-list.reportOfKnotAudit
+                          .purpose= p.purpose
+                          .count= p.count
+                          .money= p.money
+                          .total= total
+                          .suggest= p.suggest
+                          .fact= p.fact
+                          .used= p.used
+                    h3.text-right
+                      span=`申请金额：${aggregate}元`
+                      span=`，专家建议：${suggest}元`
+                      span=`，实际批准：${fact}元`
+                      span ，实际花费：
+                      span#usedMoneyTotal= used
+                      span 元
+                  br
+                  h4 附带帖子：
+                  -for(let thread of threads.completed)
+                    h4
+                      a(href=`/t/${thread.tid}` target='_blank')= thread.firstPost.t
+                  hr
+                  textarea#completedAuditContent.form-control(rows=8 placeholder='填写理由')
+                  br
+                  button.btn.btn-info(onclick=`submitCompletedAudit("pass", ${applicationForm._id})`) 通过
+                  button.btn.btn-danger(onclick=`submitCompletedAudit("notPass", ${applicationForm._id})`) 不通过
+
+          else
+            .col-xs-12.col-md-8
+              .panel.panel-default
+                .panel-body
+                  if status.completed
+                    h3 该项目已结项
+                  else
+                    if completedAudit
+                      h3 结题申请已提交，等待审查员处理
+                    else
+                      h2.text-center 结项
+                      h4=`项目名称：${project.t}`
+                      h4=`项目ID：${code}`
+                      if members && members.length !== 0
+                        h4=`组员：`
+                          -for(let m of members)
+                            a(href=`/m/${m.uid}`)= m.user.username
+                            span &nbsp;&nbsp;
+                      hr
+                      if status.completed === false
+                        h3.redFontColor 结题审核不通过，请修改后重新提交
+                        p.redFontColor= auditComments.completedAudit.c
+                        hr
+                      span= `温馨提示：`
+                      p 请详细说明每个组员在团队中所做出的贡献。
+                      p 我们会根据所有网友的评论和项目的所有报告来进行评优，优秀的项目将会展示在科创基金首页。
+                      p
+                      span 总体情况：
+                      label.radio-inline
+                        input(type='radio' name='success' checked=!!status.successful)
+                        h5 研究成功
+                      label.radio-inline
+                        input(type='radio' name='success' checked=!status.successful)
+                        h5 研究失败
+                      textarea.form-control#content(rows=10 placeholder='项目完成情况简介（建议500字左右）')= data.completedReport?data.completedReport.c: ''
+                      br
+                      if !applicationForm.fixedMoney
+                        h3 资金预算
+                        -let aggregate, suggest, fact, used;
+                        #budgetMoney
+                          -aggregate=0;
+                          -suggest=0;
+                          -fact=0;
+                          -used=0;
+                          .fund-money-list.head.reportOfKnotAudit
+                            .purpose 用途
+                            .count 数量
+                            .money 单价(元)
+                            .total 合计(元)
+                            .suggest 专家建议(元)
+                            .fact 实际批准(元)
+                            div 实际花费（元）
+                          -for(let p of applicationForm.budgetMoney)
+                            -const total = p.count*p.money;
+                            -aggregate += total;
+                            -suggest += p.suggest;
+                            -fact += p.fact;
+                            -used += p.used || 0;
+                            .fund-money-list.reportOfKnotAudit
+                              .purpose= p.purpose
+                              .count= p.count
+                              .money= p.money
+                              .total= total
+                              .suggest= p.suggest
+                              .fact= p.fact
+                              .used(contenteditable=true)= p.used || 0
+                        h3.text-right
+                          span=`申请金额：${aggregate}元`
+                          span=`，专家建议：${suggest}元`
+                          span=`，实际批准：${fact}元`
+                          span ，实际花费：
+                          span#usedMoneyTotal= used
+                          span 元
+                      br
+                      h3 结题报告（请在论坛发表，然后添加在下面）
+                      h5 已选择帖子的文号：
+                        #selectedThread
+                          span 暂未选择
+                        br
+                        .form
+                          input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
+                          input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
+                        span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
+                        span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
+                        .unselectedThreads
+                          .blank(style='color: #aaa;') 暂无数据
+                        nav(aria-label='navigation')
+                          ul.pagination.pagination-sm.pageList
+                        button.btn.btn-default(style='float: right;' onclick=`submit(${applicationForm._id})`) 提交
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_complete.js')
