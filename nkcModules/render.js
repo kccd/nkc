@@ -130,7 +130,7 @@ function filterQuote(content) {
 }
 
 function hideContentByUser(content, user={xsf: 0}, from) {
-	return content.replace(/\[hide=[0-9]+].*\[\/hide]/, function(c){
+	return content.replace(/\[hide=[0-9]+][\s\S]*\[\/hide]/, function(c){
 		const indexStart = c.indexOf(']');
 		const number = c.slice(6, indexStart);
 		if(user.xsf < number) {
@@ -173,6 +173,9 @@ function applicationFormStatus(a) {
 	} else if(a.useless === 'exceededModifyCount') {
 		str = '退修次数超过限制';
 		color = 'red';
+	} else if(a.useless === 'refuse') {
+		str = '已被彻底拒绝';
+		color = 'red';
 	} else if(!submitted || !a.lock.submitted) {
 		if(projectPassed === false) {
 			str = '专家审核不通过，等待申请人修改';
@@ -204,8 +207,10 @@ function applicationFormStatus(a) {
 		str = '等待报告审核';
 	} else if(needRemittance) {
 		str = '等待拨款';
-	} else if(!completed) {
+	} else if(completed === null) {
 		str = '资助中';
+	} else if(completed === false) {
+		str = '结题审核不通过，等待申请人修改'
 	} else if(excellent) {
 		str = '优秀项目';
 	} else if(successful) {

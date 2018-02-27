@@ -173,7 +173,7 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效
+	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效， refuse：永久拒绝
   	type: String,
 		default: null,
 		index: 1
@@ -456,7 +456,8 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		modifyCount,
 		supporter,
 		objector,
-		category
+		category,
+		disabled,
 	} = this;
 	const {
 		money,
@@ -465,11 +466,12 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	} = fund;
 
 	// 判断申请表有效性
+	if(disabled) {
+		throw '申请表已被屏蔽。';
+	}
 	switch (useless) {
-		case 'disabled':
-			throw '申请表已被屏蔽。';
-		case 'revoked':
-			throw '申请表已被永久撤销。';
+		case 'giveUp':
+			throw '申请表已被放弃。';
 		case 'exceededModifyCount':
 			throw '申请表已超过最大修改次数。';
 	}

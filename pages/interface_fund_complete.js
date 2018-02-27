@@ -3,6 +3,7 @@ var usedMoney = [];
 
 $(function(){
 	init();
+	initNumber();
 });
 
 function initNumber() {

@@ -154,16 +154,16 @@ const photoSmallify = (filePath, targetPath) => {
 	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 };
 
-const fundBGIify = (filePath, targetPath) => {
-	const {height, width} = sizeLimit.fundBGI;
+const fundBannerify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.fundBanner;
 	if(linux) {
 		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 	}
 	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 };
 
-const fundBGISmallify = (filePath, targetPath) => {
-	const {height, width} = sizeLimit.fundBGISmall;
+const fundAvatarify = (filePath, targetPath) => {
+	const {height, width} = sizeLimit.fundBannerSmall;
 	if(linux) {
 		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 	}
@@ -206,8 +206,8 @@ module.exports = {
   coverify,
   photoify,
 	photoSmallify,
-	fundBGIify,
-	fundBGISmallify,
+	fundBannerify,
+	fundAvatarify,
   removeFile,
 	lifePhotoify
 };

@@ -84,11 +84,23 @@ block content
                 input#fundImage(type="file" style='display: none')
                 button.btn.btn-default(onclick='$("#fundImage").click()') 上传banner图片
                 button.btn.btn-default(onclick='deleteBanner()') 删除banner图片
-              .col-xs-12.col-md-2
-                if fund && fund.image
-                  img#fundImageDisplay(imageId= fund.image src=`/fundBGI_small/${fund.image}`)
+              .col-xs-12.col-md-8
+                if fund && fund.image && fund.image.banner
+                  img#fundImageDisplay(imageId= fund.image.banner src=`/fundBanner/${fund.image.banner}` style='width: 100%;')
                 else
                   img#fundImageDisplay(src=`#` style='display:none;')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 avatar图片
+              .col-xs-12.col-md-2
+                input#fundAvatarImage(type="file" style='display: none')
+                button.btn.btn-default(onclick='$("#fundAvatarImage").click()') 上传avatar图片
+                button.btn.btn-default(onclick='deleteAvatar()') 删除avatar图片
+              .col-xs-12.col-md-2
+                if fund && fund.image && fund.image.avatar
+                  img#fundAvatarImageDisplay(imageId= fund.image.avatar src=`/fundAvatar/${fund.image.avatar}`)
+                else
+                  img#fundAvatarImageDisplay(src=`#` style='display:none;')
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 显示入口

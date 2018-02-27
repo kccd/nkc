@@ -253,14 +253,14 @@ const certificates ={
 			    }
 		    }
 	    },
-	    fundBGI: {
+	    fundBanner: {
 		    [name]: '基金项目背景图片',
 		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
 		    }
 	    },
-	    fundBGI_small: {
+	    fundAvatar: {
 		    [name]: '基金项目背景图片',
 		    [parameter]: {
 			    [GET]: true,
@@ -596,15 +596,16 @@ const certificates ={
 		      [GET]: true
 	      }
       },
-	    fundBGI: {
+	    fundBanner: {
 		    [name]: '基金项目背景图片',
 		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
 		    }
 	    },
-	    fundBGI_small: {
+	    fundAvatar: {
 		    [name]: '基金项目背景图片',
+		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
 		    }

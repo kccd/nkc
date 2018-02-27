@@ -63,7 +63,6 @@ block content
             -displayNext = false;
             .panel.panel-default
               .panel-body.applicationForm
-                h4.text-center 废弃的项目
                 h3.text-center.redFontColor 申请表已被屏蔽
           if useless === 'giveUp'
             -displayNext = false;
@@ -78,6 +77,12 @@ block content
               .panel-body.applicationForm
                 h4.text-center 项目已中止
                 h3.text-center.redFontColor 超过修改次数
+          if useless === 'refuse'
+            -displayNext = false;
+            .panel.panel-default
+              .panel-body.applicationForm
+                h4.text-center 项目已中止
+                h3.text-center.redFontColor 被彻底拒绝
           else
           // 队员点击同意
           if !applicationForm.status.submitted
@@ -188,50 +193,52 @@ block content
             if data.userLevel >= 7
               -isAdmin = true;
             -let needProjectAudit = false, needAdminAudit = false;
-            // 判断是否显示专家审核按钮
-            if isProjectCensor && usersSupport && projectPassed === null
-              -needProjectAudit = true;
-            //判断是否显示管理员复核按钮
-            if isAdmin && projectPassed && adminSupport === null
-              -needAdminAudit = true;
-            //判断是否显示打款按钮
             -let needRemittance = false;
-            if adminSupport && !completed
-              -for(let i = 0; i < applicationForm.remittance.length; i++)
-                -const r = applicationForm.remittance[i];
-                if i === 0
-                  if !r.status
-                    -needRemittance = true;
-                else
-                  if !r.status && r.passed === true
-                    -needRemittance = true;
-
             -let needReportAudit = false;
             -let needCompletedAudit = false;
-            if applicationForm.submittedReport && isProjectCensor
-              -needReportAudit = true;
-            if applicationForm.completedAudit
-              -needCompletedAudit = true;
+            if applicationForm.useless === null
+              // 判断是否显示专家审核按钮
+              if isProjectCensor && usersSupport && projectPassed === null
+                -needProjectAudit = true;
+              //判断是否显示管理员复核按钮
+              if isAdmin && projectPassed && adminSupport === null
+                -needAdminAudit = true;
+              //判断是否显示打款按钮
+              if adminSupport && completed === null
+                -for(let i = 0; i < applicationForm.remittance.length; i++)
+                  -const r = applicationForm.remittance[i];
+                  if i === 0
+                    if !r.status
+                      -needRemittance = true;
+                  else
+                    if !r.status && r.passed === true
+                      -needRemittance = true;
+              if applicationForm.submittedReport && isProjectCensor
+                -needReportAudit = true;
+
+              if applicationForm.completedAudit
+                -needCompletedAudit = true;
 
 
 
 
             // 申请者控制面板
-            if (data.user && applicationForm.uid === data.user.uid) || applicationForm.status.adminSupport
+            if (data.user && applicationForm.uid === data.user.uid && applicationForm.useless === null) || applicationForm.status.adminSupport
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 控制面板
                   if applicationForm.status.adminSupport
                     a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
-                    if data.user && applicationForm.uid === data.user.uid && needRemittance
+                    -console.log(!!data.user , applicationForm.uid === data.user.uid , needRemittance)
+                    if data.user && applicationForm.uid === data.user.uid
                       a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
                   if data.user && data.user.uid === applicationForm.applicant.uid
                     if !applicationForm.lock.submitted && !adminSupport
                       a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
-                    if !applicationForm.status.completed
+                    if !applicationForm.status.completed && applicationForm.useless === null
                       if applicationForm.status.adminSupport
                         a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结题
-                      else
+                      if applicationForm.useless === null
                         button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
 
 
@@ -260,15 +267,15 @@ block content
                       a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
                     else
                       a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
-
-            //普通用户
-            .panel.panel-default
-              .panel-body.applicationForm
-                h5.text-center 投票
-                textarea.form-control#content(rows=8 placeholder='填写理由')
-                br
-                a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId ? applicationForm.supportersId.length : 0}）`
-                a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId ? applicationForm.objectorsId.length : 0}）`
+            if applicationForm.useless === null
+              //普通用户
+              .panel.panel-default
+                .panel-body.applicationForm
+                  h5.text-center 投票
+                  textarea.form-control#content(rows=8 placeholder='填写理由')
+                  br
+                  a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId ? applicationForm.supportersId.length : 0}）`
+                  a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId ? applicationForm.objectorsId.length : 0}）`
 
 
 block scripts

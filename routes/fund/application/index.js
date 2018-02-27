@@ -152,6 +152,8 @@ applicationRouter
 			ctx.throw(400, '抱歉！申请表已超出最大修改次数。');
 		} else if(useless === 'delete') {
 			ctx.throw(401, '抱歉！该申请表已被删除。');
+		} else if(useless === 'refuse') {
+			ctx.throw(401, '抱歉！该申请表已被彻底拒绝。');
 		}
 		const {_id} = params;
 		if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
@@ -312,6 +314,7 @@ applicationRouter
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {submitted, usersSupport, projectPassed, adminSupport, remittance} = applicationForm.status;
 		const {type, c} = query;
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		if(type === 'giveUp'){
 			if(!c) ctx.throw(400, '请输入放弃的原因。');
 			if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
@@ -326,13 +329,12 @@ applicationRouter
 			});
 			await newDocument.save();
 			applicationForm.useless = 'giveUp';
-			applicationForm.status.completed = true;
-			applicationForm.timeOfCompleted = Date.now();
-		} else if(type === 'delete'){
-			if(submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
+		} else if(type === 'delete') {
+			if (submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
 			applicationForm.useless = 'delete';
-			applicationForm.status.completed = true;
-			applicationForm.timeOfCompleted = Date.now();
+		} else if(type === 'refuse') {
+			if(adminSupport) ctx.throw(400, '管理员复核已通过，无法完成彻底拒绝。');
+			applicationForm.useless = 'refuse';
 		} else {
 			ctx.throw(400, '未知的操作类型。');
 		}

@@ -2,6 +2,12 @@ const Router = require('koa-router');
 const auditRouter = new Router();
 auditRouter
 //审核页面
+	.use('/', async (ctx, next) => {
+		const {data} = ctx;
+		const {applicationForm} = data;
+		if(applicationForm.useless !== null) ctx.throw(400, '该申请表已失效，无法完成该操作。');
+		await next();
+	})
 	.get('/', async (ctx, next) => {
 		const {data, query} = ctx;
 		const {user, applicationForm} = data;

@@ -10,7 +10,7 @@ block content
     .row
       //.col-xs-12.col-md-12(style='margin-bottom: 1rem')
       //  .fund-panel
-      //    .fund-panel-title(style=`background-color: ${fund ? fund.color : ''};background-image: ${fund && fund.image ? `url(/fundBGI/${fund.image})` : ''}`)
+      //    .fund-panel-title(style=`background-color: ${fund ? fund.color : ''};background-image: ${fund && fund.image ? `url(/fundBanner/${fund.image})` : ''}`)
       //      .col-xs-12.col-md-12
       //        h1.fund-name=fund.name
       //        p= fund.description.brief
@@ -30,7 +30,7 @@ block content
             if !fund.image
               h2.text-center(style='margin-bottom: 4rem;color: #000;')= `科创基金-${fund.name}`
             else
-              img(src=`/fundBGI_small/${fund.image}` style="width: 100%;")
+              img(src=`/fundAvatar/${fund.image.avatar}` style="width: 100%;")
               h2.text-center(style='margin-top: -4rem;margin-bottom: 4rem;color: #fff;')= `科创基金-${fund.name}`
             .row
               .col-xs-12.col-md-12

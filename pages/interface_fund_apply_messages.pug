@@ -147,7 +147,7 @@
                   .count= p.count
                   .money= p.money
                   .total= total
-                  .suggest= p.suggest
+                  .suggest= p.suggest?p.suggest: total
                   .fact= p.fact
                   if applicationForm.status.completed
                     .used= p.used
@@ -190,7 +190,7 @@
             if aggregate
               span=`申请金额：${aggregate}元`
             if suggest
-              span=`，专家建议：${suggest}元`
+              span=`，专家建议：${suggest || aggregate}元`
             if fact
               span=`，实际批准：${fact}元`
             if applicationForm.status.completed && !applicationForm.fixedMoney

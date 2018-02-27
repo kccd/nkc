@@ -4,6 +4,7 @@ reportRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
 		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员复核，请通过后再试。');
+		if(applicationForm.disabled) ctx.throw(401, '申请表已被屏蔽。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -19,6 +20,7 @@ reportRouter
 		const {user, applicationForm} = data;
 		const {c, t, type, selectedThreads} = body;
 		if(applicationForm.status.completed) ctx.throw(400, '该项目已结项。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		const obj = {};
 		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');
 		if(type === 'applyRemittance') {
@@ -35,7 +37,13 @@ reportRouter
 					}));
 
 					r.threads = selectedThreads.map(t => t.tid);
-					r.passed = null;
+					if(applicationForm.fund.censor.appointed.length === 0 && applicationForm.fund.censor.certs.length === 0) {
+						r.passed = true;
+						obj.submittedReport = false;
+					} else {
+						r.passed = null;
+						obj.submittedReport = true;
+					}
 					const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 					r.report = newId;
 					const newDocument = db.FundDocumentModel({
@@ -47,7 +55,6 @@ reportRouter
 					});
 					await newDocument.save();
 					obj.remittance = remittance;
-					obj.submittedReport = true;
 					break;
 				}
 			}
@@ -80,6 +87,7 @@ reportRouter
 		if(appointed.includes(user.uid)) isCensor = true;
 		if(!isCensor) ctx.throw(401, '权限不足');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		for(let r of remittance) {
 			if(r.status === null && r.passed === null){
 				if(reportNeedThreads && r.threads && r.threads.length !== 0) {
@@ -110,6 +118,7 @@ reportRouter
 		const {number, support, c} = body;
 		if(!number) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if((i < number && !r.status) || (i > number && r.status)) ctx.throw(400, '参数错误。');

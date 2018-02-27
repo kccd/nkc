@@ -3,10 +3,11 @@ const remittanceRouter = new Router();
 remittanceRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.disabled) ctx.throw(400, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.useless) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		const {adminSupport, completed} = applicationForm.status;
 		if(!adminSupport) ctx.throw(400, '管理员复核暂未通过无法进行拨款操作，请等待。');
-		if(completed) ctx.throw(400, '抱歉！该申请已经完结，不需要拨款。');
+		if(completed) ctx.throw(400, '抱歉！该申请已经结题，不需要拨款。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {

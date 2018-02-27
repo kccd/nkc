@@ -18,7 +18,7 @@ var fundObj = {
 	  appointed: []
   },
   color: '#7f9eb2',
-	image: null,
+	image: {},
 	applicationMethod: {
 		personal: null,
 		team: null
@@ -64,6 +64,7 @@ $(function(){
   passedPaper();
   color();
 	uploadFundImage();
+	uploadFundAvatarImage();
 	moneyFixed();
 	moneyFixedSet();
 	applicationMethod();
@@ -72,7 +73,13 @@ $(function(){
 	member();*/
 	conflict();
 	conflictSet();
+	initImage();
 });
+
+function initImage() {
+	fundObj.image.banner = $('#fundImageDisplay').attr('imageId');
+	fundObj.image.avatar = $('#fundAvatarImageDisplay').attr('imageId');
+}
 
 function done(id){
   $(id).removeClass().addClass(yesClass).text('');
@@ -253,16 +260,26 @@ function color(){
 
 // 基金背景图片上传
 function uploadFundImage() {
-	uploadFile('/fundBGI', '#fundImage', uploadSuccess)
+	uploadFile('/fundBanner', '#fundImage', uploadSuccess)
+}
+function uploadFundAvatarImage() {
+	uploadFile('/fundAvatar', '#fundAvatarImage', uploadAvatarImgSuccess)
 }
 
 function uploadSuccess(data) {
 	var imageId = data.imageId;
-	fundObj.image = imageId;
+	fundObj.image.banner = imageId;
 	$('#fundImageDisplay').css({
 		'display': 'block'
-	}).attr('src', '/fundBGI_small/'+imageId)
+	}).attr('src', '/fundBanner/'+imageId)
+}
 
+function uploadAvatarImgSuccess(data) {
+	var imageId = data.imageId;
+	fundObj.image.avatar = imageId;
+	$('#fundAvatarImageDisplay').css({
+		'display': 'block'
+	}).attr('src', '/fundAvatar/'+imageId)
 }
 
 //基金金额 定额/不定额

@@ -4,8 +4,9 @@ completeRouter
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
 		const {applicationForm} = data;
-		const {status} = applicationForm;
+		const {status, useless} = applicationForm;
 		if(status.completed) ctx.throw('该项目已结项。');
+		if(useless !== null) ctx.throw('申请表已失效，无法完成该操作。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -73,7 +74,7 @@ completeRouter
 		if(fund.censor.appointed.includes(user.uid)) {
 			isProjectCensor = true;
 		}
-		if(!isProjectCensor) ctx.throw(401, '权限不足');
+		if(!isProjectCensor && data.userLevel < 7) ctx.throw(401, '权限不足');
 		data.report = await db.FundDocumentModel.findOne({type: 'completedReport'}).sort({toc: -1}).limit(1);
 		await next();
 	})
@@ -92,7 +93,7 @@ completeRouter
 		if(fund.censor.appointed.includes(user.uid)) {
 			isProjectCensor = true;
 		}
-		if(!isProjectCensor) ctx.throw(401, '权限不足');
+		if(!isProjectCensor && data.userLevel < 7) ctx.throw(401, '权限不足');
 
 		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 		const newDocument = db.FundDocumentModel({

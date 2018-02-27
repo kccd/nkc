@@ -18,9 +18,16 @@ const fundSchema = new Schema({
     index: 1
   },
 	image: {
-  	type: Number,
-		default: null,
-		index: 1
+  	avatar: {
+		  type: Number,
+		  default: null,
+		  index: 1
+	  },
+		banner: {
+			type: Number,
+			default: null,
+			index: 1
+		}
 	},
 	color: {
 		type: String,

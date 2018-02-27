@@ -594,7 +594,7 @@ input[type="radio"], input[type="checkbox"]{
   text-align: center;
   width: 100%;
   list-style: none;
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0,0,0,0);
   font-size: 1.5rem;
   color: #777;
   margin: 1rem 0;
@@ -604,9 +604,9 @@ input[type="radio"], input[type="checkbox"]{
   margin-top: 0;
 }
 .fund-apply-status ul li.passed{
-  background-color: #5cb85c;
-  color: #fff;
-  border: 1px solid #4cae4c;
+  background-color: rgba(0,0,0,0);
+  color: #5bc0de;
+  border: 1px solid rgba(0,0,0,0);
 }
 .fund-li{
   padding: 0.8rem 0;
