@@ -98,7 +98,7 @@ applicationRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled && data.userLevel < 7) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见

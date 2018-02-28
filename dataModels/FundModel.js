@@ -18,7 +18,7 @@ const fundSchema = new Schema({
     index: 1
   },
 	image: {
-  	avatar: {
+  	logo: {
 		  type: Number,
 		  default: null,
 		  index: 1
@@ -72,6 +72,11 @@ const fundSchema = new Schema({
 		default: true,
 		index: 1
 	},
+	auditType: {
+		type: String, // person, system
+		default: 'person',
+		index: 1
+	},
 	//设为历史基金
 	history: {
 		type: Boolean,
@@ -83,6 +88,7 @@ const fundSchema = new Schema({
 		default: false,
 		index: 1
 	},
+	//检查员
   censor: {
     certs: {
       type: [String],
@@ -94,6 +100,66 @@ const fundSchema = new Schema({
 		  index: 1
 	  }
   },
+	//评论人员
+	commentator: {
+		certs: {
+			type: [String],
+			default: []
+		},
+		appointed: {
+			type: [String],
+			default: [],
+			index: 1
+		}
+	},
+	//投票人员
+	voter: {
+		certs: {
+			type: [String],
+			default: []
+		},
+		appointed: {
+			type: [String],
+			default: [],
+			index: 1
+		}
+	},
+	//管理员
+	admin: {
+		certs: {
+			type: [String],
+			default: []
+		},
+		appointed: {
+			type: [String],
+			default: [],
+			index: 1
+		}
+	},
+	//财务
+	financialStaff: {
+		certs: {
+			type: [String],
+			default: []
+		},
+		appointed: {
+			type: [String],
+			default: [],
+			index: 1
+		}
+	},
+	//专家
+	expert: {
+  	certs: {
+  		type: [String],
+		  default: []
+	  },
+		appointed: {
+  		type: [String],
+			default: [],
+			index: 1
+		}
+	},
 	thread: {
 		count: {
 			type: Number,
@@ -152,7 +218,7 @@ const fundSchema = new Schema({
 	},
 	applicationCountLimit: { // 年申请次数限制
 		type: Number,
-		default: 2
+		default: 10
 	},
 	supportCount: {
 		type: Number,
@@ -164,7 +230,7 @@ const fundSchema = new Schema({
   },
   modifyCount: {
     type: Number,
-    default: 0
+    default: 5
   },
 	conflict: {
   	self: {
@@ -205,6 +271,25 @@ fundSchema.methods.ensureUserPermission = async function(user) {
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
 	if(authLevel > userAuthLevel) throw '身份认证等级未满足最低要求';
+};
+
+fundSchema.methods.ensureOperatorPermission = function(type, user) {
+	const {expert, censor, financialStaff, admin, commentator, voter} = this;
+	const fn = (obj, user) => {
+		for(let cert of obj.certs) {
+			if(user.certs.includes(cert)) return true;
+		}
+		return obj.appointed.includes(user.uid);
+	};
+	switch (type) {
+		case 'expert': return fn(expert, user);
+		case 'censor': return fn(censor, user);
+		case 'financialStaff': return fn(financialStaff, user);
+		case 'admin': return fn(admin, user);
+		case 'commentator': return fn(commentator, user);
+		case 'voter': return fn(voter, user);
+		default: throw '未知的身份类型。';
+	}
 };
 
 fundSchema.methods.getConflictingByUser = async function(user) {

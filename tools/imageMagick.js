@@ -162,7 +162,7 @@ const fundBannerify = (filePath, targetPath) => {
 	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
 };
 
-const fundAvatarify = (filePath, targetPath) => {
+const fundLogoify = (filePath, targetPath) => {
 	const {height, width} = sizeLimit.fundBannerSmall;
 	if(linux) {
 		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
@@ -207,7 +207,7 @@ module.exports = {
   photoify,
 	photoSmallify,
 	fundBannerify,
-	fundAvatarify,
+	fundLogoify,
   removeFile,
 	lifePhotoify
 };

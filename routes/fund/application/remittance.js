@@ -12,7 +12,9 @@ remittanceRouter
 	})
 	.get('/', async (ctx, next) => {
 		const {db, data} = ctx;
-		const {remittance} = data.applicationForm;
+		const {user, applicationForm} = data;
+		const {remittance, fund} = applicationForm;
+		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您没有资格进行拨款。');
 		ctx.template = 'interface_fund_remittance.pug';
 		await Promise.all(remittance.map(async r => {
 			if(r.uid) {
@@ -27,6 +29,7 @@ remittanceRouter
 		const {applicationForm, user} = data;
 		const {number} = body;
 		const {fund, remittance} = applicationForm;
+		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您没有资格进行拨款。');
 		for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if(i < number && !r.status) ctx.throw(400, '请依次拨款！');

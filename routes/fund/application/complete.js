@@ -65,16 +65,7 @@ completeRouter
 
 		//结项审核  审查员权限判断
 		const {fund} = applicationForm;
-		let isProjectCensor = false;
-		for(let c of fund.censor.certs)
-			if(user.certs.includes(c)) {
-				isProjectCensor = true;
-			}
-		// 判断是否是项目审查员
-		if(fund.censor.appointed.includes(user.uid)) {
-			isProjectCensor = true;
-		}
-		if(!isProjectCensor && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(!fund.ensureOperatorPermission('expert', user) || !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
 		data.report = await db.FundDocumentModel.findOne({type: 'completedReport'}).sort({toc: -1}).limit(1);
 		await next();
 	})
@@ -84,16 +75,7 @@ completeRouter
 		const {c, type} = body;
 		//结项审核  审查员权限判断
 		const {fund} = applicationForm;
-		let isProjectCensor = false;
-		for(let c of fund.censor.certs)
-			if(user.certs.includes(c)) {
-				isProjectCensor = true;
-			}
-		// 判断是否是项目审查员
-		if(fund.censor.appointed.includes(user.uid)) {
-			isProjectCensor = true;
-		}
-		if(!isProjectCensor && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(!fund.ensureOperatorPermission('expert', user) || !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
 
 		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 		const newDocument = db.FundDocumentModel({

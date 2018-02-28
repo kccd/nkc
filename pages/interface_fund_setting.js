@@ -1,6 +1,3 @@
-var yesClass = 'greenColor glyphicon glyphicon-ok-circle';
-var noClass = 'redFontColor glyphicon glyphicon-remove-circle';
-var deleteBannerPhoto = false;
 var fundObj = {
   name: '科创基金',
   money: {
@@ -9,6 +6,7 @@ var fundObj = {
 	  max: null
   },
   description: {},
+	auditType: null,
   display: true,
 	canApply: true,
 	history: false,
@@ -17,6 +15,26 @@ var fundObj = {
     certs: [],
 	  appointed: []
   },
+	expert: {
+		certs: [],
+		appointed: []
+	},
+	financialStaff: {
+		certs: [],
+		appointed: []
+	},
+	admin: {
+		certs: [],
+		appointed: []
+	},
+	voter: {
+		certs: [],
+		appointed: []
+	},
+	commentator: {
+		certs: [],
+		appointed: []
+	},
   color: '#7f9eb2',
 	image: {},
 	applicationMethod: {
@@ -24,10 +42,10 @@ var fundObj = {
 		team: null
 	},
 	applicant: {
-		userLevel: 0,
-		threadCount: 0,
-		postCount: 0,
-		timeToRegister: 0,
+		userLevel: null,
+		threadCount: null,
+		postCount: null,
+		timeToRegister: null,
 	},
 	member:{},
 	thread: {},
@@ -42,209 +60,198 @@ var fundObj = {
 
 };
 
-$(function(){
-  // UserAuthenticationSet();
-  censorSet();
-  passedPaperSet();
-  colorSet();
-  censor();
-  // fundName();
-  fundMoney();
-  fundDisplay();
-	fundDisplaySet();
-	fundCanApply();
-	fundCanApplySet();
-	fundDisabled();
-	fundDisabledSet();
-	fundHistory();
-	fundHistorySet();
-	fundCensor();
-  censorCheckBox();
-  // UserAuthentication();
-  passedPaper();
-  color();
-	uploadFundImage();
-	uploadFundAvatarImage();
+$(function() {
+	loadSettings();
 	moneyFixed();
-	moneyFixedSet();
-	applicationMethod();
-	applicationMethodSet();
-	/*memberSet();
-	member();*/
-	conflict();
-	conflictSet();
-	initImage();
+	uploadFundImage();
+	uploadfundLogoImage();
+	color();
 });
 
-function initImage() {
-	fundObj.image.banner = $('#fundImageDisplay').attr('imageId');
-	fundObj.image.avatar = $('#fundAvatarImageDisplay').attr('imageId');
-}
 
-function done(id){
-  $(id).removeClass().addClass(yesClass).text('');
-}
-function fail(id, text) {
-  $(id).removeClass().addClass(noClass).text(text);
-}
+function loadSettings() {
+	// id, 基金名，基金简介、补充说明、条款
+	fundObj._id = $('#fundId').val();
+	fundObj.name = $('#fundName').val();
+	fundObj.description.brief = $('#briefDescription').val();
+	fundObj.description.detailed = $('#detailedDescription').val();
+	fundObj.description.terms = $('#terms').val();
 
-// 审查方式
-function censorSet() {
-  if($('input[name="censor"]').eq(0).is(':checked')) {
-    $('#certsCheckBox label').removeClass('disabled');
-    $('#certsCheckBox input').attr('disabled', false);
-    fundCensor('read');
-  } else {
-    $('#certsCheckBox label').addClass('disabled');
-    $('#certsCheckBox input').attr('disabled', true);
-    fundCensor('clear');
-  }
-}
-function censor() {
-  $('.censor').on('click', function(){
-    censorSet();
-  });
-}
-
-function censorCheckBox() {
-  $('input[name="cert"]').on('click', function() {
-    fundCensor('read');
-  });
-}
-
-/*function fundName() {
-  $('#fundName').on('blur', function() {
-    var nameLength = $('#fundName').val().length;
-    if(nameLength !== 0 && nameLength < 4 || nameLength > 8){
-      fail('#fundNameInfo', ' 4-8个汉字');
-    }else {
-      done('#fundNameInfo');
-    }
-  })
-}*/
-function fundMoney() {
-   $('#fundMoney').on('blur', function() {
-     checkMoney();
-   })
-}
-
-function checkMoney() {
-  var money = $('#fundMoney').val();
-  if(money === '' || money <= 0){
-    $('#fundMoneyInfo').removeClass().addClass(noClass).text(' 金额必须大于0');
-    return false;
-  }else {
-    $('#fundMoneyInfo').removeClass().addClass(yesClass).text('');
-    return true;
-  }
-}
-
-function fundDisplay() {
-  $('input[name="display"]').on('click', function() {
-    fundDisplaySet();
-  })
-}
-
-function fundDisplaySet() {
-  if($('input[name="display"]').eq(0).is(':checked')) {
-    fundObj.display = true;
-  } else {
-    fundObj.display = false;
-  }
-}
-
-function fundCanApply() {
-	$('input[name="canApply"]').on('click', function() {
-		fundCanApplySet();
-	})
-}
-
-function fundCanApplySet() {
-	if($('input[name="canApply"]').eq(0).is(':checked')) {
-		fundObj.canApply = true;
+	//背景颜色，banner，logo
+	fundObj.color = $('#fundColor').val();
+	var banner = $('#fundImageDisplay').attr('imageId');
+	if(banner) {
+		fundObj.image.banner = parseInt(banner);
 	} else {
-		fundObj.canApply = false;
+		fundObj.image.banner = null;
 	}
-}
-
-function fundDisabled() {
-	$('input[name="disabled"]').on('click', function() {
-		fundDisabledSet();
-	})
-}
-
-function fundDisabledSet() {
-	if($('input[name="disabled"]').eq(0).is(':checked')) {
-		fundObj.disabled = true;
+	var logo = $('#fundLogoImageDisplay').attr('imageId');
+	if(logo) {
+		fundObj.image.logo = parseInt(logo);
 	} else {
-		fundObj.disabled = false;
+		fundObj.image.logo = null;
 	}
-}
-
-function fundHistory() {
-	$('input[name="history"]').on('click', function() {
-		fundHistorySet();
-	})
-}
-
-function fundHistorySet() {
-	if($('input[name="history"]').eq(0).is(':checked')) {
-		fundObj.history = true;
+	//初始金额
+	var initial = $('#fundInitial').val();
+	if(initial) {
+		initial = parseInt(initial);
+		fundObj.money.initial = initial;
 	} else {
-		fundObj.history = false;
+		fundObj.money.initial = null;
 	}
-}
+
+	//固定申请金额、最大申请金额
+	var fixedMoney = $('#fundMoney').val();
+	if(fixedMoney) {
+		fixedMoney = parseInt(fixedMoney);
+	} else {
+		fixedMoney = null;
+	}
+	if($('input[name="moneyFixed"]').eq(0).is(':checked')) {
+		fundObj.money.fixed = fixedMoney;
+		fundObj.money.max = null;
+	} else {
+		fundObj.money.max = fixedMoney;
+		fundObj.money.fixed = null;
+	}
+
+	//审核方式选择
+	if($('input[name="auditType"]').eq(0).is(':checked')) {
+		fundObj.auditType = 'person';
+	} else {
+		fundObj.auditType = 'system';
+	}
+
+	//显示入口
+	fundObj.display = $('input[name="display"]').eq(0).is(':checked');
+
+	//是否接受新申请
+	fundObj.canApply = $('input[name="canApply"]').eq(0).is(':checked');
+
+	//设置为历史基金
+	fundObj.history = $('input[name="history"]').eq(0).is(':checked');
+
+	//完全屏蔽
+	fundObj.disabled = $('input[name="disabled"]').eq(0).is(':checked');
+
+	//相关人员权限设置
+
+	//专家
+	var expertCertArr = $('input[name="expertCert"]');
+	fundObj.expert.certs = [];
+	var certInput;
+	for(var i = 0; i < expertCertArr.length; i++) {
+		certInput = expertCertArr.eq(i);
+		if(certInput.is(':checked')) {
+			fundObj.expert.certs.push(certInput.attr('cert'));
+		}
+	}
+	fundObj.expert.appointed = stringToArr($('#expertUid').val());
+
+	//财务
+	var financialStaffCertArr = $('input[name="financialStaffCert"]');
+	fundObj.financialStaff.certs = [];
+	for(var i = 0; i < financialStaffCertArr.length; i++) {
+		certInput = financialStaffCertArr.eq(i);
+		if(certInput.is(':checked')) {
+			fundObj.financialStaff.certs.push(certInput.attr('cert'));
+		}
+	}
+	fundObj.financialStaff.appointed = stringToArr($('#financialStaffUid').val());
+
+	//检查员
+	var censorCertArr = $('input[name="censorCert"]');
+	fundObj.censor.certs = [];
+	for(var i = 0; i < censorCertArr.length; i++) {
+		certInput = censorCertArr.eq(i);
+		if(certInput.is(':checked')) {
+			fundObj.censor.certs.push(certInput.attr('cert'));
+		}
+	}
+	fundObj.censor.appointed = stringToArr($('#censorUid').val());
+
+	//管理员
+	var adminCertArr = $('input[name="adminCert"]');
+	fundObj.admin.certs = [];
+	for(var i = 0; i < adminCertArr.length; i++) {
+		certInput = adminCertArr.eq(i);
+		if(certInput.is(':checked')) {
+			fundObj.admin.certs.push(certInput.attr('cert'));
+		}
+	}
+	fundObj.admin.appointed = stringToArr($('#adminUid').val());
+
+	//评论人员
+	var commentatorCertArr = $('input[name="commentatorCert"]');
+	fundObj.commentator.certs = [];
+	for(var i = 0; i < commentatorCertArr.length; i++) {
+		certInput = commentatorCertArr.eq(i);
+		if(certInput.is(':checked')) {
+			fundObj.commentator.certs.push(certInput.attr('cert'));
+		}
+	}
+	fundObj.commentator.appointed = stringToArr($('#commentatorUid').val());
+
+	//投票人员
+	var voterCertArr = $('input[name="voterCert"]');
+	fundObj.voter.certs = [];
+	for(var i = 0; i < voterCertArr.length; i++) {
+		certInput = voterCertArr.eq(i);
+		if(certInput.is(':checked')) {
+			fundObj.voter.certs.push(certInput.attr('cert'));
+		}
+	}
+	fundObj.voter.appointed = stringToArr($('#voterUid').val());
+
+	//申请人资格
+	var userLevel = $('#userLevel').val();
+	fundObj.applicant.userLevel = userLevel?parseInt(userLevel): 0;
+	var threadCount = $('#threadCount').val();
+	fundObj.applicant.threadCount = threadCount?parseInt(threadCount): 0;
+	var postCount = $('#postCount').val();
+	fundObj.applicant.postCount = postCount?parseInt(postCount): 0;
+	var timeToRegister = $('#timeToRegister').val();
+	fundObj.applicant.timeToRegister = timeToRegister?parseInt(timeToRegister): 0;
+	var applicantAuthLevel = $('#applicantAuthLevel').val();
+	fundObj.applicant.authLevel = applicantAuthLevel?parseInt(applicantAuthLevel): 1;
+	var memberAuthLevel = $('#memberAuthLevel').val();
+	fundObj.member.authLevel = memberAuthLevel?parseInt(memberAuthLevel): 1;
+
+	//附带的帖子或论文
+	var attachmentsThreads = $('#attachmentsThreads').val();
+	fundObj.thread.count = attachmentsThreads?parseInt(attachmentsThreads): 0;
+	var attachmentsPapers = $('#attachmentsPapers').val();
+	fundObj.paper.count = attachmentsPapers? parseInt(attachmentsPapers): 0;
+	fundObj.paper.passed = $('input[name="passed"]').eq(0).is(':checked');
 
 
-function fundCensor(options) {
-  if(options === 'read'){
-    fundObj.censor.certs = [];
-    if($('input[name="censor"]').eq(0).is(':checked')) {
-      var certArr = $('input[name="cert"]');
-      var length = certArr.length;
-      for (var i = 0; i < length; i++){
-        if(certArr.eq(i).is(':checked')) fundObj.censor.certs.push(certArr.eq(i).attr('cert'));
-      }
-    }
-  }
-  if(options === 'clear') {
-    fundObj.censor.certs = [];
-    fundObj.censor.appointed = [];
-	  $('#fundCensorAppointed').val('');
-    var certArr = $('input[name="cert"]');
-    var length = certArr.length;
-    for (var i = 0; i < length; i++){
-      certArr.eq(i).attr('checked', false);
-    }
-  }
-}
-/*
-function UserAuthentication() {
-  $('.authentication').on('click', function() {
-    UserAuthenticationSet();
-  });
-}
-function UserAuthenticationSet() {
-  var authenticationArr = $('.authentication');
-  var length = authenticationArr.length;
-  for(var i = 0; i < length; i++){
-    if(authenticationArr.eq(i).is(':checked')) {
-      fundObj.applicant[authenticationArr.eq(i).attr('name')] = true;
-    } else {
-      fundObj.applicant[authenticationArr.eq(i).attr('name')] = false;
-    }
-  }
-}*/
+	//其他信息
+	//申请方式
+	fundObj.applicationMethod.personal = $('input[name="applicationMethod"]').eq(0).is(':checked');
+	fundObj.applicationMethod.team = $('input[name="applicationMethod"]').eq(1).is(':checked');
 
-function passedPaperSet() {
-  fundObj.paper.passed = $('#passed').is(':checked');
+	//允许退修次数
+	var modifyCount = $('#modifyCount').val();
+	fundObj.modifyCount = modifyCount? parseInt(modifyCount): 5;
+
+	//好友支持数
+	var supportCount = $('#supportCount').val();
+	fundObj.supportCount = supportCount? parseInt(supportCount): 0;
+
+	//示众天数
+	var timeOfPublicity = $('#timeOfPublicity').val();
+	fundObj.timeOfPublicity = timeOfPublicity? parseInt(timeOfPublicity): 0;
+
+	//年最大申请次数
+	var applicationCountLimit = $('#applicationCountLimit').val();
+	fundObj.applicationCountLimit = applicationCountLimit? parseInt(applicationCountLimit): 10;
+
+	//互斥
+	fundObj.conflict.self = $('input[name="conflict"]').eq(0).is(':checked');
+	fundObj.conflict.other = $('input[name="conflict"]').eq(1).is(':checked');
+
 }
 
-function passedPaper(){
-  $('input[name="passed"]').on('click', function() {
-    passedPaperSet();
-  });
-}
 
 function colorSet() {
   var color = $('#fundColor').val() || '#7f9eb2';
@@ -262,8 +269,8 @@ function color(){
 function uploadFundImage() {
 	uploadFile('/fundBanner', '#fundImage', uploadSuccess)
 }
-function uploadFundAvatarImage() {
-	uploadFile('/fundAvatar', '#fundAvatarImage', uploadAvatarImgSuccess)
+function uploadfundLogoImage() {
+	uploadFile('/fundLogo', '#fundLogoImage', uploadAvatarImgSuccess)
 }
 
 function uploadSuccess(data) {
@@ -271,34 +278,28 @@ function uploadSuccess(data) {
 	fundObj.image.banner = imageId;
 	$('#fundImageDisplay').css({
 		'display': 'block'
-	}).attr('src', '/fundBanner/'+imageId)
+	}).attr({
+		'src': '/fundBanner/'+imageId,
+		'imageId': imageId
+	})
 }
 
 function uploadAvatarImgSuccess(data) {
 	var imageId = data.imageId;
-	fundObj.image.avatar = imageId;
-	$('#fundAvatarImageDisplay').css({
+	fundObj.image.logo = imageId;
+	$('#fundLogoImageDisplay').css({
 		'display': 'block'
-	}).attr('src', '/fundAvatar/'+imageId)
+	}).attr({
+		'src': '/fundLogo/'+imageId,
+		'imageId': imageId
+	})
 }
 
-//基金金额 定额/不定额
 function moneyFixedSet() {
 	var arr = $('input[name="moneyFixed"]');
-	var money = $('#fundMoney').val();
-	if(money) {
-		money = parseFloat(money);
-	} else {
-		money = null;
-	}
 	var placeholder = '固定金额（人民币元，不能有小数点）';
-	if(arr.eq(0).is(':checked')) {
-		fundObj.money.max = null;
-		fundObj.money.fixed = money;
-	} else {
+	if(arr.eq(1).is(':checked')) {
 		placeholder = '最大申请金额（人民币元，不能有小数点）';
-		fundObj.money.max = money;
-		fundObj.money.fixed = null;
 	}
 	$('#fundMoney').attr('placeholder', placeholder);
 	$('#fundMoneyText').text(placeholder)
@@ -309,166 +310,55 @@ function moneyFixed() {
 	});
 }
 
-function applicationMethodSet() {
-	var arr = $('input[name="applicationMethod"]');
-	if(arr.eq(0).is(':checked')) {
-		fundObj.applicationMethod.personal = true;
-	}else {
-		fundObj.applicationMethod.personal = false;
-	}
-	if(arr.eq(1).is(':checked')) {
-		fundObj.applicationMethod.team = true;
-	} else {
-		fundObj.applicationMethod.team = false;
-	}
+
+function deleteBanner() {
+	$('#fundImageDisplay').css('display', 'none').attr('imageId', '');
 }
 
-function applicationMethod() {
-	$('input[name="applicationMethod"]').on('click', function() {
-		applicationMethodSet();
-	})
+function deleteLogo() {
+	$('#fundLogoImageDisplay').css('display', 'none').attr('imageId', '');
 }
-/*
 
-function memberSet() {
-	var arr = $('.members');
+function stringToArr(str) {
+	if(str === '') return [];
+	var arr = str.split(',');
+	var newArr = [];
 	for(var i = 0; i < arr.length; i++) {
-		var element = arr.eq(i);
-		var name = element.attr('name');
-		if(element.is(':checked')) {
-			fundObj.member[name] = true;
-		} else {
-			fundObj.member[name] = false;
+		var uid = $.trim(arr[i]);
+		if(newArr.indexOf(uid) === -1) {
+			newArr.push(uid);
 		}
 	}
-}
-
-function member() {
-	$('.members').on('click', function() {
-		memberSet();
-	})
-}
-*/
-
-function conflict() {
-	$('input[name="conflict"]').on('click', function () {
-		conflictSet();
-	})
-}
-
-function conflictSet() {
-	var arr = $('input[name="conflict"]');
-	if(arr.eq(0).is(':checked')) {
-		fundObj.conflict.self = true;
-	} else {
-		fundObj.conflict.self = false;
-	}
-	if(arr.eq(1).is(':checked')) {
-		fundObj.conflict.other = true;
-	} else {
-		fundObj.conflict.other = false;
-	}
+	return newArr;
 }
 
 function submit(id) {
-	moneyFixedSet();
-	if(!deleteBannerPhoto) {
-		if (!fundObj.image) {
-			var imageId = $('#fundImageDisplay').attr('imageId');
-			if(imageId) {
-				fundObj.image = parseInt(imageId);
+
+	loadSettings();
+
+	//输入判断
+	if(fundObj._id === '') return screenTopWarning('基金编号不能为空。');
+	if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成。');
+	if(fundObj._id.length > 4) return screenTopWarning('基金编号不能超过四位！');
+
+	var url = '/fund/list';
+	var method = 'POST';
+	if(id !== undefined) {
+		url = '/fund/list/'+ id;
+		method = 'PATCH';
+	}
+	nkcAPI(url, method, {fundObj: fundObj})
+		.then(function(data){
+			var fund = data.fund;
+			if(fundObj.disabled) {
+				window.location.href = '/fund/list';
+			} else if(fundObj.history) {
+				window.location.href = '/fund/history';
+			} else {
+				window.location.href = '/fund/list/'+fund._id.toLowerCase();
 			}
-		}
-	}
-  if(!checkMoney()) return window.location.href = '#fundMoney';
-  fundObj.applicant.userLevel = $('#userLevel').val() || undefined;
-  fundObj.applicant.threadCount = $('#threadCount').val() || undefined;
-  fundObj.applicant.postCount = $('#postCount').val() || undefined;
-  fundObj.applicant.timeToRegister = $('#timeToRegister').val() || undefined;
-  fundObj.supportCount = $('#supportCount').val() || undefined;
-  fundObj.thread.count = $('#attachmentsThreads').val() || undefined;
-  fundObj.paper.count = $('#attachmentsPapers').val() || undefined;
-  fundObj.timeOfPublicity = $('#timeOfPublicity').val() || undefined;
-  fundObj.modifyCount = $('#modifyCount').val() || undefined;
-  fundObj.applicant.authLevel = $('#applicantAuthLevel').val() || undefined;
-  fundObj.member.authLevel = $('#memberAuthLevel').val() || undefined;
-  fundObj.applicationCountLimit = $('#applicationCountLimit').val() || undefined;
-  fundObj.censor.appointed = $('#fundCensorAppointed').val() || undefined;
-  fundObj.description.brief = $('#briefDescription').val() || undefined;
-  fundObj.description.detailed = $('#detailedDescription').val() || undefined;
-  fundObj.description.terms = $('#terms').val() || undefined;
-  fundObj._id = $('#fundId').val() || undefined;
-  if(fundObj._id === '') return screenTopWarning('基金编号不能为空！');
-  if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成！');
-  if(fundObj._id.length > 4) return screenTopWarning('基金编号不能超过四位！');
-  if($('#fundName').val()) fundObj.name = $('#fundName').val();
-  var initial = $('#initial').val();
-  if(initial) {
-  	initial = parseFloat(initial);
-  } else {
-  	initial = 0;
-  }
-	fundObj.money.initial = initial;
-  var url = '/fund/list';
-  var method = 'POST';
-  if(id !== undefined) {
-    url = '/fund/list/'+ id;
-    method = 'PATCH';
-  }
-  nkcAPI(url, method, {fundObj: fundObj})
-    .then(function(data){
-    	var fund = data.fund;
-    	if(fundObj.disabled) {
-    		window.location.href = '/fund/list';
-	    } else if(fundObj.history) {
-    		window.location.href = '/fund/history';
-	    } else {
-		    window.location.href = '/fund/list/'+fund._id.toLowerCase();
-	    }
-    })
-    .catch(function(data){
-      screenTopWarning(data.error);
-    })
+		})
+		.catch(function(data){
+			screenTopWarning(data.error);
+		})
 }
-
-function deleteBanner() {
-	deleteBannerPhoto = true;
-	$('#fundImageDisplay').css('display', 'none');
-}
-/*
-
-function userLevel() {
-  $('#userLevel').on('blur', function() {
-    var userLevel = $('#userLevel');
-    if(userLevel.val() < 0) {
-      fail('#userLevelInfo', ' 用户等级不能为负！');
-    } else {
-      done('#userLevelInfo');
-    }
-  })
-}
-
-function threadCont() {
-  $('#threadCount').on('blur', function() {
-    var threadCount = $('#threadCount');
-    if(threadCount.val() < 0) {
-      fail('#threadCountInfo', ' 用户不能为负！');
-    } else {
-      done('#threadCountInfo');
-    }
-  })
-}*/
-
-
-/*
-function deleteFund(name, id){
-	if(confirm('确定要删除'+name+'？') === true) {
-		nkcAPI('/fund/list/'+id, 'DELETE')
-			.then(function() {
-				window.location.href='/fund/list';
-			})
-			.catch(function(data) {
-				screenTopWarning(data.error);
-			})
-	}
-}*/

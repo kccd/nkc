@@ -16,7 +16,7 @@ const qrCodePath = path.resolve('resources/qr');
 const photoPath = path.resolve('resources/photo');
 const photoSmallPath = path.resolve('resources/photo_small');
 const fundBannerPath = path.resolve('resources/fundBanner');
-const fundAvatarPath = path.resolve('resources/fundAvatar');
+const fundLogoPath = path.resolve('resources/fundLogo');
 
 
 function generateFolderName(basePath) {
@@ -96,7 +96,7 @@ module.exports = {
   qrCodePath,
 	photoSmallPath,
 	fundBannerPath,
-	fundAvatarPath,
+	fundLogoPath,
   avatarSize: 192,
   avatarSmallSize: 48
 };

@@ -19,7 +19,7 @@ block content
       .col-xs-12.col-md-12(style='margin-bottom: 1rem')
         .fund-panel
           .fund-panel-title(style=`position:relative;background-color: ${fund?fund.color:''};`)
-            if fund.image
+            if fund.image && fund.image.banner
               img(style='width: 100%; height: 100%;position: absolute;' src=`/fundBanner/${fund.image.banner}`)
             .col-xs-12.col-md-12
               h1.fund-name=fund.name

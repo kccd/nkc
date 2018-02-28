@@ -260,7 +260,7 @@ const certificates ={
 			    [GET]: true,
 		    }
 	    },
-	    fundAvatar: {
+	    fundLogo: {
 		    [name]: '基金项目背景图片',
 		    [parameter]: {
 			    [GET]: true,
@@ -548,7 +548,10 @@ const certificates ={
 			      },
 			      comment: {
 							[name]:'评论',
-				      [POST]: true
+				      [POST]: true,
+				      [parameter]: {
+					      [DELETE]: true, //封禁评论
+				      }
 			      },
 			      member: {
         			[name]: '组员',
@@ -583,11 +586,21 @@ const certificates ={
 				      }
 			      },
 			      remittance: {
+				      [GET]: true,
+				      [POST]: true,
         			apply: {
         				[name]: '申请拨款',
 				        [GET]: true,
 				        [POST]: true
 			        }
+			      },
+			      excellent: {
+				      [name]: '评优',
+				      [PATCH]: true
+			      },
+			      disabled: {
+				      [name]: '封禁',
+				      [PATCH]: true
 			      }
 		      }
 	      },
@@ -603,7 +616,7 @@ const certificates ={
 			    [GET]: true,
 		    }
 	    },
-	    fundAvatar: {
+	    fundLogo: {
 		    [name]: '基金项目背景图片',
 		    [POST]: true,
 		    [parameter]: {
@@ -927,23 +940,7 @@ const certificates ={
 	      },
 	      a: {
         	[parameter]: {
-        		remittance: {// 拨款
-        			[GET]: true,
-			        [POST]: true
-		        },
-		        excellent: {
-        			[name]: '评优',
-			        [PATCH]: true
-		        },
-		        disabled: {
-        			[name]: '封禁',
-			        [PATCH]: true
-		        },
-		        comment: {
-        			[parameter]: {
-        				[DELETE]: true, //封禁评论
-			        }
-		        }
+
 	        }
 	      },
 				histories: {

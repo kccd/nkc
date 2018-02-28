@@ -79,13 +79,7 @@ reportRouter
 		data.type = 'reportAudit';
 		const {user, applicationForm} = data;
 		const {remittance, reportNeedThreads, submittedReport, fund} = applicationForm;
-		const {certs, appointed} = fund.censor;
-		let isCensor = false;
-		for(let c of certs) {
-			if(user.certs.includes(c)) isCensor = true;
-		}
-		if(appointed.includes(user.uid)) isCensor = true;
-		if(!isCensor) ctx.throw(401, '权限不足');
+		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		for(let r of remittance) {
@@ -108,13 +102,7 @@ reportRouter
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
 		const {submittedReport, remittance, fund} = applicationForm;
-		const {certs, appointed} = fund.censor;
-		let isCensor = false;
-		for(let c of certs) {
-			if(user.certs.includes(c)) isCensor = true;
-		}
-		if(appointed.includes(user.uid)) isCensor = true;
-		if(!isCensor) ctx.throw(401, '权限不足');
+		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
 		const {number, support, c} = body;
 		if(!number) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');

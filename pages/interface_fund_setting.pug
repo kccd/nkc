@@ -33,7 +33,7 @@ block content
               .col-xs-12.col-md-2
                 h5 基金初始金额
               .col-xs-12.col-md-2
-                input.form-control#initial(type="Number" placeholder='初始金额' value=fund ? fund.money.initial: '')
+                input.form-control#fundInitial(type="Number" placeholder='初始金额' value=fund ? fund.money.initial: '')
               .col-xs-12.col-md-2
             .fund-setting-list
               .col-xs-12.col-md-2
@@ -88,19 +88,29 @@ block content
                 if fund && fund.image && fund.image.banner
                   img#fundImageDisplay(imageId= fund.image.banner src=`/fundBanner/${fund.image.banner}` style='width: 100%;')
                 else
-                  img#fundImageDisplay(src=`#` style='display:none;')
+                  img#fundImageDisplay(src=`#` style='display:none;width: 100%;')
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 avatar图片
+                h5 logo图片
               .col-xs-12.col-md-2
-                input#fundAvatarImage(type="file" style='display: none')
-                button.btn.btn-default(onclick='$("#fundAvatarImage").click()') 上传avatar图片
-                button.btn.btn-default(onclick='deleteAvatar()') 删除avatar图片
+                input#fundLogoImage(type="file" style='display: none')
+                button.btn.btn-default(onclick='$("#fundLogoImage").click()') 上传logo图片
+                button.btn.btn-default(onclick='deleteLogo()') 删除logo图片
               .col-xs-12.col-md-2
-                if fund && fund.image && fund.image.avatar
-                  img#fundAvatarImageDisplay(imageId= fund.image.avatar src=`/fundAvatar/${fund.image.avatar}`)
+                if fund && fund.image && fund.image.logo
+                  img#fundLogoImageDisplay(imageId= fund.image.logo src=`/fundLogo/${fund.image.logo}`)
                 else
-                  img#fundAvatarImageDisplay(src=`#` style='display:none;')
+                  img#fundLogoImageDisplay(src=`#` style='display:none;')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 审核方式
+              .col-xs-12.col-md-2
+                label.radio-inline
+                  input(type='radio' name='auditType' checked=fund ? (fund.auditType === 'person') : false)
+                  h5 人工
+                label.radio-inline
+                  input(type='radio' name='auditType' checked=fund ? (fund.auditType === 'system') : true)
+                  h5 系统
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 显示入口
@@ -142,38 +152,121 @@ block content
                   input(type='radio' name='disabled' checked=fund ? (!fund.disabled) : true)
                   h5 否
             hr
-            h4 审批方式
+            h4 相关人员权限设置
             hr
             .fund-setting-list
               .col-xs-12.col-md-2
-                label.radio-inline
-                  input.censor(type='radio' name='censor' checked=fund?(fund.censor.certs.length!==0): false)
-                  h5 人工
-              //.col-xs-12.col-md-2
-              //  input.form-control(type="number" placeholder="默认为0")
-              .col-xs-10.col-md-10#certsCheckBox
+                h5 专家
+              .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    h5 审查员资格
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.expert.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='expertCert' cert=certObj.cert checked=fund.expert.certs.includes(certObj.cert))
+                          h5= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='expertCert' cert=certObj.cert)
+                          h5= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#expertUid(placeholder="填入uid" value=fund && fund.expert.appointed.length !== 0? fund.expert.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 财务
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.financialStaff.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='financialStaffCert' cert=certObj.cert checked=fund.financialStaff.certs.includes(certObj.cert))
+                          h5= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='financialStaffCert' cert=certObj.cert)
+                          h5= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#financialStaffUid(placeholder="填入uid" value=fund && fund.financialStaff.appointed.length !== 0? fund.financialStaff.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 检查员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
                     -for (let certObj of data.fundCerts)
                       if fund && fund.censor.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='cert' cert=certObj.cert checked=fund.censor.certs.includes(certObj.cert))
+                          input(type='checkbox' name='censorCert' cert=certObj.cert checked=fund.censor.certs.includes(certObj.cert))
                           h5= certObj.displayName
                       else
-                        label.checkbox-inline.disabled
-                          input(type='checkbox' name='cert' cert=certObj.cert disabled=true)
+                        label.checkbox-inline
+                          input(type='checkbox' name='censorCert' cert=certObj.cert)
                           h5= certObj.displayName
-                    hr
                   .col-xs-12.col-md-5
-                    h5 指定审查员(英文逗号,分隔)
-                    .form-group
-                      input#fundCensorAppointed.form-control(value=fund? fund.censor.appointed.join(','): '' placeholder='填入uid')
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#censorUid(placeholder="填入uid" value=fund && fund.censor.appointed.length !== 0? fund.censor.appointed.join(','): '')
             .fund-setting-list
+              hr
               .col-xs-12.col-md-2
-                label.radio-inline
-                  input.censor(type='radio' name='censor' checked=fund?(fund.censor.certs.length === 0): true)
-                  h5 系统
+                h5 管理员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.admin.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='adminCert' cert=certObj.cert checked=fund.admin.certs.includes(certObj.cert))
+                          h5= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='adminCert' cert=certObj.cert)
+                          h5= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#adminUid(placeholder="填入uid" value=fund && fund.admin.appointed.length !== 0? fund.admin.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 评论人员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.commentator.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='commentatorCert' cert=certObj.cert checked=fund.commentator.certs.includes(certObj.cert))
+                          h5= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='commentatorCert' cert=certObj.cert)
+                          h5= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#commentatorUid(placeholder="填入uid" value=fund && fund.commentator.appointed.length !== 0? fund.commentator.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 投票人员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.voter.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='voterCert' cert=certObj.cert checked=fund.voter.certs.includes(certObj.cert))
+                          h5= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='voterCert' cert=certObj.cert)
+                          h5= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#voterUid(placeholder="填入uid" value=fund && fund.voter.appointed.length !== 0? fund.voter.appointed.join(','): '')
             hr
             h4 申请人资格
             hr
@@ -217,38 +310,6 @@ block content
                 h5 组员身份认证等级
               .col-xs-12.col-md-2
                 input.form-control#memberAuthLevel(type='number' placeholder='默认1' value=member.authLevel?member.authLevel:'')
-            //.fund-setting-list
-            //  .col-xs-12.col-md-2
-            //    h5 申请人身份认证
-            //  .col-xs-10.col-md-10
-            //    label.checkbox-inline
-            //      input.authentication(type='checkbox' name='idCard' checked=applicant ? applicant.idCard : false)
-            //      h5 实名认证
-            //    label.checkbox-inline
-            //      input.authentication(type='checkbox' name='idCardPhotos' checked=applicant ? applicant.idCardPhotos : false)
-            //      h5 身份证照片
-            //    label.checkbox-inline
-            //      input.authentication(type='checkbox' name='lifePhotos' checked=applicant ? applicant.lifePhotos : false)
-            //      h5 生活照
-            //    label.checkbox-inline
-            //      input.authentication(type='checkbox' name='handheldIdCardPhoto' checked=applicant ? applicant.handheldIdCardPhoto : false)
-            //      h5 手持身份证照片
-            //.fund-setting-list
-            //  .col-xs-12.col-md-2
-            //    h5 组员身份认证
-            //  .col-xs-10.col-md-10
-            //    label.checkbox-inline
-            //      input.members(type='checkbox' name='idCard' checked=member ? member.idCard : false)
-            //      h5 实名认证
-            //    label.checkbox-inline
-            //      input.members(type='checkbox' name='idCardPhotos' checked=member ? member.idCardPhotos : false)
-            //      h5 身份证照片
-            //    label.checkbox-inline
-            //      input.members(type='checkbox' name='lifePhotos' checked=member ? member.lifePhotos : false)
-            //      h5 生活照
-            //    label.checkbox-inline
-            //      input.members(type='checkbox' name='handheldIdCardPhoto' checked=member ? member.handheldIdCardPhoto : false)
-            //      h5 手持身份证照片
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 附带帖子数目

@@ -5,7 +5,7 @@ commentRouter
 		const {data, body, db} = ctx;
 		const {applicationForm, user} = data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
-		if(!user.certs.includes('mobile')) ctx.throw('401', '您还没有通过实名认证，请前往资料设置页绑定手机号。');
+		if(!applicationForm.fund.ensureOperatorPermission('commentator', user)) ctx.throw(401, '抱歉！您没有资格进行评论。');
 		const {comment} = body;
 		if(!applicationForm.status.submitted) ctx.throw(400, '申请表未提交，暂不能评论。');
 		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);

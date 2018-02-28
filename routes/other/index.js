@@ -27,7 +27,7 @@ const testRouter = require('./test');
 const photoRouter = require('./photo');
 const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
-const fundBannerSmallRouter = require('./fundAvatar');
+const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
 const coverRouter = require('./cover');
 // -----------------------------------
@@ -151,7 +151,7 @@ otherRouter
 	.use('photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
-	.use('fundAvatar', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
+	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());

@@ -221,6 +221,25 @@ function applicationFormStatus(a) {
 	return {str, color};
 }
 
+function ensureFundOperatorPermission(type, user, fund) {
+	const {expert, censor, financialStaff, admin, commentator, voter} = fund;
+	const fn = (obj, user) => {
+		for(let cert of obj.certs) {
+			if(user.certs.includes(cert)) return true;
+		}
+		return obj.appointed.includes(user.uid);
+	};
+	switch (type) {
+		case 'expert': return fn(expert, user);
+		case 'censor': return fn(censor, user);
+		case 'financialStaff': return fn(financialStaff, user);
+		case 'admin': return fn(admin, user);
+		case 'commentator': return fn(commentator, user);
+		case 'voter': return fn(voter, user);
+		default: throw '未知的身份类型。';
+	}
+}
+
 let pugRender = (template, data) => {
   let options = {
     markdown_safe: render.commonmark_safe,
@@ -239,7 +258,8 @@ let pugRender = (template, data) => {
     htmlDiff,
     filterQuote,
 	  hideContentByUser,
-	  applicationFormStatus
+	  applicationFormStatus,
+	  ensureFundOperatorPermission,
   };
   options.data = data;
   options.filters = filters;
