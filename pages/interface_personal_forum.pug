@@ -123,9 +123,9 @@ block content
 
                   if isAdmin
                     if data.targetUser.certs.indexOf('banned') > -1
-                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'PUT', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) 解除封禁
+                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'PUT', {}).then(function(data){screenTopAlert(data.message)}).catch(function(data){screenTopWarning(data.error)})`) 解除封禁
                     else
-                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){jalert(data.message)}).catch(jwarning)`) &nbsp;封禁此人&nbsp;
+                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){screenTopAlert(data.message)}).catch(function(data){screenTopWarning(data.error)})`) &nbsp;封禁此人&nbsp;
 
 
         ul.nav.nav-tabs(style='margin-top: 0.4rem;')

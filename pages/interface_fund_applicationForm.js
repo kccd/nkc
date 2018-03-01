@@ -35,7 +35,10 @@ function support(_id) {
 
 function against(_id) {
 	var content = $('#content').val();
-	if(!content) return screenTopWarning('请输入反对的理由。');
+	if(!content) {
+		screenTopWarning('请输入反对的理由。');
+		return;
+	}
 	var obj = {
 		type: 'against',
 		c: content

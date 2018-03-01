@@ -253,14 +253,14 @@ const certificates ={
 			    }
 		    }
 	    },
-	    fundBGI: {
+	    fundBanner: {
 		    [name]: '基金项目背景图片',
 		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
 		    }
 	    },
-	    fundBGI_small: {
+	    fundLogo: {
 		    [name]: '基金项目背景图片',
 		    [parameter]: {
 			    [GET]: true,
@@ -525,9 +525,9 @@ const certificates ={
 		      [GET]: true, // 所有基金项目
 		      [parameter]: {
 			      [GET]: true, // 具体到某一个基金项目
-			      [POST]: true, // 申请该基金
 			      add: {
-				      [GET]: true // 填写申请信息页面
+				      [GET]: true, // 同意条款
+				      [POST]: true // 申请该基金
 			      },
 			      bills: {// 基金项目的账单
 			      	[GET]: true
@@ -548,7 +548,10 @@ const certificates ={
 			      },
 			      comment: {
 							[name]:'评论',
-				      [POST]: true
+				      [POST]: true,
+				      [parameter]: {
+					      [DELETE]: true, //封禁评论
+				      }
 			      },
 			      member: {
         			[name]: '组员',
@@ -575,31 +578,56 @@ const certificates ={
 			      complete: { // 结项
 				      [name]: '结项',
         			[GET]: true,
-				      [POST]: true
+				      [POST]: true,
+				      audit: {
+				      	[name]: '结题审核',
+					      [GET]: true,
+					      [POST]: true
+				      }
 			      },
 			      remittance: {
+				      [GET]: true,
+				      [POST]: true,
         			apply: {
         				[name]: '申请拨款',
 				        [GET]: true,
 				        [POST]: true
 			        }
+			      },
+			      excellent: {
+				      [name]: '评优',
+				      [PATCH]: true
+			      },
+			      disabled: {
+				      [name]: '封禁',
+				      [PATCH]: true
 			      }
 		      }
 	      },
 	      me: {
         	[name]: '我的基金',
 		      [GET]: true
+	      },
+	      info: {
+        	[name]: '科创基金所有信息',
+		      [GET]: true,
+	      },
+	      bills: {
+        	[name]: '科创基金总账单',
+		      [GET]: true,
+		      [POST]: true
 	      }
       },
-	    fundBGI: {
+	    fundBanner: {
 		    [name]: '基金项目背景图片',
 		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
 		    }
 	    },
-	    fundBGI_small: {
+	    fundLogo: {
 		    [name]: '基金项目背景图片',
+		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
 		    }
@@ -899,6 +927,11 @@ const certificates ={
 					[name]: '新建基金项目页面',
 		      [GET]: true
 	      },
+	      settings: {
+		      [name]: '科创基金总设置',
+		      [GET]: true,
+		      [PATCH]: true
+	      },
 	      list:{
         	[name]: '基金项目列表',
 		      [POST]: true, // 添加基金项目
@@ -921,23 +954,7 @@ const certificates ={
 	      },
 	      a: {
         	[parameter]: {
-        		remittance: {// 拨款
-        			[GET]: true,
-			        [POST]: true
-		        },
-		        excellent: {
-        			[name]: '评优',
-			        [PATCH]: true
-		        },
-		        disabled: {
-        			[name]: '封禁',
-			        [PATCH]: true
-		        },
-		        comment: {
-        			[parameter]: {
-        				[DELETE]: true, //封禁评论
-			        }
-		        }
+
 	        }
 	      },
 				histories: {

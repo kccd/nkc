@@ -55,6 +55,7 @@ block content
                               a(href=`/fund/a/${a._id}`)= `查看`
                               br
                               span= `状态：`
+                              -let flag = false;
                               -for(let m of members)
                                 if m.uid === data.user.uid
                                   if m.agree === true
@@ -64,6 +65,9 @@ block content
                                     //a(href=`/fund/a/${_id}`) 查看
                                   else
                                     span.redFontColor 已拒绝
+                                  -flag = true;
+                              if !flag
+                                span.redFontColor 已过期
                               hr
                             else
                               .fund-li
@@ -86,7 +90,7 @@ block content
                                   .col-xs-12.col-md-1
                                     a(href=`/fund/a/${a._id}`) 查看
                                     br
-                                    if !a.status.adminSupport && !a.disabled && a.useless === null
+                                    if !a.lock.submitted && !a.disabled && a.useless === null
                                       a(href=`/fund/a/${a._id}/settings`) 编辑
                       include interface_fund_page
 block scripts

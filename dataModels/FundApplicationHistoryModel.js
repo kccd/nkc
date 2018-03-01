@@ -186,6 +186,10 @@ const fundApplicationHistorySchema = new Schema({
 		type: Boolean,
 		default: false
 	},
+	completedAudit: {
+		type: Boolean,
+		default: false
+	},
 	category: {
 		type: String,
 		default: null,

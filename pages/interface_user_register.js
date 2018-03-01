@@ -94,33 +94,32 @@ function register_submit(){
     },5000)
 
   })
-  .catch(function(err){
-    console.log(err)
-    if(err == '用户名已存在，请输入其他用户名'){
+  .catch(function(data){
+    if(data.error == '用户名已存在，请输入其他用户名'){
       //refreshICode();
       getFocus("#username")
     }
-    if(err == '验证注册码失败，请检查！'){
+    if(data.error == '验证注册码失败，请检查！'){
       //refreshICode();
       getFocus("#regCode")
     }
-    if(err === '答卷的注册码过期，可能要重新参加考试') {
+    if(data.error === '答卷的注册码过期，可能要重新参加考试') {
       //refreshICode();
       getFocus('#regCode')
     }
-    if(err == '手机验证码不正确，请检查'){
+    if(data.error == '手机验证码不正确，请检查'){
       //refreshICode();
       getFocus("#mcode")
     }
-   /* if(err == '图片验证码不正确，请检查'){
+   /* if(data.error == '图片验证码不正确，请检查'){
       //refreshICode();
       getFocus("#icode")
     }*/
-    if(err == '此号码已经用于其他用户注册，请检查或更换'){
+    if(data.error == '此号码已经用于其他用户注册，请检查或更换'){
       //refreshICode();
       getFocus("#phone")
     }
-    error_report(err);
+    error_report(data.error);
   })
 
 }
@@ -145,6 +144,10 @@ function getMcode(){
   if(password2 == ''){
     getFocus("#password2")
     return error_report('请再次填写密码！')
+  }
+  if(password !== password2) {
+  	getFocus("#password2")
+	  return error_report('两次输入的密码不一致，请重新输入！');
   }
   if(phone == ''){
     getFocus("#phone")
@@ -184,28 +187,28 @@ function getMcode(){
           count--;
       }
     })
-    .catch(function(err){
-      if(err == '手机验证码不正确，请检查'){
+    .catch(function(data){
+      if(data.error == '手机验证码不正确，请检查'){
         //refreshICode();
         getFocus("#mcode")
       }
-     /* if(err.detail == '图片验证码不正确，请检查'){
+     /* if(data.error.detail == '图片验证码不正确，请检查'){
         //refreshICode();
         getFocus("#icode")
       }*/
-      if(err == '此号码已经用于其他用户注册，请检查或更换'){
+      if(data.error == '此号码已经用于其他用户注册，请检查或更换'){
         //refreshICode()
         getFocus("#phone")
       }
-      if(err === '验证注册码失败，请检查！'){
+      if(data.error === '验证注册码失败，请检查！'){
         //refreshICode()
         getFocus("#regCode")
       }
-      if(err === '答卷的注册码过期，可能要重新参加考试') {
+      if(data.error === '答卷的注册码过期，可能要重新参加考试') {
         //refreshICode();
         getFocus('#regCode')
       }
-      error_report(err);
+      error_report(data.error);
     })
   }
 }

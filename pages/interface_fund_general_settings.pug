@@ -1,0 +1,60 @@
+extends bootstrap_base
+block title
+
+  -const {fundSettings} = data;
+  -const {closed} = fundSettings;
+  -const mainContainer1400 = true
+  title= `科创基金设置`
+  link(rel='stylesheet' href='/fund.css')
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .panel.panel-default
+      .panel-body
+        .row
+          .col-xs-12.col-md-6.col-md-offset-3
+            h2.text-center 科创基金总设置
+            br
+            h4 基本信息
+            hr
+            span 科创基金介绍：
+            textarea.form-control#description(rows=5 placeholder='科创基金介绍')= fundSettings.description || ''
+            br
+            span 科创基金条款
+            textarea.form-control#terms(rows=10 placeholder='科创基金条款')= fundSettings.terms || ''
+            br
+            br
+            br
+            br
+
+            h4 基金控制
+            hr
+            span 只读模式：
+            label.radio-inline
+              input(type='radio' name='readOnly' checked= fundSettings.readOnly)
+              h5 是
+            label.radio-inline
+              input(type='radio' name='readOnly' checked= !fundSettings.readOnly)
+              h5 否
+            br
+            span 临时关闭：
+            label.radio-inline
+              input(type='radio' name='closed' checked= fundSettings.closed.status)
+              h5 是
+            label.radio-inline
+              input(type='radio' name='closed' checked= !fundSettings.closed.status)
+              h5 否
+            br
+            span 临时关闭的原因：
+            textarea.form-control#reason(rows=8 placeholder='请输入临时关闭的原因')= fundSettings.closed.reason || ''
+            br
+            span= `预计开放时间(已设置为：${fundSettings.closed.openingHours.toLocaleString()})：`
+            input.form-control#openingTime(type='datetime-local' time=fundSettings.closed.openingHours.getTime())
+
+            br
+            button.btn.btn-info.center-block(onclick='submit()') &nbsp;&nbsp;&nbsp;提交&nbsp;&nbsp;&nbsp;
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_general_settings.js')

@@ -93,10 +93,11 @@ const userSchema = new Schema({
 
 userSchema.pre('save', function(next) {
   try {
+  	this.usernameLowerCase = this.username;
     const certs = this.certs;
     const c = [];
     for (let cert of certs) {
-      if (cert !== 'scholar') c.push(cert);
+      if (cert && cert !== 'scholar') c.push(cert);
     }
     this.certs = c;
     return next()
@@ -214,7 +215,8 @@ userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
   let cs = ['会员'];
   for(const cert of certs) {
-    cs.push(certificates[cert].displayName);
+  	if(cert)
+      cs.push(certificates[cert].displayName);
   }
   cs = cs.join(' ');
   if(certs.includes('banned')){

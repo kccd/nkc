@@ -8,6 +8,9 @@ const settingSchema = new Schema({
     unique: true,
     required: true
   },
+
+	//系统设置
+	//---------------------------------------
   ads: {
     type: [String]
   },
@@ -27,7 +30,25 @@ const settingSchema = new Schema({
 	  photos: Number,
     forums: Number,
 	  fundDocuments: Number,
-  }
+  },
+
+	//科创基金设置
+  //-------------------------------------
+	description: {
+  	type: String,
+		maxlength: [500, '字数不能大于500个字']
+	},
+	terms: String,
+	money: Number,
+	closed: {
+  	status: Boolean,
+		reason: String,
+		openingHours: Date,
+		closingTime: Date,
+		uid: String,
+		username: String
+	},
+	readOnly: Boolean
 },
 {toObject: {
   getters: true,

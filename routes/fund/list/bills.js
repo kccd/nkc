@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const apiFn = require('../../nkcModules/apiFunction');
+const apiFn = require('../../../nkcModules/apiFunction');
 const billsRouter = new Router();
 billsRouter
 	.get('/', async (ctx, next) => {

@@ -6,7 +6,8 @@ voteRouter
 		const {type, c} = body;
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
-		if(!user.certs.includes('mobile')) ctx.throw('401', '您还没有通过实名认证，请前往资料设置页绑定手机号。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
+		if(!applicationForm.fund.ensureOperatorPermission('voter', user)) ctx.throw(401, '抱歉！您没有资格进行投票。');
 		const {fund, members, supportersId, objectorsId} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		membersId.push(applicationForm.uid);
@@ -29,7 +30,7 @@ voteRouter
 		await newDocument.save();
 		await applicationForm.save();
 
-		//获得的网友
+		//获得网友支持
 		if(fund.supportCount <= supportersId.length) {
 			await applicationForm.update({'status.usersSupport': true});
 		}

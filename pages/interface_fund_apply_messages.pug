@@ -103,6 +103,7 @@
       if !applicationForm.project
         h4.text-center= `项目内容暂未填写`
       else
+        -applicationForm.project.c = hideContentByUser(applicationForm.project.c, data.user, 'thread');
         div!= experimental_render(applicationForm.project)
       hr
       .h4 其他信息
@@ -119,31 +120,37 @@
         if applicationForm.budgetMoney === null || applicationForm.budgetMoney === ''
           span 暂未填写
         else
-          -let aggregate, suggest, fact;
+          -let aggregate, suggest, fact, used;
           #budgetMoney
             if applicationForm.budgetMoney.length !== 0 && applicationForm.budgetMoney[0].fact
               -aggregate=0;
               -suggest=0;
               -fact=0;
-              .fund-money-list.head.adminAudit
+              -used=0;
+              .fund-money-list.head.adminAudit(class=applicationForm.status.completed? 'reportOfKnotAudit': '')
                 .purpose 用途
                 .count 数量
                 .money 单价(元)
                 .total 合计(元)
                 .suggest 专家建议(元)
                 .fact 实际批准(元)
+                if applicationForm.status.completed
+                  .used 实际花费（元）
               -for(let p of applicationForm.budgetMoney)
                 -const total = p.count*p.money;
                 -aggregate += total;
                 -suggest += p.suggest;
                 -fact += p.fact;
-                .fund-money-list.adminAudit
+                -used += p.used || 0;
+                .fund-money-list.adminAudit(class=applicationForm.status.completed? 'reportOfKnotAudit': '')
                   .purpose= p.purpose
                   .count= p.count
                   .money= p.money
                   .total= total
-                  .suggest= p.suggest
+                  .suggest= p.suggest?p.suggest: total
                   .fact= p.fact
+                  if applicationForm.status.completed
+                    .used= p.used
             else if applicationForm.budgetMoney.length !== 0 && applicationForm.budgetMoney[0].suggest
               -aggregate=0;
               -suggest=0;
@@ -183,8 +190,10 @@
             if aggregate
               span=`申请金额：${aggregate}元`
             if suggest
-              span=`，专家建议：${suggest}元`
+              span=`，专家建议：${suggest || aggregate}元`
             if fact
               span=`，实际批准：${fact}元`
+            if applicationForm.status.completed && !applicationForm.fixedMoney
+              span=`，实际花费：${used}元`
 
 

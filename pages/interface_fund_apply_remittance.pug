@@ -30,7 +30,7 @@ block content
                 if remittance[number].passed === true
                   h4.greenFontColor 已通过审核，等待打款。
                 else if submittedReport && remittance[number].passed === null
-                  h3.greenFontColor.text-center 已提交申请，请等待管理员复核。
+                  h3.greenFontColor.text-center 已提交申请，请等待专家审核。
                 else if submittedReport === false
                   if remittance[number].passed === false
                     h4.redFontColor 审核不通过

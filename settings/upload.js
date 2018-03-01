@@ -15,8 +15,8 @@ const siteSpecificPath = path.resolve('resources/site_specific');
 const qrCodePath = path.resolve('resources/qr');
 const photoPath = path.resolve('resources/photo');
 const photoSmallPath = path.resolve('resources/photo_small');
-const fundBGIPath = path.resolve('resources/fundBGI');
-const fundBGISmallPath = path.resolve('resources/fundBGI_small');
+const fundBannerPath = path.resolve('resources/fundBanner');
+const fundLogoPath = path.resolve('resources/fundLogo');
 
 
 function generateFolderName(basePath) {
@@ -64,11 +64,11 @@ module.exports = {
     	width: 350,
 		  height: 230
 	  },
-	  fundBGI: {
+	  fundBanner: {
     	width: 1370,
 		  height: 189
 	  },
-	  fundBGISmall: {
+	  fundBannerSmall: {
     	width: 320,
 		  height: 144
 	  },
@@ -95,8 +95,8 @@ module.exports = {
   siteSpecificPath,
   qrCodePath,
 	photoSmallPath,
-	fundBGIPath,
-	fundBGISmallPath,
+	fundBannerPath,
+	fundLogoPath,
   avatarSize: 192,
   avatarSmallSize: 48
 };

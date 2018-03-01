@@ -34,7 +34,7 @@ registerRouter
     const regCode = params.regCode;
     let regCodeFoDB = {};
     try{
-      regCodeFoDB = await dbFn.checkRigsterCode(regCode);
+      regCodeFoDB = await dbFn.checkRegisterCode(regCode);
     }catch (err) {
       ctx.throw('404', err);
     }
@@ -77,7 +77,7 @@ registerRouter
     const regCode = params.regCode;
     let regCodeFoDB = {};
     try{
-      regCodeFoDB = await dbFn.checkRigsterCode(regCode);
+      regCodeFoDB = await dbFn.checkRegisterCode(regCode);
     }catch (err) {
       ctx.throw('404', err);
     }
@@ -100,7 +100,7 @@ registerRouter
     let emailRegister = new db.EmailRegisterModel(userObj);
     await emailRegister.save();
     let text = '欢迎注册科创论坛，点击以下链接就可以激活您的账户：';
-    let href = `http://bbs.kechuang.org/register/email/verify?email=${userObj.email}&ecode=${ecode}`;
+    let href = `http://www.kechuang.org/register/email/verify?email=${userObj.email}&ecode=${ecode}`;
     let link = `<a href="${href}">${href}</a>`;
     await nkcModules.sendEmail({
       from: settings.mailSecrets.exampleMailOptions.from,

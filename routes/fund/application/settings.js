@@ -7,7 +7,7 @@ settingsRouter
 		data.nav = '填写申请表';
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
-		if(applicationForm.useless === 'delete') ctx.throw(401, '抱歉！该申请表已被删除。');
+		if(applicationForm.useless !== null) ctx.throw(401, '申请表已失效，无法完成该操作。');
 		if(applicationForm.lock.submitted) ctx.throw(401, '抱歉！申请表已提交暂不能修改。');
 		const {status} = applicationForm;
 		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');

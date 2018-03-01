@@ -292,12 +292,12 @@ block scripts
       geid('sendMes').disabled = true;
       nkcAPI('/sms/message','post',mesObj)
       .then(function(){
-        jalert('信息发送成功！请刷新');
+        screenTopAlert('信息发送成功！请刷新');
         $("#inputContent").val('');
         geid('sendMes').disabled = false;
       })
       .catch(function(data){
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('sendMes').disabled = false;
       });
     }

@@ -279,13 +279,13 @@ block content
                         .count= p.count
                         .money= p.money
                         .total= total
-                        div= p.suggest
-                        div.factMoney(contenteditable=true)= p.suggest
+                        div= p.suggest? p.suggest: total
+                        div.factMoney(contenteditable=true)= p.suggest? p.suggest: total
                   h3=`总计：`
                     span#total= `${aggregate}`
                     span=`元`
                   h3=`管理员建议：`
-                    span#suggestMoney=`${suggest}`
+                    span#suggestMoney=`${suggest || aggregate}`
                     span=`元`
                   h3=`实际：`
                     span#factMoney=`${suggest}`

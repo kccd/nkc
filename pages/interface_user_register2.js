@@ -84,12 +84,12 @@ function register_submit(){
     })
     info_report('注册邮件发送成功，请点击邮件链接来激活您的账户！')
   })
-  .catch(function(err){
-    if(err == '此用户名已存在，请更换一个'){
+  .catch(function(data){
+    if(data.error == '此用户名已存在，请更换一个'){
       //refreshICode();
       getFocus("#username")
     }
-    if(err == '此邮箱已注册过，请检查或更换'){
+    if(data.error == '此邮箱已注册过，请检查或更换'){
       //refreshICode();
       getFocus("#email")
     }
@@ -97,7 +97,7 @@ function register_submit(){
       //refreshICode();
       getFocus("#icode")
     }*/
-    error_report(err);
+    error_report(data.error);
   })
 
 }

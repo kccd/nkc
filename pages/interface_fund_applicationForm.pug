@@ -3,7 +3,74 @@ block title
   -const mainContainer1400 = true
   -const applicationForm = data.applicationForm;
   -const comments = applicationForm.comments;
-  -const fund = applicationForm.fund;
+  -const {useless, fund, status, disabled, lock, completedAudit, submittedReport} = applicationForm;
+  -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = status;
+  -let isExpert = false, isAdmin = false, isCensor = false, isFinancialStaff = false, isCommentator = false, isVoter = false;
+  -let displayReport = false, displayApplyRemittance = false;
+  -let displayModify = false, displayGiveUp = false, displayComplete = false;
+  -let displayExpertAudit = false, displayAdminAudit = false, displayRemittance = false, displayReportAudit = false;
+  -let displayCompleteAudit = false, displayExcellent = false, displayDisabled = false, displayVote = false, displayCommentInput = false;
+  -let needRemittance = false, needReportAudit = false, needCompletedAudit = false;
+  -let useful = (useless === null && disabled === false);
+  if useful && status.adminSupport && status.completed === null
+    -for(let i = 0; i < applicationForm.remittance.length; i++)
+      -const r = applicationForm.remittance[i];
+      if i === 0
+        if !r.status
+          -needRemittance = true;
+          if data.user && data.user.uid === applicationForm.uid
+            -displayApplyRemittance = true;
+      else
+        if !r.status
+          if data.user && data.user.uid === applicationForm.uid
+            -displayApplyRemittance = true;
+          if r.passed === true
+            -needRemittance = true;
+
+  //通过了管理员复核 显示项目报告按钮
+  if status.adminSupport
+    -displayReport = true;
+  if data.user
+    if ensureFundOperatorPermission('expert', data.user, fund)
+      -isExpert = true;
+    if ensureFundOperatorPermission('admin', data.user, fund)
+      -isAdmin = true;
+    if ensureFundOperatorPermission('censor', data.user, fund)
+      -isCensor = true;
+    if ensureFundOperatorPermission('financialStaff', data.user, fund)
+      -isFinancialStaff = true;
+    if ensureFundOperatorPermission('commentator', data.user, fund)
+      -isCommentator = true;
+    if ensureFundOperatorPermission('voter', data.user, fund)
+      -isVoter = true;
+    //自己的申请表
+    if data.user.uid === applicationForm.uid && useful
+      // 未提交，审核未通过 显示修改按钮
+      if !lock.submitted && !adminSupport
+        -displayModify = true;
+      //未结题，通过了所有审核 显示结题按钮
+      if !status.completed && status.adminSupport
+        -displayComplete = true;
+      if !status.adminSupport
+        -displayGiveUp = true;
+  if isExpert && useful
+    if usersSupport && projectPassed === null
+      -displayExpertAudit = true;
+    if submittedReport
+      -needReportAudit = true;
+    if completedAudit
+      -needCompletedAudit = true;
+  if isAdmin && useful && projectPassed && adminSupport === null
+    -displayAdminAudit = true;
+  if isFinancialStaff && useful && needRemittance
+    -displayRemittance = true;
+  if isAdmin && useful
+    if completed
+      -displayExcellent = true;
+
+  if useful && submitted
+    -displayVote = true;
+
   if applicationForm.project
     title= `${applicationForm.project.t} - ${fund.name} - 科创基金`
   else
@@ -50,19 +117,17 @@ block content
                           a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除屏蔽
                         else
                           a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},true)`) 屏蔽
+                      -comment.c = hideContentByUser(comment.c, data.user, 'thread')
                       div!= experimental_render(comment)
                 br
                 include interface_fund_page
         .col-xs-12.col-md-3
-          -const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = applicationForm.status;
           //无效的申请表
-          -const {useless, disabled} = applicationForm;
           -let displayNext = true;
           if(disabled)
             -displayNext = false;
             .panel.panel-default
               .panel-body.applicationForm
-                h4.text-center 废弃的项目
                 h3.text-center.redFontColor 申请表已被屏蔽
           if useless === 'giveUp'
             -displayNext = false;
@@ -77,6 +142,12 @@ block content
               .panel-body.applicationForm
                 h4.text-center 项目已中止
                 h3.text-center.redFontColor 超过修改次数
+          if useless === 'refuse'
+            -displayNext = false;
+            .panel.panel-default
+              .panel-body.applicationForm
+                h4.text-center 项目已中止
+                h3.text-center.redFontColor 被彻底拒绝
           else
           // 队员点击同意
           if !applicationForm.status.submitted
@@ -104,7 +175,7 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    if data.user.uid !== applicationForm.uid
+                    if !data.user || data.user.uid !== applicationForm.uid
                       p.text-center=`专家审核不通过，等待申请人修改`
                     else
                       p.text-center=`专家审核不通过，`
@@ -114,21 +185,32 @@ block content
                 .panel-body.applicationForm
                   h5.text-center 审核结果
                   .redFontColor
-                    if data.user.uid !== applicationForm.uid
+                    if !data.user || data.user.uid !== applicationForm.uid
                       p.text-center=`管理员复核不通过，等待申请人修改`
                     else
                       p.text-center=`管理员复核不通过，`
                         a(href=`/fund/a/${applicationForm._id}/settings`) 去修改
                     p.text-center= data.auditComments.adminAudit.c
-            if excellent
+            if completed === false
               .panel.panel-default
                 .panel-body.applicationForm
-                  h1.text-center.greenFontColor 优秀项目
-            if successful === false
-              .panel.panel-default
-                .panel-body.applicationForm
-                  h1.text-center.redFontColor 研究失败
-            if applicationForm.status.completed
+                  h5.text-center 审核结果
+                  .redFontColor
+                    if !data.user || data.user.uid !== applicationForm.uid
+                      p.text-center=`结题审核不通过，等待申请人修改`
+                    else
+                      p.text-center=`结题审核不通过，`
+                       a(href=`/fund/a/${applicationForm._id}/complete`) 去修改
+                    p.text-center= data.auditComments.completedAudit.c
+            if completed
+              if excellent
+                .panel.panel-default
+                  .panel-body.applicationForm
+                    h1.text-center.greenFontColor 优秀项目
+              if successful === false
+                .panel.panel-default
+                  .panel-body.applicationForm
+                    h1.text-center.redFontColor 研究失败
               -displayNext = false;
             .panel.panel-default
               .panel-body.applicationForm
@@ -163,95 +245,55 @@ block content
                       li 结题
 
 
-
-            -let isProjectCensor = false, isAdmin = false;
-            if data.user
-              -for(let c of fund.censor.certs)
-                if data.user.certs.includes(c)
-                  -isProjectCensor = true;
-              // 判断是否是项目审查员
-              if fund.censor.appointed.includes(data.user.uid)
-                -isProjectCensor = true;
-            //判断是否是管理员
-            if data.userLevel >= 7
-              -isAdmin = true;
-            -let needProjectAudit = false, needAdminAudit = false;
-            // 判断是否显示专家审核按钮
-            if isProjectCensor && usersSupport && projectPassed === null
-              -needProjectAudit = true;
-            //判断是否显示管理员复核按钮
-            if isAdmin && projectPassed && adminSupport === null
-              -needAdminAudit = true;
-            //判断是否显示打款按钮
-            -let needRemittance = false;
-            if adminSupport && !completed
-              -for(let i = 0; i < applicationForm.remittance.length; i++)
-                -const r = applicationForm.remittance[i];
-                if i === 0
-                  if !r.status
-                    -needRemittance = true;
-                else
-                  if !r.status && r.passed === true
-                    -needRemittance = true;
-
-            -let needReportAudit = false;
-            if applicationForm.submittedReport && isProjectCensor
-              -needReportAudit = true;
-
-
-
-
-            // 申请者控制面板
-            if (data.user && applicationForm.uid === data.user.uid) || applicationForm.status.adminSupport
+            //申请人控制面板
+            if (displayReport || displayModify || displayComplete || displayGiveUp || displayApplyRemittance) && useful
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 控制面板
-                  if applicationForm.status.adminSupport
+                  if displayModify
+                    a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
+                  if displayReport
                     a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
-                    if data.user && applicationForm.uid === data.user.uid && !completed
-                      a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
-                  if data.user && data.user.uid === applicationForm.applicant.uid
-                    if !applicationForm.lock.submitted && !adminSupport
-                      a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
-                    if !applicationForm.status.completed
-                      if applicationForm.status.adminSupport
-                        a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结题
-                      else
-                        button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
-
-
-            //审查员控制面板
-            if isAdmin || needProjectAudit
+                  if displayApplyRemittance
+                    a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
+                  if displayComplete
+                    a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结题
+                  if displayGiveUp
+                    button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
+            //管理
+            if ((displayAdminAudit || displayExpertAudit || displayRemittance || needReportAudit || needCompletedAudit) && useful) || isAdmin
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 管理
-                  if needProjectAudit
+                  if displayExpertAudit
                     a(href=`/fund/a/${applicationForm._id}/audit?type=project`).btn.btn-info.btn-block 专家审核
-                  if needAdminAudit
+                  if displayAdminAudit
                     a(href=`/fund/a/${applicationForm._id}/audit?type=admin`).btn.btn-info.btn-block 管理员复核
-                  if needRemittance
+                  if displayRemittance
                     a(href=`/fund/a/${applicationForm._id}/remittance`).btn.btn-info.btn-block 拨款
                   if needReportAudit
                     a(href=`/fund/a/${applicationForm._id}/report/audit`).btn.btn-info.btn-block 报告审核
-                  if isAdmin
-                    if applicationForm.status.completed
-                      if applicationForm.status.excellent
-                        button(onclick=`excellent(${applicationForm._id}, false)`).btn.btn-info.btn-block 取消评为优秀项目
-                      else
-                        button(onclick=`excellent(${applicationForm._id}, true)`).btn.btn-info.btn-block 评为优秀项目
-                    if applicationForm.disabled
-                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 解除封禁
+                  if needCompletedAudit
+                    a(href=`/fund/a/${applicationForm._id}/complete/audit`).btn.btn-info.btn-block 结题审核
+                  if displayExcellent
+                    if excellent
+                      button(onclick=`excellent(${applicationForm._id}, false)`).btn.btn-info.btn-block 取消评为优秀项目
                     else
-                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 封禁
-
-            //普通用户
-            .panel.panel-default
-              .panel-body.applicationForm
-                h5.text-center 投票
-                textarea.form-control#content(rows=8 placeholder='填写理由')
-                br
-                a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId ? applicationForm.supportersId.length : 0}）`
-                a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId ? applicationForm.objectorsId.length : 0}）`
+                      button(onclick=`excellent(${applicationForm._id}, true)`).btn.btn-info.btn-block 评为优秀项目
+                  if isAdmin
+                    if disabled
+                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
+                    else
+                      a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
+            //投票
+            if displayVote
+              .panel.panel-default
+                .panel-body.applicationForm
+                  h5.text-center 投票
+                  textarea.form-control#content(rows=8 placeholder='填写理由')
+                  br
+                  a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId ? applicationForm.supportersId.length : 0}）`
+                  a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId ? applicationForm.objectorsId.length : 0}）`
 
 
 block scripts

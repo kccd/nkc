@@ -4,13 +4,14 @@ reportRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
 		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员复核，请通过后再试。');
+		if(applicationForm.disabled) ctx.throw(401, '申请表已被屏蔽。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {applicationForm} = data;
 		ctx.template = 'interface_fund_report.pug';
-		data.reports = await db.FundDocumentModel.find({type: 'report', applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
+		data.reports = await db.FundDocumentModel.find({type: {$in: ['report', 'completedReport']}, applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
 
 		await next();
 	})
@@ -19,11 +20,12 @@ reportRouter
 		const {user, applicationForm} = data;
 		const {c, t, type, selectedThreads} = body;
 		if(applicationForm.status.completed) ctx.throw(400, '该项目已结项。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		const obj = {};
 		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');
 		if(type === 'applyRemittance') {
-			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经完结。');
-			const {timeToPassed, reportNeedThreads, remittance} = applicationForm;
+			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经结题。');
+			const {timeToPassed, reportNeedThreads, remittance, fund} = applicationForm;
 			for(let r of remittance) {
 				if(!r.status) {
 					if(reportNeedThreads && selectedThreads.length === 0) ctx.throw(400, '管理员要求提交拨款申请必须要附带代表中期报告的帖子。');
@@ -35,7 +37,13 @@ reportRouter
 					}));
 
 					r.threads = selectedThreads.map(t => t.tid);
-					r.passed = null;
+					if(fund.auditType === 'system') {
+						r.passed = true;
+						obj.submittedReport = false;
+					} else {
+						r.passed = null;
+						obj.submittedReport = true;
+					}
 					const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 					r.report = newId;
 					const newDocument = db.FundDocumentModel({
@@ -47,7 +55,6 @@ reportRouter
 					});
 					await newDocument.save();
 					obj.remittance = remittance;
-					obj.submittedReport = true;
 					break;
 				}
 			}
@@ -72,25 +79,20 @@ reportRouter
 		data.type = 'reportAudit';
 		const {user, applicationForm} = data;
 		const {remittance, reportNeedThreads, submittedReport, fund} = applicationForm;
-		const {certs, appointed} = fund.censor;
-		let isCensor = false;
-		for(let c of certs) {
-			if(user.certs.includes(c)) isCensor = true;
-		}
-		if(appointed.includes(user.uid)) isCensor = true;
-		if(!isCensor) ctx.throw(401, '权限不足');
+		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
-		if(reportNeedThreads) {
-			for(let r of remittance) {
-				if(r.status === null && r.passed === null && r.threads && r.threads.length !== 0){
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
+		for(let r of remittance) {
+			if(r.status === null && r.passed === null){
+				if(reportNeedThreads && r.threads && r.threads.length !== 0) {
 					data.threads = await Promise.all(r.threads.map(async t => {
 						const thread = await db.ThreadModel.findOnly({tid: t});
-					  await thread.extendFirstPost().then(p => p.extendUser());
-					  return thread;
+						await thread.extendFirstPost().then(p => p.extendUser());
+						return thread;
 					}));
-					data.report = await db.FundDocumentModel.findOnly({_id: r.report});
-					break;
 				}
+				data.report = await db.FundDocumentModel.findOnly({_id: r.report});
+				break;
 			}
 		}
 		ctx.template = 'interface_fund_report.pug';
@@ -100,16 +102,11 @@ reportRouter
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
 		const {submittedReport, remittance, fund} = applicationForm;
-		const {certs, appointed} = fund.censor;
-		let isCensor = false;
-		for(let c of certs) {
-			if(user.certs.includes(c)) isCensor = true;
-		}
-		if(appointed.includes(user.uid)) isCensor = true;
-		if(!isCensor) ctx.throw(401, '权限不足');
+		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
 		const {number, support, c} = body;
 		if(!number) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if((i < number && !r.status) || (i > number && r.status)) ctx.throw(400, '参数错误。');

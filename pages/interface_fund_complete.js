@@ -1,6 +1,38 @@
 var selectedThreads = [];
+var usedMoney = [];
 
+$(function(){
+	init();
+	initNumber();
+});
 
+function initNumber() {
+	var arr = $('.reportOfKnotAudit .used');
+	for (var i = 0; i < arr.length; i++) {
+		var text = arr.eq(i).text();
+		var number = parseInt(text);
+		number = number > 0? number: 0;
+		arr.eq(i).text(number);
+	}
+	var moneyArr = $('.used');
+	var total = 0;
+	usedMoney = [];
+	for(var i = 0; i < moneyArr.length; i++) {
+		var num = parseInt(moneyArr.eq(i).text());
+		usedMoney.push(num);
+		total += num;
+	}
+	$('#usedMoneyTotal').html(total);
+}
+
+function init() {
+	var arr = $('.used');
+	for(var i = 0; i < arr.length; i++) {
+		arr.eq(i).on('blur', function() {
+			initNumber();
+		})
+	}
+}
 
 function getThreads(page, self) {
 	var url;
@@ -17,7 +49,7 @@ function getThreads(page, self) {
 		url = '/t?'+page+'from=applicationForm&self=true';
 	}
 	var html = '<div class="blank blank-selectedThread">搜索中...</div>';
-	$('.unselectedThreads').html(html)
+	$('.unselectedThreads').html(html);
 	nkcAPI(url, 'GET', {})
 		.then(function(data) {
 			tempThreads = data.threads;
@@ -206,7 +238,8 @@ function submit(id){
 	var obj = {
 		successful: success,
 		selectedThreads: selectedThreads,
-		c: content
+		c: content,
+		usedMoney: usedMoney
 	};
 	nkcAPI('/fund/a/'+id+'/complete', 'POST', obj)
 		.then(function() {
@@ -214,6 +247,25 @@ function submit(id){
 			setTimeout(function() {
 				window.location.href = '/fund/a/'+id;
 			}, 1200)
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+//completedAuditContent
+function submitCompletedAudit(type, id) {
+	var c = $('#completedAuditContent').val();
+	if(type === 'notPass' && c === '') {
+		return screenTopWarning('请填写理由。');
+	}
+	var obj = {
+		c: c,
+		type: type
+	};
+	nkcAPI('/fund/a/'+id+'/complete/audit', 'POST', obj)
+		.then(function() {
+			window.location.href = '/fund/a/'+id;
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

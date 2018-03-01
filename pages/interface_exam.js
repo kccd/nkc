@@ -28,8 +28,8 @@ function submit(){
     }
     window.location = '/exam/'+examobj.category+'?result=' + result.result;
   })
-  .catch(function(err){   //测试没通过
-    window.location = '/exam/'+examobj.category+'?result=fail&detail=' + (err);
+  .catch(function(data){   //测试没通过
+    window.location = '/exam/'+examobj.category+'?result=fail&detail=' + (data.error);
   })
 }
 

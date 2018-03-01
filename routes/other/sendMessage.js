@@ -20,12 +20,12 @@ sendMessageRouter
     if(!areaCode) ctx.throw(400, '国际区号不能为空');
     let code = apiFn.random(6);
     try{
-      await dbFn.checkRigsterCode(regCode);
+      await dbFn.checkRegisterCode(regCode);
     }catch (err) {
-      ctx.throw('404', err);
+      ctx.throw(400, err);
     }
     let usernameOfDBNumber = await dbFn.checkUsername(username);
-    if(usernameOfDBNumber !== 0) ctx.throw('404', '用户名已存在，请更换用户名再试！');
+    if(usernameOfDBNumber !== 0) ctx.throw(400, '用户名已存在，请更换用户名再试！');
     //以往的手机号码没有加国际区号，避免老用户用同一个手机号重复注册
     let mobileCodesNumber = await dbFn.checkMobile(mobile, oldMobile);
     if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
