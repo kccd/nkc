@@ -358,14 +358,11 @@ applicationRouter
 		const {user} = data;
 		const {applicationForm} = data;
 		const {fund} = applicationForm;
-		let isCensor = false;
+		let hasPermission = false;
 		if(user) {
-			for(let c of fund.censor.certs) {
-				if(user.certs.includes(c)) isCensor = true;
-			}
-			if(fund.censor.appointed.includes(user.uid)) isCensor = true;
+			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);
 		}
-		if(!user || (applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !isCensor)) {
+		if(!user || (applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !hasPermission)) {
 			const {applicant, members} = applicationForm;
 			applicant.mobile = null;
 			applicant.idCardNumber = null;

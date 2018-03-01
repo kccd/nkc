@@ -525,9 +525,9 @@ const certificates ={
 		      [GET]: true, // 所有基金项目
 		      [parameter]: {
 			      [GET]: true, // 具体到某一个基金项目
-			      [POST]: true, // 申请该基金
 			      add: {
-				      [GET]: true // 填写申请信息页面
+				      [GET]: true, // 同意条款
+				      [POST]: true // 申请该基金
 			      },
 			      bills: {// 基金项目的账单
 			      	[GET]: true
@@ -607,6 +607,15 @@ const certificates ={
 	      me: {
         	[name]: '我的基金',
 		      [GET]: true
+	      },
+	      info: {
+        	[name]: '科创基金所有信息',
+		      [GET]: true,
+	      },
+	      bills: {
+        	[name]: '科创基金总账单',
+		      [GET]: true,
+		      [POST]: true
 	      }
       },
 	    fundBanner: {
@@ -917,6 +926,11 @@ const certificates ={
 	      add: {
 					[name]: '新建基金项目页面',
 		      [GET]: true
+	      },
+	      settings: {
+		      [name]: '科创基金总设置',
+		      [GET]: true,
+		      [PATCH]: true
 	      },
 	      list:{
         	[name]: '基金项目列表',

@@ -344,7 +344,7 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	}
 
 	//专家审核-机器审核
-	if(status.usersSupport && fund.censor.appointed.length === 0 && fund.censor.certs.length === 0) {
+	if(status.usersSupport && fund.auditType === 'system') {
 		status.projectPassed = true;
 	}
 

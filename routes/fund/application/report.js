@@ -24,8 +24,8 @@ reportRouter
 		const obj = {};
 		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');
 		if(type === 'applyRemittance') {
-			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经完结。');
-			const {timeToPassed, reportNeedThreads, remittance} = applicationForm;
+			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经结题。');
+			const {timeToPassed, reportNeedThreads, remittance, fund} = applicationForm;
 			for(let r of remittance) {
 				if(!r.status) {
 					if(reportNeedThreads && selectedThreads.length === 0) ctx.throw(400, '管理员要求提交拨款申请必须要附带代表中期报告的帖子。');
@@ -37,7 +37,7 @@ reportRouter
 					}));
 
 					r.threads = selectedThreads.map(t => t.tid);
-					if(applicationForm.fund.censor.appointed.length === 0 && applicationForm.fund.censor.certs.length === 0) {
+					if(fund.auditType === 'system') {
 						r.passed = true;
 						obj.submittedReport = false;
 					} else {

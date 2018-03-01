@@ -1,10 +1,58 @@
 const Router = require('koa-router');
 const fundRouter = new Router();
 const applicationRouter = require('./application/index');
-const listRouter = require('./list');
+const listRouter = require('./list/index');
 const meRouter = require('./me');
 const disabledRouter = require('./disabled');
+const infoRouter = require('./info');
+const settingsRouter = require('./settings');
 fundRouter
+	//检测科创基金是否开放
+	.use('/', async (ctx, next) => {
+		const {data, db} = ctx;
+		const fundSettings = await db.SettingModel.findOne({uid: 'fund'});
+		data.fundSettings = fundSettings;
+		if(!fundSettings) {
+			const newSettings = db.SettingModel({
+				uid: 'fund',
+				description: '这是基金介绍',
+				terms: '这是科创基金总条款',
+				money: 0,
+				readOnly: false,
+				closed: {
+					status: false,
+					reason: '这是关闭原因',
+					openingHours: Date.now(),
+					closingTime: Date.now(),
+					uid: '10',
+					username: '虎哥'
+				}
+			});
+			await newSettings.save();
+			await next();
+		} else {
+			if(ctx.url === '/fund/settings') {
+				await next();
+			} else {
+				if(fundSettings.closed.status) {
+					ctx.template = 'interface_fund_closed.pug';
+					data.fundSettings = fundSettings;
+					data.error = '抱歉！科创基金已被临时关闭。';
+					const body = require('../../middlewares/body');
+					await body(ctx, ()=>{});
+				} else if(fundSettings.readOnly) {
+					if(ctx.method !== 'GET') {
+						ctx.throw(401, '抱歉！科创基金现在处于只读模式。');
+					}
+					await next();
+				} else {
+					await next();
+				}
+			}
+		}
+	})
+
+	//加载基金申请邀请通知数
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
@@ -104,5 +152,7 @@ fundRouter
 	.use('/list', listRouter.routes(), listRouter.allowedMethods())
   .use('/a', applicationRouter.routes(), applicationRouter.allowedMethods())
 	.use('/me', meRouter.routes(), meRouter.allowedMethods())
+	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
 	.use('/disabled', disabledRouter.routes(), disabledRouter.allowedMethods());
 module.exports = fundRouter;

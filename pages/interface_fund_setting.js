@@ -78,7 +78,7 @@ function loadSettings() {
 	fundObj.description.terms = $('#terms').val();
 
 	//背景颜色，banner，logo
-	fundObj.color = $('#fundColor').val();
+	fundObj.color = $('#fundColor').val() || '#7f9eb2';
 	var banner = $('#fundImageDisplay').attr('imageId');
 	if(banner) {
 		fundObj.image.banner = parseInt(banner);

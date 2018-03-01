@@ -68,6 +68,8 @@ block title
     if completed
       -displayExcellent = true;
 
+  if useful && submitted
+    -displayVote = true;
 
   if applicationForm.project
     title= `${applicationForm.project.t} - ${fund.name} - 科创基金`
@@ -259,7 +261,7 @@ block content
                   if displayGiveUp
                     button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
             //管理
-            if ((displayAdminAudit || displayExpertAudit || displayRemittance || needRemittance || needReportAudit || needCompletedAudit) && useful) || isAdmin
+            if ((displayAdminAudit || displayExpertAudit || displayRemittance || needReportAudit || needCompletedAudit) && useful) || isAdmin
               .panel.panel-default
                 .panel-body.applicationForm
                   h5.text-center 管理
@@ -267,7 +269,7 @@ block content
                     a(href=`/fund/a/${applicationForm._id}/audit?type=project`).btn.btn-info.btn-block 专家审核
                   if displayAdminAudit
                     a(href=`/fund/a/${applicationForm._id}/audit?type=admin`).btn.btn-info.btn-block 管理员复核
-                  if needRemittance
+                  if displayRemittance
                     a(href=`/fund/a/${applicationForm._id}/remittance`).btn.btn-info.btn-block 拨款
                   if needReportAudit
                     a(href=`/fund/a/${applicationForm._id}/report/audit`).btn.btn-info.btn-block 报告审核
@@ -283,102 +285,15 @@ block content
                       a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
                     else
                       a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
-
-            // -let isProjectCensor = false, isAdmin = false;
-            // if data.user
-            //   -for(let c of fund.censor.certs)
-            //     if data.user.certs.includes(c)
-            //       -isProjectCensor = true;
-            //   // 判断是否是项目审查员
-            //   if fund.censor.appointed.includes(data.user.uid)
-            //     -isProjectCensor = true;
-            // //判断是否是管理员
-            // if data.userLevel >= 7
-            //   -isAdmin = true;
-            // -let needProjectAudit = false, needAdminAudit = false;
-            // -let needRemittance = false;
-            // -let needReportAudit = false;
-            // -let needCompletedAudit = false;
-            // if applicationForm.useless === null
-            //   // 判断是否显示专家审核按钮
-            //   if isProjectCensor && usersSupport && projectPassed === null
-            //     -needProjectAudit = true;
-            //   //判断是否显示管理员复核按钮
-            //   if isAdmin && projectPassed && adminSupport === null
-            //     -needAdminAudit = true;
-            //   //判断是否显示打款按钮
-            //   if adminSupport && completed === null
-            //     -for(let i = 0; i < applicationForm.remittance.length; i++)
-            //       -const r = applicationForm.remittance[i];
-            //       if i === 0
-            //         if !r.status
-            //           -needRemittance = true;
-            //       else
-            //         if !r.status && r.passed === true
-            //           -needRemittance = true;
-            //   if applicationForm.submittedReport && isProjectCensor
-            //     -needReportAudit = true;
-            //
-            //   if applicationForm.completedAudit
-            //     -needCompletedAudit = true;
-            //
-            //
-            //
-            //
-            // // 申请者控制面板
-            // if (data.user && applicationForm.uid === data.user.uid && applicationForm.useless === null) || applicationForm.status.adminSupport
-            //   .panel.panel-default
-            //     .panel-body.applicationForm
-            //       h5.text-center 控制面板
-            //       if applicationForm.status.adminSupport
-            //         a(href=`/fund/a/${applicationForm._id}/report`).btn.btn-info.btn-block 项目进度
-            //         -console.log(!!data.user , applicationForm.uid === data.user.uid , needRemittance)
-            //         if data.user && applicationForm.uid === data.user.uid
-            //           a(href=`/fund/a/${applicationForm._id}/remittance/apply`).btn.btn-info.btn-block 申请拨款
-            //       if data.user && data.user.uid === applicationForm.applicant.uid
-            //         if !applicationForm.lock.submitted && !adminSupport
-            //           a(href=`/fund/a/${applicationForm._id}/settings`).btn.btn-info.btn-block 修改
-            //         if !applicationForm.status.completed && applicationForm.useless === null
-            //           if applicationForm.status.adminSupport
-            //             a(href=`/fund/a/${applicationForm._id}/complete`).btn.btn-info.btn-block 结题
-            //           if applicationForm.useless === null
-            //             button(onclick=`revoked("giveUp", ${applicationForm._id})`).btn.btn-danger.btn-block= `放弃申请`
-            //
-            //
-            // //审查员控制面板
-            // if isAdmin || needProjectAudit
-            //   .panel.panel-default
-            //     .panel-body.applicationForm
-            //       h5.text-center 管理
-            //       if needProjectAudit
-            //         a(href=`/fund/a/${applicationForm._id}/audit?type=project`).btn.btn-info.btn-block 专家审核
-            //       if needAdminAudit
-            //         a(href=`/fund/a/${applicationForm._id}/audit?type=admin`).btn.btn-info.btn-block 管理员复核
-            //       if needRemittance
-            //         a(href=`/fund/a/${applicationForm._id}/remittance`).btn.btn-info.btn-block 拨款
-            //       if needReportAudit
-            //         a(href=`/fund/a/${applicationForm._id}/report/audit`).btn.btn-info.btn-block 报告审核
-            //       if needCompletedAudit
-            //         a(href=`/fund/a/${applicationForm._id}/complete/audit`).btn.btn-info.btn-block 结题审核
-            //       if isAdmin
-            //         if applicationForm.status.completed
-            //           if applicationForm.status.excellent
-            //             button(onclick=`excellent(${applicationForm._id}, false)`).btn.btn-info.btn-block 取消评为优秀项目
-            //           else
-            //             button(onclick=`excellent(${applicationForm._id}, true)`).btn.btn-info.btn-block 评为优秀项目
-            //         if applicationForm.disabled
-            //           a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
-            //         else
-            //           a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
-            // if applicationForm.useless === null
-            //   //普通用户
-            //   .panel.panel-default
-            //     .panel-body.applicationForm
-            //       h5.text-center 投票
-            //       textarea.form-control#content(rows=8 placeholder='填写理由')
-            //       br
-            //       a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId ? applicationForm.supportersId.length : 0}）`
-            //       a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId ? applicationForm.objectorsId.length : 0}）`
+            //投票
+            if displayVote
+              .panel.panel-default
+                .panel-body.applicationForm
+                  h5.text-center 投票
+                  textarea.form-control#content(rows=8 placeholder='填写理由')
+                  br
+                  a(href=`javascript: support(${applicationForm._id})`).btn.btn-default.btn-block=`支持（${applicationForm.supportersId ? applicationForm.supportersId.length : 0}）`
+                  a(href=`javascript: against(${applicationForm._id})`).btn.btn-default.btn-block=`反对（${applicationForm.objectorsId ? applicationForm.objectorsId.length : 0}）`
 
 
 block scripts

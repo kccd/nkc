@@ -90,7 +90,7 @@ block content
                                   .col-xs-12.col-md-1
                                     a(href=`/fund/a/${a._id}`) 查看
                                     br
-                                    if !a.status.adminSupport && !a.disabled && a.useless === null
+                                    if !a.lock.submitted && !a.disabled && a.useless === null
                                       a(href=`/fund/a/${a._id}/settings`) 编辑
                       include interface_fund_page
 block scripts

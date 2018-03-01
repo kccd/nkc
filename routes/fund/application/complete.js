@@ -4,9 +4,10 @@ completeRouter
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
 		const {applicationForm} = data;
-		const {status, useless} = applicationForm;
-		if(status.completed) ctx.throw('该项目已结项。');
+		const {status, useless, disabled} = applicationForm;
+		if(disabled) ctx.throw(401, '申请表已被屏蔽。');
 		if(useless !== null) ctx.throw('申请表已失效，无法完成该操作。');
+		if(status.completed) ctx.throw('该项目已结项。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -62,10 +63,10 @@ completeRouter
 		const {applicationForm, user} = data;
 		ctx.template = 'interface_fund_complete.pug';
 		data.type = 'reportAudit';
-
 		//结项审核  审查员权限判断
-		const {fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('expert', user) || !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
+		const {fund, completedAudit} = applicationForm;
+		if(!completedAudit) ctx.throw(401, '抱歉！申请人暂未提交结题申请。');
+		if(!fund.ensureOperatorPermission('expert', user) && !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
 		data.report = await db.FundDocumentModel.findOne({type: 'completedReport'}).sort({toc: -1}).limit(1);
 		await next();
 	})
@@ -74,8 +75,9 @@ completeRouter
 		const {applicationForm, user} = data;
 		const {c, type} = body;
 		//结项审核  审查员权限判断
-		const {fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('expert', user) || !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
+		const {fund, completedAudit} = applicationForm;
+		if(!completedAudit) ctx.throw(401, '抱歉！申请人暂未提交结题申请。');
+		if(!fund.ensureOperatorPermission('expert', user) && !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
 
 		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 		const newDocument = db.FundDocumentModel({
