@@ -235,8 +235,14 @@ const certificates ={
 			    [GET]: true, // 所有基金项目
 			    [parameter]: {
 				    [GET]: true, // 具体到某一个基金项目
-				    bills: {// 基金项目的账单
-					    [GET]: true
+				    bills: {
+					    [name]: '基金账单',
+					    [POST]: true,
+					    [parameter]: {
+						    [GET]: true,
+						    [PATCH]: true,
+						    [DELETE]: true
+					    }
 				    }
 			    }
 		    },
@@ -570,6 +576,9 @@ const certificates ={
         			[name]: '报告进度',
         			[GET]: true,
 				      [POST]: true,
+				      [parameter]: {
+					      [DELETE]: true, //屏蔽报告
+				      },
 				      audit: { // 报告审核
 								[GET]: true,
 					      [POST]: true
@@ -614,9 +623,8 @@ const certificates ={
 	      },
 	      bills: {
         	[name]: '科创基金总账单',
-		      [GET]: true,
-		      [POST]: true
-	      }
+		      [GET]: true
+        }
       },
 	    fundBanner: {
 		    [name]: '基金项目背景图片',
@@ -940,22 +948,16 @@ const certificates ={
 			      [PATCH]: true, // 修改基金项目
 			      settings: {
 				      [GET]: true // 基金设置
-			      },
-			      bills: {
-			      	[name]: '基金账单',
-				      [POST]: true,
-							[parameter]: {
-			      		[GET]: true,
-								[PATCH]: true,
-								[DELETE]: true
-							}
 			      }
 		      }
 	      },
-	      a: {
-        	[parameter]: {
-
-	        }
+	      bills: {
+		      [POST]: true,
+			      [parameter]: {
+						[GET]: '基金池账单具体信息',
+						[DELETE]: true,
+				    [PATCH]: true
+					}
 	      },
 				histories: {
         	[name]: '历史基金',

@@ -9,6 +9,9 @@ block content
     include interface_fund_nav
     .row
       .col-xs-12.col-md-4
+        if data.bill.fundPool
+          h4
+            a(href=`/fund/bills`) <<总资金账单列表
         .panel.panel-default
           .panel-body
             span 交易时间
@@ -18,14 +21,17 @@ block content
             span 操作人
             input.form-control#uid(value=data.bill.uid)
             span 资金变动
+            .redFontColor
+              h5 在总资金账单列表中，负数代表增加金额到总资金，正数代表从总资金减少金额。
+              h5 在基金项目账单列表中，负数代表从基金项目减少金额，正数代表增加金额到基金项目。
             input.form-control#changed(value=data.bill.changed)
             span 摘要
             input.form-control#abstract(value=data.bill.abstract)
             span 备注
             textarea.form-control#notes(rows=8)= data.bill.notes
             br
-            button.btn.btn-info(onclick=`modify("${data.fund._id}", ${data.bill._id})`) 修改
-            button.btn.btn-danger(onclick=`deleteBill("${data.fund._id}", ${data.bill._id})`) 删除
+            button.btn.btn-info(onclick=`modify(${data.bill._id}, "${data.fund?data.fund._id: ''}")`) 修改
+            button.btn.btn-danger(onclick=`deleteBill(${data.bill._id}, "${data.fund?data.fund._id: ''}")`) 删除
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_bill.js')

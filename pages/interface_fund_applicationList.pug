@@ -52,7 +52,7 @@ else
           //  th 审核中
         -for (let applicationForm of applicationForms)
           if applicationForm
-            -const {toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
+            -const {timeToSubmit, toc, name, budgetMoney, applicant, members, _id, project, submittedReport, fund} = applicationForm;
              -let money;
              if fund
                -money = fund.money.fixed;
@@ -67,7 +67,7 @@ else
              tr
                th= applicationForm.code || '暂无'
                th= applicationFormStatus(applicationForm).str
-               th= toc.toLocaleString()
+               th= timeToSubmit.toLocaleString()
                th= fund?fund.name: data.fund.name
                th
                  a(href=`/m/${applicant.user.uid}`)= applicant.user.username

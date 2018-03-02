@@ -1,4 +1,4 @@
-function modify(fundId, id) {
+function modify(id, fundId) {
 	var time = $('#time').val();
 	var uid = $('#uid').val();
 	var changed = $('#changed').val();
@@ -16,7 +16,11 @@ function modify(fundId, id) {
 		abstract: abstract,
 		notes: notes
 	};
-	nkcAPI('/fund/list/'+fundId.toLowerCase()+'/bills/'+id, 'PATCH', {obj: obj})
+	var url = '/fund/bills/'+id;
+	if(fundId) {
+		url = '/fund/list/'+fundId.toLowerCase()+'/bills/'+id;
+	}
+	nkcAPI(url, 'PATCH', {obj: obj})
 		.then(function() {
 			screenTopAlert('修改成功。');
 		})
@@ -25,13 +29,19 @@ function modify(fundId, id) {
 		})
 }
 
-function deleteBill(fundId, id) {
+function deleteBill(id, fundId) {
 	if(confirm('确定要删除该记录？') === false) {
 		return;
 	}
-	nkcAPI('/fund/list/'+fundId.toLowerCase()+'/bills/'+id, 'DELETE', {})
+	var url = '/fund/bills/'+id;
+	var href = '/fund/bills';
+	if(fundId) {
+		url = '/fund/list/'+fundId.toLowerCase()+'/bills/'+id;
+		href = '/fund/list/'+fundId.toLowerCase() +'/bills';
+	}
+	nkcAPI(url, 'DELETE', {})
 		.then(function() {
-			window.location.href = '/fund/list/'+fundId.toLowerCase() +'/bills';
+			window.location.href = href;
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

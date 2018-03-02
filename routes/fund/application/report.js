@@ -9,9 +9,16 @@ reportRouter
 	})
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		const {applicationForm} = data;
+		const {applicationForm, user} = data;
 		ctx.template = 'interface_fund_report.pug';
-		data.reports = await db.FundDocumentModel.find({type: {$in: ['report', 'completedReport']}, applicationFormId: applicationForm._id, disabled: false}).sort({toc: -1});
+		const q = {
+			type: {$in: ['report', 'completedReport']},
+			applicationFormId: applicationForm._id
+		};
+		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
+			q.disabled = false;
+		}
+		data.reports = await db.FundDocumentModel.find(q).sort({toc: -1});
 
 		await next();
 	})
@@ -58,6 +65,8 @@ reportRouter
 					break;
 				}
 			}
+			obj.tlm = Date.now();
+			await applicationForm.update(obj);
 		} else {
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({
@@ -71,7 +80,6 @@ reportRouter
 			await newDocument.save();
 			data.redirect = `/fund/a/${applicationForm._id}/report`;
 		}
-		await applicationForm.update(obj);
 		await next();
 	})
 	.get('/audit', async (ctx, next) => {
@@ -129,6 +137,17 @@ reportRouter
 				break;
 			}
 		}
+		await next();
+	})
+	.del('/:reportId', async (ctx, next) => {
+		const {data, db, query, params} = ctx;
+		const {applicationForm, user} = data;
+		const {type} = query;
+		const {reportId} = params;
+		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您不是该基金项目的管理员，无法完成此操作。');
+		const report = await db.FundDocumentModel.findOnly({_id: reportId});
+		report.disabled = type;
+		await report.save();
 		await next();
 	});
 module.exports = reportRouter;

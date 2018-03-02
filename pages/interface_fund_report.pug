@@ -67,6 +67,12 @@ block content
                 -for(let r of data.reports)
                   div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
                     div(style='position: absolute;')
+                    if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
+                      span &nbsp;&nbsp;
+                      if r.disabled
+                        a(href=`javascript: disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
+                      else
+                        a(href=`javascript: disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
                   div.content
                     -r.c = hideContentByUser(r.c, data.user, 'thread')
                     div!= experimental_render(r)

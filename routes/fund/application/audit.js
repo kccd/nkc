@@ -165,6 +165,8 @@ auditRouter
 		}
 		if(!support) {
 			applicationForm.lock.submitted = false;
+		} else {
+			applicationForm.tlm = Date.now();
 		}
 		await applicationForm.save();
 		await next();

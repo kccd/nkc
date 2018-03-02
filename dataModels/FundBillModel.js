@@ -6,9 +6,13 @@ const fundBillSchema = new Schema({
 		type: String,
 		default: Date.now
 	},
+	fundPool: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
 	fundId: {
 		type: String,
-		required: true,
 		index: 1
 	},
 	uid: {
@@ -64,6 +68,14 @@ fundBillSchema.virtual('user')
 		this._user = user;
 	});
 
+fundBillSchema.virtual('fund')
+	.get(function() {
+		return this._fund;
+	})
+	.set(function(fund) {
+		this._fund = fund;
+	});
+
 fundBillSchema.virtual('balance')
 	.get(function() {
 		return this._balance;
@@ -85,6 +97,16 @@ fundBillSchema.methods.extendUser = async function() {
 	const UserModel = require('./UserModel');
 	const user = await UserModel.findOnly({uid: this.uid});
 	return this.user = user;
+};
+
+fundBillSchema.methods.extendFund = async function() {
+	let fund;
+	if(this.fundId) {
+		const FundModel = require('./FundModel');
+		fund = await FundModel.findOnly({_id: this.fundId});
+	}
+	return this.fund = fund;
+
 };
 
 const FundBillModel = mongoose.model('fundBills', fundBillSchema);

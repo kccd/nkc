@@ -557,6 +557,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.timeToSubmit = Date.now();
 	this.status.projectPassed = null;
 	this.status.adminSupport = null;
+	this.tlm = Date.now();
 	//存历史
 	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});
 	const newObj = oldApplicationForm.toObject();

@@ -32,7 +32,7 @@ voteRouter
 
 		//获得网友支持
 		if(fund.supportCount <= supportersId.length) {
-			await applicationForm.update({'status.usersSupport': true});
+			await applicationForm.update({'status.usersSupport': true, tlm: Date.now()});
 		}
 		await next();
 	});

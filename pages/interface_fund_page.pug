@@ -1,6 +1,11 @@
 -var page = data.paging.page || 0;
 -var pageCount = data.paging.pageCount || 1;
 -var min, max;
+-var query = '';
+if data.type
+  -query = `&type=${data.type}`;
+if data.sort
+  -query += `&sort=${data.sort}`;
 if pageCount > 1
   -const arr = [];
   -let n = 7;
@@ -29,14 +34,14 @@ if pageCount > 1
     ul.pagination.pagination-sm(style='margin: 0')
       if min !== 0
         li
-          a(href=`${url}?page=${0}${skipId}`)= `首`
+          a(href=`${url}?page=${0}${skipId || ''}${query}`)= `首`
       -for(let i = 0; i < pageCount; i++)
         if i >= min && i <= max
           -let active = '';
           if(page === i)
             -active = 'active';
           li(class=active)
-            a(href=`${url}?page=${i}${skipId}`)= i+1
+            a(href=`${url}?page=${i}${skipId || ''}${query}`)= i+1
       if max < pageCount - 1
         li
-          a(href=`${url}?page=${pageCount - 1}${skipId}`)= `末`
+          a(href=`${url}?page=${pageCount - 1}${skipId || ''}${query}`)= `末`

@@ -8,7 +8,7 @@ table.table.table-striped
       th 摘要
       th 备注
       th 基金剩余（元）
-      if data.userLevel >= 7
+      if ensureFundOperatorPermission('financialStaff', data.user, data.fund)
         th 操作
   tbody
     -for(let b of data.bills)
@@ -21,6 +21,6 @@ table.table.table-striped
         th= b.abstract
         th= b.notes
         th= b.balance
-        if data.userLevel >= 7
+        if ensureFundOperatorPermission('financialStaff', data.user, data.fund)
           th
             a(href=`/fund/list/${fund._id.toLowerCase()}/bills/${b._id}`) 编辑

@@ -27,7 +27,7 @@ block content
       .col-xs-12.col-md-3
         .panel.panel-default
           .panel-body
-            if !fund.image
+            if !fund.image || !fund.image.logo
               h2.text-center(style='margin-bottom: 4rem;color: #000;')= `科创基金-${fund.name}`
             else
               img(src=`/fundLogo/${fund.image.logo}` style="width: 100%;")
@@ -39,7 +39,7 @@ block content
         if data.userLevel >= 7
           .panel.panel-default
             .panel-body
-              h5.text-center 增加账单
+              h5.text-center 从总资金转入
               hr
               span 日期选择
               input#time(type='datetime-local' style='width: 100%;').form-control
@@ -48,10 +48,10 @@ block content
               input#money(type='number' placeholder = '区分正负').form-control
               br
               span 摘要
-              input#abstract(type='text' placeholder = '').form-control
+              input#abstract(type='text' placeholder = '' value='划拨').form-control
               br
               span 备注
-              textarea#notes.form-control(rows='5')
+              textarea#notes.form-control(rows='5')= `从总资金转入到基金项目 - ${data.fund.name}`
               br
               button.btn.btn-info.btn-block(onclick=`submit("${fund._id}")`) 提交
 block scripts

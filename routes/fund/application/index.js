@@ -99,7 +99,7 @@ applicationRouter
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
-		const {applicant, members} = applicationForm;
+		const {applicant, members, fund} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
 		if(applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(401, '权限不足');
@@ -109,7 +109,7 @@ applicationRouter
 			applicationFormId: applicationForm._id,
 			type: 'comment'
 		};
-		if(data.userLevel < 7) q.disabled = false;
+		if(!fund.ensureOperatorPermission('admin', user)) q.disabled = false;
 		const length = await db.FundDocumentModel.count(q);
 		const paging = apiFn.paging(page, length);
 		const comments = await db.FundDocumentModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);

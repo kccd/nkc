@@ -64,8 +64,8 @@ function submit(){
     .then(function(data){
       window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode;
     })
-    .catch(function(err){
-      error_report(err);
+    .catch(function(data){
+      error_report(data.error);
     })
 }
 
@@ -110,8 +110,8 @@ function submit2(){
       window.location = '/login'
     },5000)
   })
-  .catch(function(err){
-    error_report2(JSON.stringify(err));
+  .catch(function(data){
+    error_report2(data.error);
   })
 
 }
@@ -154,14 +154,14 @@ function getMcode(){
           count--;
       }
     })
-    .catch(function(err){
-      if(err.detail === '没有找到该手机号码，请检查') {
-        ////refreshICode3();
-      }
-      else if(err.detail === '用户名和手机号码不对应，请检查') {
-        ////refreshICode3();
-      }
-      error_report(err);
+    .catch(function(data){
+      // if(err.detail === '没有找到该手机号码，请检查') {
+      //   ////refreshICode3();
+      // }
+      // else if(err.detail === '用户名和手机号码不对应，请检查') {
+      //   ////refreshICode3();
+      // }
+      error_report(data.error);
     })
   }
 }

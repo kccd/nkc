@@ -35,9 +35,20 @@ billsRouter
 		const {user} = ctx.data;
 		const {bill} = body;
 		const fundId = params.fundId.toUpperCase();
+		const fund = await db.FundModel.findOnly({_id: fundId});
+		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您不是该基金项目的财务人员，无法完成此操作。');
+		const {changed} = bill;
+		const bills = await db.FundBillModel.find({fundPool: true});
+		let total = 0;
+		if(changed <= 0) ctx.throw(400, '金额变动不能小于0元');
+		bills.map(b => {
+			total += -1*b.changed;
+		});
+		if(changed > total) ctx.throw(400, `抱歉！总基金剩余${total}元，资金不足。`);
 		bill._id = Date.now();
 		bill.uid = user.uid;
 		bill.fundId = fundId;
+		bill.fundPool = true;
 		const newBill = db.FundBillModel(bill);
 		await newBill.save();
 		await next();
@@ -45,8 +56,10 @@ billsRouter
 	.use('/:billId', async (ctx, next) => {
 		const {data, db, params} = ctx;
 		const {billId} = params;
+		const {user} = data;
 		const bill = await db.FundBillModel.findOnly({_id: billId});
 		const fund = await db.FundModel.findOnly({_id: bill.fundId});
+		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您不是该基金项目的财务人员，无法完成此操作。');
 		data.bill = bill;
 		data.fund = fund;
 		data.nav = bill._id;

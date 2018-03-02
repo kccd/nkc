@@ -1,0 +1,90 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title= `科创基金账单列表`
+block content
+  -const mainContainer1400 = true
+  -const {fundSettings} = data;
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-9
+        .panel.panel-default
+          .panel-body
+            h2.text-center 总资金变动
+            //ul.nav.nav-pills
+            //  li(role="presentation" class= !data.type? 'active' : '')
+            //    a(href=`/fund/bills${data.paging.page > 0 ?`?page=${data.paging.page}`:''}`) 总资金变动
+            //  //li(role="presentation" class= data.type === 'all'? 'active' : '')
+            //  //  a(href=`/fund/bills?type=all${data.paging.page>0?`&page=${data.paging.page}`:''}`) 基金账单
+            hr
+            if data.bills.length === 0
+              .blank 暂无数据
+            else
+              -const url = `/fund/bills`;
+              include interface_fund_page
+              .table-responsive
+                table.table.table-striped
+                  thead
+                    tr
+                      th 时间
+                      th 交易编号
+                      th 资金变化（元）
+                      th 操作者
+                      th 摘要
+                      th 备注
+                      th 资金剩余（元）
+                      if data.userLevel >= 7 || (b.fund)
+                        th 操作
+                  -for(let b of data.bills)
+                    tr
+                      th= b.toc.toLocaleString()
+                      th= b._id
+                      if type !== 'all'
+                        -b.changed = -1*b.changed;
+                      th= b.changed
+                      th
+                        a(href=`/m/${b.user.uid}`)= b.user.username
+                      th= b.abstract
+                      th= b.notes
+                      th= b.balance
+                      if data.userLevel >= 7 || (b.fund)
+                        th
+                          if b.fund
+                            if ensureFundOperatorPermission('financialStaff', data.user, b.fund)
+                              a(href=`/fund/list/${b.fundId}/bills/${b._id}`) 编辑
+                          else if data.userLevel >= 7
+                            a(href=`/fund/bills/${b._id}`) 编辑
+      .col-xs-12.col-md-3
+        .panel.panel-default
+          .panel-body
+            h2.text-center 科创基金
+            br
+            h4.text-center 总资金剩余
+            h2.text-center(style='color:#ff7979;')= `￥${data.bills.length !== 0?data.bills[0].balance: 0}`
+            br
+            a.btn.btn-info.btn-block(href='/fund/info') 基本信息
+            a.btn.btn-info.btn-block(href='/fund/bills') 账单列表
+
+        if data.userLevel >= 7
+          .panel.panel-default
+            .panel-body
+              h5.text-center 增加金额
+              hr
+              span 日期选择
+              input#time(type='datetime-local' style='width: 100%;').form-control
+              br
+              span 金额变动(元)
+              input#money(type='number' placeholder = '区分正负').form-control
+              br
+              span 摘要
+              input#abstract(type='text' placeholder = '').form-control
+              br
+              span 备注
+              textarea#notes.form-control(rows='5')
+              br
+              button.btn.btn-info.btn-block(onclick=`submit()`) 提交
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_general_bills.js')

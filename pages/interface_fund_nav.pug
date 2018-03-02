@@ -4,9 +4,9 @@
     li
       a(href="/fund") 首页
     span &nbsp;&nbsp;&nbsp;
-    //li
-    //  a(href="/fund/info") 科创基金
-    //span &nbsp;&nbsp;&nbsp;
+    li
+      a(href="/fund/info") 科创基金
+    span &nbsp;&nbsp;&nbsp;
     span
       a(href=`/fund/me`) 我的基金&nbsp;
       if data.fundNotify > 0
@@ -20,7 +20,7 @@
     if data.applicationForm && data.applicationForm.code
       li
         a(href=`/fund/a/${data.applicationForm.code}`)= data.applicationForm.code
-    if data.bill
+    if data.bill && !data.bill.fundPool
       li
         a(href=`/fund/list/${data.fund._id.toLowerCase()}/bills`)= `基金账单`
     if data.nav

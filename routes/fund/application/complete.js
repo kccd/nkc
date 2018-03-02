@@ -54,6 +54,7 @@ completeRouter
 		applicationForm.timeOfCompleted = Date.now();
 		applicationForm.completedAudit = true;
 		applicationForm.status.completed = null;
+		applicationForm.tlm = Date.now();
 		await newDocument.save();
 		await applicationForm.save();
 		await next();
@@ -89,7 +90,7 @@ completeRouter
 			uid: user.uid
 		});
 		if(type === 'pass') {
-			await applicationForm.update({'status.completed': true, completedAudit: false});
+			await applicationForm.update({'status.completed': true, completedAudit: false, tlm: Date.now()});
 		} else {
 			await applicationForm.update({'status.completed': false, completedAudit: false});
 		}

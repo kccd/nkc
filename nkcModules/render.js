@@ -224,6 +224,7 @@ function applicationFormStatus(a) {
 function ensureFundOperatorPermission(type, user, fund) {
 	const {expert, censor, financialStaff, admin, commentator, voter} = fund;
 	const fn = (obj, user) => {
+		if(!user) return false;
 		for(let cert of obj.certs) {
 			if(user.certs.includes(cert)) return true;
 		}
