@@ -1,5 +1,6 @@
 /settings/es.js
 /settings/emailSecrets.js
+/settings/mailSecrets.js
 /settings/server.js
 /settings/smsSecrets.js
 /node_modules

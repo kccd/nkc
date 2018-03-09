@@ -372,10 +372,6 @@ fundApplicationFormSchema.pre('save', async function(next) {
 fundApplicationFormSchema.methods.extendApplicant = async function() {
 	const FundApplicationUserModel = require('./FundApplicationUserModel');
 	const applicant= await FundApplicationUserModel.findOne({applicationFormId: this._id, uid: this.uid});
-	console.log(`================`);
-	console.log(this._id);
-	console.log(applicant);
-	console.log(`================`);
 	if(applicant) await applicant.extendUser();
 	return this.applicant = applicant;
 };
