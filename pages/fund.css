@@ -21,6 +21,42 @@ a:focus{text-decoration: none}
   outline: none;
 }
 
+@keyframes blink
+{
+  0%   {background: #5bc0de;}
+  50%  {background: #deda5b;}
+  100% {background: #5bc0de;}
+}
+
+@-moz-keyframes blink /* Firefox */
+{
+  0%   {background: #5bc0de;}
+  50%  {background: #deda5b;}
+  100% {background: #5bc0de;}
+}
+
+@-webkit-keyframes blink /* Safari 和 Chrome */
+{
+  0%   {background: #5bc0de;}
+  50%  {background: #deda5b;}
+  100% {background: #5bc0de;}
+}
+
+@-o-keyframes blink /* Opera */
+{
+  0%   {background: #5bc0de;}
+  50%  {background: #deda5b;}
+  100% {background: #5bc0de;}
+}
+
+.blink{
+  animation:blink 0.2s;
+  -moz-animation:blink 0.2s; /* Firefox */
+  -webkit-animation:blink 0.2s; /* Safari and Chrome */
+  -o-animation:blink 0.2s; /* Opera */
+  animation-iteration-count:infinite;
+  -webkit-animation-iteration-count:infinite;
+}
 .fund-list{
   margin: 15px 0;
 }
@@ -48,6 +84,9 @@ a:focus{text-decoration: none}
   color: #fff;
   font-size: 3rem;
   line-height: 10rem;
+}
+.fund-name > div:first-child{
+  text-shadow: 0 0 10px #000000;
 }
 .fund-money{
   color: #ff7979;

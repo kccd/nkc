@@ -254,3 +254,13 @@ function submitAdminAudit(id) {
 		})
 }
 
+function refuse(id) {
+	if(confirm('确定要执行此操作？') === false) return;
+	nkcAPI('/fund/a/'+id+'?type=refuse', 'DELETE', {})
+		.then(function() {
+			window.location.href = '/fund/a/'+id;
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

@@ -463,6 +463,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		money,
 		thread,
 		applicationMethod,
+		detailedProject
 	} = fund;
 
 	// 判断申请表有效性
@@ -492,6 +493,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	} else {
 		if(!project.t) throw '请填写项目名称！';
 		if(!project.c) throw '请输入项目名称！';
+		if(!project.abstract && detailedProject) throw '请输入项目摘要！';
 	}
 
 	//其他信息判断
@@ -557,6 +559,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.timeToSubmit = Date.now();
 	this.status.projectPassed = null;
 	this.status.adminSupport = null;
+	this.tlm = Date.now();
 	//存历史
 	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});
 	const newObj = oldApplicationForm.toObject();

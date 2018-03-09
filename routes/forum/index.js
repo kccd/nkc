@@ -135,11 +135,12 @@ forumRouter
       data, params, db, body, address: ip, query,
       generateUsersBehavior
     } = ctx;
-    const {post} = body;
+	  const {user} = data;
+		if(!user.certs.includes('mobile')) ctx.throw(401, '您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+	  const {post} = body;
     const {c, t} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
-    const {user} = data;
     const {fid} = params;
     const {cat, mid} = post;
     const {

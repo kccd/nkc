@@ -36,12 +36,8 @@ remittanceRouter
 			if(i === number) {
 				if(r.status) ctx.throw(400, '已经打过款了，请勿重复提交！');
 				if(!r.passed && i !== 0) ctx.throw(400, '该申请人的报告还未通过，请通过后再打款。');
-				const bills = await db.FundBillModel.find({fundId: fund._id});
-				let total = 0;
-				bills.map(b => {
-					total += b.changed;
-				});
-				if(r.money > total) ctx.throw(400, '该基金余额不足。');
+				const balance = await db.FundBillModel.getBalance('fund', fund._id);
+				if(r.money > balance) ctx.throw(400, '该基金余额不足。');
 				r.status = true;
 				r.uid = user.uid;
 				const time = new Date();
@@ -51,12 +47,32 @@ remittanceRouter
 					uid: user.uid,
 					applicationFormId: applicationForm._id,
 					fundId: fund._id,
-					changed: -1*r.money,
+					money: r.money,
 					toc: time,
-					notes: `项目${applicationForm.code}第${i+1}期拨款${r.money}元`,
-					abstract: '拨款'
+					notes: `${applicationForm.code}第${i+1}期拨款`,
+					abstract: '拨款',
+					from: {
+						type: 'fund',
+						id: fund._id
+					},
+					to: {
+						type: 'user',
+						id: applicationForm.uid
+					}
 				});
 				await newFundBill.save();
+
+				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+				r.report = newId;
+				const newReport = db.FundDocumentModel({
+					_id: newId,
+					uid: user.uid,
+					type: 'report',
+					applicationFormId: applicationForm._id,
+					c: `第 ${i+1} 期拨款 ${r.money}元 完成`,
+				});
+
+				await newReport.save();
 				break;
 			}
 		}

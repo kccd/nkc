@@ -34,10 +34,10 @@ const fundSchema = new Schema({
 		default: '#7f9eb2'
 	},
 	money: {
-  	initial: {
+  	/*initial: {
   		type: Number,
 		  required: true
-	  },
+	  },*/
 		fixed: {
   		type: Number,
 			default: null
@@ -215,6 +215,10 @@ const fundSchema = new Schema({
 			default: null,
 			index: 1
 		}
+	},
+	detailedProject: {// 详细的项目内容
+		type: Boolean,
+		default: true
 	},
 	applicationCountLimit: { // 年申请次数限制
 		type: Number,

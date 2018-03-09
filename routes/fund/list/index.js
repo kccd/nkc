@@ -23,14 +23,14 @@ listRouter
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
-		const newBill = db.FundBillModel({
+		/*const newBill = db.FundBillModel({
 			fundId: newFund._id,
 			changed: newFund.money.initial,
 			uid: user.uid,
 			notes: '基金初始金额',
 			abstract: '初始'
 		});
-		await newBill.save();
+		await newBill.save();*/
 		data.fund = newFund;
 		await next();
 	})
@@ -50,12 +50,13 @@ listRouter
 		const {data, db} = ctx;
 		const {user} = data;
 		const {fundId} = ctx.params;
-		const {type} = ctx.query;
+		const {type, sort} = ctx.query;
 		const {FundApplicationFormModel} = db;
 		let page = ctx.query.page;
 		page = page? parseInt(page): 0;
 		data.type = type;
 		data.page = page;
+		data.sort = sort;
 		const fund = await db.FundModel.findOnly({_id: fundId.toUpperCase(), disabled: false});
 		data.fund = fund;
 		let query = {
@@ -65,6 +66,14 @@ listRouter
 		if(!fund.ensureOperatorPermission('admin', user)) {
 			query.disabled = false;
 		}
+
+		const sortObj = {};
+		if(sort === 'tlm') {
+			sortObj.tlm = -1;
+		} else {
+			sortObj.timeToSubmit = -1;
+		}
+
 		if(type === 'excellent') { // 优秀项目
 			query['status.excellent'] = true;
 		} else if(type === 'completed'){ // 已完成
@@ -80,7 +89,7 @@ listRouter
 		}
 		const length = await FundApplicationFormModel.count(query);
 		const paging = apiFn.paging(page, length);
-		const applicationForms = await FundApplicationFormModel.find(query).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+		const applicationForms = await FundApplicationFormModel.find(query).sort(sortObj).skip(paging.start).limit(paging.perpage);
 		data.applicationForms = await Promise.all(applicationForms.map(async a => {
 			await a.extendApplicant();
 			await a.extendMembers();

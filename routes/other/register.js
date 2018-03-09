@@ -25,7 +25,8 @@ registerRouter
       username:params.username.trim(),
       password:params.password,
       regCode: params.regCode,
-      mobile:(params.areaCode + params.mobile).replace('+', '00'),
+      mobile:params.mobile,
+	    nationCode: params.nationCode,
       regIP: ctx.address,
       regPort: ctx.port,
       mcode:params.mcode,
@@ -44,9 +45,9 @@ registerRouter
     if(!checkString.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
     let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
     if(usernameOfDBNumber !== 0) ctx.throw(400, '用户名已存在，请更换用户名再试！');
-    let mobileCodesNumber = await dbFn.checkMobile(userObj.mobile, params.mobile);
+    let mobileCodesNumber = await dbFn.checkMobile(userObj.nationCode, userObj.mobile);
     if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
-    let smsCode = await dbFn.checkMobileCode(userObj.mobile, userObj.mcode);
+    let smsCode = await dbFn.checkMobileCode(userObj.nationCode, userObj.mobile, userObj.mcode);
     if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
     await smsCode.update({used: true});
     let newUser = await dbFn.createUser(userObj);
@@ -103,7 +104,6 @@ registerRouter
     let href = `http://www.kechuang.org/register/email/verify?email=${userObj.email}&ecode=${ecode}`;
     let link = `<a href="${href}">${href}</a>`;
     await nkcModules.sendEmail({
-      from: settings.mailSecrets.exampleMailOptions.from,
       to: params.email,
       subject: '注册账户',
       text: text + href,
@@ -112,7 +112,7 @@ registerRouter
     await next();
   })
   .get('/email/verify', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data} = ctx;
     const {email, ecode} = ctx.query;
     let userPersonal = await dbFn.checkEmail(email);
     if(userPersonal > 0) ctx.throw('404', '此邮箱已注册过，请检查或更换');

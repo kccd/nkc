@@ -255,4 +255,15 @@ function submittedReportAudit(support, id, number) {
 		.catch(function(data){
 			screenTopWarning(data.error);
 		})
-};
+}
+
+
+function disabledReport(applicationFormId, reportId, type) {
+	nkcAPI('/fund/a/'+applicationFormId+'/report/'+reportId+'?type='+type, 'DELETE', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

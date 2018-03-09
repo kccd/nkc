@@ -1,0 +1,50 @@
+mixin loadInfo(obj)
+  if obj.type === 'fundPool'
+    th= '资金池'
+  if obj.type === 'fund'
+    th
+      span (基金)
+      a(href=`/fund/list/${obj.fund._id.toLowerCase()}` target='_blank')= obj.fund.name
+  if obj.type === 'user'
+    if obj.anonymous
+      th 匿名用户
+    else
+      th
+        span (用户)
+        a(href=`/m/${obj.user.uid}` target='_blank')= obj.user.username
+  if obj.type === 'other'
+    th= obj.id
+table.table.table-bordered
+  thead
+    tr
+      th 时间
+      th 交易编号
+      th 摘要
+      th 操作者
+      th 来自于
+      th 作用于
+      th 金额（元）
+      th 备注
+      if data.type === 'all'
+        th 总资金剩余（元）
+      else
+        th 剩余（元）
+      th 操作
+  tbody
+    -for(let b of data.bills)
+      tr
+        th= b.toc.toLocaleString()
+        th= b._id
+        th= b.abstract
+        th
+          a(href=`/m/${b.user.uid}`)= b.user.username
+        +loadInfo(b.fromInfo)
+        +loadInfo(b.toInfo)
+        th= b.money.toFixed(1)
+        th= b.notes
+        th= b.balance.toFixed(1)
+        if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
+          th
+            a(href=`/fund/bills/${b._id}`) 编辑
+        else
+          th= ''

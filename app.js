@@ -12,6 +12,9 @@ const staticServe = path => {
   });
 };
 const app = new Koa();
+app.on('error', err => {
+
+});
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
 const {permissions} = require('./nkcModules');

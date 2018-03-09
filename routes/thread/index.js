@@ -147,6 +147,7 @@ threadRouter
 			generateUsersBehavior
 		} = ctx;
 		const {user} = data;
+		if(!user.certs.includes('mobile')) ctx.throw(401, '您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 		const {tid} = params;
 		const {
 			ThreadModel,

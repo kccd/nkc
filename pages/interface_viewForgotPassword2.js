@@ -1,3 +1,9 @@
+var nationCode = '86';
+
+function chooseCountryNum(value) {
+	nationCode = parseInt(value);
+}
+
 function error_report(str){
   geid('error_info').innerHTML = '<strong style="color:red;">'+str+'</strong>';
   display('error_info_panel');  //下面的提示框
@@ -59,13 +65,13 @@ function submit(){
       throw({detail:'请填写手机验证码！'})
       return;
     }
-    return nkcAPI('/forgotPassword/mobile', 'post', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode});
+    return nkcAPI('/forgotPassword/mobile', 'post', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode, nationCode: nationCode});
   })
     .then(function(data){
-      window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode;
+      window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode+'&nationCode='+data.nationCode;
     })
-    .catch(function(err){
-      error_report(err);
+    .catch(function(data){
+      error_report(data.error);
     })
 }
 
@@ -76,7 +82,7 @@ function submit2(){
   var mcode = $('#mcode2').val();
   var password = $('#password').val();
   var password2 = $('#password2').val();
-
+	var nationCode = $('#nationCode').val();
   return Promise.resolve()
   .then(function(){
     if(!mobile.match(/^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/)) {
@@ -102,7 +108,7 @@ function submit2(){
       throw('两遍密码不一致')
       return;
     }
-    return nkcAPI('/forgotPassword/mobile', 'put',{mobile:mobile, mcode:mcode, password:password})
+    return nkcAPI('/forgotPassword/mobile', 'put',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
   })
   .then(function(res){
     info_report2('修改密码成功！5s后跳转到登录页面')
@@ -110,8 +116,8 @@ function submit2(){
       window.location = '/login'
     },5000)
   })
-  .catch(function(err){
-    error_report2(JSON.stringify(err));
+  .catch(function(data){
+    error_report2(data.error);
   })
 
 }
@@ -139,7 +145,7 @@ function getMcode(){
   }*/
 
   else{
-    nkcAPI('/sendMessage/reset','post' ,{mobile:phone, username:username/*, icode:icode */})
+    nkcAPI('/sendMessage/getback','post' ,{mobile:phone, username:username/*, icode:icode */, nationCode: nationCode})
     .then(function(res){
       var count = 120;
       var countdown = setInterval(CountDown, 1000);
@@ -154,14 +160,14 @@ function getMcode(){
           count--;
       }
     })
-    .catch(function(err){
-      if(err.detail === '没有找到该手机号码，请检查') {
-        ////refreshICode3();
-      }
-      else if(err.detail === '用户名和手机号码不对应，请检查') {
-        ////refreshICode3();
-      }
-      error_report(err);
+    .catch(function(data){
+      // if(err.detail === '没有找到该手机号码，请检查') {
+      //   ////refreshICode3();
+      // }
+      // else if(err.detail === '用户名和手机号码不对应，请检查') {
+      //   ////refreshICode3();
+      // }
+      error_report(data.error);
     })
   }
 }

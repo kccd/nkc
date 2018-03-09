@@ -23,6 +23,7 @@ voteRouter
 		const newDocument = db.FundDocumentModel({
 			_id: newId,
 			uid: user.uid,
+			applicationFormId: applicationForm._id,
 			type: 'vote',
 			support: type === 'support',
 			c
@@ -32,7 +33,7 @@ voteRouter
 
 		//获得网友支持
 		if(fund.supportCount <= supportersId.length) {
-			await applicationForm.update({'status.usersSupport': true});
+			await applicationForm.update({'status.usersSupport': true, tlm: Date.now()});
 		}
 		await next();
 	});

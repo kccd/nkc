@@ -3,6 +3,7 @@ block title
   -const fund = data.fund;
   -let applicationForms;
   -let isCensor = true;
+  -const {type} = data;
   if data.user
     -for (let cert of fund.censor.certs)
       if !data.user.certs.includes(cert) && !fund.censor.appointed.includes(data.user.uid)
@@ -23,27 +24,33 @@ block content
               img(style='width: 100%; height: 100%;position: absolute;left: 0;' src=`/fundBanner/${fund.image.banner}`)
             .col-xs-12.col-md-12
               h1.fund-name=fund.name
-              p= fund.description.brief
+              p(style="text-shadow: 0 0 10px #000000;")= fund.description.brief
 
       .col-xs-12.col-md-9
         .panel.panel-default
           .panel-body
             ul.nav.nav-pills
-              -const {type} = data;
               li(role="presentation" class=type === undefined ? 'active' : '')
-                a(href=`/fund/list/${fund._id.toLowerCase()}`) 全部
+                a(href=`/fund/list/${fund._id.toLowerCase()}${data.sort?`?sort=${data.sort}`: ''}`) 全部
               li(role="presentation" class=type === 'excellent' ? 'active' : '')
-                a(href=`/fund/list/${fund._id.toLowerCase()}?type=excellent`) 优秀项目
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=excellent${data.sort?`&sort=${data.sort}`: ''}`) 优秀项目
               li(role="presentation" class=type === 'completed' ? 'active' : '')
-                a(href=`/fund/list/${fund._id.toLowerCase()}?type=completed`) 已完成
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=completed${data.sort?`&sort=${data.sort}`: ''}`) 已完成
               li(role="presentation" class=type === 'funding'? 'active': '')
-                a(href=`/fund/list/${fund._id.toLowerCase()}?type=funding`) 资助中
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=funding${data.sort?`&sort=${data.sort}`: ''}`) 资助中
               li(role="presentation" class=type === 'auditing'? 'active': '')
-                a(href=`/fund/list/${fund._id.toLowerCase()}?type=auditing`) 审核中
+                a(href=`/fund/list/${fund._id.toLowerCase()}?type=auditing${data.sort?`&sort=${data.sort}`: ''}`) 审核中
             hr
             -applicationForms = data.applicationForms;
             -const url = `/fund/list/${fund._id.toLowerCase()}`;
-            include interface_fund_page
+            .row
+              if data.paging.pageCount > 1
+                .col-xs-12.col-md-4
+                  include interface_fund_page
+              .col-xs-12.col-md-5
+                .btn-group(role="group")
+                  a.btn.btn-default.btn-sm(type="button" class=data.sort !== 'tlm'? 'btn-primary': '' href=`/fund/list/${fund._id.toLowerCase()}${type?`?type=${type}`: ''}`) 按申请时间排序
+                  a.btn.btn-default.btn-sm(type="button" class=data.sort === 'tlm'? 'btn-primary': '' href=`/fund/list/${fund._id.toLowerCase()}?sort=tlm${type?`&type=${type}`: ''}`) 按活动时间排序
             include interface_fund_applicationList
             include interface_fund_page
       .col-xs-12.col-md-3

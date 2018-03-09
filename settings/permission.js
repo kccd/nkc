@@ -167,7 +167,7 @@ const certificates ={
           [name]: '绑定手机号',
           [POST]: true
         },
-        reset: {
+        getback: {
           [name]: '找回密码',
           [POST]: true
         }
@@ -235,7 +235,8 @@ const certificates ={
 			    [GET]: true, // 所有基金项目
 			    [parameter]: {
 				    [GET]: true, // 具体到某一个基金项目
-				    bills: {// 基金项目的账单
+				    bills: {
+					    [name]: '基金账单',
 					    [GET]: true
 				    }
 			    }
@@ -250,6 +251,33 @@ const certificates ={
 					    [name]: '报告进度',
 					    [GET]: true
 				    }
+			    }
+		    },
+		    info: {
+			    [name]: '科创基金所有信息',
+			    [GET]: true,
+		    },
+		    bills: {
+			    [name]: '科创基金总账单',
+			    [GET]: true,
+			    [POST]: true,
+			    [parameter]: {
+			    	[name]: '具体某一张账单',
+				    [GET]:true,
+				    [PATCH]: true,
+				    [DELETE]: true
+			    }
+		    },
+		    bill: {
+					[name]: '捐赠和添加账单页面',
+			    [GET]: true
+		    },
+		    donation: {
+		    	[name]: '捐款',
+			    [GET]: true,
+			    [POST]: true,
+			    return: {
+		    		[GET]: true
 			    }
 		    }
 	    },
@@ -528,9 +556,6 @@ const certificates ={
 			      add: {
 				      [GET]: true, // 同意条款
 				      [POST]: true // 申请该基金
-			      },
-			      bills: {// 基金项目的账单
-			      	[GET]: true
 			      }
 		      }
 	      },
@@ -570,6 +595,9 @@ const certificates ={
         			[name]: '报告进度',
         			[GET]: true,
 				      [POST]: true,
+				      [parameter]: {
+					      [DELETE]: true, //屏蔽报告
+				      },
 				      audit: { // 报告审核
 								[GET]: true,
 					      [POST]: true
@@ -607,15 +635,6 @@ const certificates ={
 	      me: {
         	[name]: '我的基金',
 		      [GET]: true
-	      },
-	      info: {
-        	[name]: '科创基金所有信息',
-		      [GET]: true,
-	      },
-	      bills: {
-        	[name]: '科创基金总账单',
-		      [GET]: true,
-		      [POST]: true
 	      }
       },
 	    fundBanner: {
@@ -940,22 +959,8 @@ const certificates ={
 			      [PATCH]: true, // 修改基金项目
 			      settings: {
 				      [GET]: true // 基金设置
-			      },
-			      bills: {
-			      	[name]: '基金账单',
-				      [POST]: true,
-							[parameter]: {
-			      		[GET]: true,
-								[PATCH]: true,
-								[DELETE]: true
-							}
 			      }
 		      }
-	      },
-	      a: {
-        	[parameter]: {
-
-	        }
 	      },
 				histories: {
         	[name]: '历史基金',

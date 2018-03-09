@@ -23,7 +23,7 @@ function login_submit(){
       location.href = '/'; //dont go back to register form
     }else{
       //alert(document.referrer)
-      if(document.referrer.match('127.0.0.1:1086') || document.referrer.match('bbs.kechuang.org') ){
+      if(document.referrer.match('127.0.0.1:1086') || document.referrer.match('www.kechuang.org') ){
         location.href = '/';
       }else{
         location.href = document.referrer; //go back in history

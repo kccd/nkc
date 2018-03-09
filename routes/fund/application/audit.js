@@ -9,7 +9,7 @@ auditRouter
 		await next();
 	})
 	.get('/', async (ctx, next) => {
-		const {data, query} = ctx;
+		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
 		const {type} = query;
 		data.type = type;
@@ -51,6 +51,9 @@ auditRouter
 		} else {
 			ctx.throw(400, '未知的type类型。');
 		}
+		data.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit'}).sort({toc: -1});
+		data.expertAudit = await db.FundDocumentModel.find({applicationFormId: applicationForm._id, type: {$in: ['userInfoAudit', 'projectAudit', 'moneyAudit']}}).sort({toc: -1}).limit(3);
+
 		ctx.template = 'interface_fund_audit.pug';
 		await next();
 	})
@@ -72,7 +75,7 @@ auditRouter
 				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他审查员审核。');
 			}
 			const {suggestMoney, comments} = body;
-			await Promise.all(comments.map(async comment => {
+			for(let comment of comments) {
 				if(!comment.support) support = false;
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newDocument = new db.FundDocumentModel({
@@ -84,7 +87,7 @@ auditRouter
 					support: comment.support
 				});
 				await newDocument.save();
-			}));
+			}
 			applicationForm.status.projectPassed = support;
 			//添加项目审查员的预算建议
 			if(!fixedMoney) {
@@ -160,11 +163,14 @@ auditRouter
 		} else {
 			ctx.throw(400, '未知的type类型。');
 		}
-		if(!support && applicationForm.modifyCount >= fund.modifyCount) {
-			applicationForm.useless = 'exceededModifyCount';
-		}
+
 		if(!support) {
+			if(applicationForm.modifyCount >= fund.modifyCount) {
+				applicationForm.useless = 'exceededModifyCount';
+			}
 			applicationForm.lock.submitted = false;
+		} else {
+			applicationForm.tlm = Date.now();
 		}
 		await applicationForm.save();
 		await next();

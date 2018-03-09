@@ -221,8 +221,8 @@ function nkc_render(options){
   render.plain_render = plain_escape;
 
 
-  // 论坛化学式转换器模块，由bbs.kechuang.org上的acmilan制作，复制时请保留本行和下一行。
-  // Forum's Chemical Formula Converter. Made by acmilan in bbs.kechuang.org. Copy with this line and the previous line.
+  // 论坛化学式转换器模块，由www.kechuang.org上的acmilan制作，复制时请保留本行和下一行。
+  // Forum's Chemical Formula Converter. Made by acmilan in www.kechuang.org. Copy with this line and the previous line.
   // 1.1版，解决了上标内存泄露问题
   // 1.2版，解决了字符串尾内存泄露问题
   // 1.3版，解决了尾下标不正确问题

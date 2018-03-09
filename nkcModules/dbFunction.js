@@ -34,14 +34,14 @@ fn.questionCountOfUser = async () => {
 
 
 
-fn.checkMobile = async (mobile, oldMobile) => {
-  let mobileCodes = await db.UsersPersonalModel.find().or([{mobile: mobile},{mobile: oldMobile}]);
+fn.checkMobile = async (nationCode, mobile) => {
+  let mobileCodes = await db.UsersPersonalModel.find({nationCode, mobile});
   return mobileCodes.length;
 };
 // 查询24小时之内发送的相同类型的短信验证码条数
-fn.checkNumberOfSendMessage = async (mobile, type) => {
+fn.checkNumberOfSendMessage = async (nationCode, mobile, type) => {
   let time = Date.now()-24*60*60*1000;
-  let smsCodes = await db.SmsCodeModel.find({mobile: mobile, toc: {$gt: time}, type: type});
+  let smsCodes = await db.SmsCodeModel.find({nationCode,mobile, type, toc: {$gt: time}});
   return smsCodes.length;
 };
 fn.checkNumberOfSendEmail = async (email) => {
@@ -64,9 +64,9 @@ fn.checkEmail = async (email) => {
   return emailOfDB.length;
 };
 
-fn.checkMobileCode = async (mobile, code) => {
+fn.checkMobileCode = async (nationCode, mobile, code) => {
   let time = Date.now() - settings.sendMessage.mobileCodeTime;  //验证码有效时间
-  return await db.SmsCodeModel.findOne({mobile: mobile, code: code, toc: {$gt: time}, used: false});
+  return await db.SmsCodeModel.findOne({nationCode: nationCode, mobile: mobile, code: code, toc: {$gt: time}, used: false});
 };
 fn.checkEmailCode = async (email, code) => {
   let time = Date.now() - settings.sendMessage.emailCodeTime;   //邮件链接有效时间

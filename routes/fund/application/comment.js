@@ -25,7 +25,8 @@ commentRouter
 		const {data, db, params, query} = ctx;
 		const {commentId} = params;
 		const {type} = query;
-		const {applicationForm} = data;
+		const {applicationForm, user} = data;
+		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您不是该基金的管理员，无法执行此操作。');
 		const comment = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, _id: commentId});
 		comment.disabled = type;
 		await comment.save();

@@ -6,14 +6,41 @@ const fundBillSchema = new Schema({
 		type: String,
 		default: Date.now
 	},
-	fundId: {
-		type: String,
-		required: true,
-		index: 1
+	from: {
+		type: {// user, fund, fundPool
+			type: String,
+			required: true,
+			index: 1
+		},
+		id: {
+			type: String,
+			default: '',
+			index: 1
+		},
+		anonymous: {
+			type: Boolean,
+			default: false
+		}
+	},
+	to: {
+		type: {// user, fund, fundPool
+			type: String,
+			required: true,
+			index: 1
+		},
+		id: {
+			type: String,
+			default: '',
+			index: 1
+		},
+		anonymous: {
+			type: Boolean,
+			default: false
+		}
 	},
 	uid: {
 		type: String,
-		required: true,
+		default: '',
 		index: 1
 	},
 	applicationFormId: {
@@ -21,13 +48,17 @@ const fundBillSchema = new Schema({
 		default: null,
 		index: 1
 	},
-	changed: {
+	money: {
 		type: Number,
 		required: true
 	},
 	toc: {
 		type: Date,
 		default: Date.now,
+		index: 1
+	},
+	tlm: {
+		type: Date,
 		index: 1
 	},
 	notes: {
@@ -39,6 +70,11 @@ const fundBillSchema = new Schema({
 		type: String,
 		required: true,
 		maxlength: [10, '摘要字数不能大于10']
+	},
+	verify: {
+		type: Boolean,
+		default: true,
+		index: 1
 	}
 }, {
 	collection: 'fundBills',
@@ -64,6 +100,14 @@ fundBillSchema.virtual('user')
 		this._user = user;
 	});
 
+fundBillSchema.virtual('fund')
+	.get(function() {
+		return this._fund;
+	})
+	.set(function(fund) {
+		this._fund = fund;
+	});
+
 fundBillSchema.virtual('balance')
 	.get(function() {
 		return this._balance;
@@ -72,6 +116,28 @@ fundBillSchema.virtual('balance')
 		this._balance = balance;
 	});
 
+fundBillSchema.virtual('fromInfo')
+	.get(function() {
+		return this._fromUser;
+	})
+	.set(function(fromUser) {
+		this._fromUser = fromUser;
+	});
+
+fundBillSchema.virtual('toInfo')
+	.get(function() {
+		return this._toUser;
+	})
+	.set(function(toUser) {
+		this._toUser = toUser;
+	});
+
+fundBillSchema.pre('save', function(next) {
+	if(!this.tlm) {
+		this.tlm = this.toc;
+	}
+	next();
+});
 
 fundBillSchema.methods.extendApplicationForm = async function() {
 	if(this.applicationFormId) {
@@ -81,10 +147,94 @@ fundBillSchema.methods.extendApplicationForm = async function() {
 	}
 };
 
+fundBillSchema.methods.extendFromInfo = async function() {
+	const {id, type, anonymous} = this.from;
+	const obj = {
+		id,
+		type,
+		anonymous
+	};
+	if(type === 'fund') {
+		const FundModel = require('./FundModel');
+		obj.fund = await FundModel.findOnly({_id: id});
+	}
+	if(type === 'user' && id && !anonymous) {
+		const UserModel = require('./UserModel');
+		obj.user = await UserModel.findOnly({uid: id});
+	}
+	return this.fromInfo = obj;
+};
+
+fundBillSchema.methods.extendToInfo = async function() {
+	const {id, type, anonymous} = this.to;
+	const obj = {
+		id,
+		type,
+		anonymous
+	};
+	if(type === 'fund') {
+		const FundModel = require('./FundModel');
+		obj.fund = await FundModel.findOnly({_id: id});
+	}
+	if(type === 'user' && id && !anonymous) {
+		const UserModel = require('./UserModel');
+		obj.user = await UserModel.findOnly({uid: id});
+	}
+	return this.toInfo = obj;
+};
+
 fundBillSchema.methods.extendUser = async function() {
-	const UserModel = require('./UserModel');
-	const user = await UserModel.findOnly({uid: this.uid});
-	return this.user = user;
+	if(this.uid) {
+		const UserModel = require('./UserModel');
+		return this.user = await UserModel.findOnly({uid: this.uid});
+	}
+};
+
+fundBillSchema.methods.extendFund = async function() {
+	let fund;
+	if(this.fundId) {
+		const FundModel = require('./FundModel');
+		fund = await FundModel.findOnly({_id: this.fundId});
+	}
+	return this.fund = fund;
+
+};
+
+fundBillSchema.statics.getBalance = async function(type, id) {
+	const FundBillModel = mongoose.model('fundBills');
+	const q = {};
+	if(type === 'fund') {
+		q.$or = [
+			{
+				'from.type': 'fund',
+				'from.id': id
+			},
+			{
+				'to.type': 'fund',
+				'to.id': id
+			}
+		];
+	} else if(type === 'fundPool') {
+		q.$or = [
+			{
+				'from.type': 'fundPool'
+			},
+			{
+				'to.type': 'fundPool'
+			}
+		];
+	}
+
+	const bills = await FundBillModel.find(q, {_id: 0, from: 1, to: 1});
+	let total = 0;
+	bills.map(b => {
+		if(b.from.type === type) {
+			total += b.money*-1;
+		} else {
+			total += b.money;
+		}
+	});
+	return total;
 };
 
 const FundBillModel = mongoose.model('fundBills', fundBillSchema);

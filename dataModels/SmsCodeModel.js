@@ -23,7 +23,12 @@ smsCodeSchema = new Schema({
   used: {
     type: Boolean,
     default: false
-  }
+  },
+	nationCode: {
+  	type: String,
+		default: '86',
+		index: 1
+	}
 });
 
 module.exports = mongoose.model('smsCodes', smsCodeSchema, 'smsCodes');

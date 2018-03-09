@@ -1,7 +1,7 @@
-var areaCode = '+86';
+var nationCode = '86';
 //选择国际区号
 function chooseCountryNum(num){
-  areaCode = parseInt(num);
+  nationCode = parseInt(num);
 }
 
 function error_report(str){
@@ -29,7 +29,7 @@ function register_submit(){
       regCode: gv('regCode'),
       mobile:gv('phone'),
       mcode:gv('mcode'),
-      areaCode: areaCode
+      nationCode: nationCode
       /*,
       icode:gv('icode')*/
     }
@@ -172,8 +172,9 @@ function getMcode(){
   }
 
   else{
-    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, areaCode: areaCode, username: username})
+    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, nationCode: nationCode, username: username})
     .then(function(res){
+	    info_report('验证码发送成功!');
       var count = 120;
       var countdown = setInterval(CountDown, 1000);
       function CountDown() {

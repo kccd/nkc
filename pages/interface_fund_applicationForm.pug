@@ -111,7 +111,7 @@ block content
                         span (申请人)
                       span &nbsp;发表于&nbsp;
                       span= fromNow(comment.toc)
-                      if data.userLevel >= 7
+                      if isAdmin
                         span &nbsp;&nbsp;
                         if comment.disabled
                           a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除屏蔽

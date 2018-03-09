@@ -256,13 +256,13 @@ function nkcAPI(operationName,method,remainingParams){  //操作名，参数
       console.error(err)
     })
 
-    //    https://www.google.com.hk/search?newwindow=1&safe=strict&source=hp&q=zvs+site%3Abbs.kechuang.org
+    //    https://www.google.com.hk/search?newwindow=1&safe=strict&source=hp&q=zvs+site%3Awww.kechuang.org
     var goto =
     //'https://www.google.com.hk/search?newwindow=1&safe=strict&source=hp&q='
 
     // 'http://cn.bing.com/search?q='
     // +encodeURI(searchstr)
-    // +'+site%3Abbs.kechuang.org'
+    // +'+site%3Awww.kechuang.org'
 
     '/api/operation?operation=viewLocalSearch&searchstring='
     + encodeURI(searchstr);

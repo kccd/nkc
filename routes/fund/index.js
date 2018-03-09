@@ -6,6 +6,9 @@ const meRouter = require('./me');
 const disabledRouter = require('./disabled');
 const infoRouter = require('./info');
 const settingsRouter = require('./settings');
+const billsRouter = require('./bills');
+const billRouter = require('./bill');
+const donationRouter = require('./donation');
 fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
@@ -154,5 +157,8 @@ fundRouter
 	.use('/me', meRouter.routes(), meRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+	.use('/bills', billsRouter.routes(), billsRouter.allowedMethods())
+	.use('/bill', billRouter.routes(), billRouter.allowedMethods())
+	.use('/donation', donationRouter.routes(), donationRouter.allowedMethods())
 	.use('/disabled', disabledRouter.routes(), disabledRouter.allowedMethods());
 module.exports = fundRouter;
