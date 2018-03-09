@@ -70,6 +70,11 @@ const fundBillSchema = new Schema({
 		type: String,
 		required: true,
 		maxlength: [10, '摘要字数不能大于10']
+	},
+	verify: {
+		type: Boolean,
+		default: true,
+		index: 1
 	}
 }, {
 	collection: 'fundBills',

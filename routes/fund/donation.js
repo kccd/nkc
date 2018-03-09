@@ -4,6 +4,10 @@ const params = require('../../settings/alipaySecret');
 directAlipay.config(params);
 const donationRouter = new Router();
 donationRouter
+	.use('/', async (ctx, next) => {
+		ctx.throw(400, '暂未开放，敬请期待。');
+		await next();
+	})
 	.get('/', async (ctx, next) => {
 		ctx.template = 'interface_fund_donation.pug';
 		const {db, data, query} = ctx;
@@ -31,14 +35,32 @@ donationRouter
 			total_fee: money,
 			extend_param: `uid^${user?user.uid:'null'}|anonymous^${anonymous || 'false'}|fundId^${fundId || 'null'}`
 		};
-		// data.url = directAlipay.buildDirectPayURL(params);
-		const obj = {
+		data.url = directAlipay.buildDirectPayURL(params);
+		/*const obj = {
 			is_success: 'T',
 			extend_param: `uid^74185|anonymous^false|fundId`,
 			out_trade_no: id
 		};
 		const queryString = require('querystring');
-		data.url = '/fund/donation/return?'+queryString.stringify(obj);
+		data.url = '/fund/donation/return?'+queryString.stringify(obj);*/
+		const newBill = db.FundBillModel({
+			_id: id,
+			uid: user?user.uid: '',
+			abstract: '捐款',
+			notes: `捐款${money}元`,
+			money: money,
+			from: {
+				type: 'user',
+				id: user?user.uid: '',
+				anonymous: !!anonymous
+			},
+			to: {
+				type: fundId?'fund': 'fundPool',
+				id: fundId?fundId: ''
+			},
+			verify: false
+		});
+		await newBill.save();
 		await next();
 	})
 	.get('/return', async (ctx, next) => {
@@ -48,13 +70,13 @@ donationRouter
 			ctx.throw(500, trade_status);
 		}
 		data.alipayReturn = true;
-		const extendParamArr = extend_param.split('|');
+		/*const extendParamArr = extend_param.split('|');
 		const extendParams = {};
 		for(let e of extendParamArr) {
 			const arr = e.split('^');
 			extendParams[arr[0]] = arr[1];
 		}
-		data.extendParam = extendParams;
+		data.extendParam = extendParams;*/
 		data.billId = out_trade_no;
 		ctx.template = 'interface_fund_donation.pug';
 		await next();

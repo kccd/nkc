@@ -31,8 +31,9 @@ function submit() {
 		if(money === '') {
 			return screenTopWarning('请输入捐款金额。');
 		}
+		money = parseFloat(money);
 		if(money >= 0) {
-			obj.money = money.toFixed(1);
+			obj.money = money.toFixed(2);
 		} else {
 			return screenTopWarning('请输入正确的捐款金额。');
 		}

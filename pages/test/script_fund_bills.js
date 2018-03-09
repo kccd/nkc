@@ -16,7 +16,8 @@ const {FundBillModel} = require('../../dataModels');
 			id: "14058"
 		},
 		applicationFormId: 6,
-		uid: "1"
+		uid: "1",
+		verify: true
 	});
 	const bill_2 = FundBillModel({
 		_id: "1520252348160",
@@ -33,7 +34,8 @@ const {FundBillModel} = require('../../dataModels');
 			id: "50827"
 		},
 		applicationFormId: 10,
-		uid: "10"
+		uid: "10",
+		verify: true
 	});
 	await bill_1.save();
 	await bill_2.save();

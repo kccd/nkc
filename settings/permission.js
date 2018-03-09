@@ -275,7 +275,10 @@ const certificates ={
 		    donation: {
 		    	[name]: '捐款',
 			    [GET]: true,
-			    [POST]: true
+			    [POST]: true,
+			    return: {
+		    		[GET]: true
+			    }
 		    }
 	    },
 	    fundBanner: {

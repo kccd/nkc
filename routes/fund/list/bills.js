@@ -8,7 +8,7 @@ billsRouter
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		const page = query.page? parseInt(query.page): 0;
 
-		let bills = await db.FundBillModel.find({$or: [
+		let bills = await db.FundBillModel.find({verify: true, $or: [
 			{
 				'from.type': 'fund',
 				'from.id': fundId

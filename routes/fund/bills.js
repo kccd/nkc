@@ -7,7 +7,7 @@ billsRouter
 		const {type} = query;
 		data.type = type;
 		const page = query.page? parseInt(query.page): 0;
-		const q = {};
+		const q = {verify: true};
 		if(type !== 'all') {
 			q.$or = [
 				{

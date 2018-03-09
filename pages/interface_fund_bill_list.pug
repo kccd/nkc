@@ -46,3 +46,5 @@ table.table.table-bordered
         if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
           th
             a(href=`/fund/bills/${b._id}`) 编辑
+        else
+          th= ''
