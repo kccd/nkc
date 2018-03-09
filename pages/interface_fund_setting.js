@@ -1,7 +1,7 @@
 var fundObj = {
   name: '科创基金',
   money: {
-  	initial: null,
+  	// initial: null,
 	  fixed: null,
 	  max: null
   },
@@ -50,6 +50,7 @@ var fundObj = {
 	member:{},
 	thread: {},
 	paper: {},
+	detailedProject: true,
   timeOfPublicity: 0,
   modifyCount: 3,
 	supportCount: 0,
@@ -91,14 +92,14 @@ function loadSettings() {
 	} else {
 		fundObj.image.logo = null;
 	}
-	//初始金额
+	/*//初始金额
 	var initial = $('#fundInitial').val();
 	if(initial) {
 		initial = parseInt(initial);
 		fundObj.money.initial = initial;
 	} else {
 		fundObj.money.initial = null;
-	}
+	}*/
 
 	//固定申请金额、最大申请金额
 	var fixedMoney = $('#fundMoney').val();
@@ -229,7 +230,7 @@ function loadSettings() {
 	//申请方式
 	fundObj.applicationMethod.personal = $('input[name="applicationMethod"]').eq(0).is(':checked');
 	fundObj.applicationMethod.team = $('input[name="applicationMethod"]').eq(1).is(':checked');
-
+	fundObj.detailedProject = $('input[name="detailedProject"]').eq(0).is(':checked');
 	//允许退修次数
 	var modifyCount = $('#modifyCount').val();
 	fundObj.modifyCount = modifyCount? parseInt(modifyCount): 5;

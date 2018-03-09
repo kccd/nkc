@@ -1,0 +1,53 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 科创基金 - 捐款
+block content
+  -var mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    include interface_fund_nav
+    if data.alipayReturn
+      h2 提交成功！等待支付结果...
+    else
+      h2.text-center 捐款
+      br
+      br
+      h4 请选择捐款对象：
+      label.radio-inline
+        input(type="radio" name='fund' checked=!data.fundId)
+        h5 资金池
+      -for(let f of data.funds)
+        label.radio-inline
+          input(type="radio" name='fund' checked=data.fundId===f._id fundId=f._id)
+          h5= f.name
+      br
+      br
+      h4 请选择捐款金额：
+      -const arr = [50,100,200,500,1000,5000,10000,100000];
+      -for(let i = 0; i < arr.length; i++)
+        -const m = arr[i];
+        label.radio-inline
+          input(type="radio" name='money' checked=i===0  money=m)
+          h5= `${m}元`
+      label.radio-inline
+        input#other(type="radio" name='money')
+        h5= `其他`
+      #otherInput.hidden
+        span 请输入捐款金额（元）：
+        input#money(type='number' placeholder='最小单位为元')
+      br
+      h4 匿名捐款：
+        label.radio-inline
+          input(type="radio" name='anonymous' checked=false)
+          h5 是
+        label.radio-inline
+          input(type="radio" name='anonymous' checked=true)
+          h5 否
+      p 说明：这是关于捐款的说明
+
+      br
+      button#submit.btn.btn-default(onclick='submit()') 提交
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_donation.js')

@@ -29,12 +29,12 @@ block content
                 input.form-control#fundName(type="text" placeholder='默认为 "科创基金"' value=fund?fund.name: '')
               .col-xs-12.col-md-2
                 //h5#fundNameInfo
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 基金初始金额
-              .col-xs-12.col-md-2
-                input.form-control#fundInitial(type="Number" placeholder='初始金额' value=fund ? fund.money.initial: '')
-              .col-xs-12.col-md-2
+            //.fund-setting-list
+            //  .col-xs-12.col-md-2
+            //    h5 基金初始金额
+            //  .col-xs-12.col-md-2
+            //    input.form-control#fundInitial(type="Number" placeholder='初始金额' value=fund ? fund.money.initial: '')
+            //  .col-xs-12.col-md-2
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 申请金额
@@ -310,27 +310,19 @@ block content
                 h5 组员身份认证等级
               .col-xs-12.col-md-2
                 input.form-control#memberAuthLevel(type='number' placeholder='默认1' value=member.authLevel?member.authLevel:'')
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 附带帖子数目
-              .col-xs-12.col-md-2
-                input.form-control#attachmentsThreads(type="number" placeholder="默认为0" value=thread? thread.count: '')
-            .fund-setting-list
-              .col-xs-12.col-md-2
-                h5 附带论文数目
-              .col-xs-12.col-md-2
-                input.form-control#attachmentsPapers(type="number" placeholder="默认为0" value=paper? paper.count: '')
-              .col-xs-12.col-md-4
-                span 是否已通过审核&nbsp;&nbsp;
-                label.radio-inline
-                  input#passed(type='radio' name='passed' checked=fund? fund.paper.passed: true)
-                  h5 是
-                label.radio-inline
-                  input(type='radio' name='passed' checked=fund? !fund.paper.passed: false)
-                  h5 否
             hr
             h4 其他信息
             hr
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 项目内容
+              .col-xs-12.col-md-10
+                label.radio-inline
+                  input(type='radio' name='detailedProject' checked=fund ? fund.detailedProject : true)
+                  h5 详细
+                label.radio-inline
+                  input(type='radio' name='detailedProject' checked=fund ? !fund.detailedProject : false)
+                  h5 简单
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 申请方式
@@ -341,6 +333,24 @@ block content
                 label.checkbox-inline
                   input(type='checkbox' name='applicationMethod' checked=fund? fund.applicationMethod.team: false)
                   h5 团队申请
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 附带帖子数目
+              .col-xs-12.col-md-2
+                input.form-control#attachmentsThreads(type="number" placeholder="默认为0" value=thread ? thread.count : '')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 附带论文数目
+              .col-xs-12.col-md-2
+                input.form-control#attachmentsPapers(type="number" placeholder="默认为0" value=paper ? paper.count : '')
+              .col-xs-12.col-md-4
+                span 是否已通过审核&nbsp;&nbsp;
+                label.radio-inline
+                  input#passed(type='radio' name='passed' checked=fund ? fund.paper.passed : true)
+                  h5 是
+                label.radio-inline
+                  input(type='radio' name='passed' checked=fund ? !fund.paper.passed : false)
+                  h5 否
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 允许退修次数

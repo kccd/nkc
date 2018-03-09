@@ -94,12 +94,6 @@ const userSchema = new Schema({
 userSchema.pre('save', function(next) {
   try {
   	this.usernameLowerCase = this.username;
-    const certs = this.certs;
-    const c = [];
-    for (let cert of certs) {
-      if (cert && cert !== 'scholar') c.push(cert);
-    }
-    this.certs = c;
     return next()
   } catch(e) {
     return next(e)
@@ -217,6 +211,9 @@ userSchema.virtual('navbarDesc').get(function() {
   for(const cert of certs) {
   	if(cert)
       cs.push(certificates[cert].displayName);
+  }
+  if(xsf > 0) {
+  	cs.push('学者');
   }
   cs = cs.join(' ');
   if(certs.includes('banned')){

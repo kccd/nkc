@@ -23,14 +23,14 @@ listRouter
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
-		const newBill = db.FundBillModel({
+		/*const newBill = db.FundBillModel({
 			fundId: newFund._id,
 			changed: newFund.money.initial,
 			uid: user.uid,
 			notes: '基金初始金额',
 			abstract: '初始'
 		});
-		await newBill.save();
+		await newBill.save();*/
 		data.fund = newFund;
 		await next();
 	})

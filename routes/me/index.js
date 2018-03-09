@@ -30,7 +30,10 @@ meRouter
     data.user.subscribeForums = subscribeForums;
     data.forumList = await dbFn.getAvailableForums(ctx);
     let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-    if(userPersonal.mobile) data.user.mobile = (userPersonal.mobile.slice(0,3) === '0086')? userPersonal.mobile.replace('0086', '+86'): userPersonal.mobile;
+    if(userPersonal.mobile) {
+    	data.user.mobile = userPersonal.mobile;
+    	data.user.nationCode = userPersonal.nationCode;
+    }
     ctx.template = 'interface_me.pug';
     await next();
   })
@@ -77,18 +80,17 @@ meRouter
   .post('/mobile', async (ctx, next) => {
     const {db} = ctx;
     const {user} = ctx.data;
-    const {mobile, areaCode, code} = ctx.body;
+    const {mobile, nationCode, code} = ctx.body;
     if(!mobile) ctx.throw(400, '电话号码不能为空！');
-    if(!areaCode) ctx.throw(400, '国际区号不能为空！');
+    if(!nationCode) ctx.throw(400, '国际区号不能为空！');
     if(!code) ctx.throw(400, '手机短信验证码不能为空！');
-    const newMobile = (areaCode + mobile).replace('+', '00');
     const userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
     if(userPersonal.mobile) ctx.throw(400, `此账号已绑定手机号码： ${userPersonal.mobile}`);
-    const mobileCodesNumber = await dbFn.checkMobile(newMobile, mobile);
+    const mobileCodesNumber = await dbFn.checkMobile(nationCode, mobile);
     if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
-    const smsCode = await dbFn.checkMobileCode(newMobile, code);
+    const smsCode = await dbFn.checkMobileCode(nationCode, mobile, code);
     if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
-    await db.UsersPersonalModel.replaceOne({uid: user.uid}, {$set: {mobile: newMobile}});
+    await db.UsersPersonalModel.replaceOne({uid: user.uid}, {$set: {mobile: mobile, nationCode: nationCode}});
     await user.update({$addToSet: {certs: 'mobile'}});
     await smsCode.update({used: true});
     await next();

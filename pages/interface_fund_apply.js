@@ -394,15 +394,20 @@ function saveApplicantMessages(callback){
 function saveProject(callback) {
 	var title = $('#title').val();
 	var abstract = $('#abstract').val();
+	var content = $('#content').val();
 	if(!title) {
 		return screenTopWarning('请输入项目标题。');
 	}
-	if(!abstract) {
+	if(!abstract && obj.detailedProject) {
 		return screenTopWarning('请输入项目摘要。');
+	}
+	if(!content && !obj.detailedProject) {
+		return screenTopWarning('请输入项目内容。');
 	}
 	var project = {
 		t: title,
-		abstract: abstract
+		abstract: abstract,
+		c: content
 	};
 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: s, project: project})
 		.then(function(data) {
@@ -481,7 +486,11 @@ function initBudgetMoney() {
 function getText(klass, i) {
 	var text = $('.'+klass+'[num='+i+']').text();
 	if(klass !== 'purpose') {
-		return parseInt(text);
+		var num = parseInt(text);
+		if(num < 0) {
+			num = 0;
+		}
+		return num;
 	}
 	return text;
 }

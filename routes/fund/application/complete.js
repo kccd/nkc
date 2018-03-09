@@ -42,6 +42,15 @@ completeRouter
 			type: 'completedReport',
 			c
 		});
+
+		const newReportId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+		const newReport = await db.FundDocumentModel({
+			_id: newReportId,
+			uid: user.uid,
+			applicationFormId: applicationForm,
+			type: 'report',
+			c: '提交结题申请'
+		});
 		if(!fixedMoney) {
 			if(budgetMoney.length !== usedMoney.length) ctx.throw(400, '请输入实际花费金额。');
 			for(let i = 0; i < budgetMoney.length; i++) {
@@ -56,6 +65,7 @@ completeRouter
 		applicationForm.status.completed = null;
 		applicationForm.tlm = Date.now();
 		await newDocument.save();
+		await newReport.save();
 		await applicationForm.save();
 		await next();
 	})
@@ -89,12 +99,12 @@ completeRouter
 			applicationFormId: applicationForm._id,
 			uid: user.uid
 		});
+		await newDocument.save();
 		if(type === 'pass') {
 			await applicationForm.update({'status.completed': true, completedAudit: false, tlm: Date.now()});
 		} else {
 			await applicationForm.update({'status.completed': false, completedAudit: false});
 		}
-		await newDocument.save();
 		await next();
 	});
 module.exports = completeRouter;

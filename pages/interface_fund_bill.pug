@@ -1,37 +1,115 @@
 extends bootstrap_base
 block title
   link(rel='stylesheet', href='/fund.css')
-  title= `基金账单-${data.bill._id}`
+  title= `科创基金`
 block content
   -const mainContainer1400 = true
-  -const {bill} = data;
+  -const {from, to, fid, tid, id} = data;
+  -const abstractArr = ['拨款', '划拨', '捐款', '支取'];
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
-    .row
-      .col-xs-12.col-md-4
-        if data.bill.fundPool
-          h4
-            a(href=`/fund/bills`) <<总资金账单列表
-        .panel.panel-default
-          .panel-body
-            span 交易时间
-            input.form-control#time(value=data.bill.toc.getTime())
-            span 交易编号
-            input.form-control(value=data.bill._id disabled )
-            span 操作人
-            input.form-control#uid(value=data.bill.uid)
-            span 资金变动
-            .redFontColor
-              h5 在总资金账单列表中，负数代表增加金额到总资金，正数代表从总资金减少金额。
-              h5 在基金项目账单列表中，负数代表从基金项目减少金额，正数代表增加金额到基金项目。
-            input.form-control#changed(value=data.bill.changed)
-            span 摘要
-            input.form-control#abstract(value=data.bill.abstract)
-            span 备注
-            textarea.form-control#notes(rows=8)= data.bill.notes
+    .panel.panel-default
+      .panel-body
+        .row
+          .col-xs-12.col-md-6.col-md-offset-3
+            h3.text-center 基金账单
+            h5= `交易时间${data.bill?`已选择时间：${data.bill.toc.toLocaleString()}`: ''}：`
+            input.form-control#time(type='datetime-local' time=data.bill?data.bill.toc.getTime(): '')
             br
-            button.btn.btn-info(onclick=`modify(${data.bill._id}, "${data.fund?data.fund._id: ''}")`) 修改
-            button.btn.btn-danger(onclick=`deleteBill(${data.bill._id}, "${data.fund?data.fund._id: ''}")`) 删除
+            h5 摘要：
+            span 快速输入&nbsp;
+            -for(let a of abstractArr)
+              a(onclick=`inputAbstract("${a}")` style='margin-right: 0.5rem;cursor: pointer;text-decoration: none;')= a
+            input.form-control#abstract(type='text' value=data.bill?data.bill.abstract: '' placeholder='')
+            br
+            h5 来自于:
+            label.radio-inline
+              input(type="radio" name='from' checked=(!data.bill || data.bill.from.type === 'user'))
+              h5 用户
+            label.radio-inline
+              input(type="radio" name='from' checked=(data.bill && data.bill.from.type === 'fund'))
+              h5 基金项目
+            label.radio-inline
+              input(type="radio" name='from' checked=(data.bill && data.bill.from.type === 'fundPool'))
+              h5 资金池
+            //label.radio-inline
+            //  input(type="radio" name='from' checked=(data.bill && data.bill.from.type === 'other'))
+            //  h5 其他
+            //#fromOther(style='display: none;')
+            //  input.form-control#fromOtherInfo(type='text' value=data.bill && data.bill.from.type === 'other' ? data.bill.from.id : '' placeholder='其他途径')
+            #fromUser(style=!data.bill || data.bill.from.type === 'user'? '': 'display: none;')
+              .row
+                .col-xs-12.col-md-12
+                  span 匿名：
+                  label.radio-inline
+                    input(type="radio" name='fromAnonymous' checked=(data.bill && data.bill.from.anonymous))
+                    h5 是
+                  label.radio-inline
+                    input(type="radio" name='fromAnonymous' checked=(!data.bill || !data.bill.from.anonymous))
+                    h5 否
+                .col-xs-12.col-md-10
+                  input.form-control#fromUid(type='text' value=data.bill && data.bill.from.type === 'user' ? data.bill.from.id : '' placeholder='用户UID')
+                .col-xs-12.col-md-2
+                  button.btn.btn-default(onclick='getUser("from")') 检测
+                .col-xs-12.col-md-12#fromUserInfo
+            #fromFund(style=data.bill && data.bill.from.type === 'fund'? '': 'display: none;')
+              -for(let f of data.funds)
+                label.radio-inline
+                  input(type="radio" name='fromFund' checked=data.bill && data.bill.from.type === 'fund' && data.bill.from.id === f._id fundId= f._id)
+                  h5= f.name
+
+            br
+            h5 作用于:
+            label.radio-inline
+              input(type="radio" name='to' checked=(!data.bill || data.bill.to.type === 'user'))
+              h5 用户
+            label.radio-inline
+              input(type="radio" name='to' checked=(data.bill && data.bill.to.type === 'fund'))
+              h5 基金项目
+            label.radio-inline
+              input(type="radio" name='to' checked=(data.bill && data.bill.to.type === 'fundPool'))
+              h5 资金池
+            label.radio-inline
+              input(type="radio" name='to' checked=(data.bill && data.bill.to.type === 'other'))
+              h5 其他
+            #toOther(style=data.bill && data.bill.to.type === 'other'? '': 'display: none;')
+              input.form-control#toOtherInfo(type='text' value=data.bill && data.bill.to.type === 'other' ? data.bill.to.id : '' placeholder='其他途径')
+            #toUser(style=!data.bill || data.bill.to.type === 'user'? '': 'display: none;')
+              .row
+                .col-xs-12.col-md-12
+                  span 匿名：
+                  label.radio-inline
+                    input(type="radio" name='toAnonymous' checked=(data.bill && data.bill.to.anonymous))
+                    h5 是
+                  label.radio-inline
+                    input(type="radio" name='toAnonymous' checked=(!data.bill || !data.bill.to.anonymous))
+                    h5 否
+                .col-xs-12.col-md-10
+                  input.form-control#toUid(type='text' value=data.bill && data.bill.to.type === 'user' ? data.bill.to.id : '' placeholder='用户UID')
+                .col-xs-12.col-md-2
+                  button.btn.btn-default(onclick='getUser("to")') 检测
+                .col-xs-12.col-md-12#toUserInfo
+            #toFund(style=data.bill && data.bill.to.type === 'fund'? '': 'display: none;')
+              -for(let f of data.funds)
+                label.radio-inline
+                  input(type="radio" name='toFund' checked=data.bill && data.bill.to.type === 'fund' && data.bill.to.id === f._id fundId= f._id)
+                  h5= f.name
+            br
+            h5 金额（元）：
+            input.form-control#money(type='number' value=data.bill?data.bill.money: '')
+            br
+            h5 备注：
+            textarea#notes.form-control(rows='5')= data.bill?data.bill.notes: ''
+            br
+            .text-center
+              button.btn.btn-info(onclick=`submit(${data.bill ? data.bill._id : ''})`) &nbsp;&nbsp;提交&nbsp;&nbsp;
+              if data.bill
+                button.btn.btn-danger(onclick=`deleteBill(${data.bill._id})`) &nbsp;&nbsp;删除&nbsp;&nbsp;
+
+
+
+
+
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_bill.js')

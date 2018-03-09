@@ -8,52 +8,41 @@ block content
     include interface_fund_nav
     .row
       .col-xs-12.col-md-12
-        .panel.panel-default
-          .panel-body
-            h1.text-center 科创基金
-            hr
-            .row
-              -for (let fund of data.funds)
-                -const {id, name, color, money} = fund;
-                .col-xs-6.col-sm-4.col-md-3.fund-list
-                  a(href=`/fund/list/${id.toLowerCase()}`)
-                    .fund-name(style=`background-color: ${color};background-image:${fund && fund.image && fund.image.logo ? `url(/fundLogo/${fund.image.logo})` : ''}`)
-                      div= name
-                      if fund.money.fixed
-                        .fund-money!= `定额${money.fixed}元`
-                      else
-                        .fund-money!= `单笔最高${money.max}元`
-            hr
-            .row
-              .col-xs-12.col-md-12
-                if data.excellent.length !== 0
-                  .panel.panel-default
-                    .panel-body
-                      h2.text-center 优秀项目
-                      -applicationForms = data.excellent;
-                      include interface_fund_applicationList
-                if data.applying.length !== 0
-                  .panel.panel-default
-                    .panel-body
-                      h2.text-center 正在申请
-                      -let applicationForms = data.applying;
-                      include interface_fund_applicationList
-                if data.funding.length !== 0
-                  .panel.panel-default
-                    .panel-body
-                      h2.text-center 资助中
-                      -applicationForms = data.funding;
-                      include interface_fund_applicationList
-                if data.excellent.length !== 0
-                  .panel.panel-default
-                    .panel-body
-                      h2.text-center 已完成
-                      -applicationForms = data.completed;
-                      include interface_fund_applicationList
-              //.col-xs-12.col-md-4
-              //  .panel.panel-default
-              //    .panel-body
-              //      h2.text-center 捐款人
-              //      br
-              //      h4!=`马小甲&nbsp;&nbsp;古人&nbsp;&nbsp;叶泽华`
+        h1.text-center 科创基金
+        .row
+          -for (let fund of data.funds)
+            -const {id, name, color, money} = fund;
+            .col-xs-6.col-sm-4.col-md-3.fund-list
+              a(href=`/fund/list/${id.toLowerCase()}`)
+                .fund-name(style=`background-color: ${color};background-image:${fund && fund.image && fund.image.logo ? `url(/fundLogo/${fund.image.logo})` : ''}`)
+                  div= name
+                  if fund.money.fixed
+                    .fund-money!= `定额${money.fixed}元`
+                  else
+                    .fund-money!= `单笔最高${money.max}元`
+        hr
+        .row
+          .col-xs-12.col-md-12
+            if data.excellent.length !== 0
+              h2.text-center 优秀项目
+              -applicationForms = data.excellent;
+              include interface_fund_applicationList
+            if data.applying.length !== 0
+              h2.text-center 正在申请
+              -let applicationForms = data.applying;
+              include interface_fund_applicationList
+            if data.funding.length !== 0
+              h2.text-center 资助中
+              -applicationForms = data.funding;
+              include interface_fund_applicationList
+            if data.excellent.length !== 0
+              h2.text-center 已完成
+              -applicationForms = data.completed;
+              include interface_fund_applicationList
+          //.col-xs-12.col-md-4
+          //  .panel.panel-default
+          //    .panel-body
+          //      h2.text-center 捐款人
+          //      br
+          //      h4!=`马小甲&nbsp;&nbsp;古人&nbsp;&nbsp;叶泽华`
 

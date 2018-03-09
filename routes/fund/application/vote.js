@@ -23,6 +23,7 @@ voteRouter
 		const newDocument = db.FundDocumentModel({
 			_id: newId,
 			uid: user.uid,
+			applicationFormId: applicationForm._id,
 			type: 'vote',
 			support: type === 'support',
 			c

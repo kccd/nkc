@@ -22,7 +22,7 @@ block content
             else
               -const url = `/fund/list/${fund._id.toLowerCase()}/bills`;
               include interface_fund_page
-              include interface_fund_billList
+              include interface_fund_bill_list
               include interface_fund_page
       .col-xs-12.col-md-3
         .panel.panel-default
@@ -35,25 +35,14 @@ block content
             .row
               .col-xs-12.col-md-12
                 h4.text-center 剩余金额
-                h2.text-center(style='color:#ff7979;')= `￥${data.balance}`
-        if data.userLevel >= 7
-          .panel.panel-default
-            .panel-body
-              h5.text-center 从总资金转入
-              hr
-              span 日期选择
-              input#time(type='datetime-local' style='width: 100%;').form-control
-              br
-              span 金额变动(元)
-              input#money(type='number' placeholder = '区分正负').form-control
-              br
-              span 摘要
-              input#abstract(type='text' placeholder = '' value='划拨').form-control
-              br
-              span 备注
-              textarea#notes.form-control(rows='5')= `从总资金转入到基金项目 - ${data.fund.name}`
-              br
-              button.btn.btn-info.btn-block(onclick=`submit("${fund._id}")`) 提交
+                h2.text-center(style='color:#ff7979;')= `￥${data.balance.toFixed(1)}`
+        .panel.panel-default
+          .panel-body
+            h5.text-center 操作
+            hr
+            if data.userLevel >= 7
+              a.btn.btn-info.btn-block(href=`/fund/bill`) 添加账单
+            a.btn.btn-info.btn-block(href=`/fund/donation?fundId=${fund._id.toLowerCase()}`) 捐款
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_bills.js')

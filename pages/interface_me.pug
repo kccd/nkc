@@ -78,19 +78,19 @@ block content
                       .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
                 button.btn.btn-default#submitnewpassword(onclick='submitnewpassword()') 提交
           .col-xs-12.col-md-10(style='padding: 0')
-            .col-xs-12.col-md-3(style="display:none")
+            .col-xs-12.col-md-3
               label(for="name")
                 .h5 选择国际区号
-              -var optionArray=[{num:'+86',country:'中国'},{num:'+852',country:'中国香港'},{num:'+853',country:'中国澳门'},{num:'+886',country:'中国台湾'},{num:'+81',country:'日本'},{num:'+82',country:'韩国'},{num:'+65',country:'新加坡'},{num:'+66',country:'泰国'},{num:'+60',country:'马来西亚'},{num:'+1',country:'美国'},{num:'+1',country:'加拿大'},{num:'+61',country:'澳大利亚'},{num:'+44',country:'英国'},{num:'+49',country:'德国'},{num:'+33',country:'法国'},{num:'+7',country:'俄罗斯'},{num:'+91',country:'印度'},{num:'+64',country:'新西兰'},{num:'+39',country:'意大利'},{num:'+31',country:'荷兰'},{num:'+34',country:'西班牙'},{num:'+46',country:'瑞典'},{num:'+43',country:'奥地利'},{num:'+41',country:'瑞士'},{num:'+370',country:'立陶宛'},{num:'+63',country:'菲律宾'},{num:'+62',country:'印度尼西亚'},{num:'+84',country:'越南'},{num:'+971',country:'阿联酋'}];
+              -var optionArray=[{num:'86',country:'中国'},{num:'852',country:'中国香港'},{num:'853',country:'中国澳门'},{num:'886',country:'中国台湾'},{num:'81',country:'日本'},{num:'82',country:'韩国'},{num:'65',country:'新加坡'},{num:'66',country:'泰国'},{num:'60',country:'马来西亚'},{num:'1',country:'美国'},{num:'1',country:'加拿大'},{num:'61',country:'澳大利亚'},{num:'44',country:'英国'},{num:'49',country:'德国'},{num:'33',country:'法国'},{num:'7',country:'俄罗斯'},{num:'91',country:'印度'},{num:'64',country:'新西兰'},{num:'39',country:'意大利'},{num:'31',country:'荷兰'},{num:'34',country:'西班牙'},{num:'46',country:'瑞典'},{num:'43',country:'奥地利'},{num:'41',country:'瑞士'},{num:'370',country:'立陶宛'},{num:'63',country:'菲律宾'},{num:'62',country:'印度尼西亚'},{num:'84',country:'越南'},{num:'971',country:'阿联酋'}];
               select.form-control(onchange='chooseCountryNum(this.value)')
                 -for(var i = 0; i < optionArray.length; i++)
                   option #{optionArray[i].num}&nbsp;&nbsp;#{optionArray[i].country}
-            .col-xs-12.col-md-5
+            .col-xs-12.col-md-4
               .form-group
                 label(for="name")
                   -if(data.user.mobile)
                     .h5 手机号码
-                      span(style='color: #888; font-size: 1.2rem') &nbsp已绑定手机号码：#{data.user.mobile}
+                      span(style='color: #888; font-size: 1.2rem') &nbsp已绑定手机号码：+#{data.user.nationCode} #{data.user.mobile}
                   -else
                     .h5 手机号码
                       span(style='color: #888; font-size: 1.2rem') &nbsp未绑定手机号码
@@ -106,13 +106,13 @@ block content
                     label(for="name")
                       .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
                 button.btn.btn-default#submitSendMcode(onclick='submitSendMcode()') 获取验证码
-            .col-xs-12.col-md-2
+            .col-xs-12.col-md-1
               .form-group
                   .col-xs-12.col-md-12.hidden-label
                       label(for="name")
                         .h5(style='opacity:0;filter:alpha(opacity=0);') hidden
                   button.btn.btn-default.center-block#submitPhoneNumber(onclick='submitPhoneNumber()') 提交
-            .col-xs-12.col-md-2
+            .col-xs-12.col-md-12
               h4
                 a(href='/set/verify') 点我去身份认证
       .col-xs-12.col-md-12
@@ -289,7 +289,7 @@ block scripts
   script(src='/interface_uploader_one.js')
   script.
     var interval_time = 59;
-    var areaCode = '+86';
+    var nationCode = '86';
     function changeFocusDiv() {
       if($('#focusDiv').css('display') == 'none'){
         $('#focusDiv').fadeIn();
@@ -301,7 +301,7 @@ block scripts
     }
     //选择国际区号
     function chooseCountryNum(num){
-      areaCode = parseInt(num);
+      nationCode = parseInt(num);
     }
     //自动填充板块id
     function fillFocusId(num) {
@@ -324,28 +324,28 @@ block scripts
         newPassword2:geid('newpassword2').value
       };
       if(passwordObj.oldPassword == ''){
-        jwarning('旧密码不能为空！');
+        screenTopWarning('旧密码不能为空！');
         return;
       }
       if(passwordObj.newPassword == '' || passwordObj.newPassword2 == ''){
-        jwarning('新密码不能为空！');
+        screenTopWarning('新密码不能为空！');
         return;
       }
       if(passwordObj.newPassword != passwordObj.newPassword2){
-        jwarning('两次输入的密码不一致！请重新输入');
+        screenTopWarning('两次输入的密码不一致！请重新输入');
         return;
       }
       geid('submitnewpassword').disabled = true;
       nkcAPI('/me/password','PATCH',passwordObj)
       .then(function(){
-        jwarning('密码修改成功！');
+        screenTopAlert('密码修改成功！');
         geid('oldpassword').value = '';
         geid('newpassword').value = '';
         geid('newpassword2').value = '';
         geid('submitnewpassword').disabled = false;
       })
       .catch(function(data){
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('submitnewpassword').disabled = false;
       })
     }
@@ -360,11 +360,11 @@ block scripts
       geid('submitpersonalsetting').disabled = true;
       nkcAPI('/me/settings','PATCH',settingObj)
       .then(function(){
-        jalert('个人资料修改成功！');
+        screenTopAlert('个人资料修改成功！');
         geid('submitpersonalsetting').disabled = false;
       })
       .catch(function(data){
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('submitpersonalsetting').disabled = false;
       })
     }
@@ -373,18 +373,14 @@ block scripts
       var mobileObj={
         mobile:geid('phoneNumber').value,
         code:geid('mCode').value,
-        areaCode:areaCode
+        nationCode:nationCode
       };
       if(mobileObj.mobile == ''){
-        jwarning('手机号码不能为空！');
-        return;
-      }
-      if(!(/(^[1-9]\d*$)/.test(mobileObj.mobile))){
-        jwarning('手机号码格式不正确！');
+        screenTopWarning('手机号码不能为空！');
         return;
       }
       if(mobileObj.code == ''){
-        jwarning('手机短信验证码不能为空！');
+        screenTopWarning('手机短信验证码不能为空！');
         return;
       }
       geid('submitPhoneNumber').disabled = true;
@@ -394,13 +390,13 @@ block scripts
         geid('submitSendMcode').disabled = false;
         clearTimeout(stopTime);
         geid('submitSendMcode').innerHTML = '获取验证码';
-        jwarning('手机号码绑定成功！');
+        screenTopAlert('手机号码绑定成功！');
         window.location.reload();
         geid('phoneNumber').value = '';
         geid('mCode').value = '';
       })
       .catch(function(data){
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('submitPhoneNumber').disabled = false;
       })
     }
@@ -408,24 +404,20 @@ block scripts
     function submitSendMcode() {
       var codeObj = {
         mobile:geid('phoneNumber').value,
-        areaCode:areaCode
+        nationCode:nationCode
       };
       if(codeObj.mobile == ''){
-        jwarning('手机号码不能为空！');
-        return;
-      }
-      if(!(/(^[1-9]\d*$)/.test(codeObj.mobile))){
-        jwarning('手机号码格式不正确！');
+        screenTopWarning('手机号码不能为空！');
         return;
       }
       geid('submitSendMcode').disabled = true;
       nkcAPI('/sendMessage/bindMobile', 'post',codeObj)
       .then(function(){
-        jwarning('手机短信验证码发送成功！');
+        screenTopAlert('手机短信验证码发送成功！');
         setTimeout(timeOut_60,1000);
       })
       .catch(function(data){
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('submitSendMcode').disabled = false;
       })
     }

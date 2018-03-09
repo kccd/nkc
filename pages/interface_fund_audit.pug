@@ -56,7 +56,16 @@ block content
                         a(href=`/m/${m.uid}` target='_blank')= m.user.username
                   else
                     h5= `申请方式：个人`
+            -let obj = {};
+            if data.expertAudit.length !== 0
+              -for(let r of data.expertAudit)
+                if !r.support
+                  -obj[r.type] = r.c;
+
             .col-xs-12.col-md-4
+              if obj.userInfoAudit
+                h5 上一次未通过审核的原因：
+                  span.redFontColor= obj.userInfoAudit
               textarea.form-control#userInfoComment(rows='12' placeholder='审核评语')
               label.radio-inline
                 input(type='radio' name='userInfoAudit' checked=false)
@@ -73,8 +82,9 @@ block content
                   -const project = applicationForm.project
                   h2.text-center#projectTitle= project.t
                   br
-                  p= project.abstract
-                  br
+                  if fund.detailedProject
+                    p= project.abstract
+                    br
                   div#projectContent!= experimental_render(project)
                   hr
                   h4= `学术分类：${applicationForm.forum.displayName}`
@@ -108,6 +118,9 @@ block content
                             br
                             a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
             .col-xs-12.col-md-4
+              if obj.projectAudit
+                h5 上一次未通过审核的原因：
+                  span.redFontColor= obj.projectAudit
               textarea.form-control#projectComment(rows='12' placeholder='审核评语')
               label.radio-inline
                 input(type='radio' name='projectAudit' checked=false)
@@ -150,6 +163,9 @@ block content
                       span=`元`
                     p#projectAuditInfo.redFontColor
             .col-xs-12.col-md-4
+              if obj.moneyAudit
+                h5 上一次未通过审核的原因：
+                  span.redFontColor= obj.moneyAudit
               textarea.form-control#moneyComment(rows='12' placeholder='审核评语')
               label.radio-inline
                 input(type='radio' name='moneyAudit' checked=false)
@@ -157,9 +173,9 @@ block content
               label.radio-inline
                 input(type='radio' name='moneyAudit' checked=true)
                 h5 不合格
-            .col-xs-12.col-md-12
-              br
-              button.btn.btn-info.center-block#submit(onclick=`submitProjectAudit(${applicationForm._id})`) 提交
+            .col-xs-12.col-md-12.text-center
+              button.btn.btn-info#submit(onclick=`submitProjectAudit(${applicationForm._id})`) 提交
+              button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底决绝
 
       else
         .col-xs-12.col-md-12
@@ -211,8 +227,9 @@ block content
               -const project = applicationForm.project
               h2.text-center#projectTitle= project.t
               br
-              p= project.abstract
-              br
+              if fund.detailedProject
+                p= project.abstract
+                br
               div#projectContent!= experimental_render(project)
               hr
               h4= `学术分类：${applicationForm.forum.displayName}`
@@ -292,6 +309,9 @@ block content
                     span=`元`
                   p#adminAuditInfo.redFontColor
         .col-xs-12.col-md-4
+          if data.adminAudit && !data.adminAudit.support
+            h5 上一次未通过审核的原因：
+              span.redFontColor= data.adminAudit.c
           textarea.form-control#adminComment(rows='12' placeholder='审核评语')
           label.radio-inline
             input(type='radio' name='adminSupport' checked=true)
@@ -322,9 +342,9 @@ block content
             label.radio-inline
               input(type='radio' name='needThreads' checked=false)
               h5 否
-        .col-xs-12.col-md-12
-          br
-          button.btn.btn-info.center-block#adminSubmit(onclick=`submitAdminAudit(${applicationForm._id})`) 提交
+        .col-xs-12.col-md-12.text-center
+          button.btn.btn-info#adminSubmit(onclick=`submitAdminAudit(${applicationForm._id})`) 提交
+          button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底决绝
 
 block scripts
   script(src='/interface_common.js')

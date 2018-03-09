@@ -39,6 +39,11 @@ const usersPersonalSchema = new Schema({
     default: '',
     match: /.*@.*/
   },
+	nationCode: {
+		type: String,
+		default: '',
+		index: 1
+	},
   mobile: {
     type: String,
     default:'',

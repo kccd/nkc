@@ -12,14 +12,16 @@ reportRouter
 		const {applicationForm, user} = data;
 		ctx.template = 'interface_fund_report.pug';
 		const q = {
-			type: {$in: ['report', 'completedReport']},
+			type: {$in: ['report', 'completedReport', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'vote']},
 			applicationFormId: applicationForm._id
 		};
 		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
 			q.disabled = false;
 		}
 		data.reports = await db.FundDocumentModel.find(q).sort({toc: -1});
-
+		await Promise.all(data.reports.map(async r => {
+			await r.extendUser();
+		}));
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -33,7 +35,8 @@ reportRouter
 		if(type === 'applyRemittance') {
 			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经结题。');
 			const {timeToPassed, reportNeedThreads, remittance, fund} = applicationForm;
-			for(let r of remittance) {
+			for(let i = 0; i < remittance.length; i++) {
+				const r = remittance[i];
 				if(!r.status) {
 					if(reportNeedThreads && selectedThreads.length === 0) ctx.throw(400, '管理员要求提交拨款申请必须要附带代表中期报告的帖子。');
 
@@ -51,7 +54,7 @@ reportRouter
 						r.passed = null;
 						obj.submittedReport = true;
 					}
-					const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+					let newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 					r.report = newId;
 					const newDocument = db.FundDocumentModel({
 						_id: newId,
@@ -61,6 +64,18 @@ reportRouter
 						c: c,
 					});
 					await newDocument.save();
+
+					//申请拨款 记录
+					newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+					r.report = newId;
+					const newReport = db.FundDocumentModel({
+						_id: newId,
+						uid: user.uid,
+						type: 'report',
+						applicationFormId: applicationForm._id,
+						c: `申请第 ${i+1} 期拨款`,
+					});
+					await newReport.save();
 					obj.remittance = remittance;
 					break;
 				}
@@ -130,10 +145,24 @@ reportRouter
 			support
 		});
 		await newDocument.save();
-		for(let r of remittance) {
+		for(let i = 0; i < remittance.length; i++) {
+			const r = remittance[i];
 			if(r.status === null && r.passed === null) {
 				r.passed = support;
+				let str = `第 ${i+1} 期拨款申请通过审核`;
+				if(!support) {
+					str = `第 ${i+1} 期拨款申请未通过审核。原因：${c}`;
+				}
 				await applicationForm.update({remittance, submittedReport: false});
+				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+				const newReport = db.FundDocumentModel({
+					_id: newId,
+					uid: user.uid,
+					type: 'report',
+					applicationFormId: applicationForm._id,
+					c: str
+				});
+				await newReport.save();
 				break;
 			}
 		}

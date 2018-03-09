@@ -24,11 +24,6 @@ block content
                 div!= markdown_safe(fundSettings.terms)
                 hr
       .col-xs-12.col-md-3
-        .panel.panel-default
-          .panel-body
-            h2.text-center 科创基金
-            br
-            a.btn.btn-info.btn-block(href='/fund/info') 基本信息
-            a.btn.btn-info.btn-block(href='/fund/bills') 账单列表
+        include interface_fund_aside
 
 

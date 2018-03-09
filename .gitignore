@@ -1,4 +1,7 @@
 /settings/es.js
+/settings/emailSecrets.js
+/settings/server.js
+/settings/smsSecrets.js
 /node_modules
 /settings/mongoDB.js
 /.idea
@@ -6,5 +9,5 @@
 /package-lock.json
 /resources
 /tmp
-/settings/mailSecrets.js
-/settings/server.js
+/log.txt
+/settings/alipaySecret.js

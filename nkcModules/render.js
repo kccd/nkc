@@ -222,6 +222,7 @@ function applicationFormStatus(a) {
 }
 
 function ensureFundOperatorPermission(type, user, fund) {
+	if(!fund) return false;
 	const {expert, censor, financialStaff, admin, commentator, voter} = fund;
 	const fn = (obj, user) => {
 		if(!user) return false;
@@ -265,9 +266,9 @@ let pugRender = (template, data) => {
   options.data = data;
   options.filters = filters;
   options.pretty = true; // 保留换行
-  if(process.env.NODE_ENV === 'production')
-    options.cache = true;
-  //options.self = true;
+	if(['production', 'development'].includes(process.env.NODE_ENV)) {
+		options.cache = true;
+	}
   return pug.renderFile(template, options);
 };
 module.exports = pugRender;

@@ -372,6 +372,10 @@ fundApplicationFormSchema.pre('save', async function(next) {
 fundApplicationFormSchema.methods.extendApplicant = async function() {
 	const FundApplicationUserModel = require('./FundApplicationUserModel');
 	const applicant= await FundApplicationUserModel.findOne({applicationFormId: this._id, uid: this.uid});
+	console.log(`================`);
+	console.log(this._id);
+	console.log(applicant);
+	console.log(`================`);
 	if(applicant) await applicant.extendUser();
 	return this.applicant = applicant;
 };
@@ -463,6 +467,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		money,
 		thread,
 		applicationMethod,
+		detailedProject
 	} = fund;
 
 	// 判断申请表有效性
@@ -492,6 +497,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	} else {
 		if(!project.t) throw '请填写项目名称！';
 		if(!project.c) throw '请输入项目名称！';
+		if(!project.abstract && detailedProject) throw '请输入项目摘要！';
 	}
 
 	//其他信息判断

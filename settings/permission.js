@@ -167,7 +167,7 @@ const certificates ={
           [name]: '绑定手机号',
           [POST]: true
         },
-        reset: {
+        getback: {
           [name]: '找回密码',
           [POST]: true
         }
@@ -237,12 +237,7 @@ const certificates ={
 				    [GET]: true, // 具体到某一个基金项目
 				    bills: {
 					    [name]: '基金账单',
-					    [POST]: true,
-					    [parameter]: {
-						    [GET]: true,
-						    [PATCH]: true,
-						    [DELETE]: true
-					    }
+					    [GET]: true
 				    }
 			    }
 		    },
@@ -257,6 +252,30 @@ const certificates ={
 					    [GET]: true
 				    }
 			    }
+		    },
+		    info: {
+			    [name]: '科创基金所有信息',
+			    [GET]: true,
+		    },
+		    bills: {
+			    [name]: '科创基金总账单',
+			    [GET]: true,
+			    [POST]: true,
+			    [parameter]: {
+			    	[name]: '具体某一张账单',
+				    [GET]:true,
+				    [PATCH]: true,
+				    [DELETE]: true
+			    }
+		    },
+		    bill: {
+					[name]: '捐赠和添加账单页面',
+			    [GET]: true
+		    },
+		    donation: {
+		    	[name]: '捐款',
+			    [GET]: true,
+			    [POST]: true
 		    }
 	    },
 	    fundBanner: {
@@ -534,9 +553,6 @@ const certificates ={
 			      add: {
 				      [GET]: true, // 同意条款
 				      [POST]: true // 申请该基金
-			      },
-			      bills: {// 基金项目的账单
-			      	[GET]: true
 			      }
 		      }
 	      },
@@ -616,15 +632,7 @@ const certificates ={
 	      me: {
         	[name]: '我的基金',
 		      [GET]: true
-	      },
-	      info: {
-        	[name]: '科创基金所有信息',
-		      [GET]: true,
-	      },
-	      bills: {
-        	[name]: '科创基金总账单',
-		      [GET]: true
-        }
+	      }
       },
 	    fundBanner: {
 		    [name]: '基金项目背景图片',
@@ -950,14 +958,6 @@ const certificates ={
 				      [GET]: true // 基金设置
 			      }
 		      }
-	      },
-	      bills: {
-		      [POST]: true,
-			      [parameter]: {
-						[GET]: '基金池账单具体信息',
-						[DELETE]: true,
-				    [PATCH]: true
-					}
 	      },
 				histories: {
         	[name]: '历史基金',

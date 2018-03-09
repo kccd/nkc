@@ -96,9 +96,10 @@
         p.redFontColor= `审核意见：${data.auditComments.projectAudit.c || '无'}`
       br
       .h3.text-center= applicationForm.project?applicationForm.project.t: '项目标题暂未填写'
-      br
-      p= applicationForm.project?applicationForm.project.abstract: '摘要暂未填写'
-      br
+      if applicationForm.fund.detailedProject
+        br
+        p= applicationForm.project?applicationForm.project.abstract: '摘要暂未填写'
+        br
       br
       if !applicationForm.project
         h4.text-center= `项目内容暂未填写`

@@ -7,10 +7,24 @@ billsRouter
 		const fundId = params.fundId.toUpperCase();
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		const page = query.page? parseInt(query.page): 0;
-		let bills = await db.FundBillModel.find({fundId}).sort({toc: 1});
+
+		let bills = await db.FundBillModel.find({$or: [
+			{
+				'from.type': 'fund',
+				'from.id': fundId
+			},
+			{
+				'to.type': 'fund',
+				'to.id': fundId
+			}
+		]}).sort({toc: 1});
 		let total = 0;
 		bills.map(b => {
-			total += b.changed;
+			if(b.from.id === fundId) {
+				total += b.money*-1;
+			} else {
+				total += b.money;
+			}
 			b.balance = total;
 		});
 		data.balance = total;
@@ -18,10 +32,12 @@ billsRouter
 		const paging = apiFn.paging(page, count);
 		bills = bills.reverse();
 		const targetBills = bills.slice(paging.start, (paging.start + paging.perpage));
-		// const bills = await db.FundBillModel.find({fundId}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(targetBills.map(async b => {
+			await b.extendFromInfo();
+			await b.extendToInfo();
 			await b.extendApplicationForm();
 			await b.extendUser();
+			await b.extendFund();
 		}));
 		data.bills = bills;
 		data.fund = fund;
@@ -38,17 +54,25 @@ billsRouter
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您不是该基金项目的财务人员，无法完成此操作。');
 		const {changed} = bill;
-		const bills = await db.FundBillModel.find({fundPool: true});
 		let total = 0;
-		if(changed <= 0) ctx.throw(400, '金额变动不能小于0元');
-		bills.map(b => {
-			total += -1*b.changed;
-		});
-		if(changed > total) ctx.throw(400, `抱歉！总基金剩余${total}元，资金不足。`);
+		if(changed === 0) ctx.throw(400, '金额变动不能小于0元');
+		if(changed > 0) { //从总基金池转入
+			const bills = await db.FundBillModel.find({fundPool: true});
+			bills.map(b => {
+				total += -1*b.changed;
+			});
+			if(changed > total) ctx.throw(400, `总资金余额不足。`);
+			bill.fundPool = true;
+		} else {
+			const bills = await db.FundBillModel.find({fundId});
+			bills.map(b => {
+				total += b.changed;
+			});
+			if(changed > total) ctx.throw(400, `该基金余额不足。`);
+		}
 		bill._id = Date.now();
 		bill.uid = user.uid;
 		bill.fundId = fundId;
-		bill.fundPool = true;
 		const newBill = db.FundBillModel(bill);
 		await newBill.save();
 		await next();

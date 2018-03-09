@@ -271,7 +271,8 @@ applicationRouter
 					applicationFormId: applicationForm._id,
 					type: 'project',
 					t: project.t,
-					abstract: project.abstract
+					abstract: project.abstract,
+					c: project.c
 				});
 				await newDocument.save();
 				updateObj.projectId = documentId;
@@ -301,6 +302,15 @@ applicationRouter
 			try{
 				applicationForm.lock.submitted = true;
 				await applicationForm.ensureInformation();
+				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+				const newReport = db.FundDocumentModel({
+					type: 'report',
+					uid: user.uid,
+					applicationFormId: applicationForm._id,
+					_id: newId,
+					c: '提交申请表'
+				});
+				await newReport.save();
 			} catch(err) {
 				ctx.throw(400, err);
 			}
@@ -335,6 +345,15 @@ applicationRouter
 		} else if(type === 'refuse') {
 			if(adminSupport) ctx.throw(400, '管理员复核已通过，无法完成彻底拒绝。');
 			applicationForm.useless = 'refuse';
+			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+			const newDocument = db.FundDocumentModel({
+				_id: newId,
+				uid: user.uid,
+				applicationFormId: applicationForm._id,
+				type: 'report',
+				c: '被彻底拒绝'
+			});
+			await newDocument.save();
 		} else {
 			ctx.throw(400, '未知的操作类型。');
 		}

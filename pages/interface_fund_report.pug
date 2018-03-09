@@ -60,11 +60,41 @@ block content
                         a(href=`/t/${t.tid}` target='_blank')= t.firstPost.t
                   div.time!= `${fromNow(applicationForm.timeOfCompleted)}&nbsp;&nbsp;&nbsp;${applicationForm.timeOfCompleted.toLocaleString()}`
                     div(style='position: absolute;')
-                  if applicationForm.useless === 'giveUp'
-                    div.content=`申请人放弃`
-                  else
-                    div.content=`完成`
-                -for(let r of data.reports)
+                  div.content=`完成`
+                -const length = data.reports.length;
+                -for(let i = 0; i < data.reports.length; i++)
+                  -const r = data.reports[i];
+                  if r.type === 'userInfoAudit'
+                    if r.support
+                      -r.c = `用户信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;
+                    else
+                      -r.c = `用户信息未通过审核，等待申请人修改。审核意见：${r.c}`;
+                  if r.type === 'projectAudit'
+                    if r.support
+                      -r.c = `项目信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;
+                    else
+                      -r.c = `项目信息未通过审核，等待申请人修改。审核意见：${r.c}`;
+                  if r.type === 'moneyAudit'
+                    -const str = applicationForm.fixedMoney?'资金用途': '资金预算';
+                    if r.support
+                      -r.c = `${str}通过审核${r.c?`。审核评语：${r.c}`: ''}`;
+                    else
+                      -r.c = `${str}未通过审核，等待申请人修改。审核意见：${r.c}`;
+                  if r.type === 'adminAudit'
+                    if r.support
+                      -r.c = `管理员复核通过，开始项目${r.c?`。审核评语：${r.c}`: ''}`;
+                    else
+                      -r.c = `管理员复核未通过，等待申请人修改。审核意见：${r.c}`;
+                  if r.type === 'completedAudit'
+                    if r.support
+                      -r.c = `结题报告审核通过${r.c?`。审核评语：${r.c}`: ''}，项目已完结`;
+                    else
+                      -r.c = `结题报告审核未通过，等待申请人修改。审核意见：${r.c}`;
+                  if r.type === 'vote'
+                    if r.support
+                      -r.c = `网友 ${r.user.username} 表示的支持${r.c?`。并说：${r.c}`: ''}`;
+                    else
+                      -r.c = `网友 ${r.user.username} 表示反对。并说：${r.c}`;
                   div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
                     div(style='position: absolute;')
                     if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
@@ -73,18 +103,14 @@ block content
                         a(href=`javascript: disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
                       else
                         a(href=`javascript: disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
-                  div.content
+                  div.content(style=i === length-1?`border: none;`:'')
                     -r.c = hideContentByUser(r.c, data.user, 'thread')
-                    div!= experimental_render(r)
-                div.time!= `${fromNow(applicationForm.timeToPassed)}&nbsp;&nbsp;&nbsp;${applicationForm.timeToPassed.toLocaleString()}`
-                  div(style='position: absolute;')
-                div.content=`开始项目`
-                div.time!= `${fromNow(applicationForm.timeToSubmit)}&nbsp;&nbsp;&nbsp;${applicationForm.timeToSubmit.toLocaleString()}`
-                  div(style='position: absolute;')
-                div.content=`提交申请表`
-                div.time!= `${fromNow(applicationForm.toc)}&nbsp;&nbsp;&nbsp;${applicationForm.toc.toLocaleString()}`
-                  div(style='position: absolute;')
-                div.content(style='border: none;')=`填写申请表`
+                    if r.support === false
+                      div.redFontColor!= experimental_render(r)
+                    else if r.support === true
+                      div.greenFontColor!= experimental_render(r)
+                    else
+                      div!= experimental_render(r)
       else if data.type === 'reportAudit'
         .col-xs-12.col-md-6
           .panel.panel-default
