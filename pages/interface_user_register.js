@@ -13,7 +13,7 @@ function error_report(str){
 function info_report(str){
   geid('error_info').innerHTML = '<strong style="color:#4169E1;">'+str+'</strong>';
   display('error_info_panel');  //下面的提示框
-  screenTopWarning(str);
+  screenTopAlert(str);
 }
 
 
@@ -33,7 +33,7 @@ function register_submit(){
       /*,
       icode:gv('icode')*/
     }
-
+		userobj.username = $.trim(userobj.username);
     if(userobj.username == ''){
       getFocus("#username")
       throw('请填写用户名！')
@@ -66,10 +66,10 @@ function register_submit(){
       getFocus("#phone")
       throw('请填写手机号码！')
     }
-    if(!(/(^[1-9]\d*$)/.test(userobj.mobile))){
+    /*if(!(/(^[1-9]\d*$)/.test(userobj.mobile))){
       getFocus("#phone")
       throw('手机号码格式不正确！')
-    }
+    }*/
     /*if(userobj.phone.length !== 11)
     {
       getFocus("#phone")
@@ -128,35 +128,40 @@ function register_submit(){
 function getMcode(){
   var phone = geid('phone').value.trim();
   var username = geid('username').value.trim();
+	username = $.trim(username);
   var password = geid('password').value.trim();
   var password2 = geid('password2').value.trim();
-  /*var icode = geid('icode').value.trim();*/
   var regCode = gv('regCode').trim();
 
-  if(username == ''){
-    getFocus("#username")
-    return error_report('请填写用户名！')
+  if(username === ''){
+    getFocus("#username");
+    return error_report('请填写用户名。')
   }
-  if(password == ''){
-    getFocus("#password")
-    return error_report('请填写密码！')
+  if(password === ''){
+    getFocus("#password");
+    return error_report('请填写密码。')
   }
-  if(password2 == ''){
-    getFocus("#password2")
-    return error_report('请再次填写密码！')
+  if(password2 === ''){
+    getFocus("#password2");
+    return error_report('请再次填写密码。')
   }
   if(password !== password2) {
-  	getFocus("#password2")
-	  return error_report('两次输入的密码不一致，请重新输入！');
+  	getFocus("#password2");
+	  return error_report('两次输入的密码不一致，请重新输入。');
   }
-  if(phone == ''){
-    getFocus("#phone")
-    return error_report('请填写手机号码！')
+  if(phone === ''){
+    getFocus("#phone");
+    return error_report('请填写手机号码。')
   }
-  if(!(/(^[1-9]\d*$)/.test(phone))){
+	var reg = /^[0-9]*$/;
+  if(!reg.test(phone)) {
+	  getFocus("#phone");
+	  return error_report('手机号码格式不正确。')
+  }
+  /*if(!(/(^[1-9]\d*$)/.test(phone))){
     getFocus("#phone")
     return error_report('手机号码格式不正确！')
-  }
+  }*/
   /*if(phone == '' || phone.length !== 11 )
   {
     getFocus("#phone")
@@ -172,9 +177,9 @@ function getMcode(){
   }
 
   else{
-    nkcAPI('/sendMessage/register','post',{mobile:phone/*, icode:icode*/, regCode: regCode, nationCode: nationCode, username: username})
-    .then(function(res){
-	    info_report('验证码发送成功!');
+    nkcAPI('/sendMessage/register','POST',{mobile:phone, regCode: regCode, nationCode: nationCode, username: username})
+    .then(function(){
+	    info_report('短信验证码发送成功。');
       var count = 120;
       var countdown = setInterval(CountDown, 1000);
       function CountDown() {
@@ -189,25 +194,14 @@ function getMcode(){
       }
     })
     .catch(function(data){
-      if(data.error == '手机验证码不正确，请检查'){
-        //refreshICode();
-        getFocus("#mcode")
+      if(['注册码无效。', '注册码已被使用。', '注册码已过期。'].indexOf(data.error) !== -1){
+        getFocus("#mcode");
       }
-     /* if(data.error.detail == '图片验证码不正确，请检查'){
-        //refreshICode();
-        getFocus("#icode")
-      }*/
-      if(data.error == '此号码已经用于其他用户注册，请检查或更换'){
-        //refreshICode()
-        getFocus("#phone")
+      if(data.error === '手机号码已被其他账号注册。'){
+        getFocus("#phone");
       }
-      if(data.error === '验证注册码失败，请检查！'){
-        //refreshICode()
-        getFocus("#regCode")
-      }
-      if(data.error === '答卷的注册码过期，可能要重新参加考试') {
-        //refreshICode();
-        getFocus('#regCode')
+      if(data.error === '用户名已被注册。'){
+        getFocus("#username");
       }
       error_report(data.error);
     })

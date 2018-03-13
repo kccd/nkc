@@ -82,9 +82,7 @@ block content
               label(for="name")
                 .h5 选择国际区号
               -var optionArray=[{num:'86',country:'中国'},{num:'852',country:'中国香港'},{num:'853',country:'中国澳门'},{num:'886',country:'中国台湾'},{num:'81',country:'日本'},{num:'82',country:'韩国'},{num:'65',country:'新加坡'},{num:'66',country:'泰国'},{num:'60',country:'马来西亚'},{num:'1',country:'美国'},{num:'1',country:'加拿大'},{num:'61',country:'澳大利亚'},{num:'44',country:'英国'},{num:'49',country:'德国'},{num:'33',country:'法国'},{num:'7',country:'俄罗斯'},{num:'91',country:'印度'},{num:'64',country:'新西兰'},{num:'39',country:'意大利'},{num:'31',country:'荷兰'},{num:'34',country:'西班牙'},{num:'46',country:'瑞典'},{num:'43',country:'奥地利'},{num:'41',country:'瑞士'},{num:'370',country:'立陶宛'},{num:'63',country:'菲律宾'},{num:'62',country:'印度尼西亚'},{num:'84',country:'越南'},{num:'971',country:'阿联酋'}];
-              select.form-control(onchange='chooseCountryNum(this.value)')
-                -for(var i = 0; i < optionArray.length; i++)
-                  option #{optionArray[i].num}&nbsp;&nbsp;#{optionArray[i].country}
+              include interface_nation_code
             .col-xs-12.col-md-4
               .form-group
                 label(for="name")
@@ -413,7 +411,7 @@ block scripts
       geid('submitSendMcode').disabled = true;
       nkcAPI('/sendMessage/bindMobile', 'post',codeObj)
       .then(function(){
-        screenTopAlert('手机短信验证码发送成功！');
+        screenTopAlert('短信验证码发送成功。');
         setTimeout(timeOut_60,1000);
       })
       .catch(function(data){

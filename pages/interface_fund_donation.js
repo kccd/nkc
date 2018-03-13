@@ -1,5 +1,6 @@
 $(function() {
 	init();
+	ensureBill();
 });
 function init() {
 	$('input[name="money"]').on('click', function() {
@@ -32,10 +33,10 @@ function submit() {
 			return screenTopWarning('请输入捐款金额。');
 		}
 		money = parseFloat(money);
-		if(money >= 0) {
-			obj.money = money.toFixed(2);
+		if(money >= 0.1) {
+			obj.money = money.toFixed(1);
 		} else {
-			return screenTopWarning('请输入正确的捐款金额。');
+			return screenTopWarning('捐款金额不能小于0.1元。');
 		}
 	} else {
 		var moneyArr = $('input[name="money"]');
@@ -62,4 +63,38 @@ function submit() {
 		.catch(function(data) {
 			screenTopWarning(data.error);
 		})
+}
+
+
+function ensureBill() {
+	var id = $('#message').attr('bid');
+	var fn = function() {
+		setTimeout(function(){
+			nkcAPI('/fund/bills/'+id, 'GET', {})
+				.then(function(data) {
+					var bill = data.bill;
+					if(bill.verify) {
+						$('#message').text('捐款成功！');
+					} else {
+						if(bill.error) {
+							$('#error').text(bill.error);
+						} else {
+							if($('#message .point').html() === '.....') {
+								$('#message .point').html('');
+							}
+							$('#message .point').html($('#message .point').html() + '.');
+							fn();
+						}
+					}
+				})
+				.catch(function(data) {
+					screenTopWarning(data.error)
+				})
+		}, 2000)
+	};
+
+	if(id) {
+		fn();
+	}
+
 }

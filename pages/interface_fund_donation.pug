@@ -7,7 +7,9 @@ block content
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     if data.alipayReturn
-      h1.greenFontColor 捐款成功！
+      h1.greenFontColor#message(bid=data.billId) 支付成功！等待系统确认
+        span.point
+      h2.redFontColor#error
     else
       h2.text-center 捐款
       br
@@ -43,11 +45,11 @@ block content
         label.radio-inline
           input(type="radio" name='anonymous' checked=true)
           h5 否
-      p 说明：这是关于捐款的说明
+      h4 捐款说明：
+      div!= markdown_safe(data.fundSettings.donationDescription)
 
       br
       button#submit.btn.btn-default(onclick='submit()') 提交
-
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_donation.js')

@@ -2,6 +2,7 @@ function submit() {
 	var obj = {
 		description: '',
 		terms: '',
+		donationDescription: '',
 		readOnly: false,
 		closed: {
 			status: false,
@@ -11,6 +12,7 @@ function submit() {
 
 	var description = $('#description').val();
 	var terms = $('#terms').val();
+	var donationDescription = $('#donationDescription').val();
 	if(!description) {
 		return screenTopWarning('请输入科创基金介绍。');
 	} else {
@@ -21,7 +23,11 @@ function submit() {
 	} else {
 		obj.terms = terms;
 	}
-
+	if(!donationDescription) {
+		return screenTopWarning('请输入科创基金捐款说明。');
+	} else {
+		obj.donationDescription = donationDescription;
+	}
 	obj.readOnly = $('input[name="readOnly"]').eq(0).is(':checked');
 	obj.closed.status = $('input[name="closed"]').eq(0).is(':checked');
 

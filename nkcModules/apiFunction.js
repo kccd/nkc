@@ -42,12 +42,12 @@ fn.sha256HMAC = (password,salt) => {
   hmac.update(password);
   return hmac.digest('hex')
 };
-fn.testPassword = (input,hashtype,storedPassword) => {
+fn.testPassword = (input,hashType,storedPassword) => {
   let pass = '';
   let hash = '';
   let salt = '';
   let hashed = '';
-  switch (hashtype) {
+  switch (hashType) {
     case 'pw9':
       pass = input;
       hash = storedPassword.hash;

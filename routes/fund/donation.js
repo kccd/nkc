@@ -5,7 +5,6 @@ directAlipay.config(params);
 const donationRouter = new Router();
 donationRouter
 	.use('/', async (ctx, next) => {
-		ctx.throw(400, '暂未开放，敬请期待。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -20,7 +19,13 @@ donationRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {money, fundId, anonymous} = body;
+		if(money >= 0.1) {
+
+		} else {
+			ctx.throw(400, '捐款金额不能小于0.1元。');
+		}
 		const {user} = data;
+		if(!anonymous && !user) ctx.throw(400, '非匿名捐款要求用户必须登陆，请登录后再试。');
 		const id = Date.now();
 		const bill = await db.FundBillModel.findOne({_id: id});
 		if(bill) ctx.throw(500, '交易编号重复，请重新提交。');
@@ -32,17 +37,9 @@ donationRouter
 			out_trade_no: id,
 			subject: `科创基金${fund?` - ${fund.name}`: ''}`,
 			body: `捐款${money}元`,
-			total_fee: money,
-			extend_param: `uid^${user?user.uid:'null'}|anonymous^${anonymous || 'false'}|fundId^${fundId || 'null'}`
+			total_fee: money
 		};
 		data.url = directAlipay.buildDirectPayURL(params);
-		/*const obj = {
-			is_success: 'T',
-			extend_param: `uid^74185|anonymous^false|fundId`,
-			out_trade_no: id
-		};
-		const queryString = require('querystring');
-		data.url = '/fund/donation/return?'+queryString.stringify(obj);*/
 		const newBill = db.FundBillModel({
 			_id: id,
 			uid: user?user.uid: '',
@@ -65,20 +62,39 @@ donationRouter
 	})
 	.get('/return', async (ctx, next) => {
 		const {data, query} = ctx;
-		const {is_success, extend_param, trade_status, out_trade_no} = query;
+		await directAlipay.verify(query);
+		const {is_success, out_trade_no} = query;
 		if(is_success !== 'T') {
-			ctx.throw(500, trade_status);
+			ctx.throw(500, '接口调用失败。');
 		}
 		data.alipayReturn = true;
-		/*const extendParamArr = extend_param.split('|');
-		const extendParams = {};
-		for(let e of extendParamArr) {
-			const arr = e.split('^');
-			extendParams[arr[0]] = arr[1];
-		}
-		data.extendParam = extendParams;*/
 		data.billId = out_trade_no;
 		ctx.template = 'interface_fund_donation.pug';
+		await next();
+	})
+	.post('/verify', async (ctx, next) => {
+		const {db, body} = ctx;
+		delete body.url;
+		delete body.method;
+		await directAlipay.verify(body);
+		const {trade_status, total_fee, trade_no, out_trade_no} = body;
+		const bill = await db.FundBillModel.findOne({_id: out_trade_no, money: parseFloat(total_fee)});
+		if(!bill) {
+			return ctx.body = 'success';
+		} else {
+			if(bill.verify) {
+				return ctx.body = 'success';
+			} else {
+				if(['TRADE_FINISHED', 'TRADE_SUCCESS'].includes(trade_status)) {
+					bill.verify = true;
+					if(!bill.notes.includes('支付宝交易号')) {
+						bill.notes += `，支付宝交易号：${trade_no}`;
+					}
+					await bill.save();
+					return ctx.body = 'success';
+				}
+			}
+		}
 		await next();
 	});
 module.exports = donationRouter;

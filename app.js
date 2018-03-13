@@ -13,7 +13,9 @@ const staticServe = path => {
 };
 const app = new Koa();
 app.on('error', err => {
-
+	if(!['read ECONNRESET', 'write ECONNABORTED'].includes(err.message)) {
+		console.log(err);
+	}
 });
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');

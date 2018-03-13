@@ -278,6 +278,9 @@ const certificates ={
 			    [POST]: true,
 			    return: {
 		    		[GET]: true
+			    },
+			    verify: {
+		    		[POST]: true
 			    }
 		    }
 	    },
