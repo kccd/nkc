@@ -35,7 +35,7 @@ forgotPasswordRouter
   data.nationCode = nationCode;
   await next();
 })
-.put('/mobile', async (ctx, next) => {
+.patch('/mobile', async (ctx, next) => {
   const {db} = ctx;
   const {password, mcode, mobile, nationCode} = ctx.body;
   if(!password) ctx.throw(400, '密码不能为空！');

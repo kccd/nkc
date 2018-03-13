@@ -40,6 +40,10 @@ const settingSchema = new Schema({
 	},
 	terms: String,
 	money: Number,
+	donationDescription: {
+  	type: String,
+		default: ''
+	},
 	closed: {
   	status: Boolean,
 		reason: String,

@@ -94,6 +94,10 @@ const userSchema = new Schema({
 userSchema.pre('save', function(next) {
   try {
   	this.usernameLowerCase = this.username;
+  	const index = this.certs.indexOf('scholar');
+  	if(index !== -1) {
+  		this.certs.splice(index, 1);
+	  }
     return next()
   } catch(e) {
     return next(e)
@@ -208,12 +212,12 @@ userSchema.methods.updateUserMessage = async function() {
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
   let cs = ['会员'];
+  if(xsf > 0 && !certs.includes('scholar')) {
+  	certs.push('scholar');
+  }
   for(const cert of certs) {
   	if(cert)
       cs.push(certificates[cert].displayName);
-  }
-  if(xsf > 0) {
-  	cs.push('学者');
   }
   cs = cs.join(' ');
   if(certs.includes('banned')){
@@ -245,5 +249,65 @@ userSchema.pre('save', async function(next) {
     return next(e)
   }
 });
+
+userSchema.statics.createUser = async (userObj) => {
+	const SettingModel = mongoose.model('settings');
+	const toc = Date.now();
+	const uid = await SettingModel.operateSystemID('users', 1);
+	userObj.uid = uid;
+	userObj.toc = toc;
+	userObj.tlv = toc;
+	userObj.tlm = toc;
+	userObj.moderators = [uid];
+	userObj.certs = [];
+	if(userObj.mobile) userObj.certs.push('mobile');
+	if(userObj.email) userObj.certs.push('email');
+	if(!userObj.isA) userObj.certs.push('examinated');
+	if(typeof(userObj.password) === 'string') {
+		const {newPasswordObject} = require('../nkcModules/apiFunction');
+		const passwordObj = newPasswordObject(userObj.password);
+		userObj.password = passwordObj.password;
+		userObj.hashType = passwordObj.hashType;
+	}
+	userObj.newMessage = {
+		messages: 0,
+		at: 0,
+		replies: 0,
+		system: 0
+	};
+	userObj.abbr = userObj.username.slice(0,6);
+	userObj.displayName = userObj.username + '的专栏';
+	userObj.descriptionOfForum = userObj.username + '的专栏';
+	const UserModel = mongoose.model('users');
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const UsersSubscribeModel = mongoose.model('usersSubscribe');
+	const PersonalForumModel = mongoose.model('personalForums');
+	const SmsModel = mongoose.model('sms');
+	const user = UserModel(userObj);
+	const userPersonal = UsersPersonalModel(userObj);
+	const userSubscribe = UsersSubscribeModel(userObj);
+	const personalForum = PersonalForumModel(userObj);
+	try {
+		await user.save();
+		await userPersonal.save();
+		await userSubscribe.save();
+		await personalForum.save();
+		const allSystemMessages = await SmsModel.find({fromSystem: true});
+		for(let sms of allSystemMessages) {
+			const viewedUsers = sms.viewedUsers;
+			viewedUsers.push(uid);
+			await sms.update({viewedUsers});
+		}
+	} catch (error) {
+		await UserModel.remove({uid});
+		await UsersPersonalModel.remove({uid});
+		await UsersSubscribeModel.remove({uid});
+		await PersonalForumModel.remove({uid});
+		const err = new Error(`新建用户出错: ${error}`);
+		err.status = 500;
+		throw err;
+	}
+	return user;
+};
 
 module.exports = mongoose.model('users', userSchema);

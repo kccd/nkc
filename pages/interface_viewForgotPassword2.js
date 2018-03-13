@@ -53,19 +53,19 @@ function submit(){
       throw({detail:'请填写手机号码！'})
       return;
     }
-    if(userobj.mobile.length < 11){
+    /*if(userobj.mobile.length < 11){
       //refreshICode();
       getFocus("#phone")
       throw({detail:'手机号码格式不正确！'})
       return;
-    }
+    }*/
     if(userobj.mcode == ''){
       //refreshICode();
       getFocus("#mcode")
       throw({detail:'请填写手机验证码！'})
       return;
     }
-    return nkcAPI('/forgotPassword/mobile', 'post', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode, nationCode: nationCode});
+    return nkcAPI('/forgotPassword/mobile', 'POST', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode, nationCode: nationCode});
   })
     .then(function(data){
       window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode+'&nationCode='+data.nationCode;
@@ -85,9 +85,17 @@ function submit2(){
 	var nationCode = $('#nationCode').val();
   return Promise.resolve()
   .then(function(){
-    if(!mobile.match(/^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/)) {
+  	if(mobile === '') {
+  		throw '请填写手机号码。';
+	  }
+	  var reg = /^[0-9]*$/;
+	  if(!reg.test(mobile)) {
+		  getFocus("#phone2");
+		  return error_report('手机号码格式不正确。')
+	  }
+    /*if(!mobile.match(/^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/)) {
       throw ('非法的手机号码')
-    }
+    }*/
     if(password == ''){
       getFocus("#password")
       throw('请填写密码！')
@@ -108,7 +116,7 @@ function submit2(){
       throw('两遍密码不一致')
       return;
     }
-    return nkcAPI('/forgotPassword/mobile', 'put',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
+    return nkcAPI('/forgotPassword/mobile', 'PATCH',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
   })
   .then(function(res){
     info_report2('修改密码成功！5s后跳转到登录页面')
@@ -131,14 +139,18 @@ function getMcode(){
 
   if(username == ''){
     getFocus("#username")
-    return error_report('请填写用户名！')
+    return error_report('请填写用户名。')
   }
-  if(phone == '' || phone.length < 11 ||
+  if(phone === '') {
+	  getFocus("#phone")
+	  return error_report('请填写手机号码。')
+  }
+  /*if(phone == '' || phone.length < 11 ||
   !phone.match(/^0?(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$/))
   {
     getFocus("#phone")
     return error_report('手机号码为空或者格式不正确！')
-  }
+  }*/
   /*if(icode == ''){
     getFocus("#icode")
     return error_report('请填写图片验证码！')

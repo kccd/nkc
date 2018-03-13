@@ -37,7 +37,10 @@ table.table.table-bordered
         th= b._id
         th= b.abstract
         th
-          a(href=`/m/${b.user.uid}`)= b.user.username
+          if(b.user)
+            a(href=`/m/${b.user.uid}`)= b.user.username
+          else
+            span 系统
         +loadInfo(b.fromInfo)
         +loadInfo(b.toInfo)
         th= b.money.toFixed(1)

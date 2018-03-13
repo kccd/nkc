@@ -75,6 +75,10 @@ const fundBillSchema = new Schema({
 		type: Boolean,
 		default: true,
 		index: 1
+	},
+	error: {
+		type: String,
+		default: null,
 	}
 }, {
 	collection: 'fundBills',

@@ -83,13 +83,15 @@ billsRouter
 				if(!toFund) ctx.throw(400, '请选择正确的基金项目。');
 			}
 			if(to.type === 'other') {
-				if(!to.id) ctx.throw(400, '请输入其他用途。');
+				if(!to.id) ctx.throw(400, '请输入资金用途。');
 			}
 			const total = await db.FundBillModel.getBalance('fund', from.id);
 			if(total < money) ctx.throw(400, '余额不足。');
 		} else if(from.type === 'fundPool') {
 			const total = await db.FundBillModel.getBalance('fundPool');
 			if(total < money) ctx.throw(400, '余额不足。');
+		} else if(from.type === 'other') {
+			if(!from.id) ctx.throw(400, '请输入资金来源。')
 		} else {
 			ctx.throw(400, '未知的操作类型。');
 		}

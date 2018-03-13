@@ -15,6 +15,16 @@ module.exports = async (ctx, next) => {
       return redirect('/login')
     }
     await user.update({tlv: Date.now()});
+    if(user.xsf > 0) {
+    	if(!user.certs.includes('scholar')) {
+    		user.certs.push('scholar');
+	    }
+    } else {
+    	const index = user.certs.indexOf('scholar');
+    	if(index !== -1) {
+    		user.certs.splice(index, 1);
+	    }
+    }
     if(user.certs.includes('banned')) user.certs = ['banned'];
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;

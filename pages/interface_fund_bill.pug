@@ -32,11 +32,11 @@ block content
             label.radio-inline
               input(type="radio" name='from' checked=(data.bill && data.bill.from.type === 'fundPool'))
               h5 资金池
-            //label.radio-inline
-            //  input(type="radio" name='from' checked=(data.bill && data.bill.from.type === 'other'))
-            //  h5 其他
-            //#fromOther(style='display: none;')
-            //  input.form-control#fromOtherInfo(type='text' value=data.bill && data.bill.from.type === 'other' ? data.bill.from.id : '' placeholder='其他途径')
+            label.radio-inline
+              input(type="radio" name='from' checked=(data.bill && data.bill.from.type === 'other'))
+              h5 其他
+            #fromOther(style='display: none;')
+              input.form-control#fromOtherInfo(type='text' value=data.bill && data.bill.from.type === 'other' ? data.bill.from.id : '' placeholder='其他途径')
             #fromUser(style=!data.bill || data.bill.from.type === 'user'? '': 'display: none;')
               .row
                 .col-xs-12.col-md-12

@@ -45,7 +45,32 @@ const answerSheetsSchema = new Schema({
     type: String,
     default: ''
   }
+}, {
+	collection: 'answerSheets'
 });
+
+answerSheetsSchema.statics.ensureAnswerSheet = async (key) => {
+	const AnswerSheetModel = mongoose.model('answerSheets');
+	const answerSheet = await AnswerSheetModel.findOne({key});
+	if(!answerSheet) {
+		const err = new Error('注册码无效。');
+		err.status = 400;
+		throw err;
+	}
+	if(answerSheet.uid) {
+		const err = new Error('注册码已被使用。');
+		err.status = 400;
+		throw err;
+	}
+	const {timeBeforeRegister} = require('../settings/exam');
+	if(answerSheet.toc < (Date.now() - timeBeforeRegister)) {
+		const err = new Error('注册码已过期。');
+		err.status = 400;
+		throw err;
+	}
+	return answerSheet;
+};
+
 answerSheetsSchema.pre('save', function(next) {
   try {
     let num = 0;

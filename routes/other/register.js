@@ -8,62 +8,68 @@ const checkString = require('../../tools/checkString');
 const registerRouter = new Router();
 registerRouter
   .get(['/','/mobile'], async (ctx, next) => {
-    let code = ctx.query.code;
-    if(code) {
-      ctx.data.regCode = code;
-    }
-    ctx.data.getCode = false;
-
-    ctx.template = 'interface_user_register.pug';
-    await next();
+  	const {data, query} = ctx;
+		const {code} = query;
+		if(code) {
+			data.regCode = code;
+		}
+		data.getCode = false;
+		ctx.template = 'interface_user_register.pug';
+		await next();
   })
-  // 手机注册
-  .post('/mobile', async (ctx, next) => {
-    let db = ctx.db;
-    let params = ctx.body;
-    let userObj = {
-      username:params.username.trim(),
-      password:params.password,
-      regCode: params.regCode,
-      mobile:params.mobile,
-	    nationCode: params.nationCode,
-      regIP: ctx.address,
-      regPort: ctx.port,
-      mcode:params.mcode,
-      isA: false
-    };
-    const regCode = params.regCode;
-    let regCodeFoDB = {};
-    try{
-      regCodeFoDB = await dbFn.checkRegisterCode(regCode);
-    }catch (err) {
-      ctx.throw('404', err);
-    }
-    userObj.isA = regCodeFoDB.isA;
-    if(checkString.contentLength(userObj.username) > 30) ctx.throw(400, '用于名不能大于30字节(ASCII)');
-    if(checkString.contentLength(userObj.password) < 8) ctx.throw(400, '密码长度至少要大于8位');
-    if(!checkString.checkPass(userObj.password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
-    let usernameOfDBNumber = await dbFn.checkUsername(userObj.username);
-    if(usernameOfDBNumber !== 0) ctx.throw(400, '用户名已存在，请更换用户名再试！');
-    let mobileCodesNumber = await dbFn.checkMobile(userObj.nationCode, userObj.mobile);
-    if(mobileCodesNumber > 0) ctx.throw(400, '此号码已经用于其他用户注册，请检查或更换');
-    let smsCode = await dbFn.checkMobileCode(userObj.nationCode, userObj.mobile, userObj.mcode);
-    if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
-    await smsCode.update({used: true});
-    let newUser = await dbFn.createUser(userObj);
-    await dbFn.useRegCode(userObj.regCode, newUser.uid);
-    await next();
+  .post('/mobile', async (ctx, next) => { // 手机注册
+	  const {db, body} = ctx;
+		const {username, password, regCode, mobile, mcode, nationCode} = body;
+		const regIP = ctx.address;
+		const regPort = ctx.port;
+		if(!regCode) ctx.throw(400, '请输入注册码。');
+		const answerSheet = await db.AnswerSheetModel.ensureAnswerSheet(regCode);
+		const isA = answerSheet.isA;
+		if(!username) ctx.throw(400, '请输入用户名。');
+	  const {contentLength, checkPass} = ctx.tools.checkString;
+	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
+		const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+		if(user) ctx.throw(400, '用户名已被注册。');
+		if(!password) ctx.throw(400, '请输入密码。');
+		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
+		if(!nationCode) ctx.throw(400, '请输入国际区号。');
+		if(!nationCode) ctx.throw(400, '请输入手机号码。');
+		const userPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
+		if(userPersonal) ctx.throw(400, '手机号码已被其他账号注册。');
+		const type = 'register';
+		const smsCodeObj = {
+			nationCode,
+			mobile,
+			type,
+			code: mcode
+		};
+		const smsCode = await db.SmsCodeModel.ensureCode(smsCodeObj);
+		const userObj = {
+			username,
+			password,
+			mobile,
+			nationCode,
+			regIP,
+			regPort,
+			isA
+		};
+		const newUser = await db.UserModel.createUser(userObj);
+	  smsCode.used = true;
+	  await smsCode.save();
+		answerSheet.uid = newUser.uid;
+		await answerSheet.save();
+		await next();
   })
   .get('/email', async (ctx, next) => {
-    let code = ctx.query.code;
+  	const {data, query} = ctx;
+  	const {code} = query;
     if(code) {
-      ctx.data.regCode = code;
+      data.regCode = code;
     }
     ctx.template = 'interface_user_register2.pug';
     await next();
   })
-  // 邮箱注册
-  .post('/email', async (ctx, next) => {
+  .post('/email', async (ctx, next) => { // 邮箱注册
     let db = ctx.db;
     let params = ctx.body;
     let userObj = {
