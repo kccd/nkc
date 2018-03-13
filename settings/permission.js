@@ -279,7 +279,9 @@ const certificates ={
 			    return: {
 		    		[GET]: true
 			    },
-			    veri
+			    verify: {
+		    		[POST]: true
+			    }
 		    }
 	    },
 	    fundBanner: {
