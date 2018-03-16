@@ -56,6 +56,10 @@ applicationRouter
 			if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
 		}
 		await applicationForm.extendFund();
+		const {fund, budgetMoney} = applicationForm;
+		if(fund.history && ctx.method !== 'GET') {
+			ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
+		}
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
 		await applicationForm.extendProject();
@@ -64,7 +68,6 @@ applicationRouter
 		}
 		await applicationForm.extendThreads();
 		await applicationForm.extendForum();
-		const {fund, budgetMoney} = applicationForm;
 		if(fund.money.fixed) {
 			applicationForm.money = fund.money.fixed;
 			applicationForm.factMoney = fund.money.fixed;
@@ -80,15 +83,6 @@ applicationRouter
 			applicationForm.money = money;
 			applicationForm.factMoney = factMoney;
 		}
-		/*const {user} = data;
-		const {applicant} = applicationForm;
-		// 信息过滤
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) {
-			applicant.idCardNumber = null;
-			applicant.mobile = null;
-			applicationForm.account.paymentType = null;
-			applicationForm.account.number = null;
-		}*/
 		data.applicationForm = applicationForm;
 		data.fund = applicationForm.fund;
 		await next();

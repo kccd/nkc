@@ -62,7 +62,9 @@ block content
             br
             .panel.panel-default
               .panel-body.fund-preconditions
-                if !data.user
+                if data.fund.history
+                  h3.text-center 历史基金，不再接受新申请
+                else if !data.user
                   h3.text-center 未登录用户不能申请
                 else
                   h3 申请条件

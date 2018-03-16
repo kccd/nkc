@@ -25,7 +25,7 @@ function error_report2(str){
 function info_report2(str){
   geid('error_info2').innerHTML = '<strong style="color:#4169E1;">'+str+'</strong>';
   display('error_info_panel2');  //下面的提示框
-  screenTopWarning(str);
+  screenTopAlert(str);
 }
 
 
@@ -45,24 +45,24 @@ function submit(){
 
     if(userobj.username == ''){
       getFocus("#username")
-      throw({detail:'请填写用户名！'})
+      throw({error:'请填写用户名！'})
       return
     }
     if(userobj.mobile == ''){
       getFocus("#phone")
-      throw({detail:'请填写手机号码！'})
+      throw({error:'请填写手机号码！'})
       return;
     }
     /*if(userobj.mobile.length < 11){
       //refreshICode();
       getFocus("#phone")
-      throw({detail:'手机号码格式不正确！'})
+      throw({error:'手机号码格式不正确！'})
       return;
     }*/
     if(userobj.mcode == ''){
       //refreshICode();
       getFocus("#mcode")
-      throw({detail:'请填写手机验证码！'})
+      throw({error:'请填写手机验证码！'})
       return;
     }
     return nkcAPI('/forgotPassword/mobile', 'POST', {username: userobj.username, mobile: userobj.mobile, mcode: userobj.mcode, nationCode: nationCode});
@@ -86,7 +86,7 @@ function submit2(){
   return Promise.resolve()
   .then(function(){
   	if(mobile === '') {
-  		throw '请填写手机号码。';
+  		throw {error: '请填写手机号码。'};
 	  }
 	  var reg = /^[0-9]*$/;
 	  if(!reg.test(mobile)) {
@@ -97,23 +97,23 @@ function submit2(){
       throw ('非法的手机号码')
     }*/
     if(password == ''){
-      getFocus("#password")
-      throw('请填写密码！')
+      getFocus("#password");
+      throw {error: '请填写密码。'};
       return;
     }
     if(password.length < 8){
-      getFocus("#password")
-      throw('密码长度要大于8位！')
+      getFocus("#password");
+      throw {error: '密码长度要大于8位。'};
       return;
     }
     if(checkPass(password) < 2){
-      getFocus("#password")
-      throw('密码要具有数字、字母和符号三者中的至少两者')
+      getFocus("#password");
+      throw {error: '密码要具有数字、字母和符号三者中的至少两者。'};
       return;
     }
     if(password != password2){
       getFocus("#password2")
-      throw('两遍密码不一致')
+      throw {error: '两遍密码不一致。'};
       return;
     }
     return nkcAPI('/forgotPassword/mobile', 'PATCH',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
@@ -173,10 +173,10 @@ function getMcode(){
       }
     })
     .catch(function(data){
-      // if(err.detail === '没有找到该手机号码，请检查') {
+      // if(data.error === '没有找到该手机号码，请检查') {
       //   ////refreshICode3();
       // }
-      // else if(err.detail === '用户名和手机号码不对应，请检查') {
+      // else if(data.error === '用户名和手机号码不对应，请检查') {
       //   ////refreshICode3();
       // }
       error_report(data.error);

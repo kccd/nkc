@@ -8,18 +8,10 @@ block content
     include interface_fund_nav
     .row
       .col-xs-12.col-md-12
-        h1.text-center 科创基金
         .row
           -for (let fund of data.funds)
             -const {id, name, color, money} = fund;
-            .col-xs-6.col-sm-4.col-md-3.fund-list
-              a(href=`/fund/list/${id.toLowerCase()}`)
-                .fund-name(style=`background-color: ${color};background-image:${fund && fund.image && fund.image.logo ? `url(/fundLogo/${fund.image.logo})` : ''}`)
-                  div= name
-                  if fund.money.fixed
-                    .fund-money!= `定额${money.fixed}元`
-                  else
-                    .fund-money!= `单笔最高${money.max}元`
+            include interface_fund_singlefund
         hr
         .row
           .col-xs-12.col-md-12

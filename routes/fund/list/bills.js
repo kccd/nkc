@@ -32,7 +32,12 @@ billsRouter
 		const paging = apiFn.paging(page, count);
 		bills = bills.reverse();
 		const targetBills = bills.slice(paging.start, (paging.start + paging.perpage));
+
+		const isAdmin = data.userLevel >= 7;
+
 		await Promise.all(targetBills.map(async b => {
+			if(!isAdmin) {
+			}
 			await b.extendFromInfo();
 			await b.extendToInfo();
 			await b.extendApplicationForm();

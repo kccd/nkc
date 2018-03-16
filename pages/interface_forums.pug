@@ -9,11 +9,11 @@ block title
   meta(property='og:description' content='华语世界最优秀的极客和创客社群，我们的宗旨是：发展科技爱好，倡导科学理性。Since 2001.')
 
   title #{data.site.name} - #{data.site.description}
-
+  -const mainContainer1400 = true
 block content
-  .container
+  .container-fluid(style='max-width: 1400px;')
     .row
-      .col-md-8.col-md-offset-2
+      .col-md-8
         .panel
           //div.hidden-sm.hidden-md.hidden-lg
           //  span(style='color: silver;') 学院&nbsp;&nbsp;&nbsp;

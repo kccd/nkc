@@ -13,7 +13,7 @@ const staticServe = path => {
 };
 const app = new Koa();
 app.on('error', err => {
-	if(!['read ECONNRESET', 'write ECONNABORTED'].includes(err.message)) {
+	if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED'].includes(err.message)) {
 		console.log(err);
 	}
 });
