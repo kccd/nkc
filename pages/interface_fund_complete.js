@@ -1,6 +1,6 @@
 var selectedThreads = [];
 var usedMoney = [];
-
+var applicationFormId = parseInt($('#applicationFormId').text());
 $(function(){
 	init();
 	initNumber();

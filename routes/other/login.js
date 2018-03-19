@@ -1,6 +1,13 @@
 const Router = require('koa-router');
 const loginRouter = new Router();
 loginRouter
+	.use('/', async (ctx, next) => {
+		const {user} = ctx.data;
+		if(user) {
+			return ctx.redirect('/');
+		}
+		await next();
+	})
   .get('/', async (ctx, next) => {
     ctx.template = 'interface_user_login.pug';
     await next();

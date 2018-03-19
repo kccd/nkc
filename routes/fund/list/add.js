@@ -8,6 +8,7 @@ addRouter
 		const {fundId} = ctx.params;
 		const fund = await db.FundModel.findOne({_id: fundId.toUpperCase(), canApply: true});
 		if(!fund) ctx.throw(400, '抱歉！该基金项目暂不能申请。');
+		if(fund.history) ctx.throw(400, '抱歉！该基金项目已被设置为历史基金，不在接受新申请。');
 		try {
 			await fund.ensureUserPermission(user);
 		} catch(e) {

@@ -9,6 +9,7 @@ const settingsRouter = require('./settings');
 const billsRouter = require('./bills');
 const billRouter = require('./bill');
 const donationRouter = require('./donation');
+const historyRouter = require('./history');
 fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
@@ -132,7 +133,7 @@ fundRouter
 		  }
 	  }));
 		data.home = true;
-    data.funds = await db.FundModel.find({display: true, disabled: false}).sort({toc: 1});
+    data.funds = await db.FundModel.find({display: true, disabled: false, history: false}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';
     await next();
   })
@@ -160,5 +161,6 @@ fundRouter
 	.use('/bills', billsRouter.routes(), billsRouter.allowedMethods())
 	.use('/bill', billRouter.routes(), billRouter.allowedMethods())
 	.use('/donation', donationRouter.routes(), donationRouter.allowedMethods())
+	.use('/history', historyRouter.routes(), historyRouter.allowedMethods())
 	.use('/disabled', disabledRouter.routes(), disabledRouter.allowedMethods());
 module.exports = fundRouter;

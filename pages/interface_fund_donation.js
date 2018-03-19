@@ -58,7 +58,7 @@ function submit() {
 	}
 	nkcAPI('/fund/donation', 'POST', obj)
 		.then(function(data) {
-			window.location.href = data.url;
+			window.open(data.url);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

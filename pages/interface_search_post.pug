@@ -9,7 +9,7 @@
       span
         a(href=`/m/${user.uid}`)= user.username
       span.new-content-forumAbbr(style=`background-color:${forum.color};`)
-        a(href=`/f/${forum.fid}`)= forum.abbr
+        a(href=`/f/${forum.fid}` style='color: #fff;padding: 0 0.5rem;')= forum.abbr
       span.icon-font=fromNow(toc)
     if(t)
       .new-content-title

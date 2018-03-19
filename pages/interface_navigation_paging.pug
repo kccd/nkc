@@ -26,7 +26,7 @@ if paging
     ul.pagination.NavigationPaging
       if start>0
         li()
-          a(href=`${toQueryString({page:0,cat,digest,sortby,tab, content})}`) 始
+          a(href=`${toQueryString({page:0,cat,digest,sortby,tab, content, type, q})}`) 始
     
       each pagenum,index in pagingarray
         - var class_str = pagenum==paging.page?'active':''

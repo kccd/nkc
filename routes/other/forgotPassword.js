@@ -1,112 +1,131 @@
 const Router = require('koa-router');
-const nkcModules = require('../../nkcModules');
-const settings = require('../../settings');
-const dbFn = nkcModules.dbFunction;
-const apiFn = nkcModules.apiFunction;
 const forgotPasswordRouter = new Router();
 forgotPasswordRouter
+	.use('/', async (ctx, next) => {
+		const {user} = ctx.data;
+		if(user) {
+			return ctx.redirect('/');
+		}
+		await next();
+	})
   // 手机找回密码页面
 .get(['/mobile', '/'], async (ctx, next) => {
-  const {data} = ctx;
-  const {mobile, mcode, nationCode} = ctx.query;
-  data.mobile = mobile;
-  data.mcode = mcode;
-  data.nationCode = nationCode;
-  ctx.template = 'interface_viewForgotPassword2.pug';
-  await next();
+	const {data, query} = ctx;
+	const {mobile, mcode, nationCode} = query;
+	data.mobile = mobile;
+	data.mcode = mcode;
+	data.nationCode = nationCode;
+	ctx.template = 'interface_viewForgotPassword2.pug';
+	await next();
 })
 .post('/mobile', async (ctx, next) => {
-  const {db, data} = ctx;
-  const {username, mcode, mobile, nationCode} = ctx.body;
-  if(!username) ctx.throw(400, '用户名不能为空！');
-  if(!nationCode) ctx.throw(400, '国际区号不能为空！');
-  if(!mobile) ctx.throw(400, '电话号码不能为空！');
-  if(!mcode) ctx.throw(400, '手机验证码不能为空！');
-  const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
-  if(!user) ctx.throw(400, `用户名不存在，请重新输入`);
-  const userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-  if(!userPersonal.mobile) ctx.throw(400, '账号未绑定手机号，请通过其他方式找回密码');
-  if(mobile !== userPersonal.mobile) ctx.throw(400, '账号与手机号无法对应，请重新输入');
-  if(nationCode !== userPersonal.nationCode) ctx.throw(400, '国际区号不匹配');
-  const smsCode = await dbFn.checkMobileCode(nationCode, mobile, mcode);
-  if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
-  data.mobile = mobile;
-  data.mcode = mcode;
-  data.nationCode = nationCode;
-  await next();
+	const {data, db, body} = ctx;
+	const {username, mcode, mobile, nationCode} = body;
+	if(!username) ctx.throw(400, '请输入用户名。');
+	const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+	if(!user) ctx.throw(400, '用户名不存在。');
+	const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+	if(!userPersonal.mobile) ctx.throw(400, '此账号未绑定手机号码。');
+	if(!nationCode) ctx.throw(400, '请输入国际区号。');
+	if(!mobile) ctx.throw(400, '请输入手机号码。');
+	if(nationCode !== userPersonal.nationCode || mobile !== userPersonal.mobile) {
+		ctx.throw(400, '账号与手机号码无法对应。');
+	}
+	if(!mcode) ctx.throw(400, '请输入短信验证码。');
+	const type = 'getback';
+	await db.SmsCodeModel.ensureCode({nationCode, mobile, type, code: mcode});
+	data.mobile = mobile;
+	data.mcode = mcode;
+	data.nationCode = nationCode;
+	await next();
 })
 .patch('/mobile', async (ctx, next) => {
-  const {db} = ctx;
-  const {password, mcode, mobile, nationCode} = ctx.body;
-  if(!password) ctx.throw(400, '密码不能为空！');
-  if(password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
-  if(!apiFn.checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
-  if(!mobile) ctx.throw(400, '电话号码不能为空！');
-  if(!nationCode) ctx.throw(400, '国际区号不能为空！');
-  if(!mcode) ctx.throw(400, '手机验证码不能为空！');
-  const smsCode = await dbFn.checkMobileCode(nationCode, mobile, mcode);
-  if(!smsCode) ctx.throw(400, '手机验证码错误或过期，请检查');
-  await smsCode.update({used: true});
-  const passwordAndType = apiFn.newPasswordObject(password);
-  await db.UsersPersonalModel.replaceOne({mobile: mobile, nationCode: nationCode}, {$set: {password: passwordAndType.password, hashType: passwordAndType.hashType}});
-  await next();
+	const {db, body} = ctx;
+	const {password, mcode, mobile, nationCode} = body;
+	if(!mobile || !nationCode || !mcode) ctx.throw(400, '参数错误，请刷新页面后重新提交。');
+	const type = 'getback';
+	const smsCode = await db.SmsCodeModel.ensureCode({nationCode, mobile, code: mcode, type});
+	if(!password) ctx.throw(400, '请输入密码。');
+	const {contentLength, checkPass} = ctx.tools.checkString;
+	if(contentLength(password) <= 8) ctx.throw(400, '密码长度至少要大于8位。');
+	if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
+	const {apiFunction} = ctx.nkcModules;
+	const passwordObj = apiFunction.newPasswordObject(password);
+	const userPersonal = await db.UsersPersonalModel.findOnly({mobile, nationCode});
+	userPersonal.password = passwordObj.password;
+	userPersonal.hashType = passwordObj.hashType;
+	smsCode.used = true;
+	await userPersonal.save();
+	await smsCode.save();
+	await next();
 })
 .get('/email', async (ctx, next) => {
-  const {data} = ctx;
-  const {sent, email, token} = ctx.query;
-  data.sent = sent;
-  data.token = token;
-  data.email = email;
-  data.token = token;
-  ctx.template = 'interface_viewForgotPassword.pug';
-  await next();
+	const {db, data, query} = ctx;
+	const {sent, email, token} = query;
+	if(email && token) {
+		const type = 'getback';
+		await db.EmailCodeModel.ensureEmailCode({email, token, type});
+	}
+	data.sent = sent;
+	data.token = token;
+	data.email = email;
+	ctx.template = 'interface_viewForgotPassword.pug';
+	await next();
 })
 .post('/email', async (ctx, next) => {
-  const {data, db} = ctx;
-  const {username, email} = ctx.body;
-  if(!username) ctx.throw(400, '用户名不能为空！');
-  if(!email) ctx.throw(400, '邮箱地址不能为空！');
-  const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
-  if(!user) ctx.throw(400, '用户名不存在，请重新输入');
-  const userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-  if(!userPersonal.email) ctx.throw(400, '账号未绑定邮箱，请通过其他方式找回密码');
-  if(email !== userPersonal.email) ctx.throw(400, '账号与邮箱地址无法对应，请重新输入');
-  const emailCountOfDB = await dbFn.checkNumberOfSendEmailReset(email);
-  if(emailCountOfDB >= settings.sendMessage.sendEmailCount) ctx.throw('404', '邮件发送次数已达上限，请隔天再试');
-  const token = Math.floor((Math.random()*(65536*65536))).toString(16);
-  const emailCode = new db.EmailCodeModel({
-    email: email,
-    token: token,
-    uid: user.uid
-  });
-  await emailCode.save();
-  const text = `有人在 ${(new Date).toLocaleString()} 请求重置账户密码。如果这不是你的操作，请忽略。 `;
-  const href = `http://www.kechuang.org/forgotPassword/email?email=${email}&token=${token}`;
-  const link = `<a href="${href}">${href}</a>`;
-  await nkcModules.sendEmail({
-    to: email,
-    subject: '请求重置密码',
-    text: text + href,
-    html: text + link,
-  });
-  data.message = '邮件发送成功，请查收';
-  await next();
+	const {db, body} = ctx;
+	const {username, email} = body;
+	if(!username) ctx.throw(400, '请输入用户名。');
+	const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+	if(!user) ctx.throw(400, '用户名不存在。');
+	const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+	if(!userPersonal.email) ctx.throw(400, '账号未绑定邮箱，请通过其他方式找回密码。');
+	if(email !== userPersonal.email) ctx.throw(400, '账号与邮箱地址无法对应。');
+	const type = 'getback';
+	await db.EmailCodeModel.ensureSendPermission({email, type});
+	const token = Math.floor((Math.random()*(65536*65536))).toString(16);
+	const emailCode = db.EmailCodeModel({
+		email,
+		token,
+		type,
+		uid: user.uid
+	});
+	await emailCode.save();
+	const text = `有人在 ${(new Date()).toLocaleString()} 请求重置账户密码。如果不是你的操作，请忽略。`;
+	const href = `https://www.kechuang.org/forgotPassword/email?email=${email}&token=${token}`;
+	const link = `<a href="${href}">${href}</a>`;
+	const {sendEmail} = ctx.nkcModules;
+	await sendEmail({
+		to: email,
+		subject: `请求重置密码`,
+		text: text + href,
+		html: text + link
+	});
+	await next();
 })
-.put('/email', async (ctx, next) => {
-  const {db} = ctx;
-  const {email, password, password2, token} = ctx.body;
-  if(password !== password2) ctx.throw(400, '两次输入的密码不一致，请重新输入');
-  if(!email) ctx.throw(400, '邮箱地址不能为空！');
-  if(!token) ctx.throw(400, 'token不能为空！');
-  if(!password) ctx.throw(400, '新密码不能为空！');
-  if(password.length <= 8) ctx.throw(400, '密码长度至少要大于8位');
-  if(!apiFn.checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者！');
-  const time = Date.now() - settings.sendMessage.emailCodeTime;
-  const emailCode = await db.EmailCodeModel.findOne({used: false, email: email, token: token, toc: {$gt: time}});
-  if(!emailCode) ctx.throw(400, '邮件已失效，请尝试重新发送邮件');
-  const passwordAndType = apiFn.newPasswordObject(password);
-  await db.UsersPersonalModel.replaceOne({email: email}, {$set: {password: passwordAndType.password, hashType: passwordAndType.hashType}});
-  await db.EmailCodeModel.replaceOne({used: false, email: email, token: token}, {$set: {used: true}});
-  await next();
+.patch('/email', async (ctx, next) => {
+	const {db, body} = ctx;
+	const {email, password, password2, token} = body;
+	if(!email || !token) ctx.throw(400, '参数错误，请刷新页面后重新提交。');
+	const type = 'getback';
+	const emailCode = await db.EmailCodeModel.ensureEmailCode({
+		type,
+		email,
+		token
+	});
+	if(!password) ctx.throw(400, '请输入密码。');
+	if(password !== password2) ctx.throw(400, '两次输入的密码不一致，请重新输入。');
+	const {checkPass, contentLength} = ctx.tools.checkString;
+	if(contentLength(password) <= 8) ctx.throw(400, '密码长度至少要大于8位。');
+	if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
+	const {apiFunction} = ctx.nkcModules;
+	const passwordObj = apiFunction.newPasswordObject(password);
+	const userPersonal = await db.UsersPersonalModel.findOnly({email});
+	userPersonal.password = passwordObj.password;
+	userPersonal.hashType = passwordObj.hashType;
+	emailCode.used = true;
+	await userPersonal.save();
+	await emailCode.save();
+	await next();
 });
 module.exports = forgotPasswordRouter;

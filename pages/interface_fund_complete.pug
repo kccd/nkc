@@ -167,6 +167,7 @@ block content
                         .form
                           input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=false)
                           input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
+                          div#applicationFormId.hidden= applicationForm._id
                         span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
                         span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
                         .unselectedThreads

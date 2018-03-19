@@ -45,6 +45,7 @@ smsCodeSchema.statics.ensureCode = async (obj) => {
 	const SmsCodeModel = mongoose.model('smsCodes');
 	const {mobileCodeTime} = require('../settings/sendMessage');
 	const smsCode = await SmsCodeModel.findOne({nationCode, mobile, code, type, used: false});
+	console.log(smsCode)
 	if(smsCode && (smsCode.toc > (Date.now() - mobileCodeTime))) {
 		return smsCode;
 	} else {

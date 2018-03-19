@@ -1,7 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-let EmailRegisterSchema = new Schema({
+let emailRegisterSchema = new Schema({
   toc: {
     type: Date,
     default: Date.now,
@@ -58,4 +58,16 @@ let EmailRegisterSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('emailRegister', EmailRegisterSchema, 'emailRegister');
+emailRegisterSchema.statics.ensureSendPermission = async (email) => {
+	const EmailRegisterModel = mongoose.model('emailRegister');
+	const {sendEmailCount} = require('../settings/sendMessage');
+	const emails = await EmailRegisterModel.find({email, toc: {$gt: (Date.now() - 24*60*60*1000)}});
+	if(emails.length >= sendEmailCount) {
+		const err = new Error('24小时内发送给同一邮箱的邮件不能超过5封。');
+		err.status = 400;
+		throw err;
+	}
+};
+
+
+module.exports = mongoose.model('emailRegister', emailRegisterSchema, 'emailRegister');

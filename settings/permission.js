@@ -214,13 +214,13 @@ const certificates ={
           [name]: '通过手机号找回',
           [GET]: true,
           [POST]: true,
-          [PUT]: true
+          [PATCH]: true
         },
         email: {
           [name]: '通过邮箱找回',
           [GET]: true,
           [POST]: true,
-          [PUT]: true,
+          [PATCH]: true,
           verify: {
             [name]: "验证邮件",
             [GET]: true
@@ -281,6 +281,13 @@ const certificates ={
 			    },
 			    verify: {
 		    		[POST]: true
+			    }
+		    },
+		    history: {
+			    [name]: '历史基金',
+			    [GET]: true,
+			    [parameter]: {
+			    	[GET]: true
 			    }
 		    }
 	    },
@@ -965,10 +972,6 @@ const certificates ={
 			      }
 		      }
 	      },
-				histories: {
-        	[name]: '历史基金',
-					[GET]: true
-				},
 	      disabled: {
         	[name]: '被屏蔽的基金',
 		      [GET]: true

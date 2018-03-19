@@ -1,4 +1,5 @@
 var selectedThreads = [];
+var applicationFormId = parseInt($('#applicationFormId').text());
 function getThreads(page, self) {
 	var url;
 	if(page !== undefined) {

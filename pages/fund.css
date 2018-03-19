@@ -83,15 +83,20 @@ a:focus{text-decoration: none}
   background-color: #7f9eb2;
   color: #fff;
   font-size: 3rem;
-  line-height: 10rem;
+  padding-top: 3rem;
+  background-size: cover;
 }
 .fund-name > div:first-child{
   text-shadow: 0 0 10px #000000;
 }
-.fund-money{
-  color: #ff7979;
-  font-size: 1.6rem;
-  line-height: 8rem;
+.fund-brief{
+  height: 7rem;
+  padding: 2rem 1.5rem 0 1.5rem;
+  color: #7f9eb2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 .fund-add{
   color: #ddd;
@@ -1176,5 +1181,11 @@ input[type="radio"], input[type="checkbox"]{
   }
   .paymenMethods > div{
     margin: 0 1rem;
+  }
+}
+
+@media screen and (max-width: 468px) {
+  .fund-list{
+    width: 100%;
   }
 }

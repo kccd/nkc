@@ -1,13 +1,10 @@
 运维:
 
     备份运行  mongo_dump.bat
-    还原运行  mongo_restore.bat
 
-    默认备份文件目录为:   E:/mongodb/backup/
-    请及时转移文件, 下次备份会重写此目录
+    默认备份文件目录为:   E:/mongodb/backup/当前时间/
 
-    还原数据库默认以   E:/mongodb/backup/   下的文件进行还原
-    如需还原, 可清空此目录, 将已有的文件放入此目录, 运行脚本
+    还原数据库cmd执行 mongorestore --db rescue --gzip E:/mongodb/backup/以时间命名的文件夹名
 
 
 
@@ -32,9 +29,13 @@
     elasticsearch: [https://www.elastic.co/cn/products]
 
 
-运行:
-
+启动:
+    
     根目录运行  run_as_production
+
+    或在根目录执行：pm2 start production.config.js  关闭：pm2 stop kc  重启：pm2 restart kc（无缝重启：pm2 reload kc）
+
+
 
 
 

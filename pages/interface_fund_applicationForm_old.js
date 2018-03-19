@@ -107,6 +107,7 @@ function postUpload(data, callback) {
   };
   xhr.open("POST","/photo",true);
   //xhr.setRequestHeader("Content-type","application/json");
+	xhr.setRequestHeader('FROM', 'nkcAPI');
   xhr.send(data);
 }
 

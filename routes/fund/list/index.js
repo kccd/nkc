@@ -8,7 +8,7 @@ listRouter
 	// 基金项目列表
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.funds = await db.FundModel.find({display: true, disabled: false}).sort({toc: 1});
+		data.funds = await db.FundModel.find({display: true, disabled: false, history: false}).sort({toc: 1});
 		ctx.template = 'interface_fund_list.pug';
 		await next();
 	})
@@ -23,14 +23,6 @@ listRouter
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
-		/*const newBill = db.FundBillModel({
-			fundId: newFund._id,
-			changed: newFund.money.initial,
-			uid: user.uid,
-			notes: '基金初始金额',
-			abstract: '初始'
-		});
-		await newBill.save();*/
 		data.fund = newFund;
 		await next();
 	})

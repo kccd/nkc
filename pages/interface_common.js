@@ -37,7 +37,8 @@ function post_api(target,body,callback){
   }
   xhr.open("POST","/api/"+target.toString().toLowerCase(),true);
   xhr.setRequestHeader("Content-type","application/json");
-  xhr.send(JSON.stringify(body));
+	xhr.setRequestHeader("FROM","nkcAPI");
+	xhr.send(JSON.stringify(body));
 };
 
 function generalRequest(obj,opt,callback){
@@ -60,7 +61,8 @@ function generalRequest(obj,opt,callback){
 
   try{
     xhr.open(opt.method,opt.url,true);
-    xhr.setRequestHeader("Content-type","application/json");
+	  xhr.setRequestHeader("Content-type","application/json");
+	  xhr.setRequestHeader("FROM","nkcAPI");
     xhr.send(JSON.stringify(obj));
   }catch(err){
     callback(err);
@@ -546,7 +548,7 @@ function postUpload(url, data, callback) {
 		}
 	};
 	xhr.open("POST",url,true);
-	//xhr.setRequestHeader("Content-type","application/json");
+	xhr.setRequestHeader("FROM","nkcAPI");
 	xhr.send(data);
 }
 function uploadFile(url, id, callback) {

@@ -108,13 +108,17 @@ billsRouter
 	.use('/:billId', async (ctx, next) => {
 		const {data, db, params} = ctx;
 		const {billId} = params;
-		if(data.userLevel < 7) ctx.throw(401, '权限不足');
 		data.bill = await db.FundBillModel.findOnly({_id: billId});
 		await next();
 	})
 	.get('/:billId', async (ctx, next) => {
 		ctx.template = 'interface_fund_bill.pug';
 		ctx.data.funds = await ctx.db.FundModel.find({disabled: false, history: false}).sort({toc: 1});
+		await next();
+	})
+	.use('/:billId', async (ctx, next) => {
+		const {data} = ctx;
+		if(data.userLevel < 7) ctx.throw(401, '权限不足');
 		await next();
 	})
 	.del('/:billId', async (ctx, next) => {

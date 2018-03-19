@@ -23,7 +23,8 @@ var attachment_uploader = function(options){
 
     xhr.open("POST",target.toString().toLowerCase(),true);
     //xhr.setRequestHeader("Content-type","application/json");
-    xhr.send(data);
+	  xhr.setRequestHeader("FROM","nkcAPI");
+	  xhr.send(data);
 
   };
 
