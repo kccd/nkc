@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const directAlipay = require('direct-alipay');
-const params = require('../../settings/alipaySecret');
-directAlipay.config(params);
+const {directConfig} = require('../../settings/alipaySecret');
+directAlipay.config(directConfig);
 const donationRouter = new Router();
 donationRouter
 	.use('/', async (ctx, next) => {
@@ -92,6 +92,11 @@ donationRouter
 					}
 					await bill.save();
 					return ctx.body = 'success';
+				} else {
+					if(!bill.notes.includes('支付宝交易号')) {
+						bill.notes = `，交易未完成。状态：${trade_status}，支付宝交易号：${trade_no}`;
+						await bill.save();
+					}
 				}
 			}
 		}

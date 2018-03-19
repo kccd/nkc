@@ -282,6 +282,7 @@ function post_upload(target,data,callback)
   }
   xhr.open("POST",target,true);
   //xhr.setRequestHeader("Content-type","application/json");
+	xhr.setRequestHeader('FROM', 'nkcAPI');
   xhr.send(data);
 }
 

@@ -22,6 +22,7 @@ function post_upload(uid,data,callback)
   }
   xhr.open("POST","/avatar/"+uid,true);
   //xhr.setRequestHeader("Content-type","application/json");
+	xhr.setRequestHeader("FROM", 'nkcAPI');
   xhr.send(data);
 }
 

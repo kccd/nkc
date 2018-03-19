@@ -23,17 +23,13 @@ module.exports = async (ctx, next) => {
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
     const type = ctx.request.accepts('json', 'html');
-    switch(type) {
-      case 'json':
-        ctx.type = 'json';
-        ctx.body = ctx.data;
-        break;
-      case 'html':
-        ctx.type = 'html';
-        ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
-        break;
-      default:
-        ctx.throw(406, 'type not accectable')
+    const from = ctx.request.get('FROM');
+    if(type === 'json' && from === 'nkcAPI') {
+	    ctx.type = 'json';
+	    ctx.body = ctx.data;
+    } else {
+	    ctx.type = 'html';
+	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
     }
     await next();
   }

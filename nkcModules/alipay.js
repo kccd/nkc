@@ -1,35 +1,28 @@
 const request = require('request');
 const queryString = require('querystring');
-const fs = require('fs');
 const moment = require('moment');
-const path = require('path');
 const crypto = require('crypto');
 
 class nodeTransfer {
-	constructor() {
-		this.signType = {
-			RSA: "RSA-SHA1",
-			RSA2: "RSA-SHA256"
-		};
-	}
-
-
 	config(obj) {
 		const configObj = Object.assign({}, obj);
-		this.rsa_private_key = fs.readFileSync(path.resolve(configObj.rsa_private_key));
-		this.rsa_public_key = fs.readFileSync(path.resolve(configObj.rsa_public_key));
+		this.rsa_private_key = configObj.rsa_private_key;
+		this.alipay_public_key = configObj.alipay_public_key;
 		this.configObj = configObj;
 	}
 
-	getSign(params, keyType) {
+	makeSign(params) {
+		const sign = crypto.createSign('RSA-SHA256');
 		const paramsStr = queryString.unescape(queryString.stringify(params));
-		const sign = crypto.createSign(this.signType[params.sign_type]);
 		sign.update(paramsStr);
-		let key = this.rsa_private_key;
-		if(keyType === 'public') {
-			key = this.rsa_public_key;
-		}
-		return sign.sign(key, 'base64');
+		return sign.sign(this.rsa_private_key, 'base64');
+	}
+
+	verifySign(params, sign) {
+		const signStr = JSON.stringify(params);
+		const verify = crypto.createVerify('RSA-SHA256');
+		verify.update(signStr);
+		return verify.verify(this.alipay_public_key, sign, 'base64');
 	}
 
 	getUrl(params) {
@@ -44,7 +37,7 @@ class nodeTransfer {
 			timestamp: moment().format(`YYYY-MM-DD HH:mm:ss`),
 			version: '1.0'
 		};
-		signObj.sign = this.getSign(signObj, 'private');
+		signObj.sign = this.makeSign(signObj, 'private');
 		return `https://openapi.alipaydev.com/gateway.do?` + queryString.stringify(signObj);
 	}
 
@@ -57,13 +50,10 @@ class nodeTransfer {
 				} else {
 					body = JSON.parse(body);
 					const {sign, alipay_fund_trans_toaccount_transfer_response} = body;
-					const publicSign = this.getSign(alipay_fund_trans_toaccount_transfer_response, 'public');
-					if(sign !== publicSign) {
-						console.log(sign);
-						console.log(publicSign);
-						reject('sign值不想等');
+					const publicSign = this.verifySign(alipay_fund_trans_toaccount_transfer_response, sign);
+					if(!publicSign) {
+						reject(`验签失败！`);
 					}
-
 					const {code, msg, order_id, out_biz_no, pay_date, sub_code} = alipay_fund_trans_toaccount_transfer_response;
 					if(code === '10000') {
 						resolve({
@@ -72,32 +62,25 @@ class nodeTransfer {
 							timestamp: pay_date
 						});
 					} else {
-						reject(`转账失败。 code: ${code}, msg: ${msg}, sub_code: ${sub_code}`);
+						reject(`转账失败！ code: ${code}, msg: ${msg}, sub_code: ${sub_code}`);
 					}
 				}
 			})
 		})
 	}
 }
-
-const config = {
-	app_id: '',
-	sign_type: 'RSA2',
-	rsa_private_key: './key/rsa_private_key.pem',
-	rsa_public_key: './key/rsa_public_key.pem',
-};
-const params = {
-	out_biz_no: Date.now(),
-	payee_type: 'ALIPAY_LOGONID',
-	payee_account: '',
-	amount: '520',
-	payer_show_name: '科创基金',
-	remark: '来自测试'
-};
-
 const alipay = {};
 
-alipay.nodeTransfer = nodeTransfer;
-
+alipay.transfer = (obj) => {
+	const {transferConfig, transferParams} = require('../settings/alipay');
+	const {account, money, notes, id} = obj;
+	transferParams.out_biz_no = id;
+	transferParams.payee_account = account;
+	transferParams.amount = money;
+	transferParams.remark = notes;
+	const transfer = new nodeTransfer();
+	transfer.config(transferConfig);
+	return transfer.request(transferParams)
+};
 
 module.exports = alipay;

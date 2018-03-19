@@ -133,7 +133,7 @@ fundRouter
 		  }
 	  }));
 		data.home = true;
-    data.funds = await db.FundModel.find({display: true, disabled: false}).sort({toc: 1});
+    data.funds = await db.FundModel.find({display: true, disabled: false, history: false}).sort({toc: 1});
     ctx.template = 'interface_fund.pug';
     await next();
   })
