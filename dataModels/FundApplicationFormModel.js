@@ -550,11 +550,9 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	}
 	//专家审核-机器审核
 	if(fund.auditType === 'system') {
+		console.log('111111');
 		status.projectPassed = true;
 		status.adminSupport = true;
-		if(!this.timeToSubmit) {
-			this.timeToSubmit = Date.now();
-		}
 		if(!this.timeToPassed) {
 			this.timeToPassed = Date.now();
 		}
@@ -564,12 +562,13 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 				status: null
 			}];
 		}
+	} else {
+		this.status.projectPassed = null;
+		this.status.adminSupport = null;
 	}
 	this.status.submitted = true;
 	this.modifyCount += 1;
 	this.timeToSubmit = Date.now();
-	this.status.projectPassed = null;
-	this.status.adminSupport = null;
 	this.submittedReport = false;
 	this.tlm = Date.now();
 	//存历史

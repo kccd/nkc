@@ -67,7 +67,6 @@ else
              tr
                th= applicationForm.code || '暂无'
                th= applicationFormStatus(applicationForm).str
-               -console.log(applicationForm);
                th= timeToSubmit.toLocaleString()
                th= fund?fund.name: data.fund.name
                th
