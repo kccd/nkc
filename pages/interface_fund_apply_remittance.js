@@ -212,3 +212,33 @@ function submitReport(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+function applyRemittance(number, id) {
+	$('#info').html('');
+	var obj = {
+		number
+	};
+	var content = $('#reportContent').val();
+	if(!content && number !== 0) {
+		return screenTopWarning('请输入中期报告。');
+	}
+	obj.c = content;
+	obj.selectedThreads = selectedThreads;
+	nkcAPI('/fund/a/'+id+'/remittance/apply', 'POST', obj)
+		.then(function(data) {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+function verifyRemittance(number, id) {
+	nkcAPI('/fund/a/'+id+'/remittance/verify', 'PATCH', {number: number})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error)
+		})
+}

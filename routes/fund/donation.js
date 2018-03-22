@@ -18,11 +18,17 @@ donationRouter
 	})
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
-		const {money, fundId, anonymous} = body;
+		const {money, fundId, anonymous, type} = body;
 		if(money >= 0.1) {
 
 		} else {
 			ctx.throw(400, '捐款金额不能小于0.1元。');
+		}
+		let abstract;
+		if(type === 'refund') {
+			abstract = '退款';
+		} else {
+			abstract = '捐款';
 		}
 		const {user} = data;
 		if(!anonymous && !user) ctx.throw(400, '非匿名捐款要求用户必须登陆，请登录后再试。');
@@ -36,15 +42,15 @@ donationRouter
 		const params = {
 			out_trade_no: id,
 			subject: `科创基金${fund?` - ${fund.name}`: ''}`,
-			body: `捐款${money}元`,
+			body: `${abstract}${money}元`,
 			total_fee: money
 		};
 		data.url = directAlipay.buildDirectPayURL(params);
 		const newBill = db.FundBillModel({
 			_id: id,
 			uid: user?user.uid: '',
-			abstract: '捐款',
-			notes: `捐款${money}元`,
+			abstract: abstract,
+			notes: `${abstract}${money}元`,
 			money: money,
 			from: {
 				type: 'user',
@@ -61,12 +67,21 @@ donationRouter
 		await next();
 	})
 	.get('/return', async (ctx, next) => {
-		const {data, query} = ctx;
+		const {data, query, db} = ctx;
 		await directAlipay.verify(query);
-		const {is_success, out_trade_no} = query;
+		const {is_success, out_trade_no, buyer_email, trade_no} = query;
+		const bill = await db.FundBillModel.findOne({_id: out_trade_no});
+		if(bill.verify) ctx.throw(500, '数据出错。');
+		bill.otherInfo = {
+			transactionNumber: trade_no,
+			account: buyer_email,
+			paymentType: 'alipay'
+		};
 		if(is_success !== 'T') {
+			bill.otherInfo.error = `调用接口失败，${JSON.stringify(query)}`;
 			ctx.throw(500, '接口调用失败。');
 		}
+		await bill.save();
 		data.alipayReturn = true;
 		data.billId = out_trade_no;
 		ctx.template = 'interface_fund_donation.pug';
@@ -77,7 +92,7 @@ donationRouter
 		delete body.url;
 		delete body.method;
 		await directAlipay.verify(body);
-		const {trade_status, total_fee, trade_no, out_trade_no} = body;
+		const {trade_status, total_fee, out_trade_no} = body;
 		const bill = await db.FundBillModel.findOne({_id: out_trade_no, money: parseFloat(total_fee)});
 		if(!bill) {
 			return ctx.body = 'success';
@@ -87,14 +102,11 @@ donationRouter
 			} else {
 				if(['TRADE_FINISHED', 'TRADE_SUCCESS'].includes(trade_status)) {
 					bill.verify = true;
-					if(!bill.notes.includes('支付宝交易号')) {
-						bill.notes += `，支付宝交易号：${trade_no}`;
-					}
 					await bill.save();
 					return ctx.body = 'success';
 				} else {
 					if(!bill.notes.includes('支付宝交易号')) {
-						bill.notes = `，交易未完成。状态：${trade_status}，支付宝交易号：${trade_no}`;
+						bill.otherInfo.error = JSON.stringify(body);
 						await bill.save();
 					}
 				}

@@ -175,7 +175,7 @@ block content
                 h5 不合格
             .col-xs-12.col-md-12.text-center
               button.btn.btn-info#submit(onclick=`submitProjectAudit(${applicationForm._id})`) 提交
-              button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底决绝
+              button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底拒绝
 
       else
         .col-xs-12.col-md-12
@@ -344,7 +344,7 @@ block content
               h5 否
         .col-xs-12.col-md-12.text-center
           button.btn.btn-info#adminSubmit(onclick=`submitAdminAudit(${applicationForm._id})`) 提交
-          button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底决绝
+          button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底拒绝
 
 block scripts
   script(src='/interface_common.js')

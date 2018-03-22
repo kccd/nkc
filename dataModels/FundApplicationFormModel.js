@@ -80,6 +80,10 @@ const fundApplicationFormSchema = new Schema({
     }
     */
   },
+	actualMoney: {
+  	type: [Schema.Types.mixed],
+		default: null
+	},
   projectCycle: { // 预计周期
 	  type: Number,
 	  default: null,
@@ -341,12 +345,17 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	// 网友支持
 	if(fund.supportCount <= supportersId.length) {
 		status.usersSupport = true;
+		//专家审核-机器审核
+		if(fund.auditType === 'system') {
+			status.projectPassed = true;
+			status.adminSupport = true;
+			this.remittance = [{
+				money: this.money,
+				status: null
+			}];
+		}
 	}
 
-	//专家审核-机器审核
-	if(status.usersSupport && fund.auditType === 'system') {
-		status.projectPassed = true;
-	}
 
 	// 生成申请表编号
 	if(submitted && !code) {
@@ -426,12 +435,6 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
-fundApplicationFormSchema.methods.saveHistory = async function() {
-	const FundApplicationHistoryModel = require('./FundApplicationHistoryModel');
-	const newHistory = new FundApplicationHistoryModel({
-
-	});
-};
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
@@ -486,7 +489,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	if(!account.paymentType) throw '请选择收款方式！';
 	if(!account.number) throw '请填写您的收款账号！';
 	if(!applicant.description) throw '请填写您的自我介绍！';
-
+	if(fund.auditType === 'system' && account.paymentType !== 'alipay') throw '系统审核只支持支付宝收款。';
 	// 项目信息判断
 	if(!projectId) {
 		throw '请填写项目信息！';
@@ -559,6 +562,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	this.timeToSubmit = Date.now();
 	this.status.projectPassed = null;
 	this.status.adminSupport = null;
+	this.submittedReport = false;
 	this.tlm = Date.now();
 	//存历史
 	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});

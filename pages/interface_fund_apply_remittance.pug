@@ -2,13 +2,56 @@ extends bootstrap_base
 block title
   -const mainContainer1400 = true
   -const applicationForm = data.applicationForm;
-  -const {remittance, project, code, submittedReport, reportNeedThreads, applicant, status} = applicationForm;
+  -const {remittance, project, code, submittedReport, reportNeedThreads, applicant, status, lock} = applicationForm;
   -const fund = applicationForm.fund;
   title= `申请拨款-${applicationForm.project.t}`
   link(rel='stylesheet' href='/fund.css')
 block content
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
+    .row
+      .col-xs-12.col-md-8
+        h3.text-center= `拨款详情`
+        table.table
+          thead
+            tr
+              th #
+              th 金额
+              th 状态
+              th 操作
+          tbody
+            -for(let i = 0; i < remittance.length; i++)
+              -const r = remittance[i];
+              tr
+                th= `第${i + 1}期`
+                th= `${r.money}元`
+                if r.status
+                  th.greenFontColor= `已拨款`
+                else if r.status === null
+                  if r.apply
+                    th= `已申请拨款，请等待`
+                  else
+                    th= `未拨款`
+                else
+                  th.redFontColor= r.description
+                th
+                  if r.status === null
+                    if i === 0 && !r.apply
+                      button(onclick=`applyRemittance(${i}, ${applicationForm._id})`) 申请拨款
+                  else if r.status === false
+                    if ['PAYEE_USER_INFO_ERROR', 'PAYEE_NOT_EXIST'].includes(r.subCode) && !lock.submitted
+                      button(onclick=`window.location.href="/fund/a/${applicationForm._id}/settings?s=1"`) 去修改
+                    else
+                      span 等待财务人员处理
+                  else
+                    if !r.verify
+                      button(onclick=`verifyRemittance(${i}, ${applicationForm._id})`) 确认收款
+                      span &nbsp;
+                      a(href='/sms/message/1' target="blank") 未收到款？去报告
+                    else
+                      span 已确认收款
+
+        p#info
     .row
       .col-xs-12.col-md-6
         -let needRemittance = false;
@@ -17,7 +60,7 @@ block content
           -const r = remittance[i];
           if i === 0 && !r.status
             -break;
-          if !r.status && i !== 0
+          if !r.status && i !== 0 && remittance[i-1].verify
             -needRemittance = true;
             -number = i;
             -break;
@@ -57,28 +100,7 @@ block content
                     .blank(style='color: #aaa;') 暂无数据
                   nav(aria-label='navigation')
                     ul.pagination.pagination-sm.pageList
-                  button.btn.btn-default(style='float: right;' onclick=`submitReport(${applicationForm._id})`) 提交
-      .col-xs-12.col-md-6
-        .panel.panel-default
-          .panel-body
-            h3.text-center= `拨款详情`
-            p 第一期拨款不用申请，请耐心等待。
-            table.table
-              thead
-                tr
-                  th #
-                  th 金额
-                  th 状态
-              tbody
-                -for(let i = 0; i < remittance.length; i++)
-                  -const r = remittance[i];
-                  tr
-                    th= `第${i + 1}期`
-                    th= `${r.money}元`
-                    if r.status
-                      th.greenFontColor= `已拨款`
-                    else
-                      th= `未拨款`
+                  button.btn.btn-default(style='float: right;' onclick=`applyRemittance(${number}, ${applicationForm._id})`) 提交
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_fund_apply_remittance.js')

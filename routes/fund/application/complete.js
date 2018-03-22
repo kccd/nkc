@@ -13,9 +13,15 @@ completeRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user, applicationForm} = data;
+		const {status, remittance} = applicationForm;
+		for(let r of remittance) {
+			if(r.status === true && !r.verify) {
+				ctx.throw(400, '请先确认收款后再申请结题。');
+			}
+		}
 		if(user.uid !== applicationForm.uid) ctx.throw('权限不足');
 		ctx.template = 'interface_fund_complete.pug';
-		if(applicationForm.status.completed === false) {
+		if(status.completed === false) {
 			data.auditComments = {};
 			data.auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
 			data.completedReport = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedReport', disabled: false}).sort({toc: -1});
@@ -25,8 +31,13 @@ completeRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
-		const {usedMoney, c, selectedThreads, successful} = body;
-		const {fixedMoney, timeToPassed, budgetMoney} = applicationForm;
+		const {actualMoney, c, selectedThreads, successful} = body;
+		const {fixedMoney, timeToPassed, remittance} = applicationForm;
+		for(let r of remittance) {
+			if(r.status === true && !r.verify) {
+				ctx.throw(400, '请先确认收款后再申请结题。');
+			}
+		}
 		if(user.uid !== applicationForm.uid) ctx.throw('权限不足');
 		//验证帖子的时间
 		await Promise.all(selectedThreads.map(async t => {
@@ -52,11 +63,8 @@ completeRouter
 			c: '提交结题申请'
 		});
 		if(!fixedMoney) {
-			if(budgetMoney.length !== usedMoney.length) ctx.throw(400, '请输入实际花费金额。');
-			for(let i = 0; i < budgetMoney.length; i++) {
-				budgetMoney[i].used = usedMoney[i];
-			}
-			await applicationForm.update({budgetMoney});
+			if(actualMoney.length === 0) ctx.throw(400, '请输入实际使用金额。');
+			await applicationForm.update({actualMoney});
 		}
 		applicationForm.threadsId.completed = selectedThreads.map(t => t.tid);
 		applicationForm.status.successful = successful;

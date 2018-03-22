@@ -123,35 +123,30 @@
         else
           -let aggregate, suggest, fact, used;
           #budgetMoney
-            if applicationForm.budgetMoney.length !== 0 && applicationForm.budgetMoney[0].fact
+            if applicationForm.budgetMoney.length !== 0 && applicationForm.actualMoney.length !== 0
               -aggregate=0;
               -suggest=0;
               -fact=0;
               -used=0;
-              .fund-money-list.head.adminAudit(class=applicationForm.status.completed? 'reportOfKnotAudit': '')
+              .fund-money-list.head.adminAudit
                 .purpose 用途
                 .count 数量
                 .money 单价(元)
                 .total 合计(元)
                 .suggest 专家建议(元)
                 .fact 实际批准(元)
-                if applicationForm.status.completed
-                  .used 实际花费（元）
               -for(let p of applicationForm.budgetMoney)
                 -const total = p.count*p.money;
                 -aggregate += total;
                 -suggest += p.suggest;
                 -fact += p.fact;
-                -used += p.used || 0;
-                .fund-money-list.adminAudit(class=applicationForm.status.completed? 'reportOfKnotAudit': '')
+                .fund-money-list.adminAudit
                   .purpose= p.purpose
                   .count= p.count
                   .money= p.money
                   .total= total
                   .suggest= p.suggest?p.suggest: total
                   .fact= p.fact
-                  if applicationForm.status.completed
-                    .used= p.used
             else if applicationForm.budgetMoney.length !== 0 && applicationForm.budgetMoney[0].suggest
               -aggregate=0;
               -suggest=0;
@@ -194,7 +189,25 @@
               span=`，专家建议：${suggest || aggregate}元`
             if fact
               span=`，实际批准：${fact}元`
-            if applicationForm.status.completed && !applicationForm.fixedMoney
-              span=`，实际花费：${used}元`
+          if applicationForm.actualMoney.length !== 0
+            h5 实际使用：
+              -let actualAggregate = 0;
+              .fund-money-list.head
+                .purpose 用途
+                .count 数量
+                .money 单价(元)
+                .total 合计(元)
+              .list
+                -for (let i = 0; i < applicationForm.actualMoney.length; i++)
+                  -const a = applicationForm.actualMoney[i];
+                  -const total = a.count*a.money;
+                  -actualAggregate += total;
+                  .fund-money-list(num= i)
+                    .actualPurpose= a.purpose
+                    .actualCount= a.count
+                    .actualMoney= a.money
+                    .actualTotal= total
+              h3.text-right(style='margin-left: 0.5rem;')= `实际批准：${fact}元，实际花费：${actualAggregate}元，退还金额：${fact >= actualAggregate ? fact - actualAggregate : 0}元 `
+
 
 

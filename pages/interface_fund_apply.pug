@@ -102,13 +102,14 @@ block content
                           //  .pay.wechat(class=options.account.paymentType === 'wechat'? 'active': '')
                           div 支付宝
                             .pay.alipay(class=options.account.paymentType === 'alipay' ? 'active' : '')
-                          div 银行卡
-                            .pay.bankCard(class=options.account.paymentType === 'bankCard' ? 'active' : '')
+                          if fund.auditType !== 'system'
+                            div 银行卡
+                              .pay.bankCard(class=options.account.paymentType === 'bankCard' ? 'active' : '')
                       .col-xs-12.col-md-12#bankName(style=`display: ${options.account.paymentType === 'bankCard' ? 'block' : 'none'}`)
                         span 银行全称（仅自己和审查员可见）：
                         input.fund-input(placeholder='请输入银行全称' value=options.account.bankName || '')
-                      .col-xs-12.col-md-12#bankCardName(style=`display: ${options.account.paymentType === 'bankCard' ? 'block' : 'none'}`)
-                        span 户名（仅自己和审查员可见）：
+                      .col-xs-12.col-md-12#bankCardName
+                        span 户名（必须与收款账号对应，仅自己和审查员可见）：
                         input.fund-input(placeholder='请输入户名' value=options.account.name || '')
                       .col-xs-12.col-md-12
                         span 收款账号（仅自己和审查员可见）：

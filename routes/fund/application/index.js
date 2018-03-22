@@ -163,7 +163,10 @@ applicationRouter
 		let updateObj = {
 			tlm: Date.now()
 		};
-		if(applicationForm.modifyCount >= fund.modifyCount) throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
+		if(applicationForm.modifyCount >= fund.modifyCount) {
+			await applicationForm.update({useless: 'exceededModifyCount'});
+			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
+		}
 		if(s === 1) {
 			const {from} = body;
 			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
@@ -337,7 +340,14 @@ applicationRouter
 			if (submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
 			applicationForm.useless = 'delete';
 		} else if(type === 'refuse') {
-			if(adminSupport) ctx.throw(400, '管理员复核已通过，无法完成彻底拒绝。');
+			let remittanceError = false;
+			for(let r of applicationForm.remittance) {
+				if(r.status === false) {
+					remittanceError = true;
+					break;
+				}
+			}
+			if(adminSupport && !remittanceError) ctx.throw(400, '管理员复核已通过，且拨款没有出错，无法完成彻底拒绝。');
 			applicationForm.useless = 'refuse';
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({
@@ -348,6 +358,13 @@ applicationRouter
 				c: '被彻底拒绝'
 			});
 			await newDocument.save();
+		} else if(type === 'withdraw') {
+			if(applicationForm.remittance[0].status !== false) ctx.throw(400, '无法完成该操作。');
+			applicationForm.lock.submitted = false;
+			await applicationForm.update({
+				'lock.submitted': false
+			});
+			return await next();
 		} else {
 			ctx.throw(400, '未知的操作类型。');
 		}

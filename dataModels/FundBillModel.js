@@ -75,6 +75,13 @@ const fundBillSchema = new Schema({
 		type: Boolean,
 		default: true,
 		index: 1
+	},
+	otherInfo: {
+		paymentType: String,
+		transactionNumber: String,
+		name: String,
+		account: String,
+		error: String
 	}
 }, {
 	collection: 'fundBills',
