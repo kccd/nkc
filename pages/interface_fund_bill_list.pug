@@ -32,7 +32,10 @@ table.table.table-bordered
       th 操作
   tbody
     -for(let b of data.bills)
-      tr
+      -let color = '#fff';
+      if !b.verify
+        -color = '#aaa';
+      tr(style='background-color: '+color+';')
         th= b.toc.toLocaleString()
         th= b._id
         th= b.abstract

@@ -13,7 +13,7 @@ block title
   -let needRemittance = false, needReportAudit = false, needCompletedAudit = false;
   -let useful = (useless === null && disabled === false), modifyAccount = false;
   -let remittanceError;
-  if useful && status.adminSupport && status.completed === null
+  if useful && status.adminSupport && status.completed !== true
     -for(let i = 0; i < applicationForm.remittance.length; i++)
       -const r = applicationForm.remittance[i];
       if r.status !== true
@@ -21,7 +21,7 @@ block title
       if r.status === false
         -modifyAccount = true;
         -remittanceError = {subCode: r.subCode, description: r.description};
-      else if r.status === null
+      else if r.status === null && !completedAudit
       if data.user && data.user.uid === applicationForm.uid && lock.submitted
         -displayApplyRemittance = true;
 
@@ -286,7 +286,7 @@ block content
                   if displayRemittance
                     a(href=`/fund/a/${applicationForm._id}/remittance`).btn.btn-info.btn-block 拨款
                   if needReportAudit
-                    a(href=`/fund/a/${applicationForm._id}/report/audit`).btn.btn-info.btn-block 拨款审核
+                    a(href=`/fund/a/${applicationForm._id}/report/audit`).btn.btn-info.btn-block 报告审核
                   if needCompletedAudit
                     a(href=`/fund/a/${applicationForm._id}/complete/audit`).btn.btn-info.btn-block 结题审核
                   if displayExcellent

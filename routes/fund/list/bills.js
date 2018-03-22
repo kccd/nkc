@@ -7,8 +7,11 @@ billsRouter
 		const fundId = params.fundId.toUpperCase();
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		const page = query.page? parseInt(query.page): 0;
-
-		let bills = await db.FundBillModel.find({verify: true, $or: [
+		const q = {};
+		if(data.userLevel < 7) {
+			q.verify = true;
+		}
+		q.$or = [
 			{
 				'from.type': 'fund',
 				'from.id': fundId
@@ -17,7 +20,8 @@ billsRouter
 				'to.type': 'fund',
 				'to.id': fundId
 			}
-		]}).sort({toc: 1});
+		];
+		let bills = await db.FundBillModel.find(q).sort({toc: 1});
 		let total = 0;
 		bills.map(b => {
 			if(b.from.id === fundId) {

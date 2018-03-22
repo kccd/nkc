@@ -149,6 +149,7 @@ remittanceRouter
 		const {money, account, fund, remittance, timeToPassed, reportNeedThreads} = applicationForm;
 		if(!applicationForm.lock.submitted) ctx.throw(400, '抱歉！该申请表暂未提交。');
 		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
+		if(applicationForm.completedAudit) ctx.throw(400, '您已经申请结题，不能再申请拨款。');
 		const {number, c, selectedThreads} = body;
 
 	  // 系统审核

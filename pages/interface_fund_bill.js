@@ -67,6 +67,7 @@ function load() {
 	loadFromTo('from');
 	loadFromTo('to');
 	obj.notes = $('#notes').val();
+	obj.verify = $('input[name="verify"]').eq(0).is(':checked');
 	var money = $('#money').val();
 	money = parseFloat(money);
 	if(money > 0) {

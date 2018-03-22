@@ -7,7 +7,10 @@ billsRouter
 		const {type} = query;
 		data.type = type;
 		const page = query.page? parseInt(query.page): 0;
-		const q = {verify: true};
+		const q = {};
+		if(data.userLevel < 7) {
+			q.verify = true;
+		}
 		if(type !== 'all') {
 			q.$or = [
 				{
@@ -56,6 +59,7 @@ billsRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
+		if(data.userLevel < 7) ctx.throw(400, '权限不足');
 		const {billObj} = body;
 		const {from, to, notes, money} = billObj;
 

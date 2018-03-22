@@ -345,15 +345,6 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	// 网友支持
 	if(fund.supportCount <= supportersId.length) {
 		status.usersSupport = true;
-		//专家审核-机器审核
-		if(fund.auditType === 'system') {
-			status.projectPassed = true;
-			status.adminSupport = true;
-			this.remittance = [{
-				money: this.money,
-				status: null
-			}];
-		}
 	}
 
 
@@ -361,7 +352,7 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	if(submitted && !code) {
 		const moment = require('moment');
 		const year = moment().format('YYYY');
-		const a = await FundApplicationFormModel.findOne({fundId: fund._id, year}).sort({order: -1});
+		const a = await FundApplicationFormModel.findOne({fundId: fund._id, year}).sort({orderss: -1});
 		let code, order;
 		if(a) {
 			order = a.order + 1;
@@ -556,6 +547,23 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 			}
 		}
 
+	}
+	//专家审核-机器审核
+	if(fund.auditType === 'system') {
+		status.projectPassed = true;
+		status.adminSupport = true;
+		if(!this.timeToSubmit) {
+			this.timeToSubmit = Date.now();
+		}
+		if(!this.timeToPassed) {
+			this.timeToPassed = Date.now();
+		}
+		if(this.remittance.length !== 1 && this.money) {
+			this.remittance = [{
+				money: this.money,
+				status: null
+			}];
+		}
 	}
 	this.status.submitted = true;
 	this.modifyCount += 1;
