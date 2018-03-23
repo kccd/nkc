@@ -11,6 +11,7 @@ block title
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
     
     meta(name='description' content=`${processed}`)
+    meta(name='keywords' content=`${thread.firstPost.t}`)
     
     meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
     meta(property='og:title' content=`${thread.firstPost.t}`)

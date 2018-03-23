@@ -25,7 +25,19 @@ block content
           h4 编辑内容
           .form-group
             input#title.form-control(type='text' placeholder='标题' value=`${data.title || ''}`)
-
+          .form-group
+            //- div#icon.form-control(type='text' placeholder='图标' value=`${data.title || ''}`)
+            //-   img(src="/format_bold.svg", alt="")
+            //-   img(src="/format_italic.svg", alt="")
+            //-   img(src="/format_link.svg", alt="")
+            //-   img(src="/format_quote.svg", alt="")
+            //-   img(src="/format_code.svg", alt="")
+            //-   img(src="/format_picture.svg", alt="")
+            //-   img(src="/format_title.svg", alt="")
+            //-   img(src="/format_hrline.svg", alt="")
+            //-   img(src="/format_numlist.png", alt="")
+            //-   img(src="/format_ullist.png", alt="")
+            //-   img(src="/format_help.png", alt="")
           //.form-group#btnGroup
             a.btn.btn-default(href='javascript:;') 黑体
             a.btn.btn-default(href='javascript:;') 链接
@@ -69,7 +81,7 @@ block content
                   
         .col-xs-12.col-sm-5.col-md-6
           h4 预览
-          .nkcpanel#fullwidthpanel(style="max-height: 800px;overflow-y: scroll;resize:vertical;")
+          .nkcpanelnew#fullwidthpanel(style="max-height: 800px;overflow-y: scroll;resize:vertical;")
             div
               h4#parsedtitle
             div#parsedcontent
@@ -135,3 +147,4 @@ block scripts
   script(src='/interface_attachment_uploader.js')
   script(type='text/jsx;harmony=true' src='/interface_attachment_list_display.js')
   
+  //- script(src="/test.js")
