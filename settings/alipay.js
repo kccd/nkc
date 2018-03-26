@@ -16,7 +16,7 @@ module.exports = {
 		{"subCode":"PERM_AML_NOT_REALNAME_REV","description":"根据监管部门的要求，需要收款用户补充身份信息才能继续操作","solution":"请联系收款方登录支付宝站内或手机客户端补充身份信息"},
 		{"subCode":"PAYER_STATUS_ERROR","description":"付款账号状态异常","solution":"请检查付款方是否进行了自助挂失，如果无，请联系支付宝客服检查付款用户状态是否正常。"},
 		{"subCode":"PAYER_STATUS_ERROR","description":"付款方用户状态不正常","solution":"请检查付款方是否进行了自助挂失，如果无，请联系支付宝客服检查用户状态是否正常。"},
-		{"subCode":"PAYEE_USER_INFO_ERROR","description":"支付宝账号和姓名不匹配，请确认姓名是否正确","solution":"请联系收款方确认收款用户姓名正确性。"},
+		{"subCode":"PAYEE_USER_INFO_ERROR","description":"支付宝账号和姓名不匹配，请检查","solution":"请联系收款方确认收款用户姓名正确性。"},
 		{"subCode":"PAYER_USER_INFO_ERROR","description":"付款用户姓名或其它信息不一致","solution":"请检查接口传递的付款方用户姓名正确性。"},
 		{"subCode":"PAYER_DATA_INCOMPLETE","description":"根据监管部门的要求，需要付款用户补充身份信息才能继续操作","solution":"根据监管部门的要求，需要付款用户登录支付宝站内或手机客户端补充身份信息才能继续操作"},
 		{"subCode":"PAYER_BALANCE_NOT_ENOUGH","description":"付款方余额不足","solution":"支付时间点付款方余额不足，请保持付款账户余额充足。"},

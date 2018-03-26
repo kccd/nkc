@@ -69,7 +69,7 @@ block content
                         span 已确认拨款
                       else if r.status === null
                         if applicationForm.account.paymentType === 'alipay'
-                          button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '拨款（支付宝）'
+                          button#remittance(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '拨款（支付宝）'
                         else
                           button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已拨款'
                       else if applicationForm.lock.submitted

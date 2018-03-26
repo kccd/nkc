@@ -1,12 +1,9 @@
 .panel.panel-default
   .panel-body
-    h2.text-center 科创基金
-    br
-    a.btn.btn-info.btn-block(href='/fund/info') 基本信息
-    a.btn.btn-info.btn-block(href='/fund/bills') 账单列表
-    br
-    h4.text-center 操作
+    h4.text-center 其他
+    a.btn.btn-info.btn-block(href='/fund/history') 已过期的基金资助行动
     if data.user && data.userLevel >= 7
-      a.btn.btn-info.btn-block(href='/fund/settings') 设置
+      a.btn.btn-info.btn-block(href='/fund/settings') 基金设置
+      a.btn.btn-info.btn-block(href='/fund/add') 新建基金
       a.btn.btn-info.btn-block(href='/fund/bill') 添加账单
     a.btn.btn-info.btn-block(href='/fund/donation') 捐款

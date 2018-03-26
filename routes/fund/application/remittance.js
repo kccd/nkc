@@ -119,9 +119,10 @@ remittanceRouter
 				const newReport = db.FundDocumentModel({
 					_id: newId,
 					uid: user.uid,
-					type: 'report',
+					type: 'system',
 					applicationFormId: applicationForm._id,
 					c: `第 ${i+1} 期拨款 ${r.money}元 完成`,
+					support: true
 				});
 				await newReport.save();
 				break;
@@ -140,6 +141,7 @@ remittanceRouter
 		const {applicationForm, user} = data;
 		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
 		ctx.template = 'interface_fund_apply_remittance.pug';
+		data.nav = '申请拨款';
 		data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
 		await next();
 	})
@@ -167,6 +169,8 @@ remittanceRouter
 			}
 			if(remittance[0].status) ctx.throw(400, '拨款已成功，请勿重复提交。');
 			if(account.paymentType !== 'alipay') ctx.throw(400, '系统审核只支持支付宝账号。');
+			const balance = await db.FundBillModel.getBalance('fund', fund._id);
+			if(remittance[0].money > balance) ctx.throw(400, '该基金余额不足。');
 			const {number, name} = account;
 			const {alipay} = ctx.nkcModules;
 			const {transferError} = ctx.settings.alipay;
@@ -177,8 +181,9 @@ remittanceRouter
 				_id: newId,
 				uid: user.uid,
 				applicationFormId: applicationForm._id,
-				type: 'report',
-				c: `申请第 1 期拨款`
+				type: 'system',
+				c: `申请第 1 期拨款`,
+				support: true
 			});
 			await newReport.save();
 			try {
@@ -205,7 +210,7 @@ remittanceRouter
 					applicationFormId: applicationForm._id,
 					abstract: '拨款',
 					notes: `${applicationForm.code}第1期拨款`,
-					uid: user.uid,
+					uid: fund.admin.appointed[0],
 					otherInfo: {
 						paymentType: 'alipay',
 						transactionNumber: alipayData.alipayId,
@@ -219,10 +224,11 @@ remittanceRouter
 				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newReport = db.FundDocumentModel({
 					_id: newId,
-					uid: user.uid,
+					uid: fund.admin.appointed[0],
 					applicationFormId: applicationForm._id,
-					type: 'report',
-					c: `第 1 期拨款 ${money}元 完成`
+					type: 'system',
+					c: `第 1 期拨款 ${money}元 完成`,
+					support: true
 				});
 				await newReport.save();
 			} catch (err) {
@@ -246,7 +252,7 @@ remittanceRouter
 				const newDocument = db.FundDocumentModel({
 					_id: documentId,
 					type: 'remittance',
-					uid: user.uid,
+					uid: fund.admin.appointed[0],
 					applicationFormId: applicationForm._id,
 					c: description,
 					support: false
@@ -279,8 +285,9 @@ remittanceRouter
 								_id: newId,
 								uid: user.uid,
 								applicationFormId: applicationForm._id,
-								type: 'report',
-								c: `申请第 1 期拨款`
+								type: 'system',
+								c: `申请第 1 期拨款`,
+								support: true
 							});
 							await newReport.save();
 						} else {
@@ -303,6 +310,7 @@ remittanceRouter
 							};
 							const report_1 = db.FundDocumentModel(obj);
 							obj.c = `申请第 ${i+1} 期拨款`;
+							obj.support = true;
 							obj._id = reportId_2;
 							const report_2 = db.FundDocumentModel(obj);
 							await report_1.save(); // 提交的报告
@@ -321,7 +329,7 @@ remittanceRouter
 		await next();
 	})
 	.patch('/verify', async (ctx, next) => {
-		const {data, body} = ctx;
+		const {data, body, db} = ctx;
 		const {number} = body;
 		if(number === undefined) {
 			ctx.throw(400, '参数错误。');
@@ -344,6 +352,16 @@ remittanceRouter
 		if(number !== num) ctx.throw(400, '参数错误。');
 		const r = remittance[number];
 		r.verify = true;
+		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+		const newReport = db.FundDocumentModel({
+			_id: newId,
+			uid: user.uid,
+			type: 'system',
+			applicationFormId: applicationForm._id,
+			support: true,
+			c: `第 ${number + 1} 期申请人确认收款`
+		});
+		await newReport.save();
 		await applicationForm.update({remittance});
 		await next();
 	});

@@ -267,6 +267,7 @@ fundSchema.pre('save', function(next){
 
 fundSchema.methods.ensureUserPermission = async function(user) {
 	const UsersPersonalModel = require('./UsersPersonalModel');
+	const FundBillModel = require('./FundBillModel');
 	const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
 	const userAuthLevel = await userPersonal.getAuthLevel();
 	const {authLevel, userLevel, postCount, threadCount, timeToRegister} = this.applicant;
@@ -275,6 +276,8 @@ fundSchema.methods.ensureUserPermission = async function(user) {
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
 	if(authLevel > userAuthLevel) throw '身份认证等级未满足最低要求';
+	const balance = await FundBillModel.getBalance('fund', this._id);
+	if(balance <= 0) throw '基金余额不足。';
 };
 
 fundSchema.methods.ensureOperatorPermission = function(type, user) {

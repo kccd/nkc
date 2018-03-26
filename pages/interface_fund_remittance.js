@@ -1,12 +1,14 @@
 function ensureRemittance(id, number) {
 	var info = '确认执行此操作？';
 	if(confirm(info) === true) {
+		$('#remittance').attr('disabled', true);
 		nkcAPI('/fund/a/'+id+'/remittance', 'POST', {number: number})
 			.then(function (data) {
 				window.location.reload();
 			})
 			.catch(function(data) {
 				screenTopWarning(data.error);
+				$('#remittance').removeAttr('disabled');
 			})
 	}
 }

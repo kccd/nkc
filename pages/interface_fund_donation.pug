@@ -11,41 +11,64 @@ block content
         span.point
       h2.redFontColor#error
     else
-      h2.text-center 捐款
+      h3 捐款对象
+      .row
+        .col-xs-6.col-sm-4.col-md-3.fund-list
+          a(href=`###` title='资金池' onclick=`selectFund()`)
+            .fund-name(style=`padding-top: 0;`)
+              div(style=`line-height: 12rem;`) 资金池
+            div(style='height: 8rem;')
+              .text-success.select(style='line-height: 8rem;font-size: 3rem;font-weight: 600;')= !data.fundId ? '已选择' : ''
+        -for(let fund of data.funds)
+          .col-xs-6.col-sm-4.col-md-3.fund-list
+            a(href=`###` title=fund.description.brief onclick=`selectFund('${fund._id}')`)
+              .fund-name(style=`padding-top: 0;background-color: ${color};background-image:${fund && fund.image && fund.image.logo ? `url(/fundLogo/${fund.image.logo})` : ''}`)
+                div(style=`line-height: 12rem;`)= fund.name
+              div(style='height: 8rem;')
+                .text-success.select(style='line-height: 8rem;font-size: 3rem;font-weight: 600;' fundid=fund._id)= data.fundId === fund._id?'已选择': ''
       br
-      br
-      h4 请选择捐款对象：
-      label.radio-inline
-        input(type="radio" name='fund' checked=!data.fundId)
-        h5 资金池
-      -for(let f of data.funds)
-        label.radio-inline
-          input(type="radio" name='fund' checked=data.fundId===f._id fundId=f._id)
-          h5= f.name
-      br
-      br
-      h4 请选择捐款金额：
-      -const arr = [50,100,200,500,1000,5000,10000,100000];
-      -for(let i = 0; i < arr.length; i++)
-        -const m = arr[i];
-        label.radio-inline
-          input(type="radio" name='money' checked=i===0  money=m)
-          h5= `${m}元`
-      label.radio-inline
-        input#other(type="radio" name='money')
-        h5= `其他`
-      #otherInput.hidden
-        span 请输入捐款金额（元）：
-        input#money(type='number' placeholder='最小单位为元')
-      br
-      h4 匿名捐款：
+      h3 捐款金额
+      -const arr = [200,500,1000,5000,10000];
+      .row
+        -for(let m of arr)
+          .col-xs-6.col-sm-4.col-md-3.fund-list
+            a(href=`###` title=`捐款${m}元` onclick=`selectMoney(${m})`)
+              .fund-name(style=`padding-top: 0;background-color: #ffe8be;`)
+                span(style=`line-height: 12rem;color: #ff6666;font-size: 4rem;font-weight:600;`)= `${m}元`
+              div(style='height: 8rem;')
+                .text-info.selectMoney(style='line-height: 8rem;font-size: 3rem;font-weight: 600;' money=m)= m === 200 ? '已选择' : ''
+        .col-xs-6.col-sm-4.col-md-3.fund-list
+          a(href=`###` title=`其他金额` onclick=`selectMoney()`)
+            .fund-name(style=`padding-top: 0;background-color: #ffe8be;`)
+              span(style=`line-height: 12rem;color: #ff6666;font-size: 4rem;font-weight:600;`)= `自定义`
+            div(style='height: 8rem;')
+              .text-info.selectMoney(style='line-height: 8rem;font-size: 3rem;font-weight: 600;')
+        .col-xs-12.col-md-12#money(style=`display:none;`)
+          h4 请输入捐款金额
+          input.form-control(type='number' placeholder='最小单位为元')
+      //br
+      //h4 捐款金额
+      //-const arr = [200,500,1000,5000,10000];
+      //-for(let i = 0; i < arr.length; i++)
+      //  -const m = arr[i];
+      //  label.radio-inline
+      //    input(type="radio" name='money' checked=i===0  money=m)
+      //    h5= `${m}元`
+      //label.radio-inline
+      //  input#other(type="radio" name='money')
+      //  h5= `其他`
+      //#otherInput.hidden
+      //  span 请输入捐款金额（元）
+      //  input#money(type='number' placeholder='最小单位为元')
+      //br
+      h4 匿名捐款
         label.radio-inline
           input(type="radio" name='anonymous' checked=false)
           h5 是
         label.radio-inline
           input(type="radio" name='anonymous' checked=true)
           h5 否
-      h4 捐款说明：
+      h4 捐款说明
       div!= markdown_safe(data.fundSettings.donationDescription)
 
       br

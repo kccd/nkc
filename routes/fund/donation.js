@@ -14,21 +14,27 @@ donationRouter
 			data.fundId = query.fundId.toUpperCase();
 		}
 		data.funds  = await db.FundModel.find({disabled: false, history: false}).sort({toc: 1});
+		data.nav = '捐款';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
-		const {money, fundId, anonymous, type} = body;
-		if(money >= 0.1) {
-
-		} else {
-			ctx.throw(400, '捐款金额不能小于0.1元。');
-		}
+		const {fundId, anonymous, type} = body;
+		const money = body.money?parseInt(body.money): 0;
 		let abstract;
 		if(type === 'refund') {
+			if(money <= 0) {
+				ctx.throw(400, '退款金额错误！');
+			}
 			abstract = '退款';
 		} else {
 			abstract = '捐款';
+			if(money < 20) {
+				ctx.throw(400, '单笔捐款金额不能少于20元。');
+			}
+			if(money > 10000) {
+				ctx.throw(400, '单笔捐款金额不能超过10000元，请分批次捐款。');
+			}
 		}
 		const {user} = data;
 		if(!anonymous && !user) ctx.throw(400, '非匿名捐款要求用户必须登陆，请登录后再试。');

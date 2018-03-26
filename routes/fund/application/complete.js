@@ -26,6 +26,7 @@ completeRouter
 			data.auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
 			data.completedReport = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedReport', disabled: false}).sort({toc: -1});
 		}
+		data.nav = '申请结题';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -59,7 +60,7 @@ completeRouter
 			_id: newReportId,
 			uid: user.uid,
 			applicationFormId: applicationForm,
-			type: 'report',
+			type: 'system',
 			c: '提交结题申请'
 		});
 		if(!fixedMoney) {
@@ -87,6 +88,7 @@ completeRouter
 		if(!completedAudit) ctx.throw(401, '抱歉！申请人暂未提交结题申请。');
 		if(!fund.ensureOperatorPermission('expert', user) && !fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行结题审核。');
 		data.report = await db.FundDocumentModel.findOne({type: 'completedReport'}).sort({toc: -1}).limit(1);
+		data.nav = '结题审核';
 		await next();
 	})
 	.post('/audit', async (ctx, next) => {

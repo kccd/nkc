@@ -5,33 +5,29 @@
       a(href="/fund") 首页
     span &nbsp;&nbsp;&nbsp;
     li
-      a(href="/fund/info") 科创基金
-    span &nbsp;&nbsp;&nbsp;
-    span
-      a(href=`/fund/me`) 我的基金&nbsp;
-      if data.fundNotify > 0
-        span.redFontColor= data.fundNotify
-    span &nbsp;&nbsp;
-    li
-      a(href=`/fund/list`) 基金列表
-    if data.fund && !data.fund.history
-      li
-        a(href=`/fund/list/${data.fund._id.toLowerCase()}`)= data.fund.name
-    if data.applicationForm && data.applicationForm.code && !data.applicationForm.fund.history
-      li
-        a(href=`/fund/a/${data.applicationForm.code}`)= data.applicationForm.code
-    if data.nav && (!data.fund || !data.fund.history)
-      li= data.nav
+      a(href="/fund/info") 基金简介
     span &nbsp;&nbsp;&nbsp;
     li
-      a(href=`/fund/history`) 历史基金
-    if data.fund && data.fund.history
+      a(href="/fund/bills") 财务公开
+    span &nbsp;&nbsp;&nbsp;
+    if data.user
       li
-        a(href=`/fund/list/${data.fund._id.toLowerCase()}`)= data.fund.name
-    if data.applicationForm && data.applicationForm.code && data.applicationForm.fund.history
+        a(href=`/fund/me`) 我的申请&nbsp;
+        if data.fundNotify > 0
+          span.redFontColor= data.fundNotify
+      span &nbsp;&nbsp;&nbsp;
+
+    if data.fund
       li
-        a(href=`/fund/a/${data.applicationForm.code}`)= data.applicationForm.code
-    if data.nav && data.fund && data.fund.history
-      li= data.nav
+        a(href=`/fund/list/${data.fund._id}`)= data.fund.name
+    if data.fund && data.applicationForm && data.applicationForm.code
+      span &nbsp;&nbsp;/&nbsp;&nbsp;
+      li
+        a(href=`/fund/a/${data.applicationForm._id}`)= data.applicationForm.code
+    if data.nav
+      if data.fund || data.applicationForm
+        span &nbsp;&nbsp;/&nbsp;&nbsp;
+      span= data.nav
     if data.fundSettings.readOnly
       h3(style='color: #888;') 科创基金已开启只读模式
+br

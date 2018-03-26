@@ -15,7 +15,7 @@ auditRouter
 		data.type = type;
 		const {fund, lock} = applicationForm;
 		if(type === 'project') {
-			data.nav = '项目审查员审核';
+			data.nav = '专家审核';
 			if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行专家审核。');
 			if(applicationForm.status.projectPassed !== null) ctx.throw(400, '抱歉！该申请表已被其他审查员审核了。');
 			if(!applicationForm.status.submitted || !applicationForm.lock.submitted) ctx.throw(400, '申请表暂未提交。');

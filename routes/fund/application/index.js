@@ -112,6 +112,9 @@ applicationRouter
 			await comment.extendResources();
 		}));
 		applicationForm.comments = comments;
+		await applicationForm.extendSupporters();
+		await applicationForm.extendObjectors();
+		await applicationForm.extendReportThreads();
 		const auditComments = {};
 		if(!applicationForm.status.projectPassed) {
 			auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
@@ -127,6 +130,11 @@ applicationRouter
 		if(applicationForm.useless === 'giveUp') {
 			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
 		}
+		const reports = await db.FundDocumentModel.find({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
+		data.reports = await Promise.all(reports.map(async r => {
+			await r.extendResources();
+			return r;
+		}));
 		data.auditComments = auditComments;
 		data.paging = paging;
 		await next();
@@ -301,11 +309,12 @@ applicationRouter
 				await applicationForm.ensureInformation();
 				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newReport = db.FundDocumentModel({
-					type: 'report',
+					type: 'system',
 					uid: user.uid,
 					applicationFormId: applicationForm._id,
 					_id: newId,
-					c: '提交申请表'
+					c: '提交申请表',
+					support: true
 				});
 				await newReport.save();
 			} catch(err) {
@@ -354,8 +363,9 @@ applicationRouter
 				_id: newId,
 				uid: user.uid,
 				applicationFormId: applicationForm._id,
-				type: 'report',
-				c: '被彻底拒绝'
+				type: 'system',
+				c: '被彻底拒绝',
+				support: false
 			});
 			await newDocument.save();
 		} else if(type === 'withdraw') {
@@ -392,6 +402,7 @@ applicationRouter
 		if(user) {
 			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);
 		}
+		//拦截申请表敏感信息
 		if(!user || (applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !hasPermission)) {
 			const {applicant, members} = applicationForm;
 			applicant.mobile = null;
@@ -402,6 +413,10 @@ applicationRouter
 				m.mobile = null;
 				m.idCardNumber = null;
 			}
+		}
+		//拦截表示反对的用户
+		if(!hasPermission) {
+			applicationForm.objectors = [];
 		}
 		await next();
 	});

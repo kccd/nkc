@@ -28,30 +28,5 @@ block content
         a(href=`/fund/list/${data.fund._id}`)= data.fund.name
     -const url = `/u/${data.user.uid}/bills`;
     include interface_fund_page
-    table.table.table-bordered
-      thead
-        tr
-          th 时间
-          th 交易编号
-          th 摘要
-          th 操作者
-          th 来自于
-          th 作用于
-          th 金额（元）
-          th 备注
-      tbody
-        -for(let b of data.bills)
-          tr
-            th= b.toc.toLocaleString()
-            th= b._id
-            th= b.abstract
-            th
-              if(b.user)
-                a(href=`/m/${b.user.uid}`)= b.user.username
-              else
-                span 系统
-            +loadInfo(b.fromInfo)
-            +loadInfo(b.toInfo)
-            th= b.money.toFixed(1)
-            th= b.notes
+    include interface_fund_bill_list
     include interface_fund_page

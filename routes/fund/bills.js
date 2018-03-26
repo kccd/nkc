@@ -11,7 +11,7 @@ billsRouter
 		if(data.userLevel < 7) {
 			q.verify = true;
 		}
-		if(type !== 'all') {
+		if(type === 'fundPool') {
 			q.$or = [
 				{
 					'from.type': 'fundPool'
@@ -20,23 +20,27 @@ billsRouter
 					'to.type': 'fundPool'
 				}
 			];
+		} else if(type === 'donation') {
+			q.abstract = '捐款';
 		}
 		let bills = await db.FundBillModel.find(q).sort({toc: 1});
 		let total = 0;
 		const arr = ['fund', 'fundPool'];
 		bills.map(b => {
-			if(type !== 'all') {
-				if(b.from.type === 'fundPool') {
-					total += b.money*-1;
+			if(b.verify === true) {
+				if(type === 'fundPool') {
+					if(b.from.type === 'fundPool') {
+						total += b.money*-1;
+					} else {
+						total += b.money;
+					}
 				} else {
-					total += b.money;
-				}
-			} else {
-				if(!arr.includes(b.from.type) && arr.includes(b.to.type)) {
-					total += b.money;
-				}
-				if(arr.includes(b.from.type) && !arr.includes(b.to.type)) {
-					total += b.money*-1;
+					if(!arr.includes(b.from.type) && arr.includes(b.to.type)) {
+						total += b.money;
+					}
+					if(arr.includes(b.from.type) && !arr.includes(b.to.type)) {
+						total += b.money*-1;
+					}
 				}
 			}
 			b.balance = total;

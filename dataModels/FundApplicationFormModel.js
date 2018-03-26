@@ -331,6 +331,30 @@ fundApplicationFormSchema.virtual('forum')
 		this._forum = forum;
 	});
 
+fundApplicationFormSchema.virtual('supporters')
+	.get(function() {
+		return this._supporters;
+	})
+	.set(function(supporters) {
+		this._supporters = supporters;
+	});
+
+fundApplicationFormSchema.virtual('objectors')
+	.get(function() {
+		return this._objectors;
+	})
+	.set(function(objectors) {
+		this._objectors = objectors;
+	});
+
+fundApplicationFormSchema.virtual('reportThreads')
+	.get(function() {
+		return this._reportThreads;
+	})
+	.set(function(reportThreads) {
+		this._reportThreads = reportThreads;
+	});
+
 
 fundApplicationFormSchema.pre('save', function(next) {
   this.tlm = Date.now();
@@ -352,7 +376,7 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	if(submitted && !code) {
 		const moment = require('moment');
 		const year = moment().format('YYYY');
-		const a = await FundApplicationFormModel.findOne({fundId: fund._id, year}).sort({orderss: -1});
+		const a = await FundApplicationFormModel.findOne({fundId: fund._id, year}).sort({order: -1});
 		let code, order;
 		if(a) {
 			order = a.order + 1;
@@ -426,6 +450,45 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
+fundApplicationFormSchema.methods.extendSupporters = async function() {
+	const UserModel = require('./UserModel');
+	const supporters = [];
+	for(let uid of this.supportersId) {
+		const user = await UserModel.findOnly({uid});
+		supporters.push(user);
+	}
+	return this.supporters = supporters;
+};
+
+fundApplicationFormSchema.methods.extendObjectors = async function() {
+	const UserModel = require('./UserModel');
+	const objectors = [];
+	for(let uid of this.objectorsId) {
+		const user = await UserModel.findOnly({uid});
+		objectors.push(user);
+	}
+	return this.objectors = objectors;
+};
+
+fundApplicationFormSchema.methods.extendReportThreads = async function() {
+	const ThreadModel = require('./ThreadModel');
+	const threadsId = [];
+	for(let r of this.remittance) {
+		if(r.threads && r.threads.length !== 0) {
+			for(tid of r.threads) {
+				if(!threadsId.includes(tid)) {
+					threadsId.push(tid)
+				}
+			}
+		}
+	}
+	const reportThreads = await Promise.all(threadsId.map(async tid => {
+		const thread = await ThreadModel.findOnly({tid});
+		await thread.extendFirstPost().then(p => p.extendUser());
+		return thread;
+	}));
+	return this.reportThreads = reportThreads;
+};
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
@@ -548,9 +611,8 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		}
 
 	}
-	//专家审核-机器审核
+	//系统审核
 	if(fund.auditType === 'system') {
-		console.log('111111');
 		status.projectPassed = true;
 		status.adminSupport = true;
 		if(!this.timeToPassed) {

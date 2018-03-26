@@ -134,6 +134,24 @@ fundRouter
 	  }));
 		data.home = true;
     data.funds = await db.FundModel.find({display: true, disabled: false, history: false}).sort({toc: 1});
+    const donationBills = await db.FundBillModel.find({
+	    'from.type': 'user',
+	    'from.anonymous': false,
+	    'from.id': {$ne: ''},
+	    abstract: '捐款',
+	    verify: true
+    }).sort({toc: -1}).limit(6);
+
+    const donationUid = [];
+    for(let b of donationBills) {
+    	const uid = b.from.id;
+    	if(!donationUid.includes(uid)) {
+    		donationUid.push(uid);
+	    }
+    }
+    data.donationUsers = await Promise.all(donationUid.map(async uid => {
+			return await db.UserModel.findOnly({uid});
+    }));
     ctx.template = 'interface_fund.pug';
     await next();
   })

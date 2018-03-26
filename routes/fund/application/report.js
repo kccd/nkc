@@ -11,8 +11,9 @@ reportRouter
 		const {data, db} = ctx;
 		const {applicationForm, user} = data;
 		ctx.template = 'interface_fund_report.pug';
+		data.nav = '项目进度';
 		const q = {
-			type: {$in: ['report', 'completedReport', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'vote', 'remittance']},
+			type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
 			applicationFormId: applicationForm._id
 		};
 		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
@@ -21,6 +22,7 @@ reportRouter
 		data.reports = await db.FundDocumentModel.find(q).sort({toc: -1});
 		await Promise.all(data.reports.map(async r => {
 			await r.extendUser();
+			await r.extendResources();
 		}));
 		await next();
 	})
@@ -47,6 +49,7 @@ reportRouter
 	.get('/audit', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.type = 'reportAudit';
+		data.nav = '报告审核';
 		const {user, applicationForm} = data;
 		const {remittance, reportNeedThreads, submittedReport, fund} = applicationForm;
 		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
@@ -106,9 +109,10 @@ reportRouter
 				const newReport = db.FundDocumentModel({
 					_id: newId,
 					uid: user.uid,
-					type: 'report',
+					type: 'system',
 					applicationFormId: applicationForm._id,
-					c: str
+					c: str,
+					support
 				});
 				await newReport.save();
 				break;

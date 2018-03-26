@@ -25,11 +25,9 @@ table.table.table-bordered
       th 作用于
       th 金额（元）
       th 备注
-      if data.type === 'all'
-        th 总资金剩余（元）
-      else
+      if displayBalance
         th 剩余（元）
-      th 操作
+        th 操作
   tbody
     -for(let b of data.bills)
       -let color = '#fff';
@@ -48,9 +46,10 @@ table.table.table-bordered
         +loadInfo(b.toInfo)
         th= b.money.toFixed(1)
         th= b.notes
-        th= b.balance.toFixed(1)
-        if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
-          th
-            a(href=`/fund/bills/${b._id}`) 编辑
-        else
-          th= ''
+        if displayBalance
+          th= b.balance.toFixed(1)
+          if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
+            th
+              a(href=`/fund/bills/${b._id}`) 编辑
+          else
+            th= ''

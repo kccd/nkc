@@ -24,10 +24,12 @@ billsRouter
 		let bills = await db.FundBillModel.find(q).sort({toc: 1});
 		let total = 0;
 		bills.map(b => {
-			if(b.from.id === fundId) {
-				total += b.money*-1;
-			} else {
-				total += b.money;
+			if(b.verify) {
+				if(b.from.id === fundId) {
+					total += b.money*-1;
+				} else {
+					total += b.money;
+				}
 			}
 			b.balance = total;
 		});

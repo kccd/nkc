@@ -1,3 +1,7 @@
+var obj = {
+	money: 200
+};
+
 $(function() {
 	init();
 	ensureBill();
@@ -33,10 +37,10 @@ function submit() {
 			return screenTopWarning('请输入捐款金额。');
 		}
 		money = parseFloat(money);
-		if(money >= 0.1) {
+		if(money >= 20) {
 			obj.money = money.toFixed(1);
 		} else {
-			return screenTopWarning('捐款金额不能小于0.1元。');
+			return screenTopWarning('捐款金额不能少于20元。');
 		}
 	} else {
 		var moneyArr = $('input[name="money"]');
@@ -97,4 +101,38 @@ function ensureBill() {
 		fn();
 	}
 
+}
+
+
+function selectFund(id) {
+	obj.fundId = id;
+	var arr = $('.select');
+	arr.text('');
+	for(var i = 0; i < arr.length; i++) {
+		var element = arr.eq(i);
+		if(element.attr('fundid') === obj.fundId) {
+			element.text('已选择');
+			break;
+		}
+	}
+}
+
+function selectMoney(m) {
+	obj.money = m;
+	var arr = $('.selectMoney');
+	arr.text('');
+	for(var i = 0; i < arr.length; i++) {
+		var element = arr.eq(i);
+		var money = element.attr('money');
+		if(money) {
+			money = parseInt(money);
+			$('#money').hide();
+		} else {
+			$('#money').show();
+		}
+		if(m === money) {
+			element.text('已选择');
+			break;
+		}
+	}
 }
