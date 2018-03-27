@@ -140,10 +140,10 @@ fundRouter
 	    'from.id': {$ne: ''},
 	    abstract: '捐款',
 	    verify: true
-    }).sort({toc: -1}).limit(6);
+    }).sort({toc: -1}).limit(12);
 
     //查询捐款人 统计捐款总金额
-		const donationUsers = [];
+		let donationUsers = [];
 		for(let b of donationBills) {
 			const uid = b.from.id;
 			let flag = false;
@@ -161,6 +161,9 @@ fundRouter
 					user: await db.UserModel.findOnly({uid})
 				});
 			}
+		}
+		if(donationUsers.length < 10) {
+			donationUsers = donationUsers.slice(0, 6);
 		}
 		data.donationUsers = donationUsers;
     ctx.template = 'interface_fund.pug';

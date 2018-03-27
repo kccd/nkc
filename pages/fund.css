@@ -96,7 +96,15 @@ a:focus{text-decoration: none}
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-  overflow: hidden;
+  position: relative;
+}
+.fund-brief>div{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top:0;
+  left:0;
+  /*background-color: rgba(255,255,255,0.5);*/
 }
 .fund-add{
   color: #ddd;
@@ -847,7 +855,7 @@ input[type="radio"], input[type="checkbox"]{
 }
 #budgetMoney, .selectedThreads, .unselectedThreads{
   padding: 1rem 0;
-  background-color: #efefef;
+  /*background-color: #efefef;*/
 }
 /*.unselectedThreads{*/
   /*overflow-y:scroll;*/
@@ -998,7 +1006,7 @@ input[type="radio"], input[type="checkbox"]{
 .threadList{
   background-color: #fff;
   padding: 0.3rem 0;
-  margin: 0.5rem 0.4rem;
+  margin: 0.5rem 0;
   border: 1px solid #dedede;
 }
 
@@ -1234,7 +1242,7 @@ input[type="radio"], input[type="checkbox"]{
   border-radius: 3.5rem 3.5rem 3.5rem 3.5rem;
 }
 .donation-btn a{
-  color: #ccc;
+  color: #aaa;
   font-size: 1.8rem;
   text-decoration: none;
   -webkit-transition: color 0.3s;
@@ -1244,7 +1252,7 @@ input[type="radio"], input[type="checkbox"]{
   transition: color 0.3s;
 }
 .donation-btn a:hover{
-  color: #999;
+  color: #666;
 }
 .vote-user{
   height: 1.5rem;

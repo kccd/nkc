@@ -44,6 +44,10 @@ const settingSchema = new Schema({
   	type: String,
 		default: ''
 	},
+	fundPoolDescription: {
+		type: String,
+		default: ''
+	},
 	closed: {
   	status: Boolean,
 		reason: String,

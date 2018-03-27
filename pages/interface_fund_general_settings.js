@@ -13,6 +13,7 @@ function submit() {
 	var description = $('#description').val();
 	var terms = $('#terms').val();
 	var donationDescription = $('#donationDescription').val();
+	var fundPoolDescription = $('#fundPoolDescription').val();
 	if(!description) {
 		return screenTopWarning('请输入科创基金介绍。');
 	} else {
@@ -27,6 +28,11 @@ function submit() {
 		return screenTopWarning('请输入科创基金捐款说明。');
 	} else {
 		obj.donationDescription = donationDescription;
+	}
+	if(!fundPoolDescription) {
+		return screenTopWarning('请输入资金池介绍。');
+	} else {
+		obj.fundPoolDescription = fundPoolDescription;
 	}
 	obj.readOnly = $('input[name="readOnly"]').eq(0).is(':checked');
 	obj.closed.status = $('input[name="closed"]').eq(0).is(':checked');

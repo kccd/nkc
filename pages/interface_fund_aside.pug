@@ -1,9 +1,14 @@
 .panel.panel-default
   .panel-body
-    h4.text-center 其他
     a.btn.btn-info.btn-block(href='/fund/history') 已过期的基金资助行动
-    if data.user && data.userLevel >= 7
+if data.user && data.userLevel >= 7
+  .panel.panel-default
+    .panel-body
+      h4.text-center 控制台
       a.btn.btn-info.btn-block(href='/fund/settings') 基金设置
       a.btn.btn-info.btn-block(href='/fund/add') 新建基金
       a.btn.btn-info.btn-block(href='/fund/bill') 添加账单
+.panel.panel-default
+  .panel-body
+    h4.text-center 支持
     a.btn.btn-info.btn-block(href='/fund/donation') 捐款

@@ -14,7 +14,10 @@ block content
             include interface_fund_singlefund
         hr
         .row
-          h2.text-center 捐款人
+          .col-xs-12.col-md-3(style='height: 3rem;line-height: 3rem;font-size: 2.5rem;') 捐款人
+          .col-xs-12.col-md-2.col-md-offset-7
+            a(href='/fund/donation').btn.btn-info.btn-block 去捐款
+        .row
           -for(let donationUser of data.donationUsers)
             .col-xs-4.col-sm-3.col-md-2.donation-user-list
               a(href=`/m/${donationUser.uid}`)
@@ -26,13 +29,10 @@ block content
                 -let description = donationUser.user.description || '暂无简介'
                 if description && description.length > 20
                   -description = description.slice(0, 20) + '...';
-                .description= description
+                .description(style='word-break:break-all;')= description
         .row.text-center.donation-btn
           a(href=`/fund/bills?type=donation`) 查看更多
         br
-        .row
-          .col-xs-12.col-md-2.col-md-offset-5
-            a(href='/fund/donation').btn.btn-info.btn-block.btn-lg 去捐款
 
         hr
         .row

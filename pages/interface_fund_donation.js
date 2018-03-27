@@ -1,5 +1,5 @@
 var obj = {
-	money: 200,
+	money: 500,
 	anonymous: false
 };
 
@@ -101,11 +101,11 @@ function ensureBill() {
 function selectFund(id) {
 	obj.fundId = id;
 	var arr = $('.select');
-	arr.text('');
+	arr.text('').css('background-color', '');
 	for(var i = 0; i < arr.length; i++) {
 		var element = arr.eq(i);
 		if(element.attr('fundid') === obj.fundId) {
-			element.text('已选择');
+			element.text('已选择').css('background-color', 'rgba(255,255,255,0.8)');
 			break;
 		}
 	}
@@ -114,7 +114,7 @@ function selectFund(id) {
 function selectMoney(m) {
 	obj.money = m;
 	var arr = $('.selectMoney');
-	arr.text('');
+	arr.text('未选择').css('color', '#c3e9f5');
 	for(var i = 0; i < arr.length; i++) {
 		var element = arr.eq(i);
 		var money = element.attr('money');
@@ -125,7 +125,7 @@ function selectMoney(m) {
 			$('#money').show();
 		}
 		if(m === money) {
-			element.text('已选择');
+			element.text('已选择').css('color', '#ffc253');
 			break;
 		}
 	}
