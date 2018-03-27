@@ -316,7 +316,7 @@ remittanceRouter
 							await report_1.save(); // 提交的报告
 							await report_2.save(); // 自动生成的报告
 							r.report = reportId_1;
-							r.threads = selectedThreads.map(t => t.tid);
+							r.threads = selectedThreads.map(t => t.tid.toString());
 							r.passed = null;
 							r.apply = true;
 						}

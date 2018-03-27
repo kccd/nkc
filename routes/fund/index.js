@@ -142,16 +142,27 @@ fundRouter
 	    verify: true
     }).sort({toc: -1}).limit(6);
 
-    const donationUid = [];
-    for(let b of donationBills) {
-    	const uid = b.from.id;
-    	if(!donationUid.includes(uid)) {
-    		donationUid.push(uid);
-	    }
-    }
-    data.donationUsers = await Promise.all(donationUid.map(async uid => {
-			return await db.UserModel.findOnly({uid});
-    }));
+    //查询捐款人 统计捐款总金额
+		const donationUsers = [];
+		for(let b of donationBills) {
+			const uid = b.from.id;
+			let flag = false;
+			for(let d of donationUsers) {
+				if(d.uid === uid) {
+					d.money += b.money;
+					flag = true;
+					break;
+				}
+			}
+			if(!flag) {
+				donationUsers.push({
+					uid,
+					money: b.money,
+					user: await db.UserModel.findOnly({uid})
+				});
+			}
+		}
+		data.donationUsers = donationUsers;
     ctx.template = 'interface_fund.pug';
     await next();
   })

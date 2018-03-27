@@ -75,6 +75,12 @@ function load() {
 	} else {
 		throw '请输入金额。';
 	}
+	obj.otherInfo = {
+		name: $('#name').val(),
+		account: $('#account').val(),
+		paymentType: $('#paymentType').val(),
+		transactionNumber: $('#transactionNumber').val()
+	}
 }
 
 function loadFromTo(type) {

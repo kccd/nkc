@@ -19,9 +19,11 @@ block content
             .col-xs-4.col-sm-3.col-md-2.donation-user-list
               a(href=`/m/${donationUser.uid}`)
                 .avatar.center-block
+                  if donationUser.money >= 5000
+                    div(title='土豪') 豪
                   img(src=`/avatar/${donationUser.uid}`)
-                .username= donationUser.username
-                -let description = donationUser.description || '暂无简介'
+                .username(style='word-break:break-all;')= donationUser.user.username
+                -let description = donationUser.user.description || '暂无简介'
                 if description && description.length > 20
                   -description = description.slice(0, 20) + '...';
                 .description= description

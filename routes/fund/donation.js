@@ -47,7 +47,7 @@ donationRouter
 		}
 		const params = {
 			out_trade_no: id,
-			subject: `科创基金${fund?` - ${fund.name}`: ''}`,
+			subject: `科创基金${fund?` - ${fund.name}`: ' - 资金池'}`,
 			body: `${abstract}${money}元`,
 			total_fee: money
 		};

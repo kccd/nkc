@@ -1203,8 +1203,19 @@ input[type="radio"], input[type="checkbox"]{
 .donation-user-list .avatar{
   height: 7rem;
   width: 7rem;
-  border-radius: 3.5rem 3.5rem 3.5rem 3.5rem;
-  overflow: hidden;
+  position: relative;
+}
+.donation-user-list .avatar>div{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  width: 2rem;
+  color: #dbb136;
+  background-color: #3e1b17;
+  border-radius: 50%;
+  line-height: 2rem;
+  text-align: center;
 }
 .donation-user-list .username{
   line-height: 4rem;
@@ -1220,6 +1231,7 @@ input[type="radio"], input[type="checkbox"]{
 }
 .donation-user-list .avatar img{
   width: 100%;
+  border-radius: 3.5rem 3.5rem 3.5rem 3.5rem;
 }
 .donation-btn a{
   color: #ccc;
@@ -1253,6 +1265,35 @@ input[type="radio"], input[type="checkbox"]{
   text-decoration: none;
 }
 
+.anonymous{
+  height: 2rem;
+  width: 2rem;
+  border: 0.25rem solid #5bc0de;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+.anonymous>div{
+  height: 1rem;
+  width: 1rem;
+  position: absolute;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgba(0,0,0,0);
+}
+.choose-anonymous{
+  display: inline-block;
+  color: #444;
+  font-size: 2.5rem;
+  cursor: pointer;
+}
+.choose-anonymous.active .anonymous>div{
+  background-color: #5bc0de;
+}
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;

@@ -1,5 +1,6 @@
 var obj = {
-	money: 200
+	money: 200,
+	anonymous: false
 };
 
 $(function() {
@@ -7,65 +8,55 @@ $(function() {
 	ensureBill();
 });
 function init() {
-	$('input[name="money"]').on('click', function() {
-		var otherInput = $('#otherInput');
-		if($('#other').is(':checked')) {
-			if(otherInput.hasClass('hidden')) {
-				otherInput.removeClass('hidden');
-			}
-		} else {
-			if(!otherInput.hasClass('hidden')) {
-				otherInput.addClass('hidden');
-			}
-		}
+	$('.choose-anonymous').on('click', function() {
+		$('.choose-anonymous').removeClass('active');
+		$(this).addClass('active');
+		obj.anonymous = $(this).attr('anonymous') === 'true';
 	})
-}
-
-function submit() {
-	var obj = {};
-	var fundArr = $('input[name="fund"]');
-	for(var i = 0; i < fundArr.length; i++) {
-		var f = fundArr.eq(i);
-		if(f.is(':checked')) {
-			obj.fundId = f.attr('fundId') || '';
+	var arr = $('.select');
+	for(var i = 0; i < arr.length; i++) {
+		if(arr.eq(i).text() === '已选择') {
+			obj.fundId = arr.eq(i).attr('fundid');
 			break;
 		}
 	}
-	if($('#other').is(':checked')) {
-		var money = $('#money').val();
-		if(money === '') {
-			return screenTopWarning('请输入捐款金额。');
-		}
-		money = parseFloat(money);
-		if(money >= 20) {
-			obj.money = money.toFixed(1);
-		} else {
-			return screenTopWarning('捐款金额不能少于20元。');
-		}
-	} else {
-		var moneyArr = $('input[name="money"]');
-		for(var i = 0; i < moneyArr.length; i++) {
-			var m = moneyArr.eq(i);
-			if(m.is(':checked')) {
-				var money = m.attr('money');
+}
+
+function submit() {
+	var fn = $('#submit').attr('onclick');
+	$('#submit').attr('onclick', '').addClass('disabled');
+	var arr = $('.selectMoney');
+	for(var i = 0; i < arr.length; i++) {
+		if(arr.eq(i).text() === '已选择') {
+			if(arr.eq(i).attr('money') === undefined) {
+				var money = $('#money input').val();
+				if(!money) {
+					money = 0;
+				} else {
+					money = parseInt(money);
+				}
+			} else {
+				var money = arr.eq(i).attr('money');
 				money = parseInt(money);
-				obj.money = money;
-				break;
 			}
+			obj.money = money;
+			break;
 		}
 	}
-	obj.anonymous = $('input[name="anonymous"]').eq(0).is(':checked');
-	if(obj.money > 0) {
+	if(obj.money > 20 && obj.money < 10000) {
 
-	}else {
+	} else {
 		return screenTopWarning('请输入正确的捐款金额。');
 	}
 	nkcAPI('/fund/donation', 'POST', obj)
 		.then(function(data) {
-			window.open(data.url);
+			$('#link').attr('href', data.url);
+			$('#link')[0].click();
+			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);
+			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 }
 
@@ -78,7 +69,10 @@ function ensureBill() {
 				.then(function(data) {
 					var bill = data.bill;
 					if(bill.verify) {
-						$('#message').text('捐款成功！');
+						$('#message').text('捐款成功，感谢您的捐款！');
+						setTimeout(function(){
+							window.location.href='/fund';
+						}, 3000);
 					} else {
 						if(bill.error) {
 							$('#error').text(bill.error);

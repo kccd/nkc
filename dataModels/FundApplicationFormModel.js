@@ -482,6 +482,13 @@ fundApplicationFormSchema.methods.extendReportThreads = async function() {
 			}
 		}
 	}
+	if(this.status.completed && this.threadsId.completed.length !== 0) {
+		for(let tid of this.threadsId.completed) {
+			if(!threadsId.includes(tid)) {
+				threadsId.push(tid);
+			}
+		}
+	}
 	const reportThreads = await Promise.all(threadsId.map(async tid => {
 		const thread = await ThreadModel.findOnly({tid});
 		await thread.extendFirstPost().then(p => p.extendUser());
