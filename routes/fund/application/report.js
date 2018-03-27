@@ -11,8 +11,9 @@ reportRouter
 		const {data, db} = ctx;
 		const {applicationForm, user} = data;
 		ctx.template = 'interface_fund_report.pug';
+		data.nav = '项目进度';
 		const q = {
-			type: {$in: ['report', 'completedReport', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'vote']},
+			type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
 			applicationFormId: applicationForm._id
 		};
 		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
@@ -21,85 +22,34 @@ reportRouter
 		data.reports = await db.FundDocumentModel.find(q).sort({toc: -1});
 		await Promise.all(data.reports.map(async r => {
 			await r.extendUser();
+			await r.extendResources();
 		}));
 		await next();
 	})
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user, applicationForm} = data;
-		const {c, t, type, selectedThreads} = body;
-		if(applicationForm.status.completed) ctx.throw(400, '该项目已结项。');
+		const {c, t} = body;
+		if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经结题。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
-		const obj = {};
 		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');
-		if(type === 'applyRemittance') {
-			if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经结题。');
-			const {timeToPassed, reportNeedThreads, remittance, fund} = applicationForm;
-			for(let i = 0; i < remittance.length; i++) {
-				const r = remittance[i];
-				if(!r.status) {
-					if(reportNeedThreads && selectedThreads.length === 0) ctx.throw(400, '管理员要求提交拨款申请必须要附带代表中期报告的帖子。');
-
-					//验证帖子时间
-					await Promise.all(selectedThreads.map(async t => {
-						const thread = await db.ThreadModel.findOnly({tid: t.tid});
-						if(thread.toc < timeToPassed) ctx.throw(400, '请选择申请项目之后所发的帖子。')
-					}));
-
-					r.threads = selectedThreads.map(t => t.tid);
-					if(fund.auditType === 'system') {
-						r.passed = true;
-						obj.submittedReport = false;
-					} else {
-						r.passed = null;
-						obj.submittedReport = true;
-					}
-					let newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-					r.report = newId;
-					const newDocument = db.FundDocumentModel({
-						_id: newId,
-						uid: user.uid,
-						type: 'report',
-						applicationFormId: applicationForm._id,
-						c: c,
-					});
-					await newDocument.save();
-
-					//申请拨款 记录
-					newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-					r.report = newId;
-					const newReport = db.FundDocumentModel({
-						_id: newId,
-						uid: user.uid,
-						type: 'report',
-						applicationFormId: applicationForm._id,
-						c: `申请第 ${i+1} 期拨款`,
-					});
-					await newReport.save();
-					obj.remittance = remittance;
-					break;
-				}
-			}
-			obj.tlm = Date.now();
-			await applicationForm.update(obj);
-		} else {
-			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-			const newDocument = db.FundDocumentModel({
-				_id: newId,
-				uid: user.uid,
-				c: c,
-				t: t,
-				applicationFormId: applicationForm._id,
-				type: 'report'
-			});
-			await newDocument.save();
-			data.redirect = `/fund/a/${applicationForm._id}/report`;
-		}
+		const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+		const newDocument = db.FundDocumentModel({
+			_id: newId,
+			uid: user.uid,
+			c: c,
+			t: t,
+			applicationFormId: applicationForm._id,
+			type: 'report'
+		});
+		await newDocument.save();
+		data.redirect = `/fund/a/${applicationForm._id}/report`;
 		await next();
 	})
 	.get('/audit', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.type = 'reportAudit';
+		data.nav = '报告审核';
 		const {user, applicationForm} = data;
 		const {remittance, reportNeedThreads, submittedReport, fund} = applicationForm;
 		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
@@ -114,7 +64,7 @@ reportRouter
 						return thread;
 					}));
 				}
-				data.report = await db.FundDocumentModel.findOnly({_id: r.report});
+				data.report = await db.FundDocumentModel.findOne({_id: r.report});
 				break;
 			}
 		}
@@ -127,11 +77,12 @@ reportRouter
 		const {submittedReport, remittance, fund} = applicationForm;
 		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
 		const {number, support, c} = body;
-		if(!number) ctx.throw(400, '参数错误');
+		if(number === undefined) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
+			if(!r.apply && i === number) ctx.throw(400, '申请人暂未提交报告。');
 			if((i < number && !r.status) || (i > number && r.status)) ctx.throw(400, '参数错误。');
 			if(i === number && r.status) ctx.throw(400, '该报告已通过审核。');
 		}
@@ -158,9 +109,10 @@ reportRouter
 				const newReport = db.FundDocumentModel({
 					_id: newId,
 					uid: user.uid,
-					type: 'report',
+					type: 'system',
 					applicationFormId: applicationForm._id,
-					c: str
+					c: str,
+					support
 				});
 				await newReport.save();
 				break;

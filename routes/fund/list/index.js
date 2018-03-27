@@ -15,12 +15,14 @@ listRouter
 	// 添加基金项目
 	.post('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		const {user} = data;
 		const {fundObj} = ctx.body;
 		fundObj.name = fundObj.name || '科创基金';
 		const fund = await db.FundModel.findOne({_id: fundObj._id});
 		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
+		if(fundObj.auditType === 'system' && fundObj.admin.appointed.length === 0) {
+			ctx.throw(400, '系统审核必须指定管理员UID。');
+		}
 		const newFund = db.FundModel(fundObj);
 		await newFund.save();
 		data.fund = newFund;
@@ -33,6 +35,9 @@ listRouter
 		const {fundObj} = ctx.body;
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
+		if(fundObj.auditType === 'system' && fundObj.admin.appointed.length === 0) {
+			ctx.throw(400, '系统审核必须指定管理员UID。');
+		}
 		await fund.update(fundObj);
 		data.fund = fund;
 		await next();
@@ -95,7 +100,7 @@ listRouter
 			const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 			data.authLevel = await userPersonal.getAuthLevel();
 		}
-		ctx.template = 'interface_fund_messages.pug';
+		ctx.template = 'interface_fund_home.pug';
 		await next();
 	})
 	.use('/:fundId/settings', settingsRouter.routes(), settingsRouter.allowedMethods())

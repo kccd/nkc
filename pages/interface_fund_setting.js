@@ -341,7 +341,9 @@ function submit(id) {
 	if(fundObj._id === '') return screenTopWarning('基金编号不能为空。');
 	if(!fundObj._id.match(/[A-Z]+/g)) return screenTopWarning('基金编号只能由大写字母组成。');
 	if(fundObj._id.length > 4) return screenTopWarning('基金编号不能超过四位！');
-
+	if(fundObj.auditType === 'system' && fundObj.admin.appointed.length === 0) {
+		return screenTopWarning('系统审核必须指定管理员UID。');
+	}
 	var url = '/fund/list';
 	var method = 'POST';
 	if(id !== undefined) {

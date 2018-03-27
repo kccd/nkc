@@ -456,7 +456,11 @@ const certificates ={
               [PATCH]: true,
               [DELETE]: true
             }
-          }
+          },
+	        bills: {
+          	[name]: '用户账单',
+		        [GET]: true
+	        }
         }
       },
       me: {
@@ -630,7 +634,11 @@ const certificates ={
         				[name]: '申请拨款',
 				        [GET]: true,
 				        [POST]: true
-			        }
+			        },
+				      verify: {
+				      	[name]: '确认收款',
+					      [PATCH]: true
+				      }
 			      },
 			      excellent: {
 				      [name]: '评优',

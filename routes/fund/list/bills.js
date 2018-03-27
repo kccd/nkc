@@ -7,8 +7,11 @@ billsRouter
 		const fundId = params.fundId.toUpperCase();
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		const page = query.page? parseInt(query.page): 0;
-
-		let bills = await db.FundBillModel.find({verify: true, $or: [
+		const q = {};
+		if(data.userLevel < 7) {
+			q.verify = true;
+		}
+		q.$or = [
 			{
 				'from.type': 'fund',
 				'from.id': fundId
@@ -17,13 +20,16 @@ billsRouter
 				'to.type': 'fund',
 				'to.id': fundId
 			}
-		]}).sort({toc: 1});
+		];
+		let bills = await db.FundBillModel.find(q).sort({toc: 1});
 		let total = 0;
 		bills.map(b => {
-			if(b.from.id === fundId) {
-				total += b.money*-1;
-			} else {
-				total += b.money;
+			if(b.verify) {
+				if(b.from.id === fundId) {
+					total += b.money*-1;
+				} else {
+					total += b.money;
+				}
 			}
 			b.balance = total;
 		});
@@ -32,19 +38,14 @@ billsRouter
 		const paging = apiFn.paging(page, count);
 		bills = bills.reverse();
 		const targetBills = bills.slice(paging.start, (paging.start + paging.perpage));
-
-		const isAdmin = data.userLevel >= 7;
-
-		await Promise.all(targetBills.map(async b => {
-			if(!isAdmin) {
-			}
+		data.bills = await Promise.all(targetBills.map(async b => {
 			await b.extendFromInfo();
 			await b.extendToInfo();
 			await b.extendApplicationForm();
 			await b.extendUser();
 			await b.extendFund();
+			return b;
 		}));
-		data.bills = bills;
 		data.fund = fund;
 		data.nav = '基金账单';
 		data.paging = paging;

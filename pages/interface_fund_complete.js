@@ -1,38 +1,12 @@
 var selectedThreads = [];
-var usedMoney = [];
+var actualMoney = [];
 var applicationFormId = parseInt($('#applicationFormId').text());
+var fundId = $('#fundId').text();
 $(function(){
-	init();
-	initNumber();
+
+	initActualMoney();
 });
 
-function initNumber() {
-	var arr = $('.reportOfKnotAudit .used');
-	for (var i = 0; i < arr.length; i++) {
-		var text = arr.eq(i).text();
-		var number = parseInt(text);
-		number = number > 0? number: 0;
-		arr.eq(i).text(number);
-	}
-	var moneyArr = $('.used');
-	var total = 0;
-	usedMoney = [];
-	for(var i = 0; i < moneyArr.length; i++) {
-		var num = parseInt(moneyArr.eq(i).text());
-		usedMoney.push(num);
-		total += num;
-	}
-	$('#usedMoneyTotal').html(total);
-}
-
-function init() {
-	var arr = $('.used');
-	for(var i = 0; i < arr.length; i++) {
-		arr.eq(i).on('blur', function() {
-			initNumber();
-		})
-	}
-}
 
 function getThreads(page, self) {
 	var url;
@@ -239,7 +213,7 @@ function submit(id){
 		successful: success,
 		selectedThreads: selectedThreads,
 		c: content,
-		usedMoney: usedMoney
+		actualMoney: actualMoney
 	};
 	nkcAPI('/fund/a/'+id+'/complete', 'POST', obj)
 		.then(function() {
@@ -266,6 +240,103 @@ function submitCompletedAudit(type, id) {
 	nkcAPI('/fund/a/'+id+'/complete/audit', 'POST', obj)
 		.then(function() {
 			window.location.href = '/fund/a/'+id;
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+
+function initActualMoney() {
+	var arr = $('#actualMoney .list .fund-money-list');
+	var length = arr.length;
+	actualMoney = [];
+	for(var i = 0; i < length; i++) {
+		var purpose = $('.actualPurpose[num="'+i+'"]').text();
+		var count = $('.actualCount[num="'+i+'"]').text();
+		count = parseInt(count);
+		if(count >= 1){
+
+		}else {
+			count = 0;
+		}
+		var money = $('.actualMoney[num="'+i+'"]').text();
+		money = parseInt(money);
+		if(money >= 1){
+
+		}else {
+			money = 0;
+		}
+		actualMoney.push({
+			purpose: purpose,
+			count: count,
+			money: money
+		});
+	}
+	displayActualMoney();
+}
+
+function displayActualMoney() {
+	var html = '';
+	var aggregate = 0;
+	for(var i = 0; i < actualMoney.length; i++) {
+		var a = actualMoney[i];
+		var total = a.count*a.money;
+		aggregate += total;
+		var purposeHtml = '<div class="actualPurpose" contenteditable=true num="'+i+'">'+a.purpose+'</div>';
+		var countHtml = '<div class="actualCount" contenteditable=true num="'+i+'">'+a.count+'</div>';
+		var moneyHtml = '<div class="actualMoney" contenteditable=true num="'+i+'">'+a.money+'</div>';
+		var totalHtml = '<div class="actualTotal" num="'+i+'">'+total+'</div>';
+		var deleteHtml = '<div class="delete glyphicon glyphicon-remove" onclick="deleteList('+i+')"></div>';
+		html += '<div class="fund-money-list">'+purposeHtml+countHtml+moneyHtml+totalHtml+deleteHtml+'</div>';
+	}
+	$('#actualMoney .list').html(html);
+	var factMoney = $('.factMoney').text();
+	factMoney = parseInt(factMoney);
+	var balance = (factMoney >= aggregate? factMoney-aggregate: 0);
+	$('#aggregate').text('实际批准：'+ factMoney + '元，实际花费：'+ aggregate + '元，应退金额：'+ balance + '元');
+	if(balance > 0) {
+		var aHtml = '&nbsp;&nbsp;<span class="fund-span" onclick="refund('+balance+')">去退款</span>';
+		$('#aggregate').html($('#aggregate').html()+aHtml)
+	}
+	divBlur();
+}
+
+function divBlur() {
+	$('div[contenteditable=true]').on('blur', function() {
+		initActualMoney();
+	})
+}
+
+
+function addList() {
+	actualMoney.push({
+		purpose: '新建',
+		count: 0,
+		money: 0
+	});
+	displayActualMoney();
+}
+
+function deleteList(num) {
+	actualMoney.splice(num, 1);
+	displayActualMoney();
+}
+
+function compute() {
+	initActualMoney();
+}
+
+function refund(money) {
+	var obj = {
+		fundId: fundId,
+		money: money,
+		type: 'refund',
+		actualMoney: actualMoney
+	};
+	nkcAPI('/fund/donation', 'POST', obj)
+		.then(function(data) {
+			window.open(data.url);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

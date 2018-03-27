@@ -46,19 +46,16 @@ function init() {
 	});
 	$('.wechat').on('click', function() {
 		chooseWechat();
-		$('#bankCardName').css('display', 'none');
 		$('#bankName').css('display', 'none');
 
 	});
 	$('.alipay').on('click', function() {
 		chooseAlipay();
-		$('#bankCardName').css('display', 'none');
 		$('#bankName').css('display', 'none');
 
 	});
 	$('.bankCard').on('click', function() {
 		chooseBankCard();
-		$('#bankCardName').css('display', 'block');
 		$('#bankName').css('display', 'block');
 	});
 	$('#account').on('click', function(){
@@ -993,12 +990,12 @@ function userMessagesForm() {
 			if(!$('#bankName input').val()){
 				throw '请输入银行全称！';
 			}
-			obj.bankCardName = $('#bankCardName input').val();
 			obj.bankName = $('#bankName input').val();
 		} else {
 			throw '请选择收款方式！';
 		}
 		obj.account = $('#account').val();
+		obj.bankCardName = $('#bankCardName input').val();
 		if(obj.account === '') {
 			throw '请输入收款账号！';
 		}

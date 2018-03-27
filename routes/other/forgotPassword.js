@@ -47,7 +47,7 @@ forgotPasswordRouter
 	const smsCode = await db.SmsCodeModel.ensureCode({nationCode, mobile, code: mcode, type});
 	if(!password) ctx.throw(400, '请输入密码。');
 	const {contentLength, checkPass} = ctx.tools.checkString;
-	if(contentLength(password) <= 8) ctx.throw(400, '密码长度至少要大于8位。');
+	if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 	if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
 	const {apiFunction} = ctx.nkcModules;
 	const passwordObj = apiFunction.newPasswordObject(password);
@@ -116,7 +116,7 @@ forgotPasswordRouter
 	if(!password) ctx.throw(400, '请输入密码。');
 	if(password !== password2) ctx.throw(400, '两次输入的密码不一致，请重新输入。');
 	const {checkPass, contentLength} = ctx.tools.checkString;
-	if(contentLength(password) <= 8) ctx.throw(400, '密码长度至少要大于8位。');
+	if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 	if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
 	const {apiFunction} = ctx.nkcModules;
 	const passwordObj = apiFunction.newPasswordObject(password);

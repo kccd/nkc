@@ -69,12 +69,20 @@ const fundBillSchema = new Schema({
 	abstract: {// 摘要
 		type: String,
 		required: true,
-		maxlength: [10, '摘要字数不能大于10']
+		maxlength: [10, '摘要字数不能大于10'],
+		index: 1
 	},
 	verify: {
 		type: Boolean,
 		default: true,
 		index: 1
+	},
+	otherInfo: {
+		paymentType: String,
+		transactionNumber: String,
+		name: String,
+		account: String,
+		error: String
 	}
 }, {
 	collection: 'fundBills',
@@ -202,7 +210,7 @@ fundBillSchema.methods.extendFund = async function() {
 
 fundBillSchema.statics.getBalance = async function(type, id) {
 	const FundBillModel = mongoose.model('fundBills');
-	const q = {};
+	const q = {verify: true};
 	if(type === 'fund') {
 		q.$or = [
 			{

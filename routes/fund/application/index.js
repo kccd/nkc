@@ -112,6 +112,9 @@ applicationRouter
 			await comment.extendResources();
 		}));
 		applicationForm.comments = comments;
+		await applicationForm.extendSupporters();
+		await applicationForm.extendObjectors();
+		await applicationForm.extendReportThreads();
 		const auditComments = {};
 		if(!applicationForm.status.projectPassed) {
 			auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
@@ -127,6 +130,11 @@ applicationRouter
 		if(applicationForm.useless === 'giveUp') {
 			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
 		}
+		const reports = await db.FundDocumentModel.find({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
+		data.reports = await Promise.all(reports.map(async r => {
+			await r.extendResources();
+			return r;
+		}));
 		data.auditComments = auditComments;
 		data.paging = paging;
 		await next();
@@ -163,7 +171,10 @@ applicationRouter
 		let updateObj = {
 			tlm: Date.now()
 		};
-		if(applicationForm.modifyCount >= fund.modifyCount) throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
+		if(applicationForm.modifyCount >= fund.modifyCount) {
+			await applicationForm.update({useless: 'exceededModifyCount'});
+			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
+		}
 		if(s === 1) {
 			const {from} = body;
 			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
@@ -298,11 +309,12 @@ applicationRouter
 				await applicationForm.ensureInformation();
 				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newReport = db.FundDocumentModel({
-					type: 'report',
+					type: 'system',
 					uid: user.uid,
 					applicationFormId: applicationForm._id,
 					_id: newId,
-					c: '提交申请表'
+					c: '提交申请表',
+					support: true
 				});
 				await newReport.save();
 			} catch(err) {
@@ -337,17 +349,32 @@ applicationRouter
 			if (submitted) ctx.throw(400, '无法删除已提交的申请表，如需停止申请请点击放弃申请按钮。');
 			applicationForm.useless = 'delete';
 		} else if(type === 'refuse') {
-			if(adminSupport) ctx.throw(400, '管理员复核已通过，无法完成彻底拒绝。');
+			let remittanceError = false;
+			for(let r of applicationForm.remittance) {
+				if(r.status === false) {
+					remittanceError = true;
+					break;
+				}
+			}
+			if(adminSupport && !remittanceError) ctx.throw(400, '管理员复核已通过，且拨款没有出错，无法完成彻底拒绝。');
 			applicationForm.useless = 'refuse';
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({
 				_id: newId,
 				uid: user.uid,
 				applicationFormId: applicationForm._id,
-				type: 'report',
-				c: '被彻底拒绝'
+				type: 'system',
+				c: '被彻底拒绝',
+				support: false
 			});
 			await newDocument.save();
+		} else if(type === 'withdraw') {
+			if(applicationForm.remittance[0].status !== false) ctx.throw(400, '无法完成该操作。');
+			applicationForm.lock.submitted = false;
+			await applicationForm.update({
+				'lock.submitted': false
+			});
+			return await next();
 		} else {
 			ctx.throw(400, '未知的操作类型。');
 		}
@@ -375,6 +402,7 @@ applicationRouter
 		if(user) {
 			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);
 		}
+		//拦截申请表敏感信息
 		if(!user || (applicationForm && data.userLevel < 7 && applicationForm.uid !== user.uid && !hasPermission)) {
 			const {applicant, members} = applicationForm;
 			applicant.mobile = null;
@@ -385,6 +413,10 @@ applicationRouter
 				m.mobile = null;
 				m.idCardNumber = null;
 			}
+		}
+		//拦截表示反对的用户
+		if(!hasPermission) {
+			applicationForm.objectors = [];
 		}
 		await next();
 	});

@@ -101,6 +101,27 @@ block content
             h5 备注：
             textarea#notes.form-control(rows='5')= data.bill?data.bill.notes: ''
             br
+
+            h5 其他信息：
+            -const {transactionNumber, paymentType, account, name} = data.bill?data.bill.otherInfo:{}
+            h5 交易平台
+            input#paymentType(value=paymentType)
+            h5=`${paymentType || ''}平台交易编号`
+            input#transactionNumber(value=transactionNumber)
+            h5 交易账号
+            input#account(value=account)
+            h5 户名
+            input#name(value=name)
+            br
+            br
+            span 已验证：
+            label.radio-inline
+              input(type="radio" name='verify' checked=(data.bill && data.bill.verify))
+              h5 是
+            label.radio-inline
+              input(type="radio" name='verify' checked=(!data.bill || !data.bill.verify))
+              h5 否
+            br
             .text-center
               button.btn.btn-info(onclick=`submit(${data.bill ? data.bill._id : ''})`) &nbsp;&nbsp;提交&nbsp;&nbsp;
               if data.bill

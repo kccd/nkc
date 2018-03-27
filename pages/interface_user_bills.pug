@@ -1,0 +1,32 @@
+extends bootstrap_base
+block title
+  title= `${data.targetUser.username}的账单`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    mixin loadInfo(obj)
+      if obj.type === 'fundPool'
+        th= '资金池'
+      if obj.type === 'fund'
+        th
+          span (基金)
+          a(href=`/fund/list/${obj.fund._id.toLowerCase()}` target='_blank')= obj.fund.name
+      if obj.type === 'user'
+        if obj.anonymous
+          th 匿名用户
+        else
+          th
+            span (用户)
+            a(href=`/m/${obj.user.uid}` target='_blank')= obj.user.username
+      if obj.type === 'other'
+        th= obj.id
+    h4 用户：
+      a(href=`/m/${data.targetUser.uid}`)= data.targetUser.username
+      if data.fund
+        span &nbsp;&nbsp;基金：
+        a(href=`/fund/list/${data.fund._id}`)= data.fund.name
+    -const url = `/u/${data.user.uid}/bills`;
+    include interface_fund_page
+    include interface_fund_bill_list
+    include interface_fund_page
