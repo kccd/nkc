@@ -46,6 +46,7 @@ function submit() {
 	if(obj.money > 20 && obj.money < 10000) {
 
 	} else {
+		$('#submit').removeClass('disabled').attr('onclick', fn);
 		return screenTopWarning('请输入正确的捐款金额。');
 	}
 	nkcAPI('/fund/donation', 'POST', obj)
