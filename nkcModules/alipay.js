@@ -4,6 +4,7 @@ const moment = require('moment');
 const crypto = require('crypto');
 
 class nodeTransfer {
+
 	config(obj) {
 		const configObj = Object.assign({}, obj);
 		this.rsa_private_key = configObj.rsa_private_key;
@@ -38,7 +39,7 @@ class nodeTransfer {
 			version: '1.0'
 		};
 		signObj.sign = this.makeSign(signObj, 'private');
-		return `https://openapi.alipaydev.com/gateway.do?` + queryString.stringify(signObj);
+		return `https://openapi.alipay${process.env.NODE_ENV === 'production'? '': 'dev'}.com/gateway.do?` + queryString.stringify(signObj);
 	}
 
 	request(params) {
@@ -62,7 +63,7 @@ class nodeTransfer {
 							timestamp: pay_date
 						});
 					} else {
-						reject(`转账失败！ code: ${code}, msg: ${msg}, sub_code: ${sub_code}`);
+						reject({code, msg, subCode: sub_code});
 					}
 				}
 			})
@@ -73,11 +74,12 @@ const alipay = {};
 
 alipay.transfer = (obj) => {
 	const {transferConfig, transferParams} = require('../settings/alipay');
-	const {account, money, notes, id} = obj;
+	const {account, money, notes, id, name} = obj;
 	transferParams.out_biz_no = id;
 	transferParams.payee_account = account;
 	transferParams.amount = money;
 	transferParams.remark = notes;
+	transferParams.payee_real_name = name;
 	const transfer = new nodeTransfer();
 	transfer.config(transferConfig);
 	return transfer.request(transferParams)

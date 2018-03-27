@@ -48,7 +48,7 @@ function register_submit(){
     }
     if(userobj.password.length < 8){
       getFocus("#password")
-      throw('密码长度要大于8位，请重新填写！')
+      throw('密码长度不能小于8位，请重新填写！')
     }
     if(checkPass(userobj.password) < 2){
       getFocus("#password")

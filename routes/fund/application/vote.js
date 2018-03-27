@@ -8,7 +8,8 @@ voteRouter
 		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		if(!applicationForm.fund.ensureOperatorPermission('voter', user)) ctx.throw(401, '抱歉！您没有资格进行投票。');
-		const {fund, members, supportersId, objectorsId} = applicationForm;
+		const {fund, members, supportersId, objectorsId, status} = applicationForm;
+		if(!status.submitted) ctx.throw(400, '申请表未提交，暂不能投票。');
 		const membersId = members.map(m => m.uid);
 		membersId.push(applicationForm.uid);
 		if(membersId.includes(user.uid)) ctx.throw(401, '抱歉！您已参与该基金的申请，无法完成该操作！');
@@ -33,7 +34,19 @@ voteRouter
 
 		//获得网友支持
 		if(fund.supportCount <= supportersId.length) {
-			await applicationForm.update({'status.usersSupport': true, tlm: Date.now()});
+			const obj = {
+				'status.usersSupport': true,
+				tlm: Date.now()
+			};
+			if(fund.auditType === 'system') {
+				obj['status.projectPassed'] = true;
+				obj['status.adminSupport'] = true;
+				obj.remittance = [{
+					money: this.money,
+					status: null
+				}];
+			}
+			await applicationForm.update(obj);
 		}
 		await next();
 	});

@@ -58,7 +58,7 @@ a:focus{text-decoration: none}
   -webkit-animation-iteration-count:infinite;
 }
 .fund-list{
-  margin: 15px 0;
+  margin: 0 0 30px 0;
 }
 .fund-list > a{
   display: inline-block;
@@ -96,7 +96,15 @@ a:focus{text-decoration: none}
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-  overflow: hidden;
+  position: relative;
+}
+.fund-brief>div{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top:0;
+  left:0;
+  /*background-color: rgba(255,255,255,0.5);*/
 }
 .fund-add{
   color: #ddd;
@@ -574,7 +582,6 @@ input[type="radio"], input[type="checkbox"]{
   background-position: -96px;
 }
 .fund-description{
-  font-size: 1rem;
   color: #999;
 }
 .fund-apply-head{
@@ -848,7 +855,7 @@ input[type="radio"], input[type="checkbox"]{
 }
 #budgetMoney, .selectedThreads, .unselectedThreads{
   padding: 1rem 0;
-  background-color: #efefef;
+  /*background-color: #efefef;*/
 }
 /*.unselectedThreads{*/
   /*overflow-y:scroll;*/
@@ -884,7 +891,11 @@ input[type="radio"], input[type="checkbox"]{
 .fund-money-list.reportOfKnotAudit > div{
   width: 14.28%;
 }
-
+.report{
+  border-top: 1px dashed #aaa;
+  border-bottom: 1px dashed #aaa;
+  margin-bottom: 01rem;
+}
 .aggregate{
   padding-left: 0.5rem;
 }
@@ -995,7 +1006,7 @@ input[type="radio"], input[type="checkbox"]{
 .threadList{
   background-color: #fff;
   padding: 0.3rem 0;
-  margin: 0.5rem 0.4rem;
+  margin: 0.5rem 0;
   border: 1px solid #dedede;
 }
 
@@ -1155,6 +1166,9 @@ input[type="radio"], input[type="checkbox"]{
   border-left: #ccc solid 2px;
   padding-left: 1rem;
 }
+.timer-shaft .content>div{
+  word-break:break-all;
+}
 
 .applicationForm .h3, .applicationForm .h4{
   font-weight: 600;
@@ -1174,6 +1188,120 @@ input[type="radio"], input[type="checkbox"]{
   color: #888;
   text-align: center;
 }
+
+.donation-user-list{
+  height: 19rem;
+  margin: 15px 0;
+}
+.donation-user-list>a{
+  padding: 1.3rem;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  box-shadow: 0 2px 15px #efefef;
+  -webkit-transition: box-shadow 0.3s;
+  -moz-transition: box-shadow 0.3s;
+  -ms-transition: box-shadow 0.3s;
+  -o-transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s;
+}
+.donation-user-list>a:hover{
+  box-shadow: 0 4px 15px #ccc;
+}
+.donation-user-list .avatar{
+  height: 7rem;
+  width: 7rem;
+  position: relative;
+}
+.donation-user-list .avatar>div{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  width: 2rem;
+  color: #dbb136;
+  background-color: #3e1b17;
+  border-radius: 50%;
+  line-height: 2rem;
+  text-align: center;
+}
+.donation-user-list .username{
+  line-height: 4rem;
+  text-align: center;
+  height: 4rem;
+  font-size: 2rem;
+
+}
+.donation-user-list .description{
+  height: 9rem;
+  text-align: center;
+  color: #999;
+}
+.donation-user-list .avatar img{
+  width: 100%;
+  border-radius: 3.5rem 3.5rem 3.5rem 3.5rem;
+}
+.donation-btn a{
+  color: #aaa;
+  font-size: 1.8rem;
+  text-decoration: none;
+  -webkit-transition: color 0.3s;
+  -moz-transition: color 0.3s;
+  -ms-transition: color 0.3s;
+  -o-transition: color 0.3s;
+  transition: color 0.3s;
+}
+.donation-btn a:hover{
+  color: #666;
+}
+.vote-user{
+  height: 1.5rem;
+  line-height: 1.5rem;
+  display: inline-block;
+  margin-right: 0.2rem;
+  color: #5bc0de;
+}
+.vote-user img{
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 100%;
+  margin-right: 2px;
+  overflow: hidden;
+}
+.vote-user a{
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.anonymous{
+  height: 2rem;
+  width: 2rem;
+  border: 0.25rem solid #5bc0de;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+.anonymous>div{
+  height: 1rem;
+  width: 1rem;
+  position: absolute;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgba(0,0,0,0);
+}
+.choose-anonymous{
+  display: inline-block;
+  color: #444;
+  font-size: 2.5rem;
+  cursor: pointer;
+}
+.choose-anonymous.active .anonymous>div{
+  background-color: #5bc0de;
+}
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;
@@ -1187,5 +1315,11 @@ input[type="radio"], input[type="checkbox"]{
 @media screen and (max-width: 468px) {
   .fund-list{
     width: 100%;
+  }
+  .donation-user-list{
+    width: 50%;
+  }
+  .donation-user-list a{
+    padding: 2rem 0.5rem;
   }
 }

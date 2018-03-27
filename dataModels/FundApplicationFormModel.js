@@ -80,6 +80,10 @@ const fundApplicationFormSchema = new Schema({
     }
     */
   },
+	actualMoney: {
+  	type: [Schema.Types.mixed],
+		default: null
+	},
   projectCycle: { // 预计周期
 	  type: Number,
 	  default: null,
@@ -327,6 +331,30 @@ fundApplicationFormSchema.virtual('forum')
 		this._forum = forum;
 	});
 
+fundApplicationFormSchema.virtual('supporters')
+	.get(function() {
+		return this._supporters;
+	})
+	.set(function(supporters) {
+		this._supporters = supporters;
+	});
+
+fundApplicationFormSchema.virtual('objectors')
+	.get(function() {
+		return this._objectors;
+	})
+	.set(function(objectors) {
+		this._objectors = objectors;
+	});
+
+fundApplicationFormSchema.virtual('reportThreads')
+	.get(function() {
+		return this._reportThreads;
+	})
+	.set(function(reportThreads) {
+		this._reportThreads = reportThreads;
+	});
+
 
 fundApplicationFormSchema.pre('save', function(next) {
   this.tlm = Date.now();
@@ -343,10 +371,6 @@ fundApplicationFormSchema.pre('save', async function(next) {
 		status.usersSupport = true;
 	}
 
-	//专家审核-机器审核
-	if(status.usersSupport && fund.auditType === 'system') {
-		status.projectPassed = true;
-	}
 
 	// 生成申请表编号
 	if(submitted && !code) {
@@ -426,11 +450,51 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	return this.threads = threads;
 };
 
-fundApplicationFormSchema.methods.saveHistory = async function() {
-	const FundApplicationHistoryModel = require('./FundApplicationHistoryModel');
-	const newHistory = new FundApplicationHistoryModel({
+fundApplicationFormSchema.methods.extendSupporters = async function() {
+	const UserModel = require('./UserModel');
+	const supporters = [];
+	for(let uid of this.supportersId) {
+		const user = await UserModel.findOnly({uid});
+		supporters.push(user);
+	}
+	return this.supporters = supporters;
+};
 
-	});
+fundApplicationFormSchema.methods.extendObjectors = async function() {
+	const UserModel = require('./UserModel');
+	const objectors = [];
+	for(let uid of this.objectorsId) {
+		const user = await UserModel.findOnly({uid});
+		objectors.push(user);
+	}
+	return this.objectors = objectors;
+};
+
+fundApplicationFormSchema.methods.extendReportThreads = async function() {
+	const ThreadModel = require('./ThreadModel');
+	const threadsId = [];
+	for(let r of this.remittance) {
+		if(r.threads && r.threads.length !== 0) {
+			for(tid of r.threads) {
+				if(!threadsId.includes(tid)) {
+					threadsId.push(tid)
+				}
+			}
+		}
+	}
+	if(this.status.completed && this.threadsId.completed.length !== 0) {
+		for(let tid of this.threadsId.completed) {
+			if(!threadsId.includes(tid)) {
+				threadsId.push(tid);
+			}
+		}
+	}
+	const reportThreads = await Promise.all(threadsId.map(async tid => {
+		const thread = await ThreadModel.findOnly({tid});
+		await thread.extendFirstPost().then(p => p.extendUser());
+		return thread;
+	}));
+	return this.reportThreads = reportThreads;
 };
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
@@ -486,7 +550,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	if(!account.paymentType) throw '请选择收款方式！';
 	if(!account.number) throw '请填写您的收款账号！';
 	if(!applicant.description) throw '请填写您的自我介绍！';
-
+	if(fund.auditType === 'system' && account.paymentType !== 'alipay') throw '系统审核只支持支付宝收款。';
 	// 项目信息判断
 	if(!projectId) {
 		throw '请填写项目信息！';
@@ -554,11 +618,27 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		}
 
 	}
+	//系统审核
+	if(fund.auditType === 'system') {
+		status.projectPassed = true;
+		status.adminSupport = true;
+		if(!this.timeToPassed) {
+			this.timeToPassed = Date.now();
+		}
+		if(this.remittance.length !== 1 && this.money) {
+			this.remittance = [{
+				money: this.money,
+				status: null
+			}];
+		}
+	} else {
+		this.status.projectPassed = null;
+		this.status.adminSupport = null;
+	}
 	this.status.submitted = true;
 	this.modifyCount += 1;
 	this.timeToSubmit = Date.now();
-	this.status.projectPassed = null;
-	this.status.adminSupport = null;
+	this.submittedReport = false;
 	this.tlm = Date.now();
 	//存历史
 	const oldApplicationForm = await FundApplicationForm.findOnly({_id: this._id});

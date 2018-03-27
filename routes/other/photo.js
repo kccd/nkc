@@ -55,7 +55,6 @@ photoRouter
     const targetPath = photoPath + photoDir + filePath;
     const smallTargetPath = photoSmallPath + photoSmallDir + filePath;
     await photoify(path, targetPath);
-    console.log(size);
     if((photoType === 'lifePhoto' || photoType === 'certsPhoto' ) && size > 1024*500) {
 			await lifePhotoify(targetPath);
     }

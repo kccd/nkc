@@ -33,7 +33,7 @@
     
     根目录运行  run_as_production
 
-    或在根目录执行：pm2 start production.config.js  关闭：pm2 stop kc  重启：pm2 restart kc（无缝重启：pm2 reload kc）
+    或在根目录执行：pm2 start production.config.js  关闭：pm2 stop kc  重启：pm2 restart kc
 
 
 

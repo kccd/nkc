@@ -103,7 +103,7 @@ function submit2(){
     }
     if(password.length < 8){
       getFocus("#password");
-      throw {error: '密码长度要大于8位。'};
+      throw {error: '密码长度不能小于8位。'};
       return;
     }
     if(checkPass(password) < 2){

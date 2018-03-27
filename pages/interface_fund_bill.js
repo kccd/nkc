@@ -67,12 +67,19 @@ function load() {
 	loadFromTo('from');
 	loadFromTo('to');
 	obj.notes = $('#notes').val();
+	obj.verify = $('input[name="verify"]').eq(0).is(':checked');
 	var money = $('#money').val();
 	money = parseFloat(money);
 	if(money > 0) {
 		obj.money = money.toFixed(1);
 	} else {
 		throw '请输入金额。';
+	}
+	obj.otherInfo = {
+		name: $('#name').val(),
+		account: $('#account').val(),
+		paymentType: $('#paymentType').val(),
+		transactionNumber: $('#transactionNumber').val()
 	}
 }
 

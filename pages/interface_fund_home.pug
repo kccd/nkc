@@ -56,9 +56,10 @@ block content
       .col-xs-12.col-md-3
         .row
           .col-xs-12.col-md-12
-            a.btn.btn-default.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/bills`)= `基金账单`
             if data.userLevel >= 6
-              a.btn.btn-default.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/settings`)= `基金设置`
+              a.btn.btn-info.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/settings`)= `基金设置`
+            a.btn.btn-info.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/bills`)= `基金账单`
+            a.btn.btn-info.btn-block(href=`/fund/donation?fundId=${fund._id.toLowerCase()}`)= `捐助该基金`
             br
             .panel.panel-default
               .panel-body.fund-preconditions

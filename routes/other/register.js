@@ -25,7 +25,7 @@ registerRouter
 		const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 		if(user) ctx.throw(400, '用户名已被注册。');
 		if(!password) ctx.throw(400, '请输入密码。');
-		if(contentLength(password) <= 8) ctx.throw(400, '密码长度至少要大于8位。');
+		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
 		if(!nationCode) ctx.throw(400, '请输入国际区号。');
 		if(!nationCode) ctx.throw(400, '请输入手机号码。');
@@ -83,7 +83,7 @@ registerRouter
 	  if(userPersonal) ctx.throw(400, '此邮箱已被其他用户注册。');
 	  await db.EmailRegisterModel.ensureSendPermission(email);
 	  if(!password) ctx.throw(400, '请输入密码。');
-	  if(contentLength(password) <= 8) ctx.throw(400, '密码长度至少要大于8位。');
+	  if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 	  if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
 	  const {apiFunction, sendEmail} = ctx.nkcModules;
 	  const ecode = apiFunction.random(14);
@@ -124,7 +124,9 @@ registerRouter
 	  await emailRegister.save();
 	  const userObj = emailRegister.toObject();
 		delete userObj._id;
-	  const answerSheet = await db.AnswerSheetModel.findOne({key: emailRegister.regCode, uid: ''});
+	  const answerSheet = await db.AnswerSheetModel.findOne({key: emailRegister.regCode});
+	  if(!answerSheet) ctx.throw(500, '抱歉！数据出错，请与管理员联系。');
+	  if(answerSheet.uid) ctx.throw(400, '注册码已失效，请重新参加考试。');
 		const newUser = await db.UserModel.createUser(userObj);
 		answerSheet.uid = newUser.uid;
 		await answerSheet.save();

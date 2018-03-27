@@ -10,7 +10,7 @@ block content
     .panel.panel-default
       .panel-body
         .row
-          .col-xs-12.col-md-8
+          .col-xs-12.col-md-10
             h4=`项目ID：`
               a(href=`/fund/a/${code}` target="_blank")= `${code}`
             h4=`项目名称：${project.t}`
@@ -27,6 +27,7 @@ block content
               h4 收款方式：银行卡
             else
               h4= `收款方式错误：${applicationForm.account.paymentType}`
+            h4= `户名：${applicationForm.account.name}`
             h4= `收款账号：${applicationForm.account.number}`
 
             hr
@@ -48,7 +49,12 @@ block content
                   tr
                     th= `第${i+1}期`
                     th= r.money + '元'
-                    th= r.status?'已拨款':'未拨款'
+                    if r.status
+                      th= `已拨款`
+                    else if r.status === false
+                      th.redFontColor= r.description
+                    else
+                      th= '未拨款'
                     th
                       if r.user
                         a(href=`/m/${r.uid}`)= r.user.username
@@ -61,10 +67,20 @@ block content
                     th
                       if r.status
                         span 已确认拨款
+                      else if r.status === null
+                        if applicationForm.account.paymentType === 'alipay'
+                          button#remittance(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '拨款（支付宝）'
+                        else
+                          button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已拨款'
+                      else if applicationForm.lock.submitted
+                        if applicationForm.account.paymentType === 'alipay'
+                          button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '重试'
+                          if ensureFundOperatorPermission('admin', data.user, applicationForm.fund)
+                            if i === 0
+                              button(onclick=`withdrawApplicationForm(${applicationForm._id})`)= r.status ? '' : '撤回申请表'
+                            button(onclick=`refuseApplicationForm(${applicationForm._id})`)= r.status ? '' : '永久撤回申请表'
                       else
-                        //a(href=`##` target="_blank")= r.status ? '' : '去拨款界面'
-                        //span &nbsp;&nbsp;
-                        button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已拨款'
+                        span 暂未提交申请表
 block scripts
   script(src="/interface_common.js")
   script(src="/interface_fund_remittance.js")
