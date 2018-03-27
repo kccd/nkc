@@ -32,9 +32,6 @@ const certificates ={
       non_images: false
     },
     permittedOperations: {
-      test: {
-        [GET]: true
-      },
       login: {
         [name]: '登录',
         [GET]: true,
@@ -931,6 +928,10 @@ const certificates ={
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
+    	log: {
+    		[name]: '网站日志',
+		    [GET]: true
+	    },
       e: {
         gitPull: {
           [name]: 'git pull',

@@ -29,7 +29,7 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';
-      ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
+	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
     }
     await next();
   }

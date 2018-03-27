@@ -23,12 +23,12 @@ const adRouter = require('./ad');
 const rtRouter = require('./rt');
 const qrCodeRouter = require('./qrcode');
 const searchRouter = require('./search');
-const testRouter = require('./test');
 const photoRouter = require('./photo');
 const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
 const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
+const logRouter = require('./log');
 const coverRouter = require('./cover');
 // -----------------------------------
 otherRouter
@@ -153,6 +153,6 @@ otherRouter
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
-  .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
-  .use('test', testRouter.routes(), testRouter.allowedMethods());
+	.use('log', logRouter.routes(), logRouter.allowedMethods())
+  .use('cover', coverRouter.routes(), coverRouter.allowedMethods());
 module.exports = otherRouter;
