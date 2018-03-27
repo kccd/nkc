@@ -25,6 +25,7 @@ mongoose.plugin(function(schema) {
     // this method should be used when you need the query throws an error
     // instead of returning a [] or null when no document matching
     const err = new Error(`${JSON.stringify(query)} document not found`);
+    err.status = 404;
     if(JSON.stringify(query) === '{}')
       throw new Error('param not specify');
     const docs = await this.find(query);
