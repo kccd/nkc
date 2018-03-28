@@ -80,8 +80,7 @@ donationRouter
 		const {data, query, db} = ctx;
 		await directAlipay.verify(query);
 		const {is_success, out_trade_no, buyer_email, trade_no} = query;
-		const bill = await db.FundBillModel.findOne({_id: out_trade_no});
-		if(bill.verify) ctx.throw(500, '数据出错。');
+		const bill = await db.FundBillModel.findOnly({_id: out_trade_no});
 		bill.otherInfo = {
 			transactionNumber: trade_no,
 			account: buyer_email,
@@ -112,20 +111,16 @@ donationRouter
 			} else {
 				if(['TRADE_FINISHED', 'TRADE_SUCCESS'].includes(trade_status)) {
 					bill.verify = true;
-					if(!bill.otherInfo && !bill.otherInfo.paymentType) {
-						bill.otherInfo = {
-							transactionNumber: trade_no,
-							account: buyer_email,
-							paymentType: 'alipay'
-						}
-					}
+					bill.otherInfo = {
+						transactionNumber: trade_no,
+						account: buyer_email,
+						paymentType: 'alipay'
+					};
 					await bill.save();
 					return ctx.body = 'success';
 				} else {
-					if(!bill.notes.includes('支付宝交易号')) {
-						bill.otherInfo.error = JSON.stringify(body);
-						await bill.save();
-					}
+					bill.otherInfo.error = JSON.stringify(body);
+					await bill.save();
 				}
 			}
 		}
