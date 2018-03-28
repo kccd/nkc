@@ -641,7 +641,6 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 				if(!b.suggest) {
 					b.suggest = total;
 				}
-				console.log(b);
 			}
 			await this.update({budgetMoney});
 		}
