@@ -21,6 +21,25 @@ a:focus{text-decoration: none}
   outline: none;
 }
 
+#donation-mask{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  margin: auto;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10;
+}
+#donation-mask>div>div{
+  background-color: #eee;
+  text-align: center;
+  color: #999;
+  font-weight: 600;
+  margin-top: 25rem;
+  padding-bottom: 0.5rem;
+  border: 2px solid #fff;
+  border-radius: 5px;
+}
 @keyframes blink
 {
   0%   {background: #5bc0de;}

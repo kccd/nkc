@@ -1,0 +1,22 @@
+extends bootstrap_base
+block title
+  title= data.status
+  -const mainContainer1400 = true
+block content
+  .container-fluid(style='max-width: 1400px;')
+    if data.status === 404
+      h1 Sorry
+      p!=`path <code>${data.url}</code> does not exist | can not be listed | is not available.`
+      br
+      img(src='/resources/site_specific/owl_bath.jpg')
+      p(style="color:#999;") #{server.name}
+    else
+      .row
+        .col-sm-12
+          h1 Sorry! 抱歉
+          p!= `request to path <code class="errUrl">${data.url}</code> encountered an error. If you think this shouldn't happen, please contact the Site Admin.`
+          p!= `请求的网址<code class="errUrl">${data.url}</code> 出错。如果您认为这个错误不应该发生，请通知网站管理员。`
+          hr
+          p 信息 message:
+          pre.intpad.zipline(style='background-color:#dceeff;') #{data.error.toString()}
+          p(style="color:#999;") #{server.name}

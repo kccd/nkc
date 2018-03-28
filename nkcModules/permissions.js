@@ -26,6 +26,7 @@ const levelOrder = {
   dev: 7
 };
 
+
 function excuteLevel(user) {
   if(!user) return 0;
   const {certs} = user;
@@ -125,7 +126,6 @@ function getPermitTree(certs) {
 	}
 	return tree;
 }
-
 async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
   const cursor = await mongoose.connection.db.collection('forums').find(
@@ -146,6 +146,11 @@ async function getVisibleFid() {
   return fs.map(e => e.fid);
 }
 
+
+//获取管理员能进的所有路由
+const adminCertificates = getPermitTree(['dev']);
+
+
 module.exports = async (ctx, next) => {
   let certs = ['visitor'];
   if(ctx.data.user) {
@@ -158,8 +163,8 @@ module.exports = async (ctx, next) => {
   ctx.data.certificates = cs;
   ctx.data.methodEnum = methodEnum;
   ctx.data.parameter = parameter;
-  ctx.data.ensurePermission = function(method = this.method, path = this.path) {
-    let obj = this.data.certificates.permittedOperations;
+  ctx.data.ensurePermission = function(method = this.method, path = this.path, permittedOperations = this.data.certificates.permittedOperations) {
+    let obj = permittedOperations;
     const m = methodEnum[method];
     const routes = path.match(/\/([^\/]*)/g)
       .map(e => e.replace('/', ''))
@@ -182,17 +187,21 @@ module.exports = async (ctx, next) => {
   ctx.getVisibleFid = getVisibleFid;
   ctx.generateMatchBase = (base = {}) => {
     if(ctx.data.userLevel < 4)
-
       base.disabled = false;
     return Map(base)
   };
   ctx.data.userLevel = excuteLevel(ctx.data.user);
   if(!ctx.data.ensurePermission()) {
-    if(ctx.data.userLevel < 0){
-      ctx.throw(403, '根据系统记录，你的账号已经被封禁，请重新注册。');
-    }else {
-      ctx.throw(403, `权限不足`);
-    }
+  	if(ctx.data.ensurePermission(ctx.method, ctx.path, adminCertificates.permittedOperations)){
+		  if(ctx.data.userLevel < 0) {
+			  ctx.throw(403, '根据系统记录，你的账号已经被封禁，请重新注册。');
+		  }
+			//403
+		  ctx.throw(403, '权限不足');
+	  } else {
+			//404
+		  ctx.throw(404, '未找到页面');
+	  }
   }
   await next();
 };

@@ -566,3 +566,13 @@ function uploadFile(url, id, callback) {
 	});
 }
 
+function deleteBill(id) {
+	if(confirm('确定要删除该条记录？') === false) return;
+	nkcAPI('/fund/bills/'+id, 'DELETE', {})
+		.then(function () {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

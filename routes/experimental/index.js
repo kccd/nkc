@@ -13,6 +13,7 @@ experimentalRouter
     ctx.data.forumList = await dbFn.getAvailableForums(ctx);
     ctx.data.forumTree = await dbFn.getForums(ctx);
     ctx.template = 'interface_experimental.pug';
+    // ctx.throw(404, '这是404错误');
     await next();
   })
   .get('/newUsers', async (ctx, next) => {

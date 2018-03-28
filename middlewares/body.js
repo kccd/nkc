@@ -3,8 +3,8 @@ const {encodeRFC5987ValueChars} = apiFn;
 const path = require('path');
 module.exports = async (ctx, next) => {
   const {filePath, resource, fs, type} = ctx;
-  if(type !== 'application/json' && type !== 'text/html') {
-    if(ctx.lastModified && ctx.fresh) {
+  if(type !== 'application/json' && type !== 'text/html' && ctx.method === 'GET') {  //只有当请求方式为GET时才返回图片
+	  if(ctx.lastModified && ctx.fresh) {
       ctx.status = 304;
       return
     }
@@ -29,7 +29,7 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';
-      ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
+	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
     }
     await next();
   }
