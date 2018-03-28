@@ -120,18 +120,15 @@ billsRouter
 		ctx.data.funds = await ctx.db.FundModel.find({disabled: false, history: false}).sort({toc: 1});
 		await next();
 	})
-	.use('/:billId', async (ctx, next) => {
-		const {data} = ctx;
-		if(data.userLevel < 7) ctx.throw(401, '权限不足');
-		await next();
-	})
 	.del('/:billId', async (ctx, next) => {
+		if(ctx.data.userLevel < 7) ctx.throw(401, '权限不足');
 		const {bill} = ctx.data;
 		await bill.remove();
 		await next();
 	})
 	.patch('/:billId', async(ctx, next) => {
 		const {body, data} = ctx;
+		if(data.userLevel < 7) ctx.throw(401, '权限不足');
 		const {billObj} = body;
 		const {from, to} = billObj;
 		const {user} = data;
