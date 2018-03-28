@@ -260,7 +260,7 @@ const certificates ={
 			    [POST]: true,
 			    [parameter]: {
 			    	[name]: '具体某一张账单',
-				    [GET]:true,
+				    [GET]: true,
 				    [PATCH]: true,
 				    [DELETE]: true
 			    }

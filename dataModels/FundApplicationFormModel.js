@@ -626,12 +626,10 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		if(!this.timeToPassed) {
 			this.timeToPassed = Date.now();
 		}
-		if(this.remittance.length !== 1 && this.money) {
-			this.remittance = [{
-				money: this.money,
-				status: null
-			}];
-		}
+		this.remittance = [{
+			money: this.money,
+			status: null
+		}];
 		if(!fixedMoney) { //非固定金额
 			for(let b of budgetMoney) {
 				const total = b.count*b.money;
@@ -645,6 +643,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 			await this.update({budgetMoney});
 		}
 	} else {
+		this.remittance = [];
 		this.status.projectPassed = null;
 		this.status.adminSupport = null;
 	}
