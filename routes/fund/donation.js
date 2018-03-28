@@ -53,7 +53,7 @@ donationRouter
 			out_trade_no: id,
 			subject: `科创基金${fund?` - ${fund.name}`: ' - 资金池'}`,
 			body: `${abstract}${money}元`,
-			total_fee: "0.01"
+			total_fee: money
 		};
 		data.url = directAlipay.buildDirectPayURL(params);
 		const newBill = db.FundBillModel({
