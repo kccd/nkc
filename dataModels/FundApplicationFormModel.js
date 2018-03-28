@@ -503,6 +503,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const FundApplicationFormHistoryModel = require('./FundApplicationHistoryModel');
 	const FundApplicationForm = mongoose.model('fundApplicationForms');
 	const {
+		fixedMoney,
 		from,
 		members,
 		applicant,
@@ -630,6 +631,18 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 				money: this.money,
 				status: null
 			}];
+		}
+		if(!fixedMoney) { //非固定金额
+			for(let b of budgetMoney) {
+				const total = b.count*b.money;
+				if(!b.fact) {
+					b.fact = total;
+				}
+				if(!b.suggest) {
+					b.suggest = total;
+				}
+			}
+			await this.update({budgetMoney});
 		}
 	} else {
 		this.status.projectPassed = null;
