@@ -13,11 +13,11 @@ block content
       .col-xs-12.col-md-6.col-md-offset-3
         h3 请在浏览器新打开的窗口完成支付!
         p 若没有新窗口打开，请检查新窗口是否已被浏览器拦截。
-        button(onclick='disappearMask()').btn.btn-default 关闭
+        button(onclick='disappearMask()').btn.btn-default 确定
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     if data.alipayReturn
-      h1.greenFontColor#message(bid=data.billId) 支付成功！等待系统确认
+      h1.greenFontColor#message(bid=data.billId) 等待系统确认
         span.point
       h2.redFontColor#error
     else

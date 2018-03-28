@@ -31,7 +31,7 @@ block content
             h4= `收款账号：${applicationForm.account.number}`
 
             hr
-            h3=`总共${remittance.length}期，总金额：${applicationForm.factMoney}元`
+            h3=`总共${remittance.length}期，总金额：${applicationForm.factMoney || applicationForm.money}元`
             table.table
               thead
                 tr

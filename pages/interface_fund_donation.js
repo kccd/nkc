@@ -45,11 +45,13 @@ function submit() {
 			break;
 		}
 	}
-	if(obj.money >= 20 && obj.money <= 10000) {
-
-	} else {
+	if(obj.money < 20) {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
-		return screenTopWarning('请输入正确的捐款金额。');
+		return screenTopWarning('单笔捐款金额不能少于20元。');
+	}
+	if(obj.money > 10000) {
+		$('#submit').removeClass('disabled').attr('onclick', fn);
+		return screenTopWarning('单笔捐款金额不能超过10000元，请分批次捐款。')
 	}
 	if(!obj.anonymous && !login) {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
@@ -77,7 +79,7 @@ function ensureBill() {
 				.then(function(data) {
 					var bill = data.bill;
 					if(bill.verify) {
-						$('#message').text('捐款成功，感谢您的捐款！');
+						$('#message').text('系统已确认，支付成功！');
 						setTimeout(function(){
 							window.location.href='/fund';
 						}, 3000);

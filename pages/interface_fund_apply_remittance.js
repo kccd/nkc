@@ -216,7 +216,7 @@ function submitReport(id) {
 function applyRemittance(number, id) {
 	$('#info').html('');
 	var obj = {
-		number
+		number: number
 	};
 	var content = $('#reportContent').val();
 	if(!content && number !== 0) {
