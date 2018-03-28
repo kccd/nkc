@@ -138,19 +138,6 @@ function submit(id) {
 }
 
 
-function deleteBill(id) {
-	if(confirm('确定要删除该条记录？') === false) return;
-	nkcAPI('/fund/bills/'+id, 'DELETE', {})
-		.then(function (data) {
-			var bill = data.bill;
-			jump(bill);
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
-}
-
-
 function jump(obj){
 	if(obj.from.type === 'fundPool') {
 		window.location.href = '/fund/bills';

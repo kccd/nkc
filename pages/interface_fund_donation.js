@@ -2,7 +2,9 @@ var obj = {
 	money: 500,
 	anonymous: false
 };
-
+var loginJson = $('#info').text();
+var info = JSON.parse(loginJson);
+var login = info.login;
 $(function() {
 	init();
 	ensureBill();
@@ -43,20 +45,25 @@ function submit() {
 			break;
 		}
 	}
-	if(obj.money > 20 && obj.money < 10000) {
+	if(obj.money >= 20 && obj.money <= 10000) {
 
 	} else {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
 		return screenTopWarning('请输入正确的捐款金额。');
 	}
+	if(!obj.anonymous && !login) {
+		$('#submit').removeClass('disabled').attr('onclick', fn);
+		return screenTopWarning('非匿名捐款要求用户必须登陆，请登录后再试。');
+	}
+	var newWindow = window.open();
 	nkcAPI('/fund/donation', 'POST', obj)
 		.then(function(data) {
-			$('#link').attr('href', data.url);
-			$('#link')[0].click();
+			newWindow.location = data.url;
+			$('#donation-mask').removeClass('hidden');
 			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 		.catch(function(data) {
-			screenTopWarning(data.error);
+			newWindow.location = '/fund/donation?error='+data.error;
 			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 }
@@ -130,4 +137,8 @@ function selectMoney(m) {
 			break;
 		}
 	}
+}
+
+function disappearMask(){
+	$('#donation-mask').addClass('hidden');
 }

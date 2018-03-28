@@ -44,6 +44,7 @@ module.exports = {
     multipart: true,
     formidable: {
       maxFields: 20,
+	    maxFileSize: 200*1024*1024,
       uploadDir,
       hash: 'md5',
       keepExtensions: true
@@ -59,7 +60,7 @@ module.exports = {
       width: 1050,
       height: 260
     },
-	  photo: 3*1024*1024, // 证件照上传不能超过3M
+	  photo: 20*1024*1024, // 证件照上传不能超过20M
 	  photoSmall: {
     	width: 350,
 		  height: 230

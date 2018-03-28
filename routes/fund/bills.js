@@ -104,10 +104,6 @@ billsRouter
 			ctx.throw(400, '未知的操作类型。');
 		}
 
-		if(!notes) {
-			ctx.throw(400, '请输入备注。');
-		}
-
 		billObj.uid = user? user.uid: '';
 		const newBill = db.FundBillModel(billObj);
 		await newBill.save();
