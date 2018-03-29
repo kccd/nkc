@@ -6,6 +6,10 @@ if data.type
   -query = `&type=${data.type}`;
 if data.sort
   -query += `&sort=${data.sort}`;
+if data.uid
+  -query += `&uid=${data.uid}`;
+if data.ip
+  -query += `&ip=${data.ip}`
 if pageCount > 1
   -const arr = [];
   -let n = 7;

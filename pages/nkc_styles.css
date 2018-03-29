@@ -1802,6 +1802,7 @@ img.emoji {
   display: inline-block;
   margin-right: 0.2rem;
 }
+/*
 
 .new-content-left{
   float: left;
@@ -1843,7 +1844,7 @@ img.emoji {
   letter-spacing: 0.4px;
   font-size: 2rem;
   font-weight: 600;
-  /*color: #337ab7;*/
+  !*color: #337ab7;*!
   text-decoration: none;
   color: #444;
   border-bottom: 1px solid transparent;
@@ -1898,26 +1899,168 @@ img.emoji {
 .nkc-cell-block {
   display: table-cell;
 }
+
+
+*/
+.new-content{
+  overflow: hidden;
+  padding: 0.5rem 0;
+}
+.new-content-forumAbbr{
+  height: 1.5rem;
+  border-radius: 0.2rem;
+  overflow: hidden;
+  padding: 1px 0;
+}
+.new-content .new-content-forumAbbr > a{
+  padding-right: 5px;
+  padding-left: 5px;
+  color: #fff;
+  text-align: center;
+}
+.new-content-info .icon{
+  margin-right: 0.2rem;
+  color: #ccc;
+}
+
+.icon-font{
+  color: #ccc;
+}
+.new-content-title > .digest-thread-title{
+  color: #d48900;
+}
+
+.nkc-cell-block {
+  display: table-cell;
+}
+.new-content-title{
+  margin: 0.5rem 0;
+}
+.new-content-title > a{
+  vertical-align: middle;
+  letter-spacing: 0.4px;
+  font-size: 2rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: #444;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+.new-content-title > a:hover{
+  color: #000;
+  border-bottom: 1px solid #333;
+}
+.new-content-left{
+  float: left;
+  width: 15rem;
+  height: 10.3rem;
+  background-position: center center;
+  background-size: cover;
+  border-radius: 0.3rem;
+}
+/*没封面图*/
+.new-content-right{
+  overflow: hidden;
+  width: 100%
+}
+.new-content-right>div{
+  width: 100%;
+  float: left;
+}
+.new-content-right>div:last-child{
+  float: right;
+}
+.new-content-right>div>p{
+  padding: 0 0.5rem 0 0.5rem;
+  font-size: 16px;
+  float: left;
+  overflow: hidden;
+  margin-bottom:0.2rem;
+  max-height: 4.1em;
+  margin-top: 0;
+  margin-left: 0;
+  background-color: rgba(0,0,0,0);
+  color: #333333;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.new-content-right>div:last-child>p{
+  padding: 0 0.5rem 0 0.5rem;
+  border-radius: 0.5rem;
+  float: right;
+  font-size: 14px;
+  max-height: 3em;
+  margin-left: 5rem;
+  margin-top: 0.2rem;
+  background-color: #f2f9ff;
+  color: #777777;
+  -webkit-line-clamp: 2;
+}
+.new-content-right>div>p>a{
+  text-decoration: none;
+  color: inherit;
+}
+/*有封面图*/
+.hasCover .new-content-right{
+  float: left;
+  /*height: 10.3rem;*/
+  width: calc(100% - 15rem);
+  position: relative;
+}
+
+.new-content-body{
+  overflow: hidden;
+}
+.new-content-info-last{
+  text-align: right;
+}
+.new-content-info > span{
+  margin-right: 0.5rem;
+}
+.new-content-info > span img{
+  width: 1.5rem;
+  border-radius: 0.3rem;
+}
 @media screen and (max-width: 768px) {
   .new-content-left{
-    min-height:25rem;
-    width: 100%;
+    width: 25%;
   }
-  .new-content-right{
-    width: 100%;
+  .hasCover .new-content-right{
+    width: 75%;
   }
   .nkc-cell-block {
     display: block;
   }
 }
+@media screen and (max-width: 668px) {
+  .new-content-left{
+    width: 30%;
+  }
+  .hasCover .new-content-right{
+    width: 70%;
+  }
+}
+@media screen and (max-width: 568px) {
+  .new-content-left{
+    width: 35%;
+  }
+  .hasCover .new-content-right{
+    width: 65%;
+  }
+}
 @media screen and (max-width: 450px) {
   .new-content-left{
-    min-height:25rem;
+    height:7rem;
   }
-  .p-img{
-    padding: 0;
+  .hasCover .new-content-right>div:last-child>p{
+    max-height: 1.5em;
+    width: 95%;
+    -webkit-line-clamp: 1;
+    margin-left: 0.5rem;
   }
-  .nkc-cell-block {
-    display: block;
+  .hasCover .new-content-right>div:first-child>p{
+    max-height: 2.8em;
+    -webkit-line-clamp: 2;
   }
 }

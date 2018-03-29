@@ -1,0 +1,68 @@
+extends bootstrap_base
+block title
+  title 网站日志
+block content
+  -const mainContainer1400 = true;
+  .container-fluid(style='max-width: 1400px;')
+    include module_experimental_nav
+    .row
+      .col-xs-12.col-md-8
+        -const url = '/log';
+        include interface_fund_page
+        table.table.table-bordered
+          thead
+            tr
+              th 时间
+              th 用户
+              th UID
+              th IP地址
+              th URL
+              th 请求方法
+              th 状态
+              th 响应时间
+              th 请求参数
+              th 错误信息
+          tbody
+            -for(let log of data.logs)
+              tr(style=log.status !==200?'background-color:#bbbbbb;':'')
+                th= log.reqTime.toLocaleString()
+                if log.user
+                  th
+                    a(href=`/m/${log.user.username}` target='_blank')= log.user.username
+                else
+                  th= 'visitor'
+                th= log.uid
+                th= `${log.ip}:${log.port}`
+                th= log.path
+                th= log.method
+                th= log.status
+                th= `${log.processTime}ms`
+                th= JSON.stringify(log.query)
+                th= JSON.stringify(log.error)
+        include interface_fund_page
+      .col-xs-12.col-md-4
+        br
+        .form-group#uid
+          label 用户UID
+          input.form-control(type='text' placeholder='UID')
+        .form-group#ip
+          label IP地址
+          input.form-control(type='text' placeholder='UID')
+        form.form-inline#time.log-time
+          .form-group
+            label 起始时间
+            br
+            input.form-control(type='number' placeholder='年' style='width: 30%;')
+            input.form-control(type='number' placeholder='月' style='width: 30%;')
+            input.form-control(type='number' placeholder='日' style='width: 30%;')
+            label 结束时间
+            br
+            input.form-control(type='number' placeholder='年' style='width: 30%;')
+            input.form-control(type='number' placeholder='月' style='width: 30%;')
+            input.form-control(type='number' placeholder='日' style='width: 30%;')
+        br
+        button.btn.btn-info.btn-block#submit(onclick='submit()') 查询
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_log.js')

@@ -16,21 +16,39 @@ const logSchema = new Schema({
   status: {
     type: Number,
     required: true,
+	  index: 1
   },
   ip: {
     type: String,
     required: true,
+	  index: 1
   },
   port: {
     type: String,
     required: true,
+	  index: 1
   },
-  reqTime: Date,
+  reqTime: {
+  	type: Date,
+	  index: 1
+  },
   processTime: Number,
   uid: {
     type: String,
     required: true
   }
 });
+logSchema.virtual('user')
+	.get(function() {
+		return this._user;
+	})
+	.set(function(user) {
+		this._user = user;
+	});
+
+logSchema.methods.extendUser = async function() {
+	const UserModel = require('./UserModel');
+	return this.user = await UserModel.findOne({uid: this.uid});
+};
 
 module.exports = mongoose.model('logs', logSchema);

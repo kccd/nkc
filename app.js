@@ -7,7 +7,7 @@ const settings = require('./settings');
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response, path, stats) {
-      response.setHeader('Cache-Control', 'public, no-cache')
+      response.setHeader('Cache-Control', 'public, max-age=604800')
     }
   });
 };
