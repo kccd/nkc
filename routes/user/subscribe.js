@@ -1,9 +1,18 @@
 const Router = require('koa-router');
 const subscribeRouter = new Router();
 const nkcModules = require('../../nkcModules');
-const apiFn = nkcModules.apiFunction;
 subscribeRouter
-  .get('/', async (ctx, next) => {
+	.get('/', async (ctx, next) => {
+		const {data, db, params} = ctx;
+		const {uid} = params;
+		data.targetUser = await db.UserModel.findOnly({uid});
+		const {dbFunction} = ctx.nkcModules;
+		data.forumList = await dbFunction.getAvailableForums(ctx);
+		data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
+		ctx.template = 'interface_user_subscribe.pug';
+		await next();
+	})
+  /*.get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
     let {fans, page} = ctx.query;
@@ -25,7 +34,7 @@ subscribeRouter
     data.paging = paging;
     ctx.template = 'interface_subscribe.pug';
     await next();
-  })
+  })*/
   // 关注该用户
   .post('/', async (ctx, next) => {
     let {uid} = ctx.params;

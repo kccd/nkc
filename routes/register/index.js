@@ -9,21 +9,24 @@ registerRouter
 		}
 		data.getCode = false;
 		ctx.template = 'interface_user_register.pug';
+	  const lastUrl = ctx.req.headers['referer'];
+	  ctx.cookies.set('lastUrl', lastUrl, {
+		  signed: true,
+		  maxAge: ctx.settings.cookie.life,
+		  httpOnly: true
+	  });
 		await next();
   })
   .post('/mobile', async (ctx, next) => { // 手机注册
 	  const {db, body} = ctx;
-		const {username, password, regCode, mobile, mcode, nationCode} = body;
+		const {username, password, mobile, mcode, nationCode} = body;
 		const regIP = ctx.address;
 		const regPort = ctx.port;
-		if(!regCode) ctx.throw(400, '请输入注册码。');
-		const answerSheet = await db.AnswerSheetModel.ensureAnswerSheet(regCode);
-		const isA = answerSheet.isA;
 		if(!username) ctx.throw(400, '请输入用户名。');
 	  const {contentLength, checkPass} = ctx.tools.checkString;
 	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
-		const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
-		if(user) ctx.throw(400, '用户名已被注册。');
+		const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+		if(targetUser) ctx.throw(400, '用户名已被注册。');
 		if(!password) ctx.throw(400, '请输入密码。');
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
@@ -45,15 +48,30 @@ registerRouter
 			mobile,
 			nationCode,
 			regIP,
-			regPort,
-			isA
+			regPort
 		};
-		const newUser = await db.UserModel.createUser(userObj);
+		const user = await db.UserModel.createUser(userObj);
 	  smsCode.used = true;
 	  await smsCode.save();
-		answerSheet.uid = newUser.uid;
-		await answerSheet.save();
-		await next();
+		const cookieStr = encodeURI(JSON.stringify({
+			uid: user.uid,
+			username: user.username,
+			lastLogin: Date.now()
+		}));
+		ctx.cookies.set('userInfo', cookieStr, {
+			signed: true,
+			maxAge: ctx.settings.cookie.life,
+			httpOnly: true
+		});
+		ctx.data = {
+			cookie: ctx.cookies.get('userInfo'),
+			introduction: 'put the cookie in req-header when using for api',
+			user
+		};
+	  await ctx.generateUsersBehavior({
+		  operation: 'dailyLogin'
+	  });
+	  await next();
   })
   .get('/email', async (ctx, next) => {
   	const {data, query} = ctx;

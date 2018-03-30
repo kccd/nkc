@@ -2022,6 +2022,36 @@ img.emoji {
   width: 1.5rem;
   border-radius: 0.3rem;
 }
+.img-alert{
+  width: 6rem;
+  height: 6rem;
+  line-height: 6rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 3rem;
+  margin: auto;
+  background-color: #81ca83;
+}
+.forum-span{
+  padding: 0.5rem;
+  margin: 0.2rem 0.5rem 0.2rem 0.5rem;
+  font-size: 1.5rem;
+  color: #fff;
+  display: inline-block;
+  cursor: pointer;
+}
+.forum-span .mask{
+  width: 0;
+  color: rgba(255,255,255,0);
+  transition: width 0.2s, color 0.2s;
+}
+.forum-span:hover .mask{
+  width: 15px;
+  color: rgba(255,255,255,1);
+}
+.forum-chose{
+  margin: 0 0 2rem 0;
+}
 @media screen and (max-width: 768px) {
   .new-content-left{
     width: 25%;
@@ -2031,6 +2061,9 @@ img.emoji {
   }
   .nkc-cell-block {
     display: block;
+  }
+  .btn-mobile{
+    width: 100%;
   }
 }
 @media screen and (max-width: 668px) {

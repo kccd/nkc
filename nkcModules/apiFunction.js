@@ -9,7 +9,8 @@ fn.paging = (page, arrLength) => {
     perpage: perpage,
     start: page*perpage,
     count: 65,
-    pageCount: Math.ceil(arrLength/perpage)
+    pageCount: Math.ceil(arrLength/perpage),
+	  aggregate: arrLength
   }
 };
 

@@ -262,7 +262,6 @@ userSchema.statics.createUser = async (userObj) => {
 	userObj.certs = [];
 	if(userObj.mobile) userObj.certs.push('mobile');
 	if(userObj.email) userObj.certs.push('email');
-	if(!userObj.isA) userObj.certs.push('examinated');
 	if(typeof(userObj.password) === 'string') {
 		const {newPasswordObject} = require('../nkcModules/apiFunction');
 		const passwordObj = newPasswordObject(userObj.password);

@@ -125,10 +125,10 @@ const certificates ={
         [name]: '注册',
         [GET]: true,
         email: {
-          [GET]: true,
-          [POST]: true,
+          [GET]: false,
+          [POST]: false,
           verify: {
-            [GET]: true
+            [GET]: false
           }
         },
         mobile: {
@@ -930,7 +930,8 @@ const certificates ={
     permittedOperations: {
     	log: {
     		[name]: '网站日志',
-		    [GET]: true
+		    [GET]: true,
+		    [DELETE]: true
 	    },
       e: {
         gitPull: {

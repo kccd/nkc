@@ -26,7 +26,6 @@ function register_submit(){
       username : gv('username'),
       password : gv('password'),
       password2 : gv('password2'),
-      regCode: gv('regCode'),
       mobile:gv('phone'),
       mcode:gv('mcode'),
       nationCode: nationCode
@@ -34,15 +33,15 @@ function register_submit(){
       icode:gv('icode')*/
     }
 		userobj.username = $.trim(userobj.username);
-    if(userobj.username == ''){
+    if(userobj.username === ''){
       getFocus("#username")
       throw('请填写用户名！')
     }
-    if(userobj.password == ''){
+    if(userobj.password === ''){
       getFocus("#password")
       throw('请填写密码！')
     }
-    if(userobj.password2 == ''){
+    if(userobj.password2 === ''){
       getFocus("#password2")
       throw('请再次填写密码！')
     }
@@ -58,11 +57,7 @@ function register_submit(){
       getFocus("#password2")
       throw('两遍密码不一致！')
     }
-    if(userobj.regCode === '') {
-      getFocus('#regCode');
-      throw('请输入注册码')
-    }
-    if(userobj.phone == ''){
+    if(userobj.phone === ''){
       getFocus("#phone")
       throw('请填写手机号码！')
     }
@@ -76,45 +71,27 @@ function register_submit(){
       throw({detail:'手机号码格式不正确！'})
       return;
     }*/
-    if(userobj.mcode == ''){
+    if(userobj.mcode === ''){
       getFocus("#mcode")
       throw('请填写手机验证码！')
     }
-   /* if(userobj.icode == ''){
-      getFocus("#icode")
-      throw({detail:'请填写图片验证码！'})
-      return;
-    }*/
     return nkcAPI('/register/mobile','post',userobj)
   })
   .then(function(result){
-    info_report('注册成功！5s后跳转到登录页面')
-    setTimeout(function(){
-      window.location = '/login'
-    },5000)
-
+    info_report('注册成功！')
   })
   .catch(function(data){
+  	if(data.error === undefined) {
+  		data = {error: data};
+	  }
     if(data.error == '用户名已存在，请输入其他用户名'){
       //refreshICode();
       getFocus("#username")
-    }
-    if(data.error == '验证注册码失败，请检查！'){
-      //refreshICode();
-      getFocus("#regCode")
-    }
-    if(data.error === '答卷的注册码过期，可能要重新参加考试') {
-      //refreshICode();
-      getFocus('#regCode')
     }
     if(data.error == '手机验证码不正确，请检查'){
       //refreshICode();
       getFocus("#mcode")
     }
-   /* if(data.error == '图片验证码不正确，请检查'){
-      //refreshICode();
-      getFocus("#icode")
-    }*/
     if(data.error == '此号码已经用于其他用户注册，请检查或更换'){
       //refreshICode();
       getFocus("#phone")
@@ -131,7 +108,6 @@ function getMcode(){
 	username = $.trim(username);
   var password = geid('password').value.trim();
   var password2 = geid('password2').value.trim();
-  var regCode = gv('regCode').trim();
 
   if(username === ''){
     getFocus("#username");
@@ -171,13 +147,9 @@ function getMcode(){
     getFocus("#icode")
     return error_report('请填写图片验证码！')
   }*/
-  if(regCode === '') {
-    getFocus('#regCode');
-    return error_report('请填写注册码')
-  }
 
   else{
-    nkcAPI('/sendMessage/register','POST',{mobile:phone, regCode: regCode, nationCode: nationCode, username: username})
+    nkcAPI('/sendMessage/register','POST',{mobile:phone, nationCode: nationCode, username: username})
     .then(function(){
 	    info_report('短信验证码发送成功。');
       var count = 120;
@@ -194,9 +166,6 @@ function getMcode(){
       }
     })
     .catch(function(data){
-      if(['注册码无效。', '注册码已被使用。', '注册码已过期。'].indexOf(data.error) !== -1){
-        getFocus("#mcode");
-      }
       if(data.error === '手机号码已被其他账号注册。'){
         getFocus("#phone");
       }

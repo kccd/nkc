@@ -1,0 +1,32 @@
+extends bootstrap_base
+block title
+  title 注册成功
+block content
+  -const mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      if 1
+        .col-xs-12.col-md-4.col-md-offset-4
+          .img-alert.glyphicon.glyphicon-ok.text-center.bg-success.center-block
+          h2.text-center(style='font-size:3rem;color: #555555;') &nbsp;注册成功
+          hr
+      .col-xs-12.col-md-8.col-md-offset-2
+        br
+        h4.text-center(style='color: #888888') 请选择您喜欢的领域，我们会优先向您推介您感兴趣的内容。
+        .row
+          .col-xs-12.col-md-2.h4= `已选择：`
+          .col-xs-12.col-md-10.forum-chose
+        .forum-list
+          .hidden= JSON.stringify({forums: data.forumList, subscribeForums: data.subscribe.subscribeForums})
+          -for(let forum of data.forumList)
+            if forum.children.length !== 0
+              .row
+                .col-xs-12.col-md-2.h4= forum.displayName
+                .col-xs-12.col-md-10
+                  -for(let child of forum.children)
+                    span.forum-span(onclick=`chooseForum("${child.fid}")` style=`background-color: ${child.color}` title=child.description)= child.displayName
+                      .mask.glyphicon.glyphicon-plus
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_subscribe.js')

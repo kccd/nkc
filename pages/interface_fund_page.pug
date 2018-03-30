@@ -10,6 +10,10 @@ if data.uid
   -query += `&uid=${data.uid}`;
 if data.ip
   -query += `&ip=${data.ip}`
+if data.begin
+  -query += `&begin=${data.begin}`
+if data.end
+  -query += `&end=${data.end}`
 if pageCount > 1
   -const arr = [];
   -let n = 7;

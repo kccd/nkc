@@ -3,9 +3,7 @@ const sendMessageRouter = new Router();
 sendMessageRouter
   .post('/register', async (ctx, next) => { // 手机号码注册
   	const {db, body} = ctx;
-		const {regCode, nationCode, username, mobile} = body;
-		if(!regCode) ctx.throw(400, '请输入注册码。');
-	  await db.AnswerSheetModel.ensureAnswerSheet(regCode);
+		const {nationCode, username, mobile} = body;
 	  if(!username) ctx.throw(400, '请输入用户名。');
 	  const {contentLength} = ctx.tools.checkString;
 	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');

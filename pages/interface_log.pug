@@ -9,6 +9,7 @@ block content
       .col-xs-12.col-md-8
         -const url = '/log';
         include interface_fund_page
+        h4=`总共 ${data.paging.aggregate} 条记录，本页查询耗时 ${data.time} ms`
         table.table.table-bordered
           thead
             tr
@@ -33,35 +34,44 @@ block content
                   th= 'visitor'
                 th= log.uid
                 th= `${log.ip}:${log.port}`
-                th= log.path
+                th(style='word-break:break-all;')= log.path
                 th= log.method
                 th= log.status
                 th= `${log.processTime}ms`
-                th= JSON.stringify(log.query)
-                th= JSON.stringify(log.error)
+                th(style='word-break:break-all;')= JSON.stringify(log.query)
+                th(style='word-break:break-all;')= JSON.stringify(log.error)
         include interface_fund_page
       .col-xs-12.col-md-4
         br
-        .form-group#uid
+        .form-group
           label 用户UID
-          input.form-control(type='text' placeholder='UID')
-        .form-group#ip
+          input.form-control(type='text' placeholder='UID' name='uid' value=data.uid)
+        .form-group
           label IP地址
-          input.form-control(type='text' placeholder='UID')
-        form.form-inline#time.log-time
+          input.form-control(type='text' placeholder='UID' name='ip' value=data.ip)
+        form.form-inline#time
           .form-group
+            -let begin = [], end = [];
+            if data.begin
+              -const time = new Date(data.begin);
+              -begin = [time.getFullYear(), time.getMonth()+1, time.getDate()];
+            if data.end
+              -const time = new Date(data.end);
+              -end = [time.getFullYear(), time.getMonth()+1, time.getDate()];
             label 起始时间
             br
-            input.form-control(type='number' placeholder='年' style='width: 30%;')
-            input.form-control(type='number' placeholder='月' style='width: 30%;')
-            input.form-control(type='number' placeholder='日' style='width: 30%;')
+            input.form-control(type='number' placeholder='年' style='width: 30%;' value=begin[0])
+            input.form-control(type='number' placeholder='月' style='width: 30%;' value=begin[1])
+            input.form-control(type='number' placeholder='日' style='width: 30%;' value=begin[2])
             label 结束时间
             br
-            input.form-control(type='number' placeholder='年' style='width: 30%;')
-            input.form-control(type='number' placeholder='月' style='width: 30%;')
-            input.form-control(type='number' placeholder='日' style='width: 30%;')
+            input.form-control(type='number' placeholder='年' style='width: 30%;' value=end[0])
+            input.form-control(type='number' placeholder='月' style='width: 30%;' value=end[1])
+            input.form-control(type='number' placeholder='日' style='width: 30%;' value=end[2])
         br
-        button.btn.btn-info.btn-block#submit(onclick='submit()') 查询
+        button.btn.btn-info.btn-block#submit(onclick='submit()') 搜索
+        a.btn.btn-info.btn-block(href='/log') 重置搜索
+        button.btn.btn-danger.btn-block#deleteLog(onclick='deleteLog()') 通过日期删除
 
 block scripts
   script(src='/interface_common.js')
