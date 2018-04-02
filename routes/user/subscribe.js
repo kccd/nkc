@@ -12,6 +12,26 @@ subscribeRouter
 		ctx.template = 'interface_user_subscribe.pug';
 		await next();
 	})
+	.post('/', async (ctx, next) => {
+		const {data, db, params, body} = ctx;
+		const {user} = data;
+		const {uid} = params;
+		const targetUser = await db.UserModel.findOnly({uid});
+		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
+		const {type} = body;
+		if(type === 'subscribeForums') {
+			const {subscribeForums} = body;
+			const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
+			await targetUserSubscribe.update({subscribeForums});
+		}
+		const lastUrl = ctx.cookies.get('lastUrl');
+		if(lastUrl.includes('kechuang') && !lastUrl.includes('logout')) {
+			data.url = lastUrl;
+		} else {
+			data.url = '/';
+		}
+		await next();
+	})
   /*.get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
@@ -36,7 +56,7 @@ subscribeRouter
     await next();
   })*/
   // 关注该用户
-  .post('/', async (ctx, next) => {
+ /* .post('/', async (ctx, next) => {
     let {uid} = ctx.params;
     if(!uid) ctx.throw(400, '参数不正确');
     let {db} = ctx;
@@ -51,7 +71,7 @@ subscribeRouter
       operation: 'subscribeUser'
     });
     await next();
-  })
+  })*/
   // 取消关注该用户
   .del('/', async (ctx, next) => {
     let {uid} = ctx.params;

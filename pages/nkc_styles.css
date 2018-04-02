@@ -2036,6 +2036,7 @@ img.emoji {
   padding: 0.5rem;
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
   font-size: 1.5rem;
+  border-radius: 3px;
   color: #fff;
   display: inline-block;
   cursor: pointer;
@@ -2043,7 +2044,7 @@ img.emoji {
 .forum-span .mask{
   width: 0;
   color: rgba(255,255,255,0);
-  transition: width 0.2s, color 0.2s;
+  transition: width 0.3s, color 0.3s;
 }
 .forum-span:hover .mask{
   width: 15px;

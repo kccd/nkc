@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const editorRouter = new Router();
 const nkcModules = require('../../nkcModules');
-const dbFn = nkcModules.dbFunction;
 editorRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;

@@ -77,8 +77,10 @@ function register_submit(){
     }
     return nkcAPI('/register/mobile','post',userobj)
   })
-  .then(function(result){
-    info_report('注册成功！')
+  .then(function(data){
+  	var uid = data.user.uid;
+    window.location.href = '/u/'+uid+'/subscribe';
+
   })
   .catch(function(data){
   	if(data.error === undefined) {

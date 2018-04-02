@@ -2,7 +2,7 @@ var dataStr = $('.hidden').text();
 var data = JSON.parse(dataStr);
 var forumList = data.forums;
 var subscribeForums = data.subscribeForums;
-
+var max = 5;
 $(function() {
 	displayForum();
 });
@@ -28,6 +28,7 @@ function getForumInfo(id) {
 
 
 function chooseForum(id) {
+	if(subscribeForums.length >= max) return screenTopWarning('最多只能选择五个邻域。');
 	if(subscribeForums.indexOf(id) === -1) {
 		subscribeForums.push(id);
 		displayForum();
@@ -58,4 +59,25 @@ function displayForum() {
 		}).css('background-color', forum.color).text(forum.displayName).append($mask);
 		$chose.append($span);
 	}
+	var length = subscribeForums.length;
+	$('#limit').text('('+length+'/'+max+')');
+}
+
+
+function submit(id) {
+	var obj = {
+		type: 'subscribeForums',
+		subscribeForums: subscribeForums
+	};
+	nkcAPI('/u/'+id+'/subscribe', 'POST', obj)
+		.then(function(data) {
+			screenTopAlert('提交成功');
+			var url = data.url;
+			setTimeout(function() {
+				window.location.href = url;
+			}, 1500);
+		})
+		.catch(function(data) {
+		  screenTopWarning(data.error);
+		})
 }
