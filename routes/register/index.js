@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
+const captcha = require('trek-captcha');
 registerRouter
   .get(['/','/mobile'], async (ctx, next) => {
   	const {data, query} = ctx;
@@ -19,7 +20,7 @@ registerRouter
   })
   .post('/mobile', async (ctx, next) => { // 手机注册
 	  const {db, body} = ctx;
-		const {username, password, mobile, mcode, nationCode} = body;
+		const {username, password, mobile, mcode, nationCode, imgCode} = body;
 		const regIP = ctx.address;
 		const regPort = ctx.port;
 		if(!username) ctx.throw(400, '请输入用户名。');
@@ -34,6 +35,11 @@ registerRouter
 		if(!nationCode) ctx.throw(400, '请输入手机号码。');
 		const userPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
 		if(userPersonal) ctx.throw(400, '手机号码已被其他账号注册。');
+		if(!imgCode) ctx.throw(400, '请输入图片验证码。');
+		const id = ctx.cookies.get('imgCodeId');
+	  const imgCodeObj = await db.ImgCodeModel.ensureCode(id, imgCode);
+	  await imgCodeObj.update({used: true});
+	  ctx.cookies.set('imgCodeId', '');
 		const type = 'register';
 		const smsCodeObj = {
 			nationCode,
@@ -73,7 +79,23 @@ registerRouter
 	  });
 	  await next();
   })
-  .get('/email', async (ctx, next) => {
+	.get('/code', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {user} = data;
+		if(user) ctx.throw(400, '您已注册，请勿恶意获取图片验证码。');
+		const {token, buffer} = await captcha();
+		const imgCode = db.ImgCodeModel({
+			token
+		});
+		await imgCode.save();
+		ctx.cookies.set('imgCodeId', imgCode._id, {
+			signed: true,
+			maxAge: ctx.settings.cookie.life,
+			httpOnly: true
+		});
+		return ctx.body = buffer;
+	});
+  /*.get('/email', async (ctx, next) => {
   	const {data, query} = ctx;
   	const {code} = query;
     if(code) {
@@ -151,5 +173,5 @@ registerRouter
 		data.activeInfo1 = `邮箱注册成功，赶紧登陆吧~`;
 		ctx.template = 'interface_user_login.pug';
 		await next();
-  });
+  });*/
 module.exports = registerRouter;

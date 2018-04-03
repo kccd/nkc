@@ -1,10 +1,13 @@
 const Router = require('koa-router');
 const subscribeRouter = new Router();
-const nkcModules = require('../../nkcModules');
 subscribeRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, params} = ctx;
+		const {data, db, params, query} = ctx;
 		const {uid} = params;
+		const {type} = query;
+		if(type === 'register') {
+			data.type = 'register';
+		}
 		data.targetUser = await db.UserModel.findOnly({uid});
 		const {dbFunction} = ctx.nkcModules;
 		data.forumList = await dbFunction.getAvailableForums(ctx);
@@ -25,9 +28,12 @@ subscribeRouter
 			await targetUserSubscribe.update({subscribeForums});
 		}
 		const lastUrl = ctx.cookies.get('lastUrl');
-		if(lastUrl.includes('kechuang') && !lastUrl.includes('logout')) {
+		ctx.cookies.set('lastUrl', '');
+		if(!lastUrl) {
+			data.url = '/me';
+		} else if(lastUrl.includes('kechuang') && !lastUrl.includes('logout')) {
 			data.url = lastUrl;
-		} else {
+		} else{
 			data.url = '/';
 		}
 		await next();

@@ -93,6 +93,16 @@ block content
                   input#phone.form-control(type='text' placeholder='请输入手机号码')
 
               .form-group
+                label.control-label.col-xs-12.col-sm-3 图片验证码
+                .col-xs-12.col-sm-4.col-md-4
+                  .row
+                    .col-xs-6.col-sm-6.col-md-6
+                      input#icode.form-control(type='text' placeholder='请输入图片验证码')
+                    .col-xs-6.col-sm-6.col-md-6(style='position: relative;')
+                      #progressBar(style='position: absolute;top: 0;height: 2px;background-color: #ff7e62;z-index: 10;')
+                      img#imgCode(src=`/register/code` style='border: 1px solid #ddd;cursor: pointer;width: 100%;' onclick='getImgCode()' title='点击切换验证码')
+
+              .form-group
                 label.control-label.col-xs-12.col-sm-3 短信验证码
                 .col-xs-6.col-sm-2
                   input#mcode.form-control(type='text' placeholder='请输入短信验证码')

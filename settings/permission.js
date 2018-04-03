@@ -113,14 +113,6 @@ const certificates ={
         [GET]: true,
         [POST]: true,
       },
-      exam: {
-        [name]: '考试',
-        [GET]: true,
-        [parameter]: {
-          [GET]: true,
-          [POST]: true,
-        }
-      },
       register: {
         [name]: '注册',
         [GET]: true,
@@ -134,7 +126,11 @@ const certificates ={
         mobile: {
           [GET]: true,
           [POST]: true
-        }
+        },
+	      code: {
+        	[name]: '图片验证码',
+		      [GET]: true
+	      }
       },
       r: {
         [name]: '附件',
@@ -346,6 +342,14 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+	    exam: {
+		    [name]: '考试',
+		    [GET]: true,
+		    [parameter]: {
+			    [GET]: true,
+			    [POST]: true,
+		    }
+	    },
       m: {
         [parameter]: {
           config: {
@@ -454,6 +458,10 @@ const certificates ={
               [DELETE]: true
             }
           },
+	        production: {
+						[name]: '产品序列号',
+						[POST]: false
+	        },
 	        bills: {
           	[name]: '用户账单',
 		        [GET]: true

@@ -5,7 +5,11 @@ editorRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
-    const {type, id, cat, title, content} = query;
+	  const {type, id, cat, title, content} = query;
+	  if((!user.volumeA || !user.certs.includes('mobile')) && type !== 'application') {
+    	ctx.template = 'interface_notice.pug';
+    	return await next();
+    }
     ctx.template = 'interface_editor.pug';
     data.type = type;
     data.id = id;

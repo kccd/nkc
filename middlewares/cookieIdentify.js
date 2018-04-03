@@ -15,6 +15,9 @@ module.exports = async (ctx, next) => {
       return redirect('/login')
     }
     await user.update({tlv: Date.now()});
+	  if(!user.certs.includes('default')) {
+		  user.certs.unshift('default');
+	  }
     if(user.xsf > 0) {
     	if(!user.certs.includes('scholar')) {
     		user.certs.push('scholar');

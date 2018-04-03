@@ -5,86 +5,90 @@ const Schema = mongoose.Schema;
 const {indexUser, updateUser} = settings.elastic;
 
 const userSchema = new Schema({
-    kcb: {
-      type: Number,
-      default: 0
-    },
-    toc: {
-      type: Date,
-      default: Date.now,
-      index: 1
-    },
-    xsf: {
-      type: Number,
-      default: 0
-    },
-    tlv: {
-      type: Date,
-      default: Date.now,
-    },
-    disabledPostsCount: {
-      type: Number,
-      default: 0
-    },
-    disabledThreadsCount: {
-      type: Number,
-      default: 0
-    },
-    postCount: {
-      type: Number,
-      default: 0
-    },
-    threadCount: {
-      type: Number,
-      default: 0
-    },
-    recCount: {
-      type: Number,
-      default: 0
-    },
-    toppedThreadsCount: {
-      type: Number,
-      default: 0
-    },
-    digestThreadsCount: {
-      type: Number,
-      default: 0,
-    },
-    score: {
-      default: 0,
-      type: Number
-    },
-    lastVisitSelf: {
-      type: Date,
-      default: Date.now
-    },
-    username: {
-      type: String,
-      unique: true,
-      required: true,
-      minlength: 1,
-      maxlength: 30,
-      trim: true
-    },
-    usernameLowerCase: {
-      type: String,
-      unique: true,
-      trim: true,
-      lowercase: true
-    },
-    uid: {
-      type: String,
-      unique: true,
-      required: true,
-    },
-    cart: [String],
-    description: String,
-    color: String,
-    certs: {
-      type: [String],
-      index: 1
-    },
-    postSign: String,
+  kcb: {
+    type: Number,
+    default: 0
+  },
+  toc: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
+  xsf: {
+    type: Number,
+    default: 0
+  },
+  tlv: {
+    type: Date,
+    default: Date.now,
+  },
+  disabledPostsCount: {
+    type: Number,
+    default: 0
+  },
+  disabledThreadsCount: {
+    type: Number,
+    default: 0
+  },
+  postCount: {
+    type: Number,
+    default: 0
+  },
+  threadCount: {
+    type: Number,
+    default: 0
+  },
+  recCount: {
+    type: Number,
+    default: 0
+  },
+  toppedThreadsCount: {
+    type: Number,
+    default: 0
+  },
+  digestThreadsCount: {
+    type: Number,
+    default: 0,
+  },
+  score: {
+    default: 0,
+    type: Number
+  },
+  lastVisitSelf: {
+    type: Date,
+    default: Date.now
+  },
+  username: {
+    type: String,
+    unique: true,
+    required: true,
+    minlength: 1,
+    maxlength: 30,
+    trim: true
+  },
+  usernameLowerCase: {
+    type: String,
+    unique: true,
+    trim: true,
+    lowercase: true
+  },
+  uid: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  cart: [String],
+  description: String,
+  color: String,
+  certs: {
+    type: [String],
+    index: 1
+  },
+  postSign: String,
+	volumeA: {
+  	type: Boolean,
+		default: 'false'
+	}
 },
 {toObject: {
   getters: true,
@@ -94,11 +98,15 @@ const userSchema = new Schema({
 userSchema.pre('save', function(next) {
   try {
   	this.usernameLowerCase = this.username;
-  	const index = this.certs.indexOf('scholar');
-  	if(index !== -1) {
-  		this.certs.splice(index, 1);
+	  const arr = ['default', 'scholar'];
+  	const certs = [];
+  	for(let cert of this.certs) {
+  		if(!arr.includes(cert) && !certs.includes(cert)) {
+				certs.push(cert);
+		  }
 	  }
-    return next()
+	  this.certs = certs;
+	  return next()
   } catch(e) {
     return next(e)
   }
@@ -211,7 +219,10 @@ userSchema.methods.updateUserMessage = async function() {
 
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
-  let cs = ['会员'];
+  let cs = [];
+  if(!certs.includes('default')) {
+  	certs.push('default');
+  }
   if(xsf > 0 && !certs.includes('scholar')) {
   	certs.push('scholar');
   }

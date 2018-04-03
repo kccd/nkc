@@ -28,7 +28,8 @@ function register_submit(){
       password2 : gv('password2'),
       mobile:gv('phone'),
       mcode:gv('mcode'),
-      nationCode: nationCode
+      nationCode: nationCode,
+	    imgCode: gv('icode')
       /*,
       icode:gv('icode')*/
     }
@@ -61,6 +62,10 @@ function register_submit(){
       getFocus("#phone")
       throw('请填写手机号码！')
     }
+    if(userobj.imgCode === '') {
+	    getFocus("#icode")
+	    throw('请填写图片验证码。');
+    }
     /*if(!(/(^[1-9]\d*$)/.test(userobj.mobile))){
       getFocus("#phone")
       throw('手机号码格式不正确！')
@@ -79,7 +84,7 @@ function register_submit(){
   })
   .then(function(data){
   	var uid = data.user.uid;
-    window.location.href = '/u/'+uid+'/subscribe';
+    window.location.href = '/u/'+uid+'/subscribe?type=register';
 
   })
   .catch(function(data){
@@ -107,9 +112,9 @@ function register_submit(){
 function getMcode(){
   var phone = geid('phone').value.trim();
   var username = geid('username').value.trim();
-	username = $.trim(username);
   var password = geid('password').value.trim();
   var password2 = geid('password2').value.trim();
+  var imgCode = geid('icode').value.trim();
 
   if(username === ''){
     getFocus("#username");
@@ -136,6 +141,10 @@ function getMcode(){
 	  getFocus("#phone");
 	  return error_report('手机号码格式不正确。')
   }
+  if(imgCode === '') {
+	  getFocus("#icode");
+	  return error_report('请输入图片中验证码。');
+  }
   /*if(!(/(^[1-9]\d*$)/.test(phone))){
     getFocus("#phone")
     return error_report('手机号码格式不正确！')
@@ -151,7 +160,7 @@ function getMcode(){
   }*/
 
   else{
-    nkcAPI('/sendMessage/register','POST',{mobile:phone, nationCode: nationCode, username: username})
+    nkcAPI('/sendMessage/register','POST',{mobile:phone, nationCode: nationCode, username: username, imgCode: imgCode})
     .then(function(){
 	    info_report('短信验证码发送成功。');
       var count = 120;
@@ -173,6 +182,9 @@ function getMcode(){
       }
       if(data.error === '用户名已被注册。'){
         getFocus("#username");
+      }
+      if(data.error === '图片验证码无效。') {
+      	getFocus("#icode");
       }
       error_report(data.error);
     })
@@ -206,15 +218,54 @@ function getFocus(a){
 
 //检查密码复杂度
 function checkPass(s){
-   var ls = 0;
-   if(s.match(/([a-zA-Z])+/)){
-      ls++;
-   }
-   if(s.match(/([0-9])+/)){
-      ls++;
-   }
-   if(s.match(/[^a-zA-Z0-9]+/)){
-      ls++;
-   }
-   return ls
- }
+	 var ls = 0;
+	 if(s.match(/([a-zA-Z])+/)){
+	    ls++;
+	 }
+	 if(s.match(/([0-9])+/)){
+	    ls++;
+	 }
+	 if(s.match(/[^a-zA-Z0-9]+/)){
+	    ls++;
+	 }
+	 return ls
+}
+
+var imgCode = $('#imgCode');
+var progressBar = $('#progressBar');
+var imgWidth = imgCode.width();
+var maxTime = 120;
+var time = maxTime;
+var sT;
+progressBar.width(imgWidth);
+
+autoChangeImg();
+
+function changeImg() {
+	imgCode.attr('src', '/register/code?'+Date.now());
+	imgWidth = imgCode.width();
+	time = maxTime;
+	displayBar();
+	autoChangeImg()
+}
+
+imgCode.on('click', function() {
+	changeImg();
+});
+
+function autoChangeImg() {
+	clearTimeout(sT);
+	sT = setTimeout(function(){
+		time -= 0.5;
+		displayBar();
+		if(time < 0) {
+			changeImg();
+		} else {
+			autoChangeImg();
+		}
+	}, 500)
+}
+
+function displayBar() {
+	progressBar.width((time/maxTime)*imgWidth + 'px');
+}

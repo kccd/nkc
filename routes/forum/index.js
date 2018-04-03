@@ -137,6 +137,7 @@ forumRouter
     } = ctx;
 	  const {user} = data;
 		if(!user.certs.includes('mobile')) ctx.throw(401, '您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发帖。');
 	  const {post} = body;
     const {c, t} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');

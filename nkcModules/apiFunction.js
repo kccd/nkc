@@ -135,4 +135,26 @@ fn.encodeRFC5987ValueChars = (str) => {
   replace(/%(?:7C|60|5E)/g, unescape);
 };
 
+
+fn.getRandomNumber = (obj) => {
+	const {count, min, max, repeat} = obj;
+	if(!repeat && (max-min+1) < count) {
+		const error = new Error(`范围[${min}, ${max}]不可能生成${count}个不同的数字。`);
+		error.status = 500;
+		throw error;
+	}
+	const arr = [];
+	while(arr.length < count) {
+		const number = Math.round(Math.random()*(max-min) + min);
+		if(repeat) {
+			arr.push(number);
+		} else {
+			if(!arr.includes(number)) {
+				arr.push(number);
+			}
+		}
+	}
+	return arr;
+};
+
 module.exports = fn;

@@ -12,7 +12,6 @@ function submit(){
   var exam = JSON.parse(decodeURI(ga('exam','exam-object')));
 
   var category=ga('category','category-string')
-
   var examobj={
     exam:exam,
     sheet:sheet,
@@ -21,15 +20,11 @@ function submit(){
 
   //console.log('haha:'+examobj);
   return nkcAPI('/exam/subject','post',examobj)
-  .then(function(result){
-    if(result.takenByUser){
-      window.location = '/me?examinated=true';
-      return
-    }
-    window.location = '/exam/'+examobj.category+'?result=' + result.result;
+  .then(function(data){
+    window.location.href = '/exam?status=true&info=恭喜您，考试通过！&type=result&isA=' + data.isA;
   })
   .catch(function(data){   //测试没通过
-    window.location = '/exam/'+examobj.category+'?result=fail&detail=' + (data.error);
+    window.location.href = '/exam?status=false&type=result&info='+data.error;
   })
 }
 

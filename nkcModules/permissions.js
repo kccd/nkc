@@ -194,10 +194,10 @@ module.exports = async (ctx, next) => {
   if(!ctx.data.ensurePermission()) {
   	if(ctx.data.ensurePermission(ctx.method, ctx.path, adminCertificates.permittedOperations)){
 		  if(ctx.data.userLevel < 0) {
-			  ctx.throw(403, '根据系统记录，你的账号已经被封禁，请重新注册。');
+			  ctx.throw(403, '您的账号已被封禁，请退出登陆后重新注册。');
 		  }
 			//403
-		  ctx.throw(403, '权限不足');
+		  ctx.throw(403, '您没有权限访问该资源。');
 	  } else {
 			//404
 		  ctx.throw(404, '未找到页面');

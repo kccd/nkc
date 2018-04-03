@@ -5,9 +5,9 @@ block content
   -const mainContainer1400 = true
   .container-fluid(style='max-width: 1400px;')
     .row
-      if 1
+      if data.type === 'register'
         .col-xs-12.col-md-4.col-md-offset-4
-          .img-alert.glyphicon.glyphicon-ok.text-center.bg-success.center-block
+          .img-alert.glyphicon.glyphicon-ok.text-center.center-block
           h2.text-center(style='font-size:3rem;color: #555555;') &nbsp;注册成功
           hr
       .col-xs-12.col-md-8.col-md-offset-2

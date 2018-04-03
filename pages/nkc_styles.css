@@ -2032,6 +2032,16 @@ img.emoji {
   margin: auto;
   background-color: #81ca83;
 }
+.img-warning{
+  width: 6rem;
+  height: 6rem;
+  line-height: 6rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 3rem;
+  margin: auto;
+  background-color: #fb8282;
+}
 .forum-span{
   padding: 0.5rem;
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
@@ -2053,6 +2063,12 @@ img.emoji {
 .forum-chose{
   margin: 0 0 2rem 0;
 }
+
+/*个人名片*/
+
+
+/*---------*/
+
 @media screen and (max-width: 768px) {
   .new-content-left{
     width: 25%;
