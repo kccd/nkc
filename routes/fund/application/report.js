@@ -4,7 +4,7 @@ reportRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
 		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员复核，请通过后再试。');
-		if(applicationForm.disabled) ctx.throw(401, '申请表已被屏蔽。');
+		if(applicationForm.disabled) ctx.throw(403,'申请表已被屏蔽。');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -52,7 +52,7 @@ reportRouter
 		data.nav = '报告审核';
 		const {user, applicationForm} = data;
 		const {remittance, reportNeedThreads, submittedReport, fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
+		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(403,'抱歉！您没有资格进行报告审核。');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		for(let r of remittance) {
@@ -75,7 +75,7 @@ reportRouter
 		const {data, db, body} = ctx;
 		const {applicationForm, user} = data;
 		const {submittedReport, remittance, fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行报告审核。');
+		if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(403,'抱歉！您没有资格进行报告审核。');
 		const {number, support, c} = body;
 		if(number === undefined) ctx.throw(400, '参数错误');
 		if(!submittedReport) ctx.throw(400, '申请人暂未提交报告。');
@@ -125,7 +125,7 @@ reportRouter
 		const {applicationForm, user} = data;
 		const {type} = query;
 		const {reportId} = params;
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您不是该基金项目的管理员，无法完成此操作。');
+		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您不是该基金项目的管理员，无法完成此操作。');
 		const report = await db.FundDocumentModel.findOnly({_id: reportId});
 		report.disabled = type;
 		await report.save();

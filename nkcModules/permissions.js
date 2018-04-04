@@ -200,7 +200,7 @@ module.exports = async (ctx, next) => {
 		  ctx.throw(403, '您没有权限访问该资源。');
 	  } else {
 			//404
-		  ctx.throw(404, '未找到页面');
+		  ctx.throw(404, '资源未找到');
 	  }
   }
   await next();

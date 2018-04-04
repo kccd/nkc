@@ -38,7 +38,6 @@ registerRouter
 		if(!imgCode) ctx.throw(400, '请输入图片验证码。');
 		const id = ctx.cookies.get('imgCodeId');
 	  const imgCodeObj = await db.ImgCodeModel.ensureCode(id, imgCode);
-	  await imgCodeObj.update({used: true});
 	  ctx.cookies.set('imgCodeId', '');
 		const type = 'register';
 		const smsCodeObj = {
@@ -57,6 +56,7 @@ registerRouter
 			regPort
 		};
 		const user = await db.UserModel.createUser(userObj);
+	  await imgCodeObj.update({used: true, uid: user.uid});
 	  smsCode.used = true;
 	  await smsCode.save();
 		const cookieStr = encodeURI(JSON.stringify({
@@ -93,6 +93,11 @@ registerRouter
 			maxAge: ctx.settings.cookie.life,
 			httpOnly: true
 		});
+		ctx.logIt = true;
+		ctx.status = ctx.response.status;
+		const passed = Date.now() - ctx.reqTime;
+		ctx.set('X-Response-Time', passed);
+		ctx.processTime = passed.toString();
 		return ctx.body = buffer;
 	});
   /*.get('/email', async (ctx, next) => {

@@ -46,7 +46,7 @@ fundRouter
 					await body(ctx, ()=>{});
 				} else if(fundSettings.readOnly) {
 					if(ctx.method !== 'GET') {
-						ctx.throw(401, '抱歉！科创基金现在处于只读模式。');
+						ctx.throw(403,'抱歉！科创基金现在处于只读模式。');
 					}
 					await next();
 				} else {

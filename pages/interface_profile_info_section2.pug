@@ -5,9 +5,9 @@
 
     if data.userLevel >= 4
       if(!user.certs.includes('banned'))
-        a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}/ban', 'GET',{}).then(function(data){jalert(data.message)}).catch(function(data){jwarning(data.error)})`) 封禁此人
+        a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}/ban', 'GET',{}).then(function(){screenTopAlert("封禁成功。")}).catch(function(data){screenTopWarning(data.error)})`) 封禁此人
       else
-        a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}/ban', 'PUT',{}).then(function(data){jalert(data.message)}).catch(function(data){jwarning(data.error)})`) 解除封禁
+        a(href='javascript:void(0)' onclick=`nkcAPI('/u/${user.uid}/ban', 'PUT',{}).then(function(){screenTopAlert("解封成功。")}).catch(function(data){screenTopWarning(data.error)})`) 解除封禁
 
     br
     span 学术分 #{user.xsf||0}

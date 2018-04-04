@@ -15,7 +15,7 @@ postRouter
     const {data, db} = ctx;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
-    if(!await post.ensurePermission(ctx)) ctx.throw(401, '权限不足');
+    if(!await post.ensurePermission(ctx)) ctx.throw(403,'权限不足');
     await post.extendUser();
     await post.extendResources();
     data.post = post;
@@ -34,7 +34,7 @@ postRouter
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
     if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
-      ctx.throw(401, '您没有权限修改别人的回复');
+      ctx.throw(403,'您没有权限修改别人的回复');
     const objOfPost = Object.assign(targetPost, {}).toObject();
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);

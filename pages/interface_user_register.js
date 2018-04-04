@@ -103,6 +103,9 @@ function register_submit(){
       //refreshICode();
       getFocus("#phone")
     }
+    if(['图片验证码无效。', '图片验证码已失效。', '图片验证码错误。'].indexOf(data.error) !== -1) {
+	    getFocus("#icode")
+    }
     error_report(data.error);
   })
 
@@ -234,8 +237,8 @@ function checkPass(s){
 var imgCode = $('#imgCode');
 var progressBar = $('#progressBar');
 var imgWidth = imgCode.width();
-var maxTime = 120;
-var time = maxTime;
+var maxTime = 60000;
+var initTime = Date.now();
 var sT;
 progressBar.width(imgWidth);
 
@@ -244,7 +247,7 @@ autoChangeImg();
 function changeImg() {
 	imgCode.attr('src', '/register/code?'+Date.now());
 	imgWidth = imgCode.width();
-	time = maxTime;
+	initTime = Date.now();
 	displayBar();
 	autoChangeImg()
 }
@@ -256,16 +259,15 @@ imgCode.on('click', function() {
 function autoChangeImg() {
 	clearTimeout(sT);
 	sT = setTimeout(function(){
-		time -= 0.5;
 		displayBar();
-		if(time < 0) {
+		if(Date.now()-initTime >= maxTime) {
 			changeImg();
 		} else {
 			autoChangeImg();
 		}
-	}, 500)
+	}, 200)
 }
 
 function displayBar() {
-	progressBar.width((time/maxTime)*imgWidth + 'px');
+	progressBar.width(((maxTime-Date.now()+initTime)/maxTime)*imgWidth + 'px');
 }

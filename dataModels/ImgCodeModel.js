@@ -7,6 +7,10 @@ const imgCodeSchema = new Schema({
 		type: String,
 		required: true
 	},
+	uid: {
+		type: String,
+		default: null
+	},
 	toc: {
 		type: Date,
 		default: Date.now,

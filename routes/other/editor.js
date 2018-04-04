@@ -33,8 +33,8 @@ editorRouter
     		data.title = project.t;
     		data.content = project.c;
 	    } else if(cat === 'c') {
-				if(!user) ctx.throw(401, '您还没有登陆，请先登陆。');
-				if(!user.certs.includes('mobile')) ctx.throw(401, '请先绑定手机号完成实名认证。');
+				if(!user) ctx.throw(403,'您还没有登陆，请先登陆。');
+				if(!user.certs.includes('mobile')) ctx.throw(403,'请先绑定手机号完成实名认证。');
 	    } else if(cat === 'r') {
 
 	    }

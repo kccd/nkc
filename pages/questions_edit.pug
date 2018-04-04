@@ -114,31 +114,28 @@ block content
       .col-xs-12.col-sm-6  
         if data.user
           if data.questions
-              
+
             h4 类目
             span(style='margin:5px')
               |[
               a(href='/q') all
               -var total = data.numberByCategory.map(el=>el.number||0).reduce((pre,cur)=>{return pre+cur})
               | : #{total}]
-            
+
             each i in data.numberByCategory
               -var category = i.category||'undefined';var number=i.number;
               span(style='margin:5px')
                 |[
                 a(href=`/q/${category}`) #{category}
                 | : #{number}]
-            
-              
+
+
             //a(href='/api/questions?all=true' target='_blank') 下载JSON格式
             .panel.panel-default
               .panel-body.post-body.imgWidth100
                 each q,index in data.questions
-
                   include questions_single.pug
 
-          
-  
   include debug_output.pug
 block scripts
 

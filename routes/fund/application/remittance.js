@@ -14,7 +14,7 @@ remittanceRouter
 		const {db, data} = ctx;
 		const {user, applicationForm} = data;
 		const {remittance, fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您没有资格进行拨款。');
+		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(403,'抱歉！您没有资格进行拨款。');
 		ctx.template = 'interface_fund_remittance.pug';
 		await Promise.all(remittance.map(async r => {
 			if(r.uid) {
@@ -30,7 +30,7 @@ remittanceRouter
 		const {number} = body;
 		const {account, fund, remittance} = applicationForm;
 		if(!applicationForm.lock.submitted) ctx.throw(400, '抱歉！该申请表暂未提交。');
-		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(401, '抱歉！您没有资格进行拨款。');
+		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(403,'抱歉！您没有资格进行拨款。');
 		for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if(i < number && !r.status) ctx.throw(400, '请依次拨款！');
@@ -139,7 +139,7 @@ remittanceRouter
 	.get('/apply', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {applicationForm, user} = data;
-		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
+		if(applicationForm.uid !== user.uid) ctx.throw(403,'权限不足');
 		ctx.template = 'interface_fund_apply_remittance.pug';
 		data.nav = '申请拨款';
 		data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
@@ -150,7 +150,7 @@ remittanceRouter
 		const {applicationForm, user} = data;
 		const {money, account, fund, remittance, timeToPassed, reportNeedThreads} = applicationForm;
 		if(!applicationForm.lock.submitted) ctx.throw(400, '抱歉！该申请表暂未提交。');
-		if(applicationForm.uid !== user.uid) ctx.throw(401, '权限不足');
+		if(applicationForm.uid !== user.uid) ctx.throw(403,'权限不足');
 		if(applicationForm.completedAudit) ctx.throw(400, '您已经申请结题，不能再申请拨款。');
 		const {number, c, selectedThreads} = body;
 

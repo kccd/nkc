@@ -2,6 +2,7 @@ extends bootstrap_base.pug
 
 
 block title
+  include MathJax.pug
   - var user = data.user
   title #{user.username} - #{data.site.name}
   meta#replytarget(value=`${data.replyTarget}`)

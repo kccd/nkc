@@ -16,7 +16,7 @@ auditRouter
 		const {fund, lock} = applicationForm;
 		if(type === 'project') {
 			data.nav = '专家审核';
-			if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行专家审核。');
+			if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(403,'抱歉！您没有资格进行专家审核。');
 			if(applicationForm.status.projectPassed !== null) ctx.throw(400, '抱歉！该申请表已被其他审查员审核了。');
 			if(!applicationForm.status.submitted || !applicationForm.lock.submitted) ctx.throw(400, '申请表暂未提交。');
 			const {auditing, uid, timeToOpen, timeToClose} = lock;
@@ -33,7 +33,7 @@ auditRouter
 			}
 		} else if(type === 'admin'){
 			data.nav = '管理员复核';
-			if(!fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行管理员审核。');
+			if(!fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您没有资格进行管理员审核。');
 			if(applicationForm.status.adminSupport !== null) ctx.throw(400, '抱歉！该申请表已被其他管理员复核了。');
 			if(!applicationForm.status.projectPassed) ctx.throw(400, '专家审核暂未通过，请等待。');
 			const {auditing, uid, timeToOpen, timeToClose} = lock;
@@ -68,7 +68,7 @@ auditRouter
 		lock.auditing = false;
 		let support = true;
 		if(type === 'project') { // 专家审核
-			if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(401, '抱歉！您没有资格进行专家审核。');
+			if(!fund.ensureOperatorPermission('expert', user)) ctx.throw(403,'抱歉！您没有资格进行专家审核。');
 			if(!applicationForm.status.submitted) ctx.throw(400, '申请表暂未提交。');
 			const {uid} = lock;
 			if(user.uid !== uid) {
@@ -106,7 +106,7 @@ auditRouter
 				await applicationForm.update({budgetMoney});
 			}
 		} else if(type === 'admin') {// 最后管理员复核
-			if(!fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！您没有资格进行管理员审核。');
+			if(!fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您没有资格进行管理员审核。');
 			if(!applicationForm.status.projectPassed) ctx.throw(400, '专家审核暂未通过，请等待。');
 			const {uid} = lock;
 			if(user.uid !== uid) {

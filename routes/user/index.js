@@ -52,11 +52,7 @@ userRouter
 				ctx.throw(403, '为什么？你为何要封禁此用户？你是怎么了？');
 			}
 	  }
-	  if(!targetUser.certs.includes('banned')) {
-  		targetUser.certs.push('banned');
-	  }
-	  await targetUser.save();
-  	data.message = '封禁用户成功。';
+	  await targetUser.update({$addToSet: {certs: 'banned'}});
   	await next();
     /*let {uid} = ctx.params;
     let {db} = ctx;
@@ -78,16 +74,13 @@ userRouter
     await next();*/
   })
   .put('/:uid/ban', async (ctx, next) => {
-  	const {data, db, params} = ctx;
+  	const {db, params} = ctx;
   	const {uid} = params;
   	const targetUser = await db.UserModel.findOnly({uid});
   	if(!targetUser.certs.includes('banned')) {
 			ctx.throw(400, '该用户未被封禁，请刷新。');
 	  }
-	  const index = targetUser.certs.indexOf('banned');
-  	targetUser.certs.splice(index, 1);
-  	await targetUser.save();
-  	data.message = '解封用户成功。';
+	  await targetUser.update({$pull: {certs: 'banned'}});
   	await next();
     /*let {uid} = ctx.params;
     let {db} = ctx;

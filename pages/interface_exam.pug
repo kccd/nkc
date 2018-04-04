@@ -68,7 +68,7 @@ block content
             h4.text-center= data.info
             h4.text-center
               :markdown
-                如果你还想再考一次，请点 [这里](/exam) ，而不要按浏览器的“退后”。
+                如果你还想再考一次，请点 [这里](/exam) ，而不要点击浏览器的“退后”。
           else
             if data.isA === 'true'
               if data.user.certs.includes('mobile')
@@ -124,25 +124,26 @@ block content
         .col-xs-12
           .panel.panel-default.f12
             .panel-body
-              meta(id='number_of_questions' value=`${data.exam.qarr.length}`)
-              each q,index in data.exam.qarr
-                div
-                  span #{index+1}.
-                  span.question!= markdown_safe(q.question)
+              .QuestionText
+                meta(id='number_of_questions' value=`${data.exam.qarr.length}`)
+                each q,index in data.exam.qarr
+                  div
+                    span #{index+1}.
+                    span.question!= markdown_safe(q.question)
 
-                case q.type
-                  when 'ans'
-                    input(type='text' id=`answer${index}`)
-                  when 'ch4'
-                    - var prefixes = ['A','B','C','D']
-                    each c,cindex in q.choices
-                      meta(id=`answer${index}`)
-                      //set value when chosen
-                      p
-                        input(type='radio' name=`answer${index}` value=`${cindex}` onclick=`geid("answer${index}").value=${cindex}`)
-                        text #{prefixes[cindex]}.  #{c}
+                  case q.type
+                    when 'ans'
+                      input(type='text' id=`answer${index}`)
+                    when 'ch4'
+                      - var prefixes = ['A','B','C','D']
+                      each c,cindex in q.choices
+                        meta(id=`answer${index}`)
+                        //set value when chosen
+                        p
+                          input(type='radio' name=`answer${index}` value=`${cindex}` onclick=`geid("answer${index}").value=${cindex}`)
+                          text #{prefixes[cindex]}.  #{c}
 
-                hr
+                  hr
               button#submit.btn.btn-default 交卷
 
             meta(id='exam' exam-object=`${encodeURI(JSON.stringify(data.exam))}`)
