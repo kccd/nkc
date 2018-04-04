@@ -71,6 +71,24 @@ block content
               span &nbsp;处理URL&nbsp;
               button#post.btn.btn-primary(type='submit' style='float: right;') 发表
           
+          .form-group
+            div#icon.form-control(type='text' placeholder='图标' value=`${data.title || ''}`)
+              img(src="/format_bold.svg", alt="",onclick="alert('点我干嘛？')")
+              img(src="/format_italic.svg", alt="")
+              img(src="/format_link.svg", alt="")
+              img(src="/format_quote.svg", alt="")
+              img(src="/format_code.svg", alt="")
+              img(src="/format_picture.svg", alt="")
+              img(src="/format_title.svg", alt="")
+              img(src="/format_hrline.svg", alt="")
+              img(src="/format_numlist.png", alt="")
+              img(src="/format_ullist.png", alt="")
+              img(src="/format_help.png", alt="")
+              
+          .form-group
+            textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;') #{data.content || ''}
+          
+          
           .nkcpanel(id='file-uploading' target='/r')
             //uploader section
             include interface_attachment_uploader_uploader.pug
