@@ -113,28 +113,24 @@ const certificates ={
         [GET]: true,
         [POST]: true,
       },
-      exam: {
-        [name]: '考试',
-        [GET]: true,
-        [parameter]: {
-          [GET]: true,
-          [POST]: true,
-        }
-      },
       register: {
         [name]: '注册',
         [GET]: true,
         email: {
-          [GET]: true,
-          [POST]: true,
+          [GET]: false,
+          [POST]: false,
           verify: {
-            [GET]: true
+            [GET]: false
           }
         },
         mobile: {
           [GET]: true,
           [POST]: true
-        }
+        },
+	      code: {
+        	[name]: '图片验证码',
+		      [GET]: true
+	      }
       },
       r: {
         [name]: '附件',
@@ -346,6 +342,14 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+	    exam: {
+		    [name]: '考试',
+		    [GET]: true,
+		    [parameter]: {
+			    [GET]: true,
+			    [POST]: true,
+		    }
+	    },
       m: {
         [parameter]: {
           config: {
@@ -440,7 +444,11 @@ const certificates ={
             [name]: '订阅',
             [GET]: true,
             [POST]: true, // 订阅该用户
-            [DELETE]: true // 取消订阅该用户
+            [DELETE]: true, // 取消订阅该用户
+	          register: {
+		          [GET]: true,
+		          [POST]: true
+	          }
           },
           collections: {
             [name]: '收藏',
@@ -454,6 +462,10 @@ const certificates ={
               [DELETE]: true
             }
           },
+	        production: {
+						[name]: '产品序列号',
+						[POST]: false
+	        },
 	        bills: {
           	[name]: '用户账单',
 		        [GET]: true
@@ -930,7 +942,8 @@ const certificates ={
     permittedOperations: {
     	log: {
     		[name]: '网站日志',
-		    [GET]: true
+		    [GET]: true,
+		    [DELETE]: true
 	    },
       e: {
         gitPull: {

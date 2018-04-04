@@ -3,11 +3,6 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
 const answerSheetsSchema = new Schema({
-	key: {
-    type: String,
-    unique: true,
-    required: true
-  },
   uid: {
     type: String,
     default: '',
@@ -29,7 +24,7 @@ const answerSheetsSchema = new Schema({
   },
   ip: {
     type: String,
-    default: '0.0.0.0',
+    default: '',
     index: 1,
   },
   isA: {

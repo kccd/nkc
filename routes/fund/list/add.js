@@ -12,7 +12,7 @@ addRouter
 		try {
 			await fund.ensureUserPermission(user);
 		} catch(e) {
-			ctx.throw(401, e);
+			ctx.throw(403,e);
 		}
 		const message = await fund.getConflictingByUser(user);
 		if(message) ctx.throw(400, message);
@@ -41,7 +41,7 @@ addRouter
 		} else if(fund.applicationMethod.team) {
 			applicationForm.from = 'team'
 		} else {
-			ctx.throw(401, '该基金设置中未勾选个人申请和团队申请！');
+			ctx.throw(403,'该基金设置中未勾选个人申请和团队申请！');
 		}
 		const newApplicationForm = db.FundApplicationFormModel(applicationForm);
 		await newApplicationForm.save();

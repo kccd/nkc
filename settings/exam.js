@@ -11,6 +11,8 @@ module.exports = {
   passScore: 6,
   // 重复获取激活码时间限制 12小时
   succeedInterval:3600*1000*12,
+	// 一天最多考5次
+	numberOfExam: 5,
   // 注册码有效时间为一小时
   timeBeforeRegister: 60*60*1000
 };

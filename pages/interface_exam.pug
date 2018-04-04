@@ -3,38 +3,109 @@ extends bootstrap_base.pug
 block title
   meta#category(category-string=`${data.category?data.category:""}`)
   include MathJax.pug
-  title 注册测试 - 科创论坛
+  -let t = '';
+  if data.type === 'chooseCategory'
+    -t = '选择考试科目';
+  else
+    -t = '科创会员专业知识测验';
+  title= t
   
 block content
   
   .container
     .row
-      if data.result
+      if data.type === 'chooseCategory'
+        .container
+          .row
+            .col-sm-12
+              img(src='/resources/site_specific/kclogo_misaka1.png' style='max-width:100%')
+
+            .col-sm-6
+              div.f12(style='line-height:1.8;')
+                :markdown
+                  # 参与考试获得证书
+
+                  ### 说明
+                  - 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
+                  - 通过B卷考试可获得高级证书，可参与特种科技爱好话题的交流。
+                  - 通过A卷考试的用户将来可以再参加B卷考试获取高级证书。
+
+          hr
+          .row
+            .col-sm-8
+              div.f12(style='line-height:1.8;')
+                :markdown
+                  # 参加测试
+
+                  请在下面选择你最擅长的题目类别。
+
+                  ----
+              -if(!data.user || !data.user.volumeA)
+                h2 A卷
+                  small （试题简单，可以参加普通话题交流，注册后还可以参加B卷考试）
+                p.f14
+                  a(href='/exam/mix') 参加 【基础题】 测试
+                hr
+              h2 B卷
+                small （可直接获得高级证书，可参与特种科技爱好话题交流）
+              -var categories = {'chem':'化学','phys':'物理学','bio':'生物学','english':'英语','aviation':'民航知识','agri':'农业技术','hedc':'高能材料','cs':'计算机科学','ml':'机器学习','3dp':'3D打印','ham':'业余无线电','ee':'电子技术','electrical':'电气工程','dev':'软件开发'}
+              -for(k in categories)
+                p.f14
+                  a(href=`/exam/${k}`) 参加 【#{categories[k]}】 测试
+
+              hr
+              p 测试题目来自论坛专家们的集体贡献。试题版权归科创研究院所有，请勿转载。
+
+      if data.type === 'result'
         .col-xs-12
-          h1 测试完成
-          if data.result.length>10
-            //if success
-            .f12
-              text 恭喜你通过测试。你的注册码是:
-              a(href=`/register/mobile?code=${data.result}`) #{data.result}
-              text &nbsp←点击跳转到注册页面。
-          else
-            //if failed
-            .f12
+          -let success = true, prompt = '考试通过';
+          if data.status === 'false'
+            -success = false;
+            -prompt = '考试未通过';
+          include module_prompt
+        .col-xs-12.col-md-6.col-md-offset-3
+          if !success
+            h4.text-center= data.info
+            h4.text-center
               :markdown
-                很遗憾，你没有通过测试啦……不如休息一下，或者去
-                [科学公园](http://scipark.net/) 或者 [果壳网](http://guokr.com)
-                逛逛。
+                如果你还想再考一次，请点 [这里](/exam) ，而不要点击浏览器的“退后”。
 
-                如果你还想再测一次，请点[这里](/exam)，而不要按浏览器的“退后”。
+                注意：每24小时只能重考5次。
+          else
+            if data.isA === 'true'
+              if data.user.certs.includes('mobile')
+                h4.text-center= `恭喜您通过了A卷考试，现在可以发布内容了。如需提升账号等级，请参加B卷考试。`
+                  a(href=`/exam`)=` 去考试`
+              else
+                h4.text-center= `恭喜您通过了A卷考试，系统检测到您还未绑定手机。`
+                  a(href=`/me`)=` 去绑定`
+            else
+              h4.text-center= `恭喜您通过了B卷考试，现在您可以参与特种科技爱好话题交流。`
+          //
+          //h1 测试完成
+          //if data.result.length>10
+          //  //if success
+          //  .f12
+          //    text 恭喜你通过测试。你的注册码是:
+          //    a(href=`/register/mobile?code=${data.result}`) #{data.result}
+          //    text &nbsp←点击跳转到注册页面。
+          //else
+          //  //if failed
+          //  .f12
+          //    :markdown
+          //      很遗憾，你没有通过测试啦……不如休息一下，或者去
+          //      [科学公园](http://scipark.net/) 或者 [果壳网](http://guokr.com)
+          //      逛逛。
+          //
+          //      如果你还想再测一次，请点[这里](/exam)，而不要按浏览器的“退后”。
+          //
+          //      ----
+          //      来自服务器的反馈：
+          //    pre
+          //      code.hljs.bash(data-sourcepos="9:1-11:14")
+          //        span.hljs-variable!= data.detail
 
-                ----
-                来自服务器的反馈：
-              pre
-                code.hljs.bash(data-sourcepos="9:1-11:14")
-                  span.hljs-variable!= data.detail
-
-      if data.exam
+      if data.type === 'getQuestions'
         .col-xs-12
           h1 欢迎参加科创会员专业知识测验
           hr
@@ -55,25 +126,26 @@ block content
         .col-xs-12
           .panel.panel-default.f12
             .panel-body
-              meta(id='number_of_questions' value=`${data.exam.qarr.length}`)
-              each q,index in data.exam.qarr
-                div
-                  span #{index+1}.
-                  span.question!= markdown_safe(q.question)
+              .QuestionText
+                meta(id='number_of_questions' value=`${data.exam.qarr.length}`)
+                each q,index in data.exam.qarr
+                  div
+                    span #{index+1}.
+                    span.question!= markdown_safe(q.question)
 
-                case q.type
-                  when 'ans'
-                    input(type='text' id=`answer${index}`)
-                  when 'ch4'
-                    - var prefixes = ['A','B','C','D']
-                    each c,cindex in q.choices
-                      meta(id=`answer${index}`)
-                      //set value when chosen
-                      p
-                        input(type='radio' name=`answer${index}` value=`${cindex}` onclick=`geid("answer${index}").value=${cindex}`)
-                        text #{prefixes[cindex]}.  #{c}
+                  case q.type
+                    when 'ans'
+                      input(type='text' id=`answer${index}`)
+                    when 'ch4'
+                      - var prefixes = ['A','B','C','D']
+                      each c,cindex in q.choices
+                        meta(id=`answer${index}`)
+                        //set value when chosen
+                        p
+                          input(type='radio' name=`answer${index}` value=`${cindex}` onclick=`geid("answer${index}").value=${cindex}`)
+                          text #{prefixes[cindex]}.  #{c}
 
-                hr
+                  hr
               button#submit.btn.btn-default 交卷
 
             meta(id='exam' exam-object=`${encodeURI(JSON.stringify(data.exam))}`)

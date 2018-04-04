@@ -9,6 +9,9 @@ latestRouter
     const visibleFid = await ctx.getVisibleFid();
     const {digest, sortby} = query;
     const {user} = data;
+    if(data.userLevel === -1) {
+    	ctx.throw(403, '您的账号已被封禁，请退出登陆后重新注册。');
+    }
     const page = query.page || 0;
     const q = {
       fid: {$in: visibleFid}

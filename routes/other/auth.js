@@ -81,7 +81,7 @@ authRouter
 		const {uid} = params;
 		const {number} = query;
 		const {user, userLevel} = data;
-		if(user.uid !== uid && userLevel < 7) ctx.throw(401, '权限不足');
+		if(user.uid !== uid && userLevel < 7) ctx.throw(403,'权限不足');
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
 		const authLevel = await userPersonal.getAuthLevel();
 		if(!userPersonal.submittedAuth) ctx.throw(400, `暂未有已提交的申请。`);

@@ -1,102 +1,3 @@
-// - var url = '/t/' + thread.tid
-// - var ocUser = thread.firstPost.user||{}
-// - var lmUser = thread.lastPost.user||{}
-// - var oc = thread.firstPost
-// - var avatar = '/avatar_small/' + oc.uid
-// - var uid = oc.uid
-// - var digest = thread.digest
-// -var hasFile = thread.hasFile
-// -var hasImage = thread.hasImage
-// -var topped = thread.topped
-// -var belong_forum = null; var pf=null
-// -if(data.forum&&data.forum.type!='forum'&&data.forumList)
-//   -data.forumList.map(group=>{group.children.map(f=>{if(f.fid==thread.fid){belong_forum=f;pf=group;}})})
-//   -var forumcolor = (belong_forum?belong_forum.color:null)||(pf?pf.color:null)||'#aaa'
-//
-// -if(data.forumListkv)
-//   -var v = data.forumListkv[thread.fid]||{}
-//   -belong_forum = v.belong_forum;pf = v.pf; var forumcolor = v.color;
-//   //span #{belong_forum._key}
-//   //span #{thread.fid}
-//
-// -var threadtype = data.threadTypes?data.threadTypes.filter(k=>k.cid==thread.cid)[0]:null;
-// .ForumThreadItem
-//   .parent.clearfix(id='')
-//     .avatar-left
-//       - var title = '';
-//       -if(ocUser && ocUser.navbarDesc)
-//         - var navbarDesc = ocUser.navbarDesc;
-//         -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-//       a(href=`/m/${uid}` title=`${title}`)
-//         img.ForumThreadAvatar(src=`/avatar/${uid}`)
-//
-//     .content-right
-//       .ForumThreadTitle
-//         .ForumThreadTitle1(style="float:left;width:77%;")
-//           - var brief = oc.c.replace(/\[.*?]/g,'').trim().slice(0,100)
-//           //span.f12.ForumThreadDigestText [精]
-//           if belong_forum && (belong_forum.fid!==(data.forum?data.forum.fid:null))
-//             a.ForumThreadHasImage(style=`background-color:${forumcolor};` href=`/f/${belong_forum.fid}`)
-//               | #{belong_forum.abbr||belong_forum.displayName}
-//
-//           if threadtype
-//             a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.cid}` style=`background-color:${forumcolor};`) #{threadtype.name}
-//
-//           a(class=`${digest?"ForumThreadDigestText":"ForumThreadNormal"}` href=`${url}` title=`${brief}`) #{oc.t}
-//
-//           if topped
-//             span.ForumThreadHasImage.ForumThreadTopped 顶
-//           if hasImage
-//             span.ForumThreadHasImage 图
-//           if hasFile
-//             span.ForumThreadHasImage.ForumThreadHasFile 附
-//
-//         .ForumThreadTitle2(style="float:right;width:21%;")
-//           .ForumThreadTitle22(style="float:right;")
-//             -var count = (thread.count_remain||thread.count)-1
-//             -var hits = thread.hits
-//             if hits
-//               .ForumThreadStat
-//                 span.ThreadHits 浏览:#{thread.hits}
-//             if count
-//               .ForumThreadStat
-//                 span.ThreadCount 回复:#{count}
-//             else
-//               .ForumThreadStat
-//                 span.ThreadCount 回复:0
-//
-//             .ForumThreadTitle3(style="display:inline-block;")
-//               if(item && item.cid)
-//                 input.ThreadCheckboxes(id=`${item.cid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
-//               else
-//                 input.ThreadCheckboxes(id=`${(item?item.tid:null)||thread.tid}` type='checkbox' style=`${showTicks?'':'display:none;'}`)
-//
-//
-//
-//
-//           //span.lighttext cat#{thread.category}
-//
-//           //帖子标题链接
-//           //span.hidden-xs.lighttext (#{oc.c.length} 字节，#{thread.hits} 点击)
-//
-//
-//       .ForumThreadCreatorInfo(style="width:50%!important;")
-//
-//         if 1
-//           span.hidden-xs.lighttext.ForumThreadItemCreationTime #{dateTimeString(thread.toc).split(' ')[0]} from
-//
-//         a.ForumThreadItemUsername(href=`/m/${ocUser.uid}`) #{ocUser.username}
-//
-//         if Date.now()-thread.tlm<86400000
-//           span.lighttext.reddish #{fromNow(thread.tlm)}
-//         else
-//           span.lighttext #{fromNow(thread.tlm)}
-//           //帖子最后回复时间和回复者
-//
-//         span.lighttext(style='margin-right:7px;')   by
-//         a.ForumThreadItemUsername(href=`/m/${lmUser.uid}`) #{lmUser.username}
-//
-
 -const showTicks = data.userLevel > 4 && data.forum
 -const {firstPost, lastPost, tid, hasCover} = thread
 -const {t, toc} = firstPost;
@@ -106,7 +7,7 @@
 -let parentForum;
 -const forum = data.forum || {fid: '_cannot_be_equal_'}
 -data.forumList.forEach(p => {if(p.children){p.children.forEach(c => {if (c.fid === firstPost.fid) {childrenForum = c;parentForum = p}})}});
-.new-content(style='overflow: hidden')
+.new-content
   .new-content-info
     span
       a(href=`/m/${targetUser.uid}` title=`${targetUser.description || ''}`)
@@ -128,7 +29,7 @@
       span(title=`${thread.hits}次浏览`)
         span.glyphicon.glyphicon-eye-open.icon
         span.icon-font=thread.hits
-      span(title=`${thread.count}条回复`)
+      span(title=`${thread.count-1}条回复`)
         span.glyphicon.glyphicon-comment.icon
         span.icon-font=(thread.count-1)
     else
@@ -155,23 +56,23 @@
     -let heightType = 'max-height';
     if hasCover
       -heightType = 'height';
-      a.new-content-left.fixed-height(style=`background-image: url(/cover/${tid})` href=`/t/${tid}`)
-    .new-content-right(class=hasCover?'div-img': 'div-noImg')
-      div(style='width: 100%; float: left;')
-        p(class=hasCover ? 'p-img' : 'p-noImg' style=`font-size: 16px;padding: 0 0.5rem 0 0.5rem;border-radius:0.5rem;float:left;${heightType}:4.1em;overflow:hidden;margin-bottom:0.2rem;`)
-          -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
-          -firstPost.c = filterQuote(firstPost.c)
-          a(href=`/t/${tid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(firstPost))
-      div(style='width: 100%; float: right;')
-        p(class=hasCover?'p-img': 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: right; max-height: 3em; overflow: hidden; margin-left: 5rem; margin-top: 0.2rem; background-color: #f2f9ff;')
-          -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
-          -lastPost.c = filterQuote(lastPost.c)
-          a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))
-      .new-content-info(style='float: right;')
-        //span
-        //  a(href=`/m/${lastPost.user.uid}`)
-        //    img(src=`/avatar_small/${lastPost.user.uid}`)
+      a.new-content-left(style=`background-image: url(/cover/${tid})` href=`/t/${tid}`)
+    div(class=hasCover?'hasCover':'')
+      .new-content-right
+        div
+          p
+            -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
+            -firstPost.c = filterQuote(firstPost.c)
+            -firstPost.c = firstPost.c.slice(0, 250);
+            a(href=`/t/${tid}`)!= replaceContent(experimental_render(firstPost))
+        div
+          p
+            -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
+            -lastPost.c = filterQuote(lastPost.c)
+            -lastPost.c = lastPost.c.slice(0, 250);
+            a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost))
+      .new-content-info-last
         span
           a(href=`/m/${lastPost.user.uid}`)= lastPost.user.username
-        span.icon-font=fromNow(lastPost.toc)
+        span.icon-font=` ${fromNow(lastPost.toc)}`
 hr(style='margin: 2px 0 2px 0;')

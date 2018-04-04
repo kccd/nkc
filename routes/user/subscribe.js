@@ -1,8 +1,44 @@
 const Router = require('koa-router');
 const subscribeRouter = new Router();
-const nkcModules = require('../../nkcModules');
-const apiFn = nkcModules.apiFunction;
+const apiFn = require('../../nkcModules/apiFunction');
 subscribeRouter
+	.get('/register', async (ctx, next) => {
+		const {data, db, params, query} = ctx;
+		const {uid} = params;
+		const {type} = query;
+		if(type === 'register') {
+			data.type = 'register';
+		}
+		data.targetUser = await db.UserModel.findOnly({uid});
+		const {dbFunction} = ctx.nkcModules;
+		data.forumList = await dbFunction.getAvailableForums(ctx);
+		data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
+		ctx.template = 'interface_user_subscribe.pug';
+		await next();
+	})
+	.post('/register', async (ctx, next) => {
+		const {data, db, params, body} = ctx;
+		const {user} = data;
+		const {uid} = params;
+		const targetUser = await db.UserModel.findOnly({uid});
+		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
+		const {type} = body;
+		if(type === 'subscribeForums') {
+			const {subscribeForums} = body;
+			const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
+			await targetUserSubscribe.update({subscribeForums});
+		}
+		const lastUrl = ctx.cookies.get('lastUrl');
+		ctx.cookies.set('lastUrl', '');
+		if(!lastUrl) {
+			data.url = '/me';
+		} else if(lastUrl.includes('kechuang') && !lastUrl.includes('logout')) {
+			data.url = lastUrl;
+		} else{
+			data.url = '/';
+		}
+		await next();
+	})
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;

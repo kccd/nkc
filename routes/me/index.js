@@ -16,7 +16,7 @@ meRouter
     const {user} = data;
     data.examinated = ctx.query.examinated;
     if(!user) {
-      ctx.throw(401, '您还没有登陆，请登录后再试。');
+      ctx.throw(403,'您还没有登陆，请登录后再试。');
     }
     data.replyTarget = 'me';
     data.personal = await db.UsersPersonalModel.findOnly({uid: user.uid});

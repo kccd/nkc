@@ -121,14 +121,14 @@ billsRouter
 		await next();
 	})
 	.del('/:billId', async (ctx, next) => {
-		if(ctx.data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(ctx.data.userLevel < 7) ctx.throw(403,'权限不足');
 		const {bill} = ctx.data;
 		await bill.remove();
 		await next();
 	})
 	.patch('/:billId', async(ctx, next) => {
 		const {body, data} = ctx;
-		if(data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(data.userLevel < 7) ctx.throw(403,'权限不足');
 		const {billObj} = body;
 		const {from, to} = billObj;
 		const {user} = data;
