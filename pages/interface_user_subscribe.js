@@ -69,7 +69,7 @@ function submit(id) {
 		type: 'subscribeForums',
 		subscribeForums: subscribeForums
 	};
-	nkcAPI('/u/'+id+'/subscribe', 'POST', obj)
+	nkcAPI('/u/'+id+'/subscribe/register', 'POST', obj)
 		.then(function(data) {
 			screenTopAlert('提交成功');
 			var url = data.url;

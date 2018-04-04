@@ -24,7 +24,7 @@ function submit(){
     window.location.href = '/exam?status=true&info=恭喜您，考试通过！&type=result&isA=' + data.isA;
   })
   .catch(function(data){   //测试没通过
-    window.location.href = '/exam?status=false&type=result&info='+data.error;
+    window.location.href = '/exam?status=false&type=result&info='+encodeURI(data.error);
   })
 }
 

@@ -444,7 +444,11 @@ const certificates ={
             [name]: '订阅',
             [GET]: true,
             [POST]: true, // 订阅该用户
-            [DELETE]: true // 取消订阅该用户
+            [DELETE]: true, // 取消订阅该用户
+	          register: {
+		          [GET]: true,
+		          [POST]: true
+	          }
           },
           collections: {
             [name]: '收藏',

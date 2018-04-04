@@ -12,7 +12,7 @@ examRouter
     data.type = 'chooseCategory';
     if(type === 'result') {
     	data.type = type;
-    	data.info = info;
+    	data.info = decodeURI(info);
     	data.status = status;
     	data.isA = isA;
     } else {
@@ -34,13 +34,13 @@ examRouter
   	if(category === 'mix') {
   		if(user.volumeA) ctx.throw(400, '您已通过A卷考试，不需要再参加A卷考试了。');
 		  const answerSheets = await db.AnswerSheetModel.find({uid: user.uid, isA: true, toc: {$gt: Date.now() - 24*60*60*1000}}).sort({toc: -1});
-		  if(answerSheets.length > settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考A卷只有${settings.exam.numberOfExam}次考试机会。`);
+		  if(answerSheets.length >= settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考A卷只有${settings.exam.numberOfExam}次考试机会。`);
 			numberOfSubject = settings.exam.numberOfSubjectA;
 			numberOfCommon = settings.exam.numberOfCommonA;
 	  } else {
 		  if(user.certs.includes('examinated')) ctx.throw(400, '您已通过B卷考试，不需要再参加B卷考试了。');
 		  const answerSheets = await db.AnswerSheetModel.find({uid: user.uid, isA: false, toc: {$gt: Date.now() - 24*60*60*1000}}).sort({toc: -1});
-		  if(answerSheets.length > settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考B卷只有${settings.exam.numberOfExam}次考试机会。`);
+		  if(answerSheets.length >= settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考B卷只有${settings.exam.numberOfExam}次考试机会。`);
 	  }
 	  const commonCount = await db.QuestionModel.count({category: 'common'});
   	const subjectCount = await db.QuestionModel.count({category});
@@ -135,7 +135,7 @@ examRouter
 	  if(!isA && user.certs.includes('examinated')) ctx.throw(400, '您已通过B卷考试，没有必要重新参加B卷考试。');
 	  const ip = ctx.address;
 	  const answerSheets = await db.AnswerSheetModel.find({uid: user.uid, isA, toc: {$gt: Date.now() - 24*60*60*1000}}).sort({toc: -1});
-	  if(answerSheets.length > settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考${isA? 'A': 'B'}卷只有${settings.exam.numberOfExam}次考试机会。`);
+	  if(answerSheets.length >= settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考${isA? 'A': 'B'}卷只有${settings.exam.numberOfExam}次考试机会。`);
 	  let score = 0;
 		const records = [];
 		for(let i = 0; i < questionsOfDB.length; i++) {
@@ -173,7 +173,7 @@ examRouter
 		});
 		await newAnswerSheet.save();
 		if(score < settings.exam.passScore) {
-			ctx.throw(400, '测试没有通过哦，别气馁，请继续努力。');
+			ctx.throw(400, '别气馁，请继续努力。');
 		}
 		if(!isA && !user.certs.includes('examinated')) {
 			user.certs.push('examinated');

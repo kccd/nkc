@@ -84,7 +84,7 @@ function register_submit(){
   })
   .then(function(data){
   	var uid = data.user.uid;
-    window.location.href = '/u/'+uid+'/subscribe?type=register';
+    window.location.href = '/u/'+uid+'/subscribe/register?type=register';
 
   })
   .catch(function(data){
@@ -234,40 +234,43 @@ function checkPass(s){
 	 return ls
 }
 
-var imgCode = $('#imgCode');
-var progressBar = $('#progressBar');
-var imgWidth = imgCode.width();
-var maxTime = 60000;
-var initTime = Date.now();
-var sT;
-progressBar.width(imgWidth);
+$(function() {
+	var imgCode = $('#imgCode');
+	var progressBar = $('#progressBar');
+	var imgWidth = imgCode.width();
+	var maxTime = 120000;
+	var initTime = Date.now();
+	var sT;
+	progressBar.width(imgWidth);
 
-autoChangeImg();
+	autoChangeImg();
 
-function changeImg() {
-	imgCode.attr('src', '/register/code?'+Date.now());
-	imgWidth = imgCode.width();
-	initTime = Date.now();
-	displayBar();
-	autoChangeImg()
-}
+	function changeImg() {
+		imgCode.attr('src', '/register/code?'+Date.now());
+		imgWidth = imgCode.width();
+		initTime = Date.now();
+		displayBar();
+		autoChangeImg()
+	}
 
-imgCode.on('click', function() {
-	changeImg();
+	imgCode.on('click', function() {
+		changeImg();
+	});
+
+	function autoChangeImg() {
+		clearTimeout(sT);
+		sT = setTimeout(function(){
+			displayBar();
+			if(Date.now()-initTime >= maxTime) {
+				changeImg();
+			} else {
+				autoChangeImg();
+			}
+		}, 200)
+	}
+
+	function displayBar() {
+		progressBar.width(((maxTime-Date.now()+initTime)/maxTime)*imgWidth + 'px');
+	}
 });
 
-function autoChangeImg() {
-	clearTimeout(sT);
-	sT = setTimeout(function(){
-		displayBar();
-		if(Date.now()-initTime >= maxTime) {
-			changeImg();
-		} else {
-			autoChangeImg();
-		}
-	}, 200)
-}
-
-function displayBar() {
-	progressBar.width(((maxTime-Date.now()+initTime)/maxTime)*imgWidth + 'px');
-}

@@ -28,6 +28,8 @@ postRouter
     const {pid} = ctx.params;
     const {data, db} = ctx;
     const {user} = data;
+	  if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});

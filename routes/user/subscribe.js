@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const subscribeRouter = new Router();
+const apiFn = require('../../nkcModules/apiFunction');
 subscribeRouter
-	.get('/', async (ctx, next) => {
+	.get('/register', async (ctx, next) => {
 		const {data, db, params, query} = ctx;
 		const {uid} = params;
 		const {type} = query;
@@ -15,7 +16,7 @@ subscribeRouter
 		ctx.template = 'interface_user_subscribe.pug';
 		await next();
 	})
-	.post('/', async (ctx, next) => {
+	.post('/register', async (ctx, next) => {
 		const {data, db, params, body} = ctx;
 		const {user} = data;
 		const {uid} = params;
@@ -38,7 +39,7 @@ subscribeRouter
 		}
 		await next();
 	})
-  /*.get('/', async (ctx, next) => {
+  .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
     let {fans, page} = ctx.query;
@@ -60,9 +61,9 @@ subscribeRouter
     data.paging = paging;
     ctx.template = 'interface_subscribe.pug';
     await next();
-  })*/
+  })
   // 关注该用户
- /* .post('/', async (ctx, next) => {
+  .post('/', async (ctx, next) => {
     let {uid} = ctx.params;
     if(!uid) ctx.throw(400, '参数不正确');
     let {db} = ctx;
@@ -77,7 +78,7 @@ subscribeRouter
       operation: 'subscribeUser'
     });
     await next();
-  })*/
+  })
   // 取消关注该用户
   .del('/', async (ctx, next) => {
     let {uid} = ctx.params;
