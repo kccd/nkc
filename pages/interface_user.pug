@@ -7,5 +7,108 @@ block title
 block content
   .container-fluid(style='max-width: 1400px;')
     .row
-      .col-xs-12.col-md-12
-        img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;')
+      .col-xs-12.col-md-8.col-md-offset-2
+        .row
+          .col-xs-12.col-md-12
+            .text-right
+              //h4=`UID: ${data.targetUser.uid}`
+              button.btn.btn-danger.btn-sm 封禁此人
+            img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;border-radius: 50%;')
+            h2.text-center= data.targetUser.username
+            p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
+            div.text-center(style='color: #333333;')!= markdown_safe(data.targetUser.description)
+            .text-center
+              button.btn.btn-primary &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
+              span &nbsp;&nbsp;
+              a.btn.btn-primary(href=`/sms/message/${data.targetUser.uid}`) &nbsp;&nbsp;发信息&nbsp;&nbsp;
+            hr
+          .col-xs-12.col-md-8
+            ul.nav.nav-tabs.user-info-nav
+              li(role="presentation" class=!data.type?'active':'')
+                a(href=`/u/${data.targetUser.uid}`) 最新动态
+              li(role="presentation" class=data.type==='forums'?'active':'')
+                a(href=`/u/${data.targetUser.uid}?type=forums`) 关注的领域
+              li(role="presentation" class=data.type==='follow'?'active':'')
+                a(href=`/u/${data.targetUser.uid}?type=follow`) 关注的人
+              li(role="presentation" class=data.type==='fans'?'active':'')
+                a(href=`/u/${data.targetUser.uid}?type=fans`) 粉丝
+            br
+            -const url = `/u/${data.targetUser.uid}`;
+            include interface_fund_page
+            if data.type === 'forums'
+              -for(let forum of data.forums)
+                .user-info-forums-list
+                  .row
+                    .col-xs-4.col-md-4
+                      img(src='')
+                    .col-xs-8.col-md-8
+
+            else
+              -for (let result of data.results)
+                .user-info-thread-list
+                  -const {firstPost, post, thread, operation, link} = result;
+                  -post.c = hideContentByUser(post.c, data.user, 'list')
+                  -post.c = filterQuote(post.c)
+                  -post.c = post.c.slice(0, 500);
+                  if operation === 'postToThread'
+                    span.time= fromNow(post.toc)
+                    span.operation &nbsp;回复&nbsp;
+                    a.username(href=`/u/${firstPost.uid}`)= firstPost.user.username
+                    span &nbsp;的帖子&nbsp;
+                    a(href=link).title= firstPost.t
+                    .content!= replaceContent(experimental_render(post))
+                    a(href=link).link
+                      p.text-right 查看详情
+                  else if operation === 'postToForum'
+                    span.time= fromNow(post.toc)
+                    span &nbsp;发表了新帖&nbsp;
+                    a(href=link).title= firstPost.t
+                    -const hasCover = thread.hasCover;
+                    if hasCover
+                      .hasCover
+                        a.content-left(style=`background-image: url(/cover/${thread.tid})` href=`/t/${thread.tid}`)
+                        .content-right!= replaceContent(experimental_render(post))
+                      a(href=link).link
+                        p.text-right 查看详情
+                    else
+                      .content!= replaceContent(experimental_render(post))
+                      a(href=link).link
+                        p.text-right 查看详情
+            include interface_fund_page
+
+
+
+
+
+          .col-xs-12.col-md-4
+            .col-xs-12.col-md-12
+              .row
+                a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-default 他的专栏
+                br
+            .col-xs-6.col-md-6
+              .row
+                .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 回复
+                  h4
+                    strong= data.targetUserSubscribe.subscribeUsers.length
+            .col-xs-6.col-md-6
+              .row
+                .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 发帖
+                  h4
+                    strong= data.targetUserSubscribe.subscribers.length
+            .col-xs-6.col-md-6
+              .row
+                a(href='###' style='color: #000;text-decoration: none;')
+                  .text-center(style='border-right:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                    h5 关注
+                    h4
+                      strong= data.targetUserSubscribe.subscribeUsers.length
+            .col-xs-6.col-md-6
+              .row
+                a(href='###' style='color: #000;text-decoration: none;')
+                  .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                    h5 粉丝
+                    h4
+                      strong= data.targetUserSubscribe.subscribers.length
+

@@ -87,8 +87,12 @@ threadRouter
 			tid: tid
 		};
 		data.highlight = highlight;
-		if(!await thread.ensurePermissionOfModerators(ctx)) q.disabled = false;
-		data.paging = apiFn.paging(page, thread.count);
+		let postCount = thread.count;
+		if(!await thread.ensurePermissionOfModerators(ctx)) {
+			q.disabled = false;
+			postCount = thread.countRemain;
+		}
+		data.paging = apiFn.paging(page, postCount);
 		const forum = await ForumModel.findOnly({fid: thread.fid});
 		const {mid, toMid} = thread;
 		data.forumList = await dbFn.getAvailableForums(ctx);
@@ -156,6 +160,7 @@ threadRouter
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		const thread = await ThreadModel.findOnly({tid});
+		const forum = await thread.extendForum();
 		const _post = await thread.newPost(post, user, ip);
 		data.targetUser = await thread.extendUser();
 		await generateUsersBehavior({
@@ -164,6 +169,7 @@ threadRouter
 			tid: thread.tid,
 			fid: thread.fid,
 			mid: thread.mid,
+			type: forum.class,
 			toMid: thread.toMid,
 		});
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});

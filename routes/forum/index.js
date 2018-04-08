@@ -156,6 +156,7 @@ forumRouter
       tid: _post.tid,
       fid: forum.fid,
       mid: user.uid,
+	    type: forum.class,
       toMid: user.uid,
     });
     const type = ctx.request.accepts('json', 'html');

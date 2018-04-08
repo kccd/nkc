@@ -25,13 +25,90 @@ userRouter
   })
 	//个人名片
   .get('/:uid', async (ctx, next) => {
-    const {data, db, params} = ctx;
+    const {data, db, params,query} = ctx;
     const {user} = data;
+    if(!user) ctx.throw(403, '请登录后再查看用户的信息。');
 		const {uid} = params;
+		const {apiFunction} = ctx.nkcModules;
 		const targetUser = await db.UserModel.findOnly({uid});
-		const usersSubscribe = await db.UsersSubscribeModel.findOnly({uid});
+		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
+		const {type} = query;
+		const page = query.page?parseInt(query.page): 0;
+		let paging;
+		const visibleFid = await ctx.getVisibleFid();
+		if(type === 'forums') {
+			let forumsId = [];
+			for (let fid of targetUserSubscribe.subscribeForums) {
+				if (visibleFid.includes(fid) && !forumsId.includes(fid)) {
+					forumsId.push(fid);
+				}
+			}
+			const count = forumsId.length;
+			paging = apiFunction.paging(page, count);
+			forumsId.slice(paging.start, paging.start + paging.perpage);
+			data.forums = await Promise.all(forumsId.map(fid => db.ForumModel.findOnly({fid})));
+		} else if (type === 'follow') {
+			let {subscribeUsers} = targetUserSubscribe;
+			const count = subscribeUsers.length;
+			paging = apiFunction.paging(page, count);
+			subscribeUsers.slice(paging.start, paging.start + paging.perpage);
+			data.subscribeUsers = await Promise.all(subscribeUsers.map(uid => db.UserModel.findOnly({uid})));
+		} else if (type === 'fans') {
+			let {subscribers} = targetUserSubscribe;
+			const count = subscribers.length;
+			paging = apiFunction.paging(page, count);
+			subscribers.slice(paging.start, paging.start + paging.perpage);
+			data.subscribers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
+		} else {
+			const q = {
+				uid,
+				operation:{
+					$in: [
+						'postToThread',
+						'postToForum'
+					]
+				},
+				type: {
+					$in: data.certificates.contentClasses
+				}
+			};
+			const count = await db.UsersBehaviorModel.count(q);
+			paging = apiFunction.paging(page, count);
+			const targetUserBehaviors = await db.UsersBehaviorModel.find(q).sort({timeStamp: -1}).skip(paging.start).limit(paging.perpage);
+			data.results = await Promise.all(targetUserBehaviors.map(async behavior => {
+				const {pid, tid, operation} = behavior;
+				// 回帖
+				const thread = await db.ThreadModel.findOnly({tid});
+				const firstPost = await thread.extendFirstPost();
+				await firstPost.extendUser();
+				let post;
+				let link;
+				if(operation === 'postToForum') {
+					await firstPost.extendResources();
+					post = firstPost;
+					link = `/t/${tid}#${pid}`
+				} else {
+					post = await db.PostModel.findOnly({pid});
+					const query = {pid};
+					if(data.userLevel < 4) {
+						query.disabled = false;
+					}
+					const obj = await thread.getStep(query);
+					link = `/t/${tid}?page=${obj.page}&highlight=${pid}#${pid}`;
+				}
+				return {
+					operation,
+					thread,
+					firstPost,
+					post,
+					link
+				}
+			}));
+		}
+		data.type = type;
+		data.paging = paging;
 		data.targetUser = targetUser;
-		data.userSubscribe = usersSubscribe;
+		data.targetUserSubscribe = targetUserSubscribe;
 		ctx.template = 'interface_user.pug';
     await next();
   })

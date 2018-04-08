@@ -2047,7 +2047,7 @@ img.emoji {
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
   font-size: 1.5rem;
   border-radius: 3px;
-  color: #fff;
+  color: #ffffff;
   display: inline-block;
   cursor: pointer;
 }
@@ -2065,8 +2065,63 @@ img.emoji {
 }
 
 /*个人名片*/
-
-
+.user-info-nav li a{
+  color: #888;
+}
+.user-info-thread-list{
+  padding: 1rem 1rem 0.2rem 1rem;
+  margin: 1rem 0;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  box-shadow: 1px 1px 2px #cccccc;
+}
+.user-info-thread-list .time{
+  color: #888;
+}
+.user-info-thread-list .operation{
+  font-weight: 700;
+}
+.user-info-thread-list .username{
+}
+.user-info-thread-list .title{
+  font-weight: 700;
+  color: #000;
+}
+.user-info-thread-list .content{
+  color: #777;
+  overflow: hidden;
+  margin-top: 1rem;
+  max-height: 8.5em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+}
+.user-info-thread-list .link{
+  text-decoration: none;
+  /*color: #333;*/
+}
+.user-info-thread-list .hasCover{
+  overflow: hidden;
+  margin-top: 1rem;
+  height: 10rem;
+}
+.user-info-thread-list .hasCover .content-left{
+  display: inline-block;
+  height: 10rem;
+  width: 30%;
+  border-radius: 5px;
+  background-size: cover;
+  overflow: hidden;
+}
+.user-info-thread-list .hasCover>.content-right{
+  overflow: hidden;
+  width: 70%;
+  padding: 0 0.5rem;
+  margin-top: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+}
 /*---------*/
 
 @media screen and (max-width: 768px) {

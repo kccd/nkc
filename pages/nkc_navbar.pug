@@ -42,7 +42,7 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;line-height: 
             - var user = data.user
             - var navbarDesc = user.navbarDesc;
             - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-            a(style='color: #337ab7;padding-right: 0.1rem' href='/me' title=`${title}`)= user.username
+            a(style='color: #337ab7;padding-right: 0.1rem' href=`/u/${data.user.uid}` title=`${title}`)= user.username
           li
 
             a(style='color: #337ab7;padding-right: 0.1rem' href='/sms') 信
