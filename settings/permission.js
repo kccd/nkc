@@ -826,10 +826,9 @@ const certificates ={
       },
       u: {
         [parameter]: {
-          ban: {
+          banned: {
             [name]: '封禁/解封用户',
-            [GET]: true,// 封禁用户 
-            [PUT]: true // 解封用户
+            [PATCH]: true
           }
         }
       },

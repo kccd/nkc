@@ -13,7 +13,7 @@
       a(href=`/m/${targetUser.uid}` title=`${targetUser.description || ''}`)
         img(src=`/avatar_small/${targetUser.uid}` style='width: 30px;')
     span
-      a(href=`/m/${targetUser.uid}`)= targetUser.username
+      a(href=`/u/${targetUser.uid}`)= targetUser.username
     if(parentForum && forum.fid === '_cannot_be_equal_')
       span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
         a(href=`/f/${parentForum.fid}` title=`${parentForum.description || ''}`)= parentForum.displayName

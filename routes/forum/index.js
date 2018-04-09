@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const operationRouter = require('./operation');
 const nkcModules = require('../../nkcModules');
+const subscribeRouter = require('./subscribe');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 const forumRouter = new Router();
@@ -185,6 +186,7 @@ forumRouter
     }
     return next()
   })
+	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
 
 module.exports = forumRouter;
