@@ -45,7 +45,6 @@ smsCodeSchema.statics.ensureCode = async (obj) => {
 	const SmsCodeModel = mongoose.model('smsCodes');
 	const {mobileCodeTime} = require('../settings/sendMessage');
 	const smsCode = await SmsCodeModel.findOne({nationCode, mobile, code, type, used: false});
-	console.log(smsCode)
 	if(smsCode && (smsCode.toc > (Date.now() - mobileCodeTime))) {
 		return smsCode;
 	} else {
@@ -62,13 +61,13 @@ smsCodeSchema.statics.ensureSendPermission = async (obj) => {
 	const SmsCodeModel = mongoose.model('smsCodes');
 	let smsCodes = await SmsCodeModel.find({nationCode, mobile, type, toc: {$gte: Date.now() - 24*60*60*1000}});
 	if(smsCodes.length >= sendMobileCodeCount) {
-		const err = new Error('同一手机号码24小时内发送短信验证码不能超过5条。');
+		const err = new Error(`同一手机号码24小时内发送短信验证码不能超过${sendMobileCodeCount}条。`);
 		err.status = 400;
 		throw err;
 	}
 	smsCodes = await SmsCodeModel.find({type, ip, toc: {$gte: Date.now() - 24*60*60*1000}});
 	if(smsCodes.length >= sendMobileCodeCountSameIp) {
-		const err = new Error('同一IP24小时内发送短信验证码不能超过10条。');
+		const err = new Error(`同一IP24小时内发送短信验证码不能超过${sendMobileCodeCountSameIp}条。`);
 		err.status = 400;
 		throw err;
 	}

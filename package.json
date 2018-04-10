@@ -45,6 +45,7 @@
     "qcloudsms_js": "^0.1.0",
     "qr-image": "^3.2.0",
     "qrcode": "^1.2.0",
+    "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",
     "xbbcode-parser": "^0.1.2",
     "xss": "^0.3.7"

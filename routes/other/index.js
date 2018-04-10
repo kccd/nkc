@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const loginRouter = require('./login');
 const logoutRouter = require('./logout');
-const registerRouter = require('./register');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
 const forgotPasswordRouter = require('./forgotPassword');
@@ -23,12 +22,12 @@ const adRouter = require('./ad');
 const rtRouter = require('./rt');
 const qrCodeRouter = require('./qrcode');
 const searchRouter = require('./search');
-const testRouter = require('./test');
 const photoRouter = require('./photo');
 const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
 const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
+const logRouter = require('./log');
 const coverRouter = require('./cover');
 // -----------------------------------
 otherRouter
@@ -131,7 +130,6 @@ otherRouter
 	})
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
-  .use('register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('exam', examRouter.routes(), examRouter.allowedMethods())
   .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
@@ -153,6 +151,6 @@ otherRouter
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
-  .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
-  .use('test', testRouter.routes(), testRouter.allowedMethods());
+	.use('log', logRouter.routes(), logRouter.allowedMethods())
+  .use('cover', coverRouter.routes(), coverRouter.allowedMethods());
 module.exports = otherRouter;

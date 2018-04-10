@@ -87,12 +87,16 @@ const forumSchema = new Schema({
 });
 // 验证是否有权限进入此版块
 forumSchema.methods.ensurePermission = async function (ctx) {
-  const {data} = ctx;
+  /*const {data} = ctx;
   const visibleFid = await ctx.getVisibleFid();
   const {contentClasses} = data.certificates;
   if(!this.visibility)
     return contentClasses.includes(this.class);
-  return visibleFid.includes(this.fid);
+  return visibleFid.includes(this.fid);*/
+
+	const {contentClasses} = ctx.data.certificates;
+	return contentClasses.includes(this.class);
+
 };
 // 若是父板块则返回有权限访问的子版块的fid
 forumSchema.methods.getFidOfChildForum = async function (ctx) {

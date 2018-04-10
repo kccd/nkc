@@ -92,11 +92,11 @@ applicationRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		const {applicant, members, fund} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
-		if(applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(401, '权限不足');
+		if(applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
 		ctx.template = 'interface_fund_applicationForm.pug';
 		const page = query.page? parseInt(query.page): 0;
 		const q = {
@@ -147,24 +147,24 @@ applicationRouter
 		const {useless, newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId, category} = body;
 		data.s = s;
 		const {applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		if(useless === 'giveUp') {
 			ctx.throw(400, '抱歉！您已放弃此次申请。');
 		} else if(useless === 'exceededModifyCount') {
 			ctx.throw(400, '抱歉！申请表已超出最大修改次数。');
 		} else if(useless === 'delete') {
-			ctx.throw(401, '抱歉！该申请表已被删除。');
+			ctx.throw(403,'抱歉！该申请表已被删除。');
 		} else if(useless === 'refuse') {
-			ctx.throw(401, '抱歉！该申请表已被彻底拒绝。');
+			ctx.throw(403,'抱歉！该申请表已被彻底拒绝。');
 		}
 		const {_id} = params;
-		if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
-		if(applicationForm.lock.submitted) ctx.throw(401, '抱歉！申请表已提交暂不能修改。');
+		if(user.uid !== applicationForm.uid) ctx.throw(403,'权限不足');
+		if(applicationForm.lock.submitted) ctx.throw(403,'抱歉！申请表已提交暂不能修改。');
 		const fund = applicationForm.fund;
 		try {
 			await fund.ensureUserPermission(user);
 		} catch(e) {
-			ctx.throw(401, e);
+			ctx.throw(403,e);
 		}
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const {applicant, members, status} = applicationForm;
@@ -327,14 +327,14 @@ applicationRouter
 	.del('/:_id', async (ctx, next) => {
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		const {submitted, usersSupport, projectPassed, adminSupport, remittance} = applicationForm.status;
 		const {type, c} = query;
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		if(type === 'giveUp'){
 			if(!c) ctx.throw(400, '请输入放弃的原因。');
-			if(user.uid !== applicationForm.uid) ctx.throw(401, '权限不足');
-			if(applicationForm.adminSupport) ctx.throw(401, '已经通过审核的申请不能放弃，您可以点击结题按钮提前结题。');
+			if(user.uid !== applicationForm.uid) ctx.throw(403,'权限不足');
+			if(applicationForm.adminSupport) ctx.throw(403,'已经通过审核的申请不能放弃，您可以点击结题按钮提前结题。');
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 			const newDocument = db.FundDocumentModel({
 				_id: newId,

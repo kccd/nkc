@@ -9,7 +9,8 @@ fn.paging = (page, arrLength) => {
     perpage: perpage,
     start: page*perpage,
     count: 65,
-    pageCount: Math.ceil(arrLength/perpage)
+    pageCount: Math.ceil(arrLength/perpage),
+	  aggregate: arrLength
   }
 };
 
@@ -132,6 +133,28 @@ fn.encodeRFC5987ValueChars = (str) => {
   // 下面的并不是 RFC5987 中 URI 编码必须的
   // 所以对于 |`^ 这3个字符我们可以稍稍提高一点可读性
   replace(/%(?:7C|60|5E)/g, unescape);
+};
+
+
+fn.getRandomNumber = (obj) => {
+	const {count, min, max, repeat} = obj;
+	if(!repeat && (max-min+1) < count) {
+		const error = new Error(`范围[${min}, ${max}]不可能生成${count}个不同的数字。`);
+		error.status = 500;
+		throw error;
+	}
+	const arr = [];
+	while(arr.length < count) {
+		const number = Math.round(Math.random()*(max-min) + min);
+		if(repeat) {
+			arr.push(number);
+		} else {
+			if(!arr.includes(number)) {
+				arr.push(number);
+			}
+		}
+	}
+	return arr;
 };
 
 module.exports = fn;

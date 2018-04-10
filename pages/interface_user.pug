@@ -1,0 +1,11 @@
+extends bootstrap_base
+block title
+  meta(name='description' content=data.targetUser.description || '')
+  meta(name='keywords' content=data.targetUser.username)
+  title= `${data.targetUser.username} - 科创论坛`
+  -const mainContainer1400 = true;
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;')

@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const editorRouter = new Router();
 const nkcModules = require('../../nkcModules');
-const dbFn = nkcModules.dbFunction;
 editorRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
@@ -10,6 +9,10 @@ editorRouter
     //发新帖，回复等使用新编辑器
     //重新编辑帖子使用旧版编辑器
     ctx.template = 'interface_editor_test.pug';
+	  if((!user.volumeA || !user.certs.includes('mobile')) && type !== 'application') {
+    	ctx.template = 'interface_notice.pug';
+    	return await next();
+    }
     data.type = type;
     data.id = id;
     data.cat = cat;
@@ -41,8 +44,8 @@ editorRouter
     		data.title = project.t;
     		data.content = project.c;
 	    } else if(cat === 'c') {
-				if(!user) ctx.throw(401, '您还没有登陆，请先登陆。');
-				if(!user.certs.includes('mobile')) ctx.throw(401, '请先绑定手机号完成实名认证。');
+				if(!user) ctx.throw(403,'您还没有登陆，请先登陆。');
+				if(!user.certs.includes('mobile')) ctx.throw(403,'请先绑定手机号完成实名认证。');
 	    } else if(cat === 'r') {
 
 	    }

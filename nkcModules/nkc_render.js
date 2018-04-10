@@ -306,7 +306,6 @@ function nkc_render(options){
       oldString=oldString.substring(index2+1);
     }
     newString+=oldString
-
     return newString;
   }
 

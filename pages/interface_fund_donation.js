@@ -2,7 +2,9 @@ var obj = {
 	money: 500,
 	anonymous: false
 };
-
+var loginJson = $('#info').text();
+var info = JSON.parse(loginJson);
+var login = info.login;
 $(function() {
 	init();
 	ensureBill();
@@ -43,19 +45,27 @@ function submit() {
 			break;
 		}
 	}
-	if(obj.money > 20 && obj.money < 10000) {
-
-	} else {
-		return screenTopWarning('请输入正确的捐款金额。');
+	if(obj.money < 20) {
+		$('#submit').removeClass('disabled').attr('onclick', fn);
+		return screenTopWarning('单笔捐款金额不能少于20元。');
 	}
+	if(obj.money > 10000) {
+		$('#submit').removeClass('disabled').attr('onclick', fn);
+		return screenTopWarning('单笔捐款金额不能超过10000元，请分批次捐款。')
+	}
+	if(!obj.anonymous && !login) {
+		$('#submit').removeClass('disabled').attr('onclick', fn);
+		return screenTopWarning('非匿名捐款要求用户必须登陆，请登录后再试。');
+	}
+	var newWindow = window.open();
 	nkcAPI('/fund/donation', 'POST', obj)
 		.then(function(data) {
-			$('#link').attr('href', data.url);
-			$('#link')[0].click();
+			newWindow.location = data.url;
+			$('#donation-mask').removeClass('hidden');
 			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 		.catch(function(data) {
-			screenTopWarning(data.error);
+			newWindow.location = '/fund/donation?error='+data.error;
 			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 }
@@ -69,7 +79,7 @@ function ensureBill() {
 				.then(function(data) {
 					var bill = data.bill;
 					if(bill.verify) {
-						$('#message').text('捐款成功，感谢您的捐款！');
+						$('#message').text('系统已确认，支付成功！');
 						setTimeout(function(){
 							window.location.href='/fund';
 						}, 3000);
@@ -129,4 +139,8 @@ function selectMoney(m) {
 			break;
 		}
 	}
+}
+
+function disappearMask(){
+	$('#donation-mask').addClass('hidden');
 }

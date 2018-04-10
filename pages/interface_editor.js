@@ -438,6 +438,23 @@ function createOption(text) {
   return option;
 }
 
+function mathfresh(){
+	if(MathJax){
+		MathJax.Hub.PreProcess(geid('parsedcontent'),function(){MathJax.Hub.Process(geid('parsedcontent'))})
+	}
+	if(hljs){
+		ReHighlightEverything() //interface_common code highlight
+	}
+}
+var screenfitted = false;
+function fitscreen(){
+	var h = $(window).height().toString()+'px'
+
+	geid('content').style.height = !screenfitted?h:'300px';
+	geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
+
+	screenfitted = !screenfitted
+}
 function extract_resource_from_tag(text) {
   // this function extract resource tags from text,
   // then find matches in list.rlist(the uploaded resources array)

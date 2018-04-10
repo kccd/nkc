@@ -3,9 +3,7 @@ const sendMessageRouter = new Router();
 sendMessageRouter
   .post('/register', async (ctx, next) => { // 手机号码注册
   	const {db, body} = ctx;
-		const {regCode, nationCode, username, mobile} = body;
-		if(!regCode) ctx.throw(400, '请输入注册码。');
-	  await db.AnswerSheetModel.ensureAnswerSheet(regCode);
+		const {nationCode, username, mobile, imgCode} = body;
 	  if(!username) ctx.throw(400, '请输入用户名。');
 	  const {contentLength} = ctx.tools.checkString;
 	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
@@ -15,6 +13,9 @@ sendMessageRouter
 		if(!mobile) ctx.throw(400, '请输入手机号码。');
 		const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
 		if(otherPersonal) ctx.throw(400, `手机号码已被其他账号注册。`);
+		if(!imgCode) ctx.throw(400, '请输入图片验证码。');
+		const id = ctx.cookies.get('imgCodeId');
+		await db.ImgCodeModel.ensureCode(id, imgCode);
 		const type = 'register';
 		const ip = ctx.address;
 		const smsCodeObj = {

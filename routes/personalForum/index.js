@@ -25,10 +25,10 @@ router
     data.popPersonalForums = setting.popPersonalForums;
     let {
       sortby = 'tlm',
-      digest = false,
       tab = 'own',
       page = 0
     } = query;
+    const digest = (query.digest === 'true');
     const matchBase = generateMatchBase();
     const $sort = {};
     if(sortby === 'toc') {
@@ -63,7 +63,7 @@ router
 	      await thread.firstPost.extendResources();
       }));
       data.posts = posts;
-      const length = await ThreadModel.count($matchThread.toJS());
+      const length = await PostModel.count($matchPost.toJS());
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {

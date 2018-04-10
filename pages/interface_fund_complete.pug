@@ -6,6 +6,12 @@ block title
   title= `${fund.name}-${project.t}`
   link(rel='stylesheet' href='/fund.css')
 block content
+  div#donation-mask.hidden
+    .container
+      .col-xs-12.col-md-6.col-md-offset-3
+        h3 请在浏览器新打开的窗口完成支付!
+        p 若没有新窗口打开，请检查新窗口是否已被浏览器拦截。
+        button(onclick='disappearMask()').btn.btn-default 确定
   .container-fluid(style='max-width: 1400px;')
     include interface_fund_nav
     .row
@@ -64,11 +70,11 @@ block content
                           .money= p.money
                           .total= total
                           .suggest= p.suggest?p.suggest: total
-                          .fact= p.fact
+                          .fact= p.fact?p.fact: total
                     h3.text-right
                       span=`申请金额：${aggregate}元`
                       span=`，专家建议：${suggest || aggregate}元`
-                      span=`，实际批准：${fact}元`
+                      span=`，实际批准：${fact || aggregate}元`
 
                     h3 实际使用
                     -let actualAggregate = 0;
@@ -87,7 +93,8 @@ block content
                           .actualCount= a.count
                           .actualMoney= a.money
                           .actualTotal= total
-                    h3(style='margin-left: 0.5rem;')= `实际批准：${fact}元，实际花费：${actualAggregate}元，应退金额：${fact >= actualAggregate?fact-actualAggregate: 0}元 `
+                    -fact = fact || aggregate
+                    h3(style='margin-left: 0.5rem;')= `实际批准：${fact || aggregate}元，实际花费：${actualAggregate}元，应退金额：${fact >= actualAggregate?fact-actualAggregate: 0}元 `
                       span.fund-span(onclick=`window.open('/u/${applicationForm.uid}/bills?fundId=${applicationForm.fund._id.toLowerCase()}')`) 查看账单
                   br
                   h4 附带帖子：
@@ -161,12 +168,12 @@ block content
                               .money= p.money
                               .total= total
                               .suggest= p.suggest?p.suggest: total
-                              .fact= p.fact
+                              .fact= p.fact?p.fact: total
                         h3.text-right
                           span=`申请金额：${aggregate}元`
                           span=`，专家建议：${suggest || aggregate}元`
                           span=`，实际批准：`
-                          span.factMoney= fact
+                          span.factMoney= fact || aggregate
                           span= `元`
 
                         br

@@ -6,7 +6,8 @@ div(class=`${classString}` style=`${styleString}`)
     .col-md-12
       ul.HomeFriendlyLink
         include nkc_footer_links.pug
-        include nkc_friendlies.pug
+        if data.navbar && data.navbar.highlight === 'latest'
+          include nkc_friendlies.pug
       //hr.hrNarrowSpace
       p #{server.name} &nbsp
         a(href=`${server.github}`) #{server.github}

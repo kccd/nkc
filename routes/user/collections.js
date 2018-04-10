@@ -45,7 +45,7 @@ collectionsRouter
     const obj = {};
     if(category) obj.category = category;
     const collection = await db.CollectionModel.findOne({cid: cid});
-    if(data.user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格修改别人的收藏');
+    if(data.user.uid !== collection.uid) ctx.throw(403,'抱歉，你没有资格修改别人的收藏');
     await collection.update(obj);
     await next();
   })
@@ -53,7 +53,7 @@ collectionsRouter
     const {db, data} = ctx;
     const {cid} = ctx.params;
     const collection = await db.CollectionModel.findOne({cid: cid});
-    if(data.user.uid !== collection.uid) ctx.throw(401, '抱歉，你没有资格删除别人的收藏');
+    if(data.user.uid !== collection.uid) ctx.throw(403,'抱歉，你没有资格删除别人的收藏');
     await collection.remove();
     await next();
   });

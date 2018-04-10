@@ -635,8 +635,6 @@ function uploadFile(url, id, callback) {
 		postUpload(url, formData, callback);
 	});
 }
-
-
 $("document").ready(function(){
   $("#text-elem").on("click",function(){
     var selection = document.getSelection();
@@ -647,3 +645,13 @@ $("document").ready(function(){
     lastEditRange = selection.getRangeAt(0)
   })
 })
+function deleteBill(id) {
+	if(confirm('确定要删除该条记录？') === false) return;
+	nkcAPI('/fund/bills/'+id, 'DELETE', {})
+		.then(function () {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

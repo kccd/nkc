@@ -145,7 +145,7 @@
               .money= p.money
               .total= total
               .suggest= p.suggest?p.suggest: total
-              .fact= p.fact
+              .fact= p.fact?p.fact: total
         else if applicationForm.budgetMoney.length !== 0 && applicationForm.budgetMoney[0].suggest
           -aggregate=0;
           -suggest=0;
@@ -181,6 +181,8 @@
               .count= p.count
               .money= p.money
               .total= total
+        -fact = fact || aggregate
+        -suggest = suggest || aggregate
       h3.text-right
         if aggregate
           span=`申请金额：${aggregate}元`

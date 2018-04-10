@@ -230,7 +230,8 @@ block content
                       //span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
                   if fund.thread.count > 0
                     br
-                    h4 申请人曾今的技术帖（从论坛发帖中选择）
+                    -const threadCount = fund.thread.count;
+                    h4=`申请人曾今的技术帖（从论坛发帖中选择${threadCount > 0?`，至少${threadCount}篇`:''}）`
                     .popupPanel.disabled
                       .popupPanel-body
                         .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')

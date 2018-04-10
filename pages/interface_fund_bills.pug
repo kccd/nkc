@@ -16,6 +16,7 @@ block content
           -const url = `/fund/list/${fund._id.toLowerCase()}/bills`;
           include interface_fund_page
           .table-responsive
+            -const displayBalance = true;
             include interface_fund_bill_list
           include interface_fund_page
 block scripts

@@ -7,7 +7,7 @@
 -let parentForum;
 -const forum = data.forum || {fid: '_cannot_be_equal_'}
 -data.forumList.forEach(p => {if(p.children){p.children.forEach(c => {if (c.fid === firstPost.fid) {childrenForum = c;parentForum = p}})}});
-.new-content(style='overflow: hidden')
+.new-content
   .new-content-info
     span
       a(href=`/m/${targetUser.uid}` title=`${targetUser.description || ''}`)
@@ -29,7 +29,7 @@
       span(title=`${thread.hits}次浏览`)
         span.glyphicon.glyphicon-eye-open.icon
         span.icon-font=thread.hits
-      span(title=`${thread.count}条回复`)
+      span(title=`${thread.count-1}条回复`)
         span.glyphicon.glyphicon-comment.icon
         span.icon-font=(thread.count-1)
     else
@@ -56,23 +56,23 @@
     -let heightType = 'max-height';
     if hasCover
       -heightType = 'height';
-      a.new-content-left.fixed-height(style=`background-image: url(/cover/${tid})` href=`/t/${tid}`)
-    .new-content-right(class=hasCover?'div-img': 'div-noImg')
-      div(style='width: 100%; float: left;')
-        p(class=hasCover ? 'p-img' : 'p-noImg' style=`font-size: 16px;padding: 0 0.5rem 0 0.5rem;border-radius:0.5rem;float:left;${heightType}:4.1em;overflow:hidden;margin-bottom:0.2rem;`)
-          -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
-          -firstPost.c = filterQuote(firstPost.c)
-          a(href=`/t/${tid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(firstPost))
-      div(style='width: 100%; float: right;')
-        p(class=hasCover?'p-img': 'p-noImg' style='padding: 0 0.5rem 0 0.5rem; border-radius: 0.5rem; float: right; max-height: 3em; overflow: hidden; margin-left: 5rem; margin-top: 0.2rem; background-color: #f2f9ff;')
-          -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
-          -lastPost.c = filterQuote(lastPost.c)
-          a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` style='text-decoration: none; color: inherit;')!= replaceContent(experimental_render(lastPost))
-      .new-content-info(style='float: right;')
-        //span
-        //  a(href=`/m/${lastPost.user.uid}`)
-        //    img(src=`/avatar_small/${lastPost.user.uid}`)
+      a.new-content-left(style=`background-image: url(/cover/${tid})` href=`/t/${tid}`)
+    div(class=hasCover?'hasCover':'')
+      .new-content-right
+        div
+          p
+            -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
+            -firstPost.c = filterQuote(firstPost.c)
+            -firstPost.c = firstPost.c.slice(0, 250);
+            a(href=`/t/${tid}`)!= replaceContent(experimental_render(firstPost))
+        div
+          p
+            -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
+            -lastPost.c = filterQuote(lastPost.c)
+            -lastPost.c = lastPost.c.slice(0, 250);
+            a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost))
+      .new-content-info-last
         span
           a(href=`/m/${lastPost.user.uid}`)= lastPost.user.username
-        span.icon-font=fromNow(lastPost.toc)
+        span.icon-font=` ${fromNow(lastPost.toc)}`
 hr(style='margin: 2px 0 2px 0;')

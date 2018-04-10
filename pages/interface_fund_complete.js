@@ -334,11 +334,18 @@ function refund(money) {
 		type: 'refund',
 		actualMoney: actualMoney
 	};
+	var newWindow = window.open();
 	nkcAPI('/fund/donation', 'POST', obj)
 		.then(function(data) {
-			window.open(data.url);
+			newWindow.location = data.url;
+			$('#donation-mask').removeClass('hidden');
 		})
 		.catch(function(data) {
+			newWindow.location = '/fund/donation?error='+data.error;
 			screenTopWarning(data.error);
 		})
+}
+
+function disappearMask(){
+	$('#donation-mask').addClass('hidden');
 }

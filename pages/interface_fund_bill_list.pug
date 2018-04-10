@@ -27,7 +27,7 @@ table.table.table-bordered
       th 备注
       if displayBalance
         th 剩余（元）
-        th 操作
+      th 操作
   tbody
     -for(let b of data.bills)
       -let color = '#fff';
@@ -48,8 +48,10 @@ table.table.table-bordered
         th= b.notes
         if displayBalance
           th= b.balance.toFixed(1)
-          if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
-            th
-              a(href=`/fund/bills/${b._id}`) 编辑
-          else
-            th= ''
+        if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
+          th
+            a(href=`/fund/bills/${b._id}`) 修改
+            span &nbsp;&nbsp;
+            a.text-danger(style='cursor: pointer;' onclick=`deleteBill(${b._id})`) 删除
+        else
+          th= ''

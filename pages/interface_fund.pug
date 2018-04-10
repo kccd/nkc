@@ -14,9 +14,9 @@ block content
             include interface_fund_singlefund
         hr
         .row
-          .col-xs-12.col-md-3(style='height: 3rem;line-height: 3rem;font-size: 2.5rem;') 捐款人
-          .col-xs-12.col-md-2.col-md-offset-7
-            a(href='/fund/donation').btn.btn-info.btn-block 去捐款
+          .col-xs-6.col-md-6(style='height: 3rem;line-height: 3rem;font-size: 2.5rem;') 捐款人
+          .col-xs-6.col-md-6.text-right
+            a.h3.text-info(href='/fund/donation').text-right 去捐款>>
         .row
           -for(let donationUser of data.donationUsers)
             .col-xs-4.col-sm-3.col-md-2.donation-user-list

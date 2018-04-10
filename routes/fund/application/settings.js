@@ -7,14 +7,14 @@ settingsRouter
 		data.nav = '填写申请表';
 		const {user, applicationForm} = data;
 		const {fund} = applicationForm;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
-		if(applicationForm.useless !== null) ctx.throw(401, '申请表已失效，无法完成该操作。');
+		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
+		if(applicationForm.useless !== null) ctx.throw(403,'申请表已失效，无法完成该操作。');
 		if(applicationForm.modifyCount >= fund.modifyCount) {
 			await applicationForm.update({useless: 'exceededModifyCount'});
 			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
 		}
 		const {lock} = applicationForm;
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(401, '权限不足');
+		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(403,'权限不足');
 		if(lock.submitted) ctx.throw(400, '申请表已提交，无法修改。');
 		let {s} = ctx.query;
 		if(s) {

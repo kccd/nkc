@@ -5,14 +5,14 @@ voteRouter
 		const {data, body, db} = ctx;
 		const {type, c} = body;
 		const {user, applicationForm} = data;
-		if(applicationForm.disabled) ctx.throw(401, '抱歉！该申请表已被屏蔽。');
+		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
-		if(!applicationForm.fund.ensureOperatorPermission('voter', user)) ctx.throw(401, '抱歉！您没有资格进行投票。');
+		if(!applicationForm.fund.ensureOperatorPermission('voter', user)) ctx.throw(403,'抱歉！您没有资格进行投票。');
 		const {fund, members, supportersId, objectorsId, status} = applicationForm;
 		if(!status.submitted) ctx.throw(400, '申请表未提交，暂不能投票。');
 		const membersId = members.map(m => m.uid);
 		membersId.push(applicationForm.uid);
-		if(membersId.includes(user.uid)) ctx.throw(401, '抱歉！您已参与该基金的申请，无法完成该操作！');
+		if(membersId.includes(user.uid)) ctx.throw(403,'抱歉！您已参与该基金的申请，无法完成该操作！');
 		if(supportersId.includes(user.uid) || objectorsId.includes(user.uid)) ctx.throw(400, '抱歉！您已经投过票了。');
 		if(type === 'support') {
 			supportersId.push(user.uid);

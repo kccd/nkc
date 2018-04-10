@@ -221,7 +221,7 @@ block content
               - for(var i =0; i < userCerts.length; i++)
                 - if(userCerts[i] === 'mobile')
                   - hasMobile = true;
-              if (data.userLevel >= 1 && hasMobile)
+              if (data.userLevel >= 1 && hasMobile && data.user.volumeA)
                 //.form-group
                   //a.f12(href='/editor?target=#{data.replytarget}') 回复（去编辑器）
 

@@ -15,7 +15,7 @@ postRouter
     const {data, db} = ctx;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
-    if(!await post.ensurePermission(ctx)) ctx.throw(401, '权限不足');
+    if(!await post.ensurePermission(ctx)) ctx.throw(403,'权限不足');
     await post.extendUser();
     await post.extendResources();
     data.post = post;
@@ -28,13 +28,15 @@ postRouter
     const {pid} = ctx.params;
     const {data, db} = ctx;
     const {user} = data;
+	  if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
     if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
-      ctx.throw(401, '您没有权限修改别人的回复');
+      ctx.throw(403,'您没有权限修改别人的回复');
     const objOfPost = Object.assign(targetPost, {}).toObject();
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);

@@ -58,7 +58,6 @@ module.exports = async (ctx, next) => {
     await next();
   } catch(err) {
     const body = require('./body');
-	  const type = ctx.request.accepts('json', 'html');
 	  ctx.status = err.statusCode || err.status || 500;
 	  ctx.error = err.stack || err;
 	  let error;
@@ -68,14 +67,9 @@ module.exports = async (ctx, next) => {
 		  error = err;
 	  }
 	  ctx.data.error = error;
-	  if(type === 'html') {
-	    if(ctx.status === 404) {
-		    ctx.template = '404.pug';
-		    ctx.data.url = ctx.url;
-	    } else {
-		    ctx.template = '500.pug';
-	    }
-    }
+	  ctx.data.status = ctx.status;
+	  ctx.data.url = ctx.url;
+	  ctx.template = 'error.pug';
 	  await body(ctx, () => {});
   }
   finally {
