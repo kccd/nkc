@@ -24,30 +24,8 @@ block content
         .col-xs-12.col-sm-7.col-md-6
           h4 编辑内容
           .form-group
-            input#title.form-control(type='text' placeholder='标题' value=`${data.title || ''}`)
-          .form-group
-            //- div#icon.form-control(type='text' placeholder='图标' value=`${data.title || ''}`)
-            //-   img(src="/format_bold.svg", alt="")
-            //-   img(src="/format_italic.svg", alt="")
-            //-   img(src="/format_link.svg", alt="")
-            //-   img(src="/format_quote.svg", alt="")
-            //-   img(src="/format_code.svg", alt="")
-            //-   img(src="/format_picture.svg", alt="")
-            //-   img(src="/format_title.svg", alt="")
-            //-   img(src="/format_hrline.svg", alt="")
-            //-   img(src="/format_numlist.png", alt="")
-            //-   img(src="/format_ullist.png", alt="")
-            //-   img(src="/format_help.png", alt="")
-          //.form-group#btnGroup
-            a.btn.btn-default(href='javascript:;') 黑体
-            a.btn.btn-default(href='javascript:;') 链接
-            a.btn.btn-default(href='javascript:;') 公式
-            a.btn.btn-default(href='javascript:;') 颜色
-
-
-          .form-group
-            textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;') #{data.content || ''}
-          
+            input#title.form-control.input-lg(type='text' placeholder='标题' value=`${data.title || ''}`)
+            
           .form-group
             div(style='margin-top: 5px;')
               //label(style='margin-left: 10px;')
@@ -70,40 +48,23 @@ block content
               input#parseURL(type='checkbox' checked)
               span &nbsp;处理URL&nbsp;
               button#post.btn.btn-primary(type='submit' style='float: right;') 发表
-          
           .form-group
             div#icon.form-control(type='text' placeholder='图标' value=`${data.title || ''}`)
-              img(src="/format_bold.svg", alt="",onclick="alert('点我干嘛？')")
-              img(src="/format_italic.svg", alt="")
-              img(src="/format_link.svg", alt="")
-              img(src="/format_quote.svg", alt="")
-              img(src="/format_code.svg", alt="")
-              img(src="/format_picture.svg", alt="")
-              img(src="/format_title.svg", alt="")
-              img(src="/format_hrline.svg", alt="")
-              img(src="/format_numlist.png", alt="")
-              img(src="/format_ullist.png", alt="")
-              img(src="/format_help.png", alt="")
-              
-          .form-group
-            textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;') #{data.content || ''}
-          
-          
+            .form-group
+              textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;')= data.content || ''
           .nkcpanel(id='file-uploading' target='/r')
             //uploader section
             include interface_attachment_uploader_uploader.pug
               
           .panel.panel-default
             .panel-heading 我的附件（点击插入帖子）
-            .panel-body(id='list-container')
-                  
+            .panel-body(id='list-container')            
         .col-xs-12.col-sm-5.col-md-6
           h4 预览
           .nkcpanelnew#fullwidthpanel(style="max-height: 800px;overflow-y: scroll;resize:vertical;")
             div
               h4#parsedtitle
             div#parsedcontent
-          
           .form-group
             button#mathfresh.btn.btn-sm.btn-default(onclick='mathfresh()') 渲染代码/数学公式
             button.btn.btn-default.btn-sm(onclick='fitscreen()') 适配屏幕
@@ -150,6 +111,7 @@ block content
   include debug_output.pug
 block scripts
 
+
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
@@ -165,4 +127,4 @@ block scripts
   script(src='/interface_attachment_uploader.js')
   script(type='text/jsx;harmony=true' src='/interface_attachment_list_display.js')
   
-  //- script(src="/test.js")
+  script(src="/test.js")

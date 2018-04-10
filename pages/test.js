@@ -1,14 +1,108 @@
-// //选中操作文本
-// $('textarea').mouseup(function(){
-//     var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
-//     //txt是对象
-//     console.log(txt)
+//-------------------------------------------------
 
-//     var newstr = txt + "";
-//     //newstr是字符串
-//     console.log(newstr)
-// })
 
+$(document).ready(function(){
+    // $("#bold").click(function(){
+    //     test()
+    // })
+    //输出选中的文本，并使用快捷键
+    $('textarea').keydown(function(){
+        //加粗 Ctrl+B
+        if(window.event.ctrlKey && window.event.keyCode == 66){
+            test()
+            // preventBrowerBehavior()
+            // var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            // //txt是对象
+            // var newstr = txt + "";
+            // //newstr是字符串
+            // var newpara = fontBold(newstr)
+            // replaceSelection("content",newpara)
+        }
+        //倾斜 Ctrl+I
+        if(window.event.ctrlKey && window.event.keyCode == 73){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontItalic(newstr)
+            replaceSelection("content",newpara)
+        }
+        //设为标题h1-h6 Ctrl+H
+        if(window.event.ctrlKey && window.event.keyCode == 72){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontTitleNum("h3",newstr)
+            replaceSelection("content",newpara)
+        }
+        //添加引用 Ctrl+Q
+        if(window.event.ctrlKey && window.event.keyCode == 81){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontAddQuote(newstr)
+            replaceSelection("content",newpara)
+        }
+        //添加代码块 Ctrl+K
+        if(window.event.ctrlKey && window.event.keyCode == 75){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontCodeMany(newstr)
+            replaceSelection("content",newpara)
+        }
+        //添加分割线 Ctrl+R
+        if(window.event.ctrlKey && window.event.keyCode == 82){
+            preventBrowerBehavior()
+            var newstr = fontAddLine();
+            console.log(newstr);
+            insertText("content",newstr)
+        }
+        //添加链接 Ctrl+L
+        if(window.event.ctrlKey && window.event.keyCode == 76){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontSetLink(newstr)
+            replaceSelection("content",newpara)
+        }
+        //添加无序列表 Ctrl+U
+        if(window.event.ctrlKey && window.event.keyCode == 85){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontAddDisOrderList(newstr)
+            replaceSelection("content",newpara)
+            document.getElementById('content').focus()
+        }
+        //添加有序列表 Ctrl+O
+        if(window.event.ctrlKey && window.event.keyCode == 79){
+            preventBrowerBehavior()
+            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+            //txt是对象
+            var newstr = txt + "";
+            //newstr是字符串
+            var newpara = fontAddOrderList(newstr)
+            replaceSelection("content",newpara)
+            document.getElementById('content').focus()
+        }
+
+        
+    })
+
+})
+//-------------------------------------------------
 
 //获取鼠标选中文本
 function mouseChioceTxt(){
@@ -24,6 +118,18 @@ function mouseChioceTxt(){
     })
 }
 
+
+//测试函数
+function test(){
+    preventBrowerBehavior()
+    var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
+    //txt是对象
+    var newstr = txt + "";
+    //newstr是字符串
+    var char = "****";
+    newstr = char + newstr + char;
+    replaceSelection("content",newstr)
+}
 
 //将文字加粗
 function fontBold(para){
@@ -42,6 +148,13 @@ function fontItalic(para){
     para = char + para + char;
     console.log("已经倾斜的文字",para)
     return para;
+}
+
+
+//添加下划线
+function fontUnderLine(para){
+    para = "<u>" + para + "</u>";
+    return para
 }
 
 
@@ -70,15 +183,6 @@ function fontTitleNum(num,para){
 }
 
 
-//包裹代码（暂时只提供多行）
-function fontCodeMany(para){
-    var char = "```";
-    para = "\n\n" + char + "\n" + para + "\n" + char + "\n\n";
-
-    return para
-}
-
-
 //添加引用
 function fontAddQuote(para){
     console.log("即将要被引用起来的文字",para)
@@ -89,86 +193,55 @@ function fontAddQuote(para){
 }
 
 
+//包裹代码（暂时只提供多行）
+function fontCodeMany(para){
+    var char = "```";
+    para = "\n\n" + char + "\n" + para + "\n" + char + "\n\n";
+
+    return para
+}
+
+
+//添加分割线
+function fontAddLine(){
+    para = "\n---------------------------------------\n";
+    return para
+}
+
+
 //将文字设为链接
 //link必须有http头
-function fontSetLink(link,para){
-    console.log("即将要被设置为链接的文字",para);
-    para = "[" + para + "](" + link + ")";
-    console.log("已经被设置为链接的文字",para)
+function fontSetLink(para){
+    if(para.length == 0){
+        para = "[" + "请在这里输入连接描述" + "](" + "请在这里输入链接地址,必须有http://或https://" + ")";
+    }else{
+        para = "[" + para + "](" + "请在这里输入链接地址,必须有http://或https://" + ")";
+    }
     return para;
 }
 
 
+//添加无序列表
+function fontAddDisOrderList(para){
+    if(para.length == 0){
+        para = "\n\n" + " " + "-" + " " + "无序列表" + "\n"
+    }else{
+        para = "\n\n" + " " + "-" + " " + para + "\n"
+    }
+    return para
+}
 
-//-------------------------------------------------
 
-
-
-// //添加操作快捷键
-// //ps:当使用快捷键时，调用函数
-// function addShortCutKey(func){
-
-// }
-
-
-$(document).ready(function(){
-
-    //输出选中的文本，并使用快捷键
-    $('textarea').keydown(function(){
-        //添加代码块 Ctrl+K
-        if(window.event.ctrlKey && window.event.keyCode == 75){
-            preventBrowerBehavior()
-            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
-            //txt是对象
-            var newstr = txt + "";
-            //newstr是字符串
-            var newpara = fontCodeMany(newstr)
-            replaceSelection("content",newpara)
-        }
-        //加粗 Ctrl+B
-        if(window.event.ctrlKey && window.event.keyCode == 66){
-            preventBrowerBehavior()
-            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
-            //txt是对象
-            var newstr = txt + "";
-            //newstr是字符串
-            var newpara = fontBold(newstr)
-            replaceSelection("content",newpara)
-        }
-        //倾斜 Ctrl+I
-        if(window.event.ctrlKey && window.event.keyCode == 73){
-            preventBrowerBehavior()
-            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
-            //txt是对象
-            var newstr = txt + "";
-            //newstr是字符串
-            var newpara = fontItalic(newstr)
-            replaceSelection("content",newpara)
-        }
-        //设为标题h1-h6 Ctrl+H
-        if(window.event.ctrlKey && window.event.keyCode == 72){
-            preventBrowerBehavior()
-            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
-            //txt是对象
-            var newstr = txt + "";
-            //newstr是字符串
-            var newpara = fontTitleNum("h2",newstr)
-            replaceSelection("content",newpara)
-        }
-        //添加引用 Ctrl+Q
-        if(window.event.ctrlKey && window.event.keyCode == 81){
-            preventBrowerBehavior()
-            var txt = window.getSelection?window.getSelection():document.selection.createRange().text;
-            //txt是对象
-            var newstr = txt + "";
-            //newstr是字符串
-            var newpara = fontAddQuote(newstr)
-            replaceSelection("content",newpara)
-        }
-        
-    })
-
-})
+//添加有序列表
+function fontAddOrderList(para){
+    if(para.length == 0){
+        para = "\n\n" + " " + "0." + " " + "有序列表" + "\n"
+    }else{
+        para = "\n\n" + " " + "0." + " " + para + "\n"
+    }
+    return para
+}
+//------------------------------------------------------------------------------------------------------------------
 
 
 //将鼠标选中的对象转为字符串
@@ -240,8 +313,45 @@ function useShortCutKey(name){
             var str1 = textareaObjToStr();
             replaceSelection(name,str1);
         }
-
     })
 }
 
 
+//在将光标移动到textarea末尾
+//id textarea的id
+function moveEnd(id){
+    var obj = document.getElementById(id)
+    obj.focus();
+    var len = obj.value.length;
+    if (document.selection) {
+        var sel = obj.createTextRange();
+        sel.moveStart('character',len);
+        sel.collapse();
+        sel.select();
+    } else if (typeof obj.selectionStart == 'number' && typeof obj.selectionEnd == 'number') {
+        obj.selectionStart = obj.selectionEnd = len;
+    }
+} 
+
+
+//在光标处插入文字
+//id textarea的id
+//str 要插入的文字字符串
+function insertText(id,str) { 
+    console.log(id)
+    var obj = document.getElementById(id)
+    if (document.selection) { 
+        var sel = document.selection.createRange(); 
+        sel.text = str; 
+    } else if (typeof obj.selectionStart === 'number' && typeof obj.selectionEnd === 'number') { 
+        var startPos = obj.selectionStart, 
+        endPos = obj.selectionEnd, 
+        cursorPos = startPos, 
+        tmpStr = obj.value; 
+        obj.value = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length); 
+        cursorPos += str.length; 
+        obj.selectionStart = obj.selectionEnd = cursorPos; 
+    } else { 
+        obj.value += str; 
+    } 
+} 

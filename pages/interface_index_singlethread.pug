@@ -152,7 +152,6 @@ if 0
         .col-lg-3.col-md-3.col-sm-4
 
           .ForumThreadItemReplyInfo
-            //.ForumThreadItemReplyCount #{thread.count-1?(thread.count-1) + ' 回复':''}
 
             if Date.now()-thread.tlm<86400000
               span.reddish #{fromNow(thread.tlm)}

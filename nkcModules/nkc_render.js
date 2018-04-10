@@ -16,7 +16,6 @@ function nkc_render(options){
     XBBCODE = window.XBBCODE;
     xss = window.filterXSS;
     twemoji = window.twemoji;
-    console.log('nkc_render.js running in browser.');
   }else{
     commonmark = require('commonmark');
     plain_escape = require('../pages/plain_escaper');
@@ -26,15 +25,19 @@ function nkc_render(options){
   }
 
   //xss-----------------
-
+  //xss白名单 .标签 = ["属性"]
   var default_whitelist = xss.whiteList;
-
-  //console.log(default_whitelist);
   default_whitelist.font = ['color']
   default_whitelist.code = ['class']
-  default_whitelist.span = ['class', 'style', 'aria-hidden'];
+  default_whitelist.span = ['class', 'style', 'aria-hidden', 'id', 'tabindex', 'role'];
   default_whitelist.a = ['href', 'title', 'target', 'style'];
   default_whitelist.div = ['style'];
+  default_whitelist.table = ['border','width','cellpadding','cellspacing'];
+  default_whitelist.tbody = [];
+  default_whitelist.tr = [];
+  default_whitelist.th = [];
+  default_whitelist.td = [];
+  default_whitelist.video = ['src','controls','preload'];
   default_whitelist.math = [];
   default_whitelist.semantics = [];
   default_whitelist.mrow = [];
@@ -45,6 +48,7 @@ function nkc_render(options){
     //default_whitelist.iframe = ['height','width','src','frameborder','allowfullscreen']
   }
 
+  //style白名单
   var xssoptions = {
     whiteList:default_whitelist,
     css: {
@@ -53,7 +57,27 @@ function nkc_render(options){
         top: true,
         left: true,
         fontSize: true,
-        display: true
+        display: true,
+        "font-weight":true,
+        "font-size":true,
+        "font-style":true,
+        "text-decoration-line":true,
+        "background-color":true,
+        "color":true,
+        "font-family":true,
+        "text-align":true,
+        "padding-bottom":true,
+        "padding-top":true,
+        "padding-left":true,
+        "padding-right":true,
+        "height":true,
+        "width":true,
+        "vertical-align":true,
+        "margin-top":true,
+        "bottom":true,
+        "word-spacing":true,
+        "top":true,
+        "border-bottom":true,
       }
     },
     onTagAttr: function(tag, name, value, isWhiteAttr) {
@@ -426,6 +450,7 @@ function nkc_render(options){
       // now post.r are marked with _used:true
     }
     else{
+      //在这里做了style的过滤
       html = custom_xss_process(content)
     }
     html = render.hiddenReplaceHTML(html)

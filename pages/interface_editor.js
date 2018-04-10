@@ -39,6 +39,7 @@ function get_selection(the_id) {
 
 function replace_selection(the_id,replace_str,setSelection) {
   var e = typeof(the_id)==='string'? document.getElementById(the_id) : the_id;
+  console.log(e)
   selection = get_selection(the_id);
   var start_pos = selection.start;
   var end_pos = start_pos + replace_str.length;
@@ -77,12 +78,23 @@ function set_selection(the_id,start_pos,end_pos) {
   return get_selection(the_id);
 }
 
+
 function Editor() {
   this.parents = geid('parents');
   this.children = geid('children');
   this.post = geid('post');
   this.title = geid('title');
-  this.content = geid('content');
+  //--获取新旧编辑器的InnerHTML
+  //旧编辑器获取文本 textarea id=content
+  //新编辑器获取标签 div id=text-elem
+  this.content = geid('content') || geid('text-elem');
+  this.specialMark = "";
+  if(geid('content')){
+    this.specialMark = "old";
+  }else{
+    this.specialMark = "new"
+  }
+  //-- --
   this.threadTypes = geid('threadTypes');
   this.postController = geid('postController');
   this.parentDefault = this.parents.value;
@@ -91,6 +103,7 @@ function Editor() {
   this.threadTypesDefault = this.threadTypes.value;
   this.query = getSearchKV();
   this.blocked = false;
+  //预览编辑内容
   this.update = function() {
     var post = {
       t: this.title.value.trim(),
@@ -111,19 +124,25 @@ function Editor() {
 
     hset('parsedtitle',title); //XSS prone.
 
-    var content = post.c;
+    var content = post.c || post.c_test;
     var parsedcontent = '';
     parsedcontent = render.experimental_render(post)
     hset('parsedcontent',parsedcontent);
   };
+
   this.trigger = function(e){
     var self = this;
     if(self.debounce_timer){
       clearTimeout(self.debounce_timer)
     }
-    self.debounce_timer = setTimeout(function() {
-      self.update()
-    }, 300)
+    //--只在旧编辑器使用预览--
+    if(this.specialMark == "old"){
+      self.debounce_timer = setTimeout(function() {
+        //--只在旧编辑器使用预览--
+          self.update()
+      }, 300)
+    }
+    //--  --
   }.bind(this);
   this.init = function() {
     var self = this;
@@ -175,7 +194,11 @@ function Editor() {
               }
             }
           }
-          self.update()
+          //--只在旧编辑器使用预览--
+          if(this.specialMark === "old"){
+            self.update()
+          }
+          //-- --
         })
         .catch(function (e) {
           console.error(e);
@@ -199,6 +222,7 @@ function getSearchKV() {
   return result
 }
 
+//隐藏html标签
 function blockOnChange(that) {
   return function() {
     var display = 'block';
@@ -302,7 +326,15 @@ function parentsOnChange(that) {
 
 function onPost(that) {
   return function() {
-    var content = that.content.value;
+    //--获取编辑器的内容--
+    var specialMark = that.specialMark;
+    if(specialMark == "old"){
+      var content = that.content.value;
+    }else{
+      var content = that.content.innerHTML.trim();
+    }
+    return console.log(that,typeof(content))
+    //-- --
     var title = that.title.value.trim();
     var type = that.query.type;
     var cat = that.query.cat;
@@ -424,4 +456,44 @@ function extract_resource_from_tag(text) {
     })
   });
   return rarr
+}
+
+function mathfresh(){
+  console.log("这里执行了吗")
+  console.log(MathJax,hljs)
+  if(MathJax){
+    MathJax.Hub.PreProcess(geid('parsedcontent'),function(){MathJax.Hub.Process(geid('parsedcontent'))})
+  }
+  if(hljs){
+    ReHighlightEverything() //interface_common code highlight
+  }
+}
+
+function fitscreen(){
+  var h = $(window).height().toString()+'px'
+
+  geid('content').style.height = !screenfitted?h:'300px';
+  geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
+
+  screenfitted = !screenfitted
+}
+
+//下面是新编辑器渲染公式
+function mathfreshnew(){
+  if(MathJax){
+    // MathJax.Hub.PreProcess(geid('text-elem'),function(){MathJax.Hub.Process(geid('text-elem'))})
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+  }
+  if(hljs){
+    ReHighlightEverything() //interface_common code highlight
+  }
+}
+
+function fitscreennew(){
+  var h = $(window).height().toString()+'px'
+
+  geid('content').style.height = !screenfitted?h:'300px';
+  geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
+
+  screenfitted = !screenfitted
 }
