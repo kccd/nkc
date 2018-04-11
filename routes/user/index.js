@@ -52,12 +52,7 @@ userRouter
 	  data.targetUserSubscribeforums = await Promise.all(forumsId.map(fid => db.ForumModel.findOnly({fid})));
 	  // --------
 
-	  // --拿到最新8个关注与最新8个粉丝
-	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(-9, -1);
-	  const newSubscribersId = targetUserSubscribe.subscribers.slice(-9, -1);
-	  data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
-		data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
-		// --------
+
 
 		// --拿到用户最新的发帖
 	  data.targetUserThreads = await targetUser.getUsersThreads();
@@ -127,6 +122,16 @@ userRouter
 			}
 			data.results = results;
 		}
+
+	  // --拿到最新8个关注与最新8个粉丝
+	  targetUserSubscribe.subscribeUsers.reverse();
+	  targetUserSubscribe.subscribers.reverse();
+	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(0, 8);
+	  const newSubscribersId = targetUserSubscribe.subscribers.slice(0, 8);
+	  data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
+	  data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
+	  // --------
+
 		data.type = type;
 		data.paging = paging;
 		data.targetUser = targetUser;

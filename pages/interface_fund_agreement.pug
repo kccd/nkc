@@ -18,16 +18,6 @@ block content
           .panel-body
             include interface_fund_terms
             br
-            br
-            .row
-              .col-xs-12.col-md-12
-                label.radio-inline
-                  input(type='radio' name='kcFund' checked=false)
-                  h5 同意
-                label.radio-inline
-                  input(type='radio' name='kcFund' checked=true)
-                  h5 不同意
-            br
             hr
             br
             h2.text-center= `${fund.name}条款`
@@ -36,23 +26,20 @@ block content
             br
             .row
               .col-xs-12.col-md-12
+                p 同意以上全部条款：
+              .col-xs-12.col-md-12
                 label.radio-inline
                   input(type='radio' name='fund' checked=false)
-                  h5 同意
+                  h5 是
                 label.radio-inline
                   input(type='radio' name='fund' checked=true)
-                  h5 不同意
+                  h5 否
             br
             hr
             br
             .row
               .col-xs-12.col-md-2.col-md-offset-5
                 button.btn.btn-block.disabled#submit(onclick=`submit("${fund._id.toLowerCase()}")`) 提交
-            //.back-next
-            //  .back
-            //    a(href=`/fund/list/${fund._id}/add?agree=true`) 同意
-            //  .next.disagree
-            //    a(href=`/fund/list/${fund._id}`) 不同意
 
 
 block scripts
