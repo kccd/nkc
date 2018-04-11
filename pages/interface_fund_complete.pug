@@ -25,11 +25,11 @@ block content
                   h4=`项目名称：${project.t}`
                   h4=`项目ID：${code}`
                   h4= `申请人：`
-                    a(href=`/m/${applicant.uid}` target='_blank')= applicant.user.username
+                    a(href=`/u/${applicant.uid}` target='_blank')= applicant.user.username
                   if members && members.length !== 0
                     h4=`组员：`
                     -for(let m of members)
-                      a(href=`/m/${m.uid}`)= m.user.username
+                      a(href=`/u/${m.uid}`)= m.user.username
                       span &nbsp;&nbsp;
                   hr
                   h4 总体情况：
@@ -123,7 +123,7 @@ block content
                       if members && members.length !== 0
                         h4=`组员：`
                           -for(let m of members)
-                            a(href=`/m/${m.uid}`)= m.user.username
+                            a(href=`/u/${m.uid}`)= m.user.username
                             span &nbsp;&nbsp;
                       hr
                       if status.completed === false

@@ -95,11 +95,7 @@ const certificates ={
       u: {
         [name]: '用户',
         [parameter]: {
-          [GET]: true,
-          activities: {
-            [name]: '个人动态',
-            [GET]: true
-          }
+          [GET]: true
         }
       },
       m: {
@@ -442,7 +438,6 @@ const certificates ={
         [parameter]: {
           subscribe: {
             [name]: '订阅',
-            [GET]: true,
             [POST]: true, // 订阅该用户
             [DELETE]: true, // 取消订阅该用户
 	          register: {
@@ -826,10 +821,9 @@ const certificates ={
       },
       u: {
         [parameter]: {
-          ban: {
+          banned: {
             [name]: '封禁/解封用户',
-            [GET]: true,// 封禁用户 
-            [PUT]: true // 解封用户
+            [PATCH]: true
           }
         }
       },

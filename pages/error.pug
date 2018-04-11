@@ -9,10 +9,10 @@ block content
         .col-xs-12.col-md-12
           -const success = false, prompt = '资源未找到'
           include module_prompt
-        .col-xs-12.col-md-12.text-center
+        .col-xs-12.col-md-8.col-md-offset-2.text-center
           p!=`path <code>${data.url}</code> does not exist | can not be listed | is not available.`
           br
-          img(src='/resources/site_specific/owl_bath.jpg')
+          img(src='/resources/site_specific/owl_bath.jpg' style='max-width: 100%;')
           p(style="color:#999;") #{server.name}
       else if data.status === 500
         .col-xs-12.col-md-12

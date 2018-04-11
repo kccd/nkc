@@ -2,10 +2,270 @@ extends bootstrap_base
 block title
   meta(name='description' content=data.targetUser.description || '')
   meta(name='keywords' content=data.targetUser.username)
-  title= `${data.targetUser.username} - 科创论坛`
+  title= `${data.targetUser.username}的个人名片 - 科创论坛`
   -const mainContainer1400 = true;
 block content
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-xs-12.col-md-12
-        img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;')
+        .row
+          .col-xs-12.col-md-12
+            .col-xs-12.col-md-10.col-md-offset-1
+              .row
+                //img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;border-radius: 50%;')
+          .col-xs-12.col-md-12
+            //hr
+          .col-xs-12.col-md-2
+            .col-xs-12.col-md-12
+              .row
+                img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;border-radius: 50%;')
+                h3.text-center= data.targetUser.username
+                p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
+                br
+                a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
+                if data.user && data.user.uid !== data.targetUser.uid
+                  a(href=`/sms/message/${data.targetUser.uid}`).btn.btn-primary.btn-block 私信
+                  if data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
+                    button.btn.btn-block.btn-danger(onclick=`subscribeUser(${data.targetUser.uid}, false)`) 取关
+                  else
+                    button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
+                if data.user && data.user.uid === data.targetUser.uid
+                  a(href='/me').btn.btn-default.btn-block
+                    span.glyphicon.glyphicon-cog
+                    span &nbsp;资料设置
+                if data.userLevel >= 4 && data.user.uid !== data.targetUser.uid
+                  if data.targetUser.certs.includes('banned')
+                    button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, false)`) 解除封禁
+                  else
+                    button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, true)`) 封禁此人
+                br
+            .col-xs-6.col-md-6
+              .row
+                .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 文章
+                  h4
+                    strong= data.targetUserSubscribe.subscribers.length
+            .col-xs-6.col-md-6
+              .row
+                .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 回复
+                  h4
+                    strong= data.targetUserSubscribe.subscribeUsers.length
+            .col-xs-6.col-md-6
+              .row
+                .text-center(style='border-right:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 学术分
+                  h4
+                    strong= data.targetUser.xsf
+            .col-xs-6.col-md-6
+              .row
+                .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 科创币
+                  h4
+                    strong= data.targetUser.kcb
+            .col-xs-6.col-md-6
+              .row
+                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
+                  .text-center(style='border-right:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                    h5 粉丝
+                    h4
+                      strong= data.targetUserSubscribe.subscribers.length
+            .col-xs-6.col-md-6
+              .row
+                a(href=`/u/${data.targetUser.uid}?type=follow` style='color: #000;text-decoration: none;')
+                  .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                    h5 关注
+                    h4
+                      strong= data.targetUserSubscribe.subscribeUsers.length
+            .col-xs-12.col-md-12
+              .row
+                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
+                  .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                    h5 注册时间
+                    h4
+                      strong= data.targetUser.toc.toLocaleString()
+            .col-xs-12.col-md-12
+              .row
+                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
+                  .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                    h5 最近登陆
+                    h4
+                      strong= fromNow(data.targetUser.tlv || data.targetUser.toc)
+            .col-xs-12.col-md-12
+              .row
+                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
+                  .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
+                    h5 个人简介
+                    p(style='color: #777777;')!= markdown_safe(data.targetUser.description || '暂未填写个人简介')
+          .col-xs-12.col-md-7
+            ul.nav.nav-pills.user-info-nav
+              li(role="presentation" class=!data.type?'active':'')
+                a(href=`/u/${data.targetUser.uid}`) 最新动态
+              li(role="presentation" class=data.type==='follow'?'active':'')
+                a(href=`/u/${data.targetUser.uid}?type=follow`) 关注的人
+              li(role="presentation" class=data.type==='fans'?'active':'')
+                a(href=`/u/${data.targetUser.uid}?type=fans`) 粉丝
+            if ['follow', 'fans'].includes(data.type)
+              .row
+                if data.targetUsers.length === 0
+                  br
+                  br
+                  br
+                  br
+                  h4.text-center(style='color: #aaaaaa;')=`暂无${data.type === 'fans'?'粉丝':'关注'}`
+                -for(let targetUser of data.targetUsers)
+                  -const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc} = targetUser;
+                  .col-xs-12.col-md-6
+                    .row
+                      .col-xs-12.col-md-12
+                        .user-info-list.forum-list(style=`min-height: 10em;padding-top: 0.5rem;${data.user && uid === data.user.uid?'border: 1px solid #337ab7': ''}`)
+                          .displayName
+                            h4(style='margin: 0.5rem 0;')
+                              a(href=`/u/${uid}` title=description style='text-decoration: none;')
+                                img(src=`/avatar/${uid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
+                                span &nbsp;
+                                span= username
+                              if data.user && uid !== data.user.uid
+                                if data.userSubscribe.subscribeUsers.includes(uid)
+                                  button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, false)`) 取关
+                                else
+                                  button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
+                          .info
+                            span= navbarDesc.cs
+                            p!=`回复:${postCount}&nbsp;帖子:${threadCount}`
+                            p!=`学术分:${xsf}&nbsp;科创币:${kcb}`
+                          .description
+                            p= description || '暂未填写个人简介'
+
+            else
+              if data.results.length === 0
+                br
+                br
+                br
+                br
+                h4.text-center(style='color: #aaaaaa;') 暂无动态信息
+              -for (let result of data.results)
+                .user-info-list
+                  -const {firstPost, post, thread, operation, link} = result;
+                  -post.c = hideContentByUser(post.c, data.user, 'list')
+                  -post.c = filterQuote(post.c)
+                  -post.c = post.c.slice(0, 500);
+                  if operation === 'postToThread'
+                    span.time= fromNow(post.toc)
+                    span.operation &nbsp;回复&nbsp;
+                    a.username(href=`/u/${firstPost.uid}`)= firstPost.user.username
+                    span &nbsp;的文章&nbsp;
+                    a(href=link).title= firstPost.t
+                    a(href=link).link
+                      .content!= replaceContent(experimental_render(post))
+                  else if operation === 'postToForum'
+                    span.time= fromNow(post.toc)
+                    span &nbsp;发表了文章&nbsp;
+                    a(href=link).title= firstPost.t
+                    -const hasCover = thread.hasCover;
+                    if hasCover
+                      a(href=link).link
+                        .hasCover
+                          .content-left(style=`background-image: url(/cover/${thread.tid})` href=`/t/${thread.tid}`)
+                          .content-right!= replaceContent(experimental_render(post))
+                    else
+                      a(href=link).link
+                        .content!= replaceContent(experimental_render(post))
+            -const url = `/u/${data.targetUser.uid}`;
+            include interface_fund_page
+
+
+
+
+
+          .col-xs-12.col-md-3
+            .col-xs-12.col-md-12
+              h4.text-center 关注的领域
+              .row
+                if data.targetUserSubscribeforums.length === 0
+                  p.text-center 暂未关注任何领域
+                else
+                  -for(let forum of data.targetUserSubscribeforums)
+                    -const {displayName, fid, description, iconFileName, color, countPosts, countThreads} = forum;
+                    .row
+                      .col-xs-12.col-md-12
+                        .user-info-list.forum-list
+                          .displayName
+                            h4(style='margin: 0.5rem 0;')
+                              a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
+                                if iconFileName
+                                  img(src=`/resources/site_specific/forum_icon/${iconFileName}.png` style='width: 3rem;height: 3rem;border-radius: 50%;')
+                                else
+                                  img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
+                                span &nbsp;
+                                span= displayName
+                                span &nbsp;&nbsp;
+                              if data.user
+                                if data.userSubscribe.subscribeForums.includes(fid)
+                                  button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
+                                else
+                                  button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
+                          .info
+                            span=`回复：${countPosts}`
+                            span &nbsp;&nbsp;
+                            span=`帖子：${countThreads}`
+                          .description
+                            p= description
+            .col-xs-12.col-md-12
+              .row
+                br
+                br
+                h4.text-center 最新文章
+                if data.targetUserThreads.length === 0
+                  p.text-center 暂未发表任何帖子
+                else
+                  -for(let thread of data.targetUserThreads)
+                    .col-xs-9.col-md-9
+                      .row(style='margin-bottom: 0.5rem;')
+                        a.ForumThreadHasImage(href=`/f/${thread.fid}` style=`font-size:inherit;padding: 0.2rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
+                        a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
+                    .col-xs-3.col-md-3
+                      .row.text-right
+                        p(style='color:#ff8700;')= fromNow(thread.toc)
+            if data.type !== 'fans'
+              .col-xs-12.col-md-12
+                br
+                br
+                h4.text-center 粉丝
+                if data.newSubscribers.length === 0
+                  p.text-center 暂无粉丝
+                else
+                  .row
+                    -for(let fans of data.newSubscribers)
+                      .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
+                        -const navbarDesc = fans.navbarDesc;
+                        -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                        a(href=`/u/${fans.uid}`)
+                          img(src=`/avatar/${fans.uid}` style='width: 100%;border-radius: 50%;' title=title)
+                    if data.newSubscribers.length >= 8
+                      .col-md-12.text-center
+                        if data.newSubscribers.length >= 8
+                      .col-xs-12.col-md-12.text-center
+                        a(href=`/u/${data.targetUser.uid}?type=fans`) 查看更多
+            if data.type !== 'follow'
+              .col-xs-12.col-md-12
+                br
+                br
+                h4.text-center 关注
+                if data.newSubscribeUsers.length === 0
+                  p.text-center 暂无关注
+                else
+                  .row
+                    -for(let follow of data.newSubscribeUsers)
+                      .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
+                        -const navbarDesc = follow.navbarDesc;
+                        -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                        a(href=`/u/${follow.uid}`)
+                          img(src=`/avatar/${follow.uid}` style='width: 100%;border-radius: 50%;' title=title)
+                    if data.newSubscribeUsers.length >= 8
+                      .col-xs-12.col-md-12.text-center
+                        a(href=`/u/${data.targetUser.uid}?type=follow`) 查看更多
+
+
+block scripts
+  script(src='/interface_common.js')

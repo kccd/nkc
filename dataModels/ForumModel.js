@@ -85,15 +85,17 @@ const forumSchema = new Schema({
     default: false
   }
 });
+
+forumSchema.virtual('moderatorUsers')
+	.get(function() {
+		return this._moderatorUsers;
+	})
+	.set(function(moderatorUsers) {
+		this._moderatorUsers = moderatorUsers;
+	});
+
 // 验证是否有权限进入此版块
 forumSchema.methods.ensurePermission = async function (ctx) {
-  /*const {data} = ctx;
-  const visibleFid = await ctx.getVisibleFid();
-  const {contentClasses} = data.certificates;
-  if(!this.visibility)
-    return contentClasses.includes(this.class);
-  return visibleFid.includes(this.fid);*/
-
 	const {contentClasses} = ctx.data.certificates;
 	return contentClasses.includes(this.class);
 
@@ -111,6 +113,20 @@ forumSchema.methods.getFidOfChildForum = async function (ctx) {
     }));
   }
   return fidArr;
+};
+
+// 加载版主
+forumSchema.methods.extendModerators = async function() {
+	const UserModel = require('./UserModel');
+	const {moderators} = this;
+	const moderatorUsers = [];
+	for(let uid of moderators){
+		const user = await UserModel.findOne({uid});
+		if(user) {
+			moderatorUsers.push(user);
+		}
+	}
+	return this.moderatorUsers = moderatorUsers;
 };
 
 forumSchema.methods.getThreadsByQuery = async function(query, match) {

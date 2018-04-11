@@ -84,7 +84,8 @@ block content
             if addQuestions
               :markdown
                 科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！
-
+        -var active_user_title = '一周活跃用户'
+        include interface_active_users
         if data.user
           .nkcpanel
             a(href=`/m/${data.user.uid}`) 我的主题

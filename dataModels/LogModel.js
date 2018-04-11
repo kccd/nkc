@@ -10,7 +10,7 @@ const logSchema = new Schema({
   },
   path: {
     type: String,
-    required: true,
+    required: true
   },
   query: Schema.Types.Mixed,
   status: {
@@ -35,7 +35,8 @@ const logSchema = new Schema({
   processTime: Number,
   uid: {
     type: String,
-    required: true
+    required: true,
+	  index: 1
   }
 });
 logSchema.virtual('user')

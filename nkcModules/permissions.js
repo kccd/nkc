@@ -126,6 +126,8 @@ function getPermitTree(certs) {
 	}
 	return tree;
 }
+
+// 拿到能看到名字的板块
 async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
   const cursor = await mongoose.connection.db.collection('forums').find(
@@ -146,6 +148,26 @@ async function getVisibleFid() {
   return fs.map(e => e.fid);
 }
 
+// 拿到能访问的板块
+async function getAccessibleFid() {
+	const cc = this.data.certificates.contentClasses;
+	const cursor = await mongoose.connection.db.collection('forums').find({class: {$in: cc}});
+	const fs = await cursor.toArray();
+	return fs.map(e => e.fid);
+}
+
+// 可从中加载出帖子在列表中显示，如主页（高权限的账号能够访问回收站，但是主页不需要显示回收站的帖子）
+async function getThreadListFid() {
+	const cc = this.data.certificates.contentClasses;
+	const cursor = await mongoose.connection.db.collection('forums').find(
+		{
+			class: {$in: cc},
+			visibility: true
+		}
+	);
+	const fs = await cursor.toArray();
+	return fs.map(e => e.fid);
+}
 
 //获取管理员能进的所有路由
 const adminCertificates = getPermitTree(['dev']);
@@ -185,6 +207,8 @@ module.exports = async (ctx, next) => {
     return obj[m]
   }.bind(ctx);
   ctx.getVisibleFid = getVisibleFid;
+  ctx.getAccessibleFid = getAccessibleFid;
+  ctx.getThreadListFid = getThreadListFid;
   ctx.generateMatchBase = (base = {}) => {
     if(ctx.data.userLevel < 4)
       base.disabled = false;

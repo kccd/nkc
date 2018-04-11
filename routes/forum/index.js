@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const operationRouter = require('./operation');
 const nkcModules = require('../../nkcModules');
+const subscribeRouter = require('./subscribe');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 const forumRouter = new Router();
@@ -73,7 +74,7 @@ forumRouter
     return ctx.redirect(`/f/${body.fid}`, 303)
 	})
   .get('/:fid', async (ctx, next) => {
-    const {ForumModel, ThreadTypeModel, UserModel} = ctx.db;
+    const {ForumModel, ThreadTypeModel, UserModel, UsersSubscribeModel} = ctx.db;
     const {fid} = ctx.params;
     const {data, query} = ctx;
     const {digest, cat, sortby} = query;
@@ -112,7 +113,16 @@ forumRouter
     for (let i = 0; i < forumList.length; i++) {
       if(forumList[i].fid === fid) {
         data.forums = forumList[i].children;
-        break;
+        for(let forum of data.forums) {
+        	const {moderators} = forum;
+        	const m = [];
+        	for(let uid of moderators) {
+        		const mUser = await UserModel.findOne({uid});
+        		if(mUser) m.push(mUser);
+	        }
+	        forum.moderatorUsers = m;
+        }
+	      break;
       }
     }
     data.replyTarget = `f/${fid}`;
@@ -126,6 +136,7 @@ forumRouter
     data.fTarget = fid;
     if(data.user) {
       data.userThreads = await data.user.getUsersThreads();
+      data.userSubscribe = await UsersSubscribeModel.findOnly({uid: data.user.uid});
     }
     ctx.template = 'interface_forum.pug';
     await next();
@@ -156,6 +167,7 @@ forumRouter
       tid: _post.tid,
       fid: forum.fid,
       mid: user.uid,
+	    type: forum.class,
       toMid: user.uid,
     });
     const type = ctx.request.accepts('json', 'html');
@@ -184,6 +196,7 @@ forumRouter
     }
     return next()
   })
+	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
 
 module.exports = forumRouter;

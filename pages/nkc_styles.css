@@ -1,4 +1,6 @@
-
+h1, h2, h3, h4, h5, p{
+  word-wrap:break-word;
+}
 .margin-right{
   margin-right: 5px;
 }
@@ -2047,7 +2049,7 @@ img.emoji {
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
   font-size: 1.5rem;
   border-radius: 3px;
-  color: #fff;
+  color: #ffffff;
   display: inline-block;
   cursor: pointer;
 }
@@ -2065,10 +2067,127 @@ img.emoji {
 }
 
 /*个人名片*/
+.user-info-nav li a{
+  color: #888;
+}
+.user-info-list{
+  padding: 1rem 1rem 0.2rem 1rem;
+  margin: 1rem 0;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  box-shadow: 1px 1px 2px #cccccc;
+}
+.user-info-list .time{
+  color: #ff8700;
+}
+.user-info-list .operation{
+  font-weight: 700;
+}
+.user-info-list .username{
+}
+.user-info-list .title{
+  font-weight: 700;
+  color: #000;
+}
+.user-info-list .content{
+  color: #777;
+  overflow: hidden;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  max-height: 7em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+.user-info-list .link{
+  text-decoration: none;
+  /*color: #333;*/
+}
+.user-info-list .hasCover{
+  overflow: hidden;
+  margin-top: 1rem;
+  height: 7.8em;
+  color: #777;
+}
+.user-info-list .hasCover .content-left{
+  display: inline-block;
+  height: 7em;
+  width: 21%;
+  border-radius: 5px;
+  background-size: cover;
+  overflow: hidden;
+}
+.user-info-list .hasCover>.content-right{
+  overflow: hidden;
+  width: 79%;
+  height: 7em;
+  padding: 0 0.5rem;
+  margin-top: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+.user-info-list.forum-list{
+  min-height: 7.5em;
+  overflow: hidden;
+  margin-top: 1rem;
+  margin-bottom: 0rem;
+  padding-top: 0.5rem;
+  text-decoration: none;
+}
+.user-info-list.forum-list>.displayName{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.user-info-list.forum-list>.description{
+  display: -webkit-box;
+  height: 2em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: #555;
+}
+.user-info-list.forum-list .info{
+  color: #ff8700;
+}
+.user-info-list.forum-list .info p{
+  margin: 0;
+}
 
-
+.cancel-subscribe-btn{
+  color: #aaa;
+  background-color: rgba(0,0,0,0);
+}
+.subscribe-btn{
+  color: #aaa;
+  background-color: rgba(0,0,0,0);
+}
+.cancel-subscribe-btn:hover{
+  background-color: #b7b7b7;
+  color: #ffffff;
+}
+.subscribe-btn:hover{
+  background-color: #6894b9;
+  color: #ffffff;
+}
 /*---------*/
-
+@media screen and (max-width: 1133px) {
+  .user-info-list .hasCover .content-left{
+    width: 27%;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 73%;
+  }
+}
+@media screen and (max-width: 991px) {
+  .user-info-list .hasCover .content-left{
+    width: 20%;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 80%;
+  }
+}
 @media screen and (max-width: 768px) {
   .new-content-left{
     width: 25%;
@@ -2081,6 +2200,12 @@ img.emoji {
   }
   .btn-mobile{
     width: 100%;
+  }
+  .user-info-list .hasCover .content-left{
+    width: 25%;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 75%;
   }
 }
 @media screen and (max-width: 668px) {
@@ -2098,6 +2223,12 @@ img.emoji {
   .hasCover .new-content-right{
     width: 65%;
   }
+  .user-info-list .hasCover .content-left{
+    width: 30%;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 70%;
+  }
 }
 @media screen and (max-width: 450px) {
   .new-content-left{
@@ -2112,5 +2243,37 @@ img.emoji {
   .hasCover .new-content-right>div:first-child>p{
     max-height: 2.8em;
     -webkit-line-clamp: 2;
+  }
+  .user-info-list .hasCover .content-left{
+    width: 35%;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 65%;
+  }
+}
+@media screen and (max-width: 400px) {
+  .user-info-list .hasCover .content-left{
+    width: 35%;
+    height: 5.8em;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 65%;
+    height: 5.8em;
+    -webkit-line-clamp: 4;
+  }
+  .user-info-list .hasCover{
+    height: 7em;
+  }
+  .user-info-list .content{
+    max-height: 5.8em;
+    -webkit-line-clamp: 4;
+  }
+}
+@media screen and (max-width: 320px) {
+  .user-info-list .hasCover .content-left{
+    width: 39%;
+  }
+  .user-info-list .hasCover>.content-right{
+    width: 61%;
   }
 }

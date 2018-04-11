@@ -221,7 +221,7 @@ userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
   let cs = [];
   if(!certs.includes('default')) {
-  	certs.push('default');
+  	certs.unshift('default');
   }
   if(xsf > 0 && !certs.includes('scholar')) {
   	certs.push('scholar');

@@ -135,7 +135,7 @@ block content
               .fund-comment
                 .comment-info
                 .comment-content
-                  a(href=`/m/${comment.user.uid}`)= comment.user.username
+                  a(href=`/u/${comment.user.uid}`)= comment.user.username
                   if applicationForm.uid === comment.user.uid
                     span (申请人)
                   span &nbsp;发表于&nbsp;
@@ -184,7 +184,7 @@ block content
           -const membersId = applicationForm.members.map(m => m.uid) || [];
           if membersId.includes(user.uid) && user.uid !== applicationForm._id
             h4.text-center=`来自`
-              a(href=`/m/${applicationForm.uid}` target='_blank')= applicationForm.applicant.user.username
+              a(href=`/u/${applicationForm.uid}` target='_blank')= applicationForm.applicant.user.username
               span 组队邀请
             -for(let aUser of applicationForm.members)
               if aUser.uid === user.uid
@@ -343,7 +343,7 @@ block content
                   h5=`${applicationForm.supporters.length}位用户表示支持`
                   -for(let user of applicationForm.supporters)
                     .vote-user
-                      a(href=`/m/${user.uid}`)
+                      a(href=`/u/${user.uid}`)
                         img(src=`/avatar/${user.uid}`)
                         span= `${user.username}`
                   br
@@ -352,7 +352,7 @@ block content
                   h5=`${applicationForm.objectors.length}位用户表示反对`
                   -for(let user of applicationForm.objectors)
                     .vote-user
-                      a(href=`/m/${user.uid}`)
+                      a(href=`/u/${user.uid}`)
                         img(src=`/avatar/${user.uid}`)
                         span.redFontColor= `${user.username}`
 

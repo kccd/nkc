@@ -44,11 +44,11 @@ router
       subscribeUsers: userSubscribe.subscribeUsers,
       subscribers: userSubscribe.subscribers
     };
-    const visibleFid = await ctx.getVisibleFid();
+    const accessibleFid = await ctx.getThreadListFid();
     if(tab === 'reply') {
       let $matchPost = matchBase
         .set('uid', uid)
-        .set('fid', {$in: visibleFid});
+        .set('fid', {$in: accessibleFid});
       let $matchThread = matchBase;
       if(digest){
         $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
@@ -67,7 +67,7 @@ router
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {
-      let $matchThread = matchBase.set('fid', {$in: visibleFid});
+      let $matchThread = matchBase.set('fid', {$in: accessibleFid});
       const $or = [
         {uid},
         {toMid: uid}
@@ -100,7 +100,7 @@ router
     }
     else if(tab === 'recommend') {
       let $postMatch = matchBase.set('pid', {$in: personalForum.recPosts}).toJS();
-      let $matchThread = matchBase.set('fid', {$in: visibleFid}).toJS();
+      let $matchThread = matchBase.set('fid', {$in: accessibleFid}).toJS();
       if(digest){
         $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
       }
@@ -164,7 +164,7 @@ router
             fid: {$in: subscribeForums}
           }
         ]},
-        {fid: {$in: visibleFid}}
+        {fid: {$in: accessibleFid}}
       ];
       if(digest) {
         $and.splice(0, 0, {$or: [{digest: true}, {digestInMid: true}]});
@@ -226,7 +226,7 @@ router
       const userBehaviors = await UsersBehaviorModel.find({
         uid,
         operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-        fid: {$in: visibleFid}
+        fid: {$in: accessibleFid}
       }, {_id: 0, tid: 1}).sort({timeStamp: 1});
       const tidArr = [];
       for (let userBehavior of userBehaviors) {
@@ -253,7 +253,7 @@ router
         {$match: {
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-          fid: {$in: visibleFid},
+          fid: {$in: accessibleFid},
         }},
         {$group: {
           _id: '$tid',
@@ -310,7 +310,7 @@ router
         {$match: {
           uid,
           operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-          fid: {$in: visibleFid},
+          fid: {$in: accessibleFid},
         }},
         {$group: {
           _id: '$tid',
