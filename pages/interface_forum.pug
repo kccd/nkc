@@ -77,6 +77,12 @@ block content
                   -var forum = data.forum
                   .ForumTitleCircle(style=`background-color:${forum.color}`)
                   .ForumName #{forum.displayName}
+                    if data.user
+                      span &nbsp;&nbsp;
+                      if !data.userSubscribe.subscribeForums.includes(forum.fid)
+                        button.btn.btn-primary.btn-sm(onclick=`subscribeForum('${forum.fid}', true)`) 关注
+                      else
+                        button.btn.btn-danger.btn-sm(onclick=`subscribeForum('${forum.fid}', false)`) 取消关注
 
                   if data.forum.description
                     div!= markdown_safe(data.forum.description)
@@ -238,28 +244,18 @@ block content
           -var user = data.user
           if user
             include interface_thread_userpatch.pug
-          //-var active_user_title = '学院活跃用户'
-          //include interface_active_users
           if hasChildren
             for forum in data.forums
               .nkcpanel
                 -var f = forum
-                -var p = forum
                 -var type = 'f'
                 include interface_forumprofile2.pug
                 hr.hrNarrowSpace
-                //  div
-                //    a.btn.btn-default(href='/editor?target=f/#{forum.fid}') 新帖
-                //if forum.moderators && forum.moderators.length
-                //  div(style='height: 20px;text-align:right; width: 20%; display: inline-block') 版主:
-                -var moderators = data.moderators || []
+                -var moderators = f.moderatorUsers || []
                   span 版主:
                 for moderator in moderators
-                  a(href=`/m/${moderator.uid}`)  #{moderator,username}
-                //hr.hrNarrowSpace
-                //.ForumThreadList
-                //  each thread,index in forum.threads
-                //    include interface_forum_singlethread.pug
+                  a(href=`/u/${moderator.uid}`)= moderator.username
+                  span &nbsp;&nbsp;
           if data.user
             .nkcpanel
               a(href=`/m/${data.user.uid}`) 我的主题

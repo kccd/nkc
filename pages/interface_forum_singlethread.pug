@@ -10,7 +10,7 @@
 .new-content
   .new-content-info
     span
-      a(href=`/m/${targetUser.uid}` title=`${targetUser.description || ''}`)
+      a(href=`/u/${targetUser.uid}` title=`${targetUser.description || ''}`)
         img(src=`/avatar_small/${targetUser.uid}` style='width: 30px;')
     span
       a(href=`/u/${targetUser.uid}`)= targetUser.username
@@ -73,6 +73,6 @@
             a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost))
       .new-content-info-last
         span
-          a(href=`/m/${lastPost.user.uid}`)= lastPost.user.username
+          a(href=`/u/${lastPost.user.uid}`)= lastPost.user.username
         span.icon-font=` ${fromNow(lastPost.toc)}`
 hr(style='margin: 2px 0 2px 0;')

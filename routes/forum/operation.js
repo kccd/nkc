@@ -32,8 +32,8 @@ operationRouter
 	.get('/category', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {fid} = ctx.params;
-		const visibleFid = await ctx.getVisibleFid();
-		if(!visibleFid.includes(fid)) ctx.throw(403,'权限不足');
+		const accessibleFid = await ctx.getAccessibleFid();
+		if(!accessibleFid.includes(fid)) ctx.throw(403,'权限不足');
 		data.categorys = await db.ThreadTypeModel.find({fid}).sort({order: 1});
 		await next();
 	})

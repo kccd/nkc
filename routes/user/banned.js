@@ -24,6 +24,9 @@ bannedRouter
 					ctx.throw(403, '权限不足');
 				}
 			}
+			if(targetUser.uid === data.user.uid) {
+				ctx.throw(403, '为什么要封禁自己？');
+			}
 			if(certs.includes('banned')) {
 				ctx.throw(400, '该用户已经被封禁，请刷新。');
 			}

@@ -22,13 +22,13 @@ router.get('/', async(ctx, next) => {
   data.queryToCharRef = replaceChineseToCharRef(q);
   if(type === 'content') {
     const {PostModel} = db;
-    const visibleFid = await ctx.getVisibleFid();
+    const accessibleFid = await ctx.getThreadListFid();
     const searchResult = await searchPost(q, page, perpage);
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     data.result = await Promise.all(searchResult.hits.hits.map(async r => {
       const pid = r._id;
       try {
-        const post = await PostModel.findOnly({pid, fid: {$in: visibleFid}});
+        const post = await PostModel.findOnly({pid, fid: {$in: accessibleFid}});
         post.t = r.highlight? r.highlight.t: r.t;
         await post.extendUser();
         await post.extendThread();

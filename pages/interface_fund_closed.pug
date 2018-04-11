@@ -12,7 +12,7 @@ block content
           br
           -const {closed} = data.fundSettings;
           h4.text-center
-            a(href=`/m/${closed.uid}` target='_blank')= closed.username
+            a(href=`/u/${closed.uid}` target='_blank')= closed.username
             span=` 发布于 ${closed.closingTime.toLocaleString()}`
           br
           br

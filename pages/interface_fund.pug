@@ -20,7 +20,7 @@ block content
         .row
           -for(let donationUser of data.donationUsers)
             .col-xs-4.col-sm-3.col-md-2.donation-user-list
-              a(href=`/m/${donationUser.uid}`)
+              a(href=`/u/${donationUser.uid}`)
                 .avatar.center-block
                   if donationUser.money >= 5000
                     div(title='土豪') 豪

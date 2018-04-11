@@ -5,7 +5,7 @@ subscribeRouter
 		const {data, db, params} = ctx;
 		const {fid} = params;
 		const {user} = data;
-		const forum = await db.ForumModel.findOnly({fid});
+		const forum = await db.ForumModel.findOnly({fid, parentId: {$ne: ''}});
 		if(!data.certificates.contentClasses.includes(forum.class)) {
 			ctx.throw(403, '权限不足');
 		}

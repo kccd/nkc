@@ -21,7 +21,7 @@ block content
               .panel.panel-default
                 .panel-body
                   h5=`账号ID：`
-                    a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
+                    a(href=`/u/${applicant.uid}` target="_blank")=`${applicant.user.username}`
                   h5=`专栏：`
                     a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
                   h5=`真实姓名：${applicant.name}`
@@ -53,7 +53,7 @@ block content
                     -for(let m of applicationForm.members)
                       if m.agree
                         span &nbsp;&nbsp;
-                        a(href=`/m/${m.uid}` target='_blank')= m.user.username
+                        a(href=`/u/${m.uid}` target='_blank')= m.user.username
                   else
                     h5= `申请方式：个人`
             -let obj = {};
@@ -109,7 +109,7 @@ block content
                             .displayNone.postString= postString
                             span 文号：
                             span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                            a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                            a(href=`/u/${firstPost.uid}` target="_blank")= firstPost.user.username
                             if notModifiedUsers.includes(thread.uid)
                               span(style='color: #aaa;') （未处理邀请）
                             if disagreeUsers.includes(thread.uid)
@@ -184,7 +184,7 @@ block content
           .panel.panel-default
             .panel-body
               h5=`账号ID：`
-                a(href=`/m/${applicant.uid}` target="_blank")=`${applicant.user.username}`
+                a(href=`/u/${applicant.uid}` target="_blank")=`${applicant.user.username}`
               h5=`专栏：`
                 a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
               h5=`真实姓名：${applicant.name}`
@@ -216,7 +216,7 @@ block content
                 -for(let m of applicationForm.members)
                   if m.agree
                     h5 &nbsp;&nbsp;
-                    a(href=`/m/${m.uid}` target='_blank')= m.user.username
+                    a(href=`/u/${m.uid}` target='_blank')= m.user.username
               else
                 h5= `申请方式：个人`
         .col-xs-12.col-md-12
@@ -254,7 +254,7 @@ block content
                         .displayNone.postString= postString
                         span 文号：
                         span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                        a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                        a(href=`/u/${firstPost.uid}` target="_blank")= firstPost.user.username
                         if notModifiedUsers.includes(thread.uid)
                           span(style='color: #aaa;') （未处理邀请）
                         if disagreeUsers.includes(thread.uid)

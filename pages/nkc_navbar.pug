@@ -21,9 +21,6 @@ nav.navbar.navbar-default.nkcshade(style='background-color:#f3f3f3;line-height: 
           a(href='/' title='扫一眼' style=`${isActive('latest')}`) 最新
         li
           a(href=`/f` title='最新内容' style=`${isActive('forums')}`) 分类
-        if(data.user)
-          li
-            a(href=`/u/${data.user.uid}/activities` title='板块学院' style=`${isActive('activities')}`) 我的
         li
           a(href=`/fund` title='科创基金' style=`${isActive('fund')}`) 基金
     .collapse.navbar-collapse#bs-example-navbar-collapse-1

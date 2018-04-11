@@ -11,7 +11,7 @@ mixin loadInfo(obj)
     else
       th
         span (用户)
-        a(href=`/m/${obj.user.uid}` target='_blank')= obj.user.username
+        a(href=`/u/${obj.user.uid}` target='_blank')= obj.user.username
   if obj.type === 'other'
     th= obj.id
 table.table.table-bordered
@@ -39,7 +39,7 @@ table.table.table-bordered
         th= b.abstract
         th
           if(b.user)
-            a(href=`/m/${b.user.uid}`)= b.user.username
+            a(href=`/u/${b.user.uid}`)= b.user.username
           else
             span 系统
         +loadInfo(b.fromInfo)

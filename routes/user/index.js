@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const subscribeRouter = require('./subscribe');
 const collectionsRouter = require('./collections');
-const activitiesRouter = require('./activities');
 const billRouter = require('./bills');
 const productionRouter = require('./production');
 const bannedRouter = require('./banned');
@@ -28,8 +27,9 @@ userRouter
   .get('/:uid', async (ctx, next) => {
     const {data, db, params,query} = ctx;
     const {user} = data;
-    if(!user) ctx.throw(403, '请登录后再查看用户的信息。');
-    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
+    if(user) {
+	    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
+    }
 		const {uid} = params;
 		const {apiFunction} = ctx.nkcModules;
 		const targetUser = await db.UserModel.findOnly({uid});
@@ -49,15 +49,20 @@ userRouter
 	  const count = forumsId.length;
 	  paging = apiFunction.paging(page, count);
 	  forumsId.slice(paging.start, paging.start + paging.perpage);
-	  data.forums = await Promise.all(forumsId.map(fid => db.ForumModel.findOnly({fid})));
+	  data.targetUserSubscribeforums = await Promise.all(forumsId.map(fid => db.ForumModel.findOnly({fid})));
 	  // --------
 
-	  // --拿到最新6个关注与最新6个粉丝
-	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(-6, -1);
-	  const newSubscribersId = targetUserSubscribe.subscribers.slice(-6, -1);
+	  // --拿到最新8个关注与最新8个粉丝
+	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(-9, -1);
+	  const newSubscribersId = targetUserSubscribe.subscribers.slice(-9, -1);
 	  data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
 		data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
 		// --------
+
+		// --拿到用户最新的发帖
+	  data.targetUserThreads = await targetUser.getUsersThreads();
+	  // --------
+
 
 
 		if (type === 'follow') {
@@ -121,35 +126,6 @@ userRouter
 				});
 			}
 			data.results = results;
-			/*data.results = await Promise.all(targetUserBehaviors.map(async behavior => {
-				const {pid, tid, operation} = behavior;
-				// 回帖
-				const thread = await db.ThreadModel.findOnly({tid});
-				const firstPost = await thread.extendFirstPost();
-				await firstPost.extendUser();
-				let post;
-				let link;
-				if(operation === 'postToForum') {
-					await firstPost.extendResources();
-					post = firstPost;
-					link = `/t/${tid}#${pid}`
-				} else {
-					post = await db.PostModel.findOnly({pid});
-					const query = {pid};
-					if(data.userLevel < 4) {
-						query.disabled = false;
-					}
-					const obj = await thread.getStep(query);
-					link = `/t/${tid}?page=${obj.page}&highlight=${pid}#${pid}`;
-				}
-				return {
-					operation,
-					thread,
-					firstPost,
-					post,
-					link
-				}
-			}));*/
 		}
 		data.type = type;
 		data.paging = paging;
@@ -157,62 +133,6 @@ userRouter
 		data.targetUserSubscribe = targetUserSubscribe;
 		ctx.template = 'interface_user.pug';
     await next();
-  })
-  .get('/:uid/ban', async (ctx, next) => {
-  	const {data, db, params} = ctx;
-  	const {uid} = params;
-  	const targetUser = await db.UserModel.findOnly({uid});
-  	const {certs} = targetUser;
-  	if(certs.includes('banned')) {
-  		ctx.throw(400, '该用户已经被封禁，请刷新。');
-	  }
-	  if(certs.indexOf('moderator') >= 0 ||
-		  certs.indexOf('editor') >= 0 ||
-		  certs.indexOf('dev') >= 0 ||
-		  certs.indexOf('scholar') >= 0 ||
-		  targetUser.xsf > 0){
-			if(data.userLevel < 6) {
-				ctx.throw(403, '为什么？你为何要封禁此用户？你是怎么了？');
-			}
-	  }
-	  await targetUser.update({$addToSet: {certs: 'banned'}});
-  	await next();
-    /*let {uid} = ctx.params;
-    let {db} = ctx;
-    let targetUser = await db.UserModel.findOnly({uid: uid});
-    let certs = targetUser.certs;
-    if(certs.indexOf('banned') > -1) ctx.throw(400, '该用户在你操作之前已经被封禁了，请刷新');
-    if(
-      certs.indexOf('moderator') >= 0 ||
-      certs.indexOf('editor') >= 0 ||
-      certs.indexOf('dev') >= 0 ||
-      certs.indexOf('scholar') >= 0 ||
-      targetUser.xsf > 0
-    ){
-    	if()
-      ctx.throw(400, '为什么？你为何要封禁此用户？你是怎么了？');
-    }
-    await db.UserModel.replaceOne({uid: targetUser.uid}, {$addToSet: {certs: 'banned'}});
-    ctx.data.message = `封禁用户成功`;
-    await next();*/
-  })
-  .put('/:uid/ban', async (ctx, next) => {
-  	const {db, params} = ctx;
-  	const {uid} = params;
-  	const targetUser = await db.UserModel.findOnly({uid});
-  	if(!targetUser.certs.includes('banned')) {
-			ctx.throw(400, '该用户未被封禁，请刷新。');
-	  }
-	  await targetUser.update({$pull: {certs: 'banned'}});
-  	await next();
-    /*let {uid} = ctx.params;
-    let {db} = ctx;
-    let targetUser = await db.UserModel.findOnly({uid: uid});
-    let certs = targetUser.certs;
-    if(certs.indexOf('banned') === -1) ctx.throw(400, '该用户未被封禁，请刷新');
-    await db.UserModel.replaceOne({uid: targetUser.uid}, {$pull: {certs: 'banned'}});
-    ctx.data.message = `解封用户成功`;
-    await next();*/
   })
   .post('/:uid/pop', async (ctx, next) => {
     const uid = ctx.params.uid;
@@ -223,6 +143,5 @@ userRouter
   .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
-	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
-  .use('/:uid/activities', activitiesRouter.routes(), activitiesRouter.allowedMethods());
+	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods());
 module.exports = userRouter;

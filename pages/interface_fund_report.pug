@@ -129,7 +129,7 @@ block content
               h4=`项目ID：`
                 a(href=`/fund/a/${code}` target='_blank')= code
               h4=`申请人：`
-                a(href=`/m/${applicant.uid}` target='_blank')= applicant.user.username
+                a(href=`/u/${applicant.uid}` target='_blank')= applicant.user.username
               hr
               h3.text-center=`申请第${number+1}期拨款`
               if number !== 0

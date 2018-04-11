@@ -1,6 +1,10 @@
 const {scheduleJob} = require('node-schedule');
-
+const moment = require('moment');
+const {spawn} = require('child_process');
 const settings = require('./settings');
+const backup = require('./settings/backup');
+const fs = require('fs');
+const path = require('path');
 const {database, elastic, user} = settings;
 const {client} = elastic;
 
@@ -38,6 +42,52 @@ jobs.updateActiveUsers = cronStr => {
       await newActiveUser.save();
     }
   })
+};
+
+jobs.backupDatabase = () => {
+	scheduleJob(backup.cronStr, async () => {
+		fs.appendFile(`${path.resolve(__dirname)}/backup.log`, `\n\n${moment().format('YYYY-MM-DD HH:mm:SS')} 开始备份数据...\n`, (err) => {
+			if(err) {
+				console.log(err);
+			}
+		});
+		console.log(`\n\n${moment().format('YYYY-MM-DD HH:mm:SS')} 开始备份数据...\n`);
+		let data = '', error = '';
+		const process = spawn(
+			'mongodump.exe',
+			[
+				'--gzip',
+				'--db',
+				backup.database,
+				'--out',
+				`${backup.out}${moment().format('YYYYMMDDHHmmSS')}`,
+			]
+		);
+		process.stdout.on('data', (d) => {
+			d = d.toString();
+			console.log(d);
+			data += (d+'\n');
+		});
+		process.stderr.on('data', (d) => {
+			d = d.toString();
+			console.log(d);
+			error += (d+'\n');
+		});
+		process.on('close', (code) => {
+			let info = '';
+			if (code === 0) {
+				info = `${moment().format('YYYY-MM-DD HH:mm:SS')} 备份完成`;
+			} else {
+				info = `${moment().format('YYYY-MM-DD HH:mm:SS')} 备份失败\n${error}`;
+			}
+			console.log(info);
+			fs.appendFile(`${path.resolve(__dirname)}/backup.log`, info, (err) => {
+				if(err) {
+					console.log(err);
+				}
+			})
+		});
+	});
 };
 
 jobs.truncateUsersLoginToday = cronStr => {
