@@ -13,8 +13,11 @@ block content
         .col-xs-12
           .form-inline(style='margin-bottom: 0.5rem;')
             .form-group(style='margin-bottom: 0;display: inline-block;')
-              input#stringToSearch.form-control(type='text' value=`${q}` style='display: inline-block;')
-              button#research.btn.btn-primary(style='display: inline-block;') 搜索
+              form(action=`/search`)
+                if data.type
+                  input.hidden(value=data.type name='type')
+                input#stringToSearch.form-control(type='text' name='q' value=`${q}` style='display: inline-block;')
+                input.btn.btn-primary(type='submit' style='display: inline-block;' value='搜索')
           ul(class="nav nav-tabs")
             li(class=`${type === 'content'? 'active': ''}`)
               a(href=`/search?&q=${q}&type=content&page=${_page}`) 内容

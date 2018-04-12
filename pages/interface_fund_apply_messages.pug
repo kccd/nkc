@@ -13,7 +13,7 @@
   .row
     .col-xs-12.col-md-6
       h5= `申请人ID：`
-        a(href=`/m/${applicationForm.applicant.uid}` target="_blank")= applicationForm.applicant.user.username
+        a(href=`/u/${applicationForm.applicant.uid}` target="_blank")= applicationForm.applicant.user.username
       h5=`真实姓名：${applicationForm.applicant.name || '暂未输入'}`
       if applicationForm.applicant.idCardNumber
         div(style='border: 1px solid #ddd;padding: 0 0.5rem;background-color: #eee;')
@@ -39,7 +39,7 @@
           -for(let m of applicationForm.members)
             if m.agree
               span &nbsp;&nbsp;
-              a(href=`/m/${m.uid}` target='_blank')= m.user.username
+              a(href=`/u/${m.uid}` target='_blank')= m.user.username
       else
         h5= `申请方式：个人`
     if applicationForm.applicant.lifePhotos.length === 0
@@ -81,7 +81,7 @@
                   .displayNone.postString= postString
                   span 文号：
                   span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                  a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                  a(href=`/u/${firstPost.uid}` target="_blank")= firstPost.user.username
                   if notModifiedUsers.includes(thread.uid)
                     span(style='color: #aaa;') （未处理邀请）
                   if disagreeUsers.includes(thread.uid)

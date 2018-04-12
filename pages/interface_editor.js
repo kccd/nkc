@@ -3,11 +3,42 @@ $(function() {
   editor.init();
   window.editor = editor;
   var c = geid('content');
-  var proxy = geid('proxy');
-  proxy.addEventListener('click', function(e) {
-    replace_selection(c, e.target.getAttribute('data-unicode'), true)
-  })
+  //新编辑器不需要旧的表情
+  // var proxy = geid('proxy');
+  // proxy.addEventListener('click', function(e) {
+  //   replace_selection(c, e.target.getAttribute('data-unicode'), true)
+  // })
 });
+
+$("document").ready(function() {
+  console.log($("#disnoneplay").html())
+  console.log(escapeChars($("#disnoneplay").html()))
+  $("#text-elem").html(htmlDecode($("#disnoneplay").html()))
+  
+})
+
+
+//html解码
+function htmlDecode(text){
+  //1.首先动态创建一个容器标签元素，如DIV
+  var temp = document.createElement("div");
+  //2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
+  temp.innerHTML = text;
+  //3.最后返回这个元素的innerText(ie支持)或者textContent(火狐，google支持)，即得到经过HTML解码的字符串了。
+  var output = temp.innerText || temp.textContent;
+  temp = null;
+  return output;
+}
+
+function escapeChars(str) {
+  str = str.replace('&amp;', /&/g);
+  str = str.replace('&lt;', /</g);
+  str = str.replace('&gt;', />/g);
+  // str = str.replace(/'/g, '&acute;');
+  // str = str.replace(/"/g, '&quot;');
+  // str = str.replace(/\|/g, '&brvbar;');
+  return str;
+}
 
 function get_selection(the_id) {
   var e = typeof(the_id)=='String'? document.getElementById(the_id) : the_id;
@@ -328,12 +359,17 @@ function onPost(that) {
   return function() {
     //--获取编辑器的内容--
     var specialMark = that.specialMark;
+    $(".MathJax_Preview").each(function(){
+      var mathfur = "$$" + $(this).next().next().html() + "$$";
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
+    })
     if(specialMark == "old"){
       var content = that.content.value;
     }else{
       var content = that.content.innerHTML.trim();
     }
-    return console.log(that,typeof(content))
     //-- --
     var title = that.title.value.trim();
     var type = that.query.type;
@@ -367,7 +403,6 @@ function onPost(that) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
       return;
     }
-    //}
     that.post.disabled = true;
     var method;
     var url;
@@ -475,42 +510,43 @@ function extract_resource_from_tag(text) {
   return rarr
 }
 
-function mathfresh(){
-  console.log("这里执行了吗")
-  console.log(MathJax,hljs)
-  if(MathJax){
-    MathJax.Hub.PreProcess(geid('parsedcontent'),function(){MathJax.Hub.Process(geid('parsedcontent'))})
-  }
-  if(hljs){
-    ReHighlightEverything() //interface_common code highlight
-  }
-}
-
-function fitscreen(){
-  var h = $(window).height().toString()+'px'
-
-  geid('content').style.height = !screenfitted?h:'300px';
-  geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
-
-  screenfitted = !screenfitted
-}
 
 //下面是新编辑器渲染公式
 function mathfreshnew(){
   if(MathJax){
-    // MathJax.Hub.PreProcess(geid('text-elem'),function(){MathJax.Hub.Process(geid('text-elem'))})
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+     MathJax.Hub.PreProcess(geid('text-elem'),function(){MathJax.Hub.Process(geid('text-elem'))})
+    //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   }
   if(hljs){
     ReHighlightEverything() //interface_common code highlight
   }
 }
 
-function fitscreennew(){
-  var h = $(window).height().toString()+'px'
-
-  geid('content').style.height = !screenfitted?h:'300px';
-  geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
-
-  screenfitted = !screenfitted
+//下面是新编辑器渲染公式
+function mathfresha1(){
+  $("#editora2").html($("#editora1").val())
+  if(MathJax){
+    MathJax.Hub.PreProcess(geid('editora2'),function(){MathJax.Hub.Process(geid('editora2'))})
+    //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+  }
+  if(hljs){
+    ReHighlightEverything() //interface_common code highlight
+  }
 }
+
+
+//重新编辑公式
+//使用方法，在编辑器中双击渲染好了的公式
+function reedit(para){
+  console.log($(para))
+  document.getElementsByClassName("w-e-icon-table2").onclick();
+}
+
+// function fitscreennew(){
+//   var h = $(window).height().toString()+'px'
+
+//   geid('content').style.height = !screenfitted?h:'300px';
+//   geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
+
+//   screenfitted = !screenfitted
+// }

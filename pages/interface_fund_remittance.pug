@@ -15,11 +15,11 @@ block content
               a(href=`/fund/a/${code}` target="_blank")= `${code}`
             h4=`项目名称：${project.t}`
             h4=`申请人：`
-              a(href=`/m/${applicant.uid}` target="_blank")= `${applicant.user.username}`
+              a(href=`/u/${applicant.uid}` target="_blank")= `${applicant.user.username}`
             if members.length > 0
               h4=`组员：`
                 -for(let aUser of members)
-                  a(href=`/m/${aUser.uid}` target="_blank")= `${aUser.user.username}`
+                  a(href=`/u/${aUser.uid}` target="_blank")= `${aUser.user.username}`
                   span &nbsp;&nbsp;
             if applicationForm.account.paymentType === 'alipay'
               h4 收款方式：支付宝

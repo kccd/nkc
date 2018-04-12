@@ -655,3 +655,61 @@ function deleteBill(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+// 封禁用户
+function bannedUser(uid, banned) {
+	var url = '/u/'+uid+'/banned';
+	var method = 'PATCH';
+	nkcAPI(url, method, {banned: banned})
+		.then(function() {
+			screenTopAlert('封禁用户成功。');
+			setTimeout(function() {
+				window.location.reload();
+			}, 1000);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+// 关注用户
+function subscribeUser(uid, subscribe) {
+	var url = '/u/'+uid+'/subscribe';
+	var method = 'POST';
+	var alertInfo = '关注成功。';
+	if(subscribe === false) {
+		method = 'DELETE';
+		alertInfo = '已取消关注。';
+	}
+	nkcAPI(url, method, {})
+		.then(function() {
+			screenTopAlert(alertInfo);
+			setTimeout(function() {
+				window.location.reload();
+			}, 1000);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
+
+// 关注领域
+function subscribeForum(fid, subscribe) {
+	var url = '/f/'+fid+'/subscribe';
+	var method = 'POST';
+	var alertInfo = '关注成功。';
+	if(subscribe === false) {
+		method = 'DELETE';
+		alertInfo = '已取消关注。';
+	}
+	nkcAPI(url, method, {})
+		.then(function() {
+			screenTopAlert(alertInfo);
+			setTimeout(function() {
+				window.location.reload();
+			}, 1000);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}

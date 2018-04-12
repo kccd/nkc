@@ -13,7 +13,6 @@ block content
     -arr.push({en: 'idCardPhotos', ch: '上传身份证照片'});
   if lifePhotos
     -arr.push({en: 'lifePhotos', ch: '上传生活照'});
-    -console.log(`================`)
   if handheldIdCardPhoto
     -arr.push({en: 'handheldIdCardPhoto', ch: '上传手持身份证照片'});
   -const mainContainer1400 = true
@@ -30,7 +29,7 @@ block content
                   br
                   h4= `${data.user.username}，您好！`
                     span 用户&nbsp;
-                    a(href=`/m/${applicant.uid}`)= applicant.user.username
+                    a(href=`/u/${applicant.uid}`)= applicant.user.username
                     span &nbsp;正在申请
                     a(href=`/fund/list/${fund._id.toLowerCase()}`)= ` 科创基金-${fund.name}`
                     span ，想要添加您为小组成员。

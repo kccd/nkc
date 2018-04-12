@@ -546,7 +546,7 @@ $.offAll = function () {
 var config = {
 
     // 默认菜单配置
-    menus: ['head', 'bold', 'fontSize', 'fontName', 'italic', 'underline', 'strikeThrough', 'foreColor', 'backColor', 'link', 'list', 'justify', 'quote', 'emoticon', 'image', 'table', 'video', 'code', 'undo', 'redo'],
+    menus: ['head', 'bold', 'fontSize', 'fontName', 'italic', 'underline', 'strikeThrough', 'foreColor', 'backColor', 'link', 'list', 'justify', 'quote', 'emoticon', 'image', 'table', 'video', 'code', 'undo', 'redo', 'formula'],
 
     fontNames: ['宋体', '微软雅黑', 'Arial', 'Tahoma', 'Verdana'],
 
@@ -2562,6 +2562,94 @@ Table.prototype = {
 };
 
 /*
+    menu - formula
+*/
+//构造函数
+function formula(editor){
+    this.editor = editor;
+    this.$elem = $('<div class="w-e-menu"><i class="w-e-icon-play"><i/></div>');
+    this.type = 'panel';
+}
+
+
+// 原型
+formula.prototype = {
+    constructor: formula,
+
+    onClick: function onClick() {
+        this._createPanel();
+    },
+
+    _createPanel: function _createPanel() {
+        var _this = this;
+
+        // 创建 id
+        var textValId = getRandom('text-val');
+        var btnId = getRandom('btn');
+
+        // 创建 panel
+        var panel = new Panel(this, {
+            width: 350,
+            // 一个 panel 多个 tab
+            tabs: [{
+                // 标题
+                title: '插入公式',
+                // 模板
+                tpl: '<div>\n' +
+                        '<input type="text" class="block" id="editora1" placeholder="例:$$\\sum_{i=0}^N\\int_{a}^{b}g(t,i)\\text{d}t$$"/>\n '+
+                        '<div id="editora2"></div>'+
+                        '<div class="w-e-button-container">\n'+
+                            '<button class="left" onclick="mathfresha1()">预览</button>\n'+
+                            '<button id="' + btnId + '" class="right">\u63D2\u5165</button>\n'+
+                        '</div>\n '+
+                    '</div>',
+                // 事件绑定
+                events: [{
+                    selector: '#' + btnId,
+                    type: 'click',
+                    fn: function fn() {
+                        var $text = $('#editora1');
+                        var val = $text.val().trim();
+                        if (val) {
+                            // 插入公式
+                            _this._insert(val);
+                        }
+                        // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
+                        return true;
+                    }
+                }]
+            } // first tab end
+            ] // tabs end
+        }); // panel end
+
+        // 显示 panel
+        panel.show();
+
+        // 记录属性
+        this.panel = panel;
+    },
+
+    // 插入公式
+    _insert: function _insert(val) {
+        var editor = this.editor;
+        editor.cmd.do('insertHTML', "<p contenteditable='false' ondblclick='reedit(this)'>"+val+"</p>" + '<p><br></p>');
+        mathfreshnew()
+    }
+};
+//下面是新编辑器渲染公式
+function mathfreshnew(){
+    if(MathJax){
+        console.log("这里执行了吗")
+       MathJax.Hub.PreProcess(geid('text-elem'),function(){MathJax.Hub.Process(geid('text-elem'))})
+      //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    }
+    if(hljs){
+      ReHighlightEverything() //interface_common code highlight
+    }
+}
+
+
+/*
     menu - video
 */
 // 构造函数
@@ -2894,6 +2982,8 @@ MenuConstructors.table = Table;
 MenuConstructors.video = Video;
 
 MenuConstructors.image = Image;
+
+MenuConstructors.formula = formula;
 
 /*
     菜单集合
@@ -4400,7 +4490,7 @@ Editor.prototype = {
             $toolbarSelector.append($toolbarElem).append($textContainerElem);
 
             // 自行创建的，需要配置默认的样式
-            $toolbarElem.css('background-color', '#f1f1f1').css('border', '1px solid #ccc');
+            $toolbarElem.css('background-color', '#f1f1f1').css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
             $textContainerElem.css('border', '1px solid #ccc').css('border-top', 'none').css('height', '300px');
         } else {
             // toolbar 和 text 的选择器都有值，记录属性

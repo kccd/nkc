@@ -29,7 +29,7 @@ function nkc_render(options){
   var default_whitelist = xss.whiteList;
   default_whitelist.font = ['color']
   default_whitelist.code = ['class']
-  default_whitelist.span = ['class', 'style', 'aria-hidden', 'id', 'tabindex', 'role'];
+  default_whitelist.span = ['class', 'style', 'aria-hidden'];
   default_whitelist.a = ['href', 'title', 'target', 'style'];
   default_whitelist.div = ['style'];
   default_whitelist.table = ['border','width','cellpadding','cellspacing'];

@@ -59,12 +59,6 @@ block content
                             span 版主：
                               each k in moderators
                                 a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
-                            -var subscribeUsersNum = (data.userSubscribe.subscribeUsers)?data.userSubscribe.subscribeUsers.length : 0;
-                            -var subscribersNum = (data.userSubscribe.subscribers)?data.userSubscribe.subscribers.length : 0;
-                            span 关注：
-                              a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe`) #{subscribeUsersNum}
-                            span 粉丝：
-                              a(class='d-inline margin-right',href=`/u/${data.targetUser.uid}/subscribe?fans=true`) #{subscribersNum}
                       div(style='position: absolute; right: 0; top: 0;')
                         if isModerator
                           div
@@ -75,10 +69,10 @@ block content
                             -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
                             if(subscribeUsers.indexOf(user.uid) > -1)
                               div
-                                a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
+                                a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUser("${user.uid}", false);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
                             else
                               div
-                                a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUserSwitch("${user.uid}");` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
+                                a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUser("${user.uid}", true);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
                       hr.hrNarrowSpace
                       div
                         if announcement && announcement != ''
@@ -124,9 +118,9 @@ block content
 
                   if isAdmin
                     if data.targetUser.certs.indexOf('banned') > -1
-                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'PUT', {}).then(function(data){screenTopAlert(data.message)}).catch(function(data){screenTopWarning(data.error)})`) 解除封禁
+                      a(href='javascript:;' onclick=`bannedUser("${data.targetUser.uid}", false)`) 解除封禁
                     else
-                      a(href='javascript:;' onclick=`nkcAPI("/u/${data.targetUser.uid}/ban", 'GET', {}).then(function(data){screenTopAlert(data.message)}).catch(function(data){screenTopWarning(data.error)})`) &nbsp;封禁此人&nbsp;
+                      a(href='javascript:;' onclick=`bannedUser("${data.targetUser.uid}", true)`) &nbsp;封禁此人&nbsp;
 
 
         ul.nav.nav-tabs(style='margin-top: 0.4rem;')

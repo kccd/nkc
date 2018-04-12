@@ -33,13 +33,12 @@ block content
                     option 无
                 select.form-control#lang(style='display: none; width: auto;')
                     option html
-                include twemoji
                 button#mathfresh.btn.btn-sm.btn-default(onclick='mathfreshnew()') 渲染代码/数学公式
                 button.btn.btn-default.btn-sm(onclick='fitscreennew()') 适配屏幕
             .form-group
-                div#content_test= data.content || ''
+                div#disnoneplay.w-e-text-container(style='display:none')= data.content
+                div#content_test
             .form-group
-                div#math_test 写点什么东西
             .nkcpanel(id='file-uploading' target='/r')
                 //uploader section
                 include interface_attachment_uploader_uploader.pug

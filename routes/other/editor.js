@@ -26,9 +26,7 @@ editorRouter
       ctx.template = 'interface_editor.pug';
       const targetPost = await db.PostModel.findOnly({pid: id});  //根据pid查询post表
       if(targetPost.l === "html"){
-        console.log("在这里应该使用新编辑器")
-      }else{
-        console.log("在这里应该使用旧编辑器")
+        ctx.template = 'interface_editor_test.pug';
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
       if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');

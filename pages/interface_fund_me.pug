@@ -50,7 +50,7 @@ block content
                             -const {toc, _id, members, applicant, fund} = a;
                             if type === 'notify'
                               span=`来自 `
-                              a(href=`/m/${applicant.uid}`)= applicant.user.username
+                              a(href=`/u/${applicant.uid}`)= applicant.user.username
                               span=` 的组队邀请，`
                               a(href=`/fund/a/${a._id}`)= `查看`
                               br
@@ -76,12 +76,12 @@ block content
                                     span.fund-li-time= toc.toLocaleString()
                                   .col-xs-12.col-md-11
                                     span= `申请人：`
-                                      a(href=`/m/${a.uid}`)= a.applicant.user.username
+                                      a(href=`/u/${a.uid}`)= a.applicant.user.username
                                     span &nbsp;&nbsp;
                                     if a.from !== 'personal'
                                       span= `组员：`
                                         -for(let u of a.members)
-                                          a(href=`/m/${u.uid}`)= `${u.user.username} `
+                                          a(href=`/u/${u.uid}`)= `${u.user.username} `
                                     br
                                     span=`项目名称：${a.project?a.project.t: '暂未填写'}`
                                     br
