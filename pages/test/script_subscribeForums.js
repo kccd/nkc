@@ -37,15 +37,3 @@ const {UsersSubscribeModel, ForumModel} = require('../../dataModels');
 	}
 	console.log('done.');
 })();
-
-/*{
-	"_id" : ObjectId("5a5502bb2d59cd3d084e6de7"),
-	"uid" : "70129",
-	"subscribers" : [],
-	"subscribeUsers" : [],
-	"subscribeForums" : [
-	"134,32,164,106,81,21",
-	""
-],
-	"__v" : 0
-}*/
