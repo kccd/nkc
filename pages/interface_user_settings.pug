@@ -1,0 +1,81 @@
+extends bootstrap_base
+block title
+  title
+  -const mainContainer1400 = true
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        .panel.panel-primary
+          .panel-heading
+            span.panel-titlePanel 资料设置
+          .list-group
+            a.list-group-item(href="#")
+              span.fa.fa-user-circle &nbsp;&nbsp;
+              span 头像设置
+            a.list-group-item(href="#")
+              span.fa.fa-list-alt &nbsp;&nbsp;
+              span 基本资料设置
+            a.list-group-item(href="#")
+              span.fa.fa-id-card-o &nbsp;&nbsp;
+              span 简历设置
+            a.list-group-item(href="#")
+              span.fa.fa-id-card-o &nbsp;&nbsp;
+              span 交易信息设置
+          .panel-heading
+            span.panel-titlePanel 账号安全
+          .list-group
+            a.list-group-item(href="#")
+              span.fa.fa-eye-slash &nbsp;&nbsp;
+              span 密码修改
+            a.list-group-item(href="#")
+              span.fa.fa-mobile-phone &nbsp;&nbsp;&nbsp;
+              span 绑定手机号
+            a.list-group-item(href="#")
+              span.fa.fa-envelope-o &nbsp;&nbsp;
+              span 绑定邮箱
+          .panel-heading
+            span.panel-titlePanel 身份认证
+          .list-group
+            a.list-group-item(href="#")
+              span.fa.fa-bicycle &nbsp;&nbsp; 身份认证1
+            a.list-group-item(href="#")
+              span.fa.fa-car &nbsp;&nbsp; 身份认证2
+            a.list-group-item(href="#")
+              span.fa.fa-fighter-jet &nbsp;&nbsp; 身份认证3
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 头像设置
+          .panel-body
+            p 请选择您最帅气的照片作为头像。
+            .row
+              .col-xs-12.col-md-6
+                .row
+                  .col-xs-12.col-md-12
+                    .user-settings-img-div
+                      #selectBox(style='background-image: url(http://kechuang.com:9000/r/280301)').user-settings-img
+                        -for(let i = 0; i < 4; i++)
+                          div.img-change-btn(id=`changeBtn${i}`)
+                      .user-settings-img-mask
+                      img#img_l(src='http://kechuang.com:9000/r/280301').user-settings-img
+                  .col-xs-12.col-md-12.text-center
+                    br
+                    button(onclick='$("#inputFile").click();') 选择图片
+                    button(onclick=`submit(${data.user.uid})`) 保存
+              .col-xs-12.col-md-3
+                .col-xs-12.col-md-12
+                  img#img_m(style='width: 192px;height: 192px;').user-settings-img
+                  span 192x192
+                .col-xs-12.col-md-12
+                  br
+                .col-xs-6.col-md-6
+                  img#img_s(style='width: 48px;height: 48px;').user-settings-img
+                  span 48x48
+            input#inputFile(type='file').hidden
+
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_settings.js')

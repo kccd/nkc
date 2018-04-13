@@ -59,7 +59,7 @@ block content
             for user in data.users
               tr
                 td
-                  a(href=`/m/${user.uid}`) #{user.username}
+                  a(href=`/u/${user.uid}`) #{user.username}
                 -if(user.email)
                   td 邮箱
                 -else if(user.mobile)

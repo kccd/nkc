@@ -464,6 +464,22 @@ const certificates ={
 	        bills: {
           	[name]: '用户账单',
 		        [GET]: true
+	        },
+	        settings: {
+          	[name]: '用户资料设置',
+		        [GET]: true,
+		        [POST]: true,
+		        avatar: {
+          		[name]: '用户头像设置',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        info: {
+          		[name]: '基本资料设置',
+			        [GET]: true,
+			        [POST]: true
+		        },
+		        
 	        }
         }
       },

@@ -4,6 +4,7 @@ const collectionsRouter = require('./collections');
 const billRouter = require('./bills');
 const productionRouter = require('./production');
 const bannedRouter = require('./banned');
+const settingRouter = require('./settings');
 const userRouter = new Router();
 
 
@@ -148,5 +149,6 @@ userRouter
   .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
+	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods());
 module.exports = userRouter;

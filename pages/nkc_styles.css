@@ -2174,6 +2174,57 @@ img.emoji {
 }
 /*---------*/
 
+
+/*---用户设置----*/
+
+.user-settings-img{
+  width: 100%;
+}
+.user-settings-img-div{
+  position: relative;
+}
+.user-settings-img-mask{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  background-color: rgba(0,0,0,0.5);
+}
+#selectBox{
+  top: 0;
+  cursor: pointer;
+  left: 0;
+  border: 1px dashed #fff;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  z-index: 10;
+}
+.img-change-btn{
+  position: absolute;
+  height: 5px;
+  width: 5px;
+  top: 0px;
+  left: 0px;
+  background-color: #fff;
+}
+.img-change-btn#changeBtn1{
+  left: auto;
+  right: 0px;
+}
+.img-change-btn#changeBtn2{
+  top: auto;
+  bottom: 0px;
+}
+.img-change-btn#changeBtn3{
+  top: auto;
+  left: auto;
+  right: 0px;
+  bottom: 0px;
+}
+/*--------------*/
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{
     width: 27%;
