@@ -468,18 +468,20 @@ const certificates ={
 	        settings: {
           	[name]: '用户资料设置',
 		        [GET]: true,
-		        [POST]: true,
 		        avatar: {
           		[name]: '用户头像设置',
-			        [GET]: true,
-			        [PATCH]: true
+			        [GET]: true
 		        },
 		        info: {
           		[name]: '基本资料设置',
 			        [GET]: true,
-			        [POST]: true
+			        [PATCH]: true
 		        },
-		        
+		        resume: {
+							[name]: '简历设置',
+			        [GET]: true,
+			        [PATCH]: true
+		        }
 	        }
         }
       },

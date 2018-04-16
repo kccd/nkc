@@ -1,0 +1,42 @@
+extends bootstrap_base
+block title
+  title 基本资料设置
+  -const mainContainer1400 = true
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 基本资料设置（完全公开）
+          .panel-body
+            .form-horizontal
+
+              .form-group
+                label.col-sm-2.control-label 用户名：
+                .col-sm-5
+                  input.form-control(placeholder='请输入用户名' value=data.user.username)
+
+              .form-group
+                label.col-sm-2.control-label 个人简介：
+                .col-sm-5
+                  textarea.form-control(rows=8 placeholder='请输入个人简介')= data.user.description
+
+              .form-group
+                label.col-sm-2.control-label 文章签名：
+                .col-sm-5
+                  textarea.form-control(rows=8 placeholder='请输入文章签名')= data.user.postSign
+
+              .form-group
+                label.col-sm-2.control-label 文章背景颜色：
+                .col-sm-5
+                  input.form-control(placeholder='默认：#e4e4e4' value=data.user.color || '')
+
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-5
+                  button.btn.btn-primary#save 保存
+block scripts
+  script(src='/interface_common.js')

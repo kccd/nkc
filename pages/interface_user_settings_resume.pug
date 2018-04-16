@@ -1,0 +1,98 @@
+extends bootstrap_base
+block title
+  title 简历设置
+  -const mainContainer1400 = true
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 简历设置
+          .panel-body
+            .form-horizontal
+
+              .form-group
+                label.col-sm-2.control-label 真实姓名：
+                .col-sm-5
+                  input.form-control(placeholder='真实姓名' value=data.user.username)
+
+              .form-group
+                label.col-sm-2.control-label 性别：
+                .col-sm-5
+                  label.radio-inline
+                    input(type='radio' name='gender')
+                    span 男
+
+                  label.radio-inline
+                    input(type='radio' name='gender')
+                    span 女
+
+              .form-group
+                label.col-sm-2.control-label 出生日期：
+                .col-sm-5
+                  input.form-control#timepicker(size="16" type="text" value="2012-05-15")
+
+              .form-group
+                label.col-sm-2.control-label 所在地区：
+                .col-sm-5
+                  .bs-chinese-region.flat.dropdown(data-submit-type="id", data-min-level="1", data-max-level="3")
+                    input#address.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="", value="")
+                    .dropdown-menu(role="menu", aria-labelledby="dLabel")
+                      div
+                        ul.nav.nav-tabs(role="tablist")
+                          li.active(role="presentation")
+                            a(href="#province", data-next="city", role="tab", data-toggle="tab") 省份
+                          li(role="presentation")
+                            a(href="#city", data-next="district", role="tab", data-toggle="tab") 城市
+                          li(role="presentation")
+                            a(href="#district", data-next="street", role="tab", data-toggle="tab") 县区
+                        .tab-content
+                          #province.tab-pane.active(role="tabpanel") --
+                          #city.tab-pane(role="tabpanel") --
+                          #district.tab-pane(role="tabpanel") --
+              .form-group
+                label.col-sm-2.control-label 详细地址：
+                .col-sm-5
+                  input.form-control(placeholder='详细地址')
+
+              .form-group
+                label.col-sm-2.control-label 教育背景：
+                .col-sm-10
+                  .education-list
+                    form.form-inline
+                      select.form-control
+                        option 小学
+                        option 初中
+                        option 高中
+                        option 中专
+                        option 大学
+                      -const minYear = 1900;
+                      -const maxYear = new Date().getFullYear();
+                      select.form-control
+                        option 入学时间
+                        -for(let i = maxYear; i >= minYear; i--)
+                          option= i
+                      input.form-control(type='text', placeholder='学校名称')
+                      input.form-control(type='text', placeholder='专业名称')
+                      button.btn.btn-success.btn-sm 保存
+                      button.btn.btn-danger.btn-sm 删除
+                      button.btn.btn-info.btn-sm 添加
+
+
+
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-5
+                  button.btn.btn-primary#save 保存
+block scripts
+  script(src='/interface_common.js')
+  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
+  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
+  script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
+  script(src="/interface_user_settings_resume.js" charset="UTF-8")
