@@ -17,26 +17,27 @@ block content
               .form-group
                 label.col-sm-2.control-label 用户名：
                 .col-sm-5
-                  input.form-control(placeholder='请输入用户名' value=data.user.username)
+                  input.form-control#username(placeholder='请输入用户名' value=data.user.username)
+                  span.text-danger *修改一次用户名将花费200个科创币
 
               .form-group
                 label.col-sm-2.control-label 个人简介：
                 .col-sm-5
-                  textarea.form-control(rows=8 placeholder='请输入个人简介')= data.user.description
+                  textarea.form-control#description(rows=8 placeholder='请输入个人简介')= data.user.description
 
               .form-group
                 label.col-sm-2.control-label 文章签名：
                 .col-sm-5
-                  textarea.form-control(rows=8 placeholder='请输入文章签名')= data.user.postSign
+                  textarea.form-control#postSign(rows=8 placeholder='请输入文章签名')= data.user.postSign
 
               .form-group
                 label.col-sm-2.control-label 文章背景颜色：
                 .col-sm-5
-                  input.form-control(placeholder='默认：#e4e4e4' value=data.user.color || '')
+                  input.form-control#color(placeholder='默认：#e4e4e4' value=data.user.color || '')
 
               .form-group
-                label.col-sm-2.control-label
-                .col-sm-5
-                  button.btn.btn-primary#save 保存
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(onclick=`submit(${data.user.uid}, "${data.user.username}")`) 保存
 block scripts
   script(src='/interface_common.js')
+  script(src='/interface_user_settings_info.js')

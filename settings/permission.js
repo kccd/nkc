@@ -152,10 +152,6 @@ const certificates ={
           [name]: '注册短信',
           [POST]: true
         },
-        bindMobile: {
-          [name]: '绑定手机号',
-          [POST]: true
-        },
         getback: {
           [name]: '找回密码',
           [POST]: true
@@ -338,6 +334,17 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+	    sendMessage: {
+		    [name]: '发短信',
+		    bindMobile: {
+			    [name]: '绑定手机号',
+			    [POST]: true
+		    },
+		    changeMobile: {
+		    	[name]: '更换手机号',
+			    [POST]: true
+		    }
+	    },
 	    exam: {
 		    [name]: '考试',
 		    [GET]: true,
@@ -465,6 +472,13 @@ const certificates ={
           	[name]: '用户账单',
 		        [GET]: true
 	        },
+	        auth: {
+		        [DELETE]: true,
+          	[parameter]: {
+          		[name]: '身份认证',
+		          [POST]: true
+	          }
+	        },
 	        settings: {
           	[name]: '用户资料设置',
 		        [GET]: true,
@@ -479,6 +493,40 @@ const certificates ={
 		        },
 		        resume: {
 							[name]: '简历设置',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        password: {
+          		[name]: '密码修改',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        mobile: {
+          		[name]: '手机绑定',
+			        [GET]: true,
+			        [PATCH]: true,
+			        [POST]: true
+		        },
+		        email: {
+          		[name]: '邮箱绑定',
+			        [GET]: true,
+			        [POST]: true,
+			        [PATCH]: true
+		        },
+		        verify: {
+          		[name]: '身份认证',
+			        [parameter]: {
+				        [GET]: true,
+				        [POST]: true
+			        }
+		        },
+		        social: {
+          		[name]: '社交账号',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        transaction: {
+          		[name]: '交易信息设置',
 			        [GET]: true,
 			        [PATCH]: true
 		        }
@@ -724,13 +772,6 @@ const certificates ={
 			    [POST]: true,
 			    [PATCH]: true
 		    }
-	    },
-	    auth: {
-		    [name]: '身份认证',
-		    [POST]: true, // 提交认证申请
-		    [parameter]: {
-			    [DELETE]: true
-		    }
 	    }
     },
     elseModifyTimeLimit: 0,
@@ -952,6 +993,15 @@ const certificates ={
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
+    	system: {
+				[name]: '网站系统',
+		    [GET]: true,
+		    settings: {
+					[name]: '系统设置',
+			    [GET]: true,
+			    [PATCH]: true
+		    }
+	    },
     	log: {
     		[name]: '网站日志',
 		    [GET]: true,
@@ -1013,11 +1063,18 @@ const certificates ={
       },
 	    auth: {
 		    [name]: '身份认证',
-		    [GET]: true,
-		    [parameter]: {
-		    	[GET]: true,
-			    [PATCH]: true,
-			    [DELETE]: true
+		    [GET]: true
+	    },
+	    u: {
+    		[parameter]: {
+    			auth: {
+    				[name]: '用户身份审核',
+				    [GET]: true,
+				    [parameter]: {
+    					[name]: '身份认证2，3',
+					    [PATCH]: true
+				    }
+			    }
 		    }
 	    }
     }

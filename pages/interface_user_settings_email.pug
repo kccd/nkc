@@ -1,0 +1,50 @@
+extends bootstrap_base
+block title
+  title 绑定邮箱
+  -const mainContainer1400 = true;
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 绑定邮箱
+          .panel-body
+            .form-horizontal
+              if data.operation === 'changeEmail'
+                input.hidden#oldToken(value=data.token)
+                .form-group
+                  label.col-sm-2.control-label 新邮箱：
+                  .col-sm-4
+                    input.form-control#email(type='email' placeholder='请输入新邮箱')
+                    p.text-success#emailInfo
+
+                .form-group
+                  .col-sm-4.col-sm-offset-2
+                    button.btn.btn-primary(onclick=`sendNewEmail(${data.user.uid})`) 提交
+
+              else if data.userEmail
+                .form-group
+                  label.col-sm-2.control-label 已绑定邮箱：
+                  .col-sm-4
+                    h4= data.userEmail
+                    p.text-success#emailInfo
+                .form-group
+                  .col-sm-4.col-sm-offset-2
+                    button.btn.btn-primary#changeBtn(onclick=`verifyOldEmail("${data.user.uid}", "${data.userEmail}")`) 更换邮箱
+
+              else
+                .form-group
+                  label.col-sm-2.control-label 邮箱：
+                  .col-sm-4
+                    input.form-control#email(type='email' placeholder='请输入邮箱')
+                    p.text-success#emailInfo
+
+                .form-group
+                  .col-sm-4.col-sm-offset-2
+                    button.btn.btn-primary(onclick=`sendBindEmail(${data.user.uid})`) 提交
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_settings_email.js')

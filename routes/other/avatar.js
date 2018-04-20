@@ -35,10 +35,12 @@ router
 		const {position} = body.fields;
 		const {file} = body.files;
 	  if(!file) ctx.throw(400, 'no file uploaded');
+	  const {path, type, size} = file;
+	  if(size > ctx.settings.upload.sizeLimit.photo) ctx.throw(400, '图片不能超过20M');
 	  const positionObj = JSON.parse(position);
+	  if(positionObj.width > 10000 || positionObj.height > 10000) ctx.throw(400, '截取的图片范围过小');
 	  const extArr = ['jpg', 'jpeg', 'png'];
 	  const {imageMagick} = tools;
-		const {path, type} = file;
 		const extension = mime.getExtension(type);
 		if(!extArr.includes(extension)) {
 			ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.');

@@ -30,7 +30,7 @@ block content
                   else
                     button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
                 if data.user && data.user.uid === data.targetUser.uid
-                  a(href='/me').btn.btn-default.btn-block
+                  a(href=`/u/${data.targetUser.uid}/settings`).btn.btn-default.btn-block
                     span.glyphicon.glyphicon-cog
                     span &nbsp;资料设置
                 if data.userLevel >= 4 && data.user.uid !== data.targetUser.uid
@@ -79,24 +79,21 @@ block content
                       strong= data.targetUserSubscribe.subscribeUsers.length
             .col-xs-12.col-md-12
               .row
-                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
-                  .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                    h5 注册时间
-                    h4
-                      strong= data.targetUser.toc.toLocaleString()
+                .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 注册时间
+                  h4
+                    strong= data.targetUser.toc.toLocaleString()
             .col-xs-12.col-md-12
               .row
-                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
-                  .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                    h5 最近登陆
-                    h4
-                      strong= fromNow(data.targetUser.tlv || data.targetUser.toc)
+                .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+                  h5 最近登陆
+                  h4
+                    strong= fromNow(data.targetUser.tlv || data.targetUser.toc)
             .col-xs-12.col-md-12
               .row
-                a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
-                  .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
-                    h5 个人简介
-                    p(style='color: #777777;')!= markdown_safe(data.targetUser.description || '暂未填写个人简介')
+                .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
+                  h5 个人简介
+                  p(style='color: #777777;')!= markdown_safe(data.targetUser.description || '暂未填写个人简介')
           .col-xs-12.col-md-7
             ul.nav.nav-pills.user-info-nav
               li(role="presentation" class=!data.type?'active':'')

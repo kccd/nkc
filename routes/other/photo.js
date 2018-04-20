@@ -2,9 +2,10 @@ const Router = require('koa-router');
 const photoRouter = new Router();
 const {photoPath, photoSmallPath, sizeLimit, generateFolderName} = require('../../settings/index').upload;
 const {photoify, photoSmallify, lifePhotoify} = require('../../tools').imageMagick;
+const path = require('path');
 photoRouter
 	.get('/:photoId', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data, db, fs} = ctx;
 		const {user, userLevel} = data;
 		const {photoId} = ctx.params;
 		const photo = await db.PhotoModel.findOnly({_id: photoId});
@@ -14,6 +15,17 @@ photoRouter
 			ctx.throw(403, '权限不足');
 		}
 		ctx.filePath = photoPath + photo.path;
+		if(photo.status === 'deleted') {
+			ctx.filePath = path.resolve(__dirname, '../../resources/default_things/deleted_photo.jpg');
+		}
+		if(photo.status === 'disabled') {
+			ctx.filePath = path.resolve(__dirname, '../../resources/default_things/disabled_photo.jpg');
+		}
+		try{
+			await fs.access(ctx.filePath);
+		} catch(err) {
+			ctx.filePath = path.resolve(__dirname, '../../resources/default_things/deleted_photo.jpg');
+		}
 		ctx.set('Cache-Control', 'public, no-cache');
 		const tlm = await ctx.fs.stat(ctx.filePath);
 		ctx.lastModified = new Date(tlm.mtime).toUTCString();
@@ -27,19 +39,19 @@ photoRouter
     const {photoType} = fields;
     let type;
 		switch(photoType) {
-			case '#idCardAPhoto':
+			case 'idCardA':
 				type = 'idCardA';
 				break;
-			case '#idCardBPhoto':
+			case 'idCardB':
 				type = 'idCardB';
 				break;
-			case '#handheldIdCardPhoto':
+			case 'handheldIdCard':
 				type = 'handheldIdCard';
 				break;
-			case '#certsPhoto':
+			case 'certs':
 				type = 'cert';
 				break;
-			case '#lifePhoto':
+			case 'life':
 				type = 'life';
 				break;
 			default:

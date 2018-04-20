@@ -3,7 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
 const settingSchema = new Schema({
-  uid: {
+  type: { // system, fund, kcb
     type: String,
     unique: true,
     required: true
@@ -40,14 +40,8 @@ const settingSchema = new Schema({
 	},
 	terms: String,
 	money: Number,
-	donationDescription: {
-  	type: String,
-		default: ''
-	},
-	fundPoolDescription: {
-		type: String,
-		default: ''
-	},
+	donationDescription: String,
+	fundPoolDescription: String,
 	closed: {
   	status: Boolean,
 		reason: String,
@@ -56,7 +50,12 @@ const settingSchema = new Schema({
 		uid: String,
 		username: String
 	},
-	readOnly: Boolean
+	readOnly: Boolean,
+
+	//科创币
+	//-------------------------------------
+	defaultUid: String,
+	changeUsername: Number
 },
 {toObject: {
   getters: true,
@@ -79,14 +78,14 @@ async function operateSystemID(type, op) {
   const attrObj = {};
   attrObj[counterType] = op;
   try {
-    setting = await this.findOneAndUpdate({uid: 'system'}, {$inc: attrObj});
+    setting = await this.findOneAndUpdate({type: 'system'}, {$inc: attrObj});
   } catch(e) {
     throw 'invalid id type, a type should be one of these [resources, users, posts, threadTypes, threads].'
   }
   let number = setting.counters[type];
   if(isNaN(number)) {
 		number = 0;
-		const settings = await this.findOnly({uid: 'system'});
+		const settings = await this.findOnly({type: 'system'});
 		const {counters} = settings;
 		counters[type] = op;
 		await settings.update({counters});
@@ -121,7 +120,7 @@ settingSchema.methods.extendAds = async function() {
 };
 
 /*let Setting = mongoose.model('settings', settingSchema);
-new Setting({uid: 'system',ads: [1], popPersonalForums:[1],counters:{
+new Setting({type: 'system',ads: [1], popPersonalForums:[1],counters:{
   resources: 1,
   users: 80000,
   posts: 850000,

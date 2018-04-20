@@ -2044,6 +2044,17 @@ img.emoji {
   margin: auto;
   background-color: #fb8282;
 }
+#uploadInfo{
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  color: #fff;
+  padding: 0.2rem 2rem;
+  background-color: rgba(0,0,0,0.7);
+  z-index:10 ;
+  display: none;
+  box-shadow: 3px 3px 8px #aaa;
+}
 .forum-span{
   padding: 0.5rem;
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
@@ -2185,6 +2196,22 @@ img.emoji {
 }
 #img_s{
   position: absolute;
+}
+.education-list{
+  margin-bottom: 0.5rem;
+}
+.industries-list{
+  margin-bottom: 1rem;
+}
+.account-list{
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+#address-div{
+  margin-bottom: 0.5rem;
+}
+.address-list>div{
+  margin-bottom: 0.5rem;
 }
 /*--------------*/
 @media screen and (max-width: 1133px) {

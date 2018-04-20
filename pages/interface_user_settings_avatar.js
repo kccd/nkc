@@ -14,6 +14,7 @@ function init() {
 	$('#element_id').Jcrop({
 		aspectRatio: 1,
 		onChange: updatePreview,
+		minSize: [50,50],
 		onSelect: updatePreview,
 	}, function() {
 		jcropApi = this;
@@ -95,6 +96,6 @@ function submit(uid) {
 			screenTopAlert('保存成功');
 		})
 		.fail(function(data) {
-			screenTopWarning(data.error);
+			screenTopWarning(JSON.parse(data.responseText).error);
 		})
 }

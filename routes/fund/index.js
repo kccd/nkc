@@ -14,11 +14,11 @@ fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		const fundSettings = await db.SettingModel.findOne({uid: 'fund'});
+		const fundSettings = await db.SettingModel.findOne({type: 'fund'});
 		data.fundSettings = fundSettings;
 		if(!fundSettings) {
 			const newSettings = db.SettingModel({
-				uid: 'fund',
+				type: 'fund',
 				description: '这是基金介绍',
 				terms: '这是科创基金总条款',
 				money: 0,

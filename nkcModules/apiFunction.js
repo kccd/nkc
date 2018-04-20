@@ -43,6 +43,15 @@ fn.sha256HMAC = (password,salt) => {
   hmac.update(password);
   return hmac.digest('hex')
 };
+fn.MD5 = (password, salt) => {
+	const crypto = require('crypto');
+	const md5 = (str) => {
+		const md5 = crypto.createHash('md5');
+		md5.update(str);
+		return md5.digest('hex');
+	};
+	return md5(md5(password)+salt);
+};
 fn.testPassword = (input,hashType,storedPassword) => {
   let pass = '';
   let hash = '';
@@ -54,7 +63,7 @@ fn.testPassword = (input,hashType,storedPassword) => {
       hash = storedPassword.hash;
       salt = storedPassword.salt;
 
-      hashed = md5(md5(pass)+salt);
+      hashed = fn.MD5(pass, salt);
       if(hashed!==hash){
         return false;
       }
@@ -66,6 +75,10 @@ fn.testPassword = (input,hashType,storedPassword) => {
       salt = storedPassword.salt;
 
       hashed = fn.sha256HMAC(pass,salt);
+      console.log(pass);
+      console.log(hash);
+      console.log(salt);
+      console.log(hashed);
       if(hashed!==hash){
         return false;
       }
@@ -104,10 +117,15 @@ fn.random = (n) => {
   }
   return Num;
 };
+
+fn.getEmailToken = () => {
+	return Math.floor((Math.random()*(65536*65536))).toString(16);
+};
+
 // 检查邮箱格式
 fn.checkEmailFormat = (email) => {
   let path = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-  return email.search(path);
+  return path.test(email);
 };
 
 fn.checkPass = (s) => {

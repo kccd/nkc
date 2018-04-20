@@ -20,29 +20,32 @@ block content
               .form-group
                 label.col-sm-2.control-label 真实姓名：
                 .col-sm-5
-                  input.form-control(placeholder='真实姓名' value=data.user.username)
+                  input.form-control#name(placeholder='真实姓名' value=data.personalInfo.name)
 
               .form-group
                 label.col-sm-2.control-label 性别：
                 .col-sm-5
                   label.radio-inline
-                    input(type='radio' name='gender')
+                    input(type='radio' name='gender' checked=data.personalInfo.gender === 'men')
                     span 男
 
                   label.radio-inline
-                    input(type='radio' name='gender')
+                    input(type='radio' name='gender' checked=data.personalInfo.gender === 'women')
                     span 女
+                  label.radio-inline
+                    input(type='radio' name='gender' checked=!data.personalInfo.gender)
+                    span 保密
 
               .form-group
                 label.col-sm-2.control-label 出生日期：
                 .col-sm-5
-                  input.form-control#timepicker(size="16" type="text" value="2012-05-15")
+                  input.form-control.time#birthDate(size="16" type="text" value=data.personalInfo.birthDate?data.personalInfo.birthDate.toLocaleDateString():'')
 
               .form-group
                 label.col-sm-2.control-label 所在地区：
                 .col-sm-5
                   .bs-chinese-region.flat.dropdown(data-submit-type="id", data-min-level="1", data-max-level="3")
-                    input#address.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="", value="")
+                    input#location.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="", data=data.personalInfo.location)
                     .dropdown-menu(role="menu", aria-labelledby="dLabel")
                       div
                         ul.nav.nav-tabs(role="tablist")
@@ -59,37 +62,28 @@ block content
               .form-group
                 label.col-sm-2.control-label 详细地址：
                 .col-sm-5
-                  input.form-control(placeholder='详细地址')
+                  input.form-control#address(placeholder='详细地址' value=data.personalInfo.address)
 
               .form-group
                 label.col-sm-2.control-label 教育背景：
                 .col-sm-10
-                  .education-list
-                    form.form-inline
-                      select.form-control
-                        option 小学
-                        option 初中
-                        option 高中
-                        option 中专
-                        option 大学
-                      -const minYear = 1900;
-                      -const maxYear = new Date().getFullYear();
-                      select.form-control
-                        option 入学时间
-                        -for(let i = maxYear; i >= minYear; i--)
-                          option= i
-                      input.form-control(type='text', placeholder='学校名称')
-                      input.form-control(type='text', placeholder='专业名称')
-                      button.btn.btn-success.btn-sm 保存
-                      button.btn.btn-danger.btn-sm 删除
-                      button.btn.btn-info.btn-sm 添加
+                  #education-div
+                  button.btn.btn-primary(onclick='addEdu();') 添加
+
+
+              .form-group
+                label.col-sm-2.control-label 职业信息 ：
+                .col-sm-10
+                  #industries-div
+                  button.btn.btn-primary(onclick='addInd();') 添加
 
 
 
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-5
-                  button.btn.btn-primary#save 保存
+                  button.btn.btn-primary#save(onclick=`submit(${data.user.uid})`) 保存
+              #data.hidden= JSON.stringify({education: data.education, industries: data.industries})
 block scripts
   script(src='/interface_common.js')
   script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")

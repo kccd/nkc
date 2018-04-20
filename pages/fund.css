@@ -793,17 +793,6 @@ input[type="radio"], input[type="checkbox"]{
   width: 100%;
   padding: 0.5rem;
 }
-#uploadInfo{
-  position: fixed;
-  bottom: 0.5rem;
-  right: 0.5rem;
-  color: #fff;
-  padding: 0.2rem 2rem;
-  background-color: rgba(0,0,0,0.7);
-  z-index:10 ;
-  display: none;
-  box-shadow: 3px 3px 8px #aaa;
-}
 .uploadFileInfo > span {
   word-wrap: break-word;
   word-break: break-all;
