@@ -1,7 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-
 const logSchema = new Schema({
   error: Object,
   method: {
@@ -39,6 +38,7 @@ const logSchema = new Schema({
 	  index: 1
   }
 });
+
 logSchema.virtual('user')
 	.get(function() {
 		return this._user;
@@ -52,4 +52,6 @@ logSchema.methods.extendUser = async function() {
 	return this.user = await UserModel.findOne({uid: this.uid});
 };
 
-module.exports = mongoose.model('logs', logSchema);
+const LogModel = mongoose.model('logs', logSchema);
+module.exports = LogModel;
+

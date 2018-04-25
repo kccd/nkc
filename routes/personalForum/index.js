@@ -21,7 +21,7 @@ router
     const personalForum = await PersonalForumModel.findOnly({uid});
     await personalForum.extendModerator();
     data.forum = personalForum;
-    const setting = await SettingModel.findOnly({uid: 'system'});
+    const setting = await SettingModel.findOnly({type: 'system'});
     data.popPersonalForums = setting.popPersonalForums;
     let {
       sortby = 'tlm',

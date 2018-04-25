@@ -44,6 +44,9 @@ billsRouter
 				}
 			}
 			b.balance = total;
+			if(data.userLevel < 7) {
+				b.otherInfo = {};
+			}
 		});
 		const count = bills.length;
 		const paging = apiFn.paging(page, count);

@@ -55,7 +55,7 @@ function submit() {
 	}
 	if(!obj.anonymous && !login) {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
-		return screenTopWarning('非匿名捐款要求用户必须登陆，请登录后再试。');
+		return screenTopWarning('非匿名捐款要求用户必须登录，请登录后再试。');
 	}
 	var newWindow = window.open();
 	nkcAPI('/fund/donation', 'POST', obj)

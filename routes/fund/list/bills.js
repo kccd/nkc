@@ -32,6 +32,9 @@ billsRouter
 				}
 			}
 			b.balance = total;
+			if(data.userLevel < 7) {
+				b.otherInfo = {};
+			}
 		});
 		data.balance = total;
 		const count = bills.length;

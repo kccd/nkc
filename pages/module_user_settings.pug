@@ -1,0 +1,62 @@
+.panel.panel-primary
+  #uploadInfo 文件已上传&nbsp;
+    span
+  .panel-heading
+    span.panel-titlePanel 资料设置
+  .list-group
+    a.list-group-item(href=`/u/${data.user.uid}/settings/avatar`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 头像设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/info`)
+      span.fa.fa-list-alt &nbsp;&nbsp;
+      span 基本资料设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/resume`)
+      span.fa.fa-id-card-o &nbsp;&nbsp;
+      span 简历设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/transaction`)
+      span.fa.fa-usd &nbsp;&nbsp;
+      span 交易信息设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/social`)
+      span.fa.fa-users &nbsp;&nbsp;
+      span 社交账号设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/photo`)
+      span.fa.fa-photo &nbsp;&nbsp;
+      span 我的照片
+    a.list-group-item(href=`/u/${data.user.uid}/settings/cert`)
+      span.fa.fa-id-badge &nbsp;&nbsp;
+      span 我的证件
+  .panel-heading
+    span.panel-titlePanel 账号安全
+  .list-group
+    a.list-group-item(href=`/u/${data.user.uid}/settings/password`)
+      span.fa.fa-eye-slash &nbsp;&nbsp;
+      span 密码修改
+    a.list-group-item(href=`/u/${data.user.uid}/settings/mobile`)
+      span.fa.fa-mobile-phone(style='font-size: 2rem;') &nbsp;&nbsp;
+      span 绑定手机号
+    a.list-group-item(href=`/u/${data.user.uid}/settings/email`)
+      span.fa.fa-envelope-o &nbsp;&nbsp;
+      span 绑定邮箱
+  .panel-heading
+    span.panel-titlePanel 身份认证
+  .list-group
+    a.list-group-item(href=`/u/${data.user.uid}/settings/verify/1`)
+      span.fa.fa-mobile(style='font-size: 2rem;') &nbsp;&nbsp;
+      span 身份认证1
+    if data.authLevel >= 1
+      a.list-group-item(href=`/u/${data.user.uid}/settings/verify/2`)
+        span.fa.fa-address-card-o &nbsp;&nbsp;
+        span 身份认证2
+    else
+      a.list-group-item.disabled
+        span.fa.fa-address-card-o &nbsp;&nbsp;
+          span 身份认证2
+
+    if data.authLevel >= 2
+      a.list-group-item(href=`/u/${data.user.uid}/settings/verify/3`)
+        span.fa.fa-id-card &nbsp;&nbsp;
+        span 身份认证3
+    else
+      a.list-group-item.disabled
+        span.fa.fa-id-card &nbsp;&nbsp;
+          span 身份认证3

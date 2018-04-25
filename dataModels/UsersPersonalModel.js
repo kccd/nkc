@@ -124,80 +124,145 @@ const usersPersonalSchema = new Schema({
     default: [],
   },
   industries: {
-    type: [
-      Schema.Types.Mixed
-      ,/*{
-      industry: {
-        type: String,
-        max: [30, '行业长度应小于30'],
-        required: true
-      },
-      duty: {
-        type: String,
-        max: [30, '职责长度应小于30'],
-        required: true
-      },
-      organization: {
-        type: String,
-        max: [30, '组织信息长度应小于30'],
-        required: true
-      },
-      id: {
-        type: Number,
-        required: true
+	  type: [Schema.Types.Mixed],
+	  default: []
+    /*type: [
+      {
+	      industry: {
+	        type: Number,
+	        required: true
+	      },
+	      duty: {
+	        type: Number,
+	        required: true
+	      },
+	      organization: {
+	        type: String,
+		      maxlength: [30, '组织信息长度应小于30'],
+	        required: true
+	      },
+	      occupation: {
+		      type: String,
+		      maxlength: [30, '职业名称长度应小于30'],
+		      required: true
+	      },
+	      timeB: {
+	      	type: Date,
+		      required: true
+	      },
+	      timeE: {
+	      	type: Date,
+		      required: true
+	      }
       }
-    }*/],
-    default: []
+    ],
+    default: []*/
   },
   education: {
-    type: [
-      Schema.Types.Mixed
-      /*{
-      school: {
-        type: String,
-        max: [30, '学校长度应小于30'],
-        required: true
-      },
-      major: {
-        type: String,
-        max: [30, '专业长度应小于30'],
-        required: true
-      },
-      degree: {
-        type: String,
-        max: [15, '学历长度应小于15'],
-        required: true
-      },
-      graduationDate: {
-        type: Date,
-        required: true
-      },
-      id: {
-        type: Number,
-        required: true
+  	type: [Schema.Types.Mixed],
+	  default: []
+    /*type: [
+      {
+	      school: {
+	        type: String,
+	        maxlength: [30, '学校长度应小于30'],
+	        required: true
+	      },
+	      major: {
+	        type: String,
+	        maxlength: [30, '专业长度应小于30'],
+		      default: ''
+	      },
+	      degree: {
+	        type: Number,
+	        required: true
+	      },
+	      timeB: {
+	        type: Date,
+	        required: true
+	      }
       }
-    }*/],
-    default: []
+    ],
+    default: []*/
   },
+	accounts: {
+		type: [Schema.Types.Mixed], //type, number
+		default: []
+	},
   personalInfo: {
-    type: {
-      QQ: {
-        type: String,
-        max: [12, 'QQ号码长度小于12'],
-        required: true
-      },
-      wechat: {
-        type: String,
-        max: [15, '微信长度应小于15'],
-        required: true
-      },
-      birthday: {
-        type: Date,
-        required: true
-      }
-    },
-    default: {}
-  }
+	  /*QQ: {
+		  type: String,
+		  max: [12, 'QQ号码长度小于12'],
+		  default: null
+	  },
+	  wechat: {
+		  type: String,
+		  max: [15, '微信长度应小于15'],
+		  default: null
+	  },*/
+	  birthDate: {
+		  type: Date,
+		  default: null
+	  },
+	  name: {
+		  type: String,
+		  maxlength: [10, '真实姓名长度应小于10'],
+		  default: null
+	  },
+	  address: {
+	  	type: String,
+		  maxlength: [100, '地址长度不能超过100'],
+		  default: null
+	  },
+	  location: {
+	  	type: String,
+		  maxlength: [20, '地区长度不能超过20'],
+		  default: null
+	  },
+	  gender: {
+	  	type: String,
+		  default: 'men'
+	  }
+  },
+	privacy: {
+  	// 0: 完全保密， 1：对我信任的人显示， 2：对学者显示， 3：对已登录用户显示， 4：完全公开
+		name: {
+			type: Number,
+			default: 3
+		},
+		gender: {
+			type: Number,
+			default: 4
+		},
+		birthDate: {
+			type: Number,
+			default: 3
+		},
+		location: {
+			type: Number,
+			default: 3
+		},
+		address: {
+			type: Number,
+			default: 1
+		},
+		education: {
+			type: Number,
+			default: 3
+		},
+		industry: {
+			type: Number,
+			default: 1
+		},
+		lifePhoto: {
+			type: Number,
+			default: 3
+		},
+		certPhoto: {
+			type: Number,
+			default: 1
+		}
+	}
 },
   {usePushEach: true});
 
@@ -238,9 +303,9 @@ usersPersonalSchema.methods.extendIdPhotos = async function() {
 	let idCardA = await PhotoModel.findOne({uid: this.uid, type: 'idCardA'}).sort({toc: -1});
 	let idCardB = await PhotoModel.findOne({uid: this.uid, type: 'idCardB'}).sort({toc: -1});
 	let handheldIdCard = await PhotoModel.findOne({uid: this.uid, type: 'handheldIdCard'}).sort({toc: -1});
-	if(idCardA && idCardA.status === 'deleted') idCardA = null;
+	/*if(idCardA && idCardA.status === 'deleted') idCardA = null;
 	if(idCardB && idCardB.status === 'deleted') idCardB = null;
-	if(handheldIdCard && handheldIdCard.status === 'deleted') handheldIdCard = null;
+	if(handheldIdCard && handheldIdCard.status === 'deleted') handheldIdCard = null;*/
 	return this.idPhotos = {
 		idCardB,
 		idCardA,
@@ -249,8 +314,8 @@ usersPersonalSchema.methods.extendIdPhotos = async function() {
 };
 
 usersPersonalSchema.methods.getAuthLevel = async function() {
-	const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();
 	if(!this.mobile) return 0;
+	const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();
 	if(!(idCardA && idCardA.status === 'passed' && idCardB && idCardB.status === 'passed')) return 1;
 	if(!(handheldIdCard && handheldIdCard.status === 'passed')) return 2;
 	return 3;

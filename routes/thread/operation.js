@@ -39,7 +39,7 @@ operationRouter
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(data.userLevel < 6) ctx.throw(403, '权限不足');
 		if(thread.disabled) ctx.throw(404, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const setting = await db.SettingModel.findOnly({uid: 'system'});
+		const setting = await db.SettingModel.findOnly({type: 'system'});
 		const ads = setting.ads;
 		const index = ads.findIndex((elem, i, arr) => elem === tid);
 		const targetUser = await thread.extendUser();

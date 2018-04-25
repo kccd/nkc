@@ -1,0 +1,7 @@
+/*!
+ * BootstrapSelection v0.1.0 (https://coding.net/u/packy/p/bootstrap-chinese-region/git)
+ * Copyright 2015 packy <lpreterite@126.com>
+ * Licensed under MIT (https://coding.net/u/packy/p/bootstrap-chinese-region/git/blob/master/LICENSE)
+ */
+
+.bs-chinese-region input[readonly]{cursor:pointer}.bs-chinese-region .dropdown-menu{padding-top:0;padding-bottom:0;width:100%}.bs-chinese-region .nav-tabs{background-color:#f5f5f5}.bs-chinese-region .nav-tabs>li>a{border-top:0}.bs-chinese-region .nav-tabs>li.active>a,.bs-chinese-region .nav-tabs>li.active>a:focus,.bs-chinese-region .nav-tabs>li.active>a:hover{border-top:0;border-right-color:#ddd}.bs-chinese-region .nav-tabs>li:first-child.active>a{border-left-color:transparent}.bs-chinese-region .tab-content>div{padding:10px;white-space:pre-wrap}.bs-chinese-region .areas-item{display:inline-block;margin-bottom:3px;padding:2px 8px}.bs-chinese-region .areas-item.current{background:#337ab7;color:#fff;border-radius:15px}.bs-chinese-region .nav-tabs,.bs-chinese-region.flat .dropdown-menu,.bs-chinese-region.flat .nav-tabs>li>a,.bs-chinese-region.flat input{border-radius:0}.bs-chinese-region.flat .nav-tabs>li>a{margin-right:0}@media screen and (min-width:768px){.bs-chinese-region .dropdown-menu{min-width:400px}}

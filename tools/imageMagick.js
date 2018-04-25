@@ -113,12 +113,14 @@ const bannerify = path => {
   return spawnProcess('magick', ['convert', path, '-resize', `${banner.width}x${banner.height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${banner.width}x${banner.height}+0+0`, path]);
 };
 
-const avatarify = path => {
-  if(linux) {
-    return spawnProcess('convert', [path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-gravity', 'Center', '-crop', `${avatarSize}x${avatarSize}+0+0`, path]);
-  }
-  return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-gravity', 'Center', '-crop', `${avatarSize}x${avatarSize}+0+0`, path]);
+const avatarify = (options) => {
+	const {top, left, width, height, path, targetPath} = options;
+	if(linux) {
+		return spawnProcess('convert', [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath]);
 };
+
 
 const avatarSmallify = (path, dest) => {
   if(linux) {
@@ -149,9 +151,9 @@ const photoify = (filePath, targetPath) => {
 const photoSmallify = (filePath, targetPath) => {
 	const {height, width} = sizeLimit.photoSmall;
 	if(linux) {
-		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}`, '-gravity', 'center', '-extent', `${width}x${height}`, targetPath])
 	}
-	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}`, '-gravity', 'center', '-extent', `${width}x${height}`, targetPath])
 };
 
 const fundBannerify = (filePath, targetPath) => {

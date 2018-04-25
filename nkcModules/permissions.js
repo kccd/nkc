@@ -218,7 +218,7 @@ module.exports = async (ctx, next) => {
   if(!ctx.data.ensurePermission()) {
   	if(ctx.data.ensurePermission(ctx.method, ctx.path, adminCertificates.permittedOperations)){
 		  if(ctx.data.userLevel < 0) {
-			  ctx.throw(403, '您的账号已被封禁，请退出登陆后重新注册。');
+			  ctx.throw(403, '您的账号已被封禁，请退出登录后重新注册。');
 		  }
 			//403
 		  ctx.throw(403, '您没有权限访问该资源。');
