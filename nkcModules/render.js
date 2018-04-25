@@ -130,21 +130,19 @@ function filterQuote(content) {
 }
 
 function hideContentByUser(content, user={xsf: 0}, from) {
-	return content.replace(/\[hide=[0-9]+][\s\S]*\[\/hide]/, function(c){
-		const indexStart = c.indexOf(']');
-		const number = c.slice(6, indexStart);
-		if(user.xsf < number) {
+	return content.replace(/\[hide=([0-9]{1,3}).*]([\s\S]*)\[\/hide]/, function(c, number, content){
+		number = parseInt(number);
+		if(user.xsf >= number) {
+			if(from === 'thread') {
+				return c;
+			} else {
+				return content;
+			}
+		} else {
 			if(from === 'thread') {
 				return `[hide=${number}]内容已隐藏[/hide]`;
 			} else {
 				return '';
-			}
-		} else {
-			if(from === 'thread') {
-				return c;
-			} else {
-				const indexEnd = c.indexOf('[/hide]');
-				return c.slice(7+(''+number).length, indexEnd);
 			}
 		}
 	})
