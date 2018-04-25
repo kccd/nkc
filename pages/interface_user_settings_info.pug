@@ -17,8 +17,15 @@ block content
               .form-group
                 label.col-sm-2.control-label 用户名：
                 .col-sm-5
-                  input.form-control#username(placeholder='请输入用户名' value=data.user.username)
-                  span.text-danger *修改一次用户名将花费200个科创币
+                  h4= data.user.username
+                    span &nbsp;&nbsp;
+                    button.btn.btn-primary.btn-sm(onclick='changeUsername()') 修改
+                  #usernameInput(style='display: none;')
+                    if data.user.kcb < data.KCBSettings.changeUsername
+                      span.text-danger=`修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币，您当前的科创币不足。`
+                    else
+                      span.text-danger=`*修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币`
+                      input.form-control#username(placeholder='请输入新的用户名')
 
               .form-group
                 label.col-sm-2.control-label 个人简介：

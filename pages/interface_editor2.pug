@@ -11,7 +11,7 @@ block content
             .col-xs-12.f12
               h1 尚未登录
               span 请先
-              a(href='/login') 登陆
+              a(href='/login') 登录
       else
         #editor
         script(type='text')#data #{JSON.stringify({target: data.replytarget, post: data.original_post, threadTypeList: data.threadtypes})}

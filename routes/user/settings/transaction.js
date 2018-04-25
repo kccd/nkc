@@ -14,6 +14,14 @@ transactionRouter
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
 		const {addresses} = body;
+		reg = /^[0-9]*$/;
+		for(let a of addresses) {
+			if(a.mobile) {
+				if(!reg.test(a.mobile)) {
+					ctx.throw(400, '电话号码格式不正确');
+				}
+			}
+		}
 		await userPersonal.update({addresses});
 		await next();
 	});

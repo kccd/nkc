@@ -23,8 +23,6 @@ var email={
 };
 
 function sendBindEmail(uid) {
-	var emailInfo = $('#emailInfo');
-	emailInfo.html('');
 	var obj = {
 		email: $('#email').val(),
 		operation: 'bindEmail'
@@ -36,10 +34,10 @@ function sendBindEmail(uid) {
 		.then(function() {
 			var url = obj.email.split('@')[1];
 			var href = email[url] || '###';
-			var spanHTML = $('<span>邮件已发送至：</span>');
 			var aHTML = $('<a href="'+href+'" target="_blank">'+obj.email+'</a>');
-			emailInfo.append(spanHTML);
-			emailInfo.append(aHTML);
+			$('#emailInfo').html(aHTML);
+			$('#bindEmailDiv').show();
+			$('input[name="email"]').val(obj.email);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
@@ -47,7 +45,6 @@ function sendBindEmail(uid) {
 }
 
 function verifyOldEmail(uid, oldEmail) {
-	var emailInfo = $('#emailInfo');
 	var obj = {
 		operation: 'verifyOldEmail'
 	};
@@ -56,10 +53,9 @@ function verifyOldEmail(uid, oldEmail) {
 			$('#changeBtn').text('重新发送邮件');
 			var url = oldEmail.split('@')[1];
 			var href = email[url] || '###';
-			var spanHTML = $('<span>邮件已发送至：</span>');
 			var aHTML = $('<a href="'+href+'" target="_blank">'+oldEmail+'</a>');
-			emailInfo.append(spanHTML);
-			emailInfo.append(aHTML);
+			$('#oldEmail').html(aHTML);
+			$('#verifyOldEmailDiv').show();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
@@ -67,7 +63,6 @@ function verifyOldEmail(uid, oldEmail) {
 }
 
 function sendNewEmail(uid) {
-	var emailInfo = $('#emailInfo');
 	var obj = {
 		oldToken: $('#oldToken').val(),
 		email: $('#email').val(),
@@ -80,12 +75,18 @@ function sendNewEmail(uid) {
 		.then(function() {
 			var url = obj.email.split('@')[1];
 			var href = email[url] || '###';
-			var spanHTML = $('<span>邮件已发送至：</span>');
 			var aHTML = $('<a href="'+href+'" target="_blank">'+obj.email+'</a>');
-			emailInfo.append(spanHTML);
-			emailInfo.append(aHTML);
+			$('#newEmail').html(aHTML);
+			$('input[name="email"]').val(obj.email);
+			$('#verifyNewEmailDiv').show();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
 		})
+}
+
+
+function displayChangeDiv() {
+	$('#changeSwitch').hide();
+	$('#changeBtnDiv').show();
 }

@@ -317,7 +317,7 @@ const certificates ={
     displayName: '开除学籍',
     permittedOperations: {
       me: {
-        [GET]: true
+        [GET]: false
       },
       logout: {
         [GET]: true
@@ -529,28 +529,38 @@ const certificates ={
           		[name]: '交易信息设置',
 			        [GET]: true,
 			        [PATCH]: true
+		        },
+		        photo: {
+          		[name]: '照片',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        cert: {
+          		[name]: '证件',
+			        [GET]: true,
+			        [PATCH]: true
 		        }
 	        }
         }
       },
       me: {
-        [PATCH]: true,
-        [GET]: true,
+        [PATCH]: false,
+        [GET]: false,
         settings: {
           [name]: '个人信息',
-          [PATCH]: true
+          [PATCH]: false
         },
         password: {
           [name]: '密码',
-          [PATCH]: true
+          [PATCH]: false
         },
         username: {
           [name]: '用户名',
-          [PATCH]: true
+          [PATCH]: false
         },
         mobile: {
           [name]: '手机',
-          [POST]: true
+          [POST]: false
         },
         resource: {
           [name]: '上传的资源',
@@ -558,36 +568,11 @@ const certificates ={
         },
         activities: {
           [name]: '个人动态',
-          [GET]: true
+          [GET]: false
         },
         threads: {
           [name]: '获取帖子',
           [GET]: true
-        },
-        addresses: {
-          [name]: '地址管理',
-          [POST]: true,
-          [parameter]: {
-            [DELETE]: true
-          }
-        },
-        industries: {
-          [name]: '工作情况管理',
-          [POST]: true,
-          [parameter]: {
-            [DELETE]: true
-          }
-        },
-        education: {
-          [name]: '教育情况管理',
-          [POST]: true,
-          [parameter]: {
-            [DELETE]: true
-          }
-        },
-        personal_info: {
-          [name]: '详细设置',
-          [POST]: true
         },
 	      life_photos: {
         	[name]: '生活照',
@@ -737,40 +722,6 @@ const certificates ={
 		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
-		    }
-	    },
-	    set: {
-      	[name]: '个人资料设置',
-		    [GET]: true,
-		    info: {
-      		[name]: '基本信息',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    security: {
-					[name]: '账号安全',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    verify: {
-      		[name]: '身份认证',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    cert: {
-      		[name]: '我的证书',
-			    [GET]:true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    album: {
-      		[name]: '我的相册',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
 		    }
 	    }
     },

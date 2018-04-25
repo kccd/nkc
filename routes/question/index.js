@@ -7,7 +7,7 @@ questionRouter
   .get('/', async (ctx, next) => {
     const {data} = ctx;
     const {user} = data;
-    if(!user) ctx.throw(403, '你还没有登陆，请登录后再试。');
+    if(!user) ctx.throw(403, '你还没有登录，请登录后再试。');
     data.questions = await dbFn.getQuestionsByQuery();
     data.userQuestions = await dbFn.getQuestionsByQuery({uid: user.uid});
     data.numberByCategory = await dbFn.questionCountOfCategory();
@@ -19,7 +19,7 @@ questionRouter
     const {data, db} = ctx;
     const user = data.user;
     const {category} = ctx.params;
-    if(!user) ctx.throw(403, '你还没有登陆，请登录后再试。');
+    if(!user) ctx.throw(403, '你还没有登录，请登录后再试。');
     data.questions = await dbFn.getQuestionsByQuery({category: category});
     data.userQuestions = await dbFn.getQuestionsByQuery({uid: user.uid});
     data.numberByCategory = await dbFn.questionCountOfCategory();

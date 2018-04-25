@@ -21,11 +21,6 @@ block content
                   .row#address-div
                   button.btn.btn-primary(onclick='addAddress()') 添加
               .form-group
-                label.col-sm-2.control-label 交易账号：
-                .col-sm-10
-                  .row#account
-                  button.btn.btn-primary(onclick='addAddress()') 添加
-              .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
   #data.hidden= JSON.stringify({addresses: data.addresses})

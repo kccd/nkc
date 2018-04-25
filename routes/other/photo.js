@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const photoRouter = new Router();
-const {photoPath, photoSmallPath, sizeLimit, generateFolderName} = require('../../settings/index').upload;
+const {photoPath, photoSmallPath, sizeLimit, generateFolderName, lifePhotoCount, certPhotoCount} = require('../../settings/index').upload;
 const {photoify, photoSmallify, lifePhotoify} = require('../../tools').imageMagick;
 const path = require('path');
 photoRouter
@@ -11,6 +11,39 @@ photoRouter
 		const photo = await db.PhotoModel.findOnly({_id: photoId});
 		if(photo.type === 'fund') {
 			// const applicationForm = db.FundApplicationFormModel.findOnly({_id: photo.applicationFormId});
+		} else if(['life', 'cert'].includes(photo.type)) {
+			const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: photo.uid});
+			let displayPhoto;
+			if(photo.type === 'life') {
+				displayPhoto = targetUserPersonal.privacy.lifePhoto;
+			} else {
+				displayPhoto = targetUserPersonal.privacy.certPhoto;
+			}
+			if(!user) {
+				if(displayPhoto !== 4) {
+					ctx.throw(403, '权限不足');
+				}
+			} else {
+				if(user.uid !== photo.uid && userLevel < 7) {
+					if(displayPhoto === 0) {
+						ctx.throw(403, '权限不足');
+					} else if(displayPhoto === 1) {
+						const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: photo.uid});
+						const {subscribeUsers} = targetUserSubscribe;
+						if (!subscribeUsers.includes(user.uid)) {
+							ctx.throw(403, '权限不足');
+						}
+					} else if(displayPhoto === 2){
+						if(user.xsf <= 0) {
+							ctx.throw(403, '权限不足');
+						}
+					} else {
+
+					}
+				}
+			}
+		} else if(!user) {
+			ctx.throw(403, '权限不足');
 		} else if(photo.uid !== user.uid && userLevel < 7) {
 			ctx.throw(403, '权限不足');
 		}
@@ -48,7 +81,7 @@ photoRouter
 			case 'handheldIdCard':
 				type = 'handheldIdCard';
 				break;
-			case 'certs':
+			case 'cert':
 				type = 'cert';
 				break;
 			case 'life':
@@ -57,8 +90,28 @@ photoRouter
 			default:
 				ctx.throw(400, '未知的图片类型');
 		}
+	  if(type === 'life') {
+		  const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		  const lifePhotos = await userPersonal.extendLifePhotos();
+		  if(lifePhotos.length >= lifePhotoCount) {
+			  ctx.throw(400, `上传的照片不能超过${lifePhotoCount}张`);
+		  }
+	  }
+	  if(type === 'cert') {
+		  const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		  const certsPhotos = await userPersonal.extendCertsPhotos();
+		  if(certsPhotos.length >= certPhotoCount) {
+			  ctx.throw(400, `上传的证件照片不能超过${certPhotoCount}张`);
+		  }
+	  }
+
     const file = files.file;
     const {size, name, path} = file;
+    const extArr = name.split('.');
+    const ext = extArr[extArr.length-1];
+    if(!['jpg', 'jpeg', 'png'].includes(ext.toLowerCase())) {
+    	ctx.throw(400, '图片格式只能为jpg、jpeg或png');
+    }
     if(size > sizeLimit.photo) ctx.throw(400, '图片大小不能超过20M！');
     const photoId = await db.SettingModel.operateSystemID('photos', 1);
     const filePath = photoId + '.jpg';

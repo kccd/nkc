@@ -151,9 +151,9 @@ const photoify = (filePath, targetPath) => {
 const photoSmallify = (filePath, targetPath) => {
 	const {height, width} = sizeLimit.photoSmall;
 	if(linux) {
-		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}`, '-gravity', 'center', '-extent', `${width}x${height}`, targetPath])
 	}
-	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath])
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}`, '-gravity', 'center', '-extent', `${width}x${height}`, targetPath])
 };
 
 const fundBannerify = (filePath, targetPath) => {

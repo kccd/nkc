@@ -9,9 +9,17 @@ function initTime() {
 		forceParse: 0
 	});
 }
+var privacy = {
+	name: 0,
+	gender: 0,
+	birthDate: 0,
+	location: 0,
+	address: 0,
+	education: 0,
+	industry: 0
+};
 
-
-$.getJSON('/sql_areas.json',function(data){
+$.getJSON('/location.json',function(data){
 	for (var i = 0; i < data.length; i++) {
 		var area = {id:data[i].id,name:data[i].cname,level:data[i].level,parentId:data[i].upid};
 		data[i] = area;
@@ -22,104 +30,44 @@ $.getJSON('/sql_areas.json',function(data){
 
 var eduName = [
 	{
-		id: 1,
+		id: 10,
 		name: '小学'
 	},
 	{
-		id: 2,
+		id: 20,
 		name: '初中'
 	},
 	{
-		id: 3,
+		id: 30,
 		name: '高中'
 	},
 	{
-		id: 4,
-		name: '大学'
+		id: 40,
+		name: '中专'
 	},
 	{
-		id: 5,
+		id: 50,
+		name: '大专'
+	},
+	{
+		id: 60,
+		name: '本科'
+	},
+	{
+		id: 70,
 		name: '硕士'
 	},
 	{
-		id: 6,
+		id: 80,
 		name: '博士'
 	}
-];
-
-var indName = [
-	{ id: 0, name: 'IT|通信|电子|互联网', level: 1 },
-	{ id: 1, name: '金融业', level: 1 },
-	{ id: 2, name: '房地产|建筑业', level: 1 },
-	{ id: 3, name: '商业服务', level: 1 },
-	{ id: 4, name: '贸易|批发|零售|租赁业', level: 1 },
-	{ id: 5, name: '文体教育|工艺美术', level: 1 },
-	{ id: 6, name: '生产|加工|制造', level: 1 },
-	{ id: 7, name: '交通|运输|物流|仓储', level: 1 },
-	{ id: 8, name: '服务业', level: 1 },
-	{ id: 9, name: '文化|传媒|娱乐|体育', level: 1 },
-	{ id: 10, name: '能源|矿产|环保', level: 1 },
-	{ id: 11, name: '政府|非盈利机构', level: 1 },
-	{ id: 12, name: '农|林|牧|渔|其他', level: 1 },
-	{ id: 13, name: '互联网/电子商务', parentId: 0, level: 2 },
-	{ id: 14, name: '计算机软件', parentId: 0, level: 2 },
-	{ id: 15, name: 'IT服务(系统/数据/维护)', parentId: 0, level: 2 },
-	{ id: 16, name: '电子技术/半导体/集成电路', parentId: 0, level: 2 },
-	{ id: 17, name: '计算机硬件', parentId: 0, level: 2 },
-	{ id: 18, name: '通信/电信/网络设备', parentId: 0, level: 2 },
-	{ id: 19, name: '通信/电信运营、增值服务', parentId: 0, level: 2 },
-	{ id: 20, name: '网络游戏', parentId: 0, level: 2 },
-	{ id: 21, name: '基金/证券/期货/投资', parentId: 1, level: 2 },
-	{ id: 22, name: '保险', parentId: 1, level: 2 },
-	{ id: 23, name: '银行', parentId: 1, level: 2 },
-	{ id: 24, name: '信托/担保/拍卖/典当', parentId: 1, level: 2 },
-	{ id: 25, name: '房地产/建筑/建材/工程', parentId: 2, level: 2 },
-	{ id: 26, name: '家居/室内设计/装饰装潢', parentId: 2, level: 2 },
-	{ id: 27, name: '物业管理/商业中心', parentId: 2, level: 2 },
-	{ id: 28, name: '专业服务/咨询(财会/法律/人力资源等)', parentId: 3, level: 2 },
-	{ id: 29, name: '广告/会展/公关', parentId: 3, level: 2 },
-	{ id: 30, name: '中介服务', parentId: 3, level: 2 },
-	{ id: 31, name: '检验/检测/认证', parentId: 3, level: 2 },
-	{ id: 32, name: '外包服务', parentId: 3, level: 2 },
-	{ id: 33, name: '快速消费品（食品/饮料/烟酒/日化）', parentId: 4, level: 2 },
-	{ id: 34, name: '耐用消费品（服饰/纺织/皮革/家具/家电）', parentId: 4, level: 2 },
-	{ id: 35, name: '贸易/进出口', parentId: 4, level: 2 },
-	{ id: 36, name: '零售/批发', parentId: 4, level: 2 },
-	{ id: 37, name: '租赁服务', parentId: 4, level: 2 },
-	{ id: 38, name: '教育/培训/院校', parentId: 5, level: 2 },
-	{ id: 39, name: '礼品/玩具/工艺美术/收藏品/奢侈品', parentId: 5, level: 2 },
-	{ id: 40, name: '汽车/摩托车', parentId: 6, level: 2 },
-	{ id: 41, name: '大型设备/机电设备/重工业', parentId: 6, level: 2 },
-	{ id: 42, name: '加工制造（原料加工/模具）', parentId: 6, level: 2 },
-	{ id: 43, name: '仪器仪表及工业自动化', parentId: 6, level: 2 },
-	{ id: 44, name: '印刷/包装/造纸', parentId: 6, level: 2 },
-	{ id: 45, name: '办公用品及设备', parentId: 6, level: 2 },
-	{ id: 46, name: '医药/生物工程', parentId: 6, level: 2 },
-	{ id: 47, name: '医疗设备/器械', parentId: 6, level: 2 },
-	{ id: 48, name: '航空/航天研究与制造', parentId: 6, level: 2 },
-	{ id: 49, name: '交通/运输', parentId: 7, level: 2 },
-	{ id: 50, name: '物流/仓储', parentId: 7, level: 2 },
-	{ id: 51, name: '医疗/护理/美容/保健/卫生服务', parentId: 8, level: 2 },
-	{ id: 52, name: '酒店/餐饮', parentId: 8, level: 2 },
-	{ id: 53, name: '旅游/度假', parentId: 8, level: 2 },
-	{ id: 54, name: '媒体/出版/影视/文化传播', parentId: 9, level: 2 },
-	{ id: 55, name: '娱乐/体育/休闲', parentId: 9, level: 2 },
-	{ id: 56, name: '能源/矿产/采掘/冶炼', parentId: 10, level: 2 },
-	{ id: 57, name: '石油/石化/化工', parentId: 10, level: 2 },
-	{ id: 58, name: '电气/电力/水利', parentId: 10, level: 2 },
-	{ id: 59, name: '环保', parentId: 10, level: 2 },
-	{ id: 60, name: '政府/公共事业/非盈利机构', parentId: 11, level: 2 },
-	{ id: 61, name: '学术/科研', parentId: 11, level: 2 },
-	{ id: 62, name: '农/林/牧/渔', parentId: 12, level: 2 },
-	{ id: 63, name: '跨领域经营', parentId: 12, level: 2 },
-	{ id: 64, name: '其他', parentId: 12, level: 2 }
 ];
 
 var data = JSON.parse($('#data').text());
 
 var education = data.education;
 var industries= data.industries;
-
+var indName = data.forumsObj;
 function educationRender(arr) {
 	var div = $('<div></div>');
 	for(var i = 0; i < arr.length; i++) {
@@ -140,7 +88,7 @@ function industriesRender(arr) {
 
 function addEduElement(obj, i) {
 	var educationList = $('<div class="education-list"></div>');
-	var form = $('<form class="form-inline"></form>');
+	var form = $('<div class="form-inline"></div>');
 	var select = $('<select class="form-control" id="eduName'+i+'" onchange="changeSelect('+i+', this.value)"></select> ');
 	for(var j = 0; j < eduName.length; j++) {
 		var selected = '';
@@ -150,9 +98,9 @@ function addEduElement(obj, i) {
 		var option = $('<option '+selected+'>'+eduName[j].name+'</option> ');
 		select.append(option);
 	}
-	var timeInput = $('<input class="form-control time" id="eduTime'+i+'" size="7" type="text" placeholder="入学时间" value="'+obj.timeB+'"> ');
+	var timeInput = $('<input readonly class="form-control time" id="eduTime'+i+'" size="7" type="text" placeholder="入学时间" value="'+obj.timeB+'"> ');
 	var schoolInput = $('<input class="form-control" id="eduSchool'+i+'" type="text" placeholder="学校名称" value="'+obj.school+'"> ');
-	var majorInput = $('<input class="form-control" id="eduMajor'+i+'" type="text" placeholder="专业名称" value="'+obj.major+'" style="'+(obj.degree > 3?'':'display: none;')+'"> ');
+	var majorInput = $('<input class="form-control" id="eduMajor'+i+'" type="text" placeholder="专业名称" value="'+obj.major+'" style="'+(obj.degree > 30?'':'display: none;')+'"> ');
 	var deleteBtn = $('<button class="btn btn-danger btn-sm" onclick="deleteEdu('+i+')" id="edu'+i+'DeleteBtn">删除</button> ');
 	form.append(select);
 	form.append('&nbsp;');
@@ -169,8 +117,15 @@ function addEduElement(obj, i) {
 }
 
 function addIndElement(obj, i) {
+	var getDivByClass = function(klass) {
+		return $('<div class="'+klass+'"></div>');
+	};
+	var getInfo = function(t) {
+		return $('<h5>'+t+'</h5>');
+	};
 	var industriesList = $('<div class="industries-list"></div>');
-	var form = $('<form class="form-inline"></form>');
+	var form = $('<div class="form"></div>');
+	var row = $('<div class="row"></div>');
 	var indSelect = $('<select class="form-control" onchange="selectInd('+i+', this.value)"></select>');
 	var dutySelect = $('<select class="form-control" onchange="selectDuty('+i+', this.value)" id="duty'+i+'"></select>');
 	for(var j = 0; j < indName.length; j++) {
@@ -192,27 +147,48 @@ function addIndElement(obj, i) {
 			dutySelect.append(option);
 		}
 	}
-	var occu = $('<input type="text" class="form-control" id="indOccu'+i+'" placeholder="职位名称" value="'+obj.occupation+'">');
-	var br = $('<br>');
-	var org = $('<input type="text" class="form-control" id="indOrg'+i+'" placeholder="公司名称" value="'+obj.organization+'">');
-	var timeB = $('<input type="text" class="form-control time" id="indTimeB'+i+'" size="8" placeholder="入职时间" value="'+obj.timeB+'">');
-	var timeE = $('<input type="text" class="form-control time" id="indTimeE'+i+'" size="8" placeholder="离职时间" value="'+obj.timeE+'">');
+	var col1 = getDivByClass('col-xs-4 col-md-4');
+	col1.append(getInfo('行业分类'));
+	col1.append(indSelect);
+	var col2 = getDivByClass('col-xs-4 col-md-4');
+	col2.append(getInfo('&nbsp;'));
+	col2.append(dutySelect);
+	var occu = $('<input type="text" class="form-control" id="indOccu'+i+'" placeholder="职位名称" value="'+(obj.occupation || '')+'">');
+	col3 = getDivByClass('col-xs-12 col-md-4');
+	col3.append(getInfo('职位名称'));
+	col3.append(occu);
+	var br = getDivByClass('col-xs-12 col-md-12');
+	var org = $('<input type="text" class="form-control" id="indOrg'+i+'" placeholder="单位名称" value="'+(obj.organization || '')+'">');
+	var col4 = getDivByClass('col-xs-12 col-md-4');
+	col4.append(getInfo('单位名称'));
+	col4.append(org);
+	var col44 = getDivByClass('row').append(getDivByClass('col-xs-12 col-md-12').append(col4));
+	var timeB = $('<input readonly type="text" class="form-control time" id="indTimeB'+i+'" size="8" placeholder="入职日期" value="'+(obj.timeB || '')+'">');
+	var col5 = getDivByClass('col-xs-12 col-md-3');
+	col5.append(getInfo('入职日期'));
+	col5.append(timeB);
+	var timeE = $('<input readonly type="text" class="form-control time" id="indTimeE'+i+'" size="8" placeholder="离职日期" value="'+(obj.timeE || '')+'">');
+	var col6 = getDivByClass('col-xs-12 col-md-3');
+	col6.append(getInfo('离职日期'));
+	col6.append(timeE);
+	var text = $('<textarea class="form-control" rows="5" placeholder="工作内容简介" id="indDes'+i+'">'+(obj.description || '')+'</textarea>');
+	var col7 = getDivByClass('col-xs-12 col-md-12');
+	col7.append(getInfo('工作内容简介'));
+	col7.append(text);
 	var deleteBtn = $('<button class="btn btn-danger btn-sm" onclick="deleteInd('+i+')" id="ind'+i+'DeleteBtn">删除</button> ');
-	form.append(indSelect);
-	form.append('&nbsp;');
-	form.append(dutySelect);
-	form.append('&nbsp;');
-	form.append(occu);
-	form.append('&nbsp;');
-	form.append(br);
-	form.append(org);
-	form.append('&nbsp;');
-	form.append(timeB);
-	form.append('&nbsp;');
-	form.append(timeE);
-	form.append('&nbsp;');
-	form.append(deleteBtn);
-	form.append('&nbsp;');
+	var btn = getDivByClass('col-xs-12 col-md-12');
+	btn.append($("<br>"));
+	btn.append(deleteBtn);
+	row.append(col1);
+	row.append(col2);
+	row.append(br);
+	row.append(col44);
+	row.append(col3);
+	row.append(col5);
+	row.append(col6);
+	row.append(col7);
+	row.append(btn);
+	form.append(row);
 	industriesList.append(form);
 	form.append('&nbsp;');
 	return industriesList;
@@ -257,8 +233,8 @@ function addInd() {
 	var obj = {
 		timeB: '',
 		timeE: '',
-		industry: 0,
-		duty: 14,
+		industry: '5',
+		duty: '81',
 		occupation: '',
 		organization: ''
 	};
@@ -281,7 +257,15 @@ function load() {
 		e.timeE = $('#indTimeE'+i).val();
 		e.occupation = $('#indOccu'+i).val();
 		e.organization = $('#indOrg'+i).val();
+		e.description = $('#indDes'+i).val();
 	}
+	loadDisplayResume('name');
+	loadDisplayResume('gender');
+	loadDisplayResume('birthDate');
+	loadDisplayResume('location');
+	loadDisplayResume('address');
+	loadDisplayResume('education');
+	loadDisplayResume('industry');
 }
 
 
@@ -294,7 +278,7 @@ function changeSelect(j, value) {
 		}
 	}
 	education[j].degree = id;
-	if(id < 4) {
+	if(id < 40) {
 		$('#eduMajor'+j).css('display', 'none');
 	} else {
 		$('#eduMajor'+j).css('display', '');
@@ -345,15 +329,14 @@ function submit(uid) {
 		name: $('#name').val(),
 		birthDate: $('#birthDate').val(),
 		address: $('#address').val(),
-		location: $('#location').val()
+		location: $('#location').val(),
+		privacy: privacy
 	};
 	var arr = $('input[name="gender"]');
 	if(arr.eq(0).is(':checked')) {
 		obj.gender = 'men';
-	} else if(arr.eq(1).is(':checked')) {
-		obj.gender = 'women';
 	} else {
-		obj.gender = ''
+		obj.gender = 'women';
 	}
 	nkcAPI('/u/'+uid+'/settings/resume', 'PATCH', obj)
 		.then(function() {
@@ -365,4 +348,29 @@ function submit(uid) {
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
 		})
+}
+
+$('#countryLi').on('click', function() {
+	$('#province').html('--');
+	$('#city').html('--');
+	$('#district').html('--');
+});
+
+
+function loadDisplayResume(id) {
+	var optionArr = [];
+	var arr = $('#'+id+'Select option');
+	for(var i = 0; i < arr.length; i++) {
+		optionArr.push({
+			data: arr.eq(i).attr('data'),
+			text: arr.eq(i).text()
+		});
+	}
+	var select = $('#'+id+'Select');
+	for(var i = 0; i < optionArr.length; i++) {
+		if(select.val() === optionArr[i].text) {
+			privacy[id] = optionArr[i].data;
+			break;
+		}
+	}
 }

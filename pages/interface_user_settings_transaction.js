@@ -75,9 +75,14 @@ function deleteAddress(i) {
 }
 
 function load() {
+	var reg = /^[0-9]*$/;
 	for(var i = 0; i < addresses.length; i++) {
 		addresses[i].address = $('#address'+i).val();
-		addresses[i].mobile = $('#mobile'+i).val();
+		var mobile = $('#mobile'+i).val();
+		if(!reg.test(mobile)) {
+			throw '电话号码格式不正确';
+		}
+		addresses[i].mobile = mobile;
 		addresses[i].username = $('#username'+i).val();
 	}
 }
@@ -88,7 +93,11 @@ $(function() {
 
 
 function submit(uid) {
-	load();
+	try {
+		load();
+	} catch(err) {
+		return screenTopWarning(err);
+	}
 	var obj = {
 		addresses: addresses
 	};

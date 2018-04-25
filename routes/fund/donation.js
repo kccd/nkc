@@ -41,7 +41,7 @@ donationRouter
 			}
 		}
 		const {user} = data;
-		if(!anonymous && !user) ctx.throw(400, '非匿名捐款要求用户必须登陆，请登录后再试。');
+		if(!anonymous && !user) ctx.throw(400, '非匿名捐款要求用户必须登录，请登录后再试。');
 		const id = Date.now();
 		const bill = await db.FundBillModel.findOne({_id: id});
 		if(bill) ctx.throw(500, '交易编号重复，请重新提交。');

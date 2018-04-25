@@ -99,9 +99,8 @@ sendMessageRouter
 		if(!userPersonal.mobile) ctx.throw(400, '您暂未绑定手机号，请刷新');
 		const {apiFunction, sendMessage} = ctx.nkcModules;
 		let smsCodeObj = {};
-
-		if(operation === 'ensureOldMobile') { //-- 验证旧手机 --
-			const type = 'bindMobile';
+		if(operation === 'verifyOldMobile') { //-- 验证旧手机 --
+			const type = 'changeMobile';
 			const ip = ctx.address;
 			smsCodeObj = {
 				nationCode: userPersonal.nationCode,
@@ -111,7 +110,7 @@ sendMessageRouter
 			};
 			await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
 			smsCodeObj.code = apiFunction.random(6);
-		} else if(operation === 'ensureNewMobile') { //-- 验证新手机 --
+		} else if(operation === 'verifyNewMobile') { //-- 验证新手机 --
 			const {nationCode, mobile} = body;
 			if(!mobile) ctx.throw(400, '新手机号不能为空');
 			if(userPersonal.mobile === mobile) ctx.throw(400, '您已绑定该手机号，请更换后重试');

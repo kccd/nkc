@@ -75,10 +75,6 @@ fn.testPassword = (input,hashType,storedPassword) => {
       salt = storedPassword.salt;
 
       hashed = fn.sha256HMAC(pass,salt);
-      console.log(pass);
-      console.log(hash);
-      console.log(salt);
-      console.log(hashed);
       if(hashed!==hash){
         return false;
       }

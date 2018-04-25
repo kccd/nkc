@@ -20,6 +20,10 @@ verifyRouter
 		const {user} = data;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const {idCardA, idCardB} = await userPersonal.extendIdPhotos();
+		const authLevel = await userPersonal.getAuthLevel();
+		if(authLevel < 1) {
+			ctx.throw(403, '您暂未通过身份认证1。');
+		}
 		data.submittedAuth = userPersonal.submittedAuth;
 		data.idCardA = idCardA;
 		data.idCardB = idCardB;
@@ -31,6 +35,10 @@ verifyRouter
 		const {data, db} = ctx;
 		const {user} = data;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const authLevel = await userPersonal.getAuthLevel();
+		if(authLevel < 2) {
+			ctx.throw(403, '您暂未通过身份认证2。');
+		}
 		const {handheldIdCard} = await userPersonal.extendIdPhotos();
 		data.submittedAuth = userPersonal.submittedAuth;
 		data.handheldIdCard = handheldIdCard;

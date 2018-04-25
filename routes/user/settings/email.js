@@ -16,6 +16,14 @@ emailRouter
 			});
 			await emailCode.update({used: true});
 			await userPersonal.update({email});
+			const newSecretBehavior = db.SecretBehaviorModel({
+				uid: user.uid,
+				type: 'bindEmail',
+				ip: ctx.address,
+				port: ctx.port,
+				email
+			});
+			await newSecretBehavior.save();
 			return ctx.redirect(`/u/${user.uid}/settings/email`);
 		} else if(operation === 'verifyOldEmail') {
 			await db.EmailCodeModel.ensureEmailCode({
@@ -49,7 +57,16 @@ emailRouter
 			}
 			await oldSmsCode.update({used: true});
 			await smsCode.update({used: true});
+			const newSecretBehavior = db.SecretBehaviorModel({
+				uid: user.uid,
+				type: 'changeEmail',
+				ip: ctx.address,
+				port: ctx.port,
+				oldEmail: userPersonal.email,
+				newEmail: email
+			});
 			await userPersonal.update({email});
+			await newSecretBehavior.save();
 			return ctx.redirect(`/u/${user.uid}/settings/email`);
 		}
 		ctx.template = 'interface_user_settings_email.pug';
@@ -80,14 +97,15 @@ emailRouter
 				uid: user.uid
 			});
 			await emailCode.save();
-			const text = `科创论坛账号绑定邮箱，点击以下链接完成验证：`;
+			const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
 			const href = `https://www.kechuang.org/u/${user.uid}/settings/email?email=${email}&token=${token}&operation=bindEmail`;
-			const link = `<a href="${href}">${href}</a>`;
+			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
+			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
 			await sendEmail({
 				to: email,
 				subject: '绑定邮箱',
 				text,
-				html: text + link
+				html: text + link + h3
 			});
 		} else if(operation === 'verifyOldEmail') {
 			if(!userPersonal.email) ctx.throw(400, '您暂未绑定任何邮箱');
@@ -104,14 +122,15 @@ emailRouter
 				uid: user.uid
 			});
 			await emailCode.save();
-			const text = `科创论坛账号更改邮箱，点击以下链接完成验证：`;
+			const text = `科创论坛账号修改邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
 			const href = `https://www.kechuang.org/u/${user.uid}/settings/email?token=${token}&operation=verifyOldEmail`;
-			const link = `<a href="${href}">${href}</a>`;
+			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
+			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
 			await sendEmail({
 				to: userPersonal.email,
 				subject: '修改邮箱',
 				text,
-				html: text + link
+				html: text + link + h3
 			});
 		} else if(operation === 'verifyNewEmail') {
 			let {email, oldToken} = body;
@@ -139,14 +158,15 @@ emailRouter
 				uid: user.uid
 			});
 			await emailCode.save();
-			const text = `科创论坛账号修改邮箱，点击以下链接完成验证：`;
+			const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
 			const href = `https://www.kechuang.org/u/${user.uid}/settings/email?email=${email}&token=${token}&oldToken=${oldToken}&operation=verifyNewEmail`;
-			const link = `<a href="${href}">${href}</a>`;
+			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
+			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
 			await sendEmail({
 				to: email,
 				subject: '修改邮箱',
 				text,
-				html: text + link
+				html: text + link + h3
 			});
 
 		} else {

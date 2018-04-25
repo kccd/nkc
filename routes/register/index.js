@@ -175,7 +175,7 @@ registerRouter
 		const newUser = await db.UserModel.createUser(userObj);
 		answerSheet.uid = newUser.uid;
 		await answerSheet.save();
-		data.activeInfo1 = `邮箱注册成功，赶紧登陆吧~`;
+		data.activeInfo1 = `邮箱注册成功，赶紧登录吧~`;
 		ctx.template = 'interface_user_login.pug';
 		await next();
   });*/

@@ -38,7 +38,7 @@ router
 	  const {path, type, size} = file;
 	  if(size > ctx.settings.upload.sizeLimit.photo) ctx.throw(400, '图片不能超过20M');
 	  const positionObj = JSON.parse(position);
-	  if(positionObj.width > 10000 || positionObj.height > 10000) ctx.throw(400, '截取的图片范围过小');
+	  if(positionObj.width > 5000 || positionObj.height > 5000) ctx.throw(400, '截取的图片范围过小');
 	  const extArr = ['jpg', 'jpeg', 'png'];
 	  const {imageMagick} = tools;
 		const extension = mime.getExtension(type);

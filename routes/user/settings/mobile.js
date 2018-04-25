@@ -27,7 +27,7 @@ mobileRouter
 				mobile: userPersonal.mobile,
 				nationCode: userPersonal.nationCode,
 				code: oldCode,
-				type: 'bindMobile'
+				type: 'changeMobile'
 			});
 		} catch(err) {
 			ctx.throw(400, `旧手机${err.message}`);
@@ -44,7 +44,18 @@ mobileRouter
 		}
 		await smsCodeOld.update({used: true});
 		await smsCode.update({used: true});
+		const newSecretBehavior = db.SecretBehaviorModel({
+			uid: user.uid,
+			type: 'changeMobile',
+			ip: ctx.address,
+			port: ctx.port,
+			oldMobile: userPersonal.mobile,
+			oldNationCode: userPersonal.nationCode,
+			newMobile: mobile,
+			newNationCode: nationCode
+		});
 		await userPersonal.update({nationCode, mobile});
+		await newSecretBehavior.save();
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -64,7 +75,16 @@ mobileRouter
 		});
 		await smsCode.update({used: true});
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const newSecretBehavior = db.SecretBehaviorModel({
+			uid: user.uid,
+			type: 'bindMobile',
+			ip: ctx.address,
+			port: ctx.port,
+			mobile,
+			nationCode
+		});
 		await userPersonal.update({nationCode, mobile});
+		await newSecretBehavior.save();
 		await next();
 	});
 module.exports = mobileRouter;

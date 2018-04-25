@@ -5,11 +5,8 @@ function submit(id, username) {
 		postSign: $('#postSign').val(),
 		color: $('#color').val()
 	};
-	if(obj.username === '') {
-		return screenTopWarning('请输入用户名');
-	}
-	if(username !== obj.username) {
-		if(confirm('您将花费200个科创币将同户名改为“'+obj.username+'”，确认无误后请点击确认按钮。') === false) return;
+	if(!obj.username) {
+		obj.username = username;
 	}
 	nkcAPI('/u/'+id+'/settings/info', 'PATCH', obj)
 		.then(function() {
@@ -18,4 +15,8 @@ function submit(id, username) {
 		.catch(function(data) {
 			screenTopWarning(data.error);
 		})
+}
+
+function changeUsername() {
+	$('#usernameInput').show();
 }

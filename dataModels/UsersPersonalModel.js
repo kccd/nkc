@@ -221,9 +221,48 @@ const usersPersonalSchema = new Schema({
 	  },
 	  gender: {
 	  	type: String,
-		  default: null
+		  default: 'men'
 	  }
-  }
+  },
+	privacy: {
+  	// 0: 完全保密， 1：对我信任的人显示， 2：对学者显示， 3：对已登录用户显示， 4：完全公开
+		name: {
+			type: Number,
+			default: 3
+		},
+		gender: {
+			type: Number,
+			default: 4
+		},
+		birthDate: {
+			type: Number,
+			default: 3
+		},
+		location: {
+			type: Number,
+			default: 3
+		},
+		address: {
+			type: Number,
+			default: 1
+		},
+		education: {
+			type: Number,
+			default: 3
+		},
+		industry: {
+			type: Number,
+			default: 1
+		},
+		lifePhoto: {
+			type: Number,
+			default: 3
+		},
+		certPhoto: {
+			type: Number,
+			default: 1
+		}
+	}
 },
   {usePushEach: true});
 

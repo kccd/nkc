@@ -14,7 +14,6 @@ const fundRouter = routers.fund;
 const registerRouter = routers.register;
 const personalForumRouter = routers.personalForum;
 const systemRouter = routers.system;
-const setRouter = routers.set;
 
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
@@ -30,5 +29,4 @@ router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethod
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
 router.use('/system', systemRouter.routes(), systemRouter.allowedMethods());
-router.use('/set', setRouter.routes(), setRouter.allowedMethods());
 module.exports = router;

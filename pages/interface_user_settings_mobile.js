@@ -10,10 +10,10 @@ function changeNumber() {
 }
 
 function sendMessage(type) {
-	var obj = {operation: 'ensureOldMobile'};
+	var obj = {operation: 'verifyOldMobile'};
 
 	if(type) {
-		obj.operation = 'ensureNewMobile';
+		obj.operation = 'verifyNewMobile';
 		obj.nationCode = nationCode;
 		obj.mobile = $('#mobile').val();
 		if(mobile === '') {

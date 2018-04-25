@@ -7,6 +7,8 @@ const mobileRouter = require('./mobile');
 const emailRouter = require('./email');
 const verifyRouter = require('./verify');
 const transactionRouter = require('./transaction');
+const photoRouter = require('./photo');
+const certRouter = require('./cert');
 const socialRouter = require('./social');
 settingRouter
 	.use('/', async (ctx, next) => {
@@ -29,5 +31,7 @@ settingRouter
 	.use('/social', socialRouter.routes(), socialRouter.allowedMethods())
 	.use('/mobile', mobileRouter.routes(), mobileRouter.allowedMethods())
 	.use('/email', emailRouter.routes(), emailRouter.allowedMethods())
+	.use('/cert', certRouter.routes(), certRouter.allowedMethods())
+	.use('/photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods());
 module.exports = settingRouter;

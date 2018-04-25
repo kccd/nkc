@@ -1,0 +1,27 @@
+extends bootstrap_base
+block title
+  title 绑定支付宝
+  -const mainContainer1400 = true
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 绑定支付宝
+          .panel-body
+            .form-horizontal
+              if !data.alipay
+              .form-group
+                label.col-sm-2.control-label 支付宝：
+                .col-sm-5
+                  input.form-control#alipay(placeholder='请输入支付宝账户')
+                  span.text-danger *用户需要转账0.01元人民币到科创支付宝账户完成支付宝验证
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(onclick=`getUrl(${data.user.uid})`) 提交
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_settings_alipay.js')
