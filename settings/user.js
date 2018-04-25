@@ -54,7 +54,10 @@ const scoreMap = {
   dailyLogin: {
     score: 1,
     loginDays: 1
-  }
+  },
+	changeUsername: {
+  	score: 0
+	}
 };
 
 const scoreCoefficientMap = {
