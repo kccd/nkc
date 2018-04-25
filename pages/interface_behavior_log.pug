@@ -131,7 +131,7 @@ block content
               th 操作
               th 详情
           tbody
-          -var operationArr = [{en: 'postToPost', ch: '编辑帖子'},{en: 'changeXSF', ch: '学术分'},{en: 'subscribeUser', ch: '关注'},{en: 'unsubscribeUser', ch: '取消关注'},{en: 'postToThread', ch: '回帖'},{en: 'postToForum', ch: '发帖'},{en: 'disablePost', ch: '屏蔽'},{en: 'enablePost', ch: '撤销屏蔽'},{en: 'moveToRecycle', ch: '移至回收站'},{en: 'recommendPost', ch: '推荐'},{en: 'unrecommendPost', ch: '取消推荐'},{en: 'setDigest', ch: '加精'},{en: 'cancelDigest', ch: '撤销精华'},{en: 'setTopped', ch: '置顶'},{en: 'cancelTopped', ch: '撤销置顶'}, {en: 'dailyLogin', ch: '日常登录'}];
+          -var operationArr = [{en: 'changeUsername', ch: '修改用户名'},{en: 'postToPost', ch: '编辑帖子'},{en: 'changeXSF', ch: '学术分'},{en: 'subscribeUser', ch: '关注'},{en: 'unsubscribeUser', ch: '取消关注'},{en: 'postToThread', ch: '回帖'},{en: 'postToForum', ch: '发帖'},{en: 'disablePost', ch: '屏蔽'},{en: 'enablePost', ch: '撤销屏蔽'},{en: 'moveToRecycle', ch: '移至回收站'},{en: 'recommendPost', ch: '推荐'},{en: 'unrecommendPost', ch: '取消推荐'},{en: 'setDigest', ch: '加精'},{en: 'cancelDigest', ch: '撤销精华'},{en: 'setTopped', ch: '置顶'},{en: 'cancelTopped', ch: '撤销置顶'}, {en: 'dailyLogin', ch: '日常登录'}];
           -for(var i = 0 ; i < data.behaviorLogs.length ; i++)
             -var operationCH = '竟然还有这种操作?';
             -for (var j = 0; j < operationArr.length; j++)
@@ -151,6 +151,8 @@ block content
               td #{data.behaviorLogs[i].timeStamp.toLocaleString()}
               td
                 a(href=`/m/${data.behaviorLogs[i].user.uid}`) (#{data.behaviorLogs[i].user.uid}) #{data.behaviorLogs[i].user.username}
+                if data.behaviorLogs[i].oldUsername
+                  span=` （旧名：${data.behaviorLogs[i].oldUsername}）`
               td
                 a(href=`/m/${data.behaviorLogs[i].toUser.uid}`) (#{data.behaviorLogs[i].toUser.uid}) #{data.behaviorLogs[i].toUser.username}
               td #{data.behaviorLogs[i].ip}:#{data.behaviorLogs[i].port}

@@ -8,7 +8,7 @@ infoRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, generateUsersBehavior} = ctx;
 		const {user} = data;
 		let {username, description, postSign, color} = body;
 		if(!username) {
@@ -51,6 +51,12 @@ infoRouter
 				uid: user.uid,
 				ip: ctx.address,
 				port: ctx.port
+			});
+			await generateUsersBehavior({
+				uid: user.uid,
+				toUid: user.uid,
+				operation: 'changeUsername',
+				oldUsername: user.username
 			});
 			await defaultUser.update({$inc: {kcb: changeUsername}});
 			await newSecretBehavior.save();
