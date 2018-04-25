@@ -4,7 +4,7 @@ const os = require('os');
 const mongoDB = require('./mongoDB');
 const options = {
   promiseLibrary: Promise,
-  autoIndex: true,
+  autoIndex: false,
   poolSize: 50,
   keepAlive: 120,
   useMongoClient: true
