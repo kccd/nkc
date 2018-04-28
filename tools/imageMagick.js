@@ -1,6 +1,6 @@
 const {spawn, exec} = require('child_process');
 const settings = require('../settings');
-const {avatarSize, sizeLimit, avatarSmallSize} = settings.upload;
+const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize} = settings.upload;
 const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
@@ -194,6 +194,15 @@ const lifePhotoify = async path => {
 	return spawnProcess('magick', ['convert', path, '-resize', `${width}x`, path]);
 };
 
+
+const forumAvatarify = async (options) => {
+	const {top, left, width, height, path, targetPath} = options;
+	if(linux) {
+		return spawnProcess('convert', [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${forumAvatarSize}x${forumAvatarSize}+${left}+${top}`, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${forumAvatarSize}x${forumAvatarSize}+${left}+${top}`, targetPath]);
+};
+
 module.exports = {
   avatarify,
   attachify,
@@ -211,7 +220,8 @@ module.exports = {
 	fundBannerify,
 	fundLogoify,
   removeFile,
-	lifePhotoify
+	lifePhotoify,
+	forumAvatarify
 };
 
 

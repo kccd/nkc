@@ -1,0 +1,23 @@
+select.form-control(onchange=`changeForum(this.value, "${data.type}")`)#module-forum-select
+  for forum in data.forums
+    if data.forum.fid === forum.fid
+      option(data-fid=forum.fid selected=true)= forum.displayName
+    else
+      option(data-fid=forum.fid)= forum.displayName
+br
+.panel.panel-default
+  .panel-heading
+    span= data.forum.displayName
+  .list-group
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/image`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 图片设置
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/info`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 基本信息设置
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/category`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 分类设置
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 权限设置

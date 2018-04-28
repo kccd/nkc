@@ -31,8 +31,8 @@ block content
                     button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
                 if data.user && data.user.uid === data.targetUser.uid
                   a(href=`/u/${data.targetUser.uid}/settings`).btn.btn-default.btn-block
-                    span.glyphicon.glyphicon-cog
-                    span &nbsp;资料设置
+                    span.fa.fa-edit
+                    span &nbsp;编辑资料
                 if data.userLevel >= 4 && data.user.uid !== data.targetUser.uid
                   if data.targetUser.certs.includes('banned')
                     button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, false)`) 解除封禁
@@ -191,7 +191,7 @@ block content
                             h4(style='margin: 0.5rem 0;')
                               a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
                                 if iconFileName
-                                  img(src=`/resources/site_specific/forum_icon/${iconFileName}.png` style='width: 3rem;height: 3rem;border-radius: 50%;')
+                                  img(src=`/forum_avatar/${fid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
                                 else
                                   img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
                                 span &nbsp;

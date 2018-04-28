@@ -1,0 +1,25 @@
+.row.forum-panel
+  .col-xs-12.col-sm-6.col-md-7(style='min-height: 5rem;')
+    .media
+      .media-left
+        if forum.iconFileName
+          img.media-object(src=`/forum_avatar/${forum.fid}` style=`height: 5rem;width: 5rem;border-radius: 50%;`)
+        else
+          .media-object(style=`height: 5rem;width: 5rem;border-radius: 50%;background-color: ${forum.color}`)
+      .media-body
+        h4.media-heading(style='margin-top: 5px;')= forum.displayName
+        p(style='color: #777777;')= forum.description
+  .col-xs-12.col-sm-5.col-sm-offset-1.col-md-4.col-md-offset-1
+    .row.text-center(style='padding-top: 0.3rem;')
+      .col-xs-3.col-sm-3.col-md-3.post-count
+        span= forum.countThreads
+        p 文章
+      .col-xs-3.col-sm-3.col-md-3.post-count
+        span= forum.countPosts
+        p 回复
+      .col-xs-1.col-sm-1.col-md-1.post-count(style=`border-right: 3px solid ${forum.color}`)
+        span &nbsp;
+        p &nbsp;
+      .col-xs-4.col-sm-4.col-md-4.post-count
+        span= forum.countPostsToday
+        p 今日回复

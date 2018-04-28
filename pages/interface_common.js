@@ -635,3 +635,40 @@ function subscribeForum(fid, subscribe) {
 			screenTopWarning(data.error);
 		})
 }
+
+// 创建元素 2018-4-26 pengxigua
+function newElement(tagName, attributes, css) {
+	var single = ['hr', 'br', 'input'];
+	var element;
+	if(single.indexOf(tagName) !== -1) {
+		element = $('<'+tagName+'>');
+	} else {
+		element = $('<'+tagName+'></'+tagName+'>');
+	}
+	if(attributes) {
+		element.attr(attributes);
+		if(css) {
+			element.css(css);
+		}
+	}
+	return element;
+}
+
+// 颜色选择器 2018-4-26 pengxigua
+// 给class为selectColorInput的输入框添加事件
+function ColorSelectionPanel() {
+	this.show = function(position) {
+		var top = position.top;
+		var left = position.left;
+	}
+}
+
+function iconSwitch() {
+	$('.fa-switch-icon').on('click', function() {
+		if($(this).hasClass('fa-toggle-on')) {
+			$(this).removeClass('fa-toggle-on').addClass('fa-toggle-off');
+		} else if($(this).hasClass('fa-toggle-off')) {
+			$(this).removeClass('fa-toggle-off').addClass('fa-toggle-on');
+		}
+	})
+}

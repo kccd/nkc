@@ -27,7 +27,7 @@ block content
           a(href=`###` title='资金池' onclick=`selectFund()`)
             .fund-name(style=`padding-top: 0;`)
               div(style=`line-height: 12rem;`) 资金池
-            .fund-brief= data.fundSettings.fundPoolDescription.slice(0, 28)
+            .fund-brief= data.fundSettings.fundPoolDescription?data.fundSettings.fundPoolDescription.slice(0, 28):''
               div(style='height: 8rem;')
                 .select(style=`color: #5bc0de;line-height: 8rem;font-size: 3rem;font-weight: 600;${!data.fundId?'background-color:rgba(255,255,255,0.8);':''}`)= !data.fundId ? '已选择' : ''
         -for(let fund of data.funds)

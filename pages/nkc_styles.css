@@ -12,6 +12,21 @@ h1, h2, h3, h4, h5, p{
   color: #ccc;
   font-size: 9pt;
 }
+body { padding-top: 70px; }
+
+.navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse{
+  max-height: 1000px;
+}
+.fa-switch-icon{
+  font-size: 3rem;
+  cursor: pointer;
+}
+.fa-switch-icon.fa-toggle-on{
+  color: #337ab7;
+}
+.fa-switch-icon.fa-toggle-off{
+  color: #337ab7;
+}
 .f16 {
   font-size:16pt;
 }
@@ -1379,7 +1394,7 @@ margin-left: 5px;
   }
 }
 
-.nkcshade{box-shadow: rgba(0, 0, 0, 0.14) 0px 3px 10px;}
+.nkcshade{box-shadow: rgba(0, 0, 0, 0.14) 0px 1px 10px;}
 
 /* Lets add an arrow after each link  */
 
@@ -2242,6 +2257,80 @@ img.emoji {
 }
 .settings-img-remove.disabled{
   display: none;
+}
+
+.forum-panel .post-count{
+  padding-top: 0.3rem;
+}
+.forum-panel .post-count span{
+  color: #333333;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+.forum-panel .post-count p{
+  color: #777777;
+  font-size: 0.9em;
+  margin-top: 0.5rem;
+}
+.forum-panel{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.children-forum-panel {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.children-forum-panel a.forum-title{
+  text-decoration: none;
+}
+.children-forum-panel a.forum-title h4{
+  font-size: 1.2em;
+}
+.children-forum-panel .post-count span{
+  color: #333333;
+  font-size: 1.5rem;
+}
+.children-forum-panel .post-count p{
+  color: #777777;
+  font-size: 0.8em;
+  margin-top: 0.1rem;
+  margin-bottom: 0;
+}
+.forums-panel{
+  margin-bottom: 0.5rem;
+}
+.forums-panel ul{
+  padding: 0;
+}
+.forums-panel ul li{
+  list-style: none;
+  float: left;
+}
+.forums-panel ul li a{
+  display: inline-block;
+  padding: 0.3rem 0.5rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #777777;
+  border-radius: 5px;
+  text-decoration: none;
+}
+.forums-panel ul li a:hover{
+  background-color: #efefef;
+}
+.forum-breadcrumb{
+  font-size: 1.4rem;
+  background-color: rgba(0,0,0,0);
+  margin-bottom: 0.5rem;
+}
+.forum-breadcrumb li{
+  margin-bottom: 1rem;
+}
+.forum-breadcrumb a{
+  padding: 0.3rem 0.8rem;
+  text-decoration: none;
+  border-radius: 5px;
+  color: #ffffff;
 }
 /*--------------*/
 @media screen and (max-width: 1133px) {

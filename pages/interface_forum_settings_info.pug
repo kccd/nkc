@@ -1,0 +1,45 @@
+extends bootstrap_base
+block title
+  title 基本信息设置
+  -const mainContainer1400 = true;
+  -const forum = data.forum;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_forum_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 基本信息设置
+          .panel-body
+            div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 板块名称
+                .col-sm-5
+                  input.form-control#displayName(type='text' placeholder='请输入板块名称' value=forum.displayName || '')
+              .form-group
+                label.col-sm-2.control-label 板块简称
+                .col-sm-5
+                  input.form-control#abbr(type='text' placeholder='请输入板块简称' value=forum.abbr || '')
+              .form-group
+                label.col-sm-2.control-label 板块颜色
+                .col-sm-5
+                  input.form-control.demo#color(type='text' value=forum.color || '' data-control='hue')
+              .form-group
+                label.col-sm-2.control-label 板块介绍
+                .col-sm-5
+                  textarea.form-control#description(placeholder='请输入板块介绍' rows=5)= forum.description || ''
+              .form-group
+                label.col-sm-2.control-label 板块说明
+                .col-sm-5
+                  textarea.form-control#declare(placeholder='请输入板块说明' rows=5)= forum.declare || ''
+              .form-group
+                .col-sm-5.col-sm-offset-2
+                  button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存
+block scripts
+  script(src='/jquery/jquery.minicolors.js')
+  script(src='/module_forum_settings.js')
+  script(src='/interface_common.js')
+  script(src='/interface_forum_settings_info.js')
