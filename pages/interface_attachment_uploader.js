@@ -20,10 +20,9 @@ var attachment_uploader = function(options){
         }
       }
     }
-
     xhr.open("POST",target.toString().toLowerCase(),true);
     //xhr.setRequestHeader("Content-type","application/json");
-	  xhr.setRequestHeader("FROM","nkcAPI");
+    xhr.setRequestHeader("FROM","nkcAPI");
 	  xhr.send(data);
 
   };
@@ -62,11 +61,10 @@ var attachment_uploader = function(options){
   function uploadListOfFile(items){
     console.log('ulof');
     return common.mapWithPromise(items,function(item){
-      console.log('item');
-      console.log(item);
       if(item&&item.size){
         var formData = new FormData();
         formData.append('file', item);
+        console.log(item)
         return create_upload(formData)
         .catch(function(err){
           console.log(err);
@@ -83,11 +81,9 @@ var attachment_uploader = function(options){
     var items = geid('file-selector').files;
     if(items.length==0)return alert('至少选一个呗');
     if(items.length>10) return alert('一次不要上传超过10个文件');
-
     for(i=0;i<items.length;i++){
       files_left_incr();
     }
-
     uploadListOfFile(items)
     .then(function(){
       geid('file-selector').value = '';
@@ -124,9 +120,10 @@ var uploader = attachment_uploader({
   ////server/api/path-to-upload
   upload_target:ga('file-uploading','target'),
 
-  upload_success_callback:function(info){  //info为刚上传的附件信息
+  upload_success_callback:function(info){
+    console.log(info)  //info为刚上传的附件信息
     //alert(JSON.stringify(info));
-    if(list)list.refresh();  //list为所有的附件列表（未刷新之前）
+    if(list)list.refresh(); //list为所有的附件列表（未刷新之前）
   },
 
   upload_failed_callback:function(info){

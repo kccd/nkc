@@ -338,6 +338,22 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+      draft: {
+        [name]: '草稿',
+        [POST]: true,
+        [GET]: true
+      },
+      download: {
+        [GET]: true,
+        [POST]: true,
+        [parameter]: {
+          [GET]: true,
+          [POST]: true,
+          [parameter]: {
+            [GET]: true
+          }
+        }
+      },
 	    exam: {
 		    [name]: '考试',
 		    [GET]: true,
@@ -464,6 +480,15 @@ const certificates ={
 	        bills: {
           	[name]: '用户账单',
 		        [GET]: true
+	        },
+	        drafts: {
+          	[name]: '草稿箱',
+            [GET]: true,
+            [DELETE]: true,
+            [POST]: true,
+            [parameter]: {
+              [DELETE]: true,
+            }
 	        }
         }
       },

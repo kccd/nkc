@@ -146,7 +146,6 @@ threadSchema.virtual('user')
   .set(function(u) {
     this._user = u;
   });
-
 threadSchema.methods.extendFirstPost = async function() {
   const PostModel = require('./PostModel');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})

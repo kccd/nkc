@@ -31,19 +31,23 @@ function nkc_render(options){
   default_whitelist.code = ['class']
   default_whitelist.span = ['class', 'style', 'aria-hidden'];
   default_whitelist.a = ['href', 'title', 'target', 'style'];
+  default_whitelist.p = ['align'];
   default_whitelist.div = ['style'];
   default_whitelist.table = ['border','width','cellpadding','cellspacing'];
   default_whitelist.tbody = [];
   default_whitelist.tr = [];
-  default_whitelist.th = [];
-  default_whitelist.td = [];
-  default_whitelist.video = ['src','controls','preload'];
+  default_whitelist.th = ['width'];
+  default_whitelist.td = ['width','valign','colspan','top','rowspan'];
+  default_whitelist.video = ['src','controls','preload','style'];
   default_whitelist.math = [];
   default_whitelist.semantics = [];
   default_whitelist.mrow = [];
   default_whitelist.msup = [];
   default_whitelist.mn = [];
   default_whitelist.annotation = ['encoding'];
+  default_whitelist.iframe = ['width','height','src','frameborder','allowfullscreen'];
+  default_whitelist.embed = ['width','height','src','frameborder','allowfullscreen'];
+  default_whitelist.img = ['src','style'];
   if(!in_browser){
     //default_whitelist.iframe = ['height','width','src','frameborder','allowfullscreen']
   }
@@ -76,8 +80,8 @@ function nkc_render(options){
         "margin-top":true,
         "bottom":true,
         "word-spacing":true,
-        "top":true,
         "border-bottom":true,
+        "max-width": true
       }
     },
     onTagAttr: function(tag, name, value, isWhiteAttr) {

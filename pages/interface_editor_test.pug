@@ -22,7 +22,7 @@ block content
             
         .row
             .form-group
-                input#title.form-control(style='height:50px' type='text' placeholder='标题：精简一点，你会更容易被搜到！' value=`${data.title || ''}`)
+                input#title.form-control(style='height:50px' type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
             .form-group
                 div(style='margin-top: 5px;')
                 select#parents.form-control(style='display: inline-block; width: auto;')
@@ -33,10 +33,7 @@ block content
                     option 无
                 select.form-control#lang(style='display: none; width: auto;')
                     option html
-                button#mathfresh.btn.btn-sm.btn-default(onclick='mathfreshnew()') 渲染代码/数学公式
-                button.btn.btn-default.btn-sm(onclick='fitscreennew()') 适配屏幕
             .form-group
-                div#disnoneplay.w-e-text-container(style='display:none')= data.content
                 div#content_test
             .form-group
             .nkcpanel(id='file-uploading' target='/r')
@@ -51,12 +48,20 @@ block content
                 input#parseURL(type='checkbox' checked)
                 span &nbsp;处理URL&nbsp;
             .form-group
-                button#post.btn.btn-primary(type='submit' style='float: right;') 发表
+                button#post.btn.btn-primary(type='submit' style='float: right;margin-right: 10px') 发表
+                button#draft.btn.btn-primary(type='submit' style='float: right;margin-right: 10px') 保存草稿
+                div#disnoneplay(style='display:none')= data.content
+                div#draftNowId(style='display:none')= data.content
+                div#userNowId(style='display:none')= data.user.uid
+                div#draftId(style='display:none')=`${data.did || ''}`
   
   include debug_output.pug
 block scripts
 
 
+  link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  script(src="/jquery-1.10.2.js")
+  script(src="/jquery-ui-1.10.4.custom.js")
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')

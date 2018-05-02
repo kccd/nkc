@@ -436,11 +436,11 @@ function edInsertContent(which, myValue, fileType, fileName) {
   if(which == "text-elem"){
   
     var codeResource = "";
-    if(fileType === "jpg" || fileType === "png"){
+    if(fileType === "jpg" || fileType === "png" || fileType === "gif"){
       //codeResource = "<b>123456</b>"
-      codeResource = "<p><img src=" + myValue + " style=max-width:30%></p>"
+      codeResource = "<p><img src=" + myValue + "></p>"
     }else if(fileType === "mp4"){
-      codeResource = "<video src=" + myValue + " controls preload='none' style=max-width:30%;border:1px;solid>你的浏览器可支持video标签</video>"
+      codeResource = "<video src=" + myValue + " controls style=max-width:40%>video</video>"
     }else{
       codeResource = "<p><a href=" + myValue + "><img src=" + "/default/default_thumbnail.png" + ">" + fileName + "</a></p>"
     }
@@ -712,4 +712,22 @@ function subscribeForum(fid, subscribe) {
 		.catch(function(data) {
 			screenTopWarning(data.error);
 		})
+}
+
+
+//舍弃草稿
+function removedraft(uid,did){
+  var url = '/u/'+uid+'/drafts/'+did+'?uid='+uid+"&did="+did;
+  var method = "DELETE";
+  var alertInfo = "已舍弃草稿";
+  nkcAPI(url, method, {})
+    .then(function(){
+      screenTopAlert(alertInfo);
+      setTimeout(function(){
+        window.location.reload();
+      }, 1000);
+    })
+    .catch(function(data){
+      screenTopWarning(data.error)
+    })
 }

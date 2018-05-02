@@ -49,7 +49,6 @@ block content
               span &nbsp;处理URL&nbsp;
               button#post.btn.btn-primary(type='submit' style='float: right;') 发表
           .form-group
-            div#icon.form-control(type='text' placeholder='图标' value=`${data.title || ''}`)
             .form-group
               textarea#content.form-control(placeholder='内容' style='height:300px;resize:vertical;')= data.content || ''
           .nkcpanel(id='file-uploading' target='/r')

@@ -3,8 +3,8 @@ script(type='text/x-mathjax-config').
     jax: ["input/TeX","output/CommonHTML"],
     extensions: ["tex2jax.js","MathZoom.js"],
     tex2jax:{
-      //inlineMath:[],
-      //displayMath:[],
+        inlineMath:  [["$", "$"] ],
+        displayMath: [["$$","$$"] ],
       ignoreClass:'container',
       processClass:"ThreadPostBody|QuestionText"
     },
@@ -13,6 +13,7 @@ script(type='text/x-mathjax-config').
       preferredFont:"STIX"
     },
     TeX: {
+
     }
   })
 script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')

@@ -17,7 +17,8 @@ forumRouter
     await next();
   })
 	.post('/', async (ctx, next) => {
-		const {data, body, db} = ctx;
+    const {data, body, db} = ctx;
+    console.log(ctx)
 		const {ForumModel, UserModel, SettingModel} = db;
 		const {userLevel} = data;
 		const {
@@ -180,6 +181,8 @@ forumRouter
     }
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     data.post = _post;
+    //帖子曾经在草稿箱中，发表时，删除草稿
+    await db.DraftModel.remove({"t":ctx.body.post.t})
     await next();
   })
   .del('/:fid', async (ctx, next) => {

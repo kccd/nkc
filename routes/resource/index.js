@@ -33,21 +33,31 @@ resourceRouter
     const {imageMagick} = ctx.tools;
     const settings = ctx.settings;
     const file = ctx.body.files.file;
+    console.log("图片文件",file)
     if(!file)
       ctx.throw(400, 'no file uploaded');
     const {name, size, path} = file;
+    //path "d:\nkc\tmp\upload_0e50089913dcacbc9514f64c3e3d31f4.png"
+    // 图片格式 png/jpg
     const extension = pathModule.extname(name).replace('.', '');
+    // 图片最大尺寸
     const {largeImage} = settings.upload.sizeLimit;
+    // 根据自增id定义图片名称
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
+    // 图片名称279471.png
     const saveName = rid + '.' + extension;
     const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
+    // 图片储存路径 /2018/04/
     const relPath = generateFolderName(uploadPath);
+    // 路径 d:\nkc\resources\upload/2018/04/
     const descPath = uploadPath + relPath;
+    // 路径+图片名称 d:\nkc\resources\upload/2018/04/279472.png
     const descFile = descPath + saveName;
     if(['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension.toLowerCase()) > -1) {
       // 如果格式满足则生成缩略图
-      const descPathOfThumbnail = generateFolderName(thumbnailPath);
-      const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName;
+      const descPathOfThumbnail = generateFolderName(thumbnailPath); // 存放路径
+      const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 路径+名称
+      //开始裁剪、压缩
       await imageMagick.thumbnailify(path, thumbnailFilePath);
       // 添加水印
       if(size > largeImage) {

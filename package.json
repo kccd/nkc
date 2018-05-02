@@ -28,6 +28,7 @@
     "cookie-signature": "^1.1.0",
     "diff": "^3.4.0",
     "direct-alipay": "^3.0.0",
+    "debug": "^2.0.0",
     "elasticsearch": "^14.0.0",
     "immutable": "^3.8.2",
     "koa": "^2.4.1",

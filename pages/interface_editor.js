@@ -10,35 +10,86 @@ $(function() {
   // })
 });
 
-$("document").ready(function() {
-  console.log($("#disnoneplay").html())
-  console.log(escapeChars($("#disnoneplay").html()))
-  $("#text-elem").html(htmlDecode($("#disnoneplay").html()))
+function dataURItoBlob (base64Data) {  
+  var byteString;  
+  if (base64Data.split(',')[0].indexOf('base64') >= 0)  
+      byteString = atob(base64Data.split(',')[1]);  
+  else  
+      byteString = unescape(base64Data.split(',')[1]);  
+  var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];  
+  var ia = new Uint8Array(byteString.length);  
+  for (var i = 0; i < byteString.length; i++) {  
+      ia[i] = byteString.charCodeAt(i);  
+  }  
+  return new Blob([ia], {type: mimeString});  
+  }
+
+
+$("document").ready(function(){
+  //编辑器缩放
+  $(".w-e-text-container").resizable({
+    containment: '#body',
+    minHeight: 100,
+    minWidth: 100,
+    maxWidth: 1400
+  });
   
+  $("#content_test").on("paste", function(){
+    function test(){
+      $("#text-elem img").each(function(){
+        // 获取当前图片url
+        if(!$(this).attr("srcs")){
+          return true
+        }
+        var newSrc = $(this).attr("srcs")
+        // 使用正在下载图片替换当前图片
+        //$(this).attr("src","/resources/site_specific/picupload.png")
+        console.log("newSrc",newSrc)
+        // 判断图片是不是系统图片
+        var sysimg = new RegExp("file:").test(newSrc)
+        // 如果是系统图片，则不向下执行
+        if(sysimg == true){
+          var elemImg = "<img src='/resources/site_specific/picdefault.png'>"
+          $(this).replaceWith(elemImg)
+          console.log("图片无法加载")
+          // await $(this).on("error",function(){
+          //   var elemImg = "<img src='./picpass.png'>"
+          //   $(this).replaceWith(elemImg)
+          //   console.log("图片无法加载")
+          // })
+          return true
+        }
+        if(newSrc.length > 10){
+          var data = {
+            loadsrc : newSrc
+          }
+          console.log("---------发送url-----------",'\n',newSrc)
+          var newimgstr = $(this)
+          
+          nkcAPI("/download", "POST", data)
+          //console.log(fff)
+          .then( function(data){
+            newimgstr.attr("src","")
+            newimgstr.attr("srcs","")
+            var newImg = "<img src='" + "/r/" + data.r.rid + "' style='max-width: 100%'>"
+            newimgstr.replaceWith(newImg)
+            if(list)list.refresh()
+          })
+          .catch( function(err){
+            console.log(err)
+            newimgstr.attr("src","")
+            newimgstr.attr("srcs","")
+            newimgstr.replaceWith("<img src='/resources/site_specific/picdefault.png'>")
+          })
+        }
+      })
+    }
+    setTimeout(function(){test()},5000)
+    
+  })
 })
 
 
-//html解码
-function htmlDecode(text){
-  //1.首先动态创建一个容器标签元素，如DIV
-  var temp = document.createElement("div");
-  //2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
-  temp.innerHTML = text;
-  //3.最后返回这个元素的innerText(ie支持)或者textContent(火狐，google支持)，即得到经过HTML解码的字符串了。
-  var output = temp.innerText || temp.textContent;
-  temp = null;
-  return output;
-}
-
-function escapeChars(str) {
-  str = str.replace('&amp;', /&/g);
-  str = str.replace('&lt;', /</g);
-  str = str.replace('&gt;', />/g);
-  // str = str.replace(/'/g, '&acute;');
-  // str = str.replace(/"/g, '&quot;');
-  // str = str.replace(/\|/g, '&brvbar;');
-  return str;
-}
 
 function get_selection(the_id) {
   var e = typeof(the_id)=='String'? document.getElementById(the_id) : the_id;
@@ -114,6 +165,7 @@ function Editor() {
   this.parents = geid('parents');
   this.children = geid('children');
   this.post = geid('post');
+  this.draft = geid('draft');
   this.title = geid('title');
   //--获取新旧编辑器的InnerHTML
   //旧编辑器获取文本 textarea id=content
@@ -181,7 +233,11 @@ function Editor() {
     this.content.addEventListener('keyup', this.trigger);
     this.language.addEventListener('change', this.update);
     this.post.onclick = onPost(self);
-    if(this.query.type && this.query.type !== 'forum') {
+    this.draft.onclick = saveDraft(self);
+    if(this.query.type === "post"){
+      document.getElementById("draft").style.display = "none"
+    }
+    if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
       this.blocked = true;
       this.parents.disabled = true;
       this.children.disabled = true;
@@ -355,12 +411,87 @@ function parentsOnChange(that) {
   }
 }
 
+//保存草稿
+function saveDraft(that){
+  return function() {
+    //--获取编辑器的内容--
+    $(".MathJax_Preview").each(function(){
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
+    })
+    //-- --
+    var draftId = $("#draftId").html();
+    var content = that.content.innerHTML.trim();
+    var title = that.title.value.trim();
+    var type = that.query.type;
+    var cat = that.query.cat;
+    var id = that.blocked ? that.query.id : that.childID;
+    var language = that.language.value.toLowerCase().trim();
+    if (content === '') {
+      screenTopWarning('请填写内容。');
+      return;
+    }
+    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
+      screenTopWarning('请填写标题。');
+      return;
+    }
+    if (geid('parseURL').checked) {
+      if (language === 'markdown') {
+        content = common.URLifyMarkdown(content);
+      }
+      if (language === 'bbcode' || language === 'pwbb') {
+        content = common.URLifyBBcode(content);
+      }
+    }
+    var post = {
+      t: title,
+      c: content,
+      l: language,
+      cat: that.threadTypeID,
+      did: draftId
+    };
+    var userId = $("#userNowId").html()
+    var method = "POST";
+    var url = "/u/"+userId+"/drafts/";
+    var data = {post:post};
+    return nkcAPI(url, method, data)
+      .then(function (result) {
+        if(result.status == "success"){
+          console.log(result.did)
+          $("#draftId").html(result.did)
+          jalert("保存成功！");
+        }
+        if(result.redirect) {
+          redirect(result.redirect)
+        } else {
+          if(that.type === 'post') {
+            redirect()
+          }
+        }
+      })
+      .catch(function (data) {
+        jwarning(data.error);
+        geid('post').disabled = false
+      })
+  }
+}
+
 function onPost(that) {
   return function() {
     //--获取编辑器的内容--
     var specialMark = that.specialMark;
     $(".MathJax_Preview").each(function(){
-      var mathfur = "$$" + $(this).next().next().html() + "$$";
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
       $(this).next().next().replaceWith(mathfur);
       $(this).next().replaceWith("");
       $(this).replaceWith("")
@@ -431,6 +562,10 @@ function onPost(that) {
 	    method = 'POST';
 	    url = '/fund/a/' + id + '/report';
 	    data = {c: post.c, t: post.t}
+    } else if(type === 'redit'){
+      method = 'POST';
+      url = '/f/' + id;
+      data = {post: post};
     } else {
       jwarning('未知的请求类型：'+type);
     }
@@ -446,7 +581,6 @@ function onPost(that) {
       })
       .catch(function (data) {
         jwarning(data.error);
-        console.log(data)
         geid('post').disabled = false
       })
   }
@@ -538,15 +672,22 @@ function mathfresha1(){
 //重新编辑公式
 //使用方法，在编辑器中双击渲染好了的公式
 function reedit(para){
-  console.log($(para))
-  document.getElementsByClassName("w-e-icon-table2").onclick();
+  $(".w-e-icon-math").click()
+  var typelength = $(para).find("script").attr("type").length
+  if(typelength < 15){
+    $("#editora1").val("$"+$(para).find("script").html()+"$")
+  }else{
+    $("#editora1").val("$$"+$(para).find("script").html()+"$$")
+  }
+  $(para).addClass("righteditor")
+  window.localStorage.pMark = "1";
 }
 
-// function fitscreennew(){
-//   var h = $(window).height().toString()+'px'
+function fitscreennew(){
+  var h = $(window).height().toString()+'px'
 
-//   geid('content').style.height = !screenfitted?h:'300px';
-//   geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
+  geid('content').style.height = !screenfitted?h:'300px';
+  geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
 
-//   screenfitted = !screenfitted
-// }
+  screenfitted = !screenfitted
+}

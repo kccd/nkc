@@ -22,6 +22,16 @@ editorRouter
     data.navbar.highlight = 'editor';
     //type=post:重新编辑回复
     //如果需要重新编辑html与语言的帖子，就使用新编辑器
+    if(type === 'redit') {
+      ctx.template = 'interface_editor_test.pug';
+      const did = ctx.query.did;
+      const singledraft = await db.DraftModel.findOnly({did:did});
+      if(singledraft.uid !== user.uid) ctx.throw(403, '权限不足');
+      data.title = singledraft.t;
+      data.content = singledraft.c;
+      data.did = singledraft.did;
+      return await next();
+    }
     if(type === 'post') {
       ctx.template = 'interface_editor.pug';
       const targetPost = await db.PostModel.findOnly({pid: id});  //根据pid查询post表
