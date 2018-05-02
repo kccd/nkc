@@ -106,7 +106,7 @@ otherRouter
     data.activeUsers = activeUsers;
     data.forumList = await dbFn.getAvailableForums(ctx);
     data.fTarget = 'home';
-    const systemSetting = await db.SettingModel.findOnly({uid: 'system'});
+    const systemSetting = await db.SettingModel.findOnly({type: 'system'});
     data.ads = await systemSetting.extendAds();
     if(data.user) data.userThreads = await data.user.getUsersThreads();
     ctx.template = 'interface_home.pug';

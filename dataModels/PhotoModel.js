@@ -60,20 +60,35 @@ const photoSchema = new Schema({
 });
 
 const ensureStatus = async (photo) => {
-	const {expiryDate, status} = photo;
-	if(expiryDate !== null && status === 'passed' && Date.now() > expiryDate) {
-		await photo.update({status: 'outdated'})
+	if(photo) {
+		const {expiryDate, status} = photo;
+		if(expiryDate !== null && status === 'passed' && Date.now() > expiryDate) {
+			await photo.update({status: 'outdated'});
+			photo.status = 'outdated';
+		}
 	}
 };
 
-photoSchema.pre('find', async function(next) {
-	await ensureStatus(this);
-	await next();
+photoSchema.post('find', async function(photo, next) {
+	try{
+		await ensureStatus(photo);
+		await next();
+	} catch(err) {
+		const error = new Error(err);
+		error.status = 500;
+		await next(error);
+	}
 });
 
-photoSchema.pre('findOne', async function(next) {
-	await ensureStatus(this);
-	await next();
+photoSchema.post('findOne', async function(photo, next) {
+	try{
+		await ensureStatus(photo);
+		await next();
+	} catch(err) {
+		const error = new Error(err);
+		error.status = 500;
+		await next(error);
+	}
 });
 
 photoSchema.pre('save', async function(next) {

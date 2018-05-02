@@ -2044,6 +2044,17 @@ img.emoji {
   margin: auto;
   background-color: #fb8282;
 }
+#uploadInfo{
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  color: #fff;
+  padding: 0.2rem 2rem;
+  background-color: rgba(0,0,0,0.7);
+  z-index:10 ;
+  display: none;
+  box-shadow: 3px 3px 8px #aaa;
+}
 .forum-span{
   padding: 0.5rem;
   margin: 0.2rem 0.5rem 0.2rem 0.5rem;
@@ -2174,6 +2185,65 @@ img.emoji {
 }
 /*---------*/
 
+
+/*---用户设置----*/
+.user-settings-img{
+  width: 100%;
+}
+#img_m{
+  position: absolute;
+
+}
+#img_s{
+  position: absolute;
+}
+.education-list{
+  margin-bottom: 0.5rem;
+}
+.industries-list{
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #efefef;
+}
+.account-list{
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+#address-div{
+  margin-bottom: 0.5rem;
+}
+.address-list>div{
+  margin-bottom: 0.5rem;
+}
+.settings-img-remove{
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  position: absolute;
+  color: #eee;
+  background-color: rgba(0,0,0,0.2);
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 2.5rem;
+  text-align: center;
+  top: 0;
+  right: 1.2rem;
+  cursor: pointer;
+  -webkit-transition: background-color 0.2s, color 0.2s;
+  -moz-transition: background-color 0.2s, color 0.2s;
+  -ms-transition: background-color 0.2s, color 0.2s;
+  -o-transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
+}
+.settings-img-remove:hover{
+  color: #fff;
+  background-color: rgba(0,0,0,0.6);
+}
+.settings-img-remove.disabled{
+  display: none;
+}
+/*--------------*/
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{
     width: 27%;

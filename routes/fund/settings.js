@@ -8,7 +8,7 @@ settingsRouter
 	.patch('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
-		const fundSettings = await db.SettingModel.findOne({uid: 'fund'});
+		const fundSettings = await db.SettingModel.findOne({type: 'fund'});
 		const {settingsObj} = body;
 		settingsObj.closed.uid = user.uid;
 		settingsObj.closed.username = user.username;

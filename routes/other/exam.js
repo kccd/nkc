@@ -8,7 +8,7 @@ examRouter
   	const {data, query} = ctx;
   	const {type, info, status, isA} = query;
   	const {user} = data;
-		if(!user) ctx.throw(403, '请登陆后再参加考试。');
+		if(!user) ctx.throw(403, '请登录后再参加考试。');
     data.type = 'chooseCategory';
     if(type === 'result') {
     	data.type = type;
@@ -27,7 +27,7 @@ examRouter
   .get('/:category', async (ctx, next) => {
   	const {data, db, params} = ctx;
   	const {user} = data;
-  	if(!user) ctx.throw(403, '请登陆后再参加考试。');
+  	if(!user) ctx.throw(403, '请登录后再参加考试。');
   	const {category} = params;
   	let numberOfSubject = settings.exam.numberOfSubject;
   	let numberOfCommon = settings.exam.numberOfCommon;
@@ -109,7 +109,7 @@ examRouter
   .post('/subject', async (ctx, next) => {
   	const {data, db, body} = ctx;
 		const {user} = data;
-		if(!user) ctx.throw(403, '请登陆后再参加考试。');
+		if(!user) ctx.throw(403, '请登录后再参加考试。');
 	  const {settings} = ctx;
 		const {exam, sheet, category} = body;
 		if(!exam) ctx.throw(400, '缺少必要的参数。');

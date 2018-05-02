@@ -28,28 +28,34 @@ router
     await next()
   })
   .post('/:uid', async (ctx, next) => {
-    const {uid} = ctx.params;
-    const {fs} = ctx;
-    const {settings, data} = ctx;
-    const {user} = data;
-    if(uid !== user.uid) ctx.throw(403, '权限不足');
-    const extArr = ['jpg', 'png', 'jpeg'];
-    const {imageMagick} = ctx.tools;
-    const file = ctx.body.files.file;
-    if(!file) ctx.throw(400, 'no file uploaded');
-    const {path, type} = file;
-    const extension = mime.getExtension(type);
-    if(!extArr.includes(extension)) {
-      ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.')
-    }
-    await imageMagick.avatarify(path);
-    const saveName = uid + '.jpg';
-    const {avatarPath, avatarSmallPath} = settings.upload;
-    const targetFile = avatarPath + '/' + saveName;
-    const targetSmallFile = avatarSmallPath + '/' + saveName;
-    await fs.rename(path, targetFile);
-    await imageMagick.avatarSmallify(targetFile, targetSmallFile);
-    await next();
+  	const {settings, data, fs, tools, params, body} = ctx;
+		const {uid} = params;
+		const {user} = data;
+		if(!user || uid !== user.uid) ctx.throw(403, '权限不足');
+		const {position} = body.fields;
+		const {file} = body.files;
+	  if(!file) ctx.throw(400, 'no file uploaded');
+	  const {path, type, size} = file;
+	  if(size > ctx.settings.upload.sizeLimit.photo) ctx.throw(400, '图片不能超过20M');
+	  const positionObj = JSON.parse(position);
+	  if(positionObj.width > 5000 || positionObj.height > 5000) ctx.throw(400, '截取的图片范围过小');
+	  const extArr = ['jpg', 'jpeg', 'png'];
+	  const {imageMagick} = tools;
+		const extension = mime.getExtension(type);
+		if(!extArr.includes(extension)) {
+			ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.');
+		}
+		const saveName = uid + '.jpg';
+		const {avatarPath, avatarSmallPath} = settings.upload;
+		const targetFile = avatarPath + '/' + saveName;
+		const targetSmallFile = avatarSmallPath + '/' + saveName;
+	  const options = Object.assign({}, positionObj);
+	  options.path = path;
+	  options.targetPath = targetFile;
+	  await imageMagick.avatarify(options);
+	  await imageMagick.avatarSmallify(targetFile, targetSmallFile);
+	  await fs.unlink(path);
+		await next();
   });
 
 module.exports = router;

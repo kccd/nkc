@@ -214,7 +214,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = require('./PostModel');
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
-  const t2 = Date.now();
   const updateObj = {};
   const lm = await PostModel.findOne({tid: this.tid, disabled: false}).sort({toc: -1});
   const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
@@ -227,10 +226,8 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
   await this.update(updateObj);
-  const t25 = Date.now();
   const forum = await this.extendForum();
   await forum.updateForumMessage();
-  const t3 = Date.now();
   const user = await this.extendUser();
   await user.updateUserMessage();
 };

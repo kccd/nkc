@@ -1,0 +1,146 @@
+extends bootstrap_base
+block title
+  title 用户身份审核
+  -const mainContainer1400 = true
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        h4
+          a(href='/auth') <<返回申请列表
+        .panel.panel-primary
+          .panel-heading
+            span 身份认证2
+          .panel-body
+            -let status; // 5,4,3,2,1(过期，通过，未通过，等待审核，未提交)
+            if data.idCardB && data.idCardA
+              if data.idCardA.status === 'outdated' || data.idCardB.status === 'outdated'
+                -status = 5;
+              else if data.idCardA.status === 'passed' && data.idCardB.status === 'passed'
+                -status = 4;
+              else if data.submittedAuth
+                -status = 2;
+              else if data.idCardA.status === null || data.idCardB.status === null
+                -status = 1;
+              else
+                -status = 3;
+            else
+              -status = 1;
+            h5 认证状态：
+              if status === 4
+                span.text-success 已通过
+              else if status === 5
+                span.text-danger 已过期
+              else if status === 2
+                span 等待审核
+              else if status === 1
+                span 暂未提交
+              else
+                span.text-danger 未通过
+            .row
+              .col-xs-12.col-md-6.text-center
+                h5 身份证正面
+                -let src;
+                if !data.idCardA
+                  -src = defaultImg;
+                else
+                  -src = `/photo_small/${data.idCardA._id}`;
+                  -srcB = `/photo/${data.idCardA._id}`;
+                a(href=srcB target='_blank')
+                  img(src=src style='max-width: 100%;').center-block
+              .col-xs-12.col-md-6.text-center
+                h5 身份证背面
+                if !data.idCardB
+                  -src = defaultImg;
+                else
+                  -src = `/photo_small/${data.idCardB._id}`;
+                  -srcB = `/photo/${data.idCardB._id}`;
+                a(href=srcB target='_blank')
+                  img(src=src style='max-width: 100%;').center-block
+              if status !== 1
+                .col-xs-12.col-md-12.text-center
+                  br
+                  br
+                  label.radio-inline
+                    input(type='radio' name='idCard' checked=status===4)
+                    span 通过
+                  label.radio-inline
+                    input(type='radio' name='idCard' checked=status!==4)
+                    span 不通过
+                  br
+                  br
+                .col-xs-12.col-md-4.col-md-offset-4.text-center#idCardPassedDiv
+                  span 过期时间：
+                  input.form-control.time#idCardTime(size="16" type="text" value=data.idCardA.expiryDate?data.idCardA.expiryDate.toLocaleDateString():'')
+                .col-xs-12.col-md-4.col-md-offset-4.text-center#idCardNotPassedDiv
+                  textarea.form-control#idCardReason(rows=6 placeholder='请填写不通过的原因')= data.idCardA.description
+                .col-xs-12.col-md-12.text-center
+                  br
+                  button.btn.btn-primary(onclick=`submitIdCardAuth("${data.targetUser.uid}")`) 提交
+        .panel.panel-primary
+          .panel-heading
+            span 身份认证3
+          .panel-body
+            // -let status; // 5,4,3,2,1(过期，通过，未通过，等待审核，未提交)
+            -const handheldIdCard = data.handheldIdCard;
+            if !handheldIdCard
+              -status = 1;
+            else
+              if handheldIdCard.status === 'outdated'
+                -status = 5;
+              else if handheldIdCard.status === 'passed'
+                -status = 4;
+              else if data.submittedAuth
+                -status = 2
+              else if handheldIdCard.status === null
+                -status = 1;
+              else
+                -status = 3;
+            h5 认证状态：
+              if status === 4
+                span.text-success 已通过
+              else if status === 5
+                span.text-danger 已过期
+              else if status === 2
+                span 等待审核
+              else if status === 1
+                span 暂未提交
+              else
+                span.text-danger 未通过
+
+            .row
+              .col-xs-12.col-md-6.text-center
+                h5 手持身份证
+                if !handheldIdCard
+                  -src = defaultImg;
+                else
+                  -src = `/photo_small/${handheldIdCard._id}`;
+                  -srcB = `/photo/${handheldIdCard._id}`;
+                a(href=srcB target='_blank')
+                  img(src=src style='max-width: 100%;').center-block
+                if status !== 1
+                  .col-xs-12.col-md-12.text-center
+                    br
+                    br
+                    label.radio-inline
+                      input(type='radio' name='handheld' checked=status === 4)
+                      span 通过
+                    label.radio-inline
+                      input(type='radio' name='handheld' checked=status !== 4)
+                      span 不通过
+                    br
+                    br
+                  .col-xs-12.col-md-6.col-md-offset-3.text-center#handheldPassedDiv
+                    span 过期时间
+                    input.form-control.time#handheldTime(size="16" type="text" value=handheldIdCard.expiryDate ? handheldIdCard.expiryDate.toLocaleDateString() : '')
+                  .col-xs-12.col-md-8.col-md-offset-2.text-center#handheldNotPassedDiv
+                    textarea.form-control#handheldReason(rows=6 placeholder='请填写不通过的原因')= handheldIdCard.description
+                  .col-xs-12.col-md-12.text-center
+                    br
+                    button.btn.btn-primary(onclick=`submitHandHeldAuth("${data.targetUser.uid}")`) 提交
+block scripts
+  script(src='/interface_common.js')
+  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
+  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
+  script(src='/interface_user_auth.js' charset="UTF-8")

@@ -13,6 +13,10 @@ const usersBehaviorSchema = new Schema({
     required: true,
     index: 1,
   },
+	oldUsername: {
+  	type: String,
+		index: 1
+	},
   toUid: {
     type: String,
     required: true,

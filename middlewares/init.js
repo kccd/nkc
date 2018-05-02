@@ -70,6 +70,7 @@ module.exports = async (ctx, next) => {
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
 	  ctx.template = 'error.pug';
+	  console.log(err);
 	  await body(ctx, () => {});
   }
   finally {

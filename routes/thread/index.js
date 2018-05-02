@@ -99,7 +99,7 @@ threadRouter
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
 		}
-		data.ads = (await SettingModel.findOnly({uid: 'system'})).ads;
+		data.ads = (await SettingModel.findOnly({type: 'system'})).ads;
 		let myForum, othersForum;
 		if(mid !== '') {
 			myForum = await PersonalForumModel.findOnly({uid: mid});

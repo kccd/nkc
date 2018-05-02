@@ -1,0 +1,31 @@
+extends bootstrap_base
+block title
+  title 交易信息设置
+  -const mainContainer1400 = true
+  link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 交易信息设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 收货地址：
+                .col-sm-10
+                  .row#address-div
+                  button.btn.btn-primary(onclick='addAddress()') 添加
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
+  #data.hidden= JSON.stringify({addresses: data.addresses})
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
+  script(src='/interface_user_settings_transaction.js')

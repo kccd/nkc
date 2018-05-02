@@ -1,0 +1,44 @@
+extends bootstrap_base
+block title
+  title 头像设置
+  link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
+  -const mainContainer1400 = true
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 头像设置
+          .panel-body
+            h5.text-danger 图片大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
+            .row
+              .col-xs-12.col-md-6
+                .row
+                  .col-xs-12.col-md-12.user-settings-img-dev
+                    img(src=`/avatar/${data.user.uid}` style='width: 100%;')
+                    //div(style='width: 100%;height: 30rem;background-color: #eee;line-height: 30rem; color: #aaa;font-size: 2rem;').text-center 未选择图片
+                  .col-xs-12.col-md-12.text-center
+                    br
+                    button.btn.btn-primary(onclick='$("#inputFile").click();') 选择图片
+                    button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
+                    br
+                    br
+              .col-xs-12.col-md-3
+                .col-xs-12.col-md-12
+                  div(style=`width: 192px;height: 192px;position: relative;overflow: hidden;`)
+                    img#img_m(src=`/avatar/${data.user.uid}`).user-settings-img
+                  h5 192x192
+                .col-xs-12.col-md-12
+                  br
+                .col-xs-6.col-md-6
+                  div(style=`width: 48px;height: 48px;position: relative;overflow: hidden;`)
+                    img#img_s(src=`/avatar_small/${data.user.uid}`).user-settings-img
+                  h5 48x48
+            input#inputFile(type='file' accept="image/*").hidden
+block scripts
+  script(src='/interface_common.js')
+  script(src='/jcrop/js/jquery.Jcrop.min.js')
+  script(src='/interface_user_settings_avatar.js')

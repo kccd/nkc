@@ -46,12 +46,12 @@ jobs.updateActiveUsers = cronStr => {
 
 jobs.backupDatabase = () => {
 	scheduleJob(backup.cronStr, async () => {
-		fs.appendFile(`${path.resolve(__dirname)}/backup.log`, `\n\n${moment().format('YYYY-MM-DD HH:mm:SS')} 开始备份数据...\n`, (err) => {
+		fs.appendFile(`${path.resolve(__dirname)}/backup.log`, `\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`, (err) => {
 			if(err) {
 				console.log(err);
 			}
 		});
-		console.log(`\n\n${moment().format('YYYY-MM-DD HH:mm:SS')} 开始备份数据...\n`);
+		console.log(`\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`);
 		let data = '', error = '';
 		const process = spawn(
 			'mongodump.exe',
@@ -60,7 +60,7 @@ jobs.backupDatabase = () => {
 				'--db',
 				backup.database,
 				'--out',
-				`${backup.out}${moment().format('YYYYMMDDHHmmSS')}`,
+				`${backup.out}${moment().format('YYYYMMDDHHmmss')}`,
 			]
 		);
 		process.stdout.on('data', (d) => {
@@ -76,9 +76,9 @@ jobs.backupDatabase = () => {
 		process.on('close', (code) => {
 			let info = '';
 			if (code === 0) {
-				info = `${moment().format('YYYY-MM-DD HH:mm:SS')} 备份完成`;
+				info = `${moment().format('YYYY-MM-DD HH:mm:ss')} 备份完成`;
 			} else {
-				info = `${moment().format('YYYY-MM-DD HH:mm:SS')} 备份失败\n${error}`;
+				info = `${moment().format('YYYY-MM-DD HH:mm:ss')} 备份失败\n${error}`;
 			}
 			console.log(info);
 			fs.appendFile(`${path.resolve(__dirname)}/backup.log`, info, (err) => {

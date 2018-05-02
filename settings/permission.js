@@ -152,10 +152,6 @@ const certificates ={
           [name]: '注册短信',
           [POST]: true
         },
-        bindMobile: {
-          [name]: '绑定手机号',
-          [POST]: true
-        },
         getback: {
           [name]: '找回密码',
           [POST]: true
@@ -321,7 +317,7 @@ const certificates ={
     displayName: '开除学籍',
     permittedOperations: {
       me: {
-        [GET]: true
+        [GET]: false
       },
       logout: {
         [GET]: true
@@ -338,6 +334,7 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+<<<<<<< HEAD
       draft: {
         [name]: '草稿',
         [POST]: true,
@@ -354,6 +351,19 @@ const certificates ={
           }
         }
       },
+=======
+	    sendMessage: {
+		    [name]: '发短信',
+		    bindMobile: {
+			    [name]: '绑定手机号',
+			    [POST]: true
+		    },
+		    changeMobile: {
+		    	[name]: '更换手机号',
+			    [POST]: true
+		    }
+	    },
+>>>>>>> 3fcfc943979283c17ac6825cefcdebc23ddfdf25
 	    exam: {
 		    [name]: '考试',
 		    [GET]: true,
@@ -481,6 +491,7 @@ const certificates ={
           	[name]: '用户账单',
 		        [GET]: true
 	        },
+<<<<<<< HEAD
 	        drafts: {
           	[name]: '草稿箱',
             [GET]: true,
@@ -489,27 +500,97 @@ const certificates ={
             [parameter]: {
               [DELETE]: true,
             }
+=======
+	        auth: {
+		        [DELETE]: true,
+          	[parameter]: {
+          		[name]: '身份认证',
+		          [POST]: true
+	          }
+	        },
+	        settings: {
+          	[name]: '用户资料设置',
+		        [GET]: true,
+		        avatar: {
+          		[name]: '用户头像设置',
+			        [GET]: true
+		        },
+		        info: {
+          		[name]: '基本资料设置',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        resume: {
+							[name]: '简历设置',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        password: {
+          		[name]: '密码修改',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        mobile: {
+          		[name]: '手机绑定',
+			        [GET]: true,
+			        [PATCH]: true,
+			        [POST]: true
+		        },
+		        email: {
+          		[name]: '邮箱绑定',
+			        [GET]: true,
+			        [POST]: true,
+			        [PATCH]: true
+		        },
+		        verify: {
+          		[name]: '身份认证',
+			        [parameter]: {
+				        [GET]: true,
+				        [POST]: true
+			        }
+		        },
+		        social: {
+          		[name]: '社交账号',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        transaction: {
+          		[name]: '交易信息设置',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        photo: {
+          		[name]: '照片',
+			        [GET]: true,
+			        [PATCH]: true
+		        },
+		        cert: {
+          		[name]: '证件',
+			        [GET]: true,
+			        [PATCH]: true
+		        }
+>>>>>>> 3fcfc943979283c17ac6825cefcdebc23ddfdf25
 	        }
         }
       },
       me: {
-        [PATCH]: true,
-        [GET]: true,
+        [PATCH]: false,
+        [GET]: false,
         settings: {
           [name]: '个人信息',
-          [PATCH]: true
+          [PATCH]: false
         },
         password: {
           [name]: '密码',
-          [PATCH]: true
+          [PATCH]: false
         },
         username: {
           [name]: '用户名',
-          [PATCH]: true
+          [PATCH]: false
         },
         mobile: {
           [name]: '手机',
-          [POST]: true
+          [POST]: false
         },
         resource: {
           [name]: '上传的资源',
@@ -517,36 +598,11 @@ const certificates ={
         },
         activities: {
           [name]: '个人动态',
-          [GET]: true
+          [GET]: false
         },
         threads: {
           [name]: '获取帖子',
           [GET]: true
-        },
-        addresses: {
-          [name]: '地址管理',
-          [POST]: true,
-          [parameter]: {
-            [DELETE]: true
-          }
-        },
-        industries: {
-          [name]: '工作情况管理',
-          [POST]: true,
-          [parameter]: {
-            [DELETE]: true
-          }
-        },
-        education: {
-          [name]: '教育情况管理',
-          [POST]: true,
-          [parameter]: {
-            [DELETE]: true
-          }
-        },
-        personal_info: {
-          [name]: '详细设置',
-          [POST]: true
         },
 	      life_photos: {
         	[name]: '生活照',
@@ -696,47 +752,6 @@ const certificates ={
 		    [POST]: true,
 		    [parameter]: {
 			    [GET]: true,
-		    }
-	    },
-	    set: {
-      	[name]: '个人资料设置',
-		    [GET]: true,
-		    info: {
-      		[name]: '基本信息',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    security: {
-					[name]: '账号安全',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    verify: {
-      		[name]: '身份认证',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    cert: {
-      		[name]: '我的证书',
-			    [GET]:true,
-			    [POST]: true,
-			    [PATCH]: true
-		    },
-		    album: {
-      		[name]: '我的相册',
-			    [GET]: true,
-			    [POST]: true,
-			    [PATCH]: true
-		    }
-	    },
-	    auth: {
-		    [name]: '身份认证',
-		    [POST]: true, // 提交认证申请
-		    [parameter]: {
-			    [DELETE]: true
 		    }
 	    }
     },
@@ -959,6 +974,15 @@ const certificates ={
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
+    	system: {
+				[name]: '网站系统',
+		    [GET]: true,
+		    settings: {
+					[name]: '系统设置',
+			    [GET]: true,
+			    [PATCH]: true
+		    }
+	    },
     	log: {
     		[name]: '网站日志',
 		    [GET]: true,
@@ -1020,11 +1044,18 @@ const certificates ={
       },
 	    auth: {
 		    [name]: '身份认证',
-		    [GET]: true,
-		    [parameter]: {
-		    	[GET]: true,
-			    [PATCH]: true,
-			    [DELETE]: true
+		    [GET]: true
+	    },
+	    u: {
+    		[parameter]: {
+    			auth: {
+    				[name]: '用户身份审核',
+				    [GET]: true,
+				    [parameter]: {
+    					[name]: '身份认证2，3',
+					    [PATCH]: true
+				    }
+			    }
 		    }
 	    }
     }
