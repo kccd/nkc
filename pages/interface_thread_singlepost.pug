@@ -42,7 +42,7 @@
                 a(href=`javascript:at('${post.user.username}')`) @该用户
 
               - if(postTo)
-                a(href=`javascript:quotePost('${post.pid}', '${data.paging.start+index}')`) 引用
+                a(href=`javascript:quotePost('${post.pid}', '${data.paging.start+index}', '${data.paging.page.toString()}')`) 引用
 
               - if(addCredit)
                 a(href=`javascript:addCredit('${post.pid}')`) 评学术分

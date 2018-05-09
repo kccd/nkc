@@ -306,8 +306,8 @@ block content
     
 block scripts
   script(src='/qrcode/build/qrcode.js')
-  script(src='/interface_common.js')
-  script(src='/interface_thread.js')
+  script(src='/interface_common.js?v=2')
+  script(src='/interface_thread.js?v=1')
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   script(src="/jquery-1.10.2.js")
@@ -320,8 +320,8 @@ block scripts
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
   script(src='/nkc_render.js')
-  script(src='/interface_editor_reply.js')
-  script(src='/interface_attachment_uploader.js')
-  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js')
+  script(src='/interface_editor_reply.js?v=1')
+  script(src='/interface_attachment_uploader.js?v=1')
+  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
   <script type="text/javascript" src="/wangEditor.js"></script>
   <script type="text/javascript" src="/newEditor_reply.js"></script>
