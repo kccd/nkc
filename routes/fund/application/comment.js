@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const commentRouter = new Router();
 commentRouter
 	.post('/', async (ctx, next) => {
+		console.log(ctx.body)
 		const {data, body, db} = ctx;
 		const {applicationForm, user} = data;
 		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
@@ -15,7 +16,8 @@ commentRouter
 			uid: user.uid,
 			type: 'comment',
 			t: comment.t,
-			c: comment.c
+			c: comment.c,
+			l: comment.l
 		});
 		await newDocument.save();
 		data.redirect = `/fund/a/${applicationForm._id}`;

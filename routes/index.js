@@ -13,12 +13,8 @@ const resourceRouter = routers.resource;
 const fundRouter = routers.fund;
 const registerRouter = routers.register;
 const personalForumRouter = routers.personalForum;
-<<<<<<< HEAD
-const setRouter = routers.set;
 const downloadRouter = routers.download;
-=======
 const systemRouter = routers.system;
->>>>>>> 3fcfc943979283c17ac6825cefcdebc23ddfdf25
 
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
@@ -33,10 +29,6 @@ router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
-<<<<<<< HEAD
-router.use('/set', setRouter.routes(), setRouter.allowedMethods());
 router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
-=======
 router.use('/system', systemRouter.routes(), systemRouter.allowedMethods());
->>>>>>> 3fcfc943979283c17ac6825cefcdebc23ddfdf25
 module.exports = router;

@@ -35,6 +35,14 @@ var ResourceListItem = React.createClass({
       )
     }
   })
+
+  var littleButton = React.createClass({
+    render:function(){
+      return (
+        <button onClick={showLittleAttachments} className="btn btn-default">收起</button>
+      )
+    }
+  })
   
   var ResourceList = React.createClass({
     render:function(){
@@ -51,6 +59,7 @@ var ResourceListItem = React.createClass({
         <div className="ResourceList">
           {renderedNodes}
           <MoarButton/>
+          <button onClick={showLittleAttachments} className="btn btn-default">收起</button>
         </div>
       )
     }
@@ -64,7 +73,7 @@ var ResourceListItem = React.createClass({
   
     list_father.innerHTML = '';//clear
     list_display.rlist = [];
-    list_display.quota = 30;
+    list_display.quota = 5;
     list_display.refresh = function(){
       //obtain rlist here
       nkcAPI('/me/resource?quota='+list_display.quota, 'get',{})
@@ -83,6 +92,11 @@ var ResourceListItem = React.createClass({
       list_display.quota+=10;
       list_display.refresh();
     }
+
+    list_display.showLittle = function(){
+      list_display.quota-=10;
+      list_display.refresh();
+    }
   
     return list_display;
   }
@@ -92,6 +106,10 @@ var ResourceListItem = React.createClass({
   
   function showMoreAttachments(){
     list.showMore();
+  }
+
+  function showLittleAttachments(){
+    list.showLittle();
   }
   
   function content_insert_resource(event)

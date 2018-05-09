@@ -17,6 +17,9 @@ block content
                         span.ForumThreadHasImage(style='background-color: #337ab7')= "标题"
                         span.title= i.t
                         br
+                        span.ForumThreadHasImage(style='background-color: #337ab7')= "内容"
+                        span= delCodeAddShrink(i.c)
+                        br
                         div#draftObjId(style='display: none')= `${i.did}`
                         span 修改于&nbsp;
                         span.time= fromNow(i.tlm)

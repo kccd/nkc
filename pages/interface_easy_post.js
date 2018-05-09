@@ -303,6 +303,9 @@ var onPost = function(that) {
       if (language === 'bbcode' || language === 'pwbb') {
         content = common.URLifyBBcode(content);
       }
+      if (language === 'html') {
+        content = common.URLifyHTML(content);
+      }
     }
     var post = {
       t: title,

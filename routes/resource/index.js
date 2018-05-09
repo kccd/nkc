@@ -11,7 +11,7 @@ resourceRouter
     const {data, db, fs, settings} = ctx;
     const {cache} = settings;
     const resource = await db.ResourceModel.findOnly({rid});
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
     if(!extArr.includes(resource.ext.toLowerCase()) && data.userLevel < 1) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
     const {path, ext} = resource;
     let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
@@ -39,7 +39,8 @@ resourceRouter
     const {name, size, path} = file;
     //path "d:\nkc\tmp\upload_0e50089913dcacbc9514f64c3e3d31f4.png"
     // 图片格式 png/jpg
-    const extension = pathModule.extname(name).replace('.', '');
+    const extensionE = pathModule.extname(name).replace('.', '');
+    const extension = extensionE.toLowerCase()
     // 图片最大尺寸
     const {largeImage} = settings.upload.sizeLimit;
     // 根据自增id定义图片名称

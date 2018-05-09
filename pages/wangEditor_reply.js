@@ -1082,7 +1082,7 @@ function Head(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="设置标题"><i class="fa fa-header"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="fa fa-header"><i/></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -1144,7 +1144,7 @@ function FontSize(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="设置字号"><i class="fa fa-text-height"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="fa fa-text-height"><i/></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -1481,7 +1481,7 @@ Link.prototype = {
                 // tab 的标题
                 title: '链接',
                 // 模板
-                tpl: '<div>\n                            <input id="' + inputTextId + '" type="text" class="block" value="' + text + '" placeholder="\u94FE\u63A5\u6587\u5B57"/></td>\n                            <input id="' + inputLinkId + '" type="text" class="block" value="' + link + '" placeholder="http://... 或 https://...."/></td>\n                            <div class="w-e-button-container">\n                                <button id="' + btnOkId + '" class="right">\u63D2\u5165</button>\n                                <button id="' + btnDelId + '" class="gray right" style="display:' + delBtnDisplay + '">\u5220\u9664\u94FE\u63A5</button>\n                            </div>\n                        </div>',
+                tpl: '<div>\n                            <input id="' + inputTextId + '" type="text" class="block" value="' + text + '" placeholder="\u94FE\u63A5\u6587\u5B57"/></td>\n                            <input id="' + inputLinkId + '" type="text" class="block" value="' + link + '" placeholder="http://..."/></td>\n                            <div class="w-e-button-container">\n                                <button id="' + btnOkId + '" class="right">\u63D2\u5165</button>\n                                <button id="' + btnDelId + '" class="gray right" style="display:' + delBtnDisplay + '">\u5220\u9664\u94FE\u63A5</button>\n                            </div>\n                        </div>',
                 // 事件绑定
                 events: [
                 // 插入链接
@@ -1546,15 +1546,6 @@ Link.prototype = {
         if (linkCheck && typeof linkCheck === 'function') {
             checkResult = linkCheck(text, link);
         }
-        var strRegex='((http|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?'; 
-        var reg = new RegExp(strRegex); 
-        if(link == '' || !reg.test(link)){
-            checkResult = '链接验证失败' // 返回字符串，即校验失败的提示信息
-        }
-        if(text == ''){
-            text = link
-        }
-        console.log('text',text,'link',link)
         if (checkResult === true) {
             editor.cmd.do('insertHTML', '<a href="' + link + '" target="_blank">' + text + '</a>');
         } else {
@@ -1880,7 +1871,7 @@ function Justify(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="对齐方式"><i class="fa fa-paragraph"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="fa fa-paragraph"><i/></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -1918,7 +1909,7 @@ function ForeColor(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="文字颜色"><i class="fa fa-pencil"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="fa fa-pencil"><i/></div>');
     this.type = 'droplist';
 
     // 获取配置的颜色
@@ -1962,7 +1953,7 @@ function BackColor(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="背景色"><i class="fa fa-paint-brush"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="fa fa-paint-brush"><i/></div>');
     this.type = 'droplist';
 
     // 获取配置的颜色
@@ -2131,7 +2122,7 @@ Code.prototype = {
                 // 标题
                 title: '插入代码',
                 // 模板
-                tpl: '<div>\n                        <textarea id="' + textId + '" style="height:145px;resize:vertical;">' + value + '</textarea>\n                        <div class="w-e-button-container">\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    <div>',
+                tpl: '<div>\n                        <textarea id="' + textId + '" style="height:145px;resize:vertical;resize:vertical;;">' + value + '</textarea>\n                        <div class="w-e-button-container">\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    <div>',
                 // 事件绑定
                 events: [
                 // 插入代码
@@ -2690,7 +2681,7 @@ formula.prototype = {
                 // 模板
                 tpl: '<div>\n' +
                     // '<input type="text" class="block" id="editora1" placeholder="例:$$\\sum_{i=0}^N\\int_{a}^{b}g(t,i)\\text{d}t$$"/>\n '+
-                    '<textarea id="editora1" style="height:70px;resize:vertical;font-size:13px" placeholder="正文显示(inline)：请使用$....$或\\(....\\)包裹代码\n单独显示(display)：请使用$$....$$或\\[....\\]包裹代码"></textarea>\n' + 
+                    '<textarea id="editora1" style="height:70px;resize:vertical;font-size:13px" placeholder="正文显示(inline):$....$\n单独显示(display):$$....$$"></textarea>\n' + 
                         '<div id="editora2"></div>'+
                         '<div class="w-e-button-container">\n'+
                             '<button class="left" onclick="mathfresha1()">预览</button>\n'+
@@ -2741,7 +2732,7 @@ formula.prototype = {
 //下面是新编辑器渲染公式
 function mathfreshnew(){
     if(MathJax){
-       MathJax.Hub.PreProcess(geid('text-elem'),function(){MathJax.Hub.Process(geid('text-elem'))})
+       MathJax.Hub.PreProcess(geid('ReplyContent-elem'),function(){MathJax.Hub.Process(geid('ReplyContent-elem'))})
       //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
     }
     if(hljs){
@@ -2785,7 +2776,7 @@ Video.prototype = {
                 // 标题
                 title: '插入视频',
                 // 模板
-                tpl: '<div>\n                        <textarea id="' + textValId + '" style="height:70px;resize:vertical;font-size:13px" placeholder="示例1: <iframe height=... width=... src=... ></iframe>\n示例2: http://server/xxx.swf"/></textarea>\n         <input id="inHeight" type="text" placeholder="高度：300~960,默认400">      <div class="w-e-button-container">\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    </div>',
+                tpl: '<div>\n                        <textarea id="' + textValId + '" style="height:70px;resize:vertical;font-size:13px" placeholder="示例1: <iframe src=... ></iframe>\n示例2: http://server/xxx.swf"/></textarea>\n                        <div class="w-e-button-container">\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    </div>',
                 // 事件绑定
                 events: [{
                     selector: '#' + btnId,
@@ -2793,22 +2784,19 @@ Video.prototype = {
                     fn: function fn() {
                         var $text = $('#' + textValId);
                         var val = $text.val().trim();
-                        var videoHeight = parseInt($("#inHeight").val());
-                        if(isNaN(videoHeight) || videoHeight > 960 || videoHeight < 300){
-                            videoHeight = "400"
-                        }
-                        console.log(videoHeight,typeof(videoHeight))
                         if(val.substr(val.length-3) == "swf"){
-                            val = "<embed src="+val+" type='application/x-shockwave-flash' width='80%' height='"+videoHeight+"px' allowfullscreen='true' frameborder=0/>"
+                            val = "<embed src="+val+" type='application/x-shockwave-flash' width='300' height='300' frameborder=0 'allowfullscreen'/>"
                         }
                         // var val = "<iframe height=300 width=300 src=" + val1  + " frameborder=0 'allowfullscreen'></iframe>"
 
                         // 测试用视频地址
                         // <iframe height=300 width=300 src='http://player.youku.com/embed/XMjcwMzc3MzM3Mg==' frameborder=0 'allowfullscreen'></iframe>
+
                         if (val) {
                             // 插入视频
                             _this._insert(val);
                         }
+
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                         return true;
                     }
@@ -3171,17 +3159,8 @@ Menus.prototype = {
             }
 
             // 下拉框，例如 head
-            // 兼容webkit 将mouseenter事件内容复制给click一份
             if (type === 'droplist' && droplist) {
-                $elem.on('click', function (e) {
-                    if (editor.selection.getRange() == null) {
-                        return;
-                    }
-                    // 显示
-                    droplist.showTimeoutId = setTimeout(function () {
-                        droplist.show();
-                    }, 200);
-                }).on('mouseenter', function(e){
+                $elem.on('mouseenter', function (e) {
                     if (editor.selection.getRange() == null) {
                         return;
                     }
@@ -4641,9 +4620,7 @@ Editor.prototype = {
             $toolbarSelector.append($toolbarElem).append($textContainerElem);
 
             // 自行创建的，需要配置默认的样式
-            //先屏蔽掉，有莫名其妙加背景色的情况发生，观察一段时间
-            //$toolbarElem.css('background-color', '#f1f1f1').css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
-            $toolbarElem.css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
+            $toolbarElem.css('background-color', '#f1f1f1').css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
             $textContainerElem.css('border', '1px solid #ccc').css('border-top', 'none').css('height', '300px');
         } else {
             // toolbar 和 text 的选择器都有值，记录属性
@@ -4678,7 +4655,7 @@ Editor.prototype = {
         $toolbarElem.attr('id', toolbarElemId);
         // var textElemId = getRandom('text-elem');
         // $textElem.attr('id', textElemId);
-        var textElemId = 'text-elem';
+        var textElemId = 'ReplyContent-elem';
         $textElem.attr('id', textElemId);
 
         // 记录属性

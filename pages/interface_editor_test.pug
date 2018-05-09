@@ -34,7 +34,16 @@ block content
                 select.form-control#lang(style='display: none; width: auto;')
                     option html
             .form-group
+                div#quoteContent
+            .form-group
                 div#content_test
+            .form-inline
+                .form-group
+                    input#parseURL(type='checkbox' checked)
+                    span &nbsp;处理URL&nbsp;
+                .form-group
+                    button#post.btn.btn-primary(type='submit' style='margin-left: 10px') 发表
+                    button#draft.btn.btn-primary(type='submit' style='margin-left: 10px') 保存草稿
             .form-group
             .nkcpanel(id='file-uploading' target='/r')
                 //uploader section
@@ -45,11 +54,9 @@ block content
                 .panel-body(id='list-container')            
 
             .form-group
-                input#parseURL(type='checkbox' checked)
-                span &nbsp;处理URL&nbsp;
+                //- input#parseURL(type='checkbox' checked)
+                //- span &nbsp;处理URL&nbsp;
             .form-group
-                button#post.btn.btn-primary(type='submit' style='float: right;margin-right: 10px') 发表
-                button#draft.btn.btn-primary(type='submit' style='float: right;margin-right: 10px') 保存草稿
                 div#disnoneplay(style='display:none')= data.content
                 div#draftNowId(style='display:none')= data.content
                 div#userNowId(style='display:none')= data.user.uid

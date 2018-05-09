@@ -222,15 +222,20 @@ block content
                 - if(userCerts[i] === 'mobile')
                   - hasMobile = true;
               if (data.userLevel >= 1 && hasMobile && data.user.volumeA)
-                //.form-group
-                  //a.f12(href='/editor?target=#{data.replytarget}') 回复（去编辑器）
 
+                //- .form-group
+                //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
                 .form-group
-                  textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
-
+                  div#quoteContent
+                .form-group
+                  div#quoteCancel(style='display: none')
+                    button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+                .form-group
+                  div#ReplyContent
                 .form-inline
                   .form-group
                     button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
+                    button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
 
                   .checkbox-inline
                     label
@@ -240,9 +245,18 @@ block content
                   if 0
                     .form-group
                       button#WiderArea.hidden-xs.btn.btn-default(onclick='widerArea()') 拓展
-                  include twemoji.pug
+                  //- include twemoji.pug
                   .form-group
                     button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
+                .form-group
+                .nkcpanel(id='file-uploading' target='/r')
+                    //uploader section
+                    include interface_attachment_uploader_uploader.pug
+                    
+                .panel.panel-default
+                    .panel-heading 我的附件（点击插入帖子）
+                    .panel-body(id='list-container')   
+
 
             include exam_notification.pug
 
@@ -296,4 +310,18 @@ block scripts
   script(src='/interface_thread.js')
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
-                
+  script(src="/jquery-1.10.2.js")
+  script(src="/jquery-ui-1.10.4.custom.js")
+  script(src='/commonmark/dist/commonmark.js')
+  script(src='/plain_escaper.js')
+  script(src='/xbbcode-parser/xbbcode.js')
+  script(src='/xss/dist/xss.js')
+  
+  script(src='/external_pkgs/react/react.min.js')
+  script(src='/external_pkgs/react/JSXTransformer.js')
+  script(src='/nkc_render.js')
+  script(src='/interface_editor_reply.js')
+  script(src='/interface_attachment_uploader.js')
+  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js')
+  <script type="text/javascript" src="/wangEditor.js"></script>
+  <script type="text/javascript" src="/newEditor_reply.js"></script>

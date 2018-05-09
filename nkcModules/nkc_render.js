@@ -31,7 +31,7 @@ function nkc_render(options){
   default_whitelist.code = ['class']
   default_whitelist.span = ['class', 'style', 'aria-hidden'];
   default_whitelist.a = ['href', 'title', 'target', 'style'];
-  default_whitelist.p = ['align'];
+  default_whitelist.p = ['align','ontouchend','ondbclick'];
   default_whitelist.div = ['style'];
   default_whitelist.table = ['border','width','cellpadding','cellspacing'];
   default_whitelist.tbody = [];
@@ -399,7 +399,6 @@ function nkc_render(options){
       +'<span class="PostResourceFileSize">'+fileSizeString+'</span>' + '<span class="PostResourceCounter">'+hits+'</span>'
       +'</div>';
     }
-
     return replaced
   }
 
@@ -459,20 +458,24 @@ function nkc_render(options){
     html = render.hiddenReplaceHTML(html)
     // fix for older posts where they forgot to inject attachments.
     var count = 0
-    for(var i in post.resources){
-      var r = post.resources[i]
-      if(!r._used){
-        var allthumbnail = true
-        if(count==0){
-          html+='<hr class="HrPostContentUnusedAttachment"/>'
-          count++;
-        }
+    // 注释掉下面代码，用来防止附件的生成
+    // for(var i in post.resources){
+    //   var r = post.resources[i]
+    //   if(!r._used){
+    //     var allthumbnail = true
+    //     if(count==0){
+    //       html+='<hr class="HrPostContentUnusedAttachment"/>'
+    //       count++;
+    //     }
 
-        if(count>=50)throw '[nkc_render]too much attachment included! refuse to process.'
+    //     if(count>=50)throw '[nkc_render]too much attachment included! refuse to process.'
+    //     html+=getHTMLForResource(r,allthumbnail)
+    //   }
+    // }
 
-        html+=getHTMLForResource(r,allthumbnail)
-      }
-    }
+    // 添加查看大图
+    // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
+    html = html.replace(/<img src="(.+?)">/img,'<a href="$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="$1" /></a>')
     return html
   }
 

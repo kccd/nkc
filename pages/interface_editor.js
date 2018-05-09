@@ -234,9 +234,9 @@ function Editor() {
     this.language.addEventListener('change', this.update);
     this.post.onclick = onPost(self);
     this.draft.onclick = saveDraft(self);
-    if(this.query.type === "post"){
-      document.getElementById("draft").style.display = "none"
-    }
+    // if(this.query.type === "post"){
+    //   document.getElementById("draft").style.display = "none"
+    // }
     if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
       this.blocked = true;
       this.parents.disabled = true;
@@ -426,19 +426,21 @@ function saveDraft(that){
       $(this).replaceWith("")
     })
     //-- --
+    var quoteContent = document.getElementById("quoteContent").innerHTML
     var draftId = $("#draftId").html();
-    var content = that.content.innerHTML.trim();
+    var content = quoteContent + that.content.innerHTML.trim();
     var title = that.title.value.trim();
     var type = that.query.type;
+    var destination = {
+      type: type,
+      typeid: that.query.id
+    }
     var cat = that.query.cat;
     var id = that.blocked ? that.query.id : that.childID;
     var language = that.language.value.toLowerCase().trim();
-    if (content === '') {
-      screenTopWarning('请填写内容。');
-      return;
-    }
-    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
-      screenTopWarning('请填写标题。');
+    var emptyContent = content.replace(/<[^>]+>/g,"");
+    if (emptyContent === '' && type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
+      screenTopWarning('请填写内容或标题');
       return;
     }
     if (geid('parseURL').checked) {
@@ -454,8 +456,10 @@ function saveDraft(that){
       c: content,
       l: language,
       cat: that.threadTypeID,
-      did: draftId
+      did: draftId,
+      destination: destination
     };
+    console.log(post)
     var userId = $("#userNowId").html()
     var method = "POST";
     var url = "/u/"+userId+"/drafts/";
@@ -496,10 +500,11 @@ function onPost(that) {
       $(this).next().replaceWith("");
       $(this).replaceWith("")
     })
+    var quoteContent = document.getElementById("quoteContent").innerHTML
     if(specialMark == "old"){
       var content = that.content.value;
     }else{
-      var content = that.content.innerHTML.trim();
+      var content = quoteContent + that.content.innerHTML.trim();
     }
     //-- --
     var title = that.title.value.trim();
@@ -561,7 +566,7 @@ function onPost(that) {
     } else if(type === 'application' && cat === 'r') { // 报告
 	    method = 'POST';
 	    url = '/fund/a/' + id + '/report';
-	    data = {c: post.c, t: post.t}
+	    data = {c: post.c, t: post.t, l: post.l}
     } else if(type === 'redit'){
       method = 'POST';
       url = '/f/' + id;

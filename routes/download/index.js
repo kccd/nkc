@@ -50,6 +50,8 @@ downloadRouter
                     ext = "gif";
                 }else if(res.headers['content-type'] == "application/x-bmp"){
                     ext = "bmp";
+                }else if(res.headers['content-type'] == "image/svg+xml"){
+                    ext = "svg";
                 }else{
                     error = new Error('不是图片')
                     reject(error)

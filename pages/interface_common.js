@@ -364,6 +364,11 @@ var common=(function(){
       return p1+'[url]'+p2+'[/url]'
     })
   }
+  common.URLifyHTML = function(content){
+    return content.replace(URLExtractRegex,function(match,p1,p2){
+      return p1+'<a href="#">'+p2+'</a>'
+    })
+  }
 
   function mapWithPromise(arr,func,k){
     k = k||0
@@ -434,9 +439,10 @@ function edInsertContent(which, myValue, fileType, fileName) {
     }
   }
   if(which == "text-elem"){
-  
+    // 将文件后缀转为小写
+    fileType = fileType.toLowerCase()
     var codeResource = "";
-    if(fileType === "jpg" || fileType === "png" || fileType === "gif"){
+    if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
       //codeResource = "<b>123456</b>"
       codeResource = "<p><img src=" + myValue + "></p>"
     }else if(fileType === "mp4"){
@@ -457,7 +463,7 @@ function insertHtmlAtCaret(html) {
   if (window.getSelection) {
     // IE9 and non-IE
     //获取光标的当前位置
-    document.getElementById("text-elem").focus();
+    document.getElementById("text-elem").focus()
     sel = window.getSelection()
     if (lastEditRange) {
       // 存在最后光标对象，选定对象清除所有光标并添加最后光标还原之前的状态
@@ -731,3 +737,13 @@ function removedraft(uid,did){
       screenTopWarning(data.error)
     })
 }
+
+// // 去标签+略缩
+// function delCodeAddShrink1(content){
+// 	content = content.replace(/<[^>]+>/g,"");
+// 	if(content.length > 10){
+//     var lastContent = content.substr(content.length-50,content.length)
+// 		content = content.substr(0,10) + "......" + lastContent;
+// 	}
+// 	return content
+// }

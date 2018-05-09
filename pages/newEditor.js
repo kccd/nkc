@@ -17,7 +17,7 @@ editor.customConfig.menus = [
     'justify',  // 对齐方式
     'quote',  // 引用
     'emoticon',  // 表情
-    'image',  // 插入图片
+    //'image',  // 插入图片
     'table',  // 表格
     'video',  // 插入视频
     'formula',  // 公式
@@ -30,7 +30,28 @@ editor.customConfig.pasteTextHandle = function (content) {
     // content 即粘贴过来的内容（html 或 纯文本），可进行自定义处理然后返回
     return content + '<p>在粘贴内容后面追加一行</p>'
 }
-editor.txt.html(htmlDecode($("#disnoneplay").html()))
+var type = GetUrlParam("type");
+if(type == "post"){
+    var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+    var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
+    if(quoteHtml)document.getElementById("quoteContent").innerHTML = quoteHtml[0]
+    disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
+    editor.txt.html(disnoneplayHtml)
+}
+if(type == "thread"){
+    var replyHtml = window.localStorage.replyHtml;
+    var quoteHtml = window.localStorage.quoteHtml;
+    editor.txt.html(replyHtml)
+    if(quoteHtml)document.getElementById("quoteContent").innerHTML = quoteHtml
+    window.localStorage.clear();
+}
+if(type == "redit"){
+    var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+    var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
+    if(quoteHtml)document.getElementById("quoteContent").innerHTML = quoteHtml[0]
+    disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
+    editor.txt.html(disnoneplayHtml)
+}
 
 //html解码
 function htmlDecode(text){
@@ -43,3 +64,23 @@ function htmlDecode(text){
     temp = null;
     return output;
   }
+
+//paraName 等找参数的名称
+function GetUrlParam(paraName) {
+    var url = document.location.toString();
+    var arrObj = url.split("?");
+    if (arrObj.length > 1) {
+        var arrPara = arrObj[1].split("&");
+        var arr;
+        for (var i = 0; i < arrPara.length; i++) {
+            arr = arrPara[i].split("=");
+            if (arr != null && arr[0] == paraName) {
+                return arr[1];
+            }
+        }
+        return "";
+    }else {
+        return "";
+    }
+}
+    

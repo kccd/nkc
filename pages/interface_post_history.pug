@@ -12,6 +12,7 @@ block content
 
         
         -var p = data.post
+        -p.c = p.c.replace(/<[^>]+>|&nbsp;/g,"");
         include interface_post_history_single.pug
         
         h3 过去版本
@@ -20,6 +21,7 @@ block content
           -var i = index - 1
           -var p = i > -1? data.histories[i]: data.post
           -var formerPost = data.histories[index]
+          -formerPost.c = formerPost.c.replace(/<[^>]+>|&nbsp;/g,"");
           include interface_post_history_single.pug
     
   

@@ -14,6 +14,16 @@ const draftSchema = new Schema({
     type: String,
     default: 0
   },
+  destination: {
+    type: {
+      type: String,
+      required: true
+    },
+    typeid: {
+      type: String,
+      required: true
+    }
+  },
   uid: {
     type: String,
     default: 0,

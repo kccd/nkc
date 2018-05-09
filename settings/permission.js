@@ -334,7 +334,6 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
-<<<<<<< HEAD
       draft: {
         [name]: '草稿',
         [POST]: true,
@@ -351,7 +350,6 @@ const certificates ={
           }
         }
       },
-=======
 	    sendMessage: {
 		    [name]: '发短信',
 		    bindMobile: {
@@ -363,7 +361,6 @@ const certificates ={
 			    [POST]: true
 		    }
 	    },
->>>>>>> 3fcfc943979283c17ac6825cefcdebc23ddfdf25
 	    exam: {
 		    [name]: '考试',
 		    [GET]: true,
@@ -491,7 +488,6 @@ const certificates ={
           	[name]: '用户账单',
 		        [GET]: true
 	        },
-<<<<<<< HEAD
 	        drafts: {
           	[name]: '草稿箱',
             [GET]: true,
@@ -500,7 +496,7 @@ const certificates ={
             [parameter]: {
               [DELETE]: true,
             }
-=======
+          },
 	        auth: {
 		        [DELETE]: true,
           	[parameter]: {
@@ -569,7 +565,6 @@ const certificates ={
 			        [GET]: true,
 			        [PATCH]: true
 		        }
->>>>>>> 3fcfc943979283c17ac6825cefcdebc23ddfdf25
 	        }
         }
       },

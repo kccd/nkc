@@ -45,9 +45,9 @@ editorRouter
       data.targetUser = await targetPost.extendUser();  //回复对象
       return await next();
     } else if(type === 'application') {
+      ctx.template = 'interface_editor_test.pug';
     	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: id});
     	if(cat === 'p') {
-        ctx.template = 'interface_editor.pug';
     		const project = await applicationForm.extendProject();
     		data.title = project.t;
     		data.content = project.c;
