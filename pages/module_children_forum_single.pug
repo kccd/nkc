@@ -8,27 +8,40 @@
           .media-object(style=`height: 2.5rem;width: 2.5rem;border-radius: 50%;background-color: ${forum.color}`)
       .media-body
         a(href=`/f/${forum.fid}`).forum-title
-          h4.media-heading(style='margin-top: 2px;')= forum.displayName
+          h4.media-heading(style='margin-top: 7px;')= forum.displayName
             span &nbsp;&nbsp;
-            small= forum.description
-        div(style='color: #777777;')
-          for f in forum.childrenForums
-            a(href=`/f/${f.fid}` style='display:inline-block;text-decoration: none;height: 2rem;line-height:2rem;' title=f.description)
-              img(src=`/forum_avatar/${f.fid}` style=`border-radius: 50%;height:1.2em;width:1.2em;margin-right: 0.3rem;background-color: ${f.color}`)
-              span=f.displayName
-            span &nbsp;&nbsp;
-
-  .col-xs-12.col-sm-5.col-sm-offset-1.col-md-5.col-md-offset-1.hidden-xs
-    .row.text-center(style='padding-top: 0.3rem;')
-      .col-xs-3.col-sm-3.col-md-3.post-count
-        span= forum.countThreads
-        p 文章
-      .col-xs-3.col-sm-3.col-md-3.post-count
-        span= forum.countPosts
-        p 回复
-      .col-xs-1.col-sm-1.col-md-1.post-count(style=`border-right: 3px solid ${forum.color}`)
+            small= forum.brief || (forum.description || '').slice(0, 12) + '...'
+        //div(style='color: #777777;')
+        //  for f in forum.childrenForums
+        //    a(href=`/f/${f.fid}` style='display:inline-block;text-decoration: none;height: 2rem;line-height:2rem;' title=f.description)
+        //      if f.iconFileName
+        //        div(style=`vertical-align:text-bottom;display: inline-block;background-size: cover;border-radius: 50%;height:1.2em;width:1.2em;margin-right: 0.3rem;background-image: url(/forum_avatar/${f.fid})`)
+        //      else
+        //        div(style=`vertical-align:text-bottom;display: inline-block;border-radius: 50%;height:1.2em;width:1.2em;margin-right: 0.3rem;background-color: ${f.color}`)
+        //      span=f.displayName
+        //    span &nbsp;&nbsp;
+  -let klass = ' col-xs-11 col-sm-6 col-md-6 hidden-xs';
+  if selectBox
+    -klass = ' col-xs-11 col-sm-5 col-md-5 hidden-xs';
+  div(class=klass)
+    .text-center(style='padding-top: 0.3rem;overflow: hidden;')
+      .post-count
+        span= forum.countPostsToday
+        p 今日更新
+      .post-count(style=`border-right: 3px solid ${forum.color}`)
         span &nbsp;
         p &nbsp;
-      .col-xs-4.col-sm-4.col-md-4.post-count
-        span= forum.countPostsToday
-        p 今日回复
+      .post-count
+        span= forum.countPosts
+        p 讨论
+      .post-count
+        span= forum.countThreads
+        p 文章
+  if selectBox
+    .col-xs-1.col-sm-1.col-md-1
+      if (!forum.childrenForums || forum.childrenForums.length === 0)
+        label
+          .icheckbox
+            input(type='checkbox' name='selectForum' data-fid=forum.fid)
+
+

@@ -25,16 +25,28 @@ block content
                     span= forum.displayName
               .form-group
                 label.col-sm-2.control-label 移动至
-                .hidden#data-forums=JSON.stringify({forums: data.forums, forum: data.forum})
+                .hidden#data-forums=JSON.stringify({forums: data.forums, forum: data.forum, threadTypes: data.threadTypes})
                 .col-sm-5
                   .form-inline#forumsDiv
-                  br
-                  button.btn.btn-default(onclick=`moveForum("${forum.fid}")`) 移动
+                  button.btn.btn-default(style='margin-top: 0.5rem;' onclick=`moveForum("${forum.fid}")`) 移动
               .form-group
                 label.col-sm-2.control-label 子版块顺序
                 .col-sm-10
                   h5.text-success 点击交换顺序
                   .form-inline#childrenForumsDiv
+              .form-group
+                label.col-sm-2.control-label 文章分类
+                .col-sm-10
+                  h5.text-success 点击交换顺序
+                  .form-inline#threadTypeDiv
+                  div(style='margin-top: 0.5rem;')
+                    button.btn.btn-default(onclick=`addThreadType("${forum.fid}")`) 添加
+                  br
+                  .form-inline
+                    select.form-control#threadTypeSelect
+
+                    button.btn.btn-default(onclick=`editorThreadType(${data.forum.fid})`) 编辑
+                    button.btn.btn-danger(onclick=`deleteThreadType(${data.forum.fid})`) 删除
 
               .form-group
                 .col-sm-5.col-sm-offset-2

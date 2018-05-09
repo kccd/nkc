@@ -27,7 +27,7 @@ userRouter
   })
 	//个人名片
   .get('/:uid', async (ctx, next) => {
-    const {data, db, params,query} = ctx;
+    const {data, db, params,query, generateUsersBehavior} = ctx;
     const {user} = data;
     if(user) {
 	    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
@@ -138,6 +138,13 @@ userRouter
 		data.paging = paging;
 		data.targetUser = targetUser;
 		data.targetUserSubscribe = targetUserSubscribe;
+
+		if(data.user) {
+			await generateUsersBehavior({
+				operation: 'viewUserCard'
+			});
+		}
+
 		ctx.template = 'interface_user.pug';
     await next();
   })

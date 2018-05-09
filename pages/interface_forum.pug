@@ -41,116 +41,7 @@ block content
 
         .col-md-9
         
-          //split 10/12 for post area
           .panel
-            //if !forumIsParent
-            //  //if forum is not category
-            //  .row
-            //    .col-xs-12
-            //      //img(src='http://www.kechuang.org/themes/site/dingzhi/images/logo.png')
-            //      if(data.forum.fid)
-            //        .ForumNavigation1(style='margin-bottom:5px;')
-            //          each group,index in data.forumList
-            //
-            //            -var gpf = group
-            //            if gpf.fid == data.forum.parentId
-            //
-            //              -var gpf = group
-            //              -var name = gpf.displayName
-            //              -gpf.color = gpf.color||'#aaa'
-            //              -var url = '/f/'+gpf.fid
-            //
-            //              -var stylestr = 'color:'+gpf.color
-            //
-            //              a(href=`${url}` class='parentforum' style=`${stylestr}`) #{name} /
-            //
-            //              each f,findex in group.children
-            //                -var backcolor=f.color||gpf.color
-            //                -var name = f.displayName
-            //                -var url = '/f/'+f.fid
-            //
-            //                -var active = f.fid==data.forum.fid
-            //                -var stylestr = active?'background-color:'+backcolor:''
-            //                a(href=`${url}` style=`${stylestr}` class=`${active?"active":""}`) #{name}
-            //
-            //
-            //      -var forum = data.forum
-            //      .ForumTitleCircle(style=`background-color:${forum.color}`)
-            //      .ForumName #{forum.displayName}
-            //        if data.user
-            //          span &nbsp;&nbsp;
-            //          if !data.userSubscribe.subscribeForums.includes(forum.fid)
-            //            button.btn.btn-primary.btn-sm(onclick=`subscribeForum('${forum.fid}', true)`) 关注
-            //          else
-            //            button.btn.btn-danger.btn-sm(onclick=`subscribeForum('${forum.fid}', false)`) 取消关注
-            //        if data.userLevel >= 7
-            //          span &nbsp;&nbsp;
-            //          a.btn.btn-default.btn-sm(href=`/f/${data.forum.fid}/settings/info`) 设置
-            //
-            //      if data.forum.description
-            //        div!= markdown_safe(data.forum.description)
-            //
-            //
-            //      div
-            //        span(style='margin-right:20px;') 今日: #{data.forum.countPostsToday||0} 主题: #{data.forum.countThreads||0} 回复: #{data.forum.countPosts||0}
-            //        if data.moderators && data.moderators.length
-            //          span 版主：
-            //            - var moderators = data.moderators
-            //            each k in moderators
-            //              a.d-inline.margin-right(href=`/m/${k.uid}`) #{k.username}
-            //
-            //      if data.forumThreadTypes && data.forumThreadTypes.length
-            //        .ForumNavigation1
-            //          hr.hrNarrowSpace
-            //          span 分类:
-            //          a(href=`/f/${data.forum.fid}` class=`${data.cat?"":"active"}`) 所有帖子
-            //          each ftt in data.forumThreadTypes
-            //            -var active = ftt.cid==data.cat
-            //            a(href=`/f/${data.forum.fid}?cat=${ftt.cid}` class=`${active?"active":""}` ) #{ftt.name}
-            //          hr.hrNarrowSpace
-            //      else
-            //        .ForumNavigation1
-            //          hr.hrNarrowSpace
-            //          span 分类: (暂无分类)
-            //          hr.hrNarrowSpace
-            //
-            //if forumIsParent
-            //  //if forum is category
-            //  .ForumNavigation1(style='margin-bottom:5px;')
-            //    a(href='/' style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部
-            //    span(style='font-size: 18px; color: grey;') /&nbsp;
-            //    each group,index in data.forumList
-            //      -var gpf = group
-            //      -var name = gpf.displayName
-            //      -var url = '/f/'+gpf.fid
-            //
-            //      -var color = gpf.color||'#aaa'
-            //      -var active = gpf.fid==data.forum.fid
-            //
-            //      -var stylestr = active?'background-color:'+color:''
-            //      a(href=`${url}` style=`${stylestr}` class=`${active?"active":""}`) #{name}
-            //  .ForumNavigation2.row
-            //    //增加大板介绍
-            //    .col-xs-12
-            //      hr.hrNarrowSpace
-            //      -var f = data.forum
-            //      -var p = data.forum
-            //      include interface_forumprofile2.pug
-            //      hr.hrNarrowSpace
-            //      //.panel(style='height: 310px; border: none; box-shadow: none;')
-            //        //-var target = 'index'
-            //        //-include gallery
-            //        //-var threadlist = data.newestDigestThreads
-            //        //-var listtitle = '推荐阅读'
-            //        //-include interface_recommend_thread
-            //      //.clearfix
-            //      div(style='width: 100%; margin-bottom: 13px;')
-            //        p(style='color: orange; padding: 5px 5px;')
-            //          span(style='font-size: 17px;') 专业分区
-            //          span(style='color: grey;') (发帖请进入对应分区)
-            //        for cForum in data.forums
-            //          a(style='margin: 2px 5px;' href=`/f/${cForum.fid}`) #{cForum.displayName}
-            //      hr.hrNarrowSpace
             include module_forum_breadcrumb
             include module_forum_single
             .row
@@ -161,14 +52,10 @@ block content
             .panel
               .row
                 .col-xs-12
-                  .form-group(style='margin-top:0px;margin-bottom:6px')
-                    a.btn(href=`/editor?&type=forum&id=${forum.fid}${data.cat? '&cid=' + data.cat: ''}` style='background-color: #337ab7; color: white;') 新帖
-                    //if data.replyTarget && !hasChildren
-                    //
-                    //  a.btn.btn-default(href=`/editor?target=${data.replyTarget}`) 发表新帖
-                    //if isModerator&&!forumIsParent
-                    //  button#enterManagementMode.btn.btn-default(onclick='enterManagementMode()') 管理
-
+                  .form(style='margin-top:0px;margin-bottom:0.5rem;')
+                    a.btn.btn-primary(href=`/editor?&type=forum&id=${forum.fid}${data.cat? '&cid=' + data.cat: ''}`) 发表文章
+                    if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
+                      button.btn.btn-primary(onclick='enterManagementMode()') 管理
                   .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
 
                     .form-inline(style='margin-top:10px')
@@ -178,20 +65,10 @@ block content
 
                       .form-group.form-group-sm
                         include forumlist_dropdown.pug
-                        button.btn.btn-default.btn-sm#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
-
-                      if data.userLevel >= 1
-                        button.btn.btn-default.btn-sm#addSelectedToMyCollection(onclick='addSelectedToMyCollection()') 添加到个人收藏
+                        button.btn.btn-default.btn-sm#moveThreadTo(onclick="moveThreads()") 移动
 
                       .form-group
-                        button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
-
-                      if data.userLevel >= 6
-                        -var ffid = data.forum.fid
-                        button.btn.btn-default.btn-sm(onclick=`renameForumCategory('${ffid}')`) 重命名分类
-                        button.btn.btn-default.btn-sm(onclick=`addForumCategory('${ffid}')`) 增加分类
-                        button.btn.btn-default.btn-sm(onclick=`deleteForumCategory('${ffid}')`) 删除分类
-
+                        button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='moveThreadToRecycle()') 送回收站
 
 
                 .col-xs-12
@@ -254,18 +131,18 @@ block content
           -var user = data.user
           if user
             include interface_thread_userpatch.pug
-          if hasChildren
-            for forum in data.forums
-              .nkcpanel
-                -var f = forum
-                -var type = 'f'
-                include interface_forumprofile2.pug
-                hr.hrNarrowSpace
-                -var moderators = f.moderatorUsers || []
-                  span 版主:
-                for moderator in moderators
-                  a(href=`/u/${moderator.uid}`)= moderator.username
-                  span &nbsp;&nbsp;
+          //if hasChildren
+          //  for forum in data.forums
+          //    .nkcpanel
+          //      -var f = forum
+          //      -var type = 'f'
+          //      include interface_forumprofile2.pug
+          //      hr.hrNarrowSpace
+          //      -var moderators = f.moderatorUsers || []
+          //        span 版主:
+          //      for moderator in moderators
+          //        a(href=`/u/${moderator.uid}`)= moderator.username
+          //        span &nbsp;&nbsp;
           if data.user
             .nkcpanel
               a(href=`/m/${data.user.uid}`) 我的主题
@@ -291,11 +168,12 @@ block content
 
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_collections.js')
+  script(src='/module_dropdown.js')
+  //script(src='/interface_collections.js')
   script(src='/interface_forum.js')
   //script(src='/gallery.js')
 
 
-  if isModerator&&!forumIsParent
-    script.
-      enterManagementMode()
+  //if isModerator&&!forumIsParent
+  //  script.
+  //    enterManagementMode()

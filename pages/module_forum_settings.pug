@@ -21,3 +21,5 @@ br
     a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
       span.fa.fa-user-circle &nbsp;&nbsp;
       span 权限设置
+button.btn.btn-primary.btn-block(onclick='newForum()') 添加板块
+button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前板块

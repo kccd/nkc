@@ -636,7 +636,7 @@ function subscribeForum(fid, subscribe) {
 		})
 }
 
-// 创建元素 2018-4-26 pengxigua
+// 创建元素
 function newElement(tagName, attributes, css) {
 	var single = ['hr', 'br', 'input'];
 	var element;
@@ -654,15 +654,8 @@ function newElement(tagName, attributes, css) {
 	return element;
 }
 
-// 颜色选择器 2018-4-26 pengxigua
-// 给class为selectColorInput的输入框添加事件
-function ColorSelectionPanel() {
-	this.show = function(position) {
-		var top = position.top;
-		var left = position.left;
-	}
-}
 
+// 图标on/off切换
 function iconSwitch() {
 	$('.fa-switch-icon').on('click', function() {
 		if($(this).hasClass('fa-toggle-on')) {
@@ -672,3 +665,45 @@ function iconSwitch() {
 		}
 	})
 }
+
+// 新建板块
+function newForum() {
+	var displayName = prompt('请输入板块名：');
+	if(displayName === null) {
+		return;
+	}
+	if(displayName === '') {
+		return screenTopWarning('板块名称不能为空');
+	}
+	nkcAPI('/f', 'POST', {displayName: displayName})
+		.then(function(data) {
+			screenTopAlert('新建板块成功，正在前往板块设置');
+			setTimeout(function() {
+				window.location.href = '/f/'+data.forum.fid+'/settings';
+			}, 1500);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}
+
+function deleteForum(fid) {
+	if(confirm('确定要删除该板块？') === false) {
+		return;
+	}
+	nkcAPI('/f/'+fid, 'DELETE', {})
+		.then(function() {
+			screenTopAlert('删除成功');
+			setTimeout(function() {
+				window.location.href = '/f';
+			}, 1500)
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+
+$(function () {
+	$('[data-toggle="tooltip"]').tooltip({
+	})
+});

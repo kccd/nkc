@@ -6,16 +6,55 @@ if data.user
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-color:#f6f6f6;line-height: 0;')
   .container-fluid(style='max-width: 1400px')
     .navbar-header
-      button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false" style='margin-right: 6px')
+      button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
         if messageSum > 0
           span(style="position: absolute;top: 0px; right: 0px;height: 0.5rem;width: 0.5rem;border-radius: 0.25rem;background-color: red")
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand(href="/" style='color: #337ab7; font-size: 2.2rem; padding-left: 7px;padding-right: 7px;')!= `${data.site?data.site.name: '科创论坛'}`
+      a.navbar-brand(href="/" style='color: #337ab7; font-size: 1.6em;')!= `${data.site?data.site.name: '科创论坛'}`
       -var navbar_highlight = data.navbar_highlight||navbar.highlight
       -var isActive = function(label){return (navbar_highlight==label)?'background-color: #337ab7;color: #fff;':''}
+      if data.user
+        - var user = data.user
+        .navbar-brand(style='float: right;min-width: 7em;padding-top: 8px;padding-bottom: 8px').userInfo-m.dropdown
+          //a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style='display:inline-block;padding-left: 0.5rem;text-decoration: none;font-size: 15px;color: #777777;')
+          //  span(title=title)= user.username
+          img(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" src=`/avatar/${user.uid}` style='float: right;width: 2em;height: 2em;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
+
+          ul.dropdown-menu(style='float: rigth;')
+            li
+              a(href=`/u/${user.uid}`)
+                span.fa.fa-user-o &nbsp;个人名片
+            li
+              a(href=`/m/${user.uid}`)
+                span.fa.fa-window-maximize &nbsp;专栏
+            li
+              a(href=`/sms`)
+                span.fa.fa-envelope-o &nbsp;信息
+                if messageSum > 0
+                  span.messageNumber= messageSum
+            li
+              a(href=`/u/${user.uid}/collections/unclassified`)
+                span.fa.fa-folder-o &nbsp;收藏
+            li
+              a(href=`/u/${user.uid}/drafts`)
+                span.fa.fa-inbox &nbsp;草稿箱
+            li.divider
+            li
+              a(href=`/u/${user.uid}/settings`)
+                span.fa.fa-edit &nbsp;编辑资料
+            li.divider
+            li
+              a(href=`/logout` title='不，不要走！')
+                span.fa.fa-sign-out &nbsp;退出
+      else
+        .navbar-brand.userInfo-m(style='font-size: 16px;float: right;')
+          a(href='/login' title='还记得密码吗？' style='color: #777;') 登录
+          span &nbsp;&nbsp;&nbsp;
+          a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛' style='color: #777;') 注册
+
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav
         li(class=navbar_highlight==='latest'?'active':'')
@@ -41,12 +80,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
         //    a(style='color: #337ab7;padding-right: 0.1rem' href='/login' title='还记得密码吗？') 登录
         //  li
         //    a(style='color: #337ab7;padding-right: 0.1rem' href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
-        if !data.user
-          li
-            a(href='/login' title='还记得密码吗？') 登录
-          li
-            a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
-        else
+        if data.user
           if data.userLevel >= 4
             li
               a(style='color: #777777;' href='/e')
@@ -55,8 +89,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
           - var user = data.user
           - var navbarDesc = user.navbarDesc;
           - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-          li.dropdown
-            img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
+          li.dropdown.userInfo
+            img(src=`/avatar/${user.uid}` style='width: 2em;height: 2em;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
             a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style='display:inline-block;padding-left: 0.5rem;')
               span(title=title)= user.username
               span.caret
@@ -75,6 +109,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
               li
                 a(href=`/u/${user.uid}/collections/unclassified`)
                   span.fa.fa-folder-o &nbsp;收藏
+              li
+                a(href=`/u/${user.uid}/drafts`)
+                  span.fa.fa-inbox &nbsp;草稿箱
               li.divider
               li
                 a(href=`/u/${user.uid}/settings`)
@@ -90,6 +127,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
                 -if(messageSum >= 100){messageSum=' 99+'}
                   span.messageNumber(style='margin-left:0;') #{messageSum}
                 span &nbsp;&nbsp;
+        else
+          li.userInfo
+            a(href='/login' title='还记得密码吗？') 登录
+          li.userInfo
+            a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
       form.navbar-form.navbar-left(action='/search' method='GET')
         .form-group
           input.form-control(type='text' name='q' placeholder='关键词、文号、用户')

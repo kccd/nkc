@@ -1,6 +1,7 @@
 var data = JSON.parse($('#data-forums').text());
 var forums = data.forums;
 var fid = data.forum.fid;
+var threadTypes = data.threadTypes;
 var selected = [];
 var exchange = [];
 var level1 = [
@@ -12,6 +13,12 @@ var level1 = [
 var forumsDiv = $('#forumsDiv');
 var childrenForumsDiv = $('#childrenForumsDiv');
 var childrenFid = [];
+var threadTypesCid = [];
+
+for(var i = 0; i < threadTypes.length; i++) {
+	threadTypesCid.push((threadTypes[i].cid).toString());
+}
+
 $(function() {
 
 	for(var i = 0; i < forums.length; i++) {
@@ -26,11 +33,14 @@ $(function() {
 
 
 	forumsDiv.append(createSelect(level1));
+
+	createThreadType(threadTypes);
+	createThreadTypesSelect(threadTypes);
 });
 
 function createChildForums(arr) {
 	if(arr.length === 0) {
-		childrenForumsDiv.html('暂无分类');
+		childrenForumsDiv.html('暂无子版块');
 	} else {
 		childrenForumsDiv.html('');
 	}
@@ -211,11 +221,129 @@ function moveForum(fid) {
 		})
 }
 
+function getThreadTypeByCid(cid) {
+	for(var i = 0; i < threadTypes.length; i++) {
+		if(threadTypes[i].cid.toString() === cid) {
+			return threadTypes[i];
+		}
+	}
+}
+
+function createThreadType(arr) {
+	var threadTypeDiv = $('#threadTypeDiv');
+	if(arr.length === 0) {
+		threadTypeDiv.html('暂无分类');
+	} else {
+		threadTypeDiv.html('');
+	}
+	for(var i = 0; i < arr.length; i++) {
+		var type = arr[i];
+		if(typeof type === 'string') {
+			type = getThreadTypeByCid(type);
+		}
+		var span = newElement('span', {
+			'onclick': 'exchangeThreadTypes("'+type.cid+'")',
+			'data-cid': type.cid
+		}, {
+			'display': 'inline-block',
+			'padding': '0.5rem',
+			'background-color': '#aaaaaa',
+			'border-radius': '5px',
+			'color': '#ffffff',
+			'margin-right': '0.5rem',
+			'cursor': 'pointer',
+			'border': '2px solid #ffffff'
+		}).text(type.name);
+		threadTypeDiv.append(span);
+	}
+}
+var typesExchange = [];
+function exchangeThreadTypes(cid) {
+	if(typesExchange.length === 0) {
+		typesExchange.push(cid);
+		$('span[data-cid="'+cid+'"]').css('border', '2px solid #555555');
+	} else {
+		typesExchange.push(cid);
+		var index = threadTypesCid.indexOf(typesExchange[0]);
+		var index2 = threadTypesCid.indexOf(typesExchange[1]);
+		threadTypesCid.splice(index, 1, typesExchange[1]);
+		threadTypesCid.splice(index2, 1, typesExchange[0]);
+		$('span[data-cid="'+typesExchange[0]+'"]').css('border', '2px solid #ffffff');
+		typesExchange = [];
+		createThreadType(threadTypesCid);
+	}
+}
+
+function addThreadType(fid) {
+	var name = prompt('请输入分类名称：');
+	if(name === null) return;
+	if(name === '') {
+		return screenTopWarning('分类名不能为空');
+	}
+	nkcAPI('/f/'+fid+'/settings/category', 'POST', {name: name})
+		.then(function(data) {
+			threadTypes.push(data.newType);
+			threadTypesCid.push(data.newType.cid);
+			createThreadType(threadTypes);
+			createThreadTypesSelect(threadTypes);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}
+
+function createThreadTypesSelect(arr) {
+	if(arr.length !== 0) {
+		var threadTypeSelect = $('#threadTypeSelect');
+		threadTypeSelect.html('');
+		for(var i = 0; i < arr.length; i ++) {
+			threadTypeSelect.append(newElement('option', {}, {}).text(arr[i].name));
+		}
+	}
+}
+
+function getThreadTypeSelectValue() {
+	return $('#threadTypeSelect').val() || '';
+}
+
+
+function deleteThreadType(fid) {
+	var name = getThreadTypeSelectValue();
+	if(!name) return screenTopWarning('暂无分类');
+	nkcAPI('/f/'+fid+'/settings/category?name='+name, 'DELETE', {})
+		.then(function() {
+			screenTopAlert('删除成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}
+
+
+function editorThreadType(fid) {
+	var oldName = getThreadTypeSelectValue();
+	if(!oldName) return screenTopWarning('暂无分类');
+	var name = prompt('请输入分类名称：', oldName);
+	var obj = {
+		operation: 'changeThreadType',
+		name: name,
+		oldName: oldName
+	};
+	if(oldName === name) return screenTopWarning('分类名未更改');
+	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
+		.then(function() {
+			screenTopAlert('修改成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}
 
 function submit(fid) {
 	var obj = {
 		operation: 'saveOrder',
-		childrenFid: childrenFid
+		childrenFid: childrenFid,
+		threadTypesCid: threadTypesCid
 	};
 	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
 		.then(function() {

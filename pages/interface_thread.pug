@@ -52,15 +52,18 @@ block content
 
                     a.ThreadTitleForumLink(href=`/f/${taget}`) #{forumname}
                 else
+                  //.ForumNavigation1(style='margin-bottom:6px')
+                  //  if parent
+                  //    -var parentcolor = parent.color
+                  //    a.active(href=`/f/${parent.fid}` style=`background-color:${parentcolor}`) #{parent.displayName}
+                  //    //span(style='margin-right:7px') /
+                  //  -var forumcolor = forum.color||parentcolor
+                  //  -var type = thread.fid? 'f' : 'm'
+                  //  a.active(href=`/${type}/${target}` style=`background-color:${forumcolor}`) #{forumname}
                   .ForumNavigation1(style='margin-bottom:6px')
-                    if parent
-                      -var parentcolor = parent.color
-                      a.active(href=`/f/${parent.fid}` style=`background-color:${parentcolor}`) #{parent.displayName}
-                      //span(style='margin-right:7px') /
-                    -var forumcolor = forum.color||parentcolor
-                    -var type = thread.fid? 'f' : 'm'
-                    a.active(href=`/${type}/${target}` style=`background-color:${forumcolor}`) #{forumname}
-
+                    -const parentForum = data.parentForums
+                    a.active(href=`/f/${parentForum.fid}` style=`background-color:${parentForum.color}`) #{parentForum.displayName}
+                    a.active(href=`/f/${data.forum.fid}` style=`background-color:${data.forum.color}`) #{data.forum.displayName}
                   span.ThreadTitleText(style="margin-right:3%;" href=`/t/${data.thread.tid}`) #{thread.firstPost.t}
 
                     //span(style='display:inline-block;') #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits} 浏览
@@ -110,10 +113,10 @@ block content
                     .form-inline(style='margin-bottom: 0.5rem')
                       .form-group.form-group-sm
                         include forumlist_dropdown.pug
-                        button.btn.btn-default.btn-sm(onclick=`javascript:moveThreadTo('${thread.tid}')`) #{moveThread? '移动' : '转发'}
+                        button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}
                       if moveThread
                         .form-group
-                            button#recyclebtn.btn.btn-sm.btn-danger(onclick=`recycleThread('${data.thread.tid}')`) 送回收站
+                            button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
                     if thread.toMid === user.uid || thread.mid === user.uid
                       -var text
                       if data.thread.toMid === data.user.uid && data.thread.hideInToMid || data.thread.mid === data.user.uid && data.thread.hideInMid
@@ -270,7 +273,7 @@ block content
             include interface_thread_userpatch.pug
 
           -var skipOtherParent = true
-          include interface_forums_list.pug
+          //include interface_forums_list.pug
           -skipOtherParent=false
 
           //forum profile section
@@ -304,6 +307,7 @@ block content
 block scripts
   script(src='/qrcode/build/qrcode.js')
   script(src='/interface_common.js')
+  script(src='/module_dropdown.js')
   script(src='/interface_thread.js')
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");

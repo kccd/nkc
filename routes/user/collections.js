@@ -33,7 +33,9 @@ collectionsRouter
     let collectionCount = await db.CollectionModel.count(queryDate);
     if(collectionCount <= 0) queryDate.category = categoryNames[0];
     const categoryCollection = await db.CollectionModel.find(queryDate).sort({toc: -1});
-    await Promise.all(categoryCollection.map(c => c.extendThread()));
+    await Promise.all(categoryCollection.map(async c => {
+    	await c.extendThread().then(t => t.extendForum()).then(f => f.extendParentForum());
+    }));
     data.category = queryDate.category;
     data.categoryCollection = categoryCollection;
     ctx.template = 'interface_collections.pug';

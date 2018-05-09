@@ -171,4 +171,10 @@ fn.getRandomNumber = (obj) => {
 	return arr;
 };
 
+fn.today = () => {
+	const moment = require('moment');
+	const t = moment().format('YYYY-MM-DD');
+	return new Date(t+' 00:00:00');
+};
+
 module.exports = fn;

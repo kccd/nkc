@@ -398,3 +398,4 @@ function forumIsVisibleForNCCSwitch(event, fid) {
     })
     .catch(jwarning)
 }
+

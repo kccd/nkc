@@ -1,35 +1,27 @@
--const showTicks = data.userLevel > 4 && data.forum
+-const showTicks = false;
 -const {firstPost, lastPost, tid, hasCover} = thread
 -const {t, toc} = firstPost;
 -const targetUser = firstPost.user;
--const {_cid} = data;
--let childrenForum;
--let parentForum;
--const forum = data.forum || {fid: '_cannot_be_equal_'}
--data.forumList.forEach(p => {if(p.children){p.children.forEach(c => {if (c.fid === firstPost.fid) {childrenForum = c;parentForum = p}})}});
+-const parentForum = thread.forum.parentForum;
 .new-content
   .new-content-info
     span
-      a(href=`/u/${targetUser.uid}` title=`${targetUser.description || ''}`)
-        img(src=`/avatar_small/${targetUser.uid}` style='width: 30px;')
+      a(href=`/u/${targetUser.uid}` title=`${targetUser.description || ''}` data-toggle="tooltip" data-placement="bottom")
+        img(src=`/avatar_small/${targetUser.uid}` style='width: 30px;border-radius: 50%;')
     span
-      a(href=`/u/${targetUser.uid}`)= targetUser.username
-    if(parentForum && forum.fid === '_cannot_be_equal_')
+      - var title = `${targetUser.navbarDesc.username}\n`+`学术分 ${targetUser.navbarDesc.xsf}\n`+`科创币 ${targetUser.navbarDesc.kcb}\n`+`${targetUser.navbarDesc.cs}`;
+      a(href=`/u/${targetUser.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= targetUser.username
+    if parentForum
       span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
-        a(href=`/f/${parentForum.fid}` title=`${parentForum.description || ''}`)= parentForum.displayName
-    if(childrenForum && childrenForum.fid !== forum.fid)
-      span.new-content-forumAbbr(style=`background-color:${childrenForum.color};`)
-        a(href=`/f/${childrenForum.fid}` title=`${childrenForum.description || ''}`)= childrenForum.abbr
-    if(thread.cid && !_cid && data.threadTypes)
-      -const threadtype = data.threadTypes.find(k=>k.cid==thread.cid)
-        if threadtype
-          a.ForumThreadHasImage(href=`/f/${thread.fid}?cat=${threadtype.cid}` style=`background-color:${forumcolor};`) #{threadtype.name}
+        a(style='text-decoration: none;' href=`/f/${parentForum.fid}` title=`${parentForum.description || ''}` data-toggle="tooltip" data-placement="bottom")= parentForum.abbr || parentForum.displayName
+    span.new-content-forumAbbr(style=`background-color:${thread.forum.color};`)
+      a(style='text-decoration: none;' href=`/f/${thread.forum.fid}` title=`${thread.forum.description || ''}` data-toggle="tooltip" data-placement="bottom")= thread.forum.abbr || thread.forum.displayName
     span.icon-font(title=`${Date(toc)}`)=fromNow(toc)
     if thread
-      span(title=`${thread.hits}次浏览`)
+      span(title=`${thread.hits}次浏览` data-toggle="tooltip" data-placement="bottom")
         span.glyphicon.glyphicon-eye-open.icon
         span.icon-font=thread.hits
-      span(title=`${thread.count-1}条回复`)
+      span(title=`${thread.count-1}条评论` data-toggle="tooltip" data-placement="bottom")
         span.glyphicon.glyphicon-comment.icon
         span.icon-font=(thread.count-1)
     else
@@ -41,7 +33,7 @@
     if thread && thread.digest
       -digest = 'digest-thread-title';
     a.ForumThreadNormal(class=digest href=`/t/${tid}`)
-      span #{t}
+      span(style='font-size: 18px;') #{t}
     -const pageCount = thread.count / 30
     -let ellipsis = false
     - for(let i = 1; i < pageCount; i++)
@@ -73,6 +65,7 @@
             a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost))
       .new-content-info-last
         span
-          a(href=`/u/${lastPost.user.uid}`)= lastPost.user.username
+          - var title = `${lastPost.user.navbarDesc.username}\n`+`学术分 ${lastPost.user.navbarDesc.xsf}\n`+`科创币 ${lastPost.user.navbarDesc.kcb}\n`+`${lastPost.user.navbarDesc.cs}`;
+          a(href=`/u/${lastPost.user.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= lastPost.user.username
         span.icon-font=` ${fromNow(lastPost.toc)}`
 hr(style='margin: 2px 0 2px 0;')

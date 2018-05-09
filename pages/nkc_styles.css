@@ -5,6 +5,11 @@ h1, h2, h3, h4, h5, p{
   margin-right: 5px;
 }
 
+.navbar-toggle{
+  float: left;
+  margin-left: 15px;
+}
+
 .rightalign {
   text-align:right;
 }
@@ -565,7 +570,37 @@ width: 100%;
     text-align: center;
     background: #f1f9f1;
     color: #b0c1b0;
-    font-size: 8px;
+    font-size: 14px;
+}
+.forum-category{
+  padding: 0.5rem;
+  background-color: #f3f3f3;
+  border-radius: 7px;
+}
+.forum-notice a{
+  color: #777777;
+  text-decoration: none;
+}
+.forum-notice a:hover{
+  color: #333333;
+}
+.forum-digest-thread a{
+  color: #d48900;
+}
+.forum-home .forum-declare img{
+  max-width: 100%;
+}
+.forum-category a{
+  display: inline-block;
+  padding: 0.2rem 0.3rem;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  font-size: 1.3rem;
+}
+.forum-category a:hover{
+  background-color: #ddd;
+  color: #fff;
 }
 .ForumThreadNormal,.ForumThreadNormal:focus{
   color: #505c65;
@@ -1795,11 +1830,6 @@ img.emoji {
   font-size: 1.6rem;
 }
 
-@media screen and (max-width: 768px) {
-  .nav-font-color li{
-    border-top: 1px solid #eee;
-  }
-}
 
 .ForumThreadHasImage:hover{
   text-decoration: none;
@@ -1956,10 +1986,10 @@ img.emoji {
 .new-content-title > a{
   vertical-align: middle;
   letter-spacing: 0.4px;
-  font-size: 2rem;
+  font-size: 18px;
   font-weight: 800;
   text-decoration: none;
-  color: #444;
+  color: #333;
   border-bottom: 1px solid transparent;
   transition: color 0.2s, border-bottom 0.2s;
 }
@@ -1969,8 +1999,8 @@ img.emoji {
 }
 .new-content-left{
   float: left;
-  width: 15rem;
-  height: 10.3rem;
+  width: 11em;
+  height: 7.5em;
   background-position: center center;
   background-size: cover;
   border-radius: 0.3rem;
@@ -1989,7 +2019,7 @@ img.emoji {
 }
 .new-content-right>div>p{
   padding: 0 0.5rem 0 0.5rem;
-  font-size: 16px;
+  font-size: 15px;
   float: left;
   overflow: hidden;
   margin-bottom:0.2rem;
@@ -2006,7 +2036,7 @@ img.emoji {
   padding: 0 0.5rem 0 0.5rem;
   border-radius: 0.5rem;
   float: right;
-  font-size: 14px;
+  font-size: 13px;
   max-height: 3em;
   margin-left: 5rem;
   margin-top: 0.2rem;
@@ -2022,7 +2052,7 @@ img.emoji {
 .hasCover .new-content-right{
   float: left;
   /*height: 10.3rem;*/
-  width: calc(100% - 15rem);
+  width: calc(100% - 11em);
   position: relative;
 }
 
@@ -2100,8 +2130,8 @@ img.emoji {
   padding: 1rem 1rem 0.2rem 1rem;
   margin: 1rem 0;
   background-color: #ffffff;
-  border: 1px solid #eee;
-  box-shadow: 1px 1px 2px #cccccc;
+  border: 1px solid rgba(0,0,0,0);
+  box-shadow: 0 0 3px 1px #dedede;
 }
 .user-info-list .time{
   color: #ff8700;
@@ -2276,6 +2306,11 @@ img.emoji {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+.forum-digest-threads{
+  /*padding: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0 3px 1px #dedede;*/
+}
 .children-forum-panel {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
@@ -2285,6 +2320,10 @@ img.emoji {
 }
 .children-forum-panel a.forum-title h4{
   font-size: 1.2em;
+}
+.children-forum-panel .post-count{
+  float: right;
+  width: 5rem;
 }
 .children-forum-panel .post-count span{
   color: #333333;
@@ -2332,6 +2371,11 @@ img.emoji {
   border-radius: 5px;
   color: #ffffff;
 }
+
+.userInfo-m{
+  display: none;
+}
+
 /*--------------*/
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{
@@ -2358,7 +2402,19 @@ img.emoji {
     width: 79%;
   }
 }
+@media screen and (max-width: 767px) {
+  .userInfo-m{
+    display: inline-block;
+  }
+  .nav .userInfo{
+    display: none;
+  }
+}
+
 @media screen and (max-width: 768px) {
+  .nav-font-color li{
+    border-top: 1px solid #eee;
+  }
   .new-content-left{
     width: 24%;
   }
@@ -2446,4 +2502,28 @@ img.emoji {
   .user-info-list .hasCover>.content-right{
     width: 60%;
   }
+}
+
+
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1060;
+  display: none;
+  max-width: 276px;
+  padding: 1px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: left;
+  white-space: normal;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }

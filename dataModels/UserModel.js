@@ -249,7 +249,7 @@ userSchema.pre('save', async function(next) {
     if (!initialState) { //this is a new user
       await indexUser(this);
       return next()
-    } else if (initialState.description !== this.description) {
+    } else if (initialState.description !== this.description || initialState.username !== this.username) {
       // description has changed , update it in the es
       await updateUser(this);
       return next()

@@ -1,24 +1,53 @@
 const Router = require('koa-router');
-const operationRouter = require('./operation');
 const nkcModules = require('../../nkcModules');
 const subscribeRouter = require('./subscribe');
 const settingsRouter = require('./settings');
+const homeRouter = require('./home');
+const latestRouter = require('./latest');
+const followerRouter = require('./follower');
+const visitorRouter = require('./visitor');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
-    const {data} = ctx;
+    const {data, db} = ctx;
     const {user} = data;
-    data.forums = await dbFn.getAvailableForums(ctx);
+    const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+		const forums = await db.ForumModel.getVisibleForums(ctx);
+		data.forums = dbFn.forumsListSort(forums, threadTypes);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
     data.navbar = {highlight: 'forums'};
     await next();
   })
 	.post('/', async (ctx, next) => {
-		const {data, body, db} = ctx;
+		const {data, db, body} = ctx;
+		const {displayName} = body;
+		if(data.userLevel < 6) ctx.throw(403, '权限不足');
+		if(!displayName) ctx.throw(400, '板块名称不能为空');
+		const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
+		if(sameDisplayNameForum) ctx.throw(400, '板块名称已存在');
+		let _id;
+		while(1) {
+			_id = await db.SettingModel.operateSystemID('forums', 1);
+			const sameIdForum = await db.ForumModel.findOne({fid: _id});
+			if(!sameIdForum) {
+				break;
+			}
+		}
+		const newForum = db.ForumModel({
+			fid: _id,
+			displayName,
+			accessible: false,
+			visibility: false,
+			type: 'forum'
+		});
+		await newForum.save();
+		data.forum = newForum;
+		await next();
+		/*const {data, body, db} = ctx;
 		const {ForumModel, UserModel, SettingModel} = db;
 		const {userLevel} = data;
 		const {
@@ -72,48 +101,57 @@ forumRouter
     body.fid = await SettingModel.operateSystemID('forums', 1);
     const newForum = new ForumModel(body);
 		await newForum.save();
-    return ctx.redirect(`/f/${body.fid}`, 303)
+    return ctx.redirect(`/f/${body.fid}`, 303)*/
 	})
 	.get('/:fid', async (ctx, next) => {
-		const {ForumModel, ThreadTypeModel, UserModel, UsersSubscribeModel} = ctx.db;
+		const {data, params, db} = ctx;
+		const {user} = data;
+		const {fid} = params;
+		const forum = await db.ForumModel.findOnly({fid});
+		if(user) {
+			const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
+			if(behavior) {
+				return ctx.redirect(`/f/${forum.fid}/latest`);
+			} else {
+				return ctx.redirect(`/f/${forum.fid}/home`);
+			}
+		} else {
+			return ctx.redirect(`/f/${forum.fid}/home`);
+		}
+		/*const {ForumModel, ThreadTypeModel, UserModel, UsersSubscribeModel} = ctx.db;
 		const {fid} = ctx.params;
-		const {data, query} = ctx;
+		const {data, query, generateUsersBehavior} = ctx;
 		const {digest, cat, sortby} = query;
 		const page = query.page || 0;
 		const forum = await ForumModel.findOnly({fid});
 		await forum.ensurePermission(ctx);
-		const fidOfChildForum = await forum.getFidOfChildForum(ctx);
-		/*let q = {
-			fid: {$in: fidOfChildForum}
-		};
-		if (cat) {
-			q.cid = cat;
-			data._cid = cat
-		}
-		if (digest) {
-			q.digest = true;
-			data.digest = true;
-		}*/
-
 		const q = {};
 		q.match = {};
 		if(cat) {
-			q.match.cid = cat;
-			data.cid = cat;
+			q.match.cid = parseInt(cat);
+			data.cat = q.match.cid;
 		}
 		if(digest) {
 			q.match.digest = true;
 			data.digest = true;
 		}
 
+		if(data.userLevel < 4 || (data.userLevel === 4 && !forum.moderators.includes(data.user.uid))) {
+			q.disabled = false;
+		}
+
 		const countOfThread = await forum.getThreadsCountByQuery(ctx, q);
 		const paging = apiFn.paging(page, countOfThread);
-		data.cat = cat;
 		data.sortby = sortby;
 		data.paging = paging;
 		data.forum = forum;
-		if (forum.moderators.length > 0) data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
-		// let threads = await forum.getThreadsByQuery(query, q);
+
+		// 加载版主
+		data.moderators = [];
+		if (forum.moderators.length > 0) {
+			data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
+		}
+
 		q.limit = paging.perpage;
 		q.skip = paging.start;
 		if(sortby === 'toc') {
@@ -121,48 +159,16 @@ forumRouter
 		} else {
 			q.sort = {tlm: -1};
 		}
-		if(data.userLevel < 4 || (data.userLevel === 4 && !forum.moderatorUsers.includes(user.uid))) {
-			q.disabled = false;
-		}
-		let threads = await forum.getThreadsByQuery(ctx, q);
-		let toppedThreads = [];
-		if (data.paging.page === 0 && data.forum.type === 'forum') {
-			toppedThreads = await forum.getToppedThreads(fidOfChildForum);
-		}
-		const forumList = await dbFn.getAvailableForums(ctx);
-		data.toppedThreads = toppedThreads;
-		data.threads = threads;
-		data.forumList = forumList;
-		data.forums = [];
-		for (let i = 0; i < forumList.length; i++) {
-			if (forumList[i].fid === fid) {
-				data.forums = forumList[i].children;
-				for (let forum of data.forums) {
-					const {moderators} = forum;
-					const m = [];
-					for (let uid of moderators) {
-						const mUser = await UserModel.findOne({uid});
-						if (mUser) m.push(mUser);
-					}
-					forum.moderatorUsers = m;
-				}
-				break;
-			}
-		}
-		data.replyTarget = `f/${fid}`;
-		const thredTypes = await ThreadTypeModel.find().sort({order: 1});
-		let forumThreadTypes = [];
-		for (let i = 0; i < thredTypes.length; i++) {
-			if (thredTypes[i].fid === fid) forumThreadTypes.push(thredTypes[i]);
-		}
-		data.threadTypes = thredTypes;
-		data.forumThreadTypes = forumThreadTypes;
-		data.fTarget = fid;
-		if (data.user) {
+
+		data.threads = await forum.getThreadsByQuery(ctx, q);
+		data.toppedThreads = await forum.getToppedThreads(ctx);
+
+		data.threadTypes = await ThreadTypeModel.find({fid}).sort({order: 1});
+
+ 		if (data.user) {
 			data.userThreads = await data.user.getUsersThreads();
 			data.userSubscribe = await UsersSubscribeModel.findOnly({uid: data.user.uid});
 		}
-
 		// 加载能看到入口的板块
 		const visibleFid = await ForumModel.getVisibleFid(ctx, '');
 
@@ -183,13 +189,18 @@ forumRouter
 			}
 		});
 
-
-		//加载帖子
-
-
-		data.getBreadcrumbForums = breadcrumbForums;
+		data.forumList = await ForumModel.find({});
+		data.forumsThreadTypes = await ThreadTypeModel.find({}).sort({order: 1});
+		data.breadcrumbForums = breadcrumbForums;
+		if(data.user) {
+			await generateUsersBehavior({
+				operation: 'viewForum',
+				fid: forum.fid,
+				type: forum.class
+			});
+		}
 		ctx.template = 'interface_forum.pug';
-		await next();
+		await next();*/
 	})
 	.post('/:fid', async (ctx, next) => {
 		const {
@@ -236,7 +247,7 @@ forumRouter
     const {params, db} = ctx;
     const {fid} = params;
     const {ThreadModel, ForumModel} = db;
-    const forum = ForumModel.findOnly({fid});
+    const forum = await ForumModel.findOnly({fid});
     const count = await ThreadModel.count({fid});
     if(count > 0) {
       ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
@@ -248,6 +259,107 @@ forumRouter
   })
 	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:fid/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
-  .use('/:fid', operationRouter.routes(), operationRouter.allowedMethods());
+	.use(['/:fid/home', '/:fid/latest', '/:fid/followers', '/:fid/visitors'], async (ctx, next) => {
+		const {data, db, params, generateUsersBehavior} = ctx;
+		const {fid} = params;
+		const forum = await db.ForumModel.findOnly({fid});
+		await forum.ensurePermission(ctx);
+		data.forum = forum;
 
+		// 添加访问记录
+		if(data.user) {
+			await generateUsersBehavior({
+				operation: 'viewForum',
+				fid: forum.fid,
+				type: forum.class
+			});
+		}
+
+
+		const {today} = ctx.nkcModules.apiFunction;
+		const fidArr = await db.ForumModel.getVisibleFid(ctx, fid);
+		const accessibleFid = await db.ForumModel.getAccessibleFid(ctx, fid);
+		accessibleFid.push(fid);
+		await forum.extendChildrenForums({fid: {$in: fidArr}});
+		fidArr.push(fid);
+		const behaviors = await db.UsersBehaviorModel.find({
+			timeStamp: {$gt: today()},
+			fid: {$in: fidArr},
+			operation: 'viewForum'
+		}).sort({timeStamp: -1});
+		const usersId = [];
+		behaviors.map(b => {
+			if(!usersId.includes(b.uid)) {
+				usersId.push(b.uid);
+			}
+		});
+		data.users = [];
+		data.behaviors = behaviors;
+		for(let uid of usersId) {
+			if(data.users.length < 9) {
+				const targetUser = await db.UserModel.findOne({uid});
+				if(targetUser) {
+					data.users.push(targetUser);
+				}
+			} else {
+				break;
+			}
+		}
+
+		await forum.extendParentForum();
+		await forum.extendNoticeThreads();
+		let followersId = forum.followersId;
+		followersId = followersId.reverse();
+		const followers = [];
+		for(let uid of followersId) {
+			if(followers.length < 9) {
+				const targetUser = await db.UserModel.findOne({uid});
+				if(targetUser) {
+					followers.push(targetUser);
+				}
+			} else {
+				break;
+			}
+		}
+		forum.followers = followers;
+
+		//版主
+		data.moderators = [];
+		if (forum.moderators.length > 0) {
+			data.moderators = await db.UserModel.find({uid: {$in: forum.moderators}});
+		}
+
+		if(data.user) {
+			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
+		}
+
+		const digestThreads = await db.ThreadModel.aggregate([
+			{
+				$match: {
+					fid: {$in: accessibleFid},
+					digest: true
+				}
+			},
+			{
+				$sample: {
+					size: 8
+				}
+			}
+		]);
+		data.digestThreads = await Promise.all(digestThreads.map(async thread => {
+			const post = await db.PostModel.findOnly({pid: thread.oc});
+			const forum = await db.ForumModel.findOnly({fid: thread.fid});
+			await post.extendUser();
+			thread.firstPost = post;
+			thread.forum = forum;
+			return thread;
+		}));
+
+		ctx.template = 'interface_forum_home.pug';
+		await next();
+	})
+	.use('/:fid/latest', latestRouter.routes(), latestRouter.allowedMethods())
+	.use('/:fid/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
+	.use('/:fid/followers', followerRouter.routes(), followerRouter.allowedMethods())
+	.use('/:fid/home', homeRouter.routes(), homeRouter.allowedMethods());
 module.exports = forumRouter;

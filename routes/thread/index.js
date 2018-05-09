@@ -71,7 +71,7 @@ threadRouter
 		await next();
 	})
 	.get('/:tid', async (ctx, next) => {
-		const {data, params, db, query} = ctx;
+		const {data, params, db, query, generateUsersBehavior} = ctx;
 		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
 		const {
@@ -95,7 +95,12 @@ threadRouter
 		data.paging = apiFn.paging(page, postCount);
 		const forum = await ForumModel.findOnly({fid: thread.fid});
 		const {mid, toMid} = thread;
-		data.forumList = await dbFn.getAvailableForums(ctx);
+		// data.forumList = await dbFn.getAvailableForums(ctx);
+
+		data.forumList = await db.ForumModel.getVisibleForums(ctx);
+		data.parentForums = await forum.extendParentForum();
+		data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
+
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
 		}
@@ -143,6 +148,13 @@ threadRouter
 		data.posts = posts;
 		await thread.extendFirstPost().then(p => p.extendUser());
 		await thread.extendLastPost();
+		if(data.user) {
+			await generateUsersBehavior({
+				operation: 'viewThread',
+				tid: thread.tid,
+				fid: thread.fid
+			});
+		}
 		await next();
 	})
 	.post('/:tid', async (ctx, next) => {

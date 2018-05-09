@@ -9,16 +9,10 @@ block content
     .row
       .col-xs-12.col-md-12
         .row
-          .col-xs-12.col-md-12
-            .col-xs-12.col-md-10.col-md-offset-1
-              .row
-                //img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;border-radius: 50%;')
-          .col-xs-12.col-md-12
-            //hr
           .col-xs-12.col-md-2
             .col-xs-12.col-md-12
               .row
-                img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;border-radius: 50%;')
+                img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username
                 p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
                 br
@@ -111,28 +105,7 @@ block content
                   br
                   h4.text-center(style='color: #aaaaaa;')=`暂无${data.type === 'fans'?'粉丝':'关注'}`
                 -for(let targetUser of data.targetUsers)
-                  -const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc} = targetUser;
-                  .col-xs-12.col-md-6
-                    .row
-                      .col-xs-12.col-md-12
-                        .user-info-list.forum-list(style=`min-height: 10em;padding-top: 0.5rem;${data.user && uid === data.user.uid?'border: 1px solid #337ab7': ''}`)
-                          .displayName
-                            h4(style='margin: 0.5rem 0;')
-                              a(href=`/u/${uid}` title=description style='text-decoration: none;')
-                                img(src=`/avatar/${uid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-                                span &nbsp;
-                                span= username
-                              if data.user && uid !== data.user.uid
-                                if data.userSubscribe.subscribeUsers.includes(uid)
-                                  button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, false)`) 取关
-                                else
-                                  button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
-                          .info
-                            span= navbarDesc.cs
-                            p!=`回复:${postCount}&nbsp;帖子:${threadCount}`
-                            p!=`学术分:${xsf}&nbsp;科创币:${kcb}`
-                          .description
-                            p= description || '暂未填写个人简介'
+                  include module_user_single_panel
 
             else
               if data.results.length === 0

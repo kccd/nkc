@@ -31,16 +31,40 @@ const forumSchema = new Schema({
   },
   description: {
     type: String,
-    required: '',
-    max: [300, '描述应少于300字']
+    default: '',
+    maxlength: [300, '描述应少于300字']
   },
   displayName: {
     type: String,
     required: true,
-    min: [1, '板块名称必须大于等于1字'],
-    max: [6, '板块名称必须小于等于6字']
+    minlength: [1, '板块名称必须大于等于1字'],
+    maxlength: [10, '板块名称必须小于等于10字']
   },
-  iconFileName: {
+	brief: {
+		type: String,
+		default: '',
+		maxlength: [15, '板块简介应少于15字']
+	},
+	// 入门
+	basicThreadsId: {
+		type: [String],
+		default: []
+	},
+	// 值得阅读
+	valuableThreadsId: {
+		type: [String],
+		default: []
+	},
+	// 板块说明
+	declare: {
+		type: String,
+		default: ''
+	},
+	noticeThreadsId: {
+		type: [String],
+		default: []
+	},
+	iconFileName: {
     type: String,
     default: ''
   },
@@ -56,12 +80,6 @@ const forumSchema = new Schema({
     type: String,
     default: ''
   },
-
-	// 板块说明
-	declare: {
-		type: String,
-		default: ''
-	},
 
 	// 可访问的
 	accessible: {
@@ -87,6 +105,12 @@ const forumSchema = new Schema({
 	isVisibleForNCC: {
 		type: Boolean,
 		default: false,
+		index: 1
+	},
+	// 关注的人
+	followersId: {
+		type: [String],
+		default: [],
 		index: 1
 	},
 
@@ -136,6 +160,46 @@ forumSchema.virtual('parentForum')
 		this._parentForum = parentForum;
 	});
 
+forumSchema.virtual('basicThreads')
+	.get(function() {
+		return this._basicThreads;
+	})
+	.set(function(basicThreads) {
+		this._basicThreads = basicThreads;
+	});
+
+forumSchema.virtual('valuableThreads')
+	.get(function() {
+		return this._valuableThreads;
+	})
+	.set(function(valuableThreads) {
+		this._valuableThreads = valuableThreads;
+	});
+
+forumSchema.virtual('noticeThreads')
+	.get(function() {
+		return this._noticeThreads;
+	})
+	.set(function(noticeThreads) {
+		this._noticeThreads = noticeThreads;
+	});
+
+forumSchema.virtual('followers')
+	.get(function() {
+		return this._followers;
+	})
+	.set(function(followers) {
+		this._followers = followers;
+	});
+
+forumSchema.virtual('threadTypes')
+	.get(function() {
+		return this._threadTypes;
+	})
+	.set(function(threadTypes) {
+		this._threadTypes = threadTypes;
+	});
+
 /*// 验证是否有权限进入此版块
 forumSchema.methods.ensurePermission = async function (ctx) {
 	const {contentClasses} = ctx.data.certificates;
@@ -171,90 +235,99 @@ forumSchema.methods.extendModerators = async function() {
 	return this.moderatorUsers = moderatorUsers;
 };
 
-/*forumSchema.methods.getThreadsByQuery = async function(query, match) {
-  const ThreadModel = require('./ThreadModel');
-  const {$match, $sort, $skip, $limit} = getQueryObj(query, match);
-  let threads = await ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
-  threads = await Promise.all(threads.map(async t => {
-    await t.extendFirstPost().then(p => p.extendUser());
-    await t.firstPost.extendResources();
-    await t.extendLastPost().then(p => p.extendUser());
-    return t;
-  }));
-  return threads;
+// 入门教程
+forumSchema.methods.extendBasicThreads = async function() {
+	const ThreadModel = mongoose.model('threads');
+	const {basicThreadsId} = this;
+	const threads = [];
+	for(let pid of basicThreadsId) {
+		const thread = await ThreadModel.findOne({oc: pid});
+		if(thread) {
+			threads.push(thread);
+		}
+	}
+	return this.basicThreads = threads;
+};
+// 值得阅读
+forumSchema.methods.extendValuableThreads = async function() {
+	const ThreadModel = mongoose.model('threads');
+	const {valuableThreadsId} = this;
+	const threads = [];
+	for(let pid of valuableThreadsId) {
+		const thread = await ThreadModel.findOne({oc: pid});
+		if(thread) {
+			threads.push(thread);
+		}
+	}
+	return this.valuableThreads = threads;
 };
 
-forumSchema.methods.getThreadCountByQuery = async function(query) {
-  const ThreadModel = require('./ThreadModel');
-  return await ThreadModel.count(query);
-};*/
-
-forumSchema.methods.getToppedThreads = async function(fidOfChildForum) {
-  const ThreadModel = require('./ThreadModel');
-  let threads = await ThreadModel.find({fid: {$in: fidOfChildForum}, topped: true});
-  threads = await Promise.all(threads.map(async t => {
-    await t.extendFirstPost().then(p => p.extendUser());
-    await t.firstPost.extendResources();
-    await t.extendLastPost().then(p => p.extendUser());
-    await t.lastPost.extendUser();
-    return t;
-  }));
-  return threads;
+// 公告
+forumSchema.methods.extendNoticeThreads = async function() {
+	const ThreadModel = mongoose.model('threads');
+	const {noticeThreadsId} = this;
+	const threads = [];
+	for(let pid of noticeThreadsId) {
+		const thread = await ThreadModel.findOne({oc: pid});
+		if(thread) {
+			await thread.extendFirstPost();
+			threads.push(thread);
+		}
+	}
+	return this.noticeThreads = threads;
 };
 
+
+forumSchema.methods.getToppedThreads = async function(ctx) {
+	// const ForumModel = mongoose.model('forums');
+	const ThreadModel = mongoose.model('threads');
+	/*const childrenFid = await ForumModel.getFidOfCanGetThreads(ctx, this.fid);
+	childrenFid.push(this.fid);*/
+	const threads = await ThreadModel.find({fid: this.fid, topped: true}).sort({tlm: -1});
+	await Promise.all(threads.map(async thread => {
+		await thread.extendForum();
+		await thread.forum.extendParentForum();
+		await thread.extendFirstPost().then(p => p.extendUser());
+		await thread.extendLastPost().then(p => p.extendUser());
+	}));
+	return threads;
+};
 
 forumSchema.methods.updateForumMessage = async function() {
-  const ThreadModel = require('./ThreadModel');
-  const ForumModel = require('./ForumModel');
-  let forumData = await ThreadModel.aggregate([
-    {
-      $match: {
-        fid: this.fid
-      }
-    },
-    {
-      $group: {
-        _id: '$fid',
-        countPosts: {$sum: '$count'},
-        countPostsToday: {$sum: '$countToday'},
-        countThreads: {$sum: 1}
-      }
-    },
-    {
-      $project: {
-        _id: 0
-      }
-    }
-  ]);
-  forumData = forumData[0];
-  const tCount = {
-    digest: 0,
-    normal: 0
-  };
-  tCount.digest = await ThreadModel.count({fid: this.fid, digest: true});
-  tCount.normal = forumData.countThreads - tCount.digest;
-  forumData.tCount = tCount;
-  await this.update(forumData);
-  if(!this.parentId) return;
-  const parentForum = await ForumModel.findOnly({fid: this.parentId});
-  const childForum = await ForumModel.find({parentId: this.parentId});
-  const obj = {
-    countPosts: 0,
-    countPostsToday: 0,
-    countThreads: 0,
-    tCount: {
-      digest: 0,
-      normal: 0
-    }
-  };
-  for (let forum of childForum) {
-    obj.countPosts += forum.countPosts;
-    obj.countPostsToday += forum.countPostsToday;
-    obj.tCount.digest += forum.tCount.digest;
-    obj.countThreads += forum.countThreads;
-  }
-  obj.tCount.normal = obj.countThreads - obj.tCount.digest;
-  await parentForum.update(obj);
+	const ThreadModel = require('./ThreadModel');
+	const ForumModel = mongoose.model('forums');
+	const PostModel = mongoose.model('posts');
+	const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
+	childrenFid.push(this.fid);
+	const countThreads = await ThreadModel.count({fid: {$in: childrenFid}});
+	let countPosts = await PostModel.count({fid: {$in: childrenFid}});
+	countPosts = countPosts - countThreads;
+	const digest = await ThreadModel.count({fid: {$in: childrenFid}, digest: true});
+	const normal = countThreads - digest;
+	const tCount = {
+		digest,
+		normal
+	};
+	const {today} = require('../nkcModules/apiFunction');
+	const countPostsToday = await PostModel.count({fid: {$in: childrenFid}, toc: {$gt: today()}});
+	await this.update({tCount, countPosts, countThreads, countPostsToday});
+	let breadcrumbForums = await this.getBreadcrumbForums();
+	breadcrumbForums = breadcrumbForums.reverse();
+	for(let forum of breadcrumbForums) {
+		const childForums = await forum.extendChildrenForums();
+		let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
+		childForums.map(f => {
+			countThreads += f.countThreads;
+			countPosts += f.countPosts;
+			countPostsToday += f.countPostsToday;
+			digest += f.tCount.digest;
+		});
+		const tCount = {
+			digest,
+			normal: (countThreads - digest)
+		};
+		await forum.update({countThreads, countPosts, countPostsToday, tCount});
+	}
 };
 
 
@@ -306,6 +379,18 @@ forumSchema.methods.extendParentForum = async function() {
 	return this.parentForum = parentForum;
 };
 
+forumSchema.methods.extendFollowers = async function() {
+	const UserModel = mongoose.model('users');
+	const users = [];
+	for (let uid of this.followersId) {
+		const user = await UserModel.findOne({uid});
+		if(user) {
+			users.push(user);
+		}
+	}
+	return this.followers = users;
+};
+
 // 加载路径导航父板块
 forumSchema.methods.getBreadcrumbForums = async function() {
 	const ForumModel = mongoose.model('forums');
@@ -332,7 +417,7 @@ forumSchema.statics.getVisibleForums = async (ctx, fid) => {
 	const visibleForums = [];
 	const findForums = async (parentId) => {
 		const accessForums = [];
-		const forums = await ForumModel.find({parentId, accessible: true, visibility: true});
+		const forums = await ForumModel.find({parentId, accessible: true, visibility: true}).sort({order: 1});
 		forums.map(forum => {
 			if(cc.includes(forum.class) || forum.isVisibleForNCC) {
 				visibleForums.push(forum);
@@ -361,7 +446,7 @@ forumSchema.statics.getAccessibleForums = async (ctx, fid) => {
 	const ForumModel = mongoose.model('forums');
 	let accessibleForum = [];
 	const findForums = async (parentId) => {
-		const forums = await ForumModel.find({parentId, accessible: true, class: {$in: cc}});
+		const forums = await ForumModel.find({parentId, accessible: true, class: {$in: cc}}).sort({order: 1});
 		accessibleForum = accessibleForum.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);
@@ -394,7 +479,7 @@ forumSchema.statics.getForumsOfCanGetThreads = async (ctx, fid) => {
 	await findForums(fid);
 	return accessibleForum;
 };
-// 加载能访问板块的fid
+// 加载可以从中拿文章的板块fid
 forumSchema.statics.getFidOfCanGetThreads= async (ctx, fid) => {
 	const ForumModel = mongoose.model('forums');
 	const forums = await ForumModel.getForumsOfCanGetThreads(ctx, fid);
@@ -405,7 +490,7 @@ forumSchema.statics.getFidOfCanGetThreads= async (ctx, fid) => {
 forumSchema.methods.ensurePermission = async function(ctx) {
 	const ForumModel = mongoose.model('forums');
 	const cc = ctx.data.certificates.contentClasses;
-	if(!cc.includes(this.class)) ctx.throw(403, '权限不足');
+	if(!cc.includes(this.class) || !this.accessible) ctx.throw(403, '权限不足');
 	const breadcrumbForums = await this.getBreadcrumbForums();
 	const accessibleFid = await ForumModel.getAccessibleFid(ctx);
 	for(forum of breadcrumbForums) {
@@ -424,8 +509,13 @@ forumSchema.methods.getThreadsByQuery = async function(ctx, query) {
 	const threads = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 	await Promise.all(threads.map(async thread => {
 		await thread.extendFirstPost().then(p => p.extendUser());
-		await thread.extendLastPost().then(p => p.extendUser());
+		if(thread.lm) {
+			await thread.extendLastPost().then(p => p.extendUser());
+		} else {
+			thread.lastPost = thread.firstPost;
+		}
 		await thread.extendForum();
+		await thread.forum.extendParentForum();
 	}));
 	return threads;
 };
@@ -438,6 +528,27 @@ forumSchema.methods.getThreadsCountByQuery = async function(ctx, query) {
 	const {match} = query;
 	match.fid = {$in: fidOfCanGetThreads};
 	return await ThreadModel.count(match);
+};
+
+forumSchema.statics.getAllChildrenForums = async function(fid) {
+	const ForumModel = mongoose.model('forums');
+	let accessibleForum = [];
+	const findForums = async (parentId) => {
+		const forums = await ForumModel.find({parentId});
+		accessibleForum = accessibleForum.concat(forums);
+		await Promise.all(forums.map(async forum => {
+			await findForums(forum.fid);
+		}));
+	};
+	fid = fid || '';
+	await findForums(fid);
+	return accessibleForum;
+};
+
+forumSchema.statics.getAllChildrenFid = async function(fid) {
+	const ForumModel = mongoose.model('forums');
+	const forums = await ForumModel.getAllChildrenForums(fid);
+	return forums.map(f => f.fid);
 };
 
 module.exports = mongoose.model('forums', forumSchema);

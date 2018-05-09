@@ -8,7 +8,26 @@
           .media-object(style=`height: 5rem;width: 5rem;border-radius: 50%;background-color: ${forum.color}`)
       .media-body
         h4.media-heading(style='margin-top: 5px;')= forum.displayName
+          if data.user
+            span &nbsp;&nbsp;
+            if !data.userSubscribe.subscribeForums.includes(forum.fid)
+              button.btn.btn-primary.btn-sm(onclick=`subscribeForum('${forum.fid}', true)`) 关注
+            else
+              button.btn.btn-danger.btn-sm(onclick=`subscribeForum('${forum.fid}', false)`) 取消关注
+          if data.userLevel >= 7
+            span &nbsp;&nbsp;
+            a.btn.btn-default.btn-sm(href=`/f/${data.forum.fid}/settings/info`) 板块设置
         p(style='color: #777777;')= forum.description
+        if data.moderators.length > 0
+          div(style='margin-bottom: 0.2rem;')
+            span 版主：
+            for user in data.moderators
+              a(href=`/u/${user.uid}`)= user.username
+              span &nbsp;&nbsp;
+        if data.threadTypes.length > 0
+          a(style=`text-decoration: none;margin-right: 0.5rem;color: #ff8700;border-bottom: 1px solid ${!data.cat?'#ff8700':'#ffffff'};` href=`/f/${data.forum.fid}`) 全部
+          for threadType in data.threadTypes
+            a(style=`text-decoration: none;margin-right: 0.5rem;color: #ff8700;border-bottom: 1px solid ${data.cat===threadType.cid?'#ff8700':'#ffffff'};` href=`/f/${data.forum.fid}?cat=${threadType.cid}`)= threadType.name
   .col-xs-12.col-sm-5.col-sm-offset-1.col-md-4.col-md-offset-1
     .row.text-center(style='padding-top: 0.3rem;')
       .col-xs-3.col-sm-3.col-md-3.post-count
@@ -16,10 +35,11 @@
         p 文章
       .col-xs-3.col-sm-3.col-md-3.post-count
         span= forum.countPosts
-        p 回复
+        p 讨论
       .col-xs-1.col-sm-1.col-md-1.post-count(style=`border-right: 3px solid ${forum.color}`)
         span &nbsp;
         p &nbsp;
       .col-xs-4.col-sm-4.col-md-4.post-count
         span= forum.countPostsToday
-        p 今日回复
+        p 今日更新
+  .col-xs-12

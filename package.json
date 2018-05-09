@@ -30,6 +30,7 @@
     "direct-alipay": "^3.0.0",
     "elasticsearch": "^14.0.0",
     "font-awesome": "^4.7.0",
+    "icheck": "^1.0.2",
     "immutable": "^3.8.2",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",

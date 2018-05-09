@@ -206,4 +206,41 @@ fn.getQuote = async function(c) {
 };
 
 
+fn.forumsListSort = (forums, types) => {
+	types = types || [];
+	const getForumById = (fid) => {
+		if(!fid) return;
+		for(let forum of forums){
+			if(forum.fid === fid) {
+				return forum;
+			}
+		}
+	};
+	const getTypesById = (fid) => {
+		const arr = [];
+		if(!fid) return [];
+		for(let t of types) {
+			if(t.fid === fid) {
+				arr.push(t);
+			}
+		}
+		return arr;
+	};
+	for(let forum of forums) {
+		forum.threadTypes = getTypesById(forum.fid);
+		const parentForum = getForumById(forum.parentId);
+		if(parentForum) {
+			parentForum.childrenForums = parentForum.childrenForums?parentForum.childrenForums: [];
+			parentForum.childrenForums.push(forum);
+		}
+	}
+	const result = [];
+	for(let forum of forums) {
+		if(!forum.parentId) {
+			result.push(forum);
+		}
+	}
+	return result;
+};
+
 module.exports = fn;
