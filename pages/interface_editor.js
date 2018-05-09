@@ -27,6 +27,7 @@ function dataURItoBlob (base64Data) {
 
 $("document").ready(function(){
   //编辑器缩放
+  if($(".w-e-text-container"))return false
   $(".w-e-text-container").resizable({
     containment: '#body',
     minHeight: 100,
@@ -233,7 +234,7 @@ function Editor() {
     this.content.addEventListener('keyup', this.trigger);
     this.language.addEventListener('change', this.update);
     this.post.onclick = onPost(self);
-    this.draft.onclick = saveDraft(self);
+    if(this.draft)this.draft.onclick = saveDraft(self);
     // if(this.query.type === "post"){
     //   document.getElementById("draft").style.display = "none"
     // }
@@ -500,7 +501,11 @@ function onPost(that) {
       $(this).next().replaceWith("");
       $(this).replaceWith("")
     })
-    var quoteContent = document.getElementById("quoteContent").innerHTML
+    if(document.getElementById("quoteContent")){
+      var quoteContent = document.getElementById("quoteContent").innerHTML
+    }else{
+      quoteContent = ''
+    }
     if(specialMark == "old"){
       var content = that.content.value;
     }else{
@@ -695,4 +700,10 @@ function fitscreennew(){
   geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
 
   screenfitted = !screenfitted
+}
+
+// 取消引用
+function cancelQuote(){
+  geid('quoteContent').innerHTML = "";
+  geid('quoteCancel').style.display = "none";
 }

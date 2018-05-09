@@ -509,9 +509,7 @@ padding: 1px 7px 1px 7px;
   display:inline;
 }
 p {
-  margin:0px;
-  margin-top:5px;
-  margin-bottom:5px;
+  margin:0 auto;
 }
 
 blockquote {
@@ -771,7 +769,7 @@ font-size: 14pt;
 
 .ThreadPostBody{
   margin-left: 60px;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.9;
   letter-spacing: 0.3px;
   word-wrap: break-word;
@@ -807,7 +805,7 @@ line-height: 1.4;
 }
 .ThreadPostBody video{max-width: 100%;}
 
-.ThreadPostBody p+p{margin-top: 18px;/* margin-bottom: 11px; */}
+/* .ThreadPostBody p+p{margin-top: 18px;margin-bottom: 11px;} */
 .ThreadPostBody p+*{}
 .ThreadPostBody *+p{}
 

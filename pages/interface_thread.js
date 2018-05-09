@@ -171,8 +171,9 @@ function setTopped(tid){
 }
 
 function assemblePostObject(){  //bbcode , markdown
-  var quoteHtml = document.getElementById('quoteContent').innerHTML
-  var replyHtml = document.getElementById('text-elem').innerHTML
+  var quoteHtml = document.getElementById('quoteContent').innerHTML;
+  var replyHtml = document.getElementById('text-elem').innerHTML;
+  if(replyHtml.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
   var replyContent = quoteHtml + replyHtml
   var post = {
     //t:gv('title').trim(),
@@ -193,7 +194,6 @@ function assemblePostObject(){  //bbcode , markdown
       post.c = common.URLifyHTML(post.c)
     }
   }
-
   post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')
 
   return post
@@ -275,7 +275,8 @@ function submit(tid){
     $(this).replaceWith("")
   })
   var post = assemblePostObject()
-  if(post.c==''){screenTopWarning('请填写内容。');return;}
+  if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
+  console.log(post.c)
 
   geid('ButtonReply').disabled=true
   return nkcAPI('/t/' + tid, 'POST', {
@@ -297,17 +298,25 @@ function cancelQuote(){
 }
 
 // 点击引用
-function quotePost(pid, number){
+function quotePost(pid, number, page){
   geid("quoteCancel").style.display = "inline"
   if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
   nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
     var strAuthor = "<a href='/m/"+pc.targetUser.uid+"'>"+pc.targetUser.username+"</a>&nbsp;" // 获取被引用的用户
-    var strFlor = "<a href='/t/"+pc.message.tid+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
+    if(page > 0){
+      var strFlor = "<a href='/t/"+pc.message.tid+'?&page='+page+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
+    }else{
+      var strFlor = "<a href='/t/"+pc.message.tid+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
+    }
     pc = pc.message;
     length_limit = 50;
     var content = pc.c;
-    content = content.replace(/<blockquote cite.+?blockquote>/img, '')
+    
+    // 去掉换行
+    content = content.replace(/\n/igm,'');
+    content = content.replace(/\r/igm,'');
+    content = content.replace(/<blockquote cite.*?blockquote>/igm, '')
     var replaceArr = [
       {reg: /<[^>]*>/gm, rep: ''},
       {reg: /<\/[^>]*>/, rep: ' '},
@@ -318,11 +327,10 @@ function quotePost(pid, number){
         content = content.replace(obj.reg, obj.rep)
       }
     }
-
     var str = content.replace(/\[quote.*?][^]*?\[\/quote]/g,'').slice(0,length_limit).trim();
-    str = content.replace(/@([^@\s]*)\s/gm, function(matched) {
-      var str = matched.replace('@', '@ ')
-      return str
+    str = str.replace(/@([^@\s]*)\s/gm, function(matched) {
+      var str1 = matched.replace('@', '@ ')
+      return str1
     });
     // 引用内容的字数不超过50
     if(str.length>=length_limit){
