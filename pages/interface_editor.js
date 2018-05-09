@@ -44,7 +44,7 @@ $("document").ready(function(){
         var newSrc = $(this).attr("srcs")
         // 使用正在下载图片替换当前图片
         //$(this).attr("src","/resources/site_specific/picupload.png")
-        console.log("newSrc",newSrc)
+        // console.log("newSrc",newSrc)
         // 判断图片是不是系统图片
         var sysimg = new RegExp("file:").test(newSrc)
         // 如果是系统图片，则不向下执行
@@ -63,7 +63,7 @@ $("document").ready(function(){
           var data = {
             loadsrc : newSrc
           }
-          console.log("---------发送url-----------",'\n',newSrc)
+          // console.log("---------发送url-----------",'\n',newSrc)
           var newimgstr = $(this)
           
           nkcAPI("/download", "POST", data)
@@ -76,7 +76,7 @@ $("document").ready(function(){
             if(list)list.refresh()
           })
           .catch( function(err){
-            console.log(err)
+            // console.log(err)
             newimgstr.attr("src","")
             newimgstr.attr("srcs","")
             newimgstr.replaceWith("<img src='/resources/site_specific/picdefault.png'>")

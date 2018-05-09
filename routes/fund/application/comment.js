@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const commentRouter = new Router();
 commentRouter
 	.post('/', async (ctx, next) => {
-		console.log(ctx.body)
 		const {data, body, db} = ctx;
 		const {applicationForm, user} = data;
 		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');

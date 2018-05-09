@@ -116,12 +116,13 @@ downloadRouter
     // 添加水印
     if(size > largeImage) {
         await imageMagick.attachify(path);
-    } else {
-        const {width, height} = await imageMagick.info(path);
-        if(height > 400 || width > 300) {
-            await imageMagick.watermarkify(path);
-        }
-    }
+    } 
+    // else {
+    //     const {width, height} = await imageMagick.info(path);
+    //     if(height > 400 || width > 300) {
+    //         await imageMagick.watermarkify(path);
+    //     }
+    // }
     await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
