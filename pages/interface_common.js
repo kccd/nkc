@@ -1,4 +1,5 @@
-//helper
+// 定义最后光标对象
+var lastEditRange;
 function geid(id){return document.getElementById(id);}
 function gv(id){return geid(id).value;}
 function ga(id,attr){return geid(id).getAttribute(attr);}
@@ -62,7 +63,7 @@ function generalRequest(obj,opt,callback){
   try{
     xhr.open(opt.method,opt.url,true);
 	  xhr.setRequestHeader("Content-type","application/json");
-	  xhr.setRequestHeader("FROM","nkcAPI");
+    xhr.setRequestHeader("FROM","nkcAPI");
     xhr.send(JSON.stringify(obj));
   }catch(err){
     callback(err);
@@ -74,7 +75,8 @@ function nkcOperationAPI(obj){
     generalRequest(obj,{
       method:obj.method,
       url:obj.url
-    },function(err,back){
+    },
+    function(err,back){
       if(err)return reject(err);
       resolve(back);
     });
@@ -362,6 +364,11 @@ var common=(function(){
       return p1+'[url]'+p2+'[/url]'
     })
   }
+  common.URLifyHTML = function(content){
+    return content.replace(URLExtractRegex,function(match,p1,p2){
+      return p1+'<a href="#">'+p2+'</a>'
+    })
+  }
 
   function mapWithPromise(arr,func,k){
     k = k||0
@@ -401,35 +408,105 @@ var common=(function(){
 //
 // Copyright (c) 2002-2008 Alex King
 // http://alexking.org/projects/js-quicktags
-function edInsertContent(which, myValue) {
+function edInsertContent(which, myValue, fileType, fileName) {
   myField = document.getElementById(which);
+  if(which == "content"){
+    //MOZILLA/NETSCAPE support
+    if (myField.selectionStart || myField.selectionStart == '0') {
+      var startPos = myField.selectionStart;
+      var endPos = myField.selectionEnd;
+      var scrollTop = myField.scrollTop;
+      myField.value = myField.value.substring(0, startPos)
+      + myValue
+      + myField.value.substring(endPos, myField.value.length);
+      //myField.focus();
 
-  //MOZILLA/NETSCAPE support
-  if (myField.selectionStart || myField.selectionStart == '0') {
-    var startPos = myField.selectionStart;
-    var endPos = myField.selectionEnd;
-    var scrollTop = myField.scrollTop;
-    myField.value = myField.value.substring(0, startPos)
-    + myValue
-    + myField.value.substring(endPos, myField.value.length);
-    //myField.focus();
+      myField.selectionStart = startPos + myValue.length;
+      myField.selectionEnd = startPos + myValue.length;
+      myField.scrollTop = scrollTop;
+    }
+    //IE support
+    else if (document.selection) {
+      myField.focus();
+      sel = document.selection.createRange();
+      sel.text = myValue;
+      myField.focus();
+    }
+    else
+    {
+      myField.value += myValue;
+      //myField.focus();
+    }
+  }
+  if(which == "text-elem"){
+    // 将文件后缀转为小写
+    fileType = fileType.toLowerCase()
+    var codeResource = "";
+    if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
+      //codeResource = "<b>123456</b>"
+      codeResource = "<p><img src=" + myValue + "></p>"
+    }else if(fileType === "mp4"){
+      codeResource = "<video src=" + myValue + " controls style=max-width:40%>video</video>"
+    }else{
+      codeResource = "<p><a href=" + myValue + "><img src=" + "/default/default_thumbnail.png" + ">" + fileName + "</a></p>"
+    }
+    insertHtmlAtCaret(codeResource)
+  }
+}
 
-    myField.selectionStart = startPos + myValue.length;
-    myField.selectionEnd = startPos + myValue.length;
-    myField.scrollTop = scrollTop;
+
+
+
+//插入图片
+function insertHtmlAtCaret(html) {
+  var sel, range;
+  if (window.getSelection) {
+    // IE9 and non-IE
+    //获取光标的当前位置
+    document.getElementById("text-elem").focus()
+    sel = window.getSelection()
+    if (lastEditRange) {
+      // 存在最后光标对象，选定对象清除所有光标并添加最后光标还原之前的状态
+      sel.removeAllRanges()
+      sel.addRange(lastEditRange)
+    }
+    //sel = window.getSelection();
+    if (sel.getRangeAt && sel.rangeCount) {
+      //创建range对象(拖蓝)
+      range = sel.getRangeAt(0);
+      //删除当前 Range 对象表示的文档区域
+      range.deleteContents();
+      
+      // Range.createContextualFragment() would be useful here but is
+      // non-standard and not supported in all browsers (IE9, for one)
+      //createElement() 方法可创建元素节点。
+      var el = document.createElement("div");
+      //将html插入元素节点
+      el.innerHTML = html;
+      //创建一个新的空文档片段(DOM节点)
+      var frag = document.createDocumentFragment(), node, lastNode;
+      while ( (node = el.firstChild) ) {
+        lastNode = frag.appendChild(node);
+      }
+      //在range内的开头插入节点
+      range.insertNode(frag);
+      // Preserve the selection
+      if (lastNode) {
+        //复制range
+        range = range.cloneRange();
+        //在指定的节点后开始范围
+        range.setStartAfter(lastNode);
+        range.collapse(true);
+        //从当前selection对象中移除所有的range对象
+        sel.removeAllRanges();
+        sel.addRange(range);  
+      }
+    }
+  } else if (document.selection && document.selection.type != "Control") {
+    // IE < 9
+    document.selection.createRange().pasteHTML(html);
   }
-  //IE support
-  else if (document.selection) {
-    myField.focus();
-    sel = document.selection.createRange();
-    sel.text = myValue;
-    myField.focus();
-  }
-  else
-  {
-    myField.value += myValue;
-    //myField.focus();
-  }
+  lastEditRange = sel.getRangeAt(0)
 }
 
 function subscribeUserSwitch(targetUid) {
@@ -533,7 +610,6 @@ function postUpload(url, data, callback) {
 		if (xhr.readyState==4)
 		{
 			if(xhr.status>=200&&xhr.status<300){
-				// jalert('上传成功！');
 				setTimeout(function(){
 					$('#uploadInfo').css('display', 'none');
 				}, 5000);
@@ -565,7 +641,16 @@ function uploadFile(url, id, callback) {
 		postUpload(url, formData, callback);
 	});
 }
-
+$("document").ready(function(){
+  $("#text-elem").on("click",function(){
+    var selection = document.getSelection();
+    lastEditRange = selection.getRangeAt(0)
+  });
+  $("text-elem").on("keyup",function(){
+    var selection = document.getSelection();
+    lastEditRange = selection.getRangeAt(0)
+  })
+})
 function deleteBill(id) {
 	if(confirm('确定要删除该条记录？') === false) return;
 	nkcAPI('/fund/bills/'+id, 'DELETE', {})
@@ -576,7 +661,6 @@ function deleteBill(id) {
 			screenTopWarning(data.error);
 		})
 }
-
 
 // 封禁用户
 function bannedUser(uid, banned) {
@@ -635,3 +719,31 @@ function subscribeForum(fid, subscribe) {
 			screenTopWarning(data.error);
 		})
 }
+
+
+//舍弃草稿
+function removedraft(uid,did){
+  var url = '/u/'+uid+'/drafts/'+did+'?uid='+uid+"&did="+did;
+  var method = "DELETE";
+  var alertInfo = "已舍弃草稿";
+  nkcAPI(url, method, {})
+    .then(function(){
+      screenTopAlert(alertInfo);
+      setTimeout(function(){
+        window.location.reload();
+      }, 1000);
+    })
+    .catch(function(data){
+      screenTopWarning(data.error)
+    })
+}
+
+// // 去标签+略缩
+// function delCodeAddShrink1(content){
+// 	content = content.replace(/<[^>]+>/g,"");
+// 	if(content.length > 10){
+//     var lastContent = content.substr(content.length-50,content.length)
+// 		content = content.substr(0,10) + "......" + lastContent;
+// 	}
+// 	return content
+// }

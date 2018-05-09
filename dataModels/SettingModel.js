@@ -29,7 +29,8 @@ const settingSchema = new Schema({
     fundApplicationForms: Number,
 	  photos: Number,
     forums: Number,
-	  fundDocuments: Number,
+    fundDocuments: Number,
+    drafts: Number
   },
 
 	//科创基金设置

@@ -1,0 +1,91 @@
+extends bootstrap_base.pug
+
+block title
+  title 编辑器 - 科创论坛
+  
+  include MathJax.pug
+  
+block content
+  
+  -var mainContainer1400 = true
+  #ife.container-fluid(style='max-width:1400px')
+    if !data.user
+        .row
+            .col-xs-12.f12
+                h1 尚未登录
+                :markdown
+                    请先[登录](/login)。
+    else
+        .row
+            .col-md-12
+            include exam_notification.pug
+            
+        .row
+            .form-group
+                input#title.form-control(style='height:50px' type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
+            .form-group
+                div(style='margin-top: 5px;')
+                select#parents.form-control(style='display: inline-block; width: auto;')
+                    option 选择一个学院
+                select#children.form-control(style='display: inline-block; width: auto;')
+                    option 选择一个专业
+                select#threadTypes.form-control(style='display: inline-block; width: auto;')
+                    option 无
+                select.form-control#lang(style='display: none; width: auto;')
+                    option html
+            .form-group
+                div#quoteContent
+            .form-group
+                div#content_test
+            .form-inline
+                .form-group
+                    input#parseURL(type='checkbox' checked)
+                    span &nbsp;处理URL&nbsp;
+                .form-group
+                    button#post.btn.btn-primary(type='submit' style='margin-left: 10px') 发表
+                    button#draft.btn.btn-primary(type='submit' style='margin-left: 10px') 保存草稿
+            .form-group
+            .nkcpanel(id='file-uploading' target='/r')
+                //uploader section
+                include interface_attachment_uploader_uploader.pug
+                
+            .panel.panel-default
+                .panel-heading 我的附件（点击插入帖子）
+                .panel-body(id='list-container')            
+
+            .form-group
+                //- input#parseURL(type='checkbox' checked)
+                //- span &nbsp;处理URL&nbsp;
+            .form-group
+                div#disnoneplay(style='display:none')= data.content
+                div#draftNowId(style='display:none')= data.content
+                div#userNowId(style='display:none')= data.user.uid
+                div#draftId(style='display:none')=`${data.did || ''}`
+  
+  include debug_output.pug
+block scripts
+
+
+  link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  script(src="/jquery-1.10.2.js")
+  script(src="/jquery-ui-1.10.4.custom.js")
+  script(src='/commonmark/dist/commonmark.js')
+  script(src='/plain_escaper.js')
+  script(src='/xbbcode-parser/xbbcode.js')
+  script(src='/xss/dist/xss.js')
+  
+  script(src='/external_pkgs/react/react.min.js')
+  script(src='/external_pkgs/react/JSXTransformer.js')
+  
+  script(src='/interface_common.js')
+  script(src='/nkc_render.js')
+  script(src='/interface_editor.js')
+  
+  script(src='/interface_attachment_uploader.js')
+  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js')
+  
+  script(src="/test.js")
+
+  
+  <script type="text/javascript" src="/wangEditor.js"></script>
+  <script type="text/javascript" src="/newEditor.js"></script>

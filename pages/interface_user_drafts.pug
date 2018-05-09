@@ -1,0 +1,31 @@
+extends bootstrap_base
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-12
+            .col-xs-12.col-md-9
+                if(data.draftSingleAll.length == 0)
+                    br
+                    br
+                    br
+                    br
+                    h4.text-center(style='color: #aaaaaa;') 暂无草稿
+                -for (let i of data.draftSingleAll)
+                    .user-info-list
+                        span.ForumThreadHasImage(style='background-color: #337ab7')= "标题"
+                        span.title= i.t
+                        br
+                        span.ForumThreadHasImage(style='background-color: #337ab7')= "内容"
+                        span= delCodeAddShrink(i.c)
+                        br
+                        div#draftObjId(style='display: none')= `${i.did}`
+                        span 修改于&nbsp;
+                        span.time= fromNow(i.tlm)
+                        span &nbsp;~~
+                        a(href=`/editor?type=redit&did=${i.did}`).link 编辑
+                        a(style='float:right;' href="javascript:;" onclick=`removedraft("${i.uid}","${i.did}")`).link 舍弃
+
+block scripts
+  script(src='/interface_common.js')
