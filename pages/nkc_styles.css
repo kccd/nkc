@@ -347,7 +347,6 @@ position: relative;
 .HomeThreadItem{
   margin-bottom: 3px;
   border-color: black;
-  //
   border-style: dashed;
   border-width: 1px;
   position: relative;
@@ -1047,7 +1046,7 @@ color: #d66;
   float: right;
 }
 
-.dclearfix:after { //clearfix exists in bootstrap already
+.dclearfix:after {
   content: "";
   display: table;
   clear: both;

@@ -171,11 +171,15 @@ function setTopped(tid){
 }
 
 function assemblePostObject(){  //bbcode , markdown
+  var quoteHtml = document.getElementById('quoteContent').innerHTML
+  var replyHtml = document.getElementById('text-elem').innerHTML
+  var replyContent = quoteHtml + replyHtml
   var post = {
     //t:gv('title').trim(),
 
-    c:gv('ReplyContent'),
-    l:"pwbb",
+    //c:gv("ReplyContent"),
+    c: replyContent,
+    l:"html",
   }
 
   if(geid('ParseURL').checked){
@@ -184,6 +188,9 @@ function assemblePostObject(){  //bbcode , markdown
     }
     if(post.l=='pwbb'){
       post.c = common.URLifyBBcode(post.c)
+    }
+    if(post.l=='html'){
+      post.c = common.URLifyHTML(post.c)
     }
   }
 
@@ -213,9 +220,61 @@ function enablePost(pid){
   })
 }
 
-function submit(tid){
-  var post = assemblePostObject()
+// 保存草稿
+function saveDraft(threadId,userId){
+  $("#ReplyContent").find(".MathJax_Preview").each(function(){
+    if($(this).next().next().attr("type").length > 15){
+      var mathfur = "$$" + $(this).next().next().html() + "$$";
+    }else{
+      var mathfur = "$" + $(this).next().next().html() + "$";
+    }
+    $(this).next().next().replaceWith(mathfur);
+    $(this).next().replaceWith("");
+    $(this).replaceWith("")
+  })
+  var post = assemblePostObject();
+  var quoteContent = document.getElementById("quoteContent").innerHTML;
+  post.c = quoteContent + post.c
+  if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
+  post.t = '';
+  post.destination = {
+    type: 'thread',
+    typeid: threadId
+  }
+  var method = "POST";
+  var url = "/u/"+userId+"/drafts/";
+  var data = {post:post};
+  return nkcAPI(url, method, data)
+    .then(function (result) {
+      if(result.status == "success"){
+        console.log(result.did)
+        $("#draftId").html(result.did)
+        jalert("保存成功！");
+      }
+      if(result.redirect) {
+        redirect(result.redirect)
+      }
+    })
+    .catch(function (data) {
+      console.log(data)
+      jwarning(data.error);
+    })
+}
 
+// 发表回复
+function submit(tid){
+  
+  $("#ReplyContent").find(".MathJax_Preview").each(function(){
+    if($(this).next().next().attr("type").length > 15){
+      var mathfur = "$$" + $(this).next().next().html() + "$$";
+    }else{
+      var mathfur = "$" + $(this).next().next().html() + "$";
+    }
+    $(this).next().next().replaceWith(mathfur);
+    $(this).next().replaceWith("");
+    $(this).replaceWith("")
+  })
+  var post = assemblePostObject()
   if(post.c==''){screenTopWarning('请填写内容。');return;}
 
   geid('ButtonReply').disabled=true
@@ -231,13 +290,24 @@ function submit(tid){
   })
 }
 
+// 取消引用
+function cancelQuote(){
+  geid('quoteContent').innerHTML = "";
+  geid('quoteCancel').style.display = "none";
+}
+
+// 点击引用
 function quotePost(pid, number){
+  geid("quoteCancel").style.display = "inline"
   if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
   nkcAPI('/p/'+pid+'/quote', 'GET',{})
   .then(function(pc){
+    var strAuthor = "<a href='/m/"+pc.targetUser.uid+"'>"+pc.targetUser.username+"</a>&nbsp;" // 获取被引用的用户
+    var strFlor = "<a href='/t/"+pc.message.tid+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
     pc = pc.message;
-    length_limit = 100;
+    length_limit = 50;
     var content = pc.c;
+    content = content.replace(/<blockquote cite.+?blockquote>/img, '')
     var replaceArr = [
       {reg: /<[^>]*>/gm, rep: ''},
       {reg: /<\/[^>]*>/, rep: ' '},
@@ -254,21 +324,37 @@ function quotePost(pid, number){
       var str = matched.replace('@', '@ ')
       return str
     });
-    if(str.length==length_limit)str+='……'
-    str = '[quote='+pc.user.username+','+pc.pid+'][/quote]'
-    geid('ReplyContent').value += str
+    // 引用内容的字数不超过50
+    if(str.length>=length_limit){
+      str = str.substring(0,50) + '.....'
+    }
+    // str = '[quote='+pc.user.username+','+pc.pid+'][/quote]'
+    // geid('ReplyContent').value += str
+    str = '<blockquote cite='+pc.user.username+','+pc.pid+' display="none">'+'引用：'+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
+    geid('quoteContent').innerHTML = str
+    // geid('ReplyContent-elem').innerHTML = str
     window.location.href='#ReplyContent'
   })
 }
 
+function dateTimeString(t){
+  return new Date(t).toLocaleString()
+}
+
 function at(username) {
   if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
-  geid('ReplyContent').value += '@'+username+' ';
+  // geid('ReplyContent').value += '@'+username+' ';
+  // window.location.href='#ReplyContent';
+  geid('text-elem').innerHTML += '<p>'+'@'+username+'</p>';
   window.location.href='#ReplyContent';
+  geid('text-elem').focus()
 }
 
 function goEditor(){
-  window.location = '/editor?&type=thread&id='+replyTarget.trim().split('/')[1]+'&content='+encodeURI(assemblePostObject().c)
+  window.localStorage.quoteHtml = document.getElementById("quoteContent").innerHTML;
+  window.localStorage.replyHtml = document.getElementById('text-elem').innerHTML;
+  //return console.log(window.localStorage)
+  window.location = '/editor?&type=thread&id='+replyTarget.trim().split('/')[1]
 }
 
 function addColl(tid){
@@ -602,3 +688,14 @@ function adSwitch(tid) {
     })
 }
 
+//html解码
+function htmlDecode(text){
+  //1.首先动态创建一个容器标签元素，如DIV
+  var temp = document.createElement("div");
+  //2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
+  temp.innerHTML = text;
+  //3.最后返回这个元素的innerText(ie支持)或者textContent(火狐，google支持)，即得到经过HTML解码的字符串了。
+  var output = temp.innerText || temp.textContent;
+  temp = null;
+  return output;
+}

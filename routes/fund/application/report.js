@@ -29,7 +29,7 @@ reportRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user, applicationForm} = data;
-		const {c, t} = body;
+		const {c, t, l} = body;
 		if(applicationForm.status.completed) ctx.throw(400, '抱歉！该申请已经结题。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		if(user.uid !== applicationForm.uid) ctx.throw(403, '权限不足');

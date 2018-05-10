@@ -3,11 +3,95 @@ $(function() {
   editor.init();
   window.editor = editor;
   var c = geid('content');
-  var proxy = geid('proxy');
-  proxy.addEventListener('click', function(e) {
-    replace_selection(c, e.target.getAttribute('data-unicode'), true)
-  })
+  //新编辑器不需要旧的表情
+  // var proxy = geid('proxy');
+  // proxy.addEventListener('click', function(e) {
+  //   replace_selection(c, e.target.getAttribute('data-unicode'), true)
+  // })
 });
+
+function dataURItoBlob (base64Data) {  
+  var byteString;  
+  if (base64Data.split(',')[0].indexOf('base64') >= 0)  
+      byteString = atob(base64Data.split(',')[1]);  
+  else  
+      byteString = unescape(base64Data.split(',')[1]);  
+  var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];  
+  var ia = new Uint8Array(byteString.length);  
+  for (var i = 0; i < byteString.length; i++) {  
+      ia[i] = byteString.charCodeAt(i);  
+  }  
+  return new Blob([ia], {type: mimeString});  
+  }
+
+
+$("document").ready(function(){
+  //编辑器缩放
+	if($(".w-e-text-container").length > 0) {
+		$(".w-e-text-container").resizable({
+			containment: '#body',
+			minHeight: 100,
+			minWidth: 100,
+			maxWidth: 1400
+		});
+	}
+  
+  $("#content_test").on("paste", function(){
+    function test(){
+      $("#text-elem img").each(function(){
+        // 获取当前图片url
+        if(!$(this).attr("srcs")){
+          return true
+        }
+        var newSrc = $(this).attr("srcs")
+        // 使用正在下载图片替换当前图片
+        //$(this).attr("src","/resources/site_specific/picupload.png")
+        // console.log("newSrc",newSrc)
+        // 判断图片是不是系统图片
+        var sysimg = new RegExp("file:").test(newSrc)
+        // 如果是系统图片，则不向下执行
+        if(sysimg == true){
+          var elemImg = "<img src='/resources/site_specific/picdefault.png'>"
+          $(this).replaceWith(elemImg)
+          console.log("图片无法加载")
+          // await $(this).on("error",function(){
+          //   var elemImg = "<img src='./picpass.png'>"
+          //   $(this).replaceWith(elemImg)
+          //   console.log("图片无法加载")
+          // })
+          return true
+        }
+        if(newSrc.length > 10){
+          var data = {
+            loadsrc : newSrc
+          }
+          // console.log("---------发送url-----------",'\n',newSrc)
+          var newimgstr = $(this)
+          
+          nkcAPI("/download", "POST", data)
+          //console.log(fff)
+          .then( function(data){
+            newimgstr.attr("src","")
+            newimgstr.attr("srcs","")
+            var newImg = "<img src='" + "/r/" + data.r.rid + "' style='max-width: 100%'>"
+            newimgstr.replaceWith(newImg)
+            if(list)list.refresh()
+          })
+          .catch( function(err){
+            // console.log(err)
+            newimgstr.attr("src","")
+            newimgstr.attr("srcs","")
+            newimgstr.replaceWith("<img src='/resources/site_specific/picdefault.png'>")
+          })
+        }
+      })
+    }
+    setTimeout(function(){test()},5000)
+    
+  })
+})
+
+
 
 function get_selection(the_id) {
   var e = typeof(the_id)=='String'? document.getElementById(the_id) : the_id;
@@ -39,6 +123,7 @@ function get_selection(the_id) {
 
 function replace_selection(the_id,replace_str,setSelection) {
   var e = typeof(the_id)==='string'? document.getElementById(the_id) : the_id;
+  console.log(e)
   selection = get_selection(the_id);
   var start_pos = selection.start;
   var end_pos = start_pos + replace_str.length;
@@ -77,25 +162,38 @@ function set_selection(the_id,start_pos,end_pos) {
   return get_selection(the_id);
 }
 
+
 function Editor() {
   this.parents = geid('parents');
   this.children = geid('children');
   this.post = geid('post');
+  this.draft = geid('draft');
   this.title = geid('title');
-  this.content = geid('content');
+  //--获取新旧编辑器的InnerHTML
+  //旧编辑器获取文本 textarea id=content
+  //新编辑器获取标签 div id=text-elem
+  this.content = geid('content') || geid('text-elem');
+  this.specialMark = "";
+  if(geid('content')){
+    this.specialMark = "old";
+  }else{
+    this.specialMark = "new"
+  }
+  //-- --
   this.threadTypes = geid('threadTypes');
   this.postController = geid('postController');
-  this.parentDefault = this.parents.value;
+  // this.parentDefault = this.parents.value;
   this.language = geid('lang');
-  this.childrenDefault = this.children.value;
-  this.threadTypesDefault = this.threadTypes.value;
+  // this.childrenDefault = this.children.value;
+  // this.threadTypesDefault = this.threadTypes.value;
   this.query = getSearchKV();
   this.blocked = false;
+  //预览编辑内容
   this.update = function() {
     var post = {
       t: this.title.value.trim(),
       c: this.content.value,
-      l: this.language.value.toLowerCase().trim(),
+      l: this.language?this.language.value.toLowerCase().trim():'html',
       cat: this.threadTypeID
     };
     post.resources = extract_resource_from_tag(post.c);
@@ -111,27 +209,45 @@ function Editor() {
 
     hset('parsedtitle',title); //XSS prone.
 
-    var content = post.c;
+    var content = post.c || post.c_test;
     var parsedcontent = '';
     parsedcontent = render.experimental_render(post)
     hset('parsedcontent',parsedcontent);
   };
+
   this.trigger = function(e){
     var self = this;
     if(self.debounce_timer){
       clearTimeout(self.debounce_timer)
     }
-    self.debounce_timer = setTimeout(function() {
-      self.update()
-    }, 300)
+    //--只在旧编辑器使用预览--
+    if(this.specialMark == "old"){
+      self.debounce_timer = setTimeout(function() {
+        //--只在旧编辑器使用预览--
+          self.update()
+      }, 300)
+    }
+    //--  --
   }.bind(this);
   this.init = function() {
     var self = this;
     this.title.addEventListener('keyup', this.trigger);
     this.content.addEventListener('keyup', this.trigger);
-    this.language.addEventListener('change', this.update);
-    this.post.onclick = onPost(self);
-    if(this.query.type && this.query.type !== 'forum') {
+    // this.language.addEventListener('change', this.update);
+	  if(this.post) {
+		  this.post.onclick = onPost(self);
+	  }
+		if(this.draft) {
+			this.draft.onclick = saveDraft(self);
+		}
+	  if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
+		  this.blocked = true;
+	  }
+		// 旧编辑器获取专业分类，由于旧编辑器只作用于修改旧帖，修改帖子不允许再修改专业
+    // if(this.query.type === "post"){
+    //   document.getElementById("draft").style.display = "none"
+    // }
+    /*if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
       this.blocked = true;
       this.parents.disabled = true;
       this.children.disabled = true;
@@ -175,12 +291,16 @@ function Editor() {
               }
             }
           }
-          self.update()
+          //--只在旧编辑器使用预览--
+          if(this.specialMark === "old"){
+            self.update()
+          }
+          //-- --
         })
         .catch(function (e) {
-          console.error(e);
+          console.log(e);
         });
-    }
+    }*/
   };
 }
 
@@ -199,6 +319,7 @@ function getSearchKV() {
   return result
 }
 
+//隐藏html标签
 function blockOnChange(that) {
   return function() {
     var display = 'block';
@@ -300,14 +421,126 @@ function parentsOnChange(that) {
   }
 }
 
-function onPost(that) {
+//保存草稿
+function saveDraft(that){
   return function() {
-    var content = that.content.value;
+    //--获取编辑器的内容--
+    $(".MathJax_Preview").each(function(){
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
+    })
+    //-- --
+    var quoteContent = document.getElementById("quoteContent").innerHTML
+    var draftId = $("#draftId").html();
+    var content = quoteContent + that.content.innerHTML.trim();
     var title = that.title.value.trim();
     var type = that.query.type;
+    var destination = {
+      type: type,
+      typeid: that.query.id
+    }
     var cat = that.query.cat;
     var id = that.blocked ? that.query.id : that.childID;
     var language = that.language.value.toLowerCase().trim();
+    var emptyContent = content.replace(/<[^>]+>/g,"");
+    if (emptyContent === '' && type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
+      screenTopWarning('请填写内容或标题');
+      return;
+    }
+    if (geid('parseURL').checked) {
+      if (language === 'markdown') {
+        content = common.URLifyMarkdown(content);
+      }
+      if (language === 'bbcode' || language === 'pwbb') {
+        content = common.URLifyBBcode(content);
+      }
+    }
+    var post = {
+      t: title,
+      c: content,
+      l: language,
+      cat: that.threadTypeID,
+      did: draftId,
+      destination: destination
+    };
+    console.log(post)
+    var userId = $("#userNowId").html()
+    var method = "POST";
+    var url = "/u/"+userId+"/drafts/";
+    var data = {post:post};
+    return nkcAPI(url, method, data)
+      .then(function (result) {
+        if(result.status == "success"){
+          console.log(result.did)
+          $("#draftId").html(result.did)
+          jalert("保存成功！");
+        }
+        if(result.redirect) {
+          redirect(result.redirect)
+        } else {
+          if(that.type === 'post') {
+            redirect()
+          }
+        }
+      })
+      .catch(function (data) {
+        jwarning(data.error);
+        geid('post').disabled = false
+      })
+  }
+}
+
+function onPost(that) {
+  return function() {
+    //--获取编辑器的内容--
+    var specialMark = that.specialMark;
+    $(".MathJax_Preview").each(function(){
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
+    })
+    var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''
+    if(specialMark == "old"){
+      var content = that.content.value;
+    }else{
+      var content = quoteContent + that.content.innerHTML.trim();
+    }
+    //-- --
+    var title = that.title.value.trim();
+    var type = that.query.type;
+    var cat = that.query.cat;
+    var id;
+
+		var id = that.blocked ? that.query.id : that.childID;
+		console.log(id);
+    if(that.blocked) {
+    	id = that.query.id;
+    } else {
+    	try{
+		    var obj = getResult();
+	    } catch(e) {
+    		return screenTopWarning(e);
+	    }
+
+	    id = obj.fid;
+	    cat = obj.cid;
+			type = 'forum';
+    }
+
+
+
+    var language = that.language?that.language.value.toLowerCase().trim():'html';
     if (content === '') {
       screenTopWarning('请填写内容。');
       return;
@@ -327,15 +560,14 @@ function onPost(that) {
     var post = {
       t: title,
       c: content,
-      l: language,
-      cat: that.threadTypeID,
+      l: language || 'html',
+      cat: cat,
       mid: that.query.mid
     };
-    if (!that.blocked && (!that.childID)) {
+    /*if (!that.blocked && (!that.childID)) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
       return;
-    }
-    //}
+    }*/
     that.post.disabled = true;
     var method;
     var url;
@@ -363,9 +595,13 @@ function onPost(that) {
     } else if(type === 'application' && cat === 'r') { // 报告
 	    method = 'POST';
 	    url = '/fund/a/' + id + '/report';
-	    data = {c: post.c, t: post.t}
+	    data = {c: post.c, t: post.t, l: post.l}
+    } else if(type === 'redit'){
+      method = 'POST';
+      url = '/f/' + id;
+      data = {post: post};
     } else {
-      jwarning('未知的请求类型：'+type);
+      return screenTopWarning('未知的请求类型：'+type);
     }
     return nkcAPI(url, method, data)
       .then(function (result) {
@@ -379,7 +615,6 @@ function onPost(that) {
       })
       .catch(function (data) {
         jwarning(data.error);
-        console.log(data)
         geid('post').disabled = false
       })
   }
@@ -441,4 +676,52 @@ function extract_resource_from_tag(text) {
     })
   });
   return rarr
+}
+
+
+//下面是新编辑器渲染公式
+function mathfreshnew(){
+  if(MathJax){
+     MathJax.Hub.PreProcess(geid('text-elem'),function(){MathJax.Hub.Process(geid('text-elem'))})
+    //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+  }
+  if(hljs){
+    ReHighlightEverything() //interface_common code highlight
+  }
+}
+
+//下面是新编辑器渲染公式
+function mathfresha1(){
+  $("#editora2").html($("#editora1").val())
+  if(MathJax){
+    MathJax.Hub.PreProcess(geid('editora2'),function(){MathJax.Hub.Process(geid('editora2'))})
+    //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+  }
+  if(hljs){
+    ReHighlightEverything() //interface_common code highlight
+  }
+}
+
+
+//重新编辑公式
+//使用方法，在编辑器中双击渲染好了的公式
+function reedit(para){
+  $(".w-e-icon-math").click()
+  var typelength = $(para).find("script").attr("type").length
+  if(typelength < 15){
+    $("#editora1").val("$"+$(para).find("script").html()+"$")
+  }else{
+    $("#editora1").val("$$"+$(para).find("script").html()+"$$")
+  }
+  $(para).addClass("righteditor")
+  window.localStorage.pMark = "1";
+}
+
+function fitscreennew(){
+  var h = $(window).height().toString()+'px'
+
+  geid('content').style.height = !screenfitted?h:'300px';
+  geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
+
+  screenfitted = !screenfitted
 }

@@ -60,7 +60,6 @@ function htmlDiff(earlier,later){
     part.value = render.plain_render(part.value);
     outputHTML += (stylestr?`<span class="${stylestr}">${part.value}</span>`:part.value)
   });
-
   return outputHTML
 }
 
@@ -127,6 +126,16 @@ function highlightString(content, str) {
 
 function filterQuote(content) {
   return content.replace(/\[quote.*\/quote]/ig, '')
+}
+
+// 去标签+略缩
+function delCodeAddShrink(content){
+	content = content.replace(/<[^>]+>/g,"");
+	if(content.length > 100){
+		var lastContent = content.substr(content.length-50,content.length)
+		content = content.substr(0,50) + "~~~~~~~~~~~~" + lastContent;
+	}
+	return content
 }
 
 function hideContentByUser(content, user={xsf: 0}, from) {
@@ -257,7 +266,8 @@ let pugRender = (template, data) => {
     creditString,
     htmlDiff,
     filterQuote,
-	  hideContentByUser,
+		hideContentByUser,
+		delCodeAddShrink,
 	  applicationFormStatus,
 	  ensureFundOperatorPermission,
   };

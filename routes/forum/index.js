@@ -207,20 +207,25 @@ forumRouter
 			data, params, db, body, address: ip, query,
       generateUsersBehavior
     } = ctx;
+		const {
+			ForumModel,
+			ThreadModel
+		} = db;
+		const {fid} = params;
+		const forum = await ForumModel.findOnly({fid});
 	  const {user} = data;
+	  await forum.ensurePermission(ctx);
+	  const childrenForums = await forum.extendChildrenForums();
+	  if(childrenForums.length !== 0) {
+	  	ctx.throw(400, '该专业存下存在其他专业，请到下属专业发表文章。');
+	  }
 		if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发帖。');
 	  const {post} = body;
     const {c, t} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
-    const {fid} = params;
     const {cat, mid} = post;
-    const {
-      ForumModel,
-      ThreadModel
-    } = db;
-    const forum = await ForumModel.findOnly({fid});
     const _post = await forum.newPost(post, user, ip, cat, mid);
     await generateUsersBehavior({
       operation: 'postToForum',
@@ -241,6 +246,8 @@ forumRouter
     }
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     data.post = _post;
+    //帖子曾经在草稿箱中，发表时，删除草稿
+    await db.DraftModel.remove({"t":ctx.body.post.t})
     await next();
   })
   .del('/:fid', async (ctx, next) => {

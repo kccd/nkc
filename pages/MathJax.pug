@@ -3,12 +3,19 @@ script(type='text/x-mathjax-config').
     jax: ["input/TeX","output/CommonHTML"],
     extensions: ["tex2jax.js","MathZoom.js"],
     tex2jax:{
-      //inlineMath:[],
-      //displayMath:[],
+        inlineMath:  [["$", "$"], ["\\(","\\)"]],
+        displayMath: [["$$","$$"], ["\\[","\\]"]],
       ignoreClass:'container',
       processClass:"ThreadPostBody|QuestionText"
     },
+    "CommonHTML":{
+      showMathMenu:false,
+      preferredFont:"STIX",
+      scale: 100,
+      minScaleAdjust: 50
+    },
     TeX: {
+
     }
   })
 script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')

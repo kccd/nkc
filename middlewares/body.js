@@ -11,7 +11,7 @@ module.exports = async (ctx, next) => {
     const basename = path.basename(ctx.filePath);
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg'];
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
     const name = resource? resource.oname: basename;
     if(extArr.includes(ext)) {
       ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);

@@ -55,7 +55,7 @@
           p
             -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
             -firstPost.c = filterQuote(firstPost.c)
-            -firstPost.c = firstPost.c.slice(0, 250);
+            -firstPost.c = firstPost.c.slice(0, 600);
             a(href=`/t/${tid}`)!= replaceContent(experimental_render(firstPost))
         div
           p

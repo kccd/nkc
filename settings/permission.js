@@ -356,6 +356,22 @@ const certificates ={
       non_broadcast: true
     },
     permittedOperations: {
+      draft: {
+        [name]: '草稿',
+        [POST]: true,
+        [GET]: true
+      },
+      download: {
+        [GET]: true,
+        [POST]: true,
+        [parameter]: {
+          [GET]: true,
+          [POST]: true,
+          [parameter]: {
+            [GET]: true
+          }
+        }
+      },
 	    sendMessage: {
 		    [name]: '发短信',
 		    bindMobile: {
@@ -494,6 +510,15 @@ const certificates ={
           	[name]: '用户账单',
 		        [GET]: true
 	        },
+	        drafts: {
+          	[name]: '草稿箱',
+            [GET]: true,
+            [DELETE]: true,
+            [POST]: true,
+            [parameter]: {
+              [DELETE]: true,
+            }
+          },
 	        auth: {
 		        [DELETE]: true,
           	[parameter]: {

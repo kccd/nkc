@@ -13,6 +13,7 @@ const resourceRouter = routers.resource;
 const fundRouter = routers.fund;
 const registerRouter = routers.register;
 const personalForumRouter = routers.personalForum;
+const downloadRouter = routers.download;
 const systemRouter = routers.system;
 
 
@@ -28,5 +29,6 @@ router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
+router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
 router.use('/system', systemRouter.routes(), systemRouter.allowedMethods());
 module.exports = router;

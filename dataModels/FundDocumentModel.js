@@ -39,7 +39,7 @@ const documentSchema = new Schema({
 	},
 	l: {//pwbb
 		type: String,
-		default: 'pwbb'
+		default: 'html'
 	},
 	t: {
 		type: String,
@@ -141,7 +141,7 @@ documentSchema.pre('save', async function(next) {
 		for(let rid of additional) {
 			const resource = await ResourceModel.findOne({rid});
 			if(resource) {
-				if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].includes(resource.ext.toLowerCase())) {
+				if (['jpg', 'jpeg', 'bmp', 'gif', 'svg', 'png'].includes(resource.ext.toLowerCase())) {
 					this.hasImage = true;
 				}
 				if(!resource.references.includes(`fund-${this._id}`)){

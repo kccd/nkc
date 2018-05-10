@@ -104,7 +104,7 @@ block content
                     a(href=`/t/${docs[i].fromPost.tid}`) #{docs[i].toPost.thread.firstPost.t||docs[i].toPost.tid}
                     span(style="font-size:0.8em;") &nbsp;下回复了你：
                     a(href=`/t/${docs[i].fromPost.tid}?&pid=${docs[i].fromPost.pid}#${docs[i].fromPost.pid}` style='text-decoration: none; color: inherit;')
-                      p(style="font-size:0.8em; word-break:break-all;")= hideContentByUser(docs[i].fromPost.c, data.user, 'list')
+                      p(style="font-size:0.8em; word-break:break-all;")= delCodeAddShrink(hideContentByUser(docs[i].fromPost.c, data.user, 'list'))
             hr(style='margin:0.5em 0;')
 
         -if(nowAt === 'at')
@@ -126,7 +126,7 @@ block content
                     span(style="font-size:0.8em;") &nbsp;在帖子&nbsp;
                     a(href=`/t/${docs[i].post.tid}#${docs[i].post.pid}`) #{docs[i].post.thread.firstPost.t||docs[i].post.thread.firstPost.tid}
                     span(style="font-size:0.8em;") &nbsp;下@了你：
-                    p(style="font-size:0.8em; word-break:break-all;")= hideContentByUser(docs[i].post.c, data.user, 'list')
+                    p(style="font-size:0.8em; word-break:break-all;")= delCodeAddShrink(hideContentByUser(docs[i].post.c, data.user, 'list'))
             hr(style='margin:0.5em 0;')
 
         -if(nowAt === 'message')

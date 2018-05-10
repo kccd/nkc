@@ -202,7 +202,11 @@ fn.getForums = async ctx => {
 };
 
 fn.getQuote = async function(c) {
-  return c.match(/\[quote=(.*?),(.*?)]/);
+  //BBCODE
+  //return c.match(/\[quote=(.*?),(.*?)]/);
+  //HTML
+  return c.match(/cite="(.*?),(.*?)"/)
+  
 };
 
 

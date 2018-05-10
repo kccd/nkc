@@ -1,9 +1,16 @@
 var selectedArr = [];
+var cat;
 var dropdownDiv = $('#dropdownDiv');
 var data = JSON.parse($('#forumListData').text());
 var forumList = data.forumList;
 var threadTypes = data.forumsThreadTypes;
-var targetForumSelect = $('#TargetForum');
+if(data.selectedArr) {
+	selectedArr = data.selectedArr;
+}
+if(data.cat) {
+	cat = parseInt(data.cat);
+}
+displaySelect();
 
 
 
@@ -37,19 +44,26 @@ function createSelect(arr, fid, category) {
 		text = '请选择分类';
 		klass = 'form-control dropdownSelect categorySelect';
 	}
-	var select = newElement('select', {class: klass}, {});
+	var select = newElement('select', {class: klass}, {
+		width: 'auto',
+		display: 'inline-block',
+		'margin-right': '0.2rem'
+	});
 	select.append(newElement('option', {}, {}).text(text));
 	for(var i = 0; i < arr.length; i++) {
 		var forum = arr[i];
 		if (!category) {
 			var option = newElement('option', {}, {}).text(forum.fid+':'+forum.displayName);
+			if(forum.fid === fid) {
+				option.attr('selected', true);
+			}
 		} else {
 			var option = newElement('option', {}, {}).text(forum.name);
+			if(forum.cid === fid) {
+				option.attr('selected', true);
+			}
 		}
 
-		if(forum.fid === fid) {
-			option.attr('selected', true);
-		}
 		select.append(option);
 	}
 	return select;
@@ -66,7 +80,7 @@ function displaySelect() {
 			if(childrenForums.length === 0) {
 				var types = getThreadTypes(selectedArr[i]);
 				types.push({name: '不分类', cid: ''});
-				dropdownDiv.append(createSelect(types, '', true));
+				dropdownDiv.append(createSelect(types, cat||'', true));
 			} else {
 				dropdownDiv.append(createSelect(childrenForums, selectedArr[i + 1]).attr('id', 'select'+(i+1)));
 			}
@@ -230,5 +244,3 @@ function moveThreadToRecycle(id) {
 	};
 	fn(n);
 }
-
-displaySelect();

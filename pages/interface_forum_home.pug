@@ -82,7 +82,7 @@ block content
               img(src=`/forum_avatar/${data.forum.fid}` style='height: 8rem;border-radius: 50%;')
             else
               div(style=`background-color: ${data.forum.color};display: inline-block;height: 8rem;width: 8rem;border-radius: 50%;`)
-            h3.text-center= data.forum.displayName
+            .h3.text-center= data.forum.displayName
             p.text-center(style='color: #ff8700;margin-bottom: 1rem;')= data.forum.brief
             if data.user
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
