@@ -1,3 +1,7 @@
+var forumInfoDiv = $('#forumInfoDiv');
+var fixedForumInfoDiv = $('#fixedForumInfoDiv');
+var digestThreadsDiv = $('#digestThreadsDiv');
+var fixedDigestThreadsDiv = $('#fixedDigestThreadsDiv');
 
 
 $(document).ready(function(){
@@ -8,7 +12,10 @@ $(document).ready(function(){
     $('.ThreadCheckboxes').css('width','12px');
     $('.ThreadCheckboxes').css('height','12px');
   }
-})
+
+	displayAside();
+
+});
 
 
 function enterManagementMode(){
@@ -18,20 +25,6 @@ function enterManagementMode(){
 
 function applyAll(f){
   return common.mapWithPromise(extractSelectedCheckboxArrayOfID(),f)
-}
-
-function moveThread(tid,fid,cid){
-  return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
-    tid:tid,
-    fid:fid,
-    cid:cid,
-  })
-  .then(function(){
-    screenTopAlert(tid + ' 已送 ' + fid + (cid?' 的 '+cid:''))
-  })
-  .catch(function(){
-    screenTopWarning(tid+ ' 无法送 ' + fid+ (cid?' 的 '+cid:''))
-  })
 }
 
 function recyclebtn(){
@@ -54,7 +47,7 @@ function extractfid(){
 }
 
 function moveThreadTo(){
-  var fid = extractfid()
+	var fid = extractfid()
   if(moveThreadToForum(fid)){
     geid('moveThreadTo').disabled=true
   }
@@ -85,7 +78,9 @@ function moveThreadToForum(fid){
   .then(function(){
     window.location.reload()
   })
-  .catch(jwarning)
+  .catch(function(data) {
+  	screenTopAlert(data.error || data)
+  })
 
   return true
 }
@@ -194,3 +189,61 @@ function mix(a,b){
     }
     return res;
 }
+
+
+$(window).scroll(function() {
+
+	displayAside();
+});
+
+function initPosition() {
+	var forumInfoDivWidth = forumInfoDiv.css('width');
+	var forumInfoDivPadding = forumInfoDiv.css('padding');
+
+
+
+	var digestThreadsDivWidth = digestThreadsDiv.css('width');
+	var digestThreadsDivPadding = digestThreadsDiv.css('padding');
+	var digestThreadsDivLeft = digestThreadsDiv.offset().left;
+
+	fixedForumInfoDiv.css({
+		width: forumInfoDivWidth,
+		padding: forumInfoDivPadding
+	});
+
+	fixedDigestThreadsDiv.css({
+		width: digestThreadsDivWidth,
+		padding: digestThreadsDivPadding,
+		left: digestThreadsDivLeft
+	});
+}
+
+function displayAside() {
+	if($(window).width() < 992) {
+		$('#topB').hide();
+		fixedForumInfoDiv.hide();
+		fixedDigestThreadsDiv.hide();
+	} else {
+		$('#topB').show();
+		initPosition();
+		var forumInfoHeight = forumInfoDiv.height();
+		var digestThreadsHeight = digestThreadsDiv.height();
+		var scrollTop = $(window).scrollTop();
+
+		if(scrollTop > forumInfoHeight) {
+			fixedForumInfoDiv.show();
+		} else {
+			fixedForumInfoDiv.hide();
+		}
+		if(scrollTop > digestThreadsHeight) {
+			fixedDigestThreadsDiv.show();
+		} else {
+			fixedDigestThreadsDiv.hide();
+		}
+	}
+
+}
+
+window.onresize = function() {
+	displayAside()
+};

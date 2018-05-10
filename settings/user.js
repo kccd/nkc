@@ -57,6 +57,18 @@ const scoreMap = {
   },
 	changeUsername: {
   	score: 0
+	},
+	viewThread: {
+  	score: 0
+	},
+	viewForum: {
+  	score: 0
+	},
+	viewUserCard: {
+  	score: 0
+	},
+	viewUserPersonalForum: {
+  	score: 0
 	}
 };
 

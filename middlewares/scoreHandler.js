@@ -12,7 +12,7 @@ module.exports = async (ctx, next) => {
     const userAttrChangeValue = attributeChange[userAttrChangeKey];
     targetUser[userAttrChangeKey] = targetUser[userAttrChangeKey] + userAttrChangeValue;
     targetUser.score = targetUser.score + attributeChange.score;
-    await targetUser.save();
+	  await targetUser.save();
     const attrChange = {name: userAttrChangeKey, change: userAttrChangeValue};
     const score = attributeChange.score;
     const uid = user.uid;

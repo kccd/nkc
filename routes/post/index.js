@@ -26,7 +26,7 @@ postRouter
     const {t, c} = ctx.body.post;
     if(c.lenght < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
-    const {data, db} = ctx;
+    const {data, db, fs} = ctx;
     const {user} = data;
 	  if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
@@ -61,6 +61,21 @@ postRouter
     targetPost.t = t;
     targetPost.c = c;
     targetPost.tlm = Date.now();
+	  if(targetThread.oc === pid) {
+			await targetThread.update({hasCover: true});
+			const {coverPath} = ctx.settings.upload;
+			if(targetThread.tid) {
+				const path = coverPath + '/' + targetThread.tid + '.jpg';
+				try {
+					await fs.access(path);
+					await fs.unlink(path);
+				} catch(e) {
+					// 之前不存在封面图
+				}
+
+			}
+
+	  }
     // targetPost.rpid = rpid;
     const q = {
       tid: targetThread.tid

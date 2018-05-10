@@ -39,7 +39,6 @@ reportRouter
 			uid: user.uid,
 			c: c,
 			t: t,
-			l,
 			applicationFormId: applicationForm._id,
 			type: 'report'
 		});

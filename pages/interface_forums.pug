@@ -12,23 +12,15 @@ block title
   title #{data.site.name} - #{data.site.description}
   -const mainContainer1400 = true
 block content
+  mixin createForumsList(forums)
+    for forum in forums
+      include module_children_forum_single
+      if forum.childrenForums && forum.childrenForums.length > 0
+        .row
+          .col-xs-12.col-md-12(style='padding-left: 4rem;')
+            +createForumsList(forum.childrenForums)
   .container-fluid(style='max-width: 1400px;')
     .row
-      .col-md-8
-        .panel
-          //div.hidden-sm.hidden-md.hidden-lg
-          //  span(style='color: silver;') 学院&nbsp;&nbsp;&nbsp;
-          //  button#FLVS.btn.btn-default.btn-sm(onclick='forumListVisibilitySwitch();' style='float: right;') 显示学院
-          //  .clearfix
-          -var forums = data.forums
-            div#indexForumList
-            -var defaultColor = 'grey'
-              for forum in forums
-                div
-                  div(style='display: table; font-size: 18px;')
-                    include interface_forum_info_parent
-                  div(style='padding-left: 3rem; display: table;')
-                    for f in forum.children
-                      -const forum = f
-                      include interface_forum_info
-                hr
+      .col-xs-12.col-md-8.col-md-offset-2
+        +createForumsList(data.forums)
+

@@ -286,7 +286,6 @@ applicationRouter
 				if(project !== undefined){
 					if(project.t) applicationForm.project.t = project.t;
 					if(project.c) applicationForm.project.c = project.c;
-					if(project.l) applicationForm.project.l = project.l;
 					if(project.abstract) applicationForm.project.abstract = project.abstract;
 					await applicationForm.project.save();
 					data.redirect = `/fund/a/${applicationForm._id}/settings?s=3`;

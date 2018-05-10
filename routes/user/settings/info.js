@@ -41,7 +41,6 @@ infoRouter
 			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认用户');
 			q.username = username;
 			q.usernameLowerCase = username.toLowerCase();
-			q.$inc = {kcb: -1*changeUsername};
 			const newSecretBehavior = db.SecretBehaviorModel({
 				type: 'changeUsername',
 				oldUsername: user.username,
@@ -60,8 +59,15 @@ infoRouter
 			});
 			await defaultUser.update({$inc: {kcb: changeUsername}});
 			await newSecretBehavior.save();
+			user.username = q.username;
+			user.usernameLowerCase = q.usernameLowerCase;
+			user.kcb -= changeUsername;
 		}
-		await user.update(q);
+		//适应搜索数据库，用save方法更新user信息
+		user.description = q.description;
+		user.color = q.color;
+		user.postSign = q.postSign;
+		await user.save();
 		const userInfo = ctx.cookies.get('userInfo');
 		const {lastLogin} = JSON.parse(decodeURI(userInfo));
 		const newUser = await db.UserModel.findOnly({uid: user.uid});

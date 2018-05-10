@@ -61,6 +61,17 @@ if(type == "redit"){
     disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
     editor.txt.html(disnoneplayHtml)
 }
+if(["application", "forum_declare"].indexOf(type) !== -1){
+	var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+	// var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
+	// if(quoteHtml){
+	// 	document.getElementById("quoteContent").innerHTML = quoteHtml[0];
+	// 	geid('quoteCancel').style.display = "inline";
+	// }
+	// disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
+	editor.txt.html(disnoneplayHtml)
+}
+
 
 //html解码
 function htmlDecode(text){

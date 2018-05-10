@@ -15,12 +15,12 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-md-9
-        .panel
-          span(style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部&nbsp;
-          span(style='color: grey; font-size: 18px;') /
-          for cForum in data.forumList
-            a(style='margin: 2px 5px; color: #909090;' href=`/f/${cForum.fid}`) #{cForum.displayName}
-
+        //.panel
+        //  span(style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部&nbsp;
+        //  span(style='color: grey; font-size: 18px;') /
+        //  for cForum in data.forumList
+        //    a(style='margin: 2px 5px; color: #909090;' href=`/f/${cForum.fid}`) #{cForum.displayName}
+        include module_forums_panel
         .panel
           a.btn(href='/editor' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
           nav

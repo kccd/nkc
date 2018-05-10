@@ -39,7 +39,6 @@ const restorePosts = async () => {
 
 		const posts = await PostModel.find({}).sort({toc: -1}).skip(m).limit(n);
 		await Promise.all(posts.map(async post => {
-			console.log(post.pid);
 			try {
 				await updatePost(post);
 			} catch(err) {
@@ -56,7 +55,7 @@ const restorePosts = async () => {
 
 (async () => {
 	try {
-		// await restoreUsers();
+		await restoreUsers();
 		await restorePosts();
 	} catch (err) {
 		console.log(err);

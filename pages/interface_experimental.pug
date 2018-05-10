@@ -38,46 +38,12 @@ block content
             h4 系统
             a.marginOfA.btn.btn-default(href='/e/newSysinfo') 发新通知
             a.marginOfA.btn.btn-default(href='/auth') 身份认证审核
-            a.marginOfA.btn.btn-default(href='/settings') 系统设置
+            //a.marginOfA.btn.btn-default(href='/settings') 系统设置
+            button.marginOfA.btn.btn-default(onclick='newForum()') 新建板块
             hr
             h4 科创基金
             a.marginOfA.btn.btn-default(href='/fund/disabled') 被屏蔽的基金
             a.marginOfA.btn.btn-default(href='/fund/settings') 科创基金设置
-
-    hr
-    .row
-      .col-md-12(style='padding-left:0;padding-left:0;')
-        .col-md-12
-          .panel.panel-default 操作说明：按钮显示的内容为当前板块的状态，如“已对用户隐藏”，表示当前板块对用户是不可见的，按下此按钮，板块属性变为对用户可见
-        .col-md-12
-          h4 分区管理
-          a.marginOfA.btn.btn-default(href='/e/new_forum') 新分区
-        .col-md-6
-          .panel.panel-default
-            ui.list-group#cForum
-              -for(var i = 0; i < data.forumTree.length; i++)
-                -var cForum = data.forumTree[i]
-                -var buttonVSInfo = cForum.visibility? '已对用户可见' : '已对用户隐藏'
-                -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户可见' : '已对无权限用户隐藏'
-                li.list-group-item
-                  span.col-md-3 #{data.forumTree[i].displayName}
-                  a.btn.btn-default.btn-sm(href='javascript:;' onclick=`listForumBranch(event,"${i}")`) 显示子版
-                  a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumVisibilitySwitch(event, "${data.forumTree[i].fid}")`) #{buttonVSInfo}
-                  a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumIsVisibleForNCCSwitch(event, "${data.forumTree[i].fid}")`) #{buttonIVInfo}
-
-        .col-md-6
-          .panel.panel-default#branch-forum
-            -for(var i = 0; i < data.forumTree.length; i++)
-              -if(data.forumTree[i].children)
-                ul.list-group.invisible
-                  -for(var j = 0; j < data.forumTree[i].children.length; j++)
-                    -var cForum = data.forumTree[i].children[j]
-                    -var buttonVSInfo = cForum.visibility? '已对用户可见' : '已对用户隐藏'
-                    -var buttonIVInfo = cForum.isVisibleForNCC? '已对无权限用户可见' : '已对无权限用户隐藏'
-                    li.list-group-item
-                      span.col-md-3 #{data.forumTree[i].children[j].displayName}
-                      a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumVisibilitySwitch(event, "${data.forumTree[i].children[j].fid}")`) #{buttonVSInfo}
-                      a.btn.btn-default.btn-sm(href='javascript:;' onclick=`forumIsVisibleForNCCSwitch(event, "${data.forumTree[i].children[j].fid}")`) #{buttonIVInfo}
               
     
   include debug_output.pug

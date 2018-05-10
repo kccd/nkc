@@ -90,6 +90,19 @@ jobs.backupDatabase = () => {
 	});
 };
 
+jobs.updateForums = cronStr => {
+	const {ForumModel} = require('./dataModels');
+	scheduleJob(cronStr, async () => {
+		const t = Date.now();
+		console.log('now updating the forums ...'.blue);
+		const forums = await ForumModel.find({});
+		for(let forum of forums) {
+			await forum.updateForumMessage();
+		}
+		console.log('done', Date.now()-t+'ms');
+	})
+};
+
 jobs.truncateUsersLoginToday = cronStr => {
 
 };

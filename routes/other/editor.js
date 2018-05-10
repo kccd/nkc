@@ -20,7 +20,20 @@ editorRouter
     data.content = content;
     data.navbar = {};
     data.navbar.highlight = 'editor';
-    //type=post:重新编辑回复
+
+    if(type !== 'application') {
+	    data.forumList = await db.ForumModel.getAccessibleForums(ctx);
+	    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+	    if(type === 'forum' && id) {
+	    	const forum = await db.ForumModel.findOnly({fid: id});
+	    	await forum.ensurePermission(ctx);
+	    	const breadcrumbForums = await forum.getBreadcrumbForums(ctx);
+	    	data.selectedArr = breadcrumbForums.map(forum => forum.fid);
+	    	data.selectedArr.push(forum.fid);
+	    }
+    }
+
+	  //type=post:重新编辑回复
     //如果需要重新编辑html与语言的帖子，就使用新编辑器
     if(type === 'redit') {
       ctx.template = 'interface_editor_test.pug';
@@ -42,6 +55,7 @@ editorRouter
       if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
       data.content = targetPost.c;  //回复内容
       data.title = targetPost.t;  //回复标题
+	    data.l = targetPost.l;
       data.targetUser = await targetPost.extendUser();  //回复对象
       return await next();
     } else if(type === 'application') {
@@ -49,6 +63,9 @@ editorRouter
     	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: id});
     	if(cat === 'p') {
     		const project = await applicationForm.extendProject();
+    		if(project.l !== 'html') {
+			    ctx.template = 'interface_editor.pug';
+		    }
     		data.title = project.t;
     		data.content = project.c;
 	    } else if(cat === 'c') {
@@ -58,6 +75,9 @@ editorRouter
 
 	    }
 	    return await next();
+    } else if(type === 'forum_declare') {
+    	const forum = await db.ForumModel.findOnly({fid: id});
+    	data.content = forum.declare;
     }
     await next();
   });

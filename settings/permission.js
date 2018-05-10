@@ -83,6 +83,22 @@ const certificates ={
         [GET]: true,
         [parameter]: {
           [GET]: true,
+	        home: {
+						[name]: '板块首页',
+		        [GET]:true
+	        },
+	        latest: {
+						[name]: '最新文章',
+		        [GET]: true
+	        },
+	        followers: {
+		        [name]: '关注者',
+		        [GET]: true
+	        },
+	        visitors: {
+						[name]: '今日来访',
+		        [GET]: true
+	        },
           c: {
             [name]: '标签',
             [GET]: true,
@@ -163,6 +179,12 @@ const certificates ={
         },
         [GET]: true
       },
+	    forum_avatar: {
+				[name]: '板块logo',
+		    [parameter]: {
+					[GET]: true
+		    }
+	    },
       ad: {
         [parameter]: {
           [GET]: true
@@ -947,21 +969,6 @@ const certificates ={
         new_forum: {
           [GET]: true,
         }
-      },
-      f: {
-        [parameter]: {
-          [PATCH]: true,
-          category: {
-            [name]: '帖子分类',
-            [POST]: true,
-            [PATCH]: true,
-            [parameter]: {
-              [name]: '删除分类',
-              [DELETE]: true
-            }
-          }
-        },
-        [POST]: true
       }
     }
   },
@@ -1052,7 +1059,44 @@ const certificates ={
 				    }
 			    }
 		    }
-	    }
+	    },
+	    f: {
+    		[POST]: true, //新建板块
+    		[parameter]: {
+    			[DELETE]: true,
+    			settings: {
+    				[name]: '板块设置',
+				    [GET]: true,
+				    image: {
+							[name]: 'logo',
+					    [GET]: true
+				    },
+				    info: {
+    					[name]: '基本信息设置',
+					    [GET]: true,
+					    [PATCH]: true
+				    },
+				    category: {
+    					[name]: '分类设置',
+					    [GET]: true,
+					    [PATCH]: true,
+					    [POST]: true,
+					    [DELETE]: true
+				    },
+				    permission: {
+    					[name]: '权限设置',
+					    [GET]: true,
+					    [PATCH]: true
+				    }
+			    }
+		    }
+	    },
+	    forum_avatar: {
+		    [name]: '板块logo',
+		    [parameter]: {
+			    [POST]: true
+		    }
+	    },
     }
   }
 };

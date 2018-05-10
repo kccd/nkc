@@ -1,37 +1,41 @@
+//.nkcpanel
+//
+//  - var cindex = 0
+//  each group,gindex in data.forumList
+//    - var groupcolor = Math.floor(Math.random()*16777216).toString('16')
+//    - var parent = group
+//
+//    -var skip = (skipOtherParent&&(parent.fid!=data.forum.parentId&&parent.fid!=data.forum.fid))
+//
+//    if !skip
+//      .ForumsListBody.ForumsListGroupItem
+//
+//        a.f12.reddish(href=`/f/${parent.fid}`) #{parent?parent.displayName:''}
+//
+//      each f,findex in group.children
+//        - var index = cindex + findex
+//
+//        .ForumsListBody.ForumsListForumItem
+//          - var marker = false
+//          if data.forum
+//            if f.fid == data.forum.fid
+//              - marker = true
+//              span.reddish >
+//          a(href=`/f/${f.fid}`)
+//            if marker
+//              span.reddish #{f.displayName}
+//            else
+//              span #{f.displayName}
+//          .ForumsListCountNumber(style='color:brown;') #{f.countPostsToday||""}
+//
+//      if !skipOtherParent
+//        hr.hrNarrowSpace
+//      - cindex += group.children.length
+//
+-const childForums = data.forumList.map(forum => {if(forum.parentId === data.forum.fid){return forum;}})
+
 .nkcpanel
-  
-  - var cindex = 0
-  each group,gindex in data.forumList
-    - var groupcolor = Math.floor(Math.random()*16777216).toString('16')
-    - var parent = group
-    
-    -var skip = (skipOtherParent&&(parent.fid!=data.forum.parentId&&parent.fid!=data.forum.fid))
-    
-    if !skip
-      .ForumsListBody.ForumsListGroupItem
-        
-        a.f12.reddish(href=`/f/${parent.fid}`) #{parent?parent.displayName:''}
-      
-      each f,findex in group.children
-        - var index = cindex + findex
-        
-        .ForumsListBody.ForumsListForumItem
-          - var marker = false
-          if data.forum
-            if f.fid == data.forum.fid
-              - marker = true
-              span.reddish > 
-          a(href=`/f/${f.fid}`)
-            if marker
-              span.reddish #{f.displayName}
-            else
-              span #{f.displayName}
-          .ForumsListCountNumber(style='color:brown;') #{f.countPostsToday||""}
-        
-      if !skipOtherParent
-        hr.hrNarrowSpace
-      - cindex += group.children.length
-    
-    
+
+
 
           

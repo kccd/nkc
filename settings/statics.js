@@ -11,6 +11,7 @@ const siteSpecificPath = path.resolve('resources/site_specific');
 const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 module.exports = {
+	siteSpecificPath,
   watermark,
   banner,
   defaultPfBannerPath,
