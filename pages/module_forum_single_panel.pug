@@ -4,7 +4,10 @@
     .media.user-info-list.forum-list
       .media-left
         a(href=`/f/${fid}`)
-          img.media-object(src=`/forum_avatar/${fid}` style='width: 80px;height: 80px;border-radius: 7px;')
+          if iconFileName
+            img.media-object(src=`/forum_avatar/${fid}` style=`width: 80px;height: 80px;border-radius: 7px;background-color: ${color}`)
+          else
+            img.media-object(style=`width: 80px;height: 80px;border-radius: 7px;background-color: ${color}`)
       .media-body
         .displayName
           h4(style='margin: 0.2rem 0;')
