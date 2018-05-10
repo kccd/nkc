@@ -33,9 +33,9 @@ subscribeRouter
 		const forum = await db.ForumModel.findOnly({fid});
 		const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
 		const {subscribeForums} = userSubscribe;
-		if(!subscribeForums.includes(fid)) {
-			ctx.throw(400, '您未关注该领域，请刷新。');
-		}
+		// if(!subscribeForums.includes(fid)) {
+		// 	ctx.throw(400, '您未关注该领域，请刷新。');
+		// }
 		await userSubscribe.update({$pull: {subscribeForums: fid}});
 		await forum.update({$pull: {followersId: user.uid}});
 		await next();

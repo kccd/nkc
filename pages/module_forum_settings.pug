@@ -1,13 +1,12 @@
-select.form-control(onchange=`changeForum(this.value, "${data.type}")`)#module-forum-select
-  for forum in data.forums
-    if data.forum.fid === forum.fid
-      option(data-fid=forum.fid selected=true)= forum.displayName
-    else
-      option(data-fid=forum.fid)= forum.displayName
-br
+- data.forumList = data.forums
+- data.disabledCategory = true;
+include forumlist_dropdown
 .panel.panel-default
   .panel-heading
     span= data.forum.displayName
+    span &nbsp;&nbsp;&nbsp;
+    a(href=`/f/${data.forum.fid}` style='text-decoration: none;') 查看专业
+
   .list-group
     a.list-group-item(href=`/f/${data.forum.fid}/settings/image`)
       span.fa.fa-user-circle &nbsp;&nbsp;
@@ -21,5 +20,5 @@ br
     a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
       span.fa.fa-user-circle &nbsp;&nbsp;
       span 权限设置
-button.btn.btn-primary.btn-block(onclick='newForum()') 添加板块
-button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前板块
+button.btn.btn-primary.btn-block(onclick='newForum()') 添加专业
+button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前专业

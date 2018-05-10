@@ -24,15 +24,16 @@ block title
       .row
         .col-xs-12.col-md-12
           .forum-digest-threads
-            h4.text-center 加精文章
+            h4.text-center 优秀文章
             -for(let thread of data.digestThreads)
-              .col-xs-9.col-md-9
+              .col-xs-12.col-md-12
                 .row(style='margin-bottom: 0.5rem;')
-                  a(href=`/f/${thread.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
+                  if data.forum.fid !== thread.fid
+                    a(href=`/f/${thread.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
                   a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
-              .col-xs-3.col-md-3
-                .row.text-right
-                  p(style='color:#ff8700;')= fromNow(thread.toc)
+                  span &nbsp;&nbsp;
+                  a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
+                    span=` ( ${thread.firstPost.user.username} )`
       br
 
 block content
@@ -48,12 +49,13 @@ block content
         h3.text-center= data.forum.displayName
         p.text-center(style='color: #ff8700;margin-bottom: 1rem;')= data.forum.brief
         if data.user
+          a.btn.btn-primary.btn-block(href=`/editor?&type=forum&id=${forum.fid}${data.cat ? '&cid=' + data.cat : ''}`)
+            span.fa.fa-edit &nbsp;发表文章
           if !data.forum.childrenForums || data.forum.childrenForums.length === 0
-            a.btn.btn-primary.btn-block(href=`/editor?&type=forum&id=${forum.fid}${data.cat ? '&cid=' + data.cat : ''}`) 发表文章
             if data.forum.followersId.includes(data.user.uid)
-              button.btn.btn-block.btn-danger(onclick=`subscribeForum(${data.forum.fid}, false)`) 取关
+              button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, false)`) 取关
             else
-              button.btn.btn-block.btn-primary(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
+              button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
         else
           a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
         if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
@@ -77,7 +79,7 @@ block content
                   p.text-center 暂无
       .col-xs-12.col-md-12
         .row
-          .col-xs-12.col-md-2.text-center#forumInfoDiv
+          .col-xs-12.col-sm-3.col-md-2.text-center#forumInfoDiv
             if data.forum.iconFileName
               img(src=`/forum_avatar/${data.forum.fid}` style='height: 8rem;border-radius: 50%;')
             else
@@ -85,12 +87,13 @@ block content
             .h3.text-center= data.forum.displayName
             p.text-center(style='color: #ff8700;margin-bottom: 1rem;')= data.forum.brief
             if data.user
+              a.btn.btn-primary.btn-block(href=`/editor?&type=forum&id=${forum.fid}${data.cat? '&cid=' + data.cat: ''}`)
+                span.fa.fa-edit &nbsp;发表文章
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
-                a.btn.btn-primary.btn-block(href=`/editor?&type=forum&id=${forum.fid}${data.cat? '&cid=' + data.cat: ''}`) 发表文章
                 if data.forum.followersId.includes(data.user.uid)
-                  button.btn.btn-block.btn-danger(onclick=`subscribeForum(${data.forum.fid}, false)`) 取关
+                  button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, false)`) 取关
                 else
-                  button.btn.btn-block.btn-primary(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
+                  button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
             else
               a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
             if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
@@ -149,7 +152,7 @@ block content
                         br
                     else
                       p.text-center 暂无
-          .col-xs-12.col-md-7
+          .col-xs-12.col-sm-5.col-md-7
             ul.nav.nav-pills.user-info-nav
               li(role="presentation" class=data.type === 'home'? 'active' : '')
                 a(href=`/f/${data.forum.fid}/home`) 专业首页
@@ -162,16 +165,15 @@ block content
             if data.type === 'home'
               div.forum-home
                 if data.forum.declare
-                  .h3.text-center 专业说明
                   -const declareObj = {l: 'html', c: data.forum.declare};
                   -declareObj.c = hideContentByUser(declareObj.c, data.user, 'list')
                   div.forum-declare!= experimental_render(declareObj)
                 if data.forum.basicThreads.length > 0
-                  .h3.text-center 入门教程
+                  .h3.text-center 快速入门
                   for thread in data.forum.basicThreads
                     include interface_forum_singlethread
                 if data.forum.valuableThreads.length > 0
-                  .h3.text-center 进阶教程
+                  .h3.text-center 推荐阅读
                   for thread in data.forum.valuableThreads
                     include interface_forum_singlethread
             else if data.type === 'latest'
@@ -226,50 +228,56 @@ block content
               include interface_navigation_paging.pug
             else if data.type === 'followers'
               include interface_navigation_paging.pug
-              for targetUser in data.followers
-                include module_user_single_panel
+              .row
+                for targetUser in data.followers
+                  .col-xs-12.col-md-6
+                    include module_user_single_panel
             else
               include interface_navigation_paging.pug
-              for targetUser in data.visitors
-                include module_user_single_panel
+              .row
+                for targetUser in data.visitors
+                  .col-xs-12.col-md-6
+                    include module_user_single_panel
             #bm
-          .col-xs-12.col-md-3#digestThreadsDiv
+          .col-xs-12.col-sm-4.col-md-3#digestThreadsDiv
+
             .row
               .col-xs-12.col-md-12
                 if data.forum.parentForum
-                  h4(style='margin-bottom: 0;').text-center 父专业
+                  h4(style='margin-bottom: 0;').text-center 上级专业
                   -var forum = data.forum.parentForum;
                   include module_forum_single_panel
                   br
                 if data.forum.childrenForums && data.forum.childrenForums.length !== 0
-                  h4(style='margin-bottom: 0;').text-center 子专业
+                  h4(style='margin-bottom: 0;').text-center 细分专业
                   for forum in data.forum.childrenForums
                     include module_forum_single_panel
                   br
                 if data.moderators.length > 0
-                  h4(style='margin-bottom: 0;').text-center 专家
+                  h4(style='margin-bottom: 0;').text-center 主管专家
                   for targetUser in data.moderators
-                    -const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc} = targetUser;
-                    .col-xs-12.col-md-12
-                      .row
-                        .user-info-list.forum-list(style=`min-height: 10em;padding-top: 0.5rem;${data.user && uid === data.user.uid ? 'border: 1px solid #337ab7' : ''}`)
-                          .displayName
-                            h4(style='margin: 0.5rem 0;')
-                              a(href=`/u/${uid}` title=description style='text-decoration: none;')
-                                img(src=`/avatar/${uid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-                                span &nbsp;
-                                span(user-popover='popover' data-toggle="popover")= username
-                              if data.user && uid !== data.user.uid
-                                if data.userSubscribe.subscribeUsers.includes(uid)
-                                  button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, false)`) 取关
-                                else
-                                  button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
-                          .info
-                            span= navbarDesc.cs
-                            p!=`回复:${postCount}&nbsp;&nbsp;文章:${threadCount}`
-                            p!=`学术分:${xsf}&nbsp;科创币:${kcb}`
-                          .description
-                            p= description || '暂未填写个人简介'
+                    include module_user_single_panel
+                    // -const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc} = targetUser;
+                    // .col-xs-12.col-md-12
+                    //   .row
+                    //     .user-info-list.forum-list(style=`min-height: 10em;padding-top: 0.5rem;${data.user && uid === data.user.uid ? 'border: 1px solid #337ab7' : ''}`)
+                    //       .displayName
+                    //         h4(style='margin: 0.5rem 0;')
+                    //           a(href=`/u/${uid}` title=description style='text-decoration: none;')
+                    //             img(src=`/avatar/${uid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
+                    //             span &nbsp;
+                    //             span(user-popover='popover' data-toggle="popover")= username
+                    //           if data.user && uid !== data.user.uid
+                    //             if data.userSubscribe.subscribeUsers.includes(uid)
+                    //               button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, false)`) 取关
+                    //             else
+                    //               button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
+                    //       .info
+                    //         span= navbarDesc.cs
+                    //         p!=`回复:${postCount}&nbsp;&nbsp;文章:${threadCount}`
+                    //         p!=`学术分:${xsf}&nbsp;科创币:${kcb}`
+                    //       .description
+                    //         p= description || '暂未填写个人简介'
                   .col-xs-12.col-md-12
                     br
             +forumDigestThreads
@@ -308,5 +316,5 @@ block content
 block scripts
   script(src='/interface_common.js')
   if data.type === 'latest'
-    script(src='/module_dropdown.js')
+    script(src='/module_dropdown.js?v=3')
   script(src='/interface_forum.js')

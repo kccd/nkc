@@ -2,7 +2,7 @@ extends bootstrap_base
 block title
   meta(name='description' content=data.targetUser.description || '')
   meta(name='keywords' content=data.targetUser.username)
-  title= `${data.targetUser.username}的名片 - 科创论坛`
+  title= `${data.targetUser.username} - 科创论坛`
   -const mainContainer1400 = true;
 block content
   .container-fluid(style='max-width: 1400px;')
@@ -105,8 +105,8 @@ block content
                   br
                   h4.text-center(style='color: #aaaaaa;')=`暂无${data.type === 'fans'?'粉丝':'关注'}`
                 -for(let targetUser of data.targetUsers)
-                  include module_user_single_panel
-
+                  .col-xs-12.col-md-6
+                    include module_user_single_panel
             else
               if data.results.length === 0
                 br

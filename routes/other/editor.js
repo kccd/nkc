@@ -75,6 +75,9 @@ editorRouter
 
 	    }
 	    return await next();
+    } else if(type === 'forum_declare') {
+    	const forum = await db.ForumModel.findOnly({fid: id});
+    	data.content = forum.declare;
     }
     await next();
   });

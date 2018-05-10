@@ -40,14 +40,22 @@ block content
               .form-group
                   div#quoteContent
               .form-group
+                div#quoteCancel(style='display: none')
+                  button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+              .form-group
                   div#content_test
               .form-inline
                   .form-group
                       input#parseURL(type='checkbox' checked)
                       span &nbsp;处理URL&nbsp;
                   .form-group
-                      button#post.btn.btn-primary(type='submit' style='margin-left: 10px') 发表
-                      button#draft.btn.btn-primary(type='submit' style='margin-left: 10px') 保存草稿
+                      button#post.btn.btn-primary(type='submit') 发表
+                  if !['forum_declare'].includes(data.type)
+                    .form-group
+                      button#draft.btn.btn-primary(type='submit') 保存草稿
+                    .form-group
+                      if data.user
+                        a.btn.btn-default(href=`/u/${data.user.uid}/drafts`) 草稿箱
               .form-group
               .nkcpanel(id='file-uploading' target='/r')
                   //uploader section
@@ -80,18 +88,17 @@ block scripts
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
-  
-  script(src='/interface_common.js')
-  script(src='/nkc_render.js')
-  if !data.type || data.type === 'forum'
-    script(src='/module_dropdown.js')
+  script(src='/interface_common.js?v=3')
+  script(src='/nkc_render.js?v=3')
+  script(src='/interface_editor.js?v=3')
 
-  script(src='/interface_editor.js')
-  
-  script(src='/interface_attachment_uploader.js')
-  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js')
-  
-  script(src="/test.js")
+  if !data.type || data.type === 'forum'
+    script(src='/module_dropdown.js?v=3')
+
+
+
+  script(src='/interface_attachment_uploader.js?v=1')
+  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
 
   <script type="text/javascript" src="/wangEditor.js"></script>
   <script type="text/javascript" src="/newEditor.js"></script>

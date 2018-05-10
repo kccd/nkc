@@ -492,9 +492,12 @@ forumSchema.methods.ensurePermission = async function(ctx) {
 	const cc = ctx.data.certificates.contentClasses;
 	if(!cc.includes(this.class) || !this.accessible) ctx.throw(403, '权限不足');
 	const breadcrumbForums = await this.getBreadcrumbForums();
-	const accessibleFid = await ForumModel.getAccessibleFid(ctx);
+	// const accessibleFid = await ForumModel.getAccessibleFid(ctx);
 	for(forum of breadcrumbForums) {
-		if(!accessibleFid.includes(forum.fid)) ctx.throw(403, '权限不足');
+		// if(!accessibleFid.includes(forum.fid)) ctx.throw(403, '权限不足');
+		if(!forum.accessible || !cc.includes(forum.class)) {
+			ctx.throw('权限不足');
+		}
 	}
 };
 
@@ -516,6 +519,7 @@ forumSchema.methods.getThreadsByQuery = async function(ctx, query) {
 		}
 		await thread.extendForum();
 		await thread.forum.extendParentForum();
+		await thread.extendCategory();
 	}));
 	return threads;
 };

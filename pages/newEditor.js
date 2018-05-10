@@ -34,7 +34,10 @@ var type = GetUrlParam("type");
 if(type == "post"){
     var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
     var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
-    if(quoteHtml)document.getElementById("quoteContent").innerHTML = quoteHtml[0]
+    if(quoteHtml){
+        document.getElementById("quoteContent").innerHTML = quoteHtml[0];
+        geid('quoteCancel').style.display = "inline";
+    }
     disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
     editor.txt.html(disnoneplayHtml)
 }
@@ -42,16 +45,33 @@ if(type == "thread"){
     var replyHtml = window.localStorage.replyHtml;
     var quoteHtml = window.localStorage.quoteHtml;
     editor.txt.html(replyHtml)
-    if(quoteHtml)document.getElementById("quoteContent").innerHTML = quoteHtml
+    if(quoteHtml){
+        document.getElementById("quoteContent").innerHTML = quoteHtml;
+        geid('quoteCancel').style.display = "inline";
+    }
     window.localStorage.clear();
 }
 if(type == "redit"){
     var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
     var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
-    if(quoteHtml)document.getElementById("quoteContent").innerHTML = quoteHtml[0]
+    if(quoteHtml){
+        document.getElementById("quoteContent").innerHTML = quoteHtml[0];
+        geid('quoteCancel').style.display = "inline";
+    }
     disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
     editor.txt.html(disnoneplayHtml)
 }
+if(["application", "forum_declare"].indexOf(type) !== -1){
+	var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+	// var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
+	// if(quoteHtml){
+	// 	document.getElementById("quoteContent").innerHTML = quoteHtml[0];
+	// 	geid('quoteCancel').style.display = "inline";
+	// }
+	// disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
+	editor.txt.html(disnoneplayHtml)
+}
+
 
 //html解码
 function htmlDecode(text){

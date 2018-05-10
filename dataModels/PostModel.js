@@ -196,6 +196,7 @@ postSchema.pre('save', async function(next) {
     const oldContent = initialState ? initialState.c : '';
     let hasImage = initialState ? initialState.hasImage : false;
     const hasImageWhenInitialized = hasImage;
+
 	  const {c, pid, l} = this;
 	  let oldResources = [], newResources = [];
 	  if(l !== 'html') {
@@ -204,16 +205,11 @@ postSchema.pre('save', async function(next) {
 		  newResources = (c.match(/{r=[0-9]{1,20}}/g) || [])
 		    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
 	  } else {
-
 		  oldResources = (oldContent.match(/\/r\/[0-9]{1,20}/g) || [])
 			  .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
-
-
 		  newResources = (c.match(/\/r\/[0-9]{1,20}/g) || [])
 			  .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
-
 	  }
-
 
     const additional = newResources.filter(e => oldResources.indexOf(e) === -1);
     const removed = oldResources.filter(e => newResources.indexOf(e) === -1);

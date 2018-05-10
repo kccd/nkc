@@ -1,25 +1,45 @@
 -const {displayName, fid, description, iconFileName, color, countPosts, countThreads} = forum;
 .row
   .col-xs-12.col-md-12
-    .user-info-list.forum-list
-      .displayName
-        h4(style='margin: 0.5rem 0;')
-          a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
-            if iconFileName
-              img(src=`/forum_avatar/${fid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-            else
-              img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
-            span &nbsp;
-            span= displayName
-            span &nbsp;&nbsp;
-          if data.user
-            if forum.followersId.includes(data.user.uid)
-              button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
-            else
-              button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
-      .info
-        span=`文章：${countThreads}`
-        span &nbsp;&nbsp;
-        span=`评论：${countPosts}`
-      .description
-        p= description
+    .media.user-info-list.forum-list
+      .media-left
+        a(href=`/f/${fid}`)
+          img.media-object(src=`/forum_avatar/${fid}` style='width: 80px;height: 80px;border-radius: 7px;')
+      .media-body
+        .displayName
+          h4(style='margin: 0.2rem 0;')
+            a(href=`/f/${fid}` title=description style='text-decoration: none;')
+              span= displayName
+            if data.user
+              if forum.followersId.includes(data.user.uid)
+                button.btn.btn-sm.cancel-subscribe-btn(style='padding: 0 10px;float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
+              else
+                button.btn.btn-sm.subscribe-btn(style='padding: 0 10px;float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
+        .info
+          span=`文章：${countThreads}`
+          span &nbsp;&nbsp;
+          span=`评论：${countPosts}`
+        .description(style='-webkit-line-clamp: 2;height: 2.6em;')
+          p= description
+    //.user-info-list.forum-list
+    //  .displayName
+    //    h4(style='margin: 0.5rem 0;')
+    //      a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
+    //        if iconFileName
+    //          img(src=`/forum_avatar/${fid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
+    //        else
+    //          img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
+    //        span &nbsp;
+    //        span= displayName
+    //        span &nbsp;&nbsp;
+    //      if data.user
+    //        if forum.followersId.includes(data.user.uid)
+    //          button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
+    //        else
+    //          button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
+    //  .info
+    //    span=`文章：${countThreads}`
+    //    span &nbsp;&nbsp;
+    //    span=`评论：${countPosts}`
+    //  .description
+    //    p= description

@@ -32,6 +32,7 @@ latestRouter
 	    	threads.splice(i, 1);
 	    }
 	    await t.extendForum();
+	    await t.forum.extendParentForum();
     }
 
     data.indexThreads = threads;

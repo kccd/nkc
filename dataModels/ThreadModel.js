@@ -166,7 +166,7 @@ threadSchema.methods.extendForum = async function() {
 
 threadSchema.methods.extendCategory = async function() {
   const ThreadTypeModel = require('./ThreadTypeModel');
-  return this.category = await ThreadTypeModel.findOnly({cid: this.cid});
+  return this.category = await ThreadTypeModel.findOne({fid: this.fid, cid: this.cid});
 };
 
 threadSchema.methods.extendUser = async function() {
@@ -179,7 +179,12 @@ threadSchema.methods.extendUser = async function() {
 // 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限
 threadSchema.methods.ensurePermission = async function (ctx) {
 	const forum = await this.extendForum();
-	await forum.ensurePermission(ctx);
+	try {
+		await forum.ensurePermission(ctx);
+	} catch (e) {
+		return false;
+	}
+
   if(this.disabled) {
     return await this.ensurePermissionOfModerators(ctx);
   } else {

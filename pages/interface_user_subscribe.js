@@ -1,6 +1,6 @@
 
 $('input[name="selectForum"]').iCheck({
-	checkboxClass: 'icheckbox_flat-red',
+	checkboxClass: 'icheckbox_minimal-red',
 });
 
 function submit(id) {

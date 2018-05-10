@@ -255,6 +255,10 @@ forumRouter
     const {fid} = params;
     const {ThreadModel, ForumModel} = db;
     const forum = await ForumModel.findOnly({fid});
+    const allChildrenFid = await db.ForumModel.getAllChildrenForums(forum.fid);
+		if(allChildrenFid.length !== 0) {
+			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
+		}
     const count = await ThreadModel.count({fid});
     if(count > 0) {
       ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);

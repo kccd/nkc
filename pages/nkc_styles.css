@@ -10,6 +10,10 @@ h1, h2, h3, h4, h5, p{
   margin-left: 15px;
 }
 
+.pagination > li > a, .pagination > li > span{
+  padding: 0 14px;
+}
+
 .rightalign {
   text-align:right;
 }
@@ -529,9 +533,7 @@ padding: 1px 7px 1px 7px;
   display:inline;
 }
 p {
-  margin:0px;
-  margin-top:5px;
-  margin-bottom:5px;
+  margin:0 auto;
 }
 
 blockquote {
@@ -577,11 +579,13 @@ width: 100%;
   border-radius: 7px;
 }
 .forum-notice a{
-  color: #777777;
+  color: #333333;
+  display: inline-block;
   text-decoration: none;
+  margin-bottom: 1rem;
 }
 .forum-notice a:hover{
-  color: #333333;
+  color: #000000;
 }
 .forum-digest-thread a{
   color: #d48900;
@@ -857,7 +861,7 @@ line-height: 1.4;
 }
 .ThreadPostBody video{max-width: 100%;}
 
-.ThreadPostBody p+p{margin-top: 18px;/* margin-bottom: 11px; */}
+/* .ThreadPostBody p+p{margin-top: 18px;margin-bottom: 11px;} */
 .ThreadPostBody p+*{}
 .ThreadPostBody *+p{}
 
@@ -2187,17 +2191,17 @@ img.emoji {
   overflow: hidden;
   margin-top: 1rem;
   margin-bottom: 0rem;
-  padding-top: 0.5rem;
+  padding-top: 0.8rem;
   text-decoration: none;
 }
-.user-info-list.forum-list>.displayName{
+.user-info-list.forum-list .displayName{
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
-.user-info-list.forum-list>.description{
+.user-info-list.forum-list .description{
   display: -webkit-box;
-  height: 1.9em;
+  height: 1.6em;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -2346,8 +2350,8 @@ img.emoji {
 }
 .forums-panel ul li a{
   display: inline-block;
-  padding: 0.3rem 0.5rem;
-  margin-right: 0.5rem;
+  padding: 0.3rem 0.2rem;
+  margin-right: 0.2rem;
   margin-bottom: 0.5rem;
   color: #777777;
   border-radius: 5px;

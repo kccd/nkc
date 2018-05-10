@@ -27,15 +27,14 @@ function dataURItoBlob (base64Data) {
 
 $("document").ready(function(){
   //编辑器缩放
-	if($(".w-e-text-container").length > 0) {
-		$(".w-e-text-container").resizable({
-			containment: '#body',
-			minHeight: 100,
-			minWidth: 100,
-			maxWidth: 1400
-		});
-	}
-  
+	if($(".w-e-text-container").length === 0) return;
+  $(".w-e-text-container").resizable({
+    containment: '#body',
+    minHeight: 100,
+    minWidth: 100,
+    maxWidth: 1400
+  });
+
   $("#content_test").on("paste", function(){
     function test(){
       $("#text-elem img").each(function(){
@@ -244,6 +243,7 @@ function Editor() {
 		  this.blocked = true;
 	  }
 		// 旧编辑器获取专业分类，由于旧编辑器只作用于修改旧帖，修改帖子不允许再修改专业
+
     // if(this.query.type === "post"){
     //   document.getElementById("draft").style.display = "none"
     // }
@@ -510,7 +510,9 @@ function onPost(that) {
       $(this).next().replaceWith("");
       $(this).replaceWith("")
     })
+
     var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''
+
     if(specialMark == "old"){
       var content = that.content.value;
     }else{
@@ -523,20 +525,22 @@ function onPost(that) {
     var id;
 
 		var id = that.blocked ? that.query.id : that.childID;
-		console.log(id);
-    if(that.blocked) {
-    	id = that.query.id;
-    } else {
-    	try{
-		    var obj = getResult();
-	    } catch(e) {
-    		return screenTopWarning(e);
-	    }
+		console.log(that.query);
+		if(type === 'forum' || !type) {
+			try{
+				var obj = getResult();
+			} catch(e) {
+				return screenTopWarning(e);
+			}
 
-	    id = obj.fid;
-	    cat = obj.cid;
+			id = obj.fid;
+			cat = obj.cid;
 			type = 'forum';
-    }
+		} else {
+			if(that.blocked) {
+				id = that.query.id;
+			}
+		}
 
 
 
@@ -545,7 +549,7 @@ function onPost(that) {
       screenTopWarning('请填写内容。');
       return;
     }
-    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
+    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '' && type !== 'forum_declare') {
       screenTopWarning('请填写标题。');
       return;
     }
@@ -596,10 +600,14 @@ function onPost(that) {
 	    method = 'POST';
 	    url = '/fund/a/' + id + '/report';
 	    data = {c: post.c, t: post.t, l: post.l}
-    } else if(type === 'redit'){
-      method = 'POST';
-      url = '/f/' + id;
-      data = {post: post};
+    } else if(type === 'redit') {
+	    method = 'POST';
+	    url = '/f/' + id;
+	    data = {post: post};
+    } else if(type === 'forum_declare') {
+			method = 'PATCH';
+			url = '/f/' + id + '/settings/info';
+			data = {declare: post.c, operation: 'updateDeclare'}
     } else {
       return screenTopWarning('未知的请求类型：'+type);
     }
@@ -724,4 +732,10 @@ function fitscreennew(){
   geid('parsedcontent').style['max-height'] = !screenfitted?h:'800px';
 
   screenfitted = !screenfitted
+}
+
+// 取消引用
+function cancelQuote(){
+  geid('quoteContent').innerHTML = "";
+  geid('quoteCancel').style.display = "none";
 }

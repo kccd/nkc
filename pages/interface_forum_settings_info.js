@@ -36,7 +36,6 @@ function submit(fid) {
 		abbr: $('#abbr').val(),
 		color: $('#color').val(),
 		description: $('#description').val(),
-		declare: $('#declare').val(),
 		brief: $('#brief').val(),
 		basicThreadsId: $('#basicThreadsId').val(),
 		noticeThreadsId: $('#noticeThreadsId').val(),

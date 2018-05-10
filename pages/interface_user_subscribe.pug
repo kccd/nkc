@@ -1,7 +1,7 @@
 extends bootstrap_base
 block title
   title 注册成功
-  link(rel='stylesheet' href='/icheck/skins/flat/red.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
 block content
   -const mainContainer1400 = true
   .container-fluid(style='max-width: 1400px;')
@@ -15,6 +15,7 @@ block content
         br
         h4.text-center(style='color: #888888') 请选择您喜欢的领域，我们会优先向您推荐您感兴趣的内容。
       -const selectBox = true;
+      -const disabledA = true;
       mixin createForumsList(forums)
         for forum in forums
           include module_children_forum_single

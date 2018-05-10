@@ -38,21 +38,21 @@ block content
               .form-group
                 label.col-sm-2.control-label 专业说明
                 .col-sm-5
-                  textarea.form-control#declare(placeholder='请输入专业说明' rows=5)= forum.declare || ''
+                  a.btn.btn-default(href=`/editor?type=forum_declare&id=${data.forum.fid}`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 专业公告
                 .col-sm-5
                   input.form-control#noticeThreadsId(placeholder='请输入文号' value=forum.noticeThreadsId?forum.noticeThreadsId.join(','): '')
               .form-group
-                label.col-sm-2.control-label 入门教程
+                label.col-sm-2.control-label 快速入门
                 .col-sm-5
                   input.form-control#basicThreadsId(placeholder='请输入文号' value=forum.basicThreadsId ? forum.basicThreadsId.join(','): '')
               .form-group
-                label.col-sm-2.control-label 值得阅读
+                label.col-sm-2.control-label 推荐阅读
                 .col-sm-5
                   input.form-control#valuableThreadsId(placeholder='请输入文号' value=forum.valuableThreadsId ? forum.valuableThreadsId.join(','): '')
               .form-group
-                label.col-sm-2.control-label 专家
+                label.col-sm-2.control-label 主管专家
                 .col-sm-5
                   input.form-control#moderators(placeholder='请输入uid' value=forum.moderators? forum.moderators.join(','): '')
               .form-group
@@ -61,5 +61,7 @@ block content
 block scripts
   script(src='/jquery/jquery.minicolors.js')
   script(src='/module_forum_settings.js')
+
   script(src='/interface_common.js')
+  script(src='/module_dropdown.js?v=3')
   script(src='/interface_forum_settings_info.js')

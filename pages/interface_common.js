@@ -796,6 +796,7 @@ $(function () {
 
 //舍弃草稿
 function removedraft(uid,did){
+	if(confirm('确认舍弃草稿？') === false) return;
   var url = '/u/'+uid+'/drafts/'+did+'?uid='+uid+"&did="+did;
   var method = "DELETE";
   var alertInfo = "已舍弃草稿";

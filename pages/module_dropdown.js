@@ -4,6 +4,7 @@ var dropdownDiv = $('#dropdownDiv');
 var data = JSON.parse($('#forumListData').text());
 var forumList = data.forumList;
 var threadTypes = data.forumsThreadTypes;
+var disabledCategory = data.disabledCategory;
 if(data.selectedArr) {
 	selectedArr = data.selectedArr;
 }
@@ -78,6 +79,9 @@ function displaySelect() {
 			}
 			var childrenForums = getChildrenForums(selectedArr[i]);
 			if(childrenForums.length === 0) {
+				if(disabledCategory) {
+					return window.location.href = '/f/'+selectedArr[i]+'/settings';
+				}
 				var types = getThreadTypes(selectedArr[i]);
 				types.push({name: '不分类', cid: ''});
 				dropdownDiv.append(createSelect(types, cat||'', true));
@@ -143,7 +147,7 @@ function getResult() {
 	if(!fid) throw '请选择板块';
 	var cid;
 	for(var i = 0; i < threadTypes.length; i++) {
-		if(threadTypes[i].fid === fid && name === category) {
+		if(threadTypes[i].fid === fid && threadTypes[i].name === category) {
 			cid = threadTypes[i].cid;
 			break;
 		}

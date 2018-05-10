@@ -4,24 +4,24 @@ const Schema = mongoose.Schema;
 const draftSchema = new Schema({
   c: {
     type: String,
-    default: 0
+    default: ''
   },
   l: {
     type: String,
-    default: 0
+    default: ''
   },
   t: {
     type: String,
-    default: 0
+    default: ''
   },
   destination: {
     type: {
       type: String,
-      required: true
+      default: ''
     },
     typeid: {
       type: String,
-      required: true
+      default: ''
     }
   },
   uid: {
