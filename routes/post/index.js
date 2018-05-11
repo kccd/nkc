@@ -23,7 +23,7 @@ postRouter
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {t, c} = ctx.body.post;
+    const {t, c, desType, desTypeId} = ctx.body.post;
     if(c.lenght < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db} = ctx;
@@ -72,6 +72,8 @@ postRouter
     page = `?page=${page}`;
     data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
     data.targetUser = targetUser;
+    //帖子曾经在草稿箱中，发表时，删除草稿
+    await db.DraftModel.remove({"desType":desType,"desTypeId":desTypeId})
     await targetUser.updateUserMessage();
     await next();
   })

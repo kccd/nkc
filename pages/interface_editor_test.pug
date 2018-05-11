@@ -64,6 +64,8 @@ block content
                 div#draftNowId(style='display:none')= data.content
                 div#userNowId(style='display:none')= data.user.uid
                 div#draftId(style='display:none')=`${data.did || ''}`
+                div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
+                div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
   
   include debug_output.pug
 block scripts

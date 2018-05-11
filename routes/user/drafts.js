@@ -39,7 +39,8 @@ draftsRouter
               c: body.c,
               uid: ctx.data.user.uid,
               did: newId,
-              destination: body.destination
+              desType: body.desType,
+              desTypeId: body.desTypeId
             });
             await newDraft.save();
             data.status = "success"

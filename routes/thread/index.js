@@ -182,6 +182,8 @@ threadRouter
 		}
 		data.post = _post;
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
+		//帖子曾经在草稿箱中，发表时，删除草稿
+		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
 		await next();
 	})
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());

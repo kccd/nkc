@@ -237,10 +237,8 @@ function saveDraft(threadId,userId){
   post.c = quoteContent + post.c
   if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
   post.t = '';
-  post.destination = {
-    type: 'thread',
-    typeid: threadId
-  }
+  post.desType = 'thread';
+  post.desTypeId = threadId;
   var method = "POST";
   var url = "/u/"+userId+"/drafts/";
   var data = {post:post};
