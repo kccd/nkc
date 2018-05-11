@@ -180,7 +180,8 @@ block content
               button.btn.btn-default.btn-block.fa-switch(style='margin-top: 5px;margin-bottom:1rem;' data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample") 更多专业信息&nbsp;
                 span.fa.fa-caret-down
               .collapse#collapseExample
-                +forumsAndModerators
+                .text-left
+                  +forumsAndModerators
                 +forumInfo
                 div(style='clear: all;')
             .visible-sm-inline-block.visible-md-inline-block.visible-lg-inline-block
@@ -296,12 +297,14 @@ block content
               .row
                 .col-xs-12.col-md-12
                   h4.text-center 关注者
-                  for user in data.forum.followers
-                    .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
-                      -const navbarDesc = user.navbarDesc;
-                      -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-                      a(href=`/u/${user.uid}`)
-                        img(src=`/avatar/${user.uid}` style='width: 100%;border-radius: 50%;' title=title)
+                  -for(let i = 0; i < data.forum.followers.length; i++)
+                    if i !== 8
+                      -const user = data.forum.followers[i];
+                      .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
+                        -const navbarDesc = user.navbarDesc;
+                        -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                        a(href=`/u/${user.uid}`)
+                          img(src=`/avatar/${user.uid}` style='width: 100%;border-radius: 50%;' title=title)
                 if data.forum.followers.length > 8
                   .col-xs-12.col-md-12.text-center
                     a(href=`/f/${data.forum.fid}/visitor`) 查看更多
@@ -310,12 +313,14 @@ block content
               .row
                 .col-xs-12.col-md-12
                   h4.text-center 今日来访
-                  for user in data.users
-                    .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
-                      -const navbarDesc = user.navbarDesc;
-                      -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-                      a(href=`/u/${user.uid}`)
-                        img(src=`/avatar/${user.uid}` style='width: 100%;border-radius: 50%;' title=title)
+                  -for(let i = 0; i < data.users.length; i++)
+                    if i !== 8
+                      -const user = data.users[i];
+                      .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
+                        -const navbarDesc = user.navbarDesc;
+                        -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                        a(href=`/u/${user.uid}`)
+                          img(src=`/avatar/${user.uid}` style='width: 100%;border-radius: 50%;' title=title)
                 if data.users.length > 8
                   .col-xs-12.col-md-12.text-center
                     a(href=`/f/${data.forum.fid}/visitor`) 查看更多
