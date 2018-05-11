@@ -19,7 +19,7 @@ function initEvent() {
 	$('.dropdownSelect').on('change', function() {
 		if(!$(this).hasClass('categorySelect')) {
 			var num = $(this).attr('id').split('select')[1];
-			var fid = $(this).val().split(':')[0];
+			var fid = $(this).val().split(':')[1];
 			selectedArr.splice(num, 1, fid);
 			if(selectedArr.length > 0) {
 				var newArr = [];
@@ -54,7 +54,7 @@ function createSelect(arr, fid, category) {
 	for(var i = 0; i < arr.length; i++) {
 		var forum = arr[i];
 		if (!category) {
-			var option = newElement('option', {}, {}).text(forum.fid+':'+forum.displayName);
+			var option = newElement('option', {}, {}).text(forum.displayName+':'+forum.fid);
 			if(forum.fid === fid) {
 				option.attr('selected', true);
 			}
@@ -134,7 +134,7 @@ function getResult() {
 			var value = arr.eq(i).val();
 			var valueArr = value.split(':');
 			if(valueArr.length === 2) {
-				fid = valueArr[0];
+				fid = valueArr[1];
 			} else {
 				throw '请选择专业';
 			}
