@@ -2,13 +2,17 @@ const Router = require('koa-router');
 const draftsRouter = new Router();
 draftsRouter
     .get('/', async(ctx, next) => {
-        const uid = ctx.data.user.uid;
-        const db = ctx.db;
-        const data = ctx.data;
-        const draftSingleAll = await db.DraftModel.find({"uid":uid});
-        data.draftSingleAll = draftSingleAll
-		ctx.template = 'interface_user_drafts.pug';
-        await next()
+    	const {data, db, query} = ctx;
+    	const {user} = data;
+    	const {uid} = user;
+    	const page = query.page?parseInt(query.page): 0;
+			const count = await db.DraftModel.count({uid});
+			const {apiFunction} = ctx.nkcModules;
+			const paging = apiFunction.paging(page, count);
+			data.drafts = await db.DraftModel.find({uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+			data.paging = paging;
+			ctx.template = 'interface_user_drafts.pug';
+      await next()
     })
     .del('/:did', async(ctx, next) => {
         const uid = ctx.query.uid;
@@ -28,12 +32,12 @@ draftsRouter
     
         //判断当前草稿是否为重新编辑，是则更新
         const newSingleDraft = await db.DraftModel.find({"uid": ctx.data.user.uid,"did":body.did})
-        if(newSingleDraft.length == 0){
+        if(newSingleDraft.length === 0){
             if(draftcount.length >= 100){
                 ctx.throw(403, "草稿箱已满！")
             }
-            var newId = await db.SettingModel.operateSystemID('drafts', 1);
-            var newDraft = db.DraftModel({
+            let newId = await db.SettingModel.operateSystemID('drafts', 1);
+            let newDraft = db.DraftModel({
               l: body.l,
               t: body.t,
               c: body.c,
@@ -45,14 +49,14 @@ draftsRouter
             data.status = "success"
             data.did = newId
         }else{
-            var datestr = Date.now()
+            let datestr = Date.now()
             const toeditdraft = await db.DraftModel.findOnly({did:body.did});
-            await toeditdraft.update({t:body.t,c:body.c,tlm:datestr})
+            await toeditdraft.update({t:body.t,c:body.c,tlm:datestr});
             // await db.DraftModel.update({t:body.t},{$set: {c:body.c,toc:datestr}});
-            data.status = "success"
+            data.status = "success";
             data.did = body.did
         }
         await next()
 
-    })
+    });
 module.exports = draftsRouter;

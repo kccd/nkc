@@ -1,4 +1,3 @@
-iconSwitch();
 
 function switchStatus(id) {
 	return $('#'+id).hasClass('fa-toggle-on');

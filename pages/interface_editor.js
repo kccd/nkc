@@ -3,11 +3,14 @@ $(function() {
   editor.init();
   window.editor = editor;
   var c = geid('content');
-  //新编辑器不需要旧的表情
-  // var proxy = geid('proxy');
-  // proxy.addEventListener('click', function(e) {
-  //   replace_selection(c, e.target.getAttribute('data-unicode'), true)
-  // })
+  if($('#text-elem').length === 0) {
+	  // 新编辑器不需要旧的表情
+	  var proxy = geid('proxy');
+	  proxy.addEventListener('click', function(e) {
+	    replace_selection(c, e.target.getAttribute('data-unicode'), true)
+	  })
+  }
+
 });
 
 function dataURItoBlob (base64Data) {  

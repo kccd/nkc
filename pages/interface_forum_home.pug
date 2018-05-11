@@ -11,21 +11,25 @@ block title
   else
     -var processed = forum.displayName
 
-  meta(name='description' content=`${processed}`)
-  meta(name='keywords' content=`${forum.displayName}`)
 
-  meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content=`${forum.displayName}`)
-  meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content=`${processed}`)
 
+  //- 快速跳转
+  mixin fastVisit()
+    select.form-control.btn-block(onchange=`fastVisit(this.value)`)
+      option 快速跳转
+      for f in data.sameLevelForums
+        if f.fid !== data.forum.fid
+          option= `${f.fid}:${f.displayName}`
+
+
+  //- 加精文章
   mixin forumDigestThreads
     if data.digestThreads.length > 0
       .row
         .col-xs-12.col-md-12
           .forum-digest-threads
             h4.text-center 优秀文章
-            -for(let thread of data.digestThreads)
+            for thread in data.digestThreads
               .col-xs-12.col-md-12
                 .row(style='margin-bottom: 0.5rem;')
                   if data.forum.fid !== thread.fid
@@ -35,6 +39,72 @@ block title
                   a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
                     span=` ( ${thread.firstPost.user.username} )`
       br
+
+  //- 专业信息
+  mixin forumInfo
+    .col-xs-6.col-md-6
+      .row
+        .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+          h5 文章
+          h4
+            strong= data.forum.countThreads
+    .col-xs-6.col-md-6
+      .row
+        .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+          h5 评论
+          h4
+            strong= data.forum.countPosts
+    .col-xs-6.col-md-6
+      .row
+        a(href=`/f/${data.forum.fid}/visitors` style='color: #000;text-decoration: none;')
+          .text-center(style='border-right:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+            h5 今日来访
+            h4
+              strong= data.users.length
+    .col-xs-6.col-md-6
+      .row
+        .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
+          h5 今日更新
+          h4
+            strong= data.forum.countPostsToday
+    .col-xs-12.col-md-12
+      .row
+        .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
+          h5 专业介绍
+          p(style='color: #777777;')!= markdown_safe(data.forum.description || '暂未填写专业介绍')
+
+  //- 上级专业、下级专业、版主
+  mixin forumsAndModerators
+    .row
+      .col-xs-12.col-md-12
+        if data.forum.parentForum
+          h4(style='margin-bottom: 0;').text-center 上级专业
+          -var forum = data.forum.parentForum;
+          include module_forum_single_panel
+          br
+        if data.forum.childrenForums && data.forum.childrenForums.length !== 0
+          h4(style='margin-bottom: 0;').text-center 细分专业
+          for forum in data.forum.childrenForums
+            include module_forum_single_panel
+          br
+        if data.moderators.length > 0
+          h4(style='margin-bottom: 0;').text-center 主管专家
+          for targetUser in data.moderators
+            include module_user_single_panel
+          .col-xs-12.col-md-12
+            br
+
+
+
+  meta(name='description' content=`${processed}`)
+  meta(name='keywords' content=`${forum.displayName}`)
+
+  meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  meta(property='og:title' content=`${forum.displayName}`)
+  meta(property='og:site_name' content='科创论坛')
+  meta(property='og:description' content=`${processed}`)
+
+
 
 block content
   .container-fluid(style='max-width: 1400px;')
@@ -64,6 +134,7 @@ block content
         if data.userLevel >= 6
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
+        +fastVisit()
         br
         .col-xs-12.col-md-12
           .row
@@ -102,64 +173,40 @@ block content
             if data.userLevel >= 6
               a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
                 span.fa.fa-cog &nbsp;设置
-            br
-            .col-xs-6.col-md-6
-              .row
-                .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                  h5 文章
-                  h4
-                    strong= data.forum.countThreads
-            .col-xs-6.col-md-6
-              .row
-                .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                  h5 评论
-                  h4
-                    strong= data.forum.countPosts
-            .col-xs-6.col-md-6
-              .row
-                a(href=`/f/${data.forum.fid}/followers` style='color: #000;text-decoration: none;')
-                  .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                    h5 关注数
-                    h4
-                      strong= data.forum.followersId.length
-            .col-xs-6.col-md-6
-              .row
-                a(href=`/f/${data.forum.fid}/visitors` style='color: #000;text-decoration: none;')
-                  .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                    h5 今日来访
-                    h4
-                      strong= data.users.length
-            .col-xs-12.col-md-12
-              .row
-                .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
-                  h5 今日更新
-                  h4
-                    strong= data.forum.countPostsToday
-            .col-xs-12.col-md-12
-              .row
-                .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
-                  h5 专业介绍
-                  p(style='color: #777777;')!= markdown_safe(data.forum.description || '暂未填写专业介绍')
-            .col-xs-12.col-md-12
-              .row
-                div(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
-                  h5.text-center 专业公告
-                  div.text-left.forum-notice
-                    if data.forum.noticeThreads.length !== 0
+            +fastVisit()
+
+
+            .visible-xs-block
+              button.btn.btn-default.btn-block.fa-switch(style='margin-top: 5px;margin-bottom:1rem;' data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample") 更多专业信息&nbsp;
+                span.fa.fa-caret-down
+              .collapse#collapseExample
+                +forumsAndModerators
+                +forumInfo
+                div(style='clear: all;')
+            .visible-sm-inline-block.visible-md-inline-block.visible-lg-inline-block
+              .div
+                br
+                +forumInfo
+            if data.forum.noticeThreads.length !== 0
+              .col-xs-12.col-md-12
+                .row
+                  div(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
+                    h5.text-center 专业公告
+                    div.text-left.forum-notice
                       -for(let i = 0; i < data.forum.noticeThreads.length; i++)
                         -const thread = data.forum.noticeThreads[i];
                         a(href=`/t/${thread.tid}`)= `${i+1}. ${thread.firstPost.t}`
                         br
-                    else
-                      p.text-center 暂无
           .col-xs-12.col-sm-5.col-md-7
             ul.nav.nav-pills.user-info-nav
               li(role="presentation" class=data.type === 'home'? 'active' : '')
                 a(href=`/f/${data.forum.fid}/home`) 专业首页
               li(role="presentation" class=data.type === 'latest' ? 'active' : '')
                 a(href=`/f/${data.forum.fid}/latest`) 最新文章
-              li(role="presentation" class=data.type === 'followers' ? 'active' : '')
-                a(href=`/f/${data.forum.fid}/followers`) 关注者
+
+              if data.forum.childrenForums.length === 0
+                li(role="presentation" class=data.type === 'followers' ? 'active' : '')
+                  a(href=`/f/${data.forum.fid}/followers`) 关注者
               li(role="presentation" class=data.type === 'visitors' ? 'active' : '')
                 a(href=`/f/${data.forum.fid}/visitors`) 今日来访
             if data.type === 'home'
@@ -227,60 +274,24 @@ block content
                 include interface_forum_singlethread
               include interface_navigation_paging.pug
             else if data.type === 'followers'
-              include interface_navigation_paging.pug
+              nav(style='margin-top: 1rem;')
+                include interface_navigation_paging.pug
               .row
                 for targetUser in data.followers
                   .col-xs-12.col-md-6
                     include module_user_single_panel
             else
-              include interface_navigation_paging.pug
+              nav(style='margin-top: 1rem;')
+                include interface_navigation_paging.pug
               .row
                 for targetUser in data.visitors
                   .col-xs-12.col-md-6
                     include module_user_single_panel
             #bm
           .col-xs-12.col-sm-4.col-md-3#digestThreadsDiv
-
-            .row
-              .col-xs-12.col-md-12
-                if data.forum.parentForum
-                  h4(style='margin-bottom: 0;').text-center 上级专业
-                  -var forum = data.forum.parentForum;
-                  include module_forum_single_panel
-                  br
-                if data.forum.childrenForums && data.forum.childrenForums.length !== 0
-                  h4(style='margin-bottom: 0;').text-center 细分专业
-                  for forum in data.forum.childrenForums
-                    include module_forum_single_panel
-                  br
-                if data.moderators.length > 0
-                  h4(style='margin-bottom: 0;').text-center 主管专家
-                  for targetUser in data.moderators
-                    include module_user_single_panel
-                    // -const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc} = targetUser;
-                    // .col-xs-12.col-md-12
-                    //   .row
-                    //     .user-info-list.forum-list(style=`min-height: 10em;padding-top: 0.5rem;${data.user && uid === data.user.uid ? 'border: 1px solid #337ab7' : ''}`)
-                    //       .displayName
-                    //         h4(style='margin: 0.5rem 0;')
-                    //           a(href=`/u/${uid}` title=description style='text-decoration: none;')
-                    //             img(src=`/avatar/${uid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-                    //             span &nbsp;
-                    //             span(user-popover='popover' data-toggle="popover")= username
-                    //           if data.user && uid !== data.user.uid
-                    //             if data.userSubscribe.subscribeUsers.includes(uid)
-                    //               button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, false)`) 取关
-                    //             else
-                    //               button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
-                    //       .info
-                    //         span= navbarDesc.cs
-                    //         p!=`回复:${postCount}&nbsp;&nbsp;文章:${threadCount}`
-                    //         p!=`学术分:${xsf}&nbsp;科创币:${kcb}`
-                    //       .description
-                    //         p= description || '暂未填写个人简介'
-                  .col-xs-12.col-md-12
-                    br
-            +forumDigestThreads
+            .visible-sm-inline-block.visible-md-inline-block.visible-lg-inline-block
+              +forumsAndModerators
+              +forumDigestThreads
             if data.forum.followers.length > 0
               .row
                 .col-xs-12.col-md-12
@@ -317,4 +328,4 @@ block scripts
   script(src='/interface_common.js')
   if data.type === 'latest'
     script(src='/module_dropdown.js?v=3')
-  script(src='/interface_forum.js')
+  script(src='/interface_forum.js?v=4')

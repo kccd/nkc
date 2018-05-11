@@ -1,6 +1,7 @@
-- data.forumList = data.forums
-- data.disabledCategory = true;
-include forumlist_dropdown
+if data.type !== 'category'
+  - data.forumList = data.forums
+  - data.disabledCategory = true;
+  include forumlist_dropdown
 .panel.panel-default
   .panel-heading
     span= data.forum.displayName

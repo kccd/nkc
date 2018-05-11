@@ -39,10 +39,10 @@ function initEvent() {
 }
 
 function createSelect(arr, fid, category) {
-	var text = '请选择板块';
+	var text = '请选择专业';
 	var klass = 'form-control dropdownSelect';
 	if(category) {
-		text = '请选择分类';
+		text = '请选择文章分类';
 		klass = 'form-control dropdownSelect categorySelect';
 	}
 	var select = newElement('select', {class: klass}, {
@@ -136,15 +136,15 @@ function getResult() {
 			if(valueArr.length === 2) {
 				fid = valueArr[0];
 			} else {
-				throw '请选择板块';
+				throw '请选择专业';
 			}
 		}
 	}
 	category = $('.categorySelect').val();
-	if(category === '请选择分类') {
-		throw '请选择分类'
+	if(category === '请选择文章分类') {
+		throw '请选择文章分类'
 	}
-	if(!fid) throw '请选择板块';
+	if(!fid) throw '请选择专业';
 	var cid;
 	for(var i = 0; i < threadTypes.length; i++) {
 		if(threadTypes[i].fid === fid && threadTypes[i].name === category) {

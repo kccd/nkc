@@ -12,7 +12,6 @@ $(document).ready(function(){
     $('.ThreadCheckboxes').css('width','12px');
     $('.ThreadCheckboxes').css('height','12px');
   }
-
 	displayAside();
 
 });
@@ -242,6 +241,15 @@ function displayAside() {
 		}
 	}
 
+}
+
+
+function fastVisit(value) {
+	if(!value) return;
+	var arr = value.split(':');
+	if(arr.length !== 2) return;
+	var fid = arr[0];
+	window.location.href = '/f/' + fid;
 }
 
 window.onresize = function() {

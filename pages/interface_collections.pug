@@ -61,8 +61,9 @@ block content
           br
           
           .CollectionCategoryThreads
+
             each item in data.categoryCollection
-              
+              -const userCollectionId = item.cid;
               .CollectionCategoryThreadItem
                 -var thread = item.thread
                 if thread
