@@ -1,6 +1,9 @@
 var cidbox = geid('cid')
 var categorybox = geid('category')
 
+$('.ThreadCheckboxes').show()
+$('.ForumManagement').show()
+
 function select(cid){
   cidbox.value = cidbox.value+cid+','
 }

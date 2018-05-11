@@ -156,31 +156,33 @@ block content
                   p.text-center 暂未关注任何领域
                 else
                   -for(let forum of data.targetUserSubscribeforums)
-                    -const {displayName, fid, description, iconFileName, color, countPosts, countThreads} = forum;
-                    .row
-                      .col-xs-12.col-md-12
-                        .user-info-list.forum-list
-                          .displayName
-                            h4(style='margin: 0.5rem 0;')
-                              a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
-                                if iconFileName
-                                  img(src=`/forum_avatar/${fid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-                                else
-                                  img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
-                                span &nbsp;
-                                span= displayName
-                                span &nbsp;&nbsp;
-                              if data.user
-                                if data.userSubscribe.subscribeForums.includes(fid)
-                                  button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
-                                else
-                                  button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
-                          .info
-                            span=`回复：${countPosts}`
-                            span &nbsp;&nbsp;
-                            span=`帖子：${countThreads}`
-                          .description
-                            p= description
+
+                    include module_forum_single_panel
+                    // -const {displayName, fid, description, iconFileName, color, countPosts, countThreads} = forum;
+                    // .row
+                    //   .col-xs-12.col-md-12
+                    //     .user-info-list.forum-list
+                    //       .displayName
+                    //         h4(style='margin: 0.5rem 0;')
+                    //           a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
+                    //             if iconFileName
+                    //               img(src=`/forum_avatar/${fid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
+                    //             else
+                    //               img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
+                    //             span &nbsp;
+                    //             span= displayName
+                    //             span &nbsp;&nbsp;
+                    //           if data.user
+                    //             if data.userSubscribe.subscribeForums.includes(fid)
+                    //               button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
+                    //             else
+                    //               button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
+                    //       .info
+                    //         span=`回复：${countPosts}`
+                    //         span &nbsp;&nbsp;
+                    //         span=`帖子：${countThreads}`
+                    //       .description
+                    //         p= description
             .col-xs-12.col-md-12
               .row
                 br

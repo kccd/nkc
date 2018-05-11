@@ -969,7 +969,38 @@ const certificates ={
         new_forum: {
           [GET]: true,
         }
-      }
+      },
+	    f: {
+		    [POST]: true, //新建板块
+		    [parameter]: {
+			    [DELETE]: true,
+			    settings: {
+				    [name]: '板块设置',
+				    [GET]: true,
+				    image: {
+					    [name]: 'logo',
+					    [GET]: true
+				    },
+				    info: {
+					    [name]: '基本信息设置',
+					    [GET]: true,
+					    [PATCH]: true
+				    },
+				    category: {
+					    [name]: '分类设置',
+					    [GET]: true,
+					    [PATCH]: true,
+					    [POST]: true,
+					    [DELETE]: true
+				    },
+				    permission: {
+					    [name]: '权限设置',
+					    [GET]: true,
+					    [PATCH]: true
+				    }
+			    }
+		    }
+	    }
     }
   },
   dev: {
@@ -1055,37 +1086,6 @@ const certificates ={
 				    [GET]: true,
 				    [parameter]: {
     					[name]: '身份认证2，3',
-					    [PATCH]: true
-				    }
-			    }
-		    }
-	    },
-	    f: {
-    		[POST]: true, //新建板块
-    		[parameter]: {
-    			[DELETE]: true,
-    			settings: {
-    				[name]: '板块设置',
-				    [GET]: true,
-				    image: {
-							[name]: 'logo',
-					    [GET]: true
-				    },
-				    info: {
-    					[name]: '基本信息设置',
-					    [GET]: true,
-					    [PATCH]: true
-				    },
-				    category: {
-    					[name]: '分类设置',
-					    [GET]: true,
-					    [PATCH]: true,
-					    [POST]: true,
-					    [DELETE]: true
-				    },
-				    permission: {
-    					[name]: '权限设置',
-					    [GET]: true,
 					    [PATCH]: true
 				    }
 			    }

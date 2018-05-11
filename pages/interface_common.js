@@ -739,16 +739,27 @@ function newElement(tagName, attributes, css) {
 }
 
 
-// 图标on/off切换
 function iconSwitch() {
-	$('.fa-switch-icon').on('click', function() {
+	// 图标on/off切换
+	$('.fa-switch-icon,.fa-switch').on('click', function() {
 		if($(this).hasClass('fa-toggle-on')) {
 			$(this).removeClass('fa-toggle-on').addClass('fa-toggle-off');
 		} else if($(this).hasClass('fa-toggle-off')) {
 			$(this).removeClass('fa-toggle-off').addClass('fa-toggle-on');
 		}
-	})
+
+		//下拉箭头转换
+
+		if($(this).children('.fa').hasClass('fa-caret-down')) {
+			$(this).children('.fa').removeClass('fa-caret-down').addClass('fa-caret-up');
+		} else {
+			$(this).children('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
+		}
+	});
+
 }
+
+
 
 // 新建板块
 function newForum() {
@@ -792,6 +803,7 @@ $(function () {
 	if(tooltipElements.length > 0) {
 		$('[data-toggle="tooltip"]').tooltip();
 	}
+	iconSwitch();
 });
 
 //舍弃草稿
