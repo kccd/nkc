@@ -237,10 +237,8 @@ function saveDraft(threadId,userId){
   post.c = quoteContent + post.c
   if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
   post.t = '';
-  post.destination = {
-    type: 'thread',
-    typeid: threadId
-  }
+  post.desType = 'thread';
+  post.desTypeId = threadId;
   var method = "POST";
   var url = "/u/"+userId+"/drafts/";
   var data = {post:post};
@@ -353,7 +351,7 @@ function at(username) {
   if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
   // geid('ReplyContent').value += '@'+username+' ';
   // window.location.href='#ReplyContent';
-  geid('text-elem').innerHTML += '<p>'+'@'+username+'</p>';
+  insertHtmlAtCaret('@'+username + ' ;');
   window.location.href='#ReplyContent';
   geid('text-elem').focus()
 }

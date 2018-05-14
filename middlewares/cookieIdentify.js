@@ -31,6 +31,7 @@ module.exports = async (ctx, next) => {
     if(user.certs.includes('banned')) user.certs = ['banned'];
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
+    user.draftCount = await db.DraftModel.count({uid: user.uid});
     ctx.data.user = user;
     await next();
   }

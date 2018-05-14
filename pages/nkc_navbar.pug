@@ -41,6 +41,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
             li
               a(href=`/u/${user.uid}/drafts`)
                 span.fa.fa-inbox &nbsp;草稿箱
+                if data.user.draftCount > 0
+                  span.messageNumber= data.user.draftCount
             li.divider
             li
               a(href=`/u/${user.uid}/settings`)
@@ -112,6 +114,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
               li
                 a(href=`/u/${user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
+                  if data.user.draftCount > 0
+                    span.messageNumber= data.user.draftCount
               li.divider
               li
                 a(href=`/u/${user.uid}/settings`)
