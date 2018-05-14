@@ -1,31 +1,20 @@
 extends bootstrap_base.pug
 
 block title
+  -const hiddenFooter = true;
   link(href='/interface_experimental.css' rel='stylesheet')
   title 管理界面
-  style.
-    .marginOfA{
-      margin:0 5px 5px 0;
-    }
 
 block content
-  
-  .container
-    .row
-      .col-xs-12
-        h4 这是管理界面
 
+  .container-fluid(style='max-width: 1400px;')
     .row
+      .col-xs-12.col-md-12
+        .h2
+          span.fa.fa-cogs &nbsp;后台管理
       .col-xs-12.col-md-12
         .panel.panel-default
           .panel-body
-            //h4 危险操作 [ 通常你也没有权限点击 ]
-            //button.btn.btn-default(onclick="nkcAPI('/e/gitPull', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") git pull
-            //button.btn.btn-default(onclick="nkcAPI('kamikaze').then(jalert).catch(jalert)") kamikaze
-            //button.btn.btn-default(onclick="nkcAPI('/e/npmInstall', 'PATCH', {}).then(function(data){jalert(data.message)}).catch(jalert)") npm install
-            //span &nbsp;
-            //a.btn.btn-default(href="/danger") 危险
-            //hr
             h4 查看
             a.marginOfA.btn.btn-default(href="/f/recycle") 回收站
             a.marginOfA.btn.btn-default(href="/f/draft") 草稿版
@@ -39,11 +28,19 @@ block content
             a.marginOfA.btn.btn-default(href='/e/newSysinfo') 发新通知
             a.marginOfA.btn.btn-default(href='/auth') 身份认证审核
             //a.marginOfA.btn.btn-default(href='/settings') 系统设置
-            button.marginOfA.btn.btn-default(onclick='newForum()') 新建板块
             hr
             h4 科创基金
             a.marginOfA.btn.btn-default(href='/fund/disabled') 被屏蔽的基金
             a.marginOfA.btn.btn-default(href='/fund/settings') 科创基金设置
+            hr
+            h4 专业设置
+            button.marginOfA.btn.btn-default(onclick='newForum()') 新建专业
+            br
+            h5 点击交换顺序
+            .hidden#data= JSON.stringify({forums: data.forums, fidArr: data.forums.map(f => f.fid)})
+            div#forumsDiv
+            button.btn.btn-primary(onclick='saveForumsOrder()') 保存
+
               
     
   include debug_output.pug
@@ -51,4 +48,4 @@ block scripts
   script(src='./react/react.js')
   script(src='./react/JSXTransformer.js')
   script(src='/interface_common.js')
-  script(type='text/jsx;harmony=true' src='./interface_experimental.js')
+  script(type='text/jsx;harmony=true' src='./interface_experimental.js?v=4')

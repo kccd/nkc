@@ -129,8 +129,8 @@ userRouter
 	  // --拿到最新8个关注与最新8个粉丝
 	  targetUserSubscribe.subscribeUsers.reverse();
 	  targetUserSubscribe.subscribers.reverse();
-	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(0, 8);
-	  const newSubscribersId = targetUserSubscribe.subscribers.slice(0, 8);
+	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(0, 9);
+	  const newSubscribersId = targetUserSubscribe.subscribers.slice(0, 9);
 	  data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
 	  data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
 	  // --------

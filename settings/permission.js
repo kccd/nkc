@@ -966,8 +966,8 @@ const certificates ={
         }
       },
       e: {
-        new_forum: {
-          [GET]: true,
+        forum: {
+          [PATCH]: true,
         }
       },
 	    f: {
@@ -1000,7 +1000,13 @@ const certificates ={
 				    }
 			    }
 		    }
-	    }
+	    },
+	    forum_avatar: {
+		    [name]: '板块logo',
+		    [parameter]: {
+			    [POST]: true
+		    }
+	    },
     }
   },
   dev: {
@@ -1090,13 +1096,7 @@ const certificates ={
 				    }
 			    }
 		    }
-	    },
-	    forum_avatar: {
-		    [name]: '板块logo',
-		    [parameter]: {
-			    [POST]: true
-		    }
-	    },
+	    }
     }
   }
 };

@@ -62,7 +62,8 @@ block content
                   //  a.active(href=`/${type}/${target}` style=`background-color:${forumcolor}`) #{forumname}
                   .ForumNavigation1(style='margin-bottom:6px')
                     -const parentForum = data.parentForums
-                    a.active(href=`/f/${parentForum.fid}` style=`background-color:${parentForum.color}`) #{parentForum.displayName}
+                    if parentForum
+                      a.active(href=`/f/${parentForum.fid}` style=`background-color:${parentForum.color}`) #{parentForum.displayName}
                     a.active(href=`/f/${data.forum.fid}` style=`background-color:${data.forum.color}`) #{data.forum.displayName}
                   span.ThreadTitleText(style="margin-right:3%;" href=`/t/${data.thread.tid}`) #{thread.firstPost.t}
 

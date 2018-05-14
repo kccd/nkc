@@ -158,31 +158,6 @@ block content
                   -for(let forum of data.targetUserSubscribeforums)
 
                     include module_forum_single_panel
-                    // -const {displayName, fid, description, iconFileName, color, countPosts, countThreads} = forum;
-                    // .row
-                    //   .col-xs-12.col-md-12
-                    //     .user-info-list.forum-list
-                    //       .displayName
-                    //         h4(style='margin: 0.5rem 0;')
-                    //           a(href=`/f/${fid}` title=description style=`text-decoration: none;color: ${color}`)
-                    //             if iconFileName
-                    //               img(src=`/forum_avatar/${fid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-                    //             else
-                    //               img(style=`display: inline-block;width: 3rem;height: 3rem;border-radius: 50%;background-color: ${color}`)
-                    //             span &nbsp;
-                    //             span= displayName
-                    //             span &nbsp;&nbsp;
-                    //           if data.user
-                    //             if data.userSubscribe.subscribeForums.includes(fid)
-                    //               button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
-                    //             else
-                    //               button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
-                    //       .info
-                    //         span=`回复：${countPosts}`
-                    //         span &nbsp;&nbsp;
-                    //         span=`帖子：${countThreads}`
-                    //       .description
-                    //         p= description
             .col-xs-12.col-md-12
               .row
                 br
@@ -208,17 +183,19 @@ block content
                   p.text-center 暂无粉丝
                 else
                   .row
-                    -for(let fans of data.newSubscribers)
-                      .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
-                        -const navbarDesc = fans.navbarDesc;
-                        -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-                        a(href=`/u/${fans.uid}`)
-                          img(src=`/avatar/${fans.uid}` style='width: 100%;border-radius: 50%;' title=title)
-                    if data.newSubscribers.length >= 8
-                      .col-md-12.text-center
-                        if data.newSubscribers.length >= 8
+                    .col-xs-12.col-md-12
+                      -for(let i = 0; i < data.newSubscribers.length; i++)
+                        if i !== 8
+                          -const user = data.newSubscribers[i];
+                          -const navbarDesc = user.navbarDesc;
+                          -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                          a(href=`/u/${user.uid}`)
+                            img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
+                    if data.newSubscribers.length > 8
                       .col-xs-12.col-md-12.text-center
                         a(href=`/u/${data.targetUser.uid}?type=fans`) 查看更多
+                  br
+
             if data.type !== 'follow'
               .col-xs-12.col-md-12
                 br
@@ -228,15 +205,18 @@ block content
                   p.text-center 暂无关注
                 else
                   .row
-                    -for(let follow of data.newSubscribeUsers)
-                      .col-xs-3.col-sm-2.col-md-3(style='margin-bottom: 1rem;overflow: hidden;')
-                        -const navbarDesc = follow.navbarDesc;
-                        -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-                        a(href=`/u/${follow.uid}`)
-                          img(src=`/avatar/${follow.uid}` style='width: 100%;border-radius: 50%;' title=title)
-                    if data.newSubscribeUsers.length >= 8
+                    .col-xs-12.col-md-12
+                      -for(let i = 0; i < data.newSubscribeUsers.length; i++)
+                        if i !== 8
+                          -const user = data.newSubscribeUsers[i];
+                          -const navbarDesc = user.navbarDesc;
+                          -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                          a(href=`/u/${user.uid}`)
+                            img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
+                    if data.newSubscribeUsers.length > 8
                       .col-xs-12.col-md-12.text-center
                         a(href=`/u/${data.targetUser.uid}?type=follow`) 查看更多
+                  br
 
 
 block scripts

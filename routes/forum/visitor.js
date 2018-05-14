@@ -6,7 +6,7 @@ visitorRouter
 		let {page} = query;
 		page = page?parseInt(page): 0;
 		let {behaviors} = data;
-		behaviors.reverse();
+		// behaviors.reverse();
 		const usersId = [];
 		for(let b of behaviors) {
 			if(!usersId.includes(b.uid)) {
