@@ -24,9 +24,19 @@ const draftSchema = new Schema({
       default: ''
     }
   },
+  desType: {
+    type: String,
+    default: 'forum',
+    index: 1
+  },
+  desTypeId: {
+    type: String,
+    default: '',
+    index: 1
+  },
   uid: {
     type: String,
-    default: 0,
+    default: '',
     index: 1
   },
   did: {

@@ -32,7 +32,7 @@ function nkc_render(options){
   default_whitelist.span = ['class', 'style', 'aria-hidden'];
   default_whitelist.a = ['href', 'title', 'target', 'style'];
   default_whitelist.p = ['align','ontouchend','ondbclick','style'];
-  default_whitelist.div = ['style'];
+  default_whitelist.div = ['style','class','contenteditable'];
   default_whitelist.table = ['border','width','cellpadding','cellspacing'];
   default_whitelist.tbody = [];
   default_whitelist.tr = [];
@@ -478,7 +478,7 @@ function nkc_render(options){
 
     // 添加查看大图
     // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
-    html = html.replace(/<img src="(.+?)">/img,'<a href="$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="$1" /></a>')
+    html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>')
     return html
   }
 

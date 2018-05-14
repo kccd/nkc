@@ -250,7 +250,10 @@ function Editor() {
     // if(this.query.type === "post"){
     //   document.getElementById("draft").style.display = "none"
     // }
-    /*if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
+    // 如果草稿是未发表的新帖保存来的，继续编辑时，可以选择模块
+    // var draftDelTypeTar = $('#draftDelType').html()
+    // if(this.query.type && this.query.type !== 'forum' && draftDelTypeTar !== 'forum') {
+      /*
       this.blocked = true;
       this.parents.disabled = true;
       this.children.disabled = true;
@@ -444,10 +447,11 @@ function saveDraft(that){
     var content = quoteContent + that.content.innerHTML.trim();
     var title = that.title.value.trim();
     var type = that.query.type;
-    var destination = {
-      type: type,
-      typeid: that.query.id
+    if(!type || type == ""){
+      type = "forum"
     }
+    var desType = type;
+    var desTypeId = that.query.id;
     var cat = that.query.cat;
     var id = that.blocked ? that.query.id : that.childID;
     var language = that.language.value.toLowerCase().trim();
@@ -470,9 +474,9 @@ function saveDraft(that){
       l: language,
       cat: that.threadTypeID,
       did: draftId,
-      destination: destination
+      desType: desType,
+      desTypeId: desTypeId
     };
-    console.log(post)
     var userId = $("#userNowId").html()
     var method = "POST";
     var url = "/u/"+userId+"/drafts/";
@@ -482,7 +486,7 @@ function saveDraft(that){
         if(result.status == "success"){
           console.log(result.did)
           $("#draftId").html(result.did)
-          jalert("保存成功！");
+          screenTopAlert("保存成功！");
         }
         if(result.redirect) {
           redirect(result.redirect)
@@ -493,7 +497,7 @@ function saveDraft(that){
         }
       })
       .catch(function (data) {
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('post').disabled = false
       })
   }
@@ -522,14 +526,16 @@ function onPost(that) {
       var content = quoteContent + that.content.innerHTML.trim();
     }
     //-- --
+    var desType = $("#draftDelType").html() || '';
+    var desTypeId = $("#draftDelTypeId").html() || '';
+    var did = $("#draftId").html() || '';
     var title = that.title.value.trim();
     var type = that.query.type;
     var cat = that.query.cat;
     var id;
 
 		var id = that.blocked ? that.query.id : that.childID;
-		console.log(that.query);
-		if(type === 'forum' || !type) {
+		if(type === 'forum' || !type || desType === 'forum') {
 			try{
 				var obj = getResult();
 			} catch(e) {
@@ -568,8 +574,11 @@ function onPost(that) {
       t: title,
       c: content,
       l: language || 'html',
+      did: did,
       cat: cat,
-      mid: that.query.mid
+      mid: that.query.mid,
+      desType: desType,
+      desTypeId: desTypeId
     };
     /*if (!that.blocked && (!that.childID)) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
@@ -603,10 +612,17 @@ function onPost(that) {
 	    method = 'POST';
 	    url = '/fund/a/' + id + '/report';
 	    data = {c: post.c, t: post.t, l: post.l}
-    } else if(type === 'redit') {
-	    method = 'POST';
-	    url = '/f/' + id;
-	    data = {post: post};
+    } else if(type === 'redit'){
+      // 判断desType的类型，重新指定发表的url
+      if(desType === "thread"){
+        method = 'POST';
+        url = '/t/' + desTypeId;
+        data = {post: post};
+      }else if(desType === "post"){
+        method = 'PATCH';
+        url = '/p/' + desTypeId;
+        data = {post: post};
+      }
     } else if(type === 'forum_declare') {
 			method = 'PATCH';
 			url = '/f/' + id + '/settings/info';

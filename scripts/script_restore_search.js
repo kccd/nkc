@@ -55,7 +55,7 @@ const restorePosts = async () => {
 
 (async () => {
 	try {
-		await restoreUsers();
+		// await restoreUsers();
 		await restorePosts();
 	} catch (err) {
 		console.log(err);

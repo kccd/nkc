@@ -138,8 +138,11 @@ function delCodeAddShrink(content){
 	return content
 }
 
+// 根据学术分隐藏内容
 function hideContentByUser(content, user={xsf: 0}, from) {
-	return content.replace(/\[hide=([0-9]{1,3}).*]([\s\S]*)\[\/hide]/, function(c, number, content){
+	// console.log(content)
+	// console.log(content.match(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm))
+	var c1 = content.replace(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm, function(c, number, content){
 		number = parseInt(number);
 		if(user.xsf >= number) {
 			if(from === 'thread') {
@@ -154,7 +157,24 @@ function hideContentByUser(content, user={xsf: 0}, from) {
 				return '';
 			}
 		}
-	})
+	});
+	return c1.replace(/<div class="nkcHiddenBox"><div class="nkcHiddenNotes" contenteditable="false">浏览这段内容需要(.+?)学术分<\/div><div class="nkcHiddenContent">(.+?)<\/div><\/div>/igm, function(c, number, content){
+		number = parseInt(number);
+		if(user.xsf >= number) {
+			if(from === 'thread') {
+				return c;
+			} else {
+				return content;
+			}
+		} else {
+			if(from === 'thread') {
+				return `<div class="nkcHiddenBox"><div class="nkcHiddenNotes" contenteditable="false">浏览这段内容需要${number}学术分</div><div class="nkcHiddenContent">内容已隐藏</div></div>`;
+			} else {
+				return '';
+			}
+		}
+	});
+  	// <div class="nkcHiddenBox"><div class="nkcHiddenNotes" contenteditable="false">浏览这段内容需要500学术分</div><div class="nkcHiddenContent">阿三大苏打萨达萨达</div></div>
 }
 
 function applicationFormStatus(a) {

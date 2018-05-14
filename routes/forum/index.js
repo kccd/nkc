@@ -247,7 +247,7 @@ forumRouter
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     data.post = _post;
     //帖子曾经在草稿箱中，发表时，删除草稿
-    await db.DraftModel.remove({"t":ctx.body.post.t})
+    await db.DraftModel.remove({"did":post.did})
     await next();
   })
   .del('/:fid', async (ctx, next) => {
