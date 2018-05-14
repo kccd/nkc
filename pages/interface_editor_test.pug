@@ -60,7 +60,7 @@ block content
                       button#draft.btn.btn-primary(type='submit') 保存草稿
                     .form-group
                       if data.user
-                        a.btn.btn-default(href=`/u/${data.user.uid}/drafts`) 草稿箱
+                        a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
               .form-group
               .nkcpanel(id='file-uploading' target='/r')
                   //uploader section
@@ -111,5 +111,7 @@ block scripts
   <script type="text/javascript" src="/newEditor.js"></script>
   script.
     window.onbeforeunload = function() {
-      return "离开前保存草稿了吗？"
+      if(document.getElementById("post").disabled === false){
+        return "离开前保存草稿了吗？"
+      }
     }
