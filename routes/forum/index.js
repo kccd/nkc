@@ -296,7 +296,7 @@ forumRouter
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: fidArr},
-			operation: 'viewForum'
+			operation: {$in: ['viewForum', 'viewThread']}
 		}).sort({timeStamp: -1});
 		const usersId = [];
 		behaviors.map(b => {

@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const forumRouter = require('./forum');
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
@@ -10,10 +11,9 @@ let buffer = [];
 
 experimentalRouter
   .get('/', async (ctx, next) => {
-    ctx.data.forumList = await dbFn.getAvailableForums(ctx);
-    ctx.data.forumTree = await dbFn.getForums(ctx);
+    const {data, db} = ctx;
+    data.forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
     ctx.template = 'interface_experimental.pug';
-    // ctx.throw(404, '这是404错误');
     await next();
   })
   .get('/newUsers', async (ctx, next) => {
@@ -107,10 +107,10 @@ experimentalRouter
     const {from, ip, to, type, sort} = ctx.query;
     data.from = from;
     data.to = to;
-    data.type = type;
+    data.type = type || '';
     data.sort = sort;
     data.ip = ip
-    const q = [];
+    const q = [{operation: {$nin: ['viewThread', 'viewForum', 'viewUserCard', 'viewUserPersonalForum']}}];
     const s = {timeStamp: -1};
     const page = ctx.query.page || 0;
     if(from) q.push({uid: from});
@@ -162,6 +162,7 @@ experimentalRouter
   .patch('/gitPull', async (ctx, next) => {
     ctx.data.message = await gitify();
     await next();
-  });
+  })
+	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
 
 module.exports = experimentalRouter;

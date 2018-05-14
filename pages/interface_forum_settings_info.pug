@@ -38,7 +38,7 @@ block content
               .form-group
                 label.col-sm-2.control-label 专业说明
                 .col-sm-5
-                  a.btn.btn-default(href=`/editor?type=forum_declare&id=${data.forum.fid}`) 去编辑器
+                  button.btn.btn-default(onclick=`submit("${data.forum.fid}", toEditor)`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 专业公告
                 .col-sm-5

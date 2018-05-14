@@ -11,19 +11,20 @@ infoRouter
 		const {forum} = data;
 		let {operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId, moderators} = body;
 		if(operation && operation === 'updateDeclare') {
-			if(!declare) ctx.throw(400, '专业说明不能为空');
+			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
 			data.redirect = `/f/${forum.fid}/home`;
 		} else {
 			if(!displayName) ctx.throw(400, '专业名称不能为空');
-			const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
-			if(sameDisplayNameForum && sameDisplayNameForum.fid !== forum.fid) ctx.throw(400, '专业名称已存在');
 			if(!abbr) ctx.throw(400, '专业简称不能为空');
-			if(!brief) ctx.throw(400, '专业简介不能为空');
+			// if(!brief) ctx.throw(400, '专业简介不能为空');
 			if(brief.length > 15) ctx.throw(400, '专业简介不能超过15个字');
+
 			const sameAbbrForum = await db.ForumModel.findOne({abbr});
 			if(sameAbbrForum && sameAbbrForum.fid !== forum.fid) ctx.throw(400, '专业简称已存在');
-			if(!description) ctx.throw(400, '专业介绍不能为空');
+
+			// if(!description) ctx.throw(400, '专业介绍不能为空');
+
 			let basicThreadsId_ = [], valuableThreadsId_ = [], noticeThreadsId_ = [], moderators_ = [];
 			await Promise.all(basicThreadsId.split(',').map(async pid => {
 				pid = pid.trim();
