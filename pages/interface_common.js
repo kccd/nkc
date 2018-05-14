@@ -450,7 +450,7 @@ function edInsertContent(which, myValue, fileType, fileName) {
     }else{
       codeResource = "<p><a href=" + myValue + "><img src=" + "/default/default_thumbnail.png" + ">" + fileName + "</a></p>"
     }
-    insertHtmlAtCaret(codeResource)
+    insertHtmlAtCaret(codeResource + "&nbsp;")
   }
 }
 

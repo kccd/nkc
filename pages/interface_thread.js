@@ -351,7 +351,7 @@ function at(username) {
   if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
   // geid('ReplyContent').value += '@'+username+' ';
   // window.location.href='#ReplyContent';
-  geid('text-elem').innerHTML += '<p>'+'@'+username+'</p>';
+  insertHtmlAtCaret('@'+username + ' ;');
   window.location.href='#ReplyContent';
   geid('text-elem').focus()
 }

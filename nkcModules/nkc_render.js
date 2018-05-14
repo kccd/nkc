@@ -478,7 +478,7 @@ function nkc_render(options){
 
     // 添加查看大图
     // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
-    html = html.replace(/<img src="(.+?)">/img,'<a href="$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="$1" /></a>')
+    html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>')
     return html
   }
 

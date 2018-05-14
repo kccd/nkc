@@ -52,6 +52,11 @@ block content
                       button#post.btn.btn-primary(type='submit') 发表
                   if !['forum_declare'].includes(data.type)
                     .form-group
+                    -if (!data.targetUser)
+                      button#draft.btn.btn-primary(type='submit') 保存草稿
+                    -else if(data.targetUser.uid === data.user.uid)
+                      button#draft.btn.btn-primary(type='submit') 保存草稿
+                    //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
                       button#draft.btn.btn-primary(type='submit') 保存草稿
                     .form-group
                       if data.user
