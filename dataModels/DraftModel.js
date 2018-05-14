@@ -14,6 +14,16 @@ const draftSchema = new Schema({
     type: String,
     default: ''
   },
+  destination: {
+    type: {
+      type: String,
+      default: ''
+    },
+    typeid: {
+      type: String,
+      default: ''
+    }
+  },
   desType: {
     type: String,
     default: 'forum',
