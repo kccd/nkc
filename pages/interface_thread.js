@@ -223,14 +223,18 @@ function enablePost(pid){
 // 保存草稿
 function saveDraft(threadId,userId){
   $("#ReplyContent").find(".MathJax_Preview").each(function(){
-    if($(this).next().next().attr("type").length > 15){
-      var mathfur = "$$" + $(this).next().next().html() + "$$";
+    if($(this).next().next().length !== 0){
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
     }else{
-      var mathfur = "$" + $(this).next().next().html() + "$";
+      $(this).parent().remove()
     }
-    $(this).next().next().replaceWith(mathfur);
-    $(this).next().replaceWith("");
-    $(this).replaceWith("")
   })
   var post = assemblePostObject();
   var quoteContent = document.getElementById("quoteContent").innerHTML;
@@ -263,18 +267,21 @@ function saveDraft(threadId,userId){
 function submit(tid){
   
   $("#ReplyContent").find(".MathJax_Preview").each(function(){
-    if($(this).next().next().attr("type").length > 15){
-      var mathfur = "$$" + $(this).next().next().html() + "$$";
+    if($(this).next().next().length !== 0){
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
     }else{
-      var mathfur = "$" + $(this).next().next().html() + "$";
+      $(this).parent().remove()
     }
-    $(this).next().next().replaceWith(mathfur);
-    $(this).next().replaceWith("");
-    $(this).replaceWith("")
   })
   var post = assemblePostObject()
   if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
-  console.log(post.c)
 
   geid('ButtonReply').disabled=true
   return nkcAPI('/t/' + tid, 'POST', {
