@@ -16,6 +16,7 @@ visitorRouter
 		const count = usersId.length;
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count);
+		data.paging = paging;
 		const uid = usersId.slice(paging.start, paging.start + paging.perpage);
 		data.visitors = await Promise.all(uid.map(u => db.UserModel.findOne({uid: u})));
 		data.type = 'visitors';

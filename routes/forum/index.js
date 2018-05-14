@@ -366,6 +366,15 @@ forumRouter
 			return thread;
 		}));
 
+
+		const parentForum = await forum.extendParentForum();
+		const contentClasses = data.certificates.contentClasses;
+		if(parentForum) {
+			data.sameLevelForums = await parentForum.extendChildrenForums({class: {$in: contentClasses}});
+		} else {
+			data.sameLevelForums = await db.ForumModel.find({parentId: '', class: {$in: contentClasses}});
+		}
+
 		ctx.template = 'interface_forum_home.pug';
 		await next();
 	})

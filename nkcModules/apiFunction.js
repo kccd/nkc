@@ -1,7 +1,6 @@
 const settings = require('../settings');
 let {perpage} = settings.paging;
 let fn = {};
-
 fn.paging = (page, arrLength) => {
   if(page === undefined) page = 0;
   return {
