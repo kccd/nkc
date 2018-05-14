@@ -1,6 +1,7 @@
 extends bootstrap_base
 block title
   title 注册成功
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
 block content
   -const mainContainer1400 = true
   .container-fluid(style='max-width: 1400px;')
@@ -13,20 +14,17 @@ block content
       .col-xs-12.col-md-8.col-md-offset-2
         br
         h4.text-center(style='color: #888888') 请选择您喜欢的领域，我们会优先向您推荐您感兴趣的内容。
-        .row
-          .col-xs-12.col-md-2.h4= `已选择`
-            span#limit(style='color:#888;') (1/5)：
-          .col-xs-12.col-md-10.forum-chose
-        .forum-list
-          .hidden= JSON.stringify({forums: data.forumList, subscribeForums: data.subscribe.subscribeForums})
-          -for(let forum of data.forumList)
-            if forum.children.length !== 0
-              .row
-                .col-xs-12.col-md-2.h4= forum.displayName
-                .col-xs-12.col-md-10
-                  -for(let child of forum.children)
-                    span.forum-span(onclick=`chooseForum("${child.fid}")` style=`background-color: ${child.color}` title=child.description)= child.displayName
-                      .mask.glyphicon.glyphicon-plus
+      -const selectBox = true;
+      -const disabledA = true;
+      mixin createForumsList(forums)
+        for forum in forums
+          include module_children_forum_single
+          if forum.childrenForums && forum.childrenForums.length > 0
+            .row
+              .col-xs-12.col-md-12(style='padding-left: 3rem;')
+                +createForumsList(forum.childrenForums)
+      .col-xs-12.col-md-10.col-md-offset-1
+        +createForumsList(data.forums)
       .col-xs-12.col-md-2.col-md-offset-5
         .row
           .col-xs-12.col-md-6.col-md-offset-3
@@ -35,4 +33,5 @@ block content
 
 block scripts
   script(src='/interface_common.js')
+  script(src='/icheck/icheck.js')
   script(src='/interface_user_subscribe.js')

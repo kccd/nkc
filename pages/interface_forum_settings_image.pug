@@ -1,0 +1,43 @@
+extends bootstrap_base
+block title
+  title 图片设置
+  -const mainContainer1400 = true;
+  -const forum = data.forum;
+  link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_forum_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span logo设置
+          .panel-body
+            .row
+              .col-xs-12.col-md-6
+                .row
+                  .col-xs-12.col-md-12.user-settings-img-dev
+                    if !forum.iconFileName
+                      span 暂无logo
+                    else
+                      img(src=`/forum_avatar/${forum.fid}` style='width: 100%;')
+                  .col-xs-12.col-md-12.text-center
+                    br
+                    button.btn.btn-primary(onclick='$("#logo").click();') 选择图片
+                    button.btn.btn-primary(onclick=`submit("${forum.fid}")`) 保存
+                    br
+                    br
+              .col-xs-12.col-md-3
+                .col-xs-12.col-md-12
+                  div(style=`width: 92px;height: 92px;position: relative;overflow: hidden;`)
+                    img#img_m(src=`/forum_avatar/${forum.fid}` title=forum.iconFileName?'':'暂无logo').user-settings-img
+                  h5 92x92
+            input#logo(type='file' accept="image/*").hidden
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/module_dropdown.js?v=3')
+  script(src='/module_forum_settings.js')
+  script(src='/jcrop/js/jquery.Jcrop.min.js')
+  script(src='/interface_forum_settings_image.js')

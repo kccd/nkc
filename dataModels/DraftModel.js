@@ -16,15 +16,17 @@ const draftSchema = new Schema({
   },
   desType: {
     type: String,
-    default: 'forum'
+    default: 'forum',
+    index: 1
   },
   desTypeId: {
     type: String,
-    default: ''
+    default: '',
+    index: 1
   },
   uid: {
     type: String,
-    default: 0,
+    default: '',
     index: 1
   },
   did: {

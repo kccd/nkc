@@ -15,6 +15,7 @@ searchInit()
     console.log('ElasticSearch is ready...'.green);
     const jobs = require('./scheduleJob');
     jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
+    jobs.updateForums(updateDate.updateForumsCronStr);
     if(useHttps) {
       const httpsOptions = settings.httpsOptions();
       server = https.Server(httpsOptions, app)

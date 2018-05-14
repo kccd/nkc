@@ -31,7 +31,7 @@ if (forum!==null)
               if f.iconFileName
                 - f.iconFileName = f.iconFileName
                   //image if present
-                  img(src=`/resources/site_specific/forum_icon/${f.iconFileName}.svg`)
+                  img(src=`/forum_avatar/${f.fid}`)
               
             a.HomeForumTitlePrimary(href=`${url}`) #{f.displayName}
               

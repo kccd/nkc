@@ -10,8 +10,10 @@ subscribeRouter
 		}
 		data.targetUser = await db.UserModel.findOnly({uid});
 		const {dbFunction} = ctx.nkcModules;
-		data.forumList = await dbFunction.getAvailableForums(ctx);
-		data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
+		// data.forumList = await dbFunction.getAvailableForums(ctx);
+		// data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
+		const forums = await db.ForumModel.getAccessibleForums(ctx);
+		data.forums = await dbFunction.forumsListSort(forums);
 		ctx.template = 'interface_user_subscribe.pug';
 		await next();
 	})
@@ -24,13 +26,24 @@ subscribeRouter
 		const {type} = body;
 		if(type === 'subscribeForums') {
 			const {subscribeForums} = body;
+			if(subscribeForums.length > 20) ctx.throw(400, '每个用户最多只能关注20个领域。');
+			const realFid = [];
+			for(let fid of subscribeForums) {
+				const forum = await db.ForumModel.findOne({fid});
+				if(forum) {
+					const childrenForums = await forum.extendChildrenForums();
+					if(!childrenForums || childrenForums.length === 0) {
+						if(!realFid.includes(fid)) realFid.push(fid);
+					}
+				}
+			}
 			const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
-			await targetUserSubscribe.update({subscribeForums});
+			await targetUserSubscribe.update({subscribeForums: realFid});
 		}
 		const lastUrl = ctx.cookies.get('lastUrl');
 		ctx.cookies.set('lastUrl', '');
 		if(!lastUrl) {
-			data.url = '/me';
+			data.url = `/u/${uid}`;
 		} else if(lastUrl.includes('kechuang') && !lastUrl.includes('logout')) {
 			data.url = lastUrl;
 		} else{

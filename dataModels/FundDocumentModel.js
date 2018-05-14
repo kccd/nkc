@@ -39,7 +39,7 @@ const documentSchema = new Schema({
 	},
 	l: {//pwbb
 		type: String,
-		default: 'pwbb'
+		default: 'html'
 	},
 	t: {
 		type: String,

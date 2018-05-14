@@ -27,14 +27,14 @@ function dataURItoBlob (base64Data) {
 
 $("document").ready(function(){
   //编辑器缩放
-  if($(".w-e-text-container"))return false
+	if($(".w-e-text-container").length === 0) return;
   $(".w-e-text-container").resizable({
     containment: '#body',
     minHeight: 100,
     minWidth: 100,
     maxWidth: 1400
   });
-  
+
   $("#content_test").on("paste", function(){
     function test(){
       $("#text-elem img").each(function(){
@@ -181,10 +181,10 @@ function Editor() {
   //-- --
   this.threadTypes = geid('threadTypes');
   this.postController = geid('postController');
-  this.parentDefault = this.parents.value;
+  // this.parentDefault = this.parents.value;
   this.language = geid('lang');
-  this.childrenDefault = this.children.value;
-  this.threadTypesDefault = this.threadTypes.value;
+  // this.childrenDefault = this.children.value;
+  // this.threadTypesDefault = this.threadTypes.value;
   this.query = getSearchKV();
   this.blocked = false;
   //预览编辑内容
@@ -192,7 +192,7 @@ function Editor() {
     var post = {
       t: this.title.value.trim(),
       c: this.content.value,
-      l: this.language.value.toLowerCase().trim(),
+      l: this.language?this.language.value.toLowerCase().trim():'html',
       cat: this.threadTypeID
     };
     post.resources = extract_resource_from_tag(post.c);
@@ -232,15 +232,25 @@ function Editor() {
     var self = this;
     this.title.addEventListener('keyup', this.trigger);
     this.content.addEventListener('keyup', this.trigger);
-    this.language.addEventListener('change', this.update);
-    this.post.onclick = onPost(self);
-    if(this.draft)this.draft.onclick = saveDraft(self);
+    // this.language.addEventListener('change', this.update);
+	  if(this.post) {
+		  this.post.onclick = onPost(self);
+	  }
+		if(this.draft) {
+			this.draft.onclick = saveDraft(self);
+		}
+	  if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
+		  this.blocked = true;
+	  }
+		// 旧编辑器获取专业分类，由于旧编辑器只作用于修改旧帖，修改帖子不允许再修改专业
+
     // if(this.query.type === "post"){
     //   document.getElementById("draft").style.display = "none"
     // }
     // 如果草稿是未发表的新帖保存来的，继续编辑时，可以选择模块
-    var draftDelTypeTar = $('#draftDelType').html()
-    if(this.query.type && this.query.type !== 'forum' && draftDelTypeTar !== 'forum') {
+    // var draftDelTypeTar = $('#draftDelType').html()
+    // if(this.query.type && this.query.type !== 'forum' && draftDelTypeTar !== 'forum') {
+      /*
       this.blocked = true;
       this.parents.disabled = true;
       this.children.disabled = true;
@@ -291,9 +301,9 @@ function Editor() {
           //-- --
         })
         .catch(function (e) {
-          console.error(e);
+          console.log(e);
         });
-    }
+    }*/
   };
 }
 
@@ -473,7 +483,7 @@ function saveDraft(that){
         if(result.status == "success"){
           console.log(result.did)
           $("#draftId").html(result.did)
-          jalert("保存成功！");
+          screenTopAlert("保存成功！");
         }
         if(result.redirect) {
           redirect(result.redirect)
@@ -484,7 +494,7 @@ function saveDraft(that){
         }
       })
       .catch(function (data) {
-        jwarning(data.error);
+        screenTopWarning(data.error);
         geid('post').disabled = false
       })
   }
@@ -504,11 +514,9 @@ function onPost(that) {
       $(this).next().replaceWith("");
       $(this).replaceWith("")
     })
-    if(document.getElementById("quoteContent")){
-      var quoteContent = document.getElementById("quoteContent").innerHTML
-    }else{
-      quoteContent = ''
-    }
+
+    var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''
+
     if(specialMark == "old"){
       var content = that.content.value;
     }else{
@@ -521,13 +529,33 @@ function onPost(that) {
     var title = that.title.value.trim();
     var type = that.query.type;
     var cat = that.query.cat;
-    var id = that.blocked ? that.query.id : that.childID;
-    var language = that.language.value.toLowerCase().trim();
+    var id;
+
+		var id = that.blocked ? that.query.id : that.childID;
+		if(type === 'forum' || !type || desType === 'forum') {
+			try{
+				var obj = getResult();
+			} catch(e) {
+				return screenTopWarning(e);
+			}
+
+			id = obj.fid;
+			cat = obj.cid;
+			type = 'forum';
+		} else {
+			if(that.blocked) {
+				id = that.query.id;
+			}
+		}
+
+
+
+    var language = that.language?that.language.value.toLowerCase().trim():'html';
     if (content === '') {
       screenTopWarning('请填写内容。');
       return;
     }
-    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '') {
+    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '' && type !== 'forum_declare') {
       screenTopWarning('请填写标题。');
       return;
     }
@@ -542,17 +570,17 @@ function onPost(that) {
     var post = {
       t: title,
       c: content,
-      l: language,
+      l: language || 'html',
       did: did,
-      cat: that.threadTypeID,
+      cat: cat,
       mid: that.query.mid,
       desType: desType,
       desTypeId: desTypeId
     };
-    if (!that.blocked && (!that.childID)) {
+    /*if (!that.blocked && (!that.childID)) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
       return;
-    }
+    }*/
     that.post.disabled = true;
     var method;
     var url;
@@ -592,8 +620,12 @@ function onPost(that) {
         url = '/p/' + desTypeId;
         data = {post: post};
       }
+    } else if(type === 'forum_declare') {
+			method = 'PATCH';
+			url = '/f/' + id + '/settings/info';
+			data = {declare: post.c, operation: 'updateDeclare'}
     } else {
-      jwarning('未知的请求类型：'+type);
+      return screenTopWarning('未知的请求类型：'+type);
     }
     return nkcAPI(url, method, data)
       .then(function (result) {

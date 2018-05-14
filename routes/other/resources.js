@@ -20,17 +20,6 @@ router
     ctx.filePath = url;
     ctx.type = ext;
     await next()
-  })
-  .get('/site_specific/forum_icon/:fileName', async (ctx, next) => {
-    const {fs} = ctx;
-    const {fileName} = ctx.params;
-    const url = `${siteSpecificPath}/forum_icon/${fileName}`;
-    await fs.access(url);
-    const [name, ext] = fileName;
-    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
-    ctx.filePath = url;
-    ctx.type = ext;
-    await next();
   });
 
 module.exports = router;

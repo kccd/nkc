@@ -99,6 +99,7 @@ module.exports = {
 	fundBannerPath,
 	fundLogoPath,
   avatarSize: 192,
+	forumAvatarSize: 96,
   avatarSmallSize: 48,
 	lifePhotoCount: 16,
 	certPhotoCount: 12

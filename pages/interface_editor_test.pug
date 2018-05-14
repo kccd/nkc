@@ -9,63 +9,72 @@ block content
   
   -var mainContainer1400 = true
   #ife.container-fluid(style='max-width:1400px')
-    if !data.user
-        .row
-            .col-xs-12.f12
-                h1 尚未登录
-                :markdown
-                    请先[登录](/login)。
-    else
-        .row
-            .col-md-12
-            include exam_notification.pug
-            
-        .row
-            .form-group
-                input#title.form-control(style='height:50px' type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
-            .form-group
-                div(style='margin-top: 5px;')
-                select#parents.form-control(style='display: inline-block; width: auto;')
-                    option 选择一个学院
-                select#children.form-control(style='display: inline-block; width: auto;')
-                    option 选择一个专业
-                select#threadTypes.form-control(style='display: inline-block; width: auto;')
-                    option 无
-                select.form-control#lang(style='display: none; width: auto;')
-                    option html
-            .form-group
-                div#quoteContent
-            .form-group
-                div#quoteCancel(style='display: none')
-                    button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-            .form-group
-                div#content_test
-            .form-inline
-                .form-group
-                    input#parseURL(type='checkbox' checked)
-                    span &nbsp;处理URL&nbsp;
-                .form-group
-                    button#post.btn.btn-primary(type='submit' style='margin-left: 10px') 发表
-                    button#draft.btn.btn-primary(type='submit' style='margin-left: 10px') 保存草稿
-            .form-group
-            .nkcpanel(id='file-uploading' target='/r')
-                //uploader section
-                include interface_attachment_uploader_uploader.pug
-                
-            .panel.panel-default
-                .panel-heading 我的附件（点击插入帖子）
-                .panel-body(id='list-container')            
+    .col-xs-12.col-md-12
+      if !data.user
+          .row
+              .col-xs-12.f12
+                  h1 尚未登录
+                  :markdown
+                      请先[登录](/login)。
+      else
+          .row
+              .col-md-12
+              include exam_notification.pug
 
-            .form-group
+          .row
+              .form-group
+                  input#title.form-control(style='height:50px' type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
+              .form-group
+                  if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+                    div(style='margin-top: 5px;')
+                    include forumlist_dropdown
+                    //select#parents.form-control(style='display: inline-block; width: auto;')
+                    //    option 选择一个学院
+                    //select#children.form-control(style='display: inline-block; width: auto;')
+                    //    option 选择一个专业
+                    //select#threadTypes.form-control(style='display: inline-block; width: auto;')
+                    //    option 无
+                    //select.form-control#lang(style='display: none; width: auto;')
+                    //    option html
+                  input.hidden#lang(value=data.l)
+              .form-group
+                  div#quoteContent
+              .form-group
+                div#quoteCancel(style='display: none')
+                  button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+              .form-group
+                  div#content_test
+              .form-inline
+                  .form-group
+                      input#parseURL(type='checkbox' checked)
+                      span &nbsp;处理URL&nbsp;
+                  .form-group
+                      button#post.btn.btn-primary(type='submit') 发表
+                  if !['forum_declare'].includes(data.type)
+                    .form-group
+                      button#draft.btn.btn-primary(type='submit') 保存草稿
+                    .form-group
+                      if data.user
+                        a.btn.btn-default(href=`/u/${data.user.uid}/drafts`) 草稿箱
+              .form-group
+              .nkcpanel(id='file-uploading' target='/r')
+                  //uploader section
+                  include interface_attachment_uploader_uploader.pug
+
+              .panel.panel-default
+                  .panel-heading 我的附件（点击插入帖子）
+                  .panel-body(id='list-container')
+
+              .form-group
                 //- input#parseURL(type='checkbox' checked)
                 //- span &nbsp;处理URL&nbsp;
-            .form-group
-                div#disnoneplay(style='display:none')= data.content
-                div#draftNowId(style='display:none')= data.content
-                div#userNowId(style='display:none')= data.user.uid
-                div#draftId(style='display:none')=`${data.did || ''}`
-                div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
-                div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
+              .form-group
+                  div#disnoneplay(style='display:none')= data.content
+                  div#draftNowId(style='display:none')= data.content
+                  div#userNowId(style='display:none')= data.user.uid
+                  div#draftId(style='display:none')=`${data.did || ''}`
+                  div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
+                  div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
   
   include debug_output.pug
 block scripts
@@ -81,14 +90,21 @@ block scripts
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
-  
-  script(src='/interface_common.js?v=1')
-  script(src='/nkc_render.js?v=1')
-  script(src='/interface_editor.js?v=1')
-  
+  script(src='/interface_common.js?v=3')
+  script(src='/nkc_render.js?v=3')
+  script(src='/interface_editor.js?v=3')
+
+  if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+    script(src='/module_dropdown.js?v=3')
+
+
+
   script(src='/interface_attachment_uploader.js?v=1')
   script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
 
-  
-  <script type="text/javascript" src="/wangEditor.js"></script>
+  <script type="text/javascript" src="/wangEditor.js?v=1"></script>
   <script type="text/javascript" src="/newEditor.js"></script>
+  script.
+    window.onbeforeunload = function() {
+      return "离开前保存草稿了吗？"
+    }

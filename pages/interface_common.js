@@ -720,9 +720,83 @@ function subscribeForum(fid, subscribe) {
 		})
 }
 
+// 创建元素
+function newElement(tagName, attributes, css) {
+	var single = ['hr', 'br', 'input'];
+	var element;
+	if(single.indexOf(tagName) !== -1) {
+		element = $('<'+tagName+'>');
+	} else {
+		element = $('<'+tagName+'></'+tagName+'>');
+	}
+	if(attributes) {
+		element.attr(attributes);
+		if(css) {
+			element.css(css);
+		}
+	}
+	return element;
+}
+
+
+// 图标on/off切换
+function iconSwitch() {
+	$('.fa-switch-icon').on('click', function() {
+		if($(this).hasClass('fa-toggle-on')) {
+			$(this).removeClass('fa-toggle-on').addClass('fa-toggle-off');
+		} else if($(this).hasClass('fa-toggle-off')) {
+			$(this).removeClass('fa-toggle-off').addClass('fa-toggle-on');
+		}
+	})
+}
+
+// 新建板块
+function newForum() {
+	var displayName = prompt('请输入板块名：');
+	if(displayName === null) {
+		return;
+	}
+	if(displayName === '') {
+		return screenTopWarning('板块名称不能为空');
+	}
+	nkcAPI('/f', 'POST', {displayName: displayName})
+		.then(function(data) {
+			screenTopAlert('新建板块成功，正在前往板块设置');
+			setTimeout(function() {
+				window.location.href = '/f/'+data.forum.fid+'/settings';
+			}, 1500);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}
+
+function deleteForum(fid) {
+	if(confirm('确定要删除该板块？') === false) {
+		return;
+	}
+	nkcAPI('/f/'+fid, 'DELETE', {})
+		.then(function() {
+			screenTopAlert('删除成功');
+			setTimeout(function() {
+				window.location.href = '/f';
+			}, 1500)
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+
+$(function () {
+	var tooltipElements = $('[data-toggle="tooltip"]');
+	if(tooltipElements.length > 0) {
+		$('[data-toggle="tooltip"]').tooltip();
+	}
+});
 
 //舍弃草稿
 function removedraft(uid,did){
+	if(confirm('确认舍弃草稿？') === false) return;
   var url = '/u/'+uid+'/drafts/'+did+'?uid='+uid+"&did="+did;
   var method = "DELETE";
   var alertInfo = "已舍弃草稿";

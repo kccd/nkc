@@ -15,8 +15,7 @@ commentRouter
 			uid: user.uid,
 			type: 'comment',
 			t: comment.t,
-			c: comment.c,
-			l: comment.l
+			c: comment.c
 		});
 		await newDocument.save();
 		data.redirect = `/fund/a/${applicationForm._id}`;

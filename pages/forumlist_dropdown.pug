@@ -1,12 +1,3 @@
-select#TargetForum.form-control
-  each fg in data.forumList
-    if listParent
-      option #{fg.fid}:#{fg.displayName} ====
-    else
-      option ----
-    each f in fg.children || []
-      -var selected = (data.forum&&data.forum.fid&&data.forum.fid===f.fid)||(data.doc&&data.doc._key===f.fid)
-      if selected
-        option(selected) #{f.fid}:#{f.displayName}
-      else
-        option #{f.fid}:#{f.displayName}
+#forumListData.hidden= JSON.stringify({forumList: data.forumList, forumsThreadTypes: data.forumsThreadTypes, selectedArr: data.selectedArr, cat: data.cat, disabledCategory: data.disabledCategory})
+#dropdownDiv.form-group
+

@@ -1,0 +1,57 @@
+extends bootstrap_base
+block title
+  title 权限设置
+  -const mainContainer1400 = true;
+  -const forum = data.forum;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_forum_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 权限设置
+          .panel-body
+            div.form-horizontal
+              .form-group
+                label.col-sm-3.control-label 总开关
+                .col-sm-5
+                  span.fa-switch-icon.fa#accessible(class=forum.accessible?'fa-toggle-on': 'fa-toggle-off')
+                  p.text-danger *关闭后该板块、下属版块以及板块下的所有帖子都将无法访问，并且会隐藏导航入口
+              .form-group
+                label.col-sm-3.control-label 导航可见
+                .col-sm-5
+                  span.fa-switch-icon.fa#visibility(class=forum.visibility?'fa-toggle-on': 'fa-toggle-off')
+                  p.text-danger *关闭后所有用户将不能在导航栏看见该板块的入口
+              .form-group
+                label.col-sm-3.control-label 无权用户在导航可见
+                .col-sm-5
+                  span.fa-switch-icon.fa#isVisibleForNCC(class=forum.isVisibleForNCC?'fa-toggle-on': 'fa-toggle-off')
+                  p.text-danger *打开后无权限访问该板块的用户将能够在导航栏看见该板块的入口（打开上一选项“导航可见”后该设置有效）
+              .form-group
+                label.col-sm-3.control-label 在父板块显示
+                .col-sm-5
+                  span.fa-switch-icon.fa#displayOnParent(class=forum.displayOnParent?'fa-toggle-on': 'fa-toggle-off')
+                  p.text-danger *打开后父板块将能够显示该板块的文章
+              .form-group
+                label.col-sm-3.control-label 板块类型
+                .col-sm-5
+                  .form-inline
+                    select.form-control#contentClass
+                      for c in data.allContentClasses
+                        if data.forum.class === c
+                          option(selected=true)= c
+                        else
+                          option= c
+              .form-group
+                .col-sm-5.col-sm-offset-3
+                  button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存
+block scripts
+  script(src='/jquery/jquery.minicolors.js')
+  script(src='/module_forum_settings.js')
+
+  script(src='/interface_common.js')
+  script(src='/module_dropdown.js?v=3')
+  script(src='/interface_forum_settings_permission.js')

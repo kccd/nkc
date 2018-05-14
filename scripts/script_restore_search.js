@@ -39,7 +39,6 @@ const restorePosts = async () => {
 
 		const posts = await PostModel.find({}).sort({toc: -1}).skip(m).limit(n);
 		await Promise.all(posts.map(async post => {
-			console.log(post.pid);
 			try {
 				await updatePost(post);
 			} catch(err) {

@@ -1,0 +1,59 @@
+extends bootstrap_base
+block title
+  title 分类设置
+  -const mainContainer1400 = true;
+  -const forum = data.forum;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_forum_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 分类设置
+          .panel-body
+            div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 当前位置
+                .col-sm-5
+                  h5
+                    for forum in data.parentForums
+                      a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
+                      span &nbsp;/&nbsp;
+                    span= forum.displayName
+              .form-group
+                label.col-sm-2.control-label 移动至
+                .hidden#data-forums=JSON.stringify({forums: data.forums, forum: data.forum, threadTypes: data.threadTypes})
+                .col-sm-5
+                  .form-inline#forumsDiv
+                  button.btn.btn-default(style='margin-top: 0.5rem;' onclick=`moveForum("${forum.fid}")`) 移动
+              .form-group
+                label.col-sm-2.control-label 子版块顺序
+                .col-sm-10
+                  h5.text-success 点击交换顺序
+                  .form-inline#childrenForumsDiv
+              .form-group
+                label.col-sm-2.control-label 文章分类
+                .col-sm-10
+                  h5.text-success 点击交换顺序
+                  .form-inline#threadTypeDiv
+                  div(style='margin-top: 0.5rem;')
+                    button.btn.btn-default(onclick=`addThreadType("${forum.fid}")`) 添加
+                  br
+                  .form-inline
+                    select.form-control#threadTypeSelect
+
+                    button.btn.btn-default(onclick=`editorThreadType(${data.forum.fid})`) 编辑
+                    button.btn.btn-danger(onclick=`deleteThreadType(${data.forum.fid})`) 删除
+
+              .form-group
+                .col-sm-5.col-sm-offset-2
+                  button.btn.btn-primary(onclick=`submit("${forum.fid}")`) 保存
+block scripts
+  script(src='/jquery/jquery.minicolors.js')
+  script(src='/module_forum_settings.js')
+  script(src='/interface_common.js')
+  script(src='/module_dropdown.js?v=3')
+  script(src='/interface_forum_settings_category.js')

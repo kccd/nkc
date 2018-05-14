@@ -280,8 +280,8 @@ function submit(tid){
   return nkcAPI('/t/' + tid, 'POST', {
     post:post,
   })
-  .then(function(){
-    redirect('/t/'+tid);
+  .then(function(data){
+    window.location.href = data.redirect;
   })
   .catch(function(data){
     screenTopWarning(data.error);

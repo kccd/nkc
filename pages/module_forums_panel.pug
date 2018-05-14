@@ -1,0 +1,13 @@
+.row.forums-panel
+  .col-xs-12.col-md-12
+    ul
+      li
+        a(href=`/f`) 全部分类
+      li
+        a /
+      for forum in data.forumList
+        -let style = '';
+        if data.forum && forum.fid === data.forum.fid
+          -style = `background-color: ${forum.color};color: #ffffff;`
+        li
+          a(href=`/f/${forum.fid}` style=style)= forum.displayName

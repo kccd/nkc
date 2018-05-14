@@ -61,6 +61,7 @@ router
         await thread.lastPost.extendUser();
 	      await thread.firstPost.extendUser();
 	      await thread.firstPost.extendResources();
+	      await thread.extendForum().then(forum => forum.extendParentForum())
       }));
       data.posts = posts;
       const length = await PostModel.count($matchPost.toJS());
@@ -340,6 +341,11 @@ router
     ctx.data.digest = digest;
     ctx.data.tab = tab;
     ctx.data.sortby = sortby;
+    if(data.threads) {
+	    await Promise.all(data.threads.map(async thread => {
+		    await thread.extendForum().then(forum => forum.extendParentForum())
+	    }));
+    }
     await next()
   })
   .use('/:uid', operationRouter.routes(), operationRouter.allowedMethods());

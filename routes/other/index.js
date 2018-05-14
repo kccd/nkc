@@ -28,6 +28,7 @@ const fundBannerRouter = require('./fundBanner');
 const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
 const logRouter = require('./log');
+const forumAvatarRouter = require('./forum_avatar');
 const coverRouter = require('./cover');
 // -----------------------------------
 otherRouter
@@ -152,5 +153,6 @@ otherRouter
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
 	.use('log', logRouter.routes(), logRouter.allowedMethods())
+	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods());
 module.exports = otherRouter;
