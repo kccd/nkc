@@ -52,3 +52,15 @@
 .now-at {
   background-color: silver;
 }
+.operation-type-span{
+  color: #ffffff;
+  cursor: pointer;
+  display:inline-block;
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem 0 0;
+  background-color: #aaaaaa;
+}
+.operation-type-span:hover{
+  background-color: #555555;
+}

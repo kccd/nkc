@@ -1,8 +1,13 @@
 var data = $('#data').text();
-data = JSON.parse(data);
-var forums = data.forums;
-var fidArr = data.fidArr;
+var forums = [];
+var fidArr = [];
 var selectedFid = [];
+if(data) {
+	data = JSON.parse(data);
+	forums = data.forums || [];
+	fidArr = data.fidArr || [];
+}
+
 $(function() {
 	createSpan(fidArr);
 });
@@ -78,7 +83,7 @@ function saveForumsOrder() {
 	var obj = {
 		fidArr: fidArr
 	};
-	nkcAPI('/e/forum', 'PATCH', obj)
+	nkcAPI('/e/settings/forum', 'PATCH', obj)
 		.then(function() {
 			screenTopAlert('保存成功');
 		})

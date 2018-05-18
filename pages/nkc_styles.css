@@ -13,6 +13,24 @@ h1, h2, h3, h4, h5, p{
 .pagination > li > a, .pagination > li > span{
   padding: 0 14px;
 }
+.progressBar{
+  height: 2px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #177cff;
+  transition: width 15s;
+  -moz-transition: width 15s;
+  -webkit-transition: width 15s;
+  -o-transition: width 15s;
+
+  transition-timing-function: cubic-bezier(0, 1.02, 0.7, 0.97);
+  -moz-transition-timing-function: cubic-bezier(0, 1.02, 0.7, 0.97);
+  -webkit-transition-timing-function: cubic-bezier(0, 1.02, 0.7, 0.97);
+  -o-transition-timing-function: cubic-bezier(0, 1.02, 0.7, 0.97);
+
+  z-index: 8;
+}
 
 .rightalign {
   text-align:right;

@@ -118,6 +118,9 @@ threadRouter
 		await thread.update({$inc: {hits: 1}});
 		data.thread = thread;
 		data.forum = forum;
+		data.selectedArr = (await forum.getBreadcrumbForums()).map( f => f.fid);
+		data.selectedArr.push(forum.fid);
+		data.cat = thread.cid;
 		data.replyTarget = `t/${tid}`;
 		ctx.template = 'interface_thread.pug';
 		let posts;

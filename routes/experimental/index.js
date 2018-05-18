@@ -1,6 +1,7 @@
 const Router = require('koa-router');
-const forumRouter = require('./forum');
 const nkcModules = require('../../nkcModules');
+const settingRouter = require('./settings');
+const statusRouter = require('./status');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 const {npmInstallify, gitify} = require('../../tools/imageMagick');
@@ -10,11 +11,12 @@ let tlv = 0;
 let buffer = [];
 
 experimentalRouter
+	.use('/', async (ctx, next) => {
+		ctx.template = 'experimental/index.pug';
+		await next();
+	})
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
-    data.forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
-    ctx.template = 'interface_experimental.pug';
-    await next();
+  	return ctx.redirect('/e/status');
   })
   .get('/newUsers', async (ctx, next) => {
     const {db, data} = ctx;
@@ -163,6 +165,7 @@ experimentalRouter
     ctx.data.message = await gitify();
     await next();
   })
-	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
+	.use('/status', statusRouter.routes(), statusRouter.allowedMethods())
+	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods());
 
 module.exports = experimentalRouter;

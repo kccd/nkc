@@ -24,7 +24,13 @@ module.exports = async (ctx, next) => {
     ctx.logIt = true; // if the request is request to a content, log it;
     const type = ctx.request.accepts('json', 'html');
     const from = ctx.request.get('FROM');
-    if(type === 'json' && from === 'nkcAPI') {
+    if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
+    	ctx.data.user = ctx.data.user.toObject();
+    }
+    if(from === 'htmlAPI'){
+	    ctx.data.html = ctx.nkcModules.render(path.resolve('./pages/' + ctx.localTemplate), ctx.data);
+	    ctx.body = ctx.data;
+    } else if(type === 'json' && from === 'nkcAPI') {
 	    ctx.type = 'json';
 	    ctx.body = ctx.data;
     } else {

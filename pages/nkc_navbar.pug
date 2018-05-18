@@ -1,4 +1,3 @@
-//nav.navbar.navbar-default
 - var navbar = data.navbar || {}
 if data.user
   -var newMessage = data.user.newMessage;
@@ -13,7 +12,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand(href="/" style='color: #337ab7; font-size: 1.6em;')!= `${data.site?data.site.name: '科创论坛'}`
+      a.navbar-brand(href="/" style='color: #337ab7; font-size: 1.6em;')!= `${data.serverSettings?data.serverSettings.websiteName: '科创论坛'}`
       -var navbar_highlight = data.navbar_highlight||navbar.highlight
       -var isActive = function(label){return (navbar_highlight==label)?'background-color: #337ab7;color: #fff;':''}
       if data.user
@@ -41,8 +40,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
             li
               a(href=`/u/${user.uid}/drafts`)
                 span.fa.fa-inbox &nbsp;草稿箱
-                if data.user.draftCount > 0
-                  span.messageNumber= data.user.draftCount
+                span.messageNumber.draftMessage= data.user.draftCount || ''
             li.divider
             li
               a(href=`/u/${user.uid}/settings`)
@@ -65,23 +63,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
           a(href=`/f` title='分类') 分类
         li(class=navbar_highlight==='fund'?'active':'')
           a(href=`/fund` title='科创基金') 基金
-      //ul.pagination.nav.navbar-nav.navbar-left.nav-btn(style='padding:0 0 0 0rem')
-      //  li
-      //    a(href='/' title='扫一眼' style=`${isActive('latest')}`) 最新
-      //  li
-      //    a(href=`/f` title='最新内容' style=`${isActive('forums')}`) 分类
-      //  li
-      //    a(href=`/fund` title='科创基金' style=`${isActive('fund')}`) 基金
-      //form.navbar-form.navbar-left(style='border: none;' action='/search' method='GET')
-      //  .form-group(style='overflow: hidden;width: 100%')
-      //    input.form-control(type="text" placeholder="关键词、文号、用户" style='width: 75%; float: left; border-top-right-radius: 0;border-bottom-right-radius: 0; border-right: none' name='q')
-      //    button.btn.btn-default(type="submit" style='width: 25%; float: left;border-top-left-radius: 0; border-bottom-left-radius: 0') 搜索
       ul.nav.navbar-nav.navbar-right.nav-font-color(style='font-size: 1em;')
-        //if !data.user
-        //  li
-        //    a(style='color: #337ab7;padding-right: 0.1rem' href='/login' title='还记得密码吗？') 登录
-        //  li
-        //    a(style='color: #337ab7;padding-right: 0.1rem' href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
         if data.user
           if data.userLevel >= 4
             li
@@ -107,15 +89,14 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
                 a(href=`/sms`)
                   span.fa.fa-envelope-o &nbsp;信息
                   if messageSum > 0
-                    span.messageNumber= messageSum
+                    span.messageNumber.newMessage= messageSum
               li
                 a(href=`/u/${user.uid}/collections/unclassified`)
                   span.fa.fa-folder-o &nbsp;收藏
               li
                 a(href=`/u/${user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
-                  if data.user.draftCount > 0
-                    span.messageNumber= data.user.draftCount
+                  span.messageNumber.draftMessage= data.user.draftCount || ''
               li.divider
               li
                 a(href=`/u/${user.uid}/settings`)
@@ -124,12 +105,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
               li
                 a(href=`/logout` title='不，不要走！')
                   span.fa.fa-sign-out &nbsp;退出
-          if(messageSum > 0)
-            li
+            li#messageIco(style=`display:${messageSum > 0?'block': 'none'}`)
               a(style='color: #337ab7;padding-right: 0.1rem' href='/sms' title='信息')
                 span.fa.fa-envelope-o(style='color: #777777;')
                 -if(messageSum >= 100){messageSum=' 99+'}
-                  span.messageNumber(style='margin-left:0;') #{messageSum}
+                  span.messageNumber.newMessage(style='margin-left:0;') #{messageSum}
                 span &nbsp;&nbsp;
         else
           li.userInfo

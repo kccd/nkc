@@ -15,7 +15,7 @@ function uploadLifePhotos(files, i) {
 	var formData = new FormData();
 	formData.append('file', file);
 	formData.append('photoType', 'cert');
-	postUpload('/photo/', formData, function() {
+	postUpload('/photo', formData, function() {
 		i++;
 		if(i <= (files.length-1)) {
 			uploadLifePhotos(files, i);

@@ -32,7 +32,9 @@ latestRouter
 		}
 		data.threads = await forum.getThreadsByQuery(ctx, q);
 		data.toppedThreads = await forum.getToppedThreads(ctx);
-		data.forumList = await db.ForumModel.find({});
+		data.forumList = await db.ForumModel.find({}).sort({order: 1});
+		data.selectedArr = (await forum.getBreadcrumbForums()).map( f => f.fid);
+		data.selectedArr.push(forum.fid);
 		data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
 		data.type = 'latest';

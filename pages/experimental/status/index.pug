@@ -1,0 +1,12 @@
+.hidden#data= JSON.stringify({results: data.results})
+.col-xs-12.col-xs-12
+  -const time = new Date();
+  h4 日期选择
+  .form-inline
+    input.form-control.time(readonly size="16" type="text" value=time.toLocaleDateString())
+    span=` 至 `
+    input.form-control.time(readonly size="16" type="text" value='')
+    button.btn.btn-primary 统计
+  .row(style='padding-top: 1rem;')
+    .col-xs-12.col-md-8
+      canvas#myChart
