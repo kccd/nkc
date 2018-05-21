@@ -17,7 +17,9 @@ latestRouter
     };
     if(digest === 'true') q.digest = true;
     const threadCount = await db.ThreadModel.count(q);
-    const {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query, q);
+    let {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query, q);
+    // 主页过滤掉退回标记的帖子
+    $match.recycleMark = {"$nin":[true]}
     data.paging = apiFn.paging(page, threadCount);
     let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
 

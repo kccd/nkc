@@ -107,6 +107,8 @@ block content
                       if moveThread
                         .form-group
                             button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
+                            button.btn.btn-primary(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 测试按钮
+                            //- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button>
                     if thread.toMid === user.uid || thread.mid === user.uid
                       -var text
                       if data.thread.toMid === data.user.uid && data.thread.hideInToMid || data.thread.mid === data.user.uid && data.thread.hideInMid
@@ -307,7 +309,8 @@ block content
           //include interface_forums_list.pug
 
     include debug_output.pug
-    
+    include thread_to_recycle.pug
+    include post_to_recycle.pug
 block scripts
   script(src='/qrcode/build/qrcode.js')
   script(src='/interface_common.js?v=3')

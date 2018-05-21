@@ -899,6 +899,10 @@ const certificates ={
             [name]: '移动贴子',
             [PATCH]: true
           },
+          moveDraft: {
+            [name]: '退回贴子',
+            [PATCH]: true
+          },
           [PATCH]: true
         },
       },

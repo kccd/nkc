@@ -49,6 +49,8 @@
 
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
                 a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
+                a(href=`` onclick=`disablePostClick('${post.pid}')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo") 测试
+                //- a(onclick=`javascript:disablePostClick()`) 测试
 
               - if(post.tlm>post.toc && data.userLevel >= 3)
                 a(href=`/p/${post.pid}/history`) 历史

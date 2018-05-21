@@ -82,6 +82,8 @@ threadRouter
 			PostModel
 		} = db;
 		const thread = await ThreadModel.findOnly({tid});
+		// 被退回的帖子，除了作者本身，其他人不能查看
+		if(thread.recycleMark === true && thread.uid !== ctx.data.user.uid) ctx.throw(403, '该贴已被退回')
 		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
 		let q = {
 			tid: tid

@@ -199,8 +199,13 @@ function assemblePostObject(){  //bbcode , markdown
   return post
 }
 
-function disablePost(pid){
-  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true})
+function disablePostClick(pid){
+  window.localStorage.pid = pid
+  console.log(window.localStorage)
+}
+
+function disablePost(pid,para){
+  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true,para: para})
   .then(function(res){
     screenTopAlert(pid+' 已屏蔽，请刷新')
     //location.reload()
@@ -450,11 +455,12 @@ function askCategoryOfForum(fid){
   })
 }
 
-function moveThread(tid,fid,cid){
+function moveThread(tid,fid,cid,para){
   return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
     tid:tid,
     fid:fid,
     cid:cid,
+    para:para
   })
   .then(function(){
     screenTopAlert('已将帖子 '+tid+' 移动至板块 '+fid+' 分类 '+cid+'下');

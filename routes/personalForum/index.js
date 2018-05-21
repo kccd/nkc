@@ -53,9 +53,17 @@ router
       if(digest){
         $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
       }
-      const posts = await PostModel.find($matchPost.toJS()).sort($sort).skip(page * perpage).limit(perpage);
+      // 过滤退回标记的帖子
+      let posts1 = await PostModel.find($matchPost.toJS()).sort($sort).skip(page * perpage).limit(perpage);
+      let posts = [];
+      for(var i in posts1){
+        var b = await ThreadModel.find({tid: posts1[i].tid,recycleMark: true})
+        if(b.length === 0){
+          posts.push(posts1[i])
+        }
+      }
       await Promise.all(posts.map(async post => {
-      	const thread = await post.extendThread();
+        const thread = await post.extendThread();
         await thread.extendFirstPost();
         await thread.extendLastPost();
         await thread.lastPost.extendUser();
@@ -87,6 +95,8 @@ router
         //if u r not the forum-moderator/moderator, u can't access hide threads
         $matchThread = $matchThread.set('hideInMid', false);
       }
+      // 过滤掉退回标记的帖子
+      $matchThread = $matchThread.set('recycleMark', {"$nin":[true]});
       const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
@@ -217,6 +227,7 @@ router
       const length = await ThreadModel.count($USM);
       data.paging = paging(page, length)
     }
+    // 专栏下的全部
     else if(tab === 'all') {
       let $sort = {};
       if(sortby === 'tlm')
@@ -237,6 +248,9 @@ router
       if(digest) {
         $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
       }
+      // 过滤掉有退回标记的帖子
+      $matchThread = $matchThread.set("recycleMark",{"$nin":[true]})
+      $matchThread = $matchThread.set("fid",{"$nin":["recycle"]})
       const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
@@ -321,11 +335,14 @@ router
         ]);*/
       data.paging = paging(page, length)
     }
+    // 专栏下的置顶
     if(tab === 'all' || tab === 'own' || tab === 'discuss') {
     	data.toppedThreads = [];
     	for(let tid of personalForum.toppedThreads) {
     		const thread = await ThreadModel.findOnly({tid});
-    		if(thread.fid === 'recycle') continue;
+        if(thread.fid === 'recycle') continue;
+        // 过滤掉有退回标记的帖子
+        if(thread.recycleMark && thread.recycleMark === true) continue;
 		    await thread.extendFirstPost().then(async p => {
 			    await p.extendUser();
 			    await p.extendResources();

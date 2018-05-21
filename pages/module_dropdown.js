@@ -207,25 +207,7 @@ function moveThreads(id) {
 }
 
 
-function moveThread(tid,fid,cid, callback){
-	return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
-		tid:tid,
-		fid:fid,
-		cid:cid,
-	})
-		.then(function(){
-			screenTopAlert(tid + ' 已送 ' + fid + (cid?' 的 '+cid:''))
-			if(callback) {
-				callback();
-			}
-		})
-		.catch(function(data){
-			screenTopWarning(data.error || data);
-			// screenTopWarning(tid+ ' 无法送 ' + fid+ (cid?' 的 '+cid:''))
-		})
-}
-
-function moveThreadToRecycle(id) {
+function moveThreadToRecycle(id,para) {
 	var arr = $('input.ThreadCheckboxes');
 	var tid = [];
 	if(id) {
@@ -243,7 +225,7 @@ function moveThreadToRecycle(id) {
 	var fn = function(i) {
 		i++;
 		if(i < tid.length) {
-			moveThread(tid[i], 'recycle', '', fn(i));
+			moveThread(tid[i], 'recycle', '',para, fn(i));
 		}
 	};
 	fn(n);

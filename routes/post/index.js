@@ -87,7 +87,17 @@ postRouter
     page = `?page=${page}`;
     data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
     data.targetUser = targetUser;
-    //帖子曾经在草稿箱中，发表时，删除草稿
+    // 帖子再重新发表时，解除退回的封禁
+    // 删除日志中modifyType改为true
+    let delPostLog = await db.DelPostLogModel.find({"postId":pid,"modifyType":false})
+    for(var i in delPostLog){
+      await delPostLog[i].update({"modifyType":true})
+    }
+    await targetThread.update({"recycleMark":false})
+    // 在post中找到这一条数据，并解除屏蔽
+    let singlePost = await db.PostModel.findOnly({pid})
+    await singlePost.update({disabled:false})
+    // 帖子曾经在草稿箱中，发表时，删除草稿
     await db.DraftModel.remove({"desType":desType,"desTypeId":desTypeId})
     await targetUser.updateUserMessage();
     await next();

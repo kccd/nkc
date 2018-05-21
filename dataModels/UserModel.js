@@ -168,7 +168,7 @@ userSchema.methods.extendThreads = async function() {
 
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = require('./ThreadModel');
-  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
+  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
   threads = await Promise.all(threads.map(async t => {
     await t.extendForum();
     await t.extendFirstPost().then(p => p.extendUser());
