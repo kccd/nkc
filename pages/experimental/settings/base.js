@@ -6,7 +6,8 @@ function submitBase() {
 		copyright: $('#copyright').val(),
 		description: $('#description').val(),
 		keywords: $('#keywords').val(),
-		brief: $('#brief').val()
+		brief: $('#brief').val(),
+		telephone: $('#telephone').val(),
 	};
 	nkcAPI('/e/settings/base', 'PATCH', obj)
 		.then(function() {

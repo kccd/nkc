@@ -55,6 +55,7 @@ mobileRouter
 			newNationCode: nationCode
 		});
 		await userPersonal.update({nationCode, mobile});
+		await user.update({$addToSet: {certs: 'mobile'}});
 		await newSecretBehavior.save();
 		await next();
 	})
@@ -84,6 +85,7 @@ mobileRouter
 			nationCode
 		});
 		await userPersonal.update({nationCode, mobile});
+		await user.update({$addToSet: {certs: 'mobile'}});
 		await newSecretBehavior.save();
 		await next();
 	});

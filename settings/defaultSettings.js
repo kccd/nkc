@@ -50,6 +50,7 @@ module.exports = [
 		type: 'server',
 		websiteName: '科创论坛',
 		serverName: 'nkc $ server',
+		telephone: '028-86691700',
 		port: 9000,
 		httpsPort: 10443,
 		useHttps: false,

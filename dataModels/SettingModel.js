@@ -31,7 +31,8 @@ const settingSchema = new Schema({
     forums: Number,
     fundDocuments: Number,
     drafts: Number,
-	  operationTypes: Number
+	  operationTypes: Number,
+	  problems: Number
   },
 
 	//科创基金设置
@@ -68,6 +69,7 @@ const settingSchema = new Schema({
   		return n.replace('$', global.NKC.NODE_ENV)
 		}
 	},
+	telephone: String,
 	port: Number,
 	httpsPort: Number,
 	useHttps: Boolean,

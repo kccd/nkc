@@ -32,6 +32,14 @@ const certificates ={
       non_images: false
     },
     permittedOperations: {
+    	problem: {
+				[name]: '问题',
+		    add: {
+					[name]: '报告问题',
+			    [GET]: true,
+			    [POST]: true
+		    }
+	    },
       login: {
         [name]: '登录',
         [GET]: true,
@@ -1066,6 +1074,16 @@ const certificates ={
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
+    	problem: {
+    		list: {
+    			[GET]: true,
+			    [parameter]: {
+    				[GET]: true,
+				    [PATCH]: true,
+				    [DELETE]: true
+			    }
+		    }
+	    },
     	system: {
 				[name]: '网站系统',
 		    [GET]: true,

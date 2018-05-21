@@ -10,12 +10,12 @@ baseRouter
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		let {websiteName, github, copyright, record, description, keywords, brief} = body;
+		let {websiteName, github, copyright, record, description, keywords, brief, telephone} = body;
 		if(!websiteName) ctx.throw(400, '网站名不能为空');
 		websiteName = websiteName.trim();
 		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
 		const keywordsArr = keywords.split(',');
-		await serverSettings.update({websiteName, github, copyright, record, description,keywords: keywordsArr, brief});
+		await serverSettings.update({websiteName, github, copyright, record, description,keywords: keywordsArr, brief, telephone});
 		global.NKC.serverSettings = await db.SettingModel.findOnly({type: 'server'});
 		await next();
 	});

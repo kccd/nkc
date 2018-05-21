@@ -157,6 +157,13 @@ operationObj.operationTree = {
 					GET: 'visitGeneralForumSettings',
 					PATCH: 'modifyGeneralForumSettings'
 				}
+			},
+			newSysInfo: {
+				GET: 'visitSystemInfo',
+				POST: 'sendSystemInfo'
+			},
+			log: {
+				GET: 'visitLog'
 			}
 		},
 
@@ -598,8 +605,22 @@ operationObj.operationTree = {
 					}
 				}
 			}
+		},
+		//-------------------------- 报告问题 ------------------------
+		problem: {
+			add: {
+				GET: 'visitAddProblem',
+				POST: 'submitProblem'
+			},
+			list: {
+				GET: 'visitProblemList',
+				PARAMETER: {
+					GET: 'visitProblem',
+					PATCH: 'modifyProblem',
+					DELETE: 'deleteProblem'
+				}
+			}
 		}
-
 	}
 };
 
