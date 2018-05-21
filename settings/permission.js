@@ -32,6 +32,14 @@ const certificates ={
       non_images: false
     },
     permittedOperations: {
+    	problem: {
+				[name]: '问题',
+		    add: {
+					[name]: '报告问题',
+			    [GET]: true,
+			    [POST]: true
+		    }
+	    },
       login: {
         [name]: '登录',
         [GET]: true,
@@ -926,7 +934,7 @@ const certificates ={
         }
       },
     },
-    elseModifyTimeLimit: 20*_year,
+	  elseModifyTimeLimit: 20*_year,
     selfModifyTimeLimit: 20*_year
   },
   senior_moderator: {
@@ -966,9 +974,62 @@ const certificates ={
         }
       },
       e: {
-        forum: {
-          [PATCH]: true,
-        }
+	      settings: {
+        	[name]: '设置',
+        	[GET]: true,
+		      forum: {
+        		[name]: '专业设置',
+			      [GET]: true,
+			      [PATCH]: true
+		      },
+		      base: {
+        		[name]: '基础设置',
+			      [GET]: true,
+			      [PATCH]: true
+		      },
+		      permission: {
+        		[name]: '权限设置',
+			      [GET]: true,
+			      [PATCH]: true
+		      },
+		      role: {
+			      [name]: '角色设置',
+			      [PATCH]: true,
+			      [POST]: true,
+			      [GET]: true,
+			      [parameter]: {
+				      [GET]: true,
+			      	[DELETE]: true,
+			      	users: {
+			      		[GET]: true,
+					      [PATCH]: true
+				      },
+				      base: {
+			      		[GET]: true,
+					      [PATCH]: true
+				      },
+				      permissions: {
+			      		[GET]: true,
+					      [PATCH]: true
+				      }
+			      },
+		      },
+		      operation: {
+        		[name]: '操作权限设置',
+			      [GET]: true,
+			      [PATCH]: true,// 修改操作
+			      [POST]: true,//添加分类
+			      [parameter]: {
+        			[GET]: true,
+				      [PATCH]: true,
+				      [DELETE]: true
+			      }
+		      },
+	      },
+	      status: {
+	      	[name]: '统计',
+		      [GET]: true
+	      }
       },
 	    f: {
 		    [POST]: true, //新建板块
@@ -1013,6 +1074,16 @@ const certificates ={
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
+    	problem: {
+    		list: {
+    			[GET]: true,
+			    [parameter]: {
+    				[GET]: true,
+				    [PATCH]: true,
+				    [DELETE]: true
+			    }
+		    }
+	    },
     	system: {
 				[name]: '网站系统',
 		    [GET]: true,

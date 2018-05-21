@@ -483,7 +483,7 @@ function saveDraft(that){
     };
     var userId = $("#userNowId").html()
     var method = "POST";
-    var url = "/u/"+userId+"/drafts/";
+    var url = "/u/"+userId+"/drafts";
     var data = {post:post};
     return nkcAPI(url, method, data)
       .then(function (result) {

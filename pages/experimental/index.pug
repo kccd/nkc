@@ -1,0 +1,99 @@
+extends ../bootstrap_base
+
+block title
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 管理界面
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        .jumbotron(style='margin-bottom: 1rem;')
+          .h2
+            span.fa.fa-cogs &nbsp;后台管理
+          p 这关系到整个网站，请谨慎操作
+      .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
+        ul.nav.nav-pills
+          li
+            a(href='/e' data-toggle='url') 统计
+          li.dropdown(role='presentation')
+            a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+              span 设置&nbsp;
+              span.fa.fa-caret-down
+            ul.dropdown-menu
+              li
+                a(href='/e/settings/base' data-toggle='url') 基本
+              li
+                a(href='/e/settings/role' data-toggle='url') 角色
+              li
+                a(href='/e/settings/operation' data-toggle='url') 操作
+              li
+                a(href='/e/settings/forum' data-toggle='url') 专业
+              li
+      .col-xs-12.col-md-12
+        .row#content
+          if data.type === 'base'
+            include settings/base
+          else if data.type === 'status'
+            include status/index
+          else if data.type === 'role'
+            include settings/role
+          else if data.type === 'operation'
+            include settings/operation
+          else if data.type === 'forum'
+            include settings/forum
+      if 1
+        .col-xs-12.col-md-12
+          br
+          br
+          .panel.panel-default
+            .panel-body
+              h4 查看
+              a.marginOfA.btn.btn-default(href="/f/recycle") 回收站
+              a.marginOfA.btn.btn-default(href="/f/draft") 草稿版
+              a.marginOfA.btn.btn-default(href='/e/stats') 统计
+              a.marginOfA.btn.btn-default(href='/e/newUsers') 新用户
+              a.marginOfA.btn.btn-default(href='/e/behavior') 积分变动
+              a.marginOfA.btn.btn-default(href='/log') 网站日志
+
+              hr
+              h4 系统
+              a.marginOfA.btn.btn-default(href='/e/newSysinfo') 发新通知
+              a.marginOfA.btn.btn-default(href='/auth') 身份认证审核
+              a.marginOfA.btn.btn-default(href='/problem/list') 问题列表
+              //a.marginOfA.btn.btn-default(href='/settings') 系统设置
+
+              hr
+              h4 科创基金
+              a.marginOfA.btn.btn-default(href='/fund/disabled') 被屏蔽的基金
+              a.marginOfA.btn.btn-default(href='/fund/settings') 科创基金设置
+              hr
+              h4 专业设置
+              button.marginOfA.btn.btn-default(onclick='newForum()') 新建专业
+              br
+              h5 点击交换顺序
+              //.hidden#data= JSON.stringify({forums: data.forums, fidArr: data.forums.map(f => f.fid)})
+              //div#forumsDiv
+              //button.btn.btn-primary(onclick='saveForumsOrder()') 保存
+
+
+
+block scripts
+
+  script(src='/chart.js/dist/Chart.bundle.js')
+  script(src='/react/JSXTransformer.js')
+  script(src='/jquery/jquery.minicolors.js')
+  script(src='/icheck/icheck.js')
+  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
+  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
+  script(src='/interface_common.js')
+  script(src='/experimental/index.js')
+  script(src='/experimental/settings/base.js')
+  script(src='/experimental/settings/role.js')
+  script(src='/experimental/settings/operation.js')
+  script(src='/experimental/settings/forum.js')
+  script(src='/experimental/status/index.js')

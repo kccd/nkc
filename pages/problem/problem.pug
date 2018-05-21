@@ -1,0 +1,22 @@
+extends ../bootstrap_base
+block title
+  -const problem = data.problem;
+  title= problem.t
+  -const hiddenFooter = true;
+block content
+  .container-fluid(style='max-width: 1400px')
+    .col-xs-12.col-md-6
+      h4
+        a(href='/problem/list') <<返回问题列表
+      span=problem.toc.toLocaleString()
+      h4= problem.t
+      p= problem.c
+      if problem.QQ
+        h5=`QQ：${problem.QQ}`
+      if problem.email
+        h5=`email：${problem.email}`
+      if problem.uid
+        a(href=`/u/${problem.uid}`)=`查看报告者`
+block scripts
+  script(src='/interface_common.js')
+  script(src='/problem/add_problem.js')

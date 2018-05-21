@@ -305,6 +305,7 @@ forumRouter
 			}
 		});
 		data.users = [];
+		data.usersId = usersId;
 		data.behaviors = behaviors;
 		for(let uid of usersId) {
 			if(data.users.length < 9) {

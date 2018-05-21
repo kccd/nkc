@@ -824,6 +824,9 @@ function removedraft(uid,did){
     })
 }
 
+
+
+
 // // 去标签+略缩
 // function delCodeAddShrink1(content){
 // 	content = content.replace(/<[^>]+>/g,"");
@@ -833,3 +836,153 @@ function removedraft(uid,did){
 // 	}
 // 	return content
 // }
+
+
+
+function htmlAPI(url, method, data, options) {
+	var id = options.id;
+	//创建进度条
+	createProgressBar();
+	return new Promise(function(resolve, reject) {
+		$.ajax({
+			url: url,
+			dataType: 'json',
+			method: method,
+			headers: {
+				'FROM': 'htmlAPI'
+			},
+			data: data
+		})
+			.done(function(data) {
+				removeProgressBar();
+				$(id).html(data.html);
+				if(data.user) {
+					var newMessage = data.user.newMessage;
+					var count = newMessage.replies + newMessage.message + newMessage.system + newMessage.at;
+					if(count === 0) {
+						$('.newMessage').text('');
+						$('#messageIco').css('display','none');
+					} else {
+						$('.newMessage').text(count);
+						$('#messageIco').css('display','block');
+					}
+					var draftCount = data.user.draftCount;
+					if(draftCount === 0) {
+						$('.draftMessage').text('');
+					} else {
+						$('.draftMessage').text(draftCount);
+					}
+				}
+				return resolve(data);
+			})
+			.fail(function(data) {
+				if(data.status === 0) {
+					removeProgressBar();
+					return screenTopWarning('连接失败');
+				}
+				removeProgressBar();
+				if(typeof data.responseText === 'object') {
+					data = JSON.parse(data.responseText);
+				} else {
+					data = data.responseText;
+				}
+
+				screenTopWarning(data.error || data);
+				return reject(data);
+			})
+	})
+}
+
+function initHtmlAPI(options) {
+
+
+	window.onpopstate = function(event) {
+		var url = event.currentTarget.location.href;
+		htmlAPI(url, 'GET', {}, options)
+	};
+
+
+	if(!window.history || !window.history.pushState) {
+		return;
+	}
+	$('a[data-toggle="url"]').on('click', function(event) {
+		//阻止a标签默认跳转行为
+		event.preventDefault();
+		var url = $(this).attr('href');
+		htmlAPI(url, 'GET', {}, options)
+			.then(function() {
+				history.pushState({},'科创',url);
+			})
+			.catch(function(data) {
+
+			})
+	});
+}
+
+function createProgressBar() {
+// 创建进度条
+	var progressBarArr = $('.progressBar');
+	progressBarArr.parent('div').remove();
+	var progress = newElement('div', {}, {});
+	var progressBar = newElement('div', {
+		'class': 'progressBar progress-bar progress-bar-striped active',
+		'role': 'progressbar',
+		'aria-valuenow': '45',
+		'valuemin': '0',
+		'aria-valuemax': '100'
+	}, {
+		width: '0%'
+	});
+	progress.append(progressBar);
+	$('body').append(progress);
+	progressBar.width('70%');
+}
+
+function removeProgressBar() {
+	var progressBar = $('.progressBar');
+	progressBar.css({
+		'width': '100%',
+		'transition-duration': '0s',
+		'-moz-transition-duration': '0s',
+		'-webkit-transition-duration': '0s',
+		'-o-transition-duration': '0s',
+	});
+	progressBar.fadeOut(500, function() {
+		progressBar.parent('div').remove();
+	});
+}
+
+
+if($('input[data-control="hue"]').length !== 0) {
+	$('input[data-control="hue"]').minicolors({
+
+		control: $(this).attr('data-control') || 'hue',
+
+		defaultValue: $(this).attr('data-defaultValue') || '',
+
+		inline: $(this).attr('data-inline') === 'true',
+
+		letterCase: $(this).attr('data-letterCase') || 'lowercase',
+
+		opacity: $(this).attr('data-opacity'),
+
+		position: $(this).attr('data-position') || 'bottom left',
+
+		change: function(hex, opacity) {
+
+			if( !hex ) return;
+
+			if( opacity ) hex += ', ' + opacity;
+
+			try {
+
+				// console.log(hex);
+
+			} catch(e) {}
+
+		},
+
+		theme: 'bootstrap'
+
+	});
+}

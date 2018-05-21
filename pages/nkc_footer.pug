@@ -10,8 +10,8 @@ if !hiddenFooter
           if data.navbar && data.navbar.highlight === 'latest'
             include nkc_friendlies.pug
         //hr.hrNarrowSpace
-        p #{server.name} &nbsp
-          a(href=`${server.github}`) #{server.github}
-        p #{data?data.site?data.site.copyright:'':''}
-        p.lighttext 蜀ICP备11004945号-2 川公网安备51010802000058号
+        p #{data.serverSettings.serverName} &nbsp
+          a(href=`${data.serverSettings.github}`) #{data.serverSettings.github}
+        p #{data.serverSettings.copyright}
+        p.lighttext= data.serverSettings.record
         br
