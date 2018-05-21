@@ -1,0 +1,17 @@
+extends ../bootstrap_base
+block title
+  title 问题列表
+  -const hiddenFooter = true;
+block content
+  .container-fluid(style='max-width: 1400px')
+    .col-xs-12.col-md-6
+      for problem in data.problems
+        span= `${fromNow(problem.toc)}  `
+        a(href=`/problem/list/${problem._id}`)
+          h4= problem.t
+        br
+      if data.problems.length === 0
+        h4 暂无问题
+block scripts
+  script(src='/interface_common.js')
+  script(src='/problem/add_problem.js')

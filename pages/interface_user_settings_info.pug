@@ -2,6 +2,8 @@ extends bootstrap_base
 block title
   title 基本资料设置
   -const mainContainer1400 = true
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+
 block content
   .container-fluid(style='max-width: 1400px;')
     .row
@@ -40,11 +42,12 @@ block content
               .form-group
                 label.col-sm-2.control-label 文章背景颜色：
                 .col-sm-5
-                  input.form-control#color(placeholder='默认：#e4e4e4' value=data.user.color || '')
+                  input.form-control#color(type='text' placeholder='默认：#e4e4e4' value=data.user.color || '' data-control='hue')
 
               .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submit(${data.user.uid}, "${data.user.username}")`) 保存
 block scripts
+  script(src='/jquery/jquery.minicolors.js')
   script(src='/interface_common.js')
   script(src='/interface_user_settings_info.js')

@@ -30,7 +30,9 @@ const settingSchema = new Schema({
 	  photos: Number,
     forums: Number,
     fundDocuments: Number,
-    drafts: Number
+    drafts: Number,
+	  operationTypes: Number,
+	  problems: Number
   },
 
 	//科创基金设置
@@ -56,7 +58,30 @@ const settingSchema = new Schema({
 	//科创币
 	//-------------------------------------
 	defaultUid: String,
-	changeUsername: Number
+	changeUsername: Number,
+
+	//网站设置
+	//-------------------------------------
+	websiteName: String,
+	serverName: {
+  	type: String,
+		get: function(n) {
+  		return n.replace('$', global.NKC.NODE_ENV)
+		}
+	},
+	telephone: String,
+	port: Number,
+	httpsPort: Number,
+	useHttps: Boolean,
+	databaseName: String,
+	address: String,
+	github: String,
+	copyright: String,
+	record: String,
+	// description: String,
+	keywords: [String],
+	brief: String,
+	language: String
 },
 {toObject: {
   getters: true,

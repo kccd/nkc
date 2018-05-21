@@ -2,6 +2,9 @@ const db = require('../dataModels');
 
 module.exports = async (ctx, next) => {
   //cookie identification
+	const {data, db} = ctx;
+	const visitorRole = await db.RoleModel.findOnly({_id: 'visitor'});
+	data.userOperations = visitorRole.operationsId;
   const userInfo = ctx.cookies.get('userInfo');
   if(!userInfo) {
     await next();
@@ -28,11 +31,27 @@ module.exports = async (ctx, next) => {
     		user.certs.splice(index, 1);
 	    }
     }
-    if(user.certs.includes('banned')) user.certs = ['banned'];
     user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     user.draftCount = await db.DraftModel.count({uid: user.uid});
-    ctx.data.user = user;
+    data.user = user;
+	  let userOperations = [];
+	  if(user.certs.includes('banned')) {
+	  	user.certs = ['banned'];
+	  } else {
+		  const defaultRole = await db.RoleModel.findOnly({_id: 'default'});
+		  userOperations = defaultRole.operationsId;
+	  }
+    await Promise.all(user.certs.map(async cert => {
+			const role = await db.RoleModel.findOne({_id: cert});
+			if(!role) return;
+			for(let operation of role.operationsId) {
+				if(!userOperations.includes(operation)) {
+					userOperations.push(operation);
+				}
+			}
+    }));
+    data.userOperations = userOperations;
     await next();
   }
 };

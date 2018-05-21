@@ -112,13 +112,38 @@ userSchema.pre('save', function(next) {
   }
 });
 
+userSchema.virtual('operations')
+	.get(function() {
+		return this._operations;
+	})
+	.set(function(operations) {
+		this._operations = operations;
+	});
+
+
 userSchema.virtual('regPort')
-  .get(function() {
-    return this._regPort;
-  })
-  .set(function(p) {
-    this._regPort = p;
-  });
+	.get(function() {
+		return this._regPort;
+	})
+	.set(function(p) {
+		this._regPort = p;
+	});
+
+userSchema.virtual('draftCount')
+	.get(function() {
+		return this._draftCount;
+	})
+	.set(function(draftCount) {
+		this._draftCount = draftCount;
+	});
+
+userSchema.virtual('subscribeUsers')
+	.get(function() {
+		return this._subscribeUsers;
+	})
+	.set(function(subscribeUsers) {
+		this._subscribeUsers = subscribeUsers;
+	});
 
 userSchema.virtual('regIP')
   .get(function() {
@@ -153,12 +178,20 @@ userSchema.virtual('group')
   });
 
 userSchema.virtual('threads')
-  .get(function() {
-    return this._threads;
-  })
-  .set(function(t) {
-    this._threads = t;
-  });
+	.get(function() {
+		return this._threads;
+	})
+	.set(function(t) {
+		this._threads = t;
+	});
+
+userSchema.virtual('newMessage')
+	.get(function() {
+		return this._newMessage;
+	})
+	.set(function(newMessage) {
+		this._newMessage = newMessage;
+	});
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = require('./ThreadModel');

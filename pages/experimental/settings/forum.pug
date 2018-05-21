@@ -1,0 +1,6 @@
+.col-xs-12.col-md-12
+  h4 点击交换位置
+  div(style='padding: 0.5rem;border: 1px solid #eee;margin: 2rem 0;')
+    .hidden#data= JSON.stringify({forums: data.forums, fidArr: data.forums.map(f => f.fid)})
+    div#forumsDiv
+  button.btn.btn-primary(onclick='saveForumsOrder()') 保存

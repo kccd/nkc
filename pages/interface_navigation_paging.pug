@@ -4,6 +4,8 @@
 - var sortby = data.sortby
 - var tab = data.tab
 - var content = data.content
+- var r = data.r
+- var t = data.t
 if paging
   - var pagingarray = []
   - var pageCount = paging.pageCount
@@ -25,13 +27,13 @@ if paging
     ul.pagination.NavigationPaging
       if start>0
         li()
-          a(href=`${toQueryString({page:0,cat,digest,sortby,tab, content, type, q})}`) 始
+          a(href=`${toQueryString({page:0,cat,digest,sortby,tab, content, type, q, role, r})}`) 始
     
       each pagenum,index in pagingarray
         - var class_str = pagenum==paging.page?'active':''
         
         li(class=`${class_str}`)
-          a(href=`${toQueryString({page:pagenum,cat,digest,sortby,tab, content, type, q})}`) #{pagenum + 1}
+          a(href=`${toQueryString({page:pagenum,cat,digest,sortby,tab, content, type, q, role, r})}`) #{pagenum + 1}
       if end<pageCount
         li()
-          a(href=`${toQueryString({page:pageCount-1,cat,digest,sortby,tab, content, type, q})}`) 末
+          a(href=`${toQueryString({page:pageCount-1,cat,digest,sortby,tab, content, type, q, role, r})}`) 末

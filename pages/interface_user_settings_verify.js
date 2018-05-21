@@ -10,7 +10,7 @@ function initEvent(elementId) {
 		var formData = new FormData();
 		formData.append('file', file);
 		formData.append('photoType', elementId);
-		postUpload('/photo/', formData, function() {
+		postUpload('/photo', formData, function() {
 			window.location.reload();
 		});
 	});

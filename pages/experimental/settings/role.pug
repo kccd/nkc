@@ -1,0 +1,141 @@
+-let defaultRoleDisplayName = '默认用户';
+.col-xs-12.col-sm-2.col-md-2(style='margin-bottom: 1rem;')
+  h4.text-center 默认角色
+  .list-group
+    for role in data.defaultRoles
+      if role._id === 'default'
+        -defaultRoleDisplayName = role.displayName;
+      a.list-group-item(href=`/e/settings/role/${role._id}/${data.t}` type="button" class=data.role._id === role._id ? 'active' : '')= role.displayName
+        if role.userCount > 0
+          span.badge(style=`background-color: ${role.color};color: #ffffff;`)= role.userCount
+  h4.text-center 自定义角色
+  h5.text-center(style='color: #aaaaaa;')=`基于${defaultRoleDisplayName}`
+  .list-group
+    for role in data.roles
+      a.list-group-item(href=`/e/settings/role/${role._id}/${data.t}` type="button" class=data.role._id === role._id ? 'active' : '')= role.displayName
+        if role.userCount > 0
+          span.badge(style=`background-color: ${role.color};color: #ffffff;`)= role.userCount
+  button.btn.btn-default.btn-block(onclick='newRole()') 新建角色
+  if !data.role.defaultRole
+    button.btn.btn-danger.btn-block(onclick=`deleteRole("${data.role._id}")`) 删除当前角色
+.col-xs-12.col-sm-10.col-md-10
+  .row
+    .col-xs-12.col-md-12
+      ul.nav.nav-pills
+        li(role='presentation' class=data.t==='users'?'active':'')
+          a(href=`/e/settings/role/${data.role._id}/users`) 用户
+        li(role='presentation' class=data.t==='base'?'active':'')
+          a(href=`/e/settings/role/${data.role._id}/base`) 基本设置
+        li(role='presentation' class=data.t==='permissions'?'active':'')
+          a(href=`/e/settings/role/${data.role._id}/permissions`) 权限设置
+    .col-xs-12.col-md-12
+      if data.t === 'users'
+        br
+        //.form-inline(style='margin: 1rem 0')
+        //  .form-group
+        //    input.form-control(type='text' placeholder='用户名、uid')
+        //  .form-group
+        //    button.btn.btn-default 搜索
+        if !data.users || data.users.length === 0
+          div.text-center(style='padding: 3rem;font-size: 2rem;color: #aaa;') 暂无用户
+        else
+          include ../../interface_navigation_paging
+          table.table.table-hover
+            thead
+              tr
+                th 用户名
+                th 文章
+                th 回复
+                th 注册时间
+                th
+            tbody
+              for user in data.users
+                tr
+                  th
+                    img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                    a(href=`/u/${user.uid}`)= user.username
+                  th= user.threadCount
+                  th= user.postCount
+                  th= fromNow(user.toc)
+                  th
+                    if data.role._id !== 'default'
+                      if data.role._id === 'banned'
+                        button(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
+                      else
+                        button 移除
+          include ../../interface_navigation_paging
+      else if data.t === 'base'
+        .row
+          .col-xs-12.col-md-10
+            br
+            .form-horizontal
+              -const {displayName, abbr, description, color, modifyPostTimeLimit} = data.role;
+              .form-group
+                label.col-sm-2.control-label 角色名称
+                .col-sm-8
+                  input.form-control#displayName(type='text' value=displayName)
+              .form-group
+                label.col-sm-2.control-label 角色简称
+                .col-sm-8
+                  input.form-control#abbr(type='text' value=abbr)
+              .form-group
+                label.col-sm-2.control-label 颜色
+                .col-sm-8
+                  input.form-control.demo#color(type='text' value=color || '' data-control='hue')
+              .form-group
+                label.col-sm-2.control-label 角色介绍
+                .col-sm-8
+                  textarea.form-control#description(rows=5)= description
+              .form-group
+                label.col-sm-2.control-label 修改post时间限制
+                .col-sm-8
+                  .text-danger -1表示无限制（0.5：只能修改0.5小时以内发表的post）
+                  input.form-control#modifyPostTimeLimit(type='number' value=modifyPostTimeLimit)
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-5
+                  button.btn.btn-primary(onclick=`submitRoleBase("${data.role._id}")`) 保存
+      else if data.t === 'permissions'
+        .form-inline
+          span.operation-type-span 全部
+          for operationType in data.operationTypes
+            span.operation-type-span(data-operation-type=operationType._id)= operationType.displayName
+        #operationsDiv(style='display:none;border: 1px solid #aaaaaa;padding: 0.5rem;margin: 1rem 0;')
+          button.btn.btn-default(onclick='selectAll()') 全选/取消
+          table.table.table-hover
+            thead
+              tr
+                th 序号
+                th 操作名
+                th 操作介绍
+                th 错误提示
+            tbody
+        table.table.table-hover
+          thead
+            tr
+              th 序号
+              th 操作名
+              th 操作介绍
+              th 错误提示
+          tbody
+            -let n = 0;
+            -const defaultRole = data.defaultRoles.filter(role => role._id === 'default')[0];
+            .hidden#data= JSON.stringify({operations: data.operations,defaultOperationsId: defaultRole.operationsId})
+            for operation in data.operations
+              -n++;
+              tr
+                th= n
+                th= operation._id
+                th= operation.description
+                th= operation.errInfo
+                th
+                  label
+                    .icheckbox
+                      if !data.role.defaultRole && defaultRole.operationsId.includes(operation._id)
+                        input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true' disabled)
+                      else
+                        if data.role.operationsId.includes(operation._id)
+                          input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true')
+                        else
+                          input(type='checkbox' name='selectOperation' data-operation=operation._id )
+        button.btn.btn-primary(onclick=`submitRolePermissions("${data.role._id}")`) 保存

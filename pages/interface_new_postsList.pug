@@ -9,9 +9,9 @@
           img(src=`/avatar_small/${thread.thread.uid}`)
       span
         a(href=`/m/${thread.thread.uid}`)= thread.thread.user.username
-      span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
+      span.new-content-forumAbbr(style=`background-color:${parentForum?parentForum.color:''};`)
         a(href=`/f/${parentForum.fid}`)= parentForum.displayName
-      span.new-content-forumAbbr(style=`background-color:${childrenForum.color};`)
+      span.new-content-forumAbbr(style=`background-color:${childrenForum?childrenForum.color:''};`)
         a(href=`/f/${childrenForum.fid}`)= childrenForum.abbr
       span.icon-font=fromNow(thread.thread.toc)
       if thread.thread
@@ -45,7 +45,9 @@
       //    img(src=`/avatar_small/${targetUser.uid}`)
       //span
       //  a(href=`/m/${targetUser.uid}`)= targetUser.username
-      span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
+      -parentForum = parentForum || {};
+      -childrenForum = childrenForum || {}
+      span.new-content-forumAbbr(style=`background-color:${parentForum?parentForum.color:''};`)
         a(href=`/f/${parentForum.fid}`)= parentForum.displayName
       span.new-content-forumAbbr(style=`background-color:${childrenForum.color};`)
         a(href=`/f/${childrenForum.fid}`)= childrenForum.abbr
