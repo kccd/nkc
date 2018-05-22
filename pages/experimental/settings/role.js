@@ -5,6 +5,11 @@ if(data) {
 	defaultOperationsId = data.defaultOperationsId;
 	operations = data.operations;
 }
+
+$('input[name="selectOperation"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+});
+
 function submitRoleBase(id) {
 	var obj = {
 		displayName: $('#displayName').val(),
