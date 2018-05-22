@@ -1,39 +1,59 @@
--const {telephone, websiteName, github, copyright, record, description, keywords, brief} = data.serverSettings || {};
-.form-horizontal
-  .form-group
-    label.col-sm-2.control-label 网站名
-    .col-sm-8
-      input.form-control#websiteName(type='text' value=websiteName)
-  .form-group
-    label.col-sm-2.control-label github
-    .col-sm-8
-      input.form-control#github(type='text' value=github)
-  .form-group
-    label.col-sm-2.control-label 电话号码
-    .col-sm-8
-      input.form-control#telephone(type='text' value=telephone)
-  .form-group
-    label.col-sm-2.control-label 版权信息
-    .col-sm-8
-      input.form-control#copyright(type='text' value=copyright)
-  .form-group
-    label.col-sm-2.control-label 备案信息
-    .col-sm-8
-      textarea.form-control#record(rows=5)= record
-  .form-group
-    label.col-sm-2.control-label 网站简介
-    .col-sm-8
-      textarea.form-control#brief(rows=3)= brief
-  .form-group
-    label.col-sm-2.control-label 网站介绍
-    .col-sm-8
-      textarea.form-control#description(rows=5)= description
-  .form-group
-    label.col-sm-2.control-label 关键词
-    .col-sm-8
-      .text-danger 英文逗号 , 分隔
-      textarea.form-control#keywords(rows=5)= keywords?keywords.join(','):''
-  .form-group
-    label.col-sm-2.control-label
-    .col-sm-8
-      button.btn.btn-primary(onclick='submitBase()') 保存
+extends ../../bootstrap_base
+
+block title
+  -const hiddenFooter = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 网站基本设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          -const {telephone, websiteName, github, copyright, record, description, keywords, brief} = data.serverSettings || {};
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 网站名
+              .col-sm-8
+                input.form-control#websiteName(type='text' value=websiteName)
+            .form-group
+              label.col-sm-2.control-label github
+              .col-sm-8
+                input.form-control#github(type='text' value=github)
+            .form-group
+              label.col-sm-2.control-label 电话号码
+              .col-sm-8
+                input.form-control#telephone(type='text' value=telephone)
+            .form-group
+              label.col-sm-2.control-label 版权信息
+              .col-sm-8
+                input.form-control#copyright(type='text' value=copyright)
+            .form-group
+              label.col-sm-2.control-label 备案信息
+              .col-sm-8
+                textarea.form-control#record(rows=5)= record
+            .form-group
+              label.col-sm-2.control-label 网站简介
+              .col-sm-8
+                textarea.form-control#brief(rows=3)= brief
+            .form-group
+              label.col-sm-2.control-label 网站介绍
+              .col-sm-8
+                textarea.form-control#description(rows=5)= description
+            .form-group
+              label.col-sm-2.control-label 关键词
+              .col-sm-8
+                .text-danger 英文逗号 , 分隔
+                textarea.form-control#keywords(rows=5)= keywords ? keywords.join(',') : ''
+            .form-group
+              label.col-sm-2.control-label
+              .col-sm-8
+                button.btn.btn-primary(onclick='submitBase()') 保存
+
+
+
+block scripts
+
+  script(src='/interface_common.js')
+  script(src='/experimental/settings/base.js')

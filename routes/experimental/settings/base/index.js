@@ -4,8 +4,7 @@ baseRouter
 	.get('/', async (ctx, next) => {
 		const {data} = ctx;
 		data.type = 'base';
-		ctx.template = 'experimental/index.pug';
-		ctx.localTemplate = 'experimental/settings/base.pug';
+		ctx.template = 'experimental/settings/base.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

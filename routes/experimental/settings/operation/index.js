@@ -3,7 +3,7 @@ const operationRouter = new Router();
 operationRouter
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		ctx.localTemplate = 'experimental/settings/operation.pug';
+		ctx.template = 'experimental/settings/operation.pug';
 		const operationTypes = await db.OperationTypeModel.find().sort({toc: 1});
 		data.operationTypes = await Promise.all(operationTypes.map(async type => {
 			await type.extendOperationCount();

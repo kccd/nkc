@@ -57,7 +57,7 @@ roleRouter
 			await role.extendUserCount();
 			return role;
 		}));
-		ctx.localTemplate = 'experimental/settings/role.pug';
+		ctx.template = 'experimental/settings/role.pug';
 		await next();
 	})
 	.use('/:_id/base', baseRouter.routes(), baseRouter.allowedMethods())

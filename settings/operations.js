@@ -153,6 +153,13 @@ operationObj.operationTree = {
 						DELETE: 'deleteOperationType'
 					}
 				},
+				user: {
+					GET: 'visitEUserSettings',
+					PARAMETER: {
+						GET: 'visitEUserInfo',
+						PATCH: 'modifyEUserInfo'
+					}
+				},
 				forum: {
 					GET: 'visitGeneralForumSettings',
 					PATCH: 'modifyGeneralForumSettings'

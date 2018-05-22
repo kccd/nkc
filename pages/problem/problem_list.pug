@@ -5,6 +5,8 @@ block title
 block content
   .container-fluid(style='max-width: 1400px')
     .col-xs-12.col-md-6
+      include ../interface_navigation_paging
+      br
       for problem in data.problems
         span= `${fromNow(problem.toc)}  `
         a(href=`/problem/list/${problem._id}`)

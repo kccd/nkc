@@ -5,6 +5,9 @@ if(data) {
 	types = data.types;
 }
 
+$('input[name="selectOperation"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+});
 
 function getIdByDisplayName(name) {
 	for(var i = 0; i < types.length; i++) {

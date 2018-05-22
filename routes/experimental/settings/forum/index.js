@@ -5,7 +5,7 @@ router
 		const {data, db} = ctx;
 		data.forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
 		data.type = 'forum';
-		ctx.localTemplate = 'experimental/settings/forum.pug';
+		ctx.template = 'experimental/settings/forum.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

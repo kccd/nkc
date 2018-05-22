@@ -11,10 +11,6 @@ let tlv = 0;
 let buffer = [];
 
 experimentalRouter
-	.use('/', async (ctx, next) => {
-		ctx.template = 'experimental/index.pug';
-		await next();
-	})
   .get('/', async (ctx, next) => {
   	return ctx.redirect('/e/status');
   })
