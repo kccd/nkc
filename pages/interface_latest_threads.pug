@@ -22,7 +22,10 @@ block content
         //    a(style='margin: 2px 5px; color: #909090;' href=`/f/${cForum.fid}`) #{cForum.displayName}
         include module_forums_panel
         .panel
-          a.btn(href='/editor' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
+          if data.user
+            a.btn(href='/editor' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
+          else
+            a.btn(href='/login' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
           nav
             include interface_navigation_paging.pug
 

@@ -10,7 +10,9 @@ const operationObj = {};
 
 // 默认操作类型
 const defaultOperations = [
-	'displayExperimentalLink'
+	'displayExperimentalLink',
+	'displayQuestionsLink',
+
 ];
 
 
