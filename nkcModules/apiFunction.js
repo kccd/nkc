@@ -17,7 +17,7 @@ fn.getQueryObj = (query, match) => {
   const {digest, cat, sortby, page = 0} = query;
   const $match = Object.assign({}, match);
   if(cat)
-    $match.cid = cat;
+    // $match.cid = cat;
   if(digest)
     $match.digest = true;
   const $sort = {};

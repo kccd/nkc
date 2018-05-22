@@ -1029,6 +1029,14 @@ const certificates ={
 				      [DELETE]: true
 			      }
 		      },
+		      user: {
+        		[name]: '用户设置',
+			      [GET]: true,
+			      [parameter]: {
+        			[GET]: true,
+				      [PATCH]: true
+			      }
+		      }
 	      },
 	      status: {
 	      	[name]: '统计',

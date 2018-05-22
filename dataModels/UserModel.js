@@ -154,20 +154,36 @@ userSchema.virtual('regIP')
   });
 
 userSchema.virtual('mobile')
-  .get(function() {
-    return this._mobile;
-  })
-  .set(function(m) {
-    this._mobile = m;
-  });
+	.get(function() {
+		return this._mobile;
+	})
+	.set(function(m) {
+		this._mobile = m;
+	});
+
+userSchema.virtual('nationCode')
+	.get(function() {
+		return this._nationCode;
+	})
+	.set(function(m) {
+		this._nationCode = m;
+	});
 
 userSchema.virtual('email')
-  .get(function() {
-    return this._email;
-  })  
-  .set(function(e) {
-    this._email = e;
-  });
+	.get(function() {
+		return this._email;
+	})
+	.set(function(e) {
+		this._email = e;
+	});
+
+userSchema.virtual('roles')
+	.get(function() {
+		return this._roles;
+	})
+	.set(function(e) {
+		this._roles = e;
+	});
 
 userSchema.virtual('group')
   .get(function() {
@@ -217,7 +233,18 @@ userSchema.methods.extend = async function() {
   this.regPort = userPersonal.regPort;
   this.regIP = userPersonal.regIP;
   this.mobile = userPersonal.mobile;
+  this.nationCode = userPersonal.nationCode;
   this.email = userPersonal.email;
+};
+
+userSchema.methods.extendRoles = async function() {
+	const RoleModel = mongoose.model('roles');
+	const roles = [];
+	for(let cert of this.certs) {
+		const role = await RoleModel.findOne({_id: cert});
+		if(role) roles.push(role);
+	}
+	return this.roles = roles;
 };
 
 userSchema.methods.updateUserMessage = async function() {

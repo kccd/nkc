@@ -53,7 +53,7 @@ block content
                         -for(let n of notPass)
                           span.redFontColor!=`${n.ch}&nbsp;`
                       h4 您可以
-                        a(href='/me/settings?type=photo')= ` 点我 `
+                        a(href=`/u/${data.user.uid}/settings`)= ` 点我 `
                         span 去完善资料，或
                         a(href=`javascript: disagree(${_id})`)=` 点我 `
                         span 拒绝

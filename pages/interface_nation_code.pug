@@ -218,6 +218,9 @@
     {"location":"Saint Kitts and Nevis","chineseName":"圣基茨和尼维斯","abbr":"KN","code":"1869","unitPrice":"0.0947 "},
     {"location":"Jamaica","chineseName":"牙买加","abbr":"JM","code":"1876","unitPrice":"0.0374 "}
   ];
-select.form-control(onchange='chooseCountryNum(this.value)')
+select.form-control#nationCodeSelect(onchange='chooseCountryNum(this.value)')
   -for(var i = 0; i < countryArr.length; i++)
-    option #{countryArr[i].code}&nbsp;&nbsp;#{countryArr[i].chineseName}
+    if selectedNationCode && selectedNationCode === countryArr[i].code
+      option(selected=true) #{countryArr[i].code}&nbsp;&nbsp;#{countryArr[i].chineseName}
+    else
+      option #{countryArr[i].code}&nbsp;&nbsp;#{countryArr[i].chineseName}

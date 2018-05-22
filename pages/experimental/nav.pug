@@ -1,0 +1,25 @@
+.col-xs-12.col-md-12
+  .jumbotron(style='margin-bottom: 1rem;')
+    .h2
+      span.fa.fa-cogs &nbsp;后台管理
+    p 这关系到整个网站，请谨慎操作
+.col-xs-12.col-md-12(style='margin-bottom: 1rem;')
+  ul.nav.nav-pills
+    li
+      a(href='/e' data-toggle='url') 统计
+    li.dropdown(role='presentation')
+      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+        span 设置&nbsp;
+        span.fa.fa-caret-down
+      ul.dropdown-menu
+        li
+          a(href='/e/settings/base' data-toggle='url') 基本
+        li
+          a(href='/e/settings/role' data-toggle='url') 角色
+        li
+          a(href='/e/settings/operation' data-toggle='url') 操作
+        li
+          a(href='/e/settings/user' data-toggle='url') 用户
+        li
+          a(href='/e/settings/forum' data-toggle='url') 专业
+        li
