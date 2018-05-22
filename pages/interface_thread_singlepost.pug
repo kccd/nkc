@@ -3,8 +3,7 @@
 -const disablePost = data.userLevel >= 4
 -const highlight = data.highlight;
 
-
-  if (!post.disabled || disablePost)
+  if (!post.disabled || disablePost || data.user.uid === post.uid)
     //horizontal line
     hr(id=`p${post.pid}`).ThreadSinglePostHr
     //meta(id=`${post.pid}'`)
@@ -72,7 +71,8 @@
               if data.paging
                 -var floornumber = data.paging.start+index
                 a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}楼
-              .clearfix
+      if post.todraft === true
+        div.clearfix(style='background:#FF6600;text-align:center') 此回复已被屏蔽，请作者点击编辑按钮修改
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       -post.c = hideContentByUser(post.c, data.user, 'thread')

@@ -242,7 +242,7 @@ operationRouter
 			const delLog = new db.DelPostLogModel(para);
 			await delLog.save();
 		}
-		if(para.noticeType === true){
+		if(para && para.noticeType === true){
 			let uid = targetThread.uid;
 			const toUser = await db.UsersPersonalModel.findOnly({uid});
 			await toUser.increasePsnl('system', 1);
