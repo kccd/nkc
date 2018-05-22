@@ -49,6 +49,7 @@ smsRouter
     data.docs = ats;
     data.paging = paging;
     data.tab = 'at';
+    console.log(data)
     ctx.template = 'interface_messages.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     await userPersonal.increasePsnl('at');
@@ -182,7 +183,29 @@ smsRouter
   .get('/system', async (ctx, next) => {
     const {data, db} = ctx;
     const page = ctx.query.page || 0;
-    const systemMessages = await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
+    const {user} = data;
+    // 根据uid取出删帖日志
+    const delPostMessage = await db.DelPostLogModel.find({"delUserId":user.uid,"noticeType":true}).sort({toc: -1});
+    // console.log(delPostMessage)
+    // 检测并处理退修超时
+    for(var i in delPostMessage){
+      let thread = await db.ThreadModel.findOne({"tid":delPostMessage[i].threadId})
+      let sysTimeStamp = new Date(delPostMessage[i].toc).getTime()
+      let nowTimeStamp = new Date().getTime()
+      let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
+      let hourTimeStamp = 3600000 * 72;
+      let lastTimestamp = parseInt(new Date(delPostMessage[i].toc).getTime()) + hourTimeStamp;
+      delPostMessage[i].lastTime = new Date(lastTimestamp)
+      // 退修转删除三个必要条件
+      // 1.未修改
+      // 2.delType为退修
+      // 3.超时
+      if(delPostMessage[i].modifyType === false && delPostMessage[i].delType === "toDraft" && diffTimeStamp > hourTimeStamp){
+        await thread.update({"recycleMark":false,fid:"recycle"})
+      }
+    }
+    const systemMessage= await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
+    const systemMessages = systemMessage.concat(delPostMessage)
     const paging = apiFn.paging(page, systemMessages.length);
     const start = paging.start;
     systemMessageArr = systemMessages.slice(start, start + perpage);
@@ -190,6 +213,8 @@ smsRouter
     data.paging = paging;
     data.tab = 'system';
     ctx.template = 'interface_messages.pug';
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    await userPersonal.increasePsnl('system');
     await next();
   })
   .get('/system/:sid', async (ctx, next) => {

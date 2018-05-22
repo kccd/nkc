@@ -8,6 +8,7 @@ collectionsRouter
     const {db, data} = ctx;
     const {category} = ctx.params;
     const user = data;
+    const {ThreadModel} = db;
     const targetUserUid = ctx.params.uid;
     let targetUser = {};
     if(user && user.uid === targetUserUid) {
@@ -32,7 +33,15 @@ collectionsRouter
     };
     let collectionCount = await db.CollectionModel.count(queryDate);
     if(collectionCount <= 0) queryDate.category = categoryNames[0];
-    const categoryCollection = await db.CollectionModel.find(queryDate).sort({toc: -1});
+    // 过滤掉有退回标记的帖子
+    let categoryCollection1 = await db.CollectionModel.find(queryDate).sort({toc: -1});
+    let categoryCollection = [];
+    for(var i in categoryCollection1){
+      var b = await ThreadModel.find({tid: categoryCollection1[i].tid,recycleMark: true})
+      if(b.length === 0){
+        categoryCollection.push(categoryCollection1[i])
+      }
+    }
     await Promise.all(categoryCollection.map(async c => {
     	await c.extendThread().then(t => t.extendForum()).then(f => f.extendParentForum());
     }));

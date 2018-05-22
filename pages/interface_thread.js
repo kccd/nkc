@@ -182,7 +182,6 @@ function assemblePostObject(){  //bbcode , markdown
     c: replyContent,
     l:"html",
   }
-
   if(geid('ParseURL').checked){
     if(post.l=='markdown'){
       post.c = common.URLifyMarkdown(post.c)
@@ -194,15 +193,21 @@ function assemblePostObject(){  //bbcode , markdown
       post.c = common.URLifyHTML(post.c)
     }
   }
+  // return console.log(post.c)
   post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')
 
   return post
 }
 
-function disablePost(pid){
-  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true})
+function disablePostClick(pid){
+  window.localStorage.pid = pid
+  console.log(window.localStorage)
+}
+
+function disablePost(pid,para){
+  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true,para: para})
   .then(function(res){
-    screenTopAlert(pid+' 已屏蔽，请刷新')
+    screenTopAlert(pid+' 已屏蔽，请等待刷新')
     //location.reload()
   })
   .catch(function(data) {
@@ -450,11 +455,12 @@ function askCategoryOfForum(fid){
   })
 }
 
-function moveThread(tid,fid,cid){
+function moveThread(tid,fid,cid,para){
   return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
     tid:tid,
     fid:fid,
     cid:cid,
+    para:para
   })
   .then(function(){
     screenTopAlert('已将帖子 '+tid+' 移动至板块 '+fid+' 分类 '+cid+'下');

@@ -6,6 +6,7 @@ router
     const {disabled} = ctx.body;
     const {pid} = ctx.params;
     const {db, data} = ctx;
+		const {user} = data;
     if(disabled === undefined) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
@@ -36,6 +37,23 @@ router
       mid: targetThread.mid
     });
     await targetThread.updateThreadMessage();
+    // 删除回复 添加日志
+    if(disabled === true){
+      let {para} = ctx.body
+      let post = await db.PostModel.findOne({"pid":pid})
+			let oc = targetThread.oc;
+			let postFirst = await db.PostModel.findOne({"pid":oc})
+      para.delUserId = targetPost.uid
+      para.userId = user.uid;
+      para.delPostTitle = postFirst.t;
+      const delLog = new db.DelPostLogModel(para);
+      await delLog.save();
+      if(para.noticeType === true){
+        let uid = targetPost.uid;
+        const toUser = await db.UsersPersonalModel.findOnly({uid});
+        await toUser.increasePsnl('system', 1);
+      }
+    }
     await next();
   });
 

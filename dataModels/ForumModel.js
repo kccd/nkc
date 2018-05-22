@@ -283,7 +283,20 @@ forumSchema.methods.getToppedThreads = async function(ctx) {
 	const ThreadModel = mongoose.model('threads');
 	/*const childrenFid = await ForumModel.getFidOfCanGetThreads(ctx, this.fid);
 	childrenFid.push(this.fid);*/
-	const threads = await ThreadModel.find({fid: this.fid, topped: true}).sort({tlm: -1});
+	let match = {
+		fid: this.fid,
+		topped: true,
+	}	// 过滤掉退回标记的帖子
+	// match.recycleMark = {"$nin":[true]}
+	// const threads = await ThreadModel.find(match).sort({tlm: -1});
+	let threads1 = await ThreadModel.find(match).sort({tlm: -1});
+	let threads = [];
+	for(var i in threads1){
+		if(threads1[i].uid !== ctx.data.user.uid && threads1[i].recycleMark === true){
+			continue;
+		}
+		threads.push(threads1[i])
+	}
 	await Promise.all(threads.map(async thread => {
 		await thread.extendForum();
 		await thread.forum.extendParentForum();
@@ -507,9 +520,28 @@ forumSchema.methods.getThreadsByQuery = async function(ctx, query) {
 	const ThreadModel = mongoose.model('threads');
 	const fidOfCanGetThreads = await ForumModel.getFidOfCanGetThreads(ctx, this.fid);
 	fidOfCanGetThreads.push(this.fid);
-	const {match, limit, sort, skip} = query;
+	let {match, limit, sort, skip} = query;
 	match.fid = {$in: fidOfCanGetThreads};
-	const threads = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
+	// // 过滤掉退回标记的帖子
+	// match.recycleMark = {"$nin":[true]}
+	// const threads = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
+	let threads1 = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
+	let threads = [];
+	if(ctx.data.userLevel === 0){
+		for(var i in threads1){
+			if(threads1[i].recycleMark === true){
+				continue;
+			}
+			threads.push(threads1[i])
+		}
+	}else{
+		for(var i in threads1){
+			if(threads1[i].uid !== ctx.data.user.uid && threads1[i].recycleMark === true){
+				continue;
+			}
+			threads.push(threads1[i])
+		}
+	}
 	await Promise.all(threads.map(async thread => {
 		await thread.extendFirstPost().then(p => p.extendUser());
 		if(thread.lm) {

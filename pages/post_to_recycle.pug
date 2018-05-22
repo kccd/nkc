@@ -1,0 +1,25 @@
+div#postRecycleModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel")
+  div.modal-dialog(role="document")
+    .modal-content
+      .modal-header
+        button.close(type="button" data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        h4#exampleModalLabel.modal-title 回复屏蔽
+      .modal-body
+        form
+          .form-group
+            label.control-label 回复屏蔽方式
+          .form-group
+            .choose-content-div1(id="toDraft" onclick="clickMethod1(this)") 退回修改
+            .choose-content-div1(id="toRecycle" onclick="clickMethod2(this)") 删除
+          .form-group
+            label.control-label 原因
+            textarea#postRecycleReason.form-control(placeholder="请在这里输入原因...")
+          .input-group(id="passMessage" style="display:none")
+            input#postNoticeType(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
+            span 是否通知用户
+      .modal-footer
+        button.btn.btn-default(type="button" data-dismiss="modal") 关闭
+        button#ssubmit.btn.btn-primary(type="button" onclick=`postMoveToRecycleBin('${data.thread.tid}')` data-dismiss="modal" disabled) 确认
+
+script(src='/post_to_recycle.js')

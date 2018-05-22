@@ -4669,6 +4669,9 @@ Editor.prototype = {
             //$toolbarElem.css('background-color', '#f1f1f1').css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
             $toolbarElem.css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
             $textContainerElem.css('border', '1px solid #ccc').css('border-top', 'none').css('height', '300px');
+            if(IsPC() === false){
+                $textContainerElem.css('height', '200px');
+            }
         } else {
             // toolbar 和 text 的选择器都有值，记录属性
             $toolbarElem = $toolbarSelector;
