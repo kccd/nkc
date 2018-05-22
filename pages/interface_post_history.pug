@@ -9,8 +9,10 @@ block content
     .row
       .col-xs-12
         h3 目前版本
-
-        
+          if data.post.hideHistories
+            button.btn.btn-danger(onclick=`disabledHistories("${data.post.pid}", false)`) 解除屏蔽
+          else
+            button.btn.btn-danger(onclick=`disabledHistories("${data.post.pid}", true)`) 屏蔽所有
         -var p = data.post
         -p.c = p.c.replace(/<[^>]+>|&nbsp;/g,"");
         include interface_post_history_single.pug
@@ -29,3 +31,4 @@ block content
 block scripts
   
   script(src='/interface_common.js')
+  script(src='/interface_history.js')

@@ -26,7 +26,7 @@ module.exports = async (ctx, next) => {
 	  ctx.data.getcode = false;
 
 	  // - 初始化网站设置
-		const {telephone, websiteName, serverName, github, copyright, record, description, keywords, brief} = global.NKC.serverSettings;
+		const {telephone, websiteName, serverName, github, copyright, record, description, keywords, brief} = await db.SettingModel.findOnly({type: 'server'});
 	  ctx.data.serverSettings = {
 			websiteName,
 			serverName,

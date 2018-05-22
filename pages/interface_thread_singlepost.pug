@@ -19,11 +19,11 @@
             -if(post && post.user && post.user.navbarDesc)
               -var navbarDesc = post.user.navbarDesc;
               -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`
-            a(href=`/m/${uid}` title=`${title}`)
+            a(href=`/u/${uid}` title=`${title}`)
               img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
           div(style='margin-left: 60px;')
             span.ThreadPostTitleMeta
-              a.ThreadPostTitleUsername(href=`/m/${uid}`) #{user?user.username:''}
+              a.ThreadPostTitleUsername(href=`/u/${uid}`) #{user?user.username:''}
               if(user && user.uid === data.targetUser.uid)
                 span(style='color: #ccc') (楼主)&nbsp
               span.lighttext #{fromNow(post.toc)} -
@@ -50,8 +50,9 @@
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
                 a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
 
-              - if(post.tlm>post.toc && data.userLevel >= 3)
-                a(href=`/p/${post.pid}/history`) 历史
+              - if(post.tlm > post.toc && data.userLevel >= 3)
+                if !post.hideHistories || data.userLevel >= 6
+                  a(href=`/p/${post.pid}/history`) 历史
 
               if data.user
                 - var user = data.user

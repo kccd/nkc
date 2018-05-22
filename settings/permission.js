@@ -948,6 +948,14 @@ const certificates ={
       administractive: true
     },
     permittedOperations: {
+    	p: {
+    		[parameter]: {
+					history: {
+						[name]: '屏蔽所有历史',
+						[PATCH]: true
+					}
+		    }
+	    },
       q: {
         [parameter]: {
           [parameter]: {

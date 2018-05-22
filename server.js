@@ -45,12 +45,11 @@ searchInit()
 
     // 将网站基本设置写入全局变量
 	  const serverSettings = await SettingModel.findOnly({type: 'server'});
-	  global.NKC.serverSettings = serverSettings;
 
 	  // 加载语言文件
 	  const languageFilePath = path.resolve('./languages/' + serverSettings.language + '.json');
 	  const languageFileContent = fs.readFileSync(languageFilePath);
-	  global.NKC.language = JSON.parse(languageFileContent);
+	  const language = JSON.parse(languageFileContent);
 
 		// 初始化操作类型,让数据库的数据与operationTree同步
     const operationsId = settings.operations.getOperationsId();
@@ -60,7 +59,7 @@ searchInit()
 		    console.log(`Initialize operation - ${operationId}`);
 		    const newOperation = OperationModel({
 			    _id: operationId,
-			    description: global.NKC.language.content[operationId] || operationId,
+			    description: language.content[operationId] || operationId,
 			    errInfo: '权限不足'
 		    });
 		    await newOperation.save();
