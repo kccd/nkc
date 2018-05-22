@@ -182,7 +182,6 @@ function assemblePostObject(){  //bbcode , markdown
     c: replyContent,
     l:"html",
   }
-
   if(geid('ParseURL').checked){
     if(post.l=='markdown'){
       post.c = common.URLifyMarkdown(post.c)
@@ -194,6 +193,7 @@ function assemblePostObject(){  //bbcode , markdown
       post.c = common.URLifyHTML(post.c)
     }
   }
+  // return console.log(post.c)
   post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')
 
   return post
@@ -207,7 +207,7 @@ function disablePostClick(pid){
 function disablePost(pid,para){
   nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true,para: para})
   .then(function(res){
-    screenTopAlert(pid+' 已屏蔽，请刷新')
+    screenTopAlert(pid+' 已屏蔽，请等待刷新')
     //location.reload()
   })
   .catch(function(data) {

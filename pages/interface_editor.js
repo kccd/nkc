@@ -560,7 +560,7 @@ function onPost(that) {
 
 
 
-    var language = that.language?that.language.value.toLowerCase().trim():'html';
+    var language = that.language?that.language.value.toLowerCase().trim():'html'
     if (content === '') {
       screenTopWarning('请填写内容。');
       return;
@@ -572,9 +572,10 @@ function onPost(that) {
     if (geid('parseURL').checked) {
       if (language === 'markdown') {
         content = common.URLifyMarkdown(content);
-      }
-      if (language === 'bbcode' || language === 'pwbb') {
+      }else if (language === 'bbcode' || language === 'pwbb') {
         content = common.URLifyBBcode(content);
+      }else{
+        content = common.URLifyHTML(content);
       }
     }
     var post = {

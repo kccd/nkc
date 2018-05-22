@@ -238,7 +238,7 @@ block content
                         span 文章退修通知：
                         br
                         span 您的标题为 
-                          a(href=`/t/${docs[i].threadId}`)
+                          a(href=`/t/${docs[i].threadId}` target='_blank')
                             b #{docs[i].delPostTitle} 
                         span 的文章由于 
                           b #{docs[i].reason} 
@@ -247,7 +247,7 @@ block content
                         span 修改文章内容，消除存在的问题，并确保符合论坛规章。
                         br
                         span 点击 
-                        a(href=`/editor?type=post&id=${docs[i].postId}`) 这里 
+                        a(href=`/editor?type=post&id=${docs[i].postId}` target='_blank') 这里 
                         span 进行修改。
                         br
                         span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。
@@ -280,10 +280,10 @@ block content
                         span 回复退修通知：
                         br
                         span 您在文章标题为 
-                          a(href=`/t/${docs[i].threadId}`)
+                          a(href=`/t/${docs[i].threadId}` target='_blank')
                             b #{docs[i].delPostTitle} 
                         span 下的 
-                        a(href=`/t/${docs[i].threadId}#${docs[i].postId}`) 回复 
+                        a(href=`/t/${docs[i].threadId}#${docs[i].postId}` target='_blank') 回复 
                         span 由于 
                           b #{docs[i].reason} 
                         span 等原因，已被退回，目前只有您自己可以查看。请您在 72 小时之内
@@ -291,7 +291,7 @@ block content
                         span 修改文章内容，消除存在的问题，并确保符合论坛规章。
                         br
                         span 点击 
-                        a(href=`/editor?type=post&id=${docs[i].postId}`) 这里 
+                        a(href=`/editor?type=post&id=${docs[i].postId}` target='_blank') 这里 
                         span 进行修改。
                         br
                         span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。

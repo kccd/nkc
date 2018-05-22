@@ -9,17 +9,17 @@ div#postRecycleModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exa
         form
           .form-group
             label.control-label 回复屏蔽方式
-            select#postRecycleMethod.form-control
-              option(value='toRecycle') 删除
-              option(value='toDraft') 退修
+          .form-group
+            .choose-content-div1(id="toDraft" onclick="clickMethod1(this)") 退回修改
+            .choose-content-div1(id="toRecycle" onclick="clickMethod2(this)") 删除
           .form-group
             label.control-label 原因
             textarea#postRecycleReason.form-control(placeholder="请在这里输入原因...")
-          .input-group
+          .input-group(id="passMessage" style="display:none")
             input#postNoticeType(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
             span 是否通知用户
       .modal-footer
         button.btn.btn-default(type="button" data-dismiss="modal") 关闭
-        button.btn.btn-primary(type="button" onclick=`postMoveToRecycleBin('${data.thread.tid}')` data-dismiss="modal") 确认
+        button#ssubmit.btn.btn-primary(type="button" onclick=`postMoveToRecycleBin('${data.thread.tid}')` data-dismiss="modal" disabled) 确认
 
 script(src='/post_to_recycle.js')

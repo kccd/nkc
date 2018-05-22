@@ -139,7 +139,7 @@ operationRouter
 		if(tid === undefined) ctx.throw(400, '参数不正确')
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid})
-		if(thread.recycleMark === true) ctx.throw(400, '该帖子已经被退回')
+		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该帖子已经被退回')
 		await thread.update({recycleMark:true})
 		// 获取主题帖的第一条回帖的标题和内容
 		let oc = thread.oc;
@@ -235,12 +235,14 @@ operationRouter
 			// 添加删帖日志
 			let oc = targetThread.oc;
 			let post = await db.PostModel.findOne({"pid":oc})
-			para.postedUsers = uidArray
-			para.delUserId = targetThread.uid
-			para.userId = user.uid;
-			para.delPostTitle = post.t;
-			const delLog = new db.DelPostLogModel(para);
-			await delLog.save();
+			if(para){
+				para.postedUsers = uidArray
+				para.delUserId = targetThread.uid
+				para.userId = user.uid;
+				para.delPostTitle = post.t;
+				const delLog = new db.DelPostLogModel(para);
+				await delLog.save();
+			}
 		}
 		if(para && para.noticeType === true){
 			let uid = targetThread.uid;

@@ -1,8 +1,30 @@
 // 选择退回回收站方式
 // toRecycle 删除
 // toDraft 退回
+function clickMethod3(para){
+  $(para).addClass("active2")
+  $("#toRecycle2").removeClass("active2")
+  document.getElementById("passMessage2").style.display = "none"
+  $("#noticeType2").prop("checked","checked")
+  $("#ssubmit2").removeAttr("disabled")
+}
+
+
+function clickMethod4(para){
+  $(para).addClass("active2")
+  $("#toDraft2").removeClass("active2")
+  document.getElementById("passMessage2").style.display = "block"
+  $("#noticeType2").prop("checked","checked")
+  $("#ssubmit2").removeAttr("disabled")
+}
+
 function recycleMethodsChoice(){
-  return $("#recycleMethod").val()
+  if($(".choose-content-div2.active2").html() === "退回修改"){
+    return "toDraft";
+  }
+  if($(".choose-content-div2.active2").html() === "删除"){
+    return "toRecycle"
+  }
 }
 
 
@@ -10,7 +32,7 @@ function recycleMethodsChoice(){
 function moveToRecycleBin(id){
   var reason = $("#recycleReason").val().trim();
   var method = recycleMethodsChoice();
-  var noticeType = $("#noticeType").is(":checked")
+  var noticeType = $("#noticeType2").is(":checked")
   // 构造数据，发送到服务器
   var parames = {
     reason: reason,
@@ -25,10 +47,16 @@ function moveToRecycleBin(id){
   }
   if(method === "toRecycle"){
     moveThreadToRecycle(id,parames)
-    window.location.href = "/t/" + id;
+    setTimeout(function(){turnTest1(id)},1800)
+    // window.location.href = "/t/" + id;
   }else if(method === "toDraft"){
     moveThreadToRedit(id,parames)
+    setTimeout(function(){turnTest1(id)},1800)
   }
+}
+
+function turnTest1(id){
+  window.location.href = "/t/" + id;
 }
 
 // 将帖子退回
@@ -38,9 +66,9 @@ function moveThreadToRedit(id,para){
     para: para
   })
     .then(function(){
-      screenTopAlert("已将帖子退回")
+      screenTopAlert("已将帖子退回，请等待刷新")
     })
     .catch(function(data){
-      screenTopAlert("无法退回")
+      screenTopAlert(data.error)
     })
 }

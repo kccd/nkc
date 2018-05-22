@@ -9,17 +9,17 @@ div#recycleModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="example
         form
           .form-group
             label.control-label 文章屏蔽方式
-            select#recycleMethod.form-control
-              option(value='toRecycle') 删除
-              option(value='toDraft') 退修
+          .form-group
+            .choose-content-div2(id="toDraft2" onclick="clickMethod3(this)") 退回修改
+            .choose-content-div2(id="toRecycle2" onclick="clickMethod4(this)") 删除
           .form-group
             label.control-label 原因
             textarea#recycleReason.form-control(placeholder="请在这里输入原因...")
-          .input-group
-            input#noticeType(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
+          .input-group(id="passMessage2" style="display:none")
+            input#noticeType2(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
             span 是否通知用户
       .modal-footer
         button.btn.btn-default(type="button" data-dismiss="modal") 关闭
-        button.btn.btn-primary(type="button" onclick=`moveToRecycleBin('${data.thread.tid}')` data-dismiss="modal") 确认
+        button#ssubmit2.btn.btn-primary(type="button" onclick=`moveToRecycleBin('${data.thread.tid}')` data-dismiss="modal" disabled) 确认
 
 script(src='/thread_to_recycle.js')

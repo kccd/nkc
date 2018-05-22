@@ -47,8 +47,8 @@
                 a(href=`javascript:addCredit('${post.pid}')`) 评学术分
 
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
-                a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
-                a(href=`` onclick=`disablePostClick('${post.pid}')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo") 测试
+                //- a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
+                a(href=`` onclick=`disablePostClick('${post.pid}')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo") 屏蔽
                 //- a(onclick=`javascript:disablePostClick()`) 测试
 
               - if(post.tlm>post.toc && data.userLevel >= 3)
@@ -72,7 +72,7 @@
                 -var floornumber = data.paging.start+index
                 a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}楼
       if post.todraft === true
-        div.clearfix(style='background:#FF6600;text-align:center') 此回复已被屏蔽，请作者点击编辑按钮修改
+        div.clearfix(style='background:#FF6600;text-align:center;font-size:18px;color:white;margin-left:80px') 本条回复已被退回修改，请作者点击编辑按钮修改
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       -post.c = hideContentByUser(post.c, data.user, 'thread')

@@ -1,8 +1,31 @@
 // 选择退回回收站方式
 // toRecycle 删除
 // toDraft 退回
+
+function clickMethod1(para){
+  $(para).addClass("active1")
+  $("#toRecycle").removeClass("active1")
+  document.getElementById("passMessage").style.display = "none"
+  $("#postNoticeType").prop("checked","checked")
+  $("#ssubmit").removeAttr("disabled")
+}
+
+
+function clickMethod2(para){
+  $(para).addClass("active1")
+  $("#toDraft").removeClass("active1")
+  document.getElementById("passMessage").style.display = "block"
+  $("#postNoticeType").prop("checked","checked")
+  $("#ssubmit").removeAttr("disabled")
+}
+
 function postRecycleMethodsChoice(){
-  return $("#postRecycleMethod").val()
+  if($(".choose-content-div1.active1").html() === "退回修改"){
+    return "toDraft";
+  }
+  if($(".choose-content-div1.active1").html() === "删除"){
+    return "toRecycle"
+  }
 }
 
 
@@ -26,23 +49,29 @@ function postMoveToRecycleBin(id){
   }
   if(method === "toRecycle"){
     disablePost(pid,parames)
-    window.location.href = "/t/" + id;
+    setTimeout(function(){turnTest(id)},1800)
+    // window.location.href = "/t/" + id;
   }else if(method === "toDraft"){
     disablePost(pid,parames)
-    window.location.href = "/t/" + id;
+    setTimeout(function(){turnTest(id)},1800)
+    // window.location.href = "/t/" + id;
   }
 }
 
-// 将帖子退回
-function moveThreadToRedit(id,para){
-  return nkcAPI('/t/'+id+'/moveDraft','PATCH',{
-    tid: id,
-    para: para
-  })
-    .then(function(){
-      screenTopAlert("已将帖子退回")
-    })
-    .catch(function(data){
-      screenTopAlert("无法退回")
-    })
+function turnTest(id){
+  window.location.href = "/t/" + id;
 }
+
+// // 将帖子退回
+// function moveThreadToRedit(id,para){
+//   return nkcAPI('/t/'+id+'/moveDraft','PATCH',{
+//     tid: id,
+//     para: para
+//   })
+//     .then(function(){
+//       screenTopAlert("已将帖子退回")
+//     })
+//     .catch(function(data){
+//       screenTopAlert("无法退回")
+//     })
+// }

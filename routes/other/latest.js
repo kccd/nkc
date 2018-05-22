@@ -18,10 +18,27 @@ latestRouter
     if(digest === 'true') q.digest = true;
     const threadCount = await db.ThreadModel.count(q);
     let {$skip, $limit, $match, $sort} = apiFn.getQueryObj(query, q);
-    // 主页过滤掉退回标记的帖子
-    $match.recycleMark = {"$nin":[true]}
+    // // 主页过滤掉退回标记的帖子
+    // $match.recycleMark = {"$nin":[true]}
     data.paging = apiFn.paging(page, threadCount);
-    let threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
+    let threads1 = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
+    let threads = [];
+    if(ctx.data.userLevel === 0){
+      for(var i in threads1){
+        if(threads1[i].recycleMark === true){
+          continue;
+        }
+        threads.push(threads1[i])
+      }
+    }else{
+      for(var i in threads1){
+        if(threads1[i].uid !== ctx.data.user.uid && threads1[i].recycleMark === true){
+          continue;
+        }
+        threads.push(threads1[i])
+      }
+    }
+    
 
     for(let i = 0; i < threads.length; i++) {
     	const t = threads[i];

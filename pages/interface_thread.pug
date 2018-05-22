@@ -106,8 +106,8 @@ block content
                         button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}
                       if moveThread
                         .form-group
-                            button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
-                            button.btn.btn-primary(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 测试按钮
+                            //- button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
+                            button.btn.btn-primary(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
                             //- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button>
                     if thread.toMid === user.uid || thread.mid === user.uid
                       -var text
@@ -191,7 +191,11 @@ block content
                       canvas#qrcode
                       // 生成二维码图片
                       //img(src=`/qr/${data.thread.tid}` style='height: 93px; width: 93px;opacity:0.35;filter:Alpha(opacity=35)')
-
+              -if(thread.recycleMark === true){
+                div(style="background:#FF3333;font-size:18px;color:white")
+                  div(style="text-align:center;") 本文已被退回修改，请作者点击编辑按钮进入编辑界面
+                  div 退修原因： #{thread.reason}
+              -}
             include interface_navigation_paging.pug
             //hr.ThreadTitleHr
             .ThreadPostList

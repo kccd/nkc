@@ -82,8 +82,17 @@ threadRouter
 			PostModel
 		} = db;
 		const thread = await ThreadModel.findOnly({tid});
-		// 被退回的帖子，除了作者本身，其他人不能查看
-		if(thread.recycleMark === true && thread.uid !== ctx.data.user.uid) ctx.throw(403, '该贴已被退回')
+		// 取出帖子被退回的原因
+		let threadReason = "";
+		if(thread.recycleMark === true){
+			let threadLogOne = await db.DelPostLogModel.find({"threadId":tid,"postType":"thread","delType":"toDraft"}).sort({toc:-1}).limit(1)
+			if(threadLogOne.length > 0){
+				thread.reason = threadLogOne[0].reason;
+			}else{
+				thread.reason = " ";
+			}
+		}
+		if(ctx.data.userLevel < 4 && thread.recycleMark === true) ctx.throw(403, '权限不足')
 		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
 		let q = {
 			tid: tid
@@ -158,7 +167,7 @@ threadRouter
 					postAll.push(posts[i])
 					continue
 				}
-				if(posts[i].uid === ctx.data.user.uid){
+				if(ctx.data.user && posts[i].uid === ctx.data.user.uid){
 					let delPostId = posts[i].pid;
 					let delPost = await db.DelPostLogModel.find({"postId":delPostId,postType:"post"}).sort({toc:-1}).limit(1)
 					if(delPost.length > 0 && delPost[0].delType === "toDraft"){

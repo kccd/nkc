@@ -140,11 +140,10 @@ function delCodeAddShrink(content){
 
 // 根据学术分隐藏内容
 function hideContentByUser(content, user={xsf: 0}, from) {
-	// console.log(content)
 	// console.log(content.match(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm))
-	content = content.replace(/\n/igm,'');
-	content = content.replace(/\r/igm,'');
-	var c1 = content.replace(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm, function(c, number, content){
+	// content = content.replace(/\n/igm,'');
+	// content = content.replace(/\r/igm,'');
+	var c1 = content.replace(/\[hide=([0-9]{1,3}).*]([\s\S]*)\[\/hide]/igm, function(c, number, content){
 		number = parseInt(number);
 		if(user.xsf >= number) {
 			if(from === 'thread') {
