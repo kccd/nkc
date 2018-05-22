@@ -16,6 +16,7 @@ emailRouter
 			});
 			await emailCode.update({used: true});
 			await userPersonal.update({email});
+			await user.update({$addToSet: {certs: 'email'}});
 			const newSecretBehavior = db.SecretBehaviorModel({
 				uid: user.uid,
 				type: 'bindEmail',
@@ -66,6 +67,7 @@ emailRouter
 				newEmail: email
 			});
 			await userPersonal.update({email});
+			await user.update({$addToSet: {certs: 'email'}});
 			await newSecretBehavior.save();
 			return ctx.redirect(`/u/${user.uid}/settings/email`);
 		}

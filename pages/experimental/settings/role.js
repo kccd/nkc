@@ -1,6 +1,3 @@
-$('input[name="selectOperation"]').iCheck({
-	checkboxClass: 'icheckbox_minimal-red',
-});
 var data = $('#data').text();
 var defaultOperationsId, operations;
 if(data) {
@@ -8,6 +5,11 @@ if(data) {
 	defaultOperationsId = data.defaultOperationsId;
 	operations = data.operations;
 }
+
+$('input[name="selectOperation"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+});
+
 function submitRoleBase(id) {
 	var obj = {
 		displayName: $('#displayName').val(),
@@ -227,4 +229,14 @@ function selectAll(){
 			}
 		}
 	}
+}
+
+function removeUserFromRole(roleId, uid) {
+	nkcAPI('/e/settings/role/'+roleId+'/users', 'PATCH', {uid: uid, operation: 'removeUserFromRole'})
+		.then(function() {
+			screenTopAlert('移除成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data)
+		})
 }

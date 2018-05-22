@@ -130,6 +130,13 @@
     "getRegisterCode": "获取注册图片验证码",
     "visitLogin": "登录页面",
     "submitLogin": "提交登录信息",
-    "logout": "退出登录"
+    "logout": "退出登录",
+
+
+
+    "visitEUserSettings": "访问管理页面的用户设置",
+    "visitEUserInfo": "在管理页面查看用户信息",
+    "modifyEUserInfo": "在管理页面修改用户信息"
+
   }
 }

@@ -1,0 +1,138 @@
+extends ../../bootstrap_base
+
+block title
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 管理界面
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .col-xs-12.col-md-12
+            if data.targetUser
+              -const targetUser = data.targetUser;
+              .col-xs-12.col-md-8.col-md-offset-2
+                .row
+                  .form.form-horizontal
+                    .form-group
+                      label.col-sm-2.control-label UID
+                      .col-sm-8
+                        input.form-control(type='text' value=targetUser.uid disabled)
+                    .form-group
+                      label.col-sm-2.control-label 用户名
+                      .col-sm-8
+                        input.form-control#username(type='text' value=targetUser.username)
+                    .form-group
+                      label.col-sm-2.control-label 个人简介
+                      .col-sm-8
+                        textarea.form-control#description(type='text' rows=8)= targetUser.description
+                    .form-group
+                      label.col-sm-2.control-label 邮箱
+                      .col-sm-8
+                        input.form-control#email(type='text' value=targetUser.email)
+                    .form-group
+                      label.col-sm-2.control-label 国际区号
+                      .col-sm-8
+                        -const selectedNationCode = targetUser.nationCode;
+                        include ../../interface_nation_code
+                    .form-group
+                      label.col-sm-2.control-label 手机号
+                      .col-sm-8
+                        input.form-control#mobile(type='text' value=targetUser.mobile)
+                    .form-group
+                      label.col-sm-2.control-label 角色
+                      .col-sm-8
+                        .col-sm-12
+                          .row
+                            for role in targetUser.roles
+                              span(style=`display: inline-block;background-color: ${role.color};padding: 0.3rem 0.5rem;border-radius: 7px;margin: 0.5rem 0.3rem;color: #ffffff;`)= role.displayName
+                        .col-sm-12
+                          .form-inline
+                            .form-group
+                              select.form-control#removeSelect
+                                for role in targetUser.roles
+                                  option= role.displayName
+                              button.btn.btn-default(onclick=`editorRole("${targetUser.uid}", 'remove')`) 移除角色
+
+                              select.form-control#addSelect
+                                for role in data.roles
+                                  option= role.displayName
+                              button.btn.btn-default(onclick=`editorRole("${targetUser.uid}", 'add')`) 添加角色
+                    .form-group
+                      label.col-sm-2.control-label
+                      .col-sm-8
+                        button.btn.btn-primary(type='text' onclick=`saveUserInfo(${targetUser.uid})`) 保存
+
+            else
+              .col-xs-12.col-md-12
+                .form-inline(style='margin-bottom: 2rem;')
+                  .form-group
+                    select.form-control#searchType
+                      option 用户名
+                      option UID
+                  .form-group
+                    input.form-control#searchInput(placeholder='请输入内容')
+                  .form-group
+                    button.btn.btn-primary.btn-block(onclick='searchUser()') 搜索
+              .col-xs-12.col-md-12
+                table.table.table-hover(style='display: none;padding: 0.5rem;border: 1px solid #cccccc;')#searchResult
+                  thead
+                    tr
+                      th 用户名
+                      th 文章
+                      th 回复
+                      th 注册时间
+                      th 注册IP
+                      th
+                  tbody
+              .col-xs-12.col-md-12
+                include ../../interface_navigation_paging
+                table.table.table-hover
+                  thead
+                    tr
+                      th 用户名
+                      th 文章
+                      th 回复
+                      th 注册时间
+                      th 注册IP
+                      th
+                  tbody
+                    for user in data.users
+                      tr
+                        th
+                          img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                          a(href=`/u/${user.uid}`)= user.username
+                        th= user.threadCount
+                        th= user.postCount
+                        th= fromNow(user.toc)
+                        th= `${user.regIP} : ${user.regPort}`
+                        th
+                          a(href=`/e/settings/user/${user.uid}`) 编辑
+                include ../../interface_navigation_paging
+
+
+
+block scripts
+
+  script(src='/chart.js/dist/Chart.bundle.js')
+  script(src='/react/JSXTransformer.js')
+  script(src='/jquery/jquery.minicolors.js')
+  script(src='/icheck/icheck.js')
+  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
+  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
+  script(src='/interface_common.js')
+  script(src='/experimental/index.js')
+  script(src='/experimental/settings/base.js')
+  script(src='/experimental/settings/role.js')
+  script(src='/experimental/settings/operation.js')
+  script(src='/experimental/settings/forum.js')
+  script(src='/experimental/status/index.js')
+  script(src='/experimental/settings/user.js')
+
+

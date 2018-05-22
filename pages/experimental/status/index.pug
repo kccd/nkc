@@ -1,12 +1,52 @@
-.hidden#data= JSON.stringify({results: data.results})
-//.col-xs-12.col-xs-12
-//  -const time = new Date();
-//  h4 日期选择
-//  .form-inline
-//    input.form-control.time(readonly size="16" type="text" value=time.toLocaleDateString())
-//    span=` 至 `
-//    input.form-control.time(readonly size="16" type="text" value='')
-//    button.btn.btn-primary 统计
-//  .row(style='padding-top: 1rem;')
-//    .col-xs-12.col-md-8
-//      canvas#myChart
+extends ../../bootstrap_base
+
+block title
+  -const hiddenFooter = true;
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 管理界面
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .hidden#data= JSON.stringify({results: data.results})
+
+      if 1
+        .col-xs-12.col-md-12
+          br
+          br
+          .panel.panel-default
+            .panel-body
+              h4 查看
+              a.marginOfA.btn.btn-default(href="/f/recycle") 回收站
+              a.marginOfA.btn.btn-default(href="/f/draft") 草稿版
+              a.marginOfA.btn.btn-default(href='/e/stats') 统计
+              a.marginOfA.btn.btn-default(href='/e/newUsers') 新用户
+              a.marginOfA.btn.btn-default(href='/e/behavior') 积分变动
+              a.marginOfA.btn.btn-default(href='/log') 网站日志
+
+              hr
+              h4 系统
+              a.marginOfA.btn.btn-default(href='/e/newSysinfo') 发新通知
+              a.marginOfA.btn.btn-default(href='/auth') 身份认证审核
+              a.marginOfA.btn.btn-default(href='/problem/list') 问题列表
+              //a.marginOfA.btn.btn-default(href='/settings') 系统设置
+
+              hr
+              h4 科创基金
+              a.marginOfA.btn.btn-default(href='/fund/disabled') 被屏蔽的基金
+              a.marginOfA.btn.btn-default(href='/fund/settings') 科创基金设置
+              hr
+              h4 专业设置
+              button.marginOfA.btn.btn-default(onclick='newForum()') 新建专业
+
+block scripts
+
+  script(src='/chart.js/dist/Chart.bundle.js')
+  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
+  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
+  script(src='/interface_common.js')
+  script(src='/experimental/status/index.js')

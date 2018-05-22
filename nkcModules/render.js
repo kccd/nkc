@@ -142,6 +142,8 @@ function delCodeAddShrink(content){
 function hideContentByUser(content, user={xsf: 0}, from) {
 	// console.log(content)
 	// console.log(content.match(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm))
+	content = content.replace(/\n/igm,'');
+	content = content.replace(/\r/igm,'');
 	var c1 = content.replace(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm, function(c, number, content){
 		number = parseInt(number);
 		if(user.xsf >= number) {

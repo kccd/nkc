@@ -10,7 +10,9 @@ const operationObj = {};
 
 // 默认操作类型
 const defaultOperations = [
-	'displayExperimentalLink'
+	'displayExperimentalLink',
+	'displayQuestionsLink',
+
 ];
 
 
@@ -151,6 +153,13 @@ operationObj.operationTree = {
 						GET: 'visitOperationType',
 						PATCH: 'modifyOperationType',
 						DELETE: 'deleteOperationType'
+					}
+				},
+				user: {
+					GET: 'visitEUserSettings',
+					PARAMETER: {
+						GET: 'visitEUserInfo',
+						PATCH: 'modifyEUserInfo'
 					}
 				},
 				forum: {
