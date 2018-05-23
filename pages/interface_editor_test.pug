@@ -6,7 +6,6 @@ block title
   include MathJax.pug
   
 block content
-  
   -var mainContainer1400 = true
   #ife.container-fluid(style='max-width:1400px')
     .col-xs-12.col-md-12
@@ -37,6 +36,8 @@ block content
                     //select.form-control#lang(style='display: none; width: auto;')
                     //    option html
                   input.hidden#lang(value=data.l)
+              if data.delReason 
+                .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
               .form-group
                   div#quoteContent
               .form-group
@@ -95,7 +96,7 @@ block scripts
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
-  script(src='/interface_common.js?v=3')
+  script(src='/interface_common.js?v=4')
   script(src='/nkc_render.js?v=3')
   script(src='/interface_editor.js?v=4')
 

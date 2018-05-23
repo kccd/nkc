@@ -366,7 +366,7 @@ var common=(function(){
   }
   common.URLifyHTML = function(content){
     return content.replace(URLExtractRegex,function(match,p1,p2){
-      return p1+'<a href="http://'+ p2 +'">'+p2+'</a>'
+      return p1+'<a href="'+ p2 +'">'+p2+'</a>'
     })
   }
 

@@ -38,6 +38,12 @@ router
     });
     await targetThread.updateThreadMessage();
     // 删除回复 添加日志
+    if(disabled === false){
+      let delPostLog = await db.DelPostLogModel.find({"postId":pid,"modifyType":false})
+      for(var i in delPostLog){
+        await delPostLog[i].update({"modifyType":true})
+      }
+    }
     if(disabled === true){
       let {para} = ctx.body
       let post = await db.PostModel.findOne({"pid":pid})
