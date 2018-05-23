@@ -59,6 +59,12 @@ editorRouter
       data.title = targetPost.t;  //回复标题
 	    data.l = targetPost.l;
       data.targetUser = await targetPost.extendUser();  //回复对象
+      // 在屏蔽日志中查找该帖子是否处于正在退修中
+      // 如果是正在退修，取出原因，并显示在编辑器中
+      let delPostLog = await db.DelPostLogModel.find({"postId":id,"delType":"toDraft","modifyType":false}).sort({toc:-1})
+      if(delPostLog.length > 0){
+        data.delReason = delPostLog[0].reason
+      }
       return await next();
     } else if(type === 'application') {
       ctx.template = 'interface_editor_test.pug';

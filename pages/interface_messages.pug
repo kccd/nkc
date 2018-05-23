@@ -263,7 +263,8 @@ block content
                         span 回复屏蔽通知：
                         br
                         span 您在文章标题为 
-                          b #{docs[i].delPostTitle} 
+                          a(href=`/t/${docs[i].threadId}` target='_blank')
+                            b #{docs[i].delPostTitle} 
                         span 下的回复由于 
                           b #{docs[i].reason} 
                         span 等原因，已被屏蔽。该操作不可恢复，也不接受申诉。

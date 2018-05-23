@@ -23,7 +23,11 @@ latestRouter
     data.paging = apiFn.paging(page, threadCount);
     let threads1 = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
     let threads = [];
-    if(ctx.data.userLevel === 0){
+    if(ctx.data.userLevel > 4){
+      for(var i in threads1){
+        threads.push(threads1[i])
+      }
+    }else if(ctx.data.userLevel === 0){
       for(var i in threads1){
         if(threads1[i].recycleMark === true){
           continue;
