@@ -286,16 +286,22 @@ forumSchema.methods.getToppedThreads = async function(ctx) {
 	let match = {
 		fid: this.fid,
 		topped: true,
-	}	// 过滤掉退回标记的帖子
+	};	// 过滤掉退回标记的帖子
 	// match.recycleMark = {"$nin":[true]}
 	// const threads = await ThreadModel.find(match).sort({tlm: -1});
 	let threads1 = await ThreadModel.find(match).sort({tlm: -1});
 	let threads = [];
-	for(var i in threads1){
-		if(threads1[i].uid !== ctx.data.user.uid && threads1[i].recycleMark === true){
-			continue;
+	for(let thread of threads1) {
+		if(thread.recycleMark) {
+			if(ctx.data.userLevel <= 0) {
+				continue;
+			} else if(ctx.data.userLevel < 6) {
+				if(ctx.data.user.uid !== thread.uid) {
+					continue;
+				}
+			}
 		}
-		threads.push(threads1[i])
+		threads.push(thread)
 	}
 	await Promise.all(threads.map(async thread => {
 		await thread.extendForum();

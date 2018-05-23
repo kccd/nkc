@@ -224,11 +224,11 @@ postSchema.pre('save', async function(next) {
       if (resource) {
         const index = resource.references.findIndex(e => e === pid);
         if (index) {
-          resource.references.splice(index, 1);
+          // resource.references.splice(index, 1);
           if (['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(resource.ext.toLowerCase()) > -1) {
             hasImage = false
           }
-          await resource.save()
+          // await resource.save()
         }
       }
     }));

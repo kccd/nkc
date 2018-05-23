@@ -21,9 +21,30 @@ latestRouter
     // // 主页过滤掉退回标记的帖子
     // $match.recycleMark = {"$nin":[true]}
     data.paging = apiFn.paging(page, threadCount);
-    let threads1 = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
-    let threads = [];
-    if(ctx.data.userLevel === 0){
+    const threads1 = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
+    const threads = [];
+
+	  if(ctx.data.userLevel > 5){
+		  for(let i in threads1){
+			  threads.push(threads1[i])
+		  }
+	  }else if(ctx.data.userLevel <= 0){
+		  for(let i in threads1){
+			  if(threads1[i].recycleMark === true){
+				  continue;
+			  }
+			  threads.push(threads1[i])
+		  }
+	  }else{
+		  for(let i in threads1){
+			  if(threads1[i].uid !== ctx.data.user.uid && threads1[i].recycleMark === true){
+				  continue;
+			  }
+			  threads.push(threads1[i])
+		  }
+	  }
+
+    /*if(ctx.data.userLevel === 0){
       for(var i in threads1){
         if(threads1[i].recycleMark === true){
           continue;
@@ -37,7 +58,7 @@ latestRouter
         }
         threads.push(threads1[i])
       }
-    }
+    }*/
     
 
     for(let i = 0; i < threads.length; i++) {
