@@ -551,7 +551,9 @@ padding: 1px 7px 1px 7px;
   display:inline;
 }
 p {
-  margin:0 auto;
+  margin:0px;
+  margin-top:5px;
+  margin-bottom:5px;
 }
 
 blockquote {
@@ -693,6 +695,53 @@ margin-top: 0px;
 /* margin-left: 10px; */
 
 /* width: 50%; */
+}
+.choose-content-div1{
+  width:49%;
+  text-align: center;
+  font-size: 2rem;
+  height: 5rem;
+  line-height: 5rem;
+  color: #bbb;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  cursor: pointer;
+  -webkit-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -moz-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -ms-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -o-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  transition: background-color 0.2s, border 0.2s, color 0.2s;
+  display: inline-block;
+}
+
+.choose-content-div1.active1{
+  background-color: #2aabd2;
+  border: 1px solid #efefef;
+  color: #fff;
+}
+
+.choose-content-div2{
+  width:49%;
+  text-align: center;
+  font-size: 2rem;
+  height: 5rem;
+  line-height: 5rem;
+  color: #bbb;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  cursor: pointer;
+  -webkit-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -moz-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -ms-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  -o-transition: background-color 0.2s, border 0.2s, color 0.2s;
+  transition: background-color 0.2s, border 0.2s, color 0.2s;
+  display: inline-block;
+}
+
+.choose-content-div2.active2{
+  background-color: #2aabd2;
+  border: 1px solid #efefef;
+  color: #fff;
 }
 
 .ForumThreadDigestText{
@@ -844,8 +893,8 @@ font-size: 14pt;
 .ThreadPostBody{
   margin-left: 60px;
   font-size: 16px;
-  line-height: 1.9;
-  letter-spacing: 0.3px;
+  /* line-height: 1.9;
+  letter-spacing: 0.3px; */
   word-wrap: break-word;
   margin-top: 4px;
 }
@@ -879,7 +928,7 @@ line-height: 1.4;
 }
 .ThreadPostBody video{max-width: 100%;}
 
-/* .ThreadPostBody p+p{margin-top: 18px;margin-bottom: 11px;} */
+.ThreadPostBody p+p{margin-top: 10px;margin-bottom: 10px;} 
 .ThreadPostBody p+*{}
 .ThreadPostBody *+p{}
 

@@ -82,6 +82,17 @@ threadRouter
 			PostModel
 		} = db;
 		const thread = await ThreadModel.findOnly({tid});
+		// 取出帖子被退回的原因
+		let threadReason = "";
+		if(thread.recycleMark === true){
+			let threadLogOne = await db.DelPostLogModel.find({"threadId":tid,"postType":"thread","delType":"toDraft"}).sort({toc:-1}).limit(1)
+			if(threadLogOne.length > 0){
+				thread.reason = threadLogOne[0].reason;
+			}else{
+				thread.reason = " ";
+			}
+		}
+		if(ctx.data.userLevel < 4 && thread.recycleMark === true) ctx.throw(403, '权限不足')
 		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
 		let q = {
 			tid: tid
@@ -89,7 +100,6 @@ threadRouter
 		data.highlight = highlight;
 		let postCount = thread.count;
 		if(!await thread.ensurePermissionOfModerators(ctx)) {
-			q.disabled = false;
 			postCount = thread.countRemain;
 		}
 		data.paging = apiFn.paging(page, postCount);
@@ -148,7 +158,35 @@ threadRouter
 				post.c = postContent.replace(/=/,`=${postLink},${step},`);
 			}
 		}));*/
-		data.posts = posts;
+		// 如果是用户自己的回复，应该添加退修标记
+		let postAll = [];
+		if(!await thread.ensurePermissionOfModerators(ctx)){
+			for(var i in posts){
+				// 拿出未被屏蔽的
+				if(posts[i].disabled === false){
+					postAll.push(posts[i])
+					continue
+				}
+				if(ctx.data.user && posts[i].uid === ctx.data.user.uid){
+					let delPostId = posts[i].pid;
+					let delPost = await db.DelPostLogModel.find({"postId":delPostId,postType:"post"}).sort({toc:-1}).limit(1)
+					if(delPost.length > 0 && delPost[0].delType === "toDraft"){
+						posts[i].todraft = true
+						postAll.push(posts[i])
+					}
+				}
+			}
+		}else{
+			for(var i in posts){
+				let delPostId = posts[i].pid;
+				let delPost = await db.DelPostLogModel.find({"postId":delPostId,postType:"post"}).sort({toc:-1}).limit(1)
+				if(delPost.length > 0 && delPost[0].delType === "toDraft" && posts[i].disabled === true){
+					posts[i].todraft = true
+				}
+				postAll.push(posts[i])
+			}
+		}
+		data.posts = postAll;
 		await thread.extendFirstPost().then(p => p.extendUser());
 		await thread.extendLastPost();
 		if(data.user) {

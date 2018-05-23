@@ -131,11 +131,38 @@ operationRouter
 		await thread.updateThreadMessage();
 		await next();
 	})
+	.patch('/moveDraft', async (ctx, next) => {
+		const {data, db} = ctx;
+		const {user} = data;
+		const {tid} = ctx.params;
+		let {fid, cid, para} = ctx.body;
+		if(tid === undefined) ctx.throw(400, '参数不正确')
+		// 根据tid添加退回标记
+		let thread = await db.ThreadModel.findOne({tid})
+		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该帖子已经被退回')
+		await thread.update({recycleMark:true})
+		// 获取主题帖的第一条回帖的标题和内容
+		let oc = thread.oc;
+		let post = await db.PostModel.findOne({"pid":oc})
+		// 添加删帖日志
+		para.delUserId = thread.uid
+		para.userId = user.uid;
+		para.delPostTitle = post.t
+		para.postId = oc
+    const delLog = new db.DelPostLogModel(para);
+		await delLog.save();
+		if(para.noticeType === true){
+			let uid = thread.uid;
+			const toUser = await db.UsersPersonalModel.findOnly({uid});
+			await toUser.increasePsnl('system', 1);
+		}
+		await next()
+	})
 	.patch('/moveThread', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
 		const {tid} = ctx.params;
-		let {fid, cid} = ctx.body;
+		let {fid, cid, para} = ctx.body;
 		if(fid === undefined) ctx.throw(400, '参数不正确');
 		if(cid === undefined) cid = 0;
 		const targetForum = await db.ForumModel.findOne({fid});
@@ -185,6 +212,17 @@ operationRouter
 		}
 		await targetThread.updateThreadMessage();
 		await targetForum.updateForumMessage();
+		// 获取某主帖下全部的回帖用户
+		let posts = await db.PostModel.find({"tid":tid},{"uid":1})
+		// 用户id去重
+		let uidArray = [];
+		let h = {};
+		for(var i=0;i<posts.length;i++){
+			if(!h[posts[i].uid]){
+				uidArray.push(posts[i].uid)
+				h[posts[i].uid] = 1;
+			}
+		}
 		if(fid === 'recycle') {
 			await ctx.generateUsersBehavior({
 				operation: 'moveToRecycle',
@@ -194,6 +232,22 @@ operationRouter
 				toMid: targetThread.toMid,
 				mid: targetThread.mid
 			});
+			// 添加删帖日志
+			let oc = targetThread.oc;
+			let post = await db.PostModel.findOne({"pid":oc})
+			if(para){
+				para.postedUsers = uidArray
+				para.delUserId = targetThread.uid
+				para.userId = user.uid;
+				para.delPostTitle = post.t;
+				const delLog = new db.DelPostLogModel(para);
+				await delLog.save();
+			}
+		}
+		if(para && para.noticeType === true){
+			let uid = targetThread.uid;
+			const toUser = await db.UsersPersonalModel.findOnly({uid});
+			await toUser.increasePsnl('system', 1);
 		}
 		await next();
 	})

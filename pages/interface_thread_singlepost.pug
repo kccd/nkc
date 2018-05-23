@@ -3,8 +3,7 @@
 -const disablePost = data.userLevel >= 4
 -const highlight = data.highlight;
 
-
-  if (!post.disabled || disablePost)
+  if (!post.disabled || disablePost || data.user.uid === post.uid)
     //horizontal line
     hr(id=`p${post.pid}`).ThreadSinglePostHr
     //meta(id=`${post.pid}'`)
@@ -48,7 +47,9 @@
                 a(href=`javascript:addCredit('${post.pid}')`) 评学术分
 
               - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
-                a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
+                //- a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
+                a(href=`` onclick=`disablePostClick('${post.pid}')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo") 屏蔽
+                //- a(onclick=`javascript:disablePostClick()`) 测试
 
               - if(post.tlm > post.toc && data.userLevel >= 3)
                 if !post.hideHistories || data.userLevel >= 6
@@ -71,7 +72,8 @@
               if data.paging
                 -var floornumber = data.paging.start+index
                 a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}楼
-              .clearfix
+      if post.todraft === true
+        div.clearfix(style='background:#FF6600;text-align:center;font-size:18px;color:white;margin-left:80px') 本条回复已被退回修改，请作者点击编辑按钮修改
       if(post.t && post.t != '' && index != 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       -post.c = hideContentByUser(post.c, data.user, 'thread')

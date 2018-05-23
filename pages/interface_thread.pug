@@ -106,7 +106,9 @@ block content
                         button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}
                       if moveThread
                         .form-group
-                            button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
+                            //- button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
+                            button.btn.btn-primary(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
+                            //- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button>
                     if thread.toMid === user.uid || thread.mid === user.uid
                       -var text
                       if data.thread.toMid === data.user.uid && data.thread.hideInToMid || data.thread.mid === data.user.uid && data.thread.hideInMid
@@ -189,7 +191,11 @@ block content
                       canvas#qrcode
                       // 生成二维码图片
                       //img(src=`/qr/${data.thread.tid}` style='height: 93px; width: 93px;opacity:0.35;filter:Alpha(opacity=35)')
-
+              -if(thread.recycleMark === true){
+                div(style="background:#FF3333;font-size:18px;color:white")
+                  div(style="text-align:center;") 本文已被退回修改，请作者点击编辑按钮进入编辑界面
+                  div 退修原因： #{thread.reason}
+              -}
             include interface_navigation_paging.pug
             //hr.ThreadTitleHr
             .ThreadPostList
@@ -307,12 +313,13 @@ block content
           //include interface_forums_list.pug
 
     include debug_output.pug
-    
+    include thread_to_recycle.pug
+    include post_to_recycle.pug
 block scripts
   script(src='/qrcode/build/qrcode.js')
   script(src='/interface_common.js?v=3')
   script(src='/module_dropdown.js?v=3')
-  script(src='/interface_thread.js?v=3')
+  script(src='/interface_thread.js?v=4')
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   script(src="/jquery-1.10.2.js")
@@ -325,7 +332,7 @@ block scripts
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
   script(src='/nkc_render.js')
-  script(src='/interface_editor_reply.js?v=3')
+  script(src='/interface_editor_reply.js?v=4')
   script(src='/interface_attachment_uploader.js?v=1')
   script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
   <script type="text/javascript" src="/wangEditor.js"></script>
