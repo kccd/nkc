@@ -16,3 +16,6 @@
 /.vscode
 /settings/backup.js
 /backup.log
+/scripts/postToResource.txt
+/scripts/resourceToPost.txt
+/scripts/notResourcePid.txt

@@ -92,7 +92,14 @@ threadRouter
 				thread.reason = " ";
 			}
 		}
-		if(ctx.data.userLevel < 4 && thread.recycleMark === true) ctx.throw(403, '权限不足')
+		if(thread.recycleMark) {
+			if(data.userLevel <= 0) {
+				ctx.throw(403, '权限不足');
+			} else if(data.userLevel < 6 && data.user.uid !== thread.uid) {
+				ctx.throw(403, '权限不足');
+			}
+		}
+		// if(thread.recycleMark === true && ctx.data.userLevel < 6 && (ctx.data.userLevel <= 0 || ctx.data.user.uid !== thread.uid)) ctx.throw(403, '权限不足');
 		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
 		let q = {
 			tid: tid
