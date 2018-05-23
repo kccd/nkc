@@ -82,7 +82,11 @@ const postSchema = new Schema({
     type: Boolean,
     index: 1,
     default: false
-  }
+  },
+	hideHistories: {
+  	type: Boolean,
+		default: false
+	}
 }, {toObject: {
   getters: true,
   virtuals: true

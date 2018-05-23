@@ -15,7 +15,6 @@ baseRouter
 		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
 		const keywordsArr = keywords.split(',');
 		await serverSettings.update({websiteName, github, copyright, record, description,keywords: keywordsArr, brief, telephone});
-		global.NKC.serverSettings = await db.SettingModel.findOnly({type: 'server'});
 		await next();
 	});
 module.exports = baseRouter;

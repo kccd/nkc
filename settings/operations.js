@@ -372,7 +372,8 @@ operationObj.operationTree = {
 					PATCH: 'disabledPost'
 				},
 				history: {
-					GET: 'visitPostHistory'
+					GET: 'visitPostHistory',
+					PATCH: 'disableHistories'
 				}
 			}
 		},
