@@ -33,7 +33,6 @@ resourceRouter
     const {imageMagick} = ctx.tools;
     const settings = ctx.settings;
     const file = ctx.body.files.file;
-    console.log("图片文件",file)
     if(!file)
       ctx.throw(400, 'no file uploaded');
     const {name, size, path} = file;
