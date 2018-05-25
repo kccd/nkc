@@ -643,23 +643,150 @@ var config = {
 
     // 表情
     emotions: [
-        // {
-    //     // tab 的标题
-    //     title: '默认',
-    //     // type -> 'emoji' / 'image'
-    //     type: 'image',
-    //     // content -> 数组
-    //     content: [{
-    //         alt: '[坏笑]',
-    //         src: '/twemoji/2/svg/1f618.svg'
-    //     }, {
-    //         alt: '[舔屏]',
-    //         src: 'http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/40/pcmoren_tian_org.png'
-    //     }, {
-    //         alt: '[污]',
-    //         src: 'http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/3c/pcmoren_wu_org.png'
-    //     }]
-    // }, {
+        {
+        // tab 的标题
+        title: '默认',
+        // type -> 'emoji' / 'image'
+        type: 'image',
+        // content -> 数组
+        content: [{src: "/twemoji/2/svg/1f600.svg",
+        alt: "😀"},
+        {src: "/twemoji/2/svg/1f601.svg",
+        alt: "😁"},
+        {src: "/twemoji/2/svg/1f602.svg",
+        alt: "😂"},
+        {src: "/twemoji/2/svg/1f603.svg",
+        alt: "😃"},
+        {src: "/twemoji/2/svg/1f604.svg",
+        alt: "😄"},
+        {src: "/twemoji/2/svg/1f605.svg",
+        alt: "😅"},
+        {src: "/twemoji/2/svg/1f606.svg",
+        alt: "😆"},
+        {src: "/twemoji/2/svg/1f607.svg",
+        alt: "😇"},
+        {src: "/twemoji/2/svg/1f608.svg",
+        alt: "😈"},
+        {src: "/twemoji/2/svg/1f609.svg",
+        alt: "😉"},
+        {src: "/twemoji/2/svg/1f60a.svg",
+        alt: "😊"},
+        {src: "/twemoji/2/svg/1f60b.svg",
+        alt: "😋"},
+        {src: "/twemoji/2/svg/1f60c.svg",
+        alt: "😌"},
+        {src: "/twemoji/2/svg/1f60d.svg",
+        alt: "😍"},
+        {src: "/twemoji/2/svg/1f60e.svg",
+        alt: "😎"},
+        {src: "/twemoji/2/svg/1f60f.svg",
+        alt: "😏"},
+        {src: "/twemoji/2/svg/1f610.svg",
+        alt: "😐"},
+        {src: "/twemoji/2/svg/1f611.svg",
+        alt: "😑"},
+        {src: "/twemoji/2/svg/1f612.svg",
+        alt: "😒"},
+        {src: "/twemoji/2/svg/1f613.svg",
+        alt: "😓"},
+        {src: "/twemoji/2/svg/1f614.svg",
+        alt: "😔"},
+        {src: "/twemoji/2/svg/1f615.svg",
+        alt: "😕"},
+        {src: "/twemoji/2/svg/1f616.svg",
+        alt: "😖"},
+        {src: "/twemoji/2/svg/1f617.svg",
+        alt: "😗"},
+        {src: "/twemoji/2/svg/1f618.svg",
+        alt: "😘"},
+        {src: "/twemoji/2/svg/1f619.svg",
+        alt: "😙"},
+        {src: "/twemoji/2/svg/1f61a.svg",
+        alt: "😚"},
+        {src: "/twemoji/2/svg/1f61b.svg",
+        alt: "😛"},
+        {src: "/twemoji/2/svg/1f61c.svg",
+        alt: "😜"},
+        {src: "/twemoji/2/svg/1f61d.svg",
+        alt: "😝"},
+        {src: "/twemoji/2/svg/1f61e.svg",
+        alt: "😞"},
+        {src: "/twemoji/2/svg/1f61f.svg",
+        alt: "😟"},
+        {src: "/twemoji/2/svg/1f620.svg",
+        alt: "😠"},
+        {src: "/twemoji/2/svg/1f621.svg",
+        alt: "😡"},
+        {src: "/twemoji/2/svg/1f622.svg",
+        alt: "😢"},
+        {src: "/twemoji/2/svg/1f623.svg",
+        alt: "😣"},
+        {src: "/twemoji/2/svg/1f624.svg",
+        alt: "😤"},
+        {src: "/twemoji/2/svg/1f625.svg",
+        alt: "😥"},
+        {src: "/twemoji/2/svg/1f626.svg",
+        alt: "😦"},
+        {src: "/twemoji/2/svg/1f627.svg",
+        alt: "😧"},
+        {src: "/twemoji/2/svg/1f628.svg",
+        alt: "😨"},
+        {src: "/twemoji/2/svg/1f629.svg",
+        alt: "😩"},
+        {src: "/twemoji/2/svg/1f62a.svg",
+        alt: "😪"},
+        {src: "/twemoji/2/svg/1f62b.svg",
+        alt: "😫"},
+        {src: "/twemoji/2/svg/1f62c.svg",
+        alt: "😬"},
+        {src: "/twemoji/2/svg/1f62d.svg",
+        alt: "😭"},
+        {src: "/twemoji/2/svg/1f62e.svg",
+        alt: "😮"},
+        {src: "/twemoji/2/svg/1f62f.svg",
+        alt: "😯"},
+        {src: "/twemoji/2/svg/1f630.svg",
+        alt: "😰"},
+        {src: "/twemoji/2/svg/1f631.svg",
+        alt: "😱"},
+        {src: "/twemoji/2/svg/1f632.svg",
+        alt: "😲"},
+        {src: "/twemoji/2/svg/1f633.svg",
+        alt: "😳"},
+        {src: "/twemoji/2/svg/1f634.svg",
+        alt: "😴"},
+        {src: "/twemoji/2/svg/1f635.svg",
+        alt: "😵"},
+        {src: "/twemoji/2/svg/1f636.svg",
+        alt: "😶"},
+        {src: "/twemoji/2/svg/1f637.svg",
+        alt: "😷"},
+        {src: "/twemoji/2/svg/1f641.svg",
+        alt: "🙁"},
+        {src: "/twemoji/2/svg/1f642.svg",
+        alt: "🙂"},
+        {src: "/twemoji/2/svg/1f643.svg",
+        alt: "🙃"},
+        {src: "/twemoji/2/svg/1f644.svg",
+        alt: "🙄"},
+        {src: "/twemoji/2/svg/1f923.svg",
+        alt: "🤣"},
+        {src: "/twemoji/2/svg/2620.svg",
+        alt: "☠" },
+        {src: "/twemoji/2/svg/2622.svg",
+        alt: "☢" },
+        {src: "/twemoji/2/svg/2623.svg",
+        alt: "☣" },
+        {src: "/twemoji/2/svg/1f47f.svg",
+        alt: "👿"},
+        {src: "/twemoji/2/svg/1f480.svg",
+        alt: "💀"},
+        {src: "/twemoji/2/svg/1f47d.svg",
+        alt: "👽"},
+        {src: "/twemoji/2/svg/1f47b.svg",
+        alt: "👻"}]
+    },
+    // {
     //     // tab 的标题
     //     title: '新浪',
     //     // type -> 'emoji' / 'image'
@@ -676,14 +803,15 @@ var config = {
     //         alt: '[浮云]'
     //     }]
     // }, 
-    {
-        // tab 的标题
-        title: 'emoji',
-        // type -> 'emoji' / 'image'
-        type: 'emoji',
-        // content -> 数组
-        content: '😀 😁 😂 😃 😄 😅 😆 😇 😈 😉 😊 😋 😌 😍 😎 😏 😐 😑 😒 😓 😔 😕 😖 😗 😘 😙 😚 😛 😜 😝 😞 😟 😠 😡 😢 😣 😤 😥 😦 😧 😨 😩 😪 😫 😬 😭 😮 😯 😰 😱 😲 😳 😴 😵 😶 😷 🙁 🙂 🙃 🙄 🤣 👿 💀 👽 👻'.split(/\s/)
-    }],
+    // {
+    //     // tab 的标题
+    //     title: 'emoji',
+    //     // type -> 'emoji' / 'image'
+    //     type: 'emoji',
+    //     // content -> 数组
+    //     content: '😀 😁 😂 😃 😄 😅 😆 😇 😈 😉 😊 😋 😌 😍 😎 😏 😐 😑 😒 😓 😔 😕 😖 😗 😘 😙 😚 😛 😜 😝 😞 😟 😠 😡 😢 😣 😤 😥 😦 😧 😨 😩 😪 😫 😬 😭 😮 😯 😰 😱 😲 😳 😴 😵 😶 😷 🙁 🙂 🙃 🙄 🤣 👿 💀 👽 👻'.split(/\s/)
+    // }
+],
 
     // 编辑区域的 z-index
     zIndex: 6,
@@ -2278,7 +2406,7 @@ Emoticon.prototype = {
                     var alt = item.alt;
                     if (src) {
                         // 加一个 data-w-e 属性，点击图片的时候不再提示编辑图片
-                        faceHtml += '<span class="w-e-item"><img src="' + src + '" alt="' + alt + '" data-w-e="1"/></span>';
+                        faceHtml += '<span class="w-e-item"><img class="emoji" src="' + src + '" alt="' + alt + '" data-w-e="1"/></span>';
                     }
                 });
             }

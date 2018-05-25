@@ -58,6 +58,10 @@ resourceRouter
       // 如果格式满足则生成缩略图
       const descPathOfThumbnail = generateFolderName(thumbnailPath); // 存放路径
       const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 路径+名称
+
+      // 图片自动旋转
+      await imageMagick.allInfo(path);
+
       //开始裁剪、压缩
       await imageMagick.thumbnailify(path, thumbnailFilePath);
       // 添加水印
