@@ -193,7 +193,7 @@ function assemblePostObject(){  //bbcode , markdown
       post.c = common.URLifyHTML(post.c)
     }
   }
-  // return console.log(post.c)
+  //  return console.log(post.c)
   post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')
 
   return post
@@ -286,6 +286,7 @@ function submit(tid){
     }
   })
   var post = assemblePostObject()
+  // return console.log(post.c)
   if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
 
   geid('ButtonReply').disabled=true

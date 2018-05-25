@@ -565,7 +565,7 @@ function onPost(that) {
       screenTopWarning('请填写内容。');
       return;
     }
-    if (type !== 'thread' && type !== 'post' && type !== 'application' && title === '' && type !== 'forum_declare') {
+    if (type !== 'redit' && type !== 'thread' && type !== 'post' && type !== 'application' && title === '' && type !== 'forum_declare') {
       screenTopWarning('请填写标题。');
       return;
     }
