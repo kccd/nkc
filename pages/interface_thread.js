@@ -285,9 +285,13 @@ function submit(tid){
       $(this).parent().remove()
     }
   })
-  var post = assemblePostObject()
-  // return console.log(post.c)
-  if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
+  try{
+    var post = assemblePostObject()
+    // return console.log(post.c)
+    if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
+  }catch(err){
+    return;
+  }
 
   geid('ButtonReply').disabled=true
   return nkcAPI('/t/' + tid, 'POST', {

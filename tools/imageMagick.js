@@ -52,6 +52,21 @@ const watermarkify = path => {
   return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
 };
 
+// 手机图片上传自动旋转
+const allInfo = async path => {
+  let back;
+  back = await spawnProcess('magick', ['identify','-format','%[orientation]', path])
+  if(back.trim() === "RightTop"){
+    return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
+  }
+  if(back.trim() === "LeftBottom"){
+    return spawnProcess('magick', ['convert', path, '-rotate', '270', path]);
+  }
+  if(back.trim() === "BottomRight"){
+    return spawnProcess('magick', ['convert', path, '-rotate', '180', path]);
+  }
+}
+
 const info = async path => {
   let back;
   if(linux) {
@@ -208,6 +223,7 @@ module.exports = {
   attachify,
   watermarkify,
   info,
+  allInfo,
   thumbnailify,
   generateAdPost,
   avatarSmallify,
