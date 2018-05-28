@@ -30,6 +30,7 @@ const authRouter = require('./auth');
 const logRouter = require('./log');
 const forumAvatarRouter = require('./forum_avatar');
 const coverRouter = require('./cover');
+const pageRouter = require('./page');
 // -----------------------------------
 otherRouter
   .get('/latest', async (ctx, next) => {
@@ -154,5 +155,6 @@ otherRouter
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
 	.use('log', logRouter.routes(), logRouter.allowedMethods())
 	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
+	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods());
 module.exports = otherRouter;

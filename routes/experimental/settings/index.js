@@ -4,6 +4,7 @@ const forumRouter = require('./forum');
 const baseRouter = require('./base');
 const roleRouter = require('./role');
 const userRouter = require('./user');
+const scoreRouter = require('./score');
 const operationRouter = require('./operation');
 settingRouter
 	.get('/', async (ctx, next) => {
@@ -12,6 +13,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/role', roleRouter.routes(), roleRouter.allowedMethods())
 	.use('/base', baseRouter.routes(), baseRouter.allowedMethods())
 	.use('/operation', operationRouter.routes(), operationRouter.allowedMethods())

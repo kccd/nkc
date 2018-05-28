@@ -19,7 +19,6 @@ userRouter
 			}
 			if(targetUser) {
 				await targetUser.extend();
-				data.targetUser = targetUser.toObject();
 			}
 		} else {
 			if(page) {
