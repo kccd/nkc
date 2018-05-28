@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   title 问题列表
-  -const hiddenFooter = true;
+  -const mainContainer1400 = true;
 block content
   .container-fluid(style='max-width: 1400px')
     .col-xs-12.col-md-6
@@ -11,7 +11,7 @@ block content
         span= `${fromNow(problem.toc)}  `
         a(href=`/problem/list/${problem._id}`)
           h4= problem.t
-        br
+        hr
       if data.problems.length === 0
         h4 暂无问题
 block scripts

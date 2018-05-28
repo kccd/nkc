@@ -20,23 +20,4 @@
           br
           span= `文章：${threadCount} 回复：${postCount}`
         .description
-          p= description || '暂未填写个人简介'
-
-      //.user-info-list.forum-list(style=`min-height: 10em;padding-top: 0.5rem;${data.user && uid === data.user.uid?'border: 1px solid #337ab7': ''}`)
-      //  .displayName
-      //    h4(style='margin: 0.5rem 0;')
-      //      a(href=`/u/${uid}` title=description style='text-decoration: none;')
-      //        img(src=`/avatar/${uid}` style='width: 3rem;height: 3rem;border-radius: 50%;')
-      //        span &nbsp;
-      //        span= username
-      //      if data.user && uid !== data.user.uid
-      //        if data.userSubscribe.subscribeUsers.includes(uid)
-      //          button.btn.btn-sm.cancel-subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, false)`) 取关
-      //        else
-      //          button.btn.btn-sm.subscribe-btn(style='float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
-      //  .info
-      //    span= navbarDesc.cs
-      //    p!=`回复:${postCount}&nbsp;&nbsp;文章:${threadCount}`
-      //    p!=`学术分:${xsf}&nbsp;科创币:${kcb}`
-      //  .description
-      //    p= description || '暂未填写个人简介'
+          p(style='margin-top: 0;')= description || '暂未填写个人简介'

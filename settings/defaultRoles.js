@@ -42,7 +42,7 @@ module.exports = [
 		contentClass: [],
 		modifyPostTimeLimit: 0,
 		defaultRole: true,
-		operationsId: []
+		operationsId: ['visitLogin', 'submitLogin']
 	}
 
 

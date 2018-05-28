@@ -81,7 +81,10 @@ const settingSchema = new Schema({
 	// description: String,
 	keywords: [String],
 	brief: String,
-	language: String
+	language: String,
+
+	//用户积分
+	operationsId: [String]
 },
 {toObject: {
   getters: true,

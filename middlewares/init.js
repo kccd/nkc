@@ -26,21 +26,22 @@ module.exports = async (ctx, next) => {
 	  ctx.data.getcode = false;
 
 	  // - 初始化网站设置
-		const {telephone, websiteName, serverName, github, copyright, record, description, keywords, brief} = await db.SettingModel.findOnly({type: 'server'});
+		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
+
 	  ctx.data.serverSettings = {
-			websiteName,
-			serverName,
-		  github,
-		  copyright,
-		  record,
-		  description,
-		  keywords,
-		  brief,
-		  telephone
+			websiteName: serverSettings.websiteName,
+			serverName: serverSettings.serverName,
+		  github: serverSettings.github,
+		  copyright: serverSettings.copyright,
+		  record: serverSettings.record,
+		  description: serverSettings.description,
+		  keywords: serverSettings.keywords,
+		  brief: serverSettings.brief,
+		  telephone: serverSettings.telephone
 	  };
 
-
 	  ctx.es = es;
+
 	  ctx.fs = {
 	    access: promisify(fs.access),
 	    unlink: promisify(fs.unlink),
@@ -77,7 +78,6 @@ module.exports = async (ctx, next) => {
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
 	  ctx.template = 'error.pug';
-	  console.log(err);
 	  await body(ctx, () => {});
   }
   finally {

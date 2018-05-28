@@ -3,6 +3,7 @@ const https = require('https');
 const app = require('./app');
 const searchInit = require('./searchInit');
 const settings = require('./settings');
+const nkcModules = require('./nkcModules');
 const fs = require('fs');
 const path = require('path');
 const {useHttps, updateDate} = settings;
@@ -43,7 +44,6 @@ searchInit()
 	    }
     }
 
-    // 将网站基本设置写入全局变量
 	  const serverSettings = await SettingModel.findOnly({type: 'server'});
 
 	  // 加载语言文件
@@ -52,7 +52,7 @@ searchInit()
 	  const language = JSON.parse(languageFileContent);
 
 		// 初始化操作类型,让数据库的数据与operationTree同步
-    const operationsId = settings.operations.getOperationsId();
+    const operationsId = nkcModules.permission.getOperationsId();
     for(let operationId of operationsId) {
 	    const operationDB = await OperationModel.findOne({_id: operationId});
 	    if(!operationDB) {

@@ -20,7 +20,7 @@ module.exports = async (ctx) => {
       console.error(
         ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${(ctx.data.operation || '404').bgGreen} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red}`
       );
-      if (process.env.NODE_ENV !== 'production')
+      if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
     } else {
       console.log(
