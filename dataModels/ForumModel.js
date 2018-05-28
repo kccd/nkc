@@ -533,11 +533,15 @@ forumSchema.methods.getThreadsByQuery = async function(ctx, query) {
 	// const threads = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 	let threads1 = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 	let threads = [];
-	if(ctx.data.userLevel === 0){
+	if(ctx.data.userLevel <= 0){
 		for(var i in threads1){
 			if(threads1[i].recycleMark === true){
 				continue;
 			}
+			threads.push(threads1[i])
+		}
+	}else if(ctx.data.userLevel > 5){
+		for(var i in threads1){
 			threads.push(threads1[i])
 		}
 	}else{
