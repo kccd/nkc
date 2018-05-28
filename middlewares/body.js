@@ -25,6 +25,13 @@ module.exports = async (ctx, next) => {
     const type = ctx.request.accepts('json', 'html');
     const from = ctx.request.get('FROM');
 
+	  if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
+		  ctx.data.user = ctx.data.user.toObject();
+	  }
+	  if(ctx.data && ctx.data.targetUser && ctx.data.targetUser.toObject) {
+		  ctx.data.targetUser = ctx.data.targetUser.toObject();
+	  }
+
     if(from === 'htmlAPI'){
 	    ctx.data.html = ctx.nkcModules.render(path.resolve('./pages/' + ctx.localTemplate), ctx.data);
 	    ctx.body = ctx.data;
@@ -37,10 +44,4 @@ module.exports = async (ctx, next) => {
     }
     await next();
   }
-	if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
-		ctx.data.user = ctx.data.user.toObject();
-	}
-	if(ctx.data && ctx.data.targetUser && ctx.data.targetUser.toObject) {
-		ctx.data.targetUser = ctx.data.targetUser.toObject();
-	}
 };
