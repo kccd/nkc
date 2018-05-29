@@ -21,6 +21,26 @@ latestRouter
     // // 主页过滤掉退回标记的帖子
     // $match.recycleMark = {"$nin":[true]}
     data.paging = apiFn.paging(page, threadCount);
+    // 删除退修过时的帖子
+    // 取出全部被标记的帖子
+    const allMarkthreads = await db.ThreadModel.find({"recycleMark":true,"fid":{"$nin":["recycle"]}})
+    for(var i in allMarkthreads){
+      const delThreadLog = await db.DelPostLogModel.find({"postType":"thread","threadId":allMarkthreads[i].tid}).sort({toc:-1})
+      if(delThreadLog.length > 0){
+        if(delThreadLog[0].modifyType === false){
+          let sysTimeStamp = new Date(delThreadLog[0].toc).getTime()
+          let nowTimeStamp = new Date().getTime()
+          let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
+          let hourTimeStamp = 3600000 * 72;
+          let lastTimestamp = parseInt(new Date(delThreadLog[0].toc).getTime()) + hourTimeStamp;
+          if(diffTimeStamp > hourTimeStamp){
+            await allMarkthreads[i].update({"recycleMark":false,fid:"recycle"})
+          }
+        }
+      }else{
+        await allMarkthreads[i].update({"recycleMark":false,fid:"recycle"})
+      }
+    }
     const threads1 = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
     const threads = [];
 

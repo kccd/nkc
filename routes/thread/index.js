@@ -165,6 +165,26 @@ threadRouter
 				post.c = postContent.replace(/=/,`=${postLink},${step},`);
 			}
 		}));*/
+		// 删除退修超时的post
+		for(var a in posts){
+			if(posts[a].disabled === true){
+				var delPostLog = await db.DelPostLogModel.find({"postType":"post","postId":posts[a].pid}).sort({toc:-1});
+				if(delPostLog.length > 0){
+					if(delPostLog[0].modifyType === false){
+						let sysTimeStamp = new Date(delPostLog[0].toc).getTime()
+						let nowTimeStamp = new Date().getTime()
+						let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
+						let hourTimeStamp = 3600000 * 72;
+						let lastTimestamp = parseInt(new Date(delPostLog[0].toc).getTime()) + hourTimeStamp;
+						if(diffTimeStamp > hourTimeStamp){
+							await delPostLog[0].update({"delType":"toRecycle"})
+						}
+					}
+				}else{
+					await delPostLog[0].update({"delType":"toRecycle"})
+				}
+			}
+		}
 		// 如果是用户自己的回复，应该添加退修标记
 		let postAll = [];
 		if(!await thread.ensurePermissionOfModerators(ctx)){
