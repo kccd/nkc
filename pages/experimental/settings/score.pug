@@ -1,0 +1,57 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 积分设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        #content
+          table.table.table-hover
+            thead
+              tr
+                th 序号
+                th 操作名
+                th 操作介绍
+                th 操作者分数变化
+                th 被操作者分数变化
+                th 状态
+            tbody
+              -let n = 0;
+              for operation in data.operations
+                -n++;
+                tr
+                  th= n
+                  th= operation._id
+                  th= operation.description
+                  th
+                    input(type='number' value= operation.score name='score' class=operation._id)
+                  th
+                    input(type='number' value= operation.targetScore name='targetScore' class=operation._id)
+                  th
+                    label
+                      .icheckbox
+                        if data.scoreSettings.operationsId.includes(operation._id)
+                          input(type='checkbox' name='selectOperation' data-operation=operation._id checked=true)
+                        else
+                          input(type='checkbox' name='selectOperation' data-operation=operation._id )
+
+          button.btn.btn-primary(onclick='submit()') 保存
+
+
+
+block scripts
+
+  script(src='/icheck/icheck.js')
+  script(src='/interface_common.js')
+  script(src='/experimental/settings/score.js')
+
+
+
+

@@ -43,7 +43,7 @@ function toQueryString(object) {
   let qs = '';
   for(const key of Object.keys(object)) {
     const value = object[key];
-    if(value !== undefined){
+    if(value !== undefined && value !== null){
       if(qs === '') qs += key.toString() + '=' + value.toString();
       else qs += '&' + key.toString() + '=' + value.toString();
     }

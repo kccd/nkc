@@ -23,6 +23,14 @@ const operationSchema = new Schema({
 		type: [Number],
 		index: 1,
 		default: []
+	},
+	score: {
+		type: Number,
+		default: 0
+	},
+	targetScore: {
+		type: Number,
+		default: 0
 	}
 },{
 	collection: 'operations'

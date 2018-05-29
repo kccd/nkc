@@ -338,6 +338,11 @@ const certificates ={
 	    'read.php': {
 		    [name]: '兼容老版本',
 		    [GET]: true
+	    },
+	    page: {
+      	faq: {
+      		[GET]: true
+	      }
 	    }
     },
     elseModifyTimeLimit: 0,
@@ -1044,6 +1049,11 @@ const certificates ={
         			[GET]: true,
 				      [PATCH]: true
 			      }
+		      },
+		      score: {
+        		[name]: '用户积分',
+			      [GET]: true,
+			      [PATCH]: true
 		      }
 	      },
 	      status: {
