@@ -20,6 +20,7 @@ userRouter
 			if(targetUser) {
 				await targetUser.extend();
 			}
+			data.targetUser = targetUser;
 		} else {
 			if(page) {
 				page = parseInt(page);
@@ -59,11 +60,13 @@ userRouter
 			// 添加角色
 			const {roleDisplayName} = body;
 			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
+			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
 			await targetUser.update({$addToSet: {certs: role._id}});
 		} else if(operation === 'removeRole') {
 			// 移除角色
 			const {roleDisplayName} = body;
 			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
+			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
 			await targetUser.update({$pull: {certs: role._id}});
 
 		} else {

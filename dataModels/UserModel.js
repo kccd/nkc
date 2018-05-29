@@ -287,7 +287,7 @@ userSchema.virtual('navbarDesc').get(function() {
   	certs.push('scholar');
   }
   for(const cert of certs) {
-  	if(cert)
+  	if(cert && certificates[cert] && certificates[cert].displayName)
       cs.push(certificates[cert].displayName);
   }
   cs = cs.join(' ');

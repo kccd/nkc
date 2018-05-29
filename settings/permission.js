@@ -1098,22 +1098,22 @@ const certificates ={
 			    [POST]: true
 		    }
 	    },
+	    problem: {
+		    list: {
+			    [GET]: true,
+			    [parameter]: {
+				    [GET]: true,
+				    [PATCH]: true,
+				    [DELETE]: true
+			    }
+		    }
+	    },
     }
   },
   dev: {
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
-    	problem: {
-    		list: {
-    			[GET]: true,
-			    [parameter]: {
-    				[GET]: true,
-				    [PATCH]: true,
-				    [DELETE]: true
-			    }
-		    }
-	    },
     	system: {
 				[name]: '网站系统',
 		    [GET]: true,

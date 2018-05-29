@@ -32,8 +32,7 @@ usersRouter
 		const {user} = data;
 		if(operation === 'removeUserFromRole') {
 			if(role._id === 'dev') {
-				const devCount = await db.UserModel.count({certs: 'dev'});
-				if(devCount <= 1) ctx.throw(400, `角色<${role.displayName}>至少包含一位用户`);
+				ctx.throw(403, '运维人员不可移除！！！');
 			}
 			const {uid} = body;
 			const targetUser = await db.UserModel.findOnly({uid});

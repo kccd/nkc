@@ -11,8 +11,83 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-3
         #content
+          .list-group
+            -let n = 0;
+            mixin operationPanel(operation)
+              -n++;
+              -selected = data.scoreSettings.operationsId.includes(operation._id)
+              a.list-group-item(href=`/e/settings/score?type=${operation._id}` type='button' class=selected ? 'list-group-item-info' : '' style='cursor: pointer;')
+                strong= `${n}. `
+                span= operation.description
+            for operation in data.scoreOperations
+              +operationPanel(operation)
+            for operation in data.operations
+              +operationPanel(operation)
+      .col-xs-12.col-md-9
+        .panel.panel-default
+          .panel-heading
+            span= data.operation.description
+          .panel-body
+            -const operation = data.operation;
+            table.table
+              thead
+                tr
+                  th 类型
+                  th 每天次数
+                  th 操作者分数变化
+                  th 被操作者分数变化
+                  th 开启
+              tbody
+                tr
+                  th 科创币
+                  th
+                    input.kcb(type='number' name='count' value=operation.kcb.count)
+                  th
+                    input.kcb(type='number' name='number' value=operation.kcb.number)
+                  th
+                    input.kcb(type='number' name='targetNumber' value=operation.kcb.targetNumber)
+                  th
+                    label
+                      .icheckbox
+                        if operation.kcb.status
+                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                        else
+                          input.kcb(type='checkbox' name='selectOperation')
+                tr
+                  th 学术分
+                  th
+                    input.xsf(type='number' name='count' value=operation.xsf.count)
+                  th
+                    input.xsf(type='number' name='number' value=operation.xsf.number)
+                  th
+                    input.xsf(type='number' name='targetNumber' value=operation.xsf.targetNumber)
+                  th
+                    label
+                      .icheckbox
+                        if operation.xsf.status
+                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                        else
+                          input.kcb(type='checkbox' name='selectOperation')
+                tr
+                  th 积分
+                  th
+                    input.score(type='number' name='count' value=operation.score.count)
+                  th
+                    input.score(type='number' name='number' value=operation.score.number)
+                  th
+                    input.score(type='number' name='targetNumber' value=operation.score.targetNumber)
+                  th
+                    label
+                      .icheckbox
+                        if operation.score.status
+                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                        else
+                          input.kcb(type='checkbox' name='selectOperation')
+            button.btn.btn-primary(onclick=`submit(${data.type})`) 保存
+
+        if 0
           table.table.table-hover
             thead
               tr
@@ -23,7 +98,7 @@ block content
                 th 被操作者分数变化
                 th 状态
             tbody
-              -let n = 0;
+              - n = 0;
               for operation in data.operations
                 -n++;
                 tr

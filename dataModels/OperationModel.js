@@ -24,13 +24,62 @@ const operationSchema = new Schema({
 		index: 1,
 		default: []
 	},
-	score: {
-		type: Number,
-		default: 0
+	kcb: {
+		status: {
+			type: Boolean,
+			default: false,
+			index: 1
+		},
+		count: {
+			type: Number,
+			default: 0
+		},
+		number: {
+			type: Number,
+			default: 0
+		},
+		targetNumber: {
+			type: Number,
+			default: 0
+		}
 	},
-	targetScore: {
-		type: Number,
-		default: 0
+	xsf: {
+		status: {
+			type: Boolean,
+			default: false,
+			index: 1
+		},
+		count: {
+			type: Number,
+			default: 0
+		},
+		number: {
+			type: Number,
+			default: 0
+		},
+		targetNumber: {
+			type: Number,
+			default: 0
+		}
+	},
+	score: {
+		status: {
+			type: Boolean,
+			default: false,
+			index: 1
+		},
+		count: {
+			type: Number,
+			default: 0
+		},
+		number: {
+			type: Number,
+			default: 0
+		},
+		targetNumber: {
+			type: Number,
+			default: 0
+		}
 	}
 },{
 	collection: 'operations'
