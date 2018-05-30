@@ -380,4 +380,14 @@ userSchema.statics.createUser = async (userObj) => {
 	return user;
 };
 
+userSchema.methods.calculateScore = async function() {
+	const UsersScoreLogModel = mongoose.model('usersScoreLogs');
+	const logs = await UsersScoreLogModel.find({uid: this.uid, type: 'score'}).sort({toc: -1});
+	let score = 0;
+	logs.map(l => {
+		score += l.change
+	});
+	console.log(score);
+};
+
 module.exports = mongoose.model('users', userSchema);

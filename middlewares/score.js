@@ -60,6 +60,7 @@ const score = async (ctx, next) => {
 				logObj.change = number;
 				const newLog = db.UsersScoreLogModel(logObj);
 				await newLog.save();
+				await user.calculateScore();
 			}
 		}
 		if(targetNumber !== 0 && targetUser) {
@@ -68,9 +69,10 @@ const score = async (ctx, next) => {
 				const logObj = Object.assign({}, obj);
 				logObj.uid = targetUser.uid;
 				logObj.type = 'score';
-				logObj.change = number;
+				logObj.change = targetNumber;
 				const newLog = db.UsersScoreLogModel(logObj);
 				await newLog.save();
+				await targetUser.calculateScore();
 			}
 		}
 	}
