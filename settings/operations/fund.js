@@ -108,7 +108,7 @@ module.exports = {
 			},
 			remittance: {
 				GET: 'visitFundApplicationRemittance',
-				POST: 'SubmitFundApplicationRemittance',
+				POST: 'submitFundApplicationRemittance',
 				apply: {
 					GET: 'visitFundApplyRemittance',
 					POST: 'submitFundApplyRemittance'

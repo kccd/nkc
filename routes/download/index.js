@@ -8,7 +8,6 @@ const request = require("request")
 
 downloadRouter
 .get('/', async (ctx, next) => {
-  return console.log(ctx)
   await next();
 })
 .post('/', async (ctx, next) => {

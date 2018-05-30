@@ -33,9 +33,9 @@ function addOperationType() {
 	}
 }
 
-function modifyOperationType(id) {
+function modifyOperationType(id, displayName) {
 	if(!id) return;
-	var displayName = prompt('请输入新的类名：', '');
+	displayName = prompt('请输入新的类名：', displayName);
 	if(displayName === null) {
 	} else if(displayName === '') {
 		return screenTopWarning('分类名不能为空');

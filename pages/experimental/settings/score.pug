@@ -11,7 +11,7 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
-      .col-xs-12.col-md-3
+      .col-xs-12.col-md-4
         #content
           .list-group
             -let n = 0;
@@ -20,12 +20,12 @@ block content
               -selected = data.scoreSettings.operationsId.includes(operation._id)
               a.list-group-item(href=`/e/settings/score?type=${operation._id}` type='button' class=selected ? 'list-group-item-info' : '' style='cursor: pointer;')
                 strong= `${n}. `
-                span= operation.description
+                span= `${operation.description}（${operation._id}）`
             for operation in data.scoreOperations
               +operationPanel(operation)
             for operation in data.operations
               +operationPanel(operation)
-      .col-xs-12.col-md-9
+      .col-xs-12.col-md-8
         .panel.panel-default
           .panel-heading
             span= data.operation.description
@@ -67,9 +67,9 @@ block content
                     label
                       .icheckbox
                         if operation.xsf.status
-                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                          input.xsf(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input.kcb(type='checkbox' name='selectOperation')
+                          input.xsf(type='checkbox' name='selectOperation')
                 tr
                   th 积分
                   th
@@ -82,11 +82,17 @@ block content
                     label
                       .icheckbox
                         if operation.score.status
-                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                          input.score(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input.kcb(type='checkbox' name='selectOperation')
-            button.btn.btn-primary(onclick=`submit(${data.type})`) 保存
-
+                          input.score(type='checkbox' name='selectOperation')
+            button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
+        .panel.panel-default
+          .panel-heading
+            span 积分计算
+          .panel-body
+            .form-group
+              textarea.form-control#formula(rows=6)= data.scoreSettings.formula
+            button.btn.btn-primary(onclick=`saveFormula()`) 保存
         if 0
           table.table.table-hover
             thead

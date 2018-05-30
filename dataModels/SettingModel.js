@@ -85,7 +85,8 @@ const settingSchema = new Schema({
 	language: String,
 
 	//用户积分
-	operationsId: [String]
+	operationsId: [String],
+	formula: String,
 },
 {toObject: {
   getters: true,

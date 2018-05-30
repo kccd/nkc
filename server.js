@@ -22,7 +22,7 @@ searchInit()
 
     // 检测数据的完整性
 		// 初始化网站配置
-    const {SettingModel, RoleModel, OperationModel} = require('./dataModels');
+    const {SettingModel, RoleModel, OperationModel, OperationTypeModel} = require('./dataModels');
     const defaultData = require('./settings/defaultSettings');
     await Promise.all(defaultData.map(async settings => {
 			const settingsDB = await SettingModel.findOne({type: settings.type});
@@ -77,6 +77,19 @@ searchInit()
 
     // 运维包含所有的操作权限
     await RoleModel.update({_id: 'dev'}, {$set: {operationsId: operationsId}});
+
+    // 初始化默认操作
+	  const defaultOperationTypes = require('./settings/defaultOperaionTypes');
+	  for(const operationType of defaultOperationTypes) {
+	  	const operationTypeDB = await OperationTypeModel.findOne({type: operationType.type});
+	  	if(!operationTypeDB) {
+	  		console.log(`Initialize operationType - ${operationType.type}`);
+			  operationType._id = await SettingModel.operateSystemID('operationTypes', 1);
+	  		const newType = OperationTypeModel(operationType);
+	  		await newType.save();
+		  }
+	  }
+
 
     const jobs = require('./scheduleJob');
     jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);

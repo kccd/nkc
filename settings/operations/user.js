@@ -75,6 +75,8 @@ module.exports = {
 			}
 		},
 		subscribe: {
+			POST: 'subscribeUser',
+			DELETE: 'unSubscribeUser',
 			register: {
 				GET: 'visitSubscribeForums',
 				POST: 'submitSubscribeForums'

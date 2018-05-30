@@ -4,7 +4,12 @@ operationRouter
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		ctx.template = 'experimental/settings/operation.pug';
-		const operationTypes = await db.OperationTypeModel.find().sort({toc: 1});
+		const defaultOperationTypes = await db.OperationTypeModel.find({type: {$ne: 'common'}});
+		data.defaultOperationTypes = await Promise.all(defaultOperationTypes.map(async type => {
+			await type.extendOperationCount();
+			return type;
+		}));
+		const operationTypes = await db.OperationTypeModel.find({type: 'common'}).sort({toc: 1});
 		data.operationTypes = await Promise.all(operationTypes.map(async type => {
 			await type.extendOperationCount();
 			return type;
@@ -14,8 +19,6 @@ operationRouter
 		await next();
 	})
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
-
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -75,6 +78,7 @@ operationRouter
 		const {db, params} = ctx;
 		const {_id} = params;
 		const operationType = await db.OperationTypeModel.findOnly({_id});
+		if(operationType.type !== 'common') ctx.throw(400, '默认分类无被删除！！！');
 		await db.OperationModel.updateMany({typeId: operationType._id}, {$pull: {typeId: operationType._id}});
 		await operationType.remove();
 		await next();

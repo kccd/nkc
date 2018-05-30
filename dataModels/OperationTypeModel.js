@@ -15,6 +15,15 @@ const operationTypeSchema = new Schema({
 		type: String,
 		required: true,
 		unique: true
+	},
+	type: {
+		type: String,
+		default: 'common',
+		index: 1
+	},
+	description: {
+		type: String,
+		default: ''
 	}
 }, {
 	collection: 'operationTypes'
