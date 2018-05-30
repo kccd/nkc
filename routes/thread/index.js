@@ -180,8 +180,6 @@ threadRouter
 							await delPostLog[0].update({"delType":"toRecycle"})
 						}
 					}
-				}else{
-					await delPostLog[0].update({"delType":"toRecycle"})
 				}
 			}
 		}

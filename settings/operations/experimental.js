@@ -51,6 +51,10 @@ module.exports = {
 		score: {
 			GET: 'visitScoreSettings',
 			PATCH: 'modifyScoreSettings'
+		},
+		log: {
+			GET: 'logParamsSetting',
+			POST: 'logParamsSettingModify'
 		}
 	},
 	newSysInfo: {

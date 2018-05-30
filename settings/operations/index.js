@@ -37,6 +37,7 @@ const sms = require('./sms');
 const t = require('./thread');
 const u = require('./user');
 const page = require('./page');
+const download = require('./download')
 const operationObj = {};
 
 
@@ -113,6 +114,8 @@ operationObj.operationTree = {
 
 		u,// 用户
 
+		download, //图片自动下载
+		
 		page
 	}
 };

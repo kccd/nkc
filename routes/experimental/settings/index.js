@@ -6,6 +6,7 @@ const roleRouter = require('./role');
 const userRouter = require('./user');
 const scoreRouter = require('./score');
 const operationRouter = require('./operation');
+const logRouter = require('./log');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -16,7 +17,8 @@ settingRouter
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/role', roleRouter.routes(), roleRouter.allowedMethods())
 	.use('/base', baseRouter.routes(), baseRouter.allowedMethods())
-	.use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
+    .use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
+    .use('/log', logRouter.routes(), logRouter.allowedMethods())
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
 module.exports = settingRouter;

@@ -1,4 +1,4 @@
-const excludePath = ['.js', '.css', '.svg', '.png', '.jpg', '.woff2', '.woff', '.eot'];
+// const excludePath = ['.js', '.css', '.svg', '.png', '.jpg', '.woff2', '.woff', '.eot'];
 module.exports = async (ctx) => {
   const {LogModel} = ctx.db;
   const processTime = ctx.processTime;
@@ -28,18 +28,18 @@ module.exports = async (ctx) => {
       );
     }
   }
-  const pathArr = log.path.split('/');
-	const lastPath = pathArr[pathArr.length - 1];
-	let needLog = true;
-	for(let path of excludePath) {
-		if(lastPath.includes(path)) {
-			needLog = false;
-		}
-	}
-	if(pathArr[1] && ['favicon.ico', 'avatar','avatar_small' , 'cover', 'pfa', 'pfb', 'photo', 'photo_small'].includes(pathArr[1])) {
-		needLog = false;
-	}
-  if(ctx.status !== 304 && needLog) {
-	  await new LogModel(log).save();
-  }
+  // const pathArr = log.path.split('/');
+	// const lastPath = pathArr[pathArr.length - 1];
+	// let needLog = true;
+	// for(let path of excludePath) {
+	// 	if(lastPath.includes(path)) {
+	// 		needLog = false;
+	// 	}
+	// }
+	// if(pathArr[1] && ['favicon.ico', 'avatar','avatar_small' , 'cover', 'pfa', 'pfb', 'photo', 'photo_small'].includes(pathArr[1])) {
+	// 	needLog = false;
+	// }
+  // if(ctx.status !== 304 && needLog) {
+	//   await new LogModel(log).save();
+  // }
 };

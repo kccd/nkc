@@ -27,6 +27,11 @@ const logSchema = new Schema({
     required: true,
 	  index: 1
   },
+  operationId: {
+    type: String,
+    required: true,
+    index: 1
+  },
   reqTime: {
   	type: Date,
 	  index: 1
