@@ -21,6 +21,12 @@ block content
               a.list-group-item(href=`/e/settings/score?type=${operation._id}` type='button' class=selected ? 'list-group-item-info' : '' style='cursor: pointer;')
                 strong= `${n}. `
                 span= `${operation.description}（${operation._id}）`
+                if operation.kcb.status
+                  span - 科创币 -
+                if operation.xsf.status
+                  span - 学术分 -
+                if operation.score.status
+                  span - 积分 -
             for operation in data.scoreOperations
               +operationPanel(operation)
             for operation in data.operations
@@ -86,13 +92,15 @@ block content
                         else
                           input.score(type='checkbox' name='selectOperation')
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
+
         .panel.panel-default
           .panel-heading
-            span 积分计算
+            span 积分计算公式
           .panel-body
             .form-group
               textarea.form-control#formula(rows=6)= data.scoreSettings.formula
             button.btn.btn-primary(onclick=`saveFormula()`) 保存
+
         if 0
           table.table.table-hover
             thead

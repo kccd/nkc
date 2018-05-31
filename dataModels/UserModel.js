@@ -209,6 +209,14 @@ userSchema.virtual('newMessage')
 		this._newMessage = newMessage;
 	});
 
+userSchema.virtual('grade')
+	.get(function() {
+		return this._grade;
+	})
+	.set(function(grade) {
+		this._grade = grade;
+	});
+
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = require('./ThreadModel');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
@@ -302,6 +310,7 @@ userSchema.virtual('navbarDesc').get(function() {
   }
 });
 
+
 userSchema.pre('save', async function(next) {
   // handle the ElasticSearch index
   try {
@@ -380,6 +389,13 @@ userSchema.statics.createUser = async (userObj) => {
 	return user;
 };
 
+userSchema.methods.extendGrade = async function() {
+	const UsersGradeModel = mongoose.model('usersGrades');
+	this.score = this.score || 0;
+	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
+	return this.grade = grade;
+};
+
 userSchema.methods.calculateScore = async function() {
 	const UsersScoreLogModel = mongoose.model('usersScoreLogs');
 	const logs = await UsersScoreLogModel.find({uid: this.uid, type: 'score'}).sort({toc: -1});
@@ -389,5 +405,7 @@ userSchema.methods.calculateScore = async function() {
 	});
 	console.log(score);
 };
+
+
 
 module.exports = mongoose.model('users', userSchema);

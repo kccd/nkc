@@ -1,5 +1,9 @@
 module.exports = {
 	type: 'score',
 	operationsId: [],
-	formula: ''
+	formula: '',
+	downloadFile: {
+		numberOfDays: 0,
+		numberOfKcb: 0
+	}
 };

@@ -3,7 +3,8 @@ const settings = [
 	'fund',
 	'kcb',
 	'system',
-	'score'
+	'score',
+	'download'
 ];
 const defaultSettings = settings.map(n => {
 	return require(`./${n}`);

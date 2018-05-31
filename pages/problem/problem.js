@@ -1,5 +1,8 @@
 var markdown = window.markdownit();
 var data = $('#data').text();
+var hljs = {
+	highlightBlock: function(){}
+};
 data = JSON.parse(data);
 update();
 $('#title, #content, #reason, #solution, #QQ, #email').on('input', function() {
@@ -24,6 +27,9 @@ function update() {
 	$('#contentDiv').html(mdToHtml(content));
 	$('#QQDiv').text('QQ：' + (QQ || '暂无'));
 	$('#emailDiv').text('邮箱地址：' + (email || '暂无'));
+	$('pre code').each(function(i, block) {
+		hljs.highlightBlock(block);
+	});
 	return {
 		t: title,
 		c: content,

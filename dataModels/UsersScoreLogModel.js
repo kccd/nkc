@@ -16,7 +16,12 @@ const usersScoreLogSchema = new Schema({
 		default: '',
 		index: 1
 	},
-	change: {
+	number: {
+		type: Number,
+		default: 0,
+		index: 1
+	},
+	targetNumber: {
 		type: Number,
 		default: 0,
 		index: 1

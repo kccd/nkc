@@ -1054,6 +1054,27 @@ const certificates ={
         		[name]: '用户积分',
 			      [GET]: true,
 			      [PATCH]: true
+		      },
+		      download: {
+        		[name]: '下载设置',
+			      [GET]: true,
+			      [PATCH]: true
+		      },
+		      grade: {
+        		[name]: '用户等级设置',
+			      [GET]: true,
+			      [POST]: true,
+			      [parameter]: {
+        			[GET]: true,
+				      [DELETE]: true,
+				      [PATCH]: true
+			      }
+		      },
+		      kcb: {
+        		[name]: '科创币设置',
+			      [GET]: true,
+			      [PATCH]: true
+
 		      }
 	      },
 	      status: {

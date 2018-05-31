@@ -146,8 +146,8 @@
     "displayQuestionsLink": "显示<题库>入口",
     "visitEForumSettings": "访问管理页专业设置",
     "modifyEForumSettings": "在管理页修改专业排序",
-    "visitScoreSettings": "访问积分、科创币、学术分加减设置",
-    "modifyScoreSettings": "修改积分、科创币、学术分加减设置",
+    "visitScoreSettings": "访问积分设置",
+    "modifyScoreSettings": "修改积分设置",
     "visitSystemInfo": "查看系统通知",
     "sendSystemInfo": "发送系统通知",
     "visitFundHome": "访问基金首页",
@@ -213,6 +213,10 @@
     "subscribeUser": "关注用户",
     "unSubscribeUser": "取消关注用户",
     "editorAutoUploadImage": "编辑器自动上传文件",
-    "visitLog": "查看日志"
+    "visitLog": "查看日志",
+    "visitDownloadSettings": "访问下载设置页",
+    "modifyDownloadSettings": "修改下载设置",
+    "visitUsersGradeSettings": "访问用户等级设置页",
+    "modifyUsersGradeSettings": "修改用户等级设置"
   }
 }

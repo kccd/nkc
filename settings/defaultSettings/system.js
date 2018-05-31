@@ -14,7 +14,8 @@ module.exports = {
 		users: 0,
 		resources: 0,
 		photos: 0,
-		forums: 0
+		forums: 0,
+		usersGrades: 0
 	},
 	popPersonalForums: [],
 	ads: []

@@ -18,11 +18,12 @@ searchInit()
 
 	  global.NKC = {};
 	  global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
+	  global.NKC.startTime = Date.now();
 
 
     // 检测数据的完整性
 		// 初始化网站配置
-    const {SettingModel, RoleModel, OperationModel, OperationTypeModel} = require('./dataModels');
+    const {SettingModel, RoleModel, OperationModel, OperationTypeModel, UsersGradeModel} = require('./dataModels');
     const defaultData = require('./settings/defaultSettings');
     await Promise.all(defaultData.map(async settings => {
 			const settingsDB = await SettingModel.findOne({type: settings.type});
@@ -90,6 +91,17 @@ searchInit()
 		  }
 	  }
 
+	  // 初始化用户等级
+	  const usersGradesCount = await UsersGradeModel.count();
+	  if(usersGradesCount === 0) {
+		  const defaultUsersGrades = require('./settings/defaultUsersGrades');
+		  for(const grade of defaultUsersGrades) {
+			  console.log(`Initialize usersGrade - ${grade.displayName}`);
+			  grade._id = await SettingModel.operateSystemID('usersGrades', 1);
+		  	const newGrade = UsersGradeModel(grade);
+		  	await newGrade.save();
+		  }
+	  }
 
     const jobs = require('./scheduleJob');
     jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);

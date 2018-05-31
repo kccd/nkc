@@ -51,6 +51,24 @@ module.exports = {
 		score: {
 			GET: 'visitScoreSettings',
 			PATCH: 'modifyScoreSettings'
+		},
+		download: {
+			GET: 'visitDownloadSettings',
+			PATCH: 'modifyDownloadSettings'
+		},
+		grade: {
+			GET: 'visitUsersGradeSettings',
+			PATCH: 'modifyUsersGradeSettings',
+			POST: 'addUsersGrade',
+			PARAMETER: {
+				GET: 'visitUsersGradeSettings',
+				PATCH: 'modifyUsersGradeSettings',
+				DELETE: 'deleteUsersGrade'
+			}
+		},
+		kcb: {
+			GET: 'visitKcbSettings',
+			PATCH: 'modifyKcbSettings'
 		}
 	},
 	newSysInfo: {
