@@ -32,20 +32,20 @@ function saveOperation(id) {
 		_id: id,
 		kcb: {
 			count: parseInt($('.kcb[name="count"]').val()),
-			number: parseInt($('.kcb[name="number"]').val()),
-			targetNumber: parseInt($('.kcb[name="targetNumber"]').val()),
+			whoChange: $('select.kcb').val() === '操作者'?'me': 'other',
+			change: parseInt($('.kcb[name="change"]').val()),
 			status: $('.kcb[name="selectOperation"]').prop('checked')
 		},
 		xsf: {
 			count: parseInt($('.xsf[name="count"]').val()),
-			number: parseInt($('.xsf[name="number"]').val()),
-			targetNumber: parseInt($('.xsf[name="targetNumber"]').val()),
+			whoChange: $('select.xsf').val() === '操作者'?'me': 'other',
+			change: parseInt($('.xsf[name="change"]').val()),
 			status: $('.xsf[name="selectOperation"]').prop('checked')
 		},
 		score: {
 			count: parseInt($('.score[name="count"]').val()),
-			number: parseInt($('.score[name="number"]').val()),
-			targetNumber: parseInt($('.score[name="targetNumber"]').val()),
+			whoChange: $('select.score').val() === '操作者'?'me': 'other',
+			change: parseInt($('.score[name="change"]').val()),
 			status: $('.score[name="selectOperation"]').prop('checked')
 		}
 	};

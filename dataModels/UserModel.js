@@ -87,7 +87,11 @@ const userSchema = new Schema({
   postSign: String,
 	volumeA: {
   	type: Boolean,
-		default: 'false'
+		default: false
+	},
+	volumeB: {
+  	type: Boolean,
+		default: false
 	}
 },
 {toObject: {

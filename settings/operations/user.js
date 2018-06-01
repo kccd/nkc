@@ -9,6 +9,9 @@ module.exports = {
 			avatar: {
 				GET: 'visitUserAvatarSettings',
 			},
+			username: {
+				PATCH: 'modifyUsername'
+			},
 			info: {
 				GET: 'visitUserInfoSettings',
 				PATCH: 'modifyUserInfo'
@@ -44,7 +47,13 @@ module.exports = {
 			},
 			email: {
 				GET: 'visitEmailSettings',
-				POST: 'bindEmail'
+				POST: 'sendEmail',
+				bind: {
+					GET: 'bindEmail'
+				},
+				verify: {
+					GET: 'changeEmail'
+				}
 			},
 			verify: {
 				PARAMETER: {

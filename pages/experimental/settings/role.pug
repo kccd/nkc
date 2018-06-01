@@ -56,31 +56,31 @@ block content
                     div.text-center(style='padding: 3rem;font-size: 2rem;color: #aaa;') 暂无用户
                   else
                     include ../../interface_navigation_paging
-                    table.table.table-hover
-                      thead
-                        tr
-                          th 用户名
-                          th 文章
-                          th 回复
-                          th 注册时间
-                          th 注册IP
-                          th
-                      tbody
-                        for user in data.users
+                      table.table.table-hover
+                        thead
                           tr
+                            th 用户名
+                            th 文章
+                            th 回复
+                            th 注册时间
+                            th 注册IP
                             th
-                              img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
-                              a(href=`/u/${user.uid}`)= user.username
-                            th= user.threadCount
-                            th= user.postCount
-                            th= fromNow(user.toc)
-                            th= `${user.regIP} : ${user.regPort}`
-                            th
-                              if data.role._id !== 'default' && data.role._id !== 'dev'
-                                if data.role._id === 'banned'
-                                  button(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
-                                else
-                                  button(onclick=`removeUserFromRole("${data.role._id}", "${user.uid}")`) 移除
+                        tbody
+                          for user in data.users
+                            tr
+                              th
+                                img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                                a(href=`/u/${user.uid}`)= user.username
+                              th= user.threadCount
+                              th= user.postCount
+                              th= fromNow(user.toc)
+                              th= `${user.regIP} : ${user.regPort}`
+                              th
+                                if data.role._id !== 'default' && data.role._id !== 'dev'
+                                  if data.role._id === 'banned'
+                                    button(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
+                                  else
+                                    button(onclick=`removeUserFromRole("${data.role._id}", "${user.uid}")`) 移除
                     include ../../interface_navigation_paging
                 else if data.t === 'base'
                   .row

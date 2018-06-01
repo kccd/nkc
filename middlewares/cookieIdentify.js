@@ -1,14 +1,9 @@
-const db = require('../dataModels');
-
 module.exports = async (ctx, next) => {
   //cookie identification
 	const {data, db} = ctx;
-	const visitorRole = await db.RoleModel.findOnly({_id: 'visitor'});
-	data.userOperationsId = visitorRole.operationsId;
   const userInfo = ctx.cookies.get('userInfo');
-  if(!userInfo) {
-    await next();
-  } else {
+	let userOperationsId = [];
+	if(userInfo) {
     const {username, uid} = JSON.parse(decodeURI(userInfo));
     const user = await db.UserModel.findOne({uid});
     if (!user || user.username !== username) {
@@ -35,7 +30,6 @@ module.exports = async (ctx, next) => {
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     user.draftCount = await db.DraftModel.count({uid: user.uid});
     data.user = user;
-	  let userOperationsId = [];
 	  if(user.certs.includes('banned')) {
 	  	user.certs = ['banned'];
 	  } else {
@@ -58,7 +52,10 @@ module.exports = async (ctx, next) => {
 				}
 			}
     }));
-    data.userOperationsId = userOperationsId;
-    await next();
+  } else {
+	  const visitorRole = await db.RoleModel.findOnly({_id: 'visitor'});
+	  userOperationsId = visitorRole.operationsId;
   }
+	data.userOperationsId = userOperationsId;
+	await next();
 };

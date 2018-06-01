@@ -65,7 +65,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:8;background-
           a(href=`/fund` title='科创基金') 基金
       ul.nav.navbar-nav.navbar-right.nav-font-color(style='font-size: 1em;')
         if data.user
-          if data.userLevel >= 4
+          if data.userOperationsId.includes('visitExperimentalStatus')
             li
               a(style='color: #777777;' href='/e')
                 span.fa.fa-cogs &nbsp;

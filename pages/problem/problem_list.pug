@@ -11,10 +11,10 @@ block content
             a(href='/problem/list') 全部
               span.badge= (data.unsolvedCount + data.resolvedCount) || ''
           li(role='presentation' class=data.type==='unsolved'?'active': '')
-            a(href='/problem/list?type=unsolved') 未解决
+            a(href='/problem/list?type=unsolved') 未完成
               span.badge= (data.unsolvedCount) || ''
           li(role='presentation' class=data.type==='resolved'?'active': '')
-            a(href='/problem/list?type=resolved') 已解决
+            a(href='/problem/list?type=resolved') 已完成
               span.badge= (data.resolvedCount) || ''
         include ../interface_navigation_paging
         br
@@ -34,9 +34,9 @@ block content
                   span &nbsp;&nbsp;
                 if !data.type
                   if problem.resolved
-                    span.label.label-success 已解决
+                    span.label.label-success 已完成
                   else
-                    span.label.label-danger 未解决
+                    span.label.label-danger 未完成
                   span &nbsp;&nbsp;
               div(style='color: #aaa;display: inline')
                 span
@@ -48,9 +48,8 @@ block content
                   span= `${fromNow(problem.toc)}`
                 a(href=`/problem/list/${problem._id}` style='text-decoration: none;')
                   h4= problem.t
-
         if data.problems.length === 0
           h4(style='color: #aaa;') 暂无问题
 block scripts
-  script(src='/interface_common.js')
-  script(src='/problem/add_problem.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/problem/add_problem.js?v=${global.NKC.startTime}`)

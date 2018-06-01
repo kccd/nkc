@@ -42,8 +42,8 @@ block content
                 tr
                   th 类型
                   th 每天次数
-                  th 操作者分数变化
-                  th 被操作者分数变化
+                  th 受影响的人
+                  th 分数变化
                   th 开启
               tbody
                 tr
@@ -51,9 +51,15 @@ block content
                   th
                     input.kcb(type='number' name='count' value=operation.kcb.count)
                   th
-                    input.kcb(type='number' name='number' value=operation.kcb.number)
+                    select.kcb
+                      if operation.kcb.whoChange === 'me'
+                        option(selected=true) 操作者
+                        option 被操作者
+                      else
+                        option 操作者
+                        option(selected=true) 被操作者
                   th
-                    input.kcb(type='number' name='targetNumber' value=operation.kcb.targetNumber)
+                    input.kcb(type='number' name='change' value=operation.kcb.change)
                   th
                     label
                       .icheckbox
@@ -66,9 +72,15 @@ block content
                   th
                     input.xsf(type='number' name='count' value=operation.xsf.count)
                   th
-                    input.xsf(type='number' name='number' value=operation.xsf.number)
+                    select.xsf
+                      if operation.xsf.whoChange === 'me'
+                        option(selected=true) 操作者
+                        option 被操作者
+                      else
+                        option 操作者
+                        option(selected=true) 被操作者
                   th
-                    input.xsf(type='number' name='targetNumber' value=operation.xsf.targetNumber)
+                    input.xsf(type='number' name='change' value=operation.xsf.change)
                   th
                     label
                       .icheckbox
@@ -81,9 +93,15 @@ block content
                   th
                     input.score(type='number' name='count' value=operation.score.count)
                   th
-                    input.score(type='number' name='number' value=operation.score.number)
+                    select.score
+                      if operation.score.whoChange === 'me'
+                        option(selected=true) 操作者
+                        option 被操作者
+                      else
+                        option 操作者
+                        option(selected=true) 被操作者
                   th
-                    input.score(type='number' name='targetNumber' value=operation.score.targetNumber)
+                    input.score(type='number' name='change' value=operation.score.change)
                   th
                     label
                       .icheckbox
@@ -91,6 +109,7 @@ block content
                           input.score(type='checkbox' name='selectOperation' checked=true)
                         else
                           input.score(type='checkbox' name='selectOperation')
+
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
 
         .panel.panel-default

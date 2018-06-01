@@ -16,14 +16,14 @@ const usersScoreLogSchema = new Schema({
 		default: '',
 		index: 1
 	},
-	number: {
+	change: {
 		type: Number,
 		default: 0,
 		index: 1
 	},
-	targetNumber: {
-		type: Number,
-		default: 0,
+	whoChange: {
+		type: String,// me, other
+		required: true,
 		index: 1
 	},
 	operationId: {

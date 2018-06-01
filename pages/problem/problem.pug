@@ -3,6 +3,7 @@ block title
   -const problem = data.problem;
   title= problem.t
   -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
   style.
     pre{
       padding: 1rem;
@@ -26,18 +27,15 @@ block content
           span=problem.toc.toLocaleString()
           span &nbsp;&nbsp;
           if problem.resolved
-            span.label.label-success 已解决
+            span.label.label-success 已完成
           else
-            span.label.label-danger 未解决
-        .h2.text-center#titleH2= problem.t
-        #contentDiv= problem.c
-        h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
-        h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
-        hr
-        h2.text-center 分析
-        #reasonDiv= problem.reason || '暂无'
-        h2.text-center 总结
-        #solutionDiv= problem.solution || '暂无'
+            span.label.label-danger 未完成
+        .h2.text-center#titleH2
+        #contentDiv
+        if problem.QQ
+          h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
+        if problem.email
+          h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
         if problem.restorer && problem.resolveTime
           h4.text-right(style='color: #aaa;padding-top:2rem;')
             span(style='margin-right: 0.5rem;')= problem.resolveTime.toLocaleString()
@@ -55,25 +53,18 @@ block content
             input.form-control#title(type='text' value=problem.t)
           .form-group
             label 详细内容
-            textarea.form-control#content(rows=6)= problem.c
+            textarea.form-control#content(rows=23)= problem.c
           .form-group
-            label 分析
-            textarea.form-control#reason(rows=15)= problem.reason
-          .form-group
-            label 总结
-              span.text-danger （填写了内容视为已解决）
-            textarea.form-control#solution(rows=3)= problem.solution
-          .form-group
-            label QQ
-            input.form-control#QQ(type='number' value=problem.QQ)
-          .form-group
-            label 邮箱
-            input.form-control#email(type='email' value=problem.email)
+            .icheckbox
+              span 标记为已解决
+              input(type='checkbox' name='select' checked=problem.resolved)
+
           button.btn.btn-primary.btn-block(onclick=`submit(${problem._id})`) 保存
 
 
 
 block scripts
+  script(src='/icheck/icheck.js')
   script(src='/interface_common.js')
   script(src='/markdown-it/dist/markdown-it.js')
   script(src='/problem/problem.js')

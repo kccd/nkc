@@ -34,13 +34,13 @@ const operationSchema = new Schema({
 			type: Number,
 			default: 0
 		},
-		number: {
+		change: {
 			type: Number,
 			default: 0
 		},
-		targetNumber: {
-			type: Number,
-			default: 0
+		whoChange: {
+			type: String,
+			default: 'me'
 		}
 	},
 	xsf: {
@@ -53,13 +53,13 @@ const operationSchema = new Schema({
 			type: Number,
 			default: 0
 		},
-		number: {
+		change: {
 			type: Number,
 			default: 0
 		},
-		targetNumber: {
-			type: Number,
-			default: 0
+		whoChange: {
+			type: String,
+			default: 'me'
 		}
 	},
 	score: {
@@ -72,13 +72,13 @@ const operationSchema = new Schema({
 			type: Number,
 			default: 0
 		},
-		number: {
+		change: {
 			type: Number,
 			default: 0
 		},
-		targetNumber: {
-			type: Number,
-			default: 0
+		whoChange: {
+			type: String,
+			default: 'me'
 		}
 	}
 },{

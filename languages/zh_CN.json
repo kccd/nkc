@@ -177,7 +177,7 @@
     "visitDisabledFundList": "查看被封禁的基金项目",
     "visitFundApplicationForm": "查看基金申请表",
     "modifyApplicationForm": "修改基金申请表",
-    "deleteApplicationForm": "放弃，删除，作废基金申请表（理由里判断权限）",
+    "deleteApplicationForm": "放弃，删除，作废基金申请表（路由里判断权限）",
     "visitFundApplicationReport": "查看基金项目申请报告",
     "addFundApplicationReport": "添加基金项目申请报告",
     "deleteFundApplicationReport": "屏蔽基金项目申请报告",
@@ -217,6 +217,14 @@
     "visitDownloadSettings": "访问下载设置页",
     "modifyDownloadSettings": "修改下载设置",
     "visitUsersGradeSettings": "访问用户等级设置页",
-    "modifyUsersGradeSettings": "修改用户等级设置"
+    "modifyUsersGradeSettings": "修改用户等级设置",
+    "modifyUsername": "修改用户名",
+    "sendEmail": "发送邮件验证证码",
+    "changeEmail": "更换邮箱",
+    "addUsersGrade": "添加用户等级",
+    "deleteUsersGrade": "删除用户等级",
+    "visitKcbSettings": "访问科创币设置页",
+    "modifyKcbSettings": "修改科创币设置",
+    "modifyRoleUsers": "将用户从某个角色中移除"
   }
 }

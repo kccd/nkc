@@ -12,67 +12,35 @@ const score = async (ctx, next) => {
 	if(thread) obj.tid = thread.tid;
 	if(forum) obj.fid = forum.fid;
 	if(post) obj.pid = post.pid;
-
-	// 学术分、科创币
-	const arr = ['kcb', 'xsf'];
+	if(user) obj.uid = user.uid;
+	if(targetUser) obj.targetUid = targetUser.uid;
+	// 学术分、科创币、积分
+	const arr = ['kcb', 'xsf', 'score'];
 	const today = ctx.nkcModules.apiFunction.today();
 	for(const a of arr) {
 		if(operation[a].status) {
-			const {number, count, targetNumber} = operation[a];
-			if(number !== 0) {
-				const todayCount = await db.UsersScoreLogModel.count({uid: user.uid, type: a, operationId: operationId, toc: {$gt: today}});
-				if(count!== -1 && todayCount >= count) continue;
-				const updateObj = {};
-				updateObj[a] = number;
-				await user.update({$inc: updateObj});
-				const logObj = Object.assign({}, obj);
-				logObj.uid = user.uid;
-				logObj.type = a;
-				logObj.change = number;
-				const newLog = db.UsersScoreLogModel(logObj);
-				await newLog.save();
+			const {count, change, whoChange} = operation[a];
+			let scoreChangedUser, todayCount;
+			if(whoChange === 'me' && user) {
+				scoreChangedUser = user;
+				todayCount = await db.UsersScoreLogModel.count({uid: user.uid, operationId: operation._id, toc: {$gt: today}});
+			} else if(whoChange === 'other' && targetUser) {
+				scoreChangedUser = targetUser;
+				todayCount = await db.UsersScoreLogModel.count({targetUid: targetUser.uid, operationId: operation._id, toc: {$gt: today}});
 			}
-			if(targetUser && targetNumber !== 0) {
-				const todayCount = await db.UsersScoreLogModel.count({uid: targetUser.uid, type: a, operationId: operationId, toc: {$gt: today}});
-				if(count!== -1 && todayCount >= count) continue;
-				const updateObj = {};
-				updateObj[a] = targetNumber;
-				await targetUser.update({$inc: updateObj});
-				const logObj = Object.assign({}, obj);
-				logObj.uid = targetUser.uid;
-				logObj.type = a;
-				logObj.change = targetNumber;
-				const newLog = db.UsersScoreLogModel(logObj);
-				await newLog.save();
-			}
-		}
-	}
-
-	// 积分计算
-	if(operation.score.status) {
-		const {number, targetNumber, count} = operation.score;
-		if(number !== 0) {
-			const todayCount = await db.UsersScoreLogModel.count({uid: user.uid, type: 'score', operationId: operationId, toc: {$gt: today}});
-			if(count === -1 || todayCount < count) {
-				const logObj = Object.assign({}, obj);
-				logObj.uid = user.uid;
-				logObj.type = 'score';
-				logObj.change = number;
-				const newLog = db.UsersScoreLogModel(logObj);
-				await newLog.save();
-				await user.calculateScore();
-			}
-		}
-		if(targetNumber !== 0 && targetUser) {
-			const todayCount = await db.UsersScoreLogModel.count({uid: targetUser.uid, type: 'score', operationId: operationId, toc: {$ne: today}});
-			if(count === -1 || todayCount < count) {
-				const logObj = Object.assign({}, obj);
-				logObj.uid = targetUser.uid;
-				logObj.type = 'score';
-				logObj.change = targetNumber;
-				const newLog = db.UsersScoreLogModel(logObj);
-				await newLog.save();
-				await targetUser.calculateScore();
+			if(!scoreChangedUser || todayCount >= count) continue;
+			const logObj = Object.assign({}, obj);
+			logObj.change = change;
+			logObj.whoChange = whoChange;
+			logObj.type = a;
+			const newLog = db.UsersScoreLogModel(logObj);
+			await newLog.save();
+			const updateObj = {};
+			updateObj[a] = change;
+			scoreChangedUser[a] += change;
+			await scoreChangedUser.update({$inc: updateObj});
+			if(a === 'score') {
+				// 计算积分的函数
 			}
 		}
 	}

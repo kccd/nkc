@@ -1,13 +1,10 @@
-function submit(id, username) {
+function submit(id) {
 	var obj = {
-		username: $('#username').val(),
 		description: $('#description').val(),
 		postSign: $('#postSign').val(),
 		color: $('#color').val()
 	};
-	if(!obj.username) {
-		obj.username = username;
-	}
+
 	nkcAPI('/u/'+id+'/settings/info', 'PATCH', obj)
 		.then(function() {
 			screenTopAlert('修改成功');
@@ -19,4 +16,15 @@ function submit(id, username) {
 
 function changeUsername() {
 	$('#usernameInput').show();
+}
+
+function saveNewUsername(id) {
+	var username = $('#username').val();
+	nkcAPI('/u/'+id+'/settings/username', 'PATCH', {newUsername: username})
+		.then(function() {
+			screenTopAlert('修改成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
 }

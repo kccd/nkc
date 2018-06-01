@@ -19,7 +19,8 @@ module.exports = {
 					PATCH: 'modifyRoleBase'
 				},
 				users: {
-					GET: 'visitRoleUsers'
+					GET: 'visitRoleUsers',
+					PATCH: 'modifyRoleUsers'
 				},
 				permissions: {
 					GET: 'visitRolePermissionsSettings',

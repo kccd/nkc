@@ -9,7 +9,7 @@ emailRouter
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		data.userEmail = userPersonal.email;
 		if(email && token && operation === 'bindEmail') {
-			const emailCode = await db.EmailCodeModel.ensureEmailCode({
+			/*const emailCode = await db.EmailCodeModel.ensureEmailCode({
 				email,
 				token,
 				type: 'bindEmail'
@@ -25,7 +25,7 @@ emailRouter
 				email
 			});
 			await newSecretBehavior.save();
-			return ctx.redirect(`/u/${user.uid}/settings/email`);
+			return ctx.redirect(`/u/${user.uid}/settings/email`);*/
 		} else if(operation === 'verifyOldEmail') {
 			await db.EmailCodeModel.ensureEmailCode({
 				email: userPersonal.email,
@@ -36,7 +36,7 @@ emailRouter
 			data.email = userPersonal.email;
 			data.token = token;
 		} else if(operation === 'verifyNewEmail') {
-			const {oldToken} = query;
+			/*const {oldToken} = query;
 			let oldSmsCode, smsCode;
 			try {
 				oldSmsCode = await db.EmailCodeModel.ensureEmailCode({
@@ -69,11 +69,80 @@ emailRouter
 			await userPersonal.update({email});
 			await user.update({$addToSet: {certs: 'email'}});
 			await newSecretBehavior.save();
-			return ctx.redirect(`/u/${user.uid}/settings/email`);
+			return ctx.redirect(`/u/${user.uid}/settings/email`);*/
 		}
 		ctx.template = 'interface_user_settings_email.pug';
 		await next();
 	})
+	// 验证绑定邮箱
+	.get('/bind', async (ctx, next) => {
+		const {data, db, query} = ctx;
+		const {user} = data;
+		const {email, token} = query;
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const emailCode = await db.EmailCodeModel.ensureEmailCode({
+			email,
+			token,
+			type: 'bindEmail'
+		});
+		await emailCode.update({used: true});
+		await userPersonal.update({email});
+		await user.update({$addToSet: {certs: 'email'}});
+		/*const newSecretBehavior = db.SecretBehaviorModel({
+			uid: user.uid,
+			type: 'bindEmail',
+			ip: ctx.address,
+			port: ctx.port,
+			email
+		});
+		await newSecretBehavior.save();*/
+		data.success = true;
+		ctx.template = 'interface_user_settings_email.pug';
+		await next();
+	})
+	// 验证新邮箱
+	.get('/verify', async (ctx, next) => {
+		const {data, db, query} = ctx;
+		const {user} = data;
+		const {email, token, oldToken} = query;
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		let oldSmsCode, smsCode;
+		try {
+			oldSmsCode = await db.EmailCodeModel.ensureEmailCode({
+				email: userPersonal.email,
+				token: oldToken,
+				type: 'verifyOldEmail'
+			});
+		} catch (err) {
+			ctx.throw(400, `旧邮箱${err.message}`);
+		}
+		try {
+			smsCode = await db.EmailCodeModel.ensureEmailCode({
+				email,
+				token,
+				type: 'bindEmail'
+			});
+		} catch (err) {
+			ctx.throw(400, `新邮箱${err.message}`);
+		}
+		await oldSmsCode.update({used: true});
+		await smsCode.update({used: true});
+		/*const newSecretBehavior = db.SecretBehaviorModel({
+			uid: user.uid,
+			type: 'changeEmail',
+			ip: ctx.address,
+			port: ctx.port,
+			oldEmail: userPersonal.email,
+			newEmail: email
+		});*/
+		// await newSecretBehavior.save();
+		await userPersonal.update({email});
+		await user.update({$addToSet: {certs: 'email'}});
+		data.success = true;
+		ctx.template = 'interface_user_settings_email.pug';
+		await next();
+	})
+
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {operation} = body;
@@ -100,7 +169,7 @@ emailRouter
 			});
 			await emailCode.save();
 			const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
-			const href = `https://www.kechuang.org/u/${user.uid}/settings/email?email=${email}&token=${token}&operation=bindEmail`;
+			const href = `https://www.kechuang.org/u/${user.uid}/settings/email/bind?email=${email}&token=${token}`;
 			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
 			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
 			await sendEmail({
@@ -161,7 +230,7 @@ emailRouter
 			});
 			await emailCode.save();
 			const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
-			const href = `https://www.kechuang.org/u/${user.uid}/settings/email?email=${email}&token=${token}&oldToken=${oldToken}&operation=verifyNewEmail`;
+			const href = `https://www.kechuang.org/u/${user.uid}/settings/email/verify?email=${email}&token=${token}&oldToken=${oldToken}`;
 			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
 			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
 			await sendEmail({

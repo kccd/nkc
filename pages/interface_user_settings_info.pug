@@ -23,11 +23,17 @@ block content
                     span &nbsp;&nbsp;
                     button.btn.btn-primary.btn-sm(onclick='changeUsername()') 修改
                   #usernameInput(style='display: none;')
-                    if data.user.kcb < data.KCBSettings.changeUsername
-                      span.text-danger=`修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币，您当前的科创币不足。`
-                    else
-                      span.text-danger=`*修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币`
-                      input.form-control#username(placeholder='请输入新的用户名')
+                    .form
+                      .col-xs-12.col-md-12
+                        if data.user.kcb < data.KCBSettings.changeUsername
+                          .form-group
+                            span.text-danger=`修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币，您当前的科创币不足。`
+                        else
+                          .form-group
+                            span.text-danger=`*修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币`
+                            input.form-control#username(placeholder='请输入新的用户名')
+                          .form-group
+                            button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
 
               .form-group
                 label.col-sm-2.control-label 个人简介：
@@ -46,7 +52,7 @@ block content
 
               .form-group
                 .col-sm-4.col-sm-offset-2
-                  button.btn.btn-primary(onclick=`submit(${data.user.uid}, "${data.user.username}")`) 保存
+                  button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
 block scripts
   script(src='/jquery/jquery.minicolors.js')
   script(src='/interface_common.js')
