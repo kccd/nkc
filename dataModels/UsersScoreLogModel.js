@@ -21,9 +21,9 @@ const usersScoreLogSchema = new Schema({
 		default: 0,
 		index: 1
 	},
-	whoChange: {
-		type: String,// me, other
-		required: true,
+	targetChange: {
+		type: Number,
+		default: 0,
 		index: 1
 	},
 	operationId: {

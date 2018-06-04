@@ -88,6 +88,9 @@ const settingSchema = new Schema({
 	//用户积分
 	operationsId: [String],
 	formula: String,
+	operationsCount: {
+		type: Schema.Types.Mixed
+	},
 
 	//下载
 	numberOfDays: Number, // 收费天数

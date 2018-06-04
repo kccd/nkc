@@ -41,25 +41,26 @@ block content
               thead
                 tr
                   th 类型
-                  th 每天次数
                   th 受影响的人
-                  th 分数变化
+                  th 每天有效次数
+                  th 分数变化（积分系数）
                   th 开启
               tbody
                 tr
-                  th 科创币
+                  th
+                    h4 科创币
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
                   th
                     input.kcb(type='number' name='count' value=operation.kcb.count)
-                  th
-                    select.kcb
-                      if operation.kcb.whoChange === 'me'
-                        option(selected=true) 操作者
-                        option 被操作者
-                      else
-                        option 操作者
-                        option(selected=true) 被操作者
+                    br
+                    input.kcb(type='number' name='targetCount' value=operation.kcb.targetCount)
                   th
                     input.kcb(type='number' name='change' value=operation.kcb.change)
+                    br
+                    input.kcb(type='number' name='targetChange' value=operation.kcb.targetChange)
                   th
                     label
                       .icheckbox
@@ -68,47 +69,49 @@ block content
                         else
                           input.kcb(type='checkbox' name='selectOperation')
                 tr
-                  th 学术分
+                  th
+                    h4 学术分
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
                   th
                     input.xsf(type='number' name='count' value=operation.xsf.count)
-                  th
-                    select.xsf
-                      if operation.xsf.whoChange === 'me'
-                        option(selected=true) 操作者
-                        option 被操作者
-                      else
-                        option 操作者
-                        option(selected=true) 被操作者
+                    br
+                    input.xsf(type='number' name='targetCount' value=operation.xsf.targetCount)
                   th
                     input.xsf(type='number' name='change' value=operation.xsf.change)
+                    br
+                    input.xsf(type='number' name='targetChange' value=operation.xsf.targetChange)
                   th
                     label
                       .icheckbox
                         if operation.xsf.status
-                          input.xsf(type='checkbox' name='selectOperation' checked=true)
+                          input.kcb(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input.xsf(type='checkbox' name='selectOperation')
+                          input.kcb(type='checkbox' name='selectOperation')
                 tr
-                  th 积分
+                  th
+                    h4 积分
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
                   th
                     input.score(type='number' name='count' value=operation.score.count)
-                  th
-                    select.score
-                      if operation.score.whoChange === 'me'
-                        option(selected=true) 操作者
-                        option 被操作者
-                      else
-                        option 操作者
-                        option(selected=true) 被操作者
+                    br
+                    input.score(type='number' name='targetCount' value=operation.score.targetCount)
                   th
                     input.score(type='number' name='change' value=operation.score.change)
+                    br
+                    input.score(type='number' name='targetChange' value=operation.score.targetChange)
                   th
                     label
                       .icheckbox
                         if operation.score.status
-                          input.score(type='checkbox' name='selectOperation' checked=true)
+                          input.kcb(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input.score(type='checkbox' name='selectOperation')
+                          input.kcb(type='checkbox' name='selectOperation')
 
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
 
