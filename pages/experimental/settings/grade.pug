@@ -1,0 +1,93 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  title 用户等级设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-2
+        #content
+          .list-group
+            -let n = 0;
+            for grade in data.grades
+              -n++;
+              a.list-group-item(title=grade.description href=`/e/settings/grade/${grade._id}` type="button" class=data.grade && data.grade._id === grade._id ? 'active' : '')= grade.displayName
+                span.badge(style=`background-color: ${grade.color};color: #ffffff;`)= grade.score
+          .list-group
+            button.btn.btn-default.btn-block(onclick=`addGrade()`) 新增等级
+            if data.grade
+              button.btn.btn-danger.btn-block(onclick=`deleteGrade(${data.grade._id})`) 删除当前等级
+      .col-xs-12.col-md-10
+        .row
+          .col-xs-12.col-md-12
+            ul.nav.nav-pills
+              li(role='presentation' class=data.t === 'base' ? 'active' : '')
+                a(href=`/e/settings/grade/${data.grade._id}?t=base`) 基本设置
+              li(role='presentation' class=data.t === 'permissions' ? 'active' : '')
+                a(href=`/e/settings/grade/${data.grade._id}?t=permissions`) 权限设置
+
+          .col-xs-12.col-md-12
+            if data.t === 'base'
+              .form-horizontal
+                .form-group
+                  label.col-sm-2.control-label 称号
+                  .col-sm-6
+                    input.form-control#displayName(type='text' value=data.grade.displayName)
+                .form-group
+                  label.col-sm-2.control-label 积分
+                  .col-sm-6
+                    input.form-control#score(type='number' value=data.grade.score)
+                .form-group
+                  label.col-sm-2.control-label 颜色
+                  .col-sm-6
+                    input.form-control.demo#color(type='text' value=data.grade.color || '' data-control='hue')
+                .form-group
+                  label.col-sm-2.control-label 介绍
+                  .col-sm-6
+                    textarea.form-control#description(rows=8)= data.grade.description || ''
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-6
+                    button.btn.btn-primary(onclick=`saveGrade(${data.grade._id})`) 保存
+            else
+              table.table.table-hover
+                thead
+                  tr
+                    th 序号
+                    th 操作名
+                    th 操作介绍
+                    th 错误提示
+                tbody
+                  -let n = 0;
+                  for operation in data.operations
+                    -n++;
+                    tr
+                      th= n
+                      th= operation._id
+                      th= operation.description
+                      th= operation.errInfo
+                      th
+                        label
+                          .icheckbox
+                            if data.grade.operationsId.includes(operation._id)
+                              input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true')
+                            else
+                              input(type='checkbox' name='selectOperation' data-operation=operation._id )
+              button.btn.btn-primary(onclick=`saveGradePermission("${data.grade._id}")`) 保存
+
+
+block scripts
+  script(src=`/jquery/jquery.minicolors.js?v=${NKC.startTime}`)
+  script(src='/icheck/icheck.js')
+  script(src=`/interface_common.js?v=${NKC.startTime}`)
+  script(src=`/experimental/settings/grade.js?v=${NKC.startTime}`)
+
+
+
+

@@ -120,6 +120,7 @@ function getPermitTree(certs) {
 	for(const cert of certs) {
 		let inheritTree = {};
 		let certificate = certificates[cert];
+		if(!certificate) continue;
 		if(certificate.inheritFrom)
 			inheritTree = getPermitTree(certificate.inheritFrom);
 		tree = mergeTree(tree, mergeTree(inheritTree, certificate));
@@ -215,7 +216,7 @@ module.exports = async (ctx, next) => {
     return Map(base)
   };
   ctx.data.userLevel = excuteLevel(ctx.data.user);
-  if(!ctx.data.ensurePermission()) {
+  /*if(!ctx.data.ensurePermission()) {
   	if(ctx.data.ensurePermission(ctx.method, ctx.path, adminCertificates.permittedOperations)){
 		  if(ctx.data.userLevel < 0) {
 			  ctx.throw(403, '您的账号已被封禁，请退出登录后重新注册。');
@@ -226,6 +227,6 @@ module.exports = async (ctx, next) => {
 			//404
 		  ctx.throw(404, '资源未找到');
 	  }
-  }
+  }*/
   await next();
 };

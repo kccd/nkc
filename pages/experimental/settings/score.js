@@ -31,21 +31,24 @@ function saveOperation(id) {
 	var obj = {
 		_id: id,
 		kcb: {
-			count: $('.kcb[name="count"]').val(),
-			number: $('.kcb[name="number"]').val(),
-			targetNumber: $('.kcb[name="targetNumber"]').val(),
+			count: parseInt($('.kcb[name="count"]').val()),
+			targetCount: parseInt($('.kcb[name="targetCount"]').val()),
+			change: parseInt($('.kcb[name="change"]').val()),
+			targetChange: parseInt($('.kcb[name="targetChange"]').val()),
 			status: $('.kcb[name="selectOperation"]').prop('checked')
 		},
 		xsf: {
-			count: $('.xsf[name="count"]').val(),
-			number: $('.xsf[name="number"]').val(),
-			targetNumber: $('.xsf[name="targetNumber"]').val(),
+			count: parseInt($('.xsf[name="count"]').val()),
+			targetCount: parseInt($('.xsf[name="targetCount"]').val()),
+			change: parseInt($('.xsf[name="change"]').val()),
+			targetChange: parseInt($('.xsf[name="targetChange"]').val()),
 			status: $('.xsf[name="selectOperation"]').prop('checked')
 		},
 		score: {
-			count: $('.score[name="count"]').val(),
-			number: $('.score[name="number"]').val(),
-			targetNumber: $('.score[name="targetNumber"]').val(),
+			count: parseInt($('.score[name="count"]').val()),
+			targetCount: parseInt($('.score[name="targetCount"]').val()),
+			change: parseInt($('.score[name="change"]').val()),
+			targetChange: parseInt($('.score[name="targetChange"]').val()),
 			status: $('.score[name="selectOperation"]').prop('checked')
 		}
 	};

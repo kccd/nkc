@@ -1,0 +1,34 @@
+//新秀、少侠、大侠、掌门、宗师、盟主
+
+module.exports = [
+	{
+		displayName: '新秀',
+		description: '新秀',
+		score: 0
+	},
+	{
+		displayName: '少侠',
+		description: '少侠',
+		score: 10
+	},
+	{
+		displayName: '大侠',
+		description: '大侠',
+		score: 30
+	},
+	{
+		displayName: '掌门',
+		description: '掌门',
+		score: 60
+	},
+	{
+		displayName: '宗师',
+		description: '宗师',
+		score: 100
+	},
+	{
+		displayName: '盟主',
+		description: '盟主',
+		score: 150
+	}
+];

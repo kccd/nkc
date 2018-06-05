@@ -45,7 +45,7 @@ function modifyOperationType(id, displayName) {
 				window.location.reload();
 			})
 			.catch(function(data) {
-				screenTopAlert(data.error || data);
+				screenTopWarning(data.error || data);
 			})
 	}
 }

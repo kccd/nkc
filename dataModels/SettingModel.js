@@ -32,7 +32,8 @@ const settingSchema = new Schema({
     fundDocuments: Number,
     drafts: Number,
 	  operationTypes: Number,
-	  problems: Number
+	  problems: Number,
+	  usersGrades: Number,
   },
 
 	//科创基金设置
@@ -87,6 +88,13 @@ const settingSchema = new Schema({
 	//用户积分
 	operationsId: [String],
 	formula: String,
+	operationsCount: {
+		type: Schema.Types.Mixed
+	},
+
+	//下载
+	numberOfDays: Number, // 收费天数
+	numberOfKcb: Number, // 单次下载收取科创币数
 },
 {toObject: {
   getters: true,

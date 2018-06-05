@@ -57,8 +57,10 @@ block content
         if user
 
           include interface_thread_userpatch.pug
-        -var addQuestions = data.user? data.user.certs.includes('qc') || data.userLevel >= 3: false;
-        -var examinated = (data.userLevel >= 2)
+        // -var addQuestions = data.user? data.user.certs.includes('qc') || data.userLevel >= 3: false;
+        // -var examinated = (data.userLevel >= 2)
+        -var addQuestions = data.userOperationsId.includes('addQuestion');
+        -var examinated = data.user && data.user.volumeA && data.user.volumeB
         if !examinated || addQuestions
           .nkcpanel
             if !examinated

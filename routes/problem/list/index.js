@@ -47,23 +47,16 @@ listRouter
 		const {_id} = params;
 		const {user} = data;
 		const problem = await db.ProblemModel.findOnly({_id});
-		const {solution, t, c, email} = body;
+		const {t, c, resolved} = body;
 		if(!t) ctx.throw(400, '标题不能为空');
 		if(!c) ctx.throw(400, '详细内容不能为空');
-		/*if(email) {
-			const {checkEmailFormat} = ctx.tools.checkString;
-			if(checkEmailFormat(email) === -1) {
-				ctx.throw(400, '邮箱格式不正确');
-			}
-		}*/
 		body.resolveTime = Date.now();
-		if(solution) {
-			body.resolved = true;
+		if(user && resolved) {
 			body.restorerId = user.uid;
 		} else {
-			body.resolved = false;
 			body.restorerId = '';
 		}
+
 		await problem.update(body);
 		await next();
 	})

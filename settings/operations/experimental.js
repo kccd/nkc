@@ -19,7 +19,8 @@ module.exports = {
 					PATCH: 'modifyRoleBase'
 				},
 				users: {
-					GET: 'visitRoleUsers'
+					GET: 'visitRoleUsers',
+					PATCH: 'modifyRoleUsers'
 				},
 				permissions: {
 					GET: 'visitRolePermissionsSettings',
@@ -55,6 +56,24 @@ module.exports = {
 		log: {
 			GET: 'logParamsSetting',
 			POST: 'logParamsSettingModify'
+		},
+		download: {
+			GET: 'visitDownloadSettings',
+			PATCH: 'modifyDownloadSettings'
+		},
+		grade: {
+			GET: 'visitUsersGradeSettings',
+			PATCH: 'modifyUsersGradeSettings',
+			POST: 'addUsersGrade',
+			PARAMETER: {
+				GET: 'visitUsersGradeSettings',
+				PATCH: 'modifyUsersGradeSettings',
+				DELETE: 'deleteUsersGrade'
+			}
+		},
+		kcb: {
+			GET: 'visitKcbSettings',
+			PATCH: 'modifyKcbSettings'
 		}
 	},
 	newSysInfo: {

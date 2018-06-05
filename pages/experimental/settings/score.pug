@@ -21,6 +21,12 @@ block content
               a.list-group-item(href=`/e/settings/score?type=${operation._id}` type='button' class=selected ? 'list-group-item-info' : '' style='cursor: pointer;')
                 strong= `${n}. `
                 span= `${operation.description}（${operation._id}）`
+                if operation.kcb.status
+                  span - 科创币 -
+                if operation.xsf.status
+                  span - 学术分 -
+                if operation.score.status
+                  span - 积分 -
             for operation in data.scoreOperations
               +operationPanel(operation)
             for operation in data.operations
@@ -35,19 +41,26 @@ block content
               thead
                 tr
                   th 类型
-                  th 每天次数
-                  th 操作者分数变化
-                  th 被操作者分数变化
+                  th 受影响的人
+                  th 每天有效次数
+                  th 分数变化（积分系数）
                   th 开启
               tbody
                 tr
-                  th 科创币
+                  th
+                    h4 科创币
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
                   th
                     input.kcb(type='number' name='count' value=operation.kcb.count)
+                    br
+                    input.kcb(type='number' name='targetCount' value=operation.kcb.targetCount)
                   th
-                    input.kcb(type='number' name='number' value=operation.kcb.number)
-                  th
-                    input.kcb(type='number' name='targetNumber' value=operation.kcb.targetNumber)
+                    input.kcb(type='number' name='change' value=operation.kcb.change)
+                    br
+                    input.kcb(type='number' name='targetChange' value=operation.kcb.targetChange)
                   th
                     label
                       .icheckbox
@@ -56,13 +69,20 @@ block content
                         else
                           input.kcb(type='checkbox' name='selectOperation')
                 tr
-                  th 学术分
+                  th
+                    h4 学术分
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
                   th
                     input.xsf(type='number' name='count' value=operation.xsf.count)
+                    br
+                    input.xsf(type='number' name='targetCount' value=operation.xsf.targetCount)
                   th
-                    input.xsf(type='number' name='number' value=operation.xsf.number)
-                  th
-                    input.xsf(type='number' name='targetNumber' value=operation.xsf.targetNumber)
+                    input.xsf(type='number' name='change' value=operation.xsf.change)
+                    br
+                    input.xsf(type='number' name='targetChange' value=operation.xsf.targetChange)
                   th
                     label
                       .icheckbox
@@ -71,13 +91,20 @@ block content
                         else
                           input.xsf(type='checkbox' name='selectOperation')
                 tr
-                  th 积分
+                  th
+                    h4 积分
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
                   th
                     input.score(type='number' name='count' value=operation.score.count)
+                    br
+                    input.score(type='number' name='targetCount' value=operation.score.targetCount)
                   th
-                    input.score(type='number' name='number' value=operation.score.number)
-                  th
-                    input.score(type='number' name='targetNumber' value=operation.score.targetNumber)
+                    input.score(type='number' name='change' value=operation.score.change)
+                    br
+                    input.score(type='number' name='targetChange' value=operation.score.targetChange)
                   th
                     label
                       .icheckbox
@@ -85,14 +112,17 @@ block content
                           input.score(type='checkbox' name='selectOperation' checked=true)
                         else
                           input.score(type='checkbox' name='selectOperation')
+
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
+
         .panel.panel-default
           .panel-heading
-            span 积分计算
+            span 积分计算公式
           .panel-body
             .form-group
               textarea.form-control#formula(rows=6)= data.scoreSettings.formula
             button.btn.btn-primary(onclick=`saveFormula()`) 保存
+
         if 0
           table.table.table-hover
             thead

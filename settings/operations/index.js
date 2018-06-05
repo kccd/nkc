@@ -43,8 +43,6 @@ const operationObj = {};
 
 // 默认操作类型
 operationObj.defaultOperations = [
-	'displayExperimentalLink',
-	'displayQuestionsLink',
 
 ];
 

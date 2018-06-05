@@ -32,23 +32,13 @@ const problemSchema = new Schema({
 	},
 	c: {
 		type: String,
-		maxlength: [2048, '内容不能超过2048个字'],
+		maxlength: [2048, '内容不能超过10000个字'],
 		required: true
 	},
 	ip: {
 		type: String,
 		required: true,
 		index: 1
-	},
-	reason: {
-		type: String,
-		default: '',
-		maxlength: [2048, '字数不能超过2048']
-	},
-	solution: {
-		type: String,
-		default: '',
-		maxlength: [2048, '字数不能超过2048']
 	},
 	restorerId: {
 		type: String,

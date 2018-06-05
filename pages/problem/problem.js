@@ -1,5 +1,8 @@
 var markdown = window.markdownit();
 var data = $('#data').text();
+var hljs = {
+	highlightBlock: function(){}
+};
 data = JSON.parse(data);
 update();
 $('#title, #content, #reason, #solution, #QQ, #email').on('input', function() {
@@ -13,29 +16,29 @@ function mdToHtml(md) {
 }
 function update() {
 	var title = $('#title').val();
-	var reason = $('#reason').val();
 	var content = $('#content').val();
-	var solution = $('#solution').val();
 	var QQ = $('#QQ').val();
 	var email = $('#email').val();
 	$('#titleH2').text(title);
-	$('#reasonDiv').html(mdToHtml(reason || '暂无'));
-	$('#solutionDiv').html(mdToHtml(solution || '暂无'));
 	$('#contentDiv').html(mdToHtml(content));
-	$('#QQDiv').text('QQ：' + (QQ || '暂无'));
-	$('#emailDiv').text('邮箱地址：' + (email || '暂无'));
+	$('pre code').each(function(i, block) {
+		hljs.highlightBlock(block);
+	});
 	return {
 		t: title,
 		c: content,
-		solution: solution,
 		QQ: QQ,
 		email: email,
-		reason: reason
 	}
 }
 
+$('input[name="select"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+});
+
 function submit(_id, callback) {
 	var obj = update();
+	obj.resolved = $('input[name="select"]').prop('checked');
 	nkcAPI('/problem/list/'+_id, 'PATCH', obj)
 		.then(function() {
 			if(callback) {

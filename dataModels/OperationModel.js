@@ -34,11 +34,15 @@ const operationSchema = new Schema({
 			type: Number,
 			default: 0
 		},
-		number: {
+		targetCount: {
 			type: Number,
 			default: 0
 		},
-		targetNumber: {
+		change: {
+			type: Number,
+			default: 0
+		},
+		targetChange: {
 			type: Number,
 			default: 0
 		}
@@ -53,11 +57,15 @@ const operationSchema = new Schema({
 			type: Number,
 			default: 0
 		},
-		number: {
+		targetCount: {
 			type: Number,
 			default: 0
 		},
-		targetNumber: {
+		change: {
+			type: Number,
+			default: 0
+		},
+		targetChange: {
 			type: Number,
 			default: 0
 		}
@@ -72,11 +80,15 @@ const operationSchema = new Schema({
 			type: Number,
 			default: 0
 		},
-		number: {
+		targetCount: {
 			type: Number,
 			default: 0
 		},
-		targetNumber: {
+		change: {
+			type: Number,
+			default: 0
+		},
+		targetChange: {
 			type: Number,
 			default: 0
 		}
