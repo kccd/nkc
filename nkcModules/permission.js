@@ -20,7 +20,7 @@ permission.getOperationsId = () => {
 	return operations;
 };
 
-permission.getOperation = (url, method) => {
+permission.getOperationId = (url, method) => {
 	let urlArr = [];
 	url = url.replace(/\?.*/, '');
 	if(url === '/') {

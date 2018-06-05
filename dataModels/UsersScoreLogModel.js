@@ -6,17 +6,17 @@ const usersScoreLogSchema = new Schema({
 		default: '',
 		index: 1
 	},
+	type: {
+		type: String,
+		required: true,
+		index: 1
+	},
 	targetUid: {
 		type: String,
 		default: '',
 		index: 1
 	},
-	score: {
-		type: Number,
-		default: 0,
-		index: 1
-	},
-	targetScore: {
+	change: {
 		type: Number,
 		default: 0,
 		index: 1

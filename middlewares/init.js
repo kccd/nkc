@@ -65,6 +65,12 @@ module.exports = async (ctx, next) => {
 		});
 	  //error handling
     await next();
+		if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
+			ctx.data.user = ctx.data.user.toObject();
+		}
+		if(ctx.data && ctx.data.targetUser && ctx.data.targetUser.toObject) {
+			ctx.data.targetUser = ctx.data.targetUser.toObject();
+		}
   } catch(err) {
     const body = require('./body');
 	  ctx.status = err.statusCode || err.status || 500;

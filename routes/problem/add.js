@@ -3,6 +3,9 @@ const addRouter = new Router();
 addRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'problem/add_problem.pug';
+		const {data, query} = ctx;
+		const {c} = query;
+		data.c = c;
 		await ctx.db.ProblemModel.ensureSubmitPermission({ip: ctx.address});
 		await next();
 	})
@@ -15,7 +18,6 @@ addRouter
 		}
 		if(email) {
 			const {checkEmailFormat} = ctx.tools.checkString;
-			console.log(checkEmailFormat(email));
 			if(checkEmailFormat(email) === -1) {
 				ctx.throw(400, '邮箱格式不正确');
 			}

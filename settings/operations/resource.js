@@ -12,7 +12,7 @@ module.exports = {
 	},
 	forum_avatar: {// 专业logo
 		PARAMETER: {
-			POST: 'updateForumImage',
+			POST: 'updateForumAvatar',
 			GET: 'getForumAvatar'
 		}
 	},

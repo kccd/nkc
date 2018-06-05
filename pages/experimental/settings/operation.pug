@@ -16,17 +16,26 @@ block content
             .list-group
               a.list-group-item(href=`/e/settings/operation` class=data.operationType ? '' : 'active') 所有操作
                 span.badge= data.operations.length
+            .list-group
+              h4.text-center 默认分类
+              for type in data.defaultOperationTypes
+                a.list-group-item(title=type.description href=`/e/settings/operation/${type._id}` type="button" class=data.operationType && data.operationType._id === type._id ? 'active' : '')= type.displayName
+                  if type.operationCount > 0
+                    span.badge= type.operationCount
+            .list-group
+              h4.text-center 自定义分类
               for type in data.operationTypes
-                a.list-group-item(href=`/e/settings/operation/${type._id}` type="button" class=data.operationType && data.operationType._id === type._id ? 'active' : '')= type.displayName
+                a.list-group-item(title=type.description href=`/e/settings/operation/${type._id}` type="button" class=data.operationType && data.operationType._id === type._id ? 'active' : '')= type.displayName
                   if type.operationCount > 0
                     span.badge= type.operationCount
             button.btn.btn-default.btn-block(onclick='addOperationType()') 新建分类
             if data.operationType
-              button.btn.btn-default.btn-block(onclick=`modifyOperationType(${data.operationType ? data.operationType._id : ''})`) 修改当前分类名称
-              button.btn.btn-danger.btn-block(onclick=`deleteOperationType(${data.operationType ? data.operationType._id : ''})`) 删除当前分类
+              button.btn.btn-default.btn-block(onclick=`modifyOperationType(${data.operationType ? data.operationType._id : ''}, "${data.operationType?data.operationType.displayName:''}")`) 修改当前分类名称
+              if data.operationType.type === 'common'
+                button.btn.btn-danger.btn-block(onclick=`deleteOperationType(${data.operationType ? data.operationType._id : ''})`) 删除当前分类
           .col-xs-12.col-md-10
             -let operations;
-            .hidden#data= JSON.stringify({types: data.operationTypes})
+            .hidden#data= JSON.stringify({types: data.operationTypes.concat(data.defaultOperationTypes)})
             if data.operationType
               -operations = data.operationType.operations;
               .form-inline
@@ -36,6 +45,8 @@ block content
               .form-inline
                 lable 将已标记的操作移动到
                 select.form-control#operationSelect
+                  for operationType in data.defaultOperationTypes
+                    option= operationType.displayName
                   for operationType in data.operationTypes
                     option= operationType.displayName
                 button.btn.btn-default(onclick='moveOperations()') 移动

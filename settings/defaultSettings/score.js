@@ -1,4 +1,5 @@
 module.exports = {
 	type: 'score',
-	operationsId: []
+	operationsId: [],
+	formula: ''
 };

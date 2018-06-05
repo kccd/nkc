@@ -26,3 +26,45 @@ function submit() {
 			screenTopWarning(data.error || data);
 		})
 }
+
+function saveOperation(id) {
+	var obj = {
+		_id: id,
+		kcb: {
+			count: $('.kcb[name="count"]').val(),
+			number: $('.kcb[name="number"]').val(),
+			targetNumber: $('.kcb[name="targetNumber"]').val(),
+			status: $('.kcb[name="selectOperation"]').prop('checked')
+		},
+		xsf: {
+			count: $('.xsf[name="count"]').val(),
+			number: $('.xsf[name="number"]').val(),
+			targetNumber: $('.xsf[name="targetNumber"]').val(),
+			status: $('.xsf[name="selectOperation"]').prop('checked')
+		},
+		score: {
+			count: $('.score[name="count"]').val(),
+			number: $('.score[name="number"]').val(),
+			targetNumber: $('.score[name="targetNumber"]').val(),
+			status: $('.score[name="selectOperation"]').prop('checked')
+		}
+	};
+	nkcAPI('/e/settings/score', 'PATCH', obj)
+		.then(function() {
+			screenTopAlert('保存成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}
+
+function saveFormula() {
+	var formula = $('#formula').val();
+	nkcAPI('/e/settings/score', 'PATCH', {formula: formula, operation: 'modifyFormula'})
+		.then(function() {
+			screenTopAlert('保存成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data);
+		})
+}

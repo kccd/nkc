@@ -3,6 +3,6 @@ module.exports = {
 		GET: 'getPersonalResources'
 	},
 	life_photos: {
-		GET: 'getLifePhotos'
+		GET: 'getPersonalLifePhotos'
 	}
 };

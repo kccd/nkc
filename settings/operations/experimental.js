@@ -45,8 +45,8 @@ module.exports = {
 			}
 		},
 		forum: {
-			GET: 'visitGeneralForumSettings',
-			PATCH: 'modifyGeneralForumSettings'
+			GET: 'visitEForumSettings',
+			PATCH: 'modifyEForumSettings'
 		},
 		score: {
 			GET: 'visitScoreSettings',

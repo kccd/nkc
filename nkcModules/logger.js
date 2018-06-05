@@ -1,6 +1,6 @@
 // const excludePath = ['.js', '.css', '.svg', '.png', '.jpg', '.woff2', '.woff', '.eot'];
 module.exports = async (ctx) => {
-  const {LogModel} = ctx.db;
+  const {LogModel, OperationModel} = ctx.db;
   const processTime = ctx.processTime;
   const {address: ip, port} = ctx;
   const log = {
@@ -15,16 +15,17 @@ module.exports = async (ctx) => {
     processTime,
     uid: ctx.data.user? ctx.data.user.uid : 'visitor'
   };
+  const operation = await OperationModel.findOne({_id: ctx.data.operationId});
   if(ctx.logIt) {
     if (ctx.error) {
       console.error(
-        ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${(ctx.data.operation || '404').bgGreen} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red}`
+        ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation.description: '未知操作')}`
       );
       if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
     } else {
       console.log(
-        ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${(ctx.data.operation || '404').bgGreen} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green}`
+        ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(operation?operation.description: '未知操作')}`
       );
     }
   }

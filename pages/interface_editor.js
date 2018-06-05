@@ -46,6 +46,13 @@ $("document").ready(function(){
           return true
         }
         var newSrc = $(this).attr("srcs")
+        // 如果是本站图片，则不予以上传
+        var ownImage = "<img src='" + newSrc + "'>";
+        var isOwnImg = newSrc.indexOf("kechuang");
+        if(isOwnImg !== -1){
+          $(this).replaceWith(ownImage)
+          return true;
+        }
         // 使用正在下载图片替换当前图片
         //$(this).attr("src","/resources/site_specific/picupload.png")
         // console.log("newSrc",newSrc)
@@ -71,7 +78,6 @@ $("document").ready(function(){
           var newimgstr = $(this)
           
           nkcAPI("/download", "POST", data)
-          //console.log(fff)
           .then( function(data){
             newimgstr.attr("src","")
             newimgstr.attr("srcs","")
@@ -80,7 +86,6 @@ $("document").ready(function(){
             if(list)list.refresh()
           })
           .catch( function(err){
-            // console.log(err)
             newimgstr.attr("src","")
             newimgstr.attr("srcs","")
             newimgstr.replaceWith("<img src='/resources/site_specific/picdefault.png'>")
@@ -240,7 +245,9 @@ function Editor() {
 		  this.post.onclick = onPost(self);
 	  }
 		if(this.draft) {
-			this.draft.onclick = saveDraft(self);
+      this.draft.onclick = saveDraft(self);
+      // 加入保存草稿的定时器，三分钟保存一次
+      setInterval(saveDraft(self), 180000)
 		}
 	  if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
 		  this.blocked = true;
@@ -488,7 +495,7 @@ function saveDraft(that){
     return nkcAPI(url, method, data)
       .then(function (result) {
         if(result.status == "success"){
-          console.log(result.did)
+          // console.log(result.did)
           $("#draftId").html(result.did)
           screenTopAlert("保存成功！");
         }
