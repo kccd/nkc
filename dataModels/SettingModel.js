@@ -67,7 +67,7 @@ const settingSchema = new Schema({
 	serverName: {
   	type: String,
 		get: function(n) {
-  		if(!n) return;
+      if(!n) return;
   		return n.replace('$', global.NKC.NODE_ENV)
 		}
 	},

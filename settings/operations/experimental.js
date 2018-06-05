@@ -70,6 +70,10 @@ module.exports = {
 		kcb: {
 			GET: 'visitKcbSettings',
 			PATCH: 'modifyKcbSettings'
+		},
+		log: {
+			GET: 'logParamsSetting',
+			POST: 'logParamsSettingModify'
 		}
 	},
 	newSysInfo: {

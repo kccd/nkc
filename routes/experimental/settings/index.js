@@ -9,6 +9,7 @@ const operationRouter = require('./operation');
 const downloadRouter = require('./download');
 const gradeRouter = require('./grade');
 const kcbRouter = require('./kcb');
+const logRouter = require('./log');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -22,7 +23,8 @@ settingRouter
 	.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
 	.use('/role', roleRouter.routes(), roleRouter.allowedMethods())
 	.use('/base', baseRouter.routes(), baseRouter.allowedMethods())
-	.use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
+    .use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
+    .use('/log', logRouter.routes(), logRouter.allowedMethods())
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
 module.exports = settingRouter;

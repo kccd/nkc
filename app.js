@@ -20,7 +20,7 @@ app.on('error', err => {
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
 const {permissions} = require('./nkcModules');
-const {init, cookieIdentify, body, scoreHandler, urlRewrite, permission, score} = require('./middlewares');
+const {init, cookieIdentify, body, scoreHandler, urlRewrite, permission, score, logger} = require('./middlewares');
 
 try {
   mkdirSync('tmp');
@@ -42,6 +42,7 @@ app.use(init)
   .use(staticServe(path.resolve('./node_modules')))
   .use(staticServe(path.resolve('./pages')))
   .use(favicon(__dirname + '/resources/site_specific/favicon.ico'))
+  .use(logger)
 	.use(permissions)
 	.use(permission)
   .use(scoreHandler)

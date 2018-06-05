@@ -23,8 +23,9 @@ module.exports = async (ctx, next) => {
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
 	  ctx.data.twemoji = settings.editor.twemoji;
-	  ctx.data.getcode = false;
-
+		ctx.data.getcode = false;
+		let {operationsId} = await db.SettingModel.findOne({"type":"log"})
+		ctx.data.logSetting = operationsId
 	  // - 初始化网站设置
 		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
 

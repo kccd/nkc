@@ -1,3 +1,3 @@
 module.exports = {
-	GET: 'editorAutoUploadImage'
+  POST: 'editorAutoUploadImage'
 };

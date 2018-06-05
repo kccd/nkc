@@ -4,7 +4,8 @@ const settings = [
 	'kcb',
 	'system',
 	'score',
-	'download'
+	'download',
+	'log'
 ];
 const defaultSettings = settings.map(n => {
 	return require(`./${n}`);

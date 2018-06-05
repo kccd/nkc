@@ -1087,7 +1087,13 @@ const certificates ={
 			      [GET]: true,
 			      [PATCH]: true
 
-		      }
+		      },
+          log: {
+        	  [name]: '日志设置',
+            [GET]: true,
+            [PATCH]: true,
+            [POST]: true
+          }
 	      },
 	      status: {
 	      	[name]: '统计',

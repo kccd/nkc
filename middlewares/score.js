@@ -20,6 +20,7 @@ const score = async (ctx, next) => {
 	const today = ctx.nkcModules.apiFunction.today();
 
 	for(const a of arr) {
+		console.log(a);
 		if(!operation[a].status) continue;
 		if(!user && !targetUser) continue;
 		let {count, targetCount, change, targetChange} = operation[a];
