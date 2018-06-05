@@ -87,9 +87,9 @@ block content
                     label
                       .icheckbox
                         if operation.xsf.status
-                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                          input.xsf(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input.kcb(type='checkbox' name='selectOperation')
+                          input.xsf(type='checkbox' name='selectOperation')
                 tr
                   th
                     h4 积分
@@ -109,9 +109,9 @@ block content
                     label
                       .icheckbox
                         if operation.score.status
-                          input.kcb(type='checkbox' name='selectOperation' checked=true)
+                          input.score(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input.kcb(type='checkbox' name='selectOperation')
+                          input.score(type='checkbox' name='selectOperation')
 
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
 

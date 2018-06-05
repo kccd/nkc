@@ -25,12 +25,11 @@ const score = async (ctx, next) => {
 		let {count, targetCount, change, targetChange} = operation[a];
 		let userLogCount, targetUserLogCount;
 		if(user) {
-			userLogCount = await db.UsersScoreLogModel.count({uid: user.uid, operationId: operation._id, toc: {$gt: today}});
+			userLogCount = await db.UsersScoreLogModel.count({uid: user.uid, type: a, operationId: operation._id, toc: {$gt: today}});
 		}
 		if(targetUser) {
-			targetUserLogCount = await db.UsersScoreLogModel.count({targetUid: targetUser.uid, operationId: operation._id, toc: {$gt: today}});
+			targetUserLogCount = await db.UsersScoreLogModel.count({targetUid: targetUser.uid, type: a, operationId: operation._id, toc: {$gt: today}});
 		}
-
 
 		if(userLogCount < count || targetUserLogCount < targetCount) {
 
