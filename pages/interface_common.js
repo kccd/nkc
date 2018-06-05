@@ -452,6 +452,7 @@ function edInsertContent(which, myValue, fileType, fileName) {
       codeResource = "<p><a href=" + myValue + "><img src=" + "/default/default_thumbnail.png" + ">" + fileName + "</a></p>"
     }
     insertHtmlAtCaret(codeResource + "&nbsp;")
+    $("#text-elem").focus();
   }
 }
 

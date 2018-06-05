@@ -18,8 +18,8 @@ block content
                                 span.badge= data.operations.length
                             for type in data.operationTypes
                                 a.list-group-item(href=`/e/settings/operation/${type._id}` type="button" class=data.operationType && data.operationType._id === type._id ? 'active' : '')= type.displayName
-                                if type.operationCount > 0
-                                    span.badge= type.operationCount
+                                    if type.operationCount > 0
+                                        span.badge= type.operationCount
                         button.btn.btn-default.btn-block(onclick='saveLogSettings()') 保存操作
                         if data.operationType
                             button.btn.btn-default.btn-block(onclick=`modifyOperationType(${data.operationType ? data.operationType._id : ''})`) 修改当前分类名称

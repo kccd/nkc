@@ -1067,6 +1067,12 @@ const certificates ={
 			      [GET]: true,
 			      [PATCH]: true
 		      },
+          log: {
+        	  [name]: '日志设置',
+            [GET]: true,
+            [PATCH]: true,
+            [POST]: true
+          },
 		      download: {
         		[name]: '下载设置',
 			      [GET]: true,
@@ -1086,14 +1092,7 @@ const certificates ={
         		[name]: '科创币设置',
 			      [GET]: true,
 			      [PATCH]: true
-
 		      },
-          log: {
-        	  [name]: '日志设置',
-            [GET]: true,
-            [PATCH]: true,
-            [POST]: true
-          }
 	      },
 	      status: {
 	      	[name]: '统计',

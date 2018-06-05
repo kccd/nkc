@@ -625,7 +625,7 @@ $.offAll = function () {
 var config = {
 
     // 默认菜单配置
-    menus: ['head', 'bold', 'fontSize', 'fontName', 'italic', 'underline', 'strikeThrough', 'foreColor', 'backColor', 'link', 'list', 'justify', 'quote', 'emoticon', 'image', 'table', 'video', 'code', 'undo', 'redo', 'formula'],
+    menus: ['head', 'bold', 'fontSize', 'fontName', 'italic', 'underline', 'strikeThrough', 'foreColor', 'backColor', 'link', 'list', 'justify', 'quote', 'emoticon', 'image', 'table', 'video', 'code', 'undo', 'clean' ,'redo', 'formula'],
 
     fontNames: ['宋体', '微软雅黑', 'Arial', 'Tahoma', 'Verdana'],
 
@@ -1006,7 +1006,7 @@ function isFunction(fn) {
 // 构造函数
 function Bold(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="加粗">\n            <i class="fa fa-bold"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="加粗">\n            <i class="fa fa-bold"></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -1228,7 +1228,7 @@ function Head(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="设置标题"><i class="fa fa-header"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="设置标题"><i class="fa fa-header"></i></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -1292,7 +1292,7 @@ function FontSize(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="设置字号"><i class="fa fa-text-height"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="设置字号"><i class="fa fa-text-height"></i></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -1332,7 +1332,7 @@ function FontName(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu"><i class="w-e-icon-font"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="w-e-icon-font"></i></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -1570,7 +1570,7 @@ Panel.prototype = {
 // 构造函数
 function Link(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="添加链接"><i class="fa fa-link"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="添加链接"><i class="fa fa-link"></i></div>');
     this.type = 'panel';
 
     // 当前是否 active 状态
@@ -1620,7 +1620,8 @@ Link.prototype = {
         var btnDelId = getRandom('btn-del');
 
         // 是否显示“删除链接”
-        var delBtnDisplay = this._active ? 'inline-block' : 'none';
+        // var delBtnDisplay = this._active ? 'inline-block' : 'none';
+        var delBtnDisplay = 'none';
 
         // 初始化并显示 panel
         var panel = new Panel(this, {
@@ -1735,7 +1736,7 @@ Link.prototype = {
 // 构造函数
 function Italic(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="倾斜">\n            <i class="fa fa-italic"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="倾斜">\n            <i class="fa fa-italic"></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -1788,7 +1789,7 @@ Italic.prototype = {
 // 构造函数
 function Redo(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="重做">\n            <i class="fa fa-repeat"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="重做">\n            <i class="fa fa-repeat"></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -1816,7 +1817,7 @@ Redo.prototype = {
 // 构造函数
 function StrikeThrough(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="删除线">\n            <i class="fa fa-strikethrough"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="删除线">\n            <i class="fa fa-strikethrough"></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -1869,7 +1870,7 @@ StrikeThrough.prototype = {
 // 构造函数
 function Underline(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu"  title="下划线">\n            <i class="fa fa-underline"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu"  title="下划线">\n            <i class="fa fa-underline"></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -1916,13 +1917,43 @@ Underline.prototype = {
     }
 };
 
+
+/*
+    clean-menu
+*/
+//构造函数
+function Clean(editor){
+    this.editor = editor;
+    this.$elem = $('<div class="w-e-menu" title="清除格式">\n       <i class="fa fa-eraser"></i>\n       </div>');
+    this.type = 'click';
+
+    //当前是否 active 状态
+    this._active = false;
+}
+
+// 原型
+Clean.prototype = {
+    constructor: Clean,
+
+    // 点击事件
+    onClick: function onClick(e){
+        // 点击菜单将出发这里
+
+        var editor = this.editor;
+
+        var $selectionELem = editor.selection.getSelectionContainerElem();
+        var selectionText = editor.selection.getSelectionText();
+        editor.cmd.do('insertHTML', '<span>' + selectionText + '</span>');
+    }
+}
+
 /*
     undo-menu
 */
 // 构造函数
 function Undo(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="撤销">\n            <i class="fa fa-undo" ><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="撤销">\n            <i class="fa fa-undo" ></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -1936,9 +1967,8 @@ Undo.prototype = {
     // 点击事件
     onClick: function onClick(e) {
         // 点击菜单将触发这里
-
+        console.log("asdasdsa")
         var editor = this.editor;
-
         // 执行 undo 命令
         editor.cmd.do('undo');
     }
@@ -1952,7 +1982,7 @@ function List(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu"><i class="w-e-icon-list2"><i/></div>');
+    this.$elem = $('<div class="w-e-menu"><i class="w-e-icon-list2"></i></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -2029,7 +2059,7 @@ function Justify(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="对齐方式"><i class="fa fa-paragraph"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="对齐方式"><i class="fa fa-paragraph"></i></div>');
     this.type = 'droplist';
 
     // 当前是否 active 状态
@@ -2068,7 +2098,7 @@ function ForeColor(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="文字颜色"><i class="fa fa-pencil"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="文字颜色"><i class="fa fa-pencil"></i></div>');
     this.type = 'droplist';
 
     // 获取配置的颜色
@@ -2113,7 +2143,7 @@ function BackColor(editor) {
     var _this = this;
 
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="背景色"><i class="fa fa-paint-brush"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="背景色"><i class="fa fa-paint-brush"></i></div>');
     this.type = 'droplist';
 
     // 获取配置的颜色
@@ -2156,7 +2186,7 @@ BackColor.prototype = {
 // 构造函数
 function Quote(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="添加引用">\n            <i class="fa fa-quote-right"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="添加引用">\n            <i class="fa fa-quote-right"></i>\n        </div>');
     this.type = 'click';
 
     // 当前是否 active 状态
@@ -2224,7 +2254,7 @@ Quote.prototype = {
 // 构造函数
 function Code(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="插入代码">\n            <i class="fa fa-file-code-o"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="插入代码">\n            <i class="fa fa-file-code-o"></i>\n        </div>');
     this.type = 'panel';
 
     // 当前是否 active 状态
@@ -2359,7 +2389,7 @@ Code.prototype = {
 // 构造函数
 function Emoticon(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="添加表情">\n            <i class="fa fa-smile-o"><i/>\n        </div>');
+    this.$elem = $('<div class="w-e-menu" title="添加表情">\n            <i class="fa fa-smile-o"></i>\n        </div>');
     this.type = 'panel';
 
     // 当前是否 active 状态
@@ -2466,7 +2496,7 @@ Emoticon.prototype = {
 // 构造函数
 function Table(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="添加表格"><i class="fa fa-table"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="添加表格"><i class="fa fa-table"></i></div>');
     this.type = 'panel';
 
     // 当前是否 active 状态
@@ -2811,7 +2841,7 @@ Table.prototype = {
 //构造函数
 function formula(editor){
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="插入公式"><i class="w-e-icon-math"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="插入公式"><i class="w-e-icon-math"></i></div>');
     this.type = 'panel';
 }
 
@@ -2907,7 +2937,7 @@ function mathfreshnew(){
 // 构造函数
 function Video(editor) {
     this.editor = editor;
-    this.$elem = $('<div class="w-e-menu" title="插入视频"><i class="fa fa-video-camera"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" title="插入视频"><i class="fa fa-video-camera"></i></div>');
     this.type = 'panel';
 
     // 当前是否 active 状态
@@ -2990,7 +3020,7 @@ Video.prototype = {
 function Image(editor) {
     this.editor = editor;
     var imgMenuId = getRandom('w-e-img');
-    this.$elem = $('<div class="w-e-menu" id="' + imgMenuId + '"><i class="fa fa-file-image-o"><i/></div>');
+    this.$elem = $('<div class="w-e-menu" id="' + imgMenuId + '"><i class="fa fa-file-image-o"></i></div>');
     editor.imgMenuId = imgMenuId;
     this.type = 'panel';
 
@@ -3221,6 +3251,8 @@ MenuConstructors.strikeThrough = StrikeThrough;
 MenuConstructors.underline = Underline;
 
 MenuConstructors.undo = Undo;
+
+MenuConstructors.clean = Clean;
 
 MenuConstructors.list = List;
 
