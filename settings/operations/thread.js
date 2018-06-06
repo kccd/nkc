@@ -6,6 +6,9 @@ module.exports = {
 		moveThread: {
 			PATCH: 'moveThread'
 		},
+		moveDraft: {
+			PATCH: 'moveDraft'
+		},
 		addColl: {
 			POST: 'collectThread'
 		},

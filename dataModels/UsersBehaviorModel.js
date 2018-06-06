@@ -10,7 +10,7 @@ const usersBehaviorSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true,
+    // required: true,
     index: 1,
   },
 	oldUsername: {
@@ -19,7 +19,7 @@ const usersBehaviorSchema = new Schema({
 	},
   toUid: {
     type: String,
-    required: true,
+    // required: true,
     index: 1
   },
   pid: {
@@ -44,12 +44,12 @@ const usersBehaviorSchema = new Schema({
   },
   ip: {
     type: String,
-    required: true,
+    // required: true,
     index: 1
   },
   port: {
     type: String,
-    required: true,
+    // required: true,
     index: 1
   },
   score: {
@@ -63,7 +63,12 @@ const usersBehaviorSchema = new Schema({
   },
   operation: {
     type: String,
-    required: true,
+    // required: true,
+    index: 1
+  },
+  operationId: {
+    type: String,
+    // required: true,
     index: 1
   },
   type: {
