@@ -225,6 +225,7 @@
     "deleteUsersGrade": "删除用户等级",
     "visitKcbSettings": "访问科创币设置页",
     "modifyKcbSettings": "修改科创币设置",
-    "modifyRoleUsers": "将用户从某个角色中移除"
+    "modifyRoleUsers": "将用户从某个角色中移除",
+    "modifyOtherPost": "修改别人的post"
   }
 }

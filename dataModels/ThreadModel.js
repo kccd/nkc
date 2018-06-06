@@ -152,29 +152,29 @@ threadSchema.virtual('user')
     this._user = u;
   });
 threadSchema.methods.extendFirstPost = async function() {
-  const PostModel = require('./PostModel');
+  const PostModel = mongoose.model('posts');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})
 };
 
 threadSchema.methods.extendLastPost = async function() {
-  const PostModel = require('./PostModel');
-  return this.lastPost = (await PostModel
+	const PostModel = mongoose.model('posts');
+	return this.lastPost = (await PostModel
     .find({tid: this.tid, disabled: false})
     .sort({toc: -1}).limit(1))[0]
 };
 
 threadSchema.methods.extendForum = async function() {
-  const ForumModel = require('./ForumModel');
+  const ForumModel = mongoose.model('forums');
   return this.forum = await ForumModel.findOnly({fid: this.fid})
 };
 
 threadSchema.methods.extendCategory = async function() {
-  const ThreadTypeModel = require('./ThreadTypeModel');
+	const ThreadTypeModel = mongoose.model('threadTypes');
   return this.category = await ThreadTypeModel.findOne({fid: this.fid, cid: this.cid});
 };
 
 threadSchema.methods.extendUser = async function() {
-  const UserModel = require('./UserModel');
+  const UserModel = mongoose.model('users');
   return this.user = await UserModel.findOnly({uid: this.uid});
 };
 

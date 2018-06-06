@@ -2,7 +2,7 @@ module.exports = async (ctx, next) => {
   //cookie identification
 	const {data, db} = ctx;
   const userInfo = ctx.cookies.get('userInfo');
-	let userOperationsId = [];
+	let userOperationsId = [], userRoles = [], userGrade;
 	if(userInfo) {
     const {username, uid} = JSON.parse(decodeURI(userInfo));
     const user = await db.UserModel.findOne({uid});
@@ -37,15 +37,16 @@ module.exports = async (ctx, next) => {
 		  const defaultRole = await db.RoleModel.findOnly({_id: 'default'});
 		  userOperationsId = defaultRole.operationsId;
 		  // 根据用户积分计算用户等级，并且获取该等级下的所有权限
-		  const grade = await user.extendGrade();
-		  if(grade) {
-			  userOperationsId = userOperationsId.concat(grade.operationsId);
+		  userGrade = await user.extendGrade();
+		  if(userGrade) {
+			  userOperationsId = userOperationsId.concat(userGrade.operationsId);
 		  }
 	  }
 	  // 根据用户的角色获取权限
     await Promise.all(user.certs.map(async cert => {
 			const role = await db.RoleModel.findOne({_id: cert});
 			if(!role) return;
+			userRoles.push(role);
 			for(let operationId of role.operationsId) {
 				if(!userOperationsId.includes(operationId)) {
 					userOperationsId.push(operationId);
@@ -55,7 +56,10 @@ module.exports = async (ctx, next) => {
   } else {
 	  const visitorRole = await db.RoleModel.findOnly({_id: 'visitor'});
 	  userOperationsId = visitorRole.operationsId;
+		userRoles = [visitorRole];
   }
 	data.userOperationsId = userOperationsId;
+	data.userRoles = userRoles;
+	data.userGrade = userGrade || {};
 	await next();
 };

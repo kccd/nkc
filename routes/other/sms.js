@@ -49,7 +49,6 @@ smsRouter
     data.docs = ats;
     data.paging = paging;
     data.tab = 'at';
-    console.log(data)
     ctx.template = 'interface_messages.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     await userPersonal.increasePsnl('at');

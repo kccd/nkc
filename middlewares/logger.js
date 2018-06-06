@@ -99,7 +99,7 @@ const logger = async (ctx, next) => {
 
   // 根据分类调用不同的model
   for (let typeId of operationClassify) {
-    console.log(typeId)
+    // console.log(typeId)
     if (typeId === 2) {
       await new db.ManageBehaviorModel(behavior).save()
     }

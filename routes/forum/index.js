@@ -1,22 +1,19 @@
 const Router = require('koa-router');
-const nkcModules = require('../../nkcModules');
 const subscribeRouter = require('./subscribe');
 const settingsRouter = require('./settings');
 const homeRouter = require('./home');
 const latestRouter = require('./latest');
 const followerRouter = require('./follower');
 const visitorRouter = require('./visitor');
-const dbFn = nkcModules.dbFunction;
-const apiFn = nkcModules.apiFunction;
 const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, nkcModules} = ctx;
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		const forums = await db.ForumModel.getVisibleForums(ctx);
-		data.forums = dbFn.forumsListSort(forums, threadTypes);
+		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
     data.navbar = {highlight: 'forums'};
@@ -47,63 +44,8 @@ forumRouter
 		await newForum.save();
 		data.forum = newForum;
 		await next();
-		/*const {data, body, db} = ctx;
-		const {ForumModel, UserModel, SettingModel} = db;
-		const {userLevel} = data;
-		const {
-		  type,
-      description,
-      displayName,
-      visibility,
-      parentId,
-      order,
-      moderators,
-      isVisibleForNCC,
-      color,
-      contentClass,
-      abbr,
-		} = body;
-    if(userLevel < 6) {
-      ctx.throw(403, '权限不足');
-      return next()
-    }
-    const isDisplayNameExists = await ForumModel.findOne({displayName});
-    if(isDisplayNameExists) {
-      ctx.throw(422, `全名为 [${displayName}] 的板块已存在`);
-      return next()
-    }
-		switch(type) {
-      case 'category':
-        body.parentId = undefined;
-        break;
-      case 'forum':
-        if(parentId && await ForumModel.findOne({fid: parentId}))
-          break;
-        else {
-          ctx.throw(422, `父分区 [${parentId}] 不存在或未指定`);
-          return next()
-        }
-      default:
-        ctx.throw(422, `未知分区类型 [${type}] `);
-        return next()
-    }
-    body.class = contentClass;
-		const usernames = moderators.split(',').map(name => name.toLowerCase());
-    try {
-      body.moderators = await Promise.all(usernames.map(async name =>
-        await UserModel.findOnly({usernameLowerCase: name})
-          .then(user => user.uid)
-      ));
-    } catch(e) {
-      ctx.throw(422, '管理员中有不存在的用户名');
-      return next()
-    }
-    body.fid = await SettingModel.operateSystemID('forums', 1);
-    const newForum = new ForumModel(body);
-		await newForum.save();
-    return ctx.redirect(`/f/${body.fid}`, 303)*/
 	})
-	.get('/:fid', async (ctx, next) => {
+	.get('/:fid', async (ctx) => {
 		const {data, params, db} = ctx;
 		const {user} = data;
 		const {fid} = params;
@@ -118,89 +60,6 @@ forumRouter
 		} else {
 			return ctx.redirect(`/f/${forum.fid}/home`);
 		}
-		/*const {ForumModel, ThreadTypeModel, UserModel, UsersSubscribeModel} = ctx.db;
-		const {fid} = ctx.params;
-		const {data, query, generateUsersBehavior} = ctx;
-		const {digest, cat, sortby} = query;
-		const page = query.page || 0;
-		const forum = await ForumModel.findOnly({fid});
-		await forum.ensurePermission(ctx);
-		const q = {};
-		q.match = {};
-		if(cat) {
-			q.match.cid = parseInt(cat);
-			data.cat = q.match.cid;
-		}
-		if(digest) {
-			q.match.digest = true;
-			data.digest = true;
-		}
-
-		if(data.userLevel < 4 || (data.userLevel === 4 && !forum.moderators.includes(data.user.uid))) {
-			q.disabled = false;
-		}
-
-		const countOfThread = await forum.getThreadsCountByQuery(ctx, q);
-		const paging = apiFn.paging(page, countOfThread);
-		data.sortby = sortby;
-		data.paging = paging;
-		data.forum = forum;
-
-		// 加载版主
-		data.moderators = [];
-		if (forum.moderators.length > 0) {
-			data.moderators = await UserModel.find({uid: {$in: forum.moderators}});
-		}
-
-		q.limit = paging.perpage;
-		q.skip = paging.start;
-		if(sortby === 'toc') {
-			q.sort = {toc: -1};
-		} else {
-			q.sort = {tlm: -1};
-		}
-
-		data.threads = await forum.getThreadsByQuery(ctx, q);
-		data.toppedThreads = await forum.getToppedThreads(ctx);
-
-		data.threadTypes = await ThreadTypeModel.find({fid}).sort({order: 1});
-
- 		if (data.user) {
-			data.userThreads = await data.user.getUsersThreads();
-			data.userSubscribe = await UsersSubscribeModel.findOnly({uid: data.user.uid});
-		}
-		// 加载能看到入口的板块
-		const visibleFid = await ForumModel.getVisibleFid(ctx, '');
-
-		// 加载路径导航，子版块
-		const breadcrumbForums = await forum.getBreadcrumbForums();
-		const childrenForums = await forum.extendChildrenForums({
-			fid: {
-				$in: visibleFid
-			}
-		});
-		await Promise.all(childrenForums.map(forum => forum.extendChildrenForums()));
-		data.childrenForums = childrenForums;
-
-		// 若路径导航存在不能访问且不可见的板块则抛出权限不足
-		breadcrumbForums.map(forum => {
-			if(!visibleFid.includes(forum.fid)) {
-				ctx.throw(403, '权限不足');
-			}
-		});
-
-		data.forumList = await ForumModel.find({});
-		data.forumsThreadTypes = await ThreadTypeModel.find({}).sort({order: 1});
-		data.breadcrumbForums = breadcrumbForums;
-		if(data.user) {
-			await generateUsersBehavior({
-				operation: 'viewForum',
-				fid: forum.fid,
-				type: forum.class
-			});
-		}
-		ctx.template = 'interface_forum.pug';
-		await next();*/
 	})
 	.post('/:fid', async (ctx, next) => {
 		const {
@@ -271,32 +130,35 @@ forumRouter
 	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:fid/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
 	.use(['/:fid/home', '/:fid/latest', '/:fid/followers', '/:fid/visitors'], async (ctx, next) => {
-		const {data, db, params, generateUsersBehavior} = ctx;
+		const {data, db, params} = ctx;
 		const {fid} = params;
+
+		// 拿到用户等级
+		const gradeId = data.userGrade._id;
+		// 拿到用户的角色
+		const rolesId = data.userRoles.map(r => r._id);
+
 		const forum = await db.ForumModel.findOnly({fid});
-		await forum.ensurePermission(ctx);
+
+		// 专业权限判断，同步
+		forum.ensurePermissionNew({gradeId, rolesId});
+
 		data.forum = forum;
 
-		// 添加访问记录
-		if(data.user) {
-			await generateUsersBehavior({
-				operation: 'viewForum',
-				fid: forum.fid,
-				type: forum.class
-			});
-		}
-
-
 		const {today} = ctx.nkcModules.apiFunction;
+		// 获取能看到入口的专业id
 		const fidArr = await db.ForumModel.getVisibleFid(ctx, fid);
+		// 拿到能访问的专业id
 		const accessibleFid = await db.ForumModel.getAccessibleFid(ctx, fid);
 		accessibleFid.push(fid);
+		// 加载能看到入口的下一级专业
 		await forum.extendChildrenForums({fid: {$in: fidArr}});
 		fidArr.push(fid);
+		// 拿到今天
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: fidArr},
-			operation: {$in: ['viewForum', 'viewThread']}
+			operationId: {$in: ['viewForum', 'viewThread']}
 		}).sort({timeStamp: -1});
 		const usersId = [];
 		behaviors.map(b => {

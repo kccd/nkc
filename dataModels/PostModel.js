@@ -130,17 +130,17 @@ postSchema.virtual('thread')
   });
 
 postSchema.methods.extendThread = async function() {
-  const ThreadModel = require('./ThreadModel');
+  const ThreadModel = mongoose.model('threads');
   return this.thread = await ThreadModel.findOnly({tid: this.tid})
 };
 
 postSchema.methods.extendResources = async function() {
-  const ResourceModel = require('./ResourceModel');
+  const ResourceModel = mongoose.model('resources');
   return this.resources = await ResourceModel.find({references: this.pid})
 };
 
 postSchema.methods.extendUser = async function() {
-  const UserModel = require('./UserModel');
+  const UserModel = mongoose.model('users');
   return this.user = await UserModel.findOnly({uid: this.uid});
 };
 
