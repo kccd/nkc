@@ -19,13 +19,13 @@ module.exports = async (ctx) => {
   if(ctx.logIt) {
     if (ctx.error) {
       console.error(
-        ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation.description: '未知操作')}`
+        ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation._id + ' ' + operation.description: '未知操作')}`
       );
       if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
     } else {
       console.log(
-        ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(operation?operation.description: '未知操作')}`
+        ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(operation?operation._id + ' ' + operation.description: '未知操作')}`
       );
     }
   }

@@ -4,9 +4,17 @@ block title
   - var thread = data.thread
   title #{thread.firstPost.t} - 科创论坛
   meta#replytarget(value=`${data.replyTarget}`)
-  
+
+  -let modifyPostTimeLimit = 0;
+  -for(let i = 0; i < data.userRoles.length; i++)
+    -const r = data.userRoles[i];
+    if r.modifyPostTimeLimit > modifyPostTimeLimit
+      -modifyPostTimeLimit = r.modifyPostTimeLimit
+    if r.modifyPostTimeLimit === -1
+      -modifyPostTimeLimit = -1;
+      -break;
   include MathJax.pug
-  
+
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
     

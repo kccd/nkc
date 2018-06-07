@@ -17,7 +17,6 @@ router
     const history = new HistoriesModel(_copy);
     await history.save();
     const {t, c, l} = targetPost;
-    console.log(l);
     originPost.t = t;
     originPost.c = c;
     originPost.l = l;

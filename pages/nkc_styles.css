@@ -2272,7 +2272,7 @@ img.emoji {
 }
 .user-info-list.forum-list .description{
   display: -webkit-box;
-  height: 1.6em;
+  height: 1.2em;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;

@@ -54,12 +54,13 @@
               - if(post.tlm > post.toc && data.userLevel >= 3)
                 if !post.hideHistories || data.userLevel >= 6
                   a(href=`/p/${post.pid}/history`) 历史
-
               if data.user
                 - var user = data.user
-                - var ownership = user.uid===uid
+                - var ownership = data.userOperationsId.includes('modifyOtherPost')
+                - ownership = ownership?true:(user.uid===uid)
 
-                - if(testModifyTimeLimit(data.certificates,ownership,post.toc))
+                //- if(testModifyTimeLimit(data.certificates,ownership,post.toc))
+                if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
                   a(href=`/editor?type=post&id=${post.pid}`) 编辑
 
                 - var cc = disablePost;

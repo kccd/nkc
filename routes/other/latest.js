@@ -41,7 +41,7 @@ latestRouter
         await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
       }
     }
-    if(!data.userOperationsId.includes('displayRecycleThreads')) {
+    if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
       if(!data.user) {
         $match.recycleMark = false;
       } else {

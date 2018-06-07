@@ -152,33 +152,39 @@ threadSchema.virtual('user')
     this._user = u;
   });
 threadSchema.methods.extendFirstPost = async function() {
-  const PostModel = require('./PostModel');
+  const PostModel = mongoose.model('posts');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})
 };
 
 threadSchema.methods.extendLastPost = async function() {
-  const PostModel = require('./PostModel');
-  return this.lastPost = (await PostModel
+	const PostModel = mongoose.model('posts');
+	return this.lastPost = (await PostModel
     .find({tid: this.tid, disabled: false})
     .sort({toc: -1}).limit(1))[0]
 };
 
 threadSchema.methods.extendForum = async function() {
-  const ForumModel = require('./ForumModel');
+  const ForumModel = mongoose.model('forums');
   return this.forum = await ForumModel.findOnly({fid: this.fid})
 };
 
 threadSchema.methods.extendCategory = async function() {
-  const ThreadTypeModel = require('./ThreadTypeModel');
+	const ThreadTypeModel = mongoose.model('threadTypes');
   return this.category = await ThreadTypeModel.findOne({fid: this.fid, cid: this.cid});
 };
 
 threadSchema.methods.extendUser = async function() {
-  const UserModel = require('./UserModel');
+  const UserModel = mongoose.model('users');
   return this.user = await UserModel.findOnly({uid: this.uid});
 };
 
-// 1、判断能否进入所在板块
+// ------------------------------ 文章权限判断 ----------------------------
+threadSchema.methods.ensurePermission = async function(options) {
+	await this.forum.ensurePermissionNew(options);
+};
+// ----------------------------------------------------------------------
+
+/*// 1、判断能否进入所在板块
 // 2、判断所在帖子是否被禁
 // 3、若所在帖子被禁则判断用户是否是该板块的版主或拥有比版主更高的权限
 threadSchema.methods.ensurePermission = async function (ctx) {
@@ -204,7 +210,7 @@ threadSchema.methods.ensurePermissionOfModerators = async function(ctx) {
     const forum = await ctx.db.ForumModel.findOnly({fid: this.fid});
     return ctx.data.user && forum.moderators.includes(ctx.data.user.uid);
   }
-};
+};*/
 
 threadSchema.methods.getPostByQuery = async function (query, macth) {
   const PostModel = require('./PostModel');

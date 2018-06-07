@@ -43,7 +43,9 @@ const operationObj = {};
 
 // 默认操作类型
 operationObj.defaultOperations = [
-	'moveThreadToRecycle'
+	'modifyOtherPost',
+	'displayRecycleMarkThreads',
+	'displayDisabledPosts'
 ];
 
 

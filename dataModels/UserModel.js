@@ -407,7 +407,7 @@ userSchema.methods.calculateScore = async function() {
 	logs.map(l => {
 		score += l.change
 	});
-	console.log(score);
+	console.log(`score: ${score}`);
 };
 
 

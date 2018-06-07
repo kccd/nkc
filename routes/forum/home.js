@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const homeRouter = new Router();
 homeRouter
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data} = ctx;
 		const {forum} = data;
 		const extend = async (threads) => {
 			await Promise.all(threads.map(async thread => {
@@ -13,7 +13,6 @@ homeRouter
 		};
 		await forum.extendValuableThreads();
 		await forum.extendBasicThreads();
-		await forum.extendNoticeThreads();
 		await extend(forum.valuableThreads);
 		await extend(forum.basicThreads);
 		data.type = 'home';

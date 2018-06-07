@@ -31,7 +31,7 @@ block title
             h4.text-center 优秀文章
             for thread in data.digestThreads
               .col-xs-12.col-md-12
-                .row(style='margin-bottom: 0.5rem;')
+                .row(style='margin-bottom: 0.2rem;line-height: 1.8rem;')
                   if data.forum.fid !== thread.fid
                     a(href=`/f/${thread.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
                   a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t

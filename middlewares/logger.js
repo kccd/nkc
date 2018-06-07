@@ -30,7 +30,7 @@ const logger = async (ctx, next) => {
   let userPort = ctx.port ? ctx.port : ''; // 用户使用的端口 没有则为空
   let requestPara = requestMethod === "GET" || requestMethod === "DELETE" ? ctx.query : ctx.body; // 请求参数 GET||DELETE=>ctx.query  POST||PATCH=>ctx.body
   let requestStatus = ctx.status ? ctx.status : '500'; // 请求状态， 没有则500
-  let requestTime = ctx.reqTime ? ctx.reqTime : Date.now; // 请求时间， 没有则使用当前时间
+  let requestTime = ctx.reqTime ? ctx.reqTime : Date.now(); // 请求时间， 没有则使用当前时间
 
   await next();
   
