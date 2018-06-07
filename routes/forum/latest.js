@@ -8,15 +8,17 @@ latestRouter
 		page = page?parseInt(page): 0;
 		// 构建查询条件
 		const match = {};
+		// 获取加精文章
 		if(digest) {
 			match.digest = true;
 			data.digest = digest;
 		}
+		// 加载某个类别的文章
 		if(cat) {
 			match.cid = parseInt(cat);
-			data.cat = q.match.cid;
+			data.cat = match.cid;
 		}
-
+		// 判断是否为该专业或上级专业的专家
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 
 		const {userGrade, userRoles} = data;
@@ -25,11 +27,15 @@ latestRouter
 			fid: forum.fid
 		};
 		options.rolesId = userRoles.map(r => r._id);
-		// 拿到可从中拿文章的专业id
+		// 拿到该专业下可从中拿文章的所有子专业id
 		const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
 		fidOfCanGetThreads.push(forum.fid);
 
 		match.fid = {$in: fidOfCanGetThreads};
+		// 专家可查看专业下所有文章
+		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
+		// 已登录用户能查看专业下未被退回的文章、自己已被退回的文章
+		// 未登录用户只能查看未被退回的文章
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 				if(!data.user) {

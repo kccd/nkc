@@ -163,7 +163,7 @@ forumRouter
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: fidArr},
-			operationId: {$in: ['viewForumHome', 'viewThread']}
+			operationId: {$in: ['visitForumLatest', 'visitThread', 'visitForumFollowers', 'visitForumVisitors']}
 		}).sort({timeStamp: -1});
 		const usersId = [];
 		// 过滤掉重复的用户

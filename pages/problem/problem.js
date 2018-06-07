@@ -65,8 +65,10 @@ function deleteProblem(_id) {
 		})
 }
 setInterval(function() {
-	submit(data.id, function(){
-		screenTopAlert('自动保存成功');
-	})
+	if(!$('input[name="select"]').prop('checked')) {
+		submit(data.id, function(){
+			screenTopAlert('自动保存成功');
+		})
+	}
 }, 30*1000);
 

@@ -306,7 +306,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
 };
  // 算post所在楼层
 threadSchema.methods.getStep = async function(obj) {
-  const PostModel = require('./PostModel');
+  const PostModel = mongoose.model('posts');
   const {perpage} = require('../settings').paging;
   const pid = obj.pid;
   const q = {
