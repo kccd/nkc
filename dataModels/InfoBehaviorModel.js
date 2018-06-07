@@ -5,7 +5,6 @@ const infoBehaviorSchema = new Schema({
 		type: String,
 		required: true,
 		index: 1,
-		// enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
 	},
 	uid: {
 		type: String,

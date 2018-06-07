@@ -298,40 +298,6 @@ forumSchema.methods.extendNoticeThreads = async function() {
 };
 
 
-forumSchema.methods.getToppedThreads = async function(ctx) {
-	// const ForumModel = mongoose.model('forums');
-	const ThreadModel = mongoose.model('threads');
-	/*const childrenFid = await ForumModel.getFidOfCanGetThreads(ctx, this.fid);
-	childrenFid.push(this.fid);*/
-	let match = {
-		fid: this.fid,
-		topped: true,
-	};	// 过滤掉退回标记的帖子
-	// match.recycleMark = {"$nin":[true]}
-	// const threads = await ThreadModel.find(match).sort({tlm: -1});
-	let threads1 = await ThreadModel.find(match).sort({tlm: -1});
-	let threads = [];
-	for(let thread of threads1) {
-		if(thread.recycleMark) {
-			if(ctx.data.userLevel <= 0) {
-				continue;
-			} else if(ctx.data.userLevel < 6) {
-				if(ctx.data.user.uid !== thread.uid) {
-					continue;
-				}
-			}
-		}
-		threads.push(thread)
-	}
-	await Promise.all(threads.map(async thread => {
-		await thread.extendForum();
-		await thread.forum.extendParentForum();
-		await thread.extendFirstPost().then(p => p.extendUser());
-		await thread.extendLastPost().then(p => p.extendUser());
-	}));
-	return threads;
-};
-
 forumSchema.methods.updateForumMessage = async function() {
 	const ThreadModel = require('./ThreadModel');
 	const ForumModel = mongoose.model('forums');
@@ -526,7 +492,7 @@ forumSchema.statics.getFidOfCanGetThreads= async (ctx, fid) => {
 	return forums.map(f => f.fid);
 };
 
-// 判断能否访问该板块
+/*// 判断能否访问该板块
 forumSchema.methods.ensurePermission = async function(ctx) {
 	const ForumModel = mongoose.model('forums');
 	const cc = ctx.data.certificates.contentClasses;
@@ -539,7 +505,7 @@ forumSchema.methods.ensurePermission = async function(ctx) {
 			ctx.throw('权限不足');
 		}
 	}
-};
+};*/
 
 
 
@@ -630,6 +596,7 @@ forumSchema.statics.visibleForums = async (options) => {
 			]
 		};
 		const forums = await ForumModel.find(q).sort({toc: 1});
+		visibleForums = visibleForums.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);
 		}));
@@ -644,7 +611,7 @@ forumSchema.statics.visibleForums = async (options) => {
 
 
 // ----------------------------- 加载能看到入口的专业fid ----------------------------
-forumSchema.statics.visibleForums = async (options) => {
+forumSchema.statics.visibleFid = async (options) => {
 	const ForumModel = mongoose.model('forums');
 	const forums = await ForumModel.visibleForums(options);
 	return forums.map(forum => forum.fid);
@@ -654,13 +621,21 @@ forumSchema.statics.visibleForums = async (options) => {
 
 
 // ----------------------------- 访问专业权限判断 --------------------------------
-forumSchema.methods.ensurePermissionNew = function(options) {
+forumSchema.methods.ensurePermissionNew = async function(options) {
+	this.ensureForumPermission(options);
+	const forums = await this.getBreadcrumbForums();
+	forums.map(forum => {
+		forum.ensureForumPermission(options);
+	})
+};
+forumSchema.methods.ensureForumPermission = function(options) {
 	if(!this.accessible) {
 		const err = new Error('专业已暂停访问');
 		err.status = 403;
 		throw err;
 	}
-	const {gradeId, rolesId} = options;
+	const {gradeId, rolesId, uid} = options;
+	if(uid && this.moderators.includes(uid)) return;
 	let hasRole = false;
 	for(const roleId of this.rolesId) {
 		if(rolesId.includes(roleId)) {
@@ -741,141 +716,19 @@ forumSchema.statics.fidOfCanGetThreads = async (options) => {
 };
 // -------------------------------------------------------------------------------
 
-forumSchema.methods.getThreadsByQuery = async function(ctx, query) {
-	const {data, db} = ctx;
-	const {userGrade, userRoles} = data;
-	const options = {
-		gradeId: userGrade._id,
-		fid: this.fid
-	};
-	options.rolesId = userRoles.map(r => r._id);
-	const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
-	fidOfCanGetThreads.push(this.fid);
-	let {match, limit, sort, skip} = query;
-	match.fid = {$in: fidOfCanGetThreads};
-
-	if(!data.userOperationsId.includes('displayRecycleThreads')) {
-		if(!data.user) {
-			match.recycleMark = false;
-		} else {
-			match.$or = [
-				{
-					recycleMark: false
-				},
-				{
-					recycleMark: true,
-					uid: data.user.uid
-				}
-			]
+// ----------------------------- 验证是否为专家 ----------------------------
+forumSchema.methods.isModerator = async function(uid) {
+	if(!uid) return false;
+	let isModerator = false;
+	const breadcrumbForums = await this.getBreadcrumbForums();
+	breadcrumbForums.map(forum => {
+		if(forum.moderators.includes(uid)) {
+			isModerator = true;
 		}
-	}
-	const threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
-	await Promise.all(threads.map(async thread => {
-		await thread.extendFirstPost().then(p => p.extendUser());
-		if(thread.lm) {
-			await thread.extendLastPost().then(p => p.extendUser());
-		} else {
-			thread.lastPost = thread.firstPost;
-		}
-		await thread.extendForum();
-		await thread.forum.extendParentForum();
-		await thread.extendCategory();
-	}));
-	return threads;
+	});
+	return isModerator;
 };
-
-forumSchema.methods.getThreadsCountByQuery = async function(ctx, query) {
-	const {data, db} = ctx;
-	const {userGrade, userRoles} = data;
-	const options = {
-		gradeId: userGrade._id,
-		fid: this.fid
-	};
-	options.rolesId = userRoles.map(r => r._id);
-	const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
-	fidOfCanGetThreads.push(this.fid);
-	let {match} = query;
-	match.fid = {$in: fidOfCanGetThreads};
-
-	if(!data.userOperationsId.includes('displayRecycleThreads')) {
-		if(!data.user) {
-			match.recycleMark = false;
-		} else {
-			match.$or = [
-				{
-					recycleMark: false
-				},
-				{
-					recycleMark: true,
-					uid: data.user.uid
-				}
-			]
-		}
-	}
-	return await db.ThreadModel.count(match);
-};
-
-/*
-//加载帖子
-forumSchema.methods.getThreadsByQuery = async function(ctx, query) {
-	const ForumModel = mongoose.model('forums');
-	const ThreadModel = mongoose.model('threads');
-	// const fidOfCanGetThreads = await ForumModel.getFidOfCanGetThreads(ctx, this.fid);
-	const rolesId = ctx.data.userRoles.map(r => r._id);
-	const gradeId = ctx.data.userGrade._id;
-	const fidOfCanGetThreads = await ForumModel.fidOfCanGetThreads({gradeId, rolesId, fid: this.fid});
-	fidOfCanGetThreads.push(this.fid);
-	let {match, limit, sort, skip} = query;
-	match.fid = {$in: fidOfCanGetThreads};
-	// // 过滤掉退回标记的帖子
-	// match.recycleMark = {"$nin":[true]}
-	// const threads = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
-	let threads1 = await ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
-	let threads = [];
-	if(ctx.data.userLevel <= 0){
-		for(var i in threads1){
-			if(threads1[i].recycleMark === true){
-				continue;
-			}
-			threads.push(threads1[i])
-		}
-	}else if(ctx.data.userLevel > 5){
-		for(var i in threads1){
-			threads.push(threads1[i])
-		}
-	}else{
-		for(var i in threads1){
-			if(threads1[i].uid !== ctx.data.user.uid && threads1[i].recycleMark === true){
-				continue;
-			}
-			threads.push(threads1[i])
-		}
-	}
-	await Promise.all(threads.map(async thread => {
-		await thread.extendFirstPost().then(p => p.extendUser());
-		if(thread.lm) {
-			await thread.extendLastPost().then(p => p.extendUser());
-		} else {
-			thread.lastPost = thread.firstPost;
-		}
-		await thread.extendForum();
-		await thread.forum.extendParentForum();
-		await thread.extendCategory();
-	}));
-	return threads;
-};
-*/
-/*
-//加载帖子数量
-forumSchema.methods.getThreadsCountByQuery = async function(ctx, query) {
-	const ForumModel = mongoose.model('forums');
-	const ThreadModel = mongoose.model('threads');
-	const fidOfCanGetThreads = await ForumModel.getFidOfCanGetThreads(ctx, this.fid);
-	fidOfCanGetThreads.push(this.fid);
-	const {match} = query;
-	match.fid = {$in: fidOfCanGetThreads};
-	return await ThreadModel.count(match);
-};*/
+// -----------------------------------------------------------------------
 
 forumSchema.statics.getAllChildrenForums = async function(fid) {
 	const ForumModel = mongoose.model('forums');

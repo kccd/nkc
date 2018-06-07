@@ -226,6 +226,10 @@
     "visitKcbSettings": "访问科创币设置页",
     "modifyKcbSettings": "修改科创币设置",
     "modifyRoleUsers": "将用户从某个角色中移除",
-    "modifyOtherPost": "修改别人的post"
+    "modifyOtherPost": "修改别人的post",
+    "moveThreadToRecycle": "移动文章到回收站",
+    "moveDraft": "退休文章",
+    "displayRecycleMarkThreads": "显示被退回的文章",
+    "displayDisabledPosts": "显示被屏蔽的post"
   }
 }

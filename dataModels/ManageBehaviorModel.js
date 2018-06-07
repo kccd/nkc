@@ -3,23 +3,23 @@ const Schema = mongoose.Schema;
 const manageBehaviorSchema = new Schema({
 	operationId: {
 		type: String,
-		required: true,
+		// required: true,
 		index: 1,
 		// enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
 	},
 	uid: {
 		type: String,
-		required: true,
+		// required: true,
 		index: 1
 	},
 	ip: {
 		type: String,
-		required: true,
+		// required: true,
 		index: 1
 	},
 	port: {
 		type: String,
-		required: true
+		// required: true
 	},
 	para: {
 		type: Schema.Types.Mixed,

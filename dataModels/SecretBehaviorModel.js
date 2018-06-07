@@ -1,11 +1,14 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const secretBehaviorSchema = new Schema({
+	operationId: {
+		type: String,
+		index: 1
+	},
 	type: {
 		type: String,
-		required: true,
 		index: 1,
-		enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
+		//enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
 	},
 	uid: {
 		type: String,

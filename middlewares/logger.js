@@ -2,21 +2,30 @@
 const nkcModules = require('../nkcModules');
 
 const logger = async (ctx, next) => {
-  const { db, address: ip, port } = ctx;
+  const { db, address: ip, port ,data} = ctx;
   const processTime = ctx.processTime;
   const {apiFunction} = nkcModules;
   const { getOperationId } = nkcModules.permission;
   ctx.data.operationId = getOperationId(ctx.url, ctx.method);
   // 获取用户的个人基本信息
-  if(ctx.data.userLevel > 0){
-    let userPersonal = await db.UsersPersonalModel.findOnly({uid: ctx.data.user.uid});
+  let userPersonal;
+  if(ctx.data.user){
+    userPersonal = await db.UsersPersonalModel.findOnly({uid: ctx.data.user.uid});
   }
+  // console.log("操作名称",ctx.data.operationId)
 
   // -----------------------------------------------------------------------------------------  
-  // 获取更改密码用到的数据
-  if(ctx.body.password && ctx.data.operationId === "modifyPassword"){
-    let newPassword = apiFunction.newPasswordObject(ctx.body.password); // 用户新密码及hash
-  }
+  // 绑定新手机号码 bindMobile
+  let newBindMobile = ctx.data.operationId === "bindMobile" ? ctx.body.mobile : ''; // 用户手机号
+  let newBindNationCode = ctx.data.operationId === "bindMobile" ? ctx.body.nationCode : ''; // 国际区号
+  // 更换旧手机号码 modifyMobile
+  let newModifyMobile = ctx.data.operationId === "modifyMobile" ? ctx.body.mobile : ''; //用户手机号
+  let newModifyNationCode = ctx.data.operationId === "modifyMobile" ? ctx.body.nationCode : ''; // 国际区号
+  // 更改用户名
+  let newChangeUsername = ctx.data.operationId === "modifyUsername" ? ctx.body.newUsername : ''; // 新的用户名
+  let oldChangeUsername = ctx.data.operationId === "modifyUsername" && ctx.data.user ? ctx.data.user.username : ''; //旧的用户名
+  let newPassword = ctx.data.operationId === "modifyPassword" && ctx.body.password ? ctx.body.password : '';
+  let newPasswordObj = ctx.data.operationId === "modifyPassword" && ctx.body.password ? apiFunction.newPasswordObject(ctx.body.password) : ''; // 用户新密码，没有则为空
   let userIp = ctx.ip ? ctx.ip : ''; // 用户ip 没有则为空
   let requestMethod = ctx.method; // 请求方法
   let userPort = ctx.port ? ctx.port : ''; // 用户使用的端口 没有则为空
@@ -27,16 +36,8 @@ const logger = async (ctx, next) => {
 
   await next();
   
-
-  // 获取绑定邮箱的数据
-  if(ctx.data.operation && ctx.data.operation === "bindEMail" && ctx.query.email){
-    let newBindMail = ctx.query.email; // 新的邮件地址
-  }
-  // 获取更换邮箱的数据
-  if(ctx.data.operation && ctx.data.operation === "verifyNewEmail" && ctx.query.email){
-    let newChangeEmail = ctx.query.email; // 新的邮件地址
-  }
-  // console.log("hhh",ctx.query, ctx.data.operation, ctx.data.operationId)
+  let newBindEmail = ctx.data.operationId === "bindEmail" && ctx.query.email ? ctx.query.email : ''; // 绑定新的邮箱，没有则为空
+  let newChangeEmail = ctx.data.operationId === "changeEmail" && ctx.query.email ? ctx.query.email : ''; // 更换新的邮箱，没有则为空
   let operationId = ctx.data.operationId ? ctx.data.operationId : ''; // 操作id 如果没有则为空
   let userId = ctx.data.user ? ctx.data.user.uid : 'visitor'; // 用户身份 id或者游客
   let userLevel = ctx.data.userLevel ? ctx.data.userLevel : 0; //用户等级 没有则为0
@@ -65,19 +66,18 @@ const logger = async (ctx, next) => {
     reqTime: ctx.reqTime,
     uid: ctx.data.user ? ctx.data.user.uid : 'visitor'
   };
-  // 定义存入四分类的数据
-  // console.log(ctx)
+  // 定义存入四分类的数据(必存数据)
   let behavior = {
     type: classType,
     operationId: operationId,
     error: ctx.error,
+    ip: userIp,
+    port: userPort,
+    uid: userId,
     method: requestMethod,
     para: requestPara,
     status: requestStatus,
-    ip: userIp,
-    port: userPort,
     reqTime: requestTime,
-    uid: userId,
     fid: forumId,
     cid: categoryId,
     tid: threadId,
@@ -99,7 +99,6 @@ const logger = async (ctx, next) => {
 
   // 根据分类调用不同的model
   for (let typeId of operationClassify) {
-    // console.log(typeId)
     if (typeId === 2) {
       await new db.ManageBehaviorModel(behavior).save()
     }
@@ -111,6 +110,37 @@ const logger = async (ctx, next) => {
     }
     if (typeId === 5) {
       // const behavior = Object.assign(para, {port, ip});
+      if(ctx.data.operationId === "modifyPassword"){
+        behavior.oldHashType = userPersonal.hashType;
+        behavior.oldHash = userPersonal.password.hash;
+        behavior.oldSalt = userPersonal.password.salt;
+        behavior.newHashType = newPasswordObj.hashType;
+        behavior.newHash = newPasswordObj.password.hash;
+        behavior.newSalt = newPasswordObj.password.salt;
+      }
+      if(ctx.data.operationId === "modifyUsername"){
+        behavior.newUsername = newChangeUsername
+        behavior.newUsernameLowerCase = newChangeUsername.toLowerCase()
+        behavior.oldUsername = oldChangeUsername
+        behavior.oldUsernameLowerCase = oldChangeUsername.toLowerCase()
+      }
+      if(ctx.data.operationId === "bindEmail"){
+        behavior.email = newBindEmail
+      }
+      if(ctx.data.operationId === "changeEmail"){
+        behavior.oldEmail = userPersonal.email
+        behavior.newEmail = newChangeEmail;
+      }
+      if(ctx.data.operationId === "bindMobile"){
+        behavior.mobile = newBindMobile;
+        behavior.nationCode = newBindNationCode;
+      }
+      if(ctx.data.operationId === "modifyMobile"){
+        behavior.oldMobile = userPersonal.mobile;
+        behavior.oldNationCode = userPersonal.nationCode;
+        behavior.newMobile = newModifyMobile;
+        behavior.newNationCode = newModifyNationCode;
+      }
       await new db.SecretBehaviorModel(behavior).save()
     }
   }

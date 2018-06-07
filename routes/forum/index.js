@@ -140,27 +140,33 @@ forumRouter
 
 		const forum = await db.ForumModel.findOnly({fid});
 
-		// 专业权限判断，同步
-		forum.ensurePermissionNew({gradeId, rolesId});
+		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
+		await forum.ensurePermissionNew({gradeId, rolesId, uid: data.user?data.user.uid: ''});
 
 		data.forum = forum;
 
 		const {today} = ctx.nkcModules.apiFunction;
 		// 获取能看到入口的专业id
-		const fidArr = await db.ForumModel.getVisibleFid(ctx, fid);
+		const options = {
+			gradeId,
+			rolesId,
+			fid
+		};
+		const fidArr = await db.ForumModel.visibleFid(options);
 		// 拿到能访问的专业id
-		const accessibleFid = await db.ForumModel.getAccessibleFid(ctx, fid);
+		const accessibleFid = await db.ForumModel.accessibleFid(options);
 		accessibleFid.push(fid);
 		// 加载能看到入口的下一级专业
 		await forum.extendChildrenForums({fid: {$in: fidArr}});
 		fidArr.push(fid);
-		// 拿到今天
+		// 拿到今天所有该专业下的用户浏览记录
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: fidArr},
-			operationId: {$in: ['viewForum', 'viewThread']}
+			operationId: {$in: ['viewForumHome', 'viewThread']}
 		}).sort({timeStamp: -1});
 		const usersId = [];
+		// 过滤掉重复的用户
 		behaviors.map(b => {
 			if(!usersId.includes(b.uid)) {
 				usersId.push(b.uid);
@@ -181,7 +187,9 @@ forumRouter
 		}
 
 		await forum.extendParentForum();
+		// 加载网站公告
 		await forum.extendNoticeThreads();
+		// 加载关注专业的用户
 		let followersId = forum.followersId;
 		followersId = followersId.reverse();
 		const followers = [];
@@ -220,6 +228,7 @@ forumRouter
 				}
 			}
 		]);
+		// 加载优秀的文章
 		data.digestThreads = await Promise.all(digestThreads.map(async thread => {
 			const post = await db.PostModel.findOnly({pid: thread.oc});
 			const forum = await db.ForumModel.findOnly({fid: thread.fid});
@@ -228,14 +237,20 @@ forumRouter
 			thread.forum = forum;
 			return thread;
 		}));
-
-
+		// 加载同级的专业
 		const parentForum = await forum.extendParentForum();
-		const contentClasses = data.certificates.contentClasses;
 		if(parentForum) {
-			data.sameLevelForums = await parentForum.extendChildrenForums({class: {$in: contentClasses}});
+			options.fid = parentForum.fid;
+			// 拿到parentForum专业下能看到入口的专业id
+			const visibleFidArr = await db.ForumModel.visibleFid(options);
+			// 拿到parentForum专业下一级能看到入口的专业
+			data.sameLevelForums = await parentForum.extendChildrenForums({fid: {$in: visibleFidArr}});
 		} else {
-			data.sameLevelForums = await db.ForumModel.find({parentId: '', class: {$in: contentClasses}});
+			delete options.fid;
+			// 拿到能看到入口的所有专业id
+			const visibleFidArr = await db.ForumModel.visibleFid(options);
+			// 拿到能看到入口的顶级专业
+			data.sameLevelForums = await db.ForumModel.find({parentId: '', fid: {$in: visibleFidArr}});
 		}
 
 		ctx.template = 'interface_forum_home.pug';
