@@ -2,7 +2,7 @@
 const nkcModules = require('../nkcModules');
 
 const logger = async (ctx, next) => {
-  const { db, address: ip, port ,data} = ctx;
+  const { db, address: ip, port } = ctx;
   const processTime = ctx.processTime;
   const {apiFunction} = nkcModules;
   const { getOperationId } = nkcModules.permission;
@@ -24,7 +24,6 @@ const logger = async (ctx, next) => {
   // 更改用户名
   let newChangeUsername = ctx.data.operationId === "modifyUsername" ? ctx.body.newUsername : ''; // 新的用户名
   let oldChangeUsername = ctx.data.operationId === "modifyUsername" && ctx.data.user ? ctx.data.user.username : ''; //旧的用户名
-  let newPassword = ctx.data.operationId === "modifyPassword" && ctx.body.password ? ctx.body.password : '';
   let newPasswordObj = ctx.data.operationId === "modifyPassword" && ctx.body.password ? apiFunction.newPasswordObject(ctx.body.password) : ''; // 用户新密码，没有则为空
   let userIp = ctx.ip ? ctx.ip : ''; // 用户ip 没有则为空
   let requestMethod = ctx.method; // 请求方法
@@ -32,7 +31,6 @@ const logger = async (ctx, next) => {
   let requestPara = requestMethod === "GET" || requestMethod === "DELETE" ? ctx.query : ctx.body; // 请求参数 GET||DELETE=>ctx.query  POST||PATCH=>ctx.body
   let requestStatus = ctx.status ? ctx.status : '500'; // 请求状态， 没有则500
   let requestTime = ctx.reqTime ? ctx.reqTime : Date.now; // 请求时间， 没有则使用当前时间
-  let timeStamp = new Date().getTime(); // 时间戳
 
   await next();
   
@@ -40,7 +38,6 @@ const logger = async (ctx, next) => {
   let newChangeEmail = ctx.data.operationId === "changeEmail" && ctx.query.email ? ctx.query.email : ''; // 更换新的邮箱，没有则为空
   let operationId = ctx.data.operationId ? ctx.data.operationId : ''; // 操作id 如果没有则为空
   let userId = ctx.data.user ? ctx.data.user.uid : 'visitor'; // 用户身份 id或者游客
-  let userLevel = ctx.data.userLevel ? ctx.data.userLevel : 0; //用户等级 没有则为0
   let targetUserId = ctx.data.targetUser ? ctx.data.targetUser.uid : ''; // 目标用户id 没有则为空
   let forumId = ctx.data.forum ? ctx.data.forum.fid : ''; // 板块id 没有则为空
   let categoryId = ctx.data.thread ? ctx.data.thread.cid : ''; // 分类id 没有则为空
@@ -70,7 +67,7 @@ const logger = async (ctx, next) => {
   let behavior = {
     type: classType,
     operationId: operationId,
-    error: ctx.error,
+    error: errorInfo,
     ip: userIp,
     port: userPort,
     uid: userId,
@@ -81,7 +78,8 @@ const logger = async (ctx, next) => {
     fid: forumId,
     cid: categoryId,
     tid: threadId,
-    pid: postId
+    pid: postId,
+    toUid: targetUserId
   };
   // ---------------------------------------构建数据结束----------------------------------------
 
@@ -91,25 +89,23 @@ const logger = async (ctx, next) => {
   // 3 用户行为类 UsersBehaviorModel
   // 4 信息查询类 InfoBehaviorModel
   // 5 敏感信息类 SerectBehaviorModel
-  let operationClassify = new Array();
-  let topClassifySingle = await db.OperationModel.find({ "_id": ctx.data.operationId })
+  let operationClassify = [];
+  let topClassifySingle = await db.OperationModel.find({ "_id": ctx.data.operationId });
   if (topClassifySingle.length > 0) {
     operationClassify = topClassifySingle[0].typeId
   }
 
   // 根据分类调用不同的model
   for (let typeId of operationClassify) {
-    if (typeId === 2) {
+    const type = await db.OperationTypeModel.findOne({_id: typeId});
+    if(!type) continue;
+    if(type.type === 'experimental') {
       await new db.ManageBehaviorModel(behavior).save()
-    }
-    if (typeId === 3) {
+    } else if(type.type === 'userBehavior') {
       await new db.UsersBehaviorModel(behavior).save()
-    }
-    if (typeId === 4) {
+    }else if(type.type === 'timeLine'){
       await new db.InfoBehaviorModel(behavior).save()
-    }
-    if (typeId === 5) {
-      // const behavior = Object.assign(para, {port, ip});
+    }else if(type.type === 'secret'){
       if(ctx.data.operationId === "modifyPassword"){
         behavior.oldHashType = userPersonal.hashType;
         behavior.oldHash = userPersonal.password.hash;
@@ -119,16 +115,16 @@ const logger = async (ctx, next) => {
         behavior.newSalt = newPasswordObj.password.salt;
       }
       if(ctx.data.operationId === "modifyUsername"){
-        behavior.newUsername = newChangeUsername
-        behavior.newUsernameLowerCase = newChangeUsername.toLowerCase()
-        behavior.oldUsername = oldChangeUsername
-        behavior.oldUsernameLowerCase = oldChangeUsername.toLowerCase()
+        behavior.newUsername = newChangeUsername;
+        behavior.newUsernameLowerCase = newChangeUsername.toLowerCase();
+        behavior.oldUsername = oldChangeUsername;
+        behavior.oldUsernameLowerCase = oldChangeUsername.toLowerCase();
       }
       if(ctx.data.operationId === "bindEmail"){
         behavior.email = newBindEmail
       }
       if(ctx.data.operationId === "changeEmail"){
-        behavior.oldEmail = userPersonal.email
+        behavior.oldEmail = userPersonal.email;
         behavior.newEmail = newChangeEmail;
       }
       if(ctx.data.operationId === "bindMobile"){
@@ -143,6 +139,50 @@ const logger = async (ctx, next) => {
       }
       await new db.SecretBehaviorModel(behavior).save()
     }
+    // if (typeId === 2) {
+    //   await new db.ManageBehaviorModel(behavior).save()
+    // }
+    // if (typeId === 3) {
+    //   await new db.UsersBehaviorModel(behavior).save()
+    // }
+    // if (typeId === 4) {
+    //   await new db.InfoBehaviorModel(behavior).save()
+    // }
+    // if (typeId === 5) {
+    //   // const behavior = Object.assign(para, {port, ip});
+    //   if(ctx.data.operationId === "modifyPassword"){
+    //     behavior.oldHashType = userPersonal.hashType;
+    //     behavior.oldHash = userPersonal.password.hash;
+    //     behavior.oldSalt = userPersonal.password.salt;
+    //     behavior.newHashType = newPasswordObj.hashType;
+    //     behavior.newHash = newPasswordObj.password.hash;
+    //     behavior.newSalt = newPasswordObj.password.salt;
+    //   }
+    //   if(ctx.data.operationId === "modifyUsername"){
+    //     behavior.newUsername = newChangeUsername;
+    //     behavior.newUsernameLowerCase = newChangeUsername.toLowerCase();
+    //     behavior.oldUsername = oldChangeUsername;
+    //     behavior.oldUsernameLowerCase = oldChangeUsername.toLowerCase();
+    //   }
+    //   if(ctx.data.operationId === "bindEmail"){
+    //     behavior.email = newBindEmail
+    //   }
+    //   if(ctx.data.operationId === "changeEmail"){
+    //     behavior.oldEmail = userPersonal.email;
+    //     behavior.newEmail = newChangeEmail;
+    //   }
+    //   if(ctx.data.operationId === "bindMobile"){
+    //     behavior.mobile = newBindMobile;
+    //     behavior.nationCode = newBindNationCode;
+    //   }
+    //   if(ctx.data.operationId === "modifyMobile"){
+    //     behavior.oldMobile = userPersonal.mobile;
+    //     behavior.oldNationCode = userPersonal.nationCode;
+    //     behavior.newMobile = newModifyMobile;
+    //     behavior.newNationCode = newModifyNationCode;
+    //   }
+    //   await new db.SecretBehaviorModel(behavior).save()
+  //   }
   }
   // ---------------------------------------存入大分类结束-----------------------------------------
 
