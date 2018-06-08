@@ -26,6 +26,12 @@ const postSchema = new Schema({
     default: false,
     index: 1
   },
+	// 是否被退回修改。true: 被退回， false: 被彻底屏蔽
+	toDraft: {
+		type: Boolean,
+		default: null,
+		index: 1
+	},
   ipoc: {
     type: String,
     default: '0.0.0.0'
@@ -152,6 +158,16 @@ postSchema.methods.ensurePermission = async function(ctx) {
   // 1、能浏览所在帖子
   // 2、post没有被禁 或 用户为该板块的版主 或 具有比版主更高的权限
   return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
+};
+
+postSchema.methods.ensurePermissionNew = async function(options) {
+	const {gradeId, rolesId, uid} = options;
+	if(this.disabled) {
+		const DelPostLogModel = mongoose.model('delPostLogs');
+		const delPostLog = await DelPostLogModel.findOne({})
+	}
+	const {ThreadModel} = mongoose.model('threads');
+
 };
 
 postSchema.pre('save', async function(next) {

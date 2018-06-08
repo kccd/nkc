@@ -2,7 +2,9 @@ const Router = require('koa-router');
 const operationRouter = require('./operation');
 const threadRouter = new Router();
 const nkcModules = require('../../nkcModules');
-const apiFn = nkcModules.apiFunction;
+const digestRouter = require('./digest');
+const toppedRouter = require('./topped');
+
 
 threadRouter
 	.get('/', async (ctx, next) => {
@@ -102,17 +104,17 @@ threadRouter
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 				if(!data.user) {
-					const toDraftPosts = await db.DelPostLogModel.find({threadId: tid, delType: 'toDraft'});
+					const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', threadId: tid, delType: 'toDraft'});
 					const toDraftPostsId = toDraftPosts.map(post => post.postId);
 					$and.push({pid: {$nin: toDraftPostsId}});
 				} else {
-					const toDraftPosts = await db.DelPostLogModel.find({threadId: tid, delType: 'toDraft', delUserId: {$ne: data.user.uid}});
+					const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', threadId: tid, delType: 'toDraft', delUserId: {$ne: data.user.uid}});
 					const toDraftPostsId = toDraftPosts.map(post => post.postId);
 					$and.push({pid: {$nin: toDraftPostsId}});
 				}
 			}
 			if(!data.userOperationsId.includes('displayDisabledPosts')) {
-				const toRecyclePosts = await db.DelPostLogModel.find({threadId: tid, delType: 'toRecycle'});
+				const toRecyclePosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', threadId: tid, delType: 'toRecycle'});
 				const toRecyclePostsId = toRecyclePosts.map(post => post.postId);
 				$and.push({pid: {$nin: toRecyclePostsId}});
 			}
@@ -142,7 +144,7 @@ threadRouter
 		}));
 		data.posts = posts;
 		// 添加给被退回的post加上标记
-		const toDraftPosts = await db.DelPostLogModel.find({postType: 'post', delType: 'toDraft', threadId: tid});
+		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
 		posts.map(async post => {
 			if(toDraftPostsId.includes(post.pid)) {
@@ -185,31 +187,31 @@ threadRouter
 	})
 	.post('/:tid', async (ctx, next) => {
 		const {
-			data, params, db, body, address: ip,
-			generateUsersBehavior
+			data, params, db, body, address: ip
 		} = ctx;
+		// 验证用户是否有权限发表回复，硬性条件。
 		const {user} = data;
-		if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		// 获取认证等级
+		const authLevel = await userPersonal.getAuthLevel();
+		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
-		const {
-			ThreadModel,
-		} = db;
+		const thread = await db.ThreadModel.findOnly({tid});
+		await thread.extendForum();
+		// 权限判断
+		const gradeId = data.userGrade;
+		const rolesId = data.userRoles.map(role => role._id);
+		const options = {
+			gradeId,
+			rolesId,
+			uid: data.user?data.user.uid: ''
+		};
+		await thread.ensurePermission(options);
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		const thread = await ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
 		const _post = await thread.newPost(post, user, ip);
 		data.targetUser = await thread.extendUser();
-		await generateUsersBehavior({
-			operation: 'postToThread',
-			pid: _post.pid,
-			tid: thread.tid,
-			fid: thread.fid,
-			mid: thread.mid,
-			type: forum.class,
-			toMid: thread.toMid,
-		});
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
 		await thread.updateThreadMessage();
@@ -224,5 +226,7 @@ threadRouter
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
 		await next();
 	})
+	.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

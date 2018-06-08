@@ -595,7 +595,7 @@ forumSchema.statics.visibleForums = async (options) => {
 				}
 			]
 		};
-		const forums = await ForumModel.find(q).sort({toc: 1});
+		const forums = await ForumModel.find(q).sort({order: 1});
 		visibleForums = visibleForums.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);
@@ -694,7 +694,7 @@ forumSchema.statics.forumsOfCanGetThreads = async (options) => {
 				}
 			]
 		};
-		const forums = await ForumModel.find(q);
+		const forums = await ForumModel.find(q).sort({order: 1});
 		resultForums = resultForums.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);
@@ -734,7 +734,7 @@ forumSchema.statics.getAllChildrenForums = async function(fid) {
 	const ForumModel = mongoose.model('forums');
 	let accessibleForum = [];
 	const findForums = async (parentId) => {
-		const forums = await ForumModel.find({parentId});
+		const forums = await ForumModel.find({parentId}).sort({order: 1});
 		accessibleForum = accessibleForum.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);

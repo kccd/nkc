@@ -1,12 +1,5 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
-const nkcModules = require('../../nkcModules');
-const path = require('path');
-const tools = require('../../tools');
-const {upload, statics} = require('../../settings');
-const {adPath, avatarPath, uploadPath} = upload;
-const {defaultAdPath} = statics;
-const {imageMagick} = tools;
 operationRouter
 // 收藏帖子
 	.post('/addColl', async (ctx, next) => {
@@ -15,7 +8,15 @@ operationRouter
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
-		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
+		await thread.extendForum();
+		const gradeId = data.userGrade._id;
+		const rolesId = data.userRoles.map(r => r._id);
+		const options = {
+			gradeId,
+			rolesId,
+			uid: user?user.uid: ''
+		};
+		await thread.ensurePermission(options);
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
 		if(collection) ctx.throw(400, '该贴子已经存在于您的收藏中，没有必要重复收藏');
 		const newCollection = new db.CollectionModel({
@@ -30,105 +31,6 @@ operationRouter
 			ctx.throw(500, `收藏失败: ${err}`);
 		}
 		data.targetUser = await thread.extendUser();
-		await next();
-	})
-	// 首页置顶
-	.patch('/ad', async (ctx, next) => {
-		const {tid} = ctx.params;
-		const {db, data, fs} = ctx;
-		const thread = await db.ThreadModel.findOnly({tid});
-		if(data.userLevel < 6) ctx.throw(403, '权限不足');
-		if(thread.disabled) ctx.throw(404, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const setting = await db.SettingModel.findOnly({type: 'system'});
-		const ads = setting.ads;
-		const index = ads.findIndex((elem, i, arr) => elem === tid);
-		const targetUser = await thread.extendUser();
-		const targetAdPath = `${adPath}/${tid}.jpg`;
-		if(index > -1) {
-			ads.splice(index, 1);
-			try{
-				await fs.unlink(targetAdPath);
-			} catch(e){}
-		} else {
-			if(ads.length === 6) {
-				ads.shift();
-			}
-			ads.push(tid);
-			const oc = await db.PostModel.findOnly({pid: thread.oc});
-			let resourceArr = await oc.extendResources();
-			let resource = resourceArr.find(elem => ['jpg', 'png', 'svg', 'jpeg'].indexOf(elem.ext.toLowerCase()) > -1);
-			let filePath;
-			if(resource) {
-				filePath = `${uploadPath}${resource.path}`;
-			} else {
-				filePath = `${avatarPath}/${targetUser.uid}.jpg`;
-			}
-			await imageMagick.generateAdPost(filePath, targetAdPath);
-		}
-		await setting.update({ads});
-		await next();
-	})
-	// 精华
-	.patch('/digest', async (ctx, next) => {
-		const {tid} = ctx.params;
-		const {digest} = ctx.body;
-		const {db, data} = ctx;
-		const {user} = data;
-		if(digest === undefined) ctx.throw(400, '参数不正确');
-		const thread = await db.ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
-		if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const obj = {digest: false};
-		if(digest) {
-			obj.digest = true;
-		}
-		if(thread.digest === digest) {
-			if(!digest) ctx.throw(400, '该贴子在您操作前已经被撤销精华了，请刷新');
-			if(digest) ctx.throw(400, '该贴子在您操作前已经被设置成精华了，请刷新');
-		}
-		await thread.update(obj);
-		data.targetUser = await thread.extendUser();
-		let operation = 'setDigest';
-		if(!digest) operation = 'cancelDigest';
-		await ctx.generateUsersBehavior({
-			operation,
-			tid,
-			fid: thread.fid,
-			isManageOp: true,
-			toMid: thread.toMid,
-			mid: thread.mid
-		});
-		await thread.updateThreadMessage();
-		await next();
-	})
-	.patch('/topped', async (ctx, next) => {
-		const {tid} = ctx.params;
-		const {db, data} = ctx;
-		const {topped} = ctx.body;
-		const {user} = data;
-		if(topped === undefined) ctx.throw(400, '参数不正确');
-		const thread = await db.ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
-		if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const obj = {topped: false};
-		if(topped) obj.topped = true;
-		await thread.update(obj);
-		if(thread.topped === topped) {
-			if(topped) ctx.throw(400, '该帖子在您操作前已经被置顶了，请刷新');
-			if(!topped) ctx.throw(400, '该帖子在您操作前已经被取消置顶了，请刷新');
-		}
-		data.targetUser = await thread.extendUser();
-		let operation = 'setTopped';
-		if(!topped) operation = 'cancelTopped';
-		await ctx.generateUsersBehavior({
-			operation,
-			tid,
-			fid: thread.fid,
-			isManageOp: true,
-			toMid: thread.toMid,
-			mid: thread.mid
-		});
-		await thread.updateThreadMessage();
 		await next();
 	})
 	.patch('/moveDraft', async (ctx, next) => {

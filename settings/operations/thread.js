@@ -13,10 +13,12 @@ module.exports = {
 			POST: 'collectThread'
 		},
 		digest: {
-			PATCH: 'digestThread'
+			POST: 'digestThread',
+			DELETE: 'unDigestThread'
 		},
 		topped: {
-			PATCH: 'toppedThread'
+			POST: 'toppedThread',
+			DELETE: 'unToppedThread'
 		},
 		switchInPersonalForum: {
 			PATCH: 'switchInPersonalForum'
