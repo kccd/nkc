@@ -135,7 +135,7 @@ threadRouter
 		// 查询该文章下的所有post
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
-		const posts = await db.PostModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(posts.map(async post => {
 			await post.extendUser();
 			await post.extendResources();

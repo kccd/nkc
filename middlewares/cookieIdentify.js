@@ -37,7 +37,7 @@ module.exports = async (ctx, next) => {
 		  const defaultRole = await db.RoleModel.findOnly({_id: 'default'});
 		  userOperationsId = defaultRole.operationsId;
 		  // 根据用户积分计算用户等级，并且获取该等级下的所有权限
-		  userGrade = await user.extendGrade();
+			userGrade = await user.extendGrade();
 		  if(userGrade) {
 			  userOperationsId = userOperationsId.concat(userGrade.operationsId);
 		  }

@@ -6,6 +6,7 @@ block title
   meta#replytarget(value=`${data.replyTarget}`)
 
   -let modifyPostTimeLimit = 0;
+  -console.log(data.userRoles)
   -for(let i = 0; i < data.userRoles.length; i++)
     -const r = data.userRoles[i];
     if r.modifyPostTimeLimit > modifyPostTimeLimit
