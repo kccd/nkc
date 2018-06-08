@@ -23,7 +23,7 @@ searchInit()
 
     // 检测数据的完整性
 		// 初始化网站配置
-    const {SettingModel, RoleModel, OperationModel, OperationTypeModel, UsersGradeModel} = require('./dataModels');
+    const {SettingModel, RoleModel, OperationModel, OperationTypeModel, UsersGradeModel, ForumModel} = require('./dataModels');
     const defaultData = require('./settings/defaultSettings');
     await Promise.all(defaultData.map(async settings => {
 			const settingsDB = await SettingModel.findOne({type: settings.type});
@@ -78,6 +78,7 @@ searchInit()
 
     // 运维包含所有的操作权限
     await RoleModel.update({_id: 'dev'}, {$set: {operationsId: operationsId}});
+    await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
 
     // 初始化默认操作
 	  const defaultOperationTypes = require('./settings/defaultOperaionTypes');

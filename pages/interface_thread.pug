@@ -77,25 +77,30 @@ block content
 
                 .ThreadTitleAuxillaryLink
                   a(href='#bottom') 本页底部
-
-                  if data.userLevel >= 1
+                  //- 设置精华
+                  if data.userOperationsId.includes('collectThread')
                     a(href=`javascript:addColl('${thread.tid}')`) 收藏
+                  if data.userOperationsId.includes('digestThread') && !thread.digest
+                    a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
+                  if data.userOperationsId.includes('unDigestThread') && thread.digest
+                    a#threadDigest(href=`javascript:cancelDigest('${data.thread.tid}')`) 撤销精华
+                  //- 设置置顶
+                  if data.userOperationsId.includes('toppedThread') && !thread.topped
+                    a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
+                  if data.userOperationsId.includes('unToppedThread') && thread.topped
+                    a#threadTop(href=`javascript:cancelTopped('${data.thread.tid}')`) 撤销置顶
+                  //-
+                    if data.userLevel >= 4
+                      if thread.digest
+                        a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 撤销精华
+                      else
+                        a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
 
-                  //if data.userLevel >= 6
-                  //  -var isAd = data.ads.includes(thread.tid)
-                  //  a#adBtn(href='javascript:;' onclick=`adSwitch('${thread.tid}')`) #{isAd ? '取消首页置顶' : '首页置顶'}
-
-                  if data.userLevel >= 4
-                    if thread.digest
-                      a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 撤销精华
-                    else
-                      a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
-
-                  if data.userLevel >= 4
-                    if thread.topped
-                      a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 撤销置顶
-                    else
-                      a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
+                    if data.userLevel >= 4
+                      if thread.topped
+                        a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 撤销置顶
+                      else
+                        a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
 
                   a(href=`/t/${data.thread.tid}`) 本帖地址
                 if user
@@ -325,9 +330,9 @@ block content
     include post_to_recycle.pug
 block scripts
   script(src='/qrcode/build/qrcode.js')
-  script(src='/interface_common.js?v=4')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/module_dropdown.js?v=3')
-  script(src='/interface_thread.js?v=4')
+  script(src=`/interface_thread.js?v=${global.NKC.startTime}`)
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   script(src="/jquery-1.10.2.js")

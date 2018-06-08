@@ -248,11 +248,11 @@ threadSchema.methods.updateThreadMessage = async function() {
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
-  const SettingModel = require('./SettingModel');
+  const SettingModel = mongoose.model('settings');
   const UsersPersonalModel = require('./UsersPersonalModel');
-  const PostModel = require('./PostModel');
-  const UserModel = require('./UserModel');
-  const ReplyModel = require('./ReplyModel');
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const ReplyModel = mongoose.model('replies');
   const dbFn = require('../nkcModules/dbFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {c, t, l} = post;

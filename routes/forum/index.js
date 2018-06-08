@@ -12,7 +12,10 @@ forumRouter
     const {data, db, nkcModules} = ctx;
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		const forums = await db.ForumModel.getVisibleForums(ctx);
+    const gradeId = data.userGrade._id;
+    const rolesId = data.userRoles.map(r => r._id);
+    const options = {gradeId, rolesId};
+		const forums = await db.ForumModel.visibleForums(options);
 		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
