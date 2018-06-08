@@ -128,7 +128,7 @@ function getPermitTree(certs) {
 	return tree;
 }
 
-// 拿到能看到名字的板块
+// 拿到能看到入口的板块
 async function getVisibleFid() {
   const cc = this.data.certificates.contentClasses;
   const cursor = await mongoose.connection.db.collection('forums').find(

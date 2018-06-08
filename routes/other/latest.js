@@ -6,14 +6,17 @@ const dbFn = nkcModules.dbFunction;
 latestRouter
   .get('/', async (ctx, next) => {
     const { data, db, query } = ctx;
-    const accessibleFid = await ctx.getThreadListFid(); // 拿到能在主页显示帖子的fid
+    const gradeId = data.userGrade._id;
+    const rolesId = data.userRoles.map(r => r._id);
+    const options = {gradeId, rolesId};
+    const fidArr = await db.ForumModel.fidOfCanGetThreads(options);
     const { digest, sortby } = query;
     if (data.userLevel === -1) {
       ctx.throw(403, '您的账号已被封禁，请退出登录后重新注册。');
     }
     const page = query.page || 0;
     const q = {
-      fid: { $in: accessibleFid }
+      fid: { $in: fidArr}
     };
     if (digest === 'true') q.digest = true;
     const threadCount = await db.ThreadModel.count(q);
