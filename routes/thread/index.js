@@ -124,7 +124,14 @@ threadRouter
 		const count = await db.PostModel.count(match);
 
 		// 删除退休超时的post
-		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*69*69*1000}}, {$set: {delType: 'toRecycle'}});
+		const postAll = await db.PostModel.find({tid:tid,toDraft:true})
+		for(let postSin of postAll){
+			let onLog = await db.DelPostLogModel.findOne({delType: 'toDraft', postType: 'post', postId: postSin.pid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}})
+			if(onLog){
+				await postSin.update({"toDraft":false})
+			}
+		}
+		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}}, {$set: {delType: 'toRecycle'}});
 		if(pid) {
 			const matchBase = ctx.generateMatchBase({pid}).toJS();
 			const {page, step} = await thread.getStep(matchBase);

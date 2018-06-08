@@ -43,6 +43,7 @@ router
       for(var i in delPostLog){
         await delPostLog[i].update({"modifyType":true})
       }
+      await targetPost.update({"toDraft":null})
     }
     if(disabled === true){
       let {para} = ctx.body

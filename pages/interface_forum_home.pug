@@ -128,7 +128,6 @@ block content
               button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
         else
           a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-        -console.log(data)
         if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
           if data.type === 'latest'
             button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
