@@ -145,7 +145,7 @@ forumRouter
 
 		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
 		await forum.ensurePermissionNew({gradeId, rolesId, uid: data.user?data.user.uid: ''});
-
+		data.isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		data.forum = forum;
 
 		const {today} = ctx.nkcModules.apiFunction;

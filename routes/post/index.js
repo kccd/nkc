@@ -15,48 +15,23 @@ postRouter
     const {data, db} = ctx;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
-    const thread = await db.ThreadModel.findOnly({tid: post.tid});
+    const thread = await post.extendThread();
+	  const forum = await thread.extendForum();
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
     const {user} = data;
+	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
     // 判断用户是否具有访问该post所在文章的权限
     const options = {
     	gradeId,
 	    rolesId,
+	    isModerator,
+	    userOperationsId: data.userOperationsId,
 	    uid: user?user.uid: ''
     };
-	  const forum = await thread.extendForum();
-	  await thread.ensurePermission(options);
-    // 被退回或被屏蔽
-    if(post.disabled) {
-    	let toRecycle, toDraft;
-    	const delLog = await db.DelPostLogModel.findOne({postType: 'post', postId: pid});
-    	if(!delLog) {
-    		toRecycle = true;
-	    } else {
-		    if(delLog.delType === 'toRecycle') {
-			    toRecycle = true;
-		    } else if(delLog.delType === 'toDraft') {
-			    if(delLog.toc < (Date.now()-3*24*60*60*1000)) {
-				    await delLog.update({delType: 'toRecycle'});
-				    toRecycle = true;
-			    } else {
-				    toDraft = true;
-			    }
-		    }
-	    }
-	    const isModerator = await forum.isModerator(user?user.uid: '');
-	    if(toRecycle) {
-				if(!data.userOperationsId.includes('displayDisabledPosts') && !isModerator) {
-					ctx.throw(403, '权限不足');
-				}
-	    }
-	    if(toDraft) {
-	    	if(!data.userOperationsId.includes('displayRecycleMarkThreads') && !isModerator && (!user || user.uid !== post.uid)) {
-	    		ctx.throw(403, '权限不足');
-		    }
-	    }
-    }
+    // 权限判断
+	  await post.ensurePermissionNew(options);
+		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();
     data.post = post;
@@ -75,14 +50,19 @@ postRouter
 	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
-
-    const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
+    const targetThread = await targetPost.extendThread();
     const targetForum = await targetThread.extendForum();
     const isModerator = await targetForum.isModerator(user.uid);
-	  if(user.uid !== targetPost.uid && !data.userOperationsId.includes('modifyOtherPosts') && !isModerator)
-		  ctx.throw(403,'您没有权限修改别人的回复');
+    // 权限判断
+    if(!data.userOperationsId.includes('modifyOtherPosts') && !isModerator) {
+    	if(user.uid !== targetPost.uid) ctx.throw(403, '您没有权限修改别人的回复');
+    	if(targetPost.disabled && !targetPost.toDraft) {
+    		ctx.throw(403, '回复已被屏蔽，暂不能修改');
+	    }
+    }
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
+    // 修改回复的时间限制
     let modifyPostTimeLimit = 0;
     for(const r of data.userRoles) {
 			if(r.modifyPostTimeLimit === -1) {

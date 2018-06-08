@@ -221,6 +221,14 @@ userSchema.virtual('grade')
 		this._grade = grade;
 	});
 
+userSchema.virtual('authLevel')
+	.get(function() {
+		return this._authLevel;
+	})
+	.set(function(authLevel) {
+		this._authLevel = authLevel;
+	});
+
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = require('./ThreadModel');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);

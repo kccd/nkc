@@ -50,6 +50,10 @@ const usersScoreLogSchema = new Schema({
 		type: String,
 		default: '',
 		index: 1
+	},
+	description: {
+		type: String,
+		default: ''
 	}
 }, {
 	collection: 'usersScoreLogs'

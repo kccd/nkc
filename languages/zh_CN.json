@@ -232,7 +232,10 @@
     "displayRecycleMarkThreads": "显示被退回的文章",
     "displayDisabledPosts": "显示被屏蔽的post",
     "unDigestThread": "取消将文章设为文章优秀",
-    "unToppedThread": "取消将文章置顶"
+    "unToppedThread": "取消将文章置顶",
+    "recommendPost": "推荐回复",
+    "unRecommendPost": "取消推荐回复",
+    "displayPostHideHistories": "显示post被屏蔽的历史"
 
   }
 }

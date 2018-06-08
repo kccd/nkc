@@ -78,45 +78,67 @@ threadRouter
 		data.highlight = highlight;
 		const thread = await db.ThreadModel.findOnly({tid});
 		const forum = await thread.extendForum();
-		const breadcrumbForums = await forum.getBreadcrumbForums();
-		// 取出帖子被退回的原因
-		if(thread.recycleMark) {
-			// 访问用户没有查看被退回帖子的权限，若不是自己发表的文章则报权限不足
-			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-				if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '权限不足');
-			}
-			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft"});
-			thread.reason = threadLogOne.reason || '';
-		}
 		// 验证权限 - new
 		const gradeId = data.userGrade._id;
 		const rolesId = data.userRoles.map(r => r._id);
 		const options = {gradeId, rolesId};
 		await thread.ensurePermission(options);
+		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
+		data.isModerator = isModerator;
+		const breadcrumbForums = await forum.getBreadcrumbForums();
+		// 判断文章是否被退回或被彻底屏蔽
+		if(thread.recycleMark) {
+			if(!isModerator) {
+				// 访问用户没有查看被退回帖子的权限，若不是自己发表的文章则报权限不足
+				if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
+					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '权限不足');
+				}
+			}
+			// 取出帖子被退回的原因
+			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft"});
+			thread.reason = threadLogOne.reason || '';
+		}
 		// 构建查询条件
-		const match = {tid};
+		const match = {
+			tid
+		};
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
 
 		// 判断是否为该专业的专家
-		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		// 如果是该专业的专家，加载所有的post；如果不是，则判断有没有相应权限。
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-				if(!data.user) {
-					const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', threadId: tid, delType: 'toDraft'});
-					const toDraftPostsId = toDraftPosts.map(post => post.postId);
-					$and.push({pid: {$nin: toDraftPostsId}});
-				} else {
-					const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', threadId: tid, delType: 'toDraft', delUserId: {$ne: data.user.uid}});
-					const toDraftPostsId = toDraftPosts.map(post => post.postId);
-					$and.push({pid: {$nin: toDraftPostsId}});
+				const $or = [
+					{
+						disabled: false
+					},
+					{
+						disabled: true,
+						toDraft: {$ne: true}
+					}
+				];
+				// 用户能查看自己被退回的回复
+				if(data.user) {
+					$or.push({
+						disabled: true,
+						toDraft: true,
+						uid: data.user.uid
+					});
 				}
+				$and.push({$or})
 			}
 			if(!data.userOperationsId.includes('displayDisabledPosts')) {
-				const toRecyclePosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', threadId: tid, delType: 'toRecycle'});
-				const toRecyclePostsId = toRecyclePosts.map(post => post.postId);
-				$and.push({pid: {$nin: toRecyclePostsId}});
+				const $or = [
+					{
+						disabled: false
+					},
+					{
+						disabled: true,
+						toDraft: {$ne: false}
+					}
+				];
+				$and.push({$or});
 			}
 			if($and.length !== 0) match.$and = $and;
 		}
@@ -126,8 +148,8 @@ threadRouter
 		// 删除退休超时的post
 		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*69*69*1000}}, {$set: {delType: 'toRecycle'}});
 		if(pid) {
-			const matchBase = ctx.generateMatchBase({pid}).toJS();
-			const {page, step} = await thread.getStep(matchBase);
+			const disabled = data.userOperationsId.includes('displayDisabledPosts');
+			const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`);
 		}
@@ -152,7 +174,7 @@ threadRouter
 			}
 		});
 		// 加载文章所在专业位置，移动文章的选择框
-		data.forumList = await db.ForumModel.getVisibleForums(ctx);
+		data.forumList = await db.ForumModel.visibleForums(options);
 		data.parentForums = await forum.extendParentForum();
 		data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
 		data.selectedArr = breadcrumbForums.map(f => f.fid);
@@ -170,6 +192,7 @@ threadRouter
 			myForum = await db.PersonalForumModel.findOnly({uid: mid});
 			data.myForum = myForum
 		}
+
 		if(toMid !== '') {
 			othersForum = await db.PersonalForumModel.findOnly({uid: toMid});
 			data.othersForum = othersForum

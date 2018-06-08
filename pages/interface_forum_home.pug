@@ -128,10 +128,10 @@ block content
               button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
         else
           a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-        if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
+        if data.userOperationsId.includes('moveThread') || data.isModerator
           if data.type === 'latest'
             button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
-        if data.userLevel >= 6
+        if data.userOperationsId.includes('visitForumInfoSettings')
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
         +fastVisit()
@@ -167,10 +167,10 @@ block content
                   button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
             else
               a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-            if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
+            if data.userOperationsId.includes('moveThread') || data.isModerator
               if data.type === 'latest'
                 button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
-            if data.userLevel >= 6
+            if data.userOperationsId.includes('visitForumInfoSettings')
               a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
                 span.fa.fa-cog &nbsp;设置
             +fastVisit()
@@ -329,8 +329,8 @@ block content
               button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
 
 block scripts
-  script(src='/interface_common.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   include MathJax
   if data.type === 'latest'
-    script(src='/module_dropdown.js?v=3')
-  script(src='/interface_forum.js?v=4')
+    script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_forum.js?v=${global.NKC.startTime}`)

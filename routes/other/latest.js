@@ -43,11 +43,11 @@ latestRouter
     }
     if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
       if(!data.user) {
-        $match.recycleMark = false;
+        $match.recycleMark = {$ne: true};
       } else {
         $match.$or = [
           {
-            recycleMark: false
+            recycleMark: {$ne: true}
           },
           {
             recycleMark: true,
@@ -56,7 +56,6 @@ latestRouter
         ]
       }
     }
-
     const threads = await db.ThreadModel.find($match).sort($sort).skip($skip).limit($limit);
     // const threads = [];
 

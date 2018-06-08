@@ -14,6 +14,10 @@ module.exports = {
 		history: {
 			GET: 'visitPostHistory',
 			PATCH: 'disableHistories'
+		},
+		recommend: {
+			POST: 'recommendPost',
+			DELETE: 'unRecommendPost'
 		}
 	}
 };

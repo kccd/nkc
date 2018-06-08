@@ -1,6 +1,6 @@
--const postTo = data.userLevel >= 1
--const addCredit = data.userLevel >= 4
--const disablePost = data.userLevel >= 4
+-const postTo = data.userOperationsId.includes('quotePost')
+-const addCredit = data.userOperationsId.includes('creditPost')
+-const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
 -const highlight = data.highlight;
 
   if (!post.disabled || disablePost || data.user.uid === post.uid)
@@ -51,16 +51,17 @@
                 a(href=`` onclick=`disablePostClick('${post.pid}')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo") 屏蔽
                 //- a(onclick=`javascript:disablePostClick()`) 测试
 
-              - if(post.tlm > post.toc && data.userLevel >= 3)
-                if !post.hideHistories || data.userLevel >= 6
+              - if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
+                if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
                   a(href=`/p/${post.pid}/history`) 历史
               if data.user
                 - var user = data.user
-                - var ownership = data.userOperationsId.includes('modifyOtherPost')
+                - var ownership = data.userOperationsId.includes('modifyOtherPosts')
                 - ownership = ownership?true:(user.uid===uid)
 
                 //- if(testModifyTimeLimit(data.certificates,ownership,post.toc))
                 if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
+
                   a(href=`/editor?type=post&id=${post.pid}`) 编辑
 
                 - var cc = disablePost;

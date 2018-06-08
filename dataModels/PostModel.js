@@ -150,6 +150,26 @@ postSchema.methods.extendUser = async function() {
   return this.user = await UserModel.findOnly({uid: this.uid});
 };
 
+postSchema.methods.ensurePermissionNew = async function(options) {
+	await this.thread.ensurePermission(options);
+	const {isModerator, userOperationsId, uid} = options;
+	if(this.disabled) {
+		if(!isModerator) {
+			if(this.toDraft && !userOperationsId.includes('displayRecycleMarkThreads')) {
+				if(!uid || uid.uid !== this.uid) {
+					const err = new Error('权限不足');
+					err.status = 403;
+					throw err;
+				}
+			}
+			if(!this.toDraft && !userOperationsId.includes('displayDisabledPosts')) {
+				const err = new Error('权限不足');
+				err.status = 403;
+				throw err;
+			}
+		}
+	}
+};
 
 postSchema.methods.ensurePermission = async function(ctx) {
   const {ThreadModel} = ctx.db;
@@ -158,16 +178,6 @@ postSchema.methods.ensurePermission = async function(ctx) {
   // 1、能浏览所在帖子
   // 2、post没有被禁 或 用户为该板块的版主 或 具有比版主更高的权限
   return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
-};
-
-postSchema.methods.ensurePermissionNew = async function(options) {
-	const {gradeId, rolesId, uid} = options;
-	if(this.disabled) {
-		const DelPostLogModel = mongoose.model('delPostLogs');
-		const delPostLog = await DelPostLogModel.findOne({})
-	}
-	const {ThreadModel} = mongoose.model('threads');
-
 };
 
 postSchema.pre('save', async function(next) {

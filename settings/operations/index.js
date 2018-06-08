@@ -45,7 +45,8 @@ const operationObj = {};
 operationObj.defaultOperations = [
 	'modifyOtherPosts',
 	'displayRecycleMarkThreads',
-	'displayDisabledPosts'
+	'displayDisabledPosts',
+	'displayPostHideHistories'
 ];
 
 

@@ -26,7 +26,9 @@ module.exports = async (ctx, next) => {
     		user.certs.splice(index, 1);
 	    }
     }
-    user.newMessage = (await db.UsersPersonalModel.findOne({uid})).newMessage;
+    const userPersonal = await db.UsersPersonalModel.findOne({uid});
+    user.newMessage = userPersonal.newMessage;
+    user.authLevel = await userPersonal.getAuthLevel();
     user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid})).subscribeUsers;
     user.draftCount = await db.DraftModel.count({uid: user.uid});
     data.user = user;
