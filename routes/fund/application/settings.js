@@ -14,7 +14,7 @@ settingsRouter
 			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
 		}
 		const {lock} = applicationForm;
-		if(user.uid !== applicationForm.uid && data.userLevel < 7) ctx.throw(403,'权限不足');
+		if(user.uid !== applicationForm.uid) ctx.throw(403,'权限不足');
 		if(lock.submitted) ctx.throw(400, '申请表已提交，无法修改。');
 		let {s} = ctx.query;
 		if(s) {

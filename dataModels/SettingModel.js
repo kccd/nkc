@@ -33,7 +33,6 @@ const settingSchema = new Schema({
     drafts: Number,
 	  operationTypes: Number,
 	  problems: Number,
-	  usersGrades: Number,
   },
 
 	//科创基金设置

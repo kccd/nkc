@@ -25,7 +25,6 @@ forumRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {displayName} = body;
-		if(data.userLevel < 6) ctx.throw(403, '权限不足');
 		if(!displayName) ctx.throw(400, '板块名称不能为空');
 		const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
 		if(sameDisplayNameForum) ctx.throw(400, '板块名称已存在');

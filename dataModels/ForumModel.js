@@ -374,7 +374,9 @@ forumSchema.methods.extendFollowers = async function() {
 	return this.followers = users;
 };
 
-// 加载路径导航父板块
+// 加载路径导航父专业
+// 该专业的所有上层专业，未验证权限
+// 若当前专业为第五级，则返回 [第一级, 第二级, 第三级, 第四级];
 forumSchema.methods.getBreadcrumbForums = async function() {
 	const ForumModel = mongoose.model('forums');
 	const parentForums = [];
@@ -390,87 +392,6 @@ forumSchema.methods.getBreadcrumbForums = async function() {
 	}
 	return parentForums.reverse();
 };
-
-
-// 加载能看到入口的板块
-forumSchema.statics.getVisibleForums = async (ctx, fid) => {
-	const cc = ctx.data.certificates.contentClasses;
-	const ForumModel = mongoose.model('forums');
-	const visibleForums = [];
-	const findForums = async (parentId) => {
-		const accessForums = [];
-		const forums = await ForumModel.find({parentId, accessible: true, visibility: true}).sort({order: 1});
-		forums.map(forum => {
-			if(cc.includes(forum.class) || forum.isVisibleForNCC) {
-				visibleForums.push(forum);
-				accessForums.push(forum);
-			}
-		});
-		await Promise.all(accessForums.map(async forum => {
-			await findForums(forum.fid);
-		}));
-	};
-	fid = fid || '';
-	await findForums(fid);
-	return visibleForums;
-};
-
-// 加载能看到入口的fid
-forumSchema.statics.getVisibleFid = async (ctx, fid) => {
-	const ForumModel = mongoose.model('forums');
-	const forums = await ForumModel.getVisibleForums(ctx, fid);
-	return forums.map(f => f.fid);
-};
-
-// 加载能访问的板块
-forumSchema.statics.getAccessibleForums = async (ctx, fid) => {
-	const cc = ctx.data.certificates.contentClasses;
-	const ForumModel = mongoose.model('forums');
-	let accessibleForum = [];
-	const findForums = async (parentId) => {
-		const forums = await ForumModel.find({parentId, accessible: true, class: {$in: cc}}).sort({order: 1});
-		accessibleForum = accessibleForum.concat(forums);
-		await Promise.all(forums.map(async forum => {
-			await findForums(forum.fid);
-		}));
-	};
-	fid = fid || '';
-	await findForums(fid);
-	return accessibleForum;
-};
-
-
-// 加载能访问板块的fid
-forumSchema.statics.getAccessibleFid = async (ctx, fid) => {
-	const ForumModel = mongoose.model('forums');
-	const forums = await ForumModel.getAccessibleForums(ctx, fid);
-	return forums.map(f => f.fid);
-};
-
-// 加载可以从中拿文章的板块
-forumSchema.statics.getForumsOfCanGetThreads = async (ctx, fid) => {
-	const cc = ctx.data.certificates.contentClasses;
-	const ForumModel = mongoose.model('forums');
-	let accessibleForum = [];
-	const findForums = async (parentId) => {
-		const forums = await ForumModel.find({parentId, accessible: true, class: {$in: cc}, displayOnParent: true});
-		accessibleForum = accessibleForum.concat(forums);
-		await Promise.all(forums.map(async forum => {
-			await findForums(forum.fid);
-		}));
-	};
-	fid = fid || '';
-	await findForums(fid);
-	return accessibleForum;
-};
-// 加载可以从中拿文章的板块fid
-forumSchema.statics.getFidOfCanGetThreads= async (ctx, fid) => {
-	const ForumModel = mongoose.model('forums');
-	const forums = await ForumModel.getForumsOfCanGetThreads(ctx, fid);
-	return forums.map(f => f.fid);
-};
-
-
 
 // -------------------------------- 加载能访问的板块 --------------------------------
 forumSchema.statics.accessibleForums = async (options) => {

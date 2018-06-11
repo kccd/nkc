@@ -236,7 +236,12 @@
     "recommendPost": "推荐回复",
     "unRecommendPost": "取消推荐回复",
     "displayPostHideHistories": "显示post被屏蔽的历史",
-    "unBannedUser": "解封用户"
-
+    "unBannedUser": "解封用户",
+    "displayFundNoVerifyBills": "显示未验证的基金账单",
+    "displayFundBillsSecretInfo": "显示基金账单的隐藏信息（支付宝交易号等）",
+    "displayFundApplicationFormSecretInfo": "显示基金申请表隐藏信息（申请人身份信息等）",
+    "modifyQuestion": "修改问题",
+    "displayAnyBodyPhoto": "可任意查看用户的照片、证件照",
+    "removeAnyBodyPhoto": "可任意删除用户的照片、证件照"
   }
 }

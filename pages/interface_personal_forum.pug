@@ -25,7 +25,7 @@ block title
 
 block content
   -var mainContainer1400 = true
-  -var isModerator = data.user? (forum.moderators.indexOf(data.user.uid) > -1) : false
+  -var isModerator = data.isModerator
   // -const isAdmin = data.userLevel >= 4
   // -const isNormalUser = data.userLevel >= 1
   .container-fluid(style='max-width:1400px;')
@@ -256,5 +256,5 @@ block content
 
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_collections.js')
+  //script(src='/interface_collections.js')
   script(src='/interface_personal_forum.js')

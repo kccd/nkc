@@ -160,14 +160,14 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.fundCerts)
+                    -for (let certObj of data.roles)
                       if fund && fund.expert.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='expertCert' cert=certObj.cert checked=fund.expert.certs.includes(certObj.cert))
+                          input(type='checkbox' name='expertCert' cert=certObj._id checked=fund.expert.certs.includes(certObj._id))
                           h5= certObj.displayName
                       else
                         label.checkbox-inline
-                          input(type='checkbox' name='expertCert' cert=certObj.cert)
+                          input(type='checkbox' name='expertCert' cert=certObj._id)
                           h5= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
@@ -179,14 +179,14 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.fundCerts)
+                    -for (let certObj of data.roles)
                       if fund && fund.financialStaff.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='financialStaffCert' cert=certObj.cert checked=fund.financialStaff.certs.includes(certObj.cert))
+                          input(type='checkbox' name='financialStaffCert' cert=certObj._id checked=fund.financialStaff.certs.includes(certObj._id))
                           h5= certObj.displayName
                       else
                         label.checkbox-inline
-                          input(type='checkbox' name='financialStaffCert' cert=certObj.cert)
+                          input(type='checkbox' name='financialStaffCert' cert=certObj._id)
                           h5= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
@@ -198,14 +198,14 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.fundCerts)
+                    -for (let certObj of data.roles)
                       if fund && fund.censor.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='censorCert' cert=certObj.cert checked=fund.censor.certs.includes(certObj.cert))
+                          input(type='checkbox' name='censorCert' cert=certObj._id checked=fund.censor.certs.includes(certObj._id))
                           h5= certObj.displayName
                       else
                         label.checkbox-inline
-                          input(type='checkbox' name='censorCert' cert=certObj.cert)
+                          input(type='checkbox' name='censorCert' cert=certObj._id)
                           h5= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
@@ -217,14 +217,14 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.fundCerts)
+                    -for (let certObj of data.roles)
                       if fund && fund.admin.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='adminCert' cert=certObj.cert checked=fund.admin.certs.includes(certObj.cert))
+                          input(type='checkbox' name='adminCert' cert=certObj._id checked=fund.admin.certs.includes(certObj._id))
                           h5= certObj.displayName
                       else
                         label.checkbox-inline
-                          input(type='checkbox' name='adminCert' cert=certObj.cert)
+                          input(type='checkbox' name='adminCert' cert=certObj._id)
                           h5= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
@@ -236,14 +236,14 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.fundCerts)
+                    -for (let certObj of data.roles)
                       if fund && fund.commentator.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='commentatorCert' cert=certObj.cert checked=fund.commentator.certs.includes(certObj.cert))
+                          input(type='checkbox' name='commentatorCert' cert=certObj._id checked=fund.commentator.certs.includes(certObj._id))
                           h5= certObj.displayName
                       else
                         label.checkbox-inline
-                          input(type='checkbox' name='commentatorCert' cert=certObj.cert)
+                          input(type='checkbox' name='commentatorCert' cert=certObj._id)
                           h5= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
@@ -255,14 +255,14 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.fundCerts)
+                    -for (let certObj of data.roles)
                       if fund && fund.voter.certs.length !== 0
                         label.checkbox-inline
-                          input(type='checkbox' name='voterCert' cert=certObj.cert checked=fund.voter.certs.includes(certObj.cert))
+                          input(type='checkbox' name='voterCert' cert=certObj._id checked=fund.voter.certs.includes(certObj._id))
                           h5= certObj.displayName
                       else
                         label.checkbox-inline
-                          input(type='checkbox' name='voterCert' cert=certObj.cert)
+                          input(type='checkbox' name='voterCert' cert=certObj._id)
                           h5= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔

@@ -98,7 +98,6 @@ searchInit()
 		  const defaultUsersGrades = require('./settings/defaultUsersGrades');
 		  for(const grade of defaultUsersGrades) {
 			  console.log(`Initialize usersGrade - ${grade.displayName}`);
-			  grade._id = await SettingModel.operateSystemID('usersGrades', 1);
 		  	const newGrade = UsersGradeModel(grade);
 		  	await newGrade.save();
 		  }

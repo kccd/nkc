@@ -1,6 +1,6 @@
 // 通过url和请求方法确定操作类型
 // PARAMETER代表url中不确定的值，如 '/u/uid/settings/info' 中的uid是个变化的值
-
+const resourceObj = require('./resource');
 const {
 	avatar,
 	avatar_small,
@@ -15,7 +15,7 @@ const {
 	fundBanner,
 	photo,
 	photo_small
-} = require('./resource');
+} = resourceObj;
 
 const auth = require('./auth');
 const editor = require('./editor');
@@ -46,7 +46,12 @@ operationObj.defaultOperations = [
 	'modifyOtherPosts',
 	'displayRecycleMarkThreads',
 	'displayDisabledPosts',
-	'displayPostHideHistories'
+	'displayPostHideHistories',
+	'displayFundNoVerifyBills',
+	'displayFundBillsSecretInfo',
+	'displayFundApplicationFormSecretInfo',
+	'getAnyBodyPhoto',
+	'removeAnyBodyPhoto'
 ];
 
 
@@ -61,6 +66,8 @@ operationObj.operationTree = {
 
 		r,// 资源
 		rt,
+
+		default: resourceObj.default,
 
 		cover,// 文章封面
 

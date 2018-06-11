@@ -12,7 +12,12 @@ subscribeRouter
 		const {dbFunction} = ctx.nkcModules;
 		// data.forumList = await dbFunction.getAvailableForums(ctx);
 		// data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
-		const forums = await db.ForumModel.getAccessibleForums(ctx);
+		const options = {
+			gradeId: data.userGrade._id,
+			rolesId: data.userRoles.map(r => r._id),
+			uid
+		};
+		const forums = await db.ForumModel.accessibleForums(options);
 		data.forums = await dbFunction.forumsListSort(forums);
 		ctx.template = 'interface_user_subscribe.pug';
 		await next();

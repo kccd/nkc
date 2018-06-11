@@ -5,7 +5,8 @@ module.exports = {
 		POST: 'addQuestion',
 		PARAMETER: {
 			GET: 'getQuestion',
-			DELETE: 'deleteQuestion'
+			DELETE: 'deleteQuestion',
+			PATCH: 'modifyQuestion'
 		}
 	}
 };

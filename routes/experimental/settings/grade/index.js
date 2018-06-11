@@ -20,14 +20,32 @@ router
 		if(sameDisplayNameGrade) ctx.throw(400, '称号已存在');
 		const sameScoreGrade = await db.UsersGradeModel.findOne({score});
 		if(sameScoreGrade) ctx.throw(400, '积分分界点已存在');
-		const _id = await db.SettingModel.operateSystemID('usersGrades', 1);
 		const newGrade = db.UsersGradeModel({
-			_id,
 			displayName,
 			score
 		});
-		await newGrade.save();
-		data.grade = newGrade;
+		const allGrade = await db.UsersGradeModel.find().sort({score: 1});
+		let insert = false;
+		for(let i = 0; i < allGrade.length; i++) {
+			if(score <= allGrade[i].score) {
+				allGrade.splice(i, 0, newGrade);
+				insert = true;
+				break;
+			}
+		}
+		if(!insert) {
+			allGrade.push(newGrade);
+		}
+		await db.UsersGradeModel.remove({});
+		for(let i = 0; i < allGrade.length; i++) {
+			const grade = allGrade[i].toObject();
+			grade._id = i+1;
+			const g = db.UsersGradeModel(grade);
+			if(g.score === score) {
+				data.grade = g;
+			}
+			await g.save();
+		}
 		await next();
 	})
 	.get('/:_id', async (ctx, next) => {
