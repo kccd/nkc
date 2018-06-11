@@ -4,19 +4,33 @@ block title
   -const mainContainer1400 = true;
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='/experimental/index.css' rel='stylesheet')
-  title 管理界面
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  script(src='/echarts/dist/echarts.min.js')
+  title 网站统计
 block content
 
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
       .col-xs-12.col-md-12
-        .row#content
-          .hidden#data= JSON.stringify({results: data.results})
+        .radiobox(style='display: inline-block;margin-right: 1rem;')
+          span 今日
+          input(type='radio' name='statusType' checked=true)
+        .radiobox(style='display: inline-block;margin-right: 1rem;')
+          span 本月
+          input(type='radio' name='statusType')
+        .radiobox(style='display: inline-block;margin-right: 1rem;')
+          span 今年
+          input(type='radio' name='statusType')
+        .radiobox(style='display: inline-block;margin-right: 1rem;')
+          span 自定义
+          input(type='radio' name='statusType')
+      .col-xs-12.col-md-12(style='margin-top: 2rem;')
+        div#main(style="width: 100%;height: 40rem;")
 block scripts
 
-  script(src='/chart.js/dist/Chart.bundle.js')
   script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
   script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
-  script(src='/interface_common.js')
-  script(src='/experimental/status/index.js')
+  script(src=`/icheck/icheck.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/status/index.js?v=${global.NKC.startTime}`)

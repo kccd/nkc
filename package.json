@@ -30,6 +30,7 @@
     "debug": "^2.0.0",
     "diff": "^3.4.0",
     "direct-alipay": "^3.0.0",
+    "echarts": "^4.1.0",
     "elasticsearch": "^14.0.0",
     "font-awesome": "^4.7.0",
     "icheck": "^1.0.2",

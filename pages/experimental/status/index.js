@@ -12,49 +12,70 @@ function initTime() {
 
 $(function() {
 	initTime();
-	if($('#myChart').length !== 0) {
+	if($('#main').length !== 0) {
 		display();
 	}
+	getResults({type: 'today'});
+});
+
+$('input[name="statusType"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+	radioClass: 'iradio_minimal-red',
 });
 
 
+function getResults(options) {
+	var type = options.type;
+	if(type === 'custom') {
+		return;
+	}
+	nkcAPI('/e/status?type='+type, 'GET', {})
+		.then(function(data) {
+			console.log(data);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error|| data);
+		})
+}
+
+
+
+
 function display() {
-	var ctx = document.getElementById("myChart").getContext('2d');
-	var myChart = new Chart(ctx, {
-		type: 'line',
-		data: {
-			labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-			datasets: [{
-				label: '# of Votes',
-				data: [12, 19, 3, 5, 2, 3],
-				backgroundColor: [
-					'rgba(255, 99, 132, 0.2)',
-					'rgba(54, 162, 235, 0.2)',
-					'rgba(255, 206, 86, 0.2)',
-					'rgba(75, 192, 192, 0.2)',
-					'rgba(153, 102, 255, 0.2)',
-					'rgba(255, 159, 64, 0.2)'
-				],
-				borderColor: [
-					'rgba(255,99,132,1)',
-					'rgba(54, 162, 235, 1)',
-					'rgba(255, 206, 86, 1)',
-					'rgba(75, 192, 192, 1)',
-					'rgba(153, 102, 255, 1)',
-					'rgba(255, 159, 64, 1)'
-				],
-				borderWidth: 1
-			}]
+	var myChart = echarts.init(document.getElementById('main'));
+
+	// 指定图表的配置项和数据
+	var option = {
+		title: {
+			text: '网站统计'
 		},
-		options: {
-			responsive: true,
-			scales: {
-				yAxes: [{
-					ticks: {
-						beginAtZero:true
-					}
-				}]
+		tooltip: {},
+		legend: {
+			data:['发表文章', '发表回复', '用户注册']
+		},
+		xAxis: {
+			data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+		},
+		yAxis: {},
+		series: [
+			{
+			name: '发表文章',
+			type: 'line',
+			data: [5, 20, 36, 10, 10, 20]
+			},
+			{
+				name: '发表回复',
+				type: 'line',
+				data: [533, 30, 32, 45, 4, 6]
+			},
+			{
+				name: '用户注册',
+				type: 'line',
+				data: [23, 3, 54, 2, 32, 32]
 			}
-		}
-	});
+		]
+	};
+
+	// 使用刚指定的配置项和数据显示图表。
+	myChart.setOption(option);
 }
