@@ -7,6 +7,59 @@
   ul.nav.nav-pills
     li
       a(href='/e' data-toggle='url') 统计
+
+    li
+      a(href='/e/systemInfo' data-toggle='url') 发送通知
+
+    li
+      a(href='/auth' data-toggle='url') 身份认证审核
+
+    li
+      a(href='/problem/list' data-toggle='url') 用户反馈
+
+
+    li.dropdown(role='presentation')
+      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+        span 特殊专业&nbsp;
+        span.fa.fa-caret-down
+      ul.dropdown-menu
+        li
+          a(href='/f/recycle' data-toggle='url') 回收站
+        li
+          a(href='/f/draft' data-toggle='url') 草稿箱
+
+
+    li.dropdown(role='presentation')
+      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+        span 科创基金&nbsp;
+        span.fa.fa-caret-down
+      ul.dropdown-menu
+        li
+          a(href='/fund/settings' data-toggle='url') 设置
+        li
+          a(href='/fund/disabled' data-toggle='url') 被屏蔽的基金
+
+
+
+    li.dropdown(role='presentation')
+      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+        span 查看记录&nbsp;
+        span.fa.fa-caret-down
+      ul.dropdown-menu
+        li
+          a(href='/e/log/score' data-toggle='url') 积分、科创币、学术分
+        li
+          a(href='/e/log/experimental' data-toggle='url') 管理操作
+        li
+          a(href='/e/log/behavior' data-toggle='url') 用户行为
+        li
+          a(href='/e/log/secret' data-toggle='url') 隐私修改
+        li
+          a(href='/e/log/info' data-toggle='url') 发表
+        li
+          a(href='/e/log/public' data-toggle='url') 日志
+
+
     li.dropdown(role='presentation')
       a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
         span 设置&nbsp;

@@ -16,7 +16,6 @@ const personalForumRouter = routers.personalForum;
 const downloadRouter = routers.download;
 const systemRouter = routers.system;
 const problemRouter = routers.problem;
-const logRouter = routers.log;
 
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
@@ -34,5 +33,4 @@ router.use('/register', registerRouter.routes(), registerRouter.allowedMethods()
 router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
 router.use('/problem', problemRouter.routes(), problemRouter.allowedMethods());
 router.use('/system', systemRouter.routes(), systemRouter.allowedMethods());
-router.use('/log', logRouter.routes(), logRouter.allowedMethods());
 module.exports = router;

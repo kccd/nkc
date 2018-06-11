@@ -6,6 +6,9 @@ const secretRouter = require('./secret');
 const experimentalRouter = require('./experimental');
 const behaviorRouter = require('./behavior');
 logRouter
+	.get('/', async (ctx, next) => {
+		return ctx.redirect(`/e/log/public`);
+	})
 	.use('/public', publicRouter.routes(), publicRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
 	.use('/experimental', experimentalRouter.routes(), experimentalRouter.allowedMethods())

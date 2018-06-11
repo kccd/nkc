@@ -26,7 +26,7 @@ $(document).ready(function() {
       return screenTopWarning('内容不能为空！');
     }
     geid('submit').disabled = true;
-    nkcAPI('/e/newSysinfo','post',userObj)
+    nkcAPI('/e/systemInfo','post',userObj)
       .then(function(){
         geid('submit').disabled = false;
         return screenTopAlert('发送成功！请刷新');

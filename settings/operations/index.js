@@ -38,7 +38,6 @@ const t = require('./thread');
 const u = require('./user');
 const page = require('./page');
 const download = require('./download');
-const log = require('./log');
 const operationObj = {};
 
 
@@ -126,8 +125,6 @@ operationObj.operationTree = {
 		download, // 编辑器自动上传图片
 
 		page,
-
-		log,// 日志
 	}
 };
 module.exports = operationObj;

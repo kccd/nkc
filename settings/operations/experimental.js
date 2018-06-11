@@ -76,11 +76,26 @@ module.exports = {
 			POST: 'logParamsSettingModify'
 		}
 	},
-	newSysInfo: {
+	systemInfo: {
 		GET: 'visitSystemInfo',
 		POST: 'sendSystemInfo'
 	},
 	log: {
-		GET: 'visitLog'
+		GET: 'visitPublicLogs',
+		public: {
+			GET: 'visitPublicLogs'
+		},
+		secret: {
+			GET: 'visitSecretLogs'
+		},
+		info: {
+			GET: 'visitInfoLogs'
+		},
+		experimental: {
+			GET: 'visitExperimentalLogs'
+		},
+		behavior: {
+			GET: 'visitBehaviorLogs'
+		}
 	}
 };
