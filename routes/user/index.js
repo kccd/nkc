@@ -28,7 +28,7 @@ userRouter
   })
 	//个人名片
   .get('/:uid', async (ctx, next) => {
-    const {data, db, params,query, generateUsersBehavior} = ctx;
+    const {data, db, params,query} = ctx;
     const {user} = data;
     if(user) {
 	    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
@@ -43,7 +43,12 @@ userRouter
 		let paging;
 
 		// --拿到关注的领域
-		const visibleFid = await ctx.getVisibleFid();
+	  const options = {
+	  	gradeId: data.userGrade._id,
+		  rolesId: data.userRoles.map(r => r._id),
+			uid: user?user.uid: ''
+	  };
+		const visibleFid = await db.ForumModel.visibleFid(options);
 	  let forumsId = [];
 	  for (let fid of targetUserSubscribe.subscribeForums) {
 		  if (visibleFid.includes(fid) && !forumsId.includes(fid)) {
@@ -77,47 +82,43 @@ userRouter
 			subscribers.slice(paging.start, paging.start + paging.perpage);
 			data.targetUsers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
 		} else {
+
+			const accessibleFid = await db.ForumModel.accessibleFid(options);
 			const q = {
 				uid,
-				operation:{
-					$in: [
-						'postToThread',
-						'postToForum'
-					]
-				},
-				type: {
-					$in: data.certificates.contentClasses
-				}
+				fid: {$in: accessibleFid},
+				operationId: {$in: ['postToForum', 'postToThread']}
 			};
-			const count = await db.UsersBehaviorModel.count(q);
+			const count = await db.InfoBehaviorModel.count(q);
 			paging = apiFunction.paging(page, count);
-			const targetUserBehaviors = await db.UsersBehaviorModel.find(q).sort({timeStamp: -1}).skip(paging.start).limit(paging.perpage);
+			const infoLogs = await db.InfoBehaviorModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 			const results = [];
-			for(let behavior of targetUserBehaviors) {
-				const {pid, tid, operation} = behavior;
-				// 回帖
-				const thread = await db.ThreadModel.findOne({tid});
+			const displayDisabledPosts = data.userOperationsId.includes('displayDisabledPosts');
+			for(const log of infoLogs) {
+				const post = await db.PostModel.findOne({pid: log.pid});
+				if(post.disabled && !displayDisabledPosts) continue;
+				if(!post) continue;
+				await post.extendUser();
+				const thread = await post.extendThread();
+				if(thread.recycleMark && !data.userOperationsId.includes('displayRecycleThreads')) continue;
 				if(!thread) continue;
-				const firstPost = await thread.extendFirstPost();
-				await firstPost.extendUser();
-				let post;
+				let firstPost;
 				let link;
-				if(operation === 'postToForum') {
-					await firstPost.extendResources();
-					post = firstPost;
-					link = `/t/${tid}#${pid}`
+				if(thread.oc === post.pid) {
+					firstPost = post;
+					link = `/t/${thread.tid}#${thread.oc}`
 				} else {
-					post = await db.PostModel.findOnly({pid});
-					const query = {pid};
-					if(data.userLevel < 4) {
-						query.disabled = false;
+					firstPost = await thread.extendFirstPost();
+					await firstPost.extendUser();
+					const m = {pid: post.pid};
+					if(!displayDisabledPosts) {
+						m.disabled = false;
 					}
-					const obj = await thread.getStep(query);
-					link = `/t/${tid}?page=${obj.page}&highlight=${pid}#${pid}`;
+					const obj = await thread.getStep(m);
+					link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
 				}
-				if(!await post.ensurePermission(ctx) || !await firstPost.ensurePermission(ctx)) continue;
 				results.push({
-					operation,
+					operation: log.operationId,
 					thread,
 					firstPost,
 					post,
@@ -141,11 +142,6 @@ userRouter
 		data.targetUser = targetUser;
 		data.targetUserSubscribe = targetUserSubscribe;
 
-		if(data.user) {
-			await generateUsersBehavior({
-				operation: 'viewUserCard'
-			});
-		}
 
 		ctx.template = 'interface_user.pug';
     await next();

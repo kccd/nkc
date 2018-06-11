@@ -167,10 +167,10 @@ block content
     include debug_output.pug
 
 block scripts
-  script(src='/interface_common.js')
-  script(src='/module_dropdown.js?v=3')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
   //script(src='/interface_collections.js')
-  script(src='/interface_forum.js')
+  script(src=`/interface_forum.js?v=${global.NKC.startTime}`)
   //script(src='/gallery.js')
 
 

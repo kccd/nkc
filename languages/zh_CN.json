@@ -58,7 +58,7 @@
     "toppedThread": "置顶文章",
     "switchInPersonalForum": "在专栏加精、置顶、隐藏",
     "visitUserCard": "访问用户名片",
-    "bannedUser": "封禁用户、解封用户",
+    "bannedUser": "封禁用户",
     "visitUserAvatarSettings": "访问账号头像设置",
     "visitUserInfoSettings": "访问账号基本信息设置",
     "modifyUserInfo": "修改账号基本设置",
@@ -235,7 +235,8 @@
     "unToppedThread": "取消将文章置顶",
     "recommendPost": "推荐回复",
     "unRecommendPost": "取消推荐回复",
-    "displayPostHideHistories": "显示post被屏蔽的历史"
+    "displayPostHideHistories": "显示post被屏蔽的历史",
+    "unBannedUser": "解封用户"
 
   }
 }

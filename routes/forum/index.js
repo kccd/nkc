@@ -66,8 +66,7 @@ forumRouter
 	})
 	.post('/:fid', async (ctx, next) => {
 		const {
-			data, params, db, body, address: ip, query,
-      generateUsersBehavior
+			data, params, db, body, address: ip, query
     } = ctx;
 		const {
 			ForumModel,
@@ -75,13 +74,19 @@ forumRouter
 		} = db;
 		const {fid} = params;
 		const forum = await ForumModel.findOnly({fid});
+		data.forum = forum;
 	  const {user} = data;
-	  await forum.ensurePermission(ctx);
+	  const options = {
+	  	gradeId: data.userGrade._id,
+		  rolesId: data.userRoles.map(r => r._id),
+	  	uid: user?user.uid: ''
+	  };
+	  await forum.ensurePermissionNew(options);
 	  const childrenForums = await forum.extendChildrenForums();
 	  if(childrenForums.length !== 0) {
 	  	ctx.throw(400, '该专业存下存在其他专业，请到下属专业发表文章。');
 	  }
-		if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+		if(user.authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发帖。');
 	  const {post} = body;
     const {c, t} = post;
@@ -89,18 +94,10 @@ forumRouter
     if(t === '') ctx.throw(400, '标题不能为空！');
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);
-    await generateUsersBehavior({
-      operation: 'postToForum',
-      pid: _post.pid,
-      tid: _post.tid,
-      fid: forum.fid,
-      mid: user.uid,
-	    type: forum.class,
-      toMid: user.uid,
-    });
     const type = ctx.request.accepts('json', 'html');
     await forum.update({$inc: {'tCount.normal': 1}});
     const thread = await ThreadModel.findOnly({tid: _post.tid});
+    data.thread = thread;
     await thread.updateThreadMessage();
     if(type === 'html') {
       ctx.status = 303;
@@ -153,7 +150,8 @@ forumRouter
 		const options = {
 			gradeId,
 			rolesId,
-			fid
+			fid,
+			uid: data.user?data.user.uid: ''
 		};
 		const fidArr = await db.ForumModel.visibleFid(options);
 		// 拿到能访问的专业id

@@ -2,7 +2,8 @@ module.exports = {
 	PARAMETER: {
 		GET: 'visitUserCard',
 		banned: {
-			PATCH: 'bannedUser'
+			PATCH: 'unBannedUser',
+			DELETE: 'bannedUser'
 		},
 		settings: {
 			GET: 'visitUserAvatarSettings',

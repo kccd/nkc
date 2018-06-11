@@ -9,14 +9,14 @@ latestRouter
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
     const options = {gradeId, rolesId};
-    const fidArr = await db.ForumModel.fidOfCanGetThreads(options);
+    const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
     const { digest, sortby } = query;
-    if (data.userLevel === -1) {
+    if (data.userRoles.includes('banned')) {
       ctx.throw(403, '您的账号已被封禁，请退出登录后重新注册。');
     }
     const page = query.page || 0;
     const q = {
-      fid: { $in: fidArr}
+      fid: { $in: fidOfCanGetThreads}
     };
     if (digest === 'true') q.digest = true;
     const threadCount = await db.ThreadModel.count(q);
@@ -114,7 +114,12 @@ latestRouter
     }
 
     data.indexThreads = threads;
-    data.forumList = await dbFn.getAvailableForums(ctx);
+    const forums = await db.ForumModel.visibleForums(options);
+    data.forumList = [];
+    await Promise.all(forums.map(async forum => {
+			if(forum.parentId !== '') return;
+			data.forumList.push(forum);
+    }));
     data.digest = digest;
     data.sortby = sortby;
     data.navbar = { highlight: 'latest' };

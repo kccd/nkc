@@ -21,19 +21,18 @@ block content
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
                 if data.user && data.user.uid !== data.targetUser.uid
                   a(href=`/sms/message/${data.targetUser.uid}`).btn.btn-primary.btn-block 私信
-                  if data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
+                  if data.userOperationsId.includes('subscribeUser') && data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
                     button.btn.btn-block.btn-danger(onclick=`subscribeUser(${data.targetUser.uid}, false)`) 取关
-                  else
+                  if data.userOperationsId.includes('unSubscribeUser') && !data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
                     button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
                 if data.user && data.user.uid === data.targetUser.uid
                   a(href=`/u/${data.targetUser.uid}/settings`).btn.btn-default.btn-block
                     span.fa.fa-edit
                     span &nbsp;编辑资料
-                if data.userLevel >= 4 && data.user.uid !== data.targetUser.uid
-                  if data.targetUser.certs.includes('banned')
-                    button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, false)`) 解除封禁
-                  else
-                    button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, true)`) 封禁此人
+                if data.userOperationsId.includes('bannedUser') && data.user.uid !== data.targetUser.uid && data.targetUser.certs.includes('banned')
+                  button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, false)`) 解除封禁
+                if data.userOperationsId.includes('unBannedUser') && data.user.uid !== data.targetUser.uid && !data.targetUser.certs.includes('banned')
+                  button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, true)`) 封禁此人
                 br
             .col-xs-6.col-md-6
               .row

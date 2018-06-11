@@ -6,9 +6,14 @@ subscribeRouter
 		const {fid} = params;
 		const {user} = data;
 		const forum = await db.ForumModel.findOnly({fid});
-		if(!data.certificates.contentClasses.includes(forum.class)) {
-			ctx.throw(403, '权限不足');
-		}
+		const gradeId = data.userGrade._id;
+		const rolesId = data.userRoles.map(r => r._id);
+		const options = {
+			gradeId,
+			rolesId,
+			uid: user?user.uid: ''
+		};
+		await forum.ensurePermissionNew(options);
 		const childrenForums = await forum.extendChildrenForums();
 		if(childrenForums.length !== 0) {
 			ctx.throw(400, '该专业下存在其他专业，无法关注。');

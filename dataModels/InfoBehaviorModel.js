@@ -1,6 +1,26 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const infoBehaviorSchema = new Schema({
+	toc: {
+		type: Date,
+		index: 1,
+		default: Date.now()
+	},
+	pid: {
+		type: String,
+		index: 1,
+		default: ''
+	},
+	fid: {
+		type: String,
+		index: 1,
+		default: ''
+	},
+	tid: {
+		type: String,
+		index: 1,
+		default: ''
+	},
 	operationId: {
 		type: String,
 		required: true,
@@ -8,22 +28,17 @@ const infoBehaviorSchema = new Schema({
 	},
 	uid: {
 		type: String,
-		// required: true,
+		default: '',
 		index: 1
 	},
 	ip: {
 		type: String,
-		// required: true,
+		default: '',
 		index: 1
 	},
 	port: {
 		type: String,
-		// required: true
-	},
-
-	tlm: {
-		type: Date,
-		index: 1
+		default: ''
 	}
 }, {
 	collection: 'infoBehaviors'

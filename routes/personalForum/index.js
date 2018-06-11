@@ -21,8 +21,11 @@ router
     const personalForum = await PersonalForumModel.findOnly({uid});
     await personalForum.extendModerator();
     data.forum = personalForum;
-    const setting = await SettingModel.findOnly({type: 'system'});
-    data.popPersonalForums = setting.popPersonalForums;
+
+    // 热门专栏
+    /*const setting = await SettingModel.findOnly({type: 'system'});
+    data.popPersonalForums = setting.popPersonalForums;*/
+
     let {
       sortby = 'tlm',
       tab = 'own',
@@ -43,6 +46,11 @@ router
     data.userSubscribe = {
       subscribeUsers: userSubscribe.subscribeUsers,
       subscribers: userSubscribe.subscribers
+    };
+    const options = {
+    	gradeId: data.userGrade._id,
+	    rolesId: data.userRoles.map(r => r._id),
+	    uid: data.user?data.user.uid: ''
     };
     const accessibleFid = await ctx.getThreadListFid();
     if(tab === 'reply') {

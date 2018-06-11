@@ -228,7 +228,9 @@ threadRouter
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
+		data.thread = thread;
 		await thread.extendForum();
+		data.forum = thread.forum;
 		// 权限判断
 		const gradeId = data.userGrade;
 		const rolesId = data.userRoles.map(role => role._id);

@@ -403,7 +403,9 @@ userSchema.statics.createUser = async (userObj) => {
 
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
-	this.score = this.score || 0;
+	if(!this.score || this.score < 0) {
+		this.score = 0
+	}
 	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
 	return this.grade = grade;
 };

@@ -90,5 +90,5 @@ block content
       //    include nkc_friendlies.pug
     div#bm
 block scripts
-  script(src='/interface_common.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(type='text/javascript')!= `$(document).ready(function () {if ($(window).width() < 900) {$('.ForumThreadStat').css('font-size', '7px');}})`

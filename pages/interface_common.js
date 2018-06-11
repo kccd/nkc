@@ -666,20 +666,16 @@ function deleteBill(id) {
 
 // 封禁用户
 function bannedUser(uid, banned) {
-	var url = '/u/'+uid+'/banned';
 	var method = 'PATCH';
-	nkcAPI(url, method, {banned: banned})
+	if(banned) method = 'DELETE';
+	nkcAPI('/u/'+uid+'/banned', method, {})
 		.then(function() {
-			screenTopAlert('封禁用户成功。');
-			setTimeout(function() {
-				window.location.reload();
-			}, 1000);
+			window.location.reload();
 		})
 		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
+			screenTopWarning(data.error||data);
+		});
 }
-
 // 关注用户
 function subscribeUser(uid, subscribe) {
 	var url = '/u/'+uid+'/subscribe';
