@@ -28,25 +28,30 @@ latestRouter
     // // 主页过滤掉退回标记的帖子
     // $match.recycleMark = {"$nin":[true]}
     data.paging = apiFn.paging(page, threadCount);
-    // 删除退修过时的帖子
+    // 删除退修超时的帖子
     // 取出全部被标记的帖子
     const allMarkthreads = await db.ThreadModel.find({ "recycleMark": true, "fid": { "$nin": ["recycle"] } })
     for (var i in allMarkthreads) {
-      const delThreadLog = await db.DelPostLogModel.find({ "postType": "thread", "threadId": allMarkthreads[i].tid }).sort({ toc: -1 })
-      if (delThreadLog.length > 0) {
-        if (delThreadLog[0].modifyType === false) {
-          let sysTimeStamp = new Date(delThreadLog[0].toc).getTime()
-          let nowTimeStamp = new Date().getTime()
-          let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
-          let hourTimeStamp = 3600000 * 72;
-          let lastTimestamp = parseInt(new Date(delThreadLog[0].toc).getTime()) + hourTimeStamp;
-          if (diffTimeStamp > hourTimeStamp) {
-            await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
-          }
-        }
-      } else {
+      const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkthreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
+      if(delThreadLog){
         await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
+        await db.PostModel.updateMany({"tid":allMarkthreads[i].tid},{$set:{"fid":"recycle"}})
+        await db.DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkthreads[i].tid},{$set:{"delType":"toRecycle"}})
       }
+      // if (delThreadLog.length > 0) {
+      //   if (delThreadLog[0].modifyType === false) {
+      //     let sysTimeStamp = new Date(delThreadLog[0].toc).getTime()
+      //     let nowTimeStamp = new Date().getTime()
+      //     let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
+      //     let hourTimeStamp = 3600000 * 72;
+      //     let lastTimestamp = parseInt(new Date(delThreadLog[0].toc).getTime()) + hourTimeStamp;
+      //     if (diffTimeStamp > hourTimeStamp) {
+      //       await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
+      //     }
+      //   }
+      // } else {
+      //   await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
+      // }
     }
     if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
       if(!data.user) {
