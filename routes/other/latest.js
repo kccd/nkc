@@ -8,7 +8,11 @@ latestRouter
     const { data, db, query } = ctx;
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
-    const options = {gradeId, rolesId};
+    const options = {
+    	gradeId,
+	    rolesId,
+	    uid: data.user?data.user.uid: ''
+    };
     const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
     const { digest, sortby } = query;
     if (data.userRoles.includes('banned')) {

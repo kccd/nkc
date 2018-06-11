@@ -24,7 +24,9 @@ latestRouter
 		const {userGrade, userRoles} = data;
 		const options = {
 			gradeId: userGrade._id,
-			fid: forum.fid
+			rolesId: userRoles.map(r => r._id),
+			fid: forum.fid,
+			uid: data.user?data.user.uid: ''
 		};
 		options.rolesId = userRoles.map(r => r._id);
 		// 拿到该专业下可从中拿文章的所有子专业id
