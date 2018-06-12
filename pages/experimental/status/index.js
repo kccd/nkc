@@ -12,10 +12,17 @@ function initTime() {
 
 $(function() {
 	initTime();
-	if($('#main').length !== 0) {
-		display();
-	}
 	getResults({type: 'today'});
+	var radios = $('input:radio[name="statusType"]');
+	radios.on('ifChanged', function() {
+		for(var i = 0; i < radios.length; i ++) {
+			var radio = radios.eq(i);
+			if(radio.prop('checked')) {
+				var type = radio.attr('data-type');
+				getResults({type: type});
+			}
+		}
+	});
 });
 
 $('input[name="statusType"]').iCheck({
@@ -31,47 +38,52 @@ function getResults(options) {
 	}
 	nkcAPI('/e/status?type='+type, 'GET', {})
 		.then(function(data) {
-			console.log(data);
+			display(data.results);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error|| data);
 		})
 }
 
+function display(results) {
 
 
-
-function display() {
 	var myChart = echarts.init(document.getElementById('main'));
+
 
 	// 指定图表的配置项和数据
 	var option = {
 		title: {
-			text: '网站统计'
+			text: results.title
 		},
-		tooltip: {},
+		tooltip: {
+			trigger: 'axis'
+		},
 		legend: {
 			data:['发表文章', '发表回复', '用户注册']
 		},
 		xAxis: {
-			data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+			data: results.x
 		},
 		yAxis: {},
 		series: [
 			{
-			name: '发表文章',
-			type: 'line',
-			data: [5, 20, 36, 10, 10, 20]
+				name: '发表文章',
+				type: 'line',
+				stack: '总量',
+				data: results.threadsData
 			},
 			{
 				name: '发表回复',
 				type: 'line',
-				data: [533, 30, 32, 45, 4, 6]
+				stack: '总量',
+				data: results.postsData
 			},
 			{
 				name: '用户注册',
 				type: 'line',
-				data: [23, 3, 54, 2, 32, 32]
+				stack: '总量',
+				data: results.usersData
 			}
 		]
 	};
@@ -79,3 +91,4 @@ function display() {
 	// 使用刚指定的配置项和数据显示图表。
 	myChart.setOption(option);
 }
+

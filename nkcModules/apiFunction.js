@@ -176,4 +176,18 @@ fn.today = () => {
 	return new Date(t+' 00:00:00');
 };
 
+fn.dayCount = (year, month) => {
+	let nextMonth, nextYear;
+	if(month === 12) {
+		nextMonth = 1;
+		nextYear = year + 1;
+	} else {
+		nextMonth = month + 1;
+		nextYear = year;
+	}
+	const nextMonthTime = new Date(`${nextYear}-${nextMonth}-1 00:00:00`);
+	const lastDay = nextMonthTime.getTime() - 24*60*60*1000;
+	return new Date(lastDay).getDate();
+};
+
 module.exports = fn;

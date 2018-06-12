@@ -15,18 +15,18 @@ block content
       .col-xs-12.col-md-12
         .radiobox(style='display: inline-block;margin-right: 1rem;')
           span 今日
-          input(type='radio' name='statusType' checked=true)
+          input(type='radio' name='statusType' checked=true data-type='today')
         .radiobox(style='display: inline-block;margin-right: 1rem;')
           span 本月
-          input(type='radio' name='statusType')
+          input(type='radio' name='statusType' data-type='month')
         .radiobox(style='display: inline-block;margin-right: 1rem;')
           span 今年
-          input(type='radio' name='statusType')
+          input(type='radio' name='statusType' data-type='year')
         .radiobox(style='display: inline-block;margin-right: 1rem;')
-          span 自定义
-          input(type='radio' name='statusType')
+          span 全部
+          input(type='radio' name='statusType' data-type='all')
       .col-xs-12.col-md-12(style='margin-top: 2rem;')
-        div#main(style="width: 100%;height: 40rem;")
+        div#main(style="width: 100%;height: 45rem;")
 block scripts
 
   script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
