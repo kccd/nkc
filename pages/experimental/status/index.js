@@ -54,7 +54,7 @@ function display(results) {
 	// 指定图表的配置项和数据
 	var option = {
 		title: {
-			text: results.title
+			text: ''
 		},
 		tooltip: {
 			trigger: 'axis'
