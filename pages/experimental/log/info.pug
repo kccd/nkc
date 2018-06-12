@@ -17,6 +17,7 @@ block content
           li(class=data.type==='post'?'active':'')
             a(href='/e/log/info?type=post' data-toggle='url') 发表回复
       .col-xs-12.col-md-12
+        -const type = data.type
         include ../../interface_navigation_paging
         table.table.table-hover
           thead
@@ -47,6 +48,6 @@ block content
                     if title.length > 40
                       span ...
 
-      include ../../interface_navigation_paging
+        include ../../interface_navigation_paging
 block scripts
   script(src='/interface_common.js')

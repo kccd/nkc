@@ -20,6 +20,7 @@ block content
           li(class=data.type==='score'?'active':'')
             a(href='/e/log/score?type=score' data-toggle='url') 积分
       .col-xs-12.col-md-12
+        -const type = data.type
         include ../../interface_navigation_paging
         table.table.table-hover
           thead
