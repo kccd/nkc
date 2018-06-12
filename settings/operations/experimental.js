@@ -96,6 +96,9 @@ module.exports = {
 		},
 		behavior: {
 			GET: 'visitBehaviorLogs'
+		},
+		score: {
+			GET: 'visitScoreLogs'
 		}
 	}
 };

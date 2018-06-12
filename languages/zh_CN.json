@@ -241,12 +241,13 @@
     "displayFundBillsSecretInfo": "显示基金账单的隐藏信息（支付宝交易号等）",
     "displayFundApplicationFormSecretInfo": "显示基金申请表隐藏信息（申请人身份信息等）",
     "modifyQuestion": "修改问题",
-    "displayAnyBodyPhoto": "可任意查看用户的照片、证件照",
+    "getAnyBodyPhoto": "可任意查看用户的照片、证件照",
     "removeAnyBodyPhoto": "可任意删除用户的照片、证件照",
     "visitPublicLogs": "查看日志",
     "visitInfoLogs": "查看用户发表记录",
     "visitExperimentalLogs": "查看用户管理操作记录",
     "visitSecretLogs": "查看用户隐私设置记录",
-    "visitBehaviorLogs": "查看用户行为记录"
+    "visitBehaviorLogs": "查看用户行为记录",
+    "visitScoreLogs": "查看积分、科创币、学术分变动记录"
   }
 }

@@ -45,6 +45,7 @@ const postSchema = new Schema({
   },
   recUsers: {
     type: [String],
+	  index: 1,
     default: []
   },
   rpid: {

@@ -18,8 +18,11 @@ router
 	    ctx.throw(403,'权限不足');
     }
     if(q < -10000 || q > 10000) ctx.throw(400, '数字无效，不在范围（-10000, 10000）');
+	  if(type === 'kcb') {
+		  if(user.kcb < q) ctx.throw(400, '您的科创币余额不足');
+	  }
     if(reason.length < 2) ctx.throw(400, '理由写得太少了，请认真对待');
-    if(type !== 'xsf' && type !== 'kcb') ctx.throw(400, '未知的数字类型，请检查');
+    if(type !== 'xsf' && type !== 'kcb') ctx.throw(400, '未知的类型，请检查');
     const targetUser = await targetPost.extendUser();
     const obj = {
     	type,

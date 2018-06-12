@@ -1,0 +1,52 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  title 发表记录
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        ul.nav.nav-pills(style='margin-bottom: 1rem;')
+          li(class=!data.type?'active':'')
+            a(href='/e/log/info' data-toggle='url') 全部
+          li(class=data.type==='thread'?'active':'')
+            a(href='/e/log/info?type=thread' data-toggle='url') 发表文章
+          li(class=data.type==='post'?'active':'')
+            a(href='/e/log/info?type=post' data-toggle='url') 发表回复
+      .col-xs-12.col-md-12
+        include ../../interface_navigation_paging
+        table.table.table-hover
+          thead
+            tr
+              th 时间
+              th 用户
+              th 类型
+              th 摘要
+          tbody
+            for behavior in data.behaviors
+              tr
+                th= behavior.toc.toLocaleString()
+                th
+                  if behavior.user
+                    a(href=`/u/${behavior.uid}` target="_blank")
+                      img(src=`/avatar/${behavior.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                      span= behavior.user.username
+                  else
+                    span
+                th= behavior.operation.description
+                th
+                  -const t = behavior.post.t;
+                  -let c = behavior.post.c;
+                  -c = c.replace(/<.*?>/g, '');
+                  -let title = (t ? `${t}...` : '') + c;
+                  a(href=`/p/${behavior.pid}` data-toggle="tooltip" data-placement="bottom" title=title)
+                    span= title.slice(0, 40)
+                    if title.length > 40
+                      span ...
+
+      include ../../interface_navigation_paging
+block scripts
+  script(src='/interface_common.js')

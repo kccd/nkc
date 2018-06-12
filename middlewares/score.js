@@ -16,11 +16,10 @@ const score = async (ctx, next) => {
 	if(user) obj.uid = user.uid;
 	if(targetUser) obj.targetUid = targetUser.uid;
 	// 学术分、科创币、积分
-	const arr = ['kcb', 'xsf', 'score'];
+	const arr = ['score', 'xsf', 'kcb'];
 	const today = ctx.nkcModules.apiFunction.today();
 
 	for(const a of arr) {
-		console.log(a);
 		if(!operation[a].status) continue;
 		if(!user && !targetUser) continue;
 		let {count, targetCount, change, targetChange} = operation[a];

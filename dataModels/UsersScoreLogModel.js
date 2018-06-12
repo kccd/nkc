@@ -59,6 +59,66 @@ const usersScoreLogSchema = new Schema({
 	collection: 'usersScoreLogs'
 });
 
+usersScoreLogSchema.virtual('user')
+	.get(function() {
+		return this._user;
+	})
+	.set(function(user) {
+		this._user = user;
+	});
+usersScoreLogSchema.virtual('targetUser')
+	.get(function() {
+		return this._targetUser;
+	})
+	.set(function(targetUser) {
+		this._targetUser = targetUser;
+	});
+usersScoreLogSchema.virtual('operation')
+	.get(function() {
+		return this._operation;
+	})
+	.set(function(operation) {
+		this._operation = operation;
+	});
+
+usersScoreLogSchema.methods.extendUser = async function() {
+	const UserModel = mongoose.model('users');
+	let user;
+	if(this.uid) {
+		const u = await UserModel.findOne({uid: this.uid});
+		if(u) {
+			user = u;
+		}
+	}
+	return this.user = user;
+};
+
+usersScoreLogSchema.methods.extendTargetUser = async function() {
+	const UserModel = mongoose.model('users');
+	let targetUser;
+	if(this.targetUid) {
+		const u = await UserModel.findOne({uid: this.targetUid});
+		if(u) {
+			targetUser = u;
+		}
+	}
+	return this.targetUser = targetUser;
+};
+
+
+usersScoreLogSchema.methods.extendOperation = async function() {
+	const OperationModel = mongoose.model('operations');
+	let operation;
+	if(this.operationId) {
+		const o = await OperationModel.findOne({_id: this.operationId});
+		if(o) {
+			operation = o;
+		}
+	}
+	return this.operation = operation;
+};
+
+
 const UsersScoreLogModel = mongoose.model('usersScoreLogs', usersScoreLogSchema);
 
 module.exports = UsersScoreLogModel;
