@@ -25,15 +25,21 @@ block content
                   #usernameInput(style='display: none;')
                     .form
                       .col-xs-12.col-md-12
-                        if data.user.kcb < data.KCBSettings.changeUsername
+                        if !data.modifyUsernameOperation.kcb.status
                           .form-group
-                            span.text-danger=`修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币，您当前的科创币不足。`
-                        else
-                          .form-group
-                            span.text-danger=`*修改一次用户名将花费${data.KCBSettings.changeUsername}个科创币`
                             input.form-control#username(placeholder='请输入新的用户名')
                           .form-group
                             button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
+                        else
+                          if data.user.kcb < -1*data.modifyUsernameOperation.kcb.change
+                            .form-group
+                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.kcb.change}个科创币，您当前的科创币不足。`
+                          else
+                            .form-group
+                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.kcb.change}个科创币`
+                              input.form-control#username(placeholder='请输入新的用户名')
+                            .form-group
+                              button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
 
               .form-group
                 label.col-sm-2.control-label 个人简介：

@@ -41,6 +41,7 @@ operationRouter
 		if(tid === undefined) ctx.throw(400, '参数不正确')
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid})
+		data.targetUser = await thread.extendUser();
 		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该帖子已经被退回')
 		await thread.update({recycleMark:true})
 		// 获取主题帖的第一条回帖的标题和内容
@@ -57,6 +58,23 @@ operationRouter
 			let uid = thread.uid;
 			const toUser = await db.UsersPersonalModel.findOnly({uid});
 			await toUser.increasePsnl('system', 1);
+		}
+		if(para && para.illegalType) {
+			const log = db.UsersScoreLogModel({
+				uid: user.uid,
+				type: 'score',
+				operationId: 'violation',
+				description: '退回文章并标记为违规',
+				change: 0,
+				targetCount: 1,
+				targetUid: data.targetUser.uid,
+				tid,
+				fid: thread.fid
+			});
+			await log.save();
+			data.targetUser.violation++;
+			await data.targetUser.update({$inc: {violationCount: 1}});
+			await data.targetUser.calculateScore();
 		}
 		await next()
 	})
@@ -129,14 +147,23 @@ operationRouter
 			}
 		}
 		if(fid === 'recycle') {
-			await ctx.generateUsersBehavior({
-				operation: 'moveToRecycle',
-				tid,
-				fid: targetThread.fid,
-				isManageOp: true,
-				toMid: targetThread.toMid,
-				mid: targetThread.mid
-			});
+			if(para && para.illegalType) {
+				const log = db.UsersScoreLogModel({
+					uid: user.uid,
+					type: 'score',
+					operationId: 'violation',
+					description: '屏蔽文章并标记为违规',
+					change: 0,
+					targetCount: 1,
+					targetUid: data.targetUser.uid,
+					tid,
+					fid: targetThread.fid
+				});
+				await log.save();
+				data.targetUser.violation++;
+				await data.targetUser.update({$inc: {violationCount: 1}});
+				await data.targetUser.calculateScore();
+			}
 			// 添加删帖日志
 			let oc = targetThread.oc;
 			let post = await db.PostModel.findOne({"pid":oc})

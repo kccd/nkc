@@ -97,6 +97,18 @@ forumRouter
     await forum.update({$inc: {'tCount.normal': 1}});
     const thread = await ThreadModel.findOnly({tid: _post.tid});
     data.thread = thread;
+
+		// 发帖数加一并生成记录
+    const log = await db.UsersScoreLogModel({
+	    uid: user.uid,
+	    type: 'score',
+	    operationId: 'postToForum',
+	    change: 1
+    });
+    await log.save();
+    await user.update({$inc: {threadCount: 1}});
+    user.threadCount++;
+    await user.calculateScore();
     await thread.updateThreadMessage();
     if(type === 'html') {
       ctx.status = 303;
@@ -104,6 +116,7 @@ forumRouter
     }
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     data.post = _post;
+
     //帖子曾经在草稿箱中，发表时，删除草稿
     await db.DraftModel.remove({"did":post.did})
     await next();

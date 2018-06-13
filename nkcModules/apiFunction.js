@@ -170,9 +170,14 @@ fn.getRandomNumber = (obj) => {
 	return arr;
 };
 
-fn.today = () => {
+fn.today = (time) => {
 	const moment = require('moment');
-	const t = moment().format('YYYY-MM-DD');
+	let t;
+	if(time) {
+		t = moment(time).format('YYYY-MM-DD');
+	} else {
+		t = moment().format('YYYY-MM-DD');
+	}
 	return new Date(t+' 00:00:00');
 };
 

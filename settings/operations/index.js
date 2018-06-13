@@ -50,8 +50,10 @@ operationObj.defaultOperations = [
 	'displayFundNoVerifyBills',
 	'displayFundBillsSecretInfo',
 	'displayFundApplicationFormSecretInfo',
-	'getAnyBodyPhoto',
-	'removeAnyBodyPhoto'
+	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
+	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
+	'dailyLogin',// 日常登陆
+	'violation',// 违规操作
 ];
 
 

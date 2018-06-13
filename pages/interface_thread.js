@@ -433,7 +433,7 @@ function addColl(tid){
 function addCredit(pid){
   var cobj = promptCredit(pid)
   if(cobj){
-    return nkcAPI('/p/'+pid+'/credit', 'PATCH',cobj)
+    return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',cobj)
     .then(function(){
       window.location.reload()
     })

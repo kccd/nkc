@@ -30,13 +30,12 @@ scoreRouter
 			const {formula} = body;
 			await scoreSettings.update({formula});
 		} else {
-			const {_id, kcb, xsf, score} = body;
+			const {_id, kcb, xsf} = body;
 			const operation = await db.OperationModel.findOnly({_id});
 			if(kcb.status && kcb.count <= 0 && kcb.count !== -1 && kcb.targetCount <= 0 && kcb.targetCount !== -1) ctx.throw(400, '科创币每天有效次数设置错误');
 			if(xsf.status && xsf.count <= 0 && xsf.count !== -1 && xsf.targetCount <= 0 && xsf.targetCount !== -1) ctx.throw(400, '学术分每天有效次数设置错误');
-			if(score.status && score.count <= 0 && score.count !== -1 && score.targetCount <= 0 && score.targetCount !== -1) ctx.throw(400, '积分每天有效次数设置错误');
-			await operation.update({kcb, xsf, score});
-			if(kcb.status || xsf.status || score.status) {
+			await operation.update({kcb, xsf});
+			if(kcb.status || xsf.status) {
 				await scoreSettings.update({$addToSet: {operationsId: operation._id}});
 			} else {
 				await scoreSettings.update({$pull: {operationsId: operation._id}});

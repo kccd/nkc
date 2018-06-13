@@ -9,9 +9,7 @@ editorRouter
     //发新帖，回复等使用新编辑器
     //重新编辑帖子使用旧版编辑器
     ctx.template = 'interface_editor_test.pug';
-    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    const authLevel = await userPersonal.getAuthLevel();
-	  if((!user.volumeA || authLevel < 1) && type !== 'application') {
+	  if((!user.volumeA || user.authLevel < 1) && type !== 'application') {
     	ctx.template = 'interface_notice.pug';
     	return await next();
     }

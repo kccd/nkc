@@ -38,7 +38,10 @@ subscribeRouter
 				if(forum) {
 					const childrenForums = await forum.extendChildrenForums();
 					if(!childrenForums || childrenForums.length === 0) {
-						if(!realFid.includes(fid)) realFid.push(fid);
+						if(!realFid.includes(fid)) {
+							await forum.update({$addToSet: {followersId: targetUser.uid}});
+							realFid.push(fid);
+						}
 					}
 				}
 			}

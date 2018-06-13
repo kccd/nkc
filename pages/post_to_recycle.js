@@ -35,7 +35,6 @@ function postMoveToRecycleBin(id){
   var method = postRecycleMethodsChoice();
   var noticeType = $("#postNoticeType").is(":checked");
   var illegalType = $("#postIsIllegalOperation").is(":checked");
-  console.log(noticeType,illegalType)
   var pid = window.localStorage.pid
   // 构造数据，发送到服务器
   var parames = {
