@@ -10,7 +10,8 @@ router
     // data.result = await db.LogModel.find({}).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
     const logs = await db.UsersBehaviorModel.find({}).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
     data.result = await Promise.all(logs.map(async behavior => {
-			await behavior.extendUser();
+      await behavior.extendUser();
+      await behavior.extendOperationName();
 			return behavior;
 		}));
     ctx.template = 'experimental/log/behavior.pug';

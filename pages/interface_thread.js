@@ -241,7 +241,7 @@ function assemblePostObject(){  //bbcode , markdown
 
 function disablePostClick(pid){
   window.localStorage.pid = pid
-  console.log(window.localStorage)
+  // console.log(window.localStorage)
 }
 
 function disablePost(pid,para){
@@ -294,7 +294,7 @@ function saveDraft(threadId,userId){
   return nkcAPI(url, method, data)
     .then(function (result) {
       if(result.status == "success"){
-        console.log(result.did)
+        // console.log(result.did)
         $("#draftId").html(result.did)
         jalert("保存成功！");
       }
@@ -303,7 +303,7 @@ function saveDraft(threadId,userId){
       }
     })
     .catch(function (data) {
-      console.log(data)
+      // console.log(data)
       jwarning(data.error);
     })
 }

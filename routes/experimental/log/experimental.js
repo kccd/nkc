@@ -17,8 +17,9 @@ router
       }
       await behavior.extendUser();
       await behavior.extendToUser();
+      await behavior.extendOperationName();
 			return behavior;
-		}));
+    }));
     ctx.template = 'experimental/log/manage.pug';
     await next()
   });

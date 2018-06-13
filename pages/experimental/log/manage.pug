@@ -26,13 +26,12 @@ block content
                 //-     a(href=`/e/log/secret?type=username`) 用户名修改
               .col-xs-12.col-md-12
                 -const type = data.type
-                -console.log(data.result)
                 include ../../interface_navigation_paging      
                   .col-xs-12.col-md-12
                     table.table.table-hover
                       thead
                         tr
-                          th 类型id
+                          th 操作名称
                           th 详细操作
                           th 执行者id
                           th 执行者用户名
@@ -42,7 +41,7 @@ block content
                       tbody
                         for manage in data.result
                           tr
-                            th= manage.operationId
+                            th= manage.operationData ? manage.operationData.description : manage.operationId
                             -const manageName = manage.manageName ? manage.manageName : ''
                             th= manageName
                             th= manage.uid

@@ -44,7 +44,7 @@ block content
                   tbody
                     for log in data.result
                       tr
-                        th= log.operationId
+                        th= log.operationData ? log.operationData.description : log.operationId
                         th= log.uid
                         -const username = log.user?log.user.username : ''
                         th= username
