@@ -18,6 +18,9 @@ div#postRecycleModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exa
           .input-group(id="passMessage" style="display:none")
             input#postNoticeType(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
             span 是否通知用户
+          .input-group
+            input#postIsIllegalOperation(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
+            span 是否为违规操作
       .modal-footer
         button.btn.btn-default(type="button" data-dismiss="modal") 关闭
         button#ssubmit.btn.btn-primary(type="button" onclick=`postMoveToRecycleBin('${data.thread.tid}')` data-dismiss="modal" disabled) 确认

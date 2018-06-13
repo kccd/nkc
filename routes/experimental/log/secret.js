@@ -2,23 +2,30 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get('/', async(ctx, next) => {
-    const {data, db, query} = ctx;
-    const {searchType} = query;
+    const {data, db, query, nkcModules} = ctx;
+    const {page=0, type} = query;
     let queryMap;
-    data.searchType = searchType;
-    if(searchType === "password"){
-      queryMap = {"operation":"changePassword"}
+    data.type = type;
+    if(type === "password"){
+      queryMap = {"operationId":"modifyPassword"}
     }
-    if(searchType === "email"){
+    if(!type || type === "email"){
       queryMap = {"operationId":{"$in":["bindEmail", "changeEmail"]}}
     }
-    if(searchType === "mobile"){
+    if(type === "mobile"){
       queryMap = {"operationId":{"$in":["bindMobile", "modifyMobile"]}}
     }
-    if(searchType === "userame"){
+    if(type === "username"){
       queryMap = {"operationId":"modifyUsername"}
     }
-    data.result = await db.SecretBehaviorModel.find(queryMap)
+    const count = await db.SecretBehaviorModel.count(queryMap);
+		const paging = nkcModules.apiFunction.paging(page, count);
+    data.paging = paging
+    const secretBehaviors = await db.SecretBehaviorModel.find(queryMap).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
+    data.result = await Promise.all(secretBehaviors.map(async behavior => {
+			await behavior.extendUser();
+			return behavior;
+		}));
     ctx.template = 'experimental/log/secret.pug';
     await next()
   })

@@ -115,5 +115,17 @@ secretBehaviorSchema.pre('save', function(next) {
 	next();
 });
 
+secretBehaviorSchema.methods.extendUser = async function() {
+	const UserModel = mongoose.model('users');
+	let user;
+	if(this.uid) {
+		const u = await UserModel.findOne({uid: this.uid});
+		if(u) {
+			user = u;
+		}
+	}
+	return this.user = user;
+};
+
 const SecretBehaviorModel = mongoose.model('secretBehaviors', secretBehaviorSchema);
 module.exports = SecretBehaviorModel;

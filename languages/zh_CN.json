@@ -245,6 +245,7 @@
     "getAnyBodyPhoto": "可任意查看用户的照片、证件照",
     "removeAnyBodyPhoto": "可任意删除用户的照片、证件照",
     "visitPublicLogs": "查看日志",
+    "deletePublicLogs": "删除日志",
     "visitInfoLogs": "查看用户发表记录",
     "visitExperimentalLogs": "查看用户管理操作记录",
     "visitSecretLogs": "查看用户隐私设置记录",

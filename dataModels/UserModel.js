@@ -102,11 +102,6 @@ const userSchema = new Schema({
 	volumeB: {
   	type: Boolean,
 		default: false
-	},
-	optionsCount: {
-  	type: Schema.Types.Mixed,
-		default: {},
-		index: 1
 	}
 },
 {toObject: {
@@ -339,11 +334,10 @@ userSchema.methods.updateUserMessage = async function() {
 	}
 	// 违规统计
 	const violationCount = await UsersScoreLogModel.count({
-		uid,
+		targetUid: uid,
 		type: 'score',
 		operationId: 'violation'
 	});
-
 
 	const updateObj = {
 		threadCount,

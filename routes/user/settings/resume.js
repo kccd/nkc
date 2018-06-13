@@ -27,7 +27,7 @@ resumeRouter
 			rolesId: data.userRoles.map(r => r._id),
 			uid: data.user?data.user.uid: ''
 		};
-		const forums = await db.ForumModel.accessibleFid(options);
+		const forums = await db.ForumModel.accessibleForums(options);
 		const forumsObj = [];
 		for(let f of forums) {
 			let level = 2;

@@ -1,3 +1,4 @@
+const mongoose = require('../settings/database');
 const settings = require('../settings');
 const {database} = settings;
 const {Schema} = database;
@@ -167,6 +168,18 @@ usersBehaviorSchema.virtual('link')
   .set(function(u) {
     this._link = u;
   });
+
+  usersBehaviorSchema.methods.extendUser = async function() {
+    const UserModel = mongoose.model('users');
+    let user;
+    if(this.uid) {
+      const u = await UserModel.findOne({uid: this.uid});
+      if(u) {
+        user = u;
+      }
+    }
+    return this.user = user;
+  };
 
 const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 

@@ -3,7 +3,7 @@ const router = new Router();
 
 router
   .patch('/', async (ctx, next) => {
-    const {disabled} = ctx.body;
+    const {disabled, para} = ctx.body;
     const {pid} = ctx.params;
     const {db, data} = ctx;
 		const {user} = data;
@@ -25,17 +25,24 @@ router
       if(disabled) ctx.throw(400, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
     }
     data.targetUser = await targetPost.extendUser();
-    let operation = 'disablePost';
-    if(!disabled) operation = 'enablePost';
-    await ctx.generateUsersBehavior({
-      operation,
-      pid,
-      tid: targetThread.tid,
-      fid: targetThread.fid,
-      isManageOp: true,
-      toMid: targetThread.toMid,
-      mid: targetThread.mid
-    });
+    if(obj.disabled && para && para.illegalType) {
+    	const log = db.UsersScoreLogModel({
+				uid: user.uid,
+		    type: 'score',
+		    operationId: 'violation',
+		    description: '屏蔽回复并标记为违规',
+		    change: 0,
+		    targetCount: 1,
+		    targetUid: data.targetUser.uid,
+		    pid,
+		    tid: targetThread.tid,
+		    fid: targetThread.fid
+	    });
+    	await log.save();
+    	data.targetUser.violation++;
+    	await data.targetUser.update({$inc: {violationCount: 1}});
+    	await data.targetUser.calculateScore();
+    }
     await targetThread.updateThreadMessage();
     // 删除回复 添加日志
     if(disabled === false){
