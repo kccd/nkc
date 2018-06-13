@@ -57,6 +57,18 @@ logSchema.methods.extendUser = async function() {
 	return this.user = await UserModel.findOne({uid: this.uid});
 };
 
+logSchema.methods.extendOperationName = async function(){
+	const OperationModel = mongoose.model("operations");
+	let operationData;
+	if(this.operationId){
+		const o = await OperationModel.findOne({_id: this.operationId});
+		if(o){
+			operationData = o;
+		}
+	}
+	return this.operationData = operationData
+}
+
 const LogModel = mongoose.model('logs', logSchema);
 module.exports = LogModel;
 

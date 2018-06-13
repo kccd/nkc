@@ -34,14 +34,14 @@
           var newSrc = $(this).attr("srcs")
           // 使用正在下载图片替换当前图片
           //$(this).attr("src","/resources/site_specific/picupload.png")
-          console.log("newSrc",newSrc)
+          // console.log("newSrc",newSrc)
           // 判断图片是不是系统图片
           var sysimg = new RegExp("file:").test(newSrc)
           // 如果是系统图片，则不向下执行
           if(sysimg == true){
             var elemImg = "<img src='/resources/site_specific/picdefault.png'>"
             $(this).replaceWith(elemImg)
-            console.log("图片无法加载")
+            // console.log("图片无法加载")
             // await $(this).on("error",function(){
             //   var elemImg = "<img src='./picpass.png'>"
             //   $(this).replaceWith(elemImg)
@@ -53,7 +53,7 @@
             var data = {
               loadsrc : newSrc
             }
-            console.log("---------发送url-----------",'\n',newSrc)
+            // console.log("---------发送url-----------",'\n',newSrc)
             var newimgstr = $(this)
             
             nkcAPI("/download", "POST", data)

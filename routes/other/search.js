@@ -29,7 +29,7 @@ router.get('/', async(ctx, next) => {
     }
     // 获取用户可以访问的板块
     const accessibleFid = await db.ForumModel.fidOfCanGetThreads(options);
-    console.log(accessibleFid)
+    // console.log(accessibleFid)
     const searchResult = await searchPost(q, page, perpage);
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     data.result = await Promise.all(searchResult.hits.hits.map(async r => {

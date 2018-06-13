@@ -31,7 +31,7 @@ block content
                     table.table.table-hover
                       thead
                         tr
-                          th 类型id
+                          th 操作名称
                           th 板块id
                           th 帖子id
                           th 执行者id
@@ -41,7 +41,7 @@ block content
                       tbody
                         for behavior in data.result
                           tr
-                            th= behavior.operationId
+                            th= behavior.operationData ? behavior.operationData.description : behavior.operationId
                             th= behavior.fid
                             th= behavior.tid
                             th= behavior.uid

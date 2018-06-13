@@ -1257,7 +1257,7 @@ Head.prototype = {
         var editor = this.editor;
 
         var $selectionElem = editor.selection.getSelectionContainerElem();
-        console.log($selectionElem)
+        // console.log($selectionElem)
         if (editor.$textElem.equal($selectionElem)) {
             // 不能选中多行来设置标题，否则会出现问题
             // 例如选中的是 <p>xxx</p><p>yyy</p> 来设置标题，设置之后会成为 <h1>xxx<br>yyy</h1> 不符合预期
@@ -1704,7 +1704,7 @@ Link.prototype = {
         if(text == ''){
             text = link
         }
-        console.log('text',text,'link',link)
+        // console.log('text',text,'link',link)
         if (checkResult === true) {
             editor.cmd.do('insertHTML', '<a href="' + link + '" target="_blank">' + text + '</a>');
         } else {
@@ -1967,7 +1967,7 @@ Undo.prototype = {
     // 点击事件
     onClick: function onClick(e) {
         // 点击菜单将触发这里
-        console.log("asdasdsa")
+        // console.log("asdasdsa")
         var editor = this.editor;
         // 执行 undo 命令
         editor.cmd.do('undo');
@@ -2979,7 +2979,7 @@ Video.prototype = {
                         if(isNaN(videoHeight) || videoHeight > 960 || videoHeight < 300){
                             videoHeight = "400"
                         }
-                        console.log(videoHeight,typeof(videoHeight))
+                        // console.log(videoHeight,typeof(videoHeight))
                         if(val.substr(val.length-3) == "swf"){
                             val = "<embed src="+val+" type='application/x-shockwave-flash' width='80%' height='"+videoHeight+"px' allowfullscreen='true' frameborder=0/>"
                         }

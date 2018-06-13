@@ -169,17 +169,29 @@ usersBehaviorSchema.virtual('link')
     this._link = u;
   });
 
-  usersBehaviorSchema.methods.extendUser = async function() {
-    const UserModel = mongoose.model('users');
-    let user;
-    if(this.uid) {
-      const u = await UserModel.findOne({uid: this.uid});
-      if(u) {
-        user = u;
-      }
+usersBehaviorSchema.methods.extendUser = async function() {
+  const UserModel = mongoose.model('users');
+  let user;
+  if(this.uid) {
+    const u = await UserModel.findOne({uid: this.uid});
+    if(u) {
+      user = u;
     }
-    return this.user = user;
-  };
+  }
+  return this.user = user;
+};
+
+usersBehaviorSchema.methods.extendOperationName = async function(){
+	const OperationModel = mongoose.model("operations");
+	let operationData;
+	if(this.operationId){
+		const o = await OperationModel.findOne({_id: this.operationId});
+		if(o){
+			operationData = o;
+		}
+	}
+	return this.operationData = operationData
+}
 
 const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 
