@@ -83,7 +83,8 @@ module.exports = {
 	log: {
 		GET: 'visitPublicLogs',
 		public: {
-			GET: 'visitPublicLogs'
+			GET: 'visitPublicLogs',
+			DELETE: 'deletePublicLogs'
 		},
 		secret: {
 			GET: 'visitSecretLogs'

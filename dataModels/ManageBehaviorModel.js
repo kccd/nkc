@@ -7,6 +7,9 @@ const manageBehaviorSchema = new Schema({
 		index: 1,
 		// enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
 	},
+	toUid: {
+		type: String
+	},
 	uid: {
 		type: String,
 		// required: true,
@@ -38,6 +41,30 @@ manageBehaviorSchema.pre('save', function(next) {
 	}
 	next();
 });
+
+manageBehaviorSchema.methods.extendUser = async function() {
+	const UserModel = mongoose.model('users');
+	let user;
+	if(this.uid) {
+		const u = await UserModel.findOne({uid: this.uid});
+		if(u) {
+			user = u;
+		}
+	}
+	return this.user = user;
+};
+
+manageBehaviorSchema.methods.extendToUser = async function() {
+	const UserModel = mongoose.model('users');
+	let toUser;
+	if(this.toUid) {
+		const u = await UserModel.findOne({uid: this.toUid});
+		if(u) {
+			toUser = u;
+		}
+	}
+	return this.toUser = toUser;
+};
 
 const ManageBehaviorModel = mongoose.model('manageBehaviors', manageBehaviorSchema);
 module.exports = ManageBehaviorModel;

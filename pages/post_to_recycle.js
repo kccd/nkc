@@ -33,7 +33,9 @@ function postRecycleMethodsChoice(){
 function postMoveToRecycleBin(id){
   var reason = $("#postRecycleReason").val().trim();
   var method = postRecycleMethodsChoice();
-  var noticeType = $("#postNoticeType").is(":checked")
+  var noticeType = $("#postNoticeType").is(":checked");
+  var illegalType = $("#postIsIllegalOperation").is(":checked");
+  console.log(noticeType,illegalType)
   var pid = window.localStorage.pid
   // 构造数据，发送到服务器
   var parames = {
@@ -42,7 +44,8 @@ function postMoveToRecycleBin(id){
     postType: "post",
     threadId: id,
     postId: pid,
-    noticeType: noticeType
+    noticeType: noticeType,
+    illegalType: illegalType
   }
   if(reason.length === 0){
     return screenTopWarning('未填写原因')

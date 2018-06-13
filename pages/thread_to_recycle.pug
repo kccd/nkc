@@ -18,6 +18,9 @@ div#recycleModal.modal.fade(tabindex="-1" role="dialog" aria-labelledby="example
           .input-group(id="passMessage2" style="display:none")
             input#noticeType2(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
             span 是否通知用户
+          .input-group
+            input#threadIsIllegalOperation(type="checkbox" aria-label="Checkbox for following text input" checked="checked") 
+            span 是否为违规操作
       .modal-footer
         button.btn.btn-default(type="button" data-dismiss="modal") 关闭
         button#ssubmit2.btn.btn-primary(type="button" onclick=`moveToRecycleBin('${data.thread.tid}')` data-dismiss="modal" disabled) 确认

@@ -1,0 +1,64 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 操作设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-12
+            .row
+              .col-xs-12.col-md-12
+                //- ul.nav.nav-pills
+                //-   li(role='presentation' class=!data.type?'active':'')
+                //-     a(href=`/e/log/secret?type=email`) 邮箱修改
+                //-   li(role='presentation' class=data.type==='password'?'active':'')
+                //-     a(href=`/e/log/secret?type=password`) 密码修改
+                //-   li(role='presentation' class=data.type==='mobile'?'active':'')
+                //-     a(href=`/e/log/secret?type=mobile`) 手机修改
+                //-   li(role='presentation' class=data.type==='username'?'active':'')
+                //-     a(href=`/e/log/secret?type=username`) 用户名修改
+              .col-xs-12.col-md-12
+                -const type = data.type
+                -console.log(data.result)
+                include ../../interface_navigation_paging      
+                  .col-xs-12.col-md-12
+                    table.table.table-hover
+                      thead
+                        tr
+                          th 类型id
+                          th 详细操作
+                          th 执行者id
+                          th 执行者用户名
+                          th 目标用户id
+                          th 目标用户名
+                          th 时间
+                      tbody
+                        for manage in data.result
+                          tr
+                            th= manage.operationId
+                            -const manageName = manage.manageName ? manage.manageName : ''
+                            th= manageName
+                            th= manage.uid
+                            -const name1 = manage.user ? manage.user.username : '';
+                            th=name1
+                            th= manage.toUid
+                            -const name2 = manage.toUser ? manage.toUser.username : '';
+                            th=name2
+                            th= fromNow(manage.toc)
+
+
+block scripts
+
+  script(src='/icheck/icheck.js')
+  script(src='/interface_common.js')
+  script(src='/laydate/laydate.dev.js')
+
+
+
