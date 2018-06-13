@@ -10,6 +10,7 @@ const downloadRouter = require('./download');
 const gradeRouter = require('./grade');
 const kcbRouter = require('./kcb');
 const logRouter = require('./log');
+const numberRouter = require('./number');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -17,6 +18,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+	.use('/number', numberRouter.routes(), numberRouter.allowedMethods())
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
 	.use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())

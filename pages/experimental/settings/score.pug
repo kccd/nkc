@@ -25,8 +25,6 @@ block content
                   span - 科创币 -
                 if operation.xsf.status
                   span - 学术分 -
-                if operation.score.status
-                  span - 积分 -
             for operation in data.scoreOperations
               +operationPanel(operation)
             for operation in data.operations
@@ -43,7 +41,7 @@ block content
                   th 类型
                   th 受影响的人
                   th 每天有效次数
-                  th 分数变化（积分系数）
+                  th 分数变化
                   th 开启
               tbody
                 tr
@@ -90,28 +88,6 @@ block content
                           input.xsf(type='checkbox' name='selectOperation' checked=true)
                         else
                           input.xsf(type='checkbox' name='selectOperation')
-                tr
-                  th
-                    h4 积分
-                  th
-                    span 操作者
-                    br
-                    span 被操作者
-                  th
-                    input.score(type='number' name='count' value=operation.score.count)
-                    br
-                    input.score(type='number' name='targetCount' value=operation.score.targetCount)
-                  th
-                    input.score(type='number' name='change' value=operation.score.change)
-                    br
-                    input.score(type='number' name='targetChange' value=operation.score.targetChange)
-                  th
-                    label
-                      .icheckbox
-                        if operation.score.status
-                          input.score(type='checkbox' name='selectOperation' checked=true)
-                        else
-                          input.score(type='checkbox' name='selectOperation')
 
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
 

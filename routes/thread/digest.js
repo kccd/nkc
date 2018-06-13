@@ -15,6 +15,20 @@ router
 		}
 		if(thread.digest) ctx.throw(400, '文章已被设置精华');
 		await thread.update({digest: true});
+		const targetUser = await thread.extendUser();
+		// 并生成记录
+		const log = db.UsersScoreLogModel({
+			uid: user.uid,
+			type: 'score',
+			operationId: 'digestThread',
+			change: 0,
+			targetUid: targetUser.uid,
+			targetChange: 1
+		});
+		await log.save();
+		await targetUser.update({$inc: {digestThreadsCount: 1}});
+		targetUser.digestThreadsCount++;
+		await targetUser.calculateScore();
 		await next();
 	})
 	.del('/', async (ctx ,next) => {
@@ -31,6 +45,20 @@ router
 		}
 		if(!thread.digest) ctx.throw(400, '文章未被设置精华');
 		await thread.update({digest: false});
+		const targetUser = await thread.extendUser();
+		// 并生成记录
+		const log = db.UsersScoreLogModel({
+			uid: user.uid,
+			type: 'score',
+			operationId: 'unDigestThread',
+			change: 0,
+			targetUid: targetUser.uid,
+			targetChange: -1
+		});
+		await log.save();
+		await targetUser.update({$inc: {digestThreadsCount: -1}});
+		targetUser.digestThreadsCount--;
+		await targetUser.calculateScore();
 		await next();
 	});
 module.exports = router;

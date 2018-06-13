@@ -243,8 +243,8 @@ threadSchema.methods.updateThreadMessage = async function() {
   await this.update(updateObj);
   const forum = await this.extendForum();
   await forum.updateForumMessage();
-  const user = await this.extendUser();
-  await user.updateUserMessage();
+  /*const user = await this.extendUser();
+  await user.updateUserMessage();*/
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {

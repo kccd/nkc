@@ -50,6 +50,16 @@ const userSchema = new Schema({
     type: Number,
     default: 0,
   },
+	// 在线天数
+	dailyLoginCount: {
+  	type: Number,
+		default: 0,
+	},
+	// 违规数
+	violationCount: {
+		type: Number,
+		default: 0
+	},
   score: {
     default: 0,
     type: Number
@@ -272,11 +282,15 @@ userSchema.methods.extendRoles = async function() {
 	return this.roles = roles;
 };
 
+
+// 用户数据更新
 userSchema.methods.updateUserMessage = async function() {
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
-  const uid = this.uid;
+  const UsersScoreLogModel = mongoose.model('usersScoreLogs');
 
+  const {uid} = this;
+	// 发帖回帖统计
   const threads = await ThreadModel.find({uid}, {oc: 1, _id: 0});
   const threadsOc = threads.map(t => t.oc);
   const threadCount = threads.length;
@@ -286,21 +300,94 @@ userSchema.methods.updateUserMessage = async function() {
 
   const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
   const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
+	// 日常登录统计
+  const dailyLoginCount = await UsersScoreLogModel.count({
+	  uid,
+	  type: 'score',
+	  operationId: 'dailyLogin'
+  });
+	// 被赞统计
+	/*const recommendCount = await UsersScoreLogModel.count({
+		targetUid: uid,
+		type: 'score',
+		operationId: 'recommendPost'
+	});
+	const unRecommendCount = await UsersScoreLogModel.count({
+		targetUid: uid,
+		type: 'score',
+		operationId: 'UNRecommendPost'
+	});
+	const recCount = recommendCount - unRecommendCount;*/
+	const results = await PostModel.aggregate([
+		{
+			$match: {
+				uid,
+				disabled: false,
+				'recUsers.0': {$exists: 1}
+			}
+		},
+		{
+			$unwind: '$recUsers'
+		},
+		{
+			$count: 'recCount'
+		}
+	]);
+	let recCount = 0;
+	if(results.length !== 0) {
+		recCount = results[0].recCount;
+	}
+	// 违规统计
+	const violationCount = await UsersScoreLogModel.count({
+		uid,
+		type: 'score',
+		operationId: 'violation'
+	});
 
-  const recCount = await PostModel.count({recUsers: uid});
 
-  const updateObj = {
+	const updateObj = {
 		threadCount,
-	  postCount,
-	  disabledPostsCount,
-	  disabledThreadsCount,
-	  digestThreadsCount,
-	  toppedThreadsCount,
-	  recCount
-  };
+		postCount,
+		disabledPostsCount,
+		disabledThreadsCount,
+		digestThreadsCount,
+		toppedThreadsCount,
+		recCount,
+		dailyLoginCount,
+		violationCount
+	};
 
   await this.update(updateObj);
+  for(const key in updateObj) {
+  	if(!updateObj.hasOwnProperty(key)) continue;
+  	this[key] = updateObj[key];
+  }
+  await this.calculateScore();
 };
+
+// 积分计算
+userSchema.methods.calculateScore = async function() {
+	const SettingModel = mongoose.model('settings');
+	// 积分设置
+	const scoreSettings = await SettingModel.findOnly({type: 'score'});
+	const {coefficients} = scoreSettings;
+
+	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, recCount} = this;
+	// 积分计算
+	const scoreOfPostToThread = coefficients.postToThread*(postCount - disabledPostsCount);
+	const scoreOfPostToForum = coefficients.postToForum*(threadCount - disabledThreadsCount);
+	const scoreOfDigestThreadCount = coefficients.digest*digestThreadsCount;
+	const scoreOfXsf = coefficients.xsf*xsf;
+	const scoreOfDailyLogin = coefficients.dailyLogin*dailyLoginCount;
+	const scoreOfViolation = coefficients.violation*violationCount;
+	let scoreOfRecommend = 0;
+	if(recCount !== 0) {
+		scoreOfRecommend = Math.log10(recCount)/Math.log10(coefficients.thumbsUp);
+	}
+	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend - scoreOfViolation;
+	await this.update({score});
+};
+
 
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
@@ -413,16 +500,6 @@ userSchema.methods.extendGrade = async function() {
 	}
 	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
 	return this.grade = grade;
-};
-
-userSchema.methods.calculateScore = async function() {
-	const UsersScoreLogModel = mongoose.model('usersScoreLogs');
-	const logs = await UsersScoreLogModel.find({uid: this.uid, type: 'score'}).sort({toc: -1});
-	let score = 0;
-	logs.map(l => {
-		score += l.change
-	});
-	console.log(`score: ${score}`);
 };
 
 

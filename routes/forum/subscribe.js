@@ -24,9 +24,10 @@ subscribeRouter
 		if(subscribeForums.length >= 20) {
 			ctx.throw(400, '每个用户最多只能关注20个领域。')
 		}
-		if(subscribeForums.includes(fid)) {
+		// 专业表里记录的关注该专业的用户 与 用户表记录的关注专业不相符的情况，不管用户点击关注还是取消关注都可消除误差。
+		/*if(subscribeForums.includes(fid)) {
 			ctx.throw(400, '您已经关注该领域，请刷新。');
-		}
+		}*/
 		await userSubscribe.update({$addToSet: {subscribeForums: fid}});
 		await forum.update({$addToSet: {followersId: user.uid}});
 		await next();

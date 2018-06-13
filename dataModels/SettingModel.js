@@ -85,13 +85,44 @@ const settingSchema = new Schema({
 	language: String,
 
 	//用户积分
+	// ---------------------------------------
 	operationsId: [String],
-	formula: String,
-	operationsCount: {
-		type: Schema.Types.Mixed
+	formula: {
+  	type: String,
+	},
+	coefficients: { // 积分计算公式系数
+		postToThread: {
+			type: Number,
+			default: 1
+		},
+		postToForum: {
+			type: Number,
+			default: 1
+		},
+		digest: {
+			type: Number,
+			default: 1
+		},
+		dailyLogin: {
+			type: Number,
+			default: 1
+		},
+		xsf: {
+			type: Number,
+			default: 1
+		},
+		thumbsUp: {
+			type: Number,
+			default: 10
+		},
+		violation: {
+			type: Number,
+			default: 1
+		}
 	},
 
 	//下载
+	// ---------------------------------------
 	numberOfDays: Number, // 收费天数
 	numberOfKcb: Number, // 单次下载收取科创币数
 },

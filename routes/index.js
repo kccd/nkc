@@ -17,6 +17,37 @@ const downloadRouter = routers.download;
 const systemRouter = routers.system;
 const problemRouter = routers.problem;
 
+// 所有请求先经过此中间件
+router.use('/', async (ctx, next)  => {
+	const {nkcModules, db, data} = ctx;
+	const {user} = data;
+	const {today} = nkcModules.apiFunction;
+	if(user) {
+		const toc = Date.now();
+		const time = today(toc);
+		const dailyLogin = await db.UsersScoreLogModel.findOne({
+			uid: user.uid,
+			type: 'score',
+			operationId: 'dailyLogin',
+			toc: {
+				$gt: time
+			}
+		});
+		if(!dailyLogin) {
+			const log = db.UsersScoreLogModel({
+				uid: user.uid,
+				toc,
+				operationId: 'dailyLogin',
+				change: 1,
+				type: 'score'
+			});
+			await log.save();
+			await user.updateUserMessage();
+		}
+	}
+	await next();
+});
+
 
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());

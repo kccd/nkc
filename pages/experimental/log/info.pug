@@ -42,8 +42,8 @@ block content
                   -const t = behavior.post.t;
                   -let c = behavior.post.c;
                   -c = c.replace(/<.*?>/g, '');
-                  -let title = (t ? `${t}...` : '') + c;
-                  a(href=`/p/${behavior.pid}` data-toggle="tooltip" data-placement="bottom" title=title)
+                  -let title = (t ? `《${t}》` : '') + c;
+                  a(href=`/p/${behavior.pid}` data-toggle="tooltip" data-placement="right" title=title)
                     span= title.slice(0, 40)
                     if title.length > 40
                       span ...

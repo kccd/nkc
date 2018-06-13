@@ -43,13 +43,6 @@ function saveOperation(id) {
 			change: parseInt($('.xsf[name="change"]').val()),
 			targetChange: parseInt($('.xsf[name="targetChange"]').val()),
 			status: $('.xsf[name="selectOperation"]').prop('checked')
-		},
-		score: {
-			count: parseInt($('.score[name="count"]').val()),
-			targetCount: parseInt($('.score[name="targetCount"]').val()),
-			change: parseInt($('.score[name="change"]').val()),
-			targetChange: parseInt($('.score[name="targetChange"]').val()),
-			status: $('.score[name="selectOperation"]').prop('checked')
 		}
 	};
 	nkcAPI('/e/settings/score', 'PATCH', obj)

@@ -67,6 +67,10 @@ module.exports = {
 				DELETE: 'deleteUsersGrade'
 			}
 		},
+		number: {
+			GET: 'visitNumberSettings',
+			PATCH: 'modifyNumberSettings'
+		},
 		kcb: {
 			GET: 'visitKcbSettings',
 			PATCH: 'modifyKcbSettings'

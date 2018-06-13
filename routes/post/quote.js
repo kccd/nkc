@@ -21,7 +21,7 @@ router
     await targetPost.extendUser();
     data.targetUser = targetPost.user;
     targetPost = targetPost.toObject();
-    targetPost.contentClasses = data.certificates.contentClasses;
+    // targetPost.contentClasses = data.certificates.contentClasses;
     data.message = xsflimit(targetPost);
     await next();
   });

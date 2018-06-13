@@ -6,7 +6,12 @@ module.exports = {
 			GET: 'quotePost'
 		},
 		credit: {
-			PATCH: 'creditPost'
+			xsf: {
+				POST: 'creditXsf'
+			},
+			kcb: {
+				POST: 'creditKcb'
+			}
 		},
 		disabled: {
 			PATCH: 'disabledPost'
