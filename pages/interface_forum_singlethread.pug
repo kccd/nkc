@@ -80,6 +80,7 @@
             -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
             -lastPost.c = filterQuote(lastPost.c)
             -lastPost.c = lastPost.c.slice(0, 250);
+            -lastPost.c = lastPost.c.replace(/<\/?.+?>/g,"")
             a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost))
       .new-content-info-last
         span

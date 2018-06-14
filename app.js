@@ -45,7 +45,7 @@ app.use(init)
   .use(logger)
 	// .use(permissions)
 	.use(permission)
-  .use(scoreHandler)
+  // .use(scoreHandler)
   .use(mainRouter.routes())
 	.use(score)
   .use(body);

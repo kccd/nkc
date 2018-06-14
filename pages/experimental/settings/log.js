@@ -1,5 +1,5 @@
-let data = $('#data').text();
-let types;
+var data = $('#data').text();
+var types;
 if(data) {
 	data = JSON.parse(data);
   types = data.types;
@@ -12,7 +12,7 @@ $('input[name="selectLogSettings"]').iCheck({
 
 function saveLogSettings(){
   // return console.log(getSelectedLogSettings())
-  let logParams = getSelectedLogSettings()
+  var logParams = getSelectedLogSettings();
   nkcAPI('/e/settings/log', 'POST', {logParams:logParams})
   .then(function() {
     window.location.reload();
@@ -23,10 +23,10 @@ function saveLogSettings(){
 }
 
 function getSelectedLogSettings() {
-	let arr = $('input[name="selectLogSettings"]');
-	let operations = [];
-	for(let i = 0; i < arr.length; i++) {
-		let e = arr.eq(i);
+	var arr = $('input[name="selectLogSettings"]');
+	var operations = [];
+	for(var i = 0; i < arr.length; i++) {
+		var e = arr.eq(i);
 		if(e.prop('checked')) {
 			operations.push(e.attr('data-operation'));
 		}
