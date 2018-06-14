@@ -154,7 +154,8 @@ function getSelectOperation(typeId) {
 	var selectedOperations = [];
 	for(var i = 0 ; i < operations.length; i++) {
 		var operation = operations[i];
-		if(operation.typeId.indexOf(typeId) !== -1 && (['visitor', 'banned', 'default'].includes(role._id) || defaultOperationsId.indexOf(operation._id) === -1)) {
+		if(operation.typeId.indexOf(typeId) !== -1) {
+		// if(operation.typeId.indexOf(typeId) !== -1 && (['visitor', 'banned', 'default'].indexOf(role._id) !== -1 || defaultOperationsId.indexOf(operation._id) === -1)) {
 			selectedOperations.push(operation);
 		}
 	}
