@@ -26,7 +26,9 @@ router
 			description: reason,
 			fid: targetThread.fid,
 			pid,
-			tid: targetThread.tid
+			tid: targetThread.tid,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 		await targetUser.update({$inc: {xsf: q}});
@@ -77,7 +79,9 @@ router
 			description: reason,
 			fid: targetThread.fid,
 			tid: targetThread.tid,
-			pid
+			pid,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 		await targetUser.update({$inc: {kcb: q}});
@@ -100,8 +104,8 @@ router
 		await targetPost.update({$push: {credits: updateObjForPost}});
 
 		await next();
-	})
-  .patch('/', async (ctx, next) => {
+	});
+  /*.patch('/', async (ctx, next) => {
     const {db, data} = ctx;
     const {pid} = ctx.params;
     const {user} = data;
@@ -153,6 +157,6 @@ router
     await targetPost.update({$push: {credits: updateObjForPost}});
     data.targetUser = targetUser;
     await next();
-  });
+  });*/
 
 module.exports = router;

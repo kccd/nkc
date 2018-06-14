@@ -60,6 +60,8 @@ const score = async (ctx, next) => {
 
 			logObj.change = change;
 			logObj.targetChange = targetChange;
+			logObj.ip = ctx.address;
+			logObj.port = ctx.port;
 
 			const newLog = db.UsersScoreLogModel(logObj);
 			await newLog.save();

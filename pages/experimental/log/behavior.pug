@@ -41,8 +41,9 @@ block content
                           tr
                             th= behavior.operationData ? behavior.operationData.description : behavior.operationId
                             th
-                              a(href=`/u/${behavior.uid}` target="_blank")
-                                span= behavior.user.username
+                              if behavior.uid
+                                a(href=`/u/${behavior.uid}` target="_blank")
+                                  span= behavior.user.username
                             th= behavior.fid
                             th
                               a(href=`/t/${behavior.tid}` target="_blank")

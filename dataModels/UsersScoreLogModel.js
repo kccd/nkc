@@ -54,6 +54,14 @@ const usersScoreLogSchema = new Schema({
 	description: {
 		type: String,
 		default: ''
+	},
+	ip: {
+		type: String,
+		default: ''
+	},
+	port: {
+		type: Number,
+		default: null
 	}
 }, {
 	collection: 'usersScoreLogs'

@@ -69,7 +69,9 @@ operationRouter
 				targetCount: 1,
 				targetUid: data.targetUser.uid,
 				tid,
-				fid: thread.fid
+				fid: thread.fid,
+				ip: ctx.address,
+				port: ctx.port
 			});
 			await log.save();
 			data.targetUser.violation++;
@@ -157,7 +159,9 @@ operationRouter
 					targetCount: 1,
 					targetUid: data.targetUser.uid,
 					tid,
-					fid: targetThread.fid
+					fid: targetThread.fid,
+					ip: ctx.address,
+					port: ctx.port
 				});
 				await log.save();
 				data.targetUser.violation++;

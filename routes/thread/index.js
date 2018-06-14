@@ -250,7 +250,9 @@ threadRouter
 			type: 'score',
 			operationId: 'postToThread',
 			change: 1,
-			targetUid: data.targetUser.uid
+			targetUid: data.targetUser.uid,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 		await user.update({$inc: {postCount: 1}});

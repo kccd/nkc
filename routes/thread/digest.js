@@ -23,7 +23,9 @@ router
 			operationId: 'digestThread',
 			change: 0,
 			targetUid: targetUser.uid,
-			targetChange: 1
+			targetChange: 1,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 		await targetUser.update({$inc: {digestThreadsCount: 1}});
@@ -53,7 +55,9 @@ router
 			operationId: 'unDigestThread',
 			change: 0,
 			targetUid: targetUser.uid,
-			targetChange: -1
+			targetChange: -1,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 		await targetUser.update({$inc: {digestThreadsCount: -1}});

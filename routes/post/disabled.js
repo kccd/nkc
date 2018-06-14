@@ -41,7 +41,9 @@ router
 		    targetUid: data.targetUser.uid,
 		    pid,
 		    tid: targetThread.tid,
-		    fid: targetThread.fid
+		    fid: targetThread.fid,
+		    ip: ctx.address,
+		    port: ctx.port
 	    });
     	await log.save();
     	data.targetUser.violation++;
