@@ -16,7 +16,6 @@ function switchFunc(){
   var checkboxes = $('.ThreadCheckboxes');
   var forumManagement = $('.ForumManagement');
   return function () {
-    console.log(flag);
     if (!flag) {
       $('.displayShit').hide();
       $('.configShit').show();

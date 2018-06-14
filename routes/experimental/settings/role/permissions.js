@@ -8,11 +8,14 @@ permissionsRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {body, settings, data} = ctx;
+		const {body, nkcModules, data} = ctx;
 		const {role} = data;
+		if(role._id === 'dev') {
+			ctx.throw(400, '运维权限不允许编辑！！！');
+		}
 		const {operationsId} = body;
 		const newOperationsId = [];
-		const defaultOperationsId = settings.operations.getOperationsId();
+		const defaultOperationsId = nkcModules.permission.getOperationsId();
 		for(let operationId of operationsId) {
 			if(defaultOperationsId.includes(operationId) && !newOperationsId.includes(operationId)) {
 				newOperationsId.push(operationId);

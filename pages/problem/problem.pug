@@ -3,20 +3,68 @@ block title
   -const problem = data.problem;
   title= problem.t
   -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  style.
+    pre{
+      padding: 1rem;
+      background-color: #fff;
+    }
 block content
   .container-fluid(style='max-width: 1400px')
-    .col-xs-12.col-md-6
-      h4
-        a(href='/problem/list') <<返回问题列表
-      span=problem.toc.toLocaleString()
-      h4= problem.t
-      p= problem.c
-      if problem.QQ
-        h5=`QQ：${problem.QQ}`
-      if problem.email
-        h5=`email：${problem.email}`
-      if problem.uid
-        a(href=`/u/${problem.uid}`)=`查看报告者`
+    .row
+      .hidden#data= JSON.stringify({id: data.problem._id})
+      .col-xs-12.col-md-12
+        a.btn.btn-default.btn-sm(href='/problem/list') << 返回列表
+      .col-xs-12.col-md-7
+        h4(style='color: #aaa;')
+          if problem.user
+            a(href=`/u/${problem.user.uid}` target='_blank')
+              img(src=`/avatar_small/${problem.user.uid}` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+              span= problem.user.username
+          else
+            span 匿名用户
+          span &nbsp;&nbsp;上报于&nbsp;&nbsp;
+          span=problem.toc.toLocaleString()
+          span &nbsp;&nbsp;
+          if problem.resolved
+            span.label.label-success 已完成
+          else
+            span.label.label-danger 未完成
+        .h2.text-center#titleH2
+        #contentDiv
+        if problem.QQ
+          h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
+        if problem.email
+          h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
+        if problem.restorer && problem.resolveTime
+          h4.text-right(style='color: #aaa;padding-top:2rem;')
+            span(style='margin-right: 0.5rem;')= problem.resolveTime.toLocaleString()
+            a(href=`/u/${problem.restorer.uid}`)
+              img(src=`/avatar_small/${problem.restorer.uid}` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+              span= problem.restorer.username
+
+
+      .col-xs-12.col-md-5
+        .text-right
+          button.btn.btn-danger.btn-sm(onclick=`deleteProblem(${problem._id})`) 删除问题
+        .form
+          .form-group
+            label 标题
+            input.form-control#title(type='text' value=problem.t)
+          .form-group
+            label 详细内容
+            textarea.form-control#content(rows=23)= problem.c
+          .form-group
+            .icheckbox
+              span 标记为已解决
+              input(type='checkbox' name='select' checked=problem.resolved)
+
+          button.btn.btn-primary.btn-block(onclick=`submit(${problem._id})`) 保存
+
+
+
 block scripts
+  script(src='/icheck/icheck.js')
   script(src='/interface_common.js')
-  script(src='/problem/add_problem.js')
+  script(src='/markdown-it/dist/markdown-it.js')
+  script(src='/problem/problem.js')

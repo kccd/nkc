@@ -4,6 +4,7 @@ infoRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.KCBSettings = await db.SettingModel.findOne({type: 'kcb'});
+		data.modifyUsernameOperation = await db.OperationModel.findOnly({_id: 'modifyUsername'});
 		ctx.template = 'interface_user_settings_info.pug';
 		await next();
 	})
@@ -35,7 +36,7 @@ infoRouter
 			if(user.kcb < changeUsername) ctx.throw(400, `科创币不足，修改用户名需花费200个科创币`);
 			const sameUsernameUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 			if(sameUsernameUser) ctx.throw(400, '用户名已存在');
-			const oldUsername = await db.SecretBehaviorModel.findOne({type: 'changeUsername', oldUsernameLowerCase: username.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+			const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: username.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 			if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
 			const defaultUser = await db.UserModel.findOne({uid: defaultUid});
 			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认用户');

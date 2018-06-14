@@ -13,10 +13,10 @@ block title
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${forum.displayName}`)
   
-  meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content=`${forum.displayName}`)
-  meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content=`${processed}`)
+  //- meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  //- meta(property='og:title' content=`${forum.displayName}`)
+  //- meta(property='og:site_name' content='科创论坛')
+  //- meta(property='og:description' content=`${processed}`)
   
   if data.threads.length>0
     meta(property='article:modified_time' content=`${(new Date(data.threads[0].toc)).toISOString()}`)
@@ -29,7 +29,7 @@ block title
     }
 
 block content   
-  -var isModerator = data.userLevel >= 4
+  // -var isModerator = data.userLevel >= 4
   -var forumIsParent = data.forum.type&&data.forum.type=='category'
   -var hasChildren = data.forum.type&&data.forum.type=='category'&&data.forums&&data.forums.length
   
@@ -167,10 +167,10 @@ block content
     include debug_output.pug
 
 block scripts
-  script(src='/interface_common.js')
-  script(src='/module_dropdown.js?v=3')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
   //script(src='/interface_collections.js')
-  script(src='/interface_forum.js')
+  script(src=`/interface_forum.js?v=${global.NKC.startTime}`)
   //script(src='/gallery.js')
 
 

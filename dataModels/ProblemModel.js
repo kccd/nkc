@@ -2,6 +2,16 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const problemSchema = new Schema({
 	_id: Number,
+	viewed: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
+	resolved: {
+		type: Boolean,
+		default: false,
+		index: 1
+	},
 	toc: {
 		type: Date,
 		default: Date.now,
@@ -22,7 +32,7 @@ const problemSchema = new Schema({
 	},
 	c: {
 		type: String,
-		maxlength: [2048, '内容不能超过2048个字'],
+		maxlength: [2048, '内容不能超过10000个字'],
 		required: true
 	},
 	ip: {
@@ -30,19 +40,13 @@ const problemSchema = new Schema({
 		required: true,
 		index: 1
 	},
-	reason: {
+	restorerId: {
 		type: String,
 		default: '',
-		maxlength: [2048, '字数不能超过2048']
+		index: 1
 	},
-	solution: {
-		type: String,
-		default: '',
-		maxlength: [2048, '字数不能超过2048']
-	},
-	repairUid: {
-		type: String,
-		default: '',
+	resolveTime: {
+		type: Date,
 		index: 1
 	},
 	QQ: {
@@ -52,6 +56,33 @@ const problemSchema = new Schema({
 }, {
 	collection: 'problems'
 });
+
+problemSchema.virtual('user')
+	.get(function() {
+		return this._user;
+	})
+	.set(function(user) {
+		this._user = user;
+	});
+
+problemSchema.virtual('restorer')
+	.get(function() {
+		return this._restorer;
+	})
+	.set(function(restorer) {
+		this._restorer = restorer;
+	});
+
+problemSchema.methods.extendUser = async function() {
+	const UserModel = mongoose.model('users');
+	return this.user = await UserModel.findOne({uid: this.uid});
+};
+
+problemSchema.methods.extendRestorer = async function() {
+	if(!this.restorerId) return this.restorer = undefined;
+	const UserModel = mongoose.model('users');
+	return this.restorer = await UserModel.findOne({uid: this.restorerId});
+};
 
 problemSchema.statics.ensureSubmitPermission = async function(option) {
 	const {ip} = option;

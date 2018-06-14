@@ -1,12 +1,5 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
-const nkcModules = require('../../nkcModules');
-const path = require('path');
-const tools = require('../../tools');
-const {upload, statics} = require('../../settings');
-const {adPath, avatarPath, uploadPath} = upload;
-const {defaultAdPath} = statics;
-const {imageMagick} = tools;
 operationRouter
 // 收藏帖子
 	.post('/addColl', async (ctx, next) => {
@@ -15,7 +8,15 @@ operationRouter
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
-		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
+		await thread.extendForum();
+		const gradeId = data.userGrade._id;
+		const rolesId = data.userRoles.map(r => r._id);
+		const options = {
+			gradeId,
+			rolesId,
+			uid: user?user.uid: ''
+		};
+		await thread.ensurePermission(options);
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
 		if(collection) ctx.throw(400, '该贴子已经存在于您的收藏中，没有必要重复收藏');
 		const newCollection = new db.CollectionModel({
@@ -32,105 +33,6 @@ operationRouter
 		data.targetUser = await thread.extendUser();
 		await next();
 	})
-	// 首页置顶
-	.patch('/ad', async (ctx, next) => {
-		const {tid} = ctx.params;
-		const {db, data, fs} = ctx;
-		const thread = await db.ThreadModel.findOnly({tid});
-		if(data.userLevel < 6) ctx.throw(403, '权限不足');
-		if(thread.disabled) ctx.throw(404, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const setting = await db.SettingModel.findOnly({type: 'system'});
-		const ads = setting.ads;
-		const index = ads.findIndex((elem, i, arr) => elem === tid);
-		const targetUser = await thread.extendUser();
-		const targetAdPath = `${adPath}/${tid}.jpg`;
-		if(index > -1) {
-			ads.splice(index, 1);
-			try{
-				await fs.unlink(targetAdPath);
-			} catch(e){}
-		} else {
-			if(ads.length === 6) {
-				ads.shift();
-			}
-			ads.push(tid);
-			const oc = await db.PostModel.findOnly({pid: thread.oc});
-			let resourceArr = await oc.extendResources();
-			let resource = resourceArr.find(elem => ['jpg', 'png', 'svg', 'jpeg'].indexOf(elem.ext.toLowerCase()) > -1);
-			let filePath;
-			if(resource) {
-				filePath = `${uploadPath}${resource.path}`;
-			} else {
-				filePath = `${avatarPath}/${targetUser.uid}.jpg`;
-			}
-			await imageMagick.generateAdPost(filePath, targetAdPath);
-		}
-		await setting.update({ads});
-		await next();
-	})
-	// 精华
-	.patch('/digest', async (ctx, next) => {
-		const {tid} = ctx.params;
-		const {digest} = ctx.body;
-		const {db, data} = ctx;
-		const {user} = data;
-		if(digest === undefined) ctx.throw(400, '参数不正确');
-		const thread = await db.ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
-		if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const obj = {digest: false};
-		if(digest) {
-			obj.digest = true;
-		}
-		if(thread.digest === digest) {
-			if(!digest) ctx.throw(400, '该贴子在您操作前已经被撤销精华了，请刷新');
-			if(digest) ctx.throw(400, '该贴子在您操作前已经被设置成精华了，请刷新');
-		}
-		await thread.update(obj);
-		data.targetUser = await thread.extendUser();
-		let operation = 'setDigest';
-		if(!digest) operation = 'cancelDigest';
-		await ctx.generateUsersBehavior({
-			operation,
-			tid,
-			fid: thread.fid,
-			isManageOp: true,
-			toMid: thread.toMid,
-			mid: thread.mid
-		});
-		await thread.updateThreadMessage();
-		await next();
-	})
-	.patch('/topped', async (ctx, next) => {
-		const {tid} = ctx.params;
-		const {db, data} = ctx;
-		const {topped} = ctx.body;
-		const {user} = data;
-		if(topped === undefined) ctx.throw(400, '参数不正确');
-		const thread = await db.ThreadModel.findOnly({tid});
-		if(!await thread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
-		if(thread.disabled) ctx.throw(400, '该贴子已被屏蔽，请先解除屏蔽再执行置顶操作');
-		const obj = {topped: false};
-		if(topped) obj.topped = true;
-		await thread.update(obj);
-		if(thread.topped === topped) {
-			if(topped) ctx.throw(400, '该帖子在您操作前已经被置顶了，请刷新');
-			if(!topped) ctx.throw(400, '该帖子在您操作前已经被取消置顶了，请刷新');
-		}
-		data.targetUser = await thread.extendUser();
-		let operation = 'setTopped';
-		if(!topped) operation = 'cancelTopped';
-		await ctx.generateUsersBehavior({
-			operation,
-			tid,
-			fid: thread.fid,
-			isManageOp: true,
-			toMid: thread.toMid,
-			mid: thread.mid
-		});
-		await thread.updateThreadMessage();
-		await next();
-	})
 	.patch('/moveDraft', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
@@ -139,6 +41,7 @@ operationRouter
 		if(tid === undefined) ctx.throw(400, '参数不正确')
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid})
+		data.targetUser = await thread.extendUser();
 		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该帖子已经被退回')
 		await thread.update({recycleMark:true})
 		// 获取主题帖的第一条回帖的标题和内容
@@ -156,6 +59,25 @@ operationRouter
 			const toUser = await db.UsersPersonalModel.findOnly({uid});
 			await toUser.increasePsnl('system', 1);
 		}
+		if(para && para.illegalType) {
+			const log = db.UsersScoreLogModel({
+				uid: user.uid,
+				type: 'score',
+				operationId: 'violation',
+				description: '退回文章并标记为违规',
+				change: 0,
+				targetCount: 1,
+				targetUid: data.targetUser.uid,
+				tid,
+				fid: thread.fid,
+				ip: ctx.address,
+				port: ctx.port
+			});
+			await log.save();
+			data.targetUser.violation++;
+			await data.targetUser.update({$inc: {violationCount: 1}});
+			await data.targetUser.calculateScore();
+		}
 		await next()
 	})
 	.patch('/moveThread', async (ctx, next) => {
@@ -172,9 +94,12 @@ operationRouter
 		const targetThread = await db.ThreadModel.findOnly({tid});
 		data.targetUser = await targetThread.extendUser();
 		const oldForum = await targetThread.extendForum();
+		const isModerator = await oldForum.isModerator();
+		if(!isModerator && !data.userOperationsId.includes('moveThread')) ctx.throw(403, '权限不足');
 		const oldCid = targetThread.cid;
 		// 版主只能改变帖子的分类，不能移动帖子到其他板块
-		if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(403, '权限不足');
+		if(!data.userOperationsId.includes('moveThread') && fid === 'recycle' && fid !== oldForum.fid) ctx.throw(403, '权限不足');
+		// if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(403, '权限不足');
 		const tCount = {
 			digest: 0,
 			normal: 0
@@ -224,14 +149,25 @@ operationRouter
 			}
 		}
 		if(fid === 'recycle') {
-			await ctx.generateUsersBehavior({
-				operation: 'moveToRecycle',
-				tid,
-				fid: targetThread.fid,
-				isManageOp: true,
-				toMid: targetThread.toMid,
-				mid: targetThread.mid
-			});
+			if(para && para.illegalType) {
+				const log = db.UsersScoreLogModel({
+					uid: user.uid,
+					type: 'score',
+					operationId: 'violation',
+					description: '屏蔽文章并标记为违规',
+					change: 0,
+					targetCount: 1,
+					targetUid: data.targetUser.uid,
+					tid,
+					fid: targetThread.fid,
+					ip: ctx.address,
+					port: ctx.port
+				});
+				await log.save();
+				data.targetUser.violation++;
+				await data.targetUser.update({$inc: {violationCount: 1}});
+				await data.targetUser.calculateScore();
+			}
 			// 添加删帖日志
 			let oc = targetThread.oc;
 			let post = await db.PostModel.findOne({"pid":oc})

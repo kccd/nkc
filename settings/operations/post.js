@@ -6,7 +6,12 @@ module.exports = {
 			GET: 'quotePost'
 		},
 		credit: {
-			PATCH: 'creditPost'
+			xsf: {
+				POST: 'creditXsf'
+			},
+			kcb: {
+				POST: 'creditKcb'
+			}
 		},
 		disabled: {
 			PATCH: 'disabledPost'
@@ -14,6 +19,10 @@ module.exports = {
 		history: {
 			GET: 'visitPostHistory',
 			PATCH: 'disableHistories'
+		},
+		recommend: {
+			POST: 'recommendPost',
+			DELETE: 'unRecommendPost'
 		}
 	}
 };

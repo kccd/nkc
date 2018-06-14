@@ -31,7 +31,7 @@ block title
             h4.text-center 优秀文章
             for thread in data.digestThreads
               .col-xs-12.col-md-12
-                .row(style='margin-bottom: 0.5rem;')
+                .row(style='margin-bottom: 0.2rem;line-height: 1.8rem;')
                   if data.forum.fid !== thread.fid
                     a(href=`/f/${thread.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
                   a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
@@ -99,10 +99,10 @@ block title
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${forum.displayName}`)
 
-  meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content=`${forum.displayName}`)
-  meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content=`${processed}`)
+  //- meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+  //- meta(property='og:title' content=`${forum.displayName}`)
+  //- meta(property='og:site_name' content='科创论坛')
+  //- meta(property='og:description' content=`${processed}`)
 
 
 
@@ -128,10 +128,10 @@ block content
               button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
         else
           a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-        if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
+        if data.userOperationsId.includes('moveThread') || data.isModerator
           if data.type === 'latest'
             button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
-        if data.userLevel >= 6
+        if data.userOperationsId.includes('visitForumInfoSettings')
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
         +fastVisit()
@@ -167,10 +167,10 @@ block content
                   button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
             else
               a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-            if data.userLevel > 4 || (data.userLevel === 4 && data.forum.moderators.includes(data.user.uid))
+            if data.userOperationsId.includes('moveThread') || data.isModerator
               if data.type === 'latest'
                 button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
-            if data.userLevel >= 6
+            if data.userOperationsId.includes('visitForumInfoSettings')
               a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
                 span.fa.fa-cog &nbsp;设置
             +fastVisit()
@@ -329,8 +329,8 @@ block content
               button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
 
 block scripts
-  script(src='/interface_common.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   include MathJax
   if data.type === 'latest'
-    script(src='/module_dropdown.js?v=3')
-  script(src='/interface_forum.js?v=4')
+    script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_forum.js?v=${global.NKC.startTime}`)

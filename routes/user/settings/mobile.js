@@ -44,7 +44,7 @@ mobileRouter
 		}
 		await smsCodeOld.update({used: true});
 		await smsCode.update({used: true});
-		const newSecretBehavior = db.SecretBehaviorModel({
+		/*const newSecretBehavior = db.SecretBehaviorModel({
 			uid: user.uid,
 			type: 'changeMobile',
 			ip: ctx.address,
@@ -53,10 +53,10 @@ mobileRouter
 			oldNationCode: userPersonal.nationCode,
 			newMobile: mobile,
 			newNationCode: nationCode
-		});
+		});*/
 		await userPersonal.update({nationCode, mobile});
 		await user.update({$addToSet: {certs: 'mobile'}});
-		await newSecretBehavior.save();
+		// await newSecretBehavior.save();
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -76,17 +76,17 @@ mobileRouter
 		});
 		await smsCode.update({used: true});
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		const newSecretBehavior = db.SecretBehaviorModel({
+		/*const newSecretBehavior = db.SecretBehaviorModel({
 			uid: user.uid,
 			type: 'bindMobile',
 			ip: ctx.address,
 			port: ctx.port,
 			mobile,
 			nationCode
-		});
+		});*/
 		await userPersonal.update({nationCode, mobile});
 		await user.update({$addToSet: {certs: 'mobile'}});
-		await newSecretBehavior.save();
+		// await newSecretBehavior.save();
 		await next();
 	});
 module.exports = mobileRouter;

@@ -50,6 +50,16 @@ const userSchema = new Schema({
     type: Number,
     default: 0,
   },
+	// 在线天数
+	dailyLoginCount: {
+  	type: Number,
+		default: 0,
+	},
+	// 违规数
+	violationCount: {
+		type: Number,
+		default: 0
+	},
   score: {
     default: 0,
     type: Number
@@ -87,7 +97,11 @@ const userSchema = new Schema({
   postSign: String,
 	volumeA: {
   	type: Boolean,
-		default: 'false'
+		default: false
+	},
+	volumeB: {
+  	type: Boolean,
+		default: false
 	}
 },
 {toObject: {
@@ -209,6 +223,22 @@ userSchema.virtual('newMessage')
 		this._newMessage = newMessage;
 	});
 
+userSchema.virtual('grade')
+	.get(function() {
+		return this._grade;
+	})
+	.set(function(grade) {
+		this._grade = grade;
+	});
+
+userSchema.virtual('authLevel')
+	.get(function() {
+		return this._authLevel;
+	})
+	.set(function(authLevel) {
+		this._authLevel = authLevel;
+	});
+
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = require('./ThreadModel');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
@@ -247,35 +277,111 @@ userSchema.methods.extendRoles = async function() {
 	return this.roles = roles;
 };
 
+
+// 用户数据更新
 userSchema.methods.updateUserMessage = async function() {
-  const PostModel = require('./PostModel');
-  const ThreadModel = require('./ThreadModel');
-  const uid = this.uid;
-  const updateObj = {};
-  updateObj.postCount = await PostModel.count({uid});
-  updateObj.disabledPostsCount = await PostModel.count({uid, disabled: true});
-  updateObj.threadCount = await ThreadModel.count({uid});
-  updateObj.postCount = updateObj.postCount - updateObj.threadCount;
-  updateObj.disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
-  updateObj.digestThreadsCount = await ThreadModel.count({uid, digest: true});
-  updateObj.toppedThreadsCount = await ThreadModel.count({uid, topped: true});
-  const recCount = await PostModel.aggregate([
-    {
-      $match: {
-        uid,
-        'recUsers.0': {$exists: 1}
-      }
-    },
-    {
-      $unwind: '$recUsers'
-    },
-    {
-      $count: 'recCount'
-    }
-  ]);
-  updateObj.recCount = recCount.length !== 0? recCount[0].recCount: 0;
+  const PostModel = mongoose.model('posts');
+  const ThreadModel = mongoose.model('threads');
+  const UsersScoreLogModel = mongoose.model('usersScoreLogs');
+
+  const {uid} = this;
+	// 发帖回帖统计
+  const threads = await ThreadModel.find({uid}, {oc: 1, _id: 0});
+  const threadsOc = threads.map(t => t.oc);
+  const threadCount = threads.length;
+  const disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
+  const digestThreadsCount = await ThreadModel.count({uid, digest: true});
+  const toppedThreadsCount = await ThreadModel.count({uid, topped: true});
+
+  const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
+  const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
+	// 日常登录统计
+  const dailyLoginCount = await UsersScoreLogModel.count({
+	  uid,
+	  type: 'score',
+	  operationId: 'dailyLogin'
+  });
+	// 被赞统计
+	/*const recommendCount = await UsersScoreLogModel.count({
+		targetUid: uid,
+		type: 'score',
+		operationId: 'recommendPost'
+	});
+	const unRecommendCount = await UsersScoreLogModel.count({
+		targetUid: uid,
+		type: 'score',
+		operationId: 'UNRecommendPost'
+	});
+	const recCount = recommendCount - unRecommendCount;*/
+	const results = await PostModel.aggregate([
+		{
+			$match: {
+				uid,
+				disabled: false,
+				'recUsers.0': {$exists: 1}
+			}
+		},
+		{
+			$unwind: '$recUsers'
+		},
+		{
+			$count: 'recCount'
+		}
+	]);
+	let recCount = 0;
+	if(results.length !== 0) {
+		recCount = results[0].recCount;
+	}
+	// 违规统计
+	const violationCount = await UsersScoreLogModel.count({
+		targetUid: uid,
+		type: 'score',
+		operationId: 'violation'
+	});
+
+	const updateObj = {
+		threadCount,
+		postCount,
+		disabledPostsCount,
+		disabledThreadsCount,
+		digestThreadsCount,
+		toppedThreadsCount,
+		recCount,
+		dailyLoginCount,
+		violationCount
+	};
+
   await this.update(updateObj);
+  for(const key in updateObj) {
+  	if(!updateObj.hasOwnProperty(key)) continue;
+  	this[key] = updateObj[key];
+  }
+  await this.calculateScore();
 };
+
+// 积分计算
+userSchema.methods.calculateScore = async function() {
+	const SettingModel = mongoose.model('settings');
+	// 积分设置
+	const scoreSettings = await SettingModel.findOnly({type: 'score'});
+	const {coefficients} = scoreSettings;
+
+	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, recCount} = this;
+	// 积分计算
+	const scoreOfPostToThread = coefficients.postToThread*(postCount - disabledPostsCount);
+	const scoreOfPostToForum = coefficients.postToForum*(threadCount - disabledThreadsCount);
+	const scoreOfDigestThreadCount = coefficients.digest*digestThreadsCount;
+	const scoreOfXsf = coefficients.xsf*xsf;
+	const scoreOfDailyLogin = coefficients.dailyLogin*dailyLoginCount;
+	const scoreOfViolation = coefficients.violation*violationCount;
+	let scoreOfRecommend = 0;
+	if(recCount !== 0) {
+		scoreOfRecommend = Math.log10(recCount)/Math.log10(coefficients.thumbsUp);
+	}
+	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend - scoreOfViolation;
+	await this.update({score});
+};
+
 
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
@@ -287,7 +393,7 @@ userSchema.virtual('navbarDesc').get(function() {
   	certs.push('scholar');
   }
   for(const cert of certs) {
-  	if(cert)
+  	if(cert && certificates[cert] && certificates[cert].displayName)
       cs.push(certificates[cert].displayName);
   }
   cs = cs.join(' ');
@@ -301,6 +407,7 @@ userSchema.virtual('navbarDesc').get(function() {
     cs: cs
   }
 });
+
 
 userSchema.pre('save', async function(next) {
   // handle the ElasticSearch index
@@ -379,5 +486,16 @@ userSchema.statics.createUser = async (userObj) => {
 	}
 	return user;
 };
+
+userSchema.methods.extendGrade = async function() {
+	const UsersGradeModel = mongoose.model('usersGrades');
+	if(!this.score || this.score < 0) {
+		this.score = 0
+	}
+	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
+	return this.grade = grade;
+};
+
+
 
 module.exports = mongoose.model('users', userSchema);

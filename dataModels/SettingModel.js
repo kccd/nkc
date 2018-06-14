@@ -32,7 +32,7 @@ const settingSchema = new Schema({
     fundDocuments: Number,
     drafts: Number,
 	  operationTypes: Number,
-	  problems: Number
+	  problems: Number,
   },
 
 	//科创基金设置
@@ -58,14 +58,13 @@ const settingSchema = new Schema({
 	//科创币
 	//-------------------------------------
 	defaultUid: String,
-	changeUsername: Number,
-
 	//网站设置
 	//-------------------------------------
 	websiteName: String,
 	serverName: {
   	type: String,
 		get: function(n) {
+  		if(!n) return;
   		return n.replace('$', global.NKC.NODE_ENV)
 		}
 	},
@@ -84,7 +83,46 @@ const settingSchema = new Schema({
 	language: String,
 
 	//用户积分
-	operationsId: [String]
+	// ---------------------------------------
+	operationsId: [String],
+	formula: {
+  	type: String,
+	},
+	coefficients: { // 积分计算公式系数
+		postToThread: {
+			type: Number,
+			default: 1
+		},
+		postToForum: {
+			type: Number,
+			default: 1
+		},
+		digest: {
+			type: Number,
+			default: 1
+		},
+		dailyLogin: {
+			type: Number,
+			default: 1
+		},
+		xsf: {
+			type: Number,
+			default: 1
+		},
+		thumbsUp: {
+			type: Number,
+			default: 10
+		},
+		violation: {
+			type: Number,
+			default: 1
+		}
+	},
+
+	//下载
+	// ---------------------------------------
+	numberOfDays: Number, // 收费天数
+	numberOfKcb: Number, // 单次下载收取科创币数
 },
 {toObject: {
   getters: true,

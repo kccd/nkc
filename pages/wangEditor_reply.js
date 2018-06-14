@@ -3236,7 +3236,7 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     if (!pasteHtml) {
         return;
     }
-    console.log("----**没有过滤**----")
+    // console.log("----**没有过滤**----")
     //console.log(pasteHtml)
     // 过滤word中状态过来的无用字符
     var docSplitHtml = pasteHtml.split('</html>');
@@ -3303,8 +3303,8 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     pasteHtml = pasteHtml.replace(/<o:p.+?o:p>/igm, '&nbsp;');
     // 过滤style样式
     pasteHtml = pasteHtml.replace(/<style.+?style>/,'')
-    console.log("----**第一次过滤之后**----")
-    console.log(pasteHtml)
+    // console.log("----**第一次过滤之后**----")
+    // console.log(pasteHtml)
     return pasteHtml;
 }
 
@@ -3729,10 +3729,10 @@ Text.prototype = {
                     // 用户自定义过滤处理粘贴内容
                     pasteHtml = '' + (pasteTextHandle(pasteHtml) || '');
                 }
-                console.log(pasteHtml)
+                // console.log(pasteHtml)
                 pasteHtml = custom_xss_process(pasteHtml);
                 pasteHtml = pasteHtml.replace(/<(img.+?)src="(.+?)"(.+?)>/igm,"<$1 srcs='$2' src='/resources/site_specific/picloading.png' $3>")
-                console.log(pasteHtml)
+                // console.log(pasteHtml)
                 editor.cmd.do('insertHTML', pasteHtml);
             } catch (ex) {
                 // 此时使用 pasteText 来兼容一下

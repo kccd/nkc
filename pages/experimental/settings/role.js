@@ -1,9 +1,10 @@
 var data = $('#data').text();
-var defaultOperationsId, operations;
+var defaultOperationsId, operations, role;
 if(data) {
 	data = JSON.parse(data);
 	defaultOperationsId = data.defaultOperationsId;
 	operations = data.operations;
+	role = data.role
 }
 
 $('input[name="selectOperation"]').iCheck({
@@ -153,7 +154,7 @@ function getSelectOperation(typeId) {
 	var selectedOperations = [];
 	for(var i = 0 ; i < operations.length; i++) {
 		var operation = operations[i];
-		if(operation.typeId.indexOf(typeId) !== -1 && defaultOperationsId.indexOf(operation._id) === -1) {
+		if(operation.typeId.indexOf(typeId) !== -1 && (['visitor', 'banned', 'default'].includes(role._id) || defaultOperationsId.indexOf(operation._id) === -1)) {
 			selectedOperations.push(operation);
 		}
 	}

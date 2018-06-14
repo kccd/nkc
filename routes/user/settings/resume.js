@@ -22,8 +22,12 @@ resumeRouter
 				i.timeE = moment(i.timeE).format('YYYY-MM-DD');
 			}
 		}
-		const {contentClasses} = data.certificates;
-		const forums = await db.ForumModel.find({class: {$in: contentClasses}});
+		const options = {
+			gradeId: data.userGrade._id,
+			rolesId: data.userRoles.map(r => r._id),
+			uid: data.user?data.user.uid: ''
+		};
+		const forums = await db.ForumModel.accessibleForums(options);
 		const forumsObj = [];
 		for(let f of forums) {
 			let level = 2;

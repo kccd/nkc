@@ -38,7 +38,7 @@ examRouter
 			numberOfSubject = settings.exam.numberOfSubjectA;
 			numberOfCommon = settings.exam.numberOfCommonA;
 	  } else {
-		  if(user.certs.includes('examinated')) ctx.throw(400, '您已通过B卷考试，不需要再参加B卷考试了。');
+		  if(user.volumeB) ctx.throw(400, '您已通过B卷考试，不需要再参加B卷考试了。');
 		  const answerSheets = await db.AnswerSheetModel.find({uid: user.uid, isA: false, toc: {$gt: Date.now() - 24*60*60*1000}}).sort({toc: -1});
 		  if(answerSheets.length >= settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考B卷只有${settings.exam.numberOfExam}次考试机会。`);
 	  }
@@ -132,7 +132,7 @@ examRouter
 		const isA = questionsOfDB[0].category === 'mix';
 	  data.isA = isA;
 	  if(isA && user.volumeA) ctx.throw(400, '您已通过A卷考试，没有必要重新参加A卷考试。');
-	  if(!isA && user.certs.includes('examinated')) ctx.throw(400, '您已通过B卷考试，没有必要重新参加B卷考试。');
+	  if(!isA && user.volumeB) ctx.throw(400, '您已通过B卷考试，没有必要重新参加B卷考试。');
 	  const ip = ctx.address;
 	  const answerSheets = await db.AnswerSheetModel.find({uid: user.uid, isA, toc: {$gt: Date.now() - 24*60*60*1000}}).sort({toc: -1});
 	  if(answerSheets.length >= settings.exam.numberOfExam) ctx.throw(403, `抱歉！24小时内同一账号考${isA? 'A': 'B'}卷只有${settings.exam.numberOfExam}次考试机会。`);
@@ -177,6 +177,7 @@ examRouter
 		}
 		if(!isA && !user.certs.includes('examinated')) {
 			user.certs.push('examinated');
+			user.volumeB = true;
 		}
 		user.volumeA = true;
 		await user.save();

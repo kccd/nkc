@@ -1,0 +1,57 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  title 积分、科创币、学术分变动记录
+  -const typeObj = {'xsf': '学术分', 'score': '积分', 'kcb': '科创币'}
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        ul.nav.nav-pills(style='margin-bottom: 1rem;')
+          li(class=!data.type?'active':'')
+            a(href='/e/log/score' data-toggle='url') 全部
+          li(class=data.type==='xsf'?'active':'')
+            a(href='/e/log/score?type=xsf' data-toggle='url') 学术分
+          li(class=data.type==='kcb'?'active':'')
+            a(href='/e/log/score?type=kcb' data-toggle='url') 科创币
+          li(class=data.type==='score'?'active':'')
+            a(href='/e/log/score?type=score' data-toggle='url') 积分
+      .col-xs-12.col-md-12
+        -const type = data.type
+        include ../../interface_navigation_paging
+        table.table.table-hover
+          thead
+            tr
+              th 时间
+              th 类型
+              th 操作名
+              th 操作者
+              th 操作者分值（次数）变化
+              th 被操作者
+              th 被操作者分值（次数）变化
+          tbody
+            for log in data.logs
+              tr
+                th= log.toc.toLocaleString()
+                th= typeObj[log.type]
+                th= log.operation.description
+                th
+                  if log.user
+                    a(href=`/u/${log.uid}` target="_blank")
+                      img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                      span= log.user.username
+                  else
+                    span
+                th= log.change
+                th
+                  if log.targetUser
+                    a(href=`/u/${log.targetUid}` target="_blank")
+                      img(src=`/avatar/${log.targetUid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                      span= log.targetUser.username
+                  else
+                    span
+                th= log.targetChange
+      include ../../interface_navigation_paging

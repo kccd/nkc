@@ -1,0 +1,63 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 操作设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-12
+            .row
+              .col-xs-12.col-md-12
+                //- ul.nav.nav-pills
+                //-   li(role='presentation' class=!data.type?'active':'')
+                //-     a(href=`/e/log/secret?type=email`) 邮箱修改
+                //-   li(role='presentation' class=data.type==='password'?'active':'')
+                //-     a(href=`/e/log/secret?type=password`) 密码修改
+                //-   li(role='presentation' class=data.type==='mobile'?'active':'')
+                //-     a(href=`/e/log/secret?type=mobile`) 手机修改
+                //-   li(role='presentation' class=data.type==='username'?'active':'')
+                //-     a(href=`/e/log/secret?type=username`) 用户名修改
+              .col-xs-12.col-md-12
+                -const type = data.type
+                include ../../interface_navigation_paging      
+                  .col-xs-12.col-md-12
+                    table.table.table-hover
+                      thead
+                        tr
+                          th 操作名称
+                          th 操作者
+                          th 板块id
+                          th 帖子id
+                          th 时间
+                      tbody
+                        for behavior in data.result
+                          tr
+                            th= behavior.operationData ? behavior.operationData.description : behavior.operationId
+                            th
+                              if behavior.uid
+                                a(href=`/u/${behavior.uid}` target="_blank")
+                                  span= behavior.user.username
+                            th= behavior.fid
+                            th
+                              a(href=`/t/${behavior.tid}` target="_blank")
+                                span=behavior.tid
+                            -let behTime = behavior.toc?behavior.toc.toLocaleString():'';
+                            -beTime = behavior.timeStamp?behavior.timeStamp.toLocaleString():'';
+                            th= beTime
+
+
+block scripts
+
+  script(src='/icheck/icheck.js')
+  script(src='/interface_common.js')
+  script(src='/laydate/laydate.dev.js')
+
+
+

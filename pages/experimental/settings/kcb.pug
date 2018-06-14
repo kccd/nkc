@@ -1,0 +1,36 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title kcb设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .col-xs-12.col-md-12
+            .form-horizontal
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  h4 修改用户名
+              .form-group
+                .col-sm-2.control-label 默认账户UID
+                .col-sm-3
+                  input.form-control#defaultUid(type='String' value=data.kcbSettings.defaultUid || '5805')
+              .form-group
+                .col-sm-2.control-label
+                .col-sm-2
+                  button.btn.btn-primary(onclick='saveKcbSettings()') 保存
+
+
+block scripts
+
+  script(src='/interface_common.js')
+  script(src='/experimental/settings/kcb.js')
+
+
+
+

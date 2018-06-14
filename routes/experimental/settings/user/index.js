@@ -20,6 +20,7 @@ userRouter
 			if(targetUser) {
 				await targetUser.extend();
 			}
+			data.targetUser = targetUser;
 		} else {
 			if(page) {
 				page = parseInt(page);
@@ -59,11 +60,13 @@ userRouter
 			// 添加角色
 			const {roleDisplayName} = body;
 			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
+			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
 			await targetUser.update({$addToSet: {certs: role._id}});
 		} else if(operation === 'removeRole') {
 			// 移除角色
 			const {roleDisplayName} = body;
 			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
+			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
 			await targetUser.update({$pull: {certs: role._id}});
 
 		} else {
@@ -86,6 +89,8 @@ userRouter
 				if (checkEmailFormat(email) === -1) {
 					ctx.throw(400, '邮箱格式不正确');
 				}
+				const u = await db.UsersPersonalModel.findOne({uid: {$ne: targetUser.uid}, email});
+				if(u) ctx.throw(400, '邮箱已被注册');
 				q.email = email;
 			}
 
@@ -110,32 +115,12 @@ userRouter
 					toc: {$gt: Date.now() - 365 * 24 * 60 * 60 * 1000}
 				}).sort({toc: -1});
 				if (oldUsername && oldUsername.uid !== targetUser.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
-				const newSecretBehavior = db.SecretBehaviorModel({
-					type: 'changeUsername',
-					oldUsername: targetUser.username,
-					oldUsernameLowerCase: targetUser.usernameLowerCase,
-					newUsername: username,
-					newUsernameLowerCase: username.toLowerCase(),
-					uid: targetUser.uid,
-					ip: ctx.address,
-					port: ctx.port
-				});
-				await newSecretBehavior.save();
+
 				q.username = username;
 				q.usernameLowerCase = username.toLowerCase();
 			}
 			await targetUser.update(q);
 			await targetUserPersonal.update(q);
-			if(q.nationCode && q.mobile) {
-				await targetUser.update({$addToSet: {certs: 'mobile'}});
-			} else {
-				await targetUser.update({$pull: {certs: 'mobile'}});
-			}
-			if(q.email) {
-				await targetUser.update({$addToSet: {certs: 'email'}});
-			} else {
-				await targetUser.update({$pull: {certs: 'email'}});
-			}
 		}
 		await next();
 	});

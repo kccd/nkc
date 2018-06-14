@@ -20,11 +20,13 @@ const delPostLogSchema = new Schema({
   // 被删除帖子的主帖id
   threadId: {
     type: String,
+	  index: 1,
     default: ''
   },
   // 被删除帖子的回帖id，如果删除的是主帖则为空
   postId: {
     type: String,
+	  index: 1,
     default: ''
   },
   // 删帖是否通知 true false

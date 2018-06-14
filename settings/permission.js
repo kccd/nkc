@@ -546,6 +546,10 @@ const certificates ={
           		[name]: '用户头像设置',
 			        [GET]: true
 		        },
+		        username: {
+							[name]: '修改用户名',
+			        [PATCH]: true
+		        },
 		        info: {
           		[name]: '基本资料设置',
 			        [GET]: true,
@@ -571,7 +575,15 @@ const certificates ={
           		[name]: '邮箱绑定',
 			        [GET]: true,
 			        [POST]: true,
-			        [PATCH]: true
+			        [PATCH]: true,
+			        bind: {
+          			[name]: '验证绑定邮箱',
+				        [GET]:true
+			        },
+			        verify: {
+          			[name]: '验证新邮箱',
+				        [GET]: true
+			        }
 		        },
 		        verify: {
           		[name]: '身份认证',
@@ -1054,7 +1066,33 @@ const certificates ={
         		[name]: '用户积分',
 			      [GET]: true,
 			      [PATCH]: true
-		      }
+		      },
+          log: {
+        	  [name]: '日志设置',
+            [GET]: true,
+            [PATCH]: true,
+            [POST]: true
+          },
+		      download: {
+        		[name]: '下载设置',
+			      [GET]: true,
+			      [PATCH]: true
+		      },
+		      grade: {
+        		[name]: '用户等级设置',
+			      [GET]: true,
+			      [POST]: true,
+			      [parameter]: {
+        			[GET]: true,
+				      [DELETE]: true,
+				      [PATCH]: true
+			      }
+		      },
+		      kcb: {
+        		[name]: '科创币设置',
+			      [GET]: true,
+			      [PATCH]: true
+		      },
 	      },
 	      status: {
 	      	[name]: '统计',
@@ -1098,22 +1136,22 @@ const certificates ={
 			    [POST]: true
 		    }
 	    },
+	    problem: {
+		    list: {
+			    [GET]: true,
+			    [parameter]: {
+				    [GET]: true,
+				    [PATCH]: true,
+				    [DELETE]: true
+			    }
+		    }
+	    },
     }
   },
   dev: {
     displayName: '运维',
     inheritFrom: ['editor'],
     permittedOperations: {
-    	problem: {
-    		list: {
-    			[GET]: true,
-			    [parameter]: {
-    				[GET]: true,
-				    [PATCH]: true,
-				    [DELETE]: true
-			    }
-		    }
-	    },
     	system: {
 				[name]: '网站系统',
 		    [GET]: true,

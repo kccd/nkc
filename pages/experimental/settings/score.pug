@@ -11,40 +11,85 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-4
         #content
-          table.table.table-hover
-            thead
-              tr
-                th 序号
-                th 操作名
-                th 操作介绍
-                th 操作者分数变化
-                th 被操作者分数变化
-                th 状态
-            tbody
-              -let n = 0;
-              for operation in data.operations
-                -n++;
+          .list-group
+            -let n = 0;
+            mixin operationPanel(operation)
+              -n++;
+              -selected = data.scoreSettings.operationsId.includes(operation._id)
+              a.list-group-item(href=`/e/settings/score?type=${operation._id}` type='button' class=selected ? 'list-group-item-info' : '' style='cursor: pointer;')
+                strong= `${n}. `
+                span= `${operation.description}（${operation._id}）`
+                if operation.kcb.status
+                  span - 科创币 -
+                if operation.xsf.status
+                  span - 学术分 -
+            for operation in data.scoreOperations
+              +operationPanel(operation)
+            for operation in data.operations
+              +operationPanel(operation)
+      .col-xs-12.col-md-8
+        .panel.panel-default
+          .panel-heading
+            span= data.operation.description
+          .panel-body
+            -const operation = data.operation;
+            table.table
+              thead
                 tr
-                  th= n
-                  th= operation._id
-                  th= operation.description
+                  th 类型
+                  th 受影响的人
+                  th 每天有效次数
+                  th 分数变化
+                  th 开启
+              tbody
+                tr
                   th
-                    input(type='number' value= operation.score name='score' class=operation._id)
+                    h4 科创币
                   th
-                    input(type='number' value= operation.targetScore name='targetScore' class=operation._id)
+                    span 操作者
+                    br
+                    span 被操作者
+                  th
+                    input.kcb(type='number' name='count' value=operation.kcb.count)
+                    br
+                    input.kcb(type='number' name='targetCount' value=operation.kcb.targetCount)
+                  th
+                    input.kcb(type='number' name='change' value=operation.kcb.change)
+                    br
+                    input.kcb(type='number' name='targetChange' value=operation.kcb.targetChange)
                   th
                     label
                       .icheckbox
-                        if data.scoreSettings.operationsId.includes(operation._id)
-                          input(type='checkbox' name='selectOperation' data-operation=operation._id checked=true)
+                        if operation.kcb.status
+                          input.kcb(type='checkbox' name='selectOperation' checked=true)
                         else
-                          input(type='checkbox' name='selectOperation' data-operation=operation._id )
+                          input.kcb(type='checkbox' name='selectOperation')
+                tr
+                  th
+                    h4 学术分
+                  th
+                    span 操作者
+                    br
+                    span 被操作者
+                  th
+                    input.xsf(type='number' name='count' value=operation.xsf.count)
+                    br
+                    input.xsf(type='number' name='targetCount' value=operation.xsf.targetCount)
+                  th
+                    input.xsf(type='number' name='change' value=operation.xsf.change)
+                    br
+                    input.xsf(type='number' name='targetChange' value=operation.xsf.targetChange)
+                  th
+                    label
+                      .icheckbox
+                        if operation.xsf.status
+                          input.xsf(type='checkbox' name='selectOperation' checked=true)
+                        else
+                          input.xsf(type='checkbox' name='selectOperation')
 
-          button.btn.btn-primary(onclick='submit()') 保存
-
-
+            button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
 
 block scripts
 

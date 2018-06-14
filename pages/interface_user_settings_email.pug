@@ -5,96 +5,102 @@ block title
 block content
   .container-fluid(style='max-width: 1400px;')
     .row
-      .col-xs-12.col-md-2
-        include module_user_settings
-      .col-xs-12.col-md-10
-        .panel.panel-primary
-          .panel-heading
-            span 绑定邮箱
-          .panel-body
-            .form-horizontal
-              if data.operation === 'changeEmail'
-                input.hidden#oldToken(value=data.token)
-                .form-group
-                  .col-sm-10.col-sm-offset-2
-                    span.text-success 旧邮箱验证成功。
-                    br
-                    br
-                  label.col-sm-2.control-label 新邮箱：
-                  .col-sm-4
-                    input.form-control#email(type='email' placeholder='请输入新邮箱')
+      if data.success
+        -success = true;
+        -prompt = '邮箱验证通过';
+        .col-xs-12.col-md-12
+          include module_prompt
+        .col-xs-12.col-md-12.text-center
+          a.btn.btn-primary(href=`/u/${data.user.uid}/settings/email`) 继续编辑资料
+      else
+        .col-xs-12.col-md-2
+          include module_user_settings
+        .col-xs-12.col-md-10
+          .panel.panel-primary
+            .panel-heading
+              span 绑定邮箱
+            .panel-body
+              .form-horizontal
+                if data.operation === 'changeEmail'
+                  input.hidden#oldToken(value=data.token)
+                  .form-group
+                    .col-sm-10.col-sm-offset-2
+                      span.text-success 旧邮箱验证成功。
+                      br
+                      br
+                    label.col-sm-2.control-label 新邮箱：
+                    .col-sm-4
+                      input.form-control#email(type='email' placeholder='请输入新邮箱')
 
-                .form-group
-                  .col-sm-4.col-sm-offset-2
-                    button.btn.btn-primary(onclick=`sendNewEmail(${data.user.uid})`) 发送验证邮件
-                .form-group#verifyNewEmailDiv(style='display: none;')
-                  .col-sm-6.col-sm-offset-2
-                    p.text-success 邮件已发送至
-                      span#newEmail
-                      span ，请前往邮箱点击邮件中的链接或将邮件中的验证码填入下方输入框点击提交完成新邮箱的验证。
-                  .col-sm-6.col-sm-offset-2
-                    .col-sm-12
-                      form.form-inline(method='GET', action=`/u/${data.user.uid}/settings/email`)
-                        .form-group
-                          label 邮件验证码
-                          input.hidden(name='email')
-                          input.hidden(name='oldToken' value=data.token)
-                          input.hidden(value='verifyNewEmail' name='operation')
-                          input.form-control(type='text' name='token')
-                          input.form-control(type='submit' value='提交')
+                  .form-group
+                    .col-sm-4.col-sm-offset-2
+                      button.btn.btn-primary(onclick=`sendNewEmail(${data.user.uid})`) 发送验证邮件
+                  .form-group#verifyNewEmailDiv(style='display: none;')
+                    .col-sm-6.col-sm-offset-2
+                      p.text-success 邮件已发送至
+                        span#newEmail
+                        span ，请前往邮箱点击邮件中的链接或将邮件中的验证码填入下方输入框点击提交完成新邮箱的验证。
+                    .col-sm-6.col-sm-offset-2
+                      .col-sm-12
+                        form.form-inline(method='GET', action=`/u/${data.user.uid}/settings/email/verify`)
+                          .form-group
+                            label 邮件验证码
+                            input.hidden(name='email')
+                            input.hidden(name='oldToken' value=data.token)
+                            input.form-control(type='text' name='token')
+                            input.form-control(type='submit' value='提交')
 
-              else if data.userEmail
-                .form-group
-                  label.col-sm-2.control-label 已绑定邮箱：
-                  .col-sm-4
-                    h4= data.userEmail
-                .form-group#changeSwitch
-                  .col-sm-4.col-sm-offset-2
-                    button.btn.btn-primary(onclick=`displayChangeDiv()`) 更换邮箱
-                .form-group#changeBtnDiv(style='display: none;')
-                  .col-sm-6.col-sm-offset-2
-                    h5.text-danger *更换绑定邮箱需要验证旧邮箱，请点击发送按钮发送验证邮件。
-                    button.btn.btn-primary#changeBtn(onclick=`verifyOldEmail("${data.user.uid}", "${data.userEmail}")`) 发送验证邮件
+                else if data.userEmail
+                  .form-group
+                    label.col-sm-2.control-label 已绑定邮箱：
+                    .col-sm-4
+                      h4= data.userEmail
+                  .form-group#changeSwitch
+                    .col-sm-4.col-sm-offset-2
+                      button.btn.btn-primary(onclick=`displayChangeDiv()`) 更换邮箱
+                  .form-group#changeBtnDiv(style='display: none;')
+                    .col-sm-6.col-sm-offset-2
+                      h5.text-danger *更换绑定邮箱需要验证旧邮箱，请点击发送按钮发送验证邮件。
+                      button.btn.btn-primary#changeBtn(onclick=`verifyOldEmail("${data.user.uid}", "${data.userEmail}")`) 发送验证邮件
 
-                .form-group#verifyOldEmailDiv(style='display: none;')
-                  .col-sm-6.col-sm-offset-2
-                    p.text-success 邮件已发送至
-                      span#oldEmail
-                      span ，请前往邮箱点击邮件中的链接或将邮件中的验证码填入下方输入框点击提交完成旧邮箱的验证。
-                  .col-sm-6.col-sm-offset-2
-                    .col-sm-12
-                      form.form-inline(method='GET', action=`/u/${data.user.uid}/settings/email`)
-                        .form-group
-                          label 邮件验证码
-                          input.hidden(value=data.userEmail name='email')
-                          input.hidden(value='verifyOldEmail' name='operation')
-                          input.form-control(type='text' name='token')
-                          input.form-control(type='submit' value='提交')
+                  .form-group#verifyOldEmailDiv(style='display: none;')
+                    .col-sm-6.col-sm-offset-2
+                      p.text-success 邮件已发送至
+                        span#oldEmail
+                        span ，请前往邮箱点击邮件中的链接或将邮件中的验证码填入下方输入框点击提交完成旧邮箱的验证。
+                    .col-sm-6.col-sm-offset-2
+                      .col-sm-12
+                        form.form-inline(method='GET', action=`/u/${data.user.uid}/settings/email`)
+                          .form-group
+                            label 邮件验证码
+                            input.hidden(value=data.userEmail name='email')
+                            input.hidden(value='verifyOldEmail' name='operation')
+                            input.form-control(type='text' name='token')
+                            input.form-control(type='submit' value='提交')
 
 
-              else
-                .form-group
-                  label.col-sm-2.control-label 邮箱：
-                  .col-sm-4
-                    input.form-control#email(type='email' placeholder='请输入邮箱')
+                else
+                  .form-group
+                    label.col-sm-2.control-label 邮箱：
+                    .col-sm-4
+                      input.form-control#email(type='email' placeholder='请输入邮箱')
 
-                .form-group
-                  .col-sm-4.col-sm-offset-2
-                    button.btn.btn-primary(onclick=`sendBindEmail(${data.user.uid})`) 发送验证邮件
-                .form-group#bindEmailDiv(style='display: none;')
-                  .col-sm-6.col-sm-offset-2
-                    p.text-success 邮件已发送至
-                      span#emailInfo
-                      span ，请前往邮箱点击邮件中的链接或将邮件中的验证码填入下方输入框点击提交完成旧邮箱的验证。
-                  .col-sm-6.col-sm-offset-2
-                    .col-sm-12
-                      form.form-inline(method='GET', action=`/u/${data.user.uid}/settings/email`)
-                        .form-group
-                          label 邮件验证码
-                          input.hidden(name='email')
-                          input.hidden(value='bindEmail' name='operation')
-                          input.form-control(type='text' name='token')
-                          input.form-control(type='submit' value='提交')
+                  .form-group
+                    .col-sm-4.col-sm-offset-2
+                      button.btn.btn-primary(onclick=`sendBindEmail(${data.user.uid})`) 发送验证邮件
+                  .form-group#bindEmailDiv(style='display: none;')
+                    .col-sm-6.col-sm-offset-2
+                      p.text-success 邮件已发送至
+                        span#emailInfo
+                        span ，请前往邮箱点击邮件中的链接或将邮件中的验证码填入下方输入框点击提交完成邮箱验证。
+                    .col-sm-6.col-sm-offset-2
+                      .col-sm-12
+                        form.form-inline(method='GET', action=`/u/${data.user.uid}/settings/email/bind`)
+                          .form-group
+                            label 邮件验证码
+                            input.hidden(name='email')
+                            input.form-control(type='text' name='token')
+                            input.form-control(type='submit' value='提交')
 block scripts
   script(src='/interface_common.js')
   script(src='/interface_user_settings_email.js')

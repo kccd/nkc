@@ -20,6 +20,7 @@ var mobeilConfig = [
     'code',  // 插入代码
     'undo',  // 撤销
     'redo',  // 重复
+    // 'clean', // 清除格式
 ]
 var pcConfig = [
     'head',  // 标题
@@ -43,6 +44,7 @@ var pcConfig = [
     'code',  // 插入代码
     'undo',  // 撤销
     'redo',  // 重复
+    'clean', // 清除格式
 ]
 function IsPC() {
     var userAgentInfo = navigator.userAgent;

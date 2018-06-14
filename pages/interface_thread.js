@@ -123,7 +123,47 @@ function cartPost(pid){
   })
 }
 
-function setDigest(tid){
+function setDigest(tid) {
+	nkcAPI('/t/'+tid+'/digest', 'POST', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+
+function cancelDigest(tid) {
+	nkcAPI('/t/'+tid+'/digest', 'DELETE', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+
+function setTopped(tid) {
+	nkcAPI('/t/'+tid+'/topped', 'POST', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+
+function cancelTopped(tid) {
+	nkcAPI('/t/'+tid+'/topped', 'DELETE', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+
+/*function setDigest(tid){
   var setDigest = '设置精华';
   var unSetDigest = '撤销精华';
   var dateObj = {};
@@ -145,9 +185,9 @@ function setDigest(tid){
   .catch(function(data){
     screenTopWarning('操作失败： ' + data.error);
   })
-}
+}*/
 
-function setTopped(tid){
+/*function setTopped(tid){
   var dataObj = {};
   var setTop = '设置置顶';
   var unSetTop = '撤销置顶';
@@ -168,7 +208,7 @@ function setTopped(tid){
   .catch(function(data){
     return screenTopWarning('操作失败： ' + data.error);
   })
-}
+}*/
 
 function assemblePostObject(){  //bbcode , markdown
   var quoteHtml = document.getElementById('quoteContent').innerHTML;
@@ -201,7 +241,7 @@ function assemblePostObject(){  //bbcode , markdown
 
 function disablePostClick(pid){
   window.localStorage.pid = pid
-  console.log(window.localStorage)
+  // console.log(window.localStorage)
 }
 
 function disablePost(pid,para){
@@ -254,7 +294,7 @@ function saveDraft(threadId,userId){
   return nkcAPI(url, method, data)
     .then(function (result) {
       if(result.status == "success"){
-        console.log(result.did)
+        // console.log(result.did)
         $("#draftId").html(result.did)
         jalert("保存成功！");
       }
@@ -263,7 +303,7 @@ function saveDraft(threadId,userId){
       }
     })
     .catch(function (data) {
-      console.log(data)
+      // console.log(data)
       jwarning(data.error);
     })
 }
@@ -393,7 +433,7 @@ function addColl(tid){
 function addCredit(pid){
   var cobj = promptCredit(pid)
   if(cobj){
-    return nkcAPI('/p/'+pid+'/credit', 'PATCH',cobj)
+    return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',cobj)
     .then(function(){
       window.location.reload()
     })

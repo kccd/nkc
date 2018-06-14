@@ -15,7 +15,23 @@ postRouter
     const {data, db} = ctx;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
-    if(!await post.ensurePermission(ctx)) ctx.throw(403,'权限不足');
+    const thread = await post.extendThread();
+	  const forum = await thread.extendForum();
+    const gradeId = data.userGrade._id;
+    const rolesId = data.userRoles.map(r => r._id);
+    const {user} = data;
+	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
+    // 判断用户是否具有访问该post所在文章的权限
+    const options = {
+    	gradeId,
+	    rolesId,
+	    isModerator,
+	    userOperationsId: data.userOperationsId,
+	    uid: user?user.uid: ''
+    };
+    // 权限判断
+	  await post.ensurePermissionNew(options);
+		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();
     data.post = post;
@@ -28,15 +44,37 @@ postRouter
     const {pid} = ctx.params;
     const {data, db, fs} = ctx;
     const {user} = data;
-	  if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const authLevel = await userPersonal.getAuthLevel();
+	  if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
-    const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
+    const targetThread = await targetPost.extendThread();
+    const targetForum = await targetThread.extendForum();
+    const isModerator = await targetForum.isModerator(user.uid);
+    // 权限判断
+    if(!data.userOperationsId.includes('modifyOtherPosts') && !isModerator) {
+    	if(user.uid !== targetPost.uid) ctx.throw(403, '您没有权限修改别人的回复');
+    	if(targetPost.disabled && !targetPost.toDraft) {
+    		ctx.throw(403, '回复已被屏蔽，暂不能修改');
+	    }
+    }
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
-    if(user.uid !== targetPost.uid && !await targetThread.ensurePermissionOfModerators(ctx))
-      ctx.throw(403,'您没有权限修改别人的回复');
+    // 修改回复的时间限制
+    let modifyPostTimeLimit = 0;
+    for(const r of data.userRoles) {
+			if(r.modifyPostTimeLimit === -1) {
+				modifyPostTimeLimit = -1;
+				break;
+			}
+			if(r.modifyPostTimeLimit > modifyPostTimeLimit) {
+				modifyPostTimeLimit = r.modifyPostTimeLimit;
+			}
+    }
+    if(modifyPostTimeLimit !== -1 && (Date.now() - targetPost.toc.getTime() > modifyPostTimeLimit*60*60*1000))
+    	ctx.throw(403, `您只能需改${modifyPostTimeLimit}小时前发表的内容`);
     const objOfPost = Object.assign(targetPost, {}).toObject();
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);
@@ -81,7 +119,9 @@ postRouter
       tid: targetThread.tid
     };
 	  await targetPost.save();
-	  if(!await targetThread.ensurePermissionOfModerators(ctx)) q.disabled = false;
+	  if(!isModerator && !data.userOperationsId.includes('displayDisabledPosts')) {
+	  	q.disabled = false;
+	  }
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;
     page = `?page=${page}`;

@@ -12,49 +12,83 @@ function initTime() {
 
 $(function() {
 	initTime();
-	if($('#myChart').length !== 0) {
-		display();
-	}
-});
-
-
-function display() {
-	var ctx = document.getElementById("myChart").getContext('2d');
-	var myChart = new Chart(ctx, {
-		type: 'line',
-		data: {
-			labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-			datasets: [{
-				label: '# of Votes',
-				data: [12, 19, 3, 5, 2, 3],
-				backgroundColor: [
-					'rgba(255, 99, 132, 0.2)',
-					'rgba(54, 162, 235, 0.2)',
-					'rgba(255, 206, 86, 0.2)',
-					'rgba(75, 192, 192, 0.2)',
-					'rgba(153, 102, 255, 0.2)',
-					'rgba(255, 159, 64, 0.2)'
-				],
-				borderColor: [
-					'rgba(255,99,132,1)',
-					'rgba(54, 162, 235, 1)',
-					'rgba(255, 206, 86, 1)',
-					'rgba(75, 192, 192, 1)',
-					'rgba(153, 102, 255, 1)',
-					'rgba(255, 159, 64, 1)'
-				],
-				borderWidth: 1
-			}]
-		},
-		options: {
-			responsive: true,
-			scales: {
-				yAxes: [{
-					ticks: {
-						beginAtZero:true
-					}
-				}]
+	getResults({type: 'today'});
+	var radios = $('input:radio[name="statusType"]');
+	radios.on('ifChanged', function() {
+		for(var i = 0; i < radios.length; i ++) {
+			var radio = radios.eq(i);
+			if(radio.prop('checked')) {
+				var type = radio.attr('data-type');
+				getResults({type: type});
 			}
 		}
 	});
+});
+
+$('input[name="statusType"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+	radioClass: 'iradio_minimal-red',
+});
+
+
+function getResults(options) {
+	var type = options.type;
+	if(type === 'custom') {
+		return;
+	}
+	nkcAPI('/e/status?type='+type, 'GET', {})
+		.then(function(data) {
+			display(data.results);
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error|| data);
+		})
 }
+
+function display(results) {
+
+
+	var myChart = echarts.init(document.getElementById('main'));
+
+
+	// 指定图表的配置项和数据
+	var option = {
+		title: {
+			text: ''
+		},
+		tooltip: {
+			trigger: 'axis'
+		},
+		legend: {
+			data:['发表文章', '发表回复', '用户注册']
+		},
+		xAxis: {
+			data: results.x
+		},
+		yAxis: {},
+		series: [
+			{
+				name: '发表文章',
+				type: 'line',
+				stack: '总量',
+				data: results.threadsData
+			},
+			{
+				name: '发表回复',
+				type: 'line',
+				stack: '总量',
+				data: results.postsData
+			},
+			{
+				name: '用户注册',
+				type: 'line',
+				stack: '总量',
+				data: results.usersData
+			}
+		]
+	};
+
+	// 使用刚指定的配置项和数据显示图表。
+	myChart.setOption(option);
+}
+

@@ -10,6 +10,7 @@ const transactionRouter = require('./transaction');
 const photoRouter = require('./photo');
 const certRouter = require('./cert');
 const socialRouter = require('./social');
+const usernameRouter = require('./username');
 settingRouter
 	.use('/', async (ctx, next) => {
 		const {data, params, db} = ctx;
@@ -26,6 +27,7 @@ settingRouter
 	})
 	.use('/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
 	.use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods())
+	.use('/username', usernameRouter.routes(), usernameRouter.allowedMethods())
 	.use('/resume', resumeRouter.routes(), resumeRouter.allowedMethods())
 	.use('/password', passwordRouter.routes(), passwordRouter.allowedMethods())
 	.use('/social', socialRouter.routes(), socialRouter.allowedMethods())

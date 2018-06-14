@@ -73,7 +73,7 @@ block content
                 注意：每24小时只能重考5次。
           else
             if data.isA === 'true'
-              if data.user.certs.includes('mobile')
+              if data.user.volumeA
                 h4.text-center= `恭喜您通过了A卷考试，现在可以发布内容了。如需提升账号等级，请参加B卷考试。`
                   a(href=`/exam`)=` 去考试`
               else

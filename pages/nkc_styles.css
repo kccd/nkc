@@ -4,7 +4,11 @@ h1, h2, h3, h4, h5, p{
 .margin-right{
   margin-right: 5px;
 }
-
+.user-grade{
+  padding: 2px 5px;
+  color: #ffffff;
+  border-radius: 2px;
+}
 .navbar-toggle{
   float: left;
   margin-left: 15px;
@@ -2268,7 +2272,7 @@ img.emoji {
 }
 .user-info-list.forum-list .description{
   display: -webkit-box;
-  height: 1.6em;
+  height: 1.2em;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;

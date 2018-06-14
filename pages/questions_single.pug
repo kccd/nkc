@@ -30,8 +30,8 @@
               text #{index+1}. #{a}
 
           
-  if q.uid == data.user.qid || data.userLevel >= 6
+  if (data.user && q.uid === data.user.qid) || data.userOperationsId.includes('deleteQuestion')
     button(onclick=`remove_question('/q/${q.category}/${q.qid}')`) 删掉
+  if (data.user && q.uid === data.user.qid) || data.userOperationsId.includes('modifyQuestion')
     button(onclick=`load_question('/q/${q.category}/${q.qid}')`) 修改
-
   hr.hrNarrowSpace

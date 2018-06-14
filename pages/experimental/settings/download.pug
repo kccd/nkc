@@ -1,0 +1,40 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 下载设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .col-xs-12.col-md-12
+            .form-horizontal
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  h4 附件下载
+              .form-group
+                .col-sm-2.control-label 收费天数
+                .col-sm-3
+                  input.form-control#numberOfDays(type='number' value=data.downloadSettings.numberOfDays)
+              .form-group
+                .col-sm-2.control-label 单次花费kcb
+                .col-sm-3
+                  input.form-control#numberOfKcb(type='number' value=data.downloadSettings.numberOfKcb)
+              .form-group
+                .col-sm-2.control-label
+                .col-sm-2
+                  button.btn.btn-primary(onclick='saveDownloadFile()') 保存
+
+
+block scripts
+
+  script(src='/interface_common.js')
+  script(src='/experimental/settings/download.js')
+
+
+
+

@@ -26,6 +26,12 @@ const postSchema = new Schema({
     default: false,
     index: 1
   },
+	// 是否被退回修改。true: 被退回， false: 被彻底屏蔽
+	toDraft: {
+		type: Boolean,
+		default: null,
+		index: 1
+	},
   ipoc: {
     type: String,
     default: '0.0.0.0'
@@ -39,6 +45,7 @@ const postSchema = new Schema({
   },
   recUsers: {
     type: [String],
+	  index: 1,
     default: []
   },
   rpid: {
@@ -130,20 +137,40 @@ postSchema.virtual('thread')
   });
 
 postSchema.methods.extendThread = async function() {
-  const ThreadModel = require('./ThreadModel');
+  const ThreadModel = mongoose.model('threads');
   return this.thread = await ThreadModel.findOnly({tid: this.tid})
 };
 
 postSchema.methods.extendResources = async function() {
-  const ResourceModel = require('./ResourceModel');
+  const ResourceModel = mongoose.model('resources');
   return this.resources = await ResourceModel.find({references: this.pid})
 };
 
 postSchema.methods.extendUser = async function() {
-  const UserModel = require('./UserModel');
+  const UserModel = mongoose.model('users');
   return this.user = await UserModel.findOnly({uid: this.uid});
 };
 
+postSchema.methods.ensurePermissionNew = async function(options) {
+	await this.thread.ensurePermission(options);
+	const {isModerator, userOperationsId, uid} = options;
+	if(this.disabled) {
+		if(!isModerator) {
+			if(this.toDraft && !userOperationsId.includes('displayRecycleMarkThreads')) {
+				if(!uid || uid.uid !== this.uid) {
+					const err = new Error('权限不足');
+					err.status = 403;
+					throw err;
+				}
+			}
+			if(!this.toDraft && !userOperationsId.includes('displayDisabledPosts')) {
+				const err = new Error('权限不足');
+				err.status = 403;
+				throw err;
+			}
+		}
+	}
+};
 
 postSchema.methods.ensurePermission = async function(ctx) {
   const {ThreadModel} = ctx.db;

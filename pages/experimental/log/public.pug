@@ -1,0 +1,65 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 操作设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-3
+            .form
+              .form-group
+                label 开始时间
+                input.form-control#startTime(placeholder="开始时间" req="true" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})")
+              .form-group
+                label 结束时间  
+                input.form-control#endTime(placeholder="结束时间" req="true" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})")
+              .form-group
+                label 用户uid  
+                input.form-control#userId
+              .form-group
+                label IP地址
+                input.form-control#ipAdress
+              .form-group
+                button.btn.btn-primary.btn-block(onclick='delLogs()') 删除
+          .col-xs-12.col-md-9
+            -const type = data.type
+            include ../../interface_navigation_paging      
+              .col-xs-12.col-md-12
+                table.table.table-hover
+                  thead
+                    tr
+                      th 类型
+                      th 用户id
+                      th 用户名称
+                      th 时间
+                      th 请求方法
+                      th ip
+                  tbody
+                    for log in data.result
+                      tr
+                        th= log.operationData ? log.operationData.description : log.operationId
+                        th= log.uid
+                        -const username = log.user?log.user.username : ''
+                        th= username
+                        th= fromNow(log.toc)
+                        th= log.method
+                        th= log.ip
+
+
+block scripts
+
+  script(src='/icheck/icheck.js')
+  script(src='/interface_common.js')
+  script(src='/experimental/settings/operation.js')
+  script(src='/experimental/log/public.js')
+  script(src='/laydate/laydate.dev.js')
+
+
+

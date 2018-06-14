@@ -1,3 +1,4 @@
+const mongoose = require('../settings/database');
 const settings = require('../settings');
 const {database} = settings;
 const {Schema} = database;
@@ -10,7 +11,7 @@ const usersBehaviorSchema = new Schema({
   },
   uid: {
     type: String,
-    required: true,
+    // required: true,
     index: 1,
   },
 	oldUsername: {
@@ -19,7 +20,7 @@ const usersBehaviorSchema = new Schema({
 	},
   toUid: {
     type: String,
-    required: true,
+    // required: true,
     index: 1
   },
   pid: {
@@ -44,12 +45,12 @@ const usersBehaviorSchema = new Schema({
   },
   ip: {
     type: String,
-    required: true,
+    // required: true,
     index: 1
   },
   port: {
     type: String,
-    required: true,
+    // required: true,
     index: 1
   },
   score: {
@@ -63,7 +64,12 @@ const usersBehaviorSchema = new Schema({
   },
   operation: {
     type: String,
-    required: true,
+    // required: true,
+    index: 1
+  },
+  operationId: {
+    type: String,
+    // required: true,
     index: 1
   },
   type: {
@@ -162,6 +168,30 @@ usersBehaviorSchema.virtual('link')
   .set(function(u) {
     this._link = u;
   });
+
+usersBehaviorSchema.methods.extendUser = async function() {
+  const UserModel = mongoose.model('users');
+  let user;
+  if(this.uid) {
+    const u = await UserModel.findOne({uid: this.uid});
+    if(u) {
+      user = u;
+    }
+  }
+  return this.user = user;
+};
+
+usersBehaviorSchema.methods.extendOperationName = async function(){
+	const OperationModel = mongoose.model("operations");
+	let operationData;
+	if(this.operationId){
+		const o = await OperationModel.findOne({_id: this.operationId});
+		if(o){
+			operationData = o;
+		}
+	}
+	return this.operationData = operationData
+}
 
 const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 

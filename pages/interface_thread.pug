@@ -4,27 +4,35 @@ block title
   - var thread = data.thread
   title #{thread.firstPost.t} - 科创论坛
   meta#replytarget(value=`${data.replyTarget}`)
-  
+
+  -let modifyPostTimeLimit = 0;
+  -for(let i = 0; i < data.userRoles.length; i++)
+    -const r = data.userRoles[i];
+    if r.modifyPostTimeLimit > modifyPostTimeLimit
+      -modifyPostTimeLimit = r.modifyPostTimeLimit
+    if r.modifyPostTimeLimit === -1
+      -modifyPostTimeLimit = -1;
+      -break;
   include MathJax.pug
-  
+
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
     
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
     
-    meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-    meta(property='og:title' content=`${thread.firstPost.t}`)
-    meta(property='og:site_name' content='科创论坛')
-    meta(property='og:description' content=`${processed}`)
+    //- meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
+    //- meta(property='og:title' content=`${thread.firstPost.t}`)
+    //- meta(property='og:site_name' content='科创论坛')
+    //- meta(property='og:description' content=`${processed}`)
     
-    meta(property='article:published_time' content=`${(new Date(thread.firstPost.toc)).toISOString()}`)
-    meta(property='article:author' content=`${data.thread.firstPost.user?data.thread.firstPost.user.username:""}`)
+    //- meta(property='article:published_time' content=`${(new Date(thread.firstPost.toc)).toISOString()}`)
+    //- meta(property='article:author' content=`${data.thread.firstPost.user?data.thread.firstPost.user.username:""}`)
   
   
 block content
   -var mainContainer1400 = true
-  -const moveThread = data.userLevel >= 4
+  -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
 
     div.container-fluid(style="max-width:1400px;")
@@ -69,25 +77,30 @@ block content
 
                 .ThreadTitleAuxillaryLink
                   a(href='#bottom') 本页底部
-
-                  if data.userLevel >= 1
+                  //- 设置精华
+                  if data.userOperationsId.includes('collectThread')
                     a(href=`javascript:addColl('${thread.tid}')`) 收藏
+                  if data.isModerator || data.userOperationsId.includes('digestThread') && !thread.digest
+                    a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
+                  if data.isModerator || data.userOperationsId.includes('unDigestThread') && thread.digest
+                    a#threadDigest(href=`javascript:cancelDigest('${data.thread.tid}')`) 撤销精华
+                  //- 设置置顶
+                  if data.isModerator || data.userOperationsId.includes('toppedThread') && !thread.topped
+                    a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
+                  if data.isModerator || data.userOperationsId.includes('unToppedThread') && thread.topped
+                    a#threadTop(href=`javascript:cancelTopped('${data.thread.tid}')`) 撤销置顶
+                  //-
+                    if data.userLevel >= 4
+                      if thread.digest
+                        a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 撤销精华
+                      else
+                        a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
 
-                  //if data.userLevel >= 6
-                  //  -var isAd = data.ads.includes(thread.tid)
-                  //  a#adBtn(href='javascript:;' onclick=`adSwitch('${thread.tid}')`) #{isAd ? '取消首页置顶' : '首页置顶'}
-
-                  if data.userLevel >= 4
-                    if thread.digest
-                      a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 撤销精华
-                    else
-                      a#threadDigest(href=`javascript:setDigest('${data.thread.tid}')`) 设置精华
-
-                  if data.userLevel >= 4
-                    if thread.topped
-                      a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 撤销置顶
-                    else
-                      a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
+                    if data.userLevel >= 4
+                      if thread.topped
+                        a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 撤销置顶
+                      else
+                        a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
 
                   a(href=`/t/${data.thread.tid}`) 本帖地址
                 if user
@@ -97,7 +110,7 @@ block content
                   - var visibilityOF // of=others forum
                   - var digestOF
                   - var topOF
-                  if(data.userLevel >= 1 && thread.uid === data.user.uid)
+                  //- if(data.userLevel >= 1 && thread.uid === data.user.uid)
 
                   if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
                     .form-inline(style='margin-bottom: 0.5rem')
@@ -226,12 +239,8 @@ block content
             hr.hrNarrowSpace
 
             -if(data.user)
-              - var userCerts = data.user.certs;
-              - var hasMobile = false;
-              - for(var i =0; i < userCerts.length; i++)
-                - if(userCerts[i] === 'mobile')
-                  - hasMobile = true;
-              if (data.userLevel >= 1 && hasMobile && data.user.volumeA)
+              - var hasMobile = data.user.authLevel > 0;
+              if hasMobile && data.user.volumeA
 
                 //- .form-group
                 //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
@@ -317,9 +326,9 @@ block content
     include post_to_recycle.pug
 block scripts
   script(src='/qrcode/build/qrcode.js')
-  script(src='/interface_common.js?v=4')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/module_dropdown.js?v=3')
-  script(src='/interface_thread.js?v=4')
+  script(src=`/interface_thread.js?v=${global.NKC.startTime}`)
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   script(src="/jquery-1.10.2.js")
@@ -331,9 +340,9 @@ block scripts
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
-  script(src='/nkc_render.js')
-  script(src='/interface_editor_reply.js?v=4')
-  script(src='/interface_attachment_uploader.js?v=1')
-  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
-  <script type="text/javascript" src="/wangEditor.js"></script>
-  <script type="text/javascript" src="/newEditor_reply.js"></script>
+  script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
+  script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
+  script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
+  script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)

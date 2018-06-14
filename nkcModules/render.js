@@ -63,7 +63,7 @@ function htmlDiff(earlier,later){
   return outputHTML
 }
 
-function testModifyTimeLimit(cs, ownership, toc){
+/*function testModifyTimeLimit(cs, ownership, toc){
 
   let smtl = cs.selfModifyTimeLimit;
   let emtl = cs.elseModifyTimeLimit;
@@ -80,6 +80,17 @@ function testModifyTimeLimit(cs, ownership, toc){
     // if he own the post
     return Date.now() < toc.getTime() + smtl;
   return Date.now() < toc.getTime() + emtl
+}*/
+
+function testModifyTimeLimit(time, ownership, toc) {
+	// time === -1 时间无限制
+	// ownership 自己或有'modifyOtherPost'操作权限
+	if(!ownership) return;
+	if(time === -1) return true;
+	const timeLimit = time*60*60*1000;
+	const nowTime = Date.now();
+	const postToc = toc.getTime();
+	return (nowTime - postToc < timeLimit);
 }
 
 let dateTimeString = (t) => {
@@ -102,10 +113,8 @@ let creditString = (t) => {
   switch (t) {
     case 'xsf':
       return '学术分';
-      break;
     case 'kcb':
       return '科创币';
-      break;
     default:
       return '[未定义积分]'
   }

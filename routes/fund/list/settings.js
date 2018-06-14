@@ -5,15 +5,7 @@ settingsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {fundId} = ctx.params;
-		const fundCerts = [];
-		const {certificates} = ctx.settings.permission;
-		for (let cert in certificates) {
-			fundCerts.push({
-				cert: cert,
-				displayName: certificates[cert].displayName
-			});
-		}
-		data.fundCerts = fundCerts;
+		data.roles = await db.RoleModel.find().sort({toc: 1});
 		data.fund = await db.FundModel.findOnly({_id: fundId.toUpperCase()});
 		data.nav = '基金设置';
 		ctx.template = 'interface_fund_setting.pug';

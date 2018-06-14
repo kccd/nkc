@@ -43,6 +43,7 @@ block content
                     a(href=`/e/settings/role/${data.role._id}/base`) 基本设置
                   li(role='presentation' class=data.t === 'permissions' ? 'active' : '')
                     a(href=`/e/settings/role/${data.role._id}/permissions`) 权限设置
+
               .col-xs-12.col-md-12
                 if data.t === 'users'
                   br
@@ -55,31 +56,31 @@ block content
                     div.text-center(style='padding: 3rem;font-size: 2rem;color: #aaa;') 暂无用户
                   else
                     include ../../interface_navigation_paging
-                    table.table.table-hover
-                      thead
-                        tr
-                          th 用户名
-                          th 文章
-                          th 回复
-                          th 注册时间
-                          th 注册IP
-                          th
-                      tbody
-                        for user in data.users
+                      table.table.table-hover
+                        thead
                           tr
+                            th 用户名
+                            th 文章
+                            th 回复
+                            th 注册时间
+                            th 注册IP
                             th
-                              img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
-                              a(href=`/u/${user.uid}`)= user.username
-                            th= user.threadCount
-                            th= user.postCount
-                            th= fromNow(user.toc)
-                            th= `${user.regIP} : ${user.regPort}`
-                            th
-                              if data.role._id !== 'default'
-                                if data.role._id === 'banned'
-                                  button(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
-                                else
-                                  button(onclick=`removeUserFromRole("${data.role._id}", "${user.uid}")`) 移除
+                        tbody
+                          for user in data.users
+                            tr
+                              th
+                                img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                                a(href=`/u/${user.uid}`)= user.username
+                              th= user.threadCount
+                              th= user.postCount
+                              th= fromNow(user.toc)
+                              th= `${user.regIP} : ${user.regPort}`
+                              th
+                                if data.role._id !== 'default' && data.role._id !== 'dev'
+                                  if data.role._id === 'banned'
+                                    button(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
+                                  else
+                                    button(onclick=`removeUserFromRole("${data.role._id}", "${user.uid}")`) 移除
                     include ../../interface_navigation_paging
                 else if data.t === 'base'
                   .row
@@ -113,10 +114,11 @@ block content
                           .col-sm-5
                             button.btn.btn-primary(onclick=`submitRoleBase("${data.role._id}")`) 保存
                 else if data.t === 'permissions'
-                  .form-inline
-                    span.operation-type-span 全部
-                    for operationType in data.operationTypes
-                      span.operation-type-span(data-operation-type=operationType._id)= operationType.displayName
+                  if data.role._id !== 'dev'
+                    .form-inline
+                      span.operation-type-span 全部
+                      for operationType in data.operationTypes
+                        span.operation-type-span(data-operation-type=operationType._id)= operationType.displayName
                   #operationsDiv(style='display:none;border: 1px solid #aaaaaa;padding: 0.5rem;margin: 1rem 0;')
                     button.btn.btn-default(onclick='selectAll()') 全选/取消
                     table.table.table-hover
@@ -137,7 +139,7 @@ block content
                     tbody
                       -let n = 0;
                       -const defaultRole = data.defaultRoles.filter(role => role._id === 'default')[0];
-                      .hidden#data= JSON.stringify({operations: data.operations,defaultOperationsId: defaultRole.operationsId})
+                      .hidden#data= JSON.stringify({role: data.role?data.role:'', operations: data.operations,defaultOperationsId: defaultRole.operationsId})
                       for operation in data.operations
                         -n++;
                         tr
@@ -148,15 +150,19 @@ block content
                           th
                             label
                               .icheckbox
-                                if !data.role.defaultRole && defaultRole.operationsId.includes(operation._id)
+                                if data.role._id === 'dev'
+                                  input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true' disabled)
+                                else if !['visitor', 'banned', 'default'].includes(data.role._id) && defaultRole.operationsId.includes(operation._id)
                                   input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true' disabled)
                                 else
                                   if data.role.operationsId.includes(operation._id)
                                     input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true')
                                   else
                                     input(type='checkbox' name='selectOperation' data-operation=operation._id )
-                  button.btn.btn-primary(onclick=`submitRolePermissions("${data.role._id}")`) 保存
-
+                  if data.role._id === 'dev'
+                    button.btn.btn-primary.disabled 保存
+                  else
+                    button.btn.btn-primary(onclick=`submitRolePermissions("${data.role._id}")`) 保存
 
 
 block scripts

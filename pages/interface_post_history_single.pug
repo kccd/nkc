@@ -18,6 +18,7 @@
       if(formerPost.t !== '')
         h1!=htmlDiff(formerPost.t, p.t)
         hr.hrNarrowSpace
+      -post.c = hideContentByUser(formerPost.c, data.user, 'thread')
       div!=htmlDiff(formerPost.c, p.c)
     else
       if(p.t !== '')

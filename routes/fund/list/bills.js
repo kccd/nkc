@@ -8,7 +8,7 @@ billsRouter
 		const fund = await db.FundModel.findOnly({_id: fundId});
 		const page = query.page? parseInt(query.page): 0;
 		const q = {};
-		if(data.userLevel < 7) {
+		if(!data.userOperationsId.includes('displayFundNoVerifyBills')) {
 			q.verify = true;
 		}
 		q.$or = [
@@ -32,7 +32,7 @@ billsRouter
 				}
 			}
 			b.balance = total;
-			if(data.userLevel < 7) {
+			if(!data.userOperationsId.includes('displayFundBillsSecretInfo')) {
 				b.otherInfo = {};
 			}
 		});

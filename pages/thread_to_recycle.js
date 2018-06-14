@@ -33,6 +33,7 @@ function moveToRecycleBin(id){
   var reason = $("#recycleReason").val().trim();
   var method = recycleMethodsChoice();
   var noticeType = $("#noticeType2").is(":checked")
+  var illegalType = $("#threadIsIllegalOperation").is(":checked")
   // 构造数据，发送到服务器
   var parames = {
     reason: reason,
@@ -40,7 +41,8 @@ function moveToRecycleBin(id){
     postType: "thread",
     threadId: id,
     postId: '',
-    noticeType: noticeType
+    noticeType: noticeType,
+    illegalType: illegalType
   }
   if(reason.length === 0){
     return screenTopWarning('未填写原因')

@@ -153,7 +153,7 @@ otherRouter
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
-	.use('log', logRouter.routes(), logRouter.allowedMethods())
+	// .use('log', logRouter.routes(), logRouter.allowedMethods())
 	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods());

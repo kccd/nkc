@@ -1,11 +1,14 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const secretBehaviorSchema = new Schema({
+	operationId: {
+		type: String,
+		index: 1
+	},
 	type: {
 		type: String,
-		required: true,
 		index: 1,
-		enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
+		//enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
 	},
 	uid: {
 		type: String,
@@ -111,6 +114,35 @@ secretBehaviorSchema.pre('save', function(next) {
 	}
 	next();
 });
+
+secretBehaviorSchema.methods.extendUser = async function() {
+	const UserModel = mongoose.model('users');
+	let user;
+	if(this.uid) {
+		const u = await UserModel.findOne({uid: this.uid});
+		if(u) {
+			user = u;
+		}
+	}
+	return this.user = user;
+};
+
+secretBehaviorSchema.methods.extendOperationName = async function() {
+	const OperationModel = mongoose.model("operations");
+	let operationData;
+	if(this.operationId){
+		const o = await OperationModel.findOne({_id: this.operationId});
+		if(o){
+			operationData = o;
+		}
+	}else if(this.type){
+		const o = await OperationModel.findOne({_id: this.type});
+		if(o){
+			operationData = o;
+		}
+	}
+	return this.operationData = operationData
+}
 
 const SecretBehaviorModel = mongoose.model('secretBehaviors', secretBehaviorSchema);
 module.exports = SecretBehaviorModel;

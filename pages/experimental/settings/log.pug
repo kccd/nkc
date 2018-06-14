@@ -1,0 +1,73 @@
+extends ../../bootstrap_base
+
+block title
+    -const mainContainer1400 = true;
+    link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+    link(href='/experimental/index.css' rel='stylesheet')
+    title 操作设置
+block content
+
+    .container-fluid(style='max-width: 1400px;')
+        .row
+            include ../nav
+            .col-xs-12.col-md-12
+                .row#content
+                    //-
+                      .col-xs-12.col-md-2
+                          .list-group
+                              a.list-group-item(href=`/e/settings/operation` class=data.operationType ? '' : 'active') 所有操作
+                                  span.badge= data.operations.length
+                              for type in data.operationTypes
+                                  a.list-group-item(href=`/e/settings/operation/${type._id}` type="button" class=data.operationType && data.operationType._id === type._id ? 'active' : '')= type.displayName
+                                      if type.operationCount > 0
+                                          span.badge= type.operationCount
+                          button.btn.btn-default.btn-block(onclick='saveLogSettings()') 保存操作
+                          if data.operationType
+                              button.btn.btn-default.btn-block(onclick=`modifyOperationType(${data.operationType ? data.operationType._id : ''})`) 修改当前分类名称
+                              button.btn.btn-danger.btn-block(onclick=`deleteOperationType(${data.operationType ? data.operationType._id : ''})`) 删除当前分类
+                    .col-xs-12.col-md-12
+                        h4 请勾选需要记日志的操作
+                        -let operations;
+                        .hidden#data= JSON.stringify({types: data.operationTypes})
+                        if data.operationType
+                            -operations = data.operationType.operations;
+                            .form-inline
+                                button.btn.btn-default(onclick=`deleteOperations(${data.operationType._id})`) 移除已标记的操作
+                        else
+                            -operations = data.operations;
+                        table.table.table-hover
+                            thead
+                                tr
+                                    th 序号
+                                    th 操作名
+                                    th 操作介绍
+                                    th 错误提示
+                                    th 是否记录日志
+                            tbody
+                                -let n = 0;
+                                for operation in operations
+                                    -n++;
+                                    tr
+                                        th= n
+                                        th= operation._id
+                                        th= operation.description
+                                        th= operation.errInfo
+                                        th
+                                            label
+                                                .icheckbox
+                                                    -let isInCheck = false;
+                                                    -if(data.logSettings && data.logSettings.indexOf(operation._id) > -1)
+                                                        input(type='checkbox' name='selectLogSettings' data-operation=operation._id checked)
+                                                    -else
+                                                        input(type='checkbox' name='selectLogSettings' data-operation=operation._id)
+                        if operations.length === 0
+                            div.text-center(style='padding: 3rem;font-size: 2rem;color: #aaa;') 暂无操作
+                        button.btn.btn-primary(onclick='saveLogSettings()') 保存操作
+
+
+
+block scripts
+
+    script(src='/icheck/icheck.js')
+    script(src='/interface_common.js')
+    script(src='/experimental/settings/log.js')

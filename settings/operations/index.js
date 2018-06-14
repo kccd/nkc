@@ -1,6 +1,6 @@
 // 通过url和请求方法确定操作类型
 // PARAMETER代表url中不确定的值，如 '/u/uid/settings/info' 中的uid是个变化的值
-
+const resourceObj = require('./resource');
 const {
 	avatar,
 	avatar_small,
@@ -15,7 +15,7 @@ const {
 	fundBanner,
 	photo,
 	photo_small
-} = require('./resource');
+} = resourceObj;
 
 const auth = require('./auth');
 const editor = require('./editor');
@@ -37,14 +37,23 @@ const sms = require('./sms');
 const t = require('./thread');
 const u = require('./user');
 const page = require('./page');
+const download = require('./download');
 const operationObj = {};
 
 
 // 默认操作类型
 operationObj.defaultOperations = [
-	'displayExperimentalLink',
-	'displayQuestionsLink',
-
+	'modifyOtherPosts',
+	'displayRecycleMarkThreads',
+	'displayDisabledPosts',
+	'displayPostHideHistories',
+	'displayFundNoVerifyBills',
+	'displayFundBillsSecretInfo',
+	'displayFundApplicationFormSecretInfo',
+	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
+	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
+	'dailyLogin',// 日常登陆
+	'violation',// 违规操作
 ];
 
 
@@ -59,6 +68,8 @@ operationObj.operationTree = {
 
 		r,// 资源
 		rt,
+
+		default: resourceObj.default,
 
 		cover,// 文章封面
 
@@ -113,7 +124,9 @@ operationObj.operationTree = {
 
 		u,// 用户
 
-		page
+		download, // 编辑器自动上传图片
+
+		page,
 	}
 };
 module.exports = operationObj;

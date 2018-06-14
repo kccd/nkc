@@ -1,0 +1,58 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 积分设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .col-xs-12.col-md-12
+            .form-horizontal
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  h4 积分公式系数设置
+
+                  p=`公式：${data.scoreSettings.formula}`
+              .form-group
+                .col-sm-2.control-label 在线天数
+                .col-sm-3
+                  input.form-control#dailyLogin(type='number' value=data.scoreSettings.coefficients.dailyLogin || 0)
+              .form-group
+                .col-sm-2.control-label 文章数
+                .col-sm-3
+                  input.form-control#postToForum(type='number' value=data.scoreSettings.coefficients.postToForum || 0)
+              .form-group
+                .col-sm-2.control-label 回复数
+                .col-sm-3
+                  input.form-control#postToThread(type='number' value=data.scoreSettings.coefficients.postToThread || 0)
+              .form-group
+                .col-sm-2.control-label 优秀文章数
+                .col-sm-3
+                  input.form-control#digest(type='number' value=data.scoreSettings.coefficients.digest || 0)
+              .form-group
+                .col-sm-2.control-label 被赞数
+                .col-sm-3
+                  input.form-control#thumbsUp(type='number' value=data.scoreSettings.coefficients.thumbsUp || 0)
+              .form-group
+                .col-sm-2.control-label 学术分
+                .col-sm-3
+                  input.form-control#xsf(type='number' value=data.scoreSettings.coefficients.xsf || 0)
+              .form-group
+                .col-sm-2.control-label 违规数
+                .col-sm-3
+                  input.form-control#violation(type='number' value=data.scoreSettings.coefficients.violation || 0)
+              .form-group
+                .col-sm-2.control-label
+                .col-sm-2
+                  button.btn.btn-primary(onclick='saveNumberSettings()') 保存
+
+
+block scripts
+
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/number.js?v=${global.NKC.startTime}`)

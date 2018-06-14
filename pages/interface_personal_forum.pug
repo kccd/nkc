@@ -13,10 +13,10 @@ block title
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${processed}`)
 
-  meta(property='og:image' content='/resources/site_specific/umaru_chem_300x200.png')
-  meta(property='og:title' content=`${forum.displayName}`)
-  meta(property='og:site_name' content='科创论坛')
-  meta(property='og:description' content=`${processed}`)
+  //- meta(property='og:image' content='/resources/site_specific/umaru_chem_300x200.png')
+  //- meta(property='og:title' content=`${forum.displayName}`)
+  //- meta(property='og:site_name' content='科创论坛')
+  //- meta(property='og:description' content=`${processed}`)
   style.
     .ThreadCheckboxes{
       display: none;
@@ -25,9 +25,9 @@ block title
 
 block content
   -var mainContainer1400 = true
-  -var isModerator = data.user? (forum.moderators.indexOf(data.user.uid) > -1) : false
-  -const isAdmin = data.userLevel >= 4
-  -const isNormalUser = data.userLevel >= 1
+  -var isModerator = data.isModerator
+  // -const isAdmin = data.userLevel >= 4
+  // -const isNormalUser = data.userLevel >= 1
   .container-fluid(style='max-width:1400px;')
     .row
       .col-md-9
@@ -116,7 +116,7 @@ block content
                       div
                         textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
 
-                  if isAdmin
+                  if data.userOperationsId.includes('bannedUser')
                     if data.targetUser.certs.indexOf('banned') > -1
                       a(href='javascript:;' onclick=`bannedUser("${data.targetUser.uid}", false)`) 解除封禁
                     else
@@ -139,24 +139,25 @@ block content
         .panel
           .row
             .col-xs-12
-              .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
-
+              if data.user && data.user.uid === data.targetUser.uid
                 .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
 
-                  .form-inline(style='margin-top:10px')
+                  .ForumManagement(style='display:none;margin-top:12px;margin-bottom:12px')
 
-                    .form-group
-                      button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
+                    .form-inline(style='margin-top:10px')
 
-                    .form-group.form-group-sm
-                      include forumlist_dropdown.pug
-                      button.btn.btn-default.btn-sm#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
+                      .form-group
+                        button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
 
-                    if data.userLevel >= 1
-                      button.btn.btn-default.btn-sm#addSelectedToMyCollection(onclick='addSelectedToMyCollection()') 添加到个人收藏
+                      .form-group.form-group-sm
+                        include forumlist_dropdown.pug
+                        button.btn.btn-default.btn-sm#moveThreadTo(onclick="javascript:moveThreadTo()") 移动
 
-                    .form-group
-                      button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
+                      if data.userOperationsId.includes('collectThread')
+                        button.btn.btn-default.btn-sm#addSelectedToMyCollection(onclick='addSelectedToMyCollection()') 添加到个人收藏
+                      if data.userOperationsId.includes('moveThread')
+                        .form-group
+                          button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='recyclebtn()') 送回收站
 
             .col-xs-12
               a.btn(href=`/editor?&mid=${data.targetUser.uid}` style='background-color: #337ab7; color: white;') 新帖
@@ -255,5 +256,5 @@ block content
 
 block scripts
   script(src='/interface_common.js')
-  script(src='/interface_collections.js')
+  //script(src='/interface_collections.js')
   script(src='/interface_personal_forum.js')

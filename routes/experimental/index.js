@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const nkcModules = require('../../nkcModules');
 const settingRouter = require('./settings');
 const statusRouter = require('./status');
+const logRouter = require('./log');
 const dbFn = nkcModules.dbFunction;
 const apiFn = nkcModules.apiFunction;
 const {npmInstallify, gitify} = require('../../tools/imageMagick');
@@ -27,11 +28,11 @@ experimentalRouter
     ctx.template = 'interface_new_users.pug';
     await next();
   })
-  .get('/newSysinfo', async (ctx, next) => {
+  .get('/systemInfo', async (ctx, next) => {
     ctx.template = 'interface_new_sysinfo.pug';
     await next();
   })
-  .post('/newSysinfo', async (ctx, next) => {
+  .post('/systemInfo', async (ctx, next) => {
     const {title, content} = ctx.body;
     if(!title) ctx.throw(400, '标题不能为空！');
     if(!content) ctx.throw(400, '内容不能为空！');
@@ -162,6 +163,8 @@ experimentalRouter
     await next();
   })
 	.use('/status', statusRouter.routes(), statusRouter.allowedMethods())
-	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods());
+	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods())
+	.use('/log', logRouter.routes(), logRouter.allowedMethods());
+
 
 module.exports = experimentalRouter;

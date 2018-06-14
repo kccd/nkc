@@ -2,12 +2,16 @@ module.exports = {
 	PARAMETER: {
 		GET: 'visitUserCard',
 		banned: {
-			PATCH: 'bannedUser'
+			PATCH: 'unBannedUser',
+			DELETE: 'bannedUser'
 		},
 		settings: {
 			GET: 'visitUserAvatarSettings',
 			avatar: {
 				GET: 'visitUserAvatarSettings',
+			},
+			username: {
+				PATCH: 'modifyUsername'
 			},
 			info: {
 				GET: 'visitUserInfoSettings',
@@ -44,7 +48,13 @@ module.exports = {
 			},
 			email: {
 				GET: 'visitEmailSettings',
-				POST: 'bindEmail'
+				POST: 'sendEmail',
+				bind: {
+					GET: 'bindEmail'
+				},
+				verify: {
+					GET: 'changeEmail'
+				}
 			},
 			verify: {
 				PARAMETER: {
@@ -75,6 +85,8 @@ module.exports = {
 			}
 		},
 		subscribe: {
+			POST: 'subscribeUser',
+			DELETE: 'unSubscribeUser',
 			register: {
 				GET: 'visitSubscribeForums',
 				POST: 'submitSubscribeForums'

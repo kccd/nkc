@@ -6,6 +6,11 @@ const roleRouter = require('./role');
 const userRouter = require('./user');
 const scoreRouter = require('./score');
 const operationRouter = require('./operation');
+const downloadRouter = require('./download');
+const gradeRouter = require('./grade');
+const kcbRouter = require('./kcb');
+const logRouter = require('./log');
+const numberRouter = require('./number');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -13,10 +18,15 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+	.use('/number', numberRouter.routes(), numberRouter.allowedMethods())
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
+	.use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
+	.use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())
+	.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
 	.use('/role', roleRouter.routes(), roleRouter.allowedMethods())
 	.use('/base', baseRouter.routes(), baseRouter.allowedMethods())
-	.use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
+    .use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
+    .use('/log', logRouter.routes(), logRouter.allowedMethods())
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
 module.exports = settingRouter;

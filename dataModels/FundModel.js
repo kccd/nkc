@@ -271,7 +271,7 @@ fundSchema.methods.ensureUserPermission = async function(user) {
 	const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
 	const userAuthLevel = await userPersonal.getAuthLevel();
 	const {authLevel, userLevel, postCount, threadCount, timeToRegister} = this.applicant;
-	// if(user.userLevel < userLevel) throw '账号等级未满足条件';
+	if(user.grade._id < userLevel) throw '账号等级未满足条件';
 	if(user.postCount < postCount) throw '回帖量未满足条件';
 	if(user.threadCount < threadCount) throw '发帖量未满足条件';
 	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';

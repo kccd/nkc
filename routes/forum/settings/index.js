@@ -13,6 +13,16 @@ settingsRouter
 		const urlArr = url.split('/');
 		const type = urlArr[urlArr.length-1];
 		data.type = (type === 'settings'?'info': type);
+		data.breadcrumbForums = await data.forum.getBreadcrumbForums();
+		const length = data.breadcrumbForums.length;
+		data.level1Forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
+		if(length === 0) {
+			data.sameLevelForums = data.level1Forums;
+		} else {
+			const parentForum = data.breadcrumbForums[data.breadcrumbForums.length - 1];
+			data.sameLevelForums = await db.ForumModel.find({parentId: parentForum.fid}).sort({order: 1});
+		}
+		data.childrenForums = await db.ForumModel.find({parentId: data.forum.fid}).sort({order: 1});
 		await next();
 	})
 	.get('/', async (ctx) => {

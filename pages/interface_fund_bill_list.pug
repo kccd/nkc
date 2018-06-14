@@ -48,7 +48,7 @@ table.table.table-bordered
         th= b.notes
         if displayBalance
           th= b.balance.toFixed(1)
-        if data.userLevel >= 7 || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
+        if data.userOperationsId.includes("modifyFundBill") || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
           th
             a(href=`/fund/bills/${b._id}`) 修改
             span &nbsp;&nbsp;

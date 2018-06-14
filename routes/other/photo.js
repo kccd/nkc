@@ -6,7 +6,7 @@ const path = require('path');
 photoRouter
 	.get('/:photoId', async (ctx, next) => {
 		const {data, db, fs} = ctx;
-		const {user, userLevel} = data;
+		const {user} = data;
 		const {photoId} = ctx.params;
 		const photo = await db.PhotoModel.findOnly({_id: photoId});
 		if(photo.type === 'fund') {
@@ -24,7 +24,7 @@ photoRouter
 					ctx.throw(403, '权限不足');
 				}
 			} else {
-				if(user.uid !== photo.uid && userLevel < 7) {
+				if(user.uid !== photo.uid && !data.userOperationsId.includes('getAnyBodyPhoto')) {
 					if(displayPhoto === 0) {
 						ctx.throw(403, '权限不足');
 					} else if(displayPhoto === 1) {
@@ -44,7 +44,7 @@ photoRouter
 			}
 		} else if(!user) {
 			ctx.throw(403, '权限不足');
-		} else if(photo.uid !== user.uid && userLevel < 7) {
+		} else if(photo.uid !== user.uid && !data.userOperationsId.includes('getAnyBodyPhoto')) {
 			ctx.throw(403, '权限不足');
 		}
 		ctx.filePath = photoPath + photo.path;
@@ -143,7 +143,7 @@ photoRouter
 		const {photoId} = params;
 		const photo = await db.PhotoModel.findOnly({_id: photoId});
 		const {user} = data;
-		if(user.uid !== photo.uid && data.userLevel < 7) ctx.throw(403, '权限不足');
+		if(user.uid !== photo.uid && data.userOperationsId.includes('removeAnyBodyPhoto')) ctx.throw(403, '权限不足');
 		await photo.removeReference();
 		await next();
 	});

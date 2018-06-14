@@ -8,7 +8,7 @@ billsRouter
 		data.type = type;
 		const page = query.page? parseInt(query.page): 0;
 		const q = {};
-		if(data.userLevel < 7) {
+		if(!data.userOperationsId.includes('displayFundNoVerifyBills')) {
 			q.verify = true;
 		}
 		if(type === 'fundPool') {
@@ -44,7 +44,7 @@ billsRouter
 				}
 			}
 			b.balance = total;
-			if(data.userLevel < 7) {
+			if(!data.userOperationsId.includes('displayFundBillsSecretInfo')) {
 				b.otherInfo = {};
 			}
 		});
@@ -66,7 +66,7 @@ billsRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
-		if(data.userLevel < 7) ctx.throw(400, '权限不足');
+		// if(data.userLevel < 7) ctx.throw(400, '权限不足');
 		const {billObj} = body;
 		const {from, to, notes, money} = billObj;
 
@@ -124,14 +124,14 @@ billsRouter
 		await next();
 	})
 	.del('/:billId', async (ctx, next) => {
-		if(ctx.data.userLevel < 7) ctx.throw(403,'权限不足');
+		// if(ctx.data.userLevel < 7) ctx.throw(403,'权限不足');
 		const {bill} = ctx.data;
 		await bill.remove();
 		await next();
 	})
 	.patch('/:billId', async(ctx, next) => {
 		const {body, data} = ctx;
-		if(data.userLevel < 7) ctx.throw(403,'权限不足');
+		// if(data.userLevel < 7) ctx.throw(403,'权限不足');
 		const {billObj} = body;
 		const {from, to} = billObj;
 		const {user} = data;

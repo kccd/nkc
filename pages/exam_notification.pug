@@ -1,11 +1,9 @@
 if data.user
   //-if !data.permittedOperations.postTo
   //-  p.f12.reddish 新科创论坛要求每一位老用户经过认证才能发帖。到 #[a(href='/register?getcode=true') 这里参加认证]。
-  - var userCerts = data.user.certs;
-  - var hasMobile = false;
-  if userCerts.includes('mobile')
-    -hasMobile = true;
-  - if(data.userLevel <= -1)
+  - var hasMobile = data.user.authLevel > 0;
+
+  - if(data.userRoles.includes('banned'))
     p.f12.reddish 根据系统记录，你的账号已经被封禁，请重新注册。
   - else
     if !hasMobile || !data.user.volumeA

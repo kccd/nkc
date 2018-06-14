@@ -4,7 +4,7 @@ const operationRouter = require('./operation');
 
 router
   .get('/:uid', async (ctx, next) => {
-    const {data, params, db, query, settings, generateMatchBase, nkcModules} = ctx;
+    const {data, params, db, query, settings, nkcModules} = ctx;
     const {paging} = nkcModules.apiFunction;
     const perpage = settings.paging.perpage;
     const {uid} = params;
@@ -16,20 +16,24 @@ router
       SettingModel,
       UsersBehaviorModel,
       ThreadModel,
-      PostModel
+      PostModel,
+	    ForumModel
     } = db;
     const personalForum = await PersonalForumModel.findOnly({uid});
     await personalForum.extendModerator();
+    if(user) {
+    	if(personalForum.moderators.includes(user.uid)) {
+    		data.isModerator = true;
+	    }
+    }
     data.forum = personalForum;
-    const setting = await SettingModel.findOnly({type: 'system'});
-    data.popPersonalForums = setting.popPersonalForums;
+
     let {
       sortby = 'tlm',
       tab = 'own',
       page = 0
     } = query;
     const digest = (query.digest === 'true');
-    const matchBase = generateMatchBase();
     const $sort = {};
     if(sortby === 'toc') {
       $sort.toc = -1;
@@ -44,17 +48,25 @@ router
       subscribeUsers: userSubscribe.subscribeUsers,
       subscribers: userSubscribe.subscribers
     };
-    const accessibleFid = await ctx.getThreadListFid();
+    const options = {
+    	gradeId: data.userGrade._id,
+	    rolesId: data.userRoles.map(r => r._id),
+	    uid: data.user?data.user.uid: ''
+    };
+    const fidOfCanGetThread = await ForumModel.fidOfCanGetThreads(options);
     if(tab === 'reply') {
-      let $matchPost = matchBase
-        .set('uid', uid)
-        .set('fid', {$in: accessibleFid});
-      let $matchThread = matchBase;
-      if(digest){
-        $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
-      }
+			const q = {
+				uid,
+				fid: {$in: fidOfCanGetThread}
+			};
+			if(digest) {
+				q.$or = [{digest: true}, {digestInMid: true}];
+			}
+			if(!data.userOperationsId.includes('displayDisabledPosts')) {
+				q.disabled = false;
+			}
       // 过滤退回标记的帖子
-      let posts1 = await PostModel.find($matchPost.toJS()).sort($sort).skip(page * perpage).limit(perpage);
+      let posts1 = await PostModel.find(q).sort($sort).skip(page * perpage).limit(perpage);
       let posts = [];
       for(var i in posts1){
         var b = await ThreadModel.find({tid: posts1[i].tid,recycleMark: true})
@@ -72,32 +84,47 @@ router
 	      await thread.extendForum().then(forum => forum.extendParentForum())
       }));
       data.posts = posts;
-      const length = await PostModel.count($matchPost.toJS());
+      const length = await PostModel.count(q);
       data.paging = paging(page, length)
     }
     else if(tab === 'own') {
-      let $matchThread = matchBase.set('fid', {$in: accessibleFid});
-      const $or = [
-        {uid},
-        {toMid: uid}
-      ];
-      const $and = [{$or: $or}];
-      if(digest) {
-        $and.push({
-          $or: [{digest: true}, {digestInMid: true}]
-        });
-      }
-      $matchThread = $matchThread.set('$and', $and);
-      if(
-        !user || personalForum.moderators.indexOf(user.uid) === -1
-        || !ctx.data.userLevel > 4
-      ) {
-        //if u r not the forum-moderator/moderator, u can't access hide threads
-        $matchThread = $matchThread.set('hideInMid', false);
-      }
+    	const q = {
+    		fid: {
+		      $in: fidOfCanGetThread
+			  },
+		    $and: [
+			    {
+			    	$or: [
+					    {uid}, {toMid: uid}
+				    ]
+			    }
+		    ]
+    	};
+    	if(digest) {
+    		q.$and.push({
+			    $or: [
+				    {
+				    	digest: true
+				    },
+				    {
+							digestInMid: true
+				    }
+			    ]
+		    })
+	    }
+	    if(!data.userOperationsId.includes('displayDisabledPosts')) {
+    		if(!data.user) {
+    			q.hideInMid = false;
+		    } else {
+    			if(data.user.uid !== uid) {
+    				q.hideInMid = false;
+			    }
+		    }
+	    }
       // 过滤掉退回标记的帖子
-      $matchThread = $matchThread.set('recycleMark', {"$nin":[true]});
-      const threads = await ThreadModel.find($matchThread.toJS()).sort($sort).skip(page*perpage).limit(perpage);
+			q.recycleMark = {$ne: true};
+      // $matchThread = $matchThread.set('recycleMark', {"$nin":[true]});
+      const threads = await ThreadModel.find(q).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
           await p.extendUser();
@@ -106,7 +133,7 @@ router
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      const length = await ThreadModel.count($matchThread.toJS());
+      const length = await ThreadModel.count(q);
       data.paging = paging(page, length)
     }
     else if(tab === 'recommend') {
@@ -229,16 +256,47 @@ router
     }
     // 专栏下的全部
     else if(tab === 'all') {
-      let $sort = {};
+    	const q = {uid, fid: {$in: fidOfCanGetThread}};
+    	if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
+				q.recycleMark = false;
+	    }
+    	let $sort = {};
+    	if(sortby === 'tlm') {
+				$sort = {tlm: -1};
+	    } else {
+    		$sort = {toc: -1};
+	    }
+	    q.operationId = {$in: ['postToForum', 'postToThread']};
+	    const count = await db.InfoBehaviorModel.count(q);
+    	const paging = ctx.nkcModules.apiFunction.paging(page, count);
+    	const infoLogs = await db.InfoBehaviorModel.find(q).sort($sort).skip(paging.start).limit(paging.perpage);
+    	const threads = [];
+    	for(const log of infoLogs) {
+    		const thread  = await db.ThreadModel.findOne({tid: log.tid});
+    		if(thread) {
+					await thread.extendFirstPost().then(p => p.extendUser());
+					if(thread.lm) {
+						await thread.extendLastPost().then(p => p.extendUser());
+					} else {
+						thread.lastPost = thread.firstPost;
+					}
+					await thread.extendForum();
+					await thread.forum.extendParentForum();
+					await thread.extendCategory();
+		    }
+		    threads.push(thread);
+	    }
+	    data.threads = threads;
+    	data.paging = paging;
+     /* let $sort = {};
       if(sortby === 'tlm')
         $sort = {'tlm': -1};
       else
         $sort = {'toc': -1};
-      let t2 = Date.now();
-      const userBehaviors = await UsersBehaviorModel.find({
+      const userBehaviors = await db.InfoBehaviorModel.find({
         uid,
         operation: {$in: ['postToForum', 'postToThread', 'recommendPost']},
-        fid: {$in: accessibleFid}
+        fid: {$in: fidOfCanGetThread}
       }, {_id: 0, tid: 1}).sort({timeStamp: 1});
       const tidArr = [];
       for (let userBehavior of userBehaviors) {
@@ -260,7 +318,7 @@ router
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
       }));
-      const length = await ThreadModel.count($matchThread.toJS());
+      const length = await ThreadModel.count($matchThread.toJS());*/
       /*data.threads = await UsersBehaviorModel.aggregate([
         {$sort: {
           timeStamp: 1
@@ -333,13 +391,13 @@ router
         }},
         {$count: 'length'}
         ]);*/
-      data.paging = paging(page, length)
     }
     // 专栏下的置顶
     if(tab === 'all' || tab === 'own' || tab === 'discuss') {
     	data.toppedThreads = [];
     	for(let tid of personalForum.toppedThreads) {
     		const thread = await ThreadModel.findOnly({tid});
+    		if(!fidOfCanGetThread.includes(thread.fid)) continue;
         if(thread.fid === 'recycle') continue;
         // 过滤掉有退回标记的帖子
         if(thread.recycleMark && thread.recycleMark === true) continue;
@@ -354,7 +412,7 @@ router
     ctx.template = 'interface_personal_forum.pug';
     if(ctx.data.user)
       ctx.data.userThreads = await ctx.data.user.getUsersThreads();
-    ctx.data.forumList = await ctx.nkcModules.dbFunction.getAvailableForums(ctx);
+    ctx.data.forumList = await ForumModel.accessibleForums(options);
     ctx.data.digest = digest;
     ctx.data.tab = tab;
     ctx.data.sortby = sortby;

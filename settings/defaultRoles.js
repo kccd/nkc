@@ -20,7 +20,9 @@ module.exports = [
 		contentClass: [],
 		modifyPostTimeLimit: 0.5,
 		defaultRole: true,
-		operationsId: []
+		operationsId: [
+			'logout'
+		]
 	},
 	{
 		_id: 'banned',
@@ -43,7 +45,18 @@ module.exports = [
 		modifyPostTimeLimit: 0,
 		defaultRole: true,
 		operationsId: ['visitLogin', 'submitLogin']
-	}
+	},
+	{
+		_id: 'moderator',
+		color: '#aaaaaa',
+		description: '版主',
+		abbr: '版',
+		displayName: '版主',
+		contentClass: [],
+		modifyPostTimeLimit: 0,
+		defaultRole: true,
+		operationsId: []
+	},
 
 
 	/*{

@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const operationRouter = require('./operation');
 const threadRouter = new Router();
 const nkcModules = require('../../nkcModules');
-const dbFn = nkcModules.dbFunction;
-const apiFn = nkcModules.apiFunction;
+const digestRouter = require('./digest');
+const toppedRouter = require('./topped');
+
 
 threadRouter
 	.get('/', async (ctx, next) => {
@@ -71,171 +72,195 @@ threadRouter
 		await next();
 	})
 	.get('/:tid', async (ctx, next) => {
-		const {data, params, db, query, generateUsersBehavior} = ctx;
+		const {data, params, db, query, nkcModules} = ctx;
 		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
-		const {
-			ThreadModel,
-			PersonalForumModel,
-			SettingModel,
-			ForumModel,
-			PostModel
-		} = db;
-		const thread = await ThreadModel.findOnly({tid});
-		// 取出帖子被退回的原因
-		let threadReason = "";
-		if(thread.recycleMark === true){
-			let threadLogOne = await db.DelPostLogModel.find({"threadId":tid,"postType":"thread","delType":"toDraft"}).sort({toc:-1}).limit(1)
-			if(threadLogOne.length > 0){
-				thread.reason = threadLogOne[0].reason;
-			}else{
-				thread.reason = " ";
-			}
-		}
-		if(thread.recycleMark) {
-			if(data.userLevel <= 0) {
-				ctx.throw(403, '权限不足');
-			} else if(data.userLevel < 6 && data.user.uid !== thread.uid) {
-				ctx.throw(403, '权限不足');
-			}
-		}
-		// if(thread.recycleMark === true && ctx.data.userLevel < 6 && (ctx.data.userLevel <= 0 || ctx.data.user.uid !== thread.uid)) ctx.throw(403, '权限不足');
-		if(!await thread.ensurePermission(ctx)) ctx.throw(403, '权限不足');
-		let q = {
-			tid: tid
-		};
 		data.highlight = highlight;
-		let postCount = thread.count;
-		if(!await thread.ensurePermissionOfModerators(ctx)) {
-			postCount = thread.countRemain;
+		const thread = await db.ThreadModel.findOnly({tid});
+		const forum = await thread.extendForum();
+		// 验证权限 - new
+		const gradeId = data.userGrade._id;
+		const rolesId = data.userRoles.map(r => r._id);
+		const options = {gradeId, rolesId};
+		await thread.ensurePermission(options);
+		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
+		data.isModerator = isModerator;
+		const breadcrumbForums = await forum.getBreadcrumbForums();
+		// 判断文章是否被退回或被彻底屏蔽
+		if(thread.recycleMark) {
+			if(!isModerator) {
+				// 访问用户没有查看被退回帖子的权限，若不是自己发表的文章则报权限不足
+				if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
+					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '权限不足');
+				}
+			}
+			// 取出帖子被退回的原因
+			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft"});
+			thread.reason = threadLogOne.reason || '';
 		}
-		data.paging = apiFn.paging(page, postCount);
-		const forum = await ForumModel.findOnly({fid: thread.fid});
-		const {mid, toMid} = thread;
-		// data.forumList = await dbFn.getAvailableForums(ctx);
+		// 构建查询条件
+		const match = {
+			tid
+		};
+		const $and = [];
+		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
 
-		data.forumList = await db.ForumModel.getVisibleForums(ctx);
+		// 判断是否为该专业的专家
+		// 如果是该专业的专家，加载所有的post；如果不是，则判断有没有相应权限。
+		if(!isModerator) {
+			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
+				const $or = [
+					{
+						disabled: false
+					},
+					{
+						disabled: true,
+						toDraft: {$ne: true}
+					}
+				];
+				// 用户能查看自己被退回的回复
+				if(data.user) {
+					$or.push({
+						disabled: true,
+						toDraft: true,
+						uid: data.user.uid
+					});
+				}
+				$and.push({$or})
+			}
+			if(!data.userOperationsId.includes('displayDisabledPosts')) {
+				const $or = [
+					{
+						disabled: false
+					},
+					{
+						disabled: true,
+						toDraft: {$ne: false}
+					}
+				];
+				$and.push({$or});
+			}
+			if($and.length !== 0) match.$and = $and;
+		}
+		// 统计post总数，分页
+		const count = await db.PostModel.count(match);
+
+		// 删除退休超时的post
+		const postAll = await db.PostModel.find({tid:tid,toDraft:true})
+		for(let postSin of postAll){
+			let onLog = await db.DelPostLogModel.findOne({delType: 'toDraft', postType: 'post', postId: postSin.pid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}})
+			if(onLog){
+				await postSin.update({"toDraft":false})
+			}
+		}
+		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}}, {$set: {delType: 'toRecycle'}});
+		if(pid) {
+			const disabled = data.userOperationsId.includes('displayDisabledPosts');
+			const {page, step} = await thread.getStep({pid, disabled});
+			ctx.status = 303;
+			return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`);
+		}
+		if(last_page) {
+			page = count -1;
+		}
+		// 查询该文章下的所有post
+		const paging = nkcModules.apiFunction.paging(page, count);
+		data.paging = paging;
+		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+		await Promise.all(posts.map(async post => {
+			await post.extendUser();
+			await post.extendResources();
+		}));
+		data.posts = posts;
+		// 添加给被退回的post加上标记
+		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
+		const toDraftPostsId = toDraftPosts.map(post => post.postId);
+		posts.map(async post => {
+			if(toDraftPostsId.includes(post.pid)) {
+				post.todraft = true;
+			}
+		});
+		// 加载文章所在专业位置，移动文章的选择框
+		data.forumList = await db.ForumModel.visibleForums(options);
 		data.parentForums = await forum.extendParentForum();
 		data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
-
+		data.selectedArr = breadcrumbForums.map(f => f.fid);
+		data.selectedArr.push(forum.fid);
+		data.cat = thread.cid;
+		// 若不是游客访问，加载用户的最新发表的文章
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
 		}
-		data.ads = (await SettingModel.findOnly({type: 'system'})).ads;
+		// data.ads = (await db.SettingModel.findOnly({type: 'system'})).ads;
+		// 判断是否显示在专栏加精、置顶...按钮
+		const {mid, toMid} = thread;
 		let myForum, othersForum;
 		if(mid !== '') {
-			myForum = await PersonalForumModel.findOnly({uid: mid});
+			myForum = await db.PersonalForumModel.findOnly({uid: mid});
 			data.myForum = myForum
 		}
+
 		if(toMid !== '') {
-			othersForum = await PersonalForumModel.findOnly({uid: toMid});
+			othersForum = await db.PersonalForumModel.findOnly({uid: toMid});
 			data.othersForum = othersForum
 		}
 		data.targetUser = await thread.extendUser();
+		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
 		data.thread = thread;
 		data.forum = forum;
-		data.selectedArr = (await forum.getBreadcrumbForums()).map( f => f.fid);
-		data.selectedArr.push(forum.fid);
-		data.cat = thread.cid;
 		data.replyTarget = `t/${tid}`;
 		ctx.template = 'interface_thread.pug';
-		let posts;
-		if(pid) {
-			const matchBase = ctx.generateMatchBase({pid}).toJS();
-			const {page, step} = await thread.getStep(matchBase);
-			ctx.status = 303;
-			return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`);
-		} else if(last_page) {
-			query.page = data.paging.pageCount - 1;
-			data.paging.page = data.paging.pageCount - 1;
-			posts = await thread.getPostByQuery(query, q);
-		} else {
-			posts = await thread.getPostByQuery(query, q);
-		}
-		//恢复旧版引用
-		/*await Promise.all(posts.map(async post => {
-			const postContent = post.c || '';
-			const index = postContent.indexOf('[quote=');
-			if(index !== -1) {
-				const targetPid = postContent.slice(postContent.indexOf(',')+1, postContent.indexOf(']'));
-				let {page, step} = await thread.getStep({pid: targetPid, disabled: q.disabled});
-				page = `?page=${page}`;
-				const postLink = `/t/${tid + page}`;
-				post.c = postContent.replace(/=/,`=${postLink},${step},`);
-			}
-		}));*/
-		// 如果是用户自己的回复，应该添加退修标记
-		let postAll = [];
-		if(!await thread.ensurePermissionOfModerators(ctx)){
-			for(var i in posts){
-				// 拿出未被屏蔽的
-				if(posts[i].disabled === false){
-					postAll.push(posts[i])
-					continue
-				}
-				if(ctx.data.user && posts[i].uid === ctx.data.user.uid){
-					let delPostId = posts[i].pid;
-					let delPost = await db.DelPostLogModel.find({"postId":delPostId,postType:"post"}).sort({toc:-1}).limit(1)
-					if(delPost.length > 0 && delPost[0].delType === "toDraft"){
-						posts[i].todraft = true
-						postAll.push(posts[i])
-					}
-				}
-			}
-		}else{
-			for(var i in posts){
-				let delPostId = posts[i].pid;
-				let delPost = await db.DelPostLogModel.find({"postId":delPostId,postType:"post"}).sort({toc:-1}).limit(1)
-				if(delPost.length > 0 && delPost[0].delType === "toDraft" && posts[i].disabled === true){
-					posts[i].todraft = true
-				}
-				postAll.push(posts[i])
-			}
-		}
-		data.posts = postAll;
 		await thread.extendFirstPost().then(p => p.extendUser());
 		await thread.extendLastPost();
-		if(data.user) {
-			await generateUsersBehavior({
-				operation: 'viewThread',
-				tid: thread.tid,
-				fid: thread.fid
-			});
-		}
 		await next();
 	})
 	.post('/:tid', async (ctx, next) => {
 		const {
-			data, params, db, body, address: ip,
-			generateUsersBehavior
+			data, params, db, body, address: ip
 		} = ctx;
+		// 验证用户是否有权限发表回复，硬性条件。
 		const {user} = data;
-		if(!user.certs.includes('mobile')) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		// 获取认证等级
+		const authLevel = await userPersonal.getAuthLevel();
+		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
-		const {
-			ThreadModel,
-		} = db;
+		const thread = await db.ThreadModel.findOnly({tid});
+		data.thread = thread;
+		await thread.extendForum();
+		data.forum = thread.forum;
+		// 权限判断
+		const gradeId = data.userGrade;
+		const rolesId = data.userRoles.map(role => role._id);
+		const options = {
+			gradeId,
+			rolesId,
+			uid: data.user?data.user.uid: ''
+		};
+		await thread.ensurePermission(options);
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		const thread = await ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
 		const _post = await thread.newPost(post, user, ip);
 		data.targetUser = await thread.extendUser();
-		await generateUsersBehavior({
-			operation: 'postToThread',
-			pid: _post.pid,
-			tid: thread.tid,
-			fid: thread.fid,
-			mid: thread.mid,
-			type: forum.class,
-			toMid: thread.toMid,
+		// 生成记录
+		const log = await db.UsersScoreLogModel({
+			uid: user.uid,
+			type: 'score',
+			operationId: 'postToThread',
+			change: 1,
+			targetUid: data.targetUser.uid,
+			ip: ctx.address,
+			port: ctx.port
 		});
+		await log.save();
+		await user.update({$inc: {postCount: 1}});
+		user.postCount++;
+		await user.calculateScore();
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
 		await thread.updateThreadMessage();
-		await user.updateUserMessage();
 		if(type === 'html') {
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
@@ -246,5 +271,7 @@ threadRouter
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
 		await next();
 	})
+	.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

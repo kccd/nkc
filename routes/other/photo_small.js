@@ -5,7 +5,7 @@ const {photoSmallPath} = require('../../settings').upload;
 photoSmallRouter
 	.get('/:id', async (ctx, next) => {
 		const {data, db, fs} = ctx;
-		const {user, userLevel} = data;
+		const {user} = data;
 		const {id} = ctx.params;
 		const photo = await db.PhotoModel.findOnly({_id: id});
 		if(photo.type === 'fund') {
@@ -23,7 +23,7 @@ photoSmallRouter
 					ctx.throw(403, '权限不足');
 				}
 			} else {
-				if(user.uid !== photo.uid && userLevel < 7) {
+				if(user.uid !== photo.uid && !data.userOperationsId.includes('displayAnyBodyPhoto')) {
 					if(displayPhoto === 0) {
 						ctx.throw(403, '权限不足');
 					} else if(displayPhoto === 1) {
@@ -43,7 +43,7 @@ photoSmallRouter
 			}
 		} else if(!user) {
 			ctx.throw(403, '权限不足');
-		} else if(photo.uid !== user.uid && userLevel < 7) {
+		} else if(photo.uid !== user.uid && !data.userOperationsId.includes('displayAnyBodyPhoto')) {
 			ctx.throw(403, '权限不足');
 		}
 		ctx.filePath = photoSmallPath + photo.path;

@@ -6,14 +6,19 @@ module.exports = {
 		moveThread: {
 			PATCH: 'moveThread'
 		},
+		moveDraft: {
+			PATCH: 'moveDraft'
+		},
 		addColl: {
 			POST: 'collectThread'
 		},
 		digest: {
-			PATCH: 'digestThread'
+			POST: 'digestThread',
+			DELETE: 'unDigestThread'
 		},
 		topped: {
-			PATCH: 'toppedThread'
+			POST: 'toppedThread',
+			DELETE: 'unToppedThread'
 		},
 		switchInPersonalForum: {
 			PATCH: 'switchInPersonalForum'
