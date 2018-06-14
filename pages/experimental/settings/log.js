@@ -12,7 +12,7 @@ $('input[name="selectLogSettings"]').iCheck({
 
 function saveLogSettings(){
   // return console.log(getSelectedLogSettings())
-  var logParams = getSelectedLogSettings()
+  var logParams = getSelectedLogSettings();
   nkcAPI('/e/settings/log', 'POST', {logParams:logParams})
   .then(function() {
     window.location.reload();
