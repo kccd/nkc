@@ -21,6 +21,7 @@
     "getFundBanner": "获取基金项目banner",
     "uploadPhoto": "上传照片（相册，证书，身份认证）",
     "getPhoto": "获取照片（相册，证书，身份认证）",
+    "deletePhoto": "删除照片（相册，证书，身份认证）",
     "getSmallPhoto": "获取照片缩略图（相册，证书，身份认证）",
     "visitExperimentalStatus": "访问网站统计",
     "visitWebBaseSettings": "访问网站基本设置",

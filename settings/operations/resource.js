@@ -69,7 +69,8 @@ module.exports = {
 	photo: {// 照片
 		POST: 'uploadPhoto',
 		PARAMETER: {
-			GET: 'getPhoto'
+			GET: 'getPhoto',
+			DELETE: 'deletePhoto'
 		}
 	},
 	photo_small: {
