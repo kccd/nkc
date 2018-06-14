@@ -80,7 +80,7 @@ var attachment_uploader = function(options){
   uploader.uploadfile_click = function(){
     var items = geid('file-selector').files;
     if(items.length==0)return alert('至少选一个呗');
-    if(items.length>10) return alert('一次不要上传超过10个文件');
+    if(items.length>50) return alert('一次不要上传超过10个文件');
     for(i=0;i<items.length;i++){
       files_left_incr();
     }

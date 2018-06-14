@@ -6,11 +6,14 @@ router
     const {page=0, type} = query;
     let queryMap;
     data.type = type;
+    if(!type){
+      queryMap = {}
+    }
+    if(type === "email"){
+      queryMap = {"operationId":{"$in":["bindEmail", "changeEmail"]}}
+    }
     if(type === "password"){
       queryMap = {"operationId":"modifyPassword"}
-    }
-    if(!type || type === "email"){
-      queryMap = {"operationId":{"$in":["bindEmail", "changeEmail"]}}
     }
     if(type === "mobile"){
       queryMap = {"operationId":{"$in":["bindMobile", "modifyMobile"]}}
@@ -23,7 +26,8 @@ router
     data.paging = paging
     const secretBehaviors = await db.SecretBehaviorModel.find(queryMap).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
     data.result = await Promise.all(secretBehaviors.map(async behavior => {
-			await behavior.extendUser();
+      await behavior.extendUser();
+      await behavior.extendOperationName();
 			return behavior;
 		}));
     ctx.template = 'experimental/log/secret.pug';
