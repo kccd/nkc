@@ -3467,7 +3467,7 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     var singlelabels = RegExp("<" + singlelabel + ".*?>","igm");
     pasteHtml = pasteHtml.replace(singlelabels,'')
     // 只过滤无用的双标签，不过滤标签内的html
-    var doubleLabel = "(ignore_js_op|object|label)";
+    var doubleLabel = "(ignore_js_op|object|label|strike)";
     var doubleLabels = RegExp("<\/?" + doubleLabel + "[^>]*>","igm")
     pasteHtml = pasteHtml.replace(doubleLabels,'')
 
