@@ -41,15 +41,16 @@ block content
                           tr
                             th= behavior.operationData ? behavior.operationData.description : behavior.operationId
                             th
-                              a(href=`/u/${behavior.uid}` target="_blank")
-                                span= behavior.user.username
+                              if behavior.user
+                                a(href=`/u/${behavior.uid}` target="_blank")
+                                  span= behavior.user.username
                             th= behavior.fid
                             th
                               a(href=`/t/${behavior.tid}` target="_blank")
                                 span=behavior.tid
                             -let behTime = behavior.toc?behavior.toc.toLocaleString():'';
-                            -beTime = behavior.timeStamp?behavior.timeStamp.toLocaleString():'';
-                            th= beTime
+                            -behTime = behavior.timeStamp?behavior.timeStamp.toLocaleString():behTime;
+                            th= behTime
 
 
 block scripts
