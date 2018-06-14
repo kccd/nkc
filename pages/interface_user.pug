@@ -14,7 +14,7 @@ block content
               .row
                 img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username
-                .text-center
+                //.text-center
                   span.user-grade(style=`background-color: ${data.targetUser.grade.color};`)= data.targetUser.grade.displayName
                 p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
                 br

@@ -144,7 +144,8 @@ threadRouter
 		}
 		// 统计post总数，分页
 		const count = await db.PostModel.count(match);
-
+		const paging_ = nkcModules.apiFunction.paging(page, count);
+		const {pageCount} = paging_;
 		// 删除退休超时的post
 		const postAll = await db.PostModel.find({tid:tid,toDraft:true})
 		for(let postSin of postAll){
@@ -161,7 +162,7 @@ threadRouter
 			return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`);
 		}
 		if(last_page) {
-			page = count -1;
+			page = pageCount -1;
 		}
 		// 查询该文章下的所有post
 		const paging = nkcModules.apiFunction.paging(page, count);
@@ -250,7 +251,9 @@ threadRouter
 			type: 'score',
 			operationId: 'postToThread',
 			change: 1,
-			targetUid: data.targetUser.uid
+			targetUid: data.targetUser.uid,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 		await user.update({$inc: {postCount: 1}});

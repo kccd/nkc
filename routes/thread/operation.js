@@ -66,10 +66,12 @@ operationRouter
 				operationId: 'violation',
 				description: '退回文章并标记为违规',
 				change: 0,
-				targetCount: 1,
+				targetChange: 1,
 				targetUid: data.targetUser.uid,
 				tid,
-				fid: thread.fid
+				fid: thread.fid,
+				ip: ctx.address,
+				port: ctx.port
 			});
 			await log.save();
 			data.targetUser.violation++;
@@ -154,10 +156,12 @@ operationRouter
 					operationId: 'violation',
 					description: '屏蔽文章并标记为违规',
 					change: 0,
-					targetCount: 1,
+					targetChange: 1,
 					targetUid: data.targetUser.uid,
 					tid,
-					fid: targetThread.fid
+					fid: targetThread.fid,
+					ip: ctx.address,
+					port: ctx.port
 				});
 				await log.save();
 				data.targetUser.violation++;

@@ -1,19 +1,19 @@
 function delLogs(){
-  let startTime = $("#startTime").val().trim();
-  let endTime = $("#endTime").val().trim();
-  let uid = $("#userId").val().trim();
-  let ip = $("#ipAdress").val().trim();
+  var startTime = $("#startTime").val().trim();
+  var endTime = $("#endTime").val().trim();
+  var uid = $("#userId").val().trim();
+  var ip = $("#ipAdress").val().trim();
   if(startTime === "" ||endTime === ""){
     screenTopWarning("请输入完整的时间区间")
     return
   }
-  let st = new Date(startTime)
-  let et = new Date(endTime)
+  var st = new Date(startTime)
+  var et = new Date(endTime)
   if(st.getTime() > et.getTime()){
     screenTopWarning("结束时间不能早于开始时间")
     return
   }
-  let del = confirm("确定删除该条件下的日志？");
+  var del = confirm("确定删除该条件下的日志？");
   if(del === false){
     return
   }

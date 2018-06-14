@@ -3,7 +3,7 @@
 -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
 -const highlight = data.highlight;
 
-  if (!post.disabled || disablePost || data.user.uid === post.uid)
+  if (!post.disabled || disablePost || (data.user && data.user.uid === post.uid))
     //horizontal line
     hr(id=`p${post.pid}`).ThreadSinglePostHr
     //meta(id=`${post.pid}'`)

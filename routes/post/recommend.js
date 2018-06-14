@@ -31,7 +31,9 @@ router
 			type: 'score',
 			operationId: 'recommendPost',
 			change: 0,
-			targetChange: 1
+			targetChange: 1,
+			ip: ctx.address,
+			port: ctx.port
 		});
 		await log.save();
 	  await data.targetUser.update({$inc: {recCount: 1}});
@@ -55,7 +57,9 @@ router
 		  type: 'score',
 		  operationId: 'unRecommendPost',
 		  change: 0,
-		  targetChange: -1
+		  targetChange: -1,
+		  ip: ctx.address,
+		  port: ctx.port
 	  });
 	  await log.save();
 	  await data.targetUser.update({$inc: {recCount: -1}});

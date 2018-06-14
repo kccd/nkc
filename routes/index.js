@@ -39,7 +39,9 @@ router.use('/', async (ctx, next)  => {
 				toc,
 				operationId: 'dailyLogin',
 				change: 1,
-				type: 'score'
+				type: 'score',
+				ip: ctx.address,
+				port: ctx.port
 			});
 			await log.save();
 			await user.updateUserMessage();

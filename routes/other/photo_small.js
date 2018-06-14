@@ -23,7 +23,7 @@ photoSmallRouter
 					ctx.throw(403, '权限不足');
 				}
 			} else {
-				if(user.uid !== photo.uid && !data.userOperationsId.includes('displayAnyBodyPhoto')) {
+				if(user.uid !== photo.uid && !data.userOperationsId.includes('getAnyBodyPhoto')) {
 					if(displayPhoto === 0) {
 						ctx.throw(403, '权限不足');
 					} else if(displayPhoto === 1) {
@@ -43,7 +43,7 @@ photoSmallRouter
 			}
 		} else if(!user) {
 			ctx.throw(403, '权限不足');
-		} else if(photo.uid !== user.uid && !data.userOperationsId.includes('displayAnyBodyPhoto')) {
+		} else if(photo.uid !== user.uid && !data.userOperationsId.includes('getAnyBodyPhoto')) {
 			ctx.throw(403, '权限不足');
 		}
 		ctx.filePath = photoSmallPath + photo.path;

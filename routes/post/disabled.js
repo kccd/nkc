@@ -37,11 +37,13 @@ router
 		    operationId: 'violation',
 		    description: '屏蔽回复并标记为违规',
 		    change: 0,
-		    targetCount: 1,
+		    targetChange: 1,
 		    targetUid: data.targetUser.uid,
 		    pid,
 		    tid: targetThread.tid,
-		    fid: targetThread.fid
+		    fid: targetThread.fid,
+		    ip: ctx.address,
+		    port: ctx.port
 	    });
     	await log.save();
     	data.targetUser.violation++;

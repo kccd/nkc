@@ -103,7 +103,9 @@ forumRouter
 	    uid: user.uid,
 	    type: 'score',
 	    operationId: 'postToForum',
-	    change: 1
+	    change: 1,
+	    port: ctx.port,
+	    ip: ctx.address
     });
     await log.save();
     await user.update({$inc: {threadCount: 1}});
