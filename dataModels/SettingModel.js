@@ -58,8 +58,6 @@ const settingSchema = new Schema({
 	//科创币
 	//-------------------------------------
 	defaultUid: String,
-	changeUsername: Number,
-
 	//网站设置
 	//-------------------------------------
 	websiteName: String,

@@ -16,5 +16,5 @@ router
 		}));
     ctx.template = 'experimental/log/behavior.pug';
     await next()
-  })
+  });
 module.exports = router;

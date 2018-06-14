@@ -24,12 +24,14 @@ jobs.updateActiveUsers = cronStr => {
     for(let d of data){
       let threadCount = 0, postCount = 0;
       const targetUser = await UserModel.findOnly({uid: d._id});
+      if(targetUser.certs.includes('banned')) continue;
       for (let post of d.posts) {
         const thread = await ThreadModel.findOne({tid: post.tid, oc: post.pid});
         if(thread) {
-          threadCount++;
+        	if(thread.fid !== 'recycle' && !thread.recycleMark) threadCount++;
         } else {
-          postCount++;
+        	const post = await PostModel.findOne({pid, disabled: false});
+        	if(post) postCount++;
         }
       }
       const vitality = user.vitalityArithmetic(threadCount, postCount, targetUser.xsf);

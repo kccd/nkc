@@ -53,10 +53,10 @@ module.exports = {
 			GET: 'visitScoreSettings',
 			PATCH: 'modifyScoreSettings'
 		},
-		download: {
+		/*download: {
 			GET: 'visitDownloadSettings',
 			PATCH: 'modifyDownloadSettings'
-		},
+		},*/
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',

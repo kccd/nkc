@@ -1,6 +1,5 @@
 function saveKcbSettings() {
 	var obj = {
-		changeUsername: $('#changeUsername').val(),
 		defaultUid: $('#defaultUid').val()
 	};
 	nkcAPI('/e/settings/kcb', 'PATCH', obj)

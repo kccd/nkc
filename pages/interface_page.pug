@@ -21,6 +21,7 @@ block content
               span &nbsp;
               a(href=`/t/${post.tid}#${post.pid}`) 原文
           .panel-body
+            -post.c = hideContentByUser(post.c, data.user, 'thread')
             div.ThreadPostBody!= experimental_render(post)
       
     

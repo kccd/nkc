@@ -16,6 +16,7 @@ block content
         h3 目前版本
         -var p = data.post
         -p.c = p.c.replace(/<[^>]+>|&nbsp;/g,"");
+        -p.c = hideContentByUser(p.c, data.user, 'thread')
         include interface_post_history_single.pug
         
         h3 过去版本

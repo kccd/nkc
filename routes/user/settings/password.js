@@ -20,7 +20,7 @@ passwordRouter
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
 		const newPassword = apiFunction.newPasswordObject(password);
-		const newSecretBehavior = db.SecretBehaviorModel({
+		/*const newSecretBehavior = db.SecretBehaviorModel({
 			uid: user.uid,
 			type: 'changePassword',
 			ip: ctx.address,
@@ -31,9 +31,9 @@ passwordRouter
 			newHashType: newPassword.hashType,
 			newHash: newPassword.password.hash,
 			newSalt: newPassword.password.salt
-		});
+		});*/
 		await userPersonal.update({password: newPassword.password, hashType: newPassword.hashType});
-		await newSecretBehavior.save();
+		// await newSecretBehavior.save();
 		await next();
 	});
 module.exports = passwordRouter;

@@ -139,7 +139,7 @@ block content
                     tbody
                       -let n = 0;
                       -const defaultRole = data.defaultRoles.filter(role => role._id === 'default')[0];
-                      .hidden#data= JSON.stringify({operations: data.operations,defaultOperationsId: defaultRole.operationsId})
+                      .hidden#data= JSON.stringify({role: data.role?data.role:'', operations: data.operations,defaultOperationsId: defaultRole.operationsId})
                       for operation in data.operations
                         -n++;
                         tr
@@ -152,7 +152,7 @@ block content
                               .icheckbox
                                 if data.role._id === 'dev'
                                   input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true' disabled)
-                                else if !data.role.defaultRole && defaultRole.operationsId.includes(operation._id)
+                                else if !['visitor', 'banned', 'default'].includes(data.role._id) && defaultRole.operationsId.includes(operation._id)
                                   input(type='checkbox' name='selectOperation' data-operation=operation._id checked='true' disabled)
                                 else
                                   if data.role.operationsId.includes(operation._id)

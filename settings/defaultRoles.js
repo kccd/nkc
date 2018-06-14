@@ -20,7 +20,9 @@ module.exports = [
 		contentClass: [],
 		modifyPostTimeLimit: 0.5,
 		defaultRole: true,
-		operationsId: []
+		operationsId: [
+			'logout'
+		]
 	},
 	{
 		_id: 'banned',

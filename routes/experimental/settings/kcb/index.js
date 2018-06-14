@@ -9,15 +9,11 @@ router
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		let {changeUsername, defaultUid} = body;
-		changeUsername = parseInt(changeUsername);
-		if(isNaN(changeUsername) || changeUsername < 0) {
-			ctx.throw(400, '科创币数量设置错误');
-		}
+		let {defaultUid} = body;
 		const defaultUser = await db.UserModel.findOne({uid: defaultUid});
 		if(!defaultUser) ctx.throw(400, '默认账户不存在');
 		const kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
-		await kcbSettings.update({changeUsername, defaultUid});
+		await kcbSettings.update({defaultUid});
 		await next();
 	});
 module.exports = router;

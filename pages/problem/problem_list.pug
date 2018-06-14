@@ -11,7 +11,7 @@ block content
             a(href='/problem/list') 全部
               span.badge= (data.unsolvedCount + data.resolvedCount) || ''
           li(role='presentation' class=data.type==='unsolved'?'active': '')
-            a(href='/problem/list?type=unsolved') 未完成
+            a(href='/problem/list?type=unsolved') 未解决
               span.badge= (data.unsolvedCount) || ''
           li(role='presentation' class=data.type==='resolved'?'active': '')
             a(href='/problem/list?type=resolved') 已完成
@@ -36,7 +36,7 @@ block content
                   if problem.resolved
                     span.label.label-success 已完成
                   else
-                    span.label.label-danger 未完成
+                    span.label.label-danger 未解决
                   span &nbsp;&nbsp;
               div(style='color: #aaa;display: inline')
                 span

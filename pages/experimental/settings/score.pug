@@ -91,48 +91,6 @@ block content
 
             button.btn.btn-primary(onclick=`saveOperation("${data.operation._id}")`) 保存
 
-        .panel.panel-default
-          .panel-heading
-            span 积分计算公式
-          .panel-body
-            .form-group
-              textarea.form-control#formula(rows=6)= data.scoreSettings.formula
-            button.btn.btn-primary(onclick=`saveFormula()`) 保存
-
-        if 0
-          table.table.table-hover
-            thead
-              tr
-                th 序号
-                th 操作名
-                th 操作介绍
-                th 操作者分数变化
-                th 被操作者分数变化
-                th 状态
-            tbody
-              - n = 0;
-              for operation in data.operations
-                -n++;
-                tr
-                  th= n
-                  th= operation._id
-                  th= operation.description
-                  th
-                    input(type='number' value= operation.score name='score' class=operation._id)
-                  th
-                    input(type='number' value= operation.targetScore name='targetScore' class=operation._id)
-                  th
-                    label
-                      .icheckbox
-                        if data.scoreSettings.operationsId.includes(operation._id)
-                          input(type='checkbox' name='selectOperation' data-operation=operation._id checked=true)
-                        else
-                          input(type='checkbox' name='selectOperation' data-operation=operation._id )
-
-          button.btn.btn-primary(onclick='submit()') 保存
-
-
-
 block scripts
 
   script(src='/icheck/icheck.js')

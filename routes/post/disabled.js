@@ -10,6 +10,11 @@ router
     if(disabled === undefined) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
+    const targetForum = await targetThread.extendForum();
+    const isModerator = await targetForum.isModerator(data.user?data.user.uid:'');
+    if(!isModerator) {
+    	if(!data.userOperationsId.includes('disabledPost')) ctx.throw(400, '权限不足');
+    }
     // if(!await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403,'权限不足');
     const obj = {disabled: false};
     if(disabled) obj.disabled = true;

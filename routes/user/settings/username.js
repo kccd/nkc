@@ -14,7 +14,7 @@ router
 		const operation = await db.OperationModel.findOne({_id: 'modifyUsername'});
 		const sameUsernameUser = await db.UserModel.findOne({usernameLowerCase: newUsername.toLowerCase()});
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
-		const oldUsername = await db.SecretBehaviorModel.findOne({type: 'changeUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
 		if(operation.kcb.status) {
 			if(user.kcb + operation.kcb.change < 0) ctx.throw(400, `科创币不足，修改用户名需花费${operation.kcb.change}个科创币`);

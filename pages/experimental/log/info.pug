@@ -36,17 +36,18 @@ block content
                       img(src=`/avatar/${behavior.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                       span= behavior.user.username
                   else
-                    span
+                    span visitor
                 th= behavior.operation.description
                 th
-                  -const t = behavior.post.t;
-                  -let c = behavior.post.c;
-                  -c = c.replace(/<.*?>/g, '');
-                  -let title = (t ? `《${t}》` : '') + c;
-                  a(href=`/p/${behavior.pid}` data-toggle="tooltip" data-placement="right" title=title)
-                    span= title.slice(0, 40)
-                    if title.length > 40
-                      span ...
+                  if behavior.post
+                    -const t = behavior.post.t;
+                    -let c = behavior.post.c;
+                    -c = c.replace(/<.*?>/g, '');
+                    -let title = (t ? `《${t}》` : '') + c;
+                    a(href=`/p/${behavior.pid}` data-toggle="tooltip" data-placement="right" title=title)
+                      span= title.slice(0, 40)
+                      if title.length > 40
+                        span ...
 
         include ../../interface_navigation_paging
 block scripts
