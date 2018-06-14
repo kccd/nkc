@@ -127,5 +127,22 @@ secretBehaviorSchema.methods.extendUser = async function() {
 	return this.user = user;
 };
 
+secretBehaviorSchema.methods.extendOperationName = async function() {
+	const OperationModel = mongoose.model("operations");
+	let operationData;
+	if(this.operationId){
+		const o = await OperationModel.findOne({_id: this.operationId});
+		if(o){
+			operationData = o;
+		}
+	}else if(this.type){
+		const o = await OperationModel.findOne({_id: this.type});
+		if(o){
+			operationData = o;
+		}
+	}
+	return this.operationData = operationData
+}
+
 const SecretBehaviorModel = mongoose.model('secretBehaviors', secretBehaviorSchema);
 module.exports = SecretBehaviorModel;

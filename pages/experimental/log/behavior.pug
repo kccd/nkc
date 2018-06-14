@@ -32,23 +32,24 @@ block content
                       thead
                         tr
                           th 操作名称
+                          th 操作者
                           th 板块id
                           th 帖子id
-                          th 执行者id
-                          th 执行者用户名
-                          th 目标用户id
                           th 时间
                       tbody
                         for behavior in data.result
                           tr
                             th= behavior.operationData ? behavior.operationData.description : behavior.operationId
+                            th
+                              a(href=`/u/${behavior.uid}` target="_blank")
+                                span= behavior.user.username
                             th= behavior.fid
-                            th= behavior.tid
-                            th= behavior.uid
-                            -const name1 = behavior.user ? behavior.user.username : '';
-                            th=name1
-                            th= behavior.toUid
-                            th= fromNow(behavior.toc)
+                            th
+                              a(href=`/t/${behavior.tid}` target="_blank")
+                                span=behavior.tid
+                            -let behTime = behavior.toc?behavior.toc.toLocaleString():'';
+                            -beTime = behavior.timeStamp?behavior.timeStamp.toLocaleString():'';
+                            th= beTime
 
 
 block scripts
