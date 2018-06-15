@@ -299,7 +299,7 @@ let pugRender = (template, data) => {
 		hideContentByUser,
 		delCodeAddShrink,
 	  applicationFormStatus,
-	  ensureFundOperatorPermission,
+		ensureFundOperatorPermission,
   };
   options.data = data;
   options.filters = filters;
