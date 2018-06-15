@@ -35,7 +35,7 @@ router
 				uid: user.uid,
 		    type: 'score',
 		    operationId: 'violation',
-		    description: '屏蔽回复并标记为违规',
+		    description: para.reason || '屏蔽回复并标记为违规',
 		    change: 0,
 		    targetChange: 1,
 		    targetUid: data.targetUser.uid,

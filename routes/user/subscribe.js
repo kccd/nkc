@@ -70,9 +70,9 @@ subscribeRouter
     let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
     if(subscribersOfDB.subscribers.indexOf(user.uid) > -1 && subscribeUsersOfDB.subscribeUsers.indexOf(uid) > -1) ctx.throw(400, '您之前已经关注过该用户了，没有必要重新关注');
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
-    await ctx.generateUsersBehavior({
+    /*await ctx.generateUsersBehavior({
       operation: 'subscribeUser'
-    });
+    });*/
     await next();
   })
   // 取消关注该用户
@@ -85,9 +85,9 @@ subscribeRouter
     let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$pull: {subscribeUsers: uid}});
     if(subscribersOfDB.subscribers.indexOf(user.uid) === -1 && subscribeUsersOfDB.subscribers.indexOf(uid) === -1) ctx.throw(400, '您之前没有关注过该用户，操作无效');
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
-    await ctx.generateUsersBehavior({
+    /*await ctx.generateUsersBehavior({
       operation: 'unsubscribeUser'
-    });
+    });*/
     await next();
   });
 

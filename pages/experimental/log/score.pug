@@ -32,6 +32,7 @@ block content
               th 操作者分值（次数）变化
               th 被操作者
               th 被操作者分值（次数）变化
+              th 说明
           tbody
             for log in data.logs
               tr
@@ -54,4 +55,5 @@ block content
                   else
                     span
                 th= log.targetChange
+                th= log.description || ''
       include ../../interface_navigation_paging

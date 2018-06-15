@@ -34,6 +34,12 @@ usersRouter
 			if(role._id === 'dev') {
 				ctx.throw(403, '运维人员不可移除！！！');
 			}
+			if(role._id === 'moderator') {
+				ctx.throw(403, '暂不支持移除版主');
+			}
+			if(role._id === 'scholar') {
+				ctx.throw(403, '无法移除用户，系统会自动根据用户的学术分进行移除');
+			}
 			const {uid} = body;
 			const targetUser = await db.UserModel.findOnly({uid});
 			if(targetUser.uid === user.uid) {

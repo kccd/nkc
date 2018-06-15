@@ -16,3 +16,23 @@ function saveNumberSettings() {
 			screenTopWarning(data.error||data);
 		})
 }
+
+function updateFormula() {
+	var dailyLogin = $('#dailyLogin').val();
+	var postToForum = $('#postToForum').val();
+	var postToThread = $('#postToThread').val();
+	var digest = $('#digest').val();
+	var thumbsUp = $('#thumbsUp').val();
+	var violation = $('#violation').val();
+	var xsf = $('#xsf').val();
+
+	var text = '公式：(在线天数 x ' + dailyLogin + ') + ' + '(文章数 x ' + postToForum + ') + (' + '回复数 x ' + postToThread + ') + (' + '优秀文章数 x ' + digest + ') + (' + '被点赞数^(1/2) x ' + thumbsUp + ') + (' + '学术分 x ' + xsf + ') + (' + '违规数 x ' + violation + ')';
+	$('#formula').text(text);
+}
+
+$(function() {
+	updateFormula();
+	$('.formula input').on('input', function() {
+		updateFormula();
+	});
+});

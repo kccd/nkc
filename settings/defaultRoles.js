@@ -49,9 +49,9 @@ module.exports = [
 	{
 		_id: 'moderator',
 		color: '#aaaaaa',
-		description: '版主',
-		abbr: '版',
-		displayName: '版主',
+		description: '专家',
+		abbr: '专',
+		displayName: '专家',
 		contentClass: [],
 		modifyPostTimeLimit: 0,
 		defaultRole: true,
