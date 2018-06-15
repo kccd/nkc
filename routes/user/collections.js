@@ -16,7 +16,17 @@ collectionsRouter
     }else {
       targetUser = await db.UserModel.findOnly({uid: targetUserUid});
     }
-    data.forumList = await dbFn.getAvailableForums(ctx);
+
+		// 拿到用户等级
+		const gradeId = data.userGrade._id;
+		// 拿到用户的角色
+		const rolesId = data.userRoles.map(r => r._id);
+    const options = {
+			gradeId,
+			rolesId,
+			uid: data.user?data.user.uid: ''
+    }
+    data.forumList = await db.ForumModel.accessibleFid(options);
     data.targetUser = targetUser;
     let categoryNames = await db.CollectionModel.aggregate([
       {$match: {uid: targetUserUid}},
@@ -37,13 +47,11 @@ collectionsRouter
     let categoryCollection1 = await db.CollectionModel.find(queryDate).sort({toc: -1});
     let categoryCollection = [];
 
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-      gradeId,
-      rolesId: [],
-      uid: user?user.uid: ''
-    };
+    // const options = {
+    //   gradeId,
+    //   rolesId: [],
+    //   uid: user?user.uid: ''
+    // };
     for(const collection of categoryCollection1) {
       const thread = await ThreadModel.findOne({tid: collection.tid, recycleMark: {$ne: true}})
       if(thread){
