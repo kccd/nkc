@@ -25,6 +25,19 @@ block content
         .radiobox(style='display: inline-block;margin-right: 1rem;')
           span 全部
           input(type='radio' name='statusType' data-type='all')
+        .radiobox(style='display: inline-block;margin-right: 1rem;')
+          span 自定义
+          input(type='radio' name='statusType' data-type='custom')
+        .form-inline(style='margin: 1rem 0rem;display:none;')#custom
+          .form-group
+            label 开始时间
+            input.form-control.time(readonly type='text' name='time1')
+          .form-group
+            label 结束时间
+            input.form-control.time(readonly type='text' name='time2')
+          .form-group
+            button.btn.btn-primary(onclick='getData("custom")') 提交
+            button.btn.btn-danger(onclick='reset()') 重置
       .col-xs-12.col-md-12(style='margin-top: 2rem;')
         div#main(style="width: 100%;height: 45rem;")
 block scripts

@@ -142,6 +142,22 @@ userSchema.virtual('registerType')
 		this._registerType = registerType;
 	});
 
+userSchema.virtual('sheetA')
+	.get(function() {
+		return this._sheetA;
+	})
+	.set(function(sheetA) {
+		this._sheetA = sheetA;
+	});
+
+userSchema.virtual('sheetB')
+	.get(function() {
+		return this._sheetB;
+	})
+	.set(function(sheetB) {
+		this._sheetB = sheetB;
+	});
+
 
 userSchema.virtual('regPort')
 	.get(function() {
@@ -268,12 +284,14 @@ userSchema.methods.getUsersThreads = async function() {
 userSchema.methods.extend = async function() {
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const SecretBehaviorModel = mongoose.model('secretBehaviors');
+  const AnswerSheetModel = mongoose.model('answerSheets');
   const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
   this.regPort = userPersonal.regPort;
   this.regIP = userPersonal.regIP;
   this.mobile = userPersonal.mobile;
   this.nationCode = userPersonal.nationCode;
   this.email = userPersonal.email;
+  // 判断注册类型
   if(this.email) {
 	  const behavior = await SecretBehaviorModel.findOne({uid: this.uid, operationId: 'bindEmail'});
 	  if(behavior) {
@@ -284,6 +302,9 @@ userSchema.methods.extend = async function() {
   } else {
   	this.registerType = 'mobile';
   }
+	// 获取b卷考试科目
+	this.sheetB = await AnswerSheetModel.findOne({uid: this.uid, isA: false, score: {$gte: 6}});
+	this.sheetA = await AnswerSheetModel.findOne({uid: this.uid, isA: true, score: {$gte: 6}});
 };
 
 userSchema.methods.extendRoles = async function() {

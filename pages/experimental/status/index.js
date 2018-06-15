@@ -1,11 +1,11 @@
 function initTime() {
 	$('.time').datetimepicker({
 		language:  'zh-CN',
-		format: 'yyyy-mm-dd',
+		format: 'yyyy-mm',
 		autoclose: 1,
 		todayHighlight: 1,
 		startView: 4,
-		minView: 2,
+		minView: 3,
 		forceParse: 0
 	});
 }
@@ -34,9 +34,27 @@ $('input[name="statusType"]').iCheck({
 function getResults(options) {
 	var type = options.type;
 	if(type === 'custom') {
-		return;
+		$('#custom').show();
+	} else {
+		$('#custom').hide();
+		getData(type)
 	}
-	nkcAPI('/e/status?type='+type, 'GET', {})
+
+}
+
+function reset() {
+	$('#custom input[name="time1"]').val('');
+	$('#custom input[name="time2"]').val('');
+}
+
+function getData(type) {
+	var url = '/e/status?type='+type;
+	if(type === 'custom') {
+		var time1 = $('#custom input[name="time1"]').val();
+		var time2 = $('#custom input[name="time2"]').val();
+		url = '/e/status?type='+type+'&time1='+time1+'&time2='+time2;
+	}
+	nkcAPI(url, 'GET', {})
 		.then(function(data) {
 			display(data.results);
 		})
@@ -70,19 +88,19 @@ function display(results) {
 			{
 				name: '发表文章',
 				type: 'line',
-				stack: '总量',
+				stack: '发表文章',
 				data: results.threadsData
 			},
 			{
 				name: '发表回复',
 				type: 'line',
-				stack: '总量',
+				stack: '发表回复',
 				data: results.postsData
 			},
 			{
 				name: '用户注册',
 				type: 'line',
-				stack: '总量',
+				stack: '用户注册',
 				data: results.usersData
 			}
 		]
