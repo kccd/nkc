@@ -75,7 +75,7 @@ block content
                 .form-group
                   input.form-control#searchInput(placeholder='请输入内容')
                 .form-group
-                  button.btn.btn-primary.btn-block(onclick='searchUser()') 搜索
+                  button.btn.btn-primary.btn-block(type='submit' onclick='searchUser()') 搜索
             .col-xs-12.col-md-12
               table.table.table-hover(style='display: none;padding: 0.5rem;border: 1px solid #cccccc;')#searchResult
                 thead
@@ -99,7 +99,7 @@ block content
                     th 文章
                     th 回复
                     th A卷
-                    th B卷
+                    th B卷（科目）
                     th 注册方式
                     th 注册时间
                     th 注册IP
@@ -119,7 +119,11 @@ block content
                           span.text-danger 未通过
                       th
                         if user.volumeB
-                          span.text-success 通过
+                          if user.sheetB
+                            a(href=`/q/${user.sheetB.category}` target='_blank')
+                              span.text-success=`通过${user.sheetB?` - ${user.sheetB.category}`:''}`
+                          else
+                            span.text-success 通过 - 试卷丢失
                         else
                           span.text-danger 未通过
                       th= user.registerType === 'mobile'?'手机': '邮箱'

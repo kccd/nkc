@@ -37,13 +37,45 @@ function createElement(user) {
 
   var th2 = newElement('th', {}, {}).text(user.threadCount);
   var th3 = newElement('th', {}, {}).text(user.postCount);
+  var klass = 'text-danger';
+  var t = '未通过';
+  if(user.volumeA) {
+	  t = '通过';
+		klass = 'text-success';
+  }
+	var th31 = newElement('th', {class: klass}, {}).text(t);
+	var th33a, th331;
+	klass = 'text-danger';
+	if(user.volumeB) {
+		klass = 'text-success';
+		if(user.sheetB) {
+			th33a = newElement('a', {
+				'href': '/q/'+ user.sheetB.category,
+				'target': '_blank',
+				'class': klass
+			});
+			th331 = newElement('span', {}, {}).text('通过 - '+user.sheetB.category);
+			th33a.append(th331);
+		} else {
+			th331 = newElement('span', {}, {}).text('通过 - 试卷丢失');
+		}
+	} else {
+		th331 = newElement('span', {}, {}).text('未通过');
+	}
+	var th32 = newElement('th', {class: klass}, {});
+	if(th33a) {
+		th32.append(th33a);
+	} else {
+		th32.append(th331);
+	}
+	var th33 = newElement('th', {}, {}).text(user.registerType==='mobile'?'手机':'邮箱');
   var th4 = newElement('th', {}, {}).text(user.toc.toLocaleString());
   var th5 = newElement('th', {}, {}).text(user.regIP + ' : ' + user.regPort);
   var th6 = newElement('th', {}, {});
   a = newElement('a', {href:'/e/settings/user/'+user.uid}, {}).text('编辑');
 	th6.append(a);
 
-  tr.append(th1, th2, th3, th4, th5, th6);
+  tr.append(th1, th2, th3, th31, th32, th33, th4, th5, th6);
 	tbody.append(tr);
 	searchResult.show();
 }
@@ -94,3 +126,9 @@ function editorRole(uid, type) {
 			screenTopWarning(data.error || data);
 		})
 }
+
+$("#searchInput").keydown(function (e) {//当按下按键时
+	if (e.which === 13) {//.which属性判断按下的是哪个键，回车键的键位序号为13
+		searchUser();
+	}
+});
