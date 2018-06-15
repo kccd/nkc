@@ -70,13 +70,13 @@ block content
                             tr
                               th
                                 img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
-                                a(href=`/u/${user.uid}`)= user.username
+                                a(href=`/u/${user.uid}` target="_blank")= user.username
                               th= user.threadCount
                               th= user.postCount
                               th= fromNow(user.toc)
                               th= `${user.regIP} : ${user.regPort}`
                               th
-                                if data.role._id !== 'default' && data.role._id !== 'dev'
+                                if !['default', 'dev', 'scholar', 'moderator'].includes(data.role._id)
                                   if data.role._id === 'banned'
                                     button(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
                                   else

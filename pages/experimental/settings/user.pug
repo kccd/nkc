@@ -83,6 +83,9 @@ block content
                     th 用户名
                     th 文章
                     th 回复
+                    th A卷
+                    th B卷
+                    th 注册方式
                     th 注册时间
                     th 注册IP
                     th
@@ -95,6 +98,9 @@ block content
                     th 用户名
                     th 文章
                     th 回复
+                    th A卷
+                    th B卷
+                    th 注册方式
                     th 注册时间
                     th 注册IP
                     th
@@ -103,17 +109,25 @@ block content
                     tr
                       th
                         img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
-                        a(href=`/u/${user.uid}`)= user.username
+                        a(href=`/u/${user.uid}` target='_blank')= user.username
                       th= user.threadCount
                       th= user.postCount
-                      th= fromNow(user.toc)
+                      th
+                        if user.volumeA
+                          span.text-success 通过
+                        else
+                          span.text-danger 未通过
+                      th
+                        if user.volumeB
+                          span.text-success 通过
+                        else
+                          span.text-danger 未通过
+                      th= user.registerType === 'mobile'?'手机': '邮箱'
+                      th= user.toc.toLocaleString()
                       th= `${user.regIP} : ${user.regPort}`
                       th
                         a(href=`/e/settings/user/${user.uid}`) 编辑
               include ../../interface_navigation_paging
-
-
-
 block scripts
 
   script(src='/interface_common.js')

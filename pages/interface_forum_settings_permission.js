@@ -14,7 +14,7 @@ function submit(fid) {
 	for(var i = 0; i < arr.length; i++) {
 		var e = arr.eq(i);
 		var roleId = e.attr('data-id');
-		if(e.prop('checked') && !selectedRolesId.includes(roleId)) {
+		if(e.prop('checked') && selectedRolesId.indexOf(roleId) === -1) {
 			selectedRolesId.push(roleId);
 		}
 	}
@@ -22,7 +22,7 @@ function submit(fid) {
 	for(var i = 0; i < arr.length; i++) {
 		var e = arr.eq(i);
 		var gradeId = e.attr('data-id');
-		if(e.prop('checked') && !selectedGradesId.includes(gradeId)) {
+		if(e.prop('checked') && selectedGradesId.indexOf(gradeId) === -1) {
 			selectedGradesId.push(gradeId);
 		}
 	}

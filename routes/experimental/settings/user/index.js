@@ -56,19 +56,18 @@ userRouter
 		const {operation} = body;
 		const {uid} = params;
 		const targetUser = await db.UserModel.findOnly({uid});
-		if(operation === 'addRole') {
-			// 添加角色
+		if(['addRole', 'removeRole'].includes(operation)) {
 			const {roleDisplayName} = body;
 			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
 			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
-			await targetUser.update({$addToSet: {certs: role._id}});
-		} else if(operation === 'removeRole') {
-			// 移除角色
-			const {roleDisplayName} = body;
-			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
-			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
-			await targetUser.update({$pull: {certs: role._id}});
-
+			if(role._id === 'scholar') ctx.throw(400, '无需给用户添加学者角色，若用户的学术分大于0系统会自动为用户添加学者角色');
+			if(['banned', 'visitor'].includes(role._id)) ctx.throw(400, '数据错误，请刷新');
+			if(role._id === 'moderator') ctx.throw(400, '暂不支持专家角色的添加与移除');
+			if(operation === 'addRole') {
+				await targetUser.update({$addToSet: {certs: role._id}});
+			} else {
+				await targetUser.update({$pull: {certs: role._id}});
+			}
 		} else {
 
 			//普通信息修改

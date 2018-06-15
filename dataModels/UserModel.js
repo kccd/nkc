@@ -134,6 +134,14 @@ userSchema.virtual('operations')
 		this._operations = operations;
 	});
 
+userSchema.virtual('registerType')
+	.get(function() {
+		return this._registerType;
+	})
+	.set(function(registerType) {
+		this._registerType = registerType;
+	});
+
 
 userSchema.virtual('regPort')
 	.get(function() {
@@ -240,13 +248,13 @@ userSchema.virtual('authLevel')
 	});
 
 userSchema.methods.extendThreads = async function() {
-  const ThreadModel = require('./ThreadModel');
+  const ThreadModel = mongoose.model('threads');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
   return this.threads = threads;
 };
 
 userSchema.methods.getUsersThreads = async function() {
-  const ThreadModel = require('./ThreadModel');
+  const ThreadModel = mongoose.model('threads');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
   threads = await Promise.all(threads.map(async t => {
     await t.extendForum();
@@ -258,13 +266,24 @@ userSchema.methods.getUsersThreads = async function() {
 };
 
 userSchema.methods.extend = async function() {
-  const UsersPersonalModel = require('./UsersPersonalModel');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const SecretBehaviorModel = mongoose.model('secretBehaviors');
   const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
   this.regPort = userPersonal.regPort;
   this.regIP = userPersonal.regIP;
   this.mobile = userPersonal.mobile;
   this.nationCode = userPersonal.nationCode;
   this.email = userPersonal.email;
+  if(this.email) {
+	  const behavior = await SecretBehaviorModel.findOne({uid: this.uid, operationId: 'bindEmail'});
+	  if(behavior) {
+		  this.registerType = 'mobile';
+	  } else {
+		  this.registerType = 'email';
+	  }
+  } else {
+  	this.registerType = 'mobile';
+  }
 };
 
 userSchema.methods.extendRoles = async function() {
@@ -375,10 +394,10 @@ userSchema.methods.calculateScore = async function() {
 	const scoreOfDailyLogin = coefficients.dailyLogin*dailyLoginCount;
 	const scoreOfViolation = coefficients.violation*violationCount;
 	let scoreOfRecommend = 0;
-	if(recCount !== 0) {
-		scoreOfRecommend = Math.log10(recCount)/Math.log10(coefficients.thumbsUp);
+	if(recCount >= 0) {
+		scoreOfRecommend = coefficients.thumbsUp*Math.sqrt(recCount);
 	}
-	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend - scoreOfViolation;
+	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend + scoreOfViolation;
 	await this.update({score});
 };
 

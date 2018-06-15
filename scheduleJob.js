@@ -30,8 +30,8 @@ jobs.updateActiveUsers = cronStr => {
         if(thread) {
         	if(thread.fid !== 'recycle' && !thread.recycleMark) threadCount++;
         } else {
-        	const post = await PostModel.findOne({pid, disabled: false});
-        	if(post) postCount++;
+        	const p = await PostModel.findOne({pid: post.pid, disabled: false});
+        	if(p) postCount++;
         }
       }
       const vitality = user.vitalityArithmetic(threadCount, postCount, targetUser.xsf);

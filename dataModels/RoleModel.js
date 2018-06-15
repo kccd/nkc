@@ -67,9 +67,13 @@ roleSchema.pre('save', function(next){
 roleSchema.methods.extendUserCount = async function() {
 	const UserModel = await mongoose.model('users');
 	const q = {};
-	if(this._id === 'default') {
+	if(this._id === 'scholar') {
+		q.certs = {$ne: 'banned'};
+		q.xsf = {$gt: 0};
+	} else if(this._id === 'default') {
 		q.certs = {$ne: 'banned'};
 	} else {
+		q.certs = {$ne: 'banned'};
 		q.certs = this._id;
 	}
 	const count = await UserModel.count(q);
@@ -80,9 +84,13 @@ roleSchema.methods.getUsers = async function(paging) {
 	const {start, perpage} = paging;
 	const UserModel = mongoose.model('users');
 	const q = {};
-	if(this._id === 'default') {
+	if(this._id === 'scholar') {
+		q.certs = {$ne: 'banned'};
+		q.xsf = {$gt: 0};
+	} else if(this._id === 'default') {
 		q.certs = {$ne: 'banned'};
 	} else {
+		q.certs = {$ne: 'banned'};
 		q.certs = this._id;
 	}
 	return await UserModel.find(q).sort({toc: -1}).skip(start).limit(perpage);
