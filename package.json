@@ -36,6 +36,7 @@
     "icheck": "^1.0.2",
     "immutable": "^3.8.2",
     "jquery-pjax": "^2.0.1",
+    "jscrollpane": "^2.2.0",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",
     "koa-compress": "^2.0.0",

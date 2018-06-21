@@ -243,18 +243,11 @@ const forumAvatarify = async (options) => {
 	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${forumAvatarSize}x${forumAvatarSize}+${left}+${top}`, targetPath]);
 };
 
-const webLogoify = async (options) => {
-	const {top, left, width, height, path, targetPath} = options;
+const webLogoify = async (path, targetPath) => {
 	if(linux) {
-		return spawnProcess('convert', [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${webLogoSize}x${webLogoSize}+${left}+${top}`, targetPath]);
+		return spawnProcess('convert', [path, targetPath]);
 	}
-	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${webLogoSize}x${webLogoSize}+${left}+${top}`, targetPath]);
-};
-const webSmallLogoify = async (path, targetPath) => {
-	if(linux) {
-		return spawnProcess('convert', [path, '-resize', `${webSmallLogoSize}x${webSmallLogoSize}^`, targetPath]);
-	}
-	return spawnProcess('magick', ['convert', path, '-resize', `${webSmallLogoSize}x${webSmallLogoSize}^`, targetPath]);
+	return spawnProcess('magick', ['convert', path, targetPath]);
 };
 
 module.exports = {
@@ -272,7 +265,6 @@ module.exports = {
   npmInstallify,
   gitify,
 	webLogoify,
-	webSmallLogoify,
   coverify,
   photoify,
 	photoSmallify,
