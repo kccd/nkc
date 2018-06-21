@@ -1,7 +1,7 @@
 const {spawn, exec} = require('child_process');
 const settings = require('../settings');
 const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize} = settings.upload;
-const {banner, watermark} = settings.statics;
+const {banner, watermark, fontTtf} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
 const fs = require('fs');
@@ -33,8 +33,16 @@ const spawnProcess = (pathName, args, options = {}) => {
   })
 };
 
+const www = "1024";
+const hhh = "480";
+
 const os = platform();
 const linux = (os === 'linux');
+
+// 图片缩小
+const imageNarrow = path => {
+  return spawnProcess('magick', ['convert', path, '-resize', `${www}>`,path])
+}
 
 const attachify = path => {
   const {width, height} = sizeLimit.attachment;
@@ -45,12 +53,20 @@ const attachify = path => {
 };
 
 
-const watermarkify = path => {
+const watermarkify = (dpi, position, path) => {
   if(linux) {
-    return spawnProcess('composite', ['-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
+    return spawnProcess('composite', ['-dissolve', '50', '-gravity', position, watermark, path, path]);
   }
-  return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
+  return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', position  ,'-geometry', dpi, watermark, path, path]);
 };
+
+const watermarkifyFont = (dpi, font, position, path) =>{
+  if(linux) {
+    return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
+  }
+  // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', 'center ' ,'-draw', "text 0,25 'hello'" ,path, path]);
+  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#FFFFFFFF', '-weight', 'bolder','-stroke','black','-gravity', position ,'-annotate', dpi, font ,path, path]);
+}
 
 // 手机图片上传自动旋转
 const allInfo = async path => {
@@ -222,6 +238,7 @@ module.exports = {
   avatarify,
   attachify,
   watermarkify,
+  watermarkifyFont,
   info,
   allInfo,
   thumbnailify,
@@ -237,7 +254,8 @@ module.exports = {
 	fundLogoify,
   removeFile,
 	lifePhotoify,
-	forumAvatarify
+  forumAvatarify,
+  imageNarrow
 };
 
 

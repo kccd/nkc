@@ -61,17 +61,84 @@ resourceRouter
       // 图片自动旋转
       await imageMagick.allInfo(path);
 
-      //开始裁剪、压缩
+      // 生成略缩图
       await imageMagick.thumbnailify(path, thumbnailFilePath);
-      // 添加水印
-      if (size > largeImage) {
-        await imageMagick.attachify(path);
-      } else {
-        const { width, height } = await imageMagick.info(path);
-        if (height > 400 || width > 300) {
-          await imageMagick.watermarkify(path);
+      // 获取个人水印设置
+      const waterSetting = await ctx.db.UsersGeneralModel.findOne({uid: ctx.data.user.uid});
+      const waterAdd = waterSetting?waterSetting.waterSetting.waterAdd : true;
+      const waterStyle = waterSetting?waterSetting.waterSetting.waterStyle : "siteLogo";
+      const waterGravity = waterSetting?waterSetting.waterSetting.waterGravity : "southeast";
+      // 获取文字水印的字符数、宽度、高度
+      const username = ctx.data.user?ctx.data.user.username : "科创论坛";
+      // const username = "特斯拉520 Casd@#$ 123ASDewfsdf,./ fds士大夫";
+      // console.log(username.replace(/[^\x00-\xff]/g,"01").length)
+      const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
+      const usernameWidth = usernameLength * 12;
+      const usernameHeight = 24;
+      // 根据水印位置计算偏移量
+      let userCoor; // 文字水印偏移量
+      let userXcoor = 0; // 文字水印横向偏移量
+      let userYcoor = 0; // 文字水印纵向偏移量
+      let logoCoor; // Logo水印偏移量
+      let logoXcoor = 0; // Logo水印横向偏移量
+      let logoYcoor = 0; // Logo水印纵向偏移量
+      if(waterGravity === "center"){
+        // 正中间，Logo横向负偏移，文字不偏移
+        // logoXcoor -= parseInt(usernameWidth/2 + 23)
+        logoCoor = "-"+parseInt(usernameWidth/2+23)+"+0";
+        userCoor = "+0+0";
+      }else if(waterGravity === "southeast"){
+        // 右下角，Logo横向负偏移，文字不偏移
+        logoCoor = "+"+parseInt(usernameWidth)+"+0"
+        userCoor = "+0+0";
+      }else if(waterGravity === "southwest"){
+        // 左下角，Logo不偏移，文字横向正偏移
+        logoCoor = "+0+0";
+        userCoor = "+27+0"
+      }else if(waterGravity === "northeast"){
+        // 右上角，Logo横向负偏移，文字纵向正偏移
+        logoCoor = "+"+parseInt(usernameWidth)+"+0"
+        userCoor = "+0+27";
+      }else if(waterGravity === "northwest"){
+        // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
+        logoCoor = "+0+0";
+        userCoor = "+27+27"
+      }else{
+        logoCoor = "+0+0";
+        userCoor = "+0+0"
+      }
+      console.log(logoCoor,userCoor)
+      // 获取图片尺寸
+      const { width, height } = await imageMagick.info(path);
+      // 如果图片宽度大于1024，则将图片宽度缩为1024
+      if(width > 1024){
+        await imageMagick.imageNarrow(path)
+      }
+      // 如果图片尺寸大于200, 并且用户水印设置为true，则为图片添加水印
+      if(width > 200 && waterAdd === true){
+        if(waterStyle === "siteLogo"){
+          await imageMagick.watermarkify(logoCoor, waterGravity, path)
+        }else{
+          await imageMagick.watermarkify(logoCoor, waterGravity, path)
+          await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path)
         }
       }
+      // console.log(width>1024)
+      // await imageMagick.imageTest(path);
+      // await imageMagick.watermarkify(path);
+      // console.log(largeImage)
+      // if (size > largeImage) {
+      //   await imageMagick.attachify(path);
+      // } else {
+      //   const { width, height } = await imageMagick.info(path);
+      //   if (height > 400 || width > 300) {
+      //     if(waterAdd === true){
+      //       console.log(path)
+      //       await imageMagick.watermarkify(path);
+      //       await imageMagick.watermarkifyFont(waterGravity,path);
+      //     }
+      //   }
+      // }
     }
     await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({

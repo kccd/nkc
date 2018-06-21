@@ -1,6 +1,7 @@
 const path = require('path');
 const defaultPath = path.resolve('resources/default_things');
-const watermark = path.resolve('resources/default_things/default_watermark3.png');
+const watermark = path.resolve('resources/default_things/logo2.png');
+const fontTtf = path.resolve('resources/default_things/simsun.ttc')
 const banner = path.resolve('resources/site_specific/ad_default.jpg');
 const defaultPfBannerPath = defaultPath + '/default_pf_banner.jpg';
 const defaultPfAvatarPath = defaultPath + '/default_pf_avatar.jpg';
@@ -14,6 +15,7 @@ module.exports = {
 	siteSpecificPath,
   watermark,
   banner,
+  fontTtf,
   defaultPfBannerPath,
   defaultPfAvatarPath,
   defaultAvatarPath,
