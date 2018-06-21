@@ -89,6 +89,10 @@ block content
                     a#threadTop(href=`javascript:setTopped('${data.thread.tid}')`) 设置置顶
                   if data.isModerator || data.userOperationsId.includes('unToppedThread') && thread.topped
                     a#threadTop(href=`javascript:cancelTopped('${data.thread.tid}')`) 撤销置顶
+                  if data.userOperationsId.includes('homeTop') && !data.ads.includes(data.thread.tid)
+                    a#threadTop(href=`javascript:homeTop('${data.thread.tid}')`) 首页置顶
+                  if data.userOperationsId.includes('unHomeTop') && data.ads.includes(data.thread.tid)
+                    a#threadTop(href=`javascript:unHomeTop('${data.thread.tid}')`) 取消首页置顶
                   //-
                     if data.userLevel >= 4
                       if thread.digest

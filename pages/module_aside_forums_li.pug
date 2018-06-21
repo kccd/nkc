@@ -1,0 +1,7 @@
+.col-xs-12.col-md-12(style='margin: 0.2rem 0;')
+  .row
+    a(href=`/f/${thread.fid}` style=`border-radius: 0.2rem;font-size:0.9em;padding: 3px 5px;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
+    a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
+    span &nbsp;&nbsp;
+    a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
+      span=` ( ${thread.firstPost.user.username} )`

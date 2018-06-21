@@ -8,6 +8,22 @@ module.exports = {
 			GET: 'visitWebBaseSettings',
 			PATCH: 'modifyWebBase'
 		},
+		home: {
+			logo: {
+				GET: 'visitHomeLogoSettings',
+				PATCH: 'modifyHomeLogoSettings',
+				DELETE: 'deleteHomeLogo'
+			},
+			top: {
+				GET: 'visitHomeTopSettings',
+				PATCH: 'modifyHomeTopSettings'
+			},
+			notice: {
+				GET: 'visitHomeNoticeSettings',
+				PATCH: 'modifyHomeNoticeSettings',
+				DELETE: 'deleteHomeNotice'
+			}
+		},
 		role: {
 			GET: 'visitRoleUsers',
 			POST: 'addRole',
@@ -78,6 +94,10 @@ module.exports = {
 		log: {
 			GET: 'logParamsSetting',
 			POST: 'logParamsSettingModify'
+		},
+		page: {
+			GET: 'visitPageSettings',
+			PATCH: 'modifyPageSettings'
 		}
 	},
 	systemInfo: {

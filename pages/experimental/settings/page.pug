@@ -1,0 +1,30 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 分页设置
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .form-horizontal
+            .col-xs-12.col-md-12
+              h4 网站首页
+            .form-group
+              label.col-sm-3.control-label 手机首次显示文章数
+              .col-sm-3
+                input.form-control#homeThreadsFirstLoad(type='text' value=data.pageSettings.homeThreadsFirstLoad)
+            .form-group
+              label.col-sm-3.control-label
+              .col-sm-3
+                button.btn.btn-primary(onclick='savePage()') 保存
+block scripts
+
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/page.js?v=${global.NKC.startTime}`)
+
+
+

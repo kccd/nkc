@@ -259,6 +259,21 @@
     "dailyLogin": "日常登录（不影响权限）",
     "violation": "违规操作（不影响权限）",
     "logParamsSettingModify": "修改日志设置",
-    "logParamsSetting": "访问日志设置"
+    "logParamsSetting": "访问日志设置",
+    "homeTop": "首页置顶",
+    "unHomeTop": "取消首页置顶",
+    "visitHomeLogoSettings": "访问首页logo设置",
+    "visitHomeTopSettings": "访问首页置顶设置",
+    "modifyHomeLogoSettings": "修改首页logo设置",
+    "modifyHomeTopSettings": "修改首页置顶设置",
+    "uploadHomeLogo": "上传网站logo",
+    "getHomeLogo": "获取网站logo",
+    "deleteHomeLogo": "删除网站logo",
+    "visitHomeNoticeSettings": "访问网站首页公告设置",
+    "modifyHomeNoticeSettings": "修改网站首页公告",
+    "deleteHomeNotice": "删除首页通知",
+    "visitPageSettings": "访问分页设置",
+    "modifyPageSettings": "修改分页设置"
+
   }
 }

@@ -1,6 +1,6 @@
 var jcropApi;
 var imgM = $('#img_m');
-var imgMWeight = 92;
+var imgMWeight = 96;
 var imgWeight = 0;
 var positionObj;
 var hasImg = false;

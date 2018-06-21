@@ -17,7 +17,14 @@ visitorRouter
 		const paging = apiFunction.paging(page, count);
 		data.paging = paging;
 		const uid = usersId.slice(paging.start, paging.start + paging.perpage);
-		data.visitors = await Promise.all(uid.map(u => db.UserModel.findOne({uid: u})));
+		data.visitors = [];
+		for(const u of uid) {
+			const user = await db.UserModel.findOne({uid: u});
+			if(user) {
+				data.visitors.push(user);
+			}
+		}
+		//data.visitors = await Promise.all(uid.map(u => db.UserModel.findOne({uid: u})));
 		data.type = 'visitors';
 		await next();
 	});

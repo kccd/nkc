@@ -1,10 +1,145 @@
 const Router = require('koa-router');
-const latestRouter = new Router();
+const homeRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const apiFn = nkcModules.apiFunction;
-const dbFn = nkcModules.dbFunction;
-latestRouter
-  .get('/', async (ctx, next) => {
+homeRouter
+	.get('/', async (ctx, next) => {
+		const {data, db, query, nkcModules} = ctx;
+		const {digest, sortby, page = 0} = query;
+		const gradeId = data.userGrade._id;
+		const rolesId = data.userRoles.map(r => r._id);
+		const options = {
+			gradeId,
+			rolesId,
+			uid: data.user?data.user.uid:''
+		};
+		const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
+		const q = {
+			fid: {$in: fidOfCanGetThreads}
+		};
+		if(digest) {
+			q.digest = true;
+			data.digest = true;
+		}
+		// 判断能否显示被退回的文章
+		if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
+			if(!data.user) {
+				q.recycleMark = {$ne: true};
+			} else {
+				q.$or = [
+					{
+						recycleMark: {$ne: true}
+					},
+					{
+						recycleMark: true,
+						uid: data.user.uid
+					}
+				]
+			}
+		}
+		const sort = {};
+		if(sortby === 'toc') {
+			sort.toc = -1;
+			data.sortby = 'toc';
+		} else {
+			sort.tlm = -1;
+		}
+		const threadCount = await db.ThreadModel.count(q);
+		const paging = nkcModules.apiFunction.paging(page, threadCount);
+		data.paging = paging;
+		// 加载文章
+		const threads = await db.ThreadModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
+		data.threads = [];
+		data.threads = await Promise.all(threads.map(async thread => {
+			await thread.extendFirstPost().then(p => p.extendUser());
+			if(thread.lm) {
+				await thread.extendLastPost().then(p => p.extendUser());
+			} else {
+				thread.lastPost = thread.firstPost;
+			}
+			await thread.extendForum();
+			await thread.forum.extendParentForum();
+			return thread;
+		}));
+
+		// 导航
+		const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+		const forums = await db.ForumModel.visibleForums(options);
+		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+
+
+		data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		data.pageSettings = await db.SettingModel.findOnly({type: 'page'});
+
+		// 公告
+		data.noticeThreads = [];
+		for(const oc of data.homeSettings.noticeThreadsId) {
+			const thread = await db.ThreadModel.findOne({oc});
+			if(thread) {
+				await thread.extendFirstPost().then(p => p.extendUser());
+				data.noticeThreads.push(thread);
+			}
+		}
+
+		// 首页置顶
+		data.ads = [];
+		for(const tid of data.homeSettings.ads) {
+			const thread = await db.ThreadModel.findOne({tid});
+			if(thread) {
+				await thread.extendFirstPost().then(p => p.extendUser());
+				await thread.extendForum();
+				data.ads.push(thread);
+			}
+		}
+
+		// 加精文章
+		data.digestThreads = [];
+		// const digestThreads = await db.ThreadModel.find({fid: {$in: fidOfCanGetThreads}, digest: true}).limit(10);
+		const digestThreads = await db.ThreadModel.aggregate([
+			{
+				$match: {
+					fid: {
+						$in: fidOfCanGetThreads
+					},
+					digest: true
+				}
+			},
+			{
+				$sample: {
+					size: 10
+				}
+			}
+		]);
+		for(const thread of digestThreads) {
+			const firstPost = await db.PostModel.findOne({pid: thread.oc});
+			if(!firstPost) {
+				continue;
+			} else {
+				await firstPost.extendUser();
+				thread.firstPost = firstPost;
+			}
+			thread.forum = await db.ForumModel.findOne({fid: thread.fid});
+			if(thread.forum) {
+				await thread.forum.extendParentForum();
+			}
+			data.digestThreads.push(thread);
+		}
+
+		// 活跃用户
+		const { home } = ctx.settings;
+		const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(home.activeUsersLength);
+		await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
+		data.activeUsers = activeUsers;
+
+		// 关注的用户
+		if(data.user) {
+			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
+		}
+		data.navbar = { highlight: 'latest' };
+		ctx.template = 'home/index.pug';
+		await next();
+	})
+  .post('/', async (ctx, next) => {
     const { data, db, query } = ctx;
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
@@ -139,8 +274,8 @@ latestRouter
     const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(home.activeUsersLength);
     await Promise.all(activeUsers.map(activeUser => activeUser.extendUser()));
     data.activeUsers = activeUsers;
-    ctx.template = 'interface_latest_threads.pug';
+    ctx.template = 'interface_home.pug';
     await next()
   });
 
-module.exports = latestRouter;
+module.exports = homeRouter;

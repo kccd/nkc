@@ -4,7 +4,7 @@ const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
 const forgotPasswordRouter = require('./forgotPassword');
-const latestRouter = require('./latest');
+const homeRouter = require('./home');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
@@ -27,10 +27,10 @@ const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
 const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
-const logRouter = require('./log');
 const forumAvatarRouter = require('./forum_avatar');
 const coverRouter = require('./cover');
 const pageRouter = require('./page');
+const logoRouter = require('./logo');
 // -----------------------------------
 otherRouter
   .get('/latest', async (ctx, next) => {
@@ -131,6 +131,7 @@ otherRouter
 		return ctx.redirect(`/`);
 	})
   .use('login', loginRouter.routes(), loginRouter.allowedMethods())
+	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('exam', examRouter.routes(), examRouter.allowedMethods())
@@ -142,7 +143,7 @@ otherRouter
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
-  .use('', latestRouter.routes(), latestRouter.allowedMethods())
+  .use('', homeRouter.routes(), homeRouter.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())
@@ -153,7 +154,6 @@ otherRouter
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
-	// .use('log', logRouter.routes(), logRouter.allowedMethods())
 	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods());

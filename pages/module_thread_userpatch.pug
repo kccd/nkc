@@ -1,8 +1,9 @@
--var uid = user.uid
-.nkcpanel
-  .UserProfileSection1
-    include interface_profile_avatar.pug
-
+.row
+  .col-xs-12.col-md-12.text-center
+      img(src=`/avatar/${targetUser.uid}` style='width: 6rem;height: 6rem;border-radius: 50%;')
+  .col-xs-12.col-md-12.text-center
+    a(href=`/u/${targetUser.uid}` style='color: #555555;')
+      h3(style='margin: 0.3rem 0;')= targetUser.username
     div(style='display:inline-block;margin-top:8px;')
       //.ForumTitleCircle(style='background-color:#{user.color||"#bbb"}')
       a(href=`/u/${uid}`)

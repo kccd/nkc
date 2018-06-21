@@ -69,12 +69,19 @@ resourceRouter
       const waterStyle = waterSetting?waterSetting.waterSetting.waterStyle : "siteLogo";
       const waterGravity = waterSetting?waterSetting.waterSetting.waterGravity : "southeast";
       // 获取文字水印的字符数、宽度、高度
-      const username = ctx.data.user?ctx.data.user.username : "科创论坛";
-      // const username = "特斯拉520 Casd@#$ 123ASDewfsdf,./ fds士大夫";
-      // console.log(username.replace(/[^\x00-\xff]/g,"01").length)
+      // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
+      const username = "123465 asdasda ASDASD 安科技杀手空间 !@$%$&^"
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
-      const usernameWidth = usernameLength * 12;
+      const usernameWidth = usernameLength * 13;
       const usernameHeight = 24;
+      console.log(usernameLength)
+      // 获取水印图片路径
+      const waterSmall = await ctx.db.SettingModel.findOne({type:"home"});
+      // const waterSmallPath = settings.upload.webSmallLogoPath + "/" + waterSmall.smallLogo + ".png";
+      const waterSmallPath = settings.upload.webSmallLogoPath + "/" + waterSmall.logo + ".png";
+      // 图片水印尺寸
+      const siteLogoWidth = settings.upload.webSmallLogoSize;
+      const siteLogoHeigth = settings.upload.webSmallLogoSize;
       // 根据水印位置计算偏移量
       let userCoor; // 文字水印偏移量
       let userXcoor = 0; // 文字水印横向偏移量
@@ -84,7 +91,6 @@ resourceRouter
       let logoYcoor = 0; // Logo水印纵向偏移量
       if(waterGravity === "center"){
         // 正中间，Logo横向负偏移，文字不偏移
-        // logoXcoor -= parseInt(usernameWidth/2 + 23)
         logoCoor = "-"+parseInt(usernameWidth/2+23)+"+0";
         userCoor = "+0+0";
       }else if(waterGravity === "southeast"){
@@ -94,32 +100,31 @@ resourceRouter
       }else if(waterGravity === "southwest"){
         // 左下角，Logo不偏移，文字横向正偏移
         logoCoor = "+0+0";
-        userCoor = "+27+0"
+        userCoor = "+"+siteLogoWidth+"+0"
       }else if(waterGravity === "northeast"){
         // 右上角，Logo横向负偏移，文字纵向正偏移
         logoCoor = "+"+parseInt(usernameWidth)+"+0"
-        userCoor = "+0+27";
+        userCoor = "+0+"+parseInt(siteLogoHeigth-24);
       }else if(waterGravity === "northwest"){
         // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
         logoCoor = "+0+0";
-        userCoor = "+27+27"
+        userCoor = "+"+siteLogoWidth+"+"+parseInt(siteLogoHeigth-24)
       }else{
         logoCoor = "+0+0";
         userCoor = "+0+0"
       }
-      console.log(logoCoor,userCoor)
       // 获取图片尺寸
       const { width, height } = await imageMagick.info(path);
       // 如果图片宽度大于1024，则将图片宽度缩为1024
       if(width > 1024){
         await imageMagick.imageNarrow(path)
       }
-      // 如果图片尺寸大于200, 并且用户水印设置为true，则为图片添加水印
-      if(width > 200 && waterAdd === true){
+      // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
+      if(width > 600 && height > 200 && waterAdd === true){
         if(waterStyle === "siteLogo"){
-          await imageMagick.watermarkify(logoCoor, waterGravity, path)
+          await imageMagick.watermarkify(waterGravity, path)
         }else{
-          await imageMagick.watermarkify(logoCoor, waterGravity, path)
+          await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path)
           await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path)
         }
       }

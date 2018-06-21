@@ -43,7 +43,7 @@ h1, h2, h3, h4, h5, p{
   color: #ccc;
   font-size: 9pt;
 }
-body { padding-top: 70px; }
+body { padding-top: 65px; }
 
 .navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse{
   max-height: 1000px;
@@ -2025,7 +2025,11 @@ img.emoji {
 */
 .new-content{
   overflow: hidden;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0.2rem;
+  border-top: 1px solid #eeeeee;
+}
+.new-content:last-child{
+  border-bottom: 1px solid #eeeeee;
 }
 .new-content-forumAbbr{
   height: 1.5rem;
@@ -2450,6 +2454,126 @@ img.emoji {
   display: none;
 }
 
+
+
+/*首页*/
+
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1060;
+  display: none;
+  max-width: 276px;
+  padding: 1px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: left;
+  white-space: normal;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+
+.swiper-home {
+  width: 100%;
+  height: 100%;
+}
+.swiper-home:hover .swiper-button{
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1);
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+  /* Center slide text vertically */
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+.swiper-button{
+  color: rgba(255,255,255,0);
+  text-align: center;
+  line-height: 44px;
+  font-size: 3em;
+  background-color: rgba(0,0,0,0);
+  /*transition: background-color 0.3s;*/
+}
+.swiper-pagination{
+  color: #ffffff;
+}
+.swiper-title{
+  color: #ffffff;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  padding: 0.5rem;
+  text-align: left;
+  background-color: rgba(0,0,0,0.4);
+  font-size: 0.8em;
+}
+
+.home-forum-list-li{
+  border-color: #eeeeee;
+}
+
+.home-forum-list-li a{
+  color: #555555;
+  text-decoration: none;
+}
+.home-post-button a{
+  text-decoration: none;
+  height: 5rem;
+  line-height: 5rem;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1.5em;
+  border: 1px solid #eeeeee;
+  color: #ff8328;
+}
+.home-post-button a:hover{
+  color: #ee8b42;
+  border-color: #eeeeee;
+  background-color: rgba(0,0,0,0.05);
+}
+
+.fixedDiv::-webkit-scrollbar {/*滚动条整体样式*/
+  width: 5px;     /*高宽分别对应横竖滚动条的尺寸*/
+  height: 1px;
+}
+.fixedDiv::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+  border-radius: 10px;
+  -webkit-box-shadow: none;
+  background: rgba(0,0,0,0.1);
+}
+.fixedDiv::-webkit-scrollbar-track {/*滚动条里面轨道*/
+  margin-left: 2px;
+  -webkit-box-shadow: none;
+  border-radius: 10px;
+  background: rgba(0,0,0,0);
+}
+
+
+
+
 /*--------------*/
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{
@@ -2469,6 +2593,15 @@ img.emoji {
 }
 
 @media screen and (max-width: 991px) {
+  #forumsDiv{
+    display: none;
+  }
+  .hiddenInMobile{
+    display: none !important
+  }
+  .swiper-home{
+    height: 36rem;
+  }
   .user-info-list .hasCover .content-left{
     width: 19%;
   }
@@ -2477,6 +2610,9 @@ img.emoji {
   }
 }
 @media screen and (max-width: 767px) {
+  .swiper-home{
+    height: 28rem;
+  }
   .userInfo-m{
     display: inline-block;
   }
@@ -2517,6 +2653,9 @@ img.emoji {
   }
 }
 @media screen and (max-width: 568px) {
+  .swiper-home{
+    height: 22rem;
+  }
   .new-content-left{
     width: 34%;
   }
@@ -2531,6 +2670,9 @@ img.emoji {
   }
 }
 @media screen and (max-width: 450px) {
+  .swiper-home{
+    height: 17rem;
+  }
   .new-content-left{
     height:7rem;
   }
@@ -2552,6 +2694,9 @@ img.emoji {
   }
 }
 @media screen and (max-width: 400px) {
+  .swiper-home{
+    height: 16rem;
+  }
   .user-info-list .hasCover .content-left{
     width: 35%;
     height: 5.8em;
@@ -2578,26 +2723,3 @@ img.emoji {
   }
 }
 
-
-.popover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1060;
-  display: none;
-  max-width: 276px;
-  padding: 1px;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.42857143;
-  text-align: left;
-  white-space: normal;
-  background-color: #fff;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  border: 1px solid #ccc;
-  border: 1px solid rgba(0,0,0,.2);
-  border-radius: 6px;
-  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-  box-shadow: 0 5px 10px rgba(0,0,0,.2);
-}

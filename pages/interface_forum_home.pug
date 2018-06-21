@@ -306,7 +306,7 @@ block content
                         img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                 if data.forum.followers.length > 8
                   .col-xs-12.col-md-12.text-center
-                    a(href=`/f/${data.forum.fid}/visitor`) 查看更多
+                    a(href=`/f/${data.forum.fid}/followers`) 查看更多
                     
               br
             if data.users.length > 0
@@ -322,7 +322,7 @@ block content
                         img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                 if data.users.length > 8
                   .col-xs-12.col-md-12.text-center
-                    a(href=`/f/${data.forum.fid}/visitor`) 查看更多
+                    a(href=`/f/${data.forum.fid}/visitors`) 查看更多
             .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: none;')
               button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
               br
