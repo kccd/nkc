@@ -15,12 +15,29 @@ var swiper = new Swiper('.swiper-container', {
 
 });
 
-function showChildrenForums(fid) {
+function showChildrenForums(fid, color) {
 	var childrenDiv = $('.f'+fid);
+	/*$('li.list-group-item.home-forum-list-li').css({
+		'border-left': '1px solid #eeeeee'
+	});*/
 	if(childrenDiv.css('display') === 'none') {
 		childrenDiv.slideDown();
+		/*$('li.list-group-item.home-forum-list-li').css({
+			'border-left': 'none'
+		});*/
+		const childrenDivLi = $('.forumLi' + fid + ' li.list-group-item.home-forum-list-li');
+		childrenDivLi.css({
+			'border-left': '3px solid '+color
+		});
 	} else {
-		childrenDiv.slideUp();
+		childrenDiv.slideUp(function() {
+			/*$('li.list-group-item.home-forum-list-li').css({
+				'border-left': '1px solid #eeeeee'
+			});*/
+			$('.forumLi' + fid + ' li.list-group-item.home-forum-list-li').css({
+				'border-left': '1px solid #eeeeee'
+			});
+		});
 	}
 
 	var span = $('.span'+fid);
@@ -35,7 +52,7 @@ function showChildrenForums(fid) {
 
 function showForumsDiv() {
 	var div = $('#forumsDiv');
-	if(div.css('display') === 'none') {
+	if(div.css('display') === '1px solid #eeeeee') {
 		div.slideDown();
 	} else {
 		div.slideUp();

@@ -1,4 +1,7 @@
 module.exports = {
 	type: 'home',
-	ads: []
+	ads: [],
+	logos: [],
+	logo: String,
+	smallLogo: String
 };

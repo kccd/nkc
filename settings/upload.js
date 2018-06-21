@@ -18,7 +18,6 @@ const photoSmallPath = path.resolve('resources/photo_small');
 const fundBannerPath = path.resolve('resources/fundBanner');
 const fundLogoPath = path.resolve('resources/fundLogo');
 const webLogoPath = path.resolve('resources/logo');
-const webSmallLogoPath = path.resolve('resources/logo_small');
 
 
 function generateFolderName(basePath) {
@@ -101,7 +100,6 @@ module.exports = {
 	fundBannerPath,
 	fundLogoPath,
 	webLogoPath,
-	webSmallLogoPath,
   avatarSize: 192,
 	forumAvatarSize: 96,
   avatarSmallSize: 48,
