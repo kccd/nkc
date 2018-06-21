@@ -1,6 +1,6 @@
 const {spawn, exec} = require('child_process');
 const settings = require('../settings');
-const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize} = settings.upload;
+const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize} = settings.upload;
 const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
@@ -218,6 +218,20 @@ const forumAvatarify = async (options) => {
 	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${forumAvatarSize}x${forumAvatarSize}+${left}+${top}`, targetPath]);
 };
 
+const webLogoify = async (options) => {
+	const {top, left, width, height, path, targetPath} = options;
+	if(linux) {
+		return spawnProcess('convert', [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${webLogoSize}x${webLogoSize}+${left}+${top}`, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${webLogoSize}x${webLogoSize}+${left}+${top}`, targetPath]);
+};
+const webSmallLogoify = async (path, targetPath) => {
+	if(linux) {
+		return spawnProcess('convert', [path, '-resize', `${webSmallLogoSize}x${webSmallLogoSize}^`, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, '-resize', `${webSmallLogoSize}x${webSmallLogoSize}^`, targetPath]);
+};
+
 module.exports = {
   avatarify,
   attachify,
@@ -230,6 +244,8 @@ module.exports = {
   bannerify,
   npmInstallify,
   gitify,
+	webLogoify,
+	webSmallLogoify,
   coverify,
   photoify,
 	photoSmallify,

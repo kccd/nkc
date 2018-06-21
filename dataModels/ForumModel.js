@@ -455,7 +455,7 @@ forumSchema.statics.accessibleFid = async (options) => {
 // ------------------------------------------------------------------------------
 
 
-// ----------------------------- 加载能管理的板块 ---------------------------------
+// ----------------------------- 加载能管理的板块fid ---------------------------------
 forumSchema.statics.canManagerFid = async function(options) {
 	const {uid, fid} = options;
 	const ForumModel = mongoose.model('forums');
@@ -476,6 +476,38 @@ forumSchema.statics.canManagerFid = async function(options) {
 		}
 	}));
 	return fidArr;
+};
+// ------------------------------------------------------------------------------
+
+
+// ----------------------------- 加载能管理的板块 ---------------------------------
+forumSchema.statics.canManagerForums = async function(options) {
+	const {uid, fid} = options;
+	const ForumModel = mongoose.model('forums');
+	const fidArr = [];
+	const results = [];
+	const q = {
+		accessible: true,
+		moderators: uid||''
+	};
+	if(0) {
+		q.parentId = fid;
+	}
+	const forums = await ForumModel.find(q);
+	await Promise.all(forums.map(async forum => {
+		if(!fidArr.includes(forum.fid)) {
+			fidArr.push(forum.fid);
+			results.push(forum);
+		}
+		const childrenForums = await ForumModel.getAllChildrenForums(forum.fid);
+		for(const forum of childrenForums) {
+			if(forum.accessible && !fidArr.includes(forum.fid)) {
+				fidArr.push(forum.fid);
+				results.push(forum);
+			}
+		}
+	}));
+	return results;
 };
 // ------------------------------------------------------------------------------
 

@@ -47,6 +47,6 @@ app.use(init)
 	.use(permission)
   // .use(scoreHandler)
   .use(mainRouter.routes())
-	.use(score)
+	// .use(score)
   .use(body);
 module.exports = app.callback();

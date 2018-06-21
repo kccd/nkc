@@ -984,3 +984,24 @@ if($('input[data-control="hue"]').length !== 0) {
 
 	});
 }
+
+// 首页置顶
+function homeTop(tid) {
+	nkcAPI('/t/'+tid+'/hometop', 'POST', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+// 取消首页置顶
+function unHomeTop(tid) {
+	nkcAPI('/t/'+tid+'/hometop', 'DELETE', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}

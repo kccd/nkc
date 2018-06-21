@@ -6,7 +6,9 @@ const settings = [
 	'score',
 	'download',
 	'log',
-	'download'
+	'download',
+	'home',
+	'page'
 ];
 const defaultSettings = settings.map(n => {
 	return require(`./${n}`);

@@ -1,11 +1,12 @@
-.nkcpanel #{active_user_title}
-  div
-    for active in data.activeUsers
-      -var user = active.user;
-      div(style='padding: 5px; width: 90px; display: inline-block;position: relative;text-align: center;')
-        a(href=`/u/${user.uid}`)
-          img(src=`/avatar/${user.uid}` style='width:80px;height:80px;border-radius:6px;')
-        div
-          a(href='/u/'+ user.uid style='display: inline-block;overflow: hidden;height: 1.2em;') #{user.username}
-        span(style='color: #d6571c; margin-right: 0; display: inline-block;overflow: hidden;') 帖:#{active.lWThreadCount} 复:#{active.lWPostCount}
-
+.row
+  .col-xs-12.col-md-12
+    div(style='border: 1px solid #eeeeee;')
+      h4.text-center 一周活跃用户
+      for active in data.activeUsers
+        -var user = active.user;
+        div(style='padding: 5px; width: 8.6rem; display: inline-block;position: relative;text-align: center;')
+          a(href=`/u/${user.uid}` target="_blank")
+            img(src=`/avatar/${user.uid}` style='width:6rem;height:6rem;border-radius:6px;')
+          div
+            a(href='/u/'+ user.uid style='display: inline-block;overflow: hidden;height: 1.2em;') #{user.username}
+          span(style='color: #d6571c; margin-right: 0; display: inline-block;overflow: hidden;') 帖:#{active.lWThreadCount} 复:#{active.lWPostCount}

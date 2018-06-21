@@ -11,9 +11,6 @@ const settingSchema = new Schema({
 
 	//系统设置
 	//---------------------------------------
-  ads: {
-    type: [String]
-  },
   popPersonalForums: {
     type: [String]
   },
@@ -33,6 +30,7 @@ const settingSchema = new Schema({
     drafts: Number,
 	  operationTypes: Number,
 	  problems: Number,
+	  logos: Number
   },
 
 	//科创基金设置
@@ -123,6 +121,19 @@ const settingSchema = new Schema({
 	// ---------------------------------------
 	numberOfDays: Number, // 收费天数
 	numberOfKcb: Number, // 单次下载收取科创币数
+
+	// 首页
+	// ---------------------------------------
+	ads: {
+		type: [String]
+	},
+	logos: [String],
+	logo: String,
+	noticeThreadsId: [String],
+
+	// 分页
+	// ---------------------------------------
+	homeThreadsFirstLoad: Number,
 },
 {toObject: {
   getters: true,

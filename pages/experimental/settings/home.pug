@@ -1,0 +1,102 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  title 网站首页设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-2
+        .list-group
+          a.list-group-item(class=data.type==='top'?'active': '' href=`/e/settings/home/top`) 置顶
+          a.list-group-item(class=data.type==='logo'?'active': '' href=`/e/settings/home/logo`) LOGO
+          a.list-group-item(class=data.type==='notice'?'active': '' href=`/e/settings/home/notice`) 网站公告
+      .col-xs-12.col-md-10
+        if data.type === 'top'
+          if data.ads.length === 0
+            h4 暂无首页置顶文章
+          .row
+            -let n = 0;
+            for thread in data.ads
+              -n++;
+              .col-xs-6.col-sm-4.col-md-3
+                .row
+                  .col-xs-12.col-xs-12
+                    h5(style='height: 1em;overflow:hidden;')
+                      a(href=`/t/${thread.tid}` target='_blank' title=thread.firstPost.t)= thread.firstPost.t
+                  .col-xs-12.col-xs-12
+                    img(src=`/cover/${thread.tid}` style=`width:100%;`)
+                  .col-xs-12.col-md-12
+                    span 序号
+                    input(style='display:inline-block;width: 5rem;margin: 0.5rem 0;padding-left: 0.8rem;' value=n data-tid=thread.tid name='threadOrder' type='number')
+                    if data.userOperationsId.includes('unHomeTop')
+                      button.btn.btn-default.btn-sm(onclick=`unHomeTop("${thread.tid}")`) 移除
+            .col-xs-12.col-sm-12.col-md-12(style='margin-top: 1rem;')
+              button.btn.btn-primary(onclick='saveAdsOrder()') 保存
+        else if data.type === 'notice'
+          h4 网站公告
+          for thread, index in data.noticeThreads
+            div(style='margin: 0.5rem 0;')
+              a(href=`/t/${thread.tid}` target='_blank')= `${index+1}. ${thread.firstPost.t}`
+              button.btn.btn-danger.btn-sm(onclick=`removeNotice("${thread.oc}")`) 移除
+
+          h5 请输入文号，以英文逗号（,）分隔
+          .from
+            .form-group
+              textarea.form-control#threadId(placeholder='文号' rows=8)= data.homeSettings.noticeThreadsId?data.homeSettings.noticeThreadsId.join(','): ''
+            .form-group
+              button.btn.btn-default(onclick='saveNotice()') 保存
+
+        else
+          .row
+            .col-xs-12.col-md-12
+              h4 默认
+              img(src=`/logo/${data.homeSettings.logo}` style='width: 13rem;height: 13rem;')
+            .col-xs-12.col-md-12
+              hr
+              h4 所有
+              for logoId in data.homeSettings.logos
+                div(style='display:inline-block; margin-right: 1rem;margin-bottom: 2rem;').text-center
+                  img(src=`/logo/${logoId}` style='width: 13rem;height: 13rem;margin-bottom:0.5rem;')
+                  div
+                    button.btn.btn-sm.btn-default(onclick=`defaultLogo("${logoId}")`) 设为默认
+                    button.btn.btn-sm.btn-danger(onclick=`deleteLogo("${logoId}")`) 删除
+            .col-xs-12.col-md-12
+              hr
+              h4 上传
+              .row
+                .col-xs-12.col-md-6
+                  .row
+                    .col-xs-12.col-md-12.user-settings-img-dev
+                      img(src=`` style='width: 100%;')
+                    .col-xs-12.col-md-12.text-center
+                      br
+                      button.btn.btn-primary(onclick='$("#inputFile").click();') 选择图片
+                      button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
+                      br
+                      br
+                .col-xs-12.col-md-3
+                  .col-xs-12.col-md-12
+                    div(style=`width: 250px;height: 250px;position: relative;overflow: hidden;`)
+                      img#img_m(src=``).user-settings-img
+                .col-xs-12.col-md-12
+                  input#inputFile(type='file' accept="image/*").hidden
+
+
+
+block scripts
+  script(src=`/jcrop/js/jquery.Jcrop.min.js?v=${global.NKC.startTime}`)
+  script(src=`/jquery/jquery.minicolors.js?v=${NKC.startTime}`)
+  script(src='/icheck/icheck.js')
+  script(src=`/interface_common.js?v=${NKC.startTime}`)
+  script(src=`/experimental/settings/home.js?v=${NKC.startTime}`)
+
+
+
+

@@ -20,6 +20,10 @@ module.exports = {
 			POST: 'toppedThread',
 			DELETE: 'unToppedThread'
 		},
+		hometop: {
+			POST: 'homeTop',
+			DELETE: 'unHomeTop'
+		},
 		switchInPersonalForum: {
 			PATCH: 'switchInPersonalForum'
 		}
