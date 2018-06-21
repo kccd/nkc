@@ -4,6 +4,7 @@ block title
   meta(name='keywords' content=data.serverSettings ? data.serverSettings.keywords.join(','): '科创论坛，专业创客，极客论坛，创客论坛，创客教育，电磁炮，高斯枪，特斯拉线圈，科技小制作，电子DIY')
   title=`${data.serverSettings.websiteName} - ${data.serverSettings.brief}`
   link(rel='stylesheet' href='/swiper/dist/css/swiper.css')
+  link(rel='stylesheet' href=`/jscrollpane/style/jquery.jscrollpane.css?v=${global.NKC.startTime}`)
 block content
   mixin createNotice(arr)
     div(style='background-color: #eeeeee;padding: 0.5rem;')
@@ -116,6 +117,8 @@ block content
           .col-xs-12.col-md-12(style='margin-top: 1.5rem;' class=data.paging.page!==0?'hiddenInMobile':'')
             include ../interface_active_users
 block scripts
+  script(src=`/jscrollpane/script/jquery.mousewheel.js?v=${global.NKC.startTime}`)
+  script(src=`/jscrollpane/script/jquery.jscrollpane.js?v=${global.NKC.startTime}`)
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/swiper/dist/js/swiper.js?v=${global.NKC.startTime}`)
   script(src=`/home/index.js?v=${global.NKC.startTime}`)

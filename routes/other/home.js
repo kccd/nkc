@@ -8,7 +8,6 @@ homeRouter
 
 		// 删除退修超时的帖子
 		// 取出全部被标记的帖子
-		const t = Date.now();
 		const allMarkthreads = await db.ThreadModel.find({ "recycleMark": true, "fid": { "$nin": ["recycle"] } })
 		for (var i in allMarkthreads) {
 			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkthreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
@@ -32,7 +31,6 @@ homeRouter
 			//   await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
 			// }
 		}
-		console.log(`耗时：${Date.now() -t}ms`);
 		const {digest, sortby, page = 0} = query;
 		const gradeId = data.userGrade._id;
 		const rolesId = data.userRoles.map(r => r._id);
