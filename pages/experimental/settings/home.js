@@ -10,7 +10,7 @@ function saveAdsOrder() {
 			orders.push(order);
 			ads.push(tid);
 		} else {
-			let pushed = false;
+			var pushed = false;
 			for(var j = 0; j < orders.length; j++) {
 				if(orders[j] > order) {
 					orders.splice(j, 0, order);
