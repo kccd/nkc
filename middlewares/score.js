@@ -4,7 +4,7 @@ const score = async (ctx, next) => {
 	let {targetUser} = data;
 	const scoreSettings = await db.SettingModel.findOnly({type: 'score'});
 	if(!scoreSettings.operationsId.includes(operationId) || !user) return await next();
-
+	if(operationId !== 'modifyUsername') return await next();
 	const operation = await db.OperationModel.findOnly({_id: operationId});
 
 	const obj = {

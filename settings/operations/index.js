@@ -14,7 +14,8 @@ const {
 	fundLogo,
 	fundBanner,
 	photo,
-	photo_small
+	photo_small,
+	logo
 } = resourceObj;
 
 const auth = require('./auth');
@@ -61,6 +62,7 @@ operationObj.operationTree = {
 	home: {
 		GET: 'visitHome',// 首页
 
+		logo, // 网站logo
 		avatar,// 用户头像
 		avatar_small,
 

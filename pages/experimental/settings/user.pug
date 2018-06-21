@@ -134,7 +134,7 @@ block content
               include ../../interface_navigation_paging
 block scripts
 
-  script(src='/interface_common.js')
-  script(src='/experimental/settings/user.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/user.js?v=${global.NKC.startTime}`)
 
 

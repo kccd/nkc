@@ -1,17 +1,32 @@
 if !hiddenFooter
-  hr
-  -var classString = mainContainer1400?'container-fluid':'container'
-  -var styleString = mainContainer1400?'max-width:1400px;':'';
-  div(class=`${classString}` style=`${styleString}`)
-    .row
-      .col-md-12
-        ul.HomeFriendlyLink
-          include nkc_footer_links.pug
-          if data.navbar && data.navbar.highlight === 'latest'
-            include nkc_friendlies.pug
-        //hr.hrNarrowSpace
-        p #{data.serverSettings.serverName} &nbsp
-          a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
-        p #{data.serverSettings.copyright}
-        p.lighttext= data.serverSettings.record
-        br
+  if homeFooter
+    .container-fluid(style='max-width: 1400px')
+      .row(style='margin-top: 1rem;')
+        .col-xs-12.col-md-8.col-md-offset-2
+          ul.HomeFriendlyLink
+            include nkc_footer_links.pug
+            if data.navbar && data.navbar.highlight === 'latest'
+              include nkc_friendlies.pug
+          //hr.hrNarrowSpace
+          p #{data.serverSettings.serverName} &nbsp
+            a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
+          p #{data.serverSettings.copyright}
+          p.lighttext= data.serverSettings.record
+          br
+  else
+    hr
+    -var classString = mainContainer1400?'container-fluid':'container'
+    -var styleString = mainContainer1400?'max-width:1400px;':'';
+    div(class=`${classString}` style=`${styleString}`)
+      .row
+        .col-md-12
+          ul.HomeFriendlyLink
+            include nkc_footer_links.pug
+            if data.navbar && data.navbar.highlight === 'latest'
+              include nkc_friendlies.pug
+          //hr.hrNarrowSpace
+          p #{data.serverSettings.serverName} &nbsp
+            a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
+          p #{data.serverSettings.copyright}
+          p.lighttext= data.serverSettings.record
+          br

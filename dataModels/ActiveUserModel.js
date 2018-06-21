@@ -37,7 +37,7 @@ activeUserSchema.virtual('user')
   });
 
 activeUserSchema.methods.extendUser = async function() {
-  const UserModel = require('./UserModel');
+  const UserModel = mongoose.model('users');
   const user = await UserModel.findOnly({uid: this.uid});
   return this.user = user;
 };

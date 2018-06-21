@@ -1,62 +1,69 @@
 extends bootstrap_base
-
 block title
-  meta(name='description' content=data.serverSettings?data.serverSettings.description:'每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
-  meta(name='keywords' content=data.serverSettings?data.serverSettings.keywords.join(','):'科创论坛，专业创客，极客论坛，创客论坛，创客教育，电磁炮，高斯枪，特斯拉线圈，科技小制作，电子DIY')
+  meta(name='description' content=data.serverSettings ? data.serverSettings.description: '每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
+  meta(name='keywords' content=data.serverSettings ? data.serverSettings.keywords.join(','): '科创论坛，专业创客，极客论坛，创客论坛，创客教育，电磁炮，高斯枪，特斯拉线圈，科技小制作，电子DIY')
 
-  //- meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  //- meta(property='og:title' content='科创论坛')
-  //- meta(property='og:site_name' content='科创论坛')
-  //- meta(property='og:description' content='华语世界最优秀的极客和创客社群，我们的宗旨是：发展科技爱好，倡导科学理性。Since 2001.')
-
-  title #{data.site.name} - #{data.site.description}
+  title #{data.serverSettings.websiteName} - #{data.serverSettings.brief}
 
 block content
-  -var mainContainer1400 = true
+  -var mainContainer1400 = true;
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-md-9
-        .panel(style='width: 100%;')
-          -var ads = data.ads
-            include interface_ads
-
+        //.panel
+        //  span(style='color: orange; font-size: 16px; padding: 3px; border-radius: 3px;') 全部&nbsp;
+        //  span(style='color: grey; font-size: 18px;') /
+        //  for cForum in data.forumList
+        //    a(style='margin: 2px 5px; color: #909090;' href=`/f/${cForum.fid}`) #{cForum.displayName}
+        include module_forums_panel
         .panel
-          a.btn(href='/editor' style='background-color: #337ab7; color: white;') 新帖
+          if data.user
+            a.btn(href='/editor' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
+          else
+            a.btn(href='/login' style='background-color: #337ab7; color: white; margin-bottom: 5px;') 新帖
+          nav
+            include interface_navigation_paging.pug
+
+            - var paging = data.paging
+            - var digest = data.digest
+            - var class_str_all = digest?'':'active'
+            - var class_str_digest = digest?'active':''
+            - var cat = data.cat
+            - var sortby = data.sortby
+            - var class_str_sortby_toc = sortby?'active':''
+            - var class_str_sortby_tlm = sortby?'':'active'
+            
+            ul.pagination.NavigationPaging
+              - var page = paging?paging.page:null
+              li(class=`${class_str_all}`)
+                a(href=`?&content=${data.content}${data.sortby? "&sortby=toc": ""}`) 全部
+
+              li(class=`${class_str_digest}`)
+                a(href=`?&content=${data.content}&digest=true${data.sortby? "&sortby=toc":""}`) 精华
+
+            ul.pagination.NavigationPaging
+              li(class=`${class_str_sortby_tlm}`)
+                a(href=`?&content=${data.content}${data.digest? "&digest=true":""}`) 复序
+              li(class=`${class_str_sortby_toc}`)
+                a(href=`?&content=${data.content}${data.digest? "&digest=true":""}&sortby=toc`) 帖序
+
           hr.hrNarrowSpace
-        .panel
-          div
-            span(style='color: silver;') 最新帖&nbsp;&nbsp;&nbsp;
-            a(style='float: right;' href='/latest') 更多>>>>
-            .clearfix
-          for thread in data.latestThreads
+          for thread in data.indexThreads
             include interface_forum_singlethread
-          div(style='width: 100%; text-align: center; margin: 4px 0 4px 0;')
-            a(href=`/latest`) 查看更多
-          hr(style='margin: 2px 0 2px 0;')
-        .panel
-          -var newestDigestThreads = data.newestDigestThreads
-            include interface_digest_threads
-        //.panel
-        //  div
-        //    span(style='color: silver;') 最新专栏&nbsp;&nbsp;&nbsp;
-        //    a(style='float: right;' href='/latest?&content=personal') 更多>>>>
-        //    .clearfix
-        //  for thread in data.latestPFThreads
-        //    include interface_index_singlethread
-        //
-        //.panel
-        //  -var popPersonalForums = data.popPersonalForums
-        //    include interface_pop_pfs
-
-        div#bm
+          nav
+            include interface_navigation_paging.pug
       .col-md-3.hidden-xs.hidden-sm
+        .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+          button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+          br
+          button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
         .nkcpanel
           include forum_logo_wisdom
 
         -var user = data.user
         if user
-
           include interface_thread_userpatch.pug
+        //if !data.permittedOperations.getLatestPosts || data.permittedOperations.viewQuestions
         // -var addQuestions = data.user? data.user.certs.includes('qc') || data.userLevel >= 3: false;
         // -var examinated = (data.userLevel >= 2)
         -var addQuestions = data.userOperationsId.includes('addQuestion');
@@ -71,7 +78,6 @@ block content
                 科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！
         -var active_user_title = '一周活跃用户'
         include interface_active_users
-
         if data.user
           .nkcpanel
             a(href=`/m/${data.user.uid}`) 我的主题
@@ -79,13 +85,10 @@ block content
             br
             for thread in data.userThreads
               include interface_users_latest_threads
-
-        .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
-          button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
-          br
-          button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
-
-
+      //.row
+      //  .col-md-12
+      //    include nkc_friendlies.pug
+    div#bm
 block scripts
-  script(src='/interface_common.js')
-  script(type='text/javascript') $(document).ready(function () {if($(window).width() < 900){$('.ForumThreadStat').css('font-size','7px');}});
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(type='text/javascript')!= `$(document).ready(function () {if ($(window).width() < 900) {$('.ForumThreadStat').css('font-size', '7px');}})`

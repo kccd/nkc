@@ -1,4 +1,10 @@
 module.exports = {
+	logo: {
+		POST: 'uploadHomeLogo',
+		PARAMETER: {
+			GET: 'getHomeLogo'
+		}
+	},
 	avatar: {// 用户头像
 		PARAMETER: {
 			GET: 'getUserAvatar',

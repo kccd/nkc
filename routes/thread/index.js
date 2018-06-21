@@ -3,6 +3,7 @@ const operationRouter = require('./operation');
 const threadRouter = new Router();
 const nkcModules = require('../../nkcModules');
 const digestRouter = require('./digest');
+const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 
 
@@ -211,6 +212,8 @@ threadRouter
 		data.thread = thread;
 		data.forum = forum;
 		data.replyTarget = `t/${tid}`;
+		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		data.ads = homeSettings.ads;
 		ctx.template = 'interface_thread.pug';
 		await thread.extendFirstPost().then(p => p.extendUser());
 		await thread.extendLastPost();
@@ -273,6 +276,7 @@ threadRouter
 		await next();
 	})
 	.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;
