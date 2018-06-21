@@ -5,6 +5,34 @@ const apiFn = nkcModules.apiFunction;
 homeRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
+
+		// 删除退修超时的帖子
+		// 取出全部被标记的帖子
+		const t = Date.now();
+		const allMarkthreads = await db.ThreadModel.find({ "recycleMark": true, "fid": { "$nin": ["recycle"] } })
+		for (var i in allMarkthreads) {
+			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkthreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
+			if(delThreadLog){
+				await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
+				await db.PostModel.updateMany({"tid":allMarkthreads[i].tid},{$set:{"fid":"recycle"}})
+				await db.DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkthreads[i].tid},{$set:{"delType":"toRecycle"}})
+			}
+			// if (delThreadLog.length > 0) {
+			//   if (delThreadLog[0].modifyType === false) {
+			//     let sysTimeStamp = new Date(delThreadLog[0].toc).getTime()
+			//     let nowTimeStamp = new Date().getTime()
+			//     let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
+			//     let hourTimeStamp = 3600000 * 72;
+			//     let lastTimestamp = parseInt(new Date(delThreadLog[0].toc).getTime()) + hourTimeStamp;
+			//     if (diffTimeStamp > hourTimeStamp) {
+			//       await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
+			//     }
+			//   }
+			// } else {
+			//   await allMarkthreads[i].update({ "recycleMark": false, fid: "recycle" })
+			// }
+		}
+		console.log(`耗时：${Date.now() -t}ms`);
 		const {digest, sortby, page = 0} = query;
 		const gradeId = data.userGrade._id;
 		const rolesId = data.userRoles.map(r => r._id);
@@ -138,8 +166,8 @@ homeRouter
 		data.navbar = { highlight: 'latest' };
 		ctx.template = 'home/index.pug';
 		await next();
-	})
-  .post('/', async (ctx, next) => {
+	});
+ /* .post('/', async (ctx, next) => {
     const { data, db, query } = ctx;
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
@@ -226,7 +254,7 @@ homeRouter
     //   }
     // }
 
-    /*if(ctx.data.userLevel === 0){
+    /!*if(ctx.data.userLevel === 0){
       for(var i in threads1){
         if(threads1[i].recycleMark === true){
           continue;
@@ -240,7 +268,7 @@ homeRouter
         }
         threads.push(threads1[i])
       }
-    }*/
+    }*!/
 
 
     for (let i = 0; i < threads.length; i++) {
@@ -276,6 +304,6 @@ homeRouter
     data.activeUsers = activeUsers;
     ctx.template = 'interface_home.pug';
     await next()
-  });
+  });*/
 
 module.exports = homeRouter;

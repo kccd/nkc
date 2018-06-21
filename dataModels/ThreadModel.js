@@ -67,6 +67,7 @@ const threadSchema = new Schema({
   },
   recycleMark: {
     type: Boolean,
+	  index: 1,
     default: false
   },
   oc: {
