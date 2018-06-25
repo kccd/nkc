@@ -23,29 +23,6 @@ const operationSchema = new Schema({
 		type: [Number],
 		index: 1,
 		default: []
-	},
-	kcb: {
-		status: {
-			type: Boolean,
-			default: false,
-			index: 1
-		},
-		count: {
-			type: Number,
-			default: 0
-		},
-		targetCount: {
-			type: Number,
-			default: 0
-		},
-		change: {
-			type: Number,
-			default: 0
-		},
-		targetChange: {
-			type: Number,
-			default: 0
-		}
 	}
 },{
 	collection: 'operations'
