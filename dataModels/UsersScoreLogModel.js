@@ -115,10 +115,10 @@ usersScoreLogSchema.methods.extendTargetUser = async function() {
 
 
 usersScoreLogSchema.methods.extendOperation = async function() {
-	const OperationModel = mongoose.model('operations');
+	const TypesOfScoreChange = mongoose.model('typesOfScoreChange');
 	let operation;
 	if(this.operationId) {
-		const o = await OperationModel.findOne({_id: this.operationId});
+		const o = await TypesOfScoreChange.findOne({_id: this.operationId});
 		if(o) {
 			operation = o;
 		}
@@ -126,6 +126,65 @@ usersScoreLogSchema.methods.extendOperation = async function() {
 	return this.operation = operation;
 };
 
+usersScoreLogSchema.statics.insertLog = async (options) => {
+	const UserModel = mongoose.model('users');
+	const TypeOfScoreChange = mongoose.model('typesOfScoreChange');
+	const SettingModel = mongoose.model('settings');
+	const UsersScoreLogModel = mongoose.model('usersScoreLogs');
+	const {today} = require('../nkcModules/apiFunction');
+	const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;
+	const typeOfScoreChange = await TypeOfScoreChange.findOnly({_id: typeIdOfScoreChange});
+	if(!user) return;
+	if(type === 'kcb') {
+		const kcbSettings = await SettingModel.findOnly({type: 'kcb'});
+		const targetUser = await UserModel.findOnly({uid: kcbSettings.defaultUid});
+		const {change, count} = typeOfScoreChange;
+		if(count !== -1) {
+			const userLogCount = await UsersScoreLogModel.count({type: 'kcb', uid: user.uid, operationId: typeIdOfScoreChange, toc: {$gt: today()}});
+			if(count <= userLogCount) return;
+		}
+		const log = UsersScoreLogModel({
+			uid: user.uid,
+			type: 'kcb',
+			targetUid: targetUser.uid,
+			change,
+			targetChange: -1*change,
+			operationId: typeIdOfScoreChange,
+			description,
+			port,
+			ip,
+			pid,
+			tid,
+			fid
+		});
+		await user.update({$inc: {kcb: change}});
+		user.kcb += change;
+		await targetUser.update({$inc: {kcb: -1*change}});
+		targetUser.kcb += -1*change;
+		await log.save();
+	} else if(type === 'score') {
+		let {key, change} = options;
+		if(!change && change !== 0) change = 1;
+		const q = {};
+		q[key] = change;
+		const log = UsersScoreLogModel({
+			uid: user.uid,
+			type: 'score',
+			change,
+			operationId: typeIdOfScoreChange,
+			description,
+			port,
+			ip,
+			pid,
+			tid,
+			fid
+		});
+		await user.update({$inc: q});
+		user[key] += change;
+		await user.calculateScore();
+		await log.save();
+	}
+};
 
 const UsersScoreLogModel = mongoose.model('usersScoreLogs', usersScoreLogSchema);
 

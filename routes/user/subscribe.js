@@ -29,6 +29,8 @@ subscribeRouter
 		const targetUser = await db.UserModel.findOnly({uid});
 		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
 		const {type} = body;
+		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
+		if(targetUserSubscribe.subscribeForums.length !== 0) ctx.throw(400, '您已选择过要关注的领域');
 		if(type === 'subscribeForums') {
 			const {subscribeForums} = body;
 			if(subscribeForums.length > 20) ctx.throw(400, '每个用户最多只能关注20个领域。');
@@ -45,7 +47,6 @@ subscribeRouter
 					}
 				}
 			}
-			const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
 			await targetUserSubscribe.update({subscribeForums: realFid});
 		}
 		const lastUrl = ctx.cookies.get('lastUrl');
@@ -70,9 +71,13 @@ subscribeRouter
     let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
     if(subscribersOfDB.subscribers.indexOf(user.uid) > -1 && subscribeUsersOfDB.subscribeUsers.indexOf(uid) > -1) ctx.throw(400, '您之前已经关注过该用户了，没有必要重新关注');
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
-    /*await ctx.generateUsersBehavior({
-      operation: 'subscribeUser'
-    });*/
+    await db.UsersScoreLogModel.insertLog({
+			user: ctx.data.targetUser,
+	    type: 'kcb',
+	    typeIdOfScoreChange: 'followed',
+	    ip: ctx.address,
+	    port: ctx.port
+    });
     await next();
   })
   // 取消关注该用户
@@ -85,9 +90,13 @@ subscribeRouter
     let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$pull: {subscribeUsers: uid}});
     if(subscribersOfDB.subscribers.indexOf(user.uid) === -1 && subscribeUsersOfDB.subscribers.indexOf(uid) === -1) ctx.throw(400, '您之前没有关注过该用户，操作无效');
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
-    /*await ctx.generateUsersBehavior({
-      operation: 'unsubscribeUser'
-    });*/
+	  await db.UsersScoreLogModel.insertLog({
+		  user: ctx.data.targetUser,
+		  type: 'kcb',
+		  typeIdOfScoreChange: 'unFollowed',
+		  ip: ctx.address,
+		  port: ctx.port
+	  });
     await next();
   });
 

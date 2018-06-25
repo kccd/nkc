@@ -248,20 +248,23 @@ threadRouter
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		const _post = await thread.newPost(post, user, ip);
 		data.targetUser = await thread.extendUser();
+
 		// 生成记录
-		const log = await db.UsersScoreLogModel({
-			uid: user.uid,
+		const obj = {
+			user,
 			type: 'score',
-			operationId: 'postToThread',
-			change: 1,
-			targetUid: data.targetUser.uid,
+			key: 'postCount',
+			typeIdOfScoreChange: 'postToThread',
+			tid: post.tid,
+			pid: post.pid,
+			fid: post.fid,
 			ip: ctx.address,
 			port: ctx.port
-		});
-		await log.save();
-		await user.update({$inc: {postCount: 1}});
-		user.postCount++;
-		await user.calculateScore();
+		};
+		await db.UsersScoreLogModel.insertLog(obj);
+		obj.type = 'kcb';
+		await db.UsersScoreLogModel.insertLog(obj);
+
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
 		await thread.updateThreadMessage();

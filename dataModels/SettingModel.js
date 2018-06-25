@@ -30,7 +30,7 @@ const settingSchema = new Schema({
     drafts: Number,
 	  operationTypes: Number,
 	  problems: Number,
-	  logos: Number
+	  logos: Number,
   },
 
 	//科创基金设置
@@ -129,6 +129,8 @@ const settingSchema = new Schema({
 	},
 	logos: [String],
 	logo: String,
+	smallLogo: String,
+	watermarkTransparency: Number,
 	noticeThreadsId: [String],
 
 	// 分页

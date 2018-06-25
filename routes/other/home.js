@@ -111,7 +111,7 @@ homeRouter
 		data.ads = [];
 		for(const tid of data.homeSettings.ads) {
 			const thread = await db.ThreadModel.findOne({tid});
-			if(thread) {
+			if(thread && fidOfCanGetThreads.includes(thread.fid)) {
 				await thread.extendFirstPost().then(p => p.extendUser());
 				await thread.extendForum();
 				data.ads.push(thread);

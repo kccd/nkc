@@ -25,20 +25,27 @@ router
     data.targetUser = await post.extendUser();
     data.message = post.recUsers.length + 1;
     // 被点赞用户的被点赞数加一并且生成记录
-		const log = db.UsersScoreLogModel({
-			uid: user.uid,
-			targetUid: data.targetUser.uid,
-			type: 'score',
-			operationId: 'recommendPost',
-			change: 0,
-			targetChange: 1,
-			ip: ctx.address,
-			port: ctx.port
-		});
-		await log.save();
-	  await data.targetUser.update({$inc: {recCount: 1}});
-	  data.targetUser.recCount++;
-	  await data.targetUser.calculateScore();
+	  await db.UsersScoreLogModel.insertLog({
+			user: data.targetUser,
+		  type: 'score',
+		  typeIdOfScoreChange: 'liked',
+		  key: 'recCount',
+		  ip: ctx.address,
+		  port: ctx.port,
+		  pid,
+		  tid: targetThread.tid,
+		  fid: targetThread.fid
+	  });
+	  await db.UsersScoreLogModel.insertLog({
+			user:data.targetUser,
+		  type: 'kcb',
+		  typeIdOfScoreChange: 'liked',
+		  ip: ctx.address,
+		  port: ctx.port,
+		  pid,
+		  tid: targetThread.tid,
+		  fid: targetThread.fid
+	  });
     await next();
   })
   .del('/', async (ctx, next) => {
@@ -47,24 +54,33 @@ router
     const {user} = data;
     const personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$pull: {recPosts: pid}});
     const post = await db.PostModel.findOneAndUpdate({pid}, {$pull: {recUsers: user.uid}});
+    const targetThread = await db.ThreadModel.findOnly({tid: post.tid});
     if(!personal.recPosts.includes(pid) && !post.recUsers.includes(user.uid))
       ctx.throw(400, '您没有推介过该post了,没有必要取消推介');
     data.message = (post.recUsers.length > 0)?post.recUsers.length - 1: 0;
     data.targetUser = await post.extendUser();
-	  const log = db.UsersScoreLogModel({
-		  uid: user.uid,
-		  targetUid: data.targetUser.uid,
+	  await db.UsersScoreLogModel.insertLog({
+		  user: data.targetUser,
 		  type: 'score',
-		  operationId: 'unRecommendPost',
-		  change: 0,
-		  targetChange: -1,
+		  typeIdOfScoreChange: 'unLiked',
+		  change: -1,
+		  key: 'recCount',
 		  ip: ctx.address,
-		  port: ctx.port
+		  port: ctx.port,
+		  pid,
+		  tid: targetThread.tid,
+		  fid: targetThread.fid
 	  });
-	  await log.save();
-	  await data.targetUser.update({$inc: {recCount: -1}});
-	  data.targetUser.recCount--;
-	  await data.targetUser.calculateScore();
+	  await db.UsersScoreLogModel.insertLog({
+		  user:data.targetUser,
+		  type: 'kcb',
+		  typeIdOfScoreChange: 'unLiked',
+		  ip: ctx.address,
+		  port: ctx.port,
+		  pid,
+		  tid: targetThread.tid,
+		  fid: targetThread.fid
+	  });
 	  await next();
   });
 

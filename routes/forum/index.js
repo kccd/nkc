@@ -103,18 +103,21 @@ forumRouter
     data.thread = thread;
 
 		// 发帖数加一并生成记录
-    const log = await db.UsersScoreLogModel({
-	    uid: user.uid,
-	    type: 'score',
-	    operationId: 'postToForum',
-	    change: 1,
-	    port: ctx.port,
-	    ip: ctx.address
-    });
-    await log.save();
-    await user.update({$inc: {threadCount: 1}});
-    user.threadCount++;
-    await user.calculateScore();
+		const obj = {
+			user,
+			type: 'score',
+			key: 'threadCount',
+			typeIdOfScoreChange: 'postToForum',
+			tid: thread.tid,
+			pid: thread.oc,
+			fid,
+			ip: ctx.address,
+			port: ctx.port
+		};
+		await db.UsersScoreLogModel.insertLog(obj);
+		obj.type = 'kcb';
+		await db.UsersScoreLogModel.insertLog(obj);
+
     await thread.updateThreadMessage();
     if(type === 'html') {
       ctx.status = 303;

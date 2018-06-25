@@ -55,38 +55,39 @@ block content
 
         else
           .row
-            .col-xs-12.col-md-12
-              h4 默认
-              img(src=`/logo/${data.homeSettings.logo}` style='width: 13rem;height: 13rem;')
+            .col-xs-12.col-md-4.col-md-offset-1
+              h4 默认大图
+              img(src=`/logo/${data.homeSettings.logo}`)
+            .col-xs-12.col-md-4.col-md-offset-2
+              h4 默认小图
+              img(src=`/logo/${data.homeSettings.smallLogo}`)
             .col-xs-12.col-md-12
               hr
               h4 所有
               for logoId in data.homeSettings.logos
                 div(style='display:inline-block; margin-right: 1rem;margin-bottom: 2rem;').text-center
-                  img(src=`/logo/${logoId}` style='width: 13rem;height: 13rem;margin-bottom:0.5rem;')
+                  img(src=`/logo/${logoId}` style='height: 15rem;margin-bottom:0.5rem;')
                   div
-                    button.btn.btn-sm.btn-default(onclick=`defaultLogo("${logoId}")`) 设为默认
+                    button.btn.btn-sm.btn-default(onclick=`defaultLogo("${logoId}", "logo")`) 设为默认大图
+                    button.btn.btn-sm.btn-default(onclick=`defaultLogo("${logoId}", "smallLogo")`) 设为默认小图
                     button.btn.btn-sm.btn-danger(onclick=`deleteLogo("${logoId}")`) 删除
             .col-xs-12.col-md-12
               hr
-              h4 上传
               .row
-                .col-xs-12.col-md-6
-                  .row
-                    .col-xs-12.col-md-12.user-settings-img-dev
-                      img(src=`` style='width: 100%;')
-                    .col-xs-12.col-md-12.text-center
-                      br
-                      button.btn.btn-primary(onclick='$("#inputFile").click();') 选择图片
-                      button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
-                      br
-                      br
-                .col-xs-12.col-md-3
-                  .col-xs-12.col-md-12
-                    div(style=`width: 250px;height: 250px;position: relative;overflow: hidden;`)
-                      img#img_m(src=``).user-settings-img
-                .col-xs-12.col-md-12
-                  input#inputFile(type='file' accept="image/*").hidden
+                .col-xs-12.col-md-4
+                  h4 水印透明度
+                    small &nbsp;取值范围：[ 0, 255 ]
+                  .form-inline
+                    .form-group
+                      input.form-control#watermarkTransparency(type='number' value=data.homeSettings.watermarkTransparency)
+                      button.btn.btn-primary(onclick='saveWaterMarkSettings()') 保存
+            .col-xs-12.col-md-12
+              hr
+              input#inputFile(type='file' accept="image/*").hidden
+              h5.text-danger 建议默认大图宽高分别为：170px、90px
+              h5.text-danger 建议默认小图宽高分别为：30px、30px
+              button.btn.btn-primary.btn-lg(onclick='$("#inputFile").click();') 上传图片
+
 
 
 
