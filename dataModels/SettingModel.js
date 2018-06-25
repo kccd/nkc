@@ -56,9 +56,6 @@ const settingSchema = new Schema({
 	//科创币
 	//-------------------------------------
 	defaultUid: String,
-	operations: {
-  	type: Schema.Types.Mixed
-	},
 	//网站设置
 	//-------------------------------------
 	websiteName: String,
