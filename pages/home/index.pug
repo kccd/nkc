@@ -117,6 +117,12 @@ block content
             +createDigestThreadsList(data.digestThreads)
           .col-xs-12.col-md-12(style='margin-top: 1.5rem;' class=data.paging.page!==0?'hiddenInMobile':'')
             include ../interface_active_users
+        .hidden-xs.hidden-sm
+          .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
+            button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
+            br
+            button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
+    div#bm
 block scripts
   script(src=`/jscrollpane/script/jquery.mousewheel.js?v=${global.NKC.startTime}`)
   script(src=`/jscrollpane/script/jquery.jscrollpane.js?v=${global.NKC.startTime}`)

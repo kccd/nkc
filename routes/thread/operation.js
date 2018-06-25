@@ -60,23 +60,15 @@ operationRouter
 			await toUser.increasePsnl('system', 1);
 		}
 		if(para && para.illegalType) {
-			const log = db.UsersScoreLogModel({
-				uid: user.uid,
+			await db.UsersScoreLogModel.insertLog({
+				user: data.targetUser,
 				type: 'score',
-				operationId: 'violation',
-				description: para.reason || '退回文章并标记为违规',
-				change: 0,
-				targetChange: 1,
-				targetUid: data.targetUser.uid,
-				tid,
-				fid: thread.fid,
+				typeIdOfScoreChange: 'violation',
+				port: ctx.port,
 				ip: ctx.address,
-				port: ctx.port
+				key: 'violationCount',
+				description: para.reason || '退回文章并标记为违规'
 			});
-			await log.save();
-			data.targetUser.violation++;
-			await data.targetUser.update({$inc: {violationCount: 1}});
-			await data.targetUser.calculateScore();
 		}
 		await next()
 	})
@@ -149,24 +141,27 @@ operationRouter
 			}
 		}
 		if(fid === 'recycle') {
+			await db.UsersScoreLogModel.insertLog({
+				user: data.targetUser,
+				type: 'kcb',
+				typeIdOfScoreChange: 'threadBlocked',
+				port: ctx.port,
+				tid: targetThread.tid,
+				fid: targetThread.fid,
+				ip: ctx.address
+			});
 			if(para && para.illegalType) {
-				const log = db.UsersScoreLogModel({
-					uid: user.uid,
+				await db.UsersScoreLogModel.insertLog({
+					user: data.targetUser,
 					type: 'score',
-					operationId: 'violation',
-					description: para.reason || '屏蔽文章并标记为违规',
-					change: 0,
-					targetChange: 1,
-					targetUid: data.targetUser.uid,
-					tid,
-					fid: targetThread.fid,
+					typeIdOfScoreChange: 'violation',
+					port: ctx.port,
 					ip: ctx.address,
-					port: ctx.port
+					key: 'violationCount',
+					tid: targetThread.tid,
+					fid: targetThread.fid,
+					description: para.reason || '屏蔽文章并标记为违规'
 				});
-				await log.save();
-				data.targetUser.violation++;
-				await data.targetUser.update({$inc: {violationCount: 1}});
-				await data.targetUser.calculateScore();
 			}
 			// 添加删帖日志
 			let oc = targetThread.oc;

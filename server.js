@@ -23,7 +23,7 @@ searchInit()
 
     // 检测数据的完整性
 		// 初始化网站配置
-    const {SettingModel, RoleModel, OperationModel, OperationTypeModel, UsersGradeModel, ForumModel} = require('./dataModels');
+    const {SettingModel, RoleModel, OperationModel, TypesOfScoreChangeModel, OperationTypeModel, UsersGradeModel, ForumModel} = require('./dataModels');
     const defaultData = require('./settings/defaultSettings');
     await Promise.all(defaultData.map(async settings => {
 			const settingsDB = await SettingModel.findOne({type: settings.type});
@@ -76,6 +76,7 @@ searchInit()
 	    }
     }
 
+
     // 运维包含所有的操作权限
     await RoleModel.update({_id: 'dev'}, {$set: {operationsId: operationsId}});
     await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
@@ -102,6 +103,27 @@ searchInit()
 		  	await newGrade.save();
 		  }
 	  }
+
+	  // 初始化分值变化类型
+	  const defaultTypesOfScoreChange = require('./settings/defaultTypesOfScoreChange');
+	  for(const type of defaultTypesOfScoreChange) {
+	  	const typeDB = await TypesOfScoreChangeModel.findOne({_id: type._id});
+	  	if(!typeDB) {
+	  		console.log(`Initialize typeOfScoreChange - ${type._id}`);
+	  		const newType = TypesOfScoreChangeModel(type);
+	  		await newType.save();
+		  }
+	  }
+
+	  // 删除无用分支变化类型
+	  const typesId = defaultTypesOfScoreChange.map(t => t._id);
+	  const types = await TypesOfScoreChangeModel.find();
+		for(const type of types) {
+			if(!typesId.includes(type._id)) {
+				console.log(`delete typeOfScoreChange - ${type._id}`);
+				await type.remove();
+			}
+		}
 
     const jobs = require('./scheduleJob');
     jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);

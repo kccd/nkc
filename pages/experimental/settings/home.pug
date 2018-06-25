@@ -73,6 +73,16 @@ block content
                     button.btn.btn-sm.btn-danger(onclick=`deleteLogo("${logoId}")`) 删除
             .col-xs-12.col-md-12
               hr
+              .row
+                .col-xs-12.col-md-4
+                  h4 水印透明度
+                    small &nbsp;取值范围：[ 0, 255 ]
+                  .form-inline
+                    .form-group
+                      input.form-control#watermarkTransparency(type='number' value=data.homeSettings.watermarkTransparency)
+                      button.btn.btn-primary(onclick='saveWaterMarkSettings()') 保存
+            .col-xs-12.col-md-12
+              hr
               input#inputFile(type='file' accept="image/*").hidden
               h5.text-danger 建议默认大图宽高分别为：170px、90px
               h5.text-danger 建议默认小图宽高分别为：30px、30px

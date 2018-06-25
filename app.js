@@ -43,10 +43,7 @@ app.use(init)
   .use(staticServe(path.resolve('./pages')))
   .use(favicon(__dirname + '/resources/site_specific/favicon.ico'))
   .use(logger)
-	// .use(permissions)
 	.use(permission)
-  // .use(scoreHandler)
   .use(mainRouter.routes())
-	.use(score)
   .use(body);
 module.exports = app.callback();

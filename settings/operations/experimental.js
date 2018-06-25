@@ -65,10 +65,10 @@ module.exports = {
 			GET: 'visitEForumSettings',
 			PATCH: 'modifyEForumSettings'
 		},
-		score: {
+		/*score: {
 			GET: 'visitScoreSettings',
 			PATCH: 'modifyScoreSettings'
-		},
+		},*/
 		/*download: {
 			GET: 'visitDownloadSettings',
 			PATCH: 'modifyDownloadSettings'

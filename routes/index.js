@@ -34,18 +34,23 @@ router.use('/', async (ctx, next)  => {
 			}
 		});
 		if(!dailyLogin) {
-			const log = db.UsersScoreLogModel({
-				uid: user.uid,
-				toc,
-				operationId: 'dailyLogin',
-				change: 1,
+			await db.UsersScoreLogModel.insertLog({
+				user,
 				type: 'score',
+				typeIdOfScoreChange: 'dailyLogin',
+				port: ctx.port,
 				ip: ctx.address,
-				port: ctx.port
+				key: 'dailyLoginCount'
 			});
-			await log.save();
 			await user.updateUserMessage();
 		}
+		await db.UsersScoreLogModel.insertLog({
+			user,
+			type: 'kcb',
+			typeIdOfScoreChange: 'dailyLogin',
+			port: ctx.port,
+			ip: ctx.address
+		});
 	}
 	await next();
 });

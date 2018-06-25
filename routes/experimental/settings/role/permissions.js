@@ -3,7 +3,7 @@ const permissionsRouter = new Router();
 permissionsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.operations = await db.OperationModel.find({}).sort({toc: 1});
+		data.operations = await db.OperationModel.find().sort({toc: 1});
 		data.operationTypes = await db.OperationTypeModel.find().sort({toc: 1});
 		await next();
 	})

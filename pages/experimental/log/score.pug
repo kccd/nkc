@@ -2,7 +2,7 @@ extends ../../bootstrap_base
 
 block title
   -const mainContainer1400 = true;
-  title 积分、科创币、学术分变动记录
+  title 分值变动记录
   -const typeObj = {'xsf': '学术分', 'score': '积分', 'kcb': '科创币'}
 block content
 
@@ -11,12 +11,12 @@ block content
       include ../nav
       .col-xs-12.col-md-12
         ul.nav.nav-pills(style='margin-bottom: 1rem;')
-          li(class=!data.type?'active':'')
-            a(href='/e/log/score' data-toggle='url') 全部
+          //li(class=!data.type?'active':'')
+          //  a(href='/e/log/score' data-toggle='url') 全部
+          li(class=data.type === 'kcb' ? 'active' : '')
+            a(href='/e/log/score?type=kcb' data-toggle='url') 科创币
           li(class=data.type==='xsf'?'active':'')
             a(href='/e/log/score?type=xsf' data-toggle='url') 学术分
-          li(class=data.type==='kcb'?'active':'')
-            a(href='/e/log/score?type=kcb' data-toggle='url') 科创币
           li(class=data.type==='score'?'active':'')
             a(href='/e/log/score?type=score' data-toggle='url') 积分
       .col-xs-12.col-md-12
@@ -25,35 +25,103 @@ block content
         table.table.table-hover
           thead
             tr
-              th 时间
-              th 类型
-              th 操作名
-              th 操作者
-              th 操作者分值（次数）变化
-              th 被操作者
-              th 被操作者分值（次数）变化
-              th 说明
+              if type === 'kcb'
+                th 时间
+                th 用户
+                th 操作名
+                th 分值变化
+                th 目标用户
+                th 目标用户分值变化
+              else if type === 'xsf'
+                th 时间
+                th 用户
+                th 分值变化
+                th 评分者
+                th 评分理由
+              else
+                th 时间
+                th 用户
+                th 操作名
+                th 次数变化
+                th 说明
           tbody
             for log in data.logs
               tr
-                th= log.toc.toLocaleString()
-                th= typeObj[log.type]
-                th= log.operation.description
-                th
-                  if log.user
-                    a(href=`/u/${log.uid}` target="_blank")
-                      img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
-                      span= log.user.username
-                  else
-                    span
-                th= log.change
-                th
-                  if log.targetUser
-                    a(href=`/u/${log.targetUid}` target="_blank")
-                      img(src=`/avatar/${log.targetUid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
-                      span= log.targetUser.username
-                  else
-                    span
-                th= log.targetChange
-                th= log.description || ''
-      include ../../interface_navigation_paging
+                if type === 'kcb'
+                  th= log.toc.toLocaleString()
+                  th
+                    if log.user
+                      a(href=`/u/${log.uid}` target="_blank")
+                        img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        span= log.user.username
+                    else
+                      span
+                  th= log.operation?log.operation.description:log.operationId
+                  th
+                    if log.change < 0
+                      span.text-danger= typeObj[log.type] + log.change
+                    else if log.change > 0
+                      span.text-success= typeObj[log.type] + '+' + log.change
+                    else
+                      span= log.change
+                  th
+                    if log.targetUser
+                      a(href=`/u/${log.targetUid}` target="_blank")
+                        img(src=`/avatar/${log.targetUid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        span= log.targetUser.username
+                    else
+                      span
+                  th
+                    if log.targetChange < 0
+                      span.text-danger= typeObj[log.type] + log.targetChange
+                    else if log.targetChange > 0
+                      span.text-success= typeObj[log.type] + '+' + log.targetChange
+                    else
+                      span= log.targetChange
+
+
+                else if type === 'xsf'
+                  th= log.toc.toLocaleString()
+                  th
+                    if log.targetUser
+                      a(href=`/u/${log.targetUid}` target="_blank")
+                        img(src=`/avatar/${log.targetUid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        span= log.targetUser.username
+                    else
+                      span
+                  th
+                    if log.targetChange < 0
+                      span.text-danger= typeObj[log.type] + log.targetChange
+                    else if log.targetChange > 0
+                      span.text-success= typeObj[log.type] + '+' + log.targetChange
+                    else
+                      span= log.targetChange
+                  th
+                    if log.user
+                      a(href=`/u/${log.uid}` target="_blank")
+                        img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        span= log.user.username
+                    else
+                      span
+                  th= log.description
+
+
+                else
+                  th= log.toc.toLocaleString()
+                  th
+                    if log.user
+                      a(href=`/u/${log.uid}` target="_blank")
+                        img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        span= log.user.username
+                    else
+                      span
+                  th= log.operation?log.operation.description:log.operationId
+                  th
+                    if log.change < 0
+                      span.text-danger= log.change
+                    else if log.change > 0
+                      span.text-success= '+' + log.change
+                    else
+                      span= log.change
+                  th= log.description || ''
+        include ../../interface_navigation_paging

@@ -30,6 +30,14 @@ subscribeRouter
 		}*/
 		await userSubscribe.update({$addToSet: {subscribeForums: fid}});
 		await forum.update({$addToSet: {followersId: user.uid}});
+		await db.UsersScoreLogModel.insertLog({
+			user,
+			type: 'kcb',
+			typeIdOfScoreChange: 'subscribeForum',
+			fid,
+			ip: ctx.address,
+			port: ctx.port
+		});
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -40,6 +48,14 @@ subscribeRouter
 		const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
 		await userSubscribe.update({$pull: {subscribeForums: fid}});
 		await forum.update({$pull: {followersId: user.uid}});
+		await db.UsersScoreLogModel.insertLog({
+			user,
+			type: 'kcb',
+			typeIdOfScoreChange: 'unSubscribeForum',
+			fid,
+			ip: ctx.address,
+			port: ctx.port
+		});
 		await next();
 	});
 module.exports = subscribeRouter;

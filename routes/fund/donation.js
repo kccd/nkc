@@ -94,6 +94,15 @@ donationRouter
 		data.alipayReturn = true;
 		data.billId = out_trade_no;
 		ctx.template = 'interface_fund_donation.pug';
+		if(data.user) {
+			await db.UsersScoreLogModel.insertLog({
+				user: data.user,
+				type: 'kcb',
+				typeIdOfScoreChange: 'fundDonation',
+				ip: ctx.address,
+				port: ctx.port
+			});
+		}
 		await next();
 	})
 	.post('/verify', async (ctx, next) => {

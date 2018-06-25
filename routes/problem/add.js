@@ -37,6 +37,13 @@ addRouter
 		});
 		if(user) {
 			newProblem.uid = user.uid;
+			await db.UsersScoreLogModel.insertLog({
+				user: user,
+				type: 'kcb',
+				typeIdOfScoreChange: 'reportIssue',
+				ip: ctx.address,
+				port: ctx.port
+			});
 		}
 		await newProblem.save();
 		await next();
