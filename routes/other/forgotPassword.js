@@ -120,7 +120,8 @@ forgotPasswordRouter
 	if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
 	const {apiFunction} = ctx.nkcModules;
 	const passwordObj = apiFunction.newPasswordObject(password);
-	const userPersonal = await db.UsersPersonalModel.findOnly({email});
+	const userPersonal = await db.UsersPersonalModel.findOne({email});
+	if(!userPersonal) ctx.throw(400, '邮箱未注册');
 	userPersonal.password = passwordObj.password;
 	userPersonal.hashType = passwordObj.hashType;
 	emailCode.used = true;

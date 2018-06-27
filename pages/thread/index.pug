@@ -210,7 +210,7 @@ block content
                       include ../interface_navigation_paging
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')
                       for post, index in data.posts
-                        if index !== 0
+                        if index !== 0 || data.paging.page !== 0
                           include ../interface_thread_singlepost
                     .col-xs-12.col-md-12
                       include ../interface_navigation_paging
