@@ -75,7 +75,6 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         else
           span(data-pid=post.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
 
-      //.post-time= post.toc.toLocaleString()
       .clearfix
       if(post.t && post.t !== '' && index !== 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
