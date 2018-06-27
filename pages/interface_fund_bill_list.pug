@@ -38,8 +38,11 @@ table.table.table-bordered
         th= b._id
         th= b.abstract
         th
-          if(b.user)
-            a(href=`/u/${b.user.uid}`)= b.user.username
+          if b.user
+            if b.fromInfo.type === 'user' && b.fromInfo.anonymous
+              span 匿名用户
+            else
+              a(href=`/u/${b.user.uid}`)= b.user.username
           else
             span 系统
         +loadInfo(b.fromInfo)
