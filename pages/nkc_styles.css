@@ -93,6 +93,10 @@ body { padding-top: 65px; }
     margin: 5px;
 }
 
+.editImgSingle{
+  max-width:60%
+}
+
 .HomeSEOLink{
 
 font-size: 10px;

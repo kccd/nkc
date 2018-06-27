@@ -172,7 +172,7 @@ downloadRouter
     // 获取图片尺寸
     const { width, height } = await imageMagick.info(path);
     // 如果图片宽度大于1024，则将图片宽度缩为1024
-    if(width > 1024){
+    if(width > 1920 && size > largeImage){
       await imageMagick.imageNarrow(path)
     }
     // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印

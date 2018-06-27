@@ -52,7 +52,7 @@ module.exports = {
     }
   },
   sizeLimit: {
-    largeImage: 1024 * 512,
+    largeImage: 1024 * 1024,
     attachment: {
       height: 16384,
       width: 1920
