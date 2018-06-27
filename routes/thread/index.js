@@ -215,7 +215,10 @@ threadRouter
 		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
 		data.ads = homeSettings.ads;
 		ctx.template = 'thread/index.pug';
-		await thread.extendFirstPost().then(p => p.extendUser());
+		await thread.extendFirstPost().then(async p => {
+			await p.extendUser();
+			await p.extendResources();
+		});
 		await thread.extendLastPost();
 
 		// 加载收藏
