@@ -17,11 +17,11 @@ router
 	    uid: data.user?data.user.uid: ''
     };
     await targetThread.ensurePermission(options);
-    if(targetPost.disabled) ctx.throw(400, '无法推荐已经被禁用的回复');
+    if(targetPost.disabled) ctx.throw(400, '回复已被屏蔽，暂无法点赞');
     const personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {recPosts: pid}});
     const post = await db.PostModel.findOneAndUpdate({pid}, {$addToSet: {recUsers: user.uid}});
     if(personal.recPosts.includes(pid) && post.recUsers.includes(user.uid))
-      ctx.throw(400, '您已经推介过该post了,没有必要重复推介');
+      ctx.throw(400, '您已经点过赞了，请刷新');
     data.targetUser = await post.extendUser();
     data.message = post.recUsers.length + 1;
     // 被点赞用户的被点赞数加一并且生成记录
@@ -56,7 +56,7 @@ router
     const post = await db.PostModel.findOneAndUpdate({pid}, {$pull: {recUsers: user.uid}});
     const targetThread = await db.ThreadModel.findOnly({tid: post.tid});
     if(!personal.recPosts.includes(pid) && !post.recUsers.includes(user.uid))
-      ctx.throw(400, '您没有推介过该post了,没有必要取消推介');
+      ctx.throw(400, '您没有为该条回复点过赞，请刷新');
     data.message = (post.recUsers.length > 0)?post.recUsers.length - 1: 0;
     data.targetUser = await post.extendUser();
 	  await db.UsersScoreLogModel.insertLog({

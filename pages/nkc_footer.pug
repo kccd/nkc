@@ -14,19 +14,19 @@ if !hiddenFooter
           p.lighttext= data.serverSettings.record
           br
   else
-    hr
     -var classString = mainContainer1400?'container-fluid':'container'
     -var styleString = mainContainer1400?'max-width:1400px;':'';
-    div(class=`${classString}` style=`${styleString}`)
-      .row
-        .col-md-12
-          ul.HomeFriendlyLink
-            include nkc_footer_links.pug
-            if data.navbar && data.navbar.highlight === 'latest'
-              include nkc_friendlies.pug
-          //hr.hrNarrowSpace
-          p #{data.serverSettings.serverName} &nbsp
-            a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
-          p #{data.serverSettings.copyright}
-          p.lighttext= data.serverSettings.record
-          br
+    .container-fluid(style='background-color: #f6f6f6;padding-top: 2rem;border-top: 1px solid #dddddd;margin-top: 3rem;')
+      div(class=`${classString}` style=`${styleString}`)
+        .row
+          .col-md-12
+            ul.HomeFriendlyLink
+              include nkc_footer_links.pug
+              if data.navbar && data.navbar.highlight === 'latest'
+                include nkc_friendlies.pug
+            //hr.hrNarrowSpace
+            p #{data.serverSettings.serverName} &nbsp
+              a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
+            p #{data.serverSettings.copyright}
+            p.lighttext= data.serverSettings.record
+            br

@@ -52,11 +52,7 @@ function showChildrenForums(fid, color) {
 
 function showForumsDiv() {
 	var div = $('#forumsDiv');
-	if(div.css('display') === '1px solid #eeeeee') {
-		div.slideDown();
-	} else {
-		div.slideUp();
-	}
+	div.slideToggle();
 }
 window.onresize = function() {
 	displayRightDiv();

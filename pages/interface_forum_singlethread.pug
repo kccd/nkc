@@ -78,7 +78,7 @@
             -lastPost.c = filterQuote(lastPost.c)
             -lastPost.c = lastPost.c.replace(/<\/?.+?>/g,"")
             -lastPost.c = lastPost.c.slice(0, 250);
-            a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost))
+            a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost) )
       .new-content-info-last
         span
           - var title = `${lastPost.user.navbarDesc.username}\n`+`学术分 ${lastPost.user.navbarDesc.xsf}\n`+`科创币 ${lastPost.user.navbarDesc.kcb}\n`+`${lastPost.user.navbarDesc.cs}`;

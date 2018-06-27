@@ -82,7 +82,7 @@ threadRouter
 		// 验证权限 - new
 		const gradeId = data.userGrade._id;
 		const rolesId = data.userRoles.map(r => r._id);
-		const options = {gradeId, rolesId};
+		const options = {gradeId, rolesId, uid: data.user?data.user.uid: ''};
 		await thread.ensurePermission(options);
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		data.isModerator = isModerator;
@@ -214,9 +214,70 @@ threadRouter
 		data.replyTarget = `t/${tid}`;
 		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
 		data.ads = homeSettings.ads;
-		ctx.template = 'interface_thread.pug';
-		await thread.extendFirstPost().then(p => p.extendUser());
+		ctx.template = 'thread/index.pug';
+		await thread.extendFirstPost().then(async p => {
+			await p.extendUser();
+			await p.extendResources();
+		});
 		await thread.extendLastPost();
+
+		// 加载收藏
+		data.collected = false;
+		if(data.user) {
+			const collection = await db.CollectionModel.findOne({uid: data.user.uid, tid});
+			if(collection) {
+				data.collected = true;
+			}
+		}
+
+		data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
+
+		if(data.user) {
+			data.subscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
+		}
+
+		// 加载用户的帖子
+		const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
+		const q = {
+			uid: data.targetUser.uid,
+			fid: {$in: fidOfCanGetThreads},
+			recycleMark: {$ne: true}
+		};
+		const targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
+		data.targetUserThreads = [];
+		for(const thread of targetUserThreads) {
+			await thread.extendFirstPost();
+			data.targetUserThreads.push(thread);
+		}
+
+		// 相似文章
+		data.sameThreads = [];
+		if(fidOfCanGetThreads.includes(forum.fid)) {
+			const sameThreads = await db.ThreadModel.aggregate([
+				{
+					$match: {
+						fid: forum.fid,
+						digest: true,
+						recycleMark: {$ne: true}
+					}
+				},
+				{
+					$sample: {
+						size: 10
+					}
+				}
+			]);
+			for(const thread of sameThreads) {
+				thread.firstPost = await db.PostModel.findOne({pid: thread.oc});
+				data.sameThreads.push(thread);
+			}
+		}
+
+		// 关注的用户
+		if(data.user) {
+			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
+		}
+		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		await next();
 	})
 	.post('/:tid', async (ctx, next) => {

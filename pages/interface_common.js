@@ -192,7 +192,7 @@ function screenTopQuestion(title,choices){
 
 function screenTopAlertInit(){
   $("body").prepend(
-    '<div id="alertOverlay" style="z-index:999; display:block; position:fixed; top:0; width:100%;">'
+    '<div id="alertOverlay" style="z-index:10001; display:block; position:fixed; top:0; width:100%;">'
     +'</div>'
   );
 }
@@ -549,7 +549,43 @@ function subscribeUserSwitch(targetUid) {
     screenTopWarning('未定义的操作.')
   }
 }
+$('.thumbsUp, .thumbsDown').on('click', function() {
+	var span = $(this);
+	var pid = span.attr('data-pid');
+	if(span.hasClass('thumbsUp')) {
+		thumbsDown(pid, function() {
+			span.removeClass('thumbsUp');
+			span.text(span.text()&&parseInt(span.text())-1>0? parseInt(span.text()) - 1:'');
+			screenTopAlert('取消点赞成功');
+		})
+	}else {
+		thumbsUp(pid, function() {
+			span.addClass('thumbsUp');
+			span.text(span.text()? parseInt(span.text()) + 1:1);
+			screenTopAlert('点赞成功');
+		})
+	}
+});
 
+function thumbsUp(pid, callback) {
+	nkcAPI('/p/'+pid+'/recommend', 'POST', {})
+		.then(function() {
+			callback();
+		})
+		.catch(function(data){
+			screenTopWarning(data.error|| data);
+		})
+}
+
+function thumbsDown(pid, callback) {
+	nkcAPI('/p/'+pid+'/recommend', 'DELETE', {})
+		.then(function() {
+			callback();
+		})
+		.catch(function(data){
+			screenTopWarning(data.error|| data);
+		})
+}
 
 function recommendPostSwitch(e, targetPid, number) {
   var button = e.target;

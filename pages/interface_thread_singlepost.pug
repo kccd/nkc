@@ -3,93 +3,92 @@
 -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
 -const highlight = data.highlight;
 
-  if (!post.disabled || disablePost || (data.user && data.user.uid === post.uid))
-    //horizontal line
-    hr(id=`p${post.pid}`).ThreadSinglePostHr
-    //meta(id=`${post.pid}'`)
-    - var uid = post.uid
-    - var user = post.user
-    //post itself
-    .parent.clearfix(id=`${post.pid}` style=`${post.pid === highlight? 'background-color: #fffbdd': ''}`)
-      .threadOneLine
-        div.fixThread
-          div(style='float: left;')
-            - var title = '';
-            -if(post && post.user && post.user.navbarDesc)
-              -var navbarDesc = post.user.navbarDesc;
-              -title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`
-            a(href=`/u/${uid}` title=`${title}`)
-              img.ThreadPostAvatar(src=`/avatar/${post.uid}`)
-          div(style='margin-left: 60px;')
-            span.ThreadPostTitleMeta
-              a.ThreadPostTitleUsername(href=`/u/${uid}`) #{user?user.username:''}
-              if(user && user.uid === data.targetUser.uid)
-                span(style='color: #ccc') (楼主)&nbsp
-              span.lighttext #{fromNow(post.toc)} -
-              span.lighttext #{dateTimeString(post.toc)}
-              -var postid = post.pid
-              span(style='margin-left:3px;').lighttext #{postid}
+if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
+  .media.post-body(style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
+    if post.todraft
+      .h4.text-center(style='padding-bottom: 1rem;border-bottom: 1px solid #ff5a0b; color: #ff5a0b;') 本条回复已被退回修改，请作者点击编辑按钮修改
+    .media-body
+      .inline-block.media-heading(style='margin-bottom: 0;')
+        a(href=`/u/${post.uid}`)
+          img(src=`/avatar/${post.uid}` style='width: 25px; height: 25px;border-radius: 50%;margin-right: 0.5rem;margin-top: -3px;')
+          span= post.user.username
+        if thread.uid === post.uid
+          span(style='color: #888888;')=`（作者）`
+      .inline-block(style='float: right;')
+        -var floornumber = data.paging.start+index
+        span.lighttext= floornumber + '楼'
+      if data.user
+        .inline-block.post-options
+          .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="false" aria-expanded="false")
+            span.fa.fa-sliders
+          ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
+            if postTo
+              li
+                a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+                  span.fa.fa-comment-o &nbsp;
+                  span 引用
+            if addCredit
+              li
+                a(href=`javascript:addCredit('${post.pid}')`)
+                  span.fa.fa-graduation-cap &nbsp;
+                  span 评学术分
+            - var ownership = data.userOperationsId.includes('modifyOtherPosts')
+            - ownership = ownership?true:(user.uid===post.uid)
+            if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
+              li
+                a(href=`/editor?type=post&id=${post.pid}`)
+                  span.fa.fa-edit &nbsp;编辑
+            if disablePost
+              li
+                a(href=`###` onclick=`disablePostClick('${post.pid}', 'post')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo")
+                  span.fa.fa-eye-slash &nbsp;屏蔽
+            if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
+              if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
+                li
+                  a(href=`/p/${post.pid}/history`)
+                    span.fa.fa-history &nbsp;历史版本
+            li.divider
+              li
+                a
+                  span.fa.fa-clock-o= ` ${post.toc.toLocaleString()}`
+            if disablePost
+              li
+                -const ipoc = post.iplm || post.ipoc;
+                a(href=`http://ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc)
+                  span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
+      .inline-block.post-qrcode
+        .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+        .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
+          .ThreadTitle22(style="border: 1px solid #bababa;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background: #ffffff;")
+            div.changeDis(style='width: 100%;')
+              p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
+              .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
+              p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;")= post.pid
+              .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
+            div.changeDisNone.text-center(style='width: 100%;')
+              canvas.qrcode(data-pid=post.pid).inline-block
 
+      .inline-block.post-thumbsUp
+        -const recUsers = post.recUsers || [];
+        if data.user && recUsers.includes(data.user.uid)
+          span(data-pid=post.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+        else
+          span(data-pid=post.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
 
-            span.ThreadTitleAuxillaryLink.PostTitleAuxillaryLink
-              -var recUsers = post.recUsers || []
-              if data.user && post.uid != data.user.uid
-                if recUsers.indexOf(data.user.uid) > -1
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}', ${recUsers.length})`) 已推介(#{recUsers.length})
-                else
-                  a(href='javascript:;' onclick=`recommendPostSwitch(event, '${post.pid}', ${recUsers.length})`) 推介(#{recUsers.length})
-                a(href=`javascript:at('${post.user.username}')`) @该用户
-
-              - if(postTo)
-                a(href=`javascript:quotePost('${post.pid}', '${data.paging.start+index}', '${data.paging.page.toString()}')`) 引用
-
-              - if(addCredit)
-                a(href=`javascript:addCredit('${post.pid}')`) 评学术分
-
-              - if(disablePost)// || ((!data.thread.fid && data.thread.toMid == data.user.uid) || !data.thread.fid && !data.thread.toMid && data.thread.mid == data.user.uid))
-                //- a(href=`javascript:disablePost('${post.pid}')`) 屏蔽
-                a(href=`` onclick=`disablePostClick('${post.pid}')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo") 屏蔽
-                //- a(onclick=`javascript:disablePostClick()`) 测试
-
-              - if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
-                if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
-                  a(href=`/p/${post.pid}/history`) 历史
-              if data.user
-                - var user = data.user
-                - var ownership = data.userOperationsId.includes('modifyOtherPosts')
-                - ownership = ownership?true:(user.uid===uid)
-
-                //- if(testModifyTimeLimit(data.certificates,ownership,post.toc))
-                if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
-
-                  a(href=`/editor?type=post&id=${post.pid}`) 编辑
-
-                - var cc = disablePost;
-                - if(cc)
-                  - var ipoc = post.iplm || null
-
-                  if ipoc
-                    - var queryforip = 'http://ip138.com/ips138.asp?ip='+ipoc.toString()+'&action=2'
-                    a.lighttext(href=`${queryforip}`) #{ipoc}
-              if data.paging
-                -var floornumber = data.paging.start+index
-                a(href=`/t/${data.thread.tid}${page?"?&page="+data.paging.page.toString():""}#${post.pid}`).lighttext #{floornumber}楼
-      if post.todraft === true
-        div.clearfix(style='background:#FF6600;text-align:center;font-size:18px;color:white;margin-left:80px') 本条回复已被退回修改，请作者点击编辑按钮修改
-      if(post.t && post.t != '' && index != 0)
+      .clearfix
+      if(post.t && post.t !== '' && index !== 0)
         div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
       -post.c = hideContentByUser(post.c, data.user, 'thread')
       div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
-        if post.toc.toLocaleString()!=post.tlm.toLocaleString()
-          p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-      //span #{post.user?post.user.post_sign:''}
+      if post.toc.toLocaleString() !== post.tlm.toLocaleString()
+        p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
       if post.credits && post.credits.length > 0
         .nkcpanel.ThreadPostCredits
           each c,index in post.credits
             -var username = c.username||c.uid
-            -var profile = (c.uid&&c.uid!='0')?'/m/'+c.uid:'/user_activities_byname/'+c.username
+            -var profile = (c.uid&&c.uid!=='0')?'/m/'+c.uid:'/user_activities_byname/'+c.username
             .ThreadPostCreditItem
-              span.TPCQ #{(c.q>0?'+':'-')}#{c.q} &nbsp;
+              span.TPCQ #{(c.q > 0 ? '+' : '-')}#{c.q} &nbsp;
               span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
               span.TPCIA
                 a(href=`${profile}`)
@@ -97,5 +96,5 @@
               span.TPCIssuer #{username} &nbsp;&nbsp;
               span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
               span.TPCReason #{c.reason}
-    if post.disabled && disablePost
-      a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+      if post.disabled && disablePost
+        a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
