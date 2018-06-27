@@ -445,9 +445,9 @@ function edInsertContent(which, myValue, fileType, fileName) {
     var codeResource = "";
     if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
       //codeResource = "<b>123456</b>"
-      codeResource = "<p><img src=" + myValue + "></p>"
+      codeResource = "<p><img src=" + myValue + " class='editImgSingle'></p>"
     }else if(fileType === "mp4"){
-      codeResource = "<video src=" + myValue + " controls style=max-width:40%>video</video>"
+      codeResource = "<video src=" + myValue + " controls style=max-width:50%>video</video>"
     }else{
       codeResource = "<p><a href=" + myValue + "><img src=" + "/default/default_thumbnail.png" + ">" + fileName + "</a></p>"
     }

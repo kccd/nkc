@@ -33,7 +33,7 @@ const spawnProcess = (pathName, args, options = {}) => {
   })
 };
 
-const www = "1024";
+const www = "1920";
 const hhh = "480";
 
 const os = platform();
