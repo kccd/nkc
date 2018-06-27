@@ -129,6 +129,7 @@ downloadRouter
     const waterSmall = await ctx.db.SettingModel.findOne({type:"home"});
     // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
     const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+    const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";
     // 获取透明度
     const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
     // 图片水印尺寸
@@ -145,29 +146,29 @@ downloadRouter
     let logoXcoor = 0; // Logo水印横向偏移量
     let logoYcoor = 0; // Logo水印纵向偏移量
     if(waterGravity === "center"){
-      // 正中间，Logo横向负偏移，文字不偏移
-      logoCoor = "-"+parseInt(usernameWidth/2+23)+"+0";
-      userCoor = "+0+0";
-    }else if(waterGravity === "southeast"){
-      // 右下角，Logo横向负偏移，文字不偏移
-      logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
-      userCoor = "+10+10";
-    }else if(waterGravity === "southwest"){
-      // 左下角，Logo不偏移，文字横向正偏移
-      logoCoor = "+10+10";
-      userCoor = "+"+parseInt(siteLogoWidth+10)+"+10"
-    }else if(waterGravity === "northeast"){
-      // 右上角，Logo横向负偏移，文字纵向正偏移
-      logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
-      userCoor = "+10+"+parseInt(siteLogoHeigth-24+10);
-    }else if(waterGravity === "northwest"){
-      // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
-      logoCoor = "+10+10";
-      userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(siteLogoHeigth-24+10)
-    }else{
-      logoCoor = "+0+0";
-      userCoor = "+0+0"
-    }
+        // 正中间，Logo横向负偏移，文字不偏移
+        logoCoor = "-"+parseInt(usernameWidth/2+23)+"+0";
+        userCoor = "+0+0";
+      }else if(waterGravity === "southeast"){
+        // 右下角，Logo横向负偏移，文字不偏移
+        logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
+        userCoor = "+10+"+parseInt(parseInt(siteLogoHeigth-24)/2+10);
+      }else if(waterGravity === "southwest"){
+        // 左下角，Logo不偏移，文字横向正偏移
+        logoCoor = "+10+10";
+        userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(parseInt(siteLogoHeigth-24)/2+10)
+      }else if(waterGravity === "northeast"){
+        // 右上角，Logo横向负偏移，文字纵向正偏移
+        logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
+        userCoor = "+10+"+parseInt(parseInt(siteLogoHeigth-24)/2+10);
+      }else if(waterGravity === "northwest"){
+        // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
+        logoCoor = "+10+10";
+        userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(parseInt(siteLogoHeigth-24)/2+10)
+      }else{
+        logoCoor = "+0+0";
+        userCoor = "+0+0"
+      }
     // 获取图片尺寸
     const { width, height } = await imageMagick.info(path);
     // 如果图片宽度大于1024，则将图片宽度缩为1024
@@ -177,7 +178,7 @@ downloadRouter
     // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
     if(width > 600 && height > 200 && waterAdd === true){
       if(waterStyle === "siteLogo"){
-        await imageMagick.watermarkify(transparency, waterGravity, path)
+        await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path);
       }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
         await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path)
         await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path)

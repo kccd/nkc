@@ -53,11 +53,11 @@ const attachify = path => {
 };
 
 
-const watermarkify = (trans, position, path) => {
+const watermarkify = (trans, position, bigWater,path) => {
   if(linux) {
-    return spawnProcess('composite', ['-dissolve', trans, '-gravity', position, watermark, path, path]);
+    return spawnProcess('composite', ['-dissolve', trans, '-gravity', position, bigWater, path, path]);
   }
-  return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position, '-geometry', '+10+10', watermark, path, path]);
+  return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position, '-geometry', '+10+10', bigWater, path, path]);
 };
 
 // sitelogo 水印
