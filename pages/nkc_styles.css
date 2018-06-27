@@ -895,7 +895,6 @@ font-size: 14pt;
 }
 
 .ThreadPostBody{
-  margin-left: 60px;
   font-size: 16px;
   /* line-height: 1.9;
   letter-spacing: 0.3px; */
@@ -961,11 +960,11 @@ margin-bottom: 5px;
 
 .ThreadPostAvatar{
 
-  border-radius: 10%;
+  border-radius: 50%;
 
-  width: 52px;
+  width: 2em;
 
-  height: 52px;
+  height: 2em;
 }
 
 .ThreadPostTitle{
@@ -1482,7 +1481,7 @@ margin-left: 5px;
 
 
 @media (max-width: 768px){
-  #fullwidthpanel {
+  .fullwidthpanel {
     padding: 15px;
     margin-left: -15px;
     margin-right: -15px;
@@ -1876,21 +1875,21 @@ img.emoji {
 .border-right{
   border-right: 1px solid #eee;
 }
-#changeDis{
+.changeDis{
   float: left;
 }
-#changeDisNone{
+.changeDisNone{
   float: left;
 }
 @media screen and (max-width: 1365px) {
-  #qrcode {
-    display: none;
+  .qrcode {
+    /*display: none;*/
   }
-  #changeDis {
-    width: 100%;
+  .changeDis {
+    /*width: 100%;*/
   }
-  #changeDisNone{
-    display: none;
+  .changeDisNone{
+    /*display: none;*/
   }
 }
 .panel {
@@ -2571,9 +2570,147 @@ img.emoji {
   background: rgba(0,0,0,0);
 }
 
+.inline-block{
+  display: inline-block;
+}
 
+/*文章页*/
+.thread-title{
+  margin-top: 0;
+}
+.thread-info{
+  margin-top: 2rem;
+  color: #aaaaaa;
+}
+.thread-info a{
+  color: #337ab7;
+  text-decoration: none;
+}
+.thread-info a:hover{
 
-
+}
+.thread-content{
+  margin-top: 1rem;
+  position: relative;
+  font-size: 16px;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+.thread-content img{
+  border-radius: 7px;
+}
+.thread-div{
+  padding: 0 1.5rem;
+}
+.thread-management{
+  margin-bottom: 0;
+  border-bottom: 1px solid #e9e9e9;
+  padding-bottom: 1rem;
+}
+.thread-management .title>span{
+  margin-right: 0.5rem;
+  color: #aaaaaa;
+}
+.thread-management .highlight{
+  color: #aaaaaa;
+  margin-right: 1rem;
+}
+.thread-oc{
+  width: 8rem;
+  float: right;
+  color: #aaaaaa;
+  font-size: 1.4em;
+  border: 1px solid #dddddd;
+  border-radius: 7px;
+  padding:3px 5px;
+}
+.thread-oc .text-center:last-child{
+  color: #ccddff;
+}
+.thread-subscribe-button{
+  padding: 2px 5px;
+}
+.post-options{
+  float: right;
+  margin-right:1rem;
+  position: relative;
+  /*font-size: 1.7rem;*/
+  color: #888888;
+  cursor: pointer;
+  /*height: 2.2rem;*/
+  text-align: center;
+  /*line-height: 2.2rem;*/
+  /*width: 2.2rem;*/
+  /*border-radius: 50%;*/
+}
+/*.post-options:hover{
+  background-color: #eeeeee;
+}*/
+.hiddenThreadContent{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: -prefix-linear-zgradient(bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 50%);
+  background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 50%);
+}
+.showThreadContentBtn{
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  display: inline-block;
+  color: #555555;
+  border-radius: 5px;
+  border: 1px solid #eeeeee;
+}
+.showThreadContentBtn:hover{
+  border: 1px solid #777777;
+}
+.post-body{
+  overflow: visible;
+  padding: 1rem 0;
+  margin: 0;
+  border-top: 1px solid #eeeeee;
+}
+.post-body .media-body{
+  overflow: visible;
+}
+.post-thumbsUp{
+  margin-right: 1rem;
+  float: right;
+  color: #999999;
+  cursor: pointer;
+}
+.post-qrcode{
+  color: #999999;
+  float: right;
+  position: relative;
+  margin-right: 1rem;
+}
+.post-thumbsUp .thumbsUp{
+  color: #ff8328;
+}
+.post-time{
+  font-size: 12px;
+  color: #555555;
+}
+.thread-aside-header{
+  border-left: 3px solid #ffa249;
+  padding-left: 0.6rem;
+  color: #555555;
+  font-size: 1.2em;
+}
+.thread-aside-title{
+  margin: 0.5rem 0;
+}
+.thread-aside-title a{
+  display: inline-block;
+  text-decoration: none;
+  color: #555555;
+  transition: color 0.3s;
+}
+.thread-aside-title a:hover{
+  color: #000000;
+}
 /*--------------*/
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{
@@ -2610,6 +2747,9 @@ img.emoji {
   }
 }
 @media screen and (max-width: 767px) {
+  .thread-div{
+    padding: 0;
+  }
   .swiper-home{
     height: 28rem;
   }
