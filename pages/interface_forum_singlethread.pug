@@ -44,13 +44,13 @@
     -let digest = '';
     if thread && thread.digest
       -digest = 'digest-thread-title';
-    a.ForumThreadNormal(class=digest href=`/t/${tid}` target='_blank')
+    a.ForumThreadNormal(class=digest href=`/t/${tid}`)
       span(style='font-size: 18px;') #{t}
     -const pageCount = thread.count / 30
     -let ellipsis = false
     - for(let i = 1; i < pageCount; i++)
       if(i < 4 || i > pageCount - 3)
-        a(href=`/t/${thread.tid}?&page=${i}` style='font-size: 14px; text-decoration: none; font-weight: normal; margin-left: 0.5rem;' target='_blank')
+        a(href=`/t/${thread.tid}?&page=${i}` style='font-size: 14px; text-decoration: none; font-weight: normal; margin-left: 0.5rem;')
           span(style='padding-left: 0.5rem; padding-right: 0.5rem; margin: 0.3rem; background-color: #04A5EA; color: white; border-radius: 0.4rem;') #{i + 1}
       else if(!ellipsis)
         -ellipsis = true
@@ -71,16 +71,16 @@
             -firstPost.c = hideContentByUser(firstPost.c, data.user, 'list')
             -firstPost.c = filterQuote(firstPost.c)
             -firstPost.c = firstPost.c.slice(0, 600);
-            a(href=`/t/${tid}` target='_blank')!= replaceContent(experimental_render(firstPost))
+            a(href=`/t/${tid}`)!= replaceContent(experimental_render(firstPost))
         div
           p
             -lastPost.c = hideContentByUser(lastPost.c, data.user, 'list')
             -lastPost.c = filterQuote(lastPost.c)
             -lastPost.c = lastPost.c.replace(/<\/?.+?>/g,"")
             -lastPost.c = lastPost.c.slice(0, 250);
-            a(href=`/t/${tid}?&last_page=true#${lastPost.pid}` target='_blank')!= replaceContent(experimental_render(lastPost) )
+            a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost) )
       .new-content-info-last
         span
           - var title = `${lastPost.user.navbarDesc.username}\n`+`学术分 ${lastPost.user.navbarDesc.xsf}\n`+`科创币 ${lastPost.user.navbarDesc.kcb}\n`+`${lastPost.user.navbarDesc.cs}`;
-          a(href=`/u/${lastPost.user.uid}` data-toggle="tooltip" data-placement="bottom" title=title target='_blank')= lastPost.user.username
+          a(href=`/u/${lastPost.user.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= lastPost.user.username
         span.icon-font=` ${fromNow(lastPost.toc)}`

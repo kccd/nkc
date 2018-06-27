@@ -73,8 +73,24 @@ block title
             -const ipoc = post.iplm || post.ipoc;
             a(href=`http://ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
               span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
-
-
+  mixin postEditTime(post)
+    if post.toc.toLocaleString() !== post.tlm.toLocaleString()
+      p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
+  mixin postCredits(post)
+    if post.credits && post.credits.length > 0
+      .nkcpanel.ThreadPostCredits
+        each c,index in post.credits
+          -var username = c.username||c.uid
+          -var profile = (c.uid&&c.uid!=='0')?'/m/'+c.uid:'/user_activities_byname/'+c.username
+          .ThreadPostCreditItem
+            span.TPCQ #{(c.q > 0 ? '+' : '-')}#{c.q} &nbsp;
+            span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
+            span.TPCIA
+              a(href=`${profile}`)
+                img.TPCIAI(src=`/avatar_small/${c.uid}`)
+            span.TPCIssuer #{username} &nbsp;&nbsp;
+            span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
+            span.TPCReason #{c.reason}
   
 block content
   -const mainContainer1400 = true;
@@ -165,7 +181,7 @@ block content
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
                       .h3.thread-title.text-center= thread.firstPost.t
                       .thread-info.text-center
-                        a(href=`/u/${thread.uid}` target='_blank')
+                        a(href=`/u/${thread.uid}`)
                           img(src=`/avatar_small/${thread.uid}` style='width: 1.5em;height: 1.5em;border-radius:50%;')
                           span= ` ${thread.firstPost.user.username}`
 
@@ -173,12 +189,18 @@ block content
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
                       if data.paging.page === 0
                         div.thread-content!= experimental_render(post)
+                        +postEditTime(post)
+                        +postCredits(post)
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
                           div!= experimental_render(post)
+                          +postEditTime(post)
+                          +postCredits(post)
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
+                      if post.disabled && disablePost
+                        a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
           .fullwidthpanel.ThreadBox.nkcpanel
             .row
               .thread-div
