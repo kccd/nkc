@@ -18,6 +18,13 @@ $(document).ready(function(){
     $('#waterGravity').attr("disabled", "disabled");
   };
 
+  var isPay = $("#isPay").attr("data");
+  if(isPay === "true"){
+    $("#isPay").show();
+  }else{
+    $("#payForWater").show()
+  }
+
 })
 
 
@@ -46,15 +53,63 @@ function submit(uid) {
   var waterStyleValue = $("#waterStyle option:selected").attr("data");
   var waterGravityValue = $("#waterGravity option:selected").attr("data")
   optionArr = {
+    type: "save",
     waterAdd: isWaterBool,
     waterStyle: waterStyleValue,
     waterGravity: waterGravityValue
   }
 	nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
 		.then(function(){
-			screenTopAlert('修改成功');
+      screenTopAlert('修改成功');
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
 		})
+}
+
+// 检测是否已经购买过不打水印的服务
+function isAlreadyPay(info){
+  if(!info){
+    $("#payForWater").show();
+  }
+}
+
+// 展示付费提醒
+function showButton(){
+  $("#payForWater").show()
+}
+
+// 隐藏付费提醒
+function hideButton(){
+  $("#payForWater").hide()
+}
+
+// 付费提示
+function yesPayForWater(uid){
+  optionArr = {
+    type: "pay"
+  }
+	nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
+		.then(function(){
+			screenTopAlert('购买成功');
+      window.location.reload();
+		})
+		.catch(function(data) {
+      screenTopWarning(data.error || data);
+      hideButton();
+		})
+}
+
+//不买
+function noPayForWater(){
+  hideButton();
+  $("#radio1").attr("checked",true)
+}
+
+// 切换示例图片
+function turnImg(){
+  // console.log($("#waterGravity").val())
+  // var newImg = "< img src='/default/"+$("#waterGravity").val()+".jpg' style='width: 100%;'>"
+  // $("#exampleImg").html(newImg)
+  $("#newImg").attr("src","/default/"+$("#waterGravity").val()+".jpg");
 }

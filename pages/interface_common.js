@@ -456,9 +456,6 @@ function edInsertContent(which, myValue, fileType, fileName) {
   }
 }
 
-
-
-
 //插入图片
 function insertHtmlAtCaret(html) {
   var sel, range;
@@ -648,7 +645,7 @@ $("document").ready(function(){
     var selection = document.getSelection();
     lastEditRange = selection.getRangeAt(0)
   });
-  $("text-elem").on("keyup",function(){
+  $("#text-elem").on("keyup",function(){
     var selection = document.getSelection();
     lastEditRange = selection.getRangeAt(0)
   })

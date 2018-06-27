@@ -23,6 +23,8 @@ resourceRouter
       }
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
     }
+    // 在resource中添加点击次数
+    await resource.update({$inc:{hits:1}})
     ctx.filePath = filePath;
     ctx.resource = resource;
     ctx.type = ext;
@@ -68,20 +70,38 @@ resourceRouter
       const waterAdd = waterSetting?waterSetting.waterSetting.waterAdd : true;
       const waterStyle = waterSetting?waterSetting.waterSetting.waterStyle : "siteLogo";
       const waterGravity = waterSetting?waterSetting.waterSetting.waterGravity : "southeast";
-      // 获取文字水印的字符数、宽度、高度
+      // 获取文字（用户名）水印的字符数、宽度、高度
+      let username;
+      if(waterStyle === "userLogo"){
+        username = ctx.data.user?ctx.data.user.username : "科创论坛";
+      }else if(waterStyle === "coluLogo"){
+        const column = await ctx.db.PersonalForumModel.findOne({uid: ctx.data.user.uid});
+        username = column?column.displayName : ctx.data.user.uid+"的专栏";
+      }else{
+        username = "";
+      }
       // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
-      const username = "123465 asdasda ASDASD 安科技杀手空间 !@$%$&^"
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
-      const usernameWidth = usernameLength * 13;
+      const usernameWidth = usernameLength * 12;
       const usernameHeight = 24;
-      console.log(usernameLength)
+      // 获取文字（专栏名）水印的字符数、宽度、高度
+      // const column = await ctx.db.PersonalForumModel.findOne({uid: ctx.data.user.uid})
+      // const coluname = column?column.displayName : username+"的专栏";
+      // const colunameLength = coluname.replace(/[^\x00-\xff]/g,"01").length;
+      // const colunameWidth = colunameLength * 12;
+      // const coluHeight = 24;
       // 获取水印图片路径
       const waterSmall = await ctx.db.SettingModel.findOne({type:"home"});
-      // const waterSmallPath = settings.upload.webSmallLogoPath + "/" + waterSmall.smallLogo + ".png";
-      const waterSmallPath = settings.upload.webSmallLogoPath + "/" + waterSmall.logo + ".png";
+      // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+      const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+      // 获取透明度
+      const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
       // 图片水印尺寸
-      const siteLogoWidth = settings.upload.webSmallLogoSize;
-      const siteLogoHeigth = settings.upload.webSmallLogoSize;
+      let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
+      siteLogoWidth = parseInt(siteLogoWidth);
+      siteLogoHeigth = parseInt(siteLogoHeigth)
+      // const siteLogoWidth = settings.upload.webSmallLogoSize;
+      // const siteLogoHeigth = settings.upload.webSmallLogoSize;
       // 根据水印位置计算偏移量
       let userCoor; // 文字水印偏移量
       let userXcoor = 0; // 文字水印横向偏移量
@@ -95,20 +115,20 @@ resourceRouter
         userCoor = "+0+0";
       }else if(waterGravity === "southeast"){
         // 右下角，Logo横向负偏移，文字不偏移
-        logoCoor = "+"+parseInt(usernameWidth)+"+0"
-        userCoor = "+0+0";
+        logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
+        userCoor = "+10+10";
       }else if(waterGravity === "southwest"){
         // 左下角，Logo不偏移，文字横向正偏移
-        logoCoor = "+0+0";
-        userCoor = "+"+siteLogoWidth+"+0"
+        logoCoor = "+10+10";
+        userCoor = "+"+parseInt(siteLogoWidth+10)+"+10"
       }else if(waterGravity === "northeast"){
         // 右上角，Logo横向负偏移，文字纵向正偏移
-        logoCoor = "+"+parseInt(usernameWidth)+"+0"
-        userCoor = "+0+"+parseInt(siteLogoHeigth-24);
+        logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
+        userCoor = "+10+"+parseInt(siteLogoHeigth-24+10);
       }else if(waterGravity === "northwest"){
         // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
-        logoCoor = "+0+0";
-        userCoor = "+"+siteLogoWidth+"+"+parseInt(siteLogoHeigth-24)
+        logoCoor = "+10+10";
+        userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(siteLogoHeigth-24+10)
       }else{
         logoCoor = "+0+0";
         userCoor = "+0+0"
@@ -122,8 +142,8 @@ resourceRouter
       // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
       if(width > 600 && height > 200 && waterAdd === true){
         if(waterStyle === "siteLogo"){
-          await imageMagick.watermarkify(waterGravity, path)
-        }else{
+          await imageMagick.watermarkify(transparency, waterGravity, path)
+        }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
           await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path)
           await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path)
         }

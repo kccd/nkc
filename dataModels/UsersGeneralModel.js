@@ -17,6 +17,14 @@ const usersGeneralSchema = new Schema({
     waterGravity: {
       type: String,
       default: "southwest"
+    },
+    waterPayTime:{
+      type: Date,
+      default: null
+    },
+    waterPayInfo:{
+      type: Boolean,
+      default: false
     }
   }
 }, {

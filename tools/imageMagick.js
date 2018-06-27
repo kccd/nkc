@@ -53,11 +53,11 @@ const attachify = path => {
 };
 
 
-const watermarkify = (position, path) => {
+const watermarkify = (trans, position, path) => {
   if(linux) {
-    return spawnProcess('composite', ['-dissolve', '50', '-gravity', position, watermark, path, path]);
+    return spawnProcess('composite', ['-dissolve', trans, '-gravity', position, watermark, path, path]);
   }
-  return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', position, '-geometry', '+10+10', watermark, path, path]);
+  return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position, '-geometry', '+10+10', watermark, path, path]);
 };
 
 // sitelogo 水印
@@ -65,7 +65,7 @@ const watermarkifyLogo = (dpi, position, waterSmallPath, path) => {
   if(linux) {
     return spawnProcess('composite', ['-dissolve', '50', '-gravity', position, waterSmallPath, path, path]);
   }
-  return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', position  ,'-geometry', dpi, waterSmallPath, path, path]);
+  return spawnProcess('magick', ['composite', '-dissolve', '100', '-gravity', position  ,'-geometry', dpi, waterSmallPath, path, path]);
 };
 
 // username 水印 
@@ -74,7 +74,7 @@ const watermarkifyFont = (dpi, font, position, path) =>{
     return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
   }
   // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', 'center ' ,'-draw', "text 0,25 'hello'" ,path, path]);
-  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#CCCCCC', '-weight', 'bolder','-stroke','#000000','-gravity', position ,'-annotate', dpi, font ,path, path]);
+  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#FFFFFF', '-weight', 'bolder','-stroke','#444444','-gravity', position ,'-annotate', dpi, font ,path, path]);
 }
 
 // 手机图片上传自动旋转
@@ -103,6 +103,20 @@ const info = async path => {
   const sizeInfo = back.split('x');
   const [width, height] = sizeInfo;
   return {width, height}
+};
+
+// 获取水印图片尺寸
+const waterInfo = async path => {
+  let back;
+  if(linux) {
+    back = await spawnProcess('identify', ['-format', '%wx%h', path]);
+  } else {
+    back = await spawnProcess('magick', ['identify', '-format', '%wx%h', path]);
+  }
+  back = back.replace('\n', '');
+  const sizeInfo = back.split('x');
+  const [siteLogoWidth, siteLogoHeigth] = sizeInfo;
+  return {siteLogoWidth, siteLogoHeigth}
 };
 
 const thumbnailify = (path, dest) => {
@@ -257,6 +271,7 @@ module.exports = {
   watermarkifyLogo,
   watermarkifyFont,
   info,
+  waterInfo,
   allInfo,
   thumbnailify,
   generateAdPost,
