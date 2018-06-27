@@ -165,7 +165,7 @@ block content
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
                       .h3.thread-title.text-center= thread.firstPost.t
                       .thread-info.text-center
-                        a(href=`/u/${thread.uid}` target='_blank')
+                        a(href=`/u/${thread.uid}`)
                           img(src=`/avatar_small/${thread.uid}` style='width: 1.5em;height: 1.5em;border-radius:50%;')
                           span= ` ${thread.firstPost.user.username}`
 
