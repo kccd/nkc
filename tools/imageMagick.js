@@ -1,7 +1,7 @@
 const {spawn, exec} = require('child_process');
 const settings = require('../settings');
+const {banner, watermark, fontTtf} = settings.statics;
 const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize} = settings.upload;
-const {banner, watermark} = settings.statics;
 const {promisify} = require('util');
 const {platform} = require('os');
 const fs = require('fs');
@@ -33,8 +33,16 @@ const spawnProcess = (pathName, args, options = {}) => {
   })
 };
 
+const www = "1024";
+const hhh = "480";
+
 const os = platform();
 const linux = (os === 'linux');
+
+// 图片缩小
+const imageNarrow = path => {
+  return spawnProcess('magick', ['convert', path, '-resize', `${www}>`,path])
+}
 
 const attachify = path => {
   const {width, height} = sizeLimit.attachment;
@@ -45,12 +53,29 @@ const attachify = path => {
 };
 
 
-const watermarkify = path => {
+const watermarkify = (trans, position, bigWater,path) => {
   if(linux) {
-    return spawnProcess('composite', ['-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
+    return spawnProcess('composite', ['-dissolve', trans, '-gravity', position, bigWater, path, path]);
   }
-  return spawnProcess('magick', ['composite', '-dissolve', '50', '-gravity', 'southeast ', watermark, path, path]);
+  return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position, '-geometry', '+10+10', bigWater, path, path]);
 };
+
+// sitelogo 水印
+const watermarkifyLogo = (dpi, position, waterSmallPath, path) => {
+  if(linux) {
+    return spawnProcess('composite', ['-dissolve', '50', '-gravity', position, waterSmallPath, path, path]);
+  }
+  return spawnProcess('magick', ['composite', '-dissolve', '100', '-gravity', position  ,'-geometry', dpi, waterSmallPath, path, path]);
+};
+
+// username 水印 
+const watermarkifyFont = (dpi, font, position, path) =>{
+  if(linux) {
+    return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
+  }
+  // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', 'center ' ,'-draw', "text 0,25 'hello'" ,path, path]);
+  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#FFFFFF', '-weight', 'bolder','-stroke','#444444','-gravity', position ,'-annotate', dpi, font ,path, path]);
+}
 
 // 手机图片上传自动旋转
 const allInfo = async path => {
@@ -78,6 +103,20 @@ const info = async path => {
   const sizeInfo = back.split('x');
   const [width, height] = sizeInfo;
   return {width, height}
+};
+
+// 获取水印图片尺寸
+const waterInfo = async path => {
+  let back;
+  if(linux) {
+    back = await spawnProcess('identify', ['-format', '%wx%h', path]);
+  } else {
+    back = await spawnProcess('magick', ['identify', '-format', '%wx%h', path]);
+  }
+  back = back.replace('\n', '');
+  const sizeInfo = back.split('x');
+  const [siteLogoWidth, siteLogoHeigth] = sizeInfo;
+  return {siteLogoWidth, siteLogoHeigth}
 };
 
 const thumbnailify = (path, dest) => {
@@ -229,7 +268,10 @@ module.exports = {
   avatarify,
   attachify,
   watermarkify,
+  watermarkifyLogo,
+  watermarkifyFont,
   info,
+  waterInfo,
   allInfo,
   thumbnailify,
   generateAdPost,
@@ -245,7 +287,8 @@ module.exports = {
 	fundLogoify,
   removeFile,
 	lifePhotoify,
-	forumAvatarify
+  forumAvatarify,
+  imageNarrow
 };
 
 

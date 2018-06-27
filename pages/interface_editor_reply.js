@@ -32,6 +32,12 @@
             return true
           }
           var newSrc = $(this).attr("srcs")
+          var ownImage = "<img src='" + newSrc + "'>";
+          var isOwnImg = newSrc.indexOf("kechuang");
+          if(isOwnImg !== -1){
+            $(this).replaceWith(ownImage)
+            return true;
+          }
           // 使用正在下载图片替换当前图片
           //$(this).attr("src","/resources/site_specific/picupload.png")
           // console.log("newSrc",newSrc)

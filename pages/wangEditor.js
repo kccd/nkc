@@ -1931,6 +1931,46 @@ function Clean(editor){
     this._active = false;
 }
 
+function getSelectedContents(){
+
+    if (window.getSelection) { //chrome,firefox,opera
+ 
+        var range=window.getSelection().getRangeAt(0);
+ 
+        var container = document.createElement('div');
+ 
+        container.appendChild(range.cloneContents());
+ 
+        return container.innerHTML;
+ 
+        //return window.getSelection(); //只复制文本
+ 
+    }
+ 
+    else if (document.getSelection) { //其他
+ 
+        var range=window.getSelection().getRangeAt(0);
+ 
+        var container = document.createElement('div');
+ 
+        container.appendChild(range.cloneContents());
+ 
+        return container.innerHTML;
+ 
+        //return document.getSelection(); //只复制文本
+ 
+    }
+ 
+    else if (document.selection) { //IE特有的
+ 
+        return document.selection.createRange().htmlText;
+ 
+        //return document.selection.createRange().text; //只复制文本
+ 
+    }
+ 
+ }
+
 // 原型
 Clean.prototype = {
     constructor: Clean,
@@ -1940,10 +1980,14 @@ Clean.prototype = {
         // 点击菜单将出发这里
 
         var editor = this.editor;
-
-        var $selectionELem = editor.selection.getSelectionContainerElem();
-        var selectionText = editor.selection.getSelectionText();
-        editor.cmd.do('insertHTML', '<span>' + selectionText + '</span>');
+        // var $selectionELem = editor.selection.getSelectionContainerElem();
+        // var selectionText = editor.selection.getSelectionText();
+        var container = document.createElement('div');
+        container.appendChild(editor.selection._currentRange.cloneContents());
+        // 清除格式保留图片 img
+        // 清除格式保留p标签，如果清除掉p标签，换行就会有问题
+        var imgInHtml = container.innerHTML.replace(/<(?!p|img|br)[^>]+>/g,"")
+        editor.cmd.do('insertHTML', '<span>' + imgInHtml + '</span>');
     }
 }
 
@@ -3467,7 +3511,7 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     var singlelabels = RegExp("<" + singlelabel + ".*?>","igm");
     pasteHtml = pasteHtml.replace(singlelabels,'')
     // 只过滤无用的双标签，不过滤标签内的html
-    var doubleLabel = "(ignore_js_op|object|label|strike|code|pre|h5|h6|blockquote|address)";
+    var doubleLabel = "(ignore_js_op|object|label|strike|code|pre|h5|h6|blockquote|address|ul|li|ol)";
     var doubleLabels = RegExp("<\/?" + doubleLabel + "[^>]*>","igm")
     pasteHtml = pasteHtml.replace(doubleLabels,'')
 
@@ -3696,11 +3740,18 @@ Text.prototype = {
             // mousedown 状态下，鼠标滑动到编辑区域外面，也需要保存选区
             $textElem.on('mouseleave', saveRange);
         });
-        $textElem.on('mouseup', function (e) {
+        // $textElem.on('mouseup', function (e) {
+        //     saveRange();
+        //     // 在编辑器区域之内完成点击，取消鼠标滑动到编辑区外面的事件
+        //     $textElem.off('mouseleave', saveRange);
+        // });
+        // 如果鼠标在拖动时移出编辑器区域，那么会导致编辑器选区会定格在移出事件
+        // 因此，将鼠标抬起事件改为作用于全局，这样便可以获得编辑器内的全部拖蓝
+        // 
+        $(document).on('mouseup', function (e){
             saveRange();
-            // 在编辑器区域之内完成点击，取消鼠标滑动到编辑区外面的事件
             $textElem.off('mouseleave', saveRange);
-        });
+        })
     },
 
     // 按回车键时的特殊处理

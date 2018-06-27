@@ -11,6 +11,7 @@ const photoRouter = require('./photo');
 const certRouter = require('./cert');
 const socialRouter = require('./social');
 const usernameRouter = require('./username');
+const waterRouter = require('./water');
 settingRouter
 	.use('/', async (ctx, next) => {
 		const {data, params, db} = ctx;
@@ -35,5 +36,6 @@ settingRouter
 	.use('/email', emailRouter.routes(), emailRouter.allowedMethods())
 	.use('/cert', certRouter.routes(), certRouter.allowedMethods())
 	.use('/photo', photoRouter.routes(), photoRouter.allowedMethods())
-	.use('/info', infoRouter.routes(), infoRouter.allowedMethods());
+	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+	.use('/water', waterRouter.routes(), waterRouter.allowedMethods());
 module.exports = settingRouter;

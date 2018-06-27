@@ -33,7 +33,12 @@ function register_submit(){
       /*,
       icode:gv('icode')*/
     }
-		userobj.username = $.trim(userobj.username);
+    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+    userobj.username = $.trim(userobj.username);
+    if(pattern.test(userobj.username)){
+      getFocus("#username")
+      throw('用户名含有非法字符！')
+    }
     if(userobj.username === ''){
       getFocus("#username")
       throw('请填写用户名！')

@@ -94,7 +94,7 @@ const logger = async (ctx, next) => {
   if (topClassifySingle.length > 0) {
     operationClassify = topClassifySingle[0].typeId
   }
-
+ 
   // 根据分类调用不同的model
   for (let typeId of operationClassify) {
     const type = await db.OperationTypeModel.findOne({_id: typeId});

@@ -72,6 +72,8 @@
 
     "visitUserPhotoSettings": "访问相册",
     "modifyUserPhotoSettings": "修改相册开放程度",
+    "visitUserWaterSettings": "访问水印设置",
+    "modifyUserWaterSettings": "修改水印设置",
     "visitUserCertPhotoSettings": "访问证书照片",
     "modifyUserCertPhotoSettings": "修改证书照片开放程度",
     "visitPasswordSettings": "访问修改密码页面",
