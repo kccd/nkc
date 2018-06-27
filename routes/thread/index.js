@@ -257,6 +257,7 @@ threadRouter
 				{
 					$match: {
 						fid: forum.fid,
+						digest: true,
 						recycleMark: {$ne: true}
 					}
 				},
