@@ -39,6 +39,7 @@ const t = require('./thread');
 const u = require('./user');
 const page = require('./page');
 const download = require('./download');
+const forgotPassword = require('./forgotPassword');
 const operationObj = {};
 
 
@@ -125,6 +126,8 @@ operationObj.operationTree = {
 		u,// 用户
 
 		download, // 编辑器自动上传图片
+
+		forgotPassword,
 
 		page,
 	}

@@ -273,6 +273,13 @@
     "modifyHomeNoticeSettings": "修改网站首页公告",
     "deleteHomeNotice": "删除首页通知",
     "visitPageSettings": "访问分页设置",
-    "modifyPageSettings": "修改分页设置"
+    "modifyPageSettings": "修改分页设置",
+    "visitFindPasswordByMobile": "访问通过手机找回密码页面",
+    "findPasswordVerifyMobile": "找回密码中的验证手机号码",
+    "modifyPasswordByMobile": "通过手机修改密码",
+    "visitFindPasswordByEmail": "访问通过邮箱找回密码页面",
+    "findPasswordSendVerifyEmail": "找回密码中的发送验证邮件",
+    "modifyPasswordByEmail": "通过邮箱修改密码",
+    "findPasswordVerifyEmail": "找回密码中的验证邮件"
   }
 }
