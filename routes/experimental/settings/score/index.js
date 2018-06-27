@@ -2,7 +2,11 @@ const Router = require('koa-router');
 const scoreRouter = new Router();
 scoreRouter
 	.get('/', async (ctx, next) => {
+		const {data, db} = ctx;
+		data.typesOfScoreChange = await db.TypesOfScoreChangeModel.find();
 		ctx.template = 'experimental/settings/score.pug';
+		await next();
+		/*ctx.template = 'experimental/settings/score.pug';
 		const {data, db, query} = ctx;
 		const {type} = query;
 		data.type = type;
@@ -21,7 +25,7 @@ scoreRouter
 			data.operation = data.scoreOperations[0] || data.operations[0];
 			data.type = data.operation._id;
 		}
-		await next();
+		await next();*/
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;

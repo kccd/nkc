@@ -64,7 +64,7 @@ $('#inputFile').on('change', function() {
 });
 
 function defaultLogo(id, type) {
-	nkcAPI('/e/settings/home/logo', 'PATCH', {id: id, type: type})
+	nkcAPI('/e/settings/home/logo', 'PATCH', {id: id, type: type, operation: 'saveLogo'})
 		.then(function() {
 			window.location.reload();
 		})
@@ -99,6 +99,20 @@ function removeNotice(oc) {
 	nkcAPI('/e/settings/home/notice?oc='+oc, 'DELETE', {})
 		.then(function() {
 			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error|| data);
+		})
+}
+
+function saveWaterMarkSettings() {
+	var watermarkTransparency = $('#watermarkTransparency').val();
+	nkcAPI('/e/settings/home/logo', 'PATCH', {
+		watermarkTransparency: watermarkTransparency,
+		operation: 'saveWaterMarkSettings'
+	})
+		.then(function() {
+			screenTopAlert('保存成功');
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error|| data);

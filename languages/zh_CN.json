@@ -256,8 +256,8 @@
     "visitScoreLogs": "查看分值变动记录",
     "visitNumberSettings": "访问积分设置",
     "modifyNumberSettings": "修改积分设置",
-    "dailyLogin": "日常登录（不影响权限）",
-    "violation": "违规操作（不影响权限）",
+    "dailyLogin": "日常登录",
+    "violation": "违规",
     "logParamsSettingModify": "修改日志设置",
     "logParamsSetting": "访问日志设置",
     "homeTop": "首页置顶",
@@ -274,6 +274,5 @@
     "deleteHomeNotice": "删除首页通知",
     "visitPageSettings": "访问分页设置",
     "modifyPageSettings": "修改分页设置"
-
   }
 }

@@ -374,7 +374,7 @@ userSchema.methods.updateUserMessage = async function() {
 	}
 	// 违规统计
 	const violationCount = await UsersScoreLogModel.count({
-		targetUid: uid,
+		uid,
 		type: 'score',
 		operationId: 'violation'
 	});

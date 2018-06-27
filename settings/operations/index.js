@@ -42,7 +42,7 @@ const download = require('./download');
 const operationObj = {};
 
 
-// 默认操作类型
+// 默认操作类型，没有路由与之对应的操作权限
 operationObj.defaultOperations = [
 	'modifyOtherPosts',
 	'displayRecycleMarkThreads',
@@ -53,8 +53,6 @@ operationObj.defaultOperations = [
 	'displayFundApplicationFormSecretInfo',
 	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
 	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
-	'dailyLogin',// 日常登陆
-	'violation',// 违规操作
 ];
 
 

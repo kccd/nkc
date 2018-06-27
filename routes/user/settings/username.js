@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.patch('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, nkcModules} = ctx;
 		const {user} = data;
 		const {newUsername} = body;
 		const reg = /\s/;
@@ -15,42 +15,41 @@ router
 		const kcbSettings = await db.SettingModel.findOne({type: 'kcb'});
 		if(!kcbSettings) ctx.throw(500, '科创币设置错误：未找到相关设置');
 		const {defaultUid} = kcbSettings;
-		const operation = await db.OperationModel.findOne({_id: 'modifyUsername'});
 		const sameUsernameUser = await db.UserModel.findOne({usernameLowerCase: newUsername.toLowerCase()});
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
 		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
-		if(operation.kcb.status) {
-			if(user.kcb + operation.kcb.change < 0) ctx.throw(400, `科创币不足，修改用户名需花费${operation.kcb.change}个科创币`);
+		const operation = await db.TypesOfScoreChangeModel.findOnly({_id: 'modifyUsername'});
+		const modifyUsernameCount = await db.UsersScoreLogModel.count({
+			uid: user.uid,
+			operationId: 'modifyUsername',
+			type: 'kcb',
+			toc: {$gt: nkcModules.apiFunction.today()}
+		});
+		if(operation.count !== 0) {
+			if(operation.count !== -1 && operation.count <= modifyUsernameCount) {
+				ctx.throw(400, `每天仅有${operation.count}次机会修改用户名，请明天再试`);
+			}
+			if(user.kcb + operation.change < 0) ctx.throw(400, `科创币不足，修改用户名需花费${operation.change}个科创币`);
 			const defaultUser = await db.UserModel.findOne({uid: defaultUid});
-			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认用户');
+			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认账户');
+			// 生成科创币交易记录
+			await db.UsersScoreLogModel.insertLog({
+				user: user,
+				type: 'kcb',
+				typeIdOfScoreChange: 'modifyUsername',
+				ip: ctx.address,
+				port: ctx.port
+			});
+
 		}
 		const newUsernameLowerCase = newUsername.toLowerCase();
 
-		/*const newSecretBehavior = db.SecretBehaviorModel({
-			type: 'changeUsername',
-			oldUsername: user.username,
-			oldUsernameLowerCase: user.usernameLowerCase,
-			newUsername: username,
-			newUsernameLowerCase: username.toLowerCase(),
-			uid: user.uid,
-			ip: ctx.address,
-			port: ctx.port
-		});
-		await generateUsersBehavior({
-			uid: user.uid,
-			toUid: user.uid,
-			operation: 'changeUsername',
-			oldUsername: user.username
-		});
-		await newSecretBehavior.save();
-		*/
-
-		// await defaultUser.update({$inc: {kcb: changeUsername}});
 		user.username = newUsername;
 		user.usernameLowerCase = newUsernameLowerCase;
-		// user.kcb -= changeUsername;
+
 		await user.save();
+
 		const userInfo = ctx.cookies.get('userInfo');
 		const {lastLogin} = JSON.parse(decodeURI(userInfo));
 		const cookieStr = encodeURI(JSON.stringify({

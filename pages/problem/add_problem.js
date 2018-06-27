@@ -12,6 +12,9 @@ function addProblem() {
 		.then(function() {
 			$('#submit').attr('disabled', false);
 			screenTopAlert('感谢您的反馈！网站工程师将会第一时间处理该问题。');
+			setTimeout(function() {
+				window.location.href = '/';
+			}, 1500)
 		})
 		.catch(function(data) {
 			$('#submit').attr('disabled', false);

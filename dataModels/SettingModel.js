@@ -130,6 +130,7 @@ const settingSchema = new Schema({
 	logos: [String],
 	logo: String,
 	smallLogo: String,
+	watermarkTransparency: Number,
 	noticeThreadsId: [String],
 
 	// 分页

@@ -4,7 +4,7 @@ router
 	.get('/', async (ctx, next) => {
 		ctx.template = 'experimental/log/score.pug';
 		const {nkcModules, data, db, query} = ctx;
-		const {page = 0, type} = query;
+		const {page = 0, type = 'kcb'} = query;
 		data.type = type;
 		const q = {};
 		if(type) {

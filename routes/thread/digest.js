@@ -17,20 +17,25 @@ router
 		await thread.update({digest: true});
 		const targetUser = await thread.extendUser();
 		// 并生成记录
-		const log = db.UsersScoreLogModel({
-			uid: user.uid,
-			type: 'score',
-			operationId: 'digestThread',
-			change: 0,
-			targetUid: targetUser.uid,
-			targetChange: 1,
-			ip: ctx.address,
-			port: ctx.port
+		await db.UsersScoreLogModel.insertLog({
+			user: targetUser,
+			type: 'kcb',
+			typeIdOfScoreChange: 'digestThread',
+			port: ctx.port,
+			fid: thread.fid,
+			tid: thread.tid,
+			ip: ctx.address
 		});
-		await log.save();
-		await targetUser.update({$inc: {digestThreadsCount: 1}});
-		targetUser.digestThreadsCount++;
-		await targetUser.calculateScore();
+		await db.UsersScoreLogModel.insertLog({
+			user: targetUser,
+			type: 'score',
+			typeIdOfScoreChange: 'digestThread',
+			port: ctx.port,
+			ip: ctx.address,
+			key: 'digestThreadsCount',
+			fid: thread.fid,
+			tid: thread.tid
+		});
 		await next();
 	})
 	.del('/', async (ctx ,next) => {
@@ -49,20 +54,26 @@ router
 		await thread.update({digest: false});
 		const targetUser = await thread.extendUser();
 		// 并生成记录
-		const log = db.UsersScoreLogModel({
-			uid: user.uid,
-			type: 'score',
-			operationId: 'unDigestThread',
-			change: 0,
-			targetUid: targetUser.uid,
-			targetChange: -1,
-			ip: ctx.address,
-			port: ctx.port
+		await db.UsersScoreLogModel.insertLog({
+			user: targetUser,
+			type: 'kcb',
+			typeIdOfScoreChange: 'unDigestThread',
+			port: ctx.port,
+			fid: thread.fid,
+			tid: thread.tid,
+			ip: ctx.address
 		});
-		await log.save();
-		await targetUser.update({$inc: {digestThreadsCount: -1}});
-		targetUser.digestThreadsCount--;
-		await targetUser.calculateScore();
+		await db.UsersScoreLogModel.insertLog({
+			user: targetUser,
+			type: 'score',
+			change: -1,
+			typeIdOfScoreChange: 'unDigestThread',
+			port: ctx.port,
+			ip: ctx.address,
+			key: 'digestThreadsCount',
+			fid: thread.fid,
+			tid: thread.tid
+		});
 		await next();
 	});
 module.exports = router;

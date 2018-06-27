@@ -11,19 +11,49 @@ block content
       include ../nav
       .col-xs-12.col-md-12
         .row#content
+          .col-xs-12.col-md-12(style='margin: 2rem 0 1rem 0;')
+            h4 默认收款账户
+            if data.defaultUser
+              .col-xs-12.col-md-12
+                div(style='float:left;height: 5rem;width: 5rem')
+                  img(src=`/avatar/${data.defaultUser.uid}` style='border-radius: 50%;height: 100%;')
+                div(style='float:left;height: 5rem;margin-left: 1rem;')
+                  h4(style='margin-bottom: 0.2rem;margin-top: 0;')
+                    a(href=`/u/${data.defaultUser.uid}` target='_blank')= data.defaultUser.username
+                  h4(style='margin-top: 0;')= `科创币：`
+                    span(style='font-size: 2em;color: #ffba53')= data.defaultUser.kcb
+          .col-xs-12.col-md-12(style='margin: 0 0 2rem 0;')
+            .from.form-inline
+              .form-group
+                input.form-control#defaultUid(type='String' value=data.kcbSettings.defaultUid || '5805')
+                button.btn.btn-primary(onclick='saveKcbSettings()')= data.defaultUser?'更改': '保存'
+
           .col-xs-12.col-md-12
-            .form-horizontal
-              .form-group
-                .col-sm-4.col-sm-offset-2
-                  h4 修改用户名
-              .form-group
-                .col-sm-2.control-label 默认账户UID
-                .col-sm-3
-                  input.form-control#defaultUid(type='String' value=data.kcbSettings.defaultUid || '5805')
-              .form-group
-                .col-sm-2.control-label
-                .col-sm-2
-                  button.btn.btn-primary(onclick='saveKcbSettings()') 保存
+            table.table
+              thead
+                tr
+                  th 序号
+                  th 操作名
+                  th 每天次数（无限制：-1）
+                  th 科创币
+                  th 描述
+              tbody
+                for type, index in data.typesOfScoreChange
+                  tr.typeOfScoreChange(id=type._id)
+                    th= index + 1
+                    th= type.description
+                    th
+                      input#count(value=type.count || 0 type='number')
+                    th
+                      input#change(value=type.change || 0 type='number')
+                    th
+                      if type.count === 0
+                        span 未启用
+                      else if type.count === -1
+                        span=`无限次数 | 每次 ${type.change > 0 ? '+' + type.change : type.change}`
+                      else
+                        span=`每天 ${type.count} 次 | 每次 ${type.change > 0 ? '+' + type.change : type.change}`
+            button.btn.btn-primary(onclick='saveKcbNumberSettings()') 保存
 
 
 block scripts

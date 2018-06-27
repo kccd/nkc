@@ -30,25 +30,42 @@ router
       if(disabled) ctx.throw(400, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
     }
     data.targetUser = await targetPost.extendUser();
-    if(obj.disabled && para && para.illegalType) {
-    	const log = db.UsersScoreLogModel({
-				uid: user.uid,
-		    type: 'score',
-		    operationId: 'violation',
-		    description: para.reason || '屏蔽回复并标记为违规',
-		    change: 0,
-		    targetChange: 1,
-		    targetUid: data.targetUser.uid,
+    if(obj.disabled && para.delType === 'toRecycle') {
+	    await db.UsersScoreLogModel.insertLog({
+		    user: data.targetUser,
+		    type: 'kcb',
+		    typeIdOfScoreChange: 'postBlocked',
+		    port: ctx.port,
+		    fid: targetPost.fid,
+		    tid: targetPost.tid,
 		    pid,
-		    tid: targetThread.tid,
-		    fid: targetThread.fid,
-		    ip: ctx.address,
-		    port: ctx.port
+		    ip: ctx.address
 	    });
-    	await log.save();
-    	data.targetUser.violation++;
-    	await data.targetUser.update({$inc: {violationCount: 1}});
-    	await data.targetUser.calculateScore();
+	    if(para && para.illegalType) {
+		    await db.UsersScoreLogModel.insertLog({
+			    user: data.targetUser,
+			    type: 'kcb',
+			    typeIdOfScoreChange: 'violation',
+			    port: ctx.port,
+			    fid: targetPost.fid,
+			    tid: targetPost.tid,
+			    pid,
+			    ip: ctx.address,
+			    description: para.reason || '屏蔽回复并标记为违规'
+		    });
+		    await db.UsersScoreLogModel.insertLog({
+			    user: data.targetUser,
+			    type: 'score',
+			    typeIdOfScoreChange: 'violation',
+			    port: ctx.port,
+			    ip: ctx.address,
+			    key: 'violationCount',
+			    fid: targetPost.fid,
+			    tid: targetPost.tid,
+			    pid,
+			    description: para.reason || '屏蔽回复并标记为违规'
+		    });
+	    }
     }
     await targetThread.updateThreadMessage();
     // 删除回复 添加日志
