@@ -29,7 +29,7 @@ block content
               .form-group#payForWater(style="display:none")
                 label.col-sm-2.control-label 
                 .col-sm-10
-                  h5.text-danger 该功能需要花费×××科创币（每年），是否继续?
+                  h5.text-danger=`隐藏水印功能需要花费${data.kcbPayForWater}科创币，是否继续?`
                 .col-sm-2
                 .col-sm-10
                   button.btn.btn-primary#save(onclick=`yesPayForWater(${data.user.uid})`) 继续
