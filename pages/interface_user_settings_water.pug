@@ -23,17 +23,17 @@ block content
                   label.radio-inline
                     input(type='radio' name='isWater' id='radio1' value="yes" checked=data.waterSetting.waterAdd === true)
                     span 是
-                  label.radio-inline#isPay(data=`${data.waterSetting.waterPayInfo}` style="display:none")
+                  label.radio-inline#isPay(data=`${data.waterSetting.waterPayInfo}`)
                     input(type='radio' name='isWater' id='radio2' value="no" checked=data.waterSetting.waterAdd === false onClick=`isAlreadyPay(${data.waterSetting.waterPayInfo})`)
                     span 否
               .form-group#payForWater(style="display:none")
                 label.col-sm-2.control-label 
                 .col-sm-10
-                  h5.text-danger 是否花费200科创币购买不打水印服务？
+                  h5.text-danger 该功能需要花费×××科创币（每年），是否继续?
                 .col-sm-2
                 .col-sm-10
-                  button.btn.btn-primary#save(onclick=`yesPayForWater(${data.user.uid})`) 买！
-                  button.btn.btn-primary#save(onclick=`hideButton()`) 不买!
+                  button.btn.btn-primary#save(onclick=`yesPayForWater(${data.user.uid})`) 继续
+                  button.btn.btn-primary#save(onclick=`hideButton()`) 取消
               .form-group
                 label.col-sm-2.control-label 水印添加方式：
                 .col-sm-10(style='margin-bottom: 0.5rem;')

@@ -18,12 +18,12 @@ $(document).ready(function(){
     $('#waterGravity').attr("disabled", "disabled");
   };
 
-  var isPay = $("#isPay").attr("data");
-  if(isPay === "true"){
-    $("#isPay").show();
-  }else{
-    $("#payForWater").show()
-  }
+  // var isPay = $("#isPay").attr("data");
+  // if(isPay === "true"){
+  //   $("#isPay").show();
+  // }else{
+  //   $("#payForWater").show()
+  // }
 
 })
 
@@ -71,6 +71,8 @@ function submit(uid) {
 function isAlreadyPay(info){
   if(!info){
     $("#payForWater").show();
+    $("#radio2").prop("checked",false);
+    $("#radio1").prop("checked",true);
   }
 }
 
@@ -91,7 +93,7 @@ function yesPayForWater(uid){
   }
 	nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
 		.then(function(){
-			screenTopAlert('购买成功');
+			screenTopAlert('修改成功');
       window.location.reload();
 		})
 		.catch(function(data) {

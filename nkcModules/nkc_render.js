@@ -435,22 +435,20 @@ function nkc_render(options){
         text:html,
         escapeHtml:true,
       })
-
       .html
-      .replace(/&#91;/g,'[')
-      .replace(/&#93;/g,']')
-      .replace(/\[[/]{0,1}backcolor[=#a-zA-Z0-9]{0,16}]/g,'')
+      // .replace(/&#91;/g,'[')
+      // .replace(/&#93;/g,']')
+      // .replace(/\[[/]{0,1}backcolor[=#a-zA-Z0-9]{0,16}]/g,'')
 
-      // for history reasons..
-      .replace(/\n/g,'<br>')
-      .replace(/\{#newline#}/g,'\n')
-      .replace(/\[attachment=([0-9]{1,16})\]/g,'#{r=$1}')
-      //.replace('http:','')
-      .replace(/\[flash.*?](.+.*?)\[\/flash]/gi,
-      //'<embed class="PostEmbedFlash" src="$1" allowFullScreen="true" quality="high" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>')
-      '<a href="$1" target="_blank" style="font-size:20px;">点击此处查看视频</a>')
-      .replace(/\[(\/?)strike]/g,'<$1s>')
-      .replace(/  /g,'&nbsp&nbsp')
+      // // for history reasons..
+      // .replace(/\n/g,'<br>')
+      // .replace(/\{#newline#}/g,'\n')
+      // .replace(/\[attachment=([0-9]{1,16})\]/g,'#{r=$1}')
+      // .replace(/\[flash.*?](.+.*?)\[\/flash]/gi, '<a href="$1" target="_blank" style="font-size:20px;">点击此处查看视频</a>')
+      // .replace(/\[(\/?)strike]/g,'<$1s>')
+      // .replace(/  /g,'&nbsp&nbsp')
+      // .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
+      console.log(html)
       html = attachment_filter(html,post)
       // now post.r are marked with _used:true
     }
