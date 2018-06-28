@@ -100,5 +100,11 @@ module.exports = [
 		description: '文章被取消加精',
 		change: -5,
 		count: 0
+	},
+	{
+		_id: 'waterPay',
+		description: '购买水印服务',
+		change: -200,
+		count: -1
 	}
 ];

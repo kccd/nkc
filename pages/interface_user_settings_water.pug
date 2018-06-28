@@ -39,11 +39,11 @@ block content
                 .col-sm-10(style='margin-bottom: 0.5rem;')
                   .row
                     .col-sm-3
-                      select.form-control#waterStyle(onChange=`changeWaterStyle()`)
-                        option(selected=(data.waterSetting.waterStyle==="siteLogo") data="siteLogo") 网站LOGO
-                        option(selected=(data.waterSetting.waterStyle==="singleLogo") data="singleLogo") LOGO(小)
-                        option(selected=(data.waterSetting.waterStyle==="userLogo") data="userLogo") LOGO(小)+用户名
-                        option(selected=(data.waterSetting.waterStyle==="coluLogo") data="coluLogo") LOGO(小)+专栏名
+                      select.form-control#waterStyle(onChange=`turnImg()`)
+                        option(selected=(data.waterSetting.waterStyle==="siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
+                        option(selected=(data.waterSetting.waterStyle==="singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
+                        option(selected=(data.waterSetting.waterStyle==="userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
+                        option(selected=(data.waterSetting.waterStyle==="coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
               .form-group
                 label.col-sm-2.control-label 水印添加位置：
                 .col-sm-10(style='margin-bottom: 0.5rem;')
@@ -60,7 +60,10 @@ block content
                 .col-sm-11.col-md-5
                   .row
                     .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
-                      img#newImg(src=`/default/${data.waterSetting.waterGravity}.jpg` style='width: 100%;')
+                      -var sty = data.waterSetting.waterStyle?data.waterSetting.waterStyle:"siteLogo";
+                      -var gra = data.waterSetting.waterGravity?data.waterSetting.waterGravity:"southeast";
+                      -var imageName = sty + gra;
+                      img#newImg(src=`/default/${imageName}.jpg` style='width: 100%;')
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-5

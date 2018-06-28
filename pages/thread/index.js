@@ -442,7 +442,7 @@ function at(username) {
 	if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
 	// geid('ReplyContent').value += '@'+username+' ';
 	// window.location.href='#ReplyContent';
-	insertHtmlAtCaret('@'+username + ' ;');
+	insertHtmlAtCaret('@'+username);
 	window.location.href='#ReplyContent';
 	geid('text-elem').focus()
 }

@@ -113,5 +113,5 @@ function turnImg(){
   // console.log($("#waterGravity").val())
   // var newImg = "< img src='/default/"+$("#waterGravity").val()+".jpg' style='width: 100%;'>"
   // $("#exampleImg").html(newImg)
-  $("#newImg").attr("src","/default/"+$("#waterGravity").val()+".jpg");
+  $("#newImg").attr("src","/default/"+$("#waterStyle").val()+$("#waterGravity").val()+".jpg");
 }

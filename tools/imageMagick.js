@@ -74,7 +74,7 @@ const watermarkifyFont = (dpi, font, position, path) =>{
     return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
   }
   // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', 'center ' ,'-draw', "text 0,25 'hello'" ,path, path]);
-  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#FFFFFF', '-weight', 'bolder','-stroke','#444444','-gravity', position ,'-annotate', dpi, font ,path, path]);
+  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#FFFFFF', '-weight', 'bolder','-stroke','#666666','-gravity', position ,'-annotate', dpi, font ,path, path]);
 }
 
 // 手机图片上传自动旋转
