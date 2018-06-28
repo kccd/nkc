@@ -80,7 +80,6 @@ resourceRouter
       }else{
         username = "";
       }
-      username = "ColumnName"
       // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       const usernameWidth = usernameLength * 12;
