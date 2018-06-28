@@ -76,10 +76,11 @@ resourceRouter
         username = ctx.data.user?ctx.data.user.username : "科创论坛";
       }else if(waterStyle === "coluLogo"){
         const column = await ctx.db.PersonalForumModel.findOne({uid: ctx.data.user.uid});
-        username = column?column.displayName : ctx.data.user.uid+"的专栏";
+        username = column?column.displayName : ctx.data.user.username+"的专栏";
       }else{
         username = "";
       }
+      username = "ColumnName"
       // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       const usernameWidth = usernameLength * 12;
