@@ -71,7 +71,7 @@ function submit(){
       window.location = '/forgotPassword/mobile?mobile='+data.mobile+'&mcode='+data.mcode+'&nationCode='+data.nationCode;
     })
     .catch(function(data){
-      error_report(data.error);
+      error_report(data.error||data);
     })
 }
 

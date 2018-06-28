@@ -138,7 +138,13 @@ block content
                                   p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
                                 div.changeDisNone
                                   canvas#qrcode
-
+                      .inline-block.post-thumbsUp
+                        span &nbsp;
+                        -const recUsers = thread.firstPost.recUsers || [];
+                        if data.user && recUsers.includes(data.user.uid)
+                          span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        else
+                          span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
                           .form-inline
@@ -166,13 +172,6 @@ block content
                                   //- button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
                                   button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
                                   //- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button>
-                      .inline-block.post-thumbsUp
-                        span &nbsp;
-                        -const recUsers = thread.firstPost.recUsers || [];
-                        if data.user && recUsers.includes(data.user.uid)
-                          span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-                        else
-                          span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
                 .col-xs-12.col-md-12
                   .row
                     .col-xs-12.col-md-12(style=`margin: 3rem 0 1rem 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
@@ -188,13 +187,13 @@ block content
                       -const post = thread.firstPost;
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
                       if data.paging.page === 0
-                        div.thread-content!= experimental_render(post)
+                        div.thread-content.ThreadPostBody!= experimental_render(post)
                         +postEditTime(post)
                         +postCredits(post)
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
-                          div!= experimental_render(post)
+                          div.ThreadPostBody!= experimental_render(post)
                           +postEditTime(post)
                           +postCredits(post)
                         .text-center

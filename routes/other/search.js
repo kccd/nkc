@@ -26,7 +26,7 @@ router.get('/', async(ctx, next) => {
 			gradeId,
 			rolesId,
 			uid: data.user?data.user.uid: ''
-    }
+    };
     // 获取用户可以访问的板块
     const accessibleFid = await db.ForumModel.fidOfCanGetThreads(options);
     // console.log(accessibleFid)
