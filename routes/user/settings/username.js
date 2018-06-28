@@ -9,6 +9,8 @@ router
 		if(reg.test(newUsername)) ctx.throw(400, '用户名不允许有空格');
 		const {contentLength} = ctx.tools.checkString;
 		if(contentLength(newUsername) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
+		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+		if(pattern.test(newUsername)) ctx.throw(400, '用户名含有非法字符！')
 		if(user.username === newUsername) {
 			ctx.throw(400, '新用户名不能与旧用户名相同');
 		}

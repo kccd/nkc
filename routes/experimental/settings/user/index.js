@@ -76,6 +76,9 @@ userRouter
 			username = username.trim();
 
 			if (!username) ctx.throw(400, '用户名不能为空');
+			const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+
+			if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！');
 
 			const {checkEmailFormat} = ctx.tools.checkString;
 

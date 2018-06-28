@@ -121,7 +121,7 @@ var uploader = attachment_uploader({
   upload_target:ga('file-uploading','target'),
 
   upload_success_callback:function(info){
-    console.log(info)  //info为刚上传的附件信息
+    // console.log(info)  //info为刚上传的附件信息
     //alert(JSON.stringify(info));
     if(list)list.refresh(); //list为所有的附件列表（未刷新之前）
   },

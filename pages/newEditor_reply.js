@@ -1,5 +1,5 @@
 var mobeilConfig = [
-    'head',  // 标题
+    // 'head',  // 标题
     //'bold',  // 粗体
     //'fontSize',  // 字号
     //'fontName',  // 字体
@@ -22,7 +22,7 @@ var mobeilConfig = [
     'redo',  // 重复
 ]
 var pcConfig = [
-    'head',  // 标题
+    // 'head',  // 标题
     'bold',  // 粗体
     'fontSize',  // 字号
     //'fontName',  // 字体

@@ -181,6 +181,7 @@ postSchema.methods.ensurePermission = async function(ctx) {
   return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
 };
 
+
 postSchema.pre('save', async function(next) {
   // analyzing the content(post.c) to find p.atUsers change
 
@@ -190,10 +191,57 @@ postSchema.pre('save', async function(next) {
     const {c} = this;
     const atUsers = []; //user info {username, uid}
     const existedUsers = []; //real User mongoose data model
-    const matchedUsernames = c.match(/@([^@\s]*)\s/g);
-    if (matchedUsernames) {
-      await Promise.all(matchedUsernames.map(async str => {
-        const username = str.slice(1, -1); //slice the @ and [\s] in reg
+    // 根据虎哥建议，重写@功能
+    // 截取所有@起向后15字符的字符串
+    var positions = [];
+    var pos = c.indexOf("@");
+    while(pos > -1){
+      positions.push(c.substr(pos+1, 16));
+      pos = c.indexOf("@",pos+1)
+    }
+    // 验证每个@是否含有特殊字符
+    for(var i in positions){
+      var atPos = positions[i].indexOf("@"); // @符号位置
+      var semiPos = positions[i].indexOf(";"); // 分号位置
+      var colonPos = positions[i].indexOf(":"); // 冒号位置
+      var ltPos = positions[i].indexOf("<"); // 左尖括号位置
+      var comPos = positions[i].indexOf("，"); // 逗号位置
+      var perPos = positions[i].indexOf("。"); // 句号位置
+      if(atPos > -1){
+        positions[i] = positions[i].substr(0,atPos)
+      }else if(semiPos > -1){
+        positions[i] = positions[i].substr(0,semiPos)
+      }else if(colonPos > -1){
+        positions[i] = positions[i].substr(0,colonPos)
+      }else if(ltPos > -1){
+        positions[i] = positions[i].substr(0,ltPos)
+      }else if(comPos > -1){
+        positions[i] = positions[i].substr(0,comPos)
+      }else if(perPos > -1){
+        positions[i] = positions[i].substr(0,perPos)
+      }
+      // 用户名从最后一个字符开始，逐个向前在数据库中查询
+      var evePos = positions[i];
+      for(var num = evePos.length;num >= 0;num--){
+        var factName = await UserModel.findOne({username:evePos.substr(0,num)});
+        if(factName){
+          positions[i] = factName.username;
+          break;
+        }
+        if(num === 0 && factName === null){
+          // positions[i] = "@科创论坛";
+          positions.splice(i,0)
+        }
+      }
+    }
+    // 这是之前的，先屏蔽掉
+    //  const matchedUsernames = c.match(/@([^@\s]*)\s/g);
+    //  console.log(matchedUsernames)
+    if (positions) {
+      await Promise.all(positions.map(async str => {
+        // const username = str.slice(1, -1); //slice the @ and [\s] in reg
+        const username = str;
+        // console.log(username)
         const user = await UserModel.findOne({username});
         if (user) {
           const {username, uid} = user;
@@ -209,12 +257,48 @@ postSchema.pre('save', async function(next) {
         }
       }))
     }
+    // 被AT用户名单
     this.atUsers = atUsers;
     return next()
   } catch(e) {
     return next(e)
   }
 });
+
+// postSchema.pre('save', async function(next) {
+//   // analyzing the content(post.c) to find p.atUsers change
+
+//   try {
+//     const UserModel = mongoose.model('users');
+
+//     const {c} = this;
+//     const atUsers = []; //user info {username, uid}
+//     const existedUsers = []; //real User mongoose data model
+//     const matchedUsernames = c.match(/@([^@\s]*)\s/g);
+//     if (matchedUsernames) {
+//       await Promise.all(matchedUsernames.map(async str => {
+//         const username = str.slice(1, -1); //slice the @ and [\s] in reg
+//         const user = await UserModel.findOne({username});
+//         if (user) {
+//           const {username, uid} = user;
+//           let flag = true; //which means this user does not in existedUsers[]
+//           for (const u of atUsers) {
+//             if (u.username === username)
+//               flag = false;
+//           }
+//           if (flag) {
+//             atUsers.push({username, uid});
+//             existedUsers.push(user)
+//           }
+//         }
+//       }))
+//     }
+//     this.atUsers = atUsers;
+//     return next()
+//   } catch(e) {
+//     return next(e)
+//   }
+// });
 
 postSchema.pre('save', async function(next) {
   // analyzing the content (post.c) and changing the

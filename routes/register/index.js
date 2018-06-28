@@ -25,7 +25,9 @@ registerRouter
 		const regPort = ctx.port;
 		if(!username) ctx.throw(400, '请输入用户名。');
 	  const {contentLength, checkPass} = ctx.tools.checkString;
-	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
+		if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
+		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！')
 		const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 		if(targetUser) ctx.throw(400, '用户名已被注册。');
 		if(!password) ctx.throw(400, '请输入密码。');

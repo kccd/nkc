@@ -478,6 +478,17 @@ function nkc_render(options){
 
     // 添加查看大图
     // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
+    
+    // 添加附件下载次数
+    var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm']
+    for(var i in post.resources){
+      var r = post.resources[i];
+      if(extArray.indexOf(r.ext) > -1){
+        continue;
+      }
+      var reg = new RegExp(r.oname, 'gm');
+      html = html.replace(reg,r.oname+'<span class="PostResourceCounter">'+r.hits+'次下载</span>')
+    }
     html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>')
     return html
   }
@@ -523,20 +534,31 @@ function nkc_render(options){
       base: '/twemoji',
       ext: '.svg'
     });
-    renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
+    // console.log(renderedHTML)
+    // 渲染at
     var atUsers = post.atUsers;
     if(atUsers && atUsers.length > 0) {
       for(var i = 0; i < atUsers.length; i++) {
-        var user = atUsers[i];
-        var matchSpace = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + ' ';
-        //双空格会产生奇怪转义
-        var matchSpecial = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '&#xA0;';
-        var matchEnter = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '<br>';
-        renderedHTML = renderedHTML.replace(matchSpace, '<a href="/m/' + user.uid + '">' + matchSpace + '</a>');
-        renderedHTML = renderedHTML.replace(matchSpecial, '<a href="/m/' + user.uid + '">' + matchSpecial + '</a>')
-        renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
+        var user = "@"+atUsers[i].username;
+        var reg = new RegExp(user, 'gm');
+        renderedHTML = renderedHTML.replace(reg,'<a href="/m/' + atUsers[i].uid + '">' + user + '</a>')
       }
     }
+    renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
+    // 下面是旧版的渲染，暂时先不用
+    // var atUsers = post.atUsers;
+    // if(atUsers && atUsers.length > 0) {
+    //   for(var i = 0; i < atUsers.length; i++) {
+    //     var user = atUsers[i];
+    //     var matchSpace = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + ' ';
+    //     //双空格会产生奇怪转义
+    //     var matchSpecial = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '&#xA0;';
+    //     var matchEnter = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '<br>';
+    //     renderedHTML = renderedHTML.replace(matchSpace, '<a href="/m/' + user.uid + '">' + matchSpace + '</a>');
+    //     renderedHTML = renderedHTML.replace(matchSpecial, '<a href="/m/' + user.uid + '">' + matchSpecial + '</a>')
+    //     renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
+    //   }
+    // }
     return renderedHTML
   }
 

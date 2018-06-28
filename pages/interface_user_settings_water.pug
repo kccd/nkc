@@ -1,0 +1,74 @@
+extends bootstrap_base
+block title
+  title 水印设置
+  -const mainContainer1400 = true;
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 水印设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 
+                .col-sm-5
+                  h5.text-danger 添加水印的图片应满足条件：宽度大于600，并且高度大于200
+              .form-group
+                label.col-sm-2.control-label 是否添加水印：
+                .col-sm-5
+                  label.radio-inline
+                    input(type='radio' name='isWater' id='radio1' value="yes" checked=data.waterSetting.waterAdd === true)
+                    span 是
+                  label.radio-inline#isPay(data=`${data.waterSetting.waterPayInfo}` style="display:none")
+                    input(type='radio' name='isWater' id='radio2' value="no" checked=data.waterSetting.waterAdd === false onClick=`isAlreadyPay(${data.waterSetting.waterPayInfo})`)
+                    span 否
+              .form-group#payForWater(style="display:none")
+                label.col-sm-2.control-label 
+                .col-sm-10
+                  h5.text-danger 是否花费200科创币购买不打水印服务？
+                .col-sm-2
+                .col-sm-10
+                  button.btn.btn-primary#save(onclick=`yesPayForWater(${data.user.uid})`) 买！
+                  button.btn.btn-primary#save(onclick=`hideButton()`) 不买!
+              .form-group
+                label.col-sm-2.control-label 水印添加方式：
+                .col-sm-10(style='margin-bottom: 0.5rem;')
+                  .row
+                    .col-sm-3
+                      select.form-control#waterStyle(onChange=`changeWaterStyle()`)
+                        option(selected=(data.waterSetting.waterStyle==="siteLogo") data="siteLogo") 网站LOGO
+                        option(selected=(data.waterSetting.waterStyle==="singleLogo") data="singleLogo") LOGO(小)
+                        option(selected=(data.waterSetting.waterStyle==="userLogo") data="userLogo") LOGO(小)+用户名
+                        option(selected=(data.waterSetting.waterStyle==="coluLogo") data="coluLogo") LOGO(小)+专栏名
+              .form-group
+                label.col-sm-2.control-label 水印添加位置：
+                .col-sm-10(style='margin-bottom: 0.5rem;')
+                  .row
+                    .col-sm-3
+                      select.form-control#waterGravity(onChange="turnImg()")
+                        option(selected=(data.waterSetting.waterGravity==="southeast") data="southeast" value="southeast") Southeast(右下角)
+                        option(selected=(data.waterSetting.waterGravity==="northeast") data="northeast" value="northeast") Northeast(右上角)
+                        option(selected=(data.waterSetting.waterGravity==="southwest") data="southwest" value="southwest") Southwest(左下角)
+                        option(selected=(data.waterSetting.waterGravity==="northwest") data="northwest" value="northwest") Northwest(左上角)
+                        option(selected=(data.waterSetting.waterGravity==="center") data="center" value="center") Center(正中间)
+              .form-group
+                label.col-sm-2.control-label 水印位置(内容仅供参考)：
+                .col-sm-11.col-md-5
+                  .row
+                    .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
+                      img#newImg(src=`/default/${data.waterSetting.waterGravity}.jpg` style='width: 100%;')
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-5
+                  button.btn.btn-primary#save(onclick=`submit(${data.user.uid})`) 保存
+
+ 
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_settings_water.js')

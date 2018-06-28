@@ -33,6 +33,10 @@ module.exports = {
 				GET: 'visitUserPhotoSettings',
 				PATCH: 'modifyUserPhotoSettings'
 			},
+			water: {
+				GET: "visitUserWaterSettings",
+				PATCH: "modifyUserWaterSettings"
+			},
 			cert: {
 				GET: 'visitUserCertPhotoSettings',
 				PATCH: 'modifyUserCertPhotoSettings'

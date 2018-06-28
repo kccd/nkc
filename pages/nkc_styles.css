@@ -93,6 +93,10 @@ body { padding-top: 65px; }
     margin: 5px;
 }
 
+.editImgSingle{
+  max-width:60%
+}
+
 .HomeSEOLink{
 
 font-size: 10px;
@@ -1050,6 +1054,13 @@ color: #d66;
 }
 .ResourceListItemText{
   display: inline-block;
+  /*设置内容不可点击，防止编辑器失去焦点*/
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 
