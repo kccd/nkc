@@ -46,7 +46,7 @@ waterRouter
       // 验证科创币
       const waterPayType = await db.TypesOfScoreChangeModel.findOne({_id: "waterPay"})
       if(waterPayType && user.kcb < parseInt(waterPayType.change*-1)){
-        ctx.throw(400,"您的科创币不足200")
+        ctx.throw(400,"您的科创币不足"+parseInt(waterPayType.change*-1))
       }
       // 消耗科创币，并生成记录
       // const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;
