@@ -5,7 +5,7 @@ block title
   
 block content  
   
-  - const {type, q = '', _page = 0, result} = data
+  - let {type, q = '', _page = 0, result} = data
 
 
     .container
@@ -20,9 +20,9 @@ block content
                 input.btn.btn-primary(type='submit' style='display: inline-block;' value='搜索')
           ul(class="nav nav-tabs")
             li(class=`${type === 'content'? 'active': ''}`)
-              a(href=`/search?&q=${q}&type=content&page=${_page}`) 内容
+              a(href=`/search?&q=${encodeURI(q)}&type=content&page=${_page}`) 内容
             li(class=`${type === 'user'? 'active': ''}`)
-              a(href=`/search?&q=${q}&type=user&page=${_page}`) 用户
+              a(href=`/search?&q=${encodeURI(q)}&type=user&page=${_page}`) 用户
           if(type === 'content')
             for post in result
               if(post)
@@ -33,7 +33,7 @@ block content
             for user in result
               if(user)
                 include interface_thread_userpatch
-
+          -q = encodeURI(q);
           include interface_navigation_paging
           br
 

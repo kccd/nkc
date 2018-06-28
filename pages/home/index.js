@@ -81,14 +81,14 @@ $(function() {
 function loadThreads() {
 	$('#loadThreads').hide();
 	$('.hiddenThread').show();
-	$('#page').removeClass('hiddenInMobile');
+	//$('#page').removeClass('hiddenInMobile');
 }
 
 function hiddenThreads() {
 	if($(window).width() >= 992) {
 		$('#loadThreads').hide();
 		$('.hiddenThread').show();
-		$('#page').removeClass('hiddenInMobile');
+		//$('#page').removeClass('hiddenInMobile');
 	} else {
 		$('#loadThreads').show();
 		$('.hiddenThread').hide();

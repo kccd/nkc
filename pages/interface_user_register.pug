@@ -132,6 +132,6 @@ block content
 
 
 block scripts
-  script(src='/interface_common.js')
-  script(src='/nkc_regex_validation.js')
-  script(src='/interface_user_register.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/nkc_regex_validation.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_user_register.js?v=${global.NKC.startTime}`)
