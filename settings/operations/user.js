@@ -5,6 +5,9 @@ module.exports = {
 			PATCH: 'unBannedUser',
 			DELETE: 'bannedUser'
 		},
+		transaction: {
+			GET: 'visitUserTransaction'
+		},
 		settings: {
 			GET: 'visitUserAvatarSettings',
 			avatar: {

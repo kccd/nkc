@@ -2721,6 +2721,11 @@ img.emoji {
 .thread-aside-title a:hover{
   color: #000000;
 }
+.grade-icon{
+  height: 12px;
+  margin-top: -3px;
+  margin-left: 4px;
+}
 /*--------------*/
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{

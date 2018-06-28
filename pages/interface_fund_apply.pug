@@ -282,13 +282,15 @@ block content
                     else
                       strong(style='color: #ff8707;')#category= '暂未选择'
                   br
-                  -for (let parentForum of data.forumList)
-                    strong= parentForum.displayName
-                    span ：
-                    -for (let childrenForum of parentForum.children)
-                      span(onclick=`chooseCategory('${childrenForum.fid}', '${childrenForum.displayName}')` style='cursor: pointer')= childrenForum.displayName
-                      span &nbsp;&nbsp;&nbsp;
-                    br
+                  for parentForum in data.forumList
+                    if parentForum
+                      span(onclick=`chooseCategory('${parentForum.fid}', '${parentForum.displayName}')` style='cursor: pointer')= parentForum.displayName
+                      if parentForum.childrenForums && parentForum.childrenForums.length
+                        span ：
+                        for childrenForum in parentForum.childrenForums
+                          span(onclick=`chooseCategory('${childrenForum.fid}', '${childrenForum.displayName}')` style='cursor: pointer')= childrenForum.displayName
+                          span &nbsp;&nbsp;&nbsp;
+                      br
 
             else if s === 5 && inputApplicantMessages !== null
               -const agreeIsFalse = [], agreeIsTrue = [], agreeIsNull = [];

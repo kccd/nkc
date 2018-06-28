@@ -36,6 +36,9 @@ block title
             a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
               span.fa.fa-comment-o &nbsp;
               span 引用
+        li
+          a(href=`javascript:at('${post.user.username}')`)
+            span.fa.fa-at= ` ${post.user.username}`
         if targetThread && targetThread.oc === post.pid && data.user && data.userOperationsId.includes('collectThread')
           li
             if data.collected

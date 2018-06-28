@@ -5,6 +5,7 @@ transactionRouter
 		const {data, db, params} = ctx;
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
+		data.targetUser = await db.UserModel.findOnly({uid});
 		data.addresses = userPersonal.addresses;
 		ctx.template = 'interface_user_settings_transaction.pug';
 		await next();
@@ -13,16 +14,22 @@ transactionRouter
 		const {db, params, body} = ctx;
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
-		const {addresses} = body;
-		reg = /^[0-9]*$/;
-		for(let a of addresses) {
-			if(a.mobile) {
-				if(!reg.test(a.mobile)) {
-					ctx.throw(400, '电话号码格式不正确');
+		let {addresses, operation, number} = body;
+		if(operation === 'deleteAddress') {
+			number = parseInt(number);
+			userPersonal.addresses.splice(number, 1);
+			await userPersonal.update({addresses: userPersonal.addresses});
+		} else {
+			reg = /^[0-9]*$/;
+			for(let a of addresses) {
+				if(a.mobile) {
+					if(!reg.test(a.mobile)) {
+						ctx.throw(400, '电话号码格式不正确');
+					}
 				}
 			}
+			await userPersonal.update({addresses});
 		}
-		await userPersonal.update({addresses});
 		await next();
 	});
 module.exports = transactionRouter;
