@@ -3,7 +3,7 @@ const settingsRouter = new Router();
 const dbFn = require('../../../nkcModules/dbFunction');
 settingsRouter
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data, db, nkcModules} = ctx;
 		data.nav = '填写申请表';
 		const {user, applicationForm} = data;
 		const {fund} = applicationForm;
@@ -24,7 +24,14 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		if(s === 4) {
-			data.forumList = await dbFn.getAvailableForums(ctx);
+			const options = {
+				uid: user?user.uid: '',
+				gradeId: data.userGrade._id,
+				rolesId: data.userRoles.map(r => r._id)
+			};
+			const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+			const forums = await db.ForumModel.visibleForums(options);
+			data.forumList = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 		}
 		if(s > 5) ctx.throw(404, 'not found');
 		data.s = s;

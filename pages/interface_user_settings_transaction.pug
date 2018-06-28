@@ -14,7 +14,45 @@ block content
           .panel-heading
             span 交易信息设置
           .panel-body
-            .form-horizontal
+            button.btn.btn-primary(onclick='addAddress()') 添加交易信息
+            #addressDiv
+            .template.hidden
+              .form-horizontal(style='margin: 2rem 0;')
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-10
+                    h4 交易信息&nbsp;
+                      span.addressNumber 1
+                .form-group
+                  label.col-sm-2.control-label 收货地址：
+                  .col-sm-6
+                    input.form-control.address(type='text')
+                .form-group
+                  label.col-sm-2.control-label 联系电话：
+                  .col-sm-6
+                    input.form-control.mobile(type='number')
+                .form-group
+                  label.col-sm-2.control-label 银行名称：
+                  .col-sm-6
+                    input.form-control.bankName(type='text')
+                .form-group
+                  label.col-sm-2.control-label 银行卡账号：
+                  .col-sm-6
+                    input.form-control.bankCardNumber(type='number')
+                .form-group
+                  label.col-sm-2.control-label 支付宝账号：
+                  .col-sm-6
+                    input.form-control.alipay(type='text')
+                .form-group
+                  label.col-sm-2.control-label 收件人：
+                  .col-sm-6
+                    input.form-control.username(type='text')
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-6
+                    button.btn.btn-primary(onclick=`submit(${data.targetUser.uid})`) 保存
+                    button.btn.btn-danger 删除
+            //.form-horizontal
               .form-group
                 label.col-sm-2.control-label 收货地址：
                 .col-sm-10
@@ -23,7 +61,7 @@ block content
               .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
-  #data.hidden= JSON.stringify({addresses: data.addresses})
+  #data.hidden= JSON.stringify({addresses: data.addresses, uid: data.targetUser.uid})
 
 block scripts
   script(src='/interface_common.js')
