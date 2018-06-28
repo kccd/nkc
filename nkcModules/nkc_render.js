@@ -436,19 +436,18 @@ function nkc_render(options){
         escapeHtml:true,
       })
       .html
-      // .replace(/&#91;/g,'[')
-      // .replace(/&#93;/g,']')
-      // .replace(/\[[/]{0,1}backcolor[=#a-zA-Z0-9]{0,16}]/g,'')
+      .replace(/&#91;/g,'[')
+      .replace(/&#93;/g,']')
+      .replace(/\[[/]{0,1}backcolor[=#a-zA-Z0-9]{0,16}]/g,'')
 
-      // // for history reasons..
-      // .replace(/\n/g,'<br>')
-      // .replace(/\{#newline#}/g,'\n')
-      // .replace(/\[attachment=([0-9]{1,16})\]/g,'#{r=$1}')
-      // .replace(/\[flash.*?](.+.*?)\[\/flash]/gi, '<a href="$1" target="_blank" style="font-size:20px;">点击此处查看视频</a>')
-      // .replace(/\[(\/?)strike]/g,'<$1s>')
-      // .replace(/  /g,'&nbsp&nbsp')
-      // .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
-      console.log(html)
+      // for history reasons..
+      .replace(/\n/g,'<br>')
+      .replace(/\{#newline#}/g,'\n')
+      .replace(/\[attachment=([0-9]{1,16})\]/g,'#{r=$1}')
+      .replace(/\[flash.*?](.+.*?)\[\/flash]/gi, '<a href="$1" target="_blank" style="font-size:20px;">点击此处查看视频</a>')
+      .replace(/\[(\/?)strike]/g,'<$1s>')
+      .replace(/  /g,'&nbsp&nbsp')
+      .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
       html = attachment_filter(html,post)
       // now post.r are marked with _used:true
     }
