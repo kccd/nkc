@@ -903,9 +903,9 @@ font-size: 14pt;
   /* line-height: 1.9;
   letter-spacing: 0.3px; */
   word-wrap: break-word;
+  word-break:break-all;
   margin-top: 4px;
 }
-
 .ThreadPostBody img{
   max-width: 100%;
   border-radius: 5px;
@@ -914,9 +914,9 @@ font-size: 14pt;
 
 .ThreadPostBody blockquote {
   font-size: 10pt;
-max-height: 200px;
-overflow-y: scroll;
-overflow-x: hidden;
+  max-height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .ThreadPostBody span.xbbcode-code, pre code{
@@ -2605,7 +2605,6 @@ img.emoji {
   position: relative;
   font-size: 16px;
   overflow: hidden;
-  word-wrap: break-word;
 }
 .thread-content img{
   border-radius: 7px;

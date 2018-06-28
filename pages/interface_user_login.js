@@ -35,7 +35,7 @@ function login_submit(){
     display('error_info_panel');
     geid('password').focus();
     //console.log(JSON.stringify(err));
-    screenTopWarning(data.error);
+    screenTopWarning(data.error||data);
   })
 }
 

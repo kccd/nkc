@@ -60,8 +60,8 @@ block content
   include debug_output.pug
     
 block scripts
-  script(src='/interface_common.js')
-  script(src='/interface_user_login.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_user_login.js?v=${global.NKC.startTime}`)
 
 
       
