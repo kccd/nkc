@@ -30,6 +30,11 @@ const manageBehaviorSchema = new Schema({
 	tlm: {
 		type: Date,
 		index: 1
+	},
+	toc: {
+		type: Date,
+		default: Date.now,
+		index: 1
 	}
 }, {
 	collection: 'manageBehaviors'
