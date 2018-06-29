@@ -2623,7 +2623,7 @@ img.emoji {
 }
 .thread-management .highlight{
   color: #aaaaaa;
-  margin-right: 1rem;
+  margin-right: 0.5rem;
 }
 .thread-oc{
   width: 8rem;
@@ -2685,7 +2685,7 @@ img.emoji {
   overflow: visible;
 }
 .post-thumbsUp{
-  margin-right: 1rem;
+  margin-right: 0.5rem;
   float: right;
   color: #999999;
   cursor: pointer;

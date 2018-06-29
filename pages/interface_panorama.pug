@@ -64,7 +64,7 @@ block content
               |  的帖子 
               a(href='/t/#{p.thread._key}') #{title}
               //a(href='/user_profile/#{p.thread.ocuser._key}') #{p.thread.ocuser.username}
-            include interface_thread_singlepost.pug
+            include thread/interface_thread_singlepost
             
     if data.latestReplies2
       h4 最新动态

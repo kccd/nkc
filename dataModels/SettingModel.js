@@ -89,31 +89,35 @@ const settingSchema = new Schema({
 	coefficients: { // 积分计算公式系数
 		postToThread: {
 			type: Number,
-			default: 1
+			default: 0
 		},
 		postToForum: {
 			type: Number,
-			default: 1
+			default: 0
 		},
 		digest: {
 			type: Number,
-			default: 1
+			default: 0
+		},
+		digestPost: {
+			type: Number,
+			default: 0
 		},
 		dailyLogin: {
 			type: Number,
-			default: 1
+			default: 0
 		},
 		xsf: {
 			type: Number,
-			default: 1
+			default: 0
 		},
 		thumbsUp: {
 			type: Number,
-			default: 10
+			default: 0
 		},
 		violation: {
 			type: Number,
-			default: 1
+			default: 0
 		}
 	},
 

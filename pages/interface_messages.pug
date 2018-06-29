@@ -208,6 +208,29 @@ block content
                     .media-body
                       h4.media-heading
                         a(href=`/sms/system/${docs[i].sid}`) #{docs[i].systemContent.title}
+                if docs[i].operationId === 'digestThread'
+                  hr(style='margin:0.5em 0;')
+                  .media(style='margin:0;')
+                    -if(atNum > 0 )
+                      -atNum--;
+                      span.redPoint
+                    span #{docs[i].toc.toLocaleString()}
+                    br
+                    span 您的文章
+                      a(href=`/t/${docs[i].tid}`)= docs[i].thread.firstPost.t
+                    span 被列入精选。
+                if docs[i].operationId === 'digestPost'
+                  hr(style='margin:0.5em 0;')
+                  .media(style='margin:0;')
+                    -if(atNum > 0 )
+                      -atNum--;
+                      span.redPoint
+                    span #{docs[i].toc.toLocaleString()}
+                    br
+                    span 您的回复
+                      -const c = docs[i].post.c.replace(/<.*?>/g, '');
+                      a(href=`/t/${docs[i].tid}?page=${docs[i].page}&highlight=${docs[i].pid}#${docs[i].pid}`)= c.slice(0, 50)+'...'
+                    span 被列入精选。
                 -if(docs[i].noticeType === true)
                   -if(docs[i].postType === "thread")
                     -if(docs[i].delType === "toRecycle")

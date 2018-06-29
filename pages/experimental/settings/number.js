@@ -3,6 +3,7 @@ function saveNumberSettings() {
 		postToForum: $('#postToForum').val(),
 		postToThread: $('#postToThread').val(),
 		digest: $('#digest').val(),
+		digestPost: $('#digestPost').val(),
 		dailyLogin: $('#dailyLogin').val(),
 		xsf: $('#xsf').val(),
 		thumbsUp: $('#thumbsUp').val(),
@@ -22,11 +23,12 @@ function updateFormula() {
 	var postToForum = $('#postToForum').val();
 	var postToThread = $('#postToThread').val();
 	var digest = $('#digest').val();
+	var digestPost_ = $('#digestPost').val();
 	var thumbsUp = $('#thumbsUp').val();
 	var violation = $('#violation').val();
 	var xsf = $('#xsf').val();
 
-	var text = '公式：(在线天数 x ' + dailyLogin + ') + ' + '(文章数 x ' + postToForum + ') + (' + '回复数 x ' + postToThread + ') + (' + '优秀文章数 x ' + digest + ') + (' + '被点赞数^(1/2) x ' + thumbsUp + ') + (' + '学术分 x ' + xsf + ') + (' + '违规数 x ' + violation + ')';
+	var text = '公式：(在线天数 x ' + dailyLogin + ') + ' + '(文章数 x ' + postToForum + ') + (' + '回复数 x ' + postToThread + ') + (' + '精选文章数 x ' + digest + ') + (' + '精选回复数 x ' + digestPost_ + ') + (' + '被点赞数^(1/2) x ' + thumbsUp + ') + (' + '学术分 x ' + xsf + ') + (' + '违规数 x ' + violation + ')';
 	$('#formula').text(text);
 }
 

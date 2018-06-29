@@ -1,0 +1,4 @@
+if !targetUser.certs.includes('banned')
+  span.user-grade(style=`color: ${targetUser.grade.color};`)
+    span= targetUser.grade.displayName
+    img.grade-icon(src=`/default/v${targetUser.grade._id}l.png` title=targetUser.grade.displayName)

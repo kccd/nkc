@@ -93,6 +93,11 @@ const postSchema = new Schema({
 	hideHistories: {
   	type: Boolean,
 		default: false
+	},
+	digest: {
+  	type: Boolean,
+		default: false,
+		index: 1
 	}
 }, {toObject: {
   getters: true,

@@ -26,6 +26,10 @@ module.exports = {
 		},
 		switchInPersonalForum: {
 			PATCH: 'switchInPersonalForum'
+		},
+		close: {
+			POST: 'closeThread',
+			DELETE: 'openThread'
 		}
 	}
 };

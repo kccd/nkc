@@ -74,6 +74,27 @@ usersScoreLogSchema.virtual('user')
 	.set(function(user) {
 		this._user = user;
 	});
+usersScoreLogSchema.virtual('post')
+	.get(function() {
+		return this._post;
+	})
+	.set(function(post) {
+		this._post = post;
+	});
+usersScoreLogSchema.virtual('page')
+	.get(function() {
+		return this._page;
+	})
+	.set(function(page) {
+		this._page = page;
+	});
+usersScoreLogSchema.virtual('thread')
+	.get(function() {
+		return this._thread;
+	})
+	.set(function(thread) {
+		this._thread = thread;
+	});
 usersScoreLogSchema.virtual('targetUser')
 	.get(function() {
 		return this._targetUser;
@@ -99,6 +120,30 @@ usersScoreLogSchema.methods.extendUser = async function() {
 		}
 	}
 	return this.user = user;
+};
+
+usersScoreLogSchema.methods.extendThread = async function() {
+	const ThreadModel = mongoose.model('threads');
+	let thread;
+	if(this.tid) {
+		const t = await ThreadModel.findOne({tid: this.tid});
+		if(t) {
+			thread = t;
+		}
+	}
+	return this.thread = thread;
+};
+
+usersScoreLogSchema.methods.extendPost = async function() {
+	const PostModel = mongoose.model('posts');
+	let post;
+	if(this.pid) {
+		const p = await PostModel.findOne({pid: this.pid});
+		if(p) {
+			post = p;
+		}
+	}
+	return this.post = post;
 };
 
 usersScoreLogSchema.methods.extendTargetUser = async function() {

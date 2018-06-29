@@ -101,7 +101,12 @@ const threadSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  }
+  },
+	closed: {
+  	type: Boolean,
+		default: false,
+		index: 1
+	}
 }, {toObject: {
   getters: true,
   virtuals: true

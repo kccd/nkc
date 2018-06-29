@@ -106,5 +106,17 @@ module.exports = [
 		description: '购买水印服务',
 		change: -200,
 		count: -1
+	},
+	{
+		_id: 'digestPost',
+		description: '回复被加精',
+		change: 0,
+		count: 0
+	},
+	{
+		_id: 'unDigestPost',
+		description: '回复被取消加精',
+		change: 0,
+		count: 0
 	}
 ];

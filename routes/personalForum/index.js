@@ -43,6 +43,7 @@ router
       $sort.tlm = -1;
     }
     data.targetUser = await UserModel.findOnly({uid});
+    await data.targetUser.extendGrade();
     const userSubscribe = await UsersSubscribeModel.findOnly({uid});
     data.userSubscribe = {
       subscribeUsers: userSubscribe.subscribeUsers,

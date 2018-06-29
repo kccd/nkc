@@ -48,7 +48,7 @@ block content
         span.fa.fa-angle-left
   mixin createDigestThreadsList(arr)
     div(style='border: 1px solid #eeeeee;overflow:hidden;padding: 0.5rem;')
-      h4.text-center 优秀文章
+      h4.text-center 精选文章
       for thread in arr
         include ../module_aside_forums_li
   -const homeFooter = true
@@ -87,7 +87,7 @@ block content
                 li(class=!data.digest ? 'active' : '')
                   a(href=`/${data.sortby === 'toc' ? `?sortby=${data.sortby}` : ''}`) 全部
                 li(class=data.digest ? 'active' : '')
-                  a(href=`/?digest=true${data.sortby === 'toc' ? `&sortby=${data.sortby}` : ''}`) 优秀
+                  a(href=`/?digest=true${data.sortby === 'toc' ? `&sortby=${data.sortby}` : ''}`) 精选
               ul.pagination.NavigationPaging
                 li(class=!data.sortby? 'active' : '')
                   a(href=`/${data.digest?`?digest=true` : ''}`) 最新回复

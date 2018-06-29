@@ -1,19 +1,23 @@
 -var uid = user.uid
 .fullwidthpanel.ThreadBox.nkcpanel(style='overflow: hidden;')
   .UserProfileSection1
-    include interface_profile_avatar.pug
-
-    div(style='display:inline-block;margin-top:8px;')
-      //.ForumTitleCircle(style='background-color:#{user.color||"#bbb"}')
-      a(href=`/u/${uid}`)
-        .ForumName(style='color: #333333;')!= user.username + '&nbsp;' + '&nbsp;' + '&nbsp;'
-        if(data.user)
-          if(user.uid != data.user.uid)
-            - var subscribeUsers = data.user.subscribeUsers || []
-            if(subscribeUsers.indexOf(user.uid) > -1)
-              a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUser("${uid}", false)`)#subscribeButton 取关
-            else
-              a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUser("${uid}", true)`)#subscribeButton 关注
+    .media
+      .media-left
+        img(src=`/avatar/${uid}` style='width: 6rem;height: 6rem;border-radius: 5px;')
+      .media-body
+        .media-heading
+          a(href=`/u/${uid}` style='vertical-align: middle;color: #333333;text-decoration: none;').inline-block
+            span(style='font-size: 2.3rem;')= user.username
+          if(data.user)
+            .inline-block(style='vertical-align: middle;')
+              if(user.uid != data.user.uid)
+                - var subscribeUsers = data.user.subscribeUsers || []
+                if(subscribeUsers.indexOf(user.uid) > -1)
+                  a.btn.btn-sm.subscribe-btn(href='javascript:;' onclick=`subscribeUser("${uid}", false)`)#subscribeButton 取关
+                else
+                  a.btn.btn-sm.subscribe-btn(href='javascript:;' onclick=`subscribeUser("${uid}", true)`)#subscribeButton 关注
+        -const targetUser = user;
+        include user/module_user_grade
 
   -user.hidelastlogin = true
   include interface_profile_info_section2.pug

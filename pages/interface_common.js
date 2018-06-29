@@ -1038,3 +1038,43 @@ function unHomeTop(tid) {
 			screenTopWarning(data.error||data);
 		})
 }
+// 打开主题
+function openThread(tid) {
+	nkcAPI('/t/'+tid+'/close', 'DELETE', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error|| data);
+		})
+}
+// 关闭主题
+function closeThread(tid) {
+	nkcAPI('/t/'+tid+'/close', 'POST', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error|| data);
+		})
+}
+// 设回复为精选
+function digestPost(pid) {
+	nkcAPI('/p/'+pid+'/digest', 'POST', {})
+		.then(function() {
+			screenTopAlert('设置成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+// 取消回复精选
+function unDigestPost(pid) {
+	nkcAPI('/p/'+pid+'/digest', 'DELETE', {})
+		.then(function() {
+			screenTopAlert('取消精选成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}

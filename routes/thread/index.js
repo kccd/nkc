@@ -5,6 +5,7 @@ const nkcModules = require('../../nkcModules');
 const digestRouter = require('./digest');
 const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
+const closeRouter = require('./close');
 
 
 threadRouter
@@ -217,7 +218,7 @@ threadRouter
 		data.ads = homeSettings.ads;
 		ctx.template = 'thread/index.pug';
 		await thread.extendFirstPost().then(async p => {
-			await p.extendUser();
+			await p.extendUser().then(u => u.extendGrade());
 			await p.extendResources();
 		});
 		await thread.extendLastPost();
@@ -294,6 +295,7 @@ threadRouter
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
+		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
 		data.thread = thread;
 		await thread.extendForum();
 		data.forum = thread.forum;
@@ -340,8 +342,9 @@ threadRouter
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
 		await next();
 	})
-	.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
 	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
+	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

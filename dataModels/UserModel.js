@@ -50,6 +50,10 @@ const userSchema = new Schema({
     type: Number,
     default: 0,
   },
+	digestPostsCount: {
+  	type: Number,
+		default: 0
+	},
 	// 在线天数
 	dailyLoginCount: {
   	type: Number,
@@ -332,7 +336,8 @@ userSchema.methods.updateUserMessage = async function() {
   const disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
   const digestThreadsCount = await ThreadModel.count({uid, digest: true});
   const toppedThreadsCount = await ThreadModel.count({uid, topped: true});
-
+	const allDigestPostsCount = await PostModel.count({uid, digest: true});
+	const digestPostsCount = allDigestPostsCount - digestThreadsCount;
   const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
   const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
 	// 日常登录统计
@@ -382,6 +387,7 @@ userSchema.methods.updateUserMessage = async function() {
 	const updateObj = {
 		threadCount,
 		postCount,
+		digestPostsCount,
 		disabledPostsCount,
 		disabledThreadsCount,
 		digestThreadsCount,
@@ -406,11 +412,12 @@ userSchema.methods.calculateScore = async function() {
 	const scoreSettings = await SettingModel.findOnly({type: 'score'});
 	const {coefficients} = scoreSettings;
 
-	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, recCount} = this;
+	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, digestPostsCount, recCount} = this;
 	// 积分计算
 	const scoreOfPostToThread = coefficients.postToThread*(postCount - disabledPostsCount);
 	const scoreOfPostToForum = coefficients.postToForum*(threadCount - disabledThreadsCount);
 	const scoreOfDigestThreadCount = coefficients.digest*digestThreadsCount;
+	const scoreOfDigestPostCount = coefficients.digestPost*digestPostsCount;
 	const scoreOfXsf = coefficients.xsf*xsf;
 	const scoreOfDailyLogin = coefficients.dailyLogin*dailyLoginCount;
 	const scoreOfViolation = coefficients.violation*violationCount;
@@ -418,7 +425,7 @@ userSchema.methods.calculateScore = async function() {
 	if(recCount >= 0) {
 		scoreOfRecommend = coefficients.thumbsUp*Math.sqrt(recCount);
 	}
-	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend + scoreOfViolation;
+	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfDigestPostCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend + scoreOfViolation;
 	await this.update({score});
 };
 

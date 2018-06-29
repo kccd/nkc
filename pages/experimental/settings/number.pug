@@ -34,10 +34,15 @@ block content
                   span.text-danger 回复数 x 系数
                   input.form-control#postToThread(type='number' value=data.scoreSettings.coefficients.postToThread || 0)
               .form-group
-                .col-sm-2.control-label 优秀文章数
+                .col-sm-2.control-label 精选文章数
                 .col-sm-3
-                  span.text-danger 优秀文章数 x 系数
+                  span.text-danger 精选文章数 x 系数
                   input.form-control#digest(type='number' value=data.scoreSettings.coefficients.digest || 0)
+              .form-group
+                .col-sm-2.control-label 精选回复数
+                .col-sm-3
+                  span.text-danger 精选回复数 x 系数
+                  input.form-control#digestPost(type='number' value=data.scoreSettings.coefficients.digestPost || 0)
               .form-group
                 .col-sm-2.control-label 被赞数
                 .col-sm-3

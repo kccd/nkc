@@ -15,9 +15,8 @@ block content
                 img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username
                 .text-center
-                  span.user-grade(style=`color: ${data.targetUser.grade.color};`)
-                    span= data.targetUser.grade.displayName
-                    img.grade-icon(src=`/default/v${data.targetUser.grade._id}l.png`)
+                  -const targetUser = data.targetUser;
+                  include user/module_user_grade
                 p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
                 br
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏

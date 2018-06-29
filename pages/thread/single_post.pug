@@ -1,8 +1,3 @@
--const postTo = data.userOperationsId.includes('quotePost')
--const addCredit = data.userOperationsId.includes('creditXsf')
--const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
--const highlight = data.highlight;
-
 if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
   div(style=(post.pid === highlight?'background-color: #fffbdd;padding: 0.5rem;border-radius: 5px;':''))
     .post-body(id= `${post.pid}` style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
@@ -13,54 +8,18 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           a(href=`/u/${post.uid}`)
             img(src=`/avatar/${post.uid}` style='width: 25px; height: 25px;border-radius: 50%;margin-right: 0.5rem;margin-top: -3px;')
             span= post.user.username
-          img.grade-icon(src=`/default/v${post.user.grade._id}l.png` title=post.user.grade.displayName)
+          -const targetUser = post.user;
+          include ../user/module_user_grade_icon
+          if post.digest
+            span &nbsp;
+            span.fa.fa-star(style='color: #ffbf16;' title='精选')
           if thread.uid === post.uid
             span(style='color: #888888;')=`（作者）`
         .inline-block(style='float: right;')
           -var floornumber = data.paging.start+index
           span.lighttext= floornumber + '楼'
         if data.user
-          .inline-block.post-options
-            .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="false" aria-expanded="false")
-              span.fa.fa-sliders
-            ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
-              if postTo
-                li
-                  a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
-                    span.fa.fa-comment-o &nbsp;
-                    span 引用
-              li
-                a(href=`javascript:at('${post.user.username}')`)
-                  span.fa.fa-at= ` ${post.user.username}`
-              if addCredit
-                li
-                  a(href=`javascript:addCredit('${post.pid}')`)
-                    span.fa.fa-graduation-cap &nbsp;
-                    span 评学术分
-              - var ownership = data.userOperationsId.includes('modifyOtherPosts')
-              - ownership = ownership?true:(user.uid===post.uid)
-              if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
-                li
-                  a(href=`/editor?type=post&id=${post.pid}`)
-                    span.fa.fa-edit &nbsp;编辑
-              if disablePost
-                li
-                  a(href=`###` onclick=`disablePostClick('${post.pid}', 'post')` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo")
-                    span.fa.fa-eye-slash &nbsp;屏蔽
-              if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
-                if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
-                  li
-                    a(href=`/p/${post.pid}/history`)
-                      span.fa.fa-history &nbsp;历史版本
-              li.divider
-                li
-                  a
-                    span.fa.fa-clock-o= ` ${post.toc.toLocaleString()}`
-              if disablePost
-                li
-                  -const ipoc = post.iplm || post.ipoc;
-                  a(href=`http://ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc)
-                    span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
+          +postOptions(post)
         .inline-block.post-qrcode
           .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
           .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
