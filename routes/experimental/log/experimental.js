@@ -10,10 +10,12 @@ router
     // data.result = await db.LogModel.find({}).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
     const logs = await db.ManageBehaviorModel.find({}).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
     data.result = await Promise.all(logs.map(async behavior => {
-      if(behavior.para && behavior.para.disabled){
+      if(behavior.operationId === "disabledPost" && behavior.para && behavior.para.disabled){
         behavior.manageName = "屏蔽回复"
-      }else if(behavior.para && !behavior.para.disabled){
+      }else if(behavior.operationId === "disabledPost" && behavior.para && !behavior.para.disabled){
         behavior.manageName = "解除屏蔽回复"
+      }else{
+        behavior.manageName = "";
       }
       await behavior.extendUser();
       await behavior.extendToUser();

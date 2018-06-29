@@ -75,6 +75,7 @@ const logger = async (ctx, next) => {
     para: requestPara,
     status: requestStatus,
     reqTime: requestTime,
+    toc: requestTime,
     fid: forumId,
     cid: categoryId,
     tid: threadId,

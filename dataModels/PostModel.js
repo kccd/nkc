@@ -199,10 +199,11 @@ postSchema.pre('save', async function(next) {
     // 根据虎哥建议，重写@功能
     // 截取所有@起向后15字符的字符串
     var positions = [];
-    var pos = c.indexOf("@");
+    var d = c.replace(/<[^>]+>/g,"");
+    var pos = d.indexOf("@");
     while(pos > -1){
-      positions.push(c.substr(pos+1, 16));
-      pos = c.indexOf("@",pos+1)
+      positions.push(d.substr(pos+1, 30));
+      pos = d.indexOf("@",pos+1)
     }
     // 验证每个@是否含有特殊字符
     for(var i in positions){
@@ -226,11 +227,12 @@ postSchema.pre('save', async function(next) {
         positions[i] = positions[i].substr(0,perPos)
       }
       // 用户名从最后一个字符开始，逐个向前在数据库中查询
-      var evePos = positions[i];
+      var evePos = positions[i].toLowerCase();
       for(var num = evePos.length;num >= 0;num--){
-        var factName = await UserModel.findOne({username:evePos.substr(0,num)});
+        var factName = await UserModel.findOne({usernameLowerCase:evePos.substr(0,num)});
         if(factName){
-          positions[i] = factName.username;
+          // positions[i] = factName.username;
+          positions[i] = positions[i].substr(0,num);
           break;
         }
         if(num === 0 && factName === null){
@@ -245,11 +247,12 @@ postSchema.pre('save', async function(next) {
     if (positions) {
       await Promise.all(positions.map(async str => {
         // const username = str.slice(1, -1); //slice the @ and [\s] in reg
-        const username = str;
+        const usernameLowerCase = str.toLowerCase();
         // console.log(username)
-        const user = await UserModel.findOne({username});
+        const user = await UserModel.findOne({usernameLowerCase});
         if (user) {
-          const {username, uid} = user;
+          const {uid} = user;
+          const username = str;
           let flag = true; //which means this user does not in existedUsers[]
           for (const u of atUsers) {
             if (u.username === username)

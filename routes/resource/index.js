@@ -11,7 +11,7 @@ resourceRouter
     const { data, db, fs, settings } = ctx;
     const { cache } = settings;
     const resource = await db.ResourceModel.findOnly({ rid });
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
     if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
     const { path, ext } = resource;
     let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
@@ -80,7 +80,7 @@ resourceRouter
       }else{
         username = "";
       }
-      username = "ColumnName"
+      username = "QWEASDAA43454sdasd撒发生事房贷首付！@#￥"
       // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       const usernameWidth = usernameLength * 12;
