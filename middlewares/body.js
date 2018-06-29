@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
 	  if(ctx.lastModified && ctx.fresh) {
       ctx.status = 304;
       return
-    }
+    } 
     const basename = path.basename(ctx.filePath);
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
