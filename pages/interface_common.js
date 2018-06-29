@@ -1058,3 +1058,23 @@ function closeThread(tid) {
 			screenTopWarning(data.error|| data);
 		})
 }
+// 设回复为精选
+function digestPost(pid) {
+	nkcAPI('/p/'+pid+'/digest', 'POST', {})
+		.then(function() {
+			screenTopAlert('设置成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}
+// 取消回复精选
+function unDigestPost(pid) {
+	nkcAPI('/p/'+pid+'/digest', 'DELETE', {})
+		.then(function() {
+			screenTopAlert('取消精选成功');
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}

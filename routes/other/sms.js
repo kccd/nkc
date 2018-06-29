@@ -203,11 +203,71 @@ smsRouter
         await thread.update({"recycleMark":false,fid:"recycle"})
       }
     }
+
+    const digestLog = await db.UsersScoreLogModel.find({uid: user.uid, operationId: {$in: ['digestThread', 'digestPost']}, type: 'score'});
+    const digestArr = [];
+		await Promise.all(digestLog.map(async log => {
+			if(log.operationId === 'digestThread') {
+				await log.extendThread();
+				if(log.thread) {
+					await log.thread.extendFirstPost();
+					digestArr.push(log);
+				}
+			} else {
+				const thread = await db.ThreadModel.findOne({tid: log.tid});
+				if(thread) {
+					await log.extendPost();
+					if(log.post) {
+						const options = {
+							pid: log.pid
+						};
+						if(!data.userOperationsId.includes('displayDisabledPosts')) {
+							options.disabled = false;
+						}
+						const {page} = await thread.getStep(options);
+						log.page = page;
+						digestArr.push(log);
+					}
+				}
+			}
+
+		}));
+
     const systemMessage= await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
-    const systemMessages = systemMessage.concat(delPostMessage)
+
+
+    let systemMessages = systemMessage.concat(digestArr);
+    systemMessages = systemMessages.concat(delPostMessage);
+
+    // 排序
+	  const arr = [];
+	  const tocArr = [];
+	  for(let i = 0; i < systemMessages.length; i++) {
+	  	const m = systemMessages[i];
+	  	const toc = m.toc;
+	  	if(tocArr.length === 0) {
+	  		tocArr.push(toc);
+	  		arr.push(m);
+		  } else {
+	  		let s = false;
+			  for(let j = 0; j < tocArr.length; j++) {
+				  const toc_ = tocArr[j];
+				  if(toc_ < toc) {
+					  tocArr.splice(j, 0, toc);
+					  arr.splice(j, 0, m);
+					  s = true;
+					  break;
+				  }
+			  }
+			  if(!s) {
+			  	tocArr.push(toc);
+			  	arr.push(m);
+			  }
+		  }
+	  }
     const paging = apiFn.paging(page, systemMessages.length);
     const start = paging.start;
-    systemMessageArr = systemMessages.slice(start, start + perpage);
+    systemMessageArr = arr.slice(start, start + perpage);
     data.docs = systemMessageArr;
     data.paging = paging;
     data.tab = 'system';

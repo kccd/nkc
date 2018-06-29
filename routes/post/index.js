@@ -4,6 +4,7 @@ const history = require('./history');
 const credit = require('./credit');
 const disabled = require('./disabled');
 const recommend = require('./recommend');
+const digestRouter = require('./digest');
 const nkcModules = require('../../nkcModules');
 const dbFn = nkcModules.dbFunction;
 const settings = require('../../settings');
@@ -143,6 +144,7 @@ postRouter
     await next();
   })
   .use('/:pid/history', history.routes(), history.allowedMethods())
+	.use('/:pid/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:pid/recommend', recommend.routes(), recommend.allowedMethods())
   .use('/:pid/credit', credit.routes(), credit.allowedMethods())
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())

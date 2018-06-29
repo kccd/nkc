@@ -291,8 +291,9 @@ function disablePost(pid,para){
 
 function enablePost(pid){
 	nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: false})
-		.then(function(res){
-			location.reload()
+		.then(function(){
+			screenTopAlert(pid+' 已解除屏蔽，请手动刷新')
+			// location.reload()
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error)

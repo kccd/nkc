@@ -28,7 +28,7 @@ block title
       .row
         .col-xs-12.col-md-12
           .forum-digest-threads
-            h4.text-center 优秀文章
+            h4.text-center 精选文章
             for thread in data.digestThreads
               .col-xs-12.col-md-12
                 .row(style='margin-bottom: 0.2rem;line-height: 1.8rem;')
@@ -245,16 +245,16 @@ block content
                 ul.pagination.NavigationPaging
                   - var page = paging?paging.page:null
                   li(class=`${class_str_all}`)
-                    a(href=`${toQueryString({cat})}`) 俱
+                    a(href=`${toQueryString({cat})}`) 全部
 
                   li(class=`${class_str_digest}`)
-                    a(href=`${toQueryString({cat, digest: true})}`) 精
+                    a(href=`${toQueryString({cat, digest: true})}`) 精选
 
                 ul.pagination.NavigationPaging
                   li(class=`${class_str_sortby_tlm}`)
-                    a(href=`${toQueryString({cat, digest})}`) 复序
+                    a(href=`${toQueryString({cat, digest})}`) 最新回复
                   li(class=`${class_str_sortby_toc}`)
-                    a(href=`${toQueryString({cat, digest, sortby: "toc"})}`) 帖序
+                    a(href=`${toQueryString({cat, digest, sortby: "toc"})}`) 最新发表
                 .form-inline(style='margin-bottom:10px;margin-top:10px;display:none;').ForumManagement
 
                   .form-group
