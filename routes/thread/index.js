@@ -170,9 +170,10 @@ threadRouter
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(posts.map(async post => {
-			await post.extendUser();
+			await post.extendUser().then(u => u.extendGrade());
 			await post.extendResources();
 		}));
+
 		data.posts = posts;
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});

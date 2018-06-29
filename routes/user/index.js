@@ -4,9 +4,10 @@ const collectionsRouter = require('./collections');
 const billRouter = require('./bills');
 const productionRouter = require('./production');
 const bannedRouter = require('./banned');
-const draftsRouter = require('./drafts')
+const draftsRouter = require('./drafts');
 const settingRouter = require('./settings');
 const authRouter = require('./auth');
+const transactionRouter = require('./transaction');
 const userRouter = new Router();
 
 
@@ -151,6 +152,7 @@ userRouter
     ctx.data.message = `推送/取消热门 用户: ${uid}`;
     await next();
   })
+	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())

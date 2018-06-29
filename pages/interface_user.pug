@@ -14,8 +14,10 @@ block content
               .row
                 img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username
-                //.text-center
-                  span.user-grade(style=`background-color: ${data.targetUser.grade.color};`)= data.targetUser.grade.displayName
+                .text-center
+                  span.user-grade(style=`color: ${data.targetUser.grade.color};`)
+                    span= data.targetUser.grade.displayName
+                    img.grade-icon(src=`/default/v${data.targetUser.grade._id}l.png`)
                 p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
                 br
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
@@ -25,6 +27,8 @@ block content
                     button.btn.btn-block.btn-danger(onclick=`subscribeUser(${data.targetUser.uid}, false)`) 取关
                   if data.userOperationsId.includes('unSubscribeUser') && !data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
                     button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
+                if data.userOperationsId.includes('visitUserTransaction')
+                  a.btn.btn-block.btn-primary(href=`/u/${data.targetUser.uid}/transaction`) 更多信息
                 if data.user && data.user.uid === data.targetUser.uid
                   a(href=`/u/${data.targetUser.uid}/settings`).btn.btn-default.btn-block
                     span.fa.fa-edit
@@ -33,6 +37,7 @@ block content
                   button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, false)`) 解除封禁
                 if data.userOperationsId.includes('unBannedUser') && data.user.uid !== data.targetUser.uid && !data.targetUser.certs.includes('banned')
                   button.btn.btn-danger.btn-block(onclick=`bannedUser(${data.targetUser.uid}, true)`) 封禁此人
+
                 br
             .col-xs-6.col-md-6
               .row

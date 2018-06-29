@@ -71,13 +71,13 @@ module.exports = {
 			report: {
 				GET: 'visitFundApplicationReport',
 				POST: 'addFundApplicationReport',
-				PARAMETER: {
-					DELETE: 'deleteFundApplicationReport'
-				},
 				audit: {
 					GET: 'visitFundApplicationReportAudit',
 					POST: 'submitFundApplicationReportAudit'
 				},
+				PARAMETER: {
+					DELETE: 'deleteFundApplicationReport'
+				}
 			},
 			settings: {
 				GET: 'visitFundApplicationFormSettings'

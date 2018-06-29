@@ -280,6 +280,7 @@
     "visitFindPasswordByEmail": "访问通过邮箱找回密码页面",
     "findPasswordSendVerifyEmail": "找回密码中的发送验证邮件",
     "modifyPasswordByEmail": "通过邮箱修改密码",
-    "findPasswordVerifyEmail": "找回密码中的验证邮件"
+    "findPasswordVerifyEmail": "找回密码中的验证邮件",
+    "visitUserTransaction": "查看用户交易信息"
   }
 }

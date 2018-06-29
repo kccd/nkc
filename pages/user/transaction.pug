@@ -1,0 +1,45 @@
+extends ../bootstrap_base
+block title
+  title= `${data.targetUser.username}的交易信息`
+  -const mainContainer1400 = true;
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+        .col-xs-12.col-md-2
+          .col-xs-12.col-md-12
+            -const targetUserSubscribe = data.targetUserSubscribe;
+            -const targetUser = data.targetUser;
+            include module_user_message_nav
+        .col-xs-12.col-md-10
+            -const addresses = data.addresses;
+            if addresses.length === 0
+              h4 暂无交易信息
+            else
+              for address, index in data.addresses
+                div(style='border: 1px solid #dddddd;border-radius: 5px;padding: 0.5rem 0.8rem;margin-bottom: 0.5rem;')
+                  h4=`交易信息 ${index+1}`
+                  .form.form-horizontal
+                    .form-group
+                      label.col-sm-2.control-label 交易地址：
+                      .col-sm-10
+                        h5= address.address
+                    .form-group
+                      label.col-sm-2.control-label 联系电话：
+                      .col-sm-10
+                        h5= address.mobile
+                    .form-group
+                      label.col-sm-2.control-label 银行名称：
+                      .col-sm-10
+                        h5= address.bankName
+                    .form-group
+                      label.col-sm-2.control-label 银行账号：
+                      .col-sm-10
+                        h5= address.bankCardNumber
+                    .form-group
+                      label.col-sm-2.control-label 支付宝账号：
+                      .col-sm-10
+                        h5= address.alipay
+                    .form-group
+                      label.col-sm-2.control-label 收件人：
+                      .col-sm-10
+                        h5= address.username
