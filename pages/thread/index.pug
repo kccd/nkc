@@ -161,6 +161,11 @@ block content
                           span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
                         else
                           span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                      if thread.firstPost.digest
+                        .inline-block.post-thumbsUp
+                          span &nbsp;
+                          span.fa.fa-star(style='color: #ffbf16;' title='精选')
+
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
                           .form-inline

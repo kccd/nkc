@@ -17,12 +17,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
       -var isActive = function(label){return (navbar_highlight==label)?'background-color: #337ab7;color: #fff;':''}
       if data.user
         - var user = data.user
-        .navbar-brand(style='float: right;min-width: 7em;padding-top: 8px;padding-bottom: 8px').userInfo-m.dropdown
+        .navbar-brand(style='float: right;min-width: 4em;padding-top: 8px;padding-bottom: 8px;position: relation').userInfo-m.dropdown
           //a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style='display:inline-block;padding-left: 0.5rem;text-decoration: none;font-size: 15px;color: #777777;')
           //  span(title=title)= user.username
           img(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" src=`/avatar/${user.uid}` style='float: right;width: 2em;height: 2em;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
 
-          ul.dropdown-menu(style='float: rigth;')
+          ul.dropdown-menu(style='right: 0;left: auto;')
             li
               a(href=`/u/${user.uid}`)
                 span.fa.fa-user-o &nbsp;个人名片
