@@ -61,6 +61,7 @@ router.get('/', async(ctx, next) => {
     data.result = [];
     for(const u of searchResult.hits.hits) {
       const user = await UserModel.findOnly({uid: u._id});
+      await user.extendGrade();
       user.username = u.highlight.username || user.username;
       data.result.push(user)
     }
