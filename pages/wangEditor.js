@@ -3021,7 +3021,7 @@ Video.prototype = {
                         var val = $text.val().trim();
                         var videoHeight = parseInt($("#inHeight").val());
                         if(isNaN(videoHeight) || videoHeight > 960 || videoHeight < 300){
-                            videoHeight = "400"
+                            videoHeight = "720"
                         }
                         // console.log(videoHeight,typeof(videoHeight))
                         if(val.substr(val.length-3) == "swf"){
