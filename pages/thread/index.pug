@@ -165,6 +165,10 @@ block content
                               button.btn.btn-default.btn-sm#threadTop(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
                             if data.userOperationsId.includes('unHomeTop') && data.ads.includes(data.thread.tid)
                               button.btn.btn-default.btn-sm#threadTop(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
+                            if data.userOperationsId.includes('closeThread') && !thread.closed
+                              button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
+                            if data.userOperationsId.includes('openThread') && thread.closed
+                              button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 打开主题
                           if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
                             .form-inline(style='margin: 0.5rem 0')
                               .form-group.form-group-sm
@@ -213,47 +217,51 @@ block content
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
-                          include ../interface_thread_singlepost
+                          include single_post
                     .col-xs-12.col-md-12
                       include ../interface_navigation_paging
                     if data.user
                       .col-xs-12.col-md-12
                         - var hasMobile = data.user.authLevel > 0;
                         if hasMobile && data.user.volumeA
-
-                          //- .form-group
-                          //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
-                          .form-group
-                            div#quoteContent
-                          .form-group
-                            div#quoteCancel(style='display: none')
-                              button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-                          .form-group
-                            div#ReplyContent
-                          .form-inline
+                          if !thread.closed
+                            //- .form-group
+                            //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
                             .form-group
-                              button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
-                              button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
-
-                            .checkbox-inline
-                              label
-                                input#ParseURL(type='checkbox' checked)
-                                | 处理URL
-
-                            if 0
+                              div#quoteContent
+                            .form-group
+                              div#quoteCancel(style='display: none')
+                                button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+                            .form-group
+                              div#ReplyContent
+                            .form-inline
                               .form-group
-                                button#WiderArea.hidden-xs.btn.btn-default(onclick='widerArea()') 拓展
-                            //- include twemoji.pug
-                            .form-group
-                              button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
-                          .form-group
-                          .nkcpanel(id='file-uploading' target='/r')
-                            //uploader section
-                            include ../interface_attachment_uploader_uploader.pug
+                                button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
+                                button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
 
-                          .panel.panel-default
-                            .panel-heading 我的附件（点击插入帖子）
-                            .panel-body(id='list-container')
+                              .checkbox-inline
+                                label
+                                  input#ParseURL(type='checkbox' checked)
+                                  | 处理URL
+
+                              if 0
+                                .form-group
+                                  button#WiderArea.hidden-xs.btn.btn-default(onclick='widerArea()') 拓展
+                              //- include twemoji.pug
+                              .form-group
+                                button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
+                            .form-group
+                            .nkcpanel(id='file-uploading' target='/r')
+                              //uploader section
+                              include ../interface_attachment_uploader_uploader.pug
+
+                            .panel.panel-default
+                              .panel-heading 我的附件（点击插入帖子）
+                              .panel-body(id='list-container')
+                          else
+                            .col-xs-12.col-md-12(style='margin: 2rem 0;')
+                              .h4.text-center(style='color: #aaaaaa;')
+                                span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复
 
 
                       include ../exam_notification.pug

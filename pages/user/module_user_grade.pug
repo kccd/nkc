@@ -1,0 +1,4 @@
+if !targetUser.certs.includes('banned')
+  span.user-grade(style=`color: ${targetUser.grade.color};`)
+    span= targetUser.grade.displayName
+    include module_user_grade_icon

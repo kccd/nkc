@@ -4,9 +4,7 @@
   .text-center
     a(href=`/u/${targetUser.uid}`)
       h4= targetUser.username
-    span.user-grade(style=`color: ${targetUser.grade.color};`)
-      span= targetUser.grade.displayName
-      img.grade-icon(src=`/default/v${data.targetUser.grade._id}l.png`)
+    include module_user_grade
   p.text-center(style='color: #ff8700;')= targetUser.navbarDesc.cs
   br
   .panel.panel-default

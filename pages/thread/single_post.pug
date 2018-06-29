@@ -13,7 +13,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           a(href=`/u/${post.uid}`)
             img(src=`/avatar/${post.uid}` style='width: 25px; height: 25px;border-radius: 50%;margin-right: 0.5rem;margin-top: -3px;')
             span= post.user.username
-          img.grade-icon(src=`/default/v${post.user.grade._id}l.png` title=post.user.grade.displayName)
+          -const targetUser = post.user;
+          include ../user/module_user_grade_icon
           if thread.uid === post.uid
             span(style='color: #888888;')=`（作者）`
         .inline-block(style='float: right;')

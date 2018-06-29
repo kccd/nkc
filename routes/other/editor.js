@@ -98,6 +98,12 @@ editorRouter
     	const forum = await db.ForumModel.findOnly({fid: id});
     	data.content = forum.declare;
     }
+
+    if(type === 'thread') {
+    	const thread = await db.ThreadModel.findOnly({tid: id});
+    	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
+    }
+
     await next();
   });
 
