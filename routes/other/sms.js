@@ -205,20 +205,30 @@ smsRouter
     }
 
     const digestLog = await db.UsersScoreLogModel.find({uid: user.uid, operationId: {$in: ['digestThread', 'digestPost']}, type: 'score'});
+    const digestArr = [];
 		await Promise.all(digestLog.map(async log => {
 			if(log.operationId === 'digestThread') {
-				await log.extendThread().then(t => t.extendFirstPost());
-			} else {
-				const thread = await db.ThreadModel.findOnly({tid: log.tid});
-				await log.extendPost();
-				const options = {
-					pid: log.pid
-				};
-				if(!data.userOperationsId.includes('displayDisabledPosts')) {
-					options.disabled = false;
+				await log.extendThread();
+				if(log.thread) {
+					await log.thread.extendFirstPost();
+					digestArr.push(log);
 				}
-				const {page} = await thread.getStep(options);
-				log.page = page;
+			} else {
+				const thread = await db.ThreadModel.findOne({tid: log.tid});
+				if(thread) {
+					await log.extendPost();
+					if(log.post) {
+						const options = {
+							pid: log.pid
+						};
+						if(!data.userOperationsId.includes('displayDisabledPosts')) {
+							options.disabled = false;
+						}
+						const {page} = await thread.getStep(options);
+						log.page = page;
+						digestArr.push(log);
+					}
+				}
 			}
 
 		}));
@@ -226,7 +236,7 @@ smsRouter
     const systemMessage= await db.SmsModel.find({fromSystem: true}).sort({toc: -1});
 
 
-    let systemMessages = systemMessage.concat(digestLog);
+    let systemMessages = systemMessage.concat(digestArr);
     systemMessages = systemMessages.concat(delPostMessage);
 
     // 排序
