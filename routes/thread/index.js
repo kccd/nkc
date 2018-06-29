@@ -342,7 +342,7 @@ threadRouter
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
 		await next();
 	})
-	.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
 	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())

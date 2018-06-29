@@ -55,7 +55,7 @@
     "postToThread": "回复文章",
     "moveThread": "移动文章",
     "collectThread": "收藏文章",
-    "digestThread": "将文章设为优秀文章",
+    "digestThread": "将文章设为精选文章",
     "toppedThread": "置顶文章",
     "switchInPersonalForum": "在专栏加精、置顶、隐藏",
     "visitUserCard": "访问用户名片",
@@ -281,6 +281,10 @@
     "findPasswordSendVerifyEmail": "找回密码中的发送验证邮件",
     "modifyPasswordByEmail": "通过邮箱修改密码",
     "findPasswordVerifyEmail": "找回密码中的验证邮件",
-    "visitUserTransaction": "查看用户交易信息"
+    "visitUserTransaction": "查看用户交易信息",
+    "digestPost": "回复加精",
+    "unDigestPost": "取消回复加精",
+    "closeThread": "关闭主题",
+    "openThread": "开放主题"
   }
 }
