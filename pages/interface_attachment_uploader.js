@@ -127,7 +127,7 @@ var uploader = attachment_uploader({
   },
 
   upload_failed_callback:function(info){
-    alert('failed. \n'+info);
+    alert('上传失败，请重新上传');
   },
 
   files_left_callback:function(num){
@@ -144,6 +144,6 @@ var uploader = attachment_uploader({
 });
 
 //enable Ctrl + V paste
-
+geid("paste-target").addEventListener("paste", uploader.paste_handler);
 //上传附件的按钮
 geid('upload-button').addEventListener('click', uploader.uploadfile_click);

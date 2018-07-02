@@ -2212,7 +2212,7 @@ function BackColor(editor) {
         }
     });
 }
-
+ 
 // 原型
 BackColor.prototype = {
     constructor: BackColor,
