@@ -934,17 +934,16 @@ input[type="radio"], input[type="checkbox"]{
 }
 .popupPanel-body{
   position: absolute;
-  top: 0;
+  top: 65px;
   right: 0;
-  bottom: 0;
   left: 0;
   margin: auto;
   width: 60rem;
-  height: 60rem;
+  max-height: 70%;
   background-color: #fff;
   box-shadow: 0px 0px 20px #888;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .popupPanel-close{
   height: 3rem;

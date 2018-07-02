@@ -155,7 +155,7 @@ function displaySelectedUsers() {
 	usersList += head;
 	for (var i = 0; i < selectedUsers.length; i++) {
 		var user = selectedUsers[i];
-		usersList += '<span class="fund-span selectedUser" uid="'+user.uid+'" onclick="deleteUser('+user.uid+')">'+user.username+'<span class="fund-span delete glyphicon glyphicon-remove"></span></span></span>';
+		usersList += '<span class="fund-span selectedUser" uid="'+user.uid+'" onclick="deleteUser('+user.uid+')">'+user.username+'<span class="fund-span delete glyphicon glyphicon-minus"></span></span></span>';
 	}
 	$('#selectedUsersDiv').html(usersList);
 }
@@ -294,9 +294,15 @@ function displayLifePhotos() {
 	}
 	var html = '';
 	for (var i = 0; i < lifePhotos.length; i++) {
-		html += '<div class="col-xs-12 col-md-4 photo-content"><div class=" glyphicon glyphicon-remove delete-photo" onclick="removePhoto('+lifePhotos[i]+')"></div><img src="/photo_small/'+lifePhotos[i]+'" photoId='+lifePhotos[i]+'/></div>';
+		html += '<div class="col-xs-12 col-md-4 photo-content"><div class=" glyphicon glyphicon-minus delete-photo" onclick="removePhoto('+lifePhotos[i]+')"></div><img src="/photo_small/'+lifePhotos[i]+'" photoId='+lifePhotos[i]+'/></div>';
 	}
 	$('.photo-selected .row').html(html);
+	if(lifePhotos.length === 0) {
+		$('#selectLifePhotoInfo').text('暂未选择生活照');
+	} else {
+		$('#selectLifePhotoInfo').text('已选择生活照');
+	}
+
 }
 
 function removePhoto(id) {
@@ -559,7 +565,7 @@ function fundMoneyList(obj, disabled) {
 	var i = obj.i;
 	var dis = '';
 	if(disabled === true) dis = 'disabled';
-	return '<div class="fund-money-list" num='+i+'><div class="purpose" contenteditable=true num='+i+'>'+purpose+'</div><div class="count" contenteditable=true num='+i+'>'+count+'</div><div class="money" contenteditable=true num='+i+'>'+money+'</div><div class="total" num='+i+'>'+total+'</div><div class="delete glyphicon glyphicon-remove '+dis+'" onclick="deleteList('+i+')"></div></div>';
+	return '<div class="fund-money-list" num='+i+'><div class="purpose" contenteditable=true num='+i+'>'+purpose+'</div><div class="count" contenteditable=true num='+i+'>'+count+'</div><div class="money" contenteditable=true num='+i+'>'+money+'</div><div class="total" num='+i+'>'+total+'</div><div class="delete glyphicon glyphicon-minus '+dis+'" onclick="deleteList('+i+')"></div></div>';
 }
 
 function onContentChange() {
@@ -688,17 +694,22 @@ function createThreadsList(arr, type, disabled) {//add, remove
 	} else {
 		disabled = '';
 	}
-	if(type === 'add') {
-		functionName = 'addThread';
-		iconClass = 'glyphicon glyphicon-plus';
-	} else {
-		functionName = 'deleteThread';
-		iconClass = 'glyphicon glyphicon-remove';
-	}
 	var html = '';
 	for(var i = 0; i < arr.length; i++) {
 		var obj = arr[i];
 		var tid = obj.tid;
+
+		functionName = 'addThread';
+		iconClass = 'glyphicon glyphicon-plus';
+		for(var j = 0; j < selectedThreads.length; j++) {
+			var e = selectedThreads[j];
+			if(e.tid === tid) {
+				functionName = 'deleteThread';
+				iconClass = 'glyphicon glyphicon-minus';
+				break;
+			}
+		}
+
 		var uid = obj.uid;
 		var pid = obj.pid;
 		var username = obj.username;
@@ -706,7 +717,7 @@ function createThreadsList(arr, type, disabled) {//add, remove
 		var toc = obj.toc;
 		var postString = JSON.stringify(obj);
 		var contentDiv = '<div class="col-xs-10 col-md-10"><div class="postString displayNone">'+postString+'</div><span>文号：</span><span class="threadNumber">'+pid+'&nbsp;&nbsp;</span><a href="/m/'+uid+'" target="_blank">'+username+'</a><span>&nbsp;发表于 '+ toc +'</span><br><a href="/t/'+tid+'" target="_blank">'+t+'</a></div>';
-		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'('+i+');this.style.backgroundColor = '+'\'#2aabd2\''+';"></div>'
+		var btnDiv = '<div class="col-xs-2 col-md-2 delete '+disabled+' '+iconClass+'" onclick="'+functionName+'(\''+tid+'\', this);"></div>';
 		html += '<div class="threadList">'+contentDiv+btnDiv+'</div>';
 	}
 	return html;
@@ -751,20 +762,45 @@ function displayDeleteThreadBtn() {
 }
 
 //删除帖子
-function deleteThread(index) {
-	selectedThreads.splice(index, 1);
+function deleteThread(tid, a) {
+	for (var i = 0; i < selectedThreads.length; i++) {
+		if(selectedThreads[i].tid === tid) {
+			selectedThreads.splice(i, 1);
+		}
+	}
+	if(a) {
+		console.log(a);
+		var e = $(a);
+		if(e.hasClass('glyphicon-minus')) {
+			e.removeClass('glyphicon-minus').addClass('glyphicon-plus');
+			var fn = e.attr('onclick');
+			e.attr('onclick', fn.replace('deleteThread', 'addThread'));
+		}
+	}
+	screenTopAlert('移除成功!');
 	displayThreadsList('.selectedThreads', selectedThreads, false, 'delete');
 }
 
 //添加帖子
-function addThread(index) {
-	var thread = tempThreads[index];
+function addThread(tid, a) {
+	var thread;
+	for(var i = 0; i < tempThreads.length; i++) {
+		if(tempThreads[i].tid === tid) {
+			thread = tempThreads[i];
+		}
+	}
 	var flag = false;
 	for (var i = 0; i < selectedThreads.length; i++) {
 		if(selectedThreads[i].tid === thread.tid) {
 			flag = true;
 			break;
 		}
+	}
+	var e = $(a);
+	if(e.hasClass('glyphicon-plus')) {
+		e.removeClass('glyphicon-plus').addClass('glyphicon-minus');
+		var fn = e.attr('onclick');
+		e.attr('onclick', fn.replace('addThread', 'deleteThread'));
 	}
 	if(!flag) {
 		selectedThreads.push(thread);

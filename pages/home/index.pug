@@ -113,6 +113,9 @@ block content
           .col-xs-12.col-md-12.hidden-sm.hidden-xs
             .nkcpanel
               include ../forum_logo_wisdom
+          if data.user
+            .col-xs-12.col-md-12
+              include ../question/module_exam_link
           if data.ads.length !== 0
             .col-xs-12.col-md-12.hidden-sm.hidden-xs#adsDiv
               +createAds(data.ads)

@@ -10,6 +10,7 @@ const billsRouter = require('./bills');
 const billRouter = require('./bill');
 const donationRouter = require('./donation');
 const historyRouter = require('./history');
+const unSubmitRouter = require('./unSubmit');
 fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
@@ -194,5 +195,6 @@ fundRouter
 	.use('/bill', billRouter.routes(), billRouter.allowedMethods())
 	.use('/donation', donationRouter.routes(), donationRouter.allowedMethods())
 	.use('/history', historyRouter.routes(), historyRouter.allowedMethods())
+	.use('/unsubmit', unSubmitRouter.routes(), unSubmitRouter.allowedMethods())
 	.use('/disabled', disabledRouter.routes(), disabledRouter.allowedMethods());
 module.exports = fundRouter;

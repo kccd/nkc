@@ -285,6 +285,8 @@
     "digestPost": "回复加精",
     "unDigestPost": "取消回复加精",
     "closeThread": "关闭主题",
-    "openThread": "开放主题"
+    "openThread": "开放主题",
+    "rollbackPost": "post回滚",
+    "visitUnSubmitFundApplicationList": "查看未提交的基金申请"
   }
 }

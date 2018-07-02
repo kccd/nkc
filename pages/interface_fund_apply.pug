@@ -64,7 +64,7 @@ block content
                           h4 已选择组员：
                           -for(let user of applicationForm.members)
                             span.fund-span.selectedUser.selected(uid=user.uid onclick=`deleteUser(${user.uid})`)= user.user.username
-                              span.fund-span.delete.glyphicon.glyphicon-remove
+                              span.fund-span.delete.glyphicon.glyphicon-minus
                       hr
                       h4(style='margin-bottom: 0.5rem;') 添加组员:
                       .form
@@ -127,16 +127,13 @@ block content
                       //else
                       //  a.btn.btn-default(onclick='displayPopupPanel()') 选择生活照
                     .col-xs-12.col-md-12
-                      if applicant.lifePhotos.length === 0
-                        span 暂未选择生活照
-                      else
-                        span 已选择生活照
+                      span#selectLifePhotoInfo
                       .photo-selected
                         .row
                           -for(let i = 0; i < applicant.lifePhotos.length; i++)
                             -const photo = applicant.lifePhotos[i];
                             .col-xs-12.col-md-4.photo-content
-                              .glyphicon.glyphicon-remove.delete-photo(onclick=`removePhoto(${photo._id})`)
+                              .glyphicon.glyphicon-minus.delete-photo(onclick=`removePhoto(${photo._id})`)
                               img(src= `/photo_small/${photo._id}` photoId=photo._id )
                     .popupPanel.disabled
                       .popupPanel-body
@@ -221,7 +218,7 @@ block content
                               .count(contenteditable=true num= i)= budgetMoney[i].count
                               .money(contenteditable=true num= i)= budgetMoney[i].money
                               .total= total
-                              .delete.glyphicon.glyphicon-remove(onclick=`deleteList(${i})`)
+                              .delete.glyphicon.glyphicon-minus(onclick=`deleteList(${i})`)
                       #aggregate(style='margin-left: 0.5rem;')=(budgetMoney !== null && budgetMoney.length !== 0 && typeof(budgetMoney) !== 'string')? `总计：${aggregate}元`: ''
                     .button
                       span.fund-span.transparent(style='margin-left: 0;' onclick='addList()') 添加
@@ -268,7 +265,7 @@ block content
                               span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
                               br
                               a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
-                            .col-xs-2.col-md-2.delete.glyphicon.glyphicon-remove(onclick=`deleteThread(${i})`)
+                            .col-xs-2.col-md-2.delete.glyphicon.glyphicon-minus(onclick=`deleteThread("${thread.tid}")`)
                     //.span.fund-span.transparent(onclick='displayDeleteThreadBtn()' style="margin-left: 0;") 编辑
                     .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
                     //.span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
@@ -398,7 +395,7 @@ block content
                   if !applicationForm.category
                     +ds('未选择学科分类。')
                   if !disabledSubmit
-                    h3.greenFontColor 信息录入完整,可提交申请！
+                    h3.greenFontColor 信息录入完整，可提交申请！
 
             -let funSave, funNext;
             if s === 1
