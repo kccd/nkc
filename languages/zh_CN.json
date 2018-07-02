@@ -287,6 +287,6 @@
     "closeThread": "关闭主题",
     "openThread": "开放主题",
     "rollbackPost": "post回滚",
-    "visitUnSubmitFundApplicationForms": "查看未提交的基金申请"
+    "visitUnSubmitFundApplicationList": "查看未提交的基金申请"
   }
 }

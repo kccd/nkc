@@ -64,7 +64,7 @@ module.exports = {
 		GET: 'visitDisabledFundList'
 	},
 	unsubmit: {
-		GET: 'visitUnSubmitFundApplicationForms'
+		GET: 'visitUnSubmitFundApplicationList'
 	},
 	a: {
 		PARAMETER: {
