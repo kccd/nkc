@@ -120,13 +120,15 @@
     if applicationForm.budgetMoney === null || applicationForm.budgetMoney === ''
       span 暂未填写
     else
-      -let aggregate, suggest, fact, used;
+      -let aggregate, suggest, fact, used, displaySuggest, displayFact;
       #budgetMoney
         if applicationForm.budgetMoney.length !== 0 && (applicationForm.actualMoney.length !== 0 || applicationForm.status.adminSupport)
           -aggregate=0;
           -suggest=0;
           -fact=0;
           -used=0;
+          -displaySuggest = true;
+          -displayFact = true;
           .fund-money-list.head.adminAudit
             .purpose 用途
             .count 数量
@@ -149,6 +151,7 @@
         else if applicationForm.budgetMoney.length !== 0 && applicationForm.budgetMoney[0].suggest
           -aggregate=0;
           -suggest=0;
+          -displaySuggest = true;
           .fund-money-list.head.projectAudit
             .purpose 用途
             .count 数量
@@ -186,9 +189,9 @@
       h3.text-right
         if aggregate
           span=`申请金额：${aggregate}元`
-        if suggest
+        if displaySuggest
           span=`，专家建议：${suggest || aggregate}元`
-        if fact
+        if displayFact
           span=`，实际批准：${fact}元`
       if applicationForm.actualMoney.length !== 0
         h5 实际使用：

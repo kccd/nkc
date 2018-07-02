@@ -4,16 +4,19 @@
     if(formerPost)
       a(href=`/p/${formerPost.pid}/history/rollback/${formerPost._id}`) 回滚至此版本
     else
-      a(href=`/p/${p.pid}/history/rollback/${p._id}`) 回滚至此版本
+      //a(href=`/p/${p.pid}/history/rollback/${p.pid}`) 回滚至此版本
     p.reddish #{dateTimeString(p.tlm)}
     p 作者(修改者)：
       -var uid = p.uidlm||p.uid
         a(href=`/m/${uid}`) #{uid}
-    
+
     p 语言：#{p.l}
-    
+    if data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
+      if formerPost
+        p=`IP: ${formerPost.iplm}`
+      else
+        p=`IP: ${p.iplm}`
     hr.hrNarrowSpace
-      
     if formerPost
       if(formerPost.t !== '')
         h1!=htmlDiff(formerPost.t, p.t)

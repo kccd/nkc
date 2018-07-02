@@ -63,6 +63,9 @@ module.exports = {
 	disabled: {
 		GET: 'visitDisabledFundList'
 	},
+	unsubmit: {
+		GET: 'visitUnSubmitFundApplicationForms'
+	},
 	a: {
 		PARAMETER: {
 			GET: 'visitFundApplicationForm',

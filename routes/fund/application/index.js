@@ -31,7 +31,7 @@ applicationRouter
 			q['status.remittance'] = {$ne: true};
 			q.useless = null
 		} else { //所有
-
+			
 		}
 		const length = await db.FundApplicationFormModel.count(q);
 		const paging = apiFn.paging(page, length);
@@ -96,7 +96,7 @@ applicationRouter
 		const {applicant, members, fund} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
-		if(applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
+		if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
 		ctx.template = 'interface_fund_applicationForm.pug';
 		const page = query.page? parseInt(query.page): 0;
 		const q = {

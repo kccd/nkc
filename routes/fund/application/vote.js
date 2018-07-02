@@ -33,7 +33,7 @@ voteRouter
 		await applicationForm.save();
 
 		//获得网友支持
-		if(fund.supportCount <= supportersId.length) {
+		if(!applicationForm.status.usersSupport && fund.supportCount <= supportersId.length) {
 			const obj = {
 				'status.usersSupport': true,
 				tlm: Date.now()

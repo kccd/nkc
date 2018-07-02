@@ -80,7 +80,11 @@ let HistoriesSchema = new Schema({
   uidlm: {
     type: String,
     index: 1
-  }
+  },
+	digest: Boolean,
+	hideHistories: Boolean,
+	hasImage: Boolean,
+	toDraft: Boolean
 });
 
 HistoriesSchema.pre('save', function(next) {
