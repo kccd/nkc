@@ -1,11 +1,12 @@
--const addQuestions = data.userOperationsId.includes('addQuestion');
+-const addQuestions = data.userOperationsId.includes('addQuestion') || (data.user && data.user.xsf > 0);
 -const examinated = data.user && data.user.volumeA && data.user.volumeB
-.row
-  .col-xs-12
-    .nkcpanel
-      if !examinated
-        :markdown
-          普通会员不能进入特种技术板块，请点击这里[参加考试](/exam)，升级高级会员
-      if addQuestions
-        :markdown
-          科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！
+if addQuestions || !examinated
+  .row
+    .col-xs-12
+      .nkcpanel
+        if !examinated
+          :markdown
+            普通会员不能进入特种技术板块，请点击这里[参加考试](/exam)，升级高级会员
+        if addQuestions
+          :markdown
+            科创题库现已面向1学术分以上会员开放。为科创入站测试[添加你的题目](/q)吧！
