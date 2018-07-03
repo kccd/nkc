@@ -28,7 +28,7 @@ block title
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
 
-  mixin postOptions(post, targetThread)
+  mixin postOptions(post, targetThread, index)
     .inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
       .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
         span.fa.fa-sliders
@@ -138,7 +138,7 @@ block content
                         if data.isModerator || canManagement
                           a(href=`javascript:displayManagement();` style='text-decoration: none;float: right;')
                             .highlight.fa.fa-cog
-                        +postOptions(thread.firstPost, thread)
+                        +postOptions(thread.firstPost, thread, 0)
                       .inline-block(style='float: right;')
                         .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") &nbsp;分享
                         .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;')
