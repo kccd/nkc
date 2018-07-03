@@ -19,7 +19,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           -var floornumber = data.paging.start+index
           span.lighttext= floornumber + '楼'
         if data.user
-          +postOptions(post)
+          +postOptions(post, '',index)
         .inline-block.post-qrcode
           .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
           .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
