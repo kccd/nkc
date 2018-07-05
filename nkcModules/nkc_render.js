@@ -477,14 +477,16 @@ function nkc_render(options){
     // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
     
     // 添加附件下载次数
-    var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm']
-    for(var i in post.resources){
-      var r = post.resources[i];
-      if(extArray.indexOf(r.ext) > -1){
-        continue;
+    if(post.l === "html"){
+      var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm']
+      for(var i in post.resources){
+        var r = post.resources[i];
+        if(extArray.indexOf(r.ext) > -1){
+          continue;
+        }
+        var reg = new RegExp(r.oname, 'gm');
+        html = html.replace(reg,r.oname+'<span class="PostResourceCounter">'+r.hits+'次下载</span>')
       }
-      var reg = new RegExp(r.oname, 'gm');
-      html = html.replace(reg,r.oname+'<span class="PostResourceCounter">'+r.hits+'次下载</span>')
     }
     html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>')
     return html
