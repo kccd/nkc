@@ -165,7 +165,7 @@ threadSchema.methods.extendFirstPost = async function() {
 threadSchema.methods.extendLastPost = async function() {
 	const PostModel = mongoose.model('posts');
 	return this.lastPost = (await PostModel
-    .find({tid: this.tid, disabled: false})
+    .find({tid: this.tid, disabled: {$nin:[true]}})
     .sort({toc: -1}).limit(1))[0]
 };
 
