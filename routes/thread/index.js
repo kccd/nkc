@@ -292,7 +292,7 @@ threadRouter
 		// 获取认证等级
 		const authLevel = await userPersonal.getAuthLevel();
 		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
-		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
+		// if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
