@@ -3493,6 +3493,12 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
         pasteHtml = docSplitHtml[0];
     }
 
+    // 如果是从记事本等粘贴过来的文本，将换行符替换成<br>，然后直接返回
+    if(clipboardData.getData('text/html').length === 0){
+        pasteHtml = pasteHtml.replace(/\n/igm,'<br>')
+        return pasteHtml
+    }
+
     // 过滤换行
     pasteHtml = pasteHtml.replace(/\n/igm,'');
     // 过滤回车
@@ -3511,7 +3517,7 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     var singlelabels = RegExp("<" + singlelabel + ".*?>","igm");
     pasteHtml = pasteHtml.replace(singlelabels,'')
     // 只过滤无用的双标签，不过滤标签内的html
-    var doubleLabel = "(ignore_js_op|object|label|strike|code|pre|h5|h6|blockquote|address|ul|li|ol)";
+    var doubleLabel = "(ignore_js_op|object|label|strike|code|pre|h5|h6|blockquote|address|ul|li|ol|span)";
     var doubleLabels = RegExp("<\/?" + doubleLabel + "[^>]*>","igm")
     pasteHtml = pasteHtml.replace(doubleLabels,'')
 
@@ -3519,7 +3525,6 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     var commonEvent = "(onclick|onmouseover)";
     var commonEvents = RegExp("\s?" + commonEvent + "=\".+?\"",'igm');
     pasteHtml = pasteHtml.replace(commonEvents,'')
-
     // 去掉注释
     pasteHtml = pasteHtml.replace(/<!--.*?-->/mg, '');
     // 将data-src替换为src
