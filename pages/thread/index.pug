@@ -83,7 +83,7 @@ block title
         li.divider
         li
           a
-            span.fa.fa-clock-o= ` ${thread.firstPost.toc.toLocaleString()}`
+            span.fa.fa-clock-o= ` ${post.toc.toLocaleString()}`
         if disablePost
           li
             -const ipoc = post.iplm || post.ipoc;
@@ -241,7 +241,8 @@ block content
                     if data.user
                       .col-xs-12.col-md-12
                         - var hasMobile = data.user.authLevel > 0;
-                        if hasMobile && data.user.volumeA
+                        //- if hasMobile && data.user.volumeA
+                        if hasMobile
                           if !thread.closed
                             //- .form-group
                             //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
