@@ -12,7 +12,7 @@ block title
   -let displayCompleteAudit = false, displayExcellent = false, displayDisabled = false, displayVote = false, displayCommentInput = false;
   -let needRemittance = false, needReportAudit = false, needCompletedAudit = false;
   -let useful = (useless === null && disabled === false), modifyAccount = false;
-  -let remittanceError;
+  -let remittanceError, displayRestore;
   if useful && status.adminSupport && status.completed !== true
     -for(let i = 0; i < applicationForm.remittance.length; i++)
       -const r = applicationForm.remittance[i];
@@ -64,6 +64,8 @@ block title
       -needCompletedAudit = true;
   if isAdmin && useful && projectPassed && adminSupport === null
     -displayAdminAudit = true;
+  if isAdmin && applicationForm.useless === 'giveUp'
+    -displayRestore = true;
   if isFinancialStaff && useful && needRemittance
     -displayRemittance = true;
   if isAdmin && useful
@@ -321,6 +323,8 @@ block content
                     button(onclick=`excellent(${applicationForm._id}, false)`).btn.btn-info.btn-block 取消评为优秀项目
                   else
                     button(onclick=`excellent(${applicationForm._id}, true)`).btn.btn-info.btn-block 评为优秀项目
+                if displayRestore
+                  button.btn.btn-primary.btn-block(onclick=`restoreApplicationForm(${applicationForm._id})`) 恢复申请表
                 if isAdmin
                   if disabled
                     a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽

@@ -85,7 +85,7 @@ homeRouter
 			}
 			await thread.extendForum();
 			await thread.forum.extendParentForum();
-			return thread;
+			return thread.toObject();
 		}));
 
 		// 导航
@@ -103,7 +103,7 @@ homeRouter
 			const thread = await db.ThreadModel.findOne({oc});
 			if(thread) {
 				await thread.extendFirstPost().then(p => p.extendUser());
-				data.noticeThreads.push(thread);
+				data.noticeThreads.push(thread.toObject());
 			}
 		}
 
@@ -113,8 +113,7 @@ homeRouter
 			const thread = await db.ThreadModel.findOne({tid});
 			if(thread && fidOfCanGetThreads.includes(thread.fid)) {
 				await thread.extendFirstPost().then(p => p.extendUser());
-				await thread.extendForum();
-				data.ads.push(thread);
+				data.ads.push(thread.toObject());
 			}
 		}
 

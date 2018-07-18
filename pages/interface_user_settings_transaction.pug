@@ -32,21 +32,29 @@ block content
                   .col-sm-6
                     input.form-control.mobile(type='number')
                 .form-group
+                  label.col-sm-2.control-label 收件人：
+                  .col-sm-6
+                    input.form-control.username(type='text')
+                .form-group
                   label.col-sm-2.control-label 银行名称：
                   .col-sm-6
                     input.form-control.bankName(type='text')
                 .form-group
-                  label.col-sm-2.control-label 银行卡账号：
+                  label.col-sm-2.control-label 银行开户人姓名：
+                  .col-sm-6
+                    input.form-control.accountHolder(type='text')
+                .form-group
+                  label.col-sm-2.control-label 银行卡号：
                   .col-sm-6
                     input.form-control.bankCardNumber(type='number')
+                .form-group
+                  label.col-sm-2.control-label 支付宝户名：
+                  .col-sm-6
+                    input.form-control.alipayHolder(type='text')
                 .form-group
                   label.col-sm-2.control-label 支付宝账号：
                   .col-sm-6
                     input.form-control.alipay(type='text')
-                .form-group
-                  label.col-sm-2.control-label 收件人：
-                  .col-sm-6
-                    input.form-control.username(type='text')
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-6
@@ -64,6 +72,6 @@ block content
   #data.hidden= JSON.stringify({addresses: data.addresses, uid: data.targetUser.uid})
 
 block scripts
-  script(src='/interface_common.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
-  script(src='/interface_user_settings_transaction.js')
+  script(src=`/interface_user_settings_transaction.js?v=${global.NKC.startTime}`)

@@ -278,13 +278,19 @@ threadRouter
 		// 关注的用户
 		if(data.user) {
 			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
+			if(!data.user.volumeA) {
+				// 加载考试设置
+				data.examSettings = await db.SettingModel.findOnly({type: 'exam'});
+				data.userPostCountToday = await db.InfoBehaviorModel.count({uid: data.user.uid, toc: {$gte: nkcModules.apiFunction.today()}, operationId: 'postToThread'});
+			}
 		}
 		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
+		data.thread = data.thread.toObject();
 		await next();
 	})
 	.post('/:tid', async (ctx, next) => {
 		const {
-			data, params, db, body, address: ip
+			data, nkcModules, params, db, body, address: ip
 		} = ctx;
 		// 验证用户是否有权限发表回复，硬性条件。
 		const {user} = data;
@@ -292,15 +298,32 @@ threadRouter
 		// 获取认证等级
 		const authLevel = await userPersonal.getAuthLevel();
 		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
+
 		// if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
+
+		if(!user.volumeA) {
+			// -1: 无限制；0：不允许；正整数：相应条数
+			const examSettings = await db.SettingModel.findOnly({type: 'exam'});
+			const postCountOneDay = examSettings.volumeAFailedPostCountOneDay;
+			if(postCountOneDay !== -1) {
+				if(postCountOneDay === 0) {
+					ctx.throw(403, '未通过A卷考试的用户暂不能发表回复');
+				} else {
+					const today = nkcModules.apiFunction.today();
+					const postCountToday = await db.InfoBehaviorModel.count({uid: user.uid, toc: {$gte: today}, operationId: 'postToThread'});
+					if(postCountToday >= postCountOneDay) ctx.throw(403, `未通过A卷考试的用户每天仅能发表${postCountOneDay}条回复`);
+				}
+			}
+		}
+
 		data.thread = thread;
 		await thread.extendForum();
 		data.forum = thread.forum;
 		// 权限判断
-		const gradeId = data.userGrade;
+		const gradeId = data.userGrade._id;
 		const rolesId = data.userRoles.map(role => role._id);
 		const options = {
 			gradeId,

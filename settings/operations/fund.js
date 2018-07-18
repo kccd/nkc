@@ -66,9 +66,13 @@ module.exports = {
 	unsubmit: {
 		GET: 'visitUnSubmitFundApplicationList'
 	},
+	giveup: {
+		GET: 'visitGiveUpFundApplicationList'
+	},
 	a: {
 		PARAMETER: {
 			GET: 'visitFundApplicationForm',
+			POST: 'restoreFundApplicationForm',
 			PATCH: 'modifyApplicationForm',
 			DELETE: 'deleteApplicationForm',
 			report: {

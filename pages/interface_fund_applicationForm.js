@@ -112,3 +112,13 @@ function disabledComment(applicationFormId, commentId, type) {
 			screenTopWarning(data.error);
 		})
 }
+
+function restoreApplicationForm(id) {
+	nkcAPI('/fund/a/'+id, 'POST', {operation: 'restore'})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error||data);
+		})
+}

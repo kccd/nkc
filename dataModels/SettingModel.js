@@ -140,6 +140,10 @@ const settingSchema = new Schema({
 	// 分页
 	// ---------------------------------------
 	homeThreadsFirstLoad: Number,
+
+	// 考试
+	// ---------------------------------------
+	volumeAFailedPostCountOneDay: Number,
 },
 {toObject: {
   getters: true,

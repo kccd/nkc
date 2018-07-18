@@ -6,7 +6,12 @@ block content
   .container-fluid(style='max-width: 1400px')
     .row
       .col-xs-12.col-md-12
-        h4 暂未提交的基金申请
+        ul.nav.nav-pills
+          li(class=data.type === 'unSubmit' ? 'active' : '')
+            a(href=`/fund/unsubmit`) 未提交
+          li(class=data.type === 'giveUp' ? 'active' : '')
+            a(href=`/fund/giveup`) 已放弃
+
       include ../interface_navigation_paging
       for a in data.applicationForms
         .col-xs-12.col-md-12

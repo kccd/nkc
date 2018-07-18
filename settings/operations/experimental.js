@@ -98,6 +98,10 @@ module.exports = {
 		page: {
 			GET: 'visitPageSettings',
 			PATCH: 'modifyPageSettings'
+		},
+		exam: {
+			GET: 'visitExamSettings',
+			PATCH: 'modifyExamSettings'
 		}
 	},
 	systemInfo: {
