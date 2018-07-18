@@ -97,7 +97,7 @@ photoSchema.pre('save', async function(next) {
 	const UsersPersonalModel = require('./UsersPersonalModel');
 	const userPersonal = await UsersPersonalModel.findOnly({uid});
 	const authLevel = await userPersonal.getAuthLevel();
-	if(type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
+	if(type !== 'fund' && type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
 		await this.remove();
 		return next(new Error('正在等待审核，请勿修改图片！'));
 	}
@@ -128,7 +128,7 @@ photoSchema.methods.removeReference = async function() {
 	const UsersPersonalModel = require('./UsersPersonalModel');
 	const {type, uid} = this;
 	const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-	if(type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
+	if(type !== 'fund' && type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
 		await this.remove();
 		return next(new Error('正在等待审核，请勿修改图片！'));
 	}

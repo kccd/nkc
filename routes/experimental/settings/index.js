@@ -13,6 +13,7 @@ const logRouter = require('./log');
 const numberRouter = require('./number');
 const homeRouter = require('./home');
 const pageRouter = require('./page');
+const examRouter = require('./exam');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -32,5 +33,6 @@ settingRouter
   .use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
   .use('/log', logRouter.routes(), logRouter.allowedMethods())
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
+	.use('/exam', examRouter.routes(), examRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
 module.exports = settingRouter;

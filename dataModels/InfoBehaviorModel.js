@@ -4,7 +4,7 @@ const infoBehaviorSchema = new Schema({
 	toc: {
 		type: Date,
 		index: 1,
-		default: Date.now()
+		default: Date.now
 	},
 	pid: {
 		type: String,

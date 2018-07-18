@@ -8,6 +8,7 @@ const settings = [
 	'log',
 	'download',
 	'home',
+	'exam',
 	'page'
 ];
 const defaultSettings = settings.map(n => {

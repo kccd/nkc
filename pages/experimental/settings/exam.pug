@@ -1,0 +1,26 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  title 考试设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .form-horizontal.formula
+          .form-group
+            .col-sm-2.control-label 未通过A卷每天回复数限制
+            .col-sm-3
+              span.text-danger -1: 无限制；0：不允许；正整数：相应条数
+              input.form-control#volumeAFailedPostCountOneDay(type='number' value=data.examSettings.volumeAFailedPostCountOneDay)
+          .form-group
+            .col-sm-2.control-label
+            .col-sm-3
+              button.btn.btn-primary(onclick='saveExamSettings()') 保存
+
+block scripts
+
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/exam.js?v=${global.NKC.startTime}`)

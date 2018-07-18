@@ -5,7 +5,7 @@ router
 		const {nkcModules, query, data, db} = ctx;
 		const {page=0} = query;
 		const q = {
-			'status.submitted': {$ne: true}
+			'useless': 'giveUp'
 		};
 		const count = await db.FundApplicationFormModel.count(q);
 		const paging = nkcModules.apiFunction.paging(page, count);
@@ -18,7 +18,7 @@ router
 		data.paging = paging;
 		data.applicationForms = applicationForm;
 		ctx.template = 'fund/applicationFormsList.pug';
-		data.type = 'unSubmit';
+		data.type = 'giveUp';
 		await next();
 	});
 module.exports = router;

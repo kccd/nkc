@@ -380,7 +380,19 @@ applicationRouter
 		await applicationForm.save();
 		await next();
 	})
-
+	.post('/:_id', async (ctx, next) => {
+		const {data, body} = ctx;
+		const {operation} = body;
+		const {applicationForm} = data;
+		const {fund} = applicationForm;
+		if(!fund.ensureOperatorPermission('admin', data.user)) {
+			ctx.throw(403, '权限不足');
+		}
+		if(operation === 'restore' && applicationForm.useless === 'giveUp') {
+			await applicationForm.update({useless: null});
+		}
+		await next();
+	})
 	.use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods())
 	.use('/:_id/remittance', remittanceRouter.routes(), remittanceRouter.allowedMethods())
 	.use('/:_id/report', reportRouter.routes(), reportRouter.allowedMethods())
