@@ -37,6 +37,8 @@ function addAddressElement(obj, i) {
 	div.find('.alipay').val(obj.alipay).attr('id', 'alipay'+i);
 	div.find('.username').val(obj.username).attr('id', 'username'+i);
 	div.find('button.btn.btn-danger').attr('data-i', i);
+	div.find('.accountHolder').val(obj.accountHolder).attr('id', 'accountHolder'+i);
+	div.find('.alipayHolder').val(obj.alipayHolder).attr('id', 'alipayHolder'+i);
 	return div;
 }
 
@@ -84,6 +86,8 @@ function load() {
 		addresses[i].alipay = $('#alipay'+i).val();
 		addresses[i].bankName = $('#bankName'+i).val();
 		addresses[i].bankCardNumber = $('#bankCardNumber'+i).val();
+		addresses[i].accountHolder = $('#accountHolder'+i).val();
+		addresses[i].alipayHolder = $('#alipayHolder'+i).val();
 	}
 }
 

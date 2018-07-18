@@ -242,41 +242,71 @@ block content
                       .col-xs-12.col-md-12
                         - var hasMobile = data.user.authLevel > 0;
                         //- if hasMobile && data.user.volumeA
+
+                        // 回复的输入面板
+                        mixin inputPanel
+                          .form-group
+                            div#quoteContent
+                          .form-group
+                            div#quoteCancel(style='display: none')
+                              button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+                          .form-group
+                            div#ReplyContent
+                          .form-inline
+                            .form-group
+                              button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
+                              button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
+
+                            .checkbox-inline
+                              label
+                                input#ParseURL(type='checkbox' checked)
+                                | 处理URL
+
+                            if 0
+                              .form-group
+                                button#WiderArea.hidden-xs.btn.btn-default(onclick='widerArea()') 拓展
+                            //- include twemoji.pug
+                            .form-group
+                              button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
+                          .form-group
+                          .nkcpanel(id='file-uploading' target='/r')
+                            //uploader section
+                            include ../interface_attachment_uploader_uploader.pug
+
+                          .panel.panel-default
+                            .panel-heading 我的附件（点击插入帖子）
+                            .panel-body(id='list-container')
+
+
                         if hasMobile
                           if !thread.closed
-                            //- .form-group
-                            //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
-                            .form-group
-                              div#quoteContent
-                            .form-group
-                              div#quoteCancel(style='display: none')
-                                button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-                            .form-group
-                              div#ReplyContent
-                            .form-inline
-                              .form-group
-                                button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
-                                button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
-
-                              .checkbox-inline
-                                label
-                                  input#ParseURL(type='checkbox' checked)
-                                  | 处理URL
-
-                              if 0
-                                .form-group
-                                  button#WiderArea.hidden-xs.btn.btn-default(onclick='widerArea()') 拓展
-                              //- include twemoji.pug
-                              .form-group
-                                button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
-                            .form-group
-                            .nkcpanel(id='file-uploading' target='/r')
-                              //uploader section
-                              include ../interface_attachment_uploader_uploader.pug
-
-                            .panel.panel-default
-                              .panel-heading 我的附件（点击插入帖子）
-                              .panel-body(id='list-container')
+                            if !data.user.volumeA
+                              -const volumeAFailedPostCountOneDay = data.examSettings.volumeAFailedPostCountOneDay;
+                              if volumeAFailedPostCountOneDay === -1
+                                // 对未通过A卷的用户回复不做限制
+                                +inputPanel
+                              else if volumeAFailedPostCountOneDay === 0
+                                .text-danger
+                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，暂不能发表文章和回复。`
+                                  .h4
+                                    a(href='/exam' target='_blank') 点击这里参加考试
+                              else if data.userPostCountToday >= data.examSettings.volumeAFailedPostCountOneDay
+                                .text-danger
+                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${data.examSettings.volumeAFailedPostCountOneDay}条回复，且不能发表文章。`
+                                  .h4= `今日已发表${data.userPostCountToday}条回复，`
+                                    a(href='/exam' target='_blank') 点击这里参加考试
+                                    span ，通过后将获得更多发言权限。
+                              else
+                                //- .form-group
+                                //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
+                                // 未通过A卷考试的用户能看到提示
+                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${data.examSettings.volumeAFailedPostCountOneDay}条回复，且不能发表文章。`
+                                  div=`今日已发表${data.userPostCountToday}条回复，`
+                                    a(href='/exam' target='_blank') 点击这里参加考试
+                                    span ，通过后将获得更多发言权限。
+                                +inputPanel
+                            else
+                              +inputPanel
                           else
                             .col-xs-12.col-md-12(style='margin: 2rem 0;')
                               .h4.text-center(style='color: #aaaaaa;')
@@ -285,7 +315,7 @@ block content
 
                       include ../exam_notification.pug
 
-                    if !data.user
+                    else
                       .col-xs-12.col-md-12
                         :markdown
                           想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
