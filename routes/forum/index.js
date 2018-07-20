@@ -25,7 +25,6 @@ forumRouter
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
 		data.navbar = {highlight: 'forums'};
-		console.log(data)
     await next();
   })
 	.post('/', async (ctx, next) => {
