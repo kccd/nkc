@@ -98,6 +98,9 @@ module.exports = {
 				GET: 'visitSubscribeForums',
 				POST: 'submitSubscribeForums'
 			}
+		},
+		bills: {
+			GET: 'visitUserBills'
 		}
 	}
 };

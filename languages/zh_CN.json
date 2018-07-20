@@ -289,6 +289,7 @@
     "rollbackPost": "post回滚",
     "visitUnSubmitFundApplicationList": "查看未提交的基金申请",
     "restoreFundApplicationForm": "恢复被放弃的基金申请",
-    "visitGiveUpFundApplicationList": "查看被放弃的基金申请"
+    "visitGiveUpFundApplicationList": "查看被放弃的基金申请",
+    "visitUserBills": "查看用户有关基金的账单"
   }
 }
