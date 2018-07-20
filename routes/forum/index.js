@@ -23,7 +23,8 @@ forumRouter
 		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
-    data.navbar = {highlight: 'forums'};
+		data.navbar = {highlight: 'forums'};
+		console.log(data)
     await next();
   })
 	.post('/', async (ctx, next) => {
