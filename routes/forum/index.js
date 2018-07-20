@@ -19,8 +19,9 @@ forumRouter
 	    rolesId,
 	    uid: user?user.uid: ''
     };
-		const forums = await db.ForumModel.visibleForums(options);
-		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+		let forums = await db.ForumModel.visibleForums(options);
+		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+		data.forums = forums.map(forum => forum.toObject());
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
 		data.navbar = {highlight: 'forums'};
