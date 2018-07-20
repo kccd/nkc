@@ -153,7 +153,10 @@ const forumSchema = new Schema({
     required: true,
     index: 1
   }
-});
+}, {toObject: {
+		getters: true,
+		virtuals: true
+}});
 
 forumSchema.virtual('moderatorUsers')
 	.get(function() {

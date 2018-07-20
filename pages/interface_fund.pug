@@ -49,7 +49,7 @@ block content
               h2.text-center 资助中
               -applicationForms = data.funding;
               include interface_fund_applicationList
-            if data.excellent.length !== 0
+            if data.completed.length !== 0
               h2.text-center 已完成
               -applicationForms = data.completed;
               include interface_fund_applicationList
