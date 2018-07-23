@@ -117,6 +117,14 @@ postSchema.pre('save' , function(next) {
   next();
 });
 
+postSchema.virtual('reason')
+	.get(function() {
+		return this._reason
+	})
+	.set(function(reason) {
+		this._reason = reason
+	});
+
 postSchema.virtual('user')
   .get(function() {
     return this._user
