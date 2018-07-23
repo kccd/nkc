@@ -157,6 +157,13 @@ threadSchema.virtual('user')
   .set(function(u) {
     this._user = u;
   });
+threadSchema.virtual('reason')
+	.get(function() {
+		return this._reason
+	})
+	.set(function(reason) {
+		this._reason = reason;
+	});
 threadSchema.methods.extendFirstPost = async function() {
   const PostModel = mongoose.model('posts');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})
