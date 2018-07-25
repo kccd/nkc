@@ -144,6 +144,9 @@ const settingSchema = new Schema({
 	// 考试
 	// ---------------------------------------
 	volumeAFailedPostCountOneDay: Number,
+
+	// 专业
+	defaultForumsId: [String],
 },
 {toObject: {
   getters: true,

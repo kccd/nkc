@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const loginRouter = require('./login');
+// const loginRouter = require('./login');
 const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
@@ -53,7 +53,7 @@ otherRouter
 		}
 		return ctx.redirect(`/`);
 	})
-  .use('login', loginRouter.routes(), loginRouter.allowedMethods())
+  // .use('login', loginRouter.routes(), loginRouter.allowedMethods())
 	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
