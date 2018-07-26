@@ -4,6 +4,8 @@ const captcha = require('trek-captcha');
 registerRouter
   .get(['/','/mobile'], async (ctx, next) => {
   	const {data, query} = ctx;
+  	const {user} = data;
+  	if(user && user.username) ctx.throw(403, '您已注册成功并且设置过用户名和密码');
 		const {code} = query;
 		if(code) {
 			data.regCode = code;
@@ -70,7 +72,7 @@ registerRouter
 		const {data, db, body} = ctx;
 		const {user} = data;
 		const {username, password} = body;
-		if(user.username) ctx.throw(403, '您已完善了该信息。');
+		if(user.username) ctx.throw(403, '您已设置过用户名和密码。');
 		if(!username) ctx.throw(400, '用户名不能为空。');
 		const {contentLength, checkPass} = ctx.tools.checkString;
 		if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');

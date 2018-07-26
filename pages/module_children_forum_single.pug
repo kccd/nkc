@@ -33,7 +33,10 @@
       if (!forum.childrenForums || forum.childrenForums.length === 0)
         label
           .icheckbox
-            input(type='checkbox' name='selectForum' data-fid=forum.fid)
+            if data.targetUser && forum.followersId.includes(data.targetUser.uid)
+              input(type='checkbox' name='selectForum' data-fid=forum.fid checked=true)
+            else
+              input(type='checkbox' name='selectForum' data-fid=forum.fid)
   -klass = ' col-xs-12 col-sm-6 col-md-6 hidden-xs';
   if selectBox
     -klass = ' col-xs-11 col-sm-5 col-md-6 hidden-xs';

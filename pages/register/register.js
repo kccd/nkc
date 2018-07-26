@@ -49,11 +49,12 @@ $(function() {
 				}
 				var obj = {
 					nationCode: app.nationCode,
-					mobile: app.mobile
+					mobile: app.mobile,
+					code: app.code
 				};
 				nkcAPI('/register', 'POST', obj)
 					.then(function() {
-						window.location.href = '/register/information';
+						window.location.reload();
 					})
 					.catch(function(data) {
 						app.warning.error = data.error || data;

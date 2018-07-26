@@ -18,8 +18,12 @@ block content
       .login-input-panel
         .row
           .col-xs-12.col-md-12
-            div.site-name 科创
-            p.site-description=data.serverSettings.brief
+            if !data.user
+              div.site-name 科创
+              p.site-description=data.serverSettings.brief
+            else
+              div.site-name 注册成功
+              p.site-description 请完善以下信息
           .col-xs-12.col-md-12
             .form
               if !data.user
@@ -48,7 +52,7 @@ block content
                   input.minimalist-input.form-control(@click='clearWarning' type='password' placeholder='密码' v-model.trim="password")
                 .form-group
                   .input-warning(v-if="warning.password1") {{warning.password1}}
-                  input.minimalist-input.form-control(@click='clearWarning' type='password' placeholder='重复密码' v-model.trim="password1")
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit1' type='password' placeholder='重复密码' v-model.trim="password1")
                 .form-group
                   div(style='margin: 0.5rem 0;color: #d9534f;') {{warning.error}}
                   button.btn.btn-danger.btn-block.minimalist-button(@click='submit1') {{btnText1}}
