@@ -18,13 +18,61 @@ registerRouter
 	  });
 		await next();
   })
-  .post('/mobile', async (ctx, next) => { // 手机注册
+  .post('/', async (ctx, next) => { // 手机注册
 	  const {db, body} = ctx;
-		const {username, password, mobile, mcode, nationCode, imgCode} = body;
-		const regIP = ctx.address;
-		const regPort = ctx.port;
-		if(!username) ctx.throw(400, '请输入用户名。');
-	  const {contentLength, checkPass} = ctx.tools.checkString;
+	  let user;
+	  const {mobile, nationCode, code} = body;
+	  if(!nationCode) ctx.throw(400, '请选择国家区号');
+	  if(!mobile) ctx.throw(400, '请输入手机号');
+	  if(!code) ctx.throw(400, '请输入验证码');
+	  const userPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
+	  if(userPersonal) ctx.throw(400, '手机号码已被其他用户注册。');
+	  const option = {
+		  type: 'register',
+		  mobile,
+		  code,
+		  nationCode
+	  };
+	  const smsCode = await db.SmsCodeModel.ensureCode(option);
+	  await smsCode.update({used: true});
+	  option.regIP = ctx.address;
+	  option.regPort = ctx.port;
+	  delete option.type;
+	  user = await db.UserModel.createUser(option);
+	  const cookieStr = encodeURI(JSON.stringify({
+		  uid: user.uid,
+		  username: user.username,
+		  lastLogin: Date.now()
+	  }));
+	  ctx.cookies.set('userInfo', cookieStr, {
+		  signed: true,
+		  maxAge: ctx.settings.cookie.life,
+		  httpOnly: true
+	  });
+	  ctx.data = {
+		  cookie: ctx.cookies.get('userInfo'),
+		  introduction: 'put the cookie in req-header when using for api',
+		  user
+	  };
+	  const forumSettings = await db.SettingModel.findOnly({type: 'forum'});
+	  const {defaultForumsId=[]} = forumSettings;
+	  if(defaultForumsId.length !== 0) {
+		  for(const fid of defaultForumsId) {
+			  const forum = await db.ForumModel.findOne({fid});
+			  if(!forum) continue;
+			  await forum.update({$addToSet: {followersId: user.uid}});
+		  }
+	  }
+	  await db.UsersSubscribeModel.update({uid: user.uid}, {subscribeForums: defaultForumsId});
+	  await next();
+  })
+	.post('/information', async (ctx, next) => {
+		const {data, db, body} = ctx;
+		const {user} = data;
+		const {username, password} = body;
+		if(user.username) ctx.throw(403, '您已完善了该信息。');
+		if(!username) ctx.throw(400, '用户名不能为空。');
+		const {contentLength, checkPass} = ctx.tools.checkString;
 		if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
 		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
 		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！')
@@ -33,54 +81,32 @@ registerRouter
 		if(!password) ctx.throw(400, '请输入密码。');
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
-		if(!nationCode) ctx.throw(400, '请输入国际区号。');
-		if(!nationCode) ctx.throw(400, '请输入手机号码。');
-		const userPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
-		if(userPersonal) ctx.throw(400, '手机号码已被其他账号注册。');
-		if(!imgCode) ctx.throw(400, '请输入图片验证码。');
-		const id = ctx.cookies.get('imgCodeId');
-	  const imgCodeObj = await db.ImgCodeModel.ensureCode(id, imgCode);
-	  ctx.cookies.set('imgCodeId', '');
-		const type = 'register';
-		const smsCodeObj = {
-			nationCode,
-			mobile,
-			type,
-			code: mcode
-		};
-		const smsCode = await db.SmsCodeModel.ensureCode(smsCodeObj);
-		const userObj = {
-			username,
-			password,
-			mobile,
-			nationCode,
-			regIP,
-			regPort
-		};
-		const user = await db.UserModel.createUser(userObj);
-	  await imgCodeObj.update({used: true, uid: user.uid});
-	  smsCode.used = true;
-	  await smsCode.save();
+		const {newPasswordObject} = ctx.nkcModules.apiFunction;
+		const passwordObj = newPasswordObject(password);
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		await user.update({username, usernameLowerCase: username.toLowerCase()});
+		await userPersonal.update({hashType: passwordObj.hashType, password: passwordObj.password});
+		await db.PersonalForumModel.update({uid: user.uid}, {
+			abbr: username.slice(0.6),
+			displayName: username + '的专栏',
+			descriptionOfForum: username + '的专栏'
+		});
+		user.username = username;
+		const userInfo = ctx.cookies.get('userInfo');
+		const {lastLogin} = JSON.parse(decodeURI(userInfo));
 		const cookieStr = encodeURI(JSON.stringify({
 			uid: user.uid,
 			username: user.username,
-			lastLogin: Date.now()
+			lastLogin
 		}));
 		ctx.cookies.set('userInfo', cookieStr, {
 			signed: true,
 			maxAge: ctx.settings.cookie.life,
 			httpOnly: true
 		});
-		ctx.data = {
-			cookie: ctx.cookies.get('userInfo'),
-			introduction: 'put the cookie in req-header when using for api',
-			user
-		};
-	  /*await ctx.generateUsersBehavior({
-		  operation: 'dailyLogin'
-	  });*/
-	  await next();
-  })
+		data.cookie = ctx.cookies.get('userInfo');
+		await next();
+	})
 	.get('/code', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;

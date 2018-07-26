@@ -74,15 +74,19 @@ const userSchema = new Schema({
   },
   username: {
     type: String,
-    unique: true,
-    required: true,
-    minlength: 1,
+	  index: 1,
+	  default: '',
+    // unique: true,
+    // required: true,
+    // minlength: 1,
     maxlength: 30,
     trim: true
   },
   usernameLowerCase: {
     type: String,
-    unique: true,
+    // unique: true,
+	  index: 1,
+	  default: '',
     trim: true,
     lowercase: true
   },
@@ -475,7 +479,72 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-userSchema.statics.createUser = async (userObj) => {
+
+// 创建用户（新）
+userSchema.statics.createUser = async (option) => {
+	const SmsCodeModel = mongoose.model('smsCodes');
+	const UserModel = mongoose.model('users');
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const UsersSubscribeModel = mongoose.model('usersSubscribe');
+	const PersonalForumModel = mongoose.model('personalForums');
+	const SettingModel = mongoose.model('settings');
+	const SmsModel = mongoose.model('sms');
+
+	const userObj = Object.assign({}, option);
+
+	const toc = Date.now();
+
+	const uid = await SettingModel.operateSystemID('users', 1);
+	userObj.uid = uid;
+	userObj.toc = toc;
+	userObj.tlv = toc;
+	userObj.tlm = toc;
+	userObj.moderators = [uid];
+	userObj.certs = [];
+
+	if(userObj.mobile) userObj.certs.push('mobile');
+
+	userObj.newMessage = {
+		messages: 0,
+		at: 0,
+		replies: 0,
+		system: 0
+	};
+
+	userObj.abbr = `用户${uid}`;
+	userObj.displayName = userObj.abbr + '的专栏';
+	userObj.descriptionOfForum = userObj.abbr + '的专栏';
+
+	const user = UserModel(userObj);
+	const userPersonal = UsersPersonalModel(userObj);
+	const userSubscribe = UsersSubscribeModel(userObj);
+	const personalForum = PersonalForumModel(userObj);
+
+	try {
+		await user.save();
+		await userPersonal.save();
+		await userSubscribe.save();
+		await personalForum.save();
+		const allSystemMessages = await SmsModel.find({fromSystem: true});
+		for(let sms of allSystemMessages) {
+			const viewedUsers = sms.viewedUsers;
+			viewedUsers.push(uid);
+			await sms.update({viewedUsers});
+		}
+	} catch (error) {
+		await UserModel.remove({uid});
+		await UsersPersonalModel.remove({uid});
+		await UsersSubscribeModel.remove({uid});
+		await PersonalForumModel.remove({uid});
+		const err = new Error(`新建用户出错: ${error}`);
+		err.status = 500;
+		throw err;
+	}
+	return user;
+};
+
+// 创建用户（旧）
+userSchema.statics.createUserOld = async (userObj) => {
 	const SettingModel = mongoose.model('settings');
 	const toc = Date.now();
 	const uid = await SettingModel.operateSystemID('users', 1);

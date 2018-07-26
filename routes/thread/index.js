@@ -180,8 +180,10 @@ threadRouter
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
 		posts.map(async post => {
-			if(toDraftPostsId.includes(post.pid)) {
+			const index = toDraftPostsId.indexOf(post.pid);
+			if(index !== -1) {
 				post.todraft = true;
+				post.reason = toDraftPosts[index].reason;
 			}
 		});
 		// 加载文章所在专业位置，移动文章的选择框

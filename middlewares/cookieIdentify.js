@@ -2,16 +2,17 @@ module.exports = async (ctx, next) => {
   //cookie identification
 	const {data, db} = ctx;
   const userInfo = ctx.cookies.get('userInfo');
+
 	let userOperationsId = [], userRoles = [], userGrade;
 	if(userInfo) {
-    const {username, uid} = JSON.parse(decodeURI(userInfo));
-    const user = await db.UserModel.findOne({uid});
-    if (!user || user.username !== username) {
-      ctx.cookies.set('userInfo', '');
-      ctx.status = 401;
-      ctx.error = new Error('缓存验证失败');
-      return ctx.redirect('/login')
-    }
+		const {username, uid} = JSON.parse(decodeURI(userInfo));
+		const user = await db.UserModel.findOne({uid});
+		if (!user || user.username !== username) {
+			ctx.cookies.set('userInfo', '');
+			ctx.status = 401;
+			ctx.error = new Error('缓存验证失败');
+			return ctx.redirect('/login')
+		}
     await user.update({tlv: Date.now()});
 	  if(!user.certs.includes('default')) {
 		  user.certs.unshift('default');

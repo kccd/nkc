@@ -258,9 +258,7 @@ router
     // 专栏下的全部
     else if(tab === 'all') {
     	const q = {uid, fid: {$in: fidOfCanGetThread}};
-    	if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-				q.recycleMark = false;
-	    }
+    	const displayRecycleMarkThreads = data.userOperationsId.includes('displayRecycleMarkThreads');
     	let $sort = {};
     	if(sortby === 'tlm') {
 				$sort = {tlm: -1};
@@ -275,6 +273,7 @@ router
     	for(const log of infoLogs) {
     		const thread  = await db.ThreadModel.findOne({tid: log.tid});
     		if(thread) {
+    			if(thread.recycleMark && !displayRecycleMarkThreads) continue;
 					await thread.extendFirstPost().then(p => p.extendUser());
 					if(thread.lm) {
 						await thread.extendLastPost().then(p => p.extendUser());
