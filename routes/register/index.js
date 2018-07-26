@@ -9,7 +9,7 @@ registerRouter
 			data.regCode = code;
 		}
 		data.getCode = false;
-		ctx.template = 'interface_user_register.pug';
+		ctx.template = 'register/register.pug';
 	  const lastUrl = ctx.req.headers['referer'];
 	  ctx.cookies.set('lastUrl', lastUrl, {
 		  signed: true,

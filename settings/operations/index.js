@@ -40,6 +40,7 @@ const u = require('./user');
 const page = require('./page');
 const download = require('./download');
 const forgotPassword = require('./forgotPassword');
+const app = require('./app');
 const operationObj = {};
 
 
@@ -130,6 +131,8 @@ operationObj.operationTree = {
 		forgotPassword,
 
 		page,
+
+		app,// 手机app
 	}
 };
 module.exports = operationObj;
