@@ -9,12 +9,12 @@ loginRouter
 		await next();
 	})
 	.get('/', async (ctx, next) => {
-		ctx.template = 'interface_user_login.pug';
+		ctx.template = 'login/login.pug';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
 		const {data, db, body, tools} = ctx;
-		const {loginTpye} = body;
+		const {loginType} = body;
 		const {
 			encryptInMD5WithSalt,
 			encryptInSHA256HMACWithSalt
@@ -24,7 +24,7 @@ loginRouter
 		let userPersonal;
 		let {password, username, mobile, nationCode, code} = body;
 
-		if(!loginTpye) {
+		if(!loginType) {
 
 			// 账号+密码
 
@@ -48,7 +48,7 @@ loginRouter
 			user = users[0];
 			userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
 
-		} else if(loginTpye === 'mobile') {
+		} else if(loginType === 'mobile') {
 
 			// 手机号+密码
 
@@ -69,7 +69,7 @@ loginRouter
 			userPersonal = userPersonal[0];
 			user = await db.UserModel.findOnly({uid: userPersonal.uid});
 
-		} else if(loginTpye === 'code') {
+		} else if(loginType === 'code') {
 
 			// 手机号+短信验证码
 			if(!nationCode) {
@@ -107,7 +107,7 @@ loginRouter
 			user = await db.UserModel.findOnly({uid: userPersonal.uid});
 
 		} else {
-			ctx.throw(400, `未知的登录方式：${loginTpye}`);
+			ctx.throw(400, `未知的登录方式：${loginType}`);
 		}
 
 		if(password) {

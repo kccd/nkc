@@ -17,6 +17,7 @@ const downloadRouter = routers.download;
 const systemRouter = routers.system;
 const problemRouter = routers.problem;
 const loginRouter = routers.login;
+const appRouter = routers.app;
 
 // 所有请求先经过此中间件
 router.use('/', async (ctx, next)  => {
@@ -56,7 +57,7 @@ router.use('/', async (ctx, next)  => {
 	await next();
 });
 
-
+router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
 router.use('/me', meRouter.routes(), meRouter.allowedMethods());
