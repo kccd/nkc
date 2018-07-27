@@ -292,6 +292,11 @@
     "visitGiveUpFundApplicationList": "查看被放弃的基金申请",
     "visitUserBills": "查看用户有关基金的账单",
     "submitInformation": "注册成功后提交用户名和密码",
-    "appCheckStatus": "app检查登录状态"
+    "appCheckStatus": "app检查登录状态",
+    "visitSmsSettings": "访问短信设置",
+    "modifySmsSettings": "修改短信设置",
+    "visitExperimentalEmailSettings": "访问邮件设置",
+    "modifyEmailSettings": "修改邮件设置",
+    "sendLoginMessage": "发送登录短信验证码"
   }
 }

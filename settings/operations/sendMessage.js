@@ -10,5 +10,8 @@ module.exports = {
 	},
 	getback: {
 		POST: 'sendGetBackPasswordMessage'
+	},
+	login: {
+		POST: 'sendLoginMessage'
 	}
 };

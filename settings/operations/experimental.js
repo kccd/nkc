@@ -4,6 +4,14 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		sms: {
+			GET: 'visitSmsSettings',
+			PATCH: 'modifySmsSettings',
+		},
+		email: {
+			GET: 'visitExperimentalEmailSettings',
+			PATCH: 'modifyEmailSettings'
+		},
 		base: {
 			GET: 'visitWebBaseSettings',
 			PATCH: 'modifyWebBase'

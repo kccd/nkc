@@ -10,7 +10,8 @@ const settings = [
 	'home',
 	'exam',
 	'page',
-	'forum'
+	'forum',
+	'sms'
 ];
 const defaultSettings = settings.map(n => {
 	return require(`./${n}`);

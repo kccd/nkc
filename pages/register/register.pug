@@ -1,6 +1,9 @@
 extends ../bootstrap_base
 block title
-  title 登录
+  if data.user
+    title 完善信息
+  else
+    title 账号注册
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
   style.
@@ -12,7 +15,9 @@ block content
   mixin forgotPossword
     div.link
       a(href="/login") 账号登录
-
+    div.link
+      a(style='cursor: pointer;' @click='changeTermsStatus') 科创网及论坛统一服务协议
+        span.caret
   .container-fluid(style='max-width: 1400px;' v-cloak)#app
     .row
       .login-input-panel
@@ -56,7 +61,12 @@ block content
                 .form-group
                   div(style='margin: 0.5rem 0;color: #d9534f;') {{warning.error}}
                   button.btn.btn-danger.btn-block.minimalist-button(@click='submit1') {{btnText1}}
-                  +forgotPossword
+
+      .col-xs-12.col-md-12(v-if="showTerms")
+        div.f12(style='line-height: 1.8;')
+          include:markdown ../EULA.md
+          br
+          br
 
 
 

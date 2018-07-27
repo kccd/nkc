@@ -13,11 +13,13 @@ registerRouter
 		data.getCode = false;
 		ctx.template = 'register/register.pug';
 	  const lastUrl = ctx.req.headers['referer'];
-	  ctx.cookies.set('lastUrl', lastUrl, {
-		  signed: true,
-		  maxAge: ctx.settings.cookie.life,
-		  httpOnly: true
-	  });
+	  if(!lastUrl || !lastUrl.includes('register')) {
+		  ctx.cookies.set('lastUrl', lastUrl, {
+			  signed: true,
+			  maxAge: ctx.settings.cookie.life,
+			  httpOnly: true
+		  });
+	  }
 		await next();
   })
   .post('/', async (ctx, next) => { // 手机注册
@@ -65,7 +67,7 @@ registerRouter
 			  await forum.update({$addToSet: {followersId: user.uid}});
 		  }
 	  }
-	  await db.UsersSubscribeModel.update({uid: user.uid}, {subscribeForums: defaultForumsId});
+	  await db.UsersSubscribeModel.update({uid: user.uid}, {$set: {subscribeForums: defaultForumsId}});
 	  await next();
   })
 	.post('/information', async (ctx, next) => {
@@ -88,11 +90,11 @@ registerRouter
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		await user.update({username, usernameLowerCase: username.toLowerCase()});
 		await userPersonal.update({hashType: passwordObj.hashType, password: passwordObj.password});
-		await db.PersonalForumModel.update({uid: user.uid}, {
+		await db.PersonalForumModel.update({uid: user.uid}, {$set: {
 			abbr: username.slice(0.6),
 			displayName: username + '的专栏',
 			descriptionOfForum: username + '的专栏'
-		});
+		}});
 		user.username = username;
 		const userInfo = ctx.cookies.get('userInfo');
 		const {lastLogin} = JSON.parse(decodeURI(userInfo));

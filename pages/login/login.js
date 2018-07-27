@@ -15,6 +15,7 @@ $(function() {
 			password: '',
 			mobile: '',
 			code: '',
+			sending: false,
 			nationCodes: nationCodes,
 			nationCode: '86',
 			loginType: 'account',// mobile, code, account
@@ -126,9 +127,31 @@ $(function() {
 			clearWarning: clearWarning,
 			sendCode: function() {
 				if(app.timeNumber > 0) return;
-				app.timeNumber = 120;
-				timeOut();
+				if(!app.mobile) {
+					app.warning.mobile = '请输入手机号';
+					return;
+				}
+				if(!app.nationCode) {
+					app.warning.error = '请选择国际区号';
+					return;
+				}
+				if(app.sending) return;
+				app.sending = true;
 				// 发送短信接口
+				var obj = {
+					nationCode: app.nationCode,
+					mobile: app.mobile
+				};
+				nkcAPI('/sendMessage/login','POST', obj)
+					.then(function() {
+						app.sending = false;
+						app.timeNumber = 120;
+						timeOut();
+					})
+					.catch(function(data) {
+						app.sending = false;
+						app.warning.error = data.error || data;
+					})
 			}
 		},
 		directives: {
