@@ -13,7 +13,7 @@ block content
     div.link
       a(href="/register") 账号注册
       span &nbsp;&nbsp;&nbsp;
-      a(href="/forgotPassword") 忘记密码
+      a(href="/forgotPassword/mobile") 忘记密码
 
   .container-fluid(style='max-width: 1400px;' v-cloak)#app
     .row
@@ -27,7 +27,7 @@ block content
               div(v-show="loginType === 'account'")
                 .form-group
                   .input-warning(v-if="warning.username") {{warning.username}}
-                  input.minimalist-input.form-control(@click='clearWarning' type='text' placeholder='用户名' v-model.trim="username" :autofocus="loginType==='account'")
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='用户名' v-model.trim="username" :autofocus="loginType==='account'")
                 .form-group
                   .input-warning(v-if="warning.password") {{warning.password}}
                   input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='password' placeholder='密码' v-model.trim="password")
@@ -37,7 +37,7 @@ block content
                     option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
                 .form-group
                   .input-warning(v-if="warning.mobile") {{warning.mobile}}
-                  input.minimalist-input.form-control(@click='clearWarning' type='text' placeholder='手机号' v-model.number="mobile")
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='number' placeholder='手机号' v-model.number="mobile")
                 .form-group
                   .input-warning(v-if="warning.password") {{warning.password}}
                   input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='password' placeholder='密码' v-model.trim="password")
@@ -47,7 +47,7 @@ block content
                     option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
                 .form-group
                   .input-warning(v-if="warning.mobile") {{warning.mobile}}
-                  input.minimalist-input.form-control(@click='clearWarning' type='text' placeholder='手机号' v-model.number="mobile")
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='number' placeholder='手机号' v-model.number="mobile")
                 .form-group
                   div(style='width: 50%;display: inline-block;position: relative;')
                     .input-warning(v-if="warning.code") {{warning.code}}

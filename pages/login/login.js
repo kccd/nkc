@@ -162,7 +162,7 @@ $(function() {
 	});
 });
 
-function focus(el, {value}) {
+function focus(el, value) {
 	if(value) {
 		el.focus();
 	}
