@@ -1,8 +1,50 @@
 const Router = require('koa-router');
 const sendMessageRouter = new Router();
 sendMessageRouter
+	.post('/login', async (ctx, next) => {
+		const {db, body} = ctx;
+		const {nationCode, mobile} = body;
+		if(!nationCode) ctx.throw(400, '国际区号不能为空');
+		if(!mobile) ctx.throw(400, '手机号不能为空');
+		const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
+		if(!otherPersonal) ctx.throw(400, '暂未有用户绑定该手机号');
+		const smsCodeObj = {
+			nationCode,
+			mobile,
+			type: 'login',
+			ip: ctx.address
+		};
+		await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+		const {apiFunction, sendMessage} = ctx.nkcModules;
+		smsCodeObj.code = apiFunction.random(6);
+		const smsCode = db.SmsCodeModel(smsCodeObj);
+		await smsCode.save();
+		await sendMessage(smsCodeObj);
+		await next();
+	})
   .post('/register', async (ctx, next) => { // 手机号码注册
   	const {db, body} = ctx;
+  	const {nationCode, mobile} = body;
+  	if(!nationCode) ctx.throw(400, '国际区号不能为空');
+  	if(!mobile) ctx.throw(400, '手机号不能为空');
+  	const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
+  	if(otherPersonal) ctx.throw(400, '手机号已被其他用户注册');
+  	const smsCodeObj = {
+  		nationCode,
+		  mobile,
+		  type: 'register',
+		  ip: ctx.address
+	  };
+  	await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+  	const {apiFunction, sendMessage} = ctx.nkcModules;
+  	smsCodeObj.code = apiFunction.random(6);
+  	const smsCode = db.SmsCodeModel(smsCodeObj);
+  	await smsCode.save();
+  	await sendMessage(smsCodeObj);
+  	await next();
+
+
+  	/*const {db, body} = ctx;
 		const {nationCode, username, mobile, imgCode} = body;
 	  if(!username) ctx.throw(400, '请输入用户名。');
 	  const {contentLength} = ctx.tools.checkString;
@@ -30,7 +72,7 @@ sendMessageRouter
 		const smsCode = db.SmsCodeModel(smsCodeObj);
 	  await smsCode.save();
 		await sendMessage(smsCodeObj);
-		await next();
+		await next();*/
   })
   .post('/getback', async (ctx, next) => { // 找回密码
   	const {db, body} = ctx;

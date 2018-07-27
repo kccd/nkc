@@ -14,7 +14,7 @@ router
 		if(volumeAFailedPostCountOneDay < 0 && volumeAFailedPostCountOneDay !== -1) {
 			ctx.throw(400, '回复数设置错误');
 		}
-		await db.SettingModel.update({type: 'exam'}, {volumeAFailedPostCountOneDay});
+		await db.SettingModel.update({type: 'exam'}, {$set: {volumeAFailedPostCountOneDay}});
 		await next();
 	});
 module.exports = router;

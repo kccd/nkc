@@ -146,7 +146,36 @@ const settingSchema = new Schema({
 	volumeAFailedPostCountOneDay: Number,
 
 	// 专业
+	// ---------------------------------------
 	defaultForumsId: [String],
+
+	// 短信
+	// ---------------------------------------
+	login: {
+  	validityPeriod: Number,
+		sameIpOneDay: Number,
+		sameMobileOneDay: Number
+	},
+	register: {
+		validityPeriod: Number,
+		sameIpOneDay: Number,
+		sameMobileOneDay: Number
+	},
+	changeMobile: {
+		validityPeriod: Number,
+		sameIpOneDay: Number,
+		sameMobileOneDay: Number
+	},
+	bindMobile: {
+		validityPeriod: Number,
+		sameIpOneDay: Number,
+		sameMobileOneDay: Number
+	},
+	getback: {
+		validityPeriod: Number,
+		sameIpOneDay: Number,
+		sameMobileOneDay: Number
+	}
 },
 {toObject: {
   getters: true,

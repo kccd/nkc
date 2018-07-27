@@ -30,7 +30,7 @@ subscribeRouter
 		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
 		const {type} = body;
 		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
-		if(targetUserSubscribe.subscribeForums.length !== 0) ctx.throw(400, '您已选择过要关注的领域');
+		// if(targetUserSubscribe.subscribeForums.length !== 0) ctx.throw(400, '您已选择过要关注的领域');
 		if(type === 'subscribeForums') {
 			const {subscribeForums} = body;
 			if(subscribeForums.length > 20) ctx.throw(400, '每个用户最多只能关注20个领域。');

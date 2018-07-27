@@ -4,6 +4,12 @@
 [v-cloak] {
   display: none;
 }
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 
 /*-------------*/
 h1, h2, h3, h4, h5, p{
@@ -2757,7 +2763,8 @@ img.emoji {
   border: 1px solid #efefef;
   border-radius: 7px;
   margin: auto;
-  margin-top: 5rem;
+  margin-top: 10rem;
+  margin-bottom: 6rem;
   padding: 3.5rem 2.5rem 3rem 2.5rem;
   width: 40rem;
 }
@@ -2772,11 +2779,12 @@ img.emoji {
 }
 
 .login-input-panel .link{
-  margin: 1.5rem 0;
+  margin: 1.5rem 0 0 0;
   text-align: center;
 }
 .login-input-panel .link a{
   text-decoration: none;
+  line-height: 1rem;
   color: #aaaaaa;
 }
 .login-input-panel .link a:hover{
@@ -2834,6 +2842,7 @@ img.emoji {
   box-shadow: none;
   border-bottom: 1px solid #eaeaea;
   border-radius: unset;
+  transition: border 0.2s;
 }
 
 /*--------------*/
@@ -2922,6 +2931,7 @@ img.emoji {
   .login-input-panel{
     width: 100%;
     margin-top: 0;
+    margin-bottom: 0;
     border: none;
     border-radius: 0;
   }

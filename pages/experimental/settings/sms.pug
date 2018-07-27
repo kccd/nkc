@@ -1,0 +1,33 @@
+extends ../../bootstrap_base
+block title
+  title 短信设置
+block content
+  -const mainContainer1400 = true;
+  #data.hidden= JSON.stringify(data.smsSettings)
+  .container-fluid(style='max-width: 1400px;' v-cloak)#app
+    .row
+      include ../nav
+      //.col-xs-12.c0l-md-12
+      //  ul.nav.nav-pills
+      //    li(v-for="setting in settings" :class="{active: setting.name===type}" @click='changeSettings(setting.name)')
+      //      a(style='cursor: pointer') {{setting.name}}
+
+      .col-xs-12.col-md-4(v-for="setting in settings")
+        .form
+          .h3 {{setting.name}}
+          .form-group
+            label 验证码有效期（分钟）
+            input.form-control(type='number' v-model.number='setting.validityPeriod')
+          .form-group
+            label 同一手机号每天次数限制
+            input.form-control(type='number' v-model.number='setting.sameMobileOneDay')
+          .form-group
+            label 同一IP每天次数限制
+            input.form-control(type='number' v-model.number='setting.sameIpOneDay')
+          .form-group
+            button.btn.btn-primary(@click='submit') 保存
+block scripts
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/vue/dist/vue.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/sms.js?v=${global.NKC.startTime}`)
+

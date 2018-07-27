@@ -4,6 +4,7 @@ $(function() {
 		el: '#app',
 		data: {
 			warning: {
+				error: '',
 				mobile: '',
 				code: '',
 				username: '',
@@ -19,15 +20,43 @@ $(function() {
 			password1: '',
 			username: '',
 			btnText: '注册',
-			btnText1: '提交'
+			btnText1: '提交',
+			sending: false,
+			showTerms: false,
 		},
 		methods: {
+			changeTermsStatus: function() {
+				app.showTerms = !app.showTerms;
+			},
 			clearWarning: clearWarning,
 			sendCode: function() {
 				if(app.timeNumber > 0) return;
-				app.timeNumber = 120;
-				timeOut();
+				if(!app.mobile) {
+					app.warning.mobile = '请输入手机号';
+					return;
+				}
+				if(!app.nationCode) {
+					app.warning.error = '请选择国际区号';
+					return;
+				}
+				if(app.sending) return;
+				app.sending = true;
 				// 发送短信接口
+				var obj = {
+					nationCode: app.nationCode,
+					mobile: app.mobile
+				};
+				nkcAPI('/sendMessage/register','POST', obj)
+					.then(function() {
+						app.sending = false;
+						app.timeNumber = 120;
+						timeOut();
+					})
+					.catch(function(data) {
+						app.sending = false;
+						app.warning.error = data.error || data;
+					})
+
 			},
 			submit: function() {
 				if(app.btnText !== '注册') return;
@@ -49,11 +78,12 @@ $(function() {
 				}
 				var obj = {
 					nationCode: app.nationCode,
-					mobile: app.mobile
+					mobile: app.mobile,
+					code: app.code
 				};
 				nkcAPI('/register', 'POST', obj)
 					.then(function() {
-						window.location.href = '/register/information';
+						window.location.reload();
 					})
 					.catch(function(data) {
 						app.warning.error = data.error || data;
