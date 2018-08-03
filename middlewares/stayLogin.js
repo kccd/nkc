@@ -5,8 +5,7 @@ module.exports = async (ctx, next) => {
 	// cookie
 	const userInfo = ctx.cookies.get('userInfo');
 	// app
-	const loginUid = ctx.request.get('loginUid');
-	const loginKey = ctx.request.get('loginKey');
+	const {loginUid, loginKey} = ctx.query || [];
 
 	let userOperationsId = [], userRoles = [], userGrade = [];
 

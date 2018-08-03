@@ -17,7 +17,8 @@ loginRouter
 		const {loginType} = body;
 		const {
 			encryptInMD5WithSalt,
-			encryptInSHA256HMACWithSalt
+			encryptInSHA256HMACWithSalt,
+			aesEncode
 		} = tools.encryption;
 
 		let user;
@@ -149,6 +150,7 @@ loginRouter
 
 		}
 
+		await user.extendGrade();
 
 		//sign the cookie
 		const cookieStr = encodeURI(JSON.stringify({
@@ -166,6 +168,11 @@ loginRouter
 			introduction: 'put the cookie in req-header when using for api',
 			user
 		};
+
+		const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
+		const loginUid = user.uid;
+		ctx.data.loginKey = loginKey;
+		ctx.data.loginUid = loginUid;
 		/*await ctx.generateUsersBehavior({
 			operation: 'dailyLogin'
 		});*/

@@ -29,6 +29,7 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else if(type === 'json' && from === 'nkcAPI') {
 	    ctx.type = 'json';
+	    if(ctx.data.user) ctx.data.user = ctx.data.user.toObject();
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';

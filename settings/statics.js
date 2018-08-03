@@ -11,6 +11,7 @@ const defaultThumbnailPath = defaultPath + '/default_thumbnail.png';
 const siteSpecificPath = path.resolve('resources/site_specific');
 const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
+const defaultUserBannerPath = defaultPath + '/default_user_banner.jpg';
 module.exports = {
 	siteSpecificPath,
   watermark,
@@ -21,7 +22,8 @@ module.exports = {
   defaultAvatarPath,
   defaultAvatarSmallPath,
   defaultThumbnailPath,
-  defaultPath,
+	defaultUserBannerPath,
+	defaultPath,
   defaultAdPath,
   defaultImageResourcePath,
 };
