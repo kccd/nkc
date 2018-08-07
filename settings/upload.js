@@ -107,5 +107,9 @@ module.exports = {
 	lifePhotoCount: 16,
 	certPhotoCount: 12,
 	webLogoSize: 250,
-	webSmallLogoSize: 50
+	webSmallLogoSize: 50,
+	userBannerSize: {
+  	height: 400,
+		width: 800
+	}
 };

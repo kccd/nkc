@@ -104,7 +104,7 @@ module.exports = {
 		},
 		banner: {
 			GET: 'getUserBanner',
-			PATCH: 'modifyUserBanner'
+			POST: 'modifyUserBanner'
 		}
 	}
 };

@@ -20,26 +20,31 @@ module.exports = async (ctx, next) => {
 			ctx.error = new Error('缓存验证失败');
 			return ctx.redirect('/login');
 		}
-		console.log(`username: ${username}`);
 	} else if(loginUid && loginKey) {
 		const {aesDecode} = ctx.tools.encryption;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: loginUid});
-		const uid = aesDecode(loginKey, userPersonal.password.hash);
-		if(uid === loginUid) {
-			user = await db.UserModel.findOne({uid});
+		let uid;
+		try{
+			const userPersonal = await db.UsersPersonalModel.findOne({uid: loginUid});
+			uid = aesDecode(loginKey, userPersonal.password.hash);
+			if(uid === loginUid) {
+				user = await db.UserModel.findOne({uid});
 
-			// 设置cookie
-			const cookieStr = encodeURI(JSON.stringify({
-				uid: user.uid,
-				username: user.username,
-				lastLogin: Date.now()
-			}));
-			ctx.cookies.set('userInfo', cookieStr, {
-				signed: true,
-				maxAge: ctx.settings.cookie.life,
-				httpOnly: true
-			});
+				// 设置cookie
+				const cookieStr = encodeURI(JSON.stringify({
+					uid: user.uid,
+					username: user.username,
+					lastLogin: Date.now()
+				}));
+				ctx.cookies.set('userInfo', cookieStr, {
+					signed: true,
+					maxAge: ctx.settings.cookie.life,
+					httpOnly: true
+				});
+			}
+		} catch(err) {
+			// console.log(err);
 		}
+
 
 	}
 
