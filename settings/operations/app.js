@@ -1,5 +1,8 @@
 module.exports = {
 	me: {
-		GET: 'getLoginUserInfo'
-	}
+		GET: 'getLoginUserInfo',
+		personal: {
+			GET: 'getLoginUserPersonal'
+		}
+	},
 };

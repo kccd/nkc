@@ -264,7 +264,13 @@ const usersPersonalSchema = new Schema({
 		}
 	}
 },
-  {usePushEach: true});
+  {
+  	usePushEach: true,
+	  toObject: {
+		  getters: true,
+		  virtuals: true
+	  }
+});
 
 usersPersonalSchema.virtual('idPhotos')
 	.get(function() {
