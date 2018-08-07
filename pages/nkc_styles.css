@@ -1,4 +1,6 @@
-
+html {
+  font-size: 12px;
+}
 /*   vue.js   */
 
 [v-cloak] {
@@ -2766,7 +2768,7 @@ img.emoji {
   margin-top: 10rem;
   margin-bottom: 6rem;
   padding: 3.5rem 2.5rem 3rem 2.5rem;
-  width: 40rem;
+  width: 37rem;
 }
 .login-input-panel .input-warning{
   position: absolute;
@@ -2796,7 +2798,7 @@ img.emoji {
 .login-input-panel .login-type-text{
   text-align: center;
   color: #888888;
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin-top: 12px;
 }
 .login-input-panel .login-type-btn{
@@ -2836,12 +2838,12 @@ img.emoji {
 }
 .minimalist-input{
   height: 4rem;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   border: none;
   webkit-box-shadow: none;
   box-shadow: none;
   border-bottom: 1px solid #eaeaea;
-  border-radius: unset;
+  border-radius: 0;
   transition: border 0.2s;
 }
 

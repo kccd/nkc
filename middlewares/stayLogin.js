@@ -5,8 +5,7 @@ module.exports = async (ctx, next) => {
 	// cookie
 	const userInfo = ctx.cookies.get('userInfo');
 	// app
-	const loginUid = ctx.request.get('loginUid');
-	const loginKey = ctx.request.get('loginKey');
+	const {loginUid, loginKey} = ctx.query || [];
 
 	let userOperationsId = [], userRoles = [], userGrade = [];
 
@@ -23,23 +22,29 @@ module.exports = async (ctx, next) => {
 		}
 	} else if(loginUid && loginKey) {
 		const {aesDecode} = ctx.tools.encryption;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: loginUid});
-		const uid = aesDecode(loginKey, userPersonal.password.hash);
-		if(uid === loginUid) {
-			user = await db.UserModel.findOne({uid});
+		let uid;
+		try{
+			const userPersonal = await db.UsersPersonalModel.findOne({uid: loginUid});
+			uid = aesDecode(loginKey, userPersonal.password.hash);
+			if(uid === loginUid) {
+				user = await db.UserModel.findOne({uid});
 
-			// 设置cookie
-			const cookieStr = encodeURI(JSON.stringify({
-				uid: user.uid,
-				username: user.username,
-				lastLogin: Date.now()
-			}));
-			ctx.cookies.set('userInfo', cookieStr, {
-				signed: true,
-				maxAge: ctx.settings.cookie.life,
-				httpOnly: true
-			});
+				// 设置cookie
+				const cookieStr = encodeURI(JSON.stringify({
+					uid: user.uid,
+					username: user.username,
+					lastLogin: Date.now()
+				}));
+				ctx.cookies.set('userInfo', cookieStr, {
+					signed: true,
+					maxAge: ctx.settings.cookie.life,
+					httpOnly: true
+				});
+			}
+		} catch(err) {
+			// console.log(err);
 		}
+
 
 	}
 

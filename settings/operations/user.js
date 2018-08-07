@@ -101,6 +101,10 @@ module.exports = {
 		},
 		bills: {
 			GET: 'visitUserBills'
+		},
+		banner: {
+			GET: 'getUserBanner',
+			POST: 'modifyUserBanner'
 		}
 	}
 };

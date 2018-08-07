@@ -18,7 +18,7 @@ const photoSmallPath = path.resolve('resources/photo_small');
 const fundBannerPath = path.resolve('resources/fundBanner');
 const fundLogoPath = path.resolve('resources/fundLogo');
 const webLogoPath = path.resolve('resources/logo');
-
+const userBannerPath = path.resolve('resources/user_banners');
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -100,11 +100,16 @@ module.exports = {
 	fundBannerPath,
 	fundLogoPath,
 	webLogoPath,
+	userBannerPath,
   avatarSize: 192,
 	forumAvatarSize: 96,
   avatarSmallSize: 48,
 	lifePhotoCount: 16,
 	certPhotoCount: 12,
 	webLogoSize: 250,
-	webSmallLogoSize: 50
+	webSmallLogoSize: 50,
+	userBannerSize: {
+  	height: 400,
+		width: 800
+	}
 };

@@ -1,5 +1,5 @@
 module.exports = {
 	me: {
-		GET: 'appCheckStatus'
+		GET: 'getLoginUserInfo'
 	}
 };
