@@ -1,5 +1,11 @@
 module.exports = {
 	me: {
-		GET: 'getLoginUserInfo'
+		GET: 'APPgetLoginUserInfo',
+		personal: {
+			GET: 'APPgetLoginUserPersonal'
+		}
+	},
+	thread: {
+		GET: 'APPgetThreadInfo'
 	}
 };
