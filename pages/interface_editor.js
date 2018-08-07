@@ -65,7 +65,6 @@ $("document").ready(function(){
           var data = {
             loadsrc : newSrc
           }
-          // console.log("---------发送url-----------",'\n',newSrc)
           var newimgstr = $(this)
           
           nkcAPI("/download", "POST", data)
