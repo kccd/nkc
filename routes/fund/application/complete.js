@@ -87,7 +87,7 @@ completeRouter
 		const {fund, completedAudit} = applicationForm;
 		if(!completedAudit) ctx.throw(403,'抱歉！申请人暂未提交结题申请。');
 		if(!fund.ensureOperatorPermission('expert', user) && !fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您没有资格进行结题审核。');
-		data.report = await db.FundDocumentModel.findOne({type: 'completedReport'}).sort({toc: -1}).limit(1);
+		data.report = await db.FundDocumentModel.findOne({type: 'completedReport', applicationFormId: applicationForm._id}).sort({toc: -1}).limit(1);
 		data.nav = '结题审核';
 		await next();
 	})

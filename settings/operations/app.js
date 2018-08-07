@@ -6,6 +6,9 @@ module.exports = {
 		}
 	},
 	thread: {
-		GET: 'APPgetThreadInfo'
+		GET: 'APPgetThreadInfo',
+		PARAMETER: {
+			GET: 'APPvisitThread'
+		}
 	}
 };
