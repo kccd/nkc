@@ -21,7 +21,6 @@ module.exports = async (ctx, next) => {
 			ctx.error = new Error('缓存验证失败');
 			return ctx.redirect('/login');
 		}
-		console.log(`username: ${username}`);
 	} else if(loginUid && loginKey) {
 		const {aesDecode} = ctx.tools.encryption;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: loginUid});

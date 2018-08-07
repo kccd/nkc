@@ -40,7 +40,7 @@ $("document").ready(function(){
 
   $("#content_test").on("paste", function(){
     function test(){
-      $("#text-elem img").each(function(){
+      $("#text-elem img[srcs]").each(function(){
         // 获取当前图片url
         if(!$(this).attr("srcs")){
           return true
@@ -53,21 +53,12 @@ $("document").ready(function(){
           $(this).replaceWith(ownImage)
           return true;
         }
-        // 使用正在下载图片替换当前图片
-        //$(this).attr("src","/resources/site_specific/picupload.png")
-        // console.log("newSrc",newSrc)
         // 判断图片是不是系统图片
         var sysimg = new RegExp("file:").test(newSrc)
         // 如果是系统图片，则不向下执行
         if(sysimg == true){
           var elemImg = "<img src='/resources/site_specific/picdefault.png'>"
           $(this).replaceWith(elemImg)
-          // console.log("图片无法加载")
-          // await $(this).on("error",function(){
-          //   var elemImg = "<img src='./picpass.png'>"
-          //   $(this).replaceWith(elemImg)
-          //   console.log("图片无法加载")
-          // })
           return true
         }
         if(newSrc.length > 10){
