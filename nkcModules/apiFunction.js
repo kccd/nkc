@@ -1,4 +1,6 @@
 const settings = require('../settings');
+const moment = require('moment');
+moment.locale('zh-cn');
 let {perpage} = settings.paging;
 let fn = {};
 fn.paging = (page, arrLength) => {
@@ -200,6 +202,10 @@ fn.dayCountOfOneYear = (year) => {
 	const c = year%400;
 	if((a === 0 && b !== 0) || c === 0) return 366;
 	return 365;
+};
+
+fn.fromNow = (time) => {
+	return moment(time).fromNow();
 };
 
 module.exports = fn;

@@ -23,7 +23,7 @@ registerRouter
 		await next();
   })
   .post('/', async (ctx, next) => { // 手机注册
-	  const {db, body} = ctx;
+	  const {db, data, body, tools} = ctx;
 	  let user;
 	  const {mobile, nationCode, code} = body;
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
@@ -68,6 +68,8 @@ registerRouter
 		  }
 	  }
 	  await db.UsersSubscribeModel.update({uid: user.uid}, {$set: {subscribeForums: defaultForumsId}});
+	  const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);
 	  await next();
   })
 	.post('/information', async (ctx, next) => {
