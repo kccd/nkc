@@ -297,11 +297,12 @@
     "visitExperimentalEmailSettings": "访问邮件设置",
     "modifyEmailSettings": "修改邮件设置",
     "sendLoginMessage": "发送登录短信验证码",
-
-    "getLoginUserInfo": "app获取登录用户信息",
-    "getLoginUserPersonal": "app获取登录用户私密信息",
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",
     "APPgetUserThreads": "app获取用户的文章"
+    "APPgetLoginUserInfo": "app获取登录用户信息",
+    "APPgetLoginUserPersonal": "app获取登录用户私密信息",
+    "APPgetThreadInfo": "app获取帖子",
+    "APPvisitThread": "app查看帖子"
   }
 }

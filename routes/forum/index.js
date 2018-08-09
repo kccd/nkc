@@ -24,7 +24,7 @@ forumRouter
 		data.forums = forums.map(forum => forum.toObject());
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
-    data.navbar = {highlight: 'forums'};
+		data.navbar = {highlight: 'forums'};
     await next();
   })
 	.post('/', async (ctx, next) => {

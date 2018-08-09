@@ -1,8 +1,8 @@
 module.exports = {
 	me: {
-		GET: 'getLoginUserInfo',
+		GET: 'APPgetLoginUserInfo',
 		personal: {
-			GET: 'getLoginUserPersonal'
+			GET: 'APPgetLoginUserPersonal'
 		}
 	},
 	u: {
@@ -14,6 +14,12 @@ module.exports = {
 			threads: {
 				GET: 'APPgetUserThreads'
 			}
+		}
+	},
+	thread: {
+		GET: 'APPgetThreadInfo',
+		PARAMETER: {
+			GET: 'APPvisitThread'
 		}
 	}
 };
