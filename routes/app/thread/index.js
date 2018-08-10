@@ -15,11 +15,21 @@ theradRouter
 		// 统计post总数
 		const count = await db.PostModel.count({tid});
 		// 查询该文章下的所有post
-		const posts = await db.PostModel.find({tid});
+		const posts = await db.PostModel.find({tid}).sort({toc: 1}).skip(1);
 		await Promise.all(posts.map(async post => {
 			await post.extendUser().then(u => u.extendGrade());
 			await post.extendResources();
 		}));
+		let newPosts = []
+		for(let post of posts){
+			if(post.disabled === true){
+				continue;
+			}
+			post = post.toObject();
+			post.headPic = "http://www.kechuang.org/avatar/" + post.uid;
+			post.c = nkcModules.APP_nkc_render.experimental_render(post);
+			newPosts.push(post)
+		}
 		data.targetUser = await thread.extendUser();
 		// 文章访问量加1
     await thread.update({$inc: {hits: 1}});
@@ -31,7 +41,7 @@ theradRouter
 		await thread.extendLastPost();
 		thread.firstPost.c = nkcModules.APP_nkc_render.experimental_render(thread.firstPost)
 		// console.log(thread.firstPost.c)
-    data.thread = thread
+		data.thread = thread;
 
 		// 加载收藏
 		data.collected = false;
@@ -52,10 +62,9 @@ theradRouter
 			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
     }
     data.replyTarget = `t/${tid}`;
-    data.posts = posts
+		data.posts = newPosts;
 		data.forum = forum;    
 		data.thread = data.thread.toObject();
-		console.log(data)
 		await next();
 	});
 module.exports = theradRouter;
