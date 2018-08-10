@@ -449,7 +449,6 @@ function APP_nkc_render(options){
       .replace(/  /g,'&nbsp&nbsp')
       .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
       html = attachment_filter(html,post)
-      console.log(html)
       // now post.r are marked with _used:true
     }
     else{
