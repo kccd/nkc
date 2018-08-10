@@ -391,7 +391,7 @@ function APP_nkc_render(options){
       case 'webm':
       case 'ogg':
       replaced =
-      '<a href="/r/'+rid+'" >'+oname_safe+'</a><br><video src="/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>'
+      '<a href="http:www.kechuang.org/r/'+rid+'" >'+oname_safe+'</a><br><video src="http://www.kechuang.org/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>'
 
       break;
 
@@ -449,6 +449,7 @@ function APP_nkc_render(options){
       .replace(/  /g,'&nbsp&nbsp')
       .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
       html = attachment_filter(html,post)
+      console.log(html)
       // now post.r are marked with _used:true
     }
     else{
@@ -558,12 +559,11 @@ function APP_nkc_render(options){
     //     renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
     //   }
     // }
+    renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
     return renderedHTML
   }
-
   return render;
 }
-
 var render = APP_nkc_render();
 
 if(in_browser){
