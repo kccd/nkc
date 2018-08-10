@@ -55,7 +55,6 @@ theradRouter
     data.posts = posts
 		data.forum = forum;    
 		data.thread = data.thread.toObject();
-		console.log(data)
 		await next();
 	});
 module.exports = theradRouter;

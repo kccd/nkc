@@ -8,6 +8,6 @@ appRouter
 		await next();
 	})
 	.use('/u', userRouter.routes(), userRouter.allowedMethods())
-	.use('/me', meRouter.routes(), meRouter.allowedMethods());
+	.use('/me', meRouter.routes(), meRouter.allowedMethods())
 	.use('/thread', threadRouter.routes(), threadRouter.allowedMethods());
 module.exports = appRouter;
