@@ -34,7 +34,6 @@ postsRouter
 		const infoLogs = await db.InfoBehaviorModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 
 		const results = [];
-
 		for(const log of infoLogs) {
 			const result = {
 				type: 'post',
@@ -47,8 +46,10 @@ postsRouter
 
 			result.tid = thread.tid;
 			result.pid = post.pid;
-
-			result.content = post.c.slice(0, 300);
+			let content = nkcModules.APP_nkc_render.experimental_render(post);
+			content = content.replace(/<.*?>/ig, '');
+			content = unescape(content.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
+			result.content = content.slice(0, 300);
 			result.time = nkcModules.apiFunction.fromNow(post.toc);
 			result.thumbUp = post.recUsers.length;
 

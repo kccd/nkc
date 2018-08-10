@@ -3,6 +3,9 @@ module.exports = {
 		GET: 'APPgetLoginUserInfo',
 		personal: {
 			GET: 'APPgetLoginUserPersonal'
+		},
+		subscribe: {
+			GET: 'APPgetLoginUserSubscribe'
 		}
 	},
 	u: {
@@ -13,6 +16,9 @@ module.exports = {
 			},
 			threads: {
 				GET: 'APPgetUserThreads'
+			},
+			subscribe: {
+				GET: 'APPgetUserSubscribe'
 			}
 		}
 	},
