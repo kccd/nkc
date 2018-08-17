@@ -1,0 +1,288 @@
+body, html{
+  height: 100%;
+}
+.ms{
+  width: 90rem;
+  height: 60rem;
+  margin-top: 2%;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.14) 0 1px 10px;
+  position: relative;
+}
+.ms .ms-left{
+  position: absolute;
+  width: 20rem;
+  top: 0;
+  left: 0;
+  background-color: #f4f4f4;
+  height: 100%;
+}
+.form-control.ms-input{
+  background-color: #fff;
+  border: 1px solid #eeeeee;
+  width: 12rem;
+  display: inline-block;
+}
+.form-control.ms-button{
+  border: none;
+  width: 4.5rem;
+  color: #555555;
+  display: inline-block;
+}
+.ms-button:active{
+  background-color: #efefef;
+}
+.ms-input:focus{
+  background-color: #fff;
+  border: 1px solid #ffffff;
+  outline: none;
+}
+.ms-list{
+  height: 57rem;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+.ms-list-body{
+  margin: 0.5rem 0;
+  min-height: 4rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #efefef;
+  display: -webkit-flex;
+  display: flex;
+  cursor: pointer;
+}
+.ms-list-body:active{
+  background-color: #eaeaea;
+}
+.ms-list-body.active{
+  background-color: #ffffff;
+}
+.ms-list-left{
+  padding-left: 0.5rem;
+  vertical-align: top;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+.ms-list-center{
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  -webkit-flex-shrink: 1;
+  -webkit-flex-grow: 1;
+  flex-shrink: 1;
+  flex-grow: 1;
+  vertical-align: top;
+}
+.ms-list-right{
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+  height: 100%;
+  padding-right: 0.5rem;
+  text-align: right;
+  font-size: 1.5rem;
+}
+.ms-list-info{
+  text-align: center;
+  height: 2rem;
+  font-size: 1rem;
+  line-height: 2rem;
+  color: #7d7d7d;
+  margin: 0;
+  background-color: #e1e1e1;
+}
+.ms-list-number{
+  color: red;
+  font-size: 1rem;
+  margin-top: 0.4rem;
+}
+.ms-list-time{
+  color: #666666;
+  font-size: 1.1rem;
+}
+.ms-list-title{
+  font-size: 1.2rem;
+}
+.ms-list-content{
+  font-size: 1rem;
+  height: 1.4rem;
+  display: -webkit-box;
+  -webkit-line-clamp:1; /*显示的行数*/
+  -webkit-box-orient:vertical;
+  overflow: hidden;
+  word-break:break-all;
+  color: #888888;
+}
+.ms-list-left .ms-list-avatar{
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 3rem;
+  color: #fff;
+  font-size: 1.6rem;
+}
+.ms-list-left.notice .ms-list-avatar.fa{
+  background-color: #ef3c3c;
+}
+.ms-list-left.remind .ms-list-avatar.fa{
+  background-color: #279d27;
+}
+
+.ms .ms-right{
+  width: 70rem;
+  height: 60rem;
+  right: 0;
+  top: 0;
+  background-color: #f9f9f9;
+  position: absolute;
+}
+.ms .ms-header{
+  height: 3rem;
+  width: 100%;
+  background-color: #337ab7;
+  padding: 0 1rem;
+}
+.ms .ms-header .form-control{
+  height: 2rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+}
+.ms-rigth-title{
+  text-align: center;
+  color: #fff;
+  line-height: 3rem;
+  font-size: 1.5rem;
+}
+.ms-single-left{
+  padding: 1rem;
+}
+.ms-single-right{
+  padding: 1rem;
+}
+.ms-single-img{
+  display: table-cell;
+  vertical-align: top;
+}
+.ms-single-img img{
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+}
+.ms-single-time{
+  font-size: 1rem;
+  padding: 0 1rem 0.1rem 1rem;
+}
+.ms-single-content-div{
+  display: table-cell;
+  vertical-align: top;
+  padding-right: 20rem;
+  padding-left: 0.5rem;
+}
+.ms-single-content{
+  word-break:break-all;
+  position: relative;
+  background-color: #dfdfdf;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  border-radius: 0 5px 5px 5px;
+  display: inline-block;
+  min-height: 2.2rem;
+}
+.ms-single-right .ms-single-content-div{
+  padding-left: 20rem;
+  padding-right: 0.5rem;
+  width: 10000px;
+}
+.ms-single-right .ms-single-content{
+  margin-right: 1rem;
+  float: right;
+  border-radius: 5px 0 5px 5px;
+}
+.ms-single-right .ms-single-time{
+  text-align: right;
+}
+.arrow{
+  position: absolute;
+  width: 0;
+  top: 0;
+  left: -1rem;
+  height: 0;
+  border-top: 1rem solid rgba(0,0,0,0);
+  border-right: 1rem solid #dfdfdf;
+  border-bottom: 1rem solid rgba(0,0,0,0);
+}
+.ms-single-right .arrow{
+  left: auto;
+  right: -1rem;
+  border-right: none;
+  border-top: 1rem solid rgba(0,0,0,0);
+  border-left: 1rem solid #dfdfdf;
+  border-bottom: 1rem solid rgba(0,0,0,0);
+}
+.ms-single{
+
+}
+.ms-right-input{
+  height: 12rem;
+}
+.ms-right-input textarea{
+  overflow-y: scroll;
+  resize: none;
+  height: 66%;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  border: none;
+  border-top: 1px solid #eeeeee;
+}
+.ms-right-input textarea:focus{
+  border-color: rgba(0,0,0,0);
+  outline: none;
+}
+.ms-right-body{
+  height: 45rem;
+  overflow-y: scroll;
+}
+.ms-right .ms-header{
+  text-align: center;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 3rem;
+}
+.noSelectUser{
+  text-align: center;
+  color: #ddd;
+  position: absolute;
+  height: 20rem;
+  width: 20rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.noSelectUser .fa{
+  font-size: 8rem;
+}
+.loading-info{
+  text-align: center;
+  color: #aaa;
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+.ms-list-img{
+  position: relative;
+}
+.ms-point{
+  position: absolute;
+  height: 1rem;
+  width: 1rem;
+  background-color: #ef3c3c;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+}
+.ms-point.online{
+  background-color: #2bd62b;
+}

@@ -63,6 +63,12 @@ module.exports = async (ctx, next) => {
 				this.__templateFile = fileName
 			}
 		});
+
+		const reqType = ctx.request.get('REQTYPE');
+		if(reqType === 'app') {
+			ctx.reqType = 'app';
+		}
+
 	  //error handling
     await next();
 		if(ctx.data && ctx.data.user && ctx.data.user.toObject) {

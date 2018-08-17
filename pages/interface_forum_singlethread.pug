@@ -28,7 +28,7 @@
           a(style='text-decoration: none;' href=`/f/${parentForum.fid}` title=`${parentForum.description || ''}` data-toggle="tooltip" data-placement="bottom")= parentForum.displayName
       span.new-content-forumAbbr(style=`background-color:${thread.forum.color};`)
         a(style='text-decoration: none;' href=`/f/${thread.forum.fid}` title=`${thread.forum.description || ''}` data-toggle="tooltip" data-placement="bottom")= thread.forum.abbr || thread.forum.displayName
-    span.icon-font(title=`${Date(toc)}`)=fromNow(toc)
+    span.icon-font(title=`${new Date(toc).toLocaleString()}`)=fromNow(toc)
     if thread
       span(title=`${thread.hits}次浏览` data-toggle="tooltip" data-placement="bottom")
         span.glyphicon.glyphicon-eye-open.icon

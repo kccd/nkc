@@ -1,0 +1,102 @@
+extends ../bootstrap_base
+block title
+  title 信息
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href="/message/message.css")
+block content
+  .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak)#app
+    .hide#data=JSON.stringify({userList: data.userList, user: data.user, uidList: data.uidList})
+    .ms.center-block
+      .ms-left
+        .ms-header
+          .form-inline
+            .form-group
+              input.form-control.ms-input(placeholder='用户名、uid' v-model.trim="searchText" @keyup.enter="search")
+              button.form-control.ms-button(@click="search") 搜索
+        .ms-list
+          div(v-if="searchUsers.length !== 0")
+            h5.ms-list-info 根据 “{{searchText}}” 所找到的用户
+            .ms-list-body(v-for="searchUser in searchUsers" @click="selectUser(searchUser.uid)")
+              .ms-list-left
+                .ms-list-img
+                  .ms-point(:class="{online: searchUser.online}")
+                  img.ms-list-avatar(:src="'/avatar/' + searchUser.uid")
+              .ms-list-center
+                .ms-list-title {{searchUser.username}}
+                .ms-list-content {{searchUser.description || '暂未填写个人简介'}}
+          h5.ms-list-info 系统
+          .ms-list-body(@click="openNotice")
+            .ms-list-left.notice
+              .ms-list-img
+                .ms-list-avatar.fa.fa-bullhorn
+            .ms-list-center
+              .ms-list-title 通知
+              .ms-list-content dfasdfa
+            .ms-list-right
+              .ms-list-time {{format('MM/DD HH:mm', new Date())}}
+              .ms-list-number(v-if="1") {{'未读' + 1}}
+          .ms-list-body(@click="openRemind")
+            .ms-list-left.remind
+              .ms-list-img
+                .ms-list-avatar.fa.fa-bell-o
+            .ms-list-center
+              .ms-list-title 提醒
+              .ms-list-content 您的内容已被列入精选
+            .ms-list-right
+              .ms-list-time {{format('MM/DD HH:mm', new Date())}}
+              .ms-list-number(v-if="1") {{'未读' + 1}}
+          h5.ms-list-info 已创建的聊天
+          .ms-list-body(v-for="item in userList" @click="selectUser(item.user.uid)")
+            .ms-list-left
+              .ms-list-img
+                .ms-point(:class="{online: item.user.online}")
+                img.ms-list-avatar(:src="'/avatar/'+item.user.uid")
+            .ms-list-center
+              .ms-list-title {{item.user.username}}
+              .ms-list-content {{item.latestMessage.c}}
+            .ms-list-right
+              .ms-list-time {{format('MM/DD HH:mm', item.latestMessage.tc)}}
+              .ms-list-number(v-if="item.newMessageCount") {{'未读' + item.newMessageCount}}
+      .ms-right(v-if='!contentType')
+        .noSelectUser
+          .fa.fa-user
+          div Chat v1.0.0
+      .ms-right(v-else-if='contentType === "notice"')
+        .noSelectUser
+          .fa 通知
+      .ms-right(v-else-if='contentType === "remind"')
+        .noSelectUser
+          .fa 提醒
+      .ms-right(v-else-if="contentType === 'message'")
+        .ms-header {{targetUser.username}}
+        .ms-right-body#contentBody
+          .loading-info(@click='getMessage') {{loadingText}}
+          //.ms-header spark
+          .ms-single(v-for="message in messages")
+            .ms-single-left(v-if="message.s !== user.uid")
+              .ms-single-img
+                a(:href="'/u/' + message.s" target="_blank")
+                  img(:src="'/avatar/' + message.s")
+              .ms-single-content-div
+                .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+                .ms-single-content
+                  .arrow
+                  span {{message.c}}
+            .ms-single-right(v-else)
+              .ms-single-content-div
+                .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+                .ms-single-content
+                  .arrow
+                  span {{message.c}}
+              .ms-single-img
+                img(:src="'/avatar/' + message.s")
+        .ms-right-input
+          textarea(placeholder='请输入聊天内容' v-model="userInput[targetUid]" @keyup.enter='sendToUser')
+          .text-right(style='padding: 0.2rem 1.5rem;')
+            button.btn.btn-default(@click="sendToUser") 发送
+
+block scripts
+  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
+  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/message/message.js?v=${global.NKC.startTime}`)

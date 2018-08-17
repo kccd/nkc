@@ -53,11 +53,12 @@
     "qcloudsms_js": "^0.1.0",
     "qr-image": "^3.2.0",
     "qrcode": "^1.2.0",
+    "socket.io": "^2.1.1",
+    "cookies-string-parse": "^0.0.1",
     "swiper": "^4.3.3",
     "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",
     "vue": "^2.5.16",
-    "xbbcode-parser": "^0.1.2",
-    "xss": "^0.3.7"
+    "xbbcode-parser": "^0.1.2"
   }
 }

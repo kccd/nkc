@@ -287,6 +287,7 @@
     "closeThread": "关闭主题",
     "openThread": "开放主题",
     "rollbackPost": "post回滚",
+    "searchUser": "通过用户名或uid搜索用户",
     "visitUnSubmitFundApplicationList": "查看未提交的基金申请",
     "restoreFundApplicationForm": "恢复被放弃的基金申请",
     "visitGiveUpFundApplicationList": "查看被放弃的基金申请",
@@ -297,12 +298,18 @@
     "visitExperimentalEmailSettings": "访问邮件设置",
     "modifyEmailSettings": "修改邮件设置",
     "sendLoginMessage": "发送登录短信验证码",
+
+    "visitMessagePage": "打开信息页面",
+
+
+
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",
     "APPgetUserThreads": "app获取用户的文章",
     "APPgetLoginUserInfo": "app获取登录用户信息",
     "APPgetLoginUserPersonal": "app获取登录用户私密信息",
     "APPgetThreadInfo": "app获取帖子",
-    "APPvisitThread": "app查看帖子"
+    "APPvisitThread": "app查看帖子",
+    "APPgetScoreChange": "app获取分数变化设置"
   }
 }

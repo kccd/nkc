@@ -168,7 +168,6 @@ loginRouter
 			introduction: 'put the cookie in req-header when using for api',
 			user
 		};
-
 		const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
 		const loginUid = user.uid;
 		ctx.data.loginKey = loginKey;

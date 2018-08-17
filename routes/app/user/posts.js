@@ -70,6 +70,7 @@ postsRouter
 			results.push(result);
 		}
 		data.results = results;
+		data.paging = paging;
 		await next();
 	});
 module.exports = postsRouter;

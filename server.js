@@ -1,6 +1,7 @@
 const http = require('http');
 const https = require('https');
 const app = require('./app');
+const io = require('./io');
 const searchInit = require('./searchInit');
 const settings = require('./settings');
 const nkcModules = require('./nkcModules');
@@ -134,7 +135,11 @@ searchInit()
         .listen(
           serverSettings.httpsPort,
           serverSettings.address,
-          () => console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
+          () => {
+          	global.NKC.io = io(server);
+	          console.log(`socket.io is ready...`.green);
+          	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
+          }
         );
 
       redirectServer = http.createServer((req, res) => {
@@ -149,9 +154,14 @@ searchInit()
       server = http.createServer(app).listen(
         serverSettings.port,
         serverSettings.address,
-        () => console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
+        () => {
+        	global.NKC.io = io(server);
+        	console.log(`socket.io is ready...`.green);
+        	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
+        }
       );
     }
+
   })
   .catch(e => {
     console.error(`error occured when initialize the server.\n${e.stack}`.red);
