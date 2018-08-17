@@ -22,6 +22,7 @@ forumRouter
 		let forums = await db.ForumModel.visibleForums(options);
 		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 		data.forums = forums.map(forum => forum.toObject());
+		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
 		data.navbar = {highlight: 'forums'};

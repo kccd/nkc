@@ -208,4 +208,44 @@ fn.fromNow = (time) => {
 	return moment(time).fromNow();
 };
 
+
+// 获取纯文本,以及略缩文字
+// content[str] 原文本 
+// reduce[bull] 是否进行略缩，默认为false
+// count[int]   略缩后剩下的字数
+fn.obtainPureText = (content, reduce, count) => {
+  content = content.replace(/<[^>]+>/g,"");
+  count = parseInt(count);
+  if(reduce === true){
+    if(content.length > count){
+      var lastContent = content.substr(content.length-count,content.length)
+      content = content.substr(0,count) + "...";
+    }
+  }
+  return content;
+}
+
+// 将全部板块转为app可用json
+fn.forumsToJson = (fors) => {
+  let newArr = [];
+  let obj = {};
+  for(let i in fors){
+    if(fors[i].childrenForums && fors[i].childrenForums.length > 0){
+      let subs = fn.forumsToJson(fors[i].childrenForums)
+      obj = {
+        name: fors[i].displayName,
+        fid: fors[i].fid,
+        sub: subs
+      }
+      newArr.push(obj)
+    }else{
+      obj = {
+        name: fors[i].displayName,
+        fid: fors[i].fid
+      }
+      newArr.push(obj)
+    }
+  }
+  return newArr;
+}
 module.exports = fn;

@@ -3,6 +3,7 @@ const theradRouter = new Router();
 theradRouter
 	.get('/:tid', async (ctx, next) => {
     const {data, params, db, query, nkcModules} = ctx;
+		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
 		const forum = await thread.extendForum();
@@ -14,8 +15,12 @@ theradRouter
 
 		// 统计post总数
 		const count = await db.PostModel.count({tid});
+		const paging_ = nkcModules.apiFunction.paging(page, count);
+		const {pageCount} = paging_;
 		// 查询该文章下的所有post
-		const posts = await db.PostModel.find({tid}).sort({toc: 1}).skip(1);
+		const paging = nkcModules.apiFunction.paging(page, count);
+		data.paging = paging;
+		const posts = await db.PostModel.find({tid}).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(posts.map(async post => {
 			await post.extendUser().then(u => u.extendGrade());
 			await post.extendResources();

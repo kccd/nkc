@@ -449,7 +449,6 @@ function APP_nkc_render(options){
       .replace(/  /g,'&nbsp&nbsp')
       .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
       html = attachment_filter(html,post)
-      console.log(html)
       // now post.r are marked with _used:true
     }
     else{
@@ -560,6 +559,8 @@ function APP_nkc_render(options){
     //   }
     // }
     renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
+  renderedHTML = renderedHTML.replace(/<a href="(.*?)".*?>(.*?)<\/a>/igm,"<a href='javascript:void(0);' onclick='openLinkInFrame(\"$1\")'>$2</a>")
+    console.log(renderedHTML)
     return renderedHTML
   }
   return render;
