@@ -3,7 +3,7 @@ module.exports = async (ctx, next) => {
 	const {data, db} = ctx;
 
 	// cookie
-	const userInfo = ctx.cookies.get('userInfo');
+	const userInfo = ctx.cookies.get('userInfo', {signed: true});
 	// app
 	const {loginUid, loginKey} = ctx.query || [];
 

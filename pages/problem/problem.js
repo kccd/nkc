@@ -1,4 +1,51 @@
 var markdown = window.markdownit();
+
+var xss = window.filterXSS;
+var default_whitelist = xss.whiteList;
+default_whitelist.font = [];
+default_whitelist.code = [];
+default_whitelist.span = [];
+default_whitelist.a = ['href', 'title'];
+default_whitelist.p = [];
+default_whitelist.div = [];
+default_whitelist.table = [];
+default_whitelist.tbody = [];
+default_whitelist.tr = [];
+default_whitelist.th = [];
+default_whitelist.td = [];
+default_whitelist.video = ['src','controls','preload'];
+default_whitelist.math = [];
+default_whitelist.semantics = [];
+default_whitelist.mrow = [];
+default_whitelist.msup = [];
+default_whitelist.mn = [];
+default_whitelist.annotation = [];
+default_whitelist.iframe = [];
+default_whitelist.embed = [];
+default_whitelist.img = ['src','style'];
+for(var i = 1; i <= 6; i++) {
+	default_whitelist['h'+i] = [];
+}
+
+var xssoptions = {
+	whiteList:default_whitelist,
+	onTagAttr: function(tag, name, value, isWhiteAttr) {
+		if(isWhiteAttr) {
+			if(tag === 'a' && name === 'href') {
+				var valueHandled = value.replace('javascript:', '');
+				return "href=" + valueHandled;
+			}
+		}
+	}
+};
+
+var custom_xss = new xss.FilterXSS(xssoptions);
+var custom_xss_process = function(str){
+	return custom_xss.process(str)
+};
+
+
+
 var data = $('#data').text();
 var hljs = {
 	highlightBlock: function(){}
@@ -20,7 +67,7 @@ function update() {
 	var QQ = $('#QQ').val();
 	var email = $('#email').val();
 	$('#titleH2').text(title);
-	$('#contentDiv').html(mdToHtml(content));
+	$('#contentDiv').html(custom_xss_process(mdToHtml(content)));
 	$('pre code').each(function(i, block) {
 		hljs.highlightBlock(block);
 	});

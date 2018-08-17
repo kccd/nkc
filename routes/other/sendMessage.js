@@ -155,7 +155,7 @@ sendMessageRouter
 		} else if(operation === 'verifyNewMobile') { //-- 验证新手机 --
 			const {nationCode, mobile} = body;
 			if(!mobile) ctx.throw(400, '新手机号不能为空');
-			if(userPersonal.mobile === mobile) ctx.throw(400, '您已绑定该手机号，请更换后重试');
+			if(userPersonal.mobile === mobile && userPersonal.nationCode === nationCode) ctx.throw(400, '您已绑定该手机号，请更换后重试');
 			const sameUserPersonal = await db.UsersPersonalModel.findOne({mobile, nationCode});
 			if(sameUserPersonal) ctx.throw(400, '该号码已被其他用户绑定，请更换后重试');
 			const type = 'bindMobile';

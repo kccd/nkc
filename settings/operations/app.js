@@ -27,5 +27,10 @@ module.exports = {
 		PARAMETER: {
 			GET: 'APPvisitThread'
 		}
+	},
+	scoreChange: {
+		PARAMETER: {
+			GET: 'APPgetScoreChange'
+		}
 	}
 };

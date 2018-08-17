@@ -9,7 +9,6 @@ try {
   secret = randomBytes(128).toString('hex');
   writeFileSync(secretFile, secret, 'utf8');
 }
-
 module.exports = {
   secret,
   life: 86400 * 30 * 1000

@@ -1078,3 +1078,24 @@ function unDigestPost(pid) {
 			screenTopWarning(data.error||data);
 		})
 }
+
+function fromNow(t) {
+  if(!moment) throw 'Need to introduce the moment module';
+  moment.locale('zh-cn');
+  return moment(t).fromNow();
+}
+
+function format(s, t) {
+  if(t) {
+    return moment(t).format(s);
+  }
+  return moment().format(s);
+}
+
+function playBeep(name) {
+  var audio = document.getElementById('beep');
+  if(!audio) return;
+  var src = "/default/" + name + '.wav';
+  audio.setAttribute('src', src);
+  audio.play();
+}

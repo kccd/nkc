@@ -25,17 +25,23 @@ collectionsRouter
 			gradeId,
 			rolesId,
 			uid: data.user?data.user.uid: ''
-    }
+    };
     data.forumList = await db.ForumModel.accessibleFid(options);
     data.targetUser = targetUser;
     let categoryNames = await db.CollectionModel.aggregate([
       {$match: {uid: targetUserUid}},
       {$sort: {toc: 1}},
-      {$group: {_id: '$category'}},
+      {$group: {_id: '$category', threadCount: {$sum: 1}}},
     ]);
+    const categories = [];
     categoryNames = categoryNames.map(n => {
+	    categories.push({
+		    name: n._id,
+		    threadCount: n.threadCount
+	    });
       return (n._id? n._id: '未分类');
     });
+    data.categories = categories;
     data.categoryNames = categoryNames;
     let queryDate = {
       uid: targetUserUid,
@@ -58,6 +64,7 @@ collectionsRouter
         await thread.extendForum();
         try{
           await thread.ensurePermission(options)
+
           categoryCollection.push(collection)
         }catch(err){
   
@@ -71,8 +78,16 @@ collectionsRouter
     //   }
     // }
 
-    await Promise.all(categoryCollection.map(async c => {
+	  categoryCollection = await Promise.all(categoryCollection.map(async c => {
     	await c.extendThread().then(t => t.extendForum()).then(f => f.extendParentForum());
+    	if(ctx.reqType === 'app') {
+				let content = ctx.nkcModules.APP_nkc_render.experimental_render(c.thread.firstPost);
+		    content = content.replace(/<.*?>/ig, '');
+		    content = unescape(content.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
+		    content = content.slice(0, 300);
+		    c.thread.firstPost.c = content;
+	    }
+    	return c.toObject();
     }));
     data.category = queryDate.category;
     data.categoryCollection = categoryCollection;

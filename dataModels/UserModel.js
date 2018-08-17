@@ -110,6 +110,11 @@ const userSchema = new Schema({
 	volumeB: {
   	type: Boolean,
 		default: false
+	},
+	online: {
+  	type: Boolean,
+		default: false,
+		index: 1
 	}
 },
 {toObject: {
