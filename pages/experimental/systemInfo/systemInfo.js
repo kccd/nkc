@@ -19,9 +19,11 @@ $(function() {
         nkcAPI('/e/systemInfo', 'POST', obj)
           .then(function() {
             app.text = '';
+            app.submitted = false;
             screenTopAlert('发送成功');
           })
           .catch(function(data) {
+            app.submitted = false;
             screenTopWarning(data.error || data);
           })
       }

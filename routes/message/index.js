@@ -1,5 +1,8 @@
 const Router = require('koa-router');
 const messageRouter = new Router();
+const systemInfoRouter = require('./systemInfo');
+const remindRouter = require('./remind');
+const userRouter = require('./user');
 messageRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
@@ -105,7 +108,24 @@ messageRouter
     }
     data.userList = userListArr;
     data.uidList = uidList;
+
+    const systemInfo = await db.MessageModel.findOne({ty: 'STE'}).sort({tc: -1});
+    const allSystemInfoCount = await db.MessageModel.count({ty: 'STE'});
+    const viewedSystemInfoCount = await db.SystemInfoLogModel.count({uid: user.uid});
+    const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+
+    const remind = await db.MessageModel.findOne({ty: 'STU'}).sort({tc: -1});
+    const newRemindCount = await db.MessageModel.count({ty: 'STU', r: user.uid, vd: false});
+
+    data.remind = remind;
+    data.newRemindCount = newRemindCount;
+
+    data.systemInfo = systemInfo;
+    data.newSystemInfoCount = newSystemInfoCount;
     ctx.template = 'message/message.pug';
     await next();
-  });
+  })
+  .use('/remind', remindRouter.routes(), remindRouter.allowedMethods())
+  .use('/user', userRouter.routes(), userRouter.allowedMethods())
+  .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods());
 module.exports = messageRouter;

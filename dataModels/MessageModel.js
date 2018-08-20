@@ -30,6 +30,19 @@ const messageSchema = new Schema({
     type: Schema.Types.Mixed,
     required: true
   },
+  /*
+  * 当信息类型为提醒时：
+  * c: {
+  *   type: String, [digestPost, @, replyThread, bannedThread, threadWasReturned, bannedPost, postWasReturned, recommend]
+  *   fromTid: String,
+  *   fromPid: String,
+  *   fromUid: String,
+  * }
+  *
+  *
+  *
+  * */
+
 
   // 是否已阅读
   vd: {

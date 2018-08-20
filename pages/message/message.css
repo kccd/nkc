@@ -286,3 +286,20 @@ body, html{
 .ms-point.online{
   background-color: #2bd62b;
 }
+.ms-notice{
+  overflow-y: scroll;
+  height: 57rem;
+  padding: 1rem;
+}
+.ms-notice-body{
+  margin: 1rem 0 2rem 0;
+}
+.ms-notice-time{
+  font-size: 1.2rem;
+}
+.ms-notice-content{
+  padding: 1rem;
+  font-size: 1.2rem;
+  background-color: #dfdfdf;
+  border-radius: 7px;
+}

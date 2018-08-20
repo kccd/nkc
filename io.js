@@ -9,11 +9,8 @@ const api = {};
 api.print = (text) => {
   console.log(`${moment().format('HH:mm:ss')} ${' socket '.bgGreen} ${text}`)
 };
-
-
-const func = async (server) => {
+const func = (server) => {
   const io = require('socket.io')(server);
-
   io.on('connection', async (socket) => {
     const cookies = new Cookies(socket.request.headers.cookie, {
       keys: [settings.cookie.secret]
@@ -76,82 +73,8 @@ const func = async (server) => {
       console.log(data);
       console.log(`----------------------`);
     });
-
-
-    // 用户 > 用户
-    socket.on('UTU', async (data, fn) => {
-      const {targetUid, content, toc} = data;
-      const {uid} = socket.kc;
-      if(content === '') return fn({
-        status: false,
-        data: '内容不能未空'
-      });
-      const user = await db.UserModel.findOnly({uid});
-      const _id = await db.SettingModel.operateSystemID('messages', 1);
-      const newMessage = db.MessageModel({
-        _id,
-        ty: 'UTU',
-        tc: toc,
-        c: content,
-        s: uid,
-        r: targetUid
-      });
-      await newMessage.save();
-      const targetSocket = await db.SocketModel.findOne({uid: targetUid, online: true});
-      if(targetSocket) {
-        io.to(targetSocket.socketId).emit('UTU', {
-          fromUser: user,
-          message: newMessage
-        });
-        if(targetSocket.targetUid === uid) {
-          await newMessage.update({vd: true});
-        }
-      }
-      fn({
-        status: true,
-        data: newMessage
-      });
-    });
-
-    socket.on('getMessage', async (data, fn) => {
-      const {ty, id, lastMessageId} = data;
-      const uid = socket.kc.uid;
-      await db.SocketModel.update({uid}, {targetUid: id});
-      socket.kc.targetUid = id;
-      const targetUid = id;
-      const targetUser = await db.UserModel.findOnly({uid: targetUid});
-      if(ty === 'UTU') {
-        const q = {
-          $or: [
-            {
-              r: uid,
-              s: targetUid
-            },
-            {
-              r: targetUid,
-              s: uid
-            }
-          ]
-        };
-        if(lastMessageId) {
-          q._id = {$lt: lastMessageId};
-        }
-        const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
-        fn({
-          status: true,
-          data: {
-            messages: messages.reverse(),
-            targetUser: targetUser
-          }
-        });
-        await db.MessageModel.updateMany({
-          r: uid,
-          s: targetUid,
-          vd: false
-        }, {$set: {vd: true}});
-      }
-    });
   });
+
   return io;
 };
 module.exports = func;

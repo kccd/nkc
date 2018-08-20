@@ -5,7 +5,8 @@ block title
   link(rel='stylesheet' href="/message/message.css")
 block content
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak)#app
-    .hide#data=JSON.stringify({userList: data.userList, user: data.user, uidList: data.uidList})
+
+    .hide#data=JSON.stringify({userList: data.userList, user: data.user, uidList: data.uidList, newSystemInfoCount: data.newSystemInfoCount, systemInfo: data.systemInfo, remind: data.remind, newRemindCount: data.newRemindCount})
     .ms.center-block
       .ms-left
         .ms-header
@@ -31,20 +32,20 @@ block content
                 .ms-list-avatar.fa.fa-bullhorn
             .ms-list-center
               .ms-list-title 通知
-              .ms-list-content dfasdfa
+              .ms-list-content {{latestSystemInfo.c}}
             .ms-list-right
-              .ms-list-time {{format('MM/DD HH:mm', new Date())}}
-              .ms-list-number(v-if="1") {{'未读' + 1}}
+              .ms-list-time {{latestSystemInfo.tc}}
+              .ms-list-number(v-if="newSystemInfoCount > 0") {{'未读' + newSystemInfoCount}}
           .ms-list-body(@click="openRemind")
             .ms-list-left.remind
               .ms-list-img
                 .ms-list-avatar.fa.fa-bell-o
             .ms-list-center
               .ms-list-title 提醒
-              .ms-list-content 您的内容已被列入精选
+              .ms-list-content {{latestRemind.c}}
             .ms-list-right
-              .ms-list-time {{format('MM/DD HH:mm', new Date())}}
-              .ms-list-number(v-if="1") {{'未读' + 1}}
+              .ms-list-time {{latestRemind.tc}}
+              .ms-list-number(v-if="newRemindCount > 0") {{'未读' + newRemindCount}}
           h5.ms-list-info 已创建的聊天
           .ms-list-body(v-for="item in userList" @click="selectUser(item.user.uid)")
             .ms-list-left
@@ -62,11 +63,25 @@ block content
           .fa.fa-user
           div Chat v1.0.0
       .ms-right(v-else-if='contentType === "notice"')
-        .noSelectUser
+        .noSelectUser(v-if='systemInfo.length === 0')
           .fa 通知
+        div(style="height: 100%;" v-else)
+          .ms-header 系统通知
+          .ms-notice
+            .ms-notice-body(v-for="message in systemInfo")
+              .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
+              .ms-notice-content {{message.c}}
+            .loading-info(@click='getSystemInfo') {{loadingText}}
       .ms-right(v-else-if='contentType === "remind"')
-        .noSelectUser
+        .noSelectUser(v-if='systemInfo.length === 0')
           .fa 提醒
+        div(style="height: 100%;" v-else)
+          .ms-header 系统提醒
+          .ms-notice
+            .ms-notice-body(v-for="message in remind")
+              .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
+              .ms-notice-content {{message.c}}
+            .loading-info(@click='getRemind') {{loadingText}}
       .ms-right(v-else-if="contentType === 'message'")
         .ms-header {{targetUser.username}}
         .ms-right-body#contentBody
