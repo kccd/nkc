@@ -7,6 +7,7 @@ block content
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak)#app
 
     .hide#data=JSON.stringify({userList: data.userList, user: data.user, uidList: data.uidList, newSystemInfoCount: data.newSystemInfoCount, systemInfo: data.systemInfo, remind: data.remind, newRemindCount: data.newRemindCount})
+    .center-block.ms-socket-status {{socketInfo}}
     .ms.center-block
       .ms-left
         .ms-header

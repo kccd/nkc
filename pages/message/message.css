@@ -4,7 +4,6 @@ body, html{
 .ms{
   width: 90rem;
   height: 60rem;
-  margin-top: 2%;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.14) 0 1px 10px;
   position: relative;
@@ -302,4 +301,10 @@ body, html{
   font-size: 1.2rem;
   background-color: #dfdfdf;
   border-radius: 7px;
+}
+.ms-socket-status{
+  width: 90rem;
+  height: 3rem;
+  margin-top: 2rem;
+  text-align: center;
 }

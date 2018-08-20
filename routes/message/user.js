@@ -6,7 +6,10 @@ userRouter
     const {uid} = params;
     const {user} = data;
     const {lastMessageId} = query;
-    await db.SocketModel.update({uid: user.uid}, {targetUid: uid});
+    const socket = global.NKC.sockets[user.uid];
+    if(socket) {
+      socket.NKC.targetUid = uid;
+    }
     const targetUser = await db.UserModel.findOnly({uid});
     const q = {
       $or: [
@@ -54,14 +57,13 @@ userRouter
       r: uid
     });
     await newMessage.save();
-    if(targetUser.online) {
-      const targetSocket = await db.SocketModel.findOne({uid});
-      global.NKC.io.to(targetSocket.socketId).emit('UTU', {
+    const socket = global.NKC.sockets[targetUser.uid];
+    if(socket) {
+      socket.emit('UTU', {
         fromUser: user,
         message: newMessage
       });
-      console.log(targetSocket.targetUid, user.uid);
-      if(targetSocket.targetUid === user.uid) {
+      if(socket.NKC.targetUid === user.uid) {
         await newMessage.update({vd: true});
       }
     }

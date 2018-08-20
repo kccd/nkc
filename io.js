@@ -5,6 +5,7 @@ const tools = require('./tools');
 const nkcModules = require('./nkcModules');
 const settings = require('./settings');
 const Cookies = require('cookies-string-parse');
+const sockets = {};
 const api = {};
 api.print = (text) => {
   console.log(`${moment().format('HH:mm:ss')} ${' socket '.bgGreen} ${text}`)
@@ -20,52 +21,40 @@ const func = (server) => {
       const {username, uid} = JSON.parse(decodeURI(userInfo));
       const user = await db.UserModel.findOne({username, uid});
       if(user) {
-        socket.kc = {
-          uid: user.uid
-        };
-        const socketDB = await db.SocketModel.findOne({uid});
-        if(!socketDB) {
-          const s = db.SocketModel({
-            uid,
-            socketId: socket.id
-          });
-          await s.save();
-        } else {
-          await socketDB.update({socketId: socket.id});
+        const oldSocket = sockets[user.uid];
+        if(oldSocket) {
+          oldSocket.disconnect(true);
         }
+        socket.NKC = {
+          uid: user.uid,
+          targetUid: ''
+        };
+        sockets[user.uid] = socket;
         await user.update({online: true});
         io.sockets.emit('login', {
           targetUid: user.uid
         });
         console.log(`用户：${user.username}连接成功`);
       } else {
-        socket.disconnect();
+        socket.disconnect(true);
       }
     } else {
-      socket.disconnect();
+      socket.disconnect(true);
     }
     // 断线处理
     socket.on('disconnect', async (reason) => {
-      api.print(reason);
-      const socketDB = await db.SocketModel.findOne({socketId: socket.id, online: true});
-      if(socketDB) {
-        await socketDB.update({targetUid: ''});
-        await db.UserModel.update({uid: socketDB.uid}, {online: false});
-        io.sockets.emit('logout', {
-          targetUid: socketDB.uid
-        })
-      }
+      const {uid} = socket.NKC;
+      io.sockets.emit('logout', {targetUid: uid});
+      delete sockets[uid];
+      await db.UserModel.update({uid}, {online: false});
+      console.log(`用户：${uid} 已下线。`);
     });
     socket.on('error', async (reason) => {
-      api.print(reason);
-      const socketDB = await db.SocketModel.findOne({socketId: socket.id, online: true});
-      if(socketDB) {
-        await socketDB.update({targetUid: ''});
-        await db.UserModel.update({uid: socketDB.uid}, {online: false});
-        io.sockets.emit('logout', {
-          targetUid: socketDB.uid
-        })
-      }
+      const {uid} = socket.NKC;
+      io.sockets.emit('logout', {targetUid: uid});
+      delete sockets[uid];
+      await db.UserModel.update({uid}, {online: false});
+      console.log(`用户：${uid} 已下线。`);
     });
 
     socket.on('message', (data) => {
@@ -75,6 +64,9 @@ const func = (server) => {
     });
   });
 
-  return io;
+  return {
+    io,
+    sockets
+  };
 };
 module.exports = func;

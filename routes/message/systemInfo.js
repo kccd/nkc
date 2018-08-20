@@ -34,7 +34,10 @@ systemInfoRouter
         await log.save();
       }
     }
-    await db.SocketModel.update({uid: user.uid, targetUid: {$ne: ''}}, {targetUid: ''});
+    const socket = global.NKC.sockets[user.uid];
+    if(socket) {
+      socket.NKC.targetUid = '';
+    }
     await next();
   });
 module.exports = systemInfoRouter;

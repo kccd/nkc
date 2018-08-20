@@ -136,7 +136,9 @@ searchInit()
           serverSettings.httpsPort,
           serverSettings.address,
           () => {
-          	global.NKC.io = io(server);
+          	const obj = io(server);
+          	global.NKC.io = obj.io;
+          	global.NKC.sockets = obj.sockets;
 	          console.log(`socket.io is ready...`.green);
           	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
           }
@@ -155,7 +157,9 @@ searchInit()
         serverSettings.port,
         serverSettings.address,
         () => {
-        	global.NKC.io = io(server);
+        	const obj = io(server);
+        	global.NKC.io = obj.io;
+        	global.NKC.sockets = obj.sockets;
         	console.log(`socket.io is ready...`.green);
         	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
         }

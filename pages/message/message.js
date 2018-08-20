@@ -1,5 +1,6 @@
 var app;
 var n = 1;
+var socket;
 $(function() {
   var data = JSON.parse(document.getElementById('data').innerText);
   app = new Vue({
@@ -25,8 +26,31 @@ $(function() {
       newSystemInfoCount: data.newSystemInfoCount,
       newRemindCount: 0,
       remind: [],
+      socketStatus: 0,
+      /*
+      * 0: 未连接,
+      * 1: 正在连接,
+      * 2: 连接成功,
+      * 3: 断开连接,
+      * 4: 正在重新连接,
+      * 5: 重新连接成功,
+      * 6: 重新连接失败,
+      * 7: 连接失败
+      * */
     },
     computed: {
+      socketInfo: function() {
+        return [
+          '未连接',
+          '正在连接',
+          '已连接',
+          '连接已断开',
+          '正在重新连接',
+          '已连接',
+          '重新连接失败',
+          '连接失败'
+        ][this.socketStatus];
+      },
       latestSystemInfo: function() {
         if(this.systemInfo.length !== 0) {
           var systemInfo = this.systemInfo[0];
@@ -179,38 +203,7 @@ $(function() {
         this.latestMessageId = newId;
       }
     },
-    created: function() {
-      socket.on('UTU', function(data) {
-        playBeep('msg');
-        receiveMessage(data);
-        computUserListOrder();
-      });
-
-      socket.on('logout', function(data) {
-        var uid = data.targetUid;
-        var index = app.uidList.indexOf(uid);
-        if(index !== -1) {
-          app.userList[index].user.online = false;
-        }
-      });
-      socket.on('login', function(data) {
-        var uid = data.targetUid;
-        var index = app.uidList.indexOf(uid);
-        if(index !== -1) {
-          app.userList[index].user.online = true;
-        }
-      });
-      socket.on('systemInfo', function(data) {
-        playBeep('msg');
-        app.newSystemInfoCount += 1;
-        app.systemInfo.unshift(data);
-      });
-      socket.on('remind', function(data) {
-        playBeep('msg');
-        app.newRemindCount += 1;
-        app.remind.unshift(data);
-      });
-    }
+    created: created
   })
 });
 
@@ -368,4 +361,49 @@ function getMessage() {
       app.canGetMessage = true;
       app.loadingText = '加载更多';
     });
+}
+
+function created() {
+  socket = io('/');
+  socket.on('connect', function() {
+    app.socketStatus = 2;
+  });
+  socket.on('connecting', function() {
+    app.socketStatus = 1;
+  });
+  socket.on('disconnect', function() {
+    app.socketStatus = 3;
+  });
+
+  socket.on('UTU', function(data) {
+    playBeep('msg');
+    receiveMessage(data);
+    computUserListOrder();
+  });
+
+  socket.on('logout', function(data) {
+    var uid = data.targetUid;
+    var index = app.uidList.indexOf(uid);
+    if(index !== -1) {
+      app.userList[index].user.online = false;
+    }
+  });
+  socket.on('login', function(data) {
+    var uid = data.targetUid;
+    var index = app.uidList.indexOf(uid);
+    if(index !== -1) {
+      app.userList[index].user.online = true;
+    }
+  });
+  socket.on('systemInfo', function(data) {
+    playBeep('msg');
+    app.newSystemInfoCount += 1;
+    app.systemInfo.unshift(data);
+  });
+  socket.on('remind', function(data) {
+    playBeep('msg');
+    app.newRemindCount += 1;
+    app.remind.unshift(data);
+  });
+  socket.on('de')
 }

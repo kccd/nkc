@@ -15,7 +15,10 @@ remindRouter
       }
     }
     data.remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
-    await db.SocketModel.update({uid: user.uid, targetUid: {$ne: ''}}, {targetUid: ''});
+    const socket = global.NKC.sockets[user.uid];
+    if(socket) {
+      socket.NKC.targetUid = '';
+    }
     await next();
   });
 module.exports = remindRouter;
