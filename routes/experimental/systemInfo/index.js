@@ -13,8 +13,9 @@ sysInfoRouter
     const message = db.MessageModel({
       _id,
       ty: 'STE',
-      c: content,
-
+      c: content
     });
+    await message.save();
+    global.NKC.io.sockets.emit('systemInfo', message);
   });
 module.exports = sysInfoRouter;

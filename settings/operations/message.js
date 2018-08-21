@@ -1,3 +1,15 @@
 module.exports = {
-  GET: 'visitMessagePage'
+  GET: 'visitMessagePage',
+  systemInfo: {
+    GET: 'getSystemInfo'
+  },
+  remind: {
+    GET: 'getRemind'
+  },
+  user: {
+    PARAMETER: {
+      GET: 'getUserMessage',
+      POST: 'sendMessageToUser'
+    }
+  }
 };

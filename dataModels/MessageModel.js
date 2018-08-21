@@ -30,6 +30,19 @@ const messageSchema = new Schema({
     type: Schema.Types.Mixed,
     required: true
   },
+  /*
+  * 当信息类型为提醒时：
+  * c: {
+  *   type: String, [digestPost, @, replyThread, bannedThread, threadWasReturned, bannedPost, postWasReturned, recommend]
+  *   fromTid: String,
+  *   fromPid: String,
+  *   fromUid: String,
+  * }
+  *
+  *
+  *
+  * */
+
 
   // 是否已阅读
   vd: {
@@ -58,9 +71,51 @@ const messageSchema = new Schema({
     }
   },
 }, {
-  collection: 'messages'
+  collection: 'messages',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
 
+messageSchema.statics.extendReminder = async (arr) => {
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const ThreadModel = mongoose.model('threads');
+  const results = [];
+  for(const r of arr) {
+    const {c, tc} = r;
+    const {type, pid, targetPid} = c;
+    if(!type) continue;
+    if(type === 'replyThread') {
+      const post = await PostModel.findOne({pid});
+      const targetPost = await PostModel.findOne({pid: targetPid});
+      if(!post || !targetPost) continue;
+      const targetUser = await UserModel.findOne({uid: targetPost.uid});
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!targetUser || !thread) continue;
+      const pageObj = await thread.getStep({pid: targetPid, disabled: false});
+      const r_ = r.toObject();
+      r_.targetUser = {
+        username: targetUser.username,
+        uid: targetUser.uid
+      };
+      r_.post = {
+        pid,
+        t: post.t,
+        tid: post.tid,
+        page: pageObj.page
+      };
+      r_.targetPost = {
+        pid: targetPid,
+        c: targetPost.c,
+      };
+      r_.ty = type;
+      results.push(r_);
+    }
+  }
+  return results;
+};
 
 
 const MessageModel = mongoose.model('messages', messageSchema);

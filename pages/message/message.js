@@ -1,5 +1,6 @@
 var app;
 var n = 1;
+var socket;
 $(function() {
   var data = JSON.parse(document.getElementById('data').innerText);
   app = new Vue({
@@ -20,7 +21,113 @@ $(function() {
       loadingText: '加载更多',
       canGetMessage: true,
       userInput: {},
-      contentType: ''
+      contentType: '',
+      systemInfo: data.systemInfo,
+      newSystemInfoCount: data.newSystemInfoCount,
+      newRemindCount: 0,
+      remind: data.remind,
+      socketStatus: 0,
+      /*
+      * 0: 未连接,
+      * 1: 正在连接,
+      * 2: 连接成功,
+      * 3: 断开连接,
+      * 4: 正在重新连接,
+      * 5: 重新连接成功,
+      * 6: 重新连接失败,
+      * 7: 连接失败
+      * */
+    },
+    computed: {
+      socketInfo: function() {
+        return [
+          {
+            text: '未连接',
+            color: 'red'
+          },
+          {
+            text: '正在连接',
+            color: 'blue'
+          },
+          {
+            text: '已连接',
+            color: 'green'
+          },
+          {
+            text: '连接已断开，您将不能实时接收信息，请刷新',
+            color: 'red'
+          },
+          {
+            text: '正在重新连接',
+            color: 'blue'
+          },
+          { // 重新连接成功
+            text: '已连接',
+            color: 'green'
+          },
+          {
+            text: '重新连接失败',
+            color: 'red'
+          },
+          { // 重新连接失败
+            text: '连接失败',
+            color: 'red'
+          }
+        ][this.socketStatus];
+      },
+      latestSystemInfo: function() {
+        if(this.systemInfo.length !== 0) {
+          var systemInfo = this.systemInfo[0];
+          return {
+            tc: format('MM/DD HH:mm', systemInfo.tc),
+            c: systemInfo.c
+          };
+        } else {
+          return {
+            tc: '',
+            c: '暂无系统通知'
+          };
+        }
+      },
+      lastSystemInfoId: function() {
+        if(this.systemInfo.length !== 0) {
+          return this.systemInfo[this.systemInfo.length - 1]._id;
+        } else {
+          return ''
+        }
+      },
+      lastRemindId: function() {
+        if(this.remind.length !== 0) {
+          return this.remind[this.remind.length - 1]._id;
+        } else {
+          return ''
+        }
+      },
+      latestRemind: function() {
+        if(this.remind.length !== 0) {
+          var remind = this.remind[0];
+          var c = '';
+          switch(remind.ty) {
+            case 'replyThread': c = '回复';break;
+            case 'digestPost': c = '设置精华';break;
+            case 'bannedThread': c = '文章被删除';break;
+            case 'threadWasReturned': c = '文章被退回';break;
+            case 'bannedPost': c = '回复被删除';break;
+            case 'postWasReturned': c = '回复被退回';break;
+            case 'recommend': c = '点赞'; break;
+            default: c = '';
+          }
+          return {
+            tc: format('MM/DD HH:mm', remind.tc),
+            c: c
+          }
+        } else {
+          return {
+            tc: '',
+            c: '暂无系统提醒'
+          };
+        }
+      }
     },
     watch: {
       searchText: function() {
@@ -31,13 +138,14 @@ $(function() {
       fromNow: fromNow,
       format: format,
       selectUser: function(uid) {
+        app.canGetMessage = true;
+        app.loadingText = '加载更多';
+        app.contentType = 'message';
         if(app.targetUid === uid) return;
         app.targetUid = uid;
         app.messages = [];
-        socket.kcEmit('getMessage', {
-          ty: 'UTU',
-          id: app.targetUid,
-        })
+        var url = '/message/user/' + app.targetUid;
+        nkcAPI(url, 'GET', {})
           .then(function(data) {
             if(data.messages.length === 0) {
               app.loadingText = '没有了~';
@@ -48,7 +156,6 @@ $(function() {
             }
             app.messages = data.messages;
             app.targetUser = data.targetUser;
-            app.contentType = 'message';
 
             for(var i = 0; i < app.userList.length; i++) {
               if(app.userList[i].user.uid !== app.targetUid) continue;
@@ -65,14 +172,13 @@ $(function() {
         app.userInput[app.targetUid]=app.userInput[app.targetUid].replace(/\n/g,"");
         if(!app.userInput[app.targetUid]) return screenTopWarning('输入的内容不能为空');
         var tc = new Date();
-        socket.kcEmit('UTU', {
-          targetUid: app.targetUid,
+        nkcAPI('/message/user/' + app.targetUid, 'POST', {
           content: app.userInput[app.targetUid],
           tc: tc
         })
           .then(function(data) {
             screenTopAlert('发送成功');
-            sendMessage(data);
+            sendMessage(data.newMessage);
             app.userInput[app.targetUid] = '';
             computUserListOrder();
           })
@@ -105,36 +211,25 @@ $(function() {
             screenTopWarning(data.error || data);
           })
       },
-      getMessage: function() {
-        if(!app.canGetMessage) return;
-        app.canGetMessage = false;
-        app.loadingText = '拼命加载中~';
-        socket.kcEmit('getMessage', {
-          ty: 'UTU',
-          id: app.targetUid,
-          lastMessageId: app.lastMessageId
-        })
-          .then(function(data) {
-            if(data.messages.length === 0) {
-              return app.loadingText = '没有了~';
-            }
-            app.lastMessageId = data.messages[0]._id;
-            app.messages = data.messages.concat(app.messages);
-            app.targetUser = data.targetUser;
-            app.canGetMessage = true;
-            app.loadingText = '加载更多';
-          })
-          .catch(function(data) {
-            screenTopWarning(data.error || data);
-            app.canGetMessage = true;
-          })
-      },
+      getMessage: getMessage,
       openNotice: function() {
+        app.targetUid = '';
+        app.targetUser = '';
+        app.loadingText = '加载更多';
         app.contentType = 'notice';
+        app.newSystemInfoCount = 0;
+        getSystemInfo();
       },
       openRemind: function() {
+        app.targetUid = '';
+        app.targetUser = '';
+        app.loadingText = '加载更多';
         app.contentType = 'remind';
-      }
+        app.newRemindCount = 0;
+        getRemind();
+      },
+      getSystemInfo: getSystemInfo,
+      getRemind: getRemind
     },
     updated: function() {
       var newId = this.messages.length > 0? this.messages[this.messages.length - 1]._id: '';
@@ -144,28 +239,7 @@ $(function() {
         this.latestMessageId = newId;
       }
     },
-    created: function() {
-      socket.on('UTU', function(data) {
-        playBeep('msg');
-        receiveMessage(data);
-        computUserListOrder();
-      });
-
-      socket.on('logout', function(data) {
-        var uid = data.targetUid;
-        var index = app.uidList.indexOf(uid);
-        if(index !== -1) {
-          app.userList[index].user.online = false;
-        }
-      });
-      socket.on('login', function(data) {
-        var uid = data.targetUid;
-        var index = app.uidList.indexOf(uid);
-        if(index !== -1) {
-          app.userList[index].user.online = true;
-        }
-      });
-    }
+    created: created
   })
 });
 
@@ -248,4 +322,124 @@ function computUserListOrder() {
     }
   }
   app.userList = userListArr;
+}
+function getSystemInfo() {
+  loadingText = '加载中~';
+  var url = '/message/systemInfo';
+  if(app.lastSystemInfoId) {
+    url += '?lastSystemInfoId=' + app.lastSystemInfoId;
+  }
+  nkcAPI(url, 'GET', {})
+    .then(function(data) {
+      if(data.systemInfo.length === 0) {
+        app.loadingText = '没有了~';
+      } else {
+        if(app.systemInfo.length === 0) {
+          app.systemInfo = data.systemInfo;
+        } else {
+          app.systemInfo = app.systemInfo.concat(data.systemInfo);
+        }
+        loadingText = '加载更多';
+      }
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+      loadingText = '加载更多';
+    })
+}
+
+function getRemind() {
+  loadingText = '加载中~';
+  var url = '/message/remind';
+  if(app.lastRemindId) {
+    url += '?lastRemindId=' + app.lastRemindId;
+  }
+  nkcAPI(url, 'GET', {})
+    .then(function(data) {
+      console.log(data.remind)
+      if(data.remind.length === 0) {
+        app.loadingText = '没有了~';
+      } else {
+        if(app.remind.length === 0) {
+          app.remind = data.remind;
+        } else {
+          app.remind = app.remind.concat(data.remind);
+        }
+        loadingText = '加载更多';
+      }
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+      loadingText = '加载更多';
+    })
+}
+
+function getMessage() {
+  if(!app.canGetMessage) return;
+  app.canGetMessage = false;
+  app.loadingText = '拼命加载中~';
+  var url = '/message/user/' + app.targetUid;
+  if(app.lastMessageId) {
+    url += '?lastMessageId=' + app.lastMessageId;
+  }
+  nkcAPI(url, 'GET', {})
+    .then(function(data) {
+      if(data.messages.length === 0) {
+        return app.loadingText = '没有了~';
+      }
+      app.lastMessageId = data.messages[0]._id;
+      app.messages = data.messages.concat(app.messages);
+      app.targetUser = data.targetUser;
+      app.canGetMessage = true;
+      app.loadingText = '加载更多';
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+      app.canGetMessage = true;
+      app.loadingText = '加载更多';
+    });
+}
+
+function created() {
+  socket = io('/');
+  socket.on('connect', function() {
+    app.socketStatus = 2;
+  });
+  socket.on('connecting', function() {
+    app.socketStatus = 1;
+  });
+  socket.on('disconnect', function() {
+    app.socketStatus = 3;
+  });
+
+  socket.on('UTU', function(data) {
+    playBeep('msg');
+    receiveMessage(data);
+    computUserListOrder();
+  });
+
+  socket.on('logout', function(data) {
+    var uid = data.targetUid;
+    var index = app.uidList.indexOf(uid);
+    if(index !== -1) {
+      app.userList[index].user.online = false;
+    }
+  });
+  socket.on('login', function(data) {
+    var uid = data.targetUid;
+    var index = app.uidList.indexOf(uid);
+    if(index !== -1) {
+      app.userList[index].user.online = true;
+    }
+  });
+  socket.on('systemInfo', function(data) {
+    playBeep('msg');
+    app.newSystemInfoCount += 1;
+    app.systemInfo.unshift(data);
+  });
+  socket.on('remind', function(data) {
+    playBeep('msg');
+    app.newRemindCount += 1;
+    app.remind.unshift(data);
+  });
 }
