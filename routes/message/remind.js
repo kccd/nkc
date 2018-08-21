@@ -14,7 +14,8 @@ remindRouter
         $lt: lastRemindId
       }
     }
-    data.remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
+    const remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
+    data.remind = await db.MessageModel.extendReminder(remind);
     const socket = global.NKC.sockets[user.uid];
     if(socket) {
       socket.NKC.targetUid = '';

@@ -109,15 +109,15 @@ messageRouter
     data.userList = userListArr;
     data.uidList = uidList;
 
-    const systemInfo = await db.MessageModel.findOne({ty: 'STE'}).sort({tc: -1});
+    const systemInfo = await db.MessageModel.find({ty: 'STE'}).sort({tc: -1}).limit(1);
     const allSystemInfoCount = await db.MessageModel.count({ty: 'STE'});
     const viewedSystemInfoCount = await db.SystemInfoLogModel.count({uid: user.uid});
     const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
 
-    const remind = await db.MessageModel.findOne({ty: 'STU'}).sort({tc: -1});
+    const remind = await db.MessageModel.find({ty: 'STU', r: user.uid}).sort({tc: -1});
     const newRemindCount = await db.MessageModel.count({ty: 'STU', r: user.uid, vd: false});
 
-    data.remind = remind;
+    data.remind = await db.MessageModel.extendReminder(remind);
     data.newRemindCount = newRemindCount;
 
     data.systemInfo = systemInfo;

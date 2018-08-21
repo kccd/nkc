@@ -303,8 +303,29 @@ body, html{
   border-radius: 7px;
 }
 .ms-socket-status{
+  font-size: 1.4rem;
+  font-weight: 700;
   width: 90rem;
   height: 3rem;
   margin-top: 2rem;
   text-align: center;
+}
+.remind-user-avatar{
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.remind-link{
+  margin: 0 0.5rem;
+}
+.remind-content:visited, .remind-content:link, .remind-content:hover, .remind-content:active {
+  text-decoration: none;
+  color: #000000;
+}
+.remind-content{
+  display: block;
+  text-decoration: none;
+  color: #000000;
+  padding: 1rem 0;
 }

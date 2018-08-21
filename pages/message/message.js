@@ -22,10 +22,10 @@ $(function() {
       canGetMessage: true,
       userInput: {},
       contentType: '',
-      systemInfo: [data.systemInfo],
+      systemInfo: data.systemInfo,
       newSystemInfoCount: data.newSystemInfoCount,
       newRemindCount: 0,
-      remind: [],
+      remind: data.remind,
       socketStatus: 0,
       /*
       * 0: 未连接,
@@ -41,14 +41,38 @@ $(function() {
     computed: {
       socketInfo: function() {
         return [
-          '未连接',
-          '正在连接',
-          '已连接',
-          '连接已断开',
-          '正在重新连接',
-          '已连接',
-          '重新连接失败',
-          '连接失败'
+          {
+            text: '未连接',
+            color: 'red'
+          },
+          {
+            text: '正在连接',
+            color: 'blue'
+          },
+          {
+            text: '已连接',
+            color: 'green'
+          },
+          {
+            text: '连接已断开，您将不能实时接收信息，请刷新',
+            color: 'red'
+          },
+          {
+            text: '正在重新连接',
+            color: 'blue'
+          },
+          { // 重新连接成功
+            text: '已连接',
+            color: 'green'
+          },
+          {
+            text: '重新连接失败',
+            color: 'red'
+          },
+          { // 重新连接失败
+            text: '连接失败',
+            color: 'red'
+          }
         ][this.socketStatus];
       },
       latestSystemInfo: function() {
@@ -82,9 +106,20 @@ $(function() {
       latestRemind: function() {
         if(this.remind.length !== 0) {
           var remind = this.remind[0];
+          var c = '';
+          switch(remind.ty) {
+            case 'replyThread': c = '回复';break;
+            case 'digestPost': c = '设置精华';break;
+            case 'bannedThread': c = '文章被删除';break;
+            case 'threadWasReturned': c = '文章被退回';break;
+            case 'bannedPost': c = '回复被删除';break;
+            case 'postWasReturned': c = '回复被退回';break;
+            case 'recommend': c = '点赞'; break;
+            default: c = '';
+          }
           return {
             tc: format('MM/DD HH:mm', remind.tc),
-            c: remind.c
+            c: c
           }
         } else {
           return {
@@ -103,6 +138,7 @@ $(function() {
       fromNow: fromNow,
       format: format,
       selectUser: function(uid) {
+        app.canGetMessage = true;
         app.loadingText = '加载更多';
         app.contentType = 'message';
         if(app.targetUid === uid) return;
@@ -320,6 +356,7 @@ function getRemind() {
   }
   nkcAPI(url, 'GET', {})
     .then(function(data) {
+      console.log(data.remind)
       if(data.remind.length === 0) {
         app.loadingText = '没有了~';
       } else {
@@ -405,5 +442,4 @@ function created() {
     app.newRemindCount += 1;
     app.remind.unshift(data);
   });
-  socket.on('de')
 }

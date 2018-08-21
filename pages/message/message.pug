@@ -7,7 +7,7 @@ block content
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak)#app
 
     .hide#data=JSON.stringify({userList: data.userList, user: data.user, uidList: data.uidList, newSystemInfoCount: data.newSystemInfoCount, systemInfo: data.systemInfo, remind: data.remind, newRemindCount: data.newRemindCount})
-    .center-block.ms-socket-status {{socketInfo}}
+    .center-block.ms-socket-status(:style="'color: ' + socketInfo.color") {{socketInfo.text}}
     .ms.center-block
       .ms-left
         .ms-header
@@ -81,7 +81,16 @@ block content
           .ms-notice
             .ms-notice-body(v-for="message in remind")
               .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
-              .ms-notice-content {{message.c}}
+              .ms-notice-content
+                div(v-if="message.ty === 'replyThread'")
+                  a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
+                    img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')
+                    span {{message.targetUser.username}}
+                  span 在您的文章
+                  a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
+                    span 《{{message.post.t}}》
+                  span 下发表了如下回复：
+                  a.remind-link.remind-content(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
             .loading-info(@click='getRemind') {{loadingText}}
       .ms-right(v-else-if="contentType === 'message'")
         .ms-header {{targetUser.username}}
