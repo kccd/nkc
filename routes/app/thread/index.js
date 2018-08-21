@@ -26,14 +26,14 @@ theradRouter
 			await post.extendResources();
 		}));
 		let newPosts = []
-		for(let post of posts){
-			if(post.disabled === true){
+		for(let i = 1;i < posts.length;i++){
+			if(posts[i].disabled === true){
 				continue;
 			}
-			post = post.toObject();
-			post.headPic = "http://www.kechuang.org/avatar/" + post.uid;
-			post.c = nkcModules.APP_nkc_render.experimental_render(post);
-			newPosts.push(post)
+			posts[i] = posts[i].toObject();
+			posts[i].headPic = "https://www.kechuang.org/avatar_small/" + posts[i].uid;
+			posts[i].c = nkcModules.APP_nkc_render.experimental_render(posts[i]);
+			newPosts.push(posts[i])
 		}
 		data.targetUser = await thread.extendUser();
 		// 文章访问量加1

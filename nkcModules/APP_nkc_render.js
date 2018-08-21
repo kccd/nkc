@@ -559,8 +559,7 @@ function APP_nkc_render(options){
     //   }
     // }
     renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
-  renderedHTML = renderedHTML.replace(/<a href="(.*?)".*?>(.*?)<\/a>/igm,"<a href='javascript:void(0);' onclick='openLinkInFrame(\"$1\")'>$2</a>")
-    console.log(renderedHTML)
+    renderedHTML = renderedHTML.replace(/<a href="(.*?)".*?>(.*?)<\/a>/igm,"<a href='javascript:void(0);' onclick='openLinkInFrame(\"$1\")'>$2</a>");
     return renderedHTML
   }
   return render;

@@ -289,7 +289,6 @@ threadRouter
 		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		data.thread = data.thread.toObject();
 		await next();
-		console.log(data)
 	})
 	.post('/:tid', async (ctx, next) => {
 		const {
