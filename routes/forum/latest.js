@@ -80,6 +80,9 @@ latestRouter
 			await thread.forum.extendParentForum();
 			await thread.extendCategory();
 		}));
+		for(var i in threads){
+			threads[i] = threads[i].toObject();
+		}
 		data.threads = threads;
 		// 构建置顶文章查询条件
 		const toppedThreadMatch = {topped: true, fid: forum.fid};
@@ -120,6 +123,11 @@ latestRouter
 		data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
 		data.type = 'latest';
+		if(data.forum.followersId.includes(data.user.uid)){
+			data.isFollow = true;
+		}else{
+			data.isFollow = false;
+		}
 		await next();
 	});
 module.exports = latestRouter;

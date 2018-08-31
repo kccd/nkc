@@ -314,6 +314,7 @@
     "APPgetLoginUserPersonal": "app获取登录用户私密信息",
     "APPgetThreadInfo": "app获取帖子",
     "APPvisitThread": "app查看帖子",
-    "APPgetScoreChange": "app获取分数变化设置"
+    "APPgetScoreChange": "app获取分数变化设置",
+    "APPsearch": "app搜索"
   }
 }

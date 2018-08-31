@@ -1,12 +1,10 @@
 const Router = require('koa-router');
-const {replaceChineseToCharRef} = require('../../tools').checkString;
+const {replaceChineseToCharRef} = require('../../../tools').checkString;
+const searchRouter = new Router();
 
-const router = new Router();
-
-router.get('/', async(ctx, next) => {
-  ctx.template = 'interface_localSearch.pug';
+searchRouter.get('/', async(ctx, next) => {
   const {data, es, settings, query, db} = ctx;
-  const {apiFunction} = ctx.nkcModules;
+  const {apiFunction, APP_nkc_render} = ctx.nkcModules;
   let {q = '', type = 'content', page = 0} = query;
   q = q.trim();
   const {perpage} = settings.paging;
@@ -41,6 +39,9 @@ router.get('/', async(ctx, next) => {
         await post.extendThread();
         await post.thread.extendFirstPost();
         await post.thread.extendForum();
+        post.c = APP_nkc_render.experimental_render(post);
+        post.t = apiFunction.obtainPureText(post.t,true,20)
+        post.c = apiFunction.obtainPureText(post.c,true,200)
         if(accessibleFid.includes(post.thread.fid)){
           return post.toObject()
         }else{
@@ -71,4 +72,4 @@ router.get('/', async(ctx, next) => {
   ctx.throw(404, 'unknown type..')
 });
 
-module.exports = router;
+module.exports = searchRouter;

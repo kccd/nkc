@@ -25,14 +25,19 @@ theradRouter
 			await post.extendUser().then(u => u.extendGrade());
 			await post.extendResources();
 		}));
+		let index = 0;
+		if(paging.page === 0){
+			index = 1;
+		}
 		let newPosts = []
-		for(let i = 1;i < posts.length;i++){
+		for(let i = index;i < posts.length;i++){
 			if(posts[i].disabled === true){
 				continue;
 			}
 			posts[i] = posts[i].toObject();
 			posts[i].headPic = "https://www.kechuang.org/avatar_small/" + posts[i].uid;
 			posts[i].c = nkcModules.APP_nkc_render.experimental_render(posts[i]);
+			posts[i].thumbCount = posts[i].recUsers.length;
 			newPosts.push(posts[i])
 		}
 		data.targetUser = await thread.extendUser();
