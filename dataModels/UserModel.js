@@ -245,12 +245,20 @@ userSchema.virtual('group')
   });
 
 userSchema.virtual('threads')
-	.get(function() {
-		return this._threads;
-	})
-	.set(function(t) {
-		this._threads = t;
-	});
+  .get(function() {
+    return this._threads;
+  })
+  .set(function(t) {
+    this._threads = t;
+  });
+
+userSchema.virtual('generalSettings')
+  .get(function() {
+    return this._generalSettings;
+  })
+  .set(function(s) {
+    this._generalSettings = s;
+  });
 
 userSchema.virtual('newMessage')
 	.get(function() {
@@ -618,6 +626,42 @@ userSchema.methods.extendGrade = async function() {
 	return this.grade = grade;
 };
 
+userSchema.methods.getNewMessagesCount = async function() {
+	const MessageModel = mongoose.model('messages');
+	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
+	// 系统通知
+  const allSystemInfoCount = await MessageModel.count({ty: 'STE'});
+  const viewedSystemInfoCount = await SystemInfoLogModel.count({uid: this.uid});
+  const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+	// 系统提醒
+  const newReminderCount = await MessageModel.count({ty: 'STU', r: this.uid, vd: false});
+	// 用户信息
+  const newUsersMessagesCount = await MessageModel.count({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
+	return {
+		newSystemInfoCount,
+		newReminderCount,
+		newUsersMessagesCount
+	}
+};
 
+userSchema.methods.getMessageLimit = async function() {
+	const grade = await this.extendGrade();
+	const roles = await this.extendRoles();
+	let {messagePersonCountLimit, messageCountLimit} = grade;
+	for(const role of roles) {
+		const personLimit = role.messagePersonCountLimit;
+		const messageLimit = role.messageCountLimit;
+		if(personLimit > messagePersonCountLimit) {
+			messagePersonCountLimit = personLimit;
+		}
+		if(messageLimit > messageCountLimit) {
+			messageCountLimit = messageLimit;
+		}
+	}
+	return {
+		messagePersonCountLimit,
+		messageCountLimit
+	}
+};
 
 module.exports = mongoose.model('users', userSchema);

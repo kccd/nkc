@@ -19,6 +19,8 @@ const fundBannerPath = path.resolve('resources/fundBanner');
 const fundLogoPath = path.resolve('resources/fundLogo');
 const webLogoPath = path.resolve('resources/logo');
 const userBannerPath = path.resolve('resources/user_banners');
+const messageFilePath = path.resolve('resources/message');
+const messageImageSMPath = path.resolve('resources/message/sm');
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -80,7 +82,11 @@ module.exports = {
     },
 	  lifePhoto: {
     	width: 1920
-	  }
+	  },
+    messageImageSM: {
+      width: 300,
+      height: 200
+    }
   },
 	count: {
   	lifePhoto: 1000 //生活照最多1000张
@@ -98,9 +104,11 @@ module.exports = {
   qrCodePath,
 	photoSmallPath,
 	fundBannerPath,
+  messageFilePath,
 	fundLogoPath,
 	webLogoPath,
 	userBannerPath,
+  messageImageSMPath,
   avatarSize: 192,
 	forumAvatarSize: 96,
   avatarSmallSize: 48,

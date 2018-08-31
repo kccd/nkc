@@ -70,6 +70,19 @@ operationRouter
 				description: para.reason || '退回文章并标记为违规'
 			});
 		}
+		const mId = await db.SettingModel.operateSystemID('messages', 1);
+		const message = db.MessageModel({
+			_id: mId,
+			ty: 'STU',
+			r: thread.uid,
+			c: {
+				type: 'threadWasReturned',
+				tid: thread.tid,
+				rea: para.reason
+			}
+		});
+		await message.save();
+		await ctx.nkcModules.socket.emitReminder(message);
 		await next()
 	})
 	.patch('/moveThread', async (ctx, next) => {
@@ -174,6 +187,19 @@ operationRouter
 				const delLog = new db.DelPostLogModel(para);
 				await delLog.save();
 			}
+      const mId = await db.SettingModel.operateSystemID('messages', 1);
+      const message = db.MessageModel({
+        _id: mId,
+        ty: 'STU',
+        r: targetThread.uid,
+        c: {
+          type: 'bannedThread',
+          tid: targetThread.tid,
+          rea: para.reason
+        }
+      });
+      await message.save();
+      await ctx.nkcModules.socket.emitReminder(message);
 		}
 		if(para && para.noticeType === true){
 			let uid = targetThread.uid;

@@ -18,7 +18,8 @@ userRouter
     const {username, uid} = query;
     const targetUsers = [];
     if(username !== undefined) {
-    	const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+      // const users = await db.UserModel.find({usernameLowerCase: new RegExp(username.toLowerCase(), 'i')});
+      const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     	if(user) targetUsers.push(user);
     }
     if(uid !== undefined) {

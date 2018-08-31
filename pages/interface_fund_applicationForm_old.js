@@ -101,6 +101,7 @@ function postUpload(data, callback) {
       if(xhr.status>=200&&xhr.status<300){
         callback(JSON.parse(xhr.responseText));
       }else {
+        console.log(xhr.responseText)
         jwarning(xhr.status.toString()+' '+xhr.responseText);
       }
     }

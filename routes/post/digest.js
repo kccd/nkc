@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.post('/', async (ctx, next) => {
-		const {db, data, params} = ctx;
+		const {db, data, params, nkcModules} = ctx;
 		const {pid} = params;
 		const post = await db.PostModel.findOnly({pid});
 		const targetUser = await post.extendUser();
@@ -26,20 +26,47 @@ router
 			tid: thread.tid,
 			ip: ctx.address
 		};
+		let message;
+    const messageId = await db.SettingModel.operateSystemID('messages', 1);
 		if(thread.oc === pid) {
 			await thread.update({digest: true});
 			await db.UsersScoreLogModel.insertLog(log);
 			log.type = 'score';
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
+			message = db.MessageModel({
+				_id: messageId,
+				ty: 'STU',
+				r: post.uid,
+				vd: false,
+				c: {
+					type: 'digestThread',
+					targetUid: targetUser.uid,
+					pid
+				}
+			});
+			await message.save();
 		} else {
 			log.typeIdOfScoreChange = 'digestPost';
 			await db.UsersScoreLogModel.insertLog(log);
 			log.key = 'digestPostsCount';
 			log.type = 'score';
 			await db.UsersScoreLogModel.insertLog(log);
+			message = db.MessageModel({
+				_id: messageId,
+				ty: 'STU',
+				r: post.uid,
+				vd: false,
+				c: {
+					type: 'digestPost',
+					targetUid: targetUser.uid,
+					pid
+				}
+			});
+			await message.save();
 		}
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
+    await nkcModules.socket.emitReminder(message);
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
 		await userPersonal.increasePsnl('system', 1);
 		await next();
 	})

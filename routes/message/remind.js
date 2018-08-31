@@ -14,12 +14,10 @@ remindRouter
         $lt: lastRemindId
       }
     }
+    await db.MessageModel.updateMany({ty: 'STU', r: user.uid, vd: false}, {$set: {vd: true}});
     const remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
     data.remind = await db.MessageModel.extendReminder(remind);
-    const socket = global.NKC.sockets[user.uid];
-    if(socket) {
-      socket.NKC.targetUid = '';
-    }
+    db.MessageModel.setTargetUid(user.uid, '');
     await next();
   });
 module.exports = remindRouter;

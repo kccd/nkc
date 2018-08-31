@@ -57,5 +57,4 @@ const SmsSchema = new Schema({
   }
 });
 
-
 module.exports = mongoose.model('sms', SmsSchema);

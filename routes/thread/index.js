@@ -354,24 +354,22 @@ threadRouter
 		obj.type = 'kcb';
 		await db.UsersScoreLogModel.insertLog(obj);
 
-		const messageId = await db.SettingModel.operateSystemID('messages', 1);
-		const message = db.MessageModel({
-			_id: messageId,
-			r: thread.uid,
-			ty: 'STU',
-			c: {
-				type: 'replyThread',
-				targetPid: _post.pid,
-				pid: thread.oc
-			}
-		});
-		await message.save();
-		const socket = global.NKC.sockets[thread.uid];
-		if(socket) {
-			const remind = await db.MessageModel.extendReminder([message]);
-			socket.emit('remind', remind[0]);
-		}
+		if(thread.uid !== user.uid) {
+      const messageId = await db.SettingModel.operateSystemID('messages', 1);
+      const message = db.MessageModel({
+        _id: messageId,
+        r: thread.uid,
+        ty: 'STU',
+        c: {
+          type: 'replyThread',
+          targetPid: _post.pid,
+          pid: thread.oc
+        }
+      });
+      await message.save();
 
+      await nkcModules.socket.emitReminder(message);
+		}
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
 		await thread.updateThreadMessage();

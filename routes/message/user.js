@@ -6,10 +6,7 @@ userRouter
     const {uid} = params;
     const {user} = data;
     const {lastMessageId} = query;
-    const socket = global.NKC.sockets[user.uid];
-    if(socket) {
-      socket.NKC.targetUid = uid;
-    }
+    db.MessageModel.setTargetUid(user.uid, uid);
     const targetUser = await db.UserModel.findOnly({uid});
     const q = {
       $or: [
@@ -41,10 +38,44 @@ userRouter
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data} = ctx;
+    const {db, body, params, data, nkcModules} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
     const {user} = data;
+    const {messageCountLimit, messagePersonCountLimit} = await user.getMessageLimit();
+    const today = nkcModules.apiFunction.today();
+    const messageCount = await db.MessageModel.count({
+      s: user.uid,
+      ty: 'UTU',
+      tc: {
+        $gte: today
+      }
+    });
+    if(messageCount >= messageCountLimit) {
+      ctx.throw(403, `根据您的证书和等级，您每天最多只能发送${messageCountLimit}条信息`);
+    }
+    let todayUid = await db.MessageModel.aggregate([
+      {
+        $match: {
+          s: user.uid,
+          ty: 'UTU',
+          tc: {
+            $gte: nkcModules.apiFunction.today()
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$r',
+        }
+      }
+    ]);
+    todayUid = todayUid.map(o => o.uid);
+    if(!todayUid.includes(uid)) {
+      if(todayUid.length >= messagePersonCountLimit) {
+        ctx.throw(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
+      }
+    }
     const {content, toc} = body;
     if(content === '') ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
@@ -54,19 +85,21 @@ userRouter
       tc: toc,
       c: content,
       s: user.uid,
-      r: uid
+      r: uid,
+      ip: ctx.address,
+      port: ctx.port
     });
+    const socketUserTargetUid = db.MessageModel.getTargetUid(user.uid);
+    if(socketUserTargetUid === uid) {
+      newMessage.vd = true;
+    }
     await newMessage.save();
-    const socket = global.NKC.sockets[targetUser.uid];
-    if(socket) {
-      socket.emit('UTU', {
+    db.MessageModel.execute(uid, (socket) => {
+      socket.emit('message', {
         fromUser: user,
         message: newMessage
       });
-      if(socket.NKC.targetUid === user.uid) {
-        await newMessage.update({vd: true});
-      }
-    }
+    });
     data.newMessage = newMessage;
     await next();
   });

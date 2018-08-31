@@ -1,5 +1,6 @@
 body, html{
   height: 100%;
+  overflow-y: scroll;
 }
 .ms{
   width: 90rem;
@@ -24,7 +25,7 @@ body, html{
 }
 .form-control.ms-button{
   border: none;
-  width: 4.5rem;
+  width: 3.5rem;
   color: #555555;
   display: inline-block;
 }
@@ -54,7 +55,7 @@ body, html{
   background-color: #eaeaea;
 }
 .ms-list-body.active{
-  background-color: #ffffff;
+  background-color: #bac9d6;
 }
 .ms-list-left{
   padding-left: 0.5rem;
@@ -101,14 +102,15 @@ body, html{
   font-size: 1.2rem;
 }
 .ms-list-content{
+  word-break:break-all;
   font-size: 1rem;
   height: 1.4rem;
   display: -webkit-box;
   -webkit-line-clamp:1; /*显示的行数*/
   -webkit-box-orient:vertical;
   overflow: hidden;
-  word-break:break-all;
   color: #888888;
+
 }
 .ms-list-left .ms-list-avatar{
   height: 3rem;
@@ -131,7 +133,7 @@ body, html{
   height: 60rem;
   right: 0;
   top: 0;
-  background-color: #f9f9f9;
+  background-color: #f4f4f4;
   position: absolute;
 }
 .ms .ms-header{
@@ -181,12 +183,20 @@ body, html{
 .ms-single-content{
   word-break:break-all;
   position: relative;
-  background-color: #dfdfdf;
+  line-height: 2.2rem;
+  background-color: #d2dfea;
   padding: 0.5rem;
   margin-left: 1rem;
   border-radius: 0 5px 5px 5px;
   display: inline-block;
   min-height: 2.2rem;
+}
+.ms-single-content .message-emoji{
+  height: 2rem;
+  vertical-align: middle;
+  margin: 0.1rem;
+  display: inline-block;
+  width: 2rem;
 }
 .ms-single-right .ms-single-content-div{
   padding-left: 20rem;
@@ -208,7 +218,7 @@ body, html{
   left: -1rem;
   height: 0;
   border-top: 1rem solid rgba(0,0,0,0);
-  border-right: 1rem solid #dfdfdf;
+  border-right: 1rem solid #d2dfea;
   border-bottom: 1rem solid rgba(0,0,0,0);
 }
 .ms-single-right .arrow{
@@ -216,7 +226,7 @@ body, html{
   right: -1rem;
   border-right: none;
   border-top: 1rem solid rgba(0,0,0,0);
-  border-left: 1rem solid #dfdfdf;
+  border-left: 1rem solid #d2dfea;
   border-bottom: 1rem solid rgba(0,0,0,0);
 }
 .ms-single{
@@ -224,11 +234,12 @@ body, html{
 }
 .ms-right-input{
   height: 12rem;
+  position: relative;
 }
 .ms-right-input textarea{
   overflow-y: scroll;
   resize: none;
-  height: 66%;
+  height: 9rem;
   width: 100%;
   padding: 0.5rem 1rem;
   font-size: 1.2rem;
@@ -241,6 +252,7 @@ body, html{
 }
 .ms-right-body{
   height: 45rem;
+  padding-bottom: 2rem;
   overflow-y: scroll;
 }
 .ms-right .ms-header{
@@ -328,4 +340,394 @@ body, html{
   text-decoration: none;
   color: #000000;
   padding: 1rem 0;
+}
+.ms-settings{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 90;
+  background-color: rgba(255,255,255,0.8);
+}
+.ms-settings-body{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 40rem;
+  height: 50rem;
+  background-color: #f4f4f4;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+}
+.ms-mask{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 100;
+  background-color: rgba(255,255,255,0.4);
+  text-align: center;
+  padding-top: 20rem;
+  font-size: 3rem;
+}
+.ms-mask.hide{
+  height: 0;
+  width: 0;
+}
+.ms-right-input-button{
+  position: relative;
+}
+.ms-right-input-button div{
+  display: inline-block;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #888888;
+}
+.ms-right-input-button div .fa{
+  color: #888888;
+  margin-left: 1rem;
+}
+.ms-right-input-button div .fa:hover{
+  color: #337ab7;
+}
+.ms-single-content-image{
+  height: 13.3333rem;
+  overflow: hidden;
+  position: relative;
+  width: 20rem;
+}
+.ms-single-content-image img{
+  width: 100%;
+}
+.ms-single-content-image a{
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.ms-single-content-image a:hover{
+  color: #f4f4f4;
+}
+.ms-single-content-image-mask{
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
+  text-align: center;
+  color: #f4f4f4;
+  font-size: 1.4rem;
+}
+.ms-single-content-image-mask div{
+  position: absolute;
+  height: 2rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+
+.ms-settings-header{
+  height: 3rem;
+  line-height: 3rem;
+  padding: 0 0 0 1rem;
+  color: #555555;
+}
+.ms-settings-header .fa{
+  height: 3rem;
+  font-size: 1.4rem;
+  line-height: 3rem;
+  float: right;
+  cursor: pointer;
+  padding: 0 1rem;
+}
+.ms-settings-options-name{
+  display: table-cell;
+  width: 8rem;
+  text-align: right;
+}
+.ms-settings-options-content{
+  display: table-cell;
+
+}
+.ms-settings-options{
+  width: 100%;
+  border-top: 1px solid #e3e3e3;
+  padding: 1rem 0.5rem;
+}
+.ms-settings-button{
+  width: 100%;
+  border-top: 1px solid #e3e3e3;
+  margin: 1rem 0;
+  text-align: center;
+  padding: 1rem 0.5rem;
+}
+.ms-settings-button button{
+  width: 8rem;
+}
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .3s ease;
+}
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+.mobile-footer{
+  text-align: center;
+  position: fixed;
+  background-color: #ffffff;
+  z-index: 100;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #efefef;
+  padding: 0.2rem 0;
+  color: #888888;
+}
+.mobile-footer .bar-name{
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1rem;
+}
+.mobile-footer .fa{
+  height: 1.8rem;
+  line-height: 2rem;
+  font-size: 1.6rem;
+}
+.mobile-footer>.active {
+  color: #337ab7;
+}
+.mobile-messages{
+  padding: 3.7rem 0 4rem 0;
+  position: fixed;
+  z-index: 10000;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+.mobile-user-list{
+  padding-bottom: 4.25rem;
+}
+.mobile-messages-panel{
+  padding: 0.5rem;
+}
+.mobile-user-list .ms-list-body{
+  margin: 0;
+  min-height: 5rem;
+  padding: 0.5rem 0.5rem;
+}
+.mobile-user-list .ms-list-left .ms-list-avatar{
+  height: 4rem;
+  line-height: 4rem;
+  width: 4rem;
+}
+.mobile-user-list .ms-list-title{
+  font-size: 1.3rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+.mobile-user-list .ms-list-content{
+  font-size: 1rem;
+}
+.mobile-user-list .ms-list-info, .mobile-settings .ms-list-info{
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.2rem;
+  background-color: #f4f4f4;
+}
+.mobile-footer-input-div{
+  position: fixed;
+  background-color: #ffffff;
+  z-index: 1000;
+  width: 100%;
+  height: 4rem;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid #efefef;
+  color: #888888;
+}
+.mobile-message-header{
+  height: 4.2rem;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  line-height: 4.2rem;
+  text-align: center;
+  background-color: #ffffff;
+  border-bottom: 1px solid #efefef;
+  color: #777777;
+}
+.mobile-message-header>div{
+  width: 100%;
+  height: 3.7rem;
+  position: absolute;
+}
+.mobile-message-header .fa{
+  font-size: 2.4rem;
+  height: 5rem;
+  line-height: 4.2rem;
+}
+.mobile-message-header .left{
+  position: absolute;
+  padding: 0 1rem;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+.mobile-footer-button{
+  display: table-cell;
+  width: 7rem;
+  height: 4rem;
+}
+.mobile-footer-button .fa{
+  font-size: 2rem;
+  margin: 0 0 0 0.9rem;
+  line-height: 4rem;
+}
+/*
+.mobile-footer-input *{
+  height: 100%;
+  border: 1px solid #f4f4f4;
+
+}*/
+.mobile-footer-input *:focus{
+  outline:none;
+}
+.mobile-footer-input input{
+  width: 68%;
+}
+.mobile-footer-input button{
+  width: 30%;
+}
+.mobile-footer-input{
+  display: table-cell;
+  vertical-align: top;
+  height: 100%;
+}
+.mobile-footer-input .input{
+  display: table-cell;
+  width: 1000px;
+}
+.mobile-footer-input .input input{
+  height: 3rem;
+  padding: 1px 5px;
+  margin: 0.5rem 0;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #dddddd;
+}
+.mobile-footer-input .button{
+  width: 17rem;
+  display: table-cell;
+  padding: 0 0.9rem;
+}
+.mobile-footer-input .button button{
+  width: 100%;
+  height: 3rem;
+  border-radius: 5px;
+  border: 1px solid #dddddd;
+  background-color: #4ea1e8;
+  color: #ffffff;
+}
+.mobile-footer-input .button button:active{
+  background-color: #488eca;
+}
+.mobile-messages-body{
+  height: 100%;
+  background-color: #f4f4f4;
+}
+.mobile-messages .ms-right-body{
+  height: 100%;
+}
+.mobile-messages .ms-single-content-div{
+  padding-right: 2rem;
+}
+.mobile-messages .ms-single-right .ms-single-content-div{
+  padding-left: 2rem;
+  padding-right: 0.5rem;
+}
+.mobile .ms-mask{
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  margin-top: 4.2rem;
+  width: 100%;
+  z-index: 10003;
+  background-color: rgba(255,255,255,0.8);
+  font-size: 1.3rem;
+}
+.mobile .loading-info{
+  padding: 1rem 0;
+}
+.mobile .ms-single-content-image{
+  width: 15rem;
+  height: 10rem;
+}
+.upload-info{
+  height: 2rem;
+  background-color: rgba(0,0,0,0.7);
+  text-align: center;
+  line-height: 2rem;
+  color: #eeeeee;
+  position: absolute;
+  top: -2rem;
+  width: 100%;
+}
+img.emoji{
+  height: 2rem;
+  width: 2rem;
+}
+.mobile img.emoji{
+  height: 2rem;
+  width: 2rem;
+}
+.expressions{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  width: 100%;
+  background-color: rgba(255,255,255,1);
+}
+.expressions a{
+  display: inline-block;
+  padding: 3px 3px;
+  cursor: pointer;
+}
+.mobile .expressions a{
+  padding: 6px 3px;
+}
+.mobile .search-user{
+  padding: 0.5rem 1rem;
+  position: relative;
+}
+.mobile .search-user .button{
+  position: absolute;
+  right: 1.5rem;
+  top: 0.8rem;
+  font-size: 2rem;
+  color: #999999;
+  cursor: pointer;
+}
+.mobile .search-user .button:active{
+  color: #bbbbbb;
 }

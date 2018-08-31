@@ -10,6 +10,8 @@ block head
   link(rel='stylesheet' href='/Draft.css')
   link(rel='stylesheet' href='/katex.min.css')
   link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
+  link(rel="stylesheet" href="/photoswipe/dist/photoswipe.css")
+  link(rel="stylesheet" href="/photoswipe/dist/default-skin/default-skin.css")
   link(href=`/nkc_styles.css?v=${global.NKC.startTime}` rel='stylesheet' type='text/css')
   link(rel='shortcut icon' href='/favicon.ico')
   block title
@@ -25,12 +27,17 @@ block body
 
   block footer
     include nkc_footer.pug
-  audio#beep
+  include photoswipe
+  if data.user
+    -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
+    audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   script(src='/jquery/jquery-1.11.1.js')
   script(src='/bootstrap/js/bootstrap.min.js')
   script(src='/twemoji/2/twemoji.min.js')
   script(src='/Promise/promise.min.js')
   script(src='/vue/dist/vue.js')
+  script(src="/photoswipe/dist/photoswipe.js")
+  script(src="/photoswipe/dist/photoswipe-ui-default.js")
   script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
   script(src=`/message/socket.js?v=${global.NKC.startTime}`)
 

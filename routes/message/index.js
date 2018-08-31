@@ -3,52 +3,20 @@ const messageRouter = new Router();
 const systemInfoRouter = require('./systemInfo');
 const remindRouter = require('./remind');
 const userRouter = require('./user');
+const resourceRouter = require('./resource');
+const settingsRouter = require('./settings');
 messageRouter
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, query} = ctx;
     const {user} = data;
-    let rList = await db.MessageModel.aggregate([
-      {
-        $match: {
-          s: user.uid
-        }
-      },
-      {
-        $sort: {
-          tc: -1
-        }
-      },
-      {
-        $group: {
-          _id: '$r',
-        }
-      }
-    ]);
-    let sList = await db.MessageModel.aggregate([
-      {
-        $match: {
-          r: user.uid
-        }
-      },
-      {
-        $sort: {
-          tc: -1
-        }
-      },
-      {
-        $group: {
-          _id: '$s',
-        }
-      }
-    ]);
-    const list = rList.concat(sList);
-    let uidList = [];
-    for(const o of list) {
-      if(o._id !== user.uid && !uidList.includes(o._id)) {
-        uidList.push(o._id);
-      }
+    const from = ctx.request.get('FROM');
+    if(from !== 'nkcAPI') {
+      data.targetUid = query.uid;
+      user.newMessage = {};
+      ctx.template = 'message/message.pug';
+      return await next();
     }
-
+    const uidList = await db.MessageModel.getUsersFriendsUid(user.uid);
     const userList = [];
     for(const uid of uidList) {
       const targetUser = await db.UserModel.findOne({uid});
@@ -108,24 +76,20 @@ messageRouter
     }
     data.userList = userListArr;
     data.uidList = uidList;
-
     const systemInfo = await db.MessageModel.find({ty: 'STE'}).sort({tc: -1}).limit(1);
-    const allSystemInfoCount = await db.MessageModel.count({ty: 'STE'});
-    const viewedSystemInfoCount = await db.SystemInfoLogModel.count({uid: user.uid});
-    const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
 
     const remind = await db.MessageModel.find({ty: 'STU', r: user.uid}).sort({tc: -1});
-    const newRemindCount = await db.MessageModel.count({ty: 'STU', r: user.uid, vd: false});
-
     data.remind = await db.MessageModel.extendReminder(remind);
-    data.newRemindCount = newRemindCount;
 
     data.systemInfo = systemInfo;
-    data.newSystemInfoCount = newSystemInfoCount;
-    ctx.template = 'message/message.pug';
+    data.newRemindCount = user.newMessage.newReminderCount;
+    data.newSystemInfoCount = user.newMessage.newSystemInfoCount;
+
     await next();
   })
   .use('/remind', remindRouter.routes(), remindRouter.allowedMethods())
   .use('/user', userRouter.routes(), userRouter.allowedMethods())
+  .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods());
 module.exports = messageRouter;

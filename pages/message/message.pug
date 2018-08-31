@@ -4,124 +4,461 @@ block title
   -const hiddenFooter = true;
   link(rel='stylesheet' href="/message/message.css")
 block content
-  .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak)#app
+  .hidden#data=JSON.stringify({targetUid: data.targetUid})
+  .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak )#app
+    input.hidden#imgInput(type='file' multiple="multiple" accept="image/*" @change="uploadResource")
+    input.hidden#fileInput(type='file' multiple="multiple" @change="uploadResource")
+    div.mobile.row(v-if="mobile")
+      .ms-mask(v-if="socketInfo" :class="{'hide': hide}" :style="'color: ' + socketInfo.color") {{socketInfo.text}}
+      .mobile-footer(v-if="showMobileNavbar")
+        .col-xs-6(:class="{active: showMobileList}" @click="openMobileList")
+          .fa.fa-list-ul
+          .bar-name 列表
+        .col-xs-6(:class="{active: showMobileSettings}" @click="openMobileSettings")
+          .fa.fa-cog
+          .bar-name 设置
+      transition(name="slide-fade")
+        .mobile-messages(v-if="showMobileMessages" :style="!targetUid?'padding-bottom:0':''")
+          .mobile-messages-body(v-if="contentType === 'remind'")
+            .noSelectUser(v-if='systemInfo.length === 0')
+              .fa 提醒
+            div(style="height: 100%;" v-else)
+              .ms-notice(style="height: 100%;")
+                .ms-notice-body(v-for="message in remind")
+                  .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
+                  .ms-notice-content
+                    div(v-if="message.ty === 'replyThread'")
+                      a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
+                        img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')
+                        span {{message.targetUser.username}}
+                      span 在您的文章
+                      a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
+                        span 《{{message.post.t}}》
+                      span 下发表了如下回复：
+                      a.remind-link.remind-content(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
+                    div(v-else-if="message.ty === 'digestThread'")
+                      span 您的文章
+                      a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
+                        span 《{{message.post.t}}》
+                      span 已被列入精选。
+                    div(v-else-if="message.ty === 'digestPost'")
+                      span 您的回复
+                        a.remind-link(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.post.pid + '#' + message.post.pid" target='_blank')
+                          span {{message.post.c}}
+                        span 已被列入精选。
+                    div(v-else-if="message.ty === 'bannedPost'")
+                      span 您在文章标题为
+                      a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                      span 下的回复由于
+                      strong &nbsp;{{message.reason}}&nbsp;
+                      span 等原因，已被屏蔽。该操作不可恢复，也不接受申诉。请您在下次发表时，认真对照国家法律法规、论坛规章，确保标题和内容清晰详细，品质优良。请勿发表没有营养的内容。
+                    div(v-else-if="message.ty === 'postWasReturned'")
+                      span 您在文章标题为
+                      a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                      span 下的回复由于
+                      strong &nbsp;{{message.reason}}&nbsp;
+                      span 等原因，已被退回，目前只有您自己可以查看。请您在 72 小时之内
+                      span(style="color: red;") （{{message.timeLimit}}）
+                      span 修改文章内容，消除存在的问题，并确保符合论坛规章。点击
+                      a(:href="'/editor?type=post&id=' + message.post.pid" target="_blank") &nbsp;这里&nbsp;
+                      span 进行修改。
+                      br
+                      span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。
+                    div(v-else-if="message.ty === 'bannedThread'")
+                      span 您的标题为
+                      a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                      span 的文章由于
+                      strong &nbsp;{{message.reason}}&nbsp;
+                      span 等原因，已被屏蔽。该操作不可恢复，也不接受申诉。请您在下次发表时，认真对照国家法律法规、论坛规章，确保标题和内容清晰详细，品质优良。请勿发表常识性问题。
+                    div(v-else-if="message.ty === 'threadWasReturned'")
+                      span 您的标题为
+                      a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                      span 的文章由于
+                      strong &nbsp;{{message.reason}}&nbsp;
+                      span 等原因，已被退回，目前只有您自己可以查看。请您在 72 小时之内
+                      span(style="color: red;") （{{message.timeLimit}}）
+                      span 修改文章内容，消除存在的问题，并确保符合论坛规章。点击
+                      a(:href="'/editor?type=post&id=' + message.firstPost.pid" target="_blank") &nbsp;这里&nbsp;
+                      span 进行修改。
+                      br
+                      span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。
+                    div(v-else-if="message.ty === '@'")
+                      a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
+                        img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')
+                        span {{message.targetUser.username}}
+                      span 在回复中@了你，
+                      a.remind-link(:href="'/t/' + message.targetPost.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank')
+                        span 立即查看
+                .loading-info(@click='getRemind') {{loadingText}}
+          .mobile-messages-body(v-if="contentType === 'notice'")
+            .noSelectUser(v-if='systemInfo.length === 0')
+              .fa 通知
+            div(style="height: 100%;" v-else)
+              .ms-notice(style="height: 100%;")
+                .ms-notice-body(v-for="message in systemInfo")
+                  .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
+                  .ms-notice-content {{message.c}}
+                .loading-info(@click='getSystemInfo') {{loadingText}}
+          .mobile-messages-body(v-if="contentType === 'message'")
+            .ms-right-body.contentBody(@click='showEmoji = false')
+              .loading-info(@click='getMessage') {{loadingText}}
+              //.ms-header spark
+              .ms-single(v-for="message in messages")
+                .ms-single-left(v-if="message.s !== user.uid")
+                  .ms-single-img
+                    a(:href="'/u/' + message.s" target="_blank")
+                      img(:src="'/avatar/' + message.s")
+                  .ms-single-content-div
+                    .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+                    .ms-single-content
+                      .arrow
+                      div(v-if="!message.c.ty" v-html="message.html")
+                      div.ms-single-content-image(v-if="message.c.ty === 'img'")
+                        .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                        .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                        a(:href="'/message/resource/' + message.c.id" target="_blank")
+                          img(:src="message.c.src?message.c.src:'/message/resource/' + message.c.id + '?type=sm'")
+                      div.ms-single-content-file(v-if="message.c.ty === 'file'")
+                        .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                        .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                        a(:href="'/message/resource/' + message.c.id" target="_blank")
+                          span &nbsp;{{message.c.na}}
+                          img(src="/default/default_thumbnail.png")
+                .ms-single-right(v-else)
+                  .ms-single-content-div
+                    .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+                    .ms-single-content
+                      .arrow
+                      div(v-if="!message.c.ty" v-html="message.html")
+                      div.ms-single-content-image(v-if="message.c.ty === 'img'")
+                        .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                        .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                        a(:href="'/message/resource/' + message.c.id" target="_blank")
+                          img(:src="message.c.src?message.c.src:'/message/resource/' + message.c.id + '?type=sm'")
+                      div.ms-single-content-file(v-if="message.c.ty === 'file'")
+                        .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                        .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                        a(:href="'/message/resource/' + message.c.id" target="_blank")
+                          img(src="/default/default_thumbnail.png")
+                          span &nbsp;{{message.c.na}}
+                  .ms-single-img
+                    a(href=`/u/${data.user.uid}/settings` target="_blank")
+                      img(:src="'/avatar/' + message.s")
+          .mobile-message-header
+            div
+              span(v-if='contentType === "message" && targetUid') {{targetUser?targetUser.username:'加载中'}}
+              span(v-if='contentType === "remind"') 系统提醒
+              span(v-if='contentType === "notice"') 系统通知
+              .left.fa.fa-angle-left(@click="closeMessages")
 
-    .hide#data=JSON.stringify({userList: data.userList, user: data.user, uidList: data.uidList, newSystemInfoCount: data.newSystemInfoCount, systemInfo: data.systemInfo, remind: data.remind, newRemindCount: data.newRemindCount})
-    .center-block.ms-socket-status(:style="'color: ' + socketInfo.color") {{socketInfo.text}}
-    .ms.center-block
-      .ms-left
-        .ms-header
-          .form-inline
-            .form-group
-              input.form-control.ms-input(placeholder='用户名、uid' v-model.trim="searchText" @keyup.enter="search")
-              button.form-control.ms-button(@click="search") 搜索
-        .ms-list
-          div(v-if="searchUsers.length !== 0")
-            h5.ms-list-info 根据 “{{searchText}}” 所找到的用户
-            .ms-list-body(v-for="searchUser in searchUsers" @click="selectUser(searchUser.uid)")
-              .ms-list-left
-                .ms-list-img
-                  .ms-point(:class="{online: searchUser.online}")
-                  img.ms-list-avatar(:src="'/avatar/' + searchUser.uid")
-              .ms-list-center
-                .ms-list-title {{searchUser.username}}
-                .ms-list-content {{searchUser.description || '暂未填写个人简介'}}
-          h5.ms-list-info 系统
-          .ms-list-body(@click="openNotice")
-            .ms-list-left.notice
-              .ms-list-img
-                .ms-list-avatar.fa.fa-bullhorn
-            .ms-list-center
-              .ms-list-title 通知
-              .ms-list-content {{latestSystemInfo.c}}
-            .ms-list-right
-              .ms-list-time {{latestSystemInfo.tc}}
-              .ms-list-number(v-if="newSystemInfoCount > 0") {{'未读' + newSystemInfoCount}}
-          .ms-list-body(@click="openRemind")
-            .ms-list-left.remind
-              .ms-list-img
-                .ms-list-avatar.fa.fa-bell-o
-            .ms-list-center
-              .ms-list-title 提醒
-              .ms-list-content {{latestRemind.c}}
-            .ms-list-right
-              .ms-list-time {{latestRemind.tc}}
-              .ms-list-number(v-if="newRemindCount > 0") {{'未读' + newRemindCount}}
-          h5.ms-list-info 已创建的聊天
-          .ms-list-body(v-for="item in userList" @click="selectUser(item.user.uid)")
+          .mobile-footer-input-div(v-if='contentType === "message" && targetUid')
+            transition(name='fade')
+              .upload-info(v-if='uploadInfo') {{uploadInfo}}
+            .mobile-footer-button
+              .fa.fa-smile-o(title='发送表情' @click='showEmoji = true')
+              //.fa.fa-picture-o(title='发送图片' onclick='$("#imgInput").click();')
+              .fa.fa-file-o(title='发送文件' onclick='$("#fileInput").click();')
+            .mobile-footer-input
+              .expressions(v-show="showEmoji")
+                a(v-for="tmj in twemoji")
+                  img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
+              .input
+                input(placeholder='请输入聊天内容' v-model="userInput[targetUid]" @keyup.enter='sendToUser' @click='showEmoji = false' ref='input')
+              .button
+                button(@click="sendToUser") 发送
+      .mobile-settings(v-if="showMobileSettings")
+        h5.ms-list-info 设置
+        .ms-settings-options(style='border: none;')
+          .ms-settings-options-name 声音提醒：
+          .ms-settings-options-content(style='border: none;')
+            div
+              input(type="checkbox" value="usersMessage" v-model="beep")
+              span &nbsp;私信
+            div
+              input(type="checkbox" value="systemInfo" v-model="beep")
+              span &nbsp;系统通知
+            div
+              input(type="checkbox" value="reminder" v-model="beep")
+              span &nbsp;系统提醒
+        .ms-settings-button(style='border: none;')
+          button.btn.btn-primary.btn-block(style="width: 100%;" @click='saveMessageSettings') 保存
+      .mobile-user-list(v-if="showMobileList")
+        div.search-user
+          input.form-control(placeholder='用户名、uid' v-model.trim="searchText" @keyup.enter="search")
+          .button.fa.fa-search(@click="search")
+        div(v-if="searchUsers.length !== 0")
+          h5.ms-list-info 根据 “{{searchText}}” 所找到的用户
+          .ms-list-body(v-for="searchUser in searchUsers" @click="selectUser(searchUser.uid)" :class="{active: targetUid === searchUser.uid}")
             .ms-list-left
               .ms-list-img
-                .ms-point(:class="{online: item.user.online}")
-                img.ms-list-avatar(:src="'/avatar/'+item.user.uid")
+                .ms-point(:class="{online: searchUser.online}")
+                img.ms-list-avatar(:src="'/avatar/' + searchUser.uid")
             .ms-list-center
-              .ms-list-title {{item.user.username}}
-              .ms-list-content {{item.latestMessage.c}}
-            .ms-list-right
-              .ms-list-time {{format('MM/DD HH:mm', item.latestMessage.tc)}}
-              .ms-list-number(v-if="item.newMessageCount") {{'未读' + item.newMessageCount}}
-      .ms-right(v-if='!contentType')
-        .noSelectUser
-          .fa.fa-user
-          div Chat v1.0.0
-      .ms-right(v-else-if='contentType === "notice"')
-        .noSelectUser(v-if='systemInfo.length === 0')
-          .fa 通知
-        div(style="height: 100%;" v-else)
-          .ms-header 系统通知
-          .ms-notice
-            .ms-notice-body(v-for="message in systemInfo")
-              .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
-              .ms-notice-content {{message.c}}
-            .loading-info(@click='getSystemInfo') {{loadingText}}
-      .ms-right(v-else-if='contentType === "remind"')
-        .noSelectUser(v-if='systemInfo.length === 0')
-          .fa 提醒
-        div(style="height: 100%;" v-else)
-          .ms-header 系统提醒
-          .ms-notice
-            .ms-notice-body(v-for="message in remind")
-              .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
-              .ms-notice-content
-                div(v-if="message.ty === 'replyThread'")
-                  a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
-                    img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')
-                    span {{message.targetUser.username}}
-                  span 在您的文章
-                  a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
-                    span 《{{message.post.t}}》
-                  span 下发表了如下回复：
-                  a.remind-link.remind-content(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
-            .loading-info(@click='getRemind') {{loadingText}}
-      .ms-right(v-else-if="contentType === 'message'")
-        .ms-header {{targetUser.username}}
-        .ms-right-body#contentBody
-          .loading-info(@click='getMessage') {{loadingText}}
-          //.ms-header spark
-          .ms-single(v-for="message in messages")
-            .ms-single-left(v-if="message.s !== user.uid")
-              .ms-single-img
-                a(:href="'/u/' + message.s" target="_blank")
-                  img(:src="'/avatar/' + message.s")
-              .ms-single-content-div
-                .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
-                .ms-single-content
-                  .arrow
-                  span {{message.c}}
-            .ms-single-right(v-else)
-              .ms-single-content-div
-                .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
-                .ms-single-content
-                  .arrow
-                  span {{message.c}}
-              .ms-single-img
-                img(:src="'/avatar/' + message.s")
-        .ms-right-input
-          textarea(placeholder='请输入聊天内容' v-model="userInput[targetUid]" @keyup.enter='sendToUser')
-          .text-right(style='padding: 0.2rem 1.5rem;')
-            button.btn.btn-default(@click="sendToUser") 发送
+              .ms-list-title {{searchUser.username}}
+                .ms-list-content {{searchUser.description || '暂未填写个人简介'}}
+        h5.ms-list-info 系统
+        .ms-list-body(@click="openNotice")
+          .ms-list-left.notice
+            .ms-list-img
+              .ms-list-avatar.fa.fa-bullhorn
+          .ms-list-center
+            .ms-list-title 通知
+            .ms-list-content {{latestSystemInfo.c}}
+          .ms-list-right
+            .ms-list-time {{latestSystemInfo.tc}}
+            .ms-list-number(v-if="newSystemInfoCount > 0") {{'未读' + newSystemInfoCount}}
+        .ms-list-body(@click="openRemind")
+          .ms-list-left.remind
+            .ms-list-img
+              .ms-list-avatar.fa.fa-bell-o
+          .ms-list-center
+            .ms-list-title 提醒
+            .ms-list-content {{latestRemind.c}}
+          .ms-list-right
+            .ms-list-time {{latestRemind.tc}}
+            .ms-list-number(v-if="newRemindCount > 0") {{'未读' + newRemindCount}}
+        h5.ms-list-info 已创建的聊天
+        .ms-list-body(v-for="item in userList" @click="selectUser(item.user.uid)")
+          .ms-list-left
+            .ms-list-img
+              .ms-point(:class="{online: item.user.online}")
+              img.ms-list-avatar(:src="'/avatar/'+item.user.uid")
+          .ms-list-center
+            .ms-list-title {{item.user.username}}
+            .ms-list-content(v-if="!item.latestMessage.c.ty") {{item.latestMessage.c}}
+            .ms-list-content(v-else-if="item.latestMessage.c.ty === 'img'") 图片
+            .ms-list-content(v-else-if="item.latestMessage.c.ty === 'file'") 文件
+          .ms-list-right
+            .ms-list-time {{format('MM/DD HH:mm', item.latestMessage.tc)}}
+            .ms-list-number(v-if="item.newMessageCount") {{'未读' + item.newMessageCount}}
+    div.computer(v-else)
+      .center-block.ms-socket-status(v-if="socketInfo" :style="'color: ' + socketInfo.color") {{socketInfo.text}}
+      .ms.center-block
+        .ms-mask(v-if="socketInfo" :class="{'hide': hide}" :style="'color: ' + socketInfo.color") {{socketInfo.text}}
+        transition(name="fade")
+          .ms-settings(v-if="showSettings")
+            .ms-settings-body
+              .ms-settings-header
+                span 设置
+                .fa.fa-remove(@click="showSettings = false")
+              .ms-settings-options
+                .ms-settings-options-name 声音提醒：
+                .ms-settings-options-content
+                  div
+                    input(type="checkbox" value="usersMessage" v-model="beep")
+                    span &nbsp;私信
+                  div
+                    input(type="checkbox" value="systemInfo" v-model="beep")
+                    span &nbsp;系统通知
+                  div
+                    input(type="checkbox" value="reminder" v-model="beep")
+                    span &nbsp;系统提醒
+              .ms-settings-button
+                button.btn.btn-default(@click='saveMessageSettings') 保存
+
+        .ms-left
+          .ms-header
+            .form-inline
+              .form-group
+                .form-control.fa.fa-cog(@click="showSettings = true" style="background-color: rgba(0,0,0,0);border: none;color: #ffffff;cursor: pointer;font-size: 1.4rem;padding: 0 0.5rem 0 0;")
+                input.form-control.ms-input(placeholder='用户名、uid' v-model.trim="searchText" @keyup.enter="search")
+                button.form-control.ms-button(@click="search") 搜索
+          .ms-list
+            div(v-if="searchUsers.length !== 0")
+              h5.ms-list-info 根据 “{{searchText}}” 所找到的用户
+              .ms-list-body(v-for="searchUser in searchUsers" @click="selectUser(searchUser.uid)" :class="{active: targetUid === searchUser.uid}")
+                .ms-list-left
+                  .ms-list-img
+                    .ms-point(:class="{online: searchUser.online}")
+                    img.ms-list-avatar(:src="'/avatar/' + searchUser.uid")
+                .ms-list-center
+                  .ms-list-title {{searchUser.username}}
+                  .ms-list-content {{searchUser.description || '暂未填写个人简介'}}
+            h5.ms-list-info 系统
+            .ms-list-body(@click="openNotice" :class="{active: contentType === 'notice'}")
+              .ms-list-left.notice
+                .ms-list-img
+                  .ms-list-avatar.fa.fa-bullhorn
+              .ms-list-center
+                .ms-list-title 通知
+                .ms-list-content {{latestSystemInfo.c}}
+              .ms-list-right
+                .ms-list-time {{latestSystemInfo.tc}}
+                .ms-list-number(v-if="newSystemInfoCount > 0") {{'未读' + newSystemInfoCount}}
+            .ms-list-body(@click="openRemind" :class="{active: contentType === 'remind'}")
+              .ms-list-left.remind
+                .ms-list-img
+                  .ms-list-avatar.fa.fa-bell-o
+              .ms-list-center
+                .ms-list-title 提醒
+                .ms-list-content {{latestRemind.c}}
+              .ms-list-right
+                .ms-list-time {{latestRemind.tc}}
+                .ms-list-number(v-if="newRemindCount > 0") {{'未读' + newRemindCount}}
+            h5.ms-list-info 已创建的聊天
+            .ms-list-body(v-for="item in userList" @click="selectUser(item.user.uid)" :class="{active: targetUid === item.user.uid}")
+              .ms-list-left
+                .ms-list-img
+                  .ms-point(:class="{online: item.user.online}")
+                  img.ms-list-avatar(:src="'/avatar/'+item.user.uid")
+              .ms-list-center
+                .ms-list-title {{item.user.username}}
+                .ms-list-content(v-if="!item.latestMessage.c.ty") {{item.latestMessage.c}}
+                .ms-list-content(v-else-if="item.latestMessage.c.ty === 'img'") 图片
+                .ms-list-content(v-else-if="item.latestMessage.c.ty === 'file'") 文件
+              .ms-list-right
+                .ms-list-time {{format('MM/DD HH:mm', item.latestMessage.tc)}}
+                .ms-list-number(v-if="item.newMessageCount") {{'未读' + item.newMessageCount}}
+        .ms-right(v-if='!contentType')
+          .noSelectUser
+            .fa.fa-user
+            div Chat v1.0.0
+        .ms-right(v-else-if='contentType === "notice"')
+          .noSelectUser(v-if='systemInfo.length === 0')
+            .fa 通知
+          div(style="height: 100%;" v-else)
+            .ms-header 系统通知
+            .ms-notice
+              .ms-notice-body(v-for="message in systemInfo")
+                .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
+                .ms-notice-content {{message.c}}
+              .loading-info(@click='getSystemInfo') {{loadingText}}
+        .ms-right(v-else-if='contentType === "remind"')
+          .noSelectUser(v-if='systemInfo.length === 0')
+            .fa 提醒
+          div(style="height: 100%;" v-else)
+            .ms-header 系统提醒
+            .ms-notice
+              .ms-notice-body(v-for="message in remind")
+                .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
+                .ms-notice-content
+                  div(v-if="message.ty === 'replyThread'")
+                    a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
+                      img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')
+                      span {{message.targetUser.username}}
+                    span 在您的文章
+                    a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
+                      span 《{{message.post.t}}》
+                    span 下发表了如下回复：
+                    a.remind-link.remind-content(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
+                  div(v-else-if="message.ty === 'digestThread'")
+                    span 您的文章
+                    a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
+                      span 《{{message.post.t}}》
+                    span 已被列入精选。
+                  div(v-else-if="message.ty === 'digestPost'")
+                    span 您的回复
+                      a.remind-link(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.post.pid + '#' + message.post.pid" target='_blank')
+                        span {{message.post.c}}
+                      span 已被列入精选。
+                  div(v-else-if="message.ty === 'bannedPost'")
+                    span 您在文章标题为
+                    a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                    span 下的回复由于
+                    strong &nbsp;{{message.reason}}&nbsp;
+                    span 等原因，已被屏蔽。该操作不可恢复，也不接受申诉。请您在下次发表时，认真对照国家法律法规、论坛规章，确保标题和内容清晰详细，品质优良。请勿发表没有营养的内容。
+                  div(v-else-if="message.ty === 'postWasReturned'")
+                    span 您在文章标题为
+                    a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                    span 下的回复由于
+                    strong &nbsp;{{message.reason}}&nbsp;
+                    span 等原因，已被退回，目前只有您自己可以查看。请您在 72 小时之内
+                    span(style="color: red;") （{{message.timeLimit}}）
+                    span 修改文章内容，消除存在的问题，并确保符合论坛规章。点击
+                    a(:href="'/editor?type=post&id=' + message.post.pid" target="_blank") &nbsp;这里&nbsp;
+                    span 进行修改。
+                    br
+                    span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。
+                  div(v-else-if="message.ty === 'bannedThread'")
+                    span 您的标题为
+                    a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                    span 的文章由于
+                    strong &nbsp;{{message.reason}}&nbsp;
+                    span 等原因，已被屏蔽。该操作不可恢复，也不接受申诉。请您在下次发表时，认真对照国家法律法规、论坛规章，确保标题和内容清晰详细，品质优良。请勿发表常识性问题。
+                  div(v-else-if="message.ty === 'threadWasReturned'")
+                    span 您的标题为
+                    a(:href="'/t/' + message.firstPost.tid" target="_blank") &nbsp;{{message.firstPost.t}}&nbsp;
+                    span 的文章由于
+                    strong &nbsp;{{message.reason}}&nbsp;
+                    span 等原因，已被退回，目前只有您自己可以查看。请您在 72 小时之内
+                    span(style="color: red;") （{{message.timeLimit}}）
+                    span 修改文章内容，消除存在的问题，并确保符合论坛规章。点击
+                    a(:href="'/editor?type=post&id=' + message.firstPost.pid" target="_blank") &nbsp;这里&nbsp;
+                    span 进行修改。
+                    br
+                    span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。
+                  div(v-else-if="message.ty === '@'")
+                    a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
+                      img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')
+                      span {{message.targetUser.username}}
+                    span 在回复中@了你，
+                    a.remind-link(:href="'/t/' + message.targetPost.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank')
+                      span 立即查看
+              .loading-info(@click='getRemind') {{loadingText}}
+        .ms-right(v-else-if="contentType === 'message'")
+          .ms-header {{targetUser.username}}
+          .ms-right-body.contentBody(@click='showEmoji = false')
+            .loading-info(@click='getMessage') {{loadingText}}
+            //.ms-header spark
+            .ms-single(v-for="message in messages")
+              .ms-single-left(v-if="message.s !== user.uid")
+                .ms-single-img
+                  a(:href="'/u/' + message.s" target="_blank")
+                    img(:src="'/avatar/' + message.s")
+                .ms-single-content-div
+                  .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+                  .ms-single-content
+                    .arrow
+                    div(v-if="!message.c.ty" v-html="message.html")
+                    div.ms-single-content-image(v-if="message.c.ty === 'img'")
+                      .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                      .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                      a(:href="'/message/resource/' + message.c.id" target="_blank")
+                        img(:src="message.c.src?message.c.src:'/message/resource/' + message.c.id + '?type=sm'")
+                    div.ms-single-content-file(v-if="message.c.ty === 'file'")
+                      .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                      .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                      a(:href="'/message/resource/' + message.c.id" target="_blank")
+                        span &nbsp;{{message.c.na}}
+                        img(src="/default/default_thumbnail.png")
+              .ms-single-right(v-else)
+                .ms-single-content-div
+                  .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+                  .ms-single-content
+                    .arrow
+                    div(v-if="!message.c.ty" v-html="message.html")
+                    div.ms-single-content-image(v-if="message.c.ty === 'img'")
+                      .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                      .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                      a(:href="'/message/resource/' + message.c.id" target="_blank")
+                        img(:src="message.c.src?message.c.src:'/message/resource/' + message.c.id + '?type=sm'")
+                    div.ms-single-content-file(v-if="message.c.ty === 'file'")
+                      .ms-single-content-image-mask(v-if="message.uploadFail") 发送失败，点击重新发送
+                      .ms-single-content-image-mask(v-else-if="message.uploadInfo") {{message.uploadInfo}}
+                      a(:href="'/message/resource/' + message.c.id" target="_blank")
+                        img(src="/default/default_thumbnail.png")
+                        span &nbsp;{{message.c.na}}
+                .ms-single-img
+                  a(href=`/u/${data.user.uid}/settings` target="_blank")
+                    img(:src="'/avatar/' + message.s")
+          .ms-right-input
+            transition(name='fade')
+              .upload-info(v-if='uploadInfo') {{uploadInfo}}
+            textarea(placeholder='请输入聊天内容' v-model="userInput[targetUid]" @keyup.enter='sendToUser' @click='showEmoji = false' ref='input')
+            .ms-right-input-button
+              .expressions(v-show="showEmoji")
+                a(v-for="tmj in twemoji")
+                  img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
+              .text-left
+                .fa.fa-smile-o(title='发送表情' @click='showEmoji = true')
+                .fa.fa-picture-o(title='发送图片' onclick='$("#imgInput").click();')
+                .fa.fa-file-o(title='发送文件' onclick='$("#fileInput").click();')
+              .text-right(style='float: right;margin-right: 2rem;')
+                button.btn.btn-default.btn-sm(@click="sendToUser") 发送
 
 block scripts
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
   script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  script(src=`/xss/dist/xss.js?v=${global.NKC.startTime}`)
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/message/message.js?v=${global.NKC.startTime}`)
