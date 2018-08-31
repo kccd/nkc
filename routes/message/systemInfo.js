@@ -34,10 +34,7 @@ systemInfoRouter
         await log.save();
       }
     }
-    const socket = global.NKC.sockets[user.uid];
-    if(socket) {
-      socket.NKC.targetUid = '';
-    }
+    db.MessageModel.setTargetUid(user.uid, '');
     await next();
   });
 module.exports = systemInfoRouter;

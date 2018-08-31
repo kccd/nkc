@@ -3,11 +3,12 @@ const {encodeRFC5987ValueChars} = apiFn;
 const path = require('path');
 module.exports = async (ctx, next) => {
   const {filePath, resource, fs, type} = ctx;
-  if(type !== 'application/json' && type !== 'text/html' && ctx.method === 'GET') {  //只有当请求方式为GET时才返回图片
+  // if(type !== 'application/json' && type !== 'text/html' && ctx.method === 'GET') {  //只有当请求方式为GET时才返回图片
+  if(filePath && ctx.method === 'GET') {
 	  if(ctx.lastModified && ctx.fresh) {
       ctx.status = 304;
       return
-    } 
+    }
     const basename = path.basename(ctx.filePath);
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');

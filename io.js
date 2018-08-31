@@ -6,13 +6,87 @@ const nkcModules = require('./nkcModules');
 const settings = require('./settings');
 const Cookies = require('cookies-string-parse');
 const sockets = {};
+const noticeSockets = {};
+let io;
 const api = {};
+let n = 0;
 api.print = (text) => {
   console.log(`${moment().format('HH:mm:ss')} ${' socket '.bgGreen} ${text}`)
 };
-const func = (server) => {
-  const io = require('socket.io')(server);
-  io.on('connection', async (socket) => {
+
+const onlienUsersCount = () => {
+  let n = 0;
+  for(let i in sockets) {
+    if(sockets.hasOwnProperty(i) && sockets[i].length !== 0) {
+      n++;
+    }
+  }
+  return n;
+};
+const func = async (server) => {
+
+  io = require('socket.io')(server);
+
+  // 聊天socket
+  io
+    .on('connection', async (socket) => {
+      socket.on('aaa', () => {
+        console.log(io)
+        for(let i in sockets) {
+          if(sockets.hasOwnProperty(i)) {
+            const targetSockets = sockets[i];
+            const arr = targetSockets.map(s => s.id);
+            console.log(`${i}: ${arr}`);
+          }
+        }
+      });
+      connection(socket, async (socket, user) => {
+        // login
+        let userSockets;
+        if(!sockets[user.uid] || sockets[user.uid].length === 0) {
+          sockets[user.uid] = [];
+        }
+        userSockets = sockets[user.uid];
+        socket.NKC = {
+          uid: user.uid,
+          targetUid: ''
+        };
+
+        if(userSockets.length >= 5) {
+          const firstSocket = userSockets[0];
+          firstSocket.NKC.removed = true;
+          firstSocket.disconnect(true);
+          userSockets = userSockets.shift();
+        }
+        userSockets.push(socket);
+
+        if(sockets[user.uid].length === 1) {
+          // 用户上线
+          await user.update({online: true});
+          // 通知好友该用户上线
+          await notifyFriends(user.uid, 'login');
+          console.log(`${' CHAT '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${user.uid.bgCyan} ${'连接成功'.bgGreen} 在线人数：${onlienUsersCount()}` );
+        }
+
+      }, async (socket) => {
+        // logout
+        if(socket.NKC.removed) return;
+        const {uid} = socket.NKC;
+        if(!uid) return;
+        const index = sockets[uid].indexOf(socket);
+        sockets[uid].splice(index, 1);
+        if(sockets[uid].length === 0) {
+          console.log(`${' CHAT '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'断开连接'.bgRed} 在线人数：${onlienUsersCount()}` );
+          await db.UserModel.update({uid}, {$set: {online: false}});
+          await notifyFriends(uid, 'logout');
+        }
+      })
+    });
+  global.NKC.sockets = sockets;
+};
+
+async function connection(socket, login, logout) {
+  try{
     const cookies = new Cookies(socket.request.headers.cookie, {
       keys: [settings.cookie.secret]
     });
@@ -21,52 +95,37 @@ const func = (server) => {
       const {username, uid} = JSON.parse(decodeURI(userInfo));
       const user = await db.UserModel.findOne({username, uid});
       if(user) {
-        const oldSocket = sockets[user.uid];
-        if(oldSocket) {
-          oldSocket.disconnect(true);
-        }
-        socket.NKC = {
-          uid: user.uid,
-          targetUid: ''
-        };
-        sockets[user.uid] = socket;
-        await user.update({online: true});
-        io.sockets.emit('login', {
-          targetUid: user.uid
-        });
-        console.log(`用户：${user.username}连接成功`);
+        await login(socket, user);
       } else {
-        socket.disconnect(true);
+        return socket.disconnect(true);
       }
     } else {
-      socket.disconnect(true);
+      return socket.disconnect(true);
     }
     // 断线处理
     socket.on('disconnect', async (reason) => {
-      const {uid} = socket.NKC;
-      io.sockets.emit('logout', {targetUid: uid});
-      delete sockets[uid];
-      await db.UserModel.update({uid}, {online: false});
-      console.log(`用户：${uid} 已下线。`);
+      await logout(socket);
     });
     socket.on('error', async (reason) => {
-      const {uid} = socket.NKC;
-      io.sockets.emit('logout', {targetUid: uid});
-      delete sockets[uid];
-      await db.UserModel.update({uid}, {online: false});
-      console.log(`用户：${uid} 已下线。`);
+      await logout(socket);
     });
+  } catch(err) {
+    console.log(err);
+  }
+}
 
-    socket.on('message', (data) => {
-      console.log(`------message---------`);
-      console.log(data);
-      console.log(`----------------------`);
-    });
-  });
+async function notifyFriends(uid, type) {
+  const usersFriendsUid = await db.MessageModel.getUsersFriendsUid(uid);
+  await Promise.all(usersFriendsUid.map(targetUid => {
+    const targetSockets = global.NKC.sockets[targetUid];
+    if(targetSockets && targetSockets.length !== 0) {
+      targetSockets.map(socket => {
+        socket.emit(type, {
+          targetUid: uid
+        });
+      });
+    }
+  }));
+}
 
-  return {
-    io,
-    sockets
-  };
-};
 module.exports = func;

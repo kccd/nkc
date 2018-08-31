@@ -147,6 +147,29 @@ statusRouter
 			x,
 			title
 		};
+
+		if(!type) {
+			data.onlineUsers = [];
+			let onlineUsersCount = 0;
+			const sockets = global.NKC.sockets;
+			for(let i in sockets) {
+				if(sockets.hasOwnProperty(i)) onlineUsersCount++;
+			}
+			data.onlineUsersCount = onlineUsersCount;
+			const onlineUsers = await db.UserModel.find({online: true}).limit(5000);
+			for(const onlineUser of onlineUsers) {
+				const targetSocket = sockets[onlineUser.uid];
+				if(!targetSocket) {
+					await onlineUser.update({online: false});
+					delete sockets[onlineUser.uid];
+				} else {
+					data.onlineUsers.push({
+						uid: onlineUser.uid,
+						username: onlineUser.username
+					});
+				}
+			}
+		}
 		await next();
 	});
 module.exports = statusRouter;

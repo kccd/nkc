@@ -12,12 +12,27 @@ html {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
-
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
 /*-------------*/
 h1, h2, h3, h4, h5, p{
   word-wrap:break-word;
 }
-
+.newMessageDiv{
+  display: none;
+}
+.newMessagePoint{
+  display: none;
+}
 .margin-right{
   margin-right: 5px;
 }
@@ -640,11 +655,11 @@ width: 100%;
 }
 .forum-category a{
   display: inline-block;
-  padding: 0.2rem 0.3rem;
+  padding: 0.2rem 0.2rem;
   border-radius: 5px;
   text-decoration: none;
-  margin-right: 0.5rem;
-  font-size: 1.3rem;
+  margin-right: 0.3rem;
+  font-size: 1.2rem;
 }
 .forum-category a:hover{
   background-color: #ddd;
@@ -3010,3 +3025,7 @@ img.emoji {
   }
 }
 
+.pswp{
+  z-index: 10010;
+  transition: display 1s;
+}

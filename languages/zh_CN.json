@@ -304,7 +304,11 @@
     "getRemind": "获取系统提醒",
     "getUserMessage": "获取与用户的聊天记录",
     "sendMessageToUser": "给用户发送信息",
-
+    "sendMessageFile": "上传聊天的资源文件",
+    "getMessageFile": "获取聊天的资源文件",
+    "modifyMessageSettings": "聊天信息设置修改",
+    "visitEMessageSettings": "访问后台聊天设置页面",
+    "modifyEMessageSettings": "后台修改聊天设置",
 
 
     "APPgetUserInfo": "app获取用户信息",

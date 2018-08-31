@@ -24,9 +24,21 @@ const usersGradeSchema = new Schema({
 		type: [String],
 		index: 1,
 		default: []
+	},
+  messagePersonCountLimit: {
+		type: Number,
+		default: 0
+	},
+	messageCountLimit: {
+		type: Number,
+		default: 0
 	}
 }, {
-	collection: 'usersGrades'
+	collection: 'usersGrades',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
 
 const UsersGradeModel = mongoose.model('usersGrades', usersGradeSchema);

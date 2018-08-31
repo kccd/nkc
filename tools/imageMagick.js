@@ -293,6 +293,14 @@ const webLogoify = async (path, targetPath) => {
 	return spawnProcess('magick', ['convert', path, targetPath]);
 };
 
+const messageImageSMify = async (path, targetPath) => {
+  const {width, height} = sizeLimit.messageImageSM;
+  if(linux) {
+    return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, '-crop', `${width}x${height}+0+0`, targetPath])
+  }
+  return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-crop', `${width}x${height}+0+0`, targetPath])
+};
+
 module.exports = {
   avatarify,
   attachify,
@@ -318,7 +326,8 @@ module.exports = {
 	lifePhotoify,
   forumAvatarify,
   imageNarrow,
-	userBannerify
+	userBannerify,
+  messageImageSMify
 };
 
 

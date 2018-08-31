@@ -26,6 +26,22 @@ const usersGeneralSchema = new Schema({
       type: Boolean,
       default: false
     }
+  },
+  messageSettings: {
+    beep: {
+      systemInfo: {
+        type: Boolean,
+        default: false
+      },
+      reminder: {
+        type: Boolean,
+        default: false
+      },
+      usersMessage: {
+        type: Boolean,
+        default: false
+      }
+    }
   }
 }, {
 	collection: 'usersGeneral'

@@ -1,3 +1,4 @@
+global.NKC = {};
 const http = require('http');
 const https = require('https');
 const app = require('./app');
@@ -16,8 +17,6 @@ searchInit()
   .then(async () => {
     console.log('ElasticSearch is ready...'.green);
 
-
-	  global.NKC = {};
 	  global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
 	  global.NKC.startTime = Date.now();
 
@@ -135,10 +134,8 @@ searchInit()
         .listen(
           serverSettings.httpsPort,
           serverSettings.address,
-          () => {
-          	const obj = io(server);
-          	global.NKC.io = obj.io;
-          	global.NKC.sockets = obj.sockets;
+          async () => {
+          	await io(server);
 	          console.log(`socket.io is ready...`.green);
           	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
           }
@@ -156,10 +153,8 @@ searchInit()
       server = http.createServer(app).listen(
         serverSettings.port,
         serverSettings.address,
-        () => {
-        	const obj = io(server);
-        	global.NKC.io = obj.io;
-        	global.NKC.sockets = obj.sockets;
+        async () => {
+        	await io(server);
         	console.log(`socket.io is ready...`.green);
         	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
         }

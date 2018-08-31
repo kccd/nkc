@@ -17,5 +17,6 @@ sysInfoRouter
     });
     await message.save();
     global.NKC.io.sockets.emit('systemInfo', message);
+    await next();
   });
 module.exports = sysInfoRouter;

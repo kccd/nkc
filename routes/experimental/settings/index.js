@@ -14,6 +14,7 @@ const numberRouter = require('./number');
 const homeRouter = require('./home');
 const pageRouter = require('./page');
 const examRouter = require('./exam');
+const messageRouter = require('./message');
 const smsRouter = require('./sms');
 settingRouter
 	.get('/', async (ctx, next) => {
@@ -22,6 +23,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+	.use('/message', messageRouter.routes(), messageRouter.allowedMethods())
 	.use('/sms', smsRouter.routes(), smsRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
 	.use('/page', pageRouter.routes(), pageRouter.allowedMethods())

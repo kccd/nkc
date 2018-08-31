@@ -110,6 +110,10 @@ module.exports = {
 		exam: {
 			GET: 'visitExamSettings',
 			PATCH: 'modifyExamSettings'
+		},
+		message: {
+			GET: 'visitEMessageSettings',
+			PATCH: 'modifyEMessageSettings'
 		}
 	},
 	systemInfo: {

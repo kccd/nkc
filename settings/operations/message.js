@@ -11,5 +11,14 @@ module.exports = {
       GET: 'getUserMessage',
       POST: 'sendMessageToUser'
     }
+  },
+  resource: {
+    POST: 'sendMessageFile',
+    PARAMETER: {
+      GET: 'getMessageFile'
+    }
+  },
+  settings: {
+    PATCH: 'modifyMessageSettings'
   }
 };

@@ -31,7 +31,8 @@ const settingSchema = new Schema({
 	  operationTypes: Number,
 	  problems: Number,
 	  logos: Number,
-		messages: Number
+		messages: Number,
+		messageFiles: Number
   },
 
 	//科创基金设置

@@ -71,11 +71,12 @@ module.exports = async (ctx, next) => {
 		}
 
 		// 获取用户信息
-		const userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
-		user.newMessage = userPersonal.newMessage;
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
 		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
+		user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
 
 		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
