@@ -170,11 +170,11 @@ $(function() {
             message.html = message.html.replace(/\[f\/(.*?)]/g, function(r, v1) {
               return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
             });
-            message.html = xss(message.html, {
+            /*message.html = xss(message.html, {
               whiteList: {
                 img: ['src', 'class']
               }
-            });
+            });*/
           }
         }
       }
