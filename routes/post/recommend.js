@@ -21,7 +21,7 @@ router
     const personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {recPosts: pid}});
     const post = await db.PostModel.findOneAndUpdate({pid}, {$addToSet: {recUsers: user.uid}});
     if(personal.recPosts.includes(pid) && post.recUsers.includes(user.uid))
-      ctx.throw(400, '您已经点过赞了，请刷新');
+      ctx.throw(400, '您已经点过赞了，请勿重复点赞');
     data.targetUser = await post.extendUser();
     data.message = post.recUsers.length + 1;
     // 被点赞用户的被点赞数加一并且生成记录

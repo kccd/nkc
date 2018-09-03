@@ -138,7 +138,6 @@ function APP_nkc_render(options){
     var rendered = commonwriter.render(parsed)
 
     return rendered;
-    //return custom_xss_process(rendered);
   }
 
   render.commonmark_safe = function(md){
