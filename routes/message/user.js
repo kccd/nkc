@@ -101,6 +101,7 @@ userRouter
       });
     });
     data.newMessage = newMessage;
+    data.targetUser = targetUser;
     await next();
   });
 module.exports = userRouter;

@@ -31,7 +31,6 @@ const func = async (server) => {
   io
     .on('connection', async (socket) => {
       socket.on('aaa', () => {
-        console.log(io)
         for(let i in sockets) {
           if(sockets.hasOwnProperty(i)) {
             const targetSockets = sockets[i];
@@ -83,6 +82,7 @@ const func = async (server) => {
       })
     });
   global.NKC.sockets = sockets;
+  global.NKC.io = io;
 };
 
 async function connection(socket, login, logout) {
