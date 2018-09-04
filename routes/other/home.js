@@ -164,6 +164,7 @@ homeRouter
 		if(ctx.reqType === "app"){
 			for(var i=0;i < data.threads.length;i++){
 				data.threads[i].firstPost.c = nkcModules.APP_nkc_render.experimental_render(data.threads[i].firstPost);
+				data.threads[i].lastPost.c = nkcModules.APP_nkc_render.experimental_render(data.threads[i].lastPost);
 			}
 		}
 	

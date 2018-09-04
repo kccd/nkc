@@ -138,7 +138,6 @@ function APP_nkc_render(options){
     var rendered = commonwriter.render(parsed)
 
     return rendered;
-    //return custom_xss_process(rendered);
   }
 
   render.commonmark_safe = function(md){
@@ -365,7 +364,7 @@ function APP_nkc_render(options){
 
       case 'bmp': //for S.D.P's post
       if(!allthumbnail)replaced =
-      '<img src="http://www.kechuang.org/r/'+rid+'" />'
+      '<img src="https://www.kechuang.org/r/'+rid+'" />'
 
       if(allthumbnail){
         replaced =
@@ -391,7 +390,7 @@ function APP_nkc_render(options){
       case 'webm':
       case 'ogg':
       replaced =
-      '<a href="http:www.kechuang.org/r/'+rid+'" >'+oname_safe+'</a><br><video src="http://www.kechuang.org/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>'
+      '<a href="https://www.kechuang.org/r/'+rid+'" >'+oname_safe+'</a><br><video style="width:100%;" src="https://www.kechuang.org/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>'
 
       break;
 
@@ -488,7 +487,11 @@ function APP_nkc_render(options){
         html = html.replace(reg,r.oname+'<span class="PostResourceCounter">'+r.hits+'次下载</span>')
       }
     }
-    html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>')
+    // 将图片加上域名前缀
+    // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>');
+    html = html.replace(/<img src="\/r(.+?)">/img,'<img class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$1" />');
+    // 将表情加上域名前缀
+    html = html.replace(/<img(.+?)src="\/twemoji(.*?)"(.*?)>/img,'<img$1src="https://www.kechuang.org/twemoji$2">$3');
     return html
   }
 
@@ -540,7 +543,7 @@ function APP_nkc_render(options){
       for(var i = 0; i < atUsers.length; i++) {
         var user = "@"+atUsers[i].username;
         var reg = new RegExp(user, 'gm');
-        renderedHTML = renderedHTML.replace(reg,'<a href="/m/' + atUsers[i].uid + '">' + user + '</a>')
+        renderedHTML = renderedHTML.replace(reg,'<a href="https://www.kechuang.org/m/' + atUsers[i].uid + '">' + user + '</a>')
       }
     }
     renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
@@ -559,7 +562,8 @@ function APP_nkc_render(options){
     //   }
     // }
     renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
-    renderedHTML = renderedHTML.replace(/<a href="(.*?)".*?>(.*?)<\/a>/igm,"<a href='javascript:void(0);' onclick='openLinkInFrame(\"$1\")'>$2</a>");
+    renderedHTML = renderedHTML.replace(/<a(.*?)href="(.*?)".*?>(.*?)<\/a>/igm,"<a$1href='javascript:void(0);' onclick='openLinkInFrame(\"$2\")'>$3</a>");
+    renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 onclick='openImage(\"$2\")'>")
     return renderedHTML
   }
   return render;

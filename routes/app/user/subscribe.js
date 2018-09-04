@@ -29,6 +29,12 @@ subscribeRouter
 			data.paging = paging;
  		}
 		data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
+		let followIds = data.subscribe.subscribeForums;
+		data.targetUserSubscribeforums = await Promise.all(followIds.map(fid => db.ForumModel.findOnly({fid})));
+		data.isFuns = false;
+		if(data.subscribe.subscribers.includes(data.user.uid)){
+			data.isFuns = true;
+		}
 		await next();
 	});
 module.exports = subscribeRouter;
