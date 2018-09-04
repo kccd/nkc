@@ -83,6 +83,7 @@ const func = async (server) => {
       })
     });
   global.NKC.sockets = sockets;
+  global.NKC.io = io;
 };
 
 async function connection(socket, login, logout) {
