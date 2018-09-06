@@ -4,10 +4,12 @@ const resourceRouter = new Router();
 resourceRouter
   .get('/:_id', async (ctx, next) => {
     const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
-    const {db, params, settings, fs, query} = ctx;
+    const {db, params, settings, fs, query, data} = ctx;
     const {_id} = params;
+    const {user} = data;
     const {type} = query;
     const messageFile = await db.MessageFileModel.findOnly({_id});
+    if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid) ctx.throw(403, '权限不足');
     const {path, ext} = messageFile;
     let filePath = PATH.join(settings.upload.messageFilePath, path);
     if(imageExt.includes(ext)) {
@@ -51,7 +53,9 @@ resourceRouter
     data.messages = [];
     for(const file of files) {
       const {name, size, path} = file;
+
       let ext = PATH.extname(name);
+
       if(!ext) ctx.throw(400, '无法识别文件格式');
       ext = ext.toLowerCase();
       ext = ext.replace('.', '');
@@ -81,15 +85,12 @@ resourceRouter
       });
       await fs.rename(path, targetPath);
       if(imageExt.includes(ext)) {
+        // await tools.imageMagick.allInfo(targetPath);
         const timePath = generateFolderName(messageImageSMPath) + _id + '.' + ext;
         const targetSMPath = messageImageSMPath + timePath;
         await tools.imageMagick.messageImageSMify(targetPath, targetSMPath);
       }
       await messageFile.save();
-      const socketTargetUid = db.MessageModel.getTargetUid(user.uid);
-      if(socketTargetUid === targetUid) {
-        message.vd = true;
-      }
       await message.save();
       data.messages.push(message);
       db.MessageModel.execute(targetUid, (socket) => {

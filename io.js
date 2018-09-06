@@ -48,7 +48,6 @@ const func = async (server) => {
         userSockets = sockets[user.uid];
         socket.NKC = {
           uid: user.uid,
-          targetUid: ''
         };
 
         if(userSockets.length >= 5) {

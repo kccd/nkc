@@ -6,7 +6,6 @@ userRouter
     const {uid} = params;
     const {user} = data;
     const {lastMessageId} = query;
-    db.MessageModel.setTargetUid(user.uid, uid);
     const targetUser = await db.UserModel.findOnly({uid});
     const q = {
       $or: [
@@ -89,10 +88,7 @@ userRouter
       ip: ctx.address,
       port: ctx.port
     });
-    const socketUserTargetUid = db.MessageModel.getTargetUid(user.uid);
-    if(socketUserTargetUid === uid) {
-      newMessage.vd = true;
-    }
+
     await newMessage.save();
     db.MessageModel.execute(uid, (socket) => {
       socket.emit('message', {

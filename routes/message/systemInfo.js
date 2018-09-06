@@ -34,7 +34,6 @@ systemInfoRouter
         await log.save();
       }
     }
-    db.MessageModel.setTargetUid(user.uid, '');
     await next();
   });
 module.exports = systemInfoRouter;

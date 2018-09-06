@@ -20,5 +20,8 @@ module.exports = {
   },
   settings: {
     PATCH: 'modifyMessageSettings'
+  },
+  mark: {
+    PATCH: 'modifyMessageStatus'
   }
 };

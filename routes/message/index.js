@@ -4,6 +4,7 @@ const systemInfoRouter = require('./systemInfo');
 const remindRouter = require('./remind');
 const userRouter = require('./user');
 const resourceRouter = require('./resource');
+const markRouter = require('./mark');
 const settingsRouter = require('./settings');
 messageRouter
   .get('/', async (ctx, next) => {
@@ -87,6 +88,7 @@ messageRouter
 
     await next();
   })
+  .use('/mark', markRouter.routes(), markRouter.allowedMethods())
   .use('/remind', remindRouter.routes(), remindRouter.allowedMethods())
   .use('/user', userRouter.routes(), userRouter.allowedMethods())
   .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())

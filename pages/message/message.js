@@ -519,6 +519,15 @@ function mounted(app) {
     beep('message');
     receiveMessage(data);
     computUserListOrder();
+    if(app.targetUser) {
+      nkcAPI('/message/mark', 'PATCH', {
+        type: 'user',
+        uid: app.targetUser.uid
+      })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+    }
   });
 
   socket.on('logout', function(data) {
@@ -541,11 +550,27 @@ function mounted(app) {
     beep('notice');
     app.newSystemInfoCount += 1;
     app.systemInfo.unshift(data);
+    if(app.showMobileNotice || app.contentType === 'notice') {
+      nkcAPI('/message/mark', 'PATCH', {
+        type: 'systemInfo'
+      })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+    }
   });
   socket.on('remind', function(data) {
     beep('reminder');
     app.newRemindCount += 1;
     app.remind.unshift(data);
+    if(app.showMobileReminder || app.contentType === 'remind') {
+      nkcAPI('/message/mark', 'PATCH', {
+        type: 'remind'
+      })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+    }
   });
 }
 
@@ -638,7 +663,7 @@ function uploadResource(e) {
     }, 3000)
   }
   updateFilePromise('/message/resource', formData, function(e) {
-    const num = ((e.loaded/e.total)*100).toFixed(2);
+    var num = ((e.loaded/e.total)*100).toFixed(2);
     app.uploadInfo = '文件上传中 ' + num + '%';
     if(e.loaded === e.total) {
       app.uploadInfo = '发送成功';

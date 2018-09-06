@@ -81,6 +81,7 @@ const watermarkifyFont = (dpi, font, position, path) =>{
 const allInfo = async path => {
   let back;
   back = await spawnProcess('magick', ['identify','-format','%[orientation]', path])
+  console.log(back);
   if(back.trim() === "RightTop"){
     return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
   }
