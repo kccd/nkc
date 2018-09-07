@@ -368,7 +368,7 @@ threadRouter
       });
       await message.save();
 
-      await nkcModules.socket.emitReminder(message);
+      await ctx.redis.pubMessage(message);
 		}
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');

@@ -93,12 +93,7 @@ resourceRouter
       await messageFile.save();
       await message.save();
       data.messages.push(message);
-      db.MessageModel.execute(targetUid, (socket) => {
-        socket.emit('message', {
-          fromUser: user,
-          message
-        });
-      });
+      await ctx.redis.pubMessage(message);
     }
 
     await next();

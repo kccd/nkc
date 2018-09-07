@@ -282,36 +282,5 @@ messageSchema.statics.getUsersFriendsUid = async (uid) => {
   return uidList;
 };
 
-
-messageSchema.statics.sendNotification = (type, toUid, fromUid) => {
-  const noticeSocket = global.NKC.noticeSockets[toUid];
-  if(noticeSocket) {
-    noticeSocket.emit('notice', {
-      type,
-      fromUid
-    });
-  }
-};
-/*messageSchema.statics.setTargetUid = (uid, targetUid) => {
-  const userSockets = global.NKC.sockets[uid];
-  if(userSockets && userSockets.length !== 0) {
-    userSockets.map(s => s.NKC.targetUid = targetUid);
-  }
-};*/
-messageSchema.statics.execute = (uid, func) => {
-  const userSockets = global.NKC.sockets[uid];
-  if(userSockets && userSockets.length !== 0) {
-    userSockets.map(socket => {
-      func(socket);
-    })
-  }
-};
-/*messageSchema.statics.getTargetUid = (uid) => {
-  const userSockets = global.NKC.sockets[uid];
-  if(userSockets && userSockets.length !== 0) {
-    return userSockets[0].NKC.targetUid;
-  }
-};*/
-
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;

@@ -2,7 +2,7 @@ global.NKC = {};
 const http = require('http');
 const https = require('https');
 const app = require('./app');
-const io = require('./io');
+const socket = require('./socket');
 const searchInit = require('./searchInit');
 const settings = require('./settings');
 const nkcModules = require('./nkcModules');
@@ -135,7 +135,7 @@ searchInit()
           serverSettings.httpsPort,
           serverSettings.address,
           async () => {
-          	await io(server);
+          	await socket(server);
 	          console.log(`socket.io is ready...`.green);
           	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
           }
@@ -154,7 +154,7 @@ searchInit()
         serverSettings.port,
         serverSettings.address,
         async () => {
-        	await io(server);
+        	await socket(server);
         	console.log(`socket.io is ready...`.green);
         	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
         }

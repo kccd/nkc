@@ -1,19 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const socketSchema = new Schema({
+  toc: {
+    type: Date,
+    default: 1,
+    index: 1
+  },
   socketId: {
     type: String,
     required: true,
-    unique: true
+    index: 1
   },
   uid: {
     type: String,
-    unique: true,
-    required: true
+    required: true,
+    index: 1
   },
-  targetUid: {
+  processId: {
     type: String,
-    default: '',
+    required: true,
     index: 1
   }
 }, {

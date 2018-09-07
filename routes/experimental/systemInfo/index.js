@@ -6,7 +6,7 @@ sysInfoRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {db, body} = ctx;
+    const {db, body, redis} = ctx;
     const {content} = body;
     if(!content) ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
@@ -16,7 +16,7 @@ sysInfoRouter
       c: content
     });
     await message.save();
-    global.NKC.io.sockets.emit('systemInfo', message);
+    await redis.pubMessage(message);
     await next();
   });
 module.exports = sysInfoRouter;

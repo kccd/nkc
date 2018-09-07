@@ -37,7 +37,7 @@ userRouter
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, nkcModules} = ctx;
+    const {db, body, params, data, nkcModules, redis} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
     const {user} = data;
@@ -90,12 +90,7 @@ userRouter
     });
 
     await newMessage.save();
-    db.MessageModel.execute(uid, (socket) => {
-      socket.emit('message', {
-        fromUser: user,
-        message: newMessage
-      });
-    });
+    await redis.pubMessage(newMessage);
     data.newMessage = newMessage;
     data.targetUser = targetUser;
     await next();

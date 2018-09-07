@@ -1,21 +1,84 @@
 body, html{
   height: 100%;
   overflow-y: scroll;
+  background-color: #f4f4f4;
 }
 .ms{
-  width: 90rem;
-  height: 60rem;
+  width: 100rem;
+  height: 62rem;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.14) 0 1px 10px;
   position: relative;
 }
 .ms .ms-left{
+  width: 25rem;
+  height: 62rem;
+  background-color: #f4f4f4;
   position: absolute;
-  width: 20rem;
   top: 0;
   left: 0;
-  background-color: #f4f4f4;
+  overflow: hidden;
+}
+
+.ms-user-panel{
+  height: 12rem;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  border-bottom: 1px solid #eeeeee;
+}
+.ms-connect-info{
+  position: absolute;
+  top: 0;
+  height: 2rem;
+  width: 100%;
+  left: 0;
+  text-align: left;
+  padding: 0 1rem;
+  z-index: 11;
+  line-height: 2rem;
+  color: #aaaaaa;
+}
+.ms-user-bg{
+  position: absolute;
+  left: 0;
+  top: 0;
   height: 100%;
+  width: 100%;
+  z-index: 10;
+  background-color: #f4f4f4;
+}
+.ms-user-bg img{
+  width: 100%;
+}
+.ms-user-username{
+  padding: 0.5rem;
+  font-size: 1.5rem;
+}
+.ms-user-info{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem 0 3rem 0;
+}
+.ms-user-avatar{
+  position: relative;
+  display: inline-block;
+  height: 5rem;
+  overflow: hidden;
+  width: 5rem;
+}
+.ms-user-avatar img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.computer{
+  /*height: 100%;*/
 }
 .form-control.ms-input{
   background-color: #fff;
@@ -38,14 +101,16 @@ body, html{
   outline: none;
 }
 .ms-list{
-  height: 57rem;
+  height: 50rem;
   overflow: hidden;
   overflow-y: scroll;
+  padding: 0.5rem 0;
+  background-color: #ffffff;
+
 }
 .ms-list-body{
-  margin: 0.5rem 0;
   min-height: 4rem;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   border-bottom: 1px solid #efefef;
   display: -webkit-flex;
   display: flex;
@@ -55,7 +120,7 @@ body, html{
   background-color: #eaeaea;
 }
 .ms-list-body.active{
-  background-color: #bac9d6;
+  background-color: #dbdbdb;
 }
 .ms-list-left{
   padding-left: 0.5rem;
@@ -99,7 +164,8 @@ body, html{
   font-size: 1.1rem;
 }
 .ms-list-title{
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  padding-top: 0.2rem;
 }
 .ms-list-content{
   word-break:break-all;
@@ -113,11 +179,11 @@ body, html{
 
 }
 .ms-list-left .ms-list-avatar{
-  height: 3rem;
-  width: 3rem;
+  height: 3.5rem;
+  width: 3.5rem;
   border-radius: 50%;
   text-align: center;
-  line-height: 3rem;
+  line-height: 3.5rem;
   color: #fff;
   font-size: 1.6rem;
 }
@@ -129,17 +195,19 @@ body, html{
 }
 
 .ms .ms-right{
-  width: 70rem;
-  height: 60rem;
+  width: 75rem;
+  height: 62rem;
   right: 0;
   top: 0;
-  background-color: #f4f4f4;
+  overflow: hidden;
+  background-color: #fff;
   position: absolute;
 }
 .ms .ms-header{
-  height: 3rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
   width: 100%;
-  background-color: #337ab7;
+  background-color: rgba(255,255,255,0.6);
   padding: 0 1rem;
 }
 .ms .ms-header .form-control{
@@ -237,33 +305,37 @@ body, html{
 
 }
 .ms-right-input{
-  height: 12rem;
+  height: 14rem;
+  background-color: #f4f4f4;
   position: relative;
 }
 .ms-right-input textarea{
   overflow-y: scroll;
   resize: none;
-  height: 9rem;
+  height: 10rem;
   width: 100%;
   padding: 0.5rem 1rem;
   font-size: 1.2rem;
   border: none;
   border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
 }
 .ms-right-input textarea:focus{
   border-color: rgba(0,0,0,0);
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
   outline: none;
 }
 .ms-right-body{
-  height: 45rem;
+  height: 46rem;
   padding-bottom: 2rem;
   overflow-y: scroll;
 }
 .ms-right .ms-header{
   text-align: center;
-  color: #fff;
-  font-size: 1.4rem;
-  line-height: 3rem;
+  font-size: 1.3rem;
+  color: #333333;
+  background-color: #dbdbdb;
 }
 .noSelectUser{
   text-align: center;
@@ -381,6 +453,7 @@ body, html{
 }
 .ms-right-input-button{
   position: relative;
+  height: 2rem;
 }
 .ms-right-input-button div{
   display: inline-block;
@@ -707,7 +780,7 @@ img.emoji{
 }
 .expressions{
   position: absolute;
-  bottom: 0;
+  bottom: 13rem;
   left: 0;
   padding: 1rem;
   width: 100%;

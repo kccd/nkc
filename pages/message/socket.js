@@ -1,5 +1,7 @@
 var pageName = '';
-var socket = io('/');
+var socket = new io('/', {
+  "transports":['polling', 'websocket']
+});
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
