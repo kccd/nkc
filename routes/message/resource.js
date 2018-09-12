@@ -17,7 +17,7 @@ resourceRouter
         filePath = PATH.join(settings.upload.messageImageSMPath, path);
       }
       try {
-        const a = await fs.access(filePath);
+        await fs.access(filePath);
       } catch(err) {
         filePath = settings.statics.defaultMessageFilePath;
       }

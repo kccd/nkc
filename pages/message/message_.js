@@ -707,7 +707,7 @@ function uploadResource(e) {
       app.uploadInfo = '';
     }, 3000)
   }
-  updateFilePromise('/message/resource', formData, function(e) {
+  uploadFilePromise('/message/resource', formData, function(e) {
     var num = ((e.loaded/e.total)*100).toFixed(2);
     app.uploadInfo = '文件上传中 ' + num + '%';
     if(e.loaded === e.total) {

@@ -706,7 +706,7 @@ $("document").ready(function(){
   })
 });
 
-function updateFilePromise(url, data, onprogress) {
+function uploadFilePromise(url, data, onprogress) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {

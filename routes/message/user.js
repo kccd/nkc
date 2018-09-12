@@ -5,7 +5,7 @@ userRouter
     const {data, db, query, params} = ctx;
     const {uid} = params;
     const {user} = data;
-    const {lastMessageId} = query;
+    const {firstMessageId} = query;
     const targetUser = await db.UserModel.findOnly({uid});
     const q = {
       $or: [
@@ -19,8 +19,8 @@ userRouter
         }
       ]
     };
-    if(lastMessageId) {
-      q._id = {$lt: lastMessageId};
+    if(firstMessageId) {
+      q._id = {$lt: firstMessageId};
     }
     await db.MessageModel.updateMany({
       r: user.uid,
@@ -78,7 +78,7 @@ userRouter
     const {content, toc} = body;
     if(content === '') ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
-    const newMessage = db.MessageModel({
+    const message = db.MessageModel({
       _id,
       ty: 'UTU',
       tc: toc,
@@ -89,9 +89,9 @@ userRouter
       port: ctx.port
     });
 
-    await newMessage.save();
-    await redis.pubMessage(newMessage);
-    data.newMessage = newMessage;
+    await message.save();
+    await redis.pubMessage(message);
+    data.message = message;
     data.targetUser = targetUser;
     await next();
   });

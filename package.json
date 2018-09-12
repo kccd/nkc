@@ -61,6 +61,7 @@
     "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",
     "vue": "^2.5.16",
-    "xbbcode-parser": "^0.1.2"
+    "xbbcode-parser": "^0.1.2",
+    "xss": "^1.0.3"
   }
 }

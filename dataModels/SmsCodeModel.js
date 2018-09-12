@@ -74,7 +74,18 @@ smsCodeSchema.statics.ensureSendPermission = async (obj) => {
 		err.status = 400;
 		throw err;
 	}
-	let smsCodes = await SmsCodeModel.find({nationCode, mobile, type, toc: {$gte: today}});
+	let smsCodes = await SmsCodeModel.find({nationCode, mobile, type, toc: {$gte: today}}).sort({toc: -1});
+	if(smsCodes.length !== 0) {
+    const timeLimit = smsCodes[0].toc - (Date.now() - 2*60*1000);
+
+    if(timeLimit > 0) {
+      // const err = new Error(`发送验证码的间隔不能小于120秒，请${(timeLimit/1000).toFixed(0)}秒后再试`);
+      const err = new Error(`发送验证码的间隔不能小于120秒`);
+      err.status = 400;
+      throw err;
+    }
+	}
+
 	if(smsCodes.length >= setting.sameMobileOneDay) {
 		const err = new Error(`每天发送相同类型的验证码条数不能超过${setting.sameMobileOneDay}条。`);
 		err.status = 400;

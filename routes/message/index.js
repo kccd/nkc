@@ -10,8 +10,8 @@ messageRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
-    const type = ctx.request.accepts('json', 'html');
-    if(type !== 'json') {
+    const from = ctx.request.get('FROM');
+    if(from !== 'nkcAPI') {
       data.targetUid = query.uid;
       user.newMessage = {};
       ctx.template = 'message/message.pug';
@@ -61,7 +61,7 @@ messageRouter
       count: user.newMessage.newSystemInfoCount
     });
     // 获取提醒
-    message = await db.MessageModel.findOne({ty: 'STU', uid: user.uid}).sort({tc: -1});
+    message = await db.MessageModel.findOne({ty: 'STU', r: user.uid}).sort({tc: -1});
     list.push({
       time: message?message.tc: new Date('2000-1-1'),
       type: 'STU',

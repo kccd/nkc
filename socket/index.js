@@ -87,6 +87,7 @@ const func = async (server) => {
       }
 
       socket.on('error', (error) => {
+        console.log(error);
         disconnect(socket);
         console.log(error.message.red);
       });
