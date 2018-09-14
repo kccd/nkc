@@ -1146,7 +1146,7 @@ function beep(name) {
   var audio = document.getElementById('beep');
   if(audio) {
     if(audio.getAttribute('data-' + name) === 'true') {
-      audio.setAttribute('src', "/default/" + name + '.wav');
+      audio.setAttribute('src', "/default/" + name + '.wav' + '?t=' + Date.now());
       audio.play();
     }
   }

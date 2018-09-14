@@ -25,12 +25,26 @@ registerRouter
   .post('/', async (ctx, next) => { // 手机注册
 	  const {db, data, body, tools} = ctx;
 	  let user;
-	  const {mobile, nationCode, code} = body;
+	  const {mobile, nationCode, code, imgCode} = body;
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
 	  if(!mobile) ctx.throw(400, '请输入手机号');
+    if(!imgCode) ctx.throw(400, '请输入验证码');
 	  if(!code) ctx.throw(400, '请输入验证码');
+
+    const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
+
+    const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
+
+    ctx.cookies.set('imgCodeId', '', {
+      httpOnly: true,
+      signed: true
+    });
+
+    await imgCodeObj.update({used: true});
+
 	  const userPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
 	  if(userPersonal) ctx.throw(400, '手机号码已被其他用户注册。');
+
 	  const option = {
 		  type: 'register',
 		  mobile,
@@ -43,6 +57,9 @@ registerRouter
 	  option.regPort = ctx.port;
 	  delete option.type;
 	  user = await db.UserModel.createUser(option);
+
+    await imgCodeObj.update({uid: user.uid});
+
 	  const cookieStr = encodeURI(JSON.stringify({
 		  uid: user.uid,
 		  username: user.username,
@@ -116,7 +133,7 @@ registerRouter
 	.get('/code', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
-		if(user) ctx.throw(400, '您已注册，请勿恶意获取图片验证码。');
+		if(user) ctx.throw(400, '您已注册，无法获取图片验证码。');
 		const {token, buffer} = await captcha();
 		const imgCode = db.ImgCodeModel({
 			token

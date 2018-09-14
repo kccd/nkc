@@ -23,8 +23,7 @@ loginRouter
 
 		let user;
 		let userPersonal;
-		let {password, username, mobile, nationCode, code} = body;
-
+		let {password, username, mobile, nationCode, code, imgCode} = body;
 		if(!loginType) {
 
 			// 账号+密码
@@ -90,7 +89,19 @@ loginRouter
 				type: 'login'
 			};
 
-			// 验证短信验证码
+      const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
+
+
+      const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
+
+      ctx.cookies.set('imgCodeId', '', {
+        httpOnly: true,
+        signed: true
+      });
+
+      await imgCodeObj.update({used: true});
+
+      // 验证短信验证码
 			const smsCode = await db.SmsCodeModel.ensureCode(option);
 
 			await smsCode.update({used: true});
@@ -107,7 +118,9 @@ loginRouter
 			userPersonal = userPersonal[0];
 			user = await db.UserModel.findOnly({uid: userPersonal.uid});
 
-		} else {
+      await imgCodeObj.update({uid: user.uid});
+
+    } else {
 			ctx.throw(400, `未知的登录方式：${loginType}`);
 		}
 
@@ -168,10 +181,10 @@ loginRouter
 			introduction: 'put the cookie in req-header when using for api',
 			user
 		};
-		const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
-		const loginUid = user.uid;
-		ctx.data.loginKey = loginKey;
-		ctx.data.loginUid = loginUid;
+		// const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
+		// const loginUid = user.uid;
+		// ctx.data.loginKey = loginKey;
+		// ctx.data.loginUid = loginUid;
 		/*await ctx.generateUsersBehavior({
 			operation: 'dailyLogin'
 		});*/

@@ -75,6 +75,31 @@ client.on('message', async (channel, data) => {
       await notifyFriends(data, 'userConnect')
     } else if(channel === 'disconnect') {
       await notifyFriends(data, 'userDisconnect')
+    } else if(channel === 'withdrawn') {
+
+      const {message, sockets} = data;
+
+      const targetUserSocketsId = sockets[global.NKC.processId] || [];
+
+      await Promise.all(targetUserSocketsId.map(async id => {
+
+        const targetSocket = global.NKC.socketIo.connected[id];
+
+        if(targetSocket) {
+
+          targetSocket.emit('withdrawn', {
+            uid: message.s,
+            messageId: message._id
+          });
+
+        } else {
+
+          await db.SocketModel.remove({socketId: id, processId: global.NKC.processId});
+
+        }
+
+      }));
+
     }
   } catch(err) {
     console.log(err);
@@ -87,6 +112,8 @@ client.subscribe(`message`);
 client.subscribe(`connect`);
 
 client.subscribe(`disconnect`);
+
+client.subscribe(`withdrawn`);
 
 const obj = {};
 
@@ -159,6 +186,12 @@ obj.pubMessage = async (message) => {
     message
   };
 
+  if(message.ty === 'STU') {
+    const {MessageModel} = require('../dataModels');
+    const messageArr = await MessageModel.extendReminder([data.message]);
+    data.message = messageArr[0] || '';
+  }
+
   if(message.ty !== 'STE') {
     const targetUserSockets = await db.SocketModel.find({uid: message.r});
     const sockets = {};
@@ -177,6 +210,21 @@ obj.pubMessage = async (message) => {
 
   pub.publish('message', JSON.stringify(data));
 
+};
+
+obj.pubWithdrawn = async (message) => {
+  const targetUserSockets = await db.SocketModel.find({uid: message.r});
+  const sockets = {};
+  targetUserSockets.map(s => {
+    const {socketId, processId} = s;
+    if(!sockets[processId]) sockets[processId] = [];
+    sockets[processId].push(socketId);
+  });
+  const data = {
+    message,
+    sockets
+  };
+  pub.publish('withdrawn', JSON.stringify(data));
 };
 
 module.exports = obj;

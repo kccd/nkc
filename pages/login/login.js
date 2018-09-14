@@ -8,13 +8,15 @@ $(function() {
 				password: '',
 				mobile: '',
 				code: '',
-				error: ''
+				error: '',
+				imgCode: ''
 			},
 			timeNumber: 0,
 			username: '',
 			password: '',
 			mobile: '',
 			code: '',
+      imgCode: '',
 			sending: false,
 			nationCodes: nationCodes,
 			nationCode: '86',
@@ -76,11 +78,16 @@ $(function() {
 						app.btnText = '登录';
 						return;
 					}
-					if(!app.mobile) {
-						app.warning.mobile = '请输入手机号';
-						app.btnText = '登录';
-						return;
-					}
+          if(!app.mobile) {
+            app.warning.mobile = '请输入手机号';
+            app.btnText = '登录';
+            return;
+          }
+          if(!app.imgCode) {
+            app.warning.imgCode = '请输入验证码';
+            app.btnText = '登录';
+            return;
+          }
 					if(!app.code) {
 						app.warning.code = '请输入验证码';
 						app.btnText = '登录';
@@ -90,10 +97,10 @@ $(function() {
 						loginType: 'code',
 						nationCode: app.nationCode,
 						mobile: app.mobile,
-						code: app.code
+						code: app.code,
+						imgCode: app.imgCode
 					}
 				}
-
 				nkcAPI('/login', 'POST', obj)
 					.then(function(data) {
 						if(
@@ -135,12 +142,16 @@ $(function() {
 					app.warning.error = '请选择国际区号';
 					return;
 				}
+				if(!app.imgCode) {
+					return app.warning.imgCode = '请输入验证码';
+				}
 				if(app.sending) return;
 				app.sending = true;
 				// 发送短信接口
 				var obj = {
 					nationCode: app.nationCode,
-					mobile: app.mobile
+					mobile: app.mobile,
+					imgCode: app.imgCode
 				};
 				nkcAPI('/sendMessage/login','POST', obj)
 					.then(function() {
@@ -152,6 +163,11 @@ $(function() {
 						app.sending = false;
 						app.warning.error = data.error || data;
 					})
+			},
+      changeImgCode: function(e) {
+				var src = e.target.getAttribute('src');
+				src = src.replace(/\?.*/, '');
+				e.target.setAttribute('src', src + '?t=' + Date.now());
 			}
 		},
 		directives: {
@@ -174,6 +190,7 @@ function clearWarning() {
 	app.warning.mobile = '';
 	app.warning.code = '';
 	app.warning.error = '';
+	app.warning.imgCode = '';
 }
 
 /*function changeFocus() {

@@ -23,5 +23,8 @@ module.exports = {
   },
   mark: {
     PATCH: 'modifyMessageStatus'
+  },
+  withdrawn: {
+    PATCH: 'userWithdrawnMessage'
   }
 };

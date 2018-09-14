@@ -6,13 +6,23 @@ const userRouter = require('./user');
 const resourceRouter = require('./resource');
 const markRouter = require('./mark');
 const settingsRouter = require('./settings');
+const withdrawnRouter = require('./withdrawn');
 messageRouter
+  .use('/', async (ctx, next) => {
+    // 未完善资料的用户跳转到完善资料页
+    const {user} = ctx.data;
+    if(!user) return ctx.redirect('/login');
+    if(user && !user.username) return ctx.redirect('/register');
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
     const from = ctx.request.get('FROM');
     if(from !== 'nkcAPI') {
-      data.targetUid = query.uid;
+      if(query.uid) {
+        data.targetUser = await db.UserModel.findOne({uid: query.uid});
+      }
       user.newMessage = {};
       ctx.template = 'message/message.pug';
       return await next();
@@ -38,6 +48,8 @@ messageRouter
           }
         ]
       }).sort({tc: -1});
+      if(!message) continue;
+      if(message.withdrawn) message.c = '';
       const count = await db.MessageModel.count({
         r: user.uid,
         s: targetUser.uid,
@@ -93,6 +105,7 @@ messageRouter
 
     await next();
   })
+  .use('/withdrawn', withdrawnRouter.routes(), withdrawnRouter.allowedMethods())
   .use('/mark', markRouter.routes(), markRouter.allowedMethods())
   .use('/remind', remindRouter.routes(), remindRouter.allowedMethods())
   .use('/user', userRouter.routes(), userRouter.allowedMethods())

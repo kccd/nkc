@@ -8,10 +8,12 @@ var data = document.getElementById('data').innerText;
 
 data = JSON.parse(data);
 
-var targetUid = data.targetUid;
+var targetUser = data.targetUser;
 
 var timeout;
 var mobile = winWidth < 1100;
+
+var pageName = 'message';
 
 if(mobile) {
   document.getElementsByTagName('body')[0].style.backgroundColor = '#ffffff';
@@ -58,14 +60,23 @@ $(function() {
       messages: function() {
         for(var i = 0; i < this.messages.length; i++) {
           var message = this.messages[i];
+
+          message.canWithdrawn = (!message.withdrawn && !message.status && new Date(message.tc) > (Date.now() - 60*1000));
+
           if(message.ty === 'UTU' && !message.c.ty) {
             message.html = xss(message.c, {
               whiteList: {}
             });
+            // 替换换行符
+            message.html = message.html.replace(/\n/g, '<br/>');
+            // 替换空格
+            message.html = message.html.replace(/\s/g, '&nbsp;');
+            // 替换表情
             message.html = message.html.replace(/\[f\/(.*?)]/g, function(r, v1) {
               return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
             });
           }
+
         }
       }
     },
@@ -302,6 +313,7 @@ $(function() {
         var c;
         switch(message.c.type) {
           case 'replyThread': c = '回复';break;
+          case 'replyPost': c = '回复';break;
           case 'digestPost': c = '回复被设置精华';break;
           case 'digestThread': c = '文章被设置精华';break;
           case 'bannedThread': c = '文章被删除';break;
@@ -384,9 +396,9 @@ $(function() {
             userList.push(o);
             continue;
           }
-          let inserted = false;
-          for(let j = 0; j < userList.length; j++) {
-            const m = userList[j];
+          var inserted = false;
+          for(var j = 0; j < userList.length; j++) {
+            var m = userList[j];
             if(new Date(o.time).getTime() > new Date(m.time).getTime()) {
               userList.splice(j, 0, o);
               inserted = true;
@@ -549,8 +561,8 @@ $(function() {
         var content;
         if(!message) {
           content = app.userInput[app.targetUser.uid];
-          content = content.replace(/\r\n/g,"");
-          content = content.replace(/\n/g,"");
+          // content = content.replace(/\r\n/g,"");
+          // content = content.replace(/\n/g,"");
           if(!content) return screenTopWarning('输入的内容不能为空');
           var localMessageId = Date.now();
           message = {
@@ -614,11 +626,11 @@ $(function() {
             app.sendFailedMessages.push(message);
           }
         }
-        app.getUserList();
-        if(!app.target) return;
         app.messages = [];
         app.canGetMessage = true;
         timeout = setTimeout(function(){
+          app.getUserList();
+          if(!app.target) return;
           app.getMessage()
             .then(function() {
               // 清空当前用户的新信息条数
@@ -659,6 +671,19 @@ $(function() {
           .catch(function(data) {
             screenTopWarning(data.error || data);
           })
+      },
+
+      // 撤回信息
+      withdrawn: function(message) {
+        nkcAPI('/message/withdrawn', 'PATCH', {messageId: message._id})
+          .then(function() {
+            message.withdrawn = true;
+            Vue.set(app.messages, app.messages.indexOf(message), message);
+          })
+          .catch(function(data) {
+            Vue.set(app.messages, app.messages.indexOf(message), message);
+            screenTopWarning(data.error || data);
+          })
       }
 
     },
@@ -673,7 +698,15 @@ $(function() {
     },
 
     mounted: function() {
-      this.getUserList();
+      this.getUserList()
+        .then(function() {
+          if(targetUser) {
+            app.selectUser({
+              type: 'UTU',
+              user: targetUser
+            });
+          }
+        });
       if(socket) {
         if(socket.connected) {
           this.socketStatus = 'connect';
@@ -726,6 +759,7 @@ $(function() {
           beep('notice');
           app.updateUserList({message: message});
           if(app.target === 'notice') {
+            app.messages.push(message);
             nkcAPI('/message/mark', 'PATCH', {
               type: 'systemInfo'
             })
@@ -737,6 +771,7 @@ $(function() {
           beep('reminder');
           app.updateUserList({message: message});
           if(app.target === 'reminder') {
+            app.messages.push(message);
             nkcAPI('/message/mark', 'PATCH', {
               type: 'remind'
             })
@@ -787,6 +822,20 @@ $(function() {
           var li = app.userList[i];
           if(li.user && li.user.uid === uid) {
             li.user.online = true;
+          }
+        }
+      });
+
+      socket.on('withdrawn', function(data) {
+        var messageId = data.messageId;
+        if(app.targetUser && data.uid === app.targetUser.uid) {
+          for(var i = 0; i < app.messages.length; i++){
+            var message = app.messages[i];
+            if(message._id === messageId) {
+              message.withdrawn = true;
+              message.c = '';
+              break;
+            }
           }
         }
       });

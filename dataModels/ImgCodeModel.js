@@ -34,6 +34,13 @@ imgCodeSchema.pre('save', function(next) {
 });
 
 imgCodeSchema.statics.ensureCode = async (_id, token) => {
+
+	if(!_id) {
+    const error = new Error('图片验证码无效。');
+    error.status = 400;
+    throw error;
+	}
+
 	const {effectiveTime} = require('../settings/imgCode');
 	const ImgCodeModel = mongoose.model('imgCodes');
 	const imgCode = await ImgCodeModel.findOne({_id: mongoose.Types.ObjectId(_id)});

@@ -33,7 +33,7 @@ const messageSchema = new Schema({
   /*
   * 当信息类型为提醒时：
   * c: {
-  *   type: String, [digestThread, digestPost, @, replyThread, bannedThread, threadWasReturned, bannedPost, postWasReturned, recommend]
+  *   type: String, [digestThread, digestPost, @, replyPost, replyThread, bannedThread, threadWasReturned, bannedPost, postWasReturned, recommend]
   * }
   *
   *
@@ -75,7 +75,14 @@ const messageSchema = new Schema({
   ip: {
     type: String,
     default: ''
+  },
+
+  withdrawn: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
+
 }, {
   collection: 'messages',
   toObject: {
@@ -112,12 +119,12 @@ messageSchema.statics.extendReminder = async (arr) => {
       r_.post = {
         pid,
         t: post.t,
-        tid: post.tid,
-        page: pageObj.page
+        tid: post.tid
       };
       r_.targetPost = {
         pid: targetPid,
         c: apiFunction.obtainPureText(targetPost.c),
+        page: pageObj.page
       };
     } else if(type === 'digestThread') {
       const {targetUid, pid} = c;
@@ -161,7 +168,7 @@ messageSchema.statics.extendReminder = async (arr) => {
       if(!targetUser || !targetPost) continue;
       const targetThread = await ThreadModel.findOne({tid: targetPost.tid});
       if(!targetThread) continue;
-      const pageObj = await targetThread.getStep({targetPid, disabled: false});
+      const pageObj = await targetThread.getStep({pid: targetPid, disabled: false});
       r_.targetPost = {
         pid: targetPost.pid,
         tid: targetPost.tid,
@@ -208,6 +215,7 @@ messageSchema.statics.extendReminder = async (arr) => {
     } else if(type === 'threadWasReturned') {
       const {tid, rea} = c;
       const thread = await ThreadModel.findOne({tid});
+      console.log(tid);
       const firstPost = await thread.extendFirstPost();
       if(!thread) continue;
       r_.firstPost = {
@@ -229,8 +237,37 @@ messageSchema.statics.extendReminder = async (arr) => {
         pid: firstPost.pid
       };
       r_.reason = rea;
+    } else if(type === 'replyPost') {
+      const {targetPid, pid} = c;
+      const targetPost = await PostModel.findOne({pid: targetPid});
+      const post = await PostModel.findOne({pid});
+      if(!targetPost || !post) continue;
+      const targetUser = await UserModel.findOne({uid: targetPost.uid});
+      if(!targetUser) continue;
+      const thread = await ThreadModel.findOne({tid: targetPost.tid});
+      if(!thread) continue;
+      const firstPost = await PostModel.findOne({pid: thread.oc});
+      if(!firstPost) continue;
+      const pageObj = await thread.getStep({pid: targetPid + '', disabled: false});
+      r_.targetPost = {
+        pid: targetPost.pid,
+        c: apiFunction.obtainPureText(targetPost.c),
+        page: pageObj.page,
+        tid: targetPost.tid
+      };
+      r_.targetUser = {
+        uid: targetUser.uid,
+        username: targetUser.username,
+      };
+      r_.firstPost = {
+        t: firstPost.t,
+        tid: firstPost.tid
+      };
     }
-    r_.ty = type;
+    r_.ty = 'STU';
+    r_.c = {
+      type: type
+    };
     results.push(r_);
   }
   return results;

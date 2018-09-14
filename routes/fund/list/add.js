@@ -5,6 +5,7 @@ addRouter
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
+		if(!user.username) return ctx.redirect('/register');
 		const {fundId} = ctx.params;
 		const fund = await db.FundModel.findOne({_id: fundId.toUpperCase(), canApply: true});
 		if(!fund) ctx.throw(400, '抱歉！该基金项目暂不能申请。');

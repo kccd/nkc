@@ -9,7 +9,8 @@ $(function() {
 				code: '',
 				username: '',
 				password: '',
-				password1: ''
+				password1: '',
+        imgCode: ''
 			},
 			mobile: '',
 			password: '',
@@ -18,6 +19,7 @@ $(function() {
 			timeNumber: 0,
 			code: '',
 			password1: '',
+      imgCode: '',
 			username: '',
 			btnText: '注册',
 			btnText1: '提交',
@@ -25,6 +27,11 @@ $(function() {
 			showTerms: false,
 		},
 		methods: {
+			changeImgCode: function(e) {
+        var src = e.target.getAttribute('src');
+        src = src.replace(/\?.*/, '');
+        e.target.setAttribute('src', src + '?t=' + Date.now());
+			},
 			changeTermsStatus: function() {
 				app.showTerms = !app.showTerms;
 			},
@@ -35,16 +42,21 @@ $(function() {
 					app.warning.mobile = '请输入手机号';
 					return;
 				}
-				if(!app.nationCode) {
-					app.warning.error = '请选择国际区号';
-					return;
-				}
+        if(!app.nationCode) {
+          app.warning.error = '请选择国际区号';
+          return;
+        }
+        if(!app.imgCode) {
+          app.warning.imgCode= '请输入验证码';
+          return;
+        }
 				if(app.sending) return;
 				app.sending = true;
 				// 发送短信接口
 				var obj = {
 					nationCode: app.nationCode,
-					mobile: app.mobile
+					mobile: app.mobile,
+					imgCode: app.imgCode
 				};
 				nkcAPI('/sendMessage/register','POST', obj)
 					.then(function() {
@@ -71,15 +83,21 @@ $(function() {
 					app.btnText = '注册';
 					return;
 				}
-				if(!app.code) {
-					app.warning.code = '请输入验证码';
-					app.btnText = '注册';
-					return;
-				}
+        if(!app.imgCode) {
+          app.warning.imgCode = '请输入验证码';
+          app.btnText = '注册';
+          return;
+        }
+        if(!app.code) {
+          app.warning.code = '请输入验证码';
+          app.btnText = '注册';
+          return;
+        }
 				var obj = {
 					nationCode: app.nationCode,
 					mobile: app.mobile,
-					code: app.code
+					code: app.code,
+					imgCode: app.imgCode
 				};
 				nkcAPI('/register', 'POST', obj)
 					.then(function() {
@@ -136,17 +154,19 @@ $(function() {
 		}
 	});
 });
-function focus(el, {value}) {
-	if(value) {
+function focus(el, o) {
+	if(o.value) {
 		el.focus();
 	}
 }
 
 function clearWarning() {
 	app.warning.username = '';
-	app.warning.password = '';
-	app.warning.mobile = '';
+  app.warning.password = '';
+  app.warning.password1 = '';
+  app.warning.mobile = '';
 	app.warning.code = '';
+  app.warning.imgCode = '';
 	app.warning.error = '';
 }
 

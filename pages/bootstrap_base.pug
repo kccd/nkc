@@ -27,7 +27,6 @@ block body
 
   block footer
     include nkc_footer.pug
-  include photoswipe
   if data.user
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
@@ -38,8 +37,9 @@ block body
   script(src='/vue/dist/vue.js')
   script(src="/photoswipe/dist/photoswipe.js")
   script(src="/photoswipe/dist/photoswipe-ui-default.js")
-  script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
-  script(src=`/message/socket.js?v=${global.NKC.startTime}`)
+  if data.user
+    script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
+    script(src=`/message/socket.js?v=${global.NKC.startTime}`)
 
   block scripts
 

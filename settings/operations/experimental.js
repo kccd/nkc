@@ -114,6 +114,10 @@ module.exports = {
 		message: {
 			GET: 'visitEMessageSettings',
 			PATCH: 'modifyEMessageSettings'
+		},
+		post: {
+			GET: 'visitEPostSettings',
+			PATCH: 'modifyEPostSettings'
 		}
 	},
 	systemInfo: {

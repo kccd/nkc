@@ -10,15 +10,15 @@ block content
     .row
       include ../nav
       .col-xs-12.col-md-12
-        .row#app
+        .row#app(v-cloak)
           .col-xs-12.col-md-6
             table.table.table-striped
               thead
                 tr
                   th 序号
                   th 角色名
-                  th 聊天人数/每天
-                  th 信息数/每天
+                  th 聊天人数/天
+                  th 信息数/天
               tbody
                 tr(v-for="role, index in roles")
                   th {{index+1}}

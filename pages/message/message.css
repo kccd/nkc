@@ -297,12 +297,14 @@ body, html{
   font-size: 1.6rem;
   color: #aaaaaa;
 }
-.ms-single-content .status .fa-circle-o-notch{
+.ms-single-content .status .fa{
+  cursor: pointer;
   color: #d2dfea;
+}
+.ms-single-content .status .fa-circle-o-notch{
 }
 .ms-single-content .status .fa-exclamation-circle{
   color: #ff6262;
-  cursor: pointer;
 }
 .ms-single-content .message-emoji{
   height: 2rem;
@@ -510,13 +512,13 @@ body, html{
   color: #337ab7;
 }
 .ms-single-content-image{
-  height: 13.3333rem;
+  height: 13rem;
   overflow: hidden;
   position: relative;
-  width: 20rem;
+  max-width: 20rem;
 }
 .ms-single-content-image img{
-  width: 100%;
+  height: 100%;
 }
 .ms-single-content-image a{
   display: block;
@@ -745,10 +747,12 @@ body, html{
 .mobile-footer-input .input{
   display: table-cell;
   width: 1000px;
+  vertical-align: top;
 }
-.mobile-footer-input .input input{
+.mobile-footer-input .input textarea{
   height: 3rem;
   padding: 1px 5px;
+  resize: none;
   margin: 0.5rem 0;
   width: 100%;
   border-radius: 5px;
@@ -758,10 +762,12 @@ body, html{
   width: 17rem;
   display: table-cell;
   padding: 0 0.9rem;
+  vertical-align: top;
 }
 .mobile-footer-input .button button{
   width: 100%;
   height: 3rem;
+  margin: 0.5rem 0;
   border-radius: 5px;
   border: none;
   background-color: #4ea1e8;
@@ -858,4 +864,18 @@ img.emoji{
 }
 .mobile .search-user .button:active{
   color: #bbbbbb;
+}
+.ms-withdrawn{
+  text-align: center;
+}
+.ms-withdrawn>div{
+  display: inline-block;
+  background-color: #d2dfea;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #666666;
 }

@@ -1,0 +1,67 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 发表内容限制
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#app(v-cloak)
+          .col-xs-12.col-md-12
+            table.table.table-striped
+              thead
+                tr
+                  th 序号
+                  th 角色名
+                  th 发表文章数/天
+                  th 发表文章间隔/分钟
+                  th 发表回复数/天
+                  th 发表回复间隔/分钟
+              tbody
+                tr(v-for="role, index in roles")
+                  th {{index+1}}
+                  th {{role.displayName}}
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="role.postToForumCountLimit")
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="role.postToForumTimeLimit")
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="role.postToThreadCountLimit")
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="role.postToThreadTimeLimit")
+            button.btn.btn-primary(@click='submit') 保存
+
+          .col-xs-12.col-md-12(style='margin-top: 2rem;')
+            table.table.table-striped
+              thead
+                tr
+                  th 等级
+                  th 等级名
+                  th 发表文章数/天
+                  th 发表文章间隔/分钟
+                  th 发表回复数/天
+                  th 发表回复间隔/分钟
+              tbody
+                tr(v-for="grade, index in grades")
+                  th {{index}}
+                  th {{grade.displayName}}
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="grade.postToForumCountLimit")
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="grade.postToForumTimeLimit")
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="grade.postToThreadCountLimit")
+                  th
+                    input(style="max-width: 6rem;" type="number" v-model="grade.postToThreadTimeLimit")
+            button.btn.btn-primary(@click='submit') 保存
+block scripts
+  script(src=`/interface_common.js?=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/post.js?=${global.NKC.startTime}`)
+

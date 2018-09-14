@@ -5,6 +5,7 @@ editorRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
+    if(!user.username) return ctx.redirect('/register');
     const {type, id, cat, title, content} = query;
     //发新帖，回复等使用新编辑器
     //重新编辑帖子使用旧版编辑器

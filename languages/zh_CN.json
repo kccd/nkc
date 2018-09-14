@@ -310,6 +310,9 @@
     "visitEMessageSettings": "访问后台聊天设置页面",
     "modifyEMessageSettings": "后台修改聊天设置",
     "modifyMessageStatus": "标记信息为已读",
+    "userWithdrawnMessage": "用户撤回聊天信息",
+    "visitEPostSettings": "访问后台发表限制设置页面",
+    "modifyEPostSettings": "修改后台发表限制设置",
 
 
     "APPgetUserInfo": "app获取用户信息",

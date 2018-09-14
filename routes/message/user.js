@@ -32,6 +32,9 @@ userRouter
       }
     });
     const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
+    messages.map(m => {
+      if(m.withdrawn) m.c = '';
+    });
     data.messages = messages.reverse();
     data.targetUser = targetUser;
     await next();

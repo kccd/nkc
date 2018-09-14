@@ -300,7 +300,7 @@ threadRouter
 		// 获取认证等级
 		const authLevel = await userPersonal.getAuthLevel();
 		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
-
+		if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
 		// if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
@@ -320,6 +320,15 @@ threadRouter
 				}
 			}
 		}
+
+		// 发表回复时间、条数限制
+		const {postToThreadCountLimit, postToThreadTimeLimit} = await user.getPostLimit();
+		const today = nkcModules.apiFunction.today();
+		const postToThreadCount = await db.InfoBehaviorModel.count({toc: {$gt: today}, uid: user.uid, operationId: 'postToThread'});
+		if(postToThreadCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复，请明天再试。`);
+		const latestPostLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToThread', toc: {$gt: (Date.now() - postToThreadTimeLimit * 60 * 1000)}});
+		if(latestPostLog) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
+
 
 		data.thread = thread;
 		await thread.extendForum();
