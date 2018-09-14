@@ -301,6 +301,22 @@ const messageImageSMify = async (path, targetPath) => {
   return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-crop', `${width}x${height}+0+0`, targetPath])
 };
 
+
+// 获取视频的第一帧为图片
+const firstFrameToImg = async (videoPath,imgPath) => {
+  return spawnProcess('ffmpeg',['-i',videoPath,'-vframes' ,'1', imgPath])
+}
+
+
+// 视频转码为H264
+const videoToH264 = async(inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-y' ,outputPath])
+}
+
+// 降低视频码率
+const turnVideo = async(inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
+}
 module.exports = {
   avatarify,
   attachify,
@@ -327,7 +343,10 @@ module.exports = {
   forumAvatarify,
   imageNarrow,
 	userBannerify,
-  messageImageSMify
+  messageImageSMify,
+  firstFrameToImg,
+  videoToH264,
+  turnVideo
 };
 
 

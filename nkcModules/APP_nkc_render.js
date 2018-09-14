@@ -390,7 +390,9 @@ function APP_nkc_render(options){
       case 'webm':
       case 'ogg':
       replaced =
-      '<a href="https://www.kechuang.org/r/'+rid+'" >'+oname_safe+'</a><br><video style="width:100%;" src="https://www.kechuang.org/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>'
+      '<a href="https://www.kechuang.org/r/'+rid+'" >'+oname_safe+'</a><br><video style="width:100%;" src="https://www.kechuang.org/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>';
+      // replaced = '<img src="http://192.168.11.114:1086/frameImg/'+ rid  +'">';
+
 
       break;
 
@@ -484,12 +486,16 @@ function APP_nkc_render(options){
           continue;
         }
         var reg = new RegExp(r.oname, 'gm');
-        html = html.replace(reg,r.oname+'<span class="PostResourceCounter">'+r.hits+'次下载</span>')
+        var hrefStr = new RegExp("href=\/r\/"+r.rid,'gm');
+        var clickStr = "onclick=\'downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")\'";
+        html = html.replace(reg,r.oname+'<span class="resourceDownCount">'+r.hits+'次下载</span>');
+        html = html.replace(hrefStr,clickStr);
       }
     }
     // 将图片加上域名前缀
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>');
     html = html.replace(/<img src="\/r(.+?)">/img,'<img class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$1" />');
+    html = html.replace(/<img src="(\/default\/default_thumbnail.png)">/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org$1" />');
     // 将表情加上域名前缀
     html = html.replace(/<img(.+?)src="\/twemoji(.*?)"(.*?)>/img,'<img$1src="https://www.kechuang.org/twemoji$2">$3');
     return html
@@ -546,7 +552,7 @@ function APP_nkc_render(options){
         renderedHTML = renderedHTML.replace(reg,'<a href="https://www.kechuang.org/m/' + atUsers[i].uid + '">' + user + '</a>')
       }
     }
-    renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
+    // renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
     // 下面是旧版的渲染，暂时先不用
     // var atUsers = post.atUsers;
     // if(atUsers && atUsers.length > 0) {
@@ -563,7 +569,10 @@ function APP_nkc_render(options){
     // }
     renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
     renderedHTML = renderedHTML.replace(/<a(.*?)href="(.*?)".*?>(.*?)<\/a>/igm,"<a$1href='javascript:void(0);' onclick='openLinkInFrame(\"$2\")'>$3</a>");
-    renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 onclick='openImage(\"$2\")'>")
+    renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 onclick='openImage(\"$2\")'>");    
+    // 将视频替换成图片
+    renderedHTML = renderedHTML.replace(/<video src="\/r(.+?)".*?<\/video>/igm,'<div style="position:relative"><img src="http://192.168.11.114:1086/frameImg$1" onerror="this.src=\'http://192.168.11.114:1086/frameImg/317\'" style="width:100%;height:10rem"><span class="play-btn" onclick="openVideo(\'/r$1\')"></span></div>');
+    // renderedHTML = renderedHTML.replace(/<video src="\/r(.+?)".*?<\/video>/igm,'<video src="http://192.168.11.114:1086/r$1" style="width:100%;height:10rem;" controls poster="http://192.168.11.114:1086/frameImg$1"></video>');
     return renderedHTML
   }
   return render;

@@ -38,6 +38,11 @@ module.exports = {
 			GET: 'getThreadCover'
 		}
 	},
+	frameImg: {// 视频封面图
+		PARAMETER: {
+			GET: 'getVideoImg'
+		}
+	},
 	resources: {// 侧栏logo
 		site_specific: {
 			PARAMETER: {

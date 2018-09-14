@@ -13,6 +13,7 @@
     "getResources": "获取资源文件",
     "getResourceSmallImage": "获取资源文件缩略图",
     "getThreadCover": "获取文章封面",
+    "getVideoImg": "获取视频封面",
     "getSiteSpecific": "获取网站logo",
     "getDefaultImage": "获取网站默认图片",
     "getPersonalForumAvatar": "获取专栏logo",
