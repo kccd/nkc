@@ -416,7 +416,10 @@ postSchema.post('save', async function(doc, next) {
   // if p.atUsers has changed, we should generate a invitation
 
   try {
+    const redis = require('../redis');
     const InviteModel = mongoose.model('invites');
+    const MessageModel = mongoose.model('messages');
+    const SettingModel = mongoose.model('settings');
 
     const {_initial_state_, atUsers} = doc;
     const oldAtUsers = _initial_state_ ? _initial_state_.atUsers : [];
@@ -430,6 +433,21 @@ postSchema.post('save', async function(doc, next) {
         pid: doc.pid
       }).save())
     );
+    await Promise.all(notInformedUsers.map(async at => {
+      const messageId = await SettingModel.operateSystemID('messages', 1);
+      const message = MessageModel({
+        _id: messageId,
+        ty: 'STU',
+        r: at.uid,
+        c: {
+          type: '@',
+          targetPid: doc.pid,
+          targetUid: doc.uid
+        }
+      });
+      await message.save();
+      await redis.pubMessage(message);
+    }));
     return next()
   } catch(e) {
     return next(e)

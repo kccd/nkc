@@ -49,11 +49,11 @@ block content
                       span &nbsp;
                       if fund.auditType === 'system'
                         if fund.admin.appointed.length === 0
-                          a(href='/sms/message/10' target="blank") 未收到款？联系拨款人
+                          a(href='/message?uid=10' target="blank") 未收到款？联系拨款人
                         else
-                          a(href=`/sms/message/${fund.admin.appointed[0]}` target="blank") 未收到款？联系拨款人
+                          a(href=`/message?uid=${fund.admin.appointed[0]}` target="blank") 未收到款？联系拨款人
                       else
-                        a(href=`/sms/message/${r.uid}` target="blank") 未收到款？联系拨款人
+                        a(href=`/message?uid=${r.uid}` target="blank") 未收到款？联系拨款人
                     else
                       span 已确认收款
 

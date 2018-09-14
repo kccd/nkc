@@ -11,21 +11,21 @@ infoRouter
 	.patch('/', async (ctx, next) => {
 		const {data, body} = ctx;
 		const {user} = data;
-		let {description, postSign, color} = body;
+		let {description, postSign, color, operation} = body;
 		const {contentLength} = ctx.tools.checkString;
-		if(contentLength(description) > 500) ctx.throw(400, '个人简介不能超过250个字。');
-		if(contentLength(postSign) > 1000) ctx.throw(400, '帖子签名不能超过500个字。');
-		if(color.length > 10) ctx.throw(400, '背景颜色错误');
-		color = color.trim();
-		const q = {
-			description,
-			postSign,
-			color
-		};
+		if(description) {
+			if(contentLength(description) > 500) ctx.throw(400, '个人简介不能超过250个字。');
+			user.description = description;
+		}
+		if(postSign) {
+			if(contentLength(postSign) > 1000) ctx.throw(400, '帖子签名不能超过500个字。');
+			user.postSign = postSign;
+		}
+		if(color) {
+			if(color.length > 10) ctx.throw(400, '背景颜色错误');
+			user.color = color;
+		}
 		//适应搜索数据库，用save方法更新user信息
-		user.description = q.description;
-		user.color = q.color;
-		user.postSign = q.postSign;
 		await user.save();
 		await next();
 	});

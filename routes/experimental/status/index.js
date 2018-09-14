@@ -147,6 +147,23 @@ statusRouter
 			x,
 			title
 		};
+
+		if(!type) {
+			data.onlineUsers = [];
+      data.onlineUsersCount = await db.UserModel.count({online: true});
+			const onlineUsers = await db.UserModel.find({online: true}).limit(5000);
+			for(const onlineUser of onlineUsers) {
+				const targetSocket = await db.SocketModel.find({uid: onlineUser.uid});
+				if(!targetSocket) {
+					await onlineUser.update({online: false});
+				} else {
+					data.onlineUsers.push({
+						uid: onlineUser.uid,
+						username: onlineUser.username
+					});
+				}
+			}
+		}
 		await next();
 	});
 module.exports = statusRouter;

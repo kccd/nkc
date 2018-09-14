@@ -24,9 +24,41 @@ const usersGradeSchema = new Schema({
 		type: [String],
 		index: 1,
 		default: []
-	}
+	},
+  messagePersonCountLimit: {
+		type: Number,
+		default: 0
+	},
+	messageCountLimit: {
+		type: Number,
+		default: 0
+	},
+  // 每天所能发表的回复数
+  postToThreadCountLimit: {
+    type: Number,
+    default: 0
+  },
+  // 发表回复间隔分钟数
+  postToThreadTimeLimit: {
+    type: Number,
+    default: 0
+  },
+  // 发表文章间隔分钟数
+  postToForumTimeLimit: {
+    type: Number,
+    default: 0
+  },
+  // 每天所能发表的文章数
+  postToForumCountLimit: {
+    type: Number,
+    default: 0
+  }
 }, {
-	collection: 'usersGrades'
+	collection: 'usersGrades',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
 
 const UsersGradeModel = mongoose.model('usersGrades', usersGradeSchema);

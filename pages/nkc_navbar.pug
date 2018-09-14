@@ -1,13 +1,12 @@
 - var navbar = data.navbar || {}
 if data.user
   -var newMessage = data.user.newMessage;
-  -var messageSum = (newMessage.message || 0) + (newMessage.system || 0) + (newMessage.at || 0) + (newMessage.replies || 0);
+  -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0);
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;background-color:#f6f6f6;line-height: 0;')
   .container-fluid(style='max-width: 1400px')
     .navbar-header
       button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
-        if messageSum > 0
-          span(style="position: absolute;top: 0px; right: 0px;height: 0.5rem;width: 0.5rem;border-radius: 0.25rem;background-color: red")
+        .newMessagePoint(style="position: absolute;top: 0px; right: 0px;height: 0.5rem;width: 0.5rem;border-radius: 0.25rem;background-color: red")
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -30,10 +29,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
               a(href=`/m/${user.uid}`)
                 span.fa.fa-window-maximize &nbsp;专栏
             li
-              a(href=`/sms`)
+              a(href=`/message` style='display: inline-block;')
                 span.fa.fa-envelope-o &nbsp;信息
-                if messageSum > 0
-                  span.messageNumber= messageSum
+                .newMessageDiv
+                  span.messageNumber.newMessage= messageSum > 0?messageSum: ''
             li
               a(href=`/u/${user.uid}/collections/unclassified`)
                 span.fa.fa-folder-o &nbsp;收藏
@@ -76,7 +75,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
           li.dropdown.userInfo
             img(src=`/avatar/${user.uid}` style='width: 2em;height: 2em;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
             a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style='display:inline-block;padding-left: 0.5rem;')
-              span(title=title)= user.username
+              span(title=title)= user.username || `用户${user.uid}`
               span.caret
             ul.dropdown-menu
               li
@@ -86,10 +85,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 a(href=`/m/${user.uid}`)
                   span.fa.fa-window-maximize &nbsp;专栏
               li
-                a(href=`/sms`)
+                a(href=`/message`)
                   span.fa.fa-envelope-o &nbsp;信息
-                  if messageSum > 0
-                    span.messageNumber.newMessage= messageSum
+                  .newMessageDiv
+                    span.messageNumber.newMessage= messageSum > 0?messageSum: ''
               li
                 a(href=`/u/${user.uid}/collections/unclassified`)
                   span.fa.fa-folder-o &nbsp;收藏
@@ -105,10 +104,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
               li
                 a(href=`/logout` title='不，不要走！')
                   span.fa.fa-sign-out &nbsp;退出
-            li#messageIco(style=`display:${messageSum > 0?'block': 'none'}`)
-              a(style='color: #337ab7;padding-right: 0.1rem' href='/sms' title='信息')
-                span.fa.fa-envelope-o(style='color: #777777;')
-                -if(messageSum >= 100){messageSum=' 99+'}
+            li#messageIco.newMessageDiv
+              a(style='color: #337ab7;padding-right: 0.1rem' href='/message' title='信息')
+                .newMessageDiv
+                  span.fa.fa-envelope-o(style='color: #777777;')
                   span.messageNumber.newMessage(style='margin-left:0;') #{messageSum}
                 span &nbsp;&nbsp;
         else

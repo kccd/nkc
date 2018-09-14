@@ -48,7 +48,7 @@ resourceRouter
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     // 图片名称279471.png
     const saveName = rid + '.' + extension;
-    const { uploadPath, generateFolderName, thumbnailPath } = settings.upload;
+    const { uploadPath, generateFolderName, thumbnailPath, frameImgPath} = settings.upload;
     // 图片储存路径 /2018/04/
     const relPath = generateFolderName(uploadPath);
     // 路径 d:\nkc\resources\upload/2018/04/
@@ -166,6 +166,18 @@ resourceRouter
       //   }
       // }
     }
+    // 上传视频，生成略缩图
+    // if (['mp4'].indexOf(extension.toLowerCase()) > -1) {
+    //   //
+    //   var timeStr = new Date().getTime();
+    //   // 输出视频路径
+    //   var outputVideoPath = "d:/nkc/tmp/" + timeStr + ".mp4";
+    //   // 略缩图路径
+    //   var videoImgPath = frameImgPath + "/" + rid + ".jpg";
+    //   // await imageMagick.turnVideo(path, outputVideoPath);
+    //   // await fs.rename(outputVideoPath, path);
+    //   await imageMagick.firstFrameToImg(path, videoImgPath);
+    // } 
     await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,

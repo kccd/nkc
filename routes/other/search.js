@@ -42,7 +42,7 @@ router.get('/', async(ctx, next) => {
         await post.thread.extendFirstPost();
         await post.thread.extendForum();
         if(accessibleFid.includes(post.thread.fid)){
-          return post
+          return post.toObject()
         }else{
           return null
         }

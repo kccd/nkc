@@ -10,6 +10,8 @@ block head
   link(rel='stylesheet' href='/Draft.css')
   link(rel='stylesheet' href='/katex.min.css')
   link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
+  link(rel="stylesheet" href="/photoswipe/dist/photoswipe.css")
+  link(rel="stylesheet" href="/photoswipe/dist/default-skin/default-skin.css")
   link(href=`/nkc_styles.css?v=${global.NKC.startTime}` rel='stylesheet' type='text/css')
   link(rel='shortcut icon' href='/favicon.ico')
   block title
@@ -25,11 +27,19 @@ block body
 
   block footer
     include nkc_footer.pug
-
+  if data.user
+    -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
+    audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   script(src='/jquery/jquery-1.11.1.js')
   script(src='/bootstrap/js/bootstrap.min.js')
   script(src='/twemoji/2/twemoji.min.js')
   script(src='/Promise/promise.min.js')
+  script(src='/vue/dist/vue.js')
+  script(src="/photoswipe/dist/photoswipe.js")
+  script(src="/photoswipe/dist/photoswipe-ui-default.js")
+  if data.user
+    script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
+    script(src=`/message/socket.js?v=${global.NKC.startTime}`)
 
   block scripts
 
@@ -41,5 +51,4 @@ block body
   script.
     console.log('(c)2018 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')
-  <script type="text/javascript" src="http://tajs.qq.com/stats?sId=65918440" charset="UTF-8"></script>
 

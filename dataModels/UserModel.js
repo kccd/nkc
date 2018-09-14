@@ -74,15 +74,19 @@ const userSchema = new Schema({
   },
   username: {
     type: String,
-    unique: true,
-    required: true,
-    minlength: 1,
+	  index: 1,
+	  default: '',
+    // unique: true,
+    // required: true,
+    // minlength: 1,
     maxlength: 30,
     trim: true
   },
   usernameLowerCase: {
     type: String,
-    unique: true,
+    // unique: true,
+	  index: 1,
+	  default: '',
     trim: true,
     lowercase: true
   },
@@ -106,6 +110,11 @@ const userSchema = new Schema({
 	volumeB: {
   	type: Boolean,
 		default: false
+	},
+	online: {
+  	type: Boolean,
+		default: false,
+		index: 1
 	}
 },
 {toObject: {
@@ -236,12 +245,20 @@ userSchema.virtual('group')
   });
 
 userSchema.virtual('threads')
-	.get(function() {
-		return this._threads;
-	})
-	.set(function(t) {
-		this._threads = t;
-	});
+  .get(function() {
+    return this._threads;
+  })
+  .set(function(t) {
+    this._threads = t;
+  });
+
+userSchema.virtual('generalSettings')
+  .get(function() {
+    return this._generalSettings;
+  })
+  .set(function(s) {
+    this._generalSettings = s;
+  });
 
 userSchema.virtual('newMessage')
 	.get(function() {
@@ -475,7 +492,87 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-userSchema.statics.createUser = async (userObj) => {
+
+// 创建用户（新）
+userSchema.statics.createUser = async (option) => {
+	const UserModel = mongoose.model('users');
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const UsersSubscribeModel = mongoose.model('usersSubscribe');
+	const PersonalForumModel = mongoose.model('personalForums');
+	const SettingModel = mongoose.model('settings');
+	const UsersGeneraModel = mongoose.model('usersGeneral');
+	const MessageModel = mongoose.model('messages');
+	const SmsModel = mongoose.model('sms');
+	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
+
+	const userObj = Object.assign({}, option);
+
+	const toc = Date.now();
+
+	const uid = await SettingModel.operateSystemID('users', 1);
+	userObj.uid = uid;
+	userObj.toc = toc;
+	userObj.tlv = toc;
+	userObj.tlm = toc;
+	userObj.moderators = [uid];
+	userObj.certs = [];
+
+	if(userObj.mobile) userObj.certs.push('mobile');
+
+	userObj.newMessage = {
+		messages: 0,
+		at: 0,
+		replies: 0,
+		system: 0
+	};
+
+	const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+	await Promise.all(systemInfo.map( async s => {
+		const log = SystemInfoLogModel({
+			mid: s._id,
+			uid
+		});
+		await log.save();
+	}));
+
+	userObj.abbr = `用户${uid}`;
+	userObj.displayName = userObj.abbr + '的专栏';
+	userObj.descriptionOfForum = userObj.abbr + '的专栏';
+
+	const user = UserModel(userObj);
+	const userPersonal = UsersPersonalModel(userObj);
+	const userSubscribe = UsersSubscribeModel(userObj);
+	const personalForum = PersonalForumModel(userObj);
+	const userGeneral = UsersGeneraModel({uid});
+
+	try {
+		await user.save();
+		await userPersonal.save();
+		await userSubscribe.save();
+		await personalForum.save();
+		await userGeneral.save();
+		const allSystemMessages = await SmsModel.find({fromSystem: true});
+		for(let sms of allSystemMessages) {
+			const viewedUsers = sms.viewedUsers;
+			viewedUsers.push(uid);
+			await sms.update({viewedUsers});
+		}
+	} catch (error) {
+		await UserModel.remove({uid});
+		await UsersPersonalModel.remove({uid});
+		await UsersSubscribeModel.remove({uid});
+		await PersonalForumModel.remove({uid});
+		await UsersGeneraModel.remove({uid});
+		await SystemInfoLogModel.removeMany({uid});
+		const err = new Error(`新建用户出错: ${error}`);
+		err.status = 500;
+		throw err;
+	}
+	return user;
+};
+
+// 创建用户（旧）
+userSchema.statics.createUserOld = async (userObj) => {
 	const SettingModel = mongoose.model('settings');
 	const toc = Date.now();
 	const uid = await SettingModel.operateSystemID('users', 1);
@@ -543,6 +640,75 @@ userSchema.methods.extendGrade = async function() {
 	return this.grade = grade;
 };
 
+userSchema.methods.getNewMessagesCount = async function() {
+	const MessageModel = mongoose.model('messages');
+	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
+	// 系统通知
+  const allSystemInfoCount = await MessageModel.count({ty: 'STE'});
+  const viewedSystemInfoCount = await SystemInfoLogModel.count({uid: this.uid});
+  const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+	// 系统提醒
+  const newReminderCount = await MessageModel.count({ty: 'STU', r: this.uid, vd: false});
+	// 用户信息
+  const newUsersMessagesCount = await MessageModel.count({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
+	return {
+		newSystemInfoCount,
+		newReminderCount,
+		newUsersMessagesCount
+	}
+};
 
+userSchema.methods.getMessageLimit = async function() {
+	const grade = await this.extendGrade();
+	const roles = await this.extendRoles();
+	let {messagePersonCountLimit, messageCountLimit} = grade;
+	for(const role of roles) {
+		const personLimit = role.messagePersonCountLimit;
+		const messageLimit = role.messageCountLimit;
+		if(personLimit > messagePersonCountLimit) {
+			messagePersonCountLimit = personLimit;
+		}
+		if(messageLimit > messageCountLimit) {
+			messageCountLimit = messageLimit;
+		}
+	}
+	return {
+		messagePersonCountLimit,
+		messageCountLimit
+	}
+};
+
+userSchema.methods.getPostLimit = async function() {
+
+	const grade = await this.extendGrade();
+	const roles = await this.extendRoles();
+
+	let {
+		postToForumCountLimit,
+		postToForumTimeLimit,
+		postToThreadCountLimit,
+		postToThreadTimeLimit
+	} = grade;
+
+	for(const role of roles) {
+		const pfc = role.postToForumCountLimit;
+		const pft = role.postToForumTimeLimit;
+		const ptc = role.postToThreadCountLimit;
+		const ptt = role.postToThreadTimeLimit;
+
+    if(pfc > postToForumCountLimit) postToForumCountLimit = pfc;
+    if(pft > postToForumTimeLimit) postToForumTimeLimit = pft;
+    if(ptc > postToThreadCountLimit) postToThreadCountLimit = ptc;
+    if(ptt > postToThreadTimeLimit) postToThreadTimeLimit = ptt;
+	}
+
+	return {
+		postToForumTimeLimit,
+		postToForumCountLimit,
+		postToThreadCountLimit,
+		postToThreadTimeLimit
+	}
+
+};
 
 module.exports = mongoose.model('users', userSchema);

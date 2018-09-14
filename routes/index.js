@@ -16,6 +16,9 @@ const personalForumRouter = routers.personalForum;
 const downloadRouter = routers.download;
 const systemRouter = routers.system;
 const problemRouter = routers.problem;
+const loginRouter = routers.login;
+const appRouter = routers.app;
+const messageRouter = routers.message;
 
 // 所有请求先经过此中间件
 router.use('/', async (ctx, next)  => {
@@ -55,7 +58,7 @@ router.use('/', async (ctx, next)  => {
 	await next();
 });
 
-
+router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
 router.use('/me', meRouter.routes(), meRouter.allowedMethods());
@@ -70,5 +73,7 @@ router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
 router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
 router.use('/problem', problemRouter.routes(), problemRouter.allowedMethods());
+router.use('/login', loginRouter.routes(), loginRouter.allowedMethods());
 router.use('/system', systemRouter.routes(), systemRouter.allowedMethods());
+router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
 module.exports = router;

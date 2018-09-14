@@ -86,6 +86,12 @@ const certificates ={
           [GET]: true
         }
       },
+      frameImg: {
+        [name]: '视频封面',
+        [parameter]: {
+          [GET]: true
+        }
+      },
       f: {
         [name]: '板块',
         [GET]: true,

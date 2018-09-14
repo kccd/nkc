@@ -16,6 +16,7 @@ block content
           li(role='presentation' class=data.type==='resolved'?'active': '')
             a(href='/problem/list?type=resolved') 已完成
               span.badge= (data.resolvedCount) || ''
+        br
         include ../interface_navigation_paging
         br
         for problem in data.problems

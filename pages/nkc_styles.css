@@ -1,5 +1,37 @@
+html {
+  font-size: 12px;
+}
+/*   vue.js   */
+
+[v-cloak] {
+  display: none;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+/*-------------*/
 h1, h2, h3, h4, h5, p{
   word-wrap:break-word;
+}
+.newMessageDiv{
+  display: none;
+}
+.newMessagePoint{
+  display: none;
 }
 .margin-right{
   margin-right: 5px;
@@ -623,11 +655,11 @@ width: 100%;
 }
 .forum-category a{
   display: inline-block;
-  padding: 0.2rem 0.3rem;
+  padding: 0.2rem 0.2rem;
   border-radius: 5px;
   text-decoration: none;
-  margin-right: 0.5rem;
-  font-size: 1.3rem;
+  margin-right: 0.3rem;
+  font-size: 1.2rem;
 }
 .forum-category a:hover{
   background-color: #ddd;
@@ -2727,6 +2759,112 @@ img.emoji {
   margin-left: 4px;
 }
 /*--------------*/
+
+
+/*  网站登录  */
+
+.site-name{
+  color: #fb5c62;
+  font-size: 4rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.site-description{
+  color: #888888;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.login-input-panel{
+  background-color: #ffffff;
+  border: 1px solid #efefef;
+  border-radius: 7px;
+  margin: auto;
+  margin-top: 10rem;
+  margin-bottom: 6rem;
+  padding: 3.5rem 3rem 3rem 3rem;
+  width: 37rem;
+}
+.login-input-panel .input-warning{
+  position: absolute;
+  color: #d9534f;
+  top: 1rem;
+  right: 0;
+}
+.login-input-panel .form-group{
+  position: relative;
+}
+
+.login-input-panel .link{
+  margin: 1.5rem 0 0 0;
+  text-align: center;
+}
+.login-input-panel .link a{
+  text-decoration: none;
+  line-height: 1rem;
+  font-size: 1rem;
+  color: #aaaaaa;
+}
+.login-input-panel .link a:hover{
+  color: #666666;
+}
+.login-input-panel .btn-group{
+  cursor: pointer;
+}
+.login-input-panel .login-type-text{
+  text-align: center;
+  color: #888888;
+  font-size: 1rem;
+  margin-top: 12px;
+}
+.login-input-panel .login-type-btn{
+  background-color: #d9534f;
+  border-radius: 50%;
+  margin: auto;
+  height: 4rem;
+  width: 4rem;
+  text-align: center;
+  color: #ffffff;
+  font-size: 2.5rem;
+}
+.login-input-panel .login-type-btn .fa{
+  line-height: 4rem;
+}
+.login-input-panel .login-type{
+  margin-top: 1rem;
+}
+.login-input-panel .send-code{
+  min-width: 47%;
+  display: inline-block;
+  text-align: right;
+  color: #888888;
+  cursor: pointer;
+}
+.login-input-panel .send-code:hover{
+  color: #555555;
+}
+.minimalist-button{
+  padding: 0.8rem 0;
+}
+.minimalist-input:focus {
+  outline: none;
+  border-color: #fb5c62;
+  box-shadow: none;
+
+}
+.minimalist-input{
+  height: 4rem;
+  font-size: 1.2rem;
+  border: none;
+  webkit-box-shadow: none;
+  box-shadow: none;
+  border-bottom: 1px solid #eaeaea;
+  border-radius: 0;
+  transition: border 0.2s;
+}
+
+/*--------------*/
+
 @media screen and (max-width: 1133px) {
   .user-info-list .hasCover .content-left{
     width: 27%;
@@ -2808,6 +2946,16 @@ img.emoji {
   }
 }
 @media screen and (max-width: 568px) {
+  .login-input-panel{
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+    border: none;
+    border-radius: 0;
+  }
+  body{
+    background-color: #ffffff;
+  }
   .swiper-home{
     height: 22rem;
   }
@@ -2878,3 +3026,7 @@ img.emoji {
   }
 }
 
+.pswp{
+  z-index: 10010;
+  transition: display 1s;
+}

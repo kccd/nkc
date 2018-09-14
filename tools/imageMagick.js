@@ -1,7 +1,7 @@
 const {spawn, exec} = require('child_process');
 const settings = require('../settings');
 const {banner, watermark, fontTtf} = settings.statics;
-const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize} = settings.upload;
+const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize, userBannerSize} = settings.upload;
 const {promisify} = require('util');
 const {platform} = require('os');
 const fs = require('fs');
@@ -168,11 +168,21 @@ const bannerify = path => {
 };
 
 const avatarify = (options) => {
-	const {top, left, width, height, path, targetPath} = options;
-	if(linux) {
-		return spawnProcess('convert', [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath]);
+	const {top, left, width, height, path, targetPath, needCrop} = options;
+	let arr;
+
+	if(needCrop) {
+		arr = [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath];
+	} else {
+		arr = [path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-crop', `${avatarSize}x${avatarSize}+0+0`, targetPath];
 	}
-	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath]);
+	if(!linux) {
+		arr.unshift('convert');
+	}
+	if(linux) {
+		return spawnProcess('convert', arr);
+	}
+	return spawnProcess('magick', arr);
 };
 
 
@@ -188,6 +198,25 @@ const npmInstallify = () => {
     cwd: __projectRoot
   });
 };
+
+const userBannerify = (options) => {
+	const {top, left, width, height, path, targetPath, needCrop} = options;
+	let arr;
+
+	if(needCrop) {
+		arr = [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${userBannerSize.width}x${userBannerSize.height}+${left}+${top}`, targetPath];
+	} else {
+		arr = [path, '-strip', '-thumbnail', `${userBannerSize.width}x${userBannerSize.height}^`, '-crop', `${userBannerSize.width}x${userBannerSize.height}+0+0`, targetPath];
+	}
+	if(!linux) {
+		arr.unshift('convert');
+	}
+	if(linux) {
+		return spawnProcess('convert', arr);
+	}
+	return spawnProcess('magick', arr);
+};
+
 
 const gitify = () => {
   return spawnProcess('git', ['pull'], {
@@ -264,6 +293,30 @@ const webLogoify = async (path, targetPath) => {
 	return spawnProcess('magick', ['convert', path, targetPath]);
 };
 
+const messageImageSMify = async (path, targetPath) => {
+  const {width, height} = sizeLimit.messageImageSM;
+  if(linux) {
+    return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, targetPath])
+  }
+  return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, targetPath])
+};
+
+
+// 获取视频的第一帧为图片
+const firstFrameToImg = async (videoPath,imgPath) => {
+  return spawnProcess('ffmpeg',['-i',videoPath,'-vframes' ,'1', imgPath])
+}
+
+
+// 视频转码为H264
+const videoToH264 = async(inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-y' ,outputPath])
+}
+
+// 降低视频码率
+const turnVideo = async(inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
+}
 module.exports = {
   avatarify,
   attachify,
@@ -288,7 +341,12 @@ module.exports = {
   removeFile,
 	lifePhotoify,
   forumAvatarify,
-  imageNarrow
+  imageNarrow,
+	userBannerify,
+  messageImageSMify,
+  firstFrameToImg,
+  videoToH264,
+  turnVideo
 };
 
 

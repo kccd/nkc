@@ -1,4 +1,5 @@
 module.exports = {
+	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
 		banned: {
@@ -101,6 +102,10 @@ module.exports = {
 		},
 		bills: {
 			GET: 'visitUserBills'
+		},
+		banner: {
+			GET: 'getUserBanner',
+			POST: 'modifyUserBanner'
 		}
 	}
 };

@@ -8,6 +8,7 @@ const draftsRouter = require('./drafts');
 const settingRouter = require('./settings');
 const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
+const bannerRouter = require('./banner');
 const userRouter = new Router();
 
 
@@ -17,7 +18,8 @@ userRouter
     const {username, uid} = query;
     const targetUsers = [];
     if(username !== undefined) {
-    	const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
+      // const users = await db.UserModel.find({usernameLowerCase: new RegExp(username.toLowerCase(), 'i')});
+      const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     	if(user) targetUsers.push(user);
     }
     if(uid !== undefined) {
@@ -157,6 +159,7 @@ userRouter
   .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	.use('/:uid/auth', authRouter.routes(), authRouter.allowedMethods())
+	.use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())

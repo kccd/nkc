@@ -45,6 +45,36 @@ const roleSchema = new Schema({
 	modifyPostTimeLimit: {
 		type: Number,
 		default: 0,
+	},
+	// 每天最多能给$个用户发送信息
+	messagePersonCountLimit: {
+		type: Number,
+		default: 0
+	},
+	// 每天所能发送信息的总条数
+	messageCountLimit: {
+		type: Number,
+		default: 0
+	},
+	// 每天所能发表的回复数
+	postToThreadCountLimit: {
+		type: Number,
+		default: 0
+	},
+  // 发表回复间隔分钟数
+  postToThreadTimeLimit: {
+		type: Number,
+		default: 0
+  },
+  // 发表文章间隔分钟数
+  postToForumTimeLimit: {
+    type: Number,
+    default: 0
+  },
+	// 每天所能发表的文章数
+	postToForumCountLimit: {
+		type: Number,
+		default: 0
 	}
 }, {
 	collection: 'roles'

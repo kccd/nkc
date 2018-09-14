@@ -8,6 +8,7 @@ const {
 	r,
 	rt,
 	cover,
+	frameImg,
 	resources,
 	pfa,
 	pfb,
@@ -40,6 +41,8 @@ const u = require('./user');
 const page = require('./page');
 const download = require('./download');
 const forgotPassword = require('./forgotPassword');
+const app = require('./app');
+const message = require('./message');
 const operationObj = {};
 
 
@@ -73,6 +76,8 @@ operationObj.operationTree = {
 		default: resourceObj.default,
 
 		cover,// 文章封面
+
+		frameImg,// 视频封面
 
 		resources,// 网站logo
 
@@ -130,6 +135,10 @@ operationObj.operationTree = {
 		forgotPassword,
 
 		page,
+
+		app,// 手机app
+
+		message, // 信息（新）
 	}
 };
 module.exports = operationObj;

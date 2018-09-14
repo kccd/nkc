@@ -264,6 +264,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = mongoose.model('settings');
   const UsersPersonalModel = require('./UsersPersonalModel');
   const PostModel = mongoose.model('posts');
+  const redis = require('../redis');
+  const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
   const ReplyModel = mongoose.model('replies');
   const dbFn = require('../nkcModules/dbFunction');
@@ -312,6 +314,21 @@ threadSchema.methods.newPost = async function(post, user, ip) {
         toUid: quUser.uid
       });
       await reply.save();
+      const messageId = await SettingModel.operateSystemID('messages', 1);
+      const message = MessageModel({
+        _id: messageId,
+        r: quUser.uid,
+        ty: 'STU',
+        c: {
+          type: 'replyPost',
+          targetPid: pid+'',
+          pid: quPid+''
+        }
+      });
+
+      await message.save();
+
+      await redis.pubMessage(message);
     }
   }
   await this.update({lm: pid});

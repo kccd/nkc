@@ -1,8 +1,56 @@
 const Router = require('koa-router');
 const sendMessageRouter = new Router();
 sendMessageRouter
+	.post('/login', async (ctx, next) => {
+		const {db, body} = ctx;
+		const {nationCode, mobile, imgCode} = body;
+		if(!imgCode) ctx.throw(400, '图形验证码不能为空');
+		if(!nationCode) ctx.throw(400, '国际区号不能为空');
+		if(!mobile) ctx.throw(400, '手机号不能为空');
+    const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
+    await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
+		const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
+		if(!otherPersonal) ctx.throw(400, '暂未有用户绑定该手机号');
+		const smsCodeObj = {
+			nationCode,
+			mobile,
+			type: 'login',
+			ip: ctx.address
+		};
+		await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+		const {apiFunction, sendMessage} = ctx.nkcModules;
+		smsCodeObj.code = apiFunction.random(6);
+		const smsCode = db.SmsCodeModel(smsCodeObj);
+		await smsCode.save();
+		await sendMessage(smsCodeObj);
+		await next();
+	})
   .post('/register', async (ctx, next) => { // 手机号码注册
   	const {db, body} = ctx;
+  	const {nationCode, mobile, imgCode} = body;
+    if(!imgCode) ctx.throw(400, '图形验证码不能为空');
+  	if(!nationCode) ctx.throw(400, '国际区号不能为空');
+  	if(!mobile) ctx.throw(400, '手机号不能为空');
+    const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
+    await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
+  	const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
+  	if(otherPersonal) ctx.throw(400, '手机号已被其他用户注册');
+  	const smsCodeObj = {
+  		nationCode,
+		  mobile,
+		  type: 'register',
+		  ip: ctx.address
+	  };
+  	await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+  	const {apiFunction, sendMessage} = ctx.nkcModules;
+  	smsCodeObj.code = apiFunction.random(6);
+  	const smsCode = db.SmsCodeModel(smsCodeObj);
+  	await smsCode.save();
+  	await sendMessage(smsCodeObj);
+  	await next();
+
+
+  	/*const {db, body} = ctx;
 		const {nationCode, username, mobile, imgCode} = body;
 	  if(!username) ctx.throw(400, '请输入用户名。');
 	  const {contentLength} = ctx.tools.checkString;
@@ -30,7 +78,7 @@ sendMessageRouter
 		const smsCode = db.SmsCodeModel(smsCodeObj);
 	  await smsCode.save();
 		await sendMessage(smsCodeObj);
-		await next();
+		await next();*/
   })
   .post('/getback', async (ctx, next) => { // 找回密码
   	const {db, body} = ctx;
@@ -113,7 +161,7 @@ sendMessageRouter
 		} else if(operation === 'verifyNewMobile') { //-- 验证新手机 --
 			const {nationCode, mobile} = body;
 			if(!mobile) ctx.throw(400, '新手机号不能为空');
-			if(userPersonal.mobile === mobile) ctx.throw(400, '您已绑定该手机号，请更换后重试');
+			if(userPersonal.mobile === mobile && userPersonal.nationCode === nationCode) ctx.throw(400, '您已绑定该手机号，请更换后重试');
 			const sameUserPersonal = await db.UsersPersonalModel.findOne({mobile, nationCode});
 			if(sameUserPersonal) ctx.throw(400, '该号码已被其他用户绑定，请更换后重试');
 			const type = 'bindMobile';

@@ -1,0 +1,84 @@
+extends ../bootstrap_base
+block title
+  title 账号登陆
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  style.
+    body{
+      background-color: #f5f5f5;
+    }
+block content
+  mixin forgotPossword
+    div.link
+      a(href="/register") 账号注册
+      span &nbsp;&nbsp;&nbsp;
+      a(href="/forgotPassword/mobile") 忘记密码
+  .container-fluid(style='max-width: 1400px;' v-cloak)#app
+    .row
+      .login-input-panel
+        .row
+          .col-xs-12.col-md-12
+            div.site-name 科创
+            p.site-description=data.serverSettings.brief
+          .col-xs-12.col-md-12
+            .form
+              div(v-show="loginType === 'account'")
+                .form-group
+                  .input-warning(v-if="warning.username") {{warning.username}}
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='用户名' v-model.trim="username" :autofocus="loginType==='account'")
+                .form-group
+                  .input-warning(v-if="warning.password") {{warning.password}}
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='password' placeholder='密码' v-model.trim="password")
+              div(v-show="loginType === 'mobile'")
+                .form-group
+                  select.form-control.minimalist-input(v-model.number="nationCode" @click='clearWarning' )
+                    option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
+                .form-group
+                  .input-warning(v-if="warning.mobile") {{warning.mobile}}
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='number' placeholder='手机号' v-model.number="mobile")
+                .form-group
+                  .input-warning(v-if="warning.password") {{warning.password}}
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='password' placeholder='密码' v-model.trim="password")
+              div(v-show="loginType==='code'")
+                .form-group
+                  select.form-control.minimalist-input(v-model.number="nationCode" @click='clearWarning' )
+                    option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
+                .form-group
+                  .input-warning(v-if="warning.mobile") {{warning.mobile}}
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='number' placeholder='手机号' v-model.number="mobile")
+                .form-group
+                  div(style='width: 50%;display: inline-block;position: relative;')
+                    .input-warning(v-if="warning.imgCode") {{warning.imgCode}}
+                    input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='图形验证码' v-model.trim="imgCode")
+                  .send-code.text-right(@click='changeImgCode')
+                    img(src='/register/code' style='height: 3.5rem;display: inline;')
+                .form-group
+                  div(style='width: 50%;display: inline-block;position: relative;')
+                    .input-warning(v-if="warning.code") {{warning.code}}
+                    input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='短信验证码' v-model.trim="code")
+                  .send-code(@click='sendCode') 发送验证码
+                    span(v-if="timeNumber > 0") &nbsp;({{timeNumber}})
+              .form-group
+                div(style='margin: 0.5rem 0;color: #d9534f;') {{warning.error}}
+                button.btn.btn-danger.btn-block.minimalist-button(@click='submit') {{btnText}}
+                +forgotPossword
+          .col-xs-12.col-md-12
+            .btn-group.btn-group-justified.login-type
+              .btn-group(@click='changeType("account")')
+                .login-type-btn
+                  .fa.fa-user
+                .login-type-text 用户名+密码
+              .btn-group(@click='changeType("mobile")')
+                .login-type-btn
+                  .fa.fa-mobile
+                .login-type-text 手机号+密码
+              .btn-group(@click='changeType("code")')
+                .login-type-btn
+                  .fa.fa-commenting
+                .login-type-text 手机号+验证码
+
+
+block scripts
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/nationCodes/nationCodes.js?v=${global.NKC.startTime}`)
+  script(src=`/login/login.js?v=${global.NKC.startTime}`)

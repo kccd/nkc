@@ -43,9 +43,16 @@ smsCodeSchema = new Schema({
 smsCodeSchema.statics.ensureCode = async (obj) => {
 	const {nationCode, mobile, code, type} = obj;
 	const SmsCodeModel = mongoose.model('smsCodes');
-	const {mobileCodeTime} = require('../settings/sendMessage');
+	const SettingModel = mongoose.model('settings');
+	const smsSettings = await SettingModel.findOnly({type: 'sms'});
+	const setting = smsSettings[type];
+	if(!setting) {
+		const err = new Error(`未知的短信验证码类型：${type}`);
+		err.status = 400;
+		throw err;
+	}
 	const smsCode = await SmsCodeModel.findOne({nationCode, mobile, code, type, used: false});
-	if(smsCode && (smsCode.toc > (Date.now() - mobileCodeTime))) {
+	if(smsCode && (smsCode.toc > (Date.now() - (setting.validityPeriod*60*1000)))) {
 		return smsCode;
 	} else {
 		const err = new Error('短信验证码无效或已过期。');
@@ -57,21 +64,39 @@ smsCodeSchema.statics.ensureCode = async (obj) => {
 // 验证是否有权限发送短信
 smsCodeSchema.statics.ensureSendPermission = async (obj) => {
 	const {nationCode, mobile, type, ip} = obj;
-	const {sendMobileCodeCount, sendMobileCodeCountSameIp} = require('../settings/sendMessage');
 	const SmsCodeModel = mongoose.model('smsCodes');
-	let smsCodes = await SmsCodeModel.find({nationCode, mobile, type, toc: {$gte: Date.now() - 24*60*60*1000}});
-	if(smsCodes.length >= sendMobileCodeCount) {
-		const err = new Error(`同一手机号码24小时内发送短信验证码不能超过${sendMobileCodeCount}条。`);
+	const SettingModel = mongoose.model('settings');
+	const smsSettings = await SettingModel.findOnly({type: 'sms'});
+	const today = require('../nkcModules/apiFunction').today();
+	const setting = smsSettings[type];
+	if(!setting) {
+		const err = new Error(`未知的短信验证码类型：${type}`);
 		err.status = 400;
 		throw err;
 	}
-	smsCodes = await SmsCodeModel.find({type, ip, toc: {$gte: Date.now() - 24*60*60*1000}});
-	if(smsCodes.length >= sendMobileCodeCountSameIp) {
-		const err = new Error(`同一IP24小时内发送短信验证码不能超过${sendMobileCodeCountSameIp}条。`);
+	let smsCodes = await SmsCodeModel.find({nationCode, mobile, type, toc: {$gte: today}}).sort({toc: -1});
+	if(smsCodes.length !== 0) {
+    const timeLimit = smsCodes[0].toc - (Date.now() - 2*60*1000);
+
+    if(timeLimit > 0) {
+      // const err = new Error(`发送验证码的间隔不能小于120秒，请${(timeLimit/1000).toFixed(0)}秒后再试`);
+      const err = new Error(`发送验证码的间隔不能小于120秒`);
+      err.status = 400;
+      throw err;
+    }
+	}
+
+	if(smsCodes.length >= setting.sameMobileOneDay) {
+		const err = new Error(`每天发送相同类型的验证码条数不能超过${setting.sameMobileOneDay}条。`);
+		err.status = 400;
+		throw err;
+	}
+	smsCodes = await SmsCodeModel.find({type, ip, toc: {$gte: today}});
+	if(smsCodes.length >= setting.sameIpOneDay) {
+		const err = new Error(`同IP每天发送相同类型的验证码条数不能超过${setting.sameIpOneDay}条。`);
 		err.status = 400;
 		throw err;
 	}
 };
-
 
 module.exports = mongoose.model('smsCodes', smsCodeSchema, 'smsCodes');

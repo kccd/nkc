@@ -30,42 +30,74 @@ router
       if(disabled) ctx.throw(400, '操作失败！该回复在您操作之前已经被屏蔽了，请刷新');
     }
     data.targetUser = await targetPost.extendUser();
-    if(obj.disabled && para.delType === 'toRecycle') {
-	    await db.UsersScoreLogModel.insertLog({
-		    user: data.targetUser,
-		    type: 'kcb',
-		    typeIdOfScoreChange: 'postBlocked',
-		    port: ctx.port,
-		    fid: targetPost.fid,
-		    tid: targetPost.tid,
-		    pid,
-		    ip: ctx.address
-	    });
-	    if(para && para.illegalType) {
-		    await db.UsersScoreLogModel.insertLog({
-			    user: data.targetUser,
-			    type: 'kcb',
-			    typeIdOfScoreChange: 'violation',
-			    port: ctx.port,
-			    fid: targetPost.fid,
-			    tid: targetPost.tid,
-			    pid,
-			    ip: ctx.address,
-			    description: para.reason || '屏蔽回复并标记为违规'
-		    });
-		    await db.UsersScoreLogModel.insertLog({
-			    user: data.targetUser,
-			    type: 'score',
-			    typeIdOfScoreChange: 'violation',
-			    port: ctx.port,
-			    ip: ctx.address,
-			    key: 'violationCount',
-			    fid: targetPost.fid,
-			    tid: targetPost.tid,
-			    pid,
-			    description: para.reason || '屏蔽回复并标记为违规'
-		    });
-	    }
+    if(obj.disabled) {
+      // 直接封禁
+      if(para.delType === 'toRecycle') {
+        await db.UsersScoreLogModel.insertLog({
+          user: data.targetUser,
+          type: 'kcb',
+          typeIdOfScoreChange: 'postBlocked',
+          port: ctx.port,
+          fid: targetPost.fid,
+          tid: targetPost.tid,
+          pid,
+          ip: ctx.address
+        });
+        if(para && para.illegalType) {
+          await db.UsersScoreLogModel.insertLog({
+            user: data.targetUser,
+            type: 'kcb',
+            typeIdOfScoreChange: 'violation',
+            port: ctx.port,
+            fid: targetPost.fid,
+            tid: targetPost.tid,
+            pid,
+            ip: ctx.address,
+            description: para.reason || '屏蔽回复并标记为违规'
+          });
+          await db.UsersScoreLogModel.insertLog({
+            user: data.targetUser,
+            type: 'score',
+            typeIdOfScoreChange: 'violation',
+            port: ctx.port,
+            ip: ctx.address,
+            key: 'violationCount',
+            fid: targetPost.fid,
+            tid: targetPost.tid,
+            pid,
+            description: para.reason || '屏蔽回复并标记为违规'
+          });
+        }
+        // 生成提醒
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const message = db.MessageModel({
+          _id: mId,
+          r: targetPost.uid,
+          ty: 'STU',
+          c: {
+            type: 'bannedPost',
+            pid: targetPost.pid,
+            rea: para.reason
+          }
+        });
+        await message.save();
+        await ctx.redis.pubMessage(message);
+      } else {
+        // 退回
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const message = db.MessageModel({
+          _id: mId,
+          r: targetPost.uid,
+          ty: 'STU',
+          c: {
+            type: 'postWasReturned',
+            pid: targetPost.pid,
+            rea: para.reason
+          }
+        });
+        await message.save();
+        await ctx.redis.pubMessage(message);
+      }
     }
     await targetThread.updateThreadMessage();
     // 删除回复 添加日志

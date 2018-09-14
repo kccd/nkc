@@ -51,7 +51,7 @@ const usersPersonalSchema = new Schema({
   },
   hashType: {
     type: String,
-    required: true
+    // required: true
   },
   lastTry: {
     type: Number,
@@ -60,11 +60,11 @@ const usersPersonalSchema = new Schema({
   password: {
     salt: {
       type: String,
-      required: true
+      // required: true
     },
     hash: {
       type: String,
-      required: true
+      // required: true
     }
   },
   newMessage: {
@@ -264,7 +264,13 @@ const usersPersonalSchema = new Schema({
 		}
 	}
 },
-  {usePushEach: true});
+  {
+  	usePushEach: true,
+	  toObject: {
+		  getters: true,
+		  virtuals: true
+	  }
+});
 
 usersPersonalSchema.virtual('idPhotos')
 	.get(function() {

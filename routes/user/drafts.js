@@ -1,6 +1,11 @@
 const Router = require('koa-router');
 const draftsRouter = new Router();
 draftsRouter
+  .use('/', async (ctx, next) => {
+    const {user} = ctx.data;
+    if(!user.username) return ctx.redirect('/register');
+    await next();
+  })
     .get('/', async(ctx, next) => {
     	const {data, db, query} = ctx;
     	const {user} = data;

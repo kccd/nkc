@@ -20,7 +20,7 @@ app.on('error', err => {
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
 const {permissions} = require('./nkcModules');
-const {init, cookieIdentify, body, scoreHandler, urlRewrite, permission, score, logger} = require('./middlewares');
+const {stayLogin, init, cookieIdentify, body, scoreHandler, urlRewrite, permission, score, logger} = require('./middlewares');
 
 try {
   mkdirSync('tmp');
@@ -31,7 +31,7 @@ try {
 
 app.keys = [settings.cookie.secret];
 app.use(init)
-  .use(cookieIdentify)
+  .use(stayLogin)
   .use(koaBody(settings.upload.koaBodySetting))
   .use(async (ctx, next) => {
     ctx.body = ctx.request.body;

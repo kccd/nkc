@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const loginRouter = require('./login');
+// const loginRouter = require('./login');
 const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
 const examRouter = require('./exam');
@@ -29,6 +29,7 @@ const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
 const forumAvatarRouter = require('./forum_avatar');
 const coverRouter = require('./cover');
+const frameImgRouter = require('./frameImg');
 const pageRouter = require('./page');
 const logoRouter = require('./logo');
 // -----------------------------------
@@ -53,7 +54,7 @@ otherRouter
 		}
 		return ctx.redirect(`/`);
 	})
-  .use('login', loginRouter.routes(), loginRouter.allowedMethods())
+  // .use('login', loginRouter.routes(), loginRouter.allowedMethods())
 	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
@@ -79,5 +80,6 @@ otherRouter
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
 	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
-  .use('cover', coverRouter.routes(), coverRouter.allowedMethods());
+  .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
+  .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods());
 module.exports = otherRouter;

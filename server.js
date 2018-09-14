@@ -1,6 +1,8 @@
+global.NKC = {};
 const http = require('http');
 const https = require('https');
 const app = require('./app');
+const socket = require('./socket');
 const searchInit = require('./searchInit');
 const settings = require('./settings');
 const nkcModules = require('./nkcModules');
@@ -15,8 +17,6 @@ searchInit()
   .then(async () => {
     console.log('ElasticSearch is ready...'.green);
 
-
-	  global.NKC = {};
 	  global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
 	  global.NKC.startTime = Date.now();
 
@@ -134,7 +134,11 @@ searchInit()
         .listen(
           serverSettings.httpsPort,
           serverSettings.address,
-          () => console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
+          async () => {
+          	await socket(server);
+	          console.log(`socket.io is ready...`.green);
+          	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
+          }
         );
 
       redirectServer = http.createServer((req, res) => {
@@ -149,9 +153,14 @@ searchInit()
       server = http.createServer(app).listen(
         serverSettings.port,
         serverSettings.address,
-        () => console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
+        async () => {
+        	await socket(server);
+        	console.log(`socket.io is ready...`.green);
+        	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
+        }
       );
     }
+
   })
   .catch(e => {
     console.error(`error occured when initialize the server.\n${e.stack}`.red);

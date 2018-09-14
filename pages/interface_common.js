@@ -44,21 +44,31 @@ function post_api(target,body,callback){
 
 function generalRequest(obj,opt,callback){
   var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange=function(){
+  xhr.onreadystatechange = function(){
     var res;
-    if (xhr.readyState==4){
+    if (xhr.readyState === 4){
       try {
         res = JSON.parse(xhr.responseText);
       } catch(e) {
         res = xhr.responseText
       }
-      if(xhr.status==0||xhr.status>=400)
+      if(xhr.status === 0) {
+        callback('发起请求失败，请检查网络连接');
+      } else if(xhr.status >= 400 || res.error || res instanceof Error) {
         callback(res);
-      if(res.error || res instanceof Error)
-        callback(res);
-      callback(null,res);
+      } else {
+        callback(null,res);
       }
+     /* if(xhr.status==0||xhr.status>=400) {
+        alert(1);
+        return callback(res);
+      }
+      if(res.error || res instanceof Error) {
+        callback(res);
+      }
+      callback(null,res);*/
     }
+  };
 
   try{
     xhr.open(opt.method,opt.url,true);
@@ -77,7 +87,9 @@ function nkcOperationAPI(obj){
       url:obj.url
     },
     function(err,back){
-      if(err)return reject(err);
+      if(err){
+        return reject(err);
+      }
       resolve(back);
     });
   })
@@ -631,9 +643,10 @@ function forumListVisibilitySwitch() {
   return true
 }
 
-function postUpload(url, data, callback) {
+function postUpload(url, data, callback, onprogress) {
 	var xhr = new XMLHttpRequest();
 	xhr.upload.onprogress = function(e) {
+	  if(onprogress) onprogress(e);
 		var percentComplete = (e.loaded / e.total) * 100;
 		percentComplete = percentComplete.toFixed(1);
 		$('#uploadInfo').css('display', 'block');
@@ -653,7 +666,13 @@ function postUpload(url, data, callback) {
 				setTimeout(function(){
 					$('#uploadInfo').css('display', 'none');
 				}, 5000);
-				var data = JSON.parse(xhr.responseText);
+				var data;
+				try{
+          data = JSON.parse(xhr.responseText);
+        } catch(err) {
+				  console.log(err);
+				  data = xhr.responseText;
+        }
 				screenTopWarning(data.error);
 			}
 		}
@@ -685,7 +704,38 @@ $("document").ready(function(){
     var selection = document.getSelection();
     lastEditRange = selection.getRangeAt(0)
   })
-})
+});
+
+function uploadFilePromise(url, data, onprogress) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = function(e) {
+      if(onprogress) onprogress(e);
+    };
+    xhr.onreadystatechange=function()
+    {
+      if (xhr.readyState === 4)
+      {
+        if(xhr.status>=200&&xhr.status<300){
+          resolve(JSON.parse(xhr.responseText));
+        }else {
+          var data;
+          try{
+            data = JSON.parse(xhr.responseText);
+          } catch(err) {
+            data = xhr.responseText;
+          }
+          reject(data);
+        }
+      }
+    };
+    xhr.open("POST",url, true);
+    xhr.setRequestHeader("FROM","nkcAPI");
+    xhr.send(data);
+  });
+}
+
+
 function deleteBill(id) {
 	if(confirm('确定要删除该条记录？') === false) return;
 	nkcAPI('/fund/bills/'+id, 'DELETE', {})
@@ -1077,4 +1127,86 @@ function unDigestPost(pid) {
 		.catch(function(data) {
 			screenTopWarning(data.error||data);
 		})
+}
+
+function fromNow(t) {
+  if(!moment) throw 'Need to introduce the moment module';
+  moment.locale('zh-cn');
+  return moment(t).fromNow();
+}
+
+function format(s, t) {
+  if(t) {
+    return moment(t).format(s);
+  }
+  return moment().format(s);
+}
+
+function beep(name) {
+  var audio = document.getElementById('beep');
+  if(audio) {
+    if(audio.getAttribute('data-' + name) === 'true') {
+      audio.setAttribute('src', "/default/" + name + '.wav' + '?t=' + Date.now());
+      audio.play();
+    }
+  }
+}
+
+function updateBeep(beep) {
+  var audio = document.getElementById('beep');
+  if(!audio) return;
+  if(beep.systemInfo) {
+    audio.setAttribute('data-notice', 'true');
+  } else {
+    audio.setAttribute('data-notice', 'false');
+  }
+  if(beep.usersMessage) {
+    audio.setAttribute('data-message', 'true');
+  } else {
+    audio.setAttribute('data-message', 'false');
+  }
+  if(beep.reminder) {
+    audio.setAttribute('data-reminder', 'true');
+  } else {
+    audio.setAttribute('data-reminder', 'false');
+  }
+}
+
+function initPhotoSwipe(url) {
+  var pswpElement = document.querySelectorAll('.pswp')[0];
+  if(!pswpElement) return;
+  var options = {
+    index: 0,
+    showHideOpacity: true,
+    closeOnScroll: false,
+    clickToCloseNonZoomable: false,
+    showAnimationDuration: 0,
+    hideAnimationDuration: 0,
+    mouseUsed: true,
+    history: false,
+    bgOpacity: 0.9,
+  };
+  var items = [];
+  var winWidth = $(window).width();
+  var winHeight = $(window).height();
+  url = url.replace(/\?.*/g, '');
+  var image = new Image();
+  image.src = url;
+  image.onload = function() {
+    var w, h;
+    if (winWidth / winHeight > image.width / image.height) {
+      h = winHeight;
+      w = image.width * h / image.height;
+    } else {
+      w = winWidth;
+      h = image.height * w / image.width;
+    }
+    items.push({
+      src: url,
+      w: w,
+      h: h
+    });
+    var gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
+    gallery.init();
+  }
 }

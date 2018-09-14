@@ -4,6 +4,14 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		sms: {
+			GET: 'visitSmsSettings',
+			PATCH: 'modifySmsSettings',
+		},
+		email: {
+			GET: 'visitExperimentalEmailSettings',
+			PATCH: 'modifyEmailSettings'
+		},
 		base: {
 			GET: 'visitWebBaseSettings',
 			PATCH: 'modifyWebBase'
@@ -102,6 +110,14 @@ module.exports = {
 		exam: {
 			GET: 'visitExamSettings',
 			PATCH: 'modifyExamSettings'
+		},
+		message: {
+			GET: 'visitEMessageSettings',
+			PATCH: 'modifyEMessageSettings'
+		},
+		post: {
+			GET: 'visitEPostSettings',
+			PATCH: 'modifyEPostSettings'
 		}
 	},
 	systemInfo: {

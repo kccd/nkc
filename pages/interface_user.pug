@@ -13,7 +13,7 @@ block content
             .col-xs-12.col-md-12
               .row
                 img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
-                h3.text-center= data.targetUser.username
+                h3.text-center= data.targetUser.username || '用户' + data.targetUser.uid
                 .text-center
                   -const targetUser = data.targetUser;
                   include user/module_user_grade
@@ -21,7 +21,7 @@ block content
                 br
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
                 if data.user && data.user.uid !== data.targetUser.uid
-                  a(href=`/sms/message/${data.targetUser.uid}`).btn.btn-primary.btn-block 私信
+                  a(href=`/message?uid=${data.targetUser.uid}`).btn.btn-primary.btn-block 私信
                   if data.userOperationsId.includes('subscribeUser') && data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
                     button.btn.btn-block.btn-danger(onclick=`subscribeUser(${data.targetUser.uid}, false)`) 取关
                   if data.userOperationsId.includes('unSubscribeUser') && !data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)

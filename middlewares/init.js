@@ -6,6 +6,7 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
 const {promisify} = require('util');
+const redis = require('../redis');
 
 module.exports = async (ctx, next) => {
 	try {
@@ -19,6 +20,7 @@ module.exports = async (ctx, next) => {
 	  ctx.db = db;
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
+	  ctx.redis = redis;
 	  ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
@@ -52,7 +54,7 @@ module.exports = async (ctx, next) => {
 	    exists: promisify(fs.exists),
 	    createReadStream: fs.createReadStream,
 	    stat: promisify(fs.stat),
-		  copyFile: promisify(fs.copyFile)
+      copyFile: promisify(fs.copyFile)
 	  };
 
 		Object.defineProperty(ctx, 'template', {
@@ -63,6 +65,12 @@ module.exports = async (ctx, next) => {
 				this.__templateFile = fileName
 			}
 		});
+
+		const reqType = ctx.request.get('REQTYPE');
+		if(reqType === 'app') {
+			ctx.reqType = 'app';
+		}
+
 	  //error handling
     await next();
 		if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
@@ -85,6 +93,7 @@ module.exports = async (ctx, next) => {
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
 	  ctx.template = 'error.pug';
+	  ctx.type = ctx.type || 'application/json';
 	  await body(ctx, () => {});
   }
   finally {
