@@ -8,6 +8,7 @@ const {
 	r,
 	rt,
 	cover,
+	frameImg,
 	resources,
 	pfa,
 	pfb,
@@ -75,6 +76,8 @@ operationObj.operationTree = {
 		default: resourceObj.default,
 
 		cover,// 文章封面
+
+		frameImg,// 视频封面
 
 		resources,// 网站logo
 

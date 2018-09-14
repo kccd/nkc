@@ -33,6 +33,7 @@
     "direct-alipay": "^3.0.0",
     "echarts": "^4.1.0",
     "elasticsearch": "^14.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "icheck": "^1.0.2",
     "immutable": "^3.8.2",
