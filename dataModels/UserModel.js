@@ -504,7 +504,6 @@ userSchema.statics.createUser = async (option) => {
 	const MessageModel = mongoose.model('messages');
 	const SmsModel = mongoose.model('sms');
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
-	const apiFunction = require('../nkcModules/apiFunction');
 
 	const userObj = Object.assign({}, option);
 
@@ -517,9 +516,7 @@ userSchema.statics.createUser = async (option) => {
 	userObj.tlm = toc;
 	userObj.moderators = [uid];
 	userObj.certs = [];
-	userObj.password = {
-    hash: apiFunction.getEmailToken()
-	};
+
 	if(userObj.mobile) userObj.certs.push('mobile');
 
 	userObj.newMessage = {

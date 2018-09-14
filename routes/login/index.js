@@ -125,12 +125,13 @@ loginRouter
 		}
 
 		if(password) {
-
 			let {
 				tries=1,
 				lastTry = Date.now(),
 				hashType
 			} = userPersonal;
+
+      if(!hashType) ctx.throw(400, '账号暂未设置密码，请使用手机号加短信验证码登录。');
 
 			const {hash, salt} = userPersonal.password;
 
@@ -157,6 +158,7 @@ loginRouter
 						ctx.throw(400, '密码错误, 请重新输入');
 					}
 					break;
+				default: ctx.throw(400, '未知的密码加密类型');
 			}
 			tries = 0;
 			await userPersonal.update({tries});
