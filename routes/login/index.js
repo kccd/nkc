@@ -125,7 +125,8 @@ loginRouter
 			ctx.throw(400, `未知的登录方式：${loginType}`);
 		}
 
-		if(password) {
+		if(loginType !== 'code') {
+
 			let {
 				tries=1,
 				lastTry = Date.now(),

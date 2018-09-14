@@ -28,8 +28,8 @@ registerRouter
 	  const {mobile, nationCode, code, imgCode} = body;
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
 	  if(!mobile) ctx.throw(400, '请输入手机号');
-    if(!imgCode) ctx.throw(400, '请输入验证码');
-	  if(!code) ctx.throw(400, '请输入验证码');
+    if(!imgCode) ctx.throw(400, '请输入图形验证码');
+	  if(!code) ctx.throw(400, '请输入短信验证码');
 
     const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
 
