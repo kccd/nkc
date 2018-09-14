@@ -116,6 +116,7 @@ loginRouter
 				ctx.throw(400, '该手机对应多个用户名，请使用用户名登录');
 			}
 			userPersonal = userPersonal[0];
+
 			user = await db.UserModel.findOnly({uid: userPersonal.uid});
 
       await imgCodeObj.update({uid: user.uid});

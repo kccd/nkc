@@ -346,7 +346,7 @@ $(function() {
       // 获取用户列表
       getUserList: function() {
         return new Promise(function(resolve, reject) {
-          nkcAPI('/message', 'GET', {})
+          nkcAPI('/message?t=' + Date.now(), 'GET', {})
             .then(function(data) {
               app.userList = data.userList;
               app.user = data.user;
@@ -361,7 +361,7 @@ $(function() {
               resolve();
             })
             .catch(function(data) {
-              screenTopAlert(data.error || data);
+              screenTopWarning(data.error || data);
             })
 
         });
