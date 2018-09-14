@@ -3,7 +3,7 @@ module.exports = {
 		{
 			name: 'kc',
 			script: 'server.js',
-			instances: 12,
+			instances: 4,
 			exec_mode: 'cluster',
 			env: {
 				NODE_ENV: 'production'

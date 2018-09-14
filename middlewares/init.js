@@ -54,7 +54,7 @@ module.exports = async (ctx, next) => {
 	    exists: promisify(fs.exists),
 	    createReadStream: fs.createReadStream,
 	    stat: promisify(fs.stat),
-		  copyFile: promisify(fs.copyFile)
+      copyFile: promisify(fs.copyFile)
 	  };
 
 		Object.defineProperty(ctx, 'template', {
