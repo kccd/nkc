@@ -85,8 +85,8 @@ registerRouter
 		  }
 	  }
 	  await db.UsersSubscribeModel.update({uid: user.uid}, {$set: {subscribeForums: defaultForumsId}});
-	  const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);
+	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
 	  await next();
   })
 	.post('/information', async (ctx, next) => {
