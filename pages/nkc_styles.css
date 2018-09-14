@@ -2782,7 +2782,7 @@ img.emoji {
   margin: auto;
   margin-top: 10rem;
   margin-bottom: 6rem;
-  padding: 3.5rem 2.5rem 3rem 2.5rem;
+  padding: 3.5rem 3rem 3rem 3rem;
   width: 37rem;
 }
 .login-input-panel .input-warning{
@@ -2802,6 +2802,7 @@ img.emoji {
 .login-input-panel .link a{
   text-decoration: none;
   line-height: 1rem;
+  font-size: 1rem;
   color: #aaaaaa;
 }
 .login-input-panel .link a:hover{
@@ -2833,7 +2834,7 @@ img.emoji {
   margin-top: 1rem;
 }
 .login-input-panel .send-code{
-  min-width: 40%;
+  min-width: 47%;
   display: inline-block;
   text-align: right;
   color: #888888;
@@ -2853,7 +2854,7 @@ img.emoji {
 }
 .minimalist-input{
   height: 4rem;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   border: none;
   webkit-box-shadow: none;
   box-shadow: none;

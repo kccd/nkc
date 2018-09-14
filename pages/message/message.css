@@ -1,21 +1,106 @@
 body, html{
   height: 100%;
   overflow-y: scroll;
+  background-color: #737373;
 }
 .ms{
-  width: 90rem;
-  height: 60rem;
+  width: 100rem;
+  height: 70rem;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.14) 0 1px 10px;
   position: relative;
 }
 .ms .ms-left{
+  width: 25rem;
+  height: 70rem;
+  background-color: #f1f1f1;
   position: absolute;
-  width: 20rem;
   top: 0;
   left: 0;
-  background-color: #f4f4f4;
+  overflow: hidden;
+}
+.ms-loading-info{
+  height: 2rem;
+  width: 100%;
+  color: #aaaaaa;
+  margin: 0.5rem 0;
+  text-align: center;
+  line-height: 2rem;
+  font-size: 1rem;
+}
+.ms-user-panel{
+  height: 12rem;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+.ms-options{
+  border-bottom: 1px solid #eeeeee;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 .5rem ;
+}
+.ms-options span{
+  padding: 0.5rem 0.5rem;
+  cursor: pointer;
+  color: #666666;
+}
+.ms-options span:hover{
+  background-color: rgba(0,0,0,0.05);
+  color: #333333;
+}
+.ms-connect-info{
+  position: absolute;
+  top: 0;
+  height: 2rem;
+  width: 100%;
+  left: 0;
+  text-align: left;
+  padding: 0 1rem;
+  z-index: 11;
+  line-height: 2rem;
+  color: #aaaaaa;
+}
+.ms-user-bg{
+  position: absolute;
+  left: 0;
+  top: 0;
   height: 100%;
+  width: 100%;
+  z-index: 10;
+  background-color: #f1f1f1;
+}
+.ms-user-bg img{
+  width: 100%;
+}
+.ms-user-username{
+  padding: 0.5rem;
+  font-size: 1.5rem;
+}
+.ms-user-info{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem 0 3rem 0;
+}
+.ms-user-avatar{
+  position: relative;
+  display: inline-block;
+  height: 5rem;
+  overflow: hidden;
+  width: 5rem;
+}
+.ms-user-avatar img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.computer{
+  /*height: 100%;*/
 }
 .form-control.ms-input{
   background-color: #fff;
@@ -38,24 +123,27 @@ body, html{
   outline: none;
 }
 .ms-list{
-  height: 57rem;
+  height: 56rem;
+  width: 100%;
   overflow: hidden;
   overflow-y: scroll;
+  padding: 0.5rem 0;
+  background-color: #ffffff;
+
 }
 .ms-list-body{
-  margin: 0.5rem 0;
   min-height: 4rem;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   border-bottom: 1px solid #efefef;
   display: -webkit-flex;
   display: flex;
   cursor: pointer;
 }
 .ms-list-body:active{
-  background-color: #eaeaea;
+  background-color: #dbdbdb;
 }
 .ms-list-body.active{
-  background-color: #bac9d6;
+  background-color: #dbdbdb;
 }
 .ms-list-left{
   padding-left: 0.5rem;
@@ -99,7 +187,8 @@ body, html{
   font-size: 1.1rem;
 }
 .ms-list-title{
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  padding-top: 0.2rem;
 }
 .ms-list-content{
   word-break:break-all;
@@ -113,11 +202,11 @@ body, html{
 
 }
 .ms-list-left .ms-list-avatar{
-  height: 3rem;
-  width: 3rem;
+  height: 3.5rem;
+  width: 3.5rem;
   border-radius: 50%;
   text-align: center;
-  line-height: 3rem;
+  line-height: 3.5rem;
   color: #fff;
   font-size: 1.6rem;
 }
@@ -129,17 +218,19 @@ body, html{
 }
 
 .ms .ms-right{
-  width: 70rem;
-  height: 60rem;
+  width: 75rem;
+  height: 70rem;
   right: 0;
   top: 0;
-  background-color: #f4f4f4;
+  overflow: hidden;
+  background-color: #fff;
   position: absolute;
 }
 .ms .ms-header{
-  height: 3rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
   width: 100%;
-  background-color: #337ab7;
+  background-color: rgba(255,255,255,0.6);
   padding: 0 1rem;
 }
 .ms .ms-header .form-control{
@@ -195,6 +286,26 @@ body, html{
   display: inline-block;
   min-height: 2.2rem;
 }
+.ms-single-content .status{
+  position: absolute;
+  left: -6.5rem;
+  height: 3rem;
+  width: 6rem;
+  text-align: right;
+  top: 0;
+  line-height: 3rem;
+  font-size: 1.6rem;
+  color: #aaaaaa;
+}
+.ms-single-content .status .fa{
+  cursor: pointer;
+  color: #d2dfea;
+}
+.ms-single-content .status .fa-circle-o-notch{
+}
+.ms-single-content .status .fa-exclamation-circle{
+  color: #ff6262;
+}
 .ms-single-content .message-emoji{
   height: 2rem;
   vertical-align: middle;
@@ -237,33 +348,37 @@ body, html{
 
 }
 .ms-right-input{
-  height: 12rem;
+  height: 14rem;
+  background-color: #f4f4f4;
   position: relative;
 }
 .ms-right-input textarea{
   overflow-y: scroll;
   resize: none;
-  height: 9rem;
+  height: 10rem;
   width: 100%;
   padding: 0.5rem 1rem;
   font-size: 1.2rem;
   border: none;
   border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
 }
 .ms-right-input textarea:focus{
   border-color: rgba(0,0,0,0);
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
   outline: none;
 }
 .ms-right-body{
-  height: 45rem;
+  height: 54rem;
   padding-bottom: 2rem;
   overflow-y: scroll;
 }
 .ms-right .ms-header{
   text-align: center;
-  color: #fff;
-  font-size: 1.4rem;
-  line-height: 3rem;
+  font-size: 1.3rem;
+  color: #333333;
+  background-color: #f4f4f4;
 }
 .noSelectUser{
   text-align: center;
@@ -304,7 +419,7 @@ body, html{
 }
 .ms-notice{
   overflow-y: scroll;
-  height: 57rem;
+  height: 67.3rem;
   padding: 1rem;
 }
 .ms-notice-body{
@@ -351,7 +466,7 @@ body, html{
   width: 100%;
   position: absolute;
   z-index: 90;
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(213, 213, 213, 0.8);
 }
 .ms-settings-body{
   position: absolute;
@@ -381,6 +496,7 @@ body, html{
 }
 .ms-right-input-button{
   position: relative;
+  height: 2rem;
 }
 .ms-right-input-button div{
   display: inline-block;
@@ -396,13 +512,13 @@ body, html{
   color: #337ab7;
 }
 .ms-single-content-image{
-  height: 13.3333rem;
+  height: 13rem;
   overflow: hidden;
   position: relative;
-  width: 20rem;
+  max-width: 20rem;
 }
 .ms-single-content-image img{
-  width: 100%;
+  height: 100%;
 }
 .ms-single-content-image a{
   display: block;
@@ -574,6 +690,7 @@ body, html{
   left: 0;
   width: 100%;
   top: 0;
+  z-index: 100;
   line-height: 4.2rem;
   text-align: center;
   background-color: #ffffff;
@@ -630,10 +747,12 @@ body, html{
 .mobile-footer-input .input{
   display: table-cell;
   width: 1000px;
+  vertical-align: top;
 }
-.mobile-footer-input .input input{
+.mobile-footer-input .input textarea{
   height: 3rem;
   padding: 1px 5px;
+  resize: none;
   margin: 0.5rem 0;
   width: 100%;
   border-radius: 5px;
@@ -643,10 +762,12 @@ body, html{
   width: 17rem;
   display: table-cell;
   padding: 0 0.9rem;
+  vertical-align: top;
 }
 .mobile-footer-input .button button{
   width: 100%;
   height: 3rem;
+  margin: 0.5rem 0;
   border-radius: 5px;
   border: none;
   background-color: #4ea1e8;
@@ -658,12 +779,14 @@ body, html{
 .mobile-messages-body{
   height: 100%;
   background-color: #f4f4f4;
+  overflow-y: scroll;
 }
 .mobile-messages .ms-right-body{
   height: 100%;
 }
 .mobile-messages .ms-single-content-div{
   padding-right: 2rem;
+  max-width: 70%;
 }
 .mobile-messages .ms-single-right .ms-single-content-div{
   padding-left: 2rem;
@@ -671,14 +794,16 @@ body, html{
 }
 .mobile .ms-mask{
   position: fixed;
-  height: 100%;
+  height: 2rem;
+  padding-top: 0;
+  font-size: 1rem;
+  line-height: 2rem;
   top: 0;
   left: 0;
   margin-top: 4.2rem;
   width: 100%;
   z-index: 10003;
   background-color: rgba(255,255,255,0.8);
-  font-size: 1.3rem;
 }
 .mobile .loading-info{
   padding: 1rem 0;
@@ -689,10 +814,10 @@ body, html{
 }
 .upload-info{
   height: 2rem;
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(255,255,255,0.5);
   text-align: center;
   line-height: 2rem;
-  color: #eeeeee;
+  color: red;
   position: absolute;
   top: -2rem;
   width: 100%;
@@ -707,11 +832,15 @@ img.emoji{
 }
 .expressions{
   position: absolute;
-  bottom: 0;
+  bottom: 12.4rem;
   left: 0;
   padding: 1rem;
   width: 100%;
   background-color: rgba(255,255,255,1);
+}
+.mobile .expressions{
+  bottom: 4rem;
+
 }
 .expressions a{
   display: inline-block;
@@ -735,4 +864,18 @@ img.emoji{
 }
 .mobile .search-user .button:active{
   color: #bbbbbb;
+}
+.ms-withdrawn{
+  text-align: center;
+}
+.ms-withdrawn>div{
+  display: inline-block;
+  background-color: #d2dfea;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #666666;
 }

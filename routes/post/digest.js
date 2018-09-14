@@ -65,7 +65,7 @@ router
 			});
 			await message.save();
 		}
-    await nkcModules.socket.emitReminder(message);
+    await ctx.redis.pubMessage(message);
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
 		await userPersonal.increasePsnl('system', 1);
 		await next();

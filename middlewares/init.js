@@ -6,6 +6,7 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
 const {promisify} = require('util');
+const redis = require('../redis');
 
 module.exports = async (ctx, next) => {
 	try {
@@ -19,6 +20,7 @@ module.exports = async (ctx, next) => {
 	  ctx.db = db;
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
+	  ctx.redis = redis;
 	  ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;

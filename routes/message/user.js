@@ -5,8 +5,7 @@ userRouter
     const {data, db, query, params} = ctx;
     const {uid} = params;
     const {user} = data;
-    const {lastMessageId} = query;
-    db.MessageModel.setTargetUid(user.uid, uid);
+    const {firstMessageId} = query;
     const targetUser = await db.UserModel.findOnly({uid});
     const q = {
       $or: [
@@ -20,8 +19,8 @@ userRouter
         }
       ]
     };
-    if(lastMessageId) {
-      q._id = {$lt: lastMessageId};
+    if(firstMessageId) {
+      q._id = {$lt: firstMessageId};
     }
     await db.MessageModel.updateMany({
       r: user.uid,
@@ -33,12 +32,15 @@ userRouter
       }
     });
     const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
+    messages.map(m => {
+      if(m.withdrawn) m.c = '';
+    });
     data.messages = messages.reverse();
     data.targetUser = targetUser;
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, nkcModules} = ctx;
+    const {db, body, params, data, nkcModules, redis} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
     const {user} = data;
@@ -79,7 +81,7 @@ userRouter
     const {content, toc} = body;
     if(content === '') ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
-    const newMessage = db.MessageModel({
+    const message = db.MessageModel({
       _id,
       ty: 'UTU',
       tc: toc,
@@ -89,18 +91,10 @@ userRouter
       ip: ctx.address,
       port: ctx.port
     });
-    const socketUserTargetUid = db.MessageModel.getTargetUid(user.uid);
-    if(socketUserTargetUid === uid) {
-      newMessage.vd = true;
-    }
-    await newMessage.save();
-    db.MessageModel.execute(uid, (socket) => {
-      socket.emit('message', {
-        fromUser: user,
-        message: newMessage
-      });
-    });
-    data.newMessage = newMessage;
+
+    await message.save();
+    await redis.pubMessage(message);
+    data.message = message;
     data.targetUser = targetUser;
     await next();
   });

@@ -495,13 +495,15 @@ userSchema.pre('save', async function(next) {
 
 // 创建用户（新）
 userSchema.statics.createUser = async (option) => {
-	const SmsCodeModel = mongoose.model('smsCodes');
 	const UserModel = mongoose.model('users');
 	const UsersPersonalModel = mongoose.model('usersPersonal');
 	const UsersSubscribeModel = mongoose.model('usersSubscribe');
 	const PersonalForumModel = mongoose.model('personalForums');
 	const SettingModel = mongoose.model('settings');
+	const UsersGeneraModel = mongoose.model('usersGeneral');
+	const MessageModel = mongoose.model('messages');
 	const SmsModel = mongoose.model('sms');
+	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
 	const apiFunction = require('../nkcModules/apiFunction');
 
 	const userObj = Object.assign({}, option);
@@ -515,7 +517,9 @@ userSchema.statics.createUser = async (option) => {
 	userObj.tlm = toc;
 	userObj.moderators = [uid];
 	userObj.certs = [];
-	userObj.password.hash = apiFunction.getEmailToken();
+	userObj.password = {
+    hash: apiFunction.getEmailToken()
+	};
 	if(userObj.mobile) userObj.certs.push('mobile');
 
 	userObj.newMessage = {
@@ -525,6 +529,15 @@ userSchema.statics.createUser = async (option) => {
 		system: 0
 	};
 
+	const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+	await Promise.all(systemInfo.map( async s => {
+		const log = SystemInfoLogModel({
+			mid: s._id,
+			uid
+		});
+		await log.save();
+	}));
+
 	userObj.abbr = `用户${uid}`;
 	userObj.displayName = userObj.abbr + '的专栏';
 	userObj.descriptionOfForum = userObj.abbr + '的专栏';
@@ -533,12 +546,14 @@ userSchema.statics.createUser = async (option) => {
 	const userPersonal = UsersPersonalModel(userObj);
 	const userSubscribe = UsersSubscribeModel(userObj);
 	const personalForum = PersonalForumModel(userObj);
+	const userGeneral = UsersGeneraModel({uid});
 
 	try {
 		await user.save();
 		await userPersonal.save();
 		await userSubscribe.save();
 		await personalForum.save();
+		await userGeneral.save();
 		const allSystemMessages = await SmsModel.find({fromSystem: true});
 		for(let sms of allSystemMessages) {
 			const viewedUsers = sms.viewedUsers;
@@ -550,6 +565,8 @@ userSchema.statics.createUser = async (option) => {
 		await UsersPersonalModel.remove({uid});
 		await UsersSubscribeModel.remove({uid});
 		await PersonalForumModel.remove({uid});
+		await UsersGeneraModel.remove({uid});
+		await SystemInfoLogModel.removeMany({uid});
 		const err = new Error(`新建用户出错: ${error}`);
 		err.status = 500;
 		throw err;
@@ -662,6 +679,39 @@ userSchema.methods.getMessageLimit = async function() {
 		messagePersonCountLimit,
 		messageCountLimit
 	}
+};
+
+userSchema.methods.getPostLimit = async function() {
+
+	const grade = await this.extendGrade();
+	const roles = await this.extendRoles();
+
+	let {
+		postToForumCountLimit,
+		postToForumTimeLimit,
+		postToThreadCountLimit,
+		postToThreadTimeLimit
+	} = grade;
+
+	for(const role of roles) {
+		const pfc = role.postToForumCountLimit;
+		const pft = role.postToForumTimeLimit;
+		const ptc = role.postToThreadCountLimit;
+		const ptt = role.postToThreadTimeLimit;
+
+    if(pfc > postToForumCountLimit) postToForumCountLimit = pfc;
+    if(pft > postToForumTimeLimit) postToForumTimeLimit = pft;
+    if(ptc > postToThreadCountLimit) postToThreadCountLimit = ptc;
+    if(ptt > postToThreadTimeLimit) postToThreadTimeLimit = ptt;
+	}
+
+	return {
+		postToForumTimeLimit,
+		postToForumCountLimit,
+		postToThreadCountLimit,
+		postToThreadTimeLimit
+	}
+
 };
 
 module.exports = mongoose.model('users', userSchema);

@@ -416,10 +416,10 @@ postSchema.post('save', async function(doc, next) {
   // if p.atUsers has changed, we should generate a invitation
 
   try {
+    const redis = require('../redis');
     const InviteModel = mongoose.model('invites');
     const MessageModel = mongoose.model('messages');
     const SettingModel = mongoose.model('settings');
-    const socket = require('../nkcModules/socket');
 
     const {_initial_state_, atUsers} = doc;
     const oldAtUsers = _initial_state_ ? _initial_state_.atUsers : [];
@@ -446,7 +446,7 @@ postSchema.post('save', async function(doc, next) {
         }
       });
       await message.save();
-      await socket.emitReminder(message);
+      await redis.pubMessage(message);
     }));
     return next()
   } catch(e) {

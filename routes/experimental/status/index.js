@@ -150,18 +150,12 @@ statusRouter
 
 		if(!type) {
 			data.onlineUsers = [];
-			let onlineUsersCount = 0;
-			const sockets = global.NKC.sockets;
-			for(let i in sockets) {
-				if(sockets.hasOwnProperty(i)) onlineUsersCount++;
-			}
-			data.onlineUsersCount = onlineUsersCount;
+      data.onlineUsersCount = await db.UserModel.count({online: true});
 			const onlineUsers = await db.UserModel.find({online: true}).limit(5000);
 			for(const onlineUser of onlineUsers) {
-				const targetSocket = sockets[onlineUser.uid];
+				const targetSocket = await db.SocketModel.find({uid: onlineUser.uid});
 				if(!targetSocket) {
 					await onlineUser.update({online: false});
-					delete sockets[onlineUser.uid];
 				} else {
 					data.onlineUsers.push({
 						uid: onlineUser.uid,

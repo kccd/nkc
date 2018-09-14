@@ -82,7 +82,7 @@ operationRouter
 			}
 		});
 		await message.save();
-		await ctx.nkcModules.socket.emitReminder(message);
+    await ctx.redis.pubMessage(message);
 		await next()
 	})
 	.patch('/moveThread', async (ctx, next) => {
@@ -199,7 +199,7 @@ operationRouter
         }
       });
       await message.save();
-      await ctx.nkcModules.socket.emitReminder(message);
+      await ctx.redis.pubMessage(message);
 		}
 		if(para && para.noticeType === true){
 			let uid = targetThread.uid;

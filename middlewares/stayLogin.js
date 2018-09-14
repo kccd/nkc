@@ -20,7 +20,8 @@ module.exports = async (ctx, next) => {
 			ctx.error = new Error('缓存验证失败');
 			return ctx.redirect('/login');
 		}
-	} else if(loginUid && loginKey) {
+	// } else if(loginUid && loginKey) {
+  } else if(0) {
 		const {aesDecode} = ctx.tools.encryption;
 		let uid;
 		try{

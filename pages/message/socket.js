@@ -1,5 +1,7 @@
 var pageName = '';
-var socket = io('/');
+var socket = new io('/', {
+  "transports":['polling', 'websocket']
+});
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
@@ -43,16 +45,14 @@ var newMessageSetTimeOut = function() {
 };
 
 socket.on('message', function(data) {
-  // message, reminder, notice
-  newMessageRemind('message');
-});
-socket.on('reminder', function(data) {
-  // message, reminder, notice
-  newMessageRemind('reminder');
-});
-socket.on('notice', function(data) {
-  // message, reminder, notice
-  newMessageRemind('notice');
+  var ty = data.message.ty;
+  if(ty === 'STE') {
+    newMessageRemind('notice');
+  } else if(ty === 'STU') {
+    newMessageRemind('reminder');
+  } else {
+    newMessageRemind('message');
+  }
 });
 
 function newMessageRemind(name) {

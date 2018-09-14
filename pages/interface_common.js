@@ -706,7 +706,7 @@ $("document").ready(function(){
   })
 });
 
-function updateFilePromise(url, data, onprogress) {
+function uploadFilePromise(url, data, onprogress) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {
@@ -1146,7 +1146,7 @@ function beep(name) {
   var audio = document.getElementById('beep');
   if(audio) {
     if(audio.getAttribute('data-' + name) === 'true') {
-      audio.setAttribute('src', "/default/" + name + '.wav');
+      audio.setAttribute('src', "/default/" + name + '.wav' + '?t=' + Date.now());
       audio.play();
     }
   }

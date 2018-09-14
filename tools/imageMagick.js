@@ -81,6 +81,7 @@ const watermarkifyFont = (dpi, font, position, path) =>{
 const allInfo = async path => {
   let back;
   back = await spawnProcess('magick', ['identify','-format','%[orientation]', path])
+  console.log(back);
   if(back.trim() === "RightTop"){
     return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
   }
@@ -296,9 +297,9 @@ const webLogoify = async (path, targetPath) => {
 const messageImageSMify = async (path, targetPath) => {
   const {width, height} = sizeLimit.messageImageSM;
   if(linux) {
-    return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, '-crop', `${width}x${height}+0+0`, targetPath])
+    return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, targetPath])
   }
-  return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-crop', `${width}x${height}+0+0`, targetPath])
+  return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, targetPath])
 };
 
 

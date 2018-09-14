@@ -8,13 +8,11 @@ block title
       background-color: #f5f5f5;
     }
 block content
-
   mixin forgotPossword
     div.link
       a(href="/register") 账号注册
       span &nbsp;&nbsp;&nbsp;
       a(href="/forgotPassword/mobile") 忘记密码
-
   .container-fluid(style='max-width: 1400px;' v-cloak)#app
     .row
       .login-input-panel
@@ -50,8 +48,14 @@ block content
                   input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='number' placeholder='手机号' v-model.number="mobile")
                 .form-group
                   div(style='width: 50%;display: inline-block;position: relative;')
+                    .input-warning(v-if="warning.imgCode") {{warning.imgCode}}
+                    input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='图形验证码' v-model.trim="imgCode")
+                  .send-code.text-right(@click='changeImgCode')
+                    img(src='/register/code' style='height: 3.5rem;display: inline;')
+                .form-group
+                  div(style='width: 50%;display: inline-block;position: relative;')
                     .input-warning(v-if="warning.code") {{warning.code}}
-                    input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='验证码' v-model.trim="code")
+                    input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='短信验证码' v-model.trim="code")
                   .send-code(@click='sendCode') 发送验证码
                     span(v-if="timeNumber > 0") &nbsp;({{timeNumber}})
               .form-group

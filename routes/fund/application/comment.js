@@ -4,6 +4,7 @@ commentRouter
 	.post('/', async (ctx, next) => {
 		const {data, body, db} = ctx;
 		const {applicationForm, user} = data;
+    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
 		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		if(!applicationForm.fund.ensureOperatorPermission('commentator', user)) ctx.throw(403,'抱歉！您没有资格进行评论。');
 		const {comment} = body;

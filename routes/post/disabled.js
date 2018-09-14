@@ -81,7 +81,7 @@ router
           }
         });
         await message.save();
-        await ctx.nkcModules.socket.emitReminder(message);
+        await ctx.redis.pubMessage(message);
       } else {
         // 退回
         const mId = await db.SettingModel.operateSystemID('messages', 1);
@@ -96,7 +96,7 @@ router
           }
         });
         await message.save();
-        await ctx.nkcModules.socket.emitReminder(message);
+        await ctx.redis.pubMessage(message);
       }
     }
     await targetThread.updateThreadMessage();

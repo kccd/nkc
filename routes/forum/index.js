@@ -71,7 +71,7 @@ forumRouter
 	})
 	.post('/:fid', async (ctx, next) => {
 		const {
-			data, params, db, body, address: ip, query
+			data, params, db, body, address: ip, query, nkcModules
     } = ctx;
 		const {
 			ForumModel,
@@ -93,10 +93,20 @@ forumRouter
 	  }
 		if(user.authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发帖。');
+    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
 	  const {post} = body;
     const {c, t} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
+
+    // 发表回复时间、条数限制
+    const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
+    const today = nkcModules.apiFunction.today();
+    const postToForumCount = await db.InfoBehaviorModel.count({toc: {$gt: today}, uid: user.uid, operationId: 'postToForum'});
+    if(postToForumCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
+    const latestThreadLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToForum', toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
+    if(latestThreadLog) ctx.throw(400, `您当前的账号等级限定发文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
+
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);
     const type = ctx.request.accepts('json', 'html');

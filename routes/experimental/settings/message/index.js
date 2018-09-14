@@ -3,8 +3,8 @@ const messageRouter = new Router();
 messageRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
-    const type = ctx.request.accepts('json', 'html');
-    if(type !== 'json') {
+    const from = ctx.request.get('FROM');
+    if(from !== 'nkcAPI') {
       ctx.template = 'experimental/settings/message.pug';
       return await next();
     }
