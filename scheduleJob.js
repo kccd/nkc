@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const {database, elastic, user} = settings;
 const {client} = elastic;
+require('colors');
 
 const {PostModel, ThreadModel, UserModel, ActiveUserModel} = require('./dataModels');
 
@@ -90,6 +91,7 @@ jobs.backupDatabase = () => {
 			})
 		});
 	});
+	console.log(`数据库自动备份已启动`.green);
 };
 
 jobs.updateForums = cronStr => {

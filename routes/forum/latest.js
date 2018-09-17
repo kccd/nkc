@@ -123,11 +123,12 @@ latestRouter
 		data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
 		data.type = 'latest';
-		if(data.forum.followersId.includes(data.user.uid)){
+		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
+		/*if(data.forum.followersId.includes(data.user.uid)){
 			data.isFollow = true;
 		}else{
 			data.isFollow = false;
-		}
+		}*/
 		await next();
 	});
 module.exports = latestRouter;

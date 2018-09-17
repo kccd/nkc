@@ -172,7 +172,8 @@ block content
 
   // 用户列表
   mixin userList
-
+    div(v-if='userList.length === 0')
+      .text-center(style='margin:1rem 0;color: #aaaaaa;') 加载中..
     div(v-for="item in userList" @click="selectUser(item)")
       //- 私信
       .ms-list-body(v-if="item.type === 'UTU'" :class="{'active': target === 'user' && item.user && item.user.uid === targetUser.uid}")
