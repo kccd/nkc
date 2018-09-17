@@ -9,10 +9,6 @@ module.exports = {
 			env: {
 				NODE_ENV: 'production'
 			}
-		},
-		{
-			name: 'auto_backup',
-			script: 'auto_backup.js'
 		}
 	]
 };

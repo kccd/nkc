@@ -85,7 +85,7 @@ const func = async (server) => {
       await pubConnect(uid);
 
 
-      console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'连接成功'.bgGreen} 已连接客户端：${onlineClientNumber()}`);
+      console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'连接成功'.bgGreen} 已连接客户端：${io.eio.clientsCount}`);
 
       if(userSockets.length === 0) {
 
@@ -127,7 +127,7 @@ async function disconnect (socket) {
 
   const socketsCount = await db.SocketModel.count({uid});
 
-  console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'断开连接'.bgRed} 已连接客户端：${onlineClientNumber()}`);
+  console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'断开连接'.bgRed} 已连接客户端：${io.eio.clientsCount}`);
 
   if(socketsCount !== 0) return;
 
