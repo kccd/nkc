@@ -215,7 +215,6 @@ messageSchema.statics.extendReminder = async (arr) => {
     } else if(type === 'threadWasReturned') {
       const {tid, rea} = c;
       const thread = await ThreadModel.findOne({tid});
-      console.log(tid);
       const firstPost = await thread.extendFirstPost();
       if(!thread) continue;
       r_.firstPost = {

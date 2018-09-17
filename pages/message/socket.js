@@ -1,11 +1,22 @@
 var pageName = '';
+var reconnectNumber = 0;
 var socket = new io('/', {
-  "transports":['polling', 'websocket']
+  transports:['polling', 'websocket'],
+  rememberUpgrade: true,
+  requestTimeout: 10,
+  reconnection: false
 });
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
 
+socket.on('disconnect', function() {
+  reconnectNumber ++;
+  if(reconnectNumber > 20) return;
+  setTimeout(function() {
+    socket.connect();
+  }, 3000);
+});
 var newMessageSetTimeoutName;
 
 var getNewMessageNumber = function() {
