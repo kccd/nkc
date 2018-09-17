@@ -617,31 +617,32 @@ $(function() {
       * 4. 清0当前用户在用户列表上的新信息条数
       * 5. 插入 1 所保存的未发送成功的信息
       * */
-      reconnect: function() {
+      connect: function() {
         clearTimeout(timeout);
-        app.sendFailedMessages = [];
-        for(var i = 0; i < app.messages.length; i++) {
+        this.sendFailedMessages = [];
+        for(var i = 0; i < this.messages.length; i++) {
           var message = this.messages[i];
           if (message.status) {
-            app.sendFailedMessages.push(message);
+            this.sendFailedMessages.push(message);
           }
         }
-        app.messages = [];
-        app.canGetMessage = true;
+        this.messages = [];
+        this.canGetMessage = true;
+        var this_ = this;
         timeout = setTimeout(function(){
-          app.getUserList();
-          if(!app.target) return;
-          app.getMessage()
+          this_.getUserList();
+          if(!this_.target) return;
+          this_.getMessage()
             .then(function() {
               // 清空当前用户的新信息条数
-              for(var i = 0; i < app.userList.length; i++) {
-                var li = app.userList[i];
-                if(li.user && app.targetUser && li.user.uid === app.targetUser.uid) {
+              for(var i = 0; i < this_.userList.length; i++) {
+                var li = this_.userList[i];
+                if(li.user && this_.targetUser && li.user.uid === this_.targetUser.uid) {
                   li.count = 0;
                 }
               }
               // 插入未发送成功的信息
-              app.messages = app.messages.concat(app.sendFailedMessages);
+              this_.messages = this_.messages.concat(this_.sendFailedMessages);
             });
         }, 2000);
       },
@@ -698,7 +699,7 @@ $(function() {
     },
 
     mounted: function() {
-      this.getUserList()
+      /*this.getUserList()
         .then(function() {
           if(targetUser) {
             app.selectUser({
@@ -706,9 +707,10 @@ $(function() {
               user: targetUser
             });
           }
-        });
+        });*/
       if(socket) {
         if(socket.connected) {
+          this.connect();
           this.socketStatus = 'connect';
         } else if(socket.disconnected) {
           this.socketStatus = 'disconnect';
@@ -717,6 +719,7 @@ $(function() {
 
       var vm = this;
       socket.on('connect', function() {
+        app.connect();
         vm.socketStatus = 'connect';
       });
       socket.on('connecting', function() {
@@ -729,7 +732,7 @@ $(function() {
         vm.socketStatus = 'reconnecting';
       });
       socket.on('reconnect', function() {
-        app.reconnect();
+        app.connect();
         vm.socketStatus = 'connect';
       });
       socket.on('connect_failed', function() {
