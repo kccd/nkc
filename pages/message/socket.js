@@ -3,20 +3,35 @@ var reconnectNumber = 0;
 var socket = new io('/', {
   transports:['polling'],
   rememberUpgrade: true,
-  requestTimeout: 10,
-  reconnection: false
+  reconnection: false,
 });
+
+function reconnect() {
+  setTimeout(function() {
+    if(socket.connected) {
+      reconnectNumber = 0;
+      return;
+    }
+    reconnectNumber ++;
+    if(reconnectNumber > 20) return;
+    socket.connect();
+    reconnect();
+  }, 3000);
+}
+
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
 
-socket.on('disconnect', function() {
-  reconnectNumber ++;
-  if(reconnectNumber > 20) return;
-  setTimeout(function() {
-    socket.connect();
-  }, 3000);
+socket.on('disconnect', function(reason) {
+  console.log(reason);
+  if(reason !== 'io server disconnect') {
+    reconnect();
+  }
 });
+
+
+
 var newMessageSetTimeoutName;
 
 var getNewMessageNumber = function() {
@@ -34,6 +49,7 @@ var setNewMessageNumber = function(number) {
 var newMessageSetTimeOut = function() {
   var number = getNewMessageNumber();
   var elements = $('.newMessageDiv');
+  var messageNum = $('.bink');
   var messagePoint = $('.newMessagePoint');
   if(number <= 0) {
     messagePoint.css('display', 'inline-none');
@@ -42,14 +58,15 @@ var newMessageSetTimeOut = function() {
   }
   messagePoint.css('display', 'inline-block');
   elements.css('display', 'inline-block');
-  if(elements.length === 0)return;
-  var visibility = elements.css('visibility');
-  if(visibility === 'visible') {
-    visibility = 'hidden';
+  if(messageNum.length === 0)return;
+  var color = messageNum.css('color');
+  console.log(color);
+  if(color === 'rgba(0, 0, 0, 0)') {
+    color = '#e99';
   } else {
-    visibility = 'visible';
+    color = 'rgba(0,0,0,0)';
   }
-  elements.css('visibility', visibility);
+  messageNum.css('color', color);
   newMessageSetTimeoutName = setTimeout(function() {
     newMessageSetTimeOut();
   }, 500);

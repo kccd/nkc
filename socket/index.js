@@ -9,20 +9,30 @@ let socketIo;
 let io;
 global.NKC.processId = process.env.NODE_APP_INSTANCE || 'development';
 
+const onlineClientNumber = () => {
+  let n = 0;
+  for (const i in socketIo.connected) {
+    if (socketIo.connected.hasOwnProperty(i)) {
+      n++
+    }
+  }
+  return n;
+};
+
 const func = async (server) => {
 
   await db.SocketModel.remove({processId: global.NKC.processId});
 
   io = require('socket.io')(server, {
     "serveClient": false ,
-    "transports":['websocket', 'polling']
+    "transports":['websocket', 'polling'],
+    "pingInterval": 30000
   });
   socketIo = io
     .on('connection', async (socket) => {
       const cookies = new Cookies(socket.request.headers.cookie, {
         keys: [settings.cookie.secret]
       });
-
       // 获取cookie中的用户信息
       const userInfo = cookies.get('userInfo', {
         signed: true
@@ -49,7 +59,7 @@ const func = async (server) => {
       }));
 
       // 每个用户的连接数不能超过5
-      if(userSockets.length >= 2) {
+      if(userSockets.length >= 5) {
 
         const firstSocket = userSockets[0];
 
@@ -74,6 +84,9 @@ const func = async (server) => {
 
       await pubConnect(uid);
 
+
+      console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'连接成功'.bgGreen} 已连接客户端：${onlineClientNumber()}`);
+
       if(userSockets.length === 0) {
 
         await db.UserModel.update({uid}, {
@@ -81,8 +94,6 @@ const func = async (server) => {
             online: true
           }
         });
-
-        console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'连接成功'.bgGreen}`);
 
       }
 
@@ -116,6 +127,8 @@ async function disconnect (socket) {
 
   const socketsCount = await db.SocketModel.count({uid});
 
+  console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'断开连接'.bgRed} 已连接客户端：${onlineClientNumber()}`);
+
   if(socketsCount !== 0) return;
 
   await db.UserModel.update({uid}, {
@@ -125,8 +138,6 @@ async function disconnect (socket) {
   });
 
   await pubDisconnect(uid);
-
-  console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'断开连接'.bgRed}`);
 
 }
 

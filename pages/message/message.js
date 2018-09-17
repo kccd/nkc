@@ -725,7 +725,7 @@ $(function() {
       socket.on('connecting', function() {
         vm.socketStatus = 'connecting';
       });
-      socket.on('disconnect', function() {
+      socket.on('disconnect', function(reason) {
         vm.socketStatus = 'disconnect';
       });
       socket.on('reconnecting', function() {
