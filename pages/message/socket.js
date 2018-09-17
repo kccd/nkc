@@ -1,7 +1,7 @@
 var pageName = '';
 var reconnectNumber = 0;
 var socket = new io('/', {
-  transports:['polling', 'websocket'],
+  transports:['polling'],
   rememberUpgrade: true,
   requestTimeout: 10,
   reconnection: false
