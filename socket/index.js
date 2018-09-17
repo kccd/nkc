@@ -9,15 +9,6 @@ let socketIo;
 let io;
 global.NKC.processId = process.env.NODE_APP_INSTANCE || 'development';
 
-const onlineClientNumber = () => {
-  let n = 0;
-  for (const i in socketIo.connected) {
-    if (socketIo.connected.hasOwnProperty(i)) {
-      n++
-    }
-  }
-  return n;
-};
 
 const func = async (server) => {
 
