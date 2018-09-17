@@ -32,7 +32,7 @@ subscribeRouter
 		let followIds = data.subscribe.subscribeForums;
 		data.targetUserSubscribeforums = await Promise.all(followIds.map(fid => db.ForumModel.findOnly({fid})));
 		data.isFuns = false;
-		if(data.subscribe.subscribers.includes(data.user.uid)){
+		if(data.user && data.subscribe.subscribers.includes(data.user.uid)){
 			data.isFuns = true;
 		}
 		await next();
