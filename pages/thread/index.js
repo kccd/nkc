@@ -54,6 +54,7 @@ $(document).ready(function(){
 			replace_selection(editor, e.target.getAttribute('data-unicode'), true)
 		})
 	}
+	scrollTo(0,0);
 });
 
 function get_selection(the_id)
