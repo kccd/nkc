@@ -22,7 +22,7 @@ const http = require('http'),
 
   // processCount = require('os').cpus().length;
   // processCount = 4, // require('os').cpus().length, 子进程数
-  processCount = process.env.PROCESS_COUNT,
+  processCount = process.env.PROCESS_COUNT || 1,
   workers = [], // 子进程对象
 
   {useHttps, updateDate} = settings,
