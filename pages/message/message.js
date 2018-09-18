@@ -628,7 +628,16 @@ $(function() {
               return nkcAPI(url, 'GET', {})
                 .then(function(data) {
                   var messages = data.messages;
+                  if(messages.length === 0) return;
+                  var name = 'message';
+                  if(messages[0].ty === 'STU') {
+                    name = 'reminder';
+                  } else if(messages[0].ty === 'STE') {
+                    name = 'notice';
+                  }
+                  beep(name);
                   if(app.target === 'user' && data.target === 'user' && app.targetUser.uid === data.targetUser.uid) {
+                    console.log(messages);
                     app.messages = app.messages.concat(messages);
                     nkcAPI('/message/mark', 'PATCH', {
                       type: 'user',
@@ -823,7 +832,7 @@ $(function() {
           });
 
           // 插入数据
-          if(app.targetUser) {
+          if(app.target === 'user' && app.targetUser) {
             nkcAPI('/message/mark', 'PATCH', {
               type: 'user',
               uid: app.targetUser.uid

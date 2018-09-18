@@ -9,6 +9,9 @@ var socket = new io('/', {
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
+socket.on('error', function() {
+  socket.disconnect();
+});
 
 
 

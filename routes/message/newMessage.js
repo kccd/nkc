@@ -25,7 +25,6 @@ router
     if(target === 'user' && uid && newUsersMessagesCount !== 0) {
       const userMessages = await db.MessageModel.find({ty: 'UTU', s: uid, r: user.uid, vd: false});
       for(const m of userMessages) {
-        if(!targetUser) continue;
         messages.push(m);
       }
     }
