@@ -123,6 +123,7 @@ messageSchema.statics.extendReminder = async (arr) => {
       };
       r_.targetPost = {
         pid: targetPid,
+        tid: post.tid,
         c: apiFunction.obtainPureText(targetPost.c),
         page: pageObj.page
       };

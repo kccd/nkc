@@ -26,5 +26,8 @@ module.exports = {
   },
   withdrawn: {
     PATCH: 'userWithdrawnMessage'
+  },
+  newMessages: {
+    GET: 'getNewMessages'
   }
 };

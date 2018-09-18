@@ -1,4 +1,5 @@
-// const excludePath = ['.js', '.css', '.svg', '.png', '.jpg', '.woff2', '.woff', '.eot'];
+const moment = require('moment');
+
 module.exports = async (ctx) => {
   const {LogModel, OperationModel} = ctx.db;
   const processTime = ctx.processTime;
@@ -19,13 +20,13 @@ module.exports = async (ctx) => {
   if(ctx.logIt) {
     if (ctx.error) {
       console.error(
-        ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation._id + ' ' + operation.description: '未知操作')}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation.description: '未知操作').grey}`
       );
       if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
     } else {
       console.log(
-        ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(operation?operation._id + ' ' + operation.description: '未知操作')}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(operation?operation.description: '未知操作').grey}`
       );
     }
   }

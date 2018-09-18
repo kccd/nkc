@@ -13,7 +13,7 @@ const options = {
 mongoose.Promise = Promise;
 mongoose.connect(mongoDB, options)
   .then(() => {
-    console.log('database connected.'.green)
+    // console.log('database connected.'.green)
   })
   .catch(e => {
     console.error(e.stack.red)
