@@ -618,7 +618,42 @@ $(function() {
       * 5. 插入 1 所保存的未发送成功的信息
       * */
       connect: function() {
-        clearTimeout(timeout);
+        app.getUserList()
+          .then(function() {
+            if(app.target) {
+              var url = '/message/newMessages?target=' + app.target;
+              if(app.target === 'user' && app.targetUser) {
+                url += '&uid=' + app.targetUser.uid;
+              }
+              return nkcAPI(url, 'GET', {})
+                .then(function(data) {
+                  var messages = data.messages;
+                  if(app.target === 'user' && data.target === 'user' && app.targetUser.uid === data.targetUser.uid) {
+                    app.messages = app.messages.concat(messages);
+                    nkcAPI('/message/mark', 'PATCH', {
+                      type: 'user',
+                      uid: app.targetUser.uid
+                    })
+                      .catch(function(data) {
+                        screenTopWarning(data.error || data);
+                      });
+                  } else if(app.target === data.target) {
+                    app.messages = app.messages.concat(messages);
+                    nkcAPI('/message/mark', 'PATCH', {
+                      type: app.target === 'notice'? 'systemInfo': 'remind'
+                    })
+                      .catch(function(data) {
+                        screenTopWarning(data.error || data);
+                      });
+                  }
+                });
+            }
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          })
+
+        /*clearTimeout(timeout);
         this.sendFailedMessages = [];
         for(var i = 0; i < this.messages.length; i++) {
           var message = this.messages[i];
@@ -644,7 +679,7 @@ $(function() {
               // 插入未发送成功的信息
               this_.messages = this_.messages.concat(this_.sendFailedMessages);
             });
-        }, 2000);
+        }, 2000);*/
       },
 
       // 搜索用户
@@ -652,10 +687,6 @@ $(function() {
         if(!app.searchText) {
           return screenTopWarning('请输入用户名');
         }
-        var obj = {
-          uid: app.searchText,
-          username: app.searchText
-        };
         var url = '/u?username=' + app.searchText + '&uid=' + app.searchText;
         nkcAPI(url, 'GET', {})
           .then(function(data) {
@@ -699,7 +730,7 @@ $(function() {
     },
 
     mounted: function() {
-      /*this.getUserList()
+      this.getUserList()
         .then(function() {
           if(targetUser) {
             app.selectUser({
@@ -707,10 +738,9 @@ $(function() {
               user: targetUser
             });
           }
-        });*/
+        });
       if(socket) {
         if(socket.connected) {
-          this.connect();
           this.socketStatus = 'connect';
         } else if(socket.disconnected) {
           this.socketStatus = 'disconnect';

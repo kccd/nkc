@@ -1,33 +1,13 @@
 var pageName = '';
-var reconnectNumber = 0;
 var socket = new io('/', {
   transports:['polling'],
-  rememberUpgrade: true,
-  reconnection: false,
+  reconnection: true,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 5
 });
-
-function reconnect() {
-  setTimeout(function() {
-    if(socket.connected) {
-      reconnectNumber = 0;
-      return;
-    }
-    reconnectNumber ++;
-    if(reconnectNumber > 20) return;
-    socket.connect();
-    reconnect();
-  }, 3000);
-}
 
 socket.on('connect', function () {
   console.log('socket连接成功');
-});
-
-socket.on('disconnect', function(reason) {
-  console.log(reason);
-  if(reason !== 'io server disconnect') {
-    reconnect();
-  }
 });
 
 

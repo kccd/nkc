@@ -7,6 +7,7 @@ const resourceRouter = require('./resource');
 const markRouter = require('./mark');
 const settingsRouter = require('./settings');
 const withdrawnRouter = require('./withdrawn');
+const newMessageRouter = require('./newMessage');
 messageRouter
   .use('/', async (ctx, next) => {
     // 未完善资料的用户跳转到完善资料页
@@ -111,5 +112,6 @@ messageRouter
   .use('/user', userRouter.routes(), userRouter.allowedMethods())
   .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
   .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
+  .use('/newMessages', newMessageRouter.routes(), newMessageRouter.allowedMethods())
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods());
 module.exports = messageRouter;

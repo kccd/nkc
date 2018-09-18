@@ -1,4 +1,7 @@
 global.NKC = {};
+global.NKC.processId = process.pid;
+global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
+global.NKC.startTime = Date.now();
 const http = require('http');
 const https = require('https');
 const app = require('./app');
@@ -16,9 +19,6 @@ let redirectServer;
 searchInit()
   .then(async () => {
     console.log('ElasticSearch is ready...'.green);
-
-	  global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
-	  global.NKC.startTime = Date.now();
 
 
     // 检测数据的完整性

@@ -314,6 +314,7 @@
     "userWithdrawnMessage": "用户撤回聊天信息",
     "visitEPostSettings": "访问后台发表限制设置页面",
     "modifyEPostSettings": "修改后台发表限制设置",
+    "getNewMessages": "获取未读信息",
 
 
     "APPgetUserInfo": "app获取用户信息",

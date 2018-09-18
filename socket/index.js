@@ -7,12 +7,12 @@ const {pubConnect, pubDisconnect} = require('../redis');
 
 let socketIo;
 let io;
-global.NKC.processId = process.env.NODE_APP_INSTANCE || 'development';
 
 
 const func = async (server) => {
 
   await db.SocketModel.remove({processId: global.NKC.processId});
+  await db.UserModel.updateMany({online: true}, {$set: {online: false}});
 
   io = require('socket.io')(server, {
     "serveClient": false ,
@@ -76,7 +76,7 @@ const func = async (server) => {
       await pubConnect(uid);
 
 
-      console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'连接成功'.bgGreen} 已连接客户端：${io.eio.clientsCount}`);
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'连接成功'.bgGreen} 已连接客户端：${io.eio.clientsCount}`);
 
       if(userSockets.length === 0) {
 
@@ -117,8 +117,7 @@ async function disconnect (socket) {
   // 若用户没有连接则向其他用户通知该用户下线
 
   const socketsCount = await db.SocketModel.count({uid});
-
-  console.log(`${' SOCKET '.bgGreen} ${(' ' + moment().format('HH:mm:ss') + ' ').grey} ${uid.bgCyan} ${'断开连接'.bgRed} 已连接客户端：${io.eio.clientsCount}`);
+  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'断开连接'.bgRed} 已连接客户端：${io.eio.clientsCount}`);
 
   if(socketsCount !== 0) return;
 
