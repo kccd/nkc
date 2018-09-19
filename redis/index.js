@@ -1,4 +1,5 @@
 require('colors');
+
 const index = require('redis');
 const db = require('../dataModels');
 

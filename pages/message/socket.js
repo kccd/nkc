@@ -1,16 +1,25 @@
 var pageName = '';
-var socket = new io('/', {
+
+var socket = io('/', {
+  forceNew: false,
   transports:['polling'],
   reconnection: true,
+  autoConnect: true,
   reconnectionAttempts: 10,
   reconnectionDelay: 5
 });
+
+// socket.open();
 
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
 socket.on('error', function() {
+  console.log('socket连接出错');
   socket.disconnect();
+});
+socket.on('disconnect', function() {
+  // socket.open();
 });
 
 
