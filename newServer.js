@@ -55,8 +55,6 @@ const dataInit = async () => {
     }
   }
 
-  serverSettings = await SettingModel.findOnly({type: 'server'});
-
   // 加载语言文件
   const languageFilePath = path.resolve('./languages/' + serverSettings.language + '.json');
   const languageFileContent = fs.readFileSync(languageFilePath);
@@ -145,13 +143,15 @@ const jobsInit = async () => {
 
 const start = async () => {
 
+  serverSettings = await SettingModel.findOnly({type: 'server'});
+
   if(global.NKC.processId === '0') {
     await dataInit();
     await jobsInit();
   }
 
   await searchInit();
-
+  console.log('ElasticSearch is ready...'.green);
 
 
   if(config.web.useHttps) {

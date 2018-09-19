@@ -37,13 +37,13 @@ block content
                     option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
                 .form-group
                   .input-warning(v-if="warning.mobile") {{warning.mobile}}
-                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit1' type='number' placeholder='手机号' v-model.number="mobile" v-focus="true")
+                  input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit1' type='text' placeholder='手机号' v-model.number="mobile" v-focus="true")
                 .form-group
                   div(style='width: 50%;display: inline-block;position: relative;')
                     .input-warning(v-if="warning.imgCode") {{warning.imgCode}}
                     input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='图形验证码' v-model.trim="imgCode")
                   .send-code.text-right(@click='changeImgCode')
-                    img(src='/register/code' style='height: 3.5rem;display: inline;')
+                    img(src='/register/code' style='height: 3.5rem;display: inline;' ref='imgCode')
                 .form-group
                   div(style='width: 50%;display: inline-block;position: relative;')
                     .input-warning(v-if="warning.code") {{warning.code}}

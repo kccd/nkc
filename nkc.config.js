@@ -14,7 +14,7 @@ module.exports = {
     {
       name: 'nkc-socket',
       script: 'socketIo.js',
-      restart_delay: 5000
+      restart_delay: 8080
     }
   ]
 };

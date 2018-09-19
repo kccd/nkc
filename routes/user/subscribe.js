@@ -49,11 +49,13 @@ subscribeRouter
 			}
 			await targetUserSubscribe.update({subscribeForums: realFid});
 		}
-		const lastUrl = ctx.cookies.get('lastUrl');
+		const lastUrl = ctx.cookies.get('lastUrl', {
+			signed: true
+		});
 		ctx.cookies.set('lastUrl', '');
 		if(!lastUrl) {
 			data.url = `/u/${uid}`;
-		} else if(lastUrl.includes('kechuang') && !lastUrl.includes('logout')) {
+		} else if(lastUrl.includes('kechuang') && !lastUrl.includes('logout') && !lastUrl.includes('login')) {
 			data.url = lastUrl;
 		} else{
 			data.url = '/';
