@@ -6,7 +6,7 @@ module.exports = {
   },
   socket: {
     useHttps: false,
-    httpPort: 9001,
-    httpsPort: 9001
+    httpPort: 8080,
+    httpsPort: 8080
   }
 };

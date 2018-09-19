@@ -880,6 +880,14 @@ $(function() {
             }
           }
         }
+        for(var i = 0; i < app.userList.length; i++) {
+          var li = app.userList[i];
+          if(li.message._id === messageId) {
+            li.message.withdrawn = true;
+            li.message.c = '';
+            break;
+          }
+        }
       });
     }
   })

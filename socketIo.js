@@ -10,6 +10,7 @@ const config = require('./config');
 const redis = require('redis');
 const Redis = require('ioredis');
 const ratelimit = require('koa-ratelimit');
+const fs = require('fs');
 const app = new Koa();
 
 app.use(ratelimit({
@@ -40,8 +41,31 @@ let server, socketIo, io;
 const createServer = () => {
 
   if(config.socket.useHttps) {
-    const httpsOptions = settings.httpsOptions();
-    server = https.createServer(httpsOptions, app.callback());
+
+    const greenlock = require('greenlock-koa').create({
+      version: 'draft-11' // Let's Encrypt v2
+      // You MUST change this to 'https://acme-v02.api.letsencrypt.org/directory' in production
+      // , server: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+      , server: 'https://acme-v02.api.letsencrypt.org/directory'
+      , email: 'jon@example.com'
+      , agreeTos: true
+      , approveDomains: [ 'kechuang.com' ]
+
+      // Join the community to get notified of important updates
+      // and help make greenlock better
+      , communityMember: true
+
+      , configDir: require('os').homedir() + '/acme/etc'
+
+      , debug: true
+    });
+
+    server = https.createServer(greenlock.tlsOptions, greenlock.middleware(app.callback()));
+
+    // const httpsOptions = settings.httpsOptions();
+
+    // server = https.createServer(httpsOptions, app.callback());
+
     server.listen(config.socket.httpsPort);
   } else {
     server = http.createServer(app.callback());
@@ -190,7 +214,7 @@ const initSocket = async () => {
       const friendsUId = await db.MessageModel.getUsersFriendsUid(uid);
 
       await Promise.all(friendsUId.map(async targetUid => {
-        const sockets = await db.SocketModel.find({targetUid});
+        const sockets = await db.SocketModel.find({uid: targetUid});
         await Promise.all(sockets.map(async s => {
           const targetSocket = socketIo.connected[s.socketId];
           if(targetSocket) {
@@ -255,7 +279,7 @@ async function disconnect (socket) {
   const friendsUId = await db.MessageModel.getUsersFriendsUid(uid);
 
   await Promise.all(friendsUId.map(async targetUid => {
-    const sockets = await db.SocketModel.find({targetUid});
+    const sockets = await db.SocketModel.find({uid: targetUid});
     await Promise.all(sockets.map(async s => {
       const targetSocket = socketIo.connected[s.socketId];
       if(targetSocket) {
