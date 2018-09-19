@@ -4,28 +4,20 @@ global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_
 
 global.NKC.startTime = Date.now();
 
-global.NKC.processId = process.pid;
+global.NKC.processId =  process.env.NODE_APP_INSTANCE || '0';
 
 const http = require('http'),
   https = require('https'),
   app = require('./app'),
-  socket = require('./socket'),
   searchInit = require('./searchInit'),
   settings = require('./settings'),
   nkcModules = require('./nkcModules'),
   fs = require('fs'),
   path = require('path'),
-  cluster = require('cluster'),
-  farmhash = require('farmhash'),
-  net = require('net'),
   colors = require('colors'),
+  config = require('./config'),
 
-  // processCount = require('os').cpus().length;
-  // processCount = 4, // require('os').cpus().length, 子进程数
-  processCount = process.env.PROCESS_COUNT || 1,
-  workers = [], // 子进程对象
-
-  {useHttps, updateDate} = settings,
+  {updateDate} = settings,
 
   {
     SettingModel,
@@ -38,6 +30,7 @@ const http = require('http'),
   } = require('./dataModels');
 
 let server, redirectServer, serverSettings;
+
 const dataInit = async () => {
 
   // 检查网站设置文件
@@ -152,80 +145,37 @@ const jobsInit = async () => {
 
 const start = async () => {
 
-  if(cluster.isMaster) {
-
+  if(global.NKC.processId === '0') {
     await dataInit();
     await jobsInit();
+  }
 
-    const spawn = (i) => {
-      workers[i] = cluster.fork();
-      workers[i].on('exit', (code, signal) => {
-        console.log(`code: ${code}, signal: ${signal}`);
-        console.log(`进程 ${i} 已退出，5秒后将重新启动。`.red);
-        setTimeout(() => {
-          console.log(`正在重启进程 ${i} ...`.green);
-          spawn(i);
-        }, 10000);
+  await searchInit();
+
+
+
+  if(config.web.useHttps) {
+    // httpsServer
+    const httpsOptions = settings.httpsOptions();
+
+    server = https.createServer(httpsOptions, app).listen(config.web.httpsPort);
+    console.log(`${serverSettings.serverName} listening on ${config.web.httpsPort}`.green);
+
+    // redirectServer
+    redirectServer = http.createServer((req, res) => {
+      const host = req.headers['host'];
+      res.writeHead(301, {
+        'Location': 'https://' + host + req.url
       });
-    };
-
-    for(let i = 0; i < processCount; i++) {
-      spawn(i);
-    }
-
-    var workerIndex = function(ip, len) {
-      return farmhash.fingerprint32(ip) % len;
-    };
-
-    const godServer = net.createServer({pauseOnConnect: true}, (connection) => {
-      const worker = workers[workerIndex(connection.remoteAddress, processCount)];
-      try{
-        worker.send('sticky-session:connection', connection);
-      } catch(err) {
-        console.log(err.message);
-      }
-    });
-
-    godServer.listen(serverSettings.port, serverSettings.address);
+      res.end();
+    }).listen(config.web.httpPort);
 
   } else {
 
-    serverSettings = await SettingModel.findOnly({type: 'server'});
-
-    await searchInit();
-
-    if(serverSettings.useHttps || useHttps) {
-      const httpsOptions = settings.httpsOptions();
-      server = https.Server(httpsOptions, app)
-        .listen(0);
-      redirectServer = http.createServer((req, res) => {
-        const host = req.headers['host'];
-        res.writeHead(301, {
-          'Location': 'https://' + host + req.url
-        });
-        res.end();
-      })
-        .listen(serverSettings.port, serverSettings.address);
-    } else {
-      server = http.createServer(app).listen(0)
-    }
-
-    await socket(server);
-
-    console.log(`进程 ${process.pid} 启动成功.`.green);
-
-    process.on('message', function(message, connection) {
-      if (message !== 'sticky-session:connection') {
-        return;
-      }
-      server.emit('connection', connection);
-
-      connection.resume();
-
-    });
+    server = http.createServer(app).listen(config.web.httpPort);
+    console.log(`${serverSettings.serverName} listening on ${config.web.httpPort}`.green);
 
   }
-
 };
 
 
