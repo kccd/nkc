@@ -1,15 +1,15 @@
 var pageName = '';
 
-var socket = io({
+var socket = io('/', {
   forceNew: false,
   transports:['polling'],
-  reconnection: false,
-  autoConnect: false,
+  reconnection: true,
+  autoConnect: true,
   reconnectionAttempts: 10,
   reconnectionDelay: 5
 });
 
-socket.open();
+// socket.open();
 
 socket.on('connect', function () {
   console.log('socket连接成功');
@@ -19,7 +19,7 @@ socket.on('error', function() {
   socket.disconnect();
 });
 socket.on('disconnect', function() {
-  socket.open();
+  // socket.open();
 });
 
 
