@@ -127,6 +127,7 @@ searchInit()
 		}
 
     const jobs = require('./scheduleJob');
+
 		if(['0'].includes(global.NKC.processId)) {
       jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
       jobs.updateForums(updateDate.updateForumsCronStr);
