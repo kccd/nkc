@@ -15,11 +15,6 @@ const socketSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  },
-  processId: {
-    type: String,
-    required: true,
-    index: 1
   }
 }, {
   collection: 'sockets'

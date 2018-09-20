@@ -7,6 +7,7 @@ const {logger} = nkcModules;
 const fs = require('fs');
 const {promisify} = require('util');
 const redis = require('../redis');
+const config = require('../config');
 
 module.exports = async (ctx, next) => {
 	try {
@@ -24,6 +25,7 @@ module.exports = async (ctx, next) => {
 	  ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
+	  ctx.data.socketConfig = config.socket;
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
 		let {operationsId} = await db.SettingModel.findOne({"type":"log"})

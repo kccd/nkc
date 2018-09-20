@@ -1,12 +1,20 @@
 var pageName = '';
-
-var socket = io('/', {
+var socketConfig = $('#socketConfig').text();
+socketConfig = JSON.parse(socketConfig);
+var url;
+if(socketConfig.useHttps) {
+  url = 'https://' + window.location.hostname + ':' + socketConfig.httpsPort;
+} else {
+  url = 'http://' + window.location.hostname + ':' + socketConfig.httpPort;
+}
+var socket = io(url, {
   forceNew: false,
-  transports:['polling'],
   reconnection: true,
   autoConnect: true,
-  reconnectionAttempts: 10,
-  reconnectionDelay: 5
+  transports: ['polling', 'websocket'],
+  reconnectionAttempts: 30,
+  reconnectionDelay: 3000,
+  reconnectionDelayMax: 5000
 });
 
 // socket.open();
@@ -19,7 +27,7 @@ socket.on('error', function() {
   socket.disconnect();
 });
 socket.on('disconnect', function() {
-  // socket.open();
+  console.log('socket连接已断开');
 });
 
 
@@ -52,7 +60,6 @@ var newMessageSetTimeOut = function() {
   elements.css('display', 'inline-block');
   if(messageNum.length === 0)return;
   var color = messageNum.css('color');
-  console.log(color);
   if(color === 'rgba(0, 0, 0, 0)') {
     color = '#e99';
   } else {

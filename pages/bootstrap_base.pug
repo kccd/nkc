@@ -28,6 +28,7 @@ block body
   block footer
     include nkc_footer.pug
   if data.user
+    div.hidden#socketConfig= JSON.stringify(data.socketConfig)
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   script(src='/jquery/jquery-1.11.1.js')

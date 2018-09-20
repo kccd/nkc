@@ -61,6 +61,11 @@ $(function() {
 						app.btnText = '登录';
 						return;
 					}
+          if(typeof(app.mobile) !== 'number') {
+            app.warning.mobile = '请输入正确的手机号';
+            app.btnText = '登录';
+            return;
+          }
 					if(!app.password) {
 						app.warning.password = '请输入密码';
 						app.btnText = '登录';
@@ -81,6 +86,10 @@ $(function() {
           if(!app.mobile) {
             app.warning.mobile = '请输入手机号';
             app.btnText = '登录';
+            return;
+          }
+          if(typeof(app.mobile) !== 'number') {
+            app.warning.mobile = '请输入正确的手机号';
             return;
           }
           if(!app.imgCode) {
@@ -138,6 +147,10 @@ $(function() {
 					app.warning.mobile = '请输入手机号';
 					return;
 				}
+        if(typeof(app.mobile) !== 'number') {
+          app.warning.mobile = '请输入正确的手机号';
+          return;
+        }
 				if(!app.nationCode) {
 					app.warning.error = '请选择国际区号';
 					return;
@@ -164,10 +177,11 @@ $(function() {
 						app.warning.error = data.error || data;
 					})
 			},
-      changeImgCode: function(e) {
-				var src = e.target.getAttribute('src');
-				src = src.replace(/\?.*/, '');
-				e.target.setAttribute('src', src + '?t=' + Date.now());
+      changeImgCode: function() {
+        var e = this.$refs.imgCode;
+        var src = e.getAttribute('src');
+        src = src.replace(/\?.*/, '');
+        e.setAttribute('src', src + '?t=' + Date.now());
 			}
 		},
 		directives: {

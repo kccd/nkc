@@ -5,7 +5,7 @@ global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_
 global.NKC.startTime = Date.now();
 
 global.NKC.processId =  process.env.NODE_APP_INSTANCE || '0';
-
+require('colors');
 const http = require('http'),
   https = require('https'),
   app = require('./app'),
@@ -14,7 +14,6 @@ const http = require('http'),
   nkcModules = require('./nkcModules'),
   fs = require('fs'),
   path = require('path'),
-  colors = require('colors'),
   config = require('./config'),
 
   {updateDate} = settings,
@@ -54,8 +53,6 @@ const dataInit = async () => {
       await newRole.save();
     }
   }
-
-  serverSettings = await SettingModel.findOnly({type: 'server'});
 
   // 加载语言文件
   const languageFilePath = path.resolve('./languages/' + serverSettings.language + '.json');
@@ -145,13 +142,15 @@ const jobsInit = async () => {
 
 const start = async () => {
 
+  serverSettings = await SettingModel.findOnly({type: 'server'});
+
   if(global.NKC.processId === '0') {
     await dataInit();
     await jobsInit();
   }
 
   await searchInit();
-
+  console.log('ElasticSearch is ready...'.green);
 
 
   if(config.web.useHttps) {
