@@ -7,6 +7,11 @@ module.exports = {
   socket: {
     useHttps: false,
     httpPort: 8080,
-    httpsPort: 8080
+    httpsPort: 8080,
+    redirectHttpPort: 8081
+  },
+  httpsCert: {
+    email: '',
+    approveDomains: ['www.kechuang.org']
   }
 };

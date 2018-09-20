@@ -5,7 +5,7 @@ global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_
 global.NKC.startTime = Date.now();
 
 global.NKC.processId =  process.env.NODE_APP_INSTANCE || '0';
-
+require('colors');
 const http = require('http'),
   https = require('https'),
   app = require('./app'),
@@ -14,7 +14,6 @@ const http = require('http'),
   nkcModules = require('./nkcModules'),
   fs = require('fs'),
   path = require('path'),
-  colors = require('colors'),
   config = require('./config'),
 
   {updateDate} = settings,

@@ -10,12 +10,11 @@ const config = require('./config');
 const redis = require('redis');
 const Redis = require('ioredis');
 const ratelimit = require('koa-ratelimit');
-const fs = require('fs');
 const app = new Koa();
 
 app.use(ratelimit({
   db: new Redis(),
-  duration: 1000,
+  duration: 600000,
   errorMessage: '<div style="text-align: center;font-size: 2rem;padding-top: 15rem;color: #888888;">Sometimes You Just Have to Slow Down.</div>',
   id: (ctx) => ctx.ip,
   headers: {
@@ -23,17 +22,21 @@ app.use(ratelimit({
     reset: 'Rate-Limit-Reset',
     total: 'Rate-Limit-Total'
   },
-  max: 5,
+  max: 100,
   disableHeader: false,
 }));
 
 app.use((ctx, next) => {
-  ctx.body = '<div style="text-align: center;font-size: 2rem;padding-top: 15rem;color: #888888;">www.kechuang.org</div>';
-  next();
+  if(config.socket.useHttps) {
+    ctx.redirect('https://www.kechuang.org');
+  } else {
+    ctx.body = '<a href="https://www.kechuang.org" style="display: block;text-align: center;font-size: 2rem;padding-top: 15rem;color: #888888;">www.kechuang.org</a>';
+    next();
+  }
 });
 
 app.on('error', (err) => {
-  console.log(err.stack.red);
+  console.log(err.stack?err.stack.red:err);
 });
 
 let server, socketIo, io;
@@ -47,9 +50,9 @@ const createServer = () => {
       // You MUST change this to 'https://acme-v02.api.letsencrypt.org/directory' in production
       // , server: 'https://acme-staging-v02.api.letsencrypt.org/directory'
       , server: 'https://acme-v02.api.letsencrypt.org/directory'
-      , email: 'jon@example.com'
+      , email: config.httpsCert.email
       , agreeTos: true
-      , approveDomains: [ 'kechuang.com' ]
+      , approveDomains: config.httpsCert.approveDomains
 
       // Join the community to get notified of important updates
       // and help make greenlock better
@@ -57,14 +60,18 @@ const createServer = () => {
 
       , configDir: require('os').homedir() + '/acme/etc'
 
-      , debug: true
+      , debug: false
     });
 
     server = https.createServer(greenlock.tlsOptions, greenlock.middleware(app.callback()));
 
-    // const httpsOptions = settings.httpsOptions();
+    const app2 = new Koa();
 
-    // server = https.createServer(httpsOptions, app.callback());
+    const redirectHttps = app2.use(require('koa-sslify')()).callback();
+
+    http.createServer(greenlock.middleware(redirectHttps)).listen(config.socket.redirectHttpPort, function() {
+      console.log('Listening on port 8081 to handle ACME http-01 challenge and redirect to https'.green);
+    });
 
     server.listen(config.socket.httpsPort);
   } else {
@@ -154,8 +161,8 @@ const initSocket = async () => {
 
   io = require('socket.io')(server, {
     "serveClient": false ,
-    "transports":['websocket'],
-    "pingInterval": 2000
+    "transports":['websocket', 'polling'],
+    "pingInterval": 30000
   });
 
   socketIo = io
@@ -240,6 +247,11 @@ const initSocket = async () => {
 
       }
 
+      /*socket.on('req', (data) => {
+        console.log(`${new Date()} test-socket: ${data}`);
+        socket.emit('res', `${new Date()} test-socket success`);
+      });*/
+
       socket.on('error', (error) => {
         console.log(error);
         disconnect(socket);
@@ -302,6 +314,7 @@ async function disconnect (socket) {
     initRedis();
     console.log(`socket server listening on ${config.socket.httpPort}`.green);
   } catch(err) {
+    console.log('socket 服务器启动失败:'.red);
     console.log(err.stack.red);
   }
 })();

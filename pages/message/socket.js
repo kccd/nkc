@@ -11,7 +11,7 @@ var socket = io(url, {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
-  transports: ['websocket'],
+  transports: ['polling', 'websocket'],
   reconnectionAttempts: 30,
   reconnectionDelay: 3000,
   reconnectionDelayMax: 5000
@@ -27,7 +27,7 @@ socket.on('error', function() {
   socket.disconnect();
 });
 socket.on('disconnect', function() {
-  // socket.open();
+  console.log('socket连接已断开');
 });
 
 
