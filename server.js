@@ -126,8 +126,11 @@ searchInit()
 		}
 
     const jobs = require('./scheduleJob');
-    jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
-    jobs.updateForums(updateDate.updateForumsCronStr);
+		if(['development', '0'].includes(global.NKC.processId)) {
+      jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
+      jobs.updateForums(updateDate.updateForumsCronStr);
+      jobs.backupDatabase();
+		}
     if(serverSettings.useHttps || useHttps) {
       const httpsOptions = settings.httpsOptions();
       server = https.Server(httpsOptions, app)

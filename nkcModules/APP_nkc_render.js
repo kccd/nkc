@@ -454,9 +454,9 @@ function APP_nkc_render(options){
     }
     else{
       //在这里做了style的过滤
-      html = custom_xss_process(content)
+      html = custom_xss_process(content);
     }
-    html = render.hiddenReplaceHTML(html)
+    html = render.hiddenReplaceHTML(html);
     // fix for older posts where they forgot to inject attachments.
     var count = 0
     // 注释掉下面代码，用来防止附件的生成
@@ -542,7 +542,6 @@ function APP_nkc_render(options){
       base: '/twemoji',
       ext: '.svg'
     });
-    // console.log(renderedHTML)
     // 渲染at
     var atUsers = post.atUsers;
     if(atUsers && atUsers.length > 0) {
@@ -552,7 +551,7 @@ function APP_nkc_render(options){
         renderedHTML = renderedHTML.replace(reg,'<a href="https://www.kechuang.org/m/' + atUsers[i].uid + '">' + user + '</a>')
       }
     }
-    // renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
+    renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
     // 下面是旧版的渲染，暂时先不用
     // var atUsers = post.atUsers;
     // if(atUsers && atUsers.length > 0) {

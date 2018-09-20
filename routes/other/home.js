@@ -170,7 +170,6 @@ homeRouter
 	
 		data.navbar = { highlight: 'latest' };
 		ctx.template = 'home/index.pug';
-		console.log(data.threads)
 		await next();
 	});
 
