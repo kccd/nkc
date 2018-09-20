@@ -85,7 +85,7 @@ block content
           a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
             span 《{{message.post.t}}》
           span 下发表了如下回复：
-          a.remind-link.remind-content(:href="'/t/' + message.targetPost.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
+          a.remind-link.remind-content(:href="'/t/' + message.post.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
         div(v-else-if="message.c.type === 'replyPost'")
           a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
             img.remind-user-avatar(:src='"/avatar/" + message.targetUser.uid')

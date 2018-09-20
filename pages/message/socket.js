@@ -1,33 +1,33 @@
 var pageName = '';
-var reconnectNumber = 0;
-var socket = new io('/', {
-  transports:['polling'],
-  rememberUpgrade: true,
-  reconnection: false,
+var socketConfig = $('#socketConfig').text();
+socketConfig = JSON.parse(socketConfig);
+var url;
+if(socketConfig.useHttps) {
+  url = 'https://' + window.location.hostname + ':' + socketConfig.httpsPort;
+} else {
+  url = 'http://' + window.location.hostname + ':' + socketConfig.httpPort;
+}
+var socket = io(url, {
+  forceNew: false,
+  reconnection: true,
+  autoConnect: true,
+  transports: ['polling', 'websocket'],
+  reconnectionAttempts: 30,
+  reconnectionDelay: 3000,
+  reconnectionDelayMax: 5000
 });
 
-function reconnect() {
-  setTimeout(function() {
-    if(socket.connected) {
-      reconnectNumber = 0;
-      return;
-    }
-    reconnectNumber ++;
-    if(reconnectNumber > 20) return;
-    socket.connect();
-    reconnect();
-  }, 3000);
-}
+// socket.open();
 
 socket.on('connect', function () {
   console.log('socket连接成功');
 });
-
-socket.on('disconnect', function(reason) {
-  console.log(reason);
-  if(reason !== 'io server disconnect') {
-    reconnect();
-  }
+socket.on('error', function() {
+  console.log('socket连接出错');
+  socket.disconnect();
+});
+socket.on('disconnect', function() {
+  console.log('socket连接已断开');
 });
 
 

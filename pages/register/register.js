@@ -27,10 +27,11 @@ $(function() {
 			showTerms: false,
 		},
 		methods: {
-			changeImgCode: function(e) {
-        var src = e.target.getAttribute('src');
+			changeImgCode: function() {
+				var e = this.$refs.imgCode;
+        var src = e.getAttribute('src');
         src = src.replace(/\?.*/, '');
-        e.target.setAttribute('src', src + '?t=' + Date.now());
+        e.setAttribute('src', src + '?t=' + Date.now());
 			},
 			changeTermsStatus: function() {
 				app.showTerms = !app.showTerms;
@@ -41,6 +42,10 @@ $(function() {
 				if(!app.mobile) {
 					app.warning.mobile = '请输入手机号';
 					return;
+				}
+				if(typeof(app.mobile) !== 'number') {
+          app.warning.mobile = '请输入正确的手机号';
+          return;
 				}
         if(!app.nationCode) {
           app.warning.error = '请选择国际区号';
@@ -67,6 +72,7 @@ $(function() {
 					.catch(function(data) {
 						app.sending = false;
 						app.warning.error = data.error || data;
+            app.changeImgCode();
 					})
 
 			},
@@ -83,6 +89,10 @@ $(function() {
 					app.btnText = '注册';
 					return;
 				}
+        if(typeof(app.mobile) !== 'number') {
+          app.warning.mobile = '请输入正确的手机号';
+          return;
+        }
         if(!app.imgCode) {
           app.warning.imgCode = '请输入验证码';
           app.btnText = '注册';
@@ -106,6 +116,7 @@ $(function() {
 					.catch(function(data) {
 						app.warning.error = data.error || data;
 						app.btnText = '注册';
+            app.changeImgCode();
 					})
 
 			},

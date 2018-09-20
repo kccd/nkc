@@ -1,13 +1,17 @@
 global.NKC = {};
+global.NKC.processId = process.env.NODE_APP_INSTANCE || '0';
+global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
+global.NKC.startTime = Date.now();
+
 const http = require('http');
 const https = require('https');
 const app = require('./app');
-const socket = require('./socket');
 const searchInit = require('./searchInit');
 const settings = require('./settings');
 const nkcModules = require('./nkcModules');
 const fs = require('fs');
 const path = require('path');
+const socket = require('./socket');
 const {useHttps, updateDate} = settings;
 
 let server;
@@ -16,9 +20,6 @@ let redirectServer;
 searchInit()
   .then(async () => {
     console.log('ElasticSearch is ready...'.green);
-
-	  global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
-	  global.NKC.startTime = Date.now();
 
 
     // 检测数据的完整性
@@ -126,7 +127,8 @@ searchInit()
 		}
 
     const jobs = require('./scheduleJob');
-		if(['development', '0'].includes(global.NKC.processId)) {
+
+		if(['0'].includes(global.NKC.processId)) {
       jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
       jobs.updateForums(updateDate.updateForumsCronStr);
       jobs.backupDatabase();
@@ -139,8 +141,7 @@ searchInit()
           serverSettings.address,
           async () => {
           	await socket(server);
-	          console.log(`socket.io is ready...`.green);
-          	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
+            console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.httpsPort}`.green)
           }
         );
 
@@ -158,7 +159,6 @@ searchInit()
         serverSettings.address,
         async () => {
         	await socket(server);
-        	console.log(`socket.io is ready...`.green);
         	console.log(`${serverSettings.serverName} listening on ${serverSettings.address}:${serverSettings.port}`.green)
         }
       );

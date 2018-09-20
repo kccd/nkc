@@ -563,7 +563,7 @@ userSchema.statics.createUser = async (option) => {
 		await UsersSubscribeModel.remove({uid});
 		await PersonalForumModel.remove({uid});
 		await UsersGeneraModel.remove({uid});
-		await SystemInfoLogModel.removeMany({uid});
+		await SystemInfoLogModel.remove({uid});
 		const err = new Error(`新建用户出错: ${error}`);
 		err.status = 500;
 		throw err;

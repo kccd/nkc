@@ -42,17 +42,17 @@
     -klass = ' col-xs-11 col-sm-5 col-md-6 hidden-xs';
   div(class=klass)
     .text-center(style='padding-top: 0.3rem;overflow: hidden;')
-      .post-count
+      //.post-count
         span= forum.countPostsToday
         p 今日更新
-      .post-count(style=`border-right: 3px solid ${forum.color}`)
-        span &nbsp;
-        p &nbsp;
       .post-count
         span= forum.countPosts
         p 讨论
       .post-count
         span= forum.countThreads
         p 文章
+      .post-count(style=`border-right: 3px solid ${forum.color}`)
+        span &nbsp;
+        p &nbsp;
 
 
