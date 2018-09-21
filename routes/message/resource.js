@@ -83,13 +83,13 @@ resourceRouter
         s: user.uid,
         r: targetUser.uid,
         c: {
-          ty: imageExt.includes(ext.toLowerCase())? 'img': 'file',
+          ty: imageExt.includes(ext)? 'img': 'file',
           id: _id,
           na: name
         }
       });
       await fs.rename(path, targetPath);
-      if(imageExt.includes(ext.toLowerCase())) {
+      if(imageExt.includes(ext)) {
         // await tools.imageMagick.allInfo(targetPath);
         const timePath = generateFolderName(messageImageSMPath) + _id + '.' + ext;
         const targetSMPath = messageImageSMPath + timePath;
