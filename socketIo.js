@@ -94,7 +94,16 @@ const initRedis = () => {
       message = JSON.parse(message);
       if(channel === 'withdrawn') {
         const {r, s, _id} = message;
-        const sockets = await db.SocketModel.find({uid: r});
+        const sockets = await db.SocketModel.find({
+          $or: [
+            {
+              uid: r
+            },
+            {
+              uid: s
+            }
+          ]
+        });
         await Promise.all(sockets.map(async socket => {
           const targetSocket = socketIo.connected[socket.socketId];
           if(targetSocket) {
@@ -128,12 +137,23 @@ const initRedis = () => {
           const sUser = await db.UserModel.findOne({uid: s});
           const rUser = await db.UserModel.findOne({uid: r});
           if(!sUser || !rUser) return;
-          const targetSockets = await db.SocketModel.find({uid: r});
+          const targetSockets = await db.SocketModel.find({
+            $or: [
+              {
+                uid: r
+              },
+              {
+                uid: s
+              }
+            ]
+          });
           await Promise.all(targetSockets.map(async socket => {
             const targetSocket = socketIo.connected[socket.socketId];
             if(targetSocket) {
               targetSocket.emit('message', {
                 user: sUser,
+                targetUser: rUser,
+                myUid: socket.uid,
                 message
               });
             } else {

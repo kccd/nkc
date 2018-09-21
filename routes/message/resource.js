@@ -39,7 +39,7 @@ resourceRouter
       await fs.mkdir(settings.upload.messageImageSMPath);
     }
     const {file} = body.files;
-    const {targetUid} = body.fields;
+    const {targetUid, socketId} = body.fields;
     const {user} = data;
     const {messageFilePath, generateFolderName, messageImageSMPath} = settings.upload;
     const targetUser = await db.UserModel.findOnly({uid: targetUid});
@@ -57,8 +57,13 @@ resourceRouter
       let ext = PATH.extname(name);
 
       if(!ext) ctx.throw(400, '无法识别文件格式');
+
+
       ext = ext.toLowerCase();
       ext = ext.replace('.', '');
+
+      if(['exe'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
+
       const _id = await db.SettingModel.operateSystemID('messageFiles', 1);
       const timePath = generateFolderName(messageFilePath) + _id + '.' + ext;
       const targetPath = messageFilePath + timePath;
@@ -93,7 +98,9 @@ resourceRouter
       await messageFile.save();
       await message.save();
       data.messages.push(message);
-      await ctx.redis.pubMessage(message);
+      const message_ = message.toObject();
+      message_.socketId = socketId;
+      await ctx.redis.pubMessage(message_);
     }
 
     await next();
