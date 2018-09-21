@@ -78,7 +78,11 @@ socket.on('message', function(data) {
   } else if(ty === 'STU') {
     newMessageRemind('reminder');
   } else {
-    newMessageRemind('message');
+    var user = data.user;
+    var myUid = data.myUid;
+    if(user.uid !== myUid) {
+      newMessageRemind('message');
+    }
   }
 });
 

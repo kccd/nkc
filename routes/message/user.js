@@ -78,13 +78,12 @@ userRouter
         ctx.throw(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
       }
     }
-    const {content, toc} = body;
+    const {content, socketId} = body;
     if(content === '') ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
     const message = db.MessageModel({
       _id,
       ty: 'UTU',
-      tc: toc,
       c: content,
       s: user.uid,
       r: uid,
@@ -93,7 +92,9 @@ userRouter
     });
 
     await message.save();
-    await redis.pubMessage(message);
+    const message_ = message.toObject();
+    message_.socketId = socketId;
+    await redis.pubMessage(message_);
     data.message = message;
     data.targetUser = targetUser;
     await next();

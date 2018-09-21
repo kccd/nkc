@@ -6,7 +6,7 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
-    const {target, uid} = query;
+    const {target, uid, lastMessageId} = query;
     if(!target) ctx.throw(400, '参数错误');
     if(uid) data.targetUser = await db.UserModel.findOnly({uid});
     data.target = target;
@@ -23,7 +23,23 @@ router
       messages = messages.concat(newRemind);
     }
     if(target === 'user' && uid && newUsersMessagesCount !== 0) {
-      const userMessages = await db.MessageModel.find({ty: 'UTU', s: uid, r: user.uid, vd: false});
+      const q = {
+        ty: 'UTU',
+        $or: [
+          {
+            s: uid,
+            r: user.uid
+          },
+          {
+            s: user.uid,
+            r: uid
+          }
+        ]
+      };
+      if(lastMessageId) {
+        q._id = {$gt: lastMessageId};
+      }
+      const userMessages = await db.MessageModel.find(q);
       for(const m of userMessages) {
         messages.push(m);
       }
