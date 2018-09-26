@@ -211,7 +211,7 @@ block content
       .ms-list-body(v-else-if="item.type === 'STU'" :class="{'active': target === 'reminder' && item.type === 'STU'}")
         .ms-list-left.remind
           .ms-list-img
-            .ms-list-avatar.fa.fa-bullhorn
+            .ms-list-avatar.fa.fa-bell-o
         .ms-list-center
           .ms-list-title 系统提醒
           .ms-list-content {{extendReminder(item.message) || '暂无提醒'}}

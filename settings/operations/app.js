@@ -35,5 +35,8 @@ module.exports = {
 		PARAMETER: {
 			GET: 'APPgetScoreChange'
 		}
+	},
+	latest: {
+		GET: 'APPgetLatestThreads'
 	}
 };

@@ -107,14 +107,16 @@ registerRouter
 		const {newPasswordObject} = ctx.nkcModules.apiFunction;
 		const passwordObj = newPasswordObject(password);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		await user.update({username, usernameLowerCase: username.toLowerCase()});
+		user.username = username;
+		user.usernameLowerCase = username.toLowerCase();
+		await user.save();
+		// await user.update({username, usernameLowerCase: username.toLowerCase()});
 		await userPersonal.update({hashType: passwordObj.hashType, password: passwordObj.password});
 		await db.PersonalForumModel.update({uid: user.uid}, {$set: {
 			abbr: username.slice(0.6),
 			displayName: username + '的专栏',
 			descriptionOfForum: username + '的专栏'
 		}});
-		user.username = username;
 		const userInfo = ctx.cookies.get('userInfo');
 		const {lastLogin} = JSON.parse(decodeURI(userInfo));
 		const cookieStr = encodeURI(JSON.stringify({

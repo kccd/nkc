@@ -325,6 +325,7 @@
     "APPgetThreadInfo": "app获取帖子",
     "APPvisitThread": "app查看帖子",
     "APPgetScoreChange": "app获取分数变化设置",
-    "APPsearch": "app搜索"
+    "APPsearch": "app搜索",
+    "APPgetLatestThreads": "app加载最新文章"
   }
 }
