@@ -75,6 +75,8 @@ $(function() {
             message.html = message.html.replace(/\[f\/(.*?)]/g, function(r, v1) {
               return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
             });
+            // 处理链接
+            message.html = common.URLifyHTML(message.html);
           }
 
         }
@@ -229,6 +231,8 @@ $(function() {
         li.time = message.tc;
         if(app.targetUser && app.targetUser.uid === li.user.uid) {
           li.count = 0;
+        } else if(message.s === app.user.uid) {
+          // 接收到自己在其他客户端所发送的信息
         } else {
           li.count ++;
         }
@@ -519,6 +523,7 @@ $(function() {
             }
             var formData = new FormData();
             formData.append('targetUid', targetUid);
+            formData.append('socketId', socket.id);
             formData.append('file', file);
             var localMessageId = Date.now() + Math.random();
 
@@ -583,6 +588,7 @@ $(function() {
         }
         nkcAPI('/message/user/' + app.targetUser.uid, 'POST', {
           content: content,
+          socketId: socket.id
         })
           .then(function(data) {
             // 发送成功 标记信息为已发送
@@ -596,6 +602,7 @@ $(function() {
           })
           .catch(function(data) {
             // 发送失败 标记信息为发送失败 点击重发
+            screenTopWarning(data.error || data);
             var index = app.messages.indexOf(message);
             app.messages[index].status = 'failed';
             Vue.set(app.messages, index, app.messages[index]);
@@ -624,6 +631,9 @@ $(function() {
               var url = '/message/newMessages?target=' + app.target;
               if(app.target === 'user' && app.targetUser) {
                 url += '&uid=' + app.targetUser.uid;
+                if(app.lastMessageId) {
+                  url += '&lastMessageId=' + app.lastMessageId;
+                }
               }
               return nkcAPI(url, 'GET', {})
                 .then(function(data) {
@@ -637,7 +647,6 @@ $(function() {
                   }
                   beep(name);
                   if(app.target === 'user' && data.target === 'user' && app.targetUser.uid === data.targetUser.uid) {
-                    console.log(messages);
                     app.messages = app.messages.concat(messages);
                     nkcAPI('/message/mark', 'PATCH', {
                       type: 'user',
@@ -794,7 +803,7 @@ $(function() {
 
         var message = data.message;
         var user = data.user;
-
+        var targetUser = data.targetUser;
         var ty = message.ty;
 
         if(ty === 'STE') {
@@ -823,7 +832,30 @@ $(function() {
           }
         } else {
 
-          beep('message');
+          var socketId = message.socketId;
+          if(socketId === socket.id) return;
+
+          // 插入数据
+          if(app.target === 'user' && app.targetUser) {
+            if(app.targetUser.uid === user.uid) {
+              nkcAPI('/message/mark', 'PATCH', {
+                type: 'user',
+                uid: app.targetUser.uid
+              })
+                .catch(function(data) {
+                  screenTopWarning(data.error || data);
+                });
+              app.messages.push(message);
+            } else if(app.targetUser.uid === targetUser.uid) {
+              app.messages.push(message);
+            }
+          }
+
+          if(user.uid !== app.user.uid) {
+            beep('message');
+          } else {
+            user = targetUser;
+          }
 
           // 更新用户列表
           app.updateUserList({
@@ -831,19 +863,6 @@ $(function() {
             message: message
           });
 
-          // 插入数据
-          if(app.target === 'user' && app.targetUser) {
-            nkcAPI('/message/mark', 'PATCH', {
-              type: 'user',
-              uid: app.targetUser.uid
-            })
-              .catch(function(data) {
-                screenTopWarning(data.error || data);
-              });
-            if(app.targetUser.uid === user.uid) {
-              app.messages.push(message);
-            }
-          }
         }
 
 
@@ -870,7 +889,7 @@ $(function() {
 
       socket.on('withdrawn', function(data) {
         var messageId = data.messageId;
-        if(app.targetUser && data.uid === app.targetUser.uid) {
+        if(app.targetUser && (data.uid === app.targetUser.uid || data.uid === app.user.uid)) {
           for(var i = 0; i < app.messages.length; i++){
             var message = app.messages[i];
             if(message._id === messageId) {
@@ -882,7 +901,7 @@ $(function() {
         }
         for(var i = 0; i < app.userList.length; i++) {
           var li = app.userList[i];
-          if(li.message._id === messageId) {
+          if(li.message && li.message._id === messageId) {
             li.message.withdrawn = true;
             li.message.c = '';
             break;

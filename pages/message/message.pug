@@ -9,7 +9,9 @@ block content
   mixin messageContent
     transition(name='fade')
       .ms-loading-info {{info}}
-    .ms-single(v-for="message in messages")
+    .ms-single(v-for="(message, index) in messages")
+      .ms-withdrawn.text-center
+        div(v-if="index === 0 || new Date(messages[index-1].tc).getTime() < new Date(message.tc).getTime() - 5*60*1000") {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
       .ms-withdrawn.text-center(v-if='message.withdrawn')
         div(v-if='message.s === user.uid') 您撤回了一条信息
         div(v-else) 对方撤回了一条信息
@@ -19,7 +21,7 @@ block content
           a(:href="'/u/' + message.s" target="_blank")
             img(:src="'/avatar/' + message.s")
         .ms-single-content-div
-          .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+          //.ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
           .ms-single-content
             .arrow
             div(v-if="!message.c.ty" v-html="message.html")
@@ -34,7 +36,7 @@ block content
       // 自己发出的信息
       .ms-single-right(v-else)
         .ms-single-content-div
-          .ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
+          //.ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
           .ms-single-content
             .status(v-if="message.status && !message.c.ty")
               i.fa.fa-exclamation-circle(title='点击重发' v-if="message.status === 'failed'" @click="sendToUser(message)")
@@ -209,7 +211,7 @@ block content
       .ms-list-body(v-else-if="item.type === 'STU'" :class="{'active': target === 'reminder' && item.type === 'STU'}")
         .ms-list-left.remind
           .ms-list-img
-            .ms-list-avatar.fa.fa-bullhorn
+            .ms-list-avatar.fa.fa-bell-o
         .ms-list-center
           .ms-list-title 系统提醒
           .ms-list-content {{extendReminder(item.message) || '暂无提醒'}}

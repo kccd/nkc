@@ -12,7 +12,6 @@ var socket = io(url, {
   reconnection: true,
   autoConnect: true,
   transports: ['polling', 'websocket'],
-  reconnectionAttempts: 30,
   reconnectionDelay: 3000,
   reconnectionDelayMax: 5000
 });
@@ -78,7 +77,11 @@ socket.on('message', function(data) {
   } else if(ty === 'STU') {
     newMessageRemind('reminder');
   } else {
-    newMessageRemind('message');
+    var user = data.user;
+    var myUid = data.myUid;
+    if(user.uid !== myUid) {
+      newMessageRemind('message');
+    }
   }
 });
 

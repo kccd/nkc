@@ -1,11 +1,28 @@
+const Cookies = require('cookies-string-parse');
 module.exports = async (ctx, next) => {
 
 	const {data, db} = ctx;
 
+
 	// cookie
-	const userInfo = ctx.cookies.get('userInfo', {signed: true});
+
+	let userInfo = ctx.cookies.get('userInfo', {signed: true});
+	if(!userInfo) {
+		try{
+      let {cookie} = ctx.query || {};
+      cookie = new Buffer(cookie, 'base64').toString();
+      if(cookie) {
+        const cookies = new Cookies(cookie, {
+          keys: [ctx.settings.cookie.secret]
+        });
+        userInfo = cookies.get('userInfo', {signed: true});
+      }
+		} catch(err) {
+			console.log(err);
+		}
+
+	}
 	// app
-	const {loginUid, loginKey} = ctx.query || [];
 
 	let userOperationsId = [], userRoles = [], userGrade = [];
 

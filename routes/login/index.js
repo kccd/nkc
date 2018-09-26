@@ -181,8 +181,7 @@ loginRouter
 			httpOnly: true
 		});
 		ctx.data = {
-			cookie: ctx.cookies.get('userInfo'),
-			introduction: 'put the cookie in req-header when using for api',
+			// cookie: ctx.req.headers.cookie,
 			user
 		};
 		// const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
