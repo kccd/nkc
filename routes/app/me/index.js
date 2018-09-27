@@ -4,7 +4,9 @@ const personalRouter = require('./personal');
 const subscribeRouter = require('./subscribe');
 meRouter
 	.get('/', async (ctx, next) => {
-		ctx.data.cookie = new Buffer(ctx.req.headers.cookie).toString('base64');
+	  if(ctx.req.headers.cookie) {
+      ctx.data.cookie = new Buffer(ctx.req.headers.cookie).toString('base64');
+    }
 		await next();
 	})
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())

@@ -10,13 +10,16 @@ module.exports = async (ctx, next) => {
 	if(!userInfo) {
 		try{
       let {cookie} = ctx.query || {};
-      cookie = new Buffer(cookie, 'base64').toString();
       if(cookie) {
-        const cookies = new Cookies(cookie, {
-          keys: [ctx.settings.cookie.secret]
-        });
-        userInfo = cookies.get('userInfo', {signed: true});
+        cookie = new Buffer(cookie, 'base64').toString();
+        if(cookie) {
+          const cookies = new Cookies(cookie, {
+            keys: [ctx.settings.cookie.secret]
+          });
+          userInfo = cookies.get('userInfo', {signed: true});
+        }
       }
+
 		} catch(err) {
 			console.log(err);
 		}
