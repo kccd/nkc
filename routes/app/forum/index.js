@@ -87,6 +87,7 @@ forumRouter
 			threads[i] = threads[i].toObject();
 		}
 		data.threads = threads;
+		
 		// 构建置顶文章查询条件
 		// const toppedThreadMatch = {topped: true, fid: forum.fid};
 		// if(!isModerator) {
