@@ -28,6 +28,12 @@ module.exports = {
 			GET: 'APPvisitThread'
 		}
 	},
+	forum: {
+		// GET: 'APPgetThreadInfo',
+		PARAMETER: {
+			GET: 'APPvisitForum'
+		}
+	},
 	search: {
 		GET: 'APPsearch'
 	},
