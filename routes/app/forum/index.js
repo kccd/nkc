@@ -128,7 +128,6 @@ forumRouter
 		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
 		data.type = 'latest';
 		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
-
 		await next();
 	});
 module.exports = forumRouter;

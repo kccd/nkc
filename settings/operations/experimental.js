@@ -32,6 +32,12 @@ module.exports = {
 				DELETE: 'deleteHomeNotice'
 			}
 		},
+		app:{
+			upload:{
+				GET: 'visitAppUploadIndex',
+				POST: 'saveAppUploadInfo'
+			}
+		},
 		role: {
 			GET: 'visitRoleUsers',
 			POST: 'addRole',

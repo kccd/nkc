@@ -92,6 +92,34 @@ const certificates ={
           [GET]: true
         }
       },
+      appDownload: {
+        [name]: 'app下载',
+        [parameter]: {
+          [GET]: true,
+          android:{
+            [name]: "android下载",
+            [GET]: true,
+            [parameter]:{
+              [GET]: true,
+              lastest:{
+                [name]: "最新",
+                [GET]: true
+              }
+            }
+          },
+          ios:{
+            [name]: "ios下载",
+            [GET]: true,
+            [parameter]:{
+              [GET]: true,
+              lastest:{
+                [name]: "最新",
+                [GET]: true
+              }
+            }
+          }
+        }
+      },
       f: {
         [name]: '板块',
         [GET]: true,

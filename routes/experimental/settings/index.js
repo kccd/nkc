@@ -12,6 +12,7 @@ const kcbRouter = require('./kcb');
 const logRouter = require('./log');
 const numberRouter = require('./number');
 const homeRouter = require('./home');
+const appRouter = require('./app');
 const pageRouter = require('./page');
 const examRouter = require('./exam');
 const messageRouter = require('./message');
@@ -28,6 +29,7 @@ settingRouter
 	.use('/message', messageRouter.routes(), messageRouter.allowedMethods())
 	.use('/sms', smsRouter.routes(), smsRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
+	.use('/app', appRouter.routes(), appRouter.allowedMethods())
 	.use('/page', pageRouter.routes(), pageRouter.allowedMethods())
 	.use('/number', numberRouter.routes(), numberRouter.allowedMethods())
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())

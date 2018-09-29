@@ -43,6 +43,18 @@ module.exports = {
 			GET: 'getVideoImg'
 		}
 	},
+	appDownload: {// 安装包下载
+		android: {
+			lastest: {
+				GET: 'getAndroidPackage'
+			}
+		},
+		ios: {
+			lastest: {
+				GET: 'getIosPackage'
+			}
+		}
+	},
 	resources: {// 侧栏logo
 		site_specific: {
 			PARAMETER: {

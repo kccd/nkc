@@ -22,6 +22,8 @@ const userBannerPath = path.resolve('resources/user_banners');
 const messageFilePath = path.resolve('resources/message');
 const messageImageSMPath = path.resolve('resources/message/sm');
 const frameImgPath = path.resolve('resources/frameImage');
+const androidSavePath = path.resolve('resources/app/android');
+const iosSavePath = path.resolve('resources/app/ios');
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -111,6 +113,8 @@ module.exports = {
 	userBannerPath,
   messageImageSMPath,
   frameImgPath,
+  iosSavePath,
+  androidSavePath,
   avatarSize: 192,
 	forumAvatarSize: 96,
   avatarSmallSize: 48,

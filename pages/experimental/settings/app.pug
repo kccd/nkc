@@ -1,0 +1,58 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+  link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  title app发布页
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-2
+        .list-group
+          a.list-group-item(class=data.type==='top'?'active': '' href=`/e/settings/app/upload`) 上传
+      .col-xs-12.col-md-10
+        if data.type === 'upload'
+          .row#content
+          -const {telephone, websiteName, github, copyright, record, description, keywords, brief} = data.serverSettings || {};
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 选择平台
+              .col-sm-8
+                select.form-control#platform
+                  option android
+                  option ios
+            .form-group
+              label.col-sm-2.control-label 版本号
+              .col-sm-8
+                input.form-control#version(type='text' value="")
+            .form-group
+              label.col-sm-2.control-label 更新内容
+              .col-sm-8
+                textarea.form-control#description(rows=5)
+            .form-group
+              label.col-sm-2.control-label 安装包
+              .col-sm-8
+                input(type='file' id='appfile')
+            .form-group
+              label.col-sm-2.control-label
+              .col-sm-8
+                button.btn.btn-primary(onclick='submitApp()') 保存
+
+
+
+
+block scripts
+  script(src=`/jcrop/js/jquery.Jcrop.min.js?v=${global.NKC.startTime}`)
+  script(src=`/jquery/jquery.minicolors.js?v=${NKC.startTime}`)
+  script(src='/icheck/icheck.js')
+  script(src=`/interface_common.js?v=${NKC.startTime}`)
+  script(src=`/experimental/settings/app.js?v=${NKC.startTime}`)
+
+
+
+

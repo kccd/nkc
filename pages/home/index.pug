@@ -77,6 +77,8 @@ block content
           if data.noticeThreads.length !== 0
             .col-xs-12.col-md-12(style='margin: 1rem 0;' class=data.paging.page!==0?'hiddenInMobile':'')
               +createNotice(data.noticeThreads)
+          .col-xs-12.col-md-12(style='margin:1rem 0;')
+            canvas#androidQrcode
 
       .col-xs-12.col-md-7
         .row
@@ -134,4 +136,5 @@ block scripts
   script(src=`/jscrollpane/script/jquery.jscrollpane.js?v=${global.NKC.startTime}`)
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/swiper/dist/js/swiper.js?v=${global.NKC.startTime}`)
+  script(src='/qrcode/build/qrcode.js')
   script(src=`/home/index.js?v=${global.NKC.startTime}`)

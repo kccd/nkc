@@ -32,6 +32,7 @@ const coverRouter = require('./cover');
 const frameImgRouter = require('./frameImg');
 const pageRouter = require('./page');
 const logoRouter = require('./logo');
+const appDownloadRouter = require('./appDownload');
 // -----------------------------------
 otherRouter
   .get('/latest', async (ctx, next) => {
@@ -81,5 +82,6 @@ otherRouter
 	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
-  .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods());
+  .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
+  .use('appDownload', appDownloadRouter.routes(), appDownloadRouter.allowedMethods());
 module.exports = otherRouter;
