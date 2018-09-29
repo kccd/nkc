@@ -37,5 +37,4 @@ const appVersionSchema = new Schema({
     index: 1
   }
 });
-
 module.exports = mongoose.model('appVersion', appVersionSchema, 'appVersion');
