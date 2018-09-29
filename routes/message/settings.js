@@ -4,9 +4,14 @@ settingsRouter
   .patch('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
-    const {beep} = body;
+    const {beep, messageSettings} = body;
     const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
-    await usersGeneral.update({'messageSettings.beep': beep});
+    if(messageSettings) {
+      await usersGeneral.update({messageSettings: messageSettings});
+    } else {
+      await usersGeneral.update({'messageSettings.beep': beep});
+    }
+
     await next();
   });
 module.exports = settingsRouter;

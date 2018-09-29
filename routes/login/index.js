@@ -184,6 +184,7 @@ loginRouter
 			// cookie: ctx.req.headers.cookie,
 			user
 		};
+
 		// const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
 		// const loginUid = user.uid;
 		// ctx.data.loginKey = loginKey;
@@ -191,7 +192,6 @@ loginRouter
 		/*await ctx.generateUsersBehavior({
 			operation: 'dailyLogin'
 		});*/
-
 
 		await next();
 	});

@@ -7,8 +7,8 @@ postsRouter
 		const {user, userGrade, userRoles} = data;
 		const {uid} = params;
 		const options = {
-			gradeId: data.userGrade._id,
-			rolesId: data.userRoles.map(r => r._id),
+			gradeId: userGrade._id,
+			rolesId: userRoles.map(r => r._id),
 			uid: user?user.uid: ''
 		};
 		// 获取能访问的专业ID
@@ -39,9 +39,9 @@ postsRouter
 				type: 'post',
 
 			};
-			const post = await db.PostModel.findOne({pid: log.pid});
+			const post = await db.PostModel.findOne({pid: log.pid, disabled: {$ne: true}});
 			if(!post) continue;
-			const thread = await db.ThreadModel.findOne({tid: post.tid});
+			const thread = await db.ThreadModel.findOne({tid: post.tid, recycleMark: {$ne: true}});
 			if(!thread) continue;
 
 			result.tid = thread.tid;

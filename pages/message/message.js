@@ -772,7 +772,6 @@ $(function() {
 
       var vm = this;
       socket.on('connect', function() {
-        app.connect();
         vm.socketStatus = 'connect';
       });
       socket.on('connecting', function() {

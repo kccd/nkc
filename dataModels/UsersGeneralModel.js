@@ -41,6 +41,34 @@ const usersGeneralSchema = new Schema({
         type: Boolean,
         default: false
       }
+    },
+    vibrate: {
+      systemInfo: {
+        type: Boolean,
+        default: false
+      },
+      reminder: {
+        type: Boolean,
+        default: false
+      },
+      usersMessage: {
+        type: Boolean,
+        default: false
+      }
+    },
+    notificationBar: {
+      systemInfo: {
+        type: Boolean,
+        default: true
+      },
+      reminder: {
+        type: Boolean,
+        default: true
+      },
+      usersMessage: {
+        type: Boolean,
+        default: true
+      }
     }
   }
 }, {
