@@ -315,6 +315,11 @@
     "visitEPostSettings": "访问后台发表限制设置页面",
     "modifyEPostSettings": "修改后台发表限制设置",
     "getNewMessages": "获取未读信息",
+    "visitAppUploadIndex": "打开app上传页面",
+    "saveAppUploadInfo": "上传app安装包",
+    "getIosPackage": "获取Ios安装包",
+    "getAndroidPackage": "获取Android安装包",
+    "visitAppDownload": "访问app下载页面",
 
 
     "APPgetUserInfo": "app获取用户信息",
@@ -325,6 +330,8 @@
     "APPgetThreadInfo": "app获取帖子",
     "APPvisitThread": "app查看帖子",
     "APPgetScoreChange": "app获取分数变化设置",
-    "APPsearch": "app搜索"
+    "APPsearch": "app搜索",
+    "APPgetLatestThreads": "app加载最新文章",
+    "APPvisitForum": "app查看专业"    
   }
 }

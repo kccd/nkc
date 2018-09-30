@@ -1,8 +1,13 @@
+mixin app
+  .col-xs-12.col-md-4
+    div.text-center(style="width: 114px;")
+      canvas#androidQrcode
+      a(href='/app' style='font-size: 1rem;color: #555555;margin-top: 0.3rem;') 安卓客户端
 if !hiddenFooter
   if homeFooter
-    .container-fluid(style='max-width: 1400px')
-      .row(style='margin-top: 1rem;')
-        .col-xs-12.col-md-8.col-md-offset-2
+    .container-fluid(style='max-width: 1400px;')
+      .row(style='margin: 1rem 0;')
+        .col-xs-12.col-md-6.col-md-offset-2
           ul.HomeFriendlyLink
             include nkc_footer_links.pug
             if data.navbar && data.navbar.highlight === 'latest'
@@ -12,14 +17,15 @@ if !hiddenFooter
             a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
           p #{data.serverSettings.copyright}
           p.lighttext= data.serverSettings.record
-          br
+        +app
+
   else
     -var classString = mainContainer1400?'container-fluid':'container'
     -var styleString = mainContainer1400?'max-width:1400px;':'';
     .container-fluid(style='background-color: #f6f6f6;padding-top: 2rem;border-top: 1px solid #dddddd;margin-top: 3rem;')
       div(class=`${classString}` style=`${styleString}`)
         .row
-          .col-md-12
+          .col-md-8
             ul.HomeFriendlyLink
               include nkc_footer_links.pug
               if data.navbar && data.navbar.highlight === 'latest'
@@ -30,3 +36,4 @@ if !hiddenFooter
             p #{data.serverSettings.copyright}
             p.lighttext= data.serverSettings.record
             br
+          +app

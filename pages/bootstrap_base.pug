@@ -36,6 +36,7 @@ block body
   script(src='/twemoji/2/twemoji.min.js')
   script(src='/Promise/promise.min.js')
   script(src='/vue/dist/vue.js')
+  script(src='/qrcode/build/qrcode.js')
   script(src="/photoswipe/dist/photoswipe.js")
   script(src="/photoswipe/dist/photoswipe-ui-default.js")
   if data.user
@@ -49,6 +50,21 @@ block body
     <script src="/external_pkgs/highlight/highlight.pack.js"></script>
   script.
     if(window.HighlightEverything){window.HighlightEverything()}
+    var qrcode = geid('androidQrcode');
+    if (qrcode) {
+      var path = window.location.origin;
+      path = path + "/app?t=" + Date.now();
+      QRCode.toCanvas(qrcode, path, {
+        scale: 3,
+        margin: 1,
+        width: 114,
+        color: {dark: '#333333'}
+      }, function (err) {
+        if (err) {
+          screenTopWarning(err);
+        }
+      })
+    }
   script.
     console.log('(c)2018 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')

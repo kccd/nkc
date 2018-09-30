@@ -1,4 +1,5 @@
 module.exports = {
+	GET: 'visitAppDownload',
 	me: {
 		GET: 'APPgetLoginUserInfo',
 		personal: {
@@ -28,6 +29,12 @@ module.exports = {
 			GET: 'APPvisitThread'
 		}
 	},
+	forum: {
+		// GET: 'APPgetThreadInfo',
+		PARAMETER: {
+			GET: 'APPvisitForum'
+		}
+	},
 	search: {
 		GET: 'APPsearch'
 	},
@@ -35,5 +42,8 @@ module.exports = {
 		PARAMETER: {
 			GET: 'APPgetScoreChange'
 		}
+	},
+	latest: {
+		GET: 'APPgetLatestThreads'
 	}
 };

@@ -35,7 +35,6 @@ theradRouter
 				continue;
 			}
 			posts[i] = posts[i].toObject();
-			posts[i].headPic = "https://www.kechuang.org/avatar_small/" + posts[i].uid;
 			posts[i].c = nkcModules.APP_nkc_render.experimental_render(posts[i]);
 			posts[i].thumbCount = posts[i].recUsers.length;
 			newPosts.push(posts[i])

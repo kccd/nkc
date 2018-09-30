@@ -369,7 +369,7 @@ function submit(tid){
 		return;
 	}
 
-	geid('ButtonReply').disabled=true
+	geid('ButtonReply').disabled=true;
 	return nkcAPI('/t/' + tid, 'POST', {
 		post:post,
 	})

@@ -9,6 +9,7 @@ const {
 	rt,
 	cover,
 	frameImg,
+	appDownload,
 	resources,
 	pfa,
 	pfb,
@@ -78,6 +79,8 @@ operationObj.operationTree = {
 		cover,// 文章封面
 
 		frameImg,// 视频封面
+
+		appDownload,
 
 		resources,// 网站logo
 

@@ -498,6 +498,11 @@ $(function() {
         })
           .then(function(data) {
             Vue.set(app.messages, app.messages.indexOf(message), data.messages[0]);
+            app.updateUserList({
+              user: app.targetUser,
+              message: data.messages[0]
+            });
+            app.computeUserListOrder();
           })
           .catch(function(data) {
             screenTopWarning(data.error || data);
@@ -767,7 +772,6 @@ $(function() {
 
       var vm = this;
       socket.on('connect', function() {
-        app.connect();
         vm.socketStatus = 'connect';
       });
       socket.on('connecting', function() {

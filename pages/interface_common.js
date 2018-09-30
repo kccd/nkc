@@ -1210,3 +1210,4 @@ function initPhotoSwipe(url) {
     gallery.init();
   }
 }
+
