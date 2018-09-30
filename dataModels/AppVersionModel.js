@@ -29,7 +29,8 @@ const appVersionSchema = new Schema({
   },
   latest: {
     type: Boolean,
-    default: true
+    default: true,
+    index: 1
   },
   toc: {
     type: Date,
