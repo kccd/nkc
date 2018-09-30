@@ -77,9 +77,9 @@ block content
           if data.noticeThreads.length !== 0
             .col-xs-12.col-md-12(style='margin: 1rem 0;' class=data.paging.page!==0?'hiddenInMobile':'')
               +createNotice(data.noticeThreads)
-          .col-xs-12.col-md-12(style='margin:1rem 0;')
-            canvas#androidQrcode
-
+      .col-xs-12.col-md-12(style='margin:1rem 0;')
+        .nkcpanel
+          canvas#androidQrcode
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
