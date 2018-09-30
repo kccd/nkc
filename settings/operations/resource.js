@@ -45,12 +45,12 @@ module.exports = {
 	},
 	appDownload: {// 安装包下载
 		android: {
-			lastest: {
+			latest: {
 				GET: 'getAndroidPackage'
 			}
 		},
 		ios: {
-			lastest: {
+			latest: {
 				GET: 'getIosPackage'
 			}
 		}

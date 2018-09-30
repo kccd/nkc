@@ -319,6 +319,7 @@
     "saveAppUploadInfo": "上传app安装包",
     "getIosPackage": "获取Ios安装包",
     "getAndroidPackage": "获取Android安装包",
+    "visitAppDownload": "访问app下载页面",
 
 
     "APPgetUserInfo": "app获取用户信息",

@@ -8,7 +8,8 @@ const scoreChangeRouter = require('./scoreChange');
 const latestRouter = require('./latest');
 const forumRouter = require('./forum');
 appRouter
-	.use('/', async (ctx, next) => {
+	.get('/', async (ctx, next) => {
+		ctx.template = 'app/index.pug';
 		await next();
 	})
 	.use('/latest', latestRouter.routes(), latestRouter.allowedMethods())

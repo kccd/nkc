@@ -10,11 +10,11 @@ router
     ctx.throw(501, 'a tid is required.');
     await next()
   })
-  .get('/android/lastest', async (ctx, next) => {
+  .get('/android/latest', async (ctx, next) => {
     const {tid} = ctx.params;
     const {fs, db, tools} = ctx;
     // 获取最新的安装包
-    const androidApk = await db.AppVersionModel.findOnly({lastest:true,appPlatForm:"android"});
+    const androidApk = await db.AppVersionModel.findOnly({latest:true,appPlatForm:"android"});
     const {fileName, appVersion} = androidApk;
     let stat;
     let url = `${androidSavePath}/${appVersion}/${fileName}`;
@@ -31,11 +31,11 @@ router
     }
     await next()
   })
-  .get('/ios/lastest', async (ctx, next) => {
+  .get('/ios/latest', async (ctx, next) => {
     const {tid} = ctx.params;
     const {fs, db, tools} = ctx;
     // 获取最新的安装包
-    const androidApk = await db.AppVersionModel.findOnly({lastest:true,appPlatForm:"ios"});
+    const androidApk = await db.AppVersionModel.findOnly({latest:true,appPlatForm:"ios"});
     const {fileName, appVersion} = androidApk;
     let stat;
     let url = `${iosSavePath}/${appVersion}/${fileName}`;

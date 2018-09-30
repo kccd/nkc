@@ -28,21 +28,31 @@ router
     const {appPlatform, appVersion, appDescription, appToc} = body.fields || {};
     let appFilePath, appPath;
 
+    const appBasePath = settings.upload.androidSavePath.replace(/app([\/\\].*)/, () => 'app');
+    try{
+      await fs.access(appBasePath);
+    } catch(e) {
+      await fs.mkdir(appBasePath);
+    }
+
+    try{
+      await fs.access(settings.upload.androidSavePath);
+    } catch(e) {
+      await fs.mkdir(settings.upload.androidSavePath);
+      await fs.mkdir(settings.upload.iosSavePath);
+    }
+
     // 根据平台和版本号创建文件夹
-    if(appPlatform == 'android') {
-      appFilePath = settings.upload.androidSavePath + '\\' + appVersion
-      try{
-        await fs.mkdir(appFilePath);
-      } catch (e) {
-        ctx.throw(500, `${e}`);
-      }
+    if(appPlatform === 'android') {
+      appFilePath = settings.upload.androidSavePath + '/' + appVersion
     }else{
-      appFilePath = settings.upload.iosSavePath + '\\' + appVersion
-      try{
-        await fs.mkdir(appFilePath);
-      } catch (e) {
-        ctx.throw(500, `${e}`);
-      }
+      appFilePath = settings.upload.iosSavePath + '/' + appVersion
+    }
+
+    try{
+      await fs.mkdir(appFilePath);
+    } catch (e) {
+      // ctx.throw(500, `${e}`);
     }
 
     // 获取文件，修改文件名，将文件存入对应的文件夹
@@ -51,13 +61,13 @@ router
     ext = ext.toLowerCase();
     ext = ext.replace('.', '');
     if(['exe'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
-    appPath = appFilePath + "\\" + name;
+    appPath = appFilePath + "/" + name;
     await fs.rename(path, appPath);
 
     // 添加上传记录
-    await db.AppVersionModel.update({lastest:true,appPlatForm:appPlatform}, {
+    await db.AppVersionModel.update({latest:true,appPlatForm:appPlatform}, {
       $set: {
-        lastest: false
+        latest: false
       }
     });
     let appUpLog = db.AppVersionModel({

@@ -101,7 +101,7 @@ const certificates ={
             [GET]: true,
             [parameter]:{
               [GET]: true,
-              lastest:{
+              latest:{
                 [name]: "最新",
                 [GET]: true
               }
@@ -112,7 +112,7 @@ const certificates ={
             [GET]: true,
             [parameter]:{
               [GET]: true,
-              lastest:{
+              latest:{
                 [name]: "最新",
                 [GET]: true
               }

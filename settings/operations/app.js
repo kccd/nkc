@@ -1,4 +1,5 @@
 module.exports = {
+	GET: 'visitAppDownload',
 	me: {
 		GET: 'APPgetLoginUserInfo',
 		personal: {

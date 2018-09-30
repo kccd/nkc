@@ -27,7 +27,7 @@ const appVersionSchema = new Schema({
     type: Number,
     default: 0
   },
-  lastest: {
+  latest: {
     type: Boolean,
     default: true
   },
