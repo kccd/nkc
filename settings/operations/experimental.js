@@ -36,6 +36,9 @@ module.exports = {
 			upload:{
 				GET: 'visitAppUploadIndex',
 				POST: 'saveAppUploadInfo'
+			},
+			histories: {
+				GET: 'visitAppUploadHistories'
 			}
 		},
 		role: {

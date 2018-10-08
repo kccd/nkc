@@ -45,12 +45,12 @@ module.exports = {
 	},
 	appDownload: {// 安装包下载
 		android: {
-			latest: {
+			PARAMETER: {
 				GET: 'getAndroidPackage'
 			}
 		},
 		ios: {
-			latest: {
+      PARAMETER: {
 				GET: 'getIosPackage'
 			}
 		}
