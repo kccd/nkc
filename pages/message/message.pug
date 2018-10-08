@@ -185,12 +185,17 @@ block content
             img.ms-list-avatar(:src="'/avatar/'+item.user.uid")
         .ms-list-center
           .ms-list-title {{item.user.username}}
-          .ms-list-content(v-if="item.message.withdrawn")
-            div(v-if='item.message.r === user.uid') 对方撤回了一条信息
-            div(v-else) 您撤回了一条信息
-          .ms-list-content(v-else-if="!item.message.c.ty") {{item.message.c}}
-          .ms-list-content(v-else-if="item.message.c.ty === 'img'") 图片
-          .ms-list-content(v-else-if="item.message.c.ty === 'file'") 文件
+          .ms-list-content
+            span(v-if="item.user.online && item.user.onlineType")
+              span(v-if="item.user.onlineType === 'phone'" style='color: #777777;margin-right:0.3rem;') [手机在线]
+              span(v-else-if="item.user.onlineType === 'computer'" style='color: #777777;margin-right:0.3rem;') [网页在线]
+            span(style='color: #777777;margin-right:0.3rem;' v-else) [离线]
+            span(v-if="item.message.withdrawn")
+              div(v-if='item.message.r === user.uid') 对方撤回了一条信息
+              div(v-else) 您撤回了一条信息
+            span(v-else-if="!item.message.c.ty") {{item.message.c}}
+            span(v-else-if="item.message.c.ty === 'img'") 图片
+            span(v-else-if="item.message.c.ty === 'file'") 文件
         .ms-list-right
           .ms-list-time {{format('MM/DD HH:mm', item.message.tc)}}
           .ms-list-number(v-if="item.count") {{'未读' + item.count}}
