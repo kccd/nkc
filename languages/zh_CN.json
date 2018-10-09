@@ -56,6 +56,7 @@
     "postToThread": "回复文章",
     "moveThread": "移动文章",
     "collectThread": "收藏文章",
+    "delCollectThread": "取消文章收藏",
     "digestThread": "将文章设为精选文章",
     "toppedThread": "置顶文章",
     "switchInPersonalForum": "在专栏加精、置顶、隐藏",

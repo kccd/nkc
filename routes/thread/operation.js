@@ -33,6 +33,15 @@ operationRouter
 		data.targetUser = await thread.extendUser();
 		await next();
 	})
+	.post('/delColl', async(ctx, next) => {
+		const {tid} = ctx.params;
+		const {db, data} = ctx;
+		const {user} = data;
+		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
+    if(!collection) ctx.throw(403,'抱歉，你尚未收藏该帖');
+    await collection.remove();
+    await next();
+	})
 	.patch('/moveDraft', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;

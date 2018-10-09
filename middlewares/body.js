@@ -20,6 +20,8 @@ module.exports = async (ctx, next) => {
       ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
     }
     ctx.body = fs.createReadStream(filePath);
+    const stats = await fs.stat(filePath);
+    ctx.set('Content-Length',stats.size);
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
