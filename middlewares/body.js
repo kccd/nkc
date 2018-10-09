@@ -16,13 +16,11 @@ module.exports = async (ctx, next) => {
     const name = resource? resource.oname: basename;
     if(extArr.includes(ext)) {
       ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
-      ctx.body = fs.createReadStream(filePath);
     } else {
-      // const koaSend = require('koa-send');
-      // await koaSend(ctx, ctx.filePath, {root: '/'});
       ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
-      ctx.body = fs.createReadStream(filePath);
     }
+    ctx.body = fs.createReadStream(filePath);
+    ctx.set('content-length', (await fs.stat(filePath)).size);
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
