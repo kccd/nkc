@@ -30,13 +30,10 @@ try {
 }
 
 app.keys = [settings.cookie.secret];
-app.use(init)
-  .use(stayLogin)
+app
   .use(koaBody(settings.upload.koaBodySetting))
-  .use(async (ctx, next) => {
-    ctx.body = ctx.request.body;
-    await next()
-  })
+  .use(init)
+  .use(stayLogin)
   .use(urlRewrite)
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./node_modules')))

@@ -14,7 +14,8 @@ block content
       include ../nav
       .col-xs-12.col-md-2
         .list-group
-          a.list-group-item(class=data.type==='top'?'active': '' href=`/e/settings/app/upload`) 上传
+          a.list-group-item(class=data.type === 'upload' ? 'active' : '' href=`/e/settings/app/upload`) 上传
+          a.list-group-item(class=data.type === 'histories' ? 'active' : '' href=`/e/settings/app/histories`) 历史记录
       .col-xs-12.col-md-10
         if data.type === 'upload'
           .row#content
@@ -42,6 +43,30 @@ block content
               label.col-sm-2.control-label
               .col-sm-8
                 button.btn.btn-primary(onclick='submitApp()') 保存
+        else if data.type === 'histories'
+          ul.nav.nav-pills
+            li(role='presentation' class=data.os === 'android' ? 'active' : '')
+              a(href='/e/settings/app/histories?os=android') android
+            li(role='presentation' class=data.os === 'ios' ? 'active' : '')
+              a(href='/e/settings/app/histories?os=ios') ios
+          .row
+            .col-md-12(style='margin-top: 1.5rem;')
+              for history in data.histories
+                .panel.panel-default
+                  .panel-heading
+                    span= history.appVersion
+                    if history.latest
+                      span (最新版本)
+                    span &nbsp;&nbsp;
+                    a(href=`/appDownload/${data.os}/${history.appVersion}`) 点击下载
+                  .panel-body
+                    p=`上传时间：${history.toc.toLocaleString()}`
+                    p=`安装包大小：${(history.appSize/(1024*1024)).toFixed(2)}MB`
+                    p 更新内容：
+                      p(style='padding: 0 1rem;')= history.appDescription
+              include ../../interface_navigation_paging
+
+
 
 
 

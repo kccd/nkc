@@ -887,6 +887,7 @@ $(function() {
           var li = app.userList[i];
           if(li.user && li.user.uid === uid) {
             li.user.online = true;
+            li.user.onlineType = data.onlineType;
           }
         }
       });

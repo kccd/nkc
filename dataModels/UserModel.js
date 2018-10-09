@@ -115,7 +115,12 @@ const userSchema = new Schema({
   	type: Boolean,
 		default: false,
 		index: 1
-	}
+	},
+  onlineType: {
+    type: String,
+    default: '',
+    index: 1
+  }
 },
 {toObject: {
   getters: true,

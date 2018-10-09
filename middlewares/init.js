@@ -17,6 +17,7 @@ module.exports = async (ctx, next) => {
 	    [ip, port] = XFF.split(':');
 	  ctx.address = ip;
 	  ctx.port = port;
+    ctx.body = ctx.request.body;
 	  ctx.reqTime = new Date();
 	  ctx.db = db;
 	  ctx.nkcModules = nkcModules;

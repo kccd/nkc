@@ -238,6 +238,11 @@ const initSocket = async () => {
       await newSocket.save();
 
 
+      let onlineType = socket.handshake.query.os;
+      if(!['phone', 'computer'].includes(onlineType)) {
+        onlineType = 'computer';
+      }
+
       const friendsUId = await db.MessageModel.getUsersFriendsUid(uid);
 
       await Promise.all(friendsUId.map(async targetUid => {
@@ -246,7 +251,8 @@ const initSocket = async () => {
           const targetSocket = socketIo.connected[s.socketId];
           if(targetSocket) {
             targetSocket.emit('userConnect', {
-              targetUid: uid
+              targetUid: uid,
+              onlineType
             });
           } else {
             await s.remove();
@@ -256,16 +262,12 @@ const initSocket = async () => {
 
 
       console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'连接成功'.bgGreen} 已连接客户端：${io.eio.clientsCount}`);
-
-      if(userSockets.length === 0) {
-
-        await db.UserModel.update({uid}, {
-          $set: {
-            online: true
-          }
-        });
-
-      }
+      await db.UserModel.update({uid}, {
+        $set: {
+          online: true,
+          onlineType
+        }
+      });
 
       /*socket.on('req', (data) => {
         console.log(`${new Date()} test-socket: ${data}`);

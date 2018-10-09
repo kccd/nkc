@@ -409,14 +409,14 @@ body, html{
   position: absolute;
   height: 1rem;
   width: 1rem;
-  border: 1px solid #ffffff;
-  background-color: #ef3c3c;
+  background-color: rgba(0,0,0,0);
   right: 0;
   bottom: 0;
   border-radius: 50%;
 }
 .ms-point.online{
   background-color: #2bd62b;
+  border: 1px solid #ffffff;
 }
 .ms-notice{
   overflow-y: scroll;
