@@ -569,7 +569,8 @@ function APP_nkc_render(options){
     // 处理表情
     var emo = "/twemoji/2/svg/";
     var pcEmoReg = new RegExp(emo,'igm');
-    renderedHTML = renderedHTML.replace(pcEmoReg,"../modules/twemoji/");
+    // renderedHTML = renderedHTML.replace(pcEmoReg,"../modules/twemoji/");
+    renderedHTML = renderedHTML.replace(pcEmoReg,"https://www.kechuang.org/twemoji/2/svg/");
     renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 onclick='openImage(\"$2\")'>");    
     // 将视频替换成图片
     renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r(.*?)".*?>(.*?)<\/video>/igm,'<div style="position:relative"><img src="https://www.kechuang.org/frameImg$2" onerror="this.src=\'https://www.kechuang.org/default/videoCover.png\'" style="width:100%;height:10rem"><span class="play-btn" onclick="openVideo(this,\'/r$2\')"></span></div>');
