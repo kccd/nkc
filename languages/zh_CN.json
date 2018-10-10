@@ -334,6 +334,7 @@
     "APPgetScoreChange": "app获取分数变化设置",
     "APPsearch": "app搜索",
     "APPgetLatestThreads": "app加载最新文章",
+    "APPcheckout": "app启动自检",
     "APPvisitForum": "app查看专业"    
   }
 }

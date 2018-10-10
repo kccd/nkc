@@ -487,7 +487,7 @@ function APP_nkc_render(options){
         }
         var reg = new RegExp(r.oname, 'gm');
         var hrefStr = new RegExp("href=\/r\/"+r.rid,'gm');
-        var clickStr = "onclick=\'downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")\'";
+        var clickStr = "onclick='downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")'";
         html = html.replace(reg,r.oname+'<span class="resourceDownCount">'+r.hits+'次下载</span>');
         html = html.replace(hrefStr,clickStr);
       }
@@ -564,7 +564,7 @@ function APP_nkc_render(options){
     //     renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
     //   }
     // }
-    renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
+    // renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
     renderedHTML = renderedHTML.replace(/<a(.*?)href="(.*?)".*?>(.*?)<\/a>/igm,"<a$1href='javascript:void(0);' onclick='openLinkInFrame(\"$2\")'>$3</a>");
     // 处理表情
     var emo = "/twemoji/2/svg/";
