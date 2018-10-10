@@ -12,6 +12,9 @@ module.exports = {
 		addColl: {
 			POST: 'collectThread'
 		},
+		delColl: {
+			POST: 'delCollectThread'
+		},
 		digest: {
 			POST: 'digestThread',
 			DELETE: 'unDigestThread'

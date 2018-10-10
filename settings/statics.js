@@ -13,6 +13,7 @@ const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 const defaultUserBannerPath = defaultPath + '/default_user_banner.jpg';
 const defaultMessageFilePath = defaultPath + '/default_resource_image.jpg';
+const defaultVideoCoverPath = defaultPath + '/videoCover.jpg';
 module.exports = {
 	siteSpecificPath,
   watermark,
@@ -27,5 +28,6 @@ module.exports = {
 	defaultPath,
   defaultAdPath,
   defaultImageResourcePath,
-  defaultMessageFilePath
+  defaultMessageFilePath,
+  defaultVideoCoverPath
 };

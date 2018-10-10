@@ -7,11 +7,13 @@ const searchRouter = require('./search');
 const scoreChangeRouter = require('./scoreChange');
 const latestRouter = require('./latest');
 const forumRouter = require('./forum');
+const checkRouter = require('./check');
 appRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'app/index.pug';
 		await next();
 	})
+	.use('/check', checkRouter.routes(), checkRouter.allowedMethods())
 	.use('/latest', latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/u', userRouter.routes(), userRouter.allowedMethods())
 	.use('/me', meRouter.routes(), meRouter.allowedMethods())

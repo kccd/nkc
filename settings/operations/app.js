@@ -29,6 +29,9 @@ module.exports = {
 			GET: 'APPvisitThread'
 		}
 	},
+	check: {
+		GET: 'APPcheckout',
+	},
 	forum: {
 		// GET: 'APPgetThreadInfo',
 		PARAMETER: {

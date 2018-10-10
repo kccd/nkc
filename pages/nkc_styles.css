@@ -3030,3 +3030,25 @@ img.emoji {
   z-index: 10010;
   transition: display 1s;
 }
+.single-post{
+  position: relative;
+  padding-top: 1rem;
+}
+.single-post-time{
+  position: absolute;
+  text-align: center;
+  /*max-width: 20rem;*/
+  height: 2rem;
+  line-height: 2rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+.single-post-time>div{
+  padding: 0 2rem;
+  color: #666666;
+  display: inline-block;
+  background-color: #ffffff;
+  font-size: 1.2rem;
+}

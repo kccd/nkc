@@ -56,6 +56,7 @@
     "postToThread": "回复文章",
     "moveThread": "移动文章",
     "collectThread": "收藏文章",
+    "delCollectThread": "取消文章收藏",
     "digestThread": "将文章设为精选文章",
     "toppedThread": "置顶文章",
     "switchInPersonalForum": "在专栏加精、置顶、隐藏",
@@ -320,6 +321,7 @@
     "getIosPackage": "获取Ios安装包",
     "getAndroidPackage": "获取Android安装包",
     "visitAppDownload": "访问app下载页面",
+    "visitAppUploadHistories": "查看app历史版本",
 
 
     "APPgetUserInfo": "app获取用户信息",
@@ -332,6 +334,7 @@
     "APPgetScoreChange": "app获取分数变化设置",
     "APPsearch": "app搜索",
     "APPgetLatestThreads": "app加载最新文章",
+    "APPcheckout": "app启动自检",
     "APPvisitForum": "app查看专业"    
   }
 }

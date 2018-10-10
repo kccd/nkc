@@ -487,14 +487,14 @@ function APP_nkc_render(options){
         }
         var reg = new RegExp(r.oname, 'gm');
         var hrefStr = new RegExp("href=\/r\/"+r.rid,'gm');
-        var clickStr = "onclick=\'downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")\'";
+        var clickStr = "onclick='downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")'";
         html = html.replace(reg,r.oname+'<span class="resourceDownCount">'+r.hits+'次下载</span>');
         html = html.replace(hrefStr,clickStr);
       }
     }
     // 将图片加上域名前缀
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>');
-    html = html.replace(/<img src="\/r(.+?)">/img,'<img class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$1" />');
+    html = html.replace(/<img(.*?)src="\/r(.+?)">/img,'<img$1class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$2" />');
     html = html.replace(/<img src="(\/default\/default_thumbnail.png)">/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org$1" />');
     return html
   }
@@ -564,15 +564,16 @@ function APP_nkc_render(options){
     //     renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
     //   }
     // }
-    renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
+    // renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
     renderedHTML = renderedHTML.replace(/<a(.*?)href="(.*?)".*?>(.*?)<\/a>/igm,"<a$1href='javascript:void(0);' onclick='openLinkInFrame(\"$2\")'>$3</a>");
     // 处理表情
     var emo = "/twemoji/2/svg/";
     var pcEmoReg = new RegExp(emo,'igm');
-    renderedHTML = renderedHTML.replace(pcEmoReg,"../modules/twemoji/");
+    // renderedHTML = renderedHTML.replace(pcEmoReg,"../modules/twemoji/");
+    renderedHTML = renderedHTML.replace(pcEmoReg,"https://www.kechuang.org/twemoji/2/svg/");
     renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 onclick='openImage(\"$2\")'>");    
     // 将视频替换成图片
-    renderedHTML = renderedHTML.replace(/<video src="\/r(.+?)".*?<\/video>/igm,'<div style="position:relative"><img src="http://192.168.11.114:9000/frameImg$1" onerror="this.src=\'http://192.168.11.114:9000/default/317.png\'" style="width:100%;height:10rem"><span class="play-btn" onclick="openVideo(this,\'/r$1\')"></span></div>');
+    renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r(.*?)".*?>(.*?)<\/video>/igm,'<div style="position:relative"><img src="https://www.kechuang.org/frameImg$2" style="width:100%;height:10rem"><span class="play-btn" onclick="openVideo(this,\'/r$2\')"></span></div>');
     // renderedHTML = renderedHTML.replace(/<video src r(.+?)".*?<\/video>/igm,'<video src="http://192.168.11.114:1086/r$1" style="width:100%;height:10rem;" controls poster="http://192.168.11.114:1086/frameImg$1"></video>');
     return renderedHTML;
   }
