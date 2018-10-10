@@ -206,8 +206,9 @@ block content
                       .h3.thread-title.text-center= thread.firstPost.t
                       .thread-info.text-center
                         a(href=`/u/${thread.uid}`)
-                          img(src=`/avatar_small/${thread.uid}` style='width: 1.5em;height: 1.5em;border-radius:50%;')
+                          img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                           span= ` ${thread.firstPost.user.username}`
+                        span(style='color: #555555;')= ` ${thread.toc.toLocaleString()}`
 
                       -const post = thread.firstPost;
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
@@ -235,6 +236,9 @@ block content
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
+                          -let previousPost;
+                          if index !== 1
+                            -previousPost = data.posts[index-1];
                           include single_post
                     .col-xs-12.col-md-12
                       include ../interface_navigation_paging
