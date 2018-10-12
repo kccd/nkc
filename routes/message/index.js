@@ -29,39 +29,27 @@ messageRouter
       return await next();
     }
 
-    const uidList = await db.MessageModel.getUsersFriendsUid(user.uid);
-
     const list = [];
+    const userList = [];
 
     // 获取已创建聊天的用户
-    for(const uid of uidList) {
-      const targetUser = await db.UserModel.findOne({uid});
+    const chat = await db.CreatedChatModel.find({uid: user.uid}).sort({tlm: -1});
+    for(const c of chat) {
+      if(c.tUid === user.uid) continue;
+      const {unread, tUid, lmId, tlm} = c;
+
+      const message = await db.MessageModel.findOne({_id: lmId});
+
+      const targetUser = await db.UserModel.findOne({uid: tUid});
+
       if(!targetUser) continue;
-      const message = await db.MessageModel.findOne({
-        $or: [
-          {
-            r: targetUser.uid,
-            s: user.uid
-          },
-          {
-            s: targetUser.uid,
-            r: user.uid
-          }
-        ]
-      }).sort({tc: -1});
-      if(!message) continue;
-      if(message.withdrawn) message.c = '';
-      const count = await db.MessageModel.count({
-        r: user.uid,
-        s: targetUser.uid,
-        vd: false
-      });
-      list.push({
-        time: message.tc,
+
+      userList.push({
+        time: tlm,
         type: 'UTU',
         user: targetUser,
         message,
-        count
+        count: unread
       });
     }
 
@@ -81,8 +69,6 @@ messageRouter
       message,
       count: user.newMessage.newReminderCount
     });
-
-    const userList = [];
     for(const o of list) {
       if(userList.length === 0) {
         userList.push(o);
@@ -101,9 +87,7 @@ messageRouter
         userList.push(o);
       }
     }
-
     data.userList = userList;
-
     await next();
   })
   .use('/withdrawn', withdrawnRouter.routes(), withdrawnRouter.allowedMethods())

@@ -62,7 +62,7 @@ const messageSchema = new Schema({
   r: {
     type: String,
     index: 1,
-    defualt: '',
+    default: '',
     required: function() {
       return ['STR', 'STU', 'UTU', 'UTR'].includes(this.ty);
     }
@@ -272,13 +272,24 @@ messageSchema.statics.extendReminder = async (arr) => {
   }
   return results;
 };
-
 messageSchema.statics.getUsersFriendsUid = async (uid) => {
+  const CreatedChatModel = mongoose.model('createdChat');
+  const chat = await CreatedChatModel.find({uid}).sort({tlm: -1});
+  const arr = [];
+  chat.map(c => {
+    if(c.tUid !== uid) arr.push(c.tUid);
+  });
+  return arr;
+};
+/*messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const MessageModel = mongoose.model('messages');
   let rList = await MessageModel.aggregate([
     {
       $match: {
-        s: uid
+        s: uid,
+        r: {
+          $ne: ''
+        }
       }
     },
     {
@@ -288,14 +299,17 @@ messageSchema.statics.getUsersFriendsUid = async (uid) => {
     },
     {
       $group: {
-        _id: '$r',
+        _id: '$r'
       }
     }
   ]);
   let sList = await MessageModel.aggregate([
     {
       $match: {
-        r: uid
+        r: uid,
+        s: {
+          $ne: ''
+        }
       }
     },
     {
@@ -305,7 +319,7 @@ messageSchema.statics.getUsersFriendsUid = async (uid) => {
     },
     {
       $group: {
-        _id: '$s',
+        _id: '$s'
       }
     }
   ]);
@@ -317,7 +331,7 @@ messageSchema.statics.getUsersFriendsUid = async (uid) => {
     }
   }
   return uidList;
-};
+};*/
 
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;

@@ -44,6 +44,7 @@ const download = require('./download');
 const forgotPassword = require('./forgotPassword');
 const app = require('./app');
 const message = require('./message');
+const test = require('./test');
 const operationObj = {};
 
 
@@ -142,6 +143,8 @@ operationObj.operationTree = {
 		app,// 手机app
 
 		message, // 信息（新）
+
+    test, // 测试路由
 	}
 };
 module.exports = operationObj;

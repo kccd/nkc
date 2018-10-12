@@ -29,7 +29,7 @@ markRouter
     } else if(type === 'remind') {
       await db.MessageModel.updateMany({ty: 'STU', r: user.uid, vd: false}, {$set: {vd: true}});
     } else {
-      const n = await db.MessageModel.updateMany({
+      await db.MessageModel.updateMany({
         ty: 'UTU',
         r: user.uid,
         s: uid,
@@ -39,6 +39,7 @@ markRouter
           vd: true
         }
       });
+      await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}});
     }
     await next();
   });
