@@ -34,7 +34,9 @@ const settingSchema = new Schema({
 		messages: Number,
 		messageFiles: Number,
     createdChat: Number,
-    friends: Number
+    friends: Number,
+    friendsApplications: Number,
+    friendsCategories: Number,
   },
 
 	//科创基金设置

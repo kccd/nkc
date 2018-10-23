@@ -16,7 +16,7 @@ const http = require('http'),
   path = require('path'),
   config = require('./config'),
 
-  {updateDate} = settings,
+  {updateDate, upload} = settings,
 
   {
     SettingModel,
@@ -140,6 +140,7 @@ const jobsInit = async () => {
   jobs.backupDatabase();
 };
 
+
 const start = async () => {
 
   serverSettings = await SettingModel.findOnly({type: 'server'});
@@ -147,6 +148,7 @@ const start = async () => {
   if(global.NKC.processId === '0') {
     await dataInit();
     await jobsInit();
+    await upload.initFolders();
   }
 
   await searchInit();

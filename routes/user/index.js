@@ -9,6 +9,7 @@ const settingRouter = require('./settings');
 const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
 const bannerRouter = require('./banner');
+const friendsRouter = require('./friends');
 const userRouter = new Router();
 
 
@@ -163,5 +164,6 @@ userRouter
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())
+  .use('/:uid/friends', friendsRouter.routes(), friendsRouter.allowedMethods())
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods());
 module.exports = userRouter;

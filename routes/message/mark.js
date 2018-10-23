@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const markRouter = new Router();
 markRouter
   .patch('/', async(ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, body, redis} = ctx;
     const {type, uid} = body;
     const {user} = data;
     if(type === 'systemInfo') {
@@ -41,6 +41,12 @@ markRouter
       });
       await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}});
     }
+    await redis.pubMessage({
+      ty: 'markAsRead',
+      messageType: type,
+      uid: user.uid,
+      targetUid: uid
+    });
     await next();
   });
 module.exports = markRouter;

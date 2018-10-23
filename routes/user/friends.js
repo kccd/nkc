@@ -1,0 +1,145 @@
+const Router = require('koa-router');
+
+const friendsRouter = new Router();
+
+friendsRouter
+  .post('/', async (ctx, next) => {
+    const {body, data, db, params, redis} = ctx;
+    const {uid} = params;
+    const {user} = data;
+    const {description = ''} = body;
+    if(description.length > 100) ctx.throw(400, '验证信息不能超过100个字');
+    const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
+    if(friend) ctx.throw(400, '该用户已经成为您的好友，请勿重复添加');
+    let applicationLog = await db.FriendsApplicationModel.findOne({
+      applicantId: user.uid,
+      respondentId: uid,
+      agree: null
+    });
+    let targetApplicationLog = await db.FriendsApplicationModel.findOne({
+      applicantId: uid,
+      respondentId: user.uid,
+      agree: null
+    });
+
+    await db.UsersGeneralModel.update({uid: uid}, {$set: {'messageSettings.chat.newFriends': true}});
+
+    // 若对方之前已发起添加好友请求，则直接通过验证并简历好友关系。
+    if(targetApplicationLog) ctx.throw(400, '该好友已向你发送添加好友申请，请点击信息中的‘新朋友’查看');
+    if(applicationLog) {
+      applicationLog.toc = Date.now();
+      applicationLog.description = description;
+      await applicationLog.save();
+    } else {
+      applicationLog = db.FriendsApplicationModel({
+        _id: await db.SettingModel.operateSystemID('friendsApplications', 1),
+        applicantId: user.uid,
+        respondentId: uid,
+        description
+      });
+      await applicationLog.save();
+    }
+    applicationLog = applicationLog.toObject();
+    applicationLog.ty = 'friendsApplication';
+    applicationLog.c = 'postApplication';
+    redis.pubMessage(applicationLog);
+    await next();
+  })
+  .post('/agree', async (ctx, next) => {
+    const {data, db, params, redis} = ctx;
+    const {uid} = params;
+    const {user} = data;
+    let application = await db.FriendsApplicationModel.findOnly({respondentId: user.uid, applicantId: uid, agree: null});
+    const toc = Date.now();
+
+    // 创建好友关系
+    let friend = await db.FriendModel.findOne({
+      uid: user.uid,
+      tUid: uid
+    });
+    if(!friend) {
+      const newFriend1 = db.FriendModel({
+        _id: await db.SettingModel.operateSystemID('friends', 1),
+        uid: user.uid,
+        tUid: uid,
+        toc
+      });
+      await newFriend1.save();
+    }
+    friend = await db.FriendModel.findOne({
+      tUid: user.uid,
+      uid: uid
+    });
+    if(!friend) {
+      const newFriend2 = db.FriendModel({
+        _id: await db.SettingModel.operateSystemID('friends', 1),
+        tUid: user.uid,
+        uid: uid,
+        toc
+      });
+      await newFriend2.save();
+    }
+
+    // 创建聊天
+    const lastMessage = await db.MessageModel.findOne({ty: 'UTU', $or: [{s: user.uid, r: uid}, {s: uid, r: user.uid}]});
+    let lmId, tlm;
+    if(lastMessage) {
+      lmId = lastMessage._id;
+      tlm = lastMessage.tc;
+    }
+    let chat = await db.CreatedChatModel.findOne({
+      uid: user.uid,
+      tUid: uid
+    });
+    if(!chat) {
+      chat = db.CreatedChatModel({
+        _id: await db.SettingModel.operateSystemID('createdChat', 1),
+        uid: user.uid,
+        tUid: uid,
+        toc: toc,
+        tlm: tlm||toc,
+        lmId
+      });
+      await chat.save();
+    }
+    let targetChat = await db.CreatedChatModel.findOne({
+      uid: uid,
+      tUid: user.uid
+    });
+    if(!targetChat) {
+      targetChat = db.CreatedChatModel({
+        _id: await db.SettingModel.operateSystemID('createdChat', 1),
+        uid: uid,
+        tUid: user.uid,
+        toc: toc,
+        tlm: tlm||toc,
+        lmId
+      });
+      await targetChat.save();
+    }
+
+    application.tlm = toc;
+    application.agree = true;
+    await application.save();
+    application = application.toObject();
+    application.ty = 'friendsApplication';
+    application.c = 'agree';
+    redis.pubMessage(application);
+    await next();
+  })
+  .post('/disagree', async (ctx, next) => {
+    const {data, db, params, redis} = ctx;
+    const {uid} = params;
+    const {user} = data;
+    const toc = Date.now();
+    let application = await db.FriendsApplicationModel.findOnly({respondentId: user.uid, applicantId: uid, agree: null});
+    application.agree = false;
+    application.tlm = toc;
+    await application.save();
+    application = application.toObject();
+    application.ty = 'friendsApplication';
+    application.c = 'disagree';
+    redis.pubMessage(application);
+    await next();
+  });
+module.exports = friendsRouter;

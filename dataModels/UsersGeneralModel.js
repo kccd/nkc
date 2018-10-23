@@ -28,6 +28,7 @@ const usersGeneralSchema = new Schema({
     }
   },
   messageSettings: {
+	  // 响铃
     beep: {
       systemInfo: {
         type: Boolean,
@@ -42,6 +43,7 @@ const usersGeneralSchema = new Schema({
         default: false
       }
     },
+    // 震动
     vibrate: {
       systemInfo: {
         type: Boolean,
@@ -56,6 +58,7 @@ const usersGeneralSchema = new Schema({
         default: false
       }
     },
+    // 状态栏
     notificationBar: {
       systemInfo: {
         type: Boolean,
@@ -66,6 +69,21 @@ const usersGeneralSchema = new Schema({
         default: true
       },
       usersMessage: {
+        type: Boolean,
+        default: true
+      }
+    },
+    // 已创建的聊天
+    chat: {
+      newFriends: {
+        type: Boolean,
+        default: true
+      },
+      systemInfo: {
+        type: Boolean,
+        default: true
+      },
+      reminder: {
         type: Boolean,
         default: true
       }

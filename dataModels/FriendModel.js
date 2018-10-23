@@ -35,8 +35,8 @@ const friendSchema = new Schema({
       default: ''
     },
     phone: {
-      type: String,
-      default: ''
+      type: [String],
+      default: ['']
     },
     location: {
       type: String,
@@ -46,14 +46,26 @@ const friendSchema = new Schema({
       type: String,
       default: ''
     },
-    imageId: {
-      type: Number,
-      default: null
+    image: {
+      type: Boolean,
+      default: false
     }
   }
 }, {
-  collection: 'friends'
+  collection: 'friends',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
+
+friendSchema.virtual('targetUser')
+  .get(function() {
+    return this._targetUser;
+  })
+  .set(function(targetUser) {
+    this._targetUser = targetUser;
+  });
 
 friendSchema.pre('save', function(next) {
   if(!this.tlm) this.tlm = this.toc;

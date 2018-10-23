@@ -301,6 +301,25 @@ const messageImageSMify = async (path, targetPath) => {
   return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, targetPath])
 };
 
+const friendImageify = async (path, targetPath) => {
+  const width = 1080;
+  const height = 1920;
+  const imageWidth = (await info(path)).width;
+  const imageHeight = (await info(path)).height;
+  let arr;
+  if(Number(imageWidth) > width || Number(imageHeight) > height) {
+    arr = [path, '-resize', `${width}x${imageHeight}`, targetPath];
+  } else {
+    arr = [path, targetPath];
+  }
+  if(linux) {
+    return spawnProcess('convert', arr);
+  } else {
+    arr.unshift('convert');
+    return spawnProcess('magick', arr);
+  }
+};
+
 
 // 获取视频的第一帧为图片
 const firstFrameToImg = async (videoPath,imgPath) => {
@@ -344,6 +363,7 @@ module.exports = {
   imageNarrow,
 	userBannerify,
   messageImageSMify,
+  friendImageify,
   firstFrameToImg,
   videoToH264,
   turnVideo

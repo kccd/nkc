@@ -22,7 +22,8 @@ userRouter
     if(firstMessageId) {
       q._id = {$lt: firstMessageId};
     }
-    await db.MessageModel.updateMany({
+    // 获取信息不在清除未读数，mark路由专用于清除未读数
+    /*await db.MessageModel.updateMany({
       r: user.uid,
       s: uid,
       vd: false
@@ -31,7 +32,7 @@ userRouter
         vd: true
       }
     });
-    await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}})
+    await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}})*/
     const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
     messages.map(m => {
       if(m.withdrawn) m.c = '';
@@ -108,11 +109,15 @@ userRouter
 
 
     if(!chat || !targetChat) {
+      let lmId = null;
+      const lastMessage = await db.MessageModel.findOne({ty: 'UTU', $or: [{s: user.uid, r: uid}, {s: uid, r: user.uid}]}, {_id: 1});
+      if(lastMessage) lmId = lastMessage._id;
       if(!chat) {
         chat = db.CreatedChatModel({
           _id: await db.SettingModel.operateSystemID('createdChat', 1),
           uid: user.uid,
-          tUid: targetUser.uid
+          tUid: targetUser.uid,
+          lmId
         });
         await chat.save();
       }
@@ -120,7 +125,8 @@ userRouter
         targetChat = db.CreatedChatModel({
           _id: await db.SettingModel.operateSystemID('createdChat', 1),
           uid: targetUser.uid,
-          tUid: user.uid
+          tUid: user.uid,
+          lmId
         });
         await targetChat.save();
       }
