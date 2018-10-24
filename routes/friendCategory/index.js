@@ -46,7 +46,7 @@ router
     const {name, description, friendsId} = body;
     if(!name) ctx.throw(400, '分组名不能为空');
     if(name.length > 20) ctx.throw(400, '分组名不能超过20个字');
-    const sameNameCategory = await db.FriendsCategoryModel.findOne({uid: user.uid, name});
+    const sameNameCategory = await db.FriendsCategoryModel.findOne({uid: user.uid, name, _id: {$ne: category._id}});
     if(sameNameCategory) ctx.throw(400, '分组名已存在');
     if(!description) ctx.throw(400, '分组介绍不能为空');
     if(description.length > 250) ctx.throw(400, '分组介绍不能超过20个字');
