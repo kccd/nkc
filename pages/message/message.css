@@ -1257,3 +1257,15 @@ img.emoji{
 .mobile .all-friends, .mobile .selected-friends{
   height: 25rem;
 }
+.mobile .friend-category-add{
+  height: 3rem;
+  line-height: 3rem;
+}
+.ms-friend-body .ms-friend-information{
+  overflow: inherit;
+  padding-bottom: 2rem;
+}
+/* 地区选择 输入框圆角  */
+.bs-chinese-region .nav-tabs, .bs-chinese-region.flat .dropdown-menu, .bs-chinese-region.flat .nav-tabs>li>a, .bs-chinese-region.flat input{
+  border-radius: 4px;
+}

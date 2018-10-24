@@ -128,7 +128,6 @@ messageRouter
       f = f.toObject();
       f.targetUser = targetUser;
       usersFriends.push(f);
-      f.name = f.info.name || f.targetUser.username;
     }));
     data.usersFriends = usersFriends;
 

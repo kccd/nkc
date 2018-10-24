@@ -16,7 +16,7 @@ settingsRouter
   })
   .patch('/:uid', async (ctx, next) => {
     const {data, db, params, body, redis} = ctx;
-    const {info} = body;
+    const {info, cid} = body;
     const {user} = data;
     const {uid} = params;
     if(info.name.length > 10) ctx.throw(400, '备注名不能超过10个字');
@@ -24,12 +24,25 @@ settingsRouter
     const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
     if(!friend) ctx.throw(403, '您与该用户暂未建立好友关系');
     friend.info = info;
+    const oldCid = friend.cid;
+    friend.cid = cid;
+    await db.FriendsCategoryModel.updateMany({uid: user.uid, _id: {$nin: cid}, friendsId: uid}, {$pull: {friendsId: uid}});
+    await db.FriendsCategoryModel.updateMany({uid: user.uid, _id: {$in: cid}}, {$addToSet: {friendsId: uid}});
     await friend.save();
     friend.targetUser = await db.UserModel.findOnly({uid: friend.tUid});
     await redis.pubMessage({
       ty: 'modifyFriend',
       friend: friend.toObject()
     });
+    const allCid = cid.concat(oldCid);
+    const categories = await db.FriendsCategoryModel.find({uid: user.uid, _id: {$in: allCid}});
+    for(const category of categories) {
+      await redis.pubMessage({
+        ty: 'editFriendCategory',
+        editType: 'modify',
+        category: category
+      });
+    }
     await next();
   });
 module.exports = settingsRouter;

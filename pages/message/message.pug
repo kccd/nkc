@@ -2,7 +2,8 @@ extends ../bootstrap_base
 block title
   title 信息
   -const hiddenFooter = true;
-  link(rel='stylesheet' href="/message/message.css")
+  link(href=`/bootstrap/css/bootstrap-chinese-region.min.css?v=${global.NKC.startTime}` media="screen" rel='stylesheet')
+  link(rel='stylesheet' href=`/message/message.css?v=${global.NKC.startTime}`)
 block content
 
   // 私信内容
@@ -94,10 +95,10 @@ block content
       div(v-if="editCategory")
         .form
           .form-group
-            table 分组介绍
+            table.control-label 分组名称
             input.form-control(v-model.trim="category.name")
           .form-group
-            table 分组介绍
+            table.control-label 分组介绍
             textarea.form-control(rows=5 v-model.trim="category.description")
         .category-edit-friends.row
           .col-xs-6.col-md-6
@@ -107,13 +108,13 @@ block content
                 .friend-letter {{o.letter}}
                 .friend-li(v-for='friend in o.friends' @click="addFriendToSelectedFriends(friend)")
                   img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="'/avatar/' + friend.targetUser.uid")
-                  span {{friend.name}}
+                  span {{friend.info.name || friend.targetUser.username}}
           .col-xs-6.col-md-6
             .header 已选择的好友
             .selected-friends
               .friend-li(v-for='friend in category.friends' @click="removeFriendFromSelectedFriends(friend)")
                 img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="'/avatar/' + friend.targetUser.uid")
-                span {{friend.name}}
+                span {{friend.info.name || friend.targetUser.username}}
                 .remove.fa.fa-remove
 
       div(v-else)
@@ -193,17 +194,40 @@ block content
             .fa.fa-angle-up(v-if="showFriendNotes")
           .form.friend-notes(v-if='showFriendNotes')
             .form-group
-              table 备注名：
+              table.control-label 备注名：
               input.form-control(v-model='friend.info.name' placeholder="不超过10个字")
             .form-group
               span 分组：
-              select
-                option(v-for="category in categories") {{category.name}}
+              span {{friend.cid}}
+              div(v-for="category in categories")
+                input(type='checkbox' :value='category._id' v-model='friend.cid')
+                label {{category.name}}
+
             .form-group
-              table 简介：
+              table.control-label 简介：
               textarea.form-control(placeholder="不超过250个字" v-model='friend.info.description' rows=4)
             .form-group
-              table 联系电话：
+              label.control-label 所在地区：
+              .bs-chinese-region.flat.dropdown(data-submit-type="id", data-min-level="0", data-max-level="4")
+                input#location.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="", :data='friend.info.location')
+                .dropdown-menu(role="menu", aria-labelledby="dLabel")
+                  div
+                    ul.nav.nav-tabs(role="tablist")
+                      li#countryLi.active(role="presentation")
+                        a(href="#country", data-next="province", role="tab", data-toggle="tab") 国家
+                      li(role="presentation")
+                        a(href="#province", data-next="city", role="tab", data-toggle="tab") 省份
+                      li(role="presentation")
+                        a(href="#city", data-next="district", role="tab", data-toggle="tab") 城市
+                      li(role="presentation")
+                        a(href="#district", data-next="street", role="tab", data-toggle="tab") 县区
+                    .tab-content
+                      #country.tab-pane.active(role="tabpanel") --
+                      #province.tab-pane(role="tabpanel") --
+                      #city.tab-pane(role="tabpanel") --
+                      #district.tab-pane(role="tabpanel") --
+            .form-group
+              table.control-label 联系电话：
               .row(v-for="phone, index in friend.info.phone" style='margin-bottom: 0.5rem;')
                 .col-md-10.col-xs-10
                   input.form-control(v-model='friend.info.phone[index]')
@@ -213,12 +237,12 @@ block content
                     .fa.fa-plus-circle.text-success(v-if="(index + 1) === friend.info.phone.length && index < 4" @click='addFriendsPhone')
 
             //.form-group
-              table 所在地区：
+              table.control-label 所在地区：
               input.form-control(v-model='friend.info.phone')
             .form-group(style='position: relative;')
               transition(name='fade')
                 .friend-image-upload(v-if="friendImageProgress" :style="'width: ' + friendImageProgress + '%'")
-              table 附加图片：
+              table.control-label 附加图片：
               input(@change="uploadFriendNoteImage" type='file' accept="image/*")
               img(v-if='friend.info.image' ref='friendImage' :src='"/friend/" + friend.tUid + "/image"' style='width: 100%;margin-top: 0.5rem;' )
 
@@ -227,16 +251,16 @@ block content
             .fa.fa-angle-up(v-if="showPermissionSettings")
           .form.friend-notes(v-if='showPermissionSettings')
             .form-group
-              table 备注名：
+              table.control-label 备注名：
               input.form-control(v-model='friend.info.name')
             .form-group
-              table 简介：
+              table.control-label 简介：
               textarea.form-control(v-model='friend.info.description' rows=4)
             .form-group
-              table 联系电话：
+              table.control-label 联系电话：
               input.form-control(v-model='friend.info.phone')
             .form-group
-              table 所在地区：
+              table.control-label 所在地区：
               input.form-control(v-model='friend.info.phone')
             .form-group
               button.btn.btn-primary 保存
@@ -732,6 +756,7 @@ block content
 
 
 block scripts
+  script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
   script(src=`/transliteration/lib/browser/transliteration.min.js?v=${global.startTime}`)
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
   script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)

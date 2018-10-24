@@ -11,13 +11,17 @@ router
     if(!description) ctx.throw(400, '分组介绍不能为空');
     if(description.length > 250) ctx.throw(400, '分组介绍不能超过20个字');
     const friendsUid = [];
+    const _id = await db.SettingModel.operateSystemID('friendsCategories', 1);
     for(const uid of friendsId) {
       const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
       if(!friend) continue;
       friendsUid.push(uid);
     }
+
+    await db.FriendModel.updateMany({uid: user.uid, tUid: {$in: friendsUid}}, {$addToSet: {cid: _id}});
+
     const category = db.FriendsCategoryModel({
-      _id: await db.SettingModel.operateSystemID('friendsCategories', 1),
+      _id,
       friendsId: friendsUid,
       name,
       description,
@@ -53,6 +57,10 @@ router
     category.friendsId = friendsUid;
     category.tlm = Date.now();
     await category.save();
+
+    await db.FriendModel.updateMany({uid: user.uid, tUid: {$in: friendsUid}}, {$addToSet: {cid: _id}});
+    await db.FriendModel.updateMany({uid: user.uid, tUid: {$nin: friendsUid}}, {$pull: {cid: _id}});
+
     data.category = category;
     await redis.pubMessage({
       ty: 'editFriendCategory',
@@ -66,7 +74,16 @@ router
     const {user} = data;
     const {_id} = params;
     const category = await db.FriendsCategoryModel.findOnly({ _id, uid: user.uid});
+    await db.FriendModel.updateMany({uid: user.uid, tUid: {$in: category.friendsId}}, {$pull: {cid: _id}});
+    const friends = await db.FriendModel.find({uid: user.uid, tUid: {$in: category.friendsId}});
     await category.remove();
+    for(const friend of friends) {
+      friend.targetUser = await db.UserModel.findOnly({uid: friend.tUid});
+      await redis.pubMessage({
+        ty: 'modifyFriend',
+        friend: friend.toObject()
+      });
+    }
     await redis.pubMessage({
       ty: 'editFriendCategory',
       editType: 'remove',

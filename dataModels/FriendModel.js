@@ -25,9 +25,9 @@ const friendSchema = new Schema({
     index: 1
   },
   cid: {
-    type: Number,
+    type: [Number],
     index: 1,
-    default: null
+    default: []
   },
   info: {
     name: {

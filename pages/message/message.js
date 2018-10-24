@@ -24,6 +24,7 @@ $(function() {
   app = new Vue({
     el: '#app',
     data: {
+      locationData: '',
       mobile: mobile,
       userList: [],
       target: '',
@@ -398,8 +399,11 @@ $(function() {
       // 保存好友设置
       saveFriendSettings: function() {
         if(!app.friend) return;
+        var locationInput = document.getElementById('location');
+        app.friend.info.location = locationInput.value;
         nkcAPI('/message/settings/' + app.friend.tUid, 'PATCH', {
-          info: app.friend.info
+          info: app.friend.info,
+          cid: app.friend.cid
         })
           .then(function() {
             screenTopAlert('保存成功');
@@ -1155,6 +1159,13 @@ $(function() {
         app.scrollToBottom();
         app.oldLastMessageId = app.lastId;
       }
+      if(this.showFriendNotes) { // 若处于编辑好友备注
+        var locationElement = document.getElementById('country');
+        if(locationElement && locationElement.innerText === '--') { // 若未初始化过地区，则初始化
+          $('.bs-chinese-region').chineseRegion('source',app.locationData);
+          $('#location').val($('#location').attr('data'));
+        }
+      }
     },
 
     mounted: function() {
@@ -1167,6 +1178,16 @@ $(function() {
             });
           }
         });
+
+      $.getJSON('/location.json',function(data){
+        for (var i = 0; i < data.length; i++) {
+          var area = {id:data[i].id,name:data[i].cname,level:data[i].level,parentId:data[i].upid};
+          data[i] = area;
+        }
+        app.locationData = data;
+
+      });
+
       if(socket) {
         if(socket.connected) {
           this.socketStatus = 'connect';
@@ -1458,6 +1479,7 @@ $(function() {
           var li = app.friends[i];
           if(li.targetUser && li.targetUser.uid === uid) {
             li.targetUser.online = true;
+            li.targetUser.onlineType = data.onlineType;
           }
         }
       });
