@@ -323,6 +323,20 @@
     "visitAppDownload": "访问app下载页面",
     "visitAppUploadHistories": "查看app历史版本",
 
+    "visitActivityIndex": "访问活动主页面",
+    "activityReleaseIndex": "访问活动发布页面",
+    "activityReleasePost": "提交活动发布申请",
+    "uploadActivityPoster": "上传活动海报",
+    "getActivityPoster": "获取活动海报",
+    "activityListIndex": "获取活动列表",
+    "visitActivitySingle": "查看活动详情",
+    "activityApplyPost": "提交活动报名",
+    "myActivityApplyIndex": "查看我的活动申请",
+    "cancelActivityApply": "取消活动报名",
+    "getActivifyModify": "获取活动管理页面",
+    "postActivifyModify": "提交活动修改",
+    "delActivifyModify": "关闭活动",
+
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",

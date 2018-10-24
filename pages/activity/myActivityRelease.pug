@@ -1,0 +1,48 @@
+extends ../bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 科创活动
+
+  -const mainContainer1400 = true
+  -const nowTimeStamp = new Date().getTime()
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+  link(rel="stylesheet", href="/external_pkgs/cropper/css/cropper.css")
+block content
+  .container-fluid(style='max-width: 1400px;')
+      include activityNav.pug
+      .row
+        .col-xs-12.col-md-12
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-body
+                .table-responsive
+                  table.table.table-striped
+                    thead
+                      tr
+                        th 活动标题
+                        th 报名截止
+                        th 活动截止
+                        th 参加人数
+                        th 活动状态
+                        th 操作
+                    tbody
+                      -for(let release of data.releases)
+                        tr
+                          th!=release.activityTitle
+                          th!=release.enrollEndTime
+                          th!=release.holdEndTime
+                          th!=release.signUser.length
+                          -if(release.activityType == "close")
+                            th 已关闭
+                          -else if(nowTimeStamp < parseInt(new Date(release.holdStartTime).getTime() ))
+                            th 未开始
+                          -else if(nowTimeStamp > parseInt(new Date(release.holdEndTime).getTime() ))
+                            th 已结束
+                          -else
+                            th 进行中
+                          th 
+                            a(href=`/activity/modify/${release.acid}`) 管理
+block scripts
+  script(src='/interface_common.js')
+  script(src="/activity/activityCommon.js")
