@@ -2,7 +2,8 @@ extends ../bootstrap_base
 block title
   title 信息
   -const hiddenFooter = true;
-  link(rel='stylesheet' href="/message/message.css")
+  link(href=`/bootstrap/css/bootstrap-chinese-region.min.css?v=${global.NKC.startTime}` media="screen" rel='stylesheet')
+  link(rel='stylesheet' href=`/message/message.css?v=${global.NKC.startTime}`)
 block content
 
   // 私信内容
@@ -18,7 +19,7 @@ block content
       //- 对方发来的信息
       .ms-single-left(v-else-if="message.s !== user.uid")
         .ms-single-img
-          a(:href="'/u/' + message.s" target="_blank")
+          a(@click='selectFriend({targetUser: targetUser})')
             img(:src="'/avatar/' + message.s")
         .ms-single-content-div
           //.ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
@@ -63,6 +64,213 @@ block content
         .ms-single-img
           a(href=`/u/${data.user.uid}/settings` target="_blank")
             img(:src="'/avatar/' + message.s")
+
+  // 新朋友通知
+  mixin newFriendsContent
+    .ms-loading-info(v-if='info') {{info}}
+    .ms-applications-body(v-for="message in messages")
+      .ms-application
+        .ms-application-time {{fromNow(message.toc)}}
+        .ms-application-user
+          .ms-application-avatar
+            a(:href="'/u/' + message.uid" target="_blank")
+              img(:src="'/avatar/' + message.uid")
+          .ms-application-user-info
+            .ms-application-username
+              a(:href="'/u/' + message.uid" target="_blank") {{message.username}}
+              span &nbsp;申请添加你为好友
+            .ms-application-description(v-if='message.description') {{message.description}}
+          .ms-application-button
+            div(v-if='message.agree === null')
+              button.btn.btn-success.btn-xs(@click='postApplication(true, message)') 同意
+              button.btn.btn-danger.btn-xs(@click='postApplication(false, message)') 拒绝
+            div(v-else-if='message.agree')
+              div.text-success 已同意
+            div(v-else-if='!message.agree')
+              div.text-danger 已拒绝
+
+  // 好友分组内容
+  mixin categoriesContent
+    .ms-friend-body(v-if='category')
+      div(v-if="editCategory")
+        .form
+          .form-group
+            table.control-label 分组名称
+            input.form-control(v-model.trim="category.name")
+          .form-group
+            table.control-label 分组介绍
+            textarea.form-control(rows=5 v-model.trim="category.description")
+        .category-edit-friends.row
+          .col-xs-6.col-md-6
+            .header 全部好友
+            .all-friends
+              div(v-for='o in friendsByOrder')
+                .friend-letter {{o.letter}}
+                .friend-li(v-for='friend in o.friends' @click="addFriendToSelectedFriends(friend)")
+                  img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="'/avatar/' + friend.targetUser.uid")
+                  span {{friend.info.name || friend.targetUser.username}}
+          .col-xs-6.col-md-6
+            .header 已选择的好友
+            .selected-friends
+              .friend-li(v-for='friend in category.friends' @click="removeFriendFromSelectedFriends(friend)")
+                img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="'/avatar/' + friend.targetUser.uid")
+                span {{friend.info.name || friend.targetUser.username}}
+                .remove.fa.fa-remove
+
+      div(v-else)
+        h4 {{category.name}}
+        p {{category.description}}
+        .category-user(v-if='category.friendsId.length === 0')
+          div 一个好友也没有，快去添加好友吧~
+        //.category-user(v-else-if='!category.friends')
+          .category-user-avatar(v-for="(uid, index) in category.friendsId")
+            img(:src="'/avatar/' + uid")
+            .category-username.loading 加载中...
+        .category-user
+          .category-user-avatar(v-for="(friend, index) in category.friends")
+            //.category-checkbox(v-if='editCategory')
+              input(type="checkbox" :checked="selectCategoryFriendsId.indexOf(friend.targetUser.uid) !== -1" @click="selectCategoryFriendsId.indexOf(friend.targetUser.uid) !== -1?selectCategoryFriendsId.splice(selectCategoryFriendsId.indexOf(friend.targetUser.uid), 1): selectCategoryFriendsId.push(friend.targetUser.uid)")
+
+            //- 点击事件
+              1. 若处于编辑状态，若该好友已被添加到多选则从多选移除该好友，反之则添加
+              2. 若处于非编辑状态，则打开好友信息
+            .category-user-avatar-div(@click="editCategory? (selectCategoryFriendsId.indexOf(friend.targetUser.uid) !== -1?selectCategoryFriendsId.splice(selectCategoryFriendsId.indexOf(friend.targetUser.uid), 1): selectCategoryFriendsId.push(friend.targetUser.uid)):selectFriend(friend)")
+              .ms-point(:class="{online: friend.targetUser.online}")
+              img(:src="'/avatar/' + friend.tUid")
+            .category-username {{friend.info.name || friend.targetUser.username}}
+      .ms-friend-button-fixed
+        .fa.fa-plus(title="添加好友" v-if="category.friendsId.length === 0 && !editCategory" @click='editCategoryBegin')
+        .fa.fa-minus(title="移除已选择的好友" v-if='selectCategoryFriendsId.length !== 0' @click='removeCategoryFriends')
+        .fa.fa-remove(title="取消编辑" v-if="editCategory" @click='cancelEditCategory')
+        .fa.fa-pencil-square-o(title="编辑" v-if="!editCategory" @click='editCategoryBegin')
+        .fa.fa-floppy-o(title="保存" v-if="editCategory" @click='saveCategory')
+        .fa.fa-trash-o.bg-color-red(@click='deleteCategory(category)' title='删除该分组')
+      //.ms-friend-save.fa.fa-plus(@click='editCategory =!editCategory')
+      //.ms-friend-save.fa.fa-pencil-square-o(@click='editCategory =!editCategory')
+
+
+
+
+  // 好友信息
+  mixin friendContent
+    .ms-friend-body(v-if='friend')
+      .ms-friend-button-fixed
+        .fa.fa-floppy-o(v-if='showFriendNotes || showPermissionSettings' @click='saveFriendSettings')
+      .ms-friend-avatar
+        img(:src='"/avatar/" + friend.targetUser.uid')
+      .ms-friend-username(v-if='friend.info && friend.info.name') {{friend.info.name}}
+        span ({{friend.targetUser.username}})
+      .ms-friend-username(v-else) {{friend.targetUser.username}}
+      .ms-friend-description {{friend.targetUser.description || '暂未填写个人简介'}}
+      .ms-friend-count
+        .col-xs-12.col-md-10.col-md-offset-1
+          .col-xs-3.col-md-3
+            .friend-count-key 文章
+            .friend-count-value {{friend.targetUser.threadCount}}
+          .col-xs-3.col-md-3
+            .friend-count-key 回复
+            .friend-count-value {{friend.targetUser.postCount}}
+          .col-xs-3.col-md-3
+            .friend-count-key 学术分
+            .friend-count-value {{friend.targetUser.xsf}}
+          .col-xs-3.col-md-3
+            .friend-count-key 科创币
+            .friend-count-value {{friend.targetUser.kcb}}
+      .ms-friend-button
+        .col-xs-12.col-md-10.col-md-offset-1
+          .col-xs-4.col-md-4
+            .row
+              a(:href="'/u/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 名片
+          .col-xs-4.col-md-4
+            .row
+              a(:href="'/m/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 专栏
+          .col-xs-4.col-md-4(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})")
+            .row
+              button.btn.btn-block.btn-default.block-btn 发信息
+      .ms-friend-information(v-if='friend.info')
+        .col-xs-12.col-md-10.col-md-offset-1
+          button.btn.btn-block.btn-default(@click='showFriendNotes = !showFriendNotes') 备注信息
+            .fa.fa-angle-down(v-if='!showFriendNotes')
+            .fa.fa-angle-up(v-if="showFriendNotes")
+          .form.friend-notes(v-if='showFriendNotes')
+            .form-group
+              label.control-label 备注名：
+              input.form-control(v-model='friend.info.name' placeholder="不超过10个字")
+            .form-group
+              label.control-label 所在分组：
+              div
+                label(v-for="category in categories" style="margin:0 0.5rem;")
+                  input(type='checkbox' :value='category._id' v-model='friend.cid')
+                  span {{category.name}}
+              button.btn.btn-default.btn-sm(style='margin: .5rem 0;' @click="addFriendCategory") 添加分组
+
+            .form-group
+              label.control-label 简介：
+              textarea.form-control(placeholder="不超过250个字" v-model='friend.info.description' rows=4)
+            .form-group
+              label.control-label 所在地区：
+              .bs-chinese-region.flat.dropdown(data-submit-type="id", data-min-level="0", data-max-level="4")
+                input#location.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="", :data='friend.info.location')
+                .dropdown-menu(role="menu", aria-labelledby="dLabel")
+                  div
+                    ul.nav.nav-tabs(role="tablist")
+                      li#countryLi.active(role="presentation")
+                        a(href="#country", data-next="province", role="tab", data-toggle="tab") 国家
+                      li(role="presentation")
+                        a(href="#province", data-next="city", role="tab", data-toggle="tab") 省份
+                      li(role="presentation")
+                        a(href="#city", data-next="district", role="tab", data-toggle="tab") 城市
+                      li(role="presentation")
+                        a(href="#district", data-next="street", role="tab", data-toggle="tab") 县区
+                    .tab-content
+                      #country.tab-pane.active(role="tabpanel") --
+                      #province.tab-pane(role="tabpanel") --
+                      #city.tab-pane(role="tabpanel") --
+                      #district.tab-pane(role="tabpanel") --
+            .form-group
+              label.control-label 联系电话：
+              .row(v-for="phone, index in friend.info.phone" style='margin-bottom: 0.5rem;')
+                .col-md-10.col-xs-10
+                  input.form-control(v-model='friend.info.phone[index]')
+                .col-md-2.col-xs-2.friend-phone-button
+                  .row
+                    .fa.fa-minus-circle.text-danger(v-if="friend.info.phone.length > 1" @click='removeFriendsPhone(index)')
+                    .fa.fa-plus-circle.text-success(v-if="(index + 1) === friend.info.phone.length && index < 4" @click='addFriendsPhone')
+
+            //.form-group
+              table.control-label 所在地区：
+              input.form-control(v-model='friend.info.phone')
+            .form-group(style='position: relative;')
+              transition(name='fade')
+                .friend-image-upload(v-if="friendImageProgress" :style="'width: ' + friendImageProgress + '%'")
+              label.control-label 附加图片：
+              input(@change="uploadFriendNoteImage" type='file' accept="image/*")
+              img(v-if='friend.info.image' ref='friendImage' :src='"/friend/" + friend.tUid + "/image"' style='width: 100%;margin-top: 0.5rem;' )
+
+          button.btn.btn-block.btn-default(@click='showPermissionSettings = !showPermissionSettings') 其他设置
+            .fa.fa-angle-down(v-if='!showPermissionSettings')
+            .fa.fa-angle-up(v-if="showPermissionSettings")
+          .form.friend-notes(v-if='showPermissionSettings')
+            .form-group
+              table.control-label 备注名：
+              input.form-control(v-model='friend.info.name')
+            .form-group
+              table.control-label 简介：
+              textarea.form-control(v-model='friend.info.description' rows=4)
+            .form-group
+              table.control-label 联系电话：
+              input.form-control(v-model='friend.info.phone')
+            .form-group
+              table.control-label 所在地区：
+              input.form-control(v-model='friend.info.phone')
+            .form-group
+              button.btn.btn-primary 保存
+          div(style='margin-top: 2rem;')
+            button.btn.btn-block.btn-danger(@click='deleteFriend') 删除好友
+      .ms-friend-information.row(v-else)
+        .col-md-10.col-md-offset-1
+          button.btn.btn-block.btn-success(@click='addFriend(friend.targetUser)') 加为好友
+
 
   // 系统通知内容
   mixin noticeContent
@@ -171,11 +379,85 @@ block content
           span &nbsp;系统提醒
     .ms-settings-button
       button.btn.btn-default(@click='saveMessageSettings') 保存
+  // 好友分组列表
+  mixin categoriesList
+    div.friend-category-add(title="添加分组" @click="addFriendCategory") +
+    div(v-if='categories.length === 0')
+      .text-center(style='margin:1rem 0;color: #aaaaaa;') 空空如也~
+    div(v-for="c in categories" @click="selectCategory(c)").friend-category
+      .ms-list-body
+        .ms-list-left
+          .ms-list-img
+            div(v-if="c.friendsId.length === 0").friend-category-avatar.text
+              span {{c.name[0]}}
+            div(v-else).friend-category-avatar
+              img(v-for="(uid, index) in c.friendsId" v-if="index < 9" :src="'/avatar_small/'+uid")
+        .ms-list-center
+          .ms-list-title {{c.name}}
+          .ms-list-content
+            span(v-if="c.description") {{c.description}}
+            //span(v-if="friend.targetUser.online && friend.targetUser.onlineType")
+            //  span(v-if="friend.targetUser.onlineType === 'phone'" style='color: #777777;margin-right:0.3rem;') [手机在线]
+            //  span(v-else-if="friend.targetUser.onlineType === 'computer'" style='color: #777777;margin-right:0.3rem;') [网页在线]
+            //span(style='color: #777777;margin-right:0.3rem;' v-else) [离线]
+            //span(:title='friend.targetUser.description') {{friend.targetUser.description}}
 
-  // 用户列表
-  mixin userList
-    div(v-if='userList.length === 0')
+
+  // 好友列表
+  mixin friendsList
+    //div(v-if='friends.length === 0')
       .text-center(style='margin:1rem 0;color: #aaaaaa;') 加载中..
+    div.friend-letter 系统
+    //- 系统通知
+    .ms-list-body.friend-list(@click="selectUser({type: 'STE'})")
+      .ms-list-left.notice
+        .ms-list-img
+          .ms-list-avatar.fa.fa-bullhorn
+      .ms-list-center
+        .ms-list-title 系统通知
+        .ms-list-content 这是系统通知
+    //- 系统提醒
+    .ms-list-body.friend-list(@click="selectUser({type: 'STU'})")
+      .ms-list-left.remind
+        .ms-list-img
+          .ms-list-avatar.fa.fa-bell-o
+      .ms-list-center
+        .ms-list-title 系统提醒
+        .ms-list-content 这是系统提醒
+
+    //- 新朋友
+    .ms-list-body.friend-list(@click="selectUser({type: 'newFriends'})")
+      .ms-list-left.remind
+        .ms-list-img
+          .ms-list-avatar.fa.fa-heart(style='background-color: #fc7868;')
+      .ms-list-center
+        .ms-list-title 新朋友
+        .ms-list-content 好友的添加申请
+
+
+    div(v-for="f in friendsByOrder")
+      div.friend-letter {{f.letter}}
+      div(v-for="friend in f.friends" @click="selectFriend(friend)").friend-list
+        .ms-list-body
+          .ms-list-left
+            .ms-list-img
+              .ms-point(:class="{online: friend.targetUser.online}")
+              img.ms-list-avatar(:src="'/avatar/'+friend.targetUser.uid")
+          .ms-list-center
+            .ms-list-title {{friend.info.name || friend.targetUser.username}}
+            .ms-list-content
+              span(v-if="friend.targetUser.online && friend.targetUser.onlineType")
+                span(v-if="friend.targetUser.onlineType === 'phone'" style='color: #777777;margin-right:0.3rem;') [手机在线]
+                span(v-else-if="friend.targetUser.onlineType === 'computer'" style='color: #777777;margin-right:0.3rem;') [网页在线]
+              span(style='color: #777777;margin-right:0.3rem;' v-else) [离线]
+              span(:title='friend.targetUser.description') {{friend.targetUser.description}}
+          .ms-list-right
+
+
+  // 消息列表
+  mixin messagesList
+    div(v-if='userList.length === 0')
+      .text-center(style='margin:1rem 0;color: #aaaaaa;') 空空如也~
     div(v-for="item in userList" @click="selectUser(item)")
       //- 私信
       .ms-list-body(v-if="item.type === 'UTU'" :class="{'active': target === 'user' && item.user && item.user.uid === targetUser.uid}")
@@ -184,21 +466,23 @@ block content
             .ms-point(:class="{online: item.user.online}")
             img.ms-list-avatar(:src="'/avatar/'+item.user.uid")
         .ms-list-center
-          .ms-list-title {{item.user.username}}
+          .ms-list-title {{item.friend && item.friend.info.name? item.friend.info.name:item.user.username}}
           .ms-list-content
             span(v-if="item.user.online && item.user.onlineType")
               span(v-if="item.user.onlineType === 'phone'" style='color: #777777;margin-right:0.3rem;') [手机在线]
               span(v-else-if="item.user.onlineType === 'computer'" style='color: #777777;margin-right:0.3rem;') [网页在线]
             span(style='color: #777777;margin-right:0.3rem;' v-else) [离线]
-            span(v-if="item.message.withdrawn")
-              div(v-if='item.message.r === user.uid') 对方撤回了一条信息
-              div(v-else) 您撤回了一条信息
-            span(v-else-if="!item.message.c.ty") {{item.message.c}}
-            span(v-else-if="item.message.c.ty === 'img'") 图片
-            span(v-else-if="item.message.c.ty === 'file'") 文件
+            span(v-if="item.message")
+              span(v-if="item.message.withdrawn")
+                span(v-if='item.message.r === user.uid') 对方撤回了一条信息
+                span(v-else) 您撤回了一条信息
+              span(v-else-if="!item.message.c.ty") {{item.message.c}}
+              span(v-else-if="item.message.c.ty === 'img'") 图片
+              span(v-else-if="item.message.c.ty === 'file'") 文件
         .ms-list-right
-          .ms-list-time {{format('MM/DD HH:mm', item.message.tc)}}
-          .ms-list-number(v-if="item.count") {{'未读' + item.count}}
+          .ms-list-time {{format('MM/DD HH:mm', item.time)}}
+            .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
+          .new-message-count(v-if='item.count > 0') {{item.count}}
 
       //- 系统通知
       .ms-list-body(v-else-if="item.type === 'STE'" :class="{'active': target === 'notice' && item.type === 'STE'}")
@@ -210,7 +494,8 @@ block content
           .ms-list-content {{item.message?item.message.c: '暂无通知'}}
         .ms-list-right
           .ms-list-time {{item.message?format('MM/DD HH:mm', item.message.tc):''}}
-          .ms-list-number(v-if="item.count > 0") {{'未读' + item.count}}
+            .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
+          div.new-message-count(v-if='item.count > 0') {{item.count}}
 
       //- 系统提醒
       .ms-list-body(v-else-if="item.type === 'STU'" :class="{'active': target === 'reminder' && item.type === 'STU'}")
@@ -222,8 +507,21 @@ block content
           .ms-list-content {{extendReminder(item.message) || '暂无提醒'}}
         .ms-list-right
           .ms-list-time {{item.message?format('MM/DD HH:mm', item.message.tc):''}}
-          .ms-list-number(v-if="item.count > 0") {{'未读' + item.count}}
+            .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
+          div.new-message-count(v-if='item.count > 0') {{item.count}}
 
+      //- 新朋友
+      .ms-list-body(v-else-if="item.type === 'newFriends'" :class="{'active': target === 'newFriends' && item.type === 'newFriends'}")
+        .ms-list-left.remind
+          .ms-list-img
+            .ms-list-avatar.fa.fa-heart(style='background-color: #fc7868;')
+        .ms-list-center
+          .ms-list-title 新朋友
+          .ms-list-content {{item.targetUser.username}} 申请添加你为好友
+        .ms-list-right
+          .ms-list-time {{format('MM/DD HH:mm', item.time)}}
+            .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
+          .new-message-count(v-if='item.count > 0') {{item.count}}
 
   .hidden#data=JSON.stringify({targetUser: data.targetUser})
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak )#app
@@ -253,7 +551,7 @@ block content
                     .form-group
                       button.btn.btn-default.btn-block(@click='searchUser') 搜索
                   .col-xs-12
-                    .ms-list-body(v-for="user in searchUsers" @click="selectUser({user: user, type: 'UTU'})")
+                    .ms-list-body.search-user-list(v-for="user in searchUsers")
                       .ms-list-left
                         .ms-list-img
                           .ms-point(:class="{online: user.online}")
@@ -261,6 +559,10 @@ block content
                       .ms-list-center
                         .ms-list-title {{user.username}}
                         .ms-list-content {{user.description || '暂未填写个人简介'}}
+                      .ms-list-right(style='line-height: 3.5rem;')
+                        div(@click="selectUser({user: user, type: 'UTU'})") 发送信息
+                        div(v-if='friendsId.indexOf(user.uid) === -1' :onclick="'openFrameOfAddFriend(' + JSON.stringify(user) + ')'") 添加好友
+
 
         //- 左侧用户列表
         .ms-left
@@ -270,17 +572,31 @@ block content
               //img(src=`/u/${data.user.uid}/banner`)
             .ms-user-info
               .ms-user-avatar
-                .ms-point(class='online')
+                .ms-point(class='online' v-if="socketStatus === 'connect'")
                 img(src=`/avatar/${data.user.uid}`)
               div.ms-user-username= data.user.username
+              //- div.ms-user-description= data.user.description
+          .ms-list-type
+            .col-md-4(:class="{'active': listType === 'messages'}" @click="listType = 'messages'") 消息
+              div.new-message-count(v-if='newMessageCount > 0') {{newMessageCount}}
+            .col-md-4(:class="{'active': listType === 'friends'}" @click="listType = 'friends'") 联系人
+            .col-md-4(:class="{'active': listType === 'categories'}" @click="listType = 'categories'") 分组
+
+
+          //- 消息列表
+          div(v-if='listType === "messages"')
+            .ms-list
+              +messagesList
+          //- 好友列表
+          .ms-list(v-else-if='listType === "friends"')
+            +friendsList
+          //- 好友分组
+          .ms-list(v-else-if='listType === "categories"')
+            +categoriesList
+
           .ms-options
-            span.fa.fa-cog(@click='showSettings = true') 设置
-            span.fa.fa-search(@click='showSearch = true') 查找用户
-
-          //- 用户列表外层div
-          .ms-list
-
-            +userList
+            span.fa.fa-cog(@click='showSettings = true' title='设置')
+            span.fa.fa-search(@click='showSearch = true' title='查找用户')
 
 
         //- 聊天内容
@@ -307,10 +623,25 @@ block content
               .ms-notice(ref='content')
                 +reminderContent
 
+          // 选择的新朋友
+          div(v-if="target === 'newFriends'" style="height: 100%;")
+            .ms-header 新朋友
+            .ms-friends-applications(ref='content')
+              +newFriendsContent
+          // 查看好友信息
+          div(v-if="target === 'friend'")
+            //.ms-header {{friend?friend.info.name||friend.targetUser.username: '加载中...'}}
+            .ms-friends-applications
+              +friendContent
+          // 查看好友分组信息
+          div(v-if="target === 'category'")
+            //.ms-header {{friend?friend.info.name||friend.targetUser.username: '加载中...'}}
+            .ms-friends-applications(style="padding-bottom: 0; padding-top: 0.5rem;")
+              +categoriesContent
 
           //- 选择了用户
           div(v-if="target === 'user'")
-            .ms-header {{targetUser.username || '加载中...'}}
+            .ms-header(style="cursor: pointer;font-weight:700;color: #666666;" @click='selectFriend({targetUser: targetUser})') {{targetUser.friend && targetUser.friend.info.name?targetUser.friend.info.name: targetUser.username}}
             .ms-right-body.new-content-body(@click="showEmoji = false" ref='content')
               +messageContent
             .ms-right-input(v-if='target === "user"')
@@ -336,12 +667,20 @@ block content
       .mobile-settings(v-if="showMobileSettings")
         +settings
       .mobile-footer(v-if="showMobileNavbar")
-        .col-xs-6(:class="{active: showMobileList}" @click="openMobileList")
+        .col-xs-3(:class="{active: showMobileList}" @click="initMobile('showMobileList')")
           .fa.fa-list-ul
-          .bar-name 列表
-        .col-xs-6(:class="{active: showMobileSettings}" @click="openMobileSettings")
+          .bar-name 信息
+        .col-xs-3(:class="{active: showMobileContacts}" @click="initMobile('showMobileContacts')")
+          .fa.fa-user
+          .bar-name 联系人
+        .col-xs-3(:class="{active: showMobileGroups}" @click="initMobile('showMobileGroups')")
+          .fa.fa-users
+          .bar-name 分组
+        .col-xs-3(:class="{active: showMobileSettings}" @click="initMobile('showMobileSettings')")
           .fa.fa-cog
           .bar-name 设置
+
+      //- 手机-信息列表
       .mobile-user-list(v-if="showMobileList")
         div.search-user
           input.form-control(placeholder='用户名、uid' v-model.trim="searchText" @keyup.enter="searchUser")
@@ -357,7 +696,14 @@ block content
               .ms-list-title {{searchUser.username}}
                 .ms-list-content {{searchUser.description || '暂未填写个人简介'}}
         h5.ms-list-info 已创建的聊天
-        +userList
+        +messagesList
+
+      //- 手机-好友列表
+      .mobile-user-list(v-if="showMobileContacts")
+        +friendsList
+      //- 好友分组
+      .mobile-user-list(v-if="showMobileGroups")
+        +categoriesList
       transition(name="slide-fade")
         .mobile-messages(v-if="target" :style="!targetUser?'padding-bottom:0':''")
           // 聊天窗口 header
@@ -366,6 +712,9 @@ block content
               span(v-if='target === "user"') {{targetUser?targetUser.username:'加载中...'}}
               span(v-if='target === "reminder"') 系统提醒
               span(v-if='target === "notice"') 系统通知
+              span(v-if='target === "friend"') 好友
+              span(v-if='target === "newFriends"') 新朋友
+              span(v-if='target === "category"') 好友分组
               .left.fa.fa-angle-left(@click="initialization")
           // 聊天窗口 footer
           .mobile-footer-input-div(v-if='target === "user"')
@@ -395,9 +744,21 @@ block content
               +noticeContent
           .mobile-messages-body(v-if="target === 'user'" ref='content' @click='showEmoji = false')
             +messageContent
+          .mobile-messages-body(v-if="target === 'friend'" ref='content')
+            //.ms-header {{friend?friend.info.name||friend.targetUser.username: '加载中...'}}
+            .ms-friends-applications
+              +friendContent
+          .mobile-messages-body(v-if="target === 'newFriends'")
+            .ms-friends-applications(ref='content')
+              +newFriendsContent
+          .mobile-messages-body(v-if="target === 'category'")
+            .ms-friends-applications(ref='content')
+              +categoriesContent
 
 
 block scripts
+  script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`/transliteration/lib/browser/transliteration.min.js?v=${global.startTime}`)
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
   script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
   script(src=`/xss/dist/xss.js?v=${global.NKC.startTime}`)

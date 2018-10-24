@@ -12,7 +12,7 @@ const nkcModules = require('./nkcModules');
 const fs = require('fs');
 const path = require('path');
 const socket = require('./socket');
-const {useHttps, updateDate} = settings;
+const {useHttps, updateDate, update} = settings;
 
 let server;
 let redirectServer;

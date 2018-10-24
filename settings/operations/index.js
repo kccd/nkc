@@ -46,6 +46,9 @@ const forgotPassword = require('./forgotPassword');
 const app = require('./app');
 const message = require('./message');
 const activity = require('./activity');
+const test = require('./test');
+const friend = require('./friend');
+const friend_category = require('./friendCatagory');
 const operationObj = {};
 
 
@@ -148,6 +151,12 @@ operationObj.operationTree = {
 		activity, //活动
 
 		message, // 信息（新）
+
+    friend, // 好友
+
+    test, // 测试路由
+
+    friend_category, // 好友分组
 	}
 };
 module.exports = operationObj;

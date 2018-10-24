@@ -24,6 +24,7 @@ $(function() {
   app = new Vue({
     el: '#app',
     data: {
+      locationData: '',
       mobile: mobile,
       userList: [],
       target: '',
@@ -41,6 +42,8 @@ $(function() {
       showSearch: false,
       searchText: '',
       searchUsers: [],
+      friends: [],
+      categories: [],
       beep: [],
       timeOut: '',
       contentBody: {
@@ -49,11 +52,21 @@ $(function() {
       },
       info: '',
       canGetMessage: true,
+      listType: 'messages',// messages, friends, categories
+      friend: '',
+      category: '',
+      editCategory: false,
+
+      showFriendNotes: false,
+      showPermissionSettings: false,
+      friendImageProgress: '',
 
       // 手机适应
       showMobileNavbar: true,
       showMobileList: true,
       showMobileSettings: false,
+      showMobileContacts: false,
+      showMobileGroups: false
 
     },
     watch: {
@@ -83,6 +96,52 @@ $(function() {
       }
     },
     computed: {
+      friendsByOrder: function() {
+        var str = '0123456789abcdefghijklmnopqrstuvwxyz*';
+        var initials = str.split('');
+        var initialsObj = {};
+        for(var i of initials) {
+          initialsObj[i] = [];
+        }
+        var friends = app.friends.concat();
+        for(var i = 0; i < friends.length; i++) {
+          var friend = friends[i];
+          var name = friend.info.name || friend.targetUser.username;
+          var k = slugify(name);
+          k = k?k[0]: '*';
+          initialsObj[k].push(friend);
+        }
+        var results = [];
+        for(var i in initialsObj) {
+          if(i !== '*' && initialsObj[i].length !== 0) {
+            results.push({
+              letter: i.toUpperCase(),
+              friends: initialsObj[i]
+            })
+          }
+        }
+        if(initialsObj['*'].length !== 0) {
+          results.push({
+            letter: '*',
+            friends: initialsObj['*']
+          })
+        }
+        return results;
+      },
+      newMessageCount: function() {
+        var n = 0;
+        for(var i = 0; i < this.userList.length; i++) {
+          if(this.userList[i].count > 0) n += this.userList[i].count;
+        }
+        return n>99?99:n;
+      },
+      friendsId: function() {
+        var arr = [];
+        for(var j = 0; j < this.friends.length; j++) {
+          arr.push(this.friends[j].uid);
+        }
+        return arr;
+      },
       firstMessageId: function() {
         var id;
         for(var i = 0; i < this.messages.length; i++) {
@@ -163,16 +222,231 @@ $(function() {
     methods: {
 
       format: format,
+      fromNow: fromNow,
 
-      // 手机
+      // 初始化手机页面
+      initMobile: function(type) {
+        app.showMobileNavbar = true;
+        app.showMobileList = false;
+        app.showMobileSettings = false;
+        app.showMobileContacts = false;
+        app.showMobileGroups = false;
+        app[type] = true;
+      },
+
+
+      // 向分组内添加好友
+      addFriendToSelectedFriends: function(friend) {
+        if(app.category.friendsId.indexOf(friend.targetUser.uid) === -1) {
+          app.category.friendsId.push(friend.targetUser.uid);
+          app.category.friends.push(friend);
+        }
+      },
+
+      // 向分组内移除好友
+      removeFriendFromSelectedFriends: function(friend) {
+        var index = app.category.friendsId.indexOf(friend.targetUser.uid);
+        if(index !== -1) {
+          app.category.friendsId.splice(index, 1);
+          app.category.friends.splice(index, 1);
+        }
+      },
+
+      // 添加分组
+      addFriendCategory: function() {
+        var category = {
+          _id: '',
+          name: '',
+          description: '',
+          friendsId: [],
+          friends: []
+        };
+        app.selectCategory(category);
+        app.editCategory = true;
+      },
+
+      // 删除分组
+      deleteCategory: function(category) {
+        if(!confirm('确认要删除分组“'+category.name+'”？')) return;
+        nkcAPI('/friend_category/' + category._id, 'DELETE', {})
+          .then(function() {
+            // socket同步信息之后会将此分类移除
+            // app.categories.splice(app.categories.indexOf(category), 1);
+            app.initialization();
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          })
+      },
+      // 取消分组编辑，复原数据
+      cancelEditCategory: function() {
+        app.editCategory = false;
+        app.category = app.category.category_;
+      },
+      // 开始分组编辑，备份分组数据
+      editCategoryBegin: function() {
+        var category = app.category;
+        app.category = JSON.parse(JSON.stringify(app.category));
+        app.category.category_ = category;
+        app.editCategory = true;
+      },
+
+      // 保存分组
+      // 将分组数据上传至服务器，将备份数据（vue公用数据）更新为最新数据
+      saveCategory: function() {
+        var category = app.category;
+        var category_ = app.category.category_;
+        if(!category || !app.editCategory) return;
+        var method = 'POST', url = '/friend_category';
+        if(category._id) {
+          method = 'PATCH';
+          url += '/' + category._id;
+        }
+        nkcAPI(url, method, {
+          name: category.name,
+          description: category.description,
+          friendsId: category.friendsId
+        })
+          .then(function(data) {
+            var newCategory = app.extendCategoryFriends(data.category);
+            /*if(category._id) {
+              Vue.set(app.categories, app.categories.indexOf(category_), newCategory);
+            } else {
+              app.categories.unshift(newCategory);
+            }*/
+            app.category = newCategory;
+            app.editCategory = false;
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          });
+      },
+
+      // 删除好友
+      deleteFriend: function() {
+        if(confirm('确认要删除该好友？') === false) return;
+        nkcAPI('/friend/' + app.friend.tUid, 'DELETE', {})
+          .then(function(data) {
+            /*for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.type === 'UTU' && li.user.uid === app.friend.tUid) {
+                app.userList.splice(i, 1);
+                break;
+              }
+            }
+            var index = app.friends.indexOf(app.friend.friend);
+            app.friends.splice(index, 1);*/
+            app.friend = {targetUser: app.friend.targetUser};
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          })
+      },
+
+      // 从已创建的聊天列表中移除聊天
+      removeChat: function(item) {
+        var type = item.type;
+        nkcAPI('/message/chat/' + (item.user?item.user.uid: item.type), 'DELETE', {})
+          .then(function() {
+
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          })
+      },
+      // 添加好友
+      addFriend: openFrameOfAddFriend,
+      // 添加好友电话号码
+      addFriendsPhone: function() {
+        if(app.friend.info.phone.length >= 5) {
+          return screenTopWarning('最多只能为好友添加5个联系电话');
+        }
+        app.friend.info.phone.push('');
+      },
+      // 移除好友电话号码
+      removeFriendsPhone: function(index) {
+        app.friend.info.phone.splice(index, 1);
+      },
+
+      // 上传好友图片
+      uploadFriendNoteImage: function(e) {
+        var input = e.target;
+        var files = input.files;
+        if(files.length === 0) return;
+        var file = files[0];
+        var formDate = new FormData();
+        formDate.append('file', file);
+        uploadFilePromise('/friend/' + app.friend.tUid + '/image', formDate, function(r) {
+          app.friendImageProgress = ((r.loaded/r.total)*100).toFixed(0);
+          if(r.loaded === r.total) {
+            setTimeout(function() {
+              app.friendImageProgress = '';
+            }, 2000)
+          }
+        })
+          .then(function(data) {
+            input.value = null;
+            if(data.friend._id === app.friend._id) {
+              app.friend.info.image = true;
+              if(app.$refs.friendImage) {
+                app.$refs.friendImage.src = '/friend/' + app.friend.tUid + '/image?t=' + Date.now();
+              }
+
+            }
+          })
+      },
+
+      // 保存好友设置
+      saveFriendSettings: function() {
+        if(!app.friend) return;
+        var locationInput = document.getElementById('location');
+        app.friend.info.location = locationInput.value;
+        nkcAPI('/message/settings/' + app.friend.tUid, 'PATCH', {
+          info: app.friend.info,
+          cid: app.friend.cid
+        })
+          .then(function() {
+            screenTopAlert('保存成功');
+            var friend = app.friend.friend;
+            delete app.friend.friend;
+            Vue.set(app.friends, app.friends.indexOf(friend), app.friend);
+            for(var i = 0; i < app.userList.length; i++) {
+              if(app.userList[i].friend && app.userList[i].friend._id === app.friend._id) {
+                app.userList[i].friend = app.friend;
+                break;
+              }
+            }
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          })
+      },
+
+      // 处理好友添加申请
+      postApplication: function(agree, message) {
+        var uid = message.uid;
+        var url;
+        if(agree) {
+          url = '/u/' + uid + '/friends/agree';
+        } else {
+          url = '/u/' + uid + '/friends/disagree';
+        }
+        nkcAPI(url, 'POST', {})
+          .then(function() {
+            message.agree = agree;
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          })
+      },
+
+      /*// 手机
       openMobileList: function() {
-        this.showMobileList = true;
-        this.showMobileSettings = false;
+        app.initMobile('showMobileList');
       },
       openMobileSettings: function() {
-        this.showMobileList = false;
-        this.showMobileSettings = true;
-      },
+        app.initMobile('showMobileSettings');
+      },*/
 
       // 信息框滚动到底部
       scrollToBottom: function() {
@@ -192,20 +466,32 @@ $(function() {
           'STU': 'reminder'
         };
         if(message.ty !== 'UTU') {
+          var systemType;
           for(var i = 0; i < app.userList.length; i++) {
             var li = app.userList[i];
             if(li.type === message.ty) {
-              li.message = message;
-              li.time = message.tc;
-              if(app.target === o[li.type]) {
-                li.count = 0;
-              } else {
-                li.count ++;
-              }
-              app.userList.splice(i, 1);
-              app.userList.unshift(li);
+              systemType = li;
               break;
             }
+          }
+          if(systemType) {
+            systemType.message = message;
+            systemType.time = message.tc;
+            app.userList.splice(app.userList.indexOf(systemType), 1);
+            app.userList.unshift(li);
+          } else {
+            systemType = {
+              type: message.ty,
+              message: message,
+              time: message.tc,
+              count: 0
+            };
+            app.userList.unshift(systemType);
+          }
+          if(app.target === o[systemType.type]) {
+            systemType.count = 0;
+          } else {
+            systemType.count ++;
           }
           return;
         }
@@ -221,10 +507,19 @@ $(function() {
           }
         }
         if(!li) {
+          var friend;
+          for(var i = 0; i < app.friends.length; i++){
+            var f = app.friends[i];
+            if(f.tUid === user.uid) {
+              friend = f;
+              break;
+            }
+          }
           li = {
             type: 'UTU',
             count: 0,
-            user: user
+            user: user,
+            friend: friend
           }
         }
         li.message = message;
@@ -254,8 +549,15 @@ $(function() {
         this.searchText = '';
         this.canGetMessage = true;
         this.searchUsers = [];
-        this.showMobileNavbar = true;
-        this.showMobileList = true;
+        /*this.showMobileNavbar = true;
+        this.showMobileList = true;*/
+        this.showFriendNotes = false;
+        this.showPermissionSettings =false;
+        this.friendImageProgress = '';
+        this.friend = '';
+        this.category = '';
+        this.selectCategoryFriendsId = [],
+        this.editCategory = false;
       },
 
       // 获取聊天记录
@@ -268,11 +570,15 @@ $(function() {
           url = '/message/user/' + this.targetUser.uid;
         } else if(this.target === 'notice') {
           url = '/message/systemInfo';
-        } else {
+        } else if(this.target === 'reminder'){
           url = '/message/remind'
+        } else if(this.target === 'newFriends') {
+          url = '/message/friendsApplication'
         }
         if(this.firstMessageId) {
-          url += '?firstMessageId=' + this.firstMessageId
+          url += '?firstMessageId=' + this.firstMessageId + '&t=' + Date.now();
+        } else {
+          url += '?t=' + Date.now();
         }
         return nkcAPI(url, 'GET', {})
           .then(function(data) {
@@ -347,12 +653,41 @@ $(function() {
         localStorage.userInput = JSON.stringify(userInput);
       },
 
+      // 拓展分类中的好友
+      extendCategoryFriends: function(category) {
+        var friendsId = [];
+        var friends = [];
+        for(var j = 0; j < category.friendsId.length; j++) {
+          var friendId = category.friendsId[j];
+          for(var n = 0; n < app.friends.length; n++) {
+            var friend = app.friends[n];
+            if(friend.targetUser.uid === friendId) {
+              friendsId.push(friend.targetUser.uid);
+              friends.push(friend);
+              break;
+            }
+          }
+        }
+        category.friendsId = friendsId;
+        category.friends = friends;
+        return category;
+      },
+
       // 获取用户列表
       getUserList: function() {
         return new Promise(function(resolve, reject) {
           nkcAPI('/message?t=' + Date.now(), 'GET', {})
             .then(function(data) {
               app.userList = data.userList;
+              app.friends = data.usersFriends;
+
+              // 拓展好友
+              for(var i = 0; i < data.categories.length; i++) {
+                data.categories[i] = app.extendCategoryFriends(data.categories[i]);
+              }
+
+              app.categories = data.categories;
+
               app.user = data.user;
               app.twemoji = data.twemoji;
               var beep = data.user.generalSettings.messageSettings.beep;
@@ -423,11 +758,22 @@ $(function() {
         if(item.type === 'UTU') {
           app.target = 'user';
           app.targetUser = item.user;
+          app.targetUser.friend = item.friend;
           this.getInputTextFromLocal();
           this.getMessage()
             .then(function() {
-              item.count = 0;
               app.scrollToBottom();
+              if(item.count === 0) return;
+              nkcAPI('/message/mark', 'PATCH', {
+                type: 'user',
+                uid: app.targetUser.uid
+              })
+                .then(function() {
+                  item.count = 0;
+                })
+                .catch(function(data) {
+                  screenTopWarning(data.error || data);
+                });
             })
             .catch(function() {
 
@@ -436,17 +782,44 @@ $(function() {
           app.target = 'notice';
           this.getMessage()
             .then(function() {
-              item.count = 0;
               app.scrollToBottom();
+              if(item.count === 0) return;
+              nkcAPI('/message/mark', 'PATCH', {
+                type: 'systemInfo'
+              })
+                .then(function() {
+                  item.count = 0;
+                })
+                .catch(function(data) {
+                  screenTopWarning(data.error || data);
+                });
             })
             .catch(function() {
 
             })
-        } else {
+        } else if(item.type === 'STU'){
           app.target = 'reminder';
           this.getMessage()
             .then(function() {
-              item.count = 0;
+              app.scrollToBottom();
+              if(item.count === 0) return;
+              nkcAPI('/message/mark', 'PATCH', {
+                type: 'remind'
+              })
+                .then(function() {
+                  item.count = 0;
+                })
+                .catch(function(data) {
+                  screenTopWarning(data.error || data);
+                });
+            })
+            .catch(function() {
+
+            })
+        } else if(item.type === 'newFriends'){
+          app.target = 'newFriends';
+          this.getMessage()
+            .then(function() {
               app.scrollToBottom();
             })
             .catch(function() {
@@ -454,6 +827,42 @@ $(function() {
             })
         }
 
+      },
+
+      selectCategory: function(c) {
+        this.initialization();
+        addHistory('category');
+        app.target = 'category';
+        // var c_ = JSON.parse(JSON.stringify(c));
+        // if(!c_.friends) c_.friends = '';
+        if(!c.friends) c.friends = '';
+        app.category = c;
+      },
+
+      selectFriend: function(friend) {
+        this.initialization();
+        addHistory('friend');
+        app.target = 'friend';
+        if(!friend._id) {
+          for(var i = 0; i < app.friends.length; i ++) {
+            var f = app.friends[i];
+            if(f.tUid === friend.targetUser.uid) {
+              friend = f;
+              break;
+            }
+          }
+        }
+        var friend_ = JSON.parse(JSON.stringify(friend));
+        friend_.friend = friend;
+        app.friend = friend_;
+
+        /*nkcAPI('/u/' + app.user.uid + '/friends/' + friend.tUid, 'GET', {})
+          .then(function(data) {
+            app.friend = data.friend;
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          });*/
       },
 
       // 选择表情
@@ -750,6 +1159,13 @@ $(function() {
         app.scrollToBottom();
         app.oldLastMessageId = app.lastId;
       }
+      if(this.showFriendNotes) { // 若处于编辑好友备注
+        var locationElement = document.getElementById('country');
+        if(locationElement && locationElement.innerText === '--') { // 若未初始化过地区，则初始化
+          $('.bs-chinese-region').chineseRegion('source',app.locationData);
+          $('#location').val($('#location').attr('data'));
+        }
+      }
     },
 
     mounted: function() {
@@ -762,6 +1178,16 @@ $(function() {
             });
           }
         });
+
+      $.getJSON('/location.json',function(data){
+        for (var i = 0; i < data.length; i++) {
+          var area = {id:data[i].id,name:data[i].cname,level:data[i].level,parentId:data[i].upid};
+          data[i] = area;
+        }
+        app.locationData = data;
+
+      });
+
       if(socket) {
         if(socket.connected) {
           this.socketStatus = 'connect';
@@ -834,7 +1260,7 @@ $(function() {
                 screenTopWarning(data.error || data);
               })
           }
-        } else {
+        } else if(ty === 'UTU') {
 
           var socketId = message.socketId;
           if(socketId === socket.id) return;
@@ -867,6 +1293,159 @@ $(function() {
             message: message
           });
 
+        } else if(ty === 'friendsApplication') {
+          app.getUserList().then(function() {
+            if(message.agree !== false) {
+              beep('message');
+            }
+          });
+          if(app.target === 'newFriends' && app.user.uid !== message.uid) {
+            var insert = false;
+            for(var i = 0; i < app.messages.length; i++) {
+              var m = app.messages[i];
+              if(m._id === message._id) {
+                m.toc = message.toc;
+                m.description = message.description;
+                m.agree = message.agree;
+                insert = true;
+                break;
+              }
+            }
+            if(!insert) {
+              app.messages.push(message);
+            }
+          }
+        } else if(ty === 'deleteFriend') {
+          var deleterId = message.deleterId;
+          var deletedId = message.deletedId;
+          var targetUid;
+          if(deleterId === app.user.uid) {
+            targetUid = deletedId;
+          } else if(deletedId === app.user.uid) {
+            targetUid = deleterId;
+          } else {
+            return;
+          }
+          for(var i = 0; i < app.friends.length; i++) {
+            var f = app.friends[i];
+            if(f.tUid === targetUid) {
+              app.friends.splice(i, 1);
+              break;
+            }
+          }
+          for(var i = 0; i < app.userList.length; i++) {
+            var li = app.userList[i];
+            if(li.type === 'UTU' && li.user.uid === targetUid) {
+              app.userList.splice(i, 1);
+              break;
+            }
+          }
+        } else if(ty === 'modifyFriend') {
+
+          var friend = message.friend;
+          if(app.user.uid !== friend.uid) return;
+          for(var i = 0; i < app.friends.length; i++) {
+            var f = app.friends[i];
+            if(f.tUid === friend.tUid) {
+              Vue.set(app.friends, i, friend);
+              break;
+            }
+          }
+          for(var i = 0; i < app.userList.length; i++) {
+            var li = app.userList[i];
+            if(li.friend && li.friend.tUid === friend.tUid) {
+              li.friend = friend;
+              break;
+            }
+          }
+
+        } else if(ty === 'removeChat') {
+          var deletedId = message.deletedId;
+          var systemType = false;
+          if(['STU', 'STE', 'newFriends'].indexOf(deletedId) !== -1) {
+            systemType = true;
+          }
+          for(var i = 0; i < app.userList.length; i++) {
+            var li = app.userList[i];
+            // 系统类型、用户
+            if((systemType && li.type === deletedId) || (li.user.uid === deletedId)) {
+              app.userList.splice(i, 1);
+              if(li.type === 'UTU' && deletedId === app.targetUser.uid) {
+                app.initialization();
+              }
+              break;
+            }
+          }
+        } else if(ty === 'markAsRead') {
+          var targetUid = message.targetUid;
+          var uid = message.uid;
+          if(app.user.uid !== uid) return;
+          var messageType = message.messageType;
+          if(messageType === 'user') {
+            for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.type === 'UTU' && li.user.uid === targetUid) {
+                li.count = 0;
+                break;
+              }
+            }
+          } else if (messageType === 'systemInfo') {
+            for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.type === 'STE') {
+                li.count = 0;
+                break;
+              }
+            }
+          } else if(messageType === 'remind') {
+            for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.type === 'STU') {
+                li.count = 0;
+                break;
+              }
+            }
+          }
+        } else if(ty === 'editFriendCategory') {
+          var category = message.category;
+          if(app.user.uid !== category.uid) return;
+          var editType = message.editType;
+          if(editType === 'add') {
+            var existing = false;
+            for(var i = 0; i < app.categories.length; i++) {
+              var c = app.categories[i];
+              if(c._id === category._id) {
+                existing = true;
+                break;
+              }
+            }
+            if(!existing) {
+              category = app.extendCategoryFriends(category);
+              app.categories.unshift(category);
+            }
+          } else if(editType === 'remove') {
+            for(var i = 0; i < app.categories.length; i++) {
+              var c = app.categories[i];
+              if(c._id === category._id) {
+                if(app.category._id === category._id) app.initialization();
+                app.categories.splice(i, 1);
+                break;
+              }
+            }
+          } else if(editType === 'modify') {
+
+            for(var i = 0; i < app.categories.length; i++) {
+              var c = app.categories[i];
+              if(c._id !== category._id) continue;
+              category = app.extendCategoryFriends(category);
+              Vue.set(app.categories, i, category);
+              if(app.category._id === category._id) {
+                app.category = category;
+              }
+              break;
+            }
+
+          }
         }
 
 
@@ -880,6 +1459,12 @@ $(function() {
             li.user.online = false;
           }
         }
+        for(var i = 0; i < app.friends.length; i++) {
+          var li = app.friends[i];
+          if(li.targetUser && li.targetUser.uid === uid) {
+            li.targetUser.online = false;
+          }
+        }
       });
       socket.on('userConnect', function(data) {
         var uid = data.targetUid;
@@ -888,6 +1473,13 @@ $(function() {
           if(li.user && li.user.uid === uid) {
             li.user.online = true;
             li.user.onlineType = data.onlineType;
+          }
+        }
+        for(var i = 0; i < app.friends.length; i++) {
+          var li = app.friends[i];
+          if(li.targetUser && li.targetUser.uid === uid) {
+            li.targetUser.online = true;
+            li.targetUser.onlineType = data.onlineType;
           }
         }
       });

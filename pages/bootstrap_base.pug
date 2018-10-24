@@ -28,6 +28,27 @@ block body
   block footer
     include nkc_footer.pug
   if data.user
+
+    .addFriend#addFriend
+      .body
+        .header
+          .row
+            .col-md-6.text-left 添加好友
+            .col-md-6.text-right(onclick='closeFrameOfAddFriend()')
+              .fa.fa-remove
+        .content
+          .avatar
+            img.center-block(src=``)
+          .username
+          .description
+          .success.text-center
+            div 请求发送成功
+            buttom.btn.btn-danger(onclick="closeFrameOfAddFriend()") 关闭
+          .input
+            .div-textarea
+              textarea.form-control(placeholder='请填写验证信息')
+            button.btn.btn-block.btn-primary(onclick='addFriendByUid()') 发送
+
     div.hidden#socketConfig= JSON.stringify(data.socketConfig)
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)

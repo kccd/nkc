@@ -1,0 +1,14 @@
+for r, index in data.results
+  div(style='margin: 1rem auto;width: 20rem;border: 1px solid red;')
+    p=`${r.t.toLocaleString()}`
+    if r.type === 'thread'
+      span 文章
+    else if r.type === 'digest'
+      span 精选
+    else if r.type === 'latest'
+      span 最新
+    else if r.type === 'message'
+      span 好友消息
+      span=`-${r.message.s}-`
+    else if r.type === 'forum'
+      span 关注的专业

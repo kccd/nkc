@@ -106,6 +106,15 @@ module.exports = {
 		banner: {
 			GET: 'getUserBanner',
 			POST: 'modifyUserBanner'
-		}
+		},
+    friends: {
+		  POST: 'sendAnApplicationToAddAFriend',
+      agree: {
+		    POST: 'agreeApplicationToAddAFriend'
+      },
+      disagree: {
+		    POST: 'disagreeApplicationToAddAFriend'
+      }
+    }
 	}
 };

@@ -76,12 +76,14 @@ socket.on('message', function(data) {
     newMessageRemind('notice');
   } else if(ty === 'STU') {
     newMessageRemind('reminder');
-  } else {
+  } else if(ty === 'UTU') {
     var user = data.user;
     var myUid = data.myUid;
     if(user.uid !== myUid) {
       newMessageRemind('message');
     }
+  } else if(ty === 'friendsApplication') {
+    newMessageRemind('friendsApplication');
   }
 });
 

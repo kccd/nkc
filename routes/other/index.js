@@ -34,6 +34,7 @@ const posterRouter = require('./poster');
 const pageRouter = require('./page');
 const logoRouter = require('./logo');
 const appDownloadRouter = require('./appDownload');
+const testRouter = require('./test');
 // -----------------------------------
 otherRouter
   .get('/latest', async (ctx, next) => {
@@ -85,5 +86,6 @@ otherRouter
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
   .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
   .use('poster', posterRouter.routes(), posterRouter.allowedMethods())
+  .use('test', testRouter.routes(), testRouter.allowedMethods())
   .use('appDownload', appDownloadRouter.routes(), appDownloadRouter.allowedMethods());
 module.exports = otherRouter;

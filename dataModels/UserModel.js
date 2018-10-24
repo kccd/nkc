@@ -701,10 +701,11 @@ userSchema.methods.getPostLimit = async function() {
 		const ptc = role.postToThreadCountLimit;
 		const ptt = role.postToThreadTimeLimit;
 
+		// 限制发帖的数量取最大，限制发帖的时间取最小
     if(pfc > postToForumCountLimit) postToForumCountLimit = pfc;
-    if(pft > postToForumTimeLimit) postToForumTimeLimit = pft;
+    if(pft < postToForumTimeLimit) postToForumTimeLimit = pft;
     if(ptc > postToThreadCountLimit) postToThreadCountLimit = ptc;
-    if(ptt > postToThreadTimeLimit) postToThreadTimeLimit = ptt;
+    if(ptt < postToThreadTimeLimit) postToThreadTimeLimit = ptt;
 	}
 
 	return {

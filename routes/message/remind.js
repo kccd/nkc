@@ -14,7 +14,7 @@ remindRouter
         $lt: firstMessageId
       }
     }
-    await db.MessageModel.updateMany({ty: 'STU', r: user.uid, vd: false}, {$set: {vd: true}});
+    // await db.MessageModel.updateMany({ty: 'STU', r: user.uid, vd: false}, {$set: {vd: true}});
     const remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
     const messages = await db.MessageModel.extendReminder(remind);
     data.messages = messages.reverse();
