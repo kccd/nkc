@@ -8,6 +8,8 @@ router
     const {name, description, friendsId} = body;
     if(!name) ctx.throw(400, '分组名不能为空');
     if(name.length > 20) ctx.throw(400, '分组名不能超过20个字');
+    const sameNameCategory = await db.FriendsCategoryModel.findOne({uid: user.uid, name});
+    if(sameNameCategory) ctx.throw(400, '分组名已存在');
     if(!description) ctx.throw(400, '分组介绍不能为空');
     if(description.length > 250) ctx.throw(400, '分组介绍不能超过20个字');
     const friendsUid = [];
@@ -44,6 +46,8 @@ router
     const {name, description, friendsId} = body;
     if(!name) ctx.throw(400, '分组名不能为空');
     if(name.length > 20) ctx.throw(400, '分组名不能超过20个字');
+    const sameNameCategory = await db.FriendsCategoryModel.findOne({uid: user.uid, name});
+    if(sameNameCategory) ctx.throw(400, '分组名已存在');
     if(!description) ctx.throw(400, '分组介绍不能为空');
     if(description.length > 250) ctx.throw(400, '分组介绍不能超过20个字');
     const friendsUid = [];
@@ -54,12 +58,25 @@ router
     }
     category.name = name;
     category.description = description;
+    const oldFriendsId = category.friendsId;
     category.friendsId = friendsUid;
     category.tlm = Date.now();
     await category.save();
 
     await db.FriendModel.updateMany({uid: user.uid, tUid: {$in: friendsUid}}, {$addToSet: {cid: _id}});
     await db.FriendModel.updateMany({uid: user.uid, tUid: {$nin: friendsUid}}, {$pull: {cid: _id}});
+
+    const allFriendsId = oldFriendsId.concat(friendsUid);
+
+    const friends = await db.FriendModel.find({uid: user.uid, tUid: {$in: allFriendsId}});
+
+    for(const friend of friends) {
+      friend.targetUser = await db.UserModel.findOnly({uid: friend.tUid});
+      await redis.pubMessage({
+        ty: 'modifyFriend',
+        friend: friend.toObject()
+      });
+    }
 
     data.category = category;
     await redis.pubMessage({

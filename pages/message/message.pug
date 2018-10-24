@@ -194,17 +194,18 @@ block content
             .fa.fa-angle-up(v-if="showFriendNotes")
           .form.friend-notes(v-if='showFriendNotes')
             .form-group
-              table.control-label 备注名：
+              label.control-label 备注名：
               input.form-control(v-model='friend.info.name' placeholder="不超过10个字")
             .form-group
-              span 分组：
-              span {{friend.cid}}
-              div(v-for="category in categories")
-                input(type='checkbox' :value='category._id' v-model='friend.cid')
-                label {{category.name}}
+              label.control-label 所在分组：
+              div
+                label(v-for="category in categories" style="margin:0 0.5rem;")
+                  input(type='checkbox' :value='category._id' v-model='friend.cid')
+                  span {{category.name}}
+              button.btn.btn-default.btn-sm(style='margin: .5rem 0;' @click="addFriendCategory") 添加分组
 
             .form-group
-              table.control-label 简介：
+              label.control-label 简介：
               textarea.form-control(placeholder="不超过250个字" v-model='friend.info.description' rows=4)
             .form-group
               label.control-label 所在地区：
@@ -227,7 +228,7 @@ block content
                       #city.tab-pane(role="tabpanel") --
                       #district.tab-pane(role="tabpanel") --
             .form-group
-              table.control-label 联系电话：
+              label.control-label 联系电话：
               .row(v-for="phone, index in friend.info.phone" style='margin-bottom: 0.5rem;')
                 .col-md-10.col-xs-10
                   input.form-control(v-model='friend.info.phone[index]')
@@ -242,7 +243,7 @@ block content
             .form-group(style='position: relative;')
               transition(name='fade')
                 .friend-image-upload(v-if="friendImageProgress" :style="'width: ' + friendImageProgress + '%'")
-              table.control-label 附加图片：
+              label.control-label 附加图片：
               input(@change="uploadFriendNoteImage" type='file' accept="image/*")
               img(v-if='friend.info.image' ref='friendImage' :src='"/friend/" + friend.tUid + "/image"' style='width: 100%;margin-top: 0.5rem;' )
 
