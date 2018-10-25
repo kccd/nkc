@@ -98,7 +98,12 @@ const postSchema = new Schema({
   	type: Boolean,
 		default: false,
 		index: 1
-	}
+	},
+  digestTime: {
+    type: Date,
+    default: null,
+    index: 1
+  }
 }, {toObject: {
   getters: true,
   virtuals: true

@@ -5,9 +5,10 @@ const testRouter = new Router();
 testRouter
   .get('/', async (ctx, next) => {
     const t = Date.now();
-    const {data, db, body, nkcModules, query} = ctx;
+    const {data, db, nkcModules, query} = ctx;
     const {page = 0} = query;
     const user = data.user;
+    // const user = await db.UserModel.findOne({uid: '10'});
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
     const options = {
@@ -15,8 +16,20 @@ testRouter
       rolesId,
       uid: data.user?data.user.uid:''
     };
+    const f2 = await db.ForumModel.getThreadForumsId(rolesId);
+    /*const r1 = Date.now();
     const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
-    const userThreads = await db.ThreadModel.find({uid: user.uid, fid: {$in: fidOfCanGetThreads}}, {tid: 1, _id: 0}).sort({tlm: -1});
+    const r2 = Date.now();
+    const f2 = await db.ForumModel.getThreadForumsId(rolesId);
+    const r3 = Date.now();
+    console.log(`old: ${r2 - r1}ms, new: ${r3 - r2}ms`);
+    console.log(fidOfCanGetThreads.length, f2.length);
+    for(const f of fidOfCanGetThreads) {
+      if(!f2.includes(f)) console.log(f);
+    }*/
+    // 1. 取到用户所有发表的帖子id
+    // 2. 取到用户所有关注的帖子id
+    /*const userThreads = await db.ThreadModel.find({uid: user.uid, fid: {$in: fidOfCanGetThreads}}, {tid: 1, _id: 0}).sort({tlm: -1});
     let tidArr = userThreads.map(t => t.tid);
     const collections = await db.CollectionModel.find({uid: user.uid, fid: {$in: fidOfCanGetThreads}}, {tid: 1, _id: 0});
     const collectionsId = collections.map(c => c.tid);
@@ -30,20 +43,80 @@ testRouter
     const count = await db.ThreadModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
 
+    const results = [];
     const threads = await db.ThreadModel.find(q, {uid: 1, tid: 1, toc: 1, oc: 1, lm: 1, tlm: 1}).skip(paging.start).limit(paging.perpage).sort({tlm: -1});
-    const results = threads.map(thread => {
-      return {
+    for(const thread of threads) {
+      thread.firstPost = await db.PostModel.findOne({pid: thread.oc});
+      thread.lastPost = await db.PostModel.findOne({pid: thread.lm});
+      if(!thread.lastPost || !thread.firstPost) continue;
+      results.push({
         type: 'thread',
         t: thread.tlm,
         thread
-      };
-    });
+      });
+    }*/
 
+
+    const friends = await db.FriendModel.find({uid: user.uid});
+    const friendsId = friends.map(f => f.tUid);
+
+    const userSubscribe = await db.UsersSubscribeModel.findOne({uid: user.uid});
+    const subscribeForums = userSubscribe.subscribeForums;
+    let subscribeForumsId = [];
+    for(const fid of subscribeForums) {
+      subscribeForumsId.push(fid);
+      const childrenFid = await db.ForumModel.getAllChildrenFid(fid);
+      subscribeForumsId = subscribeForumsId.concat(childrenFid);
+    }
+    const q = {
+      fid: {$in: f2},
+      $or: [
+        // 自己的文章与回复
+        {
+          uid: user.uid
+        },
+        // 好友的文章与回复
+        {
+          uid: {
+            $in: friendsId
+          }
+        },
+        // 关注的专业里边的文章与回复
+        {
+          fid: {
+            $in: subscribeForumsId
+          }
+        }
+
+      ]
+    };
+
+    const count = await db.ThreadModel.count(q);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    data.paging = paging;
+
+    const results = [];
+    const threads = await db.ThreadModel.find(q, {uid: 1, tid: 1, toc: 1, oc: 1, lm: 1, tlm: 1}).skip(paging.start).limit(paging.perpage).sort({tlm: -1});
+    for(const thread of threads) {
+      thread.firstPost = await db.PostModel.findOne({pid: thread.oc});
+      thread.lastPost = await db.PostModel.findOne({pid: thread.lm});
+      if(!thread.lastPost || !thread.firstPost) continue;
+      results.push({
+        type: 'thread',
+        t: thread.tlm,
+        thread
+      });
+    }
 
     const arr = [];
 
     const latestThread = await db.ThreadModel.findOne().sort({toc: -1});
-    const digestThread = await db.ThreadModel.findOne({digest: true}).sort({toc: -1});
+    latestThread.firstPost = await db.PostModel.findOne({pid: latestThread.oc});
+    latestThread.lastPost = await db.PostModel.findOne({pid: latestThread.lm});
+    const digestThread = await db.ThreadModel.findOne({digest: true}).sort({digestTime: -1});
+    digestThread.firstPost = await db.PostModel.findOne({pid: latestThread.oc});
+    digestThread.lastPost = await db.PostModel.findOne({pid: latestThread.lm});
+
 
     arr.push({
       type: 'latest',
@@ -53,7 +126,7 @@ testRouter
     arr.push({
       type: 'digest',
       thread: digestThread,
-      t: digestThread.toc
+      t: digestThread.digestTime
     });
 
 
@@ -85,12 +158,14 @@ testRouter
 
     const t2 = Date.now();
 
-    const userSubscribe = await db.UsersSubscribeModel.findOne({uid: user.uid});
-    const subscribeForums = userSubscribe.subscribeForums;
 
     for(const fid of subscribeForums) {
       const forum = await db.ForumModel.findOne({fid});
       const latestThread = await db.ThreadModel.findOne({fid}).sort({toc: -1});
+      if(!latestThread) continue;
+      latestThread.firstPost = await db.PostModel.findOne({pid: latestThread.oc});
+      latestThread.lastPost = await db.PostModel.findOne({pid: latestThread.lm});
+
       arr.push({
         type: 'forum',
         t: latestThread.toc,

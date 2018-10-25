@@ -15,6 +15,7 @@ const http = require('http'),
   fs = require('fs'),
   path = require('path'),
   config = require('./config'),
+  cacheForums = require('./redis/cacheForums'),
 
   {updateDate, upload} = settings,
 
@@ -149,6 +150,7 @@ const start = async () => {
     await dataInit();
     await jobsInit();
     await upload.initFolders();
+    await cacheForums();
   }
 
   await searchInit();

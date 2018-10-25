@@ -30,6 +30,11 @@ const threadSchema = new Schema({
     default: false,
     index: 1
   },
+  digestTime: {
+    type: Date,
+    default: null,
+    index: 1
+  },
   digestInMid: {
     type: Boolean,
     default: false

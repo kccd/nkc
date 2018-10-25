@@ -1,6 +1,8 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const client = settings.redisClient;
+
 
 const forumSchema = new Schema({
 	abbr: {
@@ -215,12 +217,52 @@ forumSchema.virtual('followers')
 	});
 
 forumSchema.virtual('threadTypes')
-	.get(function() {
-		return this._threadTypes;
-	})
-	.set(function(threadTypes) {
-		this._threadTypes = threadTypes;
-	});
+  .get(function() {
+    return this._threadTypes;
+  })
+  .set(function(threadTypes) {
+    this._threadTypes = threadTypes;
+  });
+
+
+
+/*  缓存主页需要的属性   */
+
+forumSchema.virtual('childForums')
+  .get(function() {
+    return this._childForums;
+  })
+  .set(function(childForums) {
+    this._childForums = childForums;
+  });
+
+forumSchema.virtual('allChildForums')
+  .get(function() {
+    return this._allChildForums;
+  })
+  .set(function(allChildForums) {
+    this._allChildForums = allChildForums;
+  });
+
+forumSchema.virtual('allChildForumsId')
+  .get(function() {
+    return this._allChildForumsId;
+  })
+  .set(function(allChildForumsId) {
+    this._allChildForumsId = allChildForumsId;
+  });
+
+forumSchema.virtual('childForumsId')
+  .get(function() {
+    return this._childForumsId;
+  })
+  .set(function(childForumsId) {
+    this._childForumsId = childForumsId;
+  });
+
+/*-----------------------*/
+
+
 
 // 加载版主
 forumSchema.methods.extendModerators = async function() {
@@ -733,5 +775,77 @@ forumSchema.statics.getAllChildrenFid = async function(fid) {
 	const forums = await ForumModel.getAllChildrenForums(fid);
 	return forums.map(f => f.fid);
 };
+
+
+
+forumSchema.statics.getThreadForumsId = async (rolesId, gradeId, user) => {
+  const ForumModel = mongoose.model('forums');
+  const fid = await ForumModel.getAccessibleForumsId(rolesId, gradeId, user);
+
+  const canNotFid = await client.smembersAsync('canNotDisplayInParentForumsId');
+
+  const invalidFid = [];
+
+  // 找出所有无法在父级显示的版块ID
+  for(const f of fid) {
+    if(canNotFid.includes(f)) {
+      let arr = [f];
+      const allChildFid = await client.smembersAsync(`forum:${f}:allChildForumsId`);
+      arr = arr.concat(allChildFid);
+      for(const a of arr) {
+        if(!invalidFid.includes(a)) invalidFid.push(a);
+      }
+    }
+  }
+  const result = [];
+  for(const f of fid) {
+    if(!invalidFid.includes(f)) result.push(f);
+  }
+  return result;
+};
+
+
+forumSchema.statics.getAccessibleForumsId = async (rolesId, gradeId, user) => {
+
+  let fid = [];
+
+  if(!user) {
+
+    for(const roleId of rolesId) {
+      const f = await client.smembersAsync(`role:${roleId}:accessibleForumsId`);
+      fid = fid.concat(f);
+    }
+
+  } else {
+
+    let uid;
+
+    if(typeof user === 'string') {
+      uid = user;
+    } else {
+      uid = user.uid;
+    }
+
+    const fidForUid = await client.smembersAsync(`moderator:${uid}:accessibleForumsId`);
+
+    fid = fid.concat(fidForUid);
+
+    for(const roleId of rolesId) {
+      const fidForRoleAndGrade = await client.smembersAsync`role-grade:${roleId}-${gradeId}`;
+      fid = fid.concat(fidForRoleAndGrade);
+    }
+
+  }
+
+  const result = [];
+  for(const f of fid) {
+    if(result.includes(f)) continue;
+    result.push(f);
+  }
+
+  return result;
+};
+
+
 
 module.exports = mongoose.model('forums', forumSchema);

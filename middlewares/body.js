@@ -35,7 +35,9 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';
+      const t = Date.now();
 	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
+	    console.log(`渲染：${Date.now() - t}ms`);
     }
     await next();
   }

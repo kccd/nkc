@@ -178,17 +178,15 @@ block content
             .friend-count-value {{friend.targetUser.kcb}}
       .ms-friend-button
         .col-xs-12.col-md-10.col-md-offset-1
-          .col-xs-4.col-md-4
+          .col-xs-6.col-md-6
             .row
-              a(:href="'/u/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 名片
-          .col-xs-4.col-md-4
+              a(:href="'/u/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 动态
+          .col-xs-6.col-md-6
             .row
               a(:href="'/m/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 专栏
-          .col-xs-4.col-md-4(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})")
-            .row
-              button.btn.btn-block.btn-default.block-btn 发信息
       .ms-friend-information(v-if='friend.info')
         .col-xs-12.col-md-10.col-md-offset-1
+          button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
           button.btn.btn-block.btn-default(@click='showFriendNotes = !showFriendNotes') 备注信息
             .fa.fa-angle-down(v-if='!showFriendNotes')
             .fa.fa-angle-up(v-if="showFriendNotes")
@@ -266,7 +264,7 @@ block content
             .form-group
               button.btn.btn-primary 保存
           div(style='margin-top: 2rem;')
-            button.btn.btn-block.btn-danger(@click='deleteFriend') 删除好友
+            button.btn.btn-block.btn-default(@click='deleteFriend') 删除好友
       .ms-friend-information.row(v-else)
         .col-md-10.col-md-offset-1
           button.btn.btn-block.btn-success(@click='addFriend(friend.targetUser)') 加为好友
