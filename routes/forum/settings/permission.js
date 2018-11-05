@@ -10,7 +10,7 @@ permissionRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, body, db} = ctx;
+		const {data, body, db, redis} = ctx;
 		const {forum} = data;
 		const {klass, accessible, displayOnParent, visibility, isVisibleForNCC, gradesId, rolesId, relation} = body;
 		const rolesDB = await db.RoleModel.find();
@@ -31,6 +31,7 @@ permissionRouter
 		}
 		if(!['and', 'or'].includes(relation)) ctx.throw(400, '用户角色与用户等级关系设置错误，请刷新页面重试');
 		await forum.update({class: klass, accessible, displayOnParent, visibility, isVisibleForNCC, gradesId: gradesId_, rolesId: rolesId_, relation});
+		await redis.cacheForums();
 		await next();
 	});
 module.exports = permissionRouter;

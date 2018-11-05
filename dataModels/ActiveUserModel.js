@@ -42,4 +42,21 @@ activeUserSchema.methods.extendUser = async function() {
   return this.user = user;
 };
 
+activeUserSchema.statics.extendUsers = async function(activeUsers) {
+  const UserModel = mongoose.model('users');
+  const uid = new Set();
+  activeUsers.map(a => {
+    uid.add(a.uid);
+  });
+  const users = await UserModel.find({uid: {$in: [...uid]}});
+  const usersObj = {};
+  users.map(user => {
+    usersObj[user.uid] = user;
+  });
+  return await Promise.all(activeUsers.map(a => {
+    a.user = usersObj[a.uid];
+    return a;
+  }));
+};
+
 module.exports = mongoose.model('activeUsers', activeUserSchema, 'activeUsers');

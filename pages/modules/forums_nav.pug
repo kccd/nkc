@@ -1,0 +1,9 @@
+ul.mdui-list.mdui-list-dense.forums-nav
+  for forum in data.forums
+    li.mdui-list-item.mdui-ripple
+      .mdui-list-item-avatar
+        img(src=`/forum_avatar/${forum.fid}`)
+      .mdui-list-item-content
+        a.mdui-list-item-title(href=`/f/${forum.fid}`)= forum.displayName
+        div.icon
+          i.mdui-icon.material-icons &#xe5cc;

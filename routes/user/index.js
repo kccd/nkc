@@ -47,21 +47,16 @@ userRouter
 		let paging;
 
 		// --拿到关注的领域
-	  const options = {
-	  	gradeId: data.userGrade._id,
-		  rolesId: data.userRoles.map(r => r._id),
-			uid: user?user.uid: ''
-	  };
-		const visibleFid = await db.ForumModel.visibleFid(options);
+		const visibleFid = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 	  let forumsId = [];
 	  for (let fid of targetUserSubscribe.subscribeForums) {
 		  if (visibleFid.includes(fid) && !forumsId.includes(fid)) {
 			  forumsId.push(fid);
 		  }
 	  }
-	  const count = forumsId.length;
+	  /*const count = forumsId.length;
 	  paging = apiFunction.paging(page, count);
-	  forumsId.slice(paging.start, paging.start + paging.perpage);
+	  forumsId.slice(paging.start, paging.start + paging.perpage);*/
 	  data.targetUserSubscribeforums = await Promise.all(forumsId.map(fid => db.ForumModel.findOnly({fid})));
 	  // --------
 
@@ -87,7 +82,7 @@ userRouter
 			data.targetUsers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
 		} else {
 
-			const accessibleFid = await db.ForumModel.accessibleFid(options);
+			const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
 			const q = {
 				uid,
 				fid: {$in: accessibleFid},

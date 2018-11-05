@@ -16,17 +16,8 @@ searchRouter.get('/', async(ctx, next) => {
   if(type === 'content') {
     const {PostModel} = db;
     // const accessibleFid = await ctx.getThreadListFid();
-		// 拿到用户等级
-		const gradeId = data.userGrade._id;
-		// 拿到用户的角色
-		const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-			gradeId,
-			rolesId,
-			uid: data.user?data.user.uid: ''
-    };
     // 获取用户可以访问的板块
-    const accessibleFid = await db.ForumModel.fidOfCanGetThreads(options);
+    const accessibleFid = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     // console.log(accessibleFid)
     const searchResult = await searchPost(q, page, perpage);
     data.paging = apiFunction.paging(page, searchResult.hits.total);

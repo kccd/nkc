@@ -18,20 +18,18 @@ postRouter
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
 	  const forum = await thread.extendForum();
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
     const {user} = data;
 	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
     // 判断用户是否具有访问该post所在文章的权限
     const options = {
-    	gradeId,
-	    rolesId,
+    	roles: data.userRoles,
+      grade: data.userGrade,
 	    isModerator,
 	    userOperationsId: data.userOperationsId,
-	    uid: user?user.uid: ''
+	    user
     };
     // 权限判断
-	  await post.ensurePermissionNew(options);
+	  await post.ensurePermission(options);
 		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();

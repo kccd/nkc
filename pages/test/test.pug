@@ -1,20 +1,24 @@
-extends ../bootstrap_base
+extends ../modules/mdui_base
 block title
   title 首页测试
 block content
-  .container
-    .row
-      .col-md-6
+  .mdui-container
+    .mdui-row.mdui-m-t-1
+      .mdui-col-md-2
+        include ../modules/forums_nav
+      .mdui-col-md-7
         for r, index in data.results
-          h5= r.t.toLocaleString()
+          //h5= r.t.toLocaleString()
           -const type = r.type;
           .panel.panel-default
             .panel-body
               if type === 'thread'
-                h3.text-center 【文章】
-                h4= `文章ID:${r.thread.tid}`
-                h4= `文章标题:${r.thread.firstPost.t}`
-                p= `文章最新回复：${r.thread.lastPost.c.slice(0, 200)}`
+                -const {thread} = r;
+                include ../modules/thread_panel
+                //- h3.text-center 【文章】
+                  h4= `文章ID:${r.thread.tid}`
+                  h4= `文章标题:${r.thread.firstPost.t}`
+                  p= `文章最新回复：${r.thread.lastPost.c.slice(0, 200)}`
               else if type === 'message'
                 h3.text-center= `【好友私信】`
                 p
@@ -42,19 +46,4 @@ block content
                 h4= `文章ID:${r.thread.tid}`
                 p= `文章最新回复：${r.thread.lastPost.c.slice(0, 200)}`
         include ../interface_navigation_paging
-
-
-  //for r, index in data.results
-    div(style='margin: 1rem auto;width: 20rem;border: 1px solid red;')
-      p=`${r.t.toLocaleString()}`
-      if r.type === 'thread'
-        span 文章
-      else if r.type === 'digest'
-        span 精选
-      else if r.type === 'latest'
-        span 最新
-      else if r.type === 'message'
-        span 好友消息
-        span=`-${r.message.s}-`
-      else if r.type === 'forum'
-        span 关注的专业
+      .mdui-col-md-3

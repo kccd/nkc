@@ -1,0 +1,55 @@
+div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-appbar-scroll-hide mdui-shadow-0 mdui-header")
+  .mdui-container
+    .mdui-toolbar
+      //<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+      a(href="/" class="mdui-typo-headline mdui-text-color-blue mdui-header-name") 科创论坛
+      <a href="/" class="mdui-typo-title">最新</a>
+      <a href="/f" class="mdui-typo-title">分类</a>
+      <a href="/fund" class="mdui-typo-title">基金</a>
+
+      <div class="mdui-toolbar-spacer"></div>
+      .mdui-header-search
+        .mdui-textfield.mdui-textfield-expandable.mdui-float-right
+          button(class="mdui-textfield-icon mdui-btn mdui-btn-icon")
+            i(class="mdui-icon material-icons") search
+          input(class="mdui-textfield-input" type="text" placeholder="关键词、文号、用户")
+          button(class="mdui-textfield-close mdui-btn mdui-btn-icon")
+            i(class="mdui-icon material-icons") close
+      if !data.user
+        <a href="javascript:;" class="mdui-btn mdui-btn-icon">登录</a>
+      else
+        img.mdui-img-circle.mdui-header-avatar(src=`/avatar/${data.user.uid}`)
+        .mdui-header-username(mdui-menu="{target:'#headerMenu'}")= data.user.username
+        ul.mdui-menu#headerMenu
+          li.mdui-menu-item
+            a(href=`/u/${data.user.uid}` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe7fd;
+              | 个人名片
+          li.mdui-menu-item
+            a(href=`/m/${data.user.uid}` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe02f;
+              | 专栏
+          li.mdui-menu-item
+            a(href=`/message` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe0b7;
+              | 信息
+          li.mdui-menu-item
+            a(href=`/u/${data.user.uid}/collections/unclassified` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe3b6;
+              | 收藏
+          li.mdui-menu-item
+            a(href=`/u/${data.user.uid}/drafts` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe151;
+              | 草稿箱
+          li.mdui-divider
+          li.mdui-menu-item
+            a(href=`/u/${data.user.uid}/settings` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe3c9;
+              | 编辑资料
+          li.mdui-divider
+          li.mdui-menu-item
+            a(href=`/logout` class="mdui-ripple")
+              i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe879;
+              | 退出
+    </div>
+</div>

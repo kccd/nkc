@@ -1,8 +1,6 @@
 const Router = require('koa-router');
 const operationRouter = require('./operation');
 const threadRouter = new Router();
-const nkcModules = require('../../nkcModules');
-const digestRouter = require('./digest');
 const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
@@ -81,10 +79,7 @@ threadRouter
 		const thread = await db.ThreadModel.findOnly({tid});
 		const forum = await thread.extendForum();
 		// 验证权限 - new
-		const gradeId = data.userGrade._id;
-		const rolesId = data.userRoles.map(r => r._id);
-		const options = {gradeId, rolesId, uid: data.user?data.user.uid: ''};
-		await thread.ensurePermission(options);
+		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		data.isModerator = isModerator;
 		const breadcrumbForums = await forum.getBreadcrumbForums();
@@ -170,12 +165,8 @@ threadRouter
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-		await Promise.all(posts.map(async post => {
-			await post.extendUser().then(u => u.extendGrade());
-			await post.extendResources();
-		}));
 
-		data.posts = posts;
+		data.posts = await db.PostModel.extendPosts(posts);
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
@@ -187,7 +178,7 @@ threadRouter
 			}
 		});
 		// 加载文章所在专业位置，移动文章的选择框
-		data.forumList = await db.ForumModel.visibleForums(options);
+		data.forumList = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		data.parentForums = await forum.extendParentForum();
 		data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
 		data.selectedArr = breadcrumbForums.map(f => f.fid);
@@ -241,18 +232,19 @@ threadRouter
 		}
 
 		// 加载用户的帖子
-		const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
+		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
 		const q = {
 			uid: data.targetUser.uid,
 			fid: {$in: fidOfCanGetThreads},
 			recycleMark: {$ne: true}
 		};
 		const targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
-		data.targetUserThreads = [];
-		for(const thread of targetUserThreads) {
-			await thread.extendFirstPost();
-			data.targetUserThreads.push(thread);
-		}
+		data.targetUserThreads = await db.ThreadModel.extendThreads(targetUserThreads, {
+		  forum: false,
+      firstPostUser: false,
+      lastPost: false
+    });
+
 
 		// 相似文章
 		data.sameThreads = [];
@@ -271,10 +263,11 @@ threadRouter
 					}
 				}
 			]);
-			for(const thread of sameThreads) {
-				thread.firstPost = await db.PostModel.findOne({pid: thread.oc});
-				data.sameThreads.push(thread);
-			}
+			data.sameThreads = await db.ThreadModel.extendThreads(sameThreads, {
+			  lastPost: false,
+        forum: false,
+        firstPostUser: false
+      });
 		}
 
 		// 关注的用户
@@ -334,14 +327,7 @@ threadRouter
 		await thread.extendForum();
 		data.forum = thread.forum;
 		// 权限判断
-		const gradeId = data.userGrade._id;
-		const rolesId = data.userRoles.map(role => role._id);
-		const options = {
-			gradeId,
-			rolesId,
-			uid: data.user?data.user.uid: ''
-		};
-		await thread.ensurePermission(options);
+		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		const _post = await thread.newPost(post, user, ip);

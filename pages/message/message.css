@@ -431,7 +431,7 @@ body, html{
 }
 .ms-friends-applications{
   overflow-y: scroll;
-  height: 70rem;
+  height: 65rem;
 }
 .ms-notice-body{
   margin: 1rem 0 2rem 0;
