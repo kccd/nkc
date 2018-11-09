@@ -193,12 +193,12 @@ threadRouter
 		const {mid, toMid} = thread;
 		let myForum, othersForum;
 		if(mid !== '') {
-			myForum = await db.PersonalForumModel.findOnly({uid: mid});
+			myForum = await db.PersonalForumModel.findOne({uid: mid});
 			data.myForum = myForum
 		}
 
 		if(toMid !== '') {
-			othersForum = await db.PersonalForumModel.findOnly({uid: toMid});
+			othersForum = await db.PersonalForumModel.findOne({uid: toMid});
 			data.othersForum = othersForum
 		}
 		data.targetUser = await thread.extendUser();

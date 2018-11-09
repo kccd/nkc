@@ -47,6 +47,7 @@ const message = require('./message');
 const test = require('./test');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
+const subscription = require('./homeSubscription');
 const operationObj = {};
 
 
@@ -151,6 +152,8 @@ operationObj.operationTree = {
     test, // 测试路由
 
     friend_category, // 好友分组
+
+    subscription, // 首页我的关注
 	}
 };
 module.exports = operationObj;

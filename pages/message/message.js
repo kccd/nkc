@@ -60,6 +60,7 @@ $(function() {
       showFriendNotes: false,
       showPermissionSettings: false,
       friendImageProgress: '',
+      onlyReceiveFromFriends: false,
 
       // 手机适应
       showMobileNavbar: true,
@@ -690,7 +691,9 @@ $(function() {
 
               app.user = data.user;
               app.twemoji = data.twemoji;
-              var beep = data.user.generalSettings.messageSettings.beep;
+              var messageSettings = data.user.generalSettings.messageSettings;
+              var beep = messageSettings.beep;
+              app.onlyReceiveFromFriends = messageSettings.onlyReceiveFromFriends;
               app.beep = [];
               for(var key in beep) {
                 if(beep.hasOwnProperty(key) && beep[key]) {
@@ -716,7 +719,10 @@ $(function() {
         for(var i = 0; i < app.beep.length; i++) {
           beep[app.beep[i]] = true;
         }
-        nkcAPI('/message/settings', 'PATCH', {beep: beep})
+        nkcAPI('/message/settings', 'PATCH', {
+          beep: beep,
+          onlyReceiveFromFriends: app.onlyReceiveFromFriends
+        })
           .then(function() {
             updateBeep(beep);
             screenTopAlert('保存成功');

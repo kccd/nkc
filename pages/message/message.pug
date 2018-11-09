@@ -245,28 +245,16 @@ block content
               input(@change="uploadFriendNoteImage" type='file' accept="image/*")
               img(v-if='friend.info.image' ref='friendImage' :src='"/friend/" + friend.tUid + "/image"' style='width: 100%;margin-top: 0.5rem;' )
 
-          button.btn.btn-block.btn-default(@click='showPermissionSettings = !showPermissionSettings') 其他设置
+          //button.btn.btn-block.btn-default(@click='showPermissionSettings = !showPermissionSettings') 其他设置
             .fa.fa-angle-down(v-if='!showPermissionSettings')
             .fa.fa-angle-up(v-if="showPermissionSettings")
-          .form.friend-notes(v-if='showPermissionSettings')
-            .form-group
-              table.control-label 备注名：
-              input.form-control(v-model='friend.info.name')
-            .form-group
-              table.control-label 简介：
-              textarea.form-control(v-model='friend.info.description' rows=4)
-            .form-group
-              table.control-label 联系电话：
-              input.form-control(v-model='friend.info.phone')
-            .form-group
-              table.control-label 所在地区：
-              input.form-control(v-model='friend.info.phone')
-            .form-group
-              button.btn.btn-primary 保存
+            .form.friend-notes(v-if='showPermissionSettings')
+
           div(style='margin-top: 2rem;')
             button.btn.btn-block.btn-default(@click='deleteFriend') 删除好友
       .ms-friend-information.row(v-else)
-        .col-md-10.col-md-offset-1
+        .col-xs-12.col-md-10.col-md-offset-1
+          button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
           button.btn.btn-block.btn-success(@click='addFriend(friend.targetUser)') 加为好友
 
 
@@ -366,15 +354,19 @@ block content
     .ms-settings-options
       .ms-settings-options-name 声音提醒：
       .ms-settings-options-content
-        div
-          input(type="checkbox" value="usersMessage" v-model="beep")
-          span &nbsp;私信
-        div
-          input(type="checkbox" value="systemInfo" v-model="beep")
-          span &nbsp;系统通知
-        div
-          input(type="checkbox" value="reminder" v-model="beep")
-          span &nbsp;系统提醒
+        input(type="checkbox" value="usersMessage" v-model="beep")
+        span &nbsp;私信&nbsp;&nbsp;
+        input(type="checkbox" value="systemInfo" v-model="beep")
+        span &nbsp;系统通知&nbsp;&nbsp;
+        input(type="checkbox" value="reminder" v-model="beep")
+        span &nbsp;系统提醒&nbsp;&nbsp;
+    .ms-settings-options
+      .ms-settings-options-name 只接收好友聊天信息
+      .ms-settings-options-content
+        input(type="radio" value="true" v-model="onlyReceiveFromFriends")
+        | &nbsp;是&nbsp;&nbsp;
+        input(type="radio" value="false" v-model="onlyReceiveFromFriends")
+        | &nbsp;否&nbsp;&nbsp;
     .ms-settings-button
       button.btn.btn-default(@click='saveMessageSettings') 保存
   // 好友分组列表

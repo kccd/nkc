@@ -3,14 +3,22 @@ div.thread-panel
     .mdui-chip
       img(class="mdui-chip-icon" src=`/avatar/${thread.uid}`)
       span(class="mdui-chip-title")= thread.firstPost.user.username
-    if thread.forum.parentForum
+    //-if thread.forum.parentForum
       a.thread-panel-forum-name(style={
         'color': '#555555'
       } href=`/f/${thread.forum.parentForum.fid}`)= thread.forum.parentForum.displayName
-    a.thread-panel-forum-name(style={
-      'color': '#555555'
-    } href=`/f/${thread.fid}`)= thread.forum.abbr
+    a.thread-panel-forum-name(href=`/f/${thread.fid}`)= thread.forum.displayName
     span.thread-panel-time= fromNow(thread.toc)
+    if thread.type
+      span.thread-panel-from
+        if thread.type === 'own'
+          span 来自自己的文章
+        else if thread.type === 'subscribeForum'
+          span 来自关注的专业
+        else if thread.type === 'subscribeFriend'
+          span 来自好友
+        else
+          span 来自关注的文章
   .thread-panel-title
     a(href=`/t/${thread.tid}`)= thread.firstPost.t
   .thread-panel-flex

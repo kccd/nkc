@@ -4,14 +4,18 @@ settingsRouter
   .patch('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
-    const {beep, messageSettings} = body;
+    const {beep, onlyReceiveFromFriends, messageSettings} = body;
     const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
     if(messageSettings) {
-      await usersGeneral.update({messageSettings: messageSettings});
+      await usersGeneral.update({
+        messageSettings
+      });
     } else {
-      await usersGeneral.update({'messageSettings.beep': beep});
+      await usersGeneral.update({
+        'messageSettings.beep': beep,
+        'messageSettings.onlyReceiveFromFriends': onlyReceiveFromFriends
+      });
     }
-
     await next();
   })
   .patch('/:uid', async (ctx, next) => {

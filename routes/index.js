@@ -21,7 +21,7 @@ const appRouter = routers.app;
 const messageRouter = routers.message;
 const friendRouter = routers.friend;
 const friendCategoryRouter = routers.friendCategory;
-
+const homeRouter = routers.home;
 
 // 所有请求先经过此中间件
 router.use('/', async (ctx, next)  => {
@@ -61,6 +61,10 @@ router.use('/', async (ctx, next)  => {
 	await next();
 });
 
+/*
+* 首页
+* */
+router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());

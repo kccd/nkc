@@ -576,12 +576,9 @@ body, html{
   padding: 0 1rem;
 }
 .ms-settings-options-name{
-  display: table-cell;
-  width: 8rem;
-  text-align: right;
+  width: 100%;
 }
 .ms-settings-options-content{
-  display: table-cell;
 
 }
 .ms-settings-options{

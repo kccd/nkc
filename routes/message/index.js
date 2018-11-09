@@ -10,6 +10,7 @@ const withdrawnRouter = require('./withdrawn');
 const newMessageRouter = require('./newMessage');
 const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
+const searchRouter = require('./search');
 messageRouter
   .use('/', async (ctx, next) => {
     // 未完善资料的用户跳转到完善资料页
@@ -144,5 +145,6 @@ messageRouter
   .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
   .use('/newMessages', newMessageRouter.routes(), newMessageRouter.allowedMethods())
   .use('/chat', chatRouter.routes(), chatRouter.allowedMethods())
+  .use('/search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods());
 module.exports = messageRouter;

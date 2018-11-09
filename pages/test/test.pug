@@ -1,11 +1,11 @@
-extends ../modules/mdui_base
+extends ../publicModules/mdui_base
 block title
   title 首页测试
 block content
   .mdui-container
     .mdui-row.mdui-m-t-1
       .mdui-col-md-2
-        include ../modules/forums_nav
+        include ../publicModules/forums_nav
       .mdui-col-md-7
         for r, index in data.results
           //h5= r.t.toLocaleString()
@@ -14,7 +14,7 @@ block content
             .panel-body
               if type === 'thread'
                 -const {thread} = r;
-                include ../modules/thread_panel
+                include ../publicModules/thread_panel
                 //- h3.text-center 【文章】
                   h4= `文章ID:${r.thread.tid}`
                   h4= `文章标题:${r.thread.firstPost.t}`
