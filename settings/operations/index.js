@@ -3,6 +3,7 @@
 const resourceObj = require('./resource');
 const {
 	avatar,
+	poster,
 	avatar_small,
 	forum_avatar,
 	r,
@@ -44,6 +45,8 @@ const download = require('./download');
 const forgotPassword = require('./forgotPassword');
 const app = require('./app');
 const message = require('./message');
+const activity = require('./activity');
+const share = require('./share');
 const test = require('./test');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
@@ -70,6 +73,8 @@ operationObj.operationTree = {
 		GET: 'visitHome',// 首页
 
 		logo, // 网站logo
+
+		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,
 
@@ -144,6 +149,10 @@ operationObj.operationTree = {
 		page,
 
 		app,// 手机app
+
+		activity, //活动
+
+		share, // 分享
 
 		message, // 信息（新）
 

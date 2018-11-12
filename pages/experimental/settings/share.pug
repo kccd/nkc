@@ -1,0 +1,36 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 分享设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#app(v-cloak)
+          .col-xs-12.col-md-6
+            table.table.table-striped
+              thead
+                tr
+                  th 名称
+                  th 分享类型
+                  th 有效时长(小时)
+                  th 有效次数(次)
+              tbody
+                tr
+                  th {{shareLimit.shareName}}
+                  th {{shareLimit.shareType}}
+                  th
+                    input(style="max-width: 6rem;" type="text" v-model="shareLimit.shareLimitTime")
+                  th
+                    input(style="max-width: 6rem;" type="text" v-model="shareLimit.shareLimitCount")
+            button.btn.btn-primary(@click='submit') 保存
+
+
+block scripts
+
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/share.js?v=${global.NKC.startTime}`)

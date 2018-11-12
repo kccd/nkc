@@ -30,10 +30,8 @@ block content
               a(:href="'/message/resource/' + message.c.id" target="_blank")
                 img(:src="message.c.src?message.c.src:'/message/resource/' + message.c.id + '?type=sm'")
             div.ms-single-content-file(v-if="message.c.ty === 'file'")
-              span 附件【
-              a(:href="'/message/resource/' + message.c.id" target="_blank" title='点击下载')
-                span &nbsp;{{message.c.na}}
-              span 】
+              .message-file-name.fa.fa-file &nbsp;{{message.c.na}}
+              a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
       // 自己发出的信息
       .ms-single-right(v-else)
         .ms-single-content-div
@@ -57,10 +55,8 @@ block content
             div.ms-single-content-file(v-if="message.c.ty === 'file'")
               span(v-if="!message.c.id") {{message.c.na}}
               span(v-else)
-                span 附件【
-                a(:href="'/message/resource/' + message.c.id" target="_blank" title='点击下载')
-                  span {{message.c.na}}
-                span 】
+                .message-file-name.fa.fa-file &nbsp;{{message.c.na}}
+                a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
         .ms-single-img
           a(href=`/u/${data.user.uid}/settings` target="_blank")
             img(:src="'/avatar/' + message.s")

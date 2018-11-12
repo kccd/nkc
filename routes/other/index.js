@@ -30,6 +30,7 @@ const authRouter = require('./auth');
 const forumAvatarRouter = require('./forum_avatar');
 const coverRouter = require('./cover');
 const frameImgRouter = require('./frameImg');
+const posterRouter = require('./poster');
 const pageRouter = require('./page');
 const logoRouter = require('./logo');
 const appDownloadRouter = require('./appDownload');
@@ -84,6 +85,7 @@ otherRouter
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
   .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
+  .use('poster', posterRouter.routes(), posterRouter.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods())
   .use('appDownload', appDownloadRouter.routes(), appDownloadRouter.allowedMethods());
 module.exports = otherRouter;

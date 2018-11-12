@@ -799,7 +799,11 @@ forumSchema.methods.getAllChildForumsId = async function() {
 forumSchema.methods.ensurePermission = async function(roles, grade, user) {
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
-  return fid.includes(this.fid);
+  if(!fid.includes(this.fid)) {
+    const err = new Error('权限不足');
+    err.status = 403;
+    throw err;
+  }
 };
 
 
@@ -829,7 +833,9 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
   let rolesId, gradeId, uid;
 
   if(typeof roles[0] === 'object') {
+
     rolesId = roles.map(r => r._id);
+
   } else {
     rolesId = roles;
   }
@@ -861,6 +867,7 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
     const fidForUid = await client.smembersAsync(`moderator:${uid}`);
 
     fid = fid.concat(fidForUid);
+
 
     for(const roleId of rolesId) {
       const fidForRoleAndGrade = await client.smembersAsync(`role-grade:${roleId}-${gradeId}`);

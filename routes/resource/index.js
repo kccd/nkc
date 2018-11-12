@@ -13,7 +13,7 @@ resourceRouter
     const resource = await db.ResourceModel.findOnly({ rid });
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
     if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-    if (extArr.includes(resource.ext.toLowerCase()) && resource.references.length == 0 && data.user.uid !== resource.uid) ctx.throw(403, '图片未发表在文章中，不可查看');
+    // if (extArr.includes(resource.ext.toLowerCase()) && resource.references.length == 0 && (!data.user || data.user && data.user.uid !== resource.uid)) ctx.throw(403, '图片未发表在文章中，不可查看');
     const { path, ext } = resource;
     let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
     if (extArr.includes(resource.ext.toLowerCase())) {

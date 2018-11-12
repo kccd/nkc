@@ -1246,3 +1246,59 @@ function addFriendByUid() {
       screenTopWarning(data.error || data);
     })
 }
+
+function shareTo(shareType, type, str, title){
+  var host = window.location.host;
+  var lk = 'http://'+host+'/default/logo3.png'
+  if(str){
+    var para = {
+      'str': str,
+      'type': shareType
+    }
+    nkcAPI('/share', "POST", para)
+    .then(function(data) {
+      var newUrl = 'http://' + host + data.newUrl;
+      if(type == "qq") {
+        window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
+      }
+      if(type == "qzone") {
+        window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
+      }
+      if(type == "weibo") {
+        window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
+      }
+      if(type == "weiChat") {
+        var qrcode = geid('threadCode');
+        if(qrcode) {
+          var path = newUrl;
+          path = path.replace(/\?.*/g, '');
+          QRCode.toCanvas(qrcode, path, {
+            scale: 3,
+            margin: 1,
+            color: {dark: '#000000'}
+          }, function(err) {
+            if(err){
+              screenTopWarning(err);
+            }
+          })
+        }
+      }
+    })
+    .catch(function(data) {
+      screenTopWarning("链接获取失败，请重试")
+    })
+  }
+}
+
+// 获取纯文本(带有去标签),并缩减文字
+function obtainPureText(content, reduce, count) {
+  content = content.replace(/<[^>]+>/g,"");
+  count = parseInt(count);
+  if(reduce === true){
+    if(content.length > count){
+      var lastContent = content.substr(content.length-count,content.length)
+      content = content.substr(0,count) + "...";
+    }
+  }
+  return content;
+}

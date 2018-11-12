@@ -13,6 +13,7 @@ block title
   -let needRemittance = false, needReportAudit = false, needCompletedAudit = false;
   -let useful = (useless === null && disabled === false), modifyAccount = false;
   -let remittanceError, displayRestore;
+  meta(name='description' content=`科创基金 - ${fund.name} ${applicationForm.code?'- ' + applicationForm.code: '暂无详细介绍'}`)
   if useful && status.adminSupport && status.completed !== true
     -for(let i = 0; i < applicationForm.remittance.length; i++)
       -const r = applicationForm.remittance[i];
@@ -359,6 +360,27 @@ block content
                       a(href=`/u/${user.uid}`)
                         img(src=`/avatar/${user.uid}`)
                         span.redFontColor= `${user.username}`
+          .panel.panel-default
+            .panel-body.applicationForm
+              h5.text-center 分享
+              div.changeDisNone.text-center(style='width: 100%;')
+                canvas.qrcode#qrcode
+                .col-xs-12.col-md-12
+                  .col-xs-4.col-md-4(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundapply', 'qq', window.location.href, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
+                      img(src="/default/QQ.png" style="")
+                  .col-xs-4.col-md-4(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundapply', 'qzone', window.location.href, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
+                      img(src="/default/qzone.png" style="")
+                  .col-xs-4.col-md-4(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundapply', 'weibo', window.location.href, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
+                      img(src="/default/weibo.png" style="")
+                  //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundapply', 'qq', window.location.href, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
+                  //-   img(src="/default/QQ.png" style="width:100%")
+                  //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundapply', 'qzone', window.location.href, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
+                  //-   img(src="/default/qzone.png" style="width:100%")
+                  //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundapply', 'weibo', window.location.href, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
+                  //-   img(src="/default/weibo.png" style="width:100%")
 
 
 

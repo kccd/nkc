@@ -33,6 +33,8 @@ const settingSchema = new Schema({
 	  logos: Number,
 		messages: Number,
 		messageFiles: Number,
+		activitys: Number,
+		shares: Number,
     createdChat: Number,
     friends: Number,
     friendsApplications: Number,

@@ -11,9 +11,11 @@ router
     let {uid, username, page = 0} = query;
     if(!uid && !username) ctx.throw(400, 'uid or username is required');
     let users = [];
+    console.log(page, typeof page)
     if(uid && page === 0) {
       uid = uid.trim();
       const u = await db.UserModel.find({uid});
+      console.log(u);
       users = users.concat(u);
     }
     if(username) {

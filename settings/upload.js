@@ -29,7 +29,8 @@ const paths = {
   appPath: 'resources/app',
   androidSavePath: 'resources/app/android',
   iosSavePath: 'resources/app/ios',
-  friendImagePath: 'resources/friend_image'
+  friendImagePath: 'resources/friend_image',
+  posterPath: 'resources/poster'
 };
 
 const pathsObj = {};
@@ -57,6 +58,8 @@ const pfBannerPath = path.resolve('resources/pf_banners');
 const pfAvatarPath = path.resolve('resources/pf_avatars');
 const avatarPath = path.resolve('resources/newavatar');
 const avatarSmallPath = path.resolve('resources/newavatar_small');
+const posterPath = path.resolve('resources/poster');
+const posterSmallPath = path.resolve('resources/poster_small');
 const thumbnailPath = path.resolve('resources/thumbnails');
 const adPath = path.resolve('resources/ad_posts');
 const siteSpecificPath = path.resolve('resources/site_specific');
@@ -150,6 +153,8 @@ const uploadSettings = {
   pfAvatarPath,
   avatarPath,
   avatarSmallPath,
+  posterPath,
+  posterSmallPath,
   thumbnailPath,
   adPath,
   photoPath,

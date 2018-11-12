@@ -1,3 +1,4 @@
+require('colors');
 const {ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
@@ -74,7 +75,6 @@ const cacheForums = async () => {
       // 记下不能在上级专业显示文章的专业ID
       canNotDisplayOnParentForumsId.push(forum.fid);
     }
-
     if(!accessible) {
       // 记下不能访问的专业ID
       canNotAccessibleForumsId.push(forum.fid);
@@ -268,7 +268,7 @@ const cacheForums = async () => {
   console.log(rolesAndGrades);
   console.log(moderators);*/
 
-  console.log(`更新缓存完成，耗时：${Date.now() - t}ms`);
+  console.log(`缓存更新完成`.green);
 
 };
 

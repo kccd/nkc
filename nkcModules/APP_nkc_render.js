@@ -495,7 +495,7 @@ function APP_nkc_render(options){
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>');
     html = html.replace(/<img(.*?)src="\/r(.+?)">/img,'<img$1class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$2" />');
     html = html.replace(/<img src="(\/default\/default_thumbnail.png)">/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org$1" />');
-    html = html.replace(/<img class="PostResourceDownloadThumbnail" src="\/default\/default_thumbnail.png"\/>/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org/default/default_thumbnail.png" />');
+    html = html.replace(/<img class="PostResourceDownloadThumbnail" src=('|")\/default\/default_thumbnail.png('|")\/>/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org/default/default_thumbnail.png" />');
     return html
   }
 
