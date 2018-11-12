@@ -283,13 +283,15 @@ body, html{
 .ms-single-content{
   word-wrap: break-word;
   max-width: 100%;
+  color: #fff;
   /*word-break:break-all;*/
   position: relative;
   line-height: 2.2rem;
-  background-color: #dbe9f5;
+  /*background-color: #dbe9f5;*/
+  background-color: #6aafe6;
   padding: 0.5rem;
   margin-left: 1rem;
-  border-radius: 0 5px 5px 5px;
+  border-radius: 5px;
   display: inline-block;
   min-height: 2.2rem;
 }
@@ -328,11 +330,47 @@ body, html{
 .ms-single-right .ms-single-content{
   margin-right: 1rem;
   float: right;
-  border-radius: 5px 0 5px 5px;
+  border-radius: 5px;
 }
 .ms-single-right .ms-single-time{
   text-align: right;
 }
+.arrow{
+  position: absolute;
+  top: 0;
+  left: -8px;
+  height: 20px;
+  width: 8px;
+  border-radius: 0 0 0 15px;
+  background-color: #6aafe6;
+}
+.arrow:after{
+  content: '';
+  display: block;
+  height: 18px;
+  width: 16px;
+  position: absolute;
+  top: -5px;
+  left: -8px;
+  border-radius: 0 0 0 20px;
+  background-color: #fff;
+}
+.ms-single-right .arrow{
+  left: auto;
+  right: -8px;
+  border-radius: 0 0 15px 0;
+}
+.ms-single-right .arrow:after{
+  content: '';
+  height: 17px;
+  width: 18px;
+  position: absolute;
+  top: -5px;
+  left: auto;
+  right: -10px;
+  border-radius: 0 0 20px 0;
+  background-color: #fff;
+}/*
 .arrow{
   position: absolute;
   width: 0;
@@ -350,7 +388,7 @@ body, html{
   border-top: 1rem solid rgba(0,0,0,0);
   border-left: 1rem solid #dbe9f5;
   border-bottom: 1rem solid rgba(0,0,0,0);
-}
+}*/
 .ms-single{
 
 }
@@ -431,7 +469,7 @@ body, html{
 }
 .ms-friends-applications{
   overflow-y: scroll;
-  height: 70rem;
+  height: 65rem;
 }
 .ms-notice-body{
   margin: 1rem 0 2rem 0;
@@ -576,12 +614,9 @@ body, html{
   padding: 0 1rem;
 }
 .ms-settings-options-name{
-  display: table-cell;
-  width: 8rem;
-  text-align: right;
+  width: 100%;
 }
 .ms-settings-options-content{
-  display: table-cell;
 
 }
 .ms-settings-options{
@@ -1268,4 +1303,15 @@ img.emoji{
 /* 地区选择 输入框圆角  */
 .bs-chinese-region .nav-tabs, .bs-chinese-region.flat .dropdown-menu, .bs-chinese-region.flat .nav-tabs>li>a, .bs-chinese-region.flat input{
   border-radius: 4px;
+}
+.message-file-name {
+  display: block;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #fff;
+}
+.ms-single-content-file a{
+  color: #fff;
+  display: block;
+  text-align: center;
+  text-decoration: none;
 }

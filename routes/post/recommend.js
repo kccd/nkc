@@ -11,12 +11,8 @@ router
     await targetThread.extendForum();
     const gradeId = data.userGrade._id;
     const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-    	gradeId,
-	    rolesId,
-	    uid: data.user?data.user.uid: ''
-    };
-    await targetThread.ensurePermission(options);
+
+    await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
     if(targetPost.disabled) ctx.throw(400, '回复已被屏蔽，暂无法点赞');
     const personal = await db.PersonalForumModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {recPosts: pid}});
     const post = await db.PostModel.findOneAndUpdate({pid}, {$addToSet: {recUsers: user.uid}});

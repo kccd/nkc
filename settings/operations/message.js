@@ -40,5 +40,8 @@ module.exports = {
     PARAMETER: {
       DELETE: 'removeMessageChat'
     }
+  },
+  search: {
+    GET: 'messageSearchUser'
   }
 };

@@ -3,7 +3,7 @@ require('colors');
 const Redis = require('redis');
 const db = require('../dataModels');
 const pub = Redis.createClient();
-
+const cacheForums = require('./cacheForums');
 
 pub.on('error', (err) => {
 
@@ -41,5 +41,6 @@ obj.pubWithdrawn = async (message) => {
   pub.publish('withdrawn', JSON.stringify(message));
 };
 
+obj.cacheForums = cacheForums;
 
 module.exports = obj;

@@ -49,6 +49,7 @@ const activity = require('./activity');
 const share = require('./share');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
+const subscription = require('./homeSubscription');
 const operationObj = {};
 
 
@@ -158,6 +159,8 @@ operationObj.operationTree = {
 
 
     friend_category, // 好友分组
+
+    subscription, // 首页我的关注
 	}
 };
 module.exports = operationObj;

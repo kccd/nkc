@@ -4,46 +4,77 @@ const testRouter = new Router();
 
 testRouter
   .get('/', async (ctx, next) => {
-    const t = Date.now();
-    const {data, db, body, nkcModules, query} = ctx;
+    const {data, db, nkcModules, query} = ctx;
     const {page = 0} = query;
     const user = data.user;
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-      gradeId,
-      rolesId,
-      uid: data.user?data.user.uid:''
-    };
-    const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
-    const userThreads = await db.ThreadModel.find({uid: user.uid, fid: {$in: fidOfCanGetThreads}}, {tid: 1, _id: 0}).sort({tlm: -1});
-    let tidArr = userThreads.map(t => t.tid);
-    const collections = await db.CollectionModel.find({uid: user.uid, fid: {$in: fidOfCanGetThreads}}, {tid: 1, _id: 0});
-    const collectionsId = collections.map(c => c.tid);
-    tidArr = tidArr.concat(collectionsId);
+    // const user = await db.UserModel.findOne({uid: '10'});
+    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+      data.userRoles,
+      data.userGrade,
+      data.user
+    );
+
+    const friends = await db.FriendModel.find({uid: user.uid});
+    const friendsId = friends.map(f => f.tUid);
+
+    const userSubscribe = await db.UsersSubscribeModel.findOne({uid: user.uid});
+    const subscribeForums = userSubscribe.subscribeForums;
+    let subscribeForumsId = [];
+    for(const fid of subscribeForums) {
+      subscribeForumsId.push(fid);
+      const childrenFid = await db.ForumModel.getAllChildrenFid(fid);
+      subscribeForumsId = subscribeForumsId.concat(childrenFid);
+    }
     const q = {
-      tid: {
-        $in: tidArr
-      }
+      fid: {$in: fidOfCanGetThreads},
+      $or: [
+        // 自己的文章与回复
+        {
+          uid: user.uid
+        },
+        // 好友的文章与回复
+        {
+          uid: {
+            $in: friendsId
+          }
+        },
+        // 关注的专业里边的文章与回复
+        {
+          fid: {
+            $in: subscribeForumsId
+          }
+        }
+
+      ]
     };
 
     const count = await db.ThreadModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
+    data.paging = paging;
 
-    const threads = await db.ThreadModel.find(q, {uid: 1, tid: 1, toc: 1, oc: 1, lm: 1, tlm: 1}).skip(paging.start).limit(paging.perpage).sort({tlm: -1});
-    const results = threads.map(thread => {
-      return {
+    const results = [];
+    let threads = await db.ThreadModel.find(q, {uid: 1, tid: 1, toc: 1, oc: 1, lm: 1, tlm: 1, fid: 1, hasCover: 1}).skip(paging.start).limit(paging.perpage).sort({tlm: -1});
+    threads = await db.ThreadModel.extendThreads(threads, {
+      htmlToText: true
+    });
+
+    for(const thread of threads) {
+      results.push({
         type: 'thread',
         t: thread.tlm,
         thread
-      };
-    });
-
+      });
+    }
 
     const arr = [];
 
     const latestThread = await db.ThreadModel.findOne().sort({toc: -1});
-    const digestThread = await db.ThreadModel.findOne({digest: true}).sort({toc: -1});
+    latestThread.firstPost = await db.PostModel.findOne({pid: latestThread.oc});
+    latestThread.lastPost = await db.PostModel.findOne({pid: latestThread.lm});
+    const digestThread = await db.ThreadModel.findOne({digest: true}).sort({digestTime: -1});
+    digestThread.firstPost = await db.PostModel.findOne({pid: latestThread.oc});
+    digestThread.lastPost = await db.PostModel.findOne({pid: latestThread.lm});
+
 
     arr.push({
       type: 'latest',
@@ -53,11 +84,9 @@ testRouter
     arr.push({
       type: 'digest',
       thread: digestThread,
-      t: digestThread.toc
+      t: digestThread.digestTime
     });
 
-
-    const t1 = Date.now();
 
     const chat = await db.CreatedChatModel.find({uid: user.uid});
 
@@ -83,14 +112,13 @@ testRouter
       }
     }));
 
-    const t2 = Date.now();
-
-    const userSubscribe = await db.UsersSubscribeModel.findOne({uid: user.uid});
-    const subscribeForums = userSubscribe.subscribeForums;
-
     for(const fid of subscribeForums) {
       const forum = await db.ForumModel.findOne({fid});
       const latestThread = await db.ThreadModel.findOne({fid}).sort({toc: -1});
+      if(!latestThread) continue;
+      latestThread.firstPost = await db.PostModel.findOne({pid: latestThread.oc});
+      latestThread.lastPost = await db.PostModel.findOne({pid: latestThread.lm});
+
       arr.push({
         type: 'forum',
         t: latestThread.toc,
@@ -98,8 +126,6 @@ testRouter
         latestThread
       })
     }
-
-    const t3 = Date.now();
 
     const hasThread = count > 0;
     const pageCount = paging.pageCount;
@@ -116,6 +142,10 @@ testRouter
       const lastThread = await db.ThreadModel.findOne(q).skip(paging.start-1).limit(1).sort({tlm: -1});
       lastThreadTime = lastThread.tlm;
     }
+
+    // 若文章总页数小于等于1，则将全部的信息按时间排序即可
+    // 若文章总页数大于1且当前为第一页，则将大于最后一篇文章时间的信息插入，小于的应参与下一页的排序
+    // 若文章总页数大于1且当前不处于第一页，则需先取到上一页最后一篇文章的时间，插入小于该时间大于最后一篇文章的数据。若当前为文章的最后一页，则插入小于最后一篇文章时间的数据。
 
     // 没有关于文章信息或文章信息只有一页，只需要将全部信息按时间排序即可
     if(!hasThread || pageCount === 0) {
@@ -166,33 +196,14 @@ testRouter
       }
     }
 
-
-    /*for(const a of arr) {
-      let insert = false;
-      for(let i = 0; i < results.length; i++) {
-        const r = results[i];
-        if(r.t < a.t && lastThread && lastThread.tlm <= a.t) {
-          results.splice(i, 0, a);
-          insert = true;
-          break;
-        }
-      }
-      // 若没有插入过数据且是最后一页，则在最末尾插入数据。
-      if(!insert && (lastPage || lastThread.tlm <= a.t )) {
-        results.push(a);
-      }
-    }*/
-
-    const t4 = Date.now();
-    console.log(`总条数：${results.length}, 最后一页：${isLastPage}`);
-    console.log(`精选、最新：${t1-t}ms, 聊天列表：${t2-t1}ms, 专业列表：${t3-t2}ms, 排序：${t4-t3}ms, 总计：${t4 - t}ms`);
-
-    /*results.map(r => {
-      console.log(`${require('moment')(r.t).format('YYYY-MM-DD HH:mm:ss')} type: ${r.type}`);
-    });*/
-
     data.results = results;
     ctx.template = 'test/test.pug';
+
+    const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+    let forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+    forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+    data.forums = forums.map(forum => forum.toObject());
+
     await next();
 
 

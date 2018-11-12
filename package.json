@@ -22,6 +22,7 @@
   "dependencies": {
     "alidayu-node": "^1.0.3",
     "arangojs": "^5.8.0",
+    "bluebird": "^3.5.2",
     "chart.js": "^2.7.2",
     "cheerio": "^1.0.0-rc.2",
     "colors": "^1.1.2",

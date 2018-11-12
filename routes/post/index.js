@@ -19,25 +19,24 @@ postRouter
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
 	  const forum = await thread.extendForum();
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
     const {user} = data;
 	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
     // 判断用户是否具有访问该post所在文章的权限
     const options = {
-    	gradeId,
-	    rolesId,
+    	roles: data.userRoles,
+      grade: data.userGrade,
 	    isModerator,
 	    userOperationsId: data.userOperationsId,
-	    uid: user?user.uid: ''
+	    user
     };
     // 权限判断		
     if(!token){
-			await post.ensurePermissionNew(options);
+      // 权限判断
+      await post.ensurePermission(options);
 		}else{
 			let share = await db.ShareModel.findOne({"token":token});
 			if(!share) ctx.throw(403, "权限不足");
-			if(share.tokenLife == "invalid") ctx.throw(403, "链接已失效");
+			if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
 			let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
 			if(!shareLimit){
 				shareLimit = new db.ShareLimitModel({});

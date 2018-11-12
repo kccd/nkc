@@ -1,0 +1,38 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+    link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
+    link(rel='stylesheet' href=`/publicModules/style.css?v=${global.NKC.startTime}`)
+    block title
+  body.mdui-theme-primary-light-blue.mdui-theme-accent-red.mdui-appbar-with-toolbar
+    include ../publicModules/header
+    block content
+      h1 mdui
+    script(src=`/Promise/promise.min.js?v=${global.NKC.startTime}`)
+    script(src=`/qrcode/build/qrcode.js?v=${global.NKC.startTime}`)
+    script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+    script(src=`/vue/dist/vue.js?v=${global.NKC.startTime}`)
+    script(src=`/axios/axios.min.js?v=${global.NKC.startTime}`)
+    script(src=`/publicModules/common.js?v=${global.NKC.startTime}`)
+    block scripts
+    script.
+      var qrcode = document.getElementById('androidQrcode');
+      if (qrcode) {
+        var path = window.location.origin;
+        path = path + "/app?t=" + Date.now();
+        QRCode.toCanvas(qrcode, path, {
+          scale: 3,
+          margin: 1,
+          width: 114,
+          color: {dark: '#333333'}
+        }, function (err) {
+          if (err) {
+            screenTopWarning(err);
+          }
+        })
+      }
+

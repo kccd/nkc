@@ -87,6 +87,16 @@ userRouter
     *
     * */
 
+    // 判断是否为好友关系
+    const friendRelationship = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
+    if(!friendRelationship) {
+      // 判断对方是否设置了只接收好友信息
+      const targetUserGeneralSettings = await db.UsersGeneralModel.findOnly({uid});
+      const onlyReceiveFromFriends = targetUserGeneralSettings.messageSettings.onlyReceiveFromFriends;
+      console.log(onlyReceiveFromFriends)
+      if(onlyReceiveFromFriends) ctx.throw(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
+    }
+
     const {content, socketId} = body;
     if(content === '') ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);

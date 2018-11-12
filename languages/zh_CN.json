@@ -336,6 +336,8 @@
     "modifyFriendCategory" : "修改好友分组信息",
     "removeFriendCategory": "删除好友分组",
     "addFriendsCategory": "添加好友分组",
+    "messageSearchUser": "信息中的搜索用户",
+    "visitHomeSubscription": "首页我的关注",
 
     "visitActivityIndex": "访问活动主页面",
     "activityReleaseIndex": "访问活动发布页面",

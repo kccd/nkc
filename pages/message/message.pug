@@ -30,10 +30,8 @@ block content
               a(:href="'/message/resource/' + message.c.id" target="_blank")
                 img(:src="message.c.src?message.c.src:'/message/resource/' + message.c.id + '?type=sm'")
             div.ms-single-content-file(v-if="message.c.ty === 'file'")
-              span 附件【
-              a(:href="'/message/resource/' + message.c.id" target="_blank" title='点击下载')
-                span &nbsp;{{message.c.na}}
-              span 】
+              .message-file-name.fa.fa-file &nbsp;{{message.c.na}}
+              a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
       // 自己发出的信息
       .ms-single-right(v-else)
         .ms-single-content-div
@@ -57,10 +55,8 @@ block content
             div.ms-single-content-file(v-if="message.c.ty === 'file'")
               span(v-if="!message.c.id") {{message.c.na}}
               span(v-else)
-                span 附件【
-                a(:href="'/message/resource/' + message.c.id" target="_blank" title='点击下载')
-                  span {{message.c.na}}
-                span 】
+                .message-file-name.fa.fa-file &nbsp;{{message.c.na}}
+                a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
         .ms-single-img
           a(href=`/u/${data.user.uid}/settings` target="_blank")
             img(:src="'/avatar/' + message.s")
@@ -178,17 +174,15 @@ block content
             .friend-count-value {{friend.targetUser.kcb}}
       .ms-friend-button
         .col-xs-12.col-md-10.col-md-offset-1
-          .col-xs-4.col-md-4
+          .col-xs-6.col-md-6
             .row
-              a(:href="'/u/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 名片
-          .col-xs-4.col-md-4
+              a(:href="'/u/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 动态
+          .col-xs-6.col-md-6
             .row
               a(:href="'/m/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 专栏
-          .col-xs-4.col-md-4(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})")
-            .row
-              button.btn.btn-block.btn-default.block-btn 发信息
       .ms-friend-information(v-if='friend.info')
         .col-xs-12.col-md-10.col-md-offset-1
+          button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
           button.btn.btn-block.btn-default(@click='showFriendNotes = !showFriendNotes') 备注信息
             .fa.fa-angle-down(v-if='!showFriendNotes')
             .fa.fa-angle-up(v-if="showFriendNotes")
@@ -247,28 +241,16 @@ block content
               input(@change="uploadFriendNoteImage" type='file' accept="image/*")
               img(v-if='friend.info.image' ref='friendImage' :src='"/friend/" + friend.tUid + "/image"' style='width: 100%;margin-top: 0.5rem;' )
 
-          button.btn.btn-block.btn-default(@click='showPermissionSettings = !showPermissionSettings') 其他设置
+          //button.btn.btn-block.btn-default(@click='showPermissionSettings = !showPermissionSettings') 其他设置
             .fa.fa-angle-down(v-if='!showPermissionSettings')
             .fa.fa-angle-up(v-if="showPermissionSettings")
-          .form.friend-notes(v-if='showPermissionSettings')
-            .form-group
-              table.control-label 备注名：
-              input.form-control(v-model='friend.info.name')
-            .form-group
-              table.control-label 简介：
-              textarea.form-control(v-model='friend.info.description' rows=4)
-            .form-group
-              table.control-label 联系电话：
-              input.form-control(v-model='friend.info.phone')
-            .form-group
-              table.control-label 所在地区：
-              input.form-control(v-model='friend.info.phone')
-            .form-group
-              button.btn.btn-primary 保存
+            .form.friend-notes(v-if='showPermissionSettings')
+
           div(style='margin-top: 2rem;')
-            button.btn.btn-block.btn-danger(@click='deleteFriend') 删除好友
+            button.btn.btn-block.btn-default(@click='deleteFriend') 删除好友
       .ms-friend-information.row(v-else)
-        .col-md-10.col-md-offset-1
+        .col-xs-12.col-md-10.col-md-offset-1
+          button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
           button.btn.btn-block.btn-success(@click='addFriend(friend.targetUser)') 加为好友
 
 
@@ -368,15 +350,19 @@ block content
     .ms-settings-options
       .ms-settings-options-name 声音提醒：
       .ms-settings-options-content
-        div
-          input(type="checkbox" value="usersMessage" v-model="beep")
-          span &nbsp;私信
-        div
-          input(type="checkbox" value="systemInfo" v-model="beep")
-          span &nbsp;系统通知
-        div
-          input(type="checkbox" value="reminder" v-model="beep")
-          span &nbsp;系统提醒
+        input(type="checkbox" value="usersMessage" v-model="beep")
+        span &nbsp;私信&nbsp;&nbsp;
+        input(type="checkbox" value="systemInfo" v-model="beep")
+        span &nbsp;系统通知&nbsp;&nbsp;
+        input(type="checkbox" value="reminder" v-model="beep")
+        span &nbsp;系统提醒&nbsp;&nbsp;
+    .ms-settings-options
+      .ms-settings-options-name 只接收好友聊天信息
+      .ms-settings-options-content
+        input(type="radio" value="true" v-model="onlyReceiveFromFriends")
+        | &nbsp;是&nbsp;&nbsp;
+        input(type="radio" value="false" v-model="onlyReceiveFromFriends")
+        | &nbsp;否&nbsp;&nbsp;
     .ms-settings-button
       button.btn.btn-default(@click='saveMessageSettings') 保存
   // 好友分组列表
@@ -758,7 +744,7 @@ block content
 
 block scripts
   script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
-  script(src=`/transliteration/lib/browser/transliteration.min.js?v=${global.startTime}`)
+  script(src=`/transliteration/lib/browser/transliteration.min.js?v=${global.NKC.startTime}`)
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
   script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
   script(src=`/xss/dist/xss.js?v=${global.NKC.startTime}`)

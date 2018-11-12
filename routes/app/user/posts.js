@@ -4,15 +4,10 @@ postsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
 		const {postOnly, page = 0} = query;
-		const {user, userGrade, userRoles} = data;
 		const {uid} = params;
-		const options = {
-			gradeId: userGrade._id,
-			rolesId: userRoles.map(r => r._id),
-			uid: user?user.uid: ''
-		};
+
 		// 获取能访问的专业ID
-		const accessibleFid = await db.ForumModel.accessibleFid(options);
+		const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
 
 		let operationId;
 

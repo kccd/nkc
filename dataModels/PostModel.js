@@ -98,7 +98,12 @@ const postSchema = new Schema({
   	type: Boolean,
 		default: false,
 		index: 1
-	}
+	},
+  digestTime: {
+    type: Date,
+    default: null,
+    index: 1
+  }
 }, {toObject: {
   getters: true,
   virtuals: true
@@ -185,13 +190,26 @@ postSchema.methods.ensurePermissionNew = async function(options) {
 	}
 };
 
-postSchema.methods.ensurePermission = async function(ctx) {
-  const {ThreadModel} = ctx.db;
-  const thread = await ThreadModel.findOnly({tid: this.tid});
-  // 同时满足以下条件返回true
-  // 1、能浏览所在帖子
-  // 2、post没有被禁 或 用户为该板块的版主 或 具有比版主更高的权限
-  return (await thread.ensurePermission(ctx) && (!this.disabled || await thread.ensurePermissionOfModerators(ctx)));
+postSchema.methods.ensurePermission = async function(options) {
+  const {isModerator, userOperationsId, user, roles, grade} = options;
+  await this.thread.ensurePermission(roles, grade, user);
+  const uid = user?user.uid: '';
+  if(this.disabled) {
+    if(!isModerator) {
+      if(this.toDraft && !userOperationsId.includes('displayRecycleMarkThreads')) {
+        if(!uid || uid.uid !== this.uid) {
+          const err = new Error('权限不足');
+          err.status = 403;
+          throw err;
+        }
+      }
+      if(!this.toDraft && !userOperationsId.includes('displayDisabledPosts')) {
+        const err = new Error('权限不足');
+        err.status = 403;
+        throw err;
+      }
+    }
+  }
 };
 
 
@@ -453,5 +471,67 @@ postSchema.post('save', async function(doc, next) {
     return next(e)
   }
 });
+
+const defaultOptions = {
+  user: true,
+  userGrade: true,
+  resource: true
+};
+
+postSchema.statics.extendPosts = async (posts, options) => {
+  const UserModel = mongoose.model('users');
+  const UsersGradeModel = mongoose.model('usersGrades');
+  const ResourceModel = mongoose.model('resources');
+  const o = Object.create(defaultOptions);
+  Object.assign(o, options);
+  const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {};
+
+  let grades, resources;
+  posts.map(post => {
+    pid.add(post.pid);
+    if(o.user) {
+      uid.add(post.uid);
+    }
+  });
+  if(o.user) {
+    const users = await UserModel.find({uid: {$in: [...uid]}});
+    if(o.userGrade) {
+      grades = await UsersGradeModel.find().sort({score: -1});
+    }
+    users.map(user => {
+      usersObj[user.uid] = user;
+      if(!o.userGrade) return;
+      for(const grade of grades) {
+        if((user.score < 0?0:user.score) >= grade.score) {
+          user.grade = grade;
+          break;
+        }
+      }
+    });
+  }
+
+  if(o.resource) {
+    resources = await ResourceModel.find({references: {$in: [...pid]}});
+    resources.map(resource => {
+      resource.references.map(id => {
+        if(!resourcesObj[id]) resourcesObj[id] = [];
+        resourcesObj[id].push(resource);
+      });
+    });
+  }
+
+  return posts.map(post => {
+    if(o.user) {
+      post.user = usersObj[post.uid];
+    }
+    if(o.resource) {
+      post.resources = resourcesObj[post.pid];
+    }
+
+    return post.toObject();
+
+  });
+
+};
 
 module.exports = mongoose.model('posts', postSchema);

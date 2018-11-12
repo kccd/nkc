@@ -33,7 +33,7 @@ forumRouter
 		};
 		options.rolesId = userRoles.map(r => r._id);
 		// 拿到该专业下可从中拿文章的所有子专业id
-		const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
+		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
 		fidOfCanGetThreads.push(forum.fid);
 
 		match.fid = {$in: fidOfCanGetThreads};

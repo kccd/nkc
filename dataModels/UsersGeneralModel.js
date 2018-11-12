@@ -87,6 +87,11 @@ const usersGeneralSchema = new Schema({
         type: Boolean,
         default: true
       }
+    },
+    // 权限设置
+    onlyReceiveFromFriends: {
+      type: Boolean,
+      default: false
     }
   }
 }, {

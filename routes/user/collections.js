@@ -17,16 +17,7 @@ collectionsRouter
       targetUser = await db.UserModel.findOnly({uid: targetUserUid});
     }
 
-		// 拿到用户等级
-		const gradeId = data.userGrade._id;
-		// 拿到用户的角色
-		const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-			gradeId,
-			rolesId,
-			uid: data.user?data.user.uid: ''
-    };
-    data.forumList = await db.ForumModel.accessibleFid(options);
+    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
     data.targetUser = targetUser;
     let categoryNames = await db.CollectionModel.aggregate([
       {$match: {uid: targetUserUid}},
@@ -63,7 +54,7 @@ collectionsRouter
       if(thread){
         await thread.extendForum();
         try{
-          await thread.ensurePermission(options)
+          await thread.ensurePermission(data.userRoles, data.userGrade, data.user)
 
           categoryCollection.push(collection)
         }catch(err){

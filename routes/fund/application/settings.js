@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
-const dbFn = require('../../../nkcModules/dbFunction');
 settingsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, nkcModules} = ctx;
@@ -24,13 +23,8 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		if(s === 4) {
-			const options = {
-				uid: user?user.uid: '',
-				gradeId: data.userGrade._id,
-				rolesId: data.userRoles.map(r => r._id)
-			};
 			const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-			const forums = await db.ForumModel.visibleForums(options);
+			const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 			data.forumList = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 		}
 		if(s > 5) ctx.throw(404, 'not found');

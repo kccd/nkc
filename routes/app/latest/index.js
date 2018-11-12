@@ -6,14 +6,8 @@ router
   .get('/', async(ctx, next) => {
     const {data, query, db, nkcModules} = ctx;
     const {page = 0} = query;
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-      gradeId,
-      rolesId,
-      uid: data.user?data.user.uid:''
-    };
-    const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
+
+    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     const q = {
       recycleMark: {$ne: true},
       fid: {$in: fidOfCanGetThreads}

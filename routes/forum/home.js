@@ -4,17 +4,8 @@ homeRouter
 	.get('/', async (ctx, next) => {
 		const {data} = ctx;
 		const {forum} = data;
-		const extend = async (threads) => {
-			await Promise.all(threads.map(async thread => {
-				await thread.extendFirstPost().then(p => p.extendUser());
-				await thread.extendLastPost().then(p => p.extendUser());
-				await thread.extendForum().then(f => f.extendParentForum());
-			}));
-		};
 		await forum.extendValuableThreads();
 		await forum.extendBasicThreads();
-		await extend(forum.valuableThreads);
-		await extend(forum.basicThreads);
 		data.type = 'home';
 		if(forum.valuableThreads.length === 0 &&
 			forum.basicThreads.length === 0 &&

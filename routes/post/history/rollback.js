@@ -6,17 +6,13 @@ router
     const {pid, _id} = ctx.params;
     const {db, data, address, port} = ctx;
     const {user} = data;
-    const options = {
-    	rolesId: data.userRoles.map(r => r._id),
-	    gradeId: data.userGrade._id,
-	    uid: user?user.uid: ''
-    };
+
     const {PostModel, HistoriesModel, ThreadModel} = db;
     const originPost = await PostModel.findOnly({pid});
     let targetPost = await HistoriesModel.findOnly({_id});
     const targetThread = await ThreadModel.findOnly({tid: targetPost.tid});
     await targetThread.extendForum();
-	  await targetThread.ensurePermission(options);
+	  await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
     const _copy = Object.assign({}, originPost.toObject());
     _copy._id = undefined;
     const history = new HistoriesModel(_copy);

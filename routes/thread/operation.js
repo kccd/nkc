@@ -9,14 +9,8 @@ operationRouter
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
 		await thread.extendForum();
-		const gradeId = data.userGrade._id;
-		const rolesId = data.userRoles.map(r => r._id);
-		const options = {
-			gradeId,
-			rolesId,
-			uid: user?user.uid: ''
-		};
-		await thread.ensurePermission(options);
+
+		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
 		if(collection) ctx.throw(400, '该贴子已经存在于您的收藏中，没有必要重复收藏');
 		const newCollection = new db.CollectionModel({
@@ -38,7 +32,7 @@ operationRouter
 		const {db, data} = ctx;
 		const {user} = data;
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
-    if(!collection) ctx.throw(403,'抱歉，你尚未收藏该帖');
+    if(!collection) ctx.throw(403,'抱歉，你尚未收藏该文章');
     await collection.remove();
     await next();
 	})
@@ -47,7 +41,7 @@ operationRouter
 		const {user} = data;
 		const {tid} = ctx.params;
 		let {fid, cid, para} = ctx.body;
-		if(tid === undefined) ctx.throw(400, '参数不正确')
+		if(tid === undefined) ctx.throw(400, '参数不正确');
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid})
 		data.targetUser = await thread.extendUser();

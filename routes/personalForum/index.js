@@ -49,12 +49,7 @@ router
       subscribeUsers: userSubscribe.subscribeUsers,
       subscribers: userSubscribe.subscribers
     };
-    const options = {
-    	gradeId: data.userGrade._id,
-	    rolesId: data.userRoles.map(r => r._id),
-	    uid: data.user?data.user.uid: ''
-    };
-    const fidOfCanGetThread = await ForumModel.fidOfCanGetThreads(options);
+    const fidOfCanGetThread = await ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     if(tab === 'reply') {
 			const q = {
 				uid,
@@ -126,20 +121,23 @@ router
 			q.recycleMark = {$ne: true};
       // $matchThread = $matchThread.set('recycleMark', {"$nin":[true]});
       const threads = await ThreadModel.find(q).sort($sort).skip(page*perpage).limit(perpage);
-      data.threads = await Promise.all(threads.map(async thread => {
+      data.threads = await ThreadModel.extendThreads(threads, {
+        forum: false
+      });
+      /*data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
           await p.extendUser();
           await p.extendResources();
         });
         await thread.extendLastPost().then(p => p.extendUser());
         return thread;
-      }));
+      }));*/
       const length = await ThreadModel.count(q);
       data.paging = paging(page, length)
     }
     else if(tab === 'recommend') {
       let $postMatch = matchBase.set('pid', {$in: personalForum.recPosts}).toJS();
-      let $matchThread = matchBase.set('fid', {$in: accessibleFid}).toJS();
+      let $matchThread = matchBase.set('fid', {$in: fidOfCanGetThread}).toJS();
       if(digest){
         $matchThread = $matchThread.set('$or', [{digest: true}, {digestInMid: true}]);
       }
@@ -412,13 +410,17 @@ router
     ctx.template = 'interface_personal_forum.pug';
     if(ctx.data.user)
       ctx.data.userThreads = await ctx.data.user.getUsersThreads();
-    ctx.data.forumList = await ForumModel.accessibleForums(options);
+    ctx.data.forumList = await ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
     ctx.data.digest = digest;
     ctx.data.tab = tab;
     ctx.data.sortby = sortby;
     if(data.threads) {
 	    await Promise.all(data.threads.map(async thread => {
-		    await thread.extendForum().then(forum => forum.extendParentForum())
+	      const forum = await ForumModel.findOne({fid: thread.fid});
+	      thread.forum = forum;
+	      if(forum && forum.parentId) {
+          await forum.extendParentForum();
+        }
 	    }));
     }
     await next()

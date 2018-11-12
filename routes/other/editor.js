@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const editorRouter = new Router();
-const nkcModules = require('../../nkcModules');
 editorRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
@@ -27,15 +26,11 @@ editorRouter
     // 如果需要重新编辑html与语言的帖子，就使用新编辑器
 
     if(type !== 'application') {
-    	const gradeId = data.userGrade._id;
-    	const rolesId = data.userRoles.map(r => r._id);
-    	const options = {gradeId, rolesId};
-	    data.forumList = await db.ForumModel.accessibleForums(options);
+	    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 	    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 	    if(type === 'forum' && id) {
 	    	const forum = await db.ForumModel.findOnly({fid: id});
-	    	options.uid = user.uid;
-	    	await forum.ensurePermissionNew(options);
+	    	await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	    	const breadcrumbForums = await forum.getBreadcrumbForums();
 	    	data.selectedArr = breadcrumbForums.map(forum => forum.fid);
 	    	data.selectedArr.push(forum.fid);

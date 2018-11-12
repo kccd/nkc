@@ -231,7 +231,7 @@ const initSocket = async () => {
       if(clients.length > 4) {
         let num = clients.length - 4;
         for(let i = 0; i < num; i++) {
-          socketIo.to(clients[i]).disconnect(true);
+          socketIo.connected[clients[i]].disconnect(true);
         }
       }
 
