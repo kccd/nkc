@@ -88,6 +88,23 @@ const activitySchema = new Schema({
   }
 });
 
+
+activitySchema.virtual('posts')
+.get(function() {
+  return this._post;
+})
+.set(function(post) {
+  this._post = post;
+});
+
+activitySchema.virtual('user')
+.get(function() {
+  return this._user;
+})
+.set(function(user) {
+  this._user = user;
+});
+  
 activitySchema.methods.extendUser = async function() {
   const UserModel = mongoose.model('users');
   const user = await UserModel.findOnly({uid: this.uid});
@@ -102,10 +119,13 @@ activitySchema.methods.extendUserPersonal = async function() {
 
 activitySchema.methods.extendPost = async function() {
   const ActivityPostModel = mongoose.model('activityPost');
-  const posts = await ActivityPostModel.find({acid:this.acid});
+  let posts = await ActivityPostModel.find({acid:this.acid});
   await Promise.all(posts.map(async post => {
-  	await post.extendUser();
+    await post.extendUser();
+    post = post.toObject();
+    return post;
   }));
+
   return this.posts = posts;
 }
 module.exports = mongoose.model('activity', activitySchema, 'activity');

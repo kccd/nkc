@@ -75,6 +75,7 @@ threadRouter
 	})
 	.get('/:tid', async (ctx, next) => {
 		const {data, params, db, query, nkcModules} = ctx;
+		const {token} = query;
 		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
 		data.highlight = highlight;
@@ -84,7 +85,27 @@ threadRouter
 		const gradeId = data.userGrade._id;
 		const rolesId = data.userRoles.map(r => r._id);
 		const options = {gradeId, rolesId, uid: data.user?data.user.uid: ''};
-		await thread.ensurePermission(options);
+		// 如果是分享出去的连接，含有token，则允许直接访问
+		if(!token){
+			await thread.ensurePermission(options);
+		}else{
+			let share = await db.ShareModel.findOne({"token":token});
+			if(!share) ctx.throw(403, "权限不足");
+			if(share.tokenLife == "invalid") ctx.throw(403, "链接已失效");
+			let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
+			if(!shareLimit){
+				shareLimit = new db.ShareLimitModel({});
+				await shareLimit.save();
+			}
+			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+			let nowTimeStamp = parseInt(new Date().getTime());
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
+				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				return ctx.throw(403, "链接已失效");
+			}
+			let reqUrl = ctx.origin + ctx.path;
+			if(reqUrl !== share.shareUrl) ctx.throw(403, "权限不足")
+		}
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		data.isModerator = isModerator;
 		const breadcrumbForums = await forum.getBreadcrumbForums();

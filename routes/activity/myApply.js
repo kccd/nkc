@@ -9,11 +9,20 @@ myApplyRouter
     }
     const applys = await db.ActivityApplyModel.find({"uid":user.uid, "applyStatus":"success"}).sort({toc: 1});
     await Promise.all(applys.map(async apply => {
-			await apply.extendActivity();
+      await apply.extendActivity();
 		}));
-
-    console.log(applys)
+    for(var i in applys){
+      applys[i] = applys[i].toObject();
+      const acti = await db.ActivityModel.findOnly({acid: applys[i].acid});
+      applys[i].activityTitle = acti.activityTitle;
+      applys[i].posterId = acti.posterId;
+      applys[i].enrollStartTime = acti.enrollStartTime;
+      applys[i].holdStartTime = acti.holdStartTime;
+      applys[i].signUser = acti.signUser;
+      applys[i].activityType = acti.activityType;
+    }
     data.applys = applys;
+    console.log(data.applys)
 		ctx.template = 'activity/myActivityApply.pug';
 		await next();
   })

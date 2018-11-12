@@ -78,10 +78,18 @@ const activityApplySchema = new Schema({
   }
 });
 
+activityApplySchema.virtual('activity')
+.get(function() {
+  return this._activity;
+})
+.set(function(activity) {
+  this._activity = activity;
+});
+
 activityApplySchema.methods.extendActivity = async function() {
   const ActivityModel = mongoose.model('activity');
   const activity = await ActivityModel.findOnly({acid: this.acid});
-  return this.activity = activity;
+  return this.activity = activity.toObject();
 };
 
 module.exports = mongoose.model('activityApply', activityApplySchema, 'activityApply');

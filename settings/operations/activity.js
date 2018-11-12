@@ -29,7 +29,8 @@ module.exports = {
     PARAMETER: {
       GET: 'getActivifyModify',
       POST: 'postActivityModify',
-      DELETE: 'delActivityModify'
+      DELETE: 'delActivityModify',
+      PATCH: 'sendActivityMessage'
     }
   }
 };

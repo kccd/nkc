@@ -1,7 +1,16 @@
 $(document).ready(function(){
   var replyCon = $("#replyxxx").html();
   // $("#text-elem").html(replyCon)
-  editor.txt.html(htmlDecode(replyCon))
+  editor.txt.html(htmlDecode(replyCon));
+
+  var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementById("tabExc").outerHTML + "</body></html>";
+  // 实例化一个Blob对象，其构造函数的第一个参数是包含文件内容的数组，第二个参数是包含文件类型属性的对象
+  var blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  var a = document.getElementById("outExc");
+  // 利用URL.createObjectURL()方法为a元素生成blob URL
+  a.href = URL.createObjectURL(blob);
+  // 设置文件名
+  a.download = "活动报名表.xls";
 })
 
 //html解码
@@ -171,6 +180,14 @@ function submitredit(acid){
     // 检查活动详情
     var description = document.getElementById('text-elem').innerHTML;
     description = common.URLifyHTML(description);
+
+    // 是否通知
+    var isnotice = $("#isnotice").is(":checked");
+    var noticeContent = "";
+    if(isnotice)
+    {
+      noticeContent = $("#noticeContent").text();
+    }
   
   
     var post = {
@@ -186,14 +203,16 @@ function submitredit(acid){
       contactNum: contactNum,
       posterId: posterSrc,
       description: description,
-      continueTofull: continueTofull
+      continueTofull: continueTofull,
+      isnotice: isnotice,
+      noticeContent: noticeContent
     }
   
     nkcAPI('/activity/modify/'+acid, "POST" ,{post:post})
     .then(function(data) {    
       screenTopAlert("修改成功！");
       setTimeout(function() {
-        window.location.reload();
+        window.location.href = "/activity/list";
       }, 1500);
     })
     .catch(function(data){
@@ -238,4 +257,27 @@ function closeActivity(acid) {
     .catch(function(data){
       screenTopWarning(data.error)
     })
+}
+
+// 发送通知
+function sendMessage(acid) {
+  var noticeContent = $("#noticeContent").text();
+  var post = {
+    noticeContent: noticeContent
+  }
+  var url = '/activity/modify/' + acid;
+  var method = "PATCH";
+  var alertInfo = "通知已发给全体报名者"
+  nkcAPI(url, method, post)
+    .then(function(){
+      screenTopAlert(alertInfo);
+    })
+    .catch(function(data){
+      screenTopWarning(data.error)
+    })
+}
+
+// 导出excel
+function outExcel() {
+
 }

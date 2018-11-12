@@ -1,5 +1,6 @@
 extends bootstrap_base
 block title
+  meta(name='description' content=`${data.fund.description.brief}` || '暂无基金介绍')
   -const fund = data.fund;
   -let applicationForms;
   -let isCensor = true;
@@ -123,5 +124,45 @@ block content
                 h3 补充说明
                 hr
                 div!= markdown_safe(fund.description.detailed)
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-body.fund-description
+                h3 分享基金
+                hr
+                div.changeDisNone.text-center(style='width: 100%;')
+                  canvas.qrcode#qrcode
+                  .col-xs-12.col-md-12
+                    .col-xs-4.col-md-4(style="padding:0px")
+                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundList', 'qq', window.location.href, '科创基金')`)
+                        img(src="/default/QQ.png" style="")
+                    .col-xs-4.col-md-4(style="padding:0px")
+                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundList', 'qzone', window.location.href, '科创基金')`)
+                        img(src="/default/qzone.png" style="")
+                    .col-xs-4.col-md-4(style="padding:0px")
+                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundList', 'weibo', window.location.href, '科创基金')`)
+                        img(src="/default/weibo.png" style="")
+                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qq', window.location.href, '科创基金雨行动')`)
+                    //-   img(src="/default/QQ.png" style="width:100%")
+                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qzone', window.location.href, '科创基金雨行动')`)
+                    //-   img(src="/default/qzone.png" style="width:100%")
+                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'weibo', window.location.href, '科创基金雨行动')`)
+                    //-   img(src="/default/weibo.png" style="width:100%")
+block scripts
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script.
+    	var qrcode = geid('qrcode');
+      if(qrcode) {
+        var path = window.location.href;
+        path = path.replace(/\?.*/g, '');
+        QRCode.toCanvas(qrcode, path, {
+          scale: 3,
+          margin: 1,
+          color: {dark: '#000000'}
+        }, function(err) {
+          if(err){
+            screenTopWarning(err);
+          }
+        })
+      }
 
 

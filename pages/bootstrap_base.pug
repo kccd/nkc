@@ -71,7 +71,8 @@ block body
     <script src="/external_pkgs/highlight/highlight.pack.js"></script>
   script.
     if(window.HighlightEverything){window.HighlightEverything()}
-    var qrcode = geid('androidQrcode');
+    //- var qrcode = geid('androidQrcode');
+    var qrcode = document.getElementById('androidQrcode');
     if (qrcode) {
       var path = window.location.origin;
       path = path + "/app?t=" + Date.now();

@@ -7,7 +7,7 @@ releaseRouter
 	})
 	.post('/', async (ctx, next) => {
 		const {data, params, db, body, address: ip, query, nkcModules} = ctx;
-		const {ActivityModel, SettingModel} = db;
+		const {ActivityModel, SettingModel, ActivityHistoryModel} = db;
 		const {user} = data;
 		const {post} = body;
 		const {activityTitle, address, sponsor, limitNum, enrollStartTime, enrollEndTime, holdStartTime, holdEndTime, activityType, posterId, description, contactNum, continueTofull,conditions} = post;
@@ -31,7 +31,23 @@ releaseRouter
 			uid: user.uid
 		});
 		await activityInfo.save();
-
+		const activityHistory = new ActivityHistoryModel({
+			acid,
+			activityTitle,
+			description,
+			posterId,
+			address,
+			sponsor,
+			limitNum,
+			enrollStartTime,
+			enrollEndTime,
+			holdStartTime,
+			holdEndTime,
+			contactNum,
+			continueTofull,
+			uid: user.uid
+		})
+		await activityHistory.save();
 		// 活动申请限制，每日一次
 		await next();
 	});

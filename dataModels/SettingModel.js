@@ -34,6 +34,7 @@ const settingSchema = new Schema({
 		messages: Number,
 		messageFiles: Number,
 		activitys: Number,
+		shares: Number,
     createdChat: Number,
     friends: Number,
     friendsApplications: Number,

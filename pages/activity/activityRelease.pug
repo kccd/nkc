@@ -99,6 +99,8 @@ block content
                       p 1、海报尺寸 1080*640，.jpg 或 .png格式，不超过 4M
                     .col-sm-12 
                       p 2、精美海报有助于吸引吃瓜群众围观，增加报名量！
+                    .col-sm-12 
+                      p 3、选定海报后一定要确认上传
                   .col-sm-5
                     .row
                       .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
@@ -151,38 +153,56 @@ block content
                     span 学历
                     input#wor(type="checkbox")
                     span 单位(院校)
+                
+                .form-group
+                  label.col-sm-2.control-label 活动详情：
+                  .col-sm-8
+                    div#ReplyContent
+                    .checkbox-inline(style="display:none")
+                      label
+                        input#ParseURL(type='checkbox' checked)
+                        | 处理URL
+                    .form-group
+                    .nkcpanel(id='file-uploading' target='/r')
+                      //uploader section
+                      include ../interface_attachment_uploader_uploader.pug
 
+                    .panel.panel-default
+                      .panel-heading 我的附件（点击插入帖子）
+                      .panel-body(id='list-container')
+
+                      
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-5
-                    button.btn.btn-primary#save(onclick=`submitRelease()`) 保存
+                    button.btn.btn-primary#save(onclick=`submitRelease()`) 发布
             input#inputFile(type='file' accept="image/*").hidden
 
-      .row
-        .col-xs-12.col-md-10
-          .panel.panel-primary
-            .panel-heading
-              span 活动详情
-            .panel-body
-              .form-horizontal
+      //- .row
+      //-   .col-xs-12.col-md-10
+      //-     .panel.panel-primary
+      //-       .panel-heading
+      //-         span 活动详情
+      //-       .panel-body
+      //-         .form-horizontal
 
-                .form-inline
-                  div#ReplyContent
-                .form-inline
+      //-           .form-inline
+      //-             div#ReplyContent
+      //-           .form-inline
 
-                  .checkbox-inline(style="display:none")
-                    label
-                      input#ParseURL(type='checkbox' checked)
-                      | 处理URL
+      //-             .checkbox-inline(style="display:none")
+      //-               label
+      //-                 input#ParseURL(type='checkbox' checked)
+      //-                 | 处理URL
 
-                .form-group
-                .nkcpanel(id='file-uploading' target='/r')
-                  //uploader section
-                  include ../interface_attachment_uploader_uploader.pug
+      //-           .form-group
+      //-           .nkcpanel(id='file-uploading' target='/r')
+      //-             //uploader section
+      //-             include ../interface_attachment_uploader_uploader.pug
 
-                .panel.panel-default
-                  .panel-heading 我的附件（点击插入帖子）
-                  .panel-body(id='list-container')
+      //-           .panel.panel-default
+      //-             .panel-heading 我的附件（点击插入帖子）
+      //-             .panel-body(id='list-container')
 block scripts
   script(src="/jquery-ui-1.10.4.custom.js")
   script(src='../interface_common.js')

@@ -17,14 +17,19 @@ singleRouter
       c:c,
       l:'html'
     }
-    activity.description = ctx.nkcModules.nkc_render.experimental_render(post);
+    if(ctx.reqType === "app"){
+      activity.description = ctx.nkcModules.APP_nkc_render.experimental_render(post);
+    }else{
+      activity.description = ctx.nkcModules.nkc_render.experimental_render(post);
+    }
     // 拓展聊天
     activity.posts = await activity.extendPost();
     if(user){
       activity.user = await activity.extendUser();
       activity.userPersonal = await activity.extendUserPersonal();
     }
-    data.activity = activity;
+    data.activity = activity.toObject();
+    console.log(data)
 		ctx.template = 'activity/activitySingle.pug';
 		await next();
   })
@@ -38,6 +43,9 @@ singleRouter
       ctx.throw(400, "请前往注册");
     }
     const activity = await ActivityModel.findOne({acid});
+    if(parseInt(user.id) == parseInt(activity.uid)){
+      ctx.throw(400, "不可以报名自己发起的活动")
+    }
     if(activity && activity.limitNum !==0 && activity.signUser.length >= activity.limitNum && activity.continueTofull == false){
       ctx.throw(400, "活动报名人数已达上限");
     }

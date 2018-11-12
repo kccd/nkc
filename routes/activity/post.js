@@ -36,9 +36,24 @@ postRouter
     if(user){
       post.uid = user.uid;
     }
-    console.log(post)
     const activityPost = new ActivityPostModel(post);
     await activityPost.save();
+    const activity = await db.ActivityModel.findOnly({acid:acid});
+    let c;
+    if(activity){
+      c = activity.description;
+    }
+    const post1 = {
+      c:c,
+      l:'html'
+    }
+    if(ctx.reqType === "app"){
+      activity.description = ctx.nkcModules.APP_nkc_render.experimental_render(post1);
+    }else{
+      activity.description = ctx.nkcModules.nkc_render.experimental_render(post1);
+    }
+    activity.posts = await activity.extendPost();
+    data.activity = activity.toObject();
     await next();
   })
 module.exports = postRouter;

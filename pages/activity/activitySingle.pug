@@ -1,5 +1,6 @@
 extends ../bootstrap_base
 block title
+  meta(name='description' content=`${data.activity.address}` || '暂无活动介绍')
   link(rel='stylesheet', href='/fund.css')
   title 科创活动
 
@@ -14,6 +15,26 @@ block content
         .col-xs-12.col-md-12
           .row
             .col-xs-12.col-md-2
+              .col-sm-12
+                .text-center(style="width:100%")
+                  canvas#activityQrcode
+                  .row
+                    .col-xs-2.col-md-2
+                    .col-xs-8.col-md-8
+                      .col-xs-4.col-md-4(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qq', window.location.href, '活动：${data.activity.activityTitle}')`)
+                          img(src="/default/QQ.png" style="")
+                      .col-xs-4.col-md-4(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qzone', window.location.href, '活动：${data.activity.activityTitle}')`)
+                          img(src="/default/qzone.png" style="")
+                      .col-xs-4.col-md-4(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qzone', window.location.href, '活动：${data.activity.activityTitle}')`)
+                          img(src="/default/weibo.png" style="")
+                      //- img(src="/default/QQ.png" style="width:30%" onclick=`shareTo('activity', 'qq', window.location.href, '活动：${data.activity.activityTitle}')`)
+                      //- img(src="/default/qzone.png" style="width:30%" onclick=`shareTo('activity', 'qzone', window.location.href, '活动：${data.activity.activityTitle}')`)
+                      //- img(src="/default/weibo.png" style="width:30%" onclick=`shareTo('activity', 'weibo', window.location.href, '活动：${data.activity.activityTitle}')`)
+                    .col-xs-2.col-md-2
+                //- img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")
             .col-xs-12.col-md-8
               .form-group
                 .col-sm-6
@@ -53,17 +74,18 @@ block content
                       button.btn.btn-primary(onclick="changeToApply()") 我要报名
                     //- .col-sm-6
                     //-   button.btn.btn-primary 关注
-            .col-xs-12.col-md-2
+                .col-sm-1
+            .col-xs-12.col-md-1
 
       .row
         .col-xs-12.col-md-12
           .row
             .col-xs-12.col-md-2
-            .col-xs-12.col-md-7#description(style="display:")
+            .col-xs-12.col-md-8#description(style="display:")
               hr
               .form-group
                 div!= data.activity.description
-            .col-xs-12.col-md-7#apply(style="display:none")
+            .col-xs-12.col-md-8#apply(style="display:none")
               hr
               .form-horizontal
                 .form-group
@@ -120,13 +142,13 @@ block content
                   a(href="/") 《科创网及论坛统一服务协议》
                 button.btn.btn-primary#onpost(onclick=`onpost(${data.activity.acid})`) 提交
                 button.btn.btn-warning(onclick="changeToDescription()") 取消报名
-            .col-xs-12.col-md-3
+            .col-xs-12.col-md-2
 
       .row
         .col-xs-12.col-md-12
           .row
             .col-xs-12.col-md-2
-            .col-xs-12.col-md-7
+            .col-xs-12.col-md-8
               hr
               h4 全部评论
               -for(let post of data.activity.posts)
@@ -134,21 +156,40 @@ block content
                 a(href=`/u/${post.uid}`)= post.user.username
                 span!=` 发表于 ${post.toc.toLocaleString()}`
                 div!=`${post.commentContent}`
-            .col-xs-12.col-md-3
+            .col-xs-12.col-md-2
 
       .row
         .col-xs-12.col-md-12
           .row
             .col-xs-12.col-md-2
-            .col-xs-12.col-md-7
+            .col-xs-12.col-md-8
               hr
               h4 发表评论
               textarea.form-control#commentContent(rows="8", placeholder="填写评论")
               br
               button.btn.btn-default(onclick=`submitComment(${data.activity.acid})`) 发表
-            .col-xs-12.col-md-3
+            .col-xs-12.col-md-2
 
 block scripts
   script(src='/interface_common.js')
+  script(src='/jquery/jquery-1.11.1.js')
+  script(src='/qrcode/build/qrcode.js')
   script(src="/activity/activityCommon.js")
   script(src="/activity/activitySingle.js")
+  script.
+    var qrcode = document.getElementById("activityQrcode");
+    if (qrcode) {
+      var path = window.location.href;
+      //- var path = "https://www.kechuang.org";
+      path = path + "?t=" + Date.now();
+      QRCode.toCanvas(qrcode, path, {
+        scale: 3,
+        margin: 1,
+        width: 114,
+        color: {dark: '#333333'}
+      }, function (err) {
+        if (err) {
+          screenTopWarning(err);
+        }
+      })
+    }

@@ -29,7 +29,8 @@ const paths = {
   appPath: 'resources/app',
   androidSavePath: 'resources/app/android',
   iosSavePath: 'resources/app/ios',
-  friendImagePath: 'resources/friend_image'
+  friendImagePath: 'resources/friend_image',
+  posterPath: 'resources/poster'
 };
 
 const pathsObj = {};

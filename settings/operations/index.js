@@ -46,6 +46,7 @@ const forgotPassword = require('./forgotPassword');
 const app = require('./app');
 const message = require('./message');
 const activity = require('./activity');
+const share = require('./share');
 const test = require('./test');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
@@ -149,6 +150,8 @@ operationObj.operationTree = {
 		app,// 手机app
 
 		activity, //活动
+
+		share, // 分享
 
 		message, // 信息（新）
 

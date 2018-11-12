@@ -16,6 +16,7 @@ const appRouter = require('./app');
 const pageRouter = require('./page');
 const examRouter = require('./exam');
 const messageRouter = require('./message');
+const shareRouter = require('./share');
 const smsRouter = require('./sms');
 const postRouter = require('./post');
 settingRouter
@@ -27,6 +28,7 @@ settingRouter
 	})
 	.use('/post', postRouter.routes(), postRouter.allowedMethods())
 	.use('/message', messageRouter.routes(), messageRouter.allowedMethods())
+	.use('/share', shareRouter.routes(), shareRouter.allowedMethods())
 	.use('/sms', smsRouter.routes(), smsRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
 	.use('/app', appRouter.routes(), appRouter.allowedMethods())

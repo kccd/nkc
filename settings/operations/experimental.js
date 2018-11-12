@@ -124,6 +124,10 @@ module.exports = {
 			GET: 'visitEMessageSettings',
 			PATCH: 'modifyEMessageSettings'
 		},
+		share: {
+			GET: 'visitEShareSettings',
+			PATCH: 'modifyEShareSettings'
+		},
 		post: {
 			GET: 'visitEPostSettings',
 			PATCH: 'modifyEPostSettings'

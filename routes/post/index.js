@@ -13,7 +13,8 @@ const postRouter = new Router();
 
 postRouter
   .get('/:pid', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, query} = ctx;
+		const {token} = query;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
@@ -30,8 +31,28 @@ postRouter
 	    userOperationsId: data.userOperationsId,
 	    uid: user?user.uid: ''
     };
-    // 权限判断
-	  await post.ensurePermissionNew(options);
+    // 权限判断		
+    if(!token){
+			await post.ensurePermissionNew(options);
+		}else{
+			let share = await db.ShareModel.findOne({"token":token});
+			if(!share) ctx.throw(403, "权限不足");
+			if(share.tokenLife == "invalid") ctx.throw(403, "链接已失效");
+			let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
+			if(!shareLimit){
+				shareLimit = new db.ShareLimitModel({});
+				await shareLimit.save();
+			}
+			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+			let nowTimeStamp = parseInt(new Date().getTime());
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
+				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				return ctx.throw(403, "链接已失效");
+			}
+			let reqUrl = ctx.origin + ctx.path;
+			if(reqUrl !== share.shareUrl) ctx.throw(403, "权限不足")
+		}
+	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();

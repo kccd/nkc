@@ -31,6 +31,14 @@ const activityPostSchema = new Schema({
   }
 });
 
+activityPostSchema.virtual('user')
+  .get(function() {
+    return this._user
+  })
+  .set(function(u) {
+    this._user = u
+  });
+
 activityPostSchema.methods.extendUser = async function() {
   const UserModel = mongoose.model('users');
   const user = await UserModel.findOnly({uid: this.uid});
