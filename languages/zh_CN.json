@@ -357,6 +357,7 @@
     "sendActivityMessage": "发送活动通知",
     "getShareToken": "获取分享链接的Token",
     "visitShareLink": "访问分享的链接",
+    "canSendToEveryOne": "有权给任何人发信息",
 
 
     "APPgetUserInfo": "app获取用户信息",
