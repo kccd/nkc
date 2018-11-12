@@ -47,7 +47,6 @@ const app = require('./app');
 const message = require('./message');
 const activity = require('./activity');
 const share = require('./share');
-const test = require('./test');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
 const operationObj = {};
@@ -157,7 +156,6 @@ operationObj.operationTree = {
 
     friend, // 好友
 
-    test, // 测试路由
 
     friend_category, // 好友分组
 	}
