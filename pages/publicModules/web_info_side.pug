@@ -1,0 +1,49 @@
+.web-info-side
+  .web-info-header
+    div.content 科创论坛
+    div.line
+  ul.info-link
+    li
+      a(href='/t/25436') 关于科创
+
+    li
+      a(href='/page/faq') FAQ
+
+    li
+      a(href='/t/36782') 提问须知
+
+    li
+      a(href='/t/66350') 禁止事项
+
+    li
+      a(href='/t/79481') 建设指南
+
+    li
+      a(href='/tools/index.htm') 在线计算工具
+  ul.info-link
+    li
+      a(href=data.serverSettings.github target='_blank')
+        span.fa.fa-github
+        | &nbsp;Github
+    li
+      a(href='/problem/add')
+        span.fa.fa-bug
+        | &nbsp;报告问题
+  .web-info-header
+    div.content 友情链接
+    div.line
+  ul.friend-link
+    <li><a href="http://gyhj.org/" target="_blank">故园怀旧</a></li>
+    <li><a href="http://www.5csf.com" target="_blank">5C科幻协会</a></li>
+    <li><a href="http://www.timestation.cn" target="_blank">准时钟表网</a></li>
+    <li><a href="http://www.hellocq.net/forum" target="_blank">hellocq火腿社区</a></li>
+    <li><a href="http://www.moz8.com" target="_blank">模友之吧</a></li>
+  .text.telephone= `科创论坛值班室：${data.serverSettings.telephone}`
+  .text.copyright= data.serverSettings.copyright
+  .text.record= data.serverSettings.record.split(' ')[1]
+  .text.record= data.serverSettings.record.split(' ')[0]
+  .app
+    div
+      canvas#androidQrcode
+      a(href='/app' style='font-size: 1rem;color: #555555;margin-top: 0.3rem;')
+        | 安卓客户端

@@ -7,7 +7,7 @@ infoRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		let {operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId, moderators} = body;
 		if(operation && operation === 'updateDeclare') {
@@ -62,7 +62,7 @@ infoRouter
 			}));
 			await forum.update({displayName, abbr, color, description, brief, basicThreadsId: basicThreadsId_, valuableThreadsId: valuableThreadsId_, moderators: moderators_, noticeThreadsId: noticeThreadsId_});
 		}
-
+    await redis.cacheForums();
 		await next();
 	});
 module.exports = infoRouter;

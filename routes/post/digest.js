@@ -15,7 +15,8 @@ router
 				ctx.throw(400, '回复已被加精，请刷新');
 			}
 		}
-		await post.update({digest: true});
+		const digestTime = Date.now();
+		await post.update({digest: true, digestTime});
 		const log = {
 			user: targetUser,
 			type: 'kcb',
@@ -29,7 +30,7 @@ router
 		let message;
     const messageId = await db.SettingModel.operateSystemID('messages', 1);
 		if(thread.oc === pid) {
-			await thread.update({digest: true});
+			await thread.update({digest: true, digestTime});
 			await db.UsersScoreLogModel.insertLog(log);
 			log.type = 'score';
 			log.key = 'digestThreadsCount';

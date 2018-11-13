@@ -298,13 +298,9 @@ userSchema.methods.extendThreads = async function() {
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = mongoose.model('threads');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
-  threads = await Promise.all(threads.map(async t => {
-    await t.extendForum();
-    await t.extendFirstPost().then(p => p.extendUser());
-    await t.extendLastPost().then(p => p.extendUser());
-    return t;
-  }));
-  return threads;
+  return await ThreadModel.extendThreads(threads, {
+    parentForum: false
+  });
 };
 
 userSchema.methods.extend = async function() {
@@ -701,10 +697,11 @@ userSchema.methods.getPostLimit = async function() {
 		const ptc = role.postToThreadCountLimit;
 		const ptt = role.postToThreadTimeLimit;
 
+		// 限制发帖的数量取最大，限制发帖的时间取最小
     if(pfc > postToForumCountLimit) postToForumCountLimit = pfc;
-    if(pft > postToForumTimeLimit) postToForumTimeLimit = pft;
+    if(pft < postToForumTimeLimit) postToForumTimeLimit = pft;
     if(ptc > postToThreadCountLimit) postToThreadCountLimit = ptc;
-    if(ptt > postToThreadTimeLimit) postToThreadTimeLimit = ptt;
+    if(ptt < postToThreadTimeLimit) postToThreadTimeLimit = ptt;
 	}
 
 	return {

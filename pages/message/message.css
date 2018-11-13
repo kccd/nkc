@@ -29,7 +29,7 @@ body, html{
   font-size: 1rem;
 }
 .ms-user-panel{
-  height: 12rem;
+  height: 11rem;
   overflow: hidden;
   width: 100%;
   position: relative;
@@ -74,7 +74,7 @@ body, html{
   width: 100%;
 }
 .ms-user-username{
-  padding: 0.5rem;
+  padding: 0.2rem;
   font-size: 1.5rem;
 }
 .ms-user-info{
@@ -123,7 +123,7 @@ body, html{
   outline: none;
 }
 .ms-list{
-  height: 56rem;
+  height: 54rem;
   width: 100%;
   overflow: hidden;
   overflow-y: scroll;
@@ -134,16 +134,20 @@ body, html{
 .ms-list-body{
   min-height: 4rem;
   padding: 0.6rem 0;
-  border-bottom: 1px solid #efefef;
+  /*border-bottom: 1px solid #efefef;*/
   display: -webkit-flex;
   display: flex;
   cursor: pointer;
+  width: 100%;
+}
+.ms-list-body:hover .ms-lise-remove.fa.fa-remove{
+  width: 2rem;
 }
 .ms-list-body:active{
-  background-color: #dbdbdb;
+  /*background-color: #f1f1f1;*/
 }
 .ms-list-body.active{
-  background-color: #dbdbdb;
+  background-color: #f1f1f1;
 }
 .ms-list-left{
   padding-left: 0.5rem;
@@ -154,29 +158,30 @@ body, html{
 .ms-list-center{
   padding-right: 0.5rem;
   padding-left: 0.5rem;
-  -webkit-flex-shrink: 1;
-  -webkit-flex-grow: 1;
-  flex-shrink: 1;
-  flex-grow: 1;
+  -webkit-flex-shrink: 2;
+  -webkit-flex-grow: 2;
+  flex-shrink: 2;
+  flex-grow: 2;
   vertical-align: top;
 }
 .ms-list-right{
   -webkit-flex-shrink: 0;
   flex-shrink: 0;
-  height: 100%;
+  height: 3.5rem;
   padding-right: 0.5rem;
   text-align: right;
   font-size: 1.5rem;
+  position: relative;
 }
-  .ms-list-info{
-    text-align: center;
-    height: 2rem;
-    font-size: 1rem;
-    line-height: 2rem;
-    color: #7d7d7d;
-    margin: 0;
-    background-color: #e1e1e1;
-  }
+.ms-list-info{
+  text-align: center;
+  height: 2rem;
+  font-size: 1rem;
+  line-height: 2rem;
+  color: #7d7d7d;
+  margin: 0;
+  background-color: #e1e1e1;
+}
 .ms-list-number{
   color: red;
   font-size: 1rem;
@@ -256,6 +261,7 @@ body, html{
 .ms-single-img{
   display: inline-block;
   vertical-align: top;
+  cursor: pointer;
 }
 .ms-single-img img{
   width: 4rem;
@@ -277,13 +283,15 @@ body, html{
 .ms-single-content{
   word-wrap: break-word;
   max-width: 100%;
+  color: #fff;
   /*word-break:break-all;*/
   position: relative;
   line-height: 2.2rem;
-  background-color: #dbe9f5;
+  /*background-color: #dbe9f5;*/
+  background-color: #6aafe6;
   padding: 0.5rem;
   margin-left: 1rem;
-  border-radius: 0 5px 5px 5px;
+  border-radius: 5px;
   display: inline-block;
   min-height: 2.2rem;
 }
@@ -322,11 +330,47 @@ body, html{
 .ms-single-right .ms-single-content{
   margin-right: 1rem;
   float: right;
-  border-radius: 5px 0 5px 5px;
+  border-radius: 5px;
 }
 .ms-single-right .ms-single-time{
   text-align: right;
 }
+.arrow{
+  position: absolute;
+  top: 0;
+  left: -8px;
+  height: 20px;
+  width: 8px;
+  border-radius: 0 0 0 15px;
+  background-color: #6aafe6;
+}
+.arrow:after{
+  content: '';
+  display: block;
+  height: 18px;
+  width: 16px;
+  position: absolute;
+  top: -5px;
+  left: -8px;
+  border-radius: 0 0 0 20px;
+  background-color: #fff;
+}
+.ms-single-right .arrow{
+  left: auto;
+  right: -8px;
+  border-radius: 0 0 15px 0;
+}
+.ms-single-right .arrow:after{
+  content: '';
+  height: 17px;
+  width: 18px;
+  position: absolute;
+  top: -5px;
+  left: auto;
+  right: -10px;
+  border-radius: 0 0 20px 0;
+  background-color: #fff;
+}/*
 .arrow{
   position: absolute;
   width: 0;
@@ -344,7 +388,7 @@ body, html{
   border-top: 1rem solid rgba(0,0,0,0);
   border-left: 1rem solid #dbe9f5;
   border-bottom: 1rem solid rgba(0,0,0,0);
-}
+}*/
 .ms-single{
 
 }
@@ -423,6 +467,10 @@ body, html{
   height: 67.3rem;
   padding: 1rem;
 }
+.ms-friends-applications{
+  overflow-y: scroll;
+  height: 65rem;
+}
 .ms-notice-body{
   margin: 1rem 0 2rem 0;
 }
@@ -478,7 +526,7 @@ body, html{
   margin: auto;
   width: 40rem;
   height: 50rem;
-  background-color: #f4f4f4;
+  background-color: #fff;
   box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
 }
 .ms-mask{
@@ -566,12 +614,9 @@ body, html{
   padding: 0 1rem;
 }
 .ms-settings-options-name{
-  display: table-cell;
-  width: 8rem;
-  text-align: right;
+  width: 100%;
 }
 .ms-settings-options-content{
-  display: table-cell;
 
 }
 .ms-settings-options{
@@ -879,4 +924,394 @@ img.emoji{
   border-radius: 5px;
   font-size: 1rem;
   color: #666666;
+}
+.ms-list-type{
+  text-align: center;
+  height: 3rem;
+  line-height: 3rem;
+}
+.ms-list-type>div{
+  /*border: 1px solid red;*/
+  font-size: 1.2rem;
+  color: #888888;
+  cursor: pointer;
+  border-radius: 7px 7px 0 0;
+}
+.ms-list-type>div.active{
+  background-color: #fff;
+}
+.ms-user-description{
+
+}
+.search-user-list.ms-list-body:active{
+  background-color: #fff;
+}
+.search-user-list .ms-list-right>div{
+  height: 1.7rem;
+  line-height: 1.7rem;
+  font-size: 1.2rem;
+}
+.search-user-list .ms-list-right>div:hover{
+  color: #337ab7;
+}
+.ms-application{
+  max-width: 40rem;
+  margin: auto;
+}
+.ms-application-avatar{
+  display: table-cell;
+}
+.ms-application-user-info{
+  display: table-cell;
+  padding-left: 0.5rem;
+  vertical-align: top;
+  font-size: 1.4rem;
+}
+.ms-application-time{
+
+}
+.ms-application-username{
+  font-size: 1.4rem;
+}
+.ms-application-description{
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+.ms-application-user{
+  padding: 1rem;
+  /*box-shadow: 2px 2px 10px rgba(0,0,0,0.2);*/
+  border-top: 1px solid #dddddd;
+  /*border-bottom: 1px solid #dddddd;*/
+}
+.ms-application-avatar img{
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+}
+.ms-application-button{
+  padding-top: 1rem;
+  text-align: right;
+}
+.ms-friends-applications{
+  padding-top:1rem;
+}
+.ms-applications-body{
+  margin-bottom: 1rem;
+}
+
+.new-message-count{
+  display: inline-block;
+  color: #fff;
+  height: 17px;
+  min-width: 17px;
+  background-color: #ef3c3c;
+  text-align: center;
+  line-height: 17px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.ms-friend-body{
+  max-width: 40rem;
+  margin: auto;
+  padding: 2rem 0;
+}
+.ms-friend-avatar{
+  height: 6rem;
+  width: 6rem;
+  margin: auto;
+}
+.ms-friend-avatar img{
+  height: 6rem;
+  width: 6rem;
+  border-radius: 50%;
+}
+.ms-friend-username{
+  text-align: center;
+  font-size: 2rem;
+  word-wrap: break-word;
+}
+.ms-friend-description{
+  text-align: center;
+  font-size: 1.2rem;
+  padding-top: 0.5rem;
+  color: #888888;
+}
+.ms-friend-count{
+  text-align: center;
+  padding-top: 1rem;
+  overflow: hidden;
+}
+.friend-count-key{
+  text-align: center;
+  font-size: 1.2rem;
+}
+.friend-count-value{
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.ms-friend-button{
+  padding-top: 2rem;
+}
+.block-btn{
+  border-radius: 0;
+  border: 1px solid #999999;
+}
+.block-btn:focus{
+  outline: none;
+  border: 1px solid #999999;
+}
+.ms-friend-information{
+  padding-top: 2rem;
+}
+.friend-notes{
+  margin: 2rem 0 6rem 0;
+}
+.ms-friend-button{
+  overflow: hidden;
+}
+.ms-friend-information{
+  overflow: hidden;
+}
+.ms-friend-button-fixed{
+  position: absolute;
+  right: 30px;
+  bottom: 30px;
+  z-index: 1000;
+  width: 4rem;
+  color: #ffffff;
+  text-align: center;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+.ms-friend-button-fixed .fa{
+  width: 100%;
+  margin: 0.5rem 0;
+  height: 4rem;
+  background-color: #1e88e5;
+  line-height: 4.1rem;
+  border-radius: 50%;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  transition: background-color 0.3s;
+}
+.ms-friend-button-fixed .fa.bg-color-red{
+  background-color: #fb5959;
+}
+.ms-friend-button-fixed .fa.bg-color-red:hover{
+  background-color: #ce4b4b;
+}
+.ms-friend-button-fixed .fa:hover{
+  background-color: #2773b6;
+}
+.friend-image-upload{
+  position: absolute;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #1e88e5;
+}
+.friend-phone-button{
+  font-size: 2rem;
+}
+.friend-phone-button .fa{
+  cursor: pointer;
+}
+.ms-lise-remove.fa.fa-remove{
+  width:0;
+  overflow: hidden;
+  /*background-color: red;*/
+  color: #aaaaaa;
+  text-align: center;
+  transition: width 0.3s;
+  line-height: 0.8rem;
+}
+.friend-letter{
+  height: 1.5rem;
+  line-height: 1.5rem;
+  background-color: #f4f4f4;
+  padding: 0 1rem;
+  font-weight: 600;
+  color: #777777;
+  font-size: 1rem;
+}
+.friend-list:active{
+  background-color: #f1f1f1;
+}
+.friend-category-avatar{
+  width: 4.1rem;
+  height: 4.1rem;
+  background-color: #f0f0f0;
+  line-height: 0;
+  border: 0.1rem solid #dddddd;
+}
+.friend-category-avatar.text{
+  line-height: 4.1rem;
+  text-align: center;
+  color: #aaaaaa;
+  /*font-weight: 700;*/
+  font-size: 2rem;
+}
+.friend-category:active{
+  background-color: #f1f1f1;
+}
+.friend-category-avatar img{
+  width: 1.3rem;
+  height: 1.3rem;
+  padding: 0.1rem;
+}
+.friend-category .ms-list-title{
+  padding-top: 0;
+}
+.friend-category .ms-list-content{
+  height: 2.2rem;
+  line-height: 1.1rem;
+  padding-top: 0.1rem;
+  -webkit-line-clamp: 2; /*显示的行数*/
+}
+.category-user{
+  padding: 1rem 0;
+  border-top: 1px solid #eee;
+  margin: 2rem 0;
+}
+.category-user-avatar{
+  padding: 0.5rem;
+  cursor: pointer;
+  display: inline-block;
+}
+.category-user-avatar-div{
+  position: relative;
+  text-align: center;
+}
+.category-user-avatar-div .online{
+  right: 7px;
+}
+.category-user-avatar img{
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+}
+.category-username{
+  font-size: 1rem;
+  text-align: center;
+  width: 5.6rem;
+  word-wrap: break-word;
+  padding: 0.2rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp:1; /*显示的行数*/
+  -webkit-box-orient:vertical;
+  overflow: hidden;
+  height:1.6rem;
+}
+.category-username.loading{
+  font-size: 1rem;
+  color: #aaaaaa;
+}
+.category-checkbox{
+
+}
+.friend-category-add{
+  height: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  background-color: #f4f4f4;
+  font-size: 2rem;
+  color: #aaaaaa;
+  margin: 0 0.5rem;
+  cursor: pointer;
+}
+.friend-category-add:hover{
+  background-color: #efefef;
+}
+.all-friends, .selected-friends{
+  height: 44rem;
+  overflow-y: scroll;
+}
+.all-friends .friend-letter{
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.2rem;
+}
+.friend-li{
+  height: 2.8rem;
+  line-height: 2.8rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+}
+.friend-li .remove{
+  height: 2.8rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 0;
+  display: none;
+  color: #aaaaaa;
+  line-height: 2.8rem;
+}
+.friend-li:hover{
+  background-color: #f1f1f1;
+}
+.friend-li:hover .remove{
+  display: block;
+}
+.all-friends img, .selected-friends img{
+  margin-right: 0.5rem;
+}
+.all-friends>div{
+  width: 100%;
+}
+.category-edit-friends .header{
+  padding: 0.5rem 0;
+  color: #555555;
+}
+.mobile .ms-friends-applications{
+  height: 100%;
+}
+.mobile .ms-application{
+  width: 100%;
+}
+.mobile .ms-application-time{
+  padding-left: 1rem;
+  padding-top: 1rem;
+}
+.mobile .ms-applications-body{
+  margin-left: 1rem;
+  margin-right: 1rem;
+  background-color: #dfdfdf;
+  border-radius: 7px;
+}
+.mobile .ms-application-user{
+  border-top: none;
+}
+.mobile .ms-friend-body{
+  width: 100%;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+}
+.mobile .all-friends, .mobile .selected-friends{
+  height: 25rem;
+}
+.mobile .friend-category-add{
+  height: 3rem;
+  line-height: 3rem;
+}
+.ms-friend-body .ms-friend-information{
+  overflow: inherit;
+  padding-bottom: 2rem;
+}
+/* 地区选择 输入框圆角  */
+.bs-chinese-region .nav-tabs, .bs-chinese-region.flat .dropdown-menu, .bs-chinese-region.flat .nav-tabs>li>a, .bs-chinese-region.flat input{
+  border-radius: 4px;
+}
+.message-file-name {
+  display: block;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #fff;
+}
+.ms-single-content-file a{
+  color: #fff;
+  display: block;
+  text-align: center;
+  text-decoration: none;
 }

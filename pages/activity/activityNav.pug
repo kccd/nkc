@@ -1,0 +1,22 @@
+-const {fundList} = data;
+.fund-nav
+  ol.breadcrumb(style='margin-bottom: 0;')
+    li
+      a(href="/activity") 首页
+    span &nbsp;&nbsp;&nbsp;
+    li
+      a(href="/activity/release") 活动发布
+    span &nbsp;&nbsp;&nbsp;
+    if data.user
+      li
+        a(href=`/activity/myApply`) 我的申请&nbsp;
+        if data.fundNotify > 0
+          span.redFontColor= data.fundNotify
+      span &nbsp;&nbsp;&nbsp;
+    if data.user
+      li
+        a(href=`/activity/myRelease`) 我的发布&nbsp;
+        if data.fundNotify > 0
+          span.redFontColor= data.fundNotify
+      span &nbsp;&nbsp;&nbsp;
+br

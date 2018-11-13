@@ -6,14 +6,8 @@ subscribeRouter
 		const {fid} = params;
 		const {user} = data;
 		const forum = await db.ForumModel.findOnly({fid});
-		const gradeId = data.userGrade._id;
-		const rolesId = data.userRoles.map(r => r._id);
-		const options = {
-			gradeId,
-			rolesId,
-			uid: user?user.uid: ''
-		};
-		await forum.ensurePermissionNew(options);
+
+		await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const childrenForums = await forum.extendChildrenForums();
 		if(childrenForums.length !== 0) {
 			ctx.throw(400, '该专业下存在其他专业，无法关注。');

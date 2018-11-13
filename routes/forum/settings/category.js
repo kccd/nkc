@@ -6,7 +6,10 @@ categoryRouter
 		const {forum} = data;
 		const parentForums = [];
 		let f = forum;
-		while(1) {
+		let n = 0;
+		while(n < 1000) {
+		  // 避免死循环，版块数暂小于1000
+		  n++;
 			if(f.parentId) {
 				f = await db.ForumModel.findOnly({fid: f.parentId});
 				parentForums.unshift(f);
@@ -20,7 +23,7 @@ categoryRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		const {operation} = body;
 		if(operation === 'savePosition') {
@@ -53,6 +56,7 @@ categoryRouter
 			if(!name) ctx.throw(400, '新分类名不能为空');
 			await threadType.update({name});
 		}
+    await redis.cacheForums();
 		await next();
 	})
 	.post('/', async (ctx, next) => {

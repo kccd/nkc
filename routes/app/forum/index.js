@@ -23,19 +23,9 @@ forumRouter
 		}
 		// 判断是否为该专业或上级专业的专家
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
-
-		const {userGrade, userRoles} = data;
-		const options = {
-			gradeId: userGrade._id,
-			rolesId: userRoles.map(r => r._id),
-			fid: forum.fid,
-			uid: data.user?data.user.uid: ''
-		};
-		options.rolesId = userRoles.map(r => r._id);
 		// 拿到该专业下可从中拿文章的所有子专业id
-		const fidOfCanGetThreads = await db.ForumModel.fidOfCanGetThreads(options);
+		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
 		fidOfCanGetThreads.push(forum.fid);
-
 		match.fid = {$in: fidOfCanGetThreads};
 		// 专家可查看专业下所有文章
 		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
@@ -72,7 +62,10 @@ forumRouter
 			sort = {tlm: -1};
 		}
 		const threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
-		await Promise.all(threads.map(async thread => {
+		data.threads = await db.ThreadModel.extendThreads(threads, {
+      category: true
+    });
+		/*await Promise.all(threads.map(async thread => {
 			await thread.extendFirstPost().then(p => p.extendUser());
 			if(thread.lm) {
 				await thread.extendLastPost().then(p => p.extendUser());
@@ -86,7 +79,7 @@ forumRouter
 		for(var i in threads){
 			threads[i] = threads[i].toObject();
 		}
-		data.threads = threads;
+		data.threads = threads;*/
 		
 		// 构建置顶文章查询条件
 		// const toppedThreadMatch = {topped: true, fid: forum.fid};

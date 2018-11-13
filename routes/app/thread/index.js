@@ -8,10 +8,7 @@ theradRouter
 		const thread = await db.ThreadModel.findOnly({tid});
 		const forum = await thread.extendForum();
 		// 验证权限 - new
-		const gradeId = data.userGrade._id;
-		const rolesId = data.userRoles.map(r => r._id);
-		const options = {gradeId, rolesId, uid: data.user?data.user.uid: ''};
-    await thread.ensurePermission(options);
+    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 
 		// 统计post总数
 		const count = await db.PostModel.count({tid});

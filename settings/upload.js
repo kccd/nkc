@@ -1,14 +1,65 @@
 const moment = require('moment');
 const path = require('path');
-const {mkdirSync} = require('fs');
+const fs = require('fs');
+const {mkdirSync} = fs;
 
-const uploadDir = path.resolve('tmp');
+
+const paths = {
+  uploadDir: 'tmp',
+  resourcesPath: 'resources',
+  uploadPath: 'resources/upload',
+  coverPath: 'resources/cover',
+  pfBannerPath: 'resources/pf_banners',
+  pfAvatarPath: 'resources/pf_avatars',
+  avatarPath: 'resources/newavatar',
+  avatarSmallPath: 'resources/newavatar_small',
+  thumbnailPath: 'resources/thumbnails',
+  adPath: 'resources/ad_posts',
+  siteSpecificPath: 'resources/site_specific',
+  qrCodePath: 'resources/qr',
+  photoPath: 'resources/photo',
+  photoSmallPath: 'resources/photo_small',
+  fundBannerPath: 'resources/fundBanner',
+  fundLogoPath: 'resources/fundLogo',
+  webLogoPath: 'resources/logo',
+  userBannerPath: 'resources/user_banners',
+  messageFilePath: 'resources/message',
+  messageImageSMPath: 'resources/message/sm',
+  frameImgPath: 'resources/frameImage',
+  appPath: 'resources/app',
+  androidSavePath: 'resources/app/android',
+  iosSavePath: 'resources/app/ios',
+  friendImagePath: 'resources/friend_image',
+  posterPath: 'resources/poster'
+};
+
+const pathsObj = {};
+for(const key in paths) {
+  if(!paths.hasOwnProperty(key)) continue;
+  pathsObj[key] = path.resolve(paths[key]);
+}
+
+function initFolders() {
+  for(const key in pathsObj) {
+    const realPath = pathsObj[key];
+    try {
+      fs.accessSync(realPath);
+    } catch (err) {
+      fs.mkdirSync(realPath);
+      console.error(`created folder ${realPath}`);
+    }
+  }
+}
+
+/*const uploadDir = path.resolve('tmp');
 const uploadPath = path.resolve('resources/upload');
 const coverPath = path.join(__dirname, '../resources/cover');
 const pfBannerPath = path.resolve('resources/pf_banners');
 const pfAvatarPath = path.resolve('resources/pf_avatars');
 const avatarPath = path.resolve('resources/newavatar');
 const avatarSmallPath = path.resolve('resources/newavatar_small');
+const posterPath = path.resolve('resources/poster');
+const posterSmallPath = path.resolve('resources/poster_small');
 const thumbnailPath = path.resolve('resources/thumbnails');
 const adPath = path.resolve('resources/ad_posts');
 const siteSpecificPath = path.resolve('resources/site_specific');
@@ -24,6 +75,7 @@ const messageImageSMPath = path.resolve('resources/message/sm');
 const frameImgPath = path.resolve('resources/frameImage');
 const androidSavePath = path.resolve('resources/app/android');
 const iosSavePath = path.resolve('resources/app/ios');
+const friendImagePath = path.resolve('resource/friend_image');*/
 
 function generateFolderName(basePath) {
   const year = moment().format('/YYYY/');
@@ -44,14 +96,15 @@ function generateFolderName(basePath) {
   return full;
 }
 
-module.exports = {
+const uploadSettings = {
   generateFolderName,
+  initFolders,
   koaBodySetting: {
     multipart: true,
     formidable: {
       maxFields: 20,
 	    maxFileSize: 200*1024*1024,
-      uploadDir,
+      uploadDir: pathsObj.uploadDir,
       hash: 'md5',
       keepExtensions: true
     }
@@ -94,12 +147,14 @@ module.exports = {
 	count: {
   	lifePhoto: 1000 //生活照最多1000张
 	},
-  coverPath,
+  /*coverPath,
   uploadPath,
   pfBannerPath,
   pfAvatarPath,
   avatarPath,
   avatarSmallPath,
+  posterPath,
+  posterSmallPath,
   thumbnailPath,
   adPath,
   photoPath,
@@ -114,7 +169,7 @@ module.exports = {
   messageImageSMPath,
   frameImgPath,
   iosSavePath,
-  androidSavePath,
+  androidSavePath,*/
   avatarSize: 192,
 	forumAvatarSize: 96,
   avatarSmallSize: 48,
@@ -127,3 +182,5 @@ module.exports = {
 		width: 800
 	}
 };
+
+module.exports = Object.assign(uploadSettings, pathsObj);

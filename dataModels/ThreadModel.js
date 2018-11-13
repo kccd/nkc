@@ -1,7 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const {getQueryObj} = require('../nkcModules/apiFunction');
+const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
 const threadSchema = new Schema({
   tid: {
     type: String,
@@ -28,6 +28,11 @@ const threadSchema = new Schema({
   digest: {
     type: Boolean,
     default: false,
+    index: 1
+  },
+  digestTime: {
+    type: Date,
+    default: null,
     index: 1
   },
   digestInMid: {
@@ -192,8 +197,8 @@ threadSchema.methods.extendUser = async function() {
 };
 
 // ------------------------------ 文章权限判断 ----------------------------
-threadSchema.methods.ensurePermission = async function(options) {
-	await this.forum.ensurePermissionNew(options);
+threadSchema.methods.ensurePermission = async function(roles, grade, user) {
+	await this.forum.ensurePermission(roles, grade, user);
 };
 // ----------------------------------------------------------------------
 
@@ -356,6 +361,146 @@ threadSchema.methods.getStep = async function(obj) {
     page,// 页数
     step // 楼层
   }
+};
+
+/* 拓展文章数组
+*  参数：threads, options
+*  options:
+*    参数名                类型         默认值
+*    forum              Boolean        true     是否拓展专业
+*    parentForum        Boolean        true     是否拓展上级专业
+*    firstPost          Boolean        true     是否推展文章内容
+*    firstPostUser      Boolean        true     是否推展文章的用户
+*    lastPost           Boolean        true     是否推展最新回复
+*    lastPostUser       Boolean        true     是否推展最新回复的用户
+* */
+const defaultOptions = {
+  forum: true,
+  category: false,
+  parentForum: true,
+  firstPost: true,
+  firstPostUser: true,
+  lastPost: true,
+  lastPostUser: true,
+  firstPostResource: false,
+  htmlToText: false,
+  count: 200
+};
+threadSchema.statics.extendThreads = async (threads, options) => {
+  const o = Object.assign({}, defaultOptions);
+  Object.assign(o, options);
+  let PostModel, UserModel, ForumModel, ThreadTypeModel;
+  if(o.firstPost || o.lastPost) {
+    PostModel = mongoose.model('posts');
+    if(o.lastPostUser || o.firstPostUser) {
+      UserModel = mongoose.model('users');
+    }
+  }
+  if(o.forum) {
+    ForumModel = mongoose.model('forums');
+  }
+  if(o.category) {
+    ThreadTypeModel = mongoose.model('threadTypes');
+  }
+
+  const forumsId = new Set(), postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = new Set();
+  const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
+
+  threads = threads.filter(thread => !!thread);
+
+  threads.map(thread => {
+    if(!thread) return;
+    if(o.firstPost) {
+      postsId.add(thread.oc);
+    }
+    if(o.forum) {
+      forumsId.add(thread.fid);
+    }
+    if(o.lastPost && thread.lm) postsId.add(thread.lm);
+    if(thread.cid) cid.add(thread.cid);
+  });
+
+  if(o.firstPost || o.lastPost) {
+    const posts = await PostModel.find({pid: {$in: [...postsId]}});
+    posts.map(post => {
+      if(o.htmlToText) {
+        post.c = obtainPureText(post.c, true, o.count);
+      }
+      postsObj[post.pid] = post;
+      if(o.firstPostUser || o.lastPostUser) {
+        usersId.add(post.uid);
+      }
+    });
+
+    if(o.firstPostUser || o.lastPostUser) {
+      const users = await UserModel.find({uid: {$in: [...usersId]}});
+      users.map(user => {
+        usersObj[user.uid] = user;
+      });
+    }
+  }
+
+  if(o.forum) {
+    let forums = await ForumModel.find({fid: {$in: [...forumsId]}});
+    forums.map(forum => {
+      if(forum.parentId) {
+        if(o.parentForum) {
+          parentForumsId.add(forum.parentId);
+        }
+      }
+    });
+    if(o.parentForum) {
+      const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
+      forums = forums.concat(parentForums);
+    }
+    forums.map(forum => {
+      forumsObj[forum.fid] = forum;
+    });
+
+  }
+  if(o.category) {
+    const categories = await ThreadTypeModel.find({cid: {$in: [...cid]}});
+    for(const category of categories) {
+      categoryObj[category.cid] = category;
+    }
+  }
+
+  return await Promise.all(threads.map(async thread => {
+    if(o.firstPost) {
+      const firstPost = postsObj[thread.oc];
+      if(o.firstPostUser) {
+        firstPost.user = usersObj[firstPost.uid];
+      }
+      thread.firstPost = firstPost;
+    }
+    if(o.lastPost) {
+      if(!thread.lm || thread.lm === thread.oc) {
+        thread.lastPost = thread.firstPost;
+      } else {
+        const lastPost = postsObj[thread.lm];
+        if(o.lastPostUser) {
+          lastPost.user = usersObj[lastPost.uid];
+        }
+        thread.lastPost = lastPost;
+      }
+
+    }
+    if(o.forum) {
+      const forum = forumsObj[thread.fid];
+      if(o.parentForum && forum.parentId) {
+        forum.parentForum = forumsObj[forum.parentId];
+
+      }
+      thread.forum = forum;
+    }
+    if(o.category) {
+      if(thread.cid) {
+        thread.category = categoryObj[thread.cid];
+      }
+    }
+    return thread.toObject?thread.toObject():thread;
+
+  }));
 };
 
 module.exports = mongoose.model('threads', threadSchema);

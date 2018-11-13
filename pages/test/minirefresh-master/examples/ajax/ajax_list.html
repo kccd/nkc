@@ -1,0 +1,210 @@
+<!--
+作者：吴育民
+更新时间：2017-12-29
+GitHub：https://github.com/wuyumin
+-->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>miniRefresh ajax 分页示例</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <style>
+        html, body {
+            margin: 0 auto;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        ul, li {
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #18b4fe;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            border-bottom: 1px solid #c8c7cc;
+            background-color: #fff;
+            z-index: 999;
+        }
+
+        .header .navi {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 12px;
+            line-height: 22px;
+        }
+
+        .content {
+        }
+
+        .content .minirefresh-wrap {
+            margin-top: 45px;
+        }
+
+        .content .minirefresh-scroll {
+            background-color: #fff;
+        }
+
+        .content .list-item {
+            margin: 11px 15px;
+        }
+
+        .content .list-item .news-link {
+            display: block;
+            position: relative;
+            padding: 5px 0;
+            width: 100%;
+            height: 100%;
+            border-bottom: 1px solid #c8c7cc;
+        }
+
+        .content .list-item .news-link .news-title {
+            display: block;
+            height: 35px;
+            overflow: hidden;
+            font-weight: bold;
+            font-size: 15px;
+            color: #000;
+        }
+
+        .content .list-item .news-link .news-date {
+            position: absolute;
+            right: 5px;
+            bottom: 5px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+    <!-- 引入 miniRefresh CSS -->
+    <link rel="stylesheet" href="https://minirefresh.github.io/minirefresh/dist/minirefresh.min.css">
+</head>
+<body>
+
+<div class="header">
+    <a href="../index.html" class="navi">dashboard</a>
+    ajax 分页示例
+</div>
+
+<div class="content">
+
+    <div id="minirefresh" class="minirefresh-wrap">
+        <div class="minirefresh-scroll">
+            <ul class="data-list" id="listdata">
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- 引入 jQuery 或 Zepto -->
+<script src="https://cdn.bootcss.com/jquery/2.2.3/jquery.min.js"></script>
+<!-- 引入 miniRefresh JS -->
+<script src="https://minirefresh.github.io/minirefresh/dist/minirefresh.min.js"></script>
+
+<script>
+    $(function () {
+
+        // 初始化页码
+        var page = 0;
+
+        // miniRefresh 对象
+        var miniRefresh = new MiniRefresh({
+            container: '#minirefresh',
+            down: {
+                //isLock: true,//是否禁用下拉刷新
+                callback: function () {
+                    doAjax('down');
+                }
+            },
+            up: {
+                isAuto: true,
+                callback: function () {
+                    doAjax('up');
+                }
+            }
+        });
+
+        // 组装 ajax 分页函数。参数 downOrUp 判断是下拉刷新还是上拉加载。
+        // 特别提示：若你仅使用下拉刷新或上拉加载的其中一项，可不用组装 ajax 分页函数了，直接将 ajax 分页放在下拉刷新或上拉加载的回调 callback 里。
+        var doAjax = function (downOrUp) {
+            if (downOrUp == 'down') {
+                page = 1;// 下拉刷新页码设置
+            } else {
+                page++;// 上拉加载递增页码
+            }
+
+            $.ajax({
+                url: 'data/listdata' + page + '.json',// 请求网址
+                type: 'GET',
+                data: {// 请求参数，一般会带上页码
+                    'page': page,
+                    't': new Date().getTime()// 防止GET请求缓存
+                },
+                success: function (response) {
+                    // 下面这段请根据自己的数据结构来处理
+                    var arrLen = response.data.length;
+
+                    if (arrLen > 0) {
+                        var html = '';
+                        $.each(response.data, function (key, value) {
+                            html += '<li class="list-item">' +
+                                '<a href="javascript:;" class="news-link">' +
+                                '<span class="news-title">' + value.title + '</span>' +
+                                '<span class="news-date">' + (new Date()).toLocaleString() + '</span>' +
+                                '</a>' +
+                                '</li>';
+                        });
+                        setTimeout(function () { // 使用 setTimeout 函数是方便演示的，你可以不用 setTimeout 函数
+                            if (downOrUp == 'down') {
+                                $('#listdata').html('');
+                                $('#listdata').append(html);// DOM 插入数据
+                                miniRefresh.endDownLoading(true);// 结束下拉刷新
+                            } else {
+                                $('#listdata').append(html);
+                                if (response.last_page == page) {// 是否已取完数据页
+                                    miniRefresh.endUpLoading(true);// 结束上拉加载
+                                } else {
+                                    miniRefresh.endUpLoading(false);
+                                }
+                            }
+                        }, 600);
+                    } else {
+                        if (downOrUp == 'down') {
+                            $('#listdata').html('');
+                            miniRefresh.endDownLoading(true);
+                        } else {
+                            miniRefresh.endUpLoading(true);
+                        }
+                    }
+                },
+                error: function () {
+                    if (downOrUp == 'down') {
+                        $('#listdata').html('');
+                        miniRefresh.endDownLoading(true);
+                    } else {
+                        miniRefresh.endUpLoading(true);
+                    }
+                }
+            });
+        };
+
+    });
+</script>
+</body>
+</html>

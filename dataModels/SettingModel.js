@@ -32,7 +32,13 @@ const settingSchema = new Schema({
 	  problems: Number,
 	  logos: Number,
 		messages: Number,
-		messageFiles: Number
+		messageFiles: Number,
+		activitys: Number,
+		shares: Number,
+    createdChat: Number,
+    friends: Number,
+    friendsApplications: Number,
+    friendsCategories: Number,
   },
 
 	//科创基金设置

@@ -6,6 +6,9 @@ module.exports = {
   remind: {
     GET: 'getRemind'
   },
+  friendsApplication: {
+    GET: 'getFriendsApplication'
+  },
   user: {
     PARAMETER: {
       GET: 'getUserMessage',
@@ -19,7 +22,10 @@ module.exports = {
     }
   },
   settings: {
-    PATCH: 'modifyMessageSettings'
+    PATCH: 'modifyMessageSettings',
+    PARAMETER: {
+      PATCH: 'modifyMessageSettingsForUser'
+    }
   },
   mark: {
     PATCH: 'modifyMessageStatus'
@@ -29,5 +35,13 @@ module.exports = {
   },
   newMessages: {
     GET: 'getNewMessages'
+  },
+  chat: {
+    PARAMETER: {
+      DELETE: 'removeMessageChat'
+    }
+  },
+  search: {
+    GET: 'messageSearchUser'
   }
 };

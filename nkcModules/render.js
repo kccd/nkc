@@ -305,9 +305,11 @@ let pugRender = (template, data) => {
   options.data = data;
   options.filters = filters;
   options.pretty = true; // 保留换行
-	if(['production', 'development'].includes(process.env.NODE_ENV)) {
+	if(global.NKC.NODE_ENV === 'production') {
 		options.cache = true;
-	}
+	} else {
+	  // options.debug = true;
+  }
   return pug.renderFile(template, options);
 };
 module.exports = pugRender;

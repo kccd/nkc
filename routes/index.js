@@ -19,6 +19,11 @@ const problemRouter = routers.problem;
 const loginRouter = routers.login;
 const appRouter = routers.app;
 const messageRouter = routers.message;
+const activityRouter = routers.activity;
+const friendRouter = routers.friend;
+const friendCategoryRouter = routers.friendCategory;
+const homeRouter = routers.home;
+const shareRouter = routers.share;
 
 // 所有请求先经过此中间件
 router.use('/', async (ctx, next)  => {
@@ -58,6 +63,10 @@ router.use('/', async (ctx, next)  => {
 	await next();
 });
 
+/*
+* 首页
+* */
+router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
@@ -76,4 +85,8 @@ router.use('/problem', problemRouter.routes(), problemRouter.allowedMethods());
 router.use('/login', loginRouter.routes(), loginRouter.allowedMethods());
 router.use('/system', systemRouter.routes(), systemRouter.allowedMethods());
 router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
+router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
+router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
+router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
+router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
 module.exports = router;

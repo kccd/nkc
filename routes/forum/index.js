@@ -12,14 +12,7 @@ forumRouter
     const {data, db, nkcModules} = ctx;
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
-    const options = {
-    	gradeId,
-	    rolesId,
-	    uid: user?user.uid: ''
-    };
-		let forums = await db.ForumModel.visibleForums(options);
+		let forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 		data.forums = forums.map(forum => forum.toObject());
 		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
@@ -81,12 +74,7 @@ forumRouter
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 	  const {user} = data;
-	  const options = {
-	  	gradeId: data.userGrade._id,
-		  rolesId: data.userRoles.map(r => r._id),
-	  	uid: user?user.uid: ''
-	  };
-	  await forum.ensurePermissionNew(options);
+	  await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	  const childrenForums = await forum.extendChildrenForums();
 	  if(childrenForums.length !== 0) {
 	  	ctx.throw(400, '该专业存下存在其他专业，请到下属专业发表文章。');
@@ -166,29 +154,18 @@ forumRouter
 		const {data, db, params} = ctx;
 		const {fid} = params;
 
-		// 拿到用户等级
-		const gradeId = data.userGrade._id;
-		// 拿到用户的角色
-		const rolesId = data.userRoles.map(r => r._id);
-
 		const forum = await db.ForumModel.findOnly({fid});
 
 		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
-		await forum.ensurePermissionNew({gradeId, rolesId, uid: data.user?data.user.uid: ''});
-		data.isModerator = await forum.isModerator(data.user?data.user.uid: '');
+		await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+		data.isModerator = await forum.isModerator(data.user);
 		data.forum = forum;
 
 		const {today} = ctx.nkcModules.apiFunction;
-		// 获取能看到入口的专业id
-		const options = {
-			gradeId,
-			rolesId,
-			fid,
-			uid: data.user?data.user.uid: ''
-		};
-		const fidArr = await db.ForumModel.visibleFid(options);
+		// 能看到入口的专业id
+		const fidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, forum.fid);
 		// 拿到能访问的专业id
-		const accessibleFid = await db.ForumModel.accessibleFid(options);
+		const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
 		accessibleFid.push(fid);
 		// 加载能看到入口的下一级专业
 		await forum.extendChildrenForums({fid: {$in: fidArr}});
@@ -274,15 +251,13 @@ forumRouter
 		// 加载同级的专业
 		const parentForum = await forum.extendParentForum();
 		if(parentForum) {
-			options.fid = parentForum.fid;
 			// 拿到parentForum专业下能看到入口的专业id
-			const visibleFidArr = await db.ForumModel.visibleFid(options);
+			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, parentForum.fid);
 			// 拿到parentForum专业下一级能看到入口的专业
 			data.sameLevelForums = await parentForum.extendChildrenForums({fid: {$in: visibleFidArr}});
 		} else {
-			delete options.fid;
 			// 拿到能看到入口的所有专业id
-			const visibleFidArr = await db.ForumModel.visibleFid(options);
+			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentId: '', fid: {$in: visibleFidArr}});
 		}

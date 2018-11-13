@@ -3,6 +3,7 @@
 const resourceObj = require('./resource');
 const {
 	avatar,
+	poster,
 	avatar_small,
 	forum_avatar,
 	r,
@@ -44,6 +45,11 @@ const download = require('./download');
 const forgotPassword = require('./forgotPassword');
 const app = require('./app');
 const message = require('./message');
+const activity = require('./activity');
+const share = require('./share');
+const friend = require('./friend');
+const friend_category = require('./friendCatagory');
+const subscription = require('./homeSubscription');
 const operationObj = {};
 
 
@@ -58,6 +64,7 @@ operationObj.defaultOperations = [
 	'displayFundApplicationFormSecretInfo',
 	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
 	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
+  'canSendToEveryOne', // 跳过`仅接收好友信息`限制
 ];
 
 
@@ -66,6 +73,8 @@ operationObj.operationTree = {
 		GET: 'visitHome',// 首页
 
 		logo, // 网站logo
+
+		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,
 
@@ -141,7 +150,18 @@ operationObj.operationTree = {
 
 		app,// 手机app
 
+		activity, //活动
+
+		share, // 分享
+
 		message, // 信息（新）
+
+    friend, // 好友
+
+
+    friend_category, // 好友分组
+
+    subscription, // 首页我的关注
 	}
 };
 module.exports = operationObj;

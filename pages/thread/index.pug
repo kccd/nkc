@@ -141,19 +141,33 @@ block content
                         +postOptions(thread.firstPost, thread, 0)
                       .inline-block(style='float: right;')
                         .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") &nbsp;分享
-                        .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;')
+                        .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;width:90px;background:none')
                           div(style="display:inline-block;width:100%;vertical-align:top;text-align:right;")
                             .ThreadTitle2(style="display:inline-block;max-width:100%;vertical-align:top;")
-                              .ThreadTitle22(style="border: 1px solid #ddd;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;")
-                                div.changeDis
+                              .ThreadTitle22(style="border: 1px solid #ddd;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background:#FFFFFF")
+                                div.changeDis(style="width:100%")
                                   p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
                                   .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
                                   -var tpid = thread.firstPost.pid
                                   p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
                                   .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
                                   p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
-                                div.changeDisNone
-                                  canvas#qrcode
+                                div.changeDisNone.text-center(style='width: 100%;')
+                                  .col-xs-12.col-md-12
+                                    .col-xs-4.col-md-4(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.href, '${thread.firstPost.t}')`)
+                                        img(src="/default/QQ.png" style="")
+                                    .col-xs-4.col-md-4(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.href, '${thread.firstPost.t}')`)
+                                        img(src="/default/qzone.png" style="")
+                                    .col-xs-4.col-md-4(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
+                                        img(src="/default/weibo.png" style="")
+                                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'qzone', window.location.href, '${thread.firstPost.t}')`)
+                                    //-   img(src="/default/qzone.png" style="width:100%")
+                                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
+                                    //-   img(src="/default/weibo.png" style="width:100%")
+                                  canvas.qrcode.inline-block
                       .inline-block.post-thumbsUp
                         span &nbsp;
                         -const recUsers = thread.firstPost.recUsers || [];

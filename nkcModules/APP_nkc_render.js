@@ -449,7 +449,7 @@ function APP_nkc_render(options){
       .replace(/\[(\/?)strike]/g,'<$1s>')
       .replace(/  /g,'&nbsp&nbsp')
       .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
-      html = attachment_filter(html,post)
+      html = attachment_filter(html,post);
       // now post.r are marked with _used:true
     }
     else{
@@ -476,26 +476,26 @@ function APP_nkc_render(options){
 
     // 添加查看大图
     // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
-    
     // 添加附件下载次数
-    if(post.l === "html"){
-      var extArray = ['jpg','jpeg','gif','png','bmp','mp3','mp4','wma','mid','ogg','webm']
-      for(var i in post.resources){
-        var r = post.resources[i];
-        if(extArray.indexOf(r.ext) > -1){
-          continue;
-        }
-        var reg = new RegExp(r.oname, 'gm');
-        var hrefStr = new RegExp("href=\/r\/"+r.rid,'gm');
-        var clickStr = "onclick='downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")'";
-        html = html.replace(reg,r.oname+'<span class="resourceDownCount">'+r.hits+'次下载</span>');
-        html = html.replace(hrefStr,clickStr);
-      }
-    }
+    // if(post.l === "html"){
+    //   var extArray = ['jpg','jpeg','gif','png','bmp','mp3','mp4','wma','mid','ogg','webm']
+    //   for(var i in post.resources){
+    //     var r = post.resources[i];
+    //     if(extArray.indexOf(r.ext) > -1){
+    //       continue;
+    //     }
+    //     var reg = new RegExp(r.oname, 'gm');
+    //     var hrefStr = new RegExp("href=\/r\/"+r.rid,'gm');
+    //     var clickStr = "onclick='downloadFile(\"https://www.kechuang.org/r/"+r.rid+"\",\""+r.oname+"\")'";
+    //     html = html.replace(reg,r.oname+'<span class="resourceDownCount">'+r.hits+'次下载</span>');
+    //     html = html.replace(hrefStr,clickStr);
+    //   }
+    // }
     // 将图片加上域名前缀
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>');
     html = html.replace(/<img(.*?)src="\/r(.+?)">/img,'<img$1class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$2" />');
     html = html.replace(/<img src="(\/default\/default_thumbnail.png)">/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org$1" />');
+    html = html.replace(/<img class="PostResourceDownloadThumbnail" src=('|")\/default\/default_thumbnail.png('|")\/>/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org/default/default_thumbnail.png" />');
     return html
   }
 
@@ -564,7 +564,7 @@ function APP_nkc_render(options){
     //     renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
     //   }
     // }
-    // renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
+    renderedHTML = unescape(renderedHTML.replace(/&#x/g,'%u').replace(/;/g,'').replace(/%uA0/g,' '));
     renderedHTML = renderedHTML.replace(/<a(.*?)href="(.*?)".*?>(.*?)<\/a>/igm,"<a$1href='javascript:void(0);' onclick='openLinkInFrame(\"$2\")'>$3</a>");
     // 处理表情
     var emo = "/twemoji/2/svg/";

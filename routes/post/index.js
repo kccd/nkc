@@ -13,25 +13,45 @@ const postRouter = new Router();
 
 postRouter
   .get('/:pid', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, query} = ctx;
+		const {token} = query;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
 	  const forum = await thread.extendForum();
-    const gradeId = data.userGrade._id;
-    const rolesId = data.userRoles.map(r => r._id);
     const {user} = data;
 	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
     // 判断用户是否具有访问该post所在文章的权限
     const options = {
-    	gradeId,
-	    rolesId,
+    	roles: data.userRoles,
+      grade: data.userGrade,
 	    isModerator,
 	    userOperationsId: data.userOperationsId,
-	    uid: user?user.uid: ''
+	    user
     };
-    // 权限判断
-	  await post.ensurePermissionNew(options);
+    // 权限判断		
+    if(!token){
+      // 权限判断
+      await post.ensurePermission(options);
+		}else{
+			let share = await db.ShareModel.findOne({"token":token});
+			if(!share) ctx.throw(403, "权限不足");
+			if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
+			let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
+			if(!shareLimit){
+				shareLimit = new db.ShareLimitModel({});
+				await shareLimit.save();
+			}
+			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+			let nowTimeStamp = parseInt(new Date().getTime());
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
+				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				return ctx.throw(403, "链接已失效");
+			}
+			let reqUrl = ctx.origin + ctx.path;
+			if(reqUrl !== share.shareUrl) ctx.throw(403, "权限不足")
+		}
+	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();

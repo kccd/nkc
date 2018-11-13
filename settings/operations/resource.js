@@ -11,6 +11,12 @@ module.exports = {
 			POST: 'uploadUserAvatar'
 		}
 	},
+	poster: {// 活动海报
+		PARAMETER: {
+			GET: 'getActivityPoster'
+		},
+		POST: 'uploadActivityPoster',
+	},
 	avatar_small: {// 用户头像
 		PARAMETER: {
 			GET: 'getUserAvatar',

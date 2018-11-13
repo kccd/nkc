@@ -1,0 +1,63 @@
+.swiper-home{
+  border-radius: 5px;
+}
+.swiper-slide{
+  height: 16rem;
+  position: relative;
+  background-repeat:no-repeat;
+  background-size: cover;
+}
+.swiper-title{
+  position: absolute;
+  top: 0;
+  min-height: 4rem;
+  padding: 0 1rem;
+  text-decoration: none;
+  color: #fff;
+  width: 100%;
+  font-size: 1.4rem;
+  padding-top: 1rem;
+  background-color: rgba(0,0,0,0.3);
+  background: -prefix-linear-zgradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 20%);
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%);
+}
+.swiper-home:hover .swiper-button{
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1);
+}
+.swiper-button{
+  color: rgba(255,255,255,0);
+  text-align: center;
+  line-height: 40px;
+  font-size: 3em;
+  background-color: rgba(0,0,0,0);
+  transition: background-color 0.2s, color 0.2s;
+}
+.swiper-pagination{
+  color: #ffffff;
+}
+.forums-nav .material-icons{
+  color: #aaaaaa;
+}
+.child-forums-nav{
+  position: absolute;
+  top: 0;
+  z-index: 1000;
+}
+.child-forums-nav>div{
+  position: absolute;
+}
+.child-forums-nav-div{
+  position: absolute;
+  background-color: rgba(245,245,245,0.95 );
+}
+/*   vue过度   */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+.select-forum{
+  background-color: #ddd;
+}

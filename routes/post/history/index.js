@@ -9,12 +9,7 @@ router
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     await targetThread.extendForum();
-    const options = {
-    	gradeId: data.userGrade._id,
-	    rolesId: data.userRoles.map(r => r._id),
-	    uid: data.user?data.user.uid: ''
-    };
-	  await targetThread.ensurePermission(options);
+	  await targetThread.ensurePermission(data.userGrade, data.userGrade, dat.user);
 	  if(targetPost.hideHistories && !data.userOperationsId.includes('displayPostHideHistories')) ctx.throw(403,'权限不足');
     data.post = targetPost;
     data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});

@@ -1,0 +1,10 @@
+.active-users.mdui-shadow-3.mdui-m-t-2.mdui-p-a-1
+  .active-users-header
+    <i class="mdui-icon material-icons">&#xe8d3;</i>
+    | 一周活跃用户
+  for active in data.activeUsers
+    -const user = active.user;
+    .active-user-avatar(title=user.username)
+      a(href=`/u/${user.uid}` target="_blank")
+        img(src=`/avatar/${user.uid}`)
+        div(style='font-size: 1rem;')= `文:${active.lWThreadCount} 复:${active.lWPostCount}`

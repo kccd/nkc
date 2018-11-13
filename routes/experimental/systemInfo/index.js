@@ -16,6 +16,7 @@ sysInfoRouter
       c: content
     });
     await message.save();
+    await db.UsersGeneralModel.updateMany({'messageSettings.chat.systemInfo': false}, {$set: {'messageSettings.chat.systemInfo': true}});
     await redis.pubMessage(message);
     await next();
   });
