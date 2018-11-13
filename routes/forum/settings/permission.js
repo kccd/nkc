@@ -12,7 +12,14 @@ permissionRouter
 	.patch('/', async (ctx, next) => {
 		const {data, body, db, redis} = ctx;
 		const {forum} = data;
-		const {klass, accessible, displayOnParent, visibility, isVisibleForNCC, gradesId, rolesId, relation} = body;
+		const {
+		  klass, accessible,
+      displayOnParent, visibility,
+      isVisibleForNCC, gradesId,
+      rolesId, relation,
+      shareLimitCount,
+      shareLimitTime
+		} = body;
 		const rolesDB = await db.RoleModel.find();
 		const rolesIdDB = rolesDB.map(r => r._id);
 		const gradesDB = await db.UsersGradeModel.find();
@@ -30,7 +37,17 @@ permissionRouter
 			}
 		}
 		if(!['and', 'or'].includes(relation)) ctx.throw(400, '用户角色与用户等级关系设置错误，请刷新页面重试');
-		await forum.update({class: klass, accessible, displayOnParent, visibility, isVisibleForNCC, gradesId: gradesId_, rolesId: rolesId_, relation});
+		await forum.update(
+		  {
+        class: klass, accessible,
+        displayOnParent, visibility,
+        isVisibleForNCC, gradesId: gradesId_,
+        rolesId: rolesId_,
+        relation,
+        shareLimitCount,
+        shareLimitTime
+		  }
+		);
 		await redis.cacheForums();
 		await next();
 	});

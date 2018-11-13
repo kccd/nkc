@@ -79,6 +79,18 @@ block content
                         input(type='radio' name='selectRelation' )
 
               .form-group
+                label.col-sm-3.control-label 分享链接访问次数限制
+                .col-sm-5
+                  input.form-control(id='shareLimitCount' type='number' value=forum.shareLimitCount)
+                  p.text-danger *超过访问次数的请求不再赋予token所带的权限
+
+              .form-group
+                label.col-sm-3.control-label 分享链接有效时间(小时)
+                .col-sm-5
+                  input.form-control(id='shareLimitTime' type='number' value=forum.shareLimitTime)
+
+
+              .form-group
                 .col-sm-5.col-sm-offset-3
                   button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存
 block scripts

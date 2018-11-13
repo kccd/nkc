@@ -98,6 +98,7 @@ threadRouter
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
 				return ctx.throw(403, "链接已失效");
 			}
+			console.log(ctx.origin, ctx.path);
 			let reqUrl = ctx.origin + ctx.path;
 			if(reqUrl !== share.shareUrl) ctx.throw(403, "权限不足")
 		}

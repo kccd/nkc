@@ -135,6 +135,16 @@ const forumSchema = new Schema({
 		index: 1
 	},
 
+  shareLimitTime: {
+	  type: String,
+    default: '12' // 小时
+  },
+
+  shareLimitCount: {
+    type: String,
+    default: '0' // 次数
+  },
+
   fid: {
     type: String,
     unique: true,
