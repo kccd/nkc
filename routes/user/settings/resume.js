@@ -22,12 +22,7 @@ resumeRouter
 				i.timeE = moment(i.timeE).format('YYYY-MM-DD');
 			}
 		}
-		const options = {
-			gradeId: data.userGrade._id,
-			rolesId: data.userRoles.map(r => r._id),
-			uid: data.user?data.user.uid: ''
-		};
-		const forums = await db.ForumModel.accessibleForums(options);
+		const forums = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 		const forumsObj = [];
 		for(let f of forums) {
 			let level = 2;

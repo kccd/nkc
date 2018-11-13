@@ -61,7 +61,9 @@ latestRouter
 		}
 		const threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 
-		data.threads = await db.ThreadModel.extendThreads(threads);
+		data.threads = await db.ThreadModel.extendThreads(threads, {
+		  category: true
+    });
 
 		// 构建置顶文章查询条件
 		const toppedThreadMatch = {topped: true, fid: forum.fid};

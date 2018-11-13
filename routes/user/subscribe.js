@@ -17,7 +17,7 @@ subscribeRouter
 			rolesId: data.userRoles.map(r => r._id),
 			uid
 		};
-		const forums = await db.ForumModel.accessibleForums(options);
+		const forums = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 		data.forums = await dbFunction.forumsListSort(forums);
 		ctx.template = 'interface_user_subscribe.pug';
 		await next();

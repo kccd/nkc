@@ -376,6 +376,7 @@ threadSchema.methods.getStep = async function(obj) {
 * */
 const defaultOptions = {
   forum: true,
+  category: false,
   parentForum: true,
   firstPost: true,
   firstPostUser: true,
@@ -386,11 +387,9 @@ const defaultOptions = {
   count: 200
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
-
-  const o = Object.create(defaultOptions);
+  const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
-
-  let PostModel, UserModel, ForumModel;
+  let PostModel, UserModel, ForumModel, ThreadTypeModel;
   if(o.firstPost || o.lastPost) {
     PostModel = mongoose.model('posts');
     if(o.lastPostUser || o.firstPostUser) {
@@ -400,9 +399,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   if(o.forum) {
     ForumModel = mongoose.model('forums');
   }
+  if(o.category) {
+    ThreadTypeModel = mongoose.model('threadTypes');
+  }
 
-  const forumsId = new Set(), postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {};
-  const parentForumsId = new Set(), forumsObj = {};
+  const forumsId = new Set(), postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = new Set();
+  const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
 
   threads = threads.filter(thread => !!thread);
 
@@ -415,6 +417,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       forumsId.add(thread.fid);
     }
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
+    if(thread.cid) cid.add(thread.cid);
   });
 
   if(o.firstPost || o.lastPost) {
@@ -455,7 +458,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     });
 
   }
-
+  if(o.category) {
+    const categories = await ThreadTypeModel.find({cid: {$in: [...cid]}});
+    for(const category of categories) {
+      categoryObj[category.cid] = category;
+    }
+  }
 
   return await Promise.all(threads.map(async thread => {
     if(o.firstPost) {
@@ -484,6 +492,11 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
       }
       thread.forum = forum;
+    }
+    if(o.category) {
+      if(thread.cid) {
+        thread.category = categoryObj[thread.cid];
+      }
     }
     return thread.toObject?thread.toObject():thread;
 

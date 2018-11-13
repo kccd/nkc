@@ -248,7 +248,7 @@ block content
 
           div(style='margin-top: 2rem;')
             button.btn.btn-block.btn-default(@click='deleteFriend') 删除好友
-      .ms-friend-information.row(v-else)
+      .ms-friend-information(v-else)
         .col-xs-12.col-md-10.col-md-offset-1
           button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
           button.btn.btn-block.btn-success(@click='addFriend(friend.targetUser)') 加为好友
