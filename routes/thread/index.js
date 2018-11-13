@@ -98,8 +98,7 @@ threadRouter
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
 				return ctx.throw(403, "链接已失效");
 			}
-			let reqUrl = ctx.origin + ctx.path;
-			if(reqUrl !== share.shareUrl) ctx.throw(403, "权限不足")
+			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "权限不足")
 		}
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		data.isModerator = isModerator;
