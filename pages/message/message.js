@@ -101,8 +101,8 @@ $(function() {
         var str = '0123456789abcdefghijklmnopqrstuvwxyz*';
         var initials = str.split('');
         var initialsObj = {};
-        for(var i of initials) {
-          initialsObj[i] = [];
+        for(var i = 0; i < initials.length; i++) {
+          initialsObj[initials[i]] = [];
         }
         var friends = app.friends.concat();
         for(var i = 0; i < friends.length; i++) {
