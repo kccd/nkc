@@ -23,19 +23,9 @@ forumRouter
 		}
 		// 判断是否为该专业或上级专业的专家
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
-
-		const {userGrade, userRoles} = data;
-		const options = {
-			gradeId: userGrade._id,
-			rolesId: userRoles.map(r => r._id),
-			fid: forum.fid,
-			uid: data.user?data.user.uid: ''
-		};
-		options.rolesId = userRoles.map(r => r._id);
 		// 拿到该专业下可从中拿文章的所有子专业id
-		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
 		fidOfCanGetThreads.push(forum.fid);
-
 		match.fid = {$in: fidOfCanGetThreads};
 		// 专家可查看专业下所有文章
 		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
