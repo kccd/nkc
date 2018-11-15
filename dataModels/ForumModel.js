@@ -135,6 +135,16 @@ const forumSchema = new Schema({
 		index: 1
 	},
 
+  shareLimitTime: {
+	  type: String,
+    default: '12' // 小时
+  },
+
+  shareLimitCount: {
+    type: String,
+    default: '0' // 次数
+  },
+
   fid: {
     type: String,
     unique: true,
@@ -874,12 +884,14 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
       fid = fid.concat(fidForRoleAndGrade);
     }
 
-    if(baseFid) {
-      const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
-      fid = fid.filter(f => childFid.includes(f));
-    }
+    
 
-  }
+	}
+	
+	if(baseFid) {
+		const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
+		fid = fid.filter(f => childFid.includes(f));
+	}
 
   return [...new Set(fid)];
 };

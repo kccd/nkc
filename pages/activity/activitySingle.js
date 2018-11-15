@@ -23,45 +23,55 @@ function changeToDescription() {
 
 // 提交报名
 function onpost(acid) {
-  var realName = $("#realName").val().trim();
-  var mobile = $("#mobile").val().trim();
-  var kcName = $("#kcName").val().trim() || "";
-  var email = $("#email").val().trim() || "";
-  var agreeService = $("#agreement").is(":checked");
-  var mobileReg = /^[1][3,4,5,7,8][0-9]{9}$/;
-  var emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
-  clearErrTips("#realNameErr");
-  clearErrTips("#mobileErr");
-  clearErrTips("#emailErr");
-  if(realName == ""){
-    return errInfoTips("请填写真实姓名","#realNameErr");
-  }
-  if(mobile == "" || !mobileReg.test(mobile)){
-    return errInfoTips("请填写11位手机号", "#mobileErr");
-  }
-  if(email){
-    if(email == "" || !emailReg.test(email)){
-      return errInfoTips("请填写正确的邮箱格式")
+  // var realName = $("#realName").val().trim();
+  // var mobile = $("#mobile").val().trim();
+  // var kcName = $("#kcName").val().trim() || "";
+  // var email = $("#email").val().trim() || "";
+  // var agreeService = $("#agreement").is(":checked");
+  // var mobileReg = /^[1][3,4,5,7,8][0-9]{9}$/;
+  // var emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
+  // clearErrTips("#realNameErr");
+  // clearErrTips("#mobileErr");
+  // clearErrTips("#emailErr");
+  // if(realName == ""){
+  //   return errInfoTips("请填写真实姓名","#realNameErr");
+  // }
+  // if(mobile == "" || !mobileReg.test(mobile)){
+  //   return errInfoTips("请填写11位手机号", "#mobileErr");
+  // }
+  // if(email){
+  //   if(email == "" || !emailReg.test(email)){
+  //     return errInfoTips("请填写正确的邮箱格式")
+  //   }
+  // }
+  // var wxNum = $("#wxNum").val().trim() || "";
+  // var qqNum = $("#qqNum").val().trim() || "";
+  // var age = $("#age").val().trim() || "";
+  // var education = $("#education").val().trim() || "";
+  // var wordUnit = $("#wordUnit").val().trim() || "";
+  var enrollInfo = [];
+  var isStop = false;
+  $("#apply").find(".form-group").each(function() {
+    var enrolls = {};
+    enrolls.key = $(this).find("#enrollKey").text().trim();
+    if($(this).find("#enrollValue").attr("type") == "text"){
+      enrolls.value = $(this).find("#enrollValue").val().trim();
+      if(enrolls.value == ""){
+        screenTopWarning("请填写"+enrolls.key);
+        isStop = true;
+        return false;
+      }
     }
+    enrollInfo.push(enrolls)
+  })
+  if(isStop){
+    return;
   }
-  var wxNum = $("#wxNum").val().trim() || "";
-  var qqNum = $("#qqNum").val().trim() || "";
-  var age = $("#age").val().trim() || "";
-  var education = $("#education").val().trim() || "";
-  var wordUnit = $("#wordUnit").val().trim() || "";
-
   var post = {
     acid: acid,
-    realName: realName,
-    kcName: kcName,
-    mobile: mobile,
-    email: email,
-    wxNum: wxNum,
-    qqNum: qqNum,
-    age: age,
-    education: education,
-    wordUnit: wordUnit
+    enrollInfo: enrollInfo
   }
+  console.log(post)
   nkcAPI("/activity/single/"+acid, "POST", {post:post})
   .then(function(data) {
     screenTopAlert("报名成功！");

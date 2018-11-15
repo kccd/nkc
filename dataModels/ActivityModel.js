@@ -77,8 +77,8 @@ const activitySchema = new Schema({
     default: false
   },
   conditions: {
-    type: [String],
-    default:["rna","pho"]
+    type: [Schema.Types.Mixed],
+    default: []
   }
 },
 {
@@ -104,7 +104,23 @@ activitySchema.virtual('user')
 .set(function(user) {
   this._user = user;
 });
-  
+
+activitySchema.virtual('historys')
+.get(function() {
+  return this._historys;
+})
+.set(function(historys) {
+  this._historys = historys;
+});
+
+activitySchema.virtual('userPersonal')
+.get(function() {
+  return this._userPersonal;
+})
+.set(function(userPersonal) {
+  this._userPersonal = userPersonal;
+});
+
 activitySchema.methods.extendUser = async function() {
   const UserModel = mongoose.model('users');
   const user = await UserModel.findOnly({uid: this.uid});
@@ -125,7 +141,12 @@ activitySchema.methods.extendPost = async function() {
     post = post.toObject();
     return post;
   }));
-
   return this.posts = posts;
+}
+
+activitySchema.methods.extendHistorys = async function() {
+  const ActivityHistoryModel = mongoose.model('activityHistory');
+  let historys = await ActivityHistoryModel.find({acid: this.acid}).sort({toc:-1}).skip(1);
+  return historys = historys;
 }
 module.exports = mongoose.model('activity', activitySchema, 'activity');

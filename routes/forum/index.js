@@ -151,13 +151,37 @@ forumRouter
 	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:fid/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
 	.use(['/:fid/home', '/:fid/latest', '/:fid/followers', '/:fid/visitors'], async (ctx, next) => {
-		const {data, db, params} = ctx;
+		const {data, db, params, query} = ctx;
 		const {fid} = params;
+		const {token} = query;
 
 		const forum = await db.ForumModel.findOnly({fid});
 
 		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
-		await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+		if(!token){
+			await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+		}else{
+			let share = await db.ShareModel.findOne({"token":token});
+			if(!share) ctx.throw(403, "无效的token");
+			// if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
+			if(share.tokenLife === "invalid"){
+				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+			}
+			// console.log(forum)
+			// let shareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+			// if(!shareLimit){
+			// 	shareLimit = new db.ShareLimitModel({});
+			// 	await shareLimit.save();
+			// }
+			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+			let nowTimeStamp = parseInt(new Date().getTime());
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*forum.shareLimitTime){
+				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+			}
+			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
+		}
+		// await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 		data.isModerator = await forum.isModerator(data.user);
 		data.forum = forum;
 

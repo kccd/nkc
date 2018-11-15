@@ -482,7 +482,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const UserModel = mongoose.model('users');
   const UsersGradeModel = mongoose.model('usersGrades');
   const ResourceModel = mongoose.model('resources');
-  const o = Object.create(defaultOptions);
+  const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
   const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {};
 

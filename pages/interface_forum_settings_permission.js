@@ -35,7 +35,9 @@ function submit(fid) {
 		isVisibleForNCC: switchStatus('isVisibleForNCC'),
 		rolesId: selectedRolesId,
 		gradesId: selectedGradesId,
-		relation: relation
+		relation: relation,
+    shareLimitCount: $('#shareLimitCount').val(),
+    shareLimitTime: $('#shareLimitTime').val()
 	};
 	nkcAPI('/f/'+fid+'/settings/permission', 'PATCH', obj)
 		.then(function() {

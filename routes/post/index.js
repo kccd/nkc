@@ -35,9 +35,12 @@ postRouter
       await post.ensurePermission(options);
 		}else{
 			let share = await db.ShareModel.findOne({"token":token});
-			if(!share) ctx.throw(403, "权限不足");
-			if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
-			let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
+			if(!share) ctx.throw(403, "无效的token");
+      // if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
+      if(share.tokenLife === "invalid") {
+        await post.ensurePermission(options);
+      }
+			let shareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
 			if(!shareLimit){
 				shareLimit = new db.ShareLimitModel({});
 				await shareLimit.save();
@@ -46,9 +49,9 @@ postRouter
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
-				return ctx.throw(403, "链接已失效");
+        await post.ensurePermission(options);
 			}
-			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "权限不足")
+			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
 		}
 	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息

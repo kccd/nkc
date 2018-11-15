@@ -1,7 +1,7 @@
 var app = new Vue({
   el: '#app',
   data: {
-    shareLimit: {},
+    shareLimit: [],
   },
   methods: {
     submit: function() {
@@ -14,6 +14,18 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data.error || data);
         })
+    },
+    add: function() {
+      var limit = {
+        shareName: "",
+        shareType: "",
+        shareLimitTime: "",
+        shareLimitCount: ""
+      }
+      app.shareLimit.push(limit)
+    },
+    del: function(key) {
+      app.shareLimit.splice(key,1)
     }
   },
   mounted: function() {

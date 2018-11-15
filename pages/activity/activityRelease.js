@@ -81,6 +81,7 @@ $('#inputFile').on('change', function() {
     insertToImage(url);
 	};
   reader.readAsDataURL(upLoadFile);
+  savePoster();
 });
 
 
@@ -104,18 +105,18 @@ function submitRelease() {
   var enrollEndTime = $("#enrollEndTime").val(); // 报名结束时间
   var holdStartTime = $("#holdStartTime").val(); // 活动开始时间
   var holdEndTime = $("#holdEndTime").val(); // 活动结束时间
-  if(!timeStampCheck("#enrollStartTime","#enrollStartTimeErr")){
-    return;
-  }
+  // if(!timeStampCheck("#enrollStartTime","#enrollStartTimeErr")){
+  //   return;
+  // }
   if(!timeStampCheck("#enrollEndTime","#enrollEndTimeErr")){
     return;
   }
   if(!deadlineCheck(enrollStartTime,enrollEndTime,"#enrollEndTimeErr")){
     return;
   }
-  if(!timeStampCheck("#holdStartTime","#holdStartTimeErr")){
-    return;
-  }
+  // if(!timeStampCheck("#holdStartTime","#holdStartTimeErr")){
+  //   return;
+  // }
   if(!timeStampCheck("#holdEndTime","#holdEndTimeErr")){
     return;
   }
@@ -165,9 +166,14 @@ function submitRelease() {
 
   // 获取报名条件
   var conditions = [];
-  $("#conditions").find("input").each(function(){
-    if($(this).is(":checked") == true){
-      conditions.push($(this).attr("id"))
+  $("#conditions").find(".form-inline").each(function(){
+    var forminfo = {};
+    if($(this).find("#infoName").val().trim() !== ""){
+      forminfo.infoName = $(this).find("#infoName").val().trim();
+      forminfo.infoDesc = $(this).find("#infoDesc").val().trim();
+      forminfo.formType = "text";
+      forminfo.infoPara = [];
+      conditions.push(forminfo);
     }
   })
 
@@ -285,8 +291,6 @@ function choosePoster() {
 function savePoster() {
   var formData = new FormData();
   formData.append('file', upLoadFile);
-  console.log(formData)
-  console.log(upLoadFile)
 	$.ajax({
 		url: '/poster',
 		method: 'POST',
@@ -302,9 +306,20 @@ function savePoster() {
 		.done(function(data) {
       var imgDom = '<img style="width:100%" id="poster" srcs="'+data.picname+'" src="/poster/'+data.picname+'">';
       $("#exampleImg").html(imgDom);
-			screenTopAlert('保存成功');
+			screenTopAlert('海报上传成功');
 		})
 		.fail(function(data) {
 			screenTopWarning(JSON.parse(data.responseText).error);
 		})
+}
+
+// 添加一行表单
+function addOneForm() {
+  var htmlstr = '<div class="form-inline"><input class="form-control" id="infoName" type="text" value="" placeholder="名称">&nbsp;<input class="form-control" id="infoDesc" type="text" value="" placeholder="提示信息">&nbsp;<button class="btn btn-default" onclick="delOneForm(this)"><i class="fa fa-trash"></i></button></div>';
+  $("#conditions").append(htmlstr)
+}
+
+// 删除本行
+function delOneForm(para) {
+  $(para).parent().remove();
 }
