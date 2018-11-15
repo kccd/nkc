@@ -253,11 +253,11 @@ block content
               .col-xs-12.col-md-2
 
 block scripts
-  script(src='/interface_common.js')
-  script(src='/jquery/jquery-1.11.1.js')
-  script(src='/qrcode/build/qrcode.js')
-  script(src="/activity/activityCommon.js")
-  script(src="/activity/activitySingle.js")
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/jquery/jquery-1.11.1.js?v=${global.NKC.startTime}`)
+  script(src=`/qrcode/build/qrcode.js?v=${global.NKC.startTime}`)
+  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
+  script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)
   script.
     var qrcode = document.getElementById("activityQrcode");
     if (qrcode) {

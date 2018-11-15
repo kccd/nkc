@@ -137,7 +137,7 @@ const forumSchema = new Schema({
 
   shareLimitTime: {
 	  type: String,
-    default: '12' // 小时
+    default: '720' // 小时
   },
 
   shareLimitCount: {

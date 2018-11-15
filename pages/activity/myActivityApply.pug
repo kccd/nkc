@@ -46,5 +46,5 @@ block content
                           th 
                             a(href=`/activity/single/${apply.acid}`) 查看详情
 block scripts
-  script(src='/interface_common.js')
-  script(src="/activity/activityCommon.js")
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
