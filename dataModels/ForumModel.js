@@ -884,12 +884,14 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
       fid = fid.concat(fidForRoleAndGrade);
     }
 
-    if(baseFid) {
-      const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
-      fid = fid.filter(f => childFid.includes(f));
-    }
+    
 
-  }
+	}
+	
+	if(baseFid) {
+		const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
+		fid = fid.filter(f => childFid.includes(f));
+	}
 
   return [...new Set(fid)];
 };

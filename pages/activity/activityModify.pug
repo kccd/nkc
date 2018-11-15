@@ -10,196 +10,187 @@ block title
 block content
   .container-fluid(style='max-width: 1400px;')
       include activityNav.pug
-      .row
-        .col-xs-12.col-md-10
-          .panel.panel-primary
-            .panel-heading
-              span 活动修改
-            .panel-body
-              .form-horizontal
+      .col-xs-12.col-md-2
+        .list-group
+          a.list-group-item(class=!data.modifyType || data.modifyType==='modify'?'active': '' href=`/activity/modify/${data.activity.acid}?modifyType=modify`) 修改
+          a.list-group-item(class=data.modifyType==='manage'?'active': '' href=`/activity/modify/${data.activity.acid}?modifyType=manage`) 管理
+      .col-xs-12.col-md-10
+        -if(!data.modifyType || data.modifyType == 'modify')
+          .row
+            .col-xs-12.col-md-10
+              .panel.panel-primary
+                .panel-heading
+                  span 活动修改
+                .panel-body
+                  .form-horizontal
 
-                .form-group
-                  label.col-sm-2.control-label 活动标题：
-                  .col-sm-8
-                    input.form-control#activityTitle(value=`${data.activity.activityTitle}`)
-                    span#titleErr(style='color:red')
-
-                .form-group
-                  label.col-sm-2.control-label 报名时间：
-                  .col-sm-4
-                    .input-group
-                      input.form-control.time#enrollStartTime(readonly size="16" type="text" value=`${data.activity.enrollStartTime}`)
-                      span.input-group-addon
-                        i.fa.fa-calendar
-                    span#enrollStartTimeErr(style='color:red')
-                  .col-sm-4
-                    .input-group
-                      input.form-control.time#enrollEndTime(readonly size="16" type="text" value=`${data.activity.enrollEndTime}`)
-                      span.input-group-addon
-                        i.fa.fa-calendar
-                    span#enrollEndTimeErr(style='color:red')
-
-                .form-group
-                  label.col-sm-2.control-label 举办时间：
-                  .col-sm-4
-                    .input-group
-                      input.form-control.time#holdStartTime(readonly size="16" type="text" value=`${data.activity.holdStartTime}`)
-                      span.input-group-addon
-                        i.fa.fa-calendar
-                    span#holdStartTimeErr(style='color:red')
-                  .col-sm-4
-                    .input-group
-                      input.form-control.time#holdEndTime(readonly size="16" type="text" value=`${data.activity.holdEndTime}`)
-                      span.input-group-addon
-                        i.fa.fa-calendar
-                    span#holdEndTimeErr(style='color:red')
-
-                .form-group
-                  label.col-sm-2.control-label 详细地址：
-                  .col-sm-8
-                    input.form-control#address(value=`${data.activity.address}`)
-                    span#addressErr(style='color:red')
-                
-                .form-group
-                  label.col-sm-2.control-label 活动海报：
-                  .col-sm-3
-                    .col-sm-6
-                      button.btn.btn-primary#inputImage(onclick=`$("#inputFile").click();`) 选择海报
-                    .col-sm-6
-                      button.btn.btn-primary#savePoster(onclick=`savePoster()`) 上传
-                      div#hahaha
-                    .col-sm-12
-                      p
-                    .col-sm-12
-                      p(style='color:#33CC33') 注意事项：
-                    .col-sm-12
-                      p 1、海报尺寸 1080*640，.jpg 或 .png格式，不超过 4M
-                    .col-sm-12 
-                      p 2、精美海报有助于吸引吃瓜群众围观，增加报名量！
-                  .col-sm-5
-                    .row
-                      .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
-                        img.poster#poster(src=`/poster/${data.activity.posterId}` srcs=`${data.activity.posterId}` style='width: 100%;')
-                      span#posterErr(style='color:red')
-
-                .form-group
-                  label.col-sm-2.control-label 主办方：
-                  .col-sm-8
-                    input.form-control.quantity-count#sponsor(value=`${data.activity.sponsor}`)
-                    span#sponsorErr(style='color:red')
-
-                .form-group
-                  label.col-sm-2.control-label 联系电话：
-                  .col-sm-8
-                    input.form-control.quantity-count#contactNum(value=`${data.activity.contactNum}`)
-                    span#contactNumErr(style='color:red')
-
-                .form-group
-                  label.col-sm-2.control-label 活动人数：
-                  .col-sm-4
-                    input.form-control.quantity-count#activityPartNum(value=`${data.activity.limitNum}`)
-                    span#activityPartNumErr(style='color:red')
-                  .col-sm-4
-                    -if(data.activity.continueTofull == true)
-                      input(type="checkbox" checked=true)#continueTofull
-                      span 到达人数上限时是否允许继续报名
-                    -else
-                      input(type="checkbox")#continueTofull
-                      span 到达人数上限时是否允许继续报名
-
-                .form-group
-                  label.col-sm-2.control-label 活动详情：
-                  .col-sm-8
-                    div#ReplyContent
-                    div#replyxxx(style="display:none")=data.activity.description
-                    .checkbox-inline(style="display:none")
-                      label
-                        input#ParseURL(type='checkbox' checked)
-                        | 处理URL
                     .form-group
-                    .nkcpanel(id='file-uploading' target='/r')
-                      //uploader section
-                      include ../interface_attachment_uploader_uploader.pug
+                      label.col-sm-2.control-label 活动标题：
+                      .col-sm-8
+                        input.form-control#activityTitle(value=`${data.activity.activityTitle}`)
+                        span#titleErr(style='color:red')
 
-                    .panel.panel-default
-                      .panel-heading 我的附件（点击插入帖子）
-                      .panel-body(id='list-container')
+                    .form-group
+                      label.col-sm-2.control-label 报名时间：
+                      .col-sm-4
+                        .input-group
+                          input.form-control.time#enrollStartTime(readonly size="16" type="text" value=`${data.activity.enrollStartTime}`)
+                          span.input-group-addon
+                            i.fa.fa-calendar
+                        span#enrollStartTimeErr(style='color:red')
+                      .col-sm-4
+                        .input-group
+                          input.form-control.time#enrollEndTime(readonly size="16" type="text" value=`${data.activity.enrollEndTime}`)
+                          span.input-group-addon
+                            i.fa.fa-calendar
+                        span#enrollEndTimeErr(style='color:red')
 
-                .form-group
-                  label.col-sm-2.control-label 通知内容：
-                  .col-sm-8
-                    textarea.form-control#noticeContent(rows="8")=`因变更了。。。所以。。。`
-                .form-group
-                  label.col-sm-2.control-label
-                  .col-sm-8
-                    input(type="checkbox" checked=false)#isnotice
-                    span 活动变更后是否通知报名者
-                hr
+                    .form-group
+                      label.col-sm-2.control-label 举办时间：
+                      .col-sm-4
+                        .input-group
+                          input.form-control.time#holdStartTime(readonly size="16" type="text" value=`${data.activity.holdStartTime}`)
+                          span.input-group-addon
+                            i.fa.fa-calendar
+                        span#holdStartTimeErr(style='color:red')
+                      .col-sm-4
+                        .input-group
+                          input.form-control.time#holdEndTime(readonly size="16" type="text" value=`${data.activity.holdEndTime}`)
+                          span.input-group-addon
+                            i.fa.fa-calendar
+                        span#holdEndTimeErr(style='color:red')
 
-                .form-group
-                  label.col-sm-2.control-label
-                  .col-sm-3
-                    button.btn.btn-primary#save(onclick=`submitredit(${data.activity.acid})`) 保存修改
-                  .col-sm-3
-                    button.btn.btn-primary#save(onclick=`closeActivity(${data.activity.acid})`) 关闭活动
-                  .col-sm-3
-                    button.btn.btn-primary#save(onclick=`sendMessage(${data.activity.acid})`) 发送通知
-            input#inputFile(type='file' accept="image/*").hidden
+                    .form-group
+                      label.col-sm-2.control-label 详细地址：
+                      .col-sm-8
+                        input.form-control#address(value=`${data.activity.address}`)
+                        span#addressErr(style='color:red')
+                    
+                    .form-group
+                      label.col-sm-2.control-label 活动海报：
+                      .col-sm-3
+                        .col-sm-6
+                          button.btn.btn-primary#inputImage(onclick=`$("#inputFile").click();`) 选择海报
+                        //- .col-sm-6
+                        //-   button.btn.btn-primary#savePoster(onclick=`savePoster()`) 上传
+                          div#hahaha
+                        .col-sm-12
+                          p
+                        .col-sm-12
+                          p(style='color:#33CC33') 注意事项：
+                        .col-sm-12
+                          p 1、海报尺寸 1080*640，.jpg 或 .png格式，不超过 4M
+                        .col-sm-12 
+                          p 2、精美海报有助于吸引吃瓜群众围观，增加报名量！
+                      .col-sm-5
+                        .row
+                          .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
+                            img.poster#poster(src=`/poster/${data.activity.posterId}` srcs=`${data.activity.posterId}` style='width: 100%;')
+                          span#posterErr(style='color:red')
 
-      //- .row
-      //-   .col-xs-12.col-md-10
-      //-     .panel.panel-primary
-      //-       .panel-heading
-      //-         span 变更通知
-      //-       .panel-body
-      //-         .form-horizontal
-      //-           .form-group
-      //-             label.col-sm-2.control-label 通知内容：
-      //-             .col-sm-8
-      //-               textarea.form-control#commentContent(rows="8")=`因变更了。。。所以。。。`
-      //-           .form-group
-      //-             label.col-sm-2.control-label
-      //-             .col-sm-8
-      //-               input(type="checkbox" checked=false)#continueTofull
-      //-               span 内容变更后是否通知报名者
+                    .form-group
+                      label.col-sm-2.control-label 主办方：
+                      .col-sm-8
+                        input.form-control.quantity-count#sponsor(value=`${data.activity.sponsor}`)
+                        span#sponsorErr(style='color:red')
 
+                    .form-group
+                      label.col-sm-2.control-label 联系电话：
+                      .col-sm-8
+                        input.form-control.quantity-count#contactNum(value=`${data.activity.contactNum}`)
+                        span#contactNumErr(style='color:red')
 
-      .row
-        .col-xs-12.col-md-10
-          .panel.panel-default
-            .panel-body
-              a.btn-primary#outExc 导出Excel
-              hr
-              .table-responsive
-                table.table.table-striped#tabExc(border="1")
-                  thead
-                    tr
-                      th 姓名
-                      th 手机
-                      th kc昵称
-                      th 邮箱
-                      th 微信
-                      th QQ
-                      th 年龄
-                      th 学历 
-                      th 单位(院校)
-                      th 状态
-                      //- th 操作
-                  tbody
-                    -for(let apply of data.activityApplyList)
-                      tr
-                        th!=apply.realName
-                        th!=apply.mobile
-                        th!=apply.kcName
-                        th!=apply.email
-                        th!=apply.wxNum
-                        th!=apply.qqNum
-                        th!=apply.age
-                        th!=apply.education
-                        th!=apply.wordUnit
-                        th!="已报名"
-                        //- th 
-                        //-   button(onclick=`cancelApply(${data.activity.acid},${data.activity.uid})`) 取消报名
+                    .form-group
+                      label.col-sm-2.control-label 活动人数：
+                      .col-sm-4
+                        input.form-control.quantity-count#activityPartNum(value=`${data.activity.limitNum}`)
+                        span#activityPartNumErr(style='color:red')
+                      .col-sm-4
+                        -if(data.activity.continueTofull == true)
+                          input(type="checkbox" checked=true)#continueTofull
+                          span 到达人数上限时是否允许继续报名
+                        -else
+                          input(type="checkbox")#continueTofull
+                          span 到达人数上限时是否允许继续报名
+
+                    .form-group
+                      label.col-sm-2.control-label 活动详情：
+                      .col-sm-8
+                        div#ReplyContent
+                        div#replyxxx(style="display:none")=data.activity.description
+                        .checkbox-inline(style="display:none")
+                          label
+                            input#ParseURL(type='checkbox' checked)
+                            | 处理URL
+                        .form-group
+                        .nkcpanel(id='file-uploading' target='/r')
+                          //uploader section
+                          include ../interface_attachment_uploader_uploader.pug
+
+                        .panel.panel-default
+                          .panel-heading 我的附件（点击插入帖子）
+                          .panel-body(id='list-container')
+
+                    .form-group
+                      label.col-sm-2.control-label 通知内容：
+                      .col-sm-8
+                        textarea.form-control#noticeContent(rows="8")=`因变更了。。。所以。。。`
+                    .form-group
+                      label.col-sm-2.control-label
+                      .col-sm-8
+                        input(type="checkbox" checked=false)#isnotice
+                        span 活动变更后是否通知报名者
+                    hr
+
+                    .form-group
+                      label.col-sm-2.control-label
+                      .col-sm-3
+                        button.btn.btn-primary#save(onclick=`submitredit(${data.activity.acid})`) 保存修改
+                      .col-sm-3
+                        button.btn.btn-primary#save(onclick=`closeActivity(${data.activity.acid})`) 关闭活动
+                      .col-sm-3
+                        button.btn.btn-primary#save(onclick=`sendMessage(${data.activity.acid})`) 发送通知
+                input#inputFile(type='file' accept="image/*").hidden
+
+        //- .row
+        //-   .col-xs-12.col-md-10
+        //-     .panel.panel-primary
+        //-       .panel-heading
+        //-         span 变更通知
+        //-       .panel-body
+        //-         .form-horizontal
+        //-           .form-group
+        //-             label.col-sm-2.control-label 通知内容：
+        //-             .col-sm-8
+        //-               textarea.form-control#commentContent(rows="8")=`因变更了。。。所以。。。`
+        //-           .form-group
+        //-             label.col-sm-2.control-label
+        //-             .col-sm-8
+        //-               input(type="checkbox" checked=false)#continueTofull
+        //-               span 内容变更后是否通知报名者
+
+        -if(data.modifyType == 'manage')
+          .row
+            .col-xs-12.col-md-10
+              .panel.panel-default
+                .panel-body
+                  a.btn-primary#outExc 导出Excel
+                  hr
+                  .table-responsive
+                    table.table.table-striped#tabExc(border="1")
+                      thead
+                        tr
+                          -for(var a=0;a < data.activity.conditions.length;a++)
+                            th!=data.activity.conditions[a].infoName
+                          //- th 操作
+                      tbody
+                        -for(let apply of data.activityApplyList)
+                          tr
+                            -for(var b=0;b < apply.enrollInfo.length;b++)
+                              th!=apply.enrollInfo[b].value
+                              //- th!="已报名"
+                            //- th 
+                            //-   button(onclick=`cancelApply(${data.activity.acid},${data.activity.uid})`) 取消报名
 block scripts
   script(src="/jquery-ui-1.10.4.custom.js")
   script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")

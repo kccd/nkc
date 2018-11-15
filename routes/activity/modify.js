@@ -5,6 +5,8 @@ modifyRouter
     const {data, db, params, query} = ctx;
 		const {user} = data;
     const {acid} = params;
+    const {modifyType} = query;
+    data.modifyType = modifyType;
     const activity = await db.ActivityModel.findOnly({acid:acid});
     if(!user || activity.uid !== user.uid){
       ctx.throw(404, "你无权限修改活动")

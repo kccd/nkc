@@ -41,8 +41,9 @@ block content
                             th 已结束
                           -else
                             th 进行中
-                          th 
-                            a(href=`/activity/modify/${release.acid}`) 管理
+                          th.text-align 
+                            a(href=`/activity/modify/${release.acid}?modifyType=modify`) 修改  
+                            a(href=`/activity/modify/${release.acid}?modifyType=manage`) 管理
 block scripts
   script(src='/interface_common.js')
   script(src="/activity/activityCommon.js")

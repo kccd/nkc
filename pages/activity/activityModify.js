@@ -36,6 +36,7 @@ $('#inputFile').on('change', function() {
     insertToImage(url);
 	};
   reader.readAsDataURL(upLoadFile);
+  savePoster();
 });
 
 
@@ -93,7 +94,7 @@ function savePoster() {
 		.done(function(data) {
       var imgDom = '<img style="width:100%" id="poster" srcs="'+data.picname+'" src="/poster/'+data.picname+'">';
       $("#exampleImg").html(imgDom);
-			screenTopAlert('保存成功');
+			screenTopAlert('海报上传成功');
 		})
 		.fail(function(data) {
 			screenTopWarning(JSON.parse(data.responseText).error);
@@ -115,18 +116,18 @@ function submitredit(acid){
     var enrollEndTime = $("#enrollEndTime").val(); // 报名结束时间
     var holdStartTime = $("#holdStartTime").val(); // 活动开始时间
     var holdEndTime = $("#holdEndTime").val(); // 活动结束时间
-    if(!timeStampCheck("#enrollStartTime","#enrollStartTimeErr")){
-      return;
-    }
+    // if(!timeStampCheck("#enrollStartTime","#enrollStartTimeErr")){
+    //   return;
+    // }
     if(!timeStampCheck("#enrollEndTime","#enrollEndTimeErr")){
       return;
     }
     if(!deadlineCheck(enrollStartTime,enrollEndTime,"#enrollEndTimeErr")){
       return;
     }
-    if(!timeStampCheck("#holdStartTime","#holdStartTimeErr")){
-      return;
-    }
+    // if(!timeStampCheck("#holdStartTime","#holdStartTimeErr")){
+    //   return;
+    // }
     if(!timeStampCheck("#holdEndTime","#holdEndTimeErr")){
       return;
     }

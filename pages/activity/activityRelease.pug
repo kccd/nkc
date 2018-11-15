@@ -12,9 +12,9 @@ block content
       include activityNav.pug
       .row
         .col-xs-12.col-md-10
-          .panel.panel-primary
+          .panel.panel-primary(style="border-color:#FFF")
             .panel-heading
-              span 活动发布
+              span 基本信息
             .panel-body
               .form-horizontal
 
@@ -88,8 +88,8 @@ block content
                   .col-sm-3
                     .col-sm-6
                       button.btn.btn-primary#inputImage(onclick=`$("#inputFile").click();`) 选择海报
-                    .col-sm-6
-                      button.btn.btn-primary#savePoster(onclick=`savePoster()`) 上传
+                    //- .col-sm-6
+                    //-   button.btn.btn-primary#savePoster(onclick=`savePoster()`) 上传
                       div#hahaha
                     .col-sm-12
                       p
@@ -131,45 +131,61 @@ block content
                   .col-sm-4
                     input(type="checkbox")#continueTofull
                     span 到达人数上限时是否允许继续报名
-
+      .row
+        .col-xs-12.col-md-10
+          .panel.panel-primary(style="border-color:#FFF")
+            .panel-heading
+              span 报名表单
+            .panel-body
+              .form-horizontal
+                .col-sm-8.col-md-8#conditions.text-center
+                  .form-inline
+                    input.form-control(id="infoName" type="text" value="姓名" disabled)
+                    input.form-control(id="infoDesc" type="text" value="报名用户的真实姓名" disabled)
+                    button.btn.btn-default(onclick="delOneForm(this)")
+                      i.fa.fa-trash
+                  .form-inline
+                    input.form-control(id="infoName" type="text" value="手机" disabled)
+                    input.form-control(id="infoDesc" type="text" value="报名用户的手机号码" disabled)
+                    button.btn.btn-default(onclick="delOneForm(this)")
+                      i.fa.fa-trash
+                  .form-inline
+                    input.form-control(id="infoName" type="text" value="昵称" disabled)
+                    input.form-control(id="infoDesc" type="text" value="报名用户的在论坛的昵称" disabled) 
+                    button.btn.btn-default(onclick="delOneForm(this)")
+                      i.fa.fa-trash
+                .col-sm-4.col-md-4
+                  .form-inline
+                    .col-sm-4.col-md-4
+                    .col-sm-4.col-md-4
+                      span.btn.btn-default.btn-lg.btn-block(style="margin:5px" onclick="addOneForm()")
+                        i.fa.fa-plus
+                    .col-sm-4.col-md-4
+                    
+                    
+      .row
+        .col-xs-12.col-md-10
+          .panel.panel-primary(style="border-color:#FFF")
+            .panel-heading
+              span 活动详情
+            .panel-body
+              .form-horizontal
                 .form-group
-                  label.col-sm-2.control-label 报名条件：
-                  .col-sm-8#conditions
-                    input#rna(type="checkbox" checked="checked" disabled)
-                    span 真实姓名 
-                    input#pho(type="checkbox" checked="checked" disabled)
-                    span 手机号码 
-                    input#kcn(type="checkbox")
-                    span 论坛昵称 
-                    input#ema(type="checkbox")
-                    span 邮箱 
-                    input#wxn(type="checkbox")
-                    span 微信 
-                    input#qqn(type="checkbox")
-                    span QQ 
-                    input#age(type="checkbox")
-                    span 年龄 
-                    input#edu(type="checkbox")
-                    span 学历
-                    input#wor(type="checkbox")
-                    span 单位(院校)
-                
-                .form-group
-                  label.col-sm-2.control-label 活动详情：
-                  .col-sm-8
-                    div#ReplyContent
-                    .checkbox-inline(style="display:none")
-                      label
-                        input#ParseURL(type='checkbox' checked)
-                        | 处理URL
-                    .form-group
-                    .nkcpanel(id='file-uploading' target='/r')
-                      //uploader section
-                      include ../interface_attachment_uploader_uploader.pug
+                  //- label.col-sm-2.control-label 活动详情：
+                  //- .col-sm-8
+                  div#ReplyContent
+                  .checkbox-inline(style="display:none")
+                    label
+                      input#ParseURL(type='checkbox' checked)
+                      | 处理URL
+                  .form-group
+                  .nkcpanel(id='file-uploading' target='/r')
+                    //uploader section
+                    include ../interface_attachment_uploader_uploader.pug
 
-                    .panel.panel-default
-                      .panel-heading 我的附件（点击插入帖子）
-                      .panel-body(id='list-container')
+                  .panel.panel-default
+                    .panel-heading 我的附件（点击插入帖子）
+                    .panel-body(id='list-container')
 
                       
                 .form-group
