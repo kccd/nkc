@@ -45,5 +45,5 @@ block content
                             a(href=`/activity/modify/${release.acid}?modifyType=modify`) 修改  
                             a(href=`/activity/modify/${release.acid}?modifyType=manage`) 管理
 block scripts
-  script(src='/interface_common.js')
-  script(src="/activity/activityCommon.js")
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)

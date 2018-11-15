@@ -53,9 +53,9 @@ block content
           //-   -const url = `/fund/bills`;
 
 block scripts
-  script(src="/jquery-ui-1.10.4.custom.js")
-  script(src='../interface_common.js')
-  script(src="../bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
-  script(src="../bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
-  script(src='../bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
-  script(src="./activityCommon.js" charset="UTF-8")
+  script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
+  script(src=`../interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`../bootstrap/js/bootstrap-datetimepicker.min.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`../bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`../bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
