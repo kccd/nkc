@@ -1,4 +1,4 @@
-function saveKcbSettings() {
+/*function saveKcbSettings() {
 	var obj = {
 		defaultUid: $('#defaultUid').val()
 	};
@@ -32,4 +32,26 @@ function saveKcbNumberSettings() {
 		.catch(function(data) {
 			screenTopWarning(data.error|| data);
 		})
-}
+}*/
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    kcbsTypes: []
+  },
+  mounted: function() {
+    var data = JSON.parse(this.$refs.data.innerText);
+    this.kcbsTypes = data.kcbsTypes;
+  },
+  methods: {
+    save: function() {
+      nkcAPI('/e/settings/kcb', 'PATCH', {kcbsTypes: this.kcbsTypes})
+        .then(function() {
+          screenTopAlert('保存成功');
+        })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+    }
+  }
+});

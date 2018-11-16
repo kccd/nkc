@@ -104,7 +104,7 @@
     "visitPost": "查看单条POST",
     "modifyPost": "修改回复",
     "quotePost": "引用回复",
-    "creditXsf": "评学术分",
+    "creditXsf": "进评学术分的路由（给普通用户）",
     "creditKcb": "评科创币",
     "disabledPost": "封禁回复",
     "visitPostHistory": "查看POST历史",
@@ -230,6 +230,8 @@
     "addUsersGrade": "添加用户等级",
     "deleteUsersGrade": "删除用户等级",
     "visitKcbSettings": "访问科创币设置页",
+    "visitXsfSettings": "访问<后台管理-设置-学术分>",
+    "modifyXsfSettings": "修改<后台管理-设置-学术分>",
     "modifyKcbSettings": "修改科创币设置",
     "modifyRoleUsers": "将用户从某个角色中移除",
     "modifyOtherPosts": "修改别人的post",
@@ -358,7 +360,9 @@
     "getShareToken": "获取分享链接的Token",
     "visitShareLink": "访问分享的链接",
     "canSendToEveryOne": "有权给任何人发信息",
-
+    "post-vote-up": "回复或文章-点赞",
+    "post-vote-down": "回复或文章-点踩",
+    "visitExperimentalKcb": "访问<后台管理-查看记录-科创币>",
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",

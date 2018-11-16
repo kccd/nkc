@@ -113,7 +113,7 @@ let creditString = (t) => {
   switch (t) {
     case 'xsf':
       return '学术分';
-    case 'kcb':
+    case 'creditKcb':
       return '科创币';
     default:
       return '[未定义积分]'

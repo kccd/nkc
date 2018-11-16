@@ -1,0 +1,6 @@
+.posts-vote
+  .posts-vote-up(class=votePost.usersVote==='up'?'active': '' data-pid=votePost.pid onclick=`postsVote("${votePost.pid}", "${data.user?'up': 'login'}")`)
+    .fa.fa-caret-up
+  .posts-vote-number(data-pid=votePost.pid)= votePost.voteUp
+  .posts-vote-down(class=votePost.usersVote==='down'?'active': '' data-pid=votePost.pid onclick=`postsVote("${votePost.pid}", "${data.user?'down': 'login'}")`)
+    .fa.fa-caret-down

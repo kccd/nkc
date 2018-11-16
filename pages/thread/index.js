@@ -482,6 +482,28 @@ function addCredit(pid){
 	}
 }
 
+function addKcb(pid, kcb) {
+  var num = prompt('向作者转账科创币以资鼓励，科创币数量：', '5');
+  if(!num || !Number(num)) return screenTopWarning('请输入正确的科创币数量');
+  num = Number(num);
+  if(num <= 0) return screenTopWarning('科创币最少为1');
+  if(kcb < num) return screenTopWarning('您的科创币数量不足');
+  var description = prompt('请输入理由：', '');
+  if(!description || description.length < 2) {
+    return screenTopWarning('理由写的太少啦~');
+  }
+  nkcAPI('/p/'+pid+'/credit/kcb', 'POST', {
+    num: num,
+    description: description
+  })
+    .then(function() {
+      screenTopAlert('鼓励成功!');
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    });
+}
+
 function promptCredit(pid){
 	var cobj = {pid:pid}
 

@@ -282,12 +282,19 @@ userSchema.virtual('grade')
 	});
 
 userSchema.virtual('authLevel')
-	.get(function() {
-		return this._authLevel;
-	})
-	.set(function(authLevel) {
-		this._authLevel = authLevel;
-	});
+  .get(function() {
+    return this._authLevel;
+  })
+  .set(function(authLevel) {
+    this._authLevel = authLevel;
+  });
+userSchema.virtual('newVoteUp')
+  .get(function() {
+    return this._newVoteUp;
+  })
+  .set(function(newVoteUp) {
+    this._newVoteUp = newVoteUp;
+  });
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = mongoose.model('threads');

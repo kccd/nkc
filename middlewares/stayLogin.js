@@ -99,6 +99,9 @@ module.exports = async (ctx, next) => {
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
 		user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
 
+		// 获取新点赞数
+    user.newVoteUp = await db.PostsVoteModel.count({tUid: user.uid, toc: {$gt: user.tlv}});
+
 		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
 			user.certs = ['banned'];

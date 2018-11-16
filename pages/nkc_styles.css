@@ -3142,3 +3142,54 @@ img.emoji {
   background-color: #ffffff;
   font-size: 1.2rem;
 }
+.posts-vote{
+  height: 1.5rem;
+  display: inline-block;
+  padding-right: 0.5rem;
+}
+.posts-vote>div{
+  vertical-align: top;
+  display: inline-block;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  width: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+}
+.posts-vote-up, .posts-vote-down{
+  background-color: #deedfa;
+  color: #3e9ef2;
+  border-radius: 50%;
+  transition: color 0.3s, background-color 0.3s;
+}
+/*.posts-vote-up:hover, .posts-vote-down:hover, .posts-vote-up.active, .posts-vote-down.active{*/
+.posts-vote-up.active, .posts-vote-down.active{
+  background-color: #3e9ef2;
+  color: #fff;
+}
+.posts-vote-number{
+  font-weight: 600;
+  color: #607a91;
+  max-width: 2.5rem;
+  font-size: 1.3rem;
+}
+.btn-fixed-save{
+  position: fixed;
+  right: 2rem;
+  bottom: 5rem;
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  background-color: #1e88e5;
+  line-height: 5rem;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.3s;
+}
+.btn-fixed-save:active{
+  background-color: #0b5ba2;
+}
+

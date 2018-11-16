@@ -13,8 +13,7 @@ block title
 block content
 
   mixin forgotPossword
-    div.link
-      a(href="/login") 账号登录
+    a(href="/login").btn.btn-danger.btn-block.minimalist-button 登录
     div.link
       a(style='cursor: pointer;' @click='changeTermsStatus') 科创网及论坛统一服务协议
         span.caret

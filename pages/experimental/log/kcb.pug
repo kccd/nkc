@@ -1,0 +1,47 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  title 科创币交易记录
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          h2 科创人民银行
+            span.h4!= ` 科创币剩余 <strong style="color: #ffa100;font-size: 2rem;text-decoration: underline;">${data.kcbSettings.totalMoney}</strong> 个`
+        .col-xs-12.col-md-12
+          .hidden(ref='data')= JSON.stringify({kcbsRecords: data.kcbsRecords})
+          h4 科创币交易记录 当前日期：{{now}}
+        .col-xs-12.col-md-12.table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 时间
+                th 操作名
+                th 支出者
+                th 收入者
+                th 数目
+                th
+            tbody
+              tr(v-for='(record, index) of kcbsRecords')
+                th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th
+                  span(v-if='record.type === "creditKcb"') 鼓励
+                  span(v-else) {{record.kcbsType.description}}
+                th
+                  span(v-if='record.from === "bank"') 科创人民银行
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank') {{record.fromUser.username}}
+                th
+                  span(v-if='record.to === "bank"') 科创人民银行
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank') {{record.toUser.username}}
+                th {{record.num}}
+                th.text-center
+                  a(:href="'/e/log/kcb/' + record._id") 详情
+          include ../../interface_navigation_paging
+block scripts
+  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
+  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/log/kcb.js?v=${global.NKC.startTime}`)

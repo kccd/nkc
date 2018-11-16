@@ -1177,11 +1177,34 @@ $(function() {
     mounted: function() {
       this.getUserList()
         .then(function() {
+          // 通过名片进入信息页面
           if(targetUser) {
             app.selectUser({
               type: 'UTU',
               user: targetUser
             });
+          } else {
+            // var hasNewMessage = false;
+            // 判断是否有新信息
+            for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.count !== 0) {
+                // hasNewMessage = true;
+                app.selectUser({
+                  type: 'UTU',
+                  user: li.user
+                });
+                break;
+              }
+            }
+            // 若没有新信息则打开第一个人
+            /*if(!hasNewMessage && app.userList.length > 0) {
+              var li = app.userList[0];
+              app.selectUser({
+                type: 'UTU',
+                user: li.user
+              });
+            }*/
           }
         });
 

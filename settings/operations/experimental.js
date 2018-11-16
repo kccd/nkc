@@ -108,6 +108,10 @@ module.exports = {
 			GET: 'visitKcbSettings',
 			PATCH: 'modifyKcbSettings'
 		},
+    xsf: {
+		  GET: 'visitXsfSettings',
+      PATCH: 'modifyXsfSettings'
+    },
 		log: {
 			GET: 'logParamsSetting',
 			POST: 'logParamsSettingModify'
@@ -157,6 +161,9 @@ module.exports = {
 		},
 		score: {
 			GET: 'visitScoreLogs'
-		}
+		},
+    kcb: {
+		  GET: 'visitExperimentalKcb'
+    }
 	}
 };

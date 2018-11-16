@@ -12,6 +12,12 @@ homeRouter
 				await allMarkThreads[i].update({ "recycleMark": false, fid: "recycle" })
 				await db.PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"fid":"recycle"}})
 				await db.DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
+        const tUser = await db.UserModel.findOne({uid: delThreadLog.delUserId});
+        const thread = await db.ThreadModel.findOne({tid: delThreadLog.threadId});
+        if(tUser && thread) {
+          data.thread = thread;
+          await db.KcbsRecordModel.insertSystemRecord('postBlocked', tUser, ctx);
+        }
 			}
 		}
 		const {digest, sortby, page = 0} = query;

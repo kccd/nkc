@@ -19,6 +19,7 @@ const messageRouter = require('./message');
 const shareRouter = require('./share');
 const smsRouter = require('./sms');
 const postRouter = require('./post');
+const xsfRouter = require('./xsf');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -26,6 +27,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+  .use('/xsf', xsfRouter.routes(), xsfRouter.allowedMethods())
 	.use('/post', postRouter.routes(), postRouter.allowedMethods())
 	.use('/message', messageRouter.routes(), messageRouter.allowedMethods())
 	.use('/share', shareRouter.routes(), shareRouter.allowedMethods())

@@ -1,3 +1,5 @@
+// 新的方法将放到nkc对象里，避免变量污染
+var nkc = {};
 // 定义最后光标对象
 var lastEditRange;
 function geid(id){return document.getElementById(id);}
@@ -1301,4 +1303,49 @@ function obtainPureText(content, reduce, count) {
     }
   }
   return content;
+}
+
+function postsVote(pid, type) {
+  if(type === 'login') return window.location.href = '/login';
+  var url = '/p/' + pid + '/vote/down';
+  if(type === 'up') {
+    url = '/p/' + pid + '/vote/up';
+  }
+  nkcAPI(url, 'POST', {})
+    .then(function(data) {
+      var number = data.post.voteUp;
+      var upIcon = document.querySelector('.posts-vote-up[data-pid="'+pid+'"]');
+      var downIcon = document.querySelector('.posts-vote-down[data-pid="'+pid+'"]');
+      var numberIcon = document.querySelector('.posts-vote-number[data-pid="'+pid+'"]');
+      var up = upIcon.classList.contains('active');
+      var down = downIcon.classList.contains('active');
+
+      if(type === 'up') { // 点赞
+        if(up) { // 若已经点过赞则取消已点赞背景且数字减一
+          downIcon.classList.remove('active');
+          upIcon.classList.remove('active');
+        } else { // 若没点过赞则添加已点赞背景且数字加一
+          downIcon.classList.remove('active');
+          upIcon.classList.add('active');
+        }
+      } else { // 点踩
+        if(down) {
+          // 若已经点过踩了则取消点踩背景
+          upIcon.classList.remove('active');
+          downIcon.classList.remove('active');
+        } else { // 若没点过踩
+          if(up) { // 若点过赞则取消点赞背景且数字减一并添加点踩背景
+            upIcon.classList.remove('active');
+            downIcon.classList.add('active');
+          } else { // 若没点过赞则直接添加点踩背景
+            upIcon.classList.remove('active');
+            downIcon.classList.add('active');
+          }
+        }
+      }
+      numberIcon.innerHTML = number;
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    });
 }

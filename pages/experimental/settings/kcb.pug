@@ -3,14 +3,39 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   link(href='/experimental/index.css' rel='stylesheet')
-  title kcb设置
+  title 科创币设置
 block content
 
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
-      .col-xs-12.col-md-12
-        .row#content
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          .hidden(ref='data')= JSON.stringify({kcbsTypes: data.kcbsTypes})
+          h4 科创币设置
+        .col-xs-12.col-md-12.table-responsive
+          table.table
+            thead
+              tr
+                th 序号
+                th 操作名
+                th 每天次数（无限制：-1）
+                th 科创币
+                th 描述
+            tbody
+              tr(v-for='(type, index) of kcbsTypes')
+                th {{index + 1}}
+                th {{type.description}}
+                th
+                  input(v-model.number="type.count")
+                th
+                  input(v-model.number="type.num")
+                th
+                  span(v-if="type.count === 0") 未启用
+                  span(v-else-if="type.count === -1") 无限次数 | 每次 {{type.num>0?'+': ''}}{{type.num}} 科创币
+                  span(v-else) 每天 {{type.count}} 次 | 每次 {{type.num>0?'+':''}}{{type.num}} 科创币
+          .btn-fixed-save(@click='save') 保存
+        //.row#content
           .col-xs-12.col-md-12(style='margin: 2rem 0 1rem 0;')
             h4 默认收款账户
             if data.defaultUser
@@ -57,9 +82,7 @@ block content
 
 
 block scripts
-
-  script(src='/interface_common.js')
-  script(src='/experimental/settings/kcb.js')
+  script(src=`/experimental/settings/kcb.js?v=${global.NKC.startTime}`)
 
 
 

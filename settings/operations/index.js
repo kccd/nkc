@@ -65,6 +65,7 @@ operationObj.defaultOperations = [
 	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
 	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
   'canSendToEveryOne', // 跳过`仅接收好友信息`限制
+  'creditXsf'
 ];
 
 

@@ -16,6 +16,7 @@ block title
 
   -const postTo = data.userOperationsId.includes('quotePost')
   -const addCredit = data.userOperationsId.includes('creditXsf')
+  -const addKcb = data.userOperationsId.includes('creditKcb')
   -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
   -const highlight = data.highlight;
   -const digestPost = data.userOperationsId.includes('digestPost');
@@ -67,6 +68,11 @@ block title
               span.fa.fa-star &nbsp;取消精选
         - var ownership = data.userOperationsId.includes('modifyOtherPosts')
         - ownership = ownership?true:(data.user.uid===post.uid)
+        if addKcb && post.uid !== data.user.uid
+          li
+            a(href=`javascript: addKcb("${post.pid}", ${data.user.kcb})`)
+              span.fa.fa-thumbs-o-up &nbsp;
+              span 鼓励
         if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
           li
             a(href=`/editor?type=post&id=${post.pid}`)
@@ -169,16 +175,20 @@ block content
                                     //-   img(src="/default/weibo.png" style="width:100%")
                                   canvas.qrcode.inline-block
                       .inline-block.post-thumbsUp
-                        span &nbsp;
-                        -const recUsers = thread.firstPost.recUsers || [];
-                        if data.user && recUsers.includes(data.user.uid)
-                          span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-                        else
-                          span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        //span &nbsp;
+                        //-const recUsers = thread.firstPost.recUsers || [];
+                        //if data.user && recUsers.includes(data.user.uid)
+                        //  span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        //else
+                        //  span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        // - post = thread.firstPost;
+                        - const votePost = thread.firstPost;
+                        include ../module_vote
                       if thread.firstPost.digest
                         .inline-block.post-thumbsUp
                           span &nbsp;
                           span.fa.fa-star(style='color: #ffbf16;' title='精选')
+
 
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')

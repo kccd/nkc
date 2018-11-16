@@ -144,7 +144,6 @@ const forumSchema = new Schema({
     type: String,
     default: '0' // 次数
   },
-
   fid: {
     type: String,
     unique: true,
@@ -884,11 +883,11 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
       fid = fid.concat(fidForRoleAndGrade);
     }
 
-    if(baseFid) {
-      const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
-      fid = fid.filter(f => childFid.includes(f));
-    }
+  }
 
+  if(baseFid) {
+    const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
+    fid = fid.filter(f => childFid.includes(f));
   }
 
   return [...new Set(fid)];
