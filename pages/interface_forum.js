@@ -15,37 +15,37 @@ $(document).ready(function(){
   displayAside();
   
   // var qrcodes = document.getElementsByClassName('qrcode');
-  var qrcodes = $(".qrcode");
-  for(var i in qrcodes){
-    var qrcode = qrcodes[i];
-    if(qrcode) {
-      var path = window.location.href;
-      path = path.replace(/\?.*/g, '');
-      QRCode.toCanvas(qrcode, path, {
-        scale: 3,
-        margin: 1,
-        color: {dark: '#000000'}
-      }, function(err) {
-        if(err){
-          //- screenTopWarning(err);
-        }
-      })
-    }
-  }
-  var qrcode = geid('formCode1');
-  if(qrcode) {
-    var path = window.location.href;
-    path = path.replace(/\?.*/g, '');
-    QRCode.toCanvas(qrcode, path, {
-      scale: 3,
-      margin: 1,
-      color: {dark: '#000000'}
-    }, function(err) {
-      if(err){
-        //- screenTopWarning(err);
-      }
-    })
-  }
+  // var qrcodes = $(".qrcode");
+  // for(var i in qrcodes){
+  //   var qrcode = qrcodes[i];
+  //   if(qrcode) {
+  //     var path = window.location.href;
+  //     path = path.replace(/\?.*/g, '');
+  //     QRCode.toCanvas(qrcode, path, {
+  //       scale: 3,
+  //       margin: 1,
+  //       color: {dark: '#000000'}
+  //     }, function(err) {
+  //       if(err){
+  //         //- screenTopWarning(err);
+  //       }
+  //     })
+  //   }
+  // }
+  // var qrcode = geid('formCode1');
+  // if(qrcode) {
+  //   var path = window.location.href;
+  //   path = path.replace(/\?.*/g, '');
+  //   QRCode.toCanvas(qrcode, path, {
+  //     scale: 3,
+  //     margin: 1,
+  //     color: {dark: '#000000'}
+  //   }, function(err) {
+  //     if(err){
+  //       //- screenTopWarning(err);
+  //     }
+  //   })
+  // }
 });
 
 

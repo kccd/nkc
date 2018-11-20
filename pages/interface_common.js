@@ -1247,10 +1247,12 @@ function addFriendByUid() {
     })
 }
 
-function shareTo(shareType, type, str, title){
+function shareTo(shareType, type, str, title, pid){
   var host = window.location.host;
   var lk = 'http://'+host+'/default/logo3.png'
-  var newLink = window.open();
+  if(type !== "weChat"){
+    var newLink = window.open();
+  }
   if(str){
     var para = {
       'str': str,
@@ -1271,8 +1273,39 @@ function shareTo(shareType, type, str, title){
         newLink.location='http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk;
         // window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
       }
-      if(type == "weiChat") {
-        var qrcode = geid('threadCode');
+      if(type == "weChat") {
+        var qrcode
+        if(shareType == "post"){
+          var qrid = pid+"Qrcode";
+          qrcode = geid(qrid);
+        }else{
+          if(shareType == "forum"){
+            var otherCodes = document.getElementsByClassName('forumQrcode');
+            // var otherCodes = $(".forumQrcode");
+            for(var i in otherCodes){
+              var otherCode = otherCodes[i];
+              if(otherCode && typeof(otherCode)=="object") {
+                otherCode.style.display = "inline-block"
+                var path = newUrl;
+                path = path.replace(/\?.*/g, '');
+                QRCode.toCanvas(otherCode, path, {
+                  scale: 3,
+                  margin: 1,
+                  color: {dark: '#000000'}
+                }, function(err) {
+                  if(err){
+                    //- screenTopWarning(err);
+                  }
+                })
+              }
+            }
+          }
+          var qrid = shareType+"Qrcode";
+          qrcode = geid(qrid);
+        }
+        // var qrid = shareType+"Qrcode";
+        // var qrcode = geid(qrid);
+        qrcode.style.display = "inline-block"
         if(qrcode) {
           var path = newUrl;
           path = path.replace(/\?.*/g, '');
