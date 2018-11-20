@@ -154,20 +154,23 @@ block content
                                   p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
                                 div.changeDisNone.text-center(style='width: 100%;')
                                   .col-xs-12.col-md-12
-                                    .col-xs-4.col-md-4(style="padding:0px")
+                                    .col-xs-3.col-md-3(style="padding:0px")
                                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.href, '${thread.firstPost.t}')`)
                                         img(src="/default/QQ.png" style="")
-                                    .col-xs-4.col-md-4(style="padding:0px")
+                                    .col-xs-3.col-md-3(style="padding:0px")
                                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.href, '${thread.firstPost.t}')`)
                                         img(src="/default/qzone.png" style="")
-                                    .col-xs-4.col-md-4(style="padding:0px")
+                                    .col-xs-3.col-md-3(style="padding:0px")
                                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
                                         img(src="/default/weibo.png" style="")
+                                    .col-xs-3.col-md-3(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.href, '${thread.firstPost.t}')`)
+                                        img(src="/default/weChat.png" style="")
                                     //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'qzone', window.location.href, '${thread.firstPost.t}')`)
                                     //-   img(src="/default/qzone.png" style="width:100%")
                                     //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
                                     //-   img(src="/default/weibo.png" style="width:100%")
-                                  canvas.qrcode.inline-block
+                                  canvas#threadQrcode.inline-block(style="display:none")
                       .inline-block.post-thumbsUp
                         span &nbsp;
                         -const recUsers = thread.firstPost.recUsers || [];
@@ -268,7 +271,7 @@ block content
                           .form-group
                             div#quoteCancel(style='display: none')
                               button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-                          .form-group
+                          .form-group(style="background-color:#fff;")
                             div#ReplyContent
                           .form-inline
                             .form-group

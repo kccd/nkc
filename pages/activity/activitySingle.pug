@@ -18,23 +18,26 @@ block content
               .col-xs-12.col-md-2
                 .col-sm-12
                   .text-center(style="width:100%")
-                    canvas#activityQrcode
                     .row
                       .col-xs-2.col-md-2
                       .col-xs-8.col-md-8
-                        .col-xs-4.col-md-4(style="padding:0px")
+                        .col-xs-3.col-md-3(style="padding:0px")
                           a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qq', window.location.href, '活动：${data.activity.activityTitle}')`)
                             img(src="/default/QQ.png" style="")
-                        .col-xs-4.col-md-4(style="padding:0px")
+                        .col-xs-3.col-md-3(style="padding:0px")
                           a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qzone', window.location.href, '活动：${data.activity.activityTitle}')`)
                             img(src="/default/qzone.png" style="")
-                        .col-xs-4.col-md-4(style="padding:0px")
+                        .col-xs-3.col-md-3(style="padding:0px")
                           a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weibo', window.location.href, '活动：${data.activity.activityTitle}')`)
                             img(src="/default/weibo.png" style="")
+                        .col-xs-3.col-md-3(style="padding:0px")
+                          a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weChat', window.location.href, '活动：${data.activity.activityTitle}')`)
+                            img(src="/default/weChat.png" style="")
                         //- img(src="/default/QQ.png" style="width:30%" onclick=`shareTo('activity', 'qq', window.location.href, '活动：${data.activity.activityTitle}')`)
                         //- img(src="/default/qzone.png" style="width:30%" onclick=`shareTo('activity', 'qzone', window.location.href, '活动：${data.activity.activityTitle}')`)
                         //- img(src="/default/weibo.png" style="width:30%" onclick=`shareTo('activity', 'weibo', window.location.href, '活动：${data.activity.activityTitle}')`)
                       .col-xs-2.col-md-2
+                    canvas#activityQrcode(style="display:none")
                   //- img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")
               .col-xs-12.col-md-8
                 .form-group
@@ -258,20 +261,20 @@ block scripts
   script(src=`/qrcode/build/qrcode.js?v=${global.NKC.startTime}`)
   script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
   script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)
-  script.
-    var qrcode = document.getElementById("activityQrcode");
-    if (qrcode) {
-      var path = window.location.href;
-      //- var path = "https://www.kechuang.org";
-      path = path + "?t=" + Date.now();
-      QRCode.toCanvas(qrcode, path, {
-        scale: 3,
-        margin: 1,
-        width: 114,
-        color: {dark: '#333333'}
-      }, function (err) {
-        if (err) {
-          screenTopWarning(err);
-        }
-      })
-    }
+  //- script.
+  //-   var qrcode = document.getElementById("activityQrcode");
+  //-   if (qrcode) {
+  //-     var path = window.location.href;
+  //-     //- var path = "https://www.kechuang.org";
+  //-     path = path + "?t=" + Date.now();
+  //-     QRCode.toCanvas(qrcode, path, {
+  //-       scale: 3,
+  //-       margin: 1,
+  //-       width: 114,
+  //-       color: {dark: '#333333'}
+  //-     }, function (err) {
+  //-       if (err) {
+  //-         screenTopWarning(err);
+  //-       }
+  //-     })
+  //-   }
