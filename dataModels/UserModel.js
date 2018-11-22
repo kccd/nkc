@@ -9,6 +9,10 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
+  oldKcb: {
+    type: Number,
+    default: 0
+  },
   toc: {
     type: Date,
     default: Date.now,

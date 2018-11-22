@@ -55,7 +55,7 @@ block title
                 span.fa.fa-folder-o &nbsp;加入收藏
         if addCredit
           li
-            a(href=`javascript:addCredit('${post.pid}')`)
+            a(href=`javascript:credit('${post.pid}', 'xsf')`)
               span.fa.fa-graduation-cap &nbsp;
               span 评学术分
         if digestPost && !post.digest
@@ -70,7 +70,7 @@ block title
         - ownership = ownership?true:(data.user.uid===post.uid)
         if addKcb && post.uid !== data.user.uid
           li
-            a(href=`javascript: addKcb("${post.pid}", ${data.user.kcb})`)
+            a(href=`javascript: credit("${post.pid}", 'kcb', ${data.user.kcb})`)
               span.fa.fa-thumbs-o-up &nbsp;
               span 鼓励
         if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
@@ -101,18 +101,20 @@ block title
   mixin postCredits(post)
     if post.credits && post.credits.length > 0
       .nkcpanel.ThreadPostCredits
-        each c,index in post.credits
-          -var username = c.username||c.uid
-          -var profile = (c.uid&&c.uid!=='0')?'/m/'+c.uid:'/user_activities_byname/'+c.username
+        for c,index in post.credits
+          -var username = c.fromUser.username
+          -var profile = '/u/'+c.from
           .ThreadPostCreditItem
-            span.TPCQ #{(c.q > 0 ? '+' : '-')}#{c.q} &nbsp;
+            span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA
-              a(href=`${profile}`)
+              a(href=`${profile}` style='text-decoration: none;')
                 img.TPCIAI(src=`/avatar_small/${c.uid}`)
-            span.TPCIssuer #{username} &nbsp;&nbsp;
+                span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
             span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
-            span.TPCReason #{c.reason}
+            span.TPCReason #{c.description}
+            if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
+              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
   
 block content
   -const mainContainer1400 = true;
@@ -120,6 +122,7 @@ block content
   -const {exactPost} = data
 
     .container-fluid(style="max-width:1400px;")
+      include ../module_credit
       .row
         .col-xs-12.col-md-9
           .fullwidthpanel.ThreadBox.nkcpanel
@@ -239,13 +242,13 @@ block content
                       if data.paging.page === 0
                         div.thread-content.ThreadPostBody!= experimental_render(post)
                         +postEditTime(post)
-                        +postCredits(post)
+                        +postCredits(data.posts[0])
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
                           div.ThreadPostBody!= experimental_render(post)
                           +postEditTime(post)
-                          +postCredits(post)
+                          +postCredits(data.posts[0])
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
                       if post.disabled && disablePost
@@ -388,8 +391,6 @@ block scripts
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
-  script(src="/jquery-1.10.2.js")
-  script(src="/jquery-ui-1.10.4.custom.js")
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')

@@ -25,6 +25,7 @@ const friendRouter = routers.friend;
 const friendCategoryRouter = routers.friendCategory;
 const homeRouter = routers.home;
 const shareRouter = routers.share;
+const lotteryRouter = routers.lottery;
 
 
 // 所有请求先经过此中间件
@@ -66,6 +67,7 @@ router.use('/', async (ctx, next)  => {
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
+router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());

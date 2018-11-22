@@ -68,7 +68,11 @@ module.exports = {
 				PARAMETER: {
 					GET: 'visitVerifySettings',
 				}
-			}
+			},
+      'red_envelope': {
+			  GET: 'visitUserRedEnvelopeSettings',
+        PATCH: 'modifyUserRedEnvelopeSettings'
+      }
 		},
 		auth: {
 			GET: 'visitUserAuth',

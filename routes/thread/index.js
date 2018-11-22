@@ -359,6 +359,7 @@ threadRouter
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		const _post = await thread.newPost(post, user, ip);
+    data.post = _post;
 		data.targetUser = await thread.extendUser();
 
 		// 生成记录
@@ -375,7 +376,8 @@ threadRouter
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
-		await db.UsersScoreLogModel.insertLog(obj);
+		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
+		// await db.UsersScoreLogModel.insertLog(obj);
 
 		if(thread.uid !== user.uid) {
       const messageId = await db.SettingModel.operateSystemID('messages', 1);
@@ -400,10 +402,10 @@ threadRouter
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
 		}
-		data.post = _post;
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		//帖子曾经在草稿箱中，发表时，删除草稿
-		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
+		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
+
 		await next();
 	})
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())

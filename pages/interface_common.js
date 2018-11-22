@@ -1349,3 +1349,50 @@ function postsVote(pid, type) {
       screenTopWarning(data.error || data);
     });
 }
+
+function lottery() {
+  nkcAPI('/lottery', 'POST', {})
+    .then(function(data) {
+      var result = data.result;
+      var kcb = data.kcb;
+      var domClose = document.getElementsByClassName('lottery-close');
+      if(domClose.length === 0) return;
+      domClose = domClose[0];
+      var domOpen = document.getElementsByClassName('lottery-open');
+      if(domOpen.length === 0) return;
+      domOpen = domOpen[0];
+      domClose.style.display = 'none';
+      domOpen.style.display = 'block';
+      var header = domOpen.getElementsByClassName('lottery-info-header');
+      if(header.length === 0) return;
+      if(!result) {
+        return header[0].innerText = '未中奖';
+      }
+      header[0].innerText = result.name;
+      var content = domOpen.getElementsByClassName('lottery-info');
+      if(content.length === 0) return;
+      content[0].innerText = '获得' + kcb + '个科创币';
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+}
+
+function closeLottery() {
+  var dom = document.getElementsByClassName('lottery-info-header');
+  if(dom.length !== 0 && dom[0].innerText) {
+    var lotteryDom = document.getElementsByClassName('lottery');
+    if(lotteryDom.length === 0) return;
+    return lotteryDom[0].style.display = 'none';
+  }
+  nkcAPI('/lottery', 'DELETE', {})
+    .then(function() {
+      var dom = document.getElementsByClassName('lottery');
+      if(dom.length === 0) return;
+      dom = dom[0];
+      dom.style.display = 'none';
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+}

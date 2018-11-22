@@ -1,3 +1,4 @@
+var creditDom;
 $(document).ready(function(){
 	if($(window).width()<750){
 		$('.ThreadTitleText').css('font-size','20px');
@@ -55,6 +56,10 @@ $(document).ready(function(){
 		})
 	}
 	scrollTo(0,0);
+  creditDom = $('#creditModel');
+  creditDom.modal({
+    show: false
+  });
 });
 
 function get_selection(the_id)
@@ -466,6 +471,75 @@ function addColl(tid){
 		})
 }
 
+
+function cancelXsf(pid, id) {
+  var reason = prompt('请输入撤销原因：');
+  if(reason === null) return;
+  if(reason === '') return screenTopWarning('撤销原因不能为空！');
+  nkcAPI('/p/' + pid + '/credit/xsf/' + id + '?reason=' + reason, 'DELETE', {})
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+
+}
+
+function credit(pid, type, kcb) {
+  var title = {
+    xsf: '评学术分',
+    kcb: '鼓励'
+  }[type];
+  creditDom.one('show.bs.modal', function(event) {
+    var button = event.currentTarget.getElementsByClassName('btn');
+    var t = event.currentTarget.getElementsByClassName('modal-title');
+    var kcbInfo = event.currentTarget.getElementsByClassName('kcb-info');
+    var num = event.currentTarget.getElementsByClassName('num')[0];
+    var description = event.currentTarget.getElementsByClassName('description')[0];
+    if(type === 'kcb') {
+      kcbInfo[0].style.display = 'block';
+      num.value = 5;
+    } else {
+      num.value = 1;
+      kcbInfo[0].style.display = 'none'
+    }
+    description.value = '';
+    t[0].innerText = title;
+    button[1].onclick = function() {
+      if(type === 'xsf') {
+        var obj = {
+          num: num.value,
+          description: description.value
+        };
+        return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',obj)
+          .then(function(){
+            creditDom.modal('hide');
+            window.location.reload();
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error)
+          })
+      } else if(type === 'kcb') {
+        if(num > kcb) return screenTopWarning('您的科创币不足');
+        var obj = {
+          num: num.value,
+          description: description.value
+        };
+        nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)
+          .then(function() {
+            creditDom.modal('hide');
+            window.location.reload();
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          });
+      }
+    }
+  });
+  creditDom.modal('show');
+}
+
 function addCredit(pid){
 	var cobj = promptCredit(pid)
 	if(cobj){
@@ -497,7 +571,7 @@ function addKcb(pid, kcb) {
     description: description
   })
     .then(function() {
-      screenTopAlert('鼓励成功!');
+      screenTopAlert('鼓励成功！');
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
@@ -509,12 +583,11 @@ function promptCredit(pid){
 
 	var q = prompt('请输入学术分：','1')
 	if(q&&Number(q)){
-		cobj.q=Number(q)
+		cobj.num=Number(q)
 
 		var reason = prompt('请输入评分理由：','')
 		if(reason&&reason.length>1){
-			cobj.reason = reason
-			cobj.type = 'xsf'
+			cobj.description = reason;
 
 			return cobj
 		}

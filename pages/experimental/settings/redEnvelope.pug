@@ -1,0 +1,82 @@
+extends ../../bootstrap_base
+block title
+  -const mainContainer1400 = true;
+  title 红包设置
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      #app(v-cloak)
+        .hidden(ref='data')= JSON.stringify({redEnvelopeSettings: data.redEnvelopeSettings, draftFee: data.draftFee})
+        .col-xs-12.col-md-12
+          h4 随机红包设置
+          span 每天第一次发表文章或回复将获得一次抽奖机会
+        .col-xs-12.col-md-12
+          span 总开关：
+          .checkbox(style='display:inline-block;')
+            | 开
+            input(type='radio' value='false' v-model='random.close')
+            | &nbsp;&nbsp;&nbsp;
+            | 关
+            input(type='radio' value='true' v-model='random.close')
+        .col-xs-12.col-md-12
+          table.table.table-bordered
+            //-(style='font-size:1rem;')
+            thead
+              tr
+                th 序号
+                th 奖名
+                th 奖金(科创币)
+                th 概率(%)
+                th 正负浮动(%)
+                th 其他
+            tbody
+              tr(v-for='(award, index) in random.awards')
+                th
+                  span {{index + 1}}&nbsp;
+                th
+                  input(v-model='award.name')
+                th
+                  input(v-model.number='award.kcb')
+                th
+                  input(v-model.number='award.chance')
+                th
+                  input(v-model.number='award.float')
+                th
+                  button(@click='remove(index)') 删除
+                  button(@click='add(index)') 添加
+          button.btn.btn-default(@click='add(random.awards.length)') 添加
+        .col-xs-12.col-md-12
+          br
+        .col-xs-12.col-md-12
+          h4 精选稿费设置
+        .col-xs-12.col-md-12
+          span 总开关：
+            .checkbox(style='display:inline-block;')
+              | 开
+              input(type='radio' value='false' v-model='draftFee.close')
+              | &nbsp;&nbsp;&nbsp;
+              | 关
+              input(type='radio' value='true' v-model='draftFee.close')
+        .col-xs-12.col-md-12.form-inline
+          .form-group
+            span 默认红包数量：
+            input.form-control(v-model='draftFee.defaultCount')
+          .form-group
+            span 最大值：
+            input.form-control(v-model='draftFee.maxCount')
+          .form-group
+            span 最小值：
+            input.form-control(v-model='draftFee.minCount')
+        .col-xs-12.col-md-12
+          br
+        .col-xs-12.col-md-12
+          button.btn.btn-primary(@click='save') 保存
+
+block scripts
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/redEnvelope.js?v=${global.NKC.startTime}`)
+
+
+
+

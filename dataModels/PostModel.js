@@ -502,10 +502,11 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const PostsVoteModel = mongoose.model('postsVotes');
   const ResourceModel = mongoose.model('resources');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
   o.usersVote = o.usersVote && !!o.uid;
-  const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {}, voteObj = {}, kcbsRecordsObj = {};
+  const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {}, voteObj = {}, kcbsRecordsObj = {}, xsfsRecordsObj = {};
   let grades, resources;
   posts.map(post => {
     pid.add(post.pid);
@@ -519,6 +520,12 @@ postSchema.statics.extendPosts = async (posts, options) => {
       uid.add(r.from);
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
       kcbsRecordsObj[r.pid].push(r);
+    }
+    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false}).sort({toc: 1});
+    for(const r of xsfsRecords) {
+      uid.add(r.operatorId);
+      if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+      xsfsRecordsObj[r.pid].push(r);
     }
   }
   if(o.user) {
@@ -547,7 +554,6 @@ postSchema.statics.extendPosts = async (posts, options) => {
       });
     });
   }
-
   if(o.usersVote) {
     const votes = await PostsVoteModel.find({uid: o.uid, pid: {$in: [...pid]}});
     for(const v of votes) {
@@ -556,6 +562,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   }
 
   return posts.map(post => {
+    post.credits = [];
     if(o.user) {
       post.user = usersObj[post.uid];
     }
@@ -566,9 +573,16 @@ postSchema.statics.extendPosts = async (posts, options) => {
       post.usersVote = voteObj[post.pid];
     }
     if(o.credit) {
-      post.credits = kcbsRecordsObj[post.pid] || [];
-      for(const r of post.credits) {
-        r.fromUser = usersObj[r.from];
+      // 学术分、科创币评分记录。
+      post.credits = xsfsRecordsObj[post.pid] || [];
+      post.credits = post.credits.concat(kcbsRecordsObj[post.pid] || []);
+      for(let r of post.credits) {
+        if(r.from) {
+          r.fromUser = usersObj[r.from];
+        } else {
+          r.fromUser = usersObj[r.operatorId];
+          r.type = 'xsf';
+        }
       }
     }
 

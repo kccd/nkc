@@ -7,7 +7,10 @@ module.exports = {
 		},
 		credit: {
 			xsf: {
-				POST: 'creditXsf'
+				POST: 'creditXsf',
+        PARAMETER: {
+          DELETE: 'cancelXsf'
+        }
 			},
 			kcb: {
 				POST: 'creditKcb'

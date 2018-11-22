@@ -98,7 +98,12 @@ module.exports = async (ctx, next) => {
 		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
 		user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
-
+    if(user.generalSettings.lotterySettings.status) {
+      const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+      if(redEnvelopeSettings.random.close) {
+        user.generalSettings.lotterySettings.status = false;
+      }
+    }
 		// 获取新点赞数
     user.newVoteUp = await db.PostsVoteModel.count({tUid: user.uid, toc: {$gt: user.tlv}});
 

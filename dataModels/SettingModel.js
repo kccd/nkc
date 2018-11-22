@@ -189,7 +189,12 @@ const settingSchema = new Schema({
 		validityPeriod: Number,
 		sameIpOneDay: Number,
 		sameMobileOneDay: Number
-	}
+	},
+
+	// 红包设置
+  // ----------------------------------------
+  random: Schema.Types.Mixed,
+  draftFee: Schema.Types.Mixed,
 },
 {toObject: {
   getters: true,

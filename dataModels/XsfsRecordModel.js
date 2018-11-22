@@ -60,6 +60,55 @@ const xsfsRecordSchema = new Schema({
     default: ''
   }
 }, {
-  collection: 'xsfsRecords'
+  collection: 'xsfsRecords',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
+xsfsRecordSchema.virtual('fromUser')
+  .get(function() {
+    return this._fromUser;
+  })
+  .set(function(p) {
+    this._fromUser = p;
+  });
+xsfsRecordSchema.virtual('type')
+  .get(function() {
+    return this._type;
+  })
+  .set(function(p) {
+    this._type = p;
+  });
+
+xsfsRecordSchema.statics.extendXsfsRecords = async (records) => {
+  const UserModel = mongoose.model('users');
+  const PostModel = mongoose.model('posts');
+  const uid = new Set(), pid = new Set();
+  const usersObj = {}, postsObj = {};
+  records.map(r => {
+    uid.add(r.uid).add(r.operatorId);
+    if(r.lmOperatorId) uid.add(r.lmOperatorId);
+    pid.add(r.pid);
+  });
+  const posts = await PostModel.find({pid: {$in: [...pid]}});
+  const users = await UserModel.find({uid: {$in: [...uid]}});
+  users.map(u => {
+    if(!usersObj[u.uid]) usersObj[u.uid] = [];
+    usersObj[u.uid] = u;
+  });
+  posts.map(p => {
+    if(!postsObj[p.pid]) postsObj[p.pid] = [];
+    postsObj[p.pid] = p;
+  });
+  return records.map(r => {
+    r = r.toObject();
+    r.user = usersObj[r.uid];
+    r.operator = usersObj[r.operatorId];
+    if(r.lmOperatorId) r.lmOperator = usersObj[r.lmOperatorId];
+    r.post = postsObj[r.pid];
+    return r;
+  });
+};
+
 module.exports = mongoose.model('xsfsRecords', xsfsRecordSchema);

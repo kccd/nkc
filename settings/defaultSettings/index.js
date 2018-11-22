@@ -12,7 +12,8 @@ const settings = [
 	'page',
 	'forum',
 	'sms',
-  'xsf'
+  'xsf',
+  'redEnvelope'
 ];
 const defaultSettings = settings.map(n => {
 	return require(`./${n}`);

@@ -93,6 +93,17 @@ const usersGeneralSchema = new Schema({
       type: Boolean,
       default: false
     }
+  },
+  lotterySettings: {
+	  close: {
+	    type: Boolean,
+      default: false
+    },
+	  status: {
+	    type: Boolean,
+      default: false
+    },
+
   }
 }, {
 	collection: 'usersGeneral'

@@ -13,8 +13,11 @@ module.exports = async (ctx, next) => {
 	try {
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
 	  const XFF = ctx.get('X-Forwarded-For');
-	  if(XFF !== '')
-	    [ip, port] = XFF.split(':');
+	  if(XFF !== '') {
+      [ip, port] = XFF.split(':');
+    } else {
+	    ip = ctx.ip.replace(/::ffff:/ig, '');
+    }
 	  ctx.address = ip;
 	  ctx.port = port;
     ctx.body = ctx.request.body;

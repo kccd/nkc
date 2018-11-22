@@ -2,19 +2,24 @@ var app = new Vue({
   el: '#app',
   data: {
     kcbsRecords: [],
-    now: ''
+    searchType: 'username',
+    searchText: ''
   },
   methods: {
     fromNow: fromNow,
     format: format,
+    searchUser: function() {
+      if(!this.searchText) return screenTopWarning('输入不能为空');
+      window.location.href = '/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText;
+    }
   },
   mounted: function() {
     var data = JSON.parse(this.$refs.data.innerText);
     this.kcbsRecords = data.kcbsRecords;
-    var this_ = this;
-    this_.now = this_.format('YYYY/MM/DD HH:mm:ss', new Date());
-    setInterval(function() {
-      this_.now = this_.format('YYYY/MM/DD HH:mm:ss', new Date());
-    }, 1000)
+    console.log(data);
+    if(data.t && data.content) {
+      this.searchText = data.content;
+      this.searchType = data.t;
+    }
   }
 });

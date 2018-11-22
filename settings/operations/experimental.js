@@ -135,7 +135,11 @@ module.exports = {
 		post: {
 			GET: 'visitEPostSettings',
 			PATCH: 'modifyEPostSettings'
-		}
+		},
+    'red-envelope': {
+		  GET: 'visitERedEnvelope',
+      PATCH: 'modifyEPostSettings'
+    }
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',
@@ -164,6 +168,9 @@ module.exports = {
 		},
     kcb: {
 		  GET: 'visitExperimentalKcb'
+    },
+    xsf: {
+		  GET: 'visitExperimentalXsf'
     }
 	}
 };
