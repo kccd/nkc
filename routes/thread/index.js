@@ -85,9 +85,12 @@ threadRouter
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		}else{
 			let share = await db.ShareModel.findOne({"token":token});
-			if(!share) ctx.throw(403, "权限不足");
-			if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
-			let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
+			if(!share) ctx.throw(403, "无效的token");
+			// if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
+			if(share.tokenLife === "invalid"){
+				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+			}
+			let shareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
 			if(!shareLimit){
 				shareLimit = new db.ShareLimitModel({});
 				await shareLimit.save();
@@ -96,9 +99,9 @@ threadRouter
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
-				return ctx.throw(403, "链接已失效");
+				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
-			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "权限不足")
+			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
 		}
 		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
 		data.isModerator = isModerator;

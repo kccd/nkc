@@ -1249,9 +1249,12 @@ function addFriendByUid() {
     })
 }
 
-function shareTo(shareType, type, str, title){
+function shareTo(shareType, type, str, title, pid){
   var host = window.location.host;
   var lk = 'http://'+host+'/default/logo3.png'
+  if(type !== "weChat"){
+    var newLink = window.open();
+  }
   if(str){
     var para = {
       'str': str,
@@ -1261,16 +1264,50 @@ function shareTo(shareType, type, str, title){
     .then(function(data) {
       var newUrl = 'http://' + host + data.newUrl;
       if(type == "qq") {
-        window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
+        newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
+        // window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
       }
       if(type == "qzone") {
-        window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
+        newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区';
+        // window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
       }
       if(type == "weibo") {
-        window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
+        newLink.location='http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk;
+        // window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
       }
-      if(type == "weiChat") {
-        var qrcode = geid('threadCode');
+      if(type == "weChat") {
+        var qrcode
+        if(shareType == "post"){
+          var qrid = pid+"Qrcode";
+          qrcode = geid(qrid);
+        }else{
+          if(shareType == "forum"){
+            var otherCodes = document.getElementsByClassName('forumQrcode');
+            // var otherCodes = $(".forumQrcode");
+            for(var i in otherCodes){
+              var otherCode = otherCodes[i];
+              if(otherCode && typeof(otherCode)=="object") {
+                otherCode.style.display = "inline-block"
+                var path = newUrl;
+                path = path.replace(/\?.*/g, '');
+                QRCode.toCanvas(otherCode, path, {
+                  scale: 3,
+                  margin: 1,
+                  color: {dark: '#000000'}
+                }, function(err) {
+                  if(err){
+                    //- screenTopWarning(err);
+                  }
+                })
+              }
+            }
+          }
+          var qrid = shareType+"Qrcode";
+          qrcode = geid(qrid);
+        }
+        // var qrid = shareType+"Qrcode";
+        // var qrcode = geid(qrid);
+        qrcode.style.display = "inline-block"
         if(qrcode) {
           var path = newUrl;
           path = path.replace(/\?.*/g, '');
@@ -1290,6 +1327,15 @@ function shareTo(shareType, type, str, title){
       screenTopWarning("链接获取失败，请重试")
     })
   }
+}
+
+function openwin(url) {
+  var a = document.createElement("a"); //创建a对象
+  a.setAttribute("href", url);
+  a.setAttribute("target", "_blank");
+  a.setAttribute("id", "camnpr");
+  document.body.appendChild(a);
+  a.click(); //执行当前对象
 }
 
 // 获取纯文本(带有去标签),并缩减文字

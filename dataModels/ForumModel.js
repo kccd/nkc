@@ -137,7 +137,7 @@ const forumSchema = new Schema({
 
   shareLimitTime: {
 	  type: String,
-    default: '12' // 小时
+    default: '720' // 小时
   },
 
   shareLimitCount: {
@@ -885,10 +885,10 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
 
   }
 
-  if(baseFid) {
-    const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
-    fid = fid.filter(f => childFid.includes(f));
-  }
+	if(baseFid) {
+		const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
+		fid = fid.filter(f => childFid.includes(f));
+	}
 
   return [...new Set(fid)];
 };

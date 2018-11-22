@@ -11,22 +11,22 @@ shareRouter
   const {token} = params;
   // 检测token是否存在
   let share = await db.ShareModel.findOne({"token":token});
-  if(!share) ctx.throw(404, "链接有误");
+  if(!share) ctx.throw(403, "无效的token");
   // 检测token是否有效
-  if(share.tokenLife == "invalid") ctx.throw(404, "链接已失效");
+  // if(share.tokenLife == "invalid") ctx.throw(404, "链接已失效");
   // 检测token是否已过期
   // 取出token生成日期
-  let shareLimit = await db.ShareModel.findOne({"shareType":"all"});
-  if(!shareLimit){
-    shareLimit = new db.ShareLimitModel({});
-    await shareLimit.save();
-  }
-  let shareTimeStamp = parseInt(new Date(share.toc).getTime());
-  let nowTimeStamp = parseInt(new Date().getTime());
-  if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
-    await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
-    return ctx.throw(404, "链接已过期");
-  }
+  // let shareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+  // if(!shareLimit){
+  //   shareLimit = new db.ShareLimitModel({});
+  //   await shareLimit.save();
+  // }
+  // let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+  // let nowTimeStamp = parseInt(new Date().getTime());
+  // if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
+  //   await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+  //   return ctx.throw(404, "链接已过期");
+  // }
   if(!share.ips.includes(ctx.ip)){
     share.ips.push(ctx.ip);
     await share.save()

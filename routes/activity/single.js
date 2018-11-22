@@ -5,9 +5,12 @@ singleRouter
     const {data, db, params, query} = ctx;
 		const {user} = data;
     const {acid} = params;
+    const {type, hid} = query;
+    data.type = type;
+    data.hid = hid;
     const activity = await db.ActivityModel.findOnly({acid:acid});
     if(activity.activityType == "close"){
-      return ctx.throw(404, "该活动已被关闭")
+      return ctx.throw(403, "该活动已被活动发布者被关闭")
     }
     let c;
     if(activity){
@@ -28,8 +31,12 @@ singleRouter
       activity.user = await activity.extendUser();
       activity.userPersonal = await activity.extendUserPersonal();
     }
+    // 拓展历史
+    activity.historys = await activity.extendHistorys();
+    if(data.type == 'history'){
+      data.history = await db.ActivityHistoryModel.findOne({_id:hid})
+    }
     data.activity = activity.toObject();
-    console.log(data)
 		ctx.template = 'activity/activitySingle.pug';
 		await next();
   })

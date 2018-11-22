@@ -38,7 +38,7 @@ block content
                   input.hidden#lang(value=data.l)
               if data.delReason 
                 .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
-              .form-group
+              .form-group(style="background-color:#fff;line-height:1.5;")
                   div#quoteContent
               .form-group
                 div#quoteCancel(style='display: none')
@@ -107,9 +107,8 @@ block scripts
 
   script(src='/interface_attachment_uploader.js?v=1')
   script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
-
-  <script type="text/javascript" src="/wangEditor.js?v=1"></script>
-  <script type="text/javascript" src="/newEditor.js"></script>
+  script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
+  script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
   script.
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){

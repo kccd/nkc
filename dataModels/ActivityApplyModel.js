@@ -6,26 +6,6 @@ const activityApplySchema = new Schema({
     type: String,
     required: true
   },
-  age: {
-    type: String,
-    default: null
-  },
-  education: {
-    type: String,
-    default: null
-  },
-  email: {
-    type: String,
-    default: null
-  },
-  kcName: {
-    type: String,
-    default: null
-  },
-  mobile: {
-    type: String,
-    default: null
-  },
   toc: {
     type: Date,
     default: Date.now,
@@ -35,21 +15,9 @@ const activityApplySchema = new Schema({
     type: String,
     required: true
   },
-  qqNum: {
-    type: String,
-    default:null
-  },
-  wxNum: {
-    type: String,
-    default: null
-  },
-  realName: {
-    type: String,
-    default: null
-  },
-  wordUnit: {
-    type: String,
-    default: null
+  enrollInfo: {
+    type: [Schema.Types.Mixed],
+    default: []
   },
   applyStatus: {
     type: String,
