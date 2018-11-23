@@ -119,6 +119,9 @@ module.exports = {
       disagree: {
 		    POST: 'disagreeApplicationToAddAFriend'
       }
+    },
+    kcb: {
+		  GET: 'visitUserKcb'
     }
 	}
 };

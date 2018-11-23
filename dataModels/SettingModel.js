@@ -66,6 +66,8 @@ const settingSchema = new Schema({
 	//科创币
 	//-------------------------------------
   totalMoney: Number,
+  minCount: Number,
+  maxCount: Number,
   //学术分
   //-------------------------------------
   reduceLimit: Number,

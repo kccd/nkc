@@ -1,7 +1,7 @@
 module.exports = {
   type: 'redEnvelope',
   random: {
-    close: false,
+    close: true,
     awards: [
       {
         "name" : "特等奖",
@@ -30,7 +30,7 @@ module.exports = {
     ]
   },
   draftFee: {
-    close: false,
+    close: true,
     defaultCount: 1,
     minCount: 1,
     maxCount: 5

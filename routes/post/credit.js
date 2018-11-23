@@ -10,6 +10,7 @@ router
 		num = Number(num);
 		const post = await db.PostModel.findOnly({pid});
 		const targetUser = await db.UserModel.findOnly({uid: post.uid});
+		if(targetUser.uid === user.uid) ctx.throw(403, '不允许给自己加减学术分');
 		const thread = await post.extendThread();
 		const forum = await db.ForumModel.findOnly({fid: thread.fid});
 		await forum.ensureModeratorsPermission(data);
@@ -22,7 +23,7 @@ router
 		if(num < 0 && -1*num > reduceLimit) ctx.throw(400, `单次扣除不能超过${reduceLimit}学术分`);
 		if(num > 0 && num > addLimit) ctx.throw(400, `单次添加不能超过${addLimit}学术分`);
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
-    if(description.length > 100) ctx.throw(400, '理由不能超过100个字');
+    if(description.length > 500) ctx.throw(400, '理由不能超过500个字');
 		const _id = await db.SettingModel.operateSystemID('xsfsRecords', 1);
 		const newRecord = db.XsfsRecordModel({
       _id,
@@ -99,10 +100,12 @@ router
 		if(post.disabled) {
 		  ctx.throw(403, '回复已被封禁');
     }
-		if(num <= 0) ctx.throw(400, '科创币最少为1');
-		if(num > 10000) ctx.throw(400, '单次鼓励科创币不能大于10000');
+		const kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+		if(num < kcbSettings.minCount) ctx.throw(400, `科创币最少为${kcbSettings.minCount}`);
+		if(num > kcbSettings.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.maxCount}`);
 		if(fromUser.kcb < num) ctx.throw(400, '您的科创币不足');
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
+    if(description.length > 60) ctx.throw(400, '理由不能超过60个字');
     await db.KcbsRecordModel.insertUsersRecord({
       fromUser,
       toUser,

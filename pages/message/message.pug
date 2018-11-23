@@ -343,7 +343,7 @@ block content
           a.remind-link(:href="'/t/' + message.targetPost.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank')
             span 立即查看
         div(v-else-if="message.c.type === 'xsf'")
-          span 您因您发表的内容获得了 {{message.num}} 学术分，
+          span 您发表的文章获得了 {{message.num}} 学术分，
           a.remind-link(:href="'/p/' + message.post.pid" target='_blank')
             span 立即查看
 

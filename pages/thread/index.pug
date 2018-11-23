@@ -68,7 +68,7 @@ block title
               span.fa.fa-star &nbsp;取消精选
         - var ownership = data.userOperationsId.includes('modifyOtherPosts')
         - ownership = ownership?true:(data.user.uid===post.uid)
-        if addKcb && post.uid !== data.user.uid
+        //-if addKcb && post.uid !== data.user.uid
           li
             a(href=`javascript: credit("${post.pid}", 'kcb', ${data.user.kcb})`)
               span.fa.fa-thumbs-o-up &nbsp;
@@ -180,6 +180,9 @@ block content
                                     //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
                                     //-   img(src="/default/weibo.png" style="width:100%")
                                   canvas#threadQrcode.inline-block(style="display:none")
+                      if addKcb && thread.firstPost.uid !== data.user.uid
+                        .inline-block.post-thumbsUp(style='color: #aaa;')
+                          .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
                       .inline-block.post-thumbsUp
                         //span &nbsp;
                         //-const recUsers = thread.firstPost.recUsers || [];

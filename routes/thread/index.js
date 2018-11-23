@@ -246,6 +246,8 @@ threadRouter
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
+      data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+      data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
     }
 		// 加载收藏
 		data.collected = false;

@@ -373,6 +373,7 @@
     "closeRedEnvelope": "放弃拆红包",
     "visitUserRedEnvelopeSettings": "访问<用户设置-红包设置>",
     "modifyUserRedEnvelopeSettings": "修改<用户设置-红包设置>",
+    "visitUserKcb": "访问<用户-科创币记录>",
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",

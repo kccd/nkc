@@ -12,7 +12,7 @@ router
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, redis} = ctx;
 		let {displayName, score} = body;
 		score = parseInt(score);
 		if(isNaN(score) || score < 0) ctx.throw(400, '积分分界点设置错误');
@@ -46,6 +46,7 @@ router
 			}
 			await g.save();
 		}
+    await redis.cacheForums();
 		await next();
 	})
 	.get('/:_id', async (ctx, next) => {
@@ -62,7 +63,7 @@ router
 		await next();
 	})
 	.patch('/:_id', async (ctx, next) => {
-		const {db, body, params} = ctx;
+		const {db, body, params, redis} = ctx;
 		const {_id} = params;
 		const grade = await db.UsersGradeModel.findOnly({_id});
 		const {operation} = body;
@@ -79,6 +80,7 @@ router
 			if(sameScoreGrade) ctx.throw(400, '积分分界点已存在');
 			await grade.update({color, displayName, description, score});
 		}
+    await redis.cacheForums();
 		await next();
 	})
 	.del('/:_id', async (ctx, next) => {

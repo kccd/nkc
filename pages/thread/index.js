@@ -495,14 +495,25 @@ function credit(pid, type, kcb) {
     var button = event.currentTarget.getElementsByClassName('btn');
     var t = event.currentTarget.getElementsByClassName('modal-title');
     var kcbInfo = event.currentTarget.getElementsByClassName('kcb-info');
+    var xsfInfo = event.currentTarget.getElementsByClassName('xsf-info');
     var num = event.currentTarget.getElementsByClassName('num')[0];
     var description = event.currentTarget.getElementsByClassName('description')[0];
     if(type === 'kcb') {
-      kcbInfo[0].style.display = 'block';
-      num.value = 5;
+      for(var i = 0 ; i < xsfInfo.length; i++) {
+        xsfInfo[i].style.display = 'none';
+      }
+      for(var i = 0 ; i < kcbInfo.length; i++) {
+        kcbInfo[i].style.display = 'inline-block';
+      }
+      num.value = '';
     } else {
-      num.value = 1;
-      kcbInfo[0].style.display = 'none'
+      num.value = '';
+      for(var i = 0 ; i < kcbInfo.length; i++) {
+        kcbInfo[i].style.display = 'none';
+      }
+      for(var i = 0 ; i < xsfInfo.length; i++) {
+        xsfInfo[i].style.display = 'inline-block';
+      }
     }
     description.value = '';
     t[0].innerText = title;
@@ -521,7 +532,8 @@ function credit(pid, type, kcb) {
             screenTopWarning(data.error)
           })
       } else if(type === 'kcb') {
-        if(num > kcb) return screenTopWarning('您的科创币不足');
+
+        if(num.value > kcb) return screenTopWarning('您的科创币不足');
         var obj = {
           num: num.value,
           description: description.value

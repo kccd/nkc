@@ -633,6 +633,7 @@ $(function() {
           case 'postWasReturned': c = '回复被退回';break;
           case 'recommend': c = '点赞'; break;
           case '@': c = '@';break;
+          case 'xsf': c = '学术分';break;
           default: c = '';
         }
         return c;
@@ -1188,7 +1189,7 @@ $(function() {
             // 判断是否有新信息
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
-              if(li.count !== 0) {
+              if(li.count !== 0 && li.type === 'UTU') {
                 // hasNewMessage = true;
                 app.selectUser({
                   type: 'UTU',

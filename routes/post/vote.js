@@ -51,7 +51,9 @@ voteRouter
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
     }
-    data.post = await db.PostModel.findOnly({pid: post.pid});
+    let p = await db.PostModel.findOnly({pid: post.pid});
+    p.voteUp = p.voteUp - p.voteDown;
+    data.post = p;
     await next();
   })
   .post('/down', async (ctx, next) => {
@@ -82,7 +84,9 @@ voteRouter
         await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       }
     }
-    data.post = await db.PostModel.findOnly({pid: post.pid});
+    let p = await db.PostModel.findOnly({pid: post.pid});
+    p.voteUp = p.voteUp - p.voteDown;
+    data.post = p;
     await next();
   });
 module.exports = voteRouter;

@@ -105,8 +105,16 @@ module.exports = async (ctx, next) => {
       }
     }
 		// 获取新点赞数
-    user.newVoteUp = await db.PostsVoteModel.count({tUid: user.uid, toc: {$gt: user.tlv}});
-
+    const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
+    let newVoteUp = 0;
+    votes.map(v => {
+      if(v.type === 'up') {
+        newVoteUp += v.num;
+      } else if(v.type === 'down') {
+        newVoteUp -= v.num;
+      }
+    });
+    user.newVoteUp = newVoteUp>0?newVoteUp:0;
 		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
 			user.certs = ['banned'];

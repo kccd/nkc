@@ -9,12 +9,16 @@
         .modal-body
           .form
             .form-group
-              span.kcb-info 向作者转账科创币以资鼓励
+              span.kcb-info= `向作者转账科创币以资鼓励`
             .form-group
               label 分值
+              span.kcb-info(style='display:inline-block;')=`（${data.kcbSettings.minCount} - ${data.kcbSettings.maxCount}）`
+              span.xsf-info(style='display:inline-block;')=`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`
               input.form-control.num(value='1' type='number')
             .form-group
               label 原因
+              span.kcb-info(style='display:inline-block;') （不超过60个字）
+              span.xsf-info(style='display:inline-block;') （不超过500个字）
               textarea.form-control.description(rows=3)
         .modal-footer
           button(type="button" class="btn btn-default" data-dismiss="modal") 关闭

@@ -54,6 +54,9 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                   //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}')`)
                   //-   img(src="/default/weibo.png" style="width:100%")
                 canvas.qrcode(id=post.pid+"Qrcode",data-pid=post.pid,style="display:none").inline-block
+        if addKcb && post.uid !== data.user.uid
+          .inline-block.post-qrcode
+            .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
         .inline-block.post-thumbsUp
           //- const recUsers = post.recUsers || [];
           //if data.user && recUsers.includes(data.user.uid)

@@ -10,7 +10,7 @@ kcbRouter
       if(u) {
         q.$or = [
           {
-            form: u.uid
+            from: u.uid
           },
           {
             to: u.uid

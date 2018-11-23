@@ -10,6 +10,7 @@ const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
 const bannerRouter = require('./banner');
 const friendsRouter = require('./friends');
+const kcbRouter = require('./kcb');
 const userRouter = new Router();
 
 
@@ -150,6 +151,7 @@ userRouter
     ctx.data.message = `推送/取消热门 用户: ${uid}`;
     await next();
   })
+  .use('/:uid/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
 	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())

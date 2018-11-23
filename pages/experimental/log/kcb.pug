@@ -3,6 +3,10 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   title 科创币交易记录
+  style.
+    tbody tr th {
+      max-width: 12rem;
+    }
 block content
 
   .container-fluid(style='max-width: 1400px;')
@@ -48,12 +52,14 @@ block content
                 th
                   span(v-if='record.type === "creditKcb"') 鼓励
                   span(v-else-if='record.type === "lottery"') 随机红包
+                  span(v-else-if='record.type === "updateKcb"') 换发新币
+                  span(v-else-if='record.type === "inherit"') 其它未登记详情的记录
                   span(v-else) {{record.kcbsType.description}}
                 th
-                  span(v-if='record.from === "bank"') 科创人民银行
+                  span(v-if='record.from === "bank"') 科创人民很行
                   a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb') {{record.fromUser.username}}
                 th
-                  span(v-if='record.to === "bank"') 科创人民银行
+                  span(v-if='record.to === "bank"') 科创人民很行
                   a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb') {{record.toUser.username}}
                 th {{record.num>0?'+':''}}{{record.num}}
                 th {{record.description}}
