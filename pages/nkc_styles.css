@@ -1110,6 +1110,7 @@ color: #d66;
   border-color: #D8D8D8;
   /* background-color: #FFFFFF; */
   border-radius: 5px;
+  margin-bottom: 0;
 }
 
 .ThreadPostCreditItem{  /*行*/
@@ -3302,4 +3303,19 @@ img.emoji {
 }
 .kcb-info, .xsf-info{
   display: inline;
+}
+.ThreadPostCredits{
+  display:block;
+  word-break: break-all;
+  word-wrap: break-word;  /*内容超出div自动换行*/
+  display: table;
+  /*width: 100%;*/
+  padding: 10px;
+  margin-top: 8px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #D8D8D8;
+  /* background-color: #FFFFFF; */
+  border-radius: 5px;
+  margin-bottom: 0;
 }

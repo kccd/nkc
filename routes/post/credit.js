@@ -88,7 +88,8 @@ router
 		const {data, db, body, params} = ctx;
 		const {user} = data;
 		const {pid} = params;
-		const {num, description} = body;
+		let {num, description} = body;
+		num = Number(num);
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
     const toUser = await db.UserModel.findOnly({uid: post.uid});
