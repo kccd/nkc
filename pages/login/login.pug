@@ -34,7 +34,7 @@ block content
                 .btn-group(@click='changeType("code")' :style='"border-radius: 10px 10px 0 0;padding: 1rem 0;" + (loginType === "code"?"background-color: #f5f5f5;":"")')
                   .login-type-btn
                     .fa.fa-commenting
-                  .login-type-text 手机号+验证码
+                  .login-type-text 手机号+短信
           .col-xs-12.col-md-12(style='padding-top: 1rem;background-color: #f5f5f5;')
             .form
               div(v-show="loginType === 'account'")
