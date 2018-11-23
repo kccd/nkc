@@ -50,6 +50,7 @@ const share = require('./share');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
+const lottery = require('./lottery');
 const operationObj = {};
 
 
@@ -65,6 +66,7 @@ operationObj.defaultOperations = [
 	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
 	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
   'canSendToEveryOne', // 跳过`仅接收好友信息`限制
+  'creditXsf'
 ];
 
 
@@ -162,6 +164,8 @@ operationObj.operationTree = {
     friend_category, // 好友分组
 
     subscription, // 首页我的关注
+
+    lottery, // 抽奖页
 	}
 };
 module.exports = operationObj;

@@ -1,0 +1,38 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 学术分设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          .hidden(ref='data')= JSON.stringify({xsfSettings: data.xsfSettings})
+          h4 学术分设置
+        .col-xs-12.col-md-12(v-if='xsfSettings')
+          .form-horizontal.formula
+            .form-group
+              .col-sm-2.control-label 加学术分上限
+              .col-sm-3
+                input.form-control(type='number' v-model.number='xsfSettings.addLimit')
+            .form-group
+              .col-sm-2.control-label 减学术分上限
+              .col-sm-3
+                input.form-control(type='number' v-model.number='xsfSettings.reduceLimit')
+            .form-group
+              .col-sm-2.control-label
+              .col-sm-3
+                button.btn.btn-primary(@click='save') 保存
+
+
+
+block scripts
+  script(src=`/experimental/settings/xsf.js?v=${global.NKC.startTime}`)
+
+
+
+

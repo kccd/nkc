@@ -167,11 +167,16 @@ threadRouter
 		const paging_ = nkcModules.apiFunction.paging(page, count);
 		const {pageCount} = paging_;
 		// 删除退休超时的post
-		const postAll = await db.PostModel.find({tid:tid,toDraft:true})
+		const postAll = await db.PostModel.find({tid:tid,toDraft:true});
 		for(let postSin of postAll){
 			let onLog = await db.DelPostLogModel.findOne({delType: 'toDraft', postType: 'post', postId: postSin.pid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}})
 			if(onLog){
-				await postSin.update({"toDraft":false})
+				await postSin.update({"toDraft":false});
+				const tUser = await db.UserModel.findOne({uid: onLog.delUserId});
+				data.post = await db.PostModel.findOne({pid: onLog.postId});
+				if(tUser && data.post) {
+          await db.KcbsRecordModel.insertSystemRecord('postBlocked', tUser, ctx);
+        }
 			}
 		}
 		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}}, {$set: {delType: 'toRecycle'}});
@@ -189,7 +194,7 @@ threadRouter
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 
-		data.posts = await db.PostModel.extendPosts(posts);
+		data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
@@ -238,7 +243,12 @@ threadRouter
 			await p.extendResources();
 		});
 		await thread.extendLastPost();
-
+		if(data.user) {
+      const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
+      thread.firstPost.usersVote = vote?vote.type: '';
+      data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+      data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
+    }
 		// 加载收藏
 		data.collected = false;
 		if(data.user) {
@@ -354,6 +364,7 @@ threadRouter
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		const _post = await thread.newPost(post, user, ip);
+    data.post = _post;
 		data.targetUser = await thread.extendUser();
 
 		// 生成记录
@@ -370,7 +381,8 @@ threadRouter
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
-		await db.UsersScoreLogModel.insertLog(obj);
+		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
+		// await db.UsersScoreLogModel.insertLog(obj);
 
 		if(thread.uid !== user.uid) {
       const messageId = await db.SettingModel.operateSystemID('messages', 1);
@@ -395,10 +407,10 @@ threadRouter
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
 		}
-		data.post = _post;
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		//帖子曾经在草稿箱中，发表时，删除草稿
-		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId})
+		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
+
 		await next();
 	})
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())

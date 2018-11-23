@@ -16,6 +16,7 @@ block title
 
   -const postTo = data.userOperationsId.includes('quotePost')
   -const addCredit = data.userOperationsId.includes('creditXsf')
+  -const addKcb = data.userOperationsId.includes('creditKcb')
   -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
   -const highlight = data.highlight;
   -const digestPost = data.userOperationsId.includes('digestPost');
@@ -54,7 +55,7 @@ block title
                 span.fa.fa-folder-o &nbsp;加入收藏
         if addCredit
           li
-            a(href=`javascript:addCredit('${post.pid}')`)
+            a(href=`javascript:credit('${post.pid}', 'xsf')`)
               span.fa.fa-graduation-cap &nbsp;
               span 评学术分
         if digestPost && !post.digest
@@ -67,6 +68,11 @@ block title
               span.fa.fa-star &nbsp;取消精选
         - var ownership = data.userOperationsId.includes('modifyOtherPosts')
         - ownership = ownership?true:(data.user.uid===post.uid)
+        //-if addKcb && post.uid !== data.user.uid
+          li
+            a(href=`javascript: credit("${post.pid}", 'kcb', ${data.user.kcb})`)
+              span.fa.fa-thumbs-o-up &nbsp;
+              span 鼓励
         if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
           li
             a(href=`/editor?type=post&id=${post.pid}`)
@@ -95,18 +101,20 @@ block title
   mixin postCredits(post)
     if post.credits && post.credits.length > 0
       .nkcpanel.ThreadPostCredits
-        each c,index in post.credits
-          -var username = c.username||c.uid
-          -var profile = (c.uid&&c.uid!=='0')?'/m/'+c.uid:'/user_activities_byname/'+c.username
+        for c,index in post.credits
+          -var username = c.fromUser.username
+          -var profile = '/u/'+c.from
           .ThreadPostCreditItem
-            span.TPCQ #{(c.q > 0 ? '+' : '-')}#{c.q} &nbsp;
+            span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA
-              a(href=`${profile}`)
-                img.TPCIAI(src=`/avatar_small/${c.uid}`)
-            span.TPCIssuer #{username} &nbsp;&nbsp;
+              a(href=`${profile}` style='text-decoration: none;')
+                img.TPCIAI(src=`/avatar_small/${c.fromUser.uid}`)
+                span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
             span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
-            span.TPCReason #{c.reason}
+            span.TPCReason #{c.description}
+            if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
+              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
   
 block content
   -const mainContainer1400 = true;
@@ -114,6 +122,7 @@ block content
   -const {exactPost} = data
 
     .container-fluid(style="max-width:1400px;")
+      include ../module_credit
       .row
         .col-xs-12.col-md-9
           .fullwidthpanel.ThreadBox.nkcpanel
@@ -171,17 +180,24 @@ block content
                                     //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
                                     //-   img(src="/default/weibo.png" style="width:100%")
                                   canvas#threadQrcode.inline-block(style="display:none")
+                      if addKcb && thread.firstPost.uid !== data.user.uid
+                        .inline-block.post-thumbsUp(style='color: #aaa;')
+                          .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
                       .inline-block.post-thumbsUp
-                        span &nbsp;
-                        -const recUsers = thread.firstPost.recUsers || [];
-                        if data.user && recUsers.includes(data.user.uid)
-                          span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-                        else
-                          span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        //span &nbsp;
+                        //-const recUsers = thread.firstPost.recUsers || [];
+                        //if data.user && recUsers.includes(data.user.uid)
+                        //  span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        //else
+                        //  span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+                        // - post = thread.firstPost;
+                        - const votePost = thread.firstPost;
+                        include ../module_vote
                       if thread.firstPost.digest
                         .inline-block.post-thumbsUp
                           span &nbsp;
                           span.fa.fa-star(style='color: #ffbf16;' title='精选')
+
 
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
@@ -232,13 +248,13 @@ block content
                       if data.paging.page === 0
                         div.thread-content.ThreadPostBody!= experimental_render(post)
                         +postEditTime(post)
-                        +postCredits(post)
+                        +postCredits(data.posts[0])
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
                           div.ThreadPostBody!= experimental_render(post)
                           +postEditTime(post)
-                          +postCredits(post)
+                          +postCredits(data.posts[0])
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
                       if post.disabled && disablePost
@@ -381,8 +397,6 @@ block scripts
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
-  script(src="/jquery-1.10.2.js")
-  script(src="/jquery-ui-1.10.4.custom.js")
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')

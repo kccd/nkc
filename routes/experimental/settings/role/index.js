@@ -8,7 +8,7 @@ roleRouter
 		return ctx.redirect('/e/settings/role/dev');
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, redis} = ctx;
 		let {displayName, id} = body;
 		if(!displayName) ctx.throw(400, '角色名称不能为空');
 		if(!id) ctx.throw(400, '角色id不能为空');
@@ -25,15 +25,17 @@ roleRouter
 		});
 		await role.save();
 		data.role = role;
+    await redis.cacheForums();
 		await next();
 	})
 	.del('/:_id', async (ctx, next) => {
-		const {params, db} = ctx;
+		const {params, db, redis} = ctx;
 		const {_id} = params;
 		const role = await db.RoleModel.findOnly({_id});
 		if(role.defaultRole) ctx.throw(400, '无法删除默认角色');
 		await db.UserModel.updateMany({certs: _id}, {$pull: {certs: _id}});
 		await role.remove();
+    await redis.cacheForums();
 		await next();
 	})
 	.get('/:_id', async (ctx) => {

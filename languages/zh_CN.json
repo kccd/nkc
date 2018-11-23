@@ -111,6 +111,9 @@
     "sendChangeMobileMessage": "发送<更换手机>短信验证码",
     "sendBindMobileMessage": "发送<绑定手机>短信验证码",
     "sendRegisterMessage": "发送<注册>短信验证码",
+    "visitForumModeratorSettings": "访问专业版主设置",
+    "modifyForumModeratorSettings": "修改专业版主设置",
+    "cancelXsf": "撤销学术分",
 
 
     "sendGetBackPasswordMessage": "发送<找回密码>短信验证码",
@@ -230,6 +233,8 @@
     "addUsersGrade": "添加用户等级",
     "deleteUsersGrade": "删除用户等级",
     "visitKcbSettings": "访问科创币设置页",
+    "visitXsfSettings": "访问<后台管理-设置-学术分>",
+    "modifyXsfSettings": "修改<后台管理-设置-学术分>",
     "modifyKcbSettings": "修改科创币设置",
     "modifyRoleUsers": "将用户从某个角色中移除",
     "modifyOtherPosts": "修改别人的post",
@@ -358,7 +363,17 @@
     "getShareToken": "获取分享链接的Token",
     "visitShareLink": "访问分享的链接",
     "canSendToEveryOne": "有权给任何人发信息",
-
+    "post-vote-up": "回复或文章-点赞",
+    "post-vote-down": "回复或文章-点踩",
+    "visitExperimentalKcb": "访问<后台管理-查看记录-科创币>",
+    "visitExperimentalXsf": "访问<后台管理-查看记录-学术分>",
+    "visitERedEnvelope": "访问<后台管理-设置-红包设置>",
+    "visitLottery": "访问抽奖页面",
+    "getRedEnvelope": "获取红包",
+    "closeRedEnvelope": "放弃拆红包",
+    "visitUserRedEnvelopeSettings": "访问<用户设置-红包设置>",
+    "modifyUserRedEnvelopeSettings": "修改<用户设置-红包设置>",
+    "visitUserKcb": "访问<用户-科创币记录>",
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",

@@ -97,6 +97,7 @@ forumRouter
 
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);
+    data.post = _post;
     const type = ctx.request.accepts('json', 'html');
     await forum.update({$inc: {'tCount.normal': 1}});
     const thread = await ThreadModel.findOnly({tid: _post.tid});
@@ -116,7 +117,8 @@ forumRouter
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
-		await db.UsersScoreLogModel.insertLog(obj);
+    await db.KcbsRecordModel.insertSystemRecord('postToForum', user, ctx);
+		// await db.UsersScoreLogModel.insertLog(obj);
 
     await thread.updateThreadMessage();
     if(type === 'html') {
@@ -124,7 +126,6 @@ forumRouter
       return ctx.redirect(`/t/${_post.tid}`);
     }
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
-    data.post = _post;
 
     //帖子曾经在草稿箱中，发表时，删除草稿
     await db.DraftModel.remove({"did":post.did})

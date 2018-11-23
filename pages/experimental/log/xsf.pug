@@ -1,0 +1,54 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  title 评学术分记录
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .hidden(id='data')= JSON.stringify({xsfsRecords: data.xsfsRecords})
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          h4 评学术分记录
+        .col-xs-12.col-md-12.table-responsive
+          include ../../interface_navigation_paging
+          table.table.table-bordered(style='font-size: 1rem;')
+            thead
+              tr
+                th 时间
+                th 用户
+                th 学术分
+                th 操作者
+                th 评分理由
+                th 文号
+                th 撤销
+                th 撤销者
+                th 撤销理由
+                th 撤销时间
+            tbody
+              tr(v-for='(record, index) of xsfsRecords')
+                th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th
+                  a(:href="'/u/' + record.user.uid" target='_blank') {{record.user.username}}
+                th {{record.num>0?'+' + record.num: record.num}}
+                th
+                  a(:href="'/u/' + record.operator.uid" target='_blank') {{record.operator.username}}
+                th {{record.description}}
+                th
+                  a(:href="'/p/' + record.pid" target="_blank") {{record.pid}}
+                th
+                  span(v-if='record.canceled').text-danger 是
+                  span(v-else).text-success 否
+                th
+                  a(v-if='record.lmOperator' :href="'/u/' + record.lmOperator.uid" target='_blank') {{record.lmOperator.username}}
+                th
+                  span(v-if='record.lmOperator') {{record.reason}}
+                th
+                  span(v-if='record.lmOperator') {{format('YYYY/MM/DD HH:mm:ss', record.tlm)}}
+          include ../../interface_navigation_paging
+block scripts
+  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
+  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/log/xsf.js?v=${global.NKC.startTime}`)

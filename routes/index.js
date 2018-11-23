@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const moment = require('moment');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
@@ -24,8 +25,17 @@ const friendRouter = routers.friend;
 const friendCategoryRouter = routers.friendCategory;
 const homeRouter = routers.home;
 const shareRouter = routers.share;
+const lotteryRouter = routers.lottery;
+
 
 // 所有请求先经过此中间件
+// 日常登陆
+router.use('/', async (ctx, next) => {
+  await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
+  await next();
+});
+
+
 router.use('/', async (ctx, next)  => {
 	const {nkcModules, db, data} = ctx;
 	const {user} = data;
@@ -52,21 +62,12 @@ router.use('/', async (ctx, next)  => {
 			});
 			await user.updateUserMessage();
 		}
-		await db.UsersScoreLogModel.insertLog({
-			user,
-			type: 'kcb',
-			typeIdOfScoreChange: 'dailyLogin',
-			port: ctx.port,
-			ip: ctx.address
-		});
 	}
 	await next();
 });
 
-/*
-* 首页
-* */
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
+router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());

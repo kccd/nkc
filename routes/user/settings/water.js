@@ -51,14 +51,7 @@ waterRouter
       // 消耗科创币，并生成记录
       // const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;
       // console.log(user)
-      const options = {
-        user: user,
-        type : "kcb",
-        typeIdOfScoreChange : "waterPay",
-        port: port,
-        ip : ip
-      }
-      await db.UsersScoreLogModel.insertLog(options)
+      await db.KcbsRecordModel.insertSystemRecord('waterPay', data.user, ctx);
       // 修改水印设置
       const paySuccess = {
         waterPayInfo: true,

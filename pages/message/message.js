@@ -633,6 +633,7 @@ $(function() {
           case 'postWasReturned': c = '回复被退回';break;
           case 'recommend': c = '点赞'; break;
           case '@': c = '@';break;
+          case 'xsf': c = '学术分';break;
           default: c = '';
         }
         return c;
@@ -1177,11 +1178,34 @@ $(function() {
     mounted: function() {
       this.getUserList()
         .then(function() {
+          // 通过名片进入信息页面
           if(targetUser) {
             app.selectUser({
               type: 'UTU',
               user: targetUser
             });
+          } else {
+            // var hasNewMessage = false;
+            // 判断是否有新信息
+            for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.count !== 0 && li.type === 'UTU') {
+                // hasNewMessage = true;
+                app.selectUser({
+                  type: 'UTU',
+                  user: li.user
+                });
+                break;
+              }
+            }
+            // 若没有新信息则打开第一个人
+            /*if(!hasNewMessage && app.userList.length > 0) {
+              var li = app.userList[0];
+              app.selectUser({
+                type: 'UTU',
+                user: li.user
+              });
+            }*/
           }
         });
 

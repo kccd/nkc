@@ -5,10 +5,7 @@ const credit = require('./credit');
 const disabled = require('./disabled');
 const recommend = require('./recommend');
 const digestRouter = require('./digest');
-const nkcModules = require('../../nkcModules');
-const dbFn = nkcModules.dbFunction;
-const settings = require('../../settings');
-const {perpage} = settings.paging;
+const voteRouter = require('./vote');
 const postRouter = new Router();
 
 postRouter
@@ -170,5 +167,6 @@ postRouter
   .use('/:pid/recommend', recommend.routes(), recommend.allowedMethods())
   .use('/:pid/credit', credit.routes(), credit.allowedMethods())
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
+  .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/quote', quote.routes(), quote.allowedMethods());
 module.exports = postRouter;

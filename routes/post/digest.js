@@ -31,7 +31,8 @@ router
     const messageId = await db.SettingModel.operateSystemID('messages', 1);
 		if(thread.oc === pid) {
 			await thread.update({digest: true, digestTime});
-			await db.UsersScoreLogModel.insertLog(log);
+			// await db.UsersScoreLogModel.insertLog(log);
+      await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
 			log.type = 'score';
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
@@ -49,7 +50,8 @@ router
 			await message.save();
 		} else {
 			log.typeIdOfScoreChange = 'digestPost';
-			await db.UsersScoreLogModel.insertLog(log);
+			// await db.UsersScoreLogModel.insertLog(log);
+      await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);
 			log.key = 'digestPostsCount';
 			log.type = 'score';
 			await db.UsersScoreLogModel.insertLog(log);
@@ -98,14 +100,16 @@ router
 		};
 		if(thread.oc === pid) {
 			await thread.update({digest: false});
-			await db.UsersScoreLogModel.insertLog(log);
+			// await db.UsersScoreLogModel.insertLog(log);
+      await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx);
 			log.type = 'score';
 			log.change = -1;
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
 		} else {
 			log.typeIdOfScoreChange = 'unDigestPost';
-			await db.UsersScoreLogModel.insertLog(log);
+			// await db.UsersScoreLogModel.insertLog(log);
+      await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx);
 			log.key = 'digestPostsCount';
 			log.change = -1;
 			log.type = 'score';

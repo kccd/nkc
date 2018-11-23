@@ -41,6 +41,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 span.fa.fa-inbox &nbsp;草稿箱
                 span.messageNumber.draftMessage= data.user.draftCount || ''
             li
+              a(href=`/u/${user.uid}/kcb`)
+                span.fa.fa-file-text-o &nbsp;科创币记录
+            li
               a(href=`/activity`)
                 span.fa.fa-trophy &nbsp;活动
             li.divider
@@ -99,6 +102,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 a(href=`/u/${user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.messageNumber.draftMessage= data.user.draftCount || ''
+              li
+                a(href=`/u/${user.uid}/kcb`)
+                  span.fa.fa-file-text-o &nbsp;科创币记录
               li
                 a(href=`/activity`)
                   span.fa.fa-trophy &nbsp;活动

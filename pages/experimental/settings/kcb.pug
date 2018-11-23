@@ -3,63 +3,51 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   link(href='/experimental/index.css' rel='stylesheet')
-  title kcb设置
+  title 科创币设置
 block content
 
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
-      .col-xs-12.col-md-12
-        .row#content
-          .col-xs-12.col-md-12(style='margin: 2rem 0 1rem 0;')
-            h4 默认收款账户
-            if data.defaultUser
-              .col-xs-12.col-md-12
-                div(style='float:left;height: 5rem;width: 5rem')
-                  img(src=`/avatar/${data.defaultUser.uid}` style='border-radius: 50%;height: 100%;')
-                div(style='float:left;height: 5rem;margin-left: 1rem;')
-                  h4(style='margin-bottom: 0.2rem;margin-top: 0;')
-                    a(href=`/u/${data.defaultUser.uid}` target='_blank')= data.defaultUser.username
-                  h4(style='margin-top: 0;')= `科创币：`
-                    span(style='font-size: 2em;color: #ffba53')= data.defaultUser.kcb
-          .col-xs-12.col-md-12(style='margin: 0 0 2rem 0;')
-            .from.form-inline
-              .form-group
-                input.form-control#defaultUid(type='String' value=data.kcbSettings.defaultUid || '5805')
-                button.btn.btn-primary(onclick='saveKcbSettings()')= data.defaultUser?'更改': '保存'
-
-          .col-xs-12.col-md-12
-            table.table
-              thead
-                tr
-                  th 序号
-                  th 操作名
-                  th 每天次数（无限制：-1）
-                  th 科创币
-                  th 描述
-              tbody
-                for type, index in data.typesOfScoreChange
-                  tr.typeOfScoreChange(id=type._id)
-                    th= index + 1
-                    th= type.description
-                    th
-                      input#count(value=type.count || 0 type='number')
-                    th
-                      input#change(value=type.change || 0 type='number')
-                    th
-                      if type.count === 0
-                        span 未启用
-                      else if type.count === -1
-                        span=`无限次数 | 每次 ${type.change > 0 ? '+' + type.change : type.change}`
-                      else
-                        span=`每天 ${type.count} 次 | 每次 ${type.change > 0 ? '+' + type.change : type.change}`
-            button.btn.btn-primary(onclick='saveKcbNumberSettings()') 保存
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          .hidden(ref='data')= JSON.stringify({kcbsTypes: data.kcbsTypes, kcbSettings: data.kcbSettings})
+          h4 科创币设置
+        .col-xs-12.col-md-12.table-responsive
+          table.table
+            thead
+              tr
+                th 序号
+                th 操作名
+                th 每天次数（无限制：-1）
+                th 科创币
+                th 描述
+            tbody
+              tr(v-for='(type, index) of kcbsTypes')
+                th {{index + 1}}
+                th {{type.description}}
+                th
+                  input(v-model.number="type.count")
+                th
+                  input(v-model.number="type.num")
+                th
+                  span(v-if="type.count === 0") 未启用
+                  span(v-else-if="type.count === -1") 无限次数 | 每次 {{type.num>0?'+': ''}}{{type.num}} 科创币
+                  span(v-else) 每天 {{type.count}} 次 | 每次 {{type.num>0?'+':''}}{{type.num}} 科创币
+        .col-xs-12.col-md-12
+          h4 转账限制
+          .form.form-inline
+            .form-group
+              label 最小值：
+              input.form-control(type='number' v-model.number='kcbSettings.minCount')
+            .form-group
+              label 最大值：
+              input.form-control(type='number' v-model.number='kcbSettings.maxCount')
+        .btn-fixed-save(@click='save') 保存
 
 
 block scripts
-
-  script(src='/interface_common.js')
-  script(src='/experimental/settings/kcb.js')
+  script(src=`/experimental/settings/kcb.js?v=${global.NKC.startTime}`)
 
 
 

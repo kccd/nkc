@@ -39,6 +39,8 @@ const settingSchema = new Schema({
     friends: Number,
     friendsApplications: Number,
     friendsCategories: Number,
+    kcbsRecords: Number,
+    xsfsRecords: Number,
   },
 
 	//科创基金设置
@@ -63,7 +65,13 @@ const settingSchema = new Schema({
 
 	//科创币
 	//-------------------------------------
-	defaultUid: String,
+  totalMoney: Number,
+  minCount: Number,
+  maxCount: Number,
+  //学术分
+  //-------------------------------------
+  reduceLimit: Number,
+  addLimit: Number,
 	//网站设置
 	//-------------------------------------
 	websiteName: String,
@@ -183,7 +191,12 @@ const settingSchema = new Schema({
 		validityPeriod: Number,
 		sameIpOneDay: Number,
 		sameMobileOneDay: Number
-	}
+	},
+
+	// 红包设置
+  // ----------------------------------------
+  random: Schema.Types.Mixed,
+  draftFee: Schema.Types.Mixed,
 },
 {toObject: {
   getters: true,

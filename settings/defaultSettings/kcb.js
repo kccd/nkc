@@ -1,4 +1,6 @@
 module.exports = {
 	type: 'kcb',
-	defaultUid: '',
+  totalMoney: 100000000,
+  minCount: 1,
+  maxCount: 500
 };
