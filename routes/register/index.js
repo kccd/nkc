@@ -116,7 +116,7 @@ registerRouter
       from: 'bank',
       to: targetUser.uid,
       type: 'shareRegister',
-      description: '通过你分享的链接注册所给予的奖励',
+      description: '用户通过你分享的链接成功注册账号',
       c: {
         token: shareToken
       },
