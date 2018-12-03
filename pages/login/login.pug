@@ -9,8 +9,8 @@ block title
     }
 block content
   mixin forgotPossword
+    a(href="/register").btn.btn-danger.btn-block.minimalist-button 账号注册
     div.link
-      a(href="/register") 账号注册
       span &nbsp;&nbsp;&nbsp;
       a(href="/forgotPassword/mobile") 忘记密码
   .container-fluid(style='max-width: 1400px;' v-cloak)#app
@@ -21,6 +21,21 @@ block content
             div.site-name 科创
             p.site-description=data.serverSettings.brief
           .col-xs-12.col-md-12
+            .row
+              .btn-group.btn-group-justified.login-type
+                .btn-group(@click='changeType("account")' :style='"border-radius: 10px 10px 0 0;padding: 1rem 0;" + (loginType === "account"?"background-color: #f5f5f5;":"")')
+                  .login-type-btn
+                    .fa.fa-user
+                  .login-type-text 用户名+密码
+                .btn-group(@click='changeType("mobile")' :style='"border-radius: 10px 10px 0 0;padding: 1rem 0;" + (loginType === "mobile"?"background-color: #f5f5f5;":"")')
+                  .login-type-btn
+                    .fa.fa-mobile
+                  .login-type-text 手机号+密码
+                .btn-group(@click='changeType("code")' :style='"border-radius: 10px 10px 0 0;padding: 1rem 0;" + (loginType === "code"?"background-color: #f5f5f5;":"")')
+                  .login-type-btn
+                    .fa.fa-commenting
+                  .login-type-text 手机号+短信
+          .col-xs-12.col-md-12(style='padding-top: 1rem;background-color: #f5f5f5;')
             .form
               div(v-show="loginType === 'account'")
                 .form-group
@@ -62,20 +77,6 @@ block content
                 div(style='margin: 0.5rem 0;color: #d9534f;') {{warning.error}}
                 button.btn.btn-danger.btn-block.minimalist-button(@click='submit') {{btnText}}
                 +forgotPossword
-          .col-xs-12.col-md-12
-            .btn-group.btn-group-justified.login-type
-              .btn-group(@click='changeType("account")')
-                .login-type-btn
-                  .fa.fa-user
-                .login-type-text 用户名+密码
-              .btn-group(@click='changeType("mobile")')
-                .login-type-btn
-                  .fa.fa-mobile
-                .login-type-text 手机号+密码
-              .btn-group(@click='changeType("code")')
-                .login-type-btn
-                  .fa.fa-commenting
-                .login-type-text 手机号+验证码
 
 
 block scripts

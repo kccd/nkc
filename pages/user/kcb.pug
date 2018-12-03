@@ -1,0 +1,57 @@
+extends ../bootstrap_base
+block title
+  title= `科创币交易记录`
+  -const mainContainer1400 = true;
+  style.
+    tbody tr th{
+      max-width: 12rem;
+    }
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row#app(v-cloak)
+      .hidden#data= JSON.stringify({kcbsRecords: data.kcbsRecords, user: data.user})
+      .col-xs-12.col-md-12
+        h4 科创币交易记录
+      .col-xs-12.col-md-12
+        include ../interface_navigation_paging
+      .col-xs-12.col-md-12.table-responsive
+        table.table.table-bordered(style='font-size:1rem;')
+          thead
+            tr
+              th 时间
+              th 操作名
+              th 交易对象
+              th 收入
+              th 支出
+              th 说明
+              th 文号
+          tbody
+            tr(v-for='(record, index) of kcbsRecords')
+              th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+              th
+                span(v-if='record.type === "creditKcb"') 鼓励
+                span(v-else-if='record.type === "lottery"') 随机红包
+                span(v-else-if='record.type === "updateKcb"') 换发新币
+                span(v-else-if='record.type === "inherit"') 其它未登记详情的记录
+                span(v-else) {{record.kcbsType.description}}
+              th
+                span(v-if='record.to === user.uid')
+                  span(v-if='record.from === "bank"') 科创人民很行
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb') {{record.fromUser.username}}
+                span(v-else)
+                  span(v-if='record.to === "bank"') 科创人民很行
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb') {{record.toUser.username}}
+              th
+                span(v-if='record.to === user.uid') {{record.num}}
+              th
+                span(v-if='record.from === user.uid') {{record.num}}
+
+              th {{record.description}}
+              th
+                a(v-if="record.pid" :href="'/p/' + record.pid") {{record.pid}}
+      .col-xs-12.col-md-12
+        include ../interface_navigation_paging
+block scripts
+  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
+  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  script(src=`/user/kcb.js?v=${global.NKC.startTime}`)

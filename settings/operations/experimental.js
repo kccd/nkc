@@ -108,6 +108,10 @@ module.exports = {
 			GET: 'visitKcbSettings',
 			PATCH: 'modifyKcbSettings'
 		},
+    xsf: {
+		  GET: 'visitXsfSettings',
+      PATCH: 'modifyXsfSettings'
+    },
 		log: {
 			GET: 'logParamsSetting',
 			POST: 'logParamsSettingModify'
@@ -131,7 +135,11 @@ module.exports = {
 		post: {
 			GET: 'visitEPostSettings',
 			PATCH: 'modifyEPostSettings'
-		}
+		},
+    'red-envelope': {
+		  GET: 'visitERedEnvelope',
+      PATCH: 'modifyEPostSettings'
+    }
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',
@@ -157,6 +165,12 @@ module.exports = {
 		},
 		score: {
 			GET: 'visitScoreLogs'
-		}
+		},
+    kcb: {
+		  GET: 'visitExperimentalKcb'
+    },
+    xsf: {
+		  GET: 'visitExperimentalXsf'
+    }
 	}
 };

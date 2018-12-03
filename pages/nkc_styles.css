@@ -1110,6 +1110,7 @@ color: #d66;
   border-color: #D8D8D8;
   /* background-color: #FFFFFF; */
   border-radius: 5px;
+  margin-bottom: 0;
 }
 
 .ThreadPostCreditItem{  /*行*/
@@ -2710,7 +2711,7 @@ img.emoji {
 }
 .post-body{
   overflow: visible;
-  padding: 1rem 0;
+  padding: 1rem 0 1rem 0;
   margin: 0;
   border-top: 1px solid #eeeeee;
 }
@@ -3122,15 +3123,15 @@ img.emoji {
 }
 .single-post{
   position: relative;
-  padding-top: 1rem;
+  /*padding-top: 1rem;*/
 }
 .single-post-time{
   position: absolute;
   text-align: center;
   /*max-width: 20rem;*/
-  height: 2rem;
-  line-height: 2rem;
-  top: 0;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  top: -8px;
   left: 0;
   right: 0;
   margin: auto;
@@ -3141,4 +3142,180 @@ img.emoji {
   display: inline-block;
   background-color: #ffffff;
   font-size: 1.2rem;
+}
+.posts-vote{
+  height: 1.5rem;
+  display: inline-block;
+  padding-right: 0.5rem;
+}
+.posts-vote>div{
+  vertical-align: top;
+  display: inline-block;
+  height: 1.5rem;
+  line-height: 1.3rem;
+  font-size: 1.1rem;
+  width: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+}
+.posts-vote-up, .posts-vote-down{
+  /*background-color: #deedfa;*/
+  /*color: #3e9ef2;*/
+  color: #555;
+  border: 1px solid #aaa;
+  border-radius: 50%;
+  transition: color 0.3s, background-color 0.3s;
+}
+/*.posts-vote-up:hover, .posts-vote-down:hover, .posts-vote-up.active, .posts-vote-down.active{*/
+.posts-vote-up.active, .posts-vote-down.active{
+  background-color: #3e9ef2;
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0);
+}
+.posts-vote-number{
+  font-weight: 600;
+  color: #607a91;
+  max-width: 2.5rem;
+  font-size: 1.3rem;
+}
+.btn-fixed-save{
+  position: fixed;
+  right: 2rem;
+  bottom: 5rem;
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  background-color: #1e88e5;
+  line-height: 5rem;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.3s;
+}
+.btn-fixed-save:active{
+  background-color: #0b5ba2;
+}
+
+.lottery{
+  position: fixed;
+  right: 2rem;
+  bottom: 5rem;
+  width: 13rem;
+  height: 18rem;
+  max-width: 100%;
+  z-index: 20000;
+}
+.lottery .lottery-close{
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+.lottery .lottery-close .lottery-header{
+  width: 100%;
+  height: 10rem;
+  border-radius: 50%;
+  margin-top: -5rem;
+  z-index: 30;
+  background-color: #ee0d0d;
+  box-shadow: rgba(0, 0, 0, 0.14) 3px 0 10px;
+}
+.lottery .lottery-button{
+  height: 4rem;
+  cursor: pointer;
+  width: 4rem;
+  margin: auto;
+  text-align: center;
+  line-height: 4rem;
+  background-color: #f0a607;
+  border-radius: 50%;
+  margin-top: -2rem;
+  color: #eee;
+  user-select: none;
+  font-size: 2rem;
+}
+.lottery .lottery-body{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  overflow: hidden;
+  z-index: 20;
+  background-color: #cf1717;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.14) 3px 3px 10px;
+}
+.lottery-button:active{
+  background-color: #de9b09;
+}
+
+.lottery .lottery-open{
+  height: 100%;
+  display: none;
+  width: 100%;
+}
+.lottery .lottery-open .lottery-header{
+  width: 100%;
+  height: 10rem;
+  position: absolute;
+  top: -5rem;
+  border-radius: 50%;
+  z-index: 10;
+  background-color: #ee0d0d;
+  box-shadow: rgba(0, 0, 0, 0.14) 3px 0 10px;
+}
+.lottery .lottery-open .lottery-button{
+  height: 4rem;
+  cursor: pointer;
+  width: 4rem;
+  margin: auto;
+  text-align: center;
+  line-height: 4rem;
+  background-color: #f0a607;
+  border-radius: 50%;
+  margin-top: -2rem;
+  color: #eee;
+  user-select: none;
+  font-size: 2rem;
+}
+.close-lottery{
+  position: absolute;
+  font-size: 1.4rem;
+  top: 0;
+  right: -1.5rem;
+  cursor: pointer;
+  z-index: 40;
+  color: #555;
+}
+.lottery-info{
+  padding: 1.5rem 0.5rem 0 0.5rem;
+  color: #fff;
+  text-align: center;
+}
+.lottery-info-header{
+  color: #ffad00;
+  font-size: 2rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+.bootstrap-modal{
+  z-index: 10000;
+}
+.kcb-info, .xsf-info{
+  display: inline;
+}
+.ThreadPostCredits{
+  display:block;
+  word-break: break-all;
+  word-wrap: break-word;  /*内容超出div自动换行*/
+  display: table;
+  /*width: 100%;*/
+  padding: 10px;
+  margin-top: 8px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #D8D8D8;
+  /* background-color: #FFFFFF; */
+  border-radius: 5px;
+  margin-bottom: 0;
 }

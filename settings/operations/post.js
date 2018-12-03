@@ -7,7 +7,10 @@ module.exports = {
 		},
 		credit: {
 			xsf: {
-				POST: 'creditXsf'
+				POST: 'creditXsf',
+        PARAMETER: {
+          DELETE: 'cancelXsf'
+        }
 			},
 			kcb: {
 				POST: 'creditKcb'
@@ -32,6 +35,14 @@ module.exports = {
 		digest: {
 			POST: 'digestPost',
 			DELETE: 'unDigestPost'
-		}
+		},
+    vote: {
+		  up: {
+		    POST: 'post-vote-up'
+      },
+      down: {
+		    POST: 'post-vote-down'
+      }
+    }
 	}
 };

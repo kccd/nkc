@@ -144,7 +144,6 @@ const forumSchema = new Schema({
     type: String,
     default: '0' // 次数
   },
-
   fid: {
     type: String,
     unique: true,
@@ -884,10 +883,8 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
       fid = fid.concat(fidForRoleAndGrade);
     }
 
-    
+  }
 
-	}
-	
 	if(baseFid) {
 		const childFid = await client.smembersAsync(`forum:${baseFid}:allChildForumsId`);
 		fid = fid.filter(f => childFid.includes(f));
@@ -896,6 +893,23 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
   return [...new Set(fid)];
 };
 
+forumSchema.methods.ensureModeratorsPermission = async function(data) {
+  const {user, userRoles, operationId} = data;
+  let hasOperation = false;
+  for(const role of userRoles) {
+    if(role._id !== 'moderator' && role.operationsId.includes(operationId)) {
+      hasOperation = true;
+      break;
+    }
+  }
+  if(hasOperation) return;
+  const isModerator = await this.isModerator(user);
+  if(!isModerator) {
+    const err = new Error('权限不足');
+    err.status = 403;
+    throw err;
+  }
+};
 
 
 module.exports = mongoose.model('forums', forumSchema);

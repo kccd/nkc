@@ -54,14 +54,17 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                   //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}')`)
                   //-   img(src="/default/weibo.png" style="width:100%")
                 canvas.qrcode(id=post.pid+"Qrcode",data-pid=post.pid,style="display:none").inline-block
-
+        if addKcb && post.uid !== data.user.uid
+          .inline-block.post-qrcode
+            .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
         .inline-block.post-thumbsUp
-          -const recUsers = post.recUsers || [];
-          if data.user && recUsers.includes(data.user.uid)
-            span(data-pid=post.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-          else
-            span(data-pid=post.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-
+          //- const recUsers = post.recUsers || [];
+          //if data.user && recUsers.includes(data.user.uid)
+          //  span(data-pid=post.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+          //else
+          //  span(data-pid=post.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
+          -const votePost = post;
+          include ../module_vote
         .clearfix
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
@@ -69,19 +72,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
         if post.toc.toLocaleString() !== post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-        if post.credits && post.credits.length > 0
-          .nkcpanel.ThreadPostCredits
-            each c,index in post.credits
-              -var username = c.username||c.uid
-              -var profile = (c.uid&&c.uid!=='0')?'/m/'+c.uid:'/user_activities_byname/'+c.username
-              .ThreadPostCreditItem
-                span.TPCQ #{(c.q > 0 ? '+' : '-')}#{c.q} &nbsp;
-                span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
-                span.TPCIA
-                  a(href=`${profile}`)
-                    img.TPCIAI(src=`/avatar_small/${c.uid}`)
-                span.TPCIssuer #{username} &nbsp;&nbsp;
-                span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
-                span.TPCReason #{c.reason}
+        +postCredits(post)
         if post.disabled && disablePost
           a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+

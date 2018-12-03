@@ -36,14 +36,7 @@ router
 			const defaultUser = await db.UserModel.findOne({uid: defaultUid});
 			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认账户');
 			// 生成科创币交易记录
-			await db.UsersScoreLogModel.insertLog({
-				user: user,
-				type: 'kcb',
-				typeIdOfScoreChange: 'modifyUsername',
-				ip: ctx.address,
-				port: ctx.port
-			});
-
+      await db.KcbsRecordModel.insertSystemRecord('modifyUsername', data.user, ctx);
 		}
 		const newUsernameLowerCase = newUsername.toLowerCase();
 

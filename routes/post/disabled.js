@@ -33,28 +33,9 @@ router
     if(obj.disabled) {
       // 直接封禁
       if(para.delType === 'toRecycle') {
-        await db.UsersScoreLogModel.insertLog({
-          user: data.targetUser,
-          type: 'kcb',
-          typeIdOfScoreChange: 'postBlocked',
-          port: ctx.port,
-          fid: targetPost.fid,
-          tid: targetPost.tid,
-          pid,
-          ip: ctx.address
-        });
+        await db.KcbsRecordModel.insertSystemRecord('postBlocked', data.targetUser, ctx);
         if(para && para.illegalType) {
-          await db.UsersScoreLogModel.insertLog({
-            user: data.targetUser,
-            type: 'kcb',
-            typeIdOfScoreChange: 'violation',
-            port: ctx.port,
-            fid: targetPost.fid,
-            tid: targetPost.tid,
-            pid,
-            ip: ctx.address,
-            description: para.reason || '屏蔽回复并标记为违规'
-          });
+          await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
           await db.UsersScoreLogModel.insertLog({
             user: data.targetUser,
             type: 'score',

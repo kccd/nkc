@@ -72,6 +72,7 @@ operationRouter
 				key: 'violationCount',
 				description: para.reason || '退回文章并标记为违规'
 			});
+      await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
 		}
 		const mId = await db.SettingModel.operateSystemID('messages', 1);
 		const message = db.MessageModel({
@@ -157,16 +158,8 @@ operationRouter
 			}
 		}
 		if(fid === 'recycle') {
-			await db.UsersScoreLogModel.insertLog({
-				user: data.targetUser,
-				type: 'kcb',
-				typeIdOfScoreChange: 'threadBlocked',
-				port: ctx.port,
-				tid: targetThread.tid,
-				fid: targetThread.fid,
-				ip: ctx.address
-			});
-			if(para && para.illegalType) {
+      await db.KcbsRecordModel.insertSystemRecord('threadBlocked', data.targetUser, ctx);
+      if(para && para.illegalType) {
 				await db.UsersScoreLogModel.insertLog({
 					user: data.targetUser,
 					type: 'score',
@@ -178,6 +171,7 @@ operationRouter
 					fid: targetThread.fid,
 					description: para.reason || '屏蔽文章并标记为违规'
 				});
+        await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
 			}
 			// 添加删帖日志
 			let oc = targetThread.oc;

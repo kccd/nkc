@@ -274,6 +274,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const UserModel = mongoose.model('users');
   const ReplyModel = mongoose.model('replies');
   const dbFn = require('../nkcModules/dbFunction');
+  const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {c, t, l} = post;
   const quote = await dbFn.getQuote(c);
@@ -337,6 +338,15 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     }
   }
   await this.update({lm: pid});
+  if(!user.generalSettings.lotterySettings.close) {
+    const redEnvelopeSettings = await SettingModel.findOnly({type: 'redEnvelope'});
+    if(!redEnvelopeSettings.random.close) {
+      const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+      if(postCountToday === 1) {
+        await user.generalSettings.update({'lotterySettings.status': true});
+      }
+    }
+  }
   return _post
 };
  // 算post所在楼层

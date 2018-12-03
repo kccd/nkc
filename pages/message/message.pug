@@ -18,6 +18,7 @@ block content
         div(v-else) 对方撤回了一条信息
       //- 对方发来的信息
       .ms-single-left(v-else-if="message.s !== user.uid")
+        .hidden-info {{format('YYYY-MM-DD HH:mm:ss', message.tc)}} {{targetUser.friend&&targetUser.friend.info.name?targetUser.friend.info.name:targetUser.username}}
         .ms-single-img
           a(@click='selectFriend({targetUser: targetUser})')
             img(:src="'/avatar/' + message.s")
@@ -34,6 +35,7 @@ block content
               a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
       // 自己发出的信息
       .ms-single-right(v-else)
+        .hidden-info {{format('YYYY-MM-DD HH:mm:ss', message.tc)}} {{user.username}}
         .ms-single-content-div
           //.ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
           .ms-single-content
@@ -176,10 +178,10 @@ block content
         .col-xs-12.col-md-10.col-md-offset-1
           .col-xs-6.col-md-6
             .row
-              a(:href="'/u/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 动态
+              a(:href="'/u/' + friend.targetUser.uid" target="_blank").btn.btn-block.btn-default.block-btn 动态
           .col-xs-6.col-md-6
             .row
-              a(:href="'/m/' + friend.tUid" target="_blank").btn.btn-block.btn-default.block-btn 专栏
+              a(:href="'/m/' + friend.targetUser.uid" target="_blank").btn.btn-block.btn-default.block-btn 专栏
       .ms-friend-information(v-if='friend.info')
         .col-xs-12.col-md-10.col-md-offset-1
           button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
@@ -340,6 +342,10 @@ block content
           span 在回复中@了你，
           a.remind-link(:href="'/t/' + message.targetPost.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank')
             span 立即查看
+        div(v-else-if="message.c.type === 'xsf'")
+          span 您发表的文章获得了 {{message.num}} 学术分，
+          a.remind-link(:href="'/p/' + message.post.pid" target='_blank')
+            span 立即查看
 
 
   // 设置
@@ -437,7 +443,6 @@ block content
                 span(v-else-if="friend.targetUser.onlineType === 'computer'" style='color: #777777;margin-right:0.3rem;') [网页在线]
               span(style='color: #777777;margin-right:0.3rem;' v-else) [离线]
               span(:title='friend.targetUser.description') {{friend.targetUser.description}}
-          .ms-list-right
 
 
   // 消息列表
@@ -744,7 +749,29 @@ block content
 
 block scripts
   script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
-  script(src=`/transliteration/lib/browser/transliteration.min.js?v=${global.NKC.startTime}`)
+  //- 为了让IE兼容Symbol transliteration插件用到该属性
+  script.
+    if (!window.Symbol) {
+      window.Symbol = function () {
+      };
+      Array.prototype[Symbol.iterator = "@@iterator"] = function () {
+        var i = -1;
+        var arr = this;
+        return {
+          next: function () {
+            i++;
+            return {
+              value: arr[i],
+              done: i >= arr.length
+            };
+          },
+          return: function () {
+            return true;
+          }
+        };
+      }
+    }
+  script(src=`/transliteration/lib/browser/transliteration.js?v=${global.NKC.startTime}`)
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
   script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
   script(src=`/xss/dist/xss.js?v=${global.NKC.startTime}`)

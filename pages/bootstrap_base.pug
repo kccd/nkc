@@ -28,31 +28,14 @@ block body
   block footer
     include nkc_footer.pug
   if data.user
-
-    .addFriend#addFriend
-      .body
-        .header
-          .row
-            .col-md-6.text-left 添加好友
-            .col-md-6.text-right(onclick='closeFrameOfAddFriend()')
-              .fa.fa-remove
-        .content
-          .avatar
-            img.center-block(src=``)
-          .username
-          .description
-          .success.text-center
-            div 请求发送成功
-            buttom.btn.btn-danger(onclick="closeFrameOfAddFriend()") 关闭
-          .input
-            .div-textarea
-              textarea.form-control(placeholder='请填写验证信息')
-            button.btn.btn-block.btn-primary(onclick='addFriendByUid()') 发送
-
+    include module_add_Friend.pug
+    if data.user.generalSettings.lotterySettings.status
+      include module_lottery
     div.hidden#socketConfig= JSON.stringify(data.socketConfig)
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   script(src='/jquery/jquery-1.11.1.js')
+  script(src="/jquery-ui-1.10.4.custom.js")
   script(src='/bootstrap/js/bootstrap.min.js')
   script(src='/twemoji/2/twemoji.min.js')
   script(src='/Promise/promise.min.js')
@@ -60,6 +43,7 @@ block body
   script(src='/qrcode/build/qrcode.js')
   script(src="/photoswipe/dist/photoswipe.js")
   script(src="/photoswipe/dist/photoswipe-ui-default.js")
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   if data.user
     script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
     script(src=`/message/socket.js?v=${global.NKC.startTime}`)
@@ -90,4 +74,5 @@ block body
   script.
     console.log('(c)2018 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')
-
+  if data.user && data.user.newVoteUp > 0
+    script!=`screenTopAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`

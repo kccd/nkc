@@ -12,6 +12,7 @@ const certRouter = require('./cert');
 const socialRouter = require('./social');
 const usernameRouter = require('./username');
 const waterRouter = require('./water');
+const redEnvelopeRouter = require('./redEnvelope');
 settingRouter
 	.use('/', async (ctx, next) => {
 		const {data, params, db} = ctx;
@@ -27,6 +28,7 @@ settingRouter
 		ctx.template = 'interface_user_settings_avatar.pug';
 		await next();
 	})
+  .use('/red_envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
 	.use('/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
 	.use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods())
 	.use('/username', usernameRouter.routes(), usernameRouter.allowedMethods())

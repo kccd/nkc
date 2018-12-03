@@ -19,6 +19,8 @@ const messageRouter = require('./message');
 const shareRouter = require('./share');
 const smsRouter = require('./sms');
 const postRouter = require('./post');
+const xsfRouter = require('./xsf');
+const redEnvelopeRouter = require('./redEnvelope');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -26,6 +28,8 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+  .use('/red-envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
+  .use('/xsf', xsfRouter.routes(), xsfRouter.allowedMethods())
 	.use('/post', postRouter.routes(), postRouter.allowedMethods())
 	.use('/message', messageRouter.routes(), messageRouter.allowedMethods())
 	.use('/share', shareRouter.routes(), shareRouter.allowedMethods())

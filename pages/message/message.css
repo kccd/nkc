@@ -913,6 +913,11 @@ img.emoji{
 }
 .ms-withdrawn{
   text-align: center;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
 }
 .ms-withdrawn>div{
   display: inline-block;
@@ -1314,4 +1319,10 @@ img.emoji{
   display: block;
   text-align: center;
   text-decoration: none;
+}
+.hidden-info{
+  width: 1px;
+  height: 1px;
+  color: #fff;
+  overflow: hidden;
 }

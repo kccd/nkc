@@ -1,35 +1,24 @@
-function saveKcbSettings() {
-	var obj = {
-		defaultUid: $('#defaultUid').val()
-	};
-	nkcAPI('/e/settings/kcb', 'PATCH', obj)
-		.then(function() {
-			screenTopAlert('保存成功');
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error || data);
-		})
-}
+var app = new Vue({
+  el: '#app',
+  data: {
+    kcbsTypes: [],
+    kcbSettings: {}
+  },
+  mounted: function() {
+    var data = JSON.parse(this.$refs.data.innerText);
+    this.kcbsTypes = data.kcbsTypes;
+    this.kcbSettings = data.kcbSettings;
 
-function saveKcbNumberSettings() {
-	var arr = $('.typeOfScoreChange');
-	var types = [];
-	for(var i = 0; i < arr.length; i++) {
-		var o = arr.eq(i);
-		var typeId = o.attr('id');
-		var count = o.find('#count').val();
-		var change = o.find('#change').val();
-		types.push({
-			_id: typeId,
-			count: count,
-			change: change
-		});
-	}
-	nkcAPI('/e/settings/kcb', 'PATCH', {operation: 'saveKcbNumberSettings', types: types})
-		.then(function() {
-			screenTopAlert('保存成功');
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error|| data);
-		})
-}
+  },
+  methods: {
+    save: function() {
+      nkcAPI('/e/settings/kcb', 'PATCH', {kcbsTypes: this.kcbsTypes, minCount: this.kcbSettings.minCount, maxCount: this.kcbSettings.maxCount})
+        .then(function() {
+          screenTopAlert('保存成功');
+        })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+    }
+  }
+});

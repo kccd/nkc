@@ -263,6 +263,13 @@ messageSchema.statics.extendReminder = async (arr) => {
         t: firstPost.t,
         tid: firstPost.tid
       };
+    } else if(type === 'xsf') {
+      const {pid, num} = c;
+      const post = await PostModel.findOnly({pid});
+      r_.post = {
+        pid: post.pid
+      };
+      r_.num = num;
     }
     r_.ty = 'STU';
     r_.c = {

@@ -103,6 +103,14 @@ const postSchema = new Schema({
     type: Date,
     default: null,
     index: 1
+  },
+  voteUp: {
+    type: Number,
+    default: 0
+  },
+  voteDown: {
+    type: Number,
+    default: 0
   }
 }, {toObject: {
   getters: true,
@@ -152,6 +160,13 @@ postSchema.virtual('thread')
   })
   .set(function(t) {
     this._thread = t
+  });
+postSchema.virtual('usersVote')
+  .get(function() {
+    return this._usersVote
+  })
+  .set(function(t) {
+    this._usersVote = t
   });
 
 postSchema.methods.extendThread = async function() {
@@ -475,17 +490,23 @@ postSchema.post('save', async function(doc, next) {
 const defaultOptions = {
   user: true,
   userGrade: true,
-  resource: true
+  resource: true,
+  usersVote: true,
+  credit: true
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
+  // 若需要判断用户是否点赞点踩，需要options.user
   const UserModel = mongoose.model('users');
   const UsersGradeModel = mongoose.model('usersGrades');
+  const PostsVoteModel = mongoose.model('postsVotes');
   const ResourceModel = mongoose.model('resources');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
-  const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {};
-
+  o.usersVote = o.usersVote && !!o.uid;
+  const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {}, voteObj = {}, kcbsRecordsObj = {}, xsfsRecordsObj = {};
   let grades, resources;
   posts.map(post => {
     pid.add(post.pid);
@@ -493,6 +514,20 @@ postSchema.statics.extendPosts = async (posts, options) => {
       uid.add(post.uid);
     }
   });
+  if(o.credit) {
+    const kcbsRecords = await KcbsRecordModel.find({type: 'creditKcb', pid: {$in: [...pid]}}).sort({toc: 1});
+    for(const r of kcbsRecords) {
+      uid.add(r.from);
+      if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
+      kcbsRecordsObj[r.pid].push(r);
+    }
+    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false}).sort({toc: 1});
+    for(const r of xsfsRecords) {
+      uid.add(r.operatorId);
+      if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+      xsfsRecordsObj[r.pid].push(r);
+    }
+  }
   if(o.user) {
     const users = await UserModel.find({uid: {$in: [...uid]}});
     if(o.userGrade) {
@@ -519,13 +554,36 @@ postSchema.statics.extendPosts = async (posts, options) => {
       });
     });
   }
+  if(o.usersVote) {
+    const votes = await PostsVoteModel.find({uid: o.uid, pid: {$in: [...pid]}});
+    for(const v of votes) {
+      voteObj[v.pid] = v.type;
+    }
+  }
 
   return posts.map(post => {
+    post.credits = [];
     if(o.user) {
       post.user = usersObj[post.uid];
     }
     if(o.resource) {
       post.resources = resourcesObj[post.pid];
+    }
+    if(o.usersVote) {
+      post.usersVote = voteObj[post.pid];
+    }
+    if(o.credit) {
+      // 学术分、科创币评分记录。
+      post.credits = xsfsRecordsObj[post.pid] || [];
+      post.credits = post.credits.concat(kcbsRecordsObj[post.pid] || []);
+      for(let r of post.credits) {
+        if(r.from) {
+          r.fromUser = usersObj[r.from];
+        } else {
+          r.fromUser = usersObj[r.operatorId];
+          r.type = 'xsf';
+        }
+      }
     }
 
     return post.toObject();

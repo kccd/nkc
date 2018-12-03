@@ -98,7 +98,23 @@ module.exports = async (ctx, next) => {
 		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
 		user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
-
+    if(user.generalSettings.lotterySettings.status) {
+      const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+      if(redEnvelopeSettings.random.close) {
+        user.generalSettings.lotterySettings.status = false;
+      }
+    }
+		// 获取新点赞数
+    const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
+    let newVoteUp = 0;
+    votes.map(v => {
+      if(v.type === 'up') {
+        newVoteUp += v.num;
+      } else if(v.type === 'down') {
+        newVoteUp -= v.num;
+      }
+    });
+    user.newVoteUp = newVoteUp>0?newVoteUp:0;
 		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
 			user.certs = ['banned'];
