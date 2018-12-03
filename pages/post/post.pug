@@ -1,0 +1,129 @@
+extends ../bootstrap_base
+block title
+  -var post = data.post;
+  -var title = post.t;
+  -var thread = data.thread;
+  -const addKcb = data.userOperationsId.includes('creditKcb')
+  -const addCredit = data.userOperationsId.includes('creditXsf')
+  -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
+  -const digestPost = data.userOperationsId.includes('digestPost');
+
+  -let modifyPostTimeLimit = 0;
+  -for(let i = 0; i < data.userRoles.length; i++)
+    -const r = data.userRoles[i];
+    if r.modifyPostTimeLimit > modifyPostTimeLimit
+      -modifyPostTimeLimit = r.modifyPostTimeLimit
+    if r.modifyPostTimeLimit === -1
+      -modifyPostTimeLimit = -1;
+      -break;
+
+  - var ownership = data.userOperationsId.includes('modifyOtherPosts')
+  - ownership = ownership?true:(data.user && data.user.uid===post.uid)
+
+  if !title
+    -post.c = hideContentByUser(post.c, data.user, 'thread')
+    -title = filterQuote(post.c)
+    -title = title.replace(/<\/?.+?>/g,"")
+    -title = title.slice(0, 50) + '...';
+  title=title
+  if (thread.firstPost && thread.firstPost.c)
+    -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  meta(name='description' content=`${processed}`)
+  meta(name='keywords' content=`${thread.firstPost.t}`)
+  link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)
+block content
+  -var mainContainer1400 = true
+  .container-fluid(style='max-width: 1400px;')
+    include ../module_digest
+    include ../module_credit
+    include ../thread_to_recycle.pug
+    include ../post_to_recycle.pug
+    .row
+      .col-xs-12.col-md-9
+        .nkcpanel.fullwidthpanel.ThreadBox.post
+          .post-info
+            .post-header
+              .time
+                a(href=`/u/${post.uid}` target='_blank')
+                  img.user-avatar(src=`/avatar/${post.uid}`)
+                  .username= post.user.username
+                span= fromNow(post.toc)
+              .options
+                -var votePost = post;
+                include ../module_vote
+                if addKcb && data.user && post.uid !== data.user.uid
+                  .options-fa.fa.fa-cny(onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
+                if digestPost
+                  if !post.digest
+                    .options-fa.fa.fa-star-o(onclick=`digestPost("${post.pid}")`) &nbsp;精选
+                  else
+                    .options-fa.fa.fa-star(onclick=`unDigestPost("${post.pid}")`)
+                      span &nbsp;取消精选
+                if addCredit
+                  .options-fa.fa.fa-graduation-cap(onclick=`credit("${post.pid}", 'xsf')`) &nbsp;评学术分
+                if testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc)
+                  .options-fa.fa.fa-edit(onclick=`window.location.href="/editor?type=post&id=${post.pid}"`) &nbsp;编辑
+                if disablePost
+                  if data.thread.oc !== post.pid
+                    .options-fa.fa.fa-eye-slash(onclick=`disablePostClick('${post.pid}', "post")` data-toggle="modal" data-target="#threadRecycleModal" data-whatever="@mdo") &nbsp;屏蔽
+                  else
+                    .options-fa.fa.fa-eye-slash(data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") &nbsp;屏蔽
+                  if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
+                    if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
+                      a.options-fa(href=`/p/${post.pid}/history`)
+                        span.fa.fa-history &nbsp;历史
+                  -const ipoc = post.iplm || post.ipoc;
+                  a.options-fa(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+                    span.fa.fa-map-marker(style='margin-left: 2px;') &nbsp;IP
+            span 发表于《
+            a(href=`/t/${post.tid}` target='_blank').thread-title= post.thread.firstPost.t
+            | 》
+          if post.t
+            div.ThreadTitle= post.t
+          div.ThreadPostBody!= experimental_render(post)
+          if post.credits && post.credits.length > 0
+            .nkcpanel.ThreadPostCredits
+              for c,index in post.credits
+                -var username = c.fromUser.username
+                -var profile = '/u/'+c.from
+                .ThreadPostCreditItem
+                  span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
+                  span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
+                  span.TPCIA
+                    a(href=`${profile}` style='text-decoration: none;')
+                      img.TPCIAI(src=`/avatar_small/${c.fromUser.uid}`)
+                      span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
+                  span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
+                  span.TPCReason #{c.description}
+                  if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
+                    a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
+          if post.disabled && disablePost
+            a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+        button.btn.btn-default(onclick=`window.location.href="/t/${data.thread.tid}?page=${data.step.page}&step=${data.step.step}&pid=${data.post.pid}"`) 回复
+        button.btn.btn-default(onclick=`window.location.href="${data.postUrl}"`) 查看上下文
+
+      .col-xs-12.col-md-3
+        .nkcpanel.post-share.fullwidthpanel
+          .pid=`文号 / ${post.pid}`
+          hr
+          .share 分享到：
+            img(src='/default/QQ.png' onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${data.thread.firstPost.t}', '${post.pid}')`)
+            img(src='/default/qzone.png' onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+            img(src='/default/weibo.png' onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+            img(src='/default/weChat.png' onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+            div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
+              canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
+        -var user = post.user
+        include ../interface_thread_userpatch.pug
+        if data.voteUpUsers.length !== 0
+          .nkcpanel.vote-user.fullwidthpanel
+            h4 点赞的用户
+            for u, index in data.voteUpUsers
+              if index < 30
+                a(href=`/u/${u.uid}` target='_blank' title=u.username)
+                  img(src=`/avatar/${u.uid}`)
+block scripts
+
+  script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
+  script(src=`/post_to_recycle.js?v=${global.NKC.startTime}`)
+  script(src=`/thread_to_recycle.js?v=${global.NKC.startTime}`)

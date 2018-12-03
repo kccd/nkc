@@ -30,7 +30,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 span.fa.fa-window-maximize &nbsp;专栏
             li
               a(href=`/message` style='display: inline-block;')
-                span.fa.fa-envelope-o &nbsp;信息
+                span.fa.fa-envelope-o &nbsp;消息
                 .newMessageDiv
                   span.messageNumber.newMessage= messageSum > 0?messageSum: ''
             li
@@ -42,7 +42,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 span.messageNumber.draftMessage= data.user.draftCount || ''
             li
               a(href=`/u/${user.uid}/kcb`)
-                span.fa.fa-file-text-o &nbsp;科创币记录
+                span.fa.fa-file-text-o &nbsp;账单
             li
               a(href=`/activity`)
                 span.fa.fa-trophy &nbsp;活动
@@ -64,8 +64,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
       ul.nav.navbar-nav
         li(class=navbar_highlight==='latest'?'active':'')
           a(href='/' title='扫一眼') 最新
-        li(class=navbar_highlight==='forums'?'active':'')
-          a(href=`/f` title='分类') 分类
+        li(class=[(navbar_highlight==='message'?'active':''), 'message-nav'])
+          .nav-message-num(class=!messageSum || messageSum<= 0?'disabled': '')= messageSum > 0?messageSum: ''
+          a(href=`/message` title='消息') 消息
         li(class=navbar_highlight==='fund'?'active':'')
           a(href=`/fund` title='科创基金') 基金
       ul.nav.navbar-nav.navbar-right.nav-font-color(style='font-size: 1em;')
@@ -92,7 +93,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                   span.fa.fa-window-maximize &nbsp;专栏
               li
                 a(href=`/message`)
-                  span.fa.fa-envelope-o &nbsp;信息
+                  span.fa.fa-envelope-o &nbsp;消息
                   .newMessageDiv
                     span.messageNumber.newMessage= messageSum > 0?messageSum: ''
               li
@@ -104,7 +105,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                   span.messageNumber.draftMessage= data.user.draftCount || ''
               li
                 a(href=`/u/${user.uid}/kcb`)
-                  span.fa.fa-file-text-o &nbsp;科创币记录
+                  span.fa.fa-file-text-o &nbsp;账单
               li
                 a(href=`/activity`)
                   span.fa.fa-trophy &nbsp;活动
@@ -117,7 +118,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 a(href=`/logout` title='不，不要走！')
                   span.fa.fa-sign-out &nbsp;退出
             li#messageIco.newMessageDiv
-              a(style='color: #337ab7;padding-right: 0.1rem' href='/message' title='信息')
+              a(style='color: #337ab7;padding-right: 0.1rem' href='/message' title='消息')
                 .newMessageDiv
                   span.fa.fa-envelope-o.bink(style='color: #777777;')
                   span.messageNumber.newMessage.bink(style='margin-left:0;') #{messageSum}

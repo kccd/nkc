@@ -1,10 +1,68 @@
 extends ../bootstrap_base
 block title
   title 问题列表
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${startTime}`)
+  link(rel='stylesheet' href=`/problem/problem.css?v=${startTime}`)
   -const mainContainer1400 = true;
 block content
-  .container-fluid(style='max-width: 1400px')
-    .col-xs-12.col-md-6
+  .container-fluid(style='max-width: 1400px')#app
+    .mdui-container-fluid
+      .mdui-col-xs-12.mdui-col-md-2
+        ul.mdui-list
+          for type in data.problemsTypes
+            -var cls = ['mdui-btn','mdui-btn-raised','mdui-ripple','mdui-btn-block'];
+            if(data.cid === type._id)
+              -cls.push('active');
+            -var link = `window.location.href = '/problem/list?cid=${type._id}'`
+            button.mdui-m-t-1(class=cls onclick=link)= `${type.name} ${type.count}`
+        <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-btn-block" @click='addType'>新建分类</button>
+      .mdui-col-xs-12.mdui-col-md-10
+        .mdui-col-xs-12.mdui-col-md-12
+          h3= data.problemsType.name
+            span &nbsp;&nbsp;&nbsp;
+            button(mdui-tooltip="{content: '新建记录'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`addProblem(${data.problemsType._id}, "${data.problemsType.name}")`)
+              <i class="mdui-icon material-icons">&#xe145;</i>
+            button(mdui-tooltip="{content: '修改分类名'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`modifyType(${data.problemsType._id}, "${data.problemsType.name}")`)
+              <i class="mdui-icon material-icons">&#xe3c9;</i>
+            if data.problemsType._id !== 0
+              button(mdui-tooltip="{content: '删除分类'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`deleteType(${data.problemsType._id}, "${data.problemsType.name}")`)
+                <i class="mdui-icon material-icons">&#xe872;</i>
+        .mdui-col-xs-12.mdui-col-md-12
+          include ../interface_navigation_paging
+          for problem in data.problems
+            hr(style='margin: 5px 0;')
+            .media
+              .media-left
+                if problem.user
+                  a(href=`/u/${problem.user.uid}`)
+                    img.media-object(src=`/avatar/${problem.user.uid}` style='width: 50px;height: 50px;border-radius: 50%;')
+                else
+                  .text-center(style='height: 50px;width: 50px;line-height: 50px;background-color: #aaa;border-radius: 50%;color: #fff;font-size: 2em;') 匿
+              .media-body
+                if data.type !== 'resolved'
+                  if !problem.viewed
+                    span.label.label-warning 未读
+                    span &nbsp;&nbsp;
+                  if !data.type
+                    if problem.resolved
+                      span.label.label-success 已完成
+                    else
+                      span.label.label-danger 未完成
+                    span &nbsp;&nbsp;
+                div(style='color: #aaa;display: inline')
+                  span
+                    if problem.user
+                      a(href=`/u/${problem.user.uid}`)= problem.user.username
+                    else
+                      span 匿名用户
+                  span &nbsp;&nbsp;上报于&nbsp;&nbsp;
+                    span= `${fromNow(problem.toc)}`
+                  a(href=`/problem/list/${problem._id}` style='text-decoration: none;')
+                    h4= problem.t
+          br
+          include ../interface_navigation_paging
+
+    //.col-xs-12.col-md-6
       .row
         ul.nav.nav-pills
           li(role='presentation' class=!data.type?'active': '')
@@ -52,5 +110,7 @@ block content
         if data.problems.length === 0
           h4(style='color: #aaa;') 暂无问题
 block scripts
+  script(src=`/mdui/js/mdui.min.js?v=${startTime}`)
+  script(src=`/vue/dist/vue.min.js?v=${startTime}`)
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/problem/add_problem.js?v=${global.NKC.startTime}`)
+  script(src=`/problem/problem_list.js?v=${global.NKC.startTime}`)

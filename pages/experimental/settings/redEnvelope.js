@@ -10,7 +10,8 @@ var app = new Vue({
       defaultCount: 1,
       minCount: 1,
       maxCount: 5
-    }
+    },
+    share: {}
   },
   mounted: function() {
     // var data = document.getElementById('data');
@@ -18,6 +19,22 @@ var app = new Vue({
     data = JSON.parse(data.innerText);
     this.random = data.redEnvelopeSettings.random;
     this.draftFee = data.redEnvelopeSettings.draftFee;
+    var arr = [];
+    var obj = {};
+    var s;
+    for(var key in data.redEnvelopeSettings.share) {
+      if (!data.redEnvelopeSettings.share.hasOwnProperty(key)) continue;
+      s = data.redEnvelopeSettings.share[key];
+      s.id = key;
+      arr[s.order-1] = s;
+    }
+    for(var i = 0; i < arr.length; i++) {
+      s = arr[i];
+      obj[s.id] = s;
+      delete s.id;
+    }
+    this.share = obj;
+    // this.share = data.redEnvelopeSettings.share;
     if(this.random.awards.length === 0) {
       this.random.awards = [{
         name: '',
@@ -54,7 +71,8 @@ var app = new Vue({
       }
       var data = {
         random: this.random,
-        draftFee: this.draftFee
+        draftFee: this.draftFee,
+        share: this.share
       };
       nkcAPI('/e/settings/red-envelope',  'PATCH', data)
         .then(function() {

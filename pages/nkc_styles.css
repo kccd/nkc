@@ -968,7 +968,7 @@ line-height: 1.4;
 }
 .ThreadPostBody video{max-width: 100%;}
 
-.ThreadPostBody p+p{margin-top: 10px;margin-bottom: 10px;} 
+.ThreadPostBody p+p{margin-top: 10px;margin-bottom: 10px;}
 .ThreadPostBody p+*{}
 .ThreadPostBody *+p{}
 
@@ -1859,7 +1859,7 @@ margin-left: 5px;
 @media screen and (max-width: 991px) {
   .hidden-label{
     display: none;
-  } 
+  }
 }
 .nkc-figure-text {
   font-size: 14px;
@@ -2948,6 +2948,35 @@ img.emoji {
 
 
 
+.message-nav{
+  /*animation: messagesNav 1s;
+  -moz-animation: messagesNav 1s;	!* Firefox *!
+  -webkit-animation: messagesNav 1s;	!* Safari 和 Chrome *!
+  -o-animation: messagesNav 1s;	!* Opera *!
+
+  animation-iteration-count:infinite;
+  -webkit-animation-iteration-count:infinite; !* Safari 和 Chrome *!*/
+  position: relative;
+}
+.nav-message-num{
+  position: absolute;
+  background: #ff6262;
+  color: #fff;
+  height: 16px;
+  top: 5px;
+  bottom: 0;
+  border-radius: 8px;
+  padding: 0 5px;
+  text-align: center;
+  line-height: 16px;
+  font-size: 1rem;
+  right: 0;
+  min-width: 16px;
+}
+.nav-message-num.disabled{
+  display: none;
+}
+
 
 
 
@@ -3003,6 +3032,12 @@ img.emoji {
 }
 
 @media screen and (max-width: 768px) {
+  .nav-message-num{
+    right: 1rem;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
   .nav-font-color li{
     border-top: 1px solid #eee;
   }
@@ -3157,7 +3192,9 @@ img.emoji {
   width: 1.5rem;
   cursor: pointer;
   text-align: center;
-}
+}.posts-vote>div:last-child{
+  line-height: 1.5rem;
+ }
 .posts-vote-up, .posts-vote-down{
   /*background-color: #deedfa;*/
   /*color: #3e9ef2;*/
@@ -3172,11 +3209,11 @@ img.emoji {
   color: #fff;
   border: 1px solid rgba(0,0,0,0);
 }
-.posts-vote-number{
+.posts-vote .posts-vote-number{
   font-weight: 600;
   color: #607a91;
   max-width: 2.5rem;
-  font-size: 1.3rem;
+  line-height: 1.5rem;
 }
 .btn-fixed-save{
   position: fixed;
@@ -3200,7 +3237,7 @@ img.emoji {
 
 .lottery{
   position: fixed;
-  right: 2rem;
+  right: 1rem;
   bottom: 5rem;
   width: 13rem;
   height: 18rem;
@@ -3281,11 +3318,16 @@ img.emoji {
 .close-lottery{
   position: absolute;
   font-size: 1.4rem;
-  top: 0;
-  right: -1.5rem;
+  top: -2.6rem;
+  line-height: 2.3rem;
+  background-color: rgba(0,0,0,0.8);
+  color: #fff;
+  height: 2.3rem;
+  text-align: center;
+  width: 2.3rem;
+  right: 0;
   cursor: pointer;
   z-index: 40;
-  color: #555;
 }
 .lottery-info{
   padding: 1.5rem 0.5rem 0 0.5rem;

@@ -10,5 +10,12 @@ module.exports = {
 			PATCH: 'modifyProblem',
 			DELETE: 'deleteProblem'
 		}
-	}
+	},
+  type: {
+	  POST: 'addProblemsType',
+    PARAMETER: {
+	    PATCH: 'modifyProblemsType',
+      DELETE: 'deleteProblemsType'
+    }
+  }
 };

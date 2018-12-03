@@ -53,6 +53,8 @@ block content
                   span(v-if='record.type === "creditKcb"') 鼓励
                   span(v-else-if='record.type === "lottery"') 随机红包
                   span(v-else-if='record.type === "updateKcb"') 换发新币
+                  span(v-else-if='record.type === "share"') 分享
+                  span(v-else-if='record.type === "shareRegister"') 分享注册
                   span(v-else-if='record.type === "inherit"') 其它未登记详情的记录
                   span(v-else) {{record.kcbsType.description}}
                 th

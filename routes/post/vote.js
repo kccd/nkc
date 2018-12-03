@@ -30,7 +30,6 @@ voteRouter
     if(user.xsf > 0) weights = 2;
     if(isModerator) weights = 5;
     if(!vote) {
-      await post.update({$inc: {voteUp: weights}});
       vote = db.PostsVoteModel({
         uid: user.uid,
         pid: post.pid,
@@ -42,18 +41,16 @@ voteRouter
       await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
     } else {
       if(vote.type === 'up') {
-        await post.update({$inc: {voteUp: -1*vote.num}});
         await vote.remove();
         await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       } else {
-        await post.update({$inc: {voteDown: -1*vote.num, voteUp: weights}});
         await vote.update({tlm: Date.now(), type: 'up', num: weights});
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
     }
-    let p = await db.PostModel.findOnly({pid: post.pid});
-    p.voteUp = p.voteUp - p.voteDown;
-    data.post = p;
+    await post.updatePostsVote();
+    post.voteUp = post.voteUp - post.voteDown;
+    data.post = post;
     await next();
   })
   .post('/down', async (ctx, next) => {
@@ -65,7 +62,6 @@ voteRouter
     if(user.xsf > 0) weights = 2;
     if(isModerator) weights = 5;
     if(!vote) {
-      await post.update({$inc: {voteDown: weights}});
       vote = db.PostsVoteModel({
         uid: user.uid,
         pid: post.pid,
@@ -76,17 +72,15 @@ voteRouter
       await vote.save();
     } else {
       if(vote.type === 'down') {
-        await post.update({$inc: {voteDown: -1*vote.num}});
         await vote.remove();
       } else {
-        await post.update({$inc: {voteUp: -1*vote.num, voteDown: weights}});
         await vote.update({tlm: Date.now(), type: 'down', num: weights});
         await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       }
     }
-    let p = await db.PostModel.findOnly({pid: post.pid});
-    p.voteUp = p.voteUp - p.voteDown;
-    data.post = p;
+    await post.updatePostsVote();
+    post.voteUp = post.voteUp - post.voteDown;
+    data.post = post;
     await next();
   });
 module.exports = voteRouter;

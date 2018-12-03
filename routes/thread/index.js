@@ -74,7 +74,7 @@ threadRouter
 	.get('/:tid', async (ctx, next) => {
 		const {data, params, db, query, nkcModules} = ctx;
 		const {token} = query;
-		let {page = 0, pid, last_page, highlight} = query;
+		let {page = 0, pid, last_page, highlight, step} = query;
 		const {tid} = params;
 		data.highlight = highlight;
 		const thread = await db.ThreadModel.findOnly({tid});
@@ -180,7 +180,7 @@ threadRouter
 			}
 		}
 		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}}, {$set: {delType: 'toRecycle'}});
-		if(pid) {
+		if(pid && step === undefined) {
 			const disabled = data.userOperationsId.includes('displayDisabledPosts');
 			const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
@@ -248,6 +248,7 @@ threadRouter
       thread.firstPost.usersVote = vote?vote.type: '';
       data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
       data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
+      data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
     }
 		// 加载收藏
 		data.collected = false;
@@ -314,6 +315,8 @@ threadRouter
 		}
 		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		data.thread = data.thread.toObject();
+		data.pid = pid;
+		data.step = step;
 		await next();
 	})
 	.post('/:tid', async (ctx, next) => {

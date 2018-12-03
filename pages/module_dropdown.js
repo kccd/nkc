@@ -206,7 +206,7 @@ function moveThreads(id) {
 	fn(n);
 }
 
-function moveThread(tid,fid,cid, callback){
+/*function moveThread(tid,fid,cid, callback){
 		return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
 			tid:tid,
 			fid:fid,
@@ -222,7 +222,7 @@ function moveThread(tid,fid,cid, callback){
 				screenTopWarning(data.error || data);
 				// screenTopWarning(tid+ ' 无法送 ' + fid+ (cid?' 的 '+cid:''))
 			})
-	}
+	}*/
 	
 function moveThreadToRecycle(id,para) {
 	var arr = $('input.ThreadCheckboxes');

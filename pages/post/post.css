@@ -1,0 +1,116 @@
+html{
+  font-size: 12px;
+}
+body{
+  background-color: #f1f1f1;
+}
+.post-info{
+  padding-bottom: 1rem;
+}
+.user-avatar{
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+}
+.username{
+  display: inline-block;
+  padding-right: 0.5rem;
+}
+.ThreadBox.post{
+  padding: 3rem 4rem;
+}
+.time a{
+  text-decoration: none;
+}
+.time{
+  padding-bottom: 0.5rem;
+  color: #555;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+.post-header{
+  display: -webkit-flex;
+  display: flex;
+}
+.options{
+  text-align: right;
+  -webkit-flex-grow: 1;
+  color: #777;
+  flex-grow: 1;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+}
+.options a{
+  color: #777;
+}
+.options a:hover{
+  color: #333;
+}
+.ThreadTitle{
+  text-align: center;
+  font-size: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+.options-fa{
+  margin-right: 0.3rem;
+  cursor: pointer;
+}
+.options-fa:hover{
+  color: #333;
+}
+.vote-user img{
+  height: 3rem;
+  width: 3rem;
+  cursor: pointer;
+  margin: 0.5rem;
+  transform:rotate(0deg);
+  -ms-transform:rotate(0deg); 	/* IE 9 */
+  -moz-transform:rotate(0deg); 	/* Firefox */
+  -webkit-transform:rotate(0deg); /* Safari 和 Chrome */
+  -o-transform:rotate(0deg); 	/* Opera */
+  transition: transform 1s;
+}
+.post-share hr{
+  margin: 1rem 0;
+}
+.post-share .pid{
+  text-align: center;
+  font-size: 2rem;
+  color: #555;
+}
+.post-share img{
+  height: 2rem;
+  width: 2rem;
+  margin: 0 0.5rem;
+  cursor: pointer;
+}
+/*.vote-user img:hover{
+  transform:rotate(360deg);
+  -ms-transform:rotate(360deg); 	!* IE 9 *!
+  -moz-transform:rotate(360deg); 	!* Firefox *!
+  -webkit-transform:rotate(360deg); !* Safari 和 Chrome *!
+  -o-transform:rotate(360deg); 	!* Opera *!
+}*/
+.fa-star{
+  color: #ffbf16;
+}
+.fa-star:hover{
+  color: #ffbf16;
+}
+.fa-star span{
+  color: #777;
+}
+.fa-star span:hover{
+  color: #333;
+}
+@media screen and (max-width: 768px) {
+  .ThreadBox.post{
+    padding: 1rem 1.5rem;
+  }
+}

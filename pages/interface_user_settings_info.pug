@@ -31,12 +31,12 @@ block content
                           .form-group
                             button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
                         else
-                          if data.user.kcb < -1*data.modifyUsernameOperation.change
+                          if data.user.kcb < -1*data.modifyUsernameOperation.num
                             .form-group
-                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.change}个科创币，您当前的科创币不足。`
+                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.num}个科创币，您当前的科创币不足。`
                           else
                             .form-group
-                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.change}个科创币`
+                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.num}个科创币`
                               input.form-control#username(placeholder='请输入新的用户名')
                             .form-group
                               button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存

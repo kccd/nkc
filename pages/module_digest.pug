@@ -1,15 +1,15 @@
-.digest-panel
-  button(type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#digestModel") 弹出框
-
-  div(class="modal fade" id="digestModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel").bootstrap-modal
-    div(class="modal-dialog modal-sm" role="document")
-      .modal-content
-        .modal-header
-          button(type="button" class="close" data-dismiss="modal" aria-label="Close")
-            span(aria-hidden="true") &times;
-          h4.modal-title#gridSystemModalLabel 发放精选红包
-        .modal-body
-          span Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi aperiam, consequatur culpa, dolorem dolorum ducimus enim iure nemo odit pariatur quas quasi quo saepe soluta tempore totam unde vero. Pariatur?
-        .modal-footer
-          button(type="button" class="btn btn-default" data-dismiss="modal") 关闭
-          button(type="button" class="btn btn-primary") 确认
+if data.user && data.redEnvelopeSettings && !data.redEnvelopeSettings.draftFee.close
+  .digest-panel
+    div(class="modal fade" id="digestModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel").bootstrap-modal
+      div(class="modal-dialog modal-sm" role="document")
+        .modal-content
+          .modal-header
+            button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title#gridSystemModalLabel 评为精选
+          .modal-body
+            span= `奖励科创币，范围 ${data.redEnvelopeSettings.draftFee.minCount} 到 ${data.redEnvelopeSettings.draftFee.maxCount}`
+            input(value=data.redEnvelopeSettings.draftFee.defaultCount type='number' name='digestKcb')
+          .modal-footer
+            button(type="button" class="btn btn-default" data-dismiss="modal") 关闭
+            button(type="button" class="btn btn-primary") 确认

@@ -87,6 +87,50 @@ registerRouter
 	  await db.UsersSubscribeModel.update({uid: user.uid}, {$set: {subscribeForums: defaultForumsId}});
 	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
+	  const shareToken = ctx.cookies.get('share-token', {signed: true});
+	  console.log(`shareToken`, shareToken);
+	  try{
+	    await db.ShareModel.ensureEffective(shareToken);
+    } catch(err) {
+	    console.log(err);
+      return await next();
+    }
+    const share = await db.ShareModel.findOnly({token: shareToken});
+    console.log(`share`, share);
+	  if(['', 'visitor'].includes(share.uid)) return await next();
+    if(!share.registerReward) return await next();
+    const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+    const shareSettings = redEnvelopeSettings.share.register;
+    if(!shareSettings.status) return await next();
+    const {kcb, maxKcb} = shareSettings;
+    const {registerKcbTotal} = share;
+    if(kcb + registerKcbTotal > maxKcb) {
+      addKcb = maxKcb - registerKcbTotal;
+    } else {
+      addKcb = kcb;
+    }
+    if(addKcb <= 0) return await next();
+    const targetUser = await db.UserModel.findOnly({uid: share.uid});
+    const record = db.KcbsRecordModel({
+      _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
+      from: 'bank',
+      to: targetUser.uid,
+      type: 'shareRegister',
+      description: '用户通过你分享的链接成功注册账号',
+      c: {
+        token: shareToken
+      },
+      ip: ctx.address,
+      port: ctx.port,
+      num: addKcb
+    });
+    await record.save();
+    await targetUser.update({$inc: {kcb: addKcb}});
+    await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*addKcb}});
+    ctx.cookies.set('share-token', '', {
+      httpOnly: true,
+      signed: true
+    });
 	  await next();
   })
 	.post('/information', async (ctx, next) => {

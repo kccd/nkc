@@ -15,6 +15,7 @@ postRouter
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
+    await thread.extendFirstPost();
 	  const forum = await thread.extendForum();
     const {user} = data;
 	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
@@ -54,8 +55,36 @@ postRouter
 		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();
-    data.post = post;
-    ctx.template = 'interface_page.pug';
+    const posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
+    data.post = posts[0];
+    const voteUp = await db.PostsVoteModel.find({pid, type: 'up'}).sort({toc: 1});
+    const uid = new Set();
+    for(const v of voteUp) {
+      uid.add(v.uid);
+    }
+    const users = await db.UserModel.find({uid: {$in: [...uid]}});
+    const usersObj = {};
+    for(const u of users) {
+      usersObj[u.uid] = u;
+    }
+    data.voteUpUsers = [];
+    for(const v of voteUp) {
+      data.voteUpUsers.push(usersObj [v.uid]);
+    }
+
+    const step = await thread.getStep({
+      pid,
+      disabled: data.userOperationsId.includes('displayDisabledPosts')
+    });
+    data.step = step;
+    data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
+    data.post.user = await db.UserModel.findOnly({uid: post.uid});
+    await data.post.user.extendGrade();
+    data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+    data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+    data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
+    data.thread = thread;
+    ctx.template = 'post/post.pug';
     await next();
   })
   .patch('/:pid', async (ctx, next) => {

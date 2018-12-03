@@ -86,6 +86,9 @@ $('input[name="select"]').iCheck({
 function submit(_id, callback) {
 	var obj = update();
 	obj.resolved = $('input[name="select"]').prop('checked');
+  var dom = document.getElementById('typeId');
+  if(!dom) throw 'selector error';
+  obj.name = dom.value;
 	nkcAPI('/problem/list/'+_id, 'PATCH', obj)
 		.then(function() {
 			if(callback) {
@@ -119,3 +122,6 @@ setInterval(function() {
 	}
 }, 30*1000);
 
+function changeType(problemId) {
+  submit(problemId);
+}
