@@ -18,7 +18,7 @@ forumRouter
 		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
-		data.navbar = {highlight: 'forums'};
+		// data.navbar = {highlight: 'forums'};
     await next();
   })
 	.post('/', async (ctx, next) => {

@@ -1,25 +1,26 @@
-.credit-panel.bootstrap-modal
-  div(class="modal fade" id="creditModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel").bootstrap-modal
-    div(class="modal-dialog modal-sm" role="document")
-      .modal-content
-        .modal-header
-          button(type="button" class="close" data-dismiss="modal" aria-label="Close")
-            span(aria-hidden="true") &times;
-          h4.modal-title
-        .modal-body
-          .form
-            .form-group
-              span.kcb-info= `向作者转账科创币以资鼓励`
-            .form-group
-              label 分值
-              span.kcb-info(style='display:inline-block;')=`（${data.kcbSettings.minCount} - ${data.kcbSettings.maxCount}）`
-              span.xsf-info(style='display:inline-block;')=`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`
-              input.form-control.num(value='1' type='number')
-            .form-group
-              label 原因
-              span.kcb-info(style='display:inline-block;') （不超过60个字）
-              span.xsf-info(style='display:inline-block;') （不超过500个字）
-              textarea.form-control.description(rows=3)
-        .modal-footer
-          button(type="button" class="btn btn-default" data-dismiss="modal") 关闭
-          button(type="button" class="btn btn-primary") 确认
+if data.user && data.kcbSettings && data.xsfSettings
+  .credit-panel.bootstrap-modal
+    div(class="modal fade" id="creditModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel").bootstrap-modal
+      div(class="modal-dialog modal-sm" role="document")
+        .modal-content
+          .modal-header
+            button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title
+          .modal-body
+            .form
+              .form-group
+                span.kcb-info= `向作者转账科创币以资鼓励`
+              .form-group
+                label 分值
+                span.kcb-info(style='display:inline-block;')=`（${data.kcbSettings.minCount} - ${data.kcbSettings.maxCount}）`
+                span.xsf-info(style='display:inline-block;')=`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`
+                input.form-control.num(value='1' type='number')
+              .form-group
+                label 原因
+                span.kcb-info(style='display:inline-block;') （不超过60个字）
+                span.xsf-info(style='display:inline-block;') （不超过500个字）
+                textarea.form-control.description(rows=3)
+          .modal-footer
+            button(type="button" class="btn btn-default" data-dismiss="modal") 关闭
+            button(type="button" class="btn btn-primary") 确认

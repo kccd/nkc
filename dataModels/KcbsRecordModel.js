@@ -64,6 +64,11 @@ const kcbsRecordSchema = new Schema({
     type: String,
     default: '',
     index: 1
+  },
+  c: {
+    type: Schema.Types.Mixed,
+    default: {},
+    index: 1
   }
 }, {
   collection: 'kcbsRecords',

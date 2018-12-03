@@ -80,16 +80,16 @@ block title
             .col-xs-2.col-md-2
             .col-xs-8.col-md-8
               .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qq', window.location.href, '${forum.displayName}')`)
+                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qq', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                   img(src="/default/QQ.png" style="")
               .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qzone', window.location.href, '${forum.displayName}')`)
+                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qzone', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                   img(src="/default/qzone.png" style="")
               .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weibo', window.location.href, '${forum.displayName}')`)
+                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weibo', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                   img(src="/default/weibo.png" style="")
               .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weChat', window.location.href, '${forum.displayName}')`)
+                a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weChat', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                   img(src="/default/weChat.png" style="")
           canvas.forumQrcode(style="width:100%;display:none")
   //- 上级专业、下级专业、版主
@@ -168,16 +168,16 @@ block content
               .col-xs-2.col-md-2
               .col-xs-8.col-md-8
                 .col-xs-3.col-md-3(style="padding:0px")
-                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qq', window.location.href, '${forum.displayName}')`)
+                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qq', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                     img(src="/default/QQ.png" style="")
                 .col-xs-3.col-md-3(style="padding:0px")
-                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qzone', window.location.href, '${forum.displayName}')`)
+                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'qzone', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                     img(src="/default/qzone.png" style="")
                 .col-xs-3.col-md-3(style="padding:0px")
-                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weibo', window.location.href, '${forum.displayName}')`)
+                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weibo', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                     img(src="/default/weibo.png" style="")
                 .col-xs-3.col-md-3(style="padding:0px")
-                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weChat', window.location.href, '${forum.displayName}')`)
+                  a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weChat', window.location.href, '${forum.displayName}', '${forum.fid}')`)
                     img(src="/default/weChat.png" style="")
             canvas(style="width:100%;display:none")#forumQrcode
       .col-xs-12.col-md-12
@@ -320,7 +320,6 @@ block content
                 for targetUser in data.visitors
                   .col-xs-12.col-md-6
                     include module_user_single_panel
-            #bm
           .col-xs-12.col-sm-4.col-md-3#digestThreadsDiv
             .visible-sm-inline-block.visible-md-inline-block.visible-lg-inline-block
               +forumsAndModerators
@@ -355,10 +354,7 @@ block content
                 if data.users.length > 8
                   .col-xs-12.col-md-12.text-center
                     a(href=`/f/${data.forum.fid}/visitors`) 查看更多
-            .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: none;')
-              button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
-              br
-              button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
+            include module_scrollTo
 
 block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)

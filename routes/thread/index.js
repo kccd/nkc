@@ -248,6 +248,7 @@ threadRouter
       thread.firstPost.usersVote = vote?vote.type: '';
       data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
       data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
+      data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
     }
 		// 加载收藏
 		data.collected = false;

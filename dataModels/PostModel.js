@@ -592,4 +592,20 @@ postSchema.statics.extendPosts = async (posts, options) => {
 
 };
 
+postSchema.methods.updatePostsVote = async function() {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const votes = await PostsVoteModel.find({pid: this.pid});
+  let upNum = 0, downNum = 0;
+  for(const vote of votes) {
+    if(vote.type === 'up') {
+      upNum += vote.num;
+    } else {
+      downNum += vote.num;
+    }
+  }
+  this.voteUp = upNum;
+  this.voteDown = downNum;
+  await this.update({voteUp: upNum, voteDown: downNum});
+};
+
 module.exports = mongoose.model('posts', postSchema);

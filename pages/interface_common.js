@@ -881,13 +881,166 @@ function deleteForum(fid) {
 		})
 }
 
+
+var digestDom;
+var creditDom;
 $(function () {
 	var tooltipElements = $('[data-toggle="tooltip"]');
 	if(tooltipElements.length > 0) {
 		$('[data-toggle="tooltip"]').tooltip();
 	}
 	iconSwitch();
+
+	// 精选弹窗
+  digestDom = $('#digestModel');
+  if(digestDom.length !== 0) {
+    digestDom.modal({
+      show: false
+    });
+  }
+  creditDom = $('#creditModel');
+  if(creditDom.length !== 0) {
+    creditDom.modal({
+      show: false
+    });
+  }
 });
+
+
+function cancelXsf(pid, id) {
+  var reason = prompt('请输入撤销原因：');
+  if(reason === null) return;
+  if(reason === '') return screenTopWarning('撤销原因不能为空！');
+  nkcAPI('/p/' + pid + '/credit/xsf/' + id + '?reason=' + reason, 'DELETE', {})
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+
+}
+
+function credit(pid, type, kcb) {
+  var title = {
+    xsf: '评学术分',
+    kcb: '鼓励'
+  }[type];
+  creditDom.one('show.bs.modal', function(event) {
+    var button = event.currentTarget.getElementsByClassName('btn');
+    var t = event.currentTarget.getElementsByClassName('modal-title');
+    var kcbInfo = event.currentTarget.getElementsByClassName('kcb-info');
+    var xsfInfo = event.currentTarget.getElementsByClassName('xsf-info');
+    var num = event.currentTarget.getElementsByClassName('num')[0];
+    var description = event.currentTarget.getElementsByClassName('description')[0];
+    if(type === 'kcb') {
+      for(var i = 0 ; i < xsfInfo.length; i++) {
+        xsfInfo[i].style.display = 'none';
+      }
+      for(var i = 0 ; i < kcbInfo.length; i++) {
+        kcbInfo[i].style.display = 'inline-block';
+      }
+      num.value = '';
+    } else {
+      num.value = '';
+      for(var i = 0 ; i < kcbInfo.length; i++) {
+        kcbInfo[i].style.display = 'none';
+      }
+      for(var i = 0 ; i < xsfInfo.length; i++) {
+        xsfInfo[i].style.display = 'inline-block';
+      }
+    }
+    description.value = '';
+    t[0].innerText = title;
+    button[1].onclick = function() {
+      if(type === 'xsf') {
+        var obj = {
+          num: num.value,
+          description: description.value
+        };
+        return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',obj)
+          .then(function(){
+            creditDom.modal('hide');
+            window.location.reload();
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error)
+          })
+      } else if(type === 'kcb') {
+
+        if(num.value > kcb) return screenTopWarning('您的科创币不足');
+        var obj = {
+          num: num.value,
+          description: description.value
+        };
+        nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)
+          .then(function() {
+            creditDom.modal('hide');
+            window.location.reload();
+          })
+          .catch(function(data) {
+            screenTopWarning(data.error || data);
+          });
+      }
+    }
+  });
+  creditDom.modal('show');
+}
+
+function addCredit(pid){
+  var cobj = promptCredit(pid)
+  if(cobj){
+    return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',cobj)
+      .then(function(){
+        window.location.reload()
+      })
+      .catch(function(data) {
+        screenTopWarning(data.error)
+      })
+  }
+  else{
+    screenTopWarning('取消评分。')
+  }
+}
+
+function addKcb(pid, kcb) {
+  var num = prompt('向作者转账科创币以资鼓励，科创币数量：', '5');
+  if(!num || !Number(num)) return screenTopWarning('请输入正确的科创币数量');
+  num = Number(num);
+  if(num <= 0) return screenTopWarning('科创币最少为1');
+  if(kcb < num) return screenTopWarning('您的科创币数量不足');
+  var description = prompt('请输入理由：', '');
+  if(!description || description.length < 2) {
+    return screenTopWarning('理由写的太少啦~');
+  }
+  nkcAPI('/p/'+pid+'/credit/kcb', 'POST', {
+    num: num,
+    description: description
+  })
+    .then(function() {
+      screenTopAlert('鼓励成功！');
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    });
+}
+
+function promptCredit(pid){
+  var cobj = {pid:pid}
+
+  var q = prompt('请输入学术分：','1')
+  if(q&&Number(q)){
+    cobj.num=Number(q)
+
+    var reason = prompt('请输入评分理由：','')
+    if(reason&&reason.length>1){
+      cobj.description = reason;
+
+      return cobj
+    }
+  }
+  return null
+}
 
 //舍弃草稿
 function removedraft(uid,did){
@@ -1112,19 +1265,40 @@ function closeThread(tid) {
 }
 // 设回复为精选
 function digestPost(pid) {
-	nkcAPI('/p/'+pid+'/digest', 'POST', {})
-		.then(function() {
-			screenTopAlert('设置成功');
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error||data);
-		})
+  var post = function(obj) {
+    nkcAPI('/p/'+pid+'/digest', 'POST', obj)
+      .then(function() {
+        screenTopAlert('设置成功');
+        if(digestDom.length > 0) {
+          digestDom.modal('hide');
+        }
+        window.location.reload();
+      })
+      .catch(function(data) {
+        screenTopWarning(data.error||data);
+      })
+  };
+  if(digestDom.length === 0) {
+    return post({});
+  }
+  digestDom.one('show.bs.modal', function(event) {
+    var button = event.currentTarget.getElementsByTagName('button');
+    if(!button[2]) return;
+    button[2].onclick = function() {
+      var input = event.currentTarget.getElementsByTagName('input');
+      var num = input[0].value;
+      var obj = {kcb: num};
+      post(obj);
+    }
+  });
+  digestDom.modal('show');
 }
 // 取消回复精选
 function unDigestPost(pid) {
 	nkcAPI('/p/'+pid+'/digest', 'DELETE', {})
 		.then(function() {
-			screenTopAlert('取消精选成功');
+			screenTopAlert('已取消精选');
+			window.location.reload();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error||data);
@@ -1258,7 +1432,8 @@ function shareTo(shareType, type, str, title, pid){
   if(str){
     var para = {
       'str': str,
-      'type': shareType
+      'type': shareType,
+      targetId: pid // 与type类型对应的Id
     }
     nkcAPI('/share', "POST", para)
     .then(function(data) {
@@ -1440,5 +1615,62 @@ function closeLottery() {
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
+    })
+}
+
+function scrollToBottom() {
+  $("html,body").animate({scrollTop: document.body.offsetHeight}, 300)
+}
+function scrollToTop() {
+  $("html,body").animate({scrollTop: 0}, 300)
+}
+
+
+var $postRecycleModel = $('#postRecycleModal');
+var $recycleModal = $('#recycleModal');
+function disablePostClick(pid, type){
+  window.localStorage.pid = pid
+  if(type === 'post') {
+    $postRecycleModel.modal();
+  } else if(type === 'thread'){
+    $recycleModal.modal();
+  }
+  // console.log(window.localStorage)
+}
+
+function disablePost(pid,para){
+  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true,para: para})
+    .then(function(res){
+      screenTopAlert(pid+' 已屏蔽，请等待刷新')
+      //location.reload()
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error)
+    })
+}
+
+function enablePost(pid){
+  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: false})
+    .then(function(){
+      screenTopAlert(pid+' 已解除屏蔽，请手动刷新')
+      // location.reload()
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error)
+    })
+}
+
+function moveThread(tid,fid,cid,para){
+  return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
+    tid:tid,
+    fid:fid,
+    cid:cid,
+    para:para
+  })
+    .then(function(){
+      screenTopAlert('已将帖子 '+tid+' 移动至板块 '+fid+' 分类 '+cid+'下');
+    })
+    .catch(function(data){
+      screenTopWarning('移动失败：'+data.error);
     })
 }
