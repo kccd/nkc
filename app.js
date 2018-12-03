@@ -3,7 +3,7 @@ const Koa = require('koa');
 require('colors');
 const path = require('path');
 const koaBody = require('koa-body');
-const koaCompress = require('koa-body');
+const koaCompress = require('koa-compress');
 const settings = require('./settings');
 const staticServe = path => {
   return require('koa-static')(path, {
@@ -32,7 +32,7 @@ try {
 
 app.keys = [settings.cookie.secret];
 app
-  // .use(koaCompress({threshold: 2048}))
+  .use(koaCompress({threshold: 2048}))
   .use(koaBody(settings.upload.koaBodySetting))
   .use(init)
   .use(stayLogin)
