@@ -33,7 +33,7 @@ resourceRouter
   })
   .post('/', async (ctx, next) => {
     const { fs } = ctx;
-    const { imageMagick } = ctx.tools;
+    const { imageMagick, ffmpeg } = ctx.tools;
     const settings = ctx.settings;
     const file = ctx.body.files.file;
     if (!file)
@@ -168,17 +168,17 @@ resourceRouter
       // }
     }
     // 上传视频，生成略缩图
-    // if (['mp4'].indexOf(extension.toLowerCase()) > -1) {
-    //   //
-    //   var timeStr = new Date().getTime();
-    //   // 输出视频路径
-    //   var outputVideoPath = "d:/nkc/tmp/" + timeStr + ".mp4";
-    //   // 略缩图路径
-    //   var videoImgPath = frameImgPath + "/" + rid + ".jpg";
-    //   // await imageMagick.turnVideo(path, outputVideoPath);
-    //   // await fs.rename(outputVideoPath, path);
-    //   await imageMagick.firstFrameToImg(path, videoImgPath);
-    // } 
+    if (['mp4'].indexOf(extension.toLowerCase()) > -1) {
+      //
+      var timeStr = new Date().getTime();
+      // 输出视频路径
+      var outputVideoPath = "d:/nkc/tmp/" + timeStr + ".mp4";
+      // 略缩图路径
+      var videoImgPath = frameImgPath + "/" + rid + ".jpg";
+      // await imageMagick.turnVideo(path, outputVideoPath);
+      // await fs.rename(outputVideoPath, path);
+      await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
+    } 
     await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
