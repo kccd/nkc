@@ -36,6 +36,10 @@ block title
         if targetThread
           span &nbsp;操作
       ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
+        li
+          a(href=`/p/${post.pid}`)
+            span.fa.fa-newspaper-o &nbsp;
+            span 详情
         if postTo && !thread.closed
           li
             a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
@@ -93,7 +97,7 @@ block title
         if disablePost
           li
             -const ipoc = post.iplm || post.ipoc;
-            a(href=`http://ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+            a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
               span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
   mixin postEditTime(post)
     if post.toc.toLocaleString() !== post.tlm.toLocaleString()
@@ -123,6 +127,7 @@ block content
 
     .container-fluid(style="max-width:1400px;")
       include ../module_credit
+      include ../module_digest
       .row
         .col-xs-12.col-md-9
           .fullwidthpanel.ThreadBox.nkcpanel
@@ -164,6 +169,7 @@ block content
                                 div.changeDisNone.text-center(style='width: 100%;')
                                   .col-xs-12.col-md-12
                                     .col-xs-3.col-md-3(style="padding:0px")
+<<<<<<< HEAD
                                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.origin+window.location.pathname, '${thread.firstPost.t}')`)
                                         img(src="/default/QQ.png" style="")
                                     .col-xs-3.col-md-3(style="padding:0px")
@@ -174,13 +180,25 @@ block content
                                         img(src="/default/weibo.png" style="")
                                     .col-xs-3.col-md-3(style="padding:0px")
                                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}')`)
+=======
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.href, '${thread.firstPost.t}', "${thread.tid}")`)
+                                        img(src="/default/QQ.png" style="")
+                                    .col-xs-3.col-md-3(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.href, '${thread.firstPost.t}', "${thread.tid}")`)
+                                        img(src="/default/qzone.png" style="")
+                                    .col-xs-3.col-md-3(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}', "${thread.tid}")`)
+                                        img(src="/default/weibo.png" style="")
+                                    .col-xs-3.col-md-3(style="padding:0px")
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.href, '${thread.firstPost.t}', "${thread.tid}")`)
+>>>>>>> 42efb79ab372bb9c24572cfdb47f2b88e2ba86c9
                                         img(src="/default/weChat.png" style="")
                                     //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'qzone', window.location.origin+window.location.pathname, '${thread.firstPost.t}')`)
                                     //-   img(src="/default/qzone.png" style="width:100%")
                                     //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'weibo', window.location.origin+window.location.pathname, '${thread.firstPost.t}')`)
                                     //-   img(src="/default/weibo.png" style="width:100%")
                                   canvas#threadQrcode.inline-block(style="display:none")
-                      if addKcb && thread.firstPost.uid !== data.user.uid
+                      if addKcb && data.user && thread.firstPost.uid !== data.user.uid
                         .inline-block.post-thumbsUp(style='color: #aaa;')
                           .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
                       .inline-block.post-thumbsUp
@@ -380,17 +398,12 @@ block content
           .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
             ul.HomeFriendlyLink
               include ../nkc_footer_links.pug
-          .hidden-xs.hidden-sm
-            .nkcpanel2#topB(style='margin-left: -25px; position: fixed; top: 50%; display: block;')
-              button(class="glyphicon glyphicon-chevron-up btn btn-sm btn-default" style="margin-bottom:10px; padding: 10px 3px;" onclick="javascript:window.scrollTo(0,0);")
-              br
-              button(class="glyphicon glyphicon-chevron-down btn btn-sm btn-default" onclick="location.href='#bm'" style="padding: 10px 3px;")
+          include ../module_scrollTo
 
 
     include ../debug_output.pug
     include ../thread_to_recycle.pug
     include ../post_to_recycle.pug
-    #bm
 block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/module_dropdown.js?v=3')

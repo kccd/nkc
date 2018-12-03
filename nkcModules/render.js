@@ -190,7 +190,7 @@ function hideContentByUser(content, user={xsf: 0}, from) {
 
 function applicationFormStatus(a) {
 	let str, color = '#888';
-	const {submittedReport, status} = a;
+	const {submittedReport, status, completedAudit} = a;
 	const {submitted, projectPassed, adminSupport, remittance, completed, excellent, successful, usersSupport} = status;
 	let needRemittance = false;
 	for(let r of a.remittance) {
@@ -244,9 +244,11 @@ function applicationFormStatus(a) {
 	} else if(submittedReport) {
 		str = '等待报告审核';
 	} else if(needRemittance) {
-		str = '等待拨款';
+    str = '等待拨款';
+  } else if(completedAudit) {
+    str = '结题报告已提交，等待结题审核'
 	} else if(completed === null) {
-		str = '资助中';
+    str = '资助中';
 	} else if(completed === false) {
 		str = '结题审核不通过，等待申请人修改'
 	} else if(excellent) {

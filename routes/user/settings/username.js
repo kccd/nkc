@@ -21,7 +21,7 @@ router
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
 		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
-		const operation = await db.TypesOfScoreChangeModel.findOnly({_id: 'modifyUsername'});
+		const operation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
 		const modifyUsernameCount = await db.UsersScoreLogModel.count({
 			uid: user.uid,
 			operationId: 'modifyUsername',
@@ -32,9 +32,9 @@ router
 			if(operation.count !== -1 && operation.count <= modifyUsernameCount) {
 				ctx.throw(400, `每天仅有${operation.count}次机会修改用户名，请明天再试`);
 			}
-			if(user.kcb + operation.change < 0) ctx.throw(400, `科创币不足，修改用户名需花费${-1*operation.change}个科创币`);
-			const defaultUser = await db.UserModel.findOne({uid: defaultUid});
-			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认账户');
+			if(user.kcb + operation.num < 0) ctx.throw(400, `科创币不足，修改用户名需花费${-1*operation.num}个科创币`);
+			/*const defaultUser = await db.UserModel.findOne({uid: defaultUid});
+			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认账户');*/
 			// 生成科创币交易记录
       await db.KcbsRecordModel.insertSystemRecord('modifyUsername', data.user, ctx);
 		}

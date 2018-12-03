@@ -104,6 +104,12 @@ const usersGeneralSchema = new Schema({
       default: false
     },
 
+  },
+  draftFeeSettings: {
+	  kcb: {
+	    type: Number,
+      default: 0
+    }
   }
 }, {
 	collection: 'usersGeneral'

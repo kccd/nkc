@@ -104,6 +104,9 @@ module.exports = async (ctx, next) => {
         user.generalSettings.lotterySettings.status = false;
       }
     }
+    if(user.generalSettings.draftFeeSettings.kcb !== 0) {
+      await user.generalSettings.update({'draftFeeSettings.kcb': 0});
+    }
 		// 获取新点赞数
     const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
     let newVoteUp = 0;

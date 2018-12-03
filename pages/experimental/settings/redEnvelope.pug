@@ -1,15 +1,15 @@
 extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
-  title 红包设置
+  title 奖励设置
 block content
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
       #app(v-cloak)
-        .hidden(ref='data')= JSON.stringify({redEnvelopeSettings: data.redEnvelopeSettings, draftFee: data.draftFee})
+        .hidden(ref='data')= JSON.stringify({redEnvelopeSettings: data.redEnvelopeSettings, draftFee: data.draftFee, share: data.share})
         .col-xs-12.col-md-12
-          h4 随机红包设置
+          h4 一、随机红包设置
           span 每天第一次发表文章或回复将获得一次抽奖机会
         .col-xs-12.col-md-12
           span 总开关：
@@ -48,8 +48,8 @@ block content
           button.btn.btn-default(@click='add(random.awards.length)') 添加
         .col-xs-12.col-md-12
           br
-        .col-xs-12.col-md-12
-          h4 精选稿费设置
+          br
+          h4 二、精选稿费设置
         .col-xs-12.col-md-12
           span 总开关：
             .checkbox(style='display:inline-block;')
@@ -60,14 +60,44 @@ block content
               input(type='radio' value='true' v-model='draftFee.close')
         .col-xs-12.col-md-12.form-inline
           .form-group
-            span 默认红包数量：
+            span 红包默认科创币数额：
             input.form-control(v-model='draftFee.defaultCount')
-          .form-group
-            span 最大值：
-            input.form-control(v-model='draftFee.maxCount')
           .form-group
             span 最小值：
             input.form-control(v-model='draftFee.minCount')
+          .form-group
+            span 最大值：
+            input.form-control(v-model='draftFee.maxCount')
+        .col-xs-12.col-md-12
+          br
+          br
+          h4 三、分享奖励设置
+        .col-xs-12.col-md-12.form-inline
+          table.table.table-bordered
+            thead
+              tr
+                th 分享类型
+                th 科创币
+                th 奖励上限
+                th 每天有效分享次数上限(分享次数超过该值后不再奖励)
+                th 状态
+            tbody
+              tr(v-for='s in share')
+                th {{s.name}}
+                th
+                  input(v-model.number='s.kcb')
+                th
+                  input(v-model.number='s.maxKcb')
+                th
+                  input(v-model.number='s.count')
+                th
+                  div(v-if='s.status')
+                    span 已开启
+                    button(@click='s.status = false') 关闭
+                  div(v-else)
+                    span 已关启
+                    button(@click='s.status = true') 打开
+
         .col-xs-12.col-md-12
           br
         .col-xs-12.col-md-12

@@ -197,6 +197,7 @@ const settingSchema = new Schema({
   // ----------------------------------------
   random: Schema.Types.Mixed,
   draftFee: Schema.Types.Mixed,
+  share: Schema.Types.Mixed
 },
 {toObject: {
   getters: true,

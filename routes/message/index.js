@@ -29,6 +29,7 @@ messageRouter
       }
       user.newMessage = {};
       ctx.template = 'message/message.pug';
+      data.navbar = {highlight: 'message'};
       return await next();
     }
 
@@ -37,18 +38,30 @@ messageRouter
 
     // 获取已创建聊天的用户
     const chats = await db.CreatedChatModel.find({uid: user.uid}).sort({tlm: -1});
+    const uidArr = new Set(), midArr = new Set(), userObj = {}, messageObj = {}, friendObj = {};
+    for(const c of chats) {
+      uidArr.add(c.tUid);
+      midArr.add(c.lmId);
+    }
+    const users = await db.UserModel.find({uid: {$in: [...uidArr]}});
+    const messages = await db.MessageModel.find({_id: {$in: [...midArr]}});
+    const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
+    for(const u of users) {
+      userObj[u.uid] = u;
+    }
+    for(const m of messages) {
+      messageObj[m._id] = m;
+    }
+    for(const f of friendsArr) {
+      friendObj[f.tUid] = f;
+    }
     for(const c of chats) {
       if(c.tUid === user.uid) continue;
       const {unread, tUid, lmId, tlm} = c;
-
-      const message = await db.MessageModel.findOne({_id: lmId});
-
-      const targetUser = await db.UserModel.findOne({uid: tUid});
-
+      const message = messageObj[lmId];
+      const targetUser = userObj[tUid];
       if(!targetUser) continue;
-
-      const friend = await db.FriendModel.findOne({uid: user.uid, tUid});
-
+      const friend = friendObj[tUid];
       userList.push({
         time: tlm,
         type: 'UTU',
@@ -58,7 +71,6 @@ messageRouter
         count: unread
       });
     }
-
     const {chat} = data.user.generalSettings.messageSettings;
     let message;
     // 获取通知
