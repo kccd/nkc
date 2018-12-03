@@ -15,7 +15,8 @@ block content
   mixin forgotPossword
     a(href="/login").btn.btn-danger.btn-block.minimalist-button 登录
     div.link
-      a(style='cursor: pointer;' @click='changeTermsStatus') 科创网及论坛统一服务协议
+      span(style='font-size: 1.1rem;color: #777;') 注册即代表同意&nbsp;
+      a(style='cursor: pointer;font-size: 1.1rem;' @click='changeTermsStatus') 《科创网及论坛统一服务协议》
         span.caret
   .container-fluid(style='max-width: 1400px;' v-cloak)#app
     .row

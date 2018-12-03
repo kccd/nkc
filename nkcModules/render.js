@@ -303,6 +303,7 @@ let pugRender = (template, data) => {
 		delCodeAddShrink,
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
+    startTime: global.NKC.startTime
   };
   options.data = data;
   options.filters = filters;

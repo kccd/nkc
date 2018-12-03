@@ -124,8 +124,9 @@ block content
   -const mainContainer1400 = true;
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
-
     .container-fluid(style="max-width:1400px;")
+      if data.step
+        .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
       include ../module_digest
       .row
@@ -216,7 +217,7 @@ block content
                             if data.isModerator || data.userOperationsId.includes('toppedThread') && !thread.topped
                               button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
                             if data.isModerator || data.userOperationsId.includes('unToppedThread') && thread.topped
-                              
+
                               button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('${data.thread.tid}')`) 取消专业置顶
                             if data.userOperationsId.includes('homeTop') && !data.ads.includes(data.thread.tid)
                               button.btn.btn-default.btn-sm#threadTop(onclick=`homeTop('${data.thread.tid}')`) 首页置顶

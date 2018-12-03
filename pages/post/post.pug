@@ -99,6 +99,9 @@ block content
                     a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
           if post.disabled && disablePost
             a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+        button.btn.btn-default(onclick=`window.location.href="/t/${data.thread.tid}?page=${data.step.page}&step=${data.step.step}&pid=${data.post.pid}"`) 回复
+        button.btn.btn-default(onclick=`window.location.href="${data.postUrl}"`) 查看上下文
+
       .col-xs-12.col-md-3
         .nkcpanel.post-share.fullwidthpanel
           .pid=`文号 / ${post.pid}`

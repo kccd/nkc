@@ -3,8 +3,13 @@ const addRouter = new Router();
 addRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'problem/add_problem.pug';
-		const {data, query} = ctx;
-		const {c} = query;
+		const {data, query, db} = ctx;
+		const {c, cid} = query;
+		const typeId = Number(cid);
+		if(typeId) {
+      const problemsType = await db.ProblemsTypeModel.findOne({_id: typeId});
+      if(problemsType) data.problemsType = problemsType;
+    }
 		data.c = c;
 		await ctx.db.ProblemModel.ensureSubmitPermission({ip: ctx.address});
 		await next();
@@ -12,7 +17,7 @@ addRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		await db.ProblemModel.ensureSubmitPermission({ip: ctx.address});
-		let {t, c, QQ, email} = body;
+		let {t, c, QQ, email, cid} = body;
 		if(QQ) {
 			QQ = parseInt(QQ);
 		}
@@ -26,17 +31,24 @@ addRouter
 		if(!c) ctx.throw(400, '问题内容不能为空');
 		const {user} = data;
 		const _id = await db.SettingModel.operateSystemID('problems', 1);
-		const newProblem = db.ProblemModel({
-			_id,
-			t,
-			c,
-			QQ,
-			email,
-			ip: ctx.address,
-			port: ctx.port
-		});
+		const obj = {
+      _id,
+      t,
+      c,
+      QQ,
+      email,
+      ip: ctx.address,
+      port: ctx.port
+    };
 		if(user) {
-			newProblem.uid = user.uid;
+		  obj.uid = user.uid;
+    }
+		const type = await db.ProblemsTypeModel.findOne({_id: Number(cid)});
+		if(type) {
+		  obj.typeId = Number(cid);
+    }
+		const newProblem = db.ProblemModel(obj);
+		if(user) {
 			await db.KcbsRecordModel.insertSystemRecord('reportIssue', user, ctx);
 		}
 		await newProblem.save();

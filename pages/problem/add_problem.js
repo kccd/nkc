@@ -5,6 +5,10 @@ function addProblem() {
 		email: $('#email').val(),
 		QQ: $('#QQ').val()
 	};
+	var cid = document.getElementById('cid');
+	if(cid) {
+	  obj.cid = cid.getAttribute('data-cid');
+  }
 	if(!obj.t) return screenTopWarning('请输入标题');
 	if(!obj.c) return screenTopWarning('请输入问题内容');
 	$('#submit').attr('disabled', true);

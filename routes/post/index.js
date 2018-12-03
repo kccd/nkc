@@ -71,6 +71,13 @@ postRouter
     for(const v of voteUp) {
       data.voteUpUsers.push(usersObj [v.uid]);
     }
+
+    const step = await thread.getStep({
+      pid,
+      disabled: data.userOperationsId.includes('displayDisabledPosts')
+    });
+    data.step = step;
+    data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
     data.post.user = await db.UserModel.findOnly({uid: post.uid});
     await data.post.user.extendGrade();
     data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});

@@ -88,6 +88,7 @@ registerRouter
 	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
 	  const shareToken = ctx.cookies.get('share-token', {signed: true});
+	  console.log(`shareToken`, shareToken);
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
@@ -95,6 +96,7 @@ registerRouter
       return await next();
     }
     const share = await db.ShareModel.findOnly({token: shareToken});
+    console.log(`share`, share);
 	  if(['', 'visitor'].includes(share.uid)) return await next();
     if(!share.registerReward) return await next();
     const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});

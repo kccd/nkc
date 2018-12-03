@@ -55,6 +55,13 @@ $(document).ready(function(){
 		})
 	}
 	scrollTo(0,0);
+
+	var quoteDom = document.getElementById('quotePost');
+	if(quoteDom) {
+	  var s = JSON.parse(quoteDom.innerText);
+	  quotePost(s.pid, s.step, s.page);
+  }
+
 });
 
 function get_selection(the_id)

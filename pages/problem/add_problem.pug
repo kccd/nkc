@@ -9,6 +9,9 @@ block content
         .form
           .form-group
             a.btn.btn-default(href='/problem/list') 问题列表
+          if data.problemsType
+            h4(id='cid' data-cid=data.problemsType._id)=`添加记录到分类：`
+              a(href=`/problem/list?cid=${data.problemsType._id}`)= data.problemsType.name
       .form
         .form-group
           lable 标题

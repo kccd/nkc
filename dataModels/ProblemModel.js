@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const problemSchema = new Schema({
 	_id: Number,
+  typeId: {
+	  type: Number,
+    default: 0
+  },
 	viewed: {
 		type: Boolean,
 		default: false,

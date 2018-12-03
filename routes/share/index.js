@@ -9,20 +9,26 @@ shareRouter
     const share = await db.ShareModel.findOne({token});
     if(!share) ctx.throw(403, '无效的token');
     const {kcbTotal, uid, tokenType} = share;
-    console.log(share)
     const shareUrl = share.shareUrl + '?token=' + token;
     await share.update({$inc: {hits: 1}});
+    let shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
+    if(shareAccessLog) {
+      return ctx.redirect(shareUrl);
+    } else {
+      shareAccessLog = db.SharesAccessLogModel({
+        ip: ctx.address,
+        port: ctx.port,
+        token,
+        uid: user?user.uid: ''
+      });
+      await shareAccessLog.save();
+    }
     // 若分享者是游客
     if(['', 'visitor'].includes(uid)) return ctx.redirect(shareUrl);
     const targetUser = await db.UserModel.findOnly({uid});
     // 若该ip已经访问过则不给予分享着奖励
     // 不属于站外的用户（已经登录的用户）访问时不给予分享者奖励
     if(user) return ctx.redirect(shareUrl);
-    const shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
-
-    if(shareAccessLog) {
-      return ctx.redirect(shareUrl);
-    }
     try{
       // 判断token是否有效
       await db.ShareModel.ensureEffective(token);
@@ -65,6 +71,7 @@ shareRouter
       description: `分享${shareLimit.shareName}`
     });
     share.kcbTotal += addKcb;
+    await shareAccessLog.update({kcb: addKcb});
     await record.save();
     await targetUser.save();
     await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*addKcb}});
