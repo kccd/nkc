@@ -12,8 +12,10 @@ const staticServe = path => {
   });
 };
 const app = new Koa();
+const conditional = require('koa-conditional-get');
+const etag = require('koa-etag');
 app.on('error', err => {
-	if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED'].includes(err.message)) {
+	if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED', 'write ECONNRESET'].includes(err.message)) {
 		console.log(err);
 	}
 });
@@ -35,6 +37,8 @@ app
   .use(init)
   .use(stayLogin)
   .use(urlRewrite)
+  .use(conditional())
+  .use(etag())
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./node_modules')))
   .use(staticServe(path.resolve('./pages')))

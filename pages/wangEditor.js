@@ -2959,7 +2959,7 @@ formula.prototype = {
             mathfreshnew()
         }else{
             var editor = this.editor;
-            editor.cmd.do('insertHTML', "<p contenteditable='false' style='max-width:100%' ontouchend='reedit(this)' ondblclick='reedit(this)'>"+val+"</p>" + '<p><br></p>');
+            editor.cmd.do('insertHTML', '<p contenteditable="false" style="max-width:100%" ontouchend="reedit(this)" ondblclick="reedit(this)" dataType="formula">'+val+'</p><p><br></p>');
             mathfreshnew()
         }
     }
@@ -4199,7 +4199,19 @@ Command.prototype = {
 
         if (this.queryCommandSupported('insertHTML')) {
             // W3C
-            this._execCommand('insertHTML', html);
+            // this._execCommand('insertHTML', html);
+            // 兼容webkit方法
+            // 低版本webkit内核浏览器不支持execCommand方法，插入公式的包裹标签中的属性和方法都会被过滤(实际上是替换，被替换为空)
+            // 如果没有特殊属性就使用execCommand('insertHTML')
+            // 否则就使用insertNode()插入节点
+            var dataType = $(html)[0].getAttribute("dataType");
+            if(dataType == "formula") {
+                range.deleteContents();
+                this._execCommand('insertHTML','<p><br></p>')
+                range.insertNode($(html)[0])
+            }else{
+                this._execCommand('insertHTML', html);
+            }
         } else if (range.insertNode) {
             // IE
             range.deleteContents();
