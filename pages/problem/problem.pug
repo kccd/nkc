@@ -13,8 +13,17 @@ block content
   .container-fluid(style='max-width: 1400px')
     .row
       .hidden#data= JSON.stringify({id: data.problem._id})
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-12.form-inline
         a.btn.btn-default.btn-sm(href='/problem/list') << 返回列表
+        span &nbsp;&nbsp;&nbsp;移动到
+        select.form-control.btn-sm#typeId
+          for type in data.problemsTypes
+            if type._id === data.problem.typeId
+              option(selected=true)= type.name
+            else
+              option= type.name
+        button.btn.btn-default.btn-sm(onclick=`changeType(${problem._id})`) 移动
+        button.btn.btn-danger.btn-sm(onclick=`deleteProblem(${problem._id})`) 删除问题
       .col-xs-12.col-md-7
         h4(style='color: #aaa;')
           if problem.user
@@ -36,7 +45,7 @@ block content
           h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
         if problem.email
           h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
-        if problem.restorer && problem.resolveTime
+        //if problem.restorer && problem.resolveTime
           h4.text-right(style='color: #aaa;padding-top:2rem;')
             span(style='margin-right: 0.5rem;')= problem.resolveTime.toLocaleString()
             a(href=`/u/${problem.restorer.uid}`)
@@ -45,8 +54,6 @@ block content
 
 
       .col-xs-12.col-md-5
-        .text-right
-          button.btn.btn-danger.btn-sm(onclick=`deleteProblem(${problem._id})`) 删除问题
         .form
           .form-group
             label 标题
@@ -56,7 +63,7 @@ block content
             textarea.form-control#content(rows=23)= problem.c
           .form-group
             .icheckbox
-              span 标记为已解决
+              span 标记为已完成
               input(type='checkbox' name='select' checked=problem.resolved)
 
           button.btn.btn-primary.btn-block(onclick=`submit(${problem._id})`) 保存

@@ -124,8 +124,9 @@ block content
   -const mainContainer1400 = true;
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
-
     .container-fluid(style="max-width:1400px;")
+      if data.step
+        .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
       include ../module_digest
       .row

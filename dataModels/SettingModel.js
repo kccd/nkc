@@ -41,6 +41,7 @@ const settingSchema = new Schema({
     friendsCategories: Number,
     kcbsRecords: Number,
     xsfsRecords: Number,
+    problemsTypes: Number
   },
 
 	//科创基金设置

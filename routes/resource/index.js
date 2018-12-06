@@ -173,10 +173,10 @@ resourceRouter
       var timeStr = new Date().getTime();
       // 输出视频路径
       var outputVideoPath = "d:/nkc/tmp/" + timeStr + ".mp4";
-      // 略缩图路径
+      // 视频封面图路径
       var videoImgPath = frameImgPath + "/" + rid + ".jpg";
-      // await imageMagick.turnVideo(path, outputVideoPath);
-      // await fs.rename(outputVideoPath, path);
+      await ffmpeg.videoSetPixelAndscale(path, outputVideoPath);
+      await fs.rename(outputVideoPath, path);
       await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
     } 
     await fs.rename(path, descFile);

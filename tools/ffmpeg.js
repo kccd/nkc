@@ -56,9 +56,15 @@ const videoReduceRate = async(inputPath, outputPath) => {
 const videoMoveMetaToFirstThumb = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', outputPath])
 }
+
+// 调整视频的像素与画面比例
+const videoSetPixelAndscale = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vf', 'scale=640:480', outputPath, '-hide_banner'])
+}
 module.exports = {
   videoFirstThumbTaker,
   videoTranscode,
   videoReduceRate,
-  videoMoveMetaToFirstThumb
+  videoMoveMetaToFirstThumb,
+  videoSetPixelAndscale
 };
