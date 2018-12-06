@@ -144,18 +144,18 @@ block content
                       a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundList', 'weChat', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
                         img(src="/default/weChat.png" style="")
                   canvas.qrcode#fundListQrcode(style="display:none")
-                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qq', window.location.href, '科创基金雨行动')`)
+                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qq', window.location.origin+window.location.pathname, '科创基金雨行动')`)
                     //-   img(src="/default/QQ.png" style="width:100%")
-                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qzone', window.location.href, '科创基金雨行动')`)
+                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qzone', window.location.origin+window.location.pathname, '科创基金雨行动')`)
                     //-   img(src="/default/qzone.png" style="width:100%")
-                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'weibo', window.location.href, '科创基金雨行动')`)
+                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'weibo', window.location.origin+window.location.pathname, '科创基金雨行动')`)
                     //-   img(src="/default/weibo.png" style="width:100%")
 block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   //- script.
   //-   	var qrcode = geid('qrcode');
   //-     if(qrcode) {
-  //-       var path = window.location.href;
+  //-       var path = window.location.origin+window.location.pathname;
   //-       path = path.replace(/\?.*/g, '');
   //-       QRCode.toCanvas(qrcode, path, {
   //-         scale: 3,
