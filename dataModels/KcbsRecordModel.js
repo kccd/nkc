@@ -38,11 +38,12 @@ const kcbsRecordSchema = new Schema({
   },
   ip: {
     type: String,
-    required: true,
+    default: '0.0.0.0',
     index: 1
   },
   port: {
     type: String,
+    default: '0',
     required: true
   },
   pid: {

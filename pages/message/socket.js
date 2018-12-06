@@ -11,6 +11,7 @@ var socket = io(url, {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
+  // transports: ['polling', 'websocket'],
   transports: ['polling', 'websocket'],
   reconnectionDelay: 3000,
   reconnectionDelayMax: 5000

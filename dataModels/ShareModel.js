@@ -132,34 +132,39 @@ shareSchema.statics.ensureEffective = async function(token, id) {
     await share.update({tokenLife: 'invalid'});
     throwErr(403, 'token无效');
   }
-  let shareLimitTime;
+  let defaultLimit = await ShareLimitModel.findOne({type: 'all'});
+  if(!defaultLimit) {
+    defaultLimit = ShareLimitModel({});
+    await defaultLimit.save();
+  }
+  let shareLimitTime = defaultLimit.shareLimitTime;
   if(tokenType === 'forum') {
     const forum = await ForumModel.findOnly({fid: targetId});
     shareLimitTime = forum.shareLimitTime;
   } else if(tokenType === 'thread') {
     await ThreadModel.findOnly({tid: targetId});
-    const shareLimit = await ShareLimitModel.findOnly({shareType: 'thread'});
-    shareLimitTime = shareLimit.shareLimitTime;
+    const shareLimit = await ShareLimitModel.findOne({shareType: 'thread'});
+    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
   } else if(tokenType === 'post') {
     await PostModel.findOnly({pid: targetId});
-    const shareLimit = await ShareLimitModel.findOnly({shareType: 'post'});
-    shareLimitTime = shareLimit.shareLimitTime;
+    const shareLimit = await ShareLimitModel.findOne({shareType: 'post'});
+    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
   } else if(tokenType === 'user') {
     await UserModel.findOnly({uid: targetId});
-    const shareLimit = await ShareLimitModel.findOnly({shareType: 'user'});
-    shareLimitTime = shareLimit.shareLimitTime;
+    const shareLimit = await ShareLimitModel.findOne({shareType: 'user'});
+    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
   } else if(tokenType === 'activity') {
     await ActivityModel.findOnly({acid: targetId});
-    const shareLimit = await ShareLimitModel.findOnly({shareType: 'activity'});
-    shareLimitTime = shareLimit.shareLimitTime;
+    const shareLimit = await ShareLimitModel.findOne({shareType: 'activity'});
+    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
   } else if(tokenType === 'fundlist') {
     await FundModel.findOnly({_id: targetId});
-    const shareLimit = await ShareLimitModel.findOnly({shareType: 'fundlist'});
-    shareLimitTime = shareLimit.shareLimitTime;
+    const shareLimit = await ShareLimitModel.findOne({shareType: 'fundlist'});
+    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
   } else if(tokenType === 'fundapply') {
     await FundApplicationForumModel.findOnly({_id: targetId});
-    const shareLimit = await ShareLimitModel.findOnly({shareType: 'fundapply'});
-    shareLimitTime = shareLimit.shareLimitTime;
+    const shareLimit = await ShareLimitModel.findOne({shareType: 'fundapply'});
+    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
   }
   const difference = Date.now() - new Date(toc).getTime();
   if(difference > 1000*60*60*shareLimitTime) { // token过期

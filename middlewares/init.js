@@ -12,14 +12,15 @@ const config = require('../config');
 module.exports = async (ctx, next) => {
 	try {
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
-	  const XFF = ctx.get('X-Forwarded-For');
+	  let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
+	    XFF = XFF.replace(/::ffff:/ig, '');
       [ip, port] = XFF.split(':');
     } else {
 	    ip = ctx.ip.replace(/::ffff:/ig, '');
     }
-	  ctx.address = ip;
-	  ctx.port = port;
+	  ctx.address = ip || '0.0.0.0';
+	  ctx.port = port || '0';
     ctx.body = ctx.request.body;
 	  ctx.reqTime = new Date();
 	  ctx.db = db;
