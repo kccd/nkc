@@ -1,13 +1,5 @@
 var pageName = '';
-var socketConfig = $('#socketConfig').text();
-socketConfig = JSON.parse(socketConfig);
-var url;
-if(socketConfig.useHttps) {
-  url = 'https://' + window.location.hostname + ':' + socketConfig.httpsPort;
-} else {
-  url = 'http://' + window.location.hostname + ':' + socketConfig.httpPort;
-}
-var socket = io(url, {
+var socket = io('/', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,

@@ -15,12 +15,10 @@ module.exports = async (ctx, next) => {
 	  let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
 	    XFF = XFF.replace(/::ffff:/ig, '');
-      [ip, port] = XFF.split(':');
-    } else {
-	    ip = ctx.ip.replace(/::ffff:/ig, '');
+      [ip] = XFF.split(':');
     }
-	  ctx.address = ip || '0.0.0.0';
-	  ctx.port = port || '0';
+	  ctx.address = ip;
+	  ctx.port = port;
     ctx.body = ctx.request.body;
 	  ctx.reqTime = new Date();
 	  ctx.db = db;
@@ -30,10 +28,15 @@ module.exports = async (ctx, next) => {
 	  ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
-	  ctx.data.socketConfig = config.socket;
+	  const socketServerId = ctx.get('socket-server-id');
+	  ctx.cookies.set('socket-server-id', socketServerId, {
+	    signed: true,
+      maxAge: 60*60*24*7,
+      httpOnly: true
+    });
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
-		let {operationsId} = await db.SettingModel.findOne({"type":"log"})
+		let {operationsId} = await db.SettingModel.findOne({"type":"log"});
 		ctx.data.logSetting = operationsId;
 	  // - 初始化网站设置
 		const serverSettings = await db.SettingModel.findOnly({type: 'server'});

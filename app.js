@@ -5,6 +5,9 @@ const path = require('path');
 const koaBody = require('koa-body');
 const koaCompress = require('koa-compress');
 const settings = require('./settings');
+const rateLimit = require('koa-ratelimit');
+const Redis = require('ioredis');
+
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response, path, stats) {
@@ -34,6 +37,22 @@ try {
 
 app.keys = [settings.cookie.secret];
 app
+  .use(rateLimit({
+    db: new Redis(),
+    duration: 60000,
+    errorMessage: 'Sometimes You Just Have to Slow Down.',
+    id: (ctx) => {
+      const XFF = ctx.get('X-Forwarded-For');
+      return XFF || ctx.ip;
+    },
+    headers: {
+      remaining: 'Rate-Limit-Remaining',
+      reset: 'Rate-Limit-Reset',
+      total: 'Rate-Limit-Total'
+    },
+    max: 5000,
+    disableHeader: false,
+  }))
   .use(koaCompress({threshold: 2048}))
   .use(koaBody(settings.upload.koaBodySetting))
   .use(init)
