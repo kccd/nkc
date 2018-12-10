@@ -237,7 +237,7 @@ function Editor() {
 		if(this.draft) {
       this.draft.onclick = saveDraft(self);
       // 加入保存草稿的定时器，三分钟保存一次
-      setInterval(saveDraft(self), 180000)
+      setInterval(saveDraft(self), 180000);
 		}
 	  if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
 		  this.blocked = true;
@@ -442,6 +442,7 @@ function saveDraft(that){
         $(this).parent().remove()
       }
     })
+    
     //-- --
     var quoteContent = document.getElementById("quoteContent").innerHTML
     var draftId = $("#draftId").html();
@@ -478,6 +479,7 @@ function saveDraft(that){
       desType: desType,
       desTypeId: desTypeId
     };
+    mathfreshnew();
     var userId = $("#userNowId").html()
     var method = "POST";
     var url = "/u/"+userId+"/drafts";

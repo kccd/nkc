@@ -33,7 +33,8 @@ theradRouter
 			}
 			posts[i] = posts[i].toObject();
 			posts[i].c = nkcModules.APP_nkc_render.experimental_render(posts[i]);
-			posts[i].thumbCount = posts[i].recUsers.length;
+			// posts[i].thumbCount = posts[i].recUsers.length;
+			posts[i].thumbCount = posts[i].voteUp;
 			newPosts.push(posts[i])
 		}
 		data.targetUser = await thread.extendUser();

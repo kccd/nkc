@@ -19,7 +19,7 @@ block content
                   th 分享类型
                   th 有效时长(小时)
                   th 有效次数(次)
-                  th 操作
+                  //- th 操作
               tbody
                 tr(v-for="(li,key) in shareLimit")
                   //- div(v-if="li.shareName == ''")
@@ -37,10 +37,10 @@ block content
                     input(style="max-width: 6rem;" type="text" v-model="li.shareLimitTime")
                   th
                     input(style="max-width: 6rem;" type="text" v-model="li.shareLimitCount")
-                  th
-                    button(@click='del(key)') 删除
+                  //- th
+                  //-   button(@click='del(key)') 删除
             button.btn.btn-primary(@click='submit') 保存
-            button.btn.btn-default(@click='add') 添加新项
+            //- button.btn.btn-default(@click='add') 添加新项
 
 
 block scripts

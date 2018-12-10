@@ -4,7 +4,7 @@ scoreChangeRouter
 	.get('/:_id', async (ctx, next) => {
 		const {data, db, params} = ctx;
 		const {_id} = params;
-		data.type = await db.TypesOfScoreChangeModel.findOnly({_id});
+		data.type = await db.KcbsTypeModel.findOnly({_id});
 		await next();
 	});
 module.exports = scoreChangeRouter;
