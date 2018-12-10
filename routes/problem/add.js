@@ -44,7 +44,7 @@ addRouter
 		  obj.uid = user.uid;
     }
 		if(cid) {
-      const type = await db.ProblemsTypeModel.findOne({_id: Number(cid)});
+			const type = await db.ProblemsTypeModel.findOne({_id: Number(cid)});
 		  obj.typeId = Number(type._id);
     }
 		const newProblem = db.ProblemModel(obj);

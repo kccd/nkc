@@ -90,14 +90,21 @@ threadRouter
 			if(share.tokenLife === "invalid"){
 				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
-			let shareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
-			if(!shareLimit){
-				shareLimit = new db.ShareLimitModel({});
-				await shareLimit.save();
+			// 获取分享限制时间
+			let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+			if(!allShareLimit){
+				allShareLimit = new db.ShareLimitModel({});
+				await allShareLimit.save();
+			}
+			let shareLimitTime;
+			if(forum.shareLimitTime){
+				shareLimitTime = forum.shareLimitTime;
+			}else{
+				shareLimitTime = allShareLimit.shareLimitTime;
 			}
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
-			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimit.shareLimitTime){
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
 				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}

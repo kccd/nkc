@@ -43,9 +43,30 @@ userRouter
 		const targetUser = await db.UserModel.findOnly({uid});
 		await targetUser.extendGrade();
 		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
-		const {type} = query;
+		const {type, token} = query;
 		const page = query.page?parseInt(query.page): 0;
 		let paging;
+
+		// 权限判断		
+    if(token){
+			let share = await db.ShareModel.findOne({"token":token});
+			if(!share) ctx.throw(403, "无效的token");
+      // 获取分享限制时间
+      let shareLimitTime;
+      let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+			let userShareLimit = await db.ShareLimitModel.findOne({"shareType":"user"});
+      if(userShareLimit){
+        shareLimitTime = userShareLimit.shareLimitTime;
+      }else{
+        shareLimitTime = allShareLimit.shareLimitTime;
+			}
+			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+			let nowTimeStamp = parseInt(new Date().getTime());
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
+				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+			}
+			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
+		}
 
 		// --拿到关注的领域
 		const visibleFid = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);

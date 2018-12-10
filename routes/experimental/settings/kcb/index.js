@@ -10,7 +10,7 @@ router
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		const {kcbsTypes, minCount, maxCount} = body;
+    const {kcbsTypes, minCount, maxCount} = body;
 		if(minCount <= 0) ctx.throw(400, '最小值不能小于0');
 		if(minCount > maxCount) ctx.throw(400, '最小值最大值设置错误');
     for(const type of kcbsTypes) {

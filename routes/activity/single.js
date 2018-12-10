@@ -5,9 +5,29 @@ singleRouter
     const {data, db, params, query} = ctx;
 		const {user} = data;
     const {acid} = params;
-    const {type, hid} = query;
+    const {type, hid, token} = query;
     data.type = type;
     data.hid = hid;
+    // 权限判断		
+    if(token){
+      let share = await db.ShareModel.findOne({"token":token});
+      if(!share) ctx.throw(403, "无效的token");
+      // 获取分享限制时间
+      let shareLimitTime;
+      let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+      let activityShareLimit = await db.ShareLimitModel.findOne({"shareType":"activity"});
+      if(activityShareLimit){
+        shareLimitTime = activityShareLimit.shareLimitTime;
+      }else{
+        shareLimitTime = allShareLimit.shareLimitTime;
+      }
+      let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+      let nowTimeStamp = parseInt(new Date().getTime());
+      if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
+        await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+      }
+      if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
+    }
     const activity = await db.ActivityModel.findOnly({acid:acid});
     if(activity.activityType == "close"){
       return ctx.throw(403, "该活动已被活动发布者被关闭")

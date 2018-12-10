@@ -38,13 +38,12 @@ const linux = (os === 'linux');
 
 // 获取视频的第一帧图片
 const videoFirstThumbTaker = async (videoPath,imgPath) => {
-  return spawnProcess('ffmpeg',['-i',videoPath,'-vframes' ,'1', imgPath])
+  return spawnProcess('ffmpeg',['-i',videoPath, '-ss', '1', '-vframes' ,'1', imgPath])
 }
-
 
 // 视频转码为H264
 const videoTranscode= async(inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-y' ,outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy','-movflags', 'faststart', '-y' ,outputPath])
 }
 
 // 降低视频码率
