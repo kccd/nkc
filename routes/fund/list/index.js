@@ -47,13 +47,35 @@ listRouter
 		const {data, db} = ctx;
 		const {user} = data;
 		const {fundId} = ctx.params;
-		const {type, sort} = ctx.query;
+		const {type, sort, token} = ctx.query;
 		const {FundApplicationFormModel} = db;
 		let page = ctx.query.page;
 		page = page? parseInt(page): 0;
 		data.type = type;
 		data.page = page;
 		data.sort = sort;
+
+		// 权限判断		
+		if(token){
+			let share = await db.ShareModel.findOne({"token":token});
+			if(!share) ctx.throw(403, "无效的token");
+			// 获取分享限制时间
+			let shareLimitTime;
+			let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+			let fundlistShareLimit = await db.ShareLimitModel.findOne({"shareType":"fundlist"});
+			if(fundlistShareLimit){
+				shareLimitTime = fundlistShareLimit.shareLimitTime;
+			}else{
+				shareLimitTime = allShareLimit.shareLimitTime;
+			}
+			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
+			let nowTimeStamp = parseInt(new Date().getTime());
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
+				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+			}
+			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
+		}
+
 		const fund = await db.FundModel.findOnly({_id: fundId.toUpperCase(), disabled: false});
 		data.fund = fund;
 		let query = {

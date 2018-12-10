@@ -1,3 +1,6 @@
+var fileName;
+var extension;
+
 var attachment_uploader = function(options){
   var uploader = {};
   //multi-part uploader.
@@ -9,13 +12,22 @@ var attachment_uploader = function(options){
       var percentComplete = (e.loaded / e.total) * 100;
       console.log("Uploaded " + percentComplete + "%");
       options.percentage_callback(percentComplete);
+      if(percentComplete == 100 && ['.mov', '.mp4'].indexOf(extension.toLowerCase()) > -1){
+        options.video_on_turn("on")
+      }
     };
 
     xhr.onreadystatechange=function(){
       if (xhr.readyState==4){
         if(xhr.status>=200&&xhr.status<300){
+          if(['.mov', '.mp4'].indexOf(extension.toLowerCase()) > -1) {
+            options.video_on_turn("down")
+          }
           callback(null,xhr.responseText);
         }else {
+          if(['.mov', '.mp4'].indexOf(extension.toLowerCase()) > -1) {
+            options.video_on_turn("fail")
+          }
           callback(xhr.status.toString()+' '+xhr.responseText);
         }
       }
@@ -64,6 +76,9 @@ var attachment_uploader = function(options){
       if(item&&item.size){
         var formData = new FormData();
         formData.append('file', item);
+        var index1=item.name.lastIndexOf(".");
+        var index2=item.name.length;
+        extension = item.name.substring(index1,index2);
         console.log(item)
         return create_upload(formData)
         .catch(function(err){
@@ -140,6 +155,16 @@ var uploader = attachment_uploader({
 
   percentage_callback:function(pctg){
     geid('upload-percentage').innerHTML = pctg.toFixed()+'%';
+  },
+
+  video_on_turn: function(type) {
+    if(type == "on"){
+      geid('upload-video').innerHTML = "视频正在转码";
+    }else if(type == "down") {
+      geid('upload-video').innerHTML = "视频转码完成";
+    }else if(type == "fail") {
+      geid('upload-video').innerHTML = "视频转码失败，请重新上传";
+    }
   }
 });
 

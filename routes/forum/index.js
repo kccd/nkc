@@ -168,15 +168,16 @@ forumRouter
 			if(share.tokenLife === "invalid"){
 				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
-			// console.log(forum)
-			// let shareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
-			// if(!shareLimit){
-			// 	shareLimit = new db.ShareLimitModel({});
-			// 	await shareLimit.save();
-			// }
+			let shareLimitTime;
+			let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
+			if(forum.shareLimitTime){
+				shareLimitTime = forum.shareLimitTime;
+			}else{
+				shareLimitTime = allShareLimit.shareLimitTime;
+			}
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
-			if(nowTimeStamp - shareTimeStamp > 1000*60*60*forum.shareLimitTime){
+			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
 				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}

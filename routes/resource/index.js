@@ -38,11 +38,16 @@ resourceRouter
     const file = ctx.body.files.file;
     if (!file)
       ctx.throw(400, 'no file uploaded');
-    const { name, size, path } = file;
+    let { name, size, path } = file;
     //path "d:\nkc\tmp\upload_0e50089913dcacbc9514f64c3e3d31f4.png"
     // 图片格式 png/jpg
     const extensionE = pathModule.extname(name).replace('.', '');
-    const extension = extensionE.toLowerCase()
+    let extension = extensionE.toLowerCase();
+    if(['mov'].indexOf(extension.toLowerCase()) > -1){
+      let extReg = RegExp(extension, "igm");
+      extension = "mp4";
+      name = name.replace(extReg, "mp4");
+    }
     // 图片最大尺寸
     const { largeImage } = settings.upload.sizeLimit;
     // 根据自增id定义图片名称
@@ -172,10 +177,11 @@ resourceRouter
       //
       var timeStr = new Date().getTime();
       // 输出视频路径
-      var outputVideoPath = "d:/nkc/tmp/" + timeStr + ".mp4";
+      var newpath = pathModule.resolve();
+      var outputVideoPath = newpath + "/tmp/" + timeStr + ".mp4";
       // 视频封面图路径
       var videoImgPath = frameImgPath + "/" + rid + ".jpg";
-      await ffmpeg.videoSetPixelAndscale(path, outputVideoPath);
+      await ffmpeg.videoTranscode(path, outputVideoPath);
       await fs.rename(outputVideoPath, path);
       await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
     } 
