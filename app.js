@@ -7,6 +7,7 @@ const koaCompress = require('koa-compress');
 const settings = require('./settings');
 const rateLimit = require('koa-ratelimit');
 const Redis = require('ioredis');
+const fs = require('fs');
 
 const staticServe = path => {
   return require('koa-static')(path, {
@@ -40,7 +41,7 @@ app
   .use(rateLimit({
     db: new Redis(),
     duration: 60000,
-    errorMessage: 'Sometimes You Just Have to Slow Down.',
+    errorMessage: fs.readFileSync('./pages/error/503.html').toString(),
     id: (ctx) => {
       const XFF = ctx.get('X-Forwarded-For');
       return XFF || ctx.ip;
@@ -50,7 +51,7 @@ app
       reset: 'Rate-Limit-Reset',
       total: 'Rate-Limit-Total'
     },
-    max: 5000,
+    max: 3000,
     disableHeader: false,
   }))
   .use(koaCompress({threshold: 2048}))

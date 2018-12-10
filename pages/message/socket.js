@@ -1,10 +1,10 @@
 var pageName = '';
-var socket = io('/', {
+var socket = io('/message', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
   // transports: ['polling', 'websocket'],
-  transports: ['polling', 'websocket'],
+  transports: ['websocket'],
   reconnectionDelay: 3000,
   reconnectionDelayMax: 5000
 });
