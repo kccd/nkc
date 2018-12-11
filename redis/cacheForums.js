@@ -89,7 +89,7 @@ const cacheForums = async () => {
           }
         }
         for(const gradeId of gradesId) {
-          if(!grades[gradeId].includes(fid)) {
+          if(grades[gradeId] && !grades[gradeId].includes(fid)) {
             grades[gradeId].push(fid);
           }
         }

@@ -5,12 +5,13 @@
 
       v7.6+ is required, for async function
       
-- Database: **[mongoDB](https://www.mongodb.com)** v3.4
-
-      higher version may not be compatible with current state, we're on our way, PR is welcome
+- Database: 
+    1. **[mongoDB](https://www.mongodb.com)** v3.4
+    2. **[Redis](https://redis.io/)** v3.2.100
  
 - Image Processing: **[ImageMagick](https://www.imagemagick.org)** v7.0 or higher
-- Search: **[ElasticSearch 6](https://elastic.co)** with [IK Analysis for Elasticsearch](https://github.com/medcl/elasticsearch-analysis-ik)
+- Search: **[ElasticSearch 6](https://elastic.co)** with **[IK Analysis for Elasticsearch](https://github.com/medcl/elasticsearch-analysis-ik)**
+- video Processing: **[ffmpeg](https://www.ffmpeg.org/)** v4.0.2
 
 ## Main Frameworks
 - Web Framework: **[Koa](http://koajs.com)**
