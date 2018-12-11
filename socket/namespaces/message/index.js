@@ -65,7 +65,7 @@ const message = async (io) => {
       })
     }));
     socket.join(`user/${uid}`, async () => {
-      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'连接成功'.bgGreen}`);
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'连接成功'.bgGreen}`);
     });
     await db.UserModel.update({uid}, {
       $set: {
@@ -183,7 +183,7 @@ function initRedis(io) {
 // 获取命名空间下的某房间的所有客户端id
 async function getRoomClientCount(namespace, roomName) {
   return new Promise((resolve, reject) => {
-    namespace.in(roomName).clients((err, clients) => {
+    namespace.adapter.clients((err, clients) => {
       if(err) return reject(err);
       resolve(clients);
     })
@@ -195,6 +195,7 @@ async function disconnect(io, socket) {
   const {uid} = socket.NKC;
   if(!uid) return;
   const clients = await getRoomClientCount(io, `user/${uid}`);
+  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'断开连接'.bgRed}`);
   if(clients.length !== 0) return;
   await  db.UserModel.update({uid}, {
     $set: {
