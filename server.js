@@ -15,7 +15,6 @@ const http = require('http'),
   path = require('path'),
   config = require('./config'),
   cacheForums = require('./redis/cacheForums'),
-  socketIo = require('./socketIo'),
   socket = require('./socket'),
   {updateDate, upload} = settings,
 
@@ -160,7 +159,6 @@ const start = async () => {
   const port = config.port + global.NKC.processId;
   server = http.createServer(app);
   server.listen(port);
-  // await socketIo(server);
   await socket(server);
   console.log(`${serverSettings.serverName} listening on ${port}`.green);
 

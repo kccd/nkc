@@ -1,0 +1,58 @@
+-const paging = data.paging || {page: 0, pageCount: 0};
+-const pageCount = paging.pageCount;
+-const page = paging.page;
+if pageCount > 1
+  if pageCount <= 5
+    .paging-button
+      ul
+        -for(var i = 0; i < pageCount; i++)
+          li
+            a(href='###' class=page === i?'active': '')= i + 1
+  else
+    -let min, max;
+    -let reduce1 = page-3;
+    -let reduce2 =  page+3;
+    if(reduce1 > 0)
+      if(reduce2 > pageCount)
+        -max = pageCount;
+        if(reduce1 - (reduce2 - pageCount) < 0)
+          -min = 0;
+        else
+          -min = reduce1-(reduce2 - pageCount);
+      else
+        -max = reduce2;
+        -min = reduce1;
+    else
+      -min = 0;
+      if(reduce2 < pageCount)
+        if(pageCount < reduce2 - reduce1)
+          -max = pageCount;
+        else
+          -max = reduce2-reduce1;
+      else
+        -max = pageCount - 1;
+    .paging-button
+      ul
+        if min !== 0
+          li
+            a(href=`?page=${0}`)= `1`
+          if min >= 2
+            li
+              span ...
+        -for(let i = 0; i < pageCount; i++)
+          if i >= min && i <= max
+            -let active = '';
+            if(page === i)
+              -active = 'active';
+            li
+              a(href=`?page=${i}${skipId || ''}` class=active)= i + 1
+        if max < pageCount - 2
+          li
+            span ...
+        if max < pageCount - 1
+          li
+            a(href=`?page=${pageCount - 1}`)= pageCount
+        //li
+            input
+            li
+              button 跳转

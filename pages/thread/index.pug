@@ -125,6 +125,7 @@ block content
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
     .container-fluid(style="max-width:1400px;")
+      .hidden#threadId= data.thread.tid
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
@@ -406,6 +407,7 @@ block scripts
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
+  script(src=`/thread/socket.js?v=${startTime}`)
   script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)

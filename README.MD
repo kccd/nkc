@@ -1,9 +1,7 @@
 # nkc
 
 ## Requirements
-- Base: [Node.js](https://nodejs.org)
-
-      v7.6+ is required, for async function
+- Base: [Node.js](https://nodejs.org) v8.9.1
       
 - Database: 
     1. **[mongoDB](https://www.mongodb.com)** v3.4

@@ -9,7 +9,7 @@ module.exports = async function() {
   try {
     posts = await client.indices.get({
       index: postIndex
-    })
+    });
   } catch(e) {
     await client.indices.create({
       index: postIndex,

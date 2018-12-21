@@ -420,7 +420,7 @@ threadRouter
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		//帖子曾经在草稿箱中，发表时，删除草稿
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
-
+    global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
 	})
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
