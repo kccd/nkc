@@ -1,0 +1,33 @@
+html{
+  font-size: 12px;
+}
+body{
+  background-color: #f4f4f4;
+}
+.mdui-typo .page-title{
+  margin: 0;
+  color: #555!important;
+}
+.page-title-img{
+  margin: 0 .5rem 0 0;
+}
+.mdui-container{
+  max-width: 900px;
+}
+.page-panel{
+  padding: 2.5rem 1rem;
+  background-color: #fff;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border-radius: 3px;
+}
+.mdui-typo a:before{
+  background-color: rgba(0,0,0,0);
+}
+.mdui-typo .nav-link{
+  color: #555;
+  font-size: 1.2rem;
+}
+.mdui-typo .nav-link:hover{
+  color: #000;
+}

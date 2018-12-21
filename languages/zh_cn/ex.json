@@ -1,0 +1,10 @@
+{
+  "management": "后台管理",
+  "status": "总览",
+  "sendSystemNotification": "发送系统通知",
+  "problems": "用户反馈",
+  "viewRecord": "查看记录",
+  "identityReview": "身份审核",
+  "settings": "设置",
+  "console": "控制台"
+}

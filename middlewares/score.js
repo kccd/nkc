@@ -2,8 +2,8 @@ const score = async (ctx, next) => {
 	const {data, db} = ctx;
 	const {user, operationId, thread, post, forum} = data;
 	let {targetUser} = data;
-	const scoreSettings = await db.SettingModel.findOnly({type: 'score'});
-	if(!scoreSettings.operationsId.includes(operationId) || !user) return await next();
+	const scoreSettings = await db.SettingModel.findOnly({_id: 'score'});
+	if(!scoreSettings.c.operationsId.includes(operationId) || !user) return await next();
 	if(operationId !== 'modifyUsername') return await next();
 	const operation = await db.OperationModel.findOnly({_id: operationId});
 
@@ -47,8 +47,8 @@ const score = async (ctx, next) => {
 
 				// 若为科创币的交易，不存在被操作者时，被操作者为默认账户（科创人民银行）
 				if(a === 'kcb') {
-					const kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
-					const {defaultUid} = kcbSettings;
+					const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
+					const {defaultUid} = kcbSettings.c;
 					targetUser = await db.UserModel.findOnly({uid: defaultUid});
 					logObj.targetUid = defaultUid;
 				} else {

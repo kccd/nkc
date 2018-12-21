@@ -4,11 +4,11 @@ router
 	.get('/', async  (ctx, next) => {
 		const {data, db} = ctx;
 		data.type = 'notice';
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		data.homeSettings = homeSettings;
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
+		data.homeSettings = homeSettings.c;
 		data.noticeThreads = [];
-		if(homeSettings.noticeThreadsId && homeSettings.noticeThreadsId.length !== 0) {
-			for(const oc of homeSettings.noticeThreadsId) {
+		if(homeSettings.c.noticeThreadsId && homeSettings.c.noticeThreadsId.length !== 0) {
+			for(const oc of homeSettings.c.noticeThreadsId) {
 				const thread = await db.ThreadModel.findOne({oc});
 				if(thread) {
 					await thread.extendFirstPost();
@@ -22,7 +22,7 @@ router
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {id} = body;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		const noticeThreadsId = [];
 		for(const i of id) {
 			if(!noticeThreadsId.includes(i)) {
@@ -32,14 +32,14 @@ router
 				}
 			}
 		}
-		await homeSettings.update({noticeThreadsId});
+		await homeSettings.update({'c.noticeThreadsId': noticeThreadsId});
 		await next();
 	})
 	.del('/', async (ctx, next) => {
 		const {db, query} = ctx;
 		const {oc} = query;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		await homeSettings.update({$pull: {noticeThreadsId: oc}});
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
+		await homeSettings.update({$pull: {'c.noticeThreadsId': oc}});
 		await next();
 	});
 module.exports = router;

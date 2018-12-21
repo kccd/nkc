@@ -6,8 +6,8 @@ router
 		const {settings, params, db, fs} = ctx;
 		const {id} = params;
 		const {webLogoPath} = settings.upload;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		if(!homeSettings.logos || !homeSettings.logos.includes(id)) ctx.throw(404, 'logo not found');
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
+		if(!homeSettings.c.logos || !homeSettings.c.logos.includes(id)) ctx.throw(404, 'logo not found');
 		const filePath = webLogoPath + '/' + id + '.png';
 		stat = await fs.stat(filePath);
 		ctx.response.lastModified = stat.mtime.toUTCString();
@@ -33,12 +33,13 @@ router
 		} catch (e) {
 			await fs.mkdir(webLogoPath);
 		}
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		const q = {
-			$addToSet: {logos: (''+t)}
-		};
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		await webLogoify(path, targetPath);
-		await homeSettings.update(q);
+		await homeSettings.update({
+      $addToSet: {
+        'c.logos': ('' + t)
+      }
+    });
 		await next();
 	});
 module.exports = router;

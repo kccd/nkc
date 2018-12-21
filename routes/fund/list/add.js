@@ -23,8 +23,8 @@ addRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.nav = '基金申请';
-		const fundSettings = await db.SettingModel.findOne({type: 'fund'});
-		data.terms = fundSettings.terms;
+		const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
+		data.terms = fundSettings.c.terms;
 		ctx.template = 'interface_fund_agreement.pug';
 		await next();
 	})

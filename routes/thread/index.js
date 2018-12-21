@@ -242,8 +242,8 @@ threadRouter
 		data.thread = thread;
 		data.forum = forum;
 		data.replyTarget = `t/${tid}`;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		data.ads = homeSettings.ads;
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
+		data.ads = homeSettings.c.ads;
 		ctx.template = 'thread/index.pug';
 		await thread.extendFirstPost().then(async p => {
 			await p.extendUser().then(u => u.extendGrade());
@@ -253,9 +253,9 @@ threadRouter
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
-      data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
-      data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
-      data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+      data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
+      data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
+      data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
     }
 		// 加载收藏
 		data.collected = false;
@@ -266,7 +266,7 @@ threadRouter
 			}
 		}
 
-		data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
 
 		if(data.user) {
 			data.subscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
@@ -316,7 +316,7 @@ threadRouter
 			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
 			if(!data.user.volumeA) {
 				// 加载考试设置
-				data.examSettings = await db.SettingModel.findOnly({type: 'exam'});
+				data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
 				data.userPostCountToday = await db.InfoBehaviorModel.count({uid: data.user.uid, toc: {$gte: nkcModules.apiFunction.today()}, operationId: 'postToThread'});
 			}
 		}
@@ -344,8 +344,8 @@ threadRouter
 
 		if(!user.volumeA) {
 			// -1: 无限制；0：不允许；正整数：相应条数
-			const examSettings = await db.SettingModel.findOnly({type: 'exam'});
-			const postCountOneDay = examSettings.volumeAFailedPostCountOneDay;
+			const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
+			const postCountOneDay = examSettings.c.volumeAFailedPostCountOneDay;
 			if(postCountOneDay !== -1) {
 				if(postCountOneDay === 0) {
 					ctx.throw(403, '未通过A卷考试的用户暂不能发表回复');

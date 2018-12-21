@@ -1,3 +1,15 @@
+.e-nav .nav.nav-pills li, .e-nav .nav.nav-pills li a{
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #555;
+}
+body{
+}
+.e-nav .nav.nav-pills{
+  background-color: #eee;
+  border-radius: 0 0 5px 5px;
+  margin-top: -1.5rem;
+}
 .ItemContainer {
   border-width: 1px;
   /* border: black; */
@@ -63,4 +75,10 @@
 }
 .operation-type-span:hover{
   background-color: #555555;
+}
+.e-panel{
+  box-shadow: 0 1px 3px 0 #aaa;
+  padding: 2rem;
+  background-color: #fff;
+  margin: 0.5rem 0;
 }

@@ -26,7 +26,6 @@ app.on('error', err => {
 });
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
-const {permissions} = require('./nkcModules');
 const {stayLogin, init, cookieIdentify, body, scoreHandler, urlRewrite, permission, score, logger} = require('./middlewares');
 
 try {

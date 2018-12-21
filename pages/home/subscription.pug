@@ -11,19 +11,20 @@ block content
           a(href='/editor').mdui-btn.mdui-btn-block.mdui-color-blue-grey 发表文章
         include ../publicModules/forums_nav
       .mdui-col-md-7.mdui-m-t-2
-        .swiper-container.swiper-home
-          .swiper-wrapper
-            for thread in data.ads
-              a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                'background-image': `url(/cover/${thread.tid})`
-              })
-                .swiper-title= `${thread.firstPost.t}`
-          .swiper-pagination
-          .swiper-button-next.swiper-button(style='background-image: none;')
-            <i class="mdui-icon material-icons">&#xe315;</i>
-          .swiper-button-prev.swiper-button(style='background-image: none;')
-            <i class="mdui-icon material-icons">&#xe314;</i>
-        .thread-list.mdui-m-t-2
+        if data.ads && data.ads.length !== 0
+          .swiper-container.swiper-home.mdui-m-b-2
+            .swiper-wrapper
+              for thread in data.ads
+                a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                  'background-image': `url(/cover/${thread.tid})`
+                })
+                  .swiper-title= `${thread.firstPost.t}`
+            .swiper-pagination
+            .swiper-button-next.swiper-button(style='background-image: none;')
+              <i class="mdui-icon material-icons">&#xe315;</i>
+            .swiper-button-prev.swiper-button(style='background-image: none;')
+              <i class="mdui-icon material-icons">&#xe314;</i>
+        .thread-list.mdui-m-b-2
           for thread in data.threads
             include ../publicModules/thread_panel
           #app

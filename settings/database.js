@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
-const os = require('os');
-
-const mongoDB = require('./mongoDB');
+const mongodbConfig = require('../config/mongodb.json');
+const {username, password, database, address, port} = mongodbConfig;
+let account = '';
+if(username && password) {
+  account = `${username}:${password}@`;
+}
 const options = {
   promiseLibrary: Promise,
   autoIndex: true,
@@ -9,9 +12,8 @@ const options = {
   keepAlive: 120,
   useMongoClient: true
 };
-
 mongoose.Promise = Promise;
-mongoose.connect(mongoDB, options)
+mongoose.connect(`mongodb://${account}${address}:${port}/${database}`, options)
   .then(() => {
     // console.log('database connected.'.green)
   })

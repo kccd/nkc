@@ -1,4 +1,5 @@
 const Cookies = require('cookies-string-parse');
+const languages = require('../languages');
 module.exports = async (ctx, next) => {
 
 	const {data, db} = ctx;
@@ -98,9 +99,16 @@ module.exports = async (ctx, next) => {
 		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
 		user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
+    // 根据用户语言设置加载语言对象
+    if(global.NKC.NODE_ENV !== 'production') {
+      const l = require('../languages');
+      ctx.state.language = l[user.generalSettings.language];
+    } else {
+      ctx.state.language = languages[user.generalSettings.language];
+    }
     if(user.generalSettings.lotterySettings.status) {
-      const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
-      if(redEnvelopeSettings.random.close) {
+      const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+      if(redEnvelopeSettings.c.random.close) {
         user.generalSettings.lotterySettings.status = false;
       }
     }

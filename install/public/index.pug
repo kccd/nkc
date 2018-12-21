@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  title= `${data.config.name} v${data.config.version}`
+  <link rel="stylesheet" href="/mdui/css/mdui.css">
+  <link rel="stylesheet" href="/index.css">
+</head>
+<body class='mdui-theme-primary-blue-grey mdui-color-theme-accent-pink mdui-appbar-with-tab mdui-appbar-with-toolbar'>
+<div class="mdui-container mdui-typo" id='app'>
+  <div class="mdui-appbar mdui-shadow-0 mdui-appbar-fixed mdui-color-white mdui-shadow-1">
+    div.mdui-container
+      <div class="mdui-toolbar">
+        img.page-title-img(src='/favicon.ico')
+        h3.page-title= `${data.config.name} v${data.config.version} 安装 `
+        <div class="mdui-toolbar-spacer"></div>
+        <a href="https://www.kechuang.org" class="nav-link" target='_blank'>官网</a>
+        <a href="https://www.kechuang.org" class="nav-link" target='_blank'>文档</a>
+      </div>
+  </div>
+  div(v-if='!success').mdui-p-b-5
+    .page-panel
+      .mdui-col-md-4
+        h3 管理员账号
+      .mdui-col-md-8
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">用户名（30字节以内）</label>
+        <input class="mdui-textfield-input" type="text" v-model='account.username'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">密码（至少8位数且包含字母、数字以及符号三者中的至少两者）</label>
+        <input class="mdui-textfield-input" type="password" placeholder='' v-model='account.password'>
+        </div>
+    .page-panel
+      .mdui-col-md-4
+        h3 服务器
+      .mdui-col-md-8
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">地址</label>
+        <input class="mdui-textfield-input" type="text" v-model='server.address'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">端口</label>
+        <input class="mdui-textfield-input" type="number" placeholder='' v-model.number='server.port'>
+        </div>
+    .page-panel
+      .mdui-col-md-4
+        h3 MongoDB
+      .mdui-col-md-8
+        <div class="mdui-textfield">
+          <label class="mdui-textfield-label">地址</label>
+          <input class="mdui-textfield-input" type="text" v-model='mongodb.address'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">端口</label>
+        <input class="mdui-textfield-input" type="number" v-model.number='mongodb.port'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">用户名（若数据库未启用验证则此项可忽略）</label>
+        <input class="mdui-textfield-input" type="text" v-model='mongodb.username'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">密码（若数据库未启用验证则此项可忽略）</label>
+        <input class="mdui-textfield-input" type="text" v-model='mongodb.password'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">数据库名</label>
+        <input class="mdui-textfield-input" type="text" v-model='mongodb.databaseName'>
+        </div>
+    .page-panel
+      .mdui-col-md-4
+        h3 Elasticsearch
+      .mdui-col-md-8
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">地址</label>
+        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.address'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">端口</label>
+        <input class="mdui-textfield-input" type="number" v-model.number='elasticSearch.port'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">文章索引</label>
+        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.articlesIndex'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">用户索引</label>
+        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.usersIndex'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">用户名（若数据库未启用验证则此项可忽略）</label>
+        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.username'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">密码（若数据库未启用验证则此项可忽略）</label>
+        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.password'>
+        </div>
+    .page-panel
+      .mdui-col-md-4
+        h3 Redis
+      .mdui-col-md-8
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">address</label>
+        <input class="mdui-textfield-input" type="text" v-model='redis.address'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">port</label>
+        <input class="mdui-textfield-input" type="number" v-model.number='redis.port'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">password（若数据库未配置密码则此项可忽略）</label>
+        <input class="mdui-textfield-input" type="text" v-model='redis.password'>
+        </div>
+    .mdui-m-t-2
+      span 强制安装：
+      <label class="mdui-switch">
+      <input type="checkbox" value='true' v-model='forced'>
+      <i class="mdui-switch-icon"></i>
+      </label>
+      div.mdui-text-color-grey 强制安装将会清空同名的数据库，请谨慎操作。
+    .mdui-m-t-2.mdui-text-color-red
+      span {{error}}
+    .mdui-m-t-2.mdui-m-b-5
+      button.mdui-btn.mdui-btn-block.mdui-color-theme(@click='save' v-if='!saving') 安装
+      button.mdui-btn.mdui-btn-block.mdui-color-theme(@click='save' v-else disabled) 安装中，请稍后
+  div(v-else)
+    .page-panel.mdui-text-center
+      h2.page-title 安装完成
+</div>
+<script src="/vue/dist/vue.js"></script>
+<script src="/mdui/js/mdui.js"></script>
+<script src="/axios/axios.min.js"></script>
+script(src=`/publicModules/common.js?v=${Date.now()}`)
+script(src=`/index.js?v=${Date.now()}`)
+</body>
+</html>

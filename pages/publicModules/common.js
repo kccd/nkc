@@ -60,5 +60,16 @@ function uploadFileAPI(url, formData, onUploadProgress) {
   });
 }
 
+function screenTopAlert(data) {
+  mdui.snackbar({
+    message: data,
+    position: 'top'
+  });
+}
 
-
+function screenTopWarning(data) {
+  mdui.snackbar({
+    message: data.error || data,
+    position: 'top'
+  });
+}

@@ -42,8 +42,8 @@ shareRouter
       signed: true
     });
     if(!share.shareReward) return ctx.redirect(shareUrl);// 若share分享奖励无效则不给予分享着奖励
-    const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
-    const shareSettings = redEnvelopeSettings.share[share.tokenType];
+    const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+    const shareSettings = redEnvelopeSettings.c.share[share.tokenType];
     if(!shareSettings.status) return ctx.redirect(shareUrl); // 已关闭
     if(shareSettings.maxKcb <= kcbTotal) return ctx.redirect(shareUrl); // 若分享着获得的奖励大于等于奖励设置的最大值则不再给予新的奖励
     const {kcb, maxKcb} = shareSettings;
@@ -74,7 +74,7 @@ shareRouter
     await shareAccessLog.update({kcb: addKcb});
     await record.save();
     await targetUser.save();
-    await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*addKcb}});
+    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*addKcb}});
     await share.save();
     return ctx.redirect(shareUrl);
   })
@@ -101,8 +101,8 @@ shareRouter
   const shareCount = await db.ShareModel.count({toc: {$gte: today}});
   const shareCountByType = await db.ShareModel.count({toc: {$gte: today}, tokenType: type});
   let shareReward = true, registerReward = true;
-  const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
-  const shareSettings = redEnvelopeSettings.share;
+  const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+  const shareSettings = redEnvelopeSettings.c.share;
   if(!shareSettings.register.status) registerReward = false;
   if(!shareSettings[type].status) shareReward = false;
   if(shareSettings.register.count <= shareCount) registerReward = false;

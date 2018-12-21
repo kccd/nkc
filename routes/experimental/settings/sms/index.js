@@ -3,7 +3,7 @@ const smsRouter = new Router();
 smsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.smsSettings = await db.SettingModel.findOnly({type: 'sms'});
+		data.smsSettings = (await db.SettingModel.findOnly({_id: 'sms'})).c;
 		ctx.template = 'experimental/settings/sms.pug';
 		await next();
 	})
@@ -26,8 +26,8 @@ smsRouter
 			setting.sameMobileOneDay = parseInt(setting.sameMobileOneDay);
 			setting.sameIpOneDay = parseInt(setting.sameIpOneDay);
 		}
-		const smsSettings = await db.SettingModel.findOnly({type: 'sms'});
-		await smsSettings.update(settings);
+		const smsSettings = await db.SettingModel.findOnly({_id: 'sms'});
+		await smsSettings.update({c: settings});
 		await next();
 	});
 module.exports = smsRouter;

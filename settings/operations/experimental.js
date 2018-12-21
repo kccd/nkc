@@ -172,5 +172,8 @@ module.exports = {
     xsf: {
 		  GET: 'visitExperimentalXsf'
     }
-	}
+	},
+  console: {
+	  GET: 'visitExperimentalConsole'
+  }
 };

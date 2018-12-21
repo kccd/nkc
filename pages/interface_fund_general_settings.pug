@@ -54,8 +54,8 @@ block content
             span 临时关闭的原因：
             textarea.form-control#reason(rows=8 placeholder='请输入临时关闭的原因')= fundSettings.closed.reason || ''
             br
-            span= `预计开放时间(已设置为：${fundSettings.closed.openingHours.toLocaleString()})：`
-            input.form-control#openingTime(type='datetime-local' time=fundSettings.closed.openingHours.getTime())
+            span= `预计开放时间(已设置为：${(new Date(fundSettings.closed.openingHours)).toLocaleString()})：`
+            input.form-control#openingTime(type='datetime-local' time=(new Date(fundSettings.closed.openingHours).getTime()))
 
             br
             button.btn.btn-info.center-block(onclick='submit()') &nbsp;&nbsp;&nbsp;提交&nbsp;&nbsp;&nbsp;

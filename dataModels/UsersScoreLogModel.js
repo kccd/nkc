@@ -172,7 +172,32 @@ usersScoreLogSchema.methods.extendOperation = async function() {
 };
 
 usersScoreLogSchema.statics.insertLog = async (options) => {
-	const UserModel = mongoose.model('users');
+  const UsersScoreLogModel = mongoose.model('usersScoreLogs');
+  const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;
+  if(!user) return;
+  if(type === 'score') {
+    let {key, change} = options;
+    if(!change && change !== 0) change = 1;
+    const q = {};
+    q[key] = change;
+    const log = UsersScoreLogModel({
+      uid: user.uid,
+      type: 'score',
+      change,
+      operationId: typeIdOfScoreChange,
+      description,
+      port,
+      ip,
+      pid,
+      tid,
+      fid
+    });
+    await user.update({$inc: q});
+    user[key] += change;
+    await user.calculateScore();
+    await log.save();
+  }
+	/*const UserModel = mongoose.model('users');
 	const TypeOfScoreChange = mongoose.model('typesOfScoreChange');
 	const SettingModel = mongoose.model('settings');
 	const UsersScoreLogModel = mongoose.model('usersScoreLogs');
@@ -228,7 +253,7 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
 		user[key] += change;
 		await user.calculateScore();
 		await log.save();
-	}
+	}*/
 };
 
 const UsersScoreLogModel = mongoose.model('usersScoreLogs', usersScoreLogSchema);

@@ -13,7 +13,7 @@ block content
           -const {closed} = data.fundSettings;
           h4.text-center
             a(href=`/u/${closed.uid}` target='_blank')= closed.username
-            span=` 发布于 ${closed.closingTime.toLocaleString()}`
+            span=` 发布于 ${(new Date(closed.closingTime)).toLocaleString()}`
           br
           br
           .row
@@ -23,9 +23,9 @@ block content
 
 
               h3 预计开放时间：
-                span= closed.openingHours.toLocaleString()
+                span= (new Date(closed.openingHours)).toLocaleString()
               h3 预计开放还需：
-                span#countdown(time=closed.openingHours.getTime())
+                span#countdown(time=(new Date(closed.openingHours).getTime()))
 block scripts
   script.
     var time = $('#countdown').attr('time');

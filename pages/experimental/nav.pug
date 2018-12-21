@@ -1,117 +1,120 @@
-.col-xs-12.col-md-12
-  .jumbotron(style='margin-bottom: 1rem;')
-    .h2
-      span.fa.fa-cogs &nbsp;后台管理
-    p 这关系到整个网站，请谨慎操作
 .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
-  ul.nav.nav-pills
-    li
-      a(href='/e' data-toggle='url') 统计
-
-    li
-      a(href='/e/systemInfo' data-toggle='url') 发送通知
-
-    li
-      a(href='/auth' data-toggle='url') 身份认证审核
-
-    li
-      a(href='/problem/list' data-toggle='url') 用户反馈
-
-
-    li.dropdown(role='presentation')
-      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
-        span 特殊专业&nbsp;
-        span.fa.fa-caret-down
-      ul.dropdown-menu
+  .e-nav
+    .jumbotron(style='margin-bottom: 1rem;color:#555;')
+      .h2
+        span.fa.fa-cogs=` ${lang('ex', 'management')}`
+    ul.nav.nav-pills
+      if permission('visitExperimentalStatus')
         li
-          a(href='/f/recycle' data-toggle='url') 回收站
+          a(href='/e')=lang('ex', 'status')
+      if permission('visitSystemInfo')
         li
-          a(href='/f/draft' data-toggle='url') 草稿箱
+          a(href='/e/systemInfo')=lang('ex', 'sendSystemNotification')
+      if permission('visitAuthList')
+        li
+          a(href='/auth')=lang('ex', 'identityReview')
+      if permission('visitProblemList')
+        li
+          a(href='/problem/list')=lang('ex', 'problems')
+      if permission('visitExperimentalConsole')
+        li
+          a(href='/e/console')=lang('ex', 'console')
 
 
-    li.dropdown(role='presentation')
-      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
-        span 科创基金&nbsp;
-        span.fa.fa-caret-down
-      ul.dropdown-menu
-        li
-          a(href='/fund/settings' data-toggle='url') 设置
-        li
-          a(href='/fund/disabled' data-toggle='url') 被屏蔽的基金
-        li
-          a(href='/fund/unsubmit' data-toggle='url') 基金申请
-
-
-
-    li.dropdown(role='presentation')
-      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
-        span 查看记录&nbsp;
-        span.fa.fa-caret-down
-      ul.dropdown-menu
-        li
-          a(href='/e/log/kcb') 科创币
-        li
-          a(href='/e/log/xsf') 学术分
-        li
-          a(href='/e/log/score' data-toggle='url') 分值加减
-        li
-          a(href='/e/log/experimental' data-toggle='url') 管理操作
-        li
-          a(href='/e/log/behavior' data-toggle='url') 用户行为
-        li
-          a(href='/e/log/secret' data-toggle='url') 隐私修改
-        li
-          a(href='/e/log/info' data-toggle='url') 发表内容
-        li
-          a(href='/e/log/public' data-toggle='url') 日志
-
-
-    li.dropdown(role='presentation')
-      a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
-        span 设置&nbsp;
-        span.fa.fa-caret-down
-      ul.dropdown-menu
-        li
-          a(href='/e/settings/base' data-toggle='url') 基本信息
-        li
-          a(href='/e/settings/home/top' data-toggle='url') 网站首页
-        li
-          a(href='/e/settings/page') 分页设置
-        li
-          a(href='/e/settings/operation' data-toggle='url') 操作类型
-        li
-          a(href='/e/settings/role' data-toggle='url') 用户角色
-        li
-          a(href='/e/settings/user' data-toggle='url') 用户信息
-        li
-          a(href='/e/settings/grade' data-toggle='url') 用户等级
-        li
-          a(href='/e/settings/forum' data-toggle='url') 专业设置
-        li
-          a(href='/e/settings/exam' data-toggle='url') 考试设置
-        li
-          a(href='/e/settings/sms' data-toggle='url') 短信设置
-        li
-          a(href='/e/settings/message' data-toggle='url') 聊天设置
-        li
-          a(href='/e/settings/share' data-toggle='url') 分享设置
-        li
-          a(href='/e/settings/red-envelope' data-toggle='url') 奖励设置
-        li
-          a(href='/e/settings/post' data-toggle='url') 发表限制
-        //li
-        //  a(href='/e/settings/score' data-toggle='url') 分值加减
-        li
-          a(href='/e/settings/kcb' data-toggle='url') 科创币
-        li
-          a(href='/e/settings/xsf') 学术分
-        li
-          a(href='/e/settings/number' data-toggle='url') 积分
-        //- li
-          a(href='/e/settings/upload' data-toggle='url') 上传文件
+      // li.dropdown(role='presentation')
+        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+          span 特殊专业&nbsp;
+          span.fa.fa-caret-down
+        ul.dropdown-menu
           li
-            a(href='/e/settings/download' data-toggle='url') 下载附件
-        li
-          a(href='/e/settings/log' data-toggle='url') 日志
-        li
-          a(href='/e/settings/app/upload' data-toggle='url') APP
+            a(href='/f/recycle') 回收站
+          li
+            a(href='/f/draft') 草稿箱
+
+
+      li.dropdown(role='presentation')
+        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+          span 科创基金&nbsp;
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          li
+            a(href='/fund/settings') 设置
+          li
+            a(href='/fund/disabled') 被屏蔽的基金
+          li
+            a(href='/fund/unsubmit') 基金申请
+
+
+
+      li.dropdown(role='presentation')
+        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+          span=`${lang('ex', 'viewRecord')} `
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          li
+            a(href='/e/log/kcb') 科创币
+          li
+            a(href='/e/log/xsf') 学术分
+          li
+            a(href='/e/log/score') 分值加减
+          li
+            a(href='/e/log/experimental') 管理操作
+          li
+            a(href='/e/log/behavior') 用户行为
+          li
+            a(href='/e/log/secret') 隐私修改
+          li
+            a(href='/e/log/info') 发表内容
+          li
+            a(href='/e/log/public') 日志
+
+
+      li.dropdown(role='presentation')
+        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+          span=`${lang('ex', 'settings')} `
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          li
+            a(href='/e/settings/base') 基本信息
+          li
+            a(href='/e/settings/home/top') 网站首页
+          li
+            a(href='/e/settings/page') 分页设置
+          li
+            a(href='/e/settings/operation') 操作类型
+          li
+            a(href='/e/settings/role') 用户角色
+          li
+            a(href='/e/settings/user') 用户信息
+          li
+            a(href='/e/settings/grade') 用户等级
+          li
+            a(href='/e/settings/forum') 专业设置
+          li
+            a(href='/e/settings/exam') 考试设置
+          li
+            a(href='/e/settings/sms') 短信设置
+          li
+            a(href='/e/settings/message') 聊天设置
+          li
+            a(href='/e/settings/share') 分享设置
+          li
+            a(href='/e/settings/red-envelope') 奖励设置
+          li
+            a(href='/e/settings/post') 发表限制
+          //li
+          //  a(href='/e/settings/score') 分值加减
+          li
+            a(href='/e/settings/kcb') 科创币
+          li
+            a(href='/e/settings/xsf') 学术分
+          li
+            a(href='/e/settings/number') 积分
+          //- li
+            a(href='/e/settings/upload') 上传文件
+            li
+              a(href='/e/settings/download') 下载附件
+          li
+            a(href='/e/settings/log') 日志
+          li
+            a(href='/e/settings/app/upload') APP

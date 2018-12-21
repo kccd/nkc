@@ -35,7 +35,7 @@ kcbRouter
     const paging = nkcModules.apiFunction.paging(page, count);
     const kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.kcbsRecords = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
-    data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+    data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
     data.paging = paging;
     data.t = t;
     data.content = content;

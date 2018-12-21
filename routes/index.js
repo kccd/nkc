@@ -51,7 +51,7 @@ router.use('/', async (ctx, next)  => {
 				$gt: time
 			}
 		});
-		if(!dailyLogin) {
+    if(!dailyLogin) {
 			await db.UsersScoreLogModel.insertLog({
 				user,
 				type: 'score',
@@ -63,7 +63,7 @@ router.use('/', async (ctx, next)  => {
 			await user.updateUserMessage();
 		}
 	}
-	await next();
+  await next();
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());

@@ -8,16 +8,19 @@ settingsRouter
 	.patch('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
-		const fundSettings = await db.SettingModel.findOne({type: 'fund'});
+		const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
 		const {settingsObj} = body;
 		settingsObj.closed.uid = user.uid;
 		settingsObj.closed.username = user.username;
-		if(!fundSettings.closed.status && settingsObj.closed.status) {
+		if(!fundSettings.c.closed.status && settingsObj.closed.status) {
 			settingsObj.closed.closingTime = Date.now();
 		} else {
-			settingsObj.closed.closingTime = fundSettings.closed.closingTime;
+			settingsObj.closed.closingTime = fundSettings.c.closed.closingTime;
 		}
-		await fundSettings.update({$set: settingsObj});
+		const obj = {
+		  c: settingsObj
+    };
+		await fundSettings.update({$set: obj});
 		await next();
 	});
 module.exports = settingsRouter;

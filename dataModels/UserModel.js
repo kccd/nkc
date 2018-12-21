@@ -438,8 +438,8 @@ userSchema.methods.updateUserMessage = async function() {
 userSchema.methods.calculateScore = async function() {
 	const SettingModel = mongoose.model('settings');
 	// 积分设置
-	const scoreSettings = await SettingModel.findOnly({type: 'score'});
-	const {coefficients} = scoreSettings;
+	const scoreSettings = await SettingModel.findOnly({_id: 'score'});
+	const {coefficients} = scoreSettings.c;
 
 	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, digestPostsCount, recCount} = this;
 	// 积分计算

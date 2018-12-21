@@ -9,13 +9,13 @@ router
 		const forum = await db.ForumModel.findOnly({fid: post.fid});
     await forum.ensureModeratorsPermission(data);
 		const targetUser = await post.extendUser();
-    const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+    const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     let num;
-    if(!redEnvelopeSettings.draftFee.close) {
+    if(!redEnvelopeSettings.c.draftFee.close) {
       if(!kcb) ctx.throw(400, '参数错误，请刷新');
       num = Number(kcb);
       if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
-      if(!redEnvelopeSettings.draftFee.close && (num < redEnvelopeSettings.draftFee.minCount || num > redEnvelopeSettings.draftFee.maxCount)) ctx.throw(400, '科创币数额不在范围内');
+      if(!redEnvelopeSettings.c.draftFee.close && (num < redEnvelopeSettings.c.draftFee.minCount || num > redEnvelopeSettings.c.draftFee.maxCount)) ctx.throw(400, '科创币数额不在范围内');
     }
 		data.targetUser = targetUser;
 
@@ -46,7 +46,7 @@ router
 		if(thread.oc === pid) {
 			await thread.update({digest: true, digestTime});
 			// await db.UsersScoreLogModel.insertLog(log);
-      if(!redEnvelopeSettings.draftFee.close) {
+      if(!redEnvelopeSettings.c.draftFee.close) {
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
@@ -62,7 +62,7 @@ router
           fid: thread.fid
         });
         await data.targetUser.update({$inc: {kcb: num}});
-        await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*num}});
+        await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
         await record.save();
       }
       // await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
@@ -84,7 +84,7 @@ router
 		} else {
 			log.typeIdOfScoreChange = 'digestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
-      if(!redEnvelopeSettings.draftFee.close) {
+      if(!redEnvelopeSettings.c.draftFee.close) {
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
@@ -100,7 +100,7 @@ router
           fid: thread.fid
         });
         await data.targetUser.update({$inc: {kcb: num}});
-        await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*num}});
+        await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
         await record.save();
       }
       // await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);
@@ -120,7 +120,7 @@ router
 			});
 			await message.save();
 		}
-		if(!redEnvelopeSettings.draftFee.close) {
+		if(!redEnvelopeSettings.c.draftFee.close) {
       await usersGeneralSettings.update({$inc: {'draftFeeSettings.kcb': num}});
     }
     await ctx.redis.pubMessage(message);

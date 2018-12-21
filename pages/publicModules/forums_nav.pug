@@ -14,7 +14,8 @@
       :class="{'select-forum': forumsIdList.indexOf(forum.fid) >= 0}"
     )
       .mdui-list-item-avatar
-        img(:src='"/forum_avatar/" + forum.fid')
+        img(v-if='forum.iconFileName' :src='"/forum_avatar/" + forum.fid')
+        img(v-else :style="{'background-color': forum.color}")
       .mdui-list-item-content
         span {{forum.displayName}}
         div.icon

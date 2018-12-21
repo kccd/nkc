@@ -65,8 +65,8 @@ homeRouter
 		const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
-		data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		data.pageSettings = await db.SettingModel.findOnly({type: 'page'});
+		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
+		data.pageSettings = (await db.SettingModel.findOnly({_id: 'page'})).c;
 
 		// 网站公告
 		const noticeThreads = await Promise.all(data.homeSettings.noticeThreadsId.map(async oc => {
