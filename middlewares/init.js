@@ -28,12 +28,6 @@ module.exports = async (ctx, next) => {
 	  ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
-	  const socketServerId = ctx.get('socket-server-id');
-	  ctx.cookies.set('socket-server-id', socketServerId, {
-	    signed: true,
-      maxAge: 60*60*24*7,
-      httpOnly: true
-    });
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
 		let {operationsId} = await db.SettingModel.findOne({"type":"log"});

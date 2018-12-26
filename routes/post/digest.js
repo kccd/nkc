@@ -52,12 +52,12 @@ router
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
-          type: 'digestThread',
+          type: 'digestThreadAdditional',
           to: data.targetUser.uid,
           toc: digestTime,
           port: ctx.port,
           ip: ctx.address,
-          description: '额外奖励',
+          description: '',
           num: num,
           pid,
           tid: thread.tid,
@@ -90,12 +90,12 @@ router
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
-          type: 'digestPost',
+          type: 'digestPostAdditional',
           to: data.targetUser.uid,
           toc: digestTime,
           port: ctx.port,
           ip: ctx.address,
-          description: '额外奖励',
+          description: '',
           num: num,
           pid,
           tid: thread.tid,
@@ -148,6 +148,11 @@ router
 				ctx.throw(400, '回复未被加精，请刷新');
 			}
 		}
+		let additionalReward = 0;
+		const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestThreadAdditional', pid}).sort({toc: -1});
+		if(rewardLog) {
+		  additionalReward = rewardLog.num;
+    }
 		await post.update({digest: false});
 		const log = {
 			user: targetUser,
@@ -162,7 +167,7 @@ router
 		if(thread.oc === pid) {
 			await thread.update({digest: false});
 			// await db.UsersScoreLogModel.insertLog(log);
-      await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx);
+      await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx, additionalReward);
 			log.type = 'score';
 			log.change = -1;
 			log.key = 'digestThreadsCount';
@@ -170,7 +175,7 @@ router
 		} else {
 			log.typeIdOfScoreChange = 'unDigestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
-      await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx);
+      await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx, additionalReward);
 			log.key = 'digestPostsCount';
 			log.change = -1;
 			log.type = 'score';

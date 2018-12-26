@@ -88,12 +88,15 @@ kcbsRecordSchema.virtual('fromUser')
   });
 
 // 与银行间的交易记录
-kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx) => {
+kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
+  additionalReward = additionalReward || 0;
   const {nkcModules, address, port, data, db} = ctx;
   const {user} = data;
   if(!user || !u) return;
   // 加载相应科创币设置
   const kcbsType = await db.KcbsTypeModel.findOnly({_id: type});
+  // 如果是撤销操作则扣除额外的奖励
+  kcbsType.num -= additionalReward;
   if(kcbsType.count === 0) {
     // 此操作未启动
     return;

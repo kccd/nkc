@@ -77,7 +77,16 @@ router
     targetUser.xsf -= record.num;
     await targetUser.save();
     try{
-      await record.update({reason, tlm: Date.now(), lmOperatorId: user.uid, canceled: true});
+      await record.update(
+        {
+          reason,
+          tlm: Date.now(),
+          lmOperatorId: user.uid,
+          canceled: true,
+          lmOperatorIp: ctx.address,
+          lmOperatorPort: ctx.port
+        }
+      );
     } catch(err) {
       targetUser.xsf = oldXsf;
       await targetUser.save();
