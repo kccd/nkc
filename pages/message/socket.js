@@ -3,10 +3,9 @@ var socket = io('/message', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
-  // transports: ['polling', 'websocket'],
-  transports: ['websocket'],
-  reconnectionDelay: 3000,
-  reconnectionDelayMax: 5000
+  transports: ['polling', 'websocket'],
+  reconnectionDelay: 5000,
+  reconnectionDelayMax: 10000
 });
 
 // socket.open();

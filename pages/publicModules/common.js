@@ -1,3 +1,51 @@
+if(!NKC) var NKC = {};
+NKC.methods = {};
+NKC.methods.initScrollTo = function(options, callback) {
+  var top = options.top;
+  var bottom = options.bottom;
+  window.onscroll = function() {
+    var scrollY = window.scrollY;
+    if(top) {
+      if(scrollY > NKC.config.heightOfShowScrollButton && top) {
+        NKC.methods.scrollToTopButton.show();
+      } else {
+        NKC.methods.scrollToTopButton.hide();
+      }
+    }
+    if(callback) {
+      callback(scrollY);
+    }
+  }
+};
+
+if(document.getElementById('scrollToTop')) {
+  NKC.methods.scrollToTopButton = new mdui.Fab('#scrollToTop', {});
+  if(window.scrollY > NKC.config.heightOfShowScrollButton) {
+    NKC.methods.scrollToTopButton.show();
+  } else {
+    NKC.methods.scrollToTopButton.hide();
+  }
+}
+
+NKC.methods.scrollToTop = function(number, time) {
+  if (!time) {
+    document.body.scrollTop = document.documentElement.scrollTop = number;
+    return number;
+  }
+  const spacingTime = 10;
+  let spacingIndex = time / spacingTime;
+  let nowTop = document.body.scrollTop + document.documentElement.scrollTop;
+  let everTop = (number - nowTop) / spacingIndex;
+  let scrollTimer = setInterval(() => {
+    if (spacingIndex > 0) {
+      spacingIndex--;
+      NKC.methods.scrollToTop(nowTop += everTop);
+    } else {
+      clearInterval(scrollTimer);
+    }
+  }, spacingTime);
+};
+
 // 发起请求
 function kcAPI(url, method, data) {
   var options = {
@@ -66,7 +114,6 @@ function screenTopAlert(data) {
     position: 'top'
   });
 }
-
 function screenTopWarning(data) {
   mdui.snackbar({
     message: data.error || data,

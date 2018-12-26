@@ -1,34 +1,40 @@
 extends ../publicModules/mdui_base
 block title
-  title 首页测试
+  meta(name='description' content=data.serverSettings ? data.serverSettings.description : '每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
+  meta(name='keywords' content=data.serverSettings ? data.serverSettings.keywords.join(',') : '科创论坛，专业创客，极客论坛，创客论坛，创客教育，电磁炮，高斯枪，特斯拉线圈，科技小制作，电子DIY')
+  title=`${data.serverSettings.websiteName} - ${data.serverSettings.brief}`
   link(rel='stylesheet' href='/swiper/dist/css/swiper.css')
   link(rel='stylesheet' href=`/home/subscription.css?v=${global.NKC.startTime}`)
 block content
   .mdui-container
+    include ../publicModules/scrollToTop
     .mdui-row
       .mdui-col-md-2
         .mdui-m-t-2.mdui-hidden-sm-down
           a(href='/editor').mdui-btn.mdui-btn-block.mdui-color-blue-grey 发表文章
         include ../publicModules/forums_nav
-      .mdui-col-md-7.mdui-m-t-2
-        if data.ads && data.ads.length !== 0
-          .swiper-container.swiper-home.mdui-m-b-2
-            .swiper-wrapper
-              for thread in data.ads
-                a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                  'background-image': `url(/cover/${thread.tid})`
-                })
-                  .swiper-title= `${thread.firstPost.t}`
-            .swiper-pagination
-            .swiper-button-next.swiper-button(style='background-image: none;')
-              <i class="mdui-icon material-icons">&#xe315;</i>
-            .swiper-button-prev.swiper-button(style='background-image: none;')
-              <i class="mdui-icon material-icons">&#xe314;</i>
-        .thread-list.mdui-m-b-2
+      .mdui-col-md-7.mdui-m-t-2.mdui-m-b-2
+        .swiper-container.swiper-home
+          .swiper-wrapper
+            for thread in data.ads
+              a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                'background-image': `url(/cover/${thread.tid})`
+              })
+                .swiper-title= `${thread.firstPost.t}`
+          .swiper-pagination
+          .swiper-button-next.swiper-button(style='background-image: none;')
+            <i class="mdui-icon material-icons">&#xe315;</i>
+          .swiper-button-prev.swiper-button(style='background-image: none;')
+            <i class="mdui-icon material-icons">&#xe314;</i>
+        .thread-list-button.mdui-m-t-2
+          button.mdui-btn 关注
+          button.mdui-btn 推荐
+          button.mdui-btn 最新
+        .thread-list
           for thread in data.threads
             include ../publicModules/thread_panel
           #app
-        include ../interface_navigation_paging
+        include ../publicModules/paging_button.pug
       .mdui-col-md-3
         include ../publicModules/canvas_logo
         include ../publicModules/notice

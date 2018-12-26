@@ -5,6 +5,10 @@ const usersGeneralSchema = new Schema({
 		type: String,
 		index: 1
   },
+  language: {
+	  type: String,
+    default: 'zh_cn'
+  },
   waterSetting:{
     waterAdd: {
       type: Boolean,

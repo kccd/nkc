@@ -2,13 +2,14 @@
   "name": "nkc",
   "version": "1.0.0",
   "description": "source of [www.kechuang.org]",
+  "homepage": "https://www.kechuang.org",
   "main": "server.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node server.js "
   },
   "repository": {
     "type": "git",
-    "url": "github.com/kccd/nkc.git"
+    "url": "https://github.com/kccd/nkc.git"
   },
   "keywords": [
     "koa2",
@@ -67,6 +68,7 @@
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "socket.io": "^2.1.1",
+    "socket.io-redis": "^5.2.0",
     "swiper": "^4.3.3",
     "transliteration": "^1.6.6",
     "trek-captcha": "^0.4.0",

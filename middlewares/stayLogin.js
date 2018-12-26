@@ -1,14 +1,11 @@
 const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 module.exports = async (ctx, next) => {
-
 	const {data, db} = ctx;
-
-
 	// cookie
-
 	let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
+	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
 		try{
       let {cookie} = ctx.query || {};
       if(cookie) {
@@ -20,18 +17,11 @@ module.exports = async (ctx, next) => {
           userInfo = cookies.get('userInfo', {signed: true});
         }
       }
-
 		} catch(err) {
-			console.log(err);
+		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
-
 	}
-	// app
-
-	let userOperationsId = [], userRoles = [], userGrade = [];
-
-	let user;
-
+	let userOperationsId = [], userRoles = [], userGrade = [], user;
 	if(userInfo) {
 		const {username, uid} = JSON.parse(decodeURI(userInfo));
 		user = await db.UserModel.findOne({uid});
@@ -41,33 +31,6 @@ module.exports = async (ctx, next) => {
 			ctx.error = new Error('缓存验证失败');
 			return ctx.redirect('/login');
 		}
-	// } else if(loginUid && loginKey) {
-  } else if(0) {
-		const {aesDecode} = ctx.tools.encryption;
-		let uid;
-		try{
-			const userPersonal = await db.UsersPersonalModel.findOne({uid: loginUid});
-			uid = aesDecode(loginKey, userPersonal.password.hash);
-			if(uid === loginUid) {
-				user = await db.UserModel.findOne({uid});
-
-				// 设置cookie
-				const cookieStr = encodeURI(JSON.stringify({
-					uid: user.uid,
-					username: user.username,
-					lastLogin: Date.now()
-				}));
-				ctx.cookies.set('userInfo', cookieStr, {
-					signed: true,
-					maxAge: ctx.settings.cookie.life,
-					httpOnly: true
-				});
-			}
-		} catch(err) {
-			// console.log(err);
-		}
-
-
 	}
 
 	if(!user) {
@@ -91,7 +54,6 @@ module.exports = async (ctx, next) => {
 				user.certs.splice(index, 1);
 			}
 		}
-
 		// 获取用户信息
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		user.newMessage = await user.getNewMessagesCount();
@@ -139,7 +101,6 @@ module.exports = async (ctx, next) => {
 				userOperationsId = userOperationsId.concat(userGrade.operationsId);
 			}
 		}
-
 		// 根据用户的角色获取权限
 		await Promise.all(user.certs.map(async cert => {
 			const role = await db.RoleModel.findOne({_id: cert});

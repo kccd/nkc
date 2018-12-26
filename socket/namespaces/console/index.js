@@ -1,19 +1,21 @@
 let io;
+require('colors');
+const moment = require('moment');
+const settings = require('../../../settings');
 const db = require('../../../dataModels');
 const Cookies = require('cookies-string-parse');
-const settings = require('../../../settings');
 const util = require('../../util');
-const moment = require('moment');
-const thread = async (i) => {
+const fn = async (i) => {
   io = i;
   io.NKC = {
-    postToThread
+    socketMessage,
+    webMessage
   };
+  io.on('error', (err) => {
+    console.error(err);
+  });
   io.use(async (socket, next) => {
     const {handshake} = socket;
-    const {tid} = handshake.query;
-    const thread = await db.ThreadModel.findOne({tid});
-    if(!thread) return next(new Error('thread not found'));
     const cookies = new Cookies(handshake.headers.cookie, {
       keys: [settings.cookie.secret]
     });
@@ -61,24 +63,20 @@ const thread = async (i) => {
       }));
     }
 
-    // 验证权限，暂未考虑 分享
-    try{
-      await thread.extendForum();
-      await thread.ensurePermission(userRoles, userGrade, user);
-    } catch(err) {
-      return next(new Error(err));
+    // 验证权限
+    if(!userOperationsId.includes('visitExperimentalConsole')) {
+      return next(new Error('权限不足'));
     }
 
     socket.NKC = {
       userRoles,
       userGrade: userGrade || {},
       userOperationsId,
-      tid,
       uid: user.uid
     };
 
     // 获取该用户的房间中的全部连接id
-    const clients = await util.getRoomClientsId(io, `thread/${user.uid}`);
+    const clients = await util.getRoomClientsId(io, `user/${user.uid}`);
     // 每个用户最大连接数不能超过5
     // 若连接数超过5，则断开之前的连接建立新连接，保证连接数不超过5。
     if(clients.length > 4) {
@@ -87,35 +85,39 @@ const thread = async (i) => {
         io.connected[clients[i]].disconnect(true);
       }
     }
-
     await next();
   });
-  io.on('connection', (socket) => {
-    const {tid, uid} = socket.NKC;
-    socket.join(`thread/${tid}`, async () => {
-      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${`/thread/${tid}`.bgBlue} ${'连接成功'.bgGreen}`);
-      global.NKC.io.of('/console').NKC.socketMessage(`/thread/${tid}`, true, uid);
+  io.on('connect', (socket) => {
+    const {uid} = socket.NKC;
+    socket.join(`user/${uid}`, async () => {
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/console'.bgBlue} ${'连接成功'.bgGreen}`);
+      socketMessage('/console', true, uid);
     });
+    socket.on('error', () => {
+      disconnect(socket);
+    });
+    socket.on('disconnect', () => {
+      disconnect(socket);
+    })
   });
-  io.on('error', (err) => {
-    console.log(err);
-    disconnect(socket);
-  });
-  io.on('disconnect', () => {
-    disconnect(socket);
-  })
 };
-
+module.exports = fn;
 function disconnect(socket) {
-  const {tid, uid} = socket.NKC;
-  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${''.grey} ${`/thread/${tid}`.bgBlue} ${'断开连接'.bgRed}`);
-  global.NKC.io.of('/console').NKC.socketMessage(`/thread/${tid}`, false, uid);
+  const {uid} = socket.NKC;
+  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/console'.bgBlue} ${'断开连接'.bgRed}`);
+  socketMessage('/console', false, uid)
 }
-
-async function postToThread(post) {
-  io.to(`thread/${post.tid}`).emit('postToThread', {
-    post
-  });
+function socketMessage(url, connect, uid) {
+  const data = {
+    url,
+    uid,
+    consoleType: 'socket',
+    reqTime: Date.now(),
+    processId: global.NKC.processId,
+    connect
+  };
+  io.emit('message', data);
 }
-
-module.exports = thread;
+function webMessage(data) {
+  io.emit('message', data);
+}

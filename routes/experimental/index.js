@@ -4,7 +4,7 @@ const settingRouter = require('./settings');
 const statusRouter = require('./status');
 const logRouter = require('./log');
 const sysInfoRouter = require('./systemInfo');
-const dbFn = nkcModules.dbFunction;
+const consoleRouter = require('./console');
 const apiFn = nkcModules.apiFunction;
 const {npmInstallify, gitify} = require('../../tools/imageMagick');
 const experimentalRouter = new Router();
@@ -15,7 +15,7 @@ let buffer = [];
 experimentalRouter
   .get('/', async (ctx, next) => {
   	return ctx.redirect('/e/status');
-  })
+  })/*
   .get('/newUsers', async (ctx, next) => {
     const {db, data} = ctx;
     let {page} = ctx.query;
@@ -28,7 +28,7 @@ experimentalRouter
     data.users = users;
     ctx.template = 'interface_new_users.pug';
     await next();
-  })/*
+  })/!*
   .get('/systemInfo', async (ctx, next) => {
     ctx.template = 'interface_new_sysinfo.pug';
     await next();
@@ -56,7 +56,7 @@ experimentalRouter
       ctx.throw(500, `发送系统通知出错: ${err}`);
     }
     await next();
-  })*/
+  })*!/
   .get('/stats', async (ctx, next) => {
     const type = ctx.request.accepts('json', 'html');
     if(type !== 'json') {
@@ -162,8 +162,9 @@ experimentalRouter
   .patch('/gitPull', async (ctx, next) => {
     ctx.data.message = await gitify();
     await next();
-  })
+  })*/
 	.use('/status', statusRouter.routes(), statusRouter.allowedMethods())
+  .use('/console', consoleRouter.routes(), consoleRouter.allowedMethods())
 	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods())
   .use('/systemInfo', sysInfoRouter.routes(), sysInfoRouter.allowedMethods())
 	.use('/log', logRouter.routes(), logRouter.allowedMethods());

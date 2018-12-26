@@ -387,6 +387,53 @@ html{
 .send-color{
   color: #3b8686!important;
 }
+.paging-button{
+  padding: 1rem 0;
+  text-align: center;
+}
+.paging-button ul{
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+}
+.paging-button ul li{
+  list-style: none;
+  cursor: pointer;
+  display: inline-block;
+}
+.paging-button ul a{
+  display: inline-block;
+  text-decoration: none;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.6rem;
+  border-radius: 5px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.paging-button ul a.active, .paging-button ul a:hover{
+  background-color: #eee;
+}
+.paging-button ul li input{
+  width: 2rem;
+  border: 1px solid #aaa;
+}
+.paging-button ul li button{
+  height: 2rem;
+  cursor: pointer;
+  color: #555;
+  font-size: 1rem;
+  border: none;
+  background-color: rgba(0,0,0,0);
+  outline:none;
+}
+.paging-button ul li button:hover{
+  color: #000;
+}
+.paging-button ul li input:focus{
+  outline:none;
+}
 @media (max-width: 1023px) {
   /*.mdui-header .mdui-container {
     padding: 0;
