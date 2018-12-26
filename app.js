@@ -8,6 +8,7 @@ const settings = require('./settings');
 const rateLimit = require('koa-ratelimit');
 const Redis = require('ioredis');
 const fs = require('fs');
+const helmet = require('koa-helmet');
 
 const staticServe = path => {
   return require('koa-static')(path, {
@@ -50,9 +51,10 @@ app
       reset: 'Rate-Limit-Reset',
       total: 'Rate-Limit-Total'
     },
-    max: 3000,
+    max: 1000,
     disableHeader: false,
   }))
+  .use(helmet())
   .use(koaCompress({threshold: 2048}))
   .use(koaBody(settings.upload.koaBodySetting))
   .use(init)
