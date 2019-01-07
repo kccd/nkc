@@ -27,18 +27,11 @@ app.on('error', err => {
 });
 const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
-const {permissions} = require('./nkcModules');
-const {stayLogin, init, cookieIdentify, body, scoreHandler, urlRewrite, permission, score, logger} = require('./middlewares');
-
-try {
-  mkdirSync('tmp');
-} catch(e) {
-  if(e.code !== 'EEXIST')
-    throw e
-}
+const {stayLogin, init, body, urlRewrite, permission, logger} = require('./middlewares');
 
 app.keys = [settings.cookie.secret];
 app
+  // 限制单位时间相同ip（60s）请求数
   .use(rateLimit({
     db: new Redis(),
     duration: 60000,
@@ -52,15 +45,34 @@ app
       reset: 'Rate-Limit-Reset',
       total: 'Rate-Limit-Total'
     },
-    max: 1000,
+    max: 8000,
     disableHeader: false,
   }))
+  // 限制单位时间（60s）所有请求数
+  .use(rateLimit({
+    db: new Redis(),
+    duration: 60000,
+    errorMessage: fs.readFileSync('./pages/error/503.html').toString(),
+    id: () => {
+      return 'nkc'
+    },
+    headers: {
+      remaining: 'Rate-Limit-Remaining',
+      reset: 'Rate-Limit-Reset',
+      total: 'Rate-Limit-Total'
+    },
+    max: 300000,
+    disableHeader: false,
+  }))
+  // 请求头安全设置
   .use(helmet())
+  // gzip
   .use(koaCompress({threshold: 2048}))
   .use(koaBody(settings.upload.koaBodySetting))
   .use(init)
   .use(stayLogin)
   .use(urlRewrite)
+  // 视频段支持
   .use(conditional())
   .use(etag())
   .use(staticServe(path.resolve('./nkcModules')))
