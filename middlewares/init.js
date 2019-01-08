@@ -15,7 +15,8 @@ module.exports = async (ctx, next) => {
 	  let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
 	    XFF = XFF.replace(/::ffff:/ig, '');
-      [ip] = XFF.split(':');
+      [ip_] = XFF.split(':');
+      if(ip_) ip = ip_;
     }
 	  ctx.address = ip;
 	  ctx.port = port;

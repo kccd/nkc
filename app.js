@@ -45,7 +45,7 @@ app
       reset: 'Rate-Limit-Reset',
       total: 'Rate-Limit-Total'
     },
-    max: 8000,
+    max: 2000,
     disableHeader: false,
   }))
   // 限制单位时间（60s）所有请求数
