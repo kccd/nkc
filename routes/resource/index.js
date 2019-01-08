@@ -184,7 +184,7 @@ resourceRouter
       await ffmpeg.videoTranscode(path, outputVideoPath);
       await fs.rename(outputVideoPath, path);
       await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
-    } 
+    }
     await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,

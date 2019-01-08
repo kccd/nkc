@@ -8,10 +8,24 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       include ../nav
-      .hidden(id='data')= JSON.stringify({xsfsRecords: data.xsfsRecords})
+      .hidden(id='data')= JSON.stringify({xsfsRecords: data.xsfsRecords, t: data.t, content: data.content})
       #app(v-cloak)
         .col-xs-12.col-md-12
           h4 评学术分记录
+        .col-xs-12.col-md-12
+          .form-inline(style='margin-bottom: 1rem;')
+            .form-group
+              select.form-control(v-model='searchType')
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='ip') IP
+            .form-group
+              input.form-control(placeholder='请输入内容' v-model='searchText' @keyup.enter='searchUser')
+            .form-group
+              button.btn.btn-primary(type='submit' @click='searchUser') 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/kcb') 全部
+            .text-danger= data.info
         .col-xs-12.col-md-12.table-responsive
           include ../../interface_navigation_paging
           table.table.table-bordered(style='font-size: 1rem;')
@@ -23,10 +37,12 @@ block content
                 th 操作者
                 th 评分理由
                 th 文号
+                th 操作者IP
                 th 撤销
                 th 撤销者
                 th 撤销理由
                 th 撤销时间
+                th 撤销者IP
             tbody
               tr(v-for='(record, index) of xsfsRecords')
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
@@ -39,6 +55,8 @@ block content
                 th
                   a(:href="'/p/' + record.pid" target="_blank") {{record.pid}}
                 th
+                  a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.ip+'&action=2'") {{record.ip}}
+                th
                   span(v-if='record.canceled').text-danger 是
                   span(v-else).text-success 否
                 th
@@ -47,6 +65,8 @@ block content
                   span(v-if='record.lmOperator') {{record.reason}}
                 th
                   span(v-if='record.lmOperator') {{format('YYYY/MM/DD HH:mm:ss', record.tlm)}}
+                th
+                  a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.lmOperatorIp+'&action=2'") {{record.lmOperatorIp}}
           include ../../interface_navigation_paging
 block scripts
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)

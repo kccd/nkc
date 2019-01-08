@@ -11,7 +11,7 @@ const options = {
 };
 
 mongoose.Promise = Promise;
-mongoose.connect(mongoDB, options)
+mongoose.connect(mongoDB.url, options)
   .then(() => {
     // console.log('database connected.'.green)
   })

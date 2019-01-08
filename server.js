@@ -3,11 +3,10 @@ global.NKC = {};
 global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
 
 global.NKC.startTime = Date.now();
+global.NKC.processId =  Number(process.env.PROCESS_ID) || 0;
 
-global.NKC.processId =  process.env.NODE_APP_INSTANCE || '0';
 require('colors');
 const http = require('http'),
-  https = require('https'),
   app = require('./app'),
   searchInit = require('./searchInit'),
   settings = require('./settings'),
@@ -16,7 +15,7 @@ const http = require('http'),
   path = require('path'),
   config = require('./config'),
   cacheForums = require('./redis/cacheForums'),
-
+  socket = require('./socket'),
   {updateDate, upload} = settings,
 
   {
@@ -146,7 +145,7 @@ const start = async () => {
 
   serverSettings = await SettingModel.findOnly({type: 'server'});
 
-  if(global.NKC.processId === '0') {
+  if(global.NKC.processId === 0) {
     await dataInit();
     await jobsInit();
     await upload.initFolders();
@@ -157,28 +156,12 @@ const start = async () => {
   console.log('ElasticSearch is ready...'.green);
 
 
-  if(config.web.useHttps) {
-    // httpsServer
-    const httpsOptions = settings.httpsOptions();
+  const port = config.port + global.NKC.processId;
+  server = http.createServer(app);
+  server.listen(port);
+  await socket(server);
+  console.log(`${serverSettings.serverName} listening on ${port}`.green);
 
-    server = https.createServer(httpsOptions, app).listen(config.web.httpsPort);
-    console.log(`${serverSettings.serverName} listening on ${config.web.httpsPort}`.green);
-
-    // redirectServer
-    redirectServer = http.createServer((req, res) => {
-      const host = req.headers['host'];
-      res.writeHead(301, {
-        'Location': 'https://' + host + req.url
-      });
-      res.end();
-    }).listen(config.web.httpPort);
-
-  } else {
-
-    server = http.createServer(app).listen(config.web.httpPort);
-    console.log(`${serverSettings.serverName} listening on ${config.web.httpPort}`.green);
-
-  }
 };
 
 

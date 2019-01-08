@@ -3,6 +3,7 @@ block title
   title 信息
   -const hiddenFooter = true;
   link(href=`/bootstrap/css/bootstrap-chinese-region.min.css?v=${global.NKC.startTime}` media="screen" rel='stylesheet')
+  link(href=`/mdui/css/mdui.css?v=${startTime}`)
   link(rel='stylesheet' href=`/message/message.css?v=${global.NKC.startTime}`)
 block content
 
@@ -660,7 +661,7 @@ block content
       .mobile-footer(v-if="showMobileNavbar")
         .col-xs-3(:class="{active: showMobileList}" @click="initMobile('showMobileList')")
           .fa.fa-list-ul
-          .bar-name 信息
+          .bar-name 消息
         .col-xs-3(:class="{active: showMobileContacts}" @click="initMobile('showMobileContacts')")
           .fa.fa-user
           .bar-name 联系人
@@ -700,7 +701,7 @@ block content
           // 聊天窗口 header
           .mobile-message-header
             div
-              span(v-if='target === "user"') {{targetUser?targetUser.username:'加载中...'}}
+              span(v-if='target === "user"' style="cursor: pointer;font-weight:700;color: #666666;" @click='selectFriend({targetUser: targetUser})') {{targetUser.friend && targetUser.friend.info.name?targetUser.friend.info.name: targetUser.username}}
               span(v-if='target === "reminder"') 系统提醒
               span(v-if='target === "notice"') 系统通知
               span(v-if='target === "friend"') 好友
@@ -720,7 +721,10 @@ block content
                 a(v-for="tmj in twemoji")
                   img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
               .input
-                textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
+                <div class="mdui-textfield">
+                  textarea(class="mdui-textfield-input" placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
+                </div>
+                //textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
               .button
                 button(@click="sendToUser()") 发送
           .mobile-messages-body(v-if="target === 'reminder'" ref='content')
@@ -775,5 +779,6 @@ block scripts
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
   script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
   script(src=`/xss/dist/xss.js?v=${global.NKC.startTime}`)
+  script(src=`/mdui/js/mdui.js?v=${global.NKC.startTime}`)
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/message/message.js?v=${global.NKC.startTime}`)

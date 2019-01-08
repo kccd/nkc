@@ -38,12 +38,12 @@ const kcbsRecordSchema = new Schema({
   },
   ip: {
     type: String,
-    required: true,
+    default: '0.0.0.0',
     index: 1
   },
   port: {
     type: String,
-    required: true
+    default: '0',
   },
   pid: {
     type: String,
@@ -86,13 +86,18 @@ kcbsRecordSchema.virtual('fromUser')
     this._fromUser = p;
   });
 
-// 与科创人民银行间的交易记录
-kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx) => {
+// 与银行间的交易记录
+kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
+  additionalReward = additionalReward || 0;
   const {nkcModules, address, port, data, db} = ctx;
   const {user} = data;
-  if(!user) return;
+  if(!user || !u) return;
+  // 加载相应科创币设置
   const kcbsType = await db.KcbsTypeModel.findOnly({_id: type});
+  // 如果是撤销操作则扣除额外的奖励
+  kcbsType.num -= additionalReward;
   if(kcbsType.count === 0) {
+    // 此操作未启动
     return;
   } else if(kcbsType.count !== -1) {
     // 获取今日已触发该操作的次数
@@ -114,7 +119,7 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx) => {
     // 若次数已达上限则不做任何处理
     if(recordsCount >= kcbsType.count) return;
   }
-
+  // 若kcbsType === -1则不限次数
   const kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
   const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
   const newRecords = db.KcbsRecordModel({
@@ -127,6 +132,7 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx) => {
     port
   });
   let bankChange = -1*kcbsType.num;
+  // 若该操作科创币为负，则由用户转给银行
   if(kcbsType.num < 0) {
     newRecords.from = u.uid;
     newRecords.to = 'bank';

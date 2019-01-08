@@ -1,17 +1,21 @@
 require('colors');
 
-const Redis = require('redis');
-const db = require('../dataModels');
+/*const Redis = require('redis');
+
 const pub = Redis.createClient();
-const cacheForums = require('./cacheForums');
 
 pub.on('error', (err) => {
 
   console.log(`连接redis出错: `);
   console.log(err);
 
-});
-
+});*/
+const db = require('../dataModels');
+const cacheForums = require('./cacheForums');
+const pub = {};
+pub.publish = async (channel, message) => {
+  global.NKC.io.of('/message').NKC.sendMessage(channel, message);
+};
 
 const obj = {};
 

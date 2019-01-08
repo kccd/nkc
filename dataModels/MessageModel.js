@@ -281,12 +281,17 @@ messageSchema.statics.extendReminder = async (arr) => {
 };
 messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const CreatedChatModel = mongoose.model('createdChat');
+  const FriendModel = mongoose.model('friends');
+  const uids = new Set();
   const chat = await CreatedChatModel.find({uid}).sort({tlm: -1});
-  const arr = [];
   chat.map(c => {
-    if(c.tUid !== uid) arr.push(c.tUid);
+    uids.add(c.tUid);
   });
-  return arr;
+  const friends = await FriendModel.find({uid});
+  friends.map(c => {
+    uids.add(c.tUid);
+  });
+  return [...uids];
 };
 /*messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const MessageModel = mongoose.model('messages');

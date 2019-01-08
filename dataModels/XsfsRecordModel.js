@@ -53,9 +53,19 @@ const xsfsRecordSchema = new Schema({
   },
   lmOperatorId: {
     type: String,
+    index: 1,
     default: ''
   },
   reason: {
+    type: String,
+    default: ''
+  },
+  lmOperatorIp: {
+    type: String,
+    index: 1,
+    default: ''
+  },
+  lmOperatorPort: {
     type: String,
     default: ''
   }

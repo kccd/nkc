@@ -11,12 +11,15 @@ redEnvelopeRouter
     const {db, body} = ctx;
     const {random, draftFee, share} = body;
     // 随机红包
+    let probability = 0;
     for(const award of random.awards) {
       if(award.kcb <= 0) ctx.throw(400, '奖金科创币得数量必须大于0');
       if(award.chance < 0) ctx.throw(400, '概率不能小于0');
       if(award.float < 0) ctx.throw(400, '政府浮动不能小于0');
       if(!award.name) ctx.throw(400, '奖金名不能为空');
+      probability += award.chance;
     }
+    if(probability > 100) ctx.throw(400, '总概率不能超过100%');
     // 精选红吧
     if(draftFee.defaultCount < 1) ctx.throw(400, '红包默认数目不能小于1');
     if(draftFee.minCount < 1) ctx.throw(400, '红包最小数目必须大于1');

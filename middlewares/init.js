@@ -12,11 +12,11 @@ const config = require('../config');
 module.exports = async (ctx, next) => {
 	try {
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
-	  const XFF = ctx.get('X-Forwarded-For');
+	  let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
-      [ip, port] = XFF.split(':');
-    } else {
-	    ip = ctx.ip.replace(/::ffff:/ig, '');
+	    XFF = XFF.replace(/::ffff:/ig, '');
+      [ip_] = XFF.split(':');
+      if(ip_) ip = ip_;
     }
 	  ctx.address = ip;
 	  ctx.port = port;
@@ -29,10 +29,9 @@ module.exports = async (ctx, next) => {
 	  ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
-	  ctx.data.socketConfig = config.socket;
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
-		let {operationsId} = await db.SettingModel.findOne({"type":"log"})
+		let {operationsId} = await db.SettingModel.findOne({"type":"log"});
 		ctx.data.logSetting = operationsId;
 	  // - 初始化网站设置
 		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
