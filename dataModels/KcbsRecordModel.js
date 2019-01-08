@@ -44,7 +44,6 @@ const kcbsRecordSchema = new Schema({
   port: {
     type: String,
     default: '0',
-    required: true
   },
   pid: {
     type: String,
