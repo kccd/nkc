@@ -97,10 +97,12 @@ resourceRouter
         }
       });
       await fs.rename(path, targetPath);
-      // 将amr语音文件转为mp3
-      let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';
-      let targetMp3Path = messageVoiceBrowser + voiceMp3Path;
-      await ffmpeg.audioAMRTransMP3(targetPath, targetMp3Path);
+      if(voiceExt.includes(ext)) {
+        // 将amr语音文件转为mp3
+        let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';
+        let targetMp3Path = messageVoiceBrowser + voiceMp3Path;
+        await ffmpeg.audioAMRTransMP3(targetPath, targetMp3Path);
+      }
       if(imageExt.includes(ext)) {
         // await tools.imageMagick.allInfo(targetPath);
         const timePath = generateFolderName(messageImageSMPath) + _id + '.' + ext;

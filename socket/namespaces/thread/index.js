@@ -74,7 +74,7 @@ const thread = async (i) => {
       userGrade: userGrade || {},
       userOperationsId,
       tid,
-      uid: user.uid
+      uid: user?user.uid: ''
     };
 
     // 获取该用户的房间中的全部连接id
