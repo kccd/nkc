@@ -39,19 +39,10 @@ resourceRouter
     const { data, db, fs, settings } = ctx;
     const { cache } = settings;
     const {mediaPath} = settings.upload;
-    const {mediaPicturePath, mediaVideoPath, mediaAudioPath, mediaAttachmentPath, selectDiskCharacterUp} = settings.mediaPath;
-    let filePath;
+    const {mediaPicturePath, mediaVideoPath, mediaAudioPath, mediaAttachmentPath, selectDiskCharacterUp, selectDiskCharacterDown} = settings.mediaPath;
     const resource = await db.ResourceModel.findOnly({ rid });
     const { path, ext } = resource;
-    if(pictureExts.indexOf(resource.ext.toLowerCase()) > -1) {
-      filePath = selectDiskCharacterUp("mediaPicture");
-    }else if(videoExts.indexOf(resource.ext.toLowerCase()) > -1) {
-      filePath = selectDiskCharacterUp("mediaVideo");
-    }else if(audioExts.indexOf(resource.ext.toLowerCase()) > -1) {
-      filePath = selectDiskCharacterUp("mediaAudio");
-    }else{
-      filePath = selectDiskCharacterUp("mediaAttachment");
-    }
+    let filePath = selectDiskCharacterDown(resource);
     filePath = filePath + path;
     if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
     if (extArr.includes(resource.ext.toLowerCase())) {
@@ -94,18 +85,23 @@ resourceRouter
 
     // 根据上传类型确定文件保存路径
     // mediaRealPath
+    let mediaType;
     if(pictureExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/picture";
       mediaRealPath = selectDiskCharacterUp("mediaPicture");
+      mediaType = "mediaPicture";
     }else if(videoExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/video";
       mediaRealPath = selectDiskCharacterUp("mediaVideo");
+      mediaType = "mediaVideo";
     }else if(audioExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/audio";
       mediaRealPath = selectDiskCharacterUp("mediaAudio");
+      mediaType = "mediaAudio";
     }else{
       // mediaRealPath = mediaPath + "/attachment";
       mediaRealPath = selectDiskCharacterUp("mediaAttachment");
+      mediaType = "mediaAttachment";
     }
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
@@ -269,7 +265,8 @@ resourceRouter
       ext: extension,
       size,
       uid: ctx.data.user.uid,
-      toc: Date.now()
+      toc: Date.now(),
+      mediaType: mediaType
     });
     ctx.data.r = await r.save();
     await next()

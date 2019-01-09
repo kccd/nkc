@@ -461,7 +461,7 @@ function edInsertContent(which, myValue, fileType, fileName) {
       //codeResource = "<b>123456</b>"
       codeResource = "<p><img src=" + myValue + " class='editImgSingle'></p>"
     }else if(fileType === "mp4"){
-      codeResource = "<video src=" + myValue + " controls style=max-width:50%>video</video>"
+      codeResource = "<video src=" + myValue + " controls style=width:640px;>video</video>"
     }else if(fileType === "mp3"){
       codeResource = "<audio src=" + myValue + " controls>Your browser does not support the audio element</audio>";
     }else{

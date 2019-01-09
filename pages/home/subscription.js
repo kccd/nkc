@@ -25,6 +25,12 @@ var forumNav = new Vue({
   },
   mounted: function() {
     this.forums = JSON.parse(this.$refs.forums.innerText);
+    NKC.methods.initScrollTo({
+      top: true,
+      bottom: true
+    }, function(data) {
+
+    });
   },
   methods: {
     openForum: function(forum) {

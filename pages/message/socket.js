@@ -1,19 +1,11 @@
 var pageName = '';
-var socketConfig = $('#socketConfig').text();
-socketConfig = JSON.parse(socketConfig);
-var url;
-if(socketConfig.useHttps) {
-  url = 'https://' + window.location.hostname + ':' + socketConfig.httpsPort;
-} else {
-  url = 'http://' + window.location.hostname + ':' + socketConfig.httpPort;
-}
-var socket = io(url, {
+var socket = io('/message', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
   transports: ['polling', 'websocket'],
-  reconnectionDelay: 3000,
-  reconnectionDelayMax: 5000
+  reconnectionDelay: 5000,
+  reconnectionDelayMax: 10000
 });
 
 // socket.open();

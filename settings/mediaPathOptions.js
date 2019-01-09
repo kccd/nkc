@@ -1,18 +1,18 @@
 module.exports = [
   {
-    type: "mediaPicture",
-    path: "/media/picture"
+    mediaType: "mediaPicture",
+    path: "/attach/picture"
   },
   {
-    type: "mediaVideo",
-    path: "/media/video"
+    mediaType: "mediaVideo",
+    path: "/attach/video"
   },
   {
-    type: "mediaAudio",
-    path: "/media/audio"
+    mediaType: "mediaAudio",
+    path: "/attach/audio"
   },
   {
-    type: "mediaAttachment",
-    path: "/media/attachment"
+    mediaType: "mediaAttachment",
+    path: "/attach/attachment"
   }
 ];

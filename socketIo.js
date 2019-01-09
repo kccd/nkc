@@ -3,82 +3,9 @@ const moment = require('moment');
 const settings = require('./settings');
 const db = require('./dataModels');
 const Cookies = require('cookies-string-parse');
-const Koa = require('koa');
-const http = require('http');
-const https = require('https');
-const config = require('./config');
 const redis = require('redis');
-const Redis = require('ioredis');
-const ratelimit = require('koa-ratelimit');
-const app = new Koa();
 
-app.use(ratelimit({
-  db: new Redis(),
-  duration: 600000,
-  errorMessage: '<div style="text-align: center;font-size: 2rem;padding-top: 15rem;color: #888888;">Sometimes You Just Have to Slow Down.</div>',
-  id: (ctx) => ctx.ip,
-  headers: {
-    remaining: 'Rate-Limit-Remaining',
-    reset: 'Rate-Limit-Reset',
-    total: 'Rate-Limit-Total'
-  },
-  max: 100,
-  disableHeader: false,
-}));
-
-app.use((ctx, next) => {
-  if(config.socket.useHttps) {
-    ctx.redirect('https://www.kechuang.org');
-  } else {
-    ctx.body = '<a href="https://www.kechuang.org" style="display: block;text-align: center;font-size: 2rem;padding-top: 15rem;color: #888888;">www.kechuang.org</a>';
-    next();
-  }
-});
-
-app.on('error', (err) => {
-  console.log(err.stack?err.stack.red:err);
-});
-
-let server, socketIo, io;
-
-const createServer = () => {
-
-  if(config.socket.useHttps) {
-
-    const greenlock = require('greenlock-koa').create({
-      version: 'draft-11' // Let's Encrypt v2
-      // You MUST change this to 'https://acme-v02.api.letsencrypt.org/directory' in production
-      // , server: 'https://acme-staging-v02.api.letsencrypt.org/directory'
-      , server: 'https://acme-v02.api.letsencrypt.org/directory'
-      , email: config.httpsCert.email
-      , agreeTos: true
-      , approveDomains: config.httpsCert.approveDomains
-
-      // Join the community to get notified of important updates
-      // and help make greenlock better
-      , communityMember: true
-
-      , configDir: require('os').homedir() + '/acme/etc'
-
-      , debug: false
-    });
-
-    server = https.createServer(greenlock.tlsOptions, greenlock.middleware(app.callback()));
-
-    const app2 = new Koa();
-
-    const redirectHttps = app2.use(require('koa-sslify')()).callback();
-
-    http.createServer(greenlock.middleware(redirectHttps)).listen(config.socket.redirectHttpPort, function() {
-      console.log('Listening on port 8081 to handle ACME http-01 challenge and redirect to https'.green);
-    });
-
-    server.listen(config.socket.httpsPort);
-  } else {
-    server = http.createServer(app.callback());
-    server.listen(config.socket.httpPort);
-  }
-};
+let socketIo, io;
 
 // 初始化 redis的订阅
 const initRedis = () => {
@@ -194,7 +121,7 @@ const initRedis = () => {
 
 
 // 初始化socket.io
-const initSocket = async () => {
+const initSocket = async (server) => {
 
   await db.UserModel.updateMany({online: true}, {$set: {online: false}});
 
@@ -315,19 +242,6 @@ async function disconnect (socket) {
 }
 
 
-(async () => {
-  try{
-    createServer();
-    await initSocket();
-    initRedis();
-    console.log(`socket server listening on ${config.socket.httpPort}`.green);
-  } catch(err) {
-    console.log('socket 服务器启动失败:'.red);
-    console.log(err.stack.red);
-  }
-})();
-
-
 // 获取命名空间下的某房间的所有客户端id
 async function getRoomClientCount(nameSpaceObj, roomName) {
   return new Promise((resolve, reject) => {
@@ -337,3 +251,9 @@ async function getRoomClientCount(nameSpaceObj, roomName) {
     })
   });
 }
+
+module.exports = async (server) => {
+  await initSocket(server);
+  initRedis();
+  console.log(`socket server has started`.green);
+};

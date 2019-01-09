@@ -25,31 +25,31 @@ style.
     .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#picturesDom(v-bind:style="mediaType == 'picture' ? 'display:block' : 'display:none'")
       .mdui-col(v-for = "(picture, index) in mediaPictureLists")
         .mdui-grid-tile
-          a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
-            img(v-bind:src="'/r/'+picture.rid" style="height:90px;cursor: pointer")
+          //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
+          img(v-bind:src="'/r/'+picture.rid" style="height:90px;cursor: pointer" @click="pictureInsert(picture.rid, picture.ext, picture.oname)")
           .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="picture.oname")
             .mdui-grid-tile-text
               .mdui-grid-tile-title(style="font-size:13px") {{picture.oname}}
-            .mdui-grid-tile-buttons
-              button.mdui-btn.mdui-btn-icon(@click="pictureInsert(picture.rid, picture.ext, picture.oname)")
-                i.fa.fa-check-square-o
+            //- .mdui-grid-tile-buttons
+            //-   button.mdui-btn.mdui-btn-icon(@click="pictureInsert(picture.rid, picture.ext, picture.oname)")
+            //-     i.fa.fa-check-square-o
 
     // 视频 video
     .mdui-row-xs-3.mdui-row-sm-4.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#videosDom(v-bind:style="mediaType == 'video' ? 'display:block' : 'display:none'")
       .mdui-col(v-for = "(video, index) in mediaVideoLists")
         .mdui-grid-tile(v-bind:title="video.oname")
           .mdui-card
-            .mdui-card-media
+            .mdui-card-media(@click="videoInsert(video.rid, video.ext, video.oname)")
               img(v-bind:src="'/frameImg/' + video.rid" title="123456" style="width:100%;height:120px")
-              a(v-bind:href="'/r/'+video.rid" target="_blank")
-                span(style="position:absolute;top:0;bottom:0;left:0;right:0;background-color:rgba(0, 0, 0, 0.5);line-height:150px;text-align:center;")
-                  i.fa.fa-play-circle-o(style="font-size:50px;color:#fff;display: inline;cursor: pointer;")
+              //- a(v-bind:href="'/r/'+video.rid" target="_blank")
+              span(style="position:absolute;top:0;bottom:0;left:0;right:0;background-color:rgba(0, 0, 0, 0.5);line-height:150px;text-align:center;")
+                i.fa.fa-play-circle-o(style="font-size:50px;color:#fff;display: inline;cursor: pointer;")
           .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
             .mdui-grid-tile-text
               .mdui-grid-tile-title(style="font-size:13px") {{video.oname}}
-            .mdui-grid-tile-buttons
-              button.mdui-btn.mdui-btn-icon(@click="videoInsert(video.rid, video.ext, video.oname)")
-                i.fa.fa-check-square-o
+            //- .mdui-grid-tile-buttons
+            //-   button.mdui-btn.mdui-btn-icon(@click="videoInsert(video.rid, video.ext, video.oname)")
+            //-     i.fa.fa-check-square-o
 
     // 音频 audio
     .mdui-row-xs-5.mdui-row-sm-8.mdui-row-md-10.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#audiosDom(v-bind:style="mediaType == 'audio' ? 'display:block' : 'display:none'")

@@ -5,8 +5,6 @@ const client = require('../settings/redisClient');
 const cacheForums = async () => {
 
 
-  const t = Date.now();
-
   const forums = await ForumModel.find({});
 
   const canNotDisplayOnParentForumsId = [];
@@ -89,7 +87,7 @@ const cacheForums = async () => {
           }
         }
         for(const gradeId of gradesId) {
-          if(!grades[gradeId].includes(fid)) {
+          if(grades[gradeId] && !grades[gradeId].includes(fid)) {
             grades[gradeId].push(fid);
           }
         }
@@ -262,11 +260,6 @@ const cacheForums = async () => {
   if(canNotDisplayOnNavForumsId.length !== 0) {
     await client.saddAsync(key, canNotDisplayOnNavForumsId);
   }
-
-  /*console.log(roles);
-  console.log(grades);
-  console.log(rolesAndGrades);
-  console.log(moderators);*/
 
   console.log(`缓存更新完成`.green);
 

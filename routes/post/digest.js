@@ -7,6 +7,8 @@ router
 		let {kcb} = body;
 		const post = await db.PostModel.findOnly({pid});
 		const forum = await db.ForumModel.findOnly({fid: post.fid});
+		data.forum = forum;
+		data.post = post;
     await forum.ensureModeratorsPermission(data);
 		const targetUser = await post.extendUser();
     const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
@@ -50,7 +52,7 @@ router
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
-          type: 'digestThread',
+          type: 'digestThreadAdditional',
           to: data.targetUser.uid,
           toc: digestTime,
           port: ctx.port,
@@ -65,7 +67,7 @@ router
         await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*num}});
         await record.save();
       }
-      // await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
+      await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
 			log.type = 'score';
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
@@ -88,7 +90,7 @@ router
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
-          type: 'digestPost',
+          type: 'digestPostAdditional',
           to: data.targetUser.uid,
           toc: digestTime,
           port: ctx.port,
@@ -103,7 +105,7 @@ router
         await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*num}});
         await record.save();
       }
-      // await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);
+      await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);
 			log.key = 'digestPostsCount';
 			log.type = 'score';
 			await db.UsersScoreLogModel.insertLog(log);
@@ -136,6 +138,8 @@ router
     await forum.ensureModeratorsPermission(data);
 		const targetUser = await post.extendUser();
 		data.targetUser = targetUser;
+		data.forum = forum;
+		data.post = post;
 		const thread = await db.ThreadModel.findOnly({tid: post.tid});
 		if(!post.digest) {
 			if(thread.oc === pid) {
@@ -144,6 +148,11 @@ router
 				ctx.throw(400, '回复未被加精，请刷新');
 			}
 		}
+		let additionalReward = 0;
+		const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestThreadAdditional', pid}).sort({toc: -1});
+		if(rewardLog) {
+		  additionalReward = rewardLog.num;
+    }
 		await post.update({digest: false});
 		const log = {
 			user: targetUser,
@@ -158,7 +167,7 @@ router
 		if(thread.oc === pid) {
 			await thread.update({digest: false});
 			// await db.UsersScoreLogModel.insertLog(log);
-      // await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx);
+      await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx, additionalReward);
 			log.type = 'score';
 			log.change = -1;
 			log.key = 'digestThreadsCount';
@@ -166,7 +175,7 @@ router
 		} else {
 			log.typeIdOfScoreChange = 'unDigestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
-      // await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx);
+      await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx, additionalReward);
 			log.key = 'digestPostsCount';
 			log.change = -1;
 			log.type = 'score';

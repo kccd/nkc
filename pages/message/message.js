@@ -1198,12 +1198,27 @@ $(function() {
               user: targetUser
             });
           } else {
-            // var hasNewMessage = false;
+            var hasNewMessage = false;
+            // 判断是否有新信息
+            for(var i = 0; i < app.userList.length; i++) {
+              var li = app.userList[i];
+              if(li.count !== 0) {
+                hasNewMessage = true;
+                app.selectUser(li);
+                break;
+              }
+            }
+            // 若没有新信息则打开第一个人
+            if(!hasNewMessage && app.userList.length > 0) {
+              var li = app.userList[0];
+              app.selectUser(li);
+            }
+            /*var hasNewMessage = false;
             // 判断是否有新信息
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
               if(li.count !== 0 && li.type === 'UTU') {
-                // hasNewMessage = true;
+                hasNewMessage = true;
                 app.selectUser({
                   type: 'UTU',
                   user: li.user
@@ -1212,7 +1227,7 @@ $(function() {
               }
             }
             // 若没有新信息则打开第一个人
-            /*if(!hasNewMessage && app.userList.length > 0) {
+            if(!hasNewMessage && app.userList.length > 0) {
               var li = app.userList[0];
               app.selectUser({
                 type: 'UTU',

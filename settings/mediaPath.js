@@ -2,50 +2,26 @@ const path = require('path');
 const diskOptions = require("./diskCharacterOptions");
 const mediaPathOptions = require("./mediaPathOptions");
 
-const mediaPicturePath = '/media/picture';
-const mediaVideoPath = '/media/video';
-const mediaAudioPath = '/media/audio';
-const mediaAttachmentPath = '/media/attachment';
-
 // 获取文件下载路径
 /**
  * para对象参数
- * path 2018/02/123456.jpg
- * ext jpg
- * type media
+ * toc 时间
+ * mediaType 文件类型，用来找取文件路径
  */
 function selectDiskCharacterDown(para) {
-  // 根据para.path获取盘符
-  let paraYear;
-  let paraMonth;
+  // 根据toc获取盘符
   let diskMark = "";
-  let finalPath = "";
-  let paraArr = para.path.split("/");
-  for(let p = 0;p < paraArr.length;p++){
-    if(paraArr[p].length < 1 || paraArr[p].length > 4){
-      continue;
-    }
-    if(paraArr[p].length == "4"){
-      paraYear = paraArr[p];
-    }
-    if(paraArr[p].length == "2"){
-      paraMonth = paraArr[p];
-    }
-  }
-  let timeStr = paraYear + "-" + paraMonth + "-01 00:00:00";
-  let paraTimeStr = new Date(timeStr).getTime();
+  let finalPath;
+  let tocStamp = new Date(para.toc).getTime();
   for(let d of diskOptions) {
-    if(d.diskStartTime < paraTimeStr && d.diskEndTime >= paraTimeStr) {
+    if(d.diskStartTime < tocStamp && d.diskEndTime >= tocStamp) {
       diskMark = d.diskName;
       break;
     }
   }
-  if(diskMark == ""){
-    diskMark = "C:"
-  }
-  // 根据para.type 和 para.ext获取pathObj中的路径
+  // 根据para.mediaType获取pathObj中的路径
   for(let op of mediaPathOptions){
-    if(op.type == para.type){
+    if(op.mediaType == para.mediaType){
       finalPath = diskMark + op.path;
     }
   }
@@ -54,7 +30,7 @@ function selectDiskCharacterDown(para) {
 
 
 // 获取文件上传路径
-function selectDiskCharacterUp(type) {
+function selectDiskCharacterUp(mediaType) {
   let diskMark = "";
   let finalPath = "";
   let nowTimeStamp = new Date().getTime();
@@ -65,10 +41,10 @@ function selectDiskCharacterUp(type) {
     }
   }
   if(diskMark == ""){
-    diskMark = "C:"
+    diskMark = "G:"
   }
   for(var op of mediaPathOptions){
-    if(op.type == type){
+    if(op.mediaType == mediaType){
       finalPath = diskMark + op.path;
     }
   }

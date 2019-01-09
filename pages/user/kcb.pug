@@ -35,6 +35,8 @@ block content
                 span(v-else-if='record.type === "inherit"') 其它未登记详情的记录
                 span(v-else-if='record.type === "share"') 分享
                 span(v-else-if='record.type === "shareRegister"') 分享注册
+                span(v-else-if='record.type === "digestThreadAdditional"') 文章被评为精选的额外奖励
+                span(v-else-if='record.type === "digestPostAdditional"') 回复被评为精选的额外奖励
                 span(v-else) {{record.kcbsType.description}}
               th
                 span(v-if='record.to === user.uid')
