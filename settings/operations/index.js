@@ -165,7 +165,7 @@ operationObj.operationTree = {
 
     subscription, // 首页我的关注
 
-    lottery, // 抽奖页
+		lottery, // 抽奖页
 	}
 };
 module.exports = operationObj;

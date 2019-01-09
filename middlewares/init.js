@@ -57,7 +57,9 @@ module.exports = async (ctx, next) => {
 	    writeFile: promisify(fs.writeFile),
 	    mkdir: promisify(fs.mkdir),
 	    exists: promisify(fs.exists),
+	    copyFile: promisify(fs.copyFile),
 	    createReadStream: fs.createReadStream,
+	    createWriteStream: fs.createWriteStream,
 	    stat: promisify(fs.stat),
       copyFile: promisify(fs.copyFile)
 	  };

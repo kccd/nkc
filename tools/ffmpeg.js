@@ -43,27 +43,69 @@ const videoFirstThumbTaker = async (videoPath,imgPath) => {
 
 // 视频转码为H264
 const videoTranscode= async(inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy','-movflags', 'faststart', '-y' ,outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy','-movflags', 'faststart', '-y' ,outputPath]);
 }
 
 // 降低视频码率
 const videoReduceRate = async(inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath]);
 }
 
 // 将元数据移动到视频的第一帧
 const videoMoveMetaToFirstThumb = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', outputPath]);
 }
 
 // 调整视频的像素与画面比例
 const videoSetPixelAndscale = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vf', 'scale=640:480', outputPath, '-hide_banner'])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vf', 'scale=640:480', outputPath, '-hide_banner']);
+}
+
+// 3GP转为MP4
+const video3GPTransMP4 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', outputPath]);
+}
+
+// MP4转码为H264
+const videoMP4TransH264 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-movflags', 'faststart', '-y', outputPath]);
+}
+
+// MOV转码为MP4
+const videoMOVTransMP4 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', outputPath])
+}
+
+// AVI转码为MP4
+const videoAVITransMP4 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', outputPath])
+}
+
+// AMR转码为MP3
+const audioAMRTransMP3 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+}
+
+// WAV转码为MP3
+const audioWAVTransMP3 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+}
+
+// WMA转码为MP3
+const audioWMATransMP3 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
 }
 module.exports = {
   videoFirstThumbTaker,
   videoTranscode,
   videoReduceRate,
   videoMoveMetaToFirstThumb,
-  videoSetPixelAndscale
+  videoSetPixelAndscale,
+  video3GPTransMP4,
+  videoMP4TransH264,
+  videoMOVTransMP4,
+  videoAVITransMP4,
+  audioAMRTransMP3,
+  audioWAVTransMP3,
+  audioWMATransMP3
 };

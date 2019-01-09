@@ -71,8 +71,8 @@ block content
 
 
 block scripts
-  script(src='/xss/dist/xss.js')
-  script(src='/icheck/icheck.js')
-  script(src='/interface_common.js')
-  script(src='/markdown-it/dist/markdown-it.js')
-  script(src='/problem/problem.js')
+  script(src=`/xss/dist/xss.js?v=${startTime}`)
+  script(src=`/icheck/icheck.js?v=${startTime}`)
+  script(src=`/interface_common.js?v=${startTime}`)
+  script(src=`/markdown-it/dist/markdown-it.js?v=${startTime}`)
+  script(src=`/problem/problem.js?v=${startTime}`)

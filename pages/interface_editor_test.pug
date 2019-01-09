@@ -4,6 +4,7 @@ block title
   title 编辑器 - 科创论坛
   
   include MathJax.pug
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${global.NKC.startTime}`)
   
 block content
   -var mainContainer1400 = true
@@ -63,13 +64,11 @@ block content
                       if data.user
                         a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
               .form-group
-              .nkcpanel(id='file-uploading' target='/r')
-                  //uploader section
-                  include interface_attachment_uploader_uploader.pug
+              //- .nkcpanel(id='file-uploading' target='/r')
+              //-     //uploader section
+              //-     include interface_attachment_uploader_uploader.pug
 
-              .panel.panel-default
-                  .panel-heading 我的附件（点击插入帖子）
-                  .panel-body(id='list-container')
+              include ./media/media_index.pug
 
               .form-group
                 //- input#parseURL(type='checkbox' checked)
@@ -87,6 +86,7 @@ block scripts
 
 
   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src="/jquery-1.10.2.js")
   script(src="/jquery-ui-1.10.4.custom.js")
   script(src='/commonmark/dist/commonmark.js')
@@ -105,10 +105,11 @@ block scripts
 
 
 
-  script(src='/interface_attachment_uploader.js?v=1')
-  script(type='text/jsx;harmony=true' src='/interface_attachment_list_display_test.js?v=1')
+  script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
+  script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
+  script(src=`/media/media_index.js?v=${startTime}`)
   script.
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){

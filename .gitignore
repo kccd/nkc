@@ -19,3 +19,6 @@
 /scripts
 /config.js
 /page/test
+/settings/diskCharacterOptions.js
+/settings/mediaPath.js
+/settings/mediaPathOptions.js
