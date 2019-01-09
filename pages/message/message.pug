@@ -33,6 +33,12 @@ block content
             div.ms-single-content-file(v-if="message.c.ty === 'file'")
               .message-file-name.fa.fa-file &nbsp;{{message.c.na}}
               a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
+              div(v-if="message.c.na.indexOf('mp3') > -1")
+                audio(:src="'/message/resource/' + message.c.id" controls="controls" style="background-color: #f1f3f4")
+            div.ms-single-content-file(v-if="message.c.ty === 'voice'" style="cursor:pointer", @click="stopOrStartPlay(index)")
+              span(style="width:5rem;vertical:middle" v-if="message.c.vl") {{secondToMinute(message.c.vl)}}"&nbsp;&nbsp;&nbsp;
+              audio(:src="'/message/resource/'+message.c.id+'?channel=mp3'" controls="controls" :id="'audio'+index", @ended="stopPlayType(index)" style="display:none")
+              img(:src="message.c.playType ? voiceImg.playRight : voiceImg.stopRight",style="width:50px")
       // 自己发出的信息
       .ms-single-right(v-else)
         .hidden-info {{format('YYYY-MM-DD HH:mm:ss', message.tc)}} {{user.username}}
@@ -59,6 +65,12 @@ block content
               span(v-else)
                 .message-file-name.fa.fa-file &nbsp;{{message.c.na}}
                 a(:href="'/message/resource/' + message.c.id" target="_blank") 点击下载
+                div(v-if="message.c.na.indexOf('mp3') > -1")
+                  audio(:src="'/message/resource/' + message.c.id" controls="controls" style="background-color: #f1f3f4")
+            div.ms-single-content-file(v-if="message.c.ty === 'voice'" style="cursor:pointer", @click="stopOrStartPlay(index)")
+              span(style="width:5rem;vertical:middle" v-if="message.c.vl") {{secondToMinute(message.c.vl)}}"&nbsp;&nbsp;&nbsp;
+              audio(:src="'/message/resource/'+message.c.id+'?channel=mp3'" controls="controls" :id="'audio'+index", @ended="stopPlayType(index)" style="display:none")
+              img(:src="message.c.playType ? voiceImg.playLeft : voiceImg.stopLeft", style="width:50px")
         .ms-single-img
           a(href=`/u/${data.user.uid}/settings` target="_blank")
             img(:src="'/avatar/' + message.s")

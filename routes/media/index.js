@@ -1,58 +1,32 @@
 const Router = require('koa-router');
-const resourceRouter = new Router();
+const mediaRouter = new Router();
 const pathModule = require('path');
-const util = require("util");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
-const videoExts = ["mp4", "mov", "3gp", "avi"];
+const videoExts = ["mp4", "mov"];
 const audioExts = ["mp3", "wav"];
-resourceRouter
+mediaRouter
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a resource ID is required.');
     await next()
   })
   .get('/:rid', async (ctx, next) => {
-    // const { rid } = ctx.params;
-    // const { data, db, fs, settings } = ctx;
-    // const { cache } = settings;
-    // const resource = await db.ResourceModel.findOnly({ rid });
-    // const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
-    // if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-    // // if (extArr.includes(resource.ext.toLowerCase()) && resource.references.length == 0 && (!data.user || data.user && data.user.uid !== resource.uid)) ctx.throw(403, '图片未发表在文章中，不可查看');
-    // const { path, ext } = resource;
-    // let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
-    // if (extArr.includes(resource.ext.toLowerCase())) {
-    //   try {
-    //     await fs.access(filePath);
-    //   } catch (e) {
-    //     filePath = ctx.settings.statics.defaultImageResourcePath;
-    //   }
-    //   ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
-    // }
-    // // 在resource中添加点击次数
-    // await resource.update({$inc:{hits:1}})
-    // ctx.filePath = filePath;
-    // ctx.resource = resource;
-    // ctx.type = ext;
-    // await next()
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
     const { rid } = ctx.params;
     const { data, db, fs, settings } = ctx;
     const { cache } = settings;
     const {mediaPath} = settings.upload;
-    const {mediaPicturePath, mediaVideoPath, mediaAudioPath, mediaAttachmentPath, selectDiskCharacterUp} = settings.mediaPath;
     let filePath;
     const resource = await db.ResourceModel.findOnly({ rid });
     const { path, ext } = resource;
     if(pictureExts.indexOf(resource.ext.toLowerCase()) > -1) {
-      filePath = selectDiskCharacterUp("mediaPicture");
+      filePath = mediaPath + "/picture/" + path;
     }else if(videoExts.indexOf(resource.ext.toLowerCase()) > -1) {
-      filePath = selectDiskCharacterUp("mediaVideo");
+      filePath = mediaPath + "/video/" + path;
     }else if(audioExts.indexOf(resource.ext.toLowerCase()) > -1) {
-      filePath = selectDiskCharacterUp("mediaAudio");
+      filePath = mediaPath + "/audio/" + path;
     }else{
-      filePath = selectDiskCharacterUp("mediaAttachment");
+      filePath = mediaPath + "/attachment/" + path;
     }
-    filePath = filePath + path;
     if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
     if (extArr.includes(resource.ext.toLowerCase())) {
       try {
@@ -75,7 +49,6 @@ resourceRouter
     const settings = ctx.settings;
     const { largeImage, upload } = settings.upload.sizeLimit;
     const { mediaPath, uploadPath, generateFolderName, thumbnailPath, frameImgPath} = settings.upload;
-    const {selectDiskCharacterUp} = settings.mediaPath;
     
     let mediaRealPath;
     const file = ctx.body.files.file;
@@ -86,32 +59,34 @@ resourceRouter
     // 获取文件格式 extension
     const extensionE = pathModule.extname(name).replace('.', '');
     let extension = extensionE.toLowerCase();
+    if(['mov'].indexOf(extension.toLowerCase()) > -1){
+      let extReg = RegExp(extension, "igm");
+      extension = "mp4";
+      name = name.replace(extReg, "mp4");
+    }
     // 图片最大尺寸
     // const { largeImage } = settings.upload.sizeLimit;
     // 根据自增id定义文件新名称 saveName
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
-    let saveName = rid + '.' + extension;
+    const saveName = rid + '.' + extension;
 
     // 根据上传类型确定文件保存路径
     // mediaRealPath
     if(pictureExts.indexOf(extension.toLowerCase()) > -1) {
-      // mediaRealPath = mediaPath + "/picture";
-      mediaRealPath = selectDiskCharacterUp("mediaPicture");
+      mediaRealPath = mediaPath + "/picture";
     }else if(videoExts.indexOf(extension.toLowerCase()) > -1) {
-      // mediaRealPath = mediaPath + "/video";
-      mediaRealPath = selectDiskCharacterUp("mediaVideo");
+      mediaRealPath = mediaPath + "/video";
     }else if(audioExts.indexOf(extension.toLowerCase()) > -1) {
-      // mediaRealPath = mediaPath + "/audio";
-      mediaRealPath = selectDiskCharacterUp("mediaAudio");
+      mediaRealPath = mediaPath + "/audio";
     }else{
-      // mediaRealPath = mediaPath + "/attachment";
-      mediaRealPath = selectDiskCharacterUp("mediaAttachment");
+      mediaRealPath = mediaPath + "/attachment"
     }
+
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
     const middlePath = generateFolderName(mediaRealPath);
     // 路径 d:\nkc\resources\video/2018/04/256647.mp4
-    let mediaFilePath = mediaRealPath + middlePath + saveName;
+    const mediaFilePath = mediaRealPath + middlePath + saveName;
 
     // 图片裁剪水印
     if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension.toLowerCase()) > -1) {
@@ -226,7 +201,7 @@ resourceRouter
       // }
     }
     // 视频压缩转码
-    if (videoExts.indexOf(extension.toLowerCase()) > -1) {
+    if (['mp4'].indexOf(extension.toLowerCase()) > -1) {
       //
       var timeStr = new Date().getTime();
       // 输出视频路径
@@ -234,33 +209,12 @@ resourceRouter
       var outputVideoPath = newpath + "/tmp/" + timeStr + ".mp4";
       // 视频封面图路径
       var videoImgPath = frameImgPath + "/" + rid + ".jpg";
-
-      if(['3gp'].indexOf(extension.toLowerCase()) > -1){
-        await ffmpeg.video3GPTransMP4(path, outputVideoPath);
-      }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoMP4TransH264(path, outputVideoPath);
-      }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
-      }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoAVITransMP4(path, outputVideoPath);
-      }
-
-      // 将元数据移动到视频的第一帧
-      // await ffmpeg.videoMoveMetaToFirstThumb(outputVideoPath, outputVideoPath);
-      // 移动已经转好码的视频文件再次移动到tmp临时文件夹下
+      await ffmpeg.videoTranscode(path, outputVideoPath);
       await fs.rename(outputVideoPath, path);
-      // 生成视频封面图
       await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
-      // 修改视频保存信息
-      let nameReg = new RegExp(extension, "igm");
-      name = name.replace(nameReg, "mp4");
-      extension = "mp4";
-      saveName = rid + "." + extension;
-      mediaFilePath = mediaFilePath.replace(nameReg, "mp4")
     } 
-    // await fs.rename(path, mediaFilePath);
-    await fs.copyFile(path, mediaFilePath);
-    await fs.unlink(path);
+
+    await fs.rename(path, mediaFilePath);
     const r = new ctx.db.ResourceModel({
       rid,
       oname: name,
@@ -274,4 +228,4 @@ resourceRouter
     ctx.data.r = await r.save();
     await next()
   })
-module.exports = resourceRouter;
+module.exports = mediaRouter;

@@ -35,9 +35,17 @@ const messageSchema = new Schema({
   * c: {
   *   type: String, [digestThread, digestPost, @, replyPost, replyThread, bannedThread, threadWasReturned, bannedPost, postWasReturned, recommend]
   * }
+  * na 文件名称
+  * id 文件id
+  * type 文件类型
+  *   voice 声音
+  *   img 图片
+  *   file 一般文件
   *
-  *
-  *
+  * pid
+  * type 
+  *   typeThread 回复帖子
+  *   typePost  回复单条回复
   * */
 
 
