@@ -114,13 +114,9 @@ async function sendMessage(channel, message) {
         });
       } else if(ty === 'UTU') {
         // 用户间的私信
-        console.log(message)
-        console.log(channel)
-        console.log(typeof(message))
         const sUser = await db.UserModel.findOne({uid: s});
         const rUser = await db.UserModel.findOne({uid: r});
         if(!sUser || !rUser) return;
-        console.log(sUser,rUser)
         io.to(`user/${r}`).emit('message', {
           user: sUser,
           targetUser: rUser,
