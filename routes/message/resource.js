@@ -97,8 +97,8 @@ resourceRouter
         }
       });
       await fs.rename(path, targetPath);
-      if(voiceExt.includes(ext)) {
-        // 将amr语音文件转为mp3
+      // 将amr语音文件转为mp3
+      if(voiceExt.includes(ext)){
         let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';
         let targetMp3Path = messageVoiceBrowser + voiceMp3Path;
         await ffmpeg.audioAMRTransMP3(targetPath, targetMp3Path);
