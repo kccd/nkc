@@ -7,6 +7,9 @@ html{
 [v-cloak]{
   display: none;
 }
+.mdui-typo a:before{
+  height: 0;
+}
 .mdui-header{
   border-bottom: 1px solid #f0f0f0;
 }

@@ -1,0 +1,28 @@
+extends ../publicModules/mdui_base
+block title
+  title 科创会员专业知识测验
+  link(rel='stylesheet' href=`/exam/exam.css?v=${startTime}`)
+  style.
+    body{
+      background-color: #f4f4f4;
+    }
+block content
+  .mdui-container.mdui-typo#app(v-if='category && paper' v-cloak)
+    .mdui-row
+      .mdui-col-xs-12.mdui-col-md-9
+        .mdui-shadow-1.mdui-color-white.mdui-m-t-3
+          div.paper-panel(v-for='q, index of questions')
+            .paper-content {{index+1}}. {{q.content}}
+            img.paper-img(v-if='q.hasImage' :src='"/exam/question/" + q._id + "/image"')
+            input(v-if='q.type === "ans"')
+
+      .mdui-col-xs-12.mdui-col-md-3
+        h3 科创会员专业知识测验
+        h5 考试科目：{{category.name + ' ' + paper.volume}}卷
+        h5 开考时间：{{format('YYYY-MM-DD HH:mm:ss', paper.toc)}}
+        h5 考试时长：{{category['paper' + paper.volume + 'Time']}} 分钟
+        h5(v-if='countdown') 剩余时间：{{countdown}}
+        h5.mdui-text-color-red(v-if='timeOut') 考试已结束
+
+block scripts
+  script(src=`/exam/paper.js?v=${startTime}`)

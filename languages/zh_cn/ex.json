@@ -6,5 +6,11 @@
   "viewRecord": "查看记录",
   "identityReview": "身份审核",
   "settings": "设置",
-  "console": "控制台"
+  "console": "控制台",
+  "baseSettings": "基本设置",
+  "otherSettings": "其他设置",
+  "smsSettings": "短信",
+  "emailSettings": "邮件",
+  "postSettings": "发表",
+  "exam": "考试"
 }

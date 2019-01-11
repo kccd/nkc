@@ -1,0 +1,117 @@
+extends ../publicModules/mdui_base
+block title
+  title= `${data.category.name} | 科创考试`
+  link(rel='stylesheet' href=`/exam/exam.css?v=${startTime}`)
+block content
+  .mdui-container.mdui-typo#app(v-cloak)
+    .mdui-row.mdui-m-t-3
+      .mdui-col-xs-12.mdui-col-md-12
+        span 所有考试科目：
+        span(v-for='c in categories' style='margin-right: 1rem;')
+          a.mdui-text-color-theme(:href='"/exam/category/" + c._id') {{c.name}}
+      .mdui-col-xs-12.mdui-col-md-8
+        div
+          h3.mdui-text-color-theme(style='line-height: 2rem!important;')= data.category.name
+            small.mdui-m-l-2(style='font-size: 1.2rem;')
+              | A卷：
+              if data.category.disabledA
+                | 已启用
+              else
+                | 已屏蔽
+              | &nbsp;&nbsp;&nbsp;&nbsp;B卷：
+              if data.category.disabledA
+                | 已启用
+              else
+                | 已屏蔽
+
+          p= data.category.description
+          if permission('postQuestion')
+            button.mdui-btn.mdui-color-theme-400.mdui-btn-dense(@click='displayEditor()') 添加考试题
+          if permission('visitExamSettings')
+            button.mdui-btn.mdui-color-theme-400.mdui-btn-dense(@click='visitSettings(category)') 设置
+          div(v-for='q in questions').question-panel
+            span
+              img.question-user-avatar(:src='"/avatar/" + q.uid' style='height: 1.5rem;width: 1.5rem;border-radius: 50%;')
+              a(:href="'/u/' + q.uid" target='_blank') {{q.user.username}}
+            span.question-time {{fromNow(q.toc)}}
+            span.question-type {{q.type==='ch4'?'单项选择题':'问答题'}}
+            span {{q.volume}}卷
+            span(style='cursor: pointer' @click='displayEditor(q)') 编辑
+            span.mdui-text-color-red(v-if='q.disabled' style='cursor: pointer' @click='disabledQuestion(q, false)') 解除屏蔽
+            span(v-else style='cursor: pointer' @click='disabledQuestion(q, true)') 屏蔽
+            .question-content 问题：{{q.content}}
+            img(:src="'/exam/question/'+q._id+'/image' + (q.t?'?t=' + q.t: '')" v-if='q.hasImage')
+            div.question-answer
+              div.question-content(style='display: table-cell; width: 4rem;') 回答：
+              div(style='display: table-cell')
+                div(v-for='a, index in q.answer' :class='{"mdui-text-color-green": index === 0, "mdui-text-color-red": index !== 0}') {{q.answer.length !== 1?index + 1 + '.':''}} {{a}}
+        include ../publicModules/paging_button
+          .question-editor(v-if='editor')
+            .question-editor-body.mdui-p-b-5
+              .question-header
+                <button @click='editor = false' class="mdui-btn mdui-btn-icon mdui-color-theme mdui-ripple"><i class="mdui-icon material-icons">close</i></button>
+              .question-info
+                h3 指导意见
+                ol
+                  li 不要出作业练习题。不要出炫技计算题。
+                  li 每道问答题只允许有一种回答方式。请通过在题目中提示格式，避免答题时出现诸如“到底写1/2还是0.5”的问题。
+                  li 对于专业题，请确保：学习过该专业知识/在该行业工作的人士应能在30秒内得出答案，而一般人通过搜索等方法很难在5分钟内得到答案。
+                h5 题目分类
+                <select class="mdui-select mdui-m-r-4" mdui-select="{position: 'bottom'}" v-model='question.cid' v-if='question._id'>
+                  <option v-for='c in categories' :value='c._id'>{{c.name}}</option>
+                </select>
+                <label class="mdui-radio mdui-m-r-3">
+                <input type="radio" name="group2" value='A' v-model='question.volume'>
+                <i class="mdui-radio-icon"></i>
+                | A卷
+                </label>
+                <label class="mdui-radio">
+                <input type="radio" name="group2" value='B' v-model='question.volume'>
+                <i class="mdui-radio-icon"></i>
+                | B卷
+                </label>
+
+                <div class="mdui-textfield">
+                  h5 题目内容
+                  <textarea class="mdui-textfield-input" type="text" v-model='question.content'></textarea>
+                </div>
+                input.mdui-hidden(ref='input' type='file' @change='inputChange' accept="image/*")
+                button.mdui-btn.mdui-color-theme-50.mdui-m-b-2.mdui-m-t-2(@click='clickInput') 选择图片
+                button.mdui-btn.mdui-color-theme-50.mdui-m-b-2.mdui-m-t-2(@click='removeImage' v-if='question.baseUrl || question.hasImage') 删除图片
+                div
+                  img(v-if='question.baseUrl' :src='question.baseUrl')
+                  img(v-else-if='question.hasImage' :src='"/exam/question/" + question._id + "/image"')
+                br
+                <label class="mdui-radio mdui-m-r-3">
+                <input type="radio" name="group1" value='ch4' v-model='question.type'>
+                <i class="mdui-radio-icon"></i>
+                | 单项选择题
+                </label>
+                <label class="mdui-radio">
+                <input type="radio" name="group1" value='ans' v-model='question.type'>
+                <i class="mdui-radio-icon"></i>
+                | 问答题
+                </label>
+                <div class="mdui-textfield" v-if='question.type === "ans"'>
+                  h5 答案
+                  <textarea class="mdui-textfield-input" type="text" v-model='question.arr[0].text'></textarea>
+                </div>
+                div(v-else)
+                  <div class="mdui-textfield" v-for='a, index in question.arr' v-if='index === 0'>
+                    h5.mdui-text-color-green 正确答案
+                    <textarea class="mdui-textfield-input" type="text" v-model='a.text'></textarea>
+                  </div>
+                  .mdui-row
+                    .mdui-col-xs-12
+                      <div class="mdui-textfield" v-for='a, index in question.arr' v-if='index !== 0'>
+                      h5.mdui-text-color-red 错误答案 {{index}}
+                        //<button class="mdui-m-l-3 mdui-color-theme-50 mdui-btn mdui-ripple mdui-btn-dense" v-if='index > 1' @click='removeAnswer(a)'>删除</button>
+                      <textarea class="mdui-textfield-input" type="text" v-model='a.text'></textarea>
+                      </div>
+
+                  //button.mdui-btn.mdui-color-theme-50.mdui-m-t-2(@click='addWrongAnswer') 添加错误答案
+                button.mdui-m-t-3.mdui-btn.mdui-color-theme-400.mdui-btn-block(@click='save') 保存
+      .mdui-col-xs-12.mdui-col-md-3.mdui-col-offset-md-1
+
+block scripts
+  script(src=`/exam/category.js?v=${startTime}`)

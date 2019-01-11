@@ -2,9 +2,15 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
-		data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
-		ctx.template = 'experimental/settings/exam.pug';
+	  const from = ctx.get('FROM');
+	  if(from !== 'nkcAPI') {
+      ctx.template = 'experimental/settings/exam.pug';
+      return await next();
+    }
+		const {data, db, query} = ctx;
+	  const {cid} = query;
+	  if(cid) data.cid = cid;
+		data.examsCategories = await db.ExamsCategoryModel.find().sort({order: 1});
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

@@ -1,6 +1,7 @@
 module.exports = {
   _id: 'exam',
   c: {
-    volumeAFailedPostCountOneDay: 5
+    examsQuestionsCount: 10,
+    passScore: 6
   }
 };

@@ -9,13 +9,21 @@ router
       ctx.template = 'experimental/settings/post.pug';
       return await next();
     }
+    data.postSettings = await db.SettingModel.findOnly({_id: 'post'});
     data.roles = await db.RoleModel.find().sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({toc: 1});
     await next();
   })
   .patch('/', async (ctx, next) => {
+    // 等待考试设置，设置考试试卷数量
     const {body, db} = ctx;
-    const {roles, grades} = body;
+    const {roles, grades, postToThread, postToForum} = body;
+    if(postToForum) {
+      await db.SettingModel.updateOne({_id: 'post', 'c.postToForum': postToForum});
+    }
+    if(postToThread) {
+      await db.SettingModel.updateOne({_id: 'post', 'c.postToThread': postToThread});
+    }
     await Promise.all(roles.map(async role => {
       await db.RoleModel.update({_id: role._id}, {
         $set: {

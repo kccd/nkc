@@ -82,3 +82,11 @@ body{
   background-color: #fff;
   margin: 0.5rem 0;
 }
+.table-input{
+  margin: 0 0.5rem;
+  width: 4rem;
+  font-size: 1.2rem;
+}
+.mdui-list-active{
+  background-color: #f0f0f0;
+}

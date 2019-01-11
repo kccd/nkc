@@ -7,6 +7,38 @@
       if permission('visitExperimentalStatus')
         li
           a(href='/e')=lang('ex', 'status')
+      if permission('visitExperimentalConsole')
+        li
+          a(href='/e/console')=lang('ex', 'console')
+      li.dropdown
+        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+          span= lang('ex', 'baseSettings') + ' '
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          if permission('visitWebBaseSettings')
+            li
+              a(href='/e/settings/base')=lang('ex', 'baseSettings')
+      li.dropdown
+        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
+          span= lang('ex', 'otherSettings') + ' '
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          if permission('visitSmsSettings')
+            li
+              a(href='/e/settings/sms')=lang('ex', 'smsSettings')
+          if permission('visitExperimentalEmailSettings')
+            li
+              a(href='/e/settings/sms')=lang('ex', 'emailSettings')
+          if permission('visitEPostSettings')
+            li
+              a(href='/e/settings/post')=lang('ex', 'postSettings')
+          if permission('visitExamSettings')
+            li
+              a(href='/e/settings/exam')=lang('ex', 'exam')
+
+
+      li.dropdown
+
       if permission('visitSystemInfo')
         li
           a(href='/e/systemInfo')=lang('ex', 'sendSystemNotification')
@@ -16,9 +48,6 @@
       if permission('visitProblemList')
         li
           a(href='/problem/list')=lang('ex', 'problems')
-      if permission('visitExperimentalConsole')
-        li
-          a(href='/e/console')=lang('ex', 'console')
 
 
       // li.dropdown(role='presentation')

@@ -75,7 +75,53 @@ const roleSchema = new Schema({
 	postToForumCountLimit: {
 		type: Number,
 		default: 0
-	}
+	},
+
+  postToForum: {
+	  countLimit: {
+	    unlimited: {
+	      type: Boolean,
+        default: true
+      },
+      num: {
+	      type: Number,
+        default: 0
+      }
+    },
+    timeLimit: {
+      unlimited: {
+        type: Boolean,
+        default: true
+      },
+      num: {
+        type: Number,
+        default: 0
+      }
+    }
+  },
+  postToThread: {
+	  countLimit: {
+      unlimited: {
+        type: Boolean,
+        default: true
+      },
+      num: {
+        type: Number,
+        default: 0
+      }
+    },
+    timeLimit: {
+      unlimited: {
+        type: Boolean,
+        default: true
+      },
+      num: {
+        type: Number,
+        default: 0
+      }
+    }
+  }
+
 }, {
 	collection: 'roles'
 });

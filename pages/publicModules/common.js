@@ -45,7 +45,14 @@ NKC.methods.scrollToTop = function(number, time) {
     }
   }, spacingTime);
 };
-
+NKC.methods.format = function(m, t) {
+  if(typeof moment === "undefined") throw 'moment is not loaded';
+  return moment(t).format(m);
+};
+NKC.methods.fromNow = function(t) {
+  if(typeof moment === "undefined") throw 'moment is not loaded';
+  return moment(t).fromNow();
+};
 // 发起请求
 function kcAPI(url, method, data) {
   var options = {
@@ -78,7 +85,7 @@ function kcAPI(url, method, data) {
 // 上传文件
 // 将文件添加到formData
 // formData可添加其他需上传的数据，表明图片的属性
-function uploadFileAPI(url, formData, onUploadProgress) {
+function uploadFileAPI(url, method, formData, onUploadProgress) {
   var options = {
     method: method,
     url: url,

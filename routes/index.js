@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const moment = require('moment');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
@@ -26,6 +25,7 @@ const friendCategoryRouter = routers.friendCategory;
 const homeRouter = routers.home;
 const shareRouter = routers.share;
 const lotteryRouter = routers.lottery;
+const examRouter = routers.exam;
 
 
 // 所有请求先经过此中间件
@@ -90,4 +90,5 @@ router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods())
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
 router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
 router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
+router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 module.exports = router;

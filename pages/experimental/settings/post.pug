@@ -2,19 +2,162 @@ extends ../../bootstrap_base
 
 block title
   -const mainContainer1400 = true;
-  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
-  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
-  link(href='/experimental/index.css' rel='stylesheet')
-  title 发表内容限制
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+  link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
+  title 发表设置
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid(style='max-width: 1400px;').mdui-m-b-5
     .row
       include ../nav
       .col-xs-12.col-md-12
-        .row#app(v-cloak)
+        .row#app(v-cloak v-if='postSettings')
           .col-xs-12.col-md-12
+            .row
+              .col-sm-12.mdui-m-a-1
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postToForum"}' @click='type = "postToForum"') 发表文章
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postToThread"}' @click='type = "postToThread"') 发表回复
+              .col-sm-2.text-right
+                h4 最小认证等级
+              .col-sm-10
+                <label class="mdui-radio mdui-m-r-2">
+                <input type="radio" value='0' v-model='postSettings[type].authLevelMin' />
+                <i class="mdui-radio-icon"></i>
+                | 等级0（已注册）
+                </label>
+                <label class="mdui-radio mdui-m-r-2">
+                <input type="radio" value='1' v-model='postSettings[type].authLevelMin' />
+                <i class="mdui-radio-icon"></i>
+                | 等级1（绑定手机号码）
+                </label>
+                <label class="mdui-radio">
+                <input type="radio" value='2' v-model='postSettings[type].authLevelMin'/>
+                <i class="mdui-radio-icon"></i>
+                | 等级2（身份证正反面照）
+                </label>
+                <label class="mdui-radio">
+                <input type="radio" value='3' v-model='postSettings[type].authLevelMin'/>
+                <i class="mdui-radio-icon"></i>
+                | 等级3（手持省份证照）
+                </label>
+                hr
+            .row
+              .col-sm-2.text-right
+                h4 通过考试
+              .col-sm-10
+                <label class="mdui-checkbox mdui-m-r-2">
+                <input type="checkbox" value="notPass" v-model='postSettings[type].exam'/>
+                <i class="mdui-checkbox-icon"></i>
+                | 未考试
+                </label>
+                <label class="mdui-checkbox mdui-m-r-2">
+                <input type="checkbox" value="volumeB" v-model='postSettings[type].exam'/>
+                <i class="mdui-checkbox-icon"></i>
+                | A卷
+                </label>
+                <label class="mdui-checkbox ">
+                <input type="checkbox" value="volumeA" v-model='postSettings[type].exam'/>
+                <i class="mdui-checkbox-icon"></i>
+                | B卷
+                </label>
+                div(v-if="displayNotPassCountLimit")
+                  h5 未考试用户发表数目限制
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" value='true' v-model='postSettings[type].examCountLimit.unlimited' name='notPassExamCount'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 无限制
+                  </label>
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" value='false' v-model='postSettings[type].examCountLimit.unlimited' name='notPassExamCount'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 限制
+                  </label>
+                  span
+                    input(class="table-input" v-model='postSettings[type].examCountLimit.countLimit')
+                    | &nbsp;条/每天
+                hr
+            .row
+              .col-sm-2.text-right
+                h4 角色限制
+              .col-sm-10
+                .mdui-table-fluid
+                  table.mdui-table
+                    thead
+                      tr
+                        th 角色名
+                        th 每天最大条数
+                        th 最小间隔时间
+                    tbody
+                      tr(v-for='role, index in roles')
+                        th {{role.displayName}}
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='role[type].countLimit.unlimited' :name="role._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio"value="false" v-model='role[type].countLimit.unlimited' :name="role._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model='role[type].countLimit.num')
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='role[type].timeLimit.unlimited' :name="role._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio" value="false" v-model='role[type].timeLimit.unlimited' :name="role._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model='role[type].timeLimit.num')
+                hr
+            .row
+              .col-sm-2.text-right
+                h4 等级限制
+              .col-sm-10
+                .mdui-table-fluid
+                  table.mdui-table
+                    thead
+                      tr
+                        th 等级名
+                        th 每天最大条数
+                        th 最小间隔时间
+                    tbody
+                      tr(v-for='grade, index in grades')
+                        th {{grade.displayName}}
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='grade[type].countLimit.unlimited' :name="grade._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio" value="false" v-model='grade[type].countLimit.unlimited' :name="grade._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model='grade[type].countLimit.num')
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='grade[type].timeLimit.unlimited'  :name="grade._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio" value="false" v-model='grade[type].timeLimit.unlimited' :name="grade._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model='grade[type].timeLimit.num')
+            .row
+              .col-sm-10.col-sm-offset-2.mdui-m-t-3.text-right
+                button.mdui-btn.mdui-color-theme.mdui-btn-block(@click='save') 保存
+          //.col-xs-12.col-md-12
             h5.text-danger 说明：文章数和回复数取最大值，发表文章和发表回复的间隔时间取最小值。
             table.table.table-striped
               thead
@@ -39,7 +182,7 @@ block content
                     input(style="max-width: 6rem;" type="number" v-model="role.postToThreadTimeLimit")
             button.btn.btn-primary(@click='submit') 保存
 
-          .col-xs-12.col-md-12(style='margin-top: 2rem;')
+          //.col-xs-12.col-md-12(style='margin-top: 2rem;')
             table.table.table-striped
               thead
                 tr
@@ -63,6 +206,7 @@ block content
                     input(style="max-width: 6rem;" type="number" v-model="grade.postToThreadTimeLimit")
             button.btn.btn-primary(@click='submit') 保存
 block scripts
+  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src=`/interface_common.js?=${global.NKC.startTime}`)
   script(src=`/experimental/settings/post.js?=${global.NKC.startTime}`)
 
