@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const downloadRouter = new Router();
 const fss = require("fs");
+const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 
 downloadRouter
 .post('/', async (ctx, next) => {
@@ -78,6 +79,8 @@ downloadRouter
     let funcResult = await downloadImg(url, './tmp/upload_'+timeStr);
     
     //获得图片格式和尺寸
+    const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
+    const {selectDiskCharacterUp} = settings.mediaPath;
     const extension = funcResult.exts;
     const size = funcResult.sizes;
     const name = timeStr + '.' + extension;
@@ -88,13 +91,19 @@ downloadRouter
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     // 图片名称279471.png
     const saveName = rid + '.' + extension;
-    const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
-    // 图片储存路径 /2018/04/
-    const relPath = generateFolderName(uploadPath);
-    // 路径 d:\nkc\resources\upload/2018/04/
-    const descPath = uploadPath + relPath;
-    // 路径+图片名称 d:\nkc\resources\upload/2018/04/279472.png
-    const descFile = descPath + saveName;
+
+    let mediaRealPath = selectDiskCharacterUp("mediaPicture");
+    let mediaType = "mediaPicture";
+    let middlePath = generateFolderName(mediaRealPath);
+    // 路径 d:\nkc\resources\video/2018/04/256647.mp4
+    let mediaFilePath = mediaRealPath + middlePath + saveName;
+
+    // // 图片储存路径 /2018/04/
+    // const relPath = generateFolderName(uploadPath);
+    // // 路径 d:\nkc\resources\upload/2018/04/
+    // const descPath = uploadPath + relPath;
+    // // 路径+图片名称 d:\nkc\resources\upload/2018/04/279472.png
+    // const descFile = descPath + saveName;
     // 如果格式满足则生成缩略图
     const descPathOfThumbnail = generateFolderName(thumbnailPath); // 存放路径
     const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 路径+名称
@@ -210,16 +219,19 @@ downloadRouter
     // //         await imageMagick.watermarkify(path);
     // //     }
     // // }
-    await fs.rename(path, descFile);
+    await fs.copyFile(path, mediaFilePath);
+    await fs.unlink(path);
+    // await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
       oname: name,
-      path: relPath + saveName,
-      tpath: relPath + saveName,
+      path: middlePath + saveName,
+      tpath: middlePath + saveName,
       ext: extension,
       size,
       uid: ctx.data.user.uid,
-      toc: Date.now()
+      toc: Date.now(),
+      mediaType: mediaType
     });
     ctx.data.r = await r.save();
     await next()
