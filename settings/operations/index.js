@@ -46,7 +46,7 @@ const forgotPassword = require('./forgotPassword');
 const app = require('./app');
 const message = require('./message');
 const activity = require('./activity');
-const share = require('./share');
+const s = require('./share');
 const friend = require('./friend');
 const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
@@ -86,6 +86,7 @@ operationObj.operationTree = {
 		rt,
 
 		default: resourceObj.default,
+		attachIcon: resourceObj.attachIcon,
 
 		cover,// 文章封面
 
@@ -154,7 +155,7 @@ operationObj.operationTree = {
 
 		activity, //活动
 
-		share, // 分享
+		s, // 分享
 
 		message, // 信息（新）
 

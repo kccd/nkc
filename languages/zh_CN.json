@@ -377,6 +377,7 @@
     "addProblemsType": "添加<报告问题-问题类型>",
     "modifyProblemsType": "修改<报告问题-问题类型>",
     "deleteProblemsType": "删除<报告问题-问题类型>",
+    "getAttachmentIcon": "附件图标",
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",
