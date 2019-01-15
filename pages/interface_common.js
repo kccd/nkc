@@ -1428,7 +1428,7 @@ function addFriendByUid() {
 function shareTo(shareType, type, str, title, pid){
   var host = window.location.host;
   var lk = 'http://'+host+'/default/logo3.png'
-  if(type !== "weChat"){
+  if(type !== "weChat" && type !== "link"){
     var newLink = window.open();
   }
   if(str){
@@ -1437,7 +1437,7 @@ function shareTo(shareType, type, str, title, pid){
       'type': shareType,
       targetId: pid // 与type类型对应的Id
     }
-    nkcAPI('/share', "POST", para)
+    nkcAPI('/s', "POST", para)
     .then(function(data) {
       var newUrl = 'http://' + host + data.newUrl;
       if(type == "qq") {

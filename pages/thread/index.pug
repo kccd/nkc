@@ -298,6 +298,15 @@ block content
                               button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
                           .form-group(style="background-color:#fff;")
                             div#ReplyContent
+                          .form-group
+                          //- .nkcpanel(id='file-uploading' target='/r')
+                          //-   //uploader section
+                          //-   include ../interface_attachment_uploader_uploader.pug
+
+                          //- .panel.panel-default
+                          //-   .panel-heading 我的附件（点击插入帖子）
+                          //-   .panel-body(id='list-container')
+                          include ../media/media_index.pug
                           .form-inline
                             .form-group
                               button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
@@ -314,16 +323,6 @@ block content
                             //- include twemoji.pug
                             .form-group
                               button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
-                          .form-group
-                          //- .nkcpanel(id='file-uploading' target='/r')
-                          //-   //uploader section
-                          //-   include ../interface_attachment_uploader_uploader.pug
-
-                          //- .panel.panel-default
-                          //-   .panel-heading 我的附件（点击插入帖子）
-                          //-   .panel-body(id='list-container')
-                          include ../media/media_index.pug
-
 
                         if hasMobile
                           if !thread.closed
@@ -398,23 +397,25 @@ block content
     include ../post_to_recycle.pug
 block scripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src='/module_dropdown.js?v=3')
-  script(src=`/thread/index.js?v=${global.NKC.startTime}`)
-  script.
-    common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src='/module_dropdown.js?v=3')
+  script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
+  link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
+  script(src=`/thread/index.js?v=${global.NKC.startTime}`)
+  script.
+    common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
   script(src=`/thread/socket.js?v=${startTime}`)
   script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
-  script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
+  //- script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
+  //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
   script(src=`/media/media_index.js?v=${startTime}`)
