@@ -1,7 +1,7 @@
 module.exports = [
   {
-    // diskName: "E:/nkc/resources",
-    diskName: "G:",
+    diskName: "E:/nkc/resources",
+    // diskName: "G:",
     diskStartTime: 0,
     diskEndTime: 1735660800000, // 202501
   },
