@@ -32,6 +32,8 @@ var getNewMessageNumber = function() {
 var setNewMessageNumber = function(number) {
   var elements = $('.nav-message-num');
   if(elements.length === 0) return 0;
+  var redPoint = $('.newMessagePoint');
+  redPoint.css('display', 'block');
   elements.text(number).removeClass('disabled');
 };
 

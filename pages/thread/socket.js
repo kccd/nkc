@@ -1,3 +1,4 @@
+/*
 var tid = document.getElementById('threadId');
 tid = tid.innerText;
 var threadSocket = io('/thread', {
@@ -25,4 +26,4 @@ threadSocket.on('disconnect', function() {
 });
 threadSocket.on('postToThread', function(data) {
   console.log(data.post.c);
-});
+});*/
