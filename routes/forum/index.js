@@ -95,7 +95,7 @@ forumRouter
     if(postToForumCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
     const latestThreadLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToForum', toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
     if(latestThreadLog) ctx.throw(400, `您当前的账号等级限定发文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
-
+ 
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);
 		data.post = _post;
