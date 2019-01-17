@@ -63,10 +63,10 @@ style.
         // 全部 all
         .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(all, index) in mediaAllLists")
-            .mdui-grid-tile(@click="allInsert(all.rid, all.ext, all.oname)" v-bind:title="all.rid")
+            .mdui-grid-tile(@click="allInsert(all.rid, all.ext, all.oname)" v-bind:title="all.oname")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
               img(v-bind:src="'/rt/'+all.rid" style="height:90px;cursor: pointer")
-              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="all.oname")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
                 .mdui-grid-tile-text
                   .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
                 //- .mdui-grid-tile-buttons
@@ -75,10 +75,10 @@ style.
         // 图片 picture
         .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#picturesDom(v-bind:style="mediaType == 'picture' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(picture, index) in mediaPictureLists")
-            .mdui-grid-tile(@click="pictureInsert(picture.rid, picture.ext, picture.oname)")
+            .mdui-grid-tile(@click="pictureInsert(picture.rid, picture.ext, picture.oname)" v-bind:title="picture.oname")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
               img(v-bind:src="'/rt/'+picture.rid" style="height:90px;cursor: pointer")
-              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="picture.oname")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
                 .mdui-grid-tile-text
                   .mdui-grid-tile-title(style="font-size:13px") {{picture.oname}}
                 .mdui-grid-tile-buttons
@@ -91,7 +91,7 @@ style.
             .mdui-grid-tile(v-bind:title="video.oname" @click="videoInsert(video.rid, video.ext, video.oname)")
               .mdui-card
                 .mdui-card-media(style="cursor: pointer")
-                  img(v-bind:src="'/frameImg/' + video.rid" title="123456" style="width:100%;height:90px")
+                  img(v-bind:src="'/frameImg/' + video.rid" style="width:100%;height:90px")
                   //- a(v-bind:href="'/r/'+video.rid" target="_blank")
                   //- span(style="position:absolute;top:0;bottom:0;left:0;right:0;background-color:rgba(0, 0, 0, 0.5);line-height:150px;text-align:center;")
                   //-   i.fa.fa-play-circle-o(style="font-size:50px;color:#fff;display: inline;cursor: pointer;")
@@ -105,9 +105,9 @@ style.
         // 音频 audio
         .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#audiosDom(v-bind:style="mediaType == 'audio' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(audio, index) in mediaAudioLists")
-            .mdui-grid-tile
+            .mdui-grid-tile(style="max-height:100px")
               .mdui-card
-                .mdui-card-media(@click="audioInsert(audio.rid, audio.ext, audio.oname)" style="cursor:pointer")
+                .mdui-card-media(@click="audioInsert(audio.rid, audio.ext, audio.oname)" style="cursor:pointer" v-bind:title="audio.oname")
                   img(src="/default/music.png")
                 .mdui-card-primary(style="padding:5px")
                   .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{audio.oname}}
@@ -118,12 +118,12 @@ style.
         //-     .ResourceListItemText {{attachment.oname}}
         .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#attachmentsDom(v-bind:style="mediaType == 'attachment' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(attachment, index) in mediaAttachmentLists")
-            .mdui-grid-tile
-              .mdui-card(@click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer")
+            .mdui-grid-tile(style="max-height:100px")
+              .mdui-card(@click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer" v-bind:title="attachment.oname")
                 .mdui-card-media
                   img(v-bind:src="'/attachIcon/'+attachment.ext+'.png'")
                 .mdui-card-primary(style="padding:5px")
-                  .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{attachment.oname}}
+                  .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{fileNameShrink(attachment.oname,8)}}
         // 上传 upload
         .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#uploadDom(v-bind:style="mediaType == 'upload' ? 'display:block' : 'display:none'")
           .mdui-row
@@ -208,7 +208,7 @@ style.
           table.mdui-table.mdui-table-hoverable            
             tbody
               tr(v-for = "(file, index) in uploadFileInfoArr" v-if="file.showType") 
-                td(v-bind:id="'#name'+index") {{fileNameShrink(file.name)}}
+                td(v-bind:id="'#name'+index") {{fileNameShrink(file.name, 6)}}
                 td(v-bind:id="'#percent'+index") {{file.percent}}%
                 td(v-bind:id="'#status'+index" v-if="file.statusType == 'fail'" style="color:red") 上传失败
                 td(v-bind:id="'#status'+index" v-else) {{file.status}}

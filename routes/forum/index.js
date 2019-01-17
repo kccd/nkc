@@ -5,6 +5,7 @@ const homeRouter = require('./home');
 const latestRouter = require('./latest');
 const followerRouter = require('./follower');
 const visitorRouter = require('./visitor');
+const path = require('path');
 const forumRouter = new Router();
 
 forumRouter
@@ -97,12 +98,26 @@ forumRouter
 
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);
-    data.post = _post;
+		data.post = _post;
     const type = ctx.request.accepts('json', 'html');
     await forum.update({$inc: {'tCount.normal': 1}});
     const thread = await ThreadModel.findOnly({tid: _post.tid});
-    data.thread = thread;
-
+		data.thread = thread;
+		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
+		const {coverPath} = ctx.settings.upload;
+    const {coverify} = ctx.tools.imageMagick;
+		await thread.extendFirstPost();
+		await thread.firstPost.extendResources();
+		const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg'].indexOf(e.ext.toLowerCase()) > -1);
+		const middlePath = selectDiskCharacterDown(cover);
+		const coverMiddlePath  = path.join(middlePath, cover.path);
+		if(cover) {
+			await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
+				.catch(e => {
+					thread.hasCover = false;
+					return thread.save()
+				});
+		}
 		// 发帖数加一并生成记录
 		const obj = {
 			user,

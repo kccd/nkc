@@ -378,6 +378,7 @@
     "modifyProblemsType": "修改<报告问题-问题类型>",
     "deleteProblemsType": "删除<报告问题-问题类型>",
     "getAttachmentIcon": "附件图标",
+    "removeForumCategory": "删除专业中的文章分类",
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",

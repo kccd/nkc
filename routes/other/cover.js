@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const router = new Router();
 const mime = require('mime');
 const path = require('path');
-const {upload, statics, cache} = require('../../settings');
+const {upload, statics, cache, mediaPath} = require('../../settings');
 const {coverPath, uploadPath} = upload;
+const {selectDiskCharacterDown} = mediaPath;
 
 router
   .get('/', async (ctx, next) => {
@@ -24,8 +25,10 @@ router
       await thread.extendFirstPost();
       await thread.firstPost.extendResources();
       const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg'].indexOf(e.ext.toLowerCase()) > -1);
+      const middlePath = selectDiskCharacterDown(cover);
+      const coverMiddlePath  = path.join(middlePath, cover.path);
       if(cover) {
-        await coverify(path.join(uploadPath, cover.path), `${coverPath}/${tid}.jpg`)
+        await coverify(coverMiddlePath, `${coverPath}/${tid}.jpg`)
           .catch(e => {
             thread.hasCover = false;
             return thread.save()

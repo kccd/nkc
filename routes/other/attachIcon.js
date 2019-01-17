@@ -19,7 +19,7 @@ router
     ctx.filePath = filePath;
     ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
     const [name, ext] = file;
-    ctx.type = ext;
+    ctx.type = "png";
     await next()
   });
 

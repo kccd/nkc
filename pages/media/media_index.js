@@ -68,8 +68,8 @@ $(document).ready(function() {
       cancelFailure: function(index) {
         return cancelFailure(index);
       },
-      fileNameShrink: function(name) {
-        return fileNameShrink(name);
+      fileNameShrink: function(name, length) {
+        return fileNameShrink(name, length);
       }
     }
   })
@@ -362,7 +362,7 @@ function cancelFailure(index) {
   media.uploadFileInfoArr = "";
 }
 
-function IsPC() {
+function IsPC() { 
   var userAgentInfo = navigator.userAgent;
   var Agents = ["Android", "iPhone",
               "SymbianOS", "Windows Phone",
@@ -378,9 +378,10 @@ function IsPC() {
 }
 
 // 去标签+略缩
-function fileNameShrink(content){
-	if(content.length > 6){
-		content = content.substr(0,6) + "...";
+function fileNameShrink(content,length){
+  length = parseInt(length);
+	if(content.length > length){
+		content = content.substr(0,length) + "...";
 	}
 	return content
 }
