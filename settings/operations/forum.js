@@ -29,7 +29,8 @@ module.exports = {
 			category: {
 				GET: 'visitForumCategorySettings',
 				PATCH: 'modifyForumCategory',
-				POST: 'addForumCategory'
+				POST: 'addForumCategory',
+				DELETE: 'removeForumCategory'
 			},
 			permission: {
 				GET: 'visitForumPermissionSettings',

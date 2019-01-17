@@ -5,6 +5,7 @@ const homeRouter = require('./home');
 const latestRouter = require('./latest');
 const followerRouter = require('./follower');
 const visitorRouter = require('./visitor');
+const path = require('path');
 const forumRouter = new Router();
 
 forumRouter
@@ -94,15 +95,29 @@ forumRouter
     if(postToForumCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
     const latestThreadLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToForum', toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
     if(latestThreadLog) ctx.throw(400, `您当前的账号等级限定发文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
-
+ 
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);
-    data.post = _post;
+		data.post = _post;
     const type = ctx.request.accepts('json', 'html');
     await forum.update({$inc: {'tCount.normal': 1}});
     const thread = await ThreadModel.findOnly({tid: _post.tid});
-    data.thread = thread;
-
+		data.thread = thread;
+		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
+		const {coverPath} = ctx.settings.upload;
+    const {coverify} = ctx.tools.imageMagick;
+		await thread.extendFirstPost();
+		await thread.firstPost.extendResources();
+		const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg'].indexOf(e.ext.toLowerCase()) > -1);
+		const middlePath = selectDiskCharacterDown(cover);
+		const coverMiddlePath  = path.join(middlePath, cover.path);
+		if(cover) {
+			await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
+				.catch(e => {
+					thread.hasCover = false;
+					return thread.save()
+				});
+		}
 		// 发帖数加一并生成记录
 		const obj = {
 			user,
