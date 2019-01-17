@@ -4,17 +4,18 @@ var app = new Vue({
     examsCategories: [],
     category: {},
     disabled: [],
+    roles: [],
     error: ''
   },
   mounted: function() {
-    nkcAPI(window.location.href, 'GET', {})
+    nkcAPI(window.location.href + '?t=' + Date.now(), 'GET', {})
       .then(function(data) {
         app.examsCategories = data.examsCategories;
+        app.roles = data.roles;
         if(app.examsCategories.length === 0) {
           app.addCategory();
         } else {
           var selected = false;
-          console.log(data.cid, typeof data.cid)
           if(data.cid) {
             for(var i = 0; i < app.examsCategories.length; i++) {
               if(app.examsCategories[i]._id === Number(data.cid)) {

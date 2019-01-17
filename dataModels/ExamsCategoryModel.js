@@ -70,6 +70,14 @@ const schema = new Schema({
   paperBTime: {
     type: Number,
     default: 30 // 30分钟
+  },
+  passingACert: {
+    type: String,
+    default: ''
+  },
+  passingBCert: {
+    type: String,
+    default: ''
   }
 }, {
   collection: 'examsCategories'

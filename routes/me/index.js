@@ -9,6 +9,10 @@ const education = require('./education');
 const industries = require('./industries');
 const addresses = require('./addresses');
 const personalInfo = require('./personalInfo');
+const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
+const videoExts = ["mp4"];
+const audioExts = ["mp3"];
+const attachmentExts = pictureExts.concat(videoExts, audioExts);
 
 meRouter
   .get('/', async (ctx, next) => {
@@ -100,6 +104,36 @@ meRouter
     const {db} = ctx;
     const quota = parseInt(ctx.query.quota);
     ctx.data.resources = await db.ResourceModel.find({uid: user.uid}).sort({toc: -1}).limit(quota);
+    await next();
+  })
+  .get('/media', async (ctx, next) => {
+    const {user} = ctx.data;
+    const {db} = ctx;
+    let {quota, skip, type} = ctx.query;
+    quota = parseInt(quota);
+    skip = parseInt(skip);
+    let queryMap;
+    if(type == "picture") {
+      queryMap = {"uid": user.uid, "ext": {$in: pictureExts}};
+    }else if(type == "video") {
+      queryMap = {"uid": user.uid, "ext": {$in: videoExts}};
+    }else if(type == "audio") {
+      queryMap = {"uid": user.uid, "ext": {$in: audioExts}};
+    }else{
+      queryMap = {"uid": user.uid, "ext": {$nin :attachmentExts}};
+    }
+    let newSkip = quota * skip;
+    let mediaCount = await db.ResourceModel.find(queryMap).count();
+    let maxSkip = Math.ceil(mediaCount / quota);
+    if(skip >= maxSkip){
+      ctx.data.skip = maxSkip - 1;
+    }else{
+      ctx.data.skip = skip;
+    }
+    if(newSkip > mediaCount) {
+      ctx.throw(400, '已经是最后一页了')
+    }
+    ctx.data.resources = await db.ResourceModel.find(queryMap).sort({toc: -1}).skip(newSkip).limit(quota);
     await next();
   })
   .get('/threads', async (ctx, next) => {

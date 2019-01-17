@@ -48,6 +48,13 @@ div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-hea
               i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe3c9;
               | 编辑资料
           li.mdui-divider
+          if permission('visitExperimentalStatus')
+            li.mdui-menu-item
+              <a href="/e" class="mdui-ripple">
+                <i class="mdui-menu-item-icon mdui-icon material-icons">settings</i>
+                | 后台管理
+              </a>
+            li.mdui-divider
           li.mdui-menu-item
             a(href=`/logout` class="mdui-ripple")
               i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe879;
@@ -106,6 +113,13 @@ div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-hea
       a.mdui-list-item.mdui-ripple(href=`/u/${data.user.uid}/settings`)
         i.mdui-list-item-icon.mdui-icon.material-icons.edit-color &#xe3c9;
         .mdui-list-item-content 编辑资料
+    li.mdui-divider
+    if(permission('visitExperimentalStatus'))
+      li
+        a.mdui-list-item.mdui-ripple(href=`/e`)
+          i.mdui-list-item-icon.mdui-icon.material-icons.edit-color settings
+          .mdui-list-item-content 后台管理
+      li.mdui-divider
     li
       a.mdui-list-item.mdui-ripple(href=`/logout`)
         i.mdui-list-item-icon.mdui-icon.material-icons.quit-color &#xe879;

@@ -46,7 +46,13 @@ smsCodeSchema.statics.ensureCode = async (obj) => {
 	const SettingModel = mongoose.model('settings');
 	let smsSettings = await SettingModel.findOnly({_id: 'sms'});
 	smsSettings = smsSettings.c;
-	const setting = smsSettings[type];
+	let setting;
+	for(const template of smsSettings.templates) {
+	  if(template.name === type) {
+      setting = template;
+      break;
+    }
+  }
 	if(!setting) {
 		const err = new Error(`未知的短信验证码类型：${type}`);
 		err.status = 400;
@@ -70,7 +76,13 @@ smsCodeSchema.statics.ensureSendPermission = async (obj) => {
 	let smsSettings = await SettingModel.findOnly({_id: 'sms'});
 	smsSettings = smsSettings.c;
 	const today = require('../nkcModules/apiFunction').today();
-	const setting = smsSettings[type];
+	let setting;
+	for(const template of smsSettings.templates) {
+	  if(template.name === type) {
+	    setting = template;
+	    break;
+    }
+  }
 	if(!setting) {
 		const err = new Error(`未知的短信验证码类型：${type}`);
 		err.status = 400;

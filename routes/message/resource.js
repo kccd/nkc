@@ -7,11 +7,16 @@ resourceRouter
     const {db, params, settings, fs, query, data} = ctx;
     const {_id} = params;
     const {user} = data;
-    const {type} = query;
+    const {type, channel} = query;
     const messageFile = await db.MessageFileModel.findOnly({_id});
     if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid) ctx.throw(403, '权限不足');
     const {path, ext} = messageFile;
     let filePath = PATH.join(settings.upload.messageFilePath, path);
+    if(channel && channel === "mp3") {
+      filePath = PATH.join(settings.upload.messageVoiceBrowser, path);
+      filePath = filePath.replace("amr", "mp3");
+    }
+
     if(imageExt.includes(ext)) {
       if(type === 'sm') {
         filePath = PATH.join(settings.upload.messageImageSMPath, path);
@@ -31,7 +36,9 @@ resourceRouter
   })
   .post('/', async (ctx, next) => {
     const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png'];
+    const voiceExt = ['amr'];
     const {data, db, body, settings, tools, fs} = ctx;
+    const { imageMagick, ffmpeg } = ctx.tools;
     try{
       await fs.access(settings.upload.messageFilePath);
     } catch(err) {
@@ -39,9 +46,9 @@ resourceRouter
       await fs.mkdir(settings.upload.messageImageSMPath);
     }
     const {file} = body.files;
-    const {targetUid, socketId} = body.fields;
+    const {targetUid, socketId, voiceTimer} = body.fields;
     const {user} = data;
-    const {messageFilePath, generateFolderName, messageImageSMPath} = settings.upload;
+    const {messageFilePath, generateFolderName, messageImageSMPath, messageVoiceBrowser} = settings.upload;
     const targetUser = await db.UserModel.findOnly({uid: targetUid});
     data.targetUser = targetUser;
     let files = [];
@@ -83,12 +90,19 @@ resourceRouter
         s: user.uid,
         r: targetUser.uid,
         c: {
-          ty: imageExt.includes(ext)? 'img': 'file',
+          ty: imageExt.includes(ext)? 'img': voiceExt.includes(ext)? 'voice' : 'file',
           id: _id,
-          na: name
+          na: name,
+          vl: voiceTimer ? voiceTimer : ''
         }
       });
       await fs.rename(path, targetPath);
+      // 将amr语音文件转为mp3
+      if(voiceExt.includes(ext)){
+        let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';
+        let targetMp3Path = messageVoiceBrowser + voiceMp3Path;
+        await ffmpeg.audioAMRTransMP3(targetPath, targetMp3Path);
+      }
       if(imageExt.includes(ext)) {
         // await tools.imageMagick.allInfo(targetPath);
         const timePath = generateFolderName(messageImageSMPath) + _id + '.' + ext;

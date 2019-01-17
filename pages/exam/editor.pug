@@ -1,0 +1,96 @@
+extends ../publicModules/mdui_base
+block title
+  title 添加考试题
+  link(rel='stylesheet' href=`/exam/exam.css?v=${startTime}`)
+block content
+  .mdui-container#app.mdui-typo(v-cloak).mdui-p-b-5
+    .editor-icon-submitted.mdui-text-center.mdui-p-t-4(v-if='submitted')
+      include ../publicModules/icon-success
+      h4 非常感谢您的提交！
+      p 题目最终是否收录入正式题库，将由论坛学术委员会决定。
+      button.mdui-btn(@click='reset') 再次提交
+    div(v-else style='overflow: hidden')
+      div
+        h3 指导意见
+        ol
+          li 不要出作业练习题。不要出炫技计算题。
+          li 每道问答题只允许有一种回答方式。请通过在题目中提示格式，避免答题时出现诸如“到底写1/2还是0.5”的问题。
+          li 对于专业题，请确保：学习过该专业知识/在该行业工作的人士应能在30秒内得出答案，而一般人通过搜索等方法很难在5分钟内得到答案。
+      div(v-if='question')
+        h5 选择科目
+        form
+          <label class="mdui-radio mdui-m-r-4" v-for='c in categories'>
+            <input type="radio" name="category" :value='c._id' v-model='question.cid'>
+            <i class="mdui-radio-icon"></i>
+            | {{c.name}}
+          </label>
+        h5 试卷类型
+        form
+          <label class="mdui-radio mdui-m-r-4">
+          <input type="radio" name="questionType" value='A' v-model='question.volume'>
+          <i class="mdui-radio-icon"></i>
+          | A卷
+          </label>
+          <label class="mdui-radio mdui-m-r-4">
+          <input type="radio" name="questionType" value='B' v-model='question.volume'>
+          <i class="mdui-radio-icon"></i>
+          | B卷
+          </label>
+        h5 题目类型
+        form
+          <label class="mdui-radio mdui-m-r-4">
+          <input type="radio" name="questionType" value='ch4' v-model='question.type'>
+          <i class="mdui-radio-icon"></i>
+          | 单项选择
+          </label>
+          <label class="mdui-radio mdui-m-r-4">
+          <input type="radio" name="questionType" value='ans' v-model='question.type'>
+          <i class="mdui-radio-icon"></i>
+          | 问答题
+          </label>
+        h5 题目
+        <div class="mdui-textfield">
+          <textarea class="mdui-textfield-input" v-model='question.content'></textarea>
+        </div>
+        h5 图片
+        div
+          input.mdui-hidden(ref='input' type='file' @change='inputChange' accept="image/*")
+          button.mdui-btn.mdui-color-theme-50.mdui-m-b-2.mdui-m-t-2(@click='clickInput') 选择图片
+          button.mdui-btn.mdui-color-theme-50.mdui-m-b-2.mdui-m-t-2(@click='removeImage' v-if='question.baseUrl || question.hasImage') 删除图片
+          div
+            img(v-if='question.baseUrl' :src='question.baseUrl')
+            img(v-else-if='question.hasImage' :src='"/exam/question/" + question._id + "/image"')
+        h5 答案
+        div(v-if='question.type === "ch4"')
+          <div class="mdui-textfield" v-for='a, index in question.answerObj'>
+            span(v-if='index === 0') 正确答案
+            span(v-if='index !== 0') 错误答案
+            <textarea class="mdui-textfield-input" v-model='a.text'></textarea>
+          </div>
+        div(v-else='question.type === "ans"')
+          <div class="mdui-textfield">
+            <textarea class="mdui-textfield-input" v-model='question.answerObj[0].text'></textarea>
+          </div>
+        div(v-if='question.auth === null')
+          h5 审核
+          <label class="mdui-radio mdui-m-r-4">
+          <input type="radio" name="questionType" value='true' v-model='auth'>
+          <i class="mdui-radio-icon"></i>
+          | 通过
+          </label>
+          <label class="mdui-radio mdui-m-r-4">
+          <input type="radio" name="questionType" value='false' v-model='auth'>
+          <i class="mdui-radio-icon"></i>
+          | 不通过
+          </label>
+          div(v-if='auth === "false"')
+            <div class="mdui-textfield">
+            span 原因
+            <textarea class="mdui-textfield-input" v-model='question.reason'></textarea>
+            </div>
+        button.mdui-btn.mdui-m-b-5.mdui-m-t-3.mdui-color-theme.mdui-btn-block(@click='save' v-if='!submitting') 提交
+        button.mdui-btn.mdui-m-b-5.mdui-m-t-3.mdui-color-theme.mdui-btn-block(v-else disabled) {{submitting}}
+
+
+block scripts
+  script(src=`/exam/editor.js?v=${startTime}`)

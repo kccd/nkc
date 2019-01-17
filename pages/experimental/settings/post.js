@@ -7,25 +7,35 @@ var app = new Vue({
     type: 'postToForum'
   },
   methods: {
+    extendVolume: function() {
+      var exam = this.postSettings[this.type].exam;
+      if(exam.indexOf('notPass') !== -1) {
+        if(exam.indexOf('volumeA') === -1) exam.push('volumeA');
+        if(exam.indexOf('volumeB') === -1) exam.push('volumeB');
+      } else if(exam.indexOf('volumeA') !== -1) {
+        if(exam.indexOf('volumeB') === -1) exam.push('volumeB');
+      }
+    },
     save: function() {
       var results = this.postSettings[this.type];
-      var exam_ = results.exam;
-      results.authLevel = Number(results.authLevel);
-      if(authLevel < 0 || authLevel > 3) return screenTopWarning('认证等级设置错误: ' + results.authLevel);
-      results.exam = {
-        volumeA: exam_.indexOf('volumeA') !== -1,
-        volumeB: exam_.indexOf('volumeA') !== -1,
+      var results_ = JSON.parse(JSON.stringify(results));
+      var exam = results_.exam;
+      results_.authLevel = Number(results_.authLevel);
+      if(results_.authLevel < 0 || results_.authLevel > 3) return screenTopWarning('认证等级设置错误: ' + results_.authLevel);
+      results_.exam = {
+        volumeA: exam.indexOf('volumeA') !== -1,
+        volumeB: exam.indexOf('volumeB') !== -1,
         notPass: {
-          status: exam_.indexOf('notPass') !== -1,
-          unlimited: results.examCountLimit.unlimited,
-          countLimit: results.examCountLimit.countLimit
+          status: exam.indexOf('notPass') !== -1,
+          unlimited: results_.examCountLimit.unlimited,
+          countLimit: results_.examCountLimit.countLimit
         }
       };
       var obj = {
         roles: app.roles,
         grades: app.grades
       };
-      obj[this.type] = results;
+      obj[this.type] = results_;
       nkcAPI('/e/settings/post', 'PATCH', obj)
         .then(function() {
           screenTopAlert('保存成功');

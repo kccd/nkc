@@ -461,7 +461,9 @@ function edInsertContent(which, myValue, fileType, fileName) {
       //codeResource = "<b>123456</b>"
       codeResource = "<p><img src=" + myValue + " class='editImgSingle'></p>"
     }else if(fileType === "mp4"){
-      codeResource = "<video src=" + myValue + " controls style=max-width:50%>video</video>"
+      codeResource = "<video src=" + myValue + " controls style=width:640px;>video</video>"
+    }else if(fileType === "mp3"){
+      codeResource = "<audio src=" + myValue + " controls>Your browser does not support the audio element</audio>";
     }else{
       codeResource = "<p><a href=" + myValue + "><img src=" + "/default/default_thumbnail.png" + ">" + fileName + "</a></p>"
     }
@@ -1443,7 +1445,7 @@ function shareTo(shareType, type, str, title, pid){
         // window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
       }
       if(type == "qzone") {
-        newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区';
+        newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
         // window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
       }
       if(type == "weibo") {

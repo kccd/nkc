@@ -1,5 +1,14 @@
 var upLoadFile;
 
+$.getJSON('../location.json',function(data){
+	for (var i = 0; i < data.length; i++) {
+		var area = {id:data[i].id,name:data[i].cname,level:data[i].level,parentId:data[i].upid};
+		data[i] = area;
+	}
+	$('.bs-chinese-region').chineseRegion('source',data);
+	$('#location').val($('#location').attr('data'));
+});
+
 $("document").ready(function(){
   //编辑器缩放
   $(".w-e-text-container").resizable({

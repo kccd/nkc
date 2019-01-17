@@ -409,14 +409,15 @@ html{
   text-decoration: none;
   height: 2rem;
   line-height: 2rem;
-  padding: 0 0.6rem;
+  padding: 0 0.5rem;
+  margin: 0 0.3rem;
   border-radius: 5px;
-  color: #333;
+  color: #333!important;
   transition: background-color 0.2s;
 }
 
 .paging-button ul a.active, .paging-button ul a:hover{
-  background-color: #eee;
+  background-color: #eee!important;
 }
 .paging-button ul li input{
   width: 2rem;
@@ -436,6 +437,27 @@ html{
 }
 .paging-button ul li input:focus{
   outline:none;
+}
+.mdui-textfield{
+  padding-top: 0;
+}
+i.icon-success{
+  background-color: #81ca83;
+  color: #fff;
+  height: 6rem;
+  width: 6rem;
+  line-height: 6rem;
+  font-size: 4rem;
+  border-radius: 50%;
+}
+i.icon-danger{
+  background-color: #ff8080;
+  color: #fff;
+  height: 6rem;
+  width: 6rem;
+  line-height: 6rem;
+  font-size: 4rem;
+  border-radius: 50%;
 }
 @media (max-width: 1023px) {
   /*.mdui-header .mdui-container {

@@ -384,6 +384,9 @@
   "disabledQuestion": "屏蔽考试题",
   "enabledQuestion": "取消屏蔽考试题",
   "visitAddQuestion": "访问添加考试题页面",
+  "postExamsPaper": "提交考试试卷",
+  "testSendMessage": "测试发送短信",
+  "testSendEmail": "测试发送邮件",
 
 
   "APPgetUserInfo": "app获取用户信息",

@@ -5,6 +5,7 @@ const settings = require('./settings');
 const backup = require('./settings/backup');
 const fs = require('fs');
 const path = require('path');
+const mongodb = require('./config/mongodb');
 const {database, elastic, user} = settings;
 const {client} = elastic;
 require('colors');
@@ -60,6 +61,12 @@ jobs.backupDatabase = () => {
 			'mongodump.exe',
 			[
 				'--gzip',
+        '-u',
+        mongodb.username,
+        '-p',
+        mongodb.password,
+				'--host',
+				`${mongodb.address}:${mongodb.port}`,
 				'--db',
 				backup.database,
 				'--out',

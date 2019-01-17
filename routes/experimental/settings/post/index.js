@@ -15,15 +15,30 @@ router
     await next();
   })
   .patch('/', async (ctx, next) => {
-    // 等待考试设置，设置考试试卷数量
     const {body, db} = ctx;
     const {roles, grades, postToThread, postToForum} = body;
+    const q = {};
     if(postToForum) {
-      await db.SettingModel.updateOne({_id: 'post', 'c.postToForum': postToForum});
+      const {exam} = postToForum;
+      if(exam.notPass.status) {
+        exam.volumeA = true;
+        exam.volumeB = true;
+      } else if(exam.volumeA) {
+        exam.volumeB = true;
+      }
+      q['c.postToForum'] = postToForum;
     }
     if(postToThread) {
-      await db.SettingModel.updateOne({_id: 'post', 'c.postToThread': postToThread});
+      const {exam} = postToThread;
+      if(exam.notPass.status) {
+        exam.volumeA = true;
+        exam.volumeB = true;
+      } else if(exam.volumeA) {
+        exam.volumeB = true;
+      }
+      q['c.postToThread'] = postToThread;
     }
+    await db.SettingModel.updateOne({_id: 'post'}, {$set: q});
     await Promise.all(roles.map(async role => {
       await db.RoleModel.update({_id: role._id}, {
         $set: {

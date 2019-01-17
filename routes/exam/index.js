@@ -3,7 +3,7 @@ const examRouter = new Router();
 const categoryRouter = require('./category');
 const questionRouter = require('./question');
 const paperRouter = require('./paper');
-const addRouter = require('./add');
+const editorRouter = require('./editor');
 examRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
@@ -20,7 +20,7 @@ examRouter
   })
   .use('/paper', paperRouter.routes(), paperRouter.allowedMethods())
   .use('/question', questionRouter.routes(), questionRouter.allowedMethods())
-  .use('/add', addRouter.routes(), addRouter.allowedMethods())
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods());
 
 module.exports = examRouter;

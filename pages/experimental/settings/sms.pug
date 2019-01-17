@@ -1,18 +1,81 @@
 extends ../../bootstrap_base
 block title
   title 短信设置
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+  link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
 block content
   -const mainContainer1400 = true;
+  -const hiddenFooter = true;
   #data.hidden= JSON.stringify(data.smsSettings)
   .container-fluid(style='max-width: 1400px;' v-cloak)#app
     .row
       include ../nav
+    .row
+      .col-xs-12.col-md-2.text-right
+        h4 短信配置
+      .col-xs-12.col-md-7
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">App ID</label>
+        <input class="mdui-textfield-input" type="text" v-model.number='smsSettings.appId'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">App Key</label>
+        <input class="mdui-textfield-input" type="text" v-model.trim='smsSettings.appKey'>
+        </div>
+        <div class="mdui-textfield">
+        <label class="mdui-textfield-label">短信签名</label>
+        <input class="mdui-textfield-input" type="text" v-model.trim='smsSettings.smsSign'>
+        </div>
+        p 目前仅支持腾讯短信平台，相关ID的申请方式请阅读&nbsp;
+          a(href=`https://cloud.tencent.com/document/product/382` target="_blank") 腾讯文档
+    .row.mdui-m-t-5
+      .col-xs-12.col-md-2.text-right
+        h4 短信模板
+      .col-xs-12.col-md-10
+        .mdui-table-fluid
+          table.mdui-table
+            thead
+              tr
+                th #
+                th 模板名
+                th 模板ID
+                th 有效时间(分钟)
+                th IP次数限制(每天)
+                th 手机号码次数限制(每天)
+                th 是否开启验证
+            tbody
+              tr(v-for='t, index in smsSettings.templates')
+               th {{index + 1}}
+               th {{tran(t.name)}}
+               th
+                 input(v-model.number='t.id')
+               th
+                 input.table-input(v-model.number='t.validityPeriod')
+               th
+                 input.table-input(v-model.number='t.sameIpOneDay')
+               th
+                 input.table-input(v-model.number='t.sameMobileOneDay')
+               th
+                 <label class="mdui-switch">
+                 <input type="checkbox" value='true' v-model='t.status'>
+                 <i class="mdui-switch-icon"></i>
+                 </label>
+        .mdui-m-t-3
+          select(style='display:inline-block;vertical-align: middle;' v-model='test.name')
+            option(v-for='t in smsSettings.templates' :value='t.name') {{tran(t.name)}}
+          select(style='display:inline-block;vertical-align: middle' v-model='test.nationCode')
+            option(v-for='nationCode in nationCodes' :value='nationCode.code') +{{nationCode.code}} {{nationCode.chineseName}}
+          input(style='display:inline-block;' placeholder='手机号码' v-model='test.mobile')
+          button(@click='testSendMessage') 测试
+        button.mdui-btn.mdui-btn-block.mdui-color-theme.mdui-m-t-3.mdui-m-b-5(@click='save') 保存
+
+
       //.col-xs-12.c0l-md-12
       //  ul.nav.nav-pills
       //    li(v-for="setting in settings" :class="{active: setting.name===type}" @click='changeSettings(setting.name)')
       //      a(style='cursor: pointer') {{setting.name}}
 
-      .col-xs-12.col-md-4(v-for="setting in settings")
+      //.col-xs-12.col-md-4(v-for="setting in settings")
         .form
           .h3 {{setting.name}}
           .form-group
@@ -29,5 +92,6 @@ block content
 block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/vue/dist/vue.js?v=${global.NKC.startTime}`)
+  script(src=`/nationCodes/nationCodes.js?v=${global.NKC.startTime}`)
   script(src=`/experimental/settings/sms.js?v=${global.NKC.startTime}`)
 

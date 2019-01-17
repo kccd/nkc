@@ -11,6 +11,7 @@ router
 	  const {cid} = query;
 	  if(cid) data.cid = cid;
 		data.examsCategories = await db.ExamsCategoryModel.find().sort({order: 1});
+		data.roles = await db.RoleModel.find({defaultRole: false});
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

@@ -12,7 +12,8 @@ module.exports = {
   paper: {
 	  GET: 'getExamsPaper',
 	  PARAMETER: {
-	    GET: 'getExamsPaper'
+	    GET: 'getExamsPaper',
+      POST: 'postExamsPaper'
     }
   },
   question: {
@@ -31,7 +32,7 @@ module.exports = {
 		GET: 'getExamPaper',
 		POST: 'submitExamPaper'
 	},
-  add: {
-	  GET: 'visitAddQuestion'
+  editor: {
+	  GET: 'visitEditQuestion'
   }
 };

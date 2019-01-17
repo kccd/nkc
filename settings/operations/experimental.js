@@ -7,10 +7,16 @@ module.exports = {
 		sms: {
 			GET: 'visitSmsSettings',
 			PATCH: 'modifySmsSettings',
+      test: {
+        POST: 'testSendMessage'
+      }
 		},
 		email: {
 			GET: 'visitExperimentalEmailSettings',
-			PATCH: 'modifyEmailSettings'
+			PATCH: 'modifyEmailSettings',
+      test: {
+			  POST: 'testSendEmail'
+      }
 		},
 		base: {
 			GET: 'visitWebBaseSettings',

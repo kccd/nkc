@@ -4,18 +4,29 @@ categoryRouter
   .get('/:_id', async (ctx, next) => {
     const {data, db, params, nkcModules, query} = ctx;
     const {_id} = params;
-    const {page = 0} = query;
+    const {page = 0, options} = query;
     const category = await db.ExamsCategoryModel.findOne({_id});
     if(!category) ctx.throw(404);
-    // if(category.disabled) ctx.throw(403, '该考试科目已被屏蔽，请刷新');
+    if(category.disabled) ctx.throw(403, '该考试科目已被屏蔽，请刷新');
     data.category = category;
     if(ctx.get('FROM') !== 'nkcAPI') {
       ctx.template = 'exam/category.pug';
       return await next();
     }
-    const count = await db.QuestionModel.count({cid: category._id});
+    ctx.template = 'exam/category.pug';
+    const q = {
+      cid: category._id
+    };
+    if(options) {
+      const o = JSON.parse(options);
+      q.disabled = {$in: o.disabled};
+      q.auth = {$in: o.auth};
+      q.volume = {$in: o.volume};
+    }
+    const count = await db.QuestionModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const questions = await db.QuestionModel.find({cid: category._id}).sort({toc: -1}).skip(paging.start).limit(paging.limit);
+    const questions = await db.QuestionModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    // const questions = await db.QuestionModel.find({cid: category._id}).sort({toc: -1});
     data.paging = paging;
     data.questions = await db.QuestionModel.extendQuestions(questions);
     data.categories = await db.ExamsCategoryModel.find().sort({order: 1});
@@ -46,8 +57,6 @@ categoryRouter
     question._id = await db.SettingModel.operateSystemID('questions', 1);
     question.cid = category._id;
     question.uid = user.uid;
-    // 暂时未添加审核流程，若普通用户有添加考试题的权限则默认false，并走审核流程
-    question.auth = true;
     const q = db.QuestionModel(question);
     if(file) {
       const {path} = file;

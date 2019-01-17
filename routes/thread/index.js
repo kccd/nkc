@@ -122,7 +122,7 @@ threadRouter
 				}
 			}
 			// 取出帖子被退回的原因
-			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft"});
+			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false});
 			thread.reason = threadLogOne.reason || '';
 		}
 		// 构建查询条件

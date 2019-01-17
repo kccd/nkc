@@ -35,32 +35,50 @@ block content
                 <label class="mdui-textfield-label">科目介绍</label>
                 <textarea class="mdui-textfield-input" type="text" v-model='category.description'></textarea>
                 </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">试卷A题目数量</label>
-                <input class="mdui-textfield-input" type="text" v-model.number='category.paperAQuestionsCount'/>
-                </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">试卷A及格分数</label>
-                <input class="mdui-textfield-input" type="text" v-model.number='category.paperAPassScore'/>
-                </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">试卷A考试时间（分钟）</label>
-                <input class="mdui-textfield-input" type="text" v-model.number='category.paperATime'/>
-                </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">试卷B题目数量</label>
-                <input class="mdui-textfield-input" type="text" v-model.number='category.paperBQuestionsCount'/>
-                </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">试卷B及格分数</label>
-                <input class="mdui-textfield-input" type="text" v-model.number='category.paperBPassScore'/>
-                </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">试卷B考试时间（分钟）</label>
-                <input class="mdui-textfield-input" type="text" v-model.number='category.paperBTime'/>
-                </div>
+                .mdui-row
+                  .mdui-col-xs-12.mdui-col-md-6
+                    h4 试卷A
+                    <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">题目数量</label>
+                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperAQuestionsCount'/>
+                    </div>
+                    <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">及格分数</label>
+                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperAPassScore'/>
+                    </div>
+                    <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">考试时间（分钟）</label>
+                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperATime'/>
+                    </div>
+                    <div class="mdui-textfield">
+                      <label class="mdui-textfield-label">颁发证书</label>
+                      select.mdui-select(v-model='category.passingACert')
+                        option(value='') 不颁发
+                        option(v-for="role in roles" :value='role._id') {{role.displayName}}
+                    </div>
+                  .mdui-col-xs-12.mdui-col-md-6
+                    h4 试卷B
+                    <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">题目数量</label>
+                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperBQuestionsCount'/>
+                    </div>
+                    <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">及格分数</label>
+                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperBPassScore'/>
+                    </div>
+                    <div class="mdui-textfield">
+                    <label class="mdui-textfield-label">考试时间（分钟）</label>
+                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperBTime'/>
+                    </div>
+                    <div class="mdui-textfield">
+                      <label class="mdui-textfield-label">颁发证书</label>
+                      select.mdui-select(v-model='category.passingBCert')
+                        option(value='') 不颁发
+                        option(v-for="role in roles" :value='role._id') {{role.displayName}}
+                    </div>
 
-                div(v-if='category._id')
+
+                div.mdui-m-t-3(v-if='category._id')
 
                   <label class="mdui-checkbox mdui-m-r-3">
                   <input type="checkbox" value='A' v-model='disabled'>

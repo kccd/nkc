@@ -6,7 +6,7 @@ paperRouter
     let {cid, volume} = query;
     cid = Number(cid);
     const {user} = data;
-    const oldPaper = await db.ExamsPaperModel.findOne({uid: user.uid, submitted: false, timeOut: false});
+    const oldPaper = await db.ExamsPaperModel.findOne({uid: user.uid, submitted: false, timeOut: false, violation: false});
     const category = await db.ExamsCategoryModel.findOnly({_id: cid});
     if(oldPaper) {
       // 判断试卷是否超时
@@ -27,7 +27,7 @@ paperRouter
       paperQuestionCount = category.paperBQuestionsCount;
     }
     const count = await db.QuestionModel.count({cid, volume, auth: true, disabled: false});
-    if(count < paperQuestionCount) ctx.throw(400, `${category.name}${volume}卷题库不足`);
+    if(count < paperQuestionCount) ctx.throw(400, `${category.name}${volume}卷试题数量不足`);
     let questions = await db.QuestionModel.aggregate([
       {
         $match: {
@@ -39,29 +39,35 @@ paperRouter
       },
       {
         $sample: {
-          size: 8
+          size: category[`paper${volume}QuestionsCount`]
         }
       }
     ]);
     const papersQuestions = [];
     await Promise.all(questions.map(async q => {
-      if(q.type === 'ans') return q;
-      const results = [];
-      while(results.length < 4) {
-        const num = Math.round(Math.random()*3);
-        if(!results.includes(num)) results.push(num);
+      if(q.type === 'ch4') {
+        const results = [];
+        while(results.length < 4) {
+          const num = Math.round(Math.random()*3);
+          if(!results.includes(num)) results.push(num);
+        }
+        papersQuestions.push({
+          qid: q._id,
+          answerIndex: results,
+        });
+      } else {
+        papersQuestions.push({
+          qid: q._id
+        });
       }
-      papersQuestions.push({
-        qid: q._id,
-        answerIndex: results,
-      });
     }));
     const paper = db.ExamsPaperModel({
       _id: await db.SettingModel.operateSystemID('examsPapers', 1),
       uid: user.uid,
       volume,
       cid,
-      record: papersQuestions
+      record: papersQuestions,
+      passScore: category[`paper${volume}PassScore`]
     });
     await paper.save();
     return ctx.redirect(`/exam/paper/${paper._id}`);
@@ -100,10 +106,72 @@ paperRouter
     data.paper = {
       toc: paper.toc,
       volume: paper.volume,
-      category: category
+      category: category,
+      _id: paper._id
     };
     data.category = category;
     ctx.template = 'exam/paper.pug';
+    await next();
+  })
+  .post('/:_id', async (ctx, next) => {
+    const {params, db, data, body} = ctx;
+    const {user} = data;
+    const {_id} = params;
+    const paper = await db.ExamsPaperModel.findOnly({_id: Number(_id), uid: user.uid});
+    if(paper.timeOut) ctx.throw(403, '考试已结束');
+    if(paper.submitted) ctx.throw(403, '考试已结束');
+    const category = await db.ExamsCategoryModel.findOnly({_id: paper.cid});
+    if(category[`disabled${paper.volume}`]) {
+      await paper.update({submitted: true});
+      ctx.throw(403, `该科目下的${paper.volume}卷考试已被关闭`);
+    }
+    const qid = paper.record.map(r => r.qid);
+    const questionsDB = await db.QuestionModel.find({_id: {$in : qid}});
+    const questionObj = {};
+    for(const q of questionsDB) {
+      questionObj[q._id] = q;
+    }
+    const {questions} = body;
+    const {record} = paper;
+    let score = 0;
+    const q = {};
+    for(let i = 0; i < record.length; i++) {
+      const r = record[i];
+      if(r.qid !== questions[i]._id) ctx.throw(400, '试卷题目顺序有误，本次考试无效，请重新考试。');
+      const question = questionObj[r.qid];
+      r.correct = false;
+      if(question.type === 'ch4') {
+        for(let j = 0; j < r.answerIndex.length; j ++) {
+          const index = r.answerIndex[j];
+          if(question.answer[index] !== questions[i].ans[j]) ctx.throw(400, '试卷题目答案顺序有误，本次考试无效，请重新考试。');
+          if(index === 0 && questions[i].answer === j) {
+            r.correct = true;
+            score ++;
+          }
+        }
+      } else {
+        if(question.answer[0] === questions[i].answer) {
+          r.correct = true;
+          score ++;
+        }
+      }
+      record.answer = questions[i].answer;
+    }
+    q.record = record;
+    q.score = score;
+    q.passed = paper.passScore <= q.score;
+    q.submitted = true;
+    if(q.passed) {
+      const q = {};
+      q[`volume${paper.volume}`] = true;
+      const passingCert = category[`passing${paper.volume}Cert`];
+      if(passingCert || !user.certs.includes(passingCert)) {
+        q.$addToSet = {certs: passingCert};
+      }
+      await user.update(q);
+    }
+    await paper.update(q);
+    data.passed = q.passed;
     await next();
   });
 module.exports = paperRouter;

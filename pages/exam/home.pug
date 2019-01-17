@@ -23,7 +23,11 @@ block content
           for category in data.examsCategories
             .mdui-col-xs-12.mdui-col-sm-6.mdui-col-md-4
               .mdui-p-a-2.mdui-text-center
-                .category-name= category.name
+                .category-name
+                  if !permission('visitExamsCategory')
+                    span= category.name
+                  else
+                    a(href=`/exam/category/${category._id}`)= category.name
                 .category-description= category.description
                 .mdui-p-t-2
                 a.mdui-m-r-3(href=`/exam/paper?cid=${category._id}&volume=A`) A卷

@@ -10,7 +10,7 @@ const schema = new Schema({
   },
   auth: {
     type: Boolean,
-    default: false,
+    default: null,
     index: 1
   },
   uid: {

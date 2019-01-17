@@ -74,26 +74,44 @@ forumRouter
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 	  const {user} = data;
+    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
 	  await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	  const childrenForums = await forum.extendChildrenForums();
 	  if(childrenForums.length !== 0) {
-	  	ctx.throw(400, '该专业存下存在其他专业，请到下属专业发表文章。');
+	  	ctx.throw(400, '该专业下存在其他专业，请到下属专业发表文章。');
 	  }
-		if(user.authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+
+	  // 根据发表设置，判断用户是否有权限发表文章
+    // 1. 身份认证等级
+    // 2. 考试
+    // 3. 角色
+    // 4. 等级
+	  const postSettings = await db.SettingModel.find({_id: 'post'});
+	  const {authLevelMin, exam} = postSettings.c.postToForum;
+	  const {volumeA, volumeB, notPass} = exam;
+	  const {status, countLimit, unlimited} = notPass;
+	  const today = nkcModules.apiFunction.today();
+    const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，文章发表至少需要完成身份认证 ${authLevelMin}`);
+    if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
+      if(!status) ctx.throw(403, '权限不足，请提升账号等级');
+      if(!unlimited && countLimit <= todayThreadCount) ctx.throw(403, '今日发表文章次数已用完，请明天再试。');
+    }
+
+    // 发表回复时间、条数限制
+    const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
+    if(todayThreadCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
+    const latestThreadLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToForum', toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
+    if(latestThreadLog) ctx.throw(400, `您当前的账号等级限定发文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
+
+		/*if(user.authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发帖。');
-    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
+    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');*/
+
 	  const {post} = body;
     const {c, t} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
-
-    // 发表回复时间、条数限制
-    const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
-    const today = nkcModules.apiFunction.today();
-    const postToForumCount = await db.InfoBehaviorModel.count({toc: {$gt: today}, uid: user.uid, operationId: 'postToForum'});
-    if(postToForumCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
-    const latestThreadLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToForum', toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
-    if(latestThreadLog) ctx.throw(400, `您当前的账号等级限定发文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
 
     const {cat, mid} = post;
     const _post = await forum.newPost(post, user, ip, cat, mid);

@@ -15,7 +15,8 @@ module.exports = async (ctx, next) => {
 	  let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
 	    XFF = XFF.replace(/::ffff:/ig, '');
-      [ip] = XFF.split(':');
+      [ip_] = XFF.split(':');
+      if(ip_) ip = ip_;
     }
 	  ctx.address = ip;
 	  ctx.port = port;
@@ -58,10 +59,16 @@ module.exports = async (ctx, next) => {
 	    writeFile: promisify(fs.writeFile),
 	    mkdir: promisify(fs.mkdir),
 	    exists: promisify(fs.exists),
+	    copyFile: promisify(fs.copyFile),
 	    createReadStream: fs.createReadStream,
-	    stat: promisify(fs.stat),
-      copyFile: promisify(fs.copyFile)
+	    createWriteStream: fs.createWriteStream,
+	    stat: promisify(fs.stat)
 	  };
+
+	  ctx.permission = (o) => {
+	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
+	    return ctx.data.userOperationsId.includes(o);
+    };
 
 		Object.defineProperty(ctx, 'template', {
 			get: function() {

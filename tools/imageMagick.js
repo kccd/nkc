@@ -321,8 +321,8 @@ const friendImageify = async (path, targetPath) => {
 };
 
 const questionImageify = async (path, targetPath) => {
-  const width = 300;
-  const height = 200;
+  const width = 500;
+  const height = 250;
   const arr = [path, '-resize', `${width}x${height}`, '-quality', '80', targetPath];
   if(linux) {
     return spawnProcess('convert', arr);

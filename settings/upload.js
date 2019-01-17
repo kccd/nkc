@@ -9,6 +9,7 @@ const paths = {
   uploadDir: 'tmp',
   resourcesPath: 'resources',
   uploadPath: 'resources/upload',
+  mediaPath: 'resources/media',
   coverPath: 'resources/cover',
   pfBannerPath: 'resources/pf_banners',
   pfAvatarPath: 'resources/pf_avatars',
@@ -26,6 +27,7 @@ const paths = {
   userBannerPath: 'resources/user_banners',
   messageFilePath: 'resources/message',
   messageImageSMPath: 'resources/message/sm',
+  messageVoiceBrowser: 'resources/message/vb',
   frameImgPath: 'resources/frameImage',
   appPath: 'resources/app',
   androidSavePath: 'resources/app/android',
@@ -85,11 +87,19 @@ function generateFolderName(basePath) {
   const full = moment().format('/YYYY/MM/');
 
   try {
+    mkdirSync(basePath);
+  } catch(e) {
+    if(e.code !== 'EEXIST')
+      throw e
+  }
+
+  try {
     mkdirSync(basePath + year);
   } catch(e) {
     if(e.code !== 'EEXIST')
       throw e
   }
+
   try {
     mkdirSync(basePath + full);
   } catch(e) {

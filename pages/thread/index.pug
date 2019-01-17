@@ -28,6 +28,7 @@ block title
     
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
+    link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${global.NKC.startTime}`)
 
   mixin postOptions(post, targetThread, index)
     .inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
@@ -314,13 +315,14 @@ block content
                             .form-group
                               button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
                           .form-group
-                          .nkcpanel(id='file-uploading' target='/r')
-                            //uploader section
-                            include ../interface_attachment_uploader_uploader.pug
+                          //- .nkcpanel(id='file-uploading' target='/r')
+                          //-   //uploader section
+                          //-   include ../interface_attachment_uploader_uploader.pug
 
-                          .panel.panel-default
-                            .panel-heading 我的附件（点击插入帖子）
-                            .panel-body(id='list-container')
+                          //- .panel.panel-default
+                          //-   .panel-heading 我的附件（点击插入帖子）
+                          //-   .panel-body(id='list-container')
+                          include ../media/media_index.pug
 
 
                         if hasMobile
@@ -395,6 +397,7 @@ block content
     include ../thread_to_recycle.pug
     include ../post_to_recycle.pug
 block scripts
+  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/module_dropdown.js?v=3')
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
@@ -414,3 +417,4 @@ block scripts
   script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
+  script(src=`/media/media_index.js?v=${startTime}`)

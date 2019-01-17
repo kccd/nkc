@@ -42,6 +42,11 @@ const resourceSchema = new Schema({
     required: true,
     index: 1
   },
+  mediaType: {
+    type: String,
+    index: 1,
+    default: ''
+  },
   references: {
 	  type: [String],
     index: 1,

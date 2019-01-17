@@ -1,21 +1,25 @@
-/*
-const settings = require('../settings');
-let mailSecrets = settings.mailSecrets;
 const nm = require('nodemailer');
-let transporter = nm.createTransport(mailSecrets.smtpConfig);
-let sendMail = async (mailOptions) => {
-  return await transporter.sendMail(mailOptions);
-};
-module.exports = sendMail;*/
+const mongoose = require('mongoose');
 
-const {smtpConfig, exampleMailOptions} = require('../settings/emailSecrets');
-const nm = require('nodemailer');
-const transporter = nm.createTransport(smtpConfig);
-
-const sendEmail = (mailOptions) => {
-	mailOptions.from = exampleMailOptions.from;
+const sendEmail = async (options) => {
+  const {to, type, code} = options;
+  const SettingModel = mongoose.model('settings');
+  const emailSettings = await SettingModel.findOnly({_id: 'email'});
+  const {smtpConfig, from, templates} = emailSettings.c;
+  const emailOptions = {
+    to,
+    from
+  };
+  if(smtpConfig.secure) smtpConfig.port = 465;
+  let template = templates.filter(t => t.name === type);
+  if(template.length === 0) throw `未知的模板类型`;
+  template = template[0];
+  const {title, text} = template;
+  emailOptions.subject = title;
+  emailOptions.html = text + `<h2>${code}</h2>`;
+  const transporter = nm.createTransport(smtpConfig);
 	return new Promise((resolve, reject) => {
-		transporter.sendMail(mailOptions, (error, info) => {
+		transporter.sendMail(emailOptions, (error, info) => {
 			if(error) {
 				reject(error);
 			} else {

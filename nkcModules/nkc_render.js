@@ -411,7 +411,7 @@ function nkc_render(options){
   var attachment_filter = function(stringToFilter,post){
     //console.log(stringToFilter);
     return stringToFilter.replace(render.resource_extractor,function(match,p1,offset,string){
-      var rid = p1
+      var rid = p1;
       for(var i in post.resources){
         var r = post.resources[i]
         if(r.rid===rid){

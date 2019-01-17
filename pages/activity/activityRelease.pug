@@ -2,6 +2,7 @@ extends ../bootstrap_base
 block title
   link(rel='stylesheet', href='/fund.css')
   title 科创活动
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${global.NKC.startTime}`)
 
   -const mainContainer1400 = true
   link(href='../bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
@@ -58,7 +59,7 @@ block content
                   label.col-sm-2.control-label 所在地区：
                   .col-sm-8
                     .bs-chinese-region.flat.dropdown(data-submit-type="id", data-min-level="0", data-max-level="4")
-                      input#location.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="")
+                      input#location.form-control(type="text", name="address", placeholder="选择你的地区", data-toggle="dropdown", readonly="", data=null)
                       .dropdown-menu(role="menu", aria-labelledby="dLabel")
                         div
                           ul.nav.nav-tabs(role="tablist")
@@ -179,13 +180,14 @@ block content
                       input#ParseURL(type='checkbox' checked)
                       | 处理URL
                   .form-group
-                  .nkcpanel(id='file-uploading' target='/r')
-                    //uploader section
-                    include ../interface_attachment_uploader_uploader.pug
+                  //- .nkcpanel(id='file-uploading' target='/r')
+                  //-   //uploader section
+                  //-   include ../interface_attachment_uploader_uploader.pug
 
-                  .panel.panel-default
-                    .panel-heading 我的附件（点击插入帖子）
-                    .panel-body(id='list-container')
+                  //- .panel.panel-default
+                  //-   .panel-heading 我的附件（点击插入帖子）
+                  //-   .panel-body(id='list-container')
+                  include ../media/media_index.pug       
 
                       
                 .form-group
@@ -194,32 +196,8 @@ block content
                     button.btn.btn-primary#save(onclick=`submitRelease()`) 发布
             input#inputFile(type='file' accept="image/*").hidden
 
-      //- .row
-      //-   .col-xs-12.col-md-10
-      //-     .panel.panel-primary
-      //-       .panel-heading
-      //-         span 活动详情
-      //-       .panel-body
-      //-         .form-horizontal
-
-      //-           .form-inline
-      //-             div#ReplyContent
-      //-           .form-inline
-
-      //-             .checkbox-inline(style="display:none")
-      //-               label
-      //-                 input#ParseURL(type='checkbox' checked)
-      //-                 | 处理URL
-
-      //-           .form-group
-      //-           .nkcpanel(id='file-uploading' target='/r')
-      //-             //uploader section
-      //-             include ../interface_attachment_uploader_uploader.pug
-
-      //-           .panel.panel-default
-      //-             .panel-heading 我的附件（点击插入帖子）
-      //-             .panel-body(id='list-container')
 block scripts
+  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src="/jquery-ui-1.10.4.custom.js")
   script(src='../interface_common.js')
   script(src="../bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
@@ -239,3 +217,4 @@ block scripts
   script(type="text/javascript" src=`./activityNewEditor.js?v=${global.NKC.startTime}`)
   script(src=`./activityRelease.js?v=${global.NKC.startTime}` charset="UTF-8")
   script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`../media/media_index.js?v=${startTime}`)

@@ -21,6 +21,7 @@ const smsRouter = require('./sms');
 const postRouter = require('./post');
 const xsfRouter = require('./xsf');
 const redEnvelopeRouter = require('./redEnvelope');
+const emailRouter = require('./email');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -48,5 +49,6 @@ settingRouter
   .use('/log', logRouter.routes(), logRouter.allowedMethods())
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
 	.use('/exam', examRouter.routes(), examRouter.allowedMethods())
+  .use('/email', emailRouter.routes(), emailRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
 module.exports = settingRouter;

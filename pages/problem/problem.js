@@ -2,30 +2,7 @@ var markdown = window.markdownit();
 
 var xss = window.filterXSS;
 var default_whitelist = xss.whiteList;
-default_whitelist.font = [];
-default_whitelist.code = [];
-default_whitelist.span = [];
-default_whitelist.a = ['href', 'title'];
-default_whitelist.p = [];
-default_whitelist.div = [];
-default_whitelist.table = [];
-default_whitelist.tbody = [];
-default_whitelist.tr = [];
-default_whitelist.th = [];
-default_whitelist.td = [];
-default_whitelist.video = ['src','controls','preload'];
-default_whitelist.math = [];
-default_whitelist.semantics = [];
-default_whitelist.mrow = [];
-default_whitelist.msup = [];
-default_whitelist.mn = [];
-default_whitelist.annotation = [];
-default_whitelist.iframe = [];
-default_whitelist.embed = [];
 default_whitelist.img = ['src','style'];
-for(var i = 1; i <= 6; i++) {
-	default_whitelist['h'+i] = [];
-}
 
 var xssoptions = {
 	whiteList:default_whitelist,
@@ -44,7 +21,9 @@ var custom_xss_process = function(str){
 	return custom_xss.process(str)
 };
 
-
+function mdToHtml(md) {
+  return markdown.render(md);
+}
 
 var data = $('#data').text();
 var hljs = {
@@ -58,9 +37,6 @@ $('#title, #content, #reason, #solution, #QQ, #email').on('input', function() {
 	submit(data.id, function(){screenTopAlert('自动保存成功')});
 });*/
 
-function mdToHtml(md) {
-	return markdown.render(md);
-}
 function update() {
 	var title = $('#title').val();
 	var content = $('#content').val();

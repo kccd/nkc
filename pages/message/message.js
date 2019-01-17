@@ -24,6 +24,7 @@ $(function() {
   app = new Vue({
     el: '#app',
     data: {
+      voiceHisIndex: '',
       locationData: '',
       mobile: mobile,
       userList: [],
@@ -67,7 +68,13 @@ $(function() {
       showMobileList: true,
       showMobileSettings: false,
       showMobileContacts: false,
-      showMobileGroups: false
+      showMobileGroups: false,
+      voiceImg: {
+        playRight: "/default/playRight.gif",
+        playLeft: "/default/playLeft.gif",
+        stopRight: "/default/stopRight.png",
+        stopLeft: "/default/stopLeft.png"
+      },
 
     },
     watch: {
@@ -224,6 +231,12 @@ $(function() {
 
       format: format,
       fromNow: fromNow,
+      secondToMinute: secondToMinute,
+      startPlayAudio: startPlayAudio,
+      stopPlayAudio: stopPlayAudio,
+      restartPlayAudio: restartPlayAudio,
+      stopOrStartPlay: stopOrStartPlay,
+      stopPlayType: stopPlayType,
 
       // 初始化手机页面
       initMobile: function(type) {
@@ -1567,3 +1580,67 @@ window.onpopstate = function(e) {
     app.initialization();
   }
 };
+
+// 秒数转分钟
+function secondToMinute(sec) {
+  if(!sec){
+    return "";
+  }
+  var m = parseInt(sec / 60);
+  var s = Math.ceil(sec % 60);
+  var timeStamp;
+  if(m < 1){
+    timeStamp = s + "";
+  }else{
+    timeStamp = m + "\' " + s + "";
+  }
+  return timeStamp;
+}
+
+// 播放音频
+function startPlayAudio(id) {
+  if(app.voiceHisIndex && id !== app.voiceHisIndex) {
+    stopPlayType(app.voiceHisIndex);
+    restartPlayAudio(app.voiceHisIndex);
+  }
+  app.voiceHisIndex = id;
+  audioId = 'audio'+id;
+  document.getElementById(audioId).play();
+}
+
+// 停止播放
+function stopPlayAudio(id) {
+  audioId = 'audio'+id;
+  document.getElementById(audioId).pause();
+}
+
+// 重置播放
+function restartPlayAudio(id) {
+  audioId = 'audio'+id;
+  document.getElementById(audioId).load();
+}
+
+//
+function stopOrStartPlay(id) {
+  if(!app.messages[id].c.playType) {
+    app.messages[id].c.playType = true;
+    Vue.set(app.messages, id, app.messages[id]);
+    startPlayAudio(id);
+  }else{
+    app.messages[id].c.playType = false;
+    Vue.set(app.messages, id, app.messages[id]);
+    restartPlayAudio(id);
+  }
+}
+
+// 
+function stopPlayType(id) {
+  app.messages[id].c.playType = false;
+  Vue.set(app.messages, id, app.messages[id]);
+}
+
+// 
+function startPlayType(id) {
+  app.messages[id].c.playType = true;
+  Vue.set(app.messages, id, app.messages[id]);
+}

@@ -47,17 +47,17 @@ block content
                 h4 通过考试
               .col-sm-10
                 <label class="mdui-checkbox mdui-m-r-2">
-                <input type="checkbox" value="notPass" v-model='postSettings[type].exam'/>
+                <input type="checkbox" value="notPass" v-model='postSettings[type].exam'/ @change='extendVolume'>
                 <i class="mdui-checkbox-icon"></i>
                 | 未考试
                 </label>
                 <label class="mdui-checkbox mdui-m-r-2">
-                <input type="checkbox" value="volumeB" v-model='postSettings[type].exam'/>
+                <input type="checkbox" value="volumeA" v-model='postSettings[type].exam'/ @change='extendVolume'>
                 <i class="mdui-checkbox-icon"></i>
                 | A卷
                 </label>
                 <label class="mdui-checkbox ">
-                <input type="checkbox" value="volumeA" v-model='postSettings[type].exam'/>
+                <input type="checkbox" value="volumeB" v-model='postSettings[type].exam'/ @change='extendVolume'>
                 <i class="mdui-checkbox-icon"></i>
                 | B卷
                 </label>
@@ -87,7 +87,7 @@ block content
                       tr
                         th 角色名
                         th 每天最大条数
-                        th 最小间隔时间
+                        th 最小间隔时间(分钟)
                     tbody
                       tr(v-for='role, index in roles')
                         th {{role.displayName}}
@@ -126,7 +126,7 @@ block content
                       tr
                         th 等级名
                         th 每天最大条数
-                        th 最小间隔时间
+                        th 最小间隔时间(分钟)
                     tbody
                       tr(v-for='grade, index in grades')
                         th {{grade.displayName}}

@@ -1,19 +1,69 @@
+var markdown = window.markdownit();
+
+var xss = window.filterXSS;
+var default_whitelist = xss.whiteList;
+default_whitelist.img = ['src','style'];
+
+var xssoptions = {
+  whiteList:default_whitelist,
+  onTagAttr: function(tag, name, value, isWhiteAttr) {
+    if(isWhiteAttr) {
+      if(tag === 'a' && name === 'href') {
+        var valueHandled = value.replace('javascript:', '');
+        return "href=" + valueHandled;
+      }
+    }
+  }
+};
+
+var custom_xss = new xss.FilterXSS(xssoptions);
+var custom_xss_process = function(str){
+  return custom_xss.process(str)
+};
+
+function mdToHtml(md) {
+  return markdown.render(md);
+}
 var app = new Vue({
   el: '#app',
   data: {
     editor: false,
+    displayFilter: false,
+    filter: ['A', 'B', 'enabled', 'disabled','authNull', 'authFalse', 'authTrue'],
     question: {},
     questions: [],
     category: {},
-    categories: []
+    categories: [],
+    paging: {}
+  },
+  watch: {
+    filter: function() {
+      /*var qs = this.questions;
+      var filter = this.filter;
+      for(var i = 0; i < qs.length; i++) {
+        var q = qs[i];
+        q.hide = true;
+        if(filter.indexOf(q.volume) === -1) continue;
+        if((q.disabled && filter.indexOf('disabled') === -1) || (!q.disabled && filter.indexOf('enabled') === -1)) continue;
+        if((q.auth === true && filter.indexOf('authTrue') === -1) ||
+          (q.auth === false && filter.indexOf('authFalse') === -1) ||
+          (q.auth === null && filter.indexOf('authNull') === -1)
+        ) continue;
+        q.hide = false;
+      }*/
+    }
+  },
+  updated: function() {
+    NKC.methods.renderFormula();
   },
   mounted: function() {
     var url = window.location.pathname;
     kcAPI(url, 'GET', {})
       .then(function(data) {
-        app.category = data.category;
-        app.questions = data.questions;
+        app.questions = app.extendQuestions(data.questions);
         app.categories = data.categories;
+        app.category = data.category;
+        app.paging = NKC.methods.paging(data.paging);
       })
       .catch(function(err) {
         screenTopWarning(err);
@@ -23,130 +73,72 @@ var app = new Vue({
   methods: {
     format: NKC.methods.format,
     fromNow: NKC.methods.fromNow,
+    extendQuestions: function(questions) {
+      for(var i = 0; i < questions.length; i++) {
+        var a = questions[i];
+        a.content_ = custom_xss_process(mdToHtml(a.content));
+        a.answer_ = [];
+        for(var j = 0; j < a.answer.length; j ++) {
+          if(a.type === 'ch4') {
+            a.answer_[j] = custom_xss_process(mdToHtml(['A', 'B', 'C', 'D'][j] + '. ' + a.answer[j]));
+          } else {
+            a.answer_[j] = custom_xss_process(mdToHtml(a.answer[j]));
+          }
+        }
+      }
+      return questions;
+    },
+    toPage: function(page) {
+      var options = {
+        volume: [],
+        disabled: [],
+        auth: []
+      };
+      var filter = this.filter;
+      if(filter.indexOf('A') !== -1) {
+        options.volume.push('A');
+      }
+      if(filter.indexOf('B') !== -1) {
+        options.volume.push('B');
+      }
+      if(filter.indexOf('enabled') !== -1) {
+        options.disabled.push(false);
+      }
+      if(filter.indexOf('disabled') !== -1) {
+        options.disabled.push(true);
+      }
+      if(filter.indexOf('authNull') !== -1) {
+        options.auth.push(null);
+      }
+      if(filter.indexOf('authTrue') !== -1) {
+        options.auth.push(true);
+      }
+      if(filter.indexOf('authFalse') !== -1) {
+        options.auth.push(false);
+      }
+      var data = {
+        page: page,
+        options: JSON.stringify(options)
+      };
+      kcAPI(window.location.pathname, 'GET', data)
+        .then(function(data) {
+          app.questions = app.extendQuestions(data.questions);
+          app.paging = NKC.methods.paging(data.paging);
+          NKC.methods.scrollToTop(0)
+        })
+        .catch(function(err) {
+          screenTopWarning(err);
+        })
+    },
+    toEditor: function(q) {
+      if(q && q._id) {
+        window.location.href = '/exam/editor?qid=' + q._id;
+      } else if(this.category) {
+        window.location.href = '/exam/editor?cid=' + this.category._id;
+      }
+    },
     visitSettings: function(c) {
       window.location.href = '/e/settings/exam?cid=' + c._id;
-    },
-    displayEditor: function(q) {
-      if(q) {
-        var arr = [];
-        for(var i = 0; i < q.answer.length; i++) {
-          arr.push({
-            text: q.answer[i]
-          });
-        }
-        q.arr = arr;
-        this.question = q;
-      } else {
-        this.question = {
-          type: 'ch4',
-          baseUrl: '',
-          volume: 'A',
-          cid: app.category._id,
-          answer: ['', '', '', ''],
-          arr: [
-            {
-              text: ''
-            },
-            {
-              text: ''
-            },
-            {
-              text: ''
-            },
-            {
-              text: ''
-            }
-          ]
-        };
-      }
-      this.editor = true;
-    },
-    addWrongAnswer: function() {
-      this.question.arr.push({
-        text: ''
-      })
-    },
-    removeAnswer: function(a) {
-      var arr = this.question.arr;
-      var index = arr.indexOf(a);
-      if(index === -1) return;
-      arr.splice(index, 1);
-    },
-    clickInput: function() {
-      app.$refs.input.click();
-    },
-    inputChange: function(e) {
-      var input = e.target;
-      var file = input.files?input.files[0]:'';
-      if(!file) return;
-      this.question.file = file;
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function () {
-        app.question.baseUrl = this.result;
-        Vue.set(app.questions, app.questions.indexOf(app.question), app.question)
-      };
-    },
-    save: function() {
-      var question = this.question;
-      if(!question.content) return screenTopWarning('请输入题目内容');
-      if(question.type === 'ch4') {
-        if(question.arr.length !== 4) return screenTopWarning('单项选择题答案个数错误');
-        for(var i = 0; i < question.arr.length; i++) {
-          var a = question.arr[i];
-          if(!a.text) return screenTopWarning('答案不能为空');
-          question.answer[i] = a.text;
-        }
-      } else {
-        if(!question.arr[0].text) return screenTopWarning('答案不能为空');
-        question.answer = [question.arr[0].text];
-      }
-      var formData = new FormData();
-      if(question.file) {
-        formData.append('file', question.file);
-      }
-      var q = JSON.parse(JSON.stringify(question));
-      delete q.file;
-      delete q.baseUrl;
-      delete q.arr;
-      delete q.user;
-      var url = '/exam/category/' + this.category._id;
-      var method = 'POST';
-      if(q._id) {
-        url = '/exam/question/' + q._id;
-        method = 'PATCH';
-      }
-      formData.append('question', JSON.stringify(q));
-      uploadFileAPI(url, method, formData, function(e) {
-        console.log(e);
-      })
-        .then(function(data) {
-          var newQuestion = data.question;
-          if(q._id) {
-            for(var i = 0 ; i < app.questions.length; i++) {
-              if(app.questions[i]._id === newQuestion._id) {
-                if(app.category._id !== newQuestion.cid) {
-                  app.questions.splice(i, 1);
-                } else {
-                  newQuestion.t = Date.now();
-                  app.questions[i] = newQuestion;
-                }
-                break;
-              }
-            }
-          } else {
-            app.questions.unshift(newQuestion);
-          }
-          app.editor = false;
-        })
-        .catch(function(data) {
-          screenTopWarning(data);
-        })
-    },
-    removeImage: function() {
-      delete this.question.file;
-      delete this.question.baseUrl;
-      this.question.hasImage = false;
     },
     disabledQuestion: function(q, type) {
       var url = '/exam/question/' + q._id + '/disabled';
@@ -161,6 +153,9 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data.error);
         })
+    },
+    filterFunc: function() {
+      this.displayFilter = !this.displayFilter;
     }
   }
 });

@@ -1,30 +1,57 @@
 module.exports = {
   _id: 'sms',
   c: {
-    login: {
-      validityPeriod: 15,
-      sameIpOneDay: 10,
-      sameMobileOneDay: 5
-    },
-    register: {
-      validityPeriod: 15,
-      sameIpOneDay: 10,
-      sameMobileOneDay: 5
-    },
-    changeMobile: {
-      validityPeriod: 15,
-      sameIpOneDay: 10,
-      sameMobileOneDay: 5
-    },
-    bindMobile: {
-      validityPeriod: 15,
-      sameIpOneDay: 10,
-      sameMobileOneDay: 5
-    },
-    getback: {
-      validityPeriod: 15,
-      sameIpOneDay: 10,
-      sameMobileOneDay: 5
-    }
+    appId: 0,
+    appKey: '',
+    smsSign: '',
+    templates: [
+      {
+        name: 'register',
+        id: 0,
+        status: false,
+        validityPeriod: 15,
+        sameIpOneDay: 10,
+        sameMobileOneDay: 5
+      },
+      {
+        name: 'reset',
+        id: 0,
+        status: false,
+        validityPeriod: 15,
+        sameIpOneDay: 10,
+        sameMobileOneDay: 5
+      },
+      {
+        name: 'getback',
+        id: 0,
+        status: false,
+        validityPeriod: 15,
+        sameIpOneDay: 10,
+        sameMobileOneDay: 5
+      },
+      {
+        name: 'bindMobile',
+        id: 0,
+        status: false,
+        validityPeriod: 15,
+        sameIpOneDay: 10,
+        sameMobileOneDay: 5
+      },
+      {
+        name: 'login',
+        id: 0,
+        status: false,
+        validityPeriod: 15,
+        sameIpOneDay: 10,
+        sameMobileOneDay: 5
+      },
+      {
+        name: 'changeMobile',
+        id: 0,
+        validityPeriod: 15,
+        sameIpOneDay: 10,
+        sameMobileOneDay: 5
+      }
+    ]
   }
 };

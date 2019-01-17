@@ -32,7 +32,14 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 是否提交试卷
   submitted: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  // 是否违规
+  violation: {
     type: Boolean,
     default: false,
     index: 1
@@ -45,6 +52,16 @@ const schema = new Schema({
   record: {
     type: [Schema.Types.Mixed],
     default: []
+  },
+  passed: {
+    type: Boolean,
+    default: null,
+    index: 1
+  },
+  // 及格分数
+  passScore: {
+    type: Number,
+    required: true
   }
   /*record: [
     {
@@ -66,6 +83,8 @@ const schema = new Schema({
       }
     }
   ]*/
+}, {
+  collection: 'examsPapers'
 });
 
 module.exports = mongoose.model('examsPapers', schema);
