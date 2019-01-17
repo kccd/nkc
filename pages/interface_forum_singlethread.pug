@@ -20,7 +20,7 @@
           a(style='text-decoration: none;' href=`/f/${thread.forum.fid}` title=`${thread.forum.description || ''}` data-toggle="tooltip" data-placement="bottom")= thread.forum.displayName
 
       if thread.category
-        span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
+        span.new-content-forumAbbr(style=`background-color:${thread.forum.color};`)
           a(style='text-decoration: none;' href=`/f/${data.forum.fid}?cat=${thread.category.cid}`)= thread.category.name
     else
       if parentForum

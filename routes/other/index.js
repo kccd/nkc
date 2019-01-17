@@ -12,6 +12,7 @@ const avatar = require('./avatar');
 const avatarSmall = require('./avatar_small');
 const resourcesRouter = require('./resources');
 const defaultRouter = require('./default');
+const attachIconRouter = require('./attachIcon');
 const settings = require('../../settings');
 const {home} = settings;
 const nkcModules = require('../../nkcModules');
@@ -76,6 +77,7 @@ otherRouter
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
+  .use('attachIcon', attachIconRouter.routes(), attachIconRouter.allowedMethods())
 	.use('photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
