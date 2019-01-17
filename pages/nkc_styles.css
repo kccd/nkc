@@ -33,6 +33,13 @@ h1, h2, h3, h4, h5, p{
 }
 .newMessagePoint{
   display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: red;
 }
 .margin-right{
   margin-right: 5px;
