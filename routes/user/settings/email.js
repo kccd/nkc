@@ -168,7 +168,12 @@ emailRouter
 				uid: user.uid
 			});
 			await emailCode.save();
-			const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
+			await sendEmail({
+        email,
+        code: token,
+        type
+      });
+			/*const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
 			const href = `https://www.kechuang.org/u/${user.uid}/settings/email/bind?email=${email}&token=${token}`;
 			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
 			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
@@ -177,7 +182,7 @@ emailRouter
 				subject: '绑定邮箱',
 				text,
 				html: text + link + h3
-			});
+			});*/
 		} else if(operation === 'verifyOldEmail') {
 			if(!userPersonal.email) ctx.throw(400, '您暂未绑定任何邮箱');
 			const type = 'verifyOldEmail';
@@ -193,7 +198,12 @@ emailRouter
 				uid: user.uid
 			});
 			await emailCode.save();
-			const text = `科创论坛账号修改邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
+			await sendEmail({
+        email: userPersonal.email,
+        type: 'changeEmail',
+        code: token
+      });
+			/*const text = `科创论坛账号修改邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
 			const href = `https://www.kechuang.org/u/${user.uid}/settings/email?token=${token}&operation=verifyOldEmail`;
 			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
 			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
@@ -202,7 +212,7 @@ emailRouter
 				subject: '修改邮箱',
 				text,
 				html: text + link + h3
-			});
+			});*/
 		} else if(operation === 'verifyNewEmail') {
 			let {email, oldToken} = body;
 			email = email.trim();
@@ -229,7 +239,12 @@ emailRouter
 				uid: user.uid
 			});
 			await emailCode.save();
-			const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
+			await sendEmail({
+        type,
+        email,
+        code: token
+      })
+		/*	const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
 			const href = `https://www.kechuang.org/u/${user.uid}/settings/email/verify?email=${email}&token=${token}&oldToken=${oldToken}`;
 			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
 			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
@@ -238,7 +253,7 @@ emailRouter
 				subject: '修改邮箱',
 				text,
 				html: text + link + h3
-			});
+			});*/
 
 		} else {
 			ctx.throw(400, '未知的操作类型');

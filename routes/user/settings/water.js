@@ -12,7 +12,7 @@ waterRouter
       waterPayInfo: false
     }
     // 获取该项服务所需科创币
-    const waterPayType = await db.TypesOfScoreChangeModel.findOne({_id: "waterPay"})
+    const waterPayType = await db.TypesOfScoreChangeModel.findOnly({_id: "waterPay"})
     data.kcbPayForWater = parseInt(waterPayType.change*-1);
     const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});
     if(userWaterSetting){

@@ -106,7 +106,7 @@ module.exports = async (ctx, next) => {
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
 	  ctx.template = 'error.pug';
-	  ctx.type = ctx.type || 'application/json';
+		ctx.type = ctx.type || 'application/json';
 	  await body(ctx, () => {});
   }
   finally {

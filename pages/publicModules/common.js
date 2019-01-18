@@ -258,3 +258,17 @@ function screenTopWarning(data) {
   });
 }
 
+/*
+* 播放新信息提示音
+* @param name 信息新类型，根据此类型播放相应的音频
+* @author pengxiguaa 2019/1/18
+* */
+function beep(name) {
+  var audio = document.getElementById('beep');
+  if(audio) {
+    if(audio.getAttribute('data-' + name) === 'true') {
+      audio.setAttribute('src', "/default/" + name + '.wav' + '?t=' + Date.now());
+      audio.play();
+    }
+  }
+}

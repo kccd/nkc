@@ -21,6 +21,9 @@ html
     script(src=`/axios/axios.min.js?v=${global.NKC.startTime}`)
     script(src=`/publicModules/config.js?v=${startTime}`)
     script(src=`/publicModules/common.js?v=${global.NKC.startTime}`)
+    if data.user
+      script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
+      script(src=`/message/socket.js?v=${global.NKC.startTime}`)
     block scripts
     script.
       var qrcode = document.getElementById('androidQrcode');

@@ -20,8 +20,8 @@ html{
   margin-left: 0;
 }
 .mdui-header-avatar{
-  height: 35px;
-  width: 35px;
+  height: 33px;
+  width: 33px;
   margin-right: 0;
   display: inline;
 }
@@ -390,6 +390,12 @@ html{
 .send-color{
   color: #3b8686!important;
 }
+.bills-color{
+  color: #ffbc42!important;
+}
+.activity-color{
+  color: #9baec8!important;
+}
 .paging-button{
   padding: 1rem 0;
   text-align: center;
@@ -458,6 +464,27 @@ i.icon-danger{
   line-height: 6rem;
   font-size: 4rem;
   border-radius: 50%;
+}
+.newMessagePoint{
+  display: none;
+  position: absolute;
+  top: -2px;
+  right: 0;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #ff6262;
+}
+.nav-message-num{
+  display: inline;
+  background-color: #ff6262;
+  font-size: 1rem;
+  padding: 1px 5px;
+  border-radius: 9px;
+  color: #fff;
+}
+.nav-message-num.disabled{
+  display: none;
 }
 @media (max-width: 1023px) {
   /*.mdui-header .mdui-container {

@@ -4939,13 +4939,13 @@ template {
  * ************   公共样式   ************
  * =============================================================================
  */
-body {
+/* body {
   font-family: Roboto, Noto, Helvetica, Arial, sans-serif;
   font-size: 14px;
   color: rgba(0, 0, 0, .87);
   background-color: #fff;
-}
-@media (min-width: 600px) {
+} */
+/* @media (min-width: 600px) {
   body {
     font-size: 14.5px;
   }
@@ -4953,6 +4953,22 @@ body {
 @media (min-width: 1024px) {
   body {
     font-size: 15px;
+  }
+} */
+body {
+  /* font-family: Roboto, Noto, Helvetica, Arial, sans-serif; */
+  font-size: 14px;
+  color: rgba(0, 0, 0, .87);
+  background-color: #fff;
+}
+@media (min-width: 600px) {
+  body {
+    font-size: 14px;
+  }
+}
+@media (min-width: 1024px) {
+  body {
+    font-size: 14px;
   }
 }
 body *::-webkit-scrollbar {

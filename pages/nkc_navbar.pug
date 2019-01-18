@@ -6,7 +6,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
   .container-fluid(style='max-width: 1400px')
     .navbar-header
       button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
-        .newMessagePoint(style="position: absolute;top: 0px; right: 0px;height: 0.5rem;width: 0.5rem;border-radius: 0.25rem;background-color: red")
+        .newMessagePoint(style=messageSum>0?'display: block;':'')
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
