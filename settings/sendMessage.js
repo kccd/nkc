@@ -6,7 +6,7 @@ module.exports = {
 	// 一天最多发送邮件的数量
 	sendEmailCount: 5,
 	// 一天最多发送短信验证码数量
-	sendMobileCodeCount: 5,
+	sendMobileCodeCount: 6,
 	// 一天同一ip发送短信验证码数量
 	sendMobileCodeCountSameIp: 10
 };

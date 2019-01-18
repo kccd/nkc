@@ -1,6 +1,7 @@
 module.exports = {
   _id: 'email',
   c: {
+    status: false,
     from: '"科创论坛"<blabla@blabla.com>',
     templates: [
       {

@@ -46,7 +46,9 @@ const message = async (i) => {
     if(clients.length > 4) {
       let num = clients.length - 4;
       for(let i = 0; i < num; i++) {
-        io.connected[clients[i]].disconnect(true);
+        if(io.connected[clients[i]]) {
+          io.connected[clients[i]].disconnect(true);
+        }
       }
     }
     // 判断客户端平台

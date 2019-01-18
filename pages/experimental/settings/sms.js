@@ -46,12 +46,13 @@ var app = new Vue({
     },
     save: function() {
       var smsSettings = this.smsSettings;
+      smsSettings.status = ['true', true].indexOf(smsSettings.status) !== -1;
       if(!smsSettings.appId) return screenTopWarning('appId不能为空');
       if(!smsSettings.appKey) return screenTopWarning('appKey不能为空');
       if(!smsSettings.smsSign) return screenTopWarning('短信签名不能为空');
       for(var i = 0 ; i < smsSettings.templates.length ; i++) {
         var template = smsSettings.templates[i];
-        if(template.status) {
+        if(smsSettings.status) {
           if(template.id === '') return screenTopWarning(template.name + '的模板ID不能为空');
           if(template.validityPeriod === '') return screenTopWarning(template.name + '的有效时间不能为空');
           if(template.validityPeriod <= 0) return screenTopWarning(template.name + '的有效时间必须大于0');

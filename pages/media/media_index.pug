@@ -13,115 +13,264 @@ style.
   .uploadFileFail {
     color: red;
   }
+  .mdui-table td,.mdui-table th {
+    padding: 0;
+  }
+  .mdui-table td:first-child, .mdui-table th:first-child {
+    padding: 0;
+  }
+  .mdui-btn {
+    height: 32px;
+    min-width: 1px;
+  }
 .panel.panel-default#mediaList(v-cloak)
-  .panel-heading.mdui-row-xs-10.mdui-row-sm-10.mdui-row-md-10.mdui-row-lg-10.mdui-row-xl-10.mdui-grid-list
-    button.mdui-col#mediaPictureLists.mdui-btn.mdui-btn-raised.mdui-ripple(style="min-width:40px" @click="buttonClick('picture')" v-bind:class="mediaType == 'picture'?uploadButtonClass:''") 图片
-    button.mdui-col#mediaVideoLists.mdui-btn.mdui-btn-raised.mdui-ripple(style="min-width:40px" @click="buttonClick('video')" :class="mediaType == 'video'?uploadButtonClass:''") 视频
-    button.mdui-col#mediaAudioLists.mdui-btn.mdui-btn-raised.mdui-ripple(style="min-width:40px" @click="buttonClick('audio')" :class="mediaType == 'audio'?uploadButtonClass:''") 音频
-    button.mdui-col#mediaAttachmentLists.mdui-btn.mdui-btn-raised.mdui-ripple(style="min-width:40px" @click="buttonClick('attachment')" :class="mediaType == 'attachment'?uploadButtonClass:''") 附件
-    button.mdui-col#mediaUpload.mdui-btn.mdui-btn-raised.mdui-ripple(style="min-width:40px" @click="buttonClick('upload')" :class="mediaType == 'upload'?uploadButtonClass:''") 上传
-  .panel-body
-    // 图片 picture
-    .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#picturesDom(v-bind:style="mediaType == 'picture' ? 'display:block' : 'display:none'")
-      .mdui-col(v-for = "(picture, index) in mediaPictureLists")
-        .mdui-grid-tile
-          //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
-          img(v-bind:src="'/r/'+picture.rid" style="height:90px;cursor: pointer" @click="pictureInsert(picture.rid, picture.ext, picture.oname)")
-          .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="picture.oname")
-            .mdui-grid-tile-text
-              .mdui-grid-tile-title(style="font-size:13px") {{picture.oname}}
-            //- .mdui-grid-tile-buttons
-            //-   button.mdui-btn.mdui-btn-icon(@click="pictureInsert(picture.rid, picture.ext, picture.oname)")
-            //-     i.fa.fa-check-square-o
+  .mdui-row(style="margin:0" v-if="isPc")
+    .mdui-col-xs-2
+      //- .panel-heading.mdui-row-xs-10.mdui-row-sm-10.mdui-row-md-10.mdui-row-lg-10.mdui-row-xl-10.mdui-grid-list(style="background-color:#ffffff26;border-color:#fff;padding:5px")
+      .mdui-row
+        button#mediaAllLists.mdui-btn.mdui-btn-raised.mdui-ripple(style="width:100%;" @click="buttonClick('all')" v-bind:class="mediaType == 'all'?uploadButtonClass:''") 全部
+      .mdui-row
+        button#mediaPictureLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('picture')" v-bind:class="mediaType == 'picture'?uploadButtonClass:''") 图片
+        button#mediaVideoLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('video')" :class="mediaType == 'video'?uploadButtonClass:''") 视频
+      .mdui-row
+        button#mediaAudioLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('audio')" :class="mediaType == 'audio'?uploadButtonClass:''") 音频
+        button#mediaAttachmentLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('attachment')" :class="mediaType == 'attachment'?uploadButtonClass:''") 附件
+      .mdui-row
+        button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;") 上传
+      .mdui-row()
+        .pastearea#paste-target(style="color:#000")
+          p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。      
+    .mdui-col-xs-10
+      // 翻页 prev next
+      .panel-body(v-bind:style="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? 'display:block' : 'display:none'" style="padding:5px")
+        div.mdui-table-fluid(style="max-height:150px")
+          table.mdui-table.mdui-table-hoverable            
+            tbody
+              tr(v-for = "(file, index) in uploadFileInfoArr" v-if="file.showType") 
+                //- td(v-bind:id="'#num'+index") {{file.showType}}
+                td(v-bind:id="'#name'+index") {{file.name}}
+                td(v-bind:id="'#size'+index") {{file.size}}
+                td(v-bind:id="'#type'+index") {{file.fileType}}
+                td
+                  div.mdui-progress
+                    div.mdui-progress-determinate(v-bind:id="'#process'+index" v-bind:style="'width:'+file.process+'%'")
+                td(v-bind:id="'#percent'+index") {{file.percent}}%
+                td(v-bind:id="'#status'+index" v-bind:style="file.statusType == 'fail'?'color:red':''") {{file.status}}
+                td(v-bind:id="'#opera'+index" v-if="file.statusType == 'fail'")
+                  button.mdui-btn.mdui-btn-icon(style="font-size:16px" @click="cancelFailure(index)")
+                    i.fa.fa-window-close-o
+      .panel-body(style="padding:5px")
+        // 全部 all
+        .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
+          .mdui-col(v-for = "(all, index) in mediaAllLists")
+            .mdui-grid-tile(@click="allInsert(all.rid, all.ext, all.oname)" v-bind:title="all.rid")
+              //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
+              img(v-bind:src="'/rt/'+all.rid" style="height:90px;cursor: pointer")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="all.oname")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
+                //- .mdui-grid-tile-buttons
+                //-   button.mdui-btn.mdui-btn-icon
+                //-     i.fa.fa-picture-o
+        // 图片 picture
+        .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#picturesDom(v-bind:style="mediaType == 'picture' ? 'display:block' : 'display:none'")
+          .mdui-col(v-for = "(picture, index) in mediaPictureLists")
+            .mdui-grid-tile(@click="pictureInsert(picture.rid, picture.ext, picture.oname)")
+              //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
+              img(v-bind:src="'/rt/'+picture.rid" style="height:90px;cursor: pointer")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="picture.oname")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") {{picture.oname}}
+                .mdui-grid-tile-buttons
+                  button.mdui-btn.mdui-btn-icon
+                    i.fa.fa-picture-o
 
-    // 视频 video
-    .mdui-row-xs-3.mdui-row-sm-4.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#videosDom(v-bind:style="mediaType == 'video' ? 'display:block' : 'display:none'")
-      .mdui-col(v-for = "(video, index) in mediaVideoLists")
-        .mdui-grid-tile(v-bind:title="video.oname")
-          .mdui-card
-            .mdui-card-media(@click="videoInsert(video.rid, video.ext, video.oname)")
-              img(v-bind:src="'/frameImg/' + video.rid" title="123456" style="width:100%;height:120px")
-              //- a(v-bind:href="'/r/'+video.rid" target="_blank")
-              span(style="position:absolute;top:0;bottom:0;left:0;right:0;background-color:rgba(0, 0, 0, 0.5);line-height:150px;text-align:center;")
-                i.fa.fa-play-circle-o(style="font-size:50px;color:#fff;display: inline;cursor: pointer;")
-          .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
-            .mdui-grid-tile-text
-              .mdui-grid-tile-title(style="font-size:13px") {{video.oname}}
-            //- .mdui-grid-tile-buttons
-            //-   button.mdui-btn.mdui-btn-icon(@click="videoInsert(video.rid, video.ext, video.oname)")
-            //-     i.fa.fa-check-square-o
+        // 视频 video
+        .mdui-row-xs-3.mdui-row-sm-4.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#videosDom(v-bind:style="mediaType == 'video' ? 'display:block' : 'display:none'")
+          .mdui-col(v-for = "(video, index) in mediaVideoLists")
+            .mdui-grid-tile(v-bind:title="video.oname" @click="videoInsert(video.rid, video.ext, video.oname)")
+              .mdui-card
+                .mdui-card-media(style="cursor: pointer")
+                  img(v-bind:src="'/frameImg/' + video.rid" title="123456" style="width:100%;height:90px")
+                  //- a(v-bind:href="'/r/'+video.rid" target="_blank")
+                  //- span(style="position:absolute;top:0;bottom:0;left:0;right:0;background-color:rgba(0, 0, 0, 0.5);line-height:150px;text-align:center;")
+                  //-   i.fa.fa-play-circle-o(style="font-size:50px;color:#fff;display: inline;cursor: pointer;")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") {{video.oname}}
+                .mdui-grid-tile-buttons
+                  button.mdui-btn.mdui-btn-icon
+                    i.fa.fa-video-camera
 
-    // 音频 audio
-    .mdui-row-xs-5.mdui-row-sm-8.mdui-row-md-10.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#audiosDom(v-bind:style="mediaType == 'audio' ? 'display:block' : 'display:none'")
-      .mdui-col(v-for = "(audio, index) in mediaAudioLists")
-        .mdui-grid-tile
-          .mdui-card
-            .mdui-card-media(@click="audioInsert(audio.rid, audio.ext, audio.oname)" style="cursor:pointer")
-              img(src="/default/music.png")
-            .mdui-card-primary(style="padding:5px")
-              .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{audio.oname}}
-    // 附件 attachment
-    .ResourceList#attachmentsDom(v-bind:style="mediaType == 'attachment' ? 'display:block' : 'display:none'")
-      .ResourceListItem(v-for = "(attachment, index) in mediaAttachmentLists" @click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer")
-        img.ResourceListItemThumb(src="/default/default_thumbnail.png")
-        .ResourceListItemText {{attachment.oname}}
-    //- .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#attachmentsDom(v-bind:style="mediaType == 'attachment' ? 'display:block' : 'display:none'")
-    //-   .mdui-col(v-for = "(attachment, index) in mediaAttachmentLists")
-    //-     .mdui-grid-tile
-    //-       .mdui-card(@click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer")
-    //-         .mdui-card-media
-    //-           img(v-bind:src="'/default/'+attachment.ext+'.png'")
-    //-         .mdui-card-primary(style="padding:5px")
-    //-           .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{attachment.oname}}
-    // 上传 upload
-    .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#uploadDom(v-bind:style="mediaType == 'upload' ? 'display:block' : 'display:none'")
-      div#noFiles(style="min-height:150px;width:100%;text-align:center" v-bind:style="!uploadFileList || uploadFileList.length == 0 ? 'display:block' : 'display:none'")
-        div(style="text-align:center;color:#ddd;height:150px;width:150px;display:inline-block")
-          div 暂未选择任何文件
-          div
-            .pastearea#paste-target(style="color:#000")
-              p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
-      div#hasFiles.mdui-table-fluid(v-bind:style="uploadFileList && uploadFileList.length != 0 ? 'display:block' : 'display:none'" style="height:300px")
-        table.mdui-table.mdui-table-hoverable
-          //- thead
-          //-   tr
-          //-     th 序号
-          //-     th 文件名称
-          //-     th 文件大小
-          //-     th 文件类型
-          //-     th 进度条
-          //-     th 进度百分比
-          //-     th 上传状态              
-          tbody
-            tr(v-for = "(file, index) in uploadFileInfoArr") 
-              //- td(v-bind:id="'#num'+index") {{index}}
-              td(v-bind:id="'#name'+index") {{file.name}}
-              td(v-bind:id="'#size'+index") {{file.size}}
-              td(v-bind:id="'#type'+index") {{file.fileType}}
-              td
-                div.mdui-progress
-                  div.mdui-progress-determinate(v-bind:id="'#process'+index" v-bind:style="'width:'+file.process+'%'")
-              td(v-bind:id="'#percent'+index") {{file.percent}}%
-              td(v-bind:id="'#status'+index" v-bind:style="file.statusType == 'fail'?'color:red':''") {{file.status}}
-  // 翻页 prev next
-  .panel-footer#pageTurnButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:block")
-    nav(aria-label="...")
-      ul.pager(style="margin:5px 0;")
-        li.previous
-          button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="prevPage()" style="float:left")
-            i.fa.fa-arrow-left &nbsp;PREV
-        li.next
-          button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="nextPage()" style="float:right") NEXT&nbsp;
-            i.fa.fa-arrow-right
-  // 上传按钮
-  .panel-footer#uploadFileButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:none")
-    nav(aria-label="...")
-      ul.pager(style="margin:5px 0;")
-        li.previous
-          button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="uploadFile()" style="float:right;margin-left:5px")
-            i.fa.fa-upload
-        li.next
-          button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="clickButton()" style="float:right") 选择文件&nbsp;
-            //- i.fa.fa-arrow-right
-        li(style="display:none")
-          input(id="fileList" type="file" multiple="multiple" onchange="fileSelect(this)")
+        // 音频 audio
+        .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#audiosDom(v-bind:style="mediaType == 'audio' ? 'display:block' : 'display:none'")
+          .mdui-col(v-for = "(audio, index) in mediaAudioLists")
+            .mdui-grid-tile
+              .mdui-card
+                .mdui-card-media(@click="audioInsert(audio.rid, audio.ext, audio.oname)" style="cursor:pointer")
+                  img(src="/default/music.png")
+                .mdui-card-primary(style="padding:5px")
+                  .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{audio.oname}}
+        // 附件 attachment
+        //- .ResourceList#attachmentsDom(v-bind:style="mediaType == 'attachment' ? 'display:block' : 'display:none'")
+        //-   .ResourceListItem(v-for = "(attachment, index) in mediaAttachmentLists" @click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer")
+        //-     img.ResourceListItemThumb(src="/default/default_thumbnail.png")
+        //-     .ResourceListItemText {{attachment.oname}}
+        .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#attachmentsDom(v-bind:style="mediaType == 'attachment' ? 'display:block' : 'display:none'")
+          .mdui-col(v-for = "(attachment, index) in mediaAttachmentLists")
+            .mdui-grid-tile
+              .mdui-card(@click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer")
+                .mdui-card-media
+                  img(v-bind:src="'/attachIcon/'+attachment.ext+'.png'")
+                .mdui-card-primary(style="padding:5px")
+                  .mdui-card-primary-subtitle(style="font-size:10px;line-height:15px") {{attachment.oname}}
+        // 上传 upload
+        .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#uploadDom(v-bind:style="mediaType == 'upload' ? 'display:block' : 'display:none'")
+          .mdui-row
+            .mdui-col-xs-12.mdui-col-sm-8
+              div#noFiles(style="min-height:150px;width:100%;text-align:center" v-bind:style="!uploadFileList || uploadFileList.length == 0 ? 'display:block' : 'display:none'")
+                div(style="text-align:left;color:#ddd;height:150px;width:50%;display:inline-block")
+                  div 图片格式：jpg、jpeg、png、gif、svg、bmp
+                  div 视频格式：mp4、mov、3gp、avi
+                  div 音频格式：mp3、wav、amr
+                  div 其余格式皆为附件
+            .mdui-col-xs-6.mdui-col-sm-4(style="border-left-style:solid;border-left-width:1px;border-left-color:#ddd")
+              div#noFiles(style="min-height:150px;width:100%;text-align:center" v-bind:style="!uploadFileList || uploadFileList.length == 0 ? 'display:block' : 'display:none'")
+                div(style="text-align:center;color:#ddd;height:150px;width:150px;display:inline-block")
+                  div 暂未选择任何文件
+                  div
+                    .pastearea#paste-target(style="color:#000")
+                      p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
+          div#hasFiles.mdui-table-fluid(v-bind:style="uploadFileList && uploadFileList.length != 0 ? 'display:block' : 'display:none'" style="height:300px")
+            table.mdui-table.mdui-table-hoverable
+              //- thead
+              //-   tr
+              //-     th 序号
+              //-     th 文件名称
+              //-     th 文件大小
+              //-     th 文件类型
+              //-     th 进度条
+              //-     th 进度百分比
+              //-     th 上传状态              
+              tbody#uploadTbody
+                tr(v-for = "(file, index) in uploadFileInfoArr" v-if="file.showType") 
+                  //- td(v-bind:id="'#num'+index") {{file.showType}}
+                  td(v-bind:id="'#name'+index") {{file.name}}
+                  td(v-bind:id="'#size'+index") {{file.size}}
+                  td(v-bind:id="'#type'+index") {{file.fileType}}
+                  td
+                    div.mdui-progress
+                      div.mdui-progress-determinate(v-bind:id="'#process'+index" v-bind:style="'width:'+file.process+'%'")
+                  td(v-bind:id="'#percent'+index") {{file.percent}}%
+                  td(v-bind:id="'#status'+index" v-bind:style="file.statusType == 'fail'?'color:red':''") {{file.status}}
+      // 翻页、跳转
+      .panel-footer(style="padding:0;background-color:#fff;border:0;")
+        .mdui-row
+          .mdui-col-xs-12
+            div(style="float:right")
+              button.mdui-btn.mdui-ripple.mdui-ripple-black#prevButton(onclick="prevPage()" style="min-width:5px")
+                i.fa.fa-chevron-left
+              span#currrentPage {{currentSkip}}
+              span /
+              span#totalPage {{maxSkip}}
+              button.mdui-btn.mdui-ripple.mdui-ripple-black#nextPrev(onclick="nextPage()" style="min-width:5px")
+                i.fa.fa-chevron-right
+              //- .mdui-textfield(style="display:inline-flex;width:30px")
+              input(type="text" v-model="appointSkip" style="width:40px")
+              button.mdui-btn.mdui-ripple.mdui-ripple-black(style="min-width:5px" onclick="turnPage()") 跳转
+      // 翻页 prev next
+      //- .panel-footer#pageTurnButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:block")
+      //-   nav(aria-label="...")
+      //-     ul.pager(style="margin:5px 0;")
+      //-       li.previous
+      //-         button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="prevPage()" style="float:left")
+      //-           i.fa.fa-arrow-left &nbsp;PREV
+      //-       li.next
+      //-         button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="nextPage()" style="float:right") NEXT&nbsp;
+      //-           i.fa.fa-arrow-right
+      // 上传按钮
+      .panel-footer#uploadFileButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:none")
+        nav(aria-label="...")
+          ul.pager(style="margin:5px 0;")
+            //- li.previous
+            //-   button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="uploadFile()" style="float:right;margin-left:5px")
+            //-     i.fa.fa-upload
+            li.next
+              button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="clickButton()" style="float:right") 选择文件&nbsp;
+                //- i.fa.fa-arrow-right
+            li(style="display:none")
+              input(id="fileList" type="file" multiple="multiple" onchange="fileSelect(this)")
+  .mdui-row(style="margin:0" v-else)     
+    .mdui-col-xs-12
+      // 翻页 prev next
+      .panel-body(v-bind:style="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? 'display:block' : 'display:none'" style="padding:5px")
+        div.mdui-table-fluid(style="max-height:150px")
+          table.mdui-table.mdui-table-hoverable            
+            tbody
+              tr(v-for = "(file, index) in uploadFileInfoArr" v-if="file.showType") 
+                td(v-bind:id="'#name'+index") {{fileNameShrink(file.name)}}
+                td(v-bind:id="'#percent'+index") {{file.percent}}%
+                td(v-bind:id="'#status'+index" v-if="file.statusType == 'fail'" style="color:red") 上传失败
+                td(v-bind:id="'#status'+index" v-else) {{file.status}}
+                td(v-bind:id="'#opera'+index" v-if="file.statusType == 'fail'")
+                  button.mdui-btn.mdui-btn-icon(style="font-size:16px" @click="cancelFailure(index)")
+                    i.fa.fa-window-close-o
+      .panel-body(style="padding:5px")
+        // 全部 all
+        .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
+          .mdui-col(v-for = "(all, index) in mediaAllLists")
+            .mdui-grid-tile(@click="allInsert(all.rid, all.ext, all.oname)" v-bind:title="all.rid")
+              //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
+              img(v-bind:src="'/rt/'+all.rid" style="height:60px;cursor: pointer")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="all.oname")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
+                //- .mdui-grid-tile-buttons
+                //-   button.mdui-btn.mdui-btn-icon
+                //-     i.fa.fa-picture-o
+        // 上传 upload
+        .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#uploadDom(v-bind:style="mediaType == 'upload' ? 'display:block' : 'display:none'")
+          .mdui-row
+            .mdui-col-xs-12.mdui-col-sm-8
+              div#noFiles(style="min-height:150px;width:100%;text-align:center" v-bind:style="!uploadFileList || uploadFileList.length == 0 ? 'display:block' : 'display:none'")
+                div(style="text-align:left;color:#ddd;height:150px;width:50%;display:inline-block")
+                  div 图片格式：jpg、jpeg、png、gif、svg、bmp
+                  div 视频格式：mp4、mov、3gp、avi
+                  div 音频格式：mp3、wav、amr
+                  div 其余格式皆为附件
+            .mdui-col-xs-6.mdui-col-sm-4(style="border-left-style:solid;border-left-width:1px;border-left-color:#ddd")
+              div#noFiles(style="min-height:150px;width:100%;text-align:center" v-bind:style="!uploadFileList || uploadFileList.length == 0 ? 'display:block' : 'display:none'")
+                div(style="text-align:center;color:#ddd;height:150px;width:150px;display:inline-block")
+                  div 暂未选择任何文件
+                  div
+                    .pastearea#paste-target(style="color:#000")
+                      p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
+      // 翻页、跳转
+      .panel-footer(style="padding:0;background-color:#fff;border:0;padding-top:10px;")
+        .mdui-row
+          .mdui-col-xs-2
+            button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()") 上传
+          .mdui-col-xs-10
+            div(style="float:right")
+              button.mdui-btn.mdui-ripple.mdui-ripple-black#prevButton(onclick="prevPage()" style="min-width:5px")
+                i.fa.fa-chevron-left
+              span#currrentPage {{currentSkip}}
+              span /
+              span#totalPage {{maxSkip}}
+              button.mdui-btn.mdui-ripple.mdui-ripple-black#nextPrev(onclick="nextPage()" style="min-width:5px")
+                i.fa.fa-chevron-right
+              //- .mdui-textfield(style="display:inline-flex;width:30px")
+              input(type="text" v-model="appointSkip" style="width:40px")
+              button.mdui-btn.mdui-ripple.mdui-ripple-black(style="min-width:5px" onclick="turnPage()") 跳转
+      // 上传按钮
+      .panel-footer#uploadFileButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:none")
+        nav(aria-label="...")
+          ul.pager(style="margin:5px 0;")
+            //- li.previous
+            //-   button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="uploadFile()" style="float:right;margin-left:5px")
+            //-     i.fa.fa-upload
+            li.next
+              button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-blue-600.mdui-ripple(onclick="clickButton()" style="float:right") 选择文件&nbsp;
+                //- i.fa.fa-arrow-right
+            li(style="display:none")
+              input(id="fileList" type="file" multiple="multiple" onchange="fileSelect(this)")

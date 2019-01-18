@@ -3,7 +3,7 @@ const Router = require('koa-router');
 const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
 // const examRouter = require('./exam');
-const forgotPasswordRouter = require('./forgotPassword');
+// const forgotPasswordRouter = require('./forgotPassword');
 const homeRouter = require('./home');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
@@ -12,6 +12,7 @@ const avatar = require('./avatar');
 const avatarSmall = require('./avatar_small');
 const resourcesRouter = require('./resources');
 const defaultRouter = require('./default');
+const attachIconRouter = require('./attachIcon');
 const settings = require('../../settings');
 const {home} = settings;
 const nkcModules = require('../../nkcModules');
@@ -62,7 +63,7 @@ otherRouter
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   // .use('exam', examRouter.routes(), examRouter.allowedMethods())
-  .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
+  // .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('avatar', avatar.routes(), avatar.allowedMethods())
@@ -76,6 +77,7 @@ otherRouter
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
+  .use('attachIcon', attachIconRouter.routes(), attachIconRouter.allowedMethods())
 	.use('photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())

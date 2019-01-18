@@ -12,8 +12,13 @@ block content
       include ../nav
     .row
       .col-xs-12.col-md-2.text-right
-        h4 短信配置
+        h4 基本设置
       .col-xs-12.col-md-7
+        div(style='display: inline-block;vertical-align: middle').mdui-m-r-3 开启短信验证
+        <label class="mdui-switch">
+        <input type="checkbox" value='true' v-model='smsSettings.status'>
+        <i class="mdui-switch-icon"></i>
+        </label>
         <div class="mdui-textfield">
         <label class="mdui-textfield-label">App ID</label>
         <input class="mdui-textfield-input" type="text" v-model.number='smsSettings.appId'>
@@ -42,7 +47,6 @@ block content
                 th 有效时间(分钟)
                 th IP次数限制(每天)
                 th 手机号码次数限制(每天)
-                th 是否开启验证
             tbody
               tr(v-for='t, index in smsSettings.templates')
                th {{index + 1}}
@@ -55,11 +59,6 @@ block content
                  input.table-input(v-model.number='t.sameIpOneDay')
                th
                  input.table-input(v-model.number='t.sameMobileOneDay')
-               th
-                 <label class="mdui-switch">
-                 <input type="checkbox" value='true' v-model='t.status'>
-                 <i class="mdui-switch-icon"></i>
-                 </label>
         .mdui-m-t-3
           select(style='display:inline-block;vertical-align: middle;' v-model='test.name')
             option(v-for='t in smsSettings.templates' :value='t.name') {{tran(t.name)}}

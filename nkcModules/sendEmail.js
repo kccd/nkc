@@ -2,12 +2,12 @@ const nm = require('nodemailer');
 const mongoose = require('mongoose');
 
 const sendEmail = async (options) => {
-  const {to, type, code} = options;
+  const {email, type, code} = options;
   const SettingModel = mongoose.model('settings');
   const emailSettings = await SettingModel.findOnly({_id: 'email'});
   const {smtpConfig, from, templates} = emailSettings.c;
   const emailOptions = {
-    to,
+    to: email,
     from
   };
   if(smtpConfig.secure) smtpConfig.port = 465;

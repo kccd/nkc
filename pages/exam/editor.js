@@ -30,7 +30,7 @@ var app = new Vue({
     question: JSON.parse(JSON.stringify(defaultQuestion))
   },
   mounted: function() {
-    kcAPI(window.location.href, 'get', {})
+    kcAPI(window.location.href + '?t=' + Date.now(), 'get', {})
       .then(function(data) {
         app.categories = data.categories;
         if(data.question) {

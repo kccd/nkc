@@ -76,6 +76,8 @@ const cacheForums = async () => {
     if(!accessible) {
       // 记下不能访问的专业ID
       canNotAccessibleForumsId.push(forum.fid);
+      canNotDisplayOnNavForumsId.push(fid);
+      canNotDisplayOnParentForumsId.push(forum.fid);
     } else {
       // 若专业能访问，则根据角色和等级的关系构建数据
       if(relation === 'or') {

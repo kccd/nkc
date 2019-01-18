@@ -4,7 +4,7 @@ const pathModule = require('path');
 const util = require("util");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
-const audioExts = ["mp3", "wav"];
+const audioExts = ["wav", "amr"];
 resourceRouter
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a resource ID is required.');
@@ -105,18 +105,40 @@ resourceRouter
     }
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
-    const middlePath = generateFolderName(mediaRealPath);
+    let middlePath = generateFolderName(mediaRealPath);
     // 路径 d:\nkc\resources\video/2018/04/256647.mp4
     let mediaFilePath = mediaRealPath + middlePath + saveName;
 
     // 图片裁剪水印
-    if (['jpg', 'jpeg', 'bmp', 'svg', 'png'].indexOf(extension.toLowerCase()) > -1) {
+    if (['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(extension.toLowerCase()) > -1) {
       // 如果格式满足则生成缩略图
       const descPathOfThumbnail = generateFolderName(thumbnailPath); // 存放路径
       const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 路径+名称
 
       // 图片自动旋转
-      await imageMagick.allInfo(path);
+      try{
+        await imageMagick.allInfo(path);
+      }catch(e){
+        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
+        middlePath = generateFolderName(mediaRealPath);
+        mediaFilePath = mediaRealPath + middlePath + saveName;
+        await fs.copyFile(path, mediaFilePath);
+        await fs.unlink(path);
+        const r = new ctx.db.ResourceModel({
+          rid,
+          oname: name,
+          path: middlePath + saveName,
+          tpath: middlePath + saveName,
+          ext: extension,
+          size,
+          uid: ctx.data.user.uid,
+          toc: Date.now(),
+          mediaType: "mediaAttachment"
+        });
+        ctx.data.r = await r.save();
+        ctx.throw(400, "图片上传失败，已被放至附件")
+        return await next()
+      }
 
       // 生成略缩图
       await imageMagick.thumbnailify(path, thumbnailFilePath);
@@ -232,14 +254,36 @@ resourceRouter
       // 视频封面图路径
       var videoImgPath = frameImgPath + "/" + rid + ".jpg";
 
-      if(['3gp'].indexOf(extension.toLowerCase()) > -1){
-        await ffmpeg.video3GPTransMP4(path, outputVideoPath);
-      }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoMP4TransH264(path, outputVideoPath);
-      }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
-      }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+      try{
+        if(['3gp'].indexOf(extension.toLowerCase()) > -1){
+          await ffmpeg.video3GPTransMP4(path, outputVideoPath);
+        }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoMP4TransH264(path, outputVideoPath);
+        }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
+        }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+        }
+      }catch(e) {
+        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
+        middlePath = generateFolderName(mediaRealPath);
+        mediaFilePath = mediaRealPath + middlePath + saveName;
+        await fs.copyFile(path, mediaFilePath);
+        await fs.unlink(path);
+        const r = new ctx.db.ResourceModel({
+          rid,
+          oname: name,
+          path: middlePath + saveName,
+          tpath: middlePath + saveName,
+          ext: extension,
+          size,
+          uid: ctx.data.user.uid,
+          toc: Date.now(),
+          mediaType: "mediaAttachment"
+        });
+        ctx.data.r = await r.save();
+        ctx.throw(400, "视频转码失败，已被放至附件")
+        return await next()
       }
 
       // 将元数据移动到视频的第一帧
@@ -255,6 +299,47 @@ resourceRouter
       saveName = rid + "." + extension;
       mediaFilePath = mediaFilePath.replace(nameReg, "mp4")
     } 
+    // 音频转为mp3
+    if(audioExts.indexOf(extension.toLowerCase()) > -1) {
+      var timeStr = new Date().getTime();
+      //输出音频路径
+      var newpath = pathModule.resolve();
+      var outputVideoPath = newpath + "/tmp/" + timeStr + ".mp3";
+      try{
+        if(['wav'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
+        }else if(['amr'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.audioAMRTransMP3(path, outputVideoPath);
+        }
+      }catch(e) {
+        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
+        middlePath = generateFolderName(mediaRealPath);
+        mediaFilePath = mediaRealPath + middlePath + saveName;
+        await fs.copyFile(path, mediaFilePath);
+        await fs.unlink(path);
+        const r = new ctx.db.ResourceModel({
+          rid,
+          oname: name,
+          path: middlePath + saveName,
+          tpath: middlePath + saveName,
+          ext: extension,
+          size,
+          uid: ctx.data.user.uid,
+          toc: Date.now(),
+          mediaType: "mediaAttachment"
+        });
+        ctx.data.r = await r.save();
+        ctx.throw(400, "音频转码失败，已被放至附件")
+        return await next()
+      }
+
+      await fs.rename(outputVideoPath, path);
+      let nameReg = new RegExp(extension, "igm");
+      name = name.replace(nameReg, "mp3");
+      extension = "mp3";
+      saveName = rid + "." + extension;
+      mediaFilePath = mediaFilePath.replace(nameReg, "mp3");
+    }
     // await fs.rename(path, mediaFilePath);
     await fs.copyFile(path, mediaFilePath);
     await fs.unlink(path);

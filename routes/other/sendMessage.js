@@ -82,7 +82,8 @@ sendMessageRouter
   })
   .post('/getback', async (ctx, next) => { // 找回密码
   	const {db, body} = ctx;
-  	const {username, mobile, nationCode} = body;
+  	const {username, mobile} = body;
+    const nationCode = body.nationCode.toString();
   	if(!username) ctx.throw(400, '请输入用户名。');
 	  const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 	  if(!user) ctx.throw(400, '用户名不存在。');

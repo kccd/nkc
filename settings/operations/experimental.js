@@ -4,6 +4,14 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+	  login: {
+	    GET:'visitLoginSettings',
+      PATCH: 'modifyLoginSettings'
+    },
+    register: {
+      GET: 'visitRegisterSettings',
+      PATCH: 'modifyRegisterSettings'
+    },
 		sms: {
 			GET: 'visitSmsSettings',
 			PATCH: 'modifySmsSettings',

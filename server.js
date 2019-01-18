@@ -63,7 +63,7 @@ const start = async () => {
   server = http.createServer(app);
   server.listen(port, address, async () => {
     await socket(server);
-    console.log(`${serverSettings.c.serverName.replace('$', global.NKC.NODE_ENV)} listening on ${port}`.green);
+    console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
   });
 };
 

@@ -36,7 +36,7 @@ emailRouter
     if(!email) ctx.throw(400, '测试邮箱地址不能为空');
     await sendEmail({
       type: name,
-      to: email,
+      email: email,
       code: '<后台测试>'
     });
     await next();

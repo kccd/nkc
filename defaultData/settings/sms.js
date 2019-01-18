@@ -1,6 +1,7 @@
 module.exports = {
   _id: 'sms',
   c: {
+    status: false,
     appId: 0,
     appKey: '',
     smsSign: '',
@@ -8,7 +9,6 @@ module.exports = {
       {
         name: 'register',
         id: 0,
-        status: false,
         validityPeriod: 15,
         sameIpOneDay: 10,
         sameMobileOneDay: 5
@@ -16,7 +16,6 @@ module.exports = {
       {
         name: 'reset',
         id: 0,
-        status: false,
         validityPeriod: 15,
         sameIpOneDay: 10,
         sameMobileOneDay: 5
@@ -24,7 +23,6 @@ module.exports = {
       {
         name: 'getback',
         id: 0,
-        status: false,
         validityPeriod: 15,
         sameIpOneDay: 10,
         sameMobileOneDay: 5
@@ -32,7 +30,6 @@ module.exports = {
       {
         name: 'bindMobile',
         id: 0,
-        status: false,
         validityPeriod: 15,
         sameIpOneDay: 10,
         sameMobileOneDay: 5
@@ -40,7 +37,6 @@ module.exports = {
       {
         name: 'login',
         id: 0,
-        status: false,
         validityPeriod: 15,
         sameIpOneDay: 10,
         sameMobileOneDay: 5

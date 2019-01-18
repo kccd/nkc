@@ -10,31 +10,6 @@
       if permission('visitExperimentalConsole')
         li
           a(href='/e/console')=lang('ex', 'console')
-      li.dropdown
-        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
-          span= lang('ex', 'baseSettings') + ' '
-          span.fa.fa-caret-down
-        ul.dropdown-menu
-          if permission('visitWebBaseSettings')
-            li
-              a(href='/e/settings/base')=lang('ex', 'baseSettings')
-      li.dropdown
-        a.dropdown-toggle(data-toggle='dropdown' href="#" role='button' aria-haspopup='true' aria-expanded='false')
-          span= lang('ex', 'otherSettings') + ' '
-          span.fa.fa-caret-down
-        ul.dropdown-menu
-          if permission('visitSmsSettings')
-            li
-              a(href='/e/settings/sms')=lang('ex', 'smsSettings')
-          if permission('visitExperimentalEmailSettings')
-            li
-              a(href='/e/settings/email')=lang('ex', 'emailSettings')
-          if permission('visitEPostSettings')
-            li
-              a(href='/e/settings/post')=lang('ex', 'postSettings')
-          if permission('visitExamSettings')
-            li
-              a(href='/e/settings/exam')=lang('ex', 'exam')
 
 
       li.dropdown
@@ -103,8 +78,26 @@
           span=`${lang('ex', 'settings')} `
           span.fa.fa-caret-down
         ul.dropdown-menu
-          li
-            a(href='/e/settings/base') 基本信息
+          if permission('visitWebBaseSettings')
+            li
+              a(href='/e/settings/base')=lang('ex', 'baseSettings')
+            <li role="separator" class="divider"></li>
+          if permission('visitLoginSettings')
+            li
+              a(href='/e/settings/login')=lang('ex', 'loginSettings')
+          if permission('visitSmsSettings')
+            li
+              a(href='/e/settings/sms')=lang('ex', 'smsSettings')
+          if permission('visitExperimentalEmailSettings')
+            li
+              a(href='/e/settings/email')=lang('ex', 'emailSettings')
+          if permission('visitEPostSettings')
+            li
+              a(href='/e/settings/post')=lang('ex', 'postSettings')
+          if permission('visitExamSettings')
+            li
+              a(href='/e/settings/exam')=lang('ex', 'exam')
+          <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/top') 网站首页
           li
@@ -122,15 +115,11 @@
           li
             a(href='/e/settings/exam') 考试设置
           li
-            a(href='/e/settings/sms') 短信设置
-          li
             a(href='/e/settings/message') 聊天设置
           li
             a(href='/e/settings/share') 分享设置
           li
             a(href='/e/settings/red-envelope') 奖励设置
-          li
-            a(href='/e/settings/post') 发表限制
           //li
           //  a(href='/e/settings/score') 分值加减
           li

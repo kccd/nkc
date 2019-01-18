@@ -13,7 +13,8 @@ if !hiddenFooter
             if data.navbar && data.navbar.highlight === 'latest'
               include nkc_friendlies.pug
           //hr.hrNarrowSpace
-          p #{data.serverSettings.serverName} &nbsp
+          //p #{data.serverSettings.serverName} &nbsp
+          p Github &nbsp
             a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
           p #{data.serverSettings.copyright}
           p.lighttext= data.serverSettings.record

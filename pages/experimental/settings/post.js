@@ -51,7 +51,7 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    nkcAPI('/e/settings/post', 'GET', {})
+    nkcAPI('/e/settings/post?t=' + Date.now(), 'GET', {})
       .then(function(data) {
         app.roles = data.roles;
         app.grades = data.grades;

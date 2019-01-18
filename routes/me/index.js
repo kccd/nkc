@@ -113,14 +113,16 @@ meRouter
     quota = parseInt(quota);
     skip = parseInt(skip);
     let queryMap;
-    if(type == "picture") {
-      queryMap = {"uid": user.uid, "ext": {$in: pictureExts}};
+    if(type == "all") {
+      queryMap = {"uid": user.uid};
+    }else if(type == "picture") {
+      queryMap = {"uid": user.uid, "mediaType": "mediaPicture"};
     }else if(type == "video") {
-      queryMap = {"uid": user.uid, "ext": {$in: videoExts}};
+      queryMap = {"uid": user.uid, "mediaType": "mediaVideo"};
     }else if(type == "audio") {
-      queryMap = {"uid": user.uid, "ext": {$in: audioExts}};
+      queryMap = {"uid": user.uid, "mediaType": "mediaAudio"};
     }else{
-      queryMap = {"uid": user.uid, "ext": {$nin :attachmentExts}};
+      queryMap = {"uid": user.uid, "mediaType": "mediaAttachment"};
     }
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).count();
@@ -133,6 +135,7 @@ meRouter
     if(newSkip > mediaCount) {
       ctx.throw(400, '已经是最后一页了')
     }
+    ctx.data.maxSkip = maxSkip;
     ctx.data.resources = await db.ResourceModel.find(queryMap).sort({toc: -1}).skip(newSkip).limit(quota);
     await next();
   })

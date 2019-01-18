@@ -1,4 +1,12 @@
 $(document).ready(function(){
+	//编辑器缩放
+	if($(".w-e-text-container").length === 0) return;
+	$(".w-e-text-container").resizable({
+		containment: '#body',
+		minHeight: 100,
+		minWidth: 100,
+		maxWidth: 1400
+	});
 	if($(window).width()<750){
 		$('.ThreadTitleText').css('font-size','20px');
 		/*$('.ThreadTitle1').css('width','80%');

@@ -4910,7 +4910,7 @@ Editor.prototype = {
             //先屏蔽掉，有莫名其妙加背景色的情况发生，观察一段时间
             //$toolbarElem.css('background-color', '#f1f1f1').css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
             $toolbarElem.css('border', '1px solid #ccc').css('flex-wrap', 'wrap');
-            $textContainerElem.css('border', '1px solid #ccc').css('border-top', 'none').css('height', '250px');
+            $textContainerElem.css('border', '1px solid #ccc').css('border-top', 'none').css('height', '120px');
             if(IsPC() === false){
                 $textContainerElem.css('height', '200px');
             }

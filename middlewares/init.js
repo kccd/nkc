@@ -40,7 +40,7 @@ module.exports = async (ctx, next) => {
 		serverSettings = serverSettings.c;
 	  ctx.data.serverSettings = {
 			websiteName: serverSettings.websiteName,
-			serverName: serverSettings.serverName.replace('$', global.NKC.NODE_ENV),
+			// serverName: serverSettings.serverName.replace('$', global.NKC.NODE_ENV),
 		  github: serverSettings.github,
 		  copyright: serverSettings.copyright,
 		  record: serverSettings.record,

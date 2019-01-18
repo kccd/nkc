@@ -73,6 +73,11 @@ module.exports = {
 			GET: 'getDefaultImage'
 		}
 	},
+	attachIcon: {// 默认附件图标
+		PARAMETER: {
+			GET: 'getAttachmentIcon'
+		}
+	},
 	pfa: {// 专栏logo
 		PARAMETER: {
 			GET: 'getPersonalForumAvatar'

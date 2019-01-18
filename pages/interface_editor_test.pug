@@ -23,7 +23,7 @@ block content
 
           .row
               .form-group
-                  input#title.form-control(style='height:50px' type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
+                  input#title.form-control(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
               .form-group
                   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
                     div(style='margin-top: 5px;')
@@ -46,6 +46,13 @@ block content
                   button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
               .form-group
                   div#content_test
+              .form-group
+              //- .nkcpanel(id='file-uploading' target='/r')
+              //-     //uploader section
+              //-     include interface_attachment_uploader_uploader.pug
+
+              include ./media/media_index.pug
+              
               .form-inline
                   .form-group
                       input#parseURL(type='checkbox' checked)
@@ -63,13 +70,6 @@ block content
                     .form-group
                       if data.user
                         a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
-              .form-group
-              //- .nkcpanel(id='file-uploading' target='/r')
-              //-     //uploader section
-              //-     include interface_attachment_uploader_uploader.pug
-
-              include ./media/media_index.pug
-
               .form-group
                 //- input#parseURL(type='checkbox' checked)
                 //- span &nbsp;处理URL&nbsp;
@@ -105,8 +105,8 @@ block scripts
 
 
 
-  script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
-  script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
+  //- script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
+  //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
   script(src=`/media/media_index.js?v=${startTime}`)

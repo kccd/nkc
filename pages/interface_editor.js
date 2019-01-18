@@ -29,6 +29,7 @@ function dataURItoBlob (base64Data) {
 
 
 $("document").ready(function(){
+  $(".w-e-text-container").css("height", "300px")
   //编辑器缩放
 	if($(".w-e-text-container").length === 0) return;
   $(".w-e-text-container").resizable({

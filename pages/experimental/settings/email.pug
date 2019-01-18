@@ -12,10 +12,15 @@ block content
     .row
       include ../nav
       .col-xs-12.col-md-12#app(v-cloak).mdui-m-b-5
-        .row.mdui-m-b-5
+        .row
           .col-xs-12.col-md-2.text-right
             h4 基本设置
           .col-xs-12.col-md-7
+            div(style='display: inline-block;vertical-align: middle').mdui-m-r-3 启用邮箱验证
+            <label class="mdui-switch">
+            <input type="checkbox" value='true' v-model='emailSettings.status'>
+            <i class="mdui-switch-icon"></i>
+            </label>
             <div class="mdui-textfield">
             <label class="mdui-textfield-label">发件人 格式："显示名称" <邮箱地址></label>
             <input class="mdui-textfield-input" type="text" v-model='emailSettings.from'>

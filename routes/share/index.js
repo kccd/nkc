@@ -124,7 +124,7 @@ shareRouter
     uid
   });
   await sharesAccessLog.save();
-  data.newUrl = "/share/" + token;
+  data.newUrl = "/s/" + token;
   await next();
 });
 module.exports = shareRouter;

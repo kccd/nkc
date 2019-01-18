@@ -387,6 +387,10 @@
   "postExamsPaper": "提交考试试卷",
   "testSendMessage": "测试发送短信",
   "testSendEmail": "测试发送邮件",
+  "visitLoginSettings": "访问<后台管理-登录设置>",
+  "modifyLoginSettings": "修改<后台管理-登录设置>",
+  "visitRegisterSettings": "访问<后台管理-注册设置>",
+  "modifyRegisterSettings": "修改<后台管理-注册设置>",
 
 
   "APPgetUserInfo": "app获取用户信息",
