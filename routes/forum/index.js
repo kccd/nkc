@@ -109,14 +109,16 @@ forumRouter
 		await thread.extendFirstPost();
 		await thread.firstPost.extendResources();
 		const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg'].indexOf(e.ext.toLowerCase()) > -1);
-		const middlePath = selectDiskCharacterDown(cover);
-		const coverMiddlePath  = path.join(middlePath, cover.path);
-		if(cover) {
-			await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
-				.catch(e => {
-					thread.hasCover = false;
-					return thread.save()
-				});
+		if(cover){
+			const middlePath = selectDiskCharacterDown(cover);
+			const coverMiddlePath  = path.join(middlePath, cover.path);
+			if(cover) {
+				await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
+					.catch(e => {
+						thread.hasCover = false;
+						return thread.save()
+					});
+			}
 		}
 		// 发帖数加一并生成记录
 		const obj = {
