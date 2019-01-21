@@ -65,7 +65,7 @@ forumRouter
 	})
 	.post('/:fid', async (ctx, next) => {
 		const {
-			data, params, db, body, address: ip, query, nkcModules
+			data, params, db, body, address: ip, fs, query, nkcModules
     } = ctx;
 		const {
 			ForumModel,
@@ -104,21 +104,40 @@ forumRouter
     const thread = await ThreadModel.findOnly({tid: _post.tid});
 		data.thread = thread;
 		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
-		const {coverPath} = ctx.settings.upload;
+		const {coverPath, frameImgPath} = ctx.settings.upload;
     const {coverify} = ctx.tools.imageMagick;
 		await thread.extendFirstPost();
 		await thread.firstPost.extendResources();
-		const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg'].indexOf(e.ext.toLowerCase()) > -1);
+		const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg', 'mp4'].indexOf(e.ext.toLowerCase()) > -1);
 		if(cover){
 			const middlePath = selectDiskCharacterDown(cover);
-			const coverMiddlePath  = path.join(middlePath, cover.path);
-			if(cover) {
-				await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
-					.catch(e => {
-						thread.hasCover = false;
-						return thread.save()
-					});
+			let coverMiddlePath;
+			if(cover.ext === "mp4"){
+				coverMiddlePath = path.join(path.resolve(frameImgPath), `/${cover.rid}.jpg`);
+			}else{
+				coverMiddlePath = path.join(middlePath, cover.path);
 			}
+			let coverExists = await fs.exists(coverMiddlePath);
+			if(!coverExists){
+				thread.hasCover = false;
+				await thread.save();
+				url = `${coverPath}/default.jpg`;
+			}else{
+				await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
+				.catch(e => {
+					thread.hasCover = false;
+					return thread.save()
+				});
+			}
+			// const middlePath = selectDiskCharacterDown(cover);
+			// const coverMiddlePath  = path.join(middlePath, cover.path);
+			// if(cover) {
+			// 	await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
+			// 		.catch(e => {
+			// 			thread.hasCover = false;
+			// 			return thread.save()
+			// 		});
+			// }
 		}
 		// 发帖数加一并生成记录
 		const obj = {
