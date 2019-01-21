@@ -55,7 +55,6 @@ router
       ctx.type = 'jpg';
       ctx.filePath = url
     }
-    console.log(ctx.filePath)
     await next()
   });
 

@@ -183,10 +183,11 @@ block content
                                     .col-xs-3.col-md-3(style="padding:0px")
                                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
                                         img(src="/default/weChat.png" style="")
-                                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'qzone', window.location.href, '${thread.firstPost.t}')`)
-                                    //-   img(src="/default/qzone.png" style="width:100%")
-                                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('thread', 'weibo', window.location.href, '${thread.firstPost.t}')`)
-                                    //-   img(src="/default/weibo.png" style="width:100%")
+                                  .col-xs-12.col-md-12
+                                    a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
+                                  .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
+                                    input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
+                                    button(onclick="copyLink()" id=`copyButton${thread.tid}`) 复制
                                   canvas#threadQrcode.inline-block(style="display:none")
                       if addKcb && data.user && thread.firstPost.uid !== data.user.uid
                         .inline-block.post-thumbsUp(style='color: #aaa;')

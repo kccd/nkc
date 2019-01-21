@@ -91,6 +91,11 @@ block title
               .col-xs-3.col-md-3(style="padding:0px")
                 a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weChat', window.location.origin+window.location.pathname, '${forum.displayName}', '${forum.fid}')`)
                   img(src="/default/weChat.png" style="")
+            //- .col-xs-12.col-md-12
+            //-   a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('forum', 'link', window.location.origin+window.location.pathname, '${forum.displayName}', '${forum.fid}')`) 获取分享链接
+            //- .col-xs-12.col-md-12(id=`copyArea${forum.fid}` style="display:block")
+            //-   input(type="text", id=`copyLink${forum.fid}`, name=`copyLink${forum.fid}` style="width:inherit")
+            //-   button(onclick="copyLink()" id=`copyButton${forum.fid}`) 复制
           canvas.forumQrcode(style="width:100%;display:none")
   //- 上级专业、下级专业、版主
   mixin forumsAndModerators
@@ -179,6 +184,11 @@ block content
                 .col-xs-3.col-md-3(style="padding:0px")
                   a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('forum', 'weChat', window.location.origin+window.location.pathname, '${forum.displayName}', '${forum.fid}')`)
                     img(src="/default/weChat.png" style="")
+              //- .col-xs-12.col-md-12
+              //-   a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('forum', 'link', window.location.origin+window.location.pathname, '${forum.displayName}', '${forum.fid}')`) 获取分享链接
+              //- .col-xs-12.col-md-12(id=`copyArea${forum.fid}` style="display:block")
+              //-   input(type="text", id=`copyLink${forum.fid}`, name=`copyLink${forum.fid}` style="width:inherit")
+              //-   button(onclick="copyLink()" id=`copyButton${forum.fid}`) 复制
             canvas(style="width:100%;display:none")#forumQrcode
       .col-xs-12.col-md-12
         .row
