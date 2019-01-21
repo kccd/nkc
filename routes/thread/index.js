@@ -330,19 +330,52 @@ threadRouter
 		const {
 			data, nkcModules, params, db, body, address: ip
 		} = ctx;
-		// 验证用户是否有权限发表回复，硬性条件。
 		const {user} = data;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    // 根据发表设置，判断用户是否有权限发表文章
+    // 1. 身份认证等级
+    // 2. 考试
+    // 3. 角色
+    // 4. 等级
+    const postSettings = await db.SettingModel.findOnly({_id: 'post'});
+    const {authLevelMin, exam} = postSettings.c.postToThread;
+    const {volumeA, volumeB, notPass} = exam;
+    const {status, countLimit, unlimited} = notPass;
+    const today = nkcModules.apiFunction.today();
+    const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+    let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: user.uid});
+    todayPostCount = todayPostCount - todayThreadCount;
+    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复至少需要完成身份认证 ${authLevelMin}`);
+    if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
+      if(!status) ctx.throw(403, '权限不足，请提升账号等级');
+      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请明天再试。');
+    }
+
+    // 发表回复时间、条数限制
+    const {postToThreadCountLimit, postToThreadTimeLimit} = await user.getPostLimit();
+    if(todayPostCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复，请明天再试。`);
+    const latestThread = await db.ThreadModel.findOne({uid: user.uid}).sort({toc: -1});
+    const q = {
+      uid: user.uid,
+      toc: {$gt: (Date.now() - postToThreadTimeLimit * 60 * 1000)}
+    };
+    if(latestThread) {
+      q.tid = {$ne: latestThread.tid}
+    }
+    const latestPost = await db.PostModel.findOne(q);
+    if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
+
+
+		/*const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		// 获取认证等级
 		const authLevel = await userPersonal.getAuthLevel();
 		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
 		if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
-		// if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
+		// if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');*/
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
 
-		if(!user.volumeA) {
+		/*if(!user.volumeA) {
 			// -1: 无限制；0：不允许；正整数：相应条数
 			const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
 			const postCountOneDay = examSettings.c.volumeAFailedPostCountOneDay;
@@ -355,15 +388,15 @@ threadRouter
 					if(postCountToday >= postCountOneDay) ctx.throw(403, `未通过A卷考试的用户每天仅能发表${postCountOneDay}条回复`);
 				}
 			}
-		}
+		}*/
 
-		// 发表回复时间、条数限制
+		/*// 发表回复时间、条数限制
 		const {postToThreadCountLimit, postToThreadTimeLimit} = await user.getPostLimit();
 		const today = nkcModules.apiFunction.today();
 		const postToThreadCount = await db.InfoBehaviorModel.count({toc: {$gt: today}, uid: user.uid, operationId: 'postToThread'});
 		if(postToThreadCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复，请明天再试。`);
 		const latestPostLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToThread', toc: {$gt: (Date.now() - postToThreadTimeLimit * 60 * 1000)}});
-		if(latestPostLog) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
+		if(latestPostLog) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);*/
 
 
 		data.thread = thread;

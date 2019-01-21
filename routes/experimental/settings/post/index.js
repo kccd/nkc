@@ -42,20 +42,16 @@ router
     await Promise.all(roles.map(async role => {
       await db.RoleModel.update({_id: role._id}, {
         $set: {
-          postToForumCountLimit: role.postToForumCountLimit,
-          postToThreadCountLimit: role.postToThreadCountLimit,
-          postToForumTimeLimit: role.postToForumTimeLimit,
-          postToThreadTimeLimit: role.postToThreadTimeLimit
+          postToForum: role.postToForum,
+          postToThread: role.postToThread,
         }
       })
     }));
     await Promise.all(grades.map(async grade => {
       await db.UsersGradeModel.update({_id: grade._id}, {
         $set: {
-          postToForumCountLimit: grade.postToForumCountLimit,
-          postToThreadCountLimit: grade.postToThreadCountLimit,
-          postToForumTimeLimit: grade.postToForumTimeLimit,
-          postToThreadTimeLimit: grade.postToThreadTimeLimit
+          postToForum: grade.postToForum,
+          postToThread: grade.postToThread,
         }
       })
     }));

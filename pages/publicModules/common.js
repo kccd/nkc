@@ -37,11 +37,11 @@ NKC.methods.scrollToTop = function(number, time) {
     document.body.scrollTop = document.documentElement.scrollTop = number;
     return number;
   }
-  const spacingTime = 10;
-  let spacingIndex = time / spacingTime;
-  let nowTop = document.body.scrollTop + document.documentElement.scrollTop;
-  let everTop = (number - nowTop) / spacingIndex;
-  let scrollTimer = setInterval(() => {
+  var spacingTime = 10;
+  var spacingIndex = time / spacingTime;
+  var nowTop = document.body.scrollTop + document.documentElement.scrollTop;
+  var everTop = (number - nowTop) / spacingIndex;
+  var scrollTimer = setInterval(function() {
     if (spacingIndex > 0) {
       spacingIndex--;
       NKC.methods.scrollToTop(nowTop += everTop);

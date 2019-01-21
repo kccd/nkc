@@ -54,7 +54,7 @@ luckRouter
     try {
       await record.save();
     } catch(err) {
-      await db.SettingModel.operateSystemID('kcbsRecords', -1);
+      // await db.SettingModel.operateSystemID('kcbsRecords', -1);
       await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': kcb}});
       user.kcb = oldKcb;
       await user.save();
