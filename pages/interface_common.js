@@ -1440,6 +1440,18 @@ function shareTo(shareType, type, str, title, pid){
     nkcAPI('/s', "POST", para)
     .then(function(data) {
       var newUrl = 'http://' + host + data.newUrl;
+      if(type == "link") {
+        var copyAreaId = "copyArea"+pid;
+        var copyLinkId = "copyLink"+pid;
+        var copyButton = "copyVutton"+pid;
+        // $("#"+copyAreaId).css("display", "block");
+        document.getElementById(copyAreaId).style.display = "block";
+        document.getElementById(copyLinkId).value = newUrl;
+        // $("#"+copyLinkId).val(newUrl);
+        var obj = document.getElementById(copyLinkId);
+        obj.select(); 
+        // copyLink();
+      }
       if(type == "qq") {
         newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
         // window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
@@ -1501,8 +1513,17 @@ function shareTo(shareType, type, str, title, pid){
       }
     })
     .catch(function(data) {
-      screenTopWarning("链接获取失败，请重试")
+      screenTopWarning("请登录")
     })
+  }
+}
+
+// 复制
+function copyLink() {
+  if(document.execCommand("copy", false, null)) {
+    screenTopAlert("链接复制成功");
+  }else{
+    screenTopWarning("链接复制失败，请手动复制")
   }
 }
 
