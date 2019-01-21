@@ -418,4 +418,5 @@ block scripts
   //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
-  script(src=`/media/media_index.js?v=${startTime}`)
+  if data.user
+    script(src=`/media/media_index.js?v=${startTime}`)
