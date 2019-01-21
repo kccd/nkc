@@ -36,7 +36,7 @@ style.
         button#mediaAudioLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('audio')" :class="mediaType == 'audio'?uploadButtonClass:''") 音频
         button#mediaAttachmentLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('attachment')" :class="mediaType == 'attachment'?uploadButtonClass:''") 附件
       .mdui-row
-        button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;") 上传
+        button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" :disabled="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? true : false") 上传
       .mdui-row()
         .pastearea#paste-target(style="color:#000")
           p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。      
@@ -65,7 +65,7 @@ style.
           .mdui-col(v-for = "(all, index) in mediaAllLists")
             .mdui-grid-tile(@click="allInsert(all.rid, all.ext, all.oname)" v-bind:title="all.oname")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
-              img(v-bind:src="'/rt/'+all.rid" style="height:90px;cursor: pointer")
+              img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer")
               .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
                 .mdui-grid-tile-text
                   .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
@@ -178,6 +178,7 @@ style.
               //- .mdui-textfield(style="display:inline-flex;width:30px")
               input(type="text" v-model="appointSkip" style="width:40px")
               button.mdui-btn.mdui-ripple.mdui-ripple-black(style="min-width:5px" onclick="turnPage()") 跳转
+            div(style="font-size:10px;color:blue") 注:上传文件不大于200M.图片格式:jpg|jpeg|png|gif|svg|bmp.视频格式:mp4|mov|3gp|avi.音频格式:mp3|wav|amr.
       // 翻页 prev next
       //- .panel-footer#pageTurnButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:block")
       //-   nav(aria-label="...")
@@ -262,6 +263,9 @@ style.
               //- .mdui-textfield(style="display:inline-flex;width:30px")
               input(type="text" v-model="appointSkip" style="width:40px")
               button.mdui-btn.mdui-ripple.mdui-ripple-black(style="min-width:5px" onclick="turnPage()") 跳转
+        .mdui-row
+          .mdui-col-xs-12(style="font-size:10px;color:blue")
+            span 图片:jpg|jpeg|png|gif|svg|bmp.视频:mp4|mov|3gp|avi.音频:mp3|wav|amr.文件大小不得超过200M
       // 上传按钮
       .panel-footer#uploadFileButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:none")
         nav(aria-label="...")

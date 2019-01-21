@@ -265,6 +265,7 @@ function uploadFile() {
       return;
     }
     if(items[j].size > 209759635){
+      media.haveFileFail = true;
       media.uploadFileInfoArr[j].status = "上传失败,单文件不得大于200M";
       media.uploadFileInfoArr[j].statusType = "fail";
       media.uploadFileInfoArr[j].process = 0;
@@ -276,6 +277,7 @@ function uploadFile() {
       formData.append("file", items[j]);
       var xhr = new XMLHttpRequest();
       xhr.upload.onprogress = function(e) {
+        media.uploadFileInfoArr[j].status = "正在上传";
         var percent = (e.loaded / e.total) *100;
         percent = percent.toFixed(0);
         if(parseInt(percent) > 98){
