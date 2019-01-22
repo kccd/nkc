@@ -20,7 +20,18 @@ block content
             - 通过A卷考试的用户将来可以再参加B卷考试获取高级证书。
       .mdui-col-sm-12
         .mdui.row
-          for category in data.examsCategories
+          .mdui-col-xs-12.mdui-col-md-6
+            h3.mdui-text-center A卷考试
+
+            for category in data.examsCategories
+              if !category.disabledA
+                a(style='font-size: 2rem;' href=`/exam/paper?cid=${category._id}&volume=A`)=`【${category.name}】`
+          .mdui-col-xs-12.mdui-col-md-6
+            h3.mdui-text-center B卷考试
+            for category in data.examsCategories
+              if !category.disabledB
+                a(style='font-size: 2rem;' href=`/exam/paper?cid=${category._id}&volume=A`)=`【${category.name}】`
+          //for category in data.examsCategories
             h3= `参加 `
               if permission('visitExamsCategory')
                 a(href=`/exam/category/${category._id}`)= `【${category.name}】`
