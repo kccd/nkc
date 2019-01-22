@@ -4,13 +4,27 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+	  login: {
+	    GET:'visitLoginSettings',
+      PATCH: 'modifyLoginSettings'
+    },
+    register: {
+      GET: 'visitRegisterSettings',
+      PATCH: 'modifyRegisterSettings'
+    },
 		sms: {
 			GET: 'visitSmsSettings',
 			PATCH: 'modifySmsSettings',
+      test: {
+        POST: 'testSendMessage'
+      }
 		},
 		email: {
 			GET: 'visitExperimentalEmailSettings',
-			PATCH: 'modifyEmailSettings'
+			PATCH: 'modifyEmailSettings',
+      test: {
+			  POST: 'testSendEmail'
+      }
 		},
 		base: {
 			GET: 'visitWebBaseSettings',
@@ -172,5 +186,8 @@ module.exports = {
     xsf: {
 		  GET: 'visitExperimentalXsf'
     }
-	}
+	},
+  console: {
+	  GET: 'visitExperimentalConsole'
+  }
 };

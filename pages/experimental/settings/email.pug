@@ -1,0 +1,84 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+  link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
+  title 邮件设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12#app(v-cloak).mdui-m-b-5
+        .row
+          .col-xs-12.col-md-2.text-right
+            h4 基本设置
+          .col-xs-12.col-md-7
+            div(style='display: inline-block;vertical-align: middle').mdui-m-r-3 启用邮箱验证
+            <label class="mdui-switch">
+            <input type="checkbox" value='true' v-model='emailSettings.status'>
+            <i class="mdui-switch-icon"></i>
+            </label>
+            <div class="mdui-textfield">
+            <label class="mdui-textfield-label">发件人 格式："显示名称" <邮箱地址></label>
+            <input class="mdui-textfield-input" type="text" v-model='emailSettings.from'>
+            </div>
+        .row.mdui-m-b-5
+          .col-xs-12.col-md-2.text-right
+            h4 邮件模板
+          .col-xs-12.col-md-7
+            div(v-for='t in emailSettings.templates').mdui-p-b-3
+              h5
+                em {{tran(t.name)}}
+              <div class="mdui-textfield">
+              <label class="mdui-textfield-label">标题</label>
+              <textarea class="mdui-textfield-input" type="text" v-model='t.title'></textarea>
+              </div>
+              <div class="mdui-textfield">
+              <label class="mdui-textfield-label">内容</label>
+              <textarea class="mdui-textfield-input" type="text" v-model='t.text'></textarea>
+              </div>
+            div
+              select(style='display:inline-block;vertical-align: middle;' v-model='test.name')
+                option(v-for='t in emailSettings.templates' :value='t.name') {{tran(t.name)}}
+              input(style='display:inline-block;' placeholder='邮箱地址' v-model='test.email')
+              button(@click='testSendEmail') 测试
+        .row.mdui-m-b-5
+          .col-xs-12.col-md-2.text-right
+            h4 SMTP设置
+          .col-xs-12.col-md-7(v-if='emailSettings.smtpConfig')
+            <div class="mdui-textfield">
+            <label class="mdui-textfield-label">host</label>
+            <input class="mdui-textfield-input" type="text" v-model.trim='emailSettings.smtpConfig.host'>
+            </div>
+            <div class="mdui-textfield" v-if='!emailSettings.smtpConfig.secure || emailSettings.smtpConfig.secure === "false"'>
+            <label class="mdui-textfield-label">port</label>
+            <input class="mdui-textfield-input" type="text" v-model.number='emailSettings.smtpConfig.port'>
+            </div>
+            <label class="mdui-radio mdui-m-r-3">
+            <input type="radio" name="group1" value='true' v-model='emailSettings.smtpConfig.secure'>
+            <i class="mdui-radio-icon"></i>
+              | 默认端口
+            </label>
+            <label class="mdui-radio">
+              <input type="radio" name="group1" value='false' v-model='emailSettings.smtpConfig.secure'>
+              <i class="mdui-radio-icon"></i>
+              | 其他
+            </label>
+            <div class="mdui-textfield">
+            <label class="mdui-textfield-label">user</label>
+            <input class="mdui-textfield-input" type="text" v-model.trim='emailSettings.smtpConfig.auth.user'>
+            </div>
+            <div class="mdui-textfield">
+            <label class="mdui-textfield-label">pass</label>
+            <input class="mdui-textfield-input" type="text" v-model.trim='emailSettings.smtpConfig.auth.pass'>
+            </div>
+            button.mdui-m-t-3.mdui-btn.mdui-color-theme.mdui-btn-block(@click='save') 保存
+
+
+block scripts
+  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/email.js?v=${global.NKC.startTime}`)

@@ -135,7 +135,8 @@ downloadRouter
     // const colunameWidth = colunameLength * 12;
     // const coluHeight = 24;
     // 获取水印图片路径
-    const waterSmall = await ctx.db.SettingModel.findOne({type:"home"});
+    let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
+    waterSmall = waterSmall.c;
     // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
     const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
     const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";

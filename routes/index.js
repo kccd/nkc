@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const moment = require('moment');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
@@ -26,6 +25,8 @@ const friendCategoryRouter = routers.friendCategory;
 const homeRouter = routers.home;
 const shareRouter = routers.share;
 const lotteryRouter = routers.lottery;
+const examRouter = routers.exam;
+const forgotPasswordRouter = routers.forgotPassword;
 
 
 // 所有请求先经过此中间件
@@ -51,7 +52,7 @@ router.use('/', async (ctx, next)  => {
 				$gt: time
 			}
 		});
-		if(!dailyLogin) {
+    if(!dailyLogin) {
 			await db.UsersScoreLogModel.insertLog({
 				user,
 				type: 'score',
@@ -63,7 +64,7 @@ router.use('/', async (ctx, next)  => {
 			await user.updateUserMessage();
 		}
 	}
-	await next();
+  await next();
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
@@ -89,5 +90,8 @@ router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
 router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
 router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
+router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
+router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
+router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());
 module.exports = router;

@@ -59,7 +59,7 @@ module.exports = async (ctx, next) => {
     const type = ctx.request.accepts('json', 'html');
     const from = ctx.request.get('FROM');
     if(from === 'htmlAPI'){
-	    ctx.data.html = ctx.nkcModules.render(path.resolve('./pages/' + ctx.localTemplate), ctx.data);
+	    ctx.data.html = ctx.nkcModules.render(path.resolve('./pages/' + ctx.localTemplate), ctx.data, ctx.state);
 	    ctx.body = ctx.data;
     } else if(type === 'json' && from === 'nkcAPI') {
 	    ctx.type = 'json';
@@ -67,7 +67,7 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';
-	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data);
+	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data, ctx.state);
     }
     await next();
   }

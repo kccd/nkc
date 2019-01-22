@@ -127,6 +127,7 @@ meRouter
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).count();
     let maxSkip = Math.ceil(mediaCount / quota);
+    if(maxSkip < 1) maxSkip = 1;
     if(skip >= maxSkip){
       ctx.data.skip = maxSkip - 1;
     }else{

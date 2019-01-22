@@ -12,9 +12,21 @@ baseRouter
 		let {websiteName, github, copyright, record, description, keywords, brief, telephone} = body;
 		if(!websiteName) ctx.throw(400, '网站名不能为空');
 		websiteName = websiteName.trim();
-		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
+		const serverSettings = await db.SettingModel.findOnly({_id: 'server'});
 		const keywordsArr = keywords.split(',');
-		await serverSettings.update({websiteName, github, copyright, record, description,keywords: keywordsArr, brief, telephone});
+		const obj = {
+		  c: {
+        websiteName,
+        github,
+        copyright,
+        record,
+        description,
+        keywords: keywordsArr,
+        brief,
+        telephone
+      }
+    };
+		await serverSettings.update(obj);
 		await next();
 	});
 module.exports = baseRouter;

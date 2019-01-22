@@ -379,6 +379,10 @@
     "deleteProblemsType": "删除<报告问题-问题类型>",
     "getAttachmentIcon": "附件图标",
     "removeForumCategory": "删除专业中的文章分类",
+    "getPersonalMedia": "获取自己的媒体文件",
+    "visitExamSettings": "访问<后台设置-考试设置>",
+    "modifyExamSettings": "修改<后台设置-考试设置>",
+    "faq": "阅读faq文章",
 
     "APPgetUserInfo": "app获取用户信息",
     "APPgetUserPosts": "app获取用户的回复",
@@ -391,6 +395,10 @@
     "APPsearch": "app搜索",
     "APPgetLatestThreads": "app加载最新文章",
     "APPcheckout": "app启动自检",
-    "APPvisitForum": "app查看专业"    
+    "APPvisitForum": "app查看专业",
+    "getUserBanner": "app获取用户主页背景图",
+    "modifyUserBanner": "app修改用户主页背景图",
+    "APPgetLoginUserSubscribe": "app获取登录用户的关注",
+    "APPgetUserSubscribe": "app获取用户的关注"
   }
 }

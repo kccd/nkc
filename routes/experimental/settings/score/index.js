@@ -29,10 +29,10 @@ scoreRouter
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		const scoreSettings = await db.SettingModel.findOnly({type: 'score'});
+		const scoreSettings = await db.SettingModel.findOnly({_id: 'score'});
 		if(body.operation === 'modifyFormula') {
 			const {formula} = body;
-			await scoreSettings.update({formula});
+			await scoreSettings.update({'c.formula': formula});
 		} else {
 			const {_id, kcb, xsf} = body;
 			const operation = await db.OperationModel.findOnly({_id});
@@ -40,9 +40,9 @@ scoreRouter
 			if(xsf.status && xsf.count <= 0 && xsf.count !== -1 && xsf.targetCount <= 0 && xsf.targetCount !== -1) ctx.throw(400, '学术分每天有效次数设置错误');
 			await operation.update({kcb, xsf});
 			if(kcb.status || xsf.status) {
-				await scoreSettings.update({$addToSet: {operationsId: operation._id}});
+				await scoreSettings.update({$addToSet: {'c.operationsId': operation._id}});
 			} else {
-				await scoreSettings.update({$pull: {operationsId: operation._id}});
+				await scoreSettings.update({$pull: {'c.operationsId': operation._id}});
 			}
 		}
 		await next();

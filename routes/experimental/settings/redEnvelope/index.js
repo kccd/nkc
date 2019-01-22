@@ -3,7 +3,7 @@ const redEnvelopeRouter = new Router();
 redEnvelopeRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
-    data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+    data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
     ctx.template = 'experimental/settings/redEnvelope.pug';
     await next();
   })
@@ -34,7 +34,7 @@ redEnvelopeRouter
       if(s.kcb <= 0) ctx.throw(400, '分享奖励中的科创币不能小于1');
       if(s.kcb > s.maxKcb) ctx.throw(400, '分享奖励中的科创币不能大于奖励上限');
     }
-    await db.SettingModel.update({type: 'redEnvelope'}, {$set: {random, draftFee, share}});
+    await db.SettingModel.update({_id: 'redEnvelope'}, {$set: {'c.random': random, 'c.draftFee': draftFee, 'c.share': share}});
     await next();
   });
 module.exports = redEnvelopeRouter;

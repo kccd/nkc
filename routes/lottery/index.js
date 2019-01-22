@@ -13,8 +13,8 @@ luckRouter
   .post('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
-    const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
-    const {random} = redEnvelopeSettings;
+    const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+    const {random} = redEnvelopeSettings.c;
     if(random.close) ctx.throw(403, '抱歉，抽奖功能已关闭！');
     if(!user.generalSettings.lotterySettings.status) ctx.throw(403, '抱歉，您暂未获得抽奖机会，请刷新。');
     let n = 1;
@@ -39,7 +39,7 @@ luckRouter
     const oldKcb = user.kcb;
     user.kcb += kcb;
     await user.save();
-    await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*kcb}});
+    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*kcb}});
     const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
     const record = db.KcbsRecordModel({
       _id,
@@ -54,8 +54,8 @@ luckRouter
     try {
       await record.save();
     } catch(err) {
-      await db.SettingModel.operateSystemID('kcbsRecords', -1);
-      await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: kcb}});
+      // await db.SettingModel.operateSystemID('kcbsRecords', -1);
+      await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': kcb}});
       user.kcb = oldKcb;
       await user.save();
       throw err;

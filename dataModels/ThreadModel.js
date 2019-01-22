@@ -339,8 +339,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   }
   await this.update({lm: pid});
   if(!user.generalSettings.lotterySettings.close) {
-    const redEnvelopeSettings = await SettingModel.findOnly({type: 'redEnvelope'});
-    if(!redEnvelopeSettings.random.close) {
+    const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
+    if(!redEnvelopeSettings.c.random.close) {
       const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
       if(postCountToday === 1) {
         await user.generalSettings.update({'lotterySettings.status': true});

@@ -320,6 +320,17 @@ const friendImageify = async (path, targetPath) => {
   }
 };
 
+const questionImageify = async (path, targetPath) => {
+  const width = 500;
+  const height = 250;
+  const arr = [path, '-resize', `${width}x${height}`, '-quality', '80', targetPath];
+  if(linux) {
+    return spawnProcess('convert', arr);
+  } else {
+    arr.unshift('convert');
+    return spawnProcess('magick', arr);
+  }
+};
 
 // 获取视频的第一帧为图片
 const firstFrameToImg = async (videoPath,imgPath) => {
@@ -366,7 +377,8 @@ module.exports = {
   friendImageify,
   firstFrameToImg,
   videoToH264,
-  turnVideo
+  turnVideo,
+  questionImageify
 };
 
 

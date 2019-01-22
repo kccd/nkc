@@ -1,0 +1,54 @@
+html{
+  font-size: 12px;
+}
+.req-time{
+  color: #ffc952;
+}
+.res-time{
+  color: #45d9fd;
+}
+.method{
+  color: #47b8e0;
+}
+.url{
+  color: #ff7473;
+  letter-spacing: 1px;
+}
+.uid{
+  color: #f9a11b;
+}
+.e-panel{
+  background-color: #222;
+  padding: 1rem 0 1rem 1rem;
+  font-size: 1.2rem;
+}
+.message-panel{
+  height: 40rem;
+  overflow-y: scroll;
+}
+.message>span {
+  margin: 0 0.5rem;
+  padding: 0 0.3rem;
+}
+.req-type{
+  background-color: #2b90d9;
+  color: #fff;
+}
+.status-success{
+  color: #3ac569;
+}
+.status-error{
+  color: red;
+}
+.status-warning{
+  color: #f9d423;
+}
+.process{
+  color: grey;
+}
+.connect{
+  color: #77919d;
+}
+.disconnect{
+  color: #77919d;
+}

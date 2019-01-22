@@ -4,9 +4,9 @@ router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.type = 'top';
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		data.ads = [];
-		for(const tid of homeSettings.ads) {
+		for(const tid of homeSettings.c.ads) {
 			const thread = await db.ThreadModel.findOne({tid});
 			if(thread) {
 				await thread.extendFirstPost().then(p => p.extendUser());
@@ -24,9 +24,9 @@ router
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {ads, operation} = body;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		if(operation === 'modifyOrder') {
-			await homeSettings.update({ads});
+			await homeSettings.update({'c.ads': ads});
 		}
 		await next();
 	});

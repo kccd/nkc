@@ -59,7 +59,7 @@ theradRouter
 			}
 		}
 
-		data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
 
 		if(data.user) {
 			data.subscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});

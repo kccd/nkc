@@ -115,7 +115,8 @@ $(function() {
 						if(
 							document.referrer.toString().indexOf('register')>=0 ||
 							document.referrer.toString().indexOf('logout')>=0 ||
-							document.referrer.toString().indexOf('login')>=0 ||
+              document.referrer.toString().indexOf('login')>=0 ||
+              document.referrer.toString().indexOf('forgotPassword')>=0 ||
 							document.referrer == ""
 						)
 						{

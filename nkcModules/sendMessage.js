@@ -1,10 +1,21 @@
 const QCloudSms = require('qcloudsms_js');
-const smsSecrets = require('../settings/smsSecrets');
-const {appId, appKey, smsSign} = smsSecrets;
-const qCloudSms = QCloudSms(appId, appKey);
-const sSender = qCloudSms.SmsSingleSender();
+const mongoose = require('mongoose');
 
 const sendMessage = async (obj) => {
+  const {type, code, mobile, nationCode} = obj;
+  const SettingModel = mongoose.model('settings');
+  const smsSettings = await SettingModel.findOnly({_id: 'sms'});
+  const {templates, appId, appKey, smsSign} = smsSettings.c;
+  let templateId;
+  for(const template of templates) {
+    if(template.name === type) {
+      templateId = template.id;
+      break;
+    }
+  }
+  if(templateId === undefined) throw `${type}模板未定义`;
+  const qCloudSms = QCloudSms(appId, appKey);
+  const sSender = qCloudSms.SmsSingleSender();
 	return new Promise((resolve, reject) => {
 		const callback = (err, res, resData) => {
 			if(err) {
@@ -18,11 +29,8 @@ const sendMessage = async (obj) => {
 				}
 			}
 		};
-		const {type, code, mobile} = obj;
-		const nationCode = obj.nationCode?parseInt(obj.nationCode): 86;
 		const params = [code];
-		const templateId = smsSecrets.templateId[type];
-		sSender.sendWithParam(nationCode, mobile, templateId, params, smsSign, "", "", callback);
+		sSender.sendWithParam(nationCode?parseInt(nationCode):86, mobile, templateId, params, smsSign, "", "", callback);
 	})
 };
 

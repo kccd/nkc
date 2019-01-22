@@ -92,13 +92,13 @@ $(document).ready(function() {
 function loadMedia(type, q, s, turn) {
   if(turn == "prev"){
     skip = skip - 1;
-    if(skip <= 0){
-      skip = 0;
-    }
   }else if(turn == "next") {
     skip = skip + 1;
   }else if(turn == "turn") {
     skip = skip;
+  }
+  if(skip <= 0){
+    skip = 0;
   }
   nkcAPI('/me/media?quota='+q+'&skip='+skip+'&type='+type, 'get',{})
   .then(function(data) {
@@ -328,6 +328,7 @@ function uploadFile() {
 
 // 点击选择文件按钮
 function clickButton() {
+  document.getElementById("fileList").value = "";
   document.getElementById("fileList").click();
   media.haveFileFail = false;
 }

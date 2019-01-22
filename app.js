@@ -25,8 +25,8 @@ app.on('error', err => {
 		console.log(err);
 	}
 });
-const {mkdirSync} = require('fs');
 const favicon = require('koa-favicon');
+
 const {stayLogin, init, body, urlRewrite, permission, logger} = require('./middlewares');
 
 app.keys = [settings.cookie.secret];

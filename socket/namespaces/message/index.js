@@ -46,7 +46,9 @@ const message = async (i) => {
     if(clients.length > 4) {
       let num = clients.length - 4;
       for(let i = 0; i < num; i++) {
-        io.connected[clients[i]].disconnect(true);
+        if(io.connected[clients[i]]) {
+          io.connected[clients[i]].disconnect(true);
+        }
       }
     }
     // 判断客户端平台
@@ -72,7 +74,8 @@ const message = async (i) => {
       })
     }));
     socket.join(`user/${uid}`, async () => {
-      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'连接成功'.bgGreen}`);
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/message'.bgBlue} ${'连接成功'.bgGreen}`);
+      global.NKC.io.of('/console').NKC.socketMessage('/message', true, uid);
     });
     await db.UserModel.update({uid}, {
       $set: {
@@ -183,7 +186,8 @@ async function disconnect(io, socket) {
   const {uid} = socket.NKC;
   if(!uid) return;
   const clients = await util.getRoomClientsId(io, `user/${uid}`);
-  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'断开连接'.bgRed}`);
+  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/message'.bgBlue} ${'断开连接'.bgRed}`);
+  global.NKC.io.of('/console').NKC.socketMessage('/message', false, uid);
   if(clients.length !== 0) return;
   await  db.UserModel.update({uid}, {
     $set: {

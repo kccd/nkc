@@ -1,10 +1,11 @@
-const moment = require('moment');
 const path = require('path');
 const fs = require('fs');
 const {mkdirSync} = fs;
 
 
 const paths = {
+  configDir: 'config',
+  keyDir: 'key',
   uploadDir: 'tmp',
   resourcesPath: 'resources',
   uploadPath: 'resources/upload',
@@ -32,7 +33,8 @@ const paths = {
   androidSavePath: 'resources/app/android',
   iosSavePath: 'resources/app/ios',
   friendImagePath: 'resources/friend_image',
-  posterPath: 'resources/poster'
+  posterPath: 'resources/poster',
+  questionImagePath: 'resources/question_image'
 };
 
 const pathsObj = {};
@@ -47,8 +49,8 @@ function initFolders() {
     try {
       fs.accessSync(realPath);
     } catch (err) {
+      console.error(`creating folder '${realPath}'`);
       fs.mkdirSync(realPath);
-      console.error(`created folder ${realPath}`);
     }
   }
 }
@@ -80,6 +82,7 @@ const iosSavePath = path.resolve('resources/app/ios');
 const friendImagePath = path.resolve('resource/friend_image');*/
 
 function generateFolderName(basePath) {
+  const moment = require('moment');
   const year = moment().format('/YYYY/');
   const full = moment().format('/YYYY/MM/');
 

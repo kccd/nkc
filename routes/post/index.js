@@ -87,9 +87,9 @@ postRouter
     data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
     data.post.user = await db.UserModel.findOnly({uid: post.uid});
     await data.post.user.extendGrade();
-    data.redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
-    data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
-    data.xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
+    data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
+    data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
+    data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
     data.thread = thread;
     ctx.template = 'post/post.pug';
     await next();

@@ -3,7 +3,7 @@ const infoRouter = new Router();
 infoRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.KCBSettings = await db.SettingModel.findOne({type: 'kcb'});
+		data.KCBSettings = (await db.SettingModel.findOne({_id: 'kcb'})).c;
 		data.modifyUsernameOperation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
 		ctx.template = 'interface_user_settings_info.pug';
 		await next();

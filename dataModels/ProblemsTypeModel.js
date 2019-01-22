@@ -42,7 +42,6 @@ const defaultData = {
     defaultData.count = await mongoose.model('problems').count();
     type = ProblemsTypeModel(defaultData);
     await type.save();
-    console.log(`init ProblemsType  "${defaultData.name}"`);
   } catch(err) {
     throw err;
   }

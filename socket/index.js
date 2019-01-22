@@ -1,10 +1,10 @@
 require('colors');
 const socketIo = require('socket.io');
-const config = require('../config');
+const socketConfig = require('../config/socket');
 const namespaces = Object.assign({}, require('./namespaces'));
 const socketIoRedis = require('socket.io-redis');
 async function createSocketServer(server) {
-  const io = socketIo(server, config.socket);
+  const io = socketIo(server, socketConfig);
   global.NKC.io = io;
   io.adapter(socketIoRedis({ host: 'localhost', port: 6379 }));
   for(const namespace in namespaces) {

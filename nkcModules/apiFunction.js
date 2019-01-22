@@ -1,7 +1,7 @@
-const settings = require('../settings');
+const paging = require('../settings/paging');
 const moment = require('moment');
 moment.locale('zh-cn');
-let {perpage} = settings.paging;
+let {perpage} = paging;
 let fn = {};
 fn.paging = (page, arrLength) => {
   if(page === undefined) page = 0;

@@ -19,6 +19,13 @@
 /scripts
 /config.js
 /page/test
+
+
+
+/config/*
+/install/install.lock
+/pm2.cluster.config.js
+
 /settings/diskCharacterOptions.js
 /settings/mediaPath.js
 /settings/mediaPathOptions.js

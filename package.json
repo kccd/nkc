@@ -1,16 +1,15 @@
 {
-  "name": "nkc2",
-  "version": "2.1.0",
+  "name": "nkc",
+  "version": "1.0.0",
   "description": "source of [www.kechuang.org]",
+  "homepage": "https://www.kechuang.org",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "supervisor server.js",
-    "prod-lin": "export NODE_ENV=production && supervisor server.js"
+    "start": "cross-env NODE_ENV=production node server.js "
   },
   "repository": {
     "type": "git",
-    "url": "github.com/kccd/nkc.git"
+    "url": "https://github.com/kccd/nkc.git"
   },
   "keywords": [
     "koa2",
@@ -27,6 +26,7 @@
     "commonmark": "^0.28.1",
     "cookie-signature": "^1.1.0",
     "cookies-string-parse": "^0.0.1",
+    "cross-env": "^5.2.0",
     "debug": "^2.6.9",
     "diff": "^3.4.0",
     "direct-alipay": "^3.0.0",
@@ -60,6 +60,7 @@
     "mongoose": "^4.13.10",
     "node-schedule": "^1.3.0",
     "nodemailer": "^4.4.2",
+    "open": "^0.0.5",
     "photoswipe": "^4.1.2",
     "pug": "^2.0.0-rc.4",
     "qcloudsms_js": "^0.1.0",

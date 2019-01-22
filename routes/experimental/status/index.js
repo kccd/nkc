@@ -151,7 +151,7 @@ statusRouter
 		if(!type) {
 			data.onlineUsers = [];
       data.onlineUsersCount = await db.UserModel.count({online: true});
-			const onlineUsers = await db.UserModel.find({online: true}).limit(5000);
+			const onlineUsers = await db.UserModel.find({online: true}).sort({tlv: -1}).limit(5000);
 			for(const onlineUser of onlineUsers) {
 				const targetSocket = await db.SocketModel.find({uid: onlineUser.uid});
 				if(!targetSocket) {

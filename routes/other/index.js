@@ -2,8 +2,8 @@ const Router = require('koa-router');
 // const loginRouter = require('./login');
 const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
-const examRouter = require('./exam');
-const forgotPasswordRouter = require('./forgotPassword');
+// const examRouter = require('./exam');
+// const forgotPasswordRouter = require('./forgotPassword');
 const homeRouter = require('./home');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
@@ -62,8 +62,8 @@ otherRouter
 	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
-  .use('exam', examRouter.routes(), examRouter.allowedMethods())
-  .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
+  // .use('exam', examRouter.routes(), examRouter.allowedMethods())
+  // .use('forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('avatar', avatar.routes(), avatar.allowedMethods())

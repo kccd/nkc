@@ -3,7 +3,7 @@ const router = new Router();
 router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
 		ctx.template = 'experimental/settings/home.pug';
 		data.type = 'logo';
 		await next();
@@ -11,7 +11,7 @@ router
 	.patch('/', async (ctx, next) => {
 		const {body, db} = ctx;
 		const {id, type, operation} = body;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		const q = {};
 		if(operation === 'saveWaterMarkSettings') {
 			let {watermarkTransparency} = body;
@@ -23,26 +23,29 @@ router
 			}
 		} else if(operation === 'saveLogo') {
 			if(type === 'smallLogo') {
-				if(homeSettings.smallLogo === id) ctx.throw(400, '图片已被设置为默认小图了');
+				if(homeSettings.c.smallLogo === id) ctx.throw(400, '图片已被设置为默认小图了');
 				q.smallLogo = id;
 			} else if(type === 'logo') {
-				if(homeSettings.logo === id) ctx.throw(400, '图片已被设置为默认大图了');
+				if(homeSettings.c.logo === id) ctx.throw(400, '图片已被设置为默认大图了');
 				q.logo = id;
 			} else {
 				ctx.throw(400, '参数错误');
 			}
-			if(!homeSettings.logos.includes(id)) ctx.throw(400, '图片无效');
+			if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
 		}
-		await homeSettings.update(q);
+		const obj = {
+		  c: q
+    };
+		await homeSettings.update(obj);
 		await next();
 	})
 	.del('/', async (ctx, next) => {
 		const {db, query} = ctx;
 		const {id} = query;
-		const homeSettings = await db.SettingModel.findOnly({type: 'home'});
-		if(homeSettings.logo === id || homeSettings.smallLogo === id) ctx.throw(400, '暂不能删除默认图片');
-		if(!homeSettings.logos.includes(id)) ctx.throw(400, '图片无效');
-		await homeSettings.update({$pull: {logos: id}});
+		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
+		if(homeSettings.c.logo === id || homeSettings.c.smallLogo === id) ctx.throw(400, '暂不能删除默认图片');
+		if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
+		await homeSettings.update({$pull: {'c.logos': id}});
 		await next();
 	});
 module.exports = router;

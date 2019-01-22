@@ -438,8 +438,8 @@ userSchema.methods.updateUserMessage = async function() {
 userSchema.methods.calculateScore = async function() {
 	const SettingModel = mongoose.model('settings');
 	// 积分设置
-	const scoreSettings = await SettingModel.findOnly({type: 'score'});
-	const {coefficients} = scoreSettings;
+	const scoreSettings = await SettingModel.findOnly({_id: 'score'});
+	const {coefficients} = scoreSettings.c;
 
 	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, digestPostsCount, recCount} = this;
 	// 积分计算
@@ -695,7 +695,7 @@ userSchema.methods.getPostLimit = async function() {
 	const grade = await this.extendGrade();
 	const roles = await this.extendRoles();
 
-	let {
+	/*let {
 		postToForumCountLimit,
 		postToForumTimeLimit,
 		postToThreadCountLimit,
@@ -713,7 +713,39 @@ userSchema.methods.getPostLimit = async function() {
     if(pft < postToForumTimeLimit) postToForumTimeLimit = pft;
     if(ptc > postToThreadCountLimit) postToThreadCountLimit = ptc;
     if(ptt < postToThreadTimeLimit) postToThreadTimeLimit = ptt;
-	}
+	}*/
+
+	const arr = [grade].concat(roles);
+
+	let postToForumCountLimit = 0, postToForumTimeLimit = 9999999999,
+    postToThreadCountLimit = 0, postToThreadTimeLimit = 9999999999;
+
+	for(const item of arr) {
+	  // 读取"发表文章次数"最大值。
+	  if(item.postToForum.countLimit.unlimited) {
+      postToForumCountLimit = 9999999999;
+    } else if(postToForumCountLimit < item.postToForum.countLimit.num) {
+      postToForumCountLimit = item.postToForum.countLimit.num;
+    }
+    // 读取"发表回复次数"最大值。
+    if(item.postToThread.countLimit.unlimited) {
+      postToThreadCountLimit = 9999999999;
+    } else if(postToThreadCountLimit < item.postToThread.countLimit.num) {
+      postToThreadCountLimit = item.postToThread.countLimit.num;
+    }
+    // 读取"发表文章间隔时间"最小值。
+    if(item.postToForum.timeLimit.unlimited) {
+      postToForumTimeLimit = 0;
+    } else if(postToForumTimeLimit > item.postToForum.timeLimit.num) {
+      postToForumTimeLimit = item.postToForum.timeLimit.num;
+    }
+    // 读取"发表回复间隔时间"最小值。
+    if(item.postToThread.timeLimit.unlimited) {
+      postToThreadTimeLimit = 0;
+    } else if(postToThreadTimeLimit > item.postToThread.timeLimit.num) {
+      postToThreadTimeLimit = item.postToThread.timeLimit.num;
+    }
+  }
 
 	return {
 		postToForumTimeLimit,

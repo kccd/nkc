@@ -1,12 +1,17 @@
 div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-header mdui-appbar-scroll-hide")
+  if data.user
+    -var newMessage = data.user.newMessage;
+    -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0);
   .mdui-container
     .mdui-toolbar
       <a href="javascript:;" class="mdui-header-menu mdui-typo-title mdui-hidden-md-up" mdui-drawer="{target: '#left-drawer'}">
-        <i class="mdui-icon material-icons">menu</i>
+        i.mdui-icon.material-icons(style='position: relative;') menu
+          .newMessagePoint(style=messageSum>0?'display: block;':'')
       </a>
-      a(href="/" class="mdui-typo-headline mdui-text-color-blue mdui-header-name") 科创论坛
+      a(href="/" class="mdui-typo-headline mdui-text-color-theme mdui-header-name") 科创论坛
       <a href="/" class="mdui-typo-title mdui-hidden-sm-down">最新</a>
-      <a href="/message" class="mdui-typo-title mdui-hidden-sm-down">消息</a>
+      a(href="/message").mdui-typo-title.mdui-hidden-sm-down 消息
+        .nav-message-num(class=!messageSum || messageSum<= 0?'disabled': '')= messageSum > 0?messageSum: ''
       <a href="/fund" class="mdui-typo-title mdui-hidden-sm-down">基金</a>
       <div class="mdui-toolbar-spacer"></div>
       .mdui-header-search
@@ -48,6 +53,13 @@ div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-hea
               i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe3c9;
               | 编辑资料
           li.mdui-divider
+          if permission('visitExperimentalStatus')
+            li.mdui-menu-item
+              <a href="/e" class="mdui-ripple">
+                <i class="mdui-menu-item-icon mdui-icon material-icons">settings</i>
+                | 后台管理
+              </a>
+            li.mdui-divider
           li.mdui-menu-item
             a(href=`/logout` class="mdui-ripple")
               i(class="mdui-menu-item-icon mdui-icon material-icons") &#xe879;
@@ -68,6 +80,11 @@ div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-hea
       a.mdui-list-item.mdui-ripple(href=`/subscription`)
         i.mdui-list-item-icon.mdui-icon.material-icons.latest-color &#xe192;
         .mdui-list-item-content 最新
+    li
+      a.mdui-list-item.mdui-ripple(href=`/message`)
+        i.mdui-list-item-icon.mdui-icon.material-icons.message-color &#xe0b7;
+        .mdui-list-item-content 信息
+        .nav-message-num(class=!messageSum || messageSum <= 0 ? 'disabled' : '')= messageSum > 0 ? messageSum : ''
     li
       a.mdui-list-item.mdui-ripple(href=`/f`)
         i.mdui-list-item-icon.mdui-icon.material-icons.forums-color &#xe8d2;
@@ -90,10 +107,6 @@ div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-hea
         i.mdui-list-item-icon.mdui-icon.material-icons.forums-color &#xe02f;
         .mdui-list-item-content 专栏
     li
-      a.mdui-list-item.mdui-ripple(href=`/message`)
-        i.mdui-list-item-icon.mdui-icon.material-icons.message-color &#xe0b7;
-        .mdui-list-item-content 信息
-    li
       a.mdui-list-item.mdui-ripple(href=`/u/${data.user.uid}/collections/unclassified`)
         i.mdui-list-item-icon.mdui-icon.material-icons.collection-color &#xe3b6;
         .mdui-list-item-content 收藏
@@ -101,11 +114,26 @@ div(class="mdui-appbar mdui-appbar-fixed mdui-color-white mdui-shadow-0 mdui-hea
       a.mdui-list-item.mdui-ripple(href=`/u/${data.user.uid}/drafts`)
         i.mdui-list-item-icon.mdui-icon.material-icons.draft-color &#xe151;
         .mdui-list-item-content 草稿箱
+    li
+      a.mdui-list-item.mdui-ripple(href=`/u/${data.user.uid}/drafts`)
+        i.mdui-list-item-icon.mdui-icon.material-icons.bills-color &#xe616;
+        .mdui-list-item-content 账单
+    li
+      a.mdui-list-item.mdui-ripple(href=`/u/${data.user.uid}/drafts`)
+        i.mdui-list-item-icon.mdui-icon.material-icons.activity-color &#xe53f;
+        .mdui-list-item-content 活动
     li.mdui-divider
     li
       a.mdui-list-item.mdui-ripple(href=`/u/${data.user.uid}/settings`)
         i.mdui-list-item-icon.mdui-icon.material-icons.edit-color &#xe3c9;
         .mdui-list-item-content 编辑资料
+    li.mdui-divider
+    if(permission('visitExperimentalStatus'))
+      li
+        a.mdui-list-item.mdui-ripple(href=`/e`)
+          i.mdui-list-item-icon.mdui-icon.material-icons settings
+          .mdui-list-item-content 后台管理
+      li.mdui-divider
     li
       a.mdui-list-item.mdui-ripple(href=`/logout`)
         i.mdui-list-item-icon.mdui-icon.material-icons.quit-color &#xe879;

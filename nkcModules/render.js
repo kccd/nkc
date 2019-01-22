@@ -4,6 +4,7 @@ const pug = require('pug');
 const jsdiff = require('diff');
 const settings = require('../settings');
 moment.locale('zh-cn');
+const languages = require('../languages');
 let filters = {
   markdown:render.commonmark_render,
   markdown_safe:render.commonmark_safe,
@@ -282,7 +283,8 @@ function ensureFundOperatorPermission(type, user, fund) {
 	}
 }
 
-let pugRender = (template, data) => {
+let pugRender = (template, data, state) => {
+  const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
     markdown_safe: render.commonmark_safe,
     markdown: render.commonmark_render,
@@ -303,7 +305,15 @@ let pugRender = (template, data) => {
 		delCodeAddShrink,
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
-    startTime: global.NKC.startTime
+    startTime: global.NKC.startTime,
+    // 翻译 type: 语言分类, words：关键字
+    lang: (type, words) => {
+      return language[type][words];
+    },
+    // 验证用户是否具有执行该操作的权限
+    permission: (operationId) => {
+      return data.userOperationsId.includes(operationId);
+    }
   };
   options.data = data;
   options.filters = filters;

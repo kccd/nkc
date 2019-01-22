@@ -70,7 +70,7 @@ router
       })
     }
     const ads = [];
-    data.homeSettings = await db.SettingModel.findOnly({type: 'home'});
+    data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
     for(const tid of data.homeSettings.ads) {
       const thread = await db.ThreadModel.findOne({tid});
       if(thread && fidOfCanGetThreads.includes(thread.fid)) {

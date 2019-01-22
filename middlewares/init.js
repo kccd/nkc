@@ -7,7 +7,7 @@ const {logger} = nkcModules;
 const fs = require('fs');
 const {promisify} = require('util');
 const redis = require('../redis');
-const config = require('../config');
+const path = require('path');
 
 module.exports = async (ctx, next) => {
 	try {
@@ -26,19 +26,21 @@ module.exports = async (ctx, next) => {
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
 	  ctx.redis = redis;
-	  ctx.settings = settings;
+    ctx.state = {};
+    ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
-		let {operationsId} = await db.SettingModel.findOne({"type":"log"});
+		const logSettings = await db.SettingModel.findOne({_id: "log"});
+		let {operationsId} = logSettings.c;
 		ctx.data.logSetting = operationsId;
 	  // - 初始化网站设置
-		const serverSettings = await db.SettingModel.findOnly({type: 'server'});
-
+		let serverSettings = await db.SettingModel.findOnly({_id: 'server'});
+		serverSettings = serverSettings.c;
 	  ctx.data.serverSettings = {
 			websiteName: serverSettings.websiteName,
-			serverName: serverSettings.serverName,
+			// serverName: serverSettings.serverName.replace('$', global.NKC.NODE_ENV),
 		  github: serverSettings.github,
 		  copyright: serverSettings.copyright,
 		  record: serverSettings.record,
@@ -60,9 +62,13 @@ module.exports = async (ctx, next) => {
 	    copyFile: promisify(fs.copyFile),
 	    createReadStream: fs.createReadStream,
 	    createWriteStream: fs.createWriteStream,
-	    stat: promisify(fs.stat),
-      copyFile: promisify(fs.copyFile)
+	    stat: promisify(fs.stat)
 	  };
+
+	  ctx.permission = (o) => {
+	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
+	    return ctx.data.userOperationsId.includes(o);
+    };
 
 		Object.defineProperty(ctx, 'template', {
 			get: function() {

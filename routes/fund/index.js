@@ -16,8 +16,8 @@ fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		const fundSettings = await db.SettingModel.findOne({type: 'fund'});
-		data.fundSettings = fundSettings;
+		const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
+		data.fundSettings = fundSettings.c;
 		if(!fundSettings) {
 			const newSettings = db.SettingModel({
 				type: 'fund',
@@ -40,13 +40,13 @@ fundRouter
 			if(ctx.url === '/fund/settings') {
 				await next();
 			} else {
-				if(fundSettings.closed.status) {
+				if(fundSettings.c.closed.status) {
 					ctx.template = 'interface_fund_closed.pug';
-					data.fundSettings = fundSettings;
+					data.fundSettings = fundSettings.c;
 					data.error = '抱歉！科创基金已被临时关闭。';
 					const body = require('../../middlewares/body');
 					await body(ctx, ()=>{});
-				} else if(fundSettings.readOnly) {
+				} else if(fundSettings.c.readOnly) {
 					if(ctx.method !== 'GET') {
 						ctx.throw(403,'抱歉！科创基金现在处于只读模式。');
 					}
@@ -74,7 +74,7 @@ fundRouter
 		}
 		data.fundNotify = newNotify;
 		data.navbar_highlight = 'fund';
-		await next();
+    await next();
 	})
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;

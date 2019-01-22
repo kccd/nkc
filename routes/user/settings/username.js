@@ -14,9 +14,8 @@ router
 		if(user.username === newUsername) {
 			ctx.throw(400, '新用户名不能与旧用户名相同');
 		}
-		const kcbSettings = await db.SettingModel.findOne({type: 'kcb'});
+		const kcbSettings = await db.SettingModel.findOne({_id: 'kcb'});
 		if(!kcbSettings) ctx.throw(500, '科创币设置错误：未找到相关设置');
-		const {defaultUid} = kcbSettings;
 		const sameUsernameUser = await db.UserModel.findOne({usernameLowerCase: newUsername.toLowerCase()});
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
 		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});

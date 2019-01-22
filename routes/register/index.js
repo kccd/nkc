@@ -75,7 +75,8 @@ registerRouter
 		  introduction: 'put the cookie in req-header when using for api',
 		  user
 	  };
-	  const forumSettings = await db.SettingModel.findOnly({type: 'forum'});
+	  let forumSettings = await db.SettingModel.findOnly({_id: 'forum'});
+	  forumSettings = forumSettings.c;
 	  const {defaultForumsId=[]} = forumSettings;
 	  if(defaultForumsId.length !== 0) {
 		  for(const fid of defaultForumsId) {
@@ -99,7 +100,8 @@ registerRouter
     console.log(`share`, share);
 	  if(['', 'visitor'].includes(share.uid)) return await next();
     if(!share.registerReward) return await next();
-    const redEnvelopeSettings = await db.SettingModel.findOnly({type: 'redEnvelope'});
+    let redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+    redEnvelopeSettings = redEnvelopeSettings.c;
     const shareSettings = redEnvelopeSettings.share.register;
     if(!shareSettings.status) return await next();
     const {kcb, maxKcb} = shareSettings;
@@ -126,7 +128,7 @@ registerRouter
     });
     await record.save();
     await targetUser.update({$inc: {kcb: addKcb}});
-    await db.SettingModel.update({type: 'kcb'}, {$inc: {totalMoney: -1*addKcb}});
+    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*addKcb}});
     ctx.cookies.set('share-token', '', {
       httpOnly: true,
       signed: true

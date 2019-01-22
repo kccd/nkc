@@ -77,9 +77,9 @@ router
         thread.type = 'subscribeForum';
       }
     });
-    const homeSettings = await db.SettingModel.findOnly({type: 'home'});
+    const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
     // 置顶文章轮播图
-    const ads = await Promise.all(homeSettings.ads.map(async tid => {
+    const ads = await Promise.all(homeSettings.c.ads.map(async tid => {
       const thread = await db.ThreadModel.findOne({tid});
       if(thread) return thread;
     }));
@@ -97,7 +97,7 @@ router
     const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(home.activeUsersLength);
     data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
     // 网站公告
-    const noticeThreads = await Promise.all(homeSettings.noticeThreadsId.map(async oc => {
+    const noticeThreads = await Promise.all(homeSettings.c.noticeThreadsId.map(async oc => {
       const thread = await db.ThreadModel.findOne({oc});
       if(thread) return thread;
     }));

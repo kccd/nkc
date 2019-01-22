@@ -327,31 +327,54 @@ block content
 
                         if hasMobile
                           if !thread.closed
-                            if !data.user.volumeA
-                              -const volumeAFailedPostCountOneDay = data.examSettings.volumeAFailedPostCountOneDay;
-                              if volumeAFailedPostCountOneDay === -1
-                                // 对未通过A卷的用户回复不做限制
+                            if !data.user.volumeA && !data.user.volumeB
+                              -const {exam} = data.postSettings.postToThread;
+                              -const {unlimited, countLimit} = exam.notPass;
+                              -const userPostCountToday = data.userPostCountToday;
+                              if unlimited
                                 +inputPanel
-                              else if volumeAFailedPostCountOneDay === 0
+                              else if countLimit === 0
                                 .text-danger
                                   .h4(style='margin-bottom: 0rem;')=`您还未参加考试，暂不能发表文章和回复。`
                                   .h4
                                     a(href='/exam' target='_blank') 点击这里参加考试
-                              else if data.userPostCountToday >= data.examSettings.volumeAFailedPostCountOneDay
+                              else if userPostCountToday >= countLimit
                                 .text-danger
-                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${data.examSettings.volumeAFailedPostCountOneDay}条回复，且不能发表文章。`
+                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且不能发表文章。`
                                   .h4= `今日已发表${data.userPostCountToday}条回复，`
                                     a(href='/exam' target='_blank') 点击这里参加考试
                                     span ，通过后将获得更多发言权限。
                               else
-                                //- .form-group
-                                //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
-                                // 未通过A卷考试的用户能看到提示
-                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${data.examSettings.volumeAFailedPostCountOneDay}条回复，且不能发表文章。`
-                                  div=`今日已发表${data.userPostCountToday}条回复，`
+                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且不能发表文章。`
+                                  div=`今日已发表${userPostCountToday}条回复，`
                                     a(href='/exam' target='_blank') 点击这里参加考试
                                     span ，通过后将获得更多发言权限。
                                 +inputPanel
+                              //
+                                -const volumeAFailedPostCountOneDay = data.examSettings.volumeAFailedPostCountOneDay;
+                                if volumeAFailedPostCountOneDay === -1
+                                  // 对未通过A卷的用户回复不做限制
+                                  +inputPanel
+                                else if volumeAFailedPostCountOneDay === 0
+                                  .text-danger
+                                    .h4(style='margin-bottom: 0rem;')=`您还未参加考试，暂不能发表文章和回复。`
+                                    .h4
+                                      a(href='/exam' target='_blank') 点击这里参加考试
+                                else if data.userPostCountToday >= data.examSettings.volumeAFailedPostCountOneDay
+                                  .text-danger
+                                    .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${data.examSettings.volumeAFailedPostCountOneDay}条回复，且不能发表文章。`
+                                    .h4= `今日已发表${data.userPostCountToday}条回复，`
+                                      a(href='/exam' target='_blank') 点击这里参加考试
+                                      span ，通过后将获得更多发言权限。
+                                else
+                                  //- .form-group
+                                  //-   textarea#ReplyContent.form-control(rows='5' placeholder='快速回复（bbcode语法）' style='resize:vertical; ')
+                                  // 未通过A卷考试的用户能看到提示
+                                  .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${data.examSettings.volumeAFailedPostCountOneDay}条回复，且不能发表文章。`
+                                    div=`今日已发表${data.userPostCountToday}条回复，`
+                                      a(href='/exam' target='_blank') 点击这里参加考试
+                                      span ，通过后将获得更多发言权限。
+                                  +inputPanel
                             else
                               +inputPanel
                           else

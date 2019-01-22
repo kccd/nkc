@@ -3,7 +3,7 @@ const router = new Router();
 router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.scoreSettings = await db.SettingModel.findOnly({type: 'score'});
+		data.scoreSettings = (await db.SettingModel.findOnly({_id: 'score'})).c;
 		ctx.template = 'experimental/settings/number.pug';
 		await next();
 	})
@@ -14,8 +14,8 @@ router
 			if(!coefficients.hasOwnProperty(key)) continue;
 			coefficients[key] = parseFloat(coefficients[key]);
 		}
-		const scoreSettings = await db.SettingModel.findOnly({type: 'score'});
-		await scoreSettings.update({coefficients});
+		const scoreSettings = await db.SettingModel.findOnly({_id: 'score'});
+		await scoreSettings.update({'c.coefficients': coefficients});
 		await next();
 	});
 module.exports = router;

@@ -18,8 +18,8 @@ router
 		if(thread.disabled || thread.disabled) {
 			ctx.throw(403,'无法给禁用的帖子或回复评学术分');
 		}
-		const xsfSettings = await db.SettingModel.findOnly({type: 'xsf'});
-		const {addLimit, reduceLimit} = xsfSettings;
+		const xsfSettings = await db.SettingModel.findOnly({_id: 'xsf'});
+		const {addLimit, reduceLimit} = xsfSettings.c;
 		if(num === 0) ctx.throw(400, '分值无效');
 		if(num < 0 && -1*num > reduceLimit) ctx.throw(400, `单次扣除不能超过${reduceLimit}学术分`);
 		if(num > 0 && num > addLimit) ctx.throw(400, `单次添加不能超过${addLimit}学术分`);
@@ -112,9 +112,9 @@ router
 		if(post.disabled) {
 		  ctx.throw(403, '回复已被封禁');
     }
-		const kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
-		if(num < kcbSettings.minCount) ctx.throw(400, `科创币最少为${kcbSettings.minCount}`);
-		if(num > kcbSettings.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.maxCount}`);
+		const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
+		if(num < kcbSettings.c.minCount) ctx.throw(400, `科创币最少为${kcbSettings.c.minCount}`);
+		if(num > kcbSettings.c.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.c.maxCount}`);
 		if(fromUser.kcb < num) ctx.throw(400, '您的科创币不足');
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 60) ctx.throw(400, '理由不能超过60个字');

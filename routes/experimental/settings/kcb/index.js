@@ -4,7 +4,7 @@ router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.kcbsTypes = await db.KcbsTypeModel.find();
-		data.kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+		data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
 		ctx.template = 'experimental/settings/kcb.pug';
 		await next();
 	})
@@ -21,16 +21,16 @@ router
       if(count >= 0 || count === -1) {
 
       } else {
-        ctx.throw(400, `${typeOfScoreChange.description}的次数设置错误`);
+        ctx.throw(400, `${type_.description}的次数设置错误`);
       }
       if(count === 0 || num < 0 || num > 0) {
 
       } else {
-        ctx.throw(400, `${typeOfScoreChange.description}的科创币变化值设置错误`)
+        ctx.throw(400, `${type_.description}的科创币变化值设置错误`)
       }
       await type_.update({count, num});
     }
-    await db.SettingModel.update({type: 'kcb'}, {$set: {minCount, maxCount}});
+    await db.SettingModel.update({_id: 'kcb'}, {$set: {'c.minCount': minCount, 'c.maxCount': maxCount}});
 		await next();
 	});
 module.exports = router;

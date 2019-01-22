@@ -10,6 +10,8 @@ router
 		if(type) {
 			q.type = type;
 		}
+		q.type = 'score';
+		data.type = 'score';
 		const count = await db.UsersScoreLogModel.count(q);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;

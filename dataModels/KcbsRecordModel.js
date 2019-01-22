@@ -120,7 +120,7 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     if(recordsCount >= kcbsType.count) return;
   }
   // 若kcbsType === -1则不限次数
-  const kcbSettings = await db.SettingModel.findOnly({type: 'kcb'});
+  const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
   const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
   const newRecords = db.KcbsRecordModel({
     _id,
@@ -180,7 +180,7 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     ctx.throw(err);
   }
   try{
-    await kcbSettings.update({$inc: {totalMoney: bankChange}});
+    await kcbSettings.update({$inc: {'c.totalMoney': bankChange}});
   } catch(err) {
     await newRecords.remove();
     await db.SettingModel.operateSystemID('kcbsRecords', -1);

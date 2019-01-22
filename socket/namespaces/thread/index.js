@@ -93,10 +93,24 @@ const thread = async (i) => {
   io.on('connection', (socket) => {
     const {tid, uid} = socket.NKC;
     socket.join(`thread/${tid}`, async () => {
-      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'进入房间'.grey} ${`thread/${tid}`.bgGreen}`);
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${`/thread/${tid}`.bgBlue} ${'连接成功'.bgGreen}`);
+      global.NKC.io.of('/console').NKC.socketMessage(`/thread/${tid}`, true, uid);
     });
   });
+  io.on('error', (err) => {
+    console.log(err);
+    disconnect(socket);
+  });
+  io.on('disconnect', () => {
+    disconnect(socket);
+  })
 };
+
+function disconnect(socket) {
+  const {tid, uid} = socket.NKC;
+  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${''.grey} ${`/thread/${tid}`.bgBlue} ${'断开连接'.bgRed}`);
+  global.NKC.io.of('/console').NKC.socketMessage(`/thread/${tid}`, false, uid);
+}
 
 async function postToThread(post) {
   io.to(`thread/${post.tid}`).emit('postToThread', {
