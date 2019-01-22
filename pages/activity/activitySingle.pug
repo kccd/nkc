@@ -33,9 +33,11 @@ block content
                         .col-xs-3.col-md-3(style="padding:0px")
                           a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weChat', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
                             img(src="/default/weChat.png" style="")
-                        //- img(src="/default/QQ.png" style="width:30%" onclick=`shareTo('activity', 'qq', window.location.href, '活动：${data.activity.activityTitle}')`)
-                        //- img(src="/default/qzone.png" style="width:30%" onclick=`shareTo('activity', 'qzone', window.location.href, '活动：${data.activity.activityTitle}')`)
-                        //- img(src="/default/weibo.png" style="width:30%" onclick=`shareTo('activity', 'weibo', window.location.href, '活动：${data.activity.activityTitle}')`)
+                      .col-xs-12.col-md-12
+                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('activity', 'link', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`) 获取分享链接
+                      .col-xs-12.col-md-12(id=`copyArea${data.activity.acid}` style="display:none")
+                        input(type="text", id=`copyLink${data.activity.acid}`, name=`copyLink${data.activity.acid}` style="width:inherit")
+                        button(onclick="copyLink()" id=`copyButton${data.activity.acid}`) 复制
                       .col-xs-2.col-md-2
                     canvas#activityQrcode(style="display:none")
                   //- img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")

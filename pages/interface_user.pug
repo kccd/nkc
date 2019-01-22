@@ -112,6 +112,11 @@ block content
                       .col-xs-3.col-md-3(style="padding:0px")
                         a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('user', 'weChat', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}', '${data.targetUser.uid}')`)
                           img(src="/default/weChat.png" style="")
+                    .col-xs-12.col-md-12
+                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('user', 'link', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}', '${data.targetUser.uid}')`) 获取分享链接
+                    .col-xs-12.col-md-12(id=`copyArea${data.targetUser.uid}` style="display:none")
+                      input(type="text", id=`copyLink${data.targetUser.uid}`, name=`copyLink${data.targetUser.uid}` style="width:inherit")
+                      button(onclick="copyLink()" id=`copyButton${data.targetUser.uid}`) 复制
                       //- img(src="/default/QQ.png" style="width:20%" onclick=`shareTo('user', 'qq', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}')`)
                       //- img(src="/default/qzone.png" style="width:20%" onclick=`shareTo('user', 'qzone', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}')`)
                       //- img(src="/default/weibo.png" style="width:20%" onclick=`shareTo('user', 'weibo', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}')`)
