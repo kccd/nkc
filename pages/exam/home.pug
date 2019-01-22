@@ -30,7 +30,7 @@ block content
             h3.mdui-text-center B卷考试
             for category in data.examsCategories
               if !category.disabledB
-                a(style='font-size: 2rem;' href=`/exam/paper?cid=${category._id}&volume=A`)=`【${category.name}】`
+                a(style='font-size: 2rem;' href=`/exam/paper?cid=${category._id}&volume=B`)=`【${category.name}】`
           //for category in data.examsCategories
             h3= `参加 `
               if permission('visitExamsCategory')
