@@ -12,6 +12,7 @@ router
     }
     if(qid) {
       if(!ctx.permission('modifyQuestion')) ctx.throw(403, '权限不足');
+      console.log(qid)
       data.question = await db.QuestionModel.findOnly({_id: Number(qid)});
     }
     data.cid = Number(cid);

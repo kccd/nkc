@@ -55,7 +55,7 @@ const roleSchema = new Schema({
 	messageCountLimit: {
 		type: Number,
 		default: 0
-	},/*
+	},
 	// 每天所能发表的回复数
 	postToThreadCountLimit: {
 		type: Number,
@@ -75,7 +75,7 @@ const roleSchema = new Schema({
 	postToForumCountLimit: {
 		type: Number,
 		default: 0
-	},*/
+	},
 
   postToForum: {
 	  countLimit: {

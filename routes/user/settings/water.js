@@ -10,10 +10,12 @@ waterRouter
       waterGravity: "southeast",
       waterPayTime: "",
       waterPayInfo: false
-    }
+    };
     // 获取该项服务所需科创币
-    const waterPayType = await db.TypesOfScoreChangeModel.findOnly({_id: "waterPay"})
-    data.kcbPayForWater = parseInt(waterPayType.change*-1);
+    /*const waterPayType = await db.TypesOfScoreChangeModel.findOnly({_id: "waterPay"});
+    data.kcbPayForWater = parseInt(waterPayType.change*-1);*/
+    const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
+    data.kcbPayForWater = parseInt(waterPayType.num*-1);
     const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});
     if(userWaterSetting){
       data.waterSetting = userWaterSetting.waterSetting
@@ -36,7 +38,7 @@ waterRouter
 
     if(type === "pay"){
       // 检测是否已经购买了水印服务
-      const waterAlreadyPay = await db.UsersGeneralModel.findOne({uid: user.uid})
+      const waterAlreadyPay = await db.UsersGeneralModel.findOne({uid: user.uid});
       if(waterAlreadyPay === null){
         ctx.throw(400,"您已经购买了这项服务");
       }
@@ -44,9 +46,10 @@ waterRouter
         ctx.throw(400,"您已经购买了这项服务")
       }
       // 验证科创币
-      const waterPayType = await db.TypesOfScoreChangeModel.findOne({_id: "waterPay"})
-      if(waterPayType && user.kcb < parseInt(waterPayType.change*-1)){
-        ctx.throw(400,"您的科创币不足"+parseInt(waterPayType.change*-1))
+      // const waterPayType = await db.TypesOfScoreChangeModel.findOne({_id: "waterPay"});
+      const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
+      if(waterPayType && user.kcb < parseInt(waterPayType.num*-1)){
+        ctx.throw(400,"您的科创币不足"+parseInt(waterPayType.num*-1))
       }
       // 消耗科创币，并生成记录
       // const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;

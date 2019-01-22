@@ -20,9 +20,9 @@ block content
                 <ul class="mdui-list" v-if='examsCategories.length > 0'>
                   <li class="mdui-list-item mdui-ripple" v-for='c in examsCategories' style='border-bottom:1px solid #eee;' :class="{'mdui-list-active':category._id === c._id}" @click='selectCategory(c)'>
                     <div class="mdui-list-item-content">{{c.name}}</div>
-                    span(:class="{'mdui-text-color-red-200': c.disabledA, 'mdui-text-color-green': !c.disabledA}") A
+                    span(:class="{'mdui-text-color-red-200': c.disabledA, 'mdui-text-color-green': !c.disabledA}") A:{{c.countA}}
                     span &nbsp;&nbsp;&nbsp;
-                    span(:class="{'mdui-text-color-red-200': c.disabledB, 'mdui-text-color-green': !c.disabledB}") B
+                    span(:class="{'mdui-text-color-red-200': c.disabledB, 'mdui-text-color-green': !c.disabledB}") B:{{c.countB}}
                   </li>
                 </ul>
                 button.mdui-btn.mdui-btn-block(@click='addCategory') 添加

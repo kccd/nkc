@@ -316,8 +316,12 @@ threadRouter
 			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
 			if(!data.user.volumeA) {
 				// 加载考试设置
-				data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
-				data.userPostCountToday = await db.InfoBehaviorModel.count({uid: data.user.uid, toc: {$gte: nkcModules.apiFunction.today()}, operationId: 'postToThread'});
+				// data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
+				data.postSettings = (await db.SettingModel.findOnly({_id: 'post'})).c;
+				const today = nkcModules.apiFunction.today();
+        const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: data.user.uid});
+        let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: data.user.uid});
+        data.userPostCountToday = todayPostCount - todayThreadCount;
 			}
 		}
 		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});

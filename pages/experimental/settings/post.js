@@ -27,8 +27,8 @@ var app = new Vue({
         volumeB: exam.indexOf('volumeB') !== -1,
         notPass: {
           status: exam.indexOf('notPass') !== -1,
-          unlimited: results_.examCountLimit.unlimited,
-          countLimit: results_.examCountLimit.countLimit
+          unlimited: [true, 'true'].indexOf(results_.examCountLimit.unlimited) !== -1,
+          countLimit: Number(results_.examCountLimit.countLimit)
         }
       };
       var obj = {

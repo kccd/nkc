@@ -21,7 +21,17 @@ block content
       .mdui-col-sm-12
         .mdui.row
           for category in data.examsCategories
-            .mdui-col-xs-12.mdui-col-sm-6.mdui-col-md-4
+            h3= `参加 `
+              if permission('visitExamsCategory')
+                a(href=`/exam/category/${category._id}`)= `【${category.name}】`
+              else
+                span= `【${category.name}】`
+              | &nbsp;测试
+              if !category.disabledA
+                a(href=`/exam/paper?cid=${category._id}&volume=A`) 【A卷】
+              if !category.disabledB
+                a(href=`/exam/paper?cid=${category._id}&volume=B`) 【B卷】
+            //.mdui-col-xs-12.mdui-col-sm-6.mdui-col-md-4
               .mdui-p-a-2.mdui-text-center
                 .category-name
                   if !permission('visitExamsCategory')
@@ -30,7 +40,7 @@ block content
                     a(href=`/exam/category/${category._id}`)= category.name
                 .category-description= category.description
                 .mdui-p-t-2
-                a.mdui-m-r-3(href=`/exam/paper?cid=${category._id}&volume=A`) A卷
-                a(href=`/exam/paper?cid=${category._id}&volume=B`) B卷
+                  a.mdui-m-r-3(href=`/exam/paper?cid=${category._id}&volume=A`) A卷
+                  a(href=`/exam/paper?cid=${category._id}&volume=B`) B卷
 block scripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)

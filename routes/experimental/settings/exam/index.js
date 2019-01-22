@@ -10,7 +10,13 @@ router
 		const {data, db, query} = ctx;
 	  const {cid} = query;
 	  if(cid) data.cid = cid;
-		data.examsCategories = await db.ExamsCategoryModel.find().sort({order: 1});
+		const examsCategories = await db.ExamsCategoryModel.find().sort({order: 1});
+		data.examsCategories = await Promise.all(examsCategories.map(async c => {
+      const category = c.toObject();
+      category.countA = await db.QuestionModel.count({cid: c._id, volume: 'A', auth: true, disabled: false});
+      category.countB = await db.QuestionModel.count({cid: c._id, volume: 'B', auth: true, disabled: false});
+      return category;
+    }));
 		data.roles = await db.RoleModel.find({defaultRole: false});
 		await next();
 	})

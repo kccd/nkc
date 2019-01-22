@@ -382,6 +382,10 @@
   "getQuestionImage": "获取考试题图片",
   "postQuestion": "上传考试题",
   "disabledQuestion": "屏蔽考试题",
+  "visitEditQuestion": "访问试题编辑器（上传试题、修改试题）",
+  "removeForumCategory": "删除专业中的文章分类",
+  "getAttachmentIcon": "获取附件图标",
+
   "enabledQuestion": "取消屏蔽考试题",
   "visitAddQuestion": "访问添加考试题页面",
   "postExamsPaper": "提交考试试卷",
@@ -391,6 +395,11 @@
   "modifyLoginSettings": "修改<后台管理-登录设置>",
   "visitRegisterSettings": "访问<后台管理-注册设置>",
   "modifyRegisterSettings": "修改<后台管理-注册设置>",
+  "getPersonalMedia": "获取自己的媒体文件",
+  "visitExamSettings": "访问<后台设置-考试设置>",
+  "modifyExamSettings": "修改<后台设置-考试设置>",
+  "faq": "阅读faq文章",
+  "modifyQuestion": "修改考试题",
 
 
   "APPgetUserInfo": "app获取用户信息",
@@ -404,5 +413,9 @@
   "APPsearch": "app搜索",
   "APPgetLatestThreads": "app加载最新文章",
   "APPcheckout": "app启动自检",
-  "APPvisitForum": "app查看专业"
+  "APPvisitForum": "app查看专业",
+  "getUserBanner": "app获取用户主页背景图",
+  "modifyUserBanner": "app修改用户主页背景图",
+  "APPgetLoginUserSubscribe": "app获取登录用户的关注",
+  "APPgetUserSubscribe": "app获取用户的关注"
 }

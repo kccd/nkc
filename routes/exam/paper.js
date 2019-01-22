@@ -162,13 +162,16 @@ paperRouter
     q.passed = paper.passScore <= q.score;
     q.submitted = true;
     if(q.passed) {
-      const q = {};
-      q[`volume${paper.volume}`] = true;
+      const userObj = {};
+      userObj[`volume${paper.volume}`] = true;
+      if(paper.volume === 'B') {
+        userObj.volumeA = true;
+      }
       const passingCert = category[`passing${paper.volume}Cert`];
       if(passingCert || !user.certs.includes(passingCert)) {
-        q.$addToSet = {certs: passingCert};
+        userObj.$addToSet = {certs: passingCert};
       }
-      await user.update(q);
+      await user.update(userObj);
     }
     await paper.update(q);
     data.passed = q.passed;
