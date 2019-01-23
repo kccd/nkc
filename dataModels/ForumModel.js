@@ -148,7 +148,24 @@ const forumSchema = new Schema({
     type: String,
     unique: true,
     required: true
-  },
+	},
+	// 相关专业
+	relatedForumsId: {
+		type: [String],
+		default: []
+	},
+	// 专业类型
+	//--topic 话题
+	//--discipline 学科
+	forumType: {
+		type: String,
+		default: 'discipline'
+	},
+	// 上级板块
+	parentsId: {
+		type: [String],
+		default: []
+	},
   tCount: {
     digest: {
       type: Number,

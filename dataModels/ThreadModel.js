@@ -102,6 +102,21 @@ const threadSchema = new Schema({
     type: [String],
     default: []
   },
+  // 主要分类
+  mainForumsId: {
+    type: [String],
+    default: []
+  },
+  // 辅助分类
+  minorForumsId: {
+    type: [String],
+    default: []
+  },
+  // 自定义分类
+  customForumsId: {
+    type: [String],
+    default: []
+  },
   uid: {
     type: String,
     required: true,
