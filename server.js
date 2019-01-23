@@ -15,7 +15,7 @@ const http = require('http'),
   searchInit = require('./searchInit'),
   settings = require('./settings'),
   serverConfig = require('./config/server'),
-  cacheForums = require('./redis/cacheForums'),
+  cacheForums = require('./redis/cacheForums_'),
   socket = require('./socket'),
   {updateDate, upload} = settings,
   {
