@@ -90,6 +90,7 @@ router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
 router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
 router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
+
 //router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
