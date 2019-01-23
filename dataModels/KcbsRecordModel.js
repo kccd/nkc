@@ -176,14 +176,14 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
   try{
     await newRecords.save();
   } catch(err) {
-    await db.SettingModel.operateSystemID('kcbsRecords', -1);
+    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
     ctx.throw(err);
   }
   try{
     await kcbSettings.update({$inc: {'c.totalMoney': bankChange}});
   } catch(err) {
     await newRecords.remove();
-    await db.SettingModel.operateSystemID('kcbsRecords', -1);
+    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
   }
 
   u.kcb += -1*bankChange;
@@ -221,7 +221,7 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     await fromUser.save();
     await toUser.save();
   } catch(err) {
-    await SettingModel.operateSystemID('kcbsRecords', 1);
+    // await SettingModel.operateSystemID('kcbsRecords', 1);
     if(fromUser.uid !== toUser.uid) {
       fromUser.kcb = fromUsersKcb;
       toUser.kcb = toUsersKcb;

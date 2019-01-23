@@ -12,7 +12,7 @@ router
 		const {body, db} = ctx;
 		const {id, type, operation} = body;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
-		const q = {};
+		const q = Object.assign({}, homeSettings.c);
 		if(operation === 'saveWaterMarkSettings') {
 			let {watermarkTransparency} = body;
 			watermarkTransparency = parseInt(watermarkTransparency);
@@ -33,10 +33,7 @@ router
 			}
 			if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
 		}
-		const obj = {
-		  c: q
-    };
-		await homeSettings.update(obj);
+		await homeSettings.update({c: q});
 		await next();
 	})
 	.del('/', async (ctx, next) => {
