@@ -55,10 +55,11 @@
       else if(!ellipsis)
         -ellipsis = true
         span(style='padding-left: 0.5rem; padding-right: 0.5rem; margin: 0.3rem; background-color: #04A5EA; color: white; border-radius: 0.4rem;') ...
-    if userCollectionId
-      input.ThreadCheckboxes(id=`${userCollectionId}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
-    else
-      input.ThreadCheckboxes(id=`${tid}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
+    if !hiddenCheckBox
+      if userCollectionId
+        input.ThreadCheckboxes(id=`${userCollectionId}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
+      else
+        input.ThreadCheckboxes(id=`${tid}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
   .new-content-body
     -let heightType = 'max-height';
     if hasCover

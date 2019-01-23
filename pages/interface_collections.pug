@@ -2,15 +2,20 @@ extends bootstrap_base.pug
 
 block title
   title #{data.category} - #{data.targetUser.username}的收藏 - 科创论坛
-  if data.targetUser.uid === data.user.uid
-  style.
-    .ThreadCheckboxes{
-      display: block;
-    }
+  if !data.user || data.targetUser.uid !== data.user.uid
+    style.
+      .ThreadCheckboxes{
+        display: none;
+      }
+  else
+    style.
+      .ThreadCheckboxes {
+        display: block;
+      }
 block content
-  -var ownership = data.targetUser.uid == (data.user?data.user.uid:null)
+  -var ownership = data.user && data.targetUser.uid === data.user.uid
   //- var ownership = true;
-  if (data.user == undefined)
+  if 0 && (data.user == undefined)
     h2(style="margin-left:8%;") 请先登录后查看，谢谢~
   else
     .container
@@ -63,9 +68,12 @@ block content
           .CollectionCategoryThreads
 
             each item in data.categoryCollection
-              -const userCollectionId = item.cid;
+              -let userCollectionId = item.cid;
               .CollectionCategoryThreadItem
                 -var thread = item.thread
+                -var hiddenCheckBox = false;
+                if !data.user || data.targetUser.uid !== data.user.uid
+                  - hiddenCheckBox = true;
                 if thread
                   //-var showTicks = ownership
                   include interface_forum_singlethread.pug
@@ -85,7 +93,7 @@ block content
             1. 整理论坛资料，方便个人日后取用。
             2. 整理一整个系列的作品/著述，方便他人直接浏览。
         
-    include debug_output.pug
+    //include debug_output.pug
     
     
 block scripts
