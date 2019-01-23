@@ -61,6 +61,21 @@ const postSchema = new Schema({
     required: true,
     index: 1
   },
+  // 主要分类
+  mainForumsId: {
+    type: [String],
+    default: []
+  },
+  // 辅助分类
+  minorForumsId: {
+    type: [String],
+    default: []
+  },
+  // 自定义分类
+  customForumsId: {
+    type: [String],
+    default: []
+  },
   tid: {
     type: String,
     required: true,
