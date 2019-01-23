@@ -11,7 +11,7 @@ pub.on('error', (err) => {
 
 });*/
 const db = require('../dataModels');
-const cacheForums = require('./cacheForums_');
+const cacheForums = require('./cacheForums');
 const pub = {};
 pub.publish = async (channel, message) => {
   global.NKC.io.of('/message').NKC.sendMessage(channel, message);
