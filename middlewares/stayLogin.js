@@ -89,8 +89,18 @@ module.exports = async (ctx, next) => {
     });
     user.newVoteUp = newVoteUp>0?newVoteUp:0;
 		// 判断用户是否被封禁
+		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
-			user.certs = ['banned'];
+      await Promise.all(['banned'].map(async cert => {
+        const role = await db.RoleModel.findOne({_id: cert});
+        if(!role) return;
+        userRoles.push(role);
+        for(let operationId of role.operationsId) {
+          if(!userOperationsId.includes(operationId)) {
+            userOperationsId.push(operationId);
+          }
+        }
+      }));
 		} else {
 			// 除被封用户以外的所有用户都拥有普通角色的权限
 			const defaultRole = await db.RoleModel.findOnly({_id: 'default'});
@@ -99,19 +109,19 @@ module.exports = async (ctx, next) => {
 			userGrade = await user.extendGrade();
 			if(userGrade) {
 				userOperationsId = userOperationsId.concat(userGrade.operationsId);
-			}
+      }
+      // 根据用户的角色获取权限
+      await Promise.all(user.certs.map(async cert => {
+        const role = await db.RoleModel.findOne({_id: cert});
+        if(!role) return;
+        userRoles.push(role);
+        for(let operationId of role.operationsId) {
+          if(!userOperationsId.includes(operationId)) {
+            userOperationsId.push(operationId);
+          }
+        }
+      }));
 		}
-		// 根据用户的角色获取权限
-		await Promise.all(user.certs.map(async cert => {
-			const role = await db.RoleModel.findOne({_id: cert});
-			if(!role) return;
-			userRoles.push(role);
-			for(let operationId of role.operationsId) {
-				if(!userOperationsId.includes(operationId)) {
-					userOperationsId.push(operationId);
-				}
-			}
-		}));
 	}
 	data.userOperationsId = userOperationsId;
 	data.userRoles = userRoles;
