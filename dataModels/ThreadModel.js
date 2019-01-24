@@ -43,12 +43,12 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
-  },
+  },/* 
   fid: {
     type: String,
     required: true,
     index: 1
-  },
+  }, */
   hideInMid: {
     type: Boolean,
     default: false

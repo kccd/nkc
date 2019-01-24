@@ -55,12 +55,12 @@ const postSchema = new Schema({
   t: {
     type: String,
     default: ''
-  },
+  },/* 
   fid: {
     type: String,
     required: true,
     index: 1
-  },
+  }, */
   // 主要分类
   mainForumsId: {
     type: [String],
