@@ -444,7 +444,7 @@ forumSchema.methods.extendFollowers = async function() {
 // 若当前专业为第五级，则返回 [第一级, 第二级, 第三级, 第四级];
 forumSchema.methods.getBreadcrumbForums = async function() {
 	const ForumModel = mongoose.model('forums');
-  const fid = await client.smembersAsync(`forum:${this.fid}:parentForumsId`);
+	const fid = await client.smembersAsync(`forum:${this.fid}:parentForumsId`);
   if(fid.length === 0) return fid;
   const forums_ = await ForumModel.find({fid: {$in: fid}});
   const forums = [];

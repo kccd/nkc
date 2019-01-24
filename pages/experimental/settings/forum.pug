@@ -16,13 +16,22 @@ block content
         .row#content
           .col-xs-12.col-md-12
             hr
-            div
-              button.btn.btn-default(onclick='newForum()') 添加专业
-            h5 顶级专业位置设置（点击交换）
-            div(style='margin: 1rem 0;')
-              .hidden#data= JSON.stringify({forums: data.forums, fidArr: data.forums.map(f => f.fid)})
-              div#forumsDiv
-            button.btn.btn-primary(onclick='saveForumsOrder()') 保存
+            .col-xs-6.col-md-6
+              div
+                button.btn.btn-default(onclick='newForum("discipline")') 添加专业
+              h5 顶级专业位置设置（点击交换）
+              div(style='margin: 1rem 0;')
+                .hidden#disciplinesData= JSON.stringify({disciplines: data.disciplines, fidArr: data.disciplines.map(f => f.fid)})
+                div#disciplinesDiv
+              button.btn.btn-primary(onclick='saveForumsOrder("discipline")') 保存
+            .col-xs-6.col-md-6
+              div
+                button.btn.btn-default(onclick='newForum("topic")') 添加话题
+              h5 顶级话题位置设置（点击交换）
+              div(style='margin: 1rem 0;')
+                .hidden#topicsData= JSON.stringify({topics: data.topics, fidArr: data.topics.map(f => f.fid)})
+                div#topicsDiv
+              button.btn.btn-primary(onclick='saveForumsOrder("topic")') 保存
 
 block scripts
 

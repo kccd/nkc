@@ -24,10 +24,11 @@ forumRouter
   })
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
-		const {displayName} = body;
-		if(!displayName) ctx.throw(400, '板块名称不能为空');
+		const {displayName, forumType} = body;
+		if(!forumType) ctx.throw(400, '类型不能为空');
+		if(!displayName) ctx.throw(400, '名称不能为空');
 		const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
-		if(sameDisplayNameForum) ctx.throw(400, '板块名称已存在');
+		if(sameDisplayNameForum) ctx.throw(400, '名称已存在');
 		let _id;
 		while(1) {
 			_id = await db.SettingModel.operateSystemID('forums', 1);
@@ -38,6 +39,7 @@ forumRouter
 		}
 		const newForum = db.ForumModel({
 			fid: _id,
+			forumType,
 			displayName,
 			accessible: false,
 			visibility: false,

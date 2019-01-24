@@ -54,7 +54,11 @@ function createSelect(arr, fid, category) {
 	for(var i = 0; i < arr.length; i++) {
 		var forum = arr[i];
 		if (!category) {
-			var option = newElement('option', {}, {}).text(forum.displayName+':'+forum.fid);
+			if(forum.forumType == "discipline") {
+				var option = newElement('option', {}, {}).text('(学科)'+forum.displayName+':'+forum.fid);
+			}else{
+				var option = newElement('option', {}, {}).text('(话题)'+forum.displayName+':'+forum.fid);
+			}
 			if(forum.fid === fid) {
 				option.attr('selected', true);
 			}

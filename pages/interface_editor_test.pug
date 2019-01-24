@@ -5,7 +5,6 @@ block title
   
   include MathJax.pug
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
-  
 block content
   -var mainContainer1400 = true
   #ife.container-fluid(style='max-width:1400px')
@@ -52,7 +51,9 @@ block content
               //-     include interface_attachment_uploader_uploader.pug
 
               include ./media/media_index.pug
-              
+
+              include ./forum/forum_choice.pug
+
               .form-inline
                   .form-group
                       input#parseURL(type='checkbox' checked)
@@ -110,6 +111,7 @@ block scripts
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
   script(src=`/media/media_index.js?v=${startTime}`)
+  script(src=`/forum/forum_choice.js?v=${startTime}`)
   script.
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){
