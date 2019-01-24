@@ -203,6 +203,13 @@ forumSchema.virtual('childrenForums')
 	})
 	.set(function(childrenForums) {
 		this._childrenForums = childrenForums;
+  });
+forumSchema.virtual('relatedForums')
+	.get(function() {
+		return this._relatedForums;
+	})
+	.set(function(relatedForums) {
+		this._relatedForums = relatedForums;
 	});
 
 forumSchema.virtual('parentForums')
@@ -432,7 +439,7 @@ forumSchema.methods.extendChildrenForums = async function(q) {
   @return 上级专业对象数组
   @author pengxigua 2019/1/24
 */
-forumSchema.methods.extendParentForum = async function() {
+forumSchema.methods.extendParentForums = async function() {
 	let parentForums = [];
 	if(this.parentsId.length !== 0) {
 		const ForumModel = mongoose.model('forums');
@@ -769,5 +776,18 @@ forumSchema.methods.ensureModeratorsPermission = async function(data) {
   }
 };
 
+/* 
+  获取相关专业
+  @param options 查询专业时的可选条件
+  @return 专业对象数组
+  @author pengxiguaa 2019/1/24
+*/
+forumSchema.methods.extendRelatedForums = async function(options) {
+  const ForumModel = mongoose.model('forums');
+  options = options || {fid: {$in: []}};
+  options.fid.$in = [...new Set(options.fid.$in.concat(this.relatedForumsId))];
+  const relatedForums = await ForumModel.find(options);
+  return this.relatedForums = relatedForums;
+}
 
 module.exports = mongoose.model('forums', forumSchema);
