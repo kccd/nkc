@@ -687,11 +687,19 @@ forumSchema.methods.ensurePermission = async function(roles, grade, user) {
 forumSchema.statics.getThreadForumsId = async (roles, grade, user, baseFid) => {
   const ForumModel = mongoose.model('forums');
   // 有权访问的专业ID
-  const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
+  let fid = [];
+  fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
+  if(baseFid) {
+    const forum = await ForumModel.findOnly({fid: baseFid});
+    for(const relatedFid of forum.relatedForumsId) {
+      const rFid = await ForumModel.getAccessibleForumsId(roles, grade, user, relatedFid);
+      fid = fid.concat(rFid);
+    }
+  }
   // 在上级专业不显示文章的专业ID
   const canNotFid = await client.smembersAsync('canNotDisplayOnParentForumsId');
   // 找出所有无法在父级显示的版块ID
-  return fid.filter(f => !canNotFid.includes(f));
+  return [...new Set(fid)].filter(f => !canNotFid.includes(f));
 };
 
 // 获取有权限访问的专业
@@ -778,15 +786,19 @@ forumSchema.methods.ensureModeratorsPermission = async function(data) {
 
 /* 
   获取相关专业
-  @param options 查询专业时的可选条件
+  @param fids 能够看到入口的专业，若为空则不考虑权限
   @return 专业对象数组
   @author pengxiguaa 2019/1/24
 */
-forumSchema.methods.extendRelatedForums = async function(options) {
+forumSchema.methods.extendRelatedForums = async function(fids) {
   const ForumModel = mongoose.model('forums');
-  options = options || {fid: {$in: []}};
-  options.fid.$in = [...new Set(options.fid.$in.concat(this.relatedForumsId))];
-  const relatedForums = await ForumModel.find(options);
+  let relatedForumsId;
+  if(!fids) {
+    relatedForumsId = this.relatedForumsId;
+  } else {
+    relatedForumsId = this.relatedForumsId.filter(fid => fids.includes(fid))
+  }
+  const relatedForums = await ForumModel.find({fid: {$in: relatedForumsId}});
   return this.relatedForums = relatedForums;
 }
 

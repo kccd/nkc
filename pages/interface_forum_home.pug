@@ -112,6 +112,11 @@ block title
           for forum in data.forum.childrenForums
             include module_forum_single_panel
           br
+        if data.forum.relatedForums && data.forum.relatedForums.length !== 0
+          h4(style='margin-bottom: 0;').text-center 相关专业
+          for forum in data.forum.relatedForums
+            include module_forum_single_panel
+          br
         if data.moderators.length > 0
           h4(style='margin-bottom: 0;').text-center 主管专家
           for targetUser in data.moderators

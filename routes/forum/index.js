@@ -250,7 +250,7 @@ forumRouter
 		// 加载能看到入口的下一级专业
     await forum.extendChildrenForums({fid: {$in: fidArr}});
     // 加载相关专业
-    await forum.extendRelatedForums({fid: {$in: fidArr}});
+    await forum.extendRelatedForums(fidArr);
 		fidArr.push(fid);
 		// 拿到今天所有该专业下的用户浏览记录
 		const behaviors = await db.UsersBehaviorModel.find({
