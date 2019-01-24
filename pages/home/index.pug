@@ -15,24 +15,28 @@ block content
   mixin createForumList(arr)
     .list-group(style='margin-bottom: 0')
       for forum in arr
-        div(class=`forumLi${forum.fid}`)
-          li.list-group-item.home-forum-list-li(style=`position: relative;overflow: hidden;`)
-            .row
-              .col-xs-12.col-md-12
-                div
-                  div(style='width: 75%;float: left;line-height: 24px;')
-                    if forum.iconFileName
-                      img(src=`/forum_avatar/${forum.fid}` style='width: 2rem;height: 2rem;border-radius: 50%; margin-right: 0.5rem;')
-                    else
-                      img(style=`width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;display:inline-block;background-color: ${forum.color}`)
-                    a(href=`/f/${forum.fid}` target='_blank')= forum.displayName
-                  if forum.childrenForums && forum.childrenForums.length !== 0
-                    div(style='width: 20%;float:right;line-height: 24px;cursor: pointer;' onclick=`showChildrenForums("${forum.fid}", "${forum.color}")`).text-right
-                      span.fa.fa-caret-right(class=`span${forum.fid}` style='font-size: 2rem;color: #555555;')
-          if forum.childrenForums && forum.childrenForums.length !== 0
-            .col-xs-12.col-md-12(class=`f${forum.fid}` style='display: none;')
+        if forum.forumType !== 'topic'
+          div(class=`forumLi${forum.fid}`)
+            li.list-group-item.home-forum-list-li(style=`position: relative;overflow: hidden;`)
               .row
-                +createForumList(forum.childrenForums)
+                .col-xs-12.col-md-12
+                  div
+                    div(style='width: 75%;float: left;line-height: 24px;')
+                      if forum.iconFileName
+                        img(src=`/forum_avatar/${forum.fid}` style='width: 2rem;height: 2rem;border-radius: 50%; margin-right: 0.5rem;')
+                      else
+                        img(style=`width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;display:inline-block;background-color: ${forum.color}`)
+                      a(href=`/f/${forum.fid}` target='_blank')= forum.displayName
+                    if forum.childrenForums && forum.childrenForums.length !== 0
+                      div(style='width: 20%;float:right;line-height: 24px;cursor: pointer;' onclick=`showChildrenForums("${forum.fid}", "${forum.color}")`).text-right
+                        span.fa.fa-caret-right(class=`span${forum.fid}` style='font-size: 2rem;color: #555555;')
+            if forum.childrenForums && forum.childrenForums.length !== 0
+              .col-xs-12.col-md-12(class=`f${forum.fid}` style='display: none;')
+                .row
+                  +createForumList(forum.childrenForums)
+      for forum in arr
+        if forum.forumType === 'topic'            
+          a(href=`/f/${forum.fid}`)=`${forum.displayName}(话题)`
   mixin createAds(arr)
     .swiper-container.swiper-home
       .swiper-wrapper

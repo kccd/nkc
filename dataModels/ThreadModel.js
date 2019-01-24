@@ -105,17 +105,20 @@ const threadSchema = new Schema({
   // 主要分类
   mainForumsId: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   // 辅助分类
   minorForumsId: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   // 自定义分类
   customForumsId: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   uid: {
     type: String,
@@ -389,16 +392,18 @@ threadSchema.methods.getStep = async function(obj) {
 };
 
 /* 拓展文章数组
-*  参数：threads, options
-*  options:
-*    参数名                类型         默认值
-*    forum              Boolean        true     是否拓展专业
-*    parentForum        Boolean        true     是否拓展上级专业
-*    firstPost          Boolean        true     是否推展文章内容
-*    firstPostUser      Boolean        true     是否推展文章的用户
-*    lastPost           Boolean        true     是否推展最新回复
-*    lastPostUser       Boolean        true     是否推展最新回复的用户
-* */
+  @param threads 文章对象数组
+  @param options
+      参数名                类型         默认值
+      forum              Boolean        true     是否拓展专业
+      parentForum        Boolean        true     是否拓展上级专业
+      firstPost          Boolean        true     是否推展文章内容
+      firstPostUser      Boolean        true     是否推展文章的用户
+      lastPost           Boolean        true     是否推展最新回复
+      lastPostUser       Boolean        true     是否推展最新回复的用户
+  @return 文章对象数组
+  @author pengxiguaa 2019/1/24    
+ */
 const defaultOptions = {
   forum: true,
   category: false,
@@ -428,7 +433,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     ThreadTypeModel = mongoose.model('threadTypes');
   }
 
-  const forumsId = new Set(), postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = new Set();
+  let forumsId = [], postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = new Set();
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
 
   threads = threads.filter(thread => !!thread);
@@ -439,7 +444,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       postsId.add(thread.oc);
     }
     if(o.forum) {
-      forumsId.add(thread.fid);
+      forumsId = forumsId.concat(thread.mainForumsId);
     }
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
     if(thread.cid) cid.add(thread.cid);
@@ -466,7 +471,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   }
 
   if(o.forum) {
-    let forums = await ForumModel.find({fid: {$in: [...forumsId]}});
+    let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
     forums.map(forum => {
       if(forum.parentId) {
         if(o.parentForum) {
@@ -490,7 +495,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
   }
 
-  return await Promise.all(threads.map(async thread => {
+  return await Promise.all(threads.map(async t => {
+    const thread = t.toObject? t.toObject(): t;
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
       if(o.firstPostUser) {
@@ -511,20 +517,18 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
     }
     if(o.forum) {
-      const forum = forumsObj[thread.fid];
-      if(o.parentForum && forum.parentId) {
-        forum.parentForum = forumsObj[forum.parentId];
-
+      const forums = [];
+      for(const fid of thread.mainForumsId) {
+        forums.push(forumsObj[fid]);
       }
-      thread.forum = forum;
+      thread.mainForums = forums;
     }
     if(o.category) {
       if(thread.cid) {
         thread.category = categoryObj[thread.cid];
       }
     }
-    return thread.toObject?thread.toObject():thread;
-
+    return thread;
   }));
 };
 

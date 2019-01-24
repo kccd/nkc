@@ -23,7 +23,7 @@ homeRouter
 		const {digest, sortby, page = 0} = query;
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
 		const q = {
-			fid: {$in: fidOfCanGetThreads}
+			mainForumsId: {$in: fidOfCanGetThreads}
 		};
 
 		if(digest) {
@@ -93,7 +93,7 @@ homeRouter
 		const digestThreads = await db.ThreadModel.aggregate([
 			{
 				$match: {
-					fid: {
+					mainForumsId: {
 						$in: fidOfCanGetThreads
 					},
 					digest: true
@@ -109,7 +109,7 @@ homeRouter
           _id: 0,
           oc: 1,
           tid: 1,
-          fid: 1
+          mainForumsId: 1
         }
       }
 		]);

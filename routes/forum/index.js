@@ -277,7 +277,7 @@ forumRouter
 			}
 		}
 
-		await forum.extendParentForum();
+    await forum.extendParentForum();
 		// 加载网站公告
 		await forum.extendNoticeThreads();
 		// 加载关注专业的用户
@@ -309,7 +309,7 @@ forumRouter
 		const digestThreads = await db.ThreadModel.aggregate([
 			{
 				$match: {
-					fid: {$in: accessibleFid},
+					mainForumsId: {$in: accessibleFid},
 					digest: true
 				}
 			},
@@ -319,16 +319,12 @@ forumRouter
 				}
 			}
 		]);
-		// 加载优秀的文章
-		data.digestThreads = await Promise.all(digestThreads.map(async thread => {
-			const post = await db.PostModel.findOnly({pid: thread.oc});
-			const forum = await db.ForumModel.findOnly({fid: thread.fid});
-			await post.extendUser();
-			thread.firstPost = post;
-			thread.forum = forum;
-			return thread;
-		}));
-		// 加载同级的专业
+    // 加载优秀的文章
+    data.digestThreads = await db.ThreadModel.extendThreads(digestThreads, {
+      parentForum: false,
+      lastPost: false
+    });
+		/* // 加载同级的专业
 		const parentForum = await forum.extendParentForum();
 		if(parentForum) {
 			// 拿到parentForum专业下能看到入口的专业id
@@ -340,7 +336,7 @@ forumRouter
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentId: '', fid: {$in: visibleFidArr}});
-		}
+		} */
 
 		ctx.template = 'interface_forum_home.pug';
 		await next();

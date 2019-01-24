@@ -14,7 +14,7 @@ block title
 
 
   //- 快速跳转
-  mixin fastVisit()
+  //mixin fastVisit()
     select.form-control.btn-block(onchange=`fastVisit(this.value)`)
       option 快速跳转
       for f in data.sameLevelForums
@@ -32,12 +32,13 @@ block title
             for thread in data.digestThreads
               .col-xs-12.col-md-12
                 .row(style='margin-bottom: 0.2rem;line-height: 1.8rem;')
-                  if data.forum.fid !== thread.fid
-                    a(href=`/f/${thread.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
-                  a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
-                  span &nbsp;&nbsp;
-                  a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
-                    span=` ( ${thread.firstPost.user.username} )`
+                  for f in thread.mainForums
+                    if f.fid !== data.forum.fid
+                      a(href=`/f/${f.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${f.color};text-decoration: none;`)= f.displayName
+                      a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
+                      span &nbsp;&nbsp;
+                      a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
+                        span=` ( ${thread.firstPost.user.username} )`
       br
 
   //- 专业信息
@@ -101,10 +102,10 @@ block title
   mixin forumsAndModerators
     .row
       .col-xs-12.col-md-12
-        if data.forum.parentForum
+        if data.forum.parentForums.length !== 0
           h4(style='margin-bottom: 0;').text-center 上级专业
-          -var forum = data.forum.parentForum;
-          include module_forum_single_panel
+          for forum in data.forum.parentForums
+            include module_forum_single_panel
           br
         if data.forum.childrenForums && data.forum.childrenForums.length !== 0
           h4(style='margin-bottom: 0;').text-center 细分专业
@@ -152,7 +153,7 @@ block content
         if data.userOperationsId.includes('visitForumInfoSettings')
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
-        +fastVisit()
+        //+fastVisit()
         br
         .col-xs-12.col-md-12
           .row
@@ -215,7 +216,7 @@ block content
             if data.userOperationsId.includes('visitForumInfoSettings')
               a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
                 span.fa.fa-cog &nbsp;设置
-            +fastVisit()
+            //+fastVisit()
 
 
             .visible-xs-block

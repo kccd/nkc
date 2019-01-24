@@ -64,17 +64,20 @@ const postSchema = new Schema({
   // 主要分类
   mainForumsId: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   // 辅助分类
   minorForumsId: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   // 自定义分类
   customForumsId: {
     type: [String],
-    default: []
+    default: [],
+    index: 1
   },
   tid: {
     type: String,
