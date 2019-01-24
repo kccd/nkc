@@ -26,7 +26,8 @@ const logger = async (ctx, next) => {
     let newChangeUsername = ctx.data.operationId === "modifyUsername" ? ctx.body.newUsername : ''; // 新的用户名
     let oldChangeUsername = ctx.data.operationId === "modifyUsername" && ctx.data.user ? ctx.data.user.username : ''; //旧的用户名
     let newPasswordObj = ctx.data.operationId === "modifyPassword" && ctx.body.password ? apiFunction.newPasswordObject(ctx.body.password) : ''; // 用户新密码，没有则为空
-    let userIp = ctx.ip ? ctx.ip : ''; // 用户ip 没有则为空
+    // let userIp = ctx.ip ? ctx.ip : ''; // 用户ip 没有则为空
+    let userIp = ctx.address || ctx.ip;
     let requestMethod = ctx.method; // 请求方法
     let userPort = ctx.port ? ctx.port : ''; // 用户使用的端口 没有则为空
     let requestPara = requestMethod === "GET" || requestMethod === "DELETE" ? ctx.query : ctx.body; // 请求参数 GET||DELETE=>ctx.query  POST||PATCH=>ctx.body
