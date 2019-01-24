@@ -120,6 +120,12 @@ const threadSchema = new Schema({
     default: [],
     index: 1
   },
+  // cid的集合
+  categoriesId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
   uid: {
     type: String,
     required: true,
