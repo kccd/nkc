@@ -15,7 +15,7 @@
       a(href=`/u/${targetUser.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= targetUser.username
     if data.forum
       -let displayForumNav = false;
-      for f in thread.mainForums
+      for f in thread.forums
         if f.fid !== data.forum.fid
           -displayForumNav = true;
           span.new-content-forumAbbr(style=`background-color:${f.color};`)
@@ -28,7 +28,7 @@
 
     else
       -let forum;
-      for f in thread.mainForums
+      for f in thread.forums
         -forum = f;
         if f.forumType === 'topic'
           -break;

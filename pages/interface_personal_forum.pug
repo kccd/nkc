@@ -1,9 +1,8 @@
 extends bootstrap_base.pug
 
 block title
-  title #{data.forum.displayName} - #{data.site.name}
-
-  -var forum  = data.forum
+  -var forum  = data.personalForum
+  title #{forum.displayName} - #{data.site.name}
 
   if forum.descriptionOfForum
     -var processed=forum.descriptionOfForum.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
@@ -35,17 +34,17 @@ block content
           .row
             .col-xs-12
               form(role='form')
-                - var description = data.forum.descriptionOfForum
-                - var announcement = data.forum.announcement
-                - var display_name = data.forum.displayName
+                - var description = forum.descriptionOfForum
+                - var announcement = forum.announcement
+                - var display_name = forum.displayName
                 div(style='width: 100%;')
                   .displayShit
                     div
-                      img.pfBanner(style='width: 100%;' src=`/pfb/${data.forum.uid}`)
+                      img.pfBanner(style='width: 100%;' src=`/pfb/${forum.uid}`)
                     div(style='position: relative;')
                       div(style='width: 19%; margin-top: -14%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
                         div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
-                          img(src=`/pfa/${data.forum.uid}` width='100%' style='border-radius: 5%;')
+                          img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%;')
                       div(style='display: inline-block;')
                         div
                           div(style='display: inline-block;')
@@ -54,7 +53,7 @@ block content
                             if description
                               span #{description}
                         div
-                          - var moderators = data.forum.moderatorsObj
+                          - var moderators = forum.moderatorsObj
                           if moderators && moderators.length
                             span 版主：
                               each k in moderators
@@ -82,15 +81,15 @@ block content
                     div(style='position: relative;')
                       a(href='javascript:;' onclick='uploadForumBanner();' style='display: block; position: relative;')
                         div(style='background-image: url(/default/banner_setting.jpg); background-position: center; background-size: contain; position: relative; width: 100%;')
-                          img.pfBanner(style='width: 100%; opacity: 0.2;' src=`/pfb/${data.forum.uid}`)
-                          input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`bannerOnChange(${data.forum.uid})`)
+                          img.pfBanner(style='width: 100%; opacity: 0.2;' src=`/pfb/${forum.uid}`)
+                          input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`bannerOnChange(${forum.uid})`)
                     div(style='z-index: 1; position: relative;')
                       div(style='width: 19%; margin-top: -10%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
                         div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
                           a(href='javascript:;' onclick='uploadForumAvatar();')
                             div(style='background-image: url(/default/icon_setting.jpg); background-position: center; background-size: contain; border-radius: 5%;')
                               img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%; opacity: 0.2;')
-                              input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`avatarOnChange(${data.forum.uid})`)
+                              input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`avatarOnChange(${forum.uid})`)
                       div(style='display: inline-block;')
                         div
                           div(style='display: inline-block;')
@@ -112,7 +111,7 @@ block content
                           div
                             a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
                           div
-                            a.btn.btn-default(href='javascript:;' onclick=`submitConfig("${data.forum.uid}")`) 保存
+                            a.btn.btn-default(href='javascript:;' onclick=`submitConfig("${forum.uid}")`) 保存
                       div
                         textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
 
@@ -135,7 +134,7 @@ block content
           //li(class=`${data.tab === "subscribe" ? "active" : ""}`)
           //  a(href='?&tab=subscribe') 关注
           //li
-          //  a(href=`/u/${data.forum.uid}/activities`) 动态
+          //  a(href=`/u/${forum.uid}/activities`) 动态
         .panel
           .row
             .col-xs-12

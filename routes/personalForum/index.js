@@ -26,7 +26,7 @@ router
     		data.isModerator = true;
 	    }
     }
-    data.forum = personalForum;
+    data.personalForum = personalForum;
 
     let {
       sortby = 'tlm',
@@ -53,7 +53,7 @@ router
     if(tab === 'reply') {
 			const q = {
 				uid,
-				fid: {$in: fidOfCanGetThread}
+				mainForumsId: {$in: fidOfCanGetThread}
 			};
 			if(digest) {
 				q.$or = [{digest: true}, {digestInMid: true}];
@@ -77,7 +77,7 @@ router
         await thread.lastPost.extendUser();
 	      await thread.firstPost.extendUser();
 	      await thread.firstPost.extendResources();
-	      await thread.extendForum().then(forum => forum.extendParentForum())
+        await thread.extendForums(['mainForums']);
       }));
       data.posts = posts;
       const length = await PostModel.count(q);
@@ -85,7 +85,7 @@ router
     }
     else if(tab === 'own') {
     	const q = {
-    		fid: {
+    		mainForumsId: {
 		      $in: fidOfCanGetThread
 			  },
 		    $and: [
@@ -122,7 +122,7 @@ router
       // $matchThread = $matchThread.set('recycleMark', {"$nin":[true]});
       const threads = await ThreadModel.find(q).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await ThreadModel.extendThreads(threads, {
-        forum: false
+        forum: true
       });
       /*data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
@@ -255,7 +255,7 @@ router
     }
     // 专栏下的全部
     else if(tab === 'all') {
-    	const q = {uid, fid: {$in: fidOfCanGetThread}};
+    	const q = {uid, mainForumsId: {$in: fidOfCanGetThread}};
     	const displayRecycleMarkThreads = data.userOperationsId.includes('displayRecycleMarkThreads');
     	let $sort = {};
     	if(sortby === 'tlm') {
@@ -278,8 +278,7 @@ router
 					} else {
 						thread.lastPost = thread.firstPost;
 					}
-					await thread.extendForum();
-					await thread.forum.extendParentForum();
+					await thread.extendForums(['mainForums']);
 					await thread.extendCategory();
 		    }
 		    threads.push(thread);
