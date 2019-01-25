@@ -1,6 +1,6 @@
 .col-xs-12.col-md-12(style='margin: 0.2rem 0;')
   .row
-    for f in thread.mainForums
+    for f in thread.forums
       a(href=`/f/${f.fid}` style=`border-radius: 0.2rem;font-size:0.9em;padding: 3px 5px;margin-right: 0.5rem;color: #ffffff;background-color: ${f.color};text-decoration: none;`)= f.displayName
     a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
     span &nbsp;&nbsp;

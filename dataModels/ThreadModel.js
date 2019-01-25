@@ -432,7 +432,6 @@ threadSchema.methods.getStep = async function(obj) {
 const defaultOptions = {
   forum: true,
   category: false,
-  parentForum: true,
   firstPost: true,
   firstPostUser: true,
   lastPost: true,
@@ -499,17 +498,17 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
   if(o.forum) {
     let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
-    forums.map(forum => {
+    /* forums.map(forum => {
       if(forum.parentId) {
         if(o.parentForum) {
           parentForumsId.add(forum.parentId);
         }
       }
-    });
-    if(o.parentForum) {
+    }); */
+    /* if(o.parentForum) {
       const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
       forums = forums.concat(parentForums);
-    }
+    } */
     forums.map(forum => {
       forumsObj[forum.fid] = forum;
     });
@@ -549,7 +548,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       for(const fid of thread.mainForumsId) {
         forums.push(forumsObj[fid]);
       }
-      thread.mainForums = forums;
+      thread.forums = forums;
     }
     if(o.category) {
       if(thread.categoriesId && thread.categoriesId.length !== 0) {

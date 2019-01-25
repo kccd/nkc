@@ -2583,6 +2583,10 @@ img.emoji {
 
 .home-forum-list-li{
   border-color: #eeeeee;
+  padding: 8px 10px;
+}
+.home-topic-list-li{
+  padding: 8px 10px;
 }
 
 .home-forum-list-li a{
