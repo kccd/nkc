@@ -16,9 +16,13 @@ postRouter
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     await thread.extendFirstPost();
-	  const forum = await thread.extendForum();
+	  const forums = await thread.extendForums(['mianForums', 'minorForums']);
     const {user} = data;
-	  const isModerator = await forum.isModerator(data.user?data.user.uid: '');
+    let isModerator;
+    for(const f of forums) {
+      isModerator = await f.isModerator(data.user?data.user.uid: '');
+      if(isModerator) break;
+    }
     // 判断用户是否具有访问该post所在文章的权限
     const options = {
     	roles: data.userRoles,
@@ -43,11 +47,17 @@ postRouter
 			if(!allShareLimit){
 				allShareLimit = new db.ShareLimitModel({});
 				await allShareLimit.save();
-			}
+      }
+      
       let shareLimitTime;
-      if(forum.shareLimitTime){
-        shareLimitTime = forum.shareLimitTime;
-      }else{
+      for(const f of forums) {
+        const timeLimit = Number(f.shareLimitTime)
+        if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
+          shareLimitTime = timeLimit;
+        }
+      }
+
+      if(shareLimitTime === undefined){
         shareLimitTime = allShareLimit.shareLimitTime;
       }
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());

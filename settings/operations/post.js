@@ -28,10 +28,10 @@ module.exports = {
 				}
 			}
 		},
-		recommend: {
+		/* recommend: {
 			POST: 'recommendPost',
 			DELETE: 'unRecommendPost'
-		},
+		}, */
 		digest: {
 			POST: 'digestPost',
 			DELETE: 'unDigestPost'

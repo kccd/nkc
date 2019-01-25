@@ -26,13 +26,13 @@ resumeRouter
 		const forumsObj = [];
 		for(let f of forums) {
 			let level = 2;
-			if(f.type === 'category') {
+			if(f.parentsId.length === 0) {
 				level = 1;
 			}
 			forumsObj.push({
 				id: f.fid,
 				name: f.displayName,
-				parentId: f.parentId,
+				parentsId: f.parentsId,
 				level
 			})
 		}

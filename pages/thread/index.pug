@@ -139,7 +139,10 @@ block content
                 .col-xs-12.col-md-12
                   .thread-management
                     .title
-                      if thread.forum.parentForum
+                      for forum in thread.forums
+                        a(href=`/f/${forum.fid}` style='text-decoration: none;margin-right: 0.5rem;')
+                          span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${forum.color}`)= forum.displayName
+                      //-if thread.forum.parentForum
                         a(href=`/f/${thread.forum.parentForum.fid}` style='text-decoration: none;margin-right: 0.5rem;')
                           span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${thread.forum.parentForum.color}`)= thread.forum.parentForum.displayName
                       if thread.forum
@@ -403,13 +406,13 @@ block content
                     span= index+1+'. '
                     span= thread.firstPost.t
           if data.sameThreads && data.sameThreads.length !== 0
-          .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-            .thread-aside-header 相似文章推荐
-            for thread, index in data.sameThreads
-              .thread-aside-title
-                a(href=`/t/${thread.tid}`)
-                  span= index + 1 + '. '
-                  span= thread.firstPost.t
+            .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+              .thread-aside-header 相似文章推荐
+              for thread, index in data.sameThreads
+                .thread-aside-title
+                  a(href=`/t/${thread.tid}`)
+                    span= index + 1 + '. '
+                    span= thread.firstPost.t
           .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
             ul.HomeFriendlyLink
               include ../nkc_footer_links.pug

@@ -163,12 +163,12 @@ threadSchema.virtual('lastPost')
     this._lastPost = p
   });
 
-threadSchema.virtual('forum')
+threadSchema.virtual('forums')
   .get(function() {
-    return this._forum
+    return this._forums
   })
   .set(function(f) {
-    this._forum = f
+    this._forums = f
   });
 
 threadSchema.virtual('category')
@@ -204,11 +204,28 @@ threadSchema.methods.extendLastPost = async function() {
     .find({tid: this.tid, disabled: {$nin:[true]}})
     .sort({toc: -1}).limit(1))[0]
 };
+/* 
+  拓展文章的专业
+  @param types 数组，专业的类型：mainForums, minorForums, customForums(自定义，待定)
+  @return 专业对象数组
+  @author pengxigua 2019/1/24
+*/
+threadSchema.methods.extendForums = async function(types) {
+  let fids = [];
+  if(types.includes('mainForums')) {
+    fids = fids.concat(this.mainForumsId);
+  }
+  if(types.includes('minorForums')) {
+    fids = fids.concat(this.minorForumsId);
+  }
+  const forums = await mongoose.model('forums').find({fid: {$in: fids}});
+  return this.forums = forums;
+}
 
-threadSchema.methods.extendForum = async function() {
+/* threadSchema.methods.extendForum = async function() {
   const ForumModel = mongoose.model('forums');
   return this.forum = await ForumModel.findOnly({fid: this.fid})
-};
+}; */
 
 threadSchema.methods.extendCategory = async function() {
 	const ThreadTypeModel = mongoose.model('threadTypes');
@@ -222,7 +239,9 @@ threadSchema.methods.extendUser = async function() {
 
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
-	await this.forum.ensurePermission(roles, grade, user);
+  for(const forum of this.forums) {
+    await forum.ensurePermission(roles, grade, user);
+  }
 };
 // ----------------------------------------------------------------------
 
@@ -439,7 +458,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     ThreadTypeModel = mongoose.model('threadTypes');
   }
 
-  let forumsId = [], postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = new Set();
+  let forumsId = [], postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = [];
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
 
   threads = threads.filter(thread => !!thread);
@@ -453,7 +472,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       forumsId = forumsId.concat(thread.mainForumsId);
     }
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
-    if(thread.cid) cid.add(thread.cid);
+    if(thread.categoriesId && thread.categoriesId.length !== 0) {
+      cid = cid.concat(thread.cid);
+    };
   });
 
   if(o.firstPost || o.lastPost) {
@@ -495,7 +516,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
   }
   if(o.category) {
-    const categories = await ThreadTypeModel.find({cid: {$in: [...cid]}});
+    const categories = await ThreadTypeModel.find({cid: {$in: [...new Set(cid)]}});
     for(const category of categories) {
       categoryObj[category.cid] = category;
     }
@@ -503,6 +524,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
   return await Promise.all(threads.map(async t => {
     const thread = t.toObject? t.toObject(): t;
+    thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
       if(o.firstPostUser) {
@@ -530,8 +552,10 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       thread.mainForums = forums;
     }
     if(o.category) {
-      if(thread.cid) {
-        thread.category = categoryObj[thread.cid];
+      if(thread.categoriesId && thread.categoriesId.length !== 0) {
+        for(const cid of thread.categoriesId) {
+          if(categoryObj[cid]) thread.categories.push(categoryObj[cid]);
+        }        
       }
     }
     return thread;

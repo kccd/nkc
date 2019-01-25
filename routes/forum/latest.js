@@ -15,8 +15,8 @@ latestRouter
 		}
 		// 加载某个类别的文章
 		if(cat) {
-			match.cid = parseInt(cat);
-			data.cat = match.cid;
+			match.categoriesId = parseInt(cat);
+			data.cat = match.categoriesId;
 		}
 		// 判断是否为该专业或上级专业的专家
 		const isModerator = await forum.isModerator(data.user);
@@ -89,7 +89,8 @@ latestRouter
 		data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads);
     data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 		data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+    data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+    data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
 		data.type = 'latest';
 		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
 		await next();
