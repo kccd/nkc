@@ -14,10 +14,18 @@
       - var title = `${targetUser.navbarDesc.username}\n`+`学术分 ${targetUser.navbarDesc.xsf}\n`+`科创币 ${targetUser.navbarDesc.kcb}\n`+`${targetUser.navbarDesc.cs}`;
       a(href=`/u/${targetUser.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= targetUser.username
     if data.forum
+      -let displayForumNav = false;
       for f in thread.mainForums
         if f.fid !== data.forum.fid
+          -displayForumNav = true;
           span.new-content-forumAbbr(style=`background-color:${f.color};`)
             a(style='text-decoration: none;' href=`/f/${f.fid}` title=`${f.description || ''}` data-toggle="tooltip" data-placement="bottom")= f.displayName
+      if !displayForumNav && thread.categories.length !== 0
+        for category in thread.categories
+          if data.threadTypesId.includes(category.cid)
+            span.new-content-forumAbbr(style=`background-color:${data.forum.color};`)
+              a(style='text-decoration: none;' href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
+
     else
       -let forum;
       for f in thread.mainForums

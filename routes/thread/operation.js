@@ -8,7 +8,7 @@ operationRouter
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
-		await thread.extendForum();
+		await thread.extendForums(['mainForums', 'minorForums']);
 
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
@@ -21,7 +21,7 @@ operationRouter
 		try{
 			await newCollection.save();
 		} catch (err) {
-			await db.SettingModel.operateSystemID('collections', -1);
+			// await db.SettingModel.operateSystemID('collections', -1);
 			ctx.throw(500, `收藏失败: ${err}`);
 		}
 		data.targetUser = await thread.extendUser();

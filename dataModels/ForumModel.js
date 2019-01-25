@@ -635,7 +635,7 @@ forumSchema.statics.getAllChildrenForums = async function(fid) {
 	const ForumModel = mongoose.model('forums');
 	let accessibleForum = [];
 	const findForums = async (parentId) => {
-		const forums = await ForumModel.find({parentId}).sort({order: 1});
+		const forums = await ForumModel.find({parentsId: parentId}).sort({order: 1});
 		accessibleForum = accessibleForum.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);
@@ -765,7 +765,14 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
 
   return [...new Set(fid)];
 };
-
+/* 
+  判断用户是否具有当前操作的权限
+  @param data.user 用户对象
+  @param data.userRoles 用户所有用的角色
+  @param data.operationId 操作名
+  @return boolean 是否用户权限
+  @author pengxiguaa 2019/1/25
+*/
 forumSchema.methods.ensureModeratorsPermission = async function(data) {
   const {user, userRoles, operationId} = data;
   let hasOperation = false;
@@ -776,6 +783,7 @@ forumSchema.methods.ensureModeratorsPermission = async function(data) {
     }
   }
   if(hasOperation) return;
+  // 若没有权限，则判断用户是否为专家
   const isModerator = await this.isModerator(user);
   if(!isModerator) {
     const err = new Error('权限不足');

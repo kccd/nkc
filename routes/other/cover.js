@@ -53,7 +53,10 @@ router
     } finally {
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
       ctx.type = 'jpg';
-      ctx.filePath = url
+      ctx.filePath = url;
+      if(!fs.existsSync(ctx.filePath)) {
+        ctx.filePath = ctx.settings.statics.defaultImageResourcePath;
+      }
     }
     await next()
   });

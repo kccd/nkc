@@ -13,8 +13,10 @@ router
 		const targetUser = await db.UserModel.findOnly({uid: post.uid});
 		if(targetUser.uid === user.uid) ctx.throw(403, '不允许给自己加减学术分');
 		const thread = await post.extendThread();
-		const forum = await db.ForumModel.findOnly({fid: thread.fid});
-		await forum.ensureModeratorsPermission(data);
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    for(const f of forums) {
+      await f.ensureModeratorsPermission(data);
+    }
 		if(thread.disabled || thread.disabled) {
 			ctx.throw(403,'无法给禁用的帖子或回复评学术分');
 		}
@@ -69,9 +71,12 @@ router
     const {recordId, pid} = params;
     const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid});
     const post = await db.PostModel.findOnly({pid});
+    const thread = await post.extendThread();
     const targetUser = await db.UserModel.findOnly({uid: post.uid});
-    const forum = await db.ForumModel.findOnly({fid: post.fid});
-    await forum.ensureModeratorsPermission(data);
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    for(const f of forums) {
+      await f.ensureModeratorsPermission(data);
+    }
     if(reason.length < 2) ctx.throw(400, '撤销原因写的太少啦~');
     const oldXsf = targetUser.xsf;
     targetUser.xsf -= record.num;

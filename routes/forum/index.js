@@ -194,7 +194,7 @@ forumRouter
 		if(allChildrenFid.length !== 0) {
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
 		}
-    const count = await ThreadModel.count({fid});
+    const count = await ThreadModel.count({mainForumsId: fid});
     if(count > 0) {
       ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
       return next()
