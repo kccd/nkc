@@ -221,6 +221,21 @@ function moveForum(fid) {
 		})
 }
 
+function selectForumType(fid) {
+	var forumType = $("input[name='forumType']:checked").val();
+	var obj = {
+		operation: 'selectForumType',
+		forumType: forumType
+	}
+	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
+	.then(function() {
+		window.location.reload();
+	})
+	.catch(function(data) {
+		screenTopWarning(data.error || data)
+	})
+}
+
 function getThreadTypeByCid(cid) {
 	for(var i = 0; i < threadTypes.length; i++) {
 		if(threadTypes[i].cid.toString() === cid) {

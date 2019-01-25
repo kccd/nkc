@@ -22,33 +22,37 @@ style.
   .mdui-btn {
     height: 32px;
     min-width: 1px;
+    padding: 0 5px;
   }
-//- .form-group#cidArr= JSON.stringify(data.forumsThreadTypes)
-.panel.panel-default#forumChoice
+.hidden#cidArr= JSON.stringify(data.forumsThreadTypes)
+.hidden#disciplineDom= JSON.stringify(data.subscribeDisciplines)
+.hidden#topicDom= JSON.stringify(data.subscribeTopics)
+.panel.panel-default#forumChoice(v-cloak)
   .mdui-row
     .mdui-col-xs-6
-      .mdui-col-xs-12
+      .mdui-col-xs-12(v-if="disciplineArr.length !==0")
         .mdui-col-xs-1
-          span 当前专业
+          span 关注专业
         .mdui-col-xs-11
-          -for(let discipline of data.subscribeDisciplines)
-            .mdui-chip(style=`border-radius:0px;background-color:${discipline.color}` onclick=`selectForum("${discipline.fid}")`)
-              span.mdui-chip-title!=discipline.displayName
-              span.mdui-chip-delete
-                i.mdui-icon.material-icons cancel   
+          button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-ripple(v-for="(discipline, index) in disciplineArr" style=`border-radius:0px;margin-bottom:1px;margin-right:1px` @click=`selectDiscipline(discipline.fid)`) {{discipline.displayName}}
       .mdui-col-xs-12
         .mdui-col-xs-1
           span 分类
         .mdui-col-xs-11
-          .mdui-chip
-            span.mdui-chip-title 不分类
-          .mdui-chip(v-for='(cat, index) in categorys')
+          .mdui-chip(v-for='(cat, index) in disciplineCategorys' @click="selectDisciplineCate(cat.cid)")
             span.mdui-chip-title {{cat.name}}
-      .mdui-col-xs-12
-        include ../forumlist_dropdown
     .mdui-col-xs-6
-      -for(let topic of data.subscribeTopics)
-        .mdui-chip(style=`border-radius:0px;background-color:${topic.color}`)
-          span.mdui-chip-title!=topic.displayName
-          span.mdui-chip-delete
-            i.mdui-icon.material-icons cancel 
+      .mdui-col-xs-12(v-if="topicArr.length !==0")
+        .mdui-col-xs-1
+          span 关注话题
+        .mdui-col-xs-11
+          .mdui-chip(v-for="(topic, index) in topicArr" style=`border-radius:0px;` @click=`selectTopic(topic.fid)`)
+            span.mdui-chip-title {{topic.displayName}}
+      .mdui-col-xs-12
+        .mdui-col-xs-1
+          span 分类
+        .mdui-col-xs-11
+          .mdui-chip(v-for='(cat, index) in topicCategorys' @click="selectTopicCate(cat.cid)")
+            span.mdui-chip-title {{cat.name}}
+    .mdui-col-xs-12
+      button(@click="shuchu()") shuchu 
