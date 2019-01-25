@@ -23,6 +23,21 @@ block content
                       a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
                       span &nbsp;/&nbsp;
                     span= forum.displayName
+                    -if(data.parentForums.length == 0)
+                      span (顶级专业)
+              .form-group
+                label.col-sm-2.control-label 当前属性
+                .col-sm-5
+                  h5
+                    -if(forum.forumType == "discipline")
+                      span 学科
+                    -else
+                      span 话题
+              .form-group
+                label.col-sm-2.control-label 选择专业属性
+                .col-sm-5
+                  input#forumType(type="radio", name="forumType") 学科
+                  input#forumType(type="radio", name="forumType") 话题
               .form-group
                 label.col-sm-2.control-label 移动至
                 .hidden#data-forums=JSON.stringify({forums: data.forums, forum: data.forum, threadTypes: data.threadTypes})

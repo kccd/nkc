@@ -10,6 +10,9 @@ editorRouter
     //重新编辑帖子使用旧版编辑器
     ctx.template = 'interface_editor_test.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
+    data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines();
+    data.subscribeTopics = await userSubscribe.extendSubscribeTopics();
     const authLevel = await userPersonal.getAuthLevel();
 	  if((!user.volumeA || authLevel < 1) && type !== 'application') {
     	ctx.template = 'interface_notice.pug';
@@ -101,7 +104,6 @@ editorRouter
     	const thread = await db.ThreadModel.findOnly({tid: id});
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
-
     await next();
   });
 

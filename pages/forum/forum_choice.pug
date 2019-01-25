@@ -23,15 +23,32 @@ style.
     height: 32px;
     min-width: 1px;
   }
-.panel.panel-default
+//- .form-group#cidArr= JSON.stringify(data.forumsThreadTypes)
+.panel.panel-default#forumChoice
   .mdui-row
     .mdui-col-xs-6
-      .mdui-chip(style="border-radius:0px")
-        span.mdui-chip-title 123
-        span.mdui-chip-delete
-          i.mdui-icon.material-icons cancel
-      .mdui-chip(style="border-radius:0px")
-        span.mdui-chip-title 123
-        span.mdui-chip-delete
-          i.mdui-icon.material-icons cancel
+      .mdui-col-xs-12
+        .mdui-col-xs-1
+          span 当前专业
+        .mdui-col-xs-11
+          -for(let discipline of data.subscribeDisciplines)
+            .mdui-chip(style=`border-radius:0px;background-color:${discipline.color}` onclick=`selectForum("${discipline.fid}")`)
+              span.mdui-chip-title!=discipline.displayName
+              span.mdui-chip-delete
+                i.mdui-icon.material-icons cancel   
+      .mdui-col-xs-12
+        .mdui-col-xs-1
+          span 分类
+        .mdui-col-xs-11
+          .mdui-chip
+            span.mdui-chip-title 不分类
+          .mdui-chip(v-for='(cat, index) in categorys')
+            span.mdui-chip-title {{cat.name}}
+      .mdui-col-xs-12
+        include ../forumlist_dropdown
     .mdui-col-xs-6
+      -for(let topic of data.subscribeTopics)
+        .mdui-chip(style=`border-radius:0px;background-color:${topic.color}`)
+          span.mdui-chip-title!=topic.displayName
+          span.mdui-chip-delete
+            i.mdui-icon.material-icons cancel 
