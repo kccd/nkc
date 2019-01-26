@@ -13,9 +13,9 @@ settingsRouter
 		const urlArr = url.split('/');
 		const type = urlArr[urlArr.length-1];
 		data.type = (type === 'settings'?'info': type);
-		data.breadcrumbForums = await data.forum.getBreadcrumbForums();
+    data.breadcrumbForums = await data.forum.getBreadcrumbForums();
 		const length = data.breadcrumbForums.length;
-		data.level1Forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
+    data.level1Forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		if(length === 0) {
 			data.sameLevelForums = data.level1Forums;
 		} else {
