@@ -30,7 +30,9 @@ function showChildrenForums(fid, color) {
 		});*/
 		const childrenDivLi = $('.forumLi' + fid + ' li.list-group-item.home-forum-list-li');
 		childrenDivLi.css({
-			'border-left': '3px solid '+color
+      'border-left': '3px solid '+color,
+      'padding-left': '5px',
+      'border-radius': '0'
 		});
 	} else {
 		childrenDiv.slideUp(function() {
@@ -38,7 +40,9 @@ function showChildrenForums(fid, color) {
 				'border-left': '1px solid #eeeeee'
 			});*/
 			$('.forumLi' + fid + ' li.list-group-item.home-forum-list-li').css({
-				'border-left': '1px solid #eeeeee'
+        'border-left': 'none',
+        'padding-left': '0',
+        'border-radius': '0'
 			});
 		});
 	}

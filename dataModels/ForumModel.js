@@ -352,42 +352,49 @@ forumSchema.methods.extendNoticeThreads = async function() {
 	return this.noticeThreads = await ThreadModel.extendThreads(threads);
 };
 
-
+/* 
+  更新当前专业信息，再更新上级所有专业的信息
+  @author pengxiguaa 2019/1/26
+*/
 forumSchema.methods.updateForumMessage = async function() {
 	const ThreadModel = require('./ThreadModel');
 	const ForumModel = mongoose.model('forums');
 	const PostModel = mongoose.model('posts');
 	const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
 	childrenFid.push(this.fid);
-	const countThreads = await ThreadModel.count({fid: {$in: childrenFid}});
-	let countPosts = await PostModel.count({fid: {$in: childrenFid}});
+	const countThreads = await ThreadModel.count({mainForums: {$in: childrenFid}});
+	let countPosts = await PostModel.count({mainForums: {$in: childrenFid}});
 	countPosts = countPosts - countThreads;
-	const digest = await ThreadModel.count({fid: {$in: childrenFid}, digest: true});
+	const digest = await ThreadModel.count({mainForums: {$in: childrenFid}, digest: true});
 	const normal = countThreads - digest;
 	const tCount = {
 		digest,
 		normal
 	};
 	const {today} = require('../nkcModules/apiFunction');
-	const countPostsToday = await PostModel.count({fid: {$in: childrenFid}, toc: {$gt: today()}});
-	await this.update({tCount, countPosts, countThreads, countPostsToday});
-	let breadcrumbForums = await this.getBreadcrumbForums();
-	breadcrumbForums = breadcrumbForums.reverse();
-	for(let forum of breadcrumbForums) {
-		const childForums = await forum.extendChildrenForums();
-		let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
-		childForums.map(f => {
-			countThreads += f.countThreads;
-			countPosts += f.countPosts;
-			countPostsToday += f.countPostsToday;
-			digest += f.tCount.digest;
-		});
-		const tCount = {
-			digest,
-			normal: (countThreads - digest)
-		};
-		await forum.update({countThreads, countPosts, countPostsToday, tCount});
-	}
+	const countPostsToday = await PostModel.count({mainForums: {$in: childrenFid}, toc: {$gt: today()}});
+  await this.update({tCount, countPosts, countThreads, countPostsToday});
+  const updateParentForumsMessage = async (forum) => {
+    if(forum.parentsForumsId.length === 0) return;
+    const parentsForums = await ForumModel.find({fid: {$in: forum.parentsForumsId}});
+    await Promise.all(parentsForums.map(async parentForum => {
+      const childForums = await parentForum.extendChildrenForums();
+      let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
+      childForums.map(f => {
+        countThreads += f.countThreads;
+        countPosts += f.countPosts;
+        countPostsToday += f.countPostsToday;
+        digest += f.tCount.digest;
+      });
+      const tCount = {
+        digest,
+        normal: (countThreads - digest)
+      };
+      await parentForum.update({countThreads, countPosts, countPostsToday, tCount});
+      await updateParentForumsMessage(parentForum);
+    }));
+  }
+  await updateParentForumsMessage(this);
 };
 
 
@@ -657,12 +664,26 @@ forumSchema.statics.getAllChildrenFid = async function(fid) {
 
 
 
-
-
+/* 
+  获取专业下的所有专业的id
+  @return 专业id数组
+  @author pengxiguaa 2019/1/26
+*/
 forumSchema.methods.getAllChildForumsId = async function() {
   return await client.smembersAsync(`forum:${this.fid}:allChildForumsId`);
 };
 
+/* 
+  获取专业下的全部专业
+  @return 专业对象数组
+  @author pengxiguaa 2019/1/26
+*/
+forumSchema.methods.getAllChildForums = async function() {
+  const ForumModel = mongoose.model('forums');
+  const allChildForumsId = await this.getAllChildForumsId();
+  const forums = await ForumModel.find({fid: {$in: allChildForumsId}});
+  return this.allChildForums = forums;
+}
 
 
 // 判断用户是否有权访问该版块

@@ -152,11 +152,11 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
   } else if (data.targetThread) {
     thread = data.targetThread;
   }
-  if(data.forum) {
+  /* if(data.forum) {
     forum = data.forum;
   } else if (data.targetForum) {
     forum = data.targetForum;
-  }
+  } */
   if(data.post) {
     post = data.post;
   } else if (data.targetPost) {
@@ -171,7 +171,7 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     newRecords.fid = post.fid;
     newRecords.tid = post.tid;
   }
-  if(forum) newRecords.fid = forum.fid;
+  // if(forum) newRecords.fid = forum.fid;
   if(data.problem) newRecords.problemId = data.problem._id;
   try{
     await newRecords.save();

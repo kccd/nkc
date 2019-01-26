@@ -287,7 +287,7 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
 
 
 threadSchema.methods.updateThreadMessage = async function() {
-  const PostModel = require('./PostModel');
+  const PostModel = mongoose.model('posts');
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
@@ -302,8 +302,10 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
   await this.update(updateObj);
-  const forum = await this.extendForum();
-  await forum.updateForumMessage();
+  const forums = await this.extendForum(['mainForumsId']);
+  await Promise.all(forums.map(async forum => {
+    await forum.updateForumMessage();
+  }));
   /*const user = await this.extendUser();
   await user.updateUserMessage();*/
 };
