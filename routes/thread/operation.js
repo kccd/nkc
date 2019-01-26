@@ -228,6 +228,9 @@ operationRouter
     if(fid === 'recycle') ctx.throw(403, '无法将文章移动至回收站，请点击“送回收站”按钮');
     const forum = await db.ForumModel.findOne({fid});
     if(!forum) ctx.throw(400, '目标专业不存在');
+    const forumThreadTypes = await db.ThreadTypeModel.find({fid});
+    const cids = forumThreadTypes.map(c => c.cid + '');
+    const categoriesId = thread.categoriesId.filter(c => !cids.includes(c));
     const childForumsCount = await db.ForumModel.count({parentsId: fid});
     if(childForumsCount !== 0) ctx.throw(400, '只能给文章添加最底层的专业作为分类');
     if(cid) {
@@ -240,9 +243,9 @@ operationRouter
       mainForumsId: fid
     };
     if(cid) {
-      obj.categoriesId = cid;
+      categoriesId.push(cid + '');
     }
-    await thread.update({$addToSet: obj});
+    await thread.update({$addToSet: obj, categoriesId: [...new Set(categoriesId)]});
     await db.PostModel.updateMany({tid}, {$addToSet: {mainForumsId: fid}});
     await db.InfoBehaviorModel.updateMany({tid}, {$addToSet: {mainForumsId: fid}});
     await Promise.all(forums.map(async forum => {

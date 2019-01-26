@@ -483,7 +483,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
     if(thread.categoriesId && thread.categoriesId.length !== 0) {
-      cid = cid.concat(thread.cid);
+      cid = cid.concat(thread.categoriesId);
     };
   });
 
