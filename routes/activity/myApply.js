@@ -22,7 +22,6 @@ myApplyRouter
       applys[i].activityType = acti.activityType;
     }
     data.applys = applys;
-    console.log(data.applys)
 		ctx.template = 'activity/myActivityApply.pug';
 		await next();
   })

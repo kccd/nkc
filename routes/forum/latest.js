@@ -23,7 +23,7 @@ latestRouter
 
 		// 拿到该专业下可从中拿文章的所有子专业id
 		let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
-		fidOfCanGetThreads.push(forum.fid);
+    fidOfCanGetThreads.push(forum.fid);
 		match.mainForumsId = {$in: fidOfCanGetThreads};
 		// 专家可查看专业下所有文章
 		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
@@ -63,7 +63,7 @@ latestRouter
 
 		data.threads = await db.ThreadModel.extendThreads(threads, {
 		  category: true
-		});
+    });
 
 		// 构建置顶文章查询条件
 		const toppedThreadMatch = {topped: true, mainForumsId: forum.fid};
