@@ -20,9 +20,9 @@ settingsRouter
 			data.sameLevelForums = data.level1Forums;
 		} else {
 			const parentForum = data.breadcrumbForums[data.breadcrumbForums.length - 1];
-			data.sameLevelForums = await db.ForumModel.find({parentId: parentForum.fid}).sort({order: 1});
+			data.sameLevelForums = await db.ForumModel.find({parentsId: parentForum.fid}).sort({order: 1});
 		}
-		data.childrenForums = await db.ForumModel.find({parentId: data.forum.fid}).sort({order: 1});
+		data.childrenForums = await db.ForumModel.find({parentsId: data.forum.fid}).sort({order: 1});
 		await next();
 	})
 	.get('/', async (ctx) => {
