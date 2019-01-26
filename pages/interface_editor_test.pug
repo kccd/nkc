@@ -26,7 +26,7 @@ block content
               .form-group
                   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
                     div(style='margin-top: 5px;')
-                    include forumlist_dropdown
+                    //- include forumlist_dropdown
                     //select#parents.form-control(style='display: inline-block; width: auto;')
                     //    option 选择一个学院
                     //select#children.form-control(style='display: inline-block; width: auto;')
@@ -60,6 +60,7 @@ block content
                       span &nbsp;处理URL&nbsp;
                   .form-group
                       button#post.btn.btn-primary(type='submit') 发表
+                      button.btn.btn-primary( onclick="getFidAndCidResult()") ceshi
                   if !['forum_declare'].includes(data.type)
                     .form-group
                     -if (!data.targetUser)
@@ -102,7 +103,8 @@ block scripts
   script(src='/interface_editor.js?v=4')
 
   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-    script(src='/module_dropdown.js?v=3')
+    //- script(src='/module_dropdown.js?v=3')
+    script(src='/forum/forumlist_dropdown1.js?v=3')
 
 
 
@@ -112,9 +114,9 @@ block scripts
   script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
   script(src=`/media/media_index.js?v=${startTime}`)
   script(src=`/forum/forum_choice.js?v=${startTime}`)
-  script.
-    window.onbeforeunload = function() {
-      if(document.getElementById("post").disabled === false){
-        return "离开前保存草稿了吗？"
-      }
-    }
+  //- script.
+  //-   window.onbeforeunload = function() {
+  //-     if(document.getElementById("post").disabled === false){
+  //-       return "离开前保存草稿了吗？"
+  //-     }
+  //-   }

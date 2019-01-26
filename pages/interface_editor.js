@@ -540,17 +540,17 @@ function onPost(that) {
     var type = that.query.type;
     var cat = that.query.cat;
     var id;
+    var fids = [];
+    var cids = [];
 
 		var id = that.blocked ? that.query.id : that.childID;
 		if(type === 'forum' || !type || desType === 'forum') {
-			try{
-				var obj = getResult();
-			} catch(e) {
-				return screenTopWarning(e);
-			}
-
-			id = obj.fid;
-			cat = obj.cid;
+			
+			var obj = getFidAndCidResult();
+      if(obj.fids) fids = obj.fids;
+      if(obj.cids) cids = obj.cids;
+      id = fids[0];
+      cat = cids[0];
 			type = 'forum';
 		} else {
 			if(that.blocked) {
@@ -583,6 +583,8 @@ function onPost(that) {
       c: content,
       l: language || 'html',
       did: did,
+      fids: fids,
+      cids: cids,
       cat: cat,
       mid: that.query.mid,
       desType: desType,

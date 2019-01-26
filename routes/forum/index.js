@@ -72,6 +72,7 @@ forumRouter
 			ThreadModel
 		} = db;
 		const {fid} = params;
+		console.log()
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 	  const {user} = data;
@@ -110,16 +111,21 @@ forumRouter
     if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');*/
 
 	  const {post} = body;
-    const {c, t} = post;
+		const {c, t, fids, cids} = post;
+		console.log(fids, cids)
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
 
     const {cat, mid} = post;
-    const _post = await forum.newPost(post, user, ip, cat, mid);
+		const _post = await forum.newPost(post, user, ip, cat, mid, fids);
+		await _post.update({"$set":{mainForumsId: fids}})
+		console.log(_post)
 		data.post = _post;
     const type = ctx.request.accepts('json', 'html');
     await forum.update({$inc: {'tCount.normal': 1}});
-    const thread = await ThreadModel.findOnly({tid: _post.tid});
+		const thread = await ThreadModel.findOnly({tid: _post.tid});
+		await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
+		console.log(thread)
 		data.thread = thread;
 		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
 		const {coverPath, frameImgPath} = ctx.settings.upload;

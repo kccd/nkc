@@ -2,7 +2,8 @@ const Router = require('koa-router');
 const editorRouter = new Router();
 editorRouter
   .get('/', async (ctx, next) => {
-    const {data, db, query} = ctx;
+    const {data, db, query, nkcModules} = ctx;
+    const {dbFunction} = nkcModules;
     const {user} = data;
     if(!user.username) return ctx.redirect('/register');
     const {type, id, cat, title, content} = query;
@@ -13,6 +14,7 @@ editorRouter
     const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
     data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines();
     data.subscribeTopics = await userSubscribe.extendSubscribeTopics();
+    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     const authLevel = await userPersonal.getAuthLevel();
 	  if((!user.volumeA || authLevel < 1) && type !== 'application') {
     	ctx.template = 'interface_notice.pug';
@@ -30,13 +32,12 @@ editorRouter
 
     if(type !== 'application') {
 	    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
-	    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 	    if(type === 'forum' && id) {
 	    	const forum = await db.ForumModel.findOnly({fid: id});
 	    	await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	    	const breadcrumbForums = await forum.getBreadcrumbForums();
 	    	data.selectedArr = breadcrumbForums.map(forum => forum.fid);
-	    	data.selectedArr.push(forum.fid);
+        data.selectedArr.push(forum.fid);
 	    }
     }
 
@@ -104,6 +105,10 @@ editorRouter
     	const thread = await db.ThreadModel.findOnly({tid: id});
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
+    
+    const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
+    data.allForumList = allForumList;
+    console.log(data.allForumList)
     await next();
   });
 
