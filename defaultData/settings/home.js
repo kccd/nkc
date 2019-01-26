@@ -5,6 +5,10 @@ module.exports = {
     logos: [],
     logo: String,
     smallLogo: String,
-    noticeThreadsId: []
+    noticeThreadsId: [],
+    list: {
+      topic: true,
+      discipline: true
+    }
   }
 };

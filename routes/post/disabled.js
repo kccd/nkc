@@ -10,8 +10,12 @@ router
     if(disabled === undefined) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-    const targetForum = await targetThread.extendForum();
-    const isModerator = await targetForum.isModerator(data.user?data.user.uid:'');
+    const targetForums = await targetThread.extendForums(['mainForums']);
+    let isModerator;
+    for(const f of targetForums) {
+      isModerator = await f.isModerator(data.user?data.user.uid:'');
+      if(isModerator) break;
+    }
     if(!isModerator) {
     	if(!data.userOperationsId.includes('disabledPost')) ctx.throw(400, '权限不足');
     }
@@ -43,7 +47,6 @@ router
             port: ctx.port,
             ip: ctx.address,
             key: 'violationCount',
-            fid: targetPost.fid,
             tid: targetPost.tid,
             pid,
             description: para.reason || '屏蔽回复并标记为违规'

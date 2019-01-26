@@ -19,9 +19,24 @@ forumRouter
 		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 		disciplineForums = nkcModules.dbFunction.forumsListSort(disciplineForums, threadTypes);
 		topicForums = nkcModules.dbFunction.forumsListSort(topicForums, threadTypes);
-		data.forums = forums.map(forum => forum.toObject());
-		data.disciplineForums = disciplineForums.map(discipline => discipline.toObject());
-		data.topicForums = topicForums.map(topic => topic.toObject());
+		data.forums = forums.map(forum => {
+      if(forum.toObject) {
+        forum.toObject();
+      }
+      return forum;
+    });
+		data.disciplineForums = disciplineForums.map(discipline => {
+      if(discipline.toObject) {
+        discipline.toObject();
+      }
+      return discipline;
+    });
+		data.topicForums = topicForums.map(topic => {
+      if(topic.toObject) {
+        topic.toObject();
+      }
+      return topic;
+    });
 		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
 		data.disciplineJSON = nkcModules.apiFunction.disciplineToJSON(data.forums);
 		data.topicJSON = nkcModules.apiFunction.topicToJSON(data.forums);
@@ -347,8 +362,10 @@ forumRouter
       parentForum: false,
       lastPost: false
     });
-		/* // 加载同级的专业
-		const parentForum = await forum.extendParentForum();
+		 // 加载同级的专业
+    const parentForums = await forum.extendParentForums();
+    let parentForum;
+    if(parentForums.length !== 0) parentForum = parentForums[0];
 		if(parentForum) {
 			// 拿到parentForum专业下能看到入口的专业id
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, parentForum.fid);
@@ -359,7 +376,7 @@ forumRouter
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentId: '', fid: {$in: visibleFidArr}});
-		} */
+		} 
 
 		ctx.template = 'interface_forum_home.pug';
 		await next();

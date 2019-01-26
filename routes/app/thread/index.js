@@ -6,7 +6,7 @@ theradRouter
 		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
+		const fourms = await thread.extendForums(['mainForums']);
 		// 验证权限 - new
     await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 
@@ -70,7 +70,7 @@ theradRouter
     }
     data.replyTarget = `t/${tid}`;
 		data.posts = newPosts;
-		data.forum = forum;    
+		data.forums = forums;    
 		data.thread = data.thread.toObject();
 		await next();
 	});
