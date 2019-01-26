@@ -29,8 +29,8 @@ $(document).ready(function() {
       categoryIdArr: ["0"],
       disciplineForumId: "",
       topicForumId: "",
-      disciplineCategoryId: "",
-      topicCategoryId: "",
+      disciplineCategoryId: "0",
+      topicCategoryId: "0",
       newDomNum: 0
     },
     methods:{
@@ -65,104 +65,148 @@ $(document).ready(function() {
 
 function selectDiscipline(fid) {
   app.disciplineCategorys = [];
-  if(app.disciplineCategoryId !== ""){
-    var index1 = app.categoryIdArr.indexOf(app.disciplineCategoryId)
-    if(index1>-1){
-      app.categoryIdArr.splice(index1, 1)
+  if(app.disciplineForumId == fid){
+    var disciplineIndex = app.forumIdArr.indexOf(fid);
+    if(disciplineIndex > -1){
+      app.forumIdArr.splice(disciplineIndex, 1)
     }
-    app.disciplineCategoryId = "";
+    var lastTopForumId = "#disForumId"+app.disciplineForumId;
+    $(lastTopForumId).removeClass("mdui-color-blue-300");
+    app.disciplineForumId = "";
+  }else{
+    if(app.disciplineCategoryId !== ""){
+      var index1 = app.categoryIdArr.indexOf(app.disciplineCategoryId)
+      if(index1>-1){
+        app.categoryIdArr.splice(index1, 1)
+      }
+      app.disciplineCategoryId = "";
+    }
+    var nowDisForumId = "#disForumId"+fid;
+    $(nowDisForumId).addClass("mdui-color-blue-300");
+    var threadTypes = [];
+    for(var i in cidArr){
+      if(cidArr[i].fid == fid){
+        threadTypes.push(cidArr[i])
+      }
+    }
+    app.forumIdArr.push(fid);
+    if(app.disciplineForumId !== ""){
+      if(app.disciplineForumId !== fid){
+        var lastDisForumId = "#disForumId"+app.disciplineForumId;
+        $(lastDisForumId).removeClass("mdui-color-blue-300");
+      }
+      // if(app.disciplineForumId !== fid){
+        var lastDisForumId = "#disForumId"+app.disciplineForumId;
+        $(lastDisForumId).removeClass("mdui-color-blue-300");
+      // }
+      var index = app.forumIdArr.indexOf(app.disciplineForumId);
+      if(index > -1){
+        app.forumIdArr.splice(index, 1);
+      }
+    }
+    app.disciplineForumId = fid;
   }
-  var nowDisForumId = "#disForumId"+fid;
-  $(nowDisForumId).addClass("mdui-color-blue-300");
-  var threadTypes = [];
-  for(var i in cidArr){
-    if(cidArr[i].fid == fid){
-      threadTypes.push(cidArr[i])
-    }
-  }
-  app.forumIdArr.push(fid);
-  if(app.disciplineForumId !== ""){
-    if(app.disciplineForumId !== fid){
-      var lastDisForumId = "#disForumId"+app.disciplineForumId;
-      $(lastDisForumId).removeClass("mdui-color-blue-300");
-    }
-    var index = app.forumIdArr.indexOf(app.disciplineForumId);
-    if(index > -1){
-      app.forumIdArr.splice(index, 1);
-    }
-  }
-  app.disciplineForumId = fid;
   setTimeout(function(){ app.disciplineCategorys = threadTypes; }, 300);
   // app.disciplineCategorys = threadTypes;
 }
 
 function selectTopic(fid) {
   app.topicCategorys = [];
-  if(app.topicCategoryId !== ""){
-    var index1 = app.categoryIdArr.indexOf(app.topicCategoryId)
-    if(index1>-1){
-      app.categoryIdArr.splice(index1, 1)
+  if(app.topicForumId == fid){
+    var topicIndex = app.forumIdArr.indexOf(fid);
+    if(topicIndex > -1){
+      app.forumIdArr.splice(topicIndex, 1)
     }
-    app.topicCategoryId = "";
+    var lastTopForumId = "#topForumId"+app.topicForumId;
+    $(lastTopForumId).removeClass("mdui-color-blue-300");
+    app.topicForumId = "";
+  }else{
+    if(app.topicCategoryId !== ""){
+      var index1 = app.categoryIdArr.indexOf(app.topicCategoryId)
+      if(index1>-1){
+        app.categoryIdArr.splice(index1, 1)
+      }
+      app.topicCategoryId = "";
+    }
+    var nowTopForumId = "#topForumId"+fid;
+    $(nowTopForumId).addClass("mdui-color-blue-300");
+    var threadTypes = [];
+    for(var i in cidArr){
+      if(cidArr[i].fid == fid){
+        threadTypes.push(cidArr[i])
+      }
+    }
+    app.forumIdArr.push(fid);
+    if(app.topicForumId !== ""){
+      if(app.topicForumId !== fid){
+        var lastTopForumId = "#topForumId"+app.topicForumId;
+        $(lastTopForumId).removeClass("mdui-color-blue-300");
+      }
+      var index = app.forumIdArr.indexOf(app.topicForumId);
+      if(index > -1){
+        app.forumIdArr.splice(index, 1);
+      }
+    }
+    app.topicForumId = fid;
   }
-  var nowTopForumId = "#topForumId"+fid;
-  $(nowTopForumId).addClass("mdui-color-blue-300");
-  var threadTypes = [];
-  for(var i in cidArr){
-    if(cidArr[i].fid == fid){
-      threadTypes.push(cidArr[i])
-    }
-  }
-  app.forumIdArr.push(fid);
-  if(app.topicForumId !== ""){
-    if(app.topicForumId !== fid){
-      var lastTopForumId = "#topForumId"+app.topicForumId;
-      $(lastTopForumId).removeClass("mdui-color-blue-300");
-    }
-    var index = app.forumIdArr.indexOf(app.topicForumId);
-    if(index > -1){
-      app.forumIdArr.splice(index, 1);
-    }
-  }
-  app.topicForumId = fid;
   setTimeout(function(){ app.topicCategorys = threadTypes; }, 300);
   // app.topicCategorys = threadTypes;
 }
 
 function selectDisciplineCate(cid) {
   cid = cid+"";
-  var nowDisCateId = "#disCateId" + cid;
-  $(nowDisCateId).addClass("mdui-color-blue-300")
-  app.categoryIdArr.push(cid);
-  if(app.disciplineCategoryId !== ""){
-    if(cid !== app.disciplineCategoryId){
+  if(app.disciplineCategoryId == cid){
+    var disCatIndex = app.categoryIdArr.indexOf(cid);
+    if(disCatIndex > -1){
+      app.categoryIdArr.splice(disCatIndex, 1);
       var lastDisCateId = "#disCateId" + app.disciplineCategoryId;
       $(lastDisCateId).removeClass("mdui-color-blue-300")
+      app.disciplineCategoryId = "";
     }
-    var index = app.categoryIdArr.indexOf(app.disciplineCategoryId);
-    if(index > -1) {
-      app.categoryIdArr.splice(index, 1);
+  }else{
+    var nowDisCateId = "#disCateId" + cid;
+    $(nowDisCateId).addClass("mdui-color-blue-300")
+    app.categoryIdArr.push(cid);
+    if(app.disciplineCategoryId !== ""){
+      if(cid !== app.disciplineCategoryId){
+        var lastDisCateId = "#disCateId" + app.disciplineCategoryId;
+        $(lastDisCateId).removeClass("mdui-color-blue-300")
+      }
+      var index = app.categoryIdArr.indexOf(app.disciplineCategoryId);
+      if(index > -1) {
+        app.categoryIdArr.splice(index, 1);
+      }
     }
+    app.disciplineCategoryId = cid;
   }
-  app.disciplineCategoryId = cid;
 }
 
 function selectTopicCate(cid) {
   cid = cid+"";
-  var nowTopCateId = "#topCateId" + cid;
-  $(nowTopCateId).addClass("mdui-color-blue-300")
-  app.categoryIdArr.push(cid);
-  if(app.topicCategoryId !== ""){
-    if(cid !== app.topicCategoryId){
+  if(app.topicCategoryId == cid) {
+    var topCatIndex = app.categoryIdArr.indexOf(cid);
+    if(topCatIndex > -1){
+      app.categoryIdArr.splice(topCatIndex, 1);
       var lastTopCateId = "#topCateId" + app.topicCategoryId;
       $(lastTopCateId).removeClass("mdui-color-blue-300")
+      app.topicCategoryId = "";
     }
-    var index = app.categoryIdArr.indexOf(app.topicCategoryId);
-    if(index > -1) {
-      app.categoryIdArr.splice(index, 1);
+  }else{
+    var nowTopCateId = "#topCateId" + cid;
+    $(nowTopCateId).addClass("mdui-color-blue-300")
+    app.categoryIdArr.push(cid);
+    if(app.topicCategoryId !== ""){
+      if(cid !== app.topicCategoryId){
+        var lastTopCateId = "#topCateId" + app.topicCategoryId;
+        $(lastTopCateId).removeClass("mdui-color-blue-300")
+      }
+      var index = app.categoryIdArr.indexOf(app.topicCategoryId);
+      if(index > -1) {
+        app.categoryIdArr.splice(index, 1);
+      }
     }
+    app.topicCategoryId = cid;
   }
-  app.topicCategoryId = cid;
 }
 
 function shuchu() {
