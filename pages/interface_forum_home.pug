@@ -14,7 +14,7 @@ block title
 
 
   //- 快速跳转
-  //mixin fastVisit()
+  mixin fastVisit()
     select.form-control.btn-block(onchange=`fastVisit(this.value)`)
       option 快速跳转
       for f in data.sameLevelForums
@@ -158,7 +158,7 @@ block content
         if data.userOperationsId.includes('visitForumInfoSettings')
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
-        //+fastVisit()
+        astVisit()
         br
         .col-xs-12.col-md-12
           .row
@@ -221,7 +221,7 @@ block content
             if data.userOperationsId.includes('visitForumInfoSettings')
               a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
                 span.fa.fa-cog &nbsp;设置
-            //+fastVisit()
+            +fastVisit()
 
 
             .visible-xs-block

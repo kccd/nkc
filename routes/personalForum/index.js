@@ -265,7 +265,7 @@ router
 	    }
 	    q.operationId = {$in: ['postToForum', 'postToThread']};
 	    const count = await db.InfoBehaviorModel.count(q);
-    	const paging = ctx.nkcModules.apiFunction.paging(page, count);
+      const paging = ctx.nkcModules.apiFunction.paging(page, count);
     	const infoLogs = await db.InfoBehaviorModel.find(q).sort($sort).skip(paging.start).limit(paging.perpage);
     	const threads = [];
     	for(const log of infoLogs) {
