@@ -8,7 +8,7 @@ operationRouter
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
-		await thread.extendForum();
+		await thread.extendForums(['mainForums', 'minorForums']);
 
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const collection = await db.CollectionModel.findOne({tid: tid, uid: user.uid});
@@ -21,7 +21,7 @@ operationRouter
 		try{
 			await newCollection.save();
 		} catch (err) {
-			await db.SettingModel.operateSystemID('collections', -1);
+			// await db.SettingModel.operateSystemID('collections', -1);
 			ctx.throw(500, `收藏失败: ${err}`);
 		}
 		data.targetUser = await thread.extendUser();
@@ -93,21 +93,26 @@ operationRouter
 		const {data, db} = ctx;
 		const {user} = data;
 		const {tid} = ctx.params;
-		let {fid, cid, para} = ctx.body;
+    let {fid, cid, para} = ctx.body;
 		if(fid === undefined) ctx.throw(400, '参数不正确');
-		if(cid === undefined) cid = 0;
+    if(cid === undefined) cid = 0;
+    if(fid !== 'recycle') ctx.throw(403, '参数错误');
 		const targetForum = await db.ForumModel.findOne({fid});
 		const targetCategory = await db.ThreadTypeModel.findOne({cid});
 		if(!targetCategory) cid = 0;
 		if(!targetForum || (targetCategory && targetForum.fid !== targetCategory.fid)) ctx.throw(400, '参数不正确');
 		const targetThread = await db.ThreadModel.findOnly({tid});
 		data.targetUser = await targetThread.extendUser();
-		const oldForum = await targetThread.extendForum();
-		const isModerator = await oldForum.isModerator();
+    const oldForums = await targetThread.extendForums(['mainForums']);
+    let isModerator;
+    for(const f of oldForums) {
+      isModerator = await f.isModerator();
+      if(isModerator) break;
+    }
 		if(!isModerator && !data.userOperationsId.includes('moveThread')) ctx.throw(403, '权限不足');
 		const oldCid = targetThread.cid;
 		// 版主只能改变帖子的分类，不能移动帖子到其他板块
-		if(!data.userOperationsId.includes('moveThread') && fid === 'recycle' && fid !== oldForum.fid) ctx.throw(403, '权限不足');
+		// if(!data.userOperationsId.includes('moveThread') && fid === 'recycle' && fid !== oldForum.fid) ctx.throw(403, '权限不足');
 		// if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(403, '权限不足');
 		const tCount = {
 			digest: 0,
@@ -117,14 +122,23 @@ operationRouter
 			tCount.digest = 1;
 		} else {
 			tCount.normal = 1;
-		}
+    }
+    await targetThread.update({mainForumsId: ['recycle'], disabled: true});
+    await Promise.all(oldForums.map(async forum => {
+      await forum.updateForumMessage();
+    }));
+    await targetThread.updateThreadMessage();
+    await targetForum.updateForumMessage();
+    /*
 		let status = 0;
-		try {
-			const q = {cid, fid};
-			q.disabled = (q.fid === 'recycle');
+		 try {
+      const q = {
+        mainForumsId: ['recycle']
+      };
+			q.disabled = true;
 			await targetThread.update(q);
 			status++;
-			await db.PostModel.updateMany({tid}, {$set: {fid}});
+			await db.PostModel.updateMany({tid}, {$set: {mainForumsId: ['recycle']}});
 			status++;
 			await oldForum.update({$inc: {'tCount.digest': -1*tCount.digest, 'tCount.normal': -1*tCount.normal}});
 			status++;
@@ -143,9 +157,9 @@ operationRouter
 				await targetForum.update({$inc: {'tCount.digest': -1*tCount.digest, 'tCount.normal': -1*tCount.normal}});
 			}
 			ctx.throw(500, `移动帖子失败： ${err}`);
-		}
+		} 
 		await targetThread.updateThreadMessage();
-		await targetForum.updateForumMessage();
+		await targetForum.updateForumMessage();*/
 		// 获取某主帖下全部的回帖用户
 		let posts = await db.PostModel.find({"tid":tid},{"uid":1})
 		// 用户id去重
@@ -168,7 +182,6 @@ operationRouter
 					ip: ctx.address,
 					key: 'violationCount',
 					tid: targetThread.tid,
-					fid: targetThread.fid,
 					description: para.reason || '屏蔽文章并标记为违规'
 				});
         await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
@@ -192,7 +205,7 @@ operationRouter
         c: {
           type: 'bannedThread',
           tid: targetThread.tid,
-          rea: para.reason
+          rea: para?para.reason:''
         }
       });
       await message.save();
@@ -204,7 +217,61 @@ operationRouter
 			await toUser.increasePsnl('system', 1);
 		}
 		await next();
-	})
+  })
+  .post('/forum', async (ctx, next) => {
+    const {data, db, body, params} = ctx;
+    const {tid} = params;
+    const thread = await db.ThreadModel.findOnly({tid});
+    await thread.extendForums(['mainForums', 'minorForums']);
+    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    const {fid, cid} = body;
+    if(fid === 'recycle') ctx.throw(403, '无法将文章移动至回收站，请点击“送回收站”按钮');
+    const forum = await db.ForumModel.findOne({fid});
+    if(!forum) ctx.throw(400, '目标专业不存在');
+    const childForumsCount = await db.ForumModel.count({parentsId: fid});
+    if(childForumsCount !== 0) ctx.throw(400, '只能给文章添加最底层的专业作为分类');
+    if(cid) {
+      const category = await db.ThreadTypeModel.findOne({cid, fid});
+      if(!category) ctx.throw(400, '所选的文章分类不存在');
+    }
+    const forums = await thread.extendForums(['mainForums']);
+    forums.push(forum);
+    const obj = {
+      mainForumsId: fid
+    };
+    if(cid) {
+      obj.categoriesId = cid;
+    }
+    await thread.update({$addToSet: obj});
+    await db.PostModel.updateMany({tid}, {$addToSet: {mainForumsId: fid}});
+    await db.InfoBehaviorModel.updateMany({tid}, {$addToSet: {mainForumsId: fid}});
+    await Promise.all(forums.map(async forum => {
+      await forum.updateForumMessage();
+    }));
+    await next();
+  })
+  .del('/forum', async (ctx, next) => {
+    const {data, query, db, params} = ctx;
+    const {tid} = params;
+    const {fid} = query;
+    const thread = await db.ThreadModel.findOnly({tid});
+    await thread.extendForums(['mainForums', 'minorForums']);
+    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    if(!thread.mainForumsId.includes(fid)) ctx.throw(400, '当前文章不属于该专业，请刷新');
+    const forums = await thread.extendForums(['mainForums']);
+    if(forums.length === 1) ctx.throw(403, '文章所属的专业暂不能为空');
+    const threadTypes = await db.ThreadTypeModel.find({fid});
+    const cids = threadTypes.map(t => t.cid);
+    let {categoriesId} = thread;
+    categoriesId = categoriesId.filter(cid => !cids.includes(cid));
+    await thread.update({$pull: {mainForumsId: fid}, categoriesId});
+    await db.PostModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
+    await db.InfoBehaviorModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
+    await Promise.all(forums.map(async forum => {
+      await forum.updateForumMessage();
+    }))
+    await next();
+  })
 	.patch('/switchInPersonalForum', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;

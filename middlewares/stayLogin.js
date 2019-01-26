@@ -89,7 +89,6 @@ module.exports = async (ctx, next) => {
     });
     user.newVoteUp = newVoteUp>0?newVoteUp:0;
 		// 判断用户是否被封禁
-		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
       await Promise.all(['banned'].map(async cert => {
         const role = await db.RoleModel.findOne({_id: cert});

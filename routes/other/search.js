@@ -25,13 +25,21 @@ router.get('/', async(ctx, next) => {
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     data.result = await Promise.all(searchResult.hits.hits.map(async r => {
       const pid = r._id;
-      try {
-        const post = await PostModel.findOnly({pid, fid: {$in: accessibleFid}});
+      const post = await PostModel.findOne({pid, mainForumsId: {$in: accessibleFid}});
+      if(!post) return null;
+      post.t = r.highlight? r.highlight.t: r.t;
+      await post.extendUser();
+      await post.extendThread();
+      await post.thread.extendFirstPost();
+      await post.thread.extendForums(['mainForums']);
+      return post.toObject()
+      /* try {
+        const post = await PostModel.findOnly({pid, mainForumsId: {$in: accessibleFid}});
         post.t = r.highlight? r.highlight.t: r.t;
         await post.extendUser();
         await post.extendThread();
         await post.thread.extendFirstPost();
-        await post.thread.extendForum();
+        await post.thread.extendForums();
         if(accessibleFid.includes(post.thread.fid)){
           return post.toObject()
         }else{
@@ -39,7 +47,7 @@ router.get('/', async(ctx, next) => {
         }
       } catch(e) {
         return null
-      }
+      } */
     }));
     // console.log(data.result)
     // console.log(searchResult)

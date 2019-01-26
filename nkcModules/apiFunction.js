@@ -249,6 +249,58 @@ fn.forumsToJson = (fors) => {
   return newArr;
 }
 
+// 学科转为JSON
+fn.disciplineToJSON = (fors) => {
+  let newArr = [];
+  let obj = {};
+  for(let i in fors){
+    if(fors[i].forumType == "discipline"){
+      if(fors[i].childrenForums && fors[i].childrenForums.length > 0){
+        let subs = fn.disciplineToJSON(fors[i].childrenForums)
+        obj = {
+          name: fors[i].displayName,
+          fid: fors[i].fid,
+          sub: subs
+        }
+        newArr.push(obj)
+      }else{
+        obj = {
+          name: fors[i].displayName,
+          fid: fors[i].fid
+        }
+        newArr.push(obj)
+      }
+    }
+  }
+  return newArr;
+}
+
+// 话题转为JSON
+fn.topicToJSON = (fors) => {
+  let newArr = [];
+  let obj = {};
+  for(let i in fors){
+    if(fors[i].forumType == "topic"){
+      if(fors[i].childrenForums && fors[i].childrenForums.length > 0){
+        let subs = fn.topicToJSON(fors[i].childrenForums)
+        obj = {
+          name: fors[i].displayName,
+          fid: fors[i].fid,
+          sub: subs
+        }
+        newArr.push(obj)
+      }else{
+        obj = {
+          name: fors[i].displayName,
+          fid: fors[i].fid
+        }
+        newArr.push(obj)
+      }
+    }
+  }
+  return newArr;
+}
+
 // 生成数字与小写字母组成的随机码
 fn.makeRandomCode = (digit) => {
   var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];

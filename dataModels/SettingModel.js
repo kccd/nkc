@@ -25,6 +25,25 @@ settingSchema.virtual('adThreads')
 async function operateSystemID(type, op) {
   const SettingModel = mongoose.model('settings');
   if(op !== 1 && op !== -1) throw 'invalid operation. a operation should be -1 or 1';
+  const q = {
+    $inc: {}
+  };
+  q.$inc[`c.${type}`] = op;
+  const setting = await SettingModel.findOneAndUpdate({_id: 'counters'}, q);
+  if(!setting) throw 'counters settings not found';
+  if(!setting.c[type]) {
+    setting.c[type] = 1;
+    const obj = {
+      $set: {}
+    };
+    obj.$set[`c.${type}`] = 1;
+    await setting.update(obj);
+  } else {
+    setting.c[type] += op;
+  }
+  return setting.c[type];
+  /* const SettingModel = mongoose.model('settings');
+  if(op !== 1 && op !== -1) throw 'invalid operation. a operation should be -1 or 1';
   const setting = await SettingModel.findOne({_id: 'counters'});
   if(!setting) throw 'counters settings not found';
   if(!setting.c[type]) {
@@ -33,7 +52,7 @@ async function operateSystemID(type, op) {
     setting.c[type] += op;
   }
   await setting.update({c: setting.c});
-  return setting.c[type];
+  return setting.c[type]; */
   /*if(op !== 1 && op !== -1)
     throw 'invalid operation. a operation should be -1 or 1';
   let setting;

@@ -102,6 +102,30 @@ const threadSchema = new Schema({
     type: [String],
     default: []
   },
+  // 主要分类
+  mainForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // 辅助分类
+  minorForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // 自定义分类
+  customForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // cid的集合
+  categoriesId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
   uid: {
     type: String,
     required: true,
@@ -139,13 +163,20 @@ threadSchema.virtual('lastPost')
     this._lastPost = p
   });
 
-threadSchema.virtual('forum')
+threadSchema.virtual('forums')
   .get(function() {
-    return this._forum
+    return this._forums
   })
   .set(function(f) {
-    this._forum = f
+    this._forums = f
   });
+threadSchema.virtual('categories')
+  .get(function() {
+    return this._categories
+  })
+  .set(function(f) {
+    this._categories = f
+  });  
 
 threadSchema.virtual('category')
   .get(function() {
@@ -180,11 +211,28 @@ threadSchema.methods.extendLastPost = async function() {
     .find({tid: this.tid, disabled: {$nin:[true]}})
     .sort({toc: -1}).limit(1))[0]
 };
+/* 
+  拓展文章的专业
+  @param types 数组，专业的类型：mainForums, minorForums, customForums(自定义，待定)
+  @return 专业对象数组
+  @author pengxigua 2019/1/24
+*/
+threadSchema.methods.extendForums = async function(types) {
+  let fids = [];
+  if(types.includes('mainForums')) {
+    fids = fids.concat(this.mainForumsId);
+  }
+  if(types.includes('minorForums')) {
+    fids = fids.concat(this.minorForumsId);
+  }
+  const forums = await mongoose.model('forums').find({fid: {$in: fids}});
+  return this.forums = forums;
+}
 
-threadSchema.methods.extendForum = async function() {
+/* threadSchema.methods.extendForum = async function() {
   const ForumModel = mongoose.model('forums');
   return this.forum = await ForumModel.findOnly({fid: this.fid})
-};
+}; */
 
 threadSchema.methods.extendCategory = async function() {
 	const ThreadTypeModel = mongoose.model('threadTypes');
@@ -198,7 +246,9 @@ threadSchema.methods.extendUser = async function() {
 
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
-	await this.forum.ensurePermission(roles, grade, user);
+  for(const forum of this.forums) {
+    await forum.ensurePermission(roles, grade, user);
+  }
 };
 // ----------------------------------------------------------------------
 
@@ -244,7 +294,7 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
 
 
 threadSchema.methods.updateThreadMessage = async function() {
-  const PostModel = require('./PostModel');
+  const PostModel = mongoose.model('posts');
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
@@ -259,8 +309,11 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
   await this.update(updateObj);
-  const forum = await this.extendForum();
-  await forum.updateForumMessage();
+  await PostModel.updateMany({tid: this.tid}, {$set: {mainForumsId: this.mainForumsId}});
+  const forums = await this.extendForums(['mainForums']);
+  await Promise.all(forums.map(async forum => {
+    await forum.updateForumMessage();
+  }));
   /*const user = await this.extendUser();
   await user.updateUserMessage();*/
 };
@@ -297,7 +350,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     ipoc: ip,
     iplm: ip,
     l,
-    fid: this.fid,
+    mainForumsId: this.mainForumsId,
+    minorForumsId: this.minorForumsId,
     tid: this.tid,
     uid: user.uid,
     uidlm: user.uid,
@@ -374,20 +428,21 @@ threadSchema.methods.getStep = async function(obj) {
 };
 
 /* 拓展文章数组
-*  参数：threads, options
-*  options:
-*    参数名                类型         默认值
-*    forum              Boolean        true     是否拓展专业
-*    parentForum        Boolean        true     是否拓展上级专业
-*    firstPost          Boolean        true     是否推展文章内容
-*    firstPostUser      Boolean        true     是否推展文章的用户
-*    lastPost           Boolean        true     是否推展最新回复
-*    lastPostUser       Boolean        true     是否推展最新回复的用户
-* */
+  @param threads 文章对象数组
+  @param options
+      参数名                类型         默认值
+      forum              Boolean        true     是否拓展专业
+      parentForum        Boolean        true     是否拓展上级专业
+      firstPost          Boolean        true     是否推展文章内容
+      firstPostUser      Boolean        true     是否推展文章的用户
+      lastPost           Boolean        true     是否推展最新回复
+      lastPostUser       Boolean        true     是否推展最新回复的用户
+  @return 文章对象数组
+  @author pengxiguaa 2019/1/24    
+ */
 const defaultOptions = {
   forum: true,
   category: false,
-  parentForum: true,
   firstPost: true,
   firstPostUser: true,
   lastPost: true,
@@ -413,7 +468,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     ThreadTypeModel = mongoose.model('threadTypes');
   }
 
-  const forumsId = new Set(), postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = new Set();
+  let forumsId = [], postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = [];
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
 
   threads = threads.filter(thread => !!thread);
@@ -424,10 +479,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       postsId.add(thread.oc);
     }
     if(o.forum) {
-      forumsId.add(thread.fid);
+      forumsId = forumsId.concat(thread.mainForumsId);
     }
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
-    if(thread.cid) cid.add(thread.cid);
+    if(thread.categoriesId && thread.categoriesId.length !== 0) {
+      cid = cid.concat(thread.cid);
+    };
   });
 
   if(o.firstPost || o.lastPost) {
@@ -451,31 +508,32 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   }
 
   if(o.forum) {
-    let forums = await ForumModel.find({fid: {$in: [...forumsId]}});
-    forums.map(forum => {
+    let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
+    /* forums.map(forum => {
       if(forum.parentId) {
         if(o.parentForum) {
           parentForumsId.add(forum.parentId);
         }
       }
-    });
-    if(o.parentForum) {
+    }); */
+    /* if(o.parentForum) {
       const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
       forums = forums.concat(parentForums);
-    }
+    } */
     forums.map(forum => {
       forumsObj[forum.fid] = forum;
     });
 
   }
   if(o.category) {
-    const categories = await ThreadTypeModel.find({cid: {$in: [...cid]}});
+    const categories = await ThreadTypeModel.find({cid: {$in: [...new Set(cid)]}});
     for(const category of categories) {
       categoryObj[category.cid] = category;
     }
   }
 
   return await Promise.all(threads.map(async thread => {
+    thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
       if(o.firstPostUser) {
@@ -496,20 +554,20 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
     }
     if(o.forum) {
-      const forum = forumsObj[thread.fid];
-      if(o.parentForum && forum.parentId) {
-        forum.parentForum = forumsObj[forum.parentId];
-
+      const forums = [];
+      for(const fid of thread.mainForumsId) {
+        forums.push(forumsObj[fid]);
       }
-      thread.forum = forum;
+      thread.forums = forums;
     }
     if(o.category) {
-      if(thread.cid) {
-        thread.category = categoryObj[thread.cid];
+      if(thread.categoriesId && thread.categoriesId.length !== 0) {
+        for(const cid of thread.categoriesId) {
+          if(categoryObj[cid]) thread.categories.push(categoryObj[cid]);
+        }        
       }
     }
     return thread.toObject?thread.toObject():thread;
-
   }));
 };
 

@@ -44,7 +44,11 @@ module.exports = {
 				GET: 'visitHomeNoticeSettings',
 				PATCH: 'modifyHomeNoticeSettings',
 				DELETE: 'deleteHomeNotice'
-			}
+      },
+      list: {
+        GET: 'visitHomeListSettings',
+        PATCH: 'modifyHomeListSettings'
+      }
 		},
 		app:{
 			upload:{

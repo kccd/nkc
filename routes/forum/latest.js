@@ -15,8 +15,8 @@ latestRouter
 		}
 		// 加载某个类别的文章
 		if(cat) {
-			match.cid = parseInt(cat);
-			data.cat = match.cid;
+			match.categoriesId = parseInt(cat);
+			data.cat = match.categoriesId;
 		}
 		// 判断是否为该专业或上级专业的专家
 		const isModerator = await forum.isModerator(data.user);
@@ -24,7 +24,7 @@ latestRouter
 		// 拿到该专业下可从中拿文章的所有子专业id
 		let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
 		fidOfCanGetThreads.push(forum.fid);
-		match.fid = {$in: fidOfCanGetThreads};
+		match.mainForumsId = {$in: fidOfCanGetThreads};
 		// 专家可查看专业下所有文章
 		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
 		// 已登录用户能查看专业下未被退回的文章、自己已被退回的文章
@@ -63,10 +63,10 @@ latestRouter
 
 		data.threads = await db.ThreadModel.extendThreads(threads, {
 		  category: true
-    });
+		});
 
 		// 构建置顶文章查询条件
-		const toppedThreadMatch = {topped: true, fid: forum.fid};
+		const toppedThreadMatch = {topped: true, mainForumsId: forum.fid};
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 				if(!data.user) {
@@ -89,7 +89,8 @@ latestRouter
 		data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads);
     data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 		data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+    data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+    data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
 		data.type = 'latest';
 		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
 		await next();

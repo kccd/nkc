@@ -77,8 +77,8 @@ threadRouter
 		let {page = 0, pid, last_page, highlight, step} = query;
 		const {tid} = params;
 		data.highlight = highlight;
-		const thread = await db.ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
+    const thread = await db.ThreadModel.findOnly({tid});
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
 		if(!token){
@@ -97,11 +97,15 @@ threadRouter
 				await allShareLimit.save();
 			}
 			let shareLimitTime;
-			if(forum.shareLimitTime){
-				shareLimitTime = forum.shareLimitTime;
-			}else{
-				shareLimitTime = allShareLimit.shareLimitTime;
-			}
+      for(const forum of forums) {
+        const timeLimit = Number(forum.shareLimitTime);
+        if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
+          shareLimitTime = timeLimit;
+        }
+      }
+			if(shareLimitTime === undefined) {
+        shareLimitTime = allShareLimit.shareLimitTime;
+      }
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
@@ -109,10 +113,16 @@ threadRouter
 				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
-		}
-		const isModerator = await forum.isModerator(data.user?data.user.uid: '');
+    }
+    const mainForums = forums.filter(forum => thread.mainForumsId.includes(forum.fid));
+    let isModerator = false;
+    // 若用户为某个父级专业的专家，则用户具有专家权限
+    for(const f of mainForums) {
+      const isModerator = await f.isModerator(data.user?data.user.uid: '');
+      if(isModerator) break;
+    }
 		data.isModerator = isModerator;
-		const breadcrumbForums = await forum.getBreadcrumbForums();
+		// const breadcrumbForums = await forum.getBreadcrumbForums();
 		// 判断文章是否被退回或被彻底屏蔽
 		if(thread.recycleMark) {
 			if(!isModerator) {
@@ -205,19 +215,21 @@ threadRouter
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
-		posts.map(async post => {
+		data.posts.map(async post => {
 			const index = toDraftPostsId.indexOf(post.pid);
 			if(index !== -1) {
 				post.todraft = true;
 				post.reason = toDraftPosts[index].reason;
 			}
 		});
+		// data.posts = posts;
+		// console.log(data.posts)
 		// 加载文章所在专业位置，移动文章的选择框
 		data.forumList = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
-		data.parentForums = await forum.extendParentForum();
+		// data.parentForums = await forum.extendParentForum();
 		data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
-		data.selectedArr = breadcrumbForums.map(f => f.fid);
-		data.selectedArr.push(forum.fid);
+		// data.selectedArr = breadcrumbForums.map(f => f.fid);
+		// data.selectedArr.push(forum.fid);
 		data.cat = thread.cid;
 		// 若不是游客访问，加载用户的最新发表的文章
 		if(data.user) {
@@ -240,7 +252,7 @@ threadRouter
 		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
 		data.thread = thread;
-		data.forum = forum;
+		data.forums = forums;
 		data.replyTarget = `t/${tid}`;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		data.ads = homeSettings.c.ads;
@@ -276,7 +288,7 @@ threadRouter
 		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
 		const q = {
 			uid: data.targetUser.uid,
-			fid: {$in: fidOfCanGetThreads},
+			mainForumsId: {$in: fidOfCanGetThreads},
 			recycleMark: {$ne: true}
 		};
 		const targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
@@ -288,12 +300,14 @@ threadRouter
 
 
 		// 相似文章
-		data.sameThreads = [];
-		if(fidOfCanGetThreads.includes(forum.fid)) {
-			const sameThreads = await db.ThreadModel.aggregate([
+    data.sameThreads = [];
+    let fids = thread.mainForumsId.concat(thread.minorForumsId);
+    fids = fids.filter(id => fidOfCanGetThreads.includes(id));
+    if(fids.length !== 0) {
+      const sameThreads = await db.ThreadModel.aggregate([
 				{
 					$match: {
-						fid: forum.fid,
+						mainForumsId: fids,
 						digest: true,
 						recycleMark: {$ne: true}
 					}
@@ -309,7 +323,7 @@ threadRouter
         forum: false,
         firstPostUser: false
       });
-		}
+    }
 
 		// 关注的用户
 		if(data.user) {
@@ -404,7 +418,7 @@ threadRouter
 
 
 		data.thread = thread;
-		await thread.extendForum();
+		await thread.extendForums(['mainForums', 'minorForums']);
 		data.forum = thread.forum;
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
@@ -422,7 +436,6 @@ threadRouter
 			typeIdOfScoreChange: 'postToThread',
 			tid: post.tid,
 			pid: post.pid,
-			fid: post.fid,
 			ip: ctx.address,
 			port: ctx.port
 		};
@@ -459,7 +472,7 @@ threadRouter
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
     global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
-	})
+  })
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
 	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())

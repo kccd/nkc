@@ -2,7 +2,8 @@ const Router = require('koa-router');
 const editorRouter = new Router();
 editorRouter
   .get('/', async (ctx, next) => {
-    const {data, db, query} = ctx;
+    const {data, db, query, nkcModules} = ctx;
+    const {dbFunction} = nkcModules;
     const {user} = data;
     if(!user.username) return ctx.redirect('/register');
     const {type, id, cat, title, content} = query;
@@ -10,6 +11,14 @@ editorRouter
     //重新编辑帖子使用旧版编辑器
     ctx.template = 'interface_editor_test.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
+    let existsFid = "";
+    if(type && type === "forum"){
+      existsFid = id;
+    }
+    data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines(existsFid);
+    data.subscribeTopics = await userSubscribe.extendSubscribeTopics(existsFid);
+    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     const authLevel = await userPersonal.getAuthLevel();
 	  if((!user.volumeA || authLevel < 1) && type !== 'application') {
     	ctx.template = 'interface_notice.pug';
@@ -27,13 +36,13 @@ editorRouter
 
     if(type !== 'application') {
 	    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
-	    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 	    if(type === 'forum' && id) {
-	    	const forum = await db.ForumModel.findOnly({fid: id});
+        const forum = await db.ForumModel.findOnly({fid: id});
+        data.forumType = forum.forumType;
 	    	await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	    	const breadcrumbForums = await forum.getBreadcrumbForums();
 	    	data.selectedArr = breadcrumbForums.map(forum => forum.fid);
-	    	data.selectedArr.push(forum.fid);
+        data.selectedArr.push(forum.fid);
 	    }
     }
 
@@ -56,13 +65,17 @@ editorRouter
         ctx.template = 'interface_editor_test.pug';
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
-	    const forum = await targetThread.extendForum();
-	    const isModerator = await forum.isModerator(user?user.uid: '');
-	    if(!data.userOperationsId.includes('modifyOtherPosts')) {
-	    	if(targetPost.uid !== user.uid && !isModerator) {
-	    		ctx.throw(403, '权限不足');
-		    }
-	    }
+      const forums = await targetThread.extendForums(['mainForums']);
+      let isModerator;
+      for(let forum of forums){
+        isModerator = await forum.isModerator(user?user.uid: '');
+        if(isModerator) break;
+      }
+      if(!data.userOperationsId.includes('modifyOtherPosts')) {
+        if(targetPost.uid !== user.uid && !isModerator) {
+          ctx.throw(403, '权限不足');
+        }
+      }
       // if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
       data.content = targetPost.c;  //回复内容
       data.title = targetPost.t;  //回复标题
@@ -101,7 +114,9 @@ editorRouter
     	const thread = await db.ThreadModel.findOnly({tid: id});
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
-
+    
+    const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
+    data.allForumList = allForumList;
     await next();
   });
 
