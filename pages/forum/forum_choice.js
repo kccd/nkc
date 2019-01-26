@@ -3,12 +3,20 @@ var disciplineArr;
 var topicArr;
 var app;
 var forumList;
+var isThroughForum;
+var historyFid = "";
+var forumTypeEditor;
 
 $(document).ready(function() {
+  isThroughForum = getSearchKV();
+  if(isThroughForum.type && isThroughForum.type === "forum") {
+    historyFid = isThroughForum.id;
+  }
   forumList = JSON.parse($('#allForumListData').text());
   cidArr = JSON.parse($('#cidArr').text());
   disciplineArr = JSON.parse($('#disciplineDom').text());
   topicArr = JSON.parse($('#topicDom').text());
+  forumTypeEditor = $("#forumType").text();
   app = new Vue({
     el: "#forumChoice",
     data: {
@@ -46,6 +54,13 @@ $(document).ready(function() {
       }
     }
   })
+  if(historyFid) {
+    if(forumTypeEditor == "discipline"){
+      selectDiscipline(historyFid)
+    }else if(forumTypeEditor == "topic"){
+      selectTopic(historyFid)
+    }
+  }
 })
 
 function selectDiscipline(fid) {
@@ -67,8 +82,10 @@ function selectDiscipline(fid) {
   }
   app.forumIdArr.push(fid);
   if(app.disciplineForumId !== ""){
-    var lastDisForumId = "#disForumId"+app.disciplineForumId;
-    $(lastDisForumId).removeClass("mdui-color-blue-300");
+    if(app.disciplineForumId !== fid){
+      var lastDisForumId = "#disForumId"+app.disciplineForumId;
+      $(lastDisForumId).removeClass("mdui-color-blue-300");
+    }
     var index = app.forumIdArr.indexOf(app.disciplineForumId);
     if(index > -1){
       app.forumIdArr.splice(index, 1);
@@ -98,8 +115,10 @@ function selectTopic(fid) {
   }
   app.forumIdArr.push(fid);
   if(app.topicForumId !== ""){
-    var lastTopForumId = "#topForumId"+app.topicForumId;
-    $(lastTopForumId).removeClass("mdui-color-blue-300");
+    if(app.topicForumId !== fid){
+      var lastTopForumId = "#topForumId"+app.topicForumId;
+      $(lastTopForumId).removeClass("mdui-color-blue-300");
+    }
     var index = app.forumIdArr.indexOf(app.topicForumId);
     if(index > -1){
       app.forumIdArr.splice(index, 1);
@@ -178,14 +197,32 @@ function selectNewOption() {
               return screenTopWarning("该专业已在列表中")
             }
           }
-          app.disciplineArr.unshift(forumList[i])
+          var lastDisForumId = "#disForumId"+app.disciplineForumId;
+          $(lastDisForumId).removeClass("mdui-color-blue-300");
+          var index = app.forumIdArr.indexOf(app.disciplineForumId);
+          if(index > -1){
+            app.forumIdArr.splice(index, 1);
+          }
+          app.disciplineArr.unshift(forumList[i]);
+          // setTimeout(() => {
+          //   selectDiscipline(disciplineArr[d].fid);
+          // }, 300);
         }else{
           for(var t in topicArr){
             if(topicArr[t].fid == forumList[i].fid) {
               return screenTopWarning("该话题已在列表中")
             }
           }
-          app.topicArr.unshift(forumList[i])
+          var lastTopForumId = "#topForumId"+app.topicForumId;
+          $(lastTopForumId).removeClass("mdui-color-blue-300");
+          var index = app.forumIdArr.indexOf(app.topicForumId);
+          if(index > -1){
+            app.forumIdArr.splice(index, 1);
+          }
+          app.topicArr.unshift(forumList[i]);
+          // setTimeout(() => {
+          //   selectTopic(topicArr[d].fid);
+          // }, 300);
         }
     }
   }
@@ -193,7 +230,9 @@ function selectNewOption() {
 
 function getFidAndCidResult() {
   var obj = {};
-  if(app.forumIdArr.length == 0) return screenTopWarning("请至少选择一个学科或话题");
+  if(app.forumIdArr.length == 0) {
+    throw "请至少选择一个学科或话题";
+  }
   obj.fids = app.forumIdArr;
   obj.cids = app.categoryIdArr;
   return obj

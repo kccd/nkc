@@ -533,10 +533,16 @@ forumSchema.statics.canManagerForums = async function(roles, grade, user, baseFi
 // ----------------------------- 加载能看到入口的专业 ------------------------------
 // 若forum.visibility = true, 则用户可在导航看到该专业的入口
 // forumSchema.statics.visibleForums = async (options) => {
-forumSchema.statics.visibleForums = async (roles, grade, user) => {
+forumSchema.statics.visibleForums = async (roles, grade, user, forumType) => {
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.visibleFid(roles, grade, user);
-  return await ForumModel.find({fid: {$in: fid}}).sort({order: 1});
+  let queryMap = {
+    fid: {$in: fid}
+  }
+  if(forumType){
+    queryMap.forumType = forumType;
+  }
+  return await ForumModel.find(queryMap).sort({order: 1});
 };
 // -----------------------------------------------------------------------------
 

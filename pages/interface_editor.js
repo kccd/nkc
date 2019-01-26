@@ -546,7 +546,12 @@ function onPost(that) {
 		var id = that.blocked ? that.query.id : that.childID;
 		if(type === 'forum' || !type || desType === 'forum') {
 			
-			var obj = getFidAndCidResult();
+			try{
+        var obj = getFidAndCidResult();
+      }catch(e){
+        screenTopWarning(e)
+        return;
+      }
       if(obj.fids) fids = obj.fids;
       if(obj.cids) cids = obj.cids;
       id = fids[0];

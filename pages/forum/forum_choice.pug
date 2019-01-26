@@ -24,11 +24,13 @@ style.
     min-width: 1px;
     padding: 0 5px;
   }
+.hidden#forumType= data.forumType
 .hidden#allForumListData= JSON.stringify(data.forumList)
 .hidden#cidArr= JSON.stringify(data.forumsThreadTypes)
 .hidden#disciplineDom= JSON.stringify(data.subscribeDisciplines)
 .hidden#topicDom= JSON.stringify(data.subscribeTopics)
 .panel.panel-default
+  button(onclick="shuchu()") shuchu
   div#allForumChoice(style="display:none")
     .mdui-row
       .mdui-col-xs-12
@@ -40,7 +42,7 @@ style.
   div#forumChoice(v-cloak)
     .mdui-row
       .mdui-col-xs-6      
-        .mdui-col-xs-12(v-if="disciplineArr.length !==0")
+        .mdui-col-xs-12
           .mdui-col-xs-1
             span 选择学科
           .mdui-col-xs-11
@@ -53,7 +55,7 @@ style.
             .mdui-chip(v-for='(cat, index) in disciplineCategorys' @click="selectDisciplineCate(cat.cid)" v-bind:id="'disCateId'+cat.cid")
               span.mdui-chip-title {{cat.name}}
       .mdui-col-xs-6
-        .mdui-col-xs-12(v-if="topicArr.length !==0")
+        .mdui-col-xs-12
           .mdui-col-xs-1
             span 选择话题
           .mdui-col-xs-11

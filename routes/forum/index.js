@@ -14,9 +14,17 @@ forumRouter
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		let forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+		let disciplineForums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user, 'discipline');
+		let topicForums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user, 'topic');
 		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+		disciplineForums = nkcModules.dbFunction.forumsListSort(disciplineForums, threadTypes);
+		topicForums = nkcModules.dbFunction.forumsListSort(topicForums, threadTypes);
 		data.forums = forums.map(forum => forum.toObject());
+		data.disciplineForums = disciplineForums.map(discipline => discipline.toObject());
+		data.topicForums = topicForums.map(topic => topic.toObject());
 		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
+		data.disciplineJSON = nkcModules.apiFunction.disciplineToJSON(data.forums);
+		data.topicJSON = nkcModules.apiFunction.topicToJSON(data.forums);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
 		// data.navbar = {highlight: 'forums'};
@@ -69,7 +77,8 @@ forumRouter
     } = ctx;
 		const {
 			ForumModel,
-			ThreadModel
+			ThreadModel,
+			UsersSubscribeModel,
 		} = db;
 		const {fid} = params;
 		const forum = await ForumModel.findOnly({fid});
@@ -123,6 +132,17 @@ forumRouter
 		const thread = await ThreadModel.findOnly({tid: _post.tid});
 		await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
 		data.thread = thread;
+		// 发表自动关注该学科或话题
+		const userSubscribe = await UsersSubscribeModel.findOnly({uid:user.uid});
+		if(userSubscribe.subscribeForums){
+			for(let scr of fids){
+				let index = userSubscribe.subscribeForums.indexOf(scr);
+				if(index < 0) {
+					userSubscribe.subscribeForums.unshift(scr)
+				}
+			}
+			await userSubscribe.update({$set:{subscribeForums:userSubscribe.subscribeForums}});
+		}
 		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
 		const {coverPath, frameImgPath} = ctx.settings.upload;
     const {coverify} = ctx.tools.imageMagick;

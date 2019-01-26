@@ -70,9 +70,13 @@ usersSubscribeSchema.methods.extendSubscribeUsers = async function() {
   return this.subscribersObj = subscribeUsers;
 };
 
-usersSubscribeSchema.methods.extendSubscribeDisciplines = async function() {
+usersSubscribeSchema.methods.extendSubscribeDisciplines = async function(existsFid) {
   const ForumModel = require('./ForumModel');
   const subscribeDisciplines = [];
+  let eFid = "";
+  if(existsFid) eFid=existsFid
+  var eIndex = this.subscribeForums.indexOf(existsFid);
+  if(eIndex < 0 && existsFid !== "") this.subscribeForums.unshift(existsFid);
   for(let fid of this.subscribeForums) {
     const discipline = await ForumModel.findOne({fid:fid});
     if(discipline.forumType == "discipline") {
@@ -82,9 +86,13 @@ usersSubscribeSchema.methods.extendSubscribeDisciplines = async function() {
   return this.subscribeDisciplines = subscribeDisciplines;
 }
 
-usersSubscribeSchema.methods.extendSubscribeTopics = async function() {
+usersSubscribeSchema.methods.extendSubscribeTopics = async function(existsFid) {
   const ForumModel = require('./ForumModel');
   const subscribeTopics = [];
+  let eFid = "";
+  if(existsFid) eFid=existsFid
+  var eIndex = this.subscribeForums.indexOf(existsFid);
+  if(eIndex < 0 && existsFid !== "") this.subscribeForums.unshift(existsFid)
   for(let fid of this.subscribeForums) {
     const topic = await ForumModel.findOne({fid:fid});
     if(topic.forumType == "topic") {

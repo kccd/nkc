@@ -23,19 +23,19 @@ block content
           .row
               .form-group
                   input#title.form-control(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
-              .form-group
-                  if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-                    div(style='margin-top: 5px;')
-                    //- include forumlist_dropdown
-                    //select#parents.form-control(style='display: inline-block; width: auto;')
-                    //    option 选择一个学院
-                    //select#children.form-control(style='display: inline-block; width: auto;')
-                    //    option 选择一个专业
-                    //select#threadTypes.form-control(style='display: inline-block; width: auto;')
-                    //    option 无
-                    //select.form-control#lang(style='display: none; width: auto;')
-                    //    option html
-                  input.hidden#lang(value=data.l)
+              //- .form-group
+              //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+              //-     div(style='margin-top: 5px;')
+              //-     //- include forumlist_dropdown
+              //-     //select#parents.form-control(style='display: inline-block; width: auto;')
+              //-     //    option 选择一个学院
+              //-     //select#children.form-control(style='display: inline-block; width: auto;')
+              //-     //    option 选择一个专业
+              //-     //select#threadTypes.form-control(style='display: inline-block; width: auto;')
+              //-     //    option 无
+              //-     //select.form-control#lang(style='display: none; width: auto;')
+              //-     //    option html
+              input.hidden#lang(value=data.l)
               if data.delReason 
                 .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
               .form-group(style="background-color:#fff;line-height:1.5;")

@@ -12,8 +12,12 @@ editorRouter
     ctx.template = 'interface_editor_test.pug';
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     const userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
-    data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines();
-    data.subscribeTopics = await userSubscribe.extendSubscribeTopics();
+    let existsFid = "";
+    if(type && type === "forum"){
+      existsFid = id;
+    }
+    data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines(existsFid);
+    data.subscribeTopics = await userSubscribe.extendSubscribeTopics(existsFid);
     data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     const authLevel = await userPersonal.getAuthLevel();
 	  if((!user.volumeA || authLevel < 1) && type !== 'application') {
@@ -33,7 +37,8 @@ editorRouter
     if(type !== 'application') {
 	    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 	    if(type === 'forum' && id) {
-	    	const forum = await db.ForumModel.findOnly({fid: id});
+        const forum = await db.ForumModel.findOnly({fid: id});
+        data.forumType = forum.forumType;
 	    	await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	    	const breadcrumbForums = await forum.getBreadcrumbForums();
 	    	data.selectedArr = breadcrumbForums.map(forum => forum.fid);
@@ -112,7 +117,6 @@ editorRouter
     
     const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     data.allForumList = allForumList;
-    console.log(data.allForumList)
     await next();
   });
 
