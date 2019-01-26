@@ -215,13 +215,15 @@ threadRouter
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
-		posts.map(async post => {
+		data.posts.map(async post => {
 			const index = toDraftPostsId.indexOf(post.pid);
 			if(index !== -1) {
 				post.todraft = true;
 				post.reason = toDraftPosts[index].reason;
 			}
 		});
+		// data.posts = posts;
+		// console.log(data.posts)
 		// 加载文章所在专业位置，移动文章的选择框
 		data.forumList = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		// data.parentForums = await forum.extendParentForum();
