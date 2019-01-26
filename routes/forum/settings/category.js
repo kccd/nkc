@@ -27,13 +27,14 @@ categoryRouter
 		const {forum} = data;
 		const {operation} = body;
 		if(operation === 'selectForumType') {
-			const {forumType} = body;
-			if(forum.parentsId && forum.parentsId.length == 0){
-				await forum.update({forumType:forumType})
-				forum.forumType = forumType;
-			}else{
-				ctx.throw(400, "该板块已继承父板块属性，不可再次设置");
-			}
+      const {forumType} = body;
+      if(!['topic', 'discipline'].includes(forumType)) ctx.throw(400, `未定义的专业属性：${forumType}`);
+      if(forum.parentsId.length !== 0) ctx.throw(400, '该专业不是顶级专业，暂无法更改专业属性');
+      const fids = await forum.getAllChildForumsId();
+      fids.push(forum.fid);
+			await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
+        forumType: forumType
+      }});
 		}else if(operation === 'savePosition') {
 			const {parentId} = body;
 			if(parentId === forum.fid) ctx.throw(400, '板块不能成为自己的子版块');

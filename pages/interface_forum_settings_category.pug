@@ -38,12 +38,12 @@ block content
                   label.col-sm-2.control-label 选择专业属性
                   .col-sm-5
                     label.radio
-                      input#radioDis(type="radio", name="forumType", value="discipline")
+                      input#radioDis(type="radio", name="forumType", value="discipline" checked=forum.forumType === 'discipline')
                       span 学科
                     label.radio
-                      input#radioTop(type="radio", name="forumType", value="topic")
+                      input#radioTop(type="radio", name="forumType", value="topic" checked=forum.forumType === 'topic')
                       span 话题
-                    button.btn.btn-default(style='margin-top: 0.5rem;' onclick=`selectForumType("${forum.fid}")`) 提交
+                    button.btn.btn-default(style='margin-top: 0.5rem;' onclick=`selectForumType("${forum.fid}")`) 保存属性
               .form-group
                 label.col-sm-2.control-label 移动至
                 .hidden#data-forums=JSON.stringify({forums: data.forums, forum: data.forum, threadTypes: data.threadTypes})

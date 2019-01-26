@@ -214,11 +214,6 @@ block content
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
                           .form-inline
-                            //- 设置精华
-                            //if data.isModerator || data.userOperationsId.includes('digestThread') && !thread.digest
-                            //  button.btn.btn-default.btn-sm#threadDigest(onclick=`setDigest('${data.thread.tid}')`) 设为优秀文章
-                            //if data.isModerator || data.userOperationsId.includes('unDigestThread') && thread.digest
-                            //  button.btn.btn-default.btn-sm#threadDigest(onclick=`cancelDigest('${data.thread.tid}')`) 取消设为优秀文章
                             //- 设置置顶
                             if data.isModerator || data.userOperationsId.includes('toppedThread') && !thread.topped
                               button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
