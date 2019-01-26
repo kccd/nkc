@@ -138,7 +138,7 @@ function addIndElement(obj, i) {
 			var option = $('<option '+selected+'>'+ind.name+'</option> ');
 			indSelect.append(option);
 		}
-		if(ind.parentId === obj.industry) {
+		if(ind.parentsId.indexOf(obj.industry) !== -1) {
 			selected = '';
 			if(ind.id === obj.duty) {
 				selected = 'selected';
@@ -298,7 +298,7 @@ function selectInd(j, value) {
 	}
 	for(var i = 0; i < indName.length; i++) {
 		ind = indName[i];
-		if(ind.parentId === indId) {
+		if(ind.parentsId.indexOf(indId) !== -1) {
 			var option = $('<option '+selected+'>'+ind.name+'</option>');
 			$('#duty'+j).append(option);
 			if(selected) selected = '';

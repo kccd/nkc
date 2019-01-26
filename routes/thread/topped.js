@@ -5,9 +5,13 @@ router
 		const {data, db, params} = ctx;
 		const {tid} = params;
 		const {user} = data;
-		const thread = await db.ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
-		const isModerator = await forum.isModerator(user?user.uid: '');
+    const thread = await db.ThreadModel.findOnly({tid});
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    let isModerator;
+    for(const f of forums) {
+      isModerator = await f.isModerator(user?user.uid: '');
+      if(isModerator) break;
+    }
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('toppedThread')) {
 				ctx.throw(403, '您没有权限给该文章设置置顶');
@@ -22,8 +26,11 @@ router
 		const {tid} = params;
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
-		const isModerator = await forum.isModerator(user?user.uid: '');
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    for(const f of forums) {
+      isModerator = await f.isModerator(user?user.uid: '');
+      if(isModerator) break;
+    }
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('toppedThread')) {
 				ctx.throw(403, '您没有权限取消给该文章设置置顶');

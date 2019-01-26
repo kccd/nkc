@@ -6,33 +6,58 @@ block title
   link(rel='stylesheet' href='/swiper/dist/css/swiper.css')
   link(rel='stylesheet' href=`/jscrollpane/style/jquery.jscrollpane.css?v=${global.NKC.startTime}`)
 block content
+  mixin homeListHeader(name)
+    .home-list-header
+      span=name
+      .line
   mixin createNotice(arr)
     div(style='background-color: #eeeeee;padding: 0.5rem;')
       h5.text-center 网站公告
       for thread, index in arr
         div(style='margin: 0.5rem 0;')
           a(href=`/t/${thread.tid}` target='_blank' style='color: #888888;')= `${index+1}. ${thread.firstPost.t}`
-  mixin createForumList(arr)
-    .list-group(style='margin-bottom: 0')
+  mixin createTopicList(arr)
+    .list-group(style='overflow: hidden;margin-bottom:0.5rem;')
       for forum in arr
-        div(class=`forumLi${forum.fid}`)
-          li.list-group-item.home-forum-list-li(style=`position: relative;overflow: hidden;`)
-            .row
-              .col-xs-12.col-md-12
-                div
-                  div(style='width: 75%;float: left;line-height: 24px;')
-                    if forum.iconFileName
-                      img(src=`/forum_avatar/${forum.fid}` style='width: 2rem;height: 2rem;border-radius: 50%; margin-right: 0.5rem;')
-                    else
-                      img(style=`width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;display:inline-block;background-color: ${forum.color}`)
-                    a(href=`/f/${forum.fid}` target='_blank')= forum.displayName
-                  if forum.childrenForums && forum.childrenForums.length !== 0
-                    div(style='width: 20%;float:right;line-height: 24px;cursor: pointer;' onclick=`showChildrenForums("${forum.fid}", "${forum.color}")`).text-right
-                      span.fa.fa-caret-right(class=`span${forum.fid}` style='font-size: 2rem;color: #555555;')
+        if forum.forumType === 'topic'            
+          .home-topic-list-li
+            a(href=`/f/${forum.fid}`)
+              if forum.iconFileName
+                img(src=`/forum_avatar/${forum.fid}` style='width: 2rem;height: 2rem;border-radius: 50%; margin-right: 0.5rem;')
+              else
+                img(style=`width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;display:inline-block;background-color: ${forum.color}`)
+              span= forum.displayName  
           if forum.childrenForums && forum.childrenForums.length !== 0
-            .col-xs-12.col-md-12(class=`f${forum.fid}` style='display: none;')
+            .home-topic-item-div
+              for f in forum.childrenForums
+                a(href=`/f/${f.fid}` target='_blank' style=`background-color: ${f.color}`).topic-item
+                  if f.iconFileName
+                    img(src=`/forum_avatar/${f.fid}` style='margin-left: -4px;')
+                  //-else
+                    img(style=`background-color: ${forum.color}` )
+                  span= f.displayName  
+  mixin createForumList(arr)
+    .list-group(style='margin-bottom: 0;overflow: hidden;')
+      for forum in arr
+        if forum.forumType !== 'topic'
+          div(class=`forumLi${forum.fid}`)
+            li.list-group-item.home-forum-list-li(style=`position: relative;overflow: hidden;`)
               .row
-                +createForumList(forum.childrenForums)
+                .col-xs-12.col-md-12
+                  div
+                    div(style='width: 75%;float: left;line-height: 24px;')
+                      if forum.iconFileName
+                        img(src=`/forum_avatar/${forum.fid}` style='width: 2rem;height: 2rem;border-radius: 50%; margin-right: 0.5rem;')
+                      else
+                        img(style=`width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;display:inline-block;background-color: ${forum.color}`)
+                      a(href=`/f/${forum.fid}` target='_blank')= forum.displayName
+                    if forum.childrenForums && forum.childrenForums.length !== 0
+                      div(style='width: 20%;float:right;line-height: 24px;cursor: pointer;padding-right: 0.3rem;' onclick=`showChildrenForums("${forum.fid}", "${forum.color}")`).text-right
+                        span.fa.fa-caret-right(class=`span${forum.fid}` style='font-size: 1.6rem;color: #aaa;')
+            if forum.childrenForums && forum.childrenForums.length !== 0
+              .col-xs-12.col-md-12(class=`f${forum.fid}` style='display: none;')
+                .row
+                  +createForumList(forum.childrenForums)
   mixin createAds(arr)
     .swiper-container.swiper-home
       .swiper-wrapper
@@ -60,9 +85,9 @@ block content
             .col-xs-12.visible-xs-block.visible-sm-block(style='margin-bottom: 0.5rem;' class=data.paging.page!==0?'hiddenInMobile': '')
               +createAds(data.ads)
           .col-xs-12.col-md-12.text-center(style='margin-bottom: 1rem;')
-            //div(style='margin: 0.5rem 0;')
-            //  if data.homeSettings.logo
-            //    img(src=`/logo/${data.homeSettings.logo}` style='height: 10rem;width: 10rem;border-radius: 50%;')
+            //-div(style='margin: 0.5rem 0;')
+              if data.homeSettings.logo
+                img(src=`/logo/${data.homeSettings.logo}` style='height: 10rem;width: 10rem;border-radius: 50%;')
             div.home-post-button
               a.btn-lg.btn-block(href=data.user?`/editor`: '/login' style=`margin-bottom: 0.5rem;`)
                 if data.user
@@ -73,6 +98,9 @@ block content
                 span 专业分类&nbsp;&nbsp;
                 span.fa.fa-caret-down#forumsDidButtonSpan
           .col-xs-12.col-md-12(id='forumsDiv')
+            +homeListHeader('话题')
+            +createTopicList(data.forums)
+            +homeListHeader('学科')
             +createForumList(data.forums)
           if data.noticeThreads.length !== 0
             .col-xs-12.col-md-12(style='margin: 1rem 0;' class=data.paging.page!==0?'hiddenInMobile':'')

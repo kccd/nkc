@@ -118,3 +118,19 @@ function saveWaterMarkSettings() {
 			screenTopWarning(data.error|| data);
 		})
 }
+
+function saveHomeListSettings() {
+  var inputs = $('input[name="list"]');
+  var topic = inputs.eq(0).is(':checked');
+  var discipline = inputs.eq(1).is(':checked');
+  nkcAPI('/e/settings/home/list', 'PATCH', {
+    topic: topic,
+    discipline: discipline
+  })
+  .then(function() {
+    screenTopAlert('保存成功');
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data);
+  });
+}

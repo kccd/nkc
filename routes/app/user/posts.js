@@ -20,7 +20,7 @@ postsRouter
 		const q = {
 			uid,
 			operationId,
-			fid: {$in: accessibleFid}
+			mainForumsId: {$in: accessibleFid}
 		};
 
 		const count = await db.InfoBehaviorModel.count(q);

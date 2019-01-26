@@ -8,7 +8,7 @@ router
     const {db, data} = ctx;
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-    await targetThread.extendForum();
+    await targetThread.extendForums(['mainForums', 'minorForums']);
     await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
     if(targetPost.hideHistories && !data.userOperationsId.includes('displayPostHideHistories')) ctx.throw(403,'权限不足');
     data.post = targetPost;

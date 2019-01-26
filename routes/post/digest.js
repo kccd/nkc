@@ -5,11 +5,13 @@ router
 		const {db, data, params, nkcModules, body} = ctx;
 		const {pid} = params;
 		let {kcb} = body;
-		const post = await db.PostModel.findOnly({pid});
-		const forum = await db.ForumModel.findOnly({fid: post.fid});
-		data.forum = forum;
-		data.post = post;
-    await forum.ensureModeratorsPermission(data);
+    const post = await db.PostModel.findOnly({pid});
+    const thread = await post.extendThread();
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    for(const f of forums) {
+      await f.ensureModeratorsPermission(data);
+    }
+    data.post = post;
 		const targetUser = await post.extendUser();
     const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     let num;
@@ -23,7 +25,6 @@ router
 
     const usersGeneralSettings = await db.UsersGeneralModel.findOnly({uid: data.targetUser.uid});
 
-		const thread = await db.ThreadModel.findOnly({tid: post.tid});
 		if(post.digest) {
 			if(thread.oc === pid) {
 				ctx.throw(400, '文章已被加精，请刷新');
@@ -39,7 +40,6 @@ router
 			typeIdOfScoreChange: 'digestThread',
 			port: ctx.port,
 			pid,
-			fid: thread.fid,
 			tid: thread.tid,
 			ip: ctx.address
 		};
@@ -60,8 +60,7 @@ router
           description: '',
           num: num,
           pid,
-          tid: thread.tid,
-          fid: thread.fid
+          tid: thread.tid
         });
         await data.targetUser.update({$inc: {kcb: num}});
         await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
@@ -98,8 +97,7 @@ router
           description: '',
           num: num,
           pid,
-          tid: thread.tid,
-          fid: thread.fid
+          tid: thread.tid
         });
         await data.targetUser.update({$inc: {kcb: num}});
         await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
@@ -133,14 +131,15 @@ router
 	.del('/', async (ctx, next) => {
 		const {db, params, data} = ctx;
 		const {pid} = params;
-		const post = await db.PostModel.findOnly({pid});
-    const forum = await db.ForumModel.findOnly({fid: post.fid});
-    await forum.ensureModeratorsPermission(data);
+    const post = await db.PostModel.findOnly({pid});
+    const thread = await post.extendThread();
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    for(const f of forums) {
+      await f.ensureModeratorsPermission(data);
+    }
 		const targetUser = await post.extendUser();
 		data.targetUser = targetUser;
-		data.forum = forum;
 		data.post = post;
-		const thread = await db.ThreadModel.findOnly({tid: post.tid});
 		if(!post.digest) {
 			if(thread.oc === pid) {
 				ctx.throw(400, '文章未被加精，请刷新');
@@ -160,7 +159,6 @@ router
 			typeIdOfScoreChange: 'unDigestThread',
 			port: ctx.port,
 			pid,
-			fid: thread.fid,
 			tid: thread.tid,
 			ip: ctx.address
 		};

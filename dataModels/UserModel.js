@@ -309,9 +309,7 @@ userSchema.methods.extendThreads = async function() {
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = mongoose.model('threads');
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
-  return await ThreadModel.extendThreads(threads, {
-    parentForum: false
-  });
+  return await ThreadModel.extendThreads(threads);
 };
 
 userSchema.methods.extend = async function() {

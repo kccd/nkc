@@ -85,7 +85,7 @@ userRouter
 
 
 		// --拿到用户最新的发帖
-	  data.targetUserThreads = await targetUser.getUsersThreads();
+    data.targetUserThreads = await targetUser.getUsersThreads();
 	  // --------
 
 
@@ -104,22 +104,22 @@ userRouter
 			data.targetUsers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
 		} else {
 
-			const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
+      const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
 			const q = {
 				uid,
-				fid: {$in: accessibleFid},
-				operationId: {$in: ['postToForum', 'postToThread']}
+				mainForumsId: {$in: accessibleFid},
+				// operationId: {$in: ['postToForum', 'postToThread']}
 			};
-			const count = await db.InfoBehaviorModel.count(q);
-			paging = apiFunction.paging(page, count);
-			const infoLogs = await db.InfoBehaviorModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      const count = await db.PostModel.count(q);
+      paging = apiFunction.paging(page, count);
+      const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+			// const infoLogs = await db.InfoBehaviorModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 			const results = [];
 			const displayDisabledPosts = data.userOperationsId.includes('displayDisabledPosts');
-			for(const log of infoLogs) {
-				const post = await db.PostModel.findOne({pid: log.pid});
+			for(const post of posts) {
 				if(post.disabled && !displayDisabledPosts) continue;
 				if(!post) continue;
-				await post.extendUser();
+        await post.extendUser();
 				const thread = await post.extendThread();
 				if(thread.recycleMark && !data.userOperationsId.includes('displayRecycleThreads')) continue;
 				if(!thread) continue;
@@ -139,14 +139,14 @@ userRouter
 					link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
 				}
 				results.push({
-					operation: log.operationId,
+					operation: thread.oc === post.pid?'postToForum': 'postToThread',
 					thread,
 					firstPost,
 					post,
 					link
 				});
 			}
-			data.results = results;
+      data.results = results;
 		}
 
 	  // --拿到最新8个关注与最新8个粉丝

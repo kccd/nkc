@@ -2,56 +2,64 @@ require('colors');
 const {ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
-const cacheForums = async () => {
+// 无法在父级显示的专业id
+const canNotDisplayOnParentForumsId = [];
+// 无法访问的专业id
+const canNotAccessibleForumsId = [];
+// 导航不可见的专业id
+const canNotDisplayOnNavForumsId = [];
+// 无权用户在导航可见的专业id
+const canDisplayOnNavForumsIdNCC = [];
 
+async function func() {
 
-  const forums = await ForumModel.find({});
-
-  const canNotDisplayOnParentForumsId = [];
-  const canNotAccessibleForumsId = [];
-  // 导航不可见的专业ID
-  const canNotDisplayOnNavForumsId = [];
-  // 无权用户在导航可见的专业ID
-  const canDisplayOnNavForumsIdNCC = [];
-
-  const rolesDB = await RoleModel.find({});
-  const gradesDB = await UsersGradeModel.find({});
+  const forums = await ForumModel.find();
+  const rolesDB = await RoleModel.find();
+  const gradesDB = await UsersGradeModel.find();
 
   const roles = {};
   const grades = {};
   const rolesAndGrades = {};
   const moderators = {};
 
-  for(const role of rolesDB) {
+  // 构建变量
+  rolesDB.map(role => {
     roles[role._id] = [];
-    for(const grade of gradesDB) {
+    gradesDB.map(grade => {
       grades[grade._id] = [];
       rolesAndGrades[`role-grade:${role._id}-${grade._id}`] = [];
-    }
-  }
-
-
+    });
+  });
 
   for(const forum of forums) {
-    /*-------------根据角色和等级组装数据--------------*/
-
-    const {visibility, isVisibleForNCC, rolesId, gradesId, accessible, displayOnParent, relation, fid} = forum;
+    
+    const {
+      visibility,
+      isVisibleForNCC,
+      rolesId,
+      gradesId,
+      accessible, 
+      displayOnParent,
+      relation,
+      fid
+    } = forum;
 
     // 专家
-    for(const uid of forum.moderators) {
+    forum.moderators.map(uid => {
       if(!moderators[uid]) {
         moderators[uid] = [];
       }
       if(!moderators[uid].includes(fid)) {
         moderators[uid].push(fid);
       }
-    }
+    });
 
-    // 拓展上下级关系
     const childForums = [];
     const childForumsId = [];
+
+    // 拓展下级专业
     for(const f of forums) {
-      if(f.parentId === forum.fid) {
+      if(f.parentsId.includes(fid)) {
         childForums.push(f);
         childForumsId.push(f.fid);
       }
@@ -69,19 +77,18 @@ const cacheForums = async () => {
       canDisplayOnNavForumsIdNCC.push(fid);
     }
 
+    // 无法在上级专业显示文章的专业
     if(!displayOnParent) {
-      // 记下不能在上级专业显示文章的专业ID
       canNotDisplayOnParentForumsId.push(forum.fid);
     }
+
+    // 已关闭的专业
     if(!accessible) {
-      // 记下不能访问的专业ID
       canNotAccessibleForumsId.push(forum.fid);
       canNotDisplayOnNavForumsId.push(fid);
       canNotDisplayOnParentForumsId.push(forum.fid);
     } else {
-      // 若专业能访问，则根据角色和等级的关系构建数据
       if(relation === 'or') {
-        // 若关系为or, 角色和等级都为空时该专业无法访问
         if(gradesId.length === 0 && rolesId.length === 0) continue;
         for(const roleId of rolesId) {
           if(!roles[roleId].includes(fid)) {
@@ -94,7 +101,6 @@ const cacheForums = async () => {
           }
         }
       } else {
-        // 若关系为and，角色和等级之中有一个为空该专业都将无法访问
         if(gradesId.length === 0 || rolesId.length === 0) continue;
         for(const r of rolesId) {
           for(const g of gradesId) {
@@ -108,10 +114,10 @@ const cacheForums = async () => {
     }
   }
 
-  // 清空redis 1号数据库
+  // 清空redis数据库
   await client.flushdbAsync();
 
-  // 获取子专业
+  // 获取下级专业
   for(const forum of forums) {
 
     const allChildForumsId = [];
@@ -131,13 +137,16 @@ const cacheForums = async () => {
 
     // 获取父专业
     const getParentForumId = (f) => {
-      if(!f.parentId) return;
-      for(const f1 of forums) {
-        if(f1.fid !== f.parentId) continue;
-        parentForums.push(f1);
-        parentForumsId.push(f1.fid);
-        getParentForumId(f1);
-        break;
+      if(f.parentsId.length === 0) return;
+      for(const pfid of f.parentsId) {
+        for(const f1 of forums) {
+          if(f1.fid === pfid) {
+            parentForums.push(f1);
+            parentForumsId.push(f1.fid);
+            getParentForumId(f1);
+            break;
+          }
+        }
       }
     };
 
@@ -146,7 +155,7 @@ const cacheForums = async () => {
 
     forum.allChildForumsId = allChildForumsId;
     forum.allChildForums = allChildForums;
-    forum.parentForums = parentForums.reverse();
+    forum.parentForums = parentForums;
     forum.parentForumsId = parentForumsId;
 
   }
@@ -173,7 +182,6 @@ const cacheForums = async () => {
     }
   }
 
-
   /*
   * 1. 下层子专业 forum:forumId:childForumsId
   * 2. 所有子专业 forum:forumId:addChildForumsId
@@ -185,8 +193,7 @@ const cacheForums = async () => {
   * 8. 角色和等级 role-grade:roleId-gradeId
   * 9. 无法访问的专业 canNotAccessibleForumsId:canNotAccessibleForumsId
   * */
-
-
+  
   for(const roleId in roles) {
 
     if(!roles.hasOwnProperty(roleId)) continue;
@@ -264,7 +271,7 @@ const cacheForums = async () => {
   }
 
   console.log(`缓存更新完成`.green);
+  
+}
 
-};
-
-module.exports = cacheForums;
+module.exports = func;
