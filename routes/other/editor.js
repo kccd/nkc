@@ -60,9 +60,9 @@ editorRouter
         ctx.template = 'interface_editor_test.pug';
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
-      const forum = await targetThread.extendForums(['mainForumsId']);
+      const forums = await targetThread.extendForums(['mainForums']);
       let isModerator;
-      for(let f of forum){
+      for(let forum of forums){
         isModerator = await forum.isModerator(user?user.uid: '');
         if(isModerator) break;
       }
@@ -112,7 +112,6 @@ editorRouter
     
     const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     data.allForumList = allForumList;
-    console.log(data.allForumList)
     await next();
   });
 

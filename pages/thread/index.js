@@ -761,3 +761,26 @@ function showThreadContent() {
 $(".dropdown-menu.stop-propagation").on("click",function (e) {
 	e.stopPropagation();
 });
+function removeForumsId(tid, fid) {
+  nkcAPI('/t/' + tid + '/forum?fid=' + fid, 'DELETE', {})
+  .then(function() {
+    screenTopAlert('移除成功');
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data);
+  })
+}
+
+function addForum(tid) {
+  var result = getResult();
+  nkcAPI('/t/' + tid + '/forum', 'POST', {
+    fid: result.fid,
+    cid: result.cid
+  })
+  .then(function() {
+    screenTopAlert('添加成功');
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data);
+  })
+}

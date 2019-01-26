@@ -115,13 +115,12 @@ forumRouter
     if(t === '') ctx.throw(400, '标题不能为空！');
 
     const {cat, mid} = post;
-		const _post = await forum.newPost(post, user, ip, cat, mid, fids);
-		await _post.update({"$set":{mainForumsId: fids}})
+		const _post = await forum.newPost(post, user, ip, cids, mid, fids);
 		data.post = _post;
     const type = ctx.request.accepts('json', 'html');
-    await forum.update({$inc: {'tCount.normal': 1}});
+    // await forum.update({$inc: {'tCount.normal': 1}});
 		const thread = await ThreadModel.findOnly({tid: _post.tid});
-		await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
+		// await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
 		data.thread = thread;
 		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
 		const {coverPath, frameImgPath} = ctx.settings.upload;

@@ -11,7 +11,7 @@ router
     const originPost = await PostModel.findOnly({pid});
     let targetPost = await HistoriesModel.findOnly({_id});
     const targetThread = await ThreadModel.findOnly({tid: targetPost.tid});
-    await targetThread.extendForum();
+    await targetThread.extendForums(['mainForums', 'minorForums']);
 	  await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
     const _copy = Object.assign({}, originPost.toObject());
     _copy._id = undefined;

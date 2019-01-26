@@ -302,7 +302,8 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
   await this.update(updateObj);
-  const forums = await this.extendForums(['mainForumsId']);
+  await PostModel.updateMany({tid: this.tid}, {$set: {mainForumsId: this.mainForumsId}});
+  const forums = await this.extendForums(['mainForums']);
   await Promise.all(forums.map(async forum => {
     await forum.updateForumMessage();
   }));
@@ -342,7 +343,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     ipoc: ip,
     iplm: ip,
     l,
-    fid: this.fid,
+    mainForumsId: this.mainForumsId,
+    minorForumsId: this.minorForumsId,
     tid: this.tid,
     uid: user.uid,
     uidlm: user.uid,
