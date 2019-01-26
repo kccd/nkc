@@ -6,7 +6,7 @@ theradRouter
 		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		const fourms = await thread.extendForums(['mainForums']);
+		const forums = await thread.extendForums(['mainForums']);
 		// 验证权限 - new
     await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 

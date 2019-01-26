@@ -63,7 +63,7 @@ latestRouter
 
 		data.threads = await db.ThreadModel.extendThreads(threads, {
 		  category: true
-    });
+		});
 
 		// 构建置顶文章查询条件
 		const toppedThreadMatch = {topped: true, mainForumsId: forum.fid};
