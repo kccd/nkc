@@ -117,8 +117,13 @@ postRouter
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await targetPost.extendThread();
-    const targetForum = await targetThread.extendForum();
-    const isModerator = await targetForum.isModerator(user.uid);
+    const targetForum = await targetThread.extendForums(['mainForumsId']);
+    let isModerator;
+    for(let f of targetForum){
+      isModerator = await targetForum.isModerator(user.uid);
+      if(isModerator) break;
+    }
+    // const isModerator = await targetForum.isModerator(user.uid);
     // 权限判断
     if(!data.userOperationsId.includes('modifyOtherPosts') && !isModerator) {
     	if(user.uid !== targetPost.uid) ctx.throw(403, '您没有权限修改别人的回复');

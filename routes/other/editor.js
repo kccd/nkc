@@ -60,13 +60,17 @@ editorRouter
         ctx.template = 'interface_editor_test.pug';
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
-	    const forum = await targetThread.extendForum();
-	    const isModerator = await forum.isModerator(user?user.uid: '');
-	    if(!data.userOperationsId.includes('modifyOtherPosts')) {
-	    	if(targetPost.uid !== user.uid && !isModerator) {
-	    		ctx.throw(403, '权限不足');
-		    }
-	    }
+      const forum = await targetThread.extendForums(['mainForumsId']);
+      let isModerator;
+      for(let f of forum){
+        isModerator = await forum.isModerator(user?user.uid: '');
+        if(isModerator) break;
+      }
+      if(!data.userOperationsId.includes('modifyOtherPosts')) {
+        if(targetPost.uid !== user.uid && !isModerator) {
+          ctx.throw(403, '权限不足');
+        }
+      }
       // if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
       data.content = targetPost.c;  //回复内容
       data.title = targetPost.t;  //回复标题

@@ -302,7 +302,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
   await this.update(updateObj);
-  const forums = await this.extendForum(['mainForumsId']);
+  const forums = await this.extendForums(['mainForumsId']);
   await Promise.all(forums.map(async forum => {
     await forum.updateForumMessage();
   }));
