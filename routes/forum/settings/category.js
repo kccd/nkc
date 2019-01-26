@@ -43,7 +43,11 @@ categoryRouter
 			} else {
 				const targetForum = await db.ForumModel.findOnly({fid: parentId});
 				await forum.update({parentsId:[parentId], forumType:targetForum.forumType});
-				forum.parentsId = [parentId];
+        forum.parentsId = [parentId];
+        const fids = await forum.getAllChildForumsId();
+        await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
+          forumType: targetForum.forumType
+        }});
 				await forum.updateForumMessage();
 			}
 		} else if(operation === 'saveOrder') {
@@ -69,7 +73,7 @@ categoryRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		const {name} = body;
 		if(!name) ctx.throw(400, '分类名不能为空');
@@ -88,18 +92,20 @@ categoryRouter
 			fid: forum.fid
 		});
 		await newType.save();
-		data.newType = newType;
+    data.newType = newType;
+    await redis.cacheForums();
 		await next();
 	})
 	.del('/', async (ctx, next) => {
-		const {db, query, data} = ctx;
+		const {db, query, data, redis} = ctx;
 		const {forum} = data;
 		const {name} = query;
 		if(!name) ctx.throw('分类名不能为空');
 		const threadType = await db.ThreadTypeModel.findOne({fid: forum.fid, name});
 		if(!threadType) ctx.throw(400, '分类不存在');
 		await db.ThreadModel.updateMany({cid: threadType.cid}, {$set: {cid: null}});
-		await threadType.remove();
+    await threadType.remove();
+    await redis.cacheForums();
 		await next();
-	});
+	})
 module.exports = categoryRouter;

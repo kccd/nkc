@@ -480,7 +480,7 @@ forumSchema.methods.getBreadcrumbForums = async function() {
     let hasChild = false;
     const {fid} = forum;
     for(const f of forums_) {
-      if(f.parentId === fid) {
+      if(f.parentsId.length !== 0 && f.parentsId[0] === fid) {
         hasChild = true;
         break;
       }
@@ -493,7 +493,8 @@ forumSchema.methods.getBreadcrumbForums = async function() {
   while(n < 1000 && forums.length !== fid.length) {
     n++;
     for(const forum of forums_) {
-      if(forums[forums.length - 1].parentId === forum.fid) {
+      const f = forums[forums.length - 1];
+      if(f.parentsId.length !== 0 && f.parentsId[0] === forum.fid) {
         forums.unshift(forum);
       }
     }

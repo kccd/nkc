@@ -23,7 +23,7 @@ $(function() {
 
 	for(var i = 0; i < forums.length; i++) {
 		var forum = forums[i];
-		if(!forum.parentId) {
+		if(forum.parentsId.length === 0) {
 			level1.push(forum);
 		}
 	}
@@ -139,7 +139,7 @@ function getChildrenForums(fid, type) {
 	var childrenForums = [];
 	for(var i = 0; i < forums.length; i++) {
 		var forum = forums[i];
-		if(forum.parentId === fid) {
+		if(forum.parentsId.indexOf(fid) !== -1) {
 			if(type === 'fid') {
 				childrenForums.push(forum.fid);
 			} else {
@@ -154,7 +154,7 @@ function getParentForum(fid) {
 	var parentForum = null;
 	var forum = getForumByFid(fid);
 	for(var i = 0; i < forums.length; i++) {
-		if(forum.parentId === forums[i].fid) {
+		if(forum.parentsId.indexOf(forums[i].fid) !== -1) {
 			parentForum = forums[i];
 		}
 	}
