@@ -170,6 +170,13 @@ threadSchema.virtual('forums')
   .set(function(f) {
     this._forums = f
   });
+threadSchema.virtual('categories')
+  .get(function() {
+    return this._categories
+  })
+  .set(function(f) {
+    this._categories = f
+  });  
 
 threadSchema.virtual('category')
   .get(function() {
@@ -525,8 +532,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
   }
 
-  return await Promise.all(threads.map(async t => {
-    const thread = t.toObject? t.toObject(): t;
+  return await Promise.all(threads.map(async thread => {
     thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
@@ -561,7 +567,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         }        
       }
     }
-    return thread;
+    return thread.toObject?thread.toObject():thread;
   }));
 };
 
