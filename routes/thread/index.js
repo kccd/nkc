@@ -416,7 +416,7 @@ threadRouter
 
 
 		data.thread = thread;
-		await thread.extendForum();
+		await thread.extendForums(['mainForums', 'minorForums']);
 		data.forum = thread.forum;
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
@@ -434,7 +434,6 @@ threadRouter
 			typeIdOfScoreChange: 'postToThread',
 			tid: post.tid,
 			pid: post.pid,
-			fid: post.fid,
 			ip: ctx.address,
 			port: ctx.port
 		};
@@ -471,7 +470,7 @@ threadRouter
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
     global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
-	})
+  })
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
 	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())

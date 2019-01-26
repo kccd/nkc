@@ -357,26 +357,26 @@ forumSchema.methods.extendNoticeThreads = async function() {
   @author pengxiguaa 2019/1/26
 */
 forumSchema.methods.updateForumMessage = async function() {
-	const ThreadModel = require('./ThreadModel');
+	const ThreadModel = mongoose.model('threads');
 	const ForumModel = mongoose.model('forums');
 	const PostModel = mongoose.model('posts');
 	const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
 	childrenFid.push(this.fid);
-	const countThreads = await ThreadModel.count({mainForums: {$in: childrenFid}});
-	let countPosts = await PostModel.count({mainForums: {$in: childrenFid}});
+	const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
+	let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}});
 	countPosts = countPosts - countThreads;
-	const digest = await ThreadModel.count({mainForums: {$in: childrenFid}, digest: true});
+	const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
 	const normal = countThreads - digest;
 	const tCount = {
 		digest,
 		normal
 	};
 	const {today} = require('../nkcModules/apiFunction');
-	const countPostsToday = await PostModel.count({mainForums: {$in: childrenFid}, toc: {$gt: today()}});
+	const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}});
   await this.update({tCount, countPosts, countThreads, countPostsToday});
   const updateParentForumsMessage = async (forum) => {
-    if(forum.parentsForumsId.length === 0) return;
-    const parentsForums = await ForumModel.find({fid: {$in: forum.parentsForumsId}});
+    if(forum.parentsId.length === 0) return;
+    const parentsForums = await ForumModel.find({fid: {$in: forum.parentsId}});
     await Promise.all(parentsForums.map(async parentForum => {
       const childForums = await parentForum.extendChildrenForums();
       let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
@@ -398,15 +398,16 @@ forumSchema.methods.updateForumMessage = async function() {
 };
 
 
-forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
-  const SettingModel = require('./SettingModel');
-  const ThreadModel = require('./ThreadModel');
-  const PersonalForumModel = require('./PersonalForumModel');
+forumSchema.methods.newPost = async function(post, user, ip, cids, toMid, fids) {
+  const SettingModel = mongoose.model('settings');
+  const ThreadModel = mongoose.model('threads');
+  const ForumModel = mongoose.model('forums');
+  const PersonalForumModel = mongoose.model('usersPersonal');
   const tid = await SettingModel.operateSystemID('threads', 1);
   const t = {
     tid,
-    cid,
-    fid: this.fid,
+    categoriesId: cids,
+    mainForumsId: fids,
     mid: user.uid,
     uid: user.uid,
   };
@@ -418,9 +419,9 @@ forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
       throw (new Error("only personal forum's moderator is able to post"))
   }
   const thread = await new ThreadModel(t).save();
-  const _post = await thread.newPost(post, user, ip, cid);
+  const _post = await thread.newPost(post, user, ip);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
-  await this.update({$inc: {
+  await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
     'tCount.normal': 1,
     'countPosts': 1,
     'countThreads': 1

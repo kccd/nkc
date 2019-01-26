@@ -229,7 +229,19 @@ block content
                             if data.userOperationsId.includes('openThread') && thread.closed
                               button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
                           if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
-                            .form-inline(style='margin: 0.5rem 0')
+                            div
+                              div(v-if='forums.length !== 0')
+                                h5 已选择专业
+                                div
+                                  for forum in thread.forums
+                                    span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
+                                      .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
+                              div(style='margin-top:0.5rem;').form-inline    
+                                include ../forumlist_dropdown.pug
+                                button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
+                              div(style='margin-top:0.5rem;')      
+                                button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
+                            //-.form-inline(style='margin: 0.5rem 0')
                               .form-group.form-group-sm
                                 include ../forumlist_dropdown.pug
                                 button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}

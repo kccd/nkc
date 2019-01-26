@@ -117,9 +117,9 @@ postRouter
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await targetPost.extendThread();
-    const targetForum = await targetThread.extendForums(['mainForumsId']);
+    const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
-    for(let f of targetForum){
+    for(let targetForum of targetForums){
       isModerator = await targetForum.isModerator(user.uid);
       if(isModerator) break;
     }
