@@ -78,10 +78,10 @@ const forumSchema = new Schema({
     default: 0
   },
 
-  /* parentId: {
+  parentId: {
     type: String,
     default: ''
-  }, */
+  },
 
   // 可访问的
   accessible: {
