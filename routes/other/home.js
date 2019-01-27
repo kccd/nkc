@@ -77,7 +77,7 @@ homeRouter
     });
 		// 导航
 		const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+    const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 		data.pageSettings = (await db.SettingModel.findOnly({_id: 'page'})).c;
 

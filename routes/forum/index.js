@@ -46,7 +46,7 @@ forumRouter
     await next();
   })
 	.post('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, redis, db, body} = ctx;
 		const {displayName, forumType} = body;
 		if(!displayName) ctx.throw(400, '名称不能为空');
 		const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
@@ -65,8 +65,9 @@ forumRouter
 			accessible: false,
 			visibility: false,
 			type: 'forum'
-		});
-		await newForum.save();
+    });
+    await newForum.save();
+    await redis.cacheForums();
 		data.forum = newForum;
 		await next();
 	})

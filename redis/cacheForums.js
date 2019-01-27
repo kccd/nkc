@@ -2,16 +2,17 @@ require('colors');
 const {ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
-// 无法在父级显示的专业id
-const canNotDisplayOnParentForumsId = [];
-// 无法访问的专业id
-const canNotAccessibleForumsId = [];
-// 导航不可见的专业id
-const canNotDisplayOnNavForumsId = [];
-// 无权用户在导航可见的专业id
-const canDisplayOnNavForumsIdNCC = [];
-
 async function func() {
+
+  // 无法在父级显示的专业id
+  const canNotDisplayOnParentForumsId = [];
+  // 无法访问的专业id
+  const canNotAccessibleForumsId = [];
+  // 导航不可见的专业id
+  const canNotDisplayOnNavForumsId = [];
+  // 无权用户在导航可见的专业id
+  const canDisplayOnNavForumsIdNCC = [];
+
 
   const forums = await ForumModel.find();
   const rolesDB = await RoleModel.find();
