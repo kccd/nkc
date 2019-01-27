@@ -37,6 +37,7 @@ router
     if(obj.disabled) {
       // 直接封禁
       if(para.delType === 'toRecycle') {
+        await targetPost.update({toDraft: false});
         await db.KcbsRecordModel.insertSystemRecord('postBlocked', data.targetUser, ctx);
         if(para && para.illegalType) {
           await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
@@ -68,6 +69,7 @@ router
         await ctx.redis.pubMessage(message);
       } else {
         // 退回
+        await targetPost.update({toDraft: true});
         const mId = await db.SettingModel.operateSystemID('messages', 1);
         const message = db.MessageModel({
           _id: mId,
