@@ -103,7 +103,7 @@ function displaySelect1() {
 function parentForum1() {
 	var forum = [];
 	for(var i = 0; i < forumList.length; i++) {
-		if(forumList[i].parentId === '') {
+		if(forumList[i].parentsId.length == 0) {
 			forum.push(forumList[i]);
 		}
 	}
@@ -113,7 +113,7 @@ function parentForum1() {
 function getChildrenForums1(fid) {
 	var forum = [];
 	for(var i = 0; i < forumList.length; i++) {
-		if(forumList[i].parentId === fid) {
+		if(forumList[i].parentsId.indexOf(fid) > -1) {
 			forum.push(forumList[i]);
 		}
 	}

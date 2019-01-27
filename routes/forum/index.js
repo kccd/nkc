@@ -375,7 +375,7 @@ forumRouter
 			// 拿到能看到入口的所有专业id
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 			// 拿到能看到入口的顶级专业
-			data.sameLevelForums = await db.ForumModel.find({parentId: '', fid: {$in: visibleFidArr}});
+			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		} 
 
 		ctx.template = 'interface_forum_home.pug';
