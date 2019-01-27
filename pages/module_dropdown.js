@@ -177,7 +177,45 @@ function selectbtn(){
 		arr.prop('checked', true);
 	}
 }
-
+/* 
+  移动专业文章列表中的文章
+  @author pengxiguaa 2019/1/27
+*/
+function moveListThreads(fid) {
+  var target;
+  try {
+		target = getResult();
+	} catch(err) {
+		return screenTopWarning(err);
+  }
+  var arr = $('input.ThreadCheckboxes');
+	var tid = [];
+	for(var i = 0; i < arr.length; i++) {
+    var box = arr.eq(i);
+    if(box.is(':checked')) {
+      tid.push(box.attr('id'));
+    }
+  }
+  if(tid.length === 0) return screenTopWarning('未勾选文章');
+  var data = {
+    fromFid: fid,
+    toFid: target.fid,
+    toCid: target.cid
+  }
+  var postTo = function(index, arr) {
+    if(!arr[index]) return;
+    var targetTid = arr[index];
+    nkcAPI('/t/' + targetTid + '/forum', 'PATCH', data)
+      .then(function() {
+        screenTopAlert('文章 ' + targetTid + ' 已移动到专业 ' + data.toFid);
+        postTo(index+1, arr);
+      })
+      .catch(function(data) {
+        screenTopWarning(data.error || data);
+      });
+  }
+  postTo(0, tid);
+}
 
 function moveThreads(id) {
 	var target;
