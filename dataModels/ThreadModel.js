@@ -7,12 +7,12 @@ const threadSchema = new Schema({
     type: String,
     unique: true,
     required:true
-  },
+  },/* 
   cid: {
     type: String,
     default:'',
     index: 1
-  },
+  }, */
   count: {
     type: Number,
     default: 0
@@ -43,12 +43,12 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
-  },
+  },/* 
   fid: {
     type: String,
     required: true,
     index: 1
-  },
+  }, */
   hideInMid: {
     type: Boolean,
     default: false

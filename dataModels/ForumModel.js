@@ -76,12 +76,12 @@ const forumSchema = new Schema({
   order: {
     type: Number,
     default: 0
-  },
+  },/* 
 
   parentId: {
     type: String,
     default: ''
-  },
+  }, */
 
   // 可访问的
   accessible: {
