@@ -34,7 +34,7 @@ const router = new Router();
 router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
+		data.forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		data.type = 'forum';
 		ctx.template = 'experimental/settings/forum.pug';
 		await next();
@@ -42,7 +42,7 @@ router
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {fidArr} = body;
-		const forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
+		const forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		if(fidArr.length !== forums.length) {
 			ctx.throw(400, '参数错误');
 		}

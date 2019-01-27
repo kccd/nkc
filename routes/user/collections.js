@@ -52,7 +52,7 @@ collectionsRouter
     for(const collection of categoryCollection1) {
       const thread = await ThreadModel.findOne({tid: collection.tid, recycleMark: {$ne: true}})
       if(thread){
-        await thread.extendForum();
+        await thread.extendForums(["mainForums"]);
         try{
           await thread.ensurePermission(data.userRoles, data.userGrade, data.user)
 
@@ -70,7 +70,7 @@ collectionsRouter
     // }
 
 	  categoryCollection = await Promise.all(categoryCollection.map(async c => {
-    	await c.extendThread().then(t => t.extendForum()).then(f => f.extendParentForum());
+    	await c.extendThread().then(t => t.extendForums(["mainForums"]));
     	if(ctx.reqType === 'app') {
 				let content = ctx.nkcModules.APP_nkc_render.experimental_render(c.thread.firstPost);
 		    content = content.replace(/<.*?>/ig, '');

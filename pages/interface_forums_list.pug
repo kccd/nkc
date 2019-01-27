@@ -32,7 +32,7 @@
 //        hr.hrNarrowSpace
 //      - cindex += group.children.length
 //
--const childForums = data.forumList.map(forum => {if(forum.parentId === data.forum.fid){return forum;}})
+-const childForums = data.forumList.map(forum => {if(forum.parentsId.indexOf(data.forum.fid) > -1){return forum;}})
 
 .nkcpanel
 

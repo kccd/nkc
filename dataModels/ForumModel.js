@@ -16,7 +16,7 @@ const forumSchema = new Schema({
   },
   color: {
     type: String,
-    default: 'grey'
+    default: '#808080'
   },
   countPosts: {
     type: Number,
