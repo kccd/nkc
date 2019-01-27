@@ -242,7 +242,7 @@ operationRouter
     const formTypes = await db.ThreadTypeModel.find({fid: fromFid});
     const fromTypesId = formTypes.map(t => t.cid + '');
     categoriesId = categoriesId.filter(cid => !fromTypesId.includes(cid));
-    if(toCid) {
+    if(toCid && !categoriesId.includes(toCid + '')) {
       categoriesId.push(toCid);
     }
     await thread.update({mainForumsId, categoriesId});
