@@ -98,13 +98,13 @@ block scripts
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
-  script(src='/interface_common.js?v=4')
-  script(src='/nkc_render.js?v=3')
-  script(src='/interface_editor.js?v=4')
+  script(src=`/interface_common.js?v=${startTime}`)
+  script(src=`/nkc_render.js?v=${startTime}`)
+  script(src=`/interface_editor.js?v=${startTime}`)
 
   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
     //- script(src='/module_dropdown.js?v=3')
-    script(src='/forum/forumlist_dropdown1.js?v=3')
+    script(src=`/forum/forumlist_dropdown1.js?v=${startTime}`)
 
 
 
