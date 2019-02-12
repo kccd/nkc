@@ -36,7 +36,8 @@ module.exports = {
     },
     forum: {
       POST: 'addThreadForum',
-      DELETE: 'removeThreadForum'
+      DELETE: 'removeThreadForum',
+      PATCH: 'patchThreadForum'
     }
 	}
 };

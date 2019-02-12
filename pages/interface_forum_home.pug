@@ -304,14 +304,14 @@ block content
                   li(class=`${class_str_sortby_toc}`)
                     a(href=`${toQueryString({cat, digest, sortby: "toc"})}`) 最新发表
                 .form-inline(style='margin-bottom:10px;margin-top:10px;display:none;').ForumManagement
-                  //-
-                    .form-group
-                      button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
+                  
+                  .form-group
+                    button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
 
-                    .form-group.form-group-sm
-                      include forumlist_dropdown.pug
-                      button.btn.btn-default.btn-sm#moveThreadTo(onclick="moveThreads()") 移动
-
+                  .form-group.form-group-sm
+                    include forumlist_dropdown.pug
+                    //-button.btn.btn-default.btn-sm#moveThreadTo(onclick="moveThreads()") 移动
+                    button.btn.btn-default.btn-sm#moveThreadTo(onclick=`moveListThreads("${data.forum.fid}")`) 移动
                   .form-group
                     button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='moveThreadToRecycle()') 送回收站
               if data.paging.page === 0 && !data.cat

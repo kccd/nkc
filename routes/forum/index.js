@@ -101,7 +101,11 @@ forumRouter
 		data.forum = forum;
 	  const {user} = data;
     if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
-	  await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+    const forums = await db.ForumModel.find({fid: {$in: body.post.fids}});
+    forums.push(forum);
+    for(const f of forums) {
+      await f.ensurePermission(data.userRoles, data.userGrade, data.user);
+    }
 	  const childrenForums = await forum.extendChildrenForums();
 	  if(childrenForums.length !== 0) {
 	  	ctx.throw(400, '该专业下存在其他专业，请到下属专业发表文章。');
@@ -231,7 +235,14 @@ forumRouter
 		if(allChildrenFid.length !== 0) {
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
 		}
-    const count = await ThreadModel.count({mainForumsId: fid});
+    const count = await ThreadModel.count({$or: [
+      { 
+        mainForumsId: fid
+      },
+      {
+        minorForumsId: fid
+      }
+    ]});
     if(count > 0) {
       ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
       return next()

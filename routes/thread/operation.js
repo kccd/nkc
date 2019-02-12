@@ -218,6 +218,40 @@ operationRouter
 		}
 		await next();
   })
+  .patch('/forum', async (ctx, next) => {
+    const {params, db, body} = ctx;
+    const {fromFid, toFid, toCid} = body;
+    const {tid} = params;
+    if(toFid === 'recycle') ctx.throw(400, '需移动文章到回收站请点击“送回收站”按钮');
+    const thread = await db.ThreadModel.findOnly({tid});
+    const fromForum = await db.ForumModel.findOnly({fid: fromFid});
+    const childForumsCount = await db.ForumModel.count({parentsId: fromFid});
+    if(childForumsCount !== 0) ctx.throw('当前所在专业不为最底层专业，请进入最底层专业再执行此操作');
+    const toForum = await db.ForumModel.findOne({fid: toFid});
+    if(!toForum) ctx.throw(400, '目标专业不存在');
+    if(toCid) {
+      const toForumType = await db.ThreadTypeModel.findOne({fid: toFid, cid: toCid});
+      if(!toForumType) ctx.throw(400, '目标专业的文章分类不存在');
+    }
+    let {mainForumsId, categoriesId} = thread;
+    const fromIndex = mainForumsId.indexOf(fromFid);
+    if(fromIndex !== -1) mainForumsId.splice(fromIndex, 1);
+    if(!mainForumsId.includes(toFid)) {
+      mainForumsId.push(toFid);
+    }
+    const formTypes = await db.ThreadTypeModel.find({fid: fromFid});
+    const fromTypesId = formTypes.map(t => t.cid + '');
+    categoriesId = categoriesId.filter(cid => !fromTypesId.includes(cid));
+    if(toCid && !categoriesId.includes(toCid + '')) {
+      categoriesId.push(toCid);
+    }
+    await thread.update({mainForumsId, categoriesId});
+    await db.PostModel.updateMany({tid}, {$set: {mainForumsId}});
+    await db.InfoBehaviorModel.updateMany({tid}, {$set: {mainForumsId}});
+    await fromForum.updateForumMessage();
+    await toForum.updateForumMessage();
+    await next();
+  })
   .post('/forum', async (ctx, next) => {
     const {data, db, body, params} = ctx;
     const {tid} = params;
