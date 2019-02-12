@@ -43,6 +43,8 @@
     "viewForumVisitors": "查看专业活跃用户",
     "viewForumFollowers": "查看专业订阅用户",
     "visitForumInfoSettings": "访问专业基本信息设置",
+    "visitForumMergeSettings": "访问专业合并设置",
+    "modifyMergeSettings": "合并专业",
     "modifyForumInfo": "修改专业基本信息",
     "visitForumImageSettings": "访问专业logo设置",
     "visitForumCategorySettings": "访问专业分类设置",
