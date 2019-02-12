@@ -45,7 +45,7 @@ block body
   script(src="/photoswipe/dist/photoswipe.js")
   script(src="/photoswipe/dist/photoswipe-ui-default.js")
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  if 1 || data.user
+  if data.user
     script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
     script(src=`/message/socket.js?v=${global.NKC.startTime}`)
 

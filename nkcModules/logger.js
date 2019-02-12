@@ -29,11 +29,13 @@ module.exports = async (ctx) => {
     error: ''
   };
   if(ctx.logIt) {
+    d.from = ctx.req.headers.referer;
+    d.address = ctx.address;
     if (ctx.error) {
       console.error(
         `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation.description: '未知操作').grey}`
       );
-      d.error = ctx.error
+      d.error = ctx.error;
       global.NKC.io.of('/console').NKC.webMessage(d);
       if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
