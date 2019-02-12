@@ -43,6 +43,8 @@ block content
                 span(v-if='m.status >= 200 && m.status < 300').status-success {{m.status}}
                 span(v-else-if='m.status >= 400').status-error {{m.status}}
                 span(v-else).status-warning {{m.status}}
+                span.from(v-if='m.from') 来自：
+                  a(:href='m.from' target='_blank') {{m.from}}
                 div(v-if='m.error').status-error {{JSON.stringify(m.error, '', 4)}}
               .message(v-if='m.consoleType === "socket" && categories.indexOf("socket") !== -1')
                 span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
