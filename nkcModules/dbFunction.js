@@ -231,17 +231,19 @@ fn.forumsListSort = (forums, types) => {
 		return arr;
 	};
 	for(let forum of forums) {
-		forum.threadTypes = getTypesById(forum.fid);
-		const parentForum = getForumById(forum.parentId);
-		if(parentForum) {
-			parentForum.childrenForums = parentForum.childrenForums?parentForum.childrenForums: [];
-			parentForum.childrenForums.push(forum);
-		}
+    forum.threadTypes = getTypesById(forum.fid);
+    for(const fid of forum.parentsId) {
+      const parentForum = getForumById(fid);
+      if(parentForum) {
+        parentForum.childrenForums = parentForum.childrenForums?parentForum.childrenForums: [];
+        parentForum.childrenForums.push(forum);
+      }
+    }
 	}
 	const result = [];
 	for(let forum of forums) {
-		if(!forum.parentId) {
-			result.push(forum);
+		if(forum.parentsId.length === 0) {
+			result.push(forum.toObject());
 		}
 	}
 	return result;

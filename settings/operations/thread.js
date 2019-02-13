@@ -33,6 +33,11 @@ module.exports = {
 		close: {
 			POST: 'closeThread',
 			DELETE: 'openThread'
-		}
+    },
+    forum: {
+      POST: 'addThreadForum',
+      DELETE: 'removeThreadForum',
+      PATCH: 'patchThreadForum'
+    }
 	}
 };

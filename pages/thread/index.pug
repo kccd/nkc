@@ -139,7 +139,10 @@ block content
                 .col-xs-12.col-md-12
                   .thread-management
                     .title
-                      if thread.forum.parentForum
+                      for forum in thread.forums
+                        a(href=`/f/${forum.fid}` style='text-decoration: none;margin-right: 0.5rem;')
+                          span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${forum.color}`)= forum.displayName
+                      //-if thread.forum.parentForum
                         a(href=`/f/${thread.forum.parentForum.fid}` style='text-decoration: none;margin-right: 0.5rem;')
                           span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${thread.forum.parentForum.color}`)= thread.forum.parentForum.displayName
                       if thread.forum
@@ -211,11 +214,6 @@ block content
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
                           .form-inline
-                            //- 设置精华
-                            //if data.isModerator || data.userOperationsId.includes('digestThread') && !thread.digest
-                            //  button.btn.btn-default.btn-sm#threadDigest(onclick=`setDigest('${data.thread.tid}')`) 设为优秀文章
-                            //if data.isModerator || data.userOperationsId.includes('unDigestThread') && thread.digest
-                            //  button.btn.btn-default.btn-sm#threadDigest(onclick=`cancelDigest('${data.thread.tid}')`) 取消设为优秀文章
                             //- 设置置顶
                             if data.isModerator || data.userOperationsId.includes('toppedThread') && !thread.topped
                               button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
@@ -231,7 +229,19 @@ block content
                             if data.userOperationsId.includes('openThread') && thread.closed
                               button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
                           if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
-                            .form-inline(style='margin: 0.5rem 0')
+                            div
+                              div(v-if='forums.length !== 0')
+                                h5 已选择专业
+                                div
+                                  for forum in thread.forums
+                                    span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
+                                      .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
+                              div(style='margin-top:0.5rem;').form-inline    
+                                include ../forumlist_dropdown.pug
+                                button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
+                              div(style='margin-top:0.5rem;')      
+                                button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
+                            //-.form-inline(style='margin: 0.5rem 0')
                               .form-group.form-group-sm
                                 include ../forumlist_dropdown.pug
                                 button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}
@@ -403,13 +413,13 @@ block content
                     span= index+1+'. '
                     span= thread.firstPost.t
           if data.sameThreads && data.sameThreads.length !== 0
-          .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-            .thread-aside-header 相似文章推荐
-            for thread, index in data.sameThreads
-              .thread-aside-title
-                a(href=`/t/${thread.tid}`)
-                  span= index + 1 + '. '
-                  span= thread.firstPost.t
+            .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+              .thread-aside-header 相似文章推荐
+              for thread, index in data.sameThreads
+                .thread-aside-title
+                  a(href=`/t/${thread.tid}`)
+                    span= index + 1 + '. '
+                    span= thread.firstPost.t
           .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
             ul.HomeFriendlyLink
               include ../nkc_footer_links.pug

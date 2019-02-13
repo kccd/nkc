@@ -380,8 +380,9 @@ var common=(function(){
   }
   common.URLifyHTML = function(content){
     return content.replace(URLExtractRegex,function(match,p1,p2){
-      p3 = p2.replace(/(https|http):\/\//igm,'')
-      return p1+'<a href="http://'+ p3 +'">'+p2+'</a>'
+      // p3 = p2.replace(/(https|http):\/\//igm,'');
+      // return p1+'<a href="http://'+ p3 +'">'+p2+'</a>';
+      return p1+'<a href="'+p2+'">'+p2+'</a>';
     })
   }
 
@@ -847,17 +848,17 @@ function iconSwitch() {
 
 
 // 新建板块
-function newForum() {
-	var displayName = prompt('请输入板块名：');
+function newForum(forumType) {
+	var displayName = prompt('请输入名称：');
 	if(displayName === null) {
 		return;
 	}
 	if(displayName === '') {
-		return screenTopWarning('板块名称不能为空');
+		return screenTopWarning('名称不能为空');
 	}
-	nkcAPI('/f', 'POST', {displayName: displayName})
+	nkcAPI('/f', 'POST', {displayName: displayName, forumType: forumType})
 		.then(function(data) {
-			screenTopAlert('新建板块成功，正在前往板块设置');
+			screenTopAlert('新建成功，正在前往设置');
 			setTimeout(function() {
 				window.location.href = '/f/'+data.forum.fid+'/settings';
 			}, 1500);
@@ -868,7 +869,7 @@ function newForum() {
 }
 
 function deleteForum(fid) {
-	if(confirm('确定要删除该板块？') === false) {
+	if(confirm('确定要删除？') === false) {
 		return;
 	}
 	nkcAPI('/f/'+fid, 'DELETE', {})
@@ -1439,7 +1440,7 @@ function shareTo(shareType, type, str, title, pid){
     }
     nkcAPI('/s', "POST", para)
     .then(function(data) {
-      var newUrl = 'http://' + host + data.newUrl;
+      var newUrl = 'https://' + host + data.newUrl;
       if(type == "link") {
         var copyAreaId = "copyArea"+pid;
         var copyLinkId = "copyLink"+pid;

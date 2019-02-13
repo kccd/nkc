@@ -5,6 +5,7 @@ var data = JSON.parse($('#forumListData').text());
 var forumList = data.forumList;
 var threadTypes = data.forumsThreadTypes;
 var disabledCategory = data.disabledCategory;
+var noShowCategory = data.noShowCategory
 if(data.selectedArr) {
 	selectedArr = data.selectedArr;
 }
@@ -54,7 +55,11 @@ function createSelect(arr, fid, category) {
 	for(var i = 0; i < arr.length; i++) {
 		var forum = arr[i];
 		if (!category) {
-			var option = newElement('option', {}, {}).text(forum.displayName+':'+forum.fid);
+			if(forum.forumType == "discipline") {
+				var option = newElement('option', {}, {}).text('(学科)'+forum.displayName+':'+forum.fid);
+			}else{
+				var option = newElement('option', {}, {}).text('(话题)'+forum.displayName+':'+forum.fid);
+			}
 			if(forum.fid === fid) {
 				option.attr('selected', true);
 			}
@@ -82,9 +87,11 @@ function displaySelect() {
 				if(disabledCategory) {
 					return window.location.href = '/f/'+selectedArr[i]+'/settings';
 				}
-				var types = getThreadTypes(selectedArr[i]);
-				types.push({name: '不分类', cid: ''});
-				dropdownDiv.append(createSelect(types, cat||'', true));
+				if(!noShowCategory){
+					var types = getThreadTypes(selectedArr[i]);
+					types.push({name: '不分类', cid: ''});
+					dropdownDiv.append(createSelect(types, cat||'', true));
+				}
 			} else {
 				dropdownDiv.append(createSelect(childrenForums, selectedArr[i + 1]).attr('id', 'select'+(i+1)));
 			}
@@ -99,7 +106,7 @@ function displaySelect() {
 function parentForum() {
 	var forum = [];
 	for(var i = 0; i < forumList.length; i++) {
-		if(forumList[i].parentId === '') {
+		if(forumList[i].parentsId.length == 0) {
 			forum.push(forumList[i]);
 		}
 	}
@@ -109,7 +116,7 @@ function parentForum() {
 function getChildrenForums(fid) {
 	var forum = [];
 	for(var i = 0; i < forumList.length; i++) {
-		if(forumList[i].parentId === fid) {
+		if(forumList[i].parentsId.indexOf(fid) > -1) {
 			forum.push(forumList[i]);
 		}
 	}
@@ -158,6 +165,23 @@ function getResult() {
 	}
 }
 
+function getResultForumId() {
+	var arr = $('#dropdownDiv select');
+	var fid;
+	for(var i = 0; i < arr.length; i++) {
+		if(!arr.eq(i).hasClass('categorySelect')) {
+			var value = arr.eq(i).val();
+			var valueArr = value.split(':');
+			if(valueArr.length === 2) {
+				fid = valueArr[1];
+			} else {
+				throw '请选择专业';
+			}
+		}
+	}
+	if(!fid) throw '请选择专业';
+	return fid;
+}
 
 function selectbtn(){
 	var arr = $('input.ThreadCheckboxes');
@@ -173,7 +197,45 @@ function selectbtn(){
 		arr.prop('checked', true);
 	}
 }
-
+/* 
+  移动专业文章列表中的文章
+  @author pengxiguaa 2019/1/27
+*/
+function moveListThreads(fid) {
+  var target;
+  try {
+		target = getResult();
+	} catch(err) {
+		return screenTopWarning(err);
+  }
+  var arr = $('input.ThreadCheckboxes');
+	var tid = [];
+	for(var i = 0; i < arr.length; i++) {
+    var box = arr.eq(i);
+    if(box.is(':checked')) {
+      tid.push(box.attr('id'));
+    }
+  }
+  if(tid.length === 0) return screenTopWarning('未勾选文章');
+  var data = {
+    fromFid: fid,
+    toFid: target.fid,
+    toCid: target.cid
+  }
+  var postTo = function(index, arr) {
+    if(!arr[index]) return;
+    var targetTid = arr[index];
+    nkcAPI('/t/' + targetTid + '/forum', 'PATCH', data)
+      .then(function() {
+        screenTopAlert('文章 ' + targetTid + ' 已移动到专业 ' + data.toFid);
+        postTo(index+1, arr);
+      })
+      .catch(function(data) {
+        screenTopWarning(data.error || data);
+      });
+  }
+  postTo(0, tid);
+}
 
 function moveThreads(id) {
 	var target;

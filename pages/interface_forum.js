@@ -287,3 +287,4 @@ function fastVisit(value) {
 window.onresize = function() {
 	displayAside()
 };
+

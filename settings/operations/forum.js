@@ -23,6 +23,10 @@ module.exports = {
 				GET: 'visitForumInfoSettings',
 				PATCH: 'modifyForumInfo'
 			},
+			merge: {
+				GET: 'visitForumMergeSettings',
+				PATCH: 'modifyMergeSettings',
+			},
 			image: {
 				GET: 'visitForumImageSettings',
 			},

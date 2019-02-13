@@ -32,12 +32,13 @@ block title
             for thread in data.digestThreads
               .col-xs-12.col-md-12
                 .row(style='margin-bottom: 0.2rem;line-height: 1.8rem;')
-                  if data.forum.fid !== thread.fid
-                    a(href=`/f/${thread.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${thread.forum.color};text-decoration: none;`)= thread.forum.displayName
-                  a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
-                  span &nbsp;&nbsp;
-                  a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
-                    span=` ( ${thread.firstPost.user.username} )`
+                  for f in thread.forums
+                    if f.fid !== data.forum.fid
+                      a(href=`/f/${f.fid}` style=`border-radius: 5px;font-size:inherit;padding: 0.2rem 0.4rem;margin-right: 0.5rem;color: #ffffff;background-color: ${f.color};text-decoration: none;`)= f.displayName
+                      a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
+                      span &nbsp;&nbsp;
+                      a(href=`/u/${thread.firstPost.user.uid}` style='display: inline-block; color: #ff8700;' title=thread.firstPost.user.description)
+                        span=` ( ${thread.firstPost.user.username} )`
       br
 
   //- 专业信息
@@ -101,14 +102,19 @@ block title
   mixin forumsAndModerators
     .row
       .col-xs-12.col-md-12
-        if data.forum.parentForum
+        if data.forum.parentForums.length !== 0
           h4(style='margin-bottom: 0;').text-center 上级专业
-          -var forum = data.forum.parentForum;
-          include module_forum_single_panel
+          for forum in data.forum.parentForums
+            include module_forum_single_panel
           br
         if data.forum.childrenForums && data.forum.childrenForums.length !== 0
           h4(style='margin-bottom: 0;').text-center 细分专业
           for forum in data.forum.childrenForums
+            include module_forum_single_panel
+          br
+        if data.forum.relatedForums && data.forum.relatedForums.length !== 0
+          h4(style='margin-bottom: 0;').text-center 相关专业
+          for forum in data.forum.relatedForums
             include module_forum_single_panel
           br
         if data.moderators.length > 0
@@ -152,7 +158,7 @@ block content
         if data.userOperationsId.includes('visitForumInfoSettings')
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
-        +fastVisit()
+        astVisit()
         br
         .col-xs-12.col-md-12
           .row
@@ -298,14 +304,14 @@ block content
                   li(class=`${class_str_sortby_toc}`)
                     a(href=`${toQueryString({cat, digest, sortby: "toc"})}`) 最新发表
                 .form-inline(style='margin-bottom:10px;margin-top:10px;display:none;').ForumManagement
-
+                  
                   .form-group
                     button.btn.btn-sm.btn-default(onclick='selectbtn()') 全选/不选
 
                   .form-group.form-group-sm
                     include forumlist_dropdown.pug
-                    button.btn.btn-default.btn-sm#moveThreadTo(onclick="moveThreads()") 移动
-
+                    //-button.btn.btn-default.btn-sm#moveThreadTo(onclick="moveThreads()") 移动
+                    button.btn.btn-default.btn-sm#moveThreadTo(onclick=`moveListThreads("${data.forum.fid}")`) 移动
                   .form-group
                     button#recyclebtn.btn.btn-sm.btn-danger(style='margin-left:20px;margin-right:20px;' onclick='moveThreadToRecycle()') 送回收站
               if data.paging.page === 0 && !data.cat

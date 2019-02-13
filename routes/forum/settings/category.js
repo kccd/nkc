@@ -10,8 +10,8 @@ categoryRouter
 		while(n < 1000) {
 		  // 避免死循环，版块数暂小于1000
 		  n++;
-			if(f.parentId) {
-				f = await db.ForumModel.findOnly({fid: f.parentId});
+			if(f.parentsId.length !== 0) {
+				f = await db.ForumModel.findOnly({fid: f.parentsId[0]});
 				parentForums.unshift(f);
 			} else {
 				break;
@@ -26,15 +26,28 @@ categoryRouter
 		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		const {operation} = body;
-		if(operation === 'savePosition') {
+		if(operation === 'selectForumType') {
+      const {forumType} = body;
+      if(!['topic', 'discipline'].includes(forumType)) ctx.throw(400, `未定义的专业属性：${forumType}`);
+      if(forum.parentsId.length !== 0) ctx.throw(400, '该专业不是顶级专业，暂无法更改专业属性');
+      const fids = await forum.getAllChildForumsId();
+      fids.push(forum.fid);
+			await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
+        forumType: forumType
+      }});
+		}else if(operation === 'savePosition') {
 			const {parentId} = body;
 			if(parentId === forum.fid) ctx.throw(400, '板块不能成为自己的子版块');
 			if(!parentId) {
-				await forum.update({parentId: ''});
+				await forum.update({parentsId: []});
 			} else {
 				const targetForum = await db.ForumModel.findOnly({fid: parentId});
-				await forum.update({parentId});
-				forum.parentId = parentId;
+				await forum.update({parentsId:[parentId], forumType:targetForum.forumType});
+        forum.parentsId = [parentId];
+        const fids = await forum.getAllChildForumsId();
+        await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
+          forumType: targetForum.forumType
+        }});
 				await forum.updateForumMessage();
 			}
 		} else if(operation === 'saveOrder') {
@@ -60,7 +73,7 @@ categoryRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		const {name} = body;
 		if(!name) ctx.throw(400, '分类名不能为空');
@@ -79,18 +92,20 @@ categoryRouter
 			fid: forum.fid
 		});
 		await newType.save();
-		data.newType = newType;
+    data.newType = newType;
+    await redis.cacheForums();
 		await next();
 	})
 	.del('/', async (ctx, next) => {
-		const {db, query, data} = ctx;
+		const {db, query, data, redis} = ctx;
 		const {forum} = data;
 		const {name} = query;
 		if(!name) ctx.throw('分类名不能为空');
 		const threadType = await db.ThreadTypeModel.findOne({fid: forum.fid, name});
 		if(!threadType) ctx.throw(400, '分类不存在');
 		await db.ThreadModel.updateMany({cid: threadType.cid}, {$set: {cid: null}});
-		await threadType.remove();
+    await threadType.remove();
+    await redis.cacheForums();
 		await next();
-	});
+	})
 module.exports = categoryRouter;

@@ -6,8 +6,12 @@ router
 		const {user} = data;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
-		const isModerator = await forum.isModerator(user?user.uid: '');
+    const mainForums = await thread.extendForums(['mainForums', 'minorForums']);
+    let isModerator;
+    for(const f of mainForums) {
+      isModerator = await f.isModerator(user?user.uid: '');
+      if(isModerator) break;
+    }
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('digestThread')) {
 				ctx.throw(403, '您没有权限给该文章加精');
@@ -22,7 +26,6 @@ router
 			type: 'kcb',
 			typeIdOfScoreChange: 'digestThread',
 			port: ctx.port,
-			fid: thread.fid,
 			tid: thread.tid,
 			ip: ctx.address
 		});
@@ -33,7 +36,6 @@ router
 			port: ctx.port,
 			ip: ctx.address,
 			key: 'digestThreadsCount',
-			fid: thread.fid,
 			tid: thread.tid
 		});
 		await next();
@@ -43,8 +45,12 @@ router
 		const {user} = data;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		const forum = await thread.extendForum();
-		const isModerator = await forum.isModerator(user?user.uid: '');
+    const mainForums = await thread.extendForums(['mainForums', 'minorForums']);
+    let isModerator;
+    for(const f of mainForums) {
+      isModerator = await f.isModerator(user?user.uid: '');
+      if(isModerator) break;
+    }
 		if(!isModerator) {
 			if(!data.userOperationsId.includes('unDigestThread')) {
 				ctx.throw(400, '您没有权限给该文章取消加精');
@@ -59,7 +65,6 @@ router
 			type: 'kcb',
 			typeIdOfScoreChange: 'unDigestThread',
 			port: ctx.port,
-			fid: thread.fid,
 			tid: thread.tid,
 			ip: ctx.address
 		});
@@ -71,7 +76,6 @@ router
 			port: ctx.port,
 			ip: ctx.address,
 			key: 'digestThreadsCount',
-			fid: thread.fid,
 			tid: thread.tid
 		});
 		await next();

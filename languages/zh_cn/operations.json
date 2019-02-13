@@ -400,6 +400,11 @@
   "modifyExamSettings": "修改<后台设置-考试设置>",
   "faq": "阅读faq文章",
   "modifyQuestion": "修改考试题",
+  "addThreadForum": "添加文章所属专业",
+  "removeThreadForum": "将文章从所属专业中移除",
+  "visitHomeListSettings": "访问《后台管理-首页设置-文章列表设置》",
+  "modifyHomeListSettings": "修改《后台管理-首页设置-文章列表设置》",
+  "patchThreadForum": "在专业文章列表中批量移动文章",
 
 
   "APPgetUserInfo": "app获取用户信息",

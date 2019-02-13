@@ -10,8 +10,12 @@ router
     if(disabled === undefined) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
-    const targetForum = await targetThread.extendForum();
-    const isModerator = await targetForum.isModerator(data.user?data.user.uid:'');
+    const targetForums = await targetThread.extendForums(['mainForums']);
+    let isModerator;
+    for(const f of targetForums) {
+      isModerator = await f.isModerator(data.user?data.user.uid:'');
+      if(isModerator) break;
+    }
     if(!isModerator) {
     	if(!data.userOperationsId.includes('disabledPost')) ctx.throw(400, '权限不足');
     }
@@ -33,6 +37,7 @@ router
     if(obj.disabled) {
       // 直接封禁
       if(para.delType === 'toRecycle') {
+        await targetPost.update({toDraft: false});
         await db.KcbsRecordModel.insertSystemRecord('postBlocked', data.targetUser, ctx);
         if(para && para.illegalType) {
           await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
@@ -43,7 +48,6 @@ router
             port: ctx.port,
             ip: ctx.address,
             key: 'violationCount',
-            fid: targetPost.fid,
             tid: targetPost.tid,
             pid,
             description: para.reason || '屏蔽回复并标记为违规'
@@ -65,6 +69,7 @@ router
         await ctx.redis.pubMessage(message);
       } else {
         // 退回
+        await targetPost.update({toDraft: true});
         const mId = await db.SettingModel.operateSystemID('messages', 1);
         const message = db.MessageModel({
           _id: mId,

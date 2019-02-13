@@ -152,11 +152,11 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
   } else if (data.targetThread) {
     thread = data.targetThread;
   }
-  if(data.forum) {
+  /* if(data.forum) {
     forum = data.forum;
   } else if (data.targetForum) {
     forum = data.targetForum;
-  }
+  } */
   if(data.post) {
     post = data.post;
   } else if (data.targetPost) {
@@ -171,19 +171,19 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     newRecords.fid = post.fid;
     newRecords.tid = post.tid;
   }
-  if(forum) newRecords.fid = forum.fid;
+  // if(forum) newRecords.fid = forum.fid;
   if(data.problem) newRecords.problemId = data.problem._id;
   try{
     await newRecords.save();
   } catch(err) {
-    await db.SettingModel.operateSystemID('kcbsRecords', -1);
+    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
     ctx.throw(err);
   }
   try{
     await kcbSettings.update({$inc: {'c.totalMoney': bankChange}});
   } catch(err) {
     await newRecords.remove();
-    await db.SettingModel.operateSystemID('kcbsRecords', -1);
+    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
   }
 
   u.kcb += -1*bankChange;
@@ -221,7 +221,7 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     await fromUser.save();
     await toUser.save();
   } catch(err) {
-    await SettingModel.operateSystemID('kcbsRecords', 1);
+    // await SettingModel.operateSystemID('kcbsRecords', 1);
     if(fromUser.uid !== toUser.uid) {
       fromUser.kcb = fromUsersKcb;
       toUser.kcb = toUsersKcb;

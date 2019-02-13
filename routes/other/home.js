@@ -21,9 +21,23 @@ homeRouter
 			}
 		}
 		const {digest, sortby, page = 0} = query;
-    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+    let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+    const homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
+    // 排除话题下的文章
+    if(!homeSettings.list || !homeSettings.list.topic) {
+      const topics = await db.ForumModel.find({forumType: 'topic'}, {fid: 1});
+      const fids = topics.map(t => t.fid);
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !fids.includes(fid));
+    }
+    // 排除学科下的文章
+    if(!homeSettings.list || !homeSettings.list.discipline) {
+      const dis = await db.ForumModel.find({forumType: 'discipline'}, {fid: 1});
+      const fids = dis.map(t => t.fid);
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !fids.includes(fid));
+    }
+    data.homeSettings = homeSettings;
 		const q = {
-			fid: {$in: fidOfCanGetThreads}
+			mainForumsId: {$in: fidOfCanGetThreads}
 		};
 
 		if(digest) {
@@ -63,9 +77,8 @@ homeRouter
     });
 		// 导航
 		const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+    const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
-		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
 		data.pageSettings = (await db.SettingModel.findOnly({_id: 'page'})).c;
 
 		// 网站公告
@@ -78,10 +91,11 @@ homeRouter
       lastPost: false
     });
 
-		// 首页置顶
-    const ads = await Promise.all(data.homeSettings.ads.map(async tid => {
-      const thread = await db.ThreadModel.findOne({tid});
-      if(thread) return thread;
+    // 首页置顶
+    const ads = [];
+    await Promise.all(data.homeSettings.ads.map(async tid => {
+      const thread = await db.ThreadModel.findOne({tid, mainForumsId: {$in: fidOfCanGetThreads}}); 
+      if(thread) ads.push(thread);
     }));
     data.ads = await db.ThreadModel.extendThreads(ads, {
       forum: false,
@@ -93,7 +107,7 @@ homeRouter
 		const digestThreads = await db.ThreadModel.aggregate([
 			{
 				$match: {
-					fid: {
+					mainForumsId: {
 						$in: fidOfCanGetThreads
 					},
 					digest: true
@@ -109,7 +123,7 @@ homeRouter
           _id: 0,
           oc: 1,
           tid: 1,
-          fid: 1
+          mainForumsId: 1
         }
       }
 		]);

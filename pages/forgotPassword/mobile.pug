@@ -27,7 +27,7 @@ block content
           .row
             .col-xs-6.col-md-6
               <div class="form-group">
-              <label for="exampleInputPassword1">验证码</label>
+              <label for="exampleInputPassword1">短信验证码</label>
               <input type="text" class="form-control"  placeholder="请输入验证码" v-model='code'>
               </div>
             .col-xs-6.col-md-6
@@ -47,8 +47,9 @@ block content
             <label for="exampleInputEmail1">重复新密码</label>
             <input type="password" class="form-control" placeholder="请重复密码" v-model='password2'>
             </div>
-          <button class="btn btn-default btn-block" @click='save'>提交</button>
-          a(href=`/forgotPassword/mobile` style='display: block;padding-top: 1rem;') 通过邮箱找回密码
+          <button class="btn btn-default btn-block" v-if='!inputPassword' disabled>提交</button>
+          <button class="btn btn-default btn-block" @click='save' v-else>提交</button>
+          a(href=`/forgotPassword/email` style='display: block;padding-top: 1rem;') 通过邮箱找回密码
         </div>
         </div>
 block scripts

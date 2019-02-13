@@ -10,12 +10,24 @@ const infoBehaviorSchema = new Schema({
 		type: String,
 		index: 1,
 		default: ''
-	},
+	},/* 
 	fid: {
 		type: String,
 		index: 1,
 		default: ''
-	},
+  }, */
+  // 文章的主要分类
+  mainForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // 文章的辅助分类
+  minroForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
 	tid: {
 		type: String,
 		index: 1,

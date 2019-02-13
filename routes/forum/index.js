@@ -14,20 +14,43 @@ forumRouter
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		let forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+		let disciplineForums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user, 'discipline');
+		let topicForums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user, 'topic');
 		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
-		data.forums = forums.map(forum => forum.toObject());
+		disciplineForums = nkcModules.dbFunction.forumsListSort(disciplineForums, threadTypes);
+		topicForums = nkcModules.dbFunction.forumsListSort(topicForums, threadTypes);
+		data.forums = forums.map(forum => {
+      if(forum.toObject) {
+        forum.toObject();
+      }
+      return forum;
+    });
+		data.disciplineForums = disciplineForums.map(discipline => {
+      if(discipline.toObject) {
+        discipline.toObject();
+      }
+      return discipline;
+    });
+		data.topicForums = topicForums.map(topic => {
+      if(topic.toObject) {
+        topic.toObject();
+      }
+      return topic;
+    });
 		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
+		data.disciplineJSON = nkcModules.apiFunction.disciplineToJSON(data.forums);
+		data.topicJSON = nkcModules.apiFunction.topicToJSON(data.forums);
     ctx.template = 'interface_forums.pug';
     data.uid = user? user.uid: undefined;
 		// data.navbar = {highlight: 'forums'};
     await next();
   })
 	.post('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
-		const {displayName} = body;
-		if(!displayName) ctx.throw(400, '板块名称不能为空');
+		const {data, redis, db, body} = ctx;
+		const {displayName, forumType} = body;
+		if(!displayName) ctx.throw(400, '名称不能为空');
 		const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
-		if(sameDisplayNameForum) ctx.throw(400, '板块名称已存在');
+		if(sameDisplayNameForum) ctx.throw(400, '名称已存在');
 		let _id;
 		while(1) {
 			_id = await db.SettingModel.operateSystemID('forums', 1);
@@ -42,8 +65,9 @@ forumRouter
 			accessible: false,
 			visibility: false,
 			type: 'forum'
-		});
-		await newForum.save();
+    });
+    await newForum.save();
+    await redis.cacheForums();
 		data.forum = newForum;
 		await next();
 	})
@@ -69,14 +93,19 @@ forumRouter
     } = ctx;
 		const {
 			ForumModel,
-			ThreadModel
+			ThreadModel,
+			UsersSubscribeModel,
 		} = db;
 		const {fid} = params;
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 	  const {user} = data;
     if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
-	  await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+    const forums = await db.ForumModel.find({fid: {$in: body.post.fids}});
+    forums.push(forum);
+    for(const f of forums) {
+      await f.ensurePermission(data.userRoles, data.userGrade, data.user);
+    }
 	  const childrenForums = await forum.extendChildrenForums();
 	  if(childrenForums.length !== 0) {
 	  	ctx.throw(400, '该专业下存在其他专业，请到下属专业发表文章。');
@@ -110,17 +139,29 @@ forumRouter
     if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');*/
 
 	  const {post} = body;
-    const {c, t} = post;
+		const {c, t, fids, cids} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
 
     const {cat, mid} = post;
-    const _post = await forum.newPost(post, user, ip, cat, mid);
+		const _post = await forum.newPost(post, user, ip, cids, mid, fids);
 		data.post = _post;
     const type = ctx.request.accepts('json', 'html');
-    await forum.update({$inc: {'tCount.normal': 1}});
-    const thread = await ThreadModel.findOnly({tid: _post.tid});
+    // await forum.update({$inc: {'tCount.normal': 1}});
+		const thread = await ThreadModel.findOnly({tid: _post.tid});
+		// await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
 		data.thread = thread;
+		// 发表自动关注该学科或话题
+		const userSubscribe = await UsersSubscribeModel.findOnly({uid:user.uid});
+		if(userSubscribe.subscribeForums){
+			for(let scr of fids){
+				let index = userSubscribe.subscribeForums.indexOf(scr);
+				if(index < 0) {
+					userSubscribe.subscribeForums.unshift(scr)
+				}
+			}
+			await userSubscribe.update({$set:{subscribeForums:userSubscribe.subscribeForums}});
+		}
 		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
 		const {coverPath, frameImgPath} = ctx.settings.upload;
     const {coverify} = ctx.tools.imageMagick;
@@ -194,13 +235,21 @@ forumRouter
 		if(allChildrenFid.length !== 0) {
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
 		}
-    const count = await ThreadModel.count({fid});
+    const count = await ThreadModel.count({$or: [
+      { 
+        mainForumsId: fid
+      },
+      {
+        minorForumsId: fid
+      }
+    ]});
     if(count > 0) {
       ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
       return next()
     } else {
       await forum.remove()
-    }
+		}
+		await db.UsersSubscribeModel.updateMany({"subscribeForums":fid}, {"$pull":{"subscribeForums":fid}})
     return next()
   })
 	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
@@ -248,7 +297,9 @@ forumRouter
 		const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
 		accessibleFid.push(fid);
 		// 加载能看到入口的下一级专业
-		await forum.extendChildrenForums({fid: {$in: fidArr}});
+    await forum.extendChildrenForums({fid: {$in: fidArr}});
+    // 加载相关专业
+    await forum.extendRelatedForums(fidArr);
 		fidArr.push(fid);
 		// 拿到今天所有该专业下的用户浏览记录
 		const behaviors = await db.UsersBehaviorModel.find({
@@ -277,7 +328,7 @@ forumRouter
 			}
 		}
 
-		await forum.extendParentForum();
+    await forum.extendParentForums();
 		// 加载网站公告
 		await forum.extendNoticeThreads();
 		// 加载关注专业的用户
@@ -309,7 +360,7 @@ forumRouter
 		const digestThreads = await db.ThreadModel.aggregate([
 			{
 				$match: {
-					fid: {$in: accessibleFid},
+					mainForumsId: {$in: accessibleFid},
 					digest: true
 				}
 			},
@@ -319,17 +370,15 @@ forumRouter
 				}
 			}
 		]);
-		// 加载优秀的文章
-		data.digestThreads = await Promise.all(digestThreads.map(async thread => {
-			const post = await db.PostModel.findOnly({pid: thread.oc});
-			const forum = await db.ForumModel.findOnly({fid: thread.fid});
-			await post.extendUser();
-			thread.firstPost = post;
-			thread.forum = forum;
-			return thread;
-		}));
-		// 加载同级的专业
-		const parentForum = await forum.extendParentForum();
+    // 加载优秀的文章
+    data.digestThreads = await db.ThreadModel.extendThreads(digestThreads, {
+      parentForum: false,
+      lastPost: false
+    });
+		 // 加载同级的专业
+    const parentForums = await forum.extendParentForums();
+    let parentForum;
+    if(parentForums.length !== 0) parentForum = parentForums[0];
 		if(parentForum) {
 			// 拿到parentForum专业下能看到入口的专业id
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, parentForum.fid);
@@ -339,8 +388,8 @@ forumRouter
 			// 拿到能看到入口的所有专业id
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 			// 拿到能看到入口的顶级专业
-			data.sameLevelForums = await db.ForumModel.find({parentId: '', fid: {$in: visibleFidArr}});
-		}
+			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
+		} 
 
 		ctx.template = 'interface_forum_home.pug';
 		await next();

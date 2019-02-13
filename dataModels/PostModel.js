@@ -56,9 +56,27 @@ const postSchema = new Schema({
     type: String,
     default: ''
   },
-  fid: {
+  /* fid: {
     type: String,
     required: true,
+    index: 1
+  }, */
+  // 主要分类
+  mainForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // 辅助分类
+  minorForumsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // 自定义分类
+  customForumsId: {
+    type: [String],
+    default: [],
     index: 1
   },
   tid: {

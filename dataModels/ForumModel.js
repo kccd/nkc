@@ -16,7 +16,7 @@ const forumSchema = new Schema({
   },
   color: {
     type: String,
-    default: 'grey'
+    default: '#808080'
   },
   countPosts: {
     type: Number,
@@ -76,11 +76,12 @@ const forumSchema = new Schema({
   order: {
     type: Number,
     default: 0
-  },
+  },/* 
+
   parentId: {
     type: String,
     default: ''
-  },
+  }, */
 
   // 可访问的
   accessible: {
@@ -148,7 +149,26 @@ const forumSchema = new Schema({
     type: String,
     unique: true,
     required: true
-  },
+	},
+	// 相关专业
+	relatedForumsId: {
+		type: [String],
+    default: [],
+    index: 1
+	},
+	// 专业类型
+	//--topic 话题
+	//--discipline 学科
+	forumType: {
+		type: String,
+		default: 'discipline'
+	},
+	// 上级板块
+	parentsId: {
+		type: [String],
+    default: [],
+    index: 1
+	},
   tCount: {
     digest: {
       type: Number,
@@ -183,14 +203,21 @@ forumSchema.virtual('childrenForums')
 	})
 	.set(function(childrenForums) {
 		this._childrenForums = childrenForums;
+  });
+forumSchema.virtual('relatedForums')
+	.get(function() {
+		return this._relatedForums;
+	})
+	.set(function(relatedForums) {
+		this._relatedForums = relatedForums;
 	});
 
-forumSchema.virtual('parentForum')
+forumSchema.virtual('parentForums')
 	.get(function() {
-		return this._parentForum;
+		return this._parentForums;
 	})
-	.set(function(parentForum) {
-		this._parentForum = parentForum;
+	.set(function(parentForums) {
+		this._parentForums = parentForums;
 	});
 
 forumSchema.virtual('basicThreads')
@@ -325,54 +352,62 @@ forumSchema.methods.extendNoticeThreads = async function() {
 	return this.noticeThreads = await ThreadModel.extendThreads(threads);
 };
 
-
+/* 
+  更新当前专业信息，再更新上级所有专业的信息
+  @author pengxiguaa 2019/1/26
+*/
 forumSchema.methods.updateForumMessage = async function() {
-	const ThreadModel = require('./ThreadModel');
+	const ThreadModel = mongoose.model('threads');
 	const ForumModel = mongoose.model('forums');
 	const PostModel = mongoose.model('posts');
 	const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
 	childrenFid.push(this.fid);
-	const countThreads = await ThreadModel.count({fid: {$in: childrenFid}});
-	let countPosts = await PostModel.count({fid: {$in: childrenFid}});
+	const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
+	let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}});
 	countPosts = countPosts - countThreads;
-	const digest = await ThreadModel.count({fid: {$in: childrenFid}, digest: true});
+	const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
 	const normal = countThreads - digest;
 	const tCount = {
 		digest,
 		normal
 	};
 	const {today} = require('../nkcModules/apiFunction');
-	const countPostsToday = await PostModel.count({fid: {$in: childrenFid}, toc: {$gt: today()}});
-	await this.update({tCount, countPosts, countThreads, countPostsToday});
-	let breadcrumbForums = await this.getBreadcrumbForums();
-	breadcrumbForums = breadcrumbForums.reverse();
-	for(let forum of breadcrumbForums) {
-		const childForums = await forum.extendChildrenForums();
-		let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
-		childForums.map(f => {
-			countThreads += f.countThreads;
-			countPosts += f.countPosts;
-			countPostsToday += f.countPostsToday;
-			digest += f.tCount.digest;
-		});
-		const tCount = {
-			digest,
-			normal: (countThreads - digest)
-		};
-		await forum.update({countThreads, countPosts, countPostsToday, tCount});
-	}
+	const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}});
+  await this.update({tCount, countPosts, countThreads, countPostsToday});
+  const updateParentForumsMessage = async (forum) => {
+    if(forum.parentsId.length === 0) return;
+    const parentsForums = await ForumModel.find({fid: {$in: forum.parentsId}});
+    await Promise.all(parentsForums.map(async parentForum => {
+      const childForums = await parentForum.extendChildrenForums();
+      let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
+      childForums.map(f => {
+        countThreads += f.countThreads;
+        countPosts += f.countPosts;
+        countPostsToday += f.countPostsToday;
+        digest += f.tCount.digest;
+      });
+      const tCount = {
+        digest,
+        normal: (countThreads - digest)
+      };
+      await parentForum.update({countThreads, countPosts, countPostsToday, tCount});
+      await updateParentForumsMessage(parentForum);
+    }));
+  }
+  await updateParentForumsMessage(this);
 };
 
 
-forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
-  const SettingModel = require('./SettingModel');
-  const ThreadModel = require('./ThreadModel');
-  const PersonalForumModel = require('./PersonalForumModel');
+forumSchema.methods.newPost = async function(post, user, ip, cids, toMid, fids) {
+  const SettingModel = mongoose.model('settings');
+  const ThreadModel = mongoose.model('threads');
+  const ForumModel = mongoose.model('forums');
+  const PersonalForumModel = mongoose.model('usersPersonal');
   const tid = await SettingModel.operateSystemID('threads', 1);
   const t = {
     tid,
-    cid,
-    fid: this.fid,
+    categoriesId: cids,
+    mainForumsId: fids,
     mid: user.uid,
     uid: user.uid,
   };
@@ -384,9 +419,9 @@ forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
       throw (new Error("only personal forum's moderator is able to post"))
   }
   const thread = await new ThreadModel(t).save();
-  const _post = await thread.newPost(post, user, ip, cid);
+  const _post = await thread.newPost(post, user, ip);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
-  await this.update({$inc: {
+  await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
     'tCount.normal': 1,
     'countPosts': 1,
     'countThreads': 1
@@ -394,22 +429,31 @@ forumSchema.methods.newPost = async function(post, user, ip, cid, toMid) {
   return _post;
 };
 
-// 加载子版块
+/* 
+  加载当前专业的下级专业
+  @param q 查询专业的其他条件
+  @return 下级专业对象数组
+  @author pengxiguaa 2019/1/24
+*/
 forumSchema.methods.extendChildrenForums = async function(q) {
 	const ForumModel = mongoose.model('forums');
 	q = q || {};
-	q.parentId = this.fid;
+	q.parentsId = this.fid;
 	return this.childrenForums = await ForumModel.find(q).sort({order: 1});
 };
 
-// 加载父板块
-forumSchema.methods.extendParentForum = async function() {
-	let parentForum;
-	if(this.parentId) {
+/* 
+  加载当前专业的上级专业
+  @return 上级专业对象数组
+  @author pengxigua 2019/1/24
+*/
+forumSchema.methods.extendParentForums = async function() {
+	let parentForums = [];
+	if(this.parentsId.length !== 0) {
 		const ForumModel = mongoose.model('forums');
-		parentForum = await ForumModel.findOne({fid: this.parentId});
+		parentForums = await ForumModel.find({fid: {$in: this.parentsId}});
 	}
-	return this.parentForum = parentForum;
+	return this.parentForums = parentForums;
 };
 
 forumSchema.methods.extendFollowers = async function() {
@@ -427,7 +471,7 @@ forumSchema.methods.extendFollowers = async function() {
 // 若当前专业为第五级，则返回 [第一级, 第二级, 第三级, 第四级];
 forumSchema.methods.getBreadcrumbForums = async function() {
 	const ForumModel = mongoose.model('forums');
-  const fid = await client.smembersAsync(`forum:${this.fid}:parentForumsId`);
+	const fid = await client.smembersAsync(`forum:${this.fid}:parentForumsId`);
   if(fid.length === 0) return fid;
   const forums_ = await ForumModel.find({fid: {$in: fid}});
   const forums = [];
@@ -436,7 +480,7 @@ forumSchema.methods.getBreadcrumbForums = async function() {
     let hasChild = false;
     const {fid} = forum;
     for(const f of forums_) {
-      if(f.parentId === fid) {
+      if(f.parentsId.length !== 0 && f.parentsId[0] === fid) {
         hasChild = true;
         break;
       }
@@ -449,7 +493,8 @@ forumSchema.methods.getBreadcrumbForums = async function() {
   while(n < 1000 && forums.length !== fid.length) {
     n++;
     for(const forum of forums_) {
-      if(forums[forums.length - 1].parentId === forum.fid) {
+      const f = forums[forums.length - 1];
+      if(f.parentsId.length !== 0 && f.parentsId[0] === forum.fid) {
         forums.unshift(forum);
       }
     }
@@ -457,66 +502,6 @@ forumSchema.methods.getBreadcrumbForums = async function() {
   return forums;
 };
 
-/*// -------------------------------- 加载能访问的板块 --------------------------------
-forumSchema.statics.accessibleForums = async (options) => {
-	// fid: String, 默认为null，查找某个专业下可访问的专业，默认从所有专业中查找。
-	// grade: Number, 默认为0，查找该等级能访问的板块。
-	// roles: [String]，默认为[]，查找这些角色能访问的板块。
-	const ForumModel = mongoose.model('forums');
-	let {fid, gradeId, rolesId, uid} = options;
-	let moderatorFid = [];
-	if(uid) {
-		moderatorFid = await ForumModel.canManagerFid({uid, fid});
-	}
-	let accessibleForums = [];
-	const findForums = async (parentId) => {
-		const q = {
-			parentId,
-			accessible: true,
-			$or: [
-				{
-					relation: 'and',
-					gradesId: gradeId,
-					rolesId: {$in: rolesId}
-				},
-				{
-					relation: 'or',
-					$or: [
-						{
-							gradesId: gradeId,
-						},
-						{
-							rolesId: {$in: rolesId}
-						}
-					]
-				}
-			]
-		};
-		if(uid) {
-			q.$or.push({
-				fid: {$in: moderatorFid}
-			});
-		}
-		const forums = await ForumModel.find(q).sort({order: 1});
-		accessibleForums = accessibleForums.concat(forums);
-		await Promise.all(forums.map(async forum => {
-			await findForums(forum.fid);
-		}));
-	};
-	fid = fid || '';
-	await findForums(fid);
-	return accessibleForums;
-};
-// ------------------------------------------------------------------------------
-
-
-// ----------------------------- 加载能访问的板块fid ------------------------------
-forumSchema.statics.accessibleFid = async (options) => {
-	const ForumModel = mongoose.model('forums');
-	const forums = await ForumModel.accessibleForums(options);
-	return forums.map(forum => forum.fid);
-};
-// ------------------------------------------------------------------------------*/
 
 
 // ----------------------------- 加载能管理的板块fid ---------------------------------
@@ -550,62 +535,16 @@ forumSchema.statics.canManagerForums = async function(roles, grade, user, baseFi
 // ----------------------------- 加载能看到入口的专业 ------------------------------
 // 若forum.visibility = true, 则用户可在导航看到该专业的入口
 // forumSchema.statics.visibleForums = async (options) => {
-forumSchema.statics.visibleForums = async (roles, grade, user) => {
+forumSchema.statics.visibleForums = async (roles, grade, user, forumType) => {
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.visibleFid(roles, grade, user);
-  return await ForumModel.find({fid: {$in: fid}}).sort({order: 1});
-
-
-
-	/*let {gradeId, rolesId, fid, uid} = options;
-	const ForumModel = mongoose.model('forums');
-	await ForumModel.find();
-	let visibleForums = [];
-	let moderatorFid = [];
-	if(uid) {
-		moderatorFid = await ForumModel.canManagerFid({uid, fid});
-	}
-	const findForums = async (parentId) => {
-		const q = {
-			parentId,
-			accessible: true,
-			visibility: true,
-			$or: [
-				{
-					isVisibleForNCC: true
-				},
-				{
-					relation: 'and',
-					gradesId: gradeId,
-					rolesId:  {$in: rolesId}
-				},
-				{
-					relation: 'or',
-					$or: [
-						{
-							gradesId: gradeId
-						},
-						{
-							rolesId: {$in: rolesId}
-						}
-					]
-				}
-			]
-		};
-		if(uid) {
-			q.$or.push({
-				fid: {$in: moderatorFid}
-			})
-		}
-		const forums = await ForumModel.find(q).sort({order: 1});
-		visibleForums = visibleForums.concat(forums);
-		await Promise.all(forums.map(async forum => {
-			await findForums(forum.fid);
-		}));
-	};
-	fid = fid || '';
-	await findForums(fid);
-	return visibleForums;*/
+  let queryMap = {
+    fid: {$in: fid}
+  }
+  if(forumType){
+    queryMap.forumType = forumType;
+  }
+  return await ForumModel.find(queryMap).sort({order: 1});
 };
 // -----------------------------------------------------------------------------
 
@@ -682,69 +621,6 @@ forumSchema.methods.ensureForumPermission = function(options) {
 	}
 };
 // ------------------------------------------------------------------------------
-/*
-
-// -------------------------------- 加载可以从中拿文章的专业 -----------------------
-// 专业上的displayOnParent=true, 则该专业的文章可在上层专业显示
-forumSchema.statics.forumsOfCanGetThreads = async (options) => {
-	let {fid, gradeId, rolesId, uid} = options;
-	const ForumModel = mongoose.model('forums');
-	let resultForums = [];
-	let moderatorFid = [];
-	if(uid) {
-		moderatorFid = await ForumModel.canManagerFid({uid, fid});
-	}
-	const findForums = async (parentId) => {
-		const q = {
-			parentId,
-			accessible: true,
-			displayOnParent: true,
-			$or: [
-				{
-					relation: 'and',
-					gradesId: gradeId,
-					rolesId:  {$in: rolesId}
-				},
-				{
-					relation: 'or',
-					$or: [
-						{
-							gradesId: gradeId
-						},
-						{
-							rolesId: {$in: rolesId}
-						}
-					]
-				}
-			]
-		};
-		if(uid) {
-			q.$or.push({
-				fid: {$in: moderatorFid}
-			})
-		}
-		const forums = await ForumModel.find(q).sort({order: 1});
-		resultForums = resultForums.concat(forums);
-		await Promise.all(forums.map(async forum => {
-			await findForums(forum.fid);
-		}));
-	};
-	fid = fid || '';
-	await findForums(fid);
-	return resultForums;
-};
-// ------------------------------------------------------------------------------
-
-
-
-// ------------------------------ 加载可以从中拿文章的专业fid -----------------------
-// 专业上的displayOnParent=true, 则该专业的文章可在上层专业显示
-forumSchema.statics.fidOfCanGetThreads = async (options) => {
-	const ForumModel = mongoose.model('forums');
-	const forums = await ForumModel.forumsOfCanGetThreads(options);
-	return forums.map(f => f.fid);
-};
-// -------------------------------------------------------------------------------*/
 
 // ----------------------------- 验证是否为专家 ----------------------------
 // 若用户是某个专业的专家，则该用户是该专业以及所有子专业的专家
@@ -774,7 +650,7 @@ forumSchema.statics.getAllChildrenForums = async function(fid) {
 	const ForumModel = mongoose.model('forums');
 	let accessibleForum = [];
 	const findForums = async (parentId) => {
-		const forums = await ForumModel.find({parentId}).sort({order: 1});
+		const forums = await ForumModel.find({parentsId: parentId}).sort({order: 1});
 		accessibleForum = accessibleForum.concat(forums);
 		await Promise.all(forums.map(async forum => {
 			await findForums(forum.fid);
@@ -796,12 +672,26 @@ forumSchema.statics.getAllChildrenFid = async function(fid) {
 
 
 
-
-
+/* 
+  获取专业下的所有专业的id
+  @return 专业id数组
+  @author pengxiguaa 2019/1/26
+*/
 forumSchema.methods.getAllChildForumsId = async function() {
   return await client.smembersAsync(`forum:${this.fid}:allChildForumsId`);
 };
 
+/* 
+  获取专业下的全部专业
+  @return 专业对象数组
+  @author pengxiguaa 2019/1/26
+*/
+forumSchema.methods.getAllChildForums = async function() {
+  const ForumModel = mongoose.model('forums');
+  const allChildForumsId = await this.getAllChildForumsId();
+  const forums = await ForumModel.find({fid: {$in: allChildForumsId}});
+  return this.allChildForums = forums;
+}
 
 
 // 判断用户是否有权访问该版块
@@ -815,18 +705,30 @@ forumSchema.methods.ensurePermission = async function(roles, grade, user) {
   }
 };
 
-
-// 获取有权取出文章的专业ID
-// 控制文章是否在除当前专业的其他地方显示
-// 文章列表查询的条件构建时可用（非专业内）
+/* 获取能在上层显示文章的专业id
+  @param roles 角色对象数组
+  @param grade 用户等级对象
+  @param user user对象，主要用于判断用户是否为版主
+  @param baseFid 过滤返回的结果，只返回该专业下的专业的fid
+  @return fid数组
+  @author pengxiguaa 2019/1/24
+*/
 forumSchema.statics.getThreadForumsId = async (roles, grade, user, baseFid) => {
   const ForumModel = mongoose.model('forums');
   // 有权访问的专业ID
-  const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
+  let fid = [];
+  fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
+  if(baseFid) {
+    const forum = await ForumModel.findOnly({fid: baseFid});
+    for(const relatedFid of forum.relatedForumsId) {
+      const rFid = await ForumModel.getAccessibleForumsId(roles, grade, user, relatedFid);
+      fid = fid.concat(rFid);
+    }
+  }
   // 在上级专业不显示文章的专业ID
   const canNotFid = await client.smembersAsync('canNotDisplayOnParentForumsId');
   // 找出所有无法在父级显示的版块ID
-  return fid.filter(f => !canNotFid.includes(f));
+  return [...new Set(fid)].filter(f => !canNotFid.includes(f));
 };
 
 // 获取有权限访问的专业
@@ -892,7 +794,14 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
 
   return [...new Set(fid)];
 };
-
+/* 
+  判断用户是否具有当前操作的权限
+  @param data.user 用户对象
+  @param data.userRoles 用户所有用的角色
+  @param data.operationId 操作名
+  @return boolean 是否用户权限
+  @author pengxiguaa 2019/1/25
+*/
 forumSchema.methods.ensureModeratorsPermission = async function(data) {
   const {user, userRoles, operationId} = data;
   let hasOperation = false;
@@ -903,6 +812,7 @@ forumSchema.methods.ensureModeratorsPermission = async function(data) {
     }
   }
   if(hasOperation) return;
+  // 若没有权限，则判断用户是否为专家
   const isModerator = await this.isModerator(user);
   if(!isModerator) {
     const err = new Error('权限不足');
@@ -911,5 +821,22 @@ forumSchema.methods.ensureModeratorsPermission = async function(data) {
   }
 };
 
+/* 
+  获取相关专业
+  @param fids 能够看到入口的专业，若为空则不考虑权限
+  @return 专业对象数组
+  @author pengxiguaa 2019/1/24
+*/
+forumSchema.methods.extendRelatedForums = async function(fids) {
+  const ForumModel = mongoose.model('forums');
+  let relatedForumsId;
+  if(!fids) {
+    relatedForumsId = this.relatedForumsId;
+  } else {
+    relatedForumsId = this.relatedForumsId.filter(fid => fids.includes(fid))
+  }
+  const relatedForums = await ForumModel.find({fid: {$in: relatedForumsId}});
+  return this.relatedForums = relatedForums;
+}
 
 module.exports = mongoose.model('forums', forumSchema);

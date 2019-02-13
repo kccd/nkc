@@ -2,7 +2,7 @@
 -const {firstPost, lastPost, tid, hasCover} = thread
 -const {t, toc} = firstPost;
 -const targetUser = firstPost.user;
--const parentForum = thread.forum.parentForum;
+//- -const parentForum = thread.forum.parentForum;
 .new-content
   if thread.recycleMark
     .text-center(style="margin-bottom:0.5rem;border-radius: 2px;padding: 0.2rem 0;background:#33CCFF;text-align:center;color:#ffffff")= '↓↓↓ 该文章已退回修改，只有作者本人可以查看 ↓↓↓'
@@ -14,20 +14,27 @@
       - var title = `${targetUser.navbarDesc.username}\n`+`学术分 ${targetUser.navbarDesc.xsf}\n`+`科创币 ${targetUser.navbarDesc.kcb}\n`+`${targetUser.navbarDesc.cs}`;
       a(href=`/u/${targetUser.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= targetUser.username
     if data.forum
+      -let displayForumNav = false;
+      for f in thread.forums
+        if f.fid !== data.forum.fid
+          -displayForumNav = true;
+          span.new-content-forumAbbr(style=`background-color:${f.color};`)
+            a(style='text-decoration: none;' href=`/f/${f.fid}` title=`${f.description || ''}` data-toggle="tooltip" data-placement="bottom")= f.displayName
+      if !displayForumNav && thread.categories.length !== 0
+        for category in thread.categories
+          if data.threadTypesId.includes(category.cid)
+            span.new-content-forumAbbr(style=`background-color:${data.forum.color};`)
+              a(style='text-decoration: none;' href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
 
-      if data.forum.fid !== thread.fid
-        span.new-content-forumAbbr(style=`background-color:${thread.forum.color};`)
-          a(style='text-decoration: none;' href=`/f/${thread.forum.fid}` title=`${thread.forum.description || ''}` data-toggle="tooltip" data-placement="bottom")= thread.forum.displayName
-
-      if thread.category
-        span.new-content-forumAbbr(style=`background-color:${thread.forum.color};`)
-          a(style='text-decoration: none;' href=`/f/${data.forum.fid}?cat=${thread.category.cid}`)= thread.category.name
     else
-      if parentForum
-        span.new-content-forumAbbr(style=`background-color:${parentForum.color};`)
-          a(style='text-decoration: none;' href=`/f/${parentForum.fid}` title=`${parentForum.description || ''}` data-toggle="tooltip" data-placement="bottom")= parentForum.displayName
-      span.new-content-forumAbbr(style=`background-color:${thread.forum.color};`)
-        a(style='text-decoration: none;' href=`/f/${thread.forum.fid}` title=`${thread.forum.description || ''}` data-toggle="tooltip" data-placement="bottom")= thread.forum.abbr || thread.forum.displayName
+      -let forum;
+      for f in thread.forums
+        -forum = f;
+        if f.forumType === 'topic'
+          -break;
+      span.new-content-forumAbbr(style=`background-color:${forum.color};`)
+        a(style='text-decoration: none;' href=`/f/${forum.fid}` title=`${forum.description || ''}` data-toggle="tooltip" data-placement="bottom")= forum.displayName
+
     span.icon-font(title=`${new Date(toc).toLocaleString()}`)=fromNow(toc)
     if thread
       span(title=`${thread.hits}次浏览` data-toggle="tooltip" data-placement="bottom")
@@ -55,10 +62,11 @@
       else if(!ellipsis)
         -ellipsis = true
         span(style='padding-left: 0.5rem; padding-right: 0.5rem; margin: 0.3rem; background-color: #04A5EA; color: white; border-radius: 0.4rem;') ...
-    if userCollectionId
-      input.ThreadCheckboxes(id=`${userCollectionId}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
-    else
-      input.ThreadCheckboxes(id=`${tid}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
+    if !hiddenCheckBox
+      if userCollectionId
+        input.ThreadCheckboxes(id=`${userCollectionId}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
+      else
+        input.ThreadCheckboxes(id=`${tid}` type='checkbox' style=`float: right; ${showTicks?'':'display:none;'}`)
   .new-content-body
     -let heightType = 'max-height';
     if hasCover

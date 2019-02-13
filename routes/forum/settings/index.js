@@ -4,6 +4,7 @@ const infoRouter = require('./info');
 const imageRouter = require('./image');
 const categoryRouter = require('./category');
 const permissionRouter = require('./permission');
+const mergeRouter = require('./merge');
 settingsRouter
 	.use('/', async (ctx, next) => {
 		const {data, db, params, url} = ctx;
@@ -13,16 +14,16 @@ settingsRouter
 		const urlArr = url.split('/');
 		const type = urlArr[urlArr.length-1];
 		data.type = (type === 'settings'?'info': type);
-		data.breadcrumbForums = await data.forum.getBreadcrumbForums();
+    data.breadcrumbForums = await data.forum.getBreadcrumbForums();
 		const length = data.breadcrumbForums.length;
-		data.level1Forums = await db.ForumModel.find({parentId: ''}).sort({order: 1});
+    data.level1Forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		if(length === 0) {
 			data.sameLevelForums = data.level1Forums;
 		} else {
 			const parentForum = data.breadcrumbForums[data.breadcrumbForums.length - 1];
-			data.sameLevelForums = await db.ForumModel.find({parentId: parentForum.fid}).sort({order: 1});
+			data.sameLevelForums = await db.ForumModel.find({parentsId: parentForum.fid}).sort({order: 1});
 		}
-		data.childrenForums = await db.ForumModel.find({parentId: data.forum.fid}).sort({order: 1});
+		data.childrenForums = await db.ForumModel.find({parentsId: data.forum.fid}).sort({order: 1});
 		await next();
 	})
 	.get('/', async (ctx) => {
@@ -32,5 +33,6 @@ settingsRouter
 	.use('/image', imageRouter.routes(), imageRouter.allowedMethods())
 	.use('/permission', permissionRouter.routes(), permissionRouter.allowedMethods())
 	.use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
-	.use('/info', infoRouter.routes(), infoRouter.allowedMethods());
+	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+	.use('/merge', mergeRouter.routes(), mergeRouter.allowedMethods());
 module.exports = settingsRouter;

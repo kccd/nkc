@@ -30,7 +30,9 @@ function showChildrenForums(fid, color) {
 		});*/
 		const childrenDivLi = $('.forumLi' + fid + ' li.list-group-item.home-forum-list-li');
 		childrenDivLi.css({
-			'border-left': '3px solid '+color
+      'border-left': '3px solid '+color,
+      'padding-left': '5px',
+      'border-radius': '0'
 		});
 	} else {
 		childrenDiv.slideUp(function() {
@@ -38,7 +40,9 @@ function showChildrenForums(fid, color) {
 				'border-left': '1px solid #eeeeee'
 			});*/
 			$('.forumLi' + fid + ' li.list-group-item.home-forum-list-li').css({
-				'border-left': '1px solid #eeeeee'
+        'border-left': 'none',
+        'padding-left': '0',
+        'border-radius': '0'
 			});
 		});
 	}
@@ -58,26 +62,13 @@ function showForumsDiv() {
 	div.slideToggle();
 }
 window.onresize = function() {
-	displayRightDiv();
-	if($(window).width() < 992) {// 删除悬浮div，显示原有div
-		var fixedDiv = $('.fixedDiv');
-		if(fixedDiv.length !== 0) {
-			fixedDiv.remove();
-			$('#forumsDiv').hide();
-			$('#navDiv .row').show();
-		}
-	} else { // 隐藏原有div，生成悬浮div
-		$('#navDiv .row').hide();
-		$('#forumsDiv').show();
-		createNavDiv();
-		hiddenThreads();
-	}
+  displayRightDiv();
+  displayLeftDiv();
 };
 $(function() {
-	hiddenThreads();
 	if($(window).width() >= 992) {// 隐藏原有div
-		$('#navDiv').find('.row').hide();
-		createNavDiv();
+		// $('#navDiv').find('.row').hide();
+		// createNavDiv();
 	}
 });
 
@@ -101,7 +92,7 @@ function hiddenThreads() {
 function createNavDiv() {
 	var navDiv = $('#navDiv');
 	var fixedDiv = $('.fixedDiv');
-	var html = navDiv.html();
+  var html = navDiv.html();
 	var padding = navDiv.css('padding-left');
 	var width = navDiv.width();
 	var offset = navDiv.offset();
@@ -114,7 +105,8 @@ function createNavDiv() {
 			'top': offset.top + 'px',
 			'bottom': '0px',
 			'left': offset.left + parseFloat(padding) + 'px',
-		}).html(html);
+    }).html(html);
+    fixedDiv.find('#forumsDiv').remove();
 		fixedDiv.find('.row').show();
 		$('body').append(fixedDiv);
 	}
@@ -153,7 +145,8 @@ function createRightDiv() {
 }
 
 $(document).scroll(function() {
-	displayRightDiv();
+  displayLeftDiv();
+  displayRightDiv();
 });
 
 function displayRightDiv() {
@@ -170,4 +163,21 @@ function displayRightDiv() {
 			$('#fixedThreadsListDiv').remove();
 		}
 	}
+}
+
+function displayLeftDiv() {
+  if($(window).width() < 992) {
+    $('.fixedDiv').remove();
+  } else {
+    var leftDiv = $('#navDiv');
+    var height = leftDiv.height();
+    var top = leftDiv.offset().top;
+    var scrollTop = $(document).scrollTop();
+    if(height + top - scrollTop < 65) {
+      createNavDiv();   
+    } else {
+      $('.fixedDiv').remove();
+      $('#forumsDiv').show();
+    }
+  }
 }

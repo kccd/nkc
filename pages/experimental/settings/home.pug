@@ -17,6 +17,7 @@ block content
           a.list-group-item(class=data.type==='top'?'active': '' href=`/e/settings/home/top`) 置顶
           a.list-group-item(class=data.type==='logo'?'active': '' href=`/e/settings/home/logo`) LOGO
           a.list-group-item(class=data.type==='notice'?'active': '' href=`/e/settings/home/notice`) 网站公告
+          a.list-group-item(class=data.type==='list'?'active': '' href=`/e/settings/home/list`) 首页文章列表
       .col-xs-12.col-md-10
         if data.type === 'top'
           if data.ads.length === 0
@@ -52,6 +53,26 @@ block content
               textarea.form-control#threadId(placeholder='文号' rows=8)= data.homeSettings.noticeThreadsId?data.homeSettings.noticeThreadsId.join(','): ''
             .form-group
               button.btn.btn-default(onclick='saveNotice()') 保存
+
+        else if data.type === 'list'
+          -const homeSettings = data.homeSettings;
+          .row
+            .col-xs-12.col-md-12
+              h4 首页可显示文章的专业类型
+              .checkbox
+                span 话题
+                label
+                  if homeSettings.list && homeSettings.list.topic
+                    input(type='checkbox' name='list' checked=true)
+                  else   
+                    input(type='checkbox' name='list')
+                span 学科  
+                label
+                  if homeSettings.list && homeSettings.list.discipline
+                    input(type='checkbox' name='list' checked=true)
+                  else   
+                    input(type='checkbox' name='list')
+              button.btn.btn-primary(onclick='saveHomeListSettings()') 保存    
 
         else
           .row

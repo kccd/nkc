@@ -6,8 +6,12 @@ voteRouter
     const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
-    const forum = await thread.extendForum();
-    const isModerator = await forum.isModerator(data.user);
+    const forums = await thread.extendForums(['mainFourms', 'minorForums']);
+    let isModerator;
+    for(const f of forums) {
+      isModerator = await f.isModerator(data.user);
+      if(isModerator) break;
+    }
     const options = {
       roles: data.userRoles,
       grade: data.userGrade,
