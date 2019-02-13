@@ -16,49 +16,13 @@ block content
           .panel-body
             div.form-horizontal
               .form-group
-                label.col-sm-2.control-label 被合并专业选择
+                label.col-sm-2.control-label 合并至目标专业
                 .col-sm-10
                   - data.noShowCategory = true;
                   include forumlist_dropdown
-              //- .form-group
-              //-   label.col-sm-2.control-label 专业简称
-              //-   .col-sm-5
-              //-     input.form-control#abbr(type='text' placeholder='请输入专业简称' value=forum.abbr || '')
-              //- .form-group
-              //-   label.col-sm-2.control-label 专业颜色
-              //-   .col-sm-5
-              //-     //- input.form-control.demo#color(type='text' value=forum.color || '' data-control='hue')
-              //- .form-group
-              //-   label.col-sm-2.control-label 专业简介
-              //-   .col-sm-5
-              //-     textarea.form-control#brief(placeholder='请输入专业简介（15字以内）' rows=2)= forum.brief || ''
-              //- .form-group
-              //-   label.col-sm-2.control-label 专业介绍
-              //-   .col-sm-5
-              //-     textarea.form-control#description(placeholder='请输入专业介绍' rows=5)= forum.description || ''
-              //- .form-group
-              //-   label.col-sm-2.control-label 专业说明
-              //-   .col-sm-5
-              //-     button.btn.btn-default(onclick=`submit("${data.forum.fid}", toEditor)`) 去编辑器
-              //- .form-group
-              //-   label.col-sm-2.control-label 专业公告
-              //-   .col-sm-5
-              //-     input.form-control#noticeThreadsId(placeholder='请输入文号' value=forum.noticeThreadsId?forum.noticeThreadsId.join(','): '')
-              //- .form-group
-              //-   label.col-sm-2.control-label 快速入门
-              //-   .col-sm-5
-              //-     input.form-control#basicThreadsId(placeholder='请输入文号' value=forum.basicThreadsId ? forum.basicThreadsId.join(','): '')
-              //- .form-group
-              //-   label.col-sm-2.control-label 推荐阅读
-              //-   .col-sm-5
-              //-     input.form-control#valuableThreadsId(placeholder='请输入文号' value=forum.valuableThreadsId ? forum.valuableThreadsId.join(','): '')
-              //- .form-group
-              //-   label.col-sm-2.control-label 主管专家
-              //-   .col-sm-5
-              //-     input.form-control#moderators(placeholder='请输入uid' value=forum.moderators? forum.moderators.join(','): '')
               .form-group
                 .col-sm-5.col-sm-offset-2
-                  button.btn.btn-default(onclick=`submit("${forum.fid}")`) 开始合并
+                  button.btn.btn-default#startConcat(onclick=`submit("${forum.fid}")`) 开始合并
 block scripts
   script(src='/jquery/jquery.minicolors.js')
   script(src='/module_forum_settings.js')

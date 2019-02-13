@@ -380,8 +380,9 @@ var common=(function(){
   }
   common.URLifyHTML = function(content){
     return content.replace(URLExtractRegex,function(match,p1,p2){
-      p3 = p2.replace(/(https|http):\/\//igm,'')
-      return p1+'<a href="http://'+ p3 +'">'+p2+'</a>'
+      // p3 = p2.replace(/(https|http):\/\//igm,'');
+      // return p1+'<a href="http://'+ p3 +'">'+p2+'</a>';
+      return p1+'<a href="'+p2+'">'+p2+'</a>';
     })
   }
 
@@ -1439,7 +1440,7 @@ function shareTo(shareType, type, str, title, pid){
     }
     nkcAPI('/s', "POST", para)
     .then(function(data) {
-      var newUrl = 'http://' + host + data.newUrl;
+      var newUrl = 'https://' + host + data.newUrl;
       if(type == "link") {
         var copyAreaId = "copyArea"+pid;
         var copyLinkId = "copyLink"+pid;

@@ -1,5 +1,6 @@
 
 function submit(fid) {
+  $("#startConcat").attr('disabled',true);
   try{
     var mergeForumId = getResultForumId();
   }catch(e) {
@@ -11,10 +12,12 @@ function submit(fid) {
   }
 	nkcAPI('/f/'+fid+'/settings/merge', 'PATCH', obj)
 		.then(function() {
-			screenTopAlert('保存成功');
+      screenTopAlert('保存成功');
+      $("#startConcat").attr('disabled',false);
 		})
 		.catch(function(data) {
-			screenTopWarning(data.error || data);
+      screenTopWarning(data.error || data);
+      $("#startConcat").attr('disabled',false);
 		})
 
 }
