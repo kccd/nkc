@@ -248,7 +248,8 @@ forumRouter
       return next()
     } else {
       await forum.remove()
-    }
+		}
+		await db.UsersSubscribeModel.updateMany({"subscribeForums":fid}, {"$pull":{"subscribeForums":fid}})
     return next()
   })
 	.use('/:fid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())

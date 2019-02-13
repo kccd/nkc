@@ -1,0 +1,32 @@
+extends bootstrap_base
+block title
+  title 合并设置
+  -const mainContainer1400 = true;
+  -const forum = data.forum;
+  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
+block content
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-2
+        include module_forum_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 合并设置
+          .panel-body
+            div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 合并至目标专业
+                .col-sm-10
+                  - data.noShowCategory = true;
+                  include forumlist_dropdown
+              .form-group
+                .col-sm-5.col-sm-offset-2
+                  button.btn.btn-default#startConcat(onclick=`submit("${forum.fid}")`) 开始合并
+block scripts
+  script(src='/jquery/jquery.minicolors.js')
+  script(src='/module_forum_settings.js')
+
+  script(src='/interface_common.js')
+  script(src='/module_dropdown.js?v=3')
+  script(src='/interface_forum_settings_merge.js')

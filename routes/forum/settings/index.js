@@ -4,6 +4,7 @@ const infoRouter = require('./info');
 const imageRouter = require('./image');
 const categoryRouter = require('./category');
 const permissionRouter = require('./permission');
+const mergeRouter = require('./merge');
 settingsRouter
 	.use('/', async (ctx, next) => {
 		const {data, db, params, url} = ctx;
@@ -32,5 +33,6 @@ settingsRouter
 	.use('/image', imageRouter.routes(), imageRouter.allowedMethods())
 	.use('/permission', permissionRouter.routes(), permissionRouter.allowedMethods())
 	.use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
-	.use('/info', infoRouter.routes(), infoRouter.allowedMethods());
+	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+	.use('/merge', mergeRouter.routes(), mergeRouter.allowedMethods());
 module.exports = settingsRouter;
