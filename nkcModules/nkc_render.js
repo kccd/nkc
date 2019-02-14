@@ -337,7 +337,6 @@ function nkc_render(options){
     })
   }
 
-
   var getHTMLForResource = function(r,allthumbnail){
     var rid = r.rid
     var oname_safe = plain_escape(r.oname)
@@ -481,11 +480,16 @@ function nkc_render(options){
       var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm']
       for(var i in post.resources){
         var r = post.resources[i];
+        var filesize = r.size;
+        var k = function(number){
+          return (number || 0).toPrecision(3)
+        }
+        var fileSizeString = (filesize>1024)?((filesize>1048576)?k(filesize/1048576)+'M':k(filesize/1024)+'k'):k(filesize)+'b';
         if(extArray.indexOf(r.ext) > -1){
           continue;
         }
         var reg = new RegExp(r.oname, 'gm');
-        html = html.replace(reg,r.oname+'<span class="PostResourceCounter">'+r.hits+'次下载</span>')
+        html = html.replace(reg,r.oname+'<span class="PostResourceFileSize">'+fileSizeString+'</span><span class="PostResourceCounter">'+r.hits+'次下载</span>')
       }
     }
     html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>')

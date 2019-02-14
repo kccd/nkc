@@ -23,24 +23,35 @@ searchRouter.get('/', async(ctx, next) => {
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     data.result = await Promise.all(searchResult.hits.hits.map(async r => {
       const pid = r._id;
-      try {
-        const post = await PostModel.findOnly({pid, fid: {$in: accessibleFid}});
-        post.t = r.highlight? r.highlight.t: r.t;
-        await post.extendUser();
-        await post.extendThread();
-        await post.thread.extendFirstPost();
-        await post.thread.extendForum();
-        post.c = APP_nkc_render.experimental_render(post);
-        post.t = apiFunction.obtainPureText(post.t,true,20)
-        post.c = apiFunction.obtainPureText(post.c,true,200)
-        if(accessibleFid.includes(post.thread.fid)){
-          return post.toObject()
-        }else{
-          return null
-        }
-      } catch(e) {
-        return null
-      }
+      const post = await PostModel.findOne({pid, mainForumsId: {$in: accessibleFid}});
+      if(!post) return null;
+      post.t = r.highlight? r.highlight.t: r.t;
+      await post.extendUser();
+      await post.extendThread();
+      await post.thread.extendFirstPost();
+      await post.thread.extendForums(['mainForums']);
+      post.c = APP_nkc_render.experimental_render(post);
+      post.t = apiFunction.obtainPureText(post.t,true,20)
+      post.c = apiFunction.obtainPureText(post.c,true,200)
+      return post.toObject()
+      // try {
+      //   const post = await PostModel.findOnly({pid, fid: {$in: accessibleFid}});
+      //   post.t = r.highlight? r.highlight.t: r.t;
+      //   await post.extendUser();
+      //   await post.extendThread();
+      //   await post.thread.extendFirstPost();
+      //   await post.thread.extendForum();
+      //   post.c = APP_nkc_render.experimental_render(post);
+      //   post.t = apiFunction.obtainPureText(post.t,true,20)
+      //   post.c = apiFunction.obtainPureText(post.c,true,200)
+      //   if(accessibleFid.includes(post.thread.fid)){
+      //     return post.toObject()
+      //   }else{
+      //     return null
+      //   }
+      // } catch(e) {
+      //   return null
+      // }
     }));
     // console.log(data.result)
     // console.log(searchResult)
