@@ -238,12 +238,12 @@ function uploadFileAPI(url, method, formData, onUploadProgress) {
 * @param data 需要显示的字符串
 * @author pengxiguaa 2019/1/15
 * */
-function screenTopAlert(data) {
+/* function screenTopAlert(data) {
   mdui.snackbar({
     message: data,
     position: 'top'
   });
-}
+} */
 
 /*
 * 页面顶部弹出提示
@@ -251,12 +251,12 @@ function screenTopAlert(data) {
 * @return null
 * @author pengxiguaa 2019/1/15
 * */
-function screenTopWarning(data) {
+/* function screenTopWarning(data) {
   mdui.snackbar({
     message: data.message || data.error || data,
     position: 'top'
   });
-}
+} */
 
 /*
 * 播放新信息提示音

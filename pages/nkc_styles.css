@@ -7,6 +7,9 @@ html {
 [v-cloak] {
   display: none;
 }
+.container-fluid.max-width{
+  max-width: 1400px;
+}
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
 }

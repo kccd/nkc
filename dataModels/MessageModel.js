@@ -98,6 +98,65 @@ const messageSchema = new Schema({
     virtuals: true
   }
 });
+/* 
+  判断用户是否有权限发送信息
+  @param fromUid 当前用户ID
+  @param toUid 对方用户ID
+  @parma sendToEveryOne 是否拥有”不加好友也能发送信息“的权限
+  @author pengxiguaa 2019/2/12
+*/
+messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) => {
+  const UserModel = mongoose.model('users');
+  const MessageModel = mongoose.model('messages');
+  const FriendModel = mongoose.model('friends');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const user = await UserModel.findOnly({uid: fromUid});
+  const targetUser = await UserModel.findOnly({uid: toUid});
+  const {messageCountLimit, messagePersonCountLimit} = await user.getMessageLimit();
+  const today = apiFunction.today();
+  const messageCount = await MessageModel.count({
+    s: user.uid,
+    ty: 'UTU',
+    tc: {
+      $gte: today
+    }
+  });
+  if(messageCount >= messageCountLimit) {
+    throwErr(403, `根据您的证书和等级，您每天最多只能发送${messageCountLimit}条信息`);
+  }
+  let todayUid = await MessageModel.aggregate([
+    {
+      $match: {
+        s: user.uid,
+        ty: 'UTU',
+        tc: {
+          $gte: today
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$r',
+      }
+    }
+  ]);
+  todayUid = todayUid.map(o => o.uid);
+  if(!todayUid.includes(toUid)) {
+    if(todayUid.length >= messagePersonCountLimit) {
+      throwErr(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
+    }
+  }
+
+  // 判断对方是否设置了“需要添加好友之后才能聊天”
+  const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+  if(!friendRelationship && !sendToEveryOne) {
+    const targetUserGeneralSettings = await UsersGeneralModel.findOnly({uid: targetUser.uid});
+    const onlyReceiveFromFriends = targetUserGeneralSettings.messageSettings.onlyReceiveFromFriends;
+    if(onlyReceiveFromFriends) throwErr(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
+  }
+
+}
 
 messageSchema.statics.extendReminder = async (arr) => {
   const moment = require('moment');

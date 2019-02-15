@@ -16,6 +16,10 @@ examRouter
           disabledB: {$ne: true}
         }
       ]}).sort({order: 1});
+    const papers = await db.examsPaperModel.find({
+      passed: true
+    }).sort({toc: -1});
+    
     await next();
   })
   .use('/paper', paperRouter.routes(), paperRouter.allowedMethods())

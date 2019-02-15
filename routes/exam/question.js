@@ -1,6 +1,67 @@
 const Router = require('koa-router');
 const router = new Router();
 router
+  .post('/', async (ctx, next) => {
+    const {db, data, body, tools, settings, fs} = ctx;
+    const {user} = data;
+    const {contentLength} = tools.checkString;
+    const {fields, files} = body;
+    const {file} = files;
+    let {question} = fields;
+    question = JSON.parse(question);
+    let {
+      type,
+      public,
+      hasImage,
+      volume,
+      content,
+      answer,
+      fid
+    } = question;
+    if(!type) ctx.throw(400, '答题方式不能为空');
+    if(!volume) ctx.throw(400, '试题难度不能为空');
+    if(!public) {
+      const forum = await db.ForumModel.findOne({fid});
+      if(!forum) ctx.throw(404, '专业领域不存在');
+    }
+    if(content === '') ctx.throw(400, '试题内容不能为空');
+    if(contentLength(content) > 500) ctx.throw(400, '试题内容字数不能超过500');
+    // 检测试题答案数量是否正确、内容是否为空
+    if(type === 'ch4') {
+      if(answer.length !== 4) ctx.throw(400, '答案数量不足');
+      for(const a of answer) {
+        if(a === '') ctx.throw(400, '答案不能为空');
+        if(contentLength(a) > 200) ctx.throw(400, '答案字数不能超过200');
+      }
+    } else {
+      if(answer[0] === '') ctx.throw(400, '答案不能为空');
+      if(contentLength(answer[0]) > 200) ctx.throw(400, '答案字数不能超过200');
+      answer = [answer[0]];
+    }
+    const _id = await db.SettingModel.operateSystemID('questions', 1);
+    const q = db.QuestionModel({
+      _id,
+      fid,
+      type,
+      public,
+      volume,
+      content,
+      answer,
+      uid: user.uid,
+      hasImage: false
+    });
+    if(file) {
+      const {path} = file;
+      const questionPath = settings.upload.questionImagePath;
+      const targetPath = questionPath + '/' + q._id + '.jpg';
+      await tools.imageMagick.questionImageify(path, targetPath);
+      await fs.unlink(path);
+      q.hasImage = true;
+    }
+    await q.save();
+    data.question = (await db.QuestionModel.extendQuestions([q]))[0];
+    await next();
+  })
   .patch('/:_id', async (ctx, next) => {
     const {params, db, body, data, tools, settings, fs} = ctx;
     const {user} = data;

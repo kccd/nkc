@@ -1,3 +1,37 @@
+.exam-logo{
+  height: 7rem;
+  width: 7rem;
+}
+.exam-image{
+  width: 100%;
+}
+.exam-add-question-btn{
+  height: 5rem;
+  display: block;
+  font-size: 2rem;
+  text-align: center;
+  line-height: 5rem;
+  background-color: #33b7ae;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 2px;
+}
+.exam-add-question-btn:hover, .exam-add-question-btn:visited, .exam-add-question-btn:active, .exam-add-question-btn:link{
+  text-decoration: none;
+  color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 .question-editor{
   width: 100%;
   background-color: #fff;

@@ -1,61 +1,74 @@
+var defaultQuestion = {
+  volume: 'A',
+  type: 'ch4',
+  content: '',
+  answer: [],
+  answerObj: [
+    {
+      text: ''
+    },
+    {
+      text: ''
+    },
+    {
+      text: ''
+    },
+    {
+      text: ''
+    }
+  ],
+  baseUrl: ''
+};
 var app = new Vue({
   el: '#app',
   data: {
-    question: {
-      type: 'ch4',
-      public: false,
-      hasImage: false,
-      volume: 'A',
-      content: '',
-      forum: '',
-      answer: [],
-      answerObj: [
-        {
-          text: ''
-        },
-        {
-          text: ''
-        },
-        {
-          text: ''
-        },
-        {
-          text: ''
-        }
-      ]
-    },
+    submitted: false,
+    submitting: '',
+    cid: '',
+    auth: null,
+    categories: [],
+    question: JSON.parse(JSON.stringify(defaultQuestion))
   },
   mounted: function() {
-    var data = document.getElementById('data');
-    data = JSON.parse(data.innerHTML);
-    if(data.question) {
-      this.extendAnswers(data.question);
-      this.question = data.question;
+    var url = window.location.href;
+    if(url.indexOf('?') !== -1) {
+      url += '&t=' + Date.now();
+    } else {
+      url += '?t=' + Date.now();
     }
-    vueSelectForum.init({
-      func:this.selectedForum
-    });
+    kcAPI(url, 'get', {})
+      .then(function(data) {
+        app.categories = data.categories;
+        if(data.question) {
+          app.question = data.question;
+          app.auth = data.question.auth;
+          app.question.answerObj = [];
+          for(var i = 0; i < app.question.answer.length; i++) {
+            app.question.answerObj.push({
+              text: app.question.answer[i]
+            });
+          }
+          if(app.question.answerObj.length === 1) {
+            for(var i = 0; i < 3; i++) {
+              app.question.answerObj.push({text: ''})
+            }
+          }
+        } else {
+          if(data.cid) {
+            for(var i = 0; i < app.categories.length; i++) {
+              if(data.cid === app.categories[i]._id) {
+                app.question.cid = data.cid;
+                continue;
+              }
+            }
+          }
+        }
+      })
+      .catch(function(data) {
+        screenTopWarning(data);
+      })
   },
   methods: {
-    showSelectForumPanel: function() {
-      vueSelectForum.app.show();
-    },
-    selectedForum: function(forum) {
-      this.question.forum = forum;
-    },
-    extendAnswers: function(question) {
-      if(question.type === 'ans') {
-        return question.answerObj = [{text: question.answer[0]}]
-      };
-      var answer = question.answer;
-      var answerObj = [];
-      for(var i = 0; i < answer.length; i++) {
-        answerObj.push({
-          text: answer[i]
-        });
-      }
-      question.answerObj = answerObj;
-    },
     reset: function() {
       this.question = JSON.parse(JSON.stringify(defaultQuestion));
       this.submitting = '';
@@ -84,16 +97,10 @@ var app = new Vue({
     },
     save: function() {
       var question = this.question;
-      if(question.public === 'true' || question.public === true) {
-        question.public = true;
-      } else {
-        question.public = false;
-      }
-      if(!question.public) {
-        if(!question.forum) return screenTopWarning('请选择专业领域');
-        question.fid = question.forum.fid;
-      }
+      if (!question.cid) return screenTopWarning('请选择试题所属科目');
       if (!question.content) return screenTopWarning('请输入题目内容');
+      if(app.auth === 'true' || app.auth === true) question.auth = true;
+      if(app.auth === 'false' || app.auth === false) question.auth = false;
       if (question.type === 'ch4') {
         if (question.answerObj.length !== 4) return screenTopWarning('单项选择题答案个数错误');
         for (var i = 0; i < question.answerObj.length; i++) {
@@ -114,34 +121,29 @@ var app = new Vue({
       delete q.baseUrl;
       delete q.arr;
       delete q.user;
-      delete q.forum;
-      delete q.answerObj;
-      var url = '/exam/question';
+      var url = '/exam/category/' + question.cid;
       var method = 'POST';
       if (q._id) {
         url = '/exam/question/' + q._id;
         method = 'PATCH';
       }
-      console.log(q);
       formData.append('question', JSON.stringify(q));
       submitting = '提交中';
-      uploadFilePromise(url, formData, function (e) {
+      uploadFileAPI(url, method, formData, function (e) {
         var num = ((e.loaded/e.total)*100).toFixed(2);
         if(num > 100) num = 100;
         app.submitting = '提交中... ' + num + '%';
-      }, method)
+      })
         .then(function () {
-          window.location.reload();
-          /* if(question._id) {
+          if(question._id) {
             window.location.href = '/exam/category/' + question.cid;
           } else {
             app.submitted = true;
-          } */
+          }
         })
         .catch(function (data) {
           screenTopWarning(data);
-          /* screenTopWarning(data);
-          app.submitting = '提交'; */
+          app.submitting = '提交';
         })
     }
   }

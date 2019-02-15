@@ -28,7 +28,8 @@ const chatSchema = new Schema({
   },
   tlm: {
     type: Date,
-    index: 1
+    index: 1,
+    default: Date.now
   },
   total: {
     type: Number,
@@ -47,7 +48,65 @@ chatSchema.pre('save', function(next) {
   next();
 });
 
+/* 
+  更新或创建‘已创建的聊天’中的记录
+  若记录已存在则更新记录，若记录不存在则创建记录
+  @param uid 当前用户ID
+  @param targetUid 对方用户ID
+  @author pengxiguaa 2019/2/12
+*/
+chatSchema.statics.createChat = async (uid, targetUid, both) => {
+  const CreatedChatModel = mongoose.model('createdChat');
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+  let chat = await CreatedChatModel.findOne({uid: uid, tUid: targetUid});
+  // 获取用户间的最新一条信息（可能不存在）
+  let message = await MessageModel.findOne({ty: 'UTU', $or: [{s: uid, r: targetUid}, {s: targetUid, r: uid}]}).sort({tc: -1});
+  // 获取用户间的信息总数
+  const total = await MessageModel.count({$or: [{s: uid, r: targetUid}, {r: uid, s: targetUid}]});
+  // 没有发过信息
+  if(!message) {
+    message = {
+      tc: Date.now(),
+      _id: null
+    }
+  }
+  // 不存在聊天
+  if(!chat) {
+    chat = CreatedChatModel({
+      _id: await SettingModel.operateSystemID('createdChat', 1),
+      uid: uid,
+      tUid: targetUid,
+      lmId: message._id
+    });
+    await chat.save();
+  }
+  // 更新聊天
+  await chat.update({
+    tlm: message.tc,
+    lmId: message._id,
+    total
+  });
+  // 若对方也需要生成聊天记录，同理
+  if(both) {
+    let targetChat = await CreatedChatModel.findOne({uid: targetUid, tUid: uid});
+    if(!targetChat) {
+      targetChat = CreatedChatModel({
+        _id: await SettingModel.operateSystemID('createdChat', 1),
+        uid: targetUid,
+        tUid: uid,
+        lmId: message._id
+      });
+      await targetChat.save();
+    }
+    await targetChat.update({
+      tlm: message.tc,
+      lmId: message._id,
+      total,
+      unread: await MessageModel.count({s: uid, r: targetUid, vd: false})
+    });
+  }
+};
 
 const CreatedChatModel = mongoose.model('createdChat', chatSchema);
-
 module.exports = CreatedChatModel;

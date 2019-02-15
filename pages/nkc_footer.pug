@@ -24,7 +24,8 @@ if !hiddenFooter
     -var classString = mainContainer1400?'container-fluid':'container'
     -var styleString = mainContainer1400?'max-width:1400px;':'';
     .container-fluid(style='background-color: #f6f6f6;padding-top: 2rem;border-top: 1px solid #dddddd;margin-top: 3rem;')
-      div(class=`${classString}` style=`${styleString}`)
+      //- div(class=`${classString}` style=`${styleString}`)
+      div.container-fluid.max-width
         .row
           .col-md-8
             ul.HomeFriendlyLink
@@ -32,7 +33,7 @@ if !hiddenFooter
               if data.navbar && data.navbar.highlight === 'latest'
                 include nkc_friendlies.pug
             //hr.hrNarrowSpace
-            p #{data.serverSettings.serverName} &nbsp;
+            p Github &nbsp
               a(href=`${data.serverSettings.github}` target='_blank') #{data.serverSettings.github}
             p #{data.serverSettings.copyright}
             p.lighttext= data.serverSettings.record

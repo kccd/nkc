@@ -45,12 +45,16 @@ resourceRouter
       await fs.mkdir(settings.upload.messageFilePath);
       await fs.mkdir(settings.upload.messageImageSMPath);
     }
+
     const {file} = body.files;
     const {targetUid, socketId, voiceTimer} = body.fields;
     const {user} = data;
     const {messageFilePath, generateFolderName, messageImageSMPath, messageVoiceBrowser} = settings.upload;
     const targetUser = await db.UserModel.findOnly({uid: targetUid});
     data.targetUser = targetUser;
+    // 判断是否有权限发送信息
+    await db.MessageModel.ensurePermission(user.uid, targetUid, data.userOperationsId.includes('canSendToEveryOne'));
+
     let files = [];
     if(file && file.constructor === Array) {
       files = file;
@@ -116,7 +120,8 @@ resourceRouter
       message_.socketId = socketId;
       await ctx.redis.pubMessage(message_);
     }
-
+    // 判断是否已创建聊天
+    await db.CreatedChatModel.createChat(user.uid, targetUid, true);
     await next();
   });
 module.exports = resourceRouter;

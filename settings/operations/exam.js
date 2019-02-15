@@ -3,7 +3,6 @@ module.exports = {
   category: {
 	  POST: 'addExamsCategory',
     PARAMETER: {
-	    POST: 'postQuestion',
 	    GET: 'visitExamsCategory',
 	    PATCH: 'modifyExamsCategory',
       DELETE: 'deleteExamsCategory'
@@ -17,6 +16,7 @@ module.exports = {
     }
   },
   question: {
+    POST: 'postQuestion',
 	  PARAMETER: {
 	    PATCH: 'modifyQuestion',
       disabled: {

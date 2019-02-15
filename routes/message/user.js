@@ -22,80 +22,26 @@ userRouter
     if(firstMessageId) {
       q._id = {$lt: firstMessageId};
     }
-    // 获取信息不在清除未读数，mark路由专用于清除未读数
-    /*await db.MessageModel.updateMany({
-      r: user.uid,
-      s: uid,
-      vd: false
-    }, {
-      $set: {
-        vd: true
-      }
-    });
-    await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}})*/
+
     const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
     messages.map(m => {
       if(m.withdrawn) m.c = '';
     });
     data.messages = messages.reverse();
     data.targetUser = targetUser;
+
+    // 判断是否已创建聊天
+    await db.CreatedChatModel.createChat(user.uid, uid);
+
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, nkcModules, redis} = ctx;
+    const {db, body, params, data, redis} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
     const {user} = data;
-    const {messageCountLimit, messagePersonCountLimit} = await user.getMessageLimit();
-    const today = nkcModules.apiFunction.today();
-    const messageCount = await db.MessageModel.count({
-      s: user.uid,
-      ty: 'UTU',
-      tc: {
-        $gte: today
-      }
-    });
-    if(messageCount >= messageCountLimit) {
-      ctx.throw(403, `根据您的证书和等级，您每天最多只能发送${messageCountLimit}条信息`);
-    }
-    let todayUid = await db.MessageModel.aggregate([
-      {
-        $match: {
-          s: user.uid,
-          ty: 'UTU',
-          tc: {
-            $gte: nkcModules.apiFunction.today()
-          }
-        }
-      },
-      {
-        $group: {
-          _id: '$r',
-        }
-      }
-    ]);
-    todayUid = todayUid.map(o => o.uid);
-    if(!todayUid.includes(uid)) {
-      if(todayUid.length >= messagePersonCountLimit) {
-        ctx.throw(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
-      }
-    }
-
-    /*
-    *
-    * 判断对方是否设置了 需加好友之后才能聊天 （暂无该设置）
-    *
-    * */
-
-    // 判断是否为好友关系
-    const friendRelationship = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
-    if(!friendRelationship && !data.userOperationsId.includes('canSendToEveryOne')) {
-      // 判断对方是否设置了只接收好友信息
-      const targetUserGeneralSettings = await db.UsersGeneralModel.findOnly({uid});
-      const onlyReceiveFromFriends = targetUserGeneralSettings.messageSettings.onlyReceiveFromFriends;
-      if(onlyReceiveFromFriends) ctx.throw(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
-    }
-
+    // 判断是否有权限发送信息
+    await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
     const {content, socketId} = body;
     if(content === '') ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
@@ -108,54 +54,9 @@ userRouter
       ip: ctx.address,
       port: ctx.port
     });
-
     await message.save();
-
-
     // 判断是否已创建聊天
-    let chat = await db.CreatedChatModel.findOne({uid: user.uid, tUid: targetUser.uid});
-    let targetChat = await db.CreatedChatModel.findOne({uid: targetUser.uid, tUid: user.uid});
-
-
-    if(!chat || !targetChat) {
-      let lmId = null;
-      const lastMessage = await db.MessageModel.findOne({ty: 'UTU', $or: [{s: user.uid, r: uid}, {s: uid, r: user.uid}]}, {_id: 1});
-      if(lastMessage) lmId = lastMessage._id;
-      if(!chat) {
-        chat = db.CreatedChatModel({
-          _id: await db.SettingModel.operateSystemID('createdChat', 1),
-          uid: user.uid,
-          tUid: targetUser.uid,
-          lmId
-        });
-        await chat.save();
-      }
-      if(!targetChat) {
-        targetChat = db.CreatedChatModel({
-          _id: await db.SettingModel.operateSystemID('createdChat', 1),
-          uid: targetUser.uid,
-          tUid: user.uid,
-          lmId
-        });
-        await targetChat.save();
-      }
-    }
-
-    const total = await db.MessageModel.count({$or: [{s: user.uid, r: targetUser.uid}, {r: user.uid, s: targetUser.uid}]});
-
-    await chat.update({
-      tlm: message.tc,
-      lmId: message._id,
-      total
-    });
-    await targetChat.update({
-      tlm: message.tc,
-      lmId: message._id,
-      total,
-      unread: await db.MessageModel.count({s: user.uid, r: targetUser.uid, vd: false})
-    });
-
-
+    await db.CreatedChatModel.createChat(user.uid, uid, true);
     const message_ = message.toObject();
     message_.socketId = socketId;
     await redis.pubMessage(message_);
