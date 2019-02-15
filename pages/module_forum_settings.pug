@@ -1,4 +1,4 @@
-if data.type !== 'category'
+if data.type !== 'category' && data.type !== 'merge'
   - data.forumList = data.forums
   - data.disabledCategory = true;
   include forumlist_dropdown
@@ -21,6 +21,9 @@ if data.type !== 'category'
     a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
       span.fa.fa-user-circle &nbsp;&nbsp;
       span 权限设置
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/merge`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 合并设置
 button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前专业
 h4 当前专业
 .text-center.h2

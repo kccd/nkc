@@ -5,6 +5,7 @@ var data = JSON.parse($('#forumListData').text());
 var forumList = data.forumList;
 var threadTypes = data.forumsThreadTypes;
 var disabledCategory = data.disabledCategory;
+var noShowCategory = data.noShowCategory
 if(data.selectedArr) {
 	selectedArr = data.selectedArr;
 }
@@ -86,9 +87,11 @@ function displaySelect() {
 				if(disabledCategory) {
 					return window.location.href = '/f/'+selectedArr[i]+'/settings';
 				}
-				var types = getThreadTypes(selectedArr[i]);
-				types.push({name: '不分类', cid: ''});
-				dropdownDiv.append(createSelect(types, cat||'', true));
+				if(!noShowCategory){
+					var types = getThreadTypes(selectedArr[i]);
+					types.push({name: '不分类', cid: ''});
+					dropdownDiv.append(createSelect(types, cat||'', true));
+				}
 			} else {
 				dropdownDiv.append(createSelect(childrenForums, selectedArr[i + 1]).attr('id', 'select'+(i+1)));
 			}
@@ -162,6 +165,23 @@ function getResult() {
 	}
 }
 
+function getResultForumId() {
+	var arr = $('#dropdownDiv select');
+	var fid;
+	for(var i = 0; i < arr.length; i++) {
+		if(!arr.eq(i).hasClass('categorySelect')) {
+			var value = arr.eq(i).val();
+			var valueArr = value.split(':');
+			if(valueArr.length === 2) {
+				fid = valueArr[1];
+			} else {
+				throw '请选择专业';
+			}
+		}
+	}
+	if(!fid) throw '请选择专业';
+	return fid;
+}
 
 function selectbtn(){
 	var arr = $('input.ThreadCheckboxes');
