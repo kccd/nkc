@@ -11,7 +11,7 @@
   font-size: 2rem;
   text-align: center;
   line-height: 5rem;
-  background-color: #33b7ae;
+  background-color: #3389b7;
   color: #fff;
   text-decoration: none;
   border-radius: 2px;
@@ -20,13 +20,45 @@
   text-decoration: none;
   color: #fff;
 }
-
-
-
-
-
-
-
+.user-list-avatar{
+  vertical-align: middle;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+.paper-radio{
+  display: block;
+}
+.paper-radio p{
+  margin: 0;
+}
+.paper-content{
+  font-size: 1.3rem;
+}
+.paper-answer{
+  font-size: 1.2rem;
+  color: #333;
+  padding-bottom: 1rem;
+}
+.category-link{
+  padding-right: 1rem;
+}
+.exam-nav{
+  padding: 0.5rem 1rem;
+  background-color: #eee;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.exam-nav li{
+  list-style: none;
+  float: left;
+  margin-right: 1rem;
+}
+.exam-nav li a{
+  color: #555;
+  font-size: 1.2rem;
+}
 
 
 
@@ -110,7 +142,7 @@
   /*text-align: center;*/
 }
 .paper-img{
-  border-radius: 5px;
+  margin-top:1rem;
 }
 .paper-panel p{
   margin-bottom: 0;

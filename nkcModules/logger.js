@@ -17,6 +17,7 @@ module.exports = async (ctx) => {
     uid: ctx.data.user? ctx.data.user.uid : 'visitor'
   };
   const operation = await OperationModel.findOne({_id: ctx.data.operationId});
+  const {operationId} = ctx.data;
   const d = {
     url: log.path,
     method: log.method,
@@ -33,7 +34,7 @@ module.exports = async (ctx) => {
     d.address = ctx.address;
     if (ctx.error) {
       console.error(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(operation?operation.description: '未知操作').grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${(ctx.state.lang('operations', operationId) || '未知操作').grey}`
       );
       d.error = ctx.error;
       global.NKC.io.of('/console').NKC.webMessage(d);
@@ -41,7 +42,7 @@ module.exports = async (ctx) => {
         console.error(log.error);
     } else {
       console.log(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(operation?operation.description: '未知操作').grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${(ctx.state.lang('operations', operationId)||'未知操作').grey}`
       );
       global.NKC.io.of('/console').NKC.webMessage(d);
     }

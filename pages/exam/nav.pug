@@ -1,0 +1,26 @@
+ol.exam-nav
+  li
+    a(href="/exam") 首页
+  if permission('visitEditQuestion')
+    li
+      a(href="/exam/editor") 参与出题
+    li
+      a(href="/exam/record/question") 出题记录
+        if data.unViewedCount > 0
+          span=`(${data.unViewedCount})`
+  li
+    a(href="/exam/record/paper") 考试记录
+  if permission('addExamsCategory')
+    li
+      a(href="/exam/categories/editor") 考卷管理
+  if permission('visitExamQuestionManagement')
+    li
+      a(href="/exam/questions") 试题管理
+  if permission('visitExamsQuestionAuth')
+    li
+      a(href="/exam/auth") 
+        if data.unauthCount
+          span= `试题审核(${data.unauthCount})`
+        else
+          | 试题审核  
+    

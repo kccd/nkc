@@ -7,7 +7,10 @@ router
     ctx.template = 'exam/editor.pug';
     if(qid) {
       if(!ctx.permission('modifyQuestion')) ctx.throw(403, '权限不足');
-      data.question = await db.QuestionModel.findOnly({_id: Number(qid)});
+      const question = await db.QuestionModel.findOnly({_id: Number(qid)});
+      if(question.disabled) ctx.throw(403, '试题已被屏蔽，无法修改');
+      if(question.auth !== null && !ctx.permission('modifyAllQuestions')) ctx.throw(403, '试题已通过审核，无法修改');
+      data.question = (await db.QuestionModel.extendQuestions([question]))[0];
     }
     data.qid = Number(qid);
     await next();

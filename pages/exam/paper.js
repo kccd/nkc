@@ -1,35 +1,10 @@
-var markdown = window.markdownit();
-
-var xss = window.filterXSS;
-var default_whitelist = xss.whiteList;
-default_whitelist.img = ['src','style'];
-
-var xssoptions = {
-  whiteList:default_whitelist,
-  onTagAttr: function(tag, name, value, isWhiteAttr) {
-    if(isWhiteAttr) {
-      if(tag === 'a' && name === 'href') {
-        var valueHandled = value.replace('javascript:', '');
-        return "href=" + valueHandled;
-      }
-    }
-  }
-};
-
-var custom_xss = new xss.FilterXSS(xssoptions);
-var custom_xss_process = function(str){
-  return custom_xss.process(str)
-};
-
-function mdToHtml(md) {
-  return markdown.render(md);
-}
 var app = new Vue({
   el: '#app',
   data: {
     submitted: false,
     passed: '',
     paper: '',
+    old: false,
     category: '',
     questions: [],
     countdown: '',
@@ -40,7 +15,11 @@ var app = new Vue({
     compute: function() {
       var toc = this.paper.toc;
       var time = Date.now() - new Date(toc).getTime();
-      time = this.category['paper' + this.paper.volume + 'Time']*60*1000 - time;
+      time = this.category.time*60*1000 - time;
+      if(time < 0) {
+        time = 0;
+        this.timeOut = true;
+      };
       var minutes = Math.floor(time/(1000*60));
       var seconds = Math.floor((time - minutes*60*1000)/1000);
       if(minutes < 10) minutes = '0' + minutes;
@@ -72,14 +51,15 @@ var app = new Vue({
     kcAPI(window.location.href, 'GET', {})
       .then(function(data) {
         app.paper = data.paper;
+        app.old = !!data.old;
         app.category = data.category;
         var questions = data.questions;
         for(var i = 0; i < questions.length; i++) {
           var a = questions[i];
-          a.content_ = custom_xss_process(mdToHtml(i+1+'、'+a.content));
+          a.content_ = NKC.methods.custom_xss_process(NKC.methods.mdToHtml(i+1+'、'+a.content));
           a.ans_ = [];
           for(var j = 0; j < a.ans.length; j ++) {
-            a.ans_[j] = custom_xss_process(mdToHtml(['A', 'B', 'C', 'D'][j] + '. ' + a.ans[j]));
+            a.ans_[j] = NKC.methods.custom_xss_process(NKC.methods.mdToHtml(['A', 'B', 'C', 'D'][j] + '. ' + a.ans[j]));
           }
         }
         app.questions = questions;

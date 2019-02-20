@@ -7,6 +7,7 @@ block title
   +includeCSS('/exam/exam.css')
 block content
   .container-fluid.max-width
+    include ./nav
     include ../publicModules/selectForum/selectForum.pug
     .hidden#data=JSON.stringify({question: data.question || ''})
     .row
@@ -47,8 +48,7 @@ block content
               </label>     
           .form-group(v-if='question.public === false || question.public === "false"')
             label(class="col-sm-2 control-label") 专业领域
-            .col-sm-10    
-            
+            .col-sm-10
               a.m-r-1(v-if='question.forum' :href='"/f/" + question.forum.fid' target='_blank') {{question.forum.displayName}}
               button.btn.btn-sm.btn-default(@click='showSelectForumPanel') 选择领域
           .form-group
@@ -80,7 +80,8 @@ block content
           .form-group
             label(class="col-sm-2 control-label") 
             .col-sm-10     
-              button.btn.btn-primary.btn-block(@click='save') 提交
+              button.btn.btn-primary.btn-block(@click='save' v-if='!submitting') 提交
+              button.btn.btn-primary.btn-block(v-else disabled) {{submitting}}
 block scripts
   +includeJS('/publicModules/selectForum/selectForum.js')
   +includeJS('/exam/editor.js')

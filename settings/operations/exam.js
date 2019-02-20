@@ -1,12 +1,27 @@
 module.exports = {
-	GET: 'visitExamPaperList',
-  category: {
-	  POST: 'addExamsCategory',
-    PARAMETER: {
-	    GET: 'visitExamsCategory',
-	    PATCH: 'modifyExamsCategory',
-      DELETE: 'deleteExamsCategory'
+  GET: 'visitExamPaperList',
+  record: {
+    question: {
+      GET: 'viewQuestionRecord'
+    },
+    paper: {
+      GET: 'viewPaperRecord'
     }
+  },
+  categories: {
+    POST: 'addExamsCategory',
+    editor: {
+      GET: 'visitEditCategory'
+    }
+  },
+  category: {
+    PARAMETER: {
+	    PATCH: 'modifyExamsCategory',
+    }
+  },
+  auth: {
+    GET: 'visitExamsQuestionAuth',
+    POST: 'submitExamsQuestionAuth'
   },
   paper: {
 	  GET: 'getExamsPaper',
@@ -28,10 +43,9 @@ module.exports = {
       }
     }
   },
-	PARAMETER: {
-		GET: 'getExamPaper',
-		POST: 'submitExamPaper'
-	},
+  questions: {
+    GET: 'visitExamQuestionManagement'
+  },
   editor: {
 	  GET: 'visitEditQuestion'
   }

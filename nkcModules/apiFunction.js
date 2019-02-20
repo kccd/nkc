@@ -2,6 +2,7 @@ const paging = require('../settings/paging');
 const moment = require('moment');
 moment.locale('zh-cn');
 let {perpage} = paging;
+perpage = 4;
 let fn = {};
 fn.paging = (page, arrLength) => {
   if(page === undefined) page = 0;
@@ -311,5 +312,19 @@ fn.makeRandomCode = (digit) => {
     ranstr += arr[pos]
   }
   return ranstr;
+}
+/* 
+  随机交换数组元素的位置
+  @param arr: 需要交换元素顺序的数组
+  @author pengxiguaa 2019/2/19
+*/
+fn.shuffle = (arr) => {
+  const length = arr.length;
+  for(let i = 0; i < length; i++) {
+    const index = Math.round(Math.random()*(length-1));
+    const n = arr[i];
+    arr[i] = arr[index];
+    arr[index] = n;      
+  }
 }
 module.exports = fn;

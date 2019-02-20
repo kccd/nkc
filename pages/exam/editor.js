@@ -1,6 +1,8 @@
 var app = new Vue({
   el: '#app',
   data: {
+    submitted: false,
+    submitting: '',
     question: {
       type: 'ch4',
       public: false,
@@ -30,6 +32,9 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     if(data.question) {
       this.extendAnswers(data.question);
+      if(data.question.public) {
+        data.question.forum = '';
+      }
       this.question = data.question;
     }
     vueSelectForum.init({
@@ -118,11 +123,10 @@ var app = new Vue({
       delete q.answerObj;
       var url = '/exam/question';
       var method = 'POST';
-      if (q._id) {
+      if (q._id && q.auth === null) {
         url = '/exam/question/' + q._id;
         method = 'PATCH';
       }
-      console.log(q);
       formData.append('question', JSON.stringify(q));
       submitting = '提交中';
       uploadFilePromise(url, formData, function (e) {
@@ -131,7 +135,7 @@ var app = new Vue({
         app.submitting = '提交中... ' + num + '%';
       }, method)
         .then(function () {
-          window.location.reload();
+          window.location.href = '/exam/record/question';
           /* if(question._id) {
             window.location.href = '/exam/category/' + question.cid;
           } else {

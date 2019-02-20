@@ -155,3 +155,55 @@
 .pointer{
   cursor: pointer;
 }
+
+.list-header{
+  height: 2rem;
+  line-height: 2rem;
+  position: relative;
+  margin: 1rem 0;
+}
+.list-header>span{
+  display: inline-block;
+  position: absolute;
+  width: 10rem;;
+  font-size: 1.3rem;
+  text-align: center;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 100;
+  background-color: #fff;
+}
+.list-header>.line{
+  position: absolute;
+  z-index: 90;
+  height: 1px;
+  width: 95%;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: #ccc;
+}
+.icon-success{
+  background-color: #81ca83;
+  color: #fff;
+  height: 6rem;
+  width: 6rem;
+  line-height: 6rem;
+  text-align: center;
+  font-size: 3rem;
+  border-radius: 50%;
+}
+.icon-fail{
+  background-color: #ff8080;
+  color: #fff;
+  height: 6rem;
+  width: 6rem;
+  line-height: 6rem;
+  font-size: 4rem;
+  border-radius: 50%;
+}

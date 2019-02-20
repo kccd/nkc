@@ -374,7 +374,6 @@
   "modifyProblemsType": "修改<报告问题-问题类型>",
   "deleteProblemsType": "删除<报告问题-问题类型>",
   "visitExperimentalConsole": "访问<后台管理-控制台>",
-  "deleteExamsCategory": "删除考试科目",
   "addExamsCategory": "添加考试科目",
   "modifyExamsCategory": "修改考试科目",
   "visitExamsCategory": "访问考试科目",
@@ -405,6 +404,13 @@
   "visitHomeListSettings": "访问《后台管理-首页设置-文章列表设置》",
   "modifyHomeListSettings": "修改《后台管理-首页设置-文章列表设置》",
   "patchThreadForum": "在专业文章列表中批量移动文章",
+  "visitEditCategory": "访问编辑考卷页面",
+  "visitExamsQuestionAuth": "访问试题审核界面",
+  "submitExamsQuestionAuth": "提交考试题审核结果",
+  "viewQuestionRecord": "查看出题记录",
+  "viewPaperRecord": "查看考试记录",
+  "visitExamQuestionManagement": "访问考试试题管理页面",
+  "modifyAllQuestion": "修改被审核过的试题",
 
 
   "APPgetUserInfo": "app获取用户信息",

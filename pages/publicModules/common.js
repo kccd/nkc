@@ -52,18 +52,6 @@ NKC.methods.scrollToTop = function(number, time) {
 };
 
 /*
-*  @格式化是阿锦
-* */
-NKC.methods.format = function(m, t) {
-  if(typeof moment === "undefined") throw 'moment is not loaded';
-  return moment(t).format(m);
-};
-NKC.methods.fromNow = function(t) {
-  if(typeof moment === "undefined") throw 'moment is not loaded';
-  return moment(t).fromNow();
-};
-
-/*
 * 通过vue渲染分页按钮，计算分页需要的关键数据
 * @param paging对象 包含属性page, pageCount
 * @return paging对象 包含属性page, pageCount, btnList(数组对象, 对象属性包括：text、page、active)

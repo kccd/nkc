@@ -8,10 +8,14 @@ const schema = new Schema({
     default: false,
     index: 1
   },
-  auth: {
+  auth: { // 审核状态 true: 已通过, false: 未通过, null: 未审核
     type: Boolean,
     default: null,
     index: 1
+  },
+  reason: { // 审核未通过的原因
+    type: String,
+    default: ''
   },
   uid: {
     type: String,
@@ -33,9 +37,13 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
-  uidLm: {
+  operatorId: {
     type: String,
     default: ''
+  },
+  operationTime: {
+    type: Date,
+    default: null
   },
   type: { // 问答：ans, 选择：ch4
     type: String,
@@ -69,7 +77,7 @@ const schema = new Schema({
     default: '',
     index: 1
   },
-  custom: { // 自定义试题，仅供自己使用
+  viewed: {
     type: Boolean,
     default: false,
     index: 1
@@ -80,17 +88,24 @@ const schema = new Schema({
 
 schema.statics.extendQuestions = async (questions) => {
   const UserModel = mongoose.model('users');
-  const uid = new Set(), userObj = {};
+  const ForumModel = mongoose.model('forums');
+  const uid = new Set(), userObj = {}, fid = new Set(), forumObj = {};
   for(const q of questions) {
     uid.add(q.uid);
+    fid.add(q.fid);
   }
   const users = await UserModel.find({uid: {$in: [...uid]}});
+  const forums = await ForumModel.find({fid: {$in: [...fid]}});
   users.map(u => {
     userObj[u.uid] = u;
+  });
+  forums.map(f => {
+    forumObj[f.fid] = f;
   });
   return Promise.all(questions.map(q => {
     q_ = q.toObject();
     q_.user = userObj[q_.uid];
+    q_.forum = forumObj[q_.fid];
     return q_;
   }));
 };
