@@ -5,6 +5,7 @@ const statusRouter = require('./status');
 const logRouter = require('./log');
 const sysInfoRouter = require('./systemInfo');
 const consoleRouter = require('./console');
+const shopRouter = require('./shop');
 const apiFn = nkcModules.apiFunction;
 const {npmInstallify, gitify} = require('../../tools/imageMagick');
 const experimentalRouter = new Router();
@@ -167,7 +168,8 @@ experimentalRouter
   .use('/console', consoleRouter.routes(), consoleRouter.allowedMethods())
 	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods())
   .use('/systemInfo', sysInfoRouter.routes(), sysInfoRouter.allowedMethods())
-	.use('/log', logRouter.routes(), logRouter.allowedMethods());
+  .use('/log', logRouter.routes(), logRouter.allowedMethods())
+  .use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 
 
 module.exports = experimentalRouter;

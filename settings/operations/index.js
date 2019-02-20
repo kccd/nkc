@@ -18,7 +18,7 @@ const {
 	fundBanner,
 	photo,
 	photo_small,
-	logo
+	logo,
 } = resourceObj;
 
 const auth = require('./auth');
@@ -51,6 +51,7 @@ const friend = require('./friend');
 const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
+const shop = require('./shop');
 const operationObj = {};
 
 
@@ -167,6 +168,8 @@ operationObj.operationTree = {
     subscription, // 首页我的关注
 
 		lottery, // 抽奖页
+
+		shop, //商城
 	}
 };
 module.exports = operationObj;

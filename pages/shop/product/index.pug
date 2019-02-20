@@ -1,0 +1,270 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
+  
+  title 网站统计
+  style.
+    .title {
+      text-align: left;
+      font-size: 12px;
+      margin: 0 19px 0 10px;
+      color: #999;
+    }
+    .location {
+      margin-right:6px
+    }
+    .buy {
+      overflow: hidden;
+      float: left;
+      width: 152px;
+      border-radius: 2px;
+      background-color: #f8f7f3;
+      color: #22258c;
+      cursor: pointer;
+      border: 1px solid #22258c;
+      margin-right: 18px;
+    }
+    .addCart {
+      overflow: hidden;
+      float: left;
+      width: 160px;
+      margin-top: -1px;
+      border-radius: 2px;
+      color: #fff;
+      cursor: pointer;
+      background-color: #22258c;
+    }
+    .item {
+      margin-bottom:20px
+    }
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        nav.navbar.navbar-default
+          .container-fluid
+            // Brand and toggle get grouped for better mobile display
+            .navbar-header
+              button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                span.sr-only Toggle navigation
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+              a.navbar-brand(href='#') Brand
+            // Collect the nav links, forms, and other content for toggling
+            #bs-example-navbar-collapse-1.collapse.navbar-collapse
+              ul.nav.navbar-nav
+                li.active
+                  a(href='#')
+                    | Link 
+                    span.sr-only (current)
+                li
+                  a(href='#') Link
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                    | Dropdown 
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='#') Action
+                    li
+                      a(href='#') Another action
+                    li
+                      a(href='#') Something else here
+                    li.divider(role='separator')
+                    li
+                      a(href='#') Separated link
+                    li.divider(role='separator')
+                    li
+                      a(href='#') One more separated link
+              form.navbar-form.navbar-left
+                .form-group
+                  input.form-control(type='text', placeholder='Search Shop')
+                button.btn.btn-default(type='submit') Submit
+              ul.nav.navbar-nav.navbar-right
+                li
+                  a.fa.fa-shopping-cart(href='#') Cart
+                    span.badge(style="background-color:#d9534f") 14
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                    | My Account 
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='#') Action
+                    li
+                      a(href='#') Another action
+                    li
+                      a(href='#') Something else here
+                    li.divider(role='separator')
+                    li
+                      a(href='#') Separated link
+
+      .col-xs-12.col-md-12(style="margin-bottom:30px")
+        .col-xs-12.col-md-4
+          ul#etalage
+            li
+              img.etalage_thumb_image(src='/default/shop5.jpg')
+              img.etalage_source_image(src='/default/shop5.jpg')
+            li
+              img.etalage_thumb_image(src='/default/shop3.jpg')
+              img.etalage_source_image(src='/default/shop3.jpg')
+            li
+              img.etalage_thumb_image(src='/default/shop4.jpg')
+              img.etalage_source_image(src='/default/shop4.jpg')
+            li
+              img.etalage_thumb_image(src='/default/shop1.jpg')
+              img.etalage_source_image(src='/default/shop1.jpg')
+            li
+              img.etalage_thumb_image(src='/default/shop2.jpg')
+              img.etalage_source_image(src='/default/shop2.jpg')
+
+        .col-xs-12.col-md-7
+          h3.item KC901S 3GHz Handheld Network Analyzer multi RF-meter
+          p.item KC901S is a “RF multimeter”. It offers the capabilities of single port vector network analysis and dual port scalar network analysis, also with spectrum, field strength and signal generator functions. It is a powerful and useful handheld instrument for RF engineer both in lab and on the field.
+          div.item(style="background:#c7fff8")
+            div(style="padding:7px 0;color:#333")
+              p
+                span.title Price
+                span KCB 123456
+          div.item(style="border-bottom: 1px solid #e5e5e5")
+            p
+              span.title Freight
+              span.location Place of origin
+              span.location TO
+              span.location Place of receipt
+              span.location 快递
+              sapn.location ￥12.00
+          div.item
+            p
+              span.title Add time
+              span.location 2018-10-23
+          div.item
+            p
+              span.title Number Of Products
+              span
+                input(type="number", name="", value="1")
+              span.title 库存3件
+          div.item
+            a.btn.btn.buy(href='#', role='button') Buy
+            a.btn.btn.addCart(href='#', role='button') 
+              span.fa.fa-shopping-cart  Add To Cart
+        .col-xs-1.col-md-1 
+
+      //- .col-xs-12.col-md-12
+      //-   ul.nav.nav-tabs
+      //-     li.active(role='presentation')
+      //-       a(href='#') Product Details
+      //-     li(role='presentation')
+      //-       a(href='#') Cumulative Evaluation
+      //-     li(role='presentation')
+      //-       a(href='#') Messages
+      .col-xs-12.col-md-12
+        .col-xs-12.col-md-3
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
+            .input-group
+              input.form-control(type='text', placeholder='Search for...')
+              span.input-group-btn
+                button.btn.btn-default(type='button') Search
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-heading
+                h3.panel-title 店铺信息
+              .panel-body
+                | Panel content
+          .col-xs-12.col-md-12
+            .panel.panel-default
+              .panel-heading
+                h3.panel-title 商品推荐
+              ul.list-group
+                -for(var i=0;i<9;i++)
+                  li.list-group-item
+                    a(href="#") 
+                      img(src="/default/shop1.jpg" style="width:32px;height:auto;float:right")
+                      span(style="display:block;font-weight:700;color:#666") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+                    span $ 12.00
+                    div(style="float:right")
+                      span.fa.fa-star(style="color:red")
+                      span.fa.fa-star(style="color:red")
+                      span.fa.fa-star(style="color:red")
+                      span.fa.fa-star(style="color:red")
+                      span.fa.fa-star(style="color:red")
+        .col-xs-12.col-md-9
+          ul.nav.nav-tabs
+            li(role='presentation')
+              a(href='#') Description
+            li.active(role='presentation')
+              a(href='#') Reviews (12)
+            li.active(role='presentation')
+              a(href='#')
+                | Reviewa 
+                span.badge(style="background-color:#22258c") 12
+
+          div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
+            div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
+              div
+                | Drand Name：
+                b(target='_blank') 科创仪表局
+            p(style="padding:5px 20px")
+              em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
+            .row(style="padding:0 20px 18px")
+              -for(var a=0;a<16;a++)
+                .col-sm-6.col-md-4
+                  p parameter: value
+        .col-xs-12.col-md-9
+          div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
+            h3(style="text-align:center") 商品详细描述
+        .col-xs-12.col-md-9
+          //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
+          div
+            .panel.panel-default
+              // Default panel contents
+              .panel-heading 
+                .radio
+                  label
+                    input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+                    | 好评
+                  label
+                    input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+                    | 中评
+                  label
+                    input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+                    | 差评
+                  label(style="float:right")
+                    input#haveContent(type="checkbox", name="haveContent") 
+                    | 显示内容
+                //- .check
+                //-   label
+                //-     input#haveContent(type="checkbox", name="haveContent") 
+                //-     | 显示内容
+              //- .panel-body
+              ul.list-group
+                -for(var l=0;l<9;l++)
+                  li.list-group-item 
+                    .media
+                      .media-left.media-middle
+                        a(href='#')
+                          img.media-object(src='/avatar/74847', alt='...', style="width:64px")
+                      .media-body
+                        p(style="font-size:large").media-heading 
+                        | Kris
+                        span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
+                        span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
+                        p 我觉得行 
+block scripts
+  script(src='/external_pkgs/jquery/jquery-1.11.1.js')
+  script(src='/external_pkgs/etalage/js/jquery.etalage.min.js')
+  script.
+    $(document).ready(function(){
+      $('#etalage').etalage({
+        thumb_image_width: 350,
+        thumb_image_height: 350,
+        source_image_width: 900,
+        source_image_height: 900,
+        small_thumbs:5,
+      });
+    });

@@ -1,0 +1,86 @@
+extends ./index.pug
+block name  
+  //- h1.page-header
+  //-   | Tabs & Panels 
+  //-   small Nice tabs and panels
+  .row
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-primary.text-center.no-boder.bg-color-green
+        .panel-body
+          i.fa.fa-bar-chart-o.fa-5x
+          h3 8,457
+        .panel-footer.back-footer-green
+          | Daily Visits
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-primary.text-center.no-boder.bg-color-blue
+        .panel-body
+          i.fa.fa-shopping-cart.fa-5x
+          h3 52,160 
+        .panel-footer.back-footer-blue
+          | Sales
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-primary.text-center.no-boder.bg-color-red
+        .panel-body
+          i.fa.fa.fa-comments.fa-5x
+          h3 15,823 
+        .panel-footer.back-footer-red
+          | Comments
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-primary.text-center.no-boder.bg-color-brown
+        .panel-body
+          i.fa.fa-users.fa-5x
+          h3 36,752 
+        .panel-footer.back-footer-brown
+          | No. of Visits
+  .row
+    .col-md-4
+      // Kitchen Sink
+      .panel.panel-primary
+        .panel-heading
+          | 订单统计信息
+        .table-responsive
+          table.table.table-striped.table-bordered.table-hover
+            tbody
+              tr
+                td 未处理订单
+                td
+                  a(href="#" style="color:red") 0
+                  | 个
+              tr
+                td 待发货订单
+                td Jacob
+              tr
+                td 待结算订单
+                td Larry
+              tr
+                td 已成交订单数
+                td Larry
+              tr
+                td 交易失败
+                td Larry
+    .col-md-4
+      // Kitchen Sink
+      .panel.panel-primary
+        .panel-heading
+          | 商品统计信息
+        .table-responsive
+          table.table.table-striped.table-bordered.table-hover
+            tbody
+              tr
+                td 商品总数
+                td
+                  a(href="#" style="color:red") 0
+                  | &nbsp;个
+              tr
+                td 回收站商品数
+                td Jacob
+              tr
+                td 上架商品
+                td Larry
+              tr
+                td 下架商品
+                td Larry
+              tr
+                td 商品评论数
+                td Larry
+      // End  Kitchen Sink

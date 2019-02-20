@@ -1,0 +1,205 @@
+extends ../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  title 网站统计
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
+        .e-nav
+          .jumbotron(style='margin-bottom: 1rem;color:#555;')
+            .h1
+              span.fa.fa-shopping-basket KC SHOP
+
+      .col-xs-12.col-md-12
+        nav.navbar.navbar-default
+          .container-fluid
+            // Brand and toggle get grouped for better mobile display
+            .navbar-header
+              button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                span.sr-only Toggle navigation
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+              a.navbar-brand(href='#') Brand
+            // Collect the nav links, forms, and other content for toggling
+            #bs-example-navbar-collapse-1.collapse.navbar-collapse
+              ul.nav.navbar-nav
+                li.active
+                  a(href='#')
+                    | Link 
+                    span.sr-only (current)
+                li
+                  a(href='#') Link
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                    | Dropdown 
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='#') Action
+                    li
+                      a(href='#') Another action
+                    li
+                      a(href='#') Something else here
+                    li.divider(role='separator')
+                    li
+                      a(href='#') Separated link
+                    li.divider(role='separator')
+                    li
+                      a(href='#') One more separated link
+              form.navbar-form.navbar-left
+                .form-group
+                  input.form-control(type='text', placeholder='Search Shop')
+                button.btn.btn-default(type='submit') Submit
+              ul.nav.navbar-nav.navbar-right
+                li
+                  a.fa.fa-shopping-cart(href='#') Cart
+                    span.badge(style="background-color:#d9534f") 14
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                    | My Account 
+                    span.caret
+                  ul.dropdown-menu
+                    li
+                      a(href='#') Action
+                    li
+                      a(href='#') Another action
+                    li
+                      a(href='#') Something else here
+                    li.divider(role='separator')
+                    li
+                      a(href='#') Separated link
+
+      .col-xs-12.col-md-12
+        .col-xs-2.col-md-2
+          .btn-group-vertical(role='group', aria-label='...' style="width:100%")
+            ul.list-group
+              li.list-group-item.list-group-item-warning Main Category
+              li.list-group-item.list-group-item category
+              li.list-group-item.list-group-item category
+              li.list-group-item.list-group-item category
+            .list-group
+              a.list-group-item.list-group-item-success(href='#') Dapibus ac facilisis in
+              a.list-group-item.list-group-item(href='#') 
+                | category
+                span.fa.fa-angle-right(style="float:right")
+              a.list-group-item.list-group-item(href='#') 
+                | category
+                span.fa.fa-angle-right(style="float:right")
+              a.list-group-item.list-group-item(href='#') 
+                | category
+                span.fa.fa-angle-right(style="float:right")
+            .list-group
+              a.list-group-item.list-group-item-info(href="#") Main Category
+              a.list-group-item.list-group-item(href='#') category
+              a.list-group-item.list-group-item(href='#') category
+              a.list-group-item.list-group-item(href='#') category
+            .btn-group(role='group')
+              button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                | Dropdown
+                span.caret
+              ul.dropdown-menu
+                li
+                  a(href='#') Dropdown link
+                li
+                  a(href='#') Dropdown link
+
+        .col-xs-10.xol-md-10
+          .col-xs-12.col-md-12(style="margin-bottom: 1rem;")
+            #carousel-example-generic.carousel.slide(data-ride='carousel')
+              // Indicators
+              ol.carousel-indicators
+                li.active(data-target='#carousel-example-generic', data-slide-to='0')
+                li(data-target='#carousel-example-generic', data-slide-to='1')
+                li(data-target='#carousel-example-generic', data-slide-to='2')
+              // Wrapper for slides
+              .carousel-inner(role='listbox')
+                .item.active
+                  img(src='default/shop2.jpg', alt='...' style="width:100%")
+                  .carousel-caption
+                    | ...
+                .item
+                  img(src='default/shop2.jpg', alt='...' style="width:100%")
+                  .carousel-caption
+                    | ...
+              // Controls
+              a.left.carousel-control(href='#carousel-example-generic', role='button', data-slide='prev')
+                span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+                span.sr-only Previous
+              a.right.carousel-control(href='#carousel-example-generic', role='button', data-slide='next')
+                span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+                span.sr-only Next
+          .col-xs-12.col-md-12
+            h3 Category one
+            hr
+          .col-xs-12.col-md-12
+            .row
+              .col-sm-6.col-md-4
+                .thumbnail
+                  img(src='/default/shop3.jpg', alt='...')
+                  .caption
+                    h4(style="text-align: center;") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+                    p ...
+                    p
+                      span(style="font-size: x-large;color: coral;") $ 
+                      span 12350
+                      a.btn.btn-default(href='#', role='button' style="float:right;background-color:#d9534f") Add To Cart
+              .col-sm-6.col-md-4
+                .thumbnail
+                  img(src='/default/shop3.jpg', alt='...')
+                  .caption
+                    h4(style="text-align: center;") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+                    p ...
+                    p
+                      span(style="font-size: x-large;color: coral;") $ 
+                      span 12350
+                      a.btn.btn-default(href='#', role='button' style="float:right;background-color:#d9534f") Add To Cart
+              .col-sm-6.col-md-4
+                .thumbnail
+                  img(src='/default/shop3.jpg', alt='...')
+                  .caption
+                    h4(style="text-align: center;") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+                    p ...
+                    p
+                      span(style="font-size: x-large;color: coral;") $ 
+                      span(style="font-size:large;color:#325437") 12350
+                      a.btn.btn-default(href='#', role='button' style="float:right;background-color:#d9534f") 
+                        | Add To Cart
+                        span.fa.fa-shopping-cart
+          .col-xs-12.col-md-12
+            h3 Category two
+            hr
+          .col-xs-12.col-md-12
+            .row
+              .col-sm-6.col-md-3
+                .thumbnail
+                  img(src='/default/shop1.jpg', alt='pic')
+                .caption
+                  h3 Thumbnail label
+                  p
+                    a.btn.btn-default(href='#', role='button' style="float:right") Button
+              .col-sm-6.col-md-3
+                .thumbnail
+                  img(src='/default/shop1.jpg', alt='pic')
+                .caption
+                  h3 Thumbnail label
+                  p
+                    a.btn.btn-default(href='#', role='button' style="float:right") Button
+              .col-sm-6.col-md-3
+                .thumbnail
+                  img(src='/default/shop1.jpg', alt='pic')
+                .caption
+                  h3 Thumbnail label
+                  p
+                    a.btn.btn-default(href='#', role='button' style="float:right") Button
+              .col-sm-6.col-md-3
+                .thumbnail
+                  img(src='/default/shop1.jpg', alt='pic')
+                .caption
+                  h3 Thumbnail label
+                  p
+                    a.btn.btn-default(href='#', role='button' style="float:right") Button
