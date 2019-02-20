@@ -26,6 +26,10 @@ block content
         for question in data.questions
           div.m-b-2(style='padding: 1rem;background-color: #efefef;')
             span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
+            if question.volume === 'A'
+              span.m-r-1 基础级(A)
+            else 
+              span.m-r-1 专业级(B)  
             if question.disabled
               span.m-r-1.text-danger 已被屏蔽
             else  
@@ -43,7 +47,7 @@ block content
             if question.auth === false || question.disabled
               h5.text-danger 原因：
                 span= question.reason    
-            div!=`${markdown('问：' + question.content)}`
+            div.question-content!=`${markdown('问：' + question.content)}`
             if question.hasImage
               img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
             for a, index in question.answer
@@ -56,3 +60,4 @@ block content
         include ../interface_navigation_paging  
 block scripts
   +includeJS('/exam/questions.js')        
+  include ../MathJax

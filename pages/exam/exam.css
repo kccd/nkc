@@ -114,6 +114,10 @@
   margin: 0.5rem 0;
   font-size: 1.3rem;
 }
+.question-content img{
+  max-width: 100%;
+}
+
 .question-content p{
   margin-bottom: 0;
 }

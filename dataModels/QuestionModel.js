@@ -22,11 +22,6 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  cid: {
-    type: Number,
-    // required: true,
-    index: 1
-  },
   toc: {
     type: Date,
     default: Date.now,
