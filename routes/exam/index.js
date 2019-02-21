@@ -10,30 +10,36 @@ const recordRouter = require('./record');
 const questionsRouter = require('./questions');
 examRouter
   .use(async (ctx, next) => {
-    const {db} = ctx;
+    const {db, data} = ctx;
     const papers = await db.ExamsPaperModel.find({submitted: false, timeOut: false});
     const now = Date.now();
     await Promise.all(papers.map(async paper => {
       if(now - paper.toc >= paper.time*60*1000) {
         await paper.update({
           timeOut: true,
-          tlm: Date.now(),
+          tlm: paper.toc + paper.time*60*1000,
           passed: false
         });
       }
     }));
+    if(data.user) {
+      data.unViewedCount = await db.QuestionModel.count({uid: data.user.uid, viewed: false});
+      data.unauthCount = await db.QuestionModel.count({
+        disabled: false,
+        auth: null
+      });
+    }
     await next();
   })
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
-    const {user} = data;
     ctx.template = 'exam/home.pug';
     data.examsCategories = await db.ExamsCategoryModel.find({
       disabled: false
     }).sort({order: 1});
     const papers = await db.ExamsPaperModel.find({
       passed: true
-    }).sort({toc: -1}).limit(20);
+    }).sort({toc: -1}).limit(10);
     data.papers = await db.ExamsPaperModel.extendPapers(papers);
     const result = await db.QuestionModel.aggregate([
       {
@@ -67,11 +73,7 @@ examRouter
       });
     }
     data.usersList = usersList;
-    data.unauthCount = await db.QuestionModel.count({
-      disabled: false,
-      auth: null
-    });
-    data.unViewedCount = await db.QuestionModel.count({uid: user.uid, viewed: false});
+    data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
     await next();
   })
   .use('/record', recordRouter.routes(), recordRouter.allowedMethods())

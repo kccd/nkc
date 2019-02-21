@@ -9,7 +9,7 @@ block content
       .col-xs-12.col-md-12
         .text-center(v-if='passed')
           include ../publicModules/icon-success
-          h3 考试通过
+          h3.m-b-2 考试通过
           h5(v-if='paper.volume === "A"') 恭喜您通过了A卷考试，如需提升账号等级，请参加
             a(href='/exam') B卷考试
             |。
@@ -17,7 +17,7 @@ block content
           a(href='/exam') 返回到考试主页
         .text-center(v-else)
           include ../publicModules/icon-fail
-          h3 考试未通过
+          h3.m-b-2 考试未通过
           h5 如果你还想再考一次，请点
             a(href='/exam') 这里
             |，而不要点击浏览器的后退按钮。
@@ -25,18 +25,19 @@ block content
       .col-xs-12.col-md-3
         img(src=`/resources/site_specific/holy_exam.gif`)
         h3 科创会员专业知识测验
+        h5 今日考试次数剩余：{{countOneDay - countToday + 1}} 次
         h5 考试科目：{{category.name + ' ' + {'A':'基础级', 'B': '专业级'}[category.volume]}}
         h5 开考时间：{{format('YYYY-MM-DD HH:mm:ss', paper.toc)}}
         h5 考试时长：{{category.time}} 分钟
         h5(v-if='countdown') 剩余时间：{{countdown}}
         h5.text-danger.m-t-1 请务必在规定的时间内提交试卷，规定时间之外的提交视为无效。
-        h5(v-if='old && countdown').text-danger.m-t-1 该科目下的考试暂未提交，若想重新参加该科目下的考试，请先提交当前考卷。
+        h5(v-if='created && countdown').text-danger.m-t-1 该科目下的考试暂未提交，若想重新参加该科目下的考试，请先提交当前考卷。
         h3.text-danger(v-if='timeOut').m-t-1 考试结束，您未在规定的时间之内提交试卷，当前考试无效。
         
       .col-xs-12.col-md-5.col-md-offset-1
         .m-t-3
           div.paper-panel(v-for='q, index of questions')
-            .paper-content(v-html='q.content_')
+            .question-content(v-html='q.content_')
             img.paper-img(v-if='q.hasImage' :src='"/exam/question/" + q._id + "/image"')
             form(v-if='q.type === "ans"')
               span 答案：
@@ -48,8 +49,9 @@ block content
                   .paper-answer(v-html='a')
                 </label>
               </div>
-          button.btn.btn-primary.btn-block(v-if='!submitted' @click='submit') 提交
-          button.btn.btn-primary.btn-block(v-else disabled) 提交
+          .m-t-2
+            button.btn.btn-primary.btn-block(v-if='!submitted' @click='submit') 提交
+            button.btn.btn-primary.btn-block(v-else disabled) 提交
 block scripts
   include ../publicModules/xss
   include ../publicModules/mdToHtml

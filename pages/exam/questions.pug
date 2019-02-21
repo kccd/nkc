@@ -10,14 +10,14 @@ block content
         h5.text-danger 提示：为了不影响已创建的考卷和考试，编辑试题时将不对原试题做任何修改。点击提交后系统会根据提交的数据创建新的试题，请自行将原试题做屏蔽处理。        
       .col-xs-12.col-md-3
         .list-group
-          a.btn.list-group-item(href=`/exam/questions`)
+          a.btn.list-group-item(href=`/exam/questions` class=!data.t?'active': '')
             .text-left 全部
               .pull-right=`总共：${data.allCount}, 可用：${data.count}`
-          a.btn.list-group-item(href='/exam/questions?t=pub')
+          a.btn.list-group-item(href='/exam/questions?t=pub' class=data.t==='pub'?'active': '')
             .text-left 公共题库
               .pull-right=`总共：${data.allPubCount}, 可用：${data.pubCount}`      
           for forum in data.forums
-            a.btn.list-group-item(href=`/exam/questions?t=pro&fid=${forum.fid}`)
+            a.btn.list-group-item(href=`/exam/questions?t=pro&fid=${forum.fid}` class=data.fid===forum.fid?'active': '')
               .text-left=forum.displayName
                 .pull-right=`总共：${forum.allCount}, 可用：${forum.count}`
       
@@ -26,6 +26,7 @@ block content
         for question in data.questions
           div.m-b-2(style='padding: 1rem;background-color: #efefef;')
             span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
+            a.m-r-1(href=`/u/${question.uid}` target='_blank')= question.user.username
             if question.volume === 'A'
               span.m-r-1 基础级(A)
             else 

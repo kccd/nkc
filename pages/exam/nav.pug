@@ -9,7 +9,7 @@ ol.exam-nav
         if data.unViewedCount > 0
           span=`(${data.unViewedCount})`
   li
-    a(href="/exam/record/paper") 考试记录
+    a(href="/exam/record/paper?t=self") 考试记录
   if permission('addExamsCategory')
     li
       a(href="/exam/categories/editor") 考卷管理

@@ -93,6 +93,8 @@ resourceRouter
         ty: 'UTU',
         s: user.uid,
         r: targetUser.uid,
+        ip: ctx.address,
+        port: ctx.port,
         c: {
           ty: imageExt.includes(ext)? 'img': voiceExt.includes(ext)? 'voice' : 'file',
           id: _id,

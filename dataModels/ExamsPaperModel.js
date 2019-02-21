@@ -8,6 +8,10 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  ip: {
+    type: String,
+    default: ''
+  },
   toc: {
     type: Date,
     default: Date.now,
@@ -109,6 +113,7 @@ schema.statics.extendPapers = async (papers) => {
       category: categoriesObj[paper.cid],
       _id: paper._id,
       tlm: paper.tlm,
+      toc: paper.toc,
       passed: paper.passed,
       timeOut: paper.timeOut,
       submitted: paper.submitted

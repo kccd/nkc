@@ -63,7 +63,7 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
   // 获取用户间的最新一条信息（可能不存在）
   let message = await MessageModel.findOne({ty: 'UTU', $or: [{s: uid, r: targetUid}, {s: targetUid, r: uid}]}).sort({tc: -1});
   // 获取用户间的信息总数
-  const total = await MessageModel.count({$or: [{s: uid, r: targetUid}, {r: uid, s: targetUid}]});
+  const total = await MessageModel.count({ty: 'UTU', $or: [{s: uid, r: targetUid}, {r: uid, s: targetUid}]});
   // 没有发过信息
   if(!message) {
     message = {
@@ -85,7 +85,8 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
   await chat.update({
     tlm: message.tc,
     lmId: message._id,
-    total
+    total,
+    unread: await MessageModel.count({ty: 'UTU', s: targetUid, r: uid, vd: false})
   });
   // 若对方也需要生成聊天记录，同理
   if(both) {
@@ -103,7 +104,7 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
       tlm: message.tc,
       lmId: message._id,
       total,
-      unread: await MessageModel.count({s: uid, r: targetUid, vd: false})
+      unread: await MessageModel.count({ty: 'UTU', s: uid, r: targetUid, vd: false})
     });
   }
 };

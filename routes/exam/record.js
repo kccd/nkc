@@ -25,6 +25,15 @@ router
     const q = {};
     if(t === 'self') {
       q.uid = data.user.uid
+    } else {
+      q.$or = [
+        {
+          submitted: true
+        },
+        {
+          timeOut: true
+        }
+      ]
     }
     const count = await db.ExamsPaperModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);

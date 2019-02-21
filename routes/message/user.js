@@ -29,7 +29,7 @@ userRouter
     });
     data.messages = messages.reverse();
     data.targetUser = targetUser;
-
+    await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
     // 判断是否已创建聊天
     await db.CreatedChatModel.createChat(user.uid, uid);
 

@@ -1,31 +1,32 @@
+var defaultQuestion = {
+  type: 'ch4',
+  public: false,
+  hasImage: false,
+  volume: 'A',
+  content: '',
+  forum: '',
+  answer: [],
+  answerObj: [
+    {
+      text: ''
+    },
+    {
+      text: ''
+    },
+    {
+      text: ''
+    },
+    {
+      text: ''
+    }
+  ]
+};
 var app = new Vue({
   el: '#app',
   data: {
     submitted: false,
     submitting: '',
-    question: {
-      type: 'ch4',
-      public: false,
-      hasImage: false,
-      volume: 'A',
-      content: '',
-      forum: '',
-      answer: [],
-      answerObj: [
-        {
-          text: ''
-        },
-        {
-          text: ''
-        },
-        {
-          text: ''
-        },
-        {
-          text: ''
-        }
-      ]
-    },
+    question: JSON.parse(JSON.stringify(defaultQuestion)),
   },
   mounted: function() {
     var data = document.getElementById('data');
@@ -123,7 +124,7 @@ var app = new Vue({
       delete q.answerObj;
       var url = '/exam/question';
       var method = 'POST';
-      if (q._id && q.auth === null) {
+      if (q._id) {
         url = '/exam/question/' + q._id;
         method = 'PATCH';
       }
@@ -135,8 +136,14 @@ var app = new Vue({
         app.submitting = '提交中... ' + num + '%';
       }, method)
         .then(function () {
-          window.location.href = '/exam/record/question';
-          /* if(question._id) {
+          if(question._id) {
+            screenTopAlert('保存成功');
+          } else {
+            app.submitting = '';
+            app.submitted = true;
+          }
+          /*window.location.href = '/exam/record/question';
+           if(question._id) {
             window.location.href = '/exam/category/' + question.cid;
           } else {
             app.submitted = true;
@@ -144,6 +151,8 @@ var app = new Vue({
         })
         .catch(function (data) {
           screenTopWarning(data);
+          app.submitting = '';
+          app.submitted = false;
           /* screenTopWarning(data);
           app.submitting = '提交'; */
         })

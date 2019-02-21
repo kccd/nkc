@@ -14,6 +14,12 @@ block content
             if !question.viewed
               span(style='color: red') *&nbsp;
             span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
+            if question.forum
+              a(href=`/f/${question.forum.fid}` target='_blank').m-r-1=question.forum.displayName
+            if question.volume === 'A'
+              span.m-r-1 基础级(A)
+            else 
+              span.m-r-1 专业级(B)  
             if question.disabled
               span.m-r-1.text-danger 已被屏蔽
             else  

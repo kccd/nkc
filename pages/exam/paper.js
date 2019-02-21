@@ -4,11 +4,13 @@ var app = new Vue({
     submitted: false,
     passed: '',
     paper: '',
-    old: false,
+    created: false,
     category: '',
     questions: [],
     countdown: '',
-    timeOut: false
+    timeOut: false,
+    countToday: 0,
+    countOneDay: 0
   },
   methods: {
     format: NKC.methods.format,
@@ -48,11 +50,19 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    kcAPI(window.location.href, 'GET', {})
+    var href = window.location.href;
+    if(href.indexOf('?') !== -1) {
+      href += '&t=' + Date.now();
+    } else {
+      href += '?t=' + Date.now();
+    }
+    kcAPI(href, 'GET', {})
       .then(function(data) {
         app.paper = data.paper;
-        app.old = !!data.old;
+        app.created = !!data.created;
         app.category = data.category;
+        app.countToday = data.countToday;
+        app.countOneDay = data.examSettings.countOneDay;
         var questions = data.questions;
         for(var i = 0; i < questions.length; i++) {
           var a = questions[i];

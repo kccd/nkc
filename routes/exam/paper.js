@@ -16,7 +16,22 @@ paperRouter
     if(paper) {
       return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
     }
-
+    // 限制条件
+    const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
+    const {count, countOneDay, waitingTime} = examSettings.c;
+    const paperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
+    if(paperCount >= countOneDay) ctx.throw(403, `每个用户一天之内只能参加${countOneDay}次考试，今日您的考试次数已用完，请明天再试。`);
+    const now = Date.now();
+    const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
+    let {stageTime} = user.generalSettings.examSettings;
+    stageTime = new Date(stageTime).getTime();
+    if(allPaperCount >= count) {
+      if(now > stageTime + waitingTime*24*60*60*1000) {
+        await user.generalSettings.update({'examSettings.stageTime': now});
+      } else {
+        ctx.throw(403, `每个用户最多只能参加${count}次考试，达到最大考试数之后需等待${waitingTime}天后才能再次参加考试。您当前考试次数已用完，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
+      }
+    }
     // 45分钟之内进入相同的考卷
     const {passScore, time} = category;
     paper = await db.ExamsPaperModel.findOne({uid: user.uid, cid, toc: {$gte: Date.now() - timeLimit}}).sort({toc: -1});
@@ -46,9 +61,9 @@ paperRouter
               oldQidArr.add(r.qid);
             });
           });
-          const oldPubQuestions = await db.ExamsCategoryModel.find({_id: {$in: [...oldQidArr]}, public: true, volume});
+          const oldPubQuestions = await db.QuestionModel.find({_id: {$in: [...oldQidArr]}, public: true, volume});
           const oldPubId = oldPubQuestions.map(q => q._id);
-          if(count <= oldPubId.lengh) {
+          if(count <= oldPubId.length) {
             // 45分钟之内出现的公共题数量足够
             qidArr = qidArr.concat(oldPubId.slice(0, count));
           } else {
@@ -103,6 +118,7 @@ paperRouter
       }
     }
     const questions = await db.QuestionModel.find({_id: {$in: qidArr}});
+    if(questions.length < questionCount) ctx.throw(400, '当前科目的题库试题不足，请选择其他科目参加考试。');
     nkcModules.apiFunction.shuffle(questions);
 
     const papersQuestions = [];
@@ -127,6 +143,7 @@ paperRouter
       _id: await db.SettingModel.operateSystemID('examsPapers', 1),
       uid: user.uid,
       cid,
+      ip: ctx.address,
       record: papersQuestions,
       passScore,
       time
@@ -136,16 +153,16 @@ paperRouter
     return ctx.redirect(`/exam/paper/${paper._id}`);
   })
   .get('/:_id', async (ctx, next) => {
-    const {db, data, params, query} = ctx;
+    const {db, data, params, query, nkcModules} = ctx;
     const {created} = query;
-    if(created === 'true') data.old = true;
+    if(created === 'true') data.created = true;
     const {user} = data;
     const {_id} = params;
     const paper = await db.ExamsPaperModel.findOnly({_id, uid: user.uid});
     if(paper.timeOut) ctx.throw(403, '考试已结束');
     if(paper.submitted) ctx.throw(403, '考试已结束');
     const category = await db.ExamsCategoryModel.findOnly({_id: paper.cid});
-    if(category.disabled) ctx.throw(403, '该科目下的考试已被屏蔽');
+    if(category.disabled) ctx.throw(403, '考试所在的科目已被屏蔽');
     const questions = [];
     const {record} = paper;
     for(const r of record) {
@@ -171,6 +188,8 @@ paperRouter
       _id: paper._id
     };
     data.category = category;
+    data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
+    data.countToday = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
     ctx.template = 'exam/paper.pug';
     await next();
   })

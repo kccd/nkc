@@ -26,20 +26,24 @@ block content
           tbody       
             for paper in data.papers
               tr
-                th=paper.tlm.toLocaleString()
+                th=(paper.tlm || paper.toc).toLocaleString()
                 th
-                  a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username
+                  a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
                 th= paper.category.name
                 th
                   if paper.category.volume === 'A'
-                    | 基础级  
+                    | A(基础级)  
                   else 
-                    | 专业级    
+                    | B(专业级)
                 th  
                   if paper.timeOut
                     span.text-danger 超时    
                   else if paper.passed
                     span.text-success 通过
                   else if !paper.passed    
-                    span.text-danger 未通过 
+                    if !paper.submitted && !paper.timeOut
+                      span 未结束
+                        a.p-l-1(href=`/exam/paper/${paper._id}?created=true`) 继续考试
+                    else  
+                      span.text-danger 未通过 
         include ../../interface_navigation_paging                  

@@ -1,12 +1,13 @@
 extends ../bootstrap_base
 block title 
   title=`${data.serverSettings.websiteName} | 考试系统`
+  -const {countOneDay, count, waitingTime} = data.examSettings;
   +includeCSS('/exam/exam.css')
 block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8
-        h2 参与考试获得证书
+        h2.m-b-2 参与考试获得证书
         ul
           li 
             h5 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
@@ -14,30 +15,38 @@ block content
             h5 通过B卷考试可获得高级证书，可参与特种科技爱好话题的交流。
           li 
             h5 通过A卷考试的用户将来可以再参加B卷考试获取高级证书。
+          li 
+            h5=`同一用户每天最多能参加 ${countOneDay} 次考试。`
+          li 
+            h5=`同一用户所参加的考试累计达到 ${count} 次时，该用户在${waitingTime} 天之内将无法再次参加考试。`  
+        .row.m-t-2 
+          .col-xs-12.col-md-12
+                
         .row.m-t-2
           .col-xs-12.col-md-6
             +listHeader('A卷（基础级）')
             for category in data.examsCategories
               if category.volume === 'A'
-                .p-t-1.m-b-1
-                  h4=`【${category.name}】`
-                    a(href=`/exam/paper?cid=${category._id}`) 参加考试
-                  p=category.description
+                span.h4.m-r-1(style='display: inline-block;')
+                  a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
+                  //-p=category.description
           .col-xs-12.col-md-6
             +listHeader('B卷（专业级）')
             for category in data.examsCategories
               if category.volume === 'B'
-                .m-b-1.p-t-1
-                  h4=`【${category.name}】`
-                    a(href=`/exam/paper?cid=${category._id}`) 参加考试
-                  p=category.description
+                  span.h4.m-r-1(style='display: inline-block;')
+                    a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
+                  //-p=category.description
       .col-xs-12.col-md-3.col-md-offset-1
         if permission('visitEditQuestion')
           a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题
           a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
             if data.unViewedCount > 0
               span=`(${data.unViewedCount})`
-        a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper`) 考试记录
+        else 
+          a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
+          p 科创题库暂时只允许拥有学者证书的会员参与出题，发表优质的内容将有机会获得学者证书。
+        a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper?t=self`) 考试记录
         if permission('addExamsCategory') || permission('visitExamsQuestionAuth') || permission('visitExamsQuestionAuth')
           .p-t-2  
           +listHeader('管理操作')
@@ -51,14 +60,6 @@ block content
                 span= `试题审核(${data.unauthCount})`
               else
                 | 试题审核          
-        .p-t-2  
-        +listHeader('出题统计')
-        for li in data.usersList  
-          div(style='margin: .5rem 0;')
-            span(style='font-size: 1.3rem;').pull-right=li.count
-            a(href=`/u/${li.user.uid}` target='_blank')
-              img.user-list-avatar(src=`/avatar_small/${li.user.uid}`)
-              span(style='font-size: 1.2rem;')=li.user.username
         .p-t-2        
         +listHeader('最新考试记录')      
         for paper in data.papers
@@ -66,7 +67,7 @@ block content
             span=fromNow(paper.tlm)
             //- img(src=`/avatar/${paper.user.uid}` target='_blank').user-list-avatar
             | &nbsp;
-            a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username
+            a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
             | &nbsp;
             | 通过了【
             span=paper.category.name
@@ -77,4 +78,11 @@ block content
               span 专业级
         .m-t-1.text-center
           a(href='/exam/record/paper') 查看更多
-      
+        .p-t-2  
+        +listHeader('出题统计')
+        for li in data.usersList  
+          div(style='margin: .5rem 0;')
+            span(style='font-size: 1.3rem;').pull-right=`${li.count}`
+            a(href=`/u/${li.user.uid}` target='_blank')
+              img.user-list-avatar(src=`/avatar_small/${li.user.uid}`)
+              span(style='font-size: 1.2rem;')=li.user.username
