@@ -45,7 +45,9 @@ block content
               span=`(${data.unViewedCount})`
         else 
           a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
-          p 科创题库暂时只允许拥有学者证书的会员参与出题，发表优质的内容将有机会获得学者证书。
+          p 当前只允许学术分1分以上的会员命题，您还没有学术分。点击
+            a(href='https://www.kechuang.org/t/67256' target='_blank') 这里
+            |了解学术分制度。
         a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper?t=self`) 考试记录
         if permission('addExamsCategory') || permission('visitExamsQuestionAuth') || permission('visitExamsQuestionAuth')
           .p-t-2  
