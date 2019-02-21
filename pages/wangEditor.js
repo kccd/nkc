@@ -2959,7 +2959,13 @@ formula.prototype = {
             mathfreshnew()
         }else{
             var editor = this.editor;
-            editor.cmd.do('insertHTML', '<p contenteditable="false" style="max-width:100%" ontouchend="reedit(this)" ondblclick="reedit(this)" dataType="formula">'+val+'</p><p><br></p>');
+            var moneyCode = val.substr(0, 2);
+            if(moneyCode == "$$") {
+                editor.cmd.do('insertHTML', '<p contenteditable="false" style="max-width:100%" ontouchend="reedit(this)" ondblclick="reedit(this)" dataType="formula">'+val+'</p><p><br></p>');
+            }else {
+                editor.cmd.do('insertHTML', '<span contenteditable="false" ontouchend="reedit(this)" ondblclick="reedit(this)" dataType="formula">'+val+'</span>&nbsp;');
+            }
+            // editor.cmd.do('insertHTML', '<p contenteditable="false" style="max-width:100%" ontouchend="reedit(this)" ondblclick="reedit(this)" dataType="formula">'+val+'</p><p><br></p>');
             setTimeout(function() {
                 mathfreshnew();
             },1000)
