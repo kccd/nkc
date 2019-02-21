@@ -41,7 +41,7 @@ messageRouter
     const uidArr = new Set(), midArr = new Set(), userObj = {}, messageObj = {}, friendObj = {};
     for(const c of chats) {
       uidArr.add(c.tUid);
-      midArr.add(c.lmId);
+      if(c.lmId) midArr.add(c.lmId);
     }
     const users = await db.UserModel.find({uid: {$in: [...uidArr]}});
     const messages = await db.MessageModel.find({_id: {$in: [...midArr]}});
@@ -57,13 +57,13 @@ messageRouter
     }
     for(const c of chats) {
       if(c.tUid === user.uid) continue;
-      const {unread, tUid, lmId, tlm} = c;
+      const {unread, tUid, lmId, tlm, toc} = c;
       const message = messageObj[lmId];
       const targetUser = userObj[tUid];
       if(!targetUser) continue;
       const friend = friendObj[tUid];
       userList.push({
-        time: tlm,
+        time: tlm || toc,
         type: 'UTU',
         user: targetUser,
         friend,

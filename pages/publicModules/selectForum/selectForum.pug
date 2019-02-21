@@ -1,0 +1,26 @@
+<!-- Modal -->
+<div class="modal fade" id="vueSelectForum" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document" id='vueSelectForum2' v-cloak>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">选择专业</h4>
+      </div>
+      <div class="modal-body">
+        <ol class="breadcrumb">
+          li(class='pointer' @click='all') 全部专业
+          li(class='pointer' v-for='forum in selectedForums' @click='backTo(forum)') {{forum.displayName}}
+        </ol>
+        div
+          span(v-for='forum in childForums' @click='secletForum(forum)'
+            class='pointer'
+            :style='"display: inline-block;padding: 0.5rem; margin: 0.5rem;color: #fff;border-radius: 3px;background-color: " + forum.color + ";"'
+          ) {{forum.displayName}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" @click='done'>确定</button>
+      </div>
+    </div>
+  </div>
+</div>

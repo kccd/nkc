@@ -8,18 +8,17 @@ const schema = new Schema({
     default: false,
     index: 1
   },
-  auth: {
+  auth: { // 审核状态 true: 已通过, false: 未通过, null: 未审核
     type: Boolean,
     default: null,
     index: 1
   },
+  reason: { // 审核未通过的原因
+    type: String,
+    default: ''
+  },
   uid: {
     type: String,
-    required: true,
-    index: 1
-  },
-  cid: {
-    type: Number,
     required: true,
     index: 1
   },
@@ -33,30 +32,49 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
-  uidLm: {
+  operatorId: {
     type: String,
     default: ''
   },
-  type: {
+  operationTime: {
+    type: Date,
+    default: null
+  },
+  type: { // 问答：ans, 选择：ch4
     type: String,
     required: true,
     index: 1
   },
-  content: {
+  content: { // 问题内容
     type: String,
     required: true
-  },
-  answer: {
+  }, 
+  answer: { // 答案，数组长度 选择：4, 问答： 1
     type: [String],
     required: true
   },
-  hasImage: {
+  hasImage: { // 是否有图片
     type: Boolean,
     default: false
   },
-  volume: {
+  volume: { // A: 基础级, B: 专业级
     type: String,
     required: true,
+    index: 1
+  },
+  public: { // 是否为公共题，与之对应的还有专业题，专业题需要选择专业分类。
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  fid: { // 专业领域
+    type: String,
+    default: '',
+    index: 1
+  },
+  viewed: {
+    type: Boolean,
+    default: false,
     index: 1
   }
 }, {
@@ -65,17 +83,24 @@ const schema = new Schema({
 
 schema.statics.extendQuestions = async (questions) => {
   const UserModel = mongoose.model('users');
-  const uid = new Set(), userObj = {};
+  const ForumModel = mongoose.model('forums');
+  const uid = new Set(), userObj = {}, fid = new Set(), forumObj = {};
   for(const q of questions) {
     uid.add(q.uid);
+    fid.add(q.fid);
   }
   const users = await UserModel.find({uid: {$in: [...uid]}});
+  const forums = await ForumModel.find({fid: {$in: [...fid]}});
   users.map(u => {
     userObj[u.uid] = u;
+  });
+  forums.map(f => {
+    forumObj[f.fid] = f;
   });
   return Promise.all(questions.map(q => {
     q_ = q.toObject();
     q_.user = userObj[q_.uid];
+    q_.forum = forumObj[q_.fid];
     return q_;
   }));
 };

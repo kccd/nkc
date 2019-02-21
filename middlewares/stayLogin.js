@@ -32,7 +32,7 @@ module.exports = async (ctx, next) => {
 			return ctx.redirect('/login');
 		}
 	}
-
+  let languageName = 'zh_cn';
 	if(!user) {
 		// 游客
 		const visitorRole = await db.RoleModel.findOnly({_id: 'visitor'});
@@ -60,14 +60,8 @@ module.exports = async (ctx, next) => {
 		user.authLevel = await userPersonal.getAuthLevel();
 		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
-		user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
-    // 根据用户语言设置加载语言对象
-    if(global.NKC.NODE_ENV !== 'production') {
-      const l = require('../languages');
-      ctx.state.language = l[user.generalSettings.language];
-    } else {
-      ctx.state.language = languages[user.generalSettings.language];
-    }
+    user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
+    languageName = user.generalSettings.language;
     if(user.generalSettings.lotterySettings.status) {
       const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
       if(redEnvelopeSettings.c.random.close) {
@@ -121,7 +115,12 @@ module.exports = async (ctx, next) => {
         }
       }));
 		}
-	}
+  }
+  // 根据用户语言设置加载语言对象
+  ctx.state.language = languages[languageName];
+  ctx.state.lang = (type, operationId) => {
+    return ctx.state.language[type][operationId];
+  }
 	data.userOperationsId = userOperationsId;
 	data.userRoles = userRoles;
 	data.userGrade = userGrade || {};

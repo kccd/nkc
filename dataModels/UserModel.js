@@ -312,10 +312,21 @@ userSchema.methods.getUsersThreads = async function() {
   return await ThreadModel.extendThreads(threads);
 };
 
-userSchema.methods.extend = async function() {
+userSchema.methods.extend = async function(options) {
+  const ExamsCategoryModel = mongoose.model('examsCategories');
+  let proExamsCategoriesId, pubExamsCategoriesId;
+  if(options) {
+    proExamsCategoriesId = options.proExamsCategoriesId;
+    pubExamsCategoriesId = options.pubExamsCategoriesId;
+  } else {
+    let categories = await ExamsCategoryModel.find({volume: 'B'}, {_id: 1});
+    proExamsCategoriesId = categories.map(c => c._id);
+    categories = await ExamsCategoryModel.find({volume: 'A'}, {_id: 1});
+    pubExamsCategoriesId = categories.map(c => c._id);
+  }
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const SecretBehaviorModel = mongoose.model('secretBehaviors');
-  const AnswerSheetModel = mongoose.model('answerSheets');
+  const ExamsPaperModel = mongoose.model('examsPapers');
   const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
   this.regPort = userPersonal.regPort;
   this.regIP = userPersonal.regIP;
@@ -333,9 +344,16 @@ userSchema.methods.extend = async function() {
   } else {
   	this.registerType = 'mobile';
   }
-	// 获取b卷考试科目
-	this.sheetB = await AnswerSheetModel.findOne({uid: this.uid, isA: false, score: {$gte: 6}});
-	this.sheetA = await AnswerSheetModel.findOne({uid: this.uid, isA: true, score: {$gte: 6}});
+  // 获取b卷考试科目
+  const paperB = await ExamsPaperModel.findOne({uid: this.uid, passed: true, cid: {$in: proExamsCategoriesId}}).sort({toc: 1});
+  const paperA = await ExamsPaperModel.findOne({uid: this.uid, passed: true, cid: {$in: pubExamsCategoriesId}}).sort({toc: 1});
+
+  if(paperB) {
+    this.paperB = await ExamsCategoryModel.findOne({_id: paperB.cid});
+  }
+	if(paperA) {
+    this.paperA = await ExamsCategoryModel.findOne({_id: paperA.cid});
+  }
 };
 
 userSchema.methods.extendRoles = async function() {

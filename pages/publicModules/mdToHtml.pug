@@ -1,0 +1,5 @@
++includeJS('/markdown-it/dist/markdown-it.js')
+script.
+  NKC.methods.mdToHtml = function (md){
+    return window.markdownit().render(md);
+  } 

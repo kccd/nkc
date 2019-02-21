@@ -103,7 +103,7 @@ categoryRouter
 		if(!name) ctx.throw('分类名不能为空');
 		const threadType = await db.ThreadTypeModel.findOne({fid: forum.fid, name});
 		if(!threadType) ctx.throw(400, '分类不存在');
-		await db.ThreadModel.updateMany({cid: threadType.cid}, {$set: {cid: null}});
+		await db.ThreadModel.updateMany({categoriesId: threadType.cid}, {$pull: {categoriesId: threadType.cid}});
     await threadType.remove();
     await redis.cacheForums();
 		await next();
