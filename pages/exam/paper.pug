@@ -30,9 +30,11 @@ block content
         h5 开考时间：{{format('YYYY-MM-DD HH:mm:ss', paper.toc)}}
         h5 考试时长：{{category.time}} 分钟
         h5(v-if='countdown') 剩余时间：{{countdown}}
-        h5.text-danger.m-t-1 请务必在规定的时间内提交试卷，规定时间之外的提交视为无效。
-        h5(v-if='created && countdown').text-danger.m-t-1 该科目下的考试暂未提交，若想重新参加该科目下的考试，请先提交当前考卷。
-        h3.text-danger(v-if='timeOut').m-t-1 考试结束，您未在规定的时间之内提交试卷，当前考试无效。
+        h5.text-danger.m-t-1 超时提交无效。
+        h5(v-if='created && countdown').text-danger.m-t-1 继续考试中。若想重新参加该科目下的考试，请先提交当前考卷。
+        //-h3.text-danger(v-if='timeOut').m-t-1 您未在规定的时间之内提交试卷，当前考试无效。请点击
+          a(href='/exam') 这里
+          | 重新参加考试。
         
       .col-xs-12.col-md-5.col-md-offset-1
         .m-t-3
@@ -50,7 +52,11 @@ block content
                 </label>
               </div>
           .m-t-2
-            button.btn.btn-primary.btn-block(v-if='!submitted' @click='submit') 提交
+            h3.text-danger(v-if='timeOut') 您未在规定的时间之内提交试卷，当前考试无效。请点击
+              a(href='/exam') 这里
+              | 重新参加考试。
+
+            button.btn.btn-primary.btn-block(v-if='!submitted && !timeOut' @click='submit') 提交
             button.btn.btn-primary.btn-block(v-else disabled) 提交
 block scripts
   include ../publicModules/xss

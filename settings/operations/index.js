@@ -68,6 +68,7 @@ operationObj.defaultOperations = [
   'canSendToEveryOne', // 跳过`仅接收好友信息`限制
   'creditXsf',
   'modifyAllQuestions', // 可修改审核过的试题
+  'viewAllPaperRecords' // 可查看所有的考试记录
 ];
 
 

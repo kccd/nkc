@@ -412,6 +412,7 @@
   "visitExamQuestionManagement": "访问考试试题管理页面",
   "modifyAllQuestion": "修改被审核过的试题",
   "modifyAllQuestions": "修改所有的试题（包括审核通过的）",
+  "viewAllPaperRecords": "可查看所有的考试记录",
 
 
   "APPgetUserInfo": "app获取用户信息",

@@ -69,7 +69,7 @@ block content
                 a.m-r-1(v-if='question.forum' :href='"/f/" + question.forum.fid' target='_blank') {{question.forum.displayName}}
                 button.btn.btn-sm.btn-default(@click='showSelectForumPanel') 选择领域
             .form-group
-              label(class="col-sm-2 control-label") 内容
+              label(class="col-sm-2 control-label") 问题
               .col-sm-10
                 textarea(class="form-control" placeholder="请输入问题内容，500字以内" v-model='question.content' style='min-height: 9rem;')
             .form-group

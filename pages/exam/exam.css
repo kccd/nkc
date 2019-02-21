@@ -22,10 +22,11 @@
 }
 .user-list-avatar{
   vertical-align: middle;
-  width: 2rem;
-  height: 2rem;
+  width: 5rem;
+  height: 5rem;
   border-radius: 50%;
-  margin-right: 0.3rem;
+  margin-right: 1.4rem;
+  margin-bottom: 1rem;
 }
 .paper-radio{
   display: block;

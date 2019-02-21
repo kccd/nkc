@@ -30,7 +30,7 @@ block content
                 span.text-success 审核已通过
               else 
                 span.text-danger.m-r-1 审核未通过
-                a(href=`/exam/editor?qid=${question._id}`) 重新提交
+                a(href=`/exam/editor?qid=${question._id}`) 修改完善
             if question.auth === false || question.disabled
               h5.text-danger 原因：
                 span= question.reason  

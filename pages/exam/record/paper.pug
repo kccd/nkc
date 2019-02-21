@@ -11,8 +11,9 @@ block content
         ul.nav.nav-tabs
           li(class=data.t==='self'?'active': '')
             a(href='/exam/record/paper?t=self') 我的
-          li(class=!data.t?'active': '')
-            a(href='/exam/record/paper') 全部 
+          if permission('viewAllPaperRecords')  
+            li(class=!data.t?'active': '')
+              a(href='/exam/record/paper') 全部 
         .m-t-1    
           include ../../interface_navigation_paging          
         table.table.table-striped

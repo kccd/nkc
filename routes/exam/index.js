@@ -49,6 +49,11 @@ examRouter
         }
       },
       {
+        $sort: {
+          toc: -1
+        }
+      },
+      {
         $project: {
           uid: 1
         }
@@ -58,10 +63,9 @@ examRouter
           _id: '$uid',
           count: {$sum: 1}
         }
-      }, {
-        $sort: {
-          count: -1
-        }
+      }, 
+      {
+        $limit: 12
       }
     ]);
     const usersList = [];

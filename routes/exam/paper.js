@@ -20,7 +20,7 @@ paperRouter
     const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
     const {count, countOneDay, waitingTime} = examSettings.c;
     const paperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
-    if(paperCount >= countOneDay) ctx.throw(403, `每个用户一天之内只能参加${countOneDay}次考试，今日您的考试次数已用完，请明天再试。`);
+    if(paperCount >= countOneDay) ctx.throw(403, `一天之内只能参加${countOneDay}次考试，今日您的考试次数已用完，请明天再试。`);
     const now = Date.now();
     const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
     let {stageTime} = user.generalSettings.examSettings;
@@ -29,7 +29,7 @@ paperRouter
       if(now > stageTime + waitingTime*24*60*60*1000) {
         await user.generalSettings.update({'examSettings.stageTime': now});
       } else {
-        ctx.throw(403, `每个用户最多只能参加${count}次考试，达到最大考试数之后需等待${waitingTime}天后才能再次参加考试。您当前考试次数已达上限，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
+        ctx.throw(403, `您观看考题数量过多或考试次数达到${count}次，需等待${waitingTime}天后才能再次参加考试，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
       }
     }
     // 45分钟之内进入相同的考卷

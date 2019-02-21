@@ -26,6 +26,7 @@ router
     if(t === 'self') {
       q.uid = data.user.uid
     } else {
+      if(!ctx.permission('viewAllPaperRecords')) ctx.throw(403, '权限不足');
       q.$or = [
         {
           submitted: true

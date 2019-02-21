@@ -12,13 +12,13 @@ block content
           li 
             h5 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
           li 
-            h5 通过B卷考试可获得高级证书，可参与特种科技爱好话题的交流。
+            h5 通过B卷考试可获得高级证书，可参与相应特种科技爱好话题的交流。
           li 
-            h5 通过A卷考试的用户将来可以再参加B卷考试获取高级证书。
+            h5 通过A卷考试的用户将来可以再参加B卷考试。
           li 
-            h5=`同一用户每天最多能参加 ${countOneDay} 次考试。`
+            h5=`同一用户每天最多进行 ${countOneDay} 次考试。`
           li 
-            h5=`同一用户所参加的考试累计达到 ${count} 次时，该用户在${waitingTime} 天之内将无法再次参加考试。`  
+            h5=`同一用户的考试次数累计达到 ${count} 次时，在${waitingTime} 天之内将无法再次参加考试。`  
         .row.m-t-2 
           .col-xs-12.col-md-12
                 
@@ -76,13 +76,10 @@ block content
               span 基础级
             else 
               span 专业级
-        .m-t-1.text-center
-          a(href='/exam/record/paper') 查看更多
         .p-t-2  
-        +listHeader('出题统计')
+        +listHeader('命题人')
         for li in data.usersList  
-          div(style='margin: .5rem 0;')
-            span(style='font-size: 1.3rem;').pull-right=`${li.count}`
-            a(href=`/u/${li.user.uid}` target='_blank')
-              img.user-list-avatar(src=`/avatar_small/${li.user.uid}`)
-              span(style='font-size: 1.2rem;')=li.user.username
+          a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
+            - var navbarDesc = li.user.navbarDesc;
+            - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+            img.user-list-avatar(src=`/avatar_small/${li.user.uid}`  title=title)
