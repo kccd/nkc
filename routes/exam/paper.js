@@ -29,7 +29,7 @@ paperRouter
       if(now > stageTime + waitingTime*24*60*60*1000) {
         await user.generalSettings.update({'examSettings.stageTime': now});
       } else {
-        ctx.throw(403, `每个用户最多只能参加${count}次考试，达到最大考试数之后需等待${waitingTime}天后才能再次参加考试。您当前考试次数已用完，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
+        ctx.throw(403, `每个用户最多只能参加${count}次考试，达到最大考试数之后需等待${waitingTime}天后才能再次参加考试。您当前考试次数已达上限，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
       }
     }
     // 45分钟之内进入相同的考卷
