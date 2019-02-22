@@ -76,6 +76,7 @@ var app = new Vue({
         setInterval(function() {
           app.compute();
         }, 500);
+        NKC.methods.asyncMathJaxRender();
       })
       .catch(function(err) {
         screenTopWarning(err);

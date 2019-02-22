@@ -30,7 +30,8 @@ block content
                 span.text-success 审核已通过
               else 
                 span.text-danger.m-r-1 审核未通过
-                a(href=`/exam/editor?qid=${question._id}`) 修改完善
+                a.m-r-1(href=`/exam/editor?qid=${question._id}`) 修改完善
+                a(href=`javascript:deleteQuestion('${question._id}')`) 删除
             if question.auth === false || question.disabled
               h5.text-danger 原因：
                 span= question.reason  
@@ -46,4 +47,5 @@ block content
               h5(class=c)!= markdown(i[index] + a)    
         include ../../interface_navigation_paging      
 block scripts
+  +includeJS('/exam/questions.js')
   include ../../MathJax            

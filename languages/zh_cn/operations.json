@@ -413,6 +413,8 @@
   "modifyAllQuestion": "修改被审核过的试题",
   "modifyAllQuestions": "修改所有的试题（包括审核通过的）",
   "viewAllPaperRecords": "可查看所有的考试记录",
+  "removeQuestion": "删除试题",
+  "removeAllQuestion": "删除别人的试题",
 
 
   "APPgetUserInfo": "app获取用户信息",

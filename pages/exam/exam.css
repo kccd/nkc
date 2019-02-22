@@ -60,7 +60,19 @@
   color: #555;
   font-size: 1.2rem;
 }
-
+.red-point{
+  /* height: 16px;
+  font-size: 1rem;
+  border-radius: 50%;
+  vertical-align: middle;
+  min-width: 16px;
+  background-color: red;
+  color: #fff;
+  text-align: center;
+  line-height: 16px; */
+  display: inline-block;
+  color: red;
+}
 
 
 
