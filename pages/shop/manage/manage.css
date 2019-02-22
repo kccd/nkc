@@ -17,3 +17,56 @@
   transform: translateY(-18px);
   top: 50%
 }
+.upload_image_card {
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  border: 1px solid #cdcdcd;
+}
+.upload_image_card img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+.upload_image_trash {
+  width: 28px;
+  cursor: pointer;
+  text-align: center;
+  display: inline-block;
+  font-size:x-large
+}
+.upload_image-tools {
+  height:30px;
+  bottom: 0;
+  line-height: 28px;
+  position: absolute;
+  left: 0;width: 100%;
+  font-size: 12px;
+  background-color: rgba(51,51,51,.7);
+  transition: opacity .3s ease;
+  margin: 0;color: #fff;
+  z-index: 1;
+  text-align:center
+}
+.upload_image_plus {
+  margin: 0;
+  display: block;
+  text-align: center;
+  color: #0085D7;
+  font-size:20px
+}
+.upload_image_text {
+  font-size: 12px;
+  line-height: 1;
+  color: #666;
+  text-align: center;
+  margin: 12px 0 0;
+}

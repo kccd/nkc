@@ -1,7 +1,10 @@
 module.exports = {
   GET: 'visitShopIndex',
   product: {
-		GET: 'visitProductIndex',
+    GET: 'visitProductIndex',
+    PARAMETER: {
+      GET: 'visitProductSingle'
+    }
   },
   manage: {
     PARAMETER: {
@@ -10,7 +13,8 @@ module.exports = {
         GET:'visitManageHome',
       },
       shelf: {
-        GET: 'productUpperShelf'
+        GET: 'visitShelfIndex',
+        POST: 'productToShelf'
       }
     },
   }

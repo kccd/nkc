@@ -39,7 +39,7 @@ block name
             .form-group
               label.col-sm-2.control-label 商品描述
               .col-sm-8
-                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='20')
+                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='200')
                 p(style="color:#ccc") 最多200个字
       .panel.panel-info
         .panel-heading
@@ -47,90 +47,150 @@ block name
         .panel-body
           .form-horizontal
             .form-group
-              label.col-sm-2.control-label 商品价格
+              label.col-sm-2.control-label 商品原始价格
               .col-sm-5
                 .input-group
                   input.form-control#originalPrice(type='text', placeholder="Product's Price", aria-describedby='originalPrice' oninput="autoCalcuPrice()")
                   span.input-group-addon 元
-                .input-group.input-group-sm.col-sm-7(style="margin-top:5px")
+                .input-group.input-group-sm.col-sm-10(style="margin-top:5px")
                   span.input-group-addon(style="background-color:#fff;border:0")
-                    input#useRebate(type='checkbox', aria-label='...')
+                    input#useRebate(type='checkbox', aria-label='...' onclick="autoCalcuPrice()")
                   span.input-group-addon(style="background-color:#fff;border:0") 使用折扣
-                  input.form-control#rebate(type='text', aria-label='Amount (to the nearest dollar)' placeholder="")
+                  input.form-control#rebate(type='text', aria-label='Amount (to the nearest dollar)' placeholder="" oninput="autoCalcuPrice()")
                   span.input-group-addon %
                   span.input-group-addon(style="background-color:#fff;border:0")
+                    b 折后价&nbsp;
+                    i#afterRebatePrice(style="color:red") 无
+                  span.input-group-addon(style="background-color:#fff;border:0")
                     i.fa.fa-question-circle(data-trigger='hover', data-container='body', data-toggle='popover', data-placement='bottom', data-content='折扣为小于100的正整数')
-
             .form-group
               label.col-sm-2.control-label 库存数量
               .col-sm-5
                 .input-group
-                  input.form-control(type='text', placeholder="Stock's Quantity", aria-describedby='stockQuantity')
-                  span#stockQuantity.input-group-addon 件
+                  input.form-control#stockQuantity(type='text', placeholder="Stock's Quantity", aria-describedby='stockQuantity')
+                  span.input-group-addon 件
+            .form-group
+              label.col-sm-2.control-label 库存计数
+              .col-sm-8
+                .radio
+                  label
+                    input#stockMethod1(type='radio', name='stockCostMethod', value='payReduceStock', checked='true')
+                    |     买家拍下减库存
+                    b(style="color:red")  （拍下减库存，存在恶拍风险）
+                .radio
+                  label
+                    input#stockMethod2(type='radio', name='stockCostMethod', value='orderReduceStock')
+                    |     买家付款减库存
+                    b(style="color:red")  （付款减库存，存在超卖风险）
       .panel.panel-info
         .panel-heading
           | 支付信息
         .panel-body
           .form-horizontal
+            //- .form-group
+            //-   label.col-sm-2.control-label 购买方式
+            //-   .col-sm-8
+            //-     label.radio-inline
+            //-       input#purchaseMethod1(type='radio', name='purchaseMethod', value='payOne')
+            //-       |  
+            //-     label.radio-inline
+            //-       input#purchaseMethod2(type='radio', name='purchaseMethod', value='payTwo')
+            //-       |  人民币
             .form-group
               label.col-sm-2.control-label 付款方式
               .col-sm-8
                 label.radio-inline
-                  input#paymentMethod(type='radio', name='paymentMethod', value='payOne')
+                  input#paymentMethod1(type='radio', name='paymentMethod', value='kcb')
                   |  科创币
                 label.radio-inline
-                  input#paymentMethod(type='radio', name='paymentMethod', value='payTwo')
+                  input#paymentMethod2(type='radio', name='paymentMethod', value='rmb')
                   |  人民币
                 label.radio-inline
-                  input#paymentMethod(type='radio', name='paymentMethod', value='payThree')
+                  input#paymentMethod3(type='radio', name='paymentMethod', value='kar')
                   |  科创币+人民币混合付款
+            .form-group#karMethodDom(style="display:none")
+              .col-sm-2.control-label
+              .col-sm-8
+                .col-sm-12
+                  //- p 正确填写商品属性有利于搜索，便于销售，请认真填写.
+                .col-sm-9
+                  //- div(style="background-color:#d9edf7;position: relative;float: left;font-size: 12px;clear: both;padding:20px;margin:0")
+                  div  
+                    .input-group
+                      span.input-group-addon 付款时，需支付科创币
+                      input.form-control#costKcb(type='text', aria-label='...')
+                      span.input-group-addon 元，剩余使用人民币支付
       .panel.panel-info
         .panel-heading
           | 图文描述
         .panel-body
           .form-horizontal
             .form-group
-              label.col-sm-2.control-label Product Image2
-              .col-sm-8
-                .upload_image_item
-                  .upload_image_item_border
+              label.col-sm-2.control-label 商品图片
+              .col-sm-8#productImages
+                .upload_image_item#productImage1
+                  .upload_image_item_border(onclick="openImageManage('productImage1')" data-toggle="modal" data-target="#myModal")
                     .upload_image_item_content
-                      i.fa.fa-plus(style="margin: 0;display: block;text-align: center;color: #0085D7;font-size:20px")
-                      p(style="font-size: 12px;line-height: 1;color: #666;text-align: center;margin: 12px 0 0;") 添加上传图片
-                .upload_image_item
-                  .upload_image_item_border
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage1')")
+                .upload_image_item#productImage2
+                  .upload_image_item_border(onclick="openImageManage('productImage2')" data-toggle="modal" data-target="#myModal")
                     .upload_image_item_content
-                      i.fa.fa-plus(style="margin: 0;display: block;text-align: center;color: #0085D7;font-size:20px")
-                      p(style="font-size: 12px;line-height: 1;color: #666;text-align: center;margin: 12px 0 0;") 添加上传图片
-                .upload_image_item
-                  .upload_image_item_border
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage2')")
+                .upload_image_item#productImage3
+                  .upload_image_item_border(onclick="openImageManage('productImage3')" data-toggle="modal" data-target="#myModal")
                     .upload_image_item_content
-                      i.fa.fa-plus(style="margin: 0;display: block;text-align: center;color: #0085D7;font-size:20px")
-                      p(style="font-size: 12px;line-height: 1;color: #666;text-align: center;margin: 12px 0 0;") 添加上传图片
-                .upload_image_item
-                  .upload_image_item_border
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage3')")
+                .upload_image_item#productImage4
+                  .upload_image_item_border(onclick="openImageManage('productImage4')" data-toggle="modal" data-target="#myModal")
                     .upload_image_item_content
-                      i.fa.fa-plus(style="margin: 0;display: block;text-align: center;color: #0085D7;font-size:20px")
-                      p(style="font-size: 12px;line-height: 1;color: #666;text-align: center;margin: 12px 0 0;") 添加上传图片
-                .upload_image_item
-                  .upload_image_item_border
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage4')")
+                .upload_image_item#productImage5
+                  .upload_image_item_border(onclick="openImageManage('productImage5')" data-toggle="modal" data-target="#myModal")
                     .upload_image_item_content
-                      i.fa.fa-plus(style="margin: 0;display: block;text-align: center;color: #0085D7;font-size:20px")
-                      p(style="font-size: 12px;line-height: 1;color: #666;text-align: center;margin: 12px 0 0;") 添加上传图片
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage5')")
             .form-group
-              label.col-sm-2.control-label Product Details
+              label.col-sm-2.control-label 商品详细描述
               .col-sm-8
                 div#ReplyContent
                 .checkbox-inline(style="display:none")
                   label
                     input#ParseURL(type='checkbox' checked)
                     | 处理URL
-                .form-group
-                include ../../media/media_index.pug  
+                button#showButton.btn.btn-primary.btn-xs(style="float:right;display:block" onclick="showAttachment()") 展开附件模块
+                button#hideButton.btn.btn-primary.btn-xs(style="float:right;display:none" onclick="hideAttachment()") 收起附件模块
+            .form-group#attachmentDom(style="display:none")
+              .col-sm-2
+              .col-sm-8
+               include ../../media/media_index.pug  
             .form-group
               label.col-sm-2.control-label
               .col-sm-8
-                button.btn.btn-primary.radius(onclick='submitToShelf()', type='submit')
+                button.btn.btn-primary.radius(onclick='productToShelf("1")', type='submit')
                   i.fa.fa-save
                   | &nbsp;保存并提交审核
                 button.btn.btn-info.radius(onclick='test()', type='submit')
@@ -139,16 +199,42 @@ block name
         .panel-footer
           | Panel Footer
           button.btn.btn-primary(onclick="autoCalcuPrice()") test
+      #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+        .modal-dialog(role='document' style="margin-top:200px;width:900px")
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal', aria-label='Close')
+                span(aria-hidden='true') ×
+              h4#myModalLabel.modal-title 图片管理器
+            .modal-body
+              .row#imageArrayDom()
+            .modal-footer
+              nav(aria-label='Page navigation')
+                ul.pagination(style="margin:0")  
+                  li
+                    a(href='javascript:void(0);', aria-label='Previous' onclick="prevPageManage()")
+                      span(aria-hidden='true') «
+                  li 
+                    b#currentSkip 
+                    b /
+                    b#maxSkip     
+                  li
+                    a(href='javascript:void(0);', aria-label='Next' onclick="nextPageManage()")
+                      span(aria-hidden='true') »            
+
+
+
 block manageScripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+  link(href="/jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  script(src="/jquery-ui-1.10.4.custom.js")
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/commonmark/dist/commonmark.js')
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')  
   script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
-  //- script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
   script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/shop/manage/shelfEditor.js?v=${global.NKC.startTime}`)
-  script(src=`/media/media_index.js?v=${startTime}`)
   script(src=`/shop/manage/shelf.js`)
+  script(src=`/media/media_index.js?v=${startTime}`)
