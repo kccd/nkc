@@ -3,19 +3,16 @@ module.exports = router;
 router
   .get('/', async (ctx, next) => {
     const {query, data, db} = ctx;
-    const {cid, qid} = query;
-    if(ctx.get('FROM') !== 'nkcAPI') {
-      const categoryCount = await db.ExamsCategoryModel.count();
-      if(categoryCount === 0) ctx.throw(403, '考试功能暂未开放');
-      ctx.template = 'exam/editor.pug';
-      return await next();
-    }
+    const {qid} = query;
+    ctx.template = 'exam/editor.pug';
     if(qid) {
       if(!ctx.permission('modifyQuestion')) ctx.throw(403, '权限不足');
-      data.question = await db.QuestionModel.findOnly({_id: Number(qid)});
+      const question = await db.QuestionModel.findOnly({_id: Number(qid)});
+      if(question.uid !== data.user.uid && !ctx.permission('modifyAllQuestions')) ctx.throw(403, '无权修改别人的试题');
+      if(question.disabled) ctx.throw(403, '试题已被屏蔽，无法修改');
+      if(question.auth !== null && !ctx.permission('modifyAllQuestions')) ctx.throw(403, '试题已通过审核，无法修改');
+      data.question = (await db.QuestionModel.extendQuestions([question]))[0];
     }
-    data.cid = Number(cid);
     data.qid = Number(qid);
-    data.categories = await db.ExamsCategoryModel.find({}).sort({order: 1});
     await next();
   });

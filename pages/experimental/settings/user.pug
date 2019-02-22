@@ -119,9 +119,8 @@ block content
                           span.text-danger 未通过
                       th
                         if user.volumeB
-                          if user.sheetB
-                            a(href=`/q/${user.sheetB.category}` target='_blank')
-                              span.text-success=`通过${user.sheetB?` - ${user.sheetB.category}`:''}`
+                          if user.paperB
+                            span.text-success=`通过 - ${user.paperB.name}`
                           else
                             span.text-success 通过 - 试卷丢失
                         else

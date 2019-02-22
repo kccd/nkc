@@ -1,0 +1,22 @@
++includeJS('/xss/dist/xss.js')
+script.
+  var xss = window.filterXSS;
+  var default_whitelist = xss.whiteList;
+  default_whitelist.img = ['src','style'];
+
+  var xssoptions = {
+    whiteList:default_whitelist,
+    onTagAttr: function(tag, name, value, isWhiteAttr) {
+      if(isWhiteAttr) {
+        if(tag === 'a' && name === 'href') {
+          var valueHandled = value.replace('javascript:', '');
+          return "href=" + valueHandled;
+        }
+      }
+    }
+  };
+
+  var custom_xss = new xss.FilterXSS(xssoptions);
+  NKC.methods.custom_xss_process = function(str){
+    return custom_xss.process(str)
+  };;

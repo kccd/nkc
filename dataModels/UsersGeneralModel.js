@@ -114,6 +114,12 @@ const usersGeneralSchema = new Schema({
 	    type: Number,
       default: 0
     }
+  },
+  examSettings: {
+    stageTime: {
+      type: Date,
+      default: new Date('2000-1-1 00:0000')
+    }
   }
 }, {
 	collection: 'usersGeneral'

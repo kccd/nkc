@@ -132,6 +132,7 @@ function screenTopAlert(text){
 }
 
 function screenTopWarning(text){
+  text = text.error || text;
   return screenTopAlertOfStyle(text,'warning')
 }
 
@@ -711,7 +712,7 @@ $("document").ready(function(){
   })
 });
 
-function uploadFilePromise(url, data, onprogress) {
+function uploadFilePromise(url, data, onprogress, method) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {
@@ -734,7 +735,7 @@ function uploadFilePromise(url, data, onprogress) {
         }
       }
     };
-    xhr.open("POST",url, true);
+    xhr.open(method||"POST",url, true);
     xhr.setRequestHeader("FROM","nkcAPI");
     xhr.send(data);
   });

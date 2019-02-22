@@ -70,8 +70,8 @@ var app = new Vue({
   },
   updated: function() {
     var panel = app.$refs.panel;
-    if(panel.scrollTop + panel.clientHeight >= panel.scrollHeight-100) {
-      panel.scrollTo(10000,10000)
+    if(panel.scrollTop + panel.clientHeight >= panel.scrollHeight-300) {
+      panel.scrollTo(0,999999999999999999999)
     }
   }
 });

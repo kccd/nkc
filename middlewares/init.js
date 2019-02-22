@@ -12,7 +12,7 @@ const path = require('path');
 module.exports = async (ctx, next) => {
 	try {
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
-	  let XFF = ctx.get('X-Forwarded-For');
+    let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
 	    XFF = XFF.replace(/::ffff:/ig, '');
       [ip_] = XFF.split(':');

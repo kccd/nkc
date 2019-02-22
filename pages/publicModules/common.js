@@ -52,18 +52,6 @@ NKC.methods.scrollToTop = function(number, time) {
 };
 
 /*
-*  @格式化是阿锦
-* */
-NKC.methods.format = function(m, t) {
-  if(typeof moment === "undefined") throw 'moment is not loaded';
-  return moment(t).format(m);
-};
-NKC.methods.fromNow = function(t) {
-  if(typeof moment === "undefined") throw 'moment is not loaded';
-  return moment(t).fromNow();
-};
-
-/*
 * 通过vue渲染分页按钮，计算分页需要的关键数据
 * @param paging对象 包含属性page, pageCount
 * @return paging对象 包含属性page, pageCount, btnList(数组对象, 对象属性包括：text、page、active)
@@ -231,44 +219,4 @@ function uploadFileAPI(url, method, formData, onUploadProgress) {
         }
       })
   });
-}
-
-/*
-* 页面顶部弹出提示
-* @param data 需要显示的字符串
-* @author pengxiguaa 2019/1/15
-* */
-function screenTopAlert(data) {
-  mdui.snackbar({
-    message: data,
-    position: 'top'
-  });
-}
-
-/*
-* 页面顶部弹出提示
-* @param data 需要显示的字符串，兼容对象：{message: 'blabla'}、{error: 'blabla'}
-* @return null
-* @author pengxiguaa 2019/1/15
-* */
-function screenTopWarning(data) {
-  mdui.snackbar({
-    message: data.message || data.error || data,
-    position: 'top'
-  });
-}
-
-/*
-* 播放新信息提示音
-* @param name 信息新类型，根据此类型播放相应的音频
-* @author pengxiguaa 2019/1/18
-* */
-function beep(name) {
-  var audio = document.getElementById('beep');
-  if(audio) {
-    if(audio.getAttribute('data-' + name) === 'true') {
-      audio.setAttribute('src', "/default/" + name + '.wav' + '?t=' + Date.now());
-      audio.play();
-    }
-  }
 }

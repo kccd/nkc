@@ -4,10 +4,7 @@ if(!fs.existsSync('./install/install.lock')) {
 }
 
 
-global.NKC = {};
-global.NKC.NODE_ENV = (process.env.NODE_ENV === 'production')? process.env.NODE_ENV: 'development';
-global.NKC.startTime = Date.now();
-global.NKC.processId =  Number(process.env.PROCESS_ID) || 0;
+require('./global');
 
 require('colors');
 const http = require('http'),

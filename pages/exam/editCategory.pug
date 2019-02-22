@@ -1,0 +1,107 @@
+extends ../bootstrap_base
+block title
+  title 新建考卷
+  +includeCSS('/exam/exam.css')
+block content
+  .container-fluid.max-width
+    include ./nav
+    .hidden#data=JSON.stringify({roles: data.roles, category: data.category, from: data.from})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-6
+        .form-horizontal
+          .form-group
+            label(class="col-sm-2 control-label") 考卷名称
+            .col-sm-10
+              input(class="form-control" placeholder="请输入考卷名称，50字以内" v-model='category.name')
+          .form-group
+            label(class="col-sm-2 control-label") 考卷介绍
+            .col-sm-10
+              textarea(class="form-control" placeholder="请输入考卷介绍，500字以内" v-model='category.description' style='min-height: 9rem;')
+          .form-group
+            label(class="col-sm-2 control-label") 考卷难度
+            .col-sm-10
+              h5(v-if='category._id') {{{'A': '基础', 'B': '专业'}[category.volume]}}
+              div(v-else)
+                <label class="radio-inline">
+                  <input type="radio" value="A" v-model='category.volume'> A：基础
+                </label>  
+                <label class="radio-inline">
+                  <input type="radio" value="B" v-model='category.volume'> B：专业
+                </label>
+          .form-group
+            label(class="col-sm-2 control-label") 颁发证书
+            .col-sm-10
+              .checkbox
+                label(v-for='role in roles').m-r-1
+                  input(type="checkbox" :value='role._id' v-model='category.rolesId')
+                  | {{role.displayName}}
+          .form-group
+            label(class="col-sm-2 control-label") 试题来源
+            .col-sm-10   
+              div(v-if='category.from.length === 0')
+                h5.text-danger 暂未选择任何专业领域     
+              div(v-else)    
+                h5 已选择的专业领域 试题总数：{{questionsCount}}
+                table.table.table-bordered
+                  thead
+                    tr
+                      th 专业名称
+                      th 抽取数目
+                      th
+                  tbody
+                    tr(v-for='from in category.from')
+                      th {{from.forum?from.forum.displayName: '公共题库'}}
+                      th 
+                        input(type='number' v-model.number='from.count')
+                      th 
+                        button(@click='removeForum(from)') 移除        
+              button.btn.btn-default.btn-sm(@click='showForums = !showForums') 全部专业领域
+              //- select.form-control(style='max-width: 10rem;')
+              //-   option(v-for='from of f') {{from.forum?from.forum.displayName: '公共题'}}
+              //- button.btn.btn-default 添加  
+              div(v-if='showForums').m-t-1
+                table.table.table-bordered
+                  thead
+                    tr
+                      th 专业名称
+                      th 基础题数
+                      th 专业题数
+                      th
+                  tbody
+                    tr(v-for='from in f')
+                      th {{from.forum?from.forum.displayName: '公共题库'}}
+                      th {{from.countA}}
+                      th {{from.countB}} 
+                      th 
+                        button(@click='addForum(from)') 添加
+          .form-group
+            label(class="col-sm-2 control-label") 及格分数
+            .col-sm-10
+              input(class="form-control" placeholder="请输入及格分数，不能大于试题总数且不能小于1" v-model.number='category.passScore')    
+          .form-group
+            label(class="col-sm-2 control-label") 答题时间
+            .col-sm-10
+              input(class="form-control" placeholder="请输入答题时间，单位分钟" v-model.number='category.time')
+          .form-group
+            label(class="col-sm-2 control-label") 是否屏蔽
+            .col-sm-10
+              <label class="radio-inline">
+                <input type="radio" value="true" v-model='category.disabled'> 是
+              </label>  
+              <label class="radio-inline">
+                <input type="radio" value="false" v-model='category.disabled'> 否
+              </label>
+          .form-group
+            label(class="col-sm-2 control-label") 
+            .col-sm-10    
+              button.btn.btn-primary.btn-block(@click='save') 提交
+      .col-xs-12.col-md-4.col-md-offset-2
+        h3 已创建的考卷
+        hr
+        for c in data.categories
+          h4
+            span=`【${c.name}】`
+            span=`${{'A':'【基础题】','B': '【专业题】'}[c.volume]}${c.disabled?'【已屏蔽】':''}`
+            a(href=`/exam/categories/editor?cid=${c._id}`) 编辑
+block scripts
+  +includeJS('/exam/editCategory.js')        
