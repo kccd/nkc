@@ -24,6 +24,10 @@ var defaultQuestion = {
 var app = new Vue({
   el: '#app',
   data: {
+    auth: {
+      status: true,
+      reason: ''
+    },
     submitted: false,
     submitting: '',
     question: JSON.parse(JSON.stringify(defaultQuestion)),
@@ -125,6 +129,10 @@ var app = new Vue({
       var url = '/exam/question';
       var method = 'POST';
       if (q._id) {
+        if(document.getElementById('auth')) {
+          app.auth.status = [true, 'true'].indexOf(app.auth.status) !== -1;
+          formData.append('auth', JSON.stringify(app.auth));
+        }
         url = '/exam/question/' + q._id;
         method = 'PATCH';
       }
@@ -137,7 +145,7 @@ var app = new Vue({
       }, method)
         .then(function () {
           if(question._id) {
-            screenTopAlert('保存成功');
+            window.location.href = document.referrer;
           } else {
             app.submitting = '';
             app.submitted = true;

@@ -42,7 +42,7 @@ block content
           a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题
           a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
             if data.unViewedCount > 0
-              span=`(${data.unViewedCount})`
+              .red-point=` ${data.unViewedCount}`
         else 
           a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
           p 当前只允许学术分1分以上的会员命题，您还没有学术分。点击
@@ -59,7 +59,8 @@ block content
           if permission('visitExamsQuestionAuth')  
             a.m-t-1.btn.btn-default.btn-block(href=`/exam/auth`)
               if data.unauthCount
-                span= `试题审核(${data.unauthCount})`
+                span= `试题审核 `
+                span.red-point=data.unauthCount
               else
                 | 试题审核          
         .p-t-2        

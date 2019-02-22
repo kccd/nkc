@@ -20,13 +20,26 @@ router
   })
   .get('/paper', async (ctx, next) => {
     const {data, query, db, nkcModules} = ctx;
-    const {page = 0, t} = query;
+    const {page = 0, t, sortby, cat} = query;
     data.t = t;
+    data.sortby = sortby;
+    data.cat = cat;
     const q = {};
     if(t === 'self') {
       q.uid = data.user.uid
     } else {
       if(!ctx.permission('viewAllPaperRecords')) ctx.throw(403, '权限不足');
+      if(sortby && cat) {
+        if(sortby === 'username') {
+          const targetUser = await db.UserModel.findOne({usernameLowerCase: cat.toLowerCase()});
+          if(!targetUser) ctx.throw(400, `用户不存在`);
+          q.uid = targetUser.uid;
+        } else if(sortby === 'uid') {
+          const targetUser = await db.UserModel.findOne({uid: cat});
+          if(!targetUser) ctx.throw(400, `用户不存在`);
+          q.uid = targetUser.uid;
+        }
+      }
       q.$or = [
         {
           submitted: true

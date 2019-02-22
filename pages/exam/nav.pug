@@ -5,9 +5,9 @@ ol.exam-nav
     li
       a(href="/exam/editor") 参与出题
     li
-      a(href="/exam/record/question") 出题记录
+      a(href="/exam/record/question") 出题记录&nbsp;
         if data.unViewedCount > 0
-          span=`(${data.unViewedCount})`
+          span.red-point=`${data.unViewedCount}`
   li
     a(href="/exam/record/paper?t=self") 考试记录
   if permission('addExamsCategory')
@@ -18,9 +18,10 @@ ol.exam-nav
       a(href="/exam/questions") 试题管理
   if permission('visitExamsQuestionAuth')
     li
-      a(href="/exam/auth") 
+      a(href="/exam/questions?t=waiting") 
         if data.unauthCount
-          span= `试题审核(${data.unauthCount})`
+          span= `试题审核 `
+          span.red-point=data.unauthCount
         else
           | 试题审核  
     
