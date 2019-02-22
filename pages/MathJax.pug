@@ -19,9 +19,3 @@ script(type='text/x-mathjax-config').
     }
   })
 script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')
-script.
-  NKC.methods.asyncRender = function() {
-    var script = document.createElement('script');
-    script.src = '/external_pkgs/MathJax-2.6-latest/MathJax.js?t=' + Date.now();
-    document.getElementsByTagName('body')[0].appendChild(script);
-  }
