@@ -20,7 +20,7 @@ block content
           .form-group
             label(class="col-sm-2 control-label") 考卷难度
             .col-sm-10
-              h5(v-if='category._id') {{{'A': '基础', 'B': '专业'}[category.volume]}}
+              h5(v-if='category._id') {{{'A': 'A(基础级)', 'B': 'B(专业级)'}[category.volume]}}
               div(v-else)
                 <label class="radio-inline">
                   <input type="radio" value="A" v-model='category.volume'> A：基础

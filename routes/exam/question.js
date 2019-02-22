@@ -64,6 +64,7 @@ router
   .patch('/:_id', async (ctx, next) => {
     const {db, data, body, params, tools, settings, fs} = ctx;
     const {contentLength} = tools.checkString;
+    const {user} = data;
     const {_id} = params;
     const questionDB = await db.QuestionModel.findOnly({_id});
     if(questionDB.disabled) ctx.throw(403, '试题已被屏蔽');
@@ -104,8 +105,22 @@ router
       hasImage: false
     };
     if(auth === false) {
-      q.auth = null;
+      // 提交自己审核不通过的试题时，试题会再次变为"待审核"状态。
+      if(questionDB.uid === user.uid) {
+        q.auth = null;
+      }
+    } else if(auth === null) {
+      // 当试题未通过审核时，若编辑者拥有审核试题的权限，则用户在编辑的时候可直接提交审核结果。
+      if(ctx.permission('submitExamsQuestionAuth') && fields.auth) {
+        let {status, reason} = JSON.parse(fields.auth);
+        status = !!status;
+        if(!status && reason === '') ctx.throw(400, '原因不能为空');
+        if(contentLength(reason) > 500) ctx.throw(400, '原因字数不能超过500');
+        q.auth = status;
+        if(q.auth === false) q.reason = reason;
+      }
     }
+    
     if(file) {
       const {path} = file;
       const questionPath = settings.upload.questionImagePath;
@@ -124,6 +139,16 @@ router
     ctx.filePath = settings.upload.questionImagePath + '/' + question._id + '.jpg';
     ctx.set('Cathe-Control', `public, max-age=${settings.cache.maxAge}`);
     ctx.type = 'jpg';
+    await next();
+  })
+  .del('/:_id', async (ctx, next) => {
+    const {params, db, data} = ctx;
+    const {user} = data;
+    const {_id} = params;
+    const question = await db.QuestionModel.findOnly({_id});
+    if(question.uid !== user.uid && !ctx.permission('removeAllQuestion')) ctx.throw(403, '仅能删除自己的且未能通过审核的试题');
+    if(question.auth !== false) ctx.throw(400, '只能删除未通过审核的试题');
+    await question.remove();
     await next();
   })
   .post('/:_id/disabled', async (ctx, next) => {

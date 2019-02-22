@@ -33,7 +33,6 @@ const me = require('./me');
 const m = require('./personalForum');
 const p = require('./post');
 const problem = require('./problem');
-const q = require('./question');
 const register = require('./register');
 const search = require('./search');
 const sendMessage = require('./sendMessage');
@@ -68,7 +67,8 @@ operationObj.defaultOperations = [
   'canSendToEveryOne', // 跳过`仅接收好友信息`限制
   'creditXsf',
   'modifyAllQuestions', // 可修改审核过的试题
-  'viewAllPaperRecords' // 可查看所有的考试记录
+  'viewAllPaperRecords', // 可查看所有的考试记录
+  'removeAllQuestion' // 可删除别人出的试题
 ];
 
 
@@ -132,8 +132,6 @@ operationObj.operationTree = {
 		p,// 回复
 
 		problem,// 报告问题
-
-		q,// 题库
 
 		register,// 注册
 

@@ -3,11 +3,19 @@ const router = new Router();
 router
   .get('/', async (ctx, next) => {
     const {nkcModules, query, db, data} = ctx;
-    let {t, fid, page = 0} = query;
+    let {t, fid, page = 0, v} = query;
     const q = {};
+    if(['A', 'B'].includes(v)) {
+      q.volume = v;
+      data.v = v;
+    }
     data.t = t;
     if(t === 'pub') {
       q.public = true;
+    } else if(t === 'un') {
+      q.auth = false;
+    } else if(t === 'waiting'){
+      q.auth = null;  
     } else {
       if(fid) {
         q.public = false;
@@ -53,6 +61,8 @@ router
       disabled: false,
       auth: true
     });
+    data.unCount = await db.QuestionModel.count({auth: false});
+    data.waitingCount = await db.QuestionModel.count({auth: null});
     ctx.template = 'exam/questions.pug';
     await next();
   });

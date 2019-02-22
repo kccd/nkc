@@ -33,7 +33,8 @@ module.exports = {
   question: {
     POST: 'postQuestion',
 	  PARAMETER: {
-	    PATCH: 'modifyQuestion',
+      PATCH: 'modifyQuestion',
+      DELETE: 'removeQuestion',
       disabled: {
 	      DELETE: 'enabledQuestion',
         POST: 'disabledQuestion'

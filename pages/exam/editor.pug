@@ -94,6 +94,20 @@ block content
                     v-model='a.text'
                     v-if='index !== 0'
                   )
+            if permission('submitExamsQuestionAuth') && data.question && data.question.auth === null  
+              .form-group(id='auth')
+                label(class="col-sm-2 control-label") 审核
+                .col-sm-10      
+                  <label class="radio-inline">
+                    <input type="radio" value="true" v-model='auth.status'> 通过
+                  </label>  
+                  <label class="radio-inline">
+                    <input type="radio" value="false" v-model='auth.status'> 不通过
+                  </label>
+              .form-group(v-if='auth.status === "false" || auth.status === false')
+                label(class="col-sm-2 control-label") 原因
+                .col-sm-10    
+                  textarea.form-control(placeholder='请输入原因，500字以内' v-model='auth.reason' rows=7)  
             .form-group
               label(class="col-sm-2 control-label") 
               .col-sm-10     
