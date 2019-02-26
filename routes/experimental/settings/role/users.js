@@ -1,17 +1,13 @@
+'use strict'
 const Router = require('koa-router');
 const usersRouter = new Router();
 usersRouter
 	.get('/', async (ctx, next) => {
 		const {data, query} = ctx;
-		let {page} = query;
+		const {page = 0} = query;
 		const {role} = data;
 		if(role._id === 'visitor') {
-			return ctx.redirect(`/e/settings/role/visitor/base`);
-		}
-		if(page) {
-			page = parseInt(page);
-		} else {
-			page = 0;
+			return ctx.redirect(`/e/settings/role/visitor`);
 		}
 		const count = await role.extendUserCount();
 		const {apiFunction} = ctx.nkcModules;
@@ -21,7 +17,8 @@ usersRouter
 		data.users = await Promise.all(users.map(async user => {
 			await user.extend();
 			return user;
-		}));
+    }));
+    ctx.template = 'experimental/settings/role/users.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

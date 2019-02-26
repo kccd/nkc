@@ -98,6 +98,13 @@
             li
               a(href='/e/settings/exam')=lang('ex', 'exam')
           <li role="separator" class="divider"></li>
+          if permission('visitRoleSettings')    
+            li
+              a(href='/e/settings/role') 证书
+          if permission('visitOperationSetting')     
+            li
+              a(href='/e/settings/operation') 权限  
+          <li role="separator" class="divider"></li>    
           li
             a(href='/e/settings/home/top') 网站首页
           li

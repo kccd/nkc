@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const baseRouter = new Router();
 baseRouter
 	.get('/', async (ctx, next) => {
+    ctx.template = 'experimental/settings/role/singleRole.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

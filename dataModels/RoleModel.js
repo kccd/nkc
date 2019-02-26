@@ -2,11 +2,15 @@ const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const roleSchema = new Schema({
 	_id: String,
-	defaultRole: {
-		type: Boolean,
-		default: false,
-		index: 1
-	},
+  type: { // 类型 system: 系统类（无法删除），management: 管理类（只能手动颁发），common: 普通的（可自动颁发）
+    type: String,
+    required: true,
+    index: 1
+  },
+  hasIcon: { // 是否有图标
+    type: Boolean,
+    default: false
+  },
 	toc: {
 		type: Date,
 		default: Date.now,
@@ -31,13 +35,7 @@ const roleSchema = new Schema({
 		unique: true,
 		required: true,
 		maxlength: [8, '名称不能超过8个字']
-	},
-	abbr: {
-		type: String,
-		unique: true,
-		required: true,
-		maxlength: [4, '简称不能超过4个字']
-	},
+  },
 	color: {
 		type: String,
 		default: '#aaaaaa'
@@ -144,12 +142,10 @@ roleSchema.methods.extendUserCount = async function() {
 	const UserModel = await mongoose.model('users');
 	const q = {};
 	if(this._id === 'scholar') {
-		q.certs = {$ne: 'banned'};
 		q.xsf = {$gt: 0};
 	} else if(this._id === 'default') {
-		q.certs = {$ne: 'banned'};
+		
 	} else {
-		q.certs = {$ne: 'banned'};
 		q.certs = this._id;
 	}
 	const count = await UserModel.count(q);
@@ -161,12 +157,9 @@ roleSchema.methods.getUsers = async function(paging) {
 	const UserModel = mongoose.model('users');
 	const q = {};
 	if(this._id === 'scholar') {
-		q.certs = {$ne: 'banned'};
 		q.xsf = {$gt: 0};
 	} else if(this._id === 'default') {
-		q.certs = {$ne: 'banned'};
 	} else {
-		q.certs = {$ne: 'banned'};
 		q.certs = this._id;
 	}
 	return await UserModel.find(q).sort({toc: -1}).skip(start).limit(perpage);

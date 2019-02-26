@@ -1,0 +1,14 @@
+extends ../../experimental.pug
+block eTitle
+  title= `所有用户 | ${data.role.displayName}`
+block eContent  
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          table.table
+            thead
+              tr
+                th 注册时间
+                th 用户名
+                th 

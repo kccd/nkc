@@ -415,6 +415,9 @@
   "viewAllPaperRecords": "可查看所有的考试记录",
   "removeQuestion": "删除试题",
   "removeAllQuestion": "删除别人的试题",
+  "visitRoleSettings": "访问《后台管理-证书设置》",
+  "uploadRoleIcon": "上传证书图标",
+  "modifyRole": "修改证书设置",
 
 
   "APPgetUserInfo": "app获取用户信息",
