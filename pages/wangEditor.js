@@ -1980,14 +1980,19 @@ Clean.prototype = {
         // 点击菜单将出发这里
 
         var editor = this.editor;
-        // var $selectionELem = editor.selection.getSelectionContainerElem();
-        // var selectionText = editor.selection.getSelectionText();
+        var $selectionELem = editor.selection.getSelectionContainerElem();
         var container = document.createElement('div');
         container.appendChild(editor.selection._currentRange.cloneContents());
         // 清除格式保留图片 img
-        // 清除格式保留p标签，如果清除掉p标签，换行就会有问题
+        // 清除格式保留p标签，如果清除掉p标签，则不能换行
         var imgInHtml = container.innerHTML.replace(/<(?!p|img|br|table)[^>]+>/g,"");
-        editor.cmd.do('insertHTML', '<span>' + imgInHtml + '</span><p><br></p>');
+        // 在引用中不可以执行清除格式
+        // 如果想要取消引用需要再次点击引用按钮
+        var $selectionELem = editor.selection.getSelectionContainerElem();
+        var currentElem = $selectionELem.getNodeName();
+        if(currentElem !== "BLOCKQUOTE"){
+            editor.cmd.do('insertHTML', '<span>' + imgInHtml + '</span><p><br></p>');
+        }
     }
 }
 
@@ -2245,7 +2250,7 @@ Quote.prototype = {
         var editor = this.editor;
         var $selectionElem = editor.selection.getSelectionContainerElem();
         var nodeName = $selectionElem.getNodeName();
-
+        
         if (!UA.isIE()) {
             if (nodeName === 'BLOCKQUOTE') {
                 // 撤销 quote

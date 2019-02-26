@@ -656,7 +656,7 @@ function onPost(that) {
         }
       })
       .catch(function (data) {
-        jwarning(data.error);
+        jwarning(data || data.error);
         geid('post').disabled = false
       })
   }
