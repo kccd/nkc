@@ -30,6 +30,16 @@ block content
                 i.glyphicon.glyphicon-credit-card
                 |                             商品上架
             li(style="background-color: aliceblue")
+              a.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse')
+                i.glyphicon.glyphicon-cog
+                |                             物流管理
+                span.pull-right.glyphicon.glyphicon-chevron-down
+              ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
+                li
+                  a(href='mytask')
+                    i.glyphicon.glyphicon-user
+                    | 服务商设置
+            li(style="background-color: aliceblue")
               a.nav-header.collapsed(href='#systemSetting', data-toggle='collapse')
                 i.glyphicon.glyphicon-cog
                 |                             店铺设置
@@ -64,6 +74,14 @@ block content
               a(href='./charts.html')
                 i.glyphicon.glyphicon-calendar
                 |                             图表统计
+            li(style="background-color: aliceblue")
+              a(href='./openStore')
+                i.glyphicon.glyphicon-calendar
+                |                             开店申请
+            li(style="background-color: aliceblue")
+              a(href='./info')
+                i.glyphicon.glyphicon-calendar
+                |                             店铺信息
         .col-xs-10.col-md-10
           block name               
 block scripts

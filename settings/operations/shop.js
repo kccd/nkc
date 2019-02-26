@@ -15,7 +15,15 @@ module.exports = {
       shelf: {
         GET: 'visitShelfIndex',
         POST: 'productToShelf'
+      },
+      info: {
+        GET: 'visitShopInfoIndex',
+        POST: 'modifyShopInfo'
       }
     },
+  },
+  openStore: {
+    GET: 'visitOpenStoreIndex',
+    POST: 'openStoreApply'
   }
 };

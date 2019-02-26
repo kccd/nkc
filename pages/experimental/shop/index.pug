@@ -1,0 +1,35 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 商城设置
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#content
+          .col-xs-12.col-sm-2.col-md-2(style='margin-bottom: 1rem;')
+            .list-group
+              a.list-group-item.active(href='/e/settings/shop/applys', type='button')
+                | 店铺申请处理
+                span.badge(style='background-color: #000000;color: #ffffff;') 5
+              //- a.list-group-item(href='/e/settings/role/default/users', type='button')
+              //-   | 普通用户
+              //-   span.badge(style='background-color: #234233;color: #ffffff;') 74537
+              //- a.list-group-item(href='/e/settings/role/banned/users', type='button')
+              //-   | 被封用户
+              //-   span.badge(style='background-color: #a23422;color: #ffffff;') 1560
+              //- a.list-group-item(href='/e/settings/role/visitor/users', type='button') 游客
+              //- a.list-group-item(href='/e/settings/role/moderator/users', type='button')
+              //-   | 版主
+              //-   span.badge(style='background-color: #aaaaaa;color: #ffffff;') 19
+          block shopSettings
+block scripts
+  block shopSettingScripts
+
+
+
+

@@ -4,6 +4,18 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		shop: {
+			GET: 'visitShopSettings',
+			applys: {
+				GET: 'visitShopOpenStoreApplys',
+				approve: {
+					POST: 'approveApplyStore'
+				},
+				reject: {
+					POST: "rejectApplyStore"
+				}
+			}
+		},
 	  login: {
 	    GET:'visitLoginSettings',
       PATCH: 'modifyLoginSettings'

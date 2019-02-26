@@ -1,0 +1,26 @@
+extends ./index.pug
+
+block name
+  .row
+    .col-md-12.col-sm-12.col-xs-12
+      .panel.panel-info
+        .panel-heading
+          | 店铺信息
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 店铺名称
+              .col-sm-8
+                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="30")
+            .form-group
+              label.col-sm-2.control-label 店铺简介
+              .col-sm-8
+                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对店铺的简单介绍' rows='3' maxlength='200')
+                p(style="color:#ccc") 最多200个字
+            .form-group
+              label.col-sm-2.control-label 经营地址
+              .col-sm-8
+                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="30")
+
+
+block manageScripts
