@@ -12,12 +12,13 @@ infoRouter
 		const {user} = data;
 		// 验证是否有操作该店铺的权限
 		// 待定
-		let storeInfo = body.post;
+		const {location, storeDescription, storeName} = body;
 		const storeId = params.account;
 		let store = await db.ShopStoresModel.findOne({storeId});
 		if(!store || storeId !== store.storeId) ctx.throw(400, "您无对该店铺的管理权限");
-		console.log(store)
-		await store.update({$set:{}})
+		let addressArray = [];
+		addressArray.push(location)
+		await store.update({$set:{storeName:storeName, storeDescription:storeDescription,dataPerfect:true,address:addressArray}});
 		await next();
 	})
 module.exports = infoRouter;

@@ -11,6 +11,16 @@ const shopStoresSchema = new Schema({
     index: 1,
     required: true
   },
+  // 店铺名称
+  storeName: {
+    type: String,
+    default: "",
+  },
+  // 店铺简介
+  storeDescription: {
+    type: String,
+    default: ""
+  },
   // 店主id
   uid: {
     type: String,

@@ -190,7 +190,7 @@ block name
             .form-group
               label.col-sm-2.control-label
               .col-sm-8
-                button.btn.btn-primary.radius(onclick='productToShelf("1")', type='submit')
+                button.btn.btn-primary.radius(onclick=`productToShelf("${data.myStore.storeId}")`, type='submit')
                   i.fa.fa-save
                   | &nbsp;保存并提交审核
                 button.btn.btn-info.radius(onclick='test()', type='submit')

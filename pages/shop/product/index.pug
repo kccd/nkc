@@ -207,68 +207,112 @@ block content
                       span.fa.fa-star(style="color:red")
         .col-xs-12.col-md-9
           .col-xs-12.col-xs-12
-            ul.nav.nav-tabs
+            // Nav tabs
+            ul.nav.nav-tabs(role='tablist')
+              li.active(role='presentation')
+                a(href='#home', aria-controls='home', role='tab', data-toggle='tab') Description
               li(role='presentation')
-                a(href='#') Description
-              li.active(role='presentation')
-                a(href='#') Reviews (12)
-              li.active(role='presentation')
-                a(href='#')
+                a(href='#profile', aria-controls='profile', role='tab', data-toggle='tab')
                   | Reviewa 
                   span.badge(style="background-color:#22258c") 12
-
-            div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
-              div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
+              li(role='presentation')
+                a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab') Messages
+            // Tab panes
+            .tab-content
+              #home.tab-pane.active(role='tabpanel')
+                div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
+                  h3(style="text-align:center") 商品详细描述
+                  div(style="padding:20px")!=data.productInfo.productDetails
+              #profile.tab-pane(role='tabpanel')
+                //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
                 div
-                  | Drand Name：
-                  b(target='_blank') 科创仪表局
-              p(style="padding:5px 20px")
-                em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
-              .row(style="padding:0 20px 18px")
-                -for(var a=0;a<16;a++)
-                  .col-sm-6.col-md-4
-                    p parameter: value
-          .col-xs-12.col-md-12
-            div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-              h3(style="text-align:center") 商品详细描述
-              div!=data.productInfo.productDetails
-          .col-xs-12.col-md-12
-            //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-            div
-              .panel.panel-default
-                // Default panel contents
-                .panel-heading 
-                  .radio
-                    label
-                      input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-                      | 好评
-                    label
-                      input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-                      | 中评
-                    label
-                      input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-                      | 差评
-                    label(style="float:right")
-                      input#haveContent(type="checkbox", name="haveContent") 
-                      | 显示内容
-                  //- .check
-                  //-   label
-                  //-     input#haveContent(type="checkbox", name="haveContent") 
-                  //-     | 显示内容
-                //- .panel-body
-                ul.list-group
-                  -for(var l=0;l<9;l++)
-                    li.list-group-item 
-                      .media
-                        .media-left.media-middle
-                          a(href='#')
-                            img.media-object(src='/avatar/74847', alt='...', style="width:64px")
-                        .media-body
-                          p(style="font-size:large").media-heading 
-                          | Kris
-                          span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
-                          span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
-                          p 我觉得行 
+                  .panel.panel-default
+                    // Default panel contents
+                    .panel-heading 
+                      .radio
+                        label
+                          input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+                          | 好评
+                        label
+                          input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+                          | 中评
+                        label
+                          input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+                          | 差评
+                        label(style="float:right")
+                          input#haveContent(type="checkbox", name="haveContent") 
+                          | 显示内容
+                      //- .check
+                      //-   label
+                      //-     input#haveContent(type="checkbox", name="haveContent") 
+                      //-     | 显示内容
+                    //- .panel-body
+                    ul.list-group
+                      -for(var l=0;l<9;l++)
+                        li.list-group-item 
+                          .media
+                            .media-left.media-middle
+                              a(href='#')
+                                img.media-object(src='/avatar/74847', alt='...', style="width:64px")
+                            .media-body
+                              p(style="font-size:large").media-heading 
+                              | Kris
+                              span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
+                              span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
+                              p 我觉得行 
+              #messages.tab-pane(role='tabpanel')
+                div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
+                  div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
+                    div
+                      | Drand Name：
+                      b(target='_blank') 科创仪表局
+                  p(style="padding:5px 20px")
+                    em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
+                  .row(style="padding:0 20px 18px")
+                    -for(var a=0;a<16;a++)
+                      .col-sm-6.col-md-4
+                        p parameter: value
+          //- .col-xs-12.col-md-12
+          //-   div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
+          //-     h3(style="text-align:center") 商品详细描述
+          //-     div(style="padding:20px")!=data.productInfo.productDetails
+          //- .col-xs-12.col-md-12
+          //-   //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
+          //-   div
+          //-     .panel.panel-default
+          //-       // Default panel contents
+          //-       .panel-heading 
+          //-         .radio
+          //-           label
+          //-             input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+          //-             | 好评
+          //-           label
+          //-             input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+          //-             | 中评
+          //-           label
+          //-             input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+          //-             | 差评
+          //-           label(style="float:right")
+          //-             input#haveContent(type="checkbox", name="haveContent") 
+          //-             | 显示内容
+          //-         //- .check
+          //-         //-   label
+          //-         //-     input#haveContent(type="checkbox", name="haveContent") 
+          //-         //-     | 显示内容
+          //-       //- .panel-body
+          //-       ul.list-group
+          //-         -for(var l=0;l<9;l++)
+          //-           li.list-group-item 
+          //-             .media
+          //-               .media-left.media-middle
+          //-                 a(href='#')
+          //-                   img.media-object(src='/avatar/74847', alt='...', style="width:64px")
+          //-               .media-body
+          //-                 p(style="font-size:large").media-heading 
+          //-                 | Kris
+          //-                 span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
+          //-                 span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
+          //-                 p 我觉得行 
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
