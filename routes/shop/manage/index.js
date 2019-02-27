@@ -10,6 +10,7 @@ manageRouter
     const {user} = data;
     const myStore = await db.ShopStoresModel.findOne({storeId: account});
     if(!myStore || !user || user.uid !== myStore.uid) ctx.throw(400, "您不是该店店主");
+    data.myStore = myStore;
     await next();
   })
   .get('/:account', async (ctx, next) => {

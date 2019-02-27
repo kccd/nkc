@@ -3,6 +3,7 @@
 const resourceObj = require('./resource');
 const {
 	avatar,
+	shopLogo,
 	poster,
 	avatar_small,
 	forum_avatar,
@@ -82,6 +83,7 @@ operationObj.operationTree = {
 		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,
+		shopLogo, //店铺logo
 
 		forum_avatar,// 专业logo
 

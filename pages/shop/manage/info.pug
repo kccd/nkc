@@ -11,16 +11,55 @@ block name
             .form-group
               label.col-sm-2.control-label 店铺名称
               .col-sm-8
-                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="30")
+                input.form-control#storeName(type="text", name="storeName" placeholder="最多允许输入30个字" maxlength="30")
+            .form-group
+              label.col-sm-2.control-label 店铺标志
+              .col-sm-5
+                .row
+                  .col-xs-12.col-md-12
+                    p(style="background-color: aliceblue;border: 1px solid #70b8f7;") 文件格式JPG、JPEG、PNG;文件大小80K以内;建议尺寸100*100
+                  .col-xs-12.col-md-12.user-settings-img-dev
+                    img(src=`/shopLogo/${data.myStore.storeId}` style='width: 100px;height:100px')
+                    //div(style='width: 100%;height: 30rem;background-color: #eee;line-height: 30rem; color: #aaa;font-size: 2rem;').text-center 未选择图片
+                  .col-xs-12.col-md-12
+                    br
+                    button.btn.btn-success.btn-xs(onclick='$("#inputFile").click();') 选择图片
+                    button.btn.btn-success.btn-xs(onclick=`submit(${data.myStore.storeId})`) 保存
+                    br
+                    br
+                    input#inputFile(type='file' accept="image/*").hidden
             .form-group
               label.col-sm-2.control-label 店铺简介
               .col-sm-8
-                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对店铺的简单介绍' rows='3' maxlength='200')
+                textarea.form-control#storeDescription(name="storeDescription" placeholder='请输入对店铺的简单介绍' rows='3' maxlength='200')
                 p(style="color:#ccc") 最多200个字
             .form-group
               label.col-sm-2.control-label 经营地址
               .col-sm-8
-                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="30")
+                .bs-chinese-region.flat.dropdown(data-submit-type="id", data-min-level="0", data-max-level="4")
+                  input#location.form-control(type="text", name="location", placeholder="选择你的地区", data-toggle="dropdown", readonly="", data=null)
+                  .dropdown-menu(role="menu", aria-labelledby="dLabel")
+                    div
+                      ul.nav.nav-tabs(role="tablist")
+                        li#countryLi.active(role="presentation")
+                          a(href="#country", data-next="province", role="tab", data-toggle="tab") 国家
+                        li(role="presentation")
+                          a(href="#province", data-next="city", role="tab", data-toggle="tab") 省份
+                        li(role="presentation")
+                          a(href="#city", data-next="district", role="tab", data-toggle="tab") 城市
+                        li(role="presentation")
+                          a(href="#district", data-next="street", role="tab", data-toggle="tab") 县区
+                      .tab-content
+                        #country.tab-pane.active(role="tabpanel") --
+                        #province.tab-pane(role="tabpanel") --
+                        #city.tab-pane(role="tabpanel") --
+                        #district.tab-pane(role="tabpanel") --
+                input#address.form-control(type="text", name="address", style="margin-top:5px", placeholder="请输入详细地址")
+                //- p(style="background-color: aliceblue;border: 1px solid #70b8f7;") 最多200个字
+            .form-group(style="text-align:center")
+              button.btn.btn-primary(onclick=`saveToInfo(${data.myStore.storeId})`) 保存并提交
 
 
 block manageScripts
+  script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
+  script(src=`/shop/manage/info.js`)

@@ -126,6 +126,13 @@ const thumbnailify = (path, dest) => {
   return spawnProcess('magick', ['convert', path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
 };
 
+const shopLogoify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+};
+
 const generateAdPost = async (path, name) => {
   let stats;
   try {
@@ -378,7 +385,8 @@ module.exports = {
   firstFrameToImg,
   videoToH264,
   turnVideo,
-  questionImageify
+  questionImageify,
+  shopLogoify
 };
 
 

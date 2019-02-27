@@ -14,6 +14,7 @@ const paths = {
   pfBannerPath: 'resources/pf_banners',
   pfAvatarPath: 'resources/pf_avatars',
   avatarPath: 'resources/newavatar',
+  shopLogoPath: 'resources/shopLogo',
   avatarSmallPath: 'resources/newavatar_small',
   thumbnailPath: 'resources/thumbnails',
   adPath: 'resources/ad_posts',
