@@ -46,7 +46,7 @@ function nkc_render(options){
   default_whitelist.mn = [];
   default_whitelist.annotation = ['encoding'];
   default_whitelist.iframe = ['width','height','src','frameborder','allowfullscreen'];
-  default_whitelist.embed = ['width','height','src','frameborder','allowfullscreen'];
+  default_whitelist.embed = [];
 	default_whitelist.img = ['src','class'];
 	for(var i = 1; i <= 6; i++) {
 		default_whitelist['h'+i] = ['style'];
