@@ -41,7 +41,8 @@ userRouter
 		const {uid} = params;
 		const {apiFunction} = ctx.nkcModules;
 		const targetUser = await db.UserModel.findOnly({uid});
-		await targetUser.extendGrade();
+    await targetUser.extendGrade();
+    await db.UserModel.extendUsersInfo([targetUser]);
 		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
 		const {type, token} = query;
 		const page = query.page?parseInt(query.page): 0;
@@ -154,8 +155,10 @@ userRouter
 	  targetUserSubscribe.subscribers.reverse();
 	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(0, 9);
 	  const newSubscribersId = targetUserSubscribe.subscribers.slice(0, 9);
-	  data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
-	  data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
+    data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
+    data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
+    await db.UserModel.extendUsersInfo(data.newSubscribeUsers);
+    await db.UserModel.extendUsersInfo(data.newSubscribers);
 	  // --------
 
 		data.type = type;

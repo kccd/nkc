@@ -14,24 +14,25 @@ block content
           if permission('viewAllPaperRecords')  
             li(class=!data.t?'active': '')
               a(href='/exam/record/paper') 全部 
-        .m-t-1      
-          .form.form-inline
-            .form-group
-              select.form-control(id='sortby')
-                if data.sortby === 'username'
-                  option(value='username' selected) 用户名  
-                else  
-                  option(value='username') 用户名
-                if data.sortby === 'uid'  
-                  option(value='uid' selected) UID 
-                else
-                  option(value='uid') UID   
-            .form-group
-              input.form-control(type='text' placeholder='请输入关键词' id='cat' value=data.cat)
-            .form-group
-              button.btn.btn-primary(onclick='searchRecord()') 搜索  
-            .form-group  
-              a.btn.btn-default(href='/exam/record/paper') 重置         
+        if !data.t      
+          .m-t-1      
+            .form.form-inline
+              .form-group
+                select.form-control(id='sortby')
+                  if data.sortby === 'username'
+                    option(value='username' selected) 用户名  
+                  else  
+                    option(value='username') 用户名
+                  if data.sortby === 'uid'  
+                    option(value='uid' selected) UID 
+                  else
+                    option(value='uid') UID   
+              .form-group
+                input.form-control(type='text' placeholder='请输入关键词' id='cat' value=data.cat)
+              .form-group
+                button.btn.btn-primary(onclick='searchRecord()') 搜索  
+              .form-group  
+                a.btn.btn-default(href='/exam/record/paper') 重置         
         .m-t-1    
           include ../../interface_navigation_paging
           

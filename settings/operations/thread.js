@@ -15,10 +15,10 @@ module.exports = {
 		delColl: {
 			POST: 'delCollectThread'
 		},
-		digest: {
+		/* digest: {
 			POST: 'digestThread',
 			DELETE: 'unDigestThread'
-		},
+		}, */
 		topped: {
 			POST: 'toppedThread',
 			DELETE: 'unToppedThread'

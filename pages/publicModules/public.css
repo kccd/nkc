@@ -207,3 +207,32 @@
   font-size: 4rem;
   border-radius: 50%;
 }
+.display-i-b {
+  display: inline-block;
+}
+.display-b {
+  display: block;
+}
+.display-i {
+  display: inline;
+}
+.max-width-100{
+  max-width: 100%;
+}
+.btn-fab{
+  position: fixed;
+  bottom: 17rem;
+  right: 2rem;
+  z-index: 10000;
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+  outline: none;
+  box-shadow: 1px 1px 20px -4px #555;
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus {
+    outline: none;          
+}

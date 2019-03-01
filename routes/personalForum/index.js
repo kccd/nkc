@@ -43,6 +43,7 @@ router
       $sort.tlm = -1;
     }
     data.targetUser = await UserModel.findOnly({uid});
+    await db.UserModel.extendUsersInfo([data.targetUser]);
     await data.targetUser.extendGrade();
     const userSubscribe = await UsersSubscribeModel.findOnly({uid});
     data.userSubscribe = {
@@ -74,8 +75,9 @@ router
         const thread = await post.extendThread();
         await thread.extendFirstPost();
         await thread.extendLastPost();
-        await thread.lastPost.extendUser();
-	      await thread.firstPost.extendUser();
+        const lastPostUser = await thread.lastPost.extendUser();
+        const firstPostUser = await thread.firstPost.extendUser();
+        await db.UserModel.extendUsersInfo([lastPostUser, firstPostUser]);
 	      await thread.firstPost.extendResources();
         await thread.extendForums(['mainForums']);
       }));
@@ -272,9 +274,15 @@ router
     		const thread  = await db.ThreadModel.findOne({tid: log.tid});
     		if(thread) {
     			if(thread.recycleMark && !displayRecycleMarkThreads) continue;
-					await thread.extendFirstPost().then(p => p.extendUser());
+					await thread.extendFirstPost().then(async p => {
+            const u = await p.extendUser();
+            await db.UserModel.extendUsersInfo([u]);
+          });
 					if(thread.lm) {
-						await thread.extendLastPost().then(p => p.extendUser());
+						await thread.extendLastPost().then(async p => {
+              const u = await p.extendUser();
+              await db.UserModel.extendUsersInfo([u]);
+            });
 					} else {
 						thread.lastPost = thread.firstPost;
 					}

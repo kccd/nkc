@@ -351,7 +351,7 @@ function submit(tid){
 	}catch(err){
 		return;
 	}
-
+	
 	geid('ButtonReply').disabled=true;
 	return nkcAPI('/t/' + tid, 'POST', {
 		post:post,
@@ -360,7 +360,7 @@ function submit(tid){
 			window.location.href = data.redirect;
 		})
 		.catch(function(data){
-			screenTopWarning(data.error);
+			screenTopWarning(data || data.error);
 			geid('ButtonReply').disabled=false;
 		})
 }

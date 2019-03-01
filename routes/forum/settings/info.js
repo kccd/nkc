@@ -7,9 +7,9 @@ infoRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, db, body, redis} = ctx;
+		const {data, db, body} = ctx;
 		const {forum} = data;
-		let {operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId, moderators} = body;
+		let {operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
 		if(operation && operation === 'updateDeclare') {
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
@@ -25,7 +25,7 @@ infoRouter
 
 			// if(!description) ctx.throw(400, '专业介绍不能为空');
 
-			let basicThreadsId_ = [], valuableThreadsId_ = [], noticeThreadsId_ = [], moderators_ = [];
+			let basicThreadsId_ = [], valuableThreadsId_ = [], noticeThreadsId_ = [];
 			await Promise.all(basicThreadsId.split(',').map(async pid => {
 				pid = pid.trim();
 				const thread = await db.ThreadModel.findOne({oc: pid});
@@ -43,26 +43,8 @@ infoRouter
 				const thread = await db.ThreadModel.findOne({oc: pid});
 				if(thread) noticeThreadsId_.push(pid);
 			}));
-
-			moderators = moderators.split(',');
-			const oldModerators = forum.moderators;
-			for(let uid of oldModerators) {
-				if(!moderators.includes(uid)) {
-					const user = await db.UserModel.findOnly({uid});
-					await user.update({$pull: {certs: 'moderator'}});
-				}
-			}
-			await Promise.all(moderators.map(async uid => {
-				uid = uid.trim();
-				const targetUser = await db.UserModel.findOne({uid});
-				if(targetUser) {
-					moderators_.push(uid);
-					await targetUser.update({$addToSet: {certs: 'moderator'}})
-				}
-			}));
-			await forum.update({displayName, abbr, color, description, brief, basicThreadsId: basicThreadsId_, valuableThreadsId: valuableThreadsId_, moderators: moderators_, noticeThreadsId: noticeThreadsId_});
+			await forum.update({displayName, abbr, color, description, brief, basicThreadsId: basicThreadsId_, valuableThreadsId: valuableThreadsId_, noticeThreadsId: noticeThreadsId_});
 		}
-    await redis.cacheForums();
 		await next();
 	});
 module.exports = infoRouter;

@@ -70,7 +70,8 @@ operationObj.defaultOperations = [
   'creditXsf',
   'modifyAllQuestions', // 可修改审核过的试题
   'viewAllPaperRecords', // 可查看所有的考试记录
-  'removeAllQuestion' // 可删除别人出的试题
+  'removeAllQuestion', // 可删除别人出的试题
+  'superModerator', // 超级专家，所有专业的专家权限
 ];
 
 

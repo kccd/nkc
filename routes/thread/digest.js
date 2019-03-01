@@ -7,15 +7,15 @@ router
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
     const mainForums = await thread.extendForums(['mainForums', 'minorForums']);
-    let isModerator;
-    for(const f of mainForums) {
-      isModerator = await f.isModerator(user?user.uid: '');
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of mainForums) {
+        isModerator = await f.isModerator(user?user.uid: '');
+        if(isModerator) break;
+      }
     }
 		if(!isModerator) {
-			if(!data.userOperationsId.includes('digestThread')) {
-				ctx.throw(403, '您没有权限给该文章加精');
-			}
+			ctx.throw(403, '您没有权限给该文章加精');
 		}
 		if(thread.digest) ctx.throw(400, '文章已被设置精华');
 		await thread.update({digest: true});
@@ -46,15 +46,15 @@ router
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
     const mainForums = await thread.extendForums(['mainForums', 'minorForums']);
-    let isModerator;
-    for(const f of mainForums) {
-      isModerator = await f.isModerator(user?user.uid: '');
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of mainForums) {
+        isModerator = await f.isModerator(user?user.uid: '');
+        if(isModerator) break;
+      }
     }
 		if(!isModerator) {
-			if(!data.userOperationsId.includes('unDigestThread')) {
-				ctx.throw(400, '您没有权限给该文章取消加精');
-			}
+      ctx.throw(400, '您没有权限给该文章取消加精');
 		}
 		if(!thread.digest) ctx.throw(400, '文章未被设置精华');
 		await thread.update({digest: false});

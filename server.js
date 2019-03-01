@@ -16,13 +16,12 @@ const http = require('http'),
   socket = require('./socket'),
   {updateDate, upload} = settings,
   {
-    SettingModel,
     RoleModel,
     ForumModel,
     OperationModel
   } = require('./dataModels');
 
-let server, serverSettings;
+let server;
 
 const dataInit = async () => {
   if(global.NKC.NODE_ENV !== 'production') {
@@ -45,29 +44,27 @@ const jobsInit = async () => {
 
 
 const start = async () => {
-  serverSettings = await SettingModel.findOnly({_id: 'server'});
-  if(global.NKC.processId === 0) {
-    await dataInit();
-    await jobsInit();
-    await upload.initFolders();
-    await cacheForums();
-  }
-  await searchInit();
-  console.log('ElasticSearch is ready...'.green);
+  try {
+    if(global.NKC.processId === 0) {
+      await dataInit();
+      await jobsInit();
+      await upload.initFolders();
+      await cacheForums();
+    }
+    await searchInit();
+    console.log('ElasticSearch is ready...'.green);
 
-  const port = serverConfig.port + global.NKC.processId;
-  const address = serverConfig.address;
-  server = http.createServer(app);
-  server.listen(port, address, async () => {
-    await socket(server);
-    console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
-  });
+    const port = serverConfig.port + global.NKC.processId;
+    const address = serverConfig.address;
+    server = http.createServer(app);
+    server.listen(port, address, async () => {
+      await socket(server);
+      console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
+    });
+  } catch(err) {
+    console.error(`error occured when initialize the server.\n${err.stack}`.red);
+    process.exit(-1)
+  }
 };
 
-
-try{
-  start();
-} catch(e) {
-  console.error(`error occured when initialize the server.\n${e.stack}`.red);
-  process.exit(-1)
-}
+start();
