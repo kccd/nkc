@@ -789,7 +789,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
         certs.unshift('default');
       }
       // 若用户的学术分大于0，则临时添加“scholar”证书
-      if(!certs.includes('scholar') && this.xsf > 0){
+      if(!certs.includes('scholar') && user.xsf > 0){
         certs.push('scholar');
       }
     }
