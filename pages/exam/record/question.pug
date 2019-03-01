@@ -1,0 +1,51 @@
+extends ../../bootstrap_base
+block title
+  title 出题记录
+  +includeCSS('/exam/exam.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        include ../nav.pug
+      .col-xs-12.col-md-6
+        include ../../interface_navigation_paging
+        for question in data.questions
+          div.m-b-2(style='padding: 1rem;background-color: #efefef;')
+            if !question.viewed
+              span(style='color: red') *&nbsp;
+            span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
+            if question.forum
+              a(href=`/f/${question.forum.fid}` target='_blank').m-r-1=question.forum.displayName
+            if question.volume === 'A'
+              span.m-r-1 基础级(A)
+            else 
+              span.m-r-1 专业级(B)  
+            if question.disabled
+              span.m-r-1.text-danger 已被屏蔽
+            else  
+              if question.auth === null
+                span.m-r-1 等待审核
+                a(href=`/exam/editor?qid=${question._id}`) 编辑
+              else if question.auth === true
+                span.text-success 审核已通过
+              else 
+                span.text-danger.m-r-1 审核未通过
+                a.m-r-1(href=`/exam/editor?qid=${question._id}`) 修改完善
+                a(href=`javascript:deleteQuestion('${question._id}')`) 删除
+            if question.auth === false || question.disabled
+              h5.text-danger 原因：
+                span= question.reason  
+            div!=`${markdown('问：' + question.content)}`
+            if question.hasImage
+              img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
+            for a, index in question.answer
+              -let c=[], i = ['A：', 'B：', 'C：', 'D：'];
+              if index === 0
+                -c.push('text-success');
+              else   
+                -c.push('text-danger');
+              h5(class=c)!= markdown(i[index] + a)    
+        include ../../interface_navigation_paging      
+block scripts
+  +includeJS('/exam/questions.js')
+  include ../../MathJax            

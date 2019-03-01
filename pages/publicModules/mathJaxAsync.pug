@@ -1,0 +1,26 @@
+script(type='text/x-mathjax-config').
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/CommonHTML"],
+    extensions: ["tex2jax.js","MathZoom.js"],
+    tex2jax:{
+        inlineMath:  [["$", "$"], ["\\(","\\)"]],
+        displayMath: [["$$","$$"], ["\\[","\\]"]],
+      ignoreClass:'container',
+      processClass:"ThreadPostBody|QuestionText"
+    },
+    "CommonHTML":{
+      showMathMenu:false,
+      preferredFont:"STIX",
+      scale: 100,
+      minScaleAdjust: 50
+    },
+    TeX: {
+      equationNumbers: {autoNumber: "AMS"}
+    }
+  })
+script.
+  NKC.methods.asyncMathJaxRender = function() {
+    var script = document.createElement('script');
+    script.src = '/external_pkgs/MathJax-2.6-latest/MathJax.js?t=' + Date.now();
+    document.getElementsByTagName('body')[0].appendChild(script);
+  }

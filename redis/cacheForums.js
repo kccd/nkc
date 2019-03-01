@@ -271,6 +271,17 @@ async function func() {
     await client.saddAsync(key, canNotDisplayOnNavForumsId);
   }
 
+  // 缓存证书信息
+  for(const role of rolesDB) {
+    let key = `role:${role._id}:displayName`;
+    await client.setAsync(key, role.displayName);
+    if(role.operationsId.length === 0) continue;
+    key = `role:${role._id}:operationsId`;
+    await client.saddAsync(key, role.operationsId);
+    key = `role:${role._id}:modifyPostTimeLimit`;
+    await client.setAsync(key, role.modifyPostTimeLimit);
+  }
+
   console.log(`缓存更新完成`.green);
   
 }

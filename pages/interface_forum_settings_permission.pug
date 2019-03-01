@@ -88,7 +88,10 @@ block content
                 label.col-sm-3.control-label 分享链接有效时间(小时)
                 .col-sm-5
                   input.form-control(id='shareLimitTime' type='number' value=forum.shareLimitTime)
-
+              .form-group
+                label.col-sm-3.control-label 主管专家
+                .col-sm-5
+                  input.form-control#moderators(placeholder='请输入uid' value=forum.moderators? forum.moderators.join(','): '')
 
               .form-group
                 .col-sm-5.col-sm-offset-3

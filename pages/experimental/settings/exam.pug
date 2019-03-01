@@ -1,102 +1,36 @@
 extends ../../bootstrap_base
 
 block title
-  -const mainContainer1400 = true;
-  -const hiddenFooter = true;
-  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
-  link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
+  +includeCSS('/experimental/index.css')
   title 考试设置
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       include ../nav
-      .col-xs-12.col-md-12
-        .row#app(v-cloak).mdui-m-b-5
-          .col-xs-12.col-md-12
-            h3 考试科目
-            .row
-              .col-sm-2
-                <ul class="mdui-list" v-if='examsCategories.length > 0'>
-                  <li class="mdui-list-item mdui-ripple" v-for='c in examsCategories' style='border-bottom:1px solid #eee;' :class="{'mdui-list-active':category._id === c._id}" @click='selectCategory(c)'>
-                    <div class="mdui-list-item-content">{{c.name}}</div>
-                    span(:class="{'mdui-text-color-red-200': c.disabledA, 'mdui-text-color-green': !c.disabledA}") A:{{c.countA}}
-                    span &nbsp;&nbsp;&nbsp;
-                    span(:class="{'mdui-text-color-red-200': c.disabledB, 'mdui-text-color-green': !c.disabledB}") B:{{c.countB}}
-                  </li>
-                </ul>
-                button.mdui-btn.mdui-btn-block(@click='addCategory') 添加
-              .col-sm-6.col-sm-offset-2
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">科目名称</label>
-                <input class="mdui-textfield-input" type="text" v-model='category.name'/>
-                </div>
-                <div class="mdui-textfield">
-                <label class="mdui-textfield-label">科目介绍</label>
-                <textarea class="mdui-textfield-input" type="text" v-model='category.description'></textarea>
-                </div>
-                .mdui-row
-                  .mdui-col-xs-12.mdui-col-md-6
-                    h4 试卷A
-                    <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">题目数量</label>
-                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperAQuestionsCount'/>
-                    </div>
-                    <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">及格分数</label>
-                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperAPassScore'/>
-                    </div>
-                    <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">考试时间（分钟）</label>
-                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperATime'/>
-                    </div>
-                    <div class="mdui-textfield">
-                      <label class="mdui-textfield-label">颁发证书</label>
-                      select.mdui-select(v-model='category.passingACert')
-                        option(value='') 不颁发
-                        option(v-for="role in roles" :value='role._id') {{role.displayName}}
-                    </div>
-                  .mdui-col-xs-12.mdui-col-md-6
-                    h4 试卷B
-                    <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">题目数量</label>
-                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperBQuestionsCount'/>
-                    </div>
-                    <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">及格分数</label>
-                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperBPassScore'/>
-                    </div>
-                    <div class="mdui-textfield">
-                    <label class="mdui-textfield-label">考试时间（分钟）</label>
-                    <input class="mdui-textfield-input" type="text" v-model.number='category.paperBTime'/>
-                    </div>
-                    <div class="mdui-textfield">
-                      <label class="mdui-textfield-label">颁发证书</label>
-                      select.mdui-select(v-model='category.passingBCert')
-                        option(value='') 不颁发
-                        option(v-for="role in roles" :value='role._id') {{role.displayName}}
-                    </div>
+      .hidden#data= JSON.stringify({examSettings: data.examSettings})
+      .col-xs-12.col-md-12#app(v-cloak)
+        h4 考试设置
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 每天最多考试次数
+            .col-sm-4
+              input.form-control(type='number' v-model.number='examSettings.countOneDay')
+          .form-group
+            label.col-sm-2.control-label 总次数限制
+            .col-sm-4
+              input.form-control(type='number' v-model.number='examSettings.count')    
+          .form-group
+            label.col-sm-2.control-label 禁考时间（天）
+            .col-sm-4
+              input.form-control(type='number' v-model.number='examSettings.waitingTime')        
+              h5.text-danger 考试次数达到总次数限制后，该用户将会被禁考一段时间。
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-4
+              button.btn.btn-primary.btn-block(@click='save') 保存   
 
-
-                div.mdui-m-t-3(v-if='category._id')
-
-                  <label class="mdui-checkbox mdui-m-r-3">
-                  <input type="checkbox" value='A' v-model='disabled'>
-                  <i class="mdui-checkbox-icon"></i>
-                  | 启用试卷A
-                  </label>
-
-                  <label class="mdui-checkbox">
-                  <input type="checkbox" value='B' v-model='disabled'>
-                  <i class="mdui-checkbox-icon"></i>
-                  | 启用试卷B
-                  </label>
-                span.mdui-text-color-red(v-if='error') {{error}}
-                button.mdui-btn.mdui-btn-block.mdui-color-theme.mdui-m-t-3(@click='saveCategory') 保存
-                .text-right(v-if='category._id')
-                  a.btn.mdui-btn.mdui-m-t-1(:href="'/exam/category/' + category._id") 去添加题目
-                  button.mdui-btn.mdui-m-t-1(@click='deleteCategory') 删除科目
+              
+        
 block scripts
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/settings/exam.js?v=${global.NKC.startTime}`)
+  +includeJS('/experimental/settings/exam.js')

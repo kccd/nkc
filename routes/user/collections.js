@@ -55,7 +55,6 @@ collectionsRouter
         await thread.extendForums(["mainForums"]);
         try{
           await thread.ensurePermission(data.userRoles, data.userGrade, data.user)
-
           categoryCollection.push(collection)
         }catch(err){
   
@@ -70,7 +69,8 @@ collectionsRouter
     // }
 
 	  categoryCollection = await Promise.all(categoryCollection.map(async c => {
-    	await c.extendThread().then(t => t.extendForums(["mainForums"]));
+      await c.extendThread().then(t => t.extendForums(["mainForums"]));
+      await db.UserModel.extendUsersInfo([c.thread.firstPost.user, c.thread.lastPost.user]);
     	if(ctx.reqType === 'app') {
 				let content = ctx.nkcModules.APP_nkc_render.experimental_render(c.thread.firstPost);
 		    content = content.replace(/<.*?>/ig, '');

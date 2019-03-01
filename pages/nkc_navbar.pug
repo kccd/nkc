@@ -2,7 +2,8 @@
 if data.user
   -var newMessage = data.user.newMessage;
   -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0);
-nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;background-color:#f6f6f6;line-height: 0;')
+//-nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;background-color:#f6f6f6;line-height: 0;')
+nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f6f6;line-height: 0;')
   .container-fluid(style='max-width: 1400px')
     .navbar-header
       button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
@@ -77,8 +78,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='z-index:10000;backgro
                 span.fa.fa-cogs &nbsp;
                 span 管理
           - var user = data.user
-          - var navbarDesc = user.navbarDesc;
-          - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+          //- - var navbarDesc = user.navbarDesc;
+          //- - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+          - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
           li.dropdown.userInfo
             img(src=`/avatar/${user.uid}` style='width: 2em;height: 2em;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
             a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style='display:inline-block;padding-left: 0.5rem;')

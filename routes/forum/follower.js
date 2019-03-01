@@ -13,7 +13,8 @@ followerRouter
 		const count = forum.followersId.length;
 		const paging = apiFunction.paging(page, count);
 		data.paging = paging;
-		data.followers = await db.UserModel.find({uid: {$in: forum.followersId}}).sort({tlv: -1}).skip(paging.start).limit(paging.perpage);
+    data.followers = await db.UserModel.find({uid: {$in: forum.followersId}}).sort({tlv: -1}).skip(paging.start).limit(paging.perpage);
+    await db.UserModel.extendUsersInfo(data.followers);
 		data.type = 'followers';
 		await next();
 	});

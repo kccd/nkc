@@ -1,0 +1,97 @@
+extends ../bootstrap_base
+block title
+  title 试题审核
+  +includeCSS('/exam/exam.css')
+block content
+  .container-fluid.max-width
+    include ./nav
+    .row
+      .col-xs-12.col-md-6.m-t-1
+        if data.questions.length === 0
+          h4 没有需要被审核的试题
+        else  
+          ul.media-list
+            for question in data.questions
+              li.media
+                .media-left
+                  a(href=`/u/${question.uid}` target='_blank')
+                    img.media-object(src=`/avatar/${question.uid}` style='width: 3rem; height: 3rem;')
+                .media-body
+                  h5.media-heading=`${question.user.username} ${format('YYYY/MM/DD HH:mm:ss', question.toc)}`
+                  div!=markdown(question.content)
+                span 快速审核  
+                a(href=`/exam/editor?qid=${question._id}` target='_blank') 去编辑器处理
+              
+    //-#data.hidden= JSON.stringify({questions: data.questions})
+    //-.row#app(v-cloak)
+      .col-xs-12.col-md-6
+        h3 待审核列表
+        h4(v-if='questions.length === 0') 没有需要被审核的试题
+        ul.media-list
+          li.media(v-for='question in questions')
+            .media-left
+              a(:href='"/u/" + question.uid' target='_blank')
+                img.media-object(:src='"/avatar/" + question.uid' style='width: 3rem; height: 3rem;')
+            .media-body
+              h5.media-heading {{question.user.username}} {{format('YYYY/MM/DD HH:mm:ss', question.toc)}}
+              span(v-html='question.content_')
+            
+            //-button.btn.btn-sm.btn-default(@click='select(question)') 立即处理  
+      //-.col-xs-12.col-md-6
+        .form-horizontal(v-if='question')
+          .form-group
+            label(class="col-sm-2 control-label") 内容
+            .col-sm-10
+              h5(v-html='question.content_')
+          .form-group(v-if='question.hasImage')
+            label(class="col-sm-2 control-label") 图片
+            .col-sm-10
+              img(:src='"/exam/question/" + question._id + "/image"')
+          .form-group
+            label(class="col-sm-2 control-label") 答案
+            .col-sm-10
+              h5.text-success(v-html='question.ans_[0]')
+              div(v-if='question.type === "ch4"')
+                h5.text-danger(v-for='a, index in question.ans_' v-if='index !== 0' v-html="a")
+          .form-group
+            label(class="col-sm-2 control-label") 答题方式
+            .col-sm-10
+              h5 {{question.type === 'ch4'?'选择': '填空'}}
+          .form-group
+            label(class="col-sm-2 control-label") 试题难度
+            .col-sm-10
+              h5 {{question.volume === 'A'?'基础级': '专业级'}}
+          .form-group
+            label(class="col-sm-2 control-label") 试题类型
+            .col-sm-10
+              h5 {{question.public?'公共': '专业'}}
+          .form-group(v-if='!question.public')
+            label(class="col-sm-2 control-label") 专业领域
+            .col-sm-10    
+              h5 
+                a(:href='"/f/" + question.fid' target='_blank') {{question.forum.displayName}}      
+          .form-group
+            label(class="col-sm-2 control-label") 审核
+            .col-sm-10      
+              <label class="radio-inline">
+                <input type="radio" value="true" v-model='auth.status'> 通过
+              </label>  
+              <label class="radio-inline">
+                <input type="radio" value="false" v-model='auth.status'> 不通过
+              </label>
+          .form-group(v-if='auth.status === "false"')
+            label(class="col-sm-2 control-label") 原因
+            .col-sm-10    
+              textarea.form-control(placeholder='请输入原因，500字以内' v-model='auth.reason' rows=7)
+          .form-group
+            label(class="col-sm-2 control-label") 
+            .col-sm-10        
+              button.btn.btn-primary.btn-block(@click='save') 提交
+      
+
+block scripts
+  include ../publicModules/mdToHtml
+  include ../publicModules/xss
+  include ../publicModules/moment
+  include ../MathJax
+  //-+includeJS('/exam/auth.js')

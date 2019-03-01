@@ -34,7 +34,7 @@
   default_whitelist.mn = [];
   default_whitelist.annotation = ['encoding'];
   default_whitelist.iframe = ['width','height','src','frameborder','allowfullscreen'];
-  default_whitelist.embed = ['width','height','src','frameborder','allowfullscreen'];
+  default_whitelist.embed = [];
   default_whitelist.img = ['src'];
   if(!in_browser){
     //default_whitelist.iframe = ['height','width','src','frameborder','allowfullscreen']

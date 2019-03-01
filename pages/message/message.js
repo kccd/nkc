@@ -798,6 +798,27 @@ $(function() {
             .catch(function() {
 
             })
+            // 判断是否存在于列表中，不存在则创建
+            var created = false;
+            for(var i = 0; i < app.userList.length; i++) {
+              if(app.userList[i].type === 'UTU' && app.userList[i].user.uid === item.user.uid) created = true;
+            }
+            if(!created) {
+              var friend;
+              for(var i = 0; i < app.friends.length; i++){
+                var f = app.friends[i];
+                if(f.tUid === item.user.uid) {
+                  friend = f;
+                  break;
+                }
+              }
+              app.userList.unshift({
+                type: 'UTU',
+                count: 0,
+                user: item.user,
+                friend: friend
+              });
+            }
         } else if(item.type === 'STE') {
           app.target = 'notice';
           this.getMessage()

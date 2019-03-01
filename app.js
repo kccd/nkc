@@ -37,8 +37,11 @@ app
     duration: 60000,
     errorMessage: fs.readFileSync('./pages/error/503.html').toString(),
     id: (ctx) => {
-      const XFF = ctx.get('X-Forwarded-For');
-      return XFF || ctx.ip;
+      const {req, ip} = ctx;
+      return req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress || ip;
     },
     headers: {
       remaining: 'Rate-Limit-Remaining',
@@ -77,6 +80,7 @@ app
   .use(etag())
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./node_modules')))
+  .use(staticServe(path.resolve('./public')))
   .use(staticServe(path.resolve('./pages')))
   .use(favicon(__dirname + '/resources/site_specific/favicon.ico'))
   .use(logger)

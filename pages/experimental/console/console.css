@@ -24,6 +24,7 @@ html{
 }
 .message-panel{
   height: 40rem;
+  word-break: break-all;
   overflow-y: scroll;
 }
 .message>span {

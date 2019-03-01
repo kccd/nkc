@@ -1,0 +1,116 @@
+extends ../../experimental.pug
+block eTitle
+  title= `${data.role.displayName} | 证书设置`
+block eContent  
+  .container-fluid.max-width
+    .row  
+      .col-xs-12.col-md-12  
+        include ./roleNav      
+      .col-xs-12.col-md-12.m-t-1
+      .hidden#data=JSON.stringify({role: data.role, operationTypes: data.operationTypes, operations: data.operations, users: data.users})
+    .row#app(v-cloak)
+      button.btn.btn-primary.btn-fab(@click='save') 保存
+      .col-xs-12.col-md-7.col-md-offset-2
+        h3 基本信息设置
+        hr
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 名称
+            .col-sm-10
+              input.form-control(v-model='role.displayName' placeholder='请输入证书名称，20个字节以内')
+          .form-group
+            label.col-sm-2.control-label 简介
+            .col-sm-10
+              textarea.form-control(v-model='role.description' placeholder='请输入证书简介，200个字节以内' rows=4)
+          .form-group
+            label.col-sm-2.control-label 证书类型
+            .col-sm-10
+              if data.role.type !== 'system'
+                <label class="radio-inline">
+                  <input type="radio" value="common" v-model='role.type'> 普通
+                </label>  
+                <label class="radio-inline">
+                  <input type="radio" value="management" v-model='role.type'> 管理类
+                </label>    
+              else
+                h5 系统类  
+          .form-group
+            label.col-sm-2.control-label 图标 
+            .col-sm-10
+              input.hidden(@change='uploadIcon' ref='input' type='file' accept='image/png')
+              img.m-b-1.max-width-100.display-i-b.m-r-1(ref='img' v-if='role.hasIcon' :src='"/statics/role_icon/" + role._id + ".png"')
+              button.btn.btn-sm.btn-default(@click='clickIconButton') 上传图标
+              button.btn.btn-sm.btn-default(@click='deleteIcon') 删除图标
+          .form-group
+            label.col-sm-2.control-label 颜色
+            .col-sm-10
+              input.form-control(type='text' data-control='selectColor' v-model='role.color')    
+          .form-group
+            label.col-sm-2.control-label 修改POST
+            .col-sm-10
+              input.form-control(type='number' v-model.number='role.modifyPostTimeLimit')
+              h5.text-danger -1表示无限制（0.5：只能修改0.5小时以内发表的post）
+          
+          .form-group(v-if='role.type !== "system"')
+            label.col-sm-2.control-label 
+            .col-sm-10.text-right
+              button.btn.btn-danger(@click='removeRole') 删除证书
+        .p-t-3(v-if='role._id !== "visitor"')#user     
+          h3 用户
+          hr
+          .col-xs-11.col-xs-offset-1
+            .panel.panel-default
+              table.table.table-striped
+                thead
+                  tr
+                    th 用户名
+                    th 学术分
+                    th 科创币
+                    th 文章
+                    th 回复
+                    th 注册时间
+                tbody
+                  tr(v-for='user in users')
+                    th 
+                      a(:href='"/u/" + user.uid' target='_blank') {{user.username || '用户' + user.uid}}
+                    th {{user.xsf}}  
+                    th {{user.kcb}}
+                    th {{user.threadCount}}  
+                    th {{user.postCount}}
+                    th {{format('YYYY/MM/DD HH:mm:ss', user.toc)}}
+            .text-right.p-b-3    
+              a(href=`/e/settings/user?t=${data.role._id}`) 查看更多      
+                
+        h3.p-t-6#permission 权限设置
+        hr
+        .row
+          .rol-xs-12.col-md-3
+            .list-group
+              a.pointer.list-group-item(v-for='t in types' :class='{"active": t._id === type._id}' @click='selectType(t)')
+                span {{t.displayName}}
+                span.badge {{t.operations.length}}
+          .rol-xs-12.col-md-9
+            .panel.panel-default
+              .panel-heading {{type.displayName}}
+              table.table.table-hover
+                thead
+                  tr
+                    th 权限名
+                    th 选择
+                tbody
+                  tr(v-for='o in type.operations')
+                    th(v-if='o.name') {{o.name}}({{o._id}})
+                    th(v-else) {{o._id}}
+                    th 
+                      <label>
+                        <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>
+                        span(v-else) 默认
+                      </label>
+
+block scripts
+  include ../../../publicModules/selectColor
+  include ../../../publicModules/moment
+  +includeJS('/experimental/settings/role/singleRole.js')              
+
+        
+                    

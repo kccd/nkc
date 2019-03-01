@@ -299,6 +299,13 @@ userSchema.virtual('newVoteUp')
   .set(function(newVoteUp) {
     this._newVoteUp = newVoteUp;
   });
+userSchema.virtual('info') 
+  .get(function() {
+    return this._info;
+  })
+  .set(function(info) {
+    this._info = info;
+  });  
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = mongoose.model('threads');
@@ -312,10 +319,21 @@ userSchema.methods.getUsersThreads = async function() {
   return await ThreadModel.extendThreads(threads);
 };
 
-userSchema.methods.extend = async function() {
+userSchema.methods.extend = async function(options) {
+  const ExamsCategoryModel = mongoose.model('examsCategories');
+  let proExamsCategoriesId, pubExamsCategoriesId;
+  if(options) {
+    proExamsCategoriesId = options.proExamsCategoriesId;
+    pubExamsCategoriesId = options.pubExamsCategoriesId;
+  } else {
+    let categories = await ExamsCategoryModel.find({volume: 'B'}, {_id: 1});
+    proExamsCategoriesId = categories.map(c => c._id);
+    categories = await ExamsCategoryModel.find({volume: 'A'}, {_id: 1});
+    pubExamsCategoriesId = categories.map(c => c._id);
+  }
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const SecretBehaviorModel = mongoose.model('secretBehaviors');
-  const AnswerSheetModel = mongoose.model('answerSheets');
+  const ExamsPaperModel = mongoose.model('examsPapers');
   const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
   this.regPort = userPersonal.regPort;
   this.regIP = userPersonal.regIP;
@@ -333,9 +351,16 @@ userSchema.methods.extend = async function() {
   } else {
   	this.registerType = 'mobile';
   }
-	// 获取b卷考试科目
-	this.sheetB = await AnswerSheetModel.findOne({uid: this.uid, isA: false, score: {$gte: 6}});
-	this.sheetA = await AnswerSheetModel.findOne({uid: this.uid, isA: true, score: {$gte: 6}});
+  // 获取b卷考试科目
+  const paperB = await ExamsPaperModel.findOne({uid: this.uid, passed: true, cid: {$in: proExamsCategoriesId}}).sort({toc: 1});
+  const paperA = await ExamsPaperModel.findOne({uid: this.uid, passed: true, cid: {$in: pubExamsCategoriesId}}).sort({toc: 1});
+
+  if(paperB) {
+    this.paperB = await ExamsCategoryModel.findOne({_id: paperB.cid});
+  }
+	if(paperA) {
+    this.paperA = await ExamsCategoryModel.findOne({_id: paperA.cid});
+  }
 };
 
 userSchema.methods.extendRoles = async function() {
@@ -456,7 +481,8 @@ userSchema.methods.calculateScore = async function() {
 	await this.update({score});
 };
 
-
+/* 
+旧的获取证书名称的方法
 userSchema.virtual('navbarDesc').get(function() {
   const {certs, username, xsf = 0, kcb = 0} = this;
   let cs = [];
@@ -480,7 +506,7 @@ userSchema.virtual('navbarDesc').get(function() {
     kcb: kcb,
     cs: cs
   }
-});
+}); */
 
 
 userSchema.pre('save', async function(next) {
@@ -687,31 +713,14 @@ userSchema.methods.getMessageLimit = async function() {
 		messageCountLimit
 	}
 };
-
+/* 
+  获取用户发表文章、发表回复的时间和次数限制
+  @author pengxiguaa 2019/2/27
+*/
 userSchema.methods.getPostLimit = async function() {
 
 	const grade = await this.extendGrade();
 	const roles = await this.extendRoles();
-
-	/*let {
-		postToForumCountLimit,
-		postToForumTimeLimit,
-		postToThreadCountLimit,
-		postToThreadTimeLimit
-	} = grade;
-
-	for(const role of roles) {
-		const pfc = role.postToForumCountLimit;
-		const pft = role.postToForumTimeLimit;
-		const ptc = role.postToThreadCountLimit;
-		const ptt = role.postToThreadTimeLimit;
-
-		// 限制发帖的数量取最大，限制发帖的时间取最小
-    if(pfc > postToForumCountLimit) postToForumCountLimit = pfc;
-    if(pft < postToForumTimeLimit) postToForumTimeLimit = pft;
-    if(ptc > postToThreadCountLimit) postToThreadCountLimit = ptc;
-    if(ptt < postToThreadTimeLimit) postToThreadTimeLimit = ptt;
-	}*/
 
 	const arr = [grade].concat(roles);
 
@@ -754,6 +763,52 @@ userSchema.methods.getPostLimit = async function() {
 
 };
 
+/* 
+  拓展用户基本信息，显示在用户面板中，任何人可见的内容
+  @param users: 用户对象数组
+  @author pengxiguaa 2019/2/27
+*/
+userSchema.statics.extendUsersInfo = async (users) => {
+  const RoleModel = mongoose.model('roles');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const uid = new Set(), personalObj = {};
+  for(const user of users) {
+    uid.add(user.uid);
+  }
+  const usersPersonal = await UsersPersonalModel.find({uid: {$in: [...uid]}}, {uid: 1, mobile: 1, nationCode: 1, email: 1});
+  for(const personal of usersPersonal) {
+    personalObj[personal.uid] = personal;
+  }
+  await Promise.all(users.map(async user => {
+    let certs = user.certs.concat([]);
+    // 若用户拥有“banned”证书，则忽略其他证书
+    if(certs.includes('banned')) {
+      certs = ['banned'];
+    } else {
+      if(!certs.includes('default')) {
+        certs.unshift('default');
+      }
+      // 若用户的学术分大于0，则临时添加“scholar”证书
+      if(!certs.includes('scholar') && user.xsf > 0){
+        certs.push('scholar');
+      }
+    }
+    const info = {};
+    info.certsName = [];
+    for(const cert of certs) {
+      const role = await RoleModel.extendRole(cert);
+      if(role.displayName) {
+        info.certsName.push(role.displayName);
+      }
+    }
+    const userPersonal = personalObj[user.uid];
+    // 若用户绑定了手机号，则临时添加“机友”标志
+    if(userPersonal.mobile && userPersonal.nationCode) info.certsName.push('机友');
+    // 若用户绑定了邮箱，则临时添加“笔友”标志
+    if(userPersonal.email) info.certsName.push('笔友');
+    info.certsName = info.certsName.join(' ');
+    user.info = info;
+  }));
+};
+
 module.exports = mongoose.model('users', userSchema);
-
-

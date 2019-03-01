@@ -52,10 +52,6 @@ block content
                 .col-sm-5
                   input.form-control#valuableThreadsId(placeholder='请输入文号' value=forum.valuableThreadsId ? forum.valuableThreadsId.join(','): '')
               .form-group
-                label.col-sm-2.control-label 主管专家
-                .col-sm-5
-                  input.form-control#moderators(placeholder='请输入uid' value=forum.moderators? forum.moderators.join(','): '')
-              .form-group
                 .col-sm-5.col-sm-offset-2
                   button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存
 block scripts

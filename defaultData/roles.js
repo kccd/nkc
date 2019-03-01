@@ -7,7 +7,7 @@ module.exports = [
     displayName: '运维',
     contentClass: [],
     modifyPostTimeLimit: -1,
-    defaultRole: true,
+    type: 'system',
     operationsId: []
   },
   {
@@ -18,7 +18,7 @@ module.exports = [
     displayName: '普通用户',
     contentClass: [],
     modifyPostTimeLimit: 0.5,
-    defaultRole: true,
+    type: 'system',
     operationsId: [
       'logout'
     ]
@@ -31,7 +31,7 @@ module.exports = [
     displayName: '被封用户',
     contentClass: [],
     modifyPostTimeLimit: 0,
-    defaultRole: true,
+    type: 'system',
     operationsId: []
   },
   {
@@ -42,7 +42,7 @@ module.exports = [
     displayName: '游客',
     contentClass: [],
     modifyPostTimeLimit: 0,
-    defaultRole: true,
+    type: 'system',
     operationsId: [
       'visitLogin',
       'submitLogin',
@@ -58,7 +58,7 @@ module.exports = [
     displayName: '专家',
     contentClass: [],
     modifyPostTimeLimit: 0,
-    defaultRole: true,
+    type: 'system',
     operationsId: []
   }
 ];

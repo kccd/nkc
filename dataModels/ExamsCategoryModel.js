@@ -3,21 +3,20 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
-  disabledA: {
+  disabled: { // 是否屏蔽该试卷
     type: Boolean,
-    default: true,
+    default: false,
     index: 1
   },
-  disabledB: {
-    type: Boolean,
-    default: true,
-    index: 1
+  volume: { // 试卷难度
+    type: String,
+    default: 'A'
   },
   uid: {
     type: String,
     required: true
   },
-  order: {
+  order: { // 考卷排序
     type: Number,
     default: 1,
     index: 1
@@ -27,58 +26,46 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
-  name: {
+  name: { // 考卷名称
     type: String,
     required: true
   },
-  description: {
+  description: { // 考卷介绍
     type: String,
     default: ''
   },
-  questionsCount: {
-    type: Number,
-    default: 0
-  },
-  examsCount: {
-    type: Number,
-    default: 0
-  },
-  passedCount: {
-    type: Number,
-    default: 0
-  },
-  paperAQuestionsCount: {
+  passScore: { // 及格分数
     type: Number,
     default: 10
   },
-  paperAPassScore: {
+  time: { // 考试时间
     type: Number,
-    default: 6
+    default: 30 // 默认考试时间为30分钟
   },
-  paperBQuestionsCount: {
-    type: Number,
-    default: 10
+  rolesId: { // 通过后颁发的证书
+    type: [String],
+    default: []
   },
-  paperBPassScore: {
-    type: Number,
-    default: 6
-  },
-  paperATime: {
-    type: Number,
-    default: 30 // 30分钟
-  },
-  paperBTime: {
-    type: Number,
-    default: 30 // 30分钟
-  },
-  passingACert: {
-    type: String,
-    default: ''
-  },
-  passingBCert: {
-    type: String,
-    default: ''
+  from: { // 考卷试题来源
+    type: Schema.Types.Mixed,
+    default: []
   }
+  /* from: [
+    {
+      type: { // pub: public, pro: professional
+        type: String,
+        required: true
+      },
+      fid: { // 专业ID
+        type: String,
+        default: ''
+      },
+      count: { // 从该专业抽取试题的数量
+        type: Number,
+        default: 1
+      }
+    }
+  ], */
 }, {
   collection: 'examsCategories'
 });

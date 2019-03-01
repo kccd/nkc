@@ -85,7 +85,7 @@ function htmlDiff(earlier,later){
 
 function testModifyTimeLimit(time, ownership, toc) {
 	// time === -1 时间无限制
-	// ownership 自己或有'modifyOtherPost'操作权限
+  // ownership 自己或有'modifyOtherPost'操作权限
 	if(!ownership) return;
 	if(time === -1) return true;
 	const timeLimit = time*60*60*1000;
@@ -121,9 +121,13 @@ let creditString = (t) => {
   }
 };
 
-let fromNow = (time) => {
+const fromNow = (time) => {
   return moment(time).fromNow();
 };
+
+const format = (type, toc) => {
+  return moment(toc).format(type);
+}
 
 function highlightString(content, str) {
   let result = content;
@@ -290,6 +294,7 @@ let pugRender = (template, data, state) => {
     markdown: render.commonmark_render,
     dateTimeString: dateTimeString,
     fromNow: fromNow,
+    format: format,
     server: settings.server,
     plain:render.plain_render,
     experimental_render:render.experimental_render,

@@ -5,15 +5,15 @@ block head
   meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
-  
-  link(href="/bootstrap/css/bootstrap.css" rel='stylesheet' type='text/css')
-  link(rel='stylesheet' href='/Draft.css')
-  link(rel='stylesheet' href='/katex.min.css')
-  link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
-  link(rel="stylesheet" href="/photoswipe/dist/photoswipe.css")
-  link(rel="stylesheet" href="/photoswipe/dist/default-skin/default-skin.css")
-  link(href=`/nkc_styles.css?v=${global.NKC.startTime}` rel='stylesheet' type='text/css')
   link(rel='shortcut icon' href='/favicon.ico')
+  +includeCSS('/bootstrap/css/bootstrap.css')
+  +includeCSS('/Draft.css')
+  +includeCSS('/katex.min.css')
+  +includeCSS('/font-awesome/css/font-awesome.css')
+  +includeCSS('/photoswipe/dist/photoswipe.css')
+  +includeCSS('/photoswipe/dist/default-skin/default-skin.css')
+  +includeCSS('/nkc_styles.css')
+  +includeCSS('/publicModules/public.css')
   block title
     title bootstrap_base
   
@@ -28,32 +28,49 @@ block body
   block footer
     include nkc_footer.pug
   if data.user
+    //- 添加好友的窗口，原生js（待改）
     include module_add_Friend.pug
     if data.user.generalSettings.lotterySettings.status
       include module_lottery
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
-  script(src='/jquery/jquery-1.11.1.js')
-  script(src="/jquery-ui-1.10.4.custom.js")
-  script(src='/bootstrap/js/bootstrap.min.js')
-  script(src='/twemoji/2/twemoji.min.js')
-  script(src='/Promise/promise.min.js')
-  script(src='/vue/dist/vue.js')
+  +includeJS('/jquery/jquery-1.11.1.js')
+  +includeJS('/jquery-ui-1.10.4.custom.js')
+  +includeJS('/bootstrap/js/bootstrap.min.js')
+  +includeJS('/twemoji/2/twemoji.min.js')
+  +includeJS('/Promise/promise.min.js')
+  +includeJS('/vue/dist/vue.js')
   script.
     Vue.config.productionTip = false;
-  script(src='/qrcode/build/qrcode.js')
-  script(src="/photoswipe/dist/photoswipe.js")
-  script(src="/photoswipe/dist/photoswipe-ui-default.js")
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  +includeJS('/qrcode/build/qrcode.js')
+  +includeJS('/photoswipe/dist/photoswipe.js')
+  +includeJS('/photoswipe/dist/photoswipe-ui-default.js')
+  //- 旧版common.js兼容旧的页面
+  +includeJS('/interface_common.js')
+  +includeJS('/axios/axios.min.js')
+  +includeJS('/moment/moment.js')
+  +includeJS('/moment/locale/zh-cn.js')
+  //- 新版common.js
+  +includeJS('/publicModules/common.js')
+
   if data.user
-    script(src=`/socket.io-client/dist/socket.io.js?v=${global.NKC.startTime}`)
-    script(src=`/message/socket.js?v=${global.NKC.startTime}`)
+    //- 接入即时通信
+    +includeJS('/socket.io-client/dist/socket.io.js')
+    +includeJS('/message/socket.js')
+
+    if data.user.newVoteUp > 0
+      script!=`screenTopAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
+    -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
+    if kcb > 0
+      script!=`screenTopAlert("您发表的内容被评为精选，共获得 ${kcb} 个科创币！")`
+
 
   block scripts
 
   :thru
     <link rel="stylesheet" href="/external_pkgs/highlight/styles/tomorrow.css">
     <script src="/external_pkgs/highlight/highlight.pack.js"></script>
+
   script.
     if(window.HighlightEverything){window.HighlightEverything()}
     //- var qrcode = geid('androidQrcode');
@@ -72,50 +89,5 @@ block body
         }
       })
     }
-  script.
-    var kclogo = "                                                                         \n"
-    +"                                      kc                                                                        \n"
-    +"                                    kckc                               kckc               ckkck                 \n"
-    +"                                  kckckc                               kckc          kckckck                    \n"
-    +"                                kckckckc                               kckc        kckckck                      \n"
-    +"                               kckckckck                               kckc     kckckckc                        \n"
-    +"                               kckckckck                               kckckckckckc                             \n"
-    +"                               kckckckck                               kckckckc                                 \n"
-    +"                kckckckckckckckckckckckckckckckckckck                  kckc                                     \n"
-    +"               kckckckckckckckckckckckckckckckckckckck                 kckckckckc                               \n"
-    +"             kckckckckckckckckckckckckckckckckckckckckckc              kckckckckckckckc                         \n"
-    +"             kckckckckck       kckckckck     kckckckckckc              kckc    kckckckckck                      \n"
-    +"            kckckckckck        kckckckck        kckckckckc             kckc        kckckckck                    \n"
-    +"            kckckckckck        kckckckck        kckckckckc             kckc            kckckck                  \n"
-    +"            kckckckckck        kckckckck          kckckckc             kckc               ckckck                \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                                                        \n"
-    +"            kckckckckck        kckckckck                                    ckckckckckck                        \n"
-    +"            kckckckckck        kckckckck          kckckckc               kckckckckckckckckc                     \n"
-    +"            kckckckckck        kckckckck        kckckckckc            ckckckckckckckckckckckck                  \n"
-    +"            kckckckckck        kckckckck        kckckckckc           kckc                  kckc                 \n"
-    +"             kckckckckck       kckckckck     kckckckckckc            kckc                  kckc                 \n"
-    +"             kckckckckckckckckckckckckckckckckckckckckckc            kckc                                       \n"
-    +"               kckckckckckckckckckckckckckckckckckckckc              kckc                                       \n"
-    +"                 kckckckckckckckckckckckckckckckckckc                kckc                                       \n"
-    +"                               kckckckck                             kckc                  kckc                 \n"
-    +"                               kckckckck                             kckc                  kckc                 \n"
-    +"                               kckckckck                              ckckckckckckckckckckckck                  \n"
-    +"                               kckckckc                                  kckckckckckckckckc                     \n"
-    +"                               kckckc                                       ckckckckckck                        \n"
-    +"                               kckc                                                                             \n"
-    +"                               kc                                                                               \n"
-    //- console.log(kclogo)
     console.log('(c)2018 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')
-  if data.user
-    if data.user.newVoteUp > 0
-      script!=`screenTopAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
-    -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
-    if kcb > 0
-      script!=`screenTopAlert("您发表的内容被评为精选，共获得 ${kcb} 个科创币！")`

@@ -1,57 +1,87 @@
-extends ../publicModules/mdui_base
-block title
-  title 科创考试
-  -const mainContainer1400 = true;
-  link(rel='stylesheet' href=`/exam/exam.css?v=${startTime}`)
+extends ../bootstrap_base
+block title 
+  title=`${data.serverSettings.websiteName} | 考试系统`
+  -const {countOneDay, count, waitingTime} = data.examSettings;
+  +includeCSS('/exam/exam.css')
 block content
-  .mdui-container.mdui-m-t-2.mdui-typo
+  .container-fluid.max-width
     .row
-      .mdui-col-sm-12
-        img(src='/resources/site_specific/kclogo_misaka1.png' style='max-width:100%')
-
-      .mdui-col-sm-12
-        div(style='line-height:1.8;')
-          :markdown
-            # 参与考试获得证书
-
-            ### 说明
-            - 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
-            - 通过B卷考试可获得高级证书，可参与特种科技爱好话题的交流。
-            - 通过A卷考试的用户将来可以再参加B卷考试获取高级证书。
-      .mdui-col-sm-12
-        .mdui.row
-          .mdui-col-xs-12.mdui-col-md-6
-            h3.mdui-text-center A卷考试
-
+      .col-xs-12.col-md-8
+        h2.m-b-2 参与考试获得证书
+        ul
+          li 
+            h5 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
+          li 
+            h5 通过B卷考试可获得高级证书，可参与相应特种科技爱好话题的交流。
+          li 
+            h5 通过A卷考试的用户将来可以再参加B卷考试。
+          li 
+            h5=`同一用户每天最多进行 ${countOneDay} 次考试。`
+          li 
+            h5=`同一用户的考试次数累计达到 ${count} 次时，在${waitingTime} 天之内将无法再次参加考试。`  
+        .row.m-t-2 
+          .col-xs-12.col-md-12
+                
+        .row.m-t-2
+          .col-xs-12.col-md-6
+            +listHeader('A卷（基础级）')
             for category in data.examsCategories
-              if !category.disabledA
-                a(style='font-size: 2rem;' href=`/exam/paper?cid=${category._id}&volume=A`)=`【${category.name}】`
-          .mdui-col-xs-12.mdui-col-md-6
-            h3.mdui-text-center B卷考试
+              if category.volume === 'A'
+                span.h4.m-r-1(style='display: inline-block;')
+                  a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
+                  //-p=category.description
+          .col-xs-12.col-md-6
+            +listHeader('B卷（专业级）')
             for category in data.examsCategories
-              if !category.disabledB
-                a(style='font-size: 2rem;' href=`/exam/paper?cid=${category._id}&volume=B`)=`【${category.name}】`
-          //for category in data.examsCategories
-            h3= `参加 `
-              if permission('visitExamsCategory')
-                a(href=`/exam/category/${category._id}`)= `【${category.name}】`
+              if category.volume === 'B'
+                  span.h4.m-r-1(style='display: inline-block;')
+                    a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
+                  //-p=category.description
+      .col-xs-12.col-md-3.col-md-offset-1
+        if permission('visitEditQuestion')
+          a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题
+          a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
+            if data.unViewedCount > 0
+              .red-point=` ${data.unViewedCount}`
+        else 
+          a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
+          p 当前只允许学术分1分以上的会员命题，您还没有学术分。点击
+            a(href='https://www.kechuang.org/t/67256' target='_blank') 这里
+            |了解学术分制度。
+        a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper?t=self`) 考试记录
+        if permission('addExamsCategory') || permission('visitExamsQuestionAuth') || permission('visitExamsQuestionAuth')
+          .p-t-2  
+          +listHeader('管理操作')
+          if permission('addExamsCategory')
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/categories/editor`) 考卷管理
+          if permission('visitExamQuestionManagement')  
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/questions`) 试题管理  
+          if permission('visitExamsQuestionAuth')  
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/auth`)
+              if data.unauthCount
+                span= `试题审核 `
+                span.red-point=data.unauthCount
               else
-                span= `【${category.name}】`
-              | &nbsp;测试
-              if !category.disabledA
-                a(href=`/exam/paper?cid=${category._id}&volume=A`) 【A卷】
-              if !category.disabledB
-                a(href=`/exam/paper?cid=${category._id}&volume=B`) 【B卷】
-            //.mdui-col-xs-12.mdui-col-sm-6.mdui-col-md-4
-              .mdui-p-a-2.mdui-text-center
-                .category-name
-                  if !permission('visitExamsCategory')
-                    span= category.name
-                  else
-                    a(href=`/exam/category/${category._id}`)= category.name
-                .category-description= category.description
-                .mdui-p-t-2
-                  a.mdui-m-r-3(href=`/exam/paper?cid=${category._id}&volume=A`) A卷
-                  a(href=`/exam/paper?cid=${category._id}&volume=B`) B卷
-block scripts
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+                | 试题审核          
+        .p-t-2        
+        +listHeader('最新考试记录')      
+        for paper in data.papers
+          .m-t-1
+            span=fromNow(paper.tlm)
+            //- img(src=`/avatar/${paper.user.uid}` target='_blank').user-list-avatar
+            | &nbsp;
+            a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
+            | &nbsp;
+            | 通过了【
+            span=paper.category.name
+            | 】
+            if paper.category.volume === 'A'
+              span 基础级
+            else 
+              span 专业级
+        .p-t-2  
+        +listHeader('命题人')
+        for li in data.usersList  
+          a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
+            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb}\n`+`${li.user.info.certsName}`;
+            img.user-list-avatar(src=`/avatar_small/${li.user.uid}`  title=title)

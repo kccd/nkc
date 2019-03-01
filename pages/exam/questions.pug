@@ -1,0 +1,87 @@
+extends ../bootstrap_base
+block title
+  title 试题管理
+  +includeCSS('/exam/exam.css')
+block content
+  .container-fluid.max-width
+    include ./nav
+    .row
+      .col-xs-12.col-md-12
+        h5.text-danger 提示：为了不影响已创建的考卷和考试，请谨慎修改。        
+      .col-xs-12.col-md-3
+        .list-group
+          a.btn.list-group-item(href=`/exam/questions` class=!data.t?'active': '')
+            .text-left 全部
+              .pull-right=`总共：${data.allCount}, 可用：${data.count}`
+          a.btn.list-group-item(href=`/exam/questions?t=waiting` class=data.t==='waiting'?'active': '')
+            .text-left 等待审核
+              .pull-right=`总共：${data.waitingCount}`
+          a.btn.list-group-item(href=`/exam/questions?t=un` class=data.t==='un'?'active': '')
+            .text-left 审核未通过
+              .pull-right=`总共：${data.unCount}`        
+        .list-group      
+          a.btn.list-group-item(href='/exam/questions?t=pub' class=data.t==='pub'?'active': '')
+            .text-left 公共题库
+              .pull-right=`总共：${data.allPubCount}, 可用：${data.pubCount}`      
+          for forum in data.forums
+            a.btn.list-group-item(href=`/exam/questions?t=pro&fid=${forum.fid}` class=data.fid===forum.fid?'active': '')
+              .text-left=forum.displayName
+                .pull-right=`总共：${forum.allCount}, 可用：${forum.count}`
+      
+      .col-xs-12.col-md-9
+        ul.nav.nav-pills.m-b-1
+          li(class=!data.v?'active': '')
+            a(href=`/exam/questions?${data.fid?'fid=' + data.fid + '&':''}${data.t?'t='+data.t: ''}`) 全部
+          li(class=data.v==='A'?'active': '')
+            a(href=`/exam/questions?v=A${data.fid?'&fid=' + data.fid:''}${data.t?'&t='+data.t: ''}`) A(基础级)
+          li(class=data.v==='B'?'active': '')
+            a(href=`/exam/questions?v=B${data.fid?'&fid=' + data.fid:''}${data.t?'&t='+data.t: ''}`) B(专业级)  
+        include ../interface_navigation_paging
+        for question in data.questions
+          div.m-b-2(style='padding: 1rem;background-color: #efefef;')
+            span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
+            a.m-r-1(href=`/u/${question.uid}` target='_blank')= question.user.username
+            if question.volume === 'A'
+              span.m-r-1 基础级(A)
+            else 
+              span.m-r-1 专业级(B)  
+            if question.disabled
+              span.m-r-1.text-danger 已被屏蔽
+            else  
+              if question.auth === null
+                span.m-r-1 等待审核
+              else if question.auth === true
+                span.text-success.m-r-1 审核已通过
+              else 
+                span.text-danger.m-r-1 审核未通过
+                if permission('removeAllQuestion')
+                  a.m-r-1(href=`javascript:deleteQuestion('${question._id}')`) 删除
+            a(href=`/exam/editor?qid=${question._id}`).m-r-1 编辑
+            if !question.disabled
+              a(href=`javascript:disabledQuestion(${question._id})`).m-r-1 屏蔽
+            else   
+              a(href=`javascript:enabledQuestion(${question._id})`).m-r-1 解除屏蔽
+                
+            if question.auth === false || question.disabled
+              h5.text-danger 原因：
+                span= question.reason    
+            div.question-content!=`${markdown('问：' + question.content)}`
+            if question.hasImage
+              img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
+            for a, index in question.answer
+              -let c=[], i = ['A：', 'B：', 'C：', 'D：'];
+              if index === 0
+                -c.push('text-success');
+              else   
+                -c.push('text-danger');
+              h5(class=c)!= markdown(i[index] + a)    
+            if question.auth === null
+              span 快速审核：
+              button.btn.btn-sm.btn-default(onclick=`auth("${question._id}", true)`) 
+                span.text-success 通过
+              button.btn.btn-sm.btn-default(onclick=`auth("${question._id}", false)`) 
+                span.text-danger 不通过
+        include ../interface_navigation_paging  
+block scripts
+  +includeJS('/exam/questions.js')        
+  include ../MathJax

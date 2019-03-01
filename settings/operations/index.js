@@ -33,7 +33,6 @@ const me = require('./me');
 const m = require('./personalForum');
 const p = require('./post');
 const problem = require('./problem');
-const q = require('./question');
 const register = require('./register');
 const search = require('./search');
 const sendMessage = require('./sendMessage');
@@ -66,7 +65,11 @@ operationObj.defaultOperations = [
 	'getAnyBodyPhoto',// 忽略相册、证书照片的权限
 	'removeAnyBodyPhoto',// 忽略相册、证书照片的权限
   'canSendToEveryOne', // 跳过`仅接收好友信息`限制
-  'creditXsf'
+  'creditXsf',
+  'modifyAllQuestions', // 可修改审核过的试题
+  'viewAllPaperRecords', // 可查看所有的考试记录
+  'removeAllQuestion', // 可删除别人出的试题
+  'superModerator', // 超级专家，所有专业的专家权限
 ];
 
 
@@ -130,8 +133,6 @@ operationObj.operationTree = {
 		p,// 回复
 
 		problem,// 报告问题
-
-		q,// 题库
 
 		register,// 注册
 
