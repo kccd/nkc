@@ -69,13 +69,16 @@ examRouter
       }
     ]);
     const usersList = [];
+    const users = [];
     for(const r of result) {
       const user = await db.UserModel.findOnly({uid: r._id});
+      users.push(user);
       usersList.push({
         user,
         count: r.count
       });
     }
+    await db.UserModel.extendUsersInfo(users);
     data.usersList = usersList;
     data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
     await next();

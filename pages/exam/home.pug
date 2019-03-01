@@ -83,6 +83,5 @@ block content
         +listHeader('命题人')
         for li in data.usersList  
           a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
-            - var navbarDesc = li.user.navbarDesc;
-            - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb}\n`+`${li.user.info.certsName}`;
             img.user-list-avatar(src=`/avatar_small/${li.user.uid}`  title=title)
