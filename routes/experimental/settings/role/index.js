@@ -39,7 +39,6 @@ roleRouter
     if(contentLength(_id) > 10) ctx.throw(400, '证书ID不能大于20字节');
     const sameIdRole = await db.RoleModel.findOne({_id});
     if(sameIdRole) ctx.throw(400, '证书ID已存在');
-    console.log(_id)
     const reg = /^[a-z]+$/;
     if(!reg.test(_id)) ctx.throw(400, '证书ID只能由英文大小写字母组成');
     if(!displayName) ctx.throw(400, '证书名称不能为空');
