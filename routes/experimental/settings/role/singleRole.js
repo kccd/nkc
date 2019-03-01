@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const userRouter = require('./users');
 const router = new Router();
 router
   .use('/', async (ctx, next) => {
@@ -31,7 +30,7 @@ router
     await next();
   })
   .patch('/', async (ctx, next) => {
-    const {tools, body, data, db} = ctx;
+    const {tools, body, data, db, redis} = ctx;
     const {contentLength} = tools.checkString;
     const {role} = body;
     const roleDB = data.role;
@@ -41,7 +40,8 @@ router
       color,
       hasIcon,
       operationsId,
-      type
+      type,
+      modifyPostTimeLimit
     } = role;
     if(!displayName) ctx.throw(400, '证书名称不能为空');
     if(contentLength(displayName) > 10) ctx.throw(400, '证书名称不能超过20字节');
@@ -51,17 +51,20 @@ router
     if(roleDB.type === 'system' && type !== 'system') ctx.throw(400, '系统类证书无法更改证书类型');
     if(!color) ctx.throw(400, '颜色不能为空');
     if(!color.includes('#')) ctx.throw(400, '颜色值只支持16进制');
+    if(modifyPostTimeLimit !== -1 && modifyPostTimeLimit < 0) ctx.throw(400, '更改POST的时间只能为-1或大于等于0');
     const updateObj = {
       hasIcon,
       displayName,
       description,
-      color
+      color,
+      modifyPostTimeLimit
     };
     if(role._id !== 'dev') {
       const operations = await db.OperationModel.find({_id: {$in: operationsId}});
       updateObj.operationsId = operations.map(o => o._id);
     }    
     await roleDB.update(updateObj);
+    await redis.cacheForums();
     await next();
   })
   .post('/icon', async (ctx, next) => {
@@ -78,10 +81,10 @@ router
 		const {_id} = params;
 		const role = await db.RoleModel.findOnly({_id});
 		if(role.type === 'system') ctx.throw(400, '无法删除系统类证书');
-		await db.UserModel.updateMany({certs: _id}, {$pull: {certs: _id}});
+    await db.UserModel.updateMany({certs: _id}, {$pull: {certs: _id}});
+    await db.ForumModel.updateMany({rolesId: _id}, {$pull: {rolesId: _id}});
 		await role.remove();
     await redis.cacheForums();
 		await next();
-  })
-  .use('/users', userRouter.routes(), userRouter.allowedMethods());
+  });
 module.exports = router;

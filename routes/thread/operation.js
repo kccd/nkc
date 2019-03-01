@@ -104,12 +104,14 @@ operationRouter
 		const targetThread = await db.ThreadModel.findOnly({tid});
 		data.targetUser = await targetThread.extendUser();
     const oldForums = await targetThread.extendForums(['mainForums']);
-    let isModerator;
-    for(const f of oldForums) {
-      isModerator = await f.isModerator();
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of oldForums) {
+        isModerator = await f.isModerator(user);
+        if(isModerator) break;
+      }
     }
-		if(!isModerator && !data.userOperationsId.includes('moveThread')) ctx.throw(403, '权限不足');
+		if(!isModerator) ctx.throw(403, '权限不足');
 		const oldCid = targetThread.cid;
 		// 版主只能改变帖子的分类，不能移动帖子到其他板块
 		// if(!data.userOperationsId.includes('moveThread') && fid === 'recycle' && fid !== oldForum.fid) ctx.throw(403, '权限不足');

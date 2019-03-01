@@ -152,10 +152,10 @@ block content
               button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
         else
           a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-        if data.userOperationsId.includes('moveThread') || data.isModerator
+        if data.userOperationsId.includes('moveThread') && data.isModerator
           if data.type === 'latest'
             button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
-        if data.userOperationsId.includes('visitForumInfoSettings')
+        if data.userOperationsId.includes('visitForumInfoSettings') && data.isModerator
           a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
             span.fa.fa-cog &nbsp;设置
         astVisit()
@@ -215,10 +215,10 @@ block content
                   button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
             else
               a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
-            if data.userOperationsId.includes('moveThread') || data.isModerator
+            if data.userOperationsId.includes('moveThread') && data.isModerator
               if data.type === 'latest'
                 button.btn.btn-default.btn-block(onclick='enterManagementMode()') 管理
-            if data.userOperationsId.includes('visitForumInfoSettings')
+            if data.userOperationsId.includes('visitForumInfoSettings') && data.isModerator
               a.btn.btn-block.btn-default(href=`/f/${data.forum.fid}/settings`)
                 span.fa.fa-cog &nbsp;设置
             +fastVisit()
@@ -347,8 +347,7 @@ block content
                   -for(let i = 0; i < data.forum.followers.length; i++)
                     if i !== 8
                       -const user = data.forum.followers[i];
-                      -const navbarDesc = user.navbarDesc;
-                      -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                      -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
                       a(href=`/u/${user.uid}`)
                         img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                 if data.forum.followers.length > 8
@@ -363,8 +362,7 @@ block content
                   -for(let i = 0; i < data.users.length; i++)
                     if i !== 8
                       -const user = data.users[i];
-                      -const navbarDesc = user.navbarDesc;
-                      -const title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
+                      -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
                       a(href=`/u/${user.uid}`)
                         img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                 if data.users.length > 8

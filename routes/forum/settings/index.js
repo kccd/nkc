@@ -9,7 +9,11 @@ settingsRouter
 	.use('/', async (ctx, next) => {
 		const {data, db, params, url} = ctx;
 		const {fid} = params;
-		data.forum = await db.ForumModel.findOnly({fid});
+    const forum = await db.ForumModel.findOnly({fid});
+    data.forum = forum;
+    const isModerator = (await forum.isModerator(data.user)) || ctx.permission('superModerator');
+    if(!isModerator) ctx.throw(403, '权限不足');
+    data.isModerator = isModerator;
 		data.forums = await db.ForumModel.find({}).sort({order: 1});
 		const urlArr = url.split('/');
 		const type = urlArr[urlArr.length-1];

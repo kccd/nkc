@@ -2,23 +2,24 @@ const Router = require('koa-router');
 const permissionRouter = new Router();
 permissionRouter
 	.get('/', async (ctx, next) => {
-		const {data, allContentClasses, db} = ctx;
-		data.allContentClasses = allContentClasses;
-		data.roles = await db.RoleModel.find().sort({toc: 1});
-		data.grades = await db.UsersGradeModel.find().sort({score: 1});
-		ctx.template = 'interface_forum_settings_permission.pug';
+    const {data, db} = ctx;
+    data.roles = await db.RoleModel.find().sort({toc: 1});
+    data.grades = await db.UsersGradeModel.find().sort({score: 1});
+    // ctx.template = 'forum/settings/permission.pug';
+    ctx.template = 'interface_forum_settings_permission.pug'
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
 		const {data, body, db, redis} = ctx;
 		const {forum} = data;
-		const {
+		let {
 		  klass, accessible,
       displayOnParent, visibility,
       isVisibleForNCC, gradesId,
       rolesId, relation,
       shareLimitCount,
-      shareLimitTime
+      shareLimitTime,
+      moderators
 		} = body;
 		const rolesDB = await db.RoleModel.find();
 		const rolesIdDB = rolesDB.map(r => r._id);
@@ -36,7 +37,28 @@ permissionRouter
 				gradesId_.push(gradeId);
 			}
 		}
-		if(!['and', 'or'].includes(relation)) ctx.throw(400, '用户角色与用户等级关系设置错误，请刷新页面重试');
+    if(!['and', 'or'].includes(relation)) ctx.throw(400, '用户角色与用户等级关系设置错误，请刷新页面重试');
+    moderators = moderators.split(',');
+    const oldModerators = forum.moderators;
+    for(let uid of oldModerators) {
+      if(!moderators.includes(uid)) {
+        // 移除当前专业的专家身份，若在其他专业都不为专家，则移除专家证书
+        const forumsCount = await db.ForumModel.count({fid: {$ne: forum.fid}, moderators: uid});
+        if(!forumsCount) {
+          const user = await db.UserModel.findOnly({uid});
+          await user.update({$pull: {certs: 'moderator'}});
+        }
+      }
+    }
+    const moderators_ = [];
+    await Promise.all(moderators.map(async uid => {
+      uid = uid.trim();
+      const targetUser = await db.UserModel.findOne({uid});
+      if(targetUser) {
+        moderators_.push(uid);
+        await targetUser.update({$addToSet: {certs: 'moderator'}})
+      }
+    }));
 		await forum.update(
 		  {
         class: klass, accessible,
@@ -45,7 +67,8 @@ permissionRouter
         rolesId: rolesId_,
         relation,
         shareLimitCount,
-        shareLimitTime
+        shareLimitTime,
+        moderators: moderators_
 		  }
 		);
 		await redis.cacheForums();

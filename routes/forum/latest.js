@@ -3,7 +3,7 @@ const latestRouter = new Router();
 latestRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
-		const {forum} = data;
+    const {isModerator, forum} = data;
 		let {digest, page, sortby, cat} = query;
 		page = page?parseInt(page): 0;
 		// 构建查询条件
@@ -18,9 +18,6 @@ latestRouter
 			match.categoriesId = parseInt(cat);
 			data.cat = match.categoriesId;
 		}
-		// 判断是否为该专业或上级专业的专家
-		const isModerator = await forum.isModerator(data.user);
-
 		// 拿到该专业下可从中拿文章的所有子专业id
 		let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
     fidOfCanGetThreads.push(forum.fid);
@@ -92,7 +89,7 @@ latestRouter
     data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
     data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
 		data.type = 'latest';
-		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
+    data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
 		await next();
 	});
 module.exports = latestRouter;

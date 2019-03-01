@@ -8,9 +8,15 @@ router
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
-    for(const f of forums) {
-      await f.ensureModeratorsPermission(data);
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of forums) {
+        isModerator = await f.isModerator(data.user);
+        if(isModerator) break;
+      }
     }
+    if(!isModerator) ctx.throw(403, '权限不足');
+    data.isModerator = isModerator;
     data.post = post;
 		const targetUser = await post.extendUser();
     const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
@@ -134,9 +140,15 @@ router
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
-    for(const f of forums) {
-      await f.ensureModeratorsPermission(data);
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of forums) {
+        isModerator = await f.isModerator(data.user);
+        if(isModerator) break;
+      }
     }
+    if(!isModerator) ctx.throw(400, '权限不足');
+    data.isModerator = isModerator;
 		const targetUser = await post.extendUser();
 		data.targetUser = targetUser;
 		data.post = post;

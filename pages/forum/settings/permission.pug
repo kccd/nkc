@@ -1,0 +1,107 @@
+extends ../../bootstrap_base
+block title
+  title=`权限设置 | ${data.forum.displayName}`
+block content
+  .container-fluid.max-width  
+    #data.hidden=JSON.stringify({forum: data.forum, roles: data.roles, grades: data.grades, permission: data.permission, operations: data.operations})
+    .row
+      .col-xs-12.col-md-2
+        include ../../module_forum_settings
+      .col-xs-12.col-md-10#app(v-cloak)
+        .panel.panel-default
+          .panel-heading 基本
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 总开关
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.accessible'> 开
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.accessible'> 关
+                  </label>
+              .form-group
+                label.col-sm-2.control-label 导航可见
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.visibility'> 开
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.visibility'> 关
+                  </label>    
+              .form-group
+                label.col-sm-2.control-label 无权用户在导航可见
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.isVisibleForNCC'> 开
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.isVisibleForNCC'> 关
+                  </label> 
+              .form-group
+                label.col-sm-2.control-label 在父板块显示
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.displayOnParent'> 开
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.displayOnParent'> 关
+                  </label>        
+        .panel.panel-default
+          .panel-heading 专家
+          .panel-body
+            table.table.table-stripe
+              thead
+                tr
+                  th 
+                  th(v-for='o in operations') {{o.description}}
+                  th 
+              tbody
+                tr(v-for='p in permission' v-if='p.type === "moderator"')
+                  th {{p.name}}
+                  th(v-for='o in operations')
+                    <label>
+                      <input type="checkbox" :value='o.name' v-model='p.operationsId'> 
+                    </label>
+                  th  
+                    button(@click='selectAll(p)') 全选    
+        .panel.panel-default
+          .panel-heading 证书
+          .panel-body            
+            table.table.table-stripe
+              thead
+                tr
+                  th 
+                  th(v-for='o in operations') {{o.description}}
+                  th 
+              tbody
+                tr(v-for='p in permission' v-if='p.type === "role"')
+                  th {{p.name}} 【{{{'system': '系统类','management': '管理类', 'common': '普通'}[p.roleType]}}】
+                  th(v-for='o in operations')
+                    <label>
+                      <input type="checkbox" :value='o.name' v-model='p.operationsId'> 
+                    </label>
+                  th  
+                    button(@click='selectAll(p)') 全选    
+        .panel.panel-default
+          .panel-heading 账号等级
+          .panel-body            
+            table.table.table-stripe
+              thead
+                tr
+                  th 
+                  th(v-for='o in operations') {{o.description}}
+                  th 
+              tbody
+                tr(v-for='p in permission' v-if='p.type === "grade"')
+                  th {{p.name}}
+                  th(v-for='o in operations')
+                    <label>
+                      <input type="checkbox" :value='o.name' v-model='p.operationsId'> 
+                    </label>
+                  th  
+                    button(@click='selectAll(p)') 全选                    
+block scripts
+  +includeJS('/module_dropdown.js')
+  +includeJS('/forum/settings/permission.js')              

@@ -162,7 +162,11 @@ const forumSchema = new Schema({
 	forumType: {
 		type: String,
 		default: 'discipline'
-	},
+  },
+  permission: {
+    type: [],
+    default: []
+  },
 	// 上级板块
 	parentsId: {
 		type: [String],
@@ -797,9 +801,9 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
 /* 
   判断用户是否具有当前操作的权限
   @param data.user 用户对象
-  @param data.userRoles 用户所有用的角色
+  @param data.userRoles 用户所有的角色
   @param data.operationId 操作名
-  @return boolean 是否用户权限
+  @return boolean 是否有权限
   @author pengxiguaa 2019/1/25
 */
 forumSchema.methods.ensureModeratorsPermission = async function(data) {

@@ -11,13 +11,15 @@ router
     const targetPost = await db.PostModel.findOnly({pid});
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     const targetForums = await targetThread.extendForums(['mainForums']);
-    let isModerator;
-    for(const f of targetForums) {
-      isModerator = await f.isModerator(data.user?data.user.uid:'');
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of targetForums) {
+        isModerator = await f.isModerator(data.user?data.user.uid:'');
+        if(isModerator) break;
+      }
     }
     if(!isModerator) {
-    	if(!data.userOperationsId.includes('disabledPost')) ctx.throw(400, '权限不足');
+    	ctx.throw(400, '权限不足');
     }
     // if(!await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403,'权限不足');
     const obj = {disabled: false};

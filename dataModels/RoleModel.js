@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const redisClient = require('../settings/redisClient');
 const Schema = mongoose.Schema;
 const roleSchema = new Schema({
 	_id: String,
@@ -164,6 +165,12 @@ roleSchema.methods.getUsers = async function(paging) {
 	}
 	return await UserModel.find(q).sort({toc: -1}).skip(start).limit(perpage);
 };
-
+roleSchema.statics.extendRole = async (_id) => {
+  const role = {_id};
+  role.displayName = await redisClient.getAsync(`role:${_id}:displayName`);
+  role.operationsId = await redisClient.smembersAsync(`role:${_id}:operationsId`);
+  role.modifyPostTimeLimit = await redisClient.getAsync(`role:${_id}:modifyPostTimeLimit`);
+  return role;
+};
 const RoleModel = mongoose.model('roles', roleSchema);
 module.exports = RoleModel;

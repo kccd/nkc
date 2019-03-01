@@ -37,7 +37,8 @@ function submit(fid) {
 		gradesId: selectedGradesId,
 		relation: relation,
     shareLimitCount: $('#shareLimitCount').val(),
-    shareLimitTime: $('#shareLimitTime').val()
+    shareLimitTime: $('#shareLimitTime').val(),
+    moderators: $('#moderators').val()
 	};
 	nkcAPI('/f/'+fid+'/settings/permission', 'PATCH', obj)
 		.then(function() {

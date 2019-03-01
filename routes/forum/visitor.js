@@ -23,7 +23,8 @@ visitorRouter
 			if(user) {
 				data.visitors.push(user);
 			}
-		}
+    }
+    await db.UserModel.extendUsersInfo(data.visitors);
 		//data.visitors = await Promise.all(uid.map(u => db.UserModel.findOne({uid: u})));
 		data.type = 'visitors';
 		await next();

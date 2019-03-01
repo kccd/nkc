@@ -35,11 +35,11 @@ module.exports = async (ctx, next) => {
   let languageName = 'zh_cn';
 	if(!user) {
 		// 游客
-		const visitorRole = await db.RoleModel.findOnly({_id: 'visitor'});
+		const visitorRole = await db.RoleModel.extendRole('visitor');
 		userOperationsId = visitorRole.operationsId;
 		userRoles = [visitorRole];
 	} else {
-		// 用户
+    // 用户
 		await user.update({tlv: Date.now()});
 		if(!user.certs.includes('default')) {
 			user.certs.unshift('default');
@@ -55,7 +55,8 @@ module.exports = async (ctx, next) => {
 			}
 		}
 		// 获取用户信息
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    await db.UserModel.extendUsersInfo([user]);
 		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
 		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
@@ -84,8 +85,7 @@ module.exports = async (ctx, next) => {
     user.newVoteUp = newVoteUp>0?newVoteUp:0;
 		// 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
-      await Promise.all(['banned'].map(async cert => {
-        const role = await db.RoleModel.findOne({_id: cert});
+      const role = await db.RoleModel.extendRole('banned');
         if(!role) return;
         userRoles.push(role);
         for(let operationId of role.operationsId) {
@@ -93,10 +93,9 @@ module.exports = async (ctx, next) => {
             userOperationsId.push(operationId);
           }
         }
-      }));
 		} else {
-			// 除被封用户以外的所有用户都拥有普通角色的权限
-			const defaultRole = await db.RoleModel.findOnly({_id: 'default'});
+      // 除被封用户以外的所有用户都拥有普通角色的权限
+      const defaultRole = await db.RoleModel.extendRole('default');
 			userOperationsId = defaultRole.operationsId;
 			// 根据用户积分计算用户等级，并且获取该等级下的所有权限
 			userGrade = await user.extendGrade();
@@ -105,7 +104,7 @@ module.exports = async (ctx, next) => {
       }
       // 根据用户的角色获取权限
       await Promise.all(user.certs.map(async cert => {
-        const role = await db.RoleModel.findOne({_id: cert});
+        role = await db.RoleModel.extendRole(cert);
         if(!role) return;
         userRoles.push(role);
         for(let operationId of role.operationsId) {
@@ -124,6 +123,6 @@ module.exports = async (ctx, next) => {
 	data.userOperationsId = userOperationsId;
 	data.userRoles = userRoles;
 	data.userGrade = userGrade || {};
-	data.user = user;
+  data.user = user;
 	await next();
 };

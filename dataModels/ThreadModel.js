@@ -445,6 +445,7 @@ const defaultOptions = {
   category: false,
   firstPost: true,
   firstPostUser: true,
+  userInfo: true,
   lastPost: true,
   lastPostUser: true,
   firstPostResource: false,
@@ -501,6 +502,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
 
     if(o.firstPostUser || o.lastPostUser) {
       const users = await UserModel.find({uid: {$in: [...usersId]}});
+      if(o.userInfo) {
+        await UserModel.extendUsersInfo(users);
+      }
       users.map(user => {
         usersObj[user.uid] = user;
       });

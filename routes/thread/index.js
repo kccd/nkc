@@ -115,11 +115,13 @@ threadRouter
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
     }
     const mainForums = forums.filter(forum => thread.mainForumsId.includes(forum.fid));
-    let isModerator = false;
-    // 若用户为某个父级专业的专家，则用户具有专家权限
-    for(const f of mainForums) {
-      const isModerator = await f.isModerator(data.user?data.user.uid: '');
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      // 若用户为某个父级专业的专家，则用户具有专家权限
+      for(const f of mainForums) {
+        isModerator = await f.isModerator(data.user?data.user.uid: '');
+        if(isModerator) break;
+      }  
     }
 		data.isModerator = isModerator;
 		// const breadcrumbForums = await forum.getBreadcrumbForums();
@@ -211,7 +213,7 @@ threadRouter
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 
-		data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
+    data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
@@ -248,7 +250,8 @@ threadRouter
 			othersForum = await db.PersonalForumModel.findOne({uid: toMid});
 			data.othersForum = othersForum
 		}
-		data.targetUser = await thread.extendUser();
+    data.targetUser = await thread.extendUser();
+    await db.UserModel.extendUsersInfo([data.targetUser]);
 		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
 		data.thread = thread;
@@ -260,7 +263,8 @@ threadRouter
 		await thread.extendFirstPost().then(async p => {
 			await p.extendUser().then(u => u.extendGrade());
 			await p.extendResources();
-		});
+    });
+    await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
 		await thread.extendLastPost();
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});

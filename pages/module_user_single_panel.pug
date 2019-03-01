@@ -1,4 +1,4 @@
--const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc} = targetUser;
+-const {username, uid, description, postCount, threadCount, kcb, xsf, navbarDesc, info} = targetUser;
 .row
   .col-xs-12.col-md-12
     .media.user-info-list.forum-list
@@ -16,7 +16,7 @@
               else
                 button.btn.btn-sm.subscribe-btn(style='padding: 0 10px;float: right;' onclick=`subscribeUser(${uid}, true)`) 关注
         .info
-          span= `证书：${navbarDesc.cs}`
+          span= `证书：${info.certsName}`
           br
           span= `文章：${threadCount} 回复：${postCount}`
         .description

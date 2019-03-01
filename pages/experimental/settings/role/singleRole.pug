@@ -45,6 +45,11 @@ block eContent
             label.col-sm-2.control-label 颜色
             .col-sm-10
               input.form-control(type='text' data-control='selectColor' v-model='role.color')    
+          .form-group
+            label.col-sm-2.control-label 修改POST
+            .col-sm-10
+              input.form-control(type='number' v-model.number='role.modifyPostTimeLimit')
+              h5.text-danger -1表示无限制（0.5：只能修改0.5小时以内发表的post）
           
           .form-group(v-if='role.type !== "system"')
             label.col-sm-2.control-label 
@@ -74,7 +79,7 @@ block eContent
                     th {{user.postCount}}
                     th {{format('YYYY/MM/DD HH:mm:ss', user.toc)}}
             .text-right.p-b-3    
-              a(href=`/e/settings/role/${data.role._id}/users`) 查看更多      
+              a(href=`/e/settings/user?t=${data.role._id}`) 查看更多      
                 
         h3.p-t-6#permission 权限设置
         hr
@@ -94,7 +99,8 @@ block eContent
                     th 选择
                 tbody
                   tr(v-for='o in type.operations')
-                    th {{o.name || o._id}}
+                    th(v-if='o.name') {{o.name}}({{o._id}})
+                    th(v-else) {{o._id}}
                     th 
                       <label>
                         <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>

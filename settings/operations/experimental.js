@@ -66,10 +66,6 @@ module.exports = {
 				GET: 'visitRoleUsers',
         DELETE: 'deleteRole',
         PATCH: 'modifyRole',
-				users: {
-					GET: 'visitRoleUsers',
-					PATCH: 'modifyRoleUsers'
-				},
 				icon: {
           POST: 'uploadRoleIcon'
         }
