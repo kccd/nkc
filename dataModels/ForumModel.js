@@ -163,10 +163,6 @@ const forumSchema = new Schema({
 		type: String,
 		default: 'discipline'
   },
-  permission: {
-    type: [],
-    default: []
-  },
 	// 上级板块
 	parentsId: {
 		type: [String],
