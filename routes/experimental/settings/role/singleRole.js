@@ -57,7 +57,8 @@ router
       displayName,
       description,
       color,
-      modifyPostTimeLimit
+      modifyPostTimeLimit,
+      type
     };
     if(role._id !== 'dev') {
       const operations = await db.OperationModel.find({_id: {$in: operationsId}});
