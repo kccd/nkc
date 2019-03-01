@@ -64,6 +64,7 @@ router.get('/', async(ctx, next) => {
       user.username = u.highlight.username || user.username;
       data.result.push(user)
     }
+    await db.UserModel.extendUsersInfo(data.result);
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     return next()
   }
