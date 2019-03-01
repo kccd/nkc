@@ -3,6 +3,7 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
+  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
   
   title 商品
@@ -39,6 +40,36 @@ block title
     }
     .item {
       margin-bottom:20px
+    }
+    .shopdsr-item{
+      float: left;
+      color: #999;
+      width: 36px;
+      height: 36px;
+      margin: 5px 7px 0 0;
+      position: relative;
+    }
+    .shopdsr-title {
+      text-align: center;
+      font-family: "\5b8b\4f53";
+    }
+    .shopdsr-score.shopdsr-score-up-ctrl {
+      color: #ff0036;
+      padding-left: 5px;
+      height: 18px;
+      width: 31px;
+      position: relative;
+      overflow: hidden;
+    }
+    .shopdsr-score-up {
+      color: #ff0036;
+      background: 0 0;
+      text-decoration: none;
+      height: 9px;
+      width: 8px;
+      right: 2px;
+      top: 5px;
+      position: absolute;
     }
 block content
 
@@ -146,7 +177,10 @@ block content
               span.title Freight
               span.location Place of origin
               span.location TO
-              span.location Place of receipt
+              //- span.location 新疆维吾尔自治区/巴音郭楞蒙古自治州/焉耆回族自治县
+              //- span.fa.fa-arrow-down#city 123456
+              input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
+              s.fa.fa-arrow-down
               span.location 快递
               sapn.location ￥12.00
           div.item
@@ -185,9 +219,30 @@ block content
           .col-xs-12.col-md-12
             .panel.panel-default
               .panel-heading
-                h3.panel-title 店铺信息
+                a(href='/shop/store/7', target='_blank' style="color: #333;font-size: 12px;font-weight:bold") 瓜哥的小店
               .panel-body
-                | Panel content
+                .row
+                  .col-xs-12.col-md-12(style="margin-bottom:10px")
+                    div(style="overflow: hidden;margin: 0 auto;cursor: pointer;position: relative;display:table")
+                      .shopdsr-item
+                        .shopdsr-title 描 述
+                        .shopdsr-score.shopdsr-score-up-ctrl
+                          span.shopdsr-score-con 4.9
+                          s.shopdsr-score-up
+                      .shopdsr-item
+                        .shopdsr-title 服 务
+                        .shopdsr-score.shopdsr-score-up-ctrl
+                          span.shopdsr-score-con 4.9
+                          s.shopdsr-score-up
+                      .shopdsr-item
+                        .shopdsr-title 物 流
+                        .shopdsr-score.shopdsr-score-up-ctrl
+                          span.shopdsr-score-con 4.9
+                          s.shopdsr-score-up
+                      a(target='_blank', href='/shop/store/7', style='z-index: 1;display: block; position: absolute; width: 100%;height: 100%;')
+                  .col-xs-12.col-md-12(style="text-align:center")
+                    a.btn.btn-info.btn-sm(href="/shop/store/7", style="background-color:#041567;margin-right:10px", target='_blank') 进店逛逛
+                    a.btn.btn-default.btn-sm(style="color:#041567") 收藏店铺
           .col-xs-12.col-md-12
             .panel.panel-default
               .panel-heading
@@ -221,7 +276,7 @@ block content
             .tab-content
               #home.tab-pane.active(role='tabpanel')
                 div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-                  h3(style="text-align:center") 商品详细描述
+                  //- h3(style="text-align:center") 商品详细描述
                   div(style="padding:20px")!=data.productInfo.productDetails
               #profile.tab-pane(role='tabpanel')
                 //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
@@ -316,6 +371,8 @@ block content
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/external_pkgs/citySet/city.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')
   script.
     $(document).ready(function(){
       $('#etalage').etalage({
@@ -325,4 +382,10 @@ block scripts
         source_image_height: 900,
         small_thumbs:5,
       });
+    });
+    $("#city").click(function (e) {
+      SelCity(this,e);
+    });
+    $("s").click(function (e) {
+      SelCity(document.getElementById("city"),e);
     });

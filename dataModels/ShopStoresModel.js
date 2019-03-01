@@ -31,10 +31,15 @@ const shopStoresSchema = new Schema({
     type: [String],
     default: [],
   },
+  // // 地区
+  // location: {
+  //   type: String,
+  //   default: ""
+  // },
   // 地址
   address: {
-    type: [String],
-    default: [],
+    type: String,
+    default: "",
   },
   // 商品种类数
   productsCounts: {

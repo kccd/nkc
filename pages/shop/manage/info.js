@@ -1,12 +1,3 @@
-$.getJSON('/location.json',function(data){
-	for (var i = 0; i < data.length; i++) {
-		var area = {id:data[i].id,name:data[i].cname,level:data[i].level,parentId:data[i].upid};
-		data[i] = area;
-	}
-	$('.bs-chinese-region').chineseRegion('source',data);
-	$('#location').val($('#location').attr('data'));
-});
-
 var positionObj;
 var hasImg = false;
 var upLoadFile;
@@ -70,7 +61,7 @@ function saveToInfo(storeId) {
     screenTopWarning("请完善店铺信息后再提交")
     return;
   }
-  location = location + address
+  location = location + "&" + address;
   post = {
     storeName: storeName,
     storeDescription: storeDescription,

@@ -134,6 +134,63 @@ block content
                 span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
                 span.sr-only Next
           .col-xs-12.col-md-12
+            h3 精品推荐
+            hr
+          .col-xs-12.col-md-12
+            .row
+              //- -for(var a=1;a<15;a++)
+              for item in data.featuredItems
+                .col-sm-6.col-md-2
+                  .thumbnail(style="margin:0;border:0")
+                    a(href=`/shop/product/${item.productId}`)
+                      img(src=`/r/${item.imgMaster}`, title=`${item.productDescription}` ,style="height:150px" )
+                    .caption
+                      a(href=`/shop/product/${item.productId}` style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${item.productName}`)!=item.productName
+                      div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px") 瓜哥的小店
+                      //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+                      p(style="text-align: right;color: #bf7f5f;")
+                        i(style="font-style: normal;margin-right: 3px;")
+                          span(style='font-size:14px;') ￥
+                          | 8.00
+                        span 起
+              //- .col-sm-6.col-md-2
+              //-   .thumbnail
+              //-     img(src='/default/shop3.jpg', alt='...')
+              //-     .caption
+              //-       a(href="#" style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title="KC901S 3GHz Handheld Network Analyzer multi RF-meter") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+              //-       div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px") 瓜哥的小店
+              //-       //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+              //-       p(style="text-align: right;")
+              //-         i(style="font-style: normal;margin-right: 3px;")
+              //-           span(style='font-size:14px;color: #bf7f5f;') ￥
+              //-           | 8.00
+              //-         span 起
+              //- .col-sm-6.col-md-2
+              //-   .thumbnail
+              //-     img(src='/default/shop3.jpg', alt='...')
+              //-     .caption
+              //-       a(href="#" style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title="KC901S 3GHz Handheld Network Analyzer multi RF-meter") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+              //-       div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px") 瓜哥的小店
+              //-       //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+              //-       p(style="text-align: right;")
+              //-         i(style="font-style: normal;margin-right: 3px;")
+              //-           span(style='font-size:14px;color: #bf7f5f;') ￥
+              //-           | 8.00
+              //-         span 起
+              //- .col-sm-6.col-md-2
+              //-   .thumbnail
+              //-     img(src='/default/shop3.jpg', alt='...')
+              //-     .caption
+              //-       a(href="#" style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title="KC901S 3GHz Handheld Network Analyzer multi RF-meter") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+              //-       div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px") 瓜哥的小店
+              //-       //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+              //-       p(style="text-align: right;")
+              //-         i(style="font-style: normal;margin-right: 3px;")
+              //-           span(style='font-size:14px;color: #bf7f5f;') ￥
+              //-           | 8.00
+              //-         span 起
+          
+          .col-xs-12.col-md-12
             h3 Category one
             hr
           .col-xs-12.col-md-12

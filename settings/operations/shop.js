@@ -25,5 +25,10 @@ module.exports = {
   openStore: {
     GET: 'visitOpenStoreIndex',
     POST: 'openStoreApply'
+  },
+  store: {
+    PARAMETER:{
+      GET: 'visitStoreIndex',
+    }
   }
 };

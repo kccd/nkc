@@ -14,6 +14,15 @@ module.exports = {
 				reject: {
 					POST: "rejectApplyStore"
 				}
+			},
+			homeSetting: {
+				carousel: {
+					GET: 'visitHomeSettingCarousel'
+				},
+				featured: {
+					GET: 'visitHomeSettingFeatured',
+					POST: 'changeHomeSettingFeatured'
+				}
 			}
 		},
 	  login: {

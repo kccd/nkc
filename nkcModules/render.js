@@ -310,7 +310,7 @@ let pugRender = (template, data, state) => {
 		delCodeAddShrink,
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
-    startTime: global.NKC.startTime,
+		startTime: global.NKC.startTime,
     // 翻译 type: 语言分类, words：关键字
     lang: (type, words) => {
       return language[type][words];
