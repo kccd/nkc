@@ -80,7 +80,7 @@ app
   .use(etag())
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./node_modules')))
-  .use(staticServe(path.resolve('./static')))
+  .use(staticServe(path.resolve('./public')))
   .use(staticServe(path.resolve('./pages')))
   .use(favicon(__dirname + '/resources/site_specific/favicon.ico'))
   .use(logger)

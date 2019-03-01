@@ -15,7 +15,7 @@ router
       }
       data.category = category;
     }
-    data.roles = await db.RoleModel.find({defaultRole: false});
+    data.roles = await db.RoleModel.find({type: 'common'});
     const from = [];
     const pubQ = {
       disabled: false,

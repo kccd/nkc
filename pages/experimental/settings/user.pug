@@ -3,7 +3,10 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   link(href='/experimental/index.css' rel='stylesheet')
-  title 管理界面
+  if data.role
+    title=`${data.role.displayName} | 用户管理`
+  else 
+    title 用户管理  
 block content
 
   .container-fluid(style='max-width: 1400px;')
@@ -76,6 +79,13 @@ block content
                   input.form-control#searchInput(placeholder='请输入内容')
                 .form-group
                   button.btn.btn-primary.btn-block(type='submit' onclick='searchUser()') 搜索
+            .col-xs-12.col-md-12.m-b-1
+              for role in data.roles
+                if role._id !== 'visitor'
+                  if data.t === role._id
+                    span.m-r-1(style='font-size: 1.4rem;')=role.displayName
+                  else  
+                    a.m-r-1(href=`/e/settings/user?t=${role._id}`)= role.displayName
             .col-xs-12.col-md-12
               table.table.table-hover(style='display: none;padding: 0.5rem;border: 1px solid #cccccc;')#searchResult
                 thead

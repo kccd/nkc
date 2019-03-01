@@ -60,23 +60,15 @@ module.exports = {
 			}
 		},
 		role: {
-			GET: 'visitRoleUsers',
+			GET: 'visitRoleSettings',
 			POST: 'addRole',
 			PARAMETER: {
 				GET: 'visitRoleUsers',
-				DELETE: 'deleteRole',
-				base: {
-					GET: 'visitRoleBaseSettings',
-					PATCH: 'modifyRoleBase'
-				},
-				users: {
-					GET: 'visitRoleUsers',
-					PATCH: 'modifyRoleUsers'
-				},
-				permissions: {
-					GET: 'visitRolePermissionsSettings',
-					PATCH: 'modifyRolePermissions'
-				}
+        DELETE: 'deleteRole',
+        PATCH: 'modifyRole',
+				icon: {
+          POST: 'uploadRoleIcon'
+        }
 			}
 		},
 		operation: {

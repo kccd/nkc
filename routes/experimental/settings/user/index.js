@@ -8,7 +8,7 @@ userRouter
 	})
 	.get('/', async (ctx, next) => {
 		const {query, data, db} = ctx;
-		let {page, searchType, content} = query;
+		let {page = 0, searchType, content, t} = query;
 		if(['username', 'uid'].includes(searchType)) {
 			content = content.trim();
 			let targetUser;
@@ -22,21 +22,33 @@ userRouter
 			}
 			data.targetUser = targetUser;
 		} else {
-			if(page) {
-				page = parseInt(page);
-			} else {
-				page = 0;
-			}
+      const q = {};
+      if(t) {
+        const role = await db.RoleModel.findOne({_id: t});
+        if(role) {
+          if(role._id === 'scholar') {
+            q.xsf = {$gt: 0};
+          } else if(role._id === 'default') {
+
+          } else {
+            q.certs = role._id;
+          }
+          data.t = t;
+          data.role = role;
+        }
+      }
 			const {apiFunction} = ctx.nkcModules;
-			const count = await db.UserModel.count();
+      const count = await db.UserModel.count(q);
+      console.log(count, q)
 			const paging = apiFunction.paging(page, count);
 			data.paging = paging;
-			const users = await db.UserModel.find({}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+			const users = await db.UserModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 			data.users = await Promise.all(users.map(async user => {
 				await user.extend();
 				return user;
 			}));
-		}
+    }
+    data.roles = await db.RoleModel.find();
 		await next();
 	})
 	.get('/:uid', async (ctx, next) => {
@@ -46,9 +58,7 @@ userRouter
 		await targetUser.extend();
 		await targetUser.extendRoles();
 		data.targetUser = targetUser;
-		let rolesId = targetUser.roles.map(r => r._id);
-		rolesId = rolesId.concat(['default', 'banned', 'visitor']);
-		data.roles = await db.RoleModel.find({_id: {$nin: rolesId}}).sort({toc: 1});
+		data.roles = await db.RoleModel.find({type: {$in: ['common', 'management']}}).sort({toc: 1});
 		await next();
 	})
 	.patch('/:uid', async (ctx, next) => {

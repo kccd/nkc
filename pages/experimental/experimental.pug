@@ -1,0 +1,10 @@
+extends ../bootstrap_base
+block title
+  +includeCSS('/experimental/index.css')
+  block eTitle
+block content
+  .container-fluid.max-width
+    .row
+      include ./nav
+      .col-xs-12.col-md-12
+  block eContent
