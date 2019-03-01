@@ -15,12 +15,12 @@ block title
       -break;
 
   -const postTo = data.userOperationsId.includes('quotePost')
-  -const addCredit = data.userOperationsId.includes('creditXsf')
+  -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
   -const addKcb = data.userOperationsId.includes('creditKcb')
   -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
   -const highlight = data.highlight;
-  -const digestPost = data.userOperationsId.includes('digestPost');
-  -const unDigestPost = data.userOperationsId.includes('unDigestPost');
+  -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
+  -const unDigestPost = data.userOperationsId.includes('unDigestPost')  && data.isModerator;
   include ../MathJax.pug
 
   if (thread.firstPost&&thread.firstPost.c)
@@ -79,9 +79,11 @@ block title
               span.fa.fa-thumbs-o-up &nbsp;
               span 鼓励
         if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
-          li
-            a(href=`/editor?type=post&id=${post.pid}`)
-              span.fa.fa-edit &nbsp;编辑
+          
+          if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
+            li
+              a(href=`/editor?type=post&id=${post.pid}`)
+                span.fa.fa-edit &nbsp;编辑
         if disablePost && !targetThread
           li
             a(href=`###` onclick=`disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo")
@@ -155,7 +157,7 @@ block content
                           if ['digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'].includes(operationId)
                             -canManagement = true;
                             -break;
-                        if data.isModerator || canManagement
+                        if data.isModerator && canManagement
                           a(href=`javascript:displayManagement();` style='text-decoration: none;float: right;')
                             .highlight.fa.fa-cog
                         +postOptions(thread.firstPost, thread, 0)
@@ -215,10 +217,9 @@ block content
                         div.managementDiv(style='display: none;margin-top: 1rem;')
                           .form-inline
                             //- 设置置顶
-                            if data.isModerator || data.userOperationsId.includes('toppedThread') && !thread.topped
+                            if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
                               button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
-                            if data.isModerator || data.userOperationsId.includes('unToppedThread') && thread.topped
-
+                            if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
                               button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('${data.thread.tid}')`) 取消专业置顶
                             if data.userOperationsId.includes('homeTop') && !data.ads.includes(data.thread.tid)
                               button.btn.btn-default.btn-sm#threadTop(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
@@ -228,19 +229,21 @@ block content
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                             if data.userOperationsId.includes('openThread') && thread.closed
                               button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
-                          if moveThread || (!thread.fid && !thread.toMid && isMyForumMdr)
+                          if permission('addThreadForum') || permission('moveThread')
                             div
-                              div(v-if='forums.length !== 0')
-                                h5 已选择专业
-                                div
-                                  for forum in thread.forums
-                                    span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
-                                      .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
-                              div(style='margin-top:0.5rem;').form-inline    
-                                include ../forumlist_dropdown.pug
-                                button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
-                              div(style='margin-top:0.5rem;')      
-                                button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
+                              if permission('addThreadForum')
+                                div(v-if='forums.length !== 0')
+                                  h5 已选择专业
+                                  div
+                                    for forum in thread.forums
+                                      span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
+                                        .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
+                                div(style='margin-top:0.5rem;').form-inline    
+                                  include ../forumlist_dropdown.pug
+                                  button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
+                              if permission('moveThread')    
+                                div(style='margin-top:0.5rem;')      
+                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
                             //-.form-inline(style='margin: 0.5rem 0')
                               .form-group.form-group-sm
                                 include ../forumlist_dropdown.pug

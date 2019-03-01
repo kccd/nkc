@@ -41,7 +41,8 @@ userRouter
 		const {uid} = params;
 		const {apiFunction} = ctx.nkcModules;
 		const targetUser = await db.UserModel.findOnly({uid});
-		await targetUser.extendGrade();
+    await targetUser.extendGrade();
+    await db.UserModel.extendUsersInfo([targetUser]);
 		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
 		const {type, token} = query;
 		const page = query.page?parseInt(query.page): 0;

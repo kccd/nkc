@@ -85,7 +85,7 @@ function htmlDiff(earlier,later){
 
 function testModifyTimeLimit(time, ownership, toc) {
 	// time === -1 时间无限制
-	// ownership 自己或有'modifyOtherPost'操作权限
+  // ownership 自己或有'modifyOtherPost'操作权限
 	if(!ownership) return;
 	if(time === -1) return true;
 	const timeLimit = time*60*60*1000;

@@ -13,7 +13,6 @@ function submit(fid, fn) {
 		basicThreadsId: $('#basicThreadsId').val(),
 		noticeThreadsId: $('#noticeThreadsId').val(),
 		valuableThreadsId: $('#valuableThreadsId').val(),
-		moderators: $('#moderators').val()
 	};
 	nkcAPI('/f/'+fid+'/settings/info', 'PATCH', obj)
 		.then(function() {

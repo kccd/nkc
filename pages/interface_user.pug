@@ -17,7 +17,7 @@ block content
                 .text-center
                   -const targetUser = data.targetUser;
                   include user/module_user_grade
-                p.text-center(style='color: #ff8700;')= data.targetUser.navbarDesc.cs
+                p.text-center(style='color: #ff8700;')= data.targetUser.info.certsName.join(' ')
                 br
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
                 if data.user && data.user.uid !== data.targetUser.uid

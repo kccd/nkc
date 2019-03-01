@@ -66,15 +66,15 @@ editorRouter
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
       const forums = await targetThread.extendForums(['mainForums']);
-      let isModerator;
-      for(let forum of forums){
-        isModerator = await forum.isModerator(user?user.uid: '');
-        if(isModerator) break;
-      }
-      if(!data.userOperationsId.includes('modifyOtherPosts')) {
-        if(targetPost.uid !== user.uid && !isModerator) {
-          ctx.throw(403, '权限不足');
+      let isModerator = ctx.permission('superModerator');
+      if(!isModerator) {
+        for(let forum of forums){
+          isModerator = await forum.isModerator(user?user.uid: '');
+          if(isModerator) break;
         }
+      }
+      if(targetPost.uid !== user.uid && (!ctx.permission('modifyOtherPosts') || !isModerator)) {
+        ctx.throw(403, '权限不足');
       }
       // if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
       data.content = targetPost.c;  //回复内容
