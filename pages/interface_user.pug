@@ -208,7 +208,8 @@ block content
                           -forum = f;
                           if f.forumType === 'topic' 
                             -break;
-                        a.ForumThreadHasImage(href=`/f/${forum.fid}` style=`font-size:inherit;padding: 0.2rem;margin-right: 0.5rem;color: #ffffff;background-color: ${forum.color};text-decoration: none;`)= forum.displayName
+                        if forum    
+                          a.ForumThreadHasImage(href=`/f/${forum.fid}` style=`font-size:inherit;padding: 0.2rem;margin-right: 0.5rem;color: #ffffff;background-color: ${forum.color};text-decoration: none;`)= forum.displayName
                         a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
                     .col-xs-3.col-md-3
                       .row.text-right

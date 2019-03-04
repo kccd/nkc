@@ -6,11 +6,11 @@ router
     const {page=0, type} = query;
     let searchMap = {}
     if(type === "searchLog"){
-      const startTime = query.startTime !== ""?new Date(query.startTime) : "";
-      const endTime = query.endTime !== ""?new Date(query.endTime) : "";
+      const sTime = query.sTime !== ""?new Date(query.sTime) : "";
+      const eTime = query.eTime !== ""?new Date(query.eTime) : "";
       const ip = query.ip !== ""?query.ip : "";
       const uid = query.uid !== ""?query.uid : "";
-      let searchLogMap = [{reqTime: {$gte: startTime, $lt: endTime}}]
+      let searchLogMap = [{reqTime: {$gte: sTime, $lt: eTime}}]
       if(ip !== ""){
         searchLogMap.push({"ip": ip})
       }
@@ -33,8 +33,8 @@ router
 			return behavior;
     }));
     data.searchMap = {
-      startTime: query.startTime?query.startTime:"",
-      endTime: query.endTime?query.endTime:"",
+      sTime: query.sTime?query.sTime:"",
+      eTime: query.eTime?query.eTime:"",
       uid: query.uid?query.uid:"",
       ip: query.ip?query.ip:""
     };
@@ -43,13 +43,13 @@ router
   })
   .del('/', async(ctx, next) => {
     const {db, query} = ctx;
-    const startTime = query.startTime !== ""?Date(query.startTime) : "";
-    const endTime = query.endTime !== ""?Date(query.endTime) : "";
+    const sTime = query.sTime !== ""?Date(query.sTime) : "";
+    const eTime = query.eTime !== ""?Date(query.eTime) : "";
     const ip = query.ip !== ""?query.ip : "";
     const uid = query.uid !== ""?query.uid : "";
     const delMap = {
       "$or":[
-        {"reqTime": {"$gt": startTime, "$lt": endTime}},
+        {"reqTime": {"$gt": sTime, "$lt": eTime}},
         {"uid": uid},
         {"ip": ip}
       ]
