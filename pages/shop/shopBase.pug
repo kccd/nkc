@@ -6,3 +6,8 @@ block navbar
   include ./shopNav
 block footer
   include ./shopFooter
+block scripts
+  if data.user
+    script!=`NKC.config.hasLogged = true;`
+  +includeJS('./shop.js')  
+  block shopScripts

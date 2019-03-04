@@ -5,6 +5,7 @@ const manageRouter = require('./manage');
 const openStoreRouter = require('./openStore');
 const storeRouter = require('./store');
 const accountRouter = require('./account');
+const cartRouter = require('./cart');
 shopRouter
   .get('/', async (ctx, next) => {
     const {data, db ,query, params} = ctx;
@@ -26,6 +27,7 @@ shopRouter
 	.use('/product', productRouter.routes(), productRouter.allowedMethods())
 	.use('/manage', manageRouter.routes(), manageRouter.allowedMethods())
   .use('/openStore', openStoreRouter.routes(), openStoreRouter.allowedMethods())
+  .use('/cart', cartRouter.routes(), cartRouter.allowedMethods())
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
 	.use('/store', storeRouter.routes(), storeRouter.allowedMethods())
 module.exports = shopRouter;

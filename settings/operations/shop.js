@@ -33,5 +33,8 @@ module.exports = {
     PARAMETER:{
       GET: 'visitStoreIndex',
     }
+  },
+  cart: {
+    POST: 'addGoodsToCart'
   }
 };

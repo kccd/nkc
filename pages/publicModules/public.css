@@ -236,3 +236,8 @@
 .btn.active:focus {
     outline: none;          
 }
+.clear-focus-line:focus,
+.clear-focus-line:active:focus,
+.clear-focus-line.active:focus {
+    outline: none;          
+}
