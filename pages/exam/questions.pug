@@ -41,6 +41,8 @@ block content
           div.m-b-2(style='padding: 1rem;background-color: #efefef;')
             span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
             a.m-r-1(href=`/u/${question.uid}` target='_blank')= question.user.username
+            if question.forum
+              a(href=`/f/${question.forum.fid}` target='_blank').m-r-1=question.forum.displayName
             if question.volume === 'A'
               span.m-r-1 基础级(A)
             else 
