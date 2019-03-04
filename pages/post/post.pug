@@ -4,9 +4,10 @@ block title
   -var title = post.t;
   -var thread = data.thread;
   -const addKcb = data.userOperationsId.includes('creditKcb')
-  -const addCredit = data.userOperationsId.includes('creditXsf')
-  -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
-  -const digestPost = data.userOperationsId.includes('digestPost');
+  -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
+  //- -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
+  -const disablePost = permission('moveThread');
+  -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
 
   -let modifyPostTimeLimit = 0;
   -for(let i = 0; i < data.userRoles.length; i++)
@@ -62,7 +63,8 @@ block content
                 if addCredit
                   .options-fa.fa.fa-graduation-cap(onclick=`credit("${post.pid}", 'xsf')`) &nbsp;评学术分
                 if testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc)
-                  .options-fa.fa.fa-edit(onclick=`window.location.href="/editor?type=post&id=${post.pid}"`) &nbsp;编辑
+                  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
+                    .options-fa.fa.fa-edit(onclick=`window.location.href="/editor?type=post&id=${post.pid}"`) &nbsp;编辑
                 if disablePost
                   if data.thread.oc !== post.pid
                     .options-fa.fa.fa-eye-slash(onclick=`disablePostClick('${post.pid}', "post")` data-toggle="modal" data-target="#threadRecycleModal" data-whatever="@mdo") &nbsp;屏蔽

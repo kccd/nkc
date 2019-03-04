@@ -1,14 +1,14 @@
 function delLogs(){
-  var startTime = $("#startTime").val().trim();
-  var endTime = $("#endTime").val().trim();
+  var sTime = $("#startTime").val().trim();
+  var eTime = $("#endTime").val().trim();
   var uid = $("#userId").val().trim();
   var ip = $("#ipAdress").val().trim();
-  if(startTime === "" ||endTime === ""){
+  if(sTime === "" ||eTime === ""){
     screenTopWarning("请输入完整的时间区间")
     return
   }
-  var st = new Date(startTime)
-  var et = new Date(endTime)
+  var st = new Date(sTime)
+  var et = new Date(eTime)
   if(st.getTime() > et.getTime()){
     screenTopWarning("结束时间不能早于开始时间")
     return
@@ -17,7 +17,7 @@ function delLogs(){
   if(del === false){
     return
   }
-  var url = '/e/log/public?' + "startTime="+startTime+"&" + "endTime="+endTime+"&" + "uid="+uid+"&" + "ip="+ip;
+  var url = '/e/log/public?' + "sTime="+sTime+"&" + "eTime="+eTime+"&" + "uid="+uid+"&" + "ip="+ip;
   var method = "DELETE";
   var alertInfo = "已删除相关条件下的日志";
   nkcAPI(url, method, {})
@@ -34,20 +34,20 @@ function delLogs(){
 
 
 function searchLogs(){
-  var startTime = $("#startTime").val().trim();
-  var endTime = $("#endTime").val().trim();
+  var sTime = $("#startTime").val().trim();
+  var eTime = $("#endTime").val().trim();
   var uid = $("#userId").val().trim();
   var ip = $("#ipAdress").val().trim();
-  if(startTime === "" ||endTime === ""){
+  if(sTime === "" ||eTime === ""){
     screenTopWarning("请输入完整的时间区间")
     return
   }
-  var st = new Date(startTime)
-  var et = new Date(endTime)
+  var st = new Date(sTime)
+  var et = new Date(eTime)
   if(st.getTime() > et.getTime()){
     screenTopWarning("结束时间不能早于开始时间")
     return
   }
-  var url = '/e/log/public?' + "type=searchLog&" + "startTime="+startTime+"&" + "endTime="+endTime+"&" + "uid="+uid+"&" + "ip="+ip;
+  var url = '/e/log/public?' + "type=searchLog&" + "sTime="+sTime+"&" + "eTime="+eTime+"&" + "uid="+uid+"&" + "ip="+ip;
   window.location.href = url;
 }
