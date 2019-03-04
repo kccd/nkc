@@ -1,5 +1,8 @@
 module.exports = {
   GET: 'visitShopIndex',
+  account: {
+    GET: 'visitShopAccount'
+  },
   product: {
     GET: 'visitProductIndex',
     PARAMETER: {

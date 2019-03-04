@@ -418,6 +418,7 @@
   "visitRoleSettings": "访问《后台管理-证书设置》",
   "uploadRoleIcon": "上传证书图标",
   "modifyRole": "修改证书设置",
+  "superModerator": "拥有所有专业专家的权限",
 
 
   "APPgetUserInfo": "app获取用户信息",
@@ -437,5 +438,6 @@
   "APPgetLoginUserSubscribe": "app获取登录用户的关注",
   "APPgetUserSubscribe": "app获取用户的关注",
 
-  "visitShopIndex": "访问商城首页"
+  "visitShopIndex": "访问商城首页",
+  "visitShopAccount": "访问商城中的个人主页"
 }

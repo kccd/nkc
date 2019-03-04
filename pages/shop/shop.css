@@ -1,0 +1,48 @@
+html{
+  height: 100%;
+}
+body{
+  padding-top: 0;
+  min-height: 100%;
+  padding-bottom: 10rem;
+}
+.shop-header{
+  height: 4rem;
+  line-height: 4rem;
+  background-color: #eee;
+}
+.shop-logo{
+  font-size: 1.7rem;
+  display: inline-block;
+}
+.shop-logo a{
+  text-decoration: none;
+}
+.shop-footer{
+  position:absolute;
+  height: 10rem;
+  bottom: 0;
+  width: 100%;
+  background-color: #333;
+}
+.shop-header-div{
+  
+}
+.shop-header-div{
+  margin: 0;
+  padding: 0;
+}
+.shop-header-div li{
+  display: inline-block;
+  list-style: none;
+}
+.shop-header-div li a{
+  padding: 0 1rem;
+  color: #777;
+}
+.shop-header-div.right{
+  float: right;
+}
+.shop-header-div.left{
+  float: left;
+}
