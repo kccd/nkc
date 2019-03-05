@@ -22,6 +22,23 @@ module.exports = {
       info: {
         GET: 'visitShopInfoIndex',
         POST: 'modifyShopInfo'
+      },
+      decoration: {
+        sign: {
+          POST: 'modifyShopDecorationSign'
+        },
+        service: {
+          POST: 'modifyShopDecorationService'
+        },
+        search: {
+          POST: 'modifyShopDecorationSearch'
+        },
+        featured: {
+          GET: "visitFeaturedProductList",
+          POST: "modifyShopDecorationFeatured"
+        },
+        GET: 'visitShopDecorationIndex',
+        POST: 'modifyShopDecoration'
       }
     },
   },

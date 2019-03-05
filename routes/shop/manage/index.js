@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const homeRouter = require('./home');
 const shelfRouter = require('./shelf');
 const infoRouter = require('./info');
+const decorationRouter = require('./decoration');
 const manageRouter = new Router();
 manageRouter
   .use('/:account', async (ctx, next) => {
@@ -23,4 +24,5 @@ manageRouter
   .use('/:account/home', homeRouter.routes(), homeRouter.allowedMethods())
   .use('/:account/shelf', shelfRouter.routes(), shelfRouter.allowedMethods())
   .use('/:account/info', infoRouter.routes(), infoRouter.allowedMethods())
+  .use('/:account/decoration', decorationRouter.routes(), decorationRouter.allowedMethods())
 module.exports = manageRouter;
