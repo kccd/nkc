@@ -1,0 +1,82 @@
+extends ./shopBase
+block shopTitle
+  title 科创商城
+block content
+  .container-fluid.max-width
+    include ./shopSearch
+    .row
+      .col-xs-12.col-md-12  
+        <nav class="navbar navbar-default">
+          <div class="container">
+            <ul class="nav navbar-nav">
+              <li>
+                a(href='###') 全部分类
+              </li>
+              <li>
+                a(href='###') 精选好货
+              </li>
+              <li>
+                a(href='###') 最新上架
+              </li>
+              <li>
+                a(href='###') 人气爆棚
+              </li>
+            </ul>
+          </div>
+        </nav>
+      .col-xs-12.col-md-3
+        .btn-group-vertical(role='group', aria-label='...' style="width:100%")
+          ul.list-group
+            li.list-group-item.list-group-item-warning Main Category
+            li.list-group-item.list-group-item category
+            li.list-group-item.list-group-item category
+            li.list-group-item.list-group-item category
+          .list-group
+            a.list-group-item.list-group-item-success(href='#') Dapibus ac facilisis in
+            a.list-group-item.list-group-item(href='#') 
+              | category
+              span.fa.fa-angle-right(style="float:right")
+            a.list-group-item.list-group-item(href='#') 
+              | category
+              span.fa.fa-angle-right(style="float:right")
+            a.list-group-item.list-group-item(href='#') 
+              | category
+              span.fa.fa-angle-right(style="float:right")
+          .list-group
+            a.list-group-item.list-group-item-info(href="#") Main Category
+            a.list-group-item.list-group-item(href='#') category
+            a.list-group-item.list-group-item(href='#') category
+            a.list-group-item.list-group-item(href='#') category
+          .btn-group(role='group')
+            button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+              | Dropdown
+              span.caret
+            ul.dropdown-menu
+              li
+                a(href='#') Dropdown link
+              li
+                a(href='#') Dropdown link
+      .col-xs-12.col-md-9
+        #carousel-example-generic.carousel.slide(data-ride='carousel')
+          // Indicators
+          ol.carousel-indicators
+            li.active(data-target='#carousel-example-generic', data-slide-to='0')
+            li(data-target='#carousel-example-generic', data-slide-to='1')
+            li(data-target='#carousel-example-generic', data-slide-to='2')
+          // Wrapper for slides
+          .carousel-inner(role='listbox')
+            .item.active
+              img(src='default/shop2.jpg', alt='...' style="width:100%")
+              .carousel-caption
+                | ...
+            .item
+              img(src='default/shop2.jpg', alt='...' style="width:100%")
+              .carousel-caption
+                | ...
+          // Controls
+          a.left.carousel-control(href='#carousel-example-generic', role='button', data-slide='prev')
+            span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+            span.sr-only Previous
+          a.right.carousel-control(href='#carousel-example-generic', role='button', data-slide='next')
+            span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+            span.sr-only Next          

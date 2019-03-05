@@ -1,13 +1,11 @@
 extends ../bootstrap_base
 block title
-  +includeCSS('./shop.css')
+  +includeCSS('/shop/shop.css')
   block shopTitle
 block navbar
   include ./shopNav
 block footer
   include ./shopFooter
 block scripts
-  if data.user
-    script!=`NKC.config.hasLogged = true;`
-  +includeJS('./shop.js')  
+  +includeJS('/shop/shop.js')  
   block shopScripts

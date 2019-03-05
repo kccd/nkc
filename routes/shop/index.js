@@ -21,7 +21,11 @@ shopRouter
       }
     }));
     data.featuredItems = featuredItems;
-    ctx.template = "shop/index.pug";
+    if(query.t === 'old') {
+      ctx.template = 'shop/index.pug';
+    } else {
+      ctx.template = "shop/shop.pug";
+    }
     await next();
   })
 	.use('/product', productRouter.routes(), productRouter.allowedMethods())

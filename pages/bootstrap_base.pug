@@ -55,6 +55,7 @@ block body
   +includeJS('/publicModules/common.js')
 
   if data.user
+    script!=`NKC.config.hasLogged = true;`
     //- 接入即时通信
     +includeJS('/socket.io-client/dist/socket.io.js')
     +includeJS('/message/socket.js')

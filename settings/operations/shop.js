@@ -35,6 +35,7 @@ module.exports = {
     }
   },
   cart: {
-    POST: 'addGoodsToCart'
+    POST: 'addProductToCart',
+    GET: 'visitShopCart'
   }
 };

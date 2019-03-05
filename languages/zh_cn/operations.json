@@ -419,7 +419,8 @@
   "uploadRoleIcon": "上传证书图标",
   "modifyRole": "修改证书设置",
   "superModerator": "拥有所有专业专家的权限",
-  "addGoodsToCart": "商城中添加商品到购物车",
+  "addProductToCart": "商城中添加商品到购物车",
+  "visitShopCart": "访问商城中的购物车",
 
 
   "APPgetUserInfo": "app获取用户信息",
