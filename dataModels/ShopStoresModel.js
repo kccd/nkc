@@ -63,6 +63,20 @@ const shopStoresSchema = new Schema({
   dataPerfect: {
     type: Boolean,
     default: false
+  },
+  /**
+   * 店铺装修
+   * top:{
+   *  sign:{
+   *    hasSign: true
+   *  }
+   *  navigation:
+   * }
+   * left
+   * right
+   */
+  decoration: {
+    type: Schema.Types.Mixed
   }
 }, {
   collection: 'shopStores'

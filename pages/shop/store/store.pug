@@ -3,69 +3,187 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
-  
   title 店铺
+  link(rel='stylesheet' href='/shop/store/store.css')
+
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
-      .col-xs-12.col-md-12
-        nav.navbar.navbar-default
-          .container-fluid
-            // Brand and toggle get grouped for better mobile display
-            .navbar-header
-              button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
-                span.sr-only Toggle navigation
-                span.icon-bar
-                span.icon-bar
-                span.icon-bar
-              a.navbar-brand(href='#') Brand
-            // Collect the nav links, forms, and other content for toggling
-            #bs-example-navbar-collapse-1.collapse.navbar-collapse
-              ul.nav.navbar-nav
-                li.active
-                  a(href='#')
-                    | Link 
-                    span.sr-only (current)
-                li
-                  a(href='#') Link
-                li.dropdown
-                  a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                    | Dropdown 
-                    span.caret
-                  ul.dropdown-menu
-                    li
-                      a(href='#') Action
-                    li
-                      a(href='#') Another action
-                    li
-                      a(href='#') Something else here
-                    li.divider(role='separator')
-                    li
-                      a(href='#') Separated link
-                    li.divider(role='separator')
-                    li
-                      a(href='#') One more separated link
-              form.navbar-form.navbar-left
-                .form-group
-                  input.form-control(type='text', placeholder='Search Shop')
-                button.btn.btn-default(type='submit') Submit
-              ul.nav.navbar-nav.navbar-right
-                li
-                  a.fa.fa-shopping-cart(href='#') Cart
-                    span.badge(style="background-color:#d9534f") 14
-                li.dropdown
-                  a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                    | My Account 
-                    span.caret
-                  ul.dropdown-menu
-                    li
-                      a(href='#') Action
-                    li
-                      a(href='#') Another action
-                    li
-                      a(href='#') Something else here
-                    li.divider(role='separator')
-                    li
-                      a(href='#') Separated link
+      .col-xs-1.col-md-1
+      .col-xs-10.col-md-10
+        // 页头
+        .col-xs-12.col-md-12
+          // 店铺招牌
+          .col-xs-12.col-md-12
+            .storeSign
+              img(src="/statics/storeLogo/sign.jpg", style="width:100%")
+          // 店铺导航
+          .col-xs-12.col-md-12
+            .storeNav
+              nav.navbar.navbar-default
+                .container-fluid
+                  .navbar-header
+                    button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                      span.sr-only Toggle navigation
+                      span.icon-bar
+                      span.icon-bar
+                      span.icon-bar
+                    a.navbar-brand(href='#') [店铺名称]
+                  #bs-example-navbar-collapse-1.collapse.navbar-collapse
+                    ul.nav.navbar-nav
+                      li.dropdown
+                        a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                          | 所有分类 
+                          span.caret
+                        ul.dropdown-menu
+                          li
+                            a(href='#') Action
+                          li
+                            a(href='#') Another action
+                          li
+                            a(href='#') Something else here
+                          li.divider(role='separator')
+                          li
+                            a(href='#') Separated link
+                          li.divider(role='separator')
+                          li
+                            a(href='#') One more separated link
+                      li.active
+                        a(href='#')
+                          | 首页
+                          span.sr-only (current)
+        // 页面中部
+        .col-xs-12.col-md-12
+          // 左侧模块组
+          .col-xs-3.col-md-3
+            // 店内分类
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                // Default panel contents
+                .panel-heading 店内分类
+                .panel-body(style="padding:0")
+                  ul#main-nav.nav.nav-tabs.nav-stacked(style='')
+                    li(style="background-color: aliceblue")
+                      a(href='#')
+                        | 大分类一
+                    li(style="background-color: aliceblue")
+                      a(href='#')
+                        | 大分类二
+                    li(style="background-color: aliceblue")
+                      a.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse')
+                        | 大分类三
+                        span.pull-right.glyphicon.glyphicon-chevron-down
+                      ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
+                        li
+                          a(href='#')
+                            | 小分类一
+            // 店内搜索
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-heading 店内搜索
+                .panel-body(style="padding:5")
+                  .row
+                    .col-xs-8.col-md-8
+                      input.form-control.input-sm(type='text', placeholder='关键字')
+                    .col-xs-3.col-md-3(style="padding:0;margin-bottom:10px")
+                      button.btn.btn-primary.btn-sm 搜索
+                    .col-xs-12.col-md-12(style="font-size:smaller")
+                      span 关键词一
+                      span 关键词二
+                      span 关键词三
+
+
+            // 客服中心
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                // Default panel contents
+                .panel-heading 客服中心
+                .panel-body(style="padding:0")
+                  .skin-box-bd
+                    ul
+                      li.service-block
+                        p.boldFont 工作时间
+                        ul.service-content
+                          li 周一至周五：10:00-24:00
+                          li 周六至周日：13:30-24:00
+                      //- li.service-block
+                      //-   p.boldFont 在线咨询
+                      //-   ul.service-content
+                      //-     li.group
+                      //-       span.groupname 总服务台
+                      //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=5634692&s=1&charset=gbk&fromid=cntaobao', target='_blank')
+                      //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=5634692&s=1', alt='点击这里给我发消息')
+                      //-     li.group
+                      //-       span.groupname 售前客服
+                      //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=2546508&s=1&charset=gbk&fromid=cntaobao', target='_blank')
+                      //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=2546508&s=1', alt='点击这里给我发消息')
+                      li.service-block
+                        p.boldFont 联系方式
+                        ul.service-content
+                          li.tel 联系电话：028-86691700
+            // 商品推荐
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-heading
+                  h3.panel-title 商品推荐
+                ul.list-group
+                  -for(var i=0;i<9;i++)
+                    li.list-group-item
+                      a(href="#") 
+                        img(src="/default/shop1.jpg" style="width:32px;height:auto;float:right")
+                        span(style="display:block;font-weight:700;color:#666") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+                      span $ 12.00
+                      div(style="float:right")
+                        span.fa.fa-star(style="color:red")
+                        span.fa.fa-star(style="color:red")
+                        span.fa.fa-star(style="color:red")
+                        span.fa.fa-star(style="color:red")
+                        span.fa.fa-star(style="color:red")
+          // 右侧模块组
+          .col-xs-9.col-md-9
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-heading 
+                  span 商品推荐
+                  a(href="#" style="float:right") 
+                    | 更多
+                    span.fa.fa-angle-double-right
+                .panel-body(style="padding:0")
+                  .row
+                    -for(var a=1;a<6;a++)
+                      .col-sm-6.col-md-4
+                        .thumbnail(style="margin:0;border:0")
+                          a(href=`/shop/product/4`)
+                            img(src=`/r/290218`, title=`12456` ,style="height:150px" )
+                          .caption
+                            a(href=`/shop/product/4` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`123456`) 产品Name
+                            p(style="color: red;text-align:center")
+                              i(style="font-style: normal;margin-right: 3px;font-weight: 900;")
+                                span(style='font-size:14px;') ￥
+                                | 8.00
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-heading 
+                  span 商品推荐
+                  a(href="#" style="float:right") 
+                    | 更多
+                    span.fa.fa-angle-double-right
+                .panel-body(style="padding:0")
+                  .row
+                    -for(var a=1;a<6;a++)
+                      .col-sm-6.col-md-3
+                        .thumbnail(style="margin:0;border:0")
+                          a(href=`/shop/product/4`)
+                            img(src=`/r/290218`, title=`12456` ,style="height:150px" )
+                          .caption
+                            a(href=`/shop/product/4` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`123456`) 产品Name
+                            p(style="text-align:center")
+                              i(style="font-style: normal;margin-right: 3px;font-weight: 900;color:red;")
+                                span(style='font-size:14px;') ￥
+                                | 8.00
+        // 页面尾部
+        .col-xs-12.col-md-12
+      .col-xs-1.col-md-1
+
 block scripts

@@ -1,0 +1,346 @@
+extends ./index.pug
+block title
+  style.
+    .blockBold {
+      color: #000;
+      font-weight:900
+    }
+block name
+  .row
+    .col-md-12.col-sm-12.col-xs-12
+      .panel.panel-info
+        .panel-heading
+          | 店铺装修
+        .panel-body
+          div(style="border-bottom:1px dashed #ddd")
+            p(style="font-size: x-large;font-weight: bolder;text-decoration: underline;") 店铺首部
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label#signAnchor 店铺招牌
+                .col-sm-8
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="javascript:void(0);" onclick="editStoreSign()" data-toggle="modal" data-target="#storeSignModal") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      img#storeSignImage(src=`/statics/storeLogo/storeLogo${data.myStore.storeId}.jpg`, style='width:100%')
+              .form-group
+                label.col-sm-2.control-label 导航
+                .col-sm-8
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="#") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      nav.navbar.navbar-default(style="margin-bottom:0")
+                        .container-fluid
+                          .navbar-header
+                            button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                              span.sr-only Toggle navigation
+                              span.icon-bar
+                              span.icon-bar
+                              span.icon-bar
+                            a.navbar-brand(href='#') [店铺名称]
+                          #bs-example-navbar-collapse-1.collapse.navbar-collapse
+                            ul.nav.navbar-nav
+                              li.dropdown
+                                a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                                  | 所有分类 
+                                  span.caret
+                                ul.dropdown-menu
+                                  li
+                                    a(href='#') Action
+                                  li
+                                    a(href='#') Another action
+                                  li
+                                    a(href='#') Something else here
+                                  li.divider(role='separator')
+                                  li
+                                    a(href='#') Separated link
+                                  li.divider(role='separator')
+                                  li
+                                    a(href='#') One more separated link
+                              li.active
+                                a(href='#')
+                                  | 首页
+                                  span.sr-only (current)
+
+          div(style="border-bottom:1px dashed #ddd")
+            p(style="font-size: x-large;font-weight: bolder;text-decoration: underline;") 店铺左侧
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label#serviceAnchor 客服中心
+                .col-sm-8
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="javascript:void(0);" onclick="editStoreService()" data-toggle="modal" data-target="#storeServiceModal") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      .skin-box-bd
+                        ul
+                          li.service-block
+                            p.boldFont 工作时间
+                            ul.service-content
+                              li!=`周一至周五：${data.storeDecoration.serviceTimeWork[0]}-${data.storeDecoration.serviceTimeWork[1]}`
+                              li!=`周六至周日：${data.storeDecoration.serviceTimeRest[0]}-${data.storeDecoration.serviceTimeRest[1]}`
+                          //- li.service-block
+                          //-   p.boldFont 在线咨询
+                          //-   ul.service-content
+                          //-     li.group
+                          //-       span.groupname 总服务台
+                          //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=5634692&s=1&charset=gbk&fromid=cntaobao', target='_blank')
+                          //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=5634692&s=1', alt='点击这里给我发消息')
+                          //-     li.group
+                          //-       span.groupname 售前客服
+                          //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=2546508&s=1&charset=gbk&fromid=cntaobao', target='_blank')
+                          //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=2546508&s=1', alt='点击这里给我发消息')
+                          li.service-block
+                            p.boldFont 联系方式
+                            ul.service-content
+                              li.tel!=`联系电话：${data.storeDecoration.servicePhone}`
+                              li.tel!=`联系手机：${data.storeDecoration.serviceMobile}`
+
+              .form-group
+                label.col-sm-2.control-label#featuredAnchor 商品推荐
+                .col-sm-8
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="javascript:void(0);" onclick=`editStoreFeatured(${data.storeDecoration.storeId})` data-toggle="modal" data-target="#storeFeaturedModal") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      ul.list-group(style="margin-bottom:0")
+                        -for(var i=0;i<5;i++)
+                          .form-group
+                            .media
+                              .media-left
+                                a(href='#')
+                                  img.media-object(data-src='holder.js/64x64', alt='64x64', src='/r/290218', data-holder-rendered='true', style='width: 50px; height: 50px;')
+                              .media-body
+                                p.media-heading(style="font-size:smaller") KC901C+天馈线分析仪网络测试器信号源场强计频谱扫频故障定位2G
+                                p(style="font-size:smaller") 4998.00
+                                div(style='')
+                                  span.fa.fa-star(style='color:red')
+                                  span.fa.fa-star(style='color:red')
+                                  span.fa.fa-star(style='color:red')
+                                  span.fa.fa-star(style='color:red')
+                                  span.fa.fa-star(style='color:red')
+                              .media-right
+                                span.blockBold ID: 123456
+              .form-group
+                label.col-sm-2.control-label#searchAnchor 店内分类
+                .col-sm-8
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="#") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      ul#main-nav.nav.nav-tabs.nav-stacked(style='')
+                        li(style="background-color: aliceblue")
+                          a(href='#')
+                            | 大分类一
+                        li(style="background-color: aliceblue")
+                          a(href='#')
+                            | 大分类二
+                        li(style="background-color: aliceblue")
+                          a.nav-header.collapsed(href='#asdf', data-toggle='collapse')
+                            | 大分类三
+                            span.pull-right.glyphicon.glyphicon-chevron-down
+                          ul#asdf.nav.nav-list.collapse.secondmenu(style='height: 0px;')
+                            li
+                              a(href='#')
+                                | 小分类一
+              .form-group
+                label.col-sm-2.control-label#searchAnchor 店内搜索
+                .col-sm-8
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="javascript:void(0);" onclick="editStoreSearch()" data-toggle="modal" data-target="#storeSearchModal") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      .row
+                        .col-xs-8.col-md-8
+                          input.form-control.input-sm(type='text', placeholder='预设关键词' value=`${data.storeDecoration.presetKey}`)
+                        .col-xs-3.col-md-3(style="padding:0;margin-bottom:10px")
+                          button.btn.btn-primary.btn-sm 搜索
+                        .col-xs-12.col-md-12(style="font-size:smaller")
+                          span(style="margin:5px")!=`${data.storeDecoration.recommendKeys[0]}`
+                          span(style="margin:5px")!=`${data.storeDecoration.recommendKeys[1]}`
+                          span(style="margin:5px")!=`${data.storeDecoration.recommendKeys[2]}`
+          div(style="border-bottom:1px dashed #ddd")
+            p(style="font-size: x-large;font-weight: bolder;text-decoration: underline;") 店铺右侧
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 商品推荐
+                .col-sm-10
+                  .panel.panel-success
+                    .panel-heading(style="padding:0;")
+                      span.blockBold &nbsp;
+                      a.blockBold(href="#") 
+                        | 编辑
+                        span.fa.fa-pencil-square-o
+                    .panel-body
+                      .panel.panel-default
+                        .panel-heading 
+                          span 商品推荐
+                          a(href="#" style="float:right") 
+                            | 更多
+                            span.fa.fa-angle-double-right
+                        .panel-body(style="padding:0")
+                          .row
+                            -for(var a=1;a<6;a++)
+                              .col-sm-6.col-md-4
+                                .thumbnail(style="margin:0;border:0")
+                                  a(href=`/shop/product/4`)
+                                    img(src=`/r/290218`, title=`12456` ,style="height:150px" )
+                                  .caption
+                                    a(href=`/shop/product/4` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`123456`) 产品Name
+                                    p(style="color: red;text-align:center")
+                                      i(style="font-style: normal;margin-right: 3px;font-weight: 900;")
+                                        span(style='font-size:14px;') ￥
+                                        | 8.00
+  #storeSignModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 店铺招牌
+        .modal-body
+          .form-group
+            label(for='uploadSignModal') 背景图：
+            input#uploadSignModal(type='file' accept="image/*")
+            p.help-block 建议尺寸1080*120
+            div#storeSignImageDomModal
+              img#storeSignImageModal(src=`/statics/storeLogo/storeLogo${data.myStore.storeId}.jpg`, style='width:100%')
+        .modal-footer
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal') 取消
+          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreSign(${data.myStore.storeId})`) 保存
+  #storeServiceModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 客服设置
+        .modal-body
+          .form-group(style="display: inline-block;")
+            label(for='uploadSignModal') 工作时间：
+            .col-xs-12.col-md-12
+              .col-xs-2
+                p 工作日
+              .col-xs-10
+                .row
+                  .col-xs-4
+                    select.form-control.input-sm#timeWordStart
+                      option(selected value=`${data.storeDecoration.serviceTimeWork[0]}`)!=`${data.storeDecoration.serviceTimeWork[0]}`
+                      include timeOption.pug
+                  .col-xs-1
+                    span 至
+                  .col-xs-4
+                    select.form-control.input-sm#timeWordEnd
+                      option(selected value=`${data.storeDecoration.serviceTimeWork[1]}`)!=`${data.storeDecoration.serviceTimeWork[1]}`
+                      include timeOption.pug
+            .col-xs-12.col-md-12(style="margin-top:10px")
+              .col-xs-2
+                p 休息日
+              .col-xs-10
+                .row
+                  .col-xs-4
+                    select.form-control.input-sm#timeRestStart
+                      option(selected value=`${data.storeDecoration.serviceTimeRest[0]}`)!=`${data.storeDecoration.serviceTimeRest[0]}`
+                      include timeOption.pug
+                  .col-xs-1
+                    span 至
+                  .col-xs-4
+                    select.form-control.input-sm#timeRestEnd
+                      option(selected value=`${data.storeDecoration.serviceTimeRest[1]}`)!=`${data.storeDecoration.serviceTimeRest[1]}`
+                      include timeOption.pug
+          .form-group(style="display: inline-block;")
+            label 联系方式
+            .col-xs-12.col-md-12
+              .col-xs-2
+                p 固定电话
+              .col-xs-10
+                .row
+                  .col-xs-9
+                    input.form-control.input-sm#servicePhone(type='text', placeholder='格式如：010-88776655', value=`${data.storeDecoration.servicePhone}`)
+            .col-xs-12.col-md-12(style="margin-top:10px")
+              .col-xs-2
+                p 手机号码
+              .col-xs-10
+                .row
+                  .col-xs-9
+                    input.form-control.input-sm#serviceMobile(type='text', placeholder='格式如：135 1234 xxxx', value=`${data.storeDecoration.serviceMobile}`)
+        .modal-footer
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal') 取消
+          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreService(${data.myStore.storeId})`) 保存
+  #storeSearchModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 搜索设置
+        .modal-body
+          .form-group(style="display: inline-block;")
+            label 预置关键字：
+            .col-xs-12.col-md-12
+              .col-xs-10
+                input.form-control.input-sm#presetKey(type='text', value=`${data.storeDecoration.presetKey}`)
+              .col-xs-10
+                p(style="color:#ddd") 预置关键字搜索框中，最长5个汉字、10个字母
+          .form-group(style="display: inline-block;")
+            label 推荐关键字：
+            .col-xs-12.col-md-12
+              .col-xs-4
+                input.form-control.input-sm#recommendKey1(type='text', value=`${data.storeDecoration.recommendKeys[0]}`)
+              .col-xs-4
+                input.form-control.input-sm#recommendKey2(type='text', value=`${data.storeDecoration.recommendKeys[1]}`)
+              .col-xs-4
+                input.form-control.input-sm#recommendKey3(type='text', value=`${data.storeDecoration.recommendKeys[2]}`)
+              .col-xs-12
+                p(style="color:#ddd") 推荐关键字在搜索按钮后推荐，最长5个汉字、10个字母
+        .modal-footer
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal') 取消
+          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreSearch(${data.myStore.storeId})`) 保存
+  #storeFeaturedModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 商品推荐
+        .modal-body#featuredModalBody(style="overflow-y: scroll;height: 300px;")
+          //- -for(var i=0;i<5;i++)
+          //-   .form-group
+          //-     .media
+          //-       .media-left
+          //-         a(href='/shop/product/3')
+          //-           img.media-object(src='/r/290218',style='width: 50px; height: 50px;')
+          //-       .media-body
+          //-         p.media-heading(style="font-size:smaller") KC901C+天馈线分析仪网络测试器信号源场强计频谱扫频故障定位2G
+          //-         p(style="font-size:smaller") 4998.00
+          //-       .media-right
+          //-         button.btn.btn-primary.btn-sm(onclick="") 推荐
+
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreSign(${data.myStore.storeId})`) 保存
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+          span 已推荐 
+          span#featuredCount  
+          sapn 件商品
+          input#featuredList(type="text")
+block manageScripts
+  +includeJS("/shop/manage/decoration.js")
