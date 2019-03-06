@@ -7,12 +7,7 @@ const threadSchema = new Schema({
     type: String,
     unique: true,
     required:true
-  },/* 
-  cid: {
-    type: String,
-    default:'',
-    index: 1
-  }, */
+  },
   count: {
     type: Number,
     default: 0
@@ -43,12 +38,7 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
-  },/* 
-  fid: {
-    type: String,
-    required: true,
-    index: 1
-  }, */
+  },
   hideInMid: {
     type: Boolean,
     default: false
@@ -574,5 +564,34 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     return thread.toObject?thread.toObject():thread;
   }));
 };
+
+/* 
+发表文章接口，未完成
+threadSchema.statics.newThread = async (options) => {
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const {contentLength} = require('../tools/checkString');
+  const {uid, fids, cids, ip, t, c} = options;
+  if(!uid) throwErr(404, '用户ID不能为空');
+  const user = await UserModel.findOne({uid});
+  if(!user) throwErr(404, `不存在ID为【${uid}】的用户`);
+  await user.extendRoles();
+  await user.extendGrade();
+  const accessbleForumsId = await ForumModel.getAccessibleForumsId(user.roles, user.grade, user);
+  await Promise.all(fids.map(async fid => {
+    const forum = await ForumModel.findOne({fid});
+    if(!forum) throwErr(404, `不存在ID为【${fid}】的专业`);
+    if(!accessbleForumsId.includes(forum.fid)) throwErr(403, `您没有权限在专业【${forum.displayName}】发表内容`);
+  }));
+  if(!t) throwErr(400, '标题不能为空');
+  if(contentLength(t) > 100) throwErr(400, '标题不能超过')
+  const tid = await SettingModel.operateSystemID('threads', 1);
+  const thread = ThreadModel({
+    tid
+  });
+  
+}; */
 
 module.exports = mongoose.model('threads', threadSchema);
