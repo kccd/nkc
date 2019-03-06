@@ -801,11 +801,13 @@ userSchema.statics.extendUsersInfo = async (users) => {
         info.certsName.push(role.displayName);
       }
     }
-    const userPersonal = personalObj[user.uid];
-    // 若用户绑定了手机号，则临时添加“机友”标志
-    if(userPersonal.mobile && userPersonal.nationCode) info.certsName.push('机友');
-    // 若用户绑定了邮箱，则临时添加“笔友”标志
-    if(userPersonal.email) info.certsName.push('笔友');
+    if(!certs.includes('banned')) {
+      const userPersonal = personalObj[user.uid];
+      // 若用户绑定了手机号，则临时添加“机友”标志
+      if(userPersonal.mobile && userPersonal.nationCode) info.certsName.push('机友');
+      // 若用户绑定了邮箱，则临时添加“笔友”标志
+      if(userPersonal.email) info.certsName.push('笔友');
+    }
     info.certsName = info.certsName.join(' ');
     user.info = info;
   }));
