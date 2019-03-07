@@ -51,6 +51,11 @@ const shopDecorationsSchema = new Schema({
     type: Array,
     default: []
   },
+  // 分类商品推荐
+  storeClassFeatureds: {
+    type: [Schema.Types.Mixed],
+    default: []
+  }
   // // 店铺名称
   // storeName: {
   //   type: String,

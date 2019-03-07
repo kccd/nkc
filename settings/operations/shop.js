@@ -37,8 +37,29 @@ module.exports = {
           GET: "visitFeaturedProductList",
           POST: "modifyShopDecorationFeatured"
         },
+        addClass: {
+          PATCH: 'addStoreClassFeatured'
+        },
+        delClass: {
+          PATCH: 'delStoreClassFeatured'
+        },
+        singleClass: {
+          GET: 'getStoreSingleClassify'
+        },
+        addSingleClass: {
+          PATCH: 'addStoreSingleClassify'
+        },
         GET: 'visitShopDecorationIndex',
         POST: 'modifyShopDecoration'
+      },
+      classify: {
+        GET: 'visitShopClassifyIndex',
+        add: {
+          POST: 'addStoreClassify'
+        },
+        del: {
+          POST: 'delStoreClassify'
+        }
       }
     },
   },

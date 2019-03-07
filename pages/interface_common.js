@@ -1447,8 +1447,10 @@ function shareTo(shareType, type, str, title, pid){
         var copyLinkId = "copyLink"+pid;
         var copyButton = "copyVutton"+pid;
         // $("#"+copyAreaId).css("display", "block");
+        console.log(document.getElementById(copyAreaId))
         document.getElementById(copyAreaId).style.display = "block";
         document.getElementById(copyLinkId).value = newUrl;
+        console.log(copyLinkId)
         // $("#"+copyLinkId).val(newUrl);
         var obj = document.getElementById(copyLinkId);
         obj.select(); 

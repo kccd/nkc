@@ -1,6 +1,22 @@
 /* 
   @author Kris 2019/2/20
 */
+function initTime() {
+	if(!$('.time').length){
+		return;
+	}
+	$('.time').datetimepicker({
+		language:  'zh-CN',
+		format: 'yyyy-mm-dd hh:ii',
+		autoclose: true,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 0,
+		forceParse: 0
+	});
+}
+initTime();
+
 var productImageDomId;
 var skip = 0;
 $(function () { $("[data-toggle='popover']").popover(); });
@@ -59,7 +75,7 @@ $(document).ready(function() {
     
   })
   $('input[type=radio][name=paymentMethod]').change(function() {
-    if(this.value == 'kar') {
+    if(this.value == 'or') {
       $("#karMethodDom").css("display", "");
     }else if(this.value == 'rmb'){
       $("#karMethodDom").css("display", "none");
@@ -67,8 +83,31 @@ $(document).ready(function() {
       $("#karMethodDom").css("display", "none");
     }
   });
-
-  // manageImageLoader();
+  $('input[type=radio][name=shelfMethod]').change(function() {
+    if(this.value == 'insale') {
+      $("#saleTimeDom").css("display", "none")
+    }else if(this.value == 'notonshelf'){
+      $("#saleTimeDom").css("display", "none")
+    }else if(this.value == 'insaletime'){
+      $("#saleTimeDom").css("display", "")
+    }
+  });
+  $('#useparams').change(function() {
+    if($("#useparams").prop("checked")){
+      $("#nouseParamsDom").css("display", "none");
+      $("#useParamsDom").css("display", "");
+    }else{
+      $("#nouseParamsDom").css("display", "");
+      $("#useParamsDom").css("display", "none");
+    }
+  })
+  $('#usedis').change(function() {
+    if($("#usedis").prop("checked")){
+      $("#disCostDom").css("display", "");
+    }else{
+      $("#disCostDom").css("display", "none");
+    }
+  })
 })
 
 /**
@@ -76,9 +115,13 @@ $(document).ready(function() {
  */
 function submitToShelf() {
   var productName = $("#productName").val(); // 商品名称
+  productName = productName.trim();
+  if(!productName) throw("请输入商品标题");
   var productDescription = $("#productDescription").val(); //商品描述
+  productDescription = productDescription.trim();
+  if(!productDescription) throw("请输入商品描述");
   var productOriginalPrice = $("#originalPrice").val(); // 商品原始价格
-  var useRebate = geid("useRebate").checked; // 是否使用折扣
+  // var useRebate = geid("useRebate").checked; // 是否使用折扣
   var productFinalPrice = $("#afterRebatePrice").text(); // 商品折后价格
   var stockTotalCount = $("#stockQuantity").val(); // 商品库存数量
   var stockCostMethod = $("input[name='stockCostMethod']:checked").val(); // 商品减库存方式
@@ -92,10 +135,10 @@ function submitToShelf() {
   }else if(paymentMethod == "rmb"){
     payUseRmb = productFinalPrice;
     payUseKcb = productFinalPrice - payUseRmb;
-  }else if(paymentMethod == "kar"){
+  }else if(paymentMethod == "or"){
     payUseKcb = $("#costKcb").val();
     if(parseInt(payUseKcb) > productFinalPrice){
-      return alert("使用混合付款，设置的科创币数额不得超过商品价格")
+      throw("使用混合付款，设置的科创币数额不得超过商品价格")
     }
     payUseRmb = productFinalPrice - payUseKcb;
   }
@@ -105,12 +148,27 @@ function submitToShelf() {
     imgIntroductions.push($(this).attr("imageId"));
   })
   if(imgIntroductions.length == 0){
-    return alert("至少上传一张商品图")
+    throw("至少上传一张商品图")
   }
   var imgMaster = imgIntroductions[0];
   // 获取商品详细介绍
   var productDetails = document.getElementById('text-elem').innerHTML;
   productDetails = common.URLifyHTML(productDetails);
+  // 产品状态
+  var productStatus;
+  var shelfTime = "";
+  var proSta = $("input[name='shelfMethod']:checked").val();
+  if(proSta == "insale") {
+    productStatus = "insale";
+  }else if(proSta == "notonshelf") {
+    productStatus = "notonshelf"
+  }else if(proSta == "insaletime") {
+    productStatus = "insale";
+    shelfTime = $("#saleTime").val();
+  }
+
+  var params = tableTurnParams();
+  var productParams = obtainProductPrice();
 
   // 组装上传数据
   var post = {
@@ -119,15 +177,14 @@ function submitToShelf() {
     productDetails: productDetails,
     imgIntroductions: imgIntroductions,
     imgMaster: imgMaster,
-    stockTotalCount: Number(stockTotalCount),
-    stockSurplusCount: Number(stockTotalCount),
+    // stockTotalCount: Number(stockTotalCount),
+    // stockSurplusCount: Number(stockTotalCount),
     stockCostMethod: stockCostMethod,
     paymentMethod: paymentMethod,
-    productOriginalPrice: Number(productOriginalPrice),
-    useRebate: useRebate,
-    productFinalPrice: Number(productFinalPrice),
-    payUseKcb: Number(payUseKcb),
-    payUseRmb: Number(payUseRmb)
+    productStatus: productStatus,
+    shelfTime: shelfTime,
+    params: params,
+    productParams: productParams
   }
   return post;
 }
@@ -136,8 +193,11 @@ function submitToShelf() {
  * 商品上架
  */
 function productToShelf(storeId) {
-  var productInfo = submitToShelf();
-  productInfo.productStatus = "insale";
+  try{
+    var productInfo = submitToShelf();
+  }catch(err) {
+    return screenTopWarning(err);
+  }
   nkcAPI('/shop/manage/'+storeId+'/shelf', "POST" ,{post:productInfo})
   .then(function(data) {
     // window.location.href = "/activity/list";
@@ -292,3 +352,306 @@ function showAttachment() {
 //   }
 //   $("#"+outDomId).text(countLength);
 // }
+
+/**
+ * 添加自定义规格
+ */
+function addParamTable() {
+  var paraName = $("#paraName").val();
+  var paraValue = $("#paraValue").val();
+  paraName = paraName.trim();
+  if(!paraName) return screenTopWarning("请输入规格名称");
+  paraValue = paraValue.replace(/\s+/g,"");
+  if(!paraValue) return screenTopWarning("请输入规格属性");
+
+  var trDom = '<tr><td class="pname">'+paraName+'</td><td class="pvalue">'+paraValue+'</td><td><a class="btn btn-default btn-sm padding-0 margin-right-10" onclick="openEditParamTable(this)">修改</a><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td></tr>';
+  $("#paramsTable").find("tbody").append(trDom)
+
+  $("#paraName").val("");
+  $("#paraValue").val("");
+  mulArrTurnTable();
+  $("#addProductParams").modal('hide');
+}
+
+/**
+ * 删除自定义规格
+ */
+function delParamTable(para) {
+  $(para).parents("tr").remove();
+  mulArrTurnTable();
+}
+
+/**
+ * 修改自定义规格
+ */
+function editParamTable() {
+  // 先获取tr的位置
+  var trIndex = $("#newIndex").val();
+  var newName = $("#newName").val();
+  var newValue = $("#newValue").val();
+
+  var tdDom = '<td class="pname">'+newName+'</td><td class="pvalue">'+newValue+'</td><td><a class="btn btn-default btn-sm padding-0 margin-right-10" onclick="openEditParamTable(this)">修改</a><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td>'
+
+  $("#paramsTable").find("tbody tr").eq(trIndex).html(tdDom);
+  $("#newName").val("");
+  $("#newValue").val("");
+  mulArrTurnTable();
+  $("#editProductParams").modal("hide");
+}
+
+/**
+ * 打开自定义规格修改项
+ */
+function openEditParamTable(para) {
+  var oldParaName = $(para).parents("tr").children(".pname").text();
+  var oldParaValue = $(para).parents("tr").children(".pvalue").text();
+  $("#newName").val(oldParaName);
+  $("#newValue").val(oldParaValue);
+  // 获取当前tr的位置
+  var trIndex = $(para).parents("tr").index();
+  $("#newIndex").val(trIndex)
+  $("#editProductParams").modal("show");
+}
+
+/**
+ * 生成params
+ */
+function tableTurnParams() {
+  var params = [];
+  $("#paramsTable tbody tr").each(function(index, ele) {
+    var obj = {};
+    obj.name = $(ele).find(".pname").text();
+    var valueStr = $(ele).find(".pvalue").text();
+    var valueArr = valueStr.split(",");
+    obj.values = valueArr;
+    params.push(obj)
+  })
+  if(params.length == 0){
+    params = [{
+      name: "",
+      value: []
+    }]
+  }
+  return params;
+}
+
+/**
+ * 生成多维数组
+ */
+function tableTurnMulArray() {
+  var mulArray = [];
+  $("#paramsTable tbody tr").each(function(index, ele) {
+    var valueStr = $(ele).find(".pvalue").text();
+    var valueArr = valueStr.split(",");
+    mulArray.push(valueArr);
+  })
+  return mulArray;
+}
+
+/**
+ * 多维数组组合排序
+ */
+// function mulArrayTurnObj() {
+//   var rArr = tableTurnMulArray();
+//   var result = mulArrExchangeArr(rArr);
+//   console.log(result);
+// }
+
+/**
+ * 多维数组排列组合生成新数组
+ */
+function mulArrExchangeArr(arr){
+  var len = arr.length;
+  // 当数组大于等于2个的时候
+  if(len >= 2){
+      // 第一个数组的长度
+      var len1 = arr[0].length;
+      // 第二个数组的长度
+      var len2 = arr[1].length;
+      // 2个数组产生的组合数
+      var lenBoth = len1 * len2;
+      //  申明一个新数组
+      var items = new Array(lenBoth);
+      // 申明新数组的索引
+      var index = 0;
+      for(var i=0; i<len1; i++){
+          for(var j=0; j<len2; j++){
+              if(arr[0][i] instanceof Array){
+                  items[index] = arr[0][i].concat(arr[1][j]);
+              }else{
+                  items[index] = [arr[0][i]].concat(arr[1][j]);
+              }
+              index++;
+          }
+      }
+      var newArr = new Array(len -1);
+      for(var i=2;i<arr.length;i++){
+          newArr[i-1] = arr[i];
+      }
+      newArr[0] = items;
+      return mulArrExchangeArr(newArr);
+  }else{
+      return arr[0];
+  }
+}
+
+/**
+ * 多维数组排列组合生成新的字符串
+ */
+var useStr = false;
+var firstChange = true;
+function mulArrExchangeStr(arr) {
+  var len = arr.length;
+  // 当数组大于等于2个的时候
+  if(len >= 2){
+      // 第一个数组的长度
+      var len1 = arr[0].length;
+      // 第二个数组的长度
+      var len2 = arr[1].length;
+      // 2个数组产生的组合数
+      var lenBoth = len1 * len2;
+      //  申明一个新数组
+      var items = new Array(lenBoth);
+      // 申明新数组的索引
+      var index = 0;
+      if(!useStr){
+        for(var i=0; i<len1; i++){
+          for(var j=0; j<len2; j++){
+            // items[index] = arr[0][i] + arr[1][j];
+            items[index] = i + "-" + j;
+            index++;
+          }
+        }
+      }else{
+        for(var i=0; i<len1; i++){
+          for(var j=0; j<len2; j++){
+            items[index] = arr[0][i] + "-" +j;
+            // items[index] = i + "-" + j;
+            index++;
+          }
+        }
+      }
+      // 只有第一次递归使用索引+索引
+      // 除了第一次全部使用str+索引
+      useStr = true;
+      firstChange = false;
+      var newArr = new Array(len -1);
+      for(var i=2;i<arr.length;i++){
+          newArr[i-1] = arr[i];
+      }
+      newArr[0] = items;
+      return mulArrExchangeStr(newArr);
+  }else{
+    if(firstChange){
+      var firstArray = [];
+      for(var a=0;a<arr[0].length;a++){
+        firstArray.push(a)
+      }
+      useStr = false;
+      firstChange = true;
+      return firstArray;
+    }else{
+      useStr = false;
+      firstChange = true;
+      return arr[0];
+    }
+  }
+}
+
+/**
+ * 将多维数组生成表格
+ */
+function mulArrTurnTable() {
+  var rArr = tableTurnMulArray();
+  var result = mulArrExchangeArr(rArr);
+  var strs = mulArrExchangeStr(rArr);
+  var trDom = "";
+  for(var i=0;i < result.length;i++) {
+    trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+  }
+  $("#arrayTable").find("tbody").html(trDom)
+}
+
+/**
+ * 获取商品价格、库存、优惠价格
+ */
+function obtainProductPrice() {
+  var params; // 规格信息
+  var productParams = []; // 具体规格组合
+  var payMethod = $("input[name='paymentMethod']:checked").val(); ; // 付款方式
+  var originalPrice; // 商品原价
+  // 是否使用自定义规格
+  var isUseParams = $("#useparams").prop("checked");
+  if(isUseParams) {
+    // 如果使用自定义多规格
+    $("#arrayTable").find("tbody tr").each(function(index, ele) {
+      var index = $(ele).find(".paraid").attr("sid");
+      var price = $(ele).find(".oprice").text();
+      var stocksTotal = $(ele).find(".count").text();
+      var useDiscount = $(ele).find(".usedis").prop("checked");
+      var dprice = $(ele).find(".dprice").text();
+
+      price = price.trim();
+      if(price == "" || isNaN(Number(price)) || Number(price) < 0){
+        price = -1
+      }else{
+        price = Number(price).toFixed(2)*100;
+      }
+
+      stocksTotal = stocksTotal.trim();
+      if(stocksTotal == "" || isNaN(Number(stocksTotal)) || Number(stocksTotal) < 1){
+        stocksTotal = 0;
+      }else{
+        stocksTotal = Number(stocksTotal).toFixed(0)*1;
+      }
+
+      dprice = dprice.trim();
+      if(dprice == "" || isNaN(Number(dprice)) || Number(dprice) < 0) {
+        dprice = 0;
+      }else{
+        dprice = Number(dprice).toFixed(2)*100;
+      }
+      if(dprice > price){
+        dprice = price;
+      }
+      
+      var para = {
+        index: index,
+        originPrice: price,
+        stocksTotal: stocksTotal,
+        useDiscount: useDiscount,
+        price: dprice
+      }
+      productParams.push(para);
+    })
+    if(productParams.length == 0) throw("多规格不可为空");
+  }else{
+    // 如果不使用自定义多规格
+    var params = {
+      name: "",
+      value: []
+    };
+    originalPrice = $("#originalPrice").val();
+    if(!originalPrice) throw("请输入商品价格");
+    // 是否适用优惠
+    var isDis = $("#usedis").prop("checked");
+    var price = $("#afterDisCost").val(); // 最终价格
+    if(!price) {
+      price = originalPrice
+    }
+    if(Number(price) > Number(originalPrice)) {
+      throw("优惠价不得高于商品原价");
+    }
+    var stocksTotal = $("#stockQuantity").val();
+    if(!stocksTotal) throw("请输入商品数量");
+    para = {
+      index: "",
+      stocksTotal: Number(stocksTotal).toFixed(0)*1,
+      originPrice: Number(originalPrice).toFixed(2)*100,
+      price: Number(price).toFixed(2)*100,
+      useDiscount: isDis
+    }
+    productParams.push(para);
+  }
+  return productParams;
+}

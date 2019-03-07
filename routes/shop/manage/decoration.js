@@ -20,6 +20,25 @@ decorationRouter
       storeDecoration.save();
     }
     data.storeDecoration = storeDecoration;
+
+    let featuredProducts = await db.ShopGoodsModel.find({productId:{$in:storeDecoration.storeLeftFeatureds}})
+    data.featuredProducts = featuredProducts;
+    // 获取分类推荐
+    // console.log(storeDecoration.storeClassFeatureds)
+    data.storeClassFeatureds = await Promise.all(storeDecoration.storeClassFeatureds.map(async classify => {
+      let classFeatureds = await db.ShopGoodsModel.find({productId:{$in:classify.productsArr}});
+      classify.classFeatureds = classFeatureds;
+      return classify
+    }))
+    // data.products = await Promise.all(data.products.map(async product => {
+    //   product = product.toObject();
+    //   if(storeLeftFeatureds.indexOf(product.productId) > -1){
+    //     product.isFeatured = true;
+    //   }else{
+    //     product.isFeatured = false;
+    //   }
+    //   return product;
+    // }));
 		ctx.template = 'shop/manage/decoration.pug';
 		await next();
 	})
@@ -93,13 +112,74 @@ decorationRouter
     data.storeLeftFeatureds = storeLeftFeatureds;
     data.products = await Promise.all(data.products.map(async product => {
       product = product.toObject();
-      if(storeLeftFeatureds.indexOf(product.storeId) > -1){
+      if(storeLeftFeatureds.indexOf(product.productId) > -1){
         product.isFeatured = true;
       }else{
         product.isFeatured = false;
       }
       return product;
     }));
+    await next();
+  })
+  .post('/featured', async (ctx, next) => {
+    const {data, params, body, db} = ctx;
+    const storeId = params.account;
+    let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
+    const {arr} = body;
+    await storeDecoration.update({$set:{storeLeftFeatureds: arr}})
+    await next();
+  })
+  .patch('/addClass', async (ctx, next) => {
+    const {data, params, body, db} = ctx;
+    const storeId = params.account;
+    const {newClassName} = body;
+    let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
+    // 做查询，如果分类名字已经存在，则不予添加
+    let newClassObj = {
+      name: newClassName,
+      productsArr:[]
+    }
+    storeDecoration.storeClassFeatureds.push(newClassObj);
+    await db.ShopDecorationsModel.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await next();
+  })
+  .get('/singleClass', async (ctx, next) => {
+    const {data, params, body, db, query} = ctx;
+    const {index} = query;
+    const storeId = params.account;
+
+    let products = data.products;
+    let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
+    let storeClassFeatureds = storeDecoration.storeClassFeatureds[index];
+    data.storeClassFeatureds = storeClassFeatureds;
+    data.classProducts = await Promise.all(data.products.map(async product => {
+      product = product.toObject();
+      if(storeClassFeatureds.productsArr.indexOf(product.productId) > -1){
+        product.isFeatured = true;
+      }else{
+        product.isFeatured = false;
+      }
+      return product;
+    }));
+
+    await next();
+  })
+  .patch('/addSingleClass', async (ctx, next) => {
+    const {data, params, body, db, query} = ctx;
+    const {index, arr} = body;
+    const storeId = params.account;
+    let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
+    storeDecoration.storeClassFeatureds[index].productsArr = arr;
+    await db.ShopDecorationsModel.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await next();
+  })
+  .patch('/delClass', async(ctx, next) => {
+    const {data, params, body, db, query} = ctx;
+    const storeId = params.account;
+    const {index} = body;
+    let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
+    storeDecoration.storeClassFeatureds.splice(index, 1);
+    await db.ShopDecorationsModel.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
 module.exports = decorationRouter;

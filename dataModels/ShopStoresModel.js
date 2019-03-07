@@ -77,6 +77,10 @@ const shopStoresSchema = new Schema({
    */
   decoration: {
     type: Schema.Types.Mixed
+  },
+  // 店内分类
+  storeClassifys: {
+    type: [Schema.Types.Mixed]
   }
 }, {
   collection: 'shopStores'

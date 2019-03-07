@@ -150,14 +150,13 @@ function editStoreFeatured(storeId) {
   .then(function(data) {
     var totalDom = [];
     var featuredCount = data.storeLeftFeatureds.length;
-    console.log(data.storeLeftFeatureds)
     var featuredList = data.storeLeftFeatureds;
     for(var i in data.products){
       var dom;
       if(data.products[i].isFeatured == true){
-        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].productDescription+'</p><p style="font-size:smaller;">'+data.products[i].productFinalPrice+'</p></div><div class="media-right"><p>已推荐</p><button class="btn btn-danger btn-sm" onclick="addStoreFeatured('+data.products[i].productId+')">取消推荐</button></div></div>';
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].productDescription+'</p><p style="font-size:smaller;">'+data.products[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-danger btn-sm" onclick="delStoreFeatured('+data.products[i].storeId+','+data.products[i].productId+')">取消推荐</button></div></div>';
       }else{
-        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].productDescription+'</p><p style="font-size:smaller;">'+data.products[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="">推荐</button></div></div>';
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].productDescription+'</p><p style="font-size:smaller;">'+data.products[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="addStoreFeatured('+data.products[i].storeId+','+data.products[i].productId+')">推荐</button></div></div>';
       }
       totalDom.push(dom);
     }
@@ -173,20 +172,198 @@ function editStoreFeatured(storeId) {
 /**
  * 添加商品推荐
  */
-function addStoreFeatured(productId) {
+function addStoreFeatured(storeId,productId) {
+  productId = productId + "";
+  var featuredList = $("#featuredList").val();
+  var arr = featuredList.split(",");
+  if(arr.indexOf(productId) > -1){
+    return screenTopWarning("该商品已在推荐列表中");
+  }else{
+    arr.push(productId)
+  }
+  var post  = {
+    arr
+  }
+  nkcAPI('/shop/manage/'+storeId+'/decoration/featured', "POST", post)
+  .then(function(data) {
+    editStoreFeatured(storeId)
+  })
+  .catch(function(data) {
 
+  })
 }
 
 /**
  * 取消商品推荐
  */
-function delStoreFeatured(productId) {
+function delStoreFeatured(storeId, productId) {
+  productId = productId + "";
+  var featuredList = $("#featuredList").val();
+  var arr = featuredList.split(",");
+  var index = arr.indexOf(productId);
+  if(index > -1){
+    arr.splice(index,1)
+  }
+  var post  = {
+    arr
+  }
+  nkcAPI('/shop/manage/'+storeId+'/decoration/featured', "POST", post)
+  .then(function(data) {
+    editStoreFeatured(storeId)
+  })
+  .catch(function(data) {
 
+  })
 }
 
 /**
  * 保存商品推荐
  */
 function saveStoreFeatured(storeId) {
+  screenTopAlert("保存成功");
+  $('#storeFeaturedModal').modal('hide');
+  window.location.href = '/shop/manage/'+storeId+'/decoration';
+}
 
+
+
+ /**
+  * 分类推荐管理
+  */
+function editStoreClassPick() {
+
+}
+
+/**
+ * 添加一个分类
+ * 必须填写名称
+ */
+function addStoreClass(storeId) {
+  // 获取新分类名称
+  var newClassName = $("#newClassName").val();
+  newClassName = newClassName.trim();
+  if(!newClassName){
+    return screenTopWarning("请输入分类名称");
+  }
+  nkcAPI('/shop/manage/'+storeId+'/decoration/addClass', "PATCH", {newClassName})
+  .then(function(data) {
+    screenTopAlert("保存成功");
+    $('#storeAddClassPickModal').modal('hide');
+    window.location.href = '/shop/manage/'+storeId+'/decoration';
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error);
+  })
+}
+
+/**
+ * 删除当前分类
+ */
+function delStoreClass(storeId, index) {
+  var r = confirm("是否删除当前分类");
+  if(r){
+    nkcAPI('/shop/manage/'+storeId+'/decoration/delClass', "PATCH", {index})
+    .then(function(data) {
+      screenTopAlert("删除成功");
+      $('#storeAddClassPickModal').modal('hide');
+      window.location.href = '/shop/manage/'+storeId+'/decoration';
+    })
+    .catch(function(data) {
+      screenTopWarning(data || data.error);
+    })
+  }
+}
+
+
+/**
+ * 编辑单个分类推荐
+ */
+function editSingleClassify(index,storeId) {
+  nkcAPI('/shop/manage/'+storeId+'/decoration/singleClass?index='+index, "GET", {})
+  .then(function(data) {
+    var totalDom = [];
+    var classCount = data.storeClassFeatureds.productsArr.length;
+    var classList = data.storeClassFeatureds.productsArr;
+    for(var i in data.classProducts){
+      var dom;
+      if(data.classProducts[i].isFeatured == true){
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.classProducts[i].productId+'"><img class="media-object" src="/r/'+data.classProducts[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.classProducts[i].productDescription+'</p><p style="font-size:smaller;">'+data.classProducts[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-danger btn-sm" onclick="delSingleClassify('+data.classProducts[i].storeId+','+data.classProducts[i].productId+','+index+')">取消推荐</button></div></div>';
+      }else{
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.classProducts[i].productId+'"><img class="media-object" src="/r/'+data.classProducts[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.classProducts[i].productDescription+'</p><p style="font-size:smaller;">'+data.classProducts[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="addSingleClassify('+data.classProducts[i].storeId+','+data.classProducts[i].productId+','+index+')">推荐</button></div></div>';
+      }
+      totalDom.push(dom);
+    }
+    $("#classifyModalBody").html(totalDom)
+    $("#classCount").html(classCount);
+    $("#classList").val(classList)
+  })
+  .catch(function(data) {
+
+  })
+}
+
+/**
+ * 添加单个分类推荐
+ */
+function addSingleClassify(storeId, productId, index) {
+  productId = productId + "";
+  var classList = $("#classList").val();
+  var arr;
+  if(!classList){
+    arr = []
+  }else{
+    arr = classList.split(",");
+  }
+  if(arr.indexOf(productId) > -1){
+    return screenTopWarning("该商品已在推荐列表中");
+  }else{
+    arr.push(productId)
+  }
+  var post  = {
+    arr
+  }
+  nkcAPI('/shop/manage/'+storeId+'/decoration/addSingleClass', "PATCH", {arr, index})
+  .then(function(data) {
+    editSingleClassify(index, storeId)
+  })
+  .catch(function(data) {
+
+  })
+}
+
+/**
+ * 删除单个分类推荐
+ */
+function delSingleClassify(storeId, productId, index) {
+  productId = productId + "";
+  var classList = $("#classList").val();
+  var arr;
+  if(!classList){
+    arr = []
+  }else{
+    arr = classList.split(",");
+  }
+  var pIndex = arr.indexOf(productId);
+  if(pIndex > -1){
+    arr.splice(pIndex,1)
+  }
+  var post  = {
+    arr
+  }
+  nkcAPI('/shop/manage/'+storeId+'/decoration/addSingleClass', "PATCH", {arr, index})
+  .then(function(data) {
+    editSingleClassify(index, storeId)
+  })
+  .catch(function(data) {
+
+  })
+}
+
+/**
+ * 保存分类推荐
+ */
+function saveStoreClassify(storeId) {
+  screenTopAlert("shangchua");
+  $('#storeEditClassModal').modal('hide');
+  window.location.href = '/shop/manage/'+storeId+'/decoration';
 }

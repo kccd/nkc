@@ -117,15 +117,15 @@ block name
                         span.fa.fa-pencil-square-o
                     .panel-body
                       ul.list-group(style="margin-bottom:0")
-                        -for(var i=0;i<5;i++)
+                        for featured in data.featuredProducts
                           .form-group
                             .media
                               .media-left
-                                a(href='#')
-                                  img.media-object(data-src='holder.js/64x64', alt='64x64', src='/r/290218', data-holder-rendered='true', style='width: 50px; height: 50px;')
+                                  img.media-object(data-src='holder.js/64x64', alt='64x64', src=`/r/${featured.imgMaster}`, data-holder-rendered='true', style='width: 50px; height: 50px;')
                               .media-body
-                                p.media-heading(style="font-size:smaller") KC901C+天馈线分析仪网络测试器信号源场强计频谱扫频故障定位2G
-                                p(style="font-size:smaller") 4998.00
+                                a(href=`/shop/product/${featured.productId}`)
+                                  p.media-heading(style="font-size:smaller")!=`${featured.productDescription}`
+                                  p(style="font-size:smaller")!=`${featured.productFinalPrice}`
                                 div(style='')
                                   span.fa.fa-star(style='color:red')
                                   span.fa.fa-star(style='color:red')
@@ -133,7 +133,7 @@ block name
                                   span.fa.fa-star(style='color:red')
                                   span.fa.fa-star(style='color:red')
                               .media-right
-                                span.blockBold ID: 123456
+                                span.blockBold!=`ID: ${featured.productId}`
               .form-group
                 label.col-sm-2.control-label#searchAnchor 店内分类
                 .col-sm-8
@@ -182,34 +182,33 @@ block name
             p(style="font-size: x-large;font-weight: bolder;text-decoration: underline;") 店铺右侧
             .form-horizontal
               .form-group
-                label.col-sm-2.control-label 商品推荐
+                label.col-sm-2.control-label#classAnchor 分类推荐
                 .col-sm-10
                   .panel.panel-success
                     .panel-heading(style="padding:0;")
                       span.blockBold &nbsp;
-                      a.blockBold(href="#") 
-                        | 编辑
+                      a.blockBold(href="javascript:void(0);" onclick="editStoreClassPick()" data-toggle="modal" data-target="#storeAddClassPickModal") 
+                        | 添加分类推荐
                         span.fa.fa-pencil-square-o
                     .panel-body
-                      .panel.panel-default
-                        .panel-heading 
-                          span 商品推荐
-                          a(href="#" style="float:right") 
-                            | 更多
-                            span.fa.fa-angle-double-right
-                        .panel-body(style="padding:0")
-                          .row
-                            -for(var a=1;a<6;a++)
-                              .col-sm-6.col-md-4
-                                .thumbnail(style="margin:0;border:0")
-                                  a(href=`/shop/product/4`)
-                                    img(src=`/r/290218`, title=`12456` ,style="height:150px" )
-                                  .caption
-                                    a(href=`/shop/product/4` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`123456`) 产品Name
-                                    p(style="color: red;text-align:center")
-                                      i(style="font-style: normal;margin-right: 3px;font-weight: 900;")
-                                        span(style='font-size:14px;') ￥
-                                        | 8.00
+                      for classify,index in data.storeClassFeatureds
+                        .panel.panel-default
+                          .panel-heading 
+                            span!=`${classify.name}`
+                            button.btn.btn-warning.btn-sm(onclick=`delStoreClass(${data.myStore.storeId}, ${index})`) 删除
+                            a.fa.fa-pencil( data-toggle="modal" data-target="#storeEditClassModal" style="float:right;margin-left:20px;cursor: pointer;" onclick=`editSingleClassify(${index},${data.myStore.storeId})`) 编辑
+                          .panel-body(style="padding:0")
+                            .row
+                              for cla in classify.classFeatureds
+                                .col-sm-6.col-md-4
+                                  .thumbnail(style="margin:0;border:0")
+                                    a(href=`/shop/product/${cla.productId}`)
+                                      img(src=`/r/${cla.imgMaster}`, title=`${cla.productDescription}` ,style="height:150px" )
+                                    .caption
+                                      a(href=`/shop/product/${cla.productId}` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;")!=`${cla.productName}`
+                                      p(style="color: red;text-align:center")
+                                        i(style="font-style: normal;margin-right: 3px;font-weight: 900;")
+                                          span(style='font-size:14px;')!=`￥${cla.productFinalPrice}`
   #storeSignModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
     .modal-dialog(role='document')
       .modal-content
@@ -323,24 +322,45 @@ block name
             span(aria-hidden='true') ×
           h4#myModalLabel.modal-title 商品推荐
         .modal-body#featuredModalBody(style="overflow-y: scroll;height: 300px;")
-          //- -for(var i=0;i<5;i++)
-          //-   .form-group
-          //-     .media
-          //-       .media-left
-          //-         a(href='/shop/product/3')
-          //-           img.media-object(src='/r/290218',style='width: 50px; height: 50px;')
-          //-       .media-body
-          //-         p.media-heading(style="font-size:smaller") KC901C+天馈线分析仪网络测试器信号源场强计频谱扫频故障定位2G
-          //-         p(style="font-size:smaller") 4998.00
-          //-       .media-right
-          //-         button.btn.btn-primary.btn-sm(onclick="") 推荐
 
         .modal-footer(style="text-align:left")
-          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreSign(${data.myStore.storeId})`) 保存
-          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreFeatured(${data.myStore.storeId})`) 保存
+          //- button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
           span 已推荐 
           span#featuredCount  
           sapn 件商品
-          input#featuredList(type="text")
+          input#featuredList(type="text" style="display:none")
+  #storeAddClassPickModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 添加分类
+        .modal-body(style="overflow-y: scroll;")
+          .form-group
+            .col-xs-12.col-md-12
+              label.col-xs-2 分类名称(必填)：
+              .col-xs-8
+                input.form-control.input-sm#newClassName(type='text')
+        .modal-footer
+          button.btn.btn-primary.btn-sm(type='button', onclick=`addStoreClass(${data.myStore.storeId})`) 添加
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+  #storeEditClassModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 编辑当前分类
+        .modal-body#classifyModalBody(style="overflow-y: scroll;height: 300px;")
+
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreClassify(${data.myStore.storeId})`) 保存
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+          span 已推荐 
+          span#classCount  
+          sapn 件商品
+          input#classList(type="text" style="display:none")
 block manageScripts
   +includeJS("/shop/manage/decoration.js")
