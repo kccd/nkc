@@ -6,6 +6,7 @@ const latestRouter = require('./latest');
 const followerRouter = require('./follower');
 const visitorRouter = require('./visitor');
 const Router = require('koa-router');
+const path = require('path');
 const router = new Router();
 router
   .get('/', async (ctx) => {

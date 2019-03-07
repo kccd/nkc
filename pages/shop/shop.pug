@@ -57,26 +57,45 @@ block content
               li
                 a(href='#') Dropdown link
       .col-xs-12.col-md-9
-        #carousel-example-generic.carousel.slide(data-ride='carousel')
-          // Indicators
-          ol.carousel-indicators
-            li.active(data-target='#carousel-example-generic', data-slide-to='0')
-            li(data-target='#carousel-example-generic', data-slide-to='1')
-            li(data-target='#carousel-example-generic', data-slide-to='2')
-          // Wrapper for slides
-          .carousel-inner(role='listbox')
-            .item.active
-              img(src='default/shop2.jpg', alt='...' style="width:100%")
-              .carousel-caption
-                | ...
-            .item
-              img(src='default/shop2.jpg', alt='...' style="width:100%")
-              .carousel-caption
-                | ...
-          // Controls
-          a.left.carousel-control(href='#carousel-example-generic', role='button', data-slide='prev')
-            span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
-            span.sr-only Previous
-          a.right.carousel-control(href='#carousel-example-generic', role='button', data-slide='next')
-            span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
-            span.sr-only Next          
+        .row
+          .col-xs-12.col-md-12
+            #carousel-example-generic.carousel.slide(data-ride='carousel')
+              // Indicators
+              ol.carousel-indicators
+                li.active(data-target='#carousel-example-generic', data-slide-to='0')
+                li(data-target='#carousel-example-generic', data-slide-to='1')
+                li(data-target='#carousel-example-generic', data-slide-to='2')
+              // Wrapper for slides
+              .carousel-inner(role='listbox')
+                .item.active
+                  img(src='default/shop2.jpg', alt='...' style="width:100%")
+                  .carousel-caption
+                    | ...
+                .item
+                  img(src='default/shop2.jpg', alt='...' style="width:100%")
+                  .carousel-caption
+                    | ...
+              // Controls
+              a.left.carousel-control(href='#carousel-example-generic', role='button', data-slide='prev')
+                span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+                span.sr-only Previous
+              a.right.carousel-control(href='#carousel-example-generic', role='button', data-slide='next')
+                span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+                span.sr-only Next    
+          .col-xs-12.col-md-12
+              .row
+                //- -for(var a=1;a<15;a++)
+                for item in data.featuredItems
+                  .col-sm-6.col-md-2
+                    .thumbnail(style="margin:0;border:0")
+                      a(href=`/shop/product/${item.productId}`)
+                        img(src=`/r/${item.imgMaster}`, title=`${item.productDescription}` ,style="height:150px" )
+                      .caption
+                        a(href=`/shop/product/${item.productId}` style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${item.productName}`)!=item.productName
+                        div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px") 瓜哥的小店
+                        //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+                        p(style="text-align: right;color: #bf7f5f;")
+                          i(style="font-style: normal;margin-right: 3px;")
+                            span(style='font-size:14px;') ￥
+                            | 8.00
+                          span 起          

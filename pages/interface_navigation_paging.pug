@@ -8,6 +8,10 @@
 - var t = data.t
 - var v = data.v
 - var fid = data.fid
+- var sTime = data.sTime;
+- var eTime = data.eTime;
+- var uid = data.uid;
+- var ip = data.ip;
 if paging
   - var pagingarray = []
   - var pageCount = paging.pageCount
@@ -29,13 +33,13 @@ if paging
     ul.pagination.NavigationPaging
       if start>0
         li()
-          a(href=`${toQueryString({page:0,fid,v, cat,startTime,endTime,uid,ip,digest,sortby,tab, content, type, t, q, role, r})}`) 始
+          a(href=`${toQueryString({page:0,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, type, t, q, r})}`) 始
     
       each pagenum,index in pagingarray
         - var class_str = pagenum==paging.page?'active':''
         
         li(class=`${class_str}`)
-          a(href=`${toQueryString({page:pagenum,fid,v, cat,startTime,endTime,uid,ip,digest,sortby,tab, content, t, type, q, role, r})}`) #{pagenum + 1}
+          a(href=`${toQueryString({page:pagenum,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r})}`) #{pagenum + 1}
       if end<pageCount
         li()
-          a(href=`${toQueryString({page:pageCount-1,fid,v, cat,startTime,endTime,uid,ip,digest,sortby,tab, content, t, type, q, role, r})}`) 末
+          a(href=`${toQueryString({page:pageCount-1,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r})}`) 末

@@ -1486,6 +1486,7 @@ function shareTo(shareType, type, str, title, pid){
                 QRCode.toCanvas(otherCode, path, {
                   scale: 3,
                   margin: 1,
+                  width: 150,
                   color: {dark: '#000000'}
                 }, function(err) {
                   if(err){
@@ -1507,6 +1508,7 @@ function shareTo(shareType, type, str, title, pid){
           QRCode.toCanvas(qrcode, path, {
             scale: 3,
             margin: 1,
+            width: 150,
             color: {dark: '#000000'}
           }, function(err) {
             if(err){
