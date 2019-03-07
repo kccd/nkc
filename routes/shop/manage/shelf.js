@@ -8,7 +8,7 @@ shelfRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body, nkcModules, tools} = ctx;
+		const {data, db, body, tools, settings} = ctx;
     const {user} = data;
     const {
       productName,
@@ -20,6 +20,7 @@ shelfRouter
       stockCostMethod,
       productStatus,
       shelfTime,
+      payMethod,
       productParams
     } = body;
     const paramsInfo = body.params;
@@ -53,9 +54,12 @@ shelfRouter
     if(!['payReduceStock', 'payReduceStock'].includes(stockCostMethod)) 
       ctx.throw(400, '库存计数方式错误，仅支持【付款减库存(payReduceStock)】、【下单减库存(orderReduceStock)】');
     if(!['notonshelf', 'insale'].includes(productStatus)) 
-      ctx.throw(400, '商品状态设置错误，仅支持【上架(insale)】、【不上架(notonshelf)】');
+      ctx.throw(400, '商品状态 设置错误，仅支持【上架(insale)】、【不上架(notonshelf)】');
     if(productStatus === 'insale' && shelfTime && Date.now() >= new Date(shelfTime))
       ctx.throw(400, '商品的上架时间不能早于当前时间，若想立即上架商品请点击【立即上架】按钮'); 
+    if(!['kcb', 'rmb', 'or'].includes(payMethod)) ctx.throw(400, '付款方式选择错误');
+    if(!ctx.permission('setRMBpayment') && payMethod === 'rmb')
+      ctx.throw(400, '您没有设置商品只能通过人名币付款的权限');  
     if(productParams.length === 0) ctx.throw(400, '规格信息不能为空'); 
     if(paramsInfo.length !== 0) {
       let count = paramsInfo[0].values.length;
@@ -65,6 +69,7 @@ shelfRouter
       if(count !== productParams.length) ctx.throw(400, `规格组合缺失，根据输入的规格信息，总组合数应该为${count}。`);
     }
     for(const p of productParams) {
+      if(p.originPrice < 0) continue;
       if(paramsInfo.length !== 0) {
         if(!p.index) ctx.throw(400, '规格索引不能为空');
         const arr = p.index.split('-');
@@ -74,22 +79,42 @@ shelfRouter
         }
       }
       if(p.stocksTotal < 0) ctx.throw(400, '商品库存不能小于0');
-      if(!['kcb', 'rmb', 'all'].includes(p.payMethod)) ctx.throw(400, '付款方式选择错误');
-      if(!ctx.permission('setRMBpayment') && p.payMethod === 'rmb')
-        ctx.throw(400, '您没有设置商品只能通过人名币付款的权限');
-      if(p.originPrice < 0) ctx.throw(400, '商品原价不能小于0');
       if(!p.useDiscount) p.price = p.originPrice;
       else {
+        if(p.price < 0) ctx.throw(400, '商品优惠价不能小于0');
         if(p.originPrice <= p.price) ctx.throw(400, '商品优惠价必须小于商品原价');
       }
     }
-
-    const productId = await db.SettingModel.operateSystemID('shopGoods', 1);  
+    // 发表商品文章
+    const options = {
+      title: productName,
+      abstract: productDescription,
+      content: productDetails,
+      uid: user.uid,
+      fids: mainForumsId,
+      cids: [],
+      ip: ctx.address,
+      type: 'product'
+    };
+    const thread = await db.ThreadModel.publishArticle(options);
+    const {tid, oc} = thread;
+    
+    // 将thread的类型修改为“商品文章”
+    // 将商品的主页图片复制裁剪到文章封面图文件夹
+    const resource = await db.ResourceModel.findOne({rid: imgMaster});
+    if(!resource) ctx.throw(404, `生成文章封面图失败，未找到ID为【${imgMaster}】的资源图片`);
+    const {path} = resource;
+    const basePath = settings.mediaPath.selectDiskCharacterDown(resource);
+    const imgPath = basePath + path;
+    const targetPath = settings.upload.coverPath + '/' + tid + '.jpg';
+    await tools.imageMagick.coverify(imgPath, targetPath);
+    const productId = await db.SettingModel.operateSystemID('shopGoods', 1);
     const product = db.ShopGoodsModel({
+      tid,
+      oc,
       productId,
-      productName,
-      productDescription,
-      productDetails,
+      payMethod,
+      ip: ctx.address,
       mainForumsId,
       imgIntroductions,
       imgMaster,
@@ -101,6 +126,7 @@ shelfRouter
       uid: user.uid
     });
     for(const p of productParams) {
+      if(p.originPrice < 0) continue;
       p.productId = productId;
       p.uid = user.uid;
       p.stocksSurplus = p.stocksTotal;

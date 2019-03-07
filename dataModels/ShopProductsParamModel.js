@@ -40,16 +40,6 @@ const schema = new Schema({
     type: Number,
     required: true
   },
-  /**
-   * 付款方式
-   * @kcb 只用科创币支付
-   * @rmb 只用人民币支付
-   * @kar 科创币与人民币混合付款
-   */
-  payMethod: {
-    type: String,
-    default: "kcb"
-  },
   originPrice: {
     type: Number,
     required: true
@@ -68,5 +58,15 @@ const schema = new Schema({
 }, {
   collection: 'shopProductsParams'
 });
+/* 
+  通过id查找产品规格
+  @author pengxiguaa 2019/3/7
+*/
+schema.statics.findById = async (id) => {
+  const ShopProductParamMode = mongoose.model('shopProductsParams');
+  const productParam = await ShopProductParamMode.findOne({_id: id});
+  if(!productParam) throwErr(404, `未找到ID为【${id}】的产品规格`);
+  return productParam;
+};
 const ShopProductParamMode = mongoose.model('shopProductsParams', schema);
 module.exports = ShopProductParamMode;

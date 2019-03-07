@@ -692,16 +692,45 @@ forumSchema.methods.getAllChildForums = async function() {
   const forums = await ForumModel.find({fid: {$in: allChildForumsId}});
   return this.allChildForums = forums;
 }
-
+/* 
+  验证多个专业的权限，只要有一个专业无权访问都会抛出403错误
+  @param arr: 专业对象数组[forum1, forums, ...]或专业id数组[fid1, fid2, ...]
+  @param userInfo: 用户对象或uid
+  @author pengixguaa 2019/3/7
+*/
+forumSchema.statics.ensureForumsPermission = async (arr, userInfo) => {
+  const ForumModel = mongoose.model('forums');
+  const UserModel = mongoose.model('users');
+  if(!arr) throwErr(500, 'arr is a required parameter in forum.statics method');
+  let forums = arr;
+  if(forums.length === 0) return;
+  if(forums[0].constructor === String) {
+    forums = await ForumModel.find({fid: {$in: forums}});
+  }
+  if(!userInfo) throwErr(500, `userInfo is a required parameter in forum.statics method`);
+  let user = userInfo;
+  if(userInfo.constructor === String) {
+    user = await UserModel.findUserById(uid);
+  }
+  if(!user.roles) {
+    await user.extendRoles();
+  }
+  if(!user.grade) {
+    await user.extendGrade();
+  }
+  const fid = await ForumModel.getAccessibleForumsId(user.roles, user.grade, user);
+  await Promise.all(forums.map(async forum => {
+    if(fid.includes(forum.fid)) return;
+    throwErr(403, `您没有权限访问专业【${forum.displayName}】，且无法在该专业下发表任何内容。`)
+  }));
+};
 
 // 判断用户是否有权访问该版块
 forumSchema.methods.ensurePermission = async function(roles, grade, user) {
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
   if(!fid.includes(this.fid)) {
-    const err = new Error('权限不足');
-    err.status = 403;
-    throw err;
+    throwErr(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`);
   }
 };
 

@@ -18,12 +18,15 @@ postRouter
     await thread.extendFirstPost();
 	  const forums = await thread.extendForums(['mianForums', 'minorForums']);
     const {user} = data;
-    let isModerator;
-    for(const f of forums) {
-      isModerator = await f.isModerator(data.user?data.user.uid: '');
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of forums) {
+        isModerator = await f.isModerator(data.user?data.user.uid: '');
+        if(isModerator) break;
+      }
     }
     // 判断用户是否具有访问该post所在文章的权限
+    data.isModerator = isModerator;
     const options = {
     	roles: data.userRoles,
       grade: data.userGrade,
@@ -96,6 +99,7 @@ postRouter
     data.step = step;
     data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
     data.post.user = await db.UserModel.findOnly({uid: post.uid});
+    await db.UserModel.extendUsersInfo([data.post.user]);
     await data.post.user.extendGrade();
     data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
     data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;

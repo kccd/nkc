@@ -5,11 +5,28 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const shopGoodsSchema = new Schema({
+  toc: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
   // 商品id
   productId: {
     type: String,
     index: 1,
     required: true
+  },
+  // 商品对应的文章
+  tid: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  // 商品文章的第一条post，存着商品的名称、简介和详细信息
+  oc: {
+    type: String,
+    required: true,
+    index: 1
   },
   // 新建商品时的ip
   ip: {
@@ -46,7 +63,7 @@ const shopGoodsSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  },
+  },/* 
   // 商品名称
   productName: {
     type: String,
@@ -61,7 +78,7 @@ const shopGoodsSchema = new Schema({
   productDetails: {
     type: String,
     default: ''
-  },
+  }, */
   // 自定义商品参数(不参与搜索)
   params: {
     type: [],
@@ -118,40 +135,112 @@ const shopGoodsSchema = new Schema({
   productStatus: {
     type: String,
     default: "notonshelf"
-  }
+  },
+  /**
+   * 付款方式
+   * @param kcb 只用科创币支付
+   * @param rmb 只用人民币支付
+   * @param or 科创币与人民币混合付款
+   */
+  payMethod: {
+    type: String,
+    default: 'kcb'
+  },
 }, {
   collection: 'shopGoods'
 });
 
-// 新建商品之后生成文章
-shopGoodsSchema.post('save', async function(product) {
-  const ForumModel = mongoose.model('forums');
-  const UserModel = mongoose.model('users');
-  const ResourceModel = mongoose.model('resources');
-  const mediaPath = require('../settings/mediaPath');
-  const upload = require('../settings/upload');
-  const imageMagick = require('../tools/imageMagick');
-  const {mainForumsId, productName, uid, productDescription, ip, imgMaster} = product;
-  const user = await UserModel.findOnly({uid});
-  await user.extendGeneralSettings();
-  const forum = await ForumModel.findOnly({fid: mainForumsId[0]});
-  const post = {
-    t: productName,
-    c: productDescription,
-    l: 'html'
+
+/* 
+  拓展商品信息
+  @param products: 商品对象组成的数组
+  @param o: 
+    参数    数据类型(默认值) 介绍
+    user:   Boolean(true) 是否拓展商品所属用户
+    store:  Boolean(true) 是否拓展商品所属店铺
+    post:   Boolean(true) 是否拓展商品对应的post, name, description, abstract
+    thread: Boolean(true) 是否拓展商品对应的文章
+  @reture 拓展后的对象数组，此时的商品对象已不再时schema对象，故无法调取model中定义的方法。
+  @author pengxiguaa 2019/3/6
+*/
+shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
+  if(!o) o = {};
+  let options = {
+    user: true,
+    store: true,
+    post: true,
+    thread: true
   };
-  const post_ = await forum.newPost(post, user, ip, [], '', mainForumsId);
-  const {tid} = post_;
-  const resource = await ResourceModel.findOne({rid: imgMaster});
-  if(!resource) throwErr(404, `生成文章封面图失败，未找到ID为【${imgMaster}】的资源图片`);
-  const {path} = resource;
-  const basePath = mediaPath.selectDiskCharacterDown(resource);
-  const imgPath = basePath + path;
-  console.log(imgPath);
-  const targetPath = upload.coverPath + '/' + tid + '.jpg';
-  console.log(targetPath);
-  await imageMagick.coverify(imgPath, targetPath);
-  // await forum.newPost(post, user, ip, cids, mid, fids);
-});
+  o = Object.assign(options, o);
+  const UserModel = mongoose.model('users');
+  const PostModel = mongoose.model('posts');
+  const ThreadModel = mongoose.model('threads');
+  const uid = new set(), userObj = {};
+  const pid = new Set(), postObj = {};
+  const tid = new Set(), threadObj = {};
+  const storesId = new Set(), storeObj = {};
+  products.map(p => {
+    if(o.user)
+      uid.add(p.uid);
+    if(o.store)  
+      storesId.add(p.storeId);
+    if(o.post)  
+      pid.add(p.oc);
+    if(o.thread)
+      tid.add(p.tid);
+  }); 
+  let users, stores, posts, threads;
+  if(o.user) {
+    users = await UserModel.find({uid: {$in: [...uid]}});
+    for(const user of users) {
+      userObj[user.uid] = user;
+    }
+  }
+  if(o.store) {
+    stores = await ShopStoresModel.find({storeId: {$in: [...storesId]}});
+    for(const store of stores) {
+      storeObj[store.storeId] = store;
+    }
+  }
+  if(o.thread) {
+    threads = await ThreadModel.find({tid: {$in: [...tid]}});
+    for(const thread of threads) {
+      threadObj[thread.tid] = thread;
+    }
+  }
+  if(o.post) {
+    posts = await PostModel.find({pid: {$in: [...pid]}});
+    for(const post of posts) {
+      postObj[post.pid] = post;
+    }
+  }
+  await Promise.all(products.map(p => {
+    const product = p.toObject();
+    if(o.user) product.user = userObj[p.uid];
+    if(o.store) product.store = storeObj[p.storeId];
+    if(o.post) {
+      const post = postObj[p.oc];
+      product.post = post;
+      product.name = post.t;
+      product.description = post.c;
+      product.abstract = post.abstract;
+    }
+    if(o.thread) product.thread = threadObj[p.tid];
+    return product;
+  }));
+};
+shopGoodsSchema.methods.ensurePermission = async function() {
+  if(this.disabled) throwErr(403, `商品已被屏蔽，暂无法浏览、收藏、添加到购物车和或购买`);
+};
+/* 
+  通过id查询商品
+  @author pengxiguaa 2019/3/7
+*/
+shopGoodsSchema.statics.findById = async (id) => {
+  const ShopGoodsModel = mongoose.model('shopGoods');
+  const product = await ShopGoodsModel.findOne({productId: id});
+  if(!product) throwErr(404, `为找到ID为【${id}】的商品`);
+  return product;
+};
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);
 module.exports = ShopGoodsModel;
