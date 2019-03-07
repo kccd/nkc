@@ -74,7 +74,7 @@ $(document).ready(function() {
     setTimeout(function(){test()},5000)
     
   })
-  $('input[type=radio][name=paymentMethod]').change(function() {
+  $('input[type=radio][name=payMethod]').change(function() {
     if(this.value == 'or') {
       $("#karMethodDom").css("display", "");
     }else if(this.value == 'rmb'){
@@ -128,14 +128,14 @@ function submitToShelf() {
   // 获取需要支付的KCB和RMB各是多少
   var payUseKcb = 0; // 需要支付的KCB
   var payUseRmb = 0; // 需要支付的RMB
-  var paymentMethod = $("input[name='paymentMethod']:checked").val(); // 商品的支付方式
-  if(paymentMethod == "kcb"){
+  var payMethod = $("input[name='payMethod']:checked").val(); // 商品的支付方式
+  if(payMethod == "kcb"){
     payUseKcb = productFinalPrice;
     payUseRmb = productFinalPrice - payUseKcb;
-  }else if(paymentMethod == "rmb"){
+  }else if(payMethod == "rmb"){
     payUseRmb = productFinalPrice;
     payUseKcb = productFinalPrice - payUseRmb;
-  }else if(paymentMethod == "or"){
+  }else if(payMethod == "or"){
     payUseKcb = $("#costKcb").val();
     if(parseInt(payUseKcb) > productFinalPrice){
       throw("使用混合付款，设置的科创币数额不得超过商品价格")
@@ -180,10 +180,11 @@ function submitToShelf() {
     // stockTotalCount: Number(stockTotalCount),
     // stockSurplusCount: Number(stockTotalCount),
     stockCostMethod: stockCostMethod,
-    paymentMethod: paymentMethod,
+    payMethod: payMethod,
     productStatus: productStatus,
     shelfTime: shelfTime,
     params: params,
+    mainForumsId: ["81"],
     productParams: productParams
   }
   return post;
@@ -578,7 +579,7 @@ function mulArrTurnTable() {
 function obtainProductPrice() {
   var params; // 规格信息
   var productParams = []; // 具体规格组合
-  var payMethod = $("input[name='paymentMethod']:checked").val(); ; // 付款方式
+  var payMethod = $("input[name='payMethod']:checked").val(); ; // 付款方式
   var originalPrice; // 商品原价
   // 是否使用自定义规格
   var isUseParams = $("#useparams").prop("checked");
@@ -590,7 +591,9 @@ function obtainProductPrice() {
       var stocksTotal = $(ele).find(".count").text();
       var useDiscount = $(ele).find(".usedis").prop("checked");
       var dprice = $(ele).find(".dprice").text();
-
+      if(isNaN(Number(price))){
+        throw("价格不可以输入除数字以外的字符")
+      }
       price = price.trim();
       if(price == "" || isNaN(Number(price)) || Number(price) < 0){
         price = -1

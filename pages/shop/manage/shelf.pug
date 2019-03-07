@@ -23,7 +23,7 @@ block name
             .form-group
               label.col-sm-2.control-label 商品标题
               .col-sm-8
-                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="30")
+                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="100")
             //- .form-group
             //-   label.col-sm-2.control-label 商品属性
             //-   .col-sm-8
@@ -51,7 +51,7 @@ block name
             .form-group
               label.col-sm-2.control-label 商品描述
               .col-sm-8
-                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='200')
+                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='500')
                 p(style="color:#ccc") 最多200个字
       .panel.panel-info
         .panel-heading
@@ -160,13 +160,13 @@ block name
               label.col-sm-2.control-label 付款方式
               .col-sm-8
                 label.radio-inline
-                  input#paymentMethod1(type='radio', name='paymentMethod', value='kcb' checked)
+                  input#payMethod1(type='radio', name='payMethod', value='kcb' checked)
                   |  科创币
                 label.radio-inline
-                  input#paymentMethod2(type='radio', name='paymentMethod', value='rmb')
+                  input#payMethod2(type='radio', name='payMethod', value='rmb')
                   |  人民币
                 label.radio-inline
-                  input#paymentMethod3(type='radio', name='paymentMethod', value='or')
+                  input#payMethod3(type='radio', name='payMethod', value='or')
                   |  科创币+人民币混合付款
             .form-group#karMethodDom(style="display:none")
               .col-sm-2.control-label

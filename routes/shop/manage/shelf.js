@@ -22,8 +22,8 @@ shelfRouter
       shelfTime,
       payMethod,
       productParams
-    } = body;
-    const paramsInfo = body.params;
+    } = body.post;
+    const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
     const store = await db.ShopStoresModel.findOne({uid: user.uid});
     if(!store) ctx.thrwo(404, '您还未开设地摊儿');
@@ -82,7 +82,7 @@ shelfRouter
       if(!p.useDiscount) p.price = p.originPrice;
       else {
         if(p.price < 0) ctx.throw(400, '商品优惠价不能小于0');
-        if(p.originPrice <= p.price) ctx.throw(400, '商品优惠价必须小于商品原价');
+        if(p.originPrice < p.price) ctx.throw(400, '商品优惠价必须小于商品原价');
       }
     }
     // 发表商品文章
