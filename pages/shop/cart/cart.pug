@@ -1,23 +1,45 @@
 extends ../account/shopAccountBase
 block shopAccountTitle
   title=`我的购物车 | 科创商城`
+  +includeCSS('/shop/cart/cart.css')
 block shopAccountContent
   .hidden#data= JSON.stringify({cartData: data.cartData})
-  #app
-    .h3 全部商品
+  #app(v-cloak)
+    .h4 全部商品
     div(v-for='d in cartData')  
-      img(:src="'/avatar/' + d.user.uid")
-      .username {{d.user.username}}
-      div(v-for='c in d.products')
+      .user-info
+        .m-r-1.display-i-b
+          button.btn.btn-xs.btn-default(@click='selectedAll(d)') 全选
+        img.avatar(:src="'/avatar/' + d.user.uid")
+        .username {{d.user.username}}
+      .product-panel(v-for='c in d.products' :class='{"selected": selectedId.indexOf(c._id) !== -1}')  
+        .product-select.p-l-1
+          input(type='checkbox' :value='c._id' v-model='selectedId')
         .product-img
-          img(:src="'/r/' + c.product.imgMaster")
-        .product-name {{c.product.name}}
+          img(:src="'/rt/' + c.product.imgMaster")
+        .product-name 
+          a(:href="'/shop/product/' + c.product.productId" target='_blank').name {{c.product.name}}
+          .param-name {{c.productParam.name.join('，')}}
+        .product-price(v-if='c.productParam.useDiscount')
+          .origin-price 原价 
+            span(style='text-decoration: line-through') ￥{{c.productParam.originPrice/100}}
+          .price 优惠价 ￥{{c.productParam.price/100}}
+        .product-price(v-else)  
+          .price ￥{{c.productParam.price/100}}
+        .product-count 
+          button(@click='reduceCount(c)') -
+          input(v-model.number='c.count' style='width: 2rem;' @change='changeCount(c)')
+          button(@click='addCount(c)') +
         .product-price
-          .origin-price {{c.productParam.originPrice}}
-          .price {{c.productParam.price}}
-        .product-count {{c.count}}  
+          .price.text-center 总计
+          h4 ￥{{c.productParam.price * c.count/100}}
         .product-btn
-          button.btn.btn-default 删除
+          button(@click='deleteCartData(c)') 删除 
+      .text-right.m-t-1.to-create-bill
+        span.m-r-2  合计：￥{{total}}
+        a.btn(v-if='selectedId.length' :href="'/shop/order?cart_id=' + selectedId.join('-')") 去结算
+        a.btn.disabled(v-else) 去结算
+     
 
 
 block shopScripts
