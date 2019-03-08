@@ -263,7 +263,12 @@ threadRouter
 		await thread.extendFirstPost().then(async p => {
 			await p.extendUser().then(u => u.extendGrade());
 			await p.extendResources();
-    });
+		});
+		if(thread.type == "product") {
+			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
+			data.products = await db.ShopGoodsModel.extendProductsInfo(products);
+			// data.products = products;
+		}
     await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
 		await thread.extendLastPost();
 		if(data.user) {

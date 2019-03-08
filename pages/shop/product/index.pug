@@ -78,7 +78,6 @@ block content
       .col-xs-12.col-md-12
         nav.navbar.navbar-default
           .container-fluid
-            // Brand and toggle get grouped for better mobile display
             .navbar-header
               button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
                 span.sr-only Toggle navigation
@@ -86,7 +85,6 @@ block content
                 span.icon-bar
                 span.icon-bar
               a.navbar-brand(href='#') Brand
-            // Collect the nav links, forms, and other content for toggling
             #bs-example-navbar-collapse-1.collapse.navbar-collapse
               ul.nav.navbar-nav
                 li.active
@@ -177,8 +175,6 @@ block content
               span.title Freight
               span.location Place of origin
               span.location TO
-              //- span.location 新疆维吾尔自治区/巴音郭楞蒙古自治州/焉耆回族自治县
-              //- span.fa.fa-arrow-down#city 123456
               input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
               s.fa.fa-arrow-down
               span.location 快递
@@ -201,14 +197,6 @@ block content
               span.fa.fa-shopping-cart  Add To Cart
         .col-xs-1.col-md-1 
 
-      //- .col-xs-12.col-md-12
-      //-   ul.nav.nav-tabs
-      //-     li.active(role='presentation')
-      //-       a(href='#') Product Details
-      //-     li(role='presentation')
-      //-       a(href='#') Cumulative Evaluation
-      //-     li(role='presentation')
-      //-       a(href='#') Messages
       .col-xs-12.col-md-12
         .col-xs-12.col-md-3
           .col-xs-12.col-md-12(style="margin-bottom:20px")
@@ -262,7 +250,6 @@ block content
                       span.fa.fa-star(style="color:red")
         .col-xs-12.col-md-9
           .col-xs-12.col-xs-12
-            // Nav tabs
             ul.nav.nav-tabs(role='tablist')
               li.active(role='presentation')
                 a(href='#home', aria-controls='home', role='tab', data-toggle='tab') Description
@@ -272,17 +259,13 @@ block content
                   span.badge(style="background-color:#22258c") 12
               li(role='presentation')
                 a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab') Messages
-            // Tab panes
             .tab-content
               #home.tab-pane.active(role='tabpanel')
                 div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-                  //- h3(style="text-align:center") 商品详细描述
                   div(style="padding:20px")!=data.productInfo.productDetails
               #profile.tab-pane(role='tabpanel')
-                //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
                 div
                   .panel.panel-default
-                    // Default panel contents
                     .panel-heading 
                       .radio
                         label
@@ -297,11 +280,6 @@ block content
                         label(style="float:right")
                           input#haveContent(type="checkbox", name="haveContent") 
                           | 显示内容
-                      //- .check
-                      //-   label
-                      //-     input#haveContent(type="checkbox", name="haveContent") 
-                      //-     | 显示内容
-                    //- .panel-body
                     ul.list-group
                       -for(var l=0;l<9;l++)
                         li.list-group-item 
@@ -327,47 +305,6 @@ block content
                     -for(var a=0;a<16;a++)
                       .col-sm-6.col-md-4
                         p parameter: value
-          //- .col-xs-12.col-md-12
-          //-   div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-          //-     h3(style="text-align:center") 商品详细描述
-          //-     div(style="padding:20px")!=data.productInfo.productDetails
-          //- .col-xs-12.col-md-12
-          //-   //- div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-          //-   div
-          //-     .panel.panel-default
-          //-       // Default panel contents
-          //-       .panel-heading 
-          //-         .radio
-          //-           label
-          //-             input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-          //-             | 好评
-          //-           label
-          //-             input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-          //-             | 中评
-          //-           label
-          //-             input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-          //-             | 差评
-          //-           label(style="float:right")
-          //-             input#haveContent(type="checkbox", name="haveContent") 
-          //-             | 显示内容
-          //-         //- .check
-          //-         //-   label
-          //-         //-     input#haveContent(type="checkbox", name="haveContent") 
-          //-         //-     | 显示内容
-          //-       //- .panel-body
-          //-       ul.list-group
-          //-         -for(var l=0;l<9;l++)
-          //-           li.list-group-item 
-          //-             .media
-          //-               .media-left.media-middle
-          //-                 a(href='#')
-          //-                   img.media-object(src='/avatar/74847', alt='...', style="width:64px")
-          //-               .media-body
-          //-                 p(style="font-size:large").media-heading 
-          //-                 | Kris
-          //-                 span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
-          //-                 span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
-          //-                 p 我觉得行 
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')

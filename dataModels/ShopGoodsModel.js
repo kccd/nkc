@@ -175,7 +175,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   const UserModel = mongoose.model('users');
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
-  const uid = new set(), userObj = {};
+  const uid = new Set(), userObj = {};
   const pid = new Set(), postObj = {};
   const tid = new Set(), threadObj = {};
   const storesId = new Set(), storeObj = {};
