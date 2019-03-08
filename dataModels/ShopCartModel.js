@@ -55,9 +55,8 @@ schema.statics.extendCartsInfo = async (arr) => {
   });
   const users = await UserModel.find({uid: {$in: [...uid]}});
   const products = await ShopGoodsModdel.find({productId: {$in: [...productId]}});
-  console.log([...productParamId]);
-  const productParams = await ShopProductsParamModel.find({_id: {$in: [...productParamId]}});
-
+  let productParams = await ShopProductsParamModel.find({_id: {$in: [...productParamId]}});
+  productParams = await ShopProductsParamModel.extendParamsInfo(productParams, {name: true});
   users.map(u => {
     if(!userObj[u.uid]) userObj[u.uid] = u;
   });
@@ -72,13 +71,18 @@ schema.statics.extendCartsInfo = async (arr) => {
     result.user = userObj[a.uid];
     result.product = productObj[a.productId];
     result.product = (await ShopGoodsModdel.extendProductsInfo([result.product], {
-      post: false,
       thread: false,
       store: false
     }))[0];
     result.productParam = paramObj[a.productParamId];
     return result;
   }));
+};
+schema.statics.findById = async (_id) => {
+  const ShopCartModel = mongoose.model('shopCarts');
+  const cart = await ShopCartModel.findOne({_id});
+  if(!cart) throwErr(404, '未找到ID为【${_id}】的购物车收藏记录');
+  return cart;
 };
 const ShopCartModel = mongoose.model('shopCarts', schema);
 module.exports = ShopCartModel;

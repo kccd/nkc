@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
+const singleCartRouter = require('./singleCart');
 router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
@@ -48,7 +49,7 @@ router
       let cart = await db.ShopCartModel.findOne({productId, productParamId, uid: user.uid});
       // 若商品已存在则数量+1，若商品不存在则添加
       if(cart) {
-        await cart.update({$inc: {count: count}});
+        await cart.update({$inc: {count: count}, toc: Date.now()});
       } else {
         cart = db.ShopCartModel({
           _id: await db.SettingModel.operateSystemID('shopCarts', 1),
@@ -74,7 +75,7 @@ router
         if(c.productId === productId && c.productParamId === productParamId) {
           has = true;
           c.count += count;
-          c.time = Date.now();
+          c.toc = Date.now();
         }
       }
       if(!has) {
@@ -82,7 +83,7 @@ router
           productId,
           productParamId,
           count,
-          time: Date.now()
+          toc: Date.now()
         });
       }
       cartInfo = Buffer.from(JSON.stringify(cartInfo)).toString('hex');
@@ -91,5 +92,6 @@ router
       });
     }
     await next();
-  });
+  })
+  .use('/:_id', singleCartRouter.routes(), singleCartRouter.allowedMethods());
 module.exports = router;

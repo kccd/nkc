@@ -67,6 +67,42 @@ schema.statics.findById = async (id) => {
   const productParam = await ShopProductParamMode.findOne({_id: id});
   if(!productParam) throwErr(404, `未找到ID为【${id}】的产品规格`);
   return productParam;
+}; 
+/* 
+  拓展规格信息
+  @param params: 规格对象数组
+  @param o:
+    name: Boolean(default true)是否拓展规格名 如：“黄-16g”
+  @author pengxiguaa 2019/3/8
+*/
+schema.statics.extendParamsInfo = async (params, o) => {
+  if(!o) o = {};
+  const options = {
+    name: true
+  };
+  o = Object.assign(options, o);
+  const productsId = new Set();
+  params.map(p => {
+    productsId.add(p.productId);
+  });
+  const products = await mongoose.model('shopGoods').find({productId: {$in: [...productsId]}});
+  const productObj = {};
+  products.map(p => {
+    if(!productObj[p.productId]) productObj[p.productId] = p;
+  });
+  return await Promise.all(params.map(async p => {
+    const param = p.toObject();
+    param.product = productObj[p.productId];
+    if(o.name) {
+      const arr = p.index.split('-');
+      let name = [];
+      for(let i = 0; i < arr.length; i++) {
+        name.push(param.product.params[i].values[arr[i]]);
+      }
+      param.name = name;
+    }
+    return param;
+  }));
 };
 
 /**

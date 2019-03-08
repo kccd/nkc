@@ -234,6 +234,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
       const post = postObj[p.oc];
       product.post = post;
       product.name = post.t;
+      
       product.description = post.c;
       product.abstract = post.abstract;
     }

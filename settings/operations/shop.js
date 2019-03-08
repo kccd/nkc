@@ -74,6 +74,14 @@ module.exports = {
   },
   cart: {
     POST: 'addProductToCart',
-    GET: 'visitShopCart'
+    GET: 'visitShopCart',
+    PARAMETER: {
+      PATCH: 'modifyCartData',
+      DELETE: 'modifyCartData'
+    }
+  },
+  order: {
+    GET: 'visitShopOrder',
+    POST: 'submitShopOrder'
   }
 };
