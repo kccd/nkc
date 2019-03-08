@@ -2,4 +2,23 @@ extends ../account/shopAccountBase
 block shopAccountTitle
   title=`我的购物车 | 科创商城`
 block shopAccountContent
-  h3 hello world
+  .hidden#data= JSON.stringify({cartData: data.cartData})
+  #app
+    .h3 全部商品
+    div(v-for='d in cartData')  
+      img(:src="'/avatar/' + d.user.uid")
+      .username {{d.user.username}}
+      div(v-for='c in d.products')
+        .product-img
+          img(:src="'/r/' + c.product.imgMaster")
+        .product-name {{c.product.name}}
+        .product-price
+          .origin-price {{c.productParam.originPrice}}
+          .price {{c.productParam.price}}
+        .product-count {{c.count}}  
+        .product-btn
+          button.btn.btn-default 删除
+
+
+block shopScripts
+  +includeJS('/shop/cart/cart.js')
