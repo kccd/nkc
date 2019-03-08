@@ -4,10 +4,32 @@ router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
-    const carts = await db.ShopCartModel.find({
+    let carts = await db.ShopCartModel.find({
       uid: user.uid
     }).sort({toc: -1});
-    data.carts = await db.ShopCartModel.extendCarts(carts);
+    carts = await db.ShopCartModel.extendCartsInfo(carts);
+    const productUsers = {};
+    for(const cart of carts) {
+      const productUserId = cart.product.uid;
+      if(!productUsers[productUserId]) {
+        productUsers[productUserId] = {
+          user: cart.product.user,
+          products: [cart]
+        }
+      } else {
+        productUsers[productUserId].products.push(cart);
+      }
+    }
+    const cartData = [];
+    for(const key in productUsers) {
+      if(!productUsers.hasOwnProperty(key)) continue;
+      const r = productUsers[key];
+      cartData.push({
+        user: r.user,
+        products: r.products
+      });
+    }
+    data.cartData = cartData;
     ctx.template = 'shop/cart/cart.pug';
     await next();
   })
@@ -22,7 +44,7 @@ router
     const {productId} = productParam;
     const product = await db.ShopGoodsModel.findById(productId);
     await product.ensurePermission();
-    if(!user) {
+    if(user) {
       let cart = await db.ShopCartModel.findOne({productId, productParamId, uid: user.uid});
       // 若商品已存在则数量+1，若商品不存在则添加
       if(cart) {

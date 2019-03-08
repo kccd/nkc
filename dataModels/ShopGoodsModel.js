@@ -214,7 +214,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
       postObj[post.pid] = post;
     }
   }
-  await Promise.all(products.map(p => {
+  return await Promise.all(products.map(p => {
     const product = p.toObject();
     if(o.user) product.user = userObj[p.uid];
     if(o.store) product.store = storeObj[p.storeId];
