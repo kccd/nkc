@@ -65,179 +65,179 @@ style.
     top: 5px;
     position: absolute;
   }
-.container-fluid(style='max-width: 1400px;')
-  .row
-    .col-xs-12.col-md-12(style="margin-bottom:30px")
-      .col-xs-12.col-sm-12.col-md-12.col-lg-6
-        ul#etalage
-          -for(let rid of product.imgIntroductions)
-            li
-              img.etalage_thumb_image(src=`/r/${rid}`)
-              img.etalage_source_image(src=`/r/${rid}`)
+//- .container-fluid(style='max-width: 1400px;')
+.row
+  .col-xs-12.col-md-12(style="margin-bottom:30px")
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6
+      ul#etalage
+        -for(let rid of product.imgIntroductions)
+          li
+            img.etalage_thumb_image(src=`/r/${rid}`)
+            img.etalage_source_image(src=`/r/${rid}`)
 
-      .col-xs-12.col-sm-12.col-md-12.col-lg-6
-        p.item=`${post.abstract}`
-        div.item(style="background:#c7fff8")
-          div(style="padding:7px 0;color:#333")
-            p
-              span.title 价格
-            //-   -if(data.productInfo.useRebate)
-            //-     span
-            //-       del=`${data.productInfo.productOriginalPrice}`
-            //-   -else
-            //-     span=`${data.productInfo.productOriginalPrice}`
-            //- -if(data.productInfo.useRebate)
-            //-   p
-            //-     span.title 促销价
-            //-     span(style="color:orangered;font-size:x-large;font-family:fantasy")=`${data.productInfo.productFinalPrice}`
-        div.item
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6
+      p.item=`${post.abstract}`
+      div.item(style="background:#c7fff8")
+        div(style="padding:7px 0;color:#333")
           p
-            span.title 支付方式
-            //- -if(data.productInfo.productPayMethod == "kcb")
-            //-   span(style="font-weight:bolder") 科创币
-            //- -else if(data.productInfo.productPayMethod == "rmb")
-            //-   span(style="font-weight:bolder") 人民币
-            //- -else if(data.productInfo.productPayMethod == "kar")
-            //-   span(style="font-weight:bolder") 混合付款:&nbsp;
-            //-   span 科创币
-            //-   span(style="font-weight:bolder;color:red")=`${data.productInfo.priceKCB}`
-            //-   span &nbsp;&nbsp;人民币
-            //-   span(style="font-weight:bolder;color:red")=`${data.productInfo.priceRMB}`
-        div.item(style="border-bottom: 1px solid #e5e5e5")
-          p
-            span.title Freight
-            span.location Place of origin
-            span.location TO
-            input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
-            s.fa.fa-arrow-down
-            span.location 快递
-            sapn.location ￥12.00
-        div.item
-          p
-            span.title Add time
-            span.location 2018-10-23
-        div.item
-          p
-            span.title Number Of Products
-            span
-              input(type="number", name="", value="1")
-            span.title 库存
-            //- span=`${data.productInfo.stockTotalCount}`
-            span.title 件
-        div.item
-          a.btn.btn.buy(href='#', role='button') Buy
-          a.btn.btn.addCart(href='#', role='button') 
-            span.fa.fa-shopping-cart  Add To Cart
-      .col-xs-1.col-md-1 
+            span.title 价格
+          //-   -if(data.productInfo.useRebate)
+          //-     span
+          //-       del=`${data.productInfo.productOriginalPrice}`
+          //-   -else
+          //-     span=`${data.productInfo.productOriginalPrice}`
+          //- -if(data.productInfo.useRebate)
+          //-   p
+          //-     span.title 促销价
+          //-     span(style="color:orangered;font-size:x-large;font-family:fantasy")=`${data.productInfo.productFinalPrice}`
+      div.item
+        p
+          span.title 支付方式
+          //- -if(data.productInfo.productPayMethod == "kcb")
+          //-   span(style="font-weight:bolder") 科创币
+          //- -else if(data.productInfo.productPayMethod == "rmb")
+          //-   span(style="font-weight:bolder") 人民币
+          //- -else if(data.productInfo.productPayMethod == "kar")
+          //-   span(style="font-weight:bolder") 混合付款:&nbsp;
+          //-   span 科创币
+          //-   span(style="font-weight:bolder;color:red")=`${data.productInfo.priceKCB}`
+          //-   span &nbsp;&nbsp;人民币
+          //-   span(style="font-weight:bolder;color:red")=`${data.productInfo.priceRMB}`
+      div.item(style="border-bottom: 1px solid #e5e5e5")
+        p
+          span.title Freight
+          span.location Place of origin
+          span.location TO
+          input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
+          s.fa.fa-arrow-down
+          span.location 快递
+          sapn.location ￥12.00
+      div.item
+        p
+          span.title Add time
+          span.location 2018-10-23
+      div.item
+        p
+          span.title Number Of Products
+          span
+            input(type="number", name="", value="1")
+          span.title 库存
+          //- span=`${data.productInfo.stockTotalCount}`
+          span.title 件
+      div.item
+        a.btn.btn.buy(href='#', role='button') Buy
+        a.btn.btn.addCart(href='#', role='button') 
+          span.fa.fa-shopping-cart  Add To Cart
+    .col-xs-1.col-md-1 
 
+  .col-xs-12.col-md-12
+    //- .col-xs-12.col-md-3
+    //-   .col-xs-12.col-md-12(style="margin-bottom:20px")
+    //-     .input-group
+    //-       input.form-control(type='text', placeholder='Search for...')
+    //-       span.input-group-btn
+    //-         button.btn.btn-default(type='button') Search
+    //-   .col-xs-12.col-md-12
+    //-     .panel.panel-default
+    //-       .panel-heading
+    //-         a(href='/shop/store/7', target='_blank' style="color: #333;font-size: 12px;font-weight:bold") 瓜哥的小店
+    //-       .panel-body
+    //-         .row
+    //-           .col-xs-12.col-md-12(style="margin-bottom:10px")
+    //-             div(style="overflow: hidden;margin: 0 auto;cursor: pointer;position: relative;display:table")
+    //-               .shopdsr-item
+    //-                 .shopdsr-title 描 述
+    //-                 .shopdsr-score.shopdsr-score-up-ctrl
+    //-                   span.shopdsr-score-con 4.9
+    //-                   s.shopdsr-score-up
+    //-               .shopdsr-item
+    //-                 .shopdsr-title 服 务
+    //-                 .shopdsr-score.shopdsr-score-up-ctrl
+    //-                   span.shopdsr-score-con 4.9
+    //-                   s.shopdsr-score-up
+    //-               .shopdsr-item
+    //-                 .shopdsr-title 物 流
+    //-                 .shopdsr-score.shopdsr-score-up-ctrl
+    //-                   span.shopdsr-score-con 4.9
+    //-                   s.shopdsr-score-up
+    //-               a(target='_blank', href='/shop/store/7', style='z-index: 1;display: block; position: absolute; width: 100%;height: 100%;')
+    //-           .col-xs-12.col-md-12(style="text-align:center")
+    //-             a.btn.btn-info.btn-sm(href="/shop/store/7", style="background-color:#041567;margin-right:10px", target='_blank') 进店逛逛
+    //-             a.btn.btn-default.btn-sm(style="color:#041567") 收藏店铺
+    //-   .col-xs-12.col-md-12
+    //-     .panel.panel-default
+    //-       .panel-heading
+    //-         h3.panel-title 商品推荐
+    //-       ul.list-group
+    //-         -for(var i=0;i<9;i++)
+    //-           li.list-group-item
+    //-             a(href="#") 
+    //-               img(src="/default/shop1.jpg" style="width:32px;height:auto;float:right")
+    //-               span(style="display:block;font-weight:700;color:#666") KC901S 3GHz Handheld Network Analyzer multi RF-meter
+    //-             span $ 12.00
+    //-             div(style="float:right")
+    //-               span.fa.fa-star(style="color:red")
+    //-               span.fa.fa-star(style="color:red")
+    //-               span.fa.fa-star(style="color:red")
+    //-               span.fa.fa-star(style="color:red")
+    //-               span.fa.fa-star(style="color:red")
     .col-xs-12.col-md-12
-      //- .col-xs-12.col-md-3
-      //-   .col-xs-12.col-md-12(style="margin-bottom:20px")
-      //-     .input-group
-      //-       input.form-control(type='text', placeholder='Search for...')
-      //-       span.input-group-btn
-      //-         button.btn.btn-default(type='button') Search
-      //-   .col-xs-12.col-md-12
-      //-     .panel.panel-default
-      //-       .panel-heading
-      //-         a(href='/shop/store/7', target='_blank' style="color: #333;font-size: 12px;font-weight:bold") 瓜哥的小店
-      //-       .panel-body
-      //-         .row
-      //-           .col-xs-12.col-md-12(style="margin-bottom:10px")
-      //-             div(style="overflow: hidden;margin: 0 auto;cursor: pointer;position: relative;display:table")
-      //-               .shopdsr-item
-      //-                 .shopdsr-title 描 述
-      //-                 .shopdsr-score.shopdsr-score-up-ctrl
-      //-                   span.shopdsr-score-con 4.9
-      //-                   s.shopdsr-score-up
-      //-               .shopdsr-item
-      //-                 .shopdsr-title 服 务
-      //-                 .shopdsr-score.shopdsr-score-up-ctrl
-      //-                   span.shopdsr-score-con 4.9
-      //-                   s.shopdsr-score-up
-      //-               .shopdsr-item
-      //-                 .shopdsr-title 物 流
-      //-                 .shopdsr-score.shopdsr-score-up-ctrl
-      //-                   span.shopdsr-score-con 4.9
-      //-                   s.shopdsr-score-up
-      //-               a(target='_blank', href='/shop/store/7', style='z-index: 1;display: block; position: absolute; width: 100%;height: 100%;')
-      //-           .col-xs-12.col-md-12(style="text-align:center")
-      //-             a.btn.btn-info.btn-sm(href="/shop/store/7", style="background-color:#041567;margin-right:10px", target='_blank') 进店逛逛
-      //-             a.btn.btn-default.btn-sm(style="color:#041567") 收藏店铺
-      //-   .col-xs-12.col-md-12
-      //-     .panel.panel-default
-      //-       .panel-heading
-      //-         h3.panel-title 商品推荐
-      //-       ul.list-group
-      //-         -for(var i=0;i<9;i++)
-      //-           li.list-group-item
-      //-             a(href="#") 
-      //-               img(src="/default/shop1.jpg" style="width:32px;height:auto;float:right")
-      //-               span(style="display:block;font-weight:700;color:#666") KC901S 3GHz Handheld Network Analyzer multi RF-meter
-      //-             span $ 12.00
-      //-             div(style="float:right")
-      //-               span.fa.fa-star(style="color:red")
-      //-               span.fa.fa-star(style="color:red")
-      //-               span.fa.fa-star(style="color:red")
-      //-               span.fa.fa-star(style="color:red")
-      //-               span.fa.fa-star(style="color:red")
-      .col-xs-12.col-md-12
-        .col-xs-12.col-xs-12
-          ul.nav.nav-tabs(role='tablist')
-            li.active(role='presentation')
-              a(href='#home', aria-controls='home', role='tab', data-toggle='tab') Description
-            li(role='presentation')
-              a(href='#profile', aria-controls='profile', role='tab', data-toggle='tab')
-                | Reviewa 
-                span.badge(style="background-color:#22258c") 12
-            li(role='presentation')
-              a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab') Messages
-          .tab-content
-            #home.tab-pane.active(role='tabpanel')
-              div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-                //- div(style="padding:20px")!=data.productInfo.productDetails
-            #profile.tab-pane(role='tabpanel')
-              div
-                .panel.panel-default
-                  .panel-heading 
-                    .radio
-                      label
-                        input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-                        | 好评
-                      label
-                        input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-                        | 中评
-                      label
-                        input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
-                        | 差评
-                      label(style="float:right")
-                        input#haveContent(type="checkbox", name="haveContent") 
-                        | 显示内容
-                  ul.list-group
-                    -for(var l=0;l<9;l++)
-                      li.list-group-item 
-                        .media
-                          .media-left.media-middle
-                            a(href='#')
-                              img.media-object(src='/avatar/74847', alt='...', style="width:64px")
-                          .media-body
-                            p(style="font-size:large").media-heading 
-                            | Kris
-                            span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
-                            span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
-                            p 我觉得行 
-            #messages.tab-pane(role='tabpanel')
-              div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
-                div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
-                  div
-                    | Drand Name：
-                    b(target='_blank') 科创仪表局
-                p(style="padding:5px 20px")
-                  em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
-                .row(style="padding:0 20px 18px")
-                  -for(var a=0;a<16;a++)
-                    .col-sm-6.col-md-4
-                      p parameter: value
+      div(style="padding:20px")!=experimental_render(post)
+        //- ul.nav.nav-tabs(role='tablist')
+        //-   li.active(role='presentation')
+        //-     a(href='#home', aria-controls='home', role='tab', data-toggle='tab') Description
+        //-   li(role='presentation')
+        //-     a(href='#profile', aria-controls='profile', role='tab', data-toggle='tab')
+        //-       | Reviewa 
+        //-       span.badge(style="background-color:#22258c") 12
+        //-   li(role='presentation')
+        //-     a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab') Messages
+        //- .tab-content
+        //-   #home.tab-pane.active(role='tabpanel')
+        //-     div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
+        //-       div(style="padding:20px")!=experimental_render(post)
+        //-   #profile.tab-pane(role='tabpanel')
+        //-     div
+        //-       .panel.panel-default
+        //-         .panel-heading 
+        //-           .radio
+        //-             label
+        //-               input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+        //-               | 好评
+        //-             label
+        //-               input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+        //-               | 中评
+        //-             label
+        //-               input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+        //-               | 差评
+        //-             label(style="float:right")
+        //-               input#haveContent(type="checkbox", name="haveContent") 
+        //-               | 显示内容
+        //-         ul.list-group
+        //-           -for(var l=0;l<9;l++)
+        //-             li.list-group-item 
+        //-               .media
+        //-                 .media-left.media-middle
+        //-                   a(href='#')
+        //-                     img.media-object(src='/avatar/74847', alt='...', style="width:64px")
+        //-                 .media-body
+        //-                   p(style="font-size:large").media-heading 
+        //-                   | Kris
+        //-                   span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
+        //-                   span(style="font-size:xx-small;color:#ddd") 2020.01.01 12:12:12
+        //-                   p 我觉得行 
+        //-   #messages.tab-pane(role='tabpanel')
+        //-     div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
+        //-       div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
+        //-         div
+        //-           | Drand Name：
+        //-           b(target='_blank') 科创仪表局
+        //-       p(style="padding:5px 20px")
+        //-         em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
+        //-       .row(style="padding:0 20px 18px")
+        //-         -for(var a=0;a<16;a++)
+        //-           .col-sm-6.col-md-4
+        //-             p parameter: value
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')

@@ -266,8 +266,8 @@ threadRouter
 		});
 		if(thread.type == "product") {
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
-			data.products = await db.ShopGoodsModel.extendProductsInfo(products);
-			// data.products = products;
+			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
+			data.product = productArr[0];
 		}
     await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
 		await thread.extendLastPost();

@@ -3,6 +3,7 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
+  -const product = data.product;
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
   
@@ -71,6 +72,9 @@ block title
       top: 5px;
       position: absolute;
     }
+    .activeIndex {
+      background-color: red;
+    }
 block content
 
   .container-fluid(style='max-width: 1400px;')
@@ -136,40 +140,36 @@ block content
       .col-xs-12.col-md-12(style="margin-bottom:30px")
         .col-xs-12.col-md-4
           ul#etalage
-            -for(let rid of data.productInfo.imgIntroductions)
+            -for(let rid of product.imgIntroductions)
               li
                 img.etalage_thumb_image(src=`/r/${rid}`)
                 img.etalage_source_image(src=`/r/${rid}`)
 
         .col-xs-12.col-md-7
-          h3.item=`${data.productInfo.productName}`
-          p.item=`${data.productInfo.productDescription}`
+          h3.item=`${product.post.t}`
+          p.item=`${product.post.abstract}`
           div.item(style="background:#c7fff8")
             div(style="padding:7px 0;color:#333")
               p
                 span.title 价格
-                -if(data.productInfo.useRebate)
+                -if(product.productParams[0].useDiscount)
                   span
-                    del=`${data.productInfo.productOriginalPrice}`
+                    del=`${product.productParams[0].originPrice}`
                 -else
-                  span=`${data.productInfo.productOriginalPrice}`
-              -if(data.productInfo.useRebate)
+                  span=`${product.productParams[0].originPrice}`
+              -if(product.productParams[0].useDiscount)
                 p
                   span.title 促销价
-                  span(style="color:orangered;font-size:x-large;font-family:fantasy")=`${data.productInfo.productFinalPrice}`
+                  span(style="color:orangered;font-size:x-large;font-family:fantasy")=`${product.productParams[0].price}`
           div.item
             p
               span.title 支付方式
-              -if(data.productInfo.productPayMethod == "kcb")
+              -if(product.payMethod == "kcb")
                 span(style="font-weight:bolder") 科创币
-              -else if(data.productInfo.productPayMethod == "rmb")
+              -else if(product.payMethod == "rmb")
                 span(style="font-weight:bolder") 人民币
-              -else if(data.productInfo.productPayMethod == "kar")
+              -else if(product.payMethod == "all")
                 span(style="font-weight:bolder") 混合付款:&nbsp;
-                span 科创币
-                span(style="font-weight:bolder;color:red")=`${data.productInfo.priceKCB}`
-                span &nbsp;&nbsp;人民币
-                span(style="font-weight:bolder;color:red")=`${data.productInfo.priceRMB}`
           div.item(style="border-bottom: 1px solid #e5e5e5")
             p
               span.title Freight
@@ -183,14 +183,21 @@ block content
             p
               span.title Add time
               span.location 2018-10-23
-          div.item
+          div.item(style="border-bottom: 1px solid #e5e5e5")
             p
               span.title Number Of Products
               span
                 input(type="number", name="", value="1")
               span.title 库存
-              span=`${data.productInfo.stockTotalCount}`
+              span=`${product.productParams[0].stocksTotal}`
               span.title 件
+          .item
+            .row
+              span.title.col-xs-1(style="padding-right:0") 选择规格
+              span.col-xs-10
+                for para in product.productParams
+                  span(class=para._id == "9"?"activeIndex":"", href='#',style="margin-right:5px;margin-bottom:5px" onclick="choiceProductParams(this)" index=`${para._id}`)
+                    span(data-spm-anchor-id='a220o.1000855.0.i4.3f9467307UqZkq')!=`${para.index}`
           div.item
             a.btn.btn.buy(href='#', role='button') Buy
             a.btn.btn.addCart(href='#', role='button') 
@@ -262,7 +269,7 @@ block content
             .tab-content
               #home.tab-pane.active(role='tabpanel')
                 div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
-                  div(style="padding:20px")!=data.productInfo.productDetails
+                  div(style="padding:20px")!=experimental_render(product.post)
               #profile.tab-pane(role='tabpanel')
                 div
                   .panel.panel-default
@@ -310,6 +317,7 @@ block scripts
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/external_pkgs/citySet/city.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
+  +includeJS('/shop/product/product.js')
   script.
     $(document).ready(function(){
       $('#etalage').etalage({

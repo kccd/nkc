@@ -169,16 +169,20 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
     user: true,
     store: true,
     post: true,
-    thread: true
+    thread: true,
+    productParam: true
   };
   o = Object.assign(options, o);
   const UserModel = mongoose.model('users');
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
+  const ShopStoresModel = mongoose.model('shopStores');
+  const ShopProductsParamsModel = mongoose.model('shopProductsParams');
   const uid = new Set(), userObj = {};
   const pid = new Set(), postObj = {};
   const tid = new Set(), threadObj = {};
   const storesId = new Set(), storeObj = {};
+  const productId = new Set(), productParamObj = {};
   products.map(p => {
     if(o.user)
       uid.add(p.uid);
@@ -188,8 +192,10 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
       pid.add(p.oc);
     if(o.thread)
       tid.add(p.tid);
+    if(o.productParam)
+      productId.add(p.productId);
   }); 
-  let users, stores, posts, threads;
+  let users, stores, posts, threads, productParams;
   if(o.user) {
     users = await UserModel.find({uid: {$in: [...uid]}});
     for(const user of users) {
@@ -214,6 +220,12 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
       postObj[post.pid] = post;
     }
   }
+  if(o.productParam) {
+    for(const productParam of productId) {
+      productParams = await ShopProductsParamsModel.find({productId: productParam});
+      productParamObj[productParam] = productParams;
+    }
+  }
   return await Promise.all(products.map(p => {
     const product = p.toObject();
     if(o.user) product.user = userObj[p.uid];
@@ -226,6 +238,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
       product.abstract = post.abstract;
     }
     if(o.thread) product.thread = threadObj[p.tid];
+    if(o.productParam) product.productParams = productParamObj[p.productId];
     return product;
   }));
 };

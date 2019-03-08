@@ -68,5 +68,14 @@ schema.statics.findById = async (id) => {
   if(!productParam) throwErr(404, `未找到ID为【${id}】的产品规格`);
   return productParam;
 };
+
+/**
+ * 拓展规格名称
+ * @productParams 对象数组
+ */
+schema.static.extendParamName = async (productParams) => {
+  console.log(productParams);
+  return productParams;
+}
 const ShopProductParamMode = mongoose.model('shopProductsParams', schema);
 module.exports = ShopProductParamMode;
