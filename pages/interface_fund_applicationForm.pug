@@ -356,24 +356,25 @@ block content
                   mixin pointer(s1, s2 , text, r)
                     -const passed = s1? 'passed': '';
                     -let info = '';
-                    if s1 
-                      -info= '完成';
-                    else
-                      if r.verify
+                    if r
+                      if s1 
                         -info= '完成';
-                      else  
-                        if r.status
-                          -info= '未确认';
-                        else 
-                          if r.passed  
-                            -info= '已申请';
-                          else if r.passed === false
-                            -info= '未通过'
-                          else
-                            if r.apply
+                      else
+                        if r.verify
+                          -info= '完成';
+                        else  
+                          if r.status
+                            -info= '未确认';
+                          else 
+                            if r.passed  
                               -info= '已申请';
-                            else 
-                              -info='未申请';    
+                            else if r.passed === false
+                              -info= '未通过'
+                            else
+                              if r.apply
+                                -info= '已申请';
+                              else 
+                                -info='未申请';    
                     li(class=passed)= text + info
                     if(s1 === true && s2 !== true && displayNext)
                       li.next
