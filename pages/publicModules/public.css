@@ -241,3 +241,6 @@
 .clear-focus-line.active:focus {
     outline: none;          
 }
+.cp{
+  cursor: pointer;
+}
