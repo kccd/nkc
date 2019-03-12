@@ -65,6 +65,11 @@ const kcbsRecordSchema = new Schema({
     default: '',
     index: 1
   },
+  verify: {
+    type: Boolean,
+    index: 1,
+    default: true,
+  },
   c: {
     type: Schema.Types.Mixed,
     default: {},

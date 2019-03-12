@@ -86,12 +86,13 @@ func.transfer = async (o) => {
 */
 func.receipt = async (o) => {
   let {
-    money, id, title, notes, goodsInfo
+    money, id, title, notes, goodsInfo, returnUrl
   } = o;
   if(!id) throwErr('支付宝收款ID不能为空');
   if(!money || money <= 0) throwErr('支付宝转账金额不能小于0');
   if(!title) throwErr('订单标题不能为空');
   if(!notes) throwErr('订单描述不能为空');
+  if(!returnUrl) throwErr('跳转地址不能为空');
   goodsInfo = goodsInfo || [];
   const goods_detail = [];
   for(const g of goodsInfo) {
@@ -123,7 +124,7 @@ func.receipt = async (o) => {
     charset: 'UTF-8',
     method: 'alipay.trade.page.pay',
     notify_url: 'https://soccos.cn/test',
-    return_url: 'http://a.test/shop',
+    return_url: returnUrl,
     sign_type: 'RSA2',
     timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
     version: '1.0'

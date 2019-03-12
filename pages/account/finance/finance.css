@@ -55,5 +55,6 @@
   width: 10rem;
   font-size: 1.4rem;
   border: 1px solid #eee;
-  background-color: #ffc253;
+  background-color: #ffa500;
+  border-radius: 3px;
 }
