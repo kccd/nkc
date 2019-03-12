@@ -105,19 +105,111 @@ block content
                       span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
                       br
                       a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
-            if data.reports.length !== 0
-              hr
-              br
-              h4(style=`font-weight:600;`) 最新进展
-              -for(let r of data.reports)
-                .report
-                  h4
-                    span 发表于&nbsp;
-                    span.text-info= r.toc.toLocaleString()
-                  -r.c = hideContentByUser(r.c, data.user, 'thread');
-                  div!= experimental_render(r)
-                  br
-              br
+
+
+            //- 拨款详情
+            .panel.panel-default.m-t-1
+              .panel-body
+                h3.text-center= `拨款详情`
+                table.table
+                  thead
+                    tr
+                      th #
+                      th 金额
+                      th 状态
+                  tbody
+                    -for(let i = 0; i < applicationForm.remittance.length; i++)
+                      -const r = applicationForm.remittance[i];
+                      tr
+                        th= `第${i+1}期`
+                        th= `${r.money}元`
+                        if r.status
+                          th.greenFontColor= `已拨款`
+                        else
+                          th= `未拨款`            
+
+            //- 最新进展
+            .panel.panel-default
+              .panel-body
+                h3.text-center= `最新进展`
+                .timer-shaft
+                  if status.completed
+                    if applicationForm.threadsId.completed
+                      h4 结题报告
+                      -for(let t of applicationForm.threads.completed)
+                        h4
+                          a(href=`/t/${t.tid}` target='_blank')= t.firstPost.t
+                    div.time!= `${fromNow(applicationForm.timeOfCompleted)}&nbsp;&nbsp;&nbsp;${applicationForm.timeOfCompleted.toLocaleString()}`
+                      div(style='position: absolute;')
+                    div.content=`完成`
+                  -const length = data.reports.length;
+                  -for(let i = 0; i < data.reports.length; i++)
+                    -const r = data.reports[i];
+                    if r.type === 'userInfoAudit'
+                      if r.support
+                        -r.c = `用户信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;
+                      else
+                        -r.c = `用户信息未通过审核，等待申请人修改。审核意见：${r.c}`;
+                    if r.type === 'projectAudit'
+                      if r.support
+                        -r.c = `项目信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;
+                      else
+                        -r.c = `项目信息未通过审核，等待申请人修改。审核意见：${r.c}`;
+                    if r.type === 'moneyAudit'
+                      -const str = applicationForm.fixedMoney?'资金用途': '资金预算';
+                      if r.support
+                        -r.c = `${str}通过审核${r.c?`。审核评语：${r.c}`: ''}`;
+                      else
+                        -r.c = `${str}未通过审核，等待申请人修改。审核意见：${r.c}`;
+                    if r.type === 'adminAudit'
+                      if r.support
+                        -r.c = `管理员复核通过，开始项目${r.c?`。审核评语：${r.c}`: ''}`;
+                      else
+                        -r.c = `管理员复核未通过，等待申请人修改。审核意见：${r.c}`;
+                    if r.type === 'completedAudit'
+                      if r.support
+                        -r.c = `结题报告审核通过${r.c?`。审核评语：${r.c}`: ''}`;
+                      else
+                        -r.c = `结题报告审核未通过，等待申请人修改。审核意见：${r.c}`;
+                    if r.type === 'vote'
+                      if r.support
+                        -r.c = `网友 ${r.user.username} 表示的支持${r.c?`。并说：${r.c}`: ''}`;
+                      else
+                        -r.c = `网友 ${r.user.username} 表示反对。并说：${r.c}`;
+                    if r.type === 'remittance'
+                      if !r.support
+                        -r.c = `拨款失败：${r.c}`;
+                    div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
+                      div(style='position: absolute;')
+                      if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
+                        span &nbsp;&nbsp;
+                        if r.disabled
+                          a(href=`javascript: disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
+                        else
+                          a(href=`javascript: disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
+                    div.content(style=i === length-1?`border: none;`:'')
+                      -r.c = hideContentByUser(r.c, data.user, 'thread')
+                      if r.support === false
+                        div.redFontColor!= experimental_render(r)
+                      else if r.support === true
+                        div.greenFontColor!= experimental_render(r)
+                      else
+                        div!= experimental_render(r)  
+
+
+            //- if data.reports.length !== 0
+            //-   hr
+            //-   br
+            //-   h4(style=`font-weight:600;`) 最新进展
+            //-   -for(let r of data.reports)
+            //-     .report
+            //-       h4
+            //-         span 发表于&nbsp;
+            //-         span.text-info= r.toc.toLocaleString()
+            //-       -r.c = hideContentByUser(r.c, data.user, 'thread');
+            //-       div!= experimental_render(r)
+            //-       br
+            //-   br
             h4 发表评论
             if !data.user
               h4.redFontColor 您还没有登录，请先登录。
@@ -261,9 +353,28 @@ block content
               h5.text-center 状态
               .fund-apply-status
                 ul
-                  mixin pointer(s1, s2 , text)
+                  mixin pointer(s1, s2 , text, r)
                     -const passed = s1? 'passed': '';
-                    li(class=passed)= text
+                    -let info = '';
+                    if s1 
+                      -info= '完成';
+                    else
+                      if r.verify
+                        -info= '完成';
+                      else  
+                        if r.status
+                          -info= '未确认';
+                        else 
+                          if r.passed  
+                            -info= '已申请';
+                          else if r.passed === false
+                            -info= '未通过'
+                          else
+                            if r.apply
+                              -info= '已申请';
+                            else 
+                              -info='未申请';    
+                    li(class=passed)= text + info
                     if(s1 === true && s2 !== true && displayNext)
                       li.next
                         sapn.glyphicon.glyphicon-menu-down
@@ -277,9 +388,9 @@ block content
                       -const r = applicationForm.remittance[i];
                       -const r2 = applicationForm.remittance[1+i];
                       if r2
-                        +pointer(r.status && r.verify, r2.status && r2.verify, `第${i+1}期拨款（${r.money}元）`)
+                        +pointer(r.status && r.verify, r2.status && r2.verify, `第${i+1}期拨款（${r.money}元）`, r)
                     -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
-                    +pointer(lastRemittance.status&&lastRemittance.verify, completed, `第${count}期拨款（${lastRemittance.money}元）`)
+                    +pointer(lastRemittance.status&&lastRemittance.verify, completed, `第${count}期拨款（${lastRemittance.money}元）`, lastRemittance)
                   else
                     +pointer(adminSupport, remittance,'管理员复核')
                     +pointer(remittance, completed, '拨款')
