@@ -10,13 +10,14 @@ shelfRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body, tools, settings} = ctx;
     const {user} = data;
-    const {
+    let {
       productName,
       productDescription,
       productDetails,
       mainForumsId,
       imgIntroductions,
       imgMaster,
+      freightPrice,     
       stockCostMethod,
       productStatus,
       shelfTime,
@@ -85,6 +86,9 @@ shelfRouter
         if(p.originPrice < p.price) ctx.throw(400, '商品优惠价必须小于商品原价');
       }
     }
+    if(!shelfTime) {
+      shelfTime = new Date();
+    }
     // 发表商品文章
     const options = {
       title: productName,
@@ -121,6 +125,7 @@ shelfRouter
       stockCostMethod,
       productStatus,
       shelfTime,
+      freightPrice,     
       storeId,
       params: paramsInfo,
       uid: user.uid

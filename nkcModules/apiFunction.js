@@ -1,5 +1,6 @@
 const paging = require('../settings/paging');
 const moment = require('moment');
+const http = require("http");
 moment.locale('zh-cn');
 let {perpage} = paging;
 let fn = {};
@@ -381,4 +382,39 @@ fn.doExchange = (arr) => {
     return arr[0];
   }
 }
+
+
+// 查询所在地理位置，只取结果的省市
+fn.getIpAddress = (ip) => {
+  let options = {
+    hostname: `iploc.market.alicloudapi.com`,    //接口域
+    path: `/v3/ip?ip=${ip}`,    //请求地址
+    headers: {    //请求头
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "APPCODE 90286cebbb4f49e3b97bf33c93a94cc3"
+    }
+  }
+  return new Promise((resolve, reject) => {
+      // 发起请求
+      let req = http.request(options, res => {
+          let chunks = [];
+          res.on('data', chunk => {
+              chunks.push(chunk);
+          })
+          res.on('end', () => {
+              let buffer = Buffer.concat(chunks).toString();
+              // 如果接口返回空值
+              let data = buffer ? JSON.parse(buffer) : {code: 1, data: 'ip接口没有返回值'};
+              resolve(data);
+          })
+      })
+      // 请求出错
+      req.on('error', err => {
+          resolve({code: 1, data: "请求ip接口出错"});
+      })
+      // 请求结束
+      req.end();
+  })
+}
+
 module.exports = fn;

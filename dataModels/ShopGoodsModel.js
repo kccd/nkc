@@ -82,7 +82,7 @@ const shopGoodsSchema = new Schema({
   // 自定义商品参数(不参与搜索)
   params: {
     type: [],
-    required: true
+    default: [],
   },
   //商品介绍图
   imgIntroductions:{
@@ -104,6 +104,11 @@ const shopGoodsSchema = new Schema({
    * @payReduceStock 付款减库存
    * @orderReduceStock 下单减库存
    */
+  // 运费价格
+  freightPrice: {
+    type: Number,
+    default: 0
+  },
   stockCostMethod: {
     type: String,
     default: "payReduceStock"
@@ -223,6 +228,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   if(o.productParam) {
     for(const productParam of productId) {
       productParams = await ShopProductsParamsModel.find({productId: productParam});
+      productParams = await ShopProductsParamsModel.extendParamsInfo(productParams)
       productParamObj[productParam] = productParams;
     }
   }

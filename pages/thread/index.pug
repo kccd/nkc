@@ -273,7 +273,7 @@ block content
                           div.thread-content.ThreadPostBody!= experimental_render(post)
                         else if data.thread.type == "product"
                           div.thread-content.ThreadPostBody
-                          include ./product/product.pug
+                            include ./product/product.pug
                         +postEditTime(post)
                         +postCredits(data.posts[0])
                       else
@@ -460,5 +460,6 @@ block scripts
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/shop/shop.js')
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)

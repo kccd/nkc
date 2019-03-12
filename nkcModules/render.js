@@ -152,6 +152,12 @@ function delCodeAddShrink(content){
 	return content
 }
 
+// 去除全部标签
+function delAllCode(content) {
+	content = content.replace(/<[^>]+>/g,"");
+	return content;
+}
+
 // 根据学术分隐藏内容
 function hideContentByUser(content, user={xsf: 0}, from) {
 	// console.log(content.match(/\[hide=([0-9]{1,3})](.+?)\[\/hide]/igm))
@@ -287,6 +293,26 @@ function ensureFundOperatorPermission(type, user, fund) {
 	}
 }
 
+function getProvinceCity(str) {
+	var addressArr = str.split("/");
+	var province;
+	var city;
+	var address
+	if(addressArr[0]) {
+		province = addressArr[0]
+	}
+	if(addressArr[1]) {
+		city = addressArr[1];
+	}
+	address = province + "/" + city;
+	return address;
+}
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -311,6 +337,9 @@ let pugRender = (template, data, state) => {
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
 		startTime: global.NKC.startTime,
+		getProvinceCity: getProvinceCity,
+		numToFloatTwo: numToFloatTwo,
+		delAllCode: delAllCode,
     // 翻译 type: 语言分类, words：关键字
     lang: (type, words) => {
       return language[type][words];

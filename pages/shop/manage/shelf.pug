@@ -144,6 +144,18 @@ block name
                     b(style="color:red")  （付款减库存，存在超卖风险）
       .panel.panel-info
         .panel-heading
+          | 运费物流
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 运费价格
+              .col-sm-5
+                .input-group
+                  input.form-control#freightPrice(type='number', placeholder="总运费=单件运费价格*商品数量", aria-describedby='stockQuantity')
+                  span.input-group-addon 元
+
+      .panel.panel-info
+        .panel-heading
           | 支付信息
         .panel-body
           .form-horizontal

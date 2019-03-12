@@ -97,7 +97,11 @@ schema.statics.extendParamsInfo = async (params, o) => {
       const arr = p.index.split('-');
       let name = [];
       for(let i = 0; i < arr.length; i++) {
-        name.push(param.product.params[i].values[arr[i]]);
+        if(param.product.params.length !== 0){
+          name.push(param.product.params[i].values[arr[i]]);
+        }else{
+          name.push("无规格");
+        }
       }
       param.name = name;
     }
@@ -110,7 +114,6 @@ schema.statics.extendParamsInfo = async (params, o) => {
  * @productParams 对象数组
  */
 schema.static.extendParamName = async (productParams) => {
-  console.log(productParams);
   return productParams;
 }
 const ShopProductParamMode = mongoose.model('shopProductsParams', schema);

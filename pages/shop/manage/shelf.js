@@ -169,7 +169,12 @@ function submitToShelf() {
 
   var params = tableTurnParams();
   var productParams = obtainProductPrice();
-
+  // 获取物流价格
+  var freightPrice = $("#freightPrice").val();
+  freightPrice = Number(freightPrice);
+  if(isNaN(freightPrice) || freightPrice < 0) {
+    throw("运费价格不可小于0,不可为空");
+  }
   // 组装上传数据
   var post = {
     productName: productName,
@@ -180,6 +185,7 @@ function submitToShelf() {
     // stockTotalCount: Number(stockTotalCount),
     // stockSurplusCount: Number(stockTotalCount),
     stockCostMethod: stockCostMethod,
+    freightPrice: freightPrice,
     payMethod: payMethod,
     productStatus: productStatus,
     shelfTime: shelfTime,
@@ -428,10 +434,7 @@ function tableTurnParams() {
     params.push(obj)
   })
   if(params.length == 0){
-    params = [{
-      name: "",
-      value: []
-    }]
+    params = []
   }
   return params;
 }
@@ -632,7 +635,7 @@ function obtainProductPrice() {
     // 如果不使用自定义多规格
     var params = {
       name: "",
-      value: []
+      values: []
     };
     originalPrice = $("#originalPrice").val();
     if(!originalPrice) throw("请输入商品价格");

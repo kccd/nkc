@@ -72,8 +72,9 @@ threadRouter
 		await next();
 	})
 	.get('/:tid', async (ctx, next) => {
-		const {data, params, db, query, nkcModules} = ctx;
-		const {token} = query;
+		const {data, params, db, query, nkcModules, body} = ctx;
+		const ip = ctx.address;
+		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step} = query;
 		const {tid} = params;
 		data.highlight = highlight;
@@ -268,7 +269,24 @@ threadRouter
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
 			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
 			data.product = productArr[0];
+			// 选定规格
+			let paId = 0;
+			for(let a=0;a<data.product.productParams.length;a++){
+				if(paraId == data.product.productParams[a]._id){
+					paId = a;
+				}
+			}
+			data.paId = paId;
+			data.paraId = paraId;
 		}
+		// 获取用户地址信息
+		let ipInfo = await nkcModules.apiFunction.getIpAddress("192.168.11.114");
+		let userAddress;
+		const {status, province, city} = ipInfo;
+		if(status && status == "1"){
+			userAddress = province + " " + city;
+		}
+		data.userAddress = userAddress;
     await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
 		await thread.extendLastPost();
 		if(data.user) {
