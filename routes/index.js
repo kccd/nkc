@@ -28,6 +28,7 @@ const lotteryRouter = routers.lottery;
 const examRouter = routers.exam;
 const forgotPasswordRouter = routers.forgotPassword;
 const shopRouter = routers.shop;
+const accountRouter = routers.account;
 
 
 // 所有请求先经过此中间件
@@ -97,4 +98,5 @@ router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());
 router.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
+router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
 module.exports = router;

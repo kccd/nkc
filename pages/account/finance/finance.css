@@ -1,0 +1,38 @@
+.default-panel{
+  text-align: center;
+  border: 1px solid #eee;
+  height: 10rem;
+  position: relative;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+.default-panel>div{
+  height: 5rem;
+  line-height: 5rem;
+  cursor: pointer;
+}
+.default-panel .kcb{
+  border-bottom: 1px solid #eee;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #a94442;
+}
+.default-panel .kcb input{
+  height: 2rem;
+  font-size: 1.4rem;
+  max-width: 100%;
+
+}
+.default-panel.active{
+  border: 1px solid #337ab7;
+}
+.default-panel .pointer{
+  position: absolute;
+  bottom: 0;
+  height: 2rem;
+  width: 2rem;
+  line-height: 2rem;
+  right: 0;
+  color: #fff;
+  background-color: #337ab7;
+}

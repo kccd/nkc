@@ -1,0 +1,103 @@
+extends ../../bootstrap_base
+block title
+  title 账单
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4 我的资产 
+          small.p-l-1.text-success 科创币&nbsp;
+            strong.h4.text-danger= data.user.kcb
+            |&nbsp;个
+          .display-i-b.p-l-1 
+            a.btn.btn-success.btn-sm(href='/account/finance/recharge') 充值
+            span &nbsp;
+            a.btn.btn-default.btn-sm(href='/account/finance/withdraw') 提现
+      .col-xs-12.col-md-12.m-b-1
+        .ul.nav.nav-tabs  
+          li(role='presentation' class=!data.t?'active':'')
+            a(href=`/account/finance`) 收入
+          li(role='presentation' class=data.t==='payout'?'active':'')
+            a(href=`/account/finance?t=payout`) 支出  
+          li(role='presentation' class=data.t==='all'?'active': '')
+            a(href=`/account/finance?t=all`) 所有  
+      .col-xs-12.col-md-12
+        include ../../interface_navigation_paging  
+      .col-xs-12.col-md-12(style='font-size: 1rem;')
+        if data.t !== 'all'
+          table.table.table-bordered  
+            thead
+              tr
+                th 时间
+                th 类型
+                th 说明
+                th
+                  if !data.t 
+                    span 支付者
+                  else if data.t === 'payout'
+                    span 收款人
+                th 金额
+                th 其他
+            tbody
+              for record in data.kcbsRecords
+                tr  
+                  th= record.toc.toLocaleString()
+                  th= lang('kcbsTypes', record.type)
+                  th= record.description
+                  th  
+                    -let targetUser;
+                    if !data.t
+                      -targetUser = record.fromUser
+                    else 
+                      -targetUser = record.toUser  
+                    if !targetUser
+                      span 科创人民很行
+                    else 
+                      span= targetUser.username  
+                  th= record.num    
+                  th
+                    if record.pid
+                      a(href=`/p/${record.pid}` target='_blank')=`文号(${record.pid})`
+          if !data.kcbsRecords.length
+            .text-center 暂无记录        
+        else 
+          table.table.table-bordered  
+            thead
+              tr
+                th 时间
+                th 类型
+                th 说明
+                th 交易对象
+                th 收入
+                th 支出
+                th 其他
+            tbody
+              for record in data.kcbsRecords
+                tr  
+                  th= record.toc.toLocaleString()
+                  th= lang('kcbsTypes', record.type)
+                  th= record.description
+                  th  
+                    if record.to === user.uid
+                      if !record.fromUser
+                        span 科创人民很行
+                      else 
+                        a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
+                    else
+                      if !record.toUser
+                        sapn 科创人民很行
+                      else 
+                        a(href=`/u/${record.to}` target="_blank")= record.toUser.username
+                  th
+                    if record.to === user.uid
+                      span= record.num
+                  th
+                    if record.from === user.uid    
+                      span= record.num
+                  th
+                    if record.pid
+                      a(href=`/p/${record.pid}` target='_blank')=`文号(${record.pid})`
+          if !data.kcbsRecords.length
+            .text-center 暂无记录            
+      .col-xs-12.col-md-12
+        include ../../interface_navigation_paging              

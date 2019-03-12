@@ -61,18 +61,6 @@ const shopOrdersSchema = new Schema({
   productsCounts: {
     type: Number,
     default: 0
-  },
-  // 开店时间
-  startBusinessToc: {
-    type: Date,
-    default: Date.now,
-    index: 1
-  },
-  // 关店时间
-  stopBusinessToc: {
-    type: Date,
-    default: Date.now,
-    index: 1
   }
 }, {
   collection: 'shopOrders'
