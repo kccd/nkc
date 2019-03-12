@@ -153,9 +153,11 @@ input[type="radio"], input[type="checkbox"]{
 }
 .redFontColor{
   color: red;
+  font-size: 1.4rem;
 }
 .greenFontColor{
   color: green;
+  font-size: 1.4rem;
 }
 .greenColor{
   color: green;

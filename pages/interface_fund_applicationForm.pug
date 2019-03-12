@@ -179,6 +179,9 @@ block content
                     if r.type === 'remittance'
                       if !r.support
                         -r.c = `拨款失败：${r.c}`;
+                    if ['remittance', 'completedAudit', 'adminAudit', 'moneyAudit', 'projectAudit', 'userInfoAudit'].includes(r.type)
+                      -r.c = r.c.replace(/\n/g, '<br/>');
+                      -r.c = r.c.replace(/\s/g, '&nbsp;');
                     div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
                       div(style='position: absolute;')
                       if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
