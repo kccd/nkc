@@ -52,6 +52,7 @@ const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
 const shop = require('./shop');
+const account = require('./account');
 const operationObj = {};
 
 
@@ -172,7 +173,9 @@ operationObj.operationTree = {
 
 		lottery, // 抽奖页
 
-		shop, //商城
+    shop, //商城
+    
+    account, // 个人中心
 	}
 };
 module.exports = operationObj;

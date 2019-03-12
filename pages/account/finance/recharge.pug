@@ -1,0 +1,37 @@
+extends ../../bootstrap_base
+block title
+  title 科创币充值
+  +includeCSS('/account/finance/finance.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        .row
+          .col-xs-12.col-xs-12
+            h4 我的资产 
+              small.p-l-1.text-success 科创币&nbsp;
+                strong.h4.text-danger= data.user.kcb
+                |&nbsp;个
+          .col-xs-12.col-xs-12
+            .ul.nav.nav-tabs  
+              li(role='presentation' class='active')
+                a(href=`/account/finance/recharge`) 充值
+              li(role='presentation')
+                a(href=`/account/finance/withdraw`) 提现
+          .col-xs-12.col-xs-12.m-t-1#app(v-cloak)
+            .row
+              .col-xs-4.col-md-4(v-for='d in defaultKCB')
+                .default-panel(:class="{'active': money === d}" @click='select(d)')
+                  .pointer(v-if='money === d')
+                    .fa.fa-check
+                  .kcb {{d}}KCB
+                  .rmb {{d}}元 
+              .col-xs-4.col-md-4
+                .default-panel(:class="{'active': !money}" @click='select("")')
+                  .pointer(v-if='!money')
+                    .fa.fa-check
+                  .kcb 
+                    input(placeholder='自定义' v-model.number='input' type='number')
+                  .rmb {{input || 0}}元     
+block scripts
+  +includeJS('/account/finance/recharge.js')                  

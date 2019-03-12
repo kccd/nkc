@@ -1,0 +1,32 @@
+{
+
+  "creditKcb": "鼓励",
+  "lottery": "随机红包",
+  "updateKcb": "换发新币",
+  "inherit": "其它未登记详情的记录",
+  "share": "分享",
+  "shareRegister": "分享注册",
+  "digestThreadAdditional": "文章被评为精选的额外奖励",
+  "digestPostAdditional": "回复被评为精选的额外奖励",
+
+  "dailyLogin": "日常登陆",
+  "violation": "违规",
+  "postToThread": "回复文章",
+  "postToForum": "发表文章",
+  "threadBlocked": "文章被屏蔽",
+  "postBlocked": "回复被屏蔽",
+  "subscribeForum": "关注专业",
+  "unSubscribeForum": "取消关注专业",
+  "followed": "被用户关注",
+  "unFollowed": "被用户取消关注",
+  "fundDonation": "基金捐款",
+  "liked": "回复被赞",
+  "unLiked": "取消回复被赞",
+  "reportIssue": "上报问题",
+  "modifyUsername": "修改用户名",
+  "digestThread": "文章被加精",
+  "unDigestThread": "文章被取消加精",
+  "waterPay": "购买水印服务",
+  "digestPost": "回复被加精",
+  "unDigestPost": "回复被取消加精"
+}

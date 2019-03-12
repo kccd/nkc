@@ -6,9 +6,13 @@ const openStoreRouter = require('./openStore');
 const storeRouter = require('./store');
 const accountRouter = require('./account');
 const cartRouter = require('./cart');
+const orderRouter = require('./order');
 shopRouter
   .get('/', async (ctx, next) => {
     const {data, db ,query, params} = ctx;
+    console.log(`支付宝return_url-----------------`);
+    console.log(query);
+    console.log(`支付宝return_url-----------------`);
     const homeSetting = await db.ShopSettingsModel.findOne({type:"homeSetting"});
     // 取出精选商品
     let featuredItems = await db.ShopGoodsModel.find({productId:{$in:homeSetting.featureds}});
@@ -33,5 +37,6 @@ shopRouter
   .use('/openStore', openStoreRouter.routes(), openStoreRouter.allowedMethods())
   .use('/cart', cartRouter.routes(), cartRouter.allowedMethods())
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
+  .use('/order', orderRouter.routes(), orderRouter.allowedMethods())
 	.use('/store', storeRouter.routes(), storeRouter.allowedMethods())
 module.exports = shopRouter;

@@ -96,13 +96,15 @@ userRouter
 			const count = subscribeUsers.length;
 			paging = apiFunction.paging(page, count);
 			subscribeUsers.slice(paging.start, paging.start + paging.perpage);
-			data.targetUsers = await Promise.all(subscribeUsers.map(uid => db.UserModel.findOnly({uid})));
+      data.targetUsers = await Promise.all(subscribeUsers.map(uid => db.UserModel.findOnly({uid})));
+      await db.UserModel.extendUsersInfo(data.targetUsers);
 		} else if (type === 'fans') {
 			let {subscribers} = targetUserSubscribe;
 			const count = subscribers.length;
 			paging = apiFunction.paging(page, count);
 			subscribers.slice(paging.start, paging.start + paging.perpage);
-			data.targetUsers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
+      data.targetUsers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
+      await db.UserModel.extendUsersInfo(data.targetUsers);
 		} else {
 
       const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
