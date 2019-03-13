@@ -21,6 +21,43 @@ const shopOrdersSchema = new Schema({
     type: String,
     index: 1
   },
+  // 规格id
+  paramId: {
+    type: String,
+    index: 1
+  },
+  // 购买者uid
+  uid: {
+    type: String,
+  },
+  // 数量
+  count: {
+    type: Number,
+    default: 1
+  },
+  // 订单原始总价
+  orderOriginPrice: {
+    type: Number
+  },
+  // 订单最终总价格
+  orderPrice: {
+    type: Number,
+  },
+  // 收货地址
+  receiveAddress: {
+    type: String,
+    default: ""
+  },
+  // 收货人姓名
+  receiveName: {
+    type: String,
+    default: ""
+  },
+  // 收货人电话
+  receiveTel: {
+    type: String,
+    default: ""
+  },
   // 下单时间
   orderToc: {
     type: Date,
@@ -36,10 +73,10 @@ const shopOrdersSchema = new Schema({
   },
   /**
    * 订单状态
-   * @已发货 shipped
-   * @未发货 unshipped
-   * @已签收 received
-   * @订单完成 completed
+   * @待付款 unCost
+   * @待发货 unShip
+   * @待收货 unSign
+   * @订单完成 finish
    */
   orderStatus: {
     type: String
@@ -57,11 +94,6 @@ const shopOrdersSchema = new Schema({
   refundStatus: {
     type: String
   },
-  // 商品种类数
-  productsCounts: {
-    type: Number,
-    default: 0
-  }
 }, {
   collection: 'shopOrders'
 });

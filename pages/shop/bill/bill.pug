@@ -1,0 +1,60 @@
+extends ../shopBase
+block shopTitle
+  title 确认账单 | 科创商城
+  -const cartsData = data.cartsData
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        table.table.table-striped
+          thead
+            tr
+              th 商品名称
+              th 属性
+              th 商品单价
+              th 运费
+              th 数量
+              th 小计
+          tbody
+            if data.billType == "cart"
+              for bill in cartsData
+                tr 
+                  td=bill.product.name 
+                  td=bill.productParam.name 
+                  td #{numToFloatTwo(bill.productParam.price)} 
+                  td=bill.product.freightPrice 
+                  td.order(paid=`${bill.productParam._id}`)=bill.count
+                  td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
+            else if data.billType == "product"
+              for bill in cartsData
+                tr
+                  td=bill.product.name
+                  td=bill.name
+                  td #{numToFloatTwo(bill.price)} 
+                  td=bill.product.freightPrice 
+                  td.order(paid=`${bill._id}`)=bill.count
+                  td.subtotal #{numToFloatTwo((bill.price+bill.product.freightPrice)*bill.count)}
+      .col-xs-12.col-md-12
+        div(style="text-align:right")
+          p 
+            span(style="font-weight: bold;") 合计:
+            span(style="font:700 26px tahoma;color:red")#totalPrice
+      .col-xs-12.col-md-12
+        .col-xs-8.col-md-8
+        .col-xs-4.col-md-4
+          div(style="text-align:right")
+            p(style="font-weight: bold;") 实付款
+            p(style="font-weight: bold;") 配送至
+            p(style="font-weight: bold;") 收货人
+            button.btn.btn-danger.btn-lg(onclick="submitOrders()") 立即付款
+
+block shopScripts  
+  +includeJS("/shop/bill/bill.js")
+  script.
+    var totalPrice = 0;
+    $(document).ready(function() {
+      $(".subtotal").each(function(){
+        totalPrice += $(this).text()*100;
+      });
+      $("#totalPrice").text((totalPrice/100).toFixed(2))
+    })

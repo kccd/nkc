@@ -63,5 +63,17 @@ function addProductToCart(paraId) {
 }
 
 /**
- * 获取商铺地址的省市
+ * 生成账单
+ * 直接购买
  */
+function submitProductToBill(paraId) {
+  // 获取商品数量
+  var productCount = $("#buyCount").val();
+  productCount = Number(productCount);
+  if(isNaN(productCount) || productCount < 1) {
+    return screenTopWarning("商品数量输入有误，请检查");
+  }
+  // 获取商品id 
+  var paraId = paraId;
+  window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount
+}

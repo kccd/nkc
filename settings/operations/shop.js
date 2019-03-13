@@ -80,8 +80,11 @@ module.exports = {
       DELETE: 'modifyCartData'
     }
   },
+  bill: {
+    GET: 'visitShopBill',
+    POST: 'submitShopBill'
+  },
   order: {
-    GET: 'visitShopOrder',
-    POST: 'submitShopOrder'
+    POST: 'submitToPay'
   }
 };

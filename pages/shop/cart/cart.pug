@@ -37,7 +37,7 @@ block shopAccountContent
           button(@click='deleteCartData(c)') 删除 
     .text-right.m-t-1.to-create-bill
       span.m-r-2  合计：￥{{total}}
-      a.btn(v-if='selectedId.length' :href="'/shop/order?cartsId=' + selectedId.join('-')") 去结算
+      a.btn(v-if='selectedId.length' :href="'/shop/bill?cartsId=' + selectedId.join('-')") 去结算
       a.btn.disabled(v-else) 去结算
      
 

@@ -204,9 +204,9 @@ block content
                   span(class=para._id == paraId?"activeIndex":"", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                     span=para.name.join()
           div.item
-            a.btn.btn.buy(href='#', role='button') Buy
+            a.btn.btn.buy(role='button' onclick=`submitProductToBill(${paraId})`) 立即购买
             a.btn.btn.addCart(role='button' onclick=`addProductToCart(${paraId})`) 
-              span.fa.fa-shopping-cart  Add To Cart
+              span.fa.fa-shopping-cart  加入购物车
         .col-xs-1.col-md-1 
 
       .col-xs-12.col-md-12

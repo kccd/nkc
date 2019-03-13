@@ -93,6 +93,14 @@ schema.statics.extendParamsInfo = async (params, o) => {
   return await Promise.all(params.map(async p => {
     const param = p.toObject();
     param.product = productObj[p.productId];
+    let goodsOptions = {
+      user: true,
+      store: true,
+      post: true,
+      thread: true,
+      productParam: false
+    };
+    param.product = (await mongoose.model('shopGoods').extendProductsInfo([param.product], goodsOptions))[0];
     if(o.name) {
       const arr = p.index.split('-');
       let name = [];
