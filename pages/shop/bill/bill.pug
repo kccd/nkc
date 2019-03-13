@@ -2,9 +2,12 @@ extends ../shopBase
 block shopTitle
   title 确认账单 | 科创商城
   -const cartsData = data.cartsData
+  +includeCSS('/fund.css')
 block content
   .container-fluid.max-width
     .row
+      .col-xs-12.col-md-12
+        div 选择收货地址
       .col-xs-12.col-md-12
         table.table.table-striped
           thead
@@ -41,12 +44,26 @@ block content
             span(style="font:700 26px tahoma;color:red")#totalPrice
       .col-xs-12.col-md-12
         .col-xs-8.col-md-8
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 付款方式
+              .col-sm-8
+                .radio
+                  label
+                    input#payMethod1(type='radio', name='payMethod', value='kcb', checked='true')
+                    |     科创币付款
+                .radio
+                  label
+                    input#payMethod2(type='radio', name='payMethod', value='zfb')
+                    |     支付宝付款
+
         .col-xs-4.col-md-4
           div(style="text-align:right")
             p(style="font-weight: bold;") 实付款
             p(style="font-weight: bold;") 配送至
             p(style="font-weight: bold;") 收货人
             button.btn.btn-danger.btn-lg(onclick="submitOrders()") 立即付款
+
 
 block shopScripts  
   +includeJS("/shop/bill/bill.js")

@@ -79,7 +79,8 @@ const shopOrdersSchema = new Schema({
    * @订单完成 finish
    */
   orderStatus: {
-    type: String
+    type: String,
+    default: "unCost"
   },
   // 是否有退款
   idRefund: {
@@ -92,7 +93,8 @@ const shopOrdersSchema = new Schema({
    * @end 退款已处理
    */
   refundStatus: {
-    type: String
+    type: String,
+    default: ""
   },
 }, {
   collection: 'shopOrders'

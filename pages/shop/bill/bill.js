@@ -8,6 +8,8 @@
  * ]
  */
 function submitOrders() {
+  // 选择付款方式 
+  var payMethod = $("input[name='payMethod']:checked").val();
   var para = [];
   // 获取帐单中的产品与数量
   $(".order").each(function() {
@@ -17,7 +19,7 @@ function submitOrders() {
     }
     para.push(obj)
   })
-  nkcAPI('/shop/order', "POST", {post: para})
+  nkcAPI('/shop/order', "POST", {post: para, payMethod: payMethod})
   .then(function(data) {
     console.log("提交成功")
   })
