@@ -1,9 +1,9 @@
 extends ../../bootstrap_base
 block title
-  title 充值确认
+  title 付款信息确认
 block content
   .container-fluid.max-width#app(v-cloak)
-    #data.hidden=JSON.stringify({kcbsRecordId: data.kcbsRecordId})
+    #data.hidden=JSON.stringify({pay: data.pay, kcbsRecordId: data.kcbsRecordId})
     div(v-if='success').text-center
       include ../../publicModules/icon-success
       h3 充值成功
@@ -14,9 +14,8 @@ block content
         |&nbsp;个
       a(href='/account/finance').m-r-1 查看记录
       a(href='/account/finance/recharge') 再次充值
-    div(v-else).text-center.p-t-3.p-b-3
-      h4  充值信息确认中，请稍后
-        div {{info}}
+    div(v-else).p-t-3.p-b-3
+      h4  付款信息确认中，请稍后 {{info}}
 block scripts
   script.
     var app = new Vue({
@@ -27,6 +26,7 @@ block scripts
         pointNumber: 1,
         money: 0,
         kcb: 0,
+        pay: false,
         kcbsRecordId: ''
       },
       methods: {
@@ -35,6 +35,9 @@ block scripts
           kcAPI('/account/finance/recharge?type=verify&rid='+this.kcbsRecordId, 'GET')
             .then(function(data) {
               if(data.verify) {
+                if(app.pay) {
+                  return window.location.href = '/account/finance';
+                } 
                 this_.kcb = data.user.kcb;
                 this_.money = data.money;
                 this_.success = true;
@@ -50,8 +53,8 @@ block scripts
         },
         waiting: function() {
           var this_ = this;
-          this.pointNumber = this.pointNumber + 2;
-          if(this_.pointNumber > 10) this_.pointNumber = 1;
+          this.pointNumber = this.pointNumber + 1;
+          if(this_.pointNumber > 7) this_.pointNumber = 1;
           var p = '';
           for(var i = 0; i < this_.pointNumber; i++) {
             p += '.';
@@ -59,13 +62,14 @@ block scripts
           this_.info = p;
           setTimeout(function() {
             this_.waiting();
-          }, 1000);
+          }, 200);
         } 
       },
       mounted: function() {
         var data = document.getElementById('data');
         data = JSON.parse(data.innerHTML);
         this.kcbsRecordId = data.kcbsRecordId;
+        this.pay = !!data.pay;
         this.verify();
         this.waiting();
       }

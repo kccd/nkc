@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const serverConfig = require('../config/server.json');
+const alipay2 = require('../nkcModules/alipay2');
 const kcbsRecordSchema = new Schema({
   _id: Number,
   // 花费科创币用户的ID
@@ -65,10 +67,17 @@ const kcbsRecordSchema = new Schema({
     default: '',
     index: 1
   },
+  ordersId: {
+    type: [String]
+  },
   verify: {
     type: Boolean,
     index: 1,
     default: true,
+  },
+  error: {
+    type: String,
+    default: ''
   },
   c: {
     type: Schema.Types.Mixed,
@@ -294,5 +303,52 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     return r
   });
 };
+
+/* 
+  获取支付宝链接，去充值或付款。付款时需传递参数options.type = 'pay'
+  @param options
+    uid: 充值用户、付款用户
+    money: 金额，分
+    ip: 操作人IP地址,
+    port: 操作人端口，
+    title: 账单标题, 例如：科创币充值
+    notes: 账单说明，例如：充值23个科创币
+    backParams: 携带的参数，会原样返回
+  @return url: 返回链接
+  @author pengxiguaa 2019/3/13  
+*/
+kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
+  let {uid, money, ip, port, title, notes, backParams} = options;
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const SettingModel = mongoose.model('settings');
+  money = Number(money);
+  if(money > 0) {}
+  else {
+    throwErr(400, '金额必须大于0');
+  }
+  const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+  const record = KcbsRecordModel({
+    _id: kcbsRecordId,
+    from: 'bank',
+    to: uid,
+    type: 'recharge',
+    num: money,
+    ip,
+    port,
+    verify: false,
+    description: notes
+  });
+  await record.save();
+  const o = {
+    money,
+    id: kcbsRecordId,
+    title,
+    notes,
+    backParams,
+    returnUrl: serverConfig.domain + '/account/finance/recharge?type=back' + (backParams.type === 'pay'?'&pay=true':'')
+  };
+  return await alipay2.receipt(o);
+};
+
 
 module.exports = mongoose.model('kcbsRecords', kcbsRecordSchema);
