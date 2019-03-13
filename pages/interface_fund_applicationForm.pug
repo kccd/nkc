@@ -92,7 +92,7 @@ block content
             if applicationForm.reportThreads.length > 0
               br
               hr
-              h4(style=`font-weight:600;`) 与项目有关的最新贴
+              h4(style=`font-weight:600;`) 与项目有关的最新文章
               .selectedThreads
                 -for(let i = 0; i < applicationForm.reportThreads.length; i++)
                   -const thread = applicationForm.reportThreads[i];
@@ -133,15 +133,6 @@ block content
               .panel-body
                 h3.text-center= `最新进展`
                 .timer-shaft
-                  if status.completed
-                    if applicationForm.threadsId.completed
-                      h4 结题报告
-                      -for(let t of applicationForm.threads.completed)
-                        h4
-                          a(href=`/t/${t.tid}` target='_blank')= t.firstPost.t
-                    div.time!= `${fromNow(applicationForm.timeOfCompleted)}&nbsp;&nbsp;&nbsp;${applicationForm.timeOfCompleted.toLocaleString()}`
-                      div(style='position: absolute;')
-                    div.content=`完成`
                   -const length = data.reports.length;
                   -for(let i = 0; i < data.reports.length; i++)
                     -const r = data.reports[i];
@@ -198,7 +189,24 @@ block content
                         div.greenFontColor!= experimental_render(r)
                       else
                         div!= experimental_render(r)  
-
+                  if status.completed
+                    div.time!= `${fromNow(applicationForm.timeOfCompleted)}&nbsp;&nbsp;&nbsp;${applicationForm.timeOfCompleted.toLocaleString()}`
+                      div(style='position: absolute;')
+                    div.content.greenFontColor=`完成`
+            if applicationForm.threadsId.completed
+              h4(style='margin-bottom: 0') 结题报告
+              .selectedThreads
+                -for(let i = 0; i < applicationForm.threads.completed.length; i++)
+                  -const thread = applicationForm.threads.completed[i];
+                  -const firstPost = thread.firstPost;
+                  .threadList
+                    .col-xs-10.col-md-10
+                      span 文号：
+                      span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                      a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                      span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                      br
+                      a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
 
             //- if data.reports.length !== 0
             //-   hr

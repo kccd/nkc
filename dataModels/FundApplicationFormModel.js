@@ -563,7 +563,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 
 	//其他信息判断
 	if (projectCycle === null) throw '请填写研究周期！';
-	if (!category) throw '请选择学术分类。';
+	if (!category) throw '请选择学科分类。';
 	if(money.max === null) { // 定额基金
 		if(!budgetMoney) throw '请输入资金用途！';
 	} else { //不定额基金

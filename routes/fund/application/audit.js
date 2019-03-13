@@ -73,8 +73,10 @@ auditRouter
 			const {uid} = lock;
 			if(user.uid !== uid) {
 				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他审查员审核。');
-			}
-			const {suggestMoney, comments} = body;
+      }
+      if(applicationForm.status.projectPassed !== null) ctx.throw(400, '申请表暂不需要专家审核，请勿重复提交审核结果。')
+      const {suggestMoney, comments} = body;
+      const docArr = [];
 			for(let comment of comments) {
 				if(!comment.support) support = false;
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
@@ -86,7 +88,7 @@ auditRouter
 					c: comment.c,
 					support: comment.support
 				});
-				await newDocument.save();
+				docArr.push(newDocument);
 			}
 			applicationForm.status.projectPassed = support;
 			//添加项目审查员的预算建议
@@ -104,7 +106,10 @@ auditRouter
 					if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
 				}
 				await applicationForm.update({budgetMoney});
-			}
+      }
+      for(const d of docArr) {
+        await d.save();
+      }
 		} else if(type === 'admin') {// 最后管理员复核
 			if(!fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您没有资格进行管理员审核。');
 			if(!applicationForm.status.projectPassed) ctx.throw(400, '专家审核暂未通过，请等待。');

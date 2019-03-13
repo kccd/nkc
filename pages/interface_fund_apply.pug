@@ -228,7 +228,7 @@ block content
                   if fund.thread.count > 0
                     br
                     -const threadCount = fund.thread.count;
-                    h4=`申请人曾今的技术帖（从论坛发帖中选择${threadCount > 0?`，至少${threadCount}篇`:''}）`
+                    h4=`申请人曾今的技术文章（从论坛发帖中选择${threadCount > 0?`，至少${threadCount}篇`:''}）`
                     .popupPanel.disabled
                       .popupPanel-body
                         .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
@@ -391,7 +391,7 @@ block content
                         if aggregate > fund.money.max
                           +ds(`资金预算金额已超过该基金项目单笔申请的最大金额（${fund.money.max}元）`)
                   if fund.thread.count > applicationForm.threadsId.applying.length
-                    +ds(`申请人曾今的技术帖数未达到最低要求(至少选择${fund.thread.count}篇)`)
+                    +ds(`申请人曾今的技术文章数未达到最低要求(至少选择${fund.thread.count}篇)`)
                   if !applicationForm.category
                     +ds('未选择学科分类。')
                   if !disabledSubmit
