@@ -83,6 +83,8 @@ func.transfer = async (o) => {
     id: 唯一ID
     title: 订单标题,
     notes: 订单描述,
+    returnUrl: 付款完成浏览器跳转到该url
+    backParams: 携带参数，会原样返回
     goodsInfo: [{}]
       goodsName: 商品名
       goodsId: 商品ID
@@ -91,7 +93,7 @@ func.transfer = async (o) => {
 */
 func.receipt = async (o) => {
   let {
-    money, id, title, notes, goodsInfo, returnUrl
+    money, id, title, notes, goodsInfo, returnUrl, backParams
   } = o;
   if(!id) throwErr('支付宝收款ID不能为空');
   if(!money || money <= 0) throwErr('支付宝转账金额不能小于0');
@@ -116,6 +118,7 @@ func.receipt = async (o) => {
   const params = {
     body: notes,
     out_trade_no: id,
+    passback_params: encodeURI(JSON.stringify(backParams)),
     product_code: 'FAST_INSTANT_TRADE_PAY',
     subject: title,
     total_amount: money

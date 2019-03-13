@@ -8,32 +8,23 @@ router
     let {type, money} = query;
     if(type === 'get_url') {
       money = Number(money);
-      if(money > 0){}
-      else {
-        ctx.throw(400, '充值数额必须大于0');
-      }
-      const kcbsRecordId = await db.SettingModel.operateSystemID('kcbsRecords', 1);
-      const record = db.KcbsRecordModel({
-        _id: kcbsRecordId,
-        from: 'bank',
-        to: user.uid,
-        type: 'recharge',
-        num: money*100,
+      money = money * 100;
+      data.url = await db.KcbsRecordModel.getAlipayUrl({
+        uid: user.uid,
+        money,
         ip: ctx.address,
         port: ctx.port,
-        verify: false,
-        description: '科创币充值'
+        title: '科创币充值',
+        notes: `科创币充值，充值金额${money}`,
+        backParams: {
+          type: 'recharge'
+        }
       });
-      await record.save();
-      const options = {
-        money,
-        id: kcbsRecordId,
-        title: '订单标题',
-        notes: '订单介绍',
-        returnUrl: serverConfig.domain + '/account/finance/recharge?type=back'
-      };
-      data.url = await nkcModules.alipay2.receipt(options);
     } else if(type === 'back') {
+      if(query.pay) {
+        data.pay = true;
+        delete query.pay;
+      }
       delete query.type;
       await nkcModules.alipay2.verifySign(query);
       data.kcbsRecordId = query.out_trade_no;
@@ -55,21 +46,77 @@ router
   .post('/', async (ctx) => {
     const {nkcModules, db, body} = ctx;
     const {out_trade_no, trade_status} = body;
+    // 验证信息是否来自支付宝
     await nkcModules.alipay2.verifySign(body);
+    // 查询科创币充值记录
     const record = await db.KcbsRecordModel.findOne({_id: out_trade_no});
     if(!record) return ctx.body = 'success';
-    const updateObj = {
-      c: body
-    };
+    const totalAmount = Number(body.total_amount);
     if(trade_status === 'TRADE_SUCCESS') {
-      if(!record.verify) {
-        await db.UserModel.update({uid: record.to}, {$inc: {kcb: record.num}});
-        await db.SettingModel.update({_id: 'kcb'}, {$inc: {totalMoney: -1*record.num}});
+      let backParams = body.passback_params;
+      backParams = JSON.parse(decodeURI(backParams));
+      if(record.verify) return ctx.body = 'success';
+      if(backParams.type === 'recharge') {
+        const updateObj = {
+          verify: true,
+          c: body
+        };
+        if(record.num !== totalAmount) {
+          updateObj.error = '系统账单金额与支付宝账单金额不相等';
+        } else {
+          await db.UserModel.update({uid: record.to}, {$inc: {kcb: record.num}});
+          await db.SettingModel.update({_id: 'kcb'}, {$inc: {totalMoney: -1*record.num}});
+        }
+        await record.update(updateObj);
+      } else {
+        const updateObj = {
+          verify: true,
+          c: body
+        };
+        const ordersId = backParams.ordersId;
+        const orders = [];
+        let totalMoney = 0;
+        for(const id of ordersId) {
+          const order = await db.ShopOrdersModel.findOne({orderId: id});
+          if(!order) {
+            updateObj.error = `支付宝回调信息中的订单ID(${id})不存在`;
+            await record.update(updateObj);
+            return ctx.body = 'success';
+          }
+          orders.push(order);
+          totalMoney += order.orderPrice;
+        }
+        if(totalMoney !== totalAmount) {
+          updateObj.error = '系统账单金额与支付宝账单金额不相等';
+          await record.update(updateObj);
+          return ctx.body = 'success';
+        }
+
+        const r = db.KcbsRecordModel({
+          from: record.to,
+          to: record.from,
+          type: 'pay',
+          ordersId: ordersId,
+          num: totalAmount,
+          description: '科创商城购买商品',
+          ip: ctx.address,
+          port: ctx.port,
+          verfiy: true
+        });
+
+        for(const order of orders) {
+          // 更改订单状态为已付款，添加付款时间。
+          await order.update({
+            orderStatus: 'unShip',
+            payToc: r.toc
+          });
+        }
+
+        await record.update(updateObj);
+        await r.save();
+
       }
-      record.verify = true;
-      updateObj.verify = true;
+      return ctx.body = 'success';
     }
-    await record.update(updateObj);
-    if(record.verify) ctx.body = 'success';
   });
 module.exports = router;
