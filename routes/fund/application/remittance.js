@@ -262,8 +262,8 @@ remittanceRouter
 			}
 		} else {
 			// 人工审核
-			// 申请第一期拨款不需要附带帖子
-			// 附带帖子的发表时间必须晚于申请表申请时间
+			// 申请第一期拨款不需要附带文章
+			// 附带文章的发表时间必须晚于申请表申请时间
 			for(let i = 0; i < remittance.length; i++) {
 				const r = remittance[i];
 				if(i < number) {
@@ -276,7 +276,7 @@ remittanceRouter
 					} else if(r.status === true) {
 						ctx.throw(400, `拨款已完成，请勿重复提交。`);
 					} else {
-						// 申请第一期拨款不需要附带帖子
+						// 申请第一期拨款不需要附带文章
 						if(i === 0) {
 							r.passed = true;
 							r.apply = true;
@@ -292,12 +292,12 @@ remittanceRouter
 							await newReport.save();
 						} else {
 							if(reportNeedThreads && selectedThreads.length === 0) {
-								ctx.throw(400, '申请拨款必须要附带代表中期报告的帖子。');
+								ctx.throw(400, '申请拨款必须要附带代表中期报告的文章。');
 							}
-							//验证附带帖子的发表时间
+							//验证附带文章的发表时间
 							await Promise.all(selectedThreads.map(async t => {
 								const thread = await db.ThreadModel.findOnly({tid: t.tid});
-								if(thread.toc < timeToPassed) ctx.throw(400, '请选择申请项目之后所发的帖子。')
+								if(thread.toc < timeToPassed) ctx.throw(400, '请选择申请项目之后所发的文章。')
 							}));
 							const reportId_1 = await db.SettingModel.operateSystemID('fundDocuments', 1);
 							const reportId_2 = await db.SettingModel.operateSystemID('fundDocuments', 1);

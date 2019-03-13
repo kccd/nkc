@@ -221,10 +221,10 @@ function applicationFormStatus(a) {
 		color = 'red';
 	} else if(!submitted || !a.lock.submitted) {
 		if(projectPassed === false) {
-			str = '专家审核不通过，等待申请人修改';
+			str = '未通过专家审核，等待申请人修改';
 			color = 'red';
 		} else if(adminSupport === false) {
-			str = '管理员复核不通过，等待申请人修改';
+			str = '未通过管理员复核，等待申请人修改';
 			color = 'red';
 		} else {
 			str = '暂未提交';
@@ -234,12 +234,12 @@ function applicationFormStatus(a) {
 	} else if(projectPassed === null) {
 		str = '等待专家审核';
 	} else if(projectPassed === false) {
-		str = '专家审核不通过，等待申请人修改';
+		str = '未通过专家审核，等待申请人修改';
 		color = 'red';
 	} else if(adminSupport === null) {
 		str = '等待管理员复核';
 	} else if(adminSupport === false) {
-		str = '管理员复核不通过，等待申请人修改';
+		str = '未通过管理员复核，等待申请人修改';
 		color = 'red';
 	} else if(remittance === null) {
 		str = '等待拨款';
@@ -253,15 +253,15 @@ function applicationFormStatus(a) {
   } else if(completedAudit) {
     str = '结题报告已提交，等待结题审核'
 	} else if(completed === null) {
-    str = '资助中';
+    str = '项目执行中';
 	} else if(completed === false) {
-		str = '结题审核不通过，等待申请人修改'
+		str = '未通过结题审核，等待申请人修改'
 	} else if(excellent) {
 		str = '优秀项目';
 	} else if(successful) {
-		str = '正常结题';
+		str = '成功结题';
 	} else if(!successful) {
-		str = '失败结题';
+		str = '正常结题';
 	}
 	return {str, color};
 }

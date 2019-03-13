@@ -228,17 +228,17 @@ block content
                   if fund.thread.count > 0
                     br
                     -const threadCount = fund.thread.count;
-                    h4=`申请人曾今的技术文章（从论坛发帖中选择${threadCount > 0?`，至少${threadCount}篇`:''}）`
+                    h4=`申请人曾经的技术文章（从论坛发文中选择${threadCount > 0?`，至少${threadCount}篇`:''}）`
                     .popupPanel.disabled
                       .popupPanel-body
                         .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
-                        .popupPanel-title 添加帖子
+                        .popupPanel-title 添加文章
                         .popupPanel-content
                           .col-xs-12.col-md-12
                             .form
                               input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
                               input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
-                            span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
+                            span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的文章
                             nav(aria-label='navigation')
                               ul.pagination.pagination-sm.pageList
                             .unselectedThreads
@@ -246,7 +246,7 @@ block content
                             nav(aria-label='navigation')
                               ul.pagination.pagination-sm.pageList
 
-                    h5 已选择的帖子
+                    h5 已选择的文章
                     .selectedThreads
                       if threads.applying.length === 0
                         .blank.blank-selectedThread 暂无数据
@@ -311,7 +311,7 @@ block content
                     h3 注意事项
                     br
                     p 1、如果没有好友同意你的邀请你将无法提交申请表，您可以邀请其他好友或更改申请方式为个人申请。
-                    p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的帖子中移除这些好友的帖子。
+                    p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的文章中移除这些好友的文章。
                     br
                     br
                   -let n = 0;
@@ -391,7 +391,7 @@ block content
                         if aggregate > fund.money.max
                           +ds(`资金预算金额已超过该基金项目单笔申请的最大金额（${fund.money.max}元）`)
                   if fund.thread.count > applicationForm.threadsId.applying.length
-                    +ds(`申请人曾今的技术文章数未达到最低要求(至少选择${fund.thread.count}篇)`)
+                    +ds(`申请人曾经的技术文章数未达到最低要求(至少选择${fund.thread.count}篇)`)
                   if !applicationForm.category
                     +ds('未选择学科分类。')
                   if !disabledSubmit

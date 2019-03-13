@@ -47,7 +47,7 @@ const certificates ={
         [DELETE]: true
       },
       latest: {
-        [name]: '最近帖子',
+        [name]: '最近文章',
         [GET]: true
       },
       pfa: {
@@ -81,7 +81,7 @@ const certificates ={
         }
       },
       cover: {
-        [name]: '帖子封面',
+        [name]: '文章封面',
         [parameter]: {
           [GET]: true
         }
@@ -677,7 +677,7 @@ const certificates ={
           [GET]: false
         },
         threads: {
-          [name]: '获取帖子',
+          [name]: '获取文章',
           [GET]: true
         },
 	      life_photos: {
@@ -1223,7 +1223,7 @@ const certificates ={
           [POST]: true
         },
         updateAllThreads: {
-          [name]: '更新所有帖子数据',
+          [name]: '更新所有文章数据',
           [POST]: true
         }
       },

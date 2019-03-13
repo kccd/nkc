@@ -579,7 +579,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 			if(aggregate > money.max) throw '资金预算金额已超过该基金项目单笔申请的最大金额！';
 		}
 	}
-	if(thread.count > threadsId.applying.length) throw `附带的帖子数未达到最低要求(至少${thread.count}篇)`;
+	if(thread.count > threadsId.applying.length) throw `附带的文章数未达到最低要求(至少${thread.count}篇)`;
 	// 如果是个人申请，则删除所有组员已存到基金（type='fund'）的生活照，并标记所有组员为已删除
 	if(from === 'personal') {
 		if(!applicationMethod.personal) throw '该基金不允许个人申请！';
