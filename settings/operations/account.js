@@ -3,7 +3,8 @@ module.exports = {
   finance: {
     GET: 'visitUserKcb',
     recharge: {
-      GET: 'accountRecharge'
+      GET: 'accountRecharge',
+      POST: 'rechargePost'
     },
     withdraw: {
       GET: 'accountWithdraw'

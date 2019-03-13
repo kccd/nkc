@@ -18,7 +18,7 @@ router
         from: 'bank',
         to: user.uid,
         type: 'recharge',
-        num: money,
+        num: money*100,
         ip: ctx.address,
         port: ctx.port,
         verify: false,
@@ -30,15 +30,7 @@ router
         id: kcbsRecordId,
         title: '订单标题',
         notes: '订单介绍',
-        returnUrl: serverConfig.domain + '/account/finance/recharge?type=back',
-        goodsInfo: [
-          {
-            goodsName: '商品名',
-            goodsId: '商品Id',
-            goodsCount: 1,
-            goodsPrice: 234
-          }
-        ]
+        returnUrl: serverConfig.domain + '/account/finance/recharge?type=back'
       };
       data.url = await nkcModules.alipay2.receipt(options);
     } else if(type === 'back') {
@@ -58,5 +50,26 @@ router
       ctx.template = 'account/finance/recharge.pug';
     }
     await next();
+  })
+  // 支付宝访问服务器，返回支付结果
+  .post('/', async (ctx) => {
+    const {nkcModules, db, body} = ctx;
+    const {out_trade_no, trade_status} = body;
+    await nkcModules.alipay2.verifySign(body);
+    const record = await db.KcbsRecordModel.findOne({_id: out_trade_no});
+    if(!record) return ctx.body = 'success';
+    const updateObj = {
+      c: body
+    };
+    if(trade_status === 'TRADE_SUCCESS') {
+      if(!record.verify) {
+        await db.UserModel.update({uid: record.to}, {$inc: {kcb: record.num}});
+        await db.SettingModel.update({_id: 'kcb'}, {$inc: {totalMoney: -1*record.num}});
+      }
+      record.verify = true;
+      updateObj.verify = true;
+    }
+    await record.update(updateObj);
+    if(record.verify) ctx.body = 'success';
   });
 module.exports = router;

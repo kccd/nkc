@@ -72,9 +72,8 @@ const kcbsRecordSchema = new Schema({
   },
   c: {
     type: Schema.Types.Mixed,
-    default: {},
-    index: 1
-  }
+    default: {}
+  }   
 }, {
   collection: 'kcbsRecords',
   toObject: {
