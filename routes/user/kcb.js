@@ -8,6 +8,7 @@ kcbRouter.get('/', async (ctx, next) => {
   const targetUser = await db.UserModel.findOnly({uid});
   if(targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
   const q = {
+    verify: true,
     $or: [
       {
         from: targetUser.uid
