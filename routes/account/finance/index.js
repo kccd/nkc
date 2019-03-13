@@ -7,7 +7,9 @@ router
     const {nkcModules, query, data, db} = ctx;
     const {user} = data;
     const {t, page} = query;
-    const q = {};
+    const q = {
+      verify: true
+    };
     if(!t) {
       q.to = user.uid;
     } else if(t === 'payout') {

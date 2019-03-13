@@ -18,6 +18,11 @@ const alipayConfig = require('../config/alipay.json');
 const privatekey = fs.readFileSync(path.resolve(__dirname, '../key/rsa_private_key.pem'));
 const publicKey = fs.readFileSync(path.resolve(__dirname, '../key/alipay_public_key.pem'));
 const {app_id, url} = alipayConfig;
+const serverConfig = require('../config/server.json');
+let notifyUrl = `https://soccos.cn/test`;
+if(global.NKC.NODE_ENV === 'production') {
+  notifyUrl = `${serverConfig.domain}/finance/recharge`;
+}
 const func = {};
 func.transfer = async (o) => {
   const {account, name, id, money, notes} = o;
@@ -86,12 +91,13 @@ func.transfer = async (o) => {
 */
 func.receipt = async (o) => {
   let {
-    money, id, title, notes, goodsInfo
+    money, id, title, notes, goodsInfo, returnUrl
   } = o;
   if(!id) throwErr('支付宝收款ID不能为空');
   if(!money || money <= 0) throwErr('支付宝转账金额不能小于0');
   if(!title) throwErr('订单标题不能为空');
   if(!notes) throwErr('订单描述不能为空');
+  if(!returnUrl) throwErr('跳转地址不能为空');
   goodsInfo = goodsInfo || [];
   const goods_detail = [];
   for(const g of goodsInfo) {
@@ -122,8 +128,8 @@ func.receipt = async (o) => {
     biz_content: JSON.stringify(params),
     charset: 'UTF-8',
     method: 'alipay.trade.page.pay',
-    notify_url: 'https://soccos.cn/test',
-    return_url: 'http://a.test/shop',
+    notify_url: notifyUrl,
+    return_url: returnUrl,
     sign_type: 'RSA2',
     timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
     version: '1.0'
@@ -142,7 +148,8 @@ func.receipt = async (o) => {
   @param notifyData: 支付宝服务器post请求所带的数据
   @author pengxiguaa 2019/3/11 
 */
-func.verifySign = async (notifyData) => {
+func.verifySign = async (d) => {
+  const notifyData = Object.assign({}, d);
   let data = Object.assign({}, notifyData);
   let sign = data.sign;
   delete data.sign;

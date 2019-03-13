@@ -1,0 +1,72 @@
+extends ../../bootstrap_base
+block title
+  title 充值确认
+block content
+  .container-fluid.max-width#app(v-cloak)
+    #data.hidden=JSON.stringify({kcbsRecordId: data.kcbsRecordId})
+    div(v-if='success').text-center
+      include ../../publicModules/icon-success
+      h3 充值成功
+      h5 您已成功充值&nbsp;
+        span.text-danger {{money}}
+        |&nbsp;个科创币，账户当前科创币总计&nbsp;
+        span.text-danger {{kcb}}
+        |&nbsp;个
+      a(href='/account/finance').m-r-1 查看记录
+      a(href='/account/finance/recharge') 再次充值
+    div(v-else).text-center.p-t-3.p-b-3
+      h4  充值信息确认中，请稍后
+        div {{info}}
+block scripts
+  script.
+    var app = new Vue({
+      el: '#app',
+      data: {
+        success: false,
+        info: '',
+        pointNumber: 1,
+        money: 0,
+        kcb: 0,
+        kcbsRecordId: ''
+      },
+      methods: {
+        verify: function() {
+          var this_ = this;
+          kcAPI('/account/finance/recharge?type=verify&rid='+this.kcbsRecordId, 'GET')
+            .then(function(data) {
+              if(data.verify) {
+                this_.kcb = data.user.kcb;
+                this_.money = data.money;
+                this_.success = true;
+              } else {
+                setTimeout(function() {
+                 this_.verify(); 
+                }, 2000);
+              }
+            })
+            .catch(function(data) {
+              screenTopWarning(data);
+            });
+        },
+        waiting: function() {
+          var this_ = this;
+          this.pointNumber = this.pointNumber + 2;
+          if(this_.pointNumber > 10) this_.pointNumber = 1;
+          var p = '';
+          for(var i = 0; i < this_.pointNumber; i++) {
+            p += '.';
+          }
+          this_.info = p;
+          setTimeout(function() {
+            this_.waiting();
+          }, 1000);
+        } 
+      },
+      mounted: function() {
+        var data = document.getElementById('data');
+        data = JSON.parse(data.innerHTML);
+        this.kcbsRecordId = data.kcbsRecordId;
+        this.verify();
+        this.waiting();
+      }
+    });    
