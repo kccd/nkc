@@ -58,7 +58,7 @@ const shopOrdersSchema = new Schema({
     type: String,
     default: ""
   },
-  // 下单时间
+  // 下单时间(订单生成时间)
   orderToc: {
     type: Date,
     default: Date.now
@@ -69,7 +69,28 @@ const shopOrdersSchema = new Schema({
   },
   // 付款时间
   payToc: {
-    type: Date
+    type: Date,
+    default: null
+  },
+  // 发货时间
+  shipToc: {
+    type: Date,
+    default: null
+  },
+  // 收货时间
+  signToc: {
+    type: Date,
+    default: null
+  },
+  // 完成时间
+  finish: {
+    type: Date,
+    default: null
+  },
+  // 取消订单时间
+  closeToc: {
+    type: Date,
+    default: null
   },
   /**
    * 订单状态

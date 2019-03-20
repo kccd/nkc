@@ -58,7 +58,7 @@ block name
                 p 查看物流
                 p 交易状态
                 p 
-                  a(href="#") 详情
+                  a(href=`/shop/order/detail?orderId=${order.orderId}`) 详情
               td #{numToFloatTwo(order.orderPrice)}
               td
                 if order.orderStatus == "unCost"

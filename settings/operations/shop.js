@@ -104,6 +104,9 @@ module.exports = {
     },
     receipt: {
       PATCH: 'confirmOrderReceipt'
+    },
+    detail: {
+      GET: 'visitSingleOrderDetail'
     }
   }
 };

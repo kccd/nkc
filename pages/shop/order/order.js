@@ -29,7 +29,8 @@ function visitLogisticsInfo(orderId) {
 function comfirmReceipt(orderId) {
   nkcAPI('/shop/order/receipt', "PATCH", {orderId})
   .then(function(data) {
-    screenTopAlert("已确认收货")
+    screenTopAlert("已确认收货");
+    window.location.reload();
   })
   .catch(function(data) {
     screenTopWarning(data || data.error)

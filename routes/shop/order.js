@@ -25,6 +25,21 @@ router
     ctx.template = '/shop/order/order.pug';
     await next();
   })
+  // 查看订单详情
+  .get('/detail', async (ctx, next) => {
+    const {data, db, params, query, nkcModules} = ctx;
+    const {orderId} = query;
+    const {user} = data;
+    if(!orderId) ctx.throw(400, "订单号有误");
+    const order = await db.ShopOrdersModel.findOne({orderId});
+    if(user.uid !== order.uid) ctx.throw(403, "您无权查看此订单");
+    if(!order) ctx.throw(400, "订单不存在");
+    let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+    data.order = orders[0];
+    console.log(data.order)
+    ctx.template = '/shop/order/detail.pug';
+    await next();
+  })
   // 提交订单，并跳转到支付
   .post('/', async (ctx, next) => {
     const {data, db, query, body} = ctx;
