@@ -4,6 +4,8 @@ shelfRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
     const {user} = data;
+    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
+    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		ctx.template = 'shop/manage/shelf.pug';
 		await next();
 	})

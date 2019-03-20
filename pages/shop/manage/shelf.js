@@ -175,6 +175,7 @@ function submitToShelf() {
   if(isNaN(freightPrice) || freightPrice < 0) {
     throw("运费价格不可小于0,不可为空");
   }
+  var mergeForumId = getResultForumId();
   // 组装上传数据
   var post = {
     productName: productName,
@@ -190,7 +191,7 @@ function submitToShelf() {
     productStatus: productStatus,
     shelfTime: shelfTime,
     params: params,
-    mainForumsId: ["81"],
+    mainForumsId: [mergeForumId],
     productParams: productParams
   }
   return post;

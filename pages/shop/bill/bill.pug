@@ -2,14 +2,67 @@ extends ../shopBase
 block shopTitle
   title 确认账单 | 科创商城
   -const cartsData = data.cartsData
+  -const addresses = data.addresses
   +includeCSS('/fund.css')
+  style.
+    .addressSelected {
+      border-color: #f40;
+      background-color: #fff0e8;
+      margin: 5px 0 7px;
+      line-height: 32px;
+      box-shadow: 5px 5px 0 #f3f3f3;
+    }
+    .paySelected {
+      border-color: #f40;
+      background-color: #fff0e8;
+      margin: 5px 0 7px;
+      line-height: 32px;
+      box-shadow: 5px 5px 0 #f3f3f3;
+    }
 block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
-        div 选择收货地址
+        .order-address-wrap
+          h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
+            span 确认收货地址
+            span.manage-address(style="float: right;font-size: 12px;font-weight: 400;")
+              a(href=`/u/${data.user.uid}/settings/transaction`, target='_blank', title='管理我的收货地址') 管理收货地址
+          ul.address-list(style="list-style: none;")
+            for address,index in addresses
+              li.address-wrap
+                .addressBox
+                  label.addressInfo
+                    input(type='radio', name='address' value=`${index}`)
+                    span.user-address
+                      span.address=address.address
+                      span （
+                      span.username=address.username
+                      span  收）
+                      em.mobile=address.mobile
+          //- a.btn.btn-info.btn-sm(style="margin-left:40px" onclick="addAddress()") 新增收货地址
       .col-xs-12.col-md-12
-        table.table.table-striped
+        .order-address-wrap
+          h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
+            span 确认付款方式
+          ul.address-list(style="list-style: none;")
+            li.address-wrap
+              .addressBox.paySelected
+                label.addressInfo
+                  input(type='radio', name='payMethod' checked value="kcb")
+                  span.user-address
+                    span 科创币付款
+            li.address-wrap
+              .addressBox
+                label.addressInfo
+                  input(type='radio', name='payMethod' value="zfb")
+                  span.user-address
+                    span 支付宝付款
+      .col-xs-12.col-md-12
+        .order-address-wrap
+          h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
+            span 确认账单
+        table.table.table-striped(style="margin-left:40px")
           thead
             tr
               th 商品名称
@@ -40,29 +93,20 @@ block content
       .col-xs-12.col-md-12
         div(style="text-align:right")
           p 
-            span(style="font-weight: bold;") 合计:
+            span(style="font-weight: bold;") 合计:&nbsp;
             span(style="font:700 26px tahoma;color:red")#totalPrice
       .col-xs-12.col-md-12
         .col-xs-8.col-md-8
-          .form-horizontal
-            .form-group
-              label.col-sm-2.control-label 付款方式
-              .col-sm-8
-                .radio
-                  label
-                    input#payMethod1(type='radio', name='payMethod', value='kcb', checked='true')
-                    |     科创币付款
-                .radio
-                  label
-                    input#payMethod2(type='radio', name='payMethod', value='zfb')
-                    |     支付宝付款
-
         .col-xs-4.col-md-4
           div(style="text-align:right")
-            p(style="font-weight: bold;") 实付款
-            p(style="font-weight: bold;") 配送至
-            p(style="font-weight: bold;") 收货人
-            button.btn.btn-danger.btn-lg(onclick="submitOrders()") 立即付款
+            p 
+              span(style="font-weight: bold;") 配送至:&nbsp;
+              span#finalAddress(style="margin-right: 10px;margin-left: 10px;") 
+            p
+              span(style="font-weight: bold;") 收货人:&nbsp;
+              span#finalName(style="margin-right: 10px;margin-left: 10px;") 
+              span#finalMobile 
+            button#submitPay.btn.btn-danger.btn-lg(onclick="submitOrders()") 立即付款
 
 
 block shopScripts  

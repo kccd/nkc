@@ -3,6 +3,7 @@ const router = new Router();
 router
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
+    const {user} = data;
     let {cartsId, paraId, productCount} = query;
     let billType;
     paraId = Number(paraId);
@@ -21,6 +22,14 @@ router
       data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
     }
     data.billType = billType;
+
+    // 取出全部收货地址
+    let addresses = [];
+    const userPersonal = await db.UsersPersonalModel.findOne({"uid":user.uid});
+    if(userPersonal){
+      addresses = userPersonal.addresses;
+    }
+    data.addresses = addresses;
     ctx.template = 'shop/bill/bill.pug';
     await next();
   })

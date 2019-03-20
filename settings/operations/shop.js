@@ -60,6 +60,15 @@ module.exports = {
         del: {
           POST: 'delStoreClassify'
         }
+      },
+      order: {
+        GET: 'visitShopOrderIndex',
+        sendGoods: {
+          PATCH: 'sendGoods'
+        },
+        editOrder: {
+          PATCH: 'editOrder'
+        }
       }
     },
   },
@@ -85,6 +94,16 @@ module.exports = {
     POST: 'submitShopBill'
   },
   order: {
-    POST: 'submitToPay'
+    GET: 'visitUserOrder',
+    POST: 'submitToPay',
+    cancel: {
+      PATCH: "cancelUserOrder"
+    },
+    logistics: {
+      GET: "visitOrderLogistics"
+    },
+    receipt: {
+      PATCH: 'confirmOrderReceipt'
+    }
   }
 };

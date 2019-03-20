@@ -17,6 +17,14 @@ block name
     .col-md-12.col-sm-12.col-xs-12
       .panel.panel-info
         .panel-heading
+          | 选择分类
+        .panel-body
+          .form-horizontal
+            .form-group
+              .col-sm-12
+                include ../../forumlist_dropdown
+      .panel.panel-info
+        .panel-heading
           | 基本信息
         .panel-body
           .form-horizontal
@@ -364,7 +372,9 @@ block manageScripts
   +includeJS("/jquery-ui-1.10.4.custom.js")
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/module_forum_settings.js")
   +includeJS("/interface_common.js")
+  +includeJS("/module_dropdown.js")
   +includeJS("/commonmark/dist/commonmark.js")
   +includeJS("/xbbcode-parser/xbbcode.js")
   +includeJS("/xss/dist/xss.js")

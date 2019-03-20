@@ -384,7 +384,12 @@ fn.doExchange = (arr) => {
 }
 
 
-// 查询所在地理位置，只取结果的省市
+/**
+ * 查询ip所在地地理位置(阿里云)
+ * @param {String} ip ip地址
+ * @return {JSON} data
+ * @author Kris 2019-3-14
+ */
 fn.getIpAddress = (ip) => {
   let options = {
     hostname: `iploc.market.alicloudapi.com`,    //接口域
@@ -417,4 +422,42 @@ fn.getIpAddress = (ip) => {
   })
 }
 
+
+/**
+ * 查询物流信息(阿里云)
+ * @param {String} trackNumber 快递单号 
+ * @return {JSON} data:由接口返回的物流信息，JSON
+ * @author Kris 2019-3-18
+ */
+fn.getTrackInfo = (trackNumber) => {
+  let options = {
+    hostname: `wuliu.market.alicloudapi.com`,    //接口域
+    path: `/kdi?no=${trackNumber}`,    //请求地址
+    headers: {    //请求头
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "APPCODE 90286cebbb4f49e3b97bf33c93a94cc3"
+    }
+  }
+  return new Promise((resolve, reject) => {
+      // 发起请求
+      let req = http.request(options, res => {
+          let chunks = [];
+          res.on('data', chunk => {
+              chunks.push(chunk);
+          })
+          res.on('end', () => {
+              let buffer = Buffer.concat(chunks).toString();
+              // 如果接口返回空值
+              let data = buffer ? JSON.parse(buffer) : {code: 1, data: '物流信息接口没有返回值'};
+              resolve(data);
+          })
+      })
+      // 请求出错
+      req.on('error', err => {
+          resolve({code: 1, data: "请求物流信息接口出错"});
+      })
+      // 请求结束
+      req.end();
+  })
+}
 module.exports = fn;
