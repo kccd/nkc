@@ -4,7 +4,7 @@
 function cancelOrder(orderId) {
   var confirmCancel = window.confirm("订单取消后将不可恢复,您确定要取消？");
   if(confirmCancel){
-    nkcAPI("/shop/order/cancel", "PATCH", {orderId})
+    nkcAPI("/shop/order/"+orderId+"/cancel", "PATCH", {})
     .then(function(data) {
       screenTopAlert("已取消订单");
       window.location.reload();
@@ -19,7 +19,7 @@ function cancelOrder(orderId) {
  * 查看物流信息
  */
 function visitLogisticsInfo(orderId) {
-  var targetUrl = '/shop/order/logistics?orderId='+orderId;
+  var targetUrl = '/shop/order/'+orderId+'/logistics';
   window.location.href = targetUrl;
 }
 
@@ -27,7 +27,7 @@ function visitLogisticsInfo(orderId) {
  * 确认收货
  */
 function comfirmReceipt(orderId) {
-  nkcAPI('/shop/order/receipt', "PATCH", {orderId})
+  nkcAPI('/shop/order/'+orderId+'/receipt', "PATCH", {})
   .then(function(data) {
     screenTopAlert("已确认收货")
   })

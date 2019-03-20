@@ -96,14 +96,23 @@ module.exports = {
   order: {
     GET: 'visitUserOrder',
     POST: 'submitToPay',
-    cancel: {
-      PATCH: "cancelUserOrder"
-    },
-    logistics: {
-      GET: "visitOrderLogistics"
-    },
-    receipt: {
-      PATCH: 'confirmOrderReceipt'
+    PARAMETER: {
+      cancel: {
+        PATCH: "cancelUserOrder"
+      },
+      logistics: {
+        GET: "visitOrderLogistics"
+      },
+      receipt: {
+        PATCH: 'confirmOrderReceipt'
+      }
+    }
+  },
+  pay: {
+    GET: 'visitShopPay',
+    POST: 'kcbPay',
+    alipay: {
+      GET: 'getAlipayUrl'
     }
   }
 };

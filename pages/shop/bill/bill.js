@@ -27,7 +27,7 @@ $(document).ready(function() {
  */
 function submitOrders() {
   // 获取付款方式 
-  var payMethod = $("input[name='payMethod']:checked").val();
+  //var payMethod = $("input[name='payMethod']:checked").val();
   // 获取配送地址
   var receiveDom = $("input[name='address']:checked");
   receiveAddress = receiveDom.next().find(".address").text();
@@ -38,7 +38,7 @@ function submitOrders() {
     receiveAddress, 
     receiveName, 
     receiveMobile, 
-    payMethod
+    //payMethod
   }
   var para = [];
   // 获取帐单中的产品与数量
@@ -52,7 +52,7 @@ function submitOrders() {
   $("#submitPay").attr('disabled',true);
   nkcAPI('/shop/order', "POST", {post: para, receInfo: receInfo})
   .then(function(data) {
-    console.log("提交成功")
+    window.location.href = '/shop/pay?ordersId=' + data.ordersId;
   })
   .catch(function(data) {
     screenTopWarning(data || data.error);

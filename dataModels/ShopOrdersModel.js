@@ -63,10 +63,6 @@ const shopOrdersSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  // 是否完成付款
-  payAlready: {
-    type: Boolean,
-  },
   // 付款时间
   payToc: {
     type: Date
@@ -238,7 +234,34 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
     return order
   }))
 }
-
+/* 
+  获取多个订单的信息，包括：订单名（多个商品名拼接）、订单介绍、订单价格（总计）、订单ID数组
+  @param orders: 订单对象数组
+  @return obj: 
+    name: 订单名
+    description: 订单介绍
+    totalMoney: 总价格
+    ordersId: 订单ID
+  @author pengxiguaa 2019/3/20  
+*/
+shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
+  const ShopOrdersModel = mongoose.model('shopOrders');
+  orders = await ShopOrdersModel.storeExtendOrdersInfo(orders);
+  let title = '';
+  const ordersId = [];
+  let totalMoney = 0;
+  for(const o of orders) {
+    title += `${o.count}*${o.product.name}(${o.productParam.name.join('+ ')}) `;
+    ordersId.push(o.orderId);
+    totalMoney += o.orderPrice;
+  }
+  return {
+    title,
+    description: title,
+    totalMoney,
+    ordersId
+  }
+};
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;
