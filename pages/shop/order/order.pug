@@ -71,7 +71,7 @@ block shopAccountContent
               td 
                 if order.orderStatus == "unCost"
                   p
-                    button 立即付款
+                    a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"
                   p
                     button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流

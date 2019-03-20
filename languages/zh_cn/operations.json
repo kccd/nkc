@@ -428,6 +428,9 @@
   "accountRecharge": "科创币充值",
   "accountWithdraw": "科创币提现",
   "rechargePost": "支付宝付款回调(此权限给游客)",
+  "visitShopPay": "访问商城付款页面",
+  "getAlipayUrl": "获取支付宝付款链接",
+  "kcbPay": "科创币付款",
 
 
   "APPgetUserInfo": "app获取用户信息",

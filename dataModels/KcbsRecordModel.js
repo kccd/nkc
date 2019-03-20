@@ -336,11 +336,11 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
     ip,
     port,
     verify: false,
-    description: notes
+    description: `科创币充值，充值金额${money/100}`
   });
   await record.save();
   const o = {
-    money,
+    money: money/100,
     id: kcbsRecordId,
     title,
     notes,

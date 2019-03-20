@@ -51,7 +51,7 @@ router
     // 查询科创币充值记录
     const record = await db.KcbsRecordModel.findOne({_id: out_trade_no});
     if(!record) return ctx.body = 'success';
-    const totalAmount = Number(body.total_amount);
+    const totalAmount = Number(body.total_amount)*100;
     if(trade_status === 'TRADE_SUCCESS') {
       let backParams = body.passback_params;
       backParams = JSON.parse(decodeURI(backParams));
@@ -65,7 +65,7 @@ router
           updateObj.error = '系统账单金额与支付宝账单金额不相等';
         } else {
           await db.UserModel.update({uid: record.to}, {$inc: {kcb: record.num}});
-          await db.SettingModel.update({_id: 'kcb'}, {$inc: {totalMoney: -1*record.num}});
+          await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*record.num}});
         }
         await record.update(updateObj);
       } else {
@@ -74,7 +74,7 @@ router
           c: body
         };
         const ordersId = backParams.ordersId;
-        const orders = [];
+        let orders = [];
         let totalMoney = 0;
         for(const id of ordersId) {
           const order = await db.ShopOrdersModel.findOne({orderId: id});
@@ -91,29 +91,29 @@ router
           await record.update(updateObj);
           return ctx.body = 'success';
         }
-
-        const r = db.KcbsRecordModel({
-          from: record.to,
-          to: record.from,
-          type: 'pay',
-          ordersId: ordersId,
-          num: totalAmount,
-          description: '科创商城购买商品',
-          ip: ctx.address,
-          port: ctx.port,
-          verfiy: true
-        });
-
+        orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
         for(const order of orders) {
+          const r = db.KcbsRecordModel({
+            _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
+            from: record.to,
+            to: record.from,
+            type: 'pay',
+            ordersId: [order.orderId],
+            num: order.orderPrice,
+            description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
+            ip: ctx.address,
+            port: ctx.port,
+            verfiy: true
+          });
+          await r.save();
           // 更改订单状态为已付款，添加付款时间。
-          await order.update({
+          await db.ShopOrdersModel.update({orderId: order.orderId}, {$set: {
             orderStatus: 'unShip',
             payToc: r.toc
-          });
+          }});
         }
 
         await record.update(updateObj);
-        await r.save();
 
       }
       return ctx.body = 'success';

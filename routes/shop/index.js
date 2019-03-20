@@ -8,12 +8,10 @@ const accountRouter = require('./account');
 const cartRouter = require('./cart');
 const billRouter = require('./bill');
 const orderRouter = require('./order');
+const payRouter = require('./pay');
 shopRouter
   .get('/', async (ctx, next) => {
     const {data, db ,query, params} = ctx;
-    console.log(`支付宝return_url-----------------`);
-    console.log(query);
-    console.log(`支付宝return_url-----------------`);
     const homeSetting = await db.ShopSettingsModel.findOne({type:"homeSetting"});
     // 取出精选商品
     let featuredItems = await db.ShopGoodsModel.find({productId:{$in:homeSetting.featureds}});
@@ -40,5 +38,6 @@ shopRouter
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/bill', billRouter.routes(), billRouter.allowedMethods())
   .use('/order', orderRouter.routes(), orderRouter.allowedMethods())
+  .use('/pay', payRouter.routes(), payRouter.allowedMethods())
 	.use('/store', storeRouter.routes(), storeRouter.allowedMethods())
 module.exports = shopRouter;
