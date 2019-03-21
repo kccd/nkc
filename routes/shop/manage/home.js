@@ -4,7 +4,6 @@ homeRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
     const {user} = data;
-    console.log("店铺首页")
 		ctx.template = 'shop/manage/home.pug';
 		await next();
 	})

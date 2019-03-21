@@ -44,7 +44,22 @@ router
     const order = await db.ShopOrdersModel.findOne({orderId});
     if(!order) ctx.throw(400, "未找到订单");
     if(user.uid !== order.uid) ctx.throw(400, "您无权操作此订单");
-    await order.update({$set:{"orderStatus":"finish"}})
+    let time = new Date();
+    await order.update({$set:{"orderStatus":"finish", "signToc":time}})
     await next();
-  });
+  })
+  // 查看订单详情
+  .get('/detail', async (ctx, next) => {
+    const {data, db, params, query, nkcModules} = ctx;
+    const {orderId} = params;
+    const {user} = data;
+    if(!orderId) ctx.throw(400, "订单号有误");
+    const order = await db.ShopOrdersModel.findOne({orderId});
+    if(user.uid !== order.uid) ctx.throw(403, "您无权查看此订单");
+    if(!order) ctx.throw(400, "订单不存在");
+    let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+    data.order = orders[0];
+    ctx.template = '/shop/order/detail.pug';
+    await next();
+  })
 module.exports = router;

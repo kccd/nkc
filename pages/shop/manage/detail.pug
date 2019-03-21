@@ -1,6 +1,5 @@
-extends ../account/shopAccountBase
-block shopAccountTitle
-  title=`订单详情 | 科创商城`
+extends ./index.pug
+block title
   -const order = data.order
   style.
     .orderStatusLi {
@@ -66,7 +65,7 @@ block shopAccountTitle
       font-weight: bold;
       margin-right: 10px
     }
-block shopAccountContent
+block name
   .row
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px")
       div(style="border:1px solid #ddd;background-color:#eee;padding:20px")
@@ -84,25 +83,26 @@ block shopAccountContent
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusTitle 当前订单状态：
-              span.orderStatusText 等待商家发货
+              span.orderStatusText 买家已付款、等待商家发货
             li.orderPrompt 
               span 
-                button(onclick="alert('测试：提醒商家发货')") 提醒商家发货
+                button(onclick=`openSendGoodsModal(${order.storeId}, ${order.orderId})`) 发货
             li.orderPrompt 
-              span 申请退款请前往到
-              span 
-                a(href=`/shop/order`) 已买到的宝贝
+              span 买家已付款，请尽快发货，否则买家有权申请退款
+            li.orderPrompt
+              span 如果无法发货，请及时与买家联系并说明情况
+            li.orderPrompt
+              span 买家申请退款后，须征得买家同意后再操作发货，否则买家有权拒收货物
           if order.orderStatus == "unSign"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusTitle 当前订单状态：
               span.orderStatusText 商家已发货，等待买家确认收货
             li.orderPrompt 
-              button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
-            li.orderPrompt 
-              span 申请退款请前往到
-              span 
-                a(href=`/shop/order`) 已买到的宝贝
+              span 已发货，您可以
+              span
+                button(onclick=`comfirmReceipt(${order.orderId})`) 提醒
+              span 买家确认收货
             li.orderPrompt 
               span 点击查看商品的
               span 
@@ -113,18 +113,7 @@ block shopAccountContent
               span.orderStatusTitle 当前订单状态：
               span.orderStatusText 订单已完成
             li.orderPrompt
-              span 交易成功，请前往参与
-              span
-                a.orderStatusTextLink(href=`/t/${order.product.tid}`) 讨论
-            li.orderPrompt 
-              span 如果没有收到货，或收到货后出现问题，您可以
-              span 
-                a.orderStatusTextLink(href=`/u/${order.store.uid}`) 联系卖家
-              span 协商解决
-            li.orderPrompt 
-              span 如果卖家没有履行应尽的承诺，您可以申请
-              span 
-                a.orderStatusTextLink(href=`/shop`) 商城仲裁
+              span 交易已成功，如果买家提出售后要求，请积极与买家协商，做好售后服务。
     .col-sm-12.col-md-12.col-xs-12
       .panel.panel-default
         .panel-body
@@ -167,11 +156,6 @@ block shopAccountContent
                 span.infoCaption 付款时间:
                 if order.payToc
                   span.infoContent=order.payToc.toLocaleString()
-            .col-xs-6
-              p
-                span.infoCaption 收货时间:
-                if order.signToc
-                  span.infoContent=order.signToc.toLocaleString()
             .col-xs-6
               p
                 span.infoCaption 成交时间:
@@ -220,8 +204,28 @@ block shopAccountContent
         p
           span(style='font-weight: bold;') 实付款: 
           span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice)}
-
-
-
-block shopScripts
-  +includeJS('/shop/order/order.js')
+  #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 填写运单号
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-2.control-label 快递单号
+              .col-sm-8
+                input.form-control#newtracknumber(type='text')
+            //- .form-group 
+            //-   label.col-sm-2.control-label 属性
+            //-   .col-sm-8
+            //-     textarea.form-control#newValue(name="", rows="5" placeholder="黄色,红褐色,蓝色")
+            //-     p(style="color:red") 注意：请使用英文逗号分隔多个属性值,请勿使用中文逗号
+          input#newstoreid(type="text" style="display:none")
+          input#neworderid(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+block manageScripts
+  +includeJS("/shop/manage/order.js")

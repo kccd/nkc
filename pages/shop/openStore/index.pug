@@ -3,6 +3,8 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
+  //- -const user = data.user;
+  -console.log(data.user)
   link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
   
   title 商品
@@ -86,8 +88,10 @@ block content
                   .col-sm-12
                     div(style="width:100%;background-color:#f0f8ff;border:1px solid #40c4ff;padding:20px")
                       p
-                      | 您已登陆了科创账户：Kris&nbsp;
-                      a(href="javascript:void(0);" onclick="accountAuth()") 点击认证
+                        span 您已登陆了科创账户：
+                        span!=`${data.user.username}`
+                        span 
+                          a(href="javascript:void(0);" onclick="accountAuth()") 点击认证
                       p(style="color:green") 认证成功
                       p(style="color:red") 尚未认证
                 .form-group

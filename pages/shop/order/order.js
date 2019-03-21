@@ -37,10 +37,13 @@ function comfirmReceipt(orderId) {
   })
 }
 
-// /**
-//  * 立即付款
-//  */
-// function 
+/**
+ * 立即付款
+ */
+function payNow(orderId) {
+  var targetUrl = "/shop/pay?ordersId=" + orderId;
+  window.location.href = targetUrl;
+}
 
 /**
  * 参与讨论

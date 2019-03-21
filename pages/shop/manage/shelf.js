@@ -208,8 +208,10 @@ function productToShelf(storeId) {
   }
   nkcAPI('/shop/manage/'+storeId+'/shelf', "POST" ,{post:productInfo})
   .then(function(data) {
-    // window.location.href = "/activity/list";
-    alert("上架成功")
+    screenTopAlert("上架成功");
+    var product = data.product;
+    var targetUrl = '/shop/product/'+product.productId;
+    window.location.href = targetUrl;
   })
   .catch(function(data){
     alert("上架失败")

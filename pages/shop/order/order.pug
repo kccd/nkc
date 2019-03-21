@@ -66,7 +66,7 @@ block shopAccountContent
                 if order.orderStatus == "finish"
                   p 订单已完成
                 p
-                  a(href=`/shop/order/detail?orderId=${order.orderId}` target="_blank") 订单详情
+                  a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
               td #{numToFloatTwo(order.orderPrice)}
               td 
                 if order.orderStatus == "unCost"

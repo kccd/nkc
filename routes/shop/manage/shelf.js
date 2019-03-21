@@ -54,7 +54,7 @@ shelfRouter
     }));
     if(!imgMaster) ctx.throw(400, '商品主要图片不能为空');
     if(!imgIntroductions.includes(imgMaster)) ctx.throw(400, '请在已选择的商品图片中选择商品主要图片');
-    if(!['payReduceStock', 'payReduceStock'].includes(stockCostMethod)) 
+    if(!['payReduceStock', 'orderReduceStock'].includes(stockCostMethod)) 
       ctx.throw(400, '库存计数方式错误，仅支持【付款减库存(payReduceStock)】、【下单减库存(orderReduceStock)】');
     if(!['notonshelf', 'insale'].includes(productStatus)) 
       ctx.throw(400, '商品状态 设置错误，仅支持【上架(insale)】、【不上架(notonshelf)】');
@@ -142,6 +142,7 @@ shelfRouter
       await d.save();
     }
     await product.save();
+    data.product = product;
 		await next();
 	})
 module.exports = shelfRouter;

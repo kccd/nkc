@@ -3,6 +3,8 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
+  -const storeInfo = data.storeInfo
+  -const storeDecoration = data.storeDecoration;
   title 店铺
   link(rel='stylesheet' href='/shop/store/store.css')
 
@@ -17,7 +19,7 @@ block content
           // 店铺招牌
           .col-xs-12.col-md-12
             .storeSign
-              img(src="/statics/storeLogo/sign.jpg", style="width:100%")
+              img(src=`/statics/storeLogo/storeLogo`+`${storeInfo.storeId}`+`.jpg`, style="width:100%")
           // 店铺导航
           .col-xs-12.col-md-12
             .storeNav
@@ -29,7 +31,10 @@ block content
                       span.icon-bar
                       span.icon-bar
                       span.icon-bar
-                    a.navbar-brand(href='#') [店铺名称]
+                    a.navbar-brand(href='#') 
+                      span [
+                      span!=`${storeInfo.storeName}`
+                      span ]
                   #bs-example-navbar-collapse-1.collapse.navbar-collapse
                     ul.nav.navbar-nav
                       li.dropdown
@@ -105,23 +110,25 @@ block content
                       li.service-block
                         p.boldFont 工作时间
                         ul.service-content
-                          li 周一至周五：10:00-24:00
-                          li 周六至周日：13:30-24:00
-                      //- li.service-block
-                      //-   p.boldFont 在线咨询
-                      //-   ul.service-content
-                      //-     li.group
-                      //-       span.groupname 总服务台
-                      //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=5634692&s=1&charset=gbk&fromid=cntaobao', target='_blank')
-                      //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=5634692&s=1', alt='点击这里给我发消息')
-                      //-     li.group
-                      //-       span.groupname 售前客服
-                      //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=2546508&s=1&charset=gbk&fromid=cntaobao', target='_blank')
-                      //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=2546508&s=1', alt='点击这里给我发消息')
+                          li 
+                            span 周一至周五：
+                            span!=`${storeDecoration.serviceTimeWork[0]}`
+                            span -
+                            span!=`${storeDecoration.serviceTimeWork[1]}`
+                          li 
+                            span 周六至周日：
+                            span!=`${storeDecoration.serviceTimeRest[0]}`
+                            span -
+                            span!=`${storeDecoration.serviceTimeRest[1]}`
                       li.service-block
                         p.boldFont 联系方式
                         ul.service-content
-                          li.tel 联系电话：028-86691700
+                          li.tel 
+                            span 联系电话：
+                            span!=`${storeDecoration.servicePhone}`
+                          li.mob 
+                            span 手机号码：
+                            span!=`${storeDecoration.serviceMobile}`
             // 商品推荐
             .col-xs-12.col-md-12
               .panel.panel-default

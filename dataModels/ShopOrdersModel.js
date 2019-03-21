@@ -107,11 +107,13 @@ const shopOrdersSchema = new Schema({
   /**
    * 退款状态
    * @ing 正在退款中
-   * @end 退款已处理
+   * @success 退款已成功
+   * @fail 退款已失败
+   * @null 没有退款行为
    */
   refundStatus: {
     type: String,
-    default: ""
+    default: null
   },
   /**
    * 订单是否关闭
@@ -145,18 +147,23 @@ const shopOrdersSchema = new Schema({
 shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
   if(!o) o = {};
   let options = {
+    store: true,
     user: true,
     product: true,
     productParam: true
   };
   o = Object.assign(options, o);
+  const ShopOrdersModel = mongoose.model('shopStores');
   const UserModel = mongoose.model('users');
   const ShopGoodsModel = mongoose.model('shopGoods');
   const ShopProductsParamsModel = mongoose.model('shopProductsParams');
+  const storeId = new Set(), storeObj = {};
   const uid = new Set(), userObj = {};
   const productId = new Set(), productObj = {};
   const paramId = new Set(), productParamObj = {};
   orders.map(ord =>{
+    if(o.store)
+      storeId.add(ord.storeId)
     if(o.user)
       uid.add(ord.uid);
     if(o.product)
@@ -164,7 +171,13 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
     if(o.productParam)
       paramId.add(ord.paramId)
   });
-  let users, products, productParams;
+  let stores, users, products, productParams;
+  if(o.store) {
+    stores = await ShopOrdersModel.find({storeId: {$in:[...storeId]}});
+    for(const store of stores) {
+      storeObj[store.storeId] = store;
+    }
+  }
   if(o.user) {
     users = await UserModel.find({uid: {$in:[...uid]}});
     for(const user of users) {
@@ -187,6 +200,7 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
   }
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
+    if(o.store) order.store = storeObj[ord.storeId];
     if(o.user) order.user = userObj[ord.uid];
     if(o.product) order.product = productObj[ord.productId];
     if(o.productParam) order.productParam = productParamObj[ord.paramId];

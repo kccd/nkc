@@ -6,8 +6,12 @@ storeRouter
     // 获取商品id，并检查商品是否存在
     const {storeId} = params;
     const store = await db.ShopStoresModel.findOne({storeId});
+    const storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
     if(!store) ctx.throw(404, "店铺不存在");
     data.storeInfo = store;
+    data.storeDecoration = storeDecoration;
+    console.log(data.storeInfo);
+    console.log(data.storeDecoration)
     ctx.template = "shop/store/store.pug";
     await next();
   })

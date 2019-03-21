@@ -54,11 +54,21 @@ block name
               //- td=order.user.username
               td
                 a(href=`/u/74847`) Kris
-              td 
-                p 查看物流
-                p 交易状态
+              td
+                if order.orderStatus == "unCost"
+                  p 未付款
+                if order.orderStatus == "unShip"
+                  p 等待发货
+                if order.orderStatus == "unSign"
+                  p 等待确认收货
+                if order.orderStatus == "finish"
+                  p 订单已完成
+                if order.orderStatus == "unSign" || order.orderStatus == "finish" 
+                  p 
+                    a(onclick=`visitLogisticsInfo(${order.orderId})` style="cursor:pointer") 查看物流
                 p 
-                  a(href=`/shop/order/detail?orderId=${order.orderId}`) 详情
+                  //- a(href=`/shop/order/detail?orderId=${order.orderId}`) 详情
+                  a(href=`/shop/manage/${order.storeId}/order/detail?orderId=${order.orderId}`) 详情
               td #{numToFloatTwo(order.orderPrice)}
               td
                 if order.orderStatus == "unCost"

@@ -81,3 +81,11 @@ function openEditOrderModal(storeId, orderId) {
   $("#eostoreid").val(storeId);
   $("#eoorderid").val(orderId);
 }
+
+/**
+ * 查看物流
+ */
+function visitLogisticsInfo(orderId) {
+  var targetUrl = '/shop/order/'+orderId+'/logistics';
+  window.location.href = targetUrl;
+}

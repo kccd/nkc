@@ -21,7 +21,6 @@ orderRouter
 		data.paging = paging;
 		const orders = await db.ShopOrdersModel.find(searchMap).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
 		data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);
-		console.log(data.orders)
 		data.orderStatus = orderStatus;
 		ctx.template = 'shop/manage/order.pug';
 		await next();
@@ -33,7 +32,8 @@ orderRouter
 		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "订单无效");
-		await order.update({$set: {trackNumber:trackNumber, orderStatus:"unSign"}});
+		var time = new Date();
+		await order.update({$set: {trackNumber:trackNumber, orderStatus:"unSign", shipToc:time}});
 		await next();
 	})
   // 修改订单价格
@@ -43,9 +43,25 @@ orderRouter
     const {orderId, price} = body.post;
     if(!orderId) ctx.throw(400, "订单号有误");
     const order = await db.ShopOrdersModel.findOne({orderId});
-    if(!order) ctx.throw(400, "未找到订单");
-    if(user.uid !== order.uid) ctx.throw(400, "您无权修改此订单价格");
+		if(!order) ctx.throw(400, "未找到订单");
+		let orders = await db.ShopOrdersModel.storeExtendOrdersInfo([order]);
+		data.order = orders[0];
+    if(user.uid !== data.order.store.uid) ctx.throw(400, "您无权修改此订单价格");
     await order.update({$set:{"orderPrice":price}});
     await next();
-  })
+	})
+	// 查看订单详情
+	.get('/detail', async (ctx, next) => {
+		const {data, db, params, query, nkcModules} = ctx;
+		const {user} = data;
+		const {orderId} = query;
+		if(!orderId) ctx.throw(400, "订单号有误");
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(404, "未找到订单");
+		let orders = await db.ShopOrdersModel.storeExtendOrdersInfo([order]);
+		data.order = orders[0];
+		if(data.order.store.uid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
+		ctx.template = 'shop/manage/detail.pug';
+		await next();
+	})
 module.exports = orderRouter;

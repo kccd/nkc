@@ -68,6 +68,9 @@ module.exports = {
         },
         editOrder: {
           PATCH: 'editOrder'
+        },      
+        detail: {
+          GET: "visitStoreOrderDetail"
         }
       }
     },

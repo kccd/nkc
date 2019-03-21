@@ -22,7 +22,7 @@ applysRouter
 		if(!userPersonal || !userPersonal.mobile) ctx.throw(400, "该用户尚未绑定手机号,请驳回开店申请");
 		let newStoreInfo = {
 			storeId:storeId,
-			uid: user.uid,
+			uid: apply.uid,
 			mobile: [userPersonal.mobile]
 		}
 		const newStore = new db.ShopStoresModel(newStoreInfo);
