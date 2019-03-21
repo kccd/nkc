@@ -1,21 +1,12 @@
 const Router = require('koa-router');
 const router = new Router();
+const cancelRouter = require('./cancel');
 router
-  // 取消订单
   .use('/', async (ctx, next) => {
     const {data, params, db} = ctx;
     data.order = await db.ShopOrdersModel.findOne({orderId: params.orderId});
     if(!data.order) ctx.throw(400, `订单【${params.orderId}】不存在, 请刷新`);
-    await next();
-  })
-  .patch('/cancel', async(ctx, next) => {
-    const {data, params, db, query, body} = ctx;
-    const {user} = data;
-    const {orderId} = params;
-    const order = await db.ShopOrdersModel.findOne({orderId});
-    if(!order) ctx.throw(400, "订单不存在");
-    if(order.uid !== user.uid) ctx.throw(304, "您无权操作该订单");
-    await order.update({$set:{"closeStatus":true}});
+    if(data.order.uid !== data.user.uid) ctx.throw(403, '您无权操作别人的订单')
     await next();
   })
   // 查看物流
@@ -46,5 +37,6 @@ router
     if(user.uid !== order.uid) ctx.throw(400, "您无权操作此订单");
     await order.update({$set:{"orderStatus":"finish"}})
     await next();
-  });
+  })
+  .use('/cancel', cancelRouter.routes(), cancelRouter.allowedMethods());
 module.exports = router;

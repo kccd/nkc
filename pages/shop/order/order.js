@@ -2,17 +2,19 @@
  * 取消订单
  */
 function cancelOrder(orderId) {
-  var confirmCancel = window.confirm("订单取消后将不可恢复,您确定要取消？");
-  if(confirmCancel){
-    nkcAPI("/shop/order/"+orderId+"/cancel", "PATCH", {})
-    .then(function(data) {
-      screenTopAlert("已取消订单");
-      window.location.reload();
-    })
-    .catch(function(data) {
-      screenTopWarning(data || data.error);
-    })
-  }
+  var reason = prompt("【临时理由输入框】请输入取消订单的理由（取消后不可恢复）：", "");
+  if(reason === null) return;
+  if(reason === '') return screenTopWarning('理由不能为空');
+  nkcAPI("/shop/order/"+orderId+"/cancel", "PATCH", {
+    reason: reason
+  })
+  .then(function(data) {
+    screenTopAlert("已取消订单");
+    window.location.reload();
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error);
+  });
 }
 
 /**

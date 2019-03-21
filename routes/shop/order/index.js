@@ -2,7 +2,37 @@ const Router = require('koa-router');
 const router = new Router();
 const singleOrderRouter = require('./singleOrder');
 router
+  .use('/', async (ctx, next) => {
+    // 处理超过30分钟未付款的订单
+    await ctx.db.ShopOrdersModel.clearTimeoutOrders(ctx.data.user.uid);
+    await next();
+  })
   .get('/', async (ctx, next) => {
+    const {data, db, query, params, nkcModules} = ctx;
+    let {page = 0, orderStatus} = query;
+    const {user} = data;
+    let q = {
+      uid: user.uid
+    };
+    if(orderStatus && orderStatus !== 'all') {
+      q.orderStatus = orderStatus;
+      q.closeStatus = false;
+    }
+    const count = await db.ShopOrdersModel.count(q);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    const sort = {};
+    if(orderStatus !== 'unCost') {
+      sort.payToc = -1;
+    } else {
+      sort.orderToc = -1;
+    }
+    const orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
+    data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    data.orderStatus = orderStatus;
+    ctx.template = '/shop/order/order.pug';
+    await next();
+  })
+  /* .get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
 		const {page = 0} = query;
 		let {orderStatus} = query;
@@ -31,13 +61,13 @@ router
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
     await next();
-  })
+  }) */
   // 提交订单，并跳转到支付
   .post('/', async (ctx, next) => {
     const {data, db, query, body} = ctx;
     const {user} = data;
     const {post, receInfo} = body;
-    const {receiveAddress, receiveName, receiveMobile, payMethod} = receInfo;
+    const {receiveAddress, receiveName, receiveMobile} = receInfo;
 
     // 取出全部paid
     let paids = [];
@@ -70,6 +100,7 @@ router
         orderPrice: productParam.price * bill.productCount
       });
       await order.save();
+      await db.ShopCartModel.remove({uid: user.uid, productParamId: productParam._id});
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');
