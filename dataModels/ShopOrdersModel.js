@@ -285,8 +285,16 @@ shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
   let title = '';
   const ordersId = [];
   let totalMoney = 0;
+  let needAdd = true;
   for(const o of orders) {
-    title += `${o.count}*${o.product.name}(${o.productParam.name.join('+ ')}) `;
+    if(needAdd) {
+      const old = title;
+      title += `${o.count}*${o.product.name}(${o.productParam.name.join('+ ')}) `;
+      if(title.length >= 150) {
+        needAdd = false;
+        title = old + '...';
+      }
+    }
     ordersId.push(o.orderId);
     totalMoney += o.orderPrice;
   }
@@ -297,6 +305,72 @@ shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
     ordersId
   }
 };
+/* 
+  构造查询条件
+  @param q: 自定义查询条件
+  @return 查询对象
+  @author pengxiguaa 2019/3/21
+ */
+shopOrdersSchema.statics.getQueryData = async (q) => {
+  return Object.assign({
+    closeStatus: false
+  }, q);
+};
+
+/* 
+  处理超过30分钟未付款的订单
+  @param uid: 用户ID
+  @author pengxiguaa 2019/3/21
+*/
+shopOrdersSchema.statics.clearTimeoutOrders = async (uid) => {
+  const now = Date.now();
+  await mongoose.model('shopOrders').updateMany({
+    uid,
+    toc: {
+      $lt: now - 30 * 60 *1000
+    },
+    closeStatus: false,
+    orderStatus: 'unCost'
+  }, {
+    $set: {
+      closeStatus: true,
+      closeToc: now
+    }
+  });
+};
+
+/* 
+  翻译订单当前所处的状态，会在订单对象上添加”status“属性，值为订单状态字符串
+  @param orders: 订单对象所组成的数组
+  @author pengxiguaa 2019/3/21
+*/
+shopOrdersSchema.statics.translateOrderStatus = async (orders) => {
+  return orders.map(o => {
+    let order;
+    if(o.toObject) {
+      order = o.toObject();
+    } else {
+      order = o;
+    }
+    const {orderStatus, closeStatus, refundStatus} = order;
+    let refund = '';
+    if(refundStatus === 'ing') {
+      refund = '(正在申请退款中)';
+    } else if(refundStatus === 'success') {
+      refund = '(退款成功)';
+    } else if(refundStatus === 'fail') {
+      refund = '(退款失败)';
+    }
+    if(closeStatus) {
+      order.status = '订单已关闭';
+    } else {
+      switch(orderStatus) {
+        
+      }
+    }
+
+  });
+}
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;
