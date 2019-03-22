@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
-const cancelRouter = require('./cancel');
+const refundRouter = require('./refund');
 router
   .use('/', async (ctx, next) => {
     const {data, params, db} = ctx;
@@ -53,5 +53,5 @@ router
     ctx.template = '/shop/order/detail.pug';
     await next();
   })
-  .use('/cancel', cancelRouter.routes(), cancelRouter.allowedMethods());
+  .use('/refund', refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = router;

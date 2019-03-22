@@ -9,6 +9,7 @@ const cartRouter = require('./cart');
 const billRouter = require('./bill');
 const orderRouter = require('./order');
 const payRouter = require('./pay');
+const refundRouter = require('./refund');
 shopRouter
   .get('/', async (ctx, next) => {
     const {data, db ,query, params} = ctx;
@@ -39,5 +40,6 @@ shopRouter
   .use('/bill', billRouter.routes(), billRouter.allowedMethods())
   .use('/order', orderRouter.routes(), orderRouter.allowedMethods())
   .use('/pay', payRouter.routes(), payRouter.allowedMethods())
+  .use('/refund', refundRouter.routes(), refundRouter.allowedMethods())
 	.use('/store', storeRouter.routes(), storeRouter.allowedMethods())
 module.exports = shopRouter;

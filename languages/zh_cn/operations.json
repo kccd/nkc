@@ -431,6 +431,8 @@
   "visitShopPay": "访问商城付款页面",
   "getAlipayUrl": "获取支付宝付款链接",
   "kcbPay": "科创币付款",
+  "visitUserOrderRefund": "访问用户申请退款页",
+  "userApplyRefund": "商城 用户申请退款",
 
 
   "APPgetUserInfo": "app获取用户信息",

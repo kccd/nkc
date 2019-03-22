@@ -20,7 +20,8 @@ orderRouter
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
 		const orders = await db.ShopOrdersModel.find(searchMap).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
-		data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);
+    data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);
+    data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
 		data.orderStatus = orderStatus;
 		ctx.template = 'shop/manage/order.pug';
 		await next();

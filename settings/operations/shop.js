@@ -100,8 +100,8 @@ module.exports = {
     GET: 'visitUserOrder',
     POST: 'submitToPay',
     PARAMETER: {
-      cancel: {
-        PATCH: "cancelUserOrder"
+      refund: {
+        GET: 'visitUserOrderRefund'
       },
       logistics: {
         GET: "visitOrderLogistics"
@@ -119,6 +119,12 @@ module.exports = {
     POST: 'kcbPay',
     alipay: {
       GET: 'getAlipayUrl'
+    }
+  },
+  refund: {
+    POST: 'userApplyRefund',
+    PARAMETER: {
+      PATCH: 'userApplyRefund'
     }
   }
 };

@@ -362,13 +362,17 @@ shopOrdersSchema.statics.translateOrderStatus = async (orders) => {
       refund = '(退款失败)';
     }
     if(closeStatus) {
-      order.status = '订单已关闭';
+      order.status = '已关闭';
     } else {
       switch(orderStatus) {
-        
+        case 'unCost': order.status = '待付款'; break;
+        case 'unShip': order.status = '待发货'; break;
+        case 'unSign': order.status = '待收货'; break;
+        case 'finish': order.status = '完成'; break;
       }
+      order.status += refund;
     }
-
+    return order;
   });
 }
 

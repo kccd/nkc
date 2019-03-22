@@ -54,7 +54,8 @@ block name
               //- td=order.user.username
               td
                 a(href=`/u/74847`) Kris
-              td
+              td= order.status  
+              //-td
                 if order.orderStatus == "unCost"
                   p 未付款
                 if order.orderStatus == "unShip"
