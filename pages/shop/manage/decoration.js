@@ -128,7 +128,7 @@ function saveStoreSearch(storeId) {
   .then(function(data) {
     screenTopAlert("保存成功");
     $('#storeSearchModal').modal('hide');
-    location.href = '/shop/manage/'+storeId+'/decoration#searchAnchor';
+    window.location.reload();
   })
   .catch(function(data) {
     screenTopWarning(JSON.parse(data.responseText).error);
@@ -154,9 +154,9 @@ function editStoreFeatured(storeId) {
     for(var i in data.products){
       var dom;
       if(data.products[i].isFeatured == true){
-        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].productDescription+'</p><p style="font-size:smaller;">'+data.products[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-danger btn-sm" onclick="delStoreFeatured('+data.products[i].storeId+','+data.products[i].productId+')">取消推荐</button></div></div>';
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].name+'</p></div><div class="media-right"><button class="btn btn-danger btn-sm" onclick="delStoreFeatured('+data.products[i].storeId+','+data.products[i].productId+')">取消推荐</button></div></div>';
       }else{
-        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].productDescription+'</p><p style="font-size:smaller;">'+data.products[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="addStoreFeatured('+data.products[i].storeId+','+data.products[i].productId+')">推荐</button></div></div>';
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.products[i].productId+'"><img class="media-object" src="/r/'+data.products[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.products[i].name+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="addStoreFeatured('+data.products[i].storeId+','+data.products[i].productId+')">推荐</button></div></div>';
       }
       totalDom.push(dom);
     }
@@ -279,6 +279,7 @@ function delStoreClass(storeId, index) {
  * 编辑单个分类推荐
  */
 function editSingleClassify(index,storeId) {
+  console.log(index)
   nkcAPI('/shop/manage/'+storeId+'/decoration/singleClass?index='+index, "GET", {})
   .then(function(data) {
     var totalDom = [];
@@ -287,9 +288,9 @@ function editSingleClassify(index,storeId) {
     for(var i in data.classProducts){
       var dom;
       if(data.classProducts[i].isFeatured == true){
-        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.classProducts[i].productId+'"><img class="media-object" src="/r/'+data.classProducts[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.classProducts[i].productDescription+'</p><p style="font-size:smaller;">'+data.classProducts[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-danger btn-sm" onclick="delSingleClassify('+data.classProducts[i].storeId+','+data.classProducts[i].productId+','+index+')">取消推荐</button></div></div>';
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.classProducts[i].productId+'"><img class="media-object" src="/r/'+data.classProducts[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.classProducts[i].name+'</p></div><div class="media-right"><button class="btn btn-danger btn-sm" onclick="delSingleClassify('+data.classProducts[i].storeId+','+data.classProducts[i].productId+','+index+')">取消推荐</button></div></div>';
       }else{
-        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.classProducts[i].productId+'"><img class="media-object" src="/r/'+data.classProducts[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.classProducts[i].productDescription+'</p><p style="font-size:smaller;">'+data.classProducts[i].productFinalPrice+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="addSingleClassify('+data.classProducts[i].storeId+','+data.classProducts[i].productId+','+index+')">推荐</button></div></div>';
+        dom = '<div class="form-group"></div><div class="media"><div class="media-left"><a href="/shop/product/'+data.classProducts[i].productId+'"><img class="media-object" src="/r/'+data.classProducts[i].imgMaster+'" style="width: 50px; height: 50px;" /></a></div><div class="media-body"><p class="media-heading" style="font-size:smaller;">'+data.classProducts[i].name+'</p></div><div class="media-right"><button class="btn btn-primary btn-sm" onclick="addSingleClassify('+data.classProducts[i].storeId+','+data.classProducts[i].productId+','+index+')">推荐</button></div></div>';
       }
       totalDom.push(dom);
     }
@@ -363,7 +364,7 @@ function delSingleClassify(storeId, productId, index) {
  * 保存分类推荐
  */
 function saveStoreClassify(storeId) {
-  screenTopAlert("shangchua");
+  screenTopAlert("分类推荐成功");
   $('#storeEditClassModal').modal('hide');
   window.location.href = '/shop/manage/'+storeId+'/decoration';
 }

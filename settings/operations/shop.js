@@ -4,12 +4,12 @@ module.exports = {
     GET: 'visitShopAccount'
   },
   product: {
-    GET: 'visitProductIndex',
     PARAMETER: {
       GET: 'visitProductSingle'
     }
   },
   manage: {
+    GET: "visitManageRouter",
     PARAMETER: {
       GET: 'visitManageIndex',
       home: {
@@ -20,22 +20,22 @@ module.exports = {
         POST: 'productToShelf'
       },
       info: {
-        GET: 'visitShopInfoIndex',
-        POST: 'modifyShopInfo'
+        GET: 'visitStoreInfoIndex',
+        POST: 'modifyStoreInfo'
       },
       decoration: {
         sign: {
-          POST: 'modifyShopDecorationSign'
+          POST: 'modifyStoreDecorationSign'
         },
         service: {
-          POST: 'modifyShopDecorationService'
+          POST: 'modifyStoreDecorationService'
         },
         search: {
-          POST: 'modifyShopDecorationSearch'
+          POST: 'modifyStoreDecorationSearch'
         },
         featured: {
           GET: "visitFeaturedProductList",
-          POST: "modifyShopDecorationFeatured"
+          POST: "modifyStoreDecorationFeatured"
         },
         addClass: {
           PATCH: 'addStoreClassFeatured'
@@ -49,8 +49,8 @@ module.exports = {
         addSingleClass: {
           PATCH: 'addStoreSingleClassify'
         },
-        GET: 'visitShopDecorationIndex',
-        POST: 'modifyShopDecoration'
+        GET: 'visitStoreDecorationIndex',
+        POST: 'modifyStoreDecoration'
       },
       classify: {
         GET: 'visitShopClassifyIndex',

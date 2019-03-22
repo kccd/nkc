@@ -22,12 +22,12 @@ decorationRouter
     data.storeDecoration = storeDecoration;
 
     let featuredProducts = await db.ShopGoodsModel.find({productId:{$in:storeDecoration.storeLeftFeatureds}})
-    data.featuredProducts = featuredProducts;
+    data.featuredProducts = await db.ShopGoodsModel.extendProductsInfo(featuredProducts);
     // 获取分类推荐
     // console.log(storeDecoration.storeClassFeatureds)
     data.storeClassFeatureds = await Promise.all(storeDecoration.storeClassFeatureds.map(async classify => {
       let classFeatureds = await db.ShopGoodsModel.find({productId:{$in:classify.productsArr}});
-      classify.classFeatureds = classFeatureds;
+      classify.classFeatureds = await db.ShopGoodsModel.extendProductsInfo(classFeatureds);
       return classify
     }))
     // data.products = await Promise.all(data.products.map(async product => {
@@ -100,7 +100,7 @@ decorationRouter
     const {data, db, params} = ctx;
     const storeId = params.account;
     const products = await db.ShopGoodsModel.find({storeId});
-    data.products = products;
+    data.products = await db.ShopGoodsModel.extendProductsInfo(products);
     await next();
   })
   .get('/featured', async (ctx, next) => {
@@ -111,7 +111,7 @@ decorationRouter
     let storeLeftFeatureds = storeDecoration.storeLeftFeatureds;
     data.storeLeftFeatureds = storeLeftFeatureds;
     data.products = await Promise.all(data.products.map(async product => {
-      product = product.toObject();
+      // product = product.toObject();
       if(storeLeftFeatureds.indexOf(product.productId) > -1){
         product.isFeatured = true;
       }else{
@@ -126,6 +126,10 @@ decorationRouter
     const storeId = params.account;
     let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
     const {arr} = body;
+    const nullIndex = arr.indexOf("");
+    if(nullIndex > -1) {
+      arr.splice(nullIndex, 1)
+    }
     await storeDecoration.update({$set:{storeLeftFeatureds: arr}})
     await next();
   })
@@ -140,7 +144,7 @@ decorationRouter
       productsArr:[]
     }
     storeDecoration.storeClassFeatureds.push(newClassObj);
-    await db.ShopDecorationsModel.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await storeDecoration.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
   .get('/singleClass', async (ctx, next) => {
@@ -153,7 +157,7 @@ decorationRouter
     let storeClassFeatureds = storeDecoration.storeClassFeatureds[index];
     data.storeClassFeatureds = storeClassFeatureds;
     data.classProducts = await Promise.all(data.products.map(async product => {
-      product = product.toObject();
+      // product = product.toObject();
       if(storeClassFeatureds.productsArr.indexOf(product.productId) > -1){
         product.isFeatured = true;
       }else{
@@ -167,10 +171,14 @@ decorationRouter
   .patch('/addSingleClass', async (ctx, next) => {
     const {data, params, body, db, query} = ctx;
     const {index, arr} = body;
+    const nullIndex = arr.indexOf("");
+    if(nullIndex > -1) {
+      arr.splice(nullIndex, 1);
+    }
     const storeId = params.account;
     let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
     storeDecoration.storeClassFeatureds[index].productsArr = arr;
-    await db.ShopDecorationsModel.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await storeDecoration.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
   .patch('/delClass', async(ctx, next) => {

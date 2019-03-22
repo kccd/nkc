@@ -7,6 +7,19 @@ const classifyRouter = require('./classify');
 const orderRouter = require('./order');
 const manageRouter = new Router();
 manageRouter
+  .get ('/', async (ctx, next) => {
+    const {data, db, params} = ctx;
+    const {user} = data;
+    if(!user) {
+      return ctx.redirect('/login');
+    }
+    const store = await db.ShopStoresModel.findOne({uid: user.uid});
+    if(!store) {
+      return ctx.redirect('/shop/openStore');
+    }else{
+      return ctx.redirect(`/shop/manage/${store.storeId}/home`)
+    }
+  })
   .use('/:account', async (ctx, next) => {
     const {data, db, params} = ctx;
     const {account} = params;
@@ -28,4 +41,5 @@ manageRouter
   .use('/:account/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:account/decoration', decorationRouter.routes(), decorationRouter.allowedMethods())
   .use('/:account/order', orderRouter.routes(), orderRouter.allowedMethods())
+  .use('/:account/classify', classifyRouter.routes(), classifyRouter.allowedMethods())
 module.exports = manageRouter;

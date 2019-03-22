@@ -427,17 +427,23 @@ function openEditParamTable(para) {
  * 生成params
  */
 function tableTurnParams() {
+  // 是否使用规格信息
   var params = [];
-  $("#paramsTable tbody tr").each(function(index, ele) {
-    var obj = {};
-    obj.name = $(ele).find(".pname").text();
-    var valueStr = $(ele).find(".pvalue").text();
-    var valueArr = valueStr.split(",");
-    obj.values = valueArr;
-    params.push(obj)
-  })
-  if(params.length == 0){
-    params = []
+  var isUseParams = $("#useparams").prop("checked");
+  if(isUseParams) {
+    $("#paramsTable tbody tr").each(function(index, ele) {
+      var obj = {};
+      obj.name = $(ele).find(".pname").text();
+      var valueStr = $(ele).find(".pvalue").text();
+      var valueArr = valueStr.split(",");
+      obj.values = valueArr;
+      params.push(obj)
+    })
+    if(params.length == 0){
+      params = []
+    }
+  }else{
+    params = [];
   }
   return params;
 }
@@ -470,6 +476,9 @@ function tableTurnMulArray() {
 function mulArrExchangeArr(arr){
   var len = arr.length;
   // 当数组大于等于2个的时候
+  if(len == 0) {
+    return arr;
+  }
   if(len >= 2){
       // 第一个数组的长度
       var len1 = arr[0].length;
@@ -510,6 +519,9 @@ var firstChange = true;
 function mulArrExchangeStr(arr) {
   var len = arr.length;
   // 当数组大于等于2个的时候
+  if(len == 0) {
+    return arr;
+  }
   if(len >= 2){
       // 第一个数组的长度
       var len1 = arr[0].length;
@@ -573,8 +585,10 @@ function mulArrTurnTable() {
   var result = mulArrExchangeArr(rArr);
   var strs = mulArrExchangeStr(rArr);
   var trDom = "";
-  for(var i=0;i < result.length;i++) {
-    trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+  if(rArr.length !== 0) {
+    for(var i=0;i < result.length;i++) {
+      trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+    }
   }
   $("#arrayTable").find("tbody").html(trDom)
 }

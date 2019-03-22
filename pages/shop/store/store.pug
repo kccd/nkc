@@ -5,6 +5,8 @@ block title
   -const hiddenFooter = true;
   -const storeInfo = data.storeInfo
   -const storeDecoration = data.storeDecoration;
+  -const storeClassFeatureds = data.storeClassFeatureds;
+  -const featuredProducts = data.featuredProducts;
   title 店铺
   link(rel='stylesheet' href='/shop/store/store.css')
 
@@ -38,22 +40,22 @@ block content
                   #bs-example-navbar-collapse-1.collapse.navbar-collapse
                     ul.nav.navbar-nav
                       li.dropdown
-                        a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                          | 所有分类 
-                          span.caret
-                        ul.dropdown-menu
-                          li
-                            a(href='#') Action
-                          li
-                            a(href='#') Another action
-                          li
-                            a(href='#') Something else here
-                          li.divider(role='separator')
-                          li
-                            a(href='#') Separated link
-                          li.divider(role='separator')
-                          li
-                            a(href='#') One more separated link
+                        //- a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                        //-   | 所有分类 
+                        //-   span.caret
+                        //- ul.dropdown-menu
+                        //-   li
+                        //-     a(href='#') Action
+                        //-   li
+                        //-     a(href='#') Another action
+                        //-   li
+                        //-     a(href='#') Something else here
+                        //-   li.divider(role='separator')
+                        //-   li
+                        //-     a(href='#') Separated link
+                        //-   li.divider(role='separator')
+                        //-   li
+                        //-     a(href='#') One more separated link
                       li.active
                         a(href='#')
                           | 首页
@@ -62,27 +64,27 @@ block content
         .col-xs-12.col-md-12
           // 左侧模块组
           .col-xs-3.col-md-3
-            // 店内分类
-            .col-xs-12.col-md-12
-              .panel.panel-default
-                // Default panel contents
-                .panel-heading 店内分类
-                .panel-body(style="padding:0")
-                  ul#main-nav.nav.nav-tabs.nav-stacked(style='')
-                    li(style="background-color: aliceblue")
-                      a(href='#')
-                        | 大分类一
-                    li(style="background-color: aliceblue")
-                      a(href='#')
-                        | 大分类二
-                    li(style="background-color: aliceblue")
-                      a.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse')
-                        | 大分类三
-                        span.pull-right.glyphicon.glyphicon-chevron-down
-                      ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
-                        li
-                          a(href='#')
-                            | 小分类一
+            //- // 店内分类
+            //- .col-xs-12.col-md-12
+            //-   .panel.panel-default
+            //-     // Default panel contents
+            //-     .panel-heading 店内分类
+            //-     .panel-body(style="padding:0")
+            //-       ul#main-nav.nav.nav-tabs.nav-stacked(style='')
+            //-         li(style="background-color: aliceblue")
+            //-           a(href='#')
+            //-             | 大分类一
+            //-         li(style="background-color: aliceblue")
+            //-           a(href='#')
+            //-             | 大分类二
+            //-         li(style="background-color: aliceblue")
+            //-           a.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse')
+            //-             | 大分类三
+            //-             span.pull-right.glyphicon.glyphicon-chevron-down
+            //-           ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
+            //-             li
+            //-               a(href='#')
+            //-                 | 小分类一
             // 店内搜索
             .col-xs-12.col-md-12
               .panel.panel-default
@@ -90,13 +92,12 @@ block content
                 .panel-body(style="padding:5")
                   .row
                     .col-xs-8.col-md-8
-                      input.form-control.input-sm(type='text', placeholder='关键字')
+                      input.form-control.input-sm(type='text', placeholder='关键字' value=`${storeDecoration.presetKey}`)
                     .col-xs-3.col-md-3(style="padding:0;margin-bottom:10px")
                       button.btn.btn-primary.btn-sm 搜索
                     .col-xs-12.col-md-12(style="font-size:smaller")
-                      span 关键词一
-                      span 关键词二
-                      span 关键词三
+                      for keyWord in storeDecoration.recommendKeys
+                        span(style="margin-right: 5px;")!=`${keyWord}`
 
 
             // 客服中心
@@ -135,60 +136,30 @@ block content
                 .panel-heading
                   h3.panel-title 商品推荐
                 ul.list-group
-                  -for(var i=0;i<9;i++)
+                  for feature in featuredProducts
                     li.list-group-item
-                      a(href="#") 
-                        img(src="/default/shop1.jpg" style="width:32px;height:auto;float:right")
-                        span(style="display:block;font-weight:700;color:#666") KC901S 3GHz Handheld Network Analyzer multi RF-meter
-                      span $ 12.00
-                      div(style="float:right")
-                        span.fa.fa-star(style="color:red")
-                        span.fa.fa-star(style="color:red")
-                        span.fa.fa-star(style="color:red")
-                        span.fa.fa-star(style="color:red")
-                        span.fa.fa-star(style="color:red")
+                      a(href=`/shop/product/${feature.productId}`) 
+                        img(src=`/r/${feature.imgMaster}` style="width:32px;height:auto;float:right")
+                        span(style="display:block;font-weight:700;color:#666")!=`${feature.name}`
           // 右侧模块组
           .col-xs-9.col-md-9
-            .col-xs-12.col-md-12
-              .panel.panel-default
-                .panel-heading 
-                  span 商品推荐
-                  a(href="#" style="float:right") 
-                    | 更多
-                    span.fa.fa-angle-double-right
-                .panel-body(style="padding:0")
-                  .row
-                    -for(var a=1;a<6;a++)
-                      .col-sm-6.col-md-4
-                        .thumbnail(style="margin:0;border:0")
-                          a(href=`/shop/product/4`)
-                            img(src=`/r/290218`, title=`12456` ,style="height:150px" )
-                          .caption
-                            a(href=`/shop/product/4` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`123456`) 产品Name
-                            p(style="color: red;text-align:center")
-                              i(style="font-style: normal;margin-right: 3px;font-weight: 900;")
-                                span(style='font-size:14px;') ￥
-                                | 8.00
-            .col-xs-12.col-md-12
-              .panel.panel-default
-                .panel-heading 
-                  span 商品推荐
-                  a(href="#" style="float:right") 
-                    | 更多
-                    span.fa.fa-angle-double-right
-                .panel-body(style="padding:0")
-                  .row
-                    -for(var a=1;a<6;a++)
-                      .col-sm-6.col-md-3
-                        .thumbnail(style="margin:0;border:0")
-                          a(href=`/shop/product/4`)
-                            img(src=`/r/290218`, title=`12456` ,style="height:150px" )
-                          .caption
-                            a(href=`/shop/product/4` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`123456`) 产品Name
-                            p(style="text-align:center")
-                              i(style="font-style: normal;margin-right: 3px;font-weight: 900;color:red;")
-                                span(style='font-size:14px;') ￥
-                                | 8.00
+            for classify,index in storeClassFeatureds
+              .col-xs-12.col-md-12
+                .panel.panel-default
+                  .panel-heading 
+                    span!=`${classify.name}`
+                    a(href="#" style="float:right") 
+                      | 更多
+                      span.fa.fa-angle-double-right
+                  .panel-body(style="padding:0")
+                    .row
+                      for cla in classify.classFeatureds
+                        .col-sm-6.col-md-4
+                          .thumbnail(style="margin:0;border:0")
+                            a(href=`/shop/product/${cla.productId}`)
+                              img(src=`/r/${cla.imgMaster}`, title=`${cla.abstract}` ,style="height:150px" )
+                            .caption
+                              a(href=`/shop/product/${cla.productId}` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${cla.abstract}`)!=`${cla.name}`
         // 页面尾部
         .col-xs-12.col-md-12
       .col-xs-1.col-md-1

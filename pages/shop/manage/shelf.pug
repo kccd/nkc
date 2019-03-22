@@ -33,30 +33,6 @@ block name
               label.col-sm-2.control-label 商品标题
               .col-sm-8
                 input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="100")
-            //- .form-group
-            //-   label.col-sm-2.control-label 商品属性
-            //-   .col-sm-8
-            //-       .col-sm-12
-            //-         p 正确填写商品属性有利于搜索，便于销售，请认真填写.
-            //-       .col-sm-12
-            //-         div(style="background-color:#eee;position: relative;float: left;font-size: 12px;clear: both;padding:20px")
-            //-           .col-sm-6
-            //-             label.control-label 货号
-            //-             input.form-control(type="text", name="")
-            //-           .col-sm-6
-            //-             label.control-label 材质
-            //-             input.form-control(type="text", name="")
-            //-           .col-sm-6
-            //-             label.control-label 品牌选择
-            //-             select.form-control
-            //-               option 1
-            //-               option 2
-            //-               option 3
-            //-               option 4
-            //-               option 5
-            //-           .col-sm-6
-            //-             label.control-label 材质
-            //-             input.form-control(type="text", name="")
             .form-group
               label.col-sm-2.control-label 商品描述
               .col-sm-8
@@ -110,11 +86,6 @@ block name
                   .input-group
                     input.form-control#originalPrice(type='number', placeholder="Product's Price", aria-describedby='originalPrice')
                     span.input-group-addon 元
-                  //- .input-group.input-group-sm.col-sm-10(style="margin-top:5px")
-                  //-   span.input-group-addon(style="background-color:#fff;border:0")
-                  //-     input#useRebate(type='checkbox', aria-label='...')
-                  //-   span.input-group-addon(style="background-color:#fff;border:0") 使用优惠价
-                    //- input.form-control#rebate(type='text', aria-label='Amount (to the nearest dollar)' placeholder="")
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-5
@@ -126,12 +97,6 @@ block name
                 label.col-sm-2.control-label 优惠后价格
                 .col-sm-5
                   input#afterDisCost.form-control(type="number", name="")
-                    //- span.input-group-addon %
-                    //- span.input-group-addon(style="background-color:#fff;border:0")
-                    //-   b 折后价&nbsp;
-                    //-   i#afterRebatePrice(style="color:red") 无
-                    //- span.input-group-addon(style="background-color:#fff;border:0")
-                    //-   i.fa.fa-question-circle(data-trigger='hover', data-container='body', data-toggle='popover', data-placement='bottom', data-content='折扣为小于100的正整数')
               .form-group
                 label.col-sm-2.control-label 库存数量
                 .col-sm-5
@@ -168,15 +133,6 @@ block name
           | 支付信息
         .panel-body
           .form-horizontal
-            //- .form-group
-            //-   label.col-sm-2.control-label 购买方式
-            //-   .col-sm-8
-            //-     label.radio-inline
-            //-       input#purchaseMethod1(type='radio', name='purchaseMethod', value='payOne')
-            //-       |  
-            //-     label.radio-inline
-            //-       input#purchaseMethod2(type='radio', name='purchaseMethod', value='payTwo')
-            //-       |  人民币
             .form-group
               label.col-sm-2.control-label 付款方式
               .col-sm-8
@@ -193,9 +149,7 @@ block name
               .col-sm-2.control-label
               .col-sm-8
                 .col-sm-12
-                  //- p 正确填写商品属性有利于搜索，便于销售，请认真填写.
                 .col-sm-9
-                  //- div(style="background-color:#d9edf7;position: relative;float: left;font-size: 12px;clear: both;padding:20px;margin:0")
                   div  
                     .input-group
                       span.input-group-addon 付款时，需支付科创币
@@ -380,7 +334,6 @@ block manageScripts
   +includeJS("/xbbcode-parser/xbbcode.js")
   +includeJS("/xss/dist/xss.js")
   +includeJS("/nkc_render.js")
-  //- +includeJS("/interface_attachment_list_display_test.js")
   +includeJS("/wangEditor.js")
   +includeJS("/shop/manage/shelfEditor.js")
   +includeJS("/shop/manage/shelf.js")

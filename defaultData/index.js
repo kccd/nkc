@@ -50,13 +50,13 @@ defaultData.init = async () => {
       console.log(`inserting operation '${operationId}' into database`);
     }
   }
-  /* const operationsDB = await db.OperationModel.find();
-  for(const operation of operationsDB) {
-    if(!operationsId.includes(operation._id)) {
-      await operation.remove();
-      console.log(`removing operation '${operation._id}' from database`);
-    }
-  } */
+  // const operationsDB = await db.OperationModel.find();
+  // for(const operation of operationsDB) {
+  //   if(!operationsId.includes(operation._id)) {
+  //     await operation.remove();
+  //     console.log(`removing operation '${operation._id}' from database`);
+  //   }
+  // } 
   const forums = require('./forums');
   const forumsCount = await db.ForumModel.count();
   if(forumsCount === 0) {

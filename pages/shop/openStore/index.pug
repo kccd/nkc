@@ -3,8 +3,6 @@ extends ../../bootstrap_base
 block title
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
-  //- -const user = data.user;
-  -console.log(data.user)
   link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
   
   title 商品
@@ -90,14 +88,14 @@ block content
                       p
                         span 您已登陆了科创账户：
                         span!=`${data.user.username}`
-                        span 
-                          a(href="javascript:void(0);" onclick="accountAuth()") 点击认证
-                      p(style="color:green") 认证成功
-                      p(style="color:red") 尚未认证
+                      //-   span 
+                      //-     a(href="javascript:void(0);" onclick="accountAuth()") 点击认证
+                      //- p(style="color:green") 认证成功
+                      //- p(style="color:red") 尚未认证
                 .form-group
                   .col-sm-12
                     -if(!data.applyHis)
-                      button.btn.btn-primary#apply(onclick="applyForOpenStore()") 提交申请
+                      button.btn.btn-primary#apply(onclick="applyForOpenStore()") 提交开店申请
                     -else
                       -if(data.applyHis.applyStatus == 'dealing')
                         button.btn.btn-default(disabled='true') 已提交申请

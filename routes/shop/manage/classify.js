@@ -7,7 +7,7 @@ classifyRouter
 		const storeId = params.account;
 		let store = await db.ShopStoresModel.findOne({storeId});
 		data.store = store;
-		ctx.template = 'shop/manage/classify.pug';
+		ctx.template = '/shop/manage/classify.pug';
 		await next();
 	})
 	.post('/add', async (ctx, next) => {

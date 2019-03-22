@@ -10,8 +10,15 @@ storeRouter
     if(!store) ctx.throw(404, "店铺不存在");
     data.storeInfo = store;
     data.storeDecoration = storeDecoration;
-    console.log(data.storeInfo);
-    console.log(data.storeDecoration)
+    // 获取商品推荐
+    let featuredProducts = await db.ShopGoodsModel.find({productId:{$in:storeDecoration.storeLeftFeatureds}})
+    data.featuredProducts = await db.ShopGoodsModel.extendProductsInfo(featuredProducts);
+    // 获取分类推荐
+    data.storeClassFeatureds = await Promise.all(storeDecoration.storeClassFeatureds.map(async classify => {
+      let classFeatureds = await db.ShopGoodsModel.find({productId:{$in:classify.productsArr}});
+      classify.classFeatureds = await db.ShopGoodsModel.extendProductsInfo(classFeatureds);
+      return classify
+    }))
     ctx.template = "shop/store/store.pug";
     await next();
   })
