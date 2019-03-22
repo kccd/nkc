@@ -474,6 +474,9 @@
   "editOrder": "修改订单",
   "visitSingleOrderDetail": "用户查看订单详情",
   "visitStoreOrderDetail": "商家查看订单详情",
+  "visitUserOrderRefund": "访问用户申请退款页",
+  "userApplyRefund": "商城 用户申请退款",
+
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

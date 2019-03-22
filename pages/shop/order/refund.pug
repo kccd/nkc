@@ -1,0 +1,65 @@
+extends ../shopBase
+block shopTitle
+  title 申请退款
+  +includeCSS('/shop/order/order.css')
+block content
+  .container-fluid.max-width
+    .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund})
+    .row#app(v-cloak)   
+      div(v-if='order')
+        .col-xs-12.col-md-6
+          .row
+            .col-xs-12.col-md-12
+              h4 商品信息
+              h5
+                img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+                div.display-i-b
+                  a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
+                  h5
+                    span.m-r-1 数量：{{order.count}}  
+                    span.m-r-1 规格：{{productParam.name.join('+')}}
+                    span.m-r-1 价格总计：
+                      strong.text-danger {{order.orderPrice/100}}
+                      |&nbsp;元
+                  h5 订单状态：
+                    strong {{order.status}}    
+                  h5
+                    a(:href="'/shop/order/'+order.orderId") 订单详情  
+              hr
+            .col-xs-12.col-md-12.m-t-1(v-if='refund')
+              h5 进度：{{refund.status}}
+              h5 卖家处理最后期限：
+                span.text-danger {{format('YYYY-MM-DD HH:mm:ss', new Date(refund.toc).getTime() + 24*60*60*1000)}}
+              h5 类型：{{refundType(refund.type)}}  
+              h5 理由：{{refund.reason}}
+              div(v-if='order.refundStatus === "ing"')  
+                button.btn.btn-sm.btn-default(v-if="refund.status === 'B_APPLY'" @click='editReason') 编辑理由
+                button.btn.btn-danger.btn-sm 放弃
+            .col-xs-12.col-md-12.m-t-1(v-if='displayInput')
+              .refund-type.m-t-2
+                h5 请选择退款方式
+                span(:class="{'active': type==='money'}" @click='type="money"') 退款
+                .display-i-b(v-if='["unCost", "unShip"].indexOf(order.orderStatus) === -1')
+                  span(:class="{'active': type==='product'}" @click='type="product"') 退货
+                  span(:class="{'active': type==='all'}" @click='type="all"') 退款+退货
+                .display-i-b(v-else)
+                  span.disabled 退货
+                  span.disabled 退款+退货  
+              .refund-reason.m-t-2
+                h5 请填写理由(1000字节限制)
+                textarea.from-control(v-model='reason')
+              .text-right  
+                button.btn.btn-primary(@click='submitBuyerReason') 提交
+        .col-xs-12.col-md-6
+          h4 退款说明
+          ul.text-danger
+            li 绝对不能意气用事
+            li 绝对不漏判任何一件坏事
+            li 绝对裁判的公正漂亮  
+
+
+
+
+block scripts
+  include ../../publicModules/moment.pug
+  +includeJS('/shop/order/refund.js')  

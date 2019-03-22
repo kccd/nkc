@@ -28,6 +28,7 @@ router
     }
     const orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
     await next();

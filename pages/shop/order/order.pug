@@ -56,7 +56,8 @@ block shopAccountContent
               //- td=order.user.username
               td
                 a(href=`/u/74847`) Kris
-              td
+              td= order.status  
+              //-td
                 if order.orderStatus == "unCost"
                   p 未付款
                 if order.orderStatus == "unShip"
@@ -75,9 +76,10 @@ block shopAccountContent
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"
                   p
                     button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
-                if order.orderStatus !== "finish" && order.orderStatus !== "unSign"
+                if order.orderStatus !== "finish" && order.orderStatus !== "unSign" && order.closeStatus !== true
                   p
-                    button(onclick=`cancelOrder(${order.orderId})`) 取消订单
+                    a(href=`/shop/order/${order.orderId}/refund`) 取消订单
+                    //button(onclick=`cancelOrder(${order.orderId})`) 取消订单
                 if order.orderStatus == "unSign"
                   p
                     button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
