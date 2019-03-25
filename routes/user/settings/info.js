@@ -18,7 +18,7 @@ infoRouter
 			user.description = description;
 		}
 		if(postSign) {
-			if(contentLength(postSign) > 1000) ctx.throw(400, '帖子签名不能超过500个字。');
+			if(contentLength(postSign) > 1000) ctx.throw(400, '文章签名不能超过500个字。');
 			user.postSign = postSign;
 		}
 		if(color) {

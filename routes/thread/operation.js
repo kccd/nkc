@@ -1,13 +1,13 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
 operationRouter
-// 收藏帖子
+// 收藏文章
 	.post('/addColl', async (ctx, next) => {
 		const {tid} = ctx.params;
 		const {db, data} = ctx;
 		const {user} = data;
 		const thread = await db.ThreadModel.findOnly({tid});
-		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的帖子');
+		if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的文章');
 		await thread.extendForums(['mainForums', 'minorForums']);
 
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
@@ -45,7 +45,7 @@ operationRouter
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid})
 		data.targetUser = await thread.extendUser();
-		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该帖子已经被退回')
+		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该文章已经被退回')
 		await thread.update({recycleMark:true})
 		// 获取主题帖的第一条回帖的标题和内容
 		let oc = thread.oc;
@@ -113,7 +113,7 @@ operationRouter
     }
 		if(!isModerator) ctx.throw(403, '权限不足');
 		const oldCid = targetThread.cid;
-		// 版主只能改变帖子的分类，不能移动帖子到其他板块
+		// 版主只能改变文章的分类，不能移动文章到其他板块
 		// if(!data.userOperationsId.includes('moveThread') && fid === 'recycle' && fid !== oldForum.fid) ctx.throw(403, '权限不足');
 		// if(data.userLevel <= 4 && (fid === 'recycle' || (!oldForum.moderators.includes(user.uid) || fid !== oldForum.fid))) ctx.throw(403, '权限不足');
 		const tCount = {
@@ -158,7 +158,7 @@ operationRouter
 			if(status === 3) {
 				await targetForum.update({$inc: {'tCount.digest': -1*tCount.digest, 'tCount.normal': -1*tCount.normal}});
 			}
-			ctx.throw(500, `移动帖子失败： ${err}`);
+			ctx.throw(500, `移动文章失败： ${err}`);
 		} 
 		await targetThread.updateThreadMessage();
 		await targetForum.updateForumMessage();*/

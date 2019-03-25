@@ -160,7 +160,7 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.userRoles)
+                    -for (let certObj of data.roles)
                       if fund && fund.expert.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='expertCert' cert=certObj._id checked=fund.expert.certs.includes(certObj._id))
@@ -179,7 +179,7 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.userRoles)
+                    -for (let certObj of data.roles)
                       if fund && fund.financialStaff.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='financialStaffCert' cert=certObj._id checked=fund.financialStaff.certs.includes(certObj._id))
@@ -198,7 +198,7 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.userRoles)
+                    -for (let certObj of data.roles)
                       if fund && fund.censor.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='censorCert' cert=certObj._id checked=fund.censor.certs.includes(certObj._id))
@@ -217,7 +217,7 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.userRoles)
+                    -for (let certObj of data.roles)
                       if fund && fund.admin.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='adminCert' cert=certObj._id checked=fund.admin.certs.includes(certObj._id))
@@ -236,7 +236,7 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.userRoles)
+                    -for (let certObj of data.roles)
                       if fund && fund.commentator.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='commentatorCert' cert=certObj._id checked=fund.commentator.certs.includes(certObj._id))
@@ -255,7 +255,7 @@ block content
               .col-xs-12.col-md-10
                 .row
                   .col-xs-12.col-md-12
-                    -for (let certObj of data.userRoles)
+                    -for (let certObj of data.roles)
                       if fund && fund.voter.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='voterCert' cert=certObj._id checked=fund.voter.certs.includes(certObj._id))
@@ -335,7 +335,7 @@ block content
                   h5 团队申请
             .fund-setting-list
               .col-xs-12.col-md-2
-                h5 附带帖子数目
+                h5 附带文章数目
               .col-xs-12.col-md-2
                 input.form-control#attachmentsThreads(type="number" placeholder="默认为0" value=thread ? thread.count : '')
             .fund-setting-list
