@@ -10,6 +10,10 @@ var app = new Vue({
     displayInput: false
   },
   computed: {
+    status: function() {
+      var refund = this.refunds[this.refunds.length - 1];
+      return refund.logs[refund.logs.length -1];
+    },
     product: function() {
       if(this.order) return this.order.product;
     },
@@ -25,16 +29,8 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     this.order = data.order;
     this.user = data.user;
-    for(var i = 0; i < data.refunds.length; i++) {
-      var refund = data.refunds[i];
-      for(var j = 0; j < refund.logs.length; j++) {
-        var log = refund.logs[j];
-        if(!log.info) continue;
-        log.info = log.info.replace('')
-      }
-    }
     this.refunds = data.refunds;
-    if(this.order.refundStatus) {
+    if(data.refund) {
       this.refund = data.refund;
     } else {
       this.displayInput = true;
@@ -52,20 +48,18 @@ var app = new Vue({
           screenTopWarning(data);
         });
     },
-    submitBuyerReason: function() {
-      var obj = {
-        refund: {
-          reason: this.reason,
-          type: this.type
-        },
-        orderId: this.order.orderId
-      }
+    newRefund: function(data) {
       var url = '/shop/refund';
       var method = 'POST';
       if(this.refund) {
         url = '/shop/refund/' + this.refund._id;
         method = 'PATCH';
       }
+      var obj = {
+        refund: data.refund,
+        orderId: data.orderId
+      };
+      console.log(obj);
       nkcAPI(url, method, obj)
         .then(function() {
           window.location.reload();
@@ -73,6 +67,28 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data);
         });
+    },
+    submitBuyerReasonToP: function() {
+      var data = {
+        refund: {
+          reason: this.reason,
+          type: this.type,
+          root: true
+        },
+        orderId: this.order.orderId
+      }
+      this.newRefund(data);
+    },  
+    submitBuyerReason: function() {
+      var data = {
+        refund: {
+          reason: this.reason,
+          type: this.type
+        },
+        orderId: this.order.orderId
+      }
+      this.newRefund(data);
+      
     },
     editReason: function() {
       if(this.displayInput) {

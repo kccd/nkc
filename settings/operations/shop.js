@@ -71,6 +71,9 @@ module.exports = {
         },      
         detail: {
           GET: "visitStoreOrderDetail"
+        },
+        refund: {
+          GET: 'visitStoreOrderRefund'
         }
       }
     },

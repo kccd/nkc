@@ -8,6 +8,12 @@ const schema = new Schema({
     default: '',
     index: 1
   },
+  // root=true 只能由平台更改状态 仲裁模式
+  root: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   /* 
     退款状态 
       B : buyer // 买家
@@ -72,16 +78,6 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  // 申请退款的理由
-  reason: {
-    type: String,
-    required: true
-  },
-  // 拒绝退款的理由
-  refuseReason: {
-    type: String,
-    default: ''
-  },
   // 退款是否成功，true: 成功, false: 失败, null: 处理中
   successed: {
     type: Boolean,
@@ -116,7 +112,7 @@ schema.statics.findById = async (_id) => {
 schema.statics.extendLogs = async (refunds, lang) => {
   refunds.map(r => {
     r.logs.map(l => {
-      l.description = lang('shopRefundStatus', l.type) || l.type;
+      l.description = lang('shopRefundStatus', l.status) || l.status;
     }); 
   });
 };
