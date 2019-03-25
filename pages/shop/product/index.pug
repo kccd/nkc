@@ -215,7 +215,7 @@ block content
               span
                 input#buyCount(type="number", name="", value="1")
               span.title 库存
-              span=`${product.productParams[paId].stocksSurplus}`
+              span#stockCount=`${product.productParams[paId].stocksSurplus}`
               span.title 件
           .item
             .row
