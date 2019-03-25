@@ -56,18 +56,9 @@ block shopAccountContent
               //- td=order.user.username
               td
                 a(href=`/u/74847`) Kris
-              td= order.status  
-              //-td
-                if order.orderStatus == "unCost"
-                  p 未付款
-                if order.orderStatus == "unShip"
-                  p 等待发货
-                if order.orderStatus == "unSign"
-                  p 等待确认收货
-                if order.orderStatus == "finish"
-                  p 订单已完成
-                p
-                  a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
+              td= order.status
+                | &nbsp;  
+                a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
               td #{numToFloatTwo(order.orderPrice)}
               td 
                 if order.orderStatus == "unCost"

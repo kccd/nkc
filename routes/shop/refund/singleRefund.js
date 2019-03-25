@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const giveUpRouter = require('./giveUp');
 const router = new Router();
 router
   .use('/', async (ctx, next) => {
@@ -7,6 +8,7 @@ router
     const {user} = data;
     const refund = await db.ShopRefundModel.findById(_id);
     if(refund.buyerId !== user.uid) ctx.throw(403, '您没有权限更改别人的退款申请');
+    data.refund = refund;
     await next();
   })
   .patch('/', async (ctx, next) => {
@@ -20,5 +22,6 @@ router
       type: refund.type
     }});
     await next();
-  });
+  })
+  .use("/give_up", giveUpRouter.routes(), giveUpRouter.allowedMethods());
 module.exports = router;

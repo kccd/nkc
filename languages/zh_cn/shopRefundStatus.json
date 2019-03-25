@@ -1,0 +1,22 @@
+{
+  "B_APPLY_RM": "买家申请退款",
+  "B_APPLY_RP": "买家申请退货",
+  "B_APPLY_RALL": "买家申请退款+退货",
+
+  "S_AGREE_RM": "卖家同意退款",
+  "S_AGREE_RP": "卖家同意退货",
+  "S_AGREE_RALL": "卖家同意退款+退货",
+
+  "S_DISAGREE_RM": "卖家拒绝退款",
+  "S_DISAGREE_RP": "卖家拒绝退货",
+  "S_DISAGREE_RALL": "卖家拒绝退款+退货",
+
+  "P_AGREE_RM": "平台同意退款",
+  "P_AGREE_RP": "平台同意退货",
+  "P_AGREE_RALL": "平台同意退款+退货",
+
+  "P_DISAGREE_RM": "平台拒绝退款",
+  "P_DISAGREE_RP": "平台拒绝退货",
+  "P_DISAGREE_RALL": "平台拒绝退款+退货"
+
+}

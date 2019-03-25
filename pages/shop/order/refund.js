@@ -4,6 +4,7 @@ var app = new Vue({
     user: '',
     order: '',
     refund: '',
+    refunds: [],
     reason: '',
     type: '',
     displayInput: false
@@ -24,6 +25,15 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     this.order = data.order;
     this.user = data.user;
+    for(var i = 0; i < data.refunds.length; i++) {
+      var refund = data.refunds[i];
+      for(var j = 0; j < refund.logs.length; j++) {
+        var log = refund.logs[j];
+        if(!log.info) continue;
+        log.info = log.info.replace('')
+      }
+    }
+    this.refunds = data.refunds;
     if(this.order.refundStatus) {
       this.refund = data.refund;
     } else {
@@ -32,6 +42,16 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    giveUpRefund: function() {
+      var refund = this.refund;
+      nkcAPI("/shop/refund/" + refund._id + "/give_up", 'POST', {})
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        });
+    },
     submitBuyerReason: function() {
       var obj = {
         refund: {
