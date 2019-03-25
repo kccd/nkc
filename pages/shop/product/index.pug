@@ -76,7 +76,17 @@ block title
       position: absolute;
     }
     .activeIndex {
-      background-color: red;
+      padding: 2px 9px;
+      border: 2px solid #FF0036;
+      font-size:small;
+      cursor: pointer;
+      background: cornsilk;
+    }
+    .normalIndex {
+      padding: 2px 9px;
+      border: 2px solid #e2e1e3;
+      font-size:small;
+      cursor: pointer;
     }
 block content
 
@@ -175,14 +185,25 @@ block content
                 span(style="font-weight:bolder") 人民币
               -else if(product.payMethod == "all")
                 span(style="font-weight:bolder") 混合付款:&nbsp;
+          //- div.item(style="border-bottom: 1px solid #e5e5e5")
+          //-   p
+          //-     span.title 快递费用
+          //-     span.location(style="font-size:xx-small") #{getProvinceCity(product.store.address)}
+          //-     span.location 至
+          //-     input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
+          //-     span.location 快递
+          //-     sapn.location ￥12.00
+          div.item
+            p
+              span.title 快递
+              //- span.location!=getProvinceCity(product.store.address)
+              span.location(style="font-size:xx-small") #{getProvinceCity(product.store.address)}
+              span.location(style="font-weight: bold;") 至
+              input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
           div.item(style="border-bottom: 1px solid #e5e5e5")
             p
               span.title 快递费用
-              span.location(style="font-size:xx-small") #{getProvinceCity(product.store.address)}
-              span.location 至
-              input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
-              span.location 快递
-              sapn.location ￥12.00
+              span#freightPrice #{numToFloatTwo(product.freightPrice)}
           div.item
             if(product.shelfTime)
               p
@@ -194,14 +215,14 @@ block content
               span
                 input#buyCount(type="number", name="", value="1")
               span.title 库存
-              span=`${product.productParams[paId].stocksTotal}`
+              span=`${product.productParams[paId].stocksSurplus}`
               span.title 件
           .item
             .row
               span.title.col-xs-1(style="padding-right:0") 选择规格
               span.col-xs-10
                 for para in product.productParams
-                  span(class=para._id == paraId?"activeIndex":"", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
+                  span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                     span=para.name.join()
           div.item
             a.btn.btn.buy(role='button' onclick=`submitProductToBill(${paraId})`) 立即购买
@@ -219,7 +240,7 @@ block content
           .col-xs-12.col-md-12
             .panel.panel-default
               .panel-heading
-                a(href='/shop/store/7', target='_blank' style="color: #333;font-size: 12px;font-weight:bold") 瓜哥的小店
+                a(href=`/shop/store/${product.store.storeId}`, target='_blank' style="color: #333;font-size: 12px;font-weight:bold")!=`${product.store.storeName}`
               .panel-body
                 .row
                   .col-xs-12.col-md-12(style="margin-bottom:10px")
@@ -239,9 +260,9 @@ block content
                         .shopdsr-score.shopdsr-score-up-ctrl
                           span.shopdsr-score-con 4.9
                           s.shopdsr-score-up
-                      a(target='_blank', href='/shop/store/7', style='z-index: 1;display: block; position: absolute; width: 100%;height: 100%;')
+                      a(target='_blank', href=`/shop/store/${product.store.storeId}`, style='z-index: 1;display: block; position: absolute; width: 100%;height: 100%;')
                   .col-xs-12.col-md-12(style="text-align:center")
-                    a.btn.btn-info.btn-sm(href="/shop/store/7", style="background-color:#041567;margin-right:10px", target='_blank') 进店逛逛
+                    a.btn.btn-info.btn-sm(href=`/shop/store/${product.store.storeId}`, style="background-color:#041567;margin-right:10px", target='_blank') 进店逛逛
                     a.btn.btn-default.btn-sm(style="color:#041567") 收藏店铺
           .col-xs-12.col-md-12
             .panel.panel-default
@@ -267,10 +288,10 @@ block content
                 a(href='#home', aria-controls='home', role='tab', data-toggle='tab') Description
               li(role='presentation')
                 a(href='#profile', aria-controls='profile', role='tab', data-toggle='tab')
-                  | Reviewa 
+                  | Reviews
                   span.badge(style="background-color:#22258c") 12
-              li(role='presentation')
-                a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab') Messages
+              //- li(role='presentation')
+              //-   a(href='#messages', aria-controls='messages', role='tab', data-toggle='tab') Messages
             .tab-content
               #home.tab-pane.active(role='tabpanel')
                 div(style="clear: both;border: 1px solid #e6e6e6;margin-bottom: 10px;")
@@ -290,18 +311,18 @@ block content
                               //- span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
                               span(style="font-size:xx-small;color:#ddd;margin-left:20px")=post.toc.toLocaleString()
                               p=delAllCode(post.c)
-              #messages.tab-pane(role='tabpanel')
-                div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
-                  div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
-                    div
-                      | Drand Name：
-                      b(target='_blank') 科创仪表局
-                  p(style="padding:5px 20px")
-                    em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
-                  .row(style="padding:0 20px 18px")
-                    -for(var a=0;a<16;a++)
-                      .col-sm-6.col-md-4
-                        p parameter: value
+              //- #messages.tab-pane(role='tabpanel')
+              //-   div(style="clear: both;border: 1px solid #e6e6e6;border-top: none;margin-bottom: 10px;")
+              //-     div(style='display: block;padding:8px 20px 10px;margin-bottom:10px')
+              //-       div
+              //-         | Drand Name：
+              //-         b(target='_blank') 科创仪表局
+              //-     p(style="padding:5px 20px")
+              //-       em(style="font-style:normal;color:#b7b7b7") 产品基本参数：
+              //-     .row(style="padding:0 20px 18px")
+              //-       -for(var a=0;a<16;a++)
+              //-         .col-sm-6.col-md-4
+              //-           p parameter: value
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')

@@ -69,7 +69,17 @@ style.
     position: absolute;
   }
   .activeIndex {
-    background-color: red;
+    padding: 2px 9px;
+    border: 2px solid #FF0036;
+    font-size:small;
+    cursor: pointer;
+    background: cornsilk;
+  }
+  .normalIndex {
+    padding: 2px 9px;
+    border: 2px solid #e2e1e3;
+    font-size:small;
+    cursor: pointer;
   }
 .row
   .col-xs-12.col-md-12(style="margin-bottom:30px")
@@ -114,8 +124,7 @@ style.
       div.item(style="border-bottom: 1px solid #e5e5e5")
         p
           span.title 快递费用
-          span.location ￥
-          span#freightPrice 12.00
+          span#freightPrice #{numToFloatTwo(product.freightPrice)}
       div.item
         p
           span.title 上架时间
@@ -126,19 +135,19 @@ style.
           span
             input#buyCount(type="number", name="", value="1")
           span.title 库存
-          span=`${product.productParams[paId].stocksTotal}`
+          span#stockCount=`${product.productParams[paId].stocksSurplus}`
           span.title 件
       .item
         .row
           span.title.col-xs-12(style="padding-right:0") 选择规格
           span.col-xs-12(style="margin: 0 19px 0 10px;")
             for para in product.productParams
-              span(class=para._id == paraId?"activeIndex":"", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
+              span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                 span=para.name.join()
       div.item
-        a.btn.btn.buy(href='#', role='button') Buy
+        a.btn.btn.buy(href='#', role='button' onclick=`submitProductToBill(${paraId})`) 立即购买
         a.btn.btn.addCart(role='button' onclick=`addProductToCart(${paraId})`) 
-          span.fa.fa-shopping-cart  Add To Cart
+          span.fa.fa-shopping-cart  加入购物车
     .col-xs-1.col-md-1 
 
   .col-xs-12.col-md-12

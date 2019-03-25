@@ -12,26 +12,27 @@ block shopSettings
             thead
               tr
                 th.text-center #
-                th.text-center 排序
+                //- th.text-center 排序
                 th.text-center(style="width:216px") 图片
                 th.text-center 链接地址
                 th.text-center 操作
             tbody
-              tr
-                th.text-center(style="") 1
-                th.text-center
-                  //- input#sort(type="text", name="sort")
-                  a.btn.btn-default.btn-xs
-                    i.fa.fa-arrow-up
-                  a.btn.btn-default.btn-xs
-                    i.fa.fa-arrow-down
-                th.text-center
-                  img(src='/default/shop2.jpg', alt='...', style='width:100%') 
-                th.text-center 
-                  a(href="http://www.kechuang.org") http://www.kechuang.org
-                th.text-center 
-                  a.btn.btn-warning.btn-xs
-                    i.fa.fa-trash
+              for carousel,index in data.carouselItems
+                tr
+                  th.text-center(style="")!=`${index+1}`
+                  //- th.text-center
+                  //-   //- input#sort(type="text", name="sort")
+                  //-   a.btn.btn-default.btn-xs
+                  //-     i.fa.fa-arrow-up
+                  //-   a.btn.btn-default.btn-xs
+                  //-     i.fa.fa-arrow-down
+                  th.text-center
+                    img(src=`/statics/carousels/${carousel.name}`, alt='...', style='width:100%') 
+                  th.text-center 
+                    a(href=`${carousel.targetUrl}`)!=`${carousel.targetUrl}`
+                  th.text-center 
+                    a.btn.btn-warning.btn-xs(onclick=`delCarousel(${index})`)
+                      i.fa.fa-trash
       #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
         .modal-dialog(role='document')
           .modal-content
@@ -45,15 +46,17 @@ block shopSettings
                 input#carouselLink.form-control(type='text', placeholder='https://www.kechuang.org/')
               .form-group
                 label(for='carouselImage') 图片
-                div(style="position: relative;height: 180px;border: 1px dashed #c4c6cf;")
+                div#imgDom(style="position: relative;height: 180px;border: 1px dashed #c4c6cf;" onclick='$("#imageUpload").click()')
                   //- div(style="    border: 1px dashed #c4c6cf;width: 100%;height: 100%;")
                   div(style="width: 100%;cursor: pointer;position: absolute;transform: translateY(-18px);top: 50%;")
                     i.fa.fa-plus(style="margin: 0;display: block;text-align: center;color: #0085D7;font-size: 20px;")
                     p(style="font-size: 12px;line-height: 1;color: #666;text-align: center;margin: 12px 0 0;") 点击上传图片
-                p(style="color:tomato;font-size:xx-small;float:right") 轮播图推荐尺寸1080x360
+                input#imageUpload(type="file" style="display:none;" accept="image/*")
+                p(style="color:tomato;font-size:xx-small;float:right") 轮播图推荐尺寸1080x360;宽高比为3:1
 
             .modal-footer
               button.btn.btn-default(type='button', data-dismiss='modal') 取消
-              button.btn.btn-primary(type='button') 提交
+              button.btn.btn-primary(type='button' onclick="submit()") 提交
 block shopSettingScripts
   +includeJS('/experimental/shop/homeSetting/homeSetting.js')
+  +includeJS('/experimental/shop/homeSetting/carousel.js')

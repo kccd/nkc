@@ -1,6 +1,17 @@
 extends ./shopBase
 block shopTitle
   title 科创商城
+  style.
+    .modtitle {
+      font-size: 16px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      border-bottom: 2px solid #ff720d;
+      line-height: 30px;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      position: relative;
+    }
 block content
   .container-fluid.max-width
     include ./shopSearch
@@ -25,56 +36,38 @@ block content
           </div>
         </nav>
       .col-xs-12.col-md-3
-        .btn-group-vertical(role='group', aria-label='...' style="width:100%")
-          ul.list-group
-            li.list-group-item.list-group-item-warning Main Category
-            li.list-group-item.list-group-item category
-            li.list-group-item.list-group-item category
-            li.list-group-item.list-group-item category
-          .list-group
-            a.list-group-item.list-group-item-success(href='#') Dapibus ac facilisis in
-            a.list-group-item.list-group-item(href='#') 
-              | category
-              span.fa.fa-angle-right(style="float:right")
-            a.list-group-item.list-group-item(href='#') 
-              | category
-              span.fa.fa-angle-right(style="float:right")
-            a.list-group-item.list-group-item(href='#') 
-              | category
-              span.fa.fa-angle-right(style="float:right")
-          .list-group
-            a.list-group-item.list-group-item-info(href="#") Main Category
-            a.list-group-item.list-group-item(href='#') category
-            a.list-group-item.list-group-item(href='#') category
-            a.list-group-item.list-group-item(href='#') category
-          .btn-group(role='group')
-            button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-              | Dropdown
-              span.caret
-            ul.dropdown-menu
-              li
-                a(href='#') Dropdown link
-              li
-                a(href='#') Dropdown link
+        h3.modtitle 最热商品
+        ul.list-group
+          for popular in data.popularItems
+            li.list-group-item(style="border-color:#fff")
+              a(href=`/shop/product/${popular.productId}`) 
+                img(src=`/r/${popular.imgMaster}` style="width:64px;height:auto;float:right")
+                span(style="display:block;font-weight:700;color:#666;")=popular.name
       .col-xs-12.col-md-9
         .row
-          .col-xs-12.col-md-12
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
             #carousel-example-generic.carousel.slide(data-ride='carousel')
               // Indicators
-              ol.carousel-indicators
-                li.active(data-target='#carousel-example-generic', data-slide-to='0')
-                li(data-target='#carousel-example-generic', data-slide-to='1')
-                li(data-target='#carousel-example-generic', data-slide-to='2')
+              //- ol.carousel-indicators
+              //-   li.active(data-target='#carousel-example-generic', data-slide-to='0')
+              //-   li(data-target='#carousel-example-generic', data-slide-to='1')
+              //-   li(data-target='#carousel-example-generic', data-slide-to='2')
               // Wrapper for slides
               .carousel-inner(role='listbox')
-                .item.active
-                  img(src='default/shop2.jpg', alt='...' style="width:100%")
-                  .carousel-caption
-                    | ...
-                .item
-                  img(src='default/shop2.jpg', alt='...' style="width:100%")
-                  .carousel-caption
-                    | ...
+                for carousel,index in data.homeSetting.carousels
+                  .item(class=index == 0?"active":"")
+                    a(href=`${carousel.targetUrl}`)
+                      img(src=`/statics/carousels/${carousel.name}`, alt='...' style="width:100%")
+                      .carousel-caption
+                        | ...
+                //- .item
+                //-   img(src='default/coll2.jpg', alt='...' style="width:100%")
+                //-   .carousel-caption
+                //-     | ...
+                //- .item
+                //-   img(src='default/coll3.jpg', alt='...' style="width:100%")
+                //-   .carousel-caption
+                //-     | ...
               // Controls
               a.left.carousel-control(href='#carousel-example-generic', role='button', data-slide='prev')
                 span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
@@ -82,7 +75,26 @@ block content
               a.right.carousel-control(href='#carousel-example-generic', role='button', data-slide='next')
                 span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
                 span.sr-only Next    
-          .col-xs-12.col-md-12
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
+              h3.modtitle 精选商品
+              .row
+                //- -for(var a=1;a<15;a++)
+                for item in data.featuredItems
+                  .col-sm-6.col-md-3
+                    .thumbnail(style="margin:0;border:0;height:250px")
+                      a(href=`/shop/product/${item.productId}`)
+                        img(src=`/r/${item.imgMaster}`, title=`${item.abstract}` ,style="height:150px;" )
+                      .caption
+                        a(href=`/shop/product/${item.productId}` style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${item.name}`)!=item.name
+                        div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px")=item.store.storeName
+                        //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+                        //- p(style="text-align: right;color: #bf7f5f;")
+                        //-   i(style="font-style: normal;margin-right: 3px;")
+                        //-     span(style='font-size:14px;') ￥
+                        //-     | 8.00
+                        //-   span 起       
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
+              h3.modtitle 店铺推荐
               .row
                 //- -for(var a=1;a<15;a++)
                 for item in data.featuredItems
@@ -98,4 +110,4 @@ block content
                           i(style="font-style: normal;margin-right: 3px;")
                             span(style='font-size:14px;') ￥
                             | 8.00
-                          span 起          
+                          span 起      

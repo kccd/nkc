@@ -13,10 +13,22 @@ const shopSettingsSchema = new Schema({
   // 轮播图
   carousels: {
     type: Schema.Types.Mixed,
+    default: []
   },
   // 首页精选
   featureds: {
-    type: Schema.Types.Mixed
+    type: Schema.Types.Mixed,
+    default: []
+  },
+  // 店铺推荐
+  recommendations: {
+    type: Schema.Types.Mixed,
+    default: []
+  },
+  // 最热商品
+  populars: {
+    type: Schema.Types.Mixed,
+    default: []
   }
 }, {
   collection: 'shopSettings'

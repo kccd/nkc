@@ -1,11 +1,13 @@
 extends ../index.pug
+block title
+  title 最热商品 | 商城设置
 block shopSettings
   .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;padding:1rem')
     .row
       .col-xs-12.col-md-12
         button.btn.btn-info(data-toggle="modal" data-target="#myModal")
           span.fa.fa-plus
-          | &nbsp;添加精选 
+          | &nbsp;添加最热
       .col-xs-12.col-md-12(style="margin-top:20px")
         .table-responsive
           table.table.table-bordered
@@ -17,14 +19,14 @@ block shopSettings
                 th.text-center 店铺
                 th.text-center 操作
             tbody
-              for featured,index in data.featuredItems
+              for popular,index in data.popularItems
                 tr
                   th.text-center(style="")=index+1
-                  th.text-center=featured.productId
-                  th.text-center=featured.name
-                  th.text-center(onclick=`test(${featured})`)=featured.store.storeName
+                  th.text-center=popular.productId
+                  th.text-center=popular.name
+                  th.text-center=popular.store.storeName
                   th.text-center 
-                    a.btn.btn-warning.btn-xs(href="javascript:void(0);" onclick=`delFeatured("${featured.productId}")`)
+                    a.btn.btn-warning.btn-xs(href="javascript:void(0);" onclick=`delPopular("${popular.productId}")`)
                       i.fa.fa-trash
       #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
         .modal-dialog(role='document')
@@ -32,14 +34,14 @@ block shopSettings
             .modal-header
               button.close(type='button', data-dismiss='modal', aria-label='Close')
                 span(aria-hidden='true') ×
-              h4#myModalLabel.modal-title 添加精选
+              h4#myModalLabel.modal-title 添加热门商品
             .modal-body
               .form-group
-                label(for='carouselLink') 商品Id
-                input#carouselLink.form-control(type='text', placeholder='请输入正确的商品Id')
+                label(for='popularLink') 商品Id
+                input#popularLink.form-control(type='text', placeholder='请输入正确的商品Id')
 
             .modal-footer
               button.btn.btn-default(type='button', data-dismiss='modal') 取消
-              button.btn.btn-primary(type='button', onclick="addFeatured()") 提交
+              button.btn.btn-primary(type='button', onclick="addPopular()") 提交
 block shopSettingScripts
   +includeJS('/experimental/shop/homeSetting/homeSetting.js')

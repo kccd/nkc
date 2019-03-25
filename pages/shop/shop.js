@@ -41,8 +41,10 @@ function choiceProductParams(para,productId) {
     return; 
   }else{
     // 先使用消除其他class
+    $(".activeIndex").addClass("normalIndex");
     $(".activeIndex").removeClass("activeIndex");
     // 再给自己添加class
+    $(para).removeClass("normalIndex")
     $(para).addClass("activeIndex");
   }
   // 获取当前的paraId
@@ -59,6 +61,12 @@ function addProductToCart(paraId) {
   var productCount = $("#buyCount").val();
   productCount = Number(productCount)
   if(isNaN(productCount) || productCount <0) return screenTopWarning("商品数量不得小于0");
+  // 检查库存
+  var stockCount = $("#stockCount").text();
+  stockCount = Number(stockCount);
+  if(productCount > stockCount) {
+    return screenTopWarning("库存不足");
+  }
   addToCart(paraId, parseInt(productCount));
 }
 
@@ -72,6 +80,12 @@ function submitProductToBill(paraId) {
   productCount = Number(productCount);
   if(isNaN(productCount) || productCount < 1) {
     return screenTopWarning("商品数量输入有误，请检查");
+  }
+  // 检查库存
+  var stockCount = $("#stockCount").text();
+  stockCount = Number(stockCount);
+  if(productCount > stockCount) {
+    return screenTopWarning("库存不足");
   }
   // 获取商品id 
   var paraId = paraId;

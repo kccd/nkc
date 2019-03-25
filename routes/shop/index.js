@@ -16,15 +16,19 @@ shopRouter
     const homeSetting = await db.ShopSettingsModel.findOne({type:"homeSetting"});
     // 取出精选商品
     let featuredItems = await db.ShopGoodsModel.find({productId:{$in:homeSetting.featureds}});
-    await Promise.all(featuredItems.map(async featured => {
-      let store = await db.ShopStoresModel.findOne({storeId: featured.storeId});
-      if(store){
-        featured.storeName = store.storeName;
-      }else {
-        featured.storeName = "";
-      }
-    }));
-    data.featuredItems = featuredItems;
+    data.featuredItems = await db.ShopGoodsModel.extendProductsInfo(featuredItems);
+    // 取出热门商品
+    let popularItems = await db.ShopGoodsModel.find({productId:{$in:homeSetting.populars}});
+    data.popularItems = await db.ShopGoodsModel.extendProductsInfo(popularItems);
+    data.homeSetting = homeSetting;
+    // await Promise.all(featuredItems.map(async featured => {
+    //   let store = await db.ShopStoresModel.findOne({storeId: featured.storeId});
+    //   if(store){
+    //     featured.storeName = store.storeName;
+    //   }else {
+    //     featured.storeName = "";
+    //   }
+    // }));
     if(query.t === 'old') {
       ctx.template = 'shop/index.pug';
     } else {

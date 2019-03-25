@@ -17,11 +17,21 @@ module.exports = {
 			},
 			homeSetting: {
 				carousel: {
-					GET: 'visitHomeSettingCarousel'
+					GET: 'visitHomeSettingCarousel',
+					POST: 'changeHomeSettingCarousel',
+					PATCH: 'deleteHomeSettingCarousel'
 				},
 				featured: {
 					GET: 'visitHomeSettingFeatured',
 					POST: 'changeHomeSettingFeatured'
+				},
+				recommendation: {
+					GET: 'visitHomeSettingRecommendation',
+					POST: 'changeHomeSettingRecommendation'
+				},
+				popular: {
+					GET: 'visitHomeSettingPopular',
+					POST: 'changeHomeSettingPopular'
 				}
 			}
 		},

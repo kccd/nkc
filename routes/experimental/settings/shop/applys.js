@@ -25,7 +25,9 @@ applysRouter
 			uid: apply.uid,
 			mobile: [userPersonal.mobile]
 		}
+		const newDecoration = new db.ShopDecorationsModel({storeId: storeId});
 		const newStore = new db.ShopStoresModel(newStoreInfo);
+		newDecoration.save();
 		newStore.save();
 		await next();
 	})

@@ -171,7 +171,7 @@ function submitToShelf() {
   var productParams = obtainProductPrice();
   // 获取物流价格
   var freightPrice = $("#freightPrice").val();
-  freightPrice = Number(freightPrice);
+  freightPrice = Number(freightPrice)*100;
   if(isNaN(freightPrice) || freightPrice < 0) {
     throw("运费价格不可小于0,不可为空");
   }
