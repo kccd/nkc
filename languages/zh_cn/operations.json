@@ -476,6 +476,8 @@
   "visitStoreOrderDetail": "商家查看订单详情",
   "visitUserOrderRefund": "访问用户申请退款页",
   "userApplyRefund": "商城 用户申请退款",
+  "userGiveUpRefund": "商城 用户撤销退款申请",
+  "visitStoreOrderRefund": "商家查看申请退款页",
 
 
   "APPgetUserInfo": "app获取用户信息",

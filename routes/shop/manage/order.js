@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const orderRouter = new Router();
+const refundRouter = require("./refund");
 orderRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
@@ -64,5 +65,6 @@ orderRouter
 		if(data.order.store.uid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
 		ctx.template = 'shop/manage/detail.pug';
 		await next();
-	})
+  })
+  .use("/refund", refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = orderRouter;

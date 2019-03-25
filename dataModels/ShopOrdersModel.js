@@ -376,5 +376,11 @@ shopOrdersSchema.statics.translateOrderStatus = async (orders) => {
   });
 }
 
+shopOrdersSchema.statics.findById = async (orderId) => {
+  const order = await mongoose.model('shopOrders').findOne({orderId});
+  if(!order) throwErr(404, `未找到ID为【${orderId}】的订单`);
+  return order;
+};
+
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;

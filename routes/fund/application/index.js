@@ -43,7 +43,7 @@ applicationRouter
 			await a.extendApplicant();
 			await a.extendFund();
 			return a;
-		}));
+    }));
 		ctx.template = 'interface_fund_applicationForm_list.pug';
 		await next();
 	})
@@ -130,11 +130,18 @@ applicationRouter
 		if(applicationForm.useless === 'giveUp') {
 			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
 		}
-		const reports = await db.FundDocumentModel.find({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
-		data.reports = await Promise.all(reports.map(async r => {
+    const q_ = {
+			type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
+			applicationFormId: applicationForm._id
+		};
+		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
+			q_.disabled = false;
+		}
+		data.reports = await db.FundDocumentModel.find(q_).sort({toc: 1});
+		await Promise.all(data.reports.map(async r => {
+			await r.extendUser();
 			await r.extendResources();
-			return r;
-		}));
+    }));
 		data.auditComments = auditComments;
 		data.paging = paging;
 		await next();

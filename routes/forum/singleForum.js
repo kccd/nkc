@@ -182,7 +182,7 @@ router
       }
     ]});
     if(count > 0) {
-      ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
+      ctx.throw(422, `该板块下仍有${count}个文章, 请转移后再删除板块`);
       return next()
     } else {
       await forum.remove()

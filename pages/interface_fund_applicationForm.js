@@ -139,3 +139,12 @@ function restoreApplicationForm(id) {
 			screenTopWarning(data.error||data);
 		})
 }
+function disabledReport(applicationFormId, reportId, type) {
+	nkcAPI('/fund/a/'+applicationFormId+'/report/'+reportId+'?type='+type, 'DELETE', {})
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error);
+		})
+}
