@@ -73,7 +73,8 @@ module.exports = {
           GET: "visitStoreOrderDetail"
         },
         refund: {
-          GET: 'visitStoreOrderRefund'
+          GET: 'visitStoreOrderRefund',
+          POST: 'submitStoreOrderRefund'
         }
       }
     },

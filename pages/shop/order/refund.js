@@ -7,6 +7,7 @@ var app = new Vue({
     refunds: [],
     reason: '',
     type: '',
+    money: '',
     displayInput: false
   },
   computed: {
@@ -72,6 +73,7 @@ var app = new Vue({
       var data = {
         refund: {
           reason: this.reason,
+          money: this.money,
           type: this.type,
           root: true
         },
@@ -83,6 +85,7 @@ var app = new Vue({
       var data = {
         refund: {
           reason: this.reason,
+          money: this.money,
           type: this.type
         },
         orderId: this.order.orderId
@@ -96,6 +99,7 @@ var app = new Vue({
       } else {
         if(!this.reason) {
           this.reason = this.refund.reason;
+          this.money = this.refund.money;
           this.type = this.refund.type;
         }
         this.displayInput = true;

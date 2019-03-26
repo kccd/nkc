@@ -4,7 +4,9 @@ var app = new Vue({
     order: '',
     refund: '',
     refunds: [],
-    displayInput: false
+    displayInput: false,
+    myStore: '',
+    reason: ''
   },
   computed: {
     status: function() {
@@ -26,10 +28,37 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     this.refund = data.refund;
     this.refunds = data.refunds;
+    this.myStore = data.myStore;
     this.order = data.order;
   },
   methods: {
     format: NKC.methods.format,
+    agreeR: function() {
+      nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/refund", "POST", {
+        orderId: this.order.orderId,
+        type: "agreeR",
+        reason: this.reason
+      })
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        });
+    },
+    disagreeR: function() {
+      nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/refund", "POST", {
+        orderId: this.order.orderId,
+        type: "disagreeR",
+        reason: this.reason
+      })
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        });
+    },
     refundType: function(t) {
       return {
         'money': '退款',
