@@ -8,6 +8,11 @@ const schema = new Schema({
     default: '',
     index: 1
   },
+  // 退款金额
+  money: {
+    type: Number,
+    default: 0
+  },
   // root=true 只能由平台更改状态 仲裁模式
   root: {
     type: Boolean,
@@ -48,6 +53,7 @@ const schema = new Schema({
     P_DISAGREE_RALL: 平台同意退货+退款
 
     B_RP: 买家退货中
+    RM_CO: 打款成功,
     B_GU: 买家撤销申请
     NE: 协商中
     IA： 仲裁中
@@ -109,11 +115,27 @@ schema.statics.findById = async (_id) => {
   if(!refund) throwErr(404, `未找到ID为【${_id}】的退款申请`);
   return refund;
 };
+/* 
+  推展退款申请操作记录 翻译操作类型
+  @param refunds: 退款申请对象数组
+  @param lang: ctx.state.lang 翻译函数
+  @author pengxiguaa 2019/3/26
+*/
 schema.statics.extendLogs = async (refunds, lang) => {
   refunds.map(r => {
     r.logs.map(l => {
-      l.description = lang('shopRefundStatus', l.status) || l.status;
+      l.description = lang("shopRefundStatus", l.status) || l.status;
     }); 
   });
 };
+
+schema.methods.returnMoney = async () => {
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const {money, orderId, status} = this;
+  const order = await ShopOrdersModel.findById({_id});
+  const {orderStatus, refundStatus} = order;
+  if(refundStatus !=="ing" || !["unShip", "unSign"].includes(orderStatus)) throwErr(400, "订单状态已改变，请刷新");
+  if(![""])
+  
+}
 module.exports = mongoose.model('shopRefunds', schema);

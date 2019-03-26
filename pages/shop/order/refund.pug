@@ -50,10 +50,13 @@ block content
                   .display-i-b(v-else)
                     span.disabled 退货
                     span.disabled 退款+退货  
+                .refund-money.m-t-2(v-if="type !== product")  
+                  h5 请填写退款金额(不超过{{order.orderPrice/100}}元)
+                  input.form-control(v-model.number="money" type="number")
                 .refund-reason.m-t-2
                   h5 请填写理由(1000字节限制)
-                  textarea.from-control(v-model='reason')
-                .text-right  
+                  textarea.form-control(v-model='reason')
+                .text-right.m-t-1
                   button.btn.btn-default(v-if="!refund && refunds.length !== 0" @click='submitBuyerReasonToP') 向平台申请退款
                   button.btn.btn-primary(@click='submitBuyerReason') {{refund._id?"保存": "向卖家申请退款"}}
             .col-xs-12.col-md-6
@@ -62,10 +65,12 @@ block content
                 h5 暂无记录
               .refund-log
                 div(v-for="refund in refunds")
-                  div(v-for="log in refund.logs")
+                  div(v-for="log in refund.logs").p-b-2
                     h5 {{format("YYYY-MM-DD HH:mm:ss", log.time)}} {{log.description}}
-                      span(v-if="log.info") ，理由如下：
-                    p.text-danger(v-html="log.info")
+                    p(v-if="log.money") 退款金额：
+                      span.text-danger {{log.money}} 元
+                    p(v-if="log.info") 理由：
+                      span.text-danger(v-html="log.info")
 
 
 block scripts

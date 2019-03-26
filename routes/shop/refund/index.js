@@ -6,7 +6,7 @@ router
     const {data, db, body, tools} = ctx;
     const {user} = data;
     const {orderId, refund} = body;
-    let {type, reason, root} = refund;
+    let {type, reason, root, money} = refund;
     root = !!root;
     // 查询订单 判断权限
     let order = await db.ShopOrdersModel.findById(orderId);
@@ -65,6 +65,16 @@ router
         root
       };
 
+      if(type !== "product") {
+        const refundMoney = Number(money);
+        if(refundMoney > 0 && refundMoney <= order.orderPrice){
+          r.money = refundMoney;
+        }
+        else {
+          ctx.throw(400, "退款金额必须大于0且不能超过点订单的支付金额");
+        } 
+      }
+
       if(orderStatus === "unShip") {
         // 未发货时
         r.status = root? "P_APPLY_RM": "B_APPLY_RM";
@@ -87,6 +97,9 @@ router
           time
         }
       ];
+      if(type !== "product") {
+        r.logs[0].money = r.money;
+      }
       const refundDB = db.ShopRefundModel(r);
       await refundDB.save();
       await db.ShopOrdersModel.update({

@@ -3,7 +3,7 @@ block shopTitle
   title 申请退款
 block content
   .container-fluid.max-width
-    .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
+    .hidden#data= JSON.stringify({myStore: data.myStore, order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
     .row#app(v-cloak)   
       div(v-if="order")
         .col-xs-12.col-md-12
@@ -34,6 +34,11 @@ block content
               .m-t-1(v-if='refund')
                 h5 类型：{{refundType(refund.type)}}  
                 h5 进度：{{status.description}}
+                .m-t-1(v-if="['B_APPLY_RM', 'B_APPLY_RP', 'B_APPLY_RALL'].indexOf(refund.status) !== -1")
+                  textarea.form-control(rows="8" placeholder="请输入理由，选择拒绝时理由不可省略" v-model="reason")
+                  .m-t-1.text-right
+                    button.btn.btn-success.btn-sm(@click="agreeR") 同意
+                    button.btn.btn-danger.btn-sm(@click="disagreeR") 拒绝
               .m-t-1(v-if='displayInput')
                 .refund-type.m-t-2
                   h5 请选择退款方式
@@ -56,10 +61,12 @@ block content
                 h5 暂无记录
               .refund-log
                 div(v-for="refund in refunds")
-                  div(v-for="log in refund.logs")
+                  div(v-for="log in refund.logs").p-b-2
                     h5 {{format("YYYY-MM-DD HH:mm:ss", log.time)}} {{log.description}}
-                      span(v-if="log.info") ，理由如下：
-                    p.text-danger(v-html="log.info")
+                    p(v-if="log.money") 退款金额：
+                      span.text-danger {{log.money}}元
+                    p(v-if="log.info") 理由：
+                      span.text-danger(v-html="log.info")
 block shopScripts
   include ../../../publicModules/moment.pug
   +includeJS("/shop/manage/refund/refund.js")  
