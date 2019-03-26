@@ -258,20 +258,23 @@ postSchema.pre('save', async function(next) {
     // 根据虎哥建议，重写@功能
     // 截取所有@起向后15字符的字符串
     var positions = [];
-    var d = c.replace(/<[^>]+>/g,"");
+    // 引用的内容再次发布，不解析at
+    e = c.replace(/<blockquote.*?blockquote>/im,'')
+    var d = e.replace(/<[^>]+>/g,"");
     var pos = d.indexOf("@");
     while(pos > -1){
       positions.push(d.substr(pos+1, 30));
       pos = d.indexOf("@",pos+1)
     }
     // 验证每个@是否含有特殊字符
-    for(var i in positions){
+    for(var i=0;i<positions.length;i++){
       var atPos = positions[i].indexOf("@"); // @符号位置
       var semiPos = positions[i].indexOf(";"); // 分号位置
       var colonPos = positions[i].indexOf(":"); // 冒号位置
       var ltPos = positions[i].indexOf("<"); // 左尖括号位置
       var comPos = positions[i].indexOf("，"); // 逗号位置
       var perPos = positions[i].indexOf("。"); // 句号位置
+      var spacePos = positions[i].indexOf(" "); // 空格位置
       if(atPos > -1){
         positions[i] = positions[i].substr(0,atPos)
       }else if(semiPos > -1){
@@ -284,9 +287,16 @@ postSchema.pre('save', async function(next) {
         positions[i] = positions[i].substr(0,comPos)
       }else if(perPos > -1){
         positions[i] = positions[i].substr(0,perPos)
+      }else if(spacePos > -1) {
+        positions[i] = positions[i].substr(0,spacePos)
       }
       // 用户名从最后一个字符开始，逐个向前在数据库中查询
       var evePos = positions[i].toLowerCase();
+      // 用户名至少含有一个字符，不可以为空
+      if(evePos == "") {
+        positions.splice(i, 1);
+        break;
+      }
       for(var num = evePos.length;num >= 0;num--){
         var factName = await UserModel.findOne({usernameLowerCase:evePos.substr(0,num)});
         if(factName){
