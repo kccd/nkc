@@ -4,9 +4,17 @@ var app = new Vue({
   data: {
     status: 'disconnect',
     categories: ['web', 'socket'],
-    messages: []
+    messages: [],
+    message: ''
   },
   computed: {
+    messageInfo: function() {
+      if(!this.message) return '';
+      var message = JSON.stringify(this.message, '', 4);
+      message = message.replace(/\n/g, '<br/>');
+      message = message.replace(/\s/g, '&nbsp;');
+      return message;
+    },
     statusString: function() {
       switch(this.status){
         case 'connect': return '连接成功';
@@ -66,7 +74,10 @@ var app = new Vue({
     });
   },
   methods: {
-    format: format
+    format: format,
+    selectMessage: function(m) {
+      this.message = m;
+    }
   },
   updated: function() {
     var panel = app.$refs.panel;
