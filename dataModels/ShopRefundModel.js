@@ -2,7 +2,7 @@ const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
-  // 退款方式：money: 只退款, product: 只退货, all: 退款+退货
+  // 退款方式：money: 只退款, all: 退款+退货
   type: {
     type: String,
     default: '',
@@ -131,11 +131,21 @@ schema.statics.extendLogs = async (refunds, lang) => {
 
 schema.methods.returnMoney = async () => {
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
   const {money, orderId, status} = this;
-  const order = await ShopOrdersModel.findById({_id});
+  const order = await ShopOrdersModel.findById({orderId});
   const {orderStatus, refundStatus} = order;
   if(refundStatus !=="ing" || !["unShip", "unSign"].includes(orderStatus)) throwErr(400, "订单状态已改变，请刷新");
-  if(![""]){}
-  
+  if(!["S_AGREE_RM", "P_AGREE_RM", "S_RC_P_SUCCESS"].includes(status)) throwErr(400, "退款申请的状态已改变，请刷新");
+  const record = KcbsRecordModel({
+    _id: await SettingModel.operateSytemID("kcbsRecords", 1),
+    from: "bank",
+    to: order.uid,
+    type: "refund",
+    
+  });
+  await record.save();
 }
 module.exports = mongoose.model('shopRefunds', schema);

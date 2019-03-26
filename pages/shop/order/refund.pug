@@ -45,10 +45,10 @@ block content
                   h5 请选择退款方式
                   span(:class="{'active': type==='money'}" @click='type="money"') 退款
                   .display-i-b(v-if='["unCost", "unShip"].indexOf(order.orderStatus) === -1')
-                    span(:class="{'active': type==='product'}" @click='type="product"') 退货
+                    //- span(:class="{'active': type==='product'}" @click='type="product"') 退货
                     span(:class="{'active': type==='all'}" @click='type="all"') 退款+退货
                   .display-i-b(v-else)
-                    span.disabled 退货
+                    //- span.disabled 退货
                     span.disabled 退款+退货  
                 .refund-money.m-t-2(v-if="type !== product")  
                   h5 请填写退款金额(不超过{{order.orderPrice/100}}元)
