@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const applysRouter = require("./applys");
+const refundsRouter = require("./refunds");
 const homeSettingRouter = require("./homeSetting");
 const shopRouter = new Router();
 shopRouter
@@ -11,5 +12,6 @@ shopRouter
 		await next();
   })
 	.use('/applys', applysRouter.routes(), applysRouter.allowedMethods())
+	.use('/refunds', refundsRouter.routes(), refundsRouter.allowedMethods())
 	.use('/homeSetting', homeSettingRouter.routes(), homeSettingRouter.allowedMethods())
 module.exports = shopRouter;

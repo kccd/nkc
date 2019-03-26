@@ -279,7 +279,6 @@ function delStoreClass(storeId, index) {
  * 编辑单个分类推荐
  */
 function editSingleClassify(index,storeId) {
-  console.log(index)
   nkcAPI('/shop/manage/'+storeId+'/decoration/singleClass?index='+index, "GET", {})
   .then(function(data) {
     var totalDom = [];

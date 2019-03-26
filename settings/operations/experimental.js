@@ -6,6 +6,9 @@ module.exports = {
 	settings: {
 		shop: {
 			GET: 'visitShopSettings',
+			refunds: {
+				GET: 'visitShopRefunds',
+			},
 			applys: {
 				GET: 'visitShopOpenStoreApplys',
 				approve: {
