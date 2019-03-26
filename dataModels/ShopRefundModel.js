@@ -135,7 +135,7 @@ schema.methods.returnMoney = async () => {
   const order = await ShopOrdersModel.findById({_id});
   const {orderStatus, refundStatus} = order;
   if(refundStatus !=="ing" || !["unShip", "unSign"].includes(orderStatus)) throwErr(400, "订单状态已改变，请刷新");
-  if(![""])
+  if(![""]){}
   
 }
 module.exports = mongoose.model('shopRefunds', schema);
