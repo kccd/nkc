@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const giveUpRouter = require('./giveUp');
 const router = new Router();
 router
   .use('/', async (ctx, next) => {
@@ -11,18 +10,17 @@ router
     data.refund = refund;
     await next();
   })
-  /* .patch('/', async (ctx, next) => {
-    const {data, db, body, tools} = ctx;
-    const {refund} = body;
-    const refundDB = data.refund;
-    if(refund.root) ctx.throw(400, "申请暂无法修改，请等待平台裁决");
-    if(!refund.reason) ctx.throw(400, '理由不能为空');
-    if(tools.checkString.contentLength(refund.reason) > 1000) ctx.throw(400, '理由不能超过1000个字节');
-    await db.ShopRefundModel.update({_id: refundDB._id}, {$set: {
-      reason: refund.reason,
-      type: refund.type
-    }});
+  .post('/', async (ctx, next) => {
+    const {data, body} = ctx;
+    const {refund} = data;
+    const {type, trackNumber} = body;
+    if(type === "giveUp") {
+      // 用户撤销申请
+      await refund.buyerGiveUp();
+    } else if(type === "submitTrackNumber") {
+      // 用户提交快递单号
+      await refund.insertTrackNumber(trackNumber);
+    }
     await next();
-  }) */
-  .use("/give_up", giveUpRouter.routes(), giveUpRouter.allowedMethods());
+  });
 module.exports = router;

@@ -8,7 +8,9 @@ var app = new Vue({
     reason: '',
     type: '',
     money: '',
-    displayInput: false
+    applyRMInput: false,
+    infoInput: false,
+    trackNumber: ''
   },
   computed: {
     status: function() {
@@ -33,15 +35,34 @@ var app = new Vue({
     this.refunds = data.refunds;
     if(data.refund) {
       this.refund = data.refund;
+      if(["S_AGREE_RP", "P_AGREE_RP"].indexOf(this.refund.status) !== -1)  {
+        this.infoInput = true;
+      }
     } else {
-      this.displayInput = true;
+      if(this.order.orderStatus !== "finish" && !this.order.closeStatus) {
+        this.applyRMInput = true;
+      }
     }
   },
   methods: {
     format: NKC.methods.format,
+    submitTrackNumber: function() {
+      nkcAPI("/shop/refund/" + this.refund._id, "POST", {
+        type: "submitTrackNumber",
+        trackNumber: this.trackNumber
+      })
+        .then(function() {
+          window.location.reload();
+        })    
+        .catch(function(data) {
+          screenTopWarning(data);
+        });
+    },
     giveUpRefund: function() {
       var refund = this.refund;
-      nkcAPI("/shop/refund/" + refund._id + "/give_up", 'POST', {})
+      nkcAPI("/shop/refund/" + refund._id, 'POST', {
+        type: "giveUp"
+      })
         .then(function() {
           window.location.reload();
         })
@@ -91,25 +112,11 @@ var app = new Vue({
         orderId: this.order.orderId
       }
       this.newRefund(data);
-      
-    },
-    editReason: function() {
-      if(this.displayInput) {
-        this.displayInput = false;  
-      } else {
-        if(!this.reason) {
-          this.reason = this.refund.reason;
-          this.money = this.refund.money;
-          this.type = this.refund.type;
-        }
-        this.displayInput = true;
-      }
     },
     refundType: function(t) {
       return {
         'money': '退款',
-        'product': '退货',
-        'all': '退款+退货'
+        'product': '退款+退货'
       }[t];
     }
   }

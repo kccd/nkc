@@ -40,17 +40,15 @@ block content
                 div(v-if='order.refundStatus === "ing"')  
                   //- button.btn.btn-sm.btn-default(v-if="['B_APPLY_RM', 'B_APPLY_RP', 'B_APPLY_RALL'].indexOf(refund.status) !== -1" @click='editReason') 编辑理由
                   button.btn.btn-danger.btn-sm(@click='giveUpRefund') 撤销
-              .m-t-1(v-if='displayInput && !order.closeStatus')
+              .m-t-1(v-if='applyRMInput')
                 .refund-type.m-t-2
                   h5 请选择退款方式
                   span(:class="{'active': type==='money'}" @click='type="money"') 退款
                   .display-i-b(v-if='["unCost", "unShip"].indexOf(order.orderStatus) === -1')
-                    //- span(:class="{'active': type==='product'}" @click='type="product"') 退货
-                    span(:class="{'active': type==='all'}" @click='type="all"') 退款+退货
+                    span(:class="{'active': type==='product'}" @click='type="product"') 退款+退货
                   .display-i-b(v-else)
-                    //- span.disabled 退货
                     span.disabled 退款+退货  
-                .refund-money.m-t-2(v-if="type !== product")  
+                .refund-money.m-t-2
                   h5 请填写退款金额(不超过{{order.orderPrice/100}}元)
                   input.form-control(v-model.number="money" type="number")
                 .refund-reason.m-t-2
@@ -59,6 +57,12 @@ block content
                 .text-right.m-t-1
                   button.btn.btn-default(v-if="!refund && refunds.length !== 0" @click='submitBuyerReasonToP') 向平台申请退款
                   button.btn.btn-primary(@click='submitBuyerReason') {{refund._id?"保存": "向卖家申请退款"}}
+              .m-t-1(v-if='infoInput')
+                .refund-type.m-t-2
+                  h5 请输入快递单号
+                  input.form-control(v-model="trackNumber")
+                  .m-t-1.text-right
+                    button.btn.btn-sm.btn-primary(@click="submitTrackNumber") 提交
             .col-xs-12.col-md-6
               h4 最新进度
               div(v-if="refunds.length === 0").p-t-4.text-center
@@ -71,6 +75,8 @@ block content
                       span.text-danger {{log.money/100}} 元
                     p(v-if="log.info") 理由：
                       span.text-danger(v-html="log.info")
+                    p(v-if="log.trackNumber") 快递单号：
+                      span.text-danger(v-html="log.trackNumber")
 
 
 block scripts

@@ -26,7 +26,7 @@ router
     if(!type) {
       if(orderStatus !== 'unCost') ctx.throw(400, "请选择退款类型（退款、退款+退货）");
     } else {
-      if(!["money", "all"].includes(type)) ctx.throw(400, "请选择退款类型（退款、退款+退货）");
+      if(!["money", "product"].includes(type)) ctx.throw(400, "请选择退款类型（退款、退款+退货）");
     }
     if(!reason) ctx.throw(400, "理由不能为空");
     if(tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "理由不能超过1000个字节");
@@ -65,14 +65,12 @@ router
         root
       };
 
-      if(type !== "product") {
-        const refundMoney = Number(money)*100;
-        if(refundMoney > 0 && refundMoney <= order.orderPrice){
-          r.money = refundMoney;
-        }
-        else {
-          ctx.throw(400, "退款金额必须大于0且不能超过点订单的支付金额");
-        } 
+      const refundMoney = Number(money)*100;
+      if(refundMoney > 0 && refundMoney <= order.orderPrice){
+        r.money = refundMoney;
+      }
+      else {
+        ctx.throw(400, "退款金额必须大于0且不能超过点订单的支付金额");
       }
 
       if(orderStatus === "unShip") {
@@ -85,7 +83,7 @@ router
         if(type === "money") {
           r.status = root? "P_APPLY_RM": "B_APPLY_RM";
         } else {
-          r.status = root? "P_APPLY_RALL": "B_APPLY_RALL";
+          r.status = root? "P_APPLY_RP": "B_APPLY_RP";
         }
       }
       r.logs = [
