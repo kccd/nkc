@@ -67,7 +67,9 @@ router
           }
         });
         if(refund.type === 'money') {
-          
+          console.log('退款开始');
+          await refund.returnMoney();
+          console.log('退款结束');
         }
       } else {
         // 拒绝

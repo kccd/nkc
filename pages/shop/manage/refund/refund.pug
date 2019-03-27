@@ -64,7 +64,7 @@ block content
                   div(v-for="log in refund.logs").p-b-2
                     h5 {{format("YYYY-MM-DD HH:mm:ss", log.time)}} {{log.description}}
                     p(v-if="log.money") 退款金额：
-                      span.text-danger {{log.money}}元
+                      span.text-danger {{log.money/100}}元
                     p(v-if="log.info") 理由：
                       span.text-danger(v-html="log.info")
 block shopScripts

@@ -79,7 +79,7 @@ const shopOrdersSchema = new Schema({
     default: null
   },
   // 完成时间
-  finish: {
+  finishToc: {
     type: Date,
     default: null
   },
@@ -98,11 +98,6 @@ const shopOrdersSchema = new Schema({
   orderStatus: {
     type: String,
     default: "unCost"
-  },
-  // 是否有退款
-  idRefund: {
-    type: Boolean,
-    default: false
   },
   /**
    * 退款状态

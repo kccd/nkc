@@ -24,9 +24,9 @@ router
     }
     if(root && !refunds.length) ctx.throw(400, "请先向卖家提出申请，卖家拒绝后可向平台提出申请");
     if(!type) {
-      if(orderStatus !== 'unCost') ctx.throw(400, "请选择退款类型（退款、退货、退款+退货）");
+      if(orderStatus !== 'unCost') ctx.throw(400, "请选择退款类型（退款、退款+退货）");
     } else {
-      if(!["money", "product", "all"].includes(type)) ctx.throw(400, "请选择退款类型（退款、退货、退款+退货）");
+      if(!["money", "all"].includes(type)) ctx.throw(400, "请选择退款类型（退款、退款+退货）");
     }
     if(!reason) ctx.throw(400, "理由不能为空");
     if(tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "理由不能超过1000个字节");
@@ -66,7 +66,7 @@ router
       };
 
       if(type !== "product") {
-        const refundMoney = Number(money);
+        const refundMoney = Number(money)*100;
         if(refundMoney > 0 && refundMoney <= order.orderPrice){
           r.money = refundMoney;
         }
@@ -84,8 +84,6 @@ router
         r.type = type;
         if(type === "money") {
           r.status = root? "P_APPLY_RM": "B_APPLY_RM";
-        } else if(type === "product") {
-          r.status = root? "P_APPLY_RP": "B_APPLY_RP";
         } else {
           r.status = root? "P_APPLY_RALL": "B_APPLY_RALL";
         }
@@ -94,12 +92,10 @@ router
         {
           status: r.status,
           info: reason,
-          time
+          time,
+          money: r.money
         }
       ];
-      if(type !== "product") {
-        r.logs[0].money = r.money;
-      }
       const refundDB = db.ShopRefundModel(r);
       await refundDB.save();
       await db.ShopOrdersModel.update({
