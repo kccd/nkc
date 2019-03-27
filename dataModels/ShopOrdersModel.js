@@ -79,7 +79,7 @@ const shopOrdersSchema = new Schema({
     default: null
   },
   // 完成时间
-  finish: {
+  finishToc: {
     type: Date,
     default: null
   },
@@ -98,11 +98,6 @@ const shopOrdersSchema = new Schema({
   orderStatus: {
     type: String,
     default: "unCost"
-  },
-  // 是否有退款
-  idRefund: {
-    type: Boolean,
-    default: false
   },
   /**
    * 退款状态
@@ -381,6 +376,44 @@ shopOrdersSchema.statics.findById = async (orderId) => {
   if(!order) throwErr(404, `未找到ID为【${orderId}】的订单`);
   return order;
 };
+
+/**
+ * 确认收货 银行将买家支付的kcb打给卖家
+ * @author pengxiguaa 2019/3/27
+ */
+shopOrdersSchema.methods.confirmReceipt = async function() {
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const {orderId, orderStatus, closeStatus, orderPrice, refundStatus} = this;
+  const orders = await ShopOrdersModel.userExtendOrdersInfo([order]);
+  const order = orders[0];
+  if(closeStatus) throwErr(400, `订单已被关闭，请刷新`);
+  if(orderStatus !== "unSign") throwErr(400, "订单未处于待收货状态，请刷新");
+  switch(refundStatus) {
+    case "ing": throwErr(400, "订单正处于退款流程，请刷新"); 
+    case "success": throwErr(400, "订单被取消，请刷新");
+  }
+  const time = Date.now();
+  const record = KcbsRecordModel({
+    _id: await SettingModel.operateSystemID('kcbsRecords', 1),
+    from: "bank",
+    to: order.product.uid,
+    type: "sell",
+    num: orderPrice,
+    toc: time,
+    ordersId: [orderId]
+  });
+  await record.save();
+  await SettingModel.update({_id: 'kcb'}, {$inc: {
+    "c.totalMoney": -1 * orderPrice
+  }});
+  await UserModel.update({uid: order.product.uid}, {$inc: {
+    kcb: orderPrice
+  }});
+};
+
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;

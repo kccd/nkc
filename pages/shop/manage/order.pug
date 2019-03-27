@@ -57,6 +57,10 @@ block name
               td
                 a(href=`/u/74847`) Kris
               td= order.status  
+                if order.refundStatus === "ing"
+                  span &nbsp;
+                  a(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 去处理
+                
               //-td
                 if order.orderStatus == "unCost"
                   p 未付款

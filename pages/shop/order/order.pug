@@ -69,7 +69,7 @@ block shopAccountContent
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"
                   p
                     button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
-                if order.orderStatus !== "finish" && order.orderStatus !== "unSign" && order.closeStatus !== true && order.refundStatus !== "ing"
+                if order.orderStatus !== "finish" && order.closeStatus !== true
                   p
                     a(href=`/shop/order/${order.orderId}/refund`) 取消订单
                     //button(onclick=`cancelOrder(${order.orderId})`) 取消订单

@@ -35,65 +35,28 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {tools, data, db, body} = ctx;
+    const {data, db, body} = ctx;
     const {order} = data;
     const {type, reason} = body;
     const refund = await db.ShopRefundModel.findOne({
       orderId: order.orderId
     }).sort({toc: -1});
     if(!refund) ctx.throw(404, `订单【${order.orderId}】不存在退款申请`);
-    if(refund.successed !== null) ctx.throw(400, "申请已关闭");
-    const {status} = refund;
-    const time = Date.now();
-    if(["agreeR", "disagreeR"].includes(type)) {
-      if(!["B_APPLY_RM", "B_APPLY_RP", "B_APPLY_RALL"].includes(status)) {
-        ctx.throw(400, "申请状态已改变，请刷新");
-      }
-      if(type === "agreeR") {
-        // 同意
-        if(reason && tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "拒绝理由不能超过1000个字节");
-        const newStatus = status.replace("B_APPLY", "S_AGREE");
-        await db.ShopRefundModel.update({_id: refund._id}, {
-          $set: {
-            tlm: time,
-            status: newStatus
-          },
-          $addToSet: {
-            logs: {
-              status: newStatus,
-              time,
-              info: reason
-            }
-          }
-        });
-        if(refund.type === 'money') {
-          
-        }
-      } else {
-        // 拒绝
-        if(!reason) ctx.throw(400, "拒绝的理由不能为空");
-        if(tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "拒绝理由不能超过1000个字节");
-        const newStatus = status.replace("B_APPLY", "S_DISAGREE");
-        await db.ShopRefundModel.update({_id: refund._id}, {
-          $set: {
-            tlm: time,
-            status: newStatus,
-            successed: false
-          },
-          $addToSet: {
-            logs: {
-              status: newStatus,
-              time,
-              info: reason
-            }
-          }
-        });
-        await db.ShopOrdersModel.update({orderId: order.orderId}, {
-          $set: {
-            refundStatus: "fail"
-          }
-        });
-      }
+
+    if(type === "agreeRM") {
+      // 卖家同意退款
+      await refund.sellerAgreeRM(reason);
+    } else if(type === "disagreeRM") {
+      // 卖家拒绝退款
+      await refund.sellerDisagreeRM(reason);
+    } else if(type === "agreeRP") {
+      // 卖家同意退货
+      await refund.sellerAgreeRP(reason);
+    } else if(type === "disagreeRP") {
+      // 卖家拒绝退货
+      await refund.sellerDisagreeRP(reason);
+    } else {
+      ctx.throw(400, `未知的操作类型 type=${type}`);
     }
     await next();
   });

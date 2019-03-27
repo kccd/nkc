@@ -33,23 +33,19 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
-    agreeR: function() {
+    sellerPost: function(agree) {
+      var type;
+      if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {
+        type = agree? "agreeRM": "disagreeRM";
+      } else if(["B_APPLY_RP", "P_APPLY_RP"].indexOf(this.refund.status) !== -1) {
+        type = agree? "agreeRP": "disagreeRP";
+      } else {
+        return screenTopWarning("申请记录状态异常，请刷新");
+      }
+      console.log(type)
       nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/refund", "POST", {
         orderId: this.order.orderId,
-        type: "agreeR",
-        reason: this.reason
-      })
-        .then(function() {
-          window.location.reload();
-        })
-        .catch(function(data) {
-          screenTopWarning(data);
-        });
-    },
-    disagreeR: function() {
-      nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/refund", "POST", {
-        orderId: this.order.orderId,
-        type: "disagreeR",
+        type: type,
         reason: this.reason
       })
         .then(function() {
@@ -62,8 +58,7 @@ var app = new Vue({
     refundType: function(t) {
       return {
         'money': '退款',
-        'product': '退货',
-        'all': '退款+退货'
+        'product': '退款+退货',
       }[t];
     }
   }

@@ -128,10 +128,7 @@ module.exports = {
   refund: {
     POST: 'userApplyRefund',
     PARAMETER: {
-      PATCH: 'userApplyRefund',
-      give_up: {
-        POST: "userGiveUpRefund"
-      }
+      POST: "userApplyRefund"
     }
   }
 };
