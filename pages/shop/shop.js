@@ -91,3 +91,41 @@ function submitProductToBill(paraId) {
   var paraId = paraId;
   window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount
 }
+
+/**
+ * 增加购买数量
+ */
+function addStock() {
+  var stockCount = $("#stockCount").text();
+  stockCount = Number(stockCount);
+  var buyCount = $("#buyCount").val();
+  buyCount = Number(buyCount);
+  if(buyCount < 1 || isNaN(buyCount)) {
+    buyCount = 1
+  }
+  buyCount += 1;
+  if(buyCount > stockCount) {
+    screenTopWarning("数量不得大于库存")
+    buyCount = stockCount;
+  }
+  $("#buyCount").val(buyCount);
+}
+
+/**
+ * 减少购买数量
+ */
+function delStock() {
+  var stockCount = $("#stockCount").text();
+  stockCount = Number(stockCount);
+  var buyCount = $("#buyCount").val();
+  buyCount = Number(buyCount);
+  if(isNaN(buyCount)) {
+    buyCount = 1;
+  }
+  buyCount -= 1;
+  if(buyCount < 1) {
+    screenTopWarning("至少购买一件")
+    buyCount =1 
+  }
+  $("#buyCount").val(buyCount);
+}

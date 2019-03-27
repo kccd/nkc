@@ -108,12 +108,12 @@ block name
               .col-sm-8
                 .radio
                   label
-                    input#stockMethod1(type='radio', name='stockCostMethod', value='payReduceStock', checked='true')
+                    input#stockMethod1(type='radio', name='stockCostMethod', value='orderReduceStock', checked='true')
                     |     买家拍下减库存
                     b(style="color:red")  （拍下减库存，存在恶拍风险）
                 .radio
                   label
-                    input#stockMethod2(type='radio', name='stockCostMethod', value='orderReduceStock')
+                    input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock')
                     |     买家付款减库存
                     b(style="color:red")  （付款减库存，存在超卖风险）
       .panel.panel-info
@@ -249,12 +249,12 @@ block name
                 button.btn.btn-primary.radius(onclick=`productToShelf("${data.myStore.storeId}")`, type='submit')
                   i.fa.fa-save
                   | &nbsp;保存并提交审核
-                button.btn.btn-info.radius(onclick='test()', type='submit')
-                  i.fa.fa-eye
-                  | &nbsp;预览
-        .panel-footer
-          | Panel Footer
-          button.btn.btn-primary(onclick="autoCalcuPrice()") test
+                //- button.btn.btn-info.radius(onclick='test()', type='submit')
+                //-   i.fa.fa-eye
+                //-   | &nbsp;预览
+        //- .panel-footer
+        //-   | Panel Footer
+        //-   button.btn.btn-primary(onclick="autoCalcuPrice()") test
       #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
         .modal-dialog(role='document' style="margin-top:200px;width:900px")
           .modal-content

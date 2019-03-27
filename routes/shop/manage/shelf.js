@@ -1,6 +1,19 @@
 const Router = require('koa-router');
 const shelfRouter = new Router();
 shelfRouter
+  .use('/', async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    // 检测店铺信息是否已完善，如果不完善则跳转到店铺信息设置
+    const store = await db.ShopStoresModel.findOne({uid: user.uid});
+    if(store) {
+      data.dataPerfect = store.dataPerfect;
+    }
+    if(!data.dataPerfect) {
+      return ctx.redirect(`/shop/manage/${store.storeId}/info`)
+    }
+    await next();
+  })
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
     const {user} = data;

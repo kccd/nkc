@@ -23,7 +23,8 @@ productRouter
     // 取出全部评论
     let match = {
       tid: data.product.tid,
-      pid: {$nin:[data.product.oc]}
+      pid: {$nin:[data.product.oc]},
+      disabled: false
     }
     const posts = await db.PostModel.find(match);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});

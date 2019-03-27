@@ -1446,27 +1446,19 @@ function shareTo(shareType, type, str, title, pid){
         var copyAreaId = "copyArea"+pid;
         var copyLinkId = "copyLink"+pid;
         var copyButton = "copyVutton"+pid;
-        // $("#"+copyAreaId).css("display", "block");
-        console.log(document.getElementById(copyAreaId))
         document.getElementById(copyAreaId).style.display = "block";
         document.getElementById(copyLinkId).value = newUrl;
-        console.log(copyLinkId)
-        // $("#"+copyLinkId).val(newUrl);
         var obj = document.getElementById(copyLinkId);
         obj.select(); 
-        // copyLink();
       }
       if(type == "qq") {
         newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
-        // window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
       }
       if(type == "qzone") {
         newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
-        // window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
       }
       if(type == "weibo") {
         newLink.location='http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk;
-        // window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
       }
       if(type == "weChat") {
         var qrcode
@@ -1476,7 +1468,6 @@ function shareTo(shareType, type, str, title, pid){
         }else{
           if(shareType == "forum"){
             var otherCodes = document.getElementsByClassName('forumQrcode');
-            // var otherCodes = $(".forumQrcode");
             for(var i in otherCodes){
               var otherCode = otherCodes[i];
               if(otherCode && typeof(otherCode)=="object") {
@@ -1499,8 +1490,6 @@ function shareTo(shareType, type, str, title, pid){
           var qrid = shareType+"Qrcode";
           qrcode = geid(qrid);
         }
-        // var qrid = shareType+"Qrcode";
-        // var qrcode = geid(qrid);
         qrcode.style.display = "inline-block"
         if(qrcode) {
           var path = newUrl;
@@ -1519,6 +1508,7 @@ function shareTo(shareType, type, str, title, pid){
       }
     })
     .catch(function(data) {
+      screenTopWarning(data || data.error)
       screenTopWarning("请登录")
     })
   }

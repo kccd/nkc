@@ -37,16 +37,9 @@ var app = new Vue({
     }
   },
   methods: {
-    format: NKC.methods.format,
-    giveUpRefund: function() {
-      var refund = this.refund;
-      nkcAPI("/shop/refund/" + refund._id + "/give_up", 'POST', {})
-        .then(function() {
-          window.location.reload();
-        })
-        .catch(function(data) {
-          screenTopWarning(data);
-        });
+    format: function(m, t) {
+      if(typeof moment === "undefined") throw 'moment is not loaded';
+      return moment(t).format(m);
     },
     newRefund: function(data) {
       var url = '/shop/refund';
@@ -59,8 +52,34 @@ var app = new Vue({
         refund: data.refund,
         orderId: data.orderId
       };
-      console.log(obj);
       nkcAPI(url, method, obj)
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        });
+    },
+    agreeR: function() {
+      console.log("同意")
+      nkcAPI("/e/settings/shop/refunds/agree", "POST", {
+        orderId: this.order.orderId,
+        type: "agreeR",
+        reason: this.reason
+      })
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        });
+    },
+    disagreeR: function() {
+      console.log("不同意")
+      nkcAPI("/e/settings/shop/refunds/disagree", "POST", {
+        orderId: this.order.orderId,
+        reason: this.reason
+      })
         .then(function() {
           window.location.reload();
         })

@@ -17,6 +17,8 @@ block shopAccountContent
           a(href=`/shop/order?orderStatus=unSign`, data-toggle='url') 待收货
         li(class=data.orderStatus == "finish"?"active":"")
           a(href=`/shop/order?orderStatus=finish`, data-toggle='url') 完成的订单
+        li(class=data.orderStatus == "refunding"?"active":"")
+          a(href=`/shop/order?orderStatus=refunding`, data-toggle='url') 退款中的订单
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
     .col-md-12.col-sm-12.col-xs-12  
@@ -55,7 +57,7 @@ block shopAccountContent
               td=order.count
               //- td=order.user.username
               td
-                a(href=`/u/74847`) Kris
+                a(href=`/shop/store/${order.product.storeId}`)!=`${order.product.store.storeName}`
               td= order.status
                 | &nbsp;  
                 a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
@@ -67,10 +69,13 @@ block shopAccountContent
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"
                   p
                     button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
-                if order.orderStatus !== "finish" && order.orderStatus !== "unSign" && order.closeStatus !== true
+                if order.orderStatus !== "finish" && order.orderStatus !== "unSign" && order.closeStatus !== true && order.refundStatus !== "ing"
                   p
                     a(href=`/shop/order/${order.orderId}/refund`) 取消订单
                     //button(onclick=`cancelOrder(${order.orderId})`) 取消订单
+                if order.refundStatus == "ing"
+                  p
+                    a(href=`/shop/order/${order.orderId}/refund`) 退款详情
                 if order.orderStatus == "unSign"
                   p
                     button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货

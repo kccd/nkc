@@ -74,10 +74,10 @@ block content
               a(href='./charts.html')
                 i.glyphicon.glyphicon-calendar
                 |                             图表统计
-            li(style="background-color: aliceblue")
-              a(href='./openStore')
-                i.glyphicon.glyphicon-calendar
-                |                             开店申请
+            //- li(style="background-color: aliceblue")
+            //-   a(href='./openStore')
+            //-     i.glyphicon.glyphicon-calendar
+            //-     |                             开店申请
             li(style="background-color: aliceblue")
               a(href='./info')
                 i.glyphicon.glyphicon-calendar
@@ -90,6 +90,10 @@ block content
               a(href='./classify')
                 i.glyphicon.glyphicon-calendar
                 |                             分类设置
+            li(style="background-color: aliceblue")
+              a(href=`/shop/store/${data.myStore.storeId}`)
+                i.glyphicon.glyphicon-calendar
+                |                             进入我的店铺
         .col-xs-10.col-md-10
           block name               
 block scripts

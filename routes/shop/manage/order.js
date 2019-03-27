@@ -11,10 +11,11 @@ orderRouter
 		let storeId = params.account;
 		// 构造查询条件
 		let searchMap = {
-			storeId : storeId, 
-			uid: user.uid
+			storeId : storeId
 		}
-		if(orderStatus && orderStatus !== "all"){
+		if(orderStatus == "refunding"){
+			searchMap.refundStatus = "ing";
+		}else if(orderStatus && orderStatus !== "all"){
 			searchMap.orderStatus = orderStatus;
 		}
 		const count = await db.ShopOrdersModel.count(searchMap);

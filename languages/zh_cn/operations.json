@@ -479,6 +479,16 @@
   "userGiveUpRefund": "商城 用户撤销退款申请",
   "visitStoreOrderRefund": "商家查看申请退款页",
   "submitStoreOrderRefund": "商家提交退款申请的处理结果",
+  "visitShopRefundList": "商城后台查看退款申请列表",
+  "visitShopRefundDetail": "商城后台查看退款详情",
+  "shopAgreeRefundApply": "商城后台同意退款申请",
+  "shopDisagreeRefundApply": "商城后台拒绝退款申请",
+  "changeHomeSettingCarousel": "商城后台添加首页轮播图",
+  "deleteHomeSettingCarousel": "商城后台删除首页轮播图",
+  "visitHomeSettingRecommendation": "商城后台查看店铺推荐",
+  "changeHomeSettingRecommendation": "商城后台修改店铺推荐",
+  "visitHomeSettingPopular": "商城后台查看最热商品",
+  "changeHomeSettingPopular": "商城后台修改最热商品",
 
 
   "APPgetUserInfo": "app获取用户信息",

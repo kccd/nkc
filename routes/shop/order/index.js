@@ -14,7 +14,10 @@ router
     let q = {
       uid: user.uid
     };
-    if(orderStatus && orderStatus !== 'all') {
+    if(orderStatus == "refunding"){
+      q.closeStatus = false;
+      q.refundStatus = "ing";
+    }else if(orderStatus && orderStatus !== 'all') {
       q.orderStatus = orderStatus;
       q.closeStatus = false;
     }

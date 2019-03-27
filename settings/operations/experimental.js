@@ -7,7 +7,16 @@ module.exports = {
 		shop: {
 			GET: 'visitShopSettings',
 			refunds: {
-				GET: 'visitShopRefunds',
+				GET: 'visitShopRefundList',
+				refundDetail: {
+					GET: 'visitShopRefundDetail'
+				},
+				agree: {
+					POST: 'shopAgreeRefundApply'
+				},
+				disagree: {
+					POST: 'shopDisagreeRefundApply'
+				}
 			},
 			applys: {
 				GET: 'visitShopOpenStoreApplys',

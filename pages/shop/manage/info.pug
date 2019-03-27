@@ -2,7 +2,17 @@ extends ./index.pug
 block title
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
 block name
+  -console.log(data.store)
   .row
+    .col-md-12.col-sm-12.col-xs-12
+      if data.store.dataPerfect
+        p(style="color:forestgreen") 
+          span.fa.fa-check-circle(style="font-size:30px") 
+          | 店铺信息已经完善，您现在可以去发布商品了
+      else
+        p(style="color:crimson") 
+          span.fa.fa-exclamation-circle(style="font-size:30px")
+          | 完善店铺信息后才能发布商品
     .col-md-12.col-sm-12.col-xs-12
       .panel.panel-info
         .panel-heading

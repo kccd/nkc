@@ -8,8 +8,13 @@ infoRouter
 		let store = await db.ShopStoresModel.findOne({storeId});
 		if(store) {
 			var locationArray = store.address.split("&");
-			store.location = locationArray[0];
-			store.address = locationArray[1];
+			if(locationArray.length > 1){
+				store.location = locationArray[0];
+				store.address = locationArray[1];	
+			}else{
+				store.location = "";
+				store.address = "";
+			}
 		}
 		data.store = store;
 		ctx.template = 'shop/manage/info.pug';

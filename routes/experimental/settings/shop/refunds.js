@@ -4,41 +4,94 @@ applysRouter
 	.get('/', async (ctx, next) => {
     const {data, db} = ctx;
 		// 取出待处理的退款申请
-		const refunds = await db.ShopRefundModel.find({root: true}).sort({toc:-1});
+		const refunds = await db.ShopRefundModel.find({root: true, successed:null}).sort({toc:-1});
 		data.refunds = refunds;
-		ctx.template = "experimental/shop/refunds.pug"
+		ctx.template = "experimental/shop/refund/refunds.pug"
 		await next();
 	})
-	.post('/approve', async (ctx, next) => {
-		const {data, db, body} = ctx;
-		const {id} = body;
-		const {user} = data;
-		const apply = await db.ShopApplyStoreModel.findOne({_id:id});
-		if(!apply) ctx.throw(404, "找不到申请");
-		let nowStamp = new Date();
-		await apply.update({$set:{applyStatus: "approve", dealApplyToc:nowStamp, dealUid:user.uid}});
-		const storeId = await db.SettingModel.operateSystemID('stores', 1);
-		const userPersonal = await db.UsersPersonalModel.findOne({uid:user.uid});
-		if(!userPersonal || !userPersonal.mobile) ctx.throw(400, "该用户尚未绑定手机号,请驳回开店申请");
-		let newStoreInfo = {
-			storeId:storeId,
-			uid: apply.uid,
-			mobile: [userPersonal.mobile]
+	// 平台同意退款申请
+	.post('/agree', async (ctx, next) => {
+		const {tools, data, db, body} = ctx;
+		const {orderId, reason} = body;
+		const refund = await db.ShopRefundModel.findOne({orderId}).sort({toc: -1});
+		if(!refund) ctx.throw(404, `订单【${orderId}】不存在退款申请`);
+		if(refund.successed !== null) ctx.throw(400, "申请已关闭");
+		const {status} = refund;
+		const time = Date.now();
+		if(!["P_APPLY_RM", "P_APPLY_RP", "P_APPLY_RALL"].includes(status)) {
+			ctx.throw(400, "申请状态已改变，请刷新");
 		}
-		const newDecoration = new db.ShopDecorationsModel({storeId: storeId});
-		const newStore = new db.ShopStoresModel(newStoreInfo);
-		newDecoration.save();
-		newStore.save();
+		if(reason && tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "理由不能超过1000个字节");
+		const newStatus = status.replace("P_APPLY", "P_AGREE");
+		await db.ShopRefundModel.update({_id:refund._id}, {
+			$set: {
+				tlm: time,
+				status: newStatus
+			},
+			$addToSet: {
+				logs: {
+					status: newStatus,
+					time,
+					info: reason
+				}
+			}
+		})
 		await next();
 	})
-	.post('/reject', async (ctx, next) => {
-		const {data, db, body} = ctx;
-		const {id} = body;
-		const {user} = data;
-		const apply = await db.ShopApplyStoreModel.findOne({_id:id});
-		if(!apply) ctx.throw(404, "找不到申请");
-		let nowStamp = new Date();
-		await apply.update({$set:{applyStatus: "reject", dealApplyToc:nowStamp, dealUid:user.uid}});
+	.post('/disagree', async (ctx, next) => {
+		const {tools, data, db, body} = ctx;
+		const {orderId, reason} = body;
+		const refund = await db.ShopRefundModel.findOne({orderId}).sort({toc: -1});
+		if(!refund) ctx.throw(404, `订单【${orderId}】不存在退款申请`);
+		if(refund.successed !== null) ctx.throw(400, "申请已关闭");
+		const {status} = refund;
+		const time = Date.now();
+		if(!["P_APPLY_RM", "P_APPLY_RP", "P_APPLY_RALL"].includes(status)) {
+			ctx.throw(400, "申请状态已改变，请刷新");
+		}
+		if(!reason) ctx.throw(400, "拒绝的理由不能为空");
+		if(reason && tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "理由不能超过1000个字节");
+		const newStatus = status.replace("P_APPLY", "P_DISAGREE");
+		await db.ShopRefundModel.update({_id:refund._id}, {
+			$set: {
+				tlm: time,
+				status: newStatus,
+				successed: false
+			},
+			$addToSet: {
+				logs: {
+					status: newStatus,
+					time,
+					info: reason
+				}
+			}
+		})
+		await db.ShopOrdersModel.update({orderId: orderId}, {
+			$set: {
+				refundStatus: "fail"
+			}
+		});
+		await next();
+	})
+	.get('/refundDetail', async(ctx, next) => {
+		const {data, db, body, query} = ctx;
+		const {orderId} = query;
+		let order = await db.ShopOrdersModel.findById(orderId);
+    const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+    order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
+    // 获取该订单的全部退款申请记录
+    const refunds = await db.ShopRefundModel.find({
+      orderId: order.orderId,
+      sellerId: order.product.uid,
+      buyerId: order.uid
+    }).sort({toc: 1});
+    if(refunds.length !== 0) {
+      if(refunds[refunds.length - 1].successed === null) data.refund = refunds[refunds.length - 1];
+    }
+		await db.ShopRefundModel.extendLogs(refunds, ctx.state.lang);
+		data.order = order;
+		data.refunds = refunds;
+		ctx.template = "experimental/shop/refund/refundDetail.pug"
 		await next();
 	})
 module.exports = applysRouter;
