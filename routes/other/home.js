@@ -9,8 +9,8 @@ homeRouter
 		for (var i in allMarkThreads) {
 			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
 			if(delThreadLog){
-				await allMarkThreads[i].update({ "recycleMark": false, fid: "recycle" })
-				await db.PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"fid":"recycle"}})
+				await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"] })
+				await db.PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
 				await db.DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
         const tUser = await db.UserModel.findOne({uid: delThreadLog.delUserId});
         const thread = await db.ThreadModel.findOne({tid: delThreadLog.threadId});
