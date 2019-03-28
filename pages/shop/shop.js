@@ -49,8 +49,19 @@ function choiceProductParams(para,productId) {
   }
   // 获取当前的paraId
   var paraId = $(para).attr("paraId")
-  var currentUrl = window.location.pathname;
-  window.location.href = currentUrl+"?paraId="+paraId
+  nkcAPI("/shop/product/"+productId+"/changePara" ,"PATCH", {paraId: paraId})
+  .then(function (data) {
+    var productParams = data.productParams;
+    $("#originPrice").text(numToFloatTwo(productParams.originPrice));
+    $("#newPrice").text(numToFloatTwo(productParams.price))
+    $("#stockCount").text(productParams.stocksSurplus);
+    $("#paraId").text(productParams._id)
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error)
+  })
+  // var currentUrl = window.location.pathname;
+  // window.location.href = currentUrl+"?paraId="+paraId
 }
 
 
@@ -74,7 +85,8 @@ function addProductToCart(paraId) {
  * 生成账单
  * 直接购买
  */
-function submitProductToBill(paraId) {
+function submitProductToBill() {
+
   // 获取商品数量
   var productCount = $("#buyCount").val();
   productCount = Number(productCount);
@@ -88,7 +100,7 @@ function submitProductToBill(paraId) {
     return screenTopWarning("库存不足");
   }
   // 获取商品id 
-  var paraId = paraId;
+  var paraId = $("#paraId").text();
   window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount
 }
 
@@ -129,3 +141,13 @@ function delStock() {
   }
   $("#buyCount").val(buyCount);
 }
+
+
+/**
+ * 价格显示为保留两位小数
+ * @param {*} str 
+ */
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 

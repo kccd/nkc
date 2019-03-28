@@ -89,6 +89,9 @@ block title
       font-size:small;
       cursor: pointer;
     }
+    .del{
+      text-decoration: line-through;
+    }
 block content
 
   .container-fluid(style='max-width: 1400px;')
@@ -166,17 +169,17 @@ block content
             div(style="padding:7px 0;color:#333")
               p
                 span.title 价格
-                -if(product.productParams[paId].useDiscount)
-                  span
-                    //- del=`${product.productParams[paId].originPrice}`
-                    del #{numToFloatTwo(product.productParams[paId].originPrice)}
-                -else
-                  //- span=`${product.productParams[paId].originPrice}`
-                  span  #{numToFloatTwo(product.productParams[paId].originPrice)}
-              -if(product.productParams[paId].useDiscount)
-                p
-                  span.title 优惠价
-                  span(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+                span#originPrice(class=product.productParams[paId].useDiscount == true?"del":"") #{numToFloatTwo(product.productParams[paId].originPrice)}
+                //- -if(product.productParams[paId].useDiscount)
+                //-   span
+                //-     //- del=`${product.productParams[paId].originPrice}`
+                //-     del #{numToFloatTwo(product.productParams[paId].originPrice)}
+                //- -else
+                //-   //- span=`${product.productParams[paId].originPrice}`
+                //-   span  #{numToFloatTwo(product.productParams[paId].originPrice)}
+              p
+                span.title 优惠价
+                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
           //- div.item
           //-   p
           //-     span.title 支付方式
@@ -228,6 +231,7 @@ block content
                   span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                     span=para.name.join()
           div.item
+            div(style="display:none")#paraId!=`${paraId}`
             a.btn.btn.buy(role='button' onclick=`submitProductToBill(${paraId})` style="margin-left:10px") 立即购买
             a.btn.btn.addCart(role='button' onclick=`addProductToCart(${paraId})`) 
               span.fa.fa-shopping-cart  加入购物车

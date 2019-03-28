@@ -81,6 +81,9 @@ style.
     font-size:small;
     cursor: pointer;
   }
+  .del{
+    text-decoration: line-through;
+  }
 .row
   .col-xs-12.col-md-12(style="margin-bottom:30px")
     .col-xs-12.col-sm-12.col-md-12.col-lg-6
@@ -97,15 +100,15 @@ style.
         div(style="padding:7px 0;color:#333")
           p
             span.title 价格
-            -if(product.productParams[paId].useDiscount)
-              span
-                del #{numToFloatTwo(product.productParams[paId].originPrice)}
-            -else
-              span #{numToFloatTwo(product.productParams[paId].originPrice)}
-          -if(product.productParams[paId].useDiscount)
-            p
-              span.title 优惠价
-              span(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+            span#originPrice(class=product.productParams[paId].useDiscount == true?"del":"") #{numToFloatTwo(product.productParams[paId].originPrice)}
+            //- -if(product.productParams[paId].useDiscount)
+            //-   span
+            //-     del#originPriceDis #{numToFloatTwo(product.productParams[paId].originPrice)}
+            //- -else
+            //-   span#originPrice #{numToFloatTwo(product.productParams[paId].originPrice)}
+          p
+            span.title 优惠价
+            span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
       //- div.item
       //-   p
       //-     span.title 支付方式
@@ -148,7 +151,8 @@ style.
               span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                 span=para.name.join()
       div.item
-        a.btn.btn.buy(role='button' onclick=`submitProductToBill(${paraId})` style="margin-left:10px") 立即购买
+        div(style="display:none")#paraId!=`${paraId}`
+        a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
         a.btn.btn.addCart(role='button' onclick=`addProductToCart(${paraId})`) 
           span.fa.fa-shopping-cart  加入购物车
     .col-xs-1.col-md-1 

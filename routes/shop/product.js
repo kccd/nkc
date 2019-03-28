@@ -41,4 +41,12 @@ productRouter
     ctx.template = "shop/product/index.pug";
     await next();
   })
+  .patch('/:productId/changePara', async (ctx, next) => {
+    const {data, body, db, params} = ctx;
+    const {paraId} = body;
+    const productParams = await db.ShopProductsParamModel.findOne({_id:paraId});
+    if(!productParams) ctx.throw(400, "规格查询失败");
+    data.productParams = productParams;
+    await next();
+  })
 module.exports = productRouter;

@@ -132,10 +132,10 @@ const shopGoodsSchema = new Schema({
   },
   /**
    * 商品状态
-   * @notonshelf 未上架
-   * @offshelf 已下架
-   * @insale 销售中
-   * @soldout 已售空
+   * @param notonshelf 未上架
+   * @param offshelf 已下架
+   * @param insale 销售中
+   * @param soldout 已售空
    */
   productStatus: {
     type: String,

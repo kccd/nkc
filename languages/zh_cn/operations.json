@@ -441,8 +441,8 @@
   "visitHomeSettingFeatured": "访问商城首页商品推荐设置",
   "changeHomeSettingFeatured": "修改商城首页商品推荐",
   "visitProductSingle": "查看商品",
-  "visitManageIndex": "访问商家后台",
-  "visitManageHome": "访问商家后台首页",
+  "visitManageIndex": "商家后台访问后台",
+  "visitManageHome": "商家后台访问后台首页",
   "visitShelfIndex": "商家后台商品上架首页",
   "productToShelf": "商家后台商品上架",
   "visitStoreInfoIndex": "商家后台店铺信息首页",
@@ -491,6 +491,8 @@
   "shopUploadCert": "商城用户上传凭证",
   "shopGetCert": "商城中获取凭证",
   "getAnyBodyShopCert": "可查看任何人在商城上传的凭证",
+  "visitStoreOrderLogositics": "商家后台查看物流信息",
+  "changeProductParams": "商城用户选择商品规格",
 
 
   "APPgetUserInfo": "app获取用户信息",

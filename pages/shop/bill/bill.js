@@ -38,7 +38,6 @@ function submitOrders() {
     receiveAddress, 
     receiveName, 
     receiveMobile, 
-    //payMethod
   }
   var para = [];
   // 获取帐单中的产品与数量

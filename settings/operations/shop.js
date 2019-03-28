@@ -5,7 +5,10 @@ module.exports = {
   },
   product: {
     PARAMETER: {
-      GET: 'visitProductSingle'
+      GET: 'visitProductSingle',
+      changePara: {
+        PATCH: 'changeProductParams'
+      }
     }
   },
   manage: {
