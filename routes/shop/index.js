@@ -12,6 +12,15 @@ const payRouter = require('./pay');
 const refundRouter = require('./refund');
 const certRouter = require('./cert');
 shopRouter
+  .use("/", async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    if(!user) await next();
+    data.shopInfo = {
+      cartProductCount: await db.ShopCartModel.getProductCount(user)
+    };
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const {data, db ,query, params} = ctx;
     const homeSetting = await db.ShopSettingsModel.findOne({type:"homeSetting"});

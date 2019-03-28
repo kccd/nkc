@@ -84,5 +84,34 @@ schema.statics.findById = async (_id) => {
   if(!cart) throwErr(404, '未找到ID为【${_id}】的购物车收藏记录');
   return cart;
 };
+
+/**
+ * 获取用户购物车的商品数量
+ * @param String/Object uid: 用户ID或者用户对象
+ * @return Number 数量
+ * @author pengxiguaa 2019/3/28
+ */
+schema.statics.getProductCount = async (uid) => {
+  if(typeof uid === "object") {
+    uid = uid.uid;
+  }
+  const carts = await mongoose.model("shopCarts").aggregate([
+    {
+      $match: {
+        uid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        count: {
+          $sum: "$count"
+        }
+      }  
+    }
+  ]);
+  return carts.length === 0? 0: carts[0].count;
+};
+
 const ShopCartModel = mongoose.model('shopCarts', schema);
 module.exports = ShopCartModel;

@@ -3444,3 +3444,13 @@ img.emoji {
   border-radius: 5px;
   margin-bottom: 0;
 }
+.nav-red-point-number{
+  display: inline-block;
+  height: 16px;
+  padding: 0 4px;
+  text-align: center;
+  line-height: 16px;
+  border-radius: 8px;
+  color: #fff;
+  background-color: #d9534f;
+}
