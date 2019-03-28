@@ -260,8 +260,8 @@ schema.methods.returnMoney = async function () {
 }
 /**
  * 判断退款申请的状态以及订单状态 状态异常则抛出错误
- * @param String reason: 退款理由或说名
- * @param String operation: 当前执行的操作名
+ * @param {String} reason: 退款理由或说名
+ * @param {String} operation: 当前执行的操作名
  * @return Object:
  *  reason: (String) 退款理由或说明
  *  time: (Date) 时间
@@ -296,6 +296,34 @@ schema.methods.ensureRefundPermission = async function(reason, operations) {
     order,
     refund
   };
+}
+
+/**
+ * 平台同意退款申请、同意退货申请或超时自动同意
+ */
+schema.methods.pingtaiAgreeRMP = async function(reason) {
+  const ShopRefundModel = mongoose.model("shopRefunds");
+  const {time} = await this.ensureRefundPermission(reason, [
+    "P_APPLY_RM",
+    "P_APPLY_RP"
+  ])
+  const newStatus = this.status.replace("P_APPLY", "P_AGREE");
+  await ShopRefundModel.update({_id: this._id}, {
+    $set: {
+      tlm: time,
+      status: newStatus
+    },
+    $addToSet: {
+      logs: {
+        status: newStatus,
+        time,
+        info: reason
+      }
+    }
+  })
+  if(["P_AGREE_RM"].includes(newStatus)) {
+    await this.returnMoney();
+  }
 }
 
 /**
@@ -381,6 +409,40 @@ schema.methods.sellerAgreeRP = async function(reason) {
     }
   });
 }
+
+/**
+ * 平台拒绝退款申请、退货申请
+ */
+schema.methods.pingtaiDisagreeRMP = async function(reason) {
+  const ShopRefundModel = mongoose.model("shopRefunds");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const {time, order} = await this.ensureRefundPermission(reason, [
+    "P_APPLY_RM",
+    "P_APPLY_RP"
+  ])
+  const newStatus = this.status.replace("P_APPLY", "P_DISAGREE");
+  await ShopRefundModel.update({_id: this._id}, {
+    $set: {
+      tlm: time,
+      status: newStatus,
+      successed: false
+    },
+    $addToSet: {
+      logs: {
+        status: newStatus,
+        time,
+        info: reason
+      }
+    }
+  });
+  await ShopOrdersModel.update({orderId: order.orderId}, {
+    $set: {
+      refundStatus: "fail"
+    }
+  })
+} 
+
+
 /**
  * 卖家拒绝退货申请
  * @param String reason: 退款理由或说名

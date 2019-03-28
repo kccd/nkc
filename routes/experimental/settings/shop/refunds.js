@@ -18,24 +18,11 @@ applysRouter
 		if(refund.successed !== null) ctx.throw(400, "申请已关闭");
 		const {status} = refund;
 		const time = Date.now();
-		if(!["P_APPLY_RM", "P_APPLY_RP", "P_APPLY_RALL"].includes(status)) {
+		if(!["P_APPLY_RM", "P_APPLY_RP"].includes(status)) {
 			ctx.throw(400, "申请状态已改变，请刷新");
 		}
 		if(reason && tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "理由不能超过1000个字节");
-		const newStatus = status.replace("P_APPLY", "P_AGREE");
-		await db.ShopRefundModel.update({_id:refund._id}, {
-			$set: {
-				tlm: time,
-				status: newStatus
-			},
-			$addToSet: {
-				logs: {
-					status: newStatus,
-					time,
-					info: reason
-				}
-			}
-		})
+		await refund.pingtaiAgreeRMP(reason);
 		await next();
 	})
 	.post('/disagree', async (ctx, next) => {
@@ -46,31 +33,32 @@ applysRouter
 		if(refund.successed !== null) ctx.throw(400, "申请已关闭");
 		const {status} = refund;
 		const time = Date.now();
-		if(!["P_APPLY_RM", "P_APPLY_RP", "P_APPLY_RALL"].includes(status)) {
+		if(!["P_APPLY_RM", "P_APPLY_RP"].includes(status)) {
 			ctx.throw(400, "申请状态已改变，请刷新");
 		}
 		if(!reason) ctx.throw(400, "拒绝的理由不能为空");
 		if(reason && tools.checkString.contentLength(reason) > 1000) ctx.throw(400, "理由不能超过1000个字节");
-		const newStatus = status.replace("P_APPLY", "P_DISAGREE");
-		await db.ShopRefundModel.update({_id:refund._id}, {
-			$set: {
-				tlm: time,
-				status: newStatus,
-				successed: false
-			},
-			$addToSet: {
-				logs: {
-					status: newStatus,
-					time,
-					info: reason
-				}
-			}
-		})
-		await db.ShopOrdersModel.update({orderId: orderId}, {
-			$set: {
-				refundStatus: "fail"
-			}
-		});
+		await refund.pingtaiDisagreeRMP(reason);
+		// const newStatus = status.replace("P_APPLY", "P_DISAGREE");
+		// await db.ShopRefundModel.update({_id:refund._id}, {
+		// 	$set: {
+		// 		tlm: time,
+		// 		status: newStatus,
+		// 		successed: false
+		// 	},
+		// 	$addToSet: {
+		// 		logs: {
+		// 			status: newStatus,
+		// 			time,
+		// 			info: reason
+		// 		}
+		// 	}
+		// })
+		// await db.ShopOrdersModel.update({orderId: orderId}, {
+		// 	$set: {
+		// 		refundStatus: "fail"
+		// 	}
+		// });
 		await next();
 	})
 	.get('/refundDetail', async(ctx, next) => {
