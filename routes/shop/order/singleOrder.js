@@ -20,7 +20,7 @@ router
     if(user.uid !== order.uid) ctx.throw(400, "您无权查看该订单的物流信息");
     if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
     let trackNumber = order.trackNumber;
-    const trackInfo = await nkcModules.apiFunction.getTrackInfo("3399564142457");
+    const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber);
     data.trackNumber = trackNumber;
     data.trackInfo = trackInfo;
     ctx.template = "/shop/order/logistics.pug";

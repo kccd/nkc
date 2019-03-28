@@ -75,6 +75,9 @@ module.exports = {
         refund: {
           GET: 'visitStoreOrderRefund',
           POST: 'submitStoreOrderRefund'
+        },
+        logositics: {
+          GET: 'visitStoreOrderLogositics'
         }
       }
     },

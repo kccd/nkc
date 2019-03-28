@@ -15,8 +15,10 @@ orderRouter
 		}
 		if(orderStatus == "refunding"){
 			searchMap.refundStatus = "ing";
-		}else if(orderStatus && orderStatus !== "all"){
+		}else if(orderStatus && orderStatus !== "all" && orderStatus !== "close"){
 			searchMap.orderStatus = orderStatus;
+		}else if(orderStatus == "close") {
+			searchMap.closeStatus = true;
 		}
 		const count = await db.ShopOrdersModel.count(searchMap);
 		const paging = nkcModules.apiFunction.paging(page, count);
@@ -66,6 +68,25 @@ orderRouter
 		if(data.order.store.uid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
 		ctx.template = 'shop/manage/detail.pug';
 		await next();
-  })
+	})
+	// 查看订单物流详情
+	.get('/logositics', async (ctx, next) => {
+		const {data, db, query, body, nkcModules} = ctx;
+		const {user} = data;
+		const {orderId} = query;
+		if(!orderId) ctx.throw(400, "订单号有误");
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "未找到该订单");
+		const store = await db.ShopStoresModel.findOne({"storeId":order.storeId});
+		if(!store) ctx.throw(400, "店铺不存在");
+		if(store && user.uid !== store.uid) ctx.throw(400, "您无权查看该订单的物流信息");
+		if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
+		let trackNumber = order.trackNumber;
+		const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber);
+		data.trackNumber = trackNumber;
+		data.trackInfo = trackInfo;
+		ctx.template = "/shop/manage/logositics.pug";
+		await next();
+	})
   .use("/refund", refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = orderRouter;

@@ -17,6 +17,8 @@ block shopAccountContent
           a(href=`/shop/order?orderStatus=unSign`, data-toggle='url') 待收货
         li(class=data.orderStatus == "finish"?"active":"")
           a(href=`/shop/order?orderStatus=finish`, data-toggle='url') 完成的订单
+        li(class=data.orderStatus == "close"?"active":"") 
+          a(href=`/shop/order?orderStatus=close`, data-toggle="url") 关闭的订单
         li(class=data.orderStatus == "refunding"?"active":"")
           a(href=`/shop/order?orderStatus=refunding`, data-toggle='url') 退款中的订单
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
@@ -76,7 +78,7 @@ block shopAccountContent
                 if order.refundStatus == "ing"
                   p
                     a(href=`/shop/order/${order.orderId}/refund`) 退款详情
-                if order.orderStatus == "unSign"
+                if order.orderStatus == "unSign" && order.closeStatus !== true
                   p
                     button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
                 if order.orderStatus == "finish"

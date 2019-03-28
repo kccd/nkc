@@ -16,6 +16,8 @@ block name
           a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=unSign`, data-toggle='url') 待收货
         li(class=data.orderStatus == "finish"?"active":"")
           a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=finish`, data-toggle='url') 完成的订单
+        li(class=data.orderStatus == "close"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=close`, data-toggle="url") 关闭的订单
         li(class=data.orderStatus == "refunding"?"active":"")
           a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=refunding`, data-toggle='url') 退款中的订单
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
@@ -46,21 +48,23 @@ block name
             tr(style="min-height:100px")
               //- td=order.orderId
               //- td=order.orderToc.toLocaleString()
-              td
-                //- img(src=`/r/${order.product.imgMaster}` style="width:100px;height:100px")
-                span=order.product.name
+              td(style="display:flex")
+                img(src=`/r/${order.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
+                span(style="font-size:12px")=order.product.name
               td=order.productParam.name
               td #{numToFloatTwo(order.productParam.price)}
               td #{numToFloatTwo(order.product.freightPrice)}
               td=order.count
               //- td=order.user.username
               td
-                a(href=`/u/74847`) Kris
+                a(href=`/u/${order.uid}`)!=`${order.user.username}`
               td= order.status  
                 if order.refundStatus === "ing"
                   span &nbsp;
                   a(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 去处理
-                
+                p 
+                  //- a(href=`/shop/order/detail?orderId=${order.orderId}`) 详情
+                  a(href=`/shop/manage/${order.storeId}/order/detail?orderId=${order.orderId}`) 订单详情
               //-td
                 if order.orderStatus == "unCost"
                   p 未付款
@@ -81,12 +85,15 @@ block name
                 if order.orderStatus == "unCost"
                   p
                     button(onclick=`openEditOrderModal(${data.myStore.storeId}, ${order.orderId})`) 修改订单
-                if order.orderStatus == "unShip"
+                if order.orderStatus == "unShip" && order.closeStatus !== true
                   p
                     button(onclick=`openSendGoodsModal(${data.myStore.storeId}, ${order.orderId})`) 发货
                 if order.refundStatus == "ing"
                   p
                     a.btn.btn-default.btn-sm(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 退款详情
+                if order.orderStatus == "unSign" || order.orderStatus == "finish"
+                  p
+                    a.btn.btn-default.btn-sm(href=`/shop/manage/${data.myStore.storeId}/order/logositics?orderId=${order.orderId}`) 查看物流
           //- for order in data.orders
           //-   tr
           //-     td=order.orderId

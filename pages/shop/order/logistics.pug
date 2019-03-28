@@ -52,6 +52,9 @@ block shopAccountContent
   else
     div
       p
+        span(style="font-weight:bold") 运单号码：
+        span=data.trackNumber
+      p
         span(style="font-weight:bold") 错误码：
         span=trackInfo.status
       p  

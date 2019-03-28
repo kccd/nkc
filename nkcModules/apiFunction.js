@@ -448,7 +448,17 @@ fn.getTrackInfo = (trackNumber) => {
           res.on('end', () => {
               let buffer = Buffer.concat(chunks).toString();
               // 如果接口返回空值
-              let data = buffer ? JSON.parse(buffer) : {code: 1, data: '物流信息接口没有返回值'};
+              let data = {};
+              if(buffer) {
+                try{
+                  data = JSON.parse(buffer)
+                }catch(err) {
+
+                }
+              }else{
+                data = {code: 1, data: '物流信息接口没有返回值'}
+              }
+              // let data = buffer ? JSON.parse(buffer) : {code: 1, data: '物流信息接口没有返回值'};
               resolve(data);
           })
       })

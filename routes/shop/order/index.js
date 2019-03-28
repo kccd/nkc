@@ -17,9 +17,11 @@ router
     if(orderStatus == "refunding"){
       q.closeStatus = false;
       q.refundStatus = "ing";
-    }else if(orderStatus && orderStatus !== 'all') {
+    }else if(orderStatus && orderStatus !== 'all' && orderStatus !== 'close') {
       q.orderStatus = orderStatus;
       q.closeStatus = false;
+    }else if(orderStatus == "close") {
+      q.closeStatus = true;
     }
     const count = await db.ShopOrdersModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
