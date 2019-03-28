@@ -133,5 +133,11 @@ module.exports = {
     PARAMETER: {
       POST: "userApplyRefund"
     }
+  },
+  cert: {
+    POST: 'shopUploadCert',
+    PARAMETER: {
+      GET: 'shopGetCert'
+    }
   }
 };

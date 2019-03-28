@@ -47,6 +47,20 @@ block content
                   .m-t-1.text-right
                     button.btn.btn-danger.btn-sm(@click="sellerPost(false)") 拒绝退款
                     button.btn.btn-success.btn-sm(@click="sellerPost(true)") 同意退款
+              .m-t-1(v-if='refund && ["P_APPLY_RM", "P_APPLY_RP"].indexOf(refund.status) !== -1')      
+                h4 上传凭证
+                input(type="file" @change='seletedFile' multiple="multiple")
+                <transition name="fade">
+                  h5.text-success(v-if="uploadStatus") {{uploadStatus}}
+                </transition>
+                h5 已上传的凭证
+                .text-center.p-t-1(v-if="!order.certs || order.certs.length === 0") 暂无数据
+                div(v-else)
+                  a.shop-cert(v-for="cert in order.certs" :href="'/shop/cert/' + cert._id" target="_blank" :title="cert.name")
+                    img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
+                    .text-center(v-else).shop-cert-file.p-t-2
+                      span.fa 点击下载
+                      span.fa.fa-file &nbsp;{{cert.name}}      
             .col-xs-12.col-md-6
               h4 最新进度
               div(v-if="refunds.length === 0").p-t-4.text-center

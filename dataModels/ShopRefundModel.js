@@ -1,3 +1,7 @@
+/**
+ * 退款申请
+ * @author pengxiguaa 2019/3/28
+ */
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const schema = new Schema({
@@ -260,8 +264,8 @@ schema.methods.returnMoney = async function () {
 }
 /**
  * 判断退款申请的状态以及订单状态 状态异常则抛出错误
- * @param {String} reason: 退款理由或说名
- * @param {String} operation: 当前执行的操作名
+ * @param String reason: 退款理由或说名
+ * @param String/Array 1operation: 当前执行的操作名
  * @return Object:
  *  reason: (String) 退款理由或说明
  *  time: (Date) 时间
@@ -492,10 +496,12 @@ schema.methods.buyerGiveUp = async function(reason) {
     "P_APPLY_RP",
     "P_AGREE_RP",
   ]);
-  await ShopRefundModel.update({_id: this._id}, {$set: {
-    status: "B_GU",
-    tlm: time,
-    successed: false,
+  await ShopRefundModel.update({_id: this._id}, {
+    $set: {
+      status: "B_GU",
+      tlm: time,
+      successed: false
+    },
     $addToSet: {
       logs: {
         status: "B_GU",
@@ -503,7 +509,7 @@ schema.methods.buyerGiveUp = async function(reason) {
         info: reason
       }
     }
-  }});
+  });
   await ShopOrdersModel.update({orderId: order.orderId}, {
     refundStatus: "fail"
   });

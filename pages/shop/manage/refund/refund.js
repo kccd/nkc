@@ -33,6 +33,44 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    upload: function(arr, index, dom) {
+      if(arr.length < index + 1) {
+        dom.value =  "";
+        return;
+      };
+      var file = arr[index];
+      var formData = new FormData();
+      formData.append("type", "refund");
+      formData.append("orderId", this.order.orderId);
+      formData.append("file", file);
+      uploadFilePromise("/shop/cert", formData, function(e) {
+        var p = (e.loaded/e.total)*100;
+        if(p >= 100) {
+          app.uploadStatus = "上传完成！";
+          setTimeout(function() {
+            app.uploadStatus = "";
+          }, 2000)
+        } else {
+          app.uploadStatus = "上传中... " + p.toFixed(1) + "%";
+        }
+        
+      })
+        .then(function(data) {
+          var cert = data.cert;
+          app.order.certs.push(cert);
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+        .finally(function() {
+          app.upload(arr, index+1, dom);
+        });
+    },
+    seletedFile: function(e) {
+      var inputDom = e.target;
+      var files = inputDom.files;
+      this.upload(files, 0, inputDom);
+    },
     sellerPost: function(agree) {
       var type;
       if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {

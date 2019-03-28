@@ -8,6 +8,7 @@ router
   .get('/', async(ctx, next) => {
     const {data, db} = ctx;
     let {order} = data;
+    await order.extendCerts("buyer");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
     data.order = order;

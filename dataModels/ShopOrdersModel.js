@@ -125,8 +125,21 @@ const shopOrdersSchema = new Schema({
     default: ""
   }
 }, {
-  collection: 'shopOrders'
+  collection: 'shopOrders',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
+// 虚拟属性 凭证对象数组
+shopOrdersSchema.virtual('certs')
+	.get(function() {
+		return this._certs;
+	})
+	.set(function(certs) {
+		this._certs = certs;
+	});
+
 
 /**
  * 商家拓展订单信息
@@ -413,7 +426,30 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
     kcb: orderPrice
   }});
 };
-
+/**
+ * 拓展订单的凭证
+ * @param String type buyer:只拓展买家上传的凭证，seller: 只拓展卖家上传的凭证，null: 都拓展
+ * @return [Object] 凭证对象数组
+ * @author pengxiguaa 2019/3/28
+ */
+shopOrdersSchema.methods.extendCerts = async function(type) {
+  const ShopCertModel = mongoose.model("shopCerts");
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const {orderId, productId, uid} = this;
+  const product = await ShopGoodsModel.findById(productId);
+  const c = await ShopCertModel.find({orderId}).sort({toc: 1});
+  const certs = [];
+  for(cert of c) {
+    if(type === "buyer") {
+      if(cert.uid === uid) certs.push(cert);
+    } else if(type === "seller") {
+      if(cert.uid === product.uid) certs.push(cert);
+    } else {
+      certs.push(cert);
+    }
+  }
+  return this.certs = certs;
+};  
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;
