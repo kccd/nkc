@@ -13,10 +13,10 @@ router
   .post('/', async (ctx, next) => {
     const {data, body} = ctx;
     const {refund} = data;
-    const {type, trackNumber} = body;
+    const {type, trackNumber, reason} = body;
     if(type === "giveUp") {
       // 用户撤销申请
-      await refund.buyerGiveUp();
+      await refund.buyerGiveUp(reason);
     } else if(type === "submitTrackNumber") {
       // 用户提交快递单号
       await refund.insertTrackNumber(trackNumber);

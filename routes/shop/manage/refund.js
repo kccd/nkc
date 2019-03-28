@@ -10,16 +10,19 @@ router
     } else {
       orderId = body.orderId;
     }
-    let order = await db.ShopOrdersModel.findById(orderId);
-    const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
-    order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
-    if(order.product.uid !== user.uid) ctx.throw(400, "权限不足，您不是订单中商品的卖家");
+    const order = await db.ShopOrdersModel.findById(orderId);
+    const product = await db.ShopGoodsModel.findById(order.productId);
+    if(product.uid !== user.uid) ctx.throw(400, "权限不足，您不是订单中商品的卖家");
     data.order = order;
     await next();
   })
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
-    const {order} = data;
+    let {order} = data;
+    await order.extendCerts("seller");
+    const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+    order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
+    data.order = order;
     // 获取该订单的全部退款申请记录
     const refunds = await db.ShopRefundModel.find({
       orderId: order.orderId,

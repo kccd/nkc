@@ -488,6 +488,9 @@
   "changeHomeSettingRecommendation": "商城后台修改店铺推荐",
   "visitHomeSettingPopular": "商城后台查看最热商品",
   "changeHomeSettingPopular": "商城后台修改最热商品",
+  "shopUploadCert": "商城用户上传凭证",
+  "shopGetCert": "商城中获取凭证",
+  "getAnyBodyShopCert": "可查看任何人在商城上传的凭证",
 
 
   "APPgetUserInfo": "app获取用户信息",
