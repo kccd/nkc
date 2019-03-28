@@ -73,11 +73,6 @@ const shopOrdersSchema = new Schema({
     type: Date,
     default: null
   },
-  // 收货时间
-  signToc: {
-    type: Date,
-    default: null
-  },
   // 完成时间
   finishToc: {
     type: Date,
@@ -400,19 +395,25 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   const KcbsRecordModel = mongoose.model("kcbsRecords");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const {orderId, orderStatus, closeStatus, orderPrice, refundStatus} = this;
+  let order = await ShopOrdersModel.findById(orderId);
   const orders = await ShopOrdersModel.userExtendOrdersInfo([order]);
-  const order = orders[0];
+  order = orders[0];
   if(closeStatus) throwErr(400, `订单已被关闭，请刷新`);
   if(orderStatus !== "unSign") throwErr(400, "订单未处于待收货状态，请刷新");
   switch(refundStatus) {
     case "ing": throwErr(400, "订单正处于退款流程，请刷新"); 
-    case "success": throwErr(400, "订单被取消，请刷新");
+    case "success": throwErr(400, "订单已被关闭，请刷新");
   }
   const time = Date.now();
+  await ShopOrdersModel.update({orderId}, {$set: {
+    orderStatus: "finish",
+    finishToc: time
+  }});
   const record = KcbsRecordModel({
     _id: await SettingModel.operateSystemID('kcbsRecords', 1),
     from: "bank",
     to: order.product.uid,
+    description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
     type: "sell",
     num: orderPrice,
     toc: time,

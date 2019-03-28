@@ -31,12 +31,9 @@ router
     const {data, db, params, body} = ctx;
     const {user} = data;
     const {orderId} = params;
-    if(!orderId) ctx.throw(400, "订单号有误");
-    const order = await db.ShopOrdersModel.findOne({orderId});
-    if(!order) ctx.throw(400, "未找到订单");
+    const order = await db.ShopOrdersModel.findById(orderId);
     if(user.uid !== order.uid) ctx.throw(400, "您无权操作此订单");
-    let time = new Date();
-    await order.update({$set:{"orderStatus":"finish", "signToc":time}})
+    await order.confirmReceipt();
     await next();
   })
   // 查看订单详情
