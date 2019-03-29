@@ -139,8 +139,10 @@ module.exports = {
   },
   cert: {
     POST: 'shopUploadCert',
+    PATCH: 'saveShopCerts',
     PARAMETER: {
-      GET: 'shopGetCert'
+      GET: 'shopGetCert',
+      DELETE: 'shopDeleteCert'
     }
   }
 };

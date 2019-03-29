@@ -118,6 +118,11 @@ const shopOrdersSchema = new Schema({
   trackNumber: {
     type: String,
     default: ""
+  },
+  // 用于判断买家是否可以请求平台介入
+  applyToPlatform: {
+    type: Boolean,
+    default: false
   }
 }, {
   collection: 'shopOrders',
@@ -438,7 +443,7 @@ shopOrdersSchema.methods.extendCerts = async function(type) {
   const ShopGoodsModel = mongoose.model("shopGoods");
   const {orderId, productId, uid} = this;
   const product = await ShopGoodsModel.findById(productId);
-  const c = await ShopCertModel.find({orderId}).sort({toc: 1});
+  const c = await ShopCertModel.find({orderId, deleted: false}).sort({toc: 1});
   const certs = [];
   for(cert of c) {
     if(type === "buyer") {

@@ -1,6 +1,26 @@
 var app = new Vue({
   el: '#app',
   data: {
+
+    // 向谁申请
+    applyType: "seller", // platform: 平台, seller: 买家
+    display: {
+      apply: false
+    },
+
+    // 新的退款/退货申请
+    newRefund: {
+      type: "",
+      reason: "",
+      money: ""
+    },
+
+    // 错误信息
+    error: "",
+    // 其他信息
+    info: "",
+
+
     user: '',
     order: '',
     refund: '',
@@ -9,7 +29,6 @@ var app = new Vue({
     type: '',
     money: '',
     applyRMInput: false,
-    infoInput: false,
     uploadStatus: '',
     trackNumber: '',
     displayGiveUpInput: false,
@@ -38,17 +57,93 @@ var app = new Vue({
     this.refunds = data.refunds;
     if(data.refund) {
       this.refund = data.refund;
-      if(["S_AGREE_RP", "P_AGREE_RP"].indexOf(this.refund.status) !== -1)  {
-        this.infoInput = true;
-      }
     } else {
       if(this.order.orderStatus !== "finish" && !this.order.closeStatus) {
-        this.applyRMInput = true;
+        this.display.apply = true;
       }
     }
   },
   methods: {
     format: NKC.methods.format,
+    saveCerts: function() {
+      this.clearInfo();
+      var certs = this.order.certs;
+      var certsId = [];
+      for(var i = 0; i < certs.length; i++ ) {
+        certsId.push(certs[i]._id);
+      }
+      nkcAPI("/shop/cert", "PATCH", {
+        certsId: certsId
+      })
+        .then(function() {
+          app.info = "保存成功";
+          setTimeout(function() {
+            app.info = "";
+          }, 3000); 
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        });
+    },
+    deleteCert: function(cert) {
+      this.clearInfo();
+      nkcAPI("/shop/cert/" + cert._id, "DELETE")
+        .then(function() {
+          var index = app.order.certs.indexOf(cert);
+          if(index !== -1) {
+            app.order.certs.splice(index, 1);
+          }
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        });
+    },
+    viewCert: function(cert) {
+      window.open("/shop/cert/" + cert._id);
+    },
+    // 切换申请类型 向买家、平台
+    selectApplyType: function(type) {
+      this.applyType = type;
+    },
+    // 清除info、error
+    clearInfo: function() {
+      this.info = "";
+      this.error = "";
+    },
+    // 提交申请
+    submitApply: function() {
+      this.clearInfo();
+      var applyType = this.applyType;
+      var newRefund = this.newRefund;
+      if(newRefund.reason === "") return this.error = "请输入理由";
+      if(newRefund.type === "") return this.error = "请选择退款方式";
+      if(newRefund.type !== "money") return this.error = "请求平台介入时退款方式只能选择【只退款】";
+      if(newRefund.money >= 0) {
+        if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过订单金额";
+      }
+      else return this.error = "请输入正确的退款金额";
+      var url = "/shop/refund";
+      var method = "POST";
+
+      if(applyType === "platform") {
+        newRefund.root = true;
+      }
+
+      var obj = {
+        refund: newRefund,
+        orderId: this.order.orderId
+      };
+
+      nkcAPI(url, method, obj)
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        });
+
+    },
+
     upload: function(arr, index, dom) {
       if(arr.length < index + 1) {
         dom.value =  "";
@@ -62,13 +157,14 @@ var app = new Vue({
       uploadFilePromise("/shop/cert", formData, function(e) {
         var p = (e.loaded/e.total)*100;
         if(p >= 100) {
-          app.uploadStatus = "上传完成！";
-          setTimeout(function() {
-            app.uploadStatus = "";
-          }, 2000)
-        } else {
-          app.uploadStatus = "上传中... " + p.toFixed(1) + "%";
+          p = 100;
+          if(arr.length === index+1) {
+            setTimeout(function() {
+              app.uploadStatus = "";
+            }, 2000)
+          }
         }
+        app.uploadStatus = "上传中... " + (index+1) + "/" + arr.length + " " + p.toFixed(1) + "%";
         
       })
         .then(function(data) {
@@ -76,7 +172,7 @@ var app = new Vue({
           app.order.certs.push(cert);
         })
         .catch(function(data) {
-          screenTopWarning(data);
+          app.error = data.error || data;
         })
         .finally(function() {
           app.upload(arr, index+1, dom);
@@ -88,6 +184,7 @@ var app = new Vue({
       this.upload(files, 0, inputDom);
     },
     submitTrackNumber: function() {
+      this.clearInfo();
       nkcAPI("/shop/refund/" + this.refund._id, "POST", {
         type: "submitTrackNumber",
         trackNumber: this.trackNumber
@@ -96,7 +193,7 @@ var app = new Vue({
           window.location.reload();
         })    
         .catch(function(data) {
-          screenTopWarning(data);
+          this.error = data.error || data;
         });
     },
     giveUpRefund: function() {
@@ -112,49 +209,7 @@ var app = new Vue({
           screenTopWarning(data);
         });
     },
-    newRefund: function(data) {
-      var url = '/shop/refund';
-      var method = 'POST';
-      if(this.refund) {
-        url = '/shop/refund/' + this.refund._id;
-        method = 'PATCH';
-      }
-      var obj = {
-        refund: data.refund,
-        orderId: data.orderId
-      };
-      console.log(obj);
-      nkcAPI(url, method, obj)
-        .then(function() {
-          window.location.reload();
-        })
-        .catch(function(data) {
-          screenTopWarning(data);
-        });
-    },
-    submitBuyerReasonToP: function() {
-      var data = {
-        refund: {
-          reason: this.reason,
-          money: this.money,
-          type: this.type,
-          root: true
-        },
-        orderId: this.order.orderId
-      }
-      this.newRefund(data);
-    },  
-    submitBuyerReason: function() {
-      var data = {
-        refund: {
-          reason: this.reason,
-          money: this.money,
-          type: this.type
-        },
-        orderId: this.order.orderId
-      }
-      this.newRefund(data);
-    },
+    
     refundType: function(t) {
       return {
         'money': '退款',

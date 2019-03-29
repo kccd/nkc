@@ -12,6 +12,23 @@ const schema = new Schema({
     required:true,
     index: 1
   },
+  // 是否标记为删除
+  deleted: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  // 是否可以删除
+  deletable: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
+  type: {
+    type: String,
+    reuqired: true,
+    index: 1
+  },
   // 订单ID
   orderId: {
     type: String,

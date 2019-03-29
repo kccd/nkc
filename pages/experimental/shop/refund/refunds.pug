@@ -5,22 +5,32 @@ block shopSettings
   .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;')
     .row
       .col-xs-12.col-md-12
+        ul.nav.nav-pills
+          li(class=!data.t?"active":"")
+            a(href='/e/settings/shop/refunds') 全部
+          li(class=data.t==="applying"? "active": "")
+            a(href='/e/settings/shop/refunds?t=applying') 待处理
+          li(class=data.t==="done"?"active": "")
+            a(href='/e/settings/shop/refunds?t=done') 已处理
+      .col-xs-12.col-md-12
+        include ../../../interface_navigation_paging
         table.table.table-hover
           thead
             tr
-              //- th 批量操作
-              //- th 申请人
-              th 申请人ID
               th 申请时间
+              th 订单ID
+              th 买家
+              th 卖家
               th 操作
           tbody
             for refund in data.refunds
               tr
-                //- th
-                //-   input#check(type="checkbox", name="")
-                //- th= apply.username
-                th= refund.buyerId
-                th= fromNow(refund.toc)
+                th= refund.toc.toLocaleString()
+                th= refund.orderId
+                th 
+                  a(href=`/u/${refund.buyerId}` target="_blank")= refund.buyer.username
+                th
+                  a(href=`/u/${refund.sellerId}` target="_blank")= refund.seller.username
                 th
                   //- button(onclick=`approveApply("${apply._id}")`) 批准
                   //- button(onclick=`rejectApply("${apply._id}")`) 驳回

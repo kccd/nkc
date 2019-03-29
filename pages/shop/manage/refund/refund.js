@@ -1,6 +1,21 @@
 var app = new Vue({
   el: "#app",
   data: {
+
+    error: "",
+    info: "",
+
+    // 是否同意
+    agree: "",
+    password: "",
+
+    uploadStatus: "",
+
+    // 退货地址信息
+    storeName: "",
+    address: "",
+    mobile: "",
+
     order: '',
     refund: '',
     refunds: [],
@@ -29,10 +44,34 @@ var app = new Vue({
     this.refund = data.refund;
     this.refunds = data.refunds;
     this.myStore = data.myStore;
+    this.storeName = this.myStore.storeName;
+    this.address = this.myStore.address;
+    this.mobile = this.myStore.mobile[0];
     this.order = data.order;
   },
   methods: {
     format: NKC.methods.format,
+    clearInfo: function() {
+      this.error = "";
+      this.info = "";
+    },
+    deleteCert: function(cert) {
+      this.clearInfo();
+      nkcAPI("/shop/cert/" + cert._id, "DELETE")
+        .then(function() {
+          var index = app.order.certs.indexOf(cert);
+          if(index !== -1) {
+            app.order.certs.splice(index, 1);
+          }
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        });
+    },
+    viewCert: function(cert) {
+      window.open("/shop/cert/" + cert._id);
+    },
+
     upload: function(arr, index, dom) {
       if(arr.length < index + 1) {
         dom.value =  "";
@@ -46,13 +85,14 @@ var app = new Vue({
       uploadFilePromise("/shop/cert", formData, function(e) {
         var p = (e.loaded/e.total)*100;
         if(p >= 100) {
-          app.uploadStatus = "上传完成！";
-          setTimeout(function() {
-            app.uploadStatus = "";
-          }, 2000)
-        } else {
-          app.uploadStatus = "上传中... " + p.toFixed(1) + "%";
+          p = 100;
+          if(arr.length === index+1) {
+            setTimeout(function() {
+              app.uploadStatus = "";
+            }, 2000)
+          }
         }
+        app.uploadStatus = "上传中... " + (index+1) + "/" + arr.length + " " + p.toFixed(1) + "%";
         
       })
         .then(function(data) {
@@ -71,20 +111,55 @@ var app = new Vue({
       var files = inputDom.files;
       this.upload(files, 0, inputDom);
     },
-    sellerPost: function(agree) {
+    saveCerts: function() {
+
+    },
+    sellerPost: function() {
       var type;
+      var agree = this.agree;
+      if(agree === '') return this.error = "请选择同意或者不同意";
       if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRM": "disagreeRM";
       } else if(["B_APPLY_RP", "P_APPLY_RP"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRP": "disagreeRP";
+      } else if(this.refund.status === "B_INPUT_CERT_RM") {
+        type = agree? "uploadCerts": "agreeRM";
       } else {
         return screenTopWarning("申请记录状态异常，请刷新");
       }
-      console.log(type)
+      var certsId = [];
+      if(type === "uploadCerts") {
+        for(var i = 0; i < this.order.certs.length; i++) {
+          certsId.push(this.order.certs[i]._id);
+        }
+      }
+
+      var password = this.password;
+      if(type === "agreeRM") {
+        if(password === "") return this.error = "请输入登录密码";
+      }
+
+
+
+      if(type === "agreeRP") {
+        if(!this.storeName) return this.error = "请输入收件人姓名";
+        if(!this.mobile) return this.error = "请输入收件人手机号";
+        if(!this.address) return this.error = "请输入收件人地址";
+      }
+
+
       nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/refund", "POST", {
         orderId: this.order.orderId,
         type: type,
-        reason: this.reason
+        reason: this.reason,
+        certsId: certsId,
+        password: password,
+
+        sellerInfo: {
+          name: this.storeName,
+          address: this.address,
+          mobile: this.mobile
+        }
       })
         .then(function() {
           window.location.reload();
