@@ -9,7 +9,7 @@ router
     const {user} = data;
     const cert = await db.ShopCertModel.findOne({_id, deleted: false});
     if(!cert) ctx.throw(404, `未找到ID为【${_id}】的凭证资源`);
-    if(user.uid !== cert.uid && !ctx.perimission("getAnyBodyShopCert")) {
+    if(user.uid !== cert.uid && !ctx.permission("getAnyBodyShopCert")) {
       ctx.throw(403, "您没有权限查看别人的凭证");
     } 
     const {ext, name, path} = cert;

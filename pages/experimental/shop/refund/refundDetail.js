@@ -51,6 +51,9 @@ var app = new Vue({
       this.error = "";
       this.info = "";
     },
+    viewCert: function(cert) {
+      window.open("/shop/cert/" + cert._id);
+    },
     submit: function() {
       this.clearInfo();
       var agree = this.agree;

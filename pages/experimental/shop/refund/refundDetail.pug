@@ -1,6 +1,7 @@
 extends ../index.pug
 block title
   title 退款申请处理 | 商城设置
+  +includeCSS('/shop/shop.css')
 block shopSettings
   .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;padding:1rem')
     a.btn.btn-primary(href=`/e/settings/shop/refunds`) 返回申请列表
@@ -31,6 +32,23 @@ block shopSettings
               .m-t-3
                 include ../../../shop/order/refundStatus.pug
             .col-xs-12.col-md-6
+
+              .m-t-1
+                h4 买家上传的凭证
+                div
+                  .pointer.shop-cert(v-for="cert in order.certs" :title="cert.name" v-if="cert.uid === refund.buyerId" @click="viewCert(cert)")
+                    img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
+                    .text-center(v-else).shop-cert-file.p-t-2
+                      span.fa.fa-file &nbsp;{{cert.name}}
+              .m-t-2
+                h4 卖家上传的凭证
+                div
+                  .pointer.shop-cert(v-for="cert in order.certs" :title="cert.name" v-if="cert.uid === refund.sellerId" @click="viewCert(cert)")
+                    img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
+                    .text-center(v-else).shop-cert-file.p-t-2
+                      span.fa.fa-file &nbsp;{{cert.name}}        
+
+
               div(v-if='order.refundStatus === "ing" && refund.status === "P_APPLY_RM"')  
                 .form
                   .form-group
