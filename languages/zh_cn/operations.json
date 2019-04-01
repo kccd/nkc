@@ -493,6 +493,8 @@
   "getAnyBodyShopCert": "可查看任何人在商城上传的凭证",
   "visitStoreOrderLogositics": "商家后台查看物流信息",
   "changeProductParams": "商城用户选择商品规格",
+  "shopDeleteCert": "商城用户删除凭证",
+  "saveShopCerts": "商城中用户保存凭证",
 
 
   "APPgetUserInfo": "app获取用户信息",

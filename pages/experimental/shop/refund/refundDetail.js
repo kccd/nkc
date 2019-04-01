@@ -1,6 +1,12 @@
 var app = new Vue({
   el: '#app',
   data: {
+
+    agree: '',
+
+    error: '',
+    info: '',
+
     user: '',
     order: '',
     refund: '',
@@ -41,24 +47,35 @@ var app = new Vue({
       if(typeof moment === "undefined") throw 'moment is not loaded';
       return moment(t).format(m);
     },
-    newRefund: function(data) {
-      var url = '/shop/refund';
-      var method = 'POST';
-      if(this.refund) {
-        url = '/shop/refund/' + this.refund._id;
-        method = 'PATCH';
+    clearInfo: function() {
+      this.error = "";
+      this.info = "";
+    },
+    viewCert: function(cert) {
+      window.open("/shop/cert/" + cert._id);
+    },
+    submit: function() {
+      this.clearInfo();
+      var agree = this.agree;
+      var reason = this.reason;
+
+      if(!agree) {
+        if(reason === "") return this.error = "请输入拒绝理由";
       }
-      var obj = {
-        refund: data.refund,
-        orderId: data.orderId
-      };
-      nkcAPI(url, method, obj)
+      
+      agree = agree? "agree": "disagree";
+      
+      nkcAPI("/e/settings/shop/refunds/" + agree, "POST", {
+        orderId: this.order.orderId,
+        reason: this.reason
+      })
         .then(function() {
           window.location.reload();
         })
         .catch(function(data) {
-          screenTopWarning(data);
+          app.error = data.error || data;
         });
+
     },
     agreeR: function() {
       console.log("同意")
@@ -86,39 +103,6 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data);
         });
-    },
-    submitBuyerReasonToP: function() {
-      var data = {
-        refund: {
-          reason: this.reason,
-          type: this.type,
-          root: true
-        },
-        orderId: this.order.orderId
-      }
-      this.newRefund(data);
-    },  
-    submitBuyerReason: function() {
-      var data = {
-        refund: {
-          reason: this.reason,
-          type: this.type
-        },
-        orderId: this.order.orderId
-      }
-      this.newRefund(data);
-      
-    },
-    editReason: function() {
-      if(this.displayInput) {
-        this.displayInput = false;  
-      } else {
-        if(!this.reason) {
-          this.reason = this.refund.reason;
-          this.type = this.refund.type;
-        }
-        this.displayInput = true;
-      }
     },
     refundType: function(t) {
       return {

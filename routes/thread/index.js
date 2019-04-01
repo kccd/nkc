@@ -277,7 +277,12 @@ threadRouter
 				}
 			}
 			data.paId = paId;
-			data.paraId = paraId;
+      data.paraId = paraId;
+      if(data.user) {
+        data.shopInfo = {
+          cartProductCount: await db.ShopCartModel.getProductCount(data.user)
+        }
+      }
 		}
 		// 获取用户地址信息
 		let ipInfo = await nkcModules.apiFunction.getIpAddress("192.168.11.114");

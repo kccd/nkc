@@ -75,15 +75,16 @@ router
 
       if(orderStatus === "unShip") {
         // 未发货时
-        r.status = root? "P_APPLY_RM": "B_APPLY_RM";
+        r.status = root? "B_INPUT_CERT_RM": "B_APPLY_RM";
         r.type = "money";
       } else {
         // 已发货
         r.type = type;
         if(type === "money") {
-          r.status = root? "P_APPLY_RM": "B_APPLY_RM";
+          r.status = root? "B_INPUT_CERT_RM": "B_APPLY_RM";
         } else {
-          r.status = root? "P_APPLY_RP": "B_APPLY_RP";
+          if(root) ctx.throw(400, "请求平台介入时退款方式只能选择【只退款】");
+          r.status = "B_APPLY_RP";
         }
       }
       r.logs = [
@@ -94,6 +95,18 @@ router
           money: r.money
         }
       ];
+      if(root) {
+        await db.ShopCertModel.updateMany({
+          orderId,
+          uid: user.uid,
+          deletable: true,
+          type: "refund"
+        }, {
+          $set: {
+            deletable: false
+          }
+        });
+      }
       const refundDB = db.ShopRefundModel(r);
       await refundDB.save();
       await db.ShopOrdersModel.update({

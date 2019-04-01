@@ -34,47 +34,121 @@ block content
               .m-t-1(v-if='refund && order.status !== "finish" && !order.closeStatus')
                 h5 类型：{{refundType(refund.type)}}  
                 h5 进度：{{status.description}}
+              .m-t-1
+                include ../../order/refundStatus.pug
+              
+                   
+            .col-xs-12.col-md-6(v-if="refund")
+              .m-t-1      
                 .m-t-1(v-if="['B_APPLY_RM', 'B_APPLY_RP'].indexOf(refund.status) !== -1")
-                  textarea.form-control(rows="8" placeholder="请输入理由，选择拒绝时理由不可省略" v-model="reason")
-                  .m-t-1.text-right(v-if='refund.status === "B_APPLY_RM"')
-                    button.btn.btn-danger.btn-sm(@click="sellerPost(false)") 拒绝退款
-                    button.btn.btn-success.btn-sm(@click="sellerPost(true)") 同意退款
-                  .m-t-1.text-right(v-if='refund.status === "B_APPLY_RP"')
-                    button.btn.btn-danger.btn-sm(@click="sellerPost(false)") 拒绝退货
-                    button.btn.btn-success.btn-sm(@click="sellerPost(true)") 同意退货
-                .m-t-1(v-if="refund.status === 'B_INPUT_INFO'")      
-                  textarea.form-control(rows=8 v-model="reason")
-                  .m-t-1.text-right
-                    button.btn.btn-danger.btn-sm(@click="sellerPost(false)") 拒绝退款
-                    button.btn.btn-success.btn-sm(@click="sellerPost(true)") 同意退款
-              .m-t-1(v-if='refund && ["P_APPLY_RM", "P_APPLY_RP"].indexOf(refund.status) !== -1')      
-                h4 上传凭证
-                input(type="file" @change='seletedFile' multiple="multiple")
-                <transition name="fade">
-                  h5.text-success(v-if="uploadStatus") {{uploadStatus}}
-                </transition>
-                h5 已上传的凭证
-                .text-center.p-t-1(v-if="!order.certs || order.certs.length === 0") 暂无数据
-                div(v-else)
-                  a.shop-cert(v-for="cert in order.certs" :href="'/shop/cert/' + cert._id" target="_blank" :title="cert.name")
-                    img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
-                    .text-center(v-else).shop-cert-file.p-t-2
-                      span.fa 点击下载
-                      span.fa.fa-file &nbsp;{{cert.name}}      
-            .col-xs-12.col-md-6
-              h4 最新进度
-              div(v-if="refunds.length === 0").p-t-4.text-center
-                h5 暂无记录
-              .refund-log
-                div(v-for="refund in refunds")
-                  div(v-for="log in refund.logs").p-b-2
-                    h5 {{format("YYYY-MM-DD HH:mm:ss", log.time)}} {{log.description}}
-                    p(v-if="log.money") 退款金额：
-                      span.text-danger {{log.money/100}} 元
-                    p(v-if="log.info") 理由：
-                      span.text-danger(v-html="log.info")
-                    p(v-if="log.trackNumber") 快递单号：
-                      span.text-danger(v-html="log.trackNumber")  
+                  //- 退款退货说明
+                  .m-b-3
+                    h5.text-danger 注意事项：
+                    ul
+                      li 买家申请退款时...
+                  .form
+                    .form-group
+                      h4.text-danger 
+                        strong 用户正在申请
+                          span(v-if="refund.status === 'B_APPLY_RM'") &nbsp;只退款
+                          span(v-if="refund.status === 'B_APPLY_RP'") &nbsp;退货退款
+                      div
+                        <label class="radio-inline">
+                          <input type="radio" :value="true" v-model="agree"> 同意
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" :value="false" v-model="agree"> 不同意
+                        </label>
+                    .form-group(v-if="agree === true && refund.status === 'B_APPLY_RM'")
+                      h5 请输入登录密码
+                      input.form-control(type="password" v-model="password")
+                    div(v-if="agree === true && refund.status === 'B_APPLY_RP'") 
+                      .form-group
+                        h4.text-danger 请完善以下信息，以便买家寄回商品。
+                      .form-group
+                        h5 收件人姓名  
+                        input.form-control(type="text" v-model="storeName")
+                      .form-group
+                        h5 收件人手机号
+                        input.form-control(type="text" v-model="mobile")   
+                      .form-group
+                        h5 收件人地址
+                        textarea.form-control(v-model="address" rows=7)  
+                    .form-group(v-if="agree === false")    
+                      textarea.form-control(rows="7" placeholder="请输入理由（不超过1000字节）" v-model="reason")
+                    .form-group
+                      h5.text-danger(v-if="error") {{error}}
+                      button.btn.btn-block.btn-primary(@click="sellerPost") 提交
+                .m-t-1(v-if="refund.status === 'B_INPUT_INFO'")  
+                  .m-b-2
+                    h5.text-danger 注意事项：
+                    ul
+                      li 请务必在收到买家寄来的快递并确认宝贝没有问题时再点击同意！    
+                      li 点击同意后，系统会立即将科创币退回给买家...
+                  .form
+                    .form-group      
+                      h4.text-danger 买家已发货 快递单号：
+                        strong {{refund.trackNumber}}
+                      div
+                        <label class="radio-inline">
+                          <input type="radio" :value="true" v-model="agree"> 收到货，同意退款
+                        </label>
+                        br
+                        <label class="radio-inline">
+                          <input type="radio" :value="false" v-model="agree"> 迟迟未收到货或货有问题，拒绝退款
+                        </label>
+                    .form-group(v-if="agree === false")    
+                      textarea.form-control(rows="7" placeholder="请输入理由（不超过1000字节）" v-model="reason")
+                    .form-group
+                      button.btn.btn-block.btn-primary(@click="sellerPost") 提交
+              .m-t-1(v-if='refund && ["B_INPUT_CERT_RM", "P_APPLY_RM"].indexOf(refund.status) !== -1')      
+                
+                .form  
+                  div(v-if="refund.status !== 'P_APPLY_RM'")
+                    .form-group
+                      h4.text-danger 
+                        strong 买家申请平台介入，请上传凭证
+                      div
+                        <label class="radio-inline">
+                          <input type="radio" :value="false" v-model="agree"> 坚决不能让平台介入，同意买家的
+                            strong.text-danger(v-if="refund.type === 'money'") 只退款
+                            strong.text-danger(v-else) 退货退款
+                            | 申请
+                        </label>
+                        br
+                        <label class="radio-inline">
+                          <input type="radio" :value="true" v-model="agree"> 同意让平台介入
+                        </label>
+                    .form-group(v-if="agree === false && refund.status === 'B_INPUT_CERT_RM'")    
+                      h5 请输入登录密码
+                      input.form-control(type="password" v-model="password")
+                    .form-group(v-if="agree")
+                      h5 理由（不超过1000字节）：
+                      textarea.form-control(rows=7 v-model="reason")    
+                  .form-group(v-if="agree || refund.status === 'P_APPLY_RM'")
+                    h5(v-if="refund.status !== 'P_APPLY_RM'") 上传凭证（不超过
+                      strong.text-danger 5
+                      |张）
+                    h4(v-else) 补充凭证（不超过
+                      strong.text-danger 5
+                      |张）  
+                    input(type="file" @change='seletedFile' multiple="multiple")
+                    <transition name="fade">
+                      h5.text-success(v-if="uploadStatus") {{uploadStatus}}
+                    </transition> 
+                    div(v-if="order.certs && order.certs.length !== 0")
+                      h5 已上传的凭证   
+                      .shop-cert(v-for="cert in order.certs" :title="cert.name")
+                        .shop-cert-options
+                          span(@click="viewCert(cert)").fa.fa-eye
+                          span(@click="deleteCert(cert)").fa.fa-trash
+                        img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
+                        .text-center(v-else).shop-cert-file.p-t-2
+                          span.fa.fa-file &nbsp;{{cert.name}}
+                  .form-group
+                    h5.text-danger(v-if="error") {{error}}
+                    h5.text-success(v-if="info") {{info}}
+                    button.btn.btn-primary.btn-block(@click="sellerPost") 提交
 
 block shopScripts
   include ../../../publicModules/moment.pug
