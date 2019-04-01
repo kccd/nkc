@@ -129,9 +129,12 @@ block content
                     h5(v-if="refund.status !== 'P_APPLY_RM'") 上传凭证（不超过
                       strong.text-danger 5
                       |张）
-                    h4(v-else) 补充凭证（不超过
-                      strong.text-danger 5
-                      |张）  
+                    div(v-else)
+                      h4
+                        strong.text-danger 等待平台处理，若需要补充凭证，请上传文件
+                      h4 补充凭证（不超过
+                        strong.text-danger 5
+                        |张）  
                     input(type="file" @change='seletedFile' multiple="multiple")
                     <transition name="fade">
                       h5.text-success(v-if="uploadStatus") {{uploadStatus}}
@@ -148,7 +151,7 @@ block content
                   .form-group
                     h5.text-danger(v-if="error") {{error}}
                     h5.text-success(v-if="info") {{info}}
-                    button.btn.btn-primary.btn-block(@click="sellerPost") 提交
+                    button.btn.btn-primary(@click="sellerPost") 提交
 
 block shopScripts
   include ../../../publicModules/moment.pug

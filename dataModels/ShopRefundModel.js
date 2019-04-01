@@ -136,6 +136,12 @@ const schema = new Schema({
 }, {
   collection: 'shopRefunds'
 });
+schema.pre("save", function(next) {
+  if(!this.tlm) {
+    this.tlm = this.toc;
+  }
+  next();
+});
 schema.statics.findById = async (_id) => {
   const refund = await mongoose.model('shopRefunds').findOne({_id});
   if(!refund) throwErr(404, `未找到ID为【${_id}】的退款申请`);

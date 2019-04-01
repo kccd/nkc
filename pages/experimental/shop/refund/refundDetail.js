@@ -59,7 +59,8 @@ var app = new Vue({
       var agree = this.agree;
       var reason = this.reason;
 
-      if(!agree) {
+      if(agree === "") return this.error = "请选择同意或拒绝";
+      if(agree === false) {
         if(reason === "") return this.error = "请输入拒绝理由";
       }
       
@@ -78,7 +79,6 @@ var app = new Vue({
 
     },
     agreeR: function() {
-      console.log("同意")
       nkcAPI("/e/settings/shop/refunds/agree", "POST", {
         orderId: this.order.orderId,
         type: "agreeR",

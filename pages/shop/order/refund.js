@@ -65,6 +65,24 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    cancelOrder: function() {
+      this.clearInfo();
+      nkcAPI("/shop/refund", "POST", {
+        refund: {
+          reason: app.reason
+        },
+        orderId: this.order.orderId
+      })
+        .then(function() {
+          app.info = "订单取消成功，正在前往我的订单";
+          setTimeout(function() {
+            window.location.href="/shop/order"
+          }, 2000); 
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        })
+    },
     saveCerts: function() {
       this.clearInfo();
       var certs = this.order.certs;
@@ -117,7 +135,7 @@ var app = new Vue({
       var newRefund = this.newRefund;
       if(newRefund.reason === "") return this.error = "请输入理由";
       if(newRefund.type === "") return this.error = "请选择退款方式";
-      if(newRefund.type !== "money") return this.error = "请求平台介入时退款方式只能选择【只退款】";
+      if(newRefund.type !== "money" && applyType === "platform") return this.error = "请求平台介入时退款方式只能选择【只退款】";
       if(newRefund.money >= 0) {
         if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过订单金额";
       }

@@ -363,7 +363,7 @@ shopOrdersSchema.statics.translateOrderStatus = async (orders) => {
     const {orderStatus, closeStatus, refundStatus} = order;
     let refund = '';
     if(refundStatus === 'ing') {
-      refund = '(正在申请退款中)';
+      refund = '(退款中)';
     } else if(refundStatus === 'success') {
       refund = '(退款成功)';
     } else if(refundStatus === 'fail') {

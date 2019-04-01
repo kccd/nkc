@@ -70,11 +70,30 @@ applysRouter
       buyerId: order.uid
     }).sort({toc: 1});
     if(refunds.length !== 0) {
-      if(refunds[refunds.length - 1].successed === null) data.refund = refunds[refunds.length - 1];
+      if(refunds[refunds.length - 1].status === "P_APPLY_RM") data.refund = refunds[refunds.length - 1];
     }
 		await db.ShopRefundModel.extendLogs(refunds, ctx.state.lang);
 		data.order = order;
-		data.refunds = refunds;
+    data.refunds = refunds;
+    data.buyer = (await db.UserModel.findOnly({uid: order.uid})).toObject();
+    data.seller = (await db.UserModel.findOnly({uid: order.product.uid})).toObject();
+    const buyerPersonal = await db.UsersPersonalModel.findOnly({uid: data.buyer.uid});
+    data.buyer.nationCode = buyerPersonal.nationCode;
+    data.buyer.mobile = buyerPersonal.mobile;
+    data.buyer.email = buyerPersonal.email;
+    data.seller.mobile = order.store.mobile.join(', ');
+    const sellerPersonal = await db.UsersPersonalModel.findOnly({uid: data.seller.uid});
+    data.seller.email = sellerPersonal.email;
+    if(data.refund) {
+      data.buyer.reason = data.refund.logs[data.refund.logs.length-2].info;
+      data.seller.reason = data.refund.logs[data.refund.logs.length-1].info;
+      data.buyer.refundCerts = [];
+      data.seller.refundCerts = [];
+      for(const cert of order.certs) {
+        if(cert.uid === data.buyer.uid) data.buyer.refundCerts.push(cert);
+        if(cert.uid === data.seller.uid) data.seller.refundCerts.push(cert);
+      }
+    }
 		ctx.template = "experimental/shop/refund/refundDetail.pug"
 		await next();
 	})

@@ -117,17 +117,25 @@ var app = new Vue({
     sellerPost: function() {
       var type;
       var agree = this.agree;
-      if(agree === '') return this.error = "请选择同意或者不同意";
+      var method = "POST", url = "/shop/manage/" + this.myStore.storeId + "/order/refund";
+      if(agree === '' && this.refund.status !== "P_APPLY_RM") return this.error = "请选择同意或者不同意";
       if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRM": "disagreeRM";
-      } else if(["B_APPLY_RP", "P_APPLY_RP"].indexOf(this.refund.status) !== -1) {
+      } else if(["B_APPLY_RM"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRP": "disagreeRP";
       } else if(this.refund.status === "B_INPUT_CERT_RM") {
         type = agree? "uploadCerts": "agreeRM";
+      } else if(this.refund.status === "P_APPLY_RM") {
+        method = "PATCH";
+        url = "/shop/cert";
+        type = "uploadCerts";
       } else {
         return screenTopWarning("申请记录状态异常，请刷新");
-      }
+      }  
+        
+      
       var certsId = [];
+
       if(type === "uploadCerts") {
         for(var i = 0; i < this.order.certs.length; i++) {
           certsId.push(this.order.certs[i]._id);
@@ -147,8 +155,7 @@ var app = new Vue({
         if(!this.address) return this.error = "请输入收件人地址";
       }
 
-
-      nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/refund", "POST", {
+      nkcAPI(url, method, {
         orderId: this.order.orderId,
         type: type,
         reason: this.reason,

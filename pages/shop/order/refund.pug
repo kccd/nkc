@@ -6,7 +6,25 @@ block content
   .container-fluid.max-width
     .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
     .row#app(v-cloak)   
-      div(v-if='order')
+      div(v-if="order.orderStatus === 'unCost'")
+        h4 取消订单
+        h5
+          img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+          div.display-i-b
+            a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
+            h5 数量：{{order.count}}  
+            h5 订单号：{{order.orderId}}
+
+        .form.col-xs-12.col-md-5
+          .form-group
+            label 请填写理由（不超过1000字节）：
+            textarea.form-control(v-model="reason" rows=7) 
+          .form-group
+            h5.text-danger(v-if='error') {{error}}
+            h5.text-success(v-if='info') {{info}}
+            .text-right
+              button.btn.btn-primary.btn-block(@click='cancelOrder') 提交  
+      div(v-else-if='order')
         .col-xs-12.col-md-12
           h4 退款说明
           ul.text-danger
@@ -115,6 +133,8 @@ block content
                     h5.text-success(v-if="info") {{info}}
                     button.btn.btn-block.btn-primary(@click="submitApply") 提交  
               .m-t-1(v-if="refund && ['B_INPUT_CERT_RM', 'P_APPLY_RM'].indexOf(refund.status) !== -1")
+                h4
+                  strong.text-danger 等待卖家上传凭证中，若需要补充凭证，请上传文件
                 .form-group
                   h4 补充凭证（总共不超过
                     strong.text-danger 5

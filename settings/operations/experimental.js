@@ -16,7 +16,11 @@ module.exports = {
 				},
 				disagree: {
 					POST: 'shopDisagreeRefundApply'
-				}
+        },
+        settings: {
+          GET: "visitShopRefundSettings",
+          PATCH: "modifyShopRefundSettings"
+        }
 			},
 			applys: {
 				GET: 'visitShopOpenStoreApplys',

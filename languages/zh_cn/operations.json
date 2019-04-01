@@ -495,6 +495,8 @@
   "changeProductParams": "商城用户选择商品规格",
   "shopDeleteCert": "商城用户删除凭证",
   "saveShopCerts": "商城中用户保存凭证",
+  "visitShopRefundSettings": "访问后台商城退款设置",
+  "modifyShopRefundSettings": "修改后台商城退款设置",
 
 
   "APPgetUserInfo": "app获取用户信息",
