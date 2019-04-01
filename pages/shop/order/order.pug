@@ -84,22 +84,6 @@ block shopAccountContent
                 if order.orderStatus == "finish"
                   p
                     button(onclick=`joinToDiscuss(${order.product.tid})`) 参与讨论
-          //- for order in data.orders
-          //-   tr
-          //-     td=order.orderId
-          //-     td=order.orderToc.toLocaleString()
-          //-     td=order.product.name
-          //-     td=order.productParam.name
-          //-     td #{numToFloatTwo(order.productParam.price)}
-          //-     td #{numToFloatTwo(order.product.freightPrice)}
-          //-     td=order.count
-          //-     //- td=order.user.username
-          //-     td
-          //-       a(href=`/u/74847`) Kris
-          //-     td 交易状态
-          //-     td #{numToFloatTwo(order.orderPrice)}
-          //-     td
-          //-       button.btn.btn-primary.btn-sm 操作
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
 block shopScripts

@@ -96,11 +96,15 @@ style.
     .col-xs-12.col-sm-12.col-md-12.col-lg-6
       p.item=`${post.abstract}`
         a.btn.btn(href=`/shop/product/${product.productId}`) 前往商城
+      if product.attentions && product.attentions.length > 0
+        ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+          for attStr in product.attentions
+            li(style="margin:0px")!=`* ${attStr}`
       div.item(style="background:#c7fff8")
         div(style="padding:7px 0;color:#333")
           p
             span.title 价格
-            span#originPrice(class=product.productParams[paId].useDiscount == true?"del":"") #{numToFloatTwo(product.productParams[paId].originPrice)}
+            span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
             //- -if(product.productParams[paId].useDiscount)
             //-   span
             //-     del#originPriceDis #{numToFloatTwo(product.productParams[paId].originPrice)}
@@ -109,15 +113,6 @@ style.
           p
             span.title 优惠价
             span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
-      //- div.item
-      //-   p
-      //-     span.title 支付方式
-      //-     -if(product.payMethod == "kcb")
-      //-       span(style="font-weight:bolder") 科创币
-      //-     -else if(product.payMethod == "rmb")
-      //-       span(style="font-weight:bolder") 人民币
-      //-     -else if(product.payMethod == "all")
-      //-       span(style="font-weight:bolder") 混合付款:&nbsp;
       div.item
         p
           span.title 快递
@@ -153,7 +148,7 @@ style.
       div.item
         div(style="display:none")#paraId!=`${paraId}`
         a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-        a.btn.btn.addCart(role='button' onclick=`addProductToCart(${paraId})`) 
+        a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
           span.fa.fa-shopping-cart  加入购物车
     .col-xs-1.col-md-1 
 

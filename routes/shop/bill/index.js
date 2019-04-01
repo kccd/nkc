@@ -21,6 +21,8 @@ router
       const cartsData = await db.ShopCartModel.find({_id: {$in: cartsId}}); 
       data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
     }
+    // 检测限购
+    data.cartsData = await db.ShopGoodsModel.checkOutPurchaseLimit(data.cartsData);
     data.billType = billType;
 
     // 取出全部收货地址

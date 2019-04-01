@@ -27,6 +27,7 @@ shelfRouter
     const {user} = data;
     let {
       productName,
+      attentions,
       productDescription,
       productDetails,
       mainForumsId,
@@ -36,7 +37,7 @@ shelfRouter
       stockCostMethod,
       productStatus,
       shelfTime,
-      payMethod,
+      purchaseLimitCount,
       productParams
     } = body.post;
     const paramsInfo = body.post.params;
@@ -73,9 +74,6 @@ shelfRouter
       ctx.throw(400, '商品状态 设置错误，仅支持【上架(insale)】、【不上架(notonshelf)】');
     if(productStatus === 'insale' && shelfTime && Date.now() >= new Date(shelfTime))
       ctx.throw(400, '商品的上架时间不能早于当前时间，若想立即上架商品请点击【立即上架】按钮'); 
-    if(!['kcb', 'rmb', 'or'].includes(payMethod)) ctx.throw(400, '付款方式选择错误');
-    if(!ctx.permission('setRMBpayment') && payMethod === 'rmb')
-      ctx.throw(400, '您没有设置商品只能通过人名币付款的权限');  
     if(productParams.length === 0) ctx.throw(400, '规格信息不能为空'); 
     if(paramsInfo.length !== 0) {
       let count = paramsInfo[0].values.length;
@@ -132,7 +130,8 @@ shelfRouter
       tid,
       oc,
       productId,
-      payMethod,
+      attentions,
+      purchaseLimitCount,
       ip: ctx.address,
       mainForumsId,
       imgIntroductions,

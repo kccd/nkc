@@ -2,8 +2,6 @@ extends ./index.pug
 
 block name
   .row
-    //- .col-md-12.col-sm-12.col-xs-12
-    //-   button.btn.btn-primary(onclick=`addClassify()`) 添加分类
     .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
       ul.nav.nav-pills(style="border:1px solid #ddd")
         li(class=!data.orderStatus || data.orderStatus == "all"?"active":"")
@@ -26,7 +24,7 @@ block name
       table.table.table-bordered
         thead
           tr(style="background-color:silver")
-            th 商品名称
+            th(style="width:300px") 商品名称
             th 属性
             th 商品单价
             th 运费
@@ -44,10 +42,7 @@ block name
                   span=order.orderId
                   span(style="margin-left:20px;font-weight:800") 创建时间:&nbsp;
                   span=order.orderToc.toLocaleString()
-            //- tr(style="border-bottom:20px solid white;")
             tr(style="min-height:100px")
-              //- td=order.orderId
-              //- td=order.orderToc.toLocaleString()
               td(style="display:flex")
                 img(src=`/r/${order.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
                 span(style="font-size:12px")=order.product.name
@@ -55,7 +50,6 @@ block name
               td #{numToFloatTwo(order.productParam.price)}
               td #{numToFloatTwo(order.product.freightPrice)}
               td=order.count
-              //- td=order.user.username
               td
                 a(href=`/u/${order.uid}`)!=`${order.user.username}`
               td= order.status  
@@ -63,23 +57,7 @@ block name
                   span &nbsp;
                   a(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 去处理
                 p 
-                  //- a(href=`/shop/order/detail?orderId=${order.orderId}`) 详情
                   a(href=`/shop/manage/${order.storeId}/order/detail?orderId=${order.orderId}`) 订单详情
-              //-td
-                if order.orderStatus == "unCost"
-                  p 未付款
-                if order.orderStatus == "unShip"
-                  p 等待发货
-                if order.orderStatus == "unSign"
-                  p 等待确认收货
-                if order.orderStatus == "finish"
-                  p 订单已完成
-                if order.orderStatus == "unSign" || order.orderStatus == "finish" 
-                  p 
-                    a(onclick=`visitLogisticsInfo(${order.orderId})` style="cursor:pointer") 查看物流
-                p 
-                  //- a(href=`/shop/order/detail?orderId=${order.orderId}`) 详情
-                  a(href=`/shop/manage/${order.storeId}/order/detail?orderId=${order.orderId}`) 详情
               td #{numToFloatTwo(order.orderPrice)}
               td
                 if order.orderStatus == "unCost"
@@ -94,22 +72,6 @@ block name
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"
                   p
                     a.btn.btn-default.btn-sm(href=`/shop/manage/${data.myStore.storeId}/order/logositics?orderId=${order.orderId}`) 查看物流
-          //- for order in data.orders
-          //-   tr
-          //-     td=order.orderId
-          //-     td=order.orderToc.toLocaleString()
-          //-     td=order.product.name
-          //-     td=order.productParam.name
-          //-     td #{numToFloatTwo(order.productParam.price)}
-          //-     td #{numToFloatTwo(order.product.freightPrice)}
-          //-     td=order.count
-          //-     //- td=order.user.username
-          //-     td
-          //-       a(href=`/u/74847`) Kris
-          //-     td 交易状态
-          //-     td #{numToFloatTwo(order.orderPrice)}
-          //-     td
-          //-       button.btn.btn-primary.btn-sm 操作
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
 
@@ -126,11 +88,6 @@ block name
               label.col-sm-2.control-label 商品价格
               .col-sm-8
                 input.form-control#eoPrice(type='text')
-            //- .form-group 
-            //-   label.col-sm-2.control-label 属性
-            //-   .col-sm-8
-            //-     textarea.form-control#newValue(name="", rows="5" placeholder="黄色,红褐色,蓝色")
-            //-     p(style="color:red") 注意：请使用英文逗号分隔多个属性值,请勿使用中文逗号
           input#eostoreid(type="text" style="display:none")
           input#eoorderid(type="text" style="display:none")
         .modal-footer(style="text-align:left")
@@ -150,11 +107,6 @@ block name
               label.col-sm-2.control-label 快递单号
               .col-sm-8
                 input.form-control#newtracknumber(type='text')
-            //- .form-group 
-            //-   label.col-sm-2.control-label 属性
-            //-   .col-sm-8
-            //-     textarea.form-control#newValue(name="", rows="5" placeholder="黄色,红褐色,蓝色")
-            //-     p(style="color:red") 注意：请使用英文逗号分隔多个属性值,请勿使用中文逗号
           input#newstoreid(type="text" style="display:none")
           input#neworderid(type="text" style="display:none")
         .modal-footer(style="text-align:left")

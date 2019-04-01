@@ -1,0 +1,59 @@
+extends ./index.pug
+block title
+  -const myStore = data.myStore
+block name
+  .row
+    .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
+      ul.nav.nav-pills(style="border:1px solid #ddd")
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      include ../../interface_navigation_paging
+    .col-md-12.col-sm-12.col-xs-12  
+      table.table.table-bordered
+        thead
+          tr(style="background-color:silver")
+            th(style="width:300px") 商品名称+商品ID
+            th 发布时间
+            th 规格数量
+            th 是否限购
+            th 已售出
+            th 商品状态
+            th 操作
+        tbody
+          for product in data.products
+            tr(style="min-height:100px;background-color: #d3f2ff;border-top:2px solid black;")
+              td(style="display:flex")
+                img(src=`/r/${product.imgMaster}` style="width:60px;height:60px;margin-right5px")
+                span(style="font-size:12px")=product.name
+              td=product.toc.toLocaleString()
+              td!=`${product.productParams.length}`
+              if !purchaseLimitCount || purchaseLimitCount == -1
+                td(style="color:darkgreen;") 不限购
+              else 
+                td(style="color:mediumvioletred")!=`每人限购${purchaseLimitCount}件`
+              td 暂无统计
+              if product.productStatus == "insale"
+                td(style="color:darkgreen;") 出售中
+              else
+                td(style="color:mediumvioletred") 仓库中
+              td
+                //- p
+                //-   a.btn.btn-warning.btn-sm(href=`/shop/manage/${myStore.storeId}/goodslist/editProduct?productId=${product.productId}`) 重新编辑
+                p
+                  a.btn.btn-warning.btn-sm(href=`/t/${product.tid}`) 前往论坛
+            tr
+              td(colspan="2" rowspan!=`${product.productParams.length + 1}`) 
+              th 规格名称
+              th 价格
+              th 原始库存
+              th 剩余库存
+              th 修改商品规格
+            for param in product.productParams
+              tr
+                td=param.name
+                td=param.price
+                td=param.stocksTotal
+                td=param.stocksSurplus
+                td 
+                  p
+                    a.btn.btn-info.btn-sm(href=`/shop/manage/${myStore.storeId}/goodslist/editParam?paraId=${param._id}`) 修改
+block manageScripts
