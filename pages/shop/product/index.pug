@@ -44,7 +44,7 @@ block title
       background-color: #22258c;
     }
     .item {
-      margin-bottom:20px
+      margin-bottom:15px
     }
     .shopdsr-item{
       float: left;
@@ -165,42 +165,21 @@ block content
         .col-xs-12.col-md-7
           h3.item=`${product.post.t}`
           p.item=`${product.post.abstract}`
+          if product.attentions && product.attentions.length > 0
+            ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+              for attStr in product.attentions
+                li!=`* ${attStr}`
           div.item(style="background:#c7fff8")
             div(style="padding:7px 0;color:#333")
               p
                 span.title 价格
-                span#originPrice(class=product.productParams[paId].useDiscount == true?"del":"") #{numToFloatTwo(product.productParams[paId].originPrice)}
-                //- -if(product.productParams[paId].useDiscount)
-                //-   span
-                //-     //- del=`${product.productParams[paId].originPrice}`
-                //-     del #{numToFloatTwo(product.productParams[paId].originPrice)}
-                //- -else
-                //-   //- span=`${product.productParams[paId].originPrice}`
-                //-   span  #{numToFloatTwo(product.productParams[paId].originPrice)}
+                span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
               p
                 span.title 优惠价
                 span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
-          //- div.item
-          //-   p
-          //-     span.title 支付方式
-          //-     -if(product.payMethod == "kcb")
-          //-       span(style="font-weight:bolder") 科创币
-          //-     -else if(product.payMethod == "rmb")
-          //-       span(style="font-weight:bolder") 人民币
-          //-     -else if(product.payMethod == "all")
-          //-       span(style="font-weight:bolder") 混合付款:&nbsp;
-          //- div.item(style="border-bottom: 1px solid #e5e5e5")
-          //-   p
-          //-     span.title 快递费用
-          //-     span.location(style="font-size:xx-small") #{getProvinceCity(product.store.address)}
-          //-     span.location 至
-          //-     input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true')
-          //-     span.location 快递
-          //-     sapn.location ￥12.00
           div.item
             p
               span.title 快递
-              //- span.location!=getProvinceCity(product.store.address)
               span.location(style="font-size:small") #{getProvinceCity(product.store.address)}
               span.location(style="font-size:small") 至
               input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
@@ -208,11 +187,6 @@ block content
             p
               span.title 运费
               span#freightPrice #{numToFloatTwo(product.freightPrice)}
-          //- div.item
-          //-   if(product.shelfTime)
-          //-     p
-          //-       span.title 上架时间
-          //-       span.location!=product.shelfTime.toLocaleString()
           div.item
             p
               span.title 数量
@@ -232,8 +206,8 @@ block content
                     span=para.name.join()
           div.item
             div(style="display:none")#paraId!=`${paraId}`
-            a.btn.btn.buy(role='button' onclick=`submitProductToBill(${paraId})` style="margin-left:10px") 立即购买
-            a.btn.btn.addCart(role='button' onclick=`addProductToCart(${paraId})`) 
+            a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
               span.fa.fa-shopping-cart  加入购物车
         .col-xs-1.col-md-1 
 

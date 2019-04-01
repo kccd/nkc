@@ -41,23 +41,6 @@ block content
                       span  收）
                       em.mobile=address.mobile
           //- a.btn.btn-info.btn-sm(style="margin-left:40px" onclick="addAddress()") 新增收货地址
-      //.col-xs-12.col-md-12
-        .order-address-wrap
-          h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
-            span 确认付款方式
-          ul.address-list(style="list-style: none;")
-            li.address-wrap
-              .addressBox.paySelected
-                label.addressInfo
-                  input(type='radio', name='payMethod' checked value="kcb")
-                  span.user-address
-                    span 科创币付款
-            li.address-wrap
-              .addressBox
-                label.addressInfo
-                  input(type='radio', name='payMethod' value="alipay")
-                  span.user-address
-                    span 支付宝付款
       .col-xs-12.col-md-12
         .order-address-wrap
           h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
@@ -81,6 +64,8 @@ block content
                   td=bill.product.freightPrice 
                   td.order(paid=`${bill.productParam._id}`)=bill.count
                   td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
+                  if bill.canBuy == false
+                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
             else if data.billType == "product"
               for bill in cartsData
                 tr
@@ -90,6 +75,8 @@ block content
                   td=bill.product.freightPrice 
                   td.order(paid=`${bill._id}`)=bill.count
                   td.subtotal #{numToFloatTwo((bill.price+bill.product.freightPrice)*bill.count)}
+                  if bill.canBuy == false
+                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
       .col-xs-12.col-md-12
         div(style="text-align:right")
           p 

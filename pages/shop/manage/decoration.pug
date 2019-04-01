@@ -48,23 +48,6 @@ block name
                             a.navbar-brand(href='#') [店铺名称]
                           #bs-example-navbar-collapse-1.collapse.navbar-collapse
                             ul.nav.navbar-nav
-                              //- li.dropdown
-                              //-   a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                              //-     | 所有分类 
-                              //-     span.caret
-                              //-   ul.dropdown-menu
-                              //-     li
-                              //-       a(href='#') Action
-                              //-     li
-                              //-       a(href='#') Another action
-                              //-     li
-                              //-       a(href='#') Something else here
-                              //-     li.divider(role='separator')
-                              //-     li
-                              //-       a(href='#') Separated link
-                              //-     li.divider(role='separator')
-                              //-     li
-                              //-       a(href='#') One more separated link
                               li.active
                                 a(href='#')
                                   | 首页
@@ -90,17 +73,6 @@ block name
                             ul.service-content
                               li!=`周一至周五：${data.storeDecoration.serviceTimeWork[0]}-${data.storeDecoration.serviceTimeWork[1]}`
                               li!=`周六至周日：${data.storeDecoration.serviceTimeRest[0]}-${data.storeDecoration.serviceTimeRest[1]}`
-                          //- li.service-block
-                          //-   p.boldFont 在线咨询
-                          //-   ul.service-content
-                          //-     li.group
-                          //-       span.groupname 总服务台
-                          //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=5634692&s=1&charset=gbk&fromid=cntaobao', target='_blank')
-                          //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=5634692&s=1', alt='点击这里给我发消息')
-                          //-     li.group
-                          //-       span.groupname 售前客服
-                          //-       a(href='//amos.alicdn.com/getcid.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&groupid=2546508&s=1&charset=gbk&fromid=cntaobao', target='_blank')
-                          //-         img(src='//amos.alicdn.com/grponline.aw?v=3&uid=%BF%C6%D0%C2%C9%E7&site=cntaobao&gids=2546508&s=1', alt='点击这里给我发消息')
                           li.service-block
                             p.boldFont 联系方式
                             ul.service-content
@@ -126,40 +98,8 @@ block name
                               .media-body
                                 a(href=`/shop/product/${featured.productId}`)
                                   p.media-heading(style="font-size:smaller")!=`${featured.name}`
-                                  //- p(style="font-size:smaller")!=`${featured.productFinalPrice}`
-                                //- div(style='')
-                                //-   span.fa.fa-star(style='color:red')
-                                //-   span.fa.fa-star(style='color:red')
-                                //-   span.fa.fa-star(style='color:red')
-                                //-   span.fa.fa-star(style='color:red')
-                                //-   span.fa.fa-star(style='color:red')
                               .media-right
                                 span.blockBold!=`ID: ${featured.productId}`
-              //- .form-group
-              //-   label.col-sm-2.control-label#searchAnchor 店内分类
-              //-   .col-sm-8
-              //-     .panel.panel-success
-              //-       .panel-heading(style="padding:0;")
-              //-         span.blockBold &nbsp;
-              //-         a.blockBold(href="#") 
-              //-           | 编辑
-              //-           span.fa.fa-pencil-square-o
-              //-       .panel-body
-              //-         ul#main-nav.nav.nav-tabs.nav-stacked(style='')
-              //-           li(style="background-color: aliceblue")
-              //-             a(href='#')
-              //-               | 大分类一
-              //-           li(style="background-color: aliceblue")
-              //-             a(href='#')
-              //-               | 大分类二
-              //-           li(style="background-color: aliceblue")
-              //-             a.nav-header.collapsed(href='#asdf', data-toggle='collapse')
-              //-               | 大分类三
-              //-               span.pull-right.glyphicon.glyphicon-chevron-down
-              //-             ul#asdf.nav.nav-list.collapse.secondmenu(style='height: 0px;')
-              //-               li
-              //-                 a(href='#')
-              //-                   | 小分类一
               .form-group
                 label.col-sm-2.control-label#searchAnchor 店内搜索
                 .col-sm-8
@@ -207,9 +147,6 @@ block name
                                       img(src=`/r/${cla.imgMaster}`, title=`${cla.abstract}` ,style="height:150px" )
                                     .caption
                                       a(href=`/shop/product/${cla.productId}` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;")!=`${cla.name}`
-                                      //- p(style="color: red;text-align:center")
-                                      //-   i(style="font-style: normal;margin-right: 3px;font-weight: 900;")
-                                      //-     span(style='font-size:14px;')!=`￥${cla.productFinalPrice}`
   #storeSignModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
     .modal-dialog(role='document')
       .modal-content
@@ -326,7 +263,6 @@ block name
 
         .modal-footer(style="text-align:left")
           button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreFeatured(${data.myStore.storeId})`) 保存
-          //- button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
           span 已推荐 
           span#featuredCount  
           sapn 件商品
@@ -358,7 +294,6 @@ block name
 
         .modal-footer(style="text-align:left")
           button.btn.btn-primary.btn-sm(type='button', onclick=`saveStoreClassify(${data.myStore.storeId})`) 保存
-          //- button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
           span 已推荐 
           span#classCount  
           sapn 件商品

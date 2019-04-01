@@ -108,7 +108,7 @@ schema.statics.extendParamsInfo = async (params, o) => {
         if(param.product.params.length !== 0){
           name.push(param.product.params[i].values[arr[i]]);
         }else{
-          name.push("无规格");
+          name.push("默认");
         }
       }
       param.name = name;

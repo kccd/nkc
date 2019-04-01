@@ -68,7 +68,7 @@ function choiceProductParams(para,productId) {
 /**
  * 商品添加到购物车
  */
-function addProductToCart(paraId) {
+function addProductToCart() {
   var productCount = $("#buyCount").val();
   productCount = Number(productCount)
   if(isNaN(productCount) || productCount <0) return screenTopWarning("商品数量不得小于0");
@@ -78,6 +78,8 @@ function addProductToCart(paraId) {
   if(productCount > stockCount) {
     return screenTopWarning("库存不足");
   }
+  // 获取规格
+  var paraId = $("#paraId").text();
   addToCart(paraId, parseInt(productCount));
 }
 
@@ -99,7 +101,7 @@ function submitProductToBill() {
   if(productCount > stockCount) {
     return screenTopWarning("库存不足");
   }
-  // 获取商品id 
+  // 获取规格
   var paraId = $("#paraId").text();
   window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount
 }

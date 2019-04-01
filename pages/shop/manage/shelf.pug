@@ -38,6 +38,12 @@ block name
               .col-sm-8
                 textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='500')
                 p(style="color:#ccc") 最多200个字
+            .form-group
+              label.col-sm-2.control-label 特别说明
+              .col-sm-5.attentionList
+                input.attention.form-control(type="text" placeholder="请用不超过15字来完成一个简短说明")
+              .col-sm-1
+                button(onclick="addAttention()") 添加
       .panel.panel-info
         .panel-heading
           | 销售信息
@@ -116,6 +122,17 @@ block name
                     input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock')
                     |     买家付款减库存
                     b(style="color:red")  （付款减库存，存在超卖风险）
+            .form-group
+              label.col-sm-2.control-label 购买限制
+              .col-sm-10
+                .checkbox
+                  label
+                    input#isPurchaseLimit(type='checkbox')
+                    |  是否限购
+            .form-group#purchaseLimitDom(style="display:none")
+              label.col-sm-2.control-label 每人限购数量
+              .col-sm-5
+                input.form-control#purchaseLimitCount(type="number", name="")
       .panel.panel-info
         .panel-heading
           | 运费物流
@@ -127,34 +144,6 @@ block name
                 .input-group
                   input.form-control#freightPrice(type='number', placeholder="总运费=单件运费价格*商品数量", aria-describedby='stockQuantity')
                   span.input-group-addon 元
-
-      .panel.panel-info
-        .panel-heading
-          | 支付信息
-        .panel-body
-          .form-horizontal
-            .form-group
-              label.col-sm-2.control-label 付款方式
-              .col-sm-8
-                label.radio-inline
-                  input#payMethod1(type='radio', name='payMethod', value='kcb' checked)
-                  |  科创币
-                label.radio-inline
-                  input#payMethod2(type='radio', name='payMethod', value='rmb')
-                  |  人民币
-                label.radio-inline
-                  input#payMethod3(type='radio', name='payMethod', value='or')
-                  |  科创币+人民币混合付款
-            .form-group#karMethodDom(style="display:none")
-              .col-sm-2.control-label
-              .col-sm-8
-                .col-sm-12
-                .col-sm-9
-                  div  
-                    .input-group
-                      span.input-group-addon 付款时，需支付科创币
-                      input.form-control#costKcb(type='number', aria-label='...')
-                      span.input-group-addon 元，剩余使用人民币支付
       .panel.panel-info
         .panel-heading
           | 定时上架

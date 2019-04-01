@@ -5,6 +5,7 @@ const infoRouter = require('./info');
 const decorationRouter = require('./decoration');
 const classifyRouter = require('./classify');
 const orderRouter = require('./order');
+const goodslistRouter = require('./goodslist');
 const manageRouter = new Router();
 manageRouter
   .get ('/', async (ctx, next) => {
@@ -40,6 +41,7 @@ manageRouter
   .use('/:account/shelf', shelfRouter.routes(), shelfRouter.allowedMethods())
   .use('/:account/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:account/decoration', decorationRouter.routes(), decorationRouter.allowedMethods())
-  .use('/:account/order', orderRouter.routes(), orderRouter.allowedMethods())
   .use('/:account/classify', classifyRouter.routes(), classifyRouter.allowedMethods())
+  .use('/:account/order', orderRouter.routes(), orderRouter.allowedMethods())
+  .use('/:account/goodslist', goodslistRouter.routes(), goodslistRouter.allowedMethods())
 module.exports = manageRouter;

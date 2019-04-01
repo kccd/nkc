@@ -9,11 +9,6 @@ $(document).ready(function() {
     $("#finalName").text($(this).next().find(".username").text());
     $("#finalMobile").text($(this).next().find(".mobile").text());
   });
-
-  $('input[type=radio][name=payMethod]').change(function() {
-    $(".paySelected").removeClass("paySelected");
-    $(this).parents(".addressBox").addClass("paySelected");
-  });
 })
 
 /**
@@ -26,8 +21,6 @@ $(document).ready(function() {
  * ]
  */
 function submitOrders() {
-  // 获取付款方式 
-  //var payMethod = $("input[name='payMethod']:checked").val();
   // 获取配送地址
   var receiveDom = $("input[name='address']:checked");
   receiveAddress = receiveDom.next().find(".address").text();
@@ -40,6 +33,10 @@ function submitOrders() {
     receiveMobile, 
   }
   var para = [];
+  // 检查购买限制
+  if($(".limitBuy").length > 0){
+    return screenTopWarning("有商品存在购买限制，请重新下单")
+  }
   // 获取帐单中的产品与数量
   $(".order").each(function() {
     var obj = {

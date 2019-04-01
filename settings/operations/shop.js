@@ -82,6 +82,17 @@ module.exports = {
         logositics: {
           GET: 'visitStoreOrderLogositics'
         }
+      },
+      goodslist: {
+        GET: "visitStoreGoodsList",
+        editParam: {
+          GET: "visitStoreGoodsParamEdit",
+          PATCH: "submitEditToParam"
+        },
+        editProduct: {
+          GET: "visitStoreGoodsProductEdit",
+          PATCH: "submitEditToProduct",
+        }
       }
     },
   },

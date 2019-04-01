@@ -74,15 +74,6 @@ $(document).ready(function() {
     setTimeout(function(){test()},5000)
     
   })
-  $('input[type=radio][name=payMethod]').change(function() {
-    if(this.value == 'or') {
-      $("#karMethodDom").css("display", "");
-    }else if(this.value == 'rmb'){
-      $("#karMethodDom").css("display", "none");
-    }else if(this.value == 'kcb'){
-      $("#karMethodDom").css("display", "none");
-    }
-  });
   $('input[type=radio][name=shelfMethod]').change(function() {
     if(this.value == 'insale') {
       $("#saleTimeDom").css("display", "none")
@@ -108,6 +99,13 @@ $(document).ready(function() {
       $("#disCostDom").css("display", "none");
     }
   })
+  $("#isPurchaseLimit").change(function() {
+    if($("#isPurchaseLimit").prop("checked")) {
+      $("#purchaseLimitDom").css("display", "");
+    }else{
+      $("#purchaseLimitDom").css("display", "none");
+    }
+  })
 })
 
 /**
@@ -116,8 +114,16 @@ $(document).ready(function() {
 function submitToShelf() {
   var productName = $("#productName").val(); // 商品名称
   productName = productName.trim();
-  if(!productName) throw("请输入商品标题");
+  // if(!productName) throw("请输入商品标题");
   var productDescription = $("#productDescription").val(); //商品描述
+  // 获取商品的特殊说明
+  var attentions = [];
+  $(".attention").each(function() {
+    var attStr = $(this).val().trim();
+    if(attStr.length > 0){
+      attentions.push(attStr)
+    }
+  })
   productDescription = productDescription.trim();
   if(!productDescription) throw("请输入商品描述");
   var productOriginalPrice = $("#originalPrice").val(); // 商品原始价格
@@ -125,23 +131,21 @@ function submitToShelf() {
   var productFinalPrice = $("#afterRebatePrice").text(); // 商品折后价格
   var stockTotalCount = $("#stockQuantity").val(); // 商品库存数量
   var stockCostMethod = $("input[name='stockCostMethod']:checked").val(); // 商品减库存方式
+  // 是否使用限购
+  var isPurchaseLimit = $("#isPurchaseLimit").prop("checked");
+  var purchaseLimitCount;
+  if(isPurchaseLimit) {
+    purchaseLimitCount = $("#purchaseLimitCount").val();
+    purchaseLimitCount = Number(purchaseLimitCount);
+    if(!purchaseLimitCount || isNaN(purchaseLimitCount) || purchaseLimitCount < 0){
+      throw("限购数量应该是正整数且不大于商品的库存数量");
+    }
+  }else{
+    purchaseLimitCount = -1;
+  }
   // 获取需要支付的KCB和RMB各是多少
   var payUseKcb = 0; // 需要支付的KCB
   var payUseRmb = 0; // 需要支付的RMB
-  var payMethod = $("input[name='payMethod']:checked").val(); // 商品的支付方式
-  if(payMethod == "kcb"){
-    payUseKcb = productFinalPrice;
-    payUseRmb = productFinalPrice - payUseKcb;
-  }else if(payMethod == "rmb"){
-    payUseRmb = productFinalPrice;
-    payUseKcb = productFinalPrice - payUseRmb;
-  }else if(payMethod == "or"){
-    payUseKcb = $("#costKcb").val();
-    if(parseInt(payUseKcb) > productFinalPrice){
-      throw("使用混合付款，设置的科创币数额不得超过商品价格")
-    }
-    payUseRmb = productFinalPrice - payUseKcb;
-  }
   // 获取全部商品图的id，存入一个数组
   var imgIntroductions = [];
   $("#productImages").find('img.picShow').each(function(){
@@ -187,12 +191,13 @@ function submitToShelf() {
     // stockSurplusCount: Number(stockTotalCount),
     stockCostMethod: stockCostMethod,
     freightPrice: freightPrice,
-    payMethod: payMethod,
     productStatus: productStatus,
     shelfTime: shelfTime,
     params: params,
     mainForumsId: [mergeForumId],
-    productParams: productParams
+    productParams: productParams,
+    attentions: attentions,
+    purchaseLimitCount:purchaseLimitCount
   }
   return post;
 }
@@ -599,7 +604,6 @@ function mulArrTurnTable() {
 function obtainProductPrice() {
   var params; // 规格信息
   var productParams = []; // 具体规格组合
-  var payMethod = $("input[name='payMethod']:checked").val(); ; // 付款方式
   var originalPrice; // 商品原价
   // 是否使用自定义规格
   var isUseParams = $("#useparams").prop("checked");
@@ -677,4 +681,12 @@ function obtainProductPrice() {
     productParams.push(para);
   }
   return productParams;
+}
+
+/**
+ * 添加一条署名
+ */
+function addAttention() {
+  var attDom = "<input class='attention form-control' type='text' placeholder='请用不超过15字来完成一个简短说明,不填写则无'>";
+  $(".attentionList").append(attDom)
 }

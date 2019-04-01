@@ -79,6 +79,13 @@ const shopGoodsSchema = new Schema({
     type: String,
     default: ''
   }, */
+  /**
+   * 特殊说明
+   */
+  attentions: {
+    type: Array,
+    default: []
+  },
   // 自定义商品参数(不参与搜索)
   params: {
     type: [],
@@ -142,15 +149,13 @@ const shopGoodsSchema = new Schema({
     default: "notonshelf"
   },
   /**
-   * 付款方式
-   * @param kcb 只用科创币支付
-   * @param rmb 只用人民币支付
-   * @param or 科创币与人民币混合付款
+   * 限购数量
+   * @param -1 不限购
    */
-  payMethod: {
-    type: String,
-    default: 'kcb'
-  },
+  purchaseLimitCount: {
+    type: Number,
+    default: -1
+  }
 }, {
   collection: 'shopGoods'
 });
@@ -262,5 +267,58 @@ shopGoodsSchema.statics.findById = async (id) => {
   if(!product) throwErr(404, `为找到ID为【${id}】的商品`);
   return product;
 };
+
+/**
+ * 检测商品限购
+ * @param bills 由账单组成的数组
+ * @param uid 购买者的uid
+ * @author Kris 2019-3-29
+ */
+shopGoodsSchema.statics.checkOutPurchaseLimit = async (bills) => {
+  const ShopGoodsModel = mongoose.model('shopGoods');
+  const ShopOrdersModel = mongoose.model('shopOrders');
+  const productId = new Set()
+  const countObj = {}, productObj = {};
+  bills.map(b => {
+    productId.add(b.productId)
+  });
+  // 在订单中计算每种商品得购买数量
+  let counts = await ShopOrdersModel.aggregate([
+    {$match: {productId:{$in:[...productId]}}},
+    {$group: {_id:"$productId", count:{$sum:1}}}
+  ])
+  for(const count of counts) {
+    countObj[count._id] = count;
+  }
+  // 取出每种规格的原商品
+  let products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
+  for(const product of products) {
+    productObj[product.productId] = product;
+  }
+  return await Promise.all(bills.map(b => {
+    // 已经购买的数量
+    let alreadyBuyCount = 0;
+    if(countObj[b.productId]){
+      alreadyBuyCount = Number(countObj[b.productId].count);
+    }
+    // 商品限购数量
+    let limitBuyCount = -1;
+    if(productObj[b.productId] && productObj[b.productId].purchaseLimitCount) {
+      limitBuyCount = Number(productObj[b.productId].purchaseLimitCount);
+    }
+    // 当前帐单购买数量
+    let currentBuyCount = Number(b.count);
+
+    let canBuyCount = (limitBuyCount - alreadyBuyCount) - currentBuyCount;
+
+    // 剩余购买数量
+    b.remainBuyCount = limitBuyCount - alreadyBuyCount;
+    b.canBuy = true;
+    if(limitBuyCount != -1 && canBuyCount < 0) {
+      b.canBuy = false
+    }
+    return b;
+  }));
+}
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);
 module.exports = ShopGoodsModel;
