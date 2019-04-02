@@ -61,6 +61,7 @@ block content
                   td=bill.product.name 
                   td=bill.productParam.name 
                   td #{numToFloatTwo(bill.productParam.price)} 
+                  td #{numToFloatTwo(bill.product.freightPrice)} 
                   td=bill.product.freightPrice 
                   td.order(paid=`${bill.productParam._id}`)=bill.count
                   td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
@@ -72,7 +73,7 @@ block content
                   td=bill.product.name
                   td=bill.name
                   td #{numToFloatTwo(bill.price)} 
-                  td=bill.product.freightPrice 
+                  td #{numToFloatTwo(bill.product.freightPrice)} 
                   td.order(paid=`${bill._id}`)=bill.count
                   td.subtotal #{numToFloatTwo((bill.price+bill.product.freightPrice)*bill.count)}
                   if bill.canBuy == false

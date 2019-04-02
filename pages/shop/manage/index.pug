@@ -22,15 +22,15 @@ block content
             li.active
               a(href='#') 店铺管理
             li(style="background-color: aliceblue")
-              a(href='./home')
+              a(href=`/shop/manage/${data.myStore.storeId}/home`)
                 i.glyphicon.glyphicon-credit-card
                 |                             店铺首页
             li(style="background-color: aliceblue")
-              a(href='./shelf')
+              a(href=`/shop/manage/${data.myStore.storeId}/shelf`)
                 i.glyphicon.glyphicon-credit-card
                 |                             商品上架
             li(style="background-color: aliceblue")
-              a(href='./goodslist')
+              a(href=`/shop/manage/${data.myStore.storeId}/goodslist`)
                 i.glyphicon.glyphicon-calendar
                 |                             商品管理
             li(style="background-color: aliceblue")
@@ -70,7 +70,7 @@ block content
                     i.glyphicon.glyphicon-eye-open
                     | 日志查看
             li(style="background-color: aliceblue")
-              a(href='./order')
+              a(href=`/shop/manage/${data.myStore.storeId}/order`)
                 i.glyphicon.glyphicon-globe
                 |                             订单管理
                 span.label.label-warning.pull-right 5
@@ -79,15 +79,15 @@ block content
                 i.glyphicon.glyphicon-calendar
                 |                             图表统计
             li(style="background-color: aliceblue")
-              a(href='./info')
+              a(href=`/shop/manage/${data.myStore.storeId}/info`)
                 i.glyphicon.glyphicon-calendar
                 |                             店铺信息
             li(style="background-color: aliceblue")
-              a(href='./decoration')
+              a(href=`/shop/manage/${data.myStore.storeId}/decoration`)
                 i.glyphicon.glyphicon-calendar
                 |                             店铺装修
             li(style="background-color: aliceblue")
-              a(href='./classify')
+              a(href=`/shop/manage/${data.myStore.storeId}/classify`)
                 i.glyphicon.glyphicon-calendar
                 |                             分类设置
             li(style="background-color: aliceblue")

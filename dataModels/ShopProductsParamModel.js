@@ -121,8 +121,56 @@ schema.statics.extendParamsInfo = async (params, o) => {
  * 拓展规格名称
  * @productParams 对象数组
  */
-schema.static.extendParamName = async (productParams) => {
+schema.statics.extendParamName = async (productParams) => {
   return productParams;
 }
-const ShopProductParamMode = mongoose.model('shopProductsParams', schema);
-module.exports = ShopProductParamMode;
+
+/**
+ * 减库存
+ * @description 根据订单中的productId取出product，如果符合商品的减库存条件，则根据订单中的paramId及购买数量修改该商品规格中的剩余库存
+ * @param {Array} orders 订单数组
+ * @param {String = 'payReduceStock' | 'orderReduceStock'} reduceMethod - 减库存的条件
+ * @author Kris 2019-4-2
+ */
+schema.statics.productParamReduceStock = async (orders, reduceMethod) => {
+  // 如果不传条件，则默认为付款减库存
+  if(!reduceMethod || reduceMethod == ""){
+    reduceMethod = "payReduceStock";
+  }
+  const ShopGoodsModel = mongoose.model('shopGoods');
+  const ShopProductParamModel = mongoose.model('shopProductsParams');
+  for(const order of orders) {
+    // 找出订单所属产品
+    const product = await ShopGoodsModel.findOne({productId: order.productId});
+    const {stockCostMethod} = product;
+    // 找出订单所属规格
+    const productParam = await ShopProductParamModel.findOne({_id: order.paramId});
+    // 判断减库存条件
+    if(productParam && stockCostMethod == reduceMethod) {
+      await productParam.update({$set: {stocksSurplus: (Number(productParam.stocksSurplus) - Number(order.count))}});
+    }
+  }
+}
+
+
+/**
+ * 退款恢复库存
+ * @param {Object} refund 退款记录
+ * @author Kris 2019-4-2
+ */
+schema.statics.refundRestoreStock = async (refund) => {
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const ShopProductParamModel = mongoose.model("shopProductsParams");
+  // 根据refund中的orderId找到订单
+  const order = await ShopOrdersModel.findOne({orderId: refund.orderId});
+  // 根据order中的productId取出product
+  // const product = await ShopGoodsModel.findOne({productId: product.productId});
+  // 根据订单中的paramId取出productParam
+  const productParam = await ShopProductParamModel.findOne({_id: order.paramId});
+  // 根据订单中的购买数量恢复规格中的剩余库存
+  await productParam.update({$set: {stocksSurplus: (Number(productParam.stocksSurplus) + Number(order.count))}});
+}
+
+const ShopProductsParamModel = mongoose.model('shopProductsParams', schema);
+module.exports = ShopProductsParamModel;

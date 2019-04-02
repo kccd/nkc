@@ -103,10 +103,6 @@ router
       let stockCostMethod = productParam.product.stockCostMethod;
       let stocksSurplus = productParam.stocksSurplus;
       if(Number(bill.productCount) > Number(stocksSurplus)) ctx.throw(400, "库存不足");
-      // 是否为下单减库存
-      if(stockCostMethod == "orderReduceStock") {
-        await db.ShopProductsParamModel.update({_id:productParam._id},{$set:{stocksSurplus:(Number(stocksSurplus) - Number(bill.productCount))}});
-      }
       const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
       const order = db.ShopOrdersModel({
         orderId: orderId,
@@ -118,10 +114,12 @@ router
         paramId: productParam._id,
         uid: user.uid,
         count: bill.productCount,
-        orderOriginPrice: productParam.price * bill.productCount,
-        orderPrice: productParam.price * bill.productCount
+        orderOriginPrice: (productParam.price + productParam.product.freightPrice) * bill.productCount,
+        orderPrice: (productParam.price + productParam.product.freightPrice) * bill.productCount
       });
       await order.save();
+      //减库存
+      await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
       await db.ShopCartModel.remove({uid: user.uid, productParamId: productParam._id});
       ordersId.push(order.orderId);
     }
