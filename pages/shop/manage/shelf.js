@@ -173,7 +173,7 @@ function submitToShelf() {
   }else if(proSta == "notonshelf") {
     productStatus = "notonshelf"
   }else if(proSta == "insaletime") {
-    productStatus = "insale";
+    productStatus = "notonshelf";
     shelfTime = $("#saleTime").val();
   }
 

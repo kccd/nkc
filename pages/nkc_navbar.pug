@@ -79,8 +79,18 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
                 span.caret
               ul.dropdown-menu
                 li
+                  a(href="/shop") 商城首页
+                li.divider
+                li
                   a(href="/shop/order") 
                     span 全部订单
+                li
+                  a(href="/shop/order?orderStatus=unCost") 待付款
+                li
+                  a(href="/shop/order?orderStatus=unShip") 待发货
+                li
+                  a(href="/shop/order?orderStatus=unSign") 待收货
+
                 li.divider
                 li
                   a(href="/shop/manage") 
