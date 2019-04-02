@@ -285,16 +285,16 @@ shopGoodsSchema.statics.findById = async (id) => {
 shopGoodsSchema.statics.checkOutPurchaseLimit = async (bills, uid) => {
   const ShopGoodsModel = mongoose.model('shopGoods');
   const ShopOrdersModel = mongoose.model('shopOrders');
-  const productId = new Set()
+  const productId = new Set();
   const countObj = {}, productObj = {};
   bills.map(b => {
     productId.add(b.productId)
   });
   // 在订单中计算每种商品得购买数量
   let counts = await ShopOrdersModel.aggregate([
-    {$match: {productId:{$in:[...productId], uid:uid}}},
+    {$match: {productId:{$in:[...productId]}, uid}},
     {$group: {_id:"$productId", count:{$sum:1}}}
-  ])
+  ]);
   for(const count of counts) {
     countObj[count._id] = count;
   }

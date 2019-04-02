@@ -10,8 +10,8 @@ router
     if(!cartsId){
       billType = "product";
       if(!productCount) ctx.throw(400, "请选择商品数量");
-      if(!paraId) ctx.throw(400, "请选择商品")
-      const billProducts = await db.ShopProductsParamModel.find({_id: paraId})
+      if(!paraId) ctx.throw(400, "请选择商品");
+      const billProducts = await db.ShopProductsParamModel.find({_id: paraId});
       data.cartsData = await db.ShopProductsParamModel.extendParamsInfo(billProducts);
       data.cartsData[0].count = productCount;
       // data.cartsData  = billProducts;
