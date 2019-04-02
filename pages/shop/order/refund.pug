@@ -160,7 +160,8 @@ block content
                   ul
                     li 凭证一经保存将无法删除    
               .m-t-1(v-if='refund && ["S_AGREE_RP", "P_AGREE_RP"].indexOf(refund.status) !== -1')
-                h4.text-danger 卖家已同意您的退货申请，请将商品寄回：
+                h4
+                  strong.text-danger 卖家已同意您的退货申请，请将商品寄回
                 h5 收件人姓名：{{refund.sellerInfo.name}}
                 h5 收件人手机号：{{refund.sellerInfo.mobile}}
                 h5 收件人地址：{{refund.sellerInfo.address}}

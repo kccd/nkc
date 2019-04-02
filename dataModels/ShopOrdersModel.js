@@ -94,6 +94,18 @@ const shopOrdersSchema = new Schema({
     type: String,
     default: "unCost"
   },
+  // 自动收货的时间
+  autoReceiveTime: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  // 异常订单
+  error: {
+    type: String,
+    default: "",
+    index: 1
+  },
   /**
    * 退款状态
    * @ing 正在退款中
@@ -456,6 +468,38 @@ shopOrdersSchema.methods.extendCerts = async function(type) {
   }
   return this.certs = certs;
 };  
+
+shopOrdersSchema.methods.cancelOrder = async function(reason) {
+  const {contentLength} = require("../tools/checkString");
+  if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
+  const ShopRefundModel = mongoose.model("shopRefunds");
+  const SettingModel = mongoose.model("settings");
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const product = await ShopGoodsModel.findOnly({productId: this.productId});
+  const time = Date.now();
+  const refund = ShopRefundModel({
+    _id: await SettingModel.operateSystemID("shopRefunds", 1),
+    toc: time,
+    status: "CO",
+    buyerId: this.uid,
+    sellerId: product.uid,
+    orderId: this.orderId,
+    logs: [
+      {
+        status: "CO",
+        info: reason,
+        time
+      }
+    ]
+  });
+  await refund.save();
+  await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+    closeToc: time,
+    closeStatus: true,
+    refundStatus: "success"
+  }});
+};
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;

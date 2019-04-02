@@ -72,8 +72,11 @@ shelfRouter
       ctx.throw(400, '库存计数方式错误，仅支持【付款减库存(payReduceStock)】、【下单减库存(orderReduceStock)】');
     if(!['notonshelf', 'insale'].includes(productStatus)) 
       ctx.throw(400, '商品状态 设置错误，仅支持【上架(insale)】、【不上架(notonshelf)】');
-    if(productStatus === 'insale' && shelfTime && Date.now() >= new Date(shelfTime))
+    if(productStatus === 'notonshelf' && shelfTime && Date.now() >= new Date(shelfTime))
       ctx.throw(400, '商品的上架时间不能早于当前时间，若想立即上架商品请点击【立即上架】按钮'); 
+    if(productStatus === "insale") {
+      shelfTime = Date.now();
+    }  
     if(productParams.length === 0) ctx.throw(400, '规格信息不能为空'); 
     if(paramsInfo.length !== 0) {
       let count = paramsInfo[0].values.length;
@@ -113,22 +116,9 @@ shelfRouter
       ip: ctx.address,
       type: 'product'
     };
-    const thread = await db.ThreadModel.publishArticle(options);
-    const {tid, oc} = thread;
     
-    // 将thread的类型修改为“商品文章”
-    // 将商品的主页图片复制裁剪到文章封面图文件夹
-    const resource = await db.ResourceModel.findOne({rid: imgMaster});
-    if(!resource) ctx.throw(404, `生成文章封面图失败，未找到ID为【${imgMaster}】的资源图片`);
-    const {path} = resource;
-    const basePath = settings.mediaPath.selectDiskCharacterDown(resource);
-    const imgPath = basePath + path;
-    const targetPath = settings.upload.coverPath + '/' + tid + '.jpg';
-    await tools.imageMagick.coverify(imgPath, targetPath);
     const productId = await db.SettingModel.operateSystemID('shopGoods', 1);
     const product = db.ShopGoodsModel({
-      tid,
-      oc,
       productId,
       attentions,
       purchaseLimitCount,
@@ -142,8 +132,10 @@ shelfRouter
       freightPrice,     
       storeId,
       params: paramsInfo,
-      uid: user.uid
+      uid: user.uid,
+      threadInfo: options
     });
+
     for(const p of productParams) {
       if(p.originPrice < 0) continue;
       p.productId = productId;
@@ -154,6 +146,12 @@ shelfRouter
       await d.save();
     }
     await product.save();
+
+    // 立即上架
+    if(productStatus === "insale") {
+      await product.onshelf();
+    }
+
     data.product = product;
 		await next();
 	})

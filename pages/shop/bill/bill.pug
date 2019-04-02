@@ -3,6 +3,13 @@ block shopTitle
   title 确认账单 | 科创商城
   -const cartsData = data.cartsData
   -const addresses = data.addresses
+  -let productParamId;
+  for bill in cartsData
+    if bill.productParam
+      -productParamId = bill.productParam._id
+    else 
+      -productParamId = bill._id
+
   +includeCSS('/fund.css')
   style.
     .addressSelected {
@@ -54,16 +61,31 @@ block content
               th 运费
               th 数量
               th 小计
+              th 凭证
           tbody
+            mixin orderCert(bill) 
+              if bill.product.uploadCert
+                input(type="file" id=`input_${productParamId}` data-param-id=productParamId
+                  onchange=`inputChange(this)`
+                ).hidden
+                div(class=`cert-${productParamId}`)
+                  button(onclick=`uploadCert('${productParamId}')`) 上传
+                  | &nbsp;
+                  button(onclick=`viewCert('${productParamId}')`).hidden 查看
+              else 
+                span 不需要  
             if data.billType == "cart"
               for bill in cartsData
                 tr 
-                  td=bill.product.name 
+                  td
+                    a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name 
                   td=bill.productParam.name 
                   td #{numToFloatTwo(bill.productParam.price)} 
                   td=bill.product.freightPrice 
                   td.order(paid=`${bill.productParam._id}`)=bill.count
                   td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
+                  td  
+                    +orderCert(bill)
                   if bill.canBuy == false
                     td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
             else if data.billType == "product"
@@ -73,8 +95,10 @@ block content
                   td=bill.name
                   td #{numToFloatTwo(bill.price)} 
                   td=bill.product.freightPrice 
-                  td.order(paid=`${bill._id}`)=bill.count
+                  td.order(paid=`${bill._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
                   td.subtotal #{numToFloatTwo((bill.price+bill.product.freightPrice)*bill.count)}
+                  td  
+                    +orderCert(bill)
                   if bill.canBuy == false
                     td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
       .col-xs-12.col-md-12

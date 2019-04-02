@@ -10,6 +10,7 @@ router
     root = !!root;
     // 查询订单 判断权限
     let order = await db.ShopOrdersModel.findById(orderId);
+    const orderDB = order;
     if(order.uid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
@@ -33,27 +34,7 @@ router
     const time = Date.now();
     // 未付款时取消订单
     if(orderStatus === 'unCost') {
-      const refundDB = await db.ShopRefundModel({
-        _id: await db.SettingModel.operateSystemID("shopRefunds", 1),
-        toc: time,
-        status: "CO",
-        buyerId: order.uid,
-        sellerId: order.product.uid,
-        orderId: order.orderId,
-        logs: [
-          {
-            status: "CO",
-            info: reason,
-            time
-          }
-        ]
-      });
-      await refundDB.save();
-      await db.ShopOrdersModel.update({orderId: order.orderId}, {$set: {
-        closeToc: Date.now(),
-        closeStatus: true,
-        refundStatus: "success"
-      }});
+      await orderDB.cancelOrder(reason);
     } else {
       // 已付款后取消订单
       const r = {
@@ -66,7 +47,7 @@ router
       };
 
       const refundMoney = Number(money)*100;
-      if(refundMoney > 0 && refundMoney <= order.orderPrice){
+      if(refundMoney >= 0 && refundMoney <= order.orderPrice){
         r.money = refundMoney;
       }
       else {

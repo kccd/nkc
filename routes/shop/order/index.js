@@ -2,11 +2,11 @@ const Router = require('koa-router');
 const router = new Router();
 const singleOrderRouter = require('./singleOrder');
 router
-  .use('/', async (ctx, next) => {
+  /* .use('/', async (ctx, next) => {
     // 处理超过30分钟未付款的订单
     await ctx.db.ShopOrdersModel.clearTimeoutOrders(ctx.data.user.uid);
     await next();
-  })
+  }) */
   .get('/', async (ctx, next) => {
     const {data, db, query, params, nkcModules} = ctx;
     let {page = 0, orderStatus} = query;
@@ -25,11 +25,15 @@ router
     }
     const count = await db.ShopOrdersModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const sort = {};
-    if(orderStatus !== 'unCost') {
-      sort.payToc = -1;
+    let sort = {};
+    if(orderStatus === 'unCose' || orderStatus === "close") {
+      sort = {
+        orderToc: -1
+      }
     } else {
-      sort.orderToc = -1;
+      sort = {
+        payToc: -1
+      }
     }
     const orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
@@ -88,8 +92,20 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, query, body} = ctx;
     const {user} = data;
-    const {post, receInfo} = body;
+    const {post, receInfo, paramCert} = body;
     const {receiveAddress, receiveName, receiveMobile} = receInfo;
+  
+
+    // 检验凭证
+    for(const paramId in paramCert) {
+      if(!paramCert.hasOwnProperty(paramId)) continue;
+      const certId = paramCert[paramId];
+      const param = await db.ShopProductsParamModel.findOnly({_id: paramId});
+      const product = await db.ShopGoodsModel.findOnly({productId: param.productId});
+      if(!product.uploadCert) continue;
+      const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
+      if(!cert) ctx.throw(400, "凭证上传错误，请重新上传");
+    }
 
     // 取出全部paid
     let paids = [];
@@ -122,6 +138,10 @@ router
         orderPrice: productParam.price * bill.productCount
       });
       await order.save();
+      await db.ShopCartModel.update({_id: paramCert[productParam._id]}, {$set: {
+        orderId: orderId,
+        deletable: false
+      }});
       await db.ShopCartModel.remove({uid: user.uid, productParamId: productParam._id});
       ordersId.push(order.orderId);
     }

@@ -121,7 +121,7 @@ var app = new Vue({
       if(agree === '' && this.refund.status !== "P_APPLY_RM") return this.error = "请选择同意或者不同意";
       if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRM": "disagreeRM";
-      } else if(["B_APPLY_RM"].indexOf(this.refund.status) !== -1) {
+      } else if(["B_APPLY_RP"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRP": "disagreeRP";
       } else if(this.refund.status === "B_INPUT_CERT_RM") {
         type = agree? "uploadCerts": "agreeRM";
