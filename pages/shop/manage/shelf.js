@@ -170,7 +170,7 @@ function submitToShelf() {
   var proSta = $("input[name='shelfMethod']:checked").val();
   if(proSta == "insale") {
     productStatus = "insale";
-  }else if(proSta == "notonshelf") {
+  }else if(proSta == "notonshelf") { 
     productStatus = "notonshelf"
   }else if(proSta == "insaletime") {
     productStatus = "notonshelf";
