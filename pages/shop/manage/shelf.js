@@ -143,6 +143,12 @@ function submitToShelf() {
   }else{
     purchaseLimitCount = -1;
   }
+  // 是否需要上传购买凭证
+  var isUploadCert = $("#isPurchaseLimit").prop("checked");
+  var uploadCert = false;
+  if(isUploadCert){
+    uploadCert = true;
+  }
   // 获取需要支付的KCB和RMB各是多少
   var payUseKcb = 0; // 需要支付的KCB
   var payUseRmb = 0; // 需要支付的RMB
@@ -189,6 +195,7 @@ function submitToShelf() {
     imgMaster: imgMaster,
     // stockTotalCount: Number(stockTotalCount),
     // stockSurplusCount: Number(stockTotalCount),
+    uploadCert: uploadCert,
     stockCostMethod: stockCostMethod,
     freightPrice: freightPrice,
     productStatus: productStatus,

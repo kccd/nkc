@@ -37,8 +37,10 @@ orderRouter
 		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "订单无效");
-		var time = new Date();
-		await order.update({$set: {trackNumber:trackNumber, orderStatus:"unSign", shipToc:time}});
+    var time = new Date();
+    const shopSettings = await db.SettingModel.findOnly({_id: "shop"});
+    const autoReceiveTime = Date.now() + shopSettings.c.refund.buyerReceive * 60 * 60 * 1000;
+		await order.update({$set: {trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
 		await next();
 	})
   // 修改订单价格

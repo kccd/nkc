@@ -132,6 +132,12 @@ const schema = new Schema({
   logs: {
     type: [Schema.Types.Mixed],
     default: []
+  },
+  // 自动处理时出错的信息
+  error: {
+    type: String,
+    default: "",
+    index: 1
   }
 }, {
   collection: 'shopRefunds'
@@ -179,7 +185,7 @@ schema.methods.returnMoney = async function () {
   const SettingModel = mongoose.model("settings");
   const refund = await ShopRefundModel.findById(this._id);
   const {_id, money, orderId, status, sellerId, buyerId} = refund;
-  if(money > 0){}
+  if(money >= 0){}
   else{
     throwErr(`退款金额必须大于0， money: ${money}`)
   }
@@ -346,13 +352,14 @@ schema.methods.platformAgreeRM = async function() {
 
 /**
  * 卖家同意退款申请或超时自动同意
- * @param String reason: 退款理由或说名
+ * @param String reason: 退款理由或说明
  * @authro pengxiguaa 2019/3/27
  */
 schema.methods.sellerAgreeRM = async function(reason) {
   const ShopRefundModel = mongoose.model("shopRefunds");
   const {time} = await this.ensureRefundPermission(reason, [
     "B_APPLY_RM", 
+    "B_APPLY_RP",
     "B_INPUT_INFO",
     "B_INPUT_CERT_RM"
   ]);
@@ -403,6 +410,9 @@ schema.methods.sellerDisagreeRM = async function(reason) {
     $set: {
       refundStatus: "fail",
       applyToPlatform: true
+    },
+    $inc: {
+      autoReceiveTime: time - this.toc
     }
   });
 };  
@@ -474,6 +484,9 @@ schema.methods.platformDisagreeRM = async function(reason) {
   await ShopOrdersModel.update({orderId: order.orderId}, {
     $set: {
       refundStatus: "fail"
+    },
+    $inc: {
+      autoReceiveTime: time - this.toc
     }
   });
 } 
@@ -506,6 +519,9 @@ schema.methods.sellerDisagreeRP = async function(reason) {
   await ShopOrdersModel.update({orderId: order.orderId}, {
     $set: {
       refundStatus: "fail"
+    },
+    $inc: {
+      autoReceiveTime: time - this.toc
     }
   });
 }
@@ -544,7 +560,12 @@ schema.methods.buyerGiveUp = async function(reason) {
     }
   });
   await ShopOrdersModel.update({orderId: order.orderId}, {
-    refundStatus: "fail"
+    $set: {
+      refundStatus: "fail"
+    },
+    $inc: {
+      autoReceiveTime: time - this.toc
+    }
   });
 };
 

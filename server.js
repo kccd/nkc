@@ -40,6 +40,7 @@ const jobsInit = async () => {
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
   jobs.updateForums(updateDate.updateForumsCronStr);
   jobs.backupDatabase();
+  jobs.shopOrder();
 };
 
 
