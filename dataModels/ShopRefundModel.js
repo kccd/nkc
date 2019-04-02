@@ -111,7 +111,7 @@ const schema = new Schema({
     index: 1
   },
   // 退款是否成功，true: 成功, false: 失败, null: 处理中
-  successed: {
+  succeed: {
     type: Boolean,
     default: null,
     index: 1
@@ -271,7 +271,7 @@ schema.methods.returnMoney = async function () {
   await ShopRefundModel.updateMany({_id}, {
     $set: {
       status: "RM_CO",
-      successed: true,
+      succeed: true,
       tlm: time
     }, 
     $addToSet: {
@@ -305,8 +305,8 @@ schema.methods.ensureRefundPermission = async function(reason, operations) {
   const ShopRefundModel = mongoose.model("shopRefunds");
   if(!operations) throwErr(400, "operations is required");
   const refund = await ShopRefundModel.findById(this._id);
-  const {orderId, status, successed} = refund;
-  if(successed !== null) throwErr(400, "申请已完成，无法完成退款操作，请刷新");
+  const {orderId, status, succeed} = refund;
+  if(succeed !== null) throwErr(400, "申请已完成，无法完成退款操作，请刷新");
   const order = await ShopOrdersModel.findById(orderId);
   const {orderStatus, closeStatus, refundStatus} = order;
   if(closeStatus) throwErr(400, "订单已经被关闭，无法完成退款操作，请刷新");
@@ -396,7 +396,7 @@ schema.methods.sellerDisagreeRM = async function(reason) {
     $set: {
       tlm: time,
       status: "S_DISAGREE_RM",
-      successed: false,
+      succeed: false,
     },
     $addToSet: {
       logs: {
@@ -471,7 +471,7 @@ schema.methods.platformDisagreeRM = async function(reason) {
     $set: {
       tlm: time,
       status: "P_DISAGREE_RM",
-      successed: false
+      succeed: false
     },
     $addToSet: {
       logs: {
@@ -506,7 +506,7 @@ schema.methods.sellerDisagreeRP = async function(reason) {
     $set: {
       tlm: time,
       status: "S_DISAGREE_RP",
-      successed: false
+      succeed: false
     },
     $addToSet: {
       logs: {
@@ -549,7 +549,7 @@ schema.methods.buyerGiveUp = async function(reason) {
     $set: {
       status: "B_GU",
       tlm: time,
-      successed: false
+      succeed: false
     },
     $addToSet: {
       logs: {

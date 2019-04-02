@@ -150,7 +150,7 @@ jobs.shopOrder = () => {
       status: {
         $in: ["B_APPLY_RM", "B_APPLY_RP"]
       },
-      successed: null,
+      succeed: null,
       tlm: {
         $lt: time - (shopSettings.refund.agree*60*60*1000)
       }
@@ -176,7 +176,7 @@ jobs.shopOrder = () => {
     // 3. 买家退货，卖家确认收货超时
     refunds = await ShopRefundModel.find({
       status: "B_INPUT_INFO",
-      successed: null,
+      succeed: null,
       tlm: {
         $lt: time - (shopSettings.refund.sellerReceive*60*60*1000)
       }
@@ -197,7 +197,7 @@ jobs.shopOrder = () => {
     // 4. 买家申请平台介入
     refunds = await ShopRefundModel.find({
       status: "B_INPUT_CERT_RM",
-      successed: null,
+      succeed: null,
       tlm: {
         $lt: time - (shopSettings.refund.cert*60*60*1000)
       }
@@ -218,7 +218,7 @@ jobs.shopOrder = () => {
     // 5. 买家填写物流信息
     refunds = await ShopRefundModel.find({
       status: "S_AGREE_RP",
-      successed: null,
+      succeed: null,
       tlm: {
         $lt: time - (shopSettings.refund.buyerTrack*60*60*1000)
       }
@@ -254,6 +254,7 @@ jobs.shopOrder = () => {
     }
 
     // 7. 卖家未在规定的时间内发货。
+    
     // 8. 定时上架
     orders = await ShopGoodsModel.find({
       productStatus: "notonshelf",
@@ -265,7 +266,6 @@ jobs.shopOrder = () => {
       await order.onshelf();
     }
     console.log(`商城订单更新完毕`);
-    
   });
 };
 

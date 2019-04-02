@@ -8,9 +8,9 @@ applysRouter
       root: true
     };
     if(t === "applying") {
-      q.successed = null;
+      q.succeed = null;
     } else if(t === "done") {
-      q.successed = {$ne: null}
+      q.succeed = {$ne: null}
     }
     data.t = t;
     const count = await db.ShopRefundModel.count(q);
@@ -39,7 +39,7 @@ applysRouter
 		const {orderId} = body;
 		const refund = await db.ShopRefundModel.findOne({orderId}).sort({toc: -1});
 		if(!refund) ctx.throw(404, `订单【${orderId}】未处于退款流程`);
-    if(refund.successed !== null) ctx.throw(400, "申请已关闭， 请刷新");
+    if(refund.succeed !== null) ctx.throw(400, "申请已关闭， 请刷新");
     data.refund = refund;
     await next();
   })

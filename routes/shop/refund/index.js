@@ -20,7 +20,7 @@ router
     if(refundStatus === "success") ctx.throw(400, "订单退款已完成，请勿重复提交申请");
     // 判断申请是否已存在
     const refunds = await db.ShopRefundModel.find({orderId}).sort({toc: -1});
-    if(refunds.length && refunds[0].successed === null) {
+    if(refunds.length && refunds[0].succeed === null) {
       ctx.throw(400, "申请已提交，请勿重复提交申请");
     }
     if(root && !refunds.length) ctx.throw(400, "请先向卖家提出申请，卖家拒绝后可向平台提出申请");

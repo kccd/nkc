@@ -50,6 +50,7 @@ block content
                     strong {{order.status}}    
                   h5
                     a(:href="'/shop/order/'+order.orderId + '/detail'") 订单详情  
+                    a.m-l-1(:href="'/message?uid='+product.uid" target="_blank") 联系卖家
               .m-t-1(v-if='refund')
                 h5 类型：{{refundType(refund.type)}}  
                 h5 进度：{{status.description}}
@@ -115,7 +116,7 @@ block content
                     label 4、上传凭证（不超过
                       strong.text-danger 5
                       |张）
-                    input(type="file" @change='seletedFile' multiple="multiple")
+                    input(type="file" @change='selectedFile' multiple="multiple")
                     <transition name="fade">
                       h5.text-success(v-if="uploadStatus") {{uploadStatus}}
                     </transition> 
@@ -139,7 +140,7 @@ block content
                   h4 补充凭证（总共不超过
                     strong.text-danger 5
                     |张）
-                  input(type="file" @change='seletedFile' multiple="multiple")
+                  input(type="file" @change='selectedFile' multiple="multiple")
                   <transition name="fade">
                     h5.text-success(v-if="uploadStatus") {{uploadStatus}}
                   </transition>

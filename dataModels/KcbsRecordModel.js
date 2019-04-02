@@ -350,5 +350,10 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   return await alipay2.receipt(o);
 };
 
+kcbsRecordSchema.statics.hideAlipayInfo = async (records) => {
+  for(const record of records) {
+    record.c = "";
+  }
+}
 
 module.exports = mongoose.model('kcbsRecords', kcbsRecordSchema);

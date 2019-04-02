@@ -468,7 +468,10 @@ shopOrdersSchema.methods.extendCerts = async function(type) {
   }
   return this.certs = certs;
 };  
-
+/**
+ * 买家取消订单
+ * @author pengxiguaa 2019/4/2
+ */
 shopOrdersSchema.methods.cancelOrder = async function(reason) {
   const {contentLength} = require("../tools/checkString");
   if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
@@ -481,13 +484,13 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
-    status: "CO",
+    status: "B_GIVE_UP_ORDER",
     buyerId: this.uid,
     sellerId: product.uid,
     orderId: this.orderId,
     logs: [
       {
-        status: "CO",
+        status: "B_GIVE_UP_ORDER",
         info: reason,
         time
       }
@@ -501,5 +504,40 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
   }});
 };
 
+/**
+ * 卖家取消订单
+ * @author pengxiguaa 2019/4/2
+ */
+shopOrdersSchema.methods.sellerCancelOrder = async function(reason) {
+  const {contentLength} = require("../tools/checkString");
+  if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
+  const ShopRefundModel = mongoose.model("shopRefunds");
+  const SettingModel = mongoose.model("settings");
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const product = await ShopGoodsModel.findOnly({productId: this.productId});
+  const time = Date.now();
+  const refund = ShopRefundModel({
+    _id: await SettingModel.operateSystemID("shopRefunds", 1),
+    toc: time,
+    status: "B_GIVE_UP_ORDER",
+    buyerId: this.uid,
+    sellerId: product.uid,
+    orderId: this.orderId,
+    logs: [
+      {
+        status: "B_GIVE_UP_ORDER",
+        info: reason,
+        time
+      }
+    ]
+  });
+  await refund.save();
+  await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+    closeToc: time,
+    closeStatus: true,
+    refundStatus: "success"
+  }});
+};
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 module.exports = ShopOrdersModel;

@@ -65,16 +65,17 @@ block shopAccountContent
                 a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
               td #{numToFloatTwo(order.orderPrice)}
               td 
+                if order.orderStatus !== "finish" && order.closeStatus !== true
+                  if order.orderStatus === "unCost"
+                    a(href=`/shop/order/${order.orderId}/refund`) 取消订单
+                  else 
+                    a(href=`/shop/order/${order.orderId}/refund`) 申请退款
                 if order.orderStatus == "unCost"
                   p
                     a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"
                   p
                     button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
-                if order.orderStatus !== "finish" && order.closeStatus !== true
-                  p
-                    a(href=`/shop/order/${order.orderId}/refund`) 取消订单
-                    //button(onclick=`cancelOrder(${order.orderId})`) 取消订单
                 if order.refundStatus == "ing"
                   p
                     a(href=`/shop/order/${order.orderId}/refund`) 退款详情

@@ -16,6 +16,7 @@ router
       const order = await db.ShopOrdersModel.findOne({orderId});
       if(!order) ctx.throw(400, `未找到ID为【${orderId}】的订单`);
       if(order.uid !== user.uid) ctx.throw(403, `订单【${orderId}】错误`);
+      if(order.closeStatus) ctx.throw(400, "订单已关闭");
       if(order.orderStatus !== 'unCost') ctx.throw(400, `订单【${orderId}】暂不需要付款，请勿重复提交`);
       orders.push(order);
     }

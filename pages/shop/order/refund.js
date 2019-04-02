@@ -166,7 +166,7 @@ var app = new Vue({
       if(arr.length < index + 1) {
         dom.value =  "";
         return;
-      };
+      }
       var file = arr[index];
       var formData = new FormData();
       formData.append("type", "refund");
@@ -196,7 +196,7 @@ var app = new Vue({
           app.upload(arr, index+1, dom);
         });
     },
-    seletedFile: function(e) {
+    selectedFile: function(e) {
       var inputDom = e.target;
       var files = inputDom.files;
       this.upload(files, 0, inputDom);

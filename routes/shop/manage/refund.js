@@ -31,7 +31,7 @@ router
       buyerId: order.uid
     }).sort({toc: 1});
     if(refunds.length !== 0) {
-      if(refunds[refunds.length - 1].successed === null) data.refund = refunds[refunds.length - 1];
+      if(refunds[refunds.length - 1].succeed === null) data.refund = refunds[refunds.length - 1];
     }
     await db.ShopRefundModel.extendLogs(refunds, ctx.state.lang);
     data.refunds = refunds;
