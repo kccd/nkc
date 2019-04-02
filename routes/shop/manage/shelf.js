@@ -38,7 +38,8 @@ shelfRouter
       productStatus,
       shelfTime,
       purchaseLimitCount,
-      productParams
+      productParams,
+      uploadCert
     } = body.post;
     const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
@@ -127,7 +128,7 @@ shelfRouter
       imgIntroductions,
       imgMaster,
       stockCostMethod,
-      productStatus,
+      productStatus: "notonshelf",
       shelfTime,
       freightPrice,     
       storeId,

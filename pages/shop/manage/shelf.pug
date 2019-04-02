@@ -122,6 +122,22 @@ block name
                     input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock')
                     |     买家付款减库存
                     b(style="color:red")  （付款减库存，存在超卖风险）
+            //- .form-group
+            //-   label.col-sm-2.control-label 购买限制
+            //-   .col-sm-10
+            //-     .checkbox
+            //-       label
+            //-         input#isPurchaseLimit(type='checkbox')
+            //-         |  是否限购
+            //- .form-group#purchaseLimitDom(style="display:none")
+            //-   label.col-sm-2.control-label 每人限购数量
+            //-   .col-sm-5
+            //-     input.form-control#purchaseLimitCount(type="number", name="")
+      .panel.panel-info
+        .panel-heading
+          | 购买条件
+        .panel-body
+          .form-horizontal
             .form-group
               label.col-sm-2.control-label 购买限制
               .col-sm-10
@@ -133,6 +149,13 @@ block name
               label.col-sm-2.control-label 每人限购数量
               .col-sm-5
                 input.form-control#purchaseLimitCount(type="number", name="")
+            .form-group
+              label.col-sm-2.control-label 购买凭证
+              .col-sm-10
+                .checkbox
+                  label
+                    input#isUploadCert(type='checkbox')
+                    |  是否需要上传购买凭证
       .panel.panel-info
         .panel-heading
           | 运费物流

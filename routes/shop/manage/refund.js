@@ -68,6 +68,7 @@ router
       }
 
       await refund.sellerAgreeRM(reason);
+      await db.ShopProductsParamModel.refundRestoreStock(refund);
     } else if(type === "disagreeRM") {
       // 卖家拒绝退款
       await refund.sellerDisagreeRM(reason);

@@ -71,6 +71,8 @@ router
     }
     let totalMoney = 0;
     orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    //减库存
+    await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
     for(const order of orders) {
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
@@ -92,6 +94,9 @@ router
         payToc: r.toc
       }});
     }
+    //减库存
+    // await db.ShopProductParamModel.productParamReduceStock(orders,'payReduceStock');
+    // console.log(orders);
     await db.UserModel.update({uid: user.uid}, {$inc: {kcb: -1*totalMoney}});
     await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': totalMoney}});
     await next();

@@ -115,7 +115,7 @@ let creditString = (t) => {
     case 'xsf':
       return '学术分';
     case 'creditKcb':
-      return '科创币';
+      return '科创币';   
     default:
       return '[未定义积分]'
   }
