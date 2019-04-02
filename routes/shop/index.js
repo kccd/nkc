@@ -15,7 +15,7 @@ shopRouter
   .use("/", async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
-    if(!user) await next();
+    if(!user) return ctx.redirect('/login');
     data.shopInfo = {
       cartProductCount: await db.ShopCartModel.getProductCount(user)
     };

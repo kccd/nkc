@@ -22,7 +22,7 @@ router
       data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
     }
     // 检测限购
-    data.cartsData = await db.ShopGoodsModel.checkOutPurchaseLimit(data.cartsData);
+    data.cartsData = await db.ShopGoodsModel.checkOutPurchaseLimit(data.cartsData, user.uid);
     data.billType = billType;
 
     // 取出全部收货地址
