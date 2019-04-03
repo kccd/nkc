@@ -112,6 +112,8 @@ block title
           -var username = c.fromUser.username
           -var profile = '/u/'+c.from
           .ThreadPostCreditItem
+            if c.type === "creditKcb"
+              -c.num = c.num/100;
             span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA

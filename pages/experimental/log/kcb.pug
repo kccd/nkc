@@ -61,10 +61,10 @@ block content
                   span(v-else) {{record.kcbsType.description}}
                 th
                   span(v-if='record.from === "bank"') 科创人民很行
-                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb') {{record.fromUser.username}}
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb/100') {{record.fromUser.username}}
                 th
                   span(v-if='record.to === "bank"') 科创人民很行
-                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb') {{record.toUser.username}}
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
                 th {{record.num>0?'+':''}}{{record.num}}
                 th {{record.description}}
                 th

@@ -1,6 +1,9 @@
 extends ../shopBase
 block shopTitle
-  title 申请退款
+  if data.order.orderStatus === "unCost"
+    title 取消订单
+  else
+    title 申请退款
   +includeCSS('/shop/order/order.css')
 block content
   .container-fluid.max-width
@@ -83,7 +86,7 @@ block content
                 .m-t-1.m-b-2
                   span.text-danger 注意事项：
                   p(v-if="applyType === 'seller'") 向卖家申请退款时需提交申请理由，待卖家同意后系统将自动退还科创币。
-                  p(v-else) 申请平台接入，需买家卖家上传凭证...
+                  p(v-else) 只有卖家拒绝您的退款申请后，才可以请求平台接入
 
               
               .m-t-1(v-if="display.apply && (applyType !== 'platform' || order.applyToPlatform)")

@@ -972,9 +972,9 @@ function credit(pid, type, kcb) {
           })
       } else if(type === 'kcb') {
 
-        if(num.value > kcb) return screenTopWarning('您的科创币不足');
+        if(num.value*100 > kcb) return screenTopWarning('您的科创币不足');
         var obj = {
-          num: num.value,
+          num: num.value*100,
           description: description.value
         };
         nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)

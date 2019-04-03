@@ -60,18 +60,20 @@ block name
                   a(href=`/shop/manage/${order.storeId}/order/detail?orderId=${order.orderId}`) 订单详情
               td #{numToFloatTwo(order.orderPrice)}
               td
-                if order.orderStatus == "unCost"
+                if !order.closeStatus && ["unCost", "unShip"].includes(order.orderStatus)
+                  a(href=`/shop/manage/${data.myStore.storeId}/order/cancel?orderId=${order.orderId}`) 取消订单
+                if order.orderStatus == "unCost" && !order.closeStatus
                   p
                     button(onclick=`openEditOrderModal(${data.myStore.storeId}, ${order.orderId})`) 修改订单
+                if order.refundStatus == "ing"
+                  p
+                    a(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 退款详情
+                if order.orderStatus == "unSign" || order.orderStatus == "finish"
+                  p
+                    a(href=`/shop/manage/${data.myStore.storeId}/order/logositics?orderId=${order.orderId}`) 查看物流
                 if order.orderStatus == "unShip" && order.closeStatus !== true
                   p
                     button(onclick=`openSendGoodsModal(${data.myStore.storeId}, ${order.orderId})`) 发货
-                if order.refundStatus == "ing"
-                  p
-                    a.btn.btn-default.btn-sm(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 退款详情
-                if order.orderStatus == "unSign" || order.orderStatus == "finish"
-                  p
-                    a.btn.btn-default.btn-sm(href=`/shop/manage/${data.myStore.storeId}/order/logositics?orderId=${order.orderId}`) 查看物流
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
 

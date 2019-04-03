@@ -81,6 +81,10 @@ module.exports = {
         },
         logositics: {
           GET: 'visitStoreOrderLogositics'
+        },
+        cancel: {
+          GET: "storeCancelOrder",
+          POST: "storeCancelOrder"
         }
       },
       goodslist: {

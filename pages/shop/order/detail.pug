@@ -239,7 +239,7 @@ block shopAccountContent
         tbody
           tr
             td
-              a(href=`/shop/product/${order.productId}`)!=`${order.product.name}`
+              a(href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
             td!=`${order.productParam.name}`
             td #{numToFloatTwo(order.productParam.price)}
             td #{numToFloatTwo(order.product.freightPrice)}
