@@ -5,6 +5,10 @@ block name
   .row
     .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
       ul.nav.nav-pills(style="border:1px solid #ddd")
+        li(class=!data.productStatus || data.productStatus == "insale"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/goodslist?productStatus=insale`, data-toggle='url') 出售中的商品
+        li(class=data.productStatus == "notonshelf"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/goodslist?productStatus=notonshelf`, data-toggle='url') 仓库中的商品
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
     .col-md-12.col-sm-12.col-xs-12  
@@ -23,7 +27,8 @@ block name
             tr(style="min-height:100px;background-color: #d3f2ff;border-top:2px solid black;")
               td(style="display:flex")
                 img(src=`/r/${product.imgMaster}` style="width:60px;height:60px;margin-right5px")
-                span(style="font-size:12px")=product.name
+                a(href=`/shop/product/${product.productId}` style="font-size:12px")!=`(商品ID：${product.productId})&nbsp;${product.name}`
+                //- span(style="font-size:12px")=product.name
               td=product.toc.toLocaleString()
               td!=`${product.productParams.length}`
               if !purchaseLimitCount || purchaseLimitCount == -1

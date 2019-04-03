@@ -15,7 +15,6 @@ shopRouter
   .use("/", async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
-    if(!user) return ctx.redirect('/login');
     data.shopInfo = {
       cartProductCount: await db.ShopCartModel.getProductCount(user)
     };
@@ -23,7 +22,11 @@ shopRouter
   })
   .get('/', async (ctx, next) => {
     const {data, db ,query, params} = ctx;
-    const homeSetting = await db.ShopSettingsModel.findOne({type:"homeSetting"});
+    let homeSetting = await db.ShopSettingsModel.findOne({type:"homeSetting"});
+    if(!homeSetting) {
+      homeSetting = new db.ShopSettingsModel({});
+      homeSetting.save();
+    }
     // 取出精选商品
     let featuredItems = await db.ShopGoodsModel.find({productId:{$in:homeSetting.featureds}});
     data.featuredItems = await db.ShopGoodsModel.extendProductsInfo(featuredItems);

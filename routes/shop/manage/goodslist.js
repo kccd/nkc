@@ -3,9 +3,25 @@ const goodslistRouter = new Router();
 goodslistRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
+		const {page = 0} = query;
+		let {productStatus} = query;
+		data.productStatus = productStatus;
     const storeId = params.account;
-    const products = await db.ShopGoodsModel.find({storeId});
+    // 构造查询条件
+		let searchMap = {
+			storeId : storeId
+    }
+    if(!productStatus || productStatus == "insale") {
+      searchMap.productStatus = "insale"
+    }else{
+      searchMap.productStatus = "notonshelf";
+    }
+    const count = await db.ShopGoodsModel.count(searchMap);
+		const paging = nkcModules.apiFunction.paging(page, count);
+		data.paging = paging;
+    const products = await db.ShopGoodsModel.find(searchMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);;
     data.products = await db.ShopGoodsModel.extendProductsInfo(products);
+		data.productStatus = productStatus;
 		ctx.template = 'shop/manage/goodslist.pug';
 		await next();
   })

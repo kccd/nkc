@@ -396,7 +396,7 @@ fn.getIpAddress = (ip) => {
     path: `/v3/ip?ip=${ip}`,    //请求地址
     headers: {    //请求头
         "Content-Type": "application/json; charset=utf-8",
-        "Authorization": "APPCODE 90286cebbb4f49e3b97bf33c93a94cc3"
+        "Authorization": "APPCODE b9bf63ef741a4d7aadf53059e3fe009a"
     }
   }
   return new Promise((resolve, reject) => {
@@ -435,7 +435,7 @@ fn.getTrackInfo = (trackNumber) => {
     path: `/kdi?no=${trackNumber}`,    //请求地址
     headers: {    //请求头
         "Content-Type": "application/json; charset=utf-8",
-        "Authorization": "APPCODE 90286cebbb4f49e3b97bf33c93a94cc3"
+        "Authorization": "APPCODE b9bf63ef741a4d7aadf53059e3fe009a"
     }
   }
   return new Promise((resolve, reject) => {

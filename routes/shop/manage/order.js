@@ -6,7 +6,6 @@ orderRouter
 		const {data, db, params, query, nkcModules} = ctx;
 		const {page = 0} = query;
 		let {orderStatus} = query;
-		data.orderStatus = orderStatus;
 		const {user} = data;
 		let storeId = params.account;
 		// 构造查询条件
@@ -67,6 +66,15 @@ orderRouter
 		if(!order) ctx.throw(404, "未找到订单");
 		let orders = await db.ShopOrdersModel.storeExtendOrdersInfo([order]);
 		data.order = orders[0];
+		// 获取订单凭证
+		const certs = await db.ShopCertModel.find({orderId});
+		data.certs = certs;
+    // 获取订单关闭原因
+    const refund = await db.ShopRefundModel.findOne({orderId}).sort({_id:-1}).limit(1);
+    if(refund) {
+      refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
+    }
+    data.refund = refund;
 		if(data.order.store.uid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
 		ctx.template = 'shop/manage/detail.pug';
 		await next();
