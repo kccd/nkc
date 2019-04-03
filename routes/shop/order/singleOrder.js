@@ -47,6 +47,15 @@ router
     if(!order) ctx.throw(400, "订单不存在");
     let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     data.order = orders[0];
+		// 获取订单凭证
+		const certs = await db.ShopCertModel.find({orderId});
+    data.certs = certs;
+    // 获取订单关闭原因
+    const refund = await db.ShopRefundModel.findOne({orderId}).sort({_id:-1}).limit(1);
+    if(refund) {
+      refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
+    }
+    data.refund = refund;
     ctx.template = '/shop/order/detail.pug';
     await next();
   })

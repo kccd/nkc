@@ -2,6 +2,12 @@ const Router = require('koa-router');
 const router = new Router();
 const singleOrderRouter = require('./singleOrder');
 router
+  .use('/', async (ctx, next) => {
+    const {data} = ctx;
+    const {user} = data;
+    if(!user) return ctx.redirect('/login');
+    await next();
+  })
   /* .use('/', async (ctx, next) => {
     // 处理超过30分钟未付款的订单
     await ctx.db.ShopOrdersModel.clearTimeoutOrders(ctx.data.user.uid);
@@ -25,16 +31,8 @@ router
     }
     const count = await db.ShopOrdersModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    let sort = {};
-    if(orderStatus === 'unCose' || orderStatus === "close") {
-      sort = {
-        orderToc: -1
-      }
-    } else {
-      sort = {
-        payToc: -1
-      }
-    }
+    data.paging = paging;
+    let sort = {orderToc: -1};
     const orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
     data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
@@ -84,6 +82,15 @@ router
     if(!order) ctx.throw(400, "订单不存在");
     let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     data.order = orders[0];
+		// 获取订单凭证
+		const certs = await db.ShopCertModel.find({orderId});
+    data.certs = certs;
+    // 获取订单关闭原因
+    const refund = await db.ShopRefundModel.findOne({orderId}).sort({_id:-1}).limit(1);
+    if(refund) {
+      refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
+    }
+    data.refund = refund;
     ctx.template = '/shop/order/detail.pug';
     await next();
   })

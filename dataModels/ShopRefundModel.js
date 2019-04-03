@@ -154,17 +154,33 @@ schema.statics.findById = async (_id) => {
   return refund;
 };
 
-/* 
-* 推展退款申请操作记录 翻译操作类型
-* @param refunds: 退款申请对象数组
-  @param lang: ctx.state.lang 翻译函数
-  @author pengxiguaa 2019/3/26
-*/
+/** 
+  * @name extendLogs
+  * @description 推展退款申请操作记录,翻译操作类型
+  * @param {Array} refunds 退款申请对象数组
+  * @param {Object = ctx.state.lang} lang 翻译函数
+  * @author pengxiguaa 2019-3-26
+  */
 schema.statics.extendLogs = async (refunds, lang) => {
   refunds.map(r => {
     r.logs.map(l => {
       l.description = lang("shopRefundStatus", l.status) || l.status;
     }); 
+  });
+};
+
+/**
+ * @name extendLastLog
+ * @description 拓展退款申请操作记录，直取最后一条
+ * @param {Array} refunds 退款申请对象数组
+ * @param {Object = ctx.state.lang} lang 翻译函数
+ * @author Kris 2019-4-3
+ */
+schema.statics.extendLastLog = async (refunds, lang) => {
+  refunds.map(r => {
+    r.logs.map(l => {
+      l.description = lang("shopRefundStatus", l.status) || l.status
+    });
   });
 };
 

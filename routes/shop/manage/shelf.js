@@ -44,7 +44,7 @@ shelfRouter
     const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
     const store = await db.ShopStoresModel.findOne({uid: user.uid});
-    if(!store) ctx.thrwo(404, '您还未开设地摊儿');
+    if(!store) ctx.throw(404, '您还未开设地摊儿');
     const {storeId} = store;
     if(!productName) ctx.throw(400, '商品名不能为空');
     if(contentLength(productName) > 100) ctx.throw(400, '商品名不能超过100字节');
@@ -129,6 +129,7 @@ shelfRouter
       imgMaster,
       stockCostMethod,
       productStatus: "notonshelf",
+      uploadCert,
       shelfTime,
       freightPrice,     
       storeId,
