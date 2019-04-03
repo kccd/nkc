@@ -11,8 +11,8 @@ block content
             |&nbsp;个
           .display-i-b.p-l-1 
             a.btn.btn-success.btn-sm(href='/account/finance/recharge') 充值
-            span &nbsp;
-            a.btn.btn-default.btn-sm(href='/account/finance/withdraw') 提现
+            //-span &nbsp;
+              a.btn.btn-default.btn-sm(href='/account/finance/withdraw') 提现
       .col-xs-12.col-md-12.m-b-1
         .ul.nav.nav-tabs  
           li(role='presentation' class=data.t==='all'?'active': '')
@@ -96,7 +96,9 @@ block content
                       span= record.num/100
                   th
                     if record.pid
-                      a(href=`/p/${record.pid}` target='_blank')=`文号(${record.pid})`
+                      a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
+                    if record.ordersId && record.ordersId.length !== 0
+                      span=`订单号（${record.ordersId.join(', ')}）`
           if !data.kcbsRecords.length
             .text-center 暂无记录            
       .col-xs-12.col-md-12

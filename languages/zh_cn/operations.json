@@ -497,6 +497,7 @@
   "saveShopCerts": "商城中用户保存凭证",
   "visitShopRefundSettings": "访问后台商城退款设置",
   "modifyShopRefundSettings": "修改后台商城退款设置",
+  "storeCancelOrder": "取消订单",
 
 
   "APPgetUserInfo": "app获取用户信息",

@@ -31,7 +31,6 @@ router
     if(userPersonal){
       addresses = userPersonal.addresses;
     }
-    console.log(data.cartsData);
     data.addresses = addresses;
     ctx.template = 'shop/bill/bill.pug';
     await next();

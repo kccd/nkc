@@ -1,6 +1,8 @@
 const Router = require('koa-router');
 const orderRouter = new Router();
 const refundRouter = require("./refund");
+const cancelRouter = require("./cancel");
+
 orderRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
@@ -90,5 +92,6 @@ orderRouter
 		ctx.template = "/shop/manage/logositics.pug";
 		await next();
 	})
+  .use("/cancel", cancelRouter.routes(), cancelRouter.allowedMethods())
   .use("/refund", refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = orderRouter;

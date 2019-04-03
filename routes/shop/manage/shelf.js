@@ -146,14 +146,15 @@ shelfRouter
       const d = db.ShopProductsParamModel(p);
       await d.save();
     }
-    await product.save();
 
     // 立即上架
     if(productStatus === "insale") {
       await product.onshelf();
     }
 
+    await product.save();
+
     data.product = product;
 		await next();
-	})
+	});
 module.exports = shelfRouter;

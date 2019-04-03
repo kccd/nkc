@@ -1,0 +1,39 @@
+extends ../../shopBase
+block shopTitle
+  title 取消订单
+block content
+  .container-fluid.max-width
+    .hidden#data=JSON.stringify({order: data.order, product: data.product, myStore: data.myStore})
+    .row#app(v-if="order" v-cloak)
+      .col-xs-12.col-md-6
+        h4 取消订单
+        img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+        div.display-i-b
+          a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
+          h5
+            span.m-r-1 数量：{{order.count}}
+            span.m-r-1 规格：{{order.productParam.name.join('+')}}
+            span.m-r-1 价格总计：
+              strong.text-danger {{order.orderPrice/100}}
+              | &nbsp;元
+          h5 订单状态：
+            strong {{order.status}}
+          h5
+            a(:href="'/shop/manage/'+myStore.storeId + '/order/detail?orderId=' + order.orderId") 订单详情
+        .form
+          .form-group
+            h5 请输入理由（不超过1000字节）
+            textarea.form-control(rows=7 v-model="reason")
+          div(v-if="needPassword")
+            .form-group
+              h5 请输入补偿金额（科创币：1 - 50）
+              input.form-control(type="number" v-model.number="money")
+            .form-group
+              h5 请输入登录密码
+              input.form-control(type="password" v-model="password")
+        .form-group
+          h5.text-danger(v-if="error") {{error}}
+          h5.text-success(v-if="info") {{info}}
+          button.btn.btn-primary.btn-block(@click="submit") 提交
+block scripts
+  +includeJS("/shop/manage/cancel/cancel.js")

@@ -234,7 +234,7 @@ schema.methods.returnMoney = async function () {
     // 情况1
     const diff = orderPrice - money;
     const orderToS = KcbsRecordModel({
-      _id: await SettingModel.operateSystemID("kcbsRecord", 1),
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
       to: buyerId,
       type: "refund",
@@ -244,7 +244,7 @@ schema.methods.returnMoney = async function () {
       ordersId: [orderId]
     });
     const orderToB = KcbsRecordModel({
-      _id: await SettingModel.operateSystemID("kcbsRecord", 1),
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
       to: sellerId,
       type: "sell",

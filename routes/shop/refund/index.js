@@ -46,7 +46,8 @@ router
         root
       };
 
-      const refundMoney = Number(money)*100;
+      let refundMoney = Number(money)*100;
+      refundMoney = Number(refundMoney.toFixed(2));
       if(refundMoney >= 0 && refundMoney <= order.orderPrice){
         r.money = refundMoney;
       }

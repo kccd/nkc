@@ -10,7 +10,7 @@ block shopSettings
         a(href=`/u/${u.uid}` target="_blank")= u.username
         | &nbsp;
         a(target="_blank" href=`/message?uid=${u.uid}`) 发私信
-      h5=`文章：${u.threadCount}，回复：${u.postCount}，学术分：${u.xsf}，科创币：${u.kcb}`
+      h5=`文章：${u.threadCount}，回复：${u.postCount}，学术分：${u.xsf}，科创币：${u.kcb/100}`
       h5=`手机号：${u.nationCode?"+"+u.nationCode+" ":""}${u.mobile}`
       h5=`邮箱：${u.email? u.email: "未绑定"}`
       h5=`说明：${u.reason}`

@@ -83,7 +83,7 @@ block content
                   td #{numToFloatTwo(bill.productParam.price)} 
                   td #{numToFloatTwo(bill.product.freightPrice)} 
                   td=bill.product.freightPrice 
-                  td.order(paid=`${bill.productParam._id}`)=bill.count
+                  td.order(paid=`${bill.productParam._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
                   td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
                   td  
                     +orderCert(bill)
@@ -92,11 +92,12 @@ block content
             else if data.billType == "product"
               for bill in cartsData
                 tr
-                  td=bill.product.name
+                  td
+                    a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name
                   td=bill.name
                   td #{numToFloatTwo(bill.price)} 
                   td #{numToFloatTwo(bill.product.freightPrice)} 
-                  td.order(paid=`${bill._id}`)=bill.count
+                  td.order(paid=`${bill._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
                   td.subtotal #{numToFloatTwo((bill.price+bill.product.freightPrice)*bill.count)}
                   td  
                     +orderCert(bill)

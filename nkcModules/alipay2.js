@@ -19,10 +19,7 @@ const privatekey = fs.readFileSync(path.resolve(__dirname, '../key/rsa_private_k
 const publicKey = fs.readFileSync(path.resolve(__dirname, '../key/alipay_public_key.pem'));
 const {app_id, url} = alipayConfig;
 const serverConfig = require('../config/server.json');
-let notifyUrl = `https://soccos.cn/test`;
-if(global.NKC.NODE_ENV === 'production') {
-  notifyUrl = `${serverConfig.domain}/finance/recharge`;
-}
+
 const func = {};
 func.transfer = async (o) => {
   const {account, name, id, money, notes} = o;
@@ -100,6 +97,10 @@ func.receipt = async (o) => {
   if(!title) throwErr('订单标题不能为空');
   if(!notes) throwErr('订单描述不能为空');
   if(!returnUrl) throwErr('跳转地址不能为空');
+  let notifyUrl = `https://soccos.cn/test`;
+  if(global.NKC.NODE_ENV === 'production') {
+    notifyUrl = `${serverConfig.domain}/finance/recharge`;
+  }
   goodsInfo = goodsInfo || [];
   const goods_detail = [];
   for(const g of goodsInfo) {

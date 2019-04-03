@@ -253,9 +253,7 @@ jobs.shopOrder = () => {
       );
     }
 
-    // 7. 卖家未在规定的时间内发货。
-    
-    // 8. 定时上架
+    // 7. 定时上架
     orders = await ShopGoodsModel.find({
       productStatus: "notonshelf",
       shelfTime: {

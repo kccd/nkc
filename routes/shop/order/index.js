@@ -135,7 +135,7 @@ router
       await order.save();
       //减库存
       await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
-      await db.ShopCartModel.update({_id: paramCert[productParam._id]}, {$set: {
+      await db.ShopCertModel.update({_id: paramCert[productParam._id]}, {$set: {
         orderId: orderId,
         deletable: false
       }});

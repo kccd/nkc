@@ -504,40 +504,94 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
   }});
 };
 
-/**
- * 卖家取消订单
- * @author pengxiguaa 2019/4/2
- */
-shopOrdersSchema.methods.sellerCancelOrder = async function(reason) {
+/*
+* 卖家取消订单
+* 若卖家未付款，则填写理由直接取消即可
+* 若卖家已付款，则需卖家填写补偿金额并且输入密码填写理由
+* @param {Number} money 卖家支付给卖家的补偿款
+* @param {String} reason 取消的理由
+* @author pengixguaa 2019/4/3
+* */
+shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   const {contentLength} = require("../tools/checkString");
   if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
   const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const UserModel = mongoose.model("users");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
   const product = await ShopGoodsModel.findOnly({productId: this.productId});
+  const orders = await ShopOrdersModel.userExtendOrdersInfo([this]);
+  const order = orders[0];
   const time = Date.now();
+  if(!["unCost", "unShip"].includes(order.orderStatus)) throwErr(400, "卖家仅能取消待付款或待发货的订单");
+  if(order.orderStatus === "unShip") {
+    if(money >= 100 && money <= 5000) {}
+    else throwErr(400, "补偿金额不能小于1科创币且不能大于50科创币");
+  }
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
-    status: "B_GIVE_UP_ORDER",
+    status: "S_GIVE_UP_ORDER",
     buyerId: this.uid,
     sellerId: product.uid,
     orderId: this.orderId,
     logs: [
       {
-        status: "B_GIVE_UP_ORDER",
+        status: "S_GIVE_UP_ORDER",
         info: reason,
+        money,
         time
       }
     ]
   });
   await refund.save();
+  const description = `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`;
+  if(order.orderStatus === "unShip") {
+    const refundRecord = KcbsRecordModel({
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+      from: "bank",
+      to: order.uid,
+      type: "refund",
+      num: order.orderPrice,
+      description,
+      ordersId: [order.orderId]
+    });
+    const record = KcbsRecordModel({
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+      from: product.uid,
+      to: order.uid,
+      description,
+      type: "sellerCancelOrder",
+      num: money,
+      ordersId: [order.orderId]
+    });
+    await refundRecord.save();
+    await record.save();
+    await SettingModel.update({_id: "kcb"}, {
+      $inc: {
+        "c.totalMoney": -1*order.orderPrice
+      }
+    });
+    await UserModel.update({uid: record.from}, {
+      $inc: {
+        kcb: -1*record.num
+      }
+    });
+    await UserModel.update({uid: record.to}, {
+      $inc: {
+        kcb: record.num + order.orderPrice
+      }
+    });
+  }
   await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
     closeToc: time,
     closeStatus: true,
     refundStatus: "success"
   }});
 };
+
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
+
 module.exports = ShopOrdersModel;

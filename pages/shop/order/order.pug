@@ -51,7 +51,8 @@ block shopAccountContent
               //- td=order.orderToc.toLocaleString()
               td
                 //- img(src=`/r/${order.product.imgMaster}` style="width:100px;height:100px")
-                span=order.product.name
+                span
+                  a(href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
                 span(style="font-size:18px;color:red;font-weight:800;margin-left:10px")=order.productParam.name
               //- td=order.productParam.name
               td #{numToFloatTwo(order.productParam.price)}
@@ -70,7 +71,7 @@ block shopAccountContent
                     a(href=`/shop/order/${order.orderId}/refund`) 取消订单
                   else 
                     a(href=`/shop/order/${order.orderId}/refund`) 申请退款
-                if order.orderStatus == "unCost"
+                if order.orderStatus == "unCost"&& order.closeStatus !== true
                   p
                     a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
                 if order.orderStatus == "unSign" || order.orderStatus == "finish"

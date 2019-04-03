@@ -13,7 +13,7 @@ if data.user && data.kcbSettings && data.xsfSettings
                 span.kcb-info= `向作者转账科创币以资鼓励`
               .form-group
                 label 分值
-                span.kcb-info(style='display:inline-block;')=`（${data.kcbSettings.minCount} - ${data.kcbSettings.maxCount}）`
+                span.kcb-info(style='display:inline-block;')=`（${data.kcbSettings.minCount/100} - ${data.kcbSettings.maxCount/100}）`
                 span.xsf-info(style='display:inline-block;')=`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`
                 input.form-control.num(value='1' type='number')
               .form-group
