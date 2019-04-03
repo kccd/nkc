@@ -61,7 +61,7 @@ block content
                 .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
                   h5 科创币
                   h4
-                    strong= data.targetUser.kcb
+                    strong= data.targetUser.kcb/100
             .col-xs-6.col-md-6
               .row
                 a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
@@ -227,7 +227,7 @@ block content
                         if i !== 8
                           -const user = data.newSubscribers[i];
                           -const navbarDesc = user.navbarDesc;
-                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
+                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribers.length > 8
@@ -249,7 +249,7 @@ block content
                         if i !== 8
                           -const user = data.newSubscribeUsers[i];
                           -const navbarDesc = user.navbarDesc;
-                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
+                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribeUsers.length > 8
