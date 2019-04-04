@@ -249,7 +249,7 @@ block content
                         if i !== 8
                           -const user = data.newSubscribeUsers[i];
                           -const navbarDesc = user.navbarDesc;
-                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
+                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100 }\n`+`${user.info.certsName}`;
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribeUsers.length > 8

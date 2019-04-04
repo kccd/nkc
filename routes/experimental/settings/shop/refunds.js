@@ -53,7 +53,7 @@ applysRouter
 	.post('/disagree', async (ctx, next) => {
 		const {data, body} = ctx;
     const {refund} = data;
-    await refund.platformAgreeRM(body.reason);
+    await refund.platformDisagreeRM(body.reason);
 		await next();
 	})
 	.get('/refundDetail', async(ctx, next) => {

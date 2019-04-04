@@ -118,9 +118,8 @@ jobs.updateForums = cronStr => {
 	})
 };
 
-jobs.shopOrder = () => {
+jobs.shop = () => {
   scheduleJob("0 * * * * *", async () => {
-    console.log(`开始更新商城订单`);
     const time = Date.now();
     let shopSettings = await SettingModel.findOnly({_id: "shop"});
     shopSettings = shopSettings.c;
@@ -134,7 +133,6 @@ jobs.shopOrder = () => {
         $lte: time
       }
     });
-    console.log(orders.length)
     for(const order of orders) {
       try {
         await order.confirmReceipt();
@@ -154,13 +152,8 @@ jobs.shopOrder = () => {
       tlm: {
         $lt: time - (shopSettings.refund.agree*60*60*1000)
       }
-    }); 
-    if(refunds.length !== 0) {
-      const a = refunds[0];
-      console.log(new Date(a.tlm).toLocaleString(), new Date(time).toLocaleString(), shopSettings.refund.agree*60*60, shopSettings.refund.agree);
-    }
-    
-    console.log(refunds.length)
+    });
+
     for(const refund of refunds) {
       try{
         await refund.sellerAgreeRM(
@@ -181,7 +174,6 @@ jobs.shopOrder = () => {
         $lt: time - (shopSettings.refund.sellerReceive*60*60*1000)
       }
     });
-    console.log(refunds.length)
     for(const refund of refunds) {
       try {
         await refund.sellerAgreeRM(
@@ -202,7 +194,6 @@ jobs.shopOrder = () => {
         $lt: time - (shopSettings.refund.cert*60*60*1000)
       }
     });
-    console.log(refunds.length)
     for(const refund of refunds) {
       try{
         await refund.sellerAgreeRM(
@@ -225,12 +216,10 @@ jobs.shopOrder = () => {
     });
     for(const refund of refunds) {
       try {
-        console.log(refund)
         await refund.buyerGiveUp(
           "买家发货超时，默认取消申请"
         );
       } catch(err) {
-        console.log(err);
         await refund.update({
           error: JSON.stringify(err)
         }); 
@@ -263,7 +252,6 @@ jobs.shopOrder = () => {
     for(const order of orders) {
       await order.onshelf();
     }
-    console.log(`商城订单更新完毕`);
   });
 };
 

@@ -45,7 +45,7 @@ block name
             tr(style="min-height:100px")
               td(style="display:flex")
                 img(src=`/r/${order.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
-                span(style="font-size:12px")=order.product.name
+                a(style="font-size:12px" href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
               td=order.productParam.name
               td #{numToFloatTwo(order.productParam.price)}
               td #{numToFloatTwo(order.product.freightPrice)}

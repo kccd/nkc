@@ -99,7 +99,12 @@ block content
                         </label>
                     .form-group(v-if="agree === false")    
                       textarea.form-control(rows="7" placeholder="请输入理由（不超过1000字节）" v-model="reason")
+                    .form-group(v-else-if="agree === true")
+                      h5 请输入登录密码
+                      input.form-control(type="password" v-model="password")
                     .form-group
+                      h5.text-danger(v-if="error") {{error}}
+                      h5.text-success(v-if="info") {{info}}
                       button.btn.btn-block.btn-primary(@click="sellerPost") 提交
               .m-t-1(v-if='refund && ["B_INPUT_CERT_RM", "P_APPLY_RM"].indexOf(refund.status) !== -1')      
                 

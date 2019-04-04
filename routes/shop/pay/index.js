@@ -84,7 +84,7 @@ router
         description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
         ip: ctx.address,
         port: ctx.port,
-        verfiy: true
+        verify: true
       });
       totalMoney += order.orderPrice;
       await r.save();

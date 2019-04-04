@@ -183,11 +183,11 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
   const paramId = new Set(), productParamObj = {};
   orders.map(ord =>{
     if(o.store)
-      storeId.add(ord.storeId)
+      storeId.add(ord.storeId);
     if(o.user)
       uid.add(ord.uid);
     if(o.product)
-      productId.add(ord.productId)
+      productId.add(ord.productId);
     if(o.productParam)
       paramId.add(ord.paramId)
   });
@@ -226,7 +226,7 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
     if(o.productParam) order.productParam = productParamObj[ord.paramId];
     return order
   }))
-}
+};
 
 /**
  * 买家拓展订单信息
@@ -254,9 +254,9 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   const paramId = new Set(), productParamObj = {};
   orders.map(ord => {
     if(o.store)
-      storeId.add(ord.storeId)
+      storeId.add(ord.storeId);
     if(o.product)
-      productId.add(ord.productId)
+      productId.add(ord.productId);
     if(o.productParam)
       paramId.add(ord.paramId)
   });
@@ -288,7 +288,7 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
     if(o.productParam) order.productParam = productParamObj[ord.paramId];
     return order
   }))
-}
+};
 /* 
   获取多个订单的信息，包括：订单名（多个商品名拼接）、订单介绍、订单价格（总计）、订单ID数组
   @param orders: 订单对象数组
@@ -394,7 +394,7 @@ shopOrdersSchema.statics.translateOrderStatus = async (orders) => {
     }
     return order;
   });
-}
+};
 
 shopOrdersSchema.statics.findById = async (orderId) => {
   const order = await mongoose.model('shopOrders').findOne({orderId});
@@ -418,14 +418,10 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   if(closeStatus) throwErr(400, `订单已被关闭，请刷新`);
   if(orderStatus !== "unSign") throwErr(400, "订单未处于待收货状态，请刷新");
   switch(refundStatus) {
-    case "ing": throwErr(400, "订单正处于退款流程，请刷新"); 
-    case "success": throwErr(400, "订单已被关闭，请刷新");
+    case "ing": throwErr(400, "订单正处于退款流程，请刷新"); break;
+    case "success": throwErr(400, "订单已被关闭，请刷新"); break;
   }
   const time = Date.now();
-  await ShopOrdersModel.update({orderId}, {$set: {
-    orderStatus: "finish",
-    finishToc: time
-  }});
   const record = KcbsRecordModel({
     _id: await SettingModel.operateSystemID('kcbsRecords', 1),
     from: "bank",
@@ -437,6 +433,10 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
     ordersId: [orderId]
   });
   await record.save();
+  await ShopOrdersModel.update({orderId}, {$set: {
+    orderStatus: "finish",
+    finishToc: time
+  }});
   await SettingModel.update({_id: 'kcb'}, {$inc: {
     "c.totalMoney": -1 * orderPrice
   }});
@@ -446,7 +446,7 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
 };
 /**
  * 拓展订单的凭证
- * @param String type buyer:只拓展买家上传的凭证，seller: 只拓展卖家上传的凭证，null: 都拓展
+ * @param {string} type buyer:只拓展买家上传的凭证，seller: 只拓展卖家上传的凭证，null: 都拓展
  * @return [Object] 凭证对象数组
  * @author pengxiguaa 2019/3/28
  */
@@ -567,6 +567,11 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
       num: money,
       ordersId: [order.orderId]
     });
+    await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+      closeToc: time,
+      closeStatus: true,
+      refundStatus: "success"
+    }});
     await refundRecord.save();
     await record.save();
     await SettingModel.update({_id: "kcb"}, {
@@ -585,11 +590,6 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
       }
     });
   }
-  await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
-    closeToc: time,
-    closeStatus: true,
-    refundStatus: "success"
-  }});
 };
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
