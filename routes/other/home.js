@@ -7,7 +7,7 @@ homeRouter
 		// 取出全部被标记的帖子
 		const allMarkThreads = await db.ThreadModel.find({ "recycleMark": true, "mainForumsId": { "$nin": ["recycle"] } });
 		for (var i in allMarkThreads) {
-			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 2*60*1000}})
+			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
 			if(delThreadLog){
 				await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"] })
 				await db.PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
