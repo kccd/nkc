@@ -28,10 +28,10 @@ function submitOrders() {
   receiveMobile = receiveDom.next().find(".mobile").text();
   if(!receiveAddress) return screenTopWarning("请选择收货地址")
   var receInfo = {
-    receiveAddress, 
-    receiveName, 
-    receiveMobile, 
-  }
+    receiveAddress: receiveAddress,
+    receiveName: receiveName,
+    receiveMobile: receiveMobile
+  };
   var para = [];
   // 检查购买限制
   if($(".limitBuy").length > 0){
