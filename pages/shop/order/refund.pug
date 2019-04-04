@@ -31,8 +31,9 @@ block content
         .col-xs-12.col-md-12
           h4 退款说明
           ul.text-danger
-            li 若卖家迟迟不发货，您可以向卖家发起退款请求。
-            li 当卖家拒绝了您的退款申请时，您才能请求平台介入。
+            li 若卖家未发货，您可以发起退款请求。
+            li 如果卖家已经发货，可以发起退货/退款申请。
+            li 如果卖家拒绝，可以请求平台介入。
           hr
         .col-xs-12.col-md-12
           .row
@@ -85,9 +86,9 @@ block content
                 .m-t-1.m-b-2
                   span.text-danger 注意事项：
                   p(v-if="applyType === 'seller'")
-                    | 请与卖家协商确认退款方式。选择“只退款”时无需买家寄回商品，当卖家同意后立即退款。选择“退货退款”时需买家寄回商品，待卖家确认商品无误后才能退款。
+                    | 请与卖家友好协商。选择“只退款”时无需买家寄回商品，当卖家同意后立即退款。选择“退货退款”时需买家寄回商品，待卖家确认商品无误后才能退款。
                   p(v-else)
-                    | 当买家向卖家提出退款申请并遭到拒绝后，买家才能请求平台介入。
+                    | 如果退款申请被卖家拒绝，可以请求平台介入。
 
               
               .m-t-1(v-if="display.apply && (applyType !== 'platform' || order.applyToPlatform)")
@@ -139,7 +140,8 @@ block content
                     button.btn.btn-block.btn-primary(@click="submitApply") 提交  
               .m-t-1(v-if="refund && ['B_INPUT_CERT_RM', 'P_APPLY_RM'].indexOf(refund.status) !== -1")
                 h4
-                  strong.text-danger 等待卖家上传凭证中，若需要补充凭证，请上传文件
+                  strong.text-danger(v-if="refund.status === 'B_INPUT_CERT_RM'") 等待卖家上传凭证，您可以补充凭证。
+                  strong.text-danger(v-if="refund.status === 'P_APPLY_RM'") 卖家已上传凭证，等待平台处理。
                 .form-group
                   h4 补充凭证（总共不超过
                     strong.text-danger 5

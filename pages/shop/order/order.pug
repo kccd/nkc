@@ -60,7 +60,6 @@ block shopAccountContent
               td=order.count
               //- td=order.user.username
               td
-                -console.log(order)
                 a(href=`/shop/store/${order.product.storeId}`)!=`${order.product.store.storeName}`
               td= order.status
                 | &nbsp;  

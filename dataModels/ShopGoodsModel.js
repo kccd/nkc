@@ -133,7 +133,7 @@ const shopGoodsSchema = new Schema({
   // 上架时间
   shelfTime: {
     type: Date,
-    default: Date.now,
+    default: null,
     index: 1
   },
   // 下架时间
@@ -162,6 +162,11 @@ const shopGoodsSchema = new Schema({
   // 暂不上架和定时上架 临时存文章信息
   threadInfo: {
     type: Schema.Types.Mixed,
+    default: ""
+  },
+  // 错误信息
+  error: {
+    type: String,
     default: ""
   }
 }, {
@@ -252,10 +257,19 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
     if(o.post) {
       const post = postObj[p.oc];
       product.post = post;
-      product.name = post.t;
-      
-      product.description = post.c;
-      product.abstract = post.abstract;
+      if(post) {
+        product.name = post.t;
+        product.description = post.c;
+        product.abstract = post.abstract;
+      } else if(product.threadInfo) {
+        product.name = product.threadInfo.title;
+        product.description = product.threadInfo.description;
+        product.abstract = product.threadInfo.abstract;
+      } else {
+        product.name = "商品名称丢失";
+        product.description = "商品描述丢失";
+        product.abstract = "商品简介丢失";
+      }
     }
     if(o.thread) product.thread = threadObj[p.tid];
     if(o.productParam) product.productParams = productParamObj[p.productId];
@@ -327,7 +341,7 @@ shopGoodsSchema.statics.checkOutPurchaseLimit = async (bills, uid) => {
     }
     return b;
   }));
-}
+};
 /**
  * 立即上架函数
  * 定时上架时，可调用
@@ -343,7 +357,12 @@ shopGoodsSchema.methods.onshelf = async function() {
   const settings = require("../settings");
   const thread = await ThreadModel.publishArticle(threadInfo);
   const {tid, oc} = thread;
-
+  await ShopGoodsModel.update({productId}, {$set: {
+    tid,
+    oc,
+    productStatus: "insale",
+    threadInfo: ""
+  }});
   // 将thread的类型修改为“商品文章”
   // 将商品的主页图片复制裁剪到文章封面图文件夹
   const resource = await ResourceModel.findOne({rid: imgMaster});
@@ -354,12 +373,6 @@ shopGoodsSchema.methods.onshelf = async function() {
     const targetPath = settings.upload.coverPath + '/' + tid + '.jpg';
     await tools.imageMagick.coverify(imgPath, targetPath);
   }
-  await ShopGoodsModel.update({productId}, {$set: {
-    tid,
-    oc,
-    productStatus: "insale",
-    threadInfo: ""
-  }});
 };
 
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);

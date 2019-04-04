@@ -138,7 +138,7 @@ jobs.shop = () => {
         await order.confirmReceipt();
       } catch(err) {
         await order.update({
-          error: JSON.stringify(err)
+          error: err.message || JSON.stringify(err)
         });
       }
     }
@@ -161,7 +161,7 @@ jobs.shop = () => {
         );
       } catch(err) {
         await refund.update({
-          error: JSON.stringify(err)
+          error: err.message || JSON.stringify(err)
         });
       }
     }
@@ -181,7 +181,7 @@ jobs.shop = () => {
         );
       } catch(err) {
         await refund.update({
-          error: JSON.stringify(err)
+          error: err.message || JSON.stringify(err)
         });
       }
     }
@@ -201,7 +201,7 @@ jobs.shop = () => {
         );
       } catch(err) {
         await refund.update({
-          error: JSON.stringify(err)
+          error: err.message || JSON.stringify(err)
         });        
       }
     }
@@ -221,7 +221,7 @@ jobs.shop = () => {
         );
       } catch(err) {
         await refund.update({
-          error: JSON.stringify(err)
+          error: err.message || JSON.stringify(err)
         }); 
       }
     }
@@ -237,20 +237,42 @@ jobs.shop = () => {
     }); 
 
     for(const order of orders) {
-      await order.cancelOrder(
-        "买家未在规定的时间内完成付款，订单已被取消"
-      );
+      try {
+        await order.cancelOrder(
+          "买家未在规定的时间内完成付款，订单已被取消"
+        );
+      } catch(err) {
+        order.update({
+          error: err.message || JSON.stringify(err)
+        })
+      }
+
     }
 
     // 7. 定时上架
-    orders = await ShopGoodsModel.find({
+    const products = await ShopGoodsModel.find({
       productStatus: "notonshelf",
-      shelfTime: {
-        $lt: Date.now()
-      }
+      $and: [
+        {
+          shelfTime: {
+            $ne: null
+          }
+        },
+        {
+          shelfTime: {
+            $lt: Date.now()
+          }
+        }
+      ]
     });
-    for(const order of orders) {
-      await order.onshelf();
+    for(const product of products) {
+      try {
+        await product.onshelf();
+      } catch(err) {
+        await product.update({
+          error: err.message || JSON.stringify(err)
+        });
+      }
     }
   });
 };

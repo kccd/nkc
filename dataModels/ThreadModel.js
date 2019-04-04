@@ -630,7 +630,6 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
     if(!status) throwErr(403, '权限不足，请提升账号等级');
     if(!unlimited && countLimit <= todayThreadCount) throwErr(403, '今日发表文章次数已用完，请明天再试。');
   }
-
   // 发表回复时间、条数限制
   const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
   if(todayThreadCount >= postToForumCountLimit) throwErr(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);

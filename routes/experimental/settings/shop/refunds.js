@@ -45,8 +45,26 @@ applysRouter
   })
 	// 平台同意退款申请
 	.post('/agree', async (ctx, next) => {
-    const {data} = ctx;
-    const {refund} = data;
+    const {data, body, db, tools} = ctx;
+    const {refund, user} = data;
+    const {password} = body;
+    if(!password) ctx.throw(400, "登录密码为空");
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const {hashType} = userPersonal;
+    const {hash, salt} = userPersonal.password;
+    switch(hashType) {
+      case 'pw9':
+        if(tools.encryption.encryptInMD5WithSalt(password, salt) !== hash) {
+          ctx.throw(400, '密码错误, 请重新输入');
+        }
+        break;
+      case 'sha256HMAC':
+        if(tools.encryption.encryptInSHA256HMACWithSalt(password, salt) !== hash) {
+          ctx.throw(400, '密码错误, 请重新输入');
+        }
+        break;
+      default: ctx.throw(400, '未知的密码加密类型');
+    }
     await refund.platformAgreeRM();
 		await next();
 	})
