@@ -144,7 +144,7 @@ function submitToShelf() {
     purchaseLimitCount = -1;
   }
   // 是否需要上传购买凭证
-  var isUploadCert = $("#isPurchaseLimit").prop("checked");
+  var isUploadCert = $("#isUploadCert").prop("checked");
   var uploadCert = false;
   if(isUploadCert){
     uploadCert = true;
