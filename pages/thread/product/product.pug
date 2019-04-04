@@ -86,7 +86,7 @@ style.
   }
 .row
   .col-xs-12.col-md-12(style="margin-bottom:30px")
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")
       ul#etalage
         -for(let rid of product.imgIntroductions)
           li
@@ -95,7 +95,7 @@ style.
 
     .col-xs-12.col-sm-12.col-md-12.col-lg-6
       p.item=`${post.abstract}`
-        a.btn.btn(href=`/shop/product/${product.productId}`) 前往商城
+        //- a.btn.btn(href=`/shop/product/${product.productId}`) 前往商城
       if product.attentions && product.attentions.length > 0
         ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
           for attStr in product.attentions
@@ -163,8 +163,8 @@ block scripts
   script.
     $(document).ready(function(){
       $('#etalage').etalage({
-        thumb_image_width: 350,
-        thumb_image_height: 350,
+        thumb_image_width: 420,
+        thumb_image_height: 420,
         source_image_width: 900,
         source_image_height: 900,
         small_thumbs:5,

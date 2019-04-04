@@ -3,63 +3,69 @@ block shopAccountTitle
   title=`我的订单 | 科创商城`
   -const trackInfo = data.trackInfo
 block shopAccountContent
-  if trackInfo.status == "0"
-    div(style="")
-      if trackInfo.result.deliverystatus == "0"
-        p 正在揽件(收件)
-      if trackInfo.result.deliverystatus == "1"
-        p 商品正在途中
-      if trackInfo.result.deliverystatus == "2"
-        p 快递员正在派件
-      if trackInfo.result.deliverystatus == "3"
-        p 已签收
-      if trackInfo.result.deliverystatus == "4"
-        p 派送失败(无法联系到收件人或客户要求择日派送，地址不详或手机号不清)
-      if trackInfo.result.deliverystatus == "5"
-        p 疑难件(收件人拒绝签收，地址有误或不能送达派送区域，收费等原因无法正常派送)
-      if trackInfo.result.deliverystatus == "6"
-        p 退件签收
-    br
-    div(style="background-color:#ddd;padding:30px")
-      if trackInfo.result.deliverystatus == "3"
-        for logInfo in trackInfo.result.list
+  .row
+    .col-xs-12.col-md-12(style="margin-bottom:20px")
+      a.btn.btn-info(onclick="javascript :history.back(-1);")
+        span.fa.fa-backward
+        | &nbsp;返回
+    .col-xs-12.col-md-12
+      if trackInfo.status == "0"
+        div(style="")
+          if trackInfo.result.deliverystatus == "0"
+            p 正在揽件(收件)
+          if trackInfo.result.deliverystatus == "1"
+            p 商品正在途中
+          if trackInfo.result.deliverystatus == "2"
+            p 快递员正在派件
+          if trackInfo.result.deliverystatus == "3"
+            p 已签收
+          if trackInfo.result.deliverystatus == "4"
+            p 派送失败(无法联系到收件人或客户要求择日派送，地址不详或手机号不清)
+          if trackInfo.result.deliverystatus == "5"
+            p 疑难件(收件人拒绝签收，地址有误或不能送达派送区域，收费等原因无法正常派送)
+          if trackInfo.result.deliverystatus == "6"
+            p 退件签收
+        br
+        div(style="background-color:#ddd;padding:30px")
+          if trackInfo.result.deliverystatus == "3"
+            for logInfo in trackInfo.result.list
+              p 
+                span(style="margin-right:20px;font-weight:bold")=logInfo.time
+                span=logInfo.status
+        br
+        div
+          p
+            span 运单号码：
+            span(style="font-weight:bold")=trackInfo.result.number
+          p
+            span 物流公司：
+            span(style="font-weight:bold")=trackInfo.result.expName
+          p
+            span 物流客服电话：
+            span(style="font-weight:bold")=trackInfo.result.expPhone
+          p
+            span 快递员：
+            if trackInfo.result.courier
+              span(style="font-weight:bold")=trackInfo.result.courier
+            else 
+              span(style="font-weight:bold") 暂无信息
+          p
+            span 快递员电话：
+            if trackInfo.result.courierPhone
+              span(style="font-weight:bold")=trackInfo.result.courierPhone
+            else 
+              span(style="font-weight:bold") 暂无信息
+      else
+        div
+          p
+            span(style="font-weight:bold") 运单号码：
+            span=data.trackNumber
+          p
+            span(style="font-weight:bold") 错误码：
+            span=trackInfo.status
+          p  
+            span(style="font-weight:bold") 错误信息
+            span=trackInfo.msg
           p 
-            span(style="margin-right:20px;font-weight:bold")=logInfo.time
-            span=logInfo.status
-    br
-    div
-      p
-        span 运单号码：
-        span(style="font-weight:bold")=trackInfo.result.number
-      p
-        span 物流公司：
-        span(style="font-weight:bold")=trackInfo.result.expName
-      p
-        span 物流客服电话：
-        span(style="font-weight:bold")=trackInfo.result.expPhone
-      p
-        span 快递员：
-        if trackInfo.result.courier
-          span(style="font-weight:bold")=trackInfo.result.courier
-        else 
-          span(style="font-weight:bold") 暂无信息
-      p
-        span 快递员电话：
-        if trackInfo.result.courierPhone
-          span(style="font-weight:bold")=trackInfo.result.courierPhone
-        else 
-          span(style="font-weight:bold") 暂无信息
-  else
-    div
-      p
-        span(style="font-weight:bold") 运单号码：
-        span=data.trackNumber
-      p
-        span(style="font-weight:bold") 错误码：
-        span=trackInfo.status
-      p  
-        span(style="font-weight:bold") 错误信息
-        span=trackInfo.msg
-      p 
-        span 快递信息获取失败，请联系快递公司查询或前往快递官网进行查询
+            span 快递信息获取失败，请联系快递公司查询或前往快递官网进行查询
 block shopScripts

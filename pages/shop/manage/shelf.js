@@ -221,7 +221,6 @@ function productToShelf(storeId) {
   nkcAPI('/shop/manage/'+storeId+'/shelf', "POST" ,{post:productInfo})
   .then(function(data) {
     screenTopAlert("上架成功");
-
     var targetUrl = '/shop/manage/' + storeId + '/goodslist';
     window.location.href = targetUrl;
   })

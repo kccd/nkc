@@ -97,7 +97,7 @@ block content
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-xs-12.col-md-12(style="margin-bottom:30px")
-        .col-xs-12.col-md-4
+        .col-xs-12.col-md-4(style="padding-top:20px")
           ul#etalage
             -for(let rid of product.imgIntroductions)
               li
@@ -274,8 +274,8 @@ block scripts
   script.
     $(document).ready(function(){
       $('#etalage').etalage({
-        thumb_image_width: 350,
-        thumb_image_height: 350,
+        thumb_image_width: 420,
+        thumb_image_height: 420,
         source_image_width: 900,
         source_image_height: 900,
         small_thumbs:5,
