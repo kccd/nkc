@@ -215,6 +215,7 @@ fn.fromNow = (time) => {
 // reduce[bull] 是否进行略缩，默认为false
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
+  if(!content) return content;
   content = content.replace(/<[^>]+>/g,"");
   count = parseInt(count);
   if(reduce === true){
