@@ -15,7 +15,7 @@ block content
       #app(v-cloak)
         .col-xs-12.col-md-12
           h2 科创人民银行
-            span.h4!= ` 科创币剩余 <strong style="color: #ffa100;font-size: 2rem;text-decoration: underline;">${data.kcbSettings.totalMoney}</strong> 个`
+            span.h4!= ` 科创币剩余 <strong style="color: #ffa100;font-size: 2rem;text-decoration: underline;">${data.kcbSettings.totalMoney/100}</strong> 个`
         .col-xs-12.col-md-12
           .hidden(ref='data')= JSON.stringify({kcbsRecords: data.kcbsRecords, content: data.content, t: data.t})
           h4 按条件查询记录
@@ -49,23 +49,15 @@ block content
             tbody
               tr(v-for='(record, index) of kcbsRecords')
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
-                th
-                  span(v-if='record.type === "creditKcb"') 鼓励
-                  span(v-else-if='record.type === "lottery"') 随机红包
-                  span(v-else-if='record.type === "updateKcb"') 换发新币
-                  span(v-else-if='record.type === "share"') 分享
-                  span(v-else-if='record.type === "shareRegister"') 分享注册
-                  span(v-else-if='record.type === "inherit"') 其它未登记详情的记录
-                  span(v-else-if='record.type === "digestThreadAdditional"') 文章被评为精选的额外奖励
-                  span(v-else-if='record.type === "digestPostAdditional"') 回复被评为精选的额外奖励
-                  span(v-else) {{record.kcbsType.description}}
+                th {{record.typeInfo}}
+
                 th
                   span(v-if='record.from === "bank"') 科创人民很行
-                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb') {{record.fromUser.username}}
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb/100') {{record.fromUser.username}}
                 th
                   span(v-if='record.to === "bank"') 科创人民很行
-                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb') {{record.toUser.username}}
-                th {{record.num>0?'+':''}}{{record.num}}
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
+                th {{record.num>0?'+':''}}{{record.num/100}}
                 th {{record.description}}
                 th
                   a(v-if="record.pid" :href="'/p/' + record.pid") {{record.pid}}

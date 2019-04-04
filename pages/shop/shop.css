@@ -1,0 +1,170 @@
+html{
+  height: 100%;
+}
+body{
+  min-height: 100%;
+  position: relative;
+  padding-bottom: 10rem;
+}
+.container-fluid.max-width{
+  max-width: 1100px;
+}
+.shop-header{
+  height: 4rem;
+  line-height: 4rem;
+  background-color: #eee;
+}
+.shop-logo{
+  font-size: 1.7rem;
+  display: inline-block;
+}
+.shop-logo a{
+  text-decoration: none;
+}
+.shop-footer{
+  position:absolute;
+  height: 10rem;
+  bottom: 0;
+  width: 100%;
+  background-color: rgb(240, 240, 240);
+}
+.shop-footer-container{
+  margin-top: 2rem;
+  text-align: center;
+}
+.shop-header-div{
+  
+}
+.shop-header-div{
+  margin: 0;
+  padding: 0;
+}
+.shop-header-div li{
+  display: inline-block;
+  list-style: none;
+}
+.shop-header-div li a{
+  padding: 0 1rem;
+  color: #777;
+}
+.shop-header-div.right{
+  float: right;
+}
+.shop-header-div.left{
+  float: left;
+}
+.shop-search{
+  height: 8rem;
+  position: relative;
+}
+.shop-search-img, .shop-search-img-panel{
+  height: 100%;
+}
+.shop-search-input{
+  width: 35rem;
+  border: 2px solid #ff8c5c;
+  padding: 0 0.5rem;
+  font-size: 1.2rem;
+}
+.shop-search-btn{
+  line-height: 3rem;
+  font-size: 1.2rem;
+  padding: 0 1.5rem;
+  background-color: #ff8c5c;
+  border: 2px solid #ff8c5c;
+  color: #fff;
+  margin: 0;
+  display: inline;
+}
+.shop-search-input-panel{
+  height: 4rem;
+  font-size: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  line-height: 3rem;
+  text-align: right;
+}
+.shop-search-hot{
+  color: #ff8c5c;
+  font-size: 1.2rem;
+  height: 2rem;
+  line-height: 2rem;
+}
+.shop-search-btn-advanced{
+  margin-left: 0.2rem;
+}
+.badge{
+  background-color: #e9443e;
+}
+.shop-cert{
+  display: inline-block;
+  margin: 0 1rem 1rem 0;
+  position: relative;
+  overflow: hidden;
+  height: 7rem;
+  width: 7rem;
+  background-color: #eee;
+  vertical-align: middle;
+}
+.shop-cert:hover .shop-cert-options {
+  top: 0;
+}
+.shop-cert-options{
+  position: absolute;
+  transition: top 0.2s;
+  height: 100%;
+  width: 100%;
+  top: 7rem;
+  cursor: pointer;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5)
+}
+.shop-cert-options span:first-child{
+  border-bottom: 1px solid #aaa;
+}
+.shop-cert-options span{
+  display: block;
+  width: 50%;
+  margin: auto;
+  text-align: center;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 3.5rem;
+  height: 3.5rem;
+}
+.shop-cert img{
+  height: 100%;
+  width: 100%;
+  vertical-align: middle;
+}
+.shop-cert-file{
+  text-decoration: none;
+  color: #aaa;
+  font-size: 1rem;
+  word-break: break-all;
+  padding: 2rem 0.5rem 0 0.5rem;
+}
+.refund-type span{
+  display: inline-block;
+  border: 1px solid #eee;
+  padding: .5rem 1rem;
+  border-radius: 5px;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+.refund-type span.active{
+  border: 1px solid #337ab7;
+}
+.refund-type span.disabled{
+  /* background-color: #ccc; */
+  cursor: not-allowed;
+  /* color: #fff; */
+}
+.refund-reason textarea{
+  width: 100%;
+  min-height: 15rem;
+}

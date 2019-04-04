@@ -1,0 +1,49 @@
+extends ../index.pug
+block title
+  title 退款设置
+block shopSettings
+  #data.hidden= JSON.stringify({shopSettings: data.shopSettings})
+  .col-xs-12.col-sm-10.col-md-10#app(v-cloak v-if="shopSettings")
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3
+        .form
+          .form-group
+            h4 卖家处理退款/退货退款申请的时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认卖家同意用户的申请。
+              h5 买家申请退款退货时，卖家处理超时后系统将自动退款，无需买家退货。
+            input.form-control(type="number" v-model.number="shopSettings.refund.agree")
+          .form-group
+            h4 买家申请平台介入，卖家处理时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认卖家拒绝平台介入，系统将自动退款。
+            input.form-control(type="number" v-model.number="shopSettings.refund.cert")  
+          .form-group
+            h4 买家已退货，卖家确认收货的时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认卖家已确认收货，系统将自动退款。
+            input.form-control(type="number" v-model.number="shopSettings.refund.sellerReceive")    
+          .form-group
+            h4 卖家同意退货，买家发货后填写物流信息的时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认买家放弃申请。
+            input.form-control(type="number" v-model.number="shopSettings.refund.buyerTrack")
+          .form-group
+            h4 买家付款后，卖家发货时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认取消订单并退款。
+            input.form-control(type="number" v-model.number="shopSettings.refund.sellerTrack")  
+          .form-group
+            h4 买家下单后，付款时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认取消订单。
+            input.form-control(type="number" v-model.number="shopSettings.refund.pay")    
+          .form-group
+            h4 买家确认收货的时间限制（单位：小时）
+            .text-danger
+              h5 超时后，则默认买家确认收货，系统自动将钱转给卖家。
+            input.form-control(type="number" v-model.number="shopSettings.refund.buyerReceive")
+          .form-group
+            button.btn.btn-block.btn-primary(@click='save') 保存
+block scripts
+  +includeJS("/experimental/shop/refund/settings.js")        

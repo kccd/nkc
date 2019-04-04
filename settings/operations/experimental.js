@@ -4,6 +4,53 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		shop: {
+			GET: 'visitShopSettings',
+			refunds: {
+				GET: 'visitShopRefundList',
+				refundDetail: {
+					GET: 'visitShopRefundDetail'
+				},
+				agree: {
+					POST: 'shopAgreeRefundApply'
+				},
+				disagree: {
+					POST: 'shopDisagreeRefundApply'
+        },
+        settings: {
+          GET: "visitShopRefundSettings",
+          PATCH: "modifyShopRefundSettings"
+        }
+			},
+			applys: {
+				GET: 'visitShopOpenStoreApplys',
+				approve: {
+					POST: 'approveApplyStore'
+				},
+				reject: {
+					POST: "rejectApplyStore"
+				}
+			},
+			homeSetting: {
+				carousel: {
+					GET: 'visitHomeSettingCarousel',
+					POST: 'changeHomeSettingCarousel',
+					PATCH: 'deleteHomeSettingCarousel'
+				},
+				featured: {
+					GET: 'visitHomeSettingFeatured',
+					POST: 'changeHomeSettingFeatured'
+				},
+				recommendation: {
+					GET: 'visitHomeSettingRecommendation',
+					POST: 'changeHomeSettingRecommendation'
+				},
+				popular: {
+					GET: 'visitHomeSettingPopular',
+					POST: 'changeHomeSettingPopular'
+				}
+			}
+		},
 	  login: {
 	    GET:'visitLoginSettings',
       PATCH: 'modifyLoginSettings'

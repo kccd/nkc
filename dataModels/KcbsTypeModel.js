@@ -2,10 +2,6 @@ const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const typeSchema = new Schema({
 	_id: String,
-	description: {
-		type: 'String',
-		default: ''
-	},
   num: {
 		type: Number,
 		required: true

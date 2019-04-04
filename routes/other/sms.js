@@ -192,7 +192,8 @@ smsRouter
       let sysTimeStamp = new Date(delPostMessage[i].toc).getTime()
       let nowTimeStamp = new Date().getTime()
       let diffTimeStamp = parseInt(nowTimeStamp) - parseInt(sysTimeStamp)
-      let hourTimeStamp = 3600000 * 72;
+      // let hourTimeStamp = 3600000 * 72;
+      let hourTimeStamp = 1000*60*5;
       let lastTimestamp = parseInt(new Date(delPostMessage[i].toc).getTime()) + hourTimeStamp;
       delPostMessage[i].lastTime = new Date(lastTimestamp)
       // 退修转删除三个必要条件

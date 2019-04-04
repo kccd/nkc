@@ -4013,8 +4013,7 @@ Text.prototype = {
                 }
                 // console.log(pasteHtml)
                 pasteHtml = custom_xss_process(pasteHtml);
-                pasteHtml = pasteHtml.replace(/<(img.+?)src="(.+?)"(.+?)>/igm,"<$1 srcs='$2' src='/resources/site_specific/picloading.png' $3>")
-                // console.log(pasteHtml)
+                pasteHtml = pasteHtml.replace(/<(img.*?)src="(.*?)"(.*?)>/igm,"<$1 srcs='$2' src='/resources/site_specific/picloading.png' $3>")
                 editor.cmd.do('insertHTML', pasteHtml);
             } catch (ex) {
                 // 此时使用 pasteText 来兼容一下

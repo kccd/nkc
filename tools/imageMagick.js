@@ -126,6 +126,13 @@ const thumbnailify = (path, dest) => {
   return spawnProcess('magick', ['convert', path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
 };
 
+const shopLogoify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+};
+
 const generateAdPost = async (path, name) => {
   let stats;
   try {
@@ -286,6 +293,20 @@ const forumAvatarify = async (options) => {
 	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${forumAvatarSize}x${forumAvatarSize}+${left}+${top}`, targetPath]);
 };
 
+const shopCertImageify = async (path, targetPath) => {
+	if(linux) {
+		return spawnProcess('convert', [path, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, targetPath]);
+};
+const shopCertSmallImageify = async (path, targetPath) => {
+  const width = 150, height = 150;
+	if(linux) {
+		return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath]);
+};
+
 const webLogoify = async (path, targetPath) => {
 	if(linux) {
 		return spawnProcess('convert', [path, targetPath]);
@@ -378,7 +399,10 @@ module.exports = {
   firstFrameToImg,
   videoToH264,
   turnVideo,
-  questionImageify
+  questionImageify,
+  shopLogoify,
+  shopCertImageify,
+  shopCertSmallImageify
 };
 
 

@@ -30,7 +30,7 @@ if thread
         -var title = '';
         -if(user && user.navbarDesc)
           -var navbarDesc = user.navbarDesc;
-          -title = `${navbarDesc.username}\n学术分 ${navbarDesc.xsf}\n科创币 ${navbarDesc.kcb}\n${navbarDesc.cs}` || `${user.description}`;
+          -title = `${navbarDesc.username}\n学术分 ${navbarDesc.xsf}\n科创币 ${navbarDesc.kcb/100}\n${navbarDesc.cs}` || `${user.description}`;
         a(href=`/m/${uid}` title=`${title}`)
           img.ForumThreadAvatar(src=`/avatar/${uid}`)
 

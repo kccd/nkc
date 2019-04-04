@@ -167,7 +167,7 @@ experimentalRouter
   .use('/console', consoleRouter.routes(), consoleRouter.allowedMethods())
 	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods())
   .use('/systemInfo', sysInfoRouter.routes(), sysInfoRouter.allowedMethods())
-	.use('/log', logRouter.routes(), logRouter.allowedMethods());
+  .use('/log', logRouter.routes(), logRouter.allowedMethods());
 
 
 module.exports = experimentalRouter;

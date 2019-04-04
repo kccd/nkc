@@ -1,0 +1,50 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
+  
+  title 商品
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-info
+          //- .panel-heading
+          //-   | 申请开店
+          .panel-body(style="text-align:center")
+            .col-sm-1
+            .col-sm-10
+              .form-horizontal
+                .form-group
+                  //.col-sm-12
+                    p 
+                    | 一个科创账户只能开一家店; 开店后店铺无法注销; 从申请到正式开通预计需1~3个工作日。了解更多请看
+                    a(href="#") 开店规则
+                  .text-danger 暂未开放
+                .form-group
+                  .col-sm-12
+                    div(style="width:100%;background-color:#f0f8ff;border:1px solid #40c4ff;padding:20px")
+                      p
+                        span 您已登陆了科创账户：
+                        span!=`${data.user.username}`
+                      //-   span 
+                      //-     a(href="javascript:void(0);" onclick="accountAuth()") 点击认证
+                      //- p(style="color:green") 认证成功
+                      //- p(style="color:red") 尚未认证
+                .form-group
+                  .col-sm-12
+                    -if(!data.applyHis)
+                      button.btn.btn-primary#apply(onclick="applyForOpenStore()") 提交开店申请
+                    -else
+                      -if(data.applyHis.applyStatus == 'dealing')
+                        button.btn.btn-default(disabled='true') 已提交申请
+                      -else if(data.applyHis.applyStatus == 'approve')
+                        button.btn.btn-default(disabled='true') 申请已通过
+                      
+            .col-sm-1     
+
+block scripts
+  +includeJS('/shop/openStore/openStore.js')

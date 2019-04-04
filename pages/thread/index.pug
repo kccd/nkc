@@ -112,6 +112,8 @@ block title
           -var username = c.fromUser.username
           -var profile = '/u/'+c.from
           .ThreadPostCreditItem
+            if c.type === "creditKcb"
+              -c.num = c.num/100;
             span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA
@@ -269,7 +271,11 @@ block content
                       -const post = thread.firstPost;
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
                       if data.paging.page === 0
-                        div.thread-content.ThreadPostBody!= experimental_render(post)
+                        if data.thread.type == "article"
+                          div.thread-content.ThreadPostBody!= experimental_render(post)
+                        else if data.thread.type == "product"
+                          div.thread-content.ThreadPostBody
+                            include ./product/product.pug
                         +postEditTime(post)
                         +postCredits(data.posts[0])
                       else
@@ -455,5 +461,7 @@ block scripts
   //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
+  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/shop/shop.js')
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)

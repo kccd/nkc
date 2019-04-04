@@ -364,8 +364,18 @@ userSchema.methods.extend = async function(options) {
 };
 
 userSchema.methods.extendRoles = async function() {
-	const RoleModel = mongoose.model('roles');
-	const roles = [];
+  const RoleModel = mongoose.model('roles');
+  let certs = [].concat(this.certs);
+  if(!certs.includes('default')) {
+    certs.push('default');
+  }
+  if(this.xsf > 0 && !certs.includes('scholar')) {
+    certs.push('scholar');
+  }
+  if(certs.includes('banned')) {
+    certs = ['banned'];
+  }
+  const roles = [];
 	for(let cert of this.certs) {
 		const role = await RoleModel.findOne({_id: cert});
 		if(role) roles.push(role);
@@ -675,6 +685,21 @@ userSchema.methods.extendGrade = async function() {
 	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
 	return this.grade = grade;
 };
+/* 
+  拓展全局设置
+  @author pengxiguaa 2019/3/6
+*/
+userSchema.methods.extendGeneralSettings = async function() {
+  return this.generalSettings = await mongoose.model('usersGeneral').findOnly({uid: this.uid});
+}
+/* 
+  验证用户是否完善资料，包括：用户名、密码
+  未完善则会抛出错误
+  @author pengxiguaa 2019/3/7
+*/
+userSchema.methods.ensureUserInfo = async function() {
+  if(!this.username) throwErr(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
+}
 
 userSchema.methods.getNewMessagesCount = async function() {
 	const MessageModel = mongoose.model('messages');
@@ -813,4 +838,20 @@ userSchema.statics.extendUsersInfo = async (users) => {
   }));
 };
 
+userSchema.methods.extendAuthLevel = async function() {
+  const userPersonal = await mongoose.model('usersPersonal').findUsersPersonalById(this.uid);
+  return this.authLevel = await userPersonal.getAuthLevel();
+};
+
+/* 
+  通过uid查找单一用户
+  @param uid: 用户ID
+  @author pengxiguaa 2019/3/7 
+*/
+userSchema.statics.findUserById = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({uid});
+  if(!user) throwErr(404, `未找到ID为【${uid}】的用户`);
+  return user;
+};
 module.exports = mongoose.model('users', userSchema);

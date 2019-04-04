@@ -18,7 +18,7 @@ block content
           li 
             h5=`同一用户每天最多进行 ${countOneDay} 次考试。`
           li 
-            h5=`同一用户的考试次数累计达到 ${count} 次时，在${waitingTime} 天之内将无法再次参加考试。`  
+            h5=`同一用户的考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`  
         .row.m-t-2 
           .col-xs-12.col-md-12
                 
@@ -83,5 +83,5 @@ block content
         +listHeader('命题人')
         for li in data.usersList  
           a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
-            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb}\n`+`${li.user.info.certsName}`;
+            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb/100}\n`+`${li.user.info.certsName}`;
             img.user-list-avatar(src=`/avatar_small/${li.user.uid}`  title=title)

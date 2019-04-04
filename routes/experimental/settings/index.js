@@ -22,6 +22,7 @@ const postRouter = require('./post');
 const xsfRouter = require('./xsf');
 const redEnvelopeRouter = require('./redEnvelope');
 const emailRouter = require('./email');
+const shopRouter = require('./shop');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -50,5 +51,6 @@ settingRouter
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
 	.use('/exam', examRouter.routes(), examRouter.allowedMethods())
   .use('/email', emailRouter.routes(), emailRouter.allowedMethods())
-	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
+	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods())
+	.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 module.exports = settingRouter;
