@@ -134,10 +134,10 @@ block shopAccountContent
                 span 
                   a.orderStatusTextLink(href=`/u/${order.store.uid}`) 联系卖家
                 span 协商解决
-              li.orderPrompt 
-                span 如果卖家没有履行应尽的承诺，您可以申请
-                span 
-                  a.orderStatusTextLink(href=`/shop`) 商城仲裁
+              //- li.orderPrompt 
+              //-   span 如果卖家没有履行应尽的承诺，您可以申请
+              //-   span 
+              //-     a.orderStatusTextLink(href=`/shop`) 商城仲裁
     .col-sm-12.col-md-12.col-xs-12
       .panel.panel-default
         .panel-body
@@ -182,7 +182,7 @@ block shopAccountContent
                   span.infoContent=order.payToc.toLocaleString()
             .col-xs-6
               p
-                span.infoCaption 成交时间:
+                span.infoCaption 确认收货时间:
                 if order.finishToc
                   span.infoContent=order.finishToc.toLocaleString()
             .col-xs-6
@@ -191,21 +191,21 @@ block shopAccountContent
                 if order.closeToc
                   span.infoContent=order.closeToc.toLocaleString()
 
-          .col-xs-12
-            h4.infoTitle 
-              span 商家信息
-            .col-xs-12
-              p
-                span.infoCaption 卖家昵称:
-                span.infoContent!=`${order.store.uid}`
-            .col-xs-12
-              p
-                span.infoCaption 电话:
-                span.infoContent!=`${order.store.mobile}`
-            .col-xs-12
-              p
-                span.infoCaption 所在地:
-                span.infoContent!=`${order.store.address}`
+          //- .col-xs-12
+          //-   h4.infoTitle 
+          //-     span 商家信息
+          //-   .col-xs-12
+          //-     p
+          //-       span.infoCaption 卖家昵称:
+          //-       span.infoContent!=`${order.store.uid}`
+          //-   .col-xs-12
+          //-     p
+          //-       span.infoCaption 电话:
+          //-       span.infoContent!=`${order.store.mobile}`
+          //-   .col-xs-12
+          //-     p
+          //-       span.infoCaption 所在地:
+          //-       span.infoContent!=`${order.store.address}`
           .col-xs-12
             h4.infoTitle 
               span 购买凭证

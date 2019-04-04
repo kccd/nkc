@@ -222,7 +222,7 @@ function productToShelf(storeId) {
   .then(function(data) {
     screenTopAlert("上架成功");
     var product = data.product;
-    var targetUrl = '/shop/product/'+product.productId;
+    var targetUrl = `/shop/manage/${storeId}/goodslist`;
     window.location.href = targetUrl;
   })
   .catch(function(data){
