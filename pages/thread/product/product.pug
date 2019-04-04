@@ -1,0 +1,178 @@
+-const product = data.product
+-let paraId = data.paraId;
+-if(!paraId) paraId = product.productParams[0]._id+""
+-const paId = data.paId;
+link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
+link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
+style.
+  .title {
+    text-align: left;
+    font-size: 12px;
+    margin: 0 19px 0 10px;
+    color: #999;
+  }
+  .location {
+    margin-right:6px
+  }
+  .buy {
+    overflow: hidden;
+    float: left;
+    width: 152px;
+    border-radius: 2px;
+    background-color: #f8f7f3;
+    color: #22258c;
+    cursor: pointer;
+    border: 1px solid #22258c;
+    margin-right: 18px;
+  }
+  .addCart {
+    overflow: hidden;
+    float: left;
+    width: 160px;
+    margin-top: -1px;
+    border-radius: 2px;
+    color: #fff;
+    cursor: pointer;
+    background-color: #22258c;
+  }
+  .item {
+    margin-bottom:15px
+  }
+  .shopdsr-item{
+    float: left;
+    color: #999;
+    width: 36px;
+    height: 36px;
+    margin: 5px 7px 0 0;
+    position: relative;
+  }
+  .shopdsr-title {
+    text-align: center;
+    font-family: "\5b8b\4f53";
+  }
+  .shopdsr-score.shopdsr-score-up-ctrl {
+    color: #ff0036;
+    padding-left: 5px;
+    height: 18px;
+    width: 31px;
+    position: relative;
+    overflow: hidden;
+  }
+  .shopdsr-score-up {
+    color: #ff0036;
+    background: 0 0;
+    text-decoration: none;
+    height: 9px;
+    width: 8px;
+    right: 2px;
+    top: 5px;
+    position: absolute;
+  }
+  .activeIndex {
+    padding: 2px 9px;
+    border: 2px solid #FF0036;
+    font-size:small;
+    cursor: pointer;
+    background: cornsilk;
+  }
+  .normalIndex {
+    padding: 2px 9px;
+    border: 2px solid #e2e1e3;
+    font-size:small;
+    cursor: pointer;
+  }
+  .del{
+    text-decoration: line-through;
+  }
+.row
+  .col-xs-12.col-md-12(style="margin-bottom:30px")
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")
+      ul#etalage
+        -for(let rid of product.imgIntroductions)
+          li
+            img.etalage_thumb_image(src=`/r/${rid}`)
+            img.etalage_source_image(src=`/r/${rid}`)
+
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6
+      p.item=`${post.abstract}`
+        //- a.btn.btn(href=`/shop/product/${product.productId}`) 前往商城
+      if product.attentions && product.attentions.length > 0
+        ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+          for attStr in product.attentions
+            li(style="margin:0px")!=`* ${attStr}`
+      div.item(style="background:#c7fff8")
+        div(style="padding:7px 0;color:#333")
+          p
+            span.title 价格
+            span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
+            //- -if(product.productParams[paId].useDiscount)
+            //-   span
+            //-     del#originPriceDis #{numToFloatTwo(product.productParams[paId].originPrice)}
+            //- -else
+            //-   span#originPrice #{numToFloatTwo(product.productParams[paId].originPrice)}
+          p
+            span.title 优惠价
+            span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+      div.item
+        p
+          span.title 快递
+          //- span.location!=getProvinceCity(product.store.address)
+          span.location(style="font-size:small") #{getProvinceCity(product.store.address)}
+          span.location(style="font-size:small;") 至
+          input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
+      div.item(style="border-bottom: 1px solid #e5e5e5")
+        p
+          span.title 运费
+          span#freightPrice #{numToFloatTwo(product.freightPrice)}
+      //- div.item
+      //-   p
+      //-     span.title 上架时间
+      //-     span.location!=product.shelfTime.toLocaleString()
+      div.item
+        p
+          span.title 数量
+          span(style="display: inline-flex;margin-right:5px")
+            button(onclick=`delStock()`) -
+            input#buyCount(style='width: 3rem;' value="1")
+            button(onclick=`addStock()`) +
+          span.location(style="font-size:12px") 库存
+          span#stockCount=`${product.productParams[paId].stocksSurplus}`
+          span.location(style="font-size:12px") 件
+      .item
+        .row
+          span.title.col-xs-12(style="padding-right:0;margin-bottom:15px") 规格
+          span.col-xs-12(style="margin: 0 19px 0 10px;")
+            for para in product.productParams
+              span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
+                span=para.name.join()
+      div.item
+        div(style="display:none")#paraId!=`${paraId}`
+        a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+        a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+          span.fa.fa-shopping-cart  加入购物车
+    .col-xs-1.col-md-1 
+
+  .col-xs-12.col-md-12
+    .col-xs-12.col-md-12
+      div(style="padding:20px")!=experimental_render(post)
+block scripts
+  +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
+  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/external_pkgs/citySet/city.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')
+  script.
+    $(document).ready(function(){
+      $('#etalage').etalage({
+        thumb_image_width: 420,
+        thumb_image_height: 420,
+        source_image_width: 900,
+        source_image_height: 900,
+        small_thumbs:5,
+      });
+    });
+    $("#city").click(function (e) {
+      SelCity(this,e);
+    });
+    $("s").click(function (e) {
+      SelCity(document.getElementById("city"),e);
+    });

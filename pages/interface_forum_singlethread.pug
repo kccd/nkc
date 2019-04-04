@@ -11,7 +11,7 @@
       a(href=`/u/${targetUser.uid}` title=`${targetUser.description || ''}` data-toggle="tooltip" data-placement="bottom")
         img(src=`/avatar_small/${targetUser.uid}` style='width: 30px;border-radius: 50%;')
     span
-      - var title = `${targetUser.username}\n`+`学术分 ${targetUser.xsf}\n`+`科创币 ${targetUser.kcb}\n`+`${targetUser.info.certsName}`;
+      - var title = `${targetUser.username}\n`+`学术分 ${targetUser.xsf}\n`+`科创币 ${targetUser.kcb/100}\n`+`${targetUser.info.certsName}`;
       a(href=`/u/${targetUser.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= targetUser.username
     if data.forum
       -let displayForumNav = false;
@@ -89,6 +89,6 @@
             a(href=`/t/${tid}?&last_page=true#${lastPost.pid}`)!= replaceContent(experimental_render(lastPost) )
       .new-content-info-last
         span
-          - var title = `${lastPost.user.username}\n`+`学术分 ${lastPost.user.xsf}\n`+`科创币 ${lastPost.user.kcb}\n`+`${lastPost.user.info.certsName}`;
+          - var title = `${lastPost.user.username}\n`+`学术分 ${lastPost.user.xsf}\n`+`科创币 ${lastPost.user.kcb/100}\n`+`${lastPost.user.info.certsName}`;
           a(href=`/u/${lastPost.user.uid}` data-toggle="tooltip" data-placement="bottom" title=title)= lastPost.user.username
         span.icon-font=` ${fromNow(lastPost.toc)}`

@@ -1,0 +1,46 @@
+nav.navbar.navbar-default.shop-header
+  .container-fluid.max-width
+    .navbar-header
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      a.navbar-brand(href='/shop') 科创商城
+    .collapse.navbar-collapse#bs-example-navbar-collapse-1
+      ul.nav.navbar-nav
+        li
+          a(href='/')= data.serverSettings.websiteName
+      ul.nav.navbar-nav.navbar-right
+        if !data.user
+          li
+            a(href='/login') 登录
+          li
+            a(href='/register') 注册
+        else 
+          li
+            a(href='/shop/cart') 
+              span.fa.fa-shopping-cart
+              |&nbsp;购物车&nbsp;
+              span.badge 2
+          li
+            a(href='/shop/order') 
+              span.fa.fa-file-text-o
+              |&nbsp;我的订单
+          li
+            a(href='/message')     
+              span.fa.fa-comments-o
+              |&nbsp;消息&nbsp;
+              span.badge 3
+          li
+            a(href='/shop/account') 
+              span.fa.fa-user-circle-o
+              |&nbsp;个人中心
+          li
+            a(href='/shop/manage') 
+              span.fa.fa-users
+              |&nbsp;卖家中心
+      
+
+  

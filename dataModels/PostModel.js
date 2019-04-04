@@ -56,6 +56,11 @@ const postSchema = new Schema({
     type: String,
     default: ''
   },
+  // 摘要
+  abstract: {
+    type: String,
+    default: ''
+  },
   /* fid: {
     type: String,
     required: true,
@@ -634,6 +639,100 @@ postSchema.methods.updatePostsVote = async function() {
   this.voteUp = upNum;
   this.voteDown = downNum;
   await this.update({voteUp: upNum, voteDown: downNum});
+};
+/* 
+  新建post
+  @param options
+    title: 标题
+    content: 内容
+    abstract: 摘要
+    ip: 用户ip地址
+    tid: 所属的文章ID
+  @return post对象
+  @author pengxiguaa 2019/3/7
+*/
+postSchema.statics.newPost = async (options) => {
+  const ForumModel = mongoose.model('forums');
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const {contentLength} = require('../tools/checkString');
+  const {title, content, uid, ip, abstract, tid} = options;
+  const thread = await ThreadModel.findOne({tid});
+  if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
+  if(thread.closed) throwErr(403, `文章已被关闭，暂不能发表回复`);
+  const user = await UserModel.findUserById(uid);
+  await ForumModel.ensureForumsPermission(thread.mainForumsId, user);
+  if(!title) throwErr(400, '标题不能为空');
+  if(contentLength(title) > 200) throwErr(400, '标题不能超过200字节');
+  if(!content) throwErr(400, '内容不能为空');
+  if(contentLength(content) < 6) throwErr(400, '内容太短了，至少6个字节');
+  const dbFn = require('../nkcModules/dbFunction');
+  const apiFn = require('../nkcModules/apiFunction');
+  const quote = await dbFn.getQuote(content);
+  let rpid = '';
+  if(quote && quote[2]) {
+    rpid = quote[2];
+  }
+  const pid = await SettingModel.operateSystemID('posts', 1);
+  const _post = await new PostModel({
+    pid,
+    c: content,
+    t: title,
+    abstract,
+    ipoc: ip,
+    iplm: ip,
+    l: 'html',
+    mainForumsId: thread.mainForumsId,
+    minorForumsId: thread.minorForumsId,
+    tid,
+    uid,
+    uidlm: uid,
+    rpid
+  });
+  await _post.save();
+  await thread.update({
+    lm: pid,
+    tlm: Date.now()
+  });
+  await thread.updateThreadMessage();
+  if(quote && quote[2] !== this.oc) {
+    const username = quote[1];
+    const quPid = quote[2];
+    const quUser = await UserModel.findOne({username});
+    const quPost = await PostModel.findOne({pid: quPid});
+    if(quUser && quPost) {
+      const messageId = await SettingModel.operateSystemID('messages', 1);
+      const message = MessageModel({
+        _id: messageId,
+        r: quUser.uid,
+        ty: 'STU',
+        c: {
+          type: 'replyPost',
+          targetPid: pid+'',
+          pid: quPid+''
+        }
+      });
+
+      await message.save();
+
+      await redis.pubMessage(message);
+    }
+  }
+  if(!user.generalSettings) {
+    await user.extendGeneralSettings();
+  }
+  if(!user.generalSettings.lotterySettings.close) {
+    const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
+    if(!redEnvelopeSettings.c.random.close) {
+      const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+      if(postCountToday === 1) {
+        await user.generalSettings.update({'lotterySettings.status': true});
+      }
+    }
+  }
+  return _post
 };
 
 module.exports = mongoose.model('posts', postSchema);

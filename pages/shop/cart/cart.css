@@ -1,0 +1,67 @@
+.avatar{
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+}
+.username{
+  display: inline;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #444;
+  vertical-align: middle;
+}
+.user-info{
+  height: 3rem;
+  line-height: 3rem;
+  padding-left: 1rem;
+  background-color: #eee;
+}
+.product-img{
+  width: 8rem;  
+  display: inline-block;
+  vertical-align: top;
+}
+.product-img img{
+  width: 100%;
+  display: inline-block;
+}
+.product-panel{
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0.5rem;
+}
+.product-name{
+  padding-left: 0.5rem;
+  display: inline-block;
+  max-width: 13rem;
+}
+.product-name name{
+  font-size: 1.2rem;
+}
+.product-name .param-name{
+  font-size: 1.2rem;
+}
+.product-panel>div{
+  display: inline-block;
+  margin-right: 3rem;
+}
+.product-panel .product-select{
+  margin-right: 1rem;
+}
+.product-panel.selected{
+  background-color: rgb(255, 224, 179);
+}
+.product-panel .product-img{
+  margin-right: 1rem;
+}
+.to-create-bill{
+  height: 4rem;
+  line-height: 4rem;
+  background-color: #eee;
+}
+.to-create-bill .btn{
+  border: 1px solid rgb(216, 17, 17);
+  background-color: rgb(224, 37, 37);
+  color: #fff;
+  font-size: 1.2rem;
+}

@@ -3,6 +3,7 @@
 const resourceObj = require('./resource');
 const {
 	avatar,
+	shopLogo,
 	poster,
 	avatar_small,
 	forum_avatar,
@@ -18,7 +19,7 @@ const {
 	fundBanner,
 	photo,
 	photo_small,
-	logo
+	logo,
 } = resourceObj;
 
 const auth = require('./auth');
@@ -50,6 +51,8 @@ const friend = require('./friend');
 const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
+const shop = require('./shop');
+const account = require('./account');
 const operationObj = {};
 
 
@@ -70,6 +73,7 @@ operationObj.defaultOperations = [
   'viewAllPaperRecords', // 可查看所有的考试记录
   'removeAllQuestion', // 可删除别人出的试题
   'superModerator', // 超级专家，所有专业的专家权限
+  "getAnyBodyShopCert", // 可查看任何人的商城凭证
 ];
 
 
@@ -82,6 +86,7 @@ operationObj.operationTree = {
 		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,
+		shopLogo, //店铺logo
 
 		forum_avatar,// 专业logo
 
@@ -168,6 +173,10 @@ operationObj.operationTree = {
     subscription, // 首页我的关注
 
 		lottery, // 抽奖页
+
+    shop, //商城
+    
+    account, // 个人中心
 	}
 };
 module.exports = operationObj;

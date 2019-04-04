@@ -4,7 +4,7 @@ const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
 module.exports = async (ctx, next) => {
-  const {filePath, resource, fs, type} = ctx;
+  const {filePath, fileName, resource, fs, type} = ctx;
   if(filePath && ctx.method === 'GET') {
 	  if(ctx.lastModified && ctx.fresh) {
       ctx.status = 304;
@@ -14,7 +14,14 @@ module.exports = async (ctx, next) => {
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
-    const name = resource? resource.oname: basename;
+    let name;
+    if(resource) {
+      name = resource.oname;
+    } else if(fileName) {
+      name = fileName
+    } else {
+      name = basename;
+    }
     let stats = fss.statSync(filePath);
     if(ext == "mp4"){
       if(ctx.request.headers['range']){

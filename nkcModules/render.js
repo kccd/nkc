@@ -115,7 +115,7 @@ let creditString = (t) => {
     case 'xsf':
       return '学术分';
     case 'creditKcb':
-      return '科创币';
+      return '科创币';   
     default:
       return '[未定义积分]'
   }
@@ -150,6 +150,12 @@ function delCodeAddShrink(content){
 		content = content.substr(0,50) + "~~~~~~~~~~~~" + lastContent;
 	}
 	return content
+}
+
+// 去除全部标签
+function delAllCode(content) {
+	content = content.replace(/<[^>]+>/g,"");
+	return content;
 }
 
 // 根据学术分隐藏内容
@@ -287,6 +293,26 @@ function ensureFundOperatorPermission(type, user, fund) {
 	}
 }
 
+function getProvinceCity(str) {
+	var addressArr = str.split("/");
+	var province;
+	var city;
+	var address
+	if(addressArr[0]) {
+		province = addressArr[0]
+	}
+	if(addressArr[1]) {
+		city = addressArr[1];
+	}
+	address = province + "/" + city;
+	return address;
+}
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -310,7 +336,10 @@ let pugRender = (template, data, state) => {
 		delCodeAddShrink,
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
-    startTime: global.NKC.startTime,
+		startTime: global.NKC.startTime,
+		getProvinceCity: getProvinceCity,
+		numToFloatTwo: numToFloatTwo,
+		delAllCode: delAllCode,
     // 翻译 type: 语言分类, words：关键字
     lang: (type, words) => {
       return language[type][words];
