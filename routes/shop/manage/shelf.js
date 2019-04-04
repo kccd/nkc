@@ -117,7 +117,7 @@ shelfRouter
       ip: ctx.address,
       type: 'product'
     };
-    
+    await db.ThreadModel.ensurePublishPermission(options);
     const productId = await db.SettingModel.operateSystemID('shopGoods', 1);
     const product = db.ShopGoodsModel({
       productId,
@@ -148,12 +148,12 @@ shelfRouter
       await d.save();
     }
 
+    await product.save();
+
     // 立即上架
     if(productStatus === "insale") {
       await product.onshelf();
     }
-
-    await product.save();
 
     data.product = product;
 		await next();

@@ -102,6 +102,7 @@ kcbsRecordSchema.virtual('fromUser')
 // 与银行间的交易记录
 kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
+  const UserModel = mongoose.model("users");
   const {nkcModules, address, port, data, db} = ctx;
   const {user} = data;
   if(!user || !u) return;
@@ -198,9 +199,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     await newRecords.remove();
     // await db.SettingModel.operateSystemID('kcbsRecords', -1);
   }
-
+  await UserModel.update({uid: u.uid}, {
+    $inc: {
+      kcb: -1*bankChange
+    }
+  });
   u.kcb += -1*bankChange;
-  await u.save();
 };
 
 // 用户间转账记录
@@ -354,6 +358,54 @@ kcbsRecordSchema.statics.hideAlipayInfo = async (records) => {
   for(const record of records) {
     record.c = "";
   }
-}
+};
+
+/*
+* 根据用户的kcb转账记录 计算用户的科创币总量 并将计算结果写到user.kcb
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-4-4
+* */
+kcbsRecordSchema.statics.checkRecords = async (uid) => {
+  const UserModel = mongoose.model("users");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const fromRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        from: uid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const toRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        to: uid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$sum"
+        }
+      }
+    }
+  ]);
+  const total = toRecords[0].total - fromRecords[0].total;
+  await UserModel.update({
+    uid
+  }, {
+    $set: {
+      kcb: total
+    }
+  });
+};
 
 module.exports = mongoose.model('kcbsRecords', kcbsRecordSchema);

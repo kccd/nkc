@@ -39,8 +39,8 @@ const jobsInit = async () => {
   const jobs = require('./scheduleJob');
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
   jobs.updateForums(updateDate.updateForumsCronStr);
+  jobs.shop();
   jobs.backupDatabase();
-  jobs.shopOrder();
 };
 
 

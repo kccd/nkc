@@ -130,7 +130,7 @@ var app = new Vue({
         url = "/shop/cert";
         type = "uploadCerts";
       } else {
-        return screenTopWarning("申请记录状态异常，请刷新");
+        return this.error = "申请记录状态异常，请刷新";
       }  
         
       
@@ -172,7 +172,7 @@ var app = new Vue({
           window.location.reload();
         })
         .catch(function(data) {
-          screenTopWarning(data);
+          app.error = data.error || data;
         });
     },
     refundType: function(t) {

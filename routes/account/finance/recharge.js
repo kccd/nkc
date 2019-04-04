@@ -103,7 +103,7 @@ router
             description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
             ip: ctx.address,
             port: ctx.port,
-            verfiy: true
+            verify: true
           });
           await r.save();
           // 更改订单状态为已付款，添加付款时间。

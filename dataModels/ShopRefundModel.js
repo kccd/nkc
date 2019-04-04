@@ -304,11 +304,11 @@ schema.methods.returnMoney = async function () {
       closeToc: time
     }
   });
-}
+};
 /**
  * 判断退款申请的状态以及订单状态 状态异常则抛出错误
- * @param String reason: 退款理由或说名
- * @param String/Array 1operation: 当前执行的操作名
+ * @param {String} reason: 退款理由或说名
+ * @param {String} operations: 当前执行的操作名
  * @return Object:
  *  reason: (String) 退款理由或说明
  *  time: (Date) 时间
@@ -343,7 +343,7 @@ schema.methods.ensureRefundPermission = async function(reason, operations) {
     order,
     refund
   };
-}
+};
 
 /**
  * 平台同意退款申请、同意退货申请或超时自动同意
@@ -364,11 +364,11 @@ schema.methods.platformAgreeRM = async function() {
     }
   });
   await this.returnMoney();
-}
+};
 
 /**
  * 卖家同意退款申请或超时自动同意
- * @param String reason: 退款理由或说明
+ * @param {String} reason: 退款理由或说明
  * @authro pengxiguaa 2019/3/27
  */
 schema.methods.sellerAgreeRM = async function(reason) {
@@ -393,15 +393,15 @@ schema.methods.sellerAgreeRM = async function(reason) {
     }
   });
   await this.returnMoney();
-}
+};
 
 /**
  * 卖家拒绝退款申请
- * @param String reason: 退款理由或说名
+ * @param {String} reason: 退款理由或说名
  * @author pengxiguaa 2019/3/27
  */
 schema.methods.sellerDisagreeRM = async function(reason) {
-  if(!reason) throw(400, "拒绝的理由不能为空");
+  if(!reason) throwErr(400, "拒绝的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const {order, time} = await this.ensureRefundPermission(reason, [
@@ -435,8 +435,8 @@ schema.methods.sellerDisagreeRM = async function(reason) {
 
 /**
  * 卖家同意退货申请或超时自动同意
- * @param String reason: 退款理由或说名
- * @param Object sellerInfo: 卖家信息
+ * @param {String} reason: 退款理由或说名
+ * @param {Object} sellerInfo: 卖家信息
  *  name: 收件人姓名
  *  address: 收件人地址
  *  mobile: 收件人手机号
@@ -473,7 +473,7 @@ schema.methods.sellerAgreeRP = async function(reason, sellerInfo) {
       }
     }
   });
-}
+};
 
 /**
  * 平台拒绝退款申请、退货申请
@@ -505,16 +505,16 @@ schema.methods.platformDisagreeRM = async function(reason) {
       autoReceiveTime: time - this.toc
     }
   });
-} 
+};
 
 
 /**
  * 卖家拒绝退货申请
- * @param String reason: 退款理由或说名
+ * @param {String} reason: 退款理由或说名
  * @authro pengxiguaa 2019/3/27
  */
 schema.methods.sellerDisagreeRP = async function(reason) {
-  if(!reason) throw(400, "拒绝的理由不能为空");
+  if(!reason) throwErr(400, "拒绝的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const {time, order} = await this.ensureRefundPermission(reason, "B_APPLY_RP");
@@ -540,14 +540,14 @@ schema.methods.sellerDisagreeRP = async function(reason) {
       autoReceiveTime: time - this.toc
     }
   });
-}
+};
 /**
  * 买家撤销申请 也可能是因为申请超时系统撤销
- * @param String reason: 撤销的理由或说明
+ * @param {String} reason: 撤销的理由或说明
  * @author pengxiguaa 2019/3/27
  */
 schema.methods.buyerGiveUp = async function(reason) {
-  if(!reason) throw(400, "放弃的理由不能为空");
+  if(!reason) throwErr(400, "放弃的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const {time, order} = await this.ensureRefundPermission(reason, [

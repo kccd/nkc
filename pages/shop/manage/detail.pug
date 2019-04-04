@@ -232,7 +232,8 @@ block name
             th 数量
         tbody
           tr
-            td!=`${order.product.name}`
+            td
+              a(href=`/shop/product/${order.product.productId}` target="_blank")= order.product.name
             td!=`${order.productParam.name}`
             td #{numToFloatTwo(order.productParam.price)}
             td #{numToFloatTwo(order.product.freightPrice)}

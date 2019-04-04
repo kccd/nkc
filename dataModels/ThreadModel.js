@@ -591,16 +591,31 @@ threadSchema.statics.findThreadById = async (tid) => {
   @param userInfo: 用户对象或uid
   @author pengxiguaa 2019/3/7
 */
-threadSchema.statics.ensurePublishPermission = async (userInfo) => {
+threadSchema.statics.ensurePublishPermission = async (options) => {
   const UserModel = mongoose.model('users');
   const ThreadModel = mongoose.model('threads');
   const SettingModel = mongoose.model('settings');
+  const ForumModel = mongoose.model("forums");
   const apiFunction = require('../nkcModules/apiFunction');
-  if(!userInfo) throwErr(500, `userInfo is a required parameter in forum.statics method`);
-  let user = userInfo;
-  if(userInfo.constructor === String) {
-    user = await UserModel.findUserById(userInfo);
-  }
+  const {contentLength} = require("../tools/checkString");
+  const {uid, fids, title, content} = options;
+
+  if(!uid) throwErr(404, '用户ID不能为空');
+  const user = await UserModel.findUserById(uid);
+  const forums = await ForumModel.find({fid: {$in: fids}});
+  await Promise.all(forums.map(async forum => {
+    const childrenForums = await forum.extendChildrenForums();
+    if(childrenForums.length !== 0) {
+      throwErr(400, `专业【${forum.displayName}】下存在其他专业，请到下属属专业发表内容。`);
+    }
+  }));
+
+  await ForumModel.ensureForumsPermission(fids, user);
+  if(!title) throwErr(400, "标题不能为空");
+  if(contentLength(title) > 200) throwErr(400, "标题不能大于200字节");
+  if(!content) throwErr(400, "内容不能为空");
+  if(contentLength(content) < 6) throwErr(400, "内容不能小于6个字节");
+
   // 验证是否完善过资料
   await user.ensureUserInfo();
   if(!user.authLevel) await user.extendAuthLevel();
@@ -610,17 +625,17 @@ threadSchema.statics.ensurePublishPermission = async (userInfo) => {
   const {status, countLimit, unlimited} = notPass;
   const today = apiFunction.today();
   const todayThreadCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
-  if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
+  if(authLevelMin > user.authLevel) throwErr(403,`身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
   if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
-    if(!status) ctx.throw(403, '权限不足，请提升账号等级');
-    if(!unlimited && countLimit <= todayThreadCount) ctx.throw(403, '今日发表文章次数已用完，请明天再试。');
+    if(!status) throwErr(403, '权限不足，请提升账号等级');
+    if(!unlimited && countLimit <= todayThreadCount) throwErr(403, '今日发表文章次数已用完，请明天再试。');
   }
 
   // 发表回复时间、条数限制
   const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
-  if(todayThreadCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
+  if(todayThreadCount >= postToForumCountLimit) throwErr(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
   const latestThread = await ThreadModel.findOne({uid: user.uid, toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
-  if(latestThread) ctx.throw(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
+  if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
 };
 /* 
   发表文章接口，未完成
@@ -638,20 +653,11 @@ threadSchema.statics.publishArticle = async (options) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
-  const ForumModel = mongoose.model('forums');
   const UserModel = mongoose.model('users');
   const {uid, fids, cids, ip, title, content, abstract, type} = options;
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findUserById(uid);
-  await ThreadModel.ensurePublishPermission(uid);
-  const forums = await ForumModel.find({fid: {$in: fids}});
-  await Promise.all(forums.map(async forum => {
-    const childrenForums = await forum.extendChildrenForums();
-	  if(childrenForums.length !== 0) {
-      throwErr(400, `专业【${forum.displayName}】下存在其他专业，请到下属属专业发表内容。`);
-	  }
-  }));
-  await ForumModel.ensureForumsPermission(fids, user);
+  await ThreadModel.ensurePublishPermission(options);
   const tid = await SettingModel.operateSystemID('threads', 1);
   const thread = ThreadModel({
     tid,

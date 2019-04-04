@@ -31,9 +31,8 @@ block content
         .col-xs-12.col-md-12
           h4 退款说明
           ul.text-danger
-            li 绝对不能意气用事
-            li 绝对不漏判任何一件坏事
-            li 绝对裁判的公正漂亮  
+            li 若卖家迟迟不发货，您可以向卖家发起退款请求。
+            li 当卖家拒绝了您的退款申请时，您才能请求平台介入。
           hr
         .col-xs-12.col-md-12
           .row
@@ -85,8 +84,10 @@ block content
                     a(href="###") 请求平台介入  
                 .m-t-1.m-b-2
                   span.text-danger 注意事项：
-                  p(v-if="applyType === 'seller'") 向卖家申请退款时需提交申请理由，待卖家同意后系统将自动退还科创币。
-                  p(v-else) 只有卖家拒绝您的退款申请后，才可以请求平台接入
+                  p(v-if="applyType === 'seller'")
+                    | 请与卖家协商确认退款方式。选择“只退款”时无需买家寄回商品，当卖家同意后立即退款。选择“退货退款”时需买家寄回商品，待卖家确认商品无误后才能退款。
+                  p(v-else)
+                    | 当买家向卖家提出退款申请并遭到拒绝后，买家才能请求平台介入。
 
               
               .m-t-1(v-if="display.apply && (applyType !== 'platform' || order.applyToPlatform)")
