@@ -8,8 +8,16 @@ function editProductParamInfo() {
 /**
  * 立即上架
  */
-function shelfRightNow() {
-
+function shelfRightNow(storeId, productId) {
+  nkcAPI(`/shop/manage/${storeId}/goodslist/shelfRightNow`, "PATCH", {productId})
+  .then(function() {
+    screenTopAlert("上架成功");
+    var targetUrl = `/shop/manage/${storeId}/goodslist`;
+    window.location.href = targetUrl;
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error);
+  })
 }
 
 /**

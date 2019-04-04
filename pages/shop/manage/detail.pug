@@ -64,7 +64,7 @@ block title
       color:#666;
     }
     .infoContent {
-      color:#ccc
+      color:#6e6e6e
     }
     .infoCaption {
       font-weight: bold;
@@ -124,7 +124,7 @@ block name
               li.orderPrompt 
                 span 点击查看商品的
                 span 
-                  a(onclick=`visitLogisticsInfo(${order.orderId})` style="cursor:pointer;") 物流信息
+                  a(onclick=`visitLogisticsInfo(${order.storeId},${order.orderId})` style="cursor:pointer;") 物流信息
             if order.orderStatus == "finish"
               li.orderStatusLi
                 span.fa.fa-exclamation-circle.orderStatusMark
@@ -179,6 +179,11 @@ block name
                 span.infoCaption 成交时间:
                 if order.finishToc
                   span.infoContent=order.finishToc.toLocaleString()
+            .col-xs-6
+              p
+                span.infoCaption 订单关闭时间:
+                if order.closeToc
+                  span.infoContent=order.closeToc.toLocaleString()
 
           .col-xs-12
             h4.infoTitle 

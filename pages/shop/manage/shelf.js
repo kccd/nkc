@@ -226,7 +226,7 @@ function productToShelf(storeId) {
     window.location.href = targetUrl;
   })
   .catch(function(data){
-    alert("上架失败")
+    alert(data || data.error)
   })
 }
 

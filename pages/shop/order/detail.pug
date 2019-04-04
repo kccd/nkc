@@ -65,7 +65,7 @@ block shopAccountTitle
       color:#666;
     }
     .infoContent {
-      color:#ccc
+      color:#6e6e6e
     }
     .infoCaption {
       font-weight: bold;
@@ -98,9 +98,9 @@ block shopAccountContent
                 span.fa.fa-exclamation-circle.orderStatusMark
                 span.orderStatusTitle 当前订单状态：
                 span.orderStatusText 等待商家发货
-              li.orderPrompt 
-                span 
-                  button(onclick="alert('测试：提醒商家发货')") 提醒商家发货
+              //- li.orderPrompt 
+              //-   span 
+              //-     button(onclick="alert('测试：提醒商家发货')") 提醒商家发货
               li.orderPrompt 
                 span 申请退款请前往到
                 span 
@@ -182,14 +182,14 @@ block shopAccountContent
                   span.infoContent=order.payToc.toLocaleString()
             .col-xs-6
               p
-                span.infoCaption 收货时间:
-                if order.signToc
-                  span.infoContent=order.signToc.toLocaleString()
-            .col-xs-6
-              p
                 span.infoCaption 成交时间:
                 if order.finishToc
                   span.infoContent=order.finishToc.toLocaleString()
+            .col-xs-6
+              p
+                span.infoCaption 订单关闭时间:
+                if order.closeToc
+                  span.infoContent=order.closeToc.toLocaleString()
 
           .col-xs-12
             h4.infoTitle 

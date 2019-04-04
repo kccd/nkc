@@ -96,6 +96,9 @@ module.exports = {
         editProduct: {
           GET: "visitStoreGoodsProductEdit",
           PATCH: "submitEditToProduct",
+        },
+        shelfRightNow: {
+          PATCH: "productShelfRightNow"
         }
       }
     },

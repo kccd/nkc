@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const productRouter = new Router();
 productRouter
   .get('/:productId', async (ctx, next) => {
-    const {data, body, db, params, query} = ctx;
+    const {data, body, db, params, query, nkcModules} = ctx;
     // 获取商品id，并检查商品是否存在
     const {productId} = params;
     let {paraId} = query;
@@ -37,7 +37,15 @@ productRouter
 		// 		post.todraft = true;
 		// 		post.reason = toDraftPosts[index].reason;
 		// 	}
-		// });
+    // });
+    // 获取用户地址信息
+		let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
+		let userAddress;
+		const {status, province, city} = ipInfo;
+		if(status && status == "1"){
+			userAddress = province + " " + city;
+		}
+		data.userAddress = userAddress;
     ctx.template = "shop/product/index.pug";
     await next();
   })

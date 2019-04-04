@@ -29,14 +29,17 @@ function visitLogisticsInfo(orderId) {
  * 确认收货
  */
 function comfirmReceipt(orderId) {
-  nkcAPI('/shop/order/'+orderId+'/receipt', "PATCH", {})
-  .then(function(data) {
-    screenTopAlert("已确认收货");
-    window.location.reload();
-  })
-  .catch(function(data) {
-    screenTopWarning(data || data.error)
-  })
+  var isReceipt = confirm("确认收货后，货款将打入卖家账户")
+  if(isReceipt){
+    nkcAPI('/shop/order/'+orderId+'/receipt', "PATCH", {})
+    .then(function(data) {
+      screenTopAlert("已确认收货");
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data || data.error)
+    })
+  }
 }
 
 /**

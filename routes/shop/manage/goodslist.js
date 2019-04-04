@@ -65,4 +65,12 @@ goodslistRouter
     const {data, body, query, params, db} = ctx;
     await next();
   })
+  // 立即上架
+  .patch('/shelfRightNow', async (ctx ,next) => {
+    const {data, body, params, db} = ctx;
+    const {productId} = body;
+    const product = await db.ShopGoodsModel.findOne({productId});
+    await product.onshelf();
+    await next();
+  })
 module.exports = goodslistRouter;

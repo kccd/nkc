@@ -1611,7 +1611,7 @@ function lottery() {
       header[0].innerText = result.name;
       var content = domOpen.getElementsByClassName('lottery-info');
       if(content.length === 0) return;
-      content[0].innerText = '获得' + kcb + '个科创币';
+      content[0].innerText = '获得' + numToFloatTwo(kcb) + '个科创币';
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
@@ -1693,3 +1693,8 @@ function moveThread(tid,fid,cid,para){
       screenTopWarning('移动失败：'+data.error);
     })
 }
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 

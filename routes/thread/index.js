@@ -285,7 +285,7 @@ threadRouter
       }
 		}
 		// 获取用户地址信息
-		let ipInfo = await nkcModules.apiFunction.getIpAddress("192.168.11.114");
+		let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
 		let userAddress;
 		const {status, province, city} = ipInfo;
 		if(status && status == "1"){
