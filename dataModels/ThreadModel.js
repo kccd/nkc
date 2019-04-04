@@ -602,6 +602,8 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
 
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findUserById(uid);
+  await user.extendRoles();
+  await user.extendGrade();
   const forums = await ForumModel.find({fid: {$in: fids}});
   await Promise.all(forums.map(async forum => {
     const childrenForums = await forum.extendChildrenForums();

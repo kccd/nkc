@@ -225,7 +225,7 @@ function productToShelf(storeId) {
     window.location.href = targetUrl;
   })
   .catch(function(data){
-    alert(data || data.error)
+    screenTopWarning(data.error || data);
   })
 }
 
