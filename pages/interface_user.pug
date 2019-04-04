@@ -235,7 +235,6 @@ block content
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribers.length > 8
-                      .col-xs-12.col-md-12.text-center
                         a(href=`/u/${data.targetUser.uid}?type=fans`) 查看更多
                   br
 
@@ -253,12 +252,7 @@ block content
                         if i !== 8
                           -const user = data.newSubscribeUsers[i];
                           -const navbarDesc = user.navbarDesc;
-<<<<<<< HEAD
-                          -let userKcb = numToFloatTwo(user.kcb);
-                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${userKcb}\n`+`${user.info.certsName}`;
-=======
                           -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100 }\n`+`${user.info.certsName}`;
->>>>>>> 83fdf39a1d46ef3c52963f15c14d87c3588a645b
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribeUsers.length > 8
