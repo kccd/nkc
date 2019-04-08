@@ -96,7 +96,7 @@ function displayPageList(paging, self) {
 	$('.pageList').html(html);
 }
 
-// 生成帖子列表html字符串
+// 生成文章列表html字符串
 function createThreadsList(arr, type, disabled) {//add, remove
 	var functionName = '', iconClass = '';
 	if(disabled === true) {
@@ -132,7 +132,7 @@ function createThreadsList(arr, type, disabled) {//add, remove
 function disabledRolling(num){
 	$(window).scrollTop(num);
 }
-//初始化已选帖子列表
+//初始化已选文章列表
 function initThreadsList() {
 	var arr = $('.selectedThreads .threadList .postString');
 	var length = arr.length;
@@ -142,7 +142,7 @@ function initThreadsList() {
 		selectedThreads.push(obj);
 	}
 }
-// 渲染帖子列表
+// 渲染文章列表
 function displayThreadsList(id, arr, disabled, type) {
 	var html;
 	if (type === 'add') {
@@ -208,7 +208,7 @@ function submit(id){
 	if(arr.eq(0).is(':checked')) {
 		success = true;
 	}
-	if(selectedThreads.length === 0) return screenTopWarning('请选择帖子。');
+	if(selectedThreads.length === 0) return screenTopWarning('请选择文章。');
 	var obj = {
 		successful: success,
 		selectedThreads: selectedThreads,

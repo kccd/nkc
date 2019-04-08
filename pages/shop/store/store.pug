@@ -1,0 +1,167 @@
+extends ../shopBase
+
+block shopTitle
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  -const storeInfo = data.storeInfo
+  -const storeDecoration = data.storeDecoration;
+  -const storeClassFeatureds = data.storeClassFeatureds;
+  -const featuredProducts = data.featuredProducts;
+  title 店铺首页
+  link(rel='stylesheet' href='/shop/store/store.css')
+
+block content
+
+  .container-fluid.max-width
+    .row
+      .col-xs-1.col-md-1
+      .col-xs-10.col-md-10
+        // 页头
+        .col-xs-12.col-md-12
+          // 店铺招牌
+          .col-xs-12.col-md-12
+            .storeSign
+              img(src=`/statics/storeLogo/storeLogo`+`${storeInfo.storeId}`+`.jpg`, style="width:100%")
+          // 店铺导航
+          .col-xs-12.col-md-12
+            .storeNav
+              nav.navbar.navbar-default
+                .container-fluid
+                  .navbar-header
+                    button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                      span.sr-only Toggle navigation
+                      span.icon-bar
+                      span.icon-bar
+                      span.icon-bar
+                    a.navbar-brand(href='#') 
+                      span [
+                      span!=`${storeInfo.storeName}`
+                      span ]
+                  #bs-example-navbar-collapse-1.collapse.navbar-collapse
+                    ul.nav.navbar-nav
+                      li.dropdown
+                        //- a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                        //-   | 所有分类 
+                        //-   span.caret
+                        //- ul.dropdown-menu
+                        //-   li
+                        //-     a(href='#') Action
+                        //-   li
+                        //-     a(href='#') Another action
+                        //-   li
+                        //-     a(href='#') Something else here
+                        //-   li.divider(role='separator')
+                        //-   li
+                        //-     a(href='#') Separated link
+                        //-   li.divider(role='separator')
+                        //-   li
+                        //-     a(href='#') One more separated link
+                      li.active
+                        a(href='#')
+                          | 首页
+                          span.sr-only (current)
+        // 页面中部
+        .col-xs-12.col-md-12
+          // 左侧模块组
+          .col-xs-3.col-md-3
+            //- // 店内分类
+            //- .col-xs-12.col-md-12
+            //-   .panel.panel-default
+            //-     // Default panel contents
+            //-     .panel-heading 店内分类
+            //-     .panel-body(style="padding:0")
+            //-       ul#main-nav.nav.nav-tabs.nav-stacked(style='')
+            //-         li(style="background-color: aliceblue")
+            //-           a(href='#')
+            //-             | 大分类一
+            //-         li(style="background-color: aliceblue")
+            //-           a(href='#')
+            //-             | 大分类二
+            //-         li(style="background-color: aliceblue")
+            //-           a.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse')
+            //-             | 大分类三
+            //-             span.pull-right.glyphicon.glyphicon-chevron-down
+            //-           ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
+            //-             li
+            //-               a(href='#')
+            //-                 | 小分类一
+            // 店内搜索
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-heading 店内搜索
+                .panel-body(style="padding:5")
+                  .row
+                    .col-xs-8.col-md-8
+                      input.form-control.input-sm(type='text', placeholder='关键字' value=`${storeDecoration.presetKey}`)
+                    .col-xs-3.col-md-3(style="padding:0;margin-bottom:10px")
+                      button.btn.btn-primary.btn-sm 搜索
+                    .col-xs-12.col-md-12(style="font-size:smaller")
+                      for keyWord in storeDecoration.recommendKeys
+                        span(style="margin-right: 5px;")!=`${keyWord}`
+
+
+            // 客服中心
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                // Default panel contents
+                .panel-heading 客服中心
+                .panel-body(style="padding:0")
+                  .skin-box-bd
+                    ul
+                      li.service-block
+                        p.boldFont 工作时间
+                        ul.service-content
+                          li 
+                            span 周一至周五：
+                            span!=`${storeDecoration.serviceTimeWork[0]}`
+                            span -
+                            span!=`${storeDecoration.serviceTimeWork[1]}`
+                          li 
+                            span 周六至周日：
+                            span!=`${storeDecoration.serviceTimeRest[0]}`
+                            span -
+                            span!=`${storeDecoration.serviceTimeRest[1]}`
+                      li.service-block
+                        p.boldFont 联系方式
+                        ul.service-content
+                          li.tel 
+                            span 联系电话：
+                            span!=`${storeDecoration.servicePhone}`
+                          li.mob 
+                            span 手机号码：
+                            span!=`${storeDecoration.serviceMobile}`
+            // 商品推荐
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-heading
+                  h3.panel-title 商品推荐
+                ul.list-group
+                  for feature in featuredProducts
+                    li.list-group-item
+                      a(href=`/shop/product/${feature.productId}`) 
+                        img(src=`/r/${feature.imgMaster}` style="width:32px;height:auto;float:right")
+                        span(style="display:block;font-weight:700;color:#666")!=`${feature.name}`
+          // 右侧模块组
+          .col-xs-9.col-md-9
+            for classify,index in storeClassFeatureds
+              .col-xs-12.col-md-12
+                .panel.panel-default
+                  .panel-heading 
+                    span!=`${classify.name}`
+                    a(href="#" style="float:right") 
+                      | 更多
+                      span.fa.fa-angle-double-right
+                  .panel-body(style="padding:0")
+                    .row
+                      for cla in classify.classFeatureds
+                        .col-sm-6.col-md-4
+                          .thumbnail(style="margin:0;border:0")
+                            a(href=`/shop/product/${cla.productId}`)
+                              img(src=`/r/${cla.imgMaster}`, title=`${cla.abstract}` ,style="height:150px" )
+                            .caption
+                              a(href=`/shop/product/${cla.productId}` style="display: block;font-size: 12px;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${cla.abstract}`)!=`${cla.name}`
+        // 页面尾部
+        .col-xs-12.col-md-12
+      .col-xs-1.col-md-1
+
+block scripts

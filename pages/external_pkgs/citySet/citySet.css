@@ -1,0 +1,14 @@
+* { -ms-word-wrap: break-word; word-wrap: break-word; }
+html { -webkit-text-size-adjust: none; text-size-adjust: none; }
+/* html, body {height:100%;width:100%; } */
+.wrap{width:464px;height:34px;margin:200px auto;border:0;position:relative;}
+.input{margin:0;padding-left:5px;height:30px;line-height:30px;font-size:12px;border:1px solid #c9cacb;}
+s{position:absolute;top:1px;right:0;width:32px;height:32px;}
+._citys { width: 450px; display: inline-block; border: 2px solid #eee; padding: 5px; position: relative; background-color:#fff}
+._citys span { color: #061086; height: 15px; width: 15px; line-height: 15px; text-align: center; border-radius: 3px; position: absolute; right: 10px; top: 10px; border: 1px solid #061086; cursor: pointer; }
+._citys0 { width: 95%; height: 34px; line-height: 34px; display: inline-block; border-bottom: 2px solid #061086; padding: 0px 5px; font-size:14px; font-weight:bold; margin-left:6px; }
+._citys0 li { display: inline-block; line-height: 34px; font-size: 15px; color: #888; width: 80px; text-align: center; cursor: pointer; }
+._citys1 { width: 100%; display: inline-block; padding: 10px 0; }
+._citys1 a { width: 83px; height: 35px; display: unset; background-color: #ffffff; color: #666; margin-left: 6px; margin-top: 3px; line-height: 35px; text-align: center; cursor: pointer; font-size: 12px; border-radius: 5px; overflow: hidden; }
+._citys1 a:hover { color: #fff; background-color: #061086; }
+.AreaS { background-color: #061086 !important; color: #fff !important; }

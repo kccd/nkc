@@ -9,6 +9,7 @@ const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
 const avatar = require('./avatar');
+const shopLogo = require('./shopLogo')
 const avatarSmall = require('./avatar_small');
 const resourcesRouter = require('./resources');
 const defaultRouter = require('./default');
@@ -67,6 +68,7 @@ otherRouter
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('avatar', avatar.routes(), avatar.allowedMethods())
+  .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
   .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())

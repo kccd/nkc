@@ -105,7 +105,8 @@ router
       name: 'server',
       data: {
         address: server.address,
-        port: server.port
+        port: server.port,
+        domain: `http://127.0.0.1:${server.port}`
       }
     });
     // redis

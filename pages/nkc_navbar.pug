@@ -42,7 +42,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
                 span.fa.fa-inbox &nbsp;草稿箱
                 span.messageNumber.draftMessage= data.user.draftCount || ''
             li
-              a(href=`/u/${user.uid}/kcb`)
+              a(href=`/account/finance`)
                 span.fa.fa-file-text-o &nbsp;账单
             li
               a(href=`/activity`)
@@ -72,6 +72,36 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
           a(href=`/fund` title='科创基金') 基金
       ul.nav.navbar-nav.navbar-right.nav-font-color(style='font-size: 1em;')
         if data.user
+          if data.shopInfo
+            li.dropdown
+              a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+                span 我的商城
+                span.caret
+              ul.dropdown-menu
+                li
+                  a(href="/shop") 商城首页
+                li.divider
+                li
+                  a(href="/shop/order") 
+                    span 全部订单
+                li
+                  a(href="/shop/order?orderStatus=unCost") 待付款
+                li
+                  a(href="/shop/order?orderStatus=unShip") 待发货
+                li
+                  a(href="/shop/order?orderStatus=unSign") 待收货
+
+                li.divider
+                li
+                  a(href="/shop/manage") 
+                    span 卖家中心    
+            
+            li
+              a(href="/shop/cart") 
+                span.fa.fa-shopping-cart &nbsp;
+                span 购物车
+                if data.shopInfo.cartProductCount > 0
+                  .nav-red-point-number= data.shopInfo.cartProductCount      
           if data.userOperationsId.includes('visitExperimentalStatus')
             li
               a(style='color: #777777;' href='/e')
@@ -80,7 +110,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
           - var user = data.user
           //- - var navbarDesc = user.navbarDesc;
           //- - var title = `${navbarDesc.username}\n`+`学术分 ${navbarDesc.xsf}\n`+`科创币 ${navbarDesc.kcb}\n`+`${navbarDesc.cs}`;
-          - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
+          - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
           li.dropdown.userInfo
             img(src=`/avatar/${user.uid}` style='width: 2em;height: 2em;border-radius: 50%;display:inline-block;margin-left: 0.5rem;')
             a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style='display:inline-block;padding-left: 0.5rem;')
@@ -106,7 +136,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.messageNumber.draftMessage= data.user.draftCount || ''
               li
-                a(href=`/u/${user.uid}/kcb`)
+                a(href=`/account/finance?t=all`)
                   span.fa.fa-file-text-o &nbsp;账单
               li
                 a(href=`/activity`)

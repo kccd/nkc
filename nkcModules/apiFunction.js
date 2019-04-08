@@ -1,5 +1,8 @@
 const paging = require('../settings/paging');
 const moment = require('moment');
+const http = require("http");
+const aliAppCode = require("../config/aliAppCode");
+const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 let {perpage} = paging;
 let fn = {};
@@ -214,6 +217,7 @@ fn.fromNow = (time) => {
 // reduce[bull] 是否进行略缩，默认为false
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
+  if(!content) return content;
   content = content.replace(/<[^>]+>/g,"");
   count = parseInt(count);
   if(reduce === true){
@@ -325,5 +329,148 @@ fn.shuffle = (arr) => {
     arr[i] = arr[index];
     arr[index] = n;      
   }
+}
+/* 
+  从多个数组中取值，组成与原数组长度相同的不重复的新数组
+  @param arr 原数组：
+  [
+    ['a', 'b', 'c'],
+    [1, 2, 3],
+    ['A', 'B', 'C'],
+    ...
+  ]
+  @return 新数组：
+  [
+    ['a', 1, 'A'],
+    ['a', 1, 'B'],
+    ['a', 1, 'C'],
+    ['a', 2, 'A'],
+    ['a', 2, 'B'],
+    ['a', 2, 'C'],
+    ...
+  ]
+  @author https://www.cnblogs.com/liugang-vip/p/5985210.html
+*/
+fn.doExchange = (arr) => {
+  const len = arr.length;
+  // 当数组大于等于2个的时候
+  if(len >= 2){
+    // 第一个数组的长度
+    const len1 = arr[0].length;
+    // 第二个数组的长度
+    const len2 = arr[1].length;
+    // 2个数组产生的组合数
+    const lenBoth = len1 * len2;
+    //  申明一个新数组
+    const items = new Array(lenBoth);
+    // 申明新数组的索引
+    let index = 0;
+    for(let i = 0; i < len1; i++) {
+      for(let j = 0; j < len2; j++) {
+        if(arr[0][i] instanceof Array){
+          items[index] = arr[0][i].concat(arr[1][j]);
+        } else {
+          items[index] = [arr[0][i]].concat(arr[1][j]);
+        }
+        index++;
+      }
+    }
+    const newArr = new Array(len -1);
+    for(let i = 2; i < arr.length; i++) {
+      newArr[i-1] = arr[i];
+    }
+    newArr[0] = items;
+    return fn.doExchange(newArr);
+  }else{
+    return arr[0];
+  }
+}
+
+
+/**
+ * 查询ip所在地地理位置(阿里云)
+ * @param {String} ip ip地址
+ * @return {JSON} data
+ * @author Kris 2019-3-14
+ */
+fn.getIpAddress = (ip) => {
+  let options = {
+    hostname: `iploc.market.alicloudapi.com`,    //接口域
+    path: `/v3/ip?ip=${ip}`,    //请求地址
+    headers: {    //请求头
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "APPCODE "+appCode
+    }
+  }
+  return new Promise((resolve, reject) => {
+      // 发起请求
+      let req = http.request(options, res => {
+          let chunks = [];
+          res.on('data', chunk => {
+              chunks.push(chunk);
+          })
+          res.on('end', () => {
+              let buffer = Buffer.concat(chunks).toString();
+              // 如果接口返回空值
+              let data = buffer ? JSON.parse(buffer) : {code: 1, data: 'ip接口没有返回值'};
+              resolve(data);
+          })
+      })
+      // 请求出错
+      req.on('error', err => {
+          resolve({code: 1, data: "请求ip接口出错"});
+      })
+      // 请求结束
+      req.end();
+  })
+}
+
+
+/**
+ * 查询物流信息(阿里云)
+ * @param {String} trackNumber 快递单号 
+ * @return {JSON} data:由接口返回的物流信息，JSON
+ * @author Kris 2019-3-18
+ */
+fn.getTrackInfo = (trackNumber) => {
+  let options = {
+    hostname: `wuliu.market.alicloudapi.com`,    //接口域
+    path: `/kdi?no=${trackNumber}`,    //请求地址
+    headers: {    //请求头
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "APPCODE "+appCode
+    }
+  }
+  return new Promise((resolve, reject) => {
+      // 发起请求
+      let req = http.request(options, res => {
+          let chunks = [];
+          res.on('data', chunk => {
+              chunks.push(chunk);
+          })
+          res.on('end', () => {
+              let buffer = Buffer.concat(chunks).toString();
+              // 如果接口返回空值
+              let data = {};
+              if(buffer) {
+                try{
+                  data = JSON.parse(buffer)
+                }catch(err) {
+
+                }
+              }else{
+                data = {code: 1, data: '物流信息接口没有返回值'}
+              }
+              // let data = buffer ? JSON.parse(buffer) : {code: 1, data: '物流信息接口没有返回值'};
+              resolve(data);
+          })
+      })
+      // 请求出错
+      req.on('error', err => {
+          resolve({code: 1, data: "请求物流信息接口出错"});
+      })
+      // 请求结束
+      req.end();
+  })
 }
 module.exports = fn;

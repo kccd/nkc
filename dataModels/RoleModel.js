@@ -170,6 +170,7 @@ roleSchema.statics.extendRole = async (_id) => {
   role.displayName = await redisClient.getAsync(`role:${_id}:displayName`);
   role.operationsId = await redisClient.smembersAsync(`role:${_id}:operationsId`);
   role.modifyPostTimeLimit = await redisClient.getAsync(`role:${_id}:modifyPostTimeLimit`);
+  role.modifyPostTimeLimit = Number(role.modifyPostTimeLimit || 0);
   return role;
 };
 const RoleModel = mongoose.model('roles', roleSchema);

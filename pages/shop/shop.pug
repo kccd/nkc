@@ -1,0 +1,112 @@
+extends ./shopBase
+block shopTitle
+  title 科创商城
+  style.
+    .modtitle {
+      font-size: 1.6rem;
+      font-weight: 600;
+      border-bottom: 2px solid #ff720d;
+      line-height: 30px;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      position: relative;
+    }
+block content
+  .container-fluid.max-width
+    //include ./shopSearch
+    .row.m-t-2
+      //-.col-xs-12.col-md-12
+        <nav class="navbar navbar-default">
+          <div class="container">
+            <ul class="nav navbar-nav">
+              <li>
+                a(href='###') 全部分类
+              </li>
+              <li>
+                a(href='###') 精选好货
+              </li>
+              <li>
+                a(href='###') 最新上架
+              </li>
+              <li>
+                a(href='###') 人气爆棚
+              </li>
+            </ul>
+          </div>
+        </nav>
+      .col-xs-12.col-md-3
+        h3.modtitle 最热商品
+        ul.list-group
+          for popular in data.popularItems
+            li.list-group-item(style="border-color:#fff")
+              a(href=`/shop/product/${popular.productId}`) 
+                img(src=`/r/${popular.imgMaster}` style="width:64px;height:auto;float:right")
+                span(style="display:block;font-weight:700;color:#666;")=popular.name
+      .col-xs-12.col-md-9
+        .row
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
+            #carousel-example-generic.carousel.slide(data-ride='carousel')
+              // Indicators
+              //- ol.carousel-indicators
+              //-   li.active(data-target='#carousel-example-generic', data-slide-to='0')
+              //-   li(data-target='#carousel-example-generic', data-slide-to='1')
+              //-   li(data-target='#carousel-example-generic', data-slide-to='2')
+              // Wrapper for slides
+              .carousel-inner(role='listbox')
+                for carousel,index in data.homeSetting.carousels
+                  .item(class=index == 0?"active":"")
+                    a(href=`${carousel.targetUrl}`)
+                      img(src=`/statics/carousels/${carousel.name}`, alt='...' style="width:100%")
+                      .carousel-caption
+                        | ...
+                //- .item
+                //-   img(src='default/coll2.jpg', alt='...' style="width:100%")
+                //-   .carousel-caption
+                //-     | ...
+                //- .item
+                //-   img(src='default/coll3.jpg', alt='...' style="width:100%")
+                //-   .carousel-caption
+                //-     | ...
+              // Controls
+              a.left.carousel-control(href='#carousel-example-generic', role='button', data-slide='prev')
+                span.glyphicon.glyphicon-chevron-left(aria-hidden='true')
+                span.sr-only Previous
+              a.right.carousel-control(href='#carousel-example-generic', role='button', data-slide='next')
+                span.glyphicon.glyphicon-chevron-right(aria-hidden='true')
+                span.sr-only Next    
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
+              h3.modtitle 精选商品
+              .row
+                //- -for(var a=1;a<15;a++)
+                for item in data.featuredItems
+                  .col-sm-6.col-md-3
+                    .thumbnail(style="margin:0;border:0;height:250px")
+                      a(href=`/shop/product/${item.productId}`)
+                        img(src=`/r/${item.imgMaster}`, title=`${item.abstract}` ,style="height:150px;" )
+                      .caption
+                        a(href=`/shop/product/${item.productId}` style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${item.name}`)!=item.name
+                        div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px")=item.store.storeName
+                        //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+                        //- p(style="text-align: right;color: #bf7f5f;")
+                        //-   i(style="font-style: normal;margin-right: 3px;")
+                        //-     span(style='font-size:14px;') ￥
+                        //-     | 8.00
+                        //-   span 起       
+          .col-xs-12.col-md-12(style="margin-bottom:20px")
+              h3.modtitle 店铺推荐
+              .row
+                //- -for(var a=1;a<15;a++)
+                for item in data.featuredItems
+                  .col-sm-6.col-md-2
+                    .thumbnail(style="margin:0;border:0")
+                      a(href=`/shop/product/${item.productId}`)
+                        img(src=`/r/${item.imgMaster}`, title=`${item.productDescription}` ,style="height:150px" )
+                      .caption
+                        a(href=`/shop/product/${item.productId}` style="display: block;font-size: 12px;color: #333;word-break: break-all;max-height: 40px;line-height: 20px;overflow: hidden;margin: 0 auto;" title=`${item.productName}`)!=item.productName
+                        div(style="height: 22pxoverflow: hidden;margin: 0 auto;color: #999;font-size: 12px;margin-top:5px") 瓜哥的小店
+                        //- div(style="position: absolute;width: 100%;left: 0;bottom: 0;font-size: 16px;color: #bf7f5f;")
+                        p(style="text-align: right;color: #bf7f5f;")
+                          i(style="font-style: normal;margin-right: 3px;")
+                            span(style='font-size:14px;') ￥
+                            | 8.00
+                          span 起      

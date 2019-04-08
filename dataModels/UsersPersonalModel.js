@@ -350,5 +350,14 @@ usersPersonalSchema.methods.increasePsnl = async function(type, number) {
   attrObj[counterType] = number;
   return await this.update({$inc: attrObj});
 };
-
+/* 
+  通过uid找查询用户的隐私信息
+  @author pengxiguaa 2019/3/7
+*/
+usersPersonalSchema.statics.findUsersPersonalById = async (uid) => {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const personal = await UsersPersonalModel.findOne({uid});
+  if(!personal) throwErr(404, `未找到ID为【${uid}】的用户隐私信息`);
+  return personal;
+};
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

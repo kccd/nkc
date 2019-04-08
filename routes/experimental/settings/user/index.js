@@ -39,7 +39,6 @@ userRouter
       }
 			const {apiFunction} = ctx.nkcModules;
       const count = await db.UserModel.count(q);
-      console.log(count, q)
 			const paging = apiFunction.paging(page, count);
 			data.paging = paging;
 			const users = await db.UserModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

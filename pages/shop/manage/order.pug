@@ -1,0 +1,119 @@
+extends ./index.pug
+
+block name
+  .row
+    .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
+      ul.nav.nav-pills(style="border:1px solid #ddd")
+        li(class=!data.orderStatus || data.orderStatus == "all"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=all`, data-toggle='url') 全部订单
+        li(class=data.orderStatus == "unCost"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=unCost`, data-toggle='url') 待付款
+        li(class=data.orderStatus == "unShip"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=unShip`, data-toggle='url') 待发货
+        li(class=data.orderStatus == "unSign"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=unSign`, data-toggle='url') 待收货
+        li(class=data.orderStatus == "finish"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=finish`, data-toggle='url') 完成的订单
+        li(class=data.orderStatus == "close"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=close`, data-toggle="url") 关闭的订单
+        li(class=data.orderStatus == "refunding"?"active":"")
+          a(href=`/shop/manage/${data.myStore.storeId}/order?orderStatus=refunding`, data-toggle='url') 退款中的订单
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      include ../../interface_navigation_paging
+    .col-md-12.col-sm-12.col-xs-12  
+      table.table.table-bordered
+        thead
+          tr(style="background-color:silver")
+            th(style="width:300px") 商品名称
+            th 属性
+            th 商品单价
+            th 运费
+            th 数量
+            th 买家
+            th 交易状态
+            th 实际收付款
+            th 操作
+        tbody
+          for order in data.orders
+            tr(style="background-color: #d3f2ff;border-top:2px solid black;") 
+              td(colspan="11") 
+                p
+                  span(style="font-weight:800") 订单号:&nbsp;
+                  span=order.orderId
+                  span(style="margin-left:20px;font-weight:800") 创建时间:&nbsp;
+                  span=order.orderToc.toLocaleString()
+            tr(style="min-height:100px")
+              td(style="display:flex")
+                img(src=`/r/${order.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
+                a(style="font-size:12px" href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
+              td=order.productParam.name
+              td #{numToFloatTwo(order.productParam.price)}
+              td #{numToFloatTwo(order.product.freightPrice)}
+              td=order.count
+              td
+                a(href=`/u/${order.uid}`)!=`${order.user.username}`
+              td= order.status  
+                if order.refundStatus === "ing"
+                  span &nbsp;
+                  a(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 去处理
+                p 
+                  a(href=`/shop/manage/${order.storeId}/order/detail?orderId=${order.orderId}`) 订单详情
+              td #{numToFloatTwo(order.orderPrice)}
+              td
+                if !order.closeStatus && ["unCost", "unShip"].includes(order.orderStatus)
+                  a(href=`/shop/manage/${data.myStore.storeId}/order/cancel?orderId=${order.orderId}`) 取消订单
+                if order.orderStatus == "unCost" && !order.closeStatus
+                  p
+                    button(onclick=`openEditOrderModal(${data.myStore.storeId}, ${order.orderId})`) 修改订单
+                if order.refundStatus == "ing"
+                  p
+                    a(href=`/shop/manage/${data.myStore.storeId}/order/refund?orderId=${order.orderId}`) 退款详情
+                if order.orderStatus == "unSign" || order.orderStatus == "finish"
+                  p
+                    a(href=`/shop/manage/${data.myStore.storeId}/order/logositics?orderId=${order.orderId}`) 查看物流
+                if order.orderStatus == "unShip" && order.closeStatus !== true
+                  p
+                    button(onclick=`openSendGoodsModal(${data.myStore.storeId}, ${order.orderId})`) 发货
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      include ../../interface_navigation_paging
+
+  #editOrderModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 填写价格
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-2.control-label 商品价格
+              .col-sm-8
+                input.form-control#eoPrice(type='text')
+          input#eostoreid(type="text" style="display:none")
+          input#eoorderid(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`editOrder()`) 确认修改
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消               
+
+  #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 填写运单号
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-2.control-label 快递单号
+              .col-sm-8
+                input.form-control#newtracknumber(type='text')
+          input#newstoreid(type="text" style="display:none")
+          input#neworderid(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+
+block manageScripts
+  +includeJS("/shop/manage/order.js")

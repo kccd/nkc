@@ -5,7 +5,8 @@ router
 		const {data, db, params} = ctx;
 		const {uid} = params;
 		data.targetUser = await db.UserModel.findOnly({uid});
-		await data.targetUser.extendGrade();
+    await data.targetUser.extendGrade();
+    await db.UserModel.extendUsersInfo([data.targetUser]);
 		const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.addresses = targetUserPersonal.addresses;
 		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});

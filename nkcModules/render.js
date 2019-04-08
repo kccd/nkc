@@ -115,7 +115,7 @@ let creditString = (t) => {
     case 'xsf':
       return '学术分';
     case 'creditKcb':
-      return '科创币';
+      return '科创币';   
     default:
       return '[未定义积分]'
   }
@@ -150,6 +150,12 @@ function delCodeAddShrink(content){
 		content = content.substr(0,50) + "~~~~~~~~~~~~" + lastContent;
 	}
 	return content
+}
+
+// 去除全部标签
+function delAllCode(content) {
+	content = content.replace(/<[^>]+>/g,"");
+	return content;
 }
 
 // 根据学术分隐藏内容
@@ -221,10 +227,10 @@ function applicationFormStatus(a) {
 		color = 'red';
 	} else if(!submitted || !a.lock.submitted) {
 		if(projectPassed === false) {
-			str = '专家审核不通过，等待申请人修改';
+			str = '未通过专家审核，等待申请人修改';
 			color = 'red';
 		} else if(adminSupport === false) {
-			str = '管理员复核不通过，等待申请人修改';
+			str = '未通过管理员复核，等待申请人修改';
 			color = 'red';
 		} else {
 			str = '暂未提交';
@@ -234,12 +240,12 @@ function applicationFormStatus(a) {
 	} else if(projectPassed === null) {
 		str = '等待专家审核';
 	} else if(projectPassed === false) {
-		str = '专家审核不通过，等待申请人修改';
+		str = '未通过专家审核，等待申请人修改';
 		color = 'red';
 	} else if(adminSupport === null) {
 		str = '等待管理员复核';
 	} else if(adminSupport === false) {
-		str = '管理员复核不通过，等待申请人修改';
+		str = '未通过管理员复核，等待申请人修改';
 		color = 'red';
 	} else if(remittance === null) {
 		str = '等待拨款';
@@ -253,15 +259,15 @@ function applicationFormStatus(a) {
   } else if(completedAudit) {
     str = '结题报告已提交，等待结题审核'
 	} else if(completed === null) {
-    str = '资助中';
+    str = '项目执行中';
 	} else if(completed === false) {
-		str = '结题审核不通过，等待申请人修改'
+		str = '未通过结题审核，等待申请人修改'
 	} else if(excellent) {
 		str = '优秀项目';
 	} else if(successful) {
-		str = '正常结题';
+		str = '成功结题';
 	} else if(!successful) {
-		str = '失败结题';
+		str = '正常结题';
 	}
 	return {str, color};
 }
@@ -287,6 +293,26 @@ function ensureFundOperatorPermission(type, user, fund) {
 	}
 }
 
+function getProvinceCity(str) {
+	var addressArr = str.split("/");
+	var province;
+	var city;
+	var address
+	if(addressArr[0]) {
+		province = addressArr[0]
+	}
+	if(addressArr[1]) {
+		city = addressArr[1];
+	}
+	address = province + "/" + city;
+	return address;
+}
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -310,7 +336,10 @@ let pugRender = (template, data, state) => {
 		delCodeAddShrink,
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
-    startTime: global.NKC.startTime,
+		startTime: global.NKC.startTime,
+		getProvinceCity: getProvinceCity,
+		numToFloatTwo: numToFloatTwo,
+		delAllCode: delAllCode,
     // 翻译 type: 语言分类, words：关键字
     lang: (type, words) => {
       return language[type][words];

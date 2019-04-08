@@ -1,0 +1,185 @@
+extends ../shopBase
+block shopTitle
+  if data.order.orderStatus === "unCost"
+    title 取消订单
+  else
+    title 申请退款
+  +includeCSS('/shop/order/order.css')
+block content
+  .container-fluid.max-width
+    .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
+    .row#app(v-cloak)   
+      div(v-if="order.orderStatus === 'unCost'")
+        h4 取消订单
+        h5
+          img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+          div.display-i-b
+            a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
+            h5 数量：{{order.count}}  
+            h5 订单号：{{order.orderId}}
+
+        .form.col-xs-12.col-md-5
+          .form-group
+            label 请填写理由（不超过1000字节）：
+            textarea.form-control(v-model="reason" rows=7) 
+          .form-group
+            h5.text-danger(v-if='error') {{error}}
+            h5.text-success(v-if='info') {{info}}
+            .text-right
+              button.btn.btn-primary.btn-block(@click='cancelOrder') 提交  
+      div(v-else-if='order')
+        .col-xs-12.col-md-12
+          h4 退款说明
+          ul.text-danger
+            li 若卖家未发货，您可以发起退款请求。
+            li 如果卖家已经发货，可以发起退货/退款申请。
+            li 如果卖家拒绝，可以请求平台介入。
+          hr
+        .col-xs-12.col-md-12
+          .row
+            .col-xs-12.col-md-6
+              h4 商品信息
+              h5
+                img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+                div.display-i-b
+                  a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
+                  h5
+                    span.m-r-1 数量：{{order.count}}  
+                    span.m-r-1 规格：{{productParam.name.join('+')}}
+                    span.m-r-1 价格总计：
+                      strong.text-danger {{order.orderPrice/100}}
+                      |&nbsp;元
+                  h5 订单状态：
+                    strong {{order.status}}    
+                  h5
+                    a(:href="'/shop/order/'+order.orderId + '/detail'") 订单详情  
+                    a.m-l-1(:href="'/message?uid='+product.uid" target="_blank") 联系卖家
+              .m-t-1(v-if='refund')
+                h5 类型：{{refundType(refund.type)}}  
+                h5 进度：{{status.description}}
+                //-h5 卖家处理最后期限：
+                  span.text-danger {{format('YYYY-MM-DD HH:mm:ss', new Date(refund.toc).getTime() + 24*60*60*1000)}}
+                div(v-if='order.refundStatus === "ing"')  
+                  //- button.btn.btn-sm.btn-default(v-if="['B_APPLY_RM', 'B_APPLY_RP', 'B_APPLY_RALL'].indexOf(refund.status) !== -1" @click='editReason') 编辑理由
+                  button(@click='displayGiveUpInput = true' v-if="!displayGiveUpInput") 撤销申请
+                  div(v-if='displayGiveUpInput')
+                    textarea.form-control(rows=8 placeholder="请输入撤销申请的原因" v-model='giveUpReason')
+                    .m-t-1.text-right
+                      button.btn.btn-danger(@click='giveUpRefund') 确认撤销
+              .m-t-1
+                include ./refundStatus.pug
+
+            .col-xs-12.col-md-6
+
+              .m-t-1(v-if="display.apply")
+                ul.nav.nav-tabs
+                  li(role="presentation" 
+                    :class="{'active': applyType==='seller'}" 
+                    @click="selectApplyType('seller')"
+                  )
+                    a(href="###") 向卖家申请
+                  li(role="presentation"
+                    :class="{'active': applyType==='platform'}" 
+                    @click="selectApplyType('platform')"
+                  )
+                    a(href="###") 请求平台介入  
+                .m-t-1.m-b-2
+                  span.text-danger 注意事项：
+                  p(v-if="applyType === 'seller'")
+                    | 请与卖家友好协商。选择“只退款”时无需买家寄回商品，当卖家同意后立即退款。选择“退货退款”时需买家寄回商品，待卖家确认商品无误后才能退款。
+                  p(v-else)
+                    | 如果退款申请被卖家拒绝，可以请求平台介入。
+
+              
+              .m-t-1(v-if="display.apply && (applyType !== 'platform' || order.applyToPlatform)")
+                .form
+                  .form-group
+                    label 1、选择退款方式
+                    //- 向卖家申请
+                    .refund-type(v-if="applyType === 'seller'")
+                      span(:class="{'active': newRefund.type==='money'}" @click='newRefund.type="money"') 只退款
+                      .display-i-b(v-if='["unCost", "unShip"].indexOf(order.orderStatus) === -1')
+                        span(:class="{'active': newRefund.type==='product'}" @click='newRefund.type="product"') 退款退货
+                      .display-i-b(v-else)
+                        span.disabled 退款退货  
+                    .refund-type(v-else)
+                      span(:class="{'active': newRefund.type==='money'}" @click='newRefund.type="money"'
+                        v-if="order.applyToPlatform"
+                      ) 只退款
+                      span.disabled(v-else) 只退款
+                  .form-group
+                    label 2、填写退款金额（不超过
+                      strong.text-danger {{order.orderPrice/100}}
+                      | 元）      
+                    input.form-control(v-model.number="newRefund.money" type="number")
+                  .form-group    
+                    label 3、填写理由（不超过
+                      strong.text-danger 1000
+                      |字节）
+                    textarea.form-control(v-model='newRefund.reason' rows=7)  
+                  .form-group(v-if="applyType === 'platform'")
+                    label 4、上传凭证（不超过
+                      strong.text-danger 5
+                      |张）
+                    input(type="file" @change='selectedFile' multiple="multiple")
+                    <transition name="fade">
+                      h5.text-success(v-if="uploadStatus") {{uploadStatus}}
+                    </transition> 
+                    div(v-if="order.certs && order.certs.length !== 0")
+                      h5 已上传的凭证   
+                      .shop-cert(v-for="cert in order.certs" :title="cert.name")
+                        .shop-cert-options
+                          span(@click="viewCert(cert)").fa.fa-eye
+                          span(@click="deleteCert(cert)").fa.fa-trash
+                        img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
+                        .text-center(v-else).shop-cert-file.p-t-2
+                          span.fa.fa-file &nbsp;{{cert.name}}
+                  .form-group
+                    h5.text-danger(v-if="error") {{error}}
+                    h5.text-success(v-if="info") {{info}}
+                    button.btn.btn-block.btn-primary(@click="submitApply") 提交  
+              .m-t-1(v-if="refund && ['B_INPUT_CERT_RM', 'P_APPLY_RM'].indexOf(refund.status) !== -1")
+                h4
+                  strong.text-danger(v-if="refund.status === 'B_INPUT_CERT_RM'") 等待卖家上传凭证，您可以补充凭证。
+                  strong.text-danger(v-if="refund.status === 'P_APPLY_RM'") 卖家已上传凭证，等待平台处理。
+                .form-group
+                  h4 补充凭证（总共不超过
+                    strong.text-danger 5
+                    |张）
+                  input(type="file" @change='selectedFile' multiple="multiple")
+                  <transition name="fade">
+                    h5.text-success(v-if="uploadStatus") {{uploadStatus}}
+                  </transition>
+                  h5 已上传的凭证：
+                  .shop-cert(v-for="cert in order.certs" :title="cert.name")
+                    .shop-cert-options
+                      span(@click="viewCert(cert)").fa.fa-eye
+                      span(@click="deleteCert(cert)").fa.fa-trash
+                    img(v-if="cert.ext ==='jpg'" :src="'/shop/cert/' + cert._id + '?type=sm'" style='width: 100%;')
+                    .text-center(v-else).shop-cert-file.p-t-2
+                      span.fa.fa-file &nbsp;{{cert.name}}
+                  h5.text-danger(v-if="error") {{error}}  
+                  h5.text-success(v-if="info") {{info}}  
+                .form-group
+                  button.btn.btn-primary(@click="saveCerts") 保存    
+                .m-t-2
+                  h5.text-danger 注意事项：
+                  ul
+                    li 凭证一经保存将无法删除    
+              .m-t-1(v-if='refund && ["S_AGREE_RP", "P_AGREE_RP"].indexOf(refund.status) !== -1')
+                h4
+                  strong.text-danger 卖家已同意您的退货申请，请将商品寄回
+                h5 收件人姓名：{{refund.sellerInfo.name}}
+                h5 收件人手机号：{{refund.sellerInfo.mobile}}
+                h5 收件人地址：{{refund.sellerInfo.address}}
+                .refund-type.m-t-2
+                  h5 请确保快递已寄出，然后输入快递单号
+                  input.form-control(v-model="trackNumber")
+                  .m-t-1.text-right
+                    h5.text-danger(v-if="error") {{error}}
+                    button.btn.btn-sm.btn-primary.btn-block(@click="submitTrackNumber") 提交
+
+
+block scripts
+  include ../../publicModules/moment.pug
+  +includeJS('/shop/order/refund.js')  

@@ -1,0 +1,40 @@
+extends ./shopAccountBase
+block shopAccountTitle
+  title 基本信息
+block shopAccountContent
+  .user-base-info
+    img.user-avatar(src=`/avatar/${data.user.uid}`)
+    .user-base-info-name
+      .username= data.user.username
+      .info= `身份认证等级：${data.user.authLevel}`
+      .info= `身份认证等级：${data.user.authLevel}`
+  hr    
+  .row.text-center
+    .col-xs-3.col-md-3
+      a.h5(href='###') 待付款 &nbsp;
+      span 2
+    .col-xs-3.col-md-3
+      a.h5(href='###') 待发货 &nbsp;
+      span 1
+    .col-xs-3.col-md-3
+      a.h5(href='###') 待收货 &nbsp;
+      span 9
+    .col-xs-3.col-md-3
+      a.h5(href='###') 待评价 &nbsp;
+      span 12
+  hr  
+  .logistics-info
+    .shop-account-header 物流信息
+    for item in data.goods
+      .shop-goods
+        .shop-goods-img
+          img(src=`http://www.kechuang.org/avatar/${item._id}`)
+        .shop-goods-info
+          .title= item.name
+          for i in item.info
+            .info= i
+          a(href='###') 查看物流详情  
+        .shop-goods-option
+          button 确认收货
+          br
+          button.m-t-1 订单详情

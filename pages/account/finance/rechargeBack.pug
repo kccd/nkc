@@ -1,0 +1,80 @@
+extends ../../bootstrap_base
+block title
+  title 付款信息确认
+block content
+  .container-fluid.max-width#app(v-cloak)
+    #data.hidden=JSON.stringify({pay: data.pay, kcbsRecordId: data.kcbsRecordId})
+    div(v-if='success').text-center
+      include ../../publicModules/icon-success
+      div(v-if='pay')
+        h3 付款成功
+        h5 您已成功付款&nbsp;
+          span.text-danger {{money/100}}
+          |&nbsp;元
+        a(href='/shop/order?orderStatus=unShip') 查看订单
+      div(v-else)  
+        h3 充值成功
+        h5 您已成功充值&nbsp;
+          span.text-danger {{money/100}}
+          |&nbsp;个科创币，账户当前科创币总计&nbsp;
+          span.text-danger {{kcb/100}}
+          |&nbsp;个
+        a(href='/account/finance').m-r-1 查看记录
+        a(href='/account/finance/recharge') 再次充值
+    div(v-else).p-t-3.p-b-3
+      h4  付款信息确认中，请稍后 {{info}}
+block scripts
+  script.
+    var app = new Vue({
+      el: '#app',
+      data: {
+        success: false,
+        info: '',
+        pointNumber: 1,
+        money: 0,
+        kcb: 0,
+        pay: false,
+        kcbsRecordId: ''
+      },
+      methods: {
+        verify: function() {
+          var this_ = this;
+          kcAPI('/account/finance/recharge?type=verify&rid='+this.kcbsRecordId, 'GET')
+            .then(function(data) {
+              if(data.verify) {
+                this_.kcb = data.user.kcb;
+                this_.money = data.money;
+                this_.success = true;
+              } else {
+                setTimeout(function() {
+                 this_.verify(); 
+                }, 2000);
+              }
+            })
+            .catch(function(data) {
+              screenTopWarning(data);
+            });
+        },
+        waiting: function() {
+          var this_ = this;
+          this.pointNumber = this.pointNumber + 1;
+          if(this_.pointNumber > 7) this_.pointNumber = 1;
+          var p = '';
+          for(var i = 0; i < this_.pointNumber; i++) {
+            p += '.';
+          }
+          this_.info = p;
+          setTimeout(function() {
+            this_.waiting();
+          }, 200);
+        } 
+      },
+      mounted: function() {
+        var data = document.getElementById('data');
+        data = JSON.parse(data.innerHTML);
+        this.kcbsRecordId = data.kcbsRecordId;
+        this.pay = !!data.pay;
+        this.verify();
+        this.waiting();
+      }
+    });    

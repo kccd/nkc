@@ -972,9 +972,9 @@ function credit(pid, type, kcb) {
           })
       } else if(type === 'kcb') {
 
-        if(num.value > kcb) return screenTopWarning('您的科创币不足');
+        if(num.value*100 > kcb) return screenTopWarning('您的科创币不足');
         var obj = {
-          num: num.value,
+          num: num.value*100,
           description: description.value
         };
         nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)
@@ -1446,25 +1446,19 @@ function shareTo(shareType, type, str, title, pid){
         var copyAreaId = "copyArea"+pid;
         var copyLinkId = "copyLink"+pid;
         var copyButton = "copyVutton"+pid;
-        // $("#"+copyAreaId).css("display", "block");
         document.getElementById(copyAreaId).style.display = "block";
         document.getElementById(copyLinkId).value = newUrl;
-        // $("#"+copyLinkId).val(newUrl);
         var obj = document.getElementById(copyLinkId);
         obj.select(); 
-        // copyLink();
       }
       if(type == "qq") {
         newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
-        // window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
       }
       if(type == "qzone") {
         newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
-        // window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
       }
       if(type == "weibo") {
         newLink.location='http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk;
-        // window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
       }
       if(type == "weChat") {
         var qrcode
@@ -1474,7 +1468,6 @@ function shareTo(shareType, type, str, title, pid){
         }else{
           if(shareType == "forum"){
             var otherCodes = document.getElementsByClassName('forumQrcode');
-            // var otherCodes = $(".forumQrcode");
             for(var i in otherCodes){
               var otherCode = otherCodes[i];
               if(otherCode && typeof(otherCode)=="object") {
@@ -1484,6 +1477,7 @@ function shareTo(shareType, type, str, title, pid){
                 QRCode.toCanvas(otherCode, path, {
                   scale: 3,
                   margin: 1,
+                  width: 150,
                   color: {dark: '#000000'}
                 }, function(err) {
                   if(err){
@@ -1496,8 +1490,6 @@ function shareTo(shareType, type, str, title, pid){
           var qrid = shareType+"Qrcode";
           qrcode = geid(qrid);
         }
-        // var qrid = shareType+"Qrcode";
-        // var qrcode = geid(qrid);
         qrcode.style.display = "inline-block"
         if(qrcode) {
           var path = newUrl;
@@ -1505,6 +1497,7 @@ function shareTo(shareType, type, str, title, pid){
           QRCode.toCanvas(qrcode, path, {
             scale: 3,
             margin: 1,
+            width: 150,
             color: {dark: '#000000'}
           }, function(err) {
             if(err){
@@ -1515,6 +1508,7 @@ function shareTo(shareType, type, str, title, pid){
       }
     })
     .catch(function(data) {
+      screenTopWarning(data || data.error)
       screenTopWarning("请登录")
     })
   }
@@ -1617,7 +1611,7 @@ function lottery() {
       header[0].innerText = result.name;
       var content = domOpen.getElementsByClassName('lottery-info');
       if(content.length === 0) return;
-      content[0].innerText = '获得' + kcb + '个科创币';
+      content[0].innerText = '获得' + numToFloatTwo(kcb) + '个科创币';
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
@@ -1699,3 +1693,8 @@ function moveThread(tid,fid,cid,para){
       screenTopWarning('移动失败：'+data.error);
     })
 }
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 
