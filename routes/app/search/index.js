@@ -23,7 +23,7 @@ searchRouter.get('/', async(ctx, next) => {
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     data.result = await Promise.all(searchResult.hits.hits.map(async r => {
       const pid = r._id;
-      const post = await PostModel.findOne({pid, mainForumsId: {$in: accessibleFid}});
+      const post = await PostModel.findOne({pid, mainForumsId: {$in: accessibleFid}, disabled: false});
       if(!post) return null;
       post.t = r.highlight? r.highlight.t: r.t;
       await post.extendUser();

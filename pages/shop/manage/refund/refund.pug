@@ -9,9 +9,12 @@ block content
         .col-xs-12.col-md-12
           h4 退款说明
           ul.text-danger
-            li 绝对不能意气用事
-            li 绝对不漏判任何一件坏事
-            li 绝对裁判的公正漂亮  
+            li 请与买家友好协商。如果拒绝买家的申请，买家可以申请平台介入。
+            li 如果未发货，请同意退款申请。
+            li 如果已发货，并且需要买家退货，请确认买家申请的方式是“退货退款”。如果无需退货，请确认买家申请的方式是“仅退款”。如果买家申请方式错误，可以拒绝申请并与买家协商。
+            li 对于“仅退款”申请，点击同意则意味着款项直接退还给买家，卖家自行承担收回货物的风险。
+            li 对于“退款退货”申请，点击同意则必须发送准确的退货地址、收件人、电话等退货信息给买家，如果退货信息错误，造成的损失由卖家承担。
+            li 请留意买家申请的退款金额。
           hr
         .col-xs-12.col-md-12
           .row
@@ -69,7 +72,7 @@ block content
                         h5 收件人姓名  
                         input.form-control(type="text" v-model="storeName")
                       .form-group
-                        h5 收件人手机号
+                        h5 收件人电话
                         input.form-control(type="text" v-model="mobile")   
                       .form-group
                         h5 收件人地址
@@ -83,19 +86,19 @@ block content
                   .m-b-2
                     h5.text-danger 注意事项：
                     ul
-                      li 请务必在收到买家寄来的快递并确认宝贝没有问题时再点击同意！    
-                      li 点击同意后，系统会立即将科创币退回给买家...
+                      li 请在收到退货并确认无误时再点击同意，如有疑问请与买家友好协商。
+                      li 点击同意后，系统会立即将买家申请的退款金额退回买家...
                   .form
                     .form-group      
                       h4.text-danger 买家已发货 快递单号：
                         strong {{refund.trackNumber}}
                       div
                         <label class="radio-inline">
-                          <input type="radio" :value="true" v-model="agree"> 收到货，同意退款
+                          <input type="radio" :value="true" v-model="agree"> 已收到货，同意退款
                         </label>
                         br
                         <label class="radio-inline">
-                          <input type="radio" :value="false" v-model="agree"> 迟迟未收到货或货有问题，拒绝退款
+                          <input type="radio" :value="false" v-model="agree"> 未收到货或商品有问题，拒绝退款
                         </label>
                     .form-group(v-if="agree === false")    
                       textarea.form-control(rows="7" placeholder="请输入理由（不超过1000字节）" v-model="reason")
@@ -112,17 +115,17 @@ block content
                   div(v-if="refund.status !== 'P_APPLY_RM'")
                     .form-group
                       h4.text-danger 
-                        strong 买家申请平台介入，请上传凭证
+                        strong 买家已申请平台介入，请卖家及时上传凭证，超时未上传则默认支持买家的请求。
                       div
                         <label class="radio-inline">
-                          <input type="radio" :value="false" v-model="agree"> 坚决不能让平台介入，同意买家的
+                          <input type="radio" :value="false" v-model="agree"> 拒绝平台介入，同意买家的
                             strong.text-danger(v-if="refund.type === 'money'") 只退款
                             strong.text-danger(v-else) 退货退款
                             | 申请
                         </label>
                         br
                         <label class="radio-inline">
-                          <input type="radio" :value="true" v-model="agree"> 同意让平台介入
+                          <input type="radio" :value="true" v-model="agree"> 同意平台介入
                         </label>
                     .form-group(v-if="agree === false && refund.status === 'B_INPUT_CERT_RM'")    
                       h5 请输入登录密码

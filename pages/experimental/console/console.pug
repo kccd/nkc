@@ -29,7 +29,7 @@ block content
 
         .e-panel
           .message-panel(ref='panel')
-            div(v-for='m in messages')
+            div(v-for='m in messages' @click="selectMessage(m)").pointer
               .message(v-if='m.consoleType === "web" && categories.indexOf("web") !== -1')
                 span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
                 span.process 进程{{m.processId}}
@@ -58,6 +58,8 @@ block content
                 span.url {{m.url}}
                 span.status-success(v-if='m.connect') 建立连接
                 span.status-warning(v-else) 断开连接
+        .e-panel(v-if="message" style='color: #fff;')
+          p(v-html="messageInfo")
 
 block scripts
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)

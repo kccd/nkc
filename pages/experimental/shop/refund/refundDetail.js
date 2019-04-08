@@ -7,6 +7,8 @@ var app = new Vue({
     error: '',
     info: '',
 
+    password: "",
+
     user: '',
     order: '',
     refund: '',
@@ -58,6 +60,7 @@ var app = new Vue({
       this.clearInfo();
       var agree = this.agree;
       var reason = this.reason;
+      var password = this.password;
 
       if(agree === "") return this.error = "请选择同意或拒绝";
       if(agree === false) {
@@ -68,7 +71,8 @@ var app = new Vue({
       
       nkcAPI("/e/settings/shop/refunds/" + agree, "POST", {
         orderId: this.order.orderId,
-        reason: this.reason
+        reason: this.reason,
+        password: password
       })
         .then(function() {
           window.location.reload();

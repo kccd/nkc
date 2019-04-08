@@ -177,8 +177,8 @@ var app = new Vue({
     },
     refundType: function(t) {
       return {
-        'money': '退款',
-        'product': '退款+退货',
+        'money': '只退款',
+        'product': '退货退款',
       }[t];
     }
   }

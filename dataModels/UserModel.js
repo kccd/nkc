@@ -376,7 +376,7 @@ userSchema.methods.extendRoles = async function() {
     certs = ['banned'];
   }
   const roles = [];
-	for(let cert of this.certs) {
+	for(let cert of certs) {
 		const role = await RoleModel.findOne({_id: cert});
 		if(role) roles.push(role);
 	}

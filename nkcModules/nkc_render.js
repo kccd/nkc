@@ -539,6 +539,13 @@ function nkc_render(options){
     });
     // console.log(renderedHTML)
     // 渲染at
+    // 取出帖子引用部分，帖子引用部分的at不被渲染
+    var blockDomArray = renderedHTML.match(/<blockquote.*?blockquote>/im);
+    var blockDomHtml = "";
+    if(blockDomArray){
+      blockDomHtml = blockDomArray[0];   
+      renderedHTML = renderedHTML.replace(/<blockquote.*?blockquote>/im,'');
+    }
     var atUsers = post.atUsers;
     if(atUsers && atUsers.length > 0) {
       for(var i = 0; i < atUsers.length; i++) {
@@ -547,6 +554,8 @@ function nkc_render(options){
         renderedHTML = renderedHTML.replace(reg,'<a href="/m/' + atUsers[i].uid + '">' + user + '</a>')
       }
     }
+    renderedHTML = blockDomHtml + renderedHTML;
+    // console.log(renderedHTML)
     renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
     // 下面是旧版的渲染，暂时先不用
     // var atUsers = post.atUsers;

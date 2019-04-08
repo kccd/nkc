@@ -86,6 +86,6 @@ function openEditOrderModal(storeId, orderId) {
  * 查看物流
  */
 function visitLogisticsInfo(storeId,orderId) {
-  var targetUrl = `/shop/manage/${storeId}/order/logistics?orderId=${orderId}`;
+  var targetUrl = `/shop/manage/${storeId}/order/logositics?orderId=${orderId}`;
   window.location.href = targetUrl;
 }

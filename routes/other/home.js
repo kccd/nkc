@@ -5,7 +5,7 @@ homeRouter
 		const {data, db, query, nkcModules} = ctx;
 		// 删除退修超时的帖子
 		// 取出全部被标记的帖子
-		const allMarkThreads = await db.ThreadModel.find({ "recycleMark": true, "fid": { "$nin": ["recycle"] } });
+		const allMarkThreads = await db.ThreadModel.find({ "recycleMark": true, "mainForumsId": { "$nin": ["recycle"] } });
 		for (var i in allMarkThreads) {
 			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
 			if(delThreadLog){

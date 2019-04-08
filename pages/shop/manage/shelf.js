@@ -1,4 +1,4 @@
-/* 
+/*
   @author Kris 2019/2/20
 */
 function initTime() {
@@ -221,12 +221,11 @@ function productToShelf(storeId) {
   nkcAPI('/shop/manage/'+storeId+'/shelf', "POST" ,{post:productInfo})
   .then(function(data) {
     screenTopAlert("上架成功");
-    var product = data.product;
-    var targetUrl = `/shop/manage/${storeId}/goodslist`;
+    var targetUrl = '/shop/manage/' + storeId + '/goodslist';
     window.location.href = targetUrl;
   })
   .catch(function(data){
-    screenTopWarning(data || data.error);
+    screenTopWarning(data.error || data);
   })
 }
 

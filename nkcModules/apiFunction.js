@@ -1,6 +1,8 @@
 const paging = require('../settings/paging');
 const moment = require('moment');
 const http = require("http");
+const aliAppCode = require("../config/aliAppCode");
+const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 let {perpage} = paging;
 let fn = {};
@@ -215,6 +217,7 @@ fn.fromNow = (time) => {
 // reduce[bull] 是否进行略缩，默认为false
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
+  if(!content) return content;
   content = content.replace(/<[^>]+>/g,"");
   count = parseInt(count);
   if(reduce === true){
@@ -396,7 +399,7 @@ fn.getIpAddress = (ip) => {
     path: `/v3/ip?ip=${ip}`,    //请求地址
     headers: {    //请求头
         "Content-Type": "application/json; charset=utf-8",
-        "Authorization": "APPCODE b9bf63ef741a4d7aadf53059e3fe009a"
+        "Authorization": "APPCODE "+appCode
     }
   }
   return new Promise((resolve, reject) => {
@@ -435,7 +438,7 @@ fn.getTrackInfo = (trackNumber) => {
     path: `/kdi?no=${trackNumber}`,    //请求地址
     headers: {    //请求头
         "Content-Type": "application/json; charset=utf-8",
-        "Authorization": "APPCODE b9bf63ef741a4d7aadf53059e3fe009a"
+        "Authorization": "APPCODE "+appCode
     }
   }
   return new Promise((resolve, reject) => {

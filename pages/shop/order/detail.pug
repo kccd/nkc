@@ -134,7 +134,11 @@ block shopAccountContent
                 span 
                   a.orderStatusTextLink(href=`/u/${order.store.uid}`) 联系卖家
                 span 协商解决
-              //- li.orderPrompt 
+              //-li.orderPrompt
+                span 如果卖家没有履行应尽的承诺，您可以申请
+                span 
+                  a.orderStatusTextLink(href=`/shop`) 商城仲裁
+              //- li.orderPrompt
               //-   span 如果卖家没有履行应尽的承诺，您可以申请
               //-   span 
               //-     a.orderStatusTextLink(href=`/shop`) 商城仲裁

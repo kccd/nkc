@@ -82,7 +82,6 @@ block content
                   td=bill.productParam.name 
                   td #{numToFloatTwo(bill.productParam.price)} 
                   td #{numToFloatTwo(bill.product.freightPrice)} 
-                  td=bill.product.freightPrice 
                   td.order(paid=`${bill.productParam._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
                   td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
                   td  

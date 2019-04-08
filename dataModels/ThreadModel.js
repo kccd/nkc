@@ -602,6 +602,8 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
 
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findUserById(uid);
+  await user.extendRoles();
+  await user.extendGrade();
   const forums = await ForumModel.find({fid: {$in: fids}});
   await Promise.all(forums.map(async forum => {
     const childrenForums = await forum.extendChildrenForums();
@@ -630,7 +632,6 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
     if(!status) throwErr(403, '权限不足，请提升账号等级');
     if(!unlimited && countLimit <= todayThreadCount) throwErr(403, '今日发表文章次数已用完，请明天再试。');
   }
-
   // 发表回复时间、条数限制
   const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
   if(todayThreadCount >= postToForumCountLimit) throwErr(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
