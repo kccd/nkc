@@ -55,7 +55,8 @@ router
           _id: await db.SettingModel.operateSystemID('shopCarts', 1),
           uid: user.uid,
           productParamId,
-          productId
+          productId,
+          count
         });
         await cart.save();
       }

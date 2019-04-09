@@ -123,11 +123,16 @@ style.
       div.item(style="border-bottom: 1px solid #e5e5e5")
         p
           span.title 运费
-          span#freightPrice #{numToFloatTwo(product.freightPrice)}
-      //- div.item
-      //-   p
-      //-     span.title 上架时间
-      //-     span.location!=product.shelfTime.toLocaleString()
+          if product.isFreePost
+            span#freightPrice 免邮
+            input#isFreePost(type="text" value="freePost" style="display:none")
+          else
+            span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+            input#isFreePost(type="text" value="payPost" style="display:none")
+        //- p
+        //-   span.title 运费
+        //-   span#freightPrice #{numToFloatTwo(product.freightPrice)}
       div.item
         p
           span.title 数量
@@ -167,6 +172,8 @@ block scripts
         thumb_image_height: 420,
         source_image_width: 900,
         source_image_height: 900,
+        zoom_area_width: 500,//放大镜的大小
+        zoom_area_height: 500,//放大镜的高度
         small_thumbs:5,
       });
     });

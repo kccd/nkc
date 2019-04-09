@@ -29,11 +29,11 @@ block shopAccountContent
           tr(style="background-color:silver")
             th(style="width:200px") 商品名称
             //- th 属性
-            th 商品单价
-            th 运费
-            th 数量
             th 商家
             th 交易状态
+            th 商品单价
+            th 数量
+            th 运费
             th 实际收付款
             th 交易操作
         tbody
@@ -55,15 +55,15 @@ block shopAccountContent
                   a(href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
                 span(style="font-size:18px;color:red;font-weight:800;margin-left:10px")=order.productParam.name
               //- td=order.productParam.name
-              td #{numToFloatTwo(order.productParam.price)}
-              td #{numToFloatTwo(order.product.freightPrice)}
-              td=order.count
-              //- td=order.user.username
               td
                 a(href=`/shop/store/${order.product.storeId}`)!=`${order.product.store.storeName}`
               td= order.status
                 | &nbsp;  
                 a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
+              td #{numToFloatTwo(order.productParam.price)}
+              td=order.count
+              td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
+              //- td=order.user.username
               td #{numToFloatTwo(order.orderPrice)}
               td 
                 if order.orderStatus !== "finish" && order.closeStatus !== true

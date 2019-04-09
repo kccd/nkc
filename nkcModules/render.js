@@ -313,6 +313,20 @@ function numToFloatTwo(str) {
 	return str;
 } 
 
+function calculateFreightPrice(freightPriceObj, count, isFreePost) {
+  const {firstFreightPrice, addFreightPrice} = freightPriceObj;
+	let freightPrice = 0;
+	count = Number(count);
+	if(!isFreePost) {
+		if(isNaN(count) || count <=0) {
+			freightPrice = firstFreightPrice;
+		}else{
+			freightPrice = firstFreightPrice + (addFreightPrice*(count - 1));
+		}
+	}
+  return freightPrice;
+}
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -339,6 +353,7 @@ let pugRender = (template, data, state) => {
 		startTime: global.NKC.startTime,
 		getProvinceCity: getProvinceCity,
 		numToFloatTwo: numToFloatTwo,
+		calculateFreightPrice:calculateFreightPrice,
 		delAllCode: delAllCode,
     // 翻译 type: 语言分类, words：关键字
     lang: (type, words) => {

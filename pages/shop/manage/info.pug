@@ -27,7 +27,10 @@ block name
               .col-sm-5
                 .row
                   .col-xs-12.col-md-12
-                    p(style="background-color: aliceblue;border: 1px solid #70b8f7;") 文件格式JPG、JPEG、PNG;文件大小80K以内;建议尺寸100*100
+                    p(style="background-color: aliceblue;border: 1px solid #70b8f7;display:grid") 
+                      span 文件格式JPG、JPEG、PNG;
+                      span 文件大小不得超过80K;
+                      span 建议尺寸100*100
                   .col-xs-12.col-md-12.user-settings-img-dev
                     img(src=`/shopLogo/${data.myStore.storeId}` style='width: 100px;height:100px')
                     //div(style='width: 100%;height: 30rem;background-color: #eee;line-height: 30rem; color: #aaa;font-size: 2rem;').text-center 未选择图片

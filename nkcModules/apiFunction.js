@@ -2,6 +2,7 @@ const paging = require('../settings/paging');
 const moment = require('moment');
 const http = require("http");
 const aliAppCode = require("../config/aliAppCode");
+const db = require('../dataModels');
 const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 let {perpage} = paging;
@@ -425,21 +426,48 @@ fn.getIpAddress = (ip) => {
   })
 }
 
+fn.getTrackInfo = async (trackNumber, trackName) => {
+  let objInfo;
+  let cacheData = await db.ApiCacheDataModel.findOne({id:trackNumber});
+  if(!cacheData) {
+    objInfo = await fn.getTrackInfoData(trackNumber, trackName);
+    cacheData = db.ApiCacheDataModel({
+      id: trackNumber,
+      c: JSON.stringify(objInfo),
+      type: 'track'
+    });
+    await cacheData.save();
+  }else{
+    let nowToc = Date.now()-2*60*60*1000;
+    if(nowToc > Number(cacheData.toc)){
+      let newObjInfo = await fn.getTrackInfoData(trackNumber, trackName);
+      await cacheData.update({toc:Date.now(), c:JSON.stringify(newObjInfo)})
+    }
+    objInfo = JSON.parse(cacheData.c)
+  }
+  return objInfo;
+}
+
 
 /**
  * 查询物流信息(阿里云)
  * @param {String} trackNumber 快递单号 
+ * @param {String} trackName 快递公司简称
  * @return {JSON} data:由接口返回的物流信息，JSON
  * @author Kris 2019-3-18
  */
-fn.getTrackInfo = (trackNumber) => {
+fn.getTrackInfoData = (trackNumber, trackName) => {
   let options = {
     hostname: `wuliu.market.alicloudapi.com`,    //接口域
-    path: `/kdi?no=${trackNumber}`,    //请求地址
     headers: {    //请求头
         "Content-Type": "application/json; charset=utf-8",
         "Authorization": "APPCODE "+appCode
     }
+  };
+  if(!trackName || trackName == "AUTO") {
+    options.path = `/kdi?no=${trackNumber}`
+  }else{
+    options.path = `/kdi?no=${trackNumber}&type=${trackName}`
   }
   return new Promise((resolve, reject) => {
       // 发起请求
@@ -473,4 +501,27 @@ fn.getTrackInfo = (trackNumber) => {
       req.end();
   })
 }
+
+/**
+ * 计算运费
+ * @param {Object} freightPriceObj 运费对象
+ * @param {Number} count 商品数量
+ * @param {Boolean} isFreePost 是否包邮
+ * @return {Number} freight:最终运费价格
+ * @author Kris 2019-4-9
+ */
+fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
+  const {firstFreightPrice, addFreightPrice} = freightPriceObj;
+  let freightPrice = 0;
+	count = Number(count);
+	if(!isFreePost) {
+		if(isNaN(count) || count <=0) {
+			freightPrice = firstFreightPrice;
+		}else{
+			freightPrice = firstFreightPrice + (addFreightPrice*(count - 1));
+		}
+	}
+  return freightPrice;
+}
+
 module.exports = fn;

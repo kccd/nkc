@@ -58,8 +58,8 @@ block content
               th 商品名称
               th 属性
               th 商品单价
-              th 运费
               th 数量
+              th 运费
               th 小计
               th 凭证
           tbody
@@ -81,9 +81,9 @@ block content
                     a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name 
                   td=bill.productParam.name 
                   td #{numToFloatTwo(bill.productParam.price)} 
-                  td #{numToFloatTwo(bill.product.freightPrice)} 
                   td.order(paid=`${bill.productParam._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
-                  td.subtotal #{numToFloatTwo((bill.productParam.price+bill.product.freightPrice)*bill.count)}
+                  td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
+                  td.subtotal #{numToFloatTwo((bill.productParam.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
                   td  
                     +orderCert(bill)
                   if bill.canBuy == false
@@ -95,9 +95,9 @@ block content
                     a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name
                   td=bill.name
                   td #{numToFloatTwo(bill.price)} 
-                  td #{numToFloatTwo(bill.product.freightPrice)} 
                   td.order(paid=`${bill._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
-                  td.subtotal #{numToFloatTwo((bill.price+bill.product.freightPrice)*bill.count)}
+                  td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
+                  td.subtotal #{numToFloatTwo((bill.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
                   td  
                     +orderCert(bill)
                   if bill.canBuy == false
@@ -118,7 +118,7 @@ block content
               span(style="font-weight: bold;") 收货人:&nbsp;
               span#finalName(style="margin-right: 10px;margin-left: 10px;") 
               span#finalMobile 
-            button#submitPay.btn.btn-danger.btn-lg(onclick="submitOrders()") 立即付款
+            button#submitPay.btn.btn-danger.btn-lg(onclick="submitOrders()") 提交订单
 
 
 block shopScripts  

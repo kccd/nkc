@@ -51,7 +51,7 @@ router
   })
   .post('/', async (ctx, next) => {
     const {db, data, body, tools} = ctx;
-    const {password} = body;
+    const {password, totalPrice} = body;
     let {user, orders} = data;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     const {hashType} = userPersonal;
@@ -70,10 +70,16 @@ router
       default: ctx.throw(400, '未知的密码加密类型');
     }
     let totalMoney = 0;
+    // 如果订单价格已被修改，则需要重新发起支付
+    for(let order of orders) {
+      totalMoney += order.orderPrice;
+    }
+    if(totalMoney !== Number(totalPrice)*100) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
+
     orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
     //减库存
     await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
-    for(const order of orders) {
+    for(let order of orders) {
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
         from: order.uid,
@@ -86,17 +92,15 @@ router
         port: ctx.port,
         verify: true
       });
-      totalMoney += order.orderPrice;
       await r.save();
       // 更改订单状态为已付款，添加付款时间。
       await db.ShopOrdersModel.update({orderId: order.orderId}, {$set: {
         orderStatus: 'unShip',
         payToc: r.toc
       }});
+      // 付款完毕，将商品从购物车中清除
+      await db.ShopCartModel.remove({uid: user.uid, productParamId: order.productParam._id});
     }
-    //减库存
-    // await db.ShopProductParamModel.productParamReduceStock(orders,'payReduceStock');
-    // console.log(orders);
     await db.UserModel.update({uid: user.uid}, {$inc: {kcb: -1*totalMoney}});
     await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': totalMoney}});
     await next();

@@ -116,10 +116,18 @@ const shopGoodsSchema = new Schema({
    * @payReduceStock 付款减库存
    * @orderReduceStock 下单减库存
    */
+  // 是否免邮
+  isFreePost: {
+    type: Boolean,
+    default: true
+  },
   // 运费价格
   freightPrice: {
-    type: Number,
-    default: 0
+    type: Schema.Types.Mixed,
+    default: {
+      firstFreightPrice: null,
+      addFreightPrice: null
+    }
   },
   stockCostMethod: {
     type: String,
