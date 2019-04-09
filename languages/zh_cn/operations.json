@@ -506,6 +506,8 @@
   "storeCancelOrder": "取消订单",
   "productShelfRightNow": "[CO]商品立即上架",
   "editOrderTrackNumber": "[CO]提交订单运单号修改",
+  "visitShopAuth": "[SY]访问商城后台权限设置",
+  "setShopAuth": "[SY]提交商城后台权限设置",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",
