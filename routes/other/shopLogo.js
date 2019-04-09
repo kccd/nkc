@@ -35,7 +35,7 @@ router
 		const {file} = body.files;
 	  if(!file) ctx.throw(400, 'no file uploaded');
 	  const {path, type, size} = file;
-	  if(size > ctx.settings.upload.sizeLimit.photo) ctx.throw(400, '图片不能超过20M');
+	  if(size > 81920) ctx.throw(400, '图片大小不得超过80K');
 	  const extArr = ['jpg', 'jpeg', 'png'];
 	  const {imageMagick} = tools;
 	  const extension = mime.getExtension(type);

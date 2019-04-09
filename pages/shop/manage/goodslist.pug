@@ -45,7 +45,7 @@ block name
                 //-   a.btn.btn-warning.btn-sm(href=`/shop/manage/${myStore.storeId}/goodslist/editProduct?productId=${product.productId}`) 重新编辑
                 p
                   if !data.productStatus || data.productStatus == "insale"
-                    a.btn.btn-warning.btn-sm(href=`/t/${product.tid}`) 编辑详情
+                    a.btn.btn-warning.btn-sm(href=`/editor?type=post&id=${product.oc}` target="_blank") 编辑详情
                   else
                     a.btn.btn-warning.btn-sm(onclick=`shelfRightNow(${product.storeId},${product.productId})`) 立即上架
             tr
@@ -58,7 +58,7 @@ block name
             for param in product.productParams
               tr
                 td=param.name
-                td=param.price
+                td #{numToFloatTwo(param.price)}
                 td=param.stocksTotal
                 td=param.stocksSurplus
                 td 

@@ -1,20 +1,36 @@
 var totalPrice;
+var isFreePost;
+var firstFreightPrice; // 首重运费
+var addFreightPrice; // 增加运费
 $(document).ready(function() {
-  var freightPrice = $("#freightPrice").text();
-  freightPrice = Number(freightPrice);
-  $("#buyCount").bind("input propertychange", function() {
-    var productCount = $(this).val();
-    // 获取单件产品运费
-    // 产品数量改变，改变运费显示
-    productCount = Number(productCount);
-    if(isNaN(productCount) || productCount < 0) {
-      totalPrice = freightPrice;
-    }else{
-      totalPrice = freightPrice * productCount;
-    }
-    $("#freightPrice").text(totalPrice);
-  })
+  isFreePost = $("#isFreePost").val();
+  if(isFreePost == "freePost") {
+
+  }else{
+    firstFreightPrice = $("#freightPrice").text();
+    addFreightPrice = $("#addFreightPrice").text();
+    firstFreightPrice = Number(firstFreightPrice);
+    addFreightPrice = Number(addFreightPrice)
+    $("#buyCount").bind("input propertychange", function() {
+      var productCount = $(this).val();
+      productCount = Number(productCount);
+      calculateFreightPrice(productCount);
+    })
+  }
 })
+/**
+ * 计算总运费
+ * @param {Number} count 商品数量
+ */
+function calculateFreightPrice(count) {
+  if(isNaN(count) || count <= 0) {
+    totalPrice = firstFreightPrice;
+  }else{
+    totalPrice = firstFreightPrice +  (addFreightPrice * (count-1));
+  }
+  $("#freightPrice").text(totalPrice);
+}
+
 /* 
   添加商品到购物车
   @param id: 商品规格ID
@@ -127,6 +143,9 @@ function addStock() {
     buyCount = stockCount;
   }
   $("#buyCount").val(buyCount);
+  if(isFreePost !== "freePost") {
+    calculateFreightPrice(buyCount);
+  }
 }
 
 /**
@@ -146,6 +165,9 @@ function delStock() {
     buyCount =1 
   }
   $("#buyCount").val(buyCount);
+  if(isFreePost !== "freePost") {
+    calculateFreightPrice(buyCount);
+  }
 }
 
 

@@ -19,6 +19,11 @@ block shopAccountTitle
       color: #cd3232;
       vertical-align: middle;
     }
+    .orderRefundStatusMark {
+      font-size: xx-large;
+      color: #1142ff;
+      vertical-align: middle
+    }
     .orderStatusTitle {
       width:22%;
       display:inline-block;
@@ -76,6 +81,10 @@ block shopAccountContent
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px")
       div(style="border:1px solid #ddd;background-color:#eee;padding:20px")
         ul
+          if order.refundStatus == "ing"
+            li.orderStatusLi
+              span.fa.fa-exclamation-circle.orderRefundStatusMark
+              span.orderStatusTitle 订单退款处理中
           if order.closeStatus
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderCloseStatusMark
@@ -238,16 +247,16 @@ block shopAccountContent
             th 商品名称
             th 属性
             th 商品单价
-            th 运费
             th 数量
+            th 运费
         tbody
           tr
             td
               a(href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
             td!=`${order.productParam.name}`
             td #{numToFloatTwo(order.productParam.price)}
-            td #{numToFloatTwo(order.product.freightPrice)}
             td!=`${order.count}`
+            td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
         p

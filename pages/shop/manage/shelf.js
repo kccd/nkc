@@ -106,6 +106,13 @@ $(document).ready(function() {
       $("#purchaseLimitDom").css("display", "none");
     }
   })
+  $("input[type=radio][name=freightMethod]").change(function() {
+    if(this.value == 'payPost') {
+      $("#freightPriceDom").css("display", "block");
+    }else{
+      $("#freightPriceDom").css("display", "none")
+    }
+  })
 })
 
 /**
@@ -180,11 +187,26 @@ function submitToShelf() {
   var params = tableTurnParams();
   var productParams = obtainProductPrice();
   // 获取物流价格
-  var freightPrice = $("#freightPrice").val();
-  freightPrice = Number(freightPrice)*100;
-  if(isNaN(freightPrice) || freightPrice < 0) {
-    throw("运费价格不可小于0,不可为空");
+  var isFreePost = true; // 是否免邮
+  var freightPrice = {
+    firstFreightPrice: null,
+    addFreightPrice: null
+  }; // 运费模板
+  var freightMethod = $("input[name='freightMethod']:checked").val();
+  var firstFreightPrice = Number($("#firstFreightPrice").val())*100;
+  var addFreightPrice = Number($("#addFreightPrice").val())*100;
+  if(freightMethod !== "freePost") {
+    isFreePost = false;
+    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice <= 0) {
+      throw("请正确设置运费模板");
+    }
+    freightPrice.firstFreightPrice = firstFreightPrice;
+    freightPrice.addFreightPrice = addFreightPrice;
   }
+  // freightPrice = Number(freightPrice)*100;
+  // if(isNaN(freightPrice) || freightPrice < 0) {
+  //   throw("运费价格不可小于0,不可为空");
+  // }
   var mergeForumId = getResultForumId();
   // 组装上传数据
   var post = {
@@ -197,6 +219,7 @@ function submitToShelf() {
     // stockSurplusCount: Number(stockTotalCount),
     uploadCert: uploadCert,
     stockCostMethod: stockCostMethod,
+    isFreePost: isFreePost,
     freightPrice: freightPrice,
     productStatus: productStatus,
     shelfTime: shelfTime,

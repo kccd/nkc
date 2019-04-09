@@ -505,6 +505,7 @@
   "submitEditToProduct": "[CO]提交商品信息修改",
   "storeCancelOrder": "取消订单",
   "productShelfRightNow": "[CO]商品立即上架",
+  "editOrderTrackNumber": "[CO]提交订单运单号修改",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

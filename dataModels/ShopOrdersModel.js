@@ -131,6 +131,14 @@ const shopOrdersSchema = new Schema({
     type: String,
     default: ""
   },
+  /**
+   * 快递公司简称
+   * AUTO为自动匹配
+   */
+  trackName: {
+    type: String,
+    default: "AUTO"
+  },
   // 用于判断买家是否可以请求平台介入
   applyToPlatform: {
     type: Boolean,

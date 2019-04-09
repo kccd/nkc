@@ -128,7 +128,15 @@ block content
           div.item(style="border-bottom: 1px solid #e5e5e5")
             p
               span.title 运费
-              span#freightPrice #{numToFloatTwo(product.freightPrice)}
+              if product.isFreePost
+                span#freightPrice 免邮
+                input#isFreePost(type="text" value="freePost" style="display:none")
+              else
+                span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+                span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+                input#isFreePost(type="text" value="payPost" style="display:none")
+              //- -console.log(product)
+              //- span#freightPrice #{numToFloatTwo(product.freightPrice)}
           div.item
             p
               span.title 数量

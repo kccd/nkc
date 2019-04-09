@@ -96,7 +96,7 @@ router
   })
   // 提交订单，并跳转到支付
   .post('/', async (ctx, next) => {
-    const {data, db, query, body} = ctx;
+    const {data, db, query, body, nkcModules} = ctx;
     const {user} = data;
     const {post, receInfo, paramCert} = body;
     const {receiveAddress, receiveName, receiveMobile} = receInfo;
@@ -126,6 +126,8 @@ router
       let stocksSurplus = productParam.stocksSurplus;
       if(Number(bill.productCount) > Number(stocksSurplus)) ctx.throw(400, "库存不足");
       const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
+      // 计算邮费
+      let freightPrice = await nkcModules.apiFunction.calculateFreightPrice(productParam.product.freightPrice, bill.productCount, productParam.product.isFreePost)
       const order = db.ShopOrdersModel({
         orderId: orderId,
         receiveAddress: receiveAddress,
@@ -136,8 +138,8 @@ router
         paramId: productParam._id,
         uid: user.uid,
         count: bill.productCount,
-        orderOriginPrice: (productParam.price + productParam.product.freightPrice) * bill.productCount,
-        orderPrice: (productParam.price + productParam.product.freightPrice) * bill.productCount
+        orderOriginPrice: (productParam.price) * bill.productCount + freightPrice,
+        orderPrice: (productParam.price) * bill.productCount + freightPrice
       });
       await order.save();
       //减库存
@@ -146,7 +148,6 @@ router
         orderId: orderId,
         deletable: false
       }});
-      await db.ShopCartModel.remove({uid: user.uid, productParamId: productParam._id});
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');
