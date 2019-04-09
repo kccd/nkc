@@ -16,8 +16,8 @@ block content
               li
                 a.list-group-item(href='/e/settings/shop/applys', type='button')
                   i.fa.fa-cogs
-                  | 开店申请处理
-                  span.badge(style='background-color: #000000;color: #ffffff;') 5
+                  | 交易权限申请处理
+                  span.badge(style='background-color: #000000;color: #ffffff;')!=data.applysDealing.length
               li
                 a.list-group-item(href='/e/settings/shop/refunds', type='button')
                   i.fa.fa-cogs
@@ -44,6 +44,10 @@ block content
                   li
                     a.list-group-item(href='/e/settings/shop/homeSetting/popular' style="padding-left: 30px;")
                       | 最热商品
+              li
+                a.list-group-item(href='/e/settings/shop/auth', type='button')
+                  i.fa.fa-cogs
+                  | 权限设置
               //- a.list-group-item(href='/e/settings/role/default/users', type='button')
               //-   | 普通用户
               //-   span.badge(style='background-color: #234233;color: #ffffff;') 74537

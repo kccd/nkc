@@ -9,8 +9,8 @@ function applyForOpenStore() {
     $("#apply").text("已提交申请");
     $("#apply").attr('disabled',true);
   })
-  .catch( function(err){
-    console.log("申请提交失败")
+  .catch( function(data){
+    screenTopWarning(data.error || data)
   })
 }
 

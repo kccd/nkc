@@ -1,0 +1,17 @@
+extends ./index.pug
+block shopSettings
+  .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;')
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3
+        .form
+          .form-group
+            h4 申请交易权限需要身份认证等级
+            //- .text-danger
+            //-   h5 超时后，则默认卖家同意用户的申请。
+            //-   h5 买家申请退款退货时，卖家处理超时后系统将自动退款，无需买家退货。
+            input.form-control#authLevel(type="number" value="1")
+          .form-group
+            button.btn.btn-block.btn-primary(onclick='saveAuth()') 保存
+
+block shopSettingScripts
+  +includeJS("/experimental/shop/auth.js")

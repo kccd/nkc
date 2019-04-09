@@ -319,6 +319,7 @@ usersPersonalSchema.methods.extendIdPhotos = async function() {
 	}
 };
 
+// 获取身份认证等级 
 usersPersonalSchema.methods.getAuthLevel = async function() {
 	if(!this.mobile) return 0;
 	const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();
