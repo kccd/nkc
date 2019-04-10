@@ -340,7 +340,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
     ip,
     port,
     verify: false,
-    notes
+    description: notes
   });
   await record.save();
   const o = {
