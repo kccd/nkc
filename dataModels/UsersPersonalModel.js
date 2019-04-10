@@ -102,26 +102,45 @@ const usersPersonalSchema = new Schema({
 		default: false,
 		index: 1
 	},
+  // 交易地址管理
+  /*
+  * {
+  *   name: String, 收件人姓名
+  *   nationCode: Number, 收件人手机国际区号
+  *   mobile: Number, 收件人手机号
+  *   address: String, 收货地址
+  * }
+  * */
   addresses: {
-    type: [
-      Schema.Types.Mixed
-      /*{
-      alipay: {
-        type: String,
-        max: [60, '支付宝帐号长度应小于60'],
-        required: true
-      },
-      address: {
-        type: String,
-        max: [60, '地址长度应小于60'],
-        required: true
-      },
-      id: {
-        type: Number,
-        required: true
-      }
-    }*/],
+    type: [Schema.Types.Mixed],
     default: [],
+  },
+  // 绑定的支付宝账号信息
+  /*
+  * {
+  *   account: Number, 支付宝账号
+  *   name: String, 支付宝真实姓名
+  *   time: Date, 绑定日期
+  *   default: Boolean 是否为默认账户
+  * }
+  * */
+  alipayAccounts: {
+    type: [Schema.Types.Mixed],
+    default: []
+  },
+  // 绑定的银行卡信息
+  /*
+  * {
+  *   bankName: String, 银行名称
+  *   account: Number, 银行卡号
+  *   name: String, 开户人姓名,
+  *   mobile: String,
+  *   default: Boolean 是否为默认账户
+  * }
+  * */
+  bankAccounts: {
+    type: [Schema.Types.Mixed],
+    default: []
   },
   industries: {
 	  type: [Schema.Types.Mixed],
@@ -360,4 +379,39 @@ usersPersonalSchema.statics.findUsersPersonalById = async (uid) => {
   if(!personal) throwErr(404, `未找到ID为【${uid}】的用户隐私信息`);
   return personal;
 };
+usersPersonalSchema.statics.findById = async (uid) => {
+  const UsersPersonalModel = mongoose.model("usersPersonal");
+  const usersPersonal = await UsersPersonalModel.findOne({uid});
+  if(!usersPersonal) throwErr(404, `未找到ID为${uid}的用户信息`);
+  return usersPersonal
+};
+
+/*
+* 验证密码是否正确
+* @param {String} passwordString 用户输入的密码
+* @author pengxiguaa 2019-4-10
+* */
+usersPersonalSchema.methods.ensurePassword = async function(passwordString) {
+  const {
+    encryptInMD5WithSalt,
+    encryptInSHA256HMACWithSalt
+  } = require("../tools/encryption");
+  const {password, hashType} = this;
+  const {hash, salt} = password;
+  switch(hashType) {
+    case 'pw9':
+      if(encryptInMD5WithSalt(passwordString, salt) !== hash) {
+        throwErr(400, '密码错误, 请重新输入');
+      }
+      break;
+    case 'sha256HMAC':
+      if(encryptInSHA256HMACWithSalt(passwordString, salt) !== hash) {
+        throwErr(400, '密码错误, 请重新输入');
+      }
+      break;
+    default: throwErr(400, '未知的密码加密类型');
+  }
+};
+
+
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

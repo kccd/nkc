@@ -10,9 +10,25 @@ router
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-    const {kcbsTypes, minCount, maxCount} = body;
+    const {kcbsTypes, kcbSettings} = body;
+    let {
+      minCount, maxCount,
+      withdrawMin, withdrawMax, withdrawCount,
+      withdrawTimeBegin, withdrawTimeEnd,
+      withdrawStatus,
+    } = kcbSettings;
 		if(minCount <= 0) ctx.throw(400, '最小值不能小于0');
 		if(minCount > maxCount) ctx.throw(400, '最小值最大值设置错误');
+		withdrawMin = parseInt(withdrawMin);
+    withdrawMax = parseInt(withdrawMax);
+    withdrawCount = parseInt(withdrawCount);
+    withdrawStatus = !!withdrawStatus;
+    withdrawTimeBegin = parseInt(withdrawTimeBegin);
+    withdrawTimeEnd = parseInt(withdrawTimeEnd);
+    if(withdrawMin < 0) ctx.throw(400, "最小提现金额设置错误");
+    if(withdrawMax < 0) ctx.throw(400, "最大提现金额设置错误");
+    if(withdrawCount < 0) ctx.throw(400, "每天最大提现次数设置错误");
+    if(withdrawTimeBegin > withdrawTimeEnd) ctx.throw(400, "允许提现的时间段设置错误");
     for(const type of kcbsTypes) {
       let {count, num, _id} = type;
       count = parseInt(count);
@@ -30,7 +46,17 @@ router
       }
       await type_.update({count, num});
     }
-    await db.SettingModel.update({_id: 'kcb'}, {$set: {'c.minCount': minCount, 'c.maxCount': maxCount}});
+    const c = {
+      minCount,
+      maxCount,
+      withdrawTimeEnd,
+      withdrawTimeBegin,
+      withdrawCount,
+      withdrawMin,
+      withdrawMax,
+      withdrawStatus
+    };
+    await db.SettingModel.update({_id: 'kcb'}, {$set: {c}});
 		await next();
 	});
 module.exports = router;

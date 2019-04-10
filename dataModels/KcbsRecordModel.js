@@ -349,7 +349,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
     title,
     notes,
     backParams,
-    returnUrl: serverConfig.domain + '/account/finance/recharge?type=back' + (backParams.type === 'pay'?'&pay=true':'')
+    returnUrl: serverConfig.domain + '/account/finance/recharge?type=back'
   };
   return await alipay2.receipt(o);
 };

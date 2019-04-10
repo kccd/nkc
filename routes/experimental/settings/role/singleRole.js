@@ -10,6 +10,8 @@ router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     ctx.template = 'experimental/settings/role/singleRole.pug';
+    const defaultRole = await db.RoleModel.findOnly({_id: "default"});
+    data.defaultOperationsId = defaultRole.operationsId;
     data.operationTypes = await db.OperationTypeModel.find().sort({toc: 1});
     const operations = await db.OperationModel.find();
     data.operations = await Promise.all(operations.map(async o => {
