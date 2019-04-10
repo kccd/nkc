@@ -8,6 +8,7 @@
 function sendGoods() {
   var storeId = $("#newstoreid").val();
   var orderId = $("#neworderid").val();
+  var trackName = $("#trackList").val();
   if(!orderId || !storeId) {
     $("#sendGoodsModal").modal("show");
     return screenTopWarning("请重新点击发货");
@@ -17,7 +18,8 @@ function sendGoods() {
   if(!trackNumber) return screenTopWarning("请填写快递单号");
   var para = {
     orderId: orderId,
-    trackNumber: trackNumber
+    trackNumber: trackNumber,
+    trackName: trackName
   }
   nkcAPI('/shop/manage/'+storeId+'/order/sendGoods', "PATCH", {post: para})
   .then(function(data) {
@@ -88,4 +90,33 @@ function openEditOrderModal(storeId, orderId) {
 function visitLogisticsInfo(storeId,orderId) {
   var targetUrl = `/shop/manage/${storeId}/order/logositics?orderId=${orderId}`;
   window.location.href = targetUrl;
+}
+
+/**
+ * 修改运单号
+ */
+function editTrackNum() {
+  $("#editTrackNum").css("display", "none");
+  $("#saveTrackNum").css("display", "inline-block");
+  var trackNumber = $("#trakcNumText").text();
+  var infoPutDom = "<input type='text' id='trackNumVal' value='"+trackNumber+"'>";
+  $("#trakcNumText").html(infoPutDom);
+
+}
+
+ /**
+  * 保存运单号修改
+  */
+function saveTrackNum(storeId,orderId) {
+  var trackNumber = $("#trackNumVal").val().trim();
+  nkcAPI(`/shop/manage/${storeId}/order/editOrderTrackNumber`, "PATCH", {orderId: orderId, trackNumber: trackNumber})
+  .then(function(data) {
+    screenTopAlert("修改成功");
+    $("#saveTrackNum").css("display", "none");
+    $("#editTrackNum").css("display", "inline-block");
+    $("#trakcNumText").html(trackNumber);
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data)
+  })
 }

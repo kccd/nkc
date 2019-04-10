@@ -29,6 +29,11 @@ const shopSettingsSchema = new Schema({
   populars: {
     type: Schema.Types.Mixed,
     default: []
+  },
+  // 权限申请身份等级
+  authLevel: {
+    type: Number,
+    default: 1
   }
 }, {
   collection: 'shopSettings'

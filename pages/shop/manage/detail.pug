@@ -18,6 +18,11 @@ block title
       color: #cd3232;
       vertical-align: middle;
     }
+    .orderRefundStatusMark {
+      font-size: xx-large;
+      color: #1142ff;
+      vertical-align: middle
+    }
     .orderStatusTitle {
       width:22%;
       display:inline-block;
@@ -63,6 +68,11 @@ block title
       zoom:1;
       color:#666;
     }
+    .infoListLiDd-noneWidth {
+      display:inline-block;
+      zoom:1;
+      color:#666;
+    }
     .infoContent {
       color:#6e6e6e
     }
@@ -79,6 +89,10 @@ block name
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px;margin-top:20px")
       div(style="border:1px solid #ddd;background-color:#eee;padding:20px")
         ul
+          if order.refundStatus == "ing"
+            li.orderStatusLi
+              span.fa.fa-exclamation-circle.orderRefundStatusMark
+              span.orderStatusTitle 订单退款处理中
           if order.closeStatus
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderCloseStatusMark
@@ -152,9 +166,13 @@ block name
                 li.infoListLi 
                   span.infoListLiDt 运单编号：
                   if order.trackNumber
-                    span.infoListLiDd!=`${order.trackNumber}`
+                    span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackNumber}`
                   else
-                    span.infoListLiDd 暂无物流信息
+                    span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
+                  if order.orderStatus == "unSign"
+                    span 
+                      button#editTrackNum(onclick=`editTrackNum()`) 修改
+                      button#saveTrackNum(onclick=`saveTrackNum(${order.storeId}, ${order.orderId})` style="display:none;") 保存
 
           .col-xs-12
             h4.infoTitle 
@@ -228,16 +246,16 @@ block name
             th 商品名称
             th 属性
             th 商品单价
-            th 运费
             th 数量
+            th 运费
         tbody
           tr
             td
               a(href=`/shop/product/${order.product.productId}` target="_blank")= order.product.name
             td!=`${order.productParam.name}`
             td #{numToFloatTwo(order.productParam.price)}
-            td #{numToFloatTwo(order.product.freightPrice)}
             td!=`${order.count}`
+            td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
         p
@@ -246,23 +264,5 @@ block name
         p
           span(style='font-weight: bold;') 实付款: 
           span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice)}
-  #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
-    .modal-dialog(role='document')
-      .modal-content
-        .modal-header
-          button.close(type='button', data-dismiss='modal', aria-label='Close')
-            span(aria-hidden='true') ×
-          h4#myModalLabel.modal-title 填写运单号
-        .modal-body
-          .form-horizontal
-            .form-group 
-              label.col-sm-2.control-label 快递单号
-              .col-sm-8
-                input.form-control#newtracknumber(type='text')
-          input#newstoreid(type="text" style="display:none")
-          input#neworderid(type="text" style="display:none")
-        .modal-footer(style="text-align:left")
-          button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
-          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
 block manageScripts
   +includeJS("/shop/manage/order.js")

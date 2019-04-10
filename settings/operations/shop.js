@@ -72,6 +72,9 @@ module.exports = {
         editOrder: {
           PATCH: 'editOrder'
         },      
+        editOrderTrackNumber: {
+          PATCH: 'editOrderTrackNumber'
+        },
         detail: {
           GET: "visitStoreOrderDetail"
         },

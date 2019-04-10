@@ -34,14 +34,14 @@ orderRouter
 	// 发货
 	.patch('/sendGoods', async(ctx, next) => {
 		const {data, db, params, query, body} = ctx;
-		const {orderId, trackNumber} = body.post;
+		const {orderId, trackNumber, trackName} = body.post;
 		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "订单无效");
     var time = new Date();
     const shopSettings = await db.SettingModel.findOnly({_id: "shop"});
     const autoReceiveTime = Date.now() + shopSettings.c.refund.buyerReceive * 60 * 60 * 1000;
-		await order.update({$set: {trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
+		await order.update({$set: {trackName:trackName,trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
 		await next();
 	})
   // 修改订单价格
@@ -57,6 +57,16 @@ orderRouter
     if(user.uid !== data.order.store.uid) ctx.throw(400, "您无权修改此订单价格");
     await order.update({$set:{"orderPrice":price}});
     await next();
+	})
+	.patch('/editOrderTrackNumber', async(ctx, next) => {
+		const {data, db, query, body} = ctx;
+		const {user} = data;
+		const {orderId, trackNumber} = body;
+		if(!orderId) ctx.throw(400, "订单号有误");
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order || order.orderStatus !== "unSign" || order.closeStatus == true || order.refundStatus == "success") ctx.throw(400, "该状态订单不可修改运单号");
+		await order.update({$set: {"trackNumber":trackNumber}});
+		await next();
 	})
 	// 查看订单详情
 	.get('/detail', async (ctx, next) => {
@@ -94,7 +104,8 @@ orderRouter
 		if(store && user.uid !== store.uid) ctx.throw(400, "您无权查看该订单的物流信息");
 		if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
 		let trackNumber = order.trackNumber;
-		const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber);
+		let trackName = order.trackName;
+		const trackInfo = await nkcModules.apiFunction.test(trackNumber, trackName);
 		data.trackNumber = trackNumber;
 		data.trackInfo = trackInfo;
 		ctx.template = "/shop/manage/logositics.pug";

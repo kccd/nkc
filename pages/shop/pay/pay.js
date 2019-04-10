@@ -1,8 +1,10 @@
 function submit(ordersId) {
   var password = $('#password').val();
+  var totalPrice = $("#totalPrice").text();
   nkcAPI('/shop/pay', 'POST', {
     ordersId: ordersId,
-    password: password
+    password: password,
+    totalPrice: totalPrice
   })
   .then(function() {
     hiddenInput();

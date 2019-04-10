@@ -22,6 +22,10 @@ module.exports = {
           PATCH: "modifyShopRefundSettings"
         }
 			},
+			auth: {
+				GET: "visitShopAuth",
+				POST: "setShopAuth"
+			},
 			applys: {
 				GET: 'visitShopOpenStoreApplys',
 				approve: {

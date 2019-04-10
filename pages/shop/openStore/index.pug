@@ -36,8 +36,8 @@ block content
                       //- p(style="color:red") 尚未认证
                 .form-group
                   .col-sm-12
-                    -if(!data.applyHis)
-                      button.btn.btn-primary#apply(onclick="applyForOpenStore()") 提交开店申请
+                    -if(!data.applyHis || data.applyHis.applyStatus == 'reject')
+                      button.btn.btn-primary#apply(onclick="applyForOpenStore()") 申请开通交易功能
                     -else
                       -if(data.applyHis.applyStatus == 'dealing')
                         button.btn.btn-default(disabled='true') 已提交申请

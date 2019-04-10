@@ -162,11 +162,36 @@ block name
         .panel-body
           .form-horizontal
             .form-group
-              label.col-sm-2.control-label 运费价格
-              .col-sm-5
-                .input-group
-                  input.form-control#freightPrice(type='number', placeholder="总运费=单件运费价格*商品数量", aria-describedby='stockQuantity')
-                  span.input-group-addon 元
+              label.col-sm-2.control-label 运费承担
+              .col-sm-8
+                label.radio-inline
+                  input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked)
+                  |  免邮费
+                label.radio-inline
+                  input#freightMethod2(type='radio', name='freightMethod', value='payPost')
+                  |  买家承担邮费
+            //- .form-group
+            //-   label.col-sm-2.control-label 首重价格
+            //-   .col-sm-5
+            //-     .input-group
+            //-       input.form-control#freightPrice(type='number', placeholder="总运费=单件运费价格*商品数量", aria-describedby='stockQuantity')
+            //-       span.input-group-addon 元
+            .form-group#freightPriceDom(style="display:none")
+              label.col-sm-2.control-label 
+              .col-sm-8
+                span 首件商品运费 
+                span 
+                  input#firstFreightPrice(type="text", name="", style="width:30px")
+                span  元，
+                span 每增加 1 件商品，增加运费 
+                span 
+                  input#addFreightPrice(type="text", name="", style="width:30px")
+                span  元
+                p(style="color:red;font-size:11px") 注意:首重运费与增加运费应大于0
+            //- .form-group
+            //-   label.col-sm-2.control-label
+            //-   .col-sm-8
+            //-     p 首重运费与增加运费应大于0
       .panel.panel-info
         .panel-heading
           | 定时上架
@@ -249,9 +274,9 @@ block name
                   label
                     input#ParseURL(type='checkbox' checked)
                     | 处理URL
-                button#showButton.btn.btn-primary.btn-xs(style="float:right;display:block" onclick="showAttachment()") 展开附件模块
-                button#hideButton.btn.btn-primary.btn-xs(style="float:right;display:none" onclick="hideAttachment()") 收起附件模块
-            .form-group#attachmentDom(style="display:none")
+                button#showButton.btn.btn-primary.btn-xs(style="float:right;display:none" onclick="showAttachment()") 展开附件模块
+                button#hideButton.btn.btn-primary.btn-xs(style="float:right;display:block" onclick="hideAttachment()") 收起附件模块
+            .form-group#attachmentDom(style="display:block")
               .col-sm-2
               .col-sm-8
                include ../../media/media_index.pug  
