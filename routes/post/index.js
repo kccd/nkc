@@ -137,19 +137,27 @@ postRouter
     }
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
-    // 修改回复的时间限制
-    let modifyPostTimeLimit = 0;
-    for(const r of data.userRoles) {
-			if(r.modifyPostTimeLimit === -1) {
-				modifyPostTimeLimit = -1;
-				break;
-			}
-			if(r.modifyPostTimeLimit > modifyPostTimeLimit) {
-				modifyPostTimeLimit = r.modifyPostTimeLimit;
-			}
+
+    if(targetThread.type !== "product") {
+
+      // 修改回复的时间限制
+      let modifyPostTimeLimit = 0;
+      for(const r of data.userRoles) {
+        if(r.modifyPostTimeLimit === -1) {
+          modifyPostTimeLimit = -1;
+          break;
+        }
+        if(r.modifyPostTimeLimit > modifyPostTimeLimit) {
+          modifyPostTimeLimit = r.modifyPostTimeLimit;
+        }
+      }
+      if(modifyPostTimeLimit !== -1 && (Date.now() - targetPost.toc.getTime() > modifyPostTimeLimit*60*60*1000))
+        ctx.throw(403, `您只能需改${modifyPostTimeLimit}小时前发表的内容`);
+
     }
-    if(modifyPostTimeLimit !== -1 && (Date.now() - targetPost.toc.getTime() > modifyPostTimeLimit*60*60*1000))
-    	ctx.throw(403, `您只能需改${modifyPostTimeLimit}小时前发表的内容`);
+
+
+
     const objOfPost = Object.assign(targetPost, {}).toObject();
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);
