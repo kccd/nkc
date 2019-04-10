@@ -72,7 +72,6 @@ func.transfer = async (o) => {
         } catch(err) {
           return reject(data);
         }
-        console.log(data);
         data = data.alipay_fund_trans_toaccount_transfer_response;
         const {code, sub_msg} = data;
         if(code === '10000') {

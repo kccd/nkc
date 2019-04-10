@@ -91,14 +91,6 @@ router
       const _id = await db.SettingModel.operateSystemID("kcbsRecords", 1);
       const description = `科创币提现`;
 
-      await nkcModules.alipay2.transfer({
-        account: account.account,
-        name: account.name,
-        money: money/100,
-        id: _id,
-        notes: description
-      });
-
       const record = await db.KcbsRecordModel({
         _id,
         from: user.uid,
@@ -111,6 +103,22 @@ router
       });
 
       await record.save();
+
+      try {
+        await nkcModules.alipay2.transfer({
+          account: account.account,
+          name: account.name,
+          money: money/100,
+          id: _id,
+          notes: description
+        });
+      } catch(err) {
+        await record.update({
+          error: JSON.stringify(err)
+        });
+      }
+
+
       await db.UserModel.updateOne({uid: user.uid}, {
         $inc: {
           kcb: -1*money
