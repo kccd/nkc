@@ -11,6 +11,7 @@ router
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
     const {kcbsTypes, kcbSettings} = body;
+    const kcbSettingsDB = await db.SettingModel.findById("kcb");
     let {
       minCount, maxCount,
       withdrawMin, withdrawMax, withdrawCount,
@@ -54,7 +55,8 @@ router
       withdrawCount,
       withdrawMin,
       withdrawMax,
-      withdrawStatus
+      withdrawStatus,
+      totalMoney: kcbSettingsDB.c.totalMoney
     };
     await db.SettingModel.update({_id: 'kcb'}, {$set: {c}});
 		await next();
