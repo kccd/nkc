@@ -2,6 +2,9 @@ const QCloudSms = require('qcloudsms_js');
 const mongoose = require('mongoose');
 
 const sendMessage = async (obj) => {
+  if(global.NKC.NODE_ENV !== "production") {
+    return console.log(obj);
+  }
   const {type, code, mobile, nationCode} = obj;
   const SettingModel = mongoose.model('settings');
   const smsSettings = await SettingModel.findOnly({_id: 'sms'});

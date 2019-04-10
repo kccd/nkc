@@ -12,6 +12,8 @@ const certRouter = require('./cert');
 const socialRouter = require('./social');
 const usernameRouter = require('./username');
 const waterRouter = require('./water');
+const alipayRouter = require("./alipay");
+const bankRouter = require("./bank");
 const redEnvelopeRouter = require('./redEnvelope');
 settingRouter
 	.use('/', async (ctx, next) => {
@@ -28,6 +30,7 @@ settingRouter
 		ctx.template = 'interface_user_settings_avatar.pug';
 		await next();
 	})
+  .use("/alipay", alipayRouter.routes(), alipayRouter.allowedMethods())
   .use('/red_envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
 	.use('/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
 	.use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods())
@@ -40,5 +43,6 @@ settingRouter
 	.use('/cert', certRouter.routes(), certRouter.allowedMethods())
 	.use('/photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+  .use("/bank", bankRouter.routes(), bankRouter.allowedMethods())
 	.use('/water', waterRouter.routes(), waterRouter.allowedMethods());
 module.exports = settingRouter;

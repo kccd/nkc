@@ -200,7 +200,7 @@ module.exports = {
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'
-    }
+    },
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',

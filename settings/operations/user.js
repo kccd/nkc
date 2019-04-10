@@ -72,6 +72,14 @@ module.exports = {
       'red_envelope': {
 			  GET: 'visitUserRedEnvelopeSettings',
         PATCH: 'modifyUserRedEnvelopeSettings'
+      },
+      alipay: {
+			  GET: "userBindAlipayAccounts",
+        POST: "userBindAlipayAccounts"
+      },
+      bank: {
+			  GET: 'userBindBankAccounts',
+        POST: 'userBindBankAccounts'
       }
 		},
 		auth: {

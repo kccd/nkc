@@ -4,8 +4,7 @@ const roleRouter = new Router();
 roleRouter
   .use('/', async (ctx ,next) => {
     const {data, db} = ctx;
-    const roles = await db.RoleModel.find().sort({order: 1});
-    data.roles = roles;
+    data.roles = await db.RoleModel.find().sort({order: 1});
     await next();
   })
 	.get('/', async (ctx, next) => {

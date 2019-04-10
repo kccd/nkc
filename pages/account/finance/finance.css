@@ -38,7 +38,7 @@
 }
 .payment-pannel{
   border: 1px solid #eee;
-  height: 4rem;
+  min-height: 4rem;
   line-height: 4rem;
   cursor: pointer;
   text-align: center;
@@ -57,4 +57,15 @@
   border: 1px solid #eee;
   background-color: #ffa500;
   border-radius: 3px;
+}
+.default{
+  position: absolute;
+  width: 3rem;
+  text-align: center;
+  left: 0;
+  height: 1.8rem;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.8rem;
+  color: #a94442;
 }

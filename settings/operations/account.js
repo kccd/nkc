@@ -7,7 +7,8 @@ module.exports = {
       POST: 'rechargePost'
     },
     withdraw: {
-      GET: 'accountWithdraw'
+      GET: 'accountWithdraw',
+      POST: "accountWithdraw"
     }
   }
-}
+};

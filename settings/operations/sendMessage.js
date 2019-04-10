@@ -13,5 +13,8 @@ module.exports = {
 	},
 	login: {
 		POST: 'sendLoginMessage'
-	}
+	},
+  withdraw: {
+	  POST: "sendWithdrawMessage"
+  }
 };
