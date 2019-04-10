@@ -340,7 +340,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
     ip,
     port,
     verify: false,
-    description: `科创币充值，充值金额${money/100}`
+    notes
   });
   await record.save();
   const o = {

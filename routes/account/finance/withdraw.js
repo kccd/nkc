@@ -90,6 +90,15 @@ router
       if(!existing) ctx.throw(400, "您未绑定该收款账户，请检查");
       const _id = await db.SettingModel.operateSystemID("kcbsRecords", 1);
       const description = `科创币提现`;
+
+      await nkcModules.alipay2.transfer({
+        account: account.account,
+        name: account.name,
+        money: money/100,
+        id: _id,
+        notes: description
+      });
+
       const record = await db.KcbsRecordModel({
         _id,
         from: user.uid,
@@ -100,6 +109,7 @@ router
         num: money,
         description
       });
+
       await record.save();
       await db.UserModel.updateOne({uid: user.uid}, {
         $inc: {
@@ -112,13 +122,7 @@ router
           "c.totalMoney": money
         }
       });
-      await nkcModules.alipay2.transfer({
-        account: account.account,
-        name: account.name,
-        money: money/100,
-        id: _id,
-        notes: description
-      });
+
     } else {
       ctx.throw(400, "未知的账户类型")
     }
