@@ -7,7 +7,7 @@ block eContent
       .col-xs-12.col-md-12  
         include ./roleNav      
       .col-xs-12.col-md-12.m-t-1
-      .hidden#data=JSON.stringify({role: data.role, operationTypes: data.operationTypes, operations: data.operations, users: data.users})
+      .hidden#data=JSON.stringify({defaultOperationsId: data.defaultOperationsId, role: data.role, operationTypes: data.operationTypes, operations: data.operations, users: data.users})
     .row#app(v-cloak)
       button.btn.btn-primary.btn-fab(@click='save') 保存
       .col-xs-12.col-md-7.col-md-offset-2
@@ -101,11 +101,24 @@ block eContent
                   tr(v-for='o in type.operations')
                     th(v-if='o.name') {{o.name}}({{o._id}})
                     th(v-else) {{o._id}}
-                    th 
-                      <label>
-                        <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>
-                        span(v-else) 默认
-                      </label>
+                    th
+                      div(v-if="!role.defaultRole")
+                        <label v-if="isDefault(o._id)">
+                          <input type="checkbox" checked disabled>
+                        </label>
+                        <label v-else>
+                          <input type="checkbox" :value='o._id' v-model='role.operationsId'>
+                        </label>
+                      div(v-else)
+                        <label>
+                          <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>
+                          span(v-else) 默认
+                        </label>
+                      //-
+                        <label>
+                          <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>
+                          span(v-else) 默认
+                        </label>
 
 block scripts
   include ../../../publicModules/selectColor

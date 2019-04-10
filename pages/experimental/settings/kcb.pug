@@ -12,8 +12,64 @@ block content
       #app(v-cloak)
         .col-xs-12.col-md-12
           .hidden(ref='data')= JSON.stringify({kcbsTypes: data.kcbsTypes, kcbSettings: data.kcbSettings})
+        .col-xs-12.col-md-12(v-if='kcbSettings.withdrawMin')
+          h4 提现设置
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 提现功能
+              .col-sm-10
+                <label class="radio-inline">
+                <input type="radio" :value="true" v-model="kcbSettings.withdrawStatus"> 开启
+                </label>
+                <label class="radio-inline">
+                <input type="radio" :value="false" v-model="kcbSettings.withdrawStatus"> 关闭
+                </label>
+            .form-group
+              label.col-sm-2.control-label 最小提现金额
+              .col-sm-4
+                input.form-control(type="number" v-model.number="kcbSettings.withdrawMin")
+                h5.text-danger 若用户的科创币小于最小提现金额则用户无法申请提现。
+            .form-group
+              label.col-sm-2.control-label 最大提现金额
+              .col-sm-4
+                input.form-control(type="number" v-model.number="kcbSettings.withdrawMax")
+                h5.text-danger 单笔最大提现金额，与”每天最大提现次数“可限制用户每天能提现的总金额。
+            .form-group
+              label.col-sm-2.control-label 每天最大提现次数
+              .col-md-4
+                input.form-control(type="number" v-model.number="kcbSettings.withdrawCount")
+                h5.text-danger 次数达最大值后用户当天无法再申请提现。
+            .form-group
+              label.col-sm-2.control-label 允许提现的时间段
+              .col-md-10.form-inline
+                select.form-control(v-model.number="kcbSettings.withdrawTimeBegin.hour")
+                  -for(var i = 0; i < 24; i++)
+                    option(:value=i)=i
+                span 时
+                select.form-control(v-model.number="kcbSettings.withdrawTimeBegin.min")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 分
+                select.form-control(v-model.number="kcbSettings.withdrawTimeBegin.sec")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 秒
+                span.m-l-1.m-r-1 至
+                select.form-control(v-model.number="kcbSettings.withdrawTimeEnd.hour")
+                  -for(var i = 0; i < 24; i++)
+                    option(:value=i)=i
+                span 时
+                select.form-control(v-model.number="kcbSettings.withdrawTimeEnd.min")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 分
+                select.form-control(v-model.number="kcbSettings.withdrawTimeEnd.sec")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 秒
+
+        .col-xs-12.col-md-12.table-responsive.m-t-4
           h4 科创币设置
-        .col-xs-12.col-md-12.table-responsive
           table.table
             thead
               tr

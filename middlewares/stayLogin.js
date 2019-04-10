@@ -119,7 +119,8 @@ module.exports = async (ctx, next) => {
   ctx.state.language = languages[languageName];
   ctx.state.lang = (type, operationId) => {
     return ctx.state.language[type][operationId];
-  }
+  };
+
 	data.userOperationsId = userOperationsId;
 	data.userRoles = userRoles;
 	data.userGrade = userGrade || {};

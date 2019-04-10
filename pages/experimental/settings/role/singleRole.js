@@ -3,6 +3,7 @@ var app = new Vue({
   data: {
     role: '',
     operations: [],
+    defaultOperationsId: [],
     type: '',
     types: [],
     users: []
@@ -11,9 +12,9 @@ var app = new Vue({
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
     this.role = data.role;
-    console.log(data);
     this.users = data.users;
     this.operations = data.operations;
+    this.defaultOperationsId = data.defaultOperationsId;
     this.types = this.extendCount(data.operationTypes);
     this.types.unshift({
       _id: 'all',
@@ -28,6 +29,9 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    isDefault: function(operationId) {
+      return this.defaultOperationsId.indexOf(operationId) !== -1;
+    },
     removeRole: function() {
       if(confirm('确认要删除“' + this.role.displayName + '”证书？') === false) return;
       kcAPI('/e/settings/role/' + app.role._id, 'DELETE', {})

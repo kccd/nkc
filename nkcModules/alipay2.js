@@ -15,10 +15,23 @@ const moment = require('moment');
 const crypto = require('crypto');
 const path = require('path');
 const alipayConfig = require('../config/alipay.json');
+
+const {
+  transfer,
+  receipt
+} = alipayConfig;
+
+const serverConfig = require('../config/server.json');
+
+const receiptConfig = {
+  alipay_gateway: 'https://mapi.alipay.com/gateway.do?',
+  _input_charset: 'UTF-8',
+  sign_type: 'MD5'
+};
+
 const privatekey = fs.readFileSync(path.resolve(__dirname, '../key/rsa_private_key.pem'));
 const publicKey = fs.readFileSync(path.resolve(__dirname, '../key/alipay_public_key.pem'));
-const {app_id, url} = alipayConfig;
-const serverConfig = require('../config/server.json');
+
 
 const func = {};
 func.transfer = async (o) => {
@@ -37,7 +50,7 @@ func.transfer = async (o) => {
     remark: notes // 转账备注
   };
   const options = {
-    app_id,
+    app_id: transfer.app_id,
     biz_content: JSON.stringify(params),
     charset: 'UTF-8',
     method: 'alipay.fund.trans.toaccount.transfer',
@@ -49,9 +62,8 @@ func.transfer = async (o) => {
   const sign = crypto.createSign('RSA-SHA256');
   sign.write(str);
   sign.end();
-  const key = sign.sign(privatekey, 'base64');
-  options.sign = key;
-  const link = url + '?' + queryString.stringify(options);
+  options.sign = sign.sign(privatekey, 'base64');
+  const link = transfer.url + '?' + queryString.stringify(options);
   return new Promise((resolve, reject) => {
     rp(link)
       .then((data) => {
@@ -74,7 +86,7 @@ func.transfer = async (o) => {
   });
 };
 /* 
-  收款
+  收款 电脑网页收款
   @param options
     money: 收款金额
     id: 唯一ID
@@ -88,7 +100,7 @@ func.transfer = async (o) => {
       goodsCount: 商品数量
       goodsPrice: 商品单价
 */
-func.receipt = async (o) => {
+func.receipt1 = async (o) => {
   let {
     money, id, title, notes, goodsInfo, returnUrl, backParams
   } = o;
@@ -142,17 +154,16 @@ func.receipt = async (o) => {
   const sign = crypto.createSign('RSA-SHA256');
   sign.write(str);
   sign.end();
-  const key = sign.sign(privatekey, 'base64');
-  options.sign = key;
+  options.sign = sign.sign(privatekey, 'base64');
   return url + '?' + queryString.stringify(options);
 };
 
 /* 
-  验证签名，判断是否为支付宝的请求
+  收款 电脑网页收款 验证签名，判断是否为支付宝的请求
   @param notifyData: 支付宝服务器post请求所带的数据
   @author pengxiguaa 2019/3/11 
 */
-func.verifySign = async (d) => {
+func.verifySign1 = async (d) => {
   const notifyData = Object.assign({}, d);
   let data = Object.assign({}, notifyData);
   let sign = data.sign;
@@ -176,76 +187,92 @@ func.verifySign = async (d) => {
     }
   });
 };
-module.exports = func;
-/* 
-  沙箱测试
 
-
-1、单笔转账到支付宝账户 
-const options = {
-  account: 'lihema9158@sandbox.com',
-  money: '3',
-  id: Date.now(),
-  name: '沙箱环境',
-  notes: '测试转账模块'
-};
-
-  
-2、收款
-const options  =  {
-  id: Date.now(),
-  money: '5202',
-  title: '沙箱测试收款',
-  notes: '沙箱测试收款,订单描述',
-  goodsInfo: [
-    {
-      goodsName: '特斯拉线圈',
-      goodsId: '1000212',
-      goodsCount: 10,
-      goodsPrice: 99.9
+const createSign = (obj) => {
+  let keys = Object.keys(obj);
+  keys = keys.sort();
+  const map = {};
+  for(const key of keys) {
+    if(key !== "sign" && key !== "sign_type" && obj[key]) {
+      map[key] = obj[key];
     }
-  ]
+  }
+  const str = queryString.unescape(queryString.stringify(map)) + receipt.key;
+  return crypto.createHash("MD5").update(str, "UTF-8").digest("hex");
 };
 
-3、验签
-支付宝 post 请求数据
-{ 
-  gmt_create: '2019-03-11 12:01:10',
-  charset: 'UTF-8',
-  gmt_payment: '2019-03-11 12:01:16',
-  notify_time: '2019-03-11 12:01:17',
-  subject: '沙箱测试收款',
-  sign: 'fblWjvLRUyY/DjTJ/gqpU+XOSwUM2r4RdB9ccAJA/3xxwkD2FH3bAGIxSQnZ5/5dQFtRBGWtn9+Z71b+Erou4DxKRObi+BZSYFuYQSUJd9thJiCXHgztEf1CfZJ/9GLyg3fWAvdk7mE7NywI3S8HRYvHlwX8fj4fz6blFGJa5SwqfXO5FWIcFmu+7U3Y7FuZJV3ae6syH9vaO9MK6UUdOBA7/OmyjtzRz2ha5G5LRsEwxlfDpXjM/xiJFH32zRULEFZooV+FNQOPrz3zJhsog2s6Z/nTQu+FfwfGASldQrWnlAkl//eRA6zlx5Kjo3p8BKsI3YBMmqbYbMENwJS0ww==',
-  buyer_id: '2088102175621412',
-  body: '沙箱测试收款,订单描述',
-  invoice_amount: '520.00',
-  version: '1.0',
-  notify_id: '37c9470a1737df3a22cad4b95f21c25j61',
-  fund_bill_list: '[{"amount":"520.00","fundChannel":"ALIPAYACCOUNT"}]',
-  notify_type: 'trade_status_sync',
-  out_trade_no: '1552276865688',
-  total_amount: '520.00',
-  trade_status: 'TRADE_SUCCESS',
-  trade_no: '2019031122001421410500793265',
-  auth_app_id: '2016091100489000',
-  receipt_amount: '520.00',
-  point_amount: '0.00',
-  app_id: '2016091100489000',
-  buyer_pay_amount: '520.00',
-  sign_type: 'RSA2',
-  seller_id: '2088102175198013' 
-}
+/*
+* 即时收款
+* @param options
+*   money: 收款金额
+*   id: 唯一ID
+*   title: 订单标题,
+*   notes: 订单描述,
+*   backParams: 携带参数，会原样返回
+* @author pengxiguaa 2019-4-8
+* */
+func.receipt = async (o) => {
+  let {
+    money, id, title, notes, backParams
+  } = o;
+  if(!id) throwErr('支付宝收款ID不能为空');
+  if(!money || money <= 0) throwErr('支付宝转账金额不能小于0');
+  if(!title) throwErr('订单标题不能为空');
+  if(!notes) throwErr('订单描述不能为空');
+  const returnUrl = serverConfig.domain + '/account/finance/recharge?type=back';
+  let notifyUrl = serverConfig.domain + "/finance/recharge";
 
+  if(global.NKC.NODE_ENV !== "production") {
+    notifyUrl = "https://soccos.cn/test";
+  }
 
+  const obj = {
+    service: "create_direct_pay_by_user",
+    payment_type: "1",
+    _input_charset: "UTF-8",
+    notify_url: notifyUrl,
+    partner: receipt.seller_id,
+    return_url: returnUrl,
+    seller_email: receipt.seller_email
+  };
+  Object.assign(obj, {
+    out_trade_no: id,
+    subject: title,
+    body: notes,
+    total_fee: money,
+    extra_common_param: JSON.stringify(backParams)
+  });
+  obj.sign = createSign(obj);
+  obj.sign_type = "MD5";
 
+  return receiptConfig.alipay_gateway + queryString.stringify(obj);
+};
+/*
+即时收款 验证数据
+* @param data 页面跳转query或阿里服务器访问时的body
+* @author pengxiguaa 2019-4-8
+ */
+func.verifySign = async (data) => {
+  const sign = data.sign;
+  const realSign = createSign(data);
+  return new Promise((resolve, reject) => {
+    if(sign === realSign) {
+      const url = receipt.url + queryString.stringify({
+        service: "notify_verify",
+        partner: receipt.seller_id,
+        notify_id: data['notify_id']
+      });
+      rp(url)
+        .then(() => {
+          resolve("验证通过");
+        })
+        .catch((err) => {
+          reject(`验证失败：${JSON.stringify(err)}`);
+        });
+    } else {
+      reject(`sign验证不相等：${sign} !== ${realSign}`);
+    }
+  });
+};
 
-
-
-
-
-
-
-
-
-
-*/
+module.exports = func;

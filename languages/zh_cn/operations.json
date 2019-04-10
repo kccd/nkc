@@ -384,7 +384,10 @@
   "visitEditQuestion": "访问试题编辑器（上传试题、修改试题）",
   "removeForumCategory": "删除专业中的文章分类",
   "getAttachmentIcon": "获取附件图标",
+  "sendWithdrawMessage": "发送提现验证码",
 
+  "userBindAlipayAccounts": "用户绑定支付宝账号",
+  "userBindBankAccounts": "用户绑定银行卡",
   "enabledQuestion": "取消屏蔽考试题",
   "visitAddQuestion": "访问添加考试题页面",
   "postExamsPaper": "提交考试试卷",
@@ -506,6 +509,8 @@
   "storeCancelOrder": "取消订单",
   "productShelfRightNow": "[CO]商品立即上架",
   "editOrderTrackNumber": "[CO]提交订单运单号修改",
+  "visitShopAuth": "[SY]访问商城后台权限设置",
+  "setShopAuth": "[SY]提交商城后台权限设置",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

@@ -27,6 +27,7 @@ var app = new Vue({
         case 'bindMobile': return '绑定手机';
         case 'changeMobile': return '更改手机号';
         case 'reset': return '绑定新手机号';
+        case 'withdraw': return '提现';
       }
     },
     testSendMessage: function() {

@@ -105,7 +105,7 @@ settingSchema.methods.extendAds = async function() {
   @return setting
   @author pengxiguaa 2019/3/7
 */
-settingSchema.statics.findSettingById = async (_id) => {
+settingSchema.statics.findById = async (_id) => {
   const SettingModel = mongoose.model('settings');
   const setting = await SettingModel.findOne({_id});
   if(!setting) throwErr(404, `未找到ID为【${_id}】的系统设置`);

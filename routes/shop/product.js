@@ -10,43 +10,40 @@ productRouter
     if(products.length == 0) ctx.throw(400, "商品不存在");
     const productArr = await db.ShopGoodsModel.extendProductsInfo(products);
     const product = productArr[0];
-    data.product = product;
-    // 选定规格
-    let paId = 0;
-    for(let a=0;a<product.productParams.length;a++){
-      if(paraId == product.productParams[a]._id){
-        paId = a;
-      }
+    if(product) {
+      return ctx.redirect(`/t/${product.tid}`)
+    }else{
+      return ctx.throw(400,"商品不存在")
     }
-    data.paId = paId;
-    data.paraId = paraId;
-    // 取出全部评论
-    let match = {
-      tid: data.product.tid,
-      pid: {$nin:[data.product.oc]},
-      disabled: false
-    }
-    const posts = await db.PostModel.find(match);
-    data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
-		// // 添加给被退回的post加上标记
-		// const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: data.product.tid});
-		// const toDraftPostsId = toDraftPosts.map(post => post.postId);
-		// data.posts.map(async post => {
-		// 	const index = toDraftPostsId.indexOf(post.pid);
-		// 	if(index !== -1) {
-		// 		post.todraft = true;
-		// 		post.reason = toDraftPosts[index].reason;
-		// 	}
-    // });
-    // 获取用户地址信息
-		let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
-		let userAddress;
-		const {status, province, city} = ipInfo;
-		if(status && status == "1"){
-			userAddress = province + " " + city;
-		}
-		data.userAddress = userAddress;
-    ctx.template = "shop/product/index.pug";
+    // data.product = product;
+    // // 选定规格
+    // let paId = 0;
+    // for(let a=0;a<product.productParams.length;a++){
+    //   if(paraId == product.productParams[a]._id){
+    //     paId = a;
+    //   }
+    // }
+    // data.paId = paId;
+    // data.paraId = paraId;
+    // // 取出全部评论
+    // let match = {
+    //   tid: data.product.tid,
+    //   pid: {$nin:[data.product.oc]},
+    //   disabled: false
+    // }
+    // const posts = await db.PostModel.find(match);
+    // data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
+    // // 获取用户地址信息
+    // let userAddress = "";
+    // if(data.user){
+    //   let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
+    //   const {status, province, city} = ipInfo;
+    //   if(status && status == "1"){
+    //     userAddress = province + " " + city;
+    //   }
+    // }
+		// data.userAddress = userAddress;
+    // ctx.template = "shop/product/index.pug";
     await next();
   })
   .patch('/:productId/changePara', async (ctx, next) => {

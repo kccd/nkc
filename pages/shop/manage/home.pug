@@ -1,5 +1,6 @@
 extends ./index.pug
 block name  
+  -const statistics = data.statistics;
   //- h1.page-header
   //-   | Tabs & Panels 
   //-   small Nice tabs and panels
@@ -8,79 +9,81 @@ block name
       .panel.panel-primary.text-center.no-boder.bg-color-green
         .panel-body
           i.fa.fa-bar-chart-o.fa-5x
-          h3 8,457
+          h3!=statistics.visitCount
         .panel-footer.back-footer-green
           | 访问总量
     .col-md-3.col-sm-12.col-xs-12
       .panel.panel-primary.text-center.no-boder.bg-color-blue
         .panel-body
           i.fa.fa-shopping-cart.fa-5x
-          h3 52,160 
+          h3!=statistics.sellCount
         .panel-footer.back-footer-blue
           | 已售数量
     .col-md-3.col-sm-12.col-xs-12
       .panel.panel-primary.text-center.no-boder.bg-color-red
         .panel-body
           i.fa.fa.fa-comments.fa-5x
-          h3 15,823 
+          h3!=statistics.talkCount
         .panel-footer.back-footer-red
           | 商品讨论量
     .col-md-3.col-sm-12.col-xs-12
       .panel.panel-primary.text-center.no-boder.bg-color-brown
         .panel-body
           i.fa.fa-users.fa-5x
-          h3 36,752 
+          h3!=statistics.funsCount
         .panel-footer.back-footer-brown
-          | 店铺粉丝
+          | 粉丝数量
   .row
-    .col-md-4
+    .col-md-12
       // Kitchen Sink
       .panel.panel-primary
         .panel-heading
-          | 订单统计信息
-        .table-responsive
-          table.table.table-striped.table-bordered.table-hover
-            tbody
-              tr
-                td 未处理订单
-                td
-                  a(href="#" style="color:red") 0
-                  | 个
-              tr
-                td 待发货订单
-                td Jacob
-              tr
-                td 待结算订单
-                td Larry
-              tr
-                td 已成交订单数
-                td Larry
-              tr
-                td 交易失败
-                td Larry
-    .col-md-4
-      // Kitchen Sink
-      .panel.panel-primary
-        .panel-heading
-          | 商品统计信息
+          | 统计信息
         .table-responsive
           table.table.table-striped.table-bordered.table-hover
             tbody
               tr
                 td 商品总数
                 td
-                  a(href="#" style="color:red") 0
+                  a(style="color:red")!=statistics.productCount
                   | &nbsp;个
               tr
-                td 回收站商品数
-                td Jacob
+                td 在售商品数
+                td
+                  a(style="color:red")!=statistics.productInsaleCount
+                  | &nbsp;个
               tr
-                td 上架商品
-                td Larry
+                td 仓库商品数
+                td
+                  a(style="color:red")!=statistics.productNosaleCount
+                  | &nbsp;个
               tr
-                td 下架商品
-                td Larry
+                td 订单总数
+                td
+                  a(style="color:red")!=statistics.orderCount
+                  | &nbsp;个
               tr
-                td 商品评论数
-                td Larry
-      // End  Kitchen Sink
+                td 待付款订单
+                td
+                  a(style="color:red")!=statistics.orderUnCostCount
+                  | &nbsp;个
+              tr
+                td 待发货订单
+                td
+                  a(style="color:red")!=statistics.orderUnShipCount
+                  | &nbsp;个
+              tr
+                td 待收货订单
+                td
+                  a(style="color:red")!=statistics.orderUnSignCount
+                  | &nbsp;个
+              tr
+                td 已完成订单
+                td
+                  a(style="color:red")!=statistics.orderFinishCount
+                  | &nbsp;个
+              tr
+                td 退款中订单
+                td
+                  a(style="color:red")!=statistics.orderRefundCount
+                  | &nbsp;个

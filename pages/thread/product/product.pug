@@ -102,17 +102,17 @@ style.
             li(style="margin:0px")!=`* ${attStr}`
       div.item(style="background:#c7fff8")
         div(style="padding:7px 0;color:#333")
-          p
-            span.title 价格
-            span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
-            //- -if(product.productParams[paId].useDiscount)
-            //-   span
-            //-     del#originPriceDis #{numToFloatTwo(product.productParams[paId].originPrice)}
-            //- -else
-            //-   span#originPrice #{numToFloatTwo(product.productParams[paId].originPrice)}
-          p
-            span.title 优惠价
-            span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+          if !data.user
+            p
+              span.title 价格
+              span(style="color:orangered") 登陆可见
+          else
+            p
+              span.title 价格
+              span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
+            p
+              span.title 优惠价
+              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
       div.item
         p
           span.title 快递
@@ -121,18 +121,20 @@ style.
           span.location(style="font-size:small;") 至
           input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
       div.item(style="border-bottom: 1px solid #e5e5e5")
-        p
-          span.title 运费
-          if product.isFreePost
-            span#freightPrice 免邮
-            input#isFreePost(type="text" value="freePost" style="display:none")
-          else
-            span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
-            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
-            input#isFreePost(type="text" value="payPost" style="display:none")
-        //- p
-        //-   span.title 运费
-        //-   span#freightPrice #{numToFloatTwo(product.freightPrice)}
+        if !data.user
+          p
+            span.title 运费
+            span(style="color:orangered") 登陆可见
+        else
+          p
+            span.title 运费
+            if product.isFreePost
+              span#freightPrice 免邮
+              input#isFreePost(type="text" value="freePost" style="display:none")
+            else
+              span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+              span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+              input#isFreePost(type="text" value="payPost" style="display:none")
       div.item
         p
           span.title 数量
