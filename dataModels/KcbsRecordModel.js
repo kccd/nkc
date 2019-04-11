@@ -371,6 +371,7 @@ kcbsRecordSchema.statics.checkRecords = async (uid) => {
   const fromRecords = await KcbsRecordModel.aggregate([
     {
       $match: {
+        verify: true,
         from: uid
       }
     },
@@ -386,6 +387,7 @@ kcbsRecordSchema.statics.checkRecords = async (uid) => {
   const toRecords = await KcbsRecordModel.aggregate([
     {
       $match: {
+        verify: true,
         to: uid
       }
     },
@@ -393,12 +395,14 @@ kcbsRecordSchema.statics.checkRecords = async (uid) => {
       $group: {
         _id: null,
         total: {
-          $sum: "$sum"
+          $sum: "$num"
         }
       }
     }
   ]);
-  const total = toRecords[0].total - fromRecords[0].total;
+  const expenses = fromRecords.length? fromRecords[0].total: 0;
+  const income = toRecords.length? toRecords[0].total: 0;
+  const total = income - expenses;
   await UserModel.update({
     uid
   }, {
