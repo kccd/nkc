@@ -32,42 +32,42 @@ const accountRouter = routers.account;
 
 
 // 所有请求先经过此中间件
-// 日常登陆
-router.use('/', async (ctx, next) => {
-  await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
-  await next();
-});
-
-
-router.use('/', async (ctx, next)  => {
-	const {nkcModules, db, data} = ctx;
-	const {user} = data;
-	const {today} = nkcModules.apiFunction;
-	if(user) {
-		const toc = Date.now();
-		const time = today(toc);
-		const dailyLogin = await db.UsersScoreLogModel.findOne({
-			uid: user.uid,
-			type: 'score',
-			operationId: 'dailyLogin',
-			toc: {
-				$gt: time
-			}
-		});
-    if(!dailyLogin) {
-			await db.UsersScoreLogModel.insertLog({
-				user,
-				type: 'score',
-				typeIdOfScoreChange: 'dailyLogin',
-				port: ctx.port,
-				ip: ctx.address,
-				key: 'dailyLoginCount'
-			});
-			await user.updateUserMessage();
-		}
-	}
-  await next();
-});
+// // 日常登陆
+// router.use('/', async (ctx, next) => {
+//   await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
+//   await next();
+// });
+//
+//
+// router.use('/', async (ctx, next)  => {
+// 	const {nkcModules, db, data} = ctx;
+// 	const {user} = data;
+// 	const {today} = nkcModules.apiFunction;
+// 	if(user) {
+// 		const toc = Date.now();
+// 		const time = today(toc);
+// 		const dailyLogin = await db.UsersScoreLogModel.findOne({
+// 			uid: user.uid,
+// 			type: 'score',
+// 			operationId: 'dailyLogin',
+// 			toc: {
+// 				$gt: time
+// 			}
+// 		});
+//     if(!dailyLogin) {
+// 			await db.UsersScoreLogModel.insertLog({
+// 				user,
+// 				type: 'score',
+// 				typeIdOfScoreChange: 'dailyLogin',
+// 				port: ctx.port,
+// 				ip: ctx.address,
+// 				key: 'dailyLoginCount'
+// 			});
+// 			await user.updateUserMessage();
+// 		}
+// 	}
+//   await next();
+// });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());

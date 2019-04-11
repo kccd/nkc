@@ -60,8 +60,8 @@ block content
                       span 银行
               .m-t-1
                 h4 选择支付宝账户
-                h5.text-danger(v-if="!alipayAccounts.length") 您未绑定支付宝账号，
-                  a(href=`/u/${data.user.uid}/settings/alipay` target="_blank") 去绑定
+                h5.text-danger(v-if="!alipayAccounts.length") 您未添加支付宝账号，
+                  a(href=`/u/${data.user.uid}/settings/alipay` target="_blank") 去添加
                 .row(v-else)
                   .col-xs-12.col-md-4.m-b-1(v-for="alipay in alipayAccounts" @click="selectAccount(alipay)")
                     .payment-pannel(:class="{'active': selectedAccount.account === alipay.account}")
