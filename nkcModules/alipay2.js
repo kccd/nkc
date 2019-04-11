@@ -220,7 +220,7 @@ func.receipt = async (o) => {
   if(!title) throwErr('订单标题不能为空');
   if(!notes) throwErr('订单描述不能为空');
   const returnUrl = serverConfig.domain + '/account/finance/recharge?type=back';
-  let notifyUrl = serverConfig.domain + "/finance/recharge";
+  let notifyUrl = serverConfig.domain + "/account/finance/recharge";
 
   if(global.NKC.NODE_ENV !== "production") {
     notifyUrl = "https://soccos.cn/test";
