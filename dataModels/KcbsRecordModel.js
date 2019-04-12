@@ -222,10 +222,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
 // 用户间转账记录
 kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model('settings');
   const {
     fromUser, toUser, num, description, post, ip, port
   } = options;
+  if(fromUser.uid === toUser.uid) throwErr(400, "无法对自己执行此操作");
   const _id = await SettingModel.operateSystemID('kcbsRecords', 1);
   const record = KcbsRecordModel({
     _id,
@@ -238,27 +240,9 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     port,
     type: 'creditKcb'
   });
-  let fromUsersKcb, toUsersKcb;
-  if(fromUser.uid !== toUser.uid) {
-    fromUsersKcb = fromUser.kcb;
-    toUsersKcb = toUser.kcb;
-    fromUser.kcb -= num;
-    toUser.kcb += num;
-  }
-  try{
-    await record.save();
-    await fromUser.save();
-    await toUser.save();
-  } catch(err) {
-    // await SettingModel.operateSystemID('kcbsRecords', 1);
-    if(fromUser.uid !== toUser.uid) {
-      fromUser.kcb = fromUsersKcb;
-      toUser.kcb = toUsersKcb;
-      await fromUser.save();
-      await toUser.save();
-    }
-    throw err;
-  }
+  await record.save();
+  await UserModel.updateUserKcb(fromUser.uid);
+  await UserModel.updateUserKcb(toUser.uid);
 };
 
 
