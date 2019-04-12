@@ -167,7 +167,10 @@ module.exports = {
 		},
 		kcb: {
 			GET: 'visitKcbSettings',
-			PATCH: 'modifyKcbSettings'
+			PATCH: 'modifyKcbSettings',
+      record: {
+        PATCH: "modifyWithdrawRecord"
+      }
 		},
     xsf: {
 		  GET: 'visitXsfSettings',

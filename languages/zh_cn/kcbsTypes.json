@@ -10,6 +10,7 @@
   "digestPostAdditional": "回复被评为精选的额外奖励",
   "recharge": "充值",
   "withdraw": "提现",
+  "cancelWithdraw": "提现失败退还科创币",
   "pay": "购买商品",
   "sell": "售卖商品",
   "refund": "商城退款",

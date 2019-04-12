@@ -8,7 +8,11 @@ module.exports = {
     },
     withdraw: {
       GET: 'accountWithdraw',
-      POST: "accountWithdraw"
+      POST: "accountWithdraw",
+      help: {
+        GET: "withdrawHelp",
+        POST: "withdrawHelp"
+      }
     }
   }
 };

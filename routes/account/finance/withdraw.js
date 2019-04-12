@@ -106,42 +106,47 @@ router
         c: {
           alipayAccount: account.account,
           alipayName: account.name,
-          alipayFee: withdrawFee
-        },
-        verify: false
+          alipayFee: withdrawFee,
+          alipayInterface: null
+        }
       });
 
       await record.save();
-
       try {
-        money = money*(1-withdrawFee);
+        const alipayMoney = money*(1-withdrawFee);
         await nkcModules.alipay2.transfer({
           account: account.account,
           name: account.name,
-          money: money/100,
+          money: alipayMoney/100,
           id: _id,
           notes: description
         });
-        await record.update({verify: true});
+
+        await record.update({
+          "c.alipayInterface": true
+        });
+
+        await db.UserModel.updateOne({uid: user.uid}, {
+          $inc: {
+            kcb: -1*money
+          }
+        });
+
+        user.kcb -= money;
+        await db.SettingModel.updateOne({_id: "kcb"}, {
+          $inc: {
+            "c.totalMoney": money
+          }
+        });
+
       } catch(err) {
         await record.update({
+          verify: false,
+          "c.alipayInterface": false,
           error: JSON.stringify(err)
         });
+        ctx.throw(400, err.message || err);
       }
-
-
-      await db.UserModel.updateOne({uid: user.uid}, {
-        $inc: {
-          kcb: -1*money
-        }
-      });
-
-      user.kcb -= money;
-      await db.SettingModel.updateOne({_id: "kcb"}, {
-        $inc: {
-          "c.totalMoney": money
-        }
-      });
 
     } else {
       ctx.throw(400, "未知的账户类型")

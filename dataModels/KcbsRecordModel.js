@@ -82,7 +82,19 @@ const kcbsRecordSchema = new Schema({
   c: {
     type: Schema.Types.Mixed,
     default: {}
-  }   
+  }
+  /*
+  * c: {
+  *  alipayAccount: String,
+  *  alipayName: String,
+  *  alipayFee: Number,
+  *  alipayInterface: Boolean  // 调用阿里接口是否成功 null: 未知，false: 失败， true: 成功
+  *
+  * }
+  *
+  *
+  *
+  * */
 }, {
   collection: 'kcbsRecords',
   toObject: {
