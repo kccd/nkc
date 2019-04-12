@@ -112,7 +112,6 @@ router
       });
 
       await record.save();
-
       try {
         const alipayMoney = money*(1-withdrawFee);
         await nkcModules.alipay2.transfer({
