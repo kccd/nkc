@@ -231,6 +231,7 @@ block content
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribers.length > 8
+                      .col-xs-12.col-md-12.text-center
                         a(href=`/u/${data.targetUser.uid}?type=fans`) 查看更多
                   br
 

@@ -1,0 +1,52 @@
+extends ../../bootstrap_base
+
+block title
+  title 科创币充值记录
+  style.
+    tbody tr th {
+      max-width: 12rem;
+    }
+block content
+
+  .container-fluid.max-width
+    .row
+      include ../nav
+      #data.hidden=JSON.stringify({records: data.records, t: data.t, content: data.content})
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          h4 按条件查询记录
+          .form-inline(style='margin-bottom: 1rem;')
+            .form-group
+              select.form-control(v-model='t')
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='ip') IP
+            .form-group
+              input.form-control(placeholder='请输入内容' v-model='content' @keyup.enter='search')
+            .form-group
+              button.btn.btn-primary(type='submit' @click='search') 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/recharge') 全部
+            h5.text-danger= data.info
+        .col-xs-12.col-md-12.table-responsive
+          include ../../interface_navigation_paging
+          table.table.table-bordered(style='font-size:1rem;')
+            thead
+              tr
+                th 时间
+                th 用户
+                th 充值金额（元）
+                th IP
+                th 验证
+            tbody
+              tr(v-for='(record, index) of records' :style="!record.verify?'background-color: #aaa;': ''")
+                th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th
+                  a(:href="'/u/' + record.toUser.uid" target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
+                th {{record.num/100}}
+                th {{record.ip}}:{{record.port}}
+                th {{record.verify?"是":"否"}}
+          include ../../interface_navigation_paging
+block scripts
+  include ../../publicModules/moment
+  +includeJS("/experimental/log/recharge.js")

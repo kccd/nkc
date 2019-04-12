@@ -16,12 +16,13 @@ router
       minCount, maxCount,
       withdrawMin, withdrawMax, withdrawCount,
       withdrawTimeBegin, withdrawTimeEnd,
-      withdrawStatus,
+      withdrawStatus, withdrawFee
     } = kcbSettings;
 		if(minCount <= 0) ctx.throw(400, '最小值不能小于0');
 		if(minCount > maxCount) ctx.throw(400, '最小值最大值设置错误');
 		withdrawMin = parseInt(withdrawMin);
     withdrawMax = parseInt(withdrawMax);
+    withdrawFee = Number(withdrawFee);
     withdrawCount = parseInt(withdrawCount);
     withdrawStatus = !!withdrawStatus;
     withdrawTimeBegin = parseInt(withdrawTimeBegin);
@@ -30,6 +31,7 @@ router
     if(withdrawMax < 0) ctx.throw(400, "最大提现金额设置错误");
     if(withdrawCount < 0) ctx.throw(400, "每天最大提现次数设置错误");
     if(withdrawTimeBegin > withdrawTimeEnd) ctx.throw(400, "允许提现的时间段设置错误");
+    if(withdrawFee >= 1 || withdrawFee < 0) ctx.throw(400, "提现手续费设置错误");
     for(const type of kcbsTypes) {
       let {count, num, _id} = type;
       count = parseInt(count);
@@ -54,6 +56,7 @@ router
       withdrawTimeBegin,
       withdrawCount,
       withdrawMin,
+      withdrawFee,
       withdrawMax,
       withdrawStatus,
       totalMoney: kcbSettingsDB.c.totalMoney

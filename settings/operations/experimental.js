@@ -232,6 +232,12 @@ module.exports = {
     },
     xsf: {
 		  GET: 'visitExperimentalXsf'
+    },
+    recharge: {
+		  GET: "visitExperimentalRecharge"
+    },
+    withdraw: {
+		  GET: "visitExperimentalWithdraw"
     }
 	},
   console: {

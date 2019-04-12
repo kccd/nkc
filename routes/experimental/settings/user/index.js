@@ -9,18 +9,27 @@ userRouter
 	.get('/', async (ctx, next) => {
 		const {query, data, db} = ctx;
 		let {page = 0, searchType, content, t} = query;
-		if(['username', 'uid'].includes(searchType)) {
+		if(['username', 'uid', "mobile"].includes(searchType)) {
 			content = content.trim();
-			let targetUser;
+			let targetUsers = [];
 			if(searchType === 'username') {
-				targetUser = await db.UserModel.findOne({usernameLowerCase: content.toLowerCase()});
+				targetUsers = await db.UserModel.find({usernameLowerCase: content.toLowerCase()});
+			} else if(searchType === "uid") {
+				targetUsers = await db.UserModel.find({uid: content});
 			} else {
-				targetUser = await db.UserModel.findOne({uid: content});
+			  const targetUsersPersonal = await db.UsersPersonalModel.find({mobile: content});
+			  const uid = targetUsersPersonal.map(t => t.uid);
+			  if(targetUsersPersonal) {
+			    targetUsers = await db.UserModel.find({uid: {$in: uid}});
+        }
+      }
+			if(targetUsers.length) {
+			  data.targetUsers = [];
+			  for(const u of targetUsers) {
+          await u.extend();
+          data.targetUsers.push(u.toObject());
+        }
 			}
-			if(targetUser) {
-				await targetUser.extend();
-			}
-			data.targetUser = targetUser;
 		} else {
       const q = {};
       if(t) {

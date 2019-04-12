@@ -16,7 +16,8 @@ router
       withdrawCount: kcbSettings.c.withdrawCount,
       withdrawMin: kcbSettings.c.withdrawMin,
       withdrawMax: kcbSettings.c.withdrawMax,
-      withdrawStatus: kcbSettings.c.withdrawStatus
+      withdrawStatus: kcbSettings.c.withdrawStatus,
+      withdrawFee: kcbSettings.c.withdrawFee
     };
     const today = nkcModules.apiFunction.today();
     data.countToday = await db.KcbsRecordModel.count({
@@ -41,7 +42,8 @@ router
       withdrawCount,
       withdrawStatus,
       withdrawMax,
-      withdrawMin
+      withdrawMin,
+      withdrawFee,
     } = kcbSettings.c;
     if(!withdrawStatus) ctx.throw(403, "提现功能暂未开放");
     const today = nkcModules.apiFunction.today();
@@ -56,12 +58,14 @@ router
     if(countToday >= withdrawCount) ctx.throw(403, "您今日的提现次数已用完，请明天再试");
 
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
+    money = money.toFixed(0);
     money = Number(money);
     if(money > 0){}
     else ctx.throw(400, "提现金额不正确");
     if(money < withdrawMin) ctx.throw(400, `提现金额不得低于${withdrawMin/100}元`);
     if(money > user.kcb) ctx.throw(400, `科创币不足`);
     if(money > withdrawMax) ctx.throw(400, `提现金额不能超过${withdrawMax/100}元`);
+    money = money*(1-withdrawFee); // 扣除手续费
     if(!password) ctx.throw(400, "登录密码不能为空");
     if(!code) ctx.throw(400, "短信验证码不能为空");
     if(!to) ctx.throw(400, "提现账户类型错误");
@@ -99,7 +103,12 @@ router
         ip: ctx.address,
         port: ctx.port,
         num: money,
-        description
+        description,
+        c: {
+          alipayAccount: account.account,
+          alipayName: account.name,
+          alipayFee: withdrawFee
+        }
       });
 
       await record.save();

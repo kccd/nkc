@@ -46,8 +46,9 @@ block content
                 th 说明
                 th 文号
                 th IP
+                th 验证
             tbody
-              tr(v-for='(record, index) of kcbsRecords')
+              tr(v-for='(record, index) of kcbsRecords' :style="!record.verify?'background-color: #aaa;': ''")
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
                 th {{record.typeInfo}}
 
@@ -62,6 +63,7 @@ block content
                 th
                   a(v-if="record.pid" :href="'/p/' + record.pid") {{record.pid}}
                 th {{record.ip}}:{{record.port}}
+                th {{record.verify?"是":"否"}}
           include ../../interface_navigation_paging
 block scripts
   script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
