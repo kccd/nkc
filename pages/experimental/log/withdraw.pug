@@ -39,6 +39,8 @@ block content
                 th 支付宝账号
                 th IP
                 th 验证
+                th 调用接口
+                th 其他
             tbody
               tr(v-for='(record, index) of records' :style="!record.verify?'background-color: #aaa;': ''")
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
@@ -50,6 +52,15 @@ block content
                   span(v-else) 未记录
                 th {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}
+                th
+                  span(v-if="record.c.alipayInterface===true") 成功
+                  span(v-else-if="record.c.alipayInterface===false") 失败
+                  span(v-else) 未知
+                th
+                  span(v-if="record.verify && [true, false].indexOf(record.c.alipayInterface)===-1")
+                    button(@click="success(record)") 已转账
+                    button(@click="fail(record)") 未转账
+
           include ../../interface_navigation_paging
 block scripts
   include ../../publicModules/moment

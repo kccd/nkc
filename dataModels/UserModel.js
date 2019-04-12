@@ -866,8 +866,8 @@ userSchema.statics.updateUserKcb= async (uid) => {
   const fromRecords = await KcbsRecordModel.aggregate([
     {
       $match: {
-        verify: true,
-        from: uid
+        from: uid,
+        verify: true
       }
     },
     {
@@ -882,8 +882,8 @@ userSchema.statics.updateUserKcb= async (uid) => {
   const toRecords = await KcbsRecordModel.aggregate([
     {
       $match: {
-        verify: true,
-        to: uid
+        to: uid,
+        verify: true
       }
     },
     {

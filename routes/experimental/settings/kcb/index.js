@@ -63,5 +63,50 @@ router
     };
     await db.SettingModel.update({_id: 'kcb'}, {$set: {c}});
 		await next();
-	});
+	})
+  .patch("/record", async (ctx, next) => {
+    const {body, db} = ctx;
+    const {
+      kcbsRecordId,
+      type
+    } = body;
+    const record = await db.KcbsRecordModel.findOne({
+      type: "withdraw",
+      _id: kcbsRecordId
+    });
+    if(!record) ctx.throw(404, "记录未找到");
+    if(record.c && [true, false].includes(record.c.alipayInterface)) ctx.throw(400, "当前记录无需人工操作");
+    if(!record.verify) ctx.throw(400, "当前记录无需人工操作");
+    if(type === "success") {
+      await record.update({
+        "c.alipayInterface": true
+      });
+    } else if(type === "fail") {
+
+      await record.update({
+        "c.alipayInterface": false
+      });
+
+      const r = db.KcbsRecordModel({
+        _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
+        from: record.to,
+        to: record.from,
+        type: "cancelWithdraw",
+        num: record.num,
+        ip: ctx.address
+      });
+      await r.save();
+
+      await db.UserModel.update({uid: r.to}, {$inc: {kcb: r.num}});
+      await db.SettingModel.update({_id: "kcb"}, {
+        $inc: {
+          "c.totalMoney": -1*r.num
+        }
+      });
+
+    } else {
+      ctx.throw(400, "未知的操作类型");
+    }
+    await next();
+  });
 module.exports = router;
