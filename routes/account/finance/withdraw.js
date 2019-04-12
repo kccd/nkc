@@ -65,7 +65,6 @@ router
     if(money < withdrawMin) ctx.throw(400, `提现金额不得低于${withdrawMin/100}元`);
     if(money > user.kcb) ctx.throw(400, `科创币不足`);
     if(money > withdrawMax) ctx.throw(400, `提现金额不能超过${withdrawMax/100}元`);
-    money = money*(1-withdrawFee); // 扣除手续费
     if(!password) ctx.throw(400, "登录密码不能为空");
     if(!code) ctx.throw(400, "短信验证码不能为空");
     if(!to) ctx.throw(400, "提现账户类型错误");
@@ -108,12 +107,14 @@ router
           alipayAccount: account.account,
           alipayName: account.name,
           alipayFee: withdrawFee
-        }
+        },
+        verify: false
       });
 
       await record.save();
 
       try {
+        money = money*(1-withdrawFee);
         await nkcModules.alipay2.transfer({
           account: account.account,
           name: account.name,
@@ -121,6 +122,7 @@ router
           id: _id,
           notes: description
         });
+        await record.update({verify: true});
       } catch(err) {
         await record.update({
           error: JSON.stringify(err)
@@ -133,6 +135,7 @@ router
           kcb: -1*money
         }
       });
+
       user.kcb -= money;
       await db.SettingModel.updateOne({_id: "kcb"}, {
         $inc: {
