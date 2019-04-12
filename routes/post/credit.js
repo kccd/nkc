@@ -117,7 +117,7 @@ router
 		const {pid} = params;
 		let {num, description} = body;
 		num = Number(num);
-    if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+	        num = Math.round(num);
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
     const toUser = await db.UserModel.findOnly({uid: post.uid});
