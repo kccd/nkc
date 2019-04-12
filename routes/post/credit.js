@@ -117,7 +117,7 @@ router
 		const {pid} = params;
 		let {num, description} = body;
 		num = Number(num);
-    if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+	        num = Math.round(num);
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
     const toUser = await db.UserModel.findOnly({uid: post.uid});
@@ -132,6 +132,7 @@ router
 		const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
 		if(num < kcbSettings.c.minCount) ctx.throw(400, `科创币最少为${kcbSettings.c.minCount/100}`);
 		if(num > kcbSettings.c.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.c.maxCount/100}`);
+	        await db.UserModel.updateUserKcb(fromUser.uid);
 		if(fromUser.kcb < num) ctx.throw(400, '您的科创币不足');
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 60) ctx.throw(400, '理由不能超过60个字');
