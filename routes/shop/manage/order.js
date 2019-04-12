@@ -4,6 +4,11 @@ const refundRouter = require("./refund");
 const cancelRouter = require("./cancel");
 
 orderRouter
+	.use('/', async (ctx, next) => {
+		const {data} = ctx;
+		data.active = "order";
+		await next();
+	})
 	.get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
 		const {page = 0} = query;
@@ -105,7 +110,7 @@ orderRouter
 		if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
 		let trackNumber = order.trackNumber;
 		let trackName = order.trackName;
-		const trackInfo = await nkcModules.apiFunction.test(trackNumber, trackName);
+		const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber, trackName);
 		data.trackNumber = trackNumber;
 		data.trackInfo = trackInfo;
 		ctx.template = "/shop/manage/logositics.pug";

@@ -1,6 +1,11 @@
 const Router = require('koa-router');
 const goodslistRouter = new Router();
 goodslistRouter
+  .use('/', async (ctx, next) => {
+    const {data} = ctx;
+    data.active = "goodslist";
+    await next();
+  })
 	.get('/', async (ctx, next) => {
 		const {data, db, params, query, nkcModules} = ctx;
 		const {page = 0} = query;
@@ -13,6 +18,8 @@ goodslistRouter
     }
     if(!productStatus || productStatus == "insale") {
       searchMap.productStatus = "insale"
+    }else if(productStatus == "stopsale"){
+      searchMap.productStatus = "stopsale"
     }else{
       searchMap.productStatus = "notonshelf";
     }
@@ -45,7 +52,8 @@ goodslistRouter
     if(!productParam) ctx.throw(400, "找不到该商品规格");
     // 取出剩余库存，并重新计算
     let {stocksSurplus} = productParam;
-    stocksSurplus += Number(stocksTotal);
+    let oldStocksTotal = productParam.stocksTotal;
+    stocksSurplus += Number(stocksTotal-oldStocksTotal);
     await productParam.update({$set:{originPrice, price, stocksSurplus, stocksTotal}})
     await next();
   })
@@ -71,6 +79,26 @@ goodslistRouter
     const {productId} = body;
     const product = await db.ShopGoodsModel.findOne({productId});
     await product.onshelf();
+    await next();
+  })
+  // 商品停售
+  .patch('/productStopSale', async(ctx, next) => {
+    const {data, body, db} = ctx;
+    const {productId} = body;
+    const product = await db.ShopGoodsModel.findOne({productId});
+    if(!product) ctx.throw(400, "商品不存在");
+    if(product.productStatus == "stopsale") ctx.throw(400, "该商品已处于停售状态");
+    await product.update({$set:{productStatus: "stopsale"}})
+    await next();
+  })
+  // 商品复售
+  .patch('/productGoonSale', async(ctx, next) => {
+    const {data, body, db} = ctx;
+    const {productId} = body;
+    const product = await db.ShopGoodsModel.findOne({productId});
+    if(!product) ctx.throw(400, "商品不存在");
+    if(product.productStatus == "insale") ctx.throw(400, "商品已处于售卖状态");
+    await product.update({$set:{productStatus: "insale"}});
     await next();
   })
 module.exports = goodslistRouter;

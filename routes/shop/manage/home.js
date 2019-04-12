@@ -33,12 +33,15 @@ homeRouter
 		// 统计订单信息
 		let productInsaleCount = 0;
 		let productNosaleCount = 0;
+		let productStopsaleCount = 0;
 		for(let p of products) {
 			if(p.productStatus == "insale") productInsaleCount += 1;
 			if(p.productStatus == "notonshelf") productNosaleCount += 1;
+			if(p.productStatus == "stopsale") productStopsaleCount += 1;
 		}
 		statistics.productInsaleCount = productInsaleCount;
 		statistics.productNosaleCount = productNosaleCount;
+		statistics.productStopsaleCount = productStopsaleCount;
 		// 统计商品信息
 		let orderUnCostCount = 0;
 		let orderUnShipCount = 0;

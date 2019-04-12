@@ -105,6 +105,13 @@ $(document).ready(function() {
     }else{
       $("#purchaseLimitDom").css("display", "none");
     }
+  })  
+  $("#isUploadCert").change(function() {
+    if($("#isUploadCert").prop("checked")) {
+      $("#uploadCertDom").css("display", "");
+    }else{
+      $("#uploadCertDom").css("display", "none");
+    }
   })
   $("input[type=radio][name=freightMethod]").change(function() {
     if(this.value == 'payPost') {
@@ -152,9 +159,11 @@ function submitToShelf() {
   }
   // 是否需要上传购买凭证
   var isUploadCert = $("#isUploadCert").prop("checked");
+  var uploadCertDescription;
   var uploadCert = false;
   if(isUploadCert){
     uploadCert = true;
+    uploadCertDescription = $("#uploadCertDescription").val();
   }
   // 获取需要支付的KCB和RMB各是多少
   var payUseKcb = 0; // 需要支付的KCB
@@ -197,7 +206,7 @@ function submitToShelf() {
   var addFreightPrice = Number($("#addFreightPrice").val())*100;
   if(freightMethod !== "freePost") {
     isFreePost = false;
-    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice <= 0) {
+    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice < 0) {
       throw("请正确设置运费模板");
     }
     freightPrice.firstFreightPrice = firstFreightPrice;
@@ -218,6 +227,7 @@ function submitToShelf() {
     // stockTotalCount: Number(stockTotalCount),
     // stockSurplusCount: Number(stockTotalCount),
     uploadCert: uploadCert,
+    uploadCertDescription: uploadCertDescription,
     stockCostMethod: stockCostMethod,
     isFreePost: isFreePost,
     freightPrice: freightPrice,
@@ -398,24 +408,47 @@ function showAttachment() {
 // }
 
 /**
- * 添加自定义规格
+ * 新增一条自定义规格属性
  */
-function addParamTable() {
-  var paraName = $("#paraName").val();
-  var paraValue = $("#paraValue").val();
-  paraName = paraName.trim();
-  if(!paraName) return screenTopWarning("请输入规格名称");
-  paraValue = paraValue.replace(/\s+/g,"");
-  if(!paraValue) return screenTopWarning("请输入规格属性");
-
-  var trDom = '<tr><td class="pname">'+paraName+'</td><td class="pvalue">'+paraValue+'</td><td><a class="btn btn-default btn-sm padding-0 margin-right-10" onclick="openEditParamTable(this)">修改</a><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td></tr>';
-  $("#paramsTable").find("tbody").append(trDom)
-
-  $("#paraName").val("");
-  $("#paraValue").val("");
-  mulArrTurnTable();
-  $("#addProductParams").modal('hide');
+function addNewParam() {
+  var newParamDom = '<tr><td class="pname" contenteditable="true"></td><td class="pvalue" contenteditable="true"></td><td><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
+  
+  $("#paramsTable").find("tbody").append(newParamDom)
 }
+
+
+/**
+ * 保存当前自定义规格属性
+ */
+function saveNewParam(para) {
+  var newParaName = $(para).parents("tr").children(".pname").text();
+  var newParaValue = $(para).parents("tr").children(".pvalue").text();
+  newParaName = newParaName.trim();
+  if(!newParaName) return screenTopWarning("请输入规格名称");
+  newParaValue = newParaValue.replace(/\s+/g,"");
+  if(!newParaValue) return screenTopWarning("请输入规格属性");
+  mulArrTurnTable();
+}
+
+// /**
+//  * 添加自定义规格
+//  */
+// function addParamTable() {
+//   var paraName = $("#paraName").val();
+//   var paraValue = $("#paraValue").val();
+//   paraName = paraName.trim();
+//   if(!paraName) return screenTopWarning("请输入规格名称");
+//   paraValue = paraValue.replace(/\s+/g,"");
+//   if(!paraValue) return screenTopWarning("请输入规格属性");
+
+//   var trDom = '<tr><td class="pname">'+paraName+'</td><td class="pvalue">'+paraValue+'</td><td><a class="btn btn-default btn-sm padding-0 margin-right-10" onclick="openEditParamTable(this)">修改</a><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td></tr>';
+//   $("#paramsTable").find("tbody").append(trDom)
+
+//   $("#paraName").val("");
+//   $("#paraValue").val("");
+//   mulArrTurnTable();
+//   $("#addProductParams").modal('hide');
+// }
 
 /**
  * 删除自定义规格
@@ -425,37 +458,37 @@ function delParamTable(para) {
   mulArrTurnTable();
 }
 
-/**
- * 修改自定义规格
- */
-function editParamTable() {
-  // 先获取tr的位置
-  var trIndex = $("#newIndex").val();
-  var newName = $("#newName").val();
-  var newValue = $("#newValue").val();
+// /**
+//  * 修改自定义规格
+//  */
+// function editParamTable() {
+//   // 先获取tr的位置
+//   var trIndex = $("#newIndex").val();
+//   var newName = $("#newName").val();
+//   var newValue = $("#newValue").val();
 
-  var tdDom = '<td class="pname">'+newName+'</td><td class="pvalue">'+newValue+'</td><td><a class="btn btn-default btn-sm padding-0 margin-right-10" onclick="openEditParamTable(this)">修改</a><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td>'
+//   var tdDom = '<td class="pname">'+newName+'</td><td class="pvalue">'+newValue+'</td><td><a class="btn btn-default btn-sm padding-0 margin-right-10" onclick="openEditParamTable(this)">修改</a><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td>'
 
-  $("#paramsTable").find("tbody tr").eq(trIndex).html(tdDom);
-  $("#newName").val("");
-  $("#newValue").val("");
-  mulArrTurnTable();
-  $("#editProductParams").modal("hide");
-}
+//   $("#paramsTable").find("tbody tr").eq(trIndex).html(tdDom);
+//   $("#newName").val("");
+//   $("#newValue").val("");
+//   mulArrTurnTable();
+//   $("#editProductParams").modal("hide");
+// }
 
-/**
- * 打开自定义规格修改项
- */
-function openEditParamTable(para) {
-  var oldParaName = $(para).parents("tr").children(".pname").text();
-  var oldParaValue = $(para).parents("tr").children(".pvalue").text();
-  $("#newName").val(oldParaName);
-  $("#newValue").val(oldParaValue);
-  // 获取当前tr的位置
-  var trIndex = $(para).parents("tr").index();
-  $("#newIndex").val(trIndex)
-  $("#editProductParams").modal("show");
-}
+// /**
+//  * 打开自定义规格修改项
+//  */
+// function openEditParamTable(para) {
+//   var oldParaName = $(para).parents("tr").children(".pname").text();
+//   var oldParaValue = $(para).parents("tr").children(".pvalue").text();
+//   $("#newName").val(oldParaName);
+//   $("#newValue").val(oldParaValue);
+//   // 获取当前tr的位置
+//   var trIndex = $(para).parents("tr").index();
+//   $("#newIndex").val(trIndex)
+//   $("#editProductParams").modal("show");
+// }
 
 /**
  * 生成params
@@ -501,7 +534,6 @@ function tableTurnMulArray() {
 // function mulArrayTurnObj() {
 //   var rArr = tableTurnMulArray();
 //   var result = mulArrExchangeArr(rArr);
-//   console.log(result);
 // }
 
 /**

@@ -153,10 +153,13 @@ style.
               span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                 span=para.name.join()
       div.item
-        div(style="display:none")#paraId!=`${paraId}`
-        a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-        a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
-          span.fa.fa-shopping-cart  加入购物车
+        if product.productStatus == "stopsale"
+          p(style="text-align: center;background-color: tomato;padding:10px") 商品停售中
+        else
+          div(style="display:none")#paraId!=`${paraId}`
+          a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+          a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+            span.fa.fa-shopping-cart  加入购物车
     .col-xs-1.col-md-1 
 
   .col-xs-12.col-md-12

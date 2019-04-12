@@ -74,6 +74,7 @@ block name
                 if order.orderStatus == "unShip" && order.closeStatus !== true
                   p
                     button(onclick=`openSendGoodsModal(${data.myStore.storeId}, ${order.orderId})`) 发货
+                    //- button(onclick=`test()`) 发货
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
 

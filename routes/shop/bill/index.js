@@ -12,6 +12,8 @@ router
       if(!productCount) ctx.throw(400, "请选择商品数量");
       if(!paraId) ctx.throw(400, "请选择商品");
       const billProducts = await db.ShopProductsParamModel.find({_id: paraId});
+      const product = await db.ShopGoodsModel.findOne({productId: billProducts[0].productId});
+      if(product.productStatus == "stopsale") ctx.throw(400, "商品停售中，不可购买")
       data.cartsData = await db.ShopProductsParamModel.extendParamsInfo(billProducts);
       data.cartsData[0].count = productCount;
       // data.cartsData  = billProducts;
