@@ -1,3 +1,6 @@
+function test() {
+  alert("1")
+}
 /**
  * 发货
  * 弹出窗口
@@ -88,7 +91,7 @@ function openEditOrderModal(storeId, orderId) {
  * 查看物流
  */
 function visitLogisticsInfo(storeId,orderId) {
-  var targetUrl = `/shop/manage/${storeId}/order/logositics?orderId=${orderId}`;
+  var targetUrl = '/shop/manage/'+storeId+'/order/logositics?orderId='+orderId;
   window.location.href = targetUrl;
 }
 
@@ -109,7 +112,7 @@ function editTrackNum() {
   */
 function saveTrackNum(storeId,orderId) {
   var trackNumber = $("#trackNumVal").val().trim();
-  nkcAPI(`/shop/manage/${storeId}/order/editOrderTrackNumber`, "PATCH", {orderId: orderId, trackNumber: trackNumber})
+  nkcAPI('/shop/manage/'+storeId+'/order/editOrderTrackNumber', "PATCH", {orderId: orderId, trackNumber: trackNumber})
   .then(function(data) {
     screenTopAlert("修改成功");
     $("#saveTrackNum").css("display", "none");

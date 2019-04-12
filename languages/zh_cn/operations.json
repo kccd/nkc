@@ -511,6 +511,8 @@
   "editOrderTrackNumber": "[CO]提交订单运单号修改",
   "visitShopAuth": "[SY]访问商城后台权限设置",
   "setShopAuth": "[SY]提交商城后台权限设置",
+  "productStopSale": "[CO]商品停售",
+  "productGoonSale": "[CO]商品复售",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

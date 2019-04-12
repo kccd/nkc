@@ -107,64 +107,67 @@ block content
         .col-xs-12.col-md-7
           h3.item=`${product.post.t}`
           p.item=`${product.post.abstract}`
-          if product.attentions && product.attentions.length > 0
-            ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
-              for attStr in product.attentions
-                li!=`* ${attStr}`
-          div.item(style="background:#c7fff8")
-            div(style="padding:7px 0;color:#333")
+          if product.productStatus == "stopsale"
+            p 商品停售中
+          esle
+            if product.attentions && product.attentions.length > 0
+              ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+                for attStr in product.attentions
+                  li!=`* ${attStr}`
+            div.item(style="background:#c7fff8")
+              div(style="padding:7px 0;color:#333")
+                if !data.user
+                  span.title 价格
+                  span(style="color:orangered") 登陆可见
+                else
+                  p
+                    span.title 价格
+                    span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
+                  p
+                    span.title 优惠价
+                    span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+            div.item
+              p
+                span.title 快递
+                span.location(style="font-size:small") #{getProvinceCity(product.store.address)}
+                span.location(style="font-size:small") 至
+                input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
+            div.item(style="border-bottom: 1px solid #e5e5e5")
               if !data.user
                 span.title 价格
                 span(style="color:orangered") 登陆可见
               else
                 p
-                  span.title 价格
-                  span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
-                p
-                  span.title 优惠价
-                  span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
-          div.item
-            p
-              span.title 快递
-              span.location(style="font-size:small") #{getProvinceCity(product.store.address)}
-              span.location(style="font-size:small") 至
-              input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
-          div.item(style="border-bottom: 1px solid #e5e5e5")
-            if !data.user
-              span.title 价格
-              span(style="color:orangered") 登陆可见
-            else
+                  span.title 运费
+                  if product.isFreePost
+                    span#freightPrice 免邮
+                    input#isFreePost(type="text" value="freePost" style="display:none")
+                  else
+                    span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+                    span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+                    input#isFreePost(type="text" value="payPost" style="display:none")
+            div.item
               p
-                span.title 运费
-                if product.isFreePost
-                  span#freightPrice 免邮
-                  input#isFreePost(type="text" value="freePost" style="display:none")
-                else
-                  span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
-                  span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
-                  input#isFreePost(type="text" value="payPost" style="display:none")
-          div.item
-            p
-              span.title 数量
-              span(style="display: inline-flex;margin-right:5px")
-                button(onclick=`delStock()`) -
-                input#buyCount(style='width: 3rem;' value="1")
-                button(onclick=`addStock()`) +
-              span.location(style="font-size:12px") 库存
-              span#stockCount=`${product.productParams[paId].stocksSurplus}`
-              span.location(style="font-size:12px") 件
-          .item
-            .row
-              span.title.col-xs-1(style="padding-right:0;margin-bottom:15px") 规格
-              span.col-xs-12(style="margin: 0 19px 0 10px")
-                for para in product.productParams
-                  span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
-                    span=para.name.join()
-          div.item
-            div(style="display:none")#paraId!=`${paraId}`
-            a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
-              span.fa.fa-shopping-cart  加入购物车
+                span.title 数量
+                span(style="display: inline-flex;margin-right:5px")
+                  button(onclick=`delStock()`) -
+                  input#buyCount(style='width: 3rem;' value="1")
+                  button(onclick=`addStock()`) +
+                span.location(style="font-size:12px") 库存
+                span#stockCount=`${product.productParams[paId].stocksSurplus}`
+                span.location(style="font-size:12px") 件
+            .item
+              .row
+                span.title.col-xs-1(style="padding-right:0;margin-bottom:15px") 规格
+                span.col-xs-12(style="margin: 0 19px 0 10px")
+                  for para in product.productParams
+                    span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
+                      span=para.name.join()
+            div.item
+              div(style="display:none")#paraId!=`${paraId}`
+              a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+              a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+                span.fa.fa-shopping-cart  加入购物车
         .col-xs-1.col-md-1 
 
       .col-xs-12.col-md-12

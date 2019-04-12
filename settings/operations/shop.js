@@ -102,6 +102,12 @@ module.exports = {
         },
         shelfRightNow: {
           PATCH: "productShelfRightNow"
+        },
+        productStopSale: {
+          PATCH: "productStopSale"
+        },
+        productGoonSale: {
+          PATCH: "productGoonSale"
         }
       }
     },

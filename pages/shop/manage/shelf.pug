@@ -56,7 +56,8 @@ block name
                   .panel.panel-default
                     .panel-heading(style="padding:5px")
                       span 规格列表
-                      a.fa.fa-plus(style="float:right;cursor:pointer"  data-toggle="modal" data-target="#addProductParams") 添加
+                      //- a.fa.fa-plus(style="float:right;cursor:pointer"  data-toggle="modal" data-target="#addProductParams") 添加
+                      a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addNewParam()") 添加
                     .panel-body(style="padding:5px")
                       table.table.table-condensed.margin-0#paramsTable
                         thead
@@ -147,7 +148,7 @@ block name
                     |  是否限购
             .form-group#purchaseLimitDom(style="display:none")
               label.col-sm-2.control-label 每人限购数量
-              .col-sm-5
+              .col-sm-8
                 input.form-control#purchaseLimitCount(type="number", name="")
             .form-group
               label.col-sm-2.control-label 购买凭证
@@ -156,6 +157,10 @@ block name
                   label
                     input#isUploadCert(type='checkbox')
                     |  是否需要上传购买凭证
+            .form-group#uploadCertDom(style="display:none")
+              label.col-sm-2.control-label 凭证说明
+              .col-sm-8
+                input.form-control#uploadCertDescription(type="text", name="" maxlength="50" placeholder="请简单说明买家需上传哪种凭证，不超过50字")
       .panel.panel-info
         .panel-heading
           | 运费物流
@@ -267,8 +272,12 @@ block name
                     .upload_image-tools
                       i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage5')")
             .form-group
-              label.col-sm-2.control-label 商品详细描述
+              .col-sm-2
               .col-sm-8
+                p.text-danger 提示：请先在下方编辑器的附件模块上传商品图
+            .form-group
+              label.col-sm-2.control-label 商品详细描述
+              .col-sm-10
                 div#ReplyContent
                 .checkbox-inline(style="display:none")
                   label
@@ -285,7 +294,7 @@ block name
               .col-sm-8
                 button.btn.btn-primary.radius(onclick=`productToShelf("${data.myStore.storeId}")`, type='submit')
                   i.fa.fa-save
-                  | &nbsp;保存并提交审核
+                  | &nbsp;发布商品
                 //- button.btn.btn-info.radius(onclick='test()', type='submit')
                 //-   i.fa.fa-eye
                 //-   | &nbsp;预览

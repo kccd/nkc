@@ -8,93 +8,67 @@ block title
   link(rel='stylesheet' href='/shop/manage/manage.css')
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
 block content
-
   .container-fluid(style='max-width: 1400px;')
     .row
       .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
         .e-nav
-          .jumbotron(style='margin-bottom: 1rem;color:#555;')
-            .h1
-              span.fa.fa-shopping-basket MY SHOP MANAGE
-      .col-xs-12.col-md-12
-        .col-xs-2.col-md-2
-          ul#main-nav.nav.nav-tabs.nav-stacked(style='')
-            li.active
-              a(href='#') 店铺管理
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/home`)
-                //- i.glyphicon.glyphicon-credit-card
+          ul.nav.nav-pills(style='background-color:aliceblue')
+            //- li.active
+            //-   a(href='#') 店铺管理
+            li(style="background-color: aliceblue" class=data.active == "home"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/home?active=home`)
                 |                             店铺首页
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/shelf`)
-                //- i.glyphicon.glyphicon-credit-card
+            li(style="background-color: aliceblue" class=data.active == "shelf"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/shelf?active=shelf`)
                 |                             商品上架
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/goodslist`)
-                //- i.glyphicon.glyphicon-calendar
+            li(style="background-color: aliceblue" class=data.active == "goodslist"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/goodslist?active=goodslist`)
                 |                             商品管理
-            //- li(style="background-color: aliceblue")
-            //-   a.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse')
-            //-     i.glyphicon.glyphicon-cog
-            //-     |                             物流管理
-            //-     span.pull-right.glyphicon.glyphicon-chevron-down
-            //-   ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
-            //-     li
-            //-       a(href='mytask')
-            //-         i.glyphicon.glyphicon-user
-            //-         | 服务商设置
-            //- li(style="background-color: aliceblue")
-            //-   a.nav-header.collapsed(href='#systemSetting', data-toggle='collapse')
-            //-     i.glyphicon.glyphicon-cog
-            //-     |                             店铺设置
-            //-     span.pull-right.glyphicon.glyphicon-chevron-down
-            //-   ul#systemSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
-            //-     li
-            //-       a(href='mytask')
-            //-         i.glyphicon.glyphicon-user
-            //-         | 用户管理
-            //-     li
-            //-       a(href='#')
-            //-         i.glyphicon.glyphicon-th-list
-            //-         | 菜单管理
-            //-     li
-            //-       a(href='#')
-            //-         i.glyphicon.glyphicon-asterisk
-            //-         | 角色管理
-            //-     li
-            //-       a(href='#')
-            //-         i.glyphicon.glyphicon-edit
-            //-         | 修改密码
-            //-     li
-            //-       a(href='#')
-            //-         i.glyphicon.glyphicon-eye-open
-            //-         | 日志查看
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/order`)
-                //- i.glyphicon.glyphicon-globe
+            li(style="background-color: aliceblue" class=data.active == "order"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/order?active=order`)
                 |                             订单管理
-                //- span.label.label-warning.pull-right 5
-            //- li(style="background-color: aliceblue")
-            //-   a(href='./charts.html')
-            //-     i.glyphicon.glyphicon-calendar
-            //-     |                             图表统计
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/info`)
-                //- i.glyphicon.glyphicon-calendar
+            li(style="background-color: aliceblue" class=data.active == "info"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/info?active=info`)
                 |                             店铺信息
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/decoration`)
-                //- i.glyphicon.glyphicon-calendar
+            li(style="background-color: aliceblue" class=data.active == "decoration"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/decoration?active=decoration`)
                 |                             店铺装修
-            li(style="background-color: aliceblue")
-              a(href=`/shop/manage/${data.myStore.storeId}/classify`)
-                //- i.glyphicon.glyphicon-calendar
+            li(style="background-color: aliceblue" class=data.active == "classify"?"active":"")
+              a(href=`/shop/manage/${data.myStore.storeId}/classify?active=classify`)
                 |                             分类设置
             li(style="background-color: aliceblue")
               a(href=`/shop/store/${data.myStore.storeId}`)
-                //- i.glyphicon.glyphicon-calendar
                 |                             进入我的店铺
-        .col-xs-10.col-md-10
+      .col-xs-12.col-md-12
+        //- .col-xs-2.col-md-2
+        //-   ul#main-nav.nav.nav-tabs.nav-stacked(style='')
+        //-     li.active
+        //-       a(href='#') 店铺管理
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/home`)
+        //-         |                             店铺首页
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/shelf`)
+        //-         |                             商品上架
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/goodslist`)
+        //-         |                             商品管理
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/order`)
+        //-         |                             订单管理
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/info`)
+        //-         |                             店铺信息
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/decoration`)
+        //-         |                             店铺装修
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/manage/${data.myStore.storeId}/classify`)
+        //-         |                             分类设置
+        //-     li(style="background-color: aliceblue")
+        //-       a(href=`/shop/store/${data.myStore.storeId}`)
+        //-         |                             进入我的店铺
+        .col-xs-12.col-md-12
           block name               
 block scripts
   script(src='/shop/manage/manage.js')

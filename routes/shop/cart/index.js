@@ -44,6 +44,7 @@ router
     if(productParam.stocksSurplus <= 0) ctx.throw(400, '该规格的商品库已经卖光了，暂无法添加到购物车，请选择其他商品规格。');
     const {productId} = productParam;
     const product = await db.ShopGoodsModel.findById(productId);
+    if(product.productStatus == "stopsale") ctx.throw(400, "该商品停售中，不可加入购物车");
     await product.ensurePermission();
     if(user) {
       let cart = await db.ShopCartModel.findOne({productId, productParamId, uid: user.uid});

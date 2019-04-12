@@ -22,9 +22,11 @@ manageRouter
     }
   })
   .use('/:account', async (ctx, next) => {
-    const {data, db, params} = ctx;
+    const {data, db, params, query} = ctx;
     const {account} = params;
     const {user} = data;
+    const {active} = query;
+    data.active = active;
     const myStore = await db.ShopStoresModel.findOne({storeId: account});
     if(!myStore || !user || user.uid !== myStore.uid) ctx.throw(400, "您不是该店店主");
     data.myStore = myStore;

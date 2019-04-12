@@ -96,6 +96,11 @@ const shopGoodsSchema = new Schema({
     type: Boolean,
     default: false
   },
+  // 凭证说明
+  uploadCertDescription: {
+    type: String,
+    default: ""
+  },
   //商品介绍图
   imgIntroductions:{
     type: Array,
@@ -154,6 +159,7 @@ const shopGoodsSchema = new Schema({
    * 商品状态
    * @param notonshelf 未上架
    * @param insale 销售中
+   * @param stopsale 停售中
    */
   productStatus: {
     type: String,
