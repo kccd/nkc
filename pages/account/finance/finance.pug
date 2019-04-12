@@ -103,7 +103,7 @@ block content
                       a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
                     if record.ordersId && record.ordersId.length !== 0
                       span=`订单号（${record.ordersId.join(', ')}）`
-
+                
           if !data.kcbsRecords.length
             .text-center 暂无记录            
       .col-xs-12.col-md-12
