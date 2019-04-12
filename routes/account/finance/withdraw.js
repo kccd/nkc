@@ -34,6 +34,7 @@ router
   .post("/", async (ctx, next) => {
     const {nkcModules, data, db, body} = ctx;
     const {user} = data;
+    await db.UserModel.updateUserKcb(user.uid);
     let {money, password, code, to, account} = body;
     const kcbSettings = await db.SettingModel.findById("kcb");
     const {
