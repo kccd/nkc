@@ -9,7 +9,7 @@ router
     if(type === 'get_url') {
       money = Number(money);
       money = money * 100;
-      // if(money < 100) ctx.throw(400, "科创币充值数量不能小于1");
+      if(money < 100) ctx.throw(400, "科创币充值数量不能小于1");
       if(money > 5000000) ctx.throw(400, "单笔充值金额不能超过50000");
       money = Number(money.toFixed(0));
       data.url = await db.KcbsRecordModel.getAlipayUrl({

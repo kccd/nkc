@@ -2,8 +2,8 @@ const Router = require('koa-router');
 const homeRouter = new Router();
 homeRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query, nkcModules} = ctx;
 
+		const {data, db, query, nkcModules} = ctx;
 		// 日常登陆
     await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
 
@@ -19,6 +19,7 @@ homeRouter
         }
       });
       if(!dailyLogin) {
+        await db.UserModel.updateUserKcb(data.user.uid);
         await db.UsersScoreLogModel.insertLog({
           user: data.user,
           type: 'score',
@@ -30,7 +31,6 @@ homeRouter
         await data.user.updateUserMessage();
       }
     }
-
 
 		// 删除退修超时的帖子
 		// 取出全部被标记的帖子

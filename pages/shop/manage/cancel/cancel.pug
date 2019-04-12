@@ -27,6 +27,9 @@ block content
           div(v-if="needPassword")
             .form-group
               h5 请输入补偿金额（科创币：1 - 50）
+              h5=`您当前科创币剩余 `
+                strong=data.user.kcb/100
+                span &nbsp;
               input.form-control(type="number" v-model.number="money")
             .form-group
               h5 请输入登录密码
