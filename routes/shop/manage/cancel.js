@@ -32,7 +32,8 @@ router
     const {user} = data;
     const {orderId, reason, password} = body;
     let money = body.money * 100;
-    money = Number(money.toFixed(2));
+    money = Number(money.toFixed(0));
+    if(user.kcb < money) ctx.throw(400, "您的科创币不足");
     const order = await db.ShopOrdersModel.findById(orderId);
     if(order.orderStatus === "unShip") {
       const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});

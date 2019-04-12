@@ -11,15 +11,13 @@ module.exports = {
     // 提现开启与否
     withdrawStatus: false,
     // 最小提现金额
-    withdrawMin: 50,
+    withdrawMin: 5000,
     // 最大提现金额
-    withdrawMax: 500,
+    withdrawMax: 50000,
     // 每天提现次数
     withdrawCount: 3,
     // 允许提现的时间段
     withdrawTimeBegin: Number,
-    withdrawTimeEnd: Number,
-    // 提现申请是否需要审核
-    withdrawAuth: true
+    withdrawTimeEnd: Number
   }
 };

@@ -854,4 +854,56 @@ userSchema.statics.findUserById = async (uid) => {
   if(!user) throwErr(404, `未找到ID为【${uid}】的用户`);
   return user;
 };
+
+/*
+* 根据用户的kcb转账记录 计算用户的科创币总量 并将计算结果写到user.kcb
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-4-4
+* */
+userSchema.statics.updateUserKcb= async (uid) => {
+  const UserModel = mongoose.model("users");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const fromRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        from: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const toRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        to: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const expenses = fromRecords.length? fromRecords[0].total: 0;
+  const income = toRecords.length? toRecords[0].total: 0;
+  const total = income - expenses;
+  await UserModel.update({
+    uid
+  }, {
+    $set: {
+      kcb: total
+    }
+  });
+};
 module.exports = mongoose.model('users', userSchema);

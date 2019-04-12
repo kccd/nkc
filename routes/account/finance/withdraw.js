@@ -16,7 +16,8 @@ router
       withdrawCount: kcbSettings.c.withdrawCount,
       withdrawMin: kcbSettings.c.withdrawMin,
       withdrawMax: kcbSettings.c.withdrawMax,
-      withdrawStatus: kcbSettings.c.withdrawStatus
+      withdrawStatus: kcbSettings.c.withdrawStatus,
+      withdrawFee: kcbSettings.c.withdrawFee
     };
     const today = nkcModules.apiFunction.today();
     data.countToday = await db.KcbsRecordModel.count({
@@ -33,6 +34,7 @@ router
   .post("/", async (ctx, next) => {
     const {nkcModules, data, db, body} = ctx;
     const {user} = data;
+    await db.UserModel.updateUserKcb(user.uid);
     let {money, password, code, to, account} = body;
     const kcbSettings = await db.SettingModel.findById("kcb");
     const {
@@ -41,7 +43,8 @@ router
       withdrawCount,
       withdrawStatus,
       withdrawMax,
-      withdrawMin
+      withdrawMin,
+      withdrawFee,
     } = kcbSettings.c;
     if(!withdrawStatus) ctx.throw(403, "提现功能暂未开放");
     const today = nkcModules.apiFunction.today();
@@ -56,6 +59,7 @@ router
     if(countToday >= withdrawCount) ctx.throw(403, "您今日的提现次数已用完，请明天再试");
 
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
+    money = money.toFixed(0);
     money = Number(money);
     if(money > 0){}
     else ctx.throw(400, "提现金额不正确");
@@ -90,6 +94,7 @@ router
       if(!existing) ctx.throw(400, "您未绑定该收款账户，请检查");
       const _id = await db.SettingModel.operateSystemID("kcbsRecords", 1);
       const description = `科创币提现`;
+
       const record = await db.KcbsRecordModel({
         _id,
         from: user.uid,
@@ -98,27 +103,52 @@ router
         ip: ctx.address,
         port: ctx.port,
         num: money,
-        description
+        description,
+        c: {
+          alipayAccount: account.account,
+          alipayName: account.name,
+          alipayFee: withdrawFee,
+          alipayInterface: null
+        }
       });
+
       await record.save();
-      await db.UserModel.updateOne({uid: user.uid}, {
-        $inc: {
-          kcb: -1*money
-        }
-      });
-      user.kcb -= money;
-      await db.SettingModel.updateOne({_id: "kcb"}, {
-        $inc: {
-          "c.totalMoney": money
-        }
-      });
-      await nkcModules.alipay2.transfer({
-        account: account.account,
-        name: account.name,
-        money: money/100,
-        id: _id,
-        notes: description
-      });
+      try {
+        const alipayMoney = money*(1-withdrawFee);
+        await nkcModules.alipay2.transfer({
+          account: account.account,
+          name: account.name,
+          money: alipayMoney/100,
+          id: _id,
+          notes: description
+        });
+
+        await record.update({
+          "c.alipayInterface": true
+        });
+
+        await db.UserModel.updateOne({uid: user.uid}, {
+          $inc: {
+            kcb: -1*money
+          }
+        });
+
+        user.kcb -= money;
+        await db.SettingModel.updateOne({_id: "kcb"}, {
+          $inc: {
+            "c.totalMoney": money
+          }
+        });
+
+      } catch(err) {
+        await record.update({
+          verify: false,
+          "c.alipayInterface": false,
+          error: JSON.stringify(err)
+        });
+        ctx.throw(400, err.message || err);
+      }
+
     } else {
       ctx.throw(400, "未知的账户类型")
     }

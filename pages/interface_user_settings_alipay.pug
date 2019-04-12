@@ -1,6 +1,6 @@
 extends bootstrap_base
 block title
-  title 绑定支付宝账号
+  title 添加支付宝账号
 block content
   .container-fluid.max-width
     .hidden#data=JSON.stringify({alipayAccounts: data.alipayAccounts, user: data.user})
@@ -10,11 +10,11 @@ block content
       .col-xs-12.col-md-10#app(v-cloak)
         .panel.panel-primary
           .panel-heading
-            span 绑定支付宝账号
+            span 添加支付宝账号
           .panel-body
             h5.text-danger 注意事项：
             ul
-              li 每个用户最多可绑定5个支付宝账号
+              li 每个用户最多可添加5个支付宝账号
             //- 已绑定的支付宝账号信息
             .bound.m-t-3
               //-h4 编辑绑定

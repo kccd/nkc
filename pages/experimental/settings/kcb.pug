@@ -27,17 +27,17 @@ block content
             .form-group
               label.col-sm-2.control-label 最小提现金额
               .col-sm-4
-                input.form-control(type="number" v-model.number="kcbSettings.withdrawMin")
+                input.form-control(type="text" v-model.number="kcbSettings.withdrawMin")
                 h5.text-danger 若用户的科创币小于最小提现金额则用户无法申请提现。
             .form-group
               label.col-sm-2.control-label 最大提现金额
               .col-sm-4
-                input.form-control(type="number" v-model.number="kcbSettings.withdrawMax")
+                input.form-control(type="text" v-model.number="kcbSettings.withdrawMax")
                 h5.text-danger 单笔最大提现金额，与”每天最大提现次数“可限制用户每天能提现的总金额。
             .form-group
               label.col-sm-2.control-label 每天最大提现次数
               .col-md-4
-                input.form-control(type="number" v-model.number="kcbSettings.withdrawCount")
+                input.form-control(type="text" v-model.number="kcbSettings.withdrawCount")
                 h5.text-danger 次数达最大值后用户当天无法再申请提现。
             .form-group
               label.col-sm-2.control-label 允许提现的时间段
@@ -67,7 +67,17 @@ block content
                   -for(var i = 0; i < 60; i++)
                     option(:value=i)=i
                 span 秒
-
+            .form-group
+              label.col-sm-2.control-label 提现手续费
+              .col-md-4
+                .row
+                  .col-md-4
+                    input.form-control(type="text" v-model.number="kcbSettings.withdrawFee")
+                  .col-md-4
+                    h5
+                      strong %
+                  .col-md-12
+                    h5.text-danger 提现1000，实际到账{{(1000*(1-kcbSettings.withdrawFee)).toFixed(2)}}
         .col-xs-12.col-md-12.table-responsive.m-t-4
           h4 科创币设置
           table.table

@@ -7,6 +7,8 @@ var app = new Vue({
 
     succeed: false,
     submitted: false,
+    timeLimit: 0,
+
     info: "",
 
     succeedMoney: 0,
@@ -23,6 +25,9 @@ var app = new Vue({
     to: "alipay" // alipay, bank
   },
   computed: {
+    realMoney: function() {
+      return (this.money*(1-this.withdrawSettings.withdrawFee)).toFixed(2)
+    },
     timeBegin: function() {
       var timeBegin = this.getHMS(this.withdrawSettings.withdrawTimeBegin, "string");
       return timeBegin.hour + ":" + timeBegin.min + ":" + timeBegin.sec
@@ -77,9 +82,18 @@ var app = new Vue({
         sec: sec
       }
     },
+    countdown: function() {
+      if(app.timeLimit <= 0) return;
+      app.timeLimit --;
+      setTimeout(function() {
+        app.countdown();
+      }, 1000);
+    },
     sendMessage: function() {
       nkcAPI("/sendMessage/withdraw", "POST", {})
         .then(function() {
+          app.timeLimit = 120;
+          app.countdown();
           screenTopAlert("短信验证码发送成功");
         })
         .catch(function(err) {

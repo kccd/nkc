@@ -82,7 +82,19 @@ const kcbsRecordSchema = new Schema({
   c: {
     type: Schema.Types.Mixed,
     default: {}
-  }   
+  }
+  /*
+  * c: {
+  *  alipayAccount: String,
+  *  alipayName: String,
+  *  alipayFee: Number,
+  *  alipayInterface: Boolean  // 调用阿里接口是否成功 null: 未知，false: 失败， true: 成功
+  *
+  * }
+  *
+  *
+  *
+  * */
 }, {
   collection: 'kcbsRecords',
   toObject: {
@@ -210,10 +222,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
 // 用户间转账记录
 kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model('settings');
   const {
     fromUser, toUser, num, description, post, ip, port
   } = options;
+  if(fromUser.uid === toUser.uid) throwErr(400, "无法对自己执行此操作");
   const _id = await SettingModel.operateSystemID('kcbsRecords', 1);
   const record = KcbsRecordModel({
     _id,
@@ -226,27 +240,9 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     port,
     type: 'creditKcb'
   });
-  let fromUsersKcb, toUsersKcb;
-  if(fromUser.uid !== toUser.uid) {
-    fromUsersKcb = fromUser.kcb;
-    toUsersKcb = toUser.kcb;
-    fromUser.kcb -= num;
-    toUser.kcb += num;
-  }
-  try{
-    await record.save();
-    await fromUser.save();
-    await toUser.save();
-  } catch(err) {
-    // await SettingModel.operateSystemID('kcbsRecords', 1);
-    if(fromUser.uid !== toUser.uid) {
-      fromUser.kcb = fromUsersKcb;
-      toUser.kcb = toUsersKcb;
-      await fromUser.save();
-      await toUser.save();
-    }
-    throw err;
-  }
+  await record.save();
+  await UserModel.updateUserKcb(fromUser.uid);
+  await UserModel.updateUserKcb(toUser.uid);
 };
 
 
@@ -340,7 +336,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
     ip,
     port,
     verify: false,
-    description: `科创币充值，充值金额${money/100}`
+    description: notes
   });
   await record.save();
   const o = {
@@ -358,54 +354,6 @@ kcbsRecordSchema.statics.hideAlipayInfo = async (records) => {
   for(const record of records) {
     record.c = "";
   }
-};
-
-/*
-* 根据用户的kcb转账记录 计算用户的科创币总量 并将计算结果写到user.kcb
-* @param {String} uid 用户ID
-* @author pengxiguaa 2019-4-4
-* */
-kcbsRecordSchema.statics.checkRecords = async (uid) => {
-  const UserModel = mongoose.model("users");
-  const KcbsRecordModel = mongoose.model("kcbsRecords");
-  const fromRecords = await KcbsRecordModel.aggregate([
-    {
-      $match: {
-        from: uid
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        total: {
-          $sum: "$num"
-        }
-      }
-    }
-  ]);
-  const toRecords = await KcbsRecordModel.aggregate([
-    {
-      $match: {
-        to: uid
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        total: {
-          $sum: "$sum"
-        }
-      }
-    }
-  ]);
-  const total = toRecords[0].total - fromRecords[0].total;
-  await UserModel.update({
-    uid
-  }, {
-    $set: {
-      kcb: total
-    }
-  });
 };
 
 module.exports = mongoose.model('kcbsRecords', kcbsRecordSchema);
