@@ -6,4 +6,13 @@ script(type='text/javascript', src='/ueditor/ueditor.config.js')
 script(type='text/javascript', src='/ueditor/ueditor.all.js')
 // 实例化编辑器
 script(type='text/javascript').
-  var ue = UE.getEditor('container');
+  var ue = UE.getEditor('container', {
+    toolbars: [
+      [
+        'fullscreen', 'source', '|', 'undo', 'redo', '|', 'blockquote', 'horizontal', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', '|','inserttable'
+      ],
+      [
+        'bold', 'italic', 'underline', 'strikethrough', '|' ,'superscript', 'subscript', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
+      ]
+    ]
+  });

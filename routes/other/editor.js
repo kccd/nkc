@@ -117,6 +117,9 @@ editorRouter
     
     const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     data.allForumList = allForumList;
+    
+    data.ver = query.ver;
+
     await next();
   });
 

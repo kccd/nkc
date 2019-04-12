@@ -25,7 +25,7 @@ function dataURItoBlob (base64Data) {
       ia[i] = byteString.charCodeAt(i);  
   }  
   return new Blob([ia], {type: mimeString});  
-  }
+}
 
 
 $("document").ready(function(){
@@ -121,7 +121,6 @@ function get_selection(the_id) {
 
 function replace_selection(the_id,replace_str,setSelection) {
   var e = typeof(the_id)==='string'? document.getElementById(the_id) : the_id;
-  console.log(e)
   selection = get_selection(the_id);
   var start_pos = selection.start;
   var end_pos = start_pos + replace_str.length;

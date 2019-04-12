@@ -156,8 +156,8 @@ div.edui-box {
 }
 
 .edui-default .edui-editor-toolbarboxouter {
-    border-bottom: 1px solid #d4d4d4;
-    background-color: #fafafa;
+    border-bottom: 1px solid #f2f2f2;
+    background-color: #f2f2f2;
     background-image: -moz-linear-gradient(top, #ffffff, #f2f2f2);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f2f2f2));
     background-image: -webkit-linear-gradient(top, #ffffff, #f2f2f2);
@@ -484,8 +484,8 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-button .edui-icon,
 .edui-default .edui-toolbar .edui-menubutton .edui-icon,
 .edui-default .edui-toolbar .edui-splitbutton .edui-icon {
-    height: 20px !important;
-    width: 20px !important;
+    height: 20px;
+    width: 20px;
     background-image: url(../images/icons.png);
     background-image: url(../images/icons.gif) \9;
 }
@@ -525,54 +525,102 @@ div.edui-box {
 
 /* toolbar icons */
 .edui-default .edui-for-undo .edui-icon {
-    background-position: -160px 0;
+    /* background-position: -160px 0 */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/undo.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-redo .edui-icon {
-    background-position: -100px 0;
+    /* background-position: -100px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/redo.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-bold .edui-icon {
-    background-position: 0 0;
+    /* background-position: 0 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/bold.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-italic .edui-icon {
-    background-position: -60px 0;
+    /* background-position: -60px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/italic.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-fontborder .edui-icon {
     background-position:-160px -40px;
 }
 .edui-default  .edui-for-underline .edui-icon {
-    background-position: -140px 0;
+    /* background-position: -140px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/underline.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-strikethrough .edui-icon {
-    background-position: -120px 0;
+    /* background-position: -120px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/strikethrough.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-subscript .edui-icon {
-    background-position: -600px 0;
+    /* background-position: -600px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/subscript.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-superscript .edui-icon {
-    background-position: -620px 0;
+    /* background-position: -620px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/superscript.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-blockquote .edui-icon {
-    background-position: -220px 0;
+    /* background-position: -220px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/quote.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-forecolor .edui-icon {
-    background-position: -720px 0;
+    /* background-position: -720px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/forecolor.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-backcolor .edui-icon {
-    background-position: -760px 0;
+    /* background-position: -760px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/backcolor.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-inserttable .edui-icon {
-    background-position: -580px -20px;
+    /* background-position: -580px -20px; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/inserttable.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-autotypeset .edui-icon {
@@ -580,15 +628,27 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-justifyleft .edui-icon {
-    background-position: -460px 0;
+    /* background-position: -460px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/justifyleft.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-justifycenter .edui-icon {
-    background-position: -420px 0;
+    /* background-position: -420px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/justifycenter.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-justifyright .edui-icon {
-    background-position: -480px 0;
+    /* background-position: -480px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/justifyright.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-justifyjustify .edui-icon {
@@ -616,11 +676,27 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-horizontal .edui-icon {
-    background-position: -360px 0;
+    /* background-position: -360px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/horizontal.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-link .edui-icon {
-    background-position: -500px 0;
+    /* background-position: -500px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/link.png) !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+
+.edui-default  .edui-for-unlink .edui-icon {
+    /* background-position: -640px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/unlink.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-code .edui-icon {
@@ -700,7 +776,11 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-pasteplain .edui-icon {
-    background-position: -360px -20px;
+    /* background-position: -360px -20px; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/pasteplain.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-directionalityltr .edui-icon {
@@ -712,15 +792,19 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-source .edui-icon {
-    background-position: -261px -0px;
+    /* background-position: -261px -0px; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/source.png) !important;
+    width: 40px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-removeformat .edui-icon {
-    background-position: -580px 0;
-}
-
-.edui-default  .edui-for-unlink .edui-icon {
-    background-position: -640px 0;
+    /* background-position: -580px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/removeformat.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-touppercase .edui-icon {
@@ -792,7 +876,11 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-fullscreen .edui-icon {
-    background-position: -100px -20px;
+    /* background-position: -100px -20px; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/fullscreen.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-anchor .edui-icon {
@@ -824,7 +912,11 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-indent .edui-icon {
-    background-position: -400px 0;
+    /* background-position: -400px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/indent.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-outdent .edui-icon {
@@ -1764,7 +1856,11 @@ div.edui-box {
 /*表情按钮及弹出菜单*/
 /*去除了表情的下拉箭头*/
 .edui-default .edui-for-emotion .edui-icon {
-    background-position: -60px -20px;
+    /* background-position: -60px -20px; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/emotion.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 .edui-default .edui-for-emotion .edui-popup-content iframe
 {
