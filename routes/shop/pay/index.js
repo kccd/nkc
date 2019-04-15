@@ -74,6 +74,8 @@ router
     for(let order of orders) {
       totalMoney += order.orderPrice;
     }
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
+    if(user.kcb < totalMoney) ctx.throw(400, "您的科创币不足，请先充值或选择其他付款方式支付");
     if(totalMoney !== Number(totalPrice)*100) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
     orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
@@ -101,8 +103,7 @@ router
       // 付款完毕，将商品从购物车中清除
       await db.ShopCartModel.remove({uid: user.uid, productParamId: order.productParam._id});
     }
-    await db.UserModel.update({uid: user.uid}, {$inc: {kcb: -1*totalMoney}});
-    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': totalMoney}});
+    user.uid = await db.UserModel.updateUserKcb(user.uid);
     await next();
   });
 module.exports = router;

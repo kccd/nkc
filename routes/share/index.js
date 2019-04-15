@@ -33,7 +33,6 @@ shareRouter
       // 判断token是否有效
       await db.ShareModel.ensureEffective(token);
     } catch(err) {
-      console.log(err);
       return ctx.redirect(shareUrl);
     }
     // 若share有效则写入cookie
@@ -45,7 +44,7 @@ shareRouter
     const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     const shareSettings = redEnvelopeSettings.c.share[share.tokenType];
     if(!shareSettings.status) return ctx.redirect(shareUrl); // 已关闭
-    if(shareSettings.maxKcb <= kcbTotal) return ctx.redirect(shareUrl); // 若分享着获得的奖励大于等于奖励设置的最大值则不再给予新的奖励
+    if(shareSettings.maxKcb <= kcbTotal) return ctx.redirect(shareUrl); // 若分享者获得的奖励大于等于奖励设置的最大值则不再给予新的奖励
     const {kcb, maxKcb} = shareSettings;
     let addKcb; // 奖励的kcb值
     if(kcb + kcbTotal > maxKcb) {
@@ -54,14 +53,16 @@ shareRouter
       addKcb = kcb;
     }
     if(addKcb <= 0) return ctx.redirect(shareUrl); // 获得的奖励已经超过最大值
-    targetUser.kcb += addKcb;
+    // 判断分享的是什么类容
     const shareLimit = await db.ShareLimitModel.findOnly({shareType: tokenType});
+    // 写入kcb交易记录
     const record = db.KcbsRecordModel({
       _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
       from: 'bank',
       to: targetUser.uid,
       num: addKcb,
       type: 'share',
+      shareToken: token,
       c: {
         type: tokenType,
         token
@@ -70,13 +71,21 @@ shareRouter
       port: ctx.port,
       description: `分享${shareLimit.shareName}`
     });
-    share.kcbTotal += addKcb;
-    await shareAccessLog.update({kcb: addKcb});
     await record.save();
-    await targetUser.save();
-    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*addKcb}});
-    await share.save();
+
+    // 计算分享者的kcb
+    targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
+    // 更新分享者以获得的kcb总数
+    await share.update({
+      $inc: {
+        kcbTotal: addKcb
+      }
+    });
+    // 将分享者获得的kcb写入当前用户访问的记录上
+    await shareAccessLog.update({kcb: addKcb});
+
     return ctx.redirect(shareUrl);
+
   })
 .post('/', async (ctx, next) => {
   const {query, data, body, db, nkcModules} = ctx;

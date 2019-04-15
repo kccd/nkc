@@ -68,9 +68,8 @@ router
           pid,
           tid: thread.tid
         });
-        await data.targetUser.update({$inc: {kcb: num}});
-        await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
         await record.save();
+        // data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
       }
       await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
 			log.type = 'score';
@@ -105,8 +104,6 @@ router
           pid,
           tid: thread.tid
         });
-        await data.targetUser.update({$inc: {kcb: num}});
-        await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
         await record.save();
       }
       await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);

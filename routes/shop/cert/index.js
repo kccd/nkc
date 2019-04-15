@@ -9,9 +9,19 @@ router
     const {user} = data;
     const cert = await db.ShopCertModel.findOne({_id, deleted: false});
     if(!cert) ctx.throw(404, `未找到ID为【${_id}】的凭证资源`);
-    if(user.uid !== cert.uid && !ctx.permission("getAnyBodyShopCert")) {
-      ctx.throw(403, "您没有权限查看别人的凭证");
-    } 
+    const order = await db.ShopOrdersModel.findOne({orderId: cert.orderId});
+    if(!order) ctx.throw(404, `未找到ID为【${orderId}】的订单`);
+    const product = await db.ShopGoodsModel.findOne({productId: order.productId});
+    if(!order) ctx.throw(404, `未找到ID为【${orderId}】的商品`);
+
+    if(!ctx.permission("getAnyBodyShopCert")) {
+      if(cert.uid !== user.uid) {
+        if(cert.type !== "shopping" || user.uid !== product.uid) {
+          ctx.throw(403, "您没有权限查看别人的凭证");
+        }
+      }
+    }
+
     const {ext, name, path} = cert;
     type = (type==="sm" && ext === "jpg")? "_sm": "";
     ctx.filePath = settings.upload.shopCertsPath + path + _id + type + "." + ext;

@@ -92,7 +92,6 @@ registerRouter
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
-	    console.log(err);
       return await next();
     }
     const share = await db.ShareModel.findOnly({token: shareToken});
@@ -104,6 +103,7 @@ registerRouter
     if(!shareSettings.status) return await next();
     const {kcb, maxKcb} = shareSettings;
     const {registerKcbTotal} = share;
+    let addKcb;
     if(kcb + registerKcbTotal > maxKcb) {
       addKcb = maxKcb - registerKcbTotal;
     } else {
@@ -117,6 +117,7 @@ registerRouter
       to: targetUser.uid,
       type: 'shareRegister',
       description: '用户通过你分享的链接成功注册账号',
+      shareToken: shareToken,
       c: {
         token: shareToken
       },
@@ -125,8 +126,13 @@ registerRouter
       num: addKcb
     });
     await record.save();
-    await targetUser.update({$inc: {kcb: addKcb}});
-    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*addKcb}});
+    // 更新分享者以获得的kcb总数
+    await share.update({
+      $inc: {
+        registerKcbTotal: addKcb
+      }
+    });
+    targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
     ctx.cookies.set('share-token', '', {
       httpOnly: true,
       signed: true
@@ -142,7 +148,7 @@ registerRouter
 		const {contentLength, checkPass} = ctx.tools.checkString;
 		if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
 		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！')
+		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！');
 		const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 		if(targetUser) ctx.throw(400, '用户名已被注册。');
 		if(!password) ctx.throw(400, '请输入密码。');

@@ -2,6 +2,7 @@ extends ../../bootstrap_base
 
 block title
   title 科创币充值记录
+  +includeCSS('/experimental/index.css')
   style.
     tbody tr th {
       max-width: 12rem;
@@ -34,6 +35,7 @@ block content
             thead
               tr
                 th 时间
+                th 账单ID
                 th 用户
                 th 充值金额（元）
                 th IP
@@ -41,6 +43,7 @@ block content
             tbody
               tr(v-for='(record, index) of records' :style="!record.verify?'background-color: #aaa;': ''")
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th {{record._id}}
                 th
                   a(:href="'/u/' + record.toUser.uid" target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
                 th {{record.num/100}}

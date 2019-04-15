@@ -582,21 +582,8 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     }});
     await refundRecord.save();
     await record.save();
-    await SettingModel.update({_id: "kcb"}, {
-      $inc: {
-        "c.totalMoney": -1*order.orderPrice
-      }
-    });
-    await UserModel.update({uid: record.from}, {
-      $inc: {
-        kcb: -1*record.num
-      }
-    });
-    await UserModel.update({uid: record.to}, {
-      $inc: {
-        kcb: record.num + order.orderPrice
-      }
-    });
+    await UserModel.updateUserKcb(record.from);
+    await UserModel.updateUserKcb(record.to);
   }
 };
 

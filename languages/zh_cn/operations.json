@@ -516,6 +516,8 @@
   "visitExperimentalRecharge": "后台查看充值记录",
   "visitExperimentalWithdraw": "后台查看提现记录",
   "modifyWithdrawRecord": "修改科创币提现记录",
+  "visitExperimentalDiffKcb": "后台查看kcb记录异常的用户",
+  "resetExperimentalDiffKcb": "后台重置kcb记录异常用户的检测结果",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

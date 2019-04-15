@@ -41,6 +41,7 @@ const jobsInit = async () => {
   jobs.updateForums(updateDate.updateForumsCronStr);
   jobs.shop();
   jobs.backupDatabase();
+  jobs.checkKcbsRecords();
 };
 
 

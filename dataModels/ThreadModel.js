@@ -223,7 +223,7 @@ threadSchema.methods.extendForums = async function(types) {
   }
   const forums = await mongoose.model('forums').find({fid: {$in: fids}});
   return this.forums = forums;
-}
+};
 
 /* threadSchema.methods.extendForum = async function() {
   const ForumModel = mongoose.model('forums');
@@ -601,7 +601,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
   const {uid, fids, title, content} = options;
 
   if(!uid) throwErr(404, '用户ID不能为空');
-  const user = await UserModel.findUserById(uid);
+  const user = await UserModel.findById(uid);
   await user.extendRoles();
   await user.extendGrade();
   const forums = await ForumModel.find({fid: {$in: fids}});
@@ -657,7 +657,7 @@ threadSchema.statics.publishArticle = async (options) => {
   const UserModel = mongoose.model('users');
   const {uid, fids, cids, ip, title, content, abstract, type} = options;
   if(!uid) throwErr(404, '用户ID不能为空');
-  const user = await UserModel.findUserById(uid);
+  const user = await UserModel.findById(uid);
   await ThreadModel.ensurePublishPermission(options);
   const tid = await SettingModel.operateSystemID('threads', 1);
   const thread = ThreadModel({

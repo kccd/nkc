@@ -1,0 +1,51 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  +includeCSS('/experimental/index.css')
+  title 科创币异常账单用户
+  style.
+    tbody tr th {
+      max-width: 12rem;
+    }
+block content
+
+  .container-fluid(style='max-width: 1400px;')
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        table.table
+          thead
+            tr
+              th 检测时间
+              th 用户名
+              th 上一次计算值
+              th 本次计算值
+              th 相差
+              th 检测范围（账单ID）
+              th 其他
+          tbody
+            for u in data.users
+              tr
+                th= format("YYYY-MM-DD HH:mm:ss", u.time)
+                th
+                  a(href=`/u/${u.uid}` target="_blank")= u.username
+                th= u.total/100
+                th= u.totalNew/100
+                th= (u.totalNew - u.total)/100
+                th=`[0, ${u.recordId}]`
+                th
+                  button(onclick=`clearUserRecords('${u.uid}')`) 清除
+        h5.text-danger 点击清除按钮后，系统会根据用户的所有科创币账单重新算出一个值，作为有效值用于下一次检测比对。
+block scripts
+  script.
+    function clearUserRecords(uid) {
+      if(confirm("确定要清除该条记录？") === false) return;
+      nkcAPI("/e/log/kcb/diff", "POST", {uid: uid})
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    }

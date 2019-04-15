@@ -2,6 +2,7 @@ extends ../../bootstrap_base
 
 block title
   -const mainContainer1400 = true;
+  +includeCSS('/experimental/index.css')
   title 科创币交易记录
   style.
     tbody tr th {
@@ -39,6 +40,7 @@ block content
             thead
               tr
                 th 时间
+                th 账单ID
                 th 操作名
                 th 支出者
                 th 收入者
@@ -50,6 +52,7 @@ block content
             tbody
               tr(v-for='(record, index) of kcbsRecords' :style="!record.verify?'background-color: #aaa;': ''")
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th {{record._id}}
                 th {{record.typeInfo}}
 
                 th

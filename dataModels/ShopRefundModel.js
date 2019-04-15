@@ -238,14 +238,7 @@ schema.methods.returnMoney = async function () {
       ordersId: [orderId]
     }); 
     await record.save();
-
-    await UserModel.update({uid: record.to}, {$inc: {
-      kcb: money
-    }});
-
-    await SettingModel.update({_id: "kcb"}, {$inc: {
-      "c.totalMoney": -1*money
-    }})
+    await UserModel.updateUserKcb(record.to);
   } else if(money < orderPrice) {
     // 情况1
     const diff = orderPrice - money;
@@ -271,15 +264,8 @@ schema.methods.returnMoney = async function () {
     });
     await orderToS.save();
     await orderToB.save();
-    await SettingModel.update({_id: "kcb"}, {$inc: {
-      "c.totalMoney": -1*orderPrice
-    }});
-    await UserModel.update({uid: orderToS.to}, {$inc: {
-      kcb: orderToS.num
-    }});
-    await UserModel.update({uid: orderToB.to}, {$inc: {
-      kcb: orderToB.num
-    }});
+    await UserModel.updateUserKcb(buyerId);
+    await UserModel.updateUserKcb(sellerId);
   } else {
     throwErr(400, `申请退款的金额不能超过支付订单的金额！orderId=${orderId}`);
   }
