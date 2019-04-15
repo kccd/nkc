@@ -4,6 +4,7 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;
+    await db.UserModel.updateUserKcb(user.uid);
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
     const {alipayAccounts, bankAccounts} = usersPersonal;
     data.alipayAccounts = alipayAccounts;
@@ -34,7 +35,6 @@ router
   .post("/", async (ctx, next) => {
     const {nkcModules, data, db, body} = ctx;
     const {user} = data;
-    await db.UserModel.updateUserKcb(user.uid);
     let {money, password, code, to, account} = body;
     const kcbSettings = await db.SettingModel.findById("kcb");
     const {
@@ -57,7 +57,7 @@ router
       }
     });
     if(countToday >= withdrawCount) ctx.throw(403, "您今日的提现次数已用完，请明天再试");
-
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
     money = money.toFixed(0);
     money = Number(money);
@@ -79,6 +79,7 @@ router
       nationCode: usersPersonal.nationCode
     };
     const smsCode = await db.SmsCodeModel.ensureCode(smsObj);
+    await smsCode.update({used: true});
     let now = new Date();
     // 验证登录密码
     await usersPersonal.ensurePassword(password);
@@ -127,18 +128,7 @@ router
           "c.alipayInterface": true
         });
 
-        await db.UserModel.updateOne({uid: user.uid}, {
-          $inc: {
-            kcb: -1*money
-          }
-        });
-
-        user.kcb -= money;
-        await db.SettingModel.updateOne({_id: "kcb"}, {
-          $inc: {
-            "c.totalMoney": money
-          }
-        });
+        user.kcb = await db.UserModel.updateUserKcb(user.uid);
 
       } catch(err) {
         await record.update({
@@ -152,7 +142,6 @@ router
     } else {
       ctx.throw(400, "未知的账户类型")
     }
-    await smsCode.update({used: true});
     await next();
   });
 module.exports = router;

@@ -120,6 +120,28 @@ const usersGeneralSchema = new Schema({
       type: Date,
       default: new Date('2000-1-1 00:0000')
     }
+  },
+  kcbSettings: {
+	  recordId: {
+	    type: Number,
+      default: null
+    },
+    total: {
+	    type: Number,
+      default: 0
+    },
+    diff: {
+	    type: Boolean,
+      default: false
+    },
+    totalNew: {
+	    type: Number,
+      default: 0
+    },
+    time: {
+	    type: Date,
+      default: null
+    }
   }
 }, {
 	collection: 'usersGeneral'

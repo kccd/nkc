@@ -662,7 +662,7 @@ postSchema.statics.newPost = async (options) => {
   const thread = await ThreadModel.findOne({tid});
   if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
   if(thread.closed) throwErr(403, `文章已被关闭，暂不能发表回复`);
-  const user = await UserModel.findUserById(uid);
+  const user = await UserModel.findById(uid);
   await ForumModel.ensureForumsPermission(thread.mainForumsId, user);
   if(!title) throwErr(400, '标题不能为空');
   if(contentLength(title) > 200) throwErr(400, '标题不能超过200字节');

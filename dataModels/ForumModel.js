@@ -710,7 +710,7 @@ forumSchema.statics.ensureForumsPermission = async (arr, userInfo) => {
   if(!userInfo) throwErr(500, `userInfo is a required parameter in forum.statics method`);
   let user = userInfo;
   if(userInfo.constructor === String) {
-    user = await UserModel.findUserById(uid);
+    user = await UserModel.findById(uid);
   }
   if(!user.roles) {
     await user.extendRoles();

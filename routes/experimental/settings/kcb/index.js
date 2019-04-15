@@ -97,12 +97,7 @@ router
       });
       await r.save();
 
-      await db.UserModel.update({uid: r.to}, {$inc: {kcb: r.num}});
-      await db.SettingModel.update({_id: "kcb"}, {
-        $inc: {
-          "c.totalMoney": -1*r.num
-        }
-      });
+      await db.UserModel.updateUserKcb(r.to);
 
     } else {
       ctx.throw(400, "未知的操作类型");

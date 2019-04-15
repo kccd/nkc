@@ -70,6 +70,11 @@ const kcbsRecordSchema = new Schema({
   ordersId: {
     type: [String]
   },
+  shareToken: {
+    type: String,
+    default: "",
+    index: 1
+  },
   verify: {
     type: Boolean,
     index: 1,
@@ -140,13 +145,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
           to: u.uid
         }
       ],
-      toc: {$gt: today}
+      toc: {$gte: today}
     });
     // 若次数已达上限则不做任何处理
     if(recordsCount >= kcbsType.count) return;
   }
   // 若kcbsType === -1则不限次数
-  const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
   const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
   const newRecords = db.KcbsRecordModel({
     _id,
@@ -157,12 +161,10 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     ip: address,
     port
   });
-  let bankChange = -1*kcbsType.num;
   // 若该操作科创币为负，则由用户转给银行
   if(kcbsType.num < 0) {
     newRecords.from = u.uid;
     newRecords.to = 'bank';
-    bankChange = -1*kcbsType.num;
     newRecords.num = -1*newRecords.num;
   }
   if(data.targetUser) {
@@ -172,17 +174,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
       newRecords.tUid = data.targetUser.uid;
     }
   }
-  let thread, forum, post;
+  let thread, post;
   if(data.thread) {
     thread = data.thread;
   } else if (data.targetThread) {
     thread = data.targetThread;
   }
-  /* if(data.forum) {
-    forum = data.forum;
-  } else if (data.targetForum) {
-    forum = data.targetForum;
-  } */
   if(data.post) {
     post = data.post;
   } else if (data.targetPost) {
@@ -197,26 +194,10 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     newRecords.fid = post.fid;
     newRecords.tid = post.tid;
   }
-  // if(forum) newRecords.fid = forum.fid;
   if(data.problem) newRecords.problemId = data.problem._id;
-  try{
-    await newRecords.save();
-  } catch(err) {
-    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
-    ctx.throw(err);
-  }
-  try{
-    await kcbSettings.update({$inc: {'c.totalMoney': bankChange}});
-  } catch(err) {
-    await newRecords.remove();
-    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
-  }
-  await UserModel.update({uid: u.uid}, {
-    $inc: {
-      kcb: -1*bankChange
-    }
-  });
-  u.kcb += -1*bankChange;
+  // 写入交易记录，紧接着更新用户的kcb数据
+  await newRecords.save();
+  u.kcb = await UserModel.updateUserKcb(u.uid);
 };
 
 // 用户间转账记录
@@ -241,8 +222,8 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     type: 'creditKcb'
   });
   await record.save();
-  await UserModel.updateUserKcb(fromUser.uid);
-  await UserModel.updateUserKcb(toUser.uid);
+  fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
+  toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
 };
 
 

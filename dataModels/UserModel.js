@@ -848,7 +848,7 @@ userSchema.methods.extendAuthLevel = async function() {
   @param uid: 用户ID
   @author pengxiguaa 2019/3/7 
 */
-userSchema.statics.findUserById = async (uid) => {
+userSchema.statics.findById = async (uid) => {
   const UserModel = mongoose.model('users');
   const user = await UserModel.findOne({uid});
   if(!user) throwErr(404, `未找到ID为【${uid}】的用户`);
@@ -862,6 +862,7 @@ userSchema.statics.findUserById = async (uid) => {
 * */
 userSchema.statics.updateUserKcb= async (uid) => {
   const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
   const fromRecords = await KcbsRecordModel.aggregate([
     {
@@ -898,12 +899,30 @@ userSchema.statics.updateUserKcb= async (uid) => {
   const expenses = fromRecords.length? fromRecords[0].total: 0;
   const income = toRecords.length? toRecords[0].total: 0;
   const total = income - expenses;
-  await UserModel.update({
-    uid
-  }, {
-    $set: {
-      kcb: total
-    }
-  });
+  if(uid === "bank") {
+    await SettingModel.update({_id: "kcb"}, {
+      $set: {
+        "c.totalMoney": total
+      }
+    });
+  } else {
+    await UserModel.update({
+      uid
+    }, {
+      $set: {
+        kcb: total
+      }
+    });
+  }
+  return total;
+};
+/*
+* 更新用户的kcb
+* 该方法位于user对象
+* @author pengxiguaa 2019-4-15
+* */
+userSchema.methods.updateKcb = async function() {
+  const UserModel = mongoose.model("users");
+  this.kcb = await UserModel.updateUserKcb(this.uid);
 };
 module.exports = mongoose.model('users', userSchema);

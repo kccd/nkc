@@ -67,11 +67,9 @@ router
         };
         if(record.num !== totalAmount) {
           updateObj.error = '系统账单金额与支付宝账单金额不相等';
-        } else {
-          await db.UserModel.update({uid: record.to}, {$inc: {kcb: record.num}});
-          await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*record.num}});
         }
         await record.update(updateObj);
+        await db.UserModel.updateUserKcb(record.to);
       } else {
         const updateObj = {
           verify: true,
@@ -118,6 +116,7 @@ router
         }
 
         await record.update(updateObj);
+        await db.UserModel.updateUserKcb(record.from);
 
       }
       return ctx.body = 'success';

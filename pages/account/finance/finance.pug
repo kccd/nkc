@@ -29,10 +29,11 @@ block content
             thead
               tr
                 th 时间
+                th 账单ID
                 th 类型
                 th 说明
                 th
-                  if !data.t 
+                  if !data.t
                     span 支付者
                   else if data.t === 'payout'
                     span 收款人
@@ -40,21 +41,22 @@ block content
                 th 其他
             tbody
               for record in data.kcbsRecords
-                tr  
+                tr
                   th= record.toc.toLocaleString()
+                  th= record._id
                   th= lang('kcbsTypes', record.type)
                   th= record.description
-                  th  
+                  th
                     -let targetUser;
                     if !data.t
                       -targetUser = record.fromUser
-                    else 
-                      -targetUser = record.toUser  
+                    else
+                      -targetUser = record.toUser
                     if !targetUser
                       span 科创人民很行
-                    else 
-                      span= targetUser.username  
-                  th= record.num/100    
+                    else
+                      span= targetUser.username
+                  th= record.num/100
                   th
                     if record.pid
                       a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
@@ -69,6 +71,7 @@ block content
             thead
               tr
                 th 时间
+                th 账单ID
                 th 类型
                 th 说明
                 th 交易对象
@@ -77,8 +80,9 @@ block content
                 th 其他
             tbody
               for record in data.kcbsRecords
-                tr  
+                tr
                   th= record.toc.toLocaleString()
+                  th= record._id
                   th= lang('kcbsTypes', record.type)
                   th= record.description
                   th  
@@ -103,7 +107,7 @@ block content
                       a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
                     if record.ordersId && record.ordersId.length !== 0
                       span=`订单号（${record.ordersId.join(', ')}）`
-                
+
           if !data.kcbsRecords.length
             .text-center 暂无记录            
       .col-xs-12.col-md-12
