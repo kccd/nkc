@@ -49,6 +49,16 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
                 span.fa.fa-trophy &nbsp;活动
             li.divider
             li
+              a(href=`/shop/order`)
+                span.fa.fa-trophy &nbsp;我的订单
+            li
+              a(href=`/shop/manage`)
+                span.fa.fa-trophy &nbsp;我出售的
+            li
+              a(href=`/shop/cart`)
+                span.fa.fa-trophy &nbsp;购物车
+            li.divider
+            li
               a(href=`/u/${user.uid}/settings`)
                 span.fa.fa-edit &nbsp;编辑资料
             li.divider
@@ -72,36 +82,36 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
           a(href=`/fund` title='科创基金') 基金
       ul.nav.navbar-nav.navbar-right.nav-font-color(style='font-size: 1em;')
         if data.user
-          if data.shopInfo
-            li.dropdown
-              a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
-                span 我的商城
-                span.caret
-              ul.dropdown-menu
-                li
-                  a(href="/shop") 商城首页
-                li.divider
-                li
-                  a(href="/shop/order") 
-                    span 全部订单
-                li
-                  a(href="/shop/order?orderStatus=unCost") 待付款
-                li
-                  a(href="/shop/order?orderStatus=unShip") 待发货
-                li
-                  a(href="/shop/order?orderStatus=unSign") 待收货
+          //- if data.shopInfo
+          //-   li.dropdown
+          //-     a(href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+          //-       span 我的商城
+          //-       span.caret
+          //-     ul.dropdown-menu
+          //-       li
+          //-         a(href="/shop") 商城首页
+          //-       li.divider
+          //-       li
+          //-         a(href="/shop/order") 
+          //-           span 全部订单
+          //-       li
+          //-         a(href="/shop/order?orderStatus=unCost") 待付款
+          //-       li
+          //-         a(href="/shop/order?orderStatus=unShip") 待发货
+          //-       li
+          //-         a(href="/shop/order?orderStatus=unSign") 待收货
 
-                li.divider
-                li
-                  a(href="/shop/manage") 
-                    span 卖家中心    
+          //-       li.divider
+          //-       li
+          //-         a(href="/shop/manage") 
+          //-           span 卖家中心    
             
-            li
-              a(href="/shop/cart") 
-                span.fa.fa-shopping-cart &nbsp;
-                span 购物车
-                if data.shopInfo.cartProductCount > 0
-                  .nav-red-point-number= data.shopInfo.cartProductCount      
+          //-   li
+          //-     a(href="/shop/cart") 
+          //-       span.fa.fa-shopping-cart &nbsp;
+          //-       span 购物车
+          //-       if data.shopInfo.cartProductCount > 0
+          //-         .nav-red-point-number= data.shopInfo.cartProductCount      
           if data.userOperationsId.includes('visitExperimentalStatus')
             li
               a(style='color: #777777;' href='/e')
@@ -145,6 +155,16 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style='background-color:#f6f
               li
                 a(href=`/u/${user.uid}/settings`)
                   span.fa.fa-edit &nbsp;编辑资料
+              li.divider
+              li
+                a(href=`/shop/order`)
+                  span.fa.fa-trophy &nbsp;我的订单
+              li
+                a(href=`/shop/manage`)
+                  span.fa.fa-trophy &nbsp;我出售的
+              li
+                a(href=`/shop/cart`)
+                  span.fa.fa-trophy &nbsp;购物车
               li.divider
               li
                 a(href=`/logout` title='不，不要走！')

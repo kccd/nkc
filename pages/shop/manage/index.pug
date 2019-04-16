@@ -10,35 +10,38 @@ block title
 block content
   .container-fluid(style='max-width: 1400px;')
     .row
+      .col-xs-12.col-md-12
+        if !data.dealInfo || !data.dealInfo.dataPerfect
+          p.text-danger(style="text-align:center") 提示：发布商品操作需完善交易基础信息
       .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
         .e-nav
           ul.nav.nav-pills(style='background-color:aliceblue')
             //- li.active
             //-   a(href='#') 店铺管理
             li(style="background-color: aliceblue" class=data.active == "home"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/home?active=home`)
+              a(href=`/shop/manage/${data.user.uid}/home?active=home`)
                 |                             店铺首页
             li(style="background-color: aliceblue" class=data.active == "shelf"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/shelf?active=shelf`)
+              a(href=`/shop/manage/${data.user.uid}/shelf?active=shelf`)
                 |                             商品上架
             li(style="background-color: aliceblue" class=data.active == "goodslist"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/goodslist?active=goodslist`)
+              a(href=`/shop/manage/${data.user.uid}/goodslist?active=goodslist`)
                 |                             商品管理
             li(style="background-color: aliceblue" class=data.active == "order"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/order?active=order`)
+              a(href=`/shop/manage/${data.user.uid}/order?active=order`)
                 |                             订单管理
             li(style="background-color: aliceblue" class=data.active == "info"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/info?active=info`)
-                |                             店铺信息
-            li(style="background-color: aliceblue" class=data.active == "decoration"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/decoration?active=decoration`)
-                |                             店铺装修
-            li(style="background-color: aliceblue" class=data.active == "classify"?"active":"")
-              a(href=`/shop/manage/${data.myStore.storeId}/classify?active=classify`)
-                |                             分类设置
-            li(style="background-color: aliceblue")
-              a(href=`/shop/store/${data.myStore.storeId}`)
-                |                             进入我的店铺
+              a(href=`/shop/manage/${data.user.uid}/info?active=info`)
+                |                             交易基础设置
+            //- li(style="background-color: aliceblue" class=data.active == "decoration"?"active":"")
+            //-   a(href=`/shop/manage/${data.user.uid}/decoration?active=decoration`)
+            //-     |                             店铺装修
+            //- li(style="background-color: aliceblue" class=data.active == "classify"?"active":"")
+            //-   a(href=`/shop/manage/${data.user.uid}/classify?active=classify`)
+            //-     |                             分类设置
+            //- li(style="background-color: aliceblue")
+            //-   a(href=`/shop/store/${data.user.uid}`)
+            //-     |                             进入我的店铺
       .col-xs-12.col-md-12
         //- .col-xs-2.col-md-2
         //-   ul#main-nav.nav.nav-tabs.nav-stacked(style='')

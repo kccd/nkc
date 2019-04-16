@@ -53,25 +53,33 @@ function submit(storeId) {
 
 function saveToInfo(storeId) {
   var post = {};  
-  var storeName = $("#storeName").val().trim();
-  var storeDescription = $("#storeDescription").val().trim();;
+	var dealDescription = $("#dealDescription").val().trim();
+	var dealAnnouncement = $("#dealAnnouncement").val().trim();
   var location = $("#location").val().trim();
   var address = $("#address").val().trim();
-  if(!storeName || !storeDescription || !location || !address) {
-    screenTopWarning("请完善店铺信息后再提交")
+  if(!dealAnnouncement || !dealDescription || !location || !address) {
+    screenTopWarning("请完善交易基础设置后再提交")
     return;
-  }
-  location = location + "&" + address;
+	}
+	if(dealAnnouncement.length > 500) {
+		screenTopWarning("全局公告不得超过500字");
+		return;
+	}
+	if(dealDescription.length > 200) {
+		screenTopWarning("供货说明不得超过200字");
+		return;
+	}
+  address = location + "&" + address;
   post = {
-    storeName: storeName,
-    storeDescription: storeDescription,
-    location: location
+    dealDescription: dealDescription,
+		address: address,
+		dealAnnouncement: dealAnnouncement
   }
   nkcAPI("/shop/manage/"+storeId+"/info", "POST", post)
   .then( function(data){
-    screenTopAlert('店铺信息保存成功');
+    screenTopAlert('交易基础设置保存成功');
   })
-  .catch( function(err){
+  .catch( function(data){
     screenTopWarning(data || data.error);
   })
 }

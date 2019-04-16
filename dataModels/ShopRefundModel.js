@@ -444,11 +444,11 @@ schema.methods.sellerDisagreeRM = async function(reason) {
  */
 schema.methods.sellerAgreeRP = async function(reason, sellerInfo) {
   if(!sellerInfo) {
-    const ShopStoresModel = mongoose.model("shopStores");
-    const store = await ShopStoresModel.findOne({uid: this.sellerId});
-    if(!store) throwErr(404, "用户未开设店铺");
+    const UsersModel = mongoose.model("users");
+    const sellUser = await UsersModel.findOne({uid: this.sellerId});
+    if(!sellUser) throwErr(404, "用户未开设店铺");
     sellerInfo = {
-      name: storeName,
+      name: sellUser.username,
       address: address,
       mobile: mobile[0]
     };

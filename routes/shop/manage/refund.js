@@ -27,8 +27,8 @@ router
     // 获取该订单的全部退款申请记录
     const refunds = await db.ShopRefundModel.find({
       orderId: order.orderId,
-      sellerId: order.product.uid,
-      buyerId: order.uid
+      sellerId: order.sellUid,
+      buyerId: order.buyUid
     }).sort({toc: 1});
     if(refunds.length !== 0) {
       if(refunds[refunds.length - 1].succeed === null) data.refund = refunds[refunds.length - 1];

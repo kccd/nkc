@@ -7,7 +7,10 @@ block content
       .col-xs-12.col-md-12
         h3 科创商城收银台
         hr
-        h4=`商品：${data.ordersInfo.description}`
+        h4=`商品：`
+        div(style="padding:5px")
+          for title in data.ordersInfo.description
+            p!=title
            
         h4 总计：
           span.text-danger#totalPrice=data.ordersInfo.totalMoney/100

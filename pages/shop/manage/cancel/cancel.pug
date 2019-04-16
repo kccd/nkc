@@ -3,7 +3,7 @@ block shopTitle
   title 取消订单
 block content
   .container-fluid.max-width
-    .hidden#data=JSON.stringify({order: data.order, product: data.product, myStore: data.myStore})
+    .hidden#data=JSON.stringify({order: data.order, product: data.product})
     .row#app(v-if="order" v-cloak)
       .col-xs-12.col-md-6
         h4 取消订单
@@ -19,7 +19,7 @@ block content
           h5 订单状态：
             strong {{order.status}}
           h5
-            a(:href="'/shop/manage/'+myStore.storeId + '/order/detail?orderId=' + order.orderId") 订单详情
+            a(:href="'/shop/manage/'+order.sellUid + '/order/detail?orderId=' + order.orderId") 订单详情
         .form
           .form-group
             h5 请输入理由（不超过1000字节）

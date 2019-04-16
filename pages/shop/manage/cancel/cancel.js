@@ -3,7 +3,6 @@ var app = new Vue({
   data: {
     order: "",
     product: "",
-    myStore: "",
 
     error: "",
     info: "",
@@ -22,7 +21,6 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     this.order = data.order;
     this.product = data.product;
-    this.myStore = data.myStore;
   },
   methods: {
     submit: function() {
@@ -33,7 +31,7 @@ var app = new Vue({
         if(this.money >= 1 && this.money <= 50) {}
         else return this.error = "请输入正确的补偿金额";
       }
-      nkcAPI("/shop/manage/" + this.myStore.storeId + "/order/cancel", "POST", {
+      nkcAPI("/shop/manage/" + this.order.sellUid + "/order/cancel", "POST", {
         orderId: this.order.orderId,
         money: this.money,
         reason: this.reason,
@@ -42,7 +40,7 @@ var app = new Vue({
         .then(function() {
           app.info = "订单取消成功，正在前往订单列表...";
           setTimeout(function() {
-            window.location.href = "/shop/manage/" + app.myStore.storeId + "/order";
+            window.location.href = "/shop/manage/" + app.order.sellUid + "/order";
           }, 2000);
         })
         .catch(function(data) {

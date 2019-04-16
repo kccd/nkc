@@ -5,13 +5,13 @@ shelfRouter
     const {data, db} = ctx;
     const {user} = data;
     // 检测店铺信息是否已完善，如果不完善则跳转到店铺信息设置
-    const store = await db.ShopStoresModel.findOne({uid: user.uid});
-    if(store) {
-      data.dataPerfect = store.dataPerfect;
-    }
-    if(!data.dataPerfect) {
-      return ctx.redirect(`/shop/manage/${store.storeId}/info`)
-    }
+    // const store = await db.ShopStoresModel.findOne({uid: user.uid});
+    // if(store) {
+    //   data.dataPerfect = store.dataPerfect;
+    // }
+    // if(!data.dataPerfect) {
+    //   return ctx.redirect(`/shop/manage/${user.uid}/info`)
+    // }
     await next();
   })
 	.get('/', async (ctx, next) => {
@@ -45,9 +45,6 @@ shelfRouter
     } = body.post;
     const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
-    const store = await db.ShopStoresModel.findOne({uid: user.uid});
-    if(!store) ctx.throw(404, '您还未开设地摊儿');
-    const {storeId} = store;
     if(!productName) ctx.throw(400, '商品名不能为空');
     if(contentLength(productName) > 100) ctx.throw(400, '商品名不能超过100字节');
     if(!productDescription) ctx.throw(400, '商品简介不能为空');
@@ -133,7 +130,6 @@ shelfRouter
       shelfTime,
       isFreePost,
       freightPrice,     
-      storeId,
       params: paramsInfo,
       uid: user.uid,
       threadInfo: options

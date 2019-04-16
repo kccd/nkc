@@ -11,37 +11,49 @@ const shopOrdersSchema = new Schema({
     index: 1,
     required: true
   },
-  // 商铺id
-  storeId: {
-    type: String,
-    index: 1
-  },
   // 商品id
-  productId: {
-    type: String,
-    index: 1
-  },
+  // productId: {
+  //   type: String,
+  //   index: 1
+  // },
   // 规格id
-  paramId: {
-    type: String,
-    index: 1
+  // paramId: {
+  //   type: String,
+  //   index: 1
+  // },
+  // 商品规格
+  params: {
+    type: Array,
+    default: []
   },
   // 购买者uid
-  uid: {
+  buyUid: {
     type: String,
+    required: true
+  },
+  // 贩卖者udi
+  sellUid: {
+    type: String,
+    required: true
   },
   // 数量
-  count: {
-    type: Number,
-    default: 1
-  },
+  // count: {
+  //   type: Number,
+  //   default: 1
+  // },
   // 订单原始总价
-  orderOriginPrice: {
-    type: Number
+  // orderOriginPrice: {
+  //   type: Number
+  // },
+  // 订单运费
+  orderFreightPrice: {
+    type: Number,
+    default: 0
   },
-  // 订单最终总价格
+  // 订单总价格
   orderPrice: {
     type: Number,
+    default: 0
   },
   // 收货地址
   receiveAddress: {
@@ -175,63 +187,62 @@ shopOrdersSchema.virtual('certs')
 shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
   if(!o) o = {};
   let options = {
-    store: true,
-    user: true,
+    sellUser: true,
+    buyUser: true,
     product: true,
     productParam: true
   };
   o = Object.assign(options, o);
-  const ShopOrdersModel = mongoose.model('shopStores');
   const UserModel = mongoose.model('users');
   const ShopGoodsModel = mongoose.model('shopGoods');
   const ShopProductsParamsModel = mongoose.model('shopProductsParams');
-  const storeId = new Set(), storeObj = {};
-  const uid = new Set(), userObj = {};
-  const productId = new Set(), productObj = {};
-  const paramId = new Set(), productParamObj = {};
+  const sellUid = new Set(), sellUserObj = {};
+  const buyUid = new Set(), buyUserObj = {};
+  // const productId = new Set(), productObj = {};
+  // const paramId = new Set(), productParamObj = {};
   orders.map(ord =>{
-    if(o.store)
-      storeId.add(ord.storeId);
-    if(o.user)
-      uid.add(ord.uid);
-    if(o.product)
-      productId.add(ord.productId);
-    if(o.productParam)
-      paramId.add(ord.paramId)
+    if(o.sellUser)
+      sellUid.add(ord.sellUid);
+    if(o.buyUser)
+      buyUid.add(ord.buyUid);
+    // if(o.product)
+    //   productId.add(ord.productId);
+    // if(o.productParam)
+    //   paramId.add(ord.paramId)
   });
-  let stores, users, products, productParams;
-  if(o.store) {
-    stores = await ShopOrdersModel.find({storeId: {$in:[...storeId]}});
-    for(const store of stores) {
-      storeObj[store.storeId] = store;
+  let sellUsers, buyUsers, products, productParams;
+  if(o.sellUser) {
+    sellUsers = await UserModel.find({uid: {$in:[...sellUid]}});
+    for(const sellUser of sellUsers) {
+      sellUserObj[sellUser.uid] = sellUser;
     }
   }
-  if(o.user) {
-    users = await UserModel.find({uid: {$in:[...uid]}});
-    for(const user of users) {
-      userObj[user.uid] = user;
+  if(o.buyUser) {
+    buyUsers = await UserModel.find({uid: {$in:[...buyUid]}});
+    for(const buyUser of buyUsers) {
+      buyUserObj[buyUser.uid] = buyUser;
     }
   }
-  if(o.product) {
-    products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
-    products = await ShopGoodsModel.extendProductsInfo(products);
-    for(const product of products) {
-      productObj[product.productId] = product;
-    }
-  }
-  if(o.productParam) {
-    productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
-    productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
-    for(const productParam of productParams) {
-      productParamObj[productParam._id] = productParam
-    }
-  }
+  // if(o.product) {
+  //   products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
+  //   products = await ShopGoodsModel.extendProductsInfo(products);
+  //   for(const product of products) {
+  //     productObj[product.productId] = product;
+  //   }
+  // }
+  // if(o.productParam) {
+  //   productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
+  //   productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
+  //   for(const productParam of productParams) {
+  //     productParamObj[productParam._id] = productParam
+  //   }
+  // }
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
-    if(o.store) order.store = storeObj[ord.storeId];
-    if(o.user) order.user = userObj[ord.uid];
-    if(o.product) order.product = productObj[ord.productId];
-    if(o.productParam) order.productParam = productParamObj[ord.paramId];
+    if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
+    if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
+    // if(o.product) order.product = productObj[ord.productId];
+    // if(o.productParam) order.productParam = productParamObj[ord.paramId];
     return order
   }))
 };
@@ -241,7 +252,6 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
  * @param orders 由订单组成的数组
  * @param o:
  *  参数  数据类型(默认值)    介绍
- *  store:    Boolean(true) 是否拓展店铺信息
  *  product:Boolean(true)   是否拓展商品信息
  *  productParams:Boolean(true) 是否拓展商品规格信息
  * @return 拓展后，对象已不再是schema对象，故无法调用model中的方法
@@ -249,32 +259,30 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
 shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   if(!o) o = {};
   let options = {
-    store: true,
-    product: true,
-    productParam: true,
+    product: false,
+    productParam: false,
+    sellUser: true,
+    buyUser: true
   };
   o = Object.assign(options, o);
-  const ShopStoresModel = mongoose.model("shopStores");
   const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopProductsParamsModel = mongoose.model("shopProductsParams");
-  const storeId = new Set(), storeObj = {};
+  const UserModel = mongoose.model("users");
   const productId = new Set(), productObj = {};
   const paramId = new Set(), productParamObj = {};
+  const sellUid = new Set(), sellUserObj = {};
+  const buyUid = new Set(), buyUserObj = {};
   orders.map(ord => {
-    if(o.store)
-      storeId.add(ord.storeId);
     if(o.product)
       productId.add(ord.productId);
     if(o.productParam)
       paramId.add(ord.paramId)
+      if(o.sellUser)
+        sellUid.add(ord.sellUid)
+      if(o.buyUser)
+        buyUid.add(ord.buyUid)
   });
-  let stores, products, productParams;
-  if(o.store) {
-    stores = await ShopStoresModel.find({storeId: {$in:[...storeId]}});
-    for(const store of stores) {
-      storeObj[store.storeId] = store;
-    }
-  }
+  let products, productParams, sellUsers, buyUsers;
   if(o.product) {
     products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
     products = await ShopGoodsModel.extendProductsInfo(products);
@@ -289,11 +297,24 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
       productParamObj[productParam._id] = productParam
     }
   }
+  if(o.sellUser) {
+    sellUsers = await UserModel.find({uid: {$in: [...sellUid]}});
+    for(const sellUser of sellUsers) {
+      sellUserObj[sellUser.uid] = sellUser;
+    }
+  }
+  if(o.buyUser) {
+    buyUsers = await UserModel.find({uid: {$in: [...buyUid]}});
+    for(const buyUser of buyUsers) {
+      buyUserObj[buyUser.uid] = buyUser;
+    }
+  }
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
-    if(o.store) order.store = storeObj[ord.storeId];
     if(o.product) order.product = productObj[ord.productId];
     if(o.productParam) order.productParam = productParamObj[ord.paramId];
+    if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
+    if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
     return order
   }))
 };
@@ -310,25 +331,28 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
 shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
   const ShopOrdersModel = mongoose.model('shopOrders');
   orders = await ShopOrdersModel.storeExtendOrdersInfo(orders);
-  let title = '';
+  let titles = [];
   const ordersId = [];
   let totalMoney = 0;
-  let needAdd = true;
   for(const o of orders) {
-    if(needAdd) {
-      const old = title;
-      title += `${o.count}*${o.product.name}(${o.productParam.name.join('+ ')}) `;
-      if(title.length >= 150) {
-        needAdd = false;
-        title = old + '...';
+    for(const c of o.params){
+      let title = "";
+      let needAdd = true;
+      if(needAdd) {
+        const old = title;
+        title += `${c.count}*${c.product.name}(${c.productParam.name.join('+ ')}) `;
+        if(title.length >= 150) {
+          needAdd = false;
+          title = old + '...';
+        }
       }
+      titles.push(title)
     }
     ordersId.push(o.orderId);
-    totalMoney += o.orderPrice;
+    totalMoney += (o.orderPrice + o.orderFreightPrice);
   }
   return {
-    title,
-    description: title,
+    description: titles,
     totalMoney,
     ordersId
   }
@@ -461,13 +485,13 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
 shopOrdersSchema.methods.extendCerts = async function(type) {
   const ShopCertModel = mongoose.model("shopCerts");
   const ShopGoodsModel = mongoose.model("shopGoods");
-  const {orderId, productId, uid} = this;
+  const {orderId, productId, buyUid} = this;
   const product = await ShopGoodsModel.findById(productId);
   const c = await ShopCertModel.find({orderId, deleted: false}).sort({toc: 1});
   const certs = [];
   for(cert of c) {
     if(type === "buyer") {
-      if(cert.uid === uid) certs.push(cert);
+      if(cert.uid === buyUid) certs.push(cert);
     } else if(type === "seller") {
       if(cert.uid === product.uid) certs.push(cert);
     } else {
@@ -493,7 +517,7 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
     status: "B_GIVE_UP_ORDER",
-    buyerId: this.uid,
+    buyerId: this.buyUid,
     sellerId: product.uid,
     orderId: this.orderId,
     logs: [
@@ -542,7 +566,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
     status: "S_GIVE_UP_ORDER",
-    buyerId: this.uid,
+    buyerId: this.buyUid,
     sellerId: product.uid,
     orderId: this.orderId,
     logs: [
@@ -560,7 +584,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     const refundRecord = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
-      to: order.uid,
+      to: order.buyUid,
       type: "refund",
       num: order.orderPrice,
       description,
@@ -569,7 +593,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     const record = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: product.uid,
-      to: order.uid,
+      to: order.buyUid,
       description,
       type: "sellerCancelOrder",
       num: money,

@@ -43,10 +43,10 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     this.refund = data.refund;
     this.refunds = data.refunds;
-    this.myStore = data.myStore;
-    this.storeName = this.myStore.storeName;
-    this.address = this.myStore.address;
-    this.mobile = this.myStore.mobile[0];
+    // this.myStore = data.myStore;
+    // this.storeName = this.myStore.storeName;
+    // this.address = this.myStore.address;
+    // this.mobile = this.myStore.mobile[0];
     this.order = data.order;
   },
   methods: {
@@ -117,7 +117,7 @@ var app = new Vue({
     sellerPost: function() {
       var type;
       var agree = this.agree;
-      var method = "POST", url = "/shop/manage/" + this.myStore.storeId + "/order/refund";
+      var method = "POST", url = "/shop/manage/" + this.refund.sellerId + "/order/refund";
       if(agree === '' && this.refund.status !== "P_APPLY_RM") return this.error = "请选择同意或者不同意";
       if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRM": "disagreeRM";

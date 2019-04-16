@@ -245,16 +245,16 @@ function submitToShelf() {
 /**
  * 商品上架
  */
-function productToShelf(storeId) {
+function productToShelf(uid) {
   try{
     var productInfo = submitToShelf();
   }catch(err) {
     return screenTopWarning(err);
   }
-  nkcAPI('/shop/manage/'+storeId+'/shelf', "POST" ,{post:productInfo})
+  nkcAPI('/shop/manage/'+uid+'/shelf', "POST" ,{post:productInfo})
   .then(function(data) {
     screenTopAlert("上架成功");
-    var targetUrl = '/shop/manage/' + storeId + '/goodslist';
+    var targetUrl = '/shop/manage/' + uid + '/goodslist';
     window.location.href = targetUrl;
   })
   .catch(function(data){

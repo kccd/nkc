@@ -10,11 +10,11 @@ goodslistRouter
 		const {data, db, params, query, nkcModules} = ctx;
 		const {page = 0} = query;
 		let {productStatus} = query;
-		data.productStatus = productStatus;
-    const storeId = params.account;
+    data.productStatus = productStatus;
+    const {user} = data;
     // 构造查询条件
 		let searchMap = {
-			storeId : storeId
+			uid : user.uid
     }
     if(!productStatus || productStatus == "insale") {
       searchMap.productStatus = "insale"

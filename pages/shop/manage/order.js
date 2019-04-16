@@ -6,13 +6,13 @@ function test() {
  * 弹出窗口
  * 确认发货
  * @param {String} orderId 订单号
- * @param {String} storeId 店铺Id
+ * @param {String} sellUid 卖家uId
  */
 function sendGoods() {
-  var storeId = $("#newstoreid").val();
+  var sellUid = $("#newstoreid").val();
   var orderId = $("#neworderid").val();
   var trackName = $("#trackList").val();
-  if(!orderId || !storeId) {
+  if(!orderId || !sellUid) {
     $("#sendGoodsModal").modal("show");
     return screenTopWarning("请重新点击发货");
   }
@@ -24,7 +24,7 @@ function sendGoods() {
     trackNumber: trackNumber,
     trackName: trackName
   }
-  nkcAPI('/shop/manage/'+storeId+'/order/sendGoods', "PATCH", {post: para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/sendGoods', "PATCH", {post: para})
   .then(function(data) {
     screenTopAlert("订单发货成功");
     $("#sendGoodsModal").modal("hide");
@@ -38,12 +38,12 @@ function sendGoods() {
 /**
  * 打开弹窗，填写运单号
  * @param {String} orderId  订单号
- * @param {String} storeId  店铺Id
+ * @param {String} sellUid  卖家uid
  * 
  */
-function openSendGoodsModal(storeId, orderId) {
+function openSendGoodsModal(sellUid, orderId) {
   $("#sendGoodsModal").modal("show");
-  $("#newstoreid").val(storeId);
+  $("#newstoreid").val(sellUid);
   $("#neworderid").val(orderId);
 }
 
@@ -54,7 +54,7 @@ function openSendGoodsModal(storeId, orderId) {
 function editOrder() {
   // 获取订单号与店铺ID
   var orderId = $("#eoorderid").val();
-  var storeId = $("#eostoreid").val();
+  var sellUid = $("#eostoreid").val();
   // 获取修改后的商品总价和运费
   var productPrice = $("#eoPrice").val();
   var price = Number(productPrice);
@@ -65,7 +65,7 @@ function editOrder() {
     orderId: orderId
   }
   // 向服务器发起修改请求
-  nkcAPI('/shop/manage/'+storeId+'/order/editOrder', "PATCH", {post:para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/editOrder', "PATCH", {post:para})
   .then(function(data) {
     screenTopAlert("价格修改成功")
     $("#editOrderModal").modal("hide");
@@ -78,20 +78,20 @@ function editOrder() {
 
 /**
  * 打开弹窗，修改商品价格
- * @param {String} storeId 店铺Id
+ * @param {String} sellUid 卖家Uid
  * @param {String} orderId 订单Id
  */
-function openEditOrderModal(storeId, orderId) {
+function openEditOrderModal(sellUid, orderId) {
   $("#editOrderModal").modal("show");
-  $("#eostoreid").val(storeId);
+  $("#eostoreid").val(sellUid);
   $("#eoorderid").val(orderId);
 }
 
 /**
  * 查看物流
  */
-function visitLogisticsInfo(storeId,orderId) {
-  var targetUrl = '/shop/manage/'+storeId+'/order/logositics?orderId='+orderId;
+function visitLogisticsInfo(sellUid,orderId) {
+  var targetUrl = '/shop/manage/'+sellUid+'/order/logositics?orderId='+orderId;
   window.location.href = targetUrl;
 }
 
@@ -110,9 +110,9 @@ function editTrackNum() {
  /**
   * 保存运单号修改
   */
-function saveTrackNum(storeId,orderId) {
+function saveTrackNum(sellUid,orderId) {
   var trackNumber = $("#trackNumVal").val().trim();
-  nkcAPI('/shop/manage/'+storeId+'/order/editOrderTrackNumber', "PATCH", {orderId: orderId, trackNumber: trackNumber})
+  nkcAPI('/shop/manage/'+sellUid+'/order/editOrderTrackNumber', "PATCH", {orderId: orderId, trackNumber: trackNumber})
   .then(function(data) {
     screenTopAlert("修改成功");
     $("#saveTrackNum").css("display", "none");

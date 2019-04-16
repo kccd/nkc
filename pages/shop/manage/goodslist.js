@@ -8,11 +8,11 @@ function editProductParamInfo() {
 /**
  * 立即上架
  */
-function shelfRightNow(storeId, productId) {
-  nkcAPI('/shop/manage/'+storeId+'/goodslist/shelfRightNow', "PATCH", {productId:productId})
+function shelfRightNow(uid, productId) {
+  nkcAPI('/shop/manage/'+uid+'/goodslist/shelfRightNow', "PATCH", {productId:productId})
   .then(function() {
     screenTopAlert("上架成功");
-    var targetUrl = '/shop/manage/'+storeId+'/goodslist';
+    var targetUrl = '/shop/manage/'+uid+'/goodslist';
     window.location.href = targetUrl;
   })
   .catch(function(data) {
@@ -23,10 +23,10 @@ function shelfRightNow(storeId, productId) {
 /**
  * 商品停售
  */
-function stopSale(storeId,productId) {
+function stopSale(uid,productId) {
   var sureStopSale = confirm("是否确认停售该商品?");
   if(sureStopSale){
-    nkcAPI('/shop/manage/'+storeId+'/goodslist/productStopSale', "PATCH", {productId: productId})
+    nkcAPI('/shop/manage/'+uid+'/goodslist/productStopSale', "PATCH", {productId: productId})
     .then(function(data) {
       screenTopAlert("商品已停售");
       window.location.reload();
@@ -40,10 +40,10 @@ function stopSale(storeId,productId) {
 /**
  * 商品复售
  */
-function goonSale(storeId,productId) {
+function goonSale(uid,productId) {
   var sureGoonSale = confirm("是否确认复售该商品?");
   if(sureGoonSale) {
-    nkcAPI('/shop/manage/'+storeId+'/goodslist/productGoonSale', "PATCH", {productId: productId})
+    nkcAPI('/shop/manage/'+uid+'/goodslist/productGoonSale', "PATCH", {productId: productId})
     .then(function(data) {
       screenTopAlert("商品已复售");
       window.location.reload();
@@ -69,7 +69,7 @@ function editParam(paraId) {
 /**
  * 提交修改规格信息
  */
-function paramToEdit(storeId,paraId) {
+function paramToEdit(uid,paraId) {
   // 获取要修改的规格信息
   var originPrice = Number($("#originPrice"+paraId).text());
   var paramPrice = Number($("#paramPrice"+paraId).text());
@@ -94,7 +94,7 @@ function paramToEdit(storeId,paraId) {
     price: paramPrice.toFixed(2)*100,
     stocksTotal: stocksTotal.toFixed(0)*1
   }
-  nkcAPI('/shop/manage/'+storeId+'/goodslist/editParam', "PATCH", {obj:obj})
+  nkcAPI('/shop/manage/'+uid+'/goodslist/editParam', "PATCH", {obj:obj})
   .then(function(data) {
     screenTopAlert("修改成功");
     $("#save"+paraId).css("display", "none");

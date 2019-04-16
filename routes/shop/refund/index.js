@@ -11,7 +11,7 @@ router
     // 查询订单 判断权限
     let order = await db.ShopOrdersModel.findById(orderId);
     const orderDB = order;
-    if(order.uid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
+    if(order.buyUid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
     const {refundStatus, orderStatus} = order;
@@ -40,8 +40,8 @@ router
       const r = {
         _id: await db.SettingModel.operateSystemID("shopRefunds", 1),
         toc: time,
-        buyerId: order.uid,
-        sellerId: order.product.uid,
+        buyerId: order.buyUid,
+        sellerId: order.sellUid,
         orderId: order.orderId,
         root
       };

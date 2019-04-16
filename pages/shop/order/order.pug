@@ -28,13 +28,11 @@ block shopAccountContent
         thead
           tr(style="background-color:silver")
             th(style="width:200px") 商品名称
-            //- th 属性
-            th 商家
-            th 交易状态
+            th 属性
             th 商品单价
             th 数量
-            th 运费
-            th 实际收付款
+            th 实际付款
+            th 交易状态
             th 交易操作
         tbody
           for order in data.orders
@@ -45,47 +43,46 @@ block shopAccountContent
                   span=order.orderId
                   span(style="margin-left:20px;font-weight:800") 创建时间:&nbsp;
                   span=order.orderToc.toLocaleString()
-            //- tr(style="border-bottom:20px solid white;")
-            tr(style="min-height:100px")
-              //- td=order.orderId
-              //- td=order.orderToc.toLocaleString()
-              td
-                //- img(src=`/r/${order.product.imgMaster}` style="width:100px;height:100px")
-                span
-                  a(href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
-                span(style="font-size:18px;color:red;font-weight:800;margin-left:10px")=order.productParam.name
-              //- td=order.productParam.name
-              td
-                a(href=`/shop/store/${order.product.storeId}`)!=`${order.product.store.storeName}`
-              td= order.status
-                | &nbsp;  
-                a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
-              td #{numToFloatTwo(order.productParam.price)}
-              td=order.count
-              td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
-              //- td=order.user.username
-              td #{numToFloatTwo(order.orderPrice)}
-              td 
-                if order.orderStatus !== "finish" && order.closeStatus !== true
-                  if order.orderStatus === "unCost"
-                    a(href=`/shop/order/${order.orderId}/refund`) 取消订单
-                  else 
-                    a(href=`/shop/order/${order.orderId}/refund`) 申请退款
-                if order.orderStatus == "unCost"&& order.closeStatus !== true
-                  p
-                    a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
-                if order.orderStatus == "unSign" || order.orderStatus == "finish"
-                  p
-                    button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
-                if order.refundStatus == "ing"
-                  p
-                    a(href=`/shop/order/${order.orderId}/refund`) 退款详情
-                if order.orderStatus == "unSign" && order.closeStatus !== true
-                  p
-                    button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
-                if order.orderStatus == "finish"
-                  p
-                    button(onclick=`joinToDiscuss(${order.product.tid})`) 参与讨论
+                  span(style="margin-left:20px;font-weight:800") 卖家：&nbsp;
+                  span
+                    a(href=`/u/${order.sellUid}`)!=`${order.sellUser.username}`
+            for para,key in order.params
+              tr(style="min-height:100px")
+                td
+                  div(style="float:left")
+                    img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px")
+                  div
+                    a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
+                td=para.productParam.name
+                td #{numToFloatTwo(para.productParam.price)}
+                td=para.count
+                if key == 0
+                  td(rowspan=`${order.params.length}`) #{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
+                  td(rowspan=`${order.params.length}`)= order.status
+                    | &nbsp;  
+                    a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
+                  //- td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
+                  td(rowspan=`${order.params.length}`) 
+                    if order.orderStatus !== "finish" && order.closeStatus !== true
+                      if order.orderStatus === "unCost"
+                        a(href=`/shop/order/${order.orderId}/refund`) 取消订单
+                      else 
+                        a(href=`/shop/order/${order.orderId}/refund`) 申请退款
+                    if order.orderStatus == "unCost"&& order.closeStatus !== true
+                      p
+                        a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
+                    if order.orderStatus == "unSign" || order.orderStatus == "finish"
+                      p
+                        button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
+                    if order.refundStatus == "ing"
+                      p
+                        a(href=`/shop/order/${order.orderId}/refund`) 退款详情
+                    if order.orderStatus == "unSign" && order.closeStatus !== true
+                      p
+                        button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
+                    if order.orderStatus == "finish"
+                      p
+                        //- button(onclick=`joinToDiscuss(${order.product.tid})`) 参与讨论
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
 block shopScripts
