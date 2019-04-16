@@ -29,7 +29,9 @@ const favicon = require('koa-favicon');
 
 const {stayLogin, init, body, urlRewrite, permission, logger} = require('./middlewares');
 
-app.keys = [settings.cookie.secret];
+const cookieConfig = require("./config/cookie");
+
+app.keys = [cookieConfig.secret];
 app
   // 限制单位时间相同ip（60s）请求数
   .use(rateLimit({

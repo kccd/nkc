@@ -523,5 +523,4 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
 	}
   return freightPrice;
 }
-
 module.exports = fn;

@@ -1,7 +1,7 @@
 let io;
 require('colors');
 const moment = require('moment');
-const settings = require('../../../settings');
+const cookieConfig = require("../../../config/cookie");
 const db = require('../../../dataModels');
 const Cookies = require('cookies-string-parse');
 const util = require('../../util');
@@ -17,7 +17,7 @@ const fn = async (i) => {
   io.use(async (socket, next) => {
     const {handshake} = socket;
     const cookies = new Cookies(handshake.headers.cookie, {
-      keys: [settings.cookie.secret]
+      keys: [cookieConfig.secret]
     });
     const userInfo = cookies.get('userInfo', {
       signed: true

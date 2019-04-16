@@ -1,7 +1,8 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
+const apiFunction = require('../nkcModules/apiFunction');
+const {getQueryObj, obtainPureText} = apiFunction;
 const threadSchema = new Schema({
   tid: {
     type: String,
@@ -492,6 +493,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     posts.map(post => {
       if(o.htmlToText) {
         post.c = obtainPureText(post.c, true, o.count);
+        console.log(obtainPureText)
       }
       postsObj[post.pid] = post;
       if(o.firstPostUser || o.lastPostUser) {
