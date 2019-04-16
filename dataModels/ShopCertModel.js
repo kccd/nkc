@@ -26,7 +26,7 @@ const schema = new Schema({
   },
   type: {
     type: String,
-    reuqired: true,
+    required: true,
     index: 1
   },
   // 订单ID

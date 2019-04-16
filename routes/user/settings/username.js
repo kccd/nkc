@@ -31,6 +31,7 @@ router
 			if(operation.count !== -1 && operation.count <= modifyUsernameCount) {
 				ctx.throw(400, `每天仅有${operation.count}次机会修改用户名，请明天再试`);
 			}
+			user.kcb = await db.UserModel.updateUserKcb(user.kcb);
 			if(user.kcb + operation.num < 0) ctx.throw(400, `科创币不足，修改用户名需花费${-1*operation.num}个科创币`);
 			/*const defaultUser = await db.UserModel.findOne({uid: defaultUid});
 			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认账户');*/

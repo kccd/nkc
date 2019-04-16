@@ -231,7 +231,11 @@ module.exports = {
 			GET: 'visitScoreLogs'
 		},
     kcb: {
-		  GET: 'visitExperimentalKcb'
+		  GET: 'visitExperimentalKcb',
+      diff: {
+		    GET: "visitExperimentalDiffKcb",
+        POST: "resetExperimentalDiffKcb"
+      }
     },
     xsf: {
 		  GET: 'visitExperimentalXsf'

@@ -104,7 +104,7 @@ module.exports = async (ctx, next) => {
       }
       // 根据用户的角色获取权限
       await Promise.all(user.certs.map(async cert => {
-        role = await db.RoleModel.extendRole(cert);
+        const role = await db.RoleModel.extendRole(cert);
         if(!role) return;
         userRoles.push(role);
         for(let operationId of role.operationsId) {

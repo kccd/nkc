@@ -16,21 +16,11 @@ block content
       include ../nav
       .col-xs-12.col-md-12
         .e-panel
-          .radiobox(style='display: inline-block;margin-right: 1rem;')
-            span 今日
-            input(type='radio' name='statusType' checked=true data-type='today')
-          .radiobox(style='display: inline-block;margin-right: 1rem;')
-            span 本月
-            input(type='radio' name='statusType' data-type='month')
-          .radiobox(style='display: inline-block;margin-right: 1rem;')
-            span 今年
-            input(type='radio' name='statusType' data-type='year')
-          .radiobox(style='display: inline-block;margin-right: 1rem;')
-            span 全部
-            input(type='radio' name='statusType' data-type='all')
-          .radiobox(style='display: inline-block;margin-right: 1rem;')
-            span 自定义
-            input(type='radio' name='statusType' data-type='custom')
+          button.btn.btn-default(onclick="getResults({type: 'today'})") 今日
+          button.btn.btn-default(onclick="getResults({type: 'month'})") 本月
+          button.btn.btn-default(onclick="getResults({type: 'year'})") 今年
+          button.btn.btn-default(onclick="getResults({type: 'all'})") 全部
+          button.btn.btn-default(onclick="getResults({type: 'custom'})") 自定义
           .form-inline(style='margin: 1rem 0rem;display:none;')#custom
             .form-group
               label 开始时间

@@ -36,10 +36,7 @@ luckRouter
     if(symbol === 0) floatRange = floatRange*-1;
     let kcb = result.kcb + result.kcb*floatRange*0.01;
     kcb = Math.round(kcb);
-    const oldKcb = user.kcb;
-    user.kcb += kcb;
-    await user.save();
-    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*kcb}});
+
     const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
     const record = db.KcbsRecordModel({
       _id,
@@ -51,15 +48,10 @@ luckRouter
       port: ctx.port,
       num: kcb
     });
-    try {
-      await record.save();
-    } catch(err) {
-      // await db.SettingModel.operateSystemID('kcbsRecords', -1);
-      await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': kcb}});
-      user.kcb = oldKcb;
-      await user.save();
-      throw err;
-    }
+    await record.save();
+
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
+
     data.kcb = kcb;
     data.result = result;
     await user.generalSettings.update({'lotterySettings.status': false});

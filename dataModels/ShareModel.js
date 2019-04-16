@@ -143,12 +143,18 @@ shareSchema.statics.ensureEffective = async function(token, id) {
     shareLimitTime = forum.shareLimitTime;
   } else if(tokenType === 'thread') {
     const thread = await ThreadModel.findOnly({tid: targetId});
-    const forum = await ForumModel.findOnly({fid: thread.fid});
-    shareLimitTime = forum.shareLimitTime;
+    const forums = await ForumModel.find({fid: {$in: thread.mainForumsId}});
+    let shareLimitTime = 0;
+    for(const forum of forums) {
+      if(shareLimitTime > forum.shareLimitTime) shareLimitTime = forum.shareLimitTime;
+    }
   } else if(tokenType === 'post') {
     const post = await PostModel.findOnly({tid: targetId});
-    const forum = await ForumModel.findOnly({fid: post.fid});
-    shareLimitTime = forum.shareLimitTime;
+    const forums = await ForumModel.find({fid: {$in: post.mainForumsId}});
+    let shareLimitTime = 0;
+    for(const forum of forums) {
+      if(shareLimitTime > forum.shareLimitTime) shareLimitTime = forum.shareLimitTime;
+    }
   } else if(tokenType === 'user') {
     await UserModel.findOnly({uid: targetId});
     const shareLimit = await ShareLimitModel.findOne({shareType: 'user'});

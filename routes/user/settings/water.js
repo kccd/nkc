@@ -14,6 +14,7 @@ waterRouter
     // 获取该项服务所需科创币
     /*const waterPayType = await db.TypesOfScoreChangeModel.findOnly({_id: "waterPay"});
     data.kcbPayForWater = parseInt(waterPayType.change*-1);*/
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
     const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
     data.kcbPayForWater = parseInt(waterPayType.num*-1);
     const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});
@@ -48,6 +49,7 @@ waterRouter
       // 验证科创币
       // const waterPayType = await db.TypesOfScoreChangeModel.findOne({_id: "waterPay"});
       const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
+      user.kcb = await db.UserModel.updateUserKcb(user.uid);
       if(waterPayType && user.kcb < parseInt(waterPayType.num*-1)){
         ctx.throw(400,"您的科创币不足"+parseInt(waterPayType.num*-1))
       }
