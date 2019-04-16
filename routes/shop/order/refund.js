@@ -2,7 +2,21 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .use('/', async(ctx, next) => {
-    if(ctx.data.user.uid !== ctx.data.order.buyUid) ctx.throw(403, "您没有权限操作别人的订单");
+    const {data, query} = ctx;
+    const {id} = query;
+    const {user, order} = data;
+    if(user.uid !== order.buyUid) ctx.throw(403, "您没有权限操作别人的订单");
+    if(id) {
+      let param;
+      for(const p of order.params) {
+        if(p._id === Number(id)) {
+          param = p;
+          break;
+        }
+      }
+      if(!param) ctx.throw(400, `订单中未包含ID为【${id}】的商品规格`);
+      data.param = param;
+    }
     await next();
   })
   .get('/', async(ctx, next) => {

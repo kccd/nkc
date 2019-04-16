@@ -189,8 +189,8 @@ const shopGoodsSchema = new Schema({
   // count
   // }
   buyRecord: {
-    type: Array,
-    default: []
+    type: Schema.Types.Mixed,
+    default: {}
   }
 }, {
   collection: 'shopGoods'
