@@ -4,7 +4,7 @@ const func = async (socket, next) => {
   // 从cookie中获取用户信息
   const {handshake, NKC} = socket;
   const {db, data} = NKC;
-  let userOperationsId = [], userRoles = [], userGrade = [], user;
+  let userOperationsId = [], userRoles = [], userGrade, user;
   const cookies = new Cookies(handshake.headers.cookie, {
     keys: [cookieConfig.secret]
   });
@@ -39,6 +39,10 @@ const func = async (socket, next) => {
     if(user.certs.includes("banned")) {
       user.certs = ["banned"];
     }
+    userGrade = await user.extendGrade();
+    if(userGrade) {
+      userOperationsId = userOperationsId.concat(userGrade.operationsId);
+    }
     await Promise.all(user.certs.map(async cert => {
       const role = await db.RoleModel.extendRole(cert);
       if(!role) return;
@@ -49,8 +53,11 @@ const func = async (socket, next) => {
         }
       }
     }));
-
   }
+  data.userOperationsId = userOperationsId;
+  data.userGrade = userGrade;
+  data.userRoles = userRoles;
+  data.user = user;
   await next();
 };
 module.exports = func;

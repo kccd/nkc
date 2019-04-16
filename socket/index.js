@@ -8,21 +8,26 @@ const socketIoRedis = require('socket.io-redis');
 const {init, auth} = require("./middlewares");
 
 async function createSocketServer(server) {
-  const io = socketIo(server, socketConfig);
-  io.on("error", (err) => {
-    console.log(`${err.message || err}.red`);
-  });
-  // 中间处理
-  io.use(init);
-  io.use(auth);
-  // 多进程适配
-  io.adapter(socketIoRedis({ host: redisConfig.address, port: redisConfig.port}));
-  // 多个socket连接类型
-  for(const name in namespaces) {
-    if(!namespaces.hasOwnProperty(name)) continue;
-    const namespace = io.of(`/${name}`);
-    await namespaces[name](namespace);
+  try {
+    const io = socketIo(server, socketConfig);
+    io.on("error", (err) => {
+      throw err;
+    });
+    // 中间处理
+    io.use(init);
+    io.use(auth);
+    // 多进程适配
+    io.adapter(socketIoRedis({ host: redisConfig.address, port: redisConfig.port}));
+    // 多个socket连接类型
+    for(const name in namespaces) {
+      if(!namespaces.hasOwnProperty(name)) continue;
+      const namespace = io.of(`/${name}`);
+      await namespaces[name](namespace);
+    }
+    global.NKC.io = io;
+  } catch(err) {
+    console.log(`${err.message || err}`.red);
   }
-  global.NKC.io = io;
+
 }
 module.exports = createSocketServer;

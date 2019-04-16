@@ -9,8 +9,7 @@ const func = async (socket, next) => {
     settings,
     tools,
     nkcModules,
-    data: {},
-    state: {}
+    data: {}
   };
   await next();
 };
