@@ -83,6 +83,9 @@ block shopAccountContent
                     if order.orderStatus == "finish"
                       p
                         //- button(onclick=`joinToDiscuss(${order.product.tid})`) 参与讨论
+            if order.buyMessage
+              tr
+                td(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" colspan="7")!=`我的留言： ${order.buyMessage}`
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
 block shopScripts

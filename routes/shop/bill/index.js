@@ -69,9 +69,9 @@ router
       }
     }
     // 检测限购
-    // for(let n in newCartData) {
-    //   newCartData[n].carts = await db.ShopGoodsModel.checkOutPurchaseLimit(newCartData[n].carts, user.uid);
-    // }
+    for(let n in newCartData) {
+      newCartData[n].carts = await db.ShopGoodsModel.checkOutPurchaseLimit(newCartData[n].carts, user.uid);
+    }
     data.newCartData = newCartData;
     // 计算账单总价格
     // 取出全部收货地址

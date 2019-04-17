@@ -113,6 +113,16 @@ orderRouter
 		ctx.template = "/shop/manage/logositics.pug";
 		await next();
 	})
+	// 修改订单卖家备注
+	.patch('/editSellMessage', async (ctx, next) => {
+		const {data, body, query, db} = ctx;
+		const {sellMessage, orderId} = body;
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "未找到该订单");
+		if(sellMessage.length == 0) ctx.throw(400, "卖家备注不可为空");
+		await order.update({$set: {"sellMessage":sellMessage}});
+		await next();
+	})
   .use("/cancel", cancelRouter.routes(), cancelRouter.allowedMethods())
   .use("/refund", refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = orderRouter;

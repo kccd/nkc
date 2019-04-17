@@ -94,8 +94,21 @@ router
       for(let cart of post[bill].carts) {
         if(Number(cart.count) > Number(cart.productParam.stocksSurplus)) ctx.throw(400, `${cart.product.name}+${cart.productParam.name}库存不足`);
       }
+      const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
       // 添加购买记录
       for(let cart of post[bill].carts) {
+        let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
+        let shopCost = db.ShopCostRecordModel({
+          costId,
+          orderId,
+          productId: cart.productId,
+          productParamId: cart.productParamId,
+          count: cart.count,
+          uid: cart.uid,
+          freightPrice: cart.freightPrice,
+          productPrice: cart.productPrice,
+        })
+        await shopCost.save();
         let buyProduct = await db.ShopGoodsModel.findOne({productId:cart.productId});
         let buyRecord = buyProduct.buyRecord;
         if(buyRecord[user.uid]){
@@ -105,14 +118,9 @@ router
             count: cart.count
           }
         }
-        await buyProduct.update({$set: {buyRecord: buyRecord}})
+        await buyProduct.update({$set: {buyRecord: buyRecord}});
+        // 清除购物车
       }
-      // let stockCostMethod = productParam.product.stockCostMethod;
-      // let stocksSurplus = productParam.stocksSurplus;
-      // if(Number(bill.productCount) > Number(stocksSurplus)) ctx.throw(400, "库存不足");
-      const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
-      // 计算邮费
-      // let freightPrice = await nkcModules.apiFunction.calculateFreightPrice(productParam.product.freightPrice, bill.productCount, productParam.product.isFreePost)
       const order = db.ShopOrdersModel({
         orderFreightPrice: post[bill].maxFreightPrice,
         orderId: orderId,
@@ -121,6 +129,7 @@ router
         receiveMobile: receiveMobile,
         sellUid: post[bill].user.uid,
         params: post[bill].carts,
+        buyMessage: post[bill].message,
         buyUid: user.uid,
         count: bill.productCount,
         orderPrice: post[bill].productPrice
@@ -128,10 +137,6 @@ router
       await order.save();
       //减库存
       await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
-      // await db.ShopCertModel.update({_id: paramCert[productParam._id]}, {$set: {
-      //   orderId: orderId,
-      //   deletable: false
-      // }});
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');
