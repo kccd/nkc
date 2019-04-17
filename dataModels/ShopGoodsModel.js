@@ -190,7 +190,7 @@ const shopGoodsSchema = new Schema({
   // }
   buyRecord: {
     type: Schema.Types.Mixed,
-    default: {}
+    default: null
   }
 }, {
   collection: 'shopGoods'
@@ -273,6 +273,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   }
   return await Promise.all(products.map(p => {
     const product = p.toObject();
+    product.buyRecord = p.buyRecord;
     if(o.user) product.user = userObj[p.uid];
     if(o.dealInfo) product.dealInfo = dealInfoObj[p.uid];
     if(o.post) {
@@ -322,23 +323,7 @@ shopGoodsSchema.statics.checkOutPurchaseLimit = async (bills, uid) => {
   const ShopOrdersModel = mongoose.model('shopOrders');
   const productId = new Set();
   const countObj = {}, productObj = {};
-  // console.log(bills)
-  // bills.map(b => {
-  //   productId.add(b.productId)
-  // });
-  // // 在订单中计算每种商品得购买数量
-  // let counts = await ShopOrdersModel.aggregate([
-  //   {$match: {productId:{$in:[...productId]}, uid}},
-  //   {$group: {_id:"$productId", count:{$sum:1}}}
-  // ]);
-  // for(const count of counts) {
-  //   countObj[count._id] = count;
-  // }
-  // // 取出每种规格的原商品
-  // let products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
-  // for(const product of products) {
-  //   productObj[product.productId] = product;
-  // }
+
   return await Promise.all(bills.map(b => {
     // 已经购买的数量
     let alreadyBuyCount = 0;

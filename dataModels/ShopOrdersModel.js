@@ -26,6 +26,11 @@ const shopOrdersSchema = new Schema({
     type: Array,
     default: []
   },
+  // 购买快照(不可调用，不可修改，只用来追溯查看)
+  snapshot: {
+    type: Array,
+    default: []
+  },
   // 购买者uid
   buyUid: {
     type: String,
@@ -117,6 +122,16 @@ const shopOrdersSchema = new Schema({
     type: String,
     default: "",
     index: 1
+  },
+  // 买家留言
+  buyMessage: {
+    type: String,
+    default: ""
+  },
+  // 卖家备注
+  sellMessage: {
+    type: String,
+    default: ""
   },
   /**
    * 退款状态

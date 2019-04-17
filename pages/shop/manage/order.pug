@@ -45,17 +45,41 @@ block name
                     a(href=`/u/${order.buyUid}`)!=`${order.buyUser.username}`
             for para,key in order.params
               tr(style="min-height:100px")
-                td(style="display:flex")
-                  img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
-                  a(style="font-size:12px" href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
+                td
+                  div(style="float:left;margin-right:5px")
+                    img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
+                  div
+                    a(style="font-size:12px" href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
                 td=para.productParam.name
-                td #{numToFloatTwo(para.productParam.price)}
-                td=para.count
+                td
+                  p
+                    span(id=`productSinglePrice${para._id}`) #{numToFloatTwo(para.productParam.price)}
+                    span(id=`productSingleDiff${para._id}` style="display:none") 0
+                    span 
+                      a(id=`editPriceBtn${para._id}` style="cursor:pointer" onclick=`editProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para._id})`) 修改
+                      a(id=`savePriceBtn${para._id}` style="cursor:pointer;display:none" onclick=`saveProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para._id})`) 保存
+                  p(id=`productSinglePriceDom${para._id}` style="display:none")
+                    span 折扣：
+                    span 
+                      input(id=`productSinglePriceValue${para._id}` type="text" placeholder="10~999" style="width:20%")
+                    span %&nbsp;&nbsp;
+                    span 
+                    span(id=`productSinglePriceResult${para._id}`) #{numToFloatTwo(para.productParam.price)}
+                td
+                  span(id=`productSingleCount${para._id}`)!=para.count
                 if key == 0
                   td(rowspan=`${order.params.length}`)  
-                    p 商品总价：#{numToFloatTwo(order.orderPrice)}
-                    p 运费：#{numToFloatTwo(order.orderFreightPrice)}
-                    p 总计：#{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
+                    p 
+                      span 商品总价：
+                      span(id=`productTotalPrice${order.orderId}`) #{numToFloatTwo(order.orderPrice)}
+                    p 
+                      span 运费：
+                      span(id=`productFreightPrice${order.orderId}`) #{numToFloatTwo(order.orderFreightPrice)}
+                      span
+                        a(onclick=`editOrderFreightPrice(${order.sellUid}, ${order.orderId})`) 修改
+                    p 
+                      span 总计：
+                      span(id=`orderTotalPrice${order.orderId}`) #{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
                   td(rowspan=`${order.params.length}`)= order.status  
                     if order.refundStatus === "ing"
                       span &nbsp;
@@ -67,7 +91,7 @@ block name
                       a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
                     if order.orderStatus == "unCost" && !order.closeStatus
                       p
-                        button(onclick=`openEditOrderModal(${data.user.uid}, ${order.orderId})`) 修改订单
+                        button(onclick=`openEditOrderModal(${data.user.uid}, ${order.orderId})`) 修改价格
                     if order.refundStatus == "ing"
                       p
                         a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情
@@ -78,27 +102,17 @@ block name
                       p
                         button(onclick=`openSendGoodsModal(${data.user.uid}, ${order.orderId})`) 发货
                         //- button(onclick=`test()`) 发货
+            if order.buyMessage
+              tr
+                td(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" colspan="7")!=`买家留言： ${order.buyMessage}`
+            //- if order.sellMessage
+            tr
+              td 卖家备注：
+              td(id=`sellMessage${order.orderId}` style="font-size: 12px;background-color: #eafff0;" colspan="5" contenteditable=true)!=`${order.sellMessage}`
+              td 
+                button(onclick=`editSellMessage(${order.sellUid},${order.orderId})`) 保存备注
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
-      include ../../interface_navigation_paging
-
-  #editOrderModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
-    .modal-dialog(role='document')
-      .modal-content
-        .modal-header
-          button.close(type='button', data-dismiss='modal', aria-label='Close')
-            span(aria-hidden='true') ×
-          h4#myModalLabel.modal-title 填写价格
-        .modal-body
-          .form-horizontal
-            .form-group 
-              label.col-sm-2.control-label 商品价格
-              .col-sm-8
-                input.form-control#eoPrice(type='text')
-          input#eostoreid(type="text" style="display:none")
-          input#eoorderid(type="text" style="display:none")
-        .modal-footer(style="text-align:left")
-          button.btn.btn-primary.btn-sm(type='button', onclick=`editOrder()`) 确认修改
-          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消               
+      include ../../interface_navigation_paging            
 
   #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
     .modal-dialog(role='document')

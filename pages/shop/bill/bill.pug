@@ -96,10 +96,11 @@ block content
                   //-   span #{numToFloatTwo(calculateFreightPrice(cart.product.freightPrice,cart.count,cart.product.isFreePost))}
                   td.order(paid=`${cart.productParam._id}` data-upload-cert=cart.product.uploadCert?"true": "false") 
                     +orderCert(cart)
-                  if cart.canBuy == false
-                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${cart.remainBuyCount}件`
                   td(style="border-right:1px solid #f2f7ff;text-align:right")
                     span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo((cart.productParam.price)*cart.count)}
+                if cart.canBuy == false
+                  tr
+                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" limit="yes" colspan="7")!=`该商品剩余购买数量为${cart.remainBuyCount}件`
               tr(style="background-color:#f2f7ff;")
                 td(colspan="3" rowspan="2" style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ") 
                   div(style="font-weight:bold;float:left") 给卖家留言：
