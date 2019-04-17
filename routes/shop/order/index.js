@@ -34,7 +34,8 @@ router
     data.paging = paging;
     let sort = {orderToc: -1};
     let orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
-    data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    data.orders = orders;
+    data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(data.orders);
     data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
@@ -86,19 +87,16 @@ router
     let paids = [];
     const ordersId = [];
     for(let bill in post) {
-      // // 获取对应规格商品
-      // let productParams = await db.ShopProductsParamModel.find({_id: bill.paraId});
-      // productParams = await db.ShopProductsParamModel.extendParamsInfo(productParams);
-      // let productParam = productParams[0];
       // 检查库存
       for(let cart of post[bill].carts) {
         if(Number(cart.count) > Number(cart.productParam.stocksSurplus)) ctx.throw(400, `${cart.product.name}+${cart.productParam.name}库存不足`);
       }
       const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
+      let newCarts = [];
       // 添加购买记录
       for(let cart of post[bill].carts) {
         let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
-        let shopCost = db.ShopCostRecordModel({
+        let cartObj = {
           costId,
           orderId,
           productId: cart.productId,
@@ -107,7 +105,8 @@ router
           uid: cart.uid,
           freightPrice: cart.freightPrice,
           productPrice: cart.productPrice,
-        })
+        };
+        let shopCost = db.ShopCostRecordModel(cartObj)
         await shopCost.save();
         let buyProduct = await db.ShopGoodsModel.findOne({productId:cart.productId});
         let buyRecord = buyProduct.buyRecord;
@@ -119,23 +118,27 @@ router
           }
         }
         await buyProduct.update({$set: {buyRecord: buyRecord}});
-        // 清除购物车
+        // 下单完毕，将商品从购物车中清除
+        await db.ShopCartModel.remove({uid: user.uid, productParamId: cart.productParamId});
+        newCarts.push(cartObj);
       }
-      const order = db.ShopOrdersModel({
+      let order = db.ShopOrdersModel({
         orderFreightPrice: post[bill].maxFreightPrice,
         orderId: orderId,
         receiveAddress: receiveAddress,
         receiveName: receiveName,
         receiveMobile: receiveMobile,
         sellUid: post[bill].user.uid,
-        params: post[bill].carts,
+        snapshot: newCarts,
         buyMessage: post[bill].message,
         buyUid: user.uid,
         count: bill.productCount,
         orderPrice: post[bill].productPrice
       });
       await order.save();
-      //减库存
+      // 拓展订单
+      // 减库存
+      order = await db.ShopOrdersModel.orderExtendParams(order);
       await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
       ordersId.push(order.orderId);
     }

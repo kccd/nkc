@@ -79,9 +79,8 @@ router
     if(totalMoney !== Number(totalPrice)*100) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
     // orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
-    //减库存
-    await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
     for(let order of orders) {
+      await db.ShopOrdersModel.orderExtendParams(order);
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
         from: order.buyUid,
@@ -99,11 +98,9 @@ router
         orderStatus: 'unShip',
         payToc: r.toc
       }});
-      // 付款完毕，将商品从购物车中清除
-      for(let param of order.params) {
-        await db.ShopCartModel.remove({uid: user.uid, productParamId: param.productParamId});
-      }
     }
+    //减库存
+    // await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
     user.uid = await db.UserModel.updateUserKcb(user.uid);
     await next();
   });
