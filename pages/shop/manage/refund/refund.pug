@@ -3,7 +3,7 @@ block shopTitle
   title 申请退款
 block content
   .container-fluid.max-width
-    .hidden#data= JSON.stringify({myStore: data.myStore, order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
+    .hidden#data= JSON.stringify({user: data.user, myStore: data.myStore, order: data.order, user: data.user, refund: data.refund, refunds: data.refunds, param: data.param})
     .row#app(v-cloak)   
       div(v-if="order")
         .col-xs-12.col-md-12
@@ -19,21 +19,42 @@ block content
         .col-xs-12.col-md-12
           .row
             .col-xs-12.col-md-6
-              h4 商品信息
-              h5
-                img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+              h4 订单信息
+              h5 订单ID：{{order.orderId}}
+              h5 订单状态：{{order.status}}
+              h5 订单总价：
+                strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
+                | 元 （商品总价：{{order.orderPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元）
+              h5 商品列表
+              div(v-for="p in params")
+                img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
-                  a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
-                  h5
-                    span.m-r-1 数量：{{order.count}}  
-                    span.m-r-1 规格：{{productParam.name.join('+')}}
-                    span.m-r-1 价格总计：
-                      strong.text-danger {{order.orderPrice/100}}
-                      |&nbsp;元
-                  h5 订单状态：
-                    strong {{order.status}}    
-                  h5
-                    a(:href="'/shop/order/'+order.orderId") 订单详情  
+                  a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                  h5 商品总价：
+                    strong.text-danger {{p.productPrice/100}}
+                    | 元（{{p.count}}件）
+                    strong.text-danger {{p.refundStatus==="success"?"【已退款】": ""}}
+
+              a.m-r-1(:href="'/shop/manage/'+user.uid+'/order/detail?orderId=' + order.orderId" target="_blank") 订单详情
+              a(:href="'/message?uid=' + order.buyUid" target="_blank") 联系买家
+              hr
+              div(v-if="param")
+                h4 申请退款的商品
+                img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                div.display-i-b
+                  a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}}
+                  h5 商品总价：
+                    strong.text-danger {{param.productPrice/100}}
+                    | 元（{{param.count}}件）
+              div(v-else)
+                h4 申请退款的商品
+                div(v-for="p in params" v-if="!p.refundStatus")
+                  img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                  div.display-i-b
+                    a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                    h5 商品总价：
+                      strong.text-danger {{p.productPrice/100}}
+                      | 元（{{p.count}}件）
               .m-t-1(v-if='refund && order.status !== "finish" && !order.closeStatus')
                 h5 类型：{{refundType(refund.type)}}  
                 h5 进度：{{status.description}}

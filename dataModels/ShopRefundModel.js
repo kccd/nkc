@@ -51,40 +51,10 @@ const schema = new Schema({
       P: product
       RP: return product // 退货
       RM: return money // 退款
-      RALL: return all // 退货+退款
       GU: give up // 放弃
-      NE: negotiating //协商
-      IA: inArbitration // 仲裁
       OV: overrule // 平台驳回申请
       CO: completed // 完成
       RC: receive // 收到
-
-    "B_APPLY_RM": "买家申请退款，等待卖家批准",
-    "B_APPLY_RALL": "买家申请退款+退货，等待卖家批准",
-
-    "S_AGREE_RM": "卖家同意退款，等待系统退款",
-    "S_AGREE_RALL": "卖家同意退款+退货，等待买家填写物流信息",
-
-    "S_DISAGREE_RM": "卖家拒绝了退款申请，申请已被关闭",
-    "S_DISAGREE_RALL": "卖家拒绝了退款+退货申请，申请已被关闭",
-
-    "S_RC_P_SUCCESS": "买家退货完成，等待系统退款",
-    "S_RC_P_FAIL": "快递异常或货物异常，卖家拒绝退款，申请已被关闭",
-
-    "P_APPLY_RM": "买家申请退款，等待平台批准",
-    "P_APPLY_RALL": "买家申请退款+退货，等待平台批准",
-
-    "P_AGREE_RM": "平台同意退款，等待系统退款",
-    "P_AGREE_RALL": "平台同意退款+退货，等待买家填写物流信息",
-
-    "P_DISAGREE_RM": "平台拒绝了退款申请，申请已被关闭",
-    "P_DISAGREE_RALL": "平台拒绝了退款+退货申请，申请已被关闭",
-
-    "CO": "订单取消成功",
-    
-    "RM_CO": "系统退款完成，订单已被关闭",
-
-    "B_GU": "买家撤销了申请，申请已被关闭"
 
   */
   status: {
@@ -109,6 +79,10 @@ const schema = new Schema({
     type: String,
     required: true,
     index: 1
+  },
+  paramId: {
+    type: Number,
+    default: null
   },
   // 退款是否成功，true: 成功, false: 失败, null: 处理中
   succeed: {
@@ -206,6 +180,10 @@ schema.methods.returnMoney = async function () {
     throwErr(`退款金额必须大于0， money: ${money}`)
   }
   let order = await ShopOrdersModel.findById(orderId);
+  let param;
+  if(this.paramId) {
+    param = await order.getParamById(this.paramId);
+  }
   const orders = await ShopOrdersModel.userExtendOrdersInfo([order]);
   order = orders[0];
   const description = `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`;
@@ -223,9 +201,22 @@ schema.methods.returnMoney = async function () {
     2. 支付的钱在平台，申请退款的金额等于支付的金额
       orderPrice === money
       a. 退还买家申请退款的金额  
-  */ 
-
-  if(orderPrice === money) {
+  */
+  // 退单个商品的情况
+  if(param) {
+    const record = KcbsRecordModel({
+      _id: await SettingModel.operateSystemID("kcbsRecords"),
+      from: "bank",
+      to: buyerId,
+      type: "refund",
+      toc: time,
+      num: param.productPrice,
+      description: param.product.name,
+      ordersId: [orderId]
+    });
+    await record.save();
+    await UserModel.updateUserKcb(record.to);
+  } else if(orderPrice === money) {
     // 情况2
     const record = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
@@ -283,13 +274,21 @@ schema.methods.returnMoney = async function () {
       }
     }
   });
-  await ShopOrdersModel.update({orderId: orderId}, {
-    $set: {
-      refundStatus: "success",
-      closeStatus: true,
-      closeToc: time
-    }
-  });
+  if(param) {
+    await ShopOrdersModel.update({orderId: orderId}, {
+      $set: {
+        refundStatus: "success"
+      }
+    });
+  } else {
+    await ShopOrdersModel.update({orderId: orderId}, {
+      $set: {
+        refundStatus: "success",
+        closeStatus: true,
+        closeToc: time
+      }
+    });
+  }
 };
 /**
  * 判断退款申请的状态以及订单状态 状态异常则抛出错误

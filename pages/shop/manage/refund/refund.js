@@ -2,6 +2,8 @@ var app = new Vue({
   el: "#app",
   data: {
 
+    user: "",
+
     error: "",
     info: "",
 
@@ -21,9 +23,14 @@ var app = new Vue({
     refunds: [],
     displayInput: false,
     myStore: '',
-    reason: ''
+    reason: '',
+    param: ""
+
   },
   computed: {
+    params: function() {
+      return this.order.params;
+    },
     status: function() {
       var refund = this.refunds[this.refunds.length - 1];
       return refund.logs[refund.logs.length -1];
@@ -42,7 +49,9 @@ var app = new Vue({
     var data = document.getElementById("data");
     data = JSON.parse(data.innerHTML);
     this.refund = data.refund;
+    this.param = data.param;
     this.refunds = data.refunds;
+    this.user = data.user;
     // this.myStore = data.myStore;
     // this.storeName = this.myStore.storeName;
     // this.address = this.myStore.address;

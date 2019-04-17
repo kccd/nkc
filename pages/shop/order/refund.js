@@ -32,7 +32,8 @@ var app = new Vue({
     uploadStatus: '',
     trackNumber: '',
     displayGiveUpInput: false,
-    giveUpReason: ''
+    giveUpReason: '',
+    param: ""
   },
   computed: {
     status: function() {
@@ -45,14 +46,26 @@ var app = new Vue({
     productParam: function() {
       if(this.order) return this.order.productParam;
     },
+    params: function() {
+      return this.order.params;
+    },
     seller: function() {
       if(this.order) return this.order.product.user;
+    },
+    refundMoneyMax: function() {
+      var maxMoney = 0;
+      if(this.param) {
+        return this.param.productPrice;
+      } else {
+        return this.order.orderPrice + this.order.orderFreightPrice
+      }
     }
   },
   mounted: function() {
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
     this.order = data.order;
+    this.param = data.param;
     this.user = data.user;
     this.refunds = data.refunds;
     if(data.refund) {
@@ -133,11 +146,16 @@ var app = new Vue({
       this.clearInfo();
       var applyType = this.applyType;
       var newRefund = this.newRefund;
+      var param  = this.param;
       if(newRefund.reason === "") return this.error = "请输入理由";
       if(newRefund.type === "") return this.error = "请选择退款方式";
       if(newRefund.type !== "money" && applyType === "platform") return this.error = "请求平台介入时退款方式只能选择【只退款】";
       if(newRefund.money >= 0) {
-        if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过订单金额";
+        if(param) {
+          if(newRefund.money*100 > param.productPrice) return this.error = "退款金额不能超过退款中的商品的金额";
+        } else {
+          if(newRefund.money*100 > this.order.orderPrice + this.order.orderFreightPrice) return this.error = "退款金额不能超过订单金额";
+        }
       }
       else return this.error = "请输入正确的退款金额";
       var url = "/shop/refund";
@@ -149,7 +167,8 @@ var app = new Vue({
 
       var obj = {
         refund: newRefund,
-        orderId: this.order.orderId
+        orderId: this.order.orderId,
+        paramId: param?param._id: ""
       };
 
       nkcAPI(url, method, obj)

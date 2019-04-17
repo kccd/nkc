@@ -5,11 +5,15 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, body, tools} = ctx;
     const {user} = data;
-    const {orderId, refund} = body;
+    const {orderId, refund, paramId} = body;
     let {type, reason, root, money} = refund;
     root = !!root;
     // 查询订单 判断权限
     let order = await db.ShopOrdersModel.findById(orderId);
+    let param;
+    if(paramId) {
+      param = await order.getParamById(paramId);
+    }
     const orderDB = order;
     if(order.buyUid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
@@ -43,16 +47,17 @@ router
         buyerId: order.buyUid,
         sellerId: order.sellUid,
         orderId: order.orderId,
+        paramId: param?param._id: "",
         root
       };
 
       let refundMoney = Number(money)*100;
       refundMoney = Number(refundMoney.toFixed(2));
-      if(refundMoney >= 0 && refundMoney <= order.orderPrice){
-        r.money = refundMoney;
-      }
-      else {
-        ctx.throw(400, "退款金额必须大于0且不能超过点订单的支付金额");
+      if(refundMoney < 0) ctx.throw(400, "退款金额不能小于0");
+      if(param) {
+        if(refundMoney > param.productPrice) ctx.throw(400, "退款金额不能超过要退款的商品的金额");
+      } else {
+        if(refundMoney > order.orderPrice + order.orderFreightPrice) ctx.throw(400, "退款金额不能超过订单的总金额");
       }
 
       if(orderStatus === "unShip") {

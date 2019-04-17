@@ -482,20 +482,24 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
  * @return [Object] 凭证对象数组
  * @author pengxiguaa 2019/3/28
  */
-shopOrdersSchema.methods.extendCerts = async function(type) {
+shopOrdersSchema.methods.extendCerts = async function(type, paramId) {
   const ShopCertModel = mongoose.model("shopCerts");
-  const ShopGoodsModel = mongoose.model("shopGoods");
-  const {orderId, productId, buyUid} = this;
-  const product = await ShopGoodsModel.findById(productId);
+  const {orderId, sellUid, buyUid} = this;
   const c = await ShopCertModel.find({orderId, deleted: false}).sort({toc: 1});
   const certs = [];
-  for(cert of c) {
-    if(type === "buyer") {
-      if(cert.uid === buyUid) certs.push(cert);
-    } else if(type === "seller") {
-      if(cert.uid === product.uid) certs.push(cert);
+  for(const cert of c) {
+    if(type === "buyer" && cert.uid === buyUid) {
+      if(!paramId || paramId === cert.paramId) {
+        certs.push(cert);
+      }
+    } else if(type === "seller" && cert.uid === sellUid) {
+      if(!paramId || paramId === cert.paramId) {
+        certs.push(cert);
+      }
     } else {
-      certs.push(cert);
+      if(!paramId || paramId === cert.paramId) {
+        certs.push(cert);
+      }
     }
   }
   return this.certs = certs;
@@ -609,6 +613,28 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     await UserModel.updateUserKcb(record.from);
     await UserModel.updateUserKcb(record.to);
   }
+};
+/*
+* 获取订单上指定ID的商品
+* 判断商品是否已经退款完成
+* @param {Number} 订单上的规格ID（实际为购物车ID）
+* @author pengxiguaa 2019-4-17
+* */
+shopOrdersSchema.methods.getParamById = async function(id) {
+  id = Number(id);
+  const {params} = this;
+  let param;
+  let succeedCount = 0;
+  for(const p of params) {
+    if(p.refundStatus === "success") succeedCount ++;
+    if(p._id === id) {
+      param = p;
+    }
+  }
+  if(!param) throwErr(404, `订单${this.orderId}上未找到规格id为${id}的商品`);
+  if(param.refundStatus === "success") throwErr(404, `订单${this.orderId}上规格id为${id}的商品已退款完成`);
+  if(succeedCount === params.length -1) throwErr(400, "订单中仅剩一种商品，无法进行单一商品退款。");
+  return param;
 };
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
