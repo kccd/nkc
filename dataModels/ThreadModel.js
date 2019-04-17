@@ -485,7 +485,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
     if(thread.categoriesId && thread.categoriesId.length !== 0) {
       cid = cid.concat(thread.categoriesId);
-    };
+    }
   });
 
   if(o.firstPost || o.lastPost) {
@@ -493,7 +493,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     posts.map(post => {
       if(o.htmlToText) {
         post.c = obtainPureText(post.c, true, o.count);
-        console.log(obtainPureText)
       }
       postsObj[post.pid] = post;
       if(o.firstPostUser || o.lastPostUser) {

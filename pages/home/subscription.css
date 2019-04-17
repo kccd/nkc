@@ -39,25 +39,3 @@
 .forums-nav .material-icons{
   color: #aaaaaa;
 }
-.child-forums-nav{
-  position: absolute;
-  top: 0;
-  z-index: 1000;
-}
-.child-forums-nav>div{
-  position: absolute;
-}
-.child-forums-nav-div{
-  position: absolute;
-  background-color: rgba(245,245,245,0.95 );
-}
-/*   vue过度   */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
-.select-forum{
-  background-color: #ddd;
-}
