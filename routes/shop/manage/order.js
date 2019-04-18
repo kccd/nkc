@@ -123,6 +123,33 @@ orderRouter
 		await order.update({$set: {"sellMessage":sellMessage}});
 		await next();
 	})
+	// 修改购买记录中的价格
+	.patch('/editCostRecord', async (ctx, next) => {
+		const {data, body, query, db} = ctx;
+		const {costId, orderId, costObj, orderObj} = body;
+		// 找出购买记录并修改
+		const costRecord = await db.ShopCostRecordModel.findOne({costId});
+		if(!costRecord) ctx.throw(400, "商品规格未找到");
+		const {count, singlePrice} = costObj;
+		await costRecord.update({$set: {count, singlePrice}});
+		// 找出订单并修改
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "订单未找到");
+		const {orderFreightPrice, orderPrice} = orderObj;
+		await order.update({$set: {orderFreightPrice, orderPrice}});
+		await next();
+	})
+	// 修改购买订单中的价格
+	.patch('/editOrderPrice', async (ctx, next) => {
+		const {data, body, query, db} = ctx;
+		const {orderId, orderObj} = body;
+		// 找出订单并修改
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "订单未找到");
+		const {orderFreightPrice, orderPrice} = orderObj;
+		await order.update({$set: {orderFreightPrice, orderPrice}})
+		await next();
+	})
   .use("/cancel", cancelRouter.routes(), cancelRouter.allowedMethods())
   .use("/refund", refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = orderRouter;

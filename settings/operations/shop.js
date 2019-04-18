@@ -91,6 +91,12 @@ module.exports = {
         },
         editSellMessage: {
           PATCH: "editSellMessage",
+        },
+        editCostRecord: {
+          PATCH: "editCostRecord",
+        },
+        editOrderPrice: {
+          PATCH: "editOrderPrice"
         }
       },
       goodslist: {

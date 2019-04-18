@@ -105,6 +105,7 @@ router
           uid: cart.uid,
           freightPrice: cart.freightPrice,
           productPrice: cart.productPrice,
+          singlePrice: cart.productParam.price
         };
         let shopCost = db.ShopCostRecordModel(cartObj)
         await shopCost.save();

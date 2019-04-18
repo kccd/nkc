@@ -514,6 +514,8 @@
   "productStopSale": "[CO]商品停售",
   "productGoonSale": "[CO]商品复售",
   "editSellMessage": "[CO]修改卖家订单备注",
+  "editCostRecord": "[CO]修改订单价格(购买记录+订单价格)",
+  "editOrderPrice": "[CO]修改订单价格(订单价格)",
   "visitExperimentalRecharge": "后台查看充值记录",
   "visitExperimentalWithdraw": "后台查看提现记录",
   "modifyWithdrawRecord": "修改科创币提现记录",
