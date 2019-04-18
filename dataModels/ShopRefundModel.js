@@ -414,15 +414,10 @@ schema.methods.sellerDisagreeRM = async function(reason) {
   if(!reason) throwErr(400, "拒绝的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ShopOrdersModel = mongoose.model("shopOrders");
-  const ShopCostRecordModel = mongoose.model("shopCostRecord");
   const {order, time} = await this.ensureRefundPermission(reason, [
     "B_APPLY_RM",
     "B_INPUT_INFO"
   ]);
-  let param;
-  if(this.paramId) {
-    param = await order.getParamById(this.paramId);
-  }
   await ShopRefundModel.update({_id: this._id}, {
     $set: {
       tlm: time,
@@ -438,27 +433,11 @@ schema.methods.sellerDisagreeRM = async function(reason) {
     }
   });
 
-  if(param) {
-    await ShopCostRecordModel.update({costId: param.costId}, {
-      $set: {
-        refundStatus: ""
-      }
-    })
-  } else {
-    await ShopCostRecordModel.updateMany({orderId: order.orderId, refundStatus: "ing"}, {
-      $set: {
-        refundStatus: ""
-      }
-    });
-  }
+  await this.refundFail();
 
   await ShopOrdersModel.update({orderId: order.orderId}, {
     $set: {
-      refundStatus: "",
       applyToPlatform: true
-    },
-    $inc: {
-      autoReceiveTime: time - this.toc
     }
   });
 };  
@@ -598,8 +577,7 @@ schema.methods.sellerDisagreeRP = async function(reason) {
 schema.methods.buyerGiveUp = async function(reason) {
   if(!reason) throwErr(400, "放弃的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
-  const ShopOrdersModel = mongoose.model("shopOrders");
-  const {time, order} = await this.ensureRefundPermission(reason, [
+  const {time} = await this.ensureRefundPermission(reason, [
     // 没有同意退款的操作，因为同意退款后系统会立即触发转账功能。
     "B_APPLY_RM",
     "B_APPLY_RP",
@@ -624,14 +602,7 @@ schema.methods.buyerGiveUp = async function(reason) {
       }
     }
   });
-  await ShopOrdersModel.update({orderId: order.orderId}, {
-    $set: {
-      refundStatus: "fail"
-    },
-    $inc: {
-      autoReceiveTime: time - this.toc
-    }
-  });
+  await this.refundFail();
 };
 
 schema.methods.insertTrackNumber = async function(number) {
@@ -657,6 +628,52 @@ schema.methods.insertTrackNumber = async function(number) {
       }
     }
   });
+};
+/*
+* 退款申请被关闭或被驳回
+* 更新order的状态， 若是退全部商品则将refundStatus改为fail
+* 更新order上的商品的状态，将"ing"改为""
+* @author pengxiguaa 2019-4-18
+* * */
+schema.methods.refundFail = async function() {
+  const {paramId, orderId} = this;
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const order = await ShopOrdersModel.findById(orderId);
+  if(paramId) {
+    const param = await ShopCostRecordModel.findOne({costId: paramId});
+    if(!param) throwErr(404, `订单${orderId}上未发现规格ID为${paramId}的商品`);
+    await order.update({
+      $set: {
+        refundStatus: ""
+      },
+      $inc: {
+        autoReceiveTime: Date.now() - this.toc
+      }
+    });
+    await param.update({
+      $set: {
+        refundStatus: ""
+      }
+    });
+  } else {
+    await order.update({
+      $set: {
+        refundStatus: "fail"
+      },
+      $inc: {
+        autoReceiveTime: Date.now() - this.toc
+      }
+    });
+    await ShopCostRecordModel.updateMany({
+      orderId,
+      refundStatus: "ing"
+    }, {
+      $set: {
+        refundStatus: ""
+      }
+    });
+  }
 };
 
 module.exports = mongoose.model('shopRefunds', schema);

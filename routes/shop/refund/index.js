@@ -103,7 +103,7 @@ router
           }
         });
       } else {
-        await db.ShopCostRecordModel.update({orderId: order.orderId, refundStatus: ""}, {
+        await db.ShopCostRecordModel.updateMany({orderId: order.orderId, refundStatus: ""}, {
           $set: {
             refundStatus: "ing"
           }
