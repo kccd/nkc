@@ -23,7 +23,7 @@ var vue_forums_Nav = new Vue({
     },
     displayChildForums: function(forum, num) {
 
-      var dom = this.$el;
+      var dom = this.$refs.forumNav;
 
       this.height = dom.offsetHeight;
       this.width = dom.offsetWidth;

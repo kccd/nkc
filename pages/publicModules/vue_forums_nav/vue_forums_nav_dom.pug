@@ -1,8 +1,31 @@
 .hidden-xs.hidden-sm#vue_forums_Nav(v-cloak)
-  .forums-nav-header.m-t-2
+  .forums-nav-header
+    +listHeader('话题')
+  div(v-for="forum in forums" v-if='forum.forumType === "topic"')
+    .home-topic-list-li
+      a(:href="'/f/' + forum.fid" target="_blank")
+        img(:src="'/forum_avatar/' + forum.fid"
+          v-if="forum.iconFileName"
+        )
+        img(v-else :style="'background-color:' + forum.color + ';'")
+        span {{forum.displayName}}
+    .home-topic-item-div(v-if="forum.childrenForums && forum.childrenForums.length")
+      a(
+        v-for="f in forum.childrenForums"
+        :href="'/f/' + f.fid"
+        target="_blank"
+        :style="'background-color: '+f.color+';'"
+      ).topic-item
+        img(
+          v-if="f.iconFileName"
+          :src="'/forum_avatar/'+f.fid"
+        )
+        span {{f.displayName}}
+  .forums-nav-header
     +listHeader('学科')
-  ul.list-dense.forums-nav(
+  ul.forums-nav(
     @mouseleave='forumsList = [];forumsIdList=[];'
+    ref="forumNav"
   )
     .hidden(ref='forums')= JSON.stringify(data.forums)
     li.list-item(
