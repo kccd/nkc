@@ -110,6 +110,7 @@ router
         await shopCost.save();
         let buyProduct = await db.ShopGoodsModel.findOne({productId:cart.productId});
         let buyRecord = buyProduct.buyRecord;
+        if(!buyRecord) buyRecord = {};
         if(buyRecord[user.uid]){
           buyRecord[user.uid].count += cart.count;
         }else{
@@ -138,8 +139,8 @@ router
       await order.save();
       // 拓展订单
       // 减库存
-      order = await db.ShopOrdersModel.orderExtendParams(order);
-      await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
+      // order = await db.ShopOrdersModel.orderExtendParams(order);
+      // await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');

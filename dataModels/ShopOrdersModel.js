@@ -356,7 +356,6 @@ shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
   const ordersId = [];
   let totalMoney = 0;
   for(const o of orders) {
-    await ShopOrdersModel.orderExtendParams(o);
     for(const c of o.params){
       let title = "";
       let needAdd = true;
@@ -643,20 +642,21 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
 * @author pengxiguaa 2019-4-17
 * */
 shopOrdersSchema.methods.getParamById = async function(id) {
-  id = Number(id);
-  const {params} = this;
+  const {orderId} = this;
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const params = await ShopCostRecordModel.find({orderId});
   let param;
   let succeedCount = 0;
   for(const p of params) {
     if(p.refundStatus === "success") succeedCount ++;
-    if(p._id === id) {
+    if(p.costId === id) {
       param = p;
     }
   }
   if(!param) throwErr(404, `订单${this.orderId}上未找到规格id为${id}的商品`);
-  if(param.refundStatus === "success") throwErr(404, `订单${this.orderId}上规格id为${id}的商品已退款完成`);
+  if(param.refundStatus === "success") throwErr(400, `订单${this.orderId}上规格id为${id}的商品已退款完成`);
   if(succeedCount === params.length -1) throwErr(400, "订单中仅剩一种商品，无法进行单一商品退款。");
-  return param;
+  return (await ShopCostRecordModel.orderExtendRecord([param]))[0];
 };
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);

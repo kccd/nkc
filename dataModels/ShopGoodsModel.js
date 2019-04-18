@@ -190,7 +190,7 @@ const shopGoodsSchema = new Schema({
   // }
   buyRecord: {
     type: Schema.Types.Mixed,
-    default: null
+    default: {}
   }
 }, {
   collection: 'shopGoods'
@@ -327,6 +327,7 @@ shopGoodsSchema.statics.checkOutPurchaseLimit = async (bills, uid) => {
   return await Promise.all(bills.map(b => {
     // 已经购买的数量
     let alreadyBuyCount = 0;
+    if(!b.product.buyRecord) b.product.buyRecord = {};
     if(b.product.buyRecord[uid]){
       alreadyBuyCount = Number(b.product.buyRecord[uid].count);
     }

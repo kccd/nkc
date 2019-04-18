@@ -81,8 +81,8 @@ const schema = new Schema({
     index: 1
   },
   paramId: {
-    type: Number,
-    default: null
+    type: String,
+    default: ""
   },
   // 退款是否成功，true: 成功, false: 失败, null: 处理中
   succeed: {
@@ -171,6 +171,7 @@ schema.methods.returnMoney = async function () {
   const ShopOrdersModel = mongoose.model("shopOrders");
   const ShopRefundModel = mongoose.model('shopRefunds');
   const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
   const refund = await ShopRefundModel.findById(this._id);
@@ -186,7 +187,10 @@ schema.methods.returnMoney = async function () {
   }
   const orders = await ShopOrdersModel.userExtendOrdersInfo([order]);
   order = orders[0];
-  const description = `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`;
+  let description = "";
+  for(const p of order.params) {
+    description += `${p.count}x${p.product.name}x${p.productParam.name.join('+')}`;
+  }
   const {orderStatus, refundStatus, orderPrice} = order;
   if(refundStatus !=="ing" || !["unShip", "unSign"].includes(orderStatus)) throwErr(400, "订单状态已改变，请刷新");
   if(!["S_AGREE_RM", "P_AGREE_RM"].includes(status)) throwErr(400, "退款申请的状态已改变，请刷新");
@@ -205,12 +209,12 @@ schema.methods.returnMoney = async function () {
   // 退单个商品的情况
   if(param) {
     const record = KcbsRecordModel({
-      _id: await SettingModel.operateSystemID("kcbsRecords"),
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
       to: buyerId,
       type: "refund",
       toc: time,
-      num: param.productPrice,
+      num: money,
       description: param.product.name,
       ordersId: [orderId]
     });
@@ -275,17 +279,38 @@ schema.methods.returnMoney = async function () {
     }
   });
   if(param) {
+    // 退单一商品
+
+    // 将订单的状态改为正常 并从订单总金额中减去退掉的商品的总价
     await ShopOrdersModel.update({orderId: orderId}, {
+      $set: {
+        refundStatus: ""
+      },
+      $inc: {
+        orderPrice: -1*money
+      }
+    });
+    // 将单一商品的状态改为退款成功
+    await ShopCostRecordModel.update({costId: param.costId}, {
       $set: {
         refundStatus: "success"
       }
     });
   } else {
+    // 退全部
+
+    // 将订单的状态改为关闭
     await ShopOrdersModel.update({orderId: orderId}, {
       $set: {
         refundStatus: "success",
         closeStatus: true,
         closeToc: time
+      }
+    });
+    // 将全部商品的转台改为退款完成
+    await ShopCostRecordModel.updateMany({orderId: orderId}, {
+      $set: {
+        refundStatus: "success"
       }
     });
   }
@@ -389,10 +414,15 @@ schema.methods.sellerDisagreeRM = async function(reason) {
   if(!reason) throwErr(400, "拒绝的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
   const {order, time} = await this.ensureRefundPermission(reason, [
     "B_APPLY_RM",
     "B_INPUT_INFO"
   ]);
+  let param;
+  if(this.paramId) {
+    param = await order.getParamById(this.paramId);
+  }
   await ShopRefundModel.update({_id: this._id}, {
     $set: {
       tlm: time,
@@ -407,9 +437,24 @@ schema.methods.sellerDisagreeRM = async function(reason) {
       }
     }
   });
+
+  if(param) {
+    await ShopCostRecordModel.update({costId: param.costId}, {
+      $set: {
+        refundStatus: ""
+      }
+    })
+  } else {
+    await ShopCostRecordModel.updateMany({orderId: order.orderId, refundStatus: "ing"}, {
+      $set: {
+        refundStatus: ""
+      }
+    });
+  }
+
   await ShopOrdersModel.update({orderId: order.orderId}, {
     $set: {
-      refundStatus: "fail",
+      refundStatus: "",
       applyToPlatform: true
     },
     $inc: {
@@ -502,7 +547,13 @@ schema.methods.sellerDisagreeRP = async function(reason) {
   if(!reason) throwErr(400, "拒绝的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+
   const {time, order} = await this.ensureRefundPermission(reason, "B_APPLY_RP");
+  let param;
+  if(this.paramId) {
+    param = await order.getParamById(this.paramId);
+  }
   await ShopRefundModel.update({_id: this._id}, {
     $set: {
       tlm: time,
@@ -517,6 +568,19 @@ schema.methods.sellerDisagreeRP = async function(reason) {
       }
     }
   });
+  if(param) {
+    await ShopCostRecordModel.update({costId: param.costId}, {
+      $set: {
+        refundStatus: ""
+      }
+    })
+  } else {
+    await ShopCostRecordModel.update({orderId: order.orderId, refundStatus: "ing"}, {
+      $set: {
+        refundStatus: ""
+      }
+    })
+  }
   await ShopOrdersModel.update({orderId: order.orderId}, {
     $set: {
       refundStatus: "fail"

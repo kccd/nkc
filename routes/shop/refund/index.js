@@ -47,7 +47,7 @@ router
         buyerId: order.buyUid,
         sellerId: order.sellUid,
         orderId: order.orderId,
-        paramId: param?param._id: "",
+        paramId: param?param.costId: "",
         root
       };
 
@@ -59,7 +59,7 @@ router
       } else {
         if(refundMoney > order.orderPrice + order.orderFreightPrice) ctx.throw(400, "退款金额不能超过订单的总金额");
       }
-
+      r.money = refundMoney;
       if(orderStatus === "unShip") {
         // 未发货时
         r.status = root? "B_INPUT_CERT_RM": "B_APPLY_RM";
@@ -96,6 +96,19 @@ router
       }
       const refundDB = db.ShopRefundModel(r);
       await refundDB.save();
+      if(param) {
+        await db.ShopCostRecordModel.update({costId: param.costId}, {
+          $set: {
+            refundStatus: "ing"
+          }
+        });
+      } else {
+        await db.ShopCostRecordModel.update({orderId: order.orderId, refundStatus: ""}, {
+          $set: {
+            refundStatus: "ing"
+          }
+        });
+      }
       await db.ShopOrdersModel.update({
         orderId: order.orderId
       }, {

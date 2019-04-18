@@ -168,7 +168,7 @@ var app = new Vue({
       var obj = {
         refund: newRefund,
         orderId: this.order.orderId,
-        paramId: param?param._id: ""
+        paramId: param?param.costId: ""
       };
 
       nkcAPI(url, method, obj)
