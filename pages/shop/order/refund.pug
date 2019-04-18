@@ -43,38 +43,40 @@ block content
               h5 订单状态：{{order.status}}
               h5 订单总价：
                 strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
-                |元 （商品总价：{{order.orderPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元）
+                |元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+                span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
+                |）
               h5 商品列表
               div(v-for="p in params")
                 img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
                   a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
-                  h5 商品总价：
+                  h5 商品ID：{{p.costId}}，商品总价：
                     strong.text-danger {{p.productPrice/100}}
                     | 元（{{p.count}}件）
-                    strong.text-danger {{p.refundStatus==="success"?"【已退款】": ""}}
+                    strong.text-danger(v-if="p.refundStatus==='success'") 【已退款{{p.refundMoney?p.refundMoney/100+"元":""}}】
 
               a.m-r-1(:href="'/shop/order/' + order.orderId + '/detail'" target="_blank") 订单详情
               a(:href="'/message?uid=' + order.sellUid" target="_blank") 联系卖家
               hr
-              div(v-if="param")
-                h4 申请退款的商品
-                img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
-                div.display-i-b
-                  a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}}
-                  h5 商品总价：
-                    strong.text-danger {{param.productPrice/100}}
-                    |元（{{param.count}}件）
-              div(v-else)
-                h4 申请退款的商品
-                div(v-for="p in params" v-if="!p.refundStatus")
-                  img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
-                  div.display-i-b
-                    a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
-                    h5 商品总价：
-                      strong.text-danger {{p.productPrice/100}}
-                      | 元（{{p.count}}件）
+
               .m-t-1(v-if='refund')
+                h4 退款中的商品
+                div(v-if='param')
+                  img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                  div.display-i-b
+                    a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}}
+                    h5 商品总价：
+                      strong.text-danger {{param.productPrice/100}}
+                      | 元（{{param.count}}件）
+                div(v-else)
+                  div(v-for="p in order.params" v-if="p.refundStatus === 'ing'")
+                    img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                    div.display-i-b
+                      a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                      h5 商品总价：
+                        strong.text-danger {{p.productPrice/100}}
+                        | 元（{{p.count}}件）
                 h5 类型：{{refundType(refund.type)}}  
                 h5 进度：{{status.description}}
                 //-h5 卖家处理最后期限：
@@ -114,7 +116,23 @@ block content
               .m-t-1(v-if="display.apply && (applyType !== 'platform' || order.applyToPlatform)")
                 .form
                   .form-group
-                    label 1、选择退款方式
+                    label 1、选择需要退款的商品
+                    div(style="border-bottom: 1px solid #eee")
+                      label.radio-inline
+                        input(type="radio" value="" v-model="newRefund.paramId")
+                        | 全部商品
+                    div(v-for="p in params" style="border-bottom: 1px solid #eee" v-if='p.refundStatus === ""')
+                      label.radio-inline
+                        input(type="radio"  :value="p.costId" v-model="newRefund.paramId")
+                        img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                        div.display-i-b
+                          a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                          h5 商品总价：
+                            strong.text-danger {{p.productPrice/100}}
+                            | 元（{{p.count}}件）
+                            strong.text-danger {{p.refundStatus==="success"?"【已退款】": ""}}
+                  .form-group
+                    label 2、选择退款方式
                     //- 向卖家申请
                     .refund-type(v-if="applyType === 'seller'")
                       span(:class="{'active': newRefund.type==='money'}" @click='newRefund.type="money"') 只退款
@@ -128,17 +146,17 @@ block content
                       ) 只退款
                       span.disabled(v-else) 只退款
                   .form-group
-                    label 2、填写退款金额（不超过
+                    label 3、填写退款金额（不超过
                       strong.text-danger {{refundMoneyMax/100}}
                       | 元）      
                     input.form-control(v-model.number="newRefund.money" type="number")
                   .form-group    
-                    label 3、填写理由（不超过
+                    label 4、填写理由（不超过
                       strong.text-danger 1000
                       |字节）
                     textarea.form-control(v-model='newRefund.reason' rows=7)  
                   .form-group(v-if="applyType === 'platform'")
-                    label 4、上传凭证（不超过
+                    label 5、上传凭证（不超过
                       strong.text-danger 5
                       |张）
                     input(type="file" @change='selectedFile' multiple="multiple")

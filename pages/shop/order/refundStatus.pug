@@ -8,6 +8,8 @@ div(v-if="refunds.length === 0").p-t-4.text-center
       h5 {{format("YYYY-MM-DD HH:mm:ss", log.time)}} 
       h4.text-danger
         strong {{log.description}}
+      p(v-if="refund.paramId")
+        span 商品ID：{{refund.paramId}}
       p(v-if="log.money") 
         span 退款金额：
         span {{log.money/100}} 元

@@ -58,6 +58,11 @@ const shopCostRecordSchema = new Schema({
   refundStatus: {
     type: String,
     default: ""
+  },
+  // 退款金额
+  refundMoney: {
+    type: Number,
+    default: 0
   }
 }, {
   collection: 'shopCostRecord'

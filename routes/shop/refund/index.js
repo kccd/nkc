@@ -5,15 +5,12 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, body, tools} = ctx;
     const {user} = data;
-    const {orderId, refund, paramId} = body;
-    let {type, reason, root, money} = refund;
+    const {orderId, refund} = body;
+    let {type, reason, root, money, paramId} = refund;
     root = !!root;
     // 查询订单 判断权限
     let order = await db.ShopOrdersModel.findById(orderId);
     let param;
-    if(paramId) {
-      param = await order.getParamById(paramId);
-    }
     const orderDB = order;
     if(order.buyUid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
@@ -27,6 +24,21 @@ router
     if(refunds.length && refunds[0].succeed === null) {
       ctx.throw(400, "申请已提交，请勿重复提交申请");
     }
+    // 判断是否为订单中的最后一个商品，若是则改为退全部
+    let count = 0;
+    for(const p of order.params) {
+      if(p.refundStatus === "") {
+        count++;
+      }
+      if(p.costId === paramId) {
+        if(p.refundStatus !== "")  ctx.throw(400, "商品已退款，请刷新");
+        param = p;
+      }
+    }
+    if(count <= 1) {
+      param = "";
+    }
+
     if(root && !refunds.length) ctx.throw(400, "请先向卖家提出申请，卖家拒绝后可向平台提出申请");
     if(!type) {
       if(orderStatus !== 'unCost') ctx.throw(400, "请选择退款类型（退款、退款+退货）");
@@ -50,7 +62,6 @@ router
         paramId: param?param.costId: "",
         root
       };
-
       let refundMoney = Number(money)*100;
       refundMoney = Number(refundMoney.toFixed(2));
       if(refundMoney < 0) ctx.throw(400, "退款金额不能小于0");

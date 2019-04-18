@@ -28,6 +28,13 @@ var app = new Vue({
 
   },
   computed: {
+    orderOriginPrice: function() {
+      var num = 0;
+      for(var i = 0; i < this.order.params.length; i++) {
+        num += this.order.params[i].productPrice;
+      }
+      return num
+    },
     params: function() {
       return this.order.params;
     },

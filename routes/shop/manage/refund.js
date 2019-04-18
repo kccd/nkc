@@ -18,7 +18,7 @@ router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
     let {order} = data;
-    await order.extendCerts("seller", );
+    await order.extendCerts("seller");
     // 获取该订单的全部退款申请记录
     const refunds = await db.ShopRefundModel.find({
       orderId: order.orderId,

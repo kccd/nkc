@@ -2,19 +2,15 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .use('/', async(ctx, next) => {
-    const {data, query} = ctx;
-    const {id} = query;
+    const {data} = ctx;
     const {user, order} = data;
     if(user.uid !== order.buyUid) ctx.throw(403, "您没有权限操作别人的订单");
-    if(id) {
-      data.param = await order.getParamById(id);
-    }
     await next();
   })
   .get('/', async(ctx, next) => {
     const {data, db} = ctx;
-    let {order, param} = data;
-    await order.extendCerts("buyer", param?param._id:"");
+    let {order} = data;
+    await order.extendCerts("buyer");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
     data.order = order;

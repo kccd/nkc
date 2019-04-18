@@ -12,7 +12,8 @@ var app = new Vue({
     newRefund: {
       type: "",
       reason: "",
-      money: ""
+      money: "",
+      paramId: ""
     },
 
     // 错误信息
@@ -32,10 +33,29 @@ var app = new Vue({
     uploadStatus: '',
     trackNumber: '',
     displayGiveUpInput: false,
-    giveUpReason: '',
-    param: ""
+    giveUpReason: ''
   },
   computed: {
+    orderOriginPrice: function() {
+      var num = 0;
+      for(var i = 0; i < this.order.params.length; i++) {
+        num += this.order.params[i].productPrice;
+      }
+      return num
+    },
+    param: function() {
+      var paramId;
+      if(this.newRefund && this.newRefund.paramId) {
+        paramId = this.newRefund.paramId;
+      } else if(this.refund.paramId) {
+        paramId = this.refund.paramId;
+      }
+      if(!paramId) return "";
+      for(var i = 0 ; i < this.order.params.length; i++) {
+        if(this.order.params[i].costId === paramId) return this.order.params[i];
+      }
+      return ""
+    },
     status: function() {
       var refund = this.refunds[this.refunds.length - 1];
       return refund.logs[refund.logs.length -1];
@@ -168,7 +188,6 @@ var app = new Vue({
       var obj = {
         refund: newRefund,
         orderId: this.order.orderId,
-        paramId: param?param.costId: ""
       };
 
       nkcAPI(url, method, obj)

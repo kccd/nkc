@@ -170,6 +170,11 @@ const shopOrdersSchema = new Schema({
   applyToPlatform: {
     type: Boolean,
     default: false
+  },
+  // 退款金额
+  refundMoney: {
+    type: Number,
+    default: 0
   }
 }, {
   collection: 'shopOrders',
@@ -532,24 +537,18 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
  * @return [Object] 凭证对象数组
  * @author pengxiguaa 2019/3/28
  */
-shopOrdersSchema.methods.extendCerts = async function(type, paramId) {
+shopOrdersSchema.methods.extendCerts = async function(type) {
   const ShopCertModel = mongoose.model("shopCerts");
   const {orderId, sellUid, buyUid} = this;
   const c = await ShopCertModel.find({orderId, deleted: false}).sort({toc: 1});
   const certs = [];
   for(const cert of c) {
     if(type === "buyer" && cert.uid === buyUid) {
-      if(!paramId || paramId === cert.paramId) {
-        certs.push(cert);
-      }
+      certs.push(cert);
     } else if(type === "seller" && cert.uid === sellUid) {
-      if(!paramId || paramId === cert.paramId) {
-        certs.push(cert);
-      }
+      certs.push(cert);
     } else {
-      if(!paramId || paramId === cert.paramId) {
-        certs.push(cert);
-      }
+      certs.push(cert);
     }
   }
   return this.certs = certs;
