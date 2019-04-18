@@ -21,7 +21,7 @@
   padding-bottom: 0.7rem;
 }
 .thread-panel-author span{
-  color: #9baec8;
+  color: #3494da;
   font-weight: 700;
 }
 .thread-panel-time{
@@ -45,12 +45,12 @@
   border-bottom: rgba(0,0,0,0) solid 1px;
 }
 .thread-panel-title:hover{
-  color: #333;
+  color: #282c37;
   text-decoration: none;
   border-bottom: #555 solid 1px;
 }
 .thread-panel-title:link, .thread-panel-title:visited, .thread-panel-title:active{
-  color: #333;
+  color: #282c37;
   text-decoration: none;
 }
 .thread-panel-abstract{

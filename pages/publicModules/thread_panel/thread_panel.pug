@@ -29,7 +29,8 @@
         .fa.fa-eye=` ${thread.hits}`
       if thread.count - 1
         .fa.fa-comment=` ${thread.count - 1}`
-      .fa.fa-thumbs-up=` ${thread.firstPost.voteUp-thread.firstPost.voteDown || ''}`
+      if thread.firstPost.voteUp-thread.firstPost.voteDown
+        .fa.fa-thumbs-up=` ${thread.firstPost.voteUp-thread.firstPost.voteDown || ''}`
     if thread.type
       .thread-panel-from
         if thread.type === 'own'

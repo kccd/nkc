@@ -887,6 +887,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
       color: f.color,
       parentsId: f.parentsId,
       iconFileName: f.iconFileName,
+      description: f.description,
       childrenForums: []
     }
   });

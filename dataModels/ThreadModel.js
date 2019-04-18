@@ -537,6 +537,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}}, {
       fid: 1,
       displayName: 1,
+      description: 1,
       forumType: 1,
       color: 1,
       parentsId: 1,

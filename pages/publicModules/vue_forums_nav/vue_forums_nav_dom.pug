@@ -2,7 +2,7 @@
   .hidden(ref="vue_forums_nav_data")=JSON.stringify({forums: data.forums})
   .forums-nav-header
     +listHeader('话题')
-  div(v-for="forum in forums" v-if='forum.forumType === "topic"')
+  div(v-for="forum in forums" v-if='forum.forumType === "topic"' :title="forum.description")
     .home-topic-list-li
       a(:href="'/f/' + forum.fid" target="_blank")
         img(:src="'/forum_avatar/' + forum.fid"
@@ -16,6 +16,7 @@
         :href="'/f/' + f.fid"
         target="_blank"
         :style="'background-color: '+f.color+';'"
+        :title="f.description"
       ).topic-item
         img(
           v-if="f.iconFileName"
