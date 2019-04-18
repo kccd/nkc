@@ -37,6 +37,8 @@ router
     data.orders = orders;
     data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(data.orders);
     data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
+    data.orders = await db.ShopOrdersModel.checkRefundCanBeAll(data.orders);
+		console.log(data.orders)
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
     await next();
@@ -138,10 +140,9 @@ router
         orderPrice: post[bill].productPrice
       });
       await order.save();
-      // 拓展订单
-      // 减库存
-      // order = await db.ShopOrdersModel.orderExtendParams(order);
-      // await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
+      // 拓展订单并减库存
+      let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+      await db.ShopProductsParamModel.productParamReduceStock(orders,'orderReduceStock');
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');

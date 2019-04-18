@@ -57,8 +57,13 @@ block shopAccountContent
                 td #{numToFloatTwo(para.singlePrice)}
                 td
                   p!=para.count
-                  p
-                    a(href=`/shop/order/${order.orderId}/refund?id=${para.costId}`) 退款
+                  if order.mustAllRefund == false && order.orderStatus !== "finish" && order.orderStatus !== "unCost"
+                    if para.refundStatus == "" 
+                      p
+                        a(href=`/shop/order/${order.orderId}/refund?id=${para.costId}`) 退款
+                    else
+                      p
+                        a(href=`/shop/order/${order.orderId}/refund?id=${para.costId}`) 查看退款
                 if key == 0
                   td(rowspan=`${order.params.length}`) #{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
                   td(rowspan=`${order.params.length}`)= order.status

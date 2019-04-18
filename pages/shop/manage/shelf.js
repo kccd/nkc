@@ -212,10 +212,6 @@ function submitToShelf() {
     freightPrice.firstFreightPrice = firstFreightPrice;
     freightPrice.addFreightPrice = addFreightPrice;
   }
-  // freightPrice = Number(freightPrice)*100;
-  // if(isNaN(freightPrice) || freightPrice < 0) {
-  //   throw("运费价格不可小于0,不可为空");
-  // }
   var mergeForumId = getResultForumId();
   // 组装上传数据
   var post = {
@@ -224,8 +220,6 @@ function submitToShelf() {
     productDetails: productDetails,
     imgIntroductions: imgIntroductions,
     imgMaster: imgMaster,
-    // stockTotalCount: Number(stockTotalCount),
-    // stockSurplusCount: Number(stockTotalCount),
     uploadCert: uploadCert,
     uploadCertDescription: uploadCertDescription,
     stockCostMethod: stockCostMethod,

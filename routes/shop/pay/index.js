@@ -78,7 +78,6 @@ router
     if(user.kcb < totalMoney) ctx.throw(400, "您的科创币不足，请先充值或选择其他付款方式支付");
     if(totalMoney !== Number(totalPrice)*100) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
-    // orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
     for(let order of orders) {
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
@@ -98,8 +97,9 @@ router
         payToc: r.toc
       }});
     }
-    //减库存
-    // await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
+    // 拓展订单 并 付款减库存
+    orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
     user.uid = await db.UserModel.updateUserKcb(user.uid);
     await next();
   });

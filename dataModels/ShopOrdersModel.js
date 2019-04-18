@@ -412,6 +412,35 @@ shopOrdersSchema.statics.clearTimeoutOrders = async (uid) => {
   });
 };
 
+/**
+ * 检测是否只能进行全部退款
+ * 全部退款条件：
+ * 1.params中只有一个商品规格处于未退款状态,refundStatus == ""
+ */
+shopOrdersSchema.statics.checkRefundCanBeAll = async (orders) => {
+  return orders.map(o => {
+    let order;
+    if(o.toObject) {
+      order = o.toObject();
+    }else{
+      order = o;
+    }
+    const {params} = order;
+    let paramRefundCount = 0;
+    for(let a=0;a < params.length;a++) {
+      if(params.refundStatus && params.refundStatus !== ""){
+        paramRefundCount++;
+      }
+    }
+    if(params.length - paramRefundCount == 1) {
+      order.mustAllRefund = true;
+    }else{
+      order.mustAllRefund = false;
+    }
+    return order;
+  })
+}
+
 /* 
   翻译订单当前所处的状态，会在订单对象上添加”status“属性，值为订单状态字符串
   @param orders: 订单对象所组成的数组
@@ -478,8 +507,8 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   const record = KcbsRecordModel({
     _id: await SettingModel.operateSystemID('kcbsRecords', 1),
     from: "bank",
-    to: order.product.uid,
-    description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
+    to: order.sellUid,
+    description: ``,
     type: "sell",
     num: orderPrice,
     toc: time,
@@ -493,7 +522,7 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   await SettingModel.update({_id: 'kcb'}, {$inc: {
     "c.totalMoney": -1 * orderPrice
   }});
-  await UserModel.update({uid: order.product.uid}, {$inc: {
+  await UserModel.update({uid: order.sellUid}, {$inc: {
     kcb: orderPrice
   }});
 };
