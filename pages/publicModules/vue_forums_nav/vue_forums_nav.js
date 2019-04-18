@@ -9,17 +9,21 @@ var vue_forums_Nav = new Vue({
     forumsIdList: []
   },
   mounted: function() {
-    nkcAPI("/f", "GET")
+    var data = this.$refs.vue_forums_nav_data;
+    data = JSON.parse(data.innerHTML);
+    console.log(data);
+    this.forums = data.forums;
+    /*nkcAPI("/f", "GET")
       .then(function(data) {
         vue_forums_Nav.forums = data.forums;
       })
       .catch(function(data) {
         screenTopWarning(data);
-      });
+      });*/
   },
   methods: {
     openForum: function(forum) {
-      window.location.href= '/f/' + forum.fid;
+      window.open( '/f/' + forum.fid);
     },
     displayChildForums: function(forum, num) {
 

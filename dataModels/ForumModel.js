@@ -866,6 +866,53 @@ forumSchema.methods.extendRelatedForums = async function(fids) {
   }
   const relatedForums = await ForumModel.find({fid: {$in: relatedForumsId}});
   return this.relatedForums = relatedForums;
-}
+};
+
+/*
+* 加载专业列表，树形结构，并只保留了基本信息（fid，forumType, iconFileName, displayName, parentsId, color）
+* @param {[object]} userRoles 用户的证书对象所组成的数组
+* @param {object} userGrade 用户的等级对象
+* @param {object} user 用户对象
+* @author pengxiguaa 2019-4-18
+* @return {[object]} 专业对象所组成的数组
+* */
+forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  let forums = await ForumModel.visibleForums(userRoles, userGrade, user);
+  forums = forums.map(f => {
+    return {
+      fid: f.fid,
+      displayName: f.displayName,
+      forumType: f.forumType,
+      color: f.color,
+      parentsId: f.parentsId,
+      iconFileName: f.iconFileName,
+      childrenForums: []
+    }
+  });
+  const getForumById = (fid) => {
+    if(!fid) return;
+    for(let forum of forums){
+      if(forum.fid === fid) {
+        return forum;
+      }
+    }
+  };
+  for(let forum of forums) {
+    for(const fid of forum.parentsId) {
+      const parentForum = getForumById(fid);
+      if(parentForum) {
+        parentForum.childrenForums.push(forum);
+      }
+    }
+  }
+  const result = [];
+  for(let forum of forums) {
+    if(forum.parentsId.length === 0) {
+      result.push(forum);
+    }
+  }
+  return result;
+};
 
 module.exports = mongoose.model('forums', forumSchema);

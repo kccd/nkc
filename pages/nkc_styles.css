@@ -2589,23 +2589,7 @@ img.emoji {
   padding: 8px 10px;
 } */
 
-.home-post-button a{
-  text-decoration: none;
-  height: 5rem;
-  line-height: 5rem;
-  padding: 0;
-  cursor: pointer;
-  font-weight: 600;
-  border-radius: 2px;
-  font-size: 1.5em;
-  border: 1px solid #eeeeee;
-  color: #ff8328;
-}
-.home-post-button a:hover{
-  /* color: #ee8b42; */
-  border-color: #ccc;
-  /* background-color: rgba(0,0,0,0.05); */
-}
+
 
 .fixedDiv::-webkit-scrollbar {/*滚动条整体样式*/
   width: 5px;     /*高宽分别对应横竖滚动条的尺寸*/

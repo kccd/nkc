@@ -42,6 +42,9 @@ router
       await user.updateUserMessage();
     }
 
+    // 加载专业列表
+    data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+
     // 关注的文章
     const usersCollections = await db.CollectionModel.find({uid: user.uid});
     const subscribeThreadsId = usersCollections.map(c => c.tid);

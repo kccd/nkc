@@ -489,7 +489,18 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   });
 
   if(o.firstPost || o.lastPost) {
-    const posts = await PostModel.find({pid: {$in: [...postsId]}});
+    const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
+      pid: 1,
+      t: 1,
+      c: 1,
+      abstract: 1,
+      uid: 1,
+      toc: 1,
+      tlm: 1,
+      l: 1,
+      tid: 1,
+      mainForumsId: 1
+    });
     posts.map(post => {
       if(o.htmlToText) {
         post.c = obtainPureText(post.c, true, o.count);
@@ -501,7 +512,15 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     });
 
     if(o.firstPostUser || o.lastPostUser) {
-      const users = await UserModel.find({uid: {$in: [...usersId]}});
+      const users = await UserModel.find({uid: {$in: [...usersId]}}, {
+        uid: 1,
+        toc: 1,
+        tlv: 1,
+        username: 1,
+        xsf: 1,
+        kcb: 1,
+        certs: 1
+      });
       if(o.userInfo) {
         await UserModel.extendUsersInfo(users);
       }
@@ -512,7 +531,15 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   }
 
   if(o.forum) {
-    let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
+    // let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
+    let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}}, {
+      fid: 1,
+      displayName: 1,
+      forumType: 1,
+      color: 1,
+      parentsId: 1,
+      iconFileName: 1
+    });
     /* forums.map(forum => {
       if(forum.parentId) {
         if(o.parentForum) {

@@ -36,6 +36,21 @@
 .swiper-pagination{
   color: #ffffff;
 }
-.forums-nav .material-icons{
-  color: #aaaaaa;
+.home-post-button a{
+  text-decoration: none;
+  height: 5rem;
+  line-height: 5rem;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 800;
+  border-radius: 2px;
+  font-size: 1.4rem;
+  border: 1px solid #eeeeee;
+  color: #ff8328;
+}
+.home-post-button a:hover{
+  /* color: #ee8b42; */
+  border-color: #ccc;
+  /* background-color: rgba(0,0,0,0.05); */
 }

@@ -32,6 +32,7 @@
   display: -moz-box;
   list-style: none;
   cursor: pointer;
+  color: #555;
 }
 .list-item-avatar{
   height: 3rem;
