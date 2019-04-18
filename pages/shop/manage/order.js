@@ -35,6 +35,7 @@ function sendGoods() {
   }) 
 }
 
+
 /**
  * 打开弹窗，填写运单号
  * @param {String} orderId  订单号
@@ -46,6 +47,7 @@ function openSendGoodsModal(sellUid, orderId) {
   $("#newstoreid").val(sellUid);
   $("#neworderid").val(orderId);
 }
+
 
 /**
  * 修改订单
@@ -76,6 +78,7 @@ function editOrder() {
   })
 }
 
+
 /**
  * 打开弹窗，修改商品价格
  * @param {String} sellUid 卖家Uid
@@ -87,6 +90,7 @@ function openEditOrderModal(sellUid, orderId) {
   $("#eoorderid").val(orderId);
 }
 
+
 /**
  * 查看物流
  */
@@ -94,6 +98,7 @@ function visitLogisticsInfo(sellUid,orderId) {
   var targetUrl = '/shop/manage/'+sellUid+'/order/logositics?orderId='+orderId;
   window.location.href = targetUrl;
 }
+
 
 /**
  * 修改运单号
@@ -106,6 +111,7 @@ function editTrackNum() {
   $("#trakcNumText").html(infoPutDom);
 
 }
+
 
  /**
   * 保存运单号修改
@@ -124,6 +130,7 @@ function saveTrackNum(sellUid,orderId) {
   })
 }
 
+
 /**
  * 修改卖家备注
  */
@@ -140,6 +147,7 @@ function editSellMessage(uid,orderId) {
     screenTopWarning(data.error || data);
   })
 }
+
 
 /**
  * 修改商品单价
@@ -164,31 +172,54 @@ function editProductSinglePrice(sellUid, orderId, paraId) {
   })
 }
 
+
 /**
  * 保存折后价
  */
-function saveProductSinglePrice(sellUid, orderId, paraId) {
-  $("#productSinglePriceValue"+paraId).val(100)
-  $("#productSinglePriceDom"+paraId).css("display", "none");
+function saveProductSinglePrice(sellUid, orderId, costId) {
+  $("#productSinglePriceValue"+costId).val(100)
+  $("#productSinglePriceDom"+costId).css("display", "none");
   // 计算差值
-  var result = Number($("#productSinglePriceResult"+paraId).text());
-  var originResult = Number($("#productSinglePrice"+paraId).text());
-  var resultDiff = (result - originResult) * Number($("#productSingleCount"+paraId).text());
+  var result = Number($("#productSinglePriceResult"+costId).text());
+  var originResult = Number($("#productSinglePrice"+costId).text());
+  var resultDiff = (result - originResult) * Number($("#productSingleCount"+costId).text());
   // 取出商品总价、运费、订单总价
   var productTotalPrice = Number($("#productTotalPrice"+orderId).text());
   var productFreightPrice = Number($("#productFreightPrice"+orderId).text());
   var orderTotalPrice = Number($("#orderTotalPrice"+orderId).text());
   // 隐藏保存按钮，并显示修改按钮
-  $("#editPriceBtn"+paraId).css("display", "");
-  $("#savePriceBtn"+paraId).css("display", "none");
+  $("#editPriceBtn"+costId).css("display", "");
+  $("#savePriceBtn"+costId).css("display", "none");
 
   // 输出修改后结果
-  $("#productSinglePrice"+paraId).text(result);
+  $("#productSinglePrice"+costId).text(result);
   // 修改商品总价
   $("#productTotalPrice"+orderId).text(numToFloatTwo((productTotalPrice+resultDiff)*100));
   // 修改订单总价
   productTotalPrice = Number($("#productTotalPrice"+orderId).text());
   $("#orderTotalPrice"+orderId).text(numToFloatTwo((productTotalPrice+productFreightPrice)*100));
+
+  var costObj = {
+    singlePrice: Number($("#productSinglePrice"+costId).text()) *100,
+    count: Number($("#productSingleCount"+costId).text())
+  };
+  var orderObj = {
+    orderPrice: Number($("#productTotalPrice"+orderId).text())*100,
+    orderFreightPrice: Number($("#productFreightPrice"+orderId).text())*100
+  }
+  var postObj = {
+    costId: costId,
+    orderId: orderId,
+    costObj: costObj,
+    orderObj: orderObj
+  };
+  nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PATCH", postObj)
+  .then(function(data) {
+    screenTopAlert("保存成功");
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data);
+  })
 }
 
 
@@ -196,5 +227,100 @@ function saveProductSinglePrice(sellUid, orderId, paraId) {
  * 修改运费
  */
 function editOrderFreightPrice(sellUid,orderId) {
+  $("#editFreightBtn"+orderId).css("display", "none");
+  $("#saveFreightBtn"+orderId).css("display", "");
+  var orderFreightPrice = Number($("#productFreightPrice"+orderId).text());
+  var inputDom = "<input id='productFreightPriceInput"+orderId+"' type='text' value='"+orderFreightPrice+"' style='width:13%'>";
+  $("#productFreightPrice"+orderId).html(inputDom);
+}
 
+
+/**
+ * 保存运费修改
+ */
+function saveOrderFreightPrice(sellUid, orderId) {
+  $("#editFreightBtn"+orderId).css("display", "");
+  $("#saveFreightBtn"+orderId).css("display", "none");
+  var newFreightPrice = $("#productFreightPriceInput" + orderId).val();
+  newFreightPrice = Number(newFreightPrice);
+  $("#productFreightPrice"+orderId).html(numToFloatTwo(newFreightPrice*100));
+  // 修改订单总价
+  var productTotalPrice = Number($("#productTotalPrice"+orderId).text());
+  $("#orderTotalPrice"+orderId).text(numToFloatTwo((productTotalPrice+newFreightPrice)*100));
+  var orderObj = {
+    orderPrice: Number($("#productTotalPrice"+orderId).text())*100,
+    orderFreightPrice: Number($("#productFreightPrice"+orderId).text())*100
+  }
+  var postObj = {
+    orderId: orderId,
+    orderObj: orderObj
+  }
+  nkcAPI('/shop/manage/'+sellUid+'/order/editOrderPrice', "PATCH", postObj)
+  .then(function(data) {
+    screenTopAlert("保存成功");
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data);
+  })
+}
+
+
+/**
+ * 修改数量
+ */
+function editOrderProductCount(sellUid, costId, orderId) {
+  $("#editCountBtn"+costId).css("display", "none");
+  $("#saveCountBtn"+costId).css("display", "");
+  var productCount = Number($("#productSingleCount"+costId).text());
+  var productCountDom = "<input id='productCountInput"+costId+"' type='text' value='"+productCount+"' style='width:13%'>";
+  $("#productSingleCount"+costId).html(productCountDom);
+}
+
+
+/**
+ * 保存数量修改
+ */
+function saveOrderProductCount(sellUid, costId, orderId) {
+  $("#editCountBtn"+costId).css("display", "");
+  $("#saveCountBtn"+costId).css("display", "none");
+  var newProductCount = Number($("#productCountInput"+costId).val());
+  if(isNaN(newProductCount) || newProductCount < 0) {
+    newProductCount = 1;
+  }
+  // 获取当前商品单价、 运费、 商品总价、订单总价、并计算出商品总价以及订单总价
+  var singlePrice = Number($("#productSinglePrice"+costId).text());
+  var productSingleCountHis = Number($("#productSingleCountHis"+costId).text());
+  var productTotalPrice = Number($("#productTotalPrice"+orderId).text());
+  var productFreightPrice = Number($("#productFreightPrice"+orderId).text());
+  
+  var countDiff = newProductCount - productSingleCountHis;
+  var totalPriceDiff = countDiff * singlePrice;
+  productTotalPrice += totalPriceDiff;
+
+  $("#productSingleCount"+costId).text(newProductCount);
+  $("#productSingleCountHis"+costId).text(newProductCount);
+  $("#productTotalPrice"+orderId).text(productTotalPrice);
+  $("#orderTotalPrice"+orderId).text(numToFloatTwo((productTotalPrice + productFreightPrice)*100));
+
+  var costObj = {
+    singlePrice: Number($("#productSinglePrice"+costId).text()) *100,
+    count: Number($("#productSingleCount"+costId).text())
+  };
+  var orderObj = {
+    orderPrice: Number($("#productTotalPrice"+orderId).text())*100,
+    orderFreightPrice: Number($("#productFreightPrice"+orderId).text())*100
+  }
+  var postObj = {
+    costId: costId,
+    orderId: orderId,
+    costObj: costObj,
+    orderObj: orderObj
+  };
+  nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PATCH", postObj)
+  .then(function(data) {
+    screenTopAlert("保存成功");
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data);
+  })
 }

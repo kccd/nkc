@@ -105,6 +105,7 @@ router
           uid: cart.uid,
           freightPrice: cart.freightPrice,
           productPrice: cart.productPrice,
+          singlePrice: cart.productParam.price
         };
         let shopCost = db.ShopCostRecordModel(cartObj)
         await shopCost.save();
@@ -138,8 +139,7 @@ router
       await order.save();
       // 拓展订单
       // 减库存
-      order = await db.ShopOrdersModel.orderExtendParams(order);
-      await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
+      // await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');

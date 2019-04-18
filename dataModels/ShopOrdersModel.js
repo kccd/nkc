@@ -356,7 +356,6 @@ shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
   const ordersId = [];
   let totalMoney = 0;
   for(const o of orders) {
-    await ShopOrdersModel.orderExtendParams(o);
     for(const c of o.params){
       let title = "";
       let needAdd = true;

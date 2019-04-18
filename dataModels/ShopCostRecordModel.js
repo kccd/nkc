@@ -46,10 +46,14 @@ const shopCostRecordSchema = new Schema({
   freightPrice: {
     type: Number
   },
-  // 商品单价
+  // 商品总价
   productPrice: {
     type: Number
   },
+  // 商品单价
+  singlePrice: {
+    type: Number
+  }, 
   // 退款状态
   refundStatus: {
     type: String,

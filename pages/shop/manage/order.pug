@@ -53,20 +53,27 @@ block name
                 td=para.productParam.name
                 td
                   p
-                    span(id=`productSinglePrice${para._id}`) #{numToFloatTwo(para.productParam.price)}
-                    span(id=`productSingleDiff${para._id}` style="display:none") 0
-                    span 
-                      a(id=`editPriceBtn${para._id}` style="cursor:pointer" onclick=`editProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para._id})`) 修改
-                      a(id=`savePriceBtn${para._id}` style="cursor:pointer;display:none" onclick=`saveProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para._id})`) 保存
-                  p(id=`productSinglePriceDom${para._id}` style="display:none")
+                    span(id=`productSinglePrice${para.costId}`) #{numToFloatTwo(para.singlePrice)}
+                    span(id=`productSingleDiff${para.costId}` style="display:none") 0
+                    if order.orderStatus == "unCost" && !order.closeStatus
+                      span 
+                        a(id=`editPriceBtn${para.costId}` style="cursor:pointer" onclick=`editProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para.costId})`) 修改
+                        a(id=`savePriceBtn${para.costId}` style="cursor:pointer;display:none" onclick=`saveProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para.costId})`) 保存
+                  p(id=`productSinglePriceDom${para.costId}` style="display:none")
                     span 折扣：
                     span 
-                      input(id=`productSinglePriceValue${para._id}` type="text" placeholder="10~999" style="width:20%")
+                      input(id=`productSinglePriceValue${para.costId}` type="text" placeholder="10~999" style="width:20%")
                     span %&nbsp;&nbsp;
                     span 
-                    span(id=`productSinglePriceResult${para._id}`) #{numToFloatTwo(para.productParam.price)}
+                    span(id=`productSinglePriceResult${para.costId}`) #{numToFloatTwo(para.productParam.price)}
                 td
-                  span(id=`productSingleCount${para._id}`)!=para.count
+                  span(id=`productSingleCount${para.costId}`)!=para.count
+                  span(id=`productSingleCountHis${para.costId}` style="display:none")!=para.count
+                  if order.orderStatus == "unCost" && !order.closeStatus
+                    span &nbsp;&nbsp;
+                    span
+                      a(onclick=`editOrderProductCount(${order.sellUid}, ${para.costId}, ${order.orderId})` id=`editCountBtn${para.costId}` style="cursor:pointer") 修改
+                      a(onclick=`saveOrderProductCount(${order.sellUid}, ${para.costId}, ${order.orderId})` id=`saveCountBtn${para.costId}` style="display:none;cursor:pointer") 保存
                 if key == 0
                   td(rowspan=`${order.params.length}`)  
                     p 
@@ -75,8 +82,15 @@ block name
                     p 
                       span 运费：
                       span(id=`productFreightPrice${order.orderId}`) #{numToFloatTwo(order.orderFreightPrice)}
-                      span
-                        a(onclick=`editOrderFreightPrice(${order.sellUid}, ${order.orderId})`) 修改
+                      if order.orderStatus == "unCost" && !order.closeStatus
+                        span &nbsp;&nbsp;
+                        span
+                          a(id=`editFreightBtn${order.orderId}` onclick=`editOrderFreightPrice(${order.sellUid}, ${order.orderId})` style="cursor:pointer") 修改
+                          a(id=`saveFreightBtn${order.orderId}` onclick=`saveOrderFreightPrice(${order.sellUid}, ${order.orderId})` style="display:none;cursor:pointer") 保存
+                    //- p
+                    //-   span 修改运费：&nbsp;&nbsp;
+                    //-   span 
+                    //-     input(type="text" style="width:15%")
                     p 
                       span 总计：
                       span(id=`orderTotalPrice${order.orderId}`) #{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
@@ -89,9 +103,9 @@ block name
                   td(rowspan=`${order.params.length}`) 
                     if !order.closeStatus && ["unCost", "unShip"].includes(order.orderStatus)
                       a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
-                    if order.orderStatus == "unCost" && !order.closeStatus
-                      p
-                        button(onclick=`openEditOrderModal(${data.user.uid}, ${order.orderId})`) 修改价格
+                    //- if order.orderStatus == "unCost" && !order.closeStatus
+                    //-   p
+                    //-     button(onclick=`openEditOrderModal(${data.user.uid}, ${order.orderId})`) 修改价格
                     if order.refundStatus == "ing"
                       p
                         a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情

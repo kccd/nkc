@@ -80,7 +80,6 @@ router
 
     // orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
     for(let order of orders) {
-      await db.ShopOrdersModel.orderExtendParams(order);
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
         from: order.buyUid,
