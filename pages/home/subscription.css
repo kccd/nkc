@@ -47,10 +47,13 @@
   border-radius: 2px;
   font-size: 1.4rem;
   border: 1px solid #eeeeee;
-  color: #ff8328;
+  color: #e85a71;
 }
 .home-post-button a:hover{
   /* color: #ee8b42; */
   border-color: #ccc;
   /* background-color: rgba(0,0,0,0.05); */
+}
+.container-fluid.max-width{
+  max-width: 1300px;
 }

@@ -499,7 +499,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       tlm: 1,
       l: 1,
       tid: 1,
-      mainForumsId: 1
+      mainForumsId: 1,
+      voteUp: 1,
+      voteDown: 1
     });
     posts.map(post => {
       if(o.htmlToText) {

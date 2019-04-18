@@ -42,8 +42,21 @@ router
       await user.updateUserMessage();
     }
 
+    const homeSettings = (await db.SettingModel.findById("home")).c;
+
     // 加载专业列表
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+
+    // 置顶文章轮播图
+    const ads = await Promise.all(homeSettings.ads.map(async tid => {
+      const thread = await db.ThreadModel.findOne({tid});
+      if(thread) return thread;
+    }));
+    data.ads = await db.ThreadModel.extendThreads(ads, {
+      forum: false,
+      lastPost: false
+    });
+
 
     // 关注的文章
     const usersCollections = await db.CollectionModel.find({uid: user.uid});
@@ -62,8 +75,6 @@ router
       const childFid = await db.ForumModel.getAllChildrenFid(fid);
       subscribeForumsId = subscribeForumsId.concat(childFid);
     }
-
-    const homeSettings = (await db.SettingModel.findById("home")).c;
 
     data.homeSettings = homeSettings;
 
@@ -115,7 +126,7 @@ router
     let threads = await db.ThreadModel.find(q, {
       uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
       tlm: 1, fid: 1, hasCover: 1,
-      mainForumsId: 1
+      mainForumsId: 1, hits: 1, count: 1
     }).skip(paging.start).limit(paging.perpage).sort({toc: -1});
 
     threads = await db.ThreadModel.extendThreads(threads, {

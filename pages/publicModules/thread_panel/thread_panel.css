@@ -1,0 +1,105 @@
+.thread-panel{
+  padding-bottom: 3rem;
+}
+.thread-panel-author img{
+  height: 2rem;
+  margin-top: -2px;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+.thread-panel-author {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.thread-panel-author:hover, .thread-panel-author:visited, .thread-panel-author:active, .thread-panel-author:link{
+  text-decoration: none;
+  color: #9baec8;
+}
+.thread-panel-info{
+  padding-bottom: 0.7rem;
+}
+.thread-panel-author span{
+  color: #9baec8;
+  font-weight: 700;
+}
+.thread-panel-time{
+  display: inline-block;
+  color: #aaa;
+}
+.thread-panel-forum{
+  display: inline-block;
+}
+.thread-panel-forum a{
+  color: #aaa;
+}
+.thread-panel-forum a:hover, .thread-panel-forum a:active, .thread-panel-forum a:visited,.thread-panel-forum a:link{
+  text-decoration: none;
+}
+.thread-panel-title{
+  font-size: 1.4rem;
+  color: #282c37;
+  /*font-weight: 700;*/
+  text-decoration: none;
+  border-bottom: rgba(0,0,0,0) solid 1px;
+}
+.thread-panel-title:hover{
+  color: #333;
+  text-decoration: none;
+  border-bottom: #555 solid 1px;
+}
+.thread-panel-title:link, .thread-panel-title:visited, .thread-panel-title:active{
+  color: #333;
+  text-decoration: none;
+}
+.thread-panel-abstract{
+  display: -webkit-flex;
+  display: flex;
+  margin-top: 0.4rem;
+  margin-bottom: 0.5rem;
+  color: #777;
+  max-height: 6rem;
+  overflow: hidden;
+  font-size: 1.2rem;
+}
+.thread-panel-abstract:hover, .thread-panel-abstract:link, .thread-panel-abstract:active, .thread-panel-abstract:visited{
+  text-decoration: none;
+  color: #777;
+}
+.thread-panel-abstract-content{
+  display: -webkit-box;
+  line-height: 1.8rem;
+  max-height: 6rem;
+  font-size: 1.2rem;
+  padding-top: 0.3rem;
+  overflow: hidden;
+  height: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+}
+.thread-panel-abstract-cover{
+  margin-left: 0.5rem;
+  -webkit-flex-grow: 0;
+  flex-grow: 0;
+  height: 6rem;
+  min-width: 10rem;
+  border-radius: 3px;
+  background-size: cover;
+}
+.thread-panel-from{
+  font-size: 1.2rem;
+  display: inline-block;
+  color: #9baec8;
+}
+.thread-panel-button{
+  display: inline-block;
+  font-size: 1.2rem;
+  color: #777;
+}
+.thread-panel-button .fa{
+  margin-right: 0.5rem;
+  color: #9baec8;
+}

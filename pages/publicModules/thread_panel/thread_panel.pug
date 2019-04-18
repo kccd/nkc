@@ -1,0 +1,43 @@
+.thread-panel
+  .thread-panel-info
+    a(href=`/u/${thread.uid}` target="_blank").thread-panel-author
+      img(src=`/avatar_small/${thread.uid}`)
+      span= thread.firstPost.user.username
+
+    .thread-panel-forum
+      if data.forum
+      else
+        -let forum;
+        for f in thread.forums
+          -forum = f;
+          if f.forumType === 'topic'
+            -break;
+        a(href=`/f/${forum.fid}`)= forum.displayName
+
+    .thread-panel-time=fromNow(thread.toc)
+
+  a(href=`/t/${thread.tid}`).thread-panel-title= thread.firstPost.t
+  a(href=`/t/${thread.tid}`).thread-panel-abstract
+    .thread-panel-abstract-content=thread.firstPost.c.slice(0, 200)
+    if thread.hasCover
+      .thread-panel-abstract-cover(
+        style=`background-image: url(/cover/${thread.tid})`
+      )
+  .thread-panel-info
+    .thread-panel-button
+      if thread.hits
+        .fa.fa-eye=` ${thread.hits}`
+      if thread.count - 1
+        .fa.fa-comment=` ${thread.count - 1}`
+      .fa.fa-thumbs-up=` ${thread.firstPost.voteUp-thread.firstPost.voteDown || ''}`
+    if thread.type
+      .thread-panel-from
+        if thread.type === 'own'
+          span 来自自己的文章
+        else if thread.type === 'subscribeForum'
+          span 来自关注的专业
+        else if thread.type === 'subscribeFriend'
+          span 来自好友
+        else
+          span 来自关注的文章
+

@@ -1,6 +1,7 @@
 extends ../bootstrap_base
 block title
   title=`${data.serverSettings.websiteName} - ${data.serverSettings.brief}`
+  +includeCSS("/publicModules/thread_panel/thread_panel.css")
   +includeCSS("/home/subscription.css")
   include ../publicModules/vue_forums_nav/vue_forums_nav_css
 block content
@@ -14,7 +15,23 @@ block content
             else
               span.fa.fa-login &nbsp;登录
         include ../publicModules/vue_forums_nav/vue_forums_nav_dom
-      .col-xs-12.col-md-10
-        include ../publicModules/thread_panel
+      .col-xs-12.col-md-7
+        .swiper-container.swiper-home
+          .swiper-wrapper
+            for thread in data.ads
+              a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                'background-image': `url(/cover/${thread.tid})`
+              })
+                .swiper-title= `${thread.firstPost.t}`
+          .swiper-pagination
+          .swiper-button-next.swiper-button(style='background-image: none;')
+            <i class="mdui-icon material-icons">&#xe315;</i>
+          .swiper-button-prev.swiper-button(style='background-image: none;')
+            <i class="mdui-icon material-icons">&#xe314;</i>
+
+        for thread in data.threads
+          include ../publicModules/thread_panel/thread_panel
 block scripts
+  +includeJS("/swiper/dist/js/swiper.js")
   include ../publicModules/vue_forums_nav/vue_forums_nav_js
+  +includeJS("/home/newHome.js")
