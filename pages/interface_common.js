@@ -1291,6 +1291,9 @@ function digestPost(pid) {
     button[2].onclick = function() {
       var input = event.currentTarget.getElementsByTagName('input');
       var num = input[0].value;
+      num = Number(num);
+      num = num*100;
+      if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
       var obj = {kcb: num};
       post(obj);
     }
