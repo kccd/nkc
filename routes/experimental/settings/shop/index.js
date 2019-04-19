@@ -8,6 +8,11 @@ const shopRouter = new Router();
 shopRouter
 	.use('/', async (ctx, next) => {
 		const {data,body,db} = ctx;
+		let homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
+		if(!homeSetting){
+			homeSetting = new db.ShopSettingsModel({});
+			await homeSetting.save();
+		}
 		const applysDealing = await db.ShopApplyStoreModel.find({applyStatus: "dealing"});
 		data.applysDealing = applysDealing;
 		await next();
