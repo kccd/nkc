@@ -20,7 +20,7 @@ var vue_user_panel_float = new Vue({
     close: function() {
       setTimeout(function() {
         vue_user_panel_float.show = false;
-      }, 300);
+      }, 100);
     },
 
     getMousePosition: function(event) {
@@ -51,7 +51,7 @@ var vue_user_panel_float = new Vue({
           var targetUser = data.targetUser;
           vue_user_panel_float.usersObj[targetUser.uid] = {
             username: targetUser.username,
-            description: (targetUser.description ||"").slice(0, 140),
+            description: (targetUser.description ||"暂未填写个人简介").slice(0, 140),
             uid: targetUser.uid,
             kcb: targetUser.kcb,
             xsf: targetUser.xsf,

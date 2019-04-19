@@ -145,7 +145,22 @@ router
       }
     });
 
+    // 一周活跃用户
+    const { home } = ctx.settings;
+    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(home.activeUsersLength);
+    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
+    // 网站公告
+    const noticeThreads = await Promise.all(homeSettings.noticeThreadsId.map(async oc => {
+      const thread = await db.ThreadModel.findOne({oc});
+      if(thread) return thread;
+    }));
+    data.noticeThreads = await db.ThreadModel.extendThreads(noticeThreads, {
+      forum: false,
+      lastPost: false
+    });
+
     data.threads = threads;
+    data.paging = paging;
 
     ctx.template = "home/newHome.pug";
 

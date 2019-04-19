@@ -30,8 +30,6 @@ module.exports = async (ctx, next) => {
 			ctx.status = 401;
 			ctx.error = new Error('缓存验证失败');
       user = undefined;
-      console.log(1)
-			// return ctx.redirect('/login');
 		}
 	}
   let languageName = 'zh_cn';

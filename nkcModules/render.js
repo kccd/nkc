@@ -362,7 +362,8 @@ let pugRender = (template, data, state) => {
     // 验证用户是否具有执行该操作的权限
     permission: (operationId) => {
       return data.userOperationsId.includes(operationId);
-    }
+    },
+    state: state
   };
   options.data = data;
   options.filters = filters;

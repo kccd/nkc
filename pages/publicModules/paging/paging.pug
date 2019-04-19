@@ -1,0 +1,58 @@
+-var page = data.paging.page || 0;
+-var pageCount = data.paging.pageCount || 1;
+-var min, max;
+-var query = '';
+if data.t
+  -query = `&t=${data.t}`;
+if data.s
+  -query += `&s=${data.s}`;
+if data.c
+  -query += `&c=${data.c}`;
+if pageCount > 1
+  -const arr = [];
+  -let n = 7;
+  -let reduce1 = page-3;
+  -let reduce2 =  page+3;
+  if(reduce1 > 0)
+    if(reduce2 > pageCount)
+      -max = pageCount;
+      if(reduce1-(reduce2 - pageCount) < 0)
+        -min = 0;
+      else
+        -min = reduce1-(reduce2 - pageCount);
+    else
+      -max = reduce2;
+      -min = reduce1;
+  else
+    -min = 0;
+    if(reduce2 < pageCount)
+      if(pageCount < reduce2 - reduce1)
+        -max = pageCount;
+      else
+        -max = reduce2-reduce1;
+    else
+      -max = pageCount - 1;
+  nav(aria-label='navigation').paging-nav
+    ul(style='margin: 0')
+      if min !== 0
+        li
+          a(href=`${state.url}?page=${0}${skipId || ''}${query}`) 1
+        li ...
+      -for(let i = 0; i < pageCount; i++)
+        if i >= min && i <= max
+          -let active = '';
+          if(page === i)
+            -active = 'active';
+          li(class=active)
+            a(href=`${state.url}?page=${i}${skipId || ''}${query}`)= i+1
+      if max < pageCount - 1
+        li ...
+        li
+          a(href=`${state.url}?page=${pageCount - 1}${skipId || ''}${query}`)= pageCount
+      if max < pageCount - 1 || min !== 0
+        li
+          | 跳转到
+          input(type="number" id="paging_nav_input")
+          |页
+          button(
+            onclick=`var newPage = Number($("#paging_nav_input").val());window.location.href='${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}'`) 确定

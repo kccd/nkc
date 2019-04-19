@@ -1,10 +1,10 @@
 #vue_user_panel_float(v-cloak)
   transition(name="fade")
-    div(v-if="show").content(:style="'top: ' + top+'px;left: ' + left + 'px;'")
+    div.content(v-if="show" :style="'top: ' + top+'px;left: ' + left + 'px;'")
       .user_base
         .user_avatar
           img(:src="'/avatar/' + user.uid")
-          .user_id ID:{{user.uid}}
+          .user_id ID：{{user.uid}}
         .user_div
           .user_name {{user.username}}
 

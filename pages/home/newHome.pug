@@ -35,6 +35,14 @@ block content
           .col-xs-12.col-md-12.m-t-2
             for thread in data.threads
               include ../publicModules/thread_panel/thread_panel
+            include ../publicModules/paging/paging
+      .col-xs-12.col-md-3
+        include ../publicModules/canvas_logo
+        //-include ../publicModules/notice
+          include ../publicModules/active_users
+          include ../publicModules/web_info_side.pug
+block footer
+  include ../publicModules/footer/footer
 block scripts
   +includeJS("/swiper/dist/js/swiper.js")
   include ../publicModules/vue_forums_nav/vue_forums_nav_js

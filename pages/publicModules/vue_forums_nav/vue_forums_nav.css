@@ -11,7 +11,11 @@
 }
 .child-forums-nav-div{
   position: absolute;
-  background-color: rgba(245,245,245,0.95 );
+  opacity:0.97;
+  /*background-color: rgba(245,245,245,0.95 );*/
+  background-color: #d9e1e8;
+  color: #000;
+  font-weight: 700;
 }
 .child-forums-nav .forums-nav{
   min-height: 100%;
@@ -23,11 +27,14 @@
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
-.select-forum{
-  background-color: #eee;
+.forums-nav .select-forum{
+  /*background-color: #eee;*/
+  background-color: #9baec8;
+  color: #fff;
 }
 .forums-nav{
   position: relative;
+  font-weight: 700;
   padding: 0;
 }
 .list-item{
@@ -54,6 +61,7 @@
   line-height: 3rem;
   display: inline-block;
   vertical-align: middle;
+  padding-left: 0.5rem;
 }
 .list-item-icon{
   float: right;
