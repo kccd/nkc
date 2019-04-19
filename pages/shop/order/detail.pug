@@ -232,6 +232,7 @@ block shopAccountContent
             th 属性
             th 商品单价
             th 数量
+            th 购买凭证
         tbody
           for para in order.params
             tr
@@ -240,6 +241,16 @@ block shopAccountContent
               td!=`${para.productParam.name}`
               td #{numToFloatTwo(para.productParam.price)}
               td!=`${para.count}`
+              td
+                if para.product.uploadCert
+                  for cert in data.certs
+                    if cert.paramId == para.costId && cert.orderId == para.orderId
+                      span
+                        a(href=`/shop/cert/${cert.id}` target="blank")
+                          img(src=`/shop/cert/${cert.id}` style="width:40px;height:40px;margin-right:10px")
+                else
+                  span 不需凭证
+
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
         //- p

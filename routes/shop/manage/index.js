@@ -35,7 +35,13 @@ manageRouter
     if(!user || user.uid !== uid) ctx.throw(400, "这不是您的卖家中心");
     const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
     data.dealInfo = dealInfo;
-    // data.myStore = myStore;
+    // 检测是否被封禁商品上架功能
+    const homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
+    if(homeSetting.banList) {
+      if(homeSetting.banList.indexOf(user.uid) > -1) {
+        data.isban = true;
+      }
+    }
     await next();
   })
   .get('/:uid', async (ctx, next) => {

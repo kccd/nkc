@@ -12,10 +12,14 @@ homeRouter
 		// 统计数据
 		// 统计所有商品的访问量
 		const productVisits = await db.ThreadModel.aggregate([
-			{$match: {uid: user.uid}},
+			{$match: {uid: user.uid, type: "product"}},
 			{$group: {_id:null, hits:{$sum:"$hits"}}}
 		])
-		statistics.visitCount = productVisits[0].hits;
+		if(productVisits.length > 0) {
+			statistics.visitCount = productVisits[0].hits;
+		}else{
+			statistics.visitCount = 0;
+		}
 		// 统计所有商品的售卖数量
 		const productSellCount = await db.ShopOrdersModel.count({sellUid:user.uid, orderStatus:"finish"});
 		statistics.sellCount = productSellCount;

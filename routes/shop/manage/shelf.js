@@ -12,6 +12,10 @@ shelfRouter
     // if(!data.dataPerfect) {
     //   return ctx.redirect(`/shop/manage/${user.uid}/info`)
     // }
+    const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
+    if(!data.dealInfo || !data.dealInfo.dataPerfect) {
+      return ctx.redirect(`/shop/manage/${user.uid}/info`)
+    }
     await next();
   })
 	.get('/', async (ctx, next) => {

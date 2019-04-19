@@ -656,7 +656,8 @@ function mulArrTurnTable() {
   var trDom = "";
   if(rArr.length !== 0) {
     for(var i=0;i < result.length;i++) {
-      trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+      // trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+      trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td><input type="text" class="oprice" style="width:100%"></td><td><input type="text" class="count" style="width:100%"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td><input type="text" class="dprice" style="width:100%"></td></tr>';
     }
   }
   $("#arrayTable").find("tbody").html(trDom)
@@ -675,11 +676,14 @@ function obtainProductPrice() {
     // 如果使用自定义多规格
     $("#arrayTable").find("tbody tr").each(function(index, ele) {
       var index = $(ele).find(".paraid").attr("sid");
-      var price = $(ele).find(".oprice").text();
+      // var price = $(ele).find(".oprice").text();
+      var price = $(ele).find(".oprice").val();
       if(!price || price == "") throw("多规格商品必须输入价格");
-      var stocksTotal = $(ele).find(".count").text();
+      var stocksTotal = $(ele).find(".count").val();
+      // var stocksTotal = $(ele).find(".count").text();
       var useDiscount = $(ele).find(".usedis").prop("checked");
-      var dprice = $(ele).find(".dprice").text();
+      // var dprice = $(ele).find(".dprice").text();
+      var dprice = $(ele).find(".dprice").val();
       if(isNaN(Number(price))){
         throw("价格不可以输入除数字以外的字符")
       }

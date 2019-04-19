@@ -13,6 +13,8 @@ block content
       .col-xs-12.col-md-12
         if !data.dealInfo || !data.dealInfo.dataPerfect
           p.text-danger(style="text-align:center") 提示：发布商品操作需完善交易基础信息
+        if data.isban
+          p.text-danger(style="text-align:center") 提示：您已被禁止使用商品上架功能
       .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
         .e-nav
           ul.nav.nav-pills(style='background-color:aliceblue')
