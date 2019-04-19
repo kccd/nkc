@@ -24,7 +24,6 @@ var app = new Vue({
     displayInput: false,
     myStore: '',
     reason: '',
-    param: ""
 
   },
   computed: {
@@ -34,6 +33,17 @@ var app = new Vue({
         num += this.order.params[i].productPrice;
       }
       return num
+    },
+    param: function() {
+      var paramId;
+      if(this.refund.paramId) {
+        paramId = this.refund.paramId;
+      }
+      if(!paramId) return "";
+      for(var i = 0 ; i < this.order.params.length; i++) {
+        if(this.order.params[i].costId === paramId) return this.order.params[i];
+      }
+      return ""
     },
     params: function() {
       return this.order.params;
@@ -56,13 +66,12 @@ var app = new Vue({
     var data = document.getElementById("data");
     data = JSON.parse(data.innerHTML);
     this.refund = data.refund;
-    this.param = data.param;
     this.refunds = data.refunds;
     this.user = data.user;
     // this.myStore = data.myStore;
-    // this.storeName = this.myStore.storeName;
-    // this.address = this.myStore.address;
-    // this.mobile = this.myStore.mobile[0];
+    this.storeName = data.user.username;
+    this.address = data.dealInfo.address;
+    this.mobile = data.dealInfo.mobile[0];
     this.order = data.order;
   },
   methods: {
@@ -98,6 +107,7 @@ var app = new Vue({
       formData.append("type", "refund");
       formData.append("orderId", this.order.orderId);
       formData.append("file", file);
+      if(this.param) formData.append("paramId", this.param.costId);
       uploadFilePromise("/shop/cert", formData, function(e) {
         var p = (e.loaded/e.total)*100;
         if(p >= 100) {

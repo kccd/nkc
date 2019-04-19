@@ -37,7 +37,7 @@ const schema = new Schema({
   },
   // 订单上的商品数组id
   paramId: {
-    type: Number,
+    type: String,
     default: null
   },
   // 资源所存路径

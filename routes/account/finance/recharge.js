@@ -42,6 +42,7 @@ router
         data.money = record.num;
       }
     } else {
+      user.kcb = await db.UserModel.updateUserKcb(user.uid);
       ctx.template = 'account/finance/recharge.pug';
     }
     await next();

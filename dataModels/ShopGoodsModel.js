@@ -308,7 +308,7 @@ shopGoodsSchema.methods.ensurePermission = async function() {
 shopGoodsSchema.statics.findById = async (id) => {
   const ShopGoodsModel = mongoose.model('shopGoods');
   const product = await ShopGoodsModel.findOne({productId: id});
-  if(!product) throwErr(404, `为找到ID为【${id}】的商品`);
+  if(!product) throwErr(404, `未找到ID为【${id}】的商品`);
   return product;
 };
 

@@ -3,7 +3,7 @@ block shopTitle
   title 申请退款
 block content
   .container-fluid.max-width
-    .hidden#data= JSON.stringify({user: data.user, myStore: data.myStore, order: data.order, user: data.user, refund: data.refund, refunds: data.refunds, param: data.param})
+    .hidden#data= JSON.stringify({user: data.user, dealInfo: data.dealInfo, order: data.order, user: data.user, refund: data.refund, refunds: data.refunds, param: data.param})
     .row#app(v-cloak)   
       div(v-if="order")
         .col-xs-12.col-md-12
@@ -31,7 +31,7 @@ block content
               div(v-for="p in params")
                 img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
-                  a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                  a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name.join('+')}})
                   h5 商品ID：{{p.costId}}，商品总价：
                     strong.text-danger {{p.productPrice/100}}
                     | 元（{{p.count}}件）
@@ -45,7 +45,7 @@ block content
                 div(v-if='param')
                   img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                   div.display-i-b
-                    a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}}
+                    a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}} ({{param.productParam.name.join('+')}})
                     h5 商品总价：
                       strong.text-danger {{param.productPrice/100}}
                       | 元（{{param.count}}件）
@@ -53,7 +53,7 @@ block content
                   div(v-for="p in order.params" v-if="p.refundStatus === 'ing'")
                     img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                     div.display-i-b
-                      a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                      a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name.join('+')}})
                       h5 商品总价：
                         strong.text-danger {{p.productPrice/100}}
                         | 元（{{p.count}}件）
@@ -171,7 +171,7 @@ block content
                     </transition> 
                     div(v-if="order.certs && order.certs.length !== 0")
                       h5 已上传的凭证   
-                      .shop-cert(v-for="cert in order.certs" :title="cert.name")
+                      .shop-cert(v-for="cert in order.certs" :title="cert.name" v-if="(!param && !cert.paramId) || (param && param.costId === cert.paramId)")
                         .shop-cert-options
                           span(@click="viewCert(cert)").fa.fa-eye
                           span(@click="deleteCert(cert)").fa.fa-trash

@@ -4,7 +4,7 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;
-    await db.UserModel.updateUserKcb(user.uid);
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
     const {alipayAccounts, bankAccounts} = usersPersonal;
     data.alipayAccounts = alipayAccounts;

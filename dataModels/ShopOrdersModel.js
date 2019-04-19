@@ -543,10 +543,10 @@ shopOrdersSchema.methods.extendCerts = async function(type) {
   const c = await ShopCertModel.find({orderId, deleted: false}).sort({toc: 1});
   const certs = [];
   for(const cert of c) {
-    if(type === "buyer" && cert.uid === buyUid) {
-      certs.push(cert);
-    } else if(type === "seller" && cert.uid === sellUid) {
-      certs.push(cert);
+    if(type === "buyer") {
+      if(cert.uid === buyUid) certs.push(cert);
+    } else if(type === "seller") {
+      if(cert.uid === sellUid) certs.push(cert);
     } else {
       certs.push(cert);
     }
@@ -562,16 +562,14 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
   if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
-  const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopOrdersModel = mongoose.model("shopOrders");
-  const product = await ShopGoodsModel.findOnly({productId: this.productId});
   const time = Date.now();
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
     status: "B_GIVE_UP_ORDER",
     buyerId: this.buyUid,
-    sellerId: product.uid,
+    sellerId: this.sellUid,
     orderId: this.orderId,
     logs: [
       {
@@ -602,11 +600,10 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
-  const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
-  const product = await ShopGoodsModel.findOnly({productId: this.productId});
+  const {sellUid} = this;
   const orders = await ShopOrdersModel.userExtendOrdersInfo([this]);
   const order = orders[0];
   const time = Date.now();
@@ -620,7 +617,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     toc: time,
     status: "S_GIVE_UP_ORDER",
     buyerId: this.buyUid,
-    sellerId: product.uid,
+    sellerId: sellUid,
     orderId: this.orderId,
     logs: [
       {
@@ -632,7 +629,10 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     ]
   });
   await refund.save();
-  const description = `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`;
+  let description = '';
+  for(const p of order.params) {
+    description += `${p.count}x${p.product.name}(${p.productParam.name.join('+')}) `
+  }
   if(order.orderStatus === "unShip") {
     const refundRecord = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
@@ -645,7 +645,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     });
     const record = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
-      from: product.uid,
+      from: sellUid,
       to: order.buyUid,
       description,
       type: "sellerCancelOrder",

@@ -98,7 +98,8 @@ router
           orderId,
           uid: user.uid,
           deletable: true,
-          type: "refund"
+          type: "refund",
+          paramId: param? param.costId: ''
         }, {
           $set: {
             deletable: false

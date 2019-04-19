@@ -85,7 +85,6 @@ var app = new Vue({
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
     this.order = data.order;
-    this.param = data.param;
     this.user = data.user;
     this.refunds = data.refunds;
     if(data.refund) {
@@ -210,6 +209,7 @@ var app = new Vue({
       formData.append("type", "refund");
       formData.append("orderId", this.order.orderId);
       formData.append("file", file);
+      if(this.param) formData.append("paramId", this.param.costId);
       uploadFilePromise("/shop/cert", formData, function(e) {
         var p = (e.loaded/e.total)*100;
         if(p >= 100) {
