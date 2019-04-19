@@ -11,7 +11,6 @@ var vue_forums_Nav = new Vue({
   mounted: function() {
     var data = this.$refs.vue_forums_nav_data;
     data = JSON.parse(data.innerHTML);
-    console.log(data);
     this.forums = data.forums;
     /*nkcAPI("/f", "GET")
       .then(function(data) {
@@ -24,6 +23,10 @@ var vue_forums_Nav = new Vue({
   methods: {
     openForum: function(forum) {
       window.open( '/f/' + forum.fid);
+    },
+    reset: function() {
+      this.forumsList = [];
+      this.forumsIdList = [];
     },
     displayChildForums: function(forum, num) {
 

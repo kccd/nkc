@@ -2,7 +2,10 @@
   .thread-panel-info
     a(href=`/u/${thread.uid}` target="_blank").thread-panel-author
       img(src=`/avatar_small/${thread.uid}`)
-      span= thread.firstPost.user.username
+      span(
+        onmouseover=`vue_user_panel_float.loadUser("${thread.uid}")`
+        onmouseout="vue_user_panel_float.close()"
+      )= thread.firstPost.user.username
 
     .thread-panel-forum
       if data.forum

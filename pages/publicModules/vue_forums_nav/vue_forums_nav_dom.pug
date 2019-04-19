@@ -26,15 +26,16 @@
   .forums-nav-header
     +listHeader('学科')
   ul.forums-nav(
-    @mouseleave='forumsList = [];forumsIdList=[];'
     ref="forumNav"
+    @mouseleave="reset"
   )
     .hidden(ref='forums')= JSON.stringify(data.forums)
+    //@mouseleave="reset"
     li.list-item(
       v-for='forum in forums'
       v-if="forum.forumType === 'discipline'"
       @click='openForum(forum)'
-      @mouseenter='displayChildForums(forum, 0)'
+      @mouseover='displayChildForums(forum, 0)'
       :class="{'select-forum': forumsIdList.indexOf(forum.fid) >= 0}"
       :title="forum.description"
     )
@@ -51,12 +52,12 @@
           :style='"width:" + width + "px;left:" + (index+1)*width + "px;min-height:" + height + "px"'
           :class="{'child-forums-nav-div': f.childrenForums && f.childrenForums.length !== 0}"
         )
-          ul.list-dense.forums-nav
+          ul.list-dense.forums-nav(:style="'min-height:' + height + 'px'")
             li.list-item(
               v-if="f.childrenForums"
               v-for='forum in f.childrenForums'
               @click='openForum(forum)'
-              @mouseenter='displayChildForums(forum, index + 1)'
+              @mouseover='displayChildForums(forum, index + 1)'
               :class="{'select-forum': forumsIdList.indexOf(forum.fid) >= 0}"
               :title="forum.description"
             )

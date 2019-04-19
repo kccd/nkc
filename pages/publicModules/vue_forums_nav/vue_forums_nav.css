@@ -13,6 +13,9 @@
   position: absolute;
   background-color: rgba(245,245,245,0.95 );
 }
+.child-forums-nav .forums-nav{
+  min-height: 100%;
+}
 /*   vue过度   */
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
