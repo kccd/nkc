@@ -1,17 +1,38 @@
 extends ./index.pug
+block title
+  title 封禁商品上架 | 商城设置
 block shopSettings
   .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;')
     .row
-      .col-xs-12.col-md-6.col-md-offset-3
-        .form
-          .form-group
-            h4 申请交易权限需要身份认证等级
-            //- .text-danger
-            //-   h5 超时后，则默认卖家同意用户的申请。
-            //-   h5 买家申请退款退货时，卖家处理超时后系统将自动退款，无需买家退货。
-            input.form-control#authLevel(type="number" value="1")
-          .form-group
-            button.btn.btn-block.btn-primary(onclick='saveAuth()') 保存
+      //- .col-xs-12.col-md-12
+      //-   ul.nav.nav-pills
+      //-     li(class=!data.t?"active":"")
+      //-       a(href='/e/settings/shop/refunds') 全部
+      //-     li(class=data.t==="applying"? "active": "")
+      //-       a(href='/e/settings/shop/refunds?t=applying') 待处理
+      //-     li(class=data.t==="done"?"active": "")
+      //-       a(href='/e/settings/shop/refunds?t=done') 已处理
+      
+      .col-xs-12.col-md-12
+        button.btn.btn-info(onclick="addBanUid()")
+          span.fa.fa-plus
+          | &nbsp;添加封禁 
+      .col-xs-12.col-md-12
+        //- include ../../../interface_navigation_paging
+        table.table.table-hover
+          thead
+            tr
+              th Uid
+              th 用户名称
+              th 操作
+          tbody
+            for user in data.banUsers
+              tr
+                th= user.uid
+                th= user.username
+                th
+                  button(onclick=`delBanUid(${user.uid})`) 解禁
+                  //- a(href=`/e/settings/shop/refunds/refundDetail?orderId=${refund.orderId}`) 解禁
 
 block shopSettingScripts
   +includeJS("/experimental/shop/auth.js")

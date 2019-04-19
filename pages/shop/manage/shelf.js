@@ -212,11 +212,16 @@ function submitToShelf() {
     freightPrice.firstFreightPrice = firstFreightPrice;
     freightPrice.addFreightPrice = addFreightPrice;
   }
-  // freightPrice = Number(freightPrice)*100;
-  // if(isNaN(freightPrice) || freightPrice < 0) {
-  //   throw("运费价格不可小于0,不可为空");
-  // }
-  var mergeForumId = getResultForumId();
+  var mainForumsId = []
+  var shopForum = getShopForum();
+  if(!shopForum){
+    throw("商品分类为必选，请务必选一个");
+  }
+  mainForumsId.push(shopForum);
+  var mergeForumId = getResultHaveForumId();
+  if(mergeForumId){
+    mainForumsId.push(mergeForumId)
+  }
   // 组装上传数据
   var post = {
     productName: productName,
@@ -224,8 +229,6 @@ function submitToShelf() {
     productDetails: productDetails,
     imgIntroductions: imgIntroductions,
     imgMaster: imgMaster,
-    // stockTotalCount: Number(stockTotalCount),
-    // stockSurplusCount: Number(stockTotalCount),
     uploadCert: uploadCert,
     uploadCertDescription: uploadCertDescription,
     stockCostMethod: stockCostMethod,
@@ -234,7 +237,7 @@ function submitToShelf() {
     productStatus: productStatus,
     shelfTime: shelfTime,
     params: params,
-    mainForumsId: [mergeForumId],
+    mainForumsId: mainForumsId,
     productParams: productParams,
     attentions: attentions,
     purchaseLimitCount:purchaseLimitCount
@@ -245,16 +248,16 @@ function submitToShelf() {
 /**
  * 商品上架
  */
-function productToShelf(storeId) {
+function productToShelf(uid) {
   try{
     var productInfo = submitToShelf();
   }catch(err) {
     return screenTopWarning(err);
   }
-  nkcAPI('/shop/manage/'+storeId+'/shelf', "POST" ,{post:productInfo})
+  nkcAPI('/shop/manage/'+uid+'/shelf', "POST" ,{post:productInfo})
   .then(function(data) {
     screenTopAlert("上架成功");
-    var targetUrl = '/shop/manage/' + storeId + '/goodslist';
+    var targetUrl = '/shop/manage/' + uid + '/goodslist';
     window.location.href = targetUrl;
   })
   .catch(function(data){
@@ -653,7 +656,8 @@ function mulArrTurnTable() {
   var trDom = "";
   if(rArr.length !== 0) {
     for(var i=0;i < result.length;i++) {
-      trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+      // trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
+      trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td><input type="text" class="oprice" style="width:100%"></td><td><input type="text" class="count" style="width:100%"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td><input type="text" class="dprice" style="width:100%"></td></tr>';
     }
   }
   $("#arrayTable").find("tbody").html(trDom)
@@ -672,10 +676,14 @@ function obtainProductPrice() {
     // 如果使用自定义多规格
     $("#arrayTable").find("tbody tr").each(function(index, ele) {
       var index = $(ele).find(".paraid").attr("sid");
-      var price = $(ele).find(".oprice").text();
-      var stocksTotal = $(ele).find(".count").text();
+      // var price = $(ele).find(".oprice").text();
+      var price = $(ele).find(".oprice").val();
+      if(!price || price == "") throw("多规格商品必须输入价格");
+      var stocksTotal = $(ele).find(".count").val();
+      // var stocksTotal = $(ele).find(".count").text();
       var useDiscount = $(ele).find(".usedis").prop("checked");
-      var dprice = $(ele).find(".dprice").text();
+      // var dprice = $(ele).find(".dprice").text();
+      var dprice = $(ele).find(".dprice").val();
       if(isNaN(Number(price))){
         throw("价格不可以输入除数字以外的字符")
       }
@@ -750,4 +758,12 @@ function obtainProductPrice() {
 function addAttention() {
   var attDom = "<input class='attention form-control' type='text' placeholder='请用不超过15字来完成一个简短说明,不填写则无'>";
   $(".attentionList").append(attDom)
+}
+
+/**
+ * 选择商品分类
+ */
+function getShopForum() {
+  var shopForum = $("#shopForums").val();
+  return shopForum;
 }

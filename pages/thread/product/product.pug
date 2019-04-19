@@ -116,8 +116,7 @@ style.
       div.item
         p
           span.title 快递
-          //- span.location!=getProvinceCity(product.store.address)
-          span.location(style="font-size:small") #{getProvinceCity(product.store.address)}
+          span.location(style="font-size:small") #{getProvinceCity(product.dealInfo.address)}
           span.location(style="font-size:small;") 至
           input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
       div.item(style="border-bottom: 1px solid #e5e5e5")
@@ -163,6 +162,10 @@ style.
     .col-xs-1.col-md-1 
 
   .col-xs-12.col-md-12
+    .col-xs-12.col-md-12
+      div(style="border:2px solid #bbe0e1;padding:5px")
+        p(style="font-size:15px") 公告
+        p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
     .col-xs-12.col-md-12
       div(style="padding:20px")!=experimental_render(post)
 block scripts

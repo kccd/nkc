@@ -165,6 +165,7 @@ function getResult() {
 	}
 }
 
+// 必须选一个
 function getResultForumId() {
 	var arr = $('#dropdownDiv select');
 	var fid;
@@ -180,6 +181,22 @@ function getResultForumId() {
 		}
 	}
 	if(!fid) throw '请选择专业';
+	return fid;
+}
+
+// 可以不用非得选一个
+function getResultHaveForumId() {
+	var arr = $('#dropdownDiv select');
+	var fid = "";
+	for(var i = 0; i < arr.length; i++) {
+		if(!arr.eq(i).hasClass('categorySelect')) {
+			var value = arr.eq(i).val();
+			var valueArr = value.split(':');
+			if(valueArr.length === 2) {
+				fid = valueArr[1];
+			}
+		}
+	}
 	return fid;
 }
 

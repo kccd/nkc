@@ -15,7 +15,7 @@ router
     for(const orderId of ordersId) {
       const order = await db.ShopOrdersModel.findOne({orderId});
       if(!order) ctx.throw(400, `未找到ID为【${orderId}】的订单`);
-      if(order.uid !== user.uid) ctx.throw(403, `订单【${orderId}】错误`);
+      if(order.buyUid !== user.uid) ctx.throw(403, `订单【${orderId}】错误`);
       if(order.closeStatus) ctx.throw(400, "订单已关闭");
       if(order.orderStatus !== 'unCost') ctx.throw(400, `订单【${orderId}】暂不需要付款，请勿重复提交`);
       orders.push(order);
@@ -72,24 +72,20 @@ router
     let totalMoney = 0;
     // 如果订单价格已被修改，则需要重新发起支付
     for(let order of orders) {
-      totalMoney += order.orderPrice;
+      totalMoney += (order.orderPrice+order.orderFreightPrice);
     }
     user.kcb = await db.UserModel.updateUserKcb(user.uid);
     if(user.kcb < totalMoney) ctx.throw(400, "您的科创币不足，请先充值或选择其他付款方式支付");
     if(totalMoney !== Number(totalPrice)*100) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
-    orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
-    //减库存
-    await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
     for(let order of orders) {
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-        from: order.uid,
+        from: order.buyUid,
         to: 'bank',
         type: 'pay',
         ordersId: [order.orderId],
         num: order.orderPrice,
-        description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
         ip: ctx.address,
         port: ctx.port,
         verify: true
@@ -100,9 +96,10 @@ router
         orderStatus: 'unShip',
         payToc: r.toc
       }});
-      // 付款完毕，将商品从购物车中清除
-      await db.ShopCartModel.remove({uid: user.uid, productParamId: order.productParam._id});
     }
+    // 拓展订单 并 付款减库存
+    orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
     user.uid = await db.UserModel.updateUserKcb(user.uid);
     await next();
   });

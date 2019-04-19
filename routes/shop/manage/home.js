@@ -4,21 +4,24 @@ homeRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, params} = ctx;
 		const {user} = data;
-		const storeId = params.account;
 		let statistics = {};
-		let products = await db.ShopGoodsModel.find({storeId:storeId});
+		let products = await db.ShopGoodsModel.find({uid:user.uid});
 		statistics.productCount = products.length;
-		const orders = await db.ShopOrdersModel.find({storeId: storeId});
+		const orders = await db.ShopOrdersModel.find({sellUid: user.uid});
 		statistics.orderCount = orders.length;
 		// 统计数据
 		// 统计所有商品的访问量
 		const productVisits = await db.ThreadModel.aggregate([
-			{$match: {uid: user.uid}},
+			{$match: {uid: user.uid, type: "product"}},
 			{$group: {_id:null, hits:{$sum:"$hits"}}}
 		])
-		statistics.visitCount = productVisits[0].hits;
+		if(productVisits.length > 0) {
+			statistics.visitCount = productVisits[0].hits;
+		}else{
+			statistics.visitCount = 0;
+		}
 		// 统计所有商品的售卖数量
-		const productSellCount = await db.ShopOrdersModel.count({storeId:storeId, orderStatus:"finish"});
+		const productSellCount = await db.ShopOrdersModel.count({sellUid:user.uid, orderStatus:"finish"});
 		statistics.sellCount = productSellCount;
 		// 统计商品讨论总量
 		let threadIds = [];
@@ -30,7 +33,7 @@ homeRouter
 		// 统计粉丝数量
 		const userSubscribe = await db.UsersSubscribeModel.findOne({uid:user.uid});
 		statistics.funsCount = userSubscribe.subscribers.length;
-		// 统计订单信息
+		// 统计商品信息
 		let productInsaleCount = 0;
 		let productNosaleCount = 0;
 		let productStopsaleCount = 0;
@@ -42,7 +45,7 @@ homeRouter
 		statistics.productInsaleCount = productInsaleCount;
 		statistics.productNosaleCount = productNosaleCount;
 		statistics.productStopsaleCount = productStopsaleCount;
-		// 统计商品信息
+		// 统计订单信息
 		let orderUnCostCount = 0;
 		let orderUnShipCount = 0;
 		let orderUnSignCount = 0;

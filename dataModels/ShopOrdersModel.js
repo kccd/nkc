@@ -11,37 +11,54 @@ const shopOrdersSchema = new Schema({
     index: 1,
     required: true
   },
-  // 商铺id
-  storeId: {
-    type: String,
-    index: 1
-  },
   // 商品id
-  productId: {
-    type: String,
-    index: 1
-  },
+  // productId: {
+  //   type: String,
+  //   index: 1
+  // },
   // 规格id
-  paramId: {
-    type: String,
-    index: 1
+  // paramId: {
+  //   type: String,
+  //   index: 1
+  // },
+  // 商品规格
+  // params: {
+  //   type: Array,
+  //   default: []
+  // },
+  // 购买快照(不可调用，不可修改，只用来追溯查看)
+  snapshot: {
+    type: Array,
+    default: []
   },
   // 购买者uid
-  uid: {
+  buyUid: {
     type: String,
+    required: true
+  },
+  // 贩卖者udi
+  sellUid: {
+    type: String,
+    required: true
   },
   // 数量
-  count: {
-    type: Number,
-    default: 1
-  },
+  // count: {
+  //   type: Number,
+  //   default: 1
+  // },
   // 订单原始总价
-  orderOriginPrice: {
-    type: Number
+  // orderOriginPrice: {
+  //   type: Number
+  // },
+  // 订单运费
+  orderFreightPrice: {
+    type: Number,
+    default: 0
   },
-  // 订单最终总价格
+  // 订单总价格
   orderPrice: {
     type: Number,
+    default: 0
   },
   // 收货地址
   receiveAddress: {
@@ -106,6 +123,16 @@ const shopOrdersSchema = new Schema({
     default: "",
     index: 1
   },
+  // 买家留言
+  buyMessage: {
+    type: String,
+    default: ""
+  },
+  // 卖家备注
+  sellMessage: {
+    type: String,
+    default: ""
+  },
   /**
    * 退款状态
    * @ing 正在退款中
@@ -143,6 +170,11 @@ const shopOrdersSchema = new Schema({
   applyToPlatform: {
     type: Boolean,
     default: false
+  },
+  // 退款金额
+  refundMoney: {
+    type: Number,
+    default: 0
   }
 }, {
   collection: 'shopOrders',
@@ -175,63 +207,54 @@ shopOrdersSchema.virtual('certs')
 shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
   if(!o) o = {};
   let options = {
-    store: true,
-    user: true,
+    sellUser: true,
+    buyUser: true,
     product: true,
-    productParam: true
+    productParam: true,
+    params: true
   };
   o = Object.assign(options, o);
-  const ShopOrdersModel = mongoose.model('shopStores');
   const UserModel = mongoose.model('users');
+  const ShopCostRecord = mongoose.model("shopCostRecord");
   const ShopGoodsModel = mongoose.model('shopGoods');
   const ShopProductsParamsModel = mongoose.model('shopProductsParams');
-  const storeId = new Set(), storeObj = {};
-  const uid = new Set(), userObj = {};
-  const productId = new Set(), productObj = {};
-  const paramId = new Set(), productParamObj = {};
+  const sellUid = new Set(), sellUserObj = {};
+  const buyUid = new Set(), buyUserObj = {};
+  const orderId = new Set(), paramsObj = {};
   orders.map(ord =>{
-    if(o.store)
-      storeId.add(ord.storeId);
-    if(o.user)
-      uid.add(ord.uid);
-    if(o.product)
-      productId.add(ord.productId);
-    if(o.productParam)
-      paramId.add(ord.paramId)
+    if(o.sellUser)
+      sellUid.add(ord.sellUid);
+    if(o.buyUser)
+      buyUid.add(ord.buyUid);
+    if(o.params)
+      orderId.add(ord.orderId)
   });
-  let stores, users, products, productParams;
-  if(o.store) {
-    stores = await ShopOrdersModel.find({storeId: {$in:[...storeId]}});
-    for(const store of stores) {
-      storeObj[store.storeId] = store;
+  let sellUsers, buyUsers, products, productParams, params;
+  if(o.sellUser) {
+    sellUsers = await UserModel.find({uid: {$in:[...sellUid]}});
+    for(const sellUser of sellUsers) {
+      sellUserObj[sellUser.uid] = sellUser;
     }
   }
-  if(o.user) {
-    users = await UserModel.find({uid: {$in:[...uid]}});
-    for(const user of users) {
-      userObj[user.uid] = user;
+  if(o.buyUser) {
+    buyUsers = await UserModel.find({uid: {$in:[...buyUid]}});
+    for(const buyUser of buyUsers) {
+      buyUserObj[buyUser.uid] = buyUser;
     }
   }
-  if(o.product) {
-    products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
-    products = await ShopGoodsModel.extendProductsInfo(products);
-    for(const product of products) {
-      productObj[product.productId] = product;
-    }
-  }
-  if(o.productParam) {
-    productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
-    productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
-    for(const productParam of productParams) {
-      productParamObj[productParam._id] = productParam
+  if(o.params) {
+    params = await ShopCostRecord.find({orderId:{$in: [...orderId]}});
+    params = await ShopCostRecord.orderExtendRecord(params);
+    for(const param of params) {
+      if(!paramsObj[param.orderId]) paramsObj[param.orderId] = [];
+      paramsObj[param.orderId].push(param);
     }
   }
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
-    if(o.store) order.store = storeObj[ord.storeId];
-    if(o.user) order.user = userObj[ord.uid];
-    if(o.product) order.product = productObj[ord.productId];
-    if(o.productParam) order.productParam = productParamObj[ord.paramId];
+    if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
+    if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
+    if(o.params) order.params = paramsObj[ord.orderId];
     return order
   }))
 };
@@ -241,7 +264,6 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
  * @param orders 由订单组成的数组
  * @param o:
  *  参数  数据类型(默认值)    介绍
- *  store:    Boolean(true) 是否拓展店铺信息
  *  product:Boolean(true)   是否拓展商品信息
  *  productParams:Boolean(true) 是否拓展商品规格信息
  * @return 拓展后，对象已不再是schema对象，故无法调用model中的方法
@@ -249,32 +271,35 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
 shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   if(!o) o = {};
   let options = {
-    store: true,
-    product: true,
-    productParam: true,
+    product: false,
+    productParam: false,
+    sellUser: true,
+    buyUser: true,
+    params: true
   };
   o = Object.assign(options, o);
-  const ShopStoresModel = mongoose.model("shopStores");
   const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopProductsParamsModel = mongoose.model("shopProductsParams");
-  const storeId = new Set(), storeObj = {};
+  const UserModel = mongoose.model("users");
+  const ShopCostRecord = mongoose.model("shopCostRecord");
   const productId = new Set(), productObj = {};
   const paramId = new Set(), productParamObj = {};
+  const sellUid = new Set(), sellUserObj = {};
+  const buyUid = new Set(), buyUserObj = {};
+  const orderId = new Set(), paramsObj = {};
   orders.map(ord => {
-    if(o.store)
-      storeId.add(ord.storeId);
     if(o.product)
       productId.add(ord.productId);
     if(o.productParam)
       paramId.add(ord.paramId)
+    if(o.sellUser)
+      sellUid.add(ord.sellUid)
+    if(o.buyUser)
+      buyUid.add(ord.buyUid)
+    if(o.params)
+      orderId.add(ord.orderId)
   });
-  let stores, products, productParams;
-  if(o.store) {
-    stores = await ShopStoresModel.find({storeId: {$in:[...storeId]}});
-    for(const store of stores) {
-      storeObj[store.storeId] = store;
-    }
-  }
+  let products, productParams, sellUsers, buyUsers, params;
   if(o.product) {
     products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
     products = await ShopGoodsModel.extendProductsInfo(products);
@@ -289,11 +314,33 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
       productParamObj[productParam._id] = productParam
     }
   }
+  if(o.sellUser) {
+    sellUsers = await UserModel.find({uid: {$in: [...sellUid]}});
+    for(const sellUser of sellUsers) {
+      sellUserObj[sellUser.uid] = sellUser;
+    }
+  }
+  if(o.buyUser) {
+    buyUsers = await UserModel.find({uid: {$in: [...buyUid]}});
+    for(const buyUser of buyUsers) {
+      buyUserObj[buyUser.uid] = buyUser;
+    }
+  }
+  if(o.params) {
+    params = await ShopCostRecord.find({orderId:{$in: [...orderId]}});
+    params = await ShopCostRecord.orderExtendRecord(params);
+    for(const param of params) {
+      if(!paramsObj[param.orderId]) paramsObj[param.orderId] = [];
+      paramsObj[param.orderId].push(param);
+    }
+  }
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
-    if(o.store) order.store = storeObj[ord.storeId];
     if(o.product) order.product = productObj[ord.productId];
     if(o.productParam) order.productParam = productParamObj[ord.paramId];
+    if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
+    if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
+    if(o.params) order.params = paramsObj[ord.orderId];
     return order
   }))
 };
@@ -310,25 +357,28 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
 shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
   const ShopOrdersModel = mongoose.model('shopOrders');
   orders = await ShopOrdersModel.storeExtendOrdersInfo(orders);
-  let title = '';
+  let titles = [];
   const ordersId = [];
   let totalMoney = 0;
-  let needAdd = true;
   for(const o of orders) {
-    if(needAdd) {
-      const old = title;
-      title += `${o.count}*${o.product.name}(${o.productParam.name.join('+ ')}) `;
-      if(title.length >= 150) {
-        needAdd = false;
-        title = old + '...';
+    for(const c of o.params){
+      let title = "";
+      let needAdd = true;
+      if(needAdd) {
+        const old = title;
+        title += `${c.count}*${c.product.name}(${c.productParam.name.join('+ ')}) `;
+        if(title.length >= 150) {
+          needAdd = false;
+          title = old + '...';
+        }
       }
+      titles.push(title)
     }
     ordersId.push(o.orderId);
-    totalMoney += o.orderPrice;
+    totalMoney += (o.orderPrice + o.orderFreightPrice);
   }
   return {
-    title,
-    description: title,
+    description: titles,
     totalMoney,
     ordersId
   }
@@ -366,6 +416,35 @@ shopOrdersSchema.statics.clearTimeoutOrders = async (uid) => {
     }
   });
 };
+
+/**
+ * 检测是否只能进行全部退款
+ * 全部退款条件：
+ * 1.params中只有一个商品规格处于未退款状态,refundStatus == ""
+ */
+shopOrdersSchema.statics.checkRefundCanBeAll = async (orders) => {
+  return orders.map(o => {
+    let order;
+    if(o.toObject) {
+      order = o.toObject();
+    }else{
+      order = o;
+    }
+    const {params} = order;
+    let paramRefundCount = 0;
+    for(let a=0;a < params.length;a++) {
+      if(params.refundStatus && params.refundStatus !== ""){
+        paramRefundCount++;
+      }
+    }
+    if(params.length - paramRefundCount == 1) {
+      order.mustAllRefund = true;
+    }else{
+      order.mustAllRefund = false;
+    }
+    return order;
+  })
+}
 
 /* 
   翻译订单当前所处的状态，会在订单对象上添加”status“属性，值为订单状态字符串
@@ -433,8 +512,8 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   const record = KcbsRecordModel({
     _id: await SettingModel.operateSystemID('kcbsRecords', 1),
     from: "bank",
-    to: order.product.uid,
-    description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
+    to: order.sellUid,
+    description: ``,
     type: "sell",
     num: orderPrice,
     toc: time,
@@ -448,7 +527,7 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   await SettingModel.update({_id: 'kcb'}, {$inc: {
     "c.totalMoney": -1 * orderPrice
   }});
-  await UserModel.update({uid: order.product.uid}, {$inc: {
+  await UserModel.update({uid: order.sellUid}, {$inc: {
     kcb: orderPrice
   }});
 };
@@ -460,16 +539,14 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
  */
 shopOrdersSchema.methods.extendCerts = async function(type) {
   const ShopCertModel = mongoose.model("shopCerts");
-  const ShopGoodsModel = mongoose.model("shopGoods");
-  const {orderId, productId, uid} = this;
-  const product = await ShopGoodsModel.findById(productId);
+  const {orderId, sellUid, buyUid} = this;
   const c = await ShopCertModel.find({orderId, deleted: false}).sort({toc: 1});
   const certs = [];
-  for(cert of c) {
+  for(const cert of c) {
     if(type === "buyer") {
-      if(cert.uid === uid) certs.push(cert);
+      if(cert.uid === buyUid) certs.push(cert);
     } else if(type === "seller") {
-      if(cert.uid === product.uid) certs.push(cert);
+      if(cert.uid === sellUid) certs.push(cert);
     } else {
       certs.push(cert);
     }
@@ -485,16 +562,14 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
   if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
-  const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopOrdersModel = mongoose.model("shopOrders");
-  const product = await ShopGoodsModel.findOnly({productId: this.productId});
   const time = Date.now();
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
     status: "B_GIVE_UP_ORDER",
-    buyerId: this.uid,
-    sellerId: product.uid,
+    buyerId: this.buyUid,
+    sellerId: this.sellUid,
     orderId: this.orderId,
     logs: [
       {
@@ -525,11 +600,10 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   if(reason && contentLength(reason) > 1000) throwErr(400, "理由不能超过1000字节");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
-  const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
-  const product = await ShopGoodsModel.findOnly({productId: this.productId});
+  const {sellUid} = this;
   const orders = await ShopOrdersModel.userExtendOrdersInfo([this]);
   const order = orders[0];
   const time = Date.now();
@@ -542,8 +616,8 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
     toc: time,
     status: "S_GIVE_UP_ORDER",
-    buyerId: this.uid,
-    sellerId: product.uid,
+    buyerId: this.buyUid,
+    sellerId: sellUid,
     orderId: this.orderId,
     logs: [
       {
@@ -555,12 +629,15 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     ]
   });
   await refund.save();
-  const description = `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`;
+  let description = '';
+  for(const p of order.params) {
+    description += `${p.count}x${p.product.name}(${p.productParam.name.join('+')}) `
+  }
   if(order.orderStatus === "unShip") {
     const refundRecord = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
-      to: order.uid,
+      to: order.buyUid,
       type: "refund",
       num: order.orderPrice,
       description,
@@ -568,8 +645,8 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     });
     const record = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
-      from: product.uid,
-      to: order.uid,
+      from: sellUid,
+      to: order.buyUid,
       description,
       type: "sellerCancelOrder",
       num: money,
@@ -585,6 +662,29 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     await UserModel.updateUserKcb(record.from);
     await UserModel.updateUserKcb(record.to);
   }
+};
+/*
+* 获取订单上指定ID的商品
+* 判断商品是否已经退款完成
+* @param {Number} 订单上的规格ID（实际为购物车ID）
+* @author pengxiguaa 2019-4-17
+* */
+shopOrdersSchema.methods.getParamById = async function(id) {
+  const {orderId} = this;
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const params = await ShopCostRecordModel.find({orderId});
+  let param;
+  let succeedCount = 0;
+  for(const p of params) {
+    if(p.refundStatus === "success") succeedCount ++;
+    if(p.costId === id) {
+      param = p;
+    }
+  }
+  if(!param) throwErr(404, `订单${this.orderId}上未找到规格id为${id}的商品`);
+  if(param.refundStatus === "success") throwErr(400, `订单${this.orderId}上规格id为${id}的商品已退款完成`);
+  if(succeedCount === params.length -1) throwErr(400, "订单中仅剩一种商品，无法进行单一商品退款。");
+  return (await ShopCostRecordModel.orderExtendRecord([param]))[0];
 };
 
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);

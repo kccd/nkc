@@ -26,7 +26,7 @@ function calculateFreightPrice(count) {
   if(isNaN(count) || count <= 0) {
     totalPrice = firstFreightPrice;
   }else{
-    totalPrice = firstFreightPrice +  (addFreightPrice * (count-1));
+    totalPrice = firstFreightPrice + (addFreightPrice * (count-1));
   }
   $("#freightPrice").text(totalPrice);
 }
