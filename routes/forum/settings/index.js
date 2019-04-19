@@ -3,6 +3,7 @@ const settingsRouter = new Router();
 const infoRouter = require('./info');
 const imageRouter = require('./image');
 const categoryRouter = require('./category');
+const kindRouter = require('./kind');
 const permissionRouter = require('./permission');
 const mergeRouter = require('./merge');
 settingsRouter
@@ -37,6 +38,7 @@ settingsRouter
 	.use('/image', imageRouter.routes(), imageRouter.allowedMethods())
 	.use('/permission', permissionRouter.routes(), permissionRouter.allowedMethods())
 	.use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
+	.use('/kind', kindRouter.routes(), kindRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
 	.use('/merge', mergeRouter.routes(), mergeRouter.allowedMethods());
 module.exports = settingsRouter;

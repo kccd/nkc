@@ -369,3 +369,15 @@ function submit(fid) {
 		})
 
 }
+
+function saveKind(kindName) {
+	var kindName = $("#kinds").val();
+	nkcAPI("/f/"+fid+"/settings/kind", "PATCH", {kindName: kindName})
+	.then(function(data) {
+		screenTopAlert("类别设置成功");
+		window.location.reload();
+	})
+	.catch(function(data) {
+		screenTopWarning(data.error || data);
+	})
+}
