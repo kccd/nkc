@@ -394,9 +394,17 @@ fn.doExchange = (arr) => {
  * @return {JSON} data
  * @author Kris 2019-3-14
  */
-fn.getIpAddress = async (ip) => {
+fn.getIpAddress = async (ip, ctx) => {
+  let uid;
+  if(!ctx.data.user){
+    uid = "visit"
+  }else{
+    uid = ctx.data.user.uid
+  }
   ipLog = db.IpLogModel({
-    ip: ip
+    ip: ip,
+    originalUrl: ctx.originalUrl,
+    uid: uid
   });
   await ipLog.save();
   let options = {

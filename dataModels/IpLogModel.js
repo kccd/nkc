@@ -6,6 +6,14 @@ const ipLogSchema = new Schema({
     type: String,
     default: ""
   },
+  originalUrl: {
+    type: String,
+    default: ""
+  },
+  uid: {
+    type: String,
+    default: ""
+  },
   toc: {
     type: Date,
     default: Date.now,
