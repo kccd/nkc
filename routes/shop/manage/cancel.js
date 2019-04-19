@@ -12,15 +12,13 @@ router
     const order = await db.ShopOrdersModel.findById(orderId);
     let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     orders = await db.ShopOrdersModel.translateOrderStatus(orders);
-    const product = await db.ShopGoodsModel.findById(order.productId);
-    const products = await db.ShopGoodsModel.extendProductsInfo([product]);
-    if(product.uid !== data.user.uid) ctx.throw(400, "您不是订单中商品的卖家，无权取消订单");
+    const {sellUid, buyUid} = order;
+    if(sellUid !== data.user.uid) ctx.throw(400, "您不是订单中商品的卖家，无权取消订单");
     if(order.closeStatus) ctx.throw(400, "订单已被关闭，无需取消订单");
     if(order.refundStatus === "success") ctx.throw(400, "订单已退款成功，无需取消订单");
     if(order.refundStatus === "ing") ctx.throw(400, "买家已申请退款，请先去处理退款申请");
     if(!["unCost", "unShip"].includes(order.orderStatus)) ctx.throw(400, "无法取消已发货的订单");
     data.order = orders[0];
-    data.product = products[0];
     await next();
   })
   .get("/", async (ctx, next) => {
@@ -33,6 +31,8 @@ router
     const {orderId, reason, password} = body;
     let money = body.money * 100;
     money = Number(money.toFixed(0));
+    if(money%1 !== 0) ctx.throw(400, "科创币仅支持小数点后两位");
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
     if(user.kcb < money) ctx.throw(400, "您的科创币不足");
     const order = await db.ShopOrdersModel.findById(orderId);
     if(order.orderStatus === "unShip") {

@@ -34,6 +34,7 @@ router
     }
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
+    data.dealInfo = await db.ShopDealInfoModel.findOne({uid: data.user.uid});
     data.order = order;
     data.refunds = refunds;
     ctx.template = "shop/manage/refund/refund.pug";
@@ -100,7 +101,8 @@ router
         uid: user.uid,
         orderId: order.orderId,
         deletable: true,
-        type: "refund"
+        type: "refund",
+        paramId: param?param.costId: ""
       }, {
         $set: {
           deletable: false

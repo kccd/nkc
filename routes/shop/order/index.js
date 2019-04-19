@@ -108,7 +108,15 @@ router
           productPrice: cart.productPrice,
           singlePrice: cart.productParam.price
         };
-        let shopCost = db.ShopCostRecordModel(cartObj)
+        let shopCost = db.ShopCostRecordModel(cartObj);
+        if(paramCert[cart.productParamId]) {
+          await db.ShopCertModel.update({_id: paramCert[cart.productParamId]}, {
+            $set: {
+              orderId,
+              paramId: costId || ""
+            }
+          })
+        }
         await shopCost.save();
         let buyProduct = await db.ShopGoodsModel.findOne({productId:cart.productId});
         let buyRecord = buyProduct.buyRecord;

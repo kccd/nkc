@@ -365,7 +365,7 @@ schema.methods.ensureRefundPermission = async function(reason, operations) {
  */
 schema.methods.platformAgreeRM = async function() {
   const ShopRefundModel = mongoose.model("shopRefunds");
-  const {time} = await this.ensureRefundPermission("", "P_APPLY_RM")
+  const {time} = await this.ensureRefundPermission("", "P_APPLY_RM");
   await ShopRefundModel.update({_id: this._id}, {
     $set: {
       tlm: time,
@@ -495,8 +495,7 @@ schema.methods.sellerAgreeRP = async function(reason, sellerInfo) {
 schema.methods.platformDisagreeRM = async function(reason) {
   if(!reason) throwErr(400, "拒绝理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
-  const ShopOrdersModel = mongoose.model("shopOrders");
-  const {time, order} = await this.ensureRefundPermission(reason, "P_APPLY_RM")
+  const {time, order} = await this.ensureRefundPermission(reason, "P_APPLY_RM");
   await ShopRefundModel.update({_id: this._id}, {
     $set: {
       tlm: time,
@@ -511,14 +510,7 @@ schema.methods.platformDisagreeRM = async function(reason) {
       }
     }
   });
-  await ShopOrdersModel.update({orderId: order.orderId}, {
-    $set: {
-      refundStatus: "fail"
-    },
-    $inc: {
-      autoReceiveTime: time - this.toc
-    }
-  });
+  await this.refundFail();
 };
 
 
@@ -530,8 +522,6 @@ schema.methods.platformDisagreeRM = async function(reason) {
 schema.methods.sellerDisagreeRP = async function(reason) {
   if(!reason) throwErr(400, "拒绝的理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
-  const ShopOrdersModel = mongoose.model("shopOrders");
-  const ShopCostRecordModel = mongoose.model("shopCostRecord");
 
   const {time} = await this.ensureRefundPermission(reason, "B_APPLY_RP");
   await ShopRefundModel.update({_id: this._id}, {
