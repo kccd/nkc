@@ -212,7 +212,16 @@ function submitToShelf() {
     freightPrice.firstFreightPrice = firstFreightPrice;
     freightPrice.addFreightPrice = addFreightPrice;
   }
-  var mergeForumId = getResultForumId();
+  var mainForumsId = []
+  var shopForum = getShopForum();
+  if(!shopForum){
+    throw("商品分类为必选，请务必选一个");
+  }
+  mainForumsId.push(shopForum);
+  var mergeForumId = getResultHaveForumId();
+  if(mergeForumId){
+    mainForumsId.push(mergeForumId)
+  }
   // 组装上传数据
   var post = {
     productName: productName,
@@ -228,7 +237,7 @@ function submitToShelf() {
     productStatus: productStatus,
     shelfTime: shelfTime,
     params: params,
-    mainForumsId: [mergeForumId],
+    mainForumsId: mainForumsId,
     productParams: productParams,
     attentions: attentions,
     purchaseLimitCount:purchaseLimitCount
@@ -667,6 +676,7 @@ function obtainProductPrice() {
     $("#arrayTable").find("tbody tr").each(function(index, ele) {
       var index = $(ele).find(".paraid").attr("sid");
       var price = $(ele).find(".oprice").text();
+      if(!price || price == "") throw("多规格商品必须输入价格");
       var stocksTotal = $(ele).find(".count").text();
       var useDiscount = $(ele).find(".usedis").prop("checked");
       var dprice = $(ele).find(".dprice").text();
@@ -744,4 +754,12 @@ function obtainProductPrice() {
 function addAttention() {
   var attDom = "<input class='attention form-control' type='text' placeholder='请用不超过15字来完成一个简短说明,不填写则无'>";
   $(".attentionList").append(attDom)
+}
+
+/**
+ * 选择商品分类
+ */
+function getShopForum() {
+  var shopForum = $("#shopForums").val();
+  return shopForum;
 }

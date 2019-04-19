@@ -17,8 +17,18 @@ shelfRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
     const {user} = data;
+    // 检测是否被封禁商品上架功能
+    const homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
+    if(homeSetting.banList) {
+      if(homeSetting.banList.indexOf(user.uid) > -1) {
+        return ctx.redirect('/shop/manage');
+      }
+    }
     data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
     data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+    // 取出全部商城类别专业
+    shopForumTypes = await db.ForumModel.getAllShopForums(data.userRoles, data.userGrade, data.user);
+    data.shopForumTypes = shopForumTypes;
 		ctx.template = 'shop/manage/shelf.pug';
 		await next();
 	})

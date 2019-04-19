@@ -98,6 +98,11 @@ block content
                     +orderCert(cart)
                   td(style="border-right:1px solid #f2f7ff;text-align:right")
                     span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo((cart.productParam.price)*cart.count)}
+                if cart.product.uploadCert
+                  tr 
+                    td(colspan="5" style="text-align:right;font-size:12px") 
+                      span 凭证说明：
+                      span.text-danger!=cart.product.uploadCertDescription
                 if cart.canBuy == false
                   tr
                     td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" limit="yes" colspan="7")!=`该商品剩余购买数量为${cart.remainBuyCount}件`

@@ -38,7 +38,6 @@ router
     data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(data.orders);
     data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
     data.orders = await db.ShopOrdersModel.checkRefundCanBeAll(data.orders);
-		console.log(data.orders)
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
     await next();

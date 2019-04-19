@@ -34,6 +34,11 @@ const shopSettingsSchema = new Schema({
   authLevel: {
     type: Number,
     default: 1
+  },
+  // 封禁名单
+  banList: {
+    type: Array,
+    default:[]
   }
 }, {
   collection: 'shopSettings'

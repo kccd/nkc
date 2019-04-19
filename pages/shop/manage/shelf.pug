@@ -19,11 +19,20 @@ block name
         .panel-heading
           | 选择分类
         .panel-body
-          .form-horizontal
-            .form-group
-              label.col-sm-2.control-label 商品分类
-              .col-sm-8
-                include ../../forumlist_dropdown
+          .col-md-6.col-sm-6
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 商品分类(必选)
+                .col-sm-8
+                  select#shopForums.form-control(style="width:auto")
+                    for shopForum in data.shopForumTypes
+                      option(value=`${shopForum.fid}`)!=shopForum.displayName
+          .col-md-6.col-sm-6
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 辅助分类(选填)
+                .col-sm-8
+                  include ../../forumlist_dropdown
       .panel.panel-info
         .panel-heading
           | 基本信息
