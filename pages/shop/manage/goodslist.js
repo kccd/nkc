@@ -62,7 +62,7 @@ function editParam(paraId) {
   $("#edit"+paraId).css("display", "none");
   $("#originPrice"+paraId).attr("contenteditable", "true")
   $("#paramPrice"+paraId).attr("contenteditable", "true")
-  $("#stocksTotal"+paraId).attr("contenteditable", "true")
+  $("#stocksSurplus"+paraId).attr("contenteditable", "true")
   $("#originPrice"+paraId).focus()
 }
 
@@ -73,26 +73,26 @@ function paramToEdit(uid,paraId) {
   // 获取要修改的规格信息
   var originPrice = Number($("#originPrice"+paraId).text());
   var paramPrice = Number($("#paramPrice"+paraId).text());
-  var stocksTotal = Number($("#stocksTotal"+paraId).text());
   var stocksSurplus = Number($("#stocksSurplus"+paraId).text());
-  if(originPrice <= 0 || paramPrice <= 0 || stocksTotal <= 0){
+  // var stocksSurplus = Number($("#stocksSurplus"+paraId).text());
+  if(originPrice <= 0 || paramPrice <= 0 || stocksSurplus <= 0){
     return screenTopWarning("数值必须为正数")
   }
-  if(isNaN(originPrice) || isNaN(paramPrice) || isNaN(stocksTotal)){
+  if(isNaN(originPrice) || isNaN(paramPrice) || isNaN(stocksSurplus)){
     return screenTopWarning("数值必须为正数");
   }
   if(originPrice < paramPrice) {
     return screenTopWarning("原始价格不得小于优惠价");
   }
-  if(stocksTotal < stocksSurplus) {
-    return screenTopWarning("原始库存不得小于当前库存");
-  }
+  // if(stocksTotal < stocksSurplus) {
+  //   return screenTopWarning("原始库存不得小于当前库存");
+  // }
 
   var obj = {
     paraId: paraId,
     originPrice: originPrice.toFixed(2)*100,
     price: paramPrice.toFixed(2)*100,
-    stocksTotal: stocksTotal.toFixed(0)*1
+    stocksSurplus: stocksSurplus.toFixed(0)*1
   }
   nkcAPI('/shop/manage/'+uid+'/goodslist/editParam', "PATCH", {obj:obj})
   .then(function(data) {
@@ -101,8 +101,8 @@ function paramToEdit(uid,paraId) {
     $("#edit"+paraId).css("display", "");
     $("#originPrice"+paraId).attr("contenteditable", "false")
     $("#paramPrice"+paraId).attr("contenteditable", "false")
-    $("#stocksTotal"+paraId).attr("contenteditable", "false")
-    window.location.reload();
+    $("#stocksSurplus"+paraId).attr("contenteditable", "false")
+    // window.location.reload();
   })
   .catch(function(data) {
     screenTopWarning(data || data.error)

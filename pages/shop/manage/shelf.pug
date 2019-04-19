@@ -19,19 +19,19 @@ block name
         .panel-heading
           | 选择分类
         .panel-body
-          .col-md-6.col-sm-6
+          .col-md-5.col-sm-5
             .form-horizontal
               .form-group
-                label.col-sm-2.control-label 商品分类(必选)
-                .col-sm-8
+                label.col-sm-4.control-label 商品分类(必选)
+                .col-sm-7
                   select#shopForums.form-control(style="width:auto")
                     for shopForum in data.shopForumTypes
                       option(value=`${shopForum.fid}`)!=shopForum.displayName
-          .col-md-6.col-sm-6
+          .col-md-7.col-sm-7
             .form-horizontal
               .form-group
-                label.col-sm-2.control-label 辅助分类(选填)
-                .col-sm-8
+                label.col-sm-4.control-label 辅助分类(选填)
+                .col-sm-7
                   include ../../forumlist_dropdown
       .panel.panel-info
         .panel-heading
@@ -201,11 +201,7 @@ block name
                 span 
                   input#addFreightPrice(type="text", name="", style="width:30px")
                 span  元
-                p(style="color:red;font-size:11px") 注意:首重运费与增加运费应大于0
-            //- .form-group
-            //-   label.col-sm-2.control-label
-            //-   .col-sm-8
-            //-     p 首重运费与增加运费应大于0
+                //- p(style="color:red;font-size:11px") 注意:首重运费与增加运费应大于0
       .panel.panel-info
         .panel-heading
           | 定时上架

@@ -59,16 +59,17 @@ block name
               th 规格名称
               th 原始价格
               th 优惠价格
-              th 原始库存
-              th 剩余库存
+              th 库存
+              th 销量
               th 修改商品规格
             for param in product.productParams
               tr
                 td=param.name
                 td(id=`originPrice${param._id}`) #{numToFloatTwo(param.originPrice)}
                 td(id=`paramPrice${param._id}`) #{numToFloatTwo(param.price)}
-                td(id=`stocksTotal${param._id}`)=param.stocksTotal
                 td(id=`stocksSurplus${param._id}`)=param.stocksSurplus
+                td()=param.sellCount
+                //- td(id=`stocksSurplus${param._id}`)=param.stocksSurplus
                 td 
                   p
                     a.btn.btn-info.btn-sm(id=`edit${param._id}` onclick=`editParam(${param._id})`) 修改
