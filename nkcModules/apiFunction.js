@@ -394,19 +394,7 @@ fn.doExchange = (arr) => {
  * @return {JSON} data
  * @author Kris 2019-3-14
  */
-fn.getIpAddress = async (ip, ctx) => {
-  let uid;
-  if(!ctx.data.user){
-    uid = "visit"
-  }else{
-    uid = ctx.data.user.uid
-  }
-  ipLog = db.IpLogModel({
-    ip: ip,
-    originalUrl: ctx.originalUrl,
-    uid: uid
-  });
-  await ipLog.save();
+fn.getIpAddress = async (ip) => {
   let options = {
     hostname: `iploc.market.alicloudapi.com`,    //接口域
     path: `/v3/ip?ip=${ip}`,    //请求地址

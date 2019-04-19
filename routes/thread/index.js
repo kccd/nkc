@@ -286,8 +286,8 @@ threadRouter
 		}
 		// 获取用户地址信息
 		let userAddress = "";
-		if(data.user){
-			let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address,ctx);
+		if(data.user && thread.type == "product"){
+			let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
 			const {status, province, city} = ipInfo;
 			if(status && status == "1"){
 				userAddress = province + " " + city;
