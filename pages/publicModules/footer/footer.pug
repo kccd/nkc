@@ -62,13 +62,13 @@ footer.footer
             .footer-header.text-center 手机访问
             ul.footer-link
               li.text-center
-                img(src="/default/home.jpg" style="height: 114px;width: 114px;")
+                canvas.qrcode-canvas(data-path="/")
           .col-xs-6.col-md-2
             .footer-header.text-center 安卓客户端
             ul.footer-link
               li.text-center
                 a(href='/app')
-                  canvas#androidQrcode
+                  canvas.qrcode-canvas(data-path="/app")
                   span(style='display: block;font-size: 1rem;color: #555555;margin-top: 0.3rem;') 点击下载
 
       .col-xs-12.col-md-12
