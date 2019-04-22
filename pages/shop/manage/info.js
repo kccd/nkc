@@ -51,14 +51,14 @@ function submit(storeId) {
 		})
 }
 
-function saveToInfo(storeId) {
+function saveToInfo(uid) {
   var post = {};  
 	var dealDescription = $("#dealDescription").val().trim();
 	var dealAnnouncement = $("#dealAnnouncement").val().trim();
   var location = $("#location").val().trim();
   var address = $("#address").val().trim();
-  if(!dealAnnouncement || !dealDescription || !location || !address) {
-    screenTopWarning("请完善交易基础设置后再提交")
+  if(!location || !address) {
+    screenTopWarning("地区、地址都是必填项")
     return;
 	}
 	if(dealAnnouncement.length > 500) {
@@ -75,7 +75,7 @@ function saveToInfo(storeId) {
 		address: address,
 		dealAnnouncement: dealAnnouncement
   }
-  nkcAPI("/shop/manage/"+storeId+"/info", "POST", post)
+  nkcAPI("/shop/manage/"+uid+"/info", "POST", post)
   .then( function(data){
     screenTopAlert('交易基础设置保存成功');
   })
