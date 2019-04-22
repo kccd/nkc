@@ -18,7 +18,7 @@ router
     let {page = 0, orderStatus} = query;
     const {user} = data;
     let q = {
-      uid: user.uid
+      buyUid: user.uid
     };
     if(orderStatus == "refunding"){
       q.closeStatus = false;
@@ -33,44 +33,15 @@ router
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     let sort = {orderToc: -1};
-    const orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
-    data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    let orders = await db.ShopOrdersModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
+    data.orders = orders;
+    data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(data.orders);
     data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
+    data.orders = await db.ShopOrdersModel.checkRefundCanBeAll(data.orders);
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
     await next();
   })
-  /* .get('/', async (ctx, next) => {
-		const {data, db, params, query, nkcModules} = ctx;
-		const {page = 0} = query;
-		let {orderStatus} = query;
-		const {user} = data;
-		let storeId = params.account;
-		// 构造查询条件
-		let searchMap = {
-			// storeId : "7", 
-      uid: user.uid,
-      closeStatus: false
-		}
-		if(orderStatus && orderStatus !== "all"){
-			searchMap.orderStatus = orderStatus;
-		}
-    const count = await db.ShopOrdersModel.count(searchMap);
-		const paging = nkcModules.apiFunction.paging(page, count);
-    data.paging = paging;
-    const sort = {};
-    if(orderStatus !== 'unCost') {
-      sort.payToc = -1;
-    } else {
-      sort.orderToc = -1;
-    }
-		const orders = await db.ShopOrdersModel.find(searchMap).sort(sort).skip(paging.start).limit(paging.perpage);
-    data.orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
-    data.orderStatus = orderStatus;
-    ctx.template = '/shop/order/order.pug';
-    await next();
-  })
-  */
   // 查看订单详情
   .get('/detail', async (ctx, next) => {
     const {data, db, params, query, nkcModules} = ctx;
@@ -78,7 +49,7 @@ router
     const {user} = data;
     if(!orderId) ctx.throw(400, "订单号有误");
     const order = await db.ShopOrdersModel.findOne({orderId});
-    if(user.uid !== order.uid) ctx.throw(403, "您无权查看此订单");
+    if(user.uid !== order.buyUid) ctx.throw(403, "您无权查看此订单");
     if(!order) ctx.throw(400, "订单不存在");
     let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     data.order = orders[0];
@@ -98,7 +69,7 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, query, body, nkcModules} = ctx;
     const {user} = data;
-    const {post, receInfo, paramCert} = body;
+    let {post, receInfo, paramCert} = body;
     const {receiveAddress, receiveName, receiveMobile} = receInfo;
   
 
@@ -116,38 +87,69 @@ router
     // 取出全部paid
     let paids = [];
     const ordersId = [];
-    for(let bill of post) {
-      // 获取对应规格商品
-      let productParams = await db.ShopProductsParamModel.find({_id: bill.paraId});
-      productParams = await db.ShopProductsParamModel.extendParamsInfo(productParams);
-      let productParam = productParams[0];
+    for(let bill in post) {
       // 检查库存
-      let stockCostMethod = productParam.product.stockCostMethod;
-      let stocksSurplus = productParam.stocksSurplus;
-      if(Number(bill.productCount) > Number(stocksSurplus)) ctx.throw(400, "库存不足");
+      for(let cart of post[bill].carts) {
+        if(Number(cart.count) > Number(cart.productParam.stocksSurplus)) ctx.throw(400, `${cart.product.name}+${cart.productParam.name}库存不足`);
+      }
       const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
-      // 计算邮费
-      let freightPrice = await nkcModules.apiFunction.calculateFreightPrice(productParam.product.freightPrice, bill.productCount, productParam.product.isFreePost)
-      const order = db.ShopOrdersModel({
+      let newCarts = [];
+      // 添加购买记录
+      for(let cart of post[bill].carts) {
+        let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
+        let cartObj = {
+          costId,
+          orderId,
+          productId: cart.productId,
+          productParamId: cart.productParamId,
+          count: cart.count,
+          uid: cart.uid,
+          freightPrice: cart.freightPrice,
+          productPrice: cart.productPrice,
+          singlePrice: cart.productParam.price
+        };
+        let shopCost = db.ShopCostRecordModel(cartObj);
+        if(paramCert[cart.productParamId]) {
+          await db.ShopCertModel.update({_id: paramCert[cart.productParamId]}, {
+            $set: {
+              orderId,
+              paramId: costId || ""
+            }
+          })
+        }
+        await shopCost.save();
+        let buyProduct = await db.ShopGoodsModel.findOne({productId:cart.productId});
+        let buyRecord = buyProduct.buyRecord;
+        if(!buyRecord) buyRecord = {};
+        if(buyRecord[user.uid]){
+          buyRecord[user.uid].count += cart.count;
+        }else{
+          buyRecord[user.uid] = {
+            count: cart.count
+          }
+        }
+        await buyProduct.update({$set: {buyRecord: buyRecord}});
+        // 下单完毕，将商品从购物车中清除
+        await db.ShopCartModel.remove({uid: user.uid, productParamId: cart.productParamId});
+        newCarts.push(cartObj);
+      }
+      let order = db.ShopOrdersModel({
+        orderFreightPrice: post[bill].maxFreightPrice,
         orderId: orderId,
         receiveAddress: receiveAddress,
         receiveName: receiveName,
         receiveMobile: receiveMobile,
-        storeId: productParam.product.storeId,
-        productId: productParam.productId,
-        paramId: productParam._id,
-        uid: user.uid,
+        sellUid: post[bill].user.uid,
+        snapshot: newCarts,
+        buyMessage: post[bill].message,
+        buyUid: user.uid,
         count: bill.productCount,
-        orderOriginPrice: (productParam.price) * bill.productCount + freightPrice,
-        orderPrice: (productParam.price) * bill.productCount + freightPrice
+        orderPrice: post[bill].productPrice
       });
       await order.save();
-      //减库存
-      await db.ShopProductsParamModel.productParamReduceStock([order],'orderReduceStock');
-      await db.ShopCertModel.update({_id: paramCert[productParam._id]}, {$set: {
-        orderId: orderId,
-        deletable: false
-      }});
+      // 拓展订单并减库存
+      let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+      await db.ShopProductsParamModel.productParamReduceStock(orders,'orderReduceStock');
       ordersId.push(order.orderId);
     }
     data.ordersId = ordersId.join('-');

@@ -908,6 +908,8 @@ $(function () {
       show: false
     });
   }
+
+
 });
 
 
@@ -1291,6 +1293,9 @@ function digestPost(pid) {
     button[2].onclick = function() {
       var input = event.currentTarget.getElementsByTagName('input');
       var num = input[0].value;
+      num = Number(num);
+      num = num*100;
+      if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
       var obj = {kcb: num};
       post(obj);
     }
@@ -1697,4 +1702,30 @@ function moveThread(tid,fid,cid,para){
 function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
-} 
+}
+
+function openNKCDrawer() {
+  $(".nkc-drawer").addClass("active");
+  $(".nkc-drawer-body").addClass("active");
+  $(".nkc-drawer-right").addClass("active");
+  $('body').css({
+    "overflow-y": "hidden"
+  });
+}
+function closeNKCDrawer() {
+  $(".nkc-drawer").removeClass("active");
+  $(".nkc-drawer-right").removeClass("active");
+  $(".nkc-drawer-body").removeClass("active");
+  $('body').css({
+    "overflow-y": "scroll"
+  });
+}
+
+function toggleNKCDrawer() {
+  var nkcDrawer = $(".nkc-drawer");
+  if(nkcDrawer.hasClass('active')) {
+    closeNKCDrawer();
+  } else {
+    openNKCDrawer();
+  }
+}

@@ -141,7 +141,7 @@ block shopAccountContent
               li.orderPrompt 
                 span 如果没有收到货，或收到货后出现问题，您可以
                 span 
-                  a.orderStatusTextLink(href=`/u/${order.store.uid}`) 联系卖家
+                  a.orderStatusTextLink(href=`/u/${order.sellUid}`) 联系卖家
                 span 协商解决
               //-li.orderPrompt
                 span 如果卖家没有履行应尽的承诺，您可以申请
@@ -167,7 +167,7 @@ block shopAccountContent
                   span.infoListLiDd!=`${order.orderId}`
                 li.infoListLi 
                   span.infoListLiDt 商家：
-                  span.infoListLiDd!=`${order.store.storeName}`
+                  span.infoListLiDd!=`${order.sellUser.username}`
                 li.infoListLi 
                   span.infoListLiDt 运单编号：
                   if order.trackNumber
@@ -203,40 +203,24 @@ block shopAccountContent
                 span.infoCaption 订单关闭时间:
                 if order.closeToc
                   span.infoContent=order.closeToc.toLocaleString()
-
           //- .col-xs-12
           //-   h4.infoTitle 
-          //-     span 商家信息
-          //-   .col-xs-12
-          //-     p
-          //-       span.infoCaption 卖家昵称:
-          //-       span.infoContent!=`${order.store.uid}`
-          //-   .col-xs-12
-          //-     p
-          //-       span.infoCaption 电话:
-          //-       span.infoContent!=`${order.store.mobile}`
-          //-   .col-xs-12
-          //-     p
-          //-       span.infoCaption 所在地:
-          //-       span.infoContent!=`${order.store.address}`
-          .col-xs-12
-            h4.infoTitle 
-              span 购买凭证
-            if !order.product.uploadCert
-              .col-xs-12
-                p
-                  span.infoCaption 该商品不需要购买凭证
-            else
-              if !data.certs || data.certs.length == 0
-                .col-xs-12
-                  p
-                    span.infoCaption 缺少购买凭证
-              else
-                .col-xs-12
-                  p
-                    for cert in data.certs
-                      a(href=`/shop/cert/${cert.id}` target="blank")
-                        img(src=`/shop/cert/${cert.id}` style="width:100px;height:100px;margin-right:10px")
+          //-     span 购买凭证
+          //-   if !order.product.uploadCert
+          //-     .col-xs-12
+          //-       p
+          //-         span.infoCaption 该商品不需要购买凭证
+          //-   else
+          //-     if !data.certs || data.certs.length == 0
+          //-       .col-xs-12
+          //-         p
+          //-           span.infoCaption 缺少购买凭证
+          //-     else
+          //-       .col-xs-12
+          //-         p
+          //-           for cert in data.certs
+          //-             a(href=`/shop/cert/${cert.id}` target="blank")
+          //-               img(src=`/shop/cert/${cert.id}` style="width:100px;height:100px;margin-right:10px")
     .col-sm-12.col-md-12.col-xs-12
       .order-address-wrap
         h3(style='border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;')
@@ -248,23 +232,36 @@ block shopAccountContent
             th 属性
             th 商品单价
             th 数量
-            th 运费
+            th 购买凭证
         tbody
-          tr
-            td
-              a(href=`/shop/product/${order.product.productId}` target="_blank")=order.product.name
-            td!=`${order.productParam.name}`
-            td #{numToFloatTwo(order.productParam.price)}
-            td!=`${order.count}`
-            td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
+          for para in order.params
+            tr
+              td
+                a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
+              td!=`${para.productParam.name}`
+              td #{numToFloatTwo(para.productParam.price)}
+              td!=`${para.count}`
+              td
+                if para.product.uploadCert
+                  for cert in data.certs
+                    if cert.paramId == para.costId && cert.orderId == para.orderId
+                      span
+                        a(href=`/shop/cert/${cert.id}` target="blank")
+                          img(src=`/shop/cert/${cert.id}` style="width:40px;height:40px;margin-right:10px")
+                else
+                  span 不需凭证
+
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
+        //- p
+        //-   span(style='font-weight: bold;') 订单总价: 
+        //-   span#totalPrice(style='font-size:20px;text-decoration: line-through;') #{numToFloatTwo(order.orderOriginPrice)}
         p
-          span(style='font-weight: bold;') 订单总价: 
-          span#totalPrice(style='font-size:20px;text-decoration: line-through;') #{numToFloatTwo(order.orderOriginPrice)}
-        p
-          span(style='font-weight: bold;') 实付款: 
-          span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice)}
+          span(style='font-weight: bold;') 实付款
+          span!=`( 含运费`
+          span #{numToFloatTwo(order.orderFreightPrice)}
+          span!=`)：`
+          span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice+order.orderFreightPrice)}
 
 
 

@@ -62,18 +62,21 @@ router
   .post("/", async (ctx, next) => {
     const {settings, tools, db, body, data} = ctx;
     const {files, fields} = body;
-    const {type, orderId} = fields;
+    const {type, orderId, paramId} = fields;
     const {user} = data;
+    let param, order;
+    if(orderId) order = await db.ShopOrdersModel.findById(orderId);
+    if(paramId && order) param = await order.getParamById(paramId);
     if(orderId) {
-      const order = await db.ShopOrdersModel.findById(orderId);
-      const product = await db.ShopGoodsModel.findById(order.productId);
-      if(![order.uid, product.uid].includes(user.uid)) {
+      const {sellUid, buyUid} = order;
+      if(![sellUid, buyUid].includes(user.uid)) {
         ctx.throw(403, "您没有权限上传凭证");
       }
       const certCount = await db.ShopCertModel.count({
         uid: user.uid,
         deleted: false,
         orderId,
+        paramId,
         type: "refund"
       });
       if(certCount >= 5) ctx.throw(400, "凭证数已达最大值");
@@ -109,7 +112,8 @@ router
       path: datePath,
       ext,
       name,
-      orderId
+      orderId,
+      paramId: param? param.costId: ""
     });
     await cert.save();
     data.cert = cert;

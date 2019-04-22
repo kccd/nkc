@@ -24,7 +24,10 @@ module.exports = {
 			},
 			auth: {
 				GET: "visitShopAuth",
-				POST: "setShopAuth"
+				POST: "setShopAuth",
+				delban: {
+					PATCH: "delShelfAuth"
+				}
 			},
 			applys: {
 				GET: 'visitShopOpenStoreApplys',
@@ -245,6 +248,9 @@ module.exports = {
     },
     withdraw: {
 		  GET: "visitExperimentalWithdraw"
+    },
+    exam: {
+		  GET: "visitExperimentalExam"
     }
 	},
   console: {

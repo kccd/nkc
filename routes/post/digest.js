@@ -24,7 +24,7 @@ router
     if(!redEnvelopeSettings.c.draftFee.close) {
       if(!kcb) ctx.throw(400, '参数错误，请刷新');
       num = Number(kcb);
-      if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+      if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
       if(!redEnvelopeSettings.c.draftFee.close && (num < redEnvelopeSettings.c.draftFee.minCount || num > redEnvelopeSettings.c.draftFee.maxCount)) ctx.throw(400, '科创币数额不在范围内');
     }
 		data.targetUser = targetUser;

@@ -6,12 +6,13 @@ router
     const {data, db, body, tools} = ctx;
     const {user} = data;
     const {orderId, refund} = body;
-    let {type, reason, root, money} = refund;
+    let {type, reason, root, money, paramId} = refund;
     root = !!root;
     // 查询订单 判断权限
     let order = await db.ShopOrdersModel.findById(orderId);
+    let param;
     const orderDB = order;
-    if(order.uid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
+    if(order.buyUid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
     const {refundStatus, orderStatus} = order;
@@ -23,6 +24,21 @@ router
     if(refunds.length && refunds[0].succeed === null) {
       ctx.throw(400, "申请已提交，请勿重复提交申请");
     }
+    // 判断是否为订单中的最后一个商品，若是则改为退全部
+    let count = 0;
+    for(const p of order.params) {
+      if(p.refundStatus === "") {
+        count++;
+      }
+      if(p.costId === paramId) {
+        if(p.refundStatus !== "")  ctx.throw(400, "商品已退款，请刷新");
+        param = p;
+      }
+    }
+    if(count <= 1) {
+      param = "";
+    }
+
     if(root && !refunds.length) ctx.throw(400, "请先向卖家提出申请，卖家拒绝后可向平台提出申请");
     if(!type) {
       if(orderStatus !== 'unCost') ctx.throw(400, "请选择退款类型（退款、退款+退货）");
@@ -40,21 +56,21 @@ router
       const r = {
         _id: await db.SettingModel.operateSystemID("shopRefunds", 1),
         toc: time,
-        buyerId: order.uid,
-        sellerId: order.product.uid,
+        buyerId: order.buyUid,
+        sellerId: order.sellUid,
         orderId: order.orderId,
+        paramId: param?param.costId: "",
         root
       };
-
       let refundMoney = Number(money)*100;
       refundMoney = Number(refundMoney.toFixed(2));
-      if(refundMoney >= 0 && refundMoney <= order.orderPrice){
-        r.money = refundMoney;
+      if(refundMoney < 0) ctx.throw(400, "退款金额不能小于0");
+      if(param) {
+        if(refundMoney > param.productPrice) ctx.throw(400, "退款金额不能超过要退款的商品的金额");
+      } else {
+        if(refundMoney > order.orderPrice + order.orderFreightPrice) ctx.throw(400, "退款金额不能超过订单的总金额");
       }
-      else {
-        ctx.throw(400, "退款金额必须大于0且不能超过点订单的支付金额");
-      }
-
+      r.money = refundMoney;
       if(orderStatus === "unShip") {
         // 未发货时
         r.status = root? "B_INPUT_CERT_RM": "B_APPLY_RM";
@@ -82,7 +98,8 @@ router
           orderId,
           uid: user.uid,
           deletable: true,
-          type: "refund"
+          type: "refund",
+          paramId: param? param.costId: ''
         }, {
           $set: {
             deletable: false
@@ -91,6 +108,19 @@ router
       }
       const refundDB = db.ShopRefundModel(r);
       await refundDB.save();
+      if(param) {
+        await db.ShopCostRecordModel.update({costId: param.costId}, {
+          $set: {
+            refundStatus: "ing"
+          }
+        });
+      } else {
+        await db.ShopCostRecordModel.updateMany({orderId: order.orderId, refundStatus: ""}, {
+          $set: {
+            refundStatus: "ing"
+          }
+        });
+      }
       await db.ShopOrdersModel.update({
         orderId: order.orderId
       }, {

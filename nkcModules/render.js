@@ -363,7 +363,10 @@ let pugRender = (template, data, state) => {
     permission: (operationId) => {
       return data.userOperationsId.includes(operationId);
     },
-    state: state
+    state: state,
+    ipUrl: (ip) => {
+      return `http://www.ip138.com/ips138.asp?ip=${ip}&action=2`
+    }
   };
   options.data = data;
   options.filters = filters;

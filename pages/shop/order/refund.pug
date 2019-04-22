@@ -7,26 +7,42 @@ block shopTitle
   +includeCSS('/shop/order/order.css')
 block content
   .container-fluid.max-width
-    .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
+    .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds, param: data.param})
     .row#app(v-cloak)   
-      div(v-if="order.orderStatus === 'unCost'")
-        h4 取消订单
-        h5
-          img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
-          div.display-i-b
-            a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
-            h5 数量：{{order.count}}  
-            h5 订单号：{{order.orderId}}
+      div.col-xs-12.col-md-12(v-if="order.orderStatus === 'unCost'")
 
-        .form.col-xs-12.col-md-5
-          .form-group
-            label 请填写理由（不超过1000字节）：
-            textarea.form-control(v-model="reason" rows=7) 
-          .form-group
-            h5.text-danger(v-if='error') {{error}}
-            h5.text-success(v-if='info') {{info}}
-            .text-right
-              button.btn.btn-primary.btn-block(@click='cancelOrder') 提交  
+        h4 取消订单
+
+        h5 订单ID：{{order.orderId}}
+        h5 订单状态：{{order.status}}
+        h5 订单总价：
+          strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
+          | 元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+          span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
+          | ）
+        h5 商品列表
+        div(v-for="p in params")
+          img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+          div.display-i-b
+            a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name.join('+')}})
+            h5 商品ID：{{p.costId}}，商品总价：
+              strong.text-danger {{p.productPrice/100}}
+              | 元（{{p.count}}件）
+              strong.text-danger(v-if="p.refundStatus==='success'") 【已退款{{p.refundMoney?p.refundMoney/100+"元":""}}】
+
+        a.m-r-1(:href="'/shop/order/' + order.orderId + '/detail'" target="_blank") 订单详情
+        a(:href="'/message?uid=' + order.sellUid" target="_blank") 联系卖家
+        br
+        .row
+          .form.col-xs-12.col-md-5.m-t-3
+            .form-group
+              label 请填写理由（不超过1000字节）：
+              textarea.form-control(v-model="reason" rows=7)
+            .form-group
+              h5.text-danger(v-if='error') {{error}}
+              h5.text-success(v-if='info') {{info}}
+              .text-right
+                button.btn.btn-primary.btn-block(@click='cancelOrder') 提交
       div(v-else-if='order')
         .col-xs-12.col-md-12
           h4 退款说明
@@ -38,23 +54,45 @@ block content
         .col-xs-12.col-md-12
           .row
             .col-xs-12.col-md-6
-              h4 商品信息
-              h5
-                img.m-r-1(:src="'/rt/' + product.imgMaster" style='height: 6rem;width: 6rem;vertical-align:top;')
+              h4 订单信息
+              h5 订单ID：{{order.orderId}}
+              h5 订单状态：{{order.status}}
+              h5 订单总价：
+                strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
+                |元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+                span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
+                |）
+              h5 商品列表
+              div(v-for="p in params")
+                img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
-                  a(:href="'/shop/product/'+product.productId" target='_blank' :title="product.abstract") {{product.name}}
-                  h5
-                    span.m-r-1 数量：{{order.count}}  
-                    span.m-r-1 规格：{{productParam.name.join('+')}}
-                    span.m-r-1 价格总计：
-                      strong.text-danger {{order.orderPrice/100}}
-                      |&nbsp;元
-                  h5 订单状态：
-                    strong {{order.status}}    
-                  h5
-                    a(:href="'/shop/order/'+order.orderId + '/detail'") 订单详情  
-                    a.m-l-1(:href="'/message?uid='+product.uid" target="_blank") 联系卖家
+                  a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name.join('+')}})
+                  h5 商品ID：{{p.costId}}，商品总价：
+                    strong.text-danger {{p.productPrice/100}}
+                    | 元（{{p.count}}件）
+                    strong.text-danger(v-if="p.refundStatus==='success'") 【已退款{{p.refundMoney?p.refundMoney/100+"元":""}}】
+
+              a.m-r-1(:href="'/shop/order/' + order.orderId + '/detail'" target="_blank") 订单详情
+              a(:href="'/message?uid=' + order.sellUid" target="_blank") 联系卖家
+              hr
+
               .m-t-1(v-if='refund')
+                h4 退款中的商品
+                div(v-if='param')
+                  img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                  div.display-i-b
+                    a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}} ({{param.productParam.name.join('+')}})
+                    h5 商品总价：
+                      strong.text-danger {{param.productPrice/100}}
+                      | 元（{{param.count}}件）
+                div(v-else)
+                  div(v-for="p in order.params" v-if="p.refundStatus === 'ing'")
+                    img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                    div.display-i-b
+                      a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name.join('+')}})
+                      h5 商品总价：
+                        strong.text-danger {{p.productPrice/100}}
+                        | 元（{{p.count}}件）
                 h5 类型：{{refundType(refund.type)}}  
                 h5 进度：{{status.description}}
                 //-h5 卖家处理最后期限：
@@ -94,7 +132,23 @@ block content
               .m-t-1(v-if="display.apply && (applyType !== 'platform' || order.applyToPlatform)")
                 .form
                   .form-group
-                    label 1、选择退款方式
+                    label 1、选择需要退款的商品
+                    div(style="border-bottom: 1px solid #eee")
+                      label.radio-inline
+                        input(type="radio" value="" v-model="newRefund.paramId")
+                        | 全部商品
+                    div(v-for="p in params" style="border-bottom: 1px solid #eee" v-if='p.refundStatus === ""')
+                      label.radio-inline
+                        input(type="radio"  :value="p.costId" v-model="newRefund.paramId")
+                        img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                        div.display-i-b
+                          a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
+                          h5 商品总价：
+                            strong.text-danger {{p.productPrice/100}}
+                            | 元（{{p.count}}件）
+                            strong.text-danger {{p.refundStatus==="success"?"【已退款】": ""}}
+                  .form-group
+                    label 2、选择退款方式
                     //- 向卖家申请
                     .refund-type(v-if="applyType === 'seller'")
                       span(:class="{'active': newRefund.type==='money'}" @click='newRefund.type="money"') 只退款
@@ -108,17 +162,17 @@ block content
                       ) 只退款
                       span.disabled(v-else) 只退款
                   .form-group
-                    label 2、填写退款金额（不超过
-                      strong.text-danger {{order.orderPrice/100}}
+                    label 3、填写退款金额（不超过
+                      strong.text-danger {{refundMoneyMax/100}}
                       | 元）      
                     input.form-control(v-model.number="newRefund.money" type="number")
                   .form-group    
-                    label 3、填写理由（不超过
+                    label 4、填写理由（不超过
                       strong.text-danger 1000
                       |字节）
                     textarea.form-control(v-model='newRefund.reason' rows=7)  
                   .form-group(v-if="applyType === 'platform'")
-                    label 4、上传凭证（不超过
+                    label 5、上传凭证（不超过
                       strong.text-danger 5
                       |张）
                     input(type="file" @change='selectedFile' multiple="multiple")
@@ -127,7 +181,7 @@ block content
                     </transition> 
                     div(v-if="order.certs && order.certs.length !== 0")
                       h5 已上传的凭证   
-                      .shop-cert(v-for="cert in order.certs" :title="cert.name")
+                      .shop-cert(v-for="cert in order.certs" :title="cert.name" v-if="(!param && !cert.paramId) || (param && param.costId === cert.paramId)")
                         .shop-cert-options
                           span(@click="viewCert(cert)").fa.fa-eye
                           span(@click="deleteCert(cert)").fa.fa-trash
@@ -151,7 +205,7 @@ block content
                     h5.text-success(v-if="uploadStatus") {{uploadStatus}}
                   </transition>
                   h5 已上传的凭证：
-                  .shop-cert(v-for="cert in order.certs" :title="cert.name")
+                  .shop-cert(v-for="cert in order.certs" :title="cert.name" v-if="(!param && !cert.paramId) || (param && param.costId === cert.paramId)")
                     .shop-cert-options
                       span(@click="viewCert(cert)").fa.fa-eye
                       span(@click="deleteCert(cert)").fa.fa-trash

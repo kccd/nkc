@@ -64,6 +64,6 @@ forumRouter
     await redis.cacheForums();
 		data.forum = newForum;
 		await next();
-  })
+	})
   .use('/:fid', singleForumRouter.routes(), singleForumRouter.allowedMethods());
 module.exports = forumRouter;

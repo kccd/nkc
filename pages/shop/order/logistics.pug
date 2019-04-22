@@ -2,6 +2,10 @@ extends ../account/shopAccountBase
 block shopAccountTitle
   title=`我的订单 | 科创商城`
   -const trackInfo = data.trackInfo
+  style.
+    .redFont {
+      color: red
+    }
 block shopAccountContent
   .row
     .col-xs-12.col-md-12(style="margin-bottom:20px")
@@ -27,11 +31,11 @@ block shopAccountContent
             p 退件签收
         br
         div(style="background-color:#ddd;padding:30px")
-          if trackInfo.result.deliverystatus == "3"
-            for logInfo in trackInfo.result.list
-              p 
-                span(style="margin-right:20px;font-weight:bold")=logInfo.time
-                span=logInfo.status
+          //- if trackInfo.result.deliverystatus == "3"
+          for logInfo in trackInfo.result.list
+            p 
+              span(style="margin-right:20px;font-weight:bold" class=index == "0"?"redFont":"")=logInfo.time
+                span(class=index == "0"?"redFont":"")=logInfo.status
         br
         div
           p

@@ -112,10 +112,10 @@ const shopGoodsSchema = new Schema({
     required: true
   },
   // 商铺id
-  storeId: {
-    type: String,
-    required: true
-  },
+  // storeId: {
+  //   type: String,
+  //   required: true
+  // },
   /**
    * 库存计数方式
    * @payReduceStock 付款减库存
@@ -182,6 +182,15 @@ const shopGoodsSchema = new Schema({
   error: {
     type: String,
     default: ""
+  },
+  // 用户购买记录
+  // {
+  // uid,
+  // count
+  // }
+  buyRecord: {
+    type: Schema.Types.Mixed,
+    default: {}
   }
 }, {
   collection: 'shopGoods'
@@ -194,7 +203,7 @@ const shopGoodsSchema = new Schema({
   @param o: 
     参数    数据类型(默认值) 介绍
     user:   Boolean(true) 是否拓展商品所属用户
-    store:  Boolean(true) 是否拓展商品所属店铺
+    dealInfo: Boolean(true) 是否拓展商家基础信息
     post:   Boolean(true) 是否拓展商品对应的post, name, description, abstract
     thread: Boolean(true) 是否拓展商品对应的文章
   @reture 拓展后的对象数组，此时的商品对象已不再时schema对象，故无法调取model中定义的方法。
@@ -204,7 +213,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   if(!o) o = {};
   let options = {
     user: true,
-    store: true,
+    dealInfo: true,
     post: true,
     thread: true,
     productParam: true
@@ -213,18 +222,16 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   const UserModel = mongoose.model('users');
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
-  const ShopStoresModel = mongoose.model('shopStores');
+  const ShopDealInfoModel = mongoose.model('shopDealInfo');
   const ShopProductsParamsModel = mongoose.model('shopProductsParams');
   const uid = new Set(), userObj = {};
   const pid = new Set(), postObj = {};
   const tid = new Set(), threadObj = {};
-  const storesId = new Set(), storeObj = {};
   const productId = new Set(), productParamObj = {};
+  const dealInfoObj = {};
   products.map(p => {
     if(o.user)
       uid.add(p.uid);
-    if(o.store)  
-      storesId.add(p.storeId);
     if(o.post)  
       pid.add(p.oc);
     if(o.thread)
@@ -232,17 +239,17 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
     if(o.productParam)
       productId.add(p.productId);
   }); 
-  let users, stores, posts, threads, productParams;
+  let users, posts, threads, dealInfos, productParams;
   if(o.user) {
     users = await UserModel.find({uid: {$in: [...uid]}});
     for(const user of users) {
       userObj[user.uid] = user;
     }
   }
-  if(o.store) {
-    stores = await ShopStoresModel.find({storeId: {$in: [...storesId]}});
-    for(const store of stores) {
-      storeObj[store.storeId] = store;
+  if(o.dealInfo) {
+    dealInfos = await ShopDealInfoModel.find({uid: {$in:[...uid]}});
+    for(const dealInfo of dealInfos) {
+      dealInfoObj[dealInfo.uid] = dealInfo;
     }
   }
   if(o.thread) {
@@ -266,8 +273,9 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   }
   return await Promise.all(products.map(p => {
     const product = p.toObject();
+    product.buyRecord = p.buyRecord;
     if(o.user) product.user = userObj[p.uid];
-    if(o.store) product.store = storeObj[p.storeId];
+    if(o.dealInfo) product.dealInfo = dealInfoObj[p.uid];
     if(o.post) {
       const post = postObj[p.oc];
       product.post = post;
@@ -300,7 +308,7 @@ shopGoodsSchema.methods.ensurePermission = async function() {
 shopGoodsSchema.statics.findById = async (id) => {
   const ShopGoodsModel = mongoose.model('shopGoods');
   const product = await ShopGoodsModel.findOne({productId: id});
-  if(!product) throwErr(404, `为找到ID为【${id}】的商品`);
+  if(!product) throwErr(404, `未找到ID为【${id}】的商品`);
   return product;
 };
 
@@ -315,32 +323,18 @@ shopGoodsSchema.statics.checkOutPurchaseLimit = async (bills, uid) => {
   const ShopOrdersModel = mongoose.model('shopOrders');
   const productId = new Set();
   const countObj = {}, productObj = {};
-  bills.map(b => {
-    productId.add(b.productId)
-  });
-  // 在订单中计算每种商品得购买数量
-  let counts = await ShopOrdersModel.aggregate([
-    {$match: {productId:{$in:[...productId]}, uid}},
-    {$group: {_id:"$productId", count:{$sum:1}}}
-  ]);
-  for(const count of counts) {
-    countObj[count._id] = count;
-  }
-  // 取出每种规格的原商品
-  let products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
-  for(const product of products) {
-    productObj[product.productId] = product;
-  }
+
   return await Promise.all(bills.map(b => {
     // 已经购买的数量
     let alreadyBuyCount = 0;
-    if(countObj[b.productId]){
-      alreadyBuyCount = Number(countObj[b.productId].count);
+    if(!b.product.buyRecord) b.product.buyRecord = {};
+    if(b.product.buyRecord[uid]){
+      alreadyBuyCount = Number(b.product.buyRecord[uid].count);
     }
     // 商品限购数量
     let limitBuyCount = -1;
-    if(productObj[b.productId] && productObj[b.productId].purchaseLimitCount) {
-      limitBuyCount = Number(productObj[b.productId].purchaseLimitCount);
+    if(b.product.purchaseLimitCount > -1) {
+      limitBuyCount = Number(b.product.purchaseLimitCount);
     }
     // 当前帐单购买数量
     let currentBuyCount = Number(b.count);

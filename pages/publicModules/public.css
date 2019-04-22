@@ -457,3 +457,182 @@ footer.footer ul li{
   font-size: 1.4rem;
   color: #9baec8;
 }
+.footer-li-div{
+  min-height: 18.5rem;
+}
+.nkc-drawer{
+  position: fixed;
+  top: 0;
+  height: 0;
+  width: 100%;
+  z-index: 10000;
+  left: 0;
+  line-height: 1rem;
+  background-color: rgba(0,0,0,0.2);
+}
+.nkc-drawer.active{
+  height: 100%;
+}
+.nkc-drawer-body{
+  width: 70%;
+  position: fixed;
+  top: 0;
+  left: -70%;
+  z-index: 10003;
+  height: 100%;
+  overflow-y: scroll;
+  background-color: #fff;
+  transition: left 300ms;
+}
+.nkc-drawer-body.active{
+  left: 0;
+}
+.nkc-drawer-avatar{
+  text-align: center;
+}
+.nkc-drawer-username{
+  text-align: center;
+  margin: 0.4rem 0.5rem 0 0.5rem;
+  line-height: 2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.nkc-drawer-certs{
+  text-align: center;
+  color: #e85a71;
+  margin: 0 0.5rem 0.5rem 0;
+  line-height: 2rem;
+  font-size: 1rem;
+}
+.nkc-drawer-avatar img{
+  height: 4.5rem;
+  width: 4.5rem;
+  border-radius: 50%;
+}
+.nkc-drawer-count{
+  height: 4.4rem;
+  padding: 0.2rem 0;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+.nkc-drawer-count .col-xs-3{
+  padding: 0;
+}
+.nkc-drawer-count .number{
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.nkc-drawer-count .title{
+  font-size: 1rem;
+  color: #555;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+}
+.nkc-drawer-header{
+  height: 3rem;
+  position: relative;
+}
+.nkc-drawer-settings{
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  height: 3rem;
+  min-width: 4rem;
+  padding: 0 0.5rem;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 3rem;
+  font-size: 1rem;
+}
+.nkc-drawer-message{
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  height: 3rem;
+  min-width: 4rem;
+  padding: 0 0.5rem;
+  text-align: center;
+  vertical-align: baseline;
+  line-height: 3rem;
+  font-size: 1rem;
+}
+.nkc-drawer-link:hover, .nkc-drawer-link:active, .nkc-drawer-link:visited, .nkc-drawer-link:link{
+  color: #333;
+}
+.nkc-drawer-message span{
+  font-size: 1rem;
+  height: 1.2rem;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 1.2rem;
+  padding: 0 0.3rem;
+  background-color: red;
+  color: #fff;
+  border-radius: 0.6rem;
+  margin-left: 0.3rem;
+}
+.nkc-drawer-message .fa:hover{
+  background-color: #f4f4f4;
+}
+.nkc-drawer-list{
+  padding: 1rem 0 0 0;
+}
+.nkc-drawer-list li{
+  list-style: none;
+}
+.nkc-drawer-list li:first-child a{
+  /*border-top: 1px solid #f1f1f1;*/
+}
+.nkc-drawer-list li a {
+  margin: 0 1rem;
+  /*border-bottom: 1px solid #f1f1f1;*/
+  padding: 0 1rem;
+  font-weight: 700;
+  display: block;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.2rem;
+  color: #282c37;
+}
+.nkc-drawer-list li a .pull-right{
+  height: 3rem;
+  line-height: 3rem;
+}
+.nkc-drawer-list-line{
+  background-color: #e5e5e5;
+  margin: 9px 0;
+  height:1px;
+  width: 100%;
+}
+.nkc-drawer-exit{
+  display: block;
+  height: 3rem;
+  line-height: 3rem;
+  margin: 2rem 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+.nkc-drawer-exit:hover, .nkc-drawer-exit:active, .nkc-drawer-exit:link, .nkc-drawer-exit:visited{
+  color: #999;
+  text-decoration: none;
+}
+
+.nkc-drawer-right{
+  height: 0;
+  right: 0;
+  top: 0;
+  position: fixed;
+  width: 30%;
+  z-index: 10001;
+}
+.nkc-drawer-right.active{
+  height: 100%;
+}

@@ -8,7 +8,7 @@ router
 		const {user} = data;
 		let {num, description} = body;
 		num = Number(num);
-    if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+    if(num%1 !== 0) ctx.throw(400, "学术分仅支持整数加减");
 		const post = await db.PostModel.findOnly({pid});
 		const targetUser = await db.UserModel.findOnly({uid: post.uid});
 		if(targetUser.uid === user.uid) ctx.throw(403, '不允许给自己加减学术分');
@@ -117,7 +117,7 @@ router
 		const {pid} = params;
 		let {num, description} = body;
 		num = Number(num);
-	        num = Math.round(num);
+    if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
     const toUser = await db.UserModel.findOnly({uid: post.uid});

@@ -10,11 +10,11 @@ goodslistRouter
 		const {data, db, params, query, nkcModules} = ctx;
 		const {page = 0} = query;
 		let {productStatus} = query;
-		data.productStatus = productStatus;
-    const storeId = params.account;
+    data.productStatus = productStatus;
+    const {user} = data;
     // 构造查询条件
 		let searchMap = {
-			storeId : storeId
+			uid : user.uid
     }
     if(!productStatus || productStatus == "insale") {
       searchMap.productStatus = "insale"
@@ -47,14 +47,14 @@ goodslistRouter
   // 提交规格修改信息
   .patch('/editParam', async (ctx, next) => {
     const {data, params, db, nkcModules, body} = ctx;
-    const {paraId, originPrice, price, stocksTotal} = body.obj;
+    const {paraId, originPrice, price, stocksSurplus} = body.obj;
     const productParam = await db.ShopProductsParamModel.findOne({_id:paraId});
     if(!productParam) ctx.throw(400, "找不到该商品规格");
     // 取出剩余库存，并重新计算
-    let {stocksSurplus} = productParam;
-    let oldStocksTotal = productParam.stocksTotal;
-    stocksSurplus += Number(stocksTotal-oldStocksTotal);
-    await productParam.update({$set:{originPrice, price, stocksSurplus, stocksTotal}})
+    // let {stocksSurplus} = productParam;
+    // let oldStocksTotal = productParam.stocksTotal;
+    // stocksSurplus += Number(stocksTotal-oldStocksTotal);
+    await productParam.update({$set:{originPrice, price, stocksSurplus}})
     await next();
   })
   // 访问商品重新编辑页面

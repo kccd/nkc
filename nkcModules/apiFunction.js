@@ -393,7 +393,7 @@ fn.doExchange = (arr) => {
  * @return {JSON} data
  * @author Kris 2019-3-14
  */
-fn.getIpAddress = (ip) => {
+fn.getIpAddress = async (ip) => {
   let options = {
     hostname: `iploc.market.alicloudapi.com`,    //接口域
     path: `/v3/ip?ip=${ip}`,    //请求地址

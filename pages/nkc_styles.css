@@ -1557,8 +1557,16 @@ margin-left: 5px;
   }
 }
 
-.nkcshade{box-shadow: rgba(0, 0, 0, 0.14) 0px 1px 10px;}
+.nkcshade{
+  box-shadow: rgba(0, 0, 0, 0.14) 0px 1px 10px;
+  background-color:#f6f6f6;
+  line-height: 0;
+}
 
+.nkcshade .navbar-brand{
+  color: #2b90d9;
+  font-size: 1.6em;
+}
 /* Lets add an arrow after each link  */
 
 .notusing .ThreadPostBody a[href]:after {
@@ -2506,8 +2514,19 @@ img.emoji {
 
 .userInfo-m{
   display: none;
+  float: right;
+  min-width: 4em;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
-
+.userInfo-m img{
+  float: right;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  display:inline-block;
+  margin-left: 0.5rem;
+}
 
 
 /*首页*/
@@ -3362,4 +3381,7 @@ img.emoji {
   border-radius: 8px;
   color: #fff;
   background-color: #d9534f;
+}
+.navbar button.navbar-toggle{
+  border: none;
 }

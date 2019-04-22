@@ -49,6 +49,11 @@ const schema = new Schema({
     type: Number,
     required: true
   },
+  // 销量
+  sellCount: {
+    type: Number,
+    default:0
+  },
   // 是否使用折扣
   useDiscount: {
     type: Boolean,
@@ -140,14 +145,16 @@ schema.statics.productParamReduceStock = async (orders, reduceMethod) => {
   const ShopGoodsModel = mongoose.model('shopGoods');
   const ShopProductParamModel = mongoose.model('shopProductsParams');
   for(const order of orders) {
-    // 找出订单所属产品
-    const product = await ShopGoodsModel.findOne({productId: order.productId});
-    const {stockCostMethod} = product;
-    // 找出订单所属规格
-    const productParam = await ShopProductParamModel.findOne({_id: order.paramId});
-    // 判断减库存条件
-    if(productParam && stockCostMethod == reduceMethod) {
-      await productParam.update({$set: {stocksSurplus: (Number(productParam.stocksSurplus) - Number(order.count))}});
+    for(const param of order.params) {
+      // 找出订单所属产品
+      const product = await ShopGoodsModel.findOne({productId: param.productId});
+      const {stockCostMethod} = product;
+      // 找出订单所属规格
+      const productParam = await ShopProductParamModel.findOne({_id: param.productParamId});
+      // 判断减库存条件
+      if(productParam && stockCostMethod == reduceMethod) {
+        await productParam.update({$set: {sellCount: Number(productParam.sellCount)+Number(param.count) , stocksSurplus: (Number(productParam.stocksSurplus) - Number(param.count))}});
+      }
     }
   }
 }

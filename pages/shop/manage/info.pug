@@ -4,56 +4,38 @@ block title
 block name
   .row
     .col-md-12.col-sm-12.col-xs-12
-      if data.store.dataPerfect
-        p(style="color:forestgreen") 
-          span.fa.fa-check-circle(style="font-size:30px") 
-          | 店铺信息已经完善，您现在可以去发布商品了
-      else
-        p(style="color:crimson") 
-          span.fa.fa-exclamation-circle(style="font-size:30px")
-          | 完善店铺信息后才能发布商品
+      //- if data.store.dataPerfect
+      //-   p(style="color:forestgreen") 
+      //-     span.fa.fa-check-circle(style="font-size:30px") 
+      //-     | 交易信息已经完善，您现在可以去发布商品了
+      //- else
+      //-   p(style="color:crimson") 
+      //-     span.fa.fa-exclamation-circle(style="font-size:30px")
+      //-     | 完善交易信息后才能发布商品
     .col-md-12.col-sm-12.col-xs-12
       .panel.panel-info
         .panel-heading
-          | 店铺信息
+          | 交易基础设置
         .panel-body
           .form-horizontal
             .form-group
-              label.col-sm-2.control-label 店铺名称
+              label.col-sm-2.control-label 供货说明
               .col-sm-8
-                input.form-control#storeName(type="text", name="storeName" placeholder="最多允许输入30个字" maxlength="30" value=`${data.store?data.store.storeName:""}`)
+                textarea.form-control#dealDescription(name="dealDescription" placeholder='请输入不超过200字的简单介绍' rows='3' maxlength='200')!=`${data.dealInfo?data.dealInfo.dealDescription:""}`
+                p(style="color:#ccc") (选填)最多200字
             .form-group
-              label.col-sm-2.control-label 店铺标志
-              .col-sm-5
-                .row
-                  .col-xs-12.col-md-12
-                    p(style="background-color: aliceblue;border: 1px solid #70b8f7;display:grid") 
-                      span 文件格式JPG、JPEG、PNG;
-                      span 文件大小不得超过80K;
-                      span 建议尺寸100*100
-                  .col-xs-12.col-md-12.user-settings-img-dev
-                    img(src=`/shopLogo/${data.myStore.storeId}` style='width: 100px;height:100px')
-                    //div(style='width: 100%;height: 30rem;background-color: #eee;line-height: 30rem; color: #aaa;font-size: 2rem;').text-center 未选择图片
-                  .col-xs-12.col-md-12
-                    br
-                    button.btn.btn-success.btn-xs(onclick='$("#inputFile").click();') 选择图片
-                    button.btn.btn-success.btn-xs(onclick=`submit(${data.myStore.storeId})`) 保存
-                    br
-                    br
-                    input#inputFile(type='file' accept="image/*").hidden
-            .form-group
-              label.col-sm-2.control-label 店铺简介
+              label.col-sm-2.control-label 全局公告
               .col-sm-8
-                textarea.form-control#storeDescription(name="storeDescription" placeholder='请输入对店铺的简单介绍' rows='3' maxlength='200')!=`${data.store?data.store.storeDescription:""}`
-                p(style="color:#ccc") 最多200个字
+                textarea.form-control#dealAnnouncement(name="dealAnnouncement" placeholder='请填写需要告知卖家的话' rows='3' maxlength='500')!=`${data.dealInfo?data.dealInfo.dealAnnouncement:""}`
+                p(style="color:#ccc") (选填)最多500字
             .form-group
-              label.col-sm-2.control-label 经营地址
+              label.col-sm-2.control-label 收货地址
               .col-sm-8
-                input#location.input.form-control(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true', value=`${data.store?data.store.location:""}`)
-                input#address.form-control(type="text", name="address", style="margin-top:5px", placeholder="请输入详细地址"  value=`${data.store?data.store.address:""}`)
+                input#location.input.form-control(name='', type='text', placeholder='请选择发货地址', autocomplete='off', readonly='true', value=`${data.dealInfo?data.dealInfo.location:""}`)
+                input#address.form-control(type="text", name="address", style="margin-top:5px", placeholder="请输入详细地址"  value=`${data.dealInfo?data.dealInfo.address:""}`)
                 //- p(style="background-color: aliceblue;border: 1px solid #70b8f7;") 最多200个字
             .form-group(style="text-align:center")
-              button.btn.btn-primary(onclick=`saveToInfo(${data.myStore.storeId})`) 保存并提交
+              button.btn.btn-primary(onclick=`saveToInfo(${data.user.uid})`) 保存
 
 
 block manageScripts

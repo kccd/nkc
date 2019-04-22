@@ -88,6 +88,15 @@ module.exports = {
         cancel: {
           GET: "storeCancelOrder",
           POST: "storeCancelOrder"
+        },
+        editSellMessage: {
+          PATCH: "editSellMessage",
+        },
+        editCostRecord: {
+          PATCH: "editCostRecord",
+        },
+        editOrderPrice: {
+          PATCH: "editOrderPrice"
         }
       },
       goodslist: {
