@@ -84,8 +84,8 @@ applysRouter
     // 获取该订单的全部退款申请记录
     const refunds = await db.ShopRefundModel.find({
       orderId: order.orderId,
-      sellerId: order.product.uid,
-      buyerId: order.uid
+      sellerId: order.sellUid,
+      buyerId: order.buyUid
     }).sort({toc: 1});
     if(refunds.length !== 0) {
       if(refunds[refunds.length - 1].status === "P_APPLY_RM") data.refund = refunds[refunds.length - 1];
@@ -93,15 +93,20 @@ applysRouter
 		await db.ShopRefundModel.extendLogs(refunds, ctx.state.lang);
 		data.order = order;
     data.refunds = refunds;
-    data.buyer = (await db.UserModel.findOnly({uid: order.uid})).toObject();
-    data.seller = (await db.UserModel.findOnly({uid: order.product.uid})).toObject();
+    data.buyer = (await db.UserModel.findOnly({uid: order.buyUid})).toObject();
+    data.seller = (await db.UserModel.findOnly({uid: order.sellUid})).toObject();
     const buyerPersonal = await db.UsersPersonalModel.findOnly({uid: data.buyer.uid});
     data.buyer.nationCode = buyerPersonal.nationCode;
     data.buyer.mobile = buyerPersonal.mobile;
     data.buyer.email = buyerPersonal.email;
-    data.seller.mobile = order.store.mobile.join(', ');
+    const sellerDealInfo = await db.ShopDealInfoModel.findOne({uid: data.seller.uid});
     const sellerPersonal = await db.UsersPersonalModel.findOnly({uid: data.seller.uid});
     data.seller.email = sellerPersonal.email;
+    if(sellerDealInfo) {
+      data.seller.mobile = sellerDealInfo.mobile.join(", ");
+    } else {
+      data.seller.mobile = sellerPersonal.mobile;
+    }
     if(data.refund) {
       data.buyer.reason = data.refund.logs[data.refund.logs.length-2].info;
       data.seller.reason = data.refund.logs[data.refund.logs.length-1].info;
@@ -114,5 +119,5 @@ applysRouter
     }
 		ctx.template = "experimental/shop/refund/refundDetail.pug"
 		await next();
-	})
+	});
 module.exports = applysRouter;

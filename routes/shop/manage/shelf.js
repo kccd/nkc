@@ -5,20 +5,34 @@ shelfRouter
     const {data, db} = ctx;
     const {user} = data;
     // 检测店铺信息是否已完善，如果不完善则跳转到店铺信息设置
-    const store = await db.ShopStoresModel.findOne({uid: user.uid});
-    if(store) {
-      data.dataPerfect = store.dataPerfect;
-    }
-    if(!data.dataPerfect) {
-      return ctx.redirect(`/shop/manage/${store.storeId}/info`)
+    // const store = await db.ShopStoresModel.findOne({uid: user.uid});
+    // if(store) {
+    //   data.dataPerfect = store.dataPerfect;
+    // }
+    // if(!data.dataPerfect) {
+    //   return ctx.redirect(`/shop/manage/${user.uid}/info`)
+    // }
+    const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
+    if(!data.dealInfo || !data.dealInfo.dataPerfect) {
+      return ctx.redirect(`/shop/manage/${user.uid}/info`)
     }
     await next();
   })
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
     const {user} = data;
+    // 检测是否被封禁商品上架功能
+    const homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
+    if(homeSetting.banList) {
+      if(homeSetting.banList.indexOf(user.uid) > -1) {
+        return ctx.redirect('/shop/manage');
+      }
+    }
     data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
     data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+    // 取出全部商城类别专业
+    shopForumTypes = await db.ForumModel.getAllShopForums(data.userRoles, data.userGrade, data.user);
+    data.shopForumTypes = shopForumTypes;
 		ctx.template = 'shop/manage/shelf.pug';
 		await next();
 	})
@@ -45,9 +59,6 @@ shelfRouter
     } = body.post;
     const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
-    const store = await db.ShopStoresModel.findOne({uid: user.uid});
-    if(!store) ctx.throw(404, '您还未开设地摊儿');
-    const {storeId} = store;
     if(!productName) ctx.throw(400, '商品名不能为空');
     if(contentLength(productName) > 100) ctx.throw(400, '商品名不能超过100字节');
     if(!productDescription) ctx.throw(400, '商品简介不能为空');
@@ -133,7 +144,6 @@ shelfRouter
       shelfTime,
       isFreePost,
       freightPrice,     
-      storeId,
       params: paramsInfo,
       uid: user.uid,
       threadInfo: options

@@ -17,10 +17,16 @@
   font-size: 2rem;
   color: #a94442;
 }
-.default-panel .kcb input{
+.default-panel input{
   height: 2rem;
   font-size: 1.4rem;
   max-width: 100%;
+  line-height: 0;
+}
+.default-panel .kcb-input{
+  line-height: 0;
+}
+.kcb-input h5{
 
 }
 .default-panel.active{

@@ -18,6 +18,24 @@ var app = new Vue({
     displayInput: false
   },
   computed: {
+    orderOriginPrice: function() {
+      var num = 0;
+      for(var i = 0; i < this.order.params.length; i++) {
+        num += this.order.params[i].productPrice;
+      }
+      return num
+    },
+    param: function() {
+      var paramId;
+      if(this.refund.paramId) {
+        paramId = this.refund.paramId;
+      }
+      if(!paramId) return "";
+      for(var i = 0 ; i < this.order.params.length; i++) {
+        if(this.order.params[i].costId === paramId) return this.order.params[i];
+      }
+      return ""
+    },
     status: function() {
       var refund = this.refunds[this.refunds.length - 1];
       return refund.logs[refund.logs.length -1];
@@ -30,7 +48,10 @@ var app = new Vue({
     },
     seller: function() {
       if(this.order) return this.order.product.user;
-    }
+    },
+    params: function() {
+      return this.order.params;
+    },
   },
   mounted: function() {
     var data = document.getElementById('data');

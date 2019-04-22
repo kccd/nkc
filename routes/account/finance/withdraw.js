@@ -4,7 +4,7 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;
-    await db.UserModel.updateUserKcb(user.uid);
+    user.kcb = await db.UserModel.updateUserKcb(user.uid);
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
     const {alipayAccounts, bankAccounts} = usersPersonal;
     data.alipayAccounts = alipayAccounts;
@@ -115,11 +115,13 @@ router
 
       await record.save();
       try {
-        const alipayMoney = money*(1-withdrawFee);
+        let alipayMoney = money*(1-withdrawFee);
+        alipayMoney = alipayMoney/100;
+        alipayMoney = alipayMoney.toFixed(2);
         await nkcModules.alipay2.transfer({
           account: account.account,
           name: account.name,
-          money: alipayMoney/100,
+          money: alipayMoney,
           id: _id,
           notes: description
         });

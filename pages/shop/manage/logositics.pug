@@ -32,11 +32,11 @@ block name
             p 退件签收
         br
         div(style="background-color:#ddd;padding:30px")
-          if trackInfo.result.deliverystatus == "3"
-            for logInfo,index in trackInfo.result.list
-              p 
-                span(style="margin-right:20px;font-weight:bold" class=index == "0"?"redFont":"")=logInfo.time
-                span(class=index == "0"?"redFont":"")=logInfo.status
+          //- if trackInfo.result.deliverystatus == "3"
+          for logInfo,index in trackInfo.result.list
+            p 
+              span(style="margin-right:20px;font-weight:bold" class=index == "0"?"redFont":"")=logInfo.time
+              span(class=index == "0"?"redFont":"")=logInfo.status
         br
         div
           p

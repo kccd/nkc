@@ -30,6 +30,9 @@ module.exports = {
 			image: {
 				GET: 'visitForumImageSettings', // 查看专业头像设置
 			},
+			kind: {
+				PATCH: "addForumKind"
+			},
 			category: {
 				GET: 'visitForumCategorySettings', // 查看专业分类设置
 				PATCH: 'modifyForumCategory', // 修改专业分类设置

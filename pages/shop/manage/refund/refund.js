@@ -2,6 +2,8 @@ var app = new Vue({
   el: "#app",
   data: {
 
+    user: "",
+
     error: "",
     info: "",
 
@@ -21,9 +23,31 @@ var app = new Vue({
     refunds: [],
     displayInput: false,
     myStore: '',
-    reason: ''
+    reason: '',
+
   },
   computed: {
+    orderOriginPrice: function() {
+      var num = 0;
+      for(var i = 0; i < this.order.params.length; i++) {
+        num += this.order.params[i].productPrice;
+      }
+      return num
+    },
+    param: function() {
+      var paramId;
+      if(this.refund.paramId) {
+        paramId = this.refund.paramId;
+      }
+      if(!paramId) return "";
+      for(var i = 0 ; i < this.order.params.length; i++) {
+        if(this.order.params[i].costId === paramId) return this.order.params[i];
+      }
+      return ""
+    },
+    params: function() {
+      return this.order.params;
+    },
     status: function() {
       var refund = this.refunds[this.refunds.length - 1];
       return refund.logs[refund.logs.length -1];
@@ -43,10 +67,11 @@ var app = new Vue({
     data = JSON.parse(data.innerHTML);
     this.refund = data.refund;
     this.refunds = data.refunds;
-    this.myStore = data.myStore;
-    this.storeName = this.myStore.storeName;
-    this.address = this.myStore.address;
-    this.mobile = this.myStore.mobile[0];
+    this.user = data.user;
+    // this.myStore = data.myStore;
+    this.storeName = data.user.username;
+    this.address = data.dealInfo.address;
+    this.mobile = data.dealInfo.mobile[0];
     this.order = data.order;
   },
   methods: {
@@ -82,6 +107,7 @@ var app = new Vue({
       formData.append("type", "refund");
       formData.append("orderId", this.order.orderId);
       formData.append("file", file);
+      if(this.param) formData.append("paramId", this.param.costId);
       uploadFilePromise("/shop/cert", formData, function(e) {
         var p = (e.loaded/e.total)*100;
         if(p >= 100) {
@@ -117,7 +143,7 @@ var app = new Vue({
     sellerPost: function() {
       var type;
       var agree = this.agree;
-      var method = "POST", url = "/shop/manage/" + this.myStore.storeId + "/order/refund";
+      var method = "POST", url = "/shop/manage/" + this.refund.sellerId + "/order/refund";
       if(agree === '' && this.refund.status !== "P_APPLY_RM") return this.error = "请选择同意或者不同意";
       if(["B_APPLY_RM", "B_INPUT_INFO"].indexOf(this.refund.status) !== -1) {
         type = agree? "agreeRM": "disagreeRM";

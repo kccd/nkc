@@ -1,16 +1,15 @@
 extends ./index.pug
 block title
-  -const myStore = data.myStore
 block name
   .row
     .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
       ul.nav.nav-pills(style="border:1px solid #ddd")
         li(class=!data.productStatus || data.productStatus == "insale"?"active":"")
-          a(href=`/shop/manage/${data.myStore.storeId}/goodslist?productStatus=insale`, data-toggle='url') 出售中的商品
+          a(href=`/shop/manage/${data.user.uid}/goodslist?productStatus=insale`, data-toggle='url') 出售中的商品
         li(class=data.productStatus == "notonshelf"?"active":"")
-          a(href=`/shop/manage/${data.myStore.storeId}/goodslist?productStatus=notonshelf`, data-toggle='url') 仓库中的商品
+          a(href=`/shop/manage/${data.user.uid}/goodslist?productStatus=notonshelf`, data-toggle='url') 仓库中的商品
         li(class=data.productStatus == "stopsale"?"active":"")
-          a(href=`/shop/manage/${data.myStore.storeId}/goodslist?productStatus=stopsale`, data-toggle='url') 停售中的商品
+          a(href=`/shop/manage/${data.user.uid}/goodslist?productStatus=stopsale`, data-toggle='url') 停售中的商品
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
     .col-md-12.col-sm-12.col-xs-12  
@@ -45,37 +44,35 @@ block name
               else
                 td(style="color:mediumvioletred") 仓库中
               td
-                //- p
-                //-   a.btn.btn-warning.btn-sm(href=`/shop/manage/${myStore.storeId}/goodslist/editProduct?productId=${product.productId}`) 重新编辑
                 p
                   if !product.productStatus || product.productStatus == "insale"
                     a.btn.btn-warning.btn-sm(href=`/editor?type=post&id=${product.oc}` target="_blank") 编辑详情
                   else
-                    a.btn.btn-warning.btn-sm(onclick=`shelfRightNow(${product.storeId},${product.productId})`) 立即上架
+                    a.btn.btn-warning.btn-sm(onclick=`shelfRightNow(${data.user.uid},${product.productId})`) 立即上架
                 p
                   if product.productStatus == "insale"
-                    a.btn.btn-warning.btn-sm(onclick=`stopSale(${product.storeId},${product.productId})`) 停售
+                    a.btn.btn-warning.btn-sm(onclick=`stopSale(${data.user.uid},${product.productId})`) 停售
                   else if product.productStatus == "stopsale"
-                    a.btn.btn-warning.btn-sm(onclick=`goonSale(${product.storeId},${product.productId})`) 复售
+                    a.btn.btn-warning.btn-sm(onclick=`goonSale(${data.user.uid},${product.productId})`) 复售
             tr
               td(colspan="1" rowspan!=`${product.productParams.length + 1}`) 
               th 规格名称
               th 原始价格
               th 优惠价格
-              th 原始库存
-              th 剩余库存
+              th 库存
+              th 销量
               th 修改商品规格
             for param in product.productParams
               tr
                 td=param.name
                 td(id=`originPrice${param._id}`) #{numToFloatTwo(param.originPrice)}
                 td(id=`paramPrice${param._id}`) #{numToFloatTwo(param.price)}
-                td(id=`stocksTotal${param._id}`)=param.stocksTotal
                 td(id=`stocksSurplus${param._id}`)=param.stocksSurplus
+                td()=param.sellCount
+                //- td(id=`stocksSurplus${param._id}`)=param.stocksSurplus
                 td 
                   p
-                    //- a.btn.btn-info.btn-sm(id=`edit${param_id}` href=`/shop/manage/${myStore.storeId}/goodslist/editParam?paraId=${param._id}`) 修改
                     a.btn.btn-info.btn-sm(id=`edit${param._id}` onclick=`editParam(${param._id})`) 修改
-                    a.btn.btn-info.btn-sm(id=`save${param._id}` onclick=`paramToEdit(${product.storeId}, ${param._id})` style="display:none") 保存
+                    a.btn.btn-info.btn-sm(id=`save${param._id}` onclick=`paramToEdit(${data.user.uid}, ${param._id})` style="display:none") 保存
 block manageScripts
   +includeJS("/shop/manage/goodslist.js")

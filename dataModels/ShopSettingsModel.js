@@ -8,7 +8,8 @@ const shopSettingsSchema = new Schema({
   // 设置类型
   type: {
     type: String,
-    index: 1
+    index: 1,
+    default: "homeSetting"
   },
   // 轮播图
   carousels: {
@@ -34,6 +35,11 @@ const shopSettingsSchema = new Schema({
   authLevel: {
     type: Number,
     default: 1
+  },
+  // 封禁名单
+  banList: {
+    type: Array,
+    default:[]
   }
 }, {
   collection: 'shopSettings'

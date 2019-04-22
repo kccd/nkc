@@ -14,10 +14,9 @@ orderRouter
 		const {page = 0} = query;
 		let {orderStatus} = query;
 		const {user} = data;
-		let storeId = params.account;
 		// 构造查询条件
 		let searchMap = {
-			storeId : storeId
+			sellUid : user.uid
 		}
 		if(orderStatus == "refunding"){
 			searchMap.refundStatus = "ing";
@@ -31,7 +30,7 @@ orderRouter
 		data.paging = paging;
 		const orders = await db.ShopOrdersModel.find(searchMap).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
     data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);
-    data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
+		data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
 		data.orderStatus = orderStatus;
 		ctx.template = 'shop/manage/order.pug';
 		await next();
@@ -59,7 +58,7 @@ orderRouter
 		if(!order) ctx.throw(400, "未找到订单");
 		let orders = await db.ShopOrdersModel.storeExtendOrdersInfo([order]);
 		data.order = orders[0];
-    if(user.uid !== data.order.store.uid) ctx.throw(400, "您无权修改此订单价格");
+    if(user.uid !== data.order.sellUid) ctx.throw(400, "您无权修改此订单价格");
     await order.update({$set:{"orderPrice":price}});
     await next();
 	})
@@ -92,7 +91,7 @@ orderRouter
       refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
     }
     data.refund = refund;
-		if(data.order.store.uid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
+		if(data.order.sellUid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
 		ctx.template = 'shop/manage/detail.pug';
 		await next();
 	})
@@ -104,9 +103,7 @@ orderRouter
 		if(!orderId) ctx.throw(400, "订单号有误");
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "未找到该订单");
-		const store = await db.ShopStoresModel.findOne({"storeId":order.storeId});
-		if(!store) ctx.throw(400, "店铺不存在");
-		if(store && user.uid !== store.uid) ctx.throw(400, "您无权查看该订单的物流信息");
+		if(user.uid !== order.sellUid) ctx.throw(400, "您无权查看该订单的物流信息");
 		if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
 		let trackNumber = order.trackNumber;
 		let trackName = order.trackName;
@@ -114,6 +111,43 @@ orderRouter
 		data.trackNumber = trackNumber;
 		data.trackInfo = trackInfo;
 		ctx.template = "/shop/manage/logositics.pug";
+		await next();
+	})
+	// 修改订单卖家备注
+	.patch('/editSellMessage', async (ctx, next) => {
+		const {data, body, query, db} = ctx;
+		const {sellMessage, orderId} = body;
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "未找到该订单");
+		if(sellMessage.length == 0) ctx.throw(400, "卖家备注不可为空");
+		await order.update({$set: {"sellMessage":sellMessage}});
+		await next();
+	})
+	// 修改购买记录中的价格
+	.patch('/editCostRecord', async (ctx, next) => {
+		const {data, body, query, db} = ctx;
+		const {costId, orderId, costObj, orderObj} = body;
+		// 找出购买记录并修改
+		const costRecord = await db.ShopCostRecordModel.findOne({costId});
+		if(!costRecord) ctx.throw(400, "商品规格未找到");
+		const {count, singlePrice} = costObj;
+		await costRecord.update({$set: {count, singlePrice}});
+		// 找出订单并修改
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "订单未找到");
+		const {orderFreightPrice, orderPrice} = orderObj;
+		await order.update({$set: {orderFreightPrice, orderPrice}});
+		await next();
+	})
+	// 修改购买订单中的价格
+	.patch('/editOrderPrice', async (ctx, next) => {
+		const {data, body, query, db} = ctx;
+		const {orderId, orderObj} = body;
+		// 找出订单并修改
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "订单未找到");
+		const {orderFreightPrice, orderPrice} = orderObj;
+		await order.update({$set: {orderFreightPrice, orderPrice}})
 		await next();
 	})
   .use("/cancel", cancelRouter.routes(), cancelRouter.allowedMethods())

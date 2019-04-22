@@ -12,7 +12,8 @@ var app = new Vue({
     newRefund: {
       type: "",
       reason: "",
-      money: ""
+      money: "",
+      paramId: ""
     },
 
     // 错误信息
@@ -35,6 +36,26 @@ var app = new Vue({
     giveUpReason: ''
   },
   computed: {
+    orderOriginPrice: function() {
+      var num = 0;
+      for(var i = 0; i < this.order.params.length; i++) {
+        num += this.order.params[i].productPrice;
+      }
+      return num
+    },
+    param: function() {
+      var paramId;
+      if(this.newRefund && this.newRefund.paramId) {
+        paramId = this.newRefund.paramId;
+      } else if(this.refund.paramId) {
+        paramId = this.refund.paramId;
+      }
+      if(!paramId) return "";
+      for(var i = 0 ; i < this.order.params.length; i++) {
+        if(this.order.params[i].costId === paramId) return this.order.params[i];
+      }
+      return ""
+    },
     status: function() {
       var refund = this.refunds[this.refunds.length - 1];
       return refund.logs[refund.logs.length -1];
@@ -45,8 +66,19 @@ var app = new Vue({
     productParam: function() {
       if(this.order) return this.order.productParam;
     },
+    params: function() {
+      return this.order.params;
+    },
     seller: function() {
       if(this.order) return this.order.product.user;
+    },
+    refundMoneyMax: function() {
+      var maxMoney = 0;
+      if(this.param) {
+        return this.param.productPrice;
+      } else {
+        return this.order.orderPrice + this.order.orderFreightPrice
+      }
     }
   },
   mounted: function() {
@@ -133,11 +165,16 @@ var app = new Vue({
       this.clearInfo();
       var applyType = this.applyType;
       var newRefund = this.newRefund;
+      var param  = this.param;
       if(newRefund.reason === "") return this.error = "请输入理由";
       if(newRefund.type === "") return this.error = "请选择退款方式";
       if(newRefund.type !== "money" && applyType === "platform") return this.error = "请求平台介入时退款方式只能选择【只退款】";
       if(newRefund.money >= 0) {
-        if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过订单金额";
+        if(param) {
+          if(newRefund.money*100 > param.productPrice) return this.error = "退款金额不能超过退款中的商品的金额";
+        } else {
+          if(newRefund.money*100 > this.order.orderPrice + this.order.orderFreightPrice) return this.error = "退款金额不能超过订单金额";
+        }
       }
       else return this.error = "请输入正确的退款金额";
       var url = "/shop/refund";
@@ -149,7 +186,7 @@ var app = new Vue({
 
       var obj = {
         refund: newRefund,
-        orderId: this.order.orderId
+        orderId: this.order.orderId,
       };
 
       nkcAPI(url, method, obj)
@@ -172,6 +209,7 @@ var app = new Vue({
       formData.append("type", "refund");
       formData.append("orderId", this.order.orderId);
       formData.append("file", file);
+      if(this.param) formData.append("paramId", this.param.costId);
       uploadFilePromise("/shop/cert", formData, function(e) {
         var p = (e.loaded/e.total)*100;
         if(p >= 100) {

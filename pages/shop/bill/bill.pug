@@ -2,13 +2,8 @@ extends ../shopBase
 block shopTitle
   title 确认账单 | 科创商城
   -const cartsData = data.cartsData
+  -const newCartData = data.newCartData
   -const addresses = data.addresses
-  -let productParamId;
-  for bill in cartsData
-    if bill.productParam
-      -productParamId = bill.productParam._id
-    else 
-      -productParamId = bill._id
 
   +includeCSS('/fund.css')
   style.
@@ -26,7 +21,11 @@ block shopTitle
       line-height: 32px;
       box-shadow: 5px 5px 0 #f3f3f3;
     }
+    .table > tbody > tr > td {
+      border: 0
+    }
 block content
+  .hidden#data= JSON.stringify(data.newCartData)
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
@@ -52,56 +51,120 @@ block content
         .order-address-wrap
           h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
             span 确认账单
-        table.table.table-striped(style="margin-left:40px")
+        table.table(style="margin-left:40px")
           thead
-            tr
+            tr(style="background: burlywood;")
               th 商品名称
               th 属性
               th 商品单价
               th 数量
-              th 运费
-              th 小计
+              //- th 运费
               th 凭证
+              th 小计
           tbody
-            mixin orderCert(bill) 
-              if bill.product.uploadCert
-                input(type="file" id=`input_${productParamId}` data-param-id=productParamId
-                  onchange=`inputChange(this)`
-                ).hidden
-                div(class=`cert-${productParamId}`)
-                  button(onclick=`uploadCert('${productParamId}')`) 上传
-                  | &nbsp;
-                  button(onclick=`viewCert('${productParamId}')`).hidden 查看
-              else 
-                span 不需要  
-            if data.billType == "cart"
-              for bill in cartsData
-                tr 
+            for bill in newCartData
+              tr(style="border-bottom:1px solid #80b2ff")
+                td(colspan="7" style="height:5px;")
+                  p(style="background-color: antiquewhite;width: fit-content;")   
+                    span 卖家：
+                    span!=bill.user.username
+              for cart in bill.carts
+                mixin orderCert(cart) 
+                  if cart.product.uploadCert
+                    input(type="file" id=`input_${cart.productParamId}` data-param-id=cart.productParamId
+                      onchange=`inputChange(this)`
+                    ).hidden
+                    div(class=`cert-${cart.productParamId}`)
+                      button(onclick=`uploadCert('${cart.productParamId}')`) 上传
+                      | &nbsp;
+                      button(onclick=`viewCert('${cart.productParamId}')`).hidden 查看
+                  else
+                    div 不需凭证
+                tr(style="background-color:#fbfcff;border-bottom:1px solid #f2f7ff")
+                  td(style="border-right:1px solid #f2f7ff;width:30%;")
+                    div(style="float:left")
+                      img(src=`/r/${cart.product.imgMaster}` style="width:60px;height:60px;margin-right:5px")
+                    div
+                      a(href=`/shop/product/${cart.product.productId}` target="_blank")=cart.product.name 
+                  td(style="border-right:1px solid #f2f7ff")
+                    span=cart.productParam.name
+                  td(style="border-right:1px solid #f2f7ff")
+                    span #{numToFloatTwo(cart.productParam.price)} 
+                  td(style="border-right:1px solid #f2f7ff")
+                    span=cart.count
+                  //- td(style="border-right:1px solid #f2f7ff")
+                  //-   span #{numToFloatTwo(calculateFreightPrice(cart.product.freightPrice,cart.count,cart.product.isFreePost))}
+                  td.order(paid=`${cart.productParam._id}` data-upload-cert=cart.product.uploadCert?"true": "false") 
+                    +orderCert(cart)
+                  td(style="border-right:1px solid #f2f7ff;text-align:right")
+                    span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo((cart.productParam.price)*cart.count)}
+                if cart.product.uploadCert
+                  tr 
+                    td(colspan="5" style="text-align:right;font-size:12px") 
+                      span 凭证说明：
+                      span.text-danger!=cart.product.uploadCertDescription
+                if cart.canBuy == false
+                  tr
+                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" limit="yes" colspan="7")!=`该商品剩余购买数量为${cart.remainBuyCount}件`
+              tr(style="background-color:#f2f7ff;")
+                td(colspan="3" rowspan="2" style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ") 
+                  div(style="font-weight:bold;float:left") 给卖家留言：
+                  div 
+                    textarea(id=`message${bill.user.uid}`, cols="30", rows="2" placeholder="选填，请先与卖家协商一致")
+                td(style="font-weight: bold;") 运费
+                if bill.maxFreightPrice == 0
                   td
-                    a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name 
-                  td=bill.productParam.name 
-                  td #{numToFloatTwo(bill.productParam.price)} 
-                  td.order(paid=`${bill.productParam._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
-                  td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-                  td.subtotal #{numToFloatTwo((bill.productParam.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-                  td  
-                    +orderCert(bill)
-                  if bill.canBuy == false
-                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
-            else if data.billType == "product"
-              for bill in cartsData
-                tr
+                    span 卖家承担
+                  td(style="text-align:right")
+                    span(style="color:#ffad11;font-weight:bold;") 0.00
+                else
                   td
-                    a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name
-                  td=bill.name
-                  td #{numToFloatTwo(bill.price)} 
-                  td.order(paid=`${bill._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
-                  td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-                  td.subtotal #{numToFloatTwo((bill.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-                  td  
-                    +orderCert(bill)
-                  if bill.canBuy == false
-                    td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
+                    span 不包邮
+                  td(style="text-align:right")
+                    span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo(bill.maxFreightPrice)}
+              tr(style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ")
+                td(colspan="2" style="font-weight:bold;") 商品合计(含运费)
+                td.subtotal(style="color:red;font-weight:bold;text-align:right") #{numToFloatTwo(bill.maxFreightPrice + bill.productPrice)}
+          //- tbody
+          //-   mixin orderCert(bill) 
+          //-     if bill.product.uploadCert
+          //-       input(type="file" id=`input_${productParamId}` data-param-id=productParamId
+          //-         onchange=`inputChange(this)`
+          //-       ).hidden
+          //-       div(class=`cert-${productParamId}`)
+          //-         button(onclick=`uploadCert('${productParamId}')`) 上传
+          //-         | &nbsp;
+          //-         button(onclick=`viewCert('${productParamId}')`).hidden 查看
+          //-     else 
+          //-       span 不需要  
+          //-   if data.billType == "cart"
+          //-     for bill in cartsData
+          //-       tr 
+          //-         td
+          //-           a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name 
+          //-         td=bill.productParam.name 
+          //-         td #{numToFloatTwo(bill.productParam.price)} 
+          //-         td.order(paid=`${bill.productParam._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
+          //-         td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
+          //-         td.subtotal #{numToFloatTwo((bill.productParam.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
+          //-         td  
+          //-           +orderCert(bill)
+          //-         if bill.canBuy == false
+          //-           td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
+          //-   else if data.billType == "product"
+          //-     for bill in cartsData
+          //-       tr
+          //-         td
+          //-           a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name
+          //-         td=bill.name
+          //-         td #{numToFloatTwo(bill.price)} 
+          //-         td.order(paid=`${bill._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
+          //-         td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
+          //-         td.subtotal #{numToFloatTwo((bill.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
+          //-         td  
+          //-           +orderCert(bill)
+          //-         if bill.canBuy == false
+          //-           td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
       .col-xs-12.col-md-12
         div(style="text-align:right")
           p 

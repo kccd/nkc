@@ -37,6 +37,14 @@ function submitOrders() {
   if($(".limitBuy").length > 0){
     return screenTopWarning("有商品存在购买限制，请重新下单")
   }
+  // 获取账单信息
+  var data = document.getElementById('data');
+  data = JSON.parse(data.innerHTML);
+  for(var i in data) {
+    // 获取卖家留言
+    var message = $("#message"+data[i].user.uid).val();
+    data[i].message = message;
+  }
   // 获取帐单中的产品与数量
   $(".order").each(function() {
     var needUploadCert = $(this).attr("data-upload-cert");
@@ -47,14 +55,9 @@ function submitOrders() {
         throw "请上传凭证"
       }
     }
-    var obj = {
-      paraId: $(this).attr("paid"),
-      productCount: $(this).text()
-    }
-    para.push(obj)
   })
   $("#submitPay").attr('disabled',true);
-  nkcAPI('/shop/order', "POST", {post: para, receInfo: receInfo, paramCert: paramCert})
+  nkcAPI('/shop/order', "POST", {post: data, receInfo: receInfo, paramCert: paramCert})
   .then(function(data) {
     window.location.href = '/shop/pay?ordersId=' + data.ordersId;
   })

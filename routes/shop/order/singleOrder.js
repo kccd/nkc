@@ -6,7 +6,7 @@ router
     const {data, params, db} = ctx;
     data.order = await db.ShopOrdersModel.findOne({orderId: params.orderId});
     if(!data.order) ctx.throw(400, `订单【${params.orderId}】不存在, 请刷新`);
-    if(data.order.uid !== data.user.uid) ctx.throw(403, '您无权操作别人的订单')
+    if(data.order.buyUid !== data.user.uid) ctx.throw(403, '您无权操作别人的订单')
     await next();
   })
   // 查看物流
@@ -17,7 +17,7 @@ router
     if(!orderId) ctx.throw(400, "订单号有误");
     const order = await db.ShopOrdersModel.findOne({orderId});
     if(!order) ctx.throw(400, "未找到该订单");
-    if(user.uid !== order.uid) ctx.throw(400, "您无权查看该订单的物流信息");
+    if(user.uid !== order.buyUid) ctx.throw(400, "您无权查看该订单的物流信息");
     if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
     let trackNumber = order.trackNumber;
     let trackName = order.trackName;
@@ -33,7 +33,7 @@ router
     const {user} = data;
     const {orderId} = params;
     const order = await db.ShopOrdersModel.findById(orderId);
-    if(user.uid !== order.uid) ctx.throw(400, "您无权操作此订单");
+    if(user.uid !== order.buyUid) ctx.throw(400, "您无权操作此订单");
     await order.confirmReceipt();
     await next();
   })
@@ -44,7 +44,7 @@ router
     const {user} = data;
     if(!orderId) ctx.throw(400, "订单号有误");
     const order = await db.ShopOrdersModel.findOne({orderId});
-    if(user.uid !== order.uid) ctx.throw(403, "您无权查看此订单");
+    if(user.uid !== order.buyUid) ctx.throw(403, "您无权查看此订单");
     if(!order) ctx.throw(400, "订单不存在");
     let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     data.order = orders[0];

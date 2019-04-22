@@ -30,6 +30,10 @@ const forumSchema = new Schema({
     type: Number,
     default: 0
   },
+  kindName: {
+    type: String,
+    default: ""
+  },
   description: {
     type: String,
     default: '',
@@ -765,6 +769,13 @@ forumSchema.statics.getAccessibleForums = async (roles, grade, user, baseFid) =>
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
   return await ForumModel.find({fid: {$in: fid}}).sort({order: 1});
+};
+
+// 获取全部商城类别专业
+forumSchema.statics.getAllShopForums = async (roles, grade, user, baseFid) => {
+  const ForumModel = mongoose.model('forums');
+  const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
+  return await ForumModel.find({fid: {$in:fid}, "kindName":"shop"}).sort({order: 1});
 };
 
 // 获取有权限访问的专业ID
