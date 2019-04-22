@@ -47,10 +47,13 @@ block content
               .form-group 
                 label.col-sm-2.control-label 当前类别
                 .col-sm-5
-                  if data.forum.kindName == ""
-                    h5 暂无类别
-                  else if data.forum.kindName == "shop"
-                    h5 商城
+                  p
+                    if data.forum.kindName == ""
+                      span 暂无类别
+                    else if data.forum.kindName == "shop"
+                      span 商城
+                      span(style="margin-left:15px") 
+                        button.btn.btn-sm.btn-danger(onclick=`clearKind(${forum.fid})`) 清除类别
               .form-group
                 label.col-sm-2.control-label 选择类别
                 .col-sm-3
