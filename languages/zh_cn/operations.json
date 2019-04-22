@@ -524,6 +524,8 @@
   "addForumKind": "[SY]添加专业类别",
   "delForumKind": "[SY]清除专业类别",
   "delShelfAuth": "[SY]解除用户商品上架封禁",
+  "getThumbs": "[VI]获取小图(略缩图)150",
+  "getMediums": "[VI]获取中图640",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

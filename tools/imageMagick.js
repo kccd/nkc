@@ -126,6 +126,14 @@ const thumbnailify = (path, dest) => {
   return spawnProcess('magick', ['convert', path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
 };
 
+const mediumify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+}
+
+
 const shopLogoify = (path, dest) => {
   if(linux) {
     return spawnProcess('convert', [path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
@@ -378,6 +386,7 @@ module.exports = {
   waterInfo,
   allInfo,
   thumbnailify,
+  mediumify,
   generateAdPost,
   avatarSmallify,
   bannerify,
