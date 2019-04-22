@@ -45,7 +45,7 @@ block name
                 td(style="color:mediumvioletred") 仓库中
               td
                 p
-                  if !product.productStatus || product.productStatus == "insale"
+                  if !product.productStatus || product.productStatus == "insale" || product.productStatus == "stopsale"
                     a.btn.btn-warning.btn-sm(href=`/editor?type=post&id=${product.oc}` target="_blank") 编辑详情
                   else
                     a.btn.btn-warning.btn-sm(onclick=`shelfRightNow(${data.user.uid},${product.productId})`) 立即上架

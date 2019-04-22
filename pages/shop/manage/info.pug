@@ -22,14 +22,14 @@ block name
               label.col-sm-2.control-label 供货说明
               .col-sm-8
                 textarea.form-control#dealDescription(name="dealDescription" placeholder='请输入不超过200字的简单介绍' rows='3' maxlength='200')!=`${data.dealInfo?data.dealInfo.dealDescription:""}`
-                p(style="color:#ccc") 最多200字
+                p(style="color:#ccc") (选填)最多200字
             .form-group
               label.col-sm-2.control-label 全局公告
               .col-sm-8
                 textarea.form-control#dealAnnouncement(name="dealAnnouncement" placeholder='请填写需要告知卖家的话' rows='3' maxlength='500')!=`${data.dealInfo?data.dealInfo.dealAnnouncement:""}`
-                p(style="color:#ccc") 最多500字
+                p(style="color:#ccc") (选填)最多500字
             .form-group
-              label.col-sm-2.control-label 发货地址
+              label.col-sm-2.control-label 收货地址
               .col-sm-8
                 input#location.input.form-control(name='', type='text', placeholder='请选择发货地址', autocomplete='off', readonly='true', value=`${data.dealInfo?data.dealInfo.location:""}`)
                 input#address.form-control(type="text", name="address", style="margin-top:5px", placeholder="请输入详细地址"  value=`${data.dealInfo?data.dealInfo.address:""}`)

@@ -85,7 +85,7 @@ style.
     text-decoration: line-through;
   }
 .row
-  .col-xs-12.col-md-12(style="margin-bottom:30px")
+  .col-xs-12.col-md-12(style="margin-bottom:5px")
     .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")
       ul#etalage
         -for(let rid of product.imgIntroductions)
@@ -93,7 +93,7 @@ style.
             img.etalage_thumb_image(src=`/r/${rid}`)
             img.etalage_source_image(src=`/r/${rid}`)
 
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;padding-left:65px")
       p.item=`${post.abstract}`
         //- a.btn.btn(href=`/shop/product/${product.productId}`) 前往商城
       if product.attentions && product.attentions.length > 0
@@ -162,12 +162,13 @@ style.
     .col-xs-1.col-md-1 
 
   .col-xs-12.col-md-12
+    if product.dealInfo.dealAnnouncement
+      .col-xs-12.col-md-12
+        div(style="border:2px solid #bbe0e1;padding:5px")
+          p(style="font-size:15px") 公告
+          p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
     .col-xs-12.col-md-12
-      div(style="border:2px solid #bbe0e1;padding:5px")
-        p(style="font-size:15px") 公告
-        p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
-    .col-xs-12.col-md-12
-      div(style="padding:20px")!=experimental_render(post)
+      div(style="padding:5px")!=experimental_render(post)
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
@@ -177,12 +178,13 @@ block scripts
     $(document).ready(function(){
       $('#etalage').etalage({
         thumb_image_width: 420,
-        thumb_image_height: 420,
+        thumb_image_height: 350,
         source_image_width: 900,
         source_image_height: 900,
         zoom_area_width: 500,//放大镜的大小
         zoom_area_height: 500,//放大镜的高度
         small_thumbs:5,
+        autoplay: false
       });
     });
     $("#city").click(function (e) {
