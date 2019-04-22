@@ -1,0 +1,152 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  +includeCSS('/experimental/index.css')
+  title 考试记录
+  style.
+    tbody tr th {
+      max-width: 12rem;
+    }
+block content
+
+  .container-fluid.max-width
+    .row
+      include ../nav
+      if data.paper
+        .col-xs-12.col-md-5
+          .form-horizontal
+            .form-group
+              label.col-sm-5.control-label 考卷ID：
+              h5.col-sm-7
+                strong= data.paper._id
+            .form-group
+              label.col-sm-5.control-label 时间：
+              h5.col-sm-7
+                strong= data.paper.toc.toLocaleString()
+            .form-group
+              label.col-sm-5.control-label 用户：
+              h5.col-sm-7
+                a(href=`/u/${data.paper.user.uid}` target="_blank")
+                  strong= data.paper.user.username
+            .form-group
+              label.col-sm-5.control-label 考试科目
+              h5.col-sm-7
+                a(href=`/exam/categories/editor?cid=${data.paper.category._id}` target="_blank")
+                  strong= data.paper.category.name
+                span=` (${data.paper.category.volume})`
+            .form-group
+              label.col-sm-5.control-label 及格分数：
+              h5.col-sm-7
+                strong= data.paper.passScore
+            .form-group
+              label.col-sm-5.control-label 试卷得分：
+              h5.col-sm-7
+                strong=data.paper.score
+            .form-group
+              label.col-sm-5.control-label 状态：
+              h5.col-sm-7
+                if data.paper.passed
+                  strong.text-success 通过
+                else
+                  strong.text-danger 未通过
+            .form-group
+              label.col-sm-5.control-label IP：
+              h5.col-sm-7
+                strong
+                  a(href=ipUrl(data.paper.ip) target="_blank")=data.paper.ip
+        .col-xs-12.col-md-7
+          hr
+          h3.m-b-2
+            strong 答题卡
+            small &nbsp;绿色为正确答案
+          -const an = ["A", "B", "C", "D"];
+          for r , index in data.paper.record
+            if !r.question
+              h5=`${index+1}、太久远，未导入😭`
+            else
+              div.m-b-5
+                h4
+                  strong!=markdown(`${index+1}、` + r.question.content)
+                  if r.question.hasImage
+                    div
+                      img(src=`/exam/question/${r.question._id}/image` style="max-width: 100%;")
+                h5 原答案顺序：
+                for a, index in r.question.answer
+                  h5
+                    span=an[index] + "、"
+                    if index === 0
+                      span.text-success= a
+                    else
+                      span.text-danger= a
+                if r.answerIndex
+                  h5 试卷答案顺序：
+                    for i, index in r.answerIndex
+                      h5
+                        span=an[index] + "、"
+                        if i === 0
+                          span.text-success=r.question.answer[i]
+                        else
+                          span.text-danger=r.question.answer[i]
+                        if index === r.answer
+                          strong 【被选答案】
+                else
+                  span=`用户作答：${r.answer}`
+
+
+
+
+      else
+        .col-xs-12.col-md-12
+          h4.m-b-1 按条件查询记录
+          #data.hidden=JSON.stringify({t: data.t, content: data.content})
+          .form-inline(style='margin-bottom: 1rem;' v-cloak)#app
+            .form-group
+              select.form-control(v-model='t')
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='ip') IP
+            .form-group
+              input.form-control(placeholder='请输入内容' v-model='content' @keyup.enter='search')
+            .form-group
+              button.btn.btn-primary(type='submit' @click='search') 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/exam') 全部
+            h5.text-danger= data.info
+        .col-xs-12.col-md-12
+          include ../../interface_navigation_paging
+          table.table
+            thead
+              tr
+                th 时间
+                th 用户
+                th 科目
+                th 题目类型
+                th 状态
+                th 及格分数
+                th 得分
+                th IP
+                th 答题卡
+            tbody
+              for paper in data.papers
+                tr
+                  th=paper.toc.toLocaleString()
+                  th
+                    a(href=`/u/${paper.uid}` target="_blank")=paper.user.username || paper.user.uid
+                  th=paper.category.name
+                  th=paper.category.volume
+                  th
+                    if paper.passed
+                      .text-success 通过
+                    else
+                      .text-danger 未通过
+                  th=paper.passScore
+                  th=paper.score
+                  th
+                    a(href=ipUrl(paper.ip) target="_blank")=paper.ip
+                  th
+                    a(href=`/e/log/exam?t=paper&content=${paper._id}` target="_blank") 查看
+          include ../../interface_navigation_paging
+block scripts
+  +includeJS("/experimental/log/exam.js")
+  include ../../MathJax

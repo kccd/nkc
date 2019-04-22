@@ -90,7 +90,10 @@ const schema = new Schema({
   @param papers: 试卷对象数组
   @author pengxiguaa 2019/2/18
 */
-schema.statics.extendPapers = async (papers) => {
+schema.statics.extendPapers = async (papers, options) => {
+  options = Object.assign({
+    secretInfo: false
+  }, options);
   const UserModel = mongoose.model('users');
   const ExamsCategoryModel = mongoose.model('examsCategories');
   const cid = new Set(), categoriesObj = {};
@@ -108,7 +111,7 @@ schema.statics.extendPapers = async (papers) => {
     categoriesObj[category._id] = category;
   });
   return papers.map(paper => {
-    const paper_ = {
+    const p = {
       user: userObj[paper.uid],
       category: categoriesObj[paper.cid],
       _id: paper._id,
@@ -117,9 +120,22 @@ schema.statics.extendPapers = async (papers) => {
       passed: paper.passed,
       timeOut: paper.timeOut,
       submitted: paper.submitted
+    };
+    if(options.secretInfo) {
+      p.record = paper.record;
+      p.passScore = paper.passScore;
+      p.score = paper.score;
+      p.ip = paper.ip;
     }
-    return paper_;
+    return p;
   });
+};
+
+schema.statics.findById = async (_id) => {
+  const ExamsPaperModel = mongoose.model("examsPapers");
+  const paper = await ExamsPaperModel.findOne({_id: Number(_id)});
+  if(!paper) throwErr(404, `未找到ID为【${_id}】的考卷`);
+  return paper;
 };
 
 module.exports = mongoose.model('examsPapers', schema);

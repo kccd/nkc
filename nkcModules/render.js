@@ -362,6 +362,9 @@ let pugRender = (template, data, state) => {
     // 验证用户是否具有执行该操作的权限
     permission: (operationId) => {
       return data.userOperationsId.includes(operationId);
+    },
+    ipUrl: (ip) => {
+      return `http://www.ip138.com/ips138.asp?ip=${ip}&action=2`
     }
   };
   options.data = data;

@@ -10,10 +10,12 @@ const kcbRouter = require('./kcb');
 const xsfRouter = require('./xsf');
 const rechargeRouter = require("./recharge");
 const withdrawRouter = require("./withdraw");
+const examRouter = require("./exam");
 logRouter
   .get('/', async (ctx, next) => {
     return ctx.redirect(`/e/log/public`);
   })
+  .use("/exam", examRouter.routes(), examRouter.allowedMethods())
   .use("/withdraw", withdrawRouter.routes(), withdrawRouter.allowedMethods())
   .use("/recharge", rechargeRouter.routes(), rechargeRouter.allowedMethods())
   .use('/xsf', xsfRouter.routes(), xsfRouter.allowedMethods())

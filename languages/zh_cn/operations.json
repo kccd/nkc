@@ -521,6 +521,7 @@
   "modifyWithdrawRecord": "修改科创币提现记录",
   "visitExperimentalDiffKcb": "后台查看kcb记录异常的用户",
   "resetExperimentalDiffKcb": "后台重置kcb记录异常用户的检测结果",
+  "visitExperimentalExam": "后台查看考试记录",
   "addForumKind": "[SY]添加专业类别",
   "delShelfAuth": "[SY]解除用户商品上架封禁",
 
