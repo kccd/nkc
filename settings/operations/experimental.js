@@ -248,6 +248,9 @@ module.exports = {
     },
     withdraw: {
 		  GET: "visitExperimentalWithdraw"
+    },
+    exam: {
+		  GET: "visitExperimentalExam"
     }
 	},
   console: {

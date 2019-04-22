@@ -107,12 +107,14 @@ var app = new Vue({
       var password = this.password;
       var code = this.code;
       if(!money || money <= 0) return this.error = "请输入正确的提现金额";
+      money = money*100;
+      if(money%1 !== 0) return this.error = "提现金额仅支持小数点后两位";
       if(!code) return this.error = "请输入短信验证码";
       if(!password) return this.error = "请输入登录密码";
       if(this.submitted) return;
       this.submitted = true;
       nkcAPI("/account/finance/withdraw", "POST", {
-        money: parseInt(money * 100),
+        money: money,
         password: password,
         code: code,
         to: this.to,
