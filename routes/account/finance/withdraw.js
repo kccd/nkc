@@ -115,11 +115,13 @@ router
 
       await record.save();
       try {
-        const alipayMoney = money*(1-withdrawFee);
+        let alipayMoney = money*(1-withdrawFee);
+        alipayMoney = alipayMoney/100;
+        alipayMoney = alipayMoney.toFixed(2);
         await nkcModules.alipay2.transfer({
           account: account.account,
           name: account.name,
-          money: alipayMoney/100,
+          money: alipayMoney,
           id: _id,
           notes: description
         });

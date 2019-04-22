@@ -23,8 +23,9 @@ block content
                 .default-panel(:class="{'active': !money}" @click='select("")')
                   .pointer(v-if='!money')
                     .fa.fa-check
-                  .kcb 
-                    input(placeholder='自定义数额' v-model.number='input' type='text')
+                  .kcb.kcb-input
+                    h5 自定义金额
+                    input(v-model.number='input' type='text')
                   .rmb {{input || 0}}元     
             h4 支付方式
             .row
