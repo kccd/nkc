@@ -23,6 +23,9 @@ block content
           .row
               .form-group
                   input#title.form-control(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
+              .form-group
+                textarea#abstract(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
+                  //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
               //- .form-group
               //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
               //-     div(style='margin-top: 5px;')
