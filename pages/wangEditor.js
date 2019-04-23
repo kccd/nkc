@@ -3578,6 +3578,8 @@ function getPasteHtml(e, filterStyle, ignoreImg) {
     pasteHtml = pasteHtml.replace(/<o:p.+?o:p>/igm, '&nbsp;');
     // 过滤style样式
     pasteHtml = pasteHtml.replace(/<style.+?style>/,'')
+    // 过滤strike
+    pasteHtml = pasteHtml.replace(/<strike.+?strike>/, '');
     // console.log("----**第一次过滤之后**----")
     // console.log(pasteHtml)
     return pasteHtml;
