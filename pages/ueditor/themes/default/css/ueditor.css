@@ -398,8 +398,8 @@ div.edui-box {
 .edui-default .edui-menuitem .edui-icon {
     width: 20px !important;
     height: 20px !important;
-    background: url(../images/icons.png) 0 -4000px;
-    background: url(../images/icons.gif) 0 -4000px\9;
+    /* background: url(../images/icons.png) 0 -4000px;
+    background: url(../images/icons.gif) 0 -4000px\9; */
 }
 
 .edui-default .edui-menuitem .edui-label {
@@ -1140,9 +1140,9 @@ div.edui-box {
     border: 1px solid rgba(0, 0, 0, 0.2);
     *border-right-width: 2px;
     *border-bottom-width: 2px;
-    -webkit-border-radius: 6px;
+    /* -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
-    border-radius: 6px;
+    border-radius: 6px; */
     -webkit-box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
     -moz-box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
