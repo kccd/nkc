@@ -1,11 +1,11 @@
 .thread-panel
   .thread-panel-author-info
-    a(href=`/u/${thread.uid}` target="_blank"
-      onmouseover=`vue_user_panel_float.loadUser("${thread.uid}")`
-      onmouseleave="vue_user_panel_float.close()"
-    ).thread-panel-author
+    a(href=`/u/${thread.uid}` target="_blank").thread-panel-author
       img(src=`/avatar_small/${thread.uid}`)
-      span= thread.firstPost.user.username
+      span(
+        onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.firstPost.user)}')`
+        onmouseleave="vue_user_panel_float.close()"
+      )= thread.firstPost.user.username
 
     .thread-panel-forum
       if data.forum

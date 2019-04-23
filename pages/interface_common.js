@@ -1708,17 +1708,13 @@ function openNKCDrawer() {
   $(".nkc-drawer").addClass("active");
   $(".nkc-drawer-body").addClass("active");
   $(".nkc-drawer-right").addClass("active");
-  $('body').css({
-    "overflow-y": "hidden"
-  });
+  stopBodyScroll(true);
 }
 function closeNKCDrawer() {
   $(".nkc-drawer").removeClass("active");
   $(".nkc-drawer-right").removeClass("active");
   $(".nkc-drawer-body").removeClass("active");
-  $('body').css({
-    "overflow-y": "scroll"
-  });
+  stopBodyScroll(false);
 }
 
 function toggleNKCDrawer() {
@@ -1728,4 +1724,28 @@ function toggleNKCDrawer() {
   } else {
     openNKCDrawer();
   }
+}
+
+var nkcDrawerBodyTop = 0;
+
+function stopBodyScroll (isFixed) {
+  var bodyEl = document.body;
+  if (isFixed) {
+    nkcDrawerBodyTop = window.scrollY;
+    bodyEl.style.position = 'fixed';
+    bodyEl.style.top = -nkcDrawerBodyTop + 'px'
+  } else {
+    bodyEl.style.position = '';
+    bodyEl.style.top = '';
+    window.scrollTo(0, nkcDrawerBodyTop) // 回到原先的top
+  }
+}
+
+// 字符床转对象，对应pug渲染函数objToStr
+function strToObj(str) {
+  return JSON.parse(decodeURIComponent(str));
+}
+// 通过dom元素id获取渲染页面时藏在dom中的数据
+function getDataById(id) {
+  return strToObj(document.getElementById(id).innerHTML);
 }

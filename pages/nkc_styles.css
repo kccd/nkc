@@ -86,7 +86,10 @@ h1, h2, h3, h4, h5, p{
   color: #ccc;
   font-size: 9pt;
 }
-body { padding-top: 65px; }
+body {
+  padding-top: 65px;
+  width: 100%;
+}
 
 .navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse{
   max-height: 1000px;
@@ -1562,11 +1565,18 @@ margin-left: 5px;
   background-color:#f6f6f6;
   line-height: 0;
 }
-
 .nkcshade .navbar-brand{
-  color: #2b90d9;
+  font-size: 1.4em;
+}
+.nkcshade a.navbar-brand{
   font-size: 1.6em;
 }
+
+.nkcshade a.navbar-brand:link, .nkcshade a.navbar-brand:hover, .nkcshade a.navbar-brand:active, .nkcshade a.navbar-brand:visited{
+  color: #2b90d9;
+  text-decoration: none;
+}
+
 /* Lets add an arrow after each link  */
 
 .notusing .ThreadPostBody a[href]:after {
@@ -1963,7 +1973,7 @@ img.emoji {
   margin: 8px 0;
 }
 .nav-font-color{
-  font-size: 1.6rem;
+  font-size: 1.2rem;
 }
 
 
@@ -2512,12 +2522,37 @@ img.emoji {
   color: #ffffff;
 }
 
+.userInfo img{
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display:inline-block;
+  margin-left: 0.5rem;
+}
+.userInfo .username{
+  display:inline-block;
+  padding-left: 0.5rem;
+}
 .userInfo-m{
   display: none;
   float: right;
   min-width: 4em;
+  position: relative;
   padding-top: 8px;
   padding-bottom: 8px;
+}
+.userInfo-m-point{
+  height: 1.2rem;
+  padding: 0 0.32rem;
+  background-color: red;
+  text-align: center;
+  line-height: 1.2rem;
+  color: #fff;
+  border-radius: 0.6rem;
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  font-size: 1rem;
 }
 .userInfo-m img{
   float: right;
@@ -2527,7 +2562,14 @@ img.emoji {
   display:inline-block;
   margin-left: 0.5rem;
 }
-
+.userInfo-m a{
+  font-size: 1.2rem;
+  line-height: 3rem;
+}
+.userInfo-m a:hover, .userInfo-m a:active, .userInfo-m a:link, .userInfo-m a:visited{
+  color: #282c37;
+  text-decoration: none;
+}
 
 /*首页*/
 

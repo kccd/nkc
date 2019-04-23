@@ -500,7 +500,7 @@ footer.footer ul li{
 .nkc-drawer-certs{
   text-align: center;
   color: #e85a71;
-  margin: 0 0.5rem 0.5rem 0;
+  margin: 0 0 0.5rem 0;
   line-height: 2rem;
   font-size: 1rem;
 }
@@ -512,20 +512,43 @@ footer.footer ul li{
 .nkc-drawer-count{
   height: 4.4rem;
   padding: 0.2rem 0;
-  background-color: #fafafa;
-  border-radius: 8px;
+  background-color: #f5f5f5;
+  border-radius: 2.2rem;
 }
 .nkc-drawer-count .col-xs-3{
   padding: 0;
 }
-.nkc-drawer-count .number{
+.nkc-drawer-count .nkc-drawer-count-number{
   height: 2rem;
   line-height: 2rem;
   text-align: center;
   font-size: 1rem;
   font-weight: 700;
 }
-.nkc-drawer-count .title{
+.nkc-drawer-visitor{
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 1rem;
+}
+.nkc-drawer-visitor .fa{
+  display: inline-block;
+  height: 4.5rem;
+  color: #dedede;
+  width: 4.5rem;
+  font-size: 4rem;
+  line-height: 4.5rem;
+}
+.nkc-drawer-visitor .col-xs-4{
+  margin-top: 1rem;
+}
+.nkc-drawer-visitor a{
+  color: #9baec8;
+}
+.nkc-drawer-visitor a:hover, .nkc-drawer-visitor a:link, .nkc-drawer-visitor a:active, .nkc-drawer-visitor a:visited{
+  text-decoration: none;
+  color: #9baec8;
+}
+.nkc-drawer-count .nkc-drawer-count-title{
   font-size: 1rem;
   color: #555;
   height: 2rem;
@@ -533,7 +556,7 @@ footer.footer ul li{
   text-align: center;
 }
 .nkc-drawer-header{
-  height: 3rem;
+  height: 4.5rem;
   position: relative;
 }
 .nkc-drawer-settings{
@@ -566,6 +589,7 @@ footer.footer ul li{
 }
 .nkc-drawer-link:hover, .nkc-drawer-link:active, .nkc-drawer-link:visited, .nkc-drawer-link:link{
   color: #333;
+  text-decoration: none;
 }
 .nkc-drawer-message span{
   font-size: 1rem;
@@ -573,7 +597,7 @@ footer.footer ul li{
   display: inline-block;
   vertical-align: baseline;
   line-height: 1.2rem;
-  padding: 0 0.3rem;
+  padding: 0 0.32rem;
   background-color: red;
   color: #fff;
   border-radius: 0.6rem;
@@ -584,6 +608,7 @@ footer.footer ul li{
 }
 .nkc-drawer-list{
   padding: 1rem 0 0 0;
+  margin-bottom: 0;
 }
 .nkc-drawer-list li{
   list-style: none;
@@ -597,14 +622,18 @@ footer.footer ul li{
   padding: 0 1rem;
   font-weight: 700;
   display: block;
-  height: 3rem;
-  line-height: 3rem;
+  height: 3.4rem;
+  line-height: 3.4rem;
   font-size: 1.2rem;
   color: #282c37;
+  /*color: #9baec8;*/
 }
 .nkc-drawer-list li a .pull-right{
-  height: 3rem;
-  line-height: 3rem;
+  height: 3.4rem;
+  line-height: 3.4rem;
+}
+.nkc-drawer-list li:hover{
+  background-color: #d9e1e8;
 }
 .nkc-drawer-list-line{
   background-color: #e5e5e5;
@@ -635,4 +664,11 @@ footer.footer ul li{
 }
 .nkc-drawer-right.active{
   height: 100%;
+}
+.message-switch.disabled{
+  display: none!important;
+}
+
+.message-switch-div.disabled{
+  display: none;
 }

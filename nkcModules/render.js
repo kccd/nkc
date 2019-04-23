@@ -297,7 +297,7 @@ function getProvinceCity(str) {
 	var addressArr = str.split("/");
 	var province;
 	var city;
-	var address
+	var address;
 	if(addressArr[0]) {
 		province = addressArr[0]
 	}
@@ -325,6 +325,14 @@ function calculateFreightPrice(freightPriceObj, count, isFreePost) {
 		}
 	}
   return freightPrice;
+}
+// 组装ip查询链接
+function ipUrl(ip) {
+  return `http://www.ip138.com/ips138.asp?ip=${ip}&action=2`
+}
+// pug渲染时藏数据，对应前端函数strToObj
+function objToStr(obj) {
+  return encodeURIComponent(JSON.stringify(obj));
 }
 
 let pugRender = (template, data, state) => {
@@ -363,10 +371,9 @@ let pugRender = (template, data, state) => {
     permission: (operationId) => {
       return data.userOperationsId.includes(operationId);
     },
-    state: state,
-    ipUrl: (ip) => {
-      return `http://www.ip138.com/ips138.asp?ip=${ip}&action=2`
-    }
+    state,
+    ipUrl,
+    objToStr
   };
   options.data = data;
   options.filters = filters;

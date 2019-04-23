@@ -2,7 +2,7 @@
   border-radius: 3px;
 }
 .swiper-slide{
-  height: 24rem;
+  min-height: 24rem;
   position: relative;
   background-repeat:no-repeat;
   background-size: cover;

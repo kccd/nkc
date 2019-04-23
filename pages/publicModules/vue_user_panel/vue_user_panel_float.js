@@ -33,37 +33,33 @@ var vue_user_panel_float = new Vue({
       return { 'x': x, 'y': y-scrollTop };
     },
 
-    loadUser: function(uid) {
+    loadUser: function(userString) {
+      var user = strToObj(userString);
+
       var position = this.getMousePosition();
       this.top = position.y+20;
       this.left = position.x+20;
 
-      if(this.usersObj[uid]) {
-        this.user = this.usersObj[uid];
+      if(this.usersObj[user.uid]) {
+        this.user = this.usersObj[user.uid];
         return vue_user_panel_float.show = true;
       }
 
-      nkcAPI("/u/" + uid, "GET")
-        .then(function(data) {
+      vue_user_panel_float.show = true;
 
-          vue_user_panel_float.show = true;
+      var targetUser = user;
 
-          var targetUser = data.targetUser;
-          vue_user_panel_float.usersObj[targetUser.uid] = {
-            username: targetUser.username,
-            description: (targetUser.description ||"暂未填写个人简介").slice(0, 140),
-            uid: targetUser.uid,
-            kcb: targetUser.kcb,
-            xsf: targetUser.xsf,
-            postCount: targetUser.postCount,
-            threadCount: targetUser.threadCount,
-            certsName: targetUser.info.certsName
-          };
-          vue_user_panel_float.user = vue_user_panel_float.usersObj[targetUser.uid];
-        })
-        .catch(function(data) {
-          screenTopWarning(data)
-        })
+      vue_user_panel_float.usersObj[targetUser.uid] = {
+        username: targetUser.username,
+        description: (targetUser.description ||"暂未填写个人简介").slice(0, 140),
+        uid: targetUser.uid,
+        kcb: targetUser.kcb,
+        xsf: targetUser.xsf,
+        postCount: targetUser.postCount,
+        threadCount: targetUser.threadCount,
+        certsName: targetUser.info.certsName
+      };
+      vue_user_panel_float.user = vue_user_panel_float.usersObj[targetUser.uid];
     }
   }
 });

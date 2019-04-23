@@ -13,15 +13,17 @@ async function createSocketServer(server) {
     io.on("error", (err) => {
       throw err;
     });
-    // 中间处理
-    io.use(init);
-    io.use(auth);
+    // io.use(init);
+    // io.use(auth);
     // 多进程适配
     io.adapter(socketIoRedis({ host: redisConfig.address, port: redisConfig.port}));
     // 多个socket连接类型
     for(const name in namespaces) {
       if(!namespaces.hasOwnProperty(name)) continue;
       const namespace = io.of(`/${name}`);
+      // 中间处理
+      await namespace.use(init);
+      await namespace.use(auth);
       await namespaces[name](namespace);
     }
     global.NKC.io = io;

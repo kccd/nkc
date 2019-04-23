@@ -1,7 +1,10 @@
 
 const func = (io) => {
   io.on("connection", async (socket) => {
-    console.log(`home socket connected, id: ${socket.id}`);
+    const {data, db} = socket.NKC;
+    const {user} = data;
+    console.log(`访问 home socket , ${user? user.username: "visitor"}`);
+    if(!user) return socket.disconnect(true);
   });
 };
 module.exports = func;

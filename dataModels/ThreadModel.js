@@ -521,6 +521,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         username: 1,
         xsf: 1,
         kcb: 1,
+        description: 1,
         certs: 1
       });
       if(o.userInfo) {
