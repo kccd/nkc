@@ -61,8 +61,8 @@ shelfRouter
     const {contentLength} = tools.checkString;
     if(!productName) ctx.throw(400, '商品名不能为空');
     if(contentLength(productName) > 100) ctx.throw(400, '商品名不能超过100字节');
-    if(!productDescription) ctx.throw(400, '商品简介不能为空');
-    if(contentLength(productDescription) > 500) ctx.throw(400, '商品简介不能超过500字节');
+    if(!productDescription) ctx.throw(400, '商品描述不能为空');
+    if(contentLength(productDescription) > 500) ctx.throw(400, '商品描述不能超过500字节');
     if(!productDetails) ctx.throw(400, '商品详细介绍不能为空');
     if(contentLength(productDetails) > 50000) ctx.throw(400, '商品详细介绍不能超过50000字节');
     const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
