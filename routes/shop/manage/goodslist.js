@@ -60,17 +60,33 @@ goodslistRouter
   // 访问商品重新编辑页面
   .get('/editProduct', async (ctx, next) => {
     const {data, body, query, params, db} = ctx;
-    ctx.throw(404, "该路由暂不可访问")
     const {productId} = query;
     if(!productId) ctx.throw(400, "商品Id有误");
     let product = await db.ShopGoodsModel.findOne({productId});
     if(!product) ctx.throw(400, "商品不存在");
-    data.product = await db.ShopGoodsModel.extendProductsInfo([product]);
+    product = await db.ShopGoodsModel.extendProductsInfo([product]);
+    data.product = product[0];
+    ctx.template = "shop/manage/goodsProductEdit.pug"
     await next();
   })
   // 提交商品修改信息
   .patch('/editProduct', async (ctx, next) => {
     const {data, body, query, params, db} = ctx;
+    const {user} = data;
+    const {uid} = params;
+    if(uid !== user.uid) ctx.throw(400, "您无权修改别人的商品");
+    const {
+      stockCostMethod,
+      purchaseLimitCount,
+      uploadCert,
+      uploadCertDescription,
+      isFreePost,
+      freightPrice,
+      productId
+    } = body;
+    const product = await db.ShopGoodsModel.findOne({productId});
+    if(user.uid !== product.uid) ctx.throw(400, "您无权修改别人的作品");
+    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice}})
     await next();
   })
   // 立即上架

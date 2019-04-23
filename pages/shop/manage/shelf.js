@@ -4,7 +4,7 @@
 function initTime() {
 	if(!$('.time').length){
 		return;
-	}
+  }
 	$('.time').datetimepicker({
 		language:  'zh-CN',
 		format: 'yyyy-mm-dd hh:ii',
