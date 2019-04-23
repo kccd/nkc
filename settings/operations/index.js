@@ -9,6 +9,7 @@ const {
 	forum_avatar,
 	r,
 	rt,
+	rm,
 	cover,
 	frameImg,
 	appDownload,
@@ -92,6 +93,7 @@ operationObj.operationTree = {
 
 		r,// 资源
 		rt,
+		rm,
 
 		default: resourceObj.default,
 		attachIcon: resourceObj.attachIcon,

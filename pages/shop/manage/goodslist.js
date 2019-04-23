@@ -108,3 +108,64 @@ function paramToEdit(uid,paraId) {
     screenTopWarning(data || data.error)
   })
 }
+
+/**
+ * 
+ */
+function editProductShelf(uid, productId) {
+  var stockCostMethod = $("input[name='stockCostMethod']:checked").val(); // 商品减库存方式
+  // 是否使用限购
+  var isPurchaseLimit = $("#isPurchaseLimit").prop("checked");
+  var purchaseLimitCount;
+  if(isPurchaseLimit) {
+    purchaseLimitCount = $("#purchaseLimitCount").val();
+    purchaseLimitCount = Number(purchaseLimitCount);
+    if(!purchaseLimitCount || isNaN(purchaseLimitCount) || purchaseLimitCount < 0){
+      throw("限购数量应该是正整数且不大于商品的库存数量");
+    }
+  }else{
+    purchaseLimitCount = -1;
+  }
+  // 是否需要上传购买凭证
+  var isUploadCert = $("#isUploadCert").prop("checked");
+  var uploadCertDescription;
+  var uploadCert = false;
+  if(isUploadCert){
+    uploadCert = true;
+    uploadCertDescription = $("#uploadCertDescription").val();
+  }
+  // 获取物流价格
+  var isFreePost = true; // 是否免邮
+  var freightPrice = {
+    firstFreightPrice: null,
+    addFreightPrice: null
+  }; // 运费模板
+  var freightMethod = $("input[name='freightMethod']:checked").val();
+  var firstFreightPrice = Number($("#firstFreightPrice").val())*100;
+  var addFreightPrice = Number($("#addFreightPrice").val())*100;
+  if(freightMethod !== "freePost") {
+    isFreePost = false;
+    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice < 0) {
+      throw("请正确设置运费模板");
+    }
+    freightPrice.firstFreightPrice = firstFreightPrice;
+    freightPrice.addFreightPrice = addFreightPrice;
+  }
+  // 组装修改数据
+  var post = {
+    stockCostMethod: stockCostMethod,
+    purchaseLimitCount:purchaseLimitCount,
+    uploadCert: uploadCert,
+    uploadCertDescription: uploadCertDescription,
+    isFreePost: isFreePost,
+    freightPrice: freightPrice,
+    productId:productId
+  }
+  nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
+  .then(function(data) {
+    screenTopAlert("修改成功");
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data)
+  })
+}

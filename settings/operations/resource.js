@@ -42,7 +42,12 @@ module.exports = {
 	},
 	rt: {
 		PARAMETER: {
-			GET: 'getResources'
+			GET: 'getThumbs'
+		}
+	},
+	rm: {
+		PARAMETER: {
+			GET: 'getMediums'
 		}
 	},
 	cover: {// 文章封面图

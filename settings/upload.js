@@ -17,6 +17,7 @@ const paths = {
   shopLogoPath: 'resources/shopLogo',
   avatarSmallPath: 'resources/newavatar_small',
   thumbnailPath: 'resources/thumbnails',
+  mediumPath: 'resources/mediums',
   adPath: 'resources/ad_posts',
   siteSpecificPath: 'resources/site_specific',
   qrCodePath: 'resources/qr',
