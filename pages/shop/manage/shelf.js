@@ -22,7 +22,7 @@ var skip = 0;
 $(function () { $("[data-toggle='popover']").popover(); });
 
 function ceshi() {
-  $("#test").tagsinput("add", "some tag")
+  console.log($("#test").val())
 }
 
 $(document).ready(function() {
@@ -423,23 +423,31 @@ function showAttachment() {
 // }
 
 /**
- * 新增一条自定义规格属性
+ * 新增一条自定义属性
  */
 function addNewParam() {
   var newParamDom = '<tr><td style="width:20%"><input type="text" class="pname" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td><td style="width:10%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
   $("#paramsTable").find("tbody").append(newParamDom)
   $(".pvalue").tagsinput({
-    maxChars: 3, // 单个标记最大字符数
+    maxChars: 5, // 单个标记最大字符数 
+    maxTags: 5, // 最大标签数
   })
 }
 
+/**
+ * 获取当前属性条目的全部属性值
+ */
+// function getParamTags(para) {
+//   console.log($(para).parents("tr").find(".pvalue").val())
+// }
 
 /**
  * 保存当前自定义规格属性
  */
 function saveNewParam(para) {
-  var newParaName = $(para).parents("tr").children(".pname").text();
-  var newParaValue = $(para).parents("tr").children(".pvalue").text();
+  var newParaName = $(para).parents("tr").find(".pname").val();
+  // var newParaValue = $(para).parents("tr").children(".pvalue").text();
+  var newParaValue = $(para).parents("tr").find(".pvalue").val();
   newParaName = newParaName.trim();
   if(!newParaName) return screenTopWarning("请输入规格名称");
   newParaValue = newParaValue.replace(/\s+/g,"");
@@ -538,7 +546,7 @@ function tableTurnParams() {
 function tableTurnMulArray() {
   var mulArray = [];
   $("#paramsTable tbody tr").each(function(index, ele) {
-    var valueStr = $(ele).find(".pvalue").text();
+    var valueStr = $(ele).find(".pvalue").val();
     var valueArr = valueStr.split(",");
     mulArray.push(valueArr);
   })
