@@ -797,10 +797,7 @@ function subscribeForum(fid, subscribe) {
 	}
 	nkcAPI(url, method, {})
 		.then(function() {
-			screenTopAlert(alertInfo);
-			setTimeout(function() {
-				window.location.reload();
-			}, 1000);
+      window.location.reload();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

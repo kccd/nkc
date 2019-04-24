@@ -1,0 +1,71 @@
+extends ../bootstrap_base
+block title
+  title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
+  +includeCSS("/publicModules/thread_panel/thread_panel.css")
+  include ../publicModules/vue_forums_nav/vue_forums_nav_css
+  +includeCSS("/publicModules/vue_user_panel/vue_user_panel_float.css")
+  +includeCSS("/forum/forum.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include ../publicModules/post_button
+        include ../publicModules/vue_forums_nav/vue_forums_nav_dom
+      .col-xs-12.col-md-7
+        .row
+          .col-xs-12.col-md-12
+            .forum-info-panel
+              .forum-banner
+                .forum-banner-cover
+                img(src=`/f/${data.forum.fid}/banner`)
+              .forum-info-body
+                .forum-avatar
+                  .col-xs-12
+                    if data.forum.iconFileName
+                      img(src=`/forum_avatar/${data.forum.fid}`)
+                    else
+                      img(style=`background-color: ${data.forum.color}`)
+                .forum-info
+                  .forum-name=data.forum.displayName
+                    if data.subscribed
+                      button.btn-sm.forum-sub-btn.btn(
+                        onclick=`subscribeForum("${data.forum.fid}", false)`
+                      ) 取关
+                    else
+                      button.btn-sm.forum-sub-btn.btn.success(
+                        onclick=`subscribeForum("${data.forum.fid}", true)`
+                      ) 关注
+                    .forum-abbr=data.forum.abbr
+                  .forum-number
+                    .col-xs-4.col-md-2
+                      .number=data.forum.countThreads
+                      .title 文章
+                    .col-xs-4.col-md-2
+                      .number=data.forum.countPosts
+                      .title 回复
+                    .col-xs-4.col-md-2
+                      .number=data.forum.countPostsToday
+                      .title 今日更新
+                    .col-xs-4.col-md-2
+                      .number=data.subUsersCount
+                      .title 关注的人
+                    //.col-xs-4.col-md-2
+                    //  .number=data.usersId.length
+                    //  .title 今日来访
+          .col-xs-12.col-md-12.m-t-2
+            .hidden-xs.hidden-sm
+              include ../publicModules/paging/paging
+            if data.paging.page === 0 && data.toppedThreads.length > 0
+              for thread in data.toppedThreads
+                include ../publicModules/thread_panel/thread_panel
+              div.topped-thread-header - 以上是置顶 -
+            for thread in data.threads
+              include ../publicModules/thread_panel/thread_panel
+            include ../publicModules/paging/paging
+      .col-xs-12.col-md-3
+
+block scripts
+  include ../publicModules/vue_forums_nav/vue_forums_nav_js
+  +includeJS("/forum/forum.js")
+  include ../publicModules/vue_user_panel/vue_user_panel_float_js
+

@@ -52,29 +52,31 @@ router
       const thread = await db.ThreadModel.findOne({tid});
       if(thread) return thread;
     }));
+
     data.ads = await db.ThreadModel.extendThreads(ads, {
       forum: false,
       lastPost: false
     });
 
+    // 关注
 
-    // 关注的文章
-    const usersCollections = await db.CollectionModel.find({uid: user.uid});
-    const subscribeThreadsId = usersCollections.map(c => c.tid);
+    const subs = await db.SubscribeModel.find({
+      uid: user.uid
+    }, {
+      fid: 1,
+      tid: 1,
+      tUid: 1,
+      type: 1
+    }).sort({toc: -1});
 
-    // 好友
-    const friends = await db.FriendModel.find({uid: user.uid});
-    const friendsId = friends.map(f => f.tUid);
+    // 关注的专业ID，关注的用户ID，关注的文章ID
+    const subFid = [], subUid = [], subTid = [];
 
-    // 关注的专业
-    const userSubscribe = await db.UsersSubscribeModel.findOne({uid: user.uid});
-    const subscribeForums = userSubscribe.subscribeForums;
-    let subscribeForumsId = [];
-    for(const fid of subscribeForums) {
-      subscribeForumsId.push(fid);
-      const childFid = await db.ForumModel.getAllChildrenFid(fid);
-      subscribeForumsId = subscribeForumsId.concat(childFid);
-    }
+    subs.map(s => {
+      if(s.type === "forum") subFid.push(s.fid);
+      if(s.type === "thread") subTid.push(s.tid);
+      if(s.type === "user") subUid.push(s.tUid);
+    });
 
     data.homeSettings = homeSettings;
 
@@ -98,10 +100,11 @@ router
       recycleMark: {
         $ne: true
       },
+      disabled: false,
       $or: [
         {
           fid: {
-            $in: subscribeForumsId
+            $in: subFid
           }
         },
         {
@@ -109,12 +112,12 @@ router
         },
         {
           uid: {
-            $in: friendsId
+            $in: subUid
           }
         },
         {
           tid: {
-            $in: subscribeThreadsId
+            $in: subTid
           }
         }
       ]
@@ -134,14 +137,14 @@ router
     });
 
     threads.map(thread => {
-      if(subscribeThreadsId.includes(thread.tid)) {
-        thread.type = 'subscribeThread';
-      } else if(friendsId.includes(thread.uid)) {
-        thread.type = 'subscribeFriend';
+      if(subTid.includes(thread.tid)) {
+        thread.from = 'subThread';
+      } else if(subUid.includes(thread.uid)) {
+        thread.from = 'subFriend';
       } else if(thread.uid === user.uid) {
-        thread.type = 'own';
+        thread.from = 'own';
       } else {
-        thread.type = 'subscribeForum';
+        thread.from = 'subForum';
       }
     });
 
@@ -163,8 +166,6 @@ router
     data.paging = paging;
 
     ctx.template = "home/newHome.pug";
-
-
 
     await next();
   })

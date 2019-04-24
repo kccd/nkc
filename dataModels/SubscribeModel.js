@@ -1,9 +1,16 @@
+// 用户的关注，分为：关注的用户、关注的专业、关注的文章
+
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
   _id: Number,
+  toc: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
   // 类型
   // 1. thread 关注的文章
   // 2. forum 关注的专业
@@ -17,7 +24,7 @@ const schema = new Schema({
   // thread类型 sub: 关注的文章, post: 自己发表的文章, replay: 回复过的文章, coll: 收藏的文章
   detail: {
     type: String,
-    required: "",
+    default: "",
     index: 1
   },
   // 关注的发起人
@@ -26,16 +33,19 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 若为关注用户，此字段表示关注的人ID
   tUid: {
     type: String,
     default: "",
     index: 1
   },
+  // 关注的专业ID
   fid: {
     type: String,
     default: "",
     index: 1
   },
+  // 关注的文章ID
   tid: {
     type: String,
     default: "",
@@ -44,5 +54,6 @@ const schema = new Schema({
 }, {
   collection: "subscribes"
 });
+
 
 module.exports = mongoose.model('subscribes', schema);

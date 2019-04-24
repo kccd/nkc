@@ -925,4 +925,40 @@ userSchema.methods.updateKcb = async function() {
   const UserModel = mongoose.model("users");
   this.kcb = await UserModel.updateUserKcb(this.uid);
 };
+/*
+* 验证用户是否还能关注相应的内容
+* @param {String} type 关注的类型 user: 关注用户, forum: 关注专业, thread: 关注文章
+* @author pengxiguaa 2019-4-24
+* */
+userSchema.methods.ensureSubLimit = async function(type) {
+  const SubscribeModel = mongoose.model("subscribes");
+  const SettingModel = mongoose.model("settings");
+  const subSettings = await SettingModel.findById("subscribe");
+  const {subUserCountLimit, subForumCountLimit, subThreadCountLimit} = subSettings.c;
+  if(type === "user") {
+    if(subUserCountLimit <= 0) throwErr(400, "关注用户功能已关闭");
+    const userCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "user"
+    });
+    if(userCount >= subUserCountLimit) throwErr(400, "关注用户数量已达上限");
+  } else if(type === "forum") {
+    if(subForumCountLimit <= 0) throwErr(400, "关注专业已关闭");
+    const forumCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "forum"
+    });
+    if(forumCount >= subForumCountLimit) throwErr(400, "关注专业数量已达上限");
+  } else if(type === "thread") {
+    if(subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
+    const threadCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "thread"
+    });
+    if(threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
+  } else {
+    throwErr(500, `未知的type类型：${type}`);
+  }
+};
+
 module.exports = mongoose.model('users', userSchema);

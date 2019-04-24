@@ -22,11 +22,13 @@ latestRouter
 		let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
     fidOfCanGetThreads.push(forum.fid);
 		match.mainForumsId = {$in: fidOfCanGetThreads};
+		match.disabled = false;
+		match.recycleMark = {$ne: true};
 		// 专家可查看专业下所有文章
 		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
 		// 已登录用户能查看专业下未被退回的文章、自己已被退回的文章
 		// 未登录用户只能查看未被退回的文章
-		if(!isModerator) {
+		/*if(!isModerator) {
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 				if(!data.user) {
 					match.recycleMark = {$ne: true};
@@ -42,7 +44,7 @@ latestRouter
 					]
 				}
 			}
-		}
+		}*/
 		const count = await db.ThreadModel.count(match);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count);
@@ -63,8 +65,13 @@ latestRouter
     });
 
 		// 构建置顶文章查询条件
-		const toppedThreadMatch = {topped: true, mainForumsId: forum.fid};
-		if(!isModerator) {
+		const toppedThreadMatch = {
+		  topped: true,
+      mainForumsId: forum.fid,
+      disabled: false,
+      recycleMark: {$ne: true}
+		};
+		/*if(!isModerator) {
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 				if(!data.user) {
 					toppedThreadMatch.recycleMark = {$ne: true};
@@ -80,7 +87,7 @@ latestRouter
 					]
 				}
 			}
-		}
+		}*/
 		// 加载、拓展置顶文章
 		const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
 		data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads);

@@ -106,6 +106,9 @@
           if permission('visitExamSettings')
             li
               a(href='/e/settings/exam')=lang('ex', 'exam')
+          if permission('experimentalSubSettings')
+            li
+              a(href='/e/settings/sub')=lang('ex', 'sub')
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')    
             li

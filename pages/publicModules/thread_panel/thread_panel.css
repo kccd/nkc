@@ -55,11 +55,14 @@
 .thread-panel-title:hover{
   color: #282c37;
   text-decoration: none;
-  border-bottom: #555 solid 1px;
+  border-bottom: solid 1px;
 }
 .thread-panel-title:link, .thread-panel-title:visited, .thread-panel-title:active{
   color: #282c37;
   text-decoration: none;
+}
+.thread-panel-title.digest{
+  color: #e85a71;
 }
 .thread-panel-abstract{
   display: -webkit-flex;

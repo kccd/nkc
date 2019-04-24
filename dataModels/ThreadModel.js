@@ -522,7 +522,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         xsf: 1,
         kcb: 1,
         description: 1,
-        certs: 1
+        certs: 1,
+        threadCount: 1,
+        postCount: 1
       });
       if(o.userInfo) {
         await UserModel.extendUsersInfo(users);

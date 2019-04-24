@@ -203,6 +203,10 @@ module.exports = {
 			GET: 'visitEPostSettings',
 			PATCH: 'modifyEPostSettings'
 		},
+    sub: {
+      GET: "experimentalSubSettings",
+      PATCH: "experimentalSubSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'

@@ -9,6 +9,15 @@
 
     .thread-panel-forum
       if data.forum
+        -let displayForumNav = false;
+        for f in thread.forums
+          if f.fid !== data.forum.fid
+            -displayForumNav = true;
+            a(href=`/f/${f.fid}`)= f.displayName
+        if !displayForumNav && thread.categories.length !== 0
+          for category in thread.categories
+            if data.threadTypesId.includes(category.cid)
+              a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
       else
         -let forum;
         for f in thread.forums
@@ -19,7 +28,7 @@
 
     .thread-panel-time=fromNow(thread.toc)
 
-  a(href=`/t/${thread.tid}`).thread-panel-title= thread.firstPost.t
+  a(href=`/t/${thread.tid}` class=thread.digest?"digest":"").thread-panel-title= thread.firstPost.t
   a(href=`/t/${thread.tid}`).thread-panel-abstract
     .thread-panel-abstract-content
       .thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
@@ -31,15 +40,15 @@
             .fa.fa-comment=` ${thread.count - 1}`
           if thread.firstPost.voteUp - thread.firstPost.voteDown
             .fa.fa-thumbs-up=` ${thread.firstPost.voteUp - thread.firstPost.voteDown || ''}`
-        if thread.type
+        if thread.from
           .thread-panel-from
-            if thread.type === 'own'
+            if thread.from === 'own'
               span 来自自己的文章
-            else if thread.type === 'subscribeForum'
+            else if thread.from === 'subForum'
               span 来自关注的专业
-            else if thread.type === 'subscribeFriend'
+            else if thread.from === 'subFriend'
               span 来自好友
-            else
+            else if thread.from === "subThread"
               span 来自关注的文章
     if thread.hasCover
       .thread-panel-abstract-cover(

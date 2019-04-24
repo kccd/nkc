@@ -48,10 +48,11 @@ activeUserSchema.statics.extendUsers = async function(activeUsers) {
   activeUsers.map(a => {
     uid.add(a.uid);
   });
-  const users = await UserModel.find({uid: {$in: [...uid]}});
+  let users = await UserModel.find({uid: {$in: [...uid]}});
+  await UserModel.extendUsersInfo(users);
   const usersObj = {};
   users.map(user => {
-    usersObj[user.uid] = user;
+    usersObj[user.uid] = user.toObject();
   });
   return await Promise.all(activeUsers.map(a => {
     a.user = usersObj[a.uid];

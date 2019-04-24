@@ -35,7 +35,6 @@ var vue_user_panel_float = new Vue({
 
     loadUser: function(userString) {
       var user = strToObj(userString);
-
       var position = this.getMousePosition();
       this.top = position.y+20;
       this.left = position.x+20;

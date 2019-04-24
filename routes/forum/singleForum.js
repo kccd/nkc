@@ -1,9 +1,10 @@
-'use strict'
+'use strict';
 const subscribeRouter = require('./subscribe');
 const settingsRouter = require('./settings');
 const homeRouter = require('./home');
 const latestRouter = require('./latest');
 const followerRouter = require('./follower');
+const bannerRouter = require('./banner');
 const visitorRouter = require('./visitor');
 const Router = require('koa-router');
 const path = require('path');
@@ -240,7 +241,7 @@ router
     await forum.extendRelatedForums(fidArr);
 		fidArr.push(fid);
 		// 拿到今天所有该专业下的用户浏览记录
-		const behaviors = await db.UsersBehaviorModel.find({
+		/*const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: fidArr},
 			operationId: {$in: ['visitForumLatest', 'visitThread', 'visitForumFollowers', 'visitForumVisitors']}
@@ -265,27 +266,11 @@ router
 				break;
 			}
     }
-    await db.UserModel.extendUsersInfo(data.users);
+    await db.UserModel.extendUsersInfo(data.users);*/
 
     await forum.extendParentForums();
 		// 加载网站公告
 		await forum.extendNoticeThreads();
-		// 加载关注专业的用户
-		let followersId = forum.followersId;
-		followersId = followersId.reverse();
-		const followers = [];
-		for(let uid of followersId) {
-			if(followers.length < 9) {
-				const targetUser = await db.UserModel.findOne({uid});
-				if(targetUser) {
-					followers.push(targetUser);
-				}
-			} else {
-				break;
-			}
-    }
-    await db.UserModel.extendUsersInfo(followers);
-    forum.followers = followers;
 
 		//版主
 		data.moderators = [];
@@ -293,9 +278,6 @@ router
       data.moderators = await db.UserModel.find({uid: {$in: forum.moderators}});
     }
     await db.UserModel.extendUsersInfo(data.moderators);
-		if(data.user) {
-			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
-		}
 
 		const digestThreads = await db.ThreadModel.aggregate([
 			{
@@ -329,15 +311,25 @@ router
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
-		} 
-
-		ctx.template = 'interface_forum_home.pug';
+		}
+    data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+		data.subUsersCount = await db.SubscribeModel.count({fid, type: "forum"});
+		if(data.user) {
+      const sub = await db.SubscribeModel.count({
+        uid: data.user.uid,
+        type: "forum",
+        fid
+      });
+      data.subscribed = !!sub;
+    }
+		ctx.template = 'forum/forum.pug';
 		await next();
 	})
 	.use('/latest', latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
-	.use('/home', homeRouter.routes(), homeRouter.allowedMethods());
+	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
+  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods());
 module.exports = router;
 
 

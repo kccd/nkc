@@ -39,24 +39,4 @@
 .swiper-pagination{
   color: #ffffff;
 }
-.home-post-button a{
-  text-decoration: none;
-  height: 5rem;
-  line-height: 5rem;
-  padding: 0;
-  cursor: pointer;
-  text-align: center;
-  font-weight: 800;
-  border-radius: 2px;
-  font-size: 1.4rem;
-  border: 1px solid #eeeeee;
-  color: #e85a71;
-}
-.home-post-button a:hover{
-  /* color: #ee8b42; */
-  border-color: #ccc;
-  /* background-color: rgba(0,0,0,0.05); */
-}
-.container-fluid.max-width{
-  max-width: 1300px;
-}
+

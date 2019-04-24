@@ -11,12 +11,7 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
-        div.home-post-button.hidden-xs.hidden-sm
-          a.btn-lg.btn-block(href=data.user ? `/editor` : '/login' style=`margin-bottom: 0.5rem;`)
-            if data.user
-              span.fa.fa-edit &nbsp;发表文章
-            else
-              span.fa.fa-login &nbsp;登录
+        include ../publicModules/post_button
         include ../publicModules/vue_forums_nav/vue_forums_nav_dom
       .col-xs-12.col-md-7
         .row
@@ -41,9 +36,9 @@ block content
             include ../publicModules/paging/paging
       .col-xs-12.col-md-3
         include ../publicModules/canvas_logo
-        //-include ../publicModules/notice
-          include ../publicModules/active_users
-          include ../publicModules/web_info_side.pug
+        include ../publicModules/notice
+        include ../publicModules/active_users
+        //include ../publicModules/web_info_side.pug
 block footer
   include ../publicModules/footer/footer
 block scripts
