@@ -30,6 +30,7 @@ function addAddressElement(obj, i) {
 	var html = $('.template').html();
 	var div = newElement('div', {}, {}).html(html);
 	div.find('.addressNumber').text(i+1);
+	div.find('.location').val(obj.location).attr('id', 'location'+i);
 	div.find('.address').val(obj.address).attr('id', 'address'+i);
 	div.find('.mobile').val(obj.mobile).attr('id', 'mobile'+i);
 	div.find('.bankName').val(obj.bankName).attr('id', 'bankName'+i);
@@ -47,8 +48,10 @@ function displayAddress() {
 	addressDiv.html('');
 	for(var i = 0; i < addresses.length; i++) {
 		addressDiv.append(addAddressElement(addresses[i], i));
-
 	}
+	$(".location").click(function (e) {
+		SelCity(this,e);
+	});
 	$('button.btn.btn-danger').on('click', function() {
 		var i = $(this).attr('data-i');
 		nkcAPI('/u/'+uid+'/settings/transaction', 'PATCH', {operation: 'deleteAddress', number: i})
@@ -76,6 +79,7 @@ function addAddress() {
 function load() {
 	var reg = /^[0-9]*$/;
 	for(var i = 0; i < addresses.length; i++) {
+		addresses[i].location = $('#location'+i).val();
 		addresses[i].address = $('#address'+i).val();
 		var mobile = $('#mobile'+i).val();
 		if(!reg.test(mobile)) {
