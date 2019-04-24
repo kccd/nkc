@@ -21,7 +21,19 @@ var productImageDomId;
 var skip = 0;
 $(function () { $("[data-toggle='popover']").popover(); });
 
+function ceshi() {
+  $("#test").tagsinput("add", "some tag")
+}
+
 $(document).ready(function() {
+  $("#test").tagsinput({
+    // maxChars: 3, // 单个标记最大字符数
+    // maxTags: 3, // 标记的最大个数
+    // trimValue: true, // 默认删除编辑周围的空格
+    // typeahead: {
+    //   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo']
+    // }
+  })
   //编辑器缩放
   $(".w-e-text-container").resizable({
     containment: '#body',
@@ -414,9 +426,11 @@ function showAttachment() {
  * 新增一条自定义规格属性
  */
 function addNewParam() {
-  var newParamDom = '<tr><td class="pname" contenteditable="true"></td><td class="pvalue" contenteditable="true"></td><td><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
-  
+  var newParamDom = '<tr><td style="width:20%"><input type="text" class="pname" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td><td style="width:10%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
   $("#paramsTable").find("tbody").append(newParamDom)
+  $(".pvalue").tagsinput({
+    maxChars: 3, // 单个标记最大字符数
+  })
 }
 
 

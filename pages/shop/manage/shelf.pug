@@ -3,6 +3,7 @@ extends ./index.pug
 block name
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
   style.
     .padding-0 {
       padding: 0
@@ -19,20 +20,25 @@ block name
         .panel-heading
           | 选择分类
         .panel-body
-          .col-md-5.col-sm-5
+          .col-md-12.col-sm-12
             .form-horizontal
               .form-group
-                label.col-sm-4.control-label 商品分类(必选)
-                .col-sm-7
-                  select#shopForums.form-control(style="width:auto")
+                label.col-sm-2.control-label 商品分类(必选)
+                .col-sm-8(style="padding:0")
+                  select#shopForums.form-control()
                     for shopForum in data.shopForumTypes
                       option(value=`${shopForum.fid}`)!=shopForum.displayName
-          .col-md-7.col-sm-7
+          .col-md-12.col-sm-12
             .form-horizontal
               .form-group
-                label.col-sm-4.control-label 辅助分类(选填)
-                .col-sm-7
+                label.col-sm-2.control-label 辅助分类(选填)
+                .col-sm-9
                   include ../../forumlist_dropdown
+          .col-md-12.col-sm-12
+            input(type="text" id="test")
+            input(type="text" id="test")
+            input(type="text" id="test")
+            button(onclick="ceshi()") 测试
       .panel.panel-info
         .panel-heading
           | 基本信息
@@ -378,6 +384,7 @@ block manageScripts
   +includeJS("/jquery-ui-1.10.4.custom.js")
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.min.js")
   +includeJS("/module_forum_settings.js")
   +includeJS("/interface_common.js")
   +includeJS("/module_dropdown.js")
