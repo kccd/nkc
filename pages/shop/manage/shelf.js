@@ -132,6 +132,9 @@ $(document).ready(function() {
       $("#freightPriceDom").css("display", "none")
     }
   })
+  $("#productDescription").on("input propertychange" ,function() {
+    $("#productDescriptionNum").text($("#productDescription").val().length)
+  })
 })
 
 /**

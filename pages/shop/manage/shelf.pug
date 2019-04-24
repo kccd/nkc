@@ -52,11 +52,14 @@ block name
               label.col-sm-2.control-label 商品描述
               .col-sm-8
                 textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='500')
-                p(style="color:#ccc") 最多500个字
+                p(style="color:#ccc") 
+                  span 最多
+                  span#productDescriptionNum 0 
+                  span /500个字
             .form-group
-              label.col-sm-2.control-label 特别说明
-              .col-sm-5.attentionList
-                input.attention.form-control(type="text" placeholder="请用不超过15字来完成一个简短说明")
+              label.col-sm-2.control-label 关键词
+              .col-sm-8.attentionList
+                input.attention.form-control(type="text" placeholder="关键词总字数不超过200")
               //- .col-sm-1
               //-   button(onclick="addAttention()") 添加
       .panel.panel-info
@@ -298,7 +301,7 @@ block name
                 p.text-danger 提示：请先在下方编辑器的附件模块上传商品图
             .form-group#attachmentDom(style="display:block")
               .col-sm-2
-              .col-sm-8
+              .col-sm-10
                include ../../media/media_index.pug  
             .form-group
               label.col-sm-2.control-label
