@@ -6,6 +6,16 @@ function init() {
 	positionObj = undefined;
 }
 
+$(document).ready(function() {
+	$("#dealDescription").on("input propertychange" ,function() {
+    $("#dealDescriptionNum").text($("#dealDescription").val().length)
+	});
+	
+	$("#dealAnnouncement").on("input propertychange" ,function() {
+    $("#dealAnnouncementNum").text($("#dealAnnouncement").val().length)
+  });
+})
+
 $('#inputFile').on('change', function() {
 	var file = $('#inputFile')[0].files[0];
 	if(file) {

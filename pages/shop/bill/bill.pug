@@ -41,7 +41,7 @@ block content
                   label.addressInfo
                     input(type='radio', name='address' value=`${index}`)
                     span.user-address
-                      span.address=address.address
+                      span.address=address.location+address.address
                       span （
                       span.username=address.username
                       span  收）
@@ -68,6 +68,8 @@ block content
                   p(style="background-color: antiquewhite;width: fit-content;")   
                     span 卖家：
                     span!=bill.user.username
+                    span(style="margin-left:20px;color:#000")
+                      a.btn(href=`/message?uid=${bill.user.uid}`).fa.fa-commenting 联系卖家
               for cart in bill.carts
                 mixin orderCert(cart) 
                   if cart.product.uploadCert
