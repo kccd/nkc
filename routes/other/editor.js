@@ -79,6 +79,7 @@ editorRouter
       // if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
       data.content = targetPost.c;  //回复内容
       data.title = targetPost.t;  //回复标题
+      data.abstract = targetPost.abstract; // 文章摘要
 	    data.l = targetPost.l;
       data.targetUser = await targetPost.extendUser();  //回复对象
       // 在屏蔽日志中查找该帖子是否处于正在退修中

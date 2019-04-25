@@ -19,7 +19,8 @@ permissionRouter
       rolesId, relation,
       shareLimitCount,
       shareLimitTime,
-      moderators
+      moderators,
+      subType
 		} = body;
 		const rolesDB = await db.RoleModel.find();
 		const rolesIdDB = rolesDB.map(r => r._id);
@@ -38,6 +39,7 @@ permissionRouter
 			}
 		}
     if(!['and', 'or'].includes(relation)) ctx.throw(400, '用户角色与用户等级关系设置错误，请刷新页面重试');
+    if(!["free", "force", "unSub"].includes(subType)) ctx.throw(400, "请选择关注类型");
     moderators = moderators.split(',');
     const oldModerators = forum.moderators;
     for(let uid of oldModerators) {
@@ -68,7 +70,8 @@ permissionRouter
         relation,
         shareLimitCount,
         shareLimitTime,
-        moderators: moderators_
+        moderators: moderators_,
+        subType
 		  }
 		);
 		await redis.cacheForums();

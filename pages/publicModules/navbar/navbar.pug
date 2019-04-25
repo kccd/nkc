@@ -76,7 +76,24 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                   span.pull-right.fa.fa-angle-right
               li
                 a(href='/message')
+                  span.fa.fa-comment-o &nbsp;订阅
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href='/message')
+                  span.fa.fa-comment-o &nbsp;最新
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href='/message')
                   span.fa.fa-comment-o &nbsp;消息
+                  span.pull-right.fa.fa-angle-right
+            else
+              li
+                a(href='/message')
+                  span.fa.fa-comment-o &nbsp;推荐
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href='/message')
+                  span.fa.fa-comment-o &nbsp;最新
                   span.pull-right.fa.fa-angle-right
             li
               a(href='/fund')
@@ -141,11 +158,19 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
     //- 电脑屏幕
     .collapse.navbar-collapse
       ul.nav.navbar-nav
-        li(class=navbar_highlight==='latest'?'active':'')
-          a(href='/' title='扫一眼') 最新
-        li(class=[(navbar_highlight==='message'?'active':''), 'message-nav'])
-          .nav-message-num.message-switch(class=!messageSum?'disabled': '')= messageSum
-          a(href=`/message` title='消息') 消息
+        if data.user
+          li(class=navbar_highlight === 'latest' ? 'active' : '')
+            a(href='/' title='扫一眼') 订阅
+          li(class=navbar_highlight === 'latest' ? 'active' : '')
+            a(href='/' title='扫一眼') 最新
+          li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
+            .nav-message-num.message-switch(class=!messageSum ? 'disabled' : '')= messageSum
+            a(href=`/message` title='消息') 消息
+        else
+          li(class=navbar_highlight==='latest'?'active':'')
+            a(href='/' title='扫一眼') 推荐
+          li(class=navbar_highlight === 'latest' ? 'active' : '')
+            a(href='/' title='扫一眼') 最新
         li(class=navbar_highlight==='fund'?'active':'')
           a(href=`/fund` title='科创基金') 基金
       ul.nav.navbar-nav.navbar-right.nav-font-color
@@ -168,6 +193,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
               aria-expanded="false"
             )
               span(title=title)= user.username || `用户${user.uid}`
+              span.caret
 
             //- 用户名下拉列表
             ul.dropdown-menu

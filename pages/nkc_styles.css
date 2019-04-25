@@ -647,11 +647,7 @@ width: 100%;
     color: #b0c1b0;
     font-size: 14px;
 }
-.forum-category{
-  padding: 0.5rem;
-  background-color: #f3f3f3;
-  border-radius: 7px;
-}
+
 .forum-notice a{
   color: #333333;
   display: inline-block;
@@ -667,18 +663,7 @@ width: 100%;
 .forum-home .forum-declare img{
   max-width: 100%;
 }
-.forum-category a{
-  display: inline-block;
-  padding: 0.2rem 0.2rem;
-  border-radius: 5px;
-  text-decoration: none;
-  margin-right: 0.3rem;
-  font-size: 1.2rem;
-}
-.forum-category a:hover{
-  background-color: #ddd;
-  color: #fff;
-}
+
 .ForumThreadNormal,.ForumThreadNormal:focus{
   color: #505c65;
 }

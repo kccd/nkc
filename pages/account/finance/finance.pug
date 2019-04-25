@@ -62,8 +62,7 @@ block content
                       a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
                     if record.ordersId && record.ordersId.length !== 0
                       span=`订单号（${record.ordersId.join(', ')}）`
-                    if record.type === "withdraw"
-                      a(href=`/account/finance/withdraw/help?id=${record._id}`) 提现未到账？
+
           if !data.kcbsRecords.length
             .text-center 暂无记录        
         else 

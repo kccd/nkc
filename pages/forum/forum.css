@@ -59,7 +59,7 @@
   font-weight: 500;
 }
 .forum-abbr{
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 .forum-number{
   margin-top: 1rem;
@@ -112,4 +112,29 @@
   text-align: center;
   color: #666;
   font-weight: 700;
+}
+.forum-category{
+  padding: 1rem 0.5rem;
+  background-color: #d9e1e8;
+  border-radius: 3px;
+}
+.forum-category a.active{
+  color: #fff;
+  background-color: #9baec8;
+}
+.forum-category a{
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.3rem;
+  border-radius: 2px;
+  text-decoration: none;
+  margin-right: 0.3rem;
+  color: #656565;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.forum-category a:hover{
+  background-color: #9baec8;
+  color: #fff;
 }

@@ -62,10 +62,6 @@ module.exports = {
 	    GET:'visitLoginSettings',
       PATCH: 'modifyLoginSettings'
     },
-    register: {
-      GET: 'visitRegisterSettings',
-      PATCH: 'modifyRegisterSettings'
-    },
 		sms: {
 			GET: 'visitSmsSettings',
 			PATCH: 'modifySmsSettings',
@@ -146,14 +142,6 @@ module.exports = {
 			GET: 'visitEForumSettings',
 			PATCH: 'modifyEForumSettings'
 		},
-		/*score: {
-			GET: 'visitScoreSettings',
-			PATCH: 'modifyScoreSettings'
-		},*/
-		/*download: {
-			GET: 'visitDownloadSettings',
-			PATCH: 'modifyDownloadSettings'
-		},*/
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',
@@ -206,6 +194,10 @@ module.exports = {
     sub: {
       GET: "experimentalSubSettings",
       PATCH: "experimentalSubSettings"
+    },
+    register: {
+      GET: "experimentalRegisterSettings",
+      PATCH: "experimentalRegisterSettings"
     },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',

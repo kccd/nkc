@@ -4,7 +4,7 @@ block title
   link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
 block content
   -const mainContainer1400 = true
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       if data.type === 'register'
         .col-xs-12.col-md-4.col-md-offset-4
@@ -13,7 +13,7 @@ block content
           hr
       .col-xs-12.col-md-8.col-md-offset-2
         br
-        h4.text-center(style='color: #888888') 请选择您喜欢的领域，我们会优先向您推荐您感兴趣的内容。
+        h4.text-center(style='color: #888888') 请选择您感兴趣的话题或学科，优先向您展示关注的内容。
       -const selectBox = true;
       -const disabledA = true;
       mixin createForumsList(forums)

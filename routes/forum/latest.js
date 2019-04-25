@@ -61,7 +61,8 @@ latestRouter
 		const threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 
 		data.threads = await db.ThreadModel.extendThreads(threads, {
-		  category: true
+		  category: true,
+      htmlToText: true
     });
 
 		// 构建置顶文章查询条件

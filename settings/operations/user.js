@@ -73,6 +73,10 @@ module.exports = {
 			  GET: 'visitUserRedEnvelopeSettings',
         PATCH: 'modifyUserRedEnvelopeSettings'
       },
+      display: {
+			  GET: 'userDisplaySettings',
+        PATCH: 'userDisplaySettings'
+      },
       alipay: {
 			  GET: "userBindAlipayAccounts",
         POST: "userBindAlipayAccounts"

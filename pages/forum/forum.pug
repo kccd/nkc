@@ -52,7 +52,12 @@ block content
                     //.col-xs-4.col-md-2
                     //  .number=data.usersId.length
                     //  .title 今日来访
-          .col-xs-12.col-md-12.m-t-2
+          .col-xs-12.col-md-12.m-t-1
+            if data.threadTypes.length > 0
+              .forum-category.m-b-2
+                a(class=!data.cat?"active":"" href=`/f/${data.forum.fid}`) 全部
+                for threadType in data.threadTypes
+                  a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
             .hidden-xs.hidden-sm
               include ../publicModules/paging/paging
             if data.paging.page === 0 && data.toppedThreads.length > 0
@@ -63,6 +68,9 @@ block content
               include ../publicModules/thread_panel/thread_panel
             include ../publicModules/paging/paging
       .col-xs-12.col-md-3
+        .forum-single-panel
+          .forum-single-panel-header
+
 
 block scripts
   include ../publicModules/vue_forums_nav/vue_forums_nav_js

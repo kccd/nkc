@@ -187,6 +187,15 @@ const forumSchema = new Schema({
     type: String,
     required: true,
     index: 1
+  },
+  // 关注类型
+  // force: 强制关注（关注后不可取消）
+  // free: 自由关注（可取消）
+  // unSub: 不可关注（已关注的可取消）
+  subType: {
+    type: String,
+    default: "free",
+    index: 1
   }
 }, {toObject: {
 		getters: true,

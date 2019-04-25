@@ -1,0 +1,28 @@
+extends bootstrap_base
+block title
+  title 显示设置
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+
+        .panel.panel-primary
+          .panel-heading
+            span 红包设置
+          .panel-body
+            .col-xs-12.col-md-12
+              span 接收随机红包：
+                .checkbox(style='display:inline-block;')
+                  | 我的关注
+                  input(type='radio'  name='r' checked=data.user.generalSettings.displaySettings.homeThreadList==="subscribe")
+                  | &nbsp;&nbsp;&nbsp;
+                  | 最新
+                  input(type='radio' name='r' checked=data.user.generalSettings.displaySettings.homeThreadList==="latest")
+            .col-xs-12.col-md-12
+              button.btn.btn-primary(onclick=`save("${data.user.uid}")`) 保存
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_user_settings_email.js')

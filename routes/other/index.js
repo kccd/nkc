@@ -15,6 +15,7 @@ const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
 const adRouter = require('./ad');
 const rtRouter = require('./rt');
+const rmRouter = require('./rm');
 const qrCodeRouter = require('./qrcode');
 const searchRouter = require('./search');
 const photoRouter = require('./photo');
@@ -64,6 +65,7 @@ otherRouter
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
   // .use('', homeRouter.routes(), homeRouter.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
+  .use('rm', rmRouter.routes(), rmRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
   .use('search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())

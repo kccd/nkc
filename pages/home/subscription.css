@@ -1,8 +1,9 @@
 .swiper-home{
+  margin-top: 1rem;
   border-radius: 3px;
 }
 .swiper-slide{
-  min-height: 24rem;
+  min-height: 16rem;
   position: relative;
   background-repeat:no-repeat;
   background-size: cover;

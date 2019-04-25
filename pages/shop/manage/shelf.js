@@ -4,7 +4,7 @@
 function initTime() {
 	if(!$('.time').length){
 		return;
-	}
+  }
 	$('.time').datetimepicker({
 		language:  'zh-CN',
 		format: 'yyyy-mm-dd hh:ii',
@@ -119,6 +119,9 @@ $(document).ready(function() {
     }else{
       $("#freightPriceDom").css("display", "none")
     }
+  })
+  $("#productDescription").on("input propertychange" ,function() {
+    $("#productDescriptionNum").text($("#productDescription").val().length)
   })
 })
 

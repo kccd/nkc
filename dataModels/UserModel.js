@@ -545,6 +545,7 @@ userSchema.statics.createUser = async (option) => {
 	const UsersPersonalModel = mongoose.model('usersPersonal');
 	const UsersSubscribeModel = mongoose.model('usersSubscribe');
 	const PersonalForumModel = mongoose.model('personalForums');
+	const SubscribeModel = mongoose.model("subscribes");
 	const SettingModel = mongoose.model('settings');
 	const UsersGeneraModel = mongoose.model('usersGeneral');
 	const MessageModel = mongoose.model('messages');
@@ -591,6 +592,10 @@ userSchema.statics.createUser = async (option) => {
 	const personalForum = PersonalForumModel(userObj);
 	const userGeneral = UsersGeneraModel({uid});
 
+	// 生成关注专业记录
+  const regSettings = await SettingModel.findById("register");
+  const {defaultSubscribeForumsId} = regSettings.c;
+
 	try {
 		await user.save();
 		await userPersonal.save();
@@ -603,6 +608,17 @@ userSchema.statics.createUser = async (option) => {
 			viewedUsers.push(uid);
 			await sms.update({viewedUsers});
 		}
+
+		for(const fid of defaultSubscribeForumsId) {
+		  const sub = SubscribeModel({
+        _id: await SettingModel.operateSystemID("subscribes", 1),
+        uid,
+        type: "forum",
+        fid
+      });
+		  await sub.save();
+    }
+
 	} catch (error) {
 		await UserModel.remove({uid});
 		await UsersPersonalModel.remove({uid});
@@ -610,7 +626,12 @@ userSchema.statics.createUser = async (option) => {
 		await PersonalForumModel.remove({uid});
 		await UsersGeneraModel.remove({uid});
 		await SystemInfoLogModel.remove({uid});
-		const err = new Error(`新建用户出错: ${error}`);
+		await SubscribeModel.remove({
+      uid,
+      type: "forum",
+      fid: {$in: defaultSubscribeForumsId}
+    });
+		const err = new Error(`创建用户出错: ${error}`);
 		err.status = 500;
 		throw err;
 	}

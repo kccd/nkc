@@ -527,6 +527,10 @@
   "delShelfAuth": "[SY]解除用户商品上架封禁",
   "experimentalSubSettings": "后台管理-关注设置",
   "visitForumBanner": "获取专业的banner图片",
+  "getThumbs": "[VI]获取小图(略缩图)150",
+  "getMediums": "[VI]获取中图640",
+  "experimentalRegisterSettings": "后台管理-注册设置",
+  "userDisplaySettings": "用户设置-显示设置",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

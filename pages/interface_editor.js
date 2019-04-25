@@ -537,6 +537,7 @@ function onPost(that) {
     var desTypeId = $("#draftDelTypeId").html() || '';
     var did = $("#draftId").html() || '';
     var title = that.title.value.trim();
+    var abstract = $("#abstract").val().trim();
     var type = that.query.type;
     var cat = that.query.cat;
     var id;
@@ -594,6 +595,9 @@ function onPost(that) {
       mid: that.query.mid,
       desType: desType,
       desTypeId: desTypeId
+    };
+    if(type == "post") {
+      post.abstract = abstract
     };
     /*if (!that.blocked && (!that.childID)) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');

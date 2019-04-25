@@ -1,11 +1,12 @@
 extends bootstrap_base
 block title
+  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   title 交易信息设置
   -const mainContainer1400 = true
   link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
 
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_user_settings
@@ -15,6 +16,7 @@ block content
             span 交易信息设置
           .panel-body
             button.btn.btn-primary(onclick='addAddress()') 添加交易信息
+            button#test 测试       
             #addressDiv
             .template.hidden
               .form-horizontal(style='margin: 2rem 0;')
@@ -26,7 +28,8 @@ block content
                 .form-group
                   label.col-sm-2.control-label 收货地址：
                   .col-sm-6
-                    input.form-control.address(type='text')
+                    input.location.form-control(name='', type='text', placeholder='请选择省、市、区', autocomplete='off', readonly='true', value=`${data.dealInfo?data.dealInfo.location:""}`)
+                    input.form-control.address(type='text' placeholder="填写详细地址")
                 .form-group
                   label.col-sm-2.control-label 联系电话：
                   .col-sm-6
@@ -55,3 +58,9 @@ block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
   script(src=`/interface_user_settings_transaction.js?v=${global.NKC.startTime}`)
+  +includeJS('/external_pkgs/citySet/city.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')  
+  script.
+    $(".location").click(function (e) {
+      SelCity(this,e);
+    });
