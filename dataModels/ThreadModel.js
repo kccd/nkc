@@ -111,28 +111,81 @@ const threadSchema = new Schema({
     default: [],
     index: 1
   },
+
   // 自定义分类
   customForumsId: {
     type: [String],
     default: [],
     index: 1
   },
+
   // cid的集合
   categoriesId: {
     type: [String],
     default: [],
     index: 1
   },
+
   uid: {
     type: String,
     required: true,
     index: 1
   },
+
+  // 文章是否关闭，关闭后不可回复
 	closed: {
   	type: Boolean,
 		default: false,
 		index: 1
-	}
+	},
+
+  // 首条回复的支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  // 首条回复的反对数
+  voteDown: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 所有回复的鼓励总数
+  encourageTotal: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 支持总数 所有回复支持之和
+  voteUpTotal: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  // 反对总数 所有回复反对之和
+  voteDownTotal: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 最大支持数 回复中最高的支持数
+  voteUpMax: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 回复的用户数，已去重
+  replyUserCount: {
+    type: Number,
+    default: 0,
+    index: 1
+  }
+
 }, {toObject: {
   getters: true,
   virtuals: true
@@ -291,6 +344,65 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
   return posts;
 };
 
+/*
+* 更新文章的支持、反对数量
+* 数据来源于文章下的post
+* */
+threadSchema.methods.updateThreadVote = async function() {
+  const PostModel = mongoose.model("posts");
+  const updateObj = {};
+  const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
+  updateObj.voteUp = oc.voteUp;
+  updateObj.voteDown = oc.voteDown;
+  let count = await PostModel.aggregate([
+    {
+      $match: {
+        tid: this.tid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$voteUp"
+        }
+      }
+    }
+  ]);
+  updateObj.voteUpTotal = count.length? count[0].total: 0;
+
+  count = await PostModel.aggregate([
+    {
+      $match: {
+        tid: this.tid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$voteDown"
+        }
+      }
+    }
+  ]);
+  updateObj.voteDownTotal = count.length? count[0].total: 0;
+
+  const voteUpMax = await PostModel.findOne({tid: this.tid}).sort({voteUp: -1});
+  updateObj.voteUpMax = voteUpMax? voteUpMax.voteUp: 0;
+  await this.update(updateObj);
+};
+/*
+* 更新文章的鼓励数量
+* */
+threadSchema.methods.updateThreadEncourage = async function() {
+  const PostModel = mongoose.model('posts');
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const posts = await PostModel.find({tid: this.tid}, {pid: 1});
+  const pid = posts.map(p => p.pid);
+  const encourageTotal = await KcbsRecordModel.count({type: "creditKcb", pid: {$in: pid}});
+  await this.update({encourageTotal});
+};
 
 threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = mongoose.model('posts');
@@ -307,14 +419,28 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countToday = await PostModel.count({tid: this.tid, toc: {$gt: time}});
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
+
+  const userCount = await PostModel.aggregate([
+    {
+      $match: {
+        tid: this.tid
+      }
+    },
+    {
+      $group: {
+        _id: "$uid"
+      }
+    }
+  ]);
+  updateObj.replyUserCount = userCount.length - 1;
+
+
   await this.update(updateObj);
   await PostModel.updateMany({tid: this.tid}, {$set: {mainForumsId: this.mainForumsId}});
   const forums = await this.extendForums(['mainForums']);
   await Promise.all(forums.map(async forum => {
     await forum.updateForumMessage();
   }));
-  /*const user = await this.extendUser();
-  await user.updateUserMessage();*/
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {

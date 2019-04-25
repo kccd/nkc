@@ -10,10 +10,10 @@ block content
 
         .panel.panel-primary
           .panel-heading
-            span 红包设置
+            span 显示设置
           .panel-body
             .col-xs-12.col-md-12
-              span 接收随机红包：
+              span 首页文章列表来源：
                 .checkbox(style='display:inline-block;')
                   | 我的关注
                   input(type='radio'  name='r' checked=data.user.generalSettings.displaySettings.homeThreadList==="subscribe")
@@ -24,5 +24,20 @@ block content
               button.btn.btn-primary(onclick=`save("${data.user.uid}")`) 保存
 
 block scripts
-  script(src='/interface_common.js')
-  script(src='/interface_user_settings_email.js')
+  script.
+    function save(uid) {
+      var dom = $("input[name='r']");
+      var homeThreadList = "latest";
+      if(dom.eq(0).prop("checked")) {
+        homeThreadList = "subscribe";
+      }
+      nkcAPI("/u/" + uid + '/settings/display', "PATCH", {
+        homeThreadList: homeThreadList
+      })
+        .then(function() {
+          screenTopAlert("保存成功");
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    }

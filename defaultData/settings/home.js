@@ -3,12 +3,13 @@ module.exports = {
   c: {
     ads: [],
     logos: [],
-    logo: String,
-    smallLogo: String,
+    logo: "",
+    smallLogo: "",
     noticeThreadsId: [],
     list: {
       topic: true,
       discipline: true
-    }
+    },
+    visitorThreadList: "recommend"
   }
 };

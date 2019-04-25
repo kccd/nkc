@@ -10,11 +10,13 @@ router
   })
   .patch('/', async (ctx, next) => {
     const {db, body} = ctx;
-    const {topic, discipline} = body;
+    const {topic, discipline, visitorThreadList} = body;
+    if(!["recommend", "latest"].includes(visitorThreadList)) ctx.throw(400, `参数visitorThreadList错误：${visitorThreadList}`);
     await db.SettingModel.update({_id: 'home'}, {$set: {
       'c.list.topic': !!topic,
-      'c.list.discipline': !!discipline
-    }})
+      'c.list.discipline': !!discipline,
+      'c.visitorThreadList': visitorThreadList
+    }});
     await next();
   });
 module.exports = router;

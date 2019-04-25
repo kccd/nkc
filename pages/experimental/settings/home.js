@@ -123,14 +123,64 @@ function saveHomeListSettings() {
   var inputs = $('input[name="list"]');
   var topic = inputs.eq(0).is(':checked');
   var discipline = inputs.eq(1).is(':checked');
+  var visitorThreadList = $('input[name="visitor"]');
+  visitorThreadList = visitorThreadList.eq(0).is(":checked")?"latest": "recommend";
   nkcAPI('/e/settings/home/list', 'PATCH', {
     topic: topic,
-    discipline: discipline
+    discipline: discipline,
+    visitorThreadList: visitorThreadList
   })
   .then(function() {
     screenTopAlert('保存成功');
   })
   .catch(function(data) {
     screenTopWarning(data.error || data);
+  });
+}
+var vueDom = document.getElementById("app");
+if(vueDom) {
+  var app = new Vue({
+    el: '#app',
+    data: {
+      homeSettings: '',
+      info: '',
+      list: [],
+      error: ""
+    },
+    mounted: function() {
+      var data = getDataById("data");
+      this.homeSetting = data.homeSettings;
+      if(this.homeSetting.list.topic) {
+        this.list.push("topic");
+      }
+      if(this.homeSetting.list.discipline) {
+        this.list.push("discipline");
+      }
+    },
+    methods: {
+      save: function() {
+        this.error = "";
+        this.info = "";
+        var homeSettings = this.homeSettings;
+        var list = this.list;
+        if(list.indexOf('topic') !== -1) {
+          homeSettings.list.topic = true;
+        }
+        if(list.indexOf("discipline") !== -1) {
+          homeSettings.list.discipline = true;
+        }
+        nkcAPI('/e/settings/home/list', 'PATCH', {
+          topic: homeSettings.list.topic,
+          discipline: homeSettings.list.discipline,
+          visitorThreadList: homeSettings.visitorThreadList
+        })
+          .then(function() {
+            app.info = "保存成功";
+          })
+          .catch(function(data) {
+            app.error = data.error || data;
+          });
+      }
+    }
   });
 }
