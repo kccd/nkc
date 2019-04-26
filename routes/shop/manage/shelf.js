@@ -41,7 +41,7 @@ shelfRouter
     const {user} = data;
     let {
       productName,
-      attentions,
+      attention,
       productDescription,
       productDetails,
       mainForumsId,
@@ -54,6 +54,7 @@ shelfRouter
       shelfTime,
       purchaseLimitCount,
       productParams,
+      singleParams,
       uploadCert,
       uploadCertDescription
     } = body.post;
@@ -63,6 +64,7 @@ shelfRouter
     if(contentLength(productName) > 100) ctx.throw(400, '商品名不能超过100字节');
     if(!productDescription) ctx.throw(400, '商品描述不能为空');
     if(contentLength(productDescription) > 500) ctx.throw(400, '商品描述不能超过500字节');
+    if(!attention) attention = "";
     if(!productDetails) ctx.throw(400, '商品详细介绍不能为空');
     if(contentLength(productDetails) > 50000) ctx.throw(400, '商品详细介绍不能超过50000字节');
     const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
@@ -120,6 +122,7 @@ shelfRouter
     const options = {
       title: productName,
       abstract: productDescription,
+      keywords: attention,
       content: productDetails,
       uid: user.uid,
       fids: mainForumsId,
@@ -131,7 +134,6 @@ shelfRouter
     const productId = await db.SettingModel.operateSystemID('shopGoods', 1);
     const product = db.ShopGoodsModel({
       productId,
-      attentions,
       purchaseLimitCount,
       ip: ctx.address,
       mainForumsId,
@@ -149,16 +151,33 @@ shelfRouter
       threadInfo: options
     });
 
+    // 存储多规格
+    let paraIdArr = [];
     for(const p of productParams) {
-      if(p.originPrice < 0) continue;
+      if(p.originPrice < 0) p.originPrice = 0;
       p.productId = productId;
       p.uid = user.uid;
       p.stocksSurplus = p.stocksTotal;
       p._id = await db.SettingModel.operateSystemID('shopProductsParams', 1);
+      paraIdArr.push(p._id);
       const d = db.ShopProductsParamModel(p);
       await d.save();
     }
-
+    // 存储独立规格
+    let singleParaIdArr = [];
+    for(const s of singleParams) {
+      if(s.originPrice < 0) s.originPrice = 0;
+      s.productId = productId;
+      s.uid = user.uid;
+      s.type = "single";
+      s.stocksSurplus = s.stocksTotal;
+      s._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
+      singleParaIdArr.push(s._id);
+      const sd = db.ShopProductsParamModel(s);
+      await sd.save();
+    }
+    product.singleParaIdArr = singleParaIdArr;
+    product.paraIdArr = paraIdArr;
     await product.save();
 
     // 立即上架

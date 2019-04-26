@@ -272,7 +272,6 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   if(!o) o = {};
   let options = {
     product: false,
-    productParam: false,
     sellUser: true,
     buyUser: true,
     params: true
@@ -283,7 +282,7 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   const UserModel = mongoose.model("users");
   const ShopCostRecord = mongoose.model("shopCostRecord");
   const productId = new Set(), productObj = {};
-  const paramId = new Set(), productParamObj = {};
+  // const paramId = new Set(), productParamObj = {};
   const sellUid = new Set(), sellUserObj = {};
   const buyUid = new Set(), buyUserObj = {};
   const orderId = new Set(), paramsObj = {};
@@ -299,7 +298,7 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
     if(o.params)
       orderId.add(ord.orderId)
   });
-  let products, productParams, sellUsers, buyUsers, params;
+  let products, sellUsers, buyUsers, params;
   if(o.product) {
     products = await ShopGoodsModel.find({productId: {$in:[...productId]}});
     products = await ShopGoodsModel.extendProductsInfo(products);
@@ -307,13 +306,13 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
       productObj[product.productId] = product;
     }
   }
-  if(o.productParam) {
-    productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
-    productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
-    for(const productParam of productParams) {
-      productParamObj[productParam._id] = productParam
-    }
-  }
+  // if(o.productParam) {
+  //   productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
+  //   productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
+  //   for(const productParam of productParams) {
+  //     productParamObj[productParam._id] = productParam
+  //   }
+  // }
   if(o.sellUser) {
     sellUsers = await UserModel.find({uid: {$in: [...sellUid]}});
     for(const sellUser of sellUsers) {
@@ -337,7 +336,7 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
     if(o.product) order.product = productObj[ord.productId];
-    if(o.productParam) order.productParam = productParamObj[ord.paramId];
+    // if(o.productParam) order.productParam = productParamObj[ord.paramId];
     if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
     if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
     if(o.params) order.params = paramsObj[ord.orderId];
@@ -366,7 +365,7 @@ shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
       let needAdd = true;
       if(needAdd) {
         const old = title;
-        title += `${c.count}*${c.product.name}(${c.productParam.name.join('+ ')}) `;
+        title += `${c.count}*${c.product.name}(${c.productParam.name}) `;
         if(title.length >= 150) {
           needAdd = false;
           title = old + '...';

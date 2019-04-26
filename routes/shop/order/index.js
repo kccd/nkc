@@ -97,11 +97,14 @@ router
       // 添加购买记录
       for(let cart of post[bill].carts) {
         let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
+        let newProductParam = await db.ShopProductsParamModel.findOne({_id:cart.productParamId});
+        if(!newProductParam) ctx.throw(400, "商品规格已被商家修改，请重新下单")
         let cartObj = {
           costId,
           orderId,
           productId: cart.productId,
           productParamId: cart.productParamId,
+          productParam: newProductParam,
           count: cart.count,
           uid: cart.uid,
           freightPrice: cart.freightPrice,

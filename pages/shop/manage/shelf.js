@@ -21,15 +21,59 @@ var productImageDomId;
 var skip = 0;
 $(function () { $("[data-toggle='popover']").popover(); });
 
-function ceshi() {
-  console.log($("#test").val())
-}
-
 $(document).ready(function() {
+  var data = document.getElementById('data');
+  if(data) {
+    data = JSON.parse(data.innerHTML);
+    var product = data.product;
+    // 拓展商品属性列表
+    var params = product.params;
+    if(params.length > 0) {
+      for(var i in params) {
+        var paramDom = '<tr><td style="width:5%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td><td style="width:10%"><input type="text" class="pname pnameCla" data-role="tagsinput" value="'+params[i].name+'"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%" value="'+params[i].values+'"></td>><td style="width:5%"><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
+        $("#paramsTable").find("tbody").append(paramDom)
+        $(".pvalue").tagsinput({
+          maxChars: 8, // 单个标记最大字符数 
+          maxTags: 20, // 最大标签数
+        })
+      }
+    }
+    // 拓展商品详细规格
+    var productParams = product.productParams;
+    if(params.length > 0) {
+      var trDom = "";
+      var trDomSingle = "";
+      for(var a in productParams) {
+        if(productParams[a].type == "common"){
+          var checkDom;
+          if(productParams[a].useDiscount) {
+            checkDom = '<input type="checkbox" class="usedis" checked>';
+          }else{
+            checkDom = '<input type="checkbox" class="usedis">'
+          }
+          if(!productParams[a].isEnable) {
+            trDom += '<tr style="background-color:#ddd"><td contenteditable="false" sid="'+productParams[a].index+'" class="paraid">'+productParams[a].name+'</td><td style="width:15%"><button class="ban" onclick="banParam(this)" style="display:none">禁用</button><button class="enable" onclick="enableParam(this)">启用</button><span class="text-danger bantext" style="font-size:10px;margin-left:5px">禁用中</span></td><td><input type="text" class="oprice" style="width:100%;background-color:#ddd" value="'+numToFloatTwo(productParams[a].originPrice)+'" readonly></td><td><input type="text" class="count" style="width:100%;background-color:#ddd" value="'+productParams[a].stocksSurplus+'" readonly></td><td contenteditable="false">'+checkDom+'</td><td><input type="text" class="dprice" style="width:100%;background-color:#ddd" value="'+numToFloatTwo(productParams[a].price)+'" readonly></td></tr>';
+          }else{
+            trDom += '<tr><td contenteditable="false" sid="'+productParams[a].index+'" class="paraid">'+productParams[a].name+'</td><td style="width:15%"><button class="ban" onclick="banParam(this)">禁用</button><button class="enable" onclick="enableParam(this)" style="display:none">启用</button><span class="text-danger bantext" style="font-size:10px;margin-left:5px;display:none">禁用中</span></td><td><input type="text" class="oprice" style="width:100%" value="'+numToFloatTwo(productParams[a].originPrice)+'"></td><td><input type="text" class="count" style="width:100%" value="'+productParams[a].stocksSurplus+'"></td><td contenteditable="false">'+checkDom+'</td><td><input type="text" class="dprice" style="width:100%" value="'+numToFloatTwo(productParams[a].price)+'"></td></tr>';
+          }
+        }else{
+          var checkDom;
+          if(productParams[a].useDiscount) {
+            checkDom = '<input type="checkbox" class="singleUseDiscount" checked>';
+          }else{
+            checkDom = '<input type="checkbox" class="singleUseDiscount">'
+          }
+          trDomSingle += '<tr><td><input type="text" class="singleName" value="'+productParams[a].name+'"></td><td><input type="text" class="singleOriginPrice" value="'+numToFloatTwo(productParams[a].originPrice)+'"></td><td><input type="text" class="singleCount" value="'+productParams[a].stocksSurplus+'"></td><td>'+checkDom+'</td><td><input type="text" class="singlePrice" value="'+numToFloatTwo(productParams[a].price)+'"></td><td><button onclick="delSingleParam(this)" class="btn btn-danger btn-sm padding-0 margin-right-10">删除</button></td></tr>';
+        }
+      }
+      $("#arrayTable").find("tbody").html(trDom)
+      $("#singleParams").find("tbody").html(trDomSingle)
+    }
+  }
   $("#test").tagsinput({
-    // maxChars: 3, // 单个标记最大字符数
-    // maxTags: 3, // 标记的最大个数
-    // trimValue: true, // 默认删除编辑周围的空格
+    maxChars: 8, // 单个标记最大字符数 
+    maxTags: 20, // 最大标签数
+    trimValue: true, // 默认删除编辑周围的空格
     // typeahead: {
     //   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo']
     // }
@@ -146,13 +190,10 @@ function submitToShelf() {
   // if(!productName) throw("请输入商品标题");
   var productDescription = $("#productDescription").val(); //商品描述
   // 获取商品的特殊说明
-  var attentions = [];
-  $(".attention").each(function() {
-    var attStr = $(this).val().trim();
-    if(attStr.length > 0){
-      attentions.push(attStr)
-    }
-  })
+  var attention = $(".attention").val();
+  if(attention.length > 200) {
+    throw("关键词不能超过200字");
+  }
   productDescription = productDescription.trim();
   if(!productDescription) throw("请输入商品描述");
   var productOriginalPrice = $("#originalPrice").val(); // 商品原始价格
@@ -210,6 +251,7 @@ function submitToShelf() {
 
   var params = tableTurnParams();
   var productParams = obtainProductPrice();
+  var singleParams = getSingleParams();
   // 获取物流价格
   var isFreePost = true; // 是否免邮
   var freightPrice = {
@@ -254,7 +296,8 @@ function submitToShelf() {
     params: params,
     mainForumsId: mainForumsId,
     productParams: productParams,
-    attentions: attentions,
+    singleParams: singleParams,
+    attention: attention,
     purchaseLimitCount:purchaseLimitCount
   }
   return post;
@@ -429,12 +472,66 @@ function showAttachment() {
  * 新增一条自定义属性
  */
 function addNewParam() {
-  var newParamDom = '<tr><td style="width:20%"><input type="text" class="pname" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td><td style="width:10%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
+  if($("#paramsTable tbody tr").length == 5) {
+    return screenTopAlert("属性种类最大数量为5")
+  }
+  var newParamDom = '<tr><td style="width:5%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td><td style="width:10%"><input type="text" class="pname pnameCla" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td>><td style="width:5%"><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
   $("#paramsTable").find("tbody").append(newParamDom)
   $(".pvalue").tagsinput({
-    maxChars: 5, // 单个标记最大字符数 
-    maxTags: 5, // 最大标签数
+    maxChars: 8, // 单个标记最大字符数 
+    maxTags: 20, // 最大标签数
   })
+}
+
+/**
+ * 新增一条独立规格
+ */
+function addSingleParam() {
+  var singleParam = '<tr><td><input type="text" class="singleName"></td><td><input type="text" class="singleOriginPrice"></td><td><input type="text" class="singleCount"></td><td><input type="checkbox" class="singleUseDiscount"></td><td><input type="text" class="singlePrice"></td><td><button onclick="delSingleParam(this)" class="btn btn-danger btn-sm padding-0 margin-right-10">删除</button></td></tr>';
+  $("#singleParams").find("tbody").append(singleParam);
+}
+
+/**
+ * 删除当前的独立规格
+ */
+function delSingleParam(para) {
+  $(para).parents("tr").remove();
+}
+
+/**
+ * 获取独立规格全部条目
+ */
+function getSingleParams() {
+  var singleParams = [];
+  var isUseParams = $("#useparams").prop("checked");
+  if(isUseParams) {
+    $("#singleParams tbody tr").each(function(index, ele) {
+      var obj = {};
+      var singleName = $(ele).find(".singleName").val();
+      if(!singleName) throw("独立规格名称不能为空");
+      var singleOriginPrice = Number($(ele).find(".singleOriginPrice").val());
+      if(!singleOriginPrice || isNaN(singleOriginPrice)) throw("请输入正确的独立规格价格");
+      var singleCount = Number($(ele).find(".singleCount").val());
+      if(!singleCount || isNaN(singleCount)) singleCount = 0;
+      var singlePrice = Number($(ele).find(".singlePrice").val());
+      if(!singlePrice || isNaN(singlePrice)) throw("独立规格优惠价格有误")
+      if(singlePrice > singleOriginPrice) throw("独立规格中优惠价格不得大于原价格");
+      var singleUseDiscount = $(ele).find(".singleUseDiscount").prop("checked");
+      obj.name = singleName;
+      obj.originPrice = singleOriginPrice*100;
+      obj.stocksSurplus = singleCount;
+      obj.stocksTotal = singleCount;
+      obj.price = singlePrice*100;
+      obj.useDiscount = singleUseDiscount;
+      singleParams.push(obj)
+    })
+    if(singleParams.length == 0){
+      singleParams = []
+    }
+  }else{
+    singleParams = [];
+  }
+  return singleParams;
 }
 
 /**
@@ -482,8 +579,11 @@ function saveNewParam(para) {
  * 删除自定义规格
  */
 function delParamTable(para) {
-  $(para).parents("tr").remove();
-  mulArrTurnTable();
+  var sureDel = confirm("确定要删除当前属性吗？");
+  if(sureDel) {
+    $(para).parents("tr").remove();
+    mulArrTurnTable();
+  }
 }
 
 // /**
@@ -528,8 +628,8 @@ function tableTurnParams() {
   if(isUseParams) {
     $("#paramsTable tbody tr").each(function(index, ele) {
       var obj = {};
-      obj.name = $(ele).find(".pname").text();
-      var valueStr = $(ele).find(".pvalue").text();
+      obj.name = $(ele).find(".pname").val();
+      var valueStr = $(ele).find(".pvalue").val();
       var valueArr = valueStr.split(",");
       obj.values = valueArr;
       params.push(obj)
@@ -679,31 +779,100 @@ function mulArrTurnTable() {
   var result = mulArrExchangeArr(rArr);
   var strs = mulArrExchangeStr(rArr);
   var trDom = "";
+  var hisDom = $("#arrayTable").find("tbody");
   if(rArr.length !== 0) {
     for(var i=0;i < result.length;i++) {
-      // trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td class="oprice"></td><td class="count"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td class="dprice"></td></tr>';
-      trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td><input type="text" class="oprice" style="width:100%"></td><td><input type="text" class="count" style="width:100%"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td><input type="text" class="dprice" style="width:100%"></td></tr>';
+      var useHis = false;
+      var hisPriceO;
+      var hisCount;
+      var hisUsedis;
+      var hisPriceD;
+      var hisBan;
+      hisDom.find("tr").each(function() {
+        if(result[i] == $(this).find(".paraid").text()) {
+          hisPriceO = $(this).find(".oprice").val();
+          hisCount = $(this).find(".count").val();
+          hisUsedis = $(this).find(".usedis").prop("checked");
+          hisPriceD = $(this).find(".dprice").val();
+          hisBan = $(this).find(".ban").css("display");
+          useHis = true;
+        }
+      })
+      if(!useHis) {
+        trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td style="width:15%"><button class="ban" onclick="banParam(this)">禁用</button><button class="enable" onclick="enableParam(this)" style="display:none">启用</button><span class="text-danger bantext" style="font-size:10px;margin-left:5px;display:none">禁用中</span></td><td><input type="text" class="oprice" style="width:100%"></td><td><input type="text" class="count" style="width:100%"></td><td contenteditable="false"><input type="checkbox" class="usedis"></td><td><input type="text" class="dprice" style="width:100%"></td></tr>';
+      }else{
+        var checkDom;
+        if(hisUsedis) {
+          checkDom = '<input type="checkbox" class="usedis" checked>';
+        }else{
+          checkDom = '<input type="checkbox" class="usedis">'
+        }
+        if(hisBan == "none") {
+          trDom += '<tr style="background-color:#ddd"><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td style="width:15%"><button class="ban" onclick="banParam(this)" style="display:none">禁用</button><button class="enable" onclick="enableParam(this)">启用</button><span class="text-danger bantext" style="font-size:10px;margin-left:5px;">禁用中</span></td><td><input type="text" class="oprice" style="width:100%;background-color:#ddd" value="'+hisPriceO+'" readonly></td><td><input type="text" class="count" style="width:100%;background-color:#ddd" value="'+hisCount+'" readonly></td><td contenteditable="false">'+checkDom+'</td><td><input type="text" class="dprice" style="width:100%;background-color:#ddd" value="'+hisPriceD+'" readonly></td></tr>';
+        }else{
+          trDom += '<tr><td contenteditable="false" sid="'+strs[i]+'" class="paraid">'+result[i]+'</td><td style="width:15%"><button class="ban" onclick="banParam(this)">禁用</button><button class="enable" onclick="enableParam(this)" style="display:none">启用</button><span class="text-danger bantext" style="font-size:10px;margin-left:5px;display:none">禁用中</span></td><td><input type="text" class="oprice" style="width:100%" value="'+hisPriceO+'"></td><td><input type="text" class="count" style="width:100%" value="'+hisCount+'"></td><td contenteditable="false">'+checkDom+'</td><td><input type="text" class="dprice" style="width:100%" value="'+hisPriceD+'"></td></tr>';
+        }
+      }
     }
   }
   $("#arrayTable").find("tbody").html(trDom)
 }
 
 /**
+ * 禁用当前规格
+ */
+function banParam(para) {
+  $(para).parents("tr").css("background-color","#ddd");
+  $(para).parents("tr").find(".oprice").attr("readonly","true");
+  $(para).parents("tr").find(".oprice").css("background-color","#ddd");
+  $(para).parents("tr").find(".count").attr("readonly","true");
+  $(para).parents("tr").find(".count").css("background-color","#ddd");
+  $(para).parents("tr").find(".dprice").attr("readonly","true");
+  $(para).parents("tr").find(".dprice").css("background-color","#ddd");
+  $(para).parents("tr").find(".ban").css("display", "none");
+  $(para).parents("tr").find(".enable").css("display", "");
+  $(para).parents("tr").find(".bantext").css("display", "");
+}
+
+/**
+ * 启用当前规格
+ */
+function enableParam(para) {
+  $(para).parents("tr").css("background-color", "");
+  $(para).parents("tr").find(".oprice").removeAttr("readonly");
+  $(para).parents("tr").find(".oprice").css("background-color","");
+  $(para).parents("tr").find(".count").removeAttr("readonly");
+  $(para).parents("tr").find(".count").css("background-color","");
+  $(para).parents("tr").find(".dprice").removeAttr("readonly");
+  $(para).parents("tr").find(".dprice").css("background-color","");
+  $(para).parents("tr").find(".ban").css("display", "");
+  $(para).parents("tr").find(".enable").css("display", "none");
+  $(para).parents("tr").find(".bantext").css("display", "none");
+}
+
+
+/**
  * 获取商品价格、库存、优惠价格
  */
 function obtainProductPrice() {
+  var name = "默认"; // 规格名称
+  var isEnable = true; // 禁用按钮状态
   var params; // 规格信息
   var productParams = []; // 具体规格组合
   var originalPrice; // 商品原价
+  var paraCount = 0;
   // 是否使用自定义规格
   var isUseParams = $("#useparams").prop("checked");
   if(isUseParams) {
     // 如果使用自定义多规格
     $("#arrayTable").find("tbody tr").each(function(index, ele) {
+      isEnable = true;
       var index = $(ele).find(".paraid").attr("sid");
+      var name = $(ele).find(".paraid").text();
+      var banStatus = $(ele).find(".ban").css("display");
       // var price = $(ele).find(".oprice").text();
       var price = $(ele).find(".oprice").val();
-      if(!price || price == "") throw("多规格商品必须输入价格");
+      if((!price || price == "") && banStatus !== "none") throw("未禁用的规格必须输入价格");
       var stocksTotal = $(ele).find(".count").val();
       // var stocksTotal = $(ele).find(".count").text();
       var useDiscount = $(ele).find(".usedis").prop("checked");
@@ -711,6 +880,10 @@ function obtainProductPrice() {
       var dprice = $(ele).find(".dprice").val();
       if(isNaN(Number(price))){
         throw("价格不可以输入除数字以外的字符")
+      }
+      if(banStatus == "none") {
+        isEnable = false;
+        paraCount ++;
       }
       price = price.trim();
       if(price == "" || isNaN(Number(price)) || Number(price) < 0){
@@ -738,6 +911,8 @@ function obtainProductPrice() {
       
       var para = {
         index: index,
+        name: name,
+        isEnable: isEnable,
         originPrice: price,
         stocksTotal: stocksTotal,
         useDiscount: useDiscount,
@@ -746,6 +921,7 @@ function obtainProductPrice() {
       productParams.push(para);
     })
     if(productParams.length == 0) throw("多规格不可为空");
+    if(productParams.length == paraCount) throw("至少启用一个规格")
   }else{
     // 如果不使用自定义多规格
     var params = {
@@ -767,6 +943,8 @@ function obtainProductPrice() {
     if(!stocksTotal) throw("请输入商品数量");
     para = {
       index: "",
+      name: name,
+      isEnable: isEnable,
       stocksTotal: Number(stocksTotal).toFixed(0)*1,
       originPrice: Number(originalPrice).toFixed(2)*100,
       price: Number(price).toFixed(2)*100,
@@ -791,4 +969,71 @@ function addAttention() {
 function getShopForum() {
   var shopForum = $("#shopForums").val();
   return shopForum;
+}
+
+/**
+ * 
+ */
+function editProductShelf(uid, productId) {
+  var stockCostMethod = $("input[name='stockCostMethod']:checked").val(); // 商品减库存方式
+  // 是否使用限购
+  var isPurchaseLimit = $("#isPurchaseLimit").prop("checked");
+  var purchaseLimitCount;
+  if(isPurchaseLimit) {
+    purchaseLimitCount = $("#purchaseLimitCount").val();
+    purchaseLimitCount = Number(purchaseLimitCount);
+    if(!purchaseLimitCount || isNaN(purchaseLimitCount) || purchaseLimitCount < 0){
+      throw("限购数量应该是正整数且不大于商品的库存数量");
+    }
+  }else{
+    purchaseLimitCount = -1;
+  }
+  // 是否需要上传购买凭证
+  var isUploadCert = $("#isUploadCert").prop("checked");
+  var uploadCertDescription;
+  var uploadCert = false;
+  if(isUploadCert){
+    uploadCert = true;
+    uploadCertDescription = $("#uploadCertDescription").val();
+  }
+  // 获取物流价格
+  var isFreePost = true; // 是否免邮
+  var freightPrice = {
+    firstFreightPrice: null,
+    addFreightPrice: null
+  }; // 运费模板
+  var freightMethod = $("input[name='freightMethod']:checked").val();
+  var firstFreightPrice = Number($("#firstFreightPrice").val())*100;
+  var addFreightPrice = Number($("#addFreightPrice").val())*100;
+  if(freightMethod !== "freePost") {
+    isFreePost = false;
+    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice < 0) {
+      throw("请正确设置运费模板");
+    }
+    freightPrice.firstFreightPrice = firstFreightPrice;
+    freightPrice.addFreightPrice = addFreightPrice;
+  }
+  var params = tableTurnParams();
+  var productParams = obtainProductPrice();
+  var singleParams = getSingleParams();
+  // 组装修改数据
+  var post = {
+    stockCostMethod: stockCostMethod,
+    purchaseLimitCount:purchaseLimitCount,
+    uploadCert: uploadCert,
+    uploadCertDescription: uploadCertDescription,
+    isFreePost: isFreePost,
+    freightPrice: freightPrice,
+    productId:productId,
+    params: params,
+    productParams: productParams,
+    singleParams: singleParams
+  }
+  nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
+  .then(function(data) {
+    screenTopAlert("修改成功");
+  })
+  .catch(function(data) {
+    screenTopWarning(data.error || data)
+  })
 }

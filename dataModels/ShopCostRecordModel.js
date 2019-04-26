@@ -34,6 +34,10 @@ const shopCostRecordSchema = new Schema({
     index: 1,
     required: true
   },
+  // 规格对象
+  productParam: {
+    type: Schema.Types.Mixed,
+  },
   // 购买数量
   count: {
     type: Number 
@@ -75,7 +79,6 @@ shopCostRecordSchema.statics.orderExtendRecord = async (costRecords, o) => {
   if(!o) o = {};
   let options = {
     product: true,
-    productParam: true,
     user: true
   };
   o = Object.assign(options, o);
@@ -83,13 +86,13 @@ shopCostRecordSchema.statics.orderExtendRecord = async (costRecords, o) => {
   const ShopProductsParamsModel = mongoose.model("shopProductsParams");
   const UserModel = mongoose.model("users");
   const productId = new Set(), productObj = {};
-  const paramId = new Set(), productParamObj = {};
+  // const paramId = new Set(), productParamObj = {};
   const uid = new Set(), userObj = {};
   costRecords.map(cos => {
     if(o.product)
       productId.add(cos.productId);
-    if(o.productParam)
-      paramId.add(cos.productParamId)
+    // if(o.productParam)
+    //   paramId.add(cos.productParamId)
     if(o.user)
       uid.add(cos.uid)
   });
@@ -101,13 +104,13 @@ shopCostRecordSchema.statics.orderExtendRecord = async (costRecords, o) => {
       productObj[product.productId] = product;
     }
   }
-  if(o.productParam) {
-    productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
-    productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
-    for(const productParam of productParams) {
-      productParamObj[productParam._id] = productParam
-    }
-  }
+  // if(o.productParam) {
+  //   productParams = await ShopProductsParamsModel.find({_id: {$in:[...paramId]}});
+  //   productParams = await ShopProductsParamsModel.extendParamsInfo(productParams);
+  //   for(const productParam of productParams) {
+  //     productParamObj[productParam._id] = productParam
+  //   }
+  // }
   if(o.user) {
     users = await UserModel.find({uid: {$in: [...uid]}});
     for(const user of users) {
@@ -117,7 +120,7 @@ shopCostRecordSchema.statics.orderExtendRecord = async (costRecords, o) => {
   return await Promise.all(costRecords.map(cos => {
     const costRecord = cos.toObject();
     if(o.product) costRecord.product = productObj[cos.productId];
-    if(o.productParam) costRecord.productParam = productParamObj[cos.productParamId];
+    // if(o.productParam) costRecord.productParam = productParamObj[cos.productParamId];
     if(o.user) costRecord.user = userObj[cos.uid];
     return costRecord
   }))
