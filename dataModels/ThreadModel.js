@@ -655,7 +655,7 @@ threadSchema.statics.publishArticle = async (options) => {
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
-  const {uid, fids, cids, ip, title, content, abstract, type} = options;
+  const {uid, fids, cids, ip, title, content, abstract, type, keywords} = options;
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findById(uid);
   await ThreadModel.ensurePublishPermission(options);
@@ -673,6 +673,7 @@ threadSchema.statics.publishArticle = async (options) => {
     title,
     content,
     abstract,
+    keywords,
     ip,
     uid,
     tid
