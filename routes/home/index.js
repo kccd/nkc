@@ -4,8 +4,10 @@ const subscriptionRouter = require('./subscription');
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query} = ctx;
-    const {page = 0} = query;
+    const {page = 0, s} = query;
     const {user} = data;
+
+    if(s) data.s = s;
 
     if(user) {
       // 日常登陆
@@ -62,34 +64,17 @@ router
     // 加载专业列表
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
 
-    const homeAds = homeSettings.ads.filter(id => fidOfCanGetThreads.includes(id));
-    const homeNotice = homeSettings.noticeThreadsId.filter(id => fidOfCanGetThreads.includes(id));
-
     // 置顶文章轮播图
-    const ads = await Promise.all(homeAds.map(async tid => {
-      const thread = await db.ThreadModel.findOne({tid});
-      if(thread) return thread;
-    }));
+    data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
 
-    data.ads = await db.ThreadModel.extendThreads(ads, {
-      forum: false,
-      lastPost: false
-    });
-
+    // 网站公告
+    data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
 
     // 一周活跃用户
-    const { home } = ctx.settings;
-    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(home.activeUsersLength);
-    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
-    // 网站公告
-    const noticeThreads = await Promise.all(homeNotice.map(async oc => {
-      const thread = await db.ThreadModel.findOne({oc});
-      if(thread) return thread;
-    }));
-    data.noticeThreads = await db.ThreadModel.extendThreads(noticeThreads, {
-      forum: false,
-      lastPost: false
-    });
+    data.activeUsers = await db.ActiveUserModel.getActiveUsers();
+
+    // 全站精选
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
 
     let q = {};
@@ -169,17 +154,21 @@ router
         ]
       };
     } else {
-      // 游客 推荐
+      q = await db.ThreadModel.getRecommendMatch(fidOfCanGetThreads);
     }
 
     const count = await db.ThreadModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
 
+    let sort = {tlm: -1};
+    if(s === "toc") sort = {toc: -1};
+
     let threads = await db.ThreadModel.find(q, {
       uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
       tlm: 1, fid: 1, hasCover: 1,
-      mainForumsId: 1, hits: 1, count: 1
-    }).skip(paging.start).limit(paging.perpage).sort({tlm: -1});
+      mainForumsId: 1, hits: 1, count: 1,
+      digest: 1
+    }).skip(paging.start).limit(paging.perpage).sort(sort);
 
     threads = await db.ThreadModel.extendThreads(threads, {
       htmlToText: true

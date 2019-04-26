@@ -1,5 +1,5 @@
 .thread-panel{
-  padding-bottom: 3rem;
+  padding-bottom: 2rem;
 }
 .thread-panel:last-child{
   padding-bottom: 0;
@@ -22,7 +22,6 @@
 }
 .thread-panel-info{
   width: 100%;
-  padding-top: 0.7rem;
 }
 .thread-panel-author-info{
   width: 100%;
@@ -46,11 +45,12 @@
   text-decoration: none;
 }
 .thread-panel-title{
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   color: #282c37;
   font-weight: 700;
   text-decoration: none;
   border-bottom: rgba(0,0,0,0) solid 1px;
+  transition: border-bottom 200ms;
 }
 .thread-panel-title:hover{
   color: #282c37;
@@ -68,38 +68,54 @@
   display: -webkit-flex;
   display: flex;
   margin-top: 0.4rem;
-  margin-bottom: 0.5rem;
-  color: #777;
-  max-height: 8rem;
+  max-height: 7rem;
   overflow: hidden;
   font-size: 1.2rem;
 }
 .thread-panel-abstract:hover, .thread-panel-abstract:link, .thread-panel-abstract:active, .thread-panel-abstract:visited{
   text-decoration: none;
-  color: #777;
+  color: #555;
 }
 .thread-panel-abstract-content-div{
-  max-height: 6rem;
+  max-height: 5rem;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   -webkit-flex-grow: 1;
 }
+.thread-panel-abstract-reply{
+  height: 1.6rem;
+  margin-top: 0.4rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  -webkit-flex-grow: 1;
+  font-size: 1.08rem;
+  float: right;
+  color: #666;
+  margin-left: 5rem;
+  /*display: inline-block;*/
+  background-color: #f2f9ff;
+  border-radius: 3px;
+  line-height: 1.6rem;
+  padding: 0 0.5rem;
+}
 .thread-panel-abstract-content{
   line-height: 1.8rem;
-  max-height: 8rem;
-  font-size: 1.2rem;
-  padding-top: 0.3rem;
+  max-height: 7rem;
+  max-width: 100%;
+  font-size: 1.25rem;
   height: 100%;
-
   flex-grow: 1;
 }
 .thread-panel-abstract-cover{
-  margin-left: 0.5rem;
+  margin-right: 1rem;
   -webkit-flex-grow: 0;
   flex-grow: 0;
-  height: 6rem;
+  margin-bottom: 0.5rem;
+  height: 6.5rem;
   min-width: 10rem;
   border-radius: 3px;
   background-size: cover;
@@ -117,4 +133,19 @@
 .thread-panel-button .fa{
   margin-right: 0.5rem;
   color: #9baec8;
+}
+.thread-panel-reply{
+  float: right;
+  display: inline-block;
+}
+.thread-panel-reply a{
+  color: #9baec8;
+}
+.thread-panel-reply a:link, .thread-panel-reply a:hover, .thread-panel-reply:active, .thread-panel-reply:visited{
+  color: #9baec8;
+  text-decoration: none;
+}
+.thread-panel-reply span{
+  color: #9baec8;
+  margin-left: 0.5rem;
 }

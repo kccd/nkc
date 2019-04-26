@@ -145,17 +145,24 @@ if(vueDom) {
       homeSettings: '',
       info: '',
       list: [],
+      recommend: [],
       error: ""
     },
     mounted: function() {
       var data = getDataById("data");
-      this.homeSetting = data.homeSettings;
-      if(this.homeSetting.list.topic) {
+      if(data.homeSettings.list.topic) {
         this.list.push("topic");
       }
-      if(this.homeSetting.list.discipline) {
+      if(data.homeSettings.list.discipline) {
         this.list.push("discipline");
       }
+      if(data.homeSettings.recommend.featuredThreads) {
+        this.recommend.push("featuredThreads")
+      }
+      if(data.homeSettings.recommend.hotThreads) {
+        this.recommend.push("hotThreads")
+      }
+      this.homeSettings = data.homeSettings;
     },
     methods: {
       save: function() {
@@ -163,6 +170,19 @@ if(vueDom) {
         this.info = "";
         var homeSettings = this.homeSettings;
         var list = this.list;
+        homeSettings.list.topic = false;
+        homeSettings.list.discipline = false;
+        if(homeSettings.hotThreads.postCount < 0) return this.error = "热门文章最小回复数不能小于0";
+        if(homeSettings.hotThreads.postUserCount < 0) return this.error = "热门文章最小回复用户总数不能小于0";
+        var recommend = this.recommend;
+        homeSettings.recommend.hotThreads = false;
+        homeSettings.recommend.featuredThreads = false;
+
+        if(recommend.indexOf("hotThreads") !== -1) homeSettings.recommend.hotThreads = true;
+        if(recommend.indexOf("featuredThreads") !== -1) homeSettings.recommend.featuredThreads = true;
+        if(homeSettings.recommend.voteUpTotal < 0) return this.error = "推荐条件中点赞总数不能小于0";
+        if(homeSettings.recommend.voteUpMax < 0) return this.error = "推荐条件中独立点赞数不能小于0";
+        if(homeSettings.recommend.encourageTotal < 0) return this.error = "推荐条件中鼓励次数不能小于0";
         if(list.indexOf('topic') !== -1) {
           homeSettings.list.topic = true;
         }
@@ -172,7 +192,9 @@ if(vueDom) {
         nkcAPI('/e/settings/home/list', 'PATCH', {
           topic: homeSettings.list.topic,
           discipline: homeSettings.list.discipline,
-          visitorThreadList: homeSettings.visitorThreadList
+          visitorThreadList: homeSettings.visitorThreadList,
+          hotThreads: homeSettings.hotThreads,
+          recommend: homeSettings.recommend
         })
           .then(function() {
             app.info = "保存成功";

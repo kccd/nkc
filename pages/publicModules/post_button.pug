@@ -1,5 +1,10 @@
 div.home-post-button.hidden-xs.hidden-sm
-  a.btn-lg.btn-block(href=data.user ? `/editor` : '/login' style=`margin-bottom: 0.5rem;`)
+  -let href = '/editor';
+  if data.forum
+    -href = `/editor?&type=forum&id=${data.forum.fid}`;
+  if !data.user
+    -href = `/login`;
+  a.btn-lg.btn-block(href=href style=`margin-bottom: 0.5rem;`)
     if data.user
       span.fa.fa-edit &nbsp;发表文章
     else

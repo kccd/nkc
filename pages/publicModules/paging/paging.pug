@@ -32,6 +32,19 @@ if pageCount > 1
         -max = reduce2-reduce1;
     else
       -max = pageCount - 1;
+  if showHomeButton
+    .paging-button
+      a.radius-left.button(href=`/`) 订阅
+      a.button(href=`/`) 推荐
+      a.radius-right.button(href=`/`) 最新
+  if showPagingDigestButton
+    .paging-button
+      a.radius-left.button(href=`/`) 全部
+      a.radius-right.button(href=`/?d=true`) 精选
+  if showPagingSortButton
+    .paging-button
+      a.radius-left.button(href=`/?s=tlm` class=data.s!=='toc'? "active": '') 最新回复
+      a.radius-right.button(href=`/?s=toc` class=data.s==="toc"?" active": "") 最新发表
   nav(aria-label='navigation').paging-nav
     ul(style='margin: 0')
       if min !== 0
@@ -49,7 +62,7 @@ if pageCount > 1
         li ...
         li
           a(href=`${state.url}?page=${pageCount - 1}${skipId || ''}${query}`)= pageCount
-      if max < pageCount - 1 || min !== 0
+      if showPagingInput && (max < pageCount - 1 || min !== 0)
         li
           | 跳转到
           input(type="number" id="paging_nav_input")

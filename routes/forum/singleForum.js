@@ -279,24 +279,20 @@ router
     }
     await db.UserModel.extendUsersInfo(data.moderators);
 
-		const digestThreads = await db.ThreadModel.aggregate([
-			{
-				$match: {
-					mainForumsId: {$in: accessibleFid},
-					digest: true
-				}
-			},
-			{
-				$sample: {
-					size: 8
-				}
-			}
-		]);
+    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+      data.userRoles,
+      data.userGrade,
+      data.user
+    );
+
     // 加载优秀的文章
-    data.digestThreads = await db.ThreadModel.extendThreads(digestThreads, {
-      parentForum: false,
-      lastPost: false
-    });
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+
+    // 最新文章
+    const latestFid = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
+    latestFid.push(forum.fid);
+    data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads.filter(fid => !latestFid.includes(fid)));
+
 		 // 加载同级的专业
     const parentForums = await forum.extendParentForums();
     let parentForum;
@@ -312,7 +308,7 @@ router
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
-    data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+
 		data.subUsersCount = await db.SubscribeModel.count({fid, type: "forum"});
 		if(data.user) {
       const sub = await db.SubscribeModel.count({

@@ -10,51 +10,33 @@ block content
     .row
       .col-xs-12.col-md-2
         include ../publicModules/post_button
-        include ../publicModules/vue_forums_nav/vue_forums_nav_dom
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
             .forum-info-panel
               .forum-banner
                 .forum-banner-cover
-                img(src=`/f/${data.forum.fid}/banner`)
+                .forum-banner-img(style=`background-image: url(/f/${data.forum.fid}/banner)`)
               .forum-info-body
                 .forum-avatar
-                  .col-xs-12
-                    if data.forum.iconFileName
-                      img(src=`/forum_avatar/${data.forum.fid}`)
-                    else
-                      img(style=`background-color: ${data.forum.color}`)
+                  if data.forum.iconFileName
+                    img(src=`/forum_avatar/${data.forum.fid}`)
+                  else
+                    img(style=`background-color: ${data.forum.color}`)
                 .forum-info
                   .forum-name=data.forum.displayName
                     if data.subscribed
                       button.btn-sm.forum-sub-btn.btn(
                         onclick=`subscribeForum("${data.forum.fid}", false)`
-                      ) 取关
+                      ) 已关注
                     else
                       button.btn-sm.forum-sub-btn.btn.success(
                         onclick=`subscribeForum("${data.forum.fid}", true)`
                       ) 关注
                     .forum-abbr=data.forum.abbr
-                  .forum-number
-                    .col-xs-4.col-md-2
-                      .number=data.forum.countThreads
-                      .title 文章
-                    .col-xs-4.col-md-2
-                      .number=data.forum.countPosts
-                      .title 回复
-                    .col-xs-4.col-md-2
-                      .number=data.forum.countPostsToday
-                      .title 今日更新
-                    .col-xs-4.col-md-2
-                      .number=data.subUsersCount
-                      .title 关注的人
-                    //.col-xs-4.col-md-2
-                    //  .number=data.usersId.length
-                    //  .title 今日来访
           .col-xs-12.col-md-12.m-t-1
             if data.threadTypes.length > 0
-              .forum-category.m-b-2
+              //-.forum-category.m-b-2
                 a(class=!data.cat?"active":"" href=`/f/${data.forum.fid}`) 全部
                 for threadType in data.threadTypes
                   a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
@@ -68,8 +50,14 @@ block content
               include ../publicModules/thread_panel/thread_panel
             include ../publicModules/paging/paging
       .col-xs-12.col-md-3
-        .forum-single-panel
-          .forum-single-panel-header
+        -let sideThreads = data.featuredThreads;
+        -let sideThreadsHeader = "精选文章"
+        include ../publicModules/side_thread_list
+        .m-t-1
+          -sideThreads = data.latestThreads;
+          -sideThreadsHeader = "最新文章"
+          include ../publicModules/side_thread_list
+
 
 
 block scripts

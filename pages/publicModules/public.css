@@ -244,9 +244,41 @@
 .cp{
   cursor: pointer;
 }
+.paging-button{
+  display: inline-block;
+  padding-right: 1rem;
+  margin-bottom: 0.5rem;
 
+}
+.paging-button a{
+  display: inline-block;
+  height: 2rem;
+  color: #fff;
+  line-height: 2rem;
+  text-align: center;
+  min-width: 2rem;
+  padding: 0 0.8rem;
+  font-size: 1.2rem;
+  background-color: #9baec8;
+}
+.paging-button a.radius-left{
+  border-radius: 2px 0 0 2px;
+}
+.paging-button a.radius-right{
+  border-radius: 0 2px 2px 0;
+}
+.paging-button a:hover, .paging-button a:visited, .paging-button a:link, .paging-button a:active{
+  text-decoration: none;
+}
+.paging-button a:hover{
+  background-color: #2b90d9;
+}
+.paging-button a.active{
+  background-color: #2b90d9;
+}
 .paging-nav{
-  margin: 0.5rem 0 ;
+  display: inline-block;
+  margin-bottom: 0.5rem;
 }
 .paging-nav ul{
   padding: 0;
@@ -257,7 +289,6 @@
   display: inline-block;
   font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
   color: #282c37;
 }
 .paging-nav ul li a{
@@ -298,7 +329,7 @@
 .canvas-logo{
   padding: 1rem;
   border-radius: 3px;
-  box-shadow: 0 0 10px 0 #aaa;
+  box-shadow: 0 0 3px 0 #aaa;
 }
 .canvas-logo img{
   width: 100%;
@@ -319,7 +350,7 @@
 }
 .active-user-avatar{
   display: inline-block;
-  padding: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0 0.9rem 1rem 0.9rem;
   text-align: center;
 }
 .active-user-avatar a{
@@ -692,4 +723,35 @@ footer.footer ul li{
 }
 .container-fluid.max-width{
   max-width: 1300px;
+}
+.side-thread-header{
+  background-color: #d9e1e8;
+  color: #444;
+  height: 2.5rem;
+  font-weight: 700;
+  line-height: 2.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+.side-thread{
+  padding-bottom: 0.5rem;
+}
+.side-thread-title{
+  color: #646873;
+  word-break: break-all;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.side-thread-title:hover{
+  color: #646873;
+}
+.side-thread-info{
+  text-align: left;
+}
+.side-thread-info>*{
+  color: #9baec8;
+  font-size: 1rem;
+  margin-right: 0.5rem;
 }

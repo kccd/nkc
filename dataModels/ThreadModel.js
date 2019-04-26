@@ -411,9 +411,9 @@ threadSchema.methods.updateThreadMessage = async function() {
   const updateObj = {};
   const lm = await PostModel.findOne({tid: this.tid, disabled: false}).sort({toc: -1});
   const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
-  updateObj.tlm = lm.toc;
+  updateObj.tlm = lm?lm.toc:'';
   updateObj.toc = oc.toc;
-  updateObj.lm = lm.pid;
+  updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
   updateObj.count = await PostModel.count({tid: this.tid});
   updateObj.countToday = await PostModel.count({tid: this.tid, toc: {$gt: time}});
@@ -839,6 +839,142 @@ threadSchema.statics.publishArticle = async (options) => {
   });
   await thread.update({$set:{oc: post.pid, count: 1, hits: 1}});
   return await ThreadModel.findThreadById(thread.tid);
+};
+/*
+* 加载首页轮播图
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getAds = async (fid) => {
+  let homeSettings = await mongoose.model("settings").findById("home");
+  const ThreadModel = mongoose.model("threads");
+  const ads = [];
+  for(const tid of homeSettings.c.ads) {
+    const thread = await ThreadModel.findOne({tid, mainForumsId: {$in: fid}});
+    if(thread) ads.push(thread);
+  }
+  return await ThreadModel.extendThreads(ads, {
+    forum: false,
+    lastPost: false
+  });
+};
+/*
+* 加载网站公告
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getNotice = async (fid) => {
+  let homeSettings = await mongoose.model("settings").findById("home");
+  const ThreadModel = mongoose.model("threads");
+  const notice = [];
+  for(const oc of homeSettings.c.noticeThreadsId) {
+    const thread = await ThreadModel.findOne({oc, mainForumsId: {$in: fid}});
+    if(thread) notice.push(thread);
+  }
+  return await ThreadModel.extendThreads(notice, {
+    forum: false,
+    lastPost: false
+  });
+};
+/*
+* 加载置顶专业内的精选文章 随机
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getFeaturedThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const threads = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid
+        }
+      }
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1
+      }
+    },
+    {
+      $sample: {
+        size: 10
+      }
+    }
+  ]);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  })
+};
+/*
+* 获取全站最新文章
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getLatestThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const threads = await ThreadModel.find({mainForumsId: {$in: fid}}).sort({tlm: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  });
+};
+/*
+* 获取"推荐文章列表"的查询条件
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getRecommendMatch = async (fid) => {
+  const SettingModel = mongoose.model("settings");
+  const homeSettings = await SettingModel.findById('home');
+  const {featuredThreads, hotThreads, voteUpTotal, voteUpMax, encourageTotal} = homeSettings.c.recommend;
+
+  const match = {
+    disabled: false,
+    recycleMark: {$ne: true},
+    mainForumsId: {$in: fid},
+    $or: [
+      {
+        voteUpTotal: {
+          $gte: voteUpTotal
+        }
+      },
+      {
+        voteUpMax: {
+          $gte: voteUpMax
+        }
+      },
+      {
+        encourageTotal: {
+          $gte: encourageTotal
+        }
+      }
+    ]
+  };
+
+  if(hotThreads) {
+    match.$or.push({
+      count: {
+        $gte: homeSettings.c.hotThreads.postCount+1
+      },
+      replyUserCount: {
+        $gte: homeSettings.c.hotThreads.postUserCount+1
+      }
+    });
+  }
+
+  if(featuredThreads) {
+    match.$or.push({
+      digest: true
+    });
+  }
+  return match;
 };
 
 module.exports = mongoose.model('threads', threadSchema);

@@ -13,7 +13,7 @@
         for f in thread.forums
           if f.fid !== data.forum.fid
             -displayForumNav = true;
-            a(href=`/f/${f.fid}`)= f.displayName
+            a(href=`/f/${f.fid}` title=f.description)= f.displayName
         if !displayForumNav && thread.categories.length !== 0
           for category in thread.categories
             if data.threadTypesId.includes(category.cid)
@@ -24,35 +24,44 @@
           -forum = f;
           if f.forumType === 'topic'
             -break;
-        a(href=`/f/${forum.fid}`)= forum.displayName
+        a(href=`/f/${forum.fid}` title=forum.description)= forum.displayName
 
     .thread-panel-time=fromNow(thread.toc)
 
   a(href=`/t/${thread.tid}` class=thread.digest?"digest":"").thread-panel-title= thread.firstPost.t
   a(href=`/t/${thread.tid}`).thread-panel-abstract
-    .thread-panel-abstract-content
-      .thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
-      .thread-panel-info
-        .thread-panel-button
-          if thread.hits
-            .fa.fa-eye=` ${thread.hits}`
-          if thread.count - 1
-            .fa.fa-comment=` ${thread.count - 1}`
-          if thread.firstPost.voteUp - thread.firstPost.voteDown
-            .fa.fa-thumbs-up=` ${thread.firstPost.voteUp - thread.firstPost.voteDown || ''}`
-        if thread.from
-          .thread-panel-from
-            if thread.from === 'own'
-              span 来自自己的文章
-            else if thread.from === 'subForum'
-              span 来自关注的专业
-            else if thread.from === 'subFriend'
-              span 来自好友
-            else if thread.from === "subThread"
-              span 来自关注的文章
     if thread.hasCover
       .thread-panel-abstract-cover(
         style=`background-image: url(/cover/${thread.tid})`
       )
+    .thread-panel-abstract-content
+      .thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
+      .text-right
+        p.thread-panel-abstract-reply=thread.lastPost.c.slice(0, 200)
+  .thread-panel-info
+    .thread-panel-button
+      if thread.firstPost.voteUp - thread.firstPost.voteDown
+        .fa.fa-thumbs-up=` ${thread.firstPost.voteUp - thread.firstPost.voteDown || ''}`
+      if thread.hits
+        .fa.fa-eye=` ${thread.hits}`
+      if thread.count - 1
+        .fa.fa-comment=` ${thread.count - 1}`
+    if thread.from
+      .thread-panel-from
+        if thread.from === 'own'
+          span 来自自己的文章
+        else if thread.from === 'subForum'
+          span 来自关注的专业
+        else if thread.from === 'subFriend'
+          span 来自好友
+        else if thread.from === "subThread"
+          span 来自关注的文章
+    .thread-panel-reply
+      a(href=`/u/${thread.lastPost.uid}` target="_blank"
+        onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.lastPost.user)}')`
+        onmouseleave="vue_user_panel_float.close()"
+      )= thread.lastPost.user.username
+      span=fromNow(thread.lastPost.toc)
+
 
 
