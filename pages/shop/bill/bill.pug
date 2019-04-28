@@ -87,11 +87,16 @@ block content
                     div(style="float:left")
                       img(src=`/r/${cart.product.imgMaster}` style="width:60px;height:60px;margin-right:5px")
                     div
-                      a(href=`/shop/product/${cart.product.productId}` target="_blank")=cart.product.name 
+                      span 
+                        a(href=`/shop/product/${cart.product.productId}` target="_blank")=cart.product.name 
+                      span!=`(商品ID:${cart.product.productId})`
                   td(style="border-right:1px solid #f2f7ff")
                     span=cart.productParam.name
                   td(style="border-right:1px solid #f2f7ff")
-                    span #{numToFloatTwo(cart.productParam.price)} 
+                    if cart.vipDiscount
+                      span #{numToFloatTwo(cart.productParam.price * (cart.vipNum / 100))} 
+                    else
+                      span #{numToFloatTwo(cart.productParam.price)} 
                   td(style="border-right:1px solid #f2f7ff")
                     span=cart.count
                   //- td(style="border-right:1px solid #f2f7ff")
@@ -99,7 +104,7 @@ block content
                   td.order(paid=`${cart.productParam._id}` data-upload-cert=cart.product.uploadCert?"true": "false") 
                     +orderCert(cart)
                   td(style="border-right:1px solid #f2f7ff;text-align:right")
-                    span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo((cart.productParam.price)*cart.count)}
+                    span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo((cart.productParam.price * (cart.vipNum / 100))*cart.count)}
                 if cart.product.uploadCert
                   tr 
                     td(colspan="5" style="text-align:right;font-size:12px") 
