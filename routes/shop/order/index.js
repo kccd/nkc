@@ -100,6 +100,19 @@ router
         let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
         let newProductParam = await db.ShopProductsParamModel.findOne({_id:cart.productParamId});
         if(!newProductParam) ctx.throw(400, "商品规格已被商家修改，请重新下单")
+        // 取出会员折扣
+        let vipNum = 100;
+        if(cart.product.vipDiscount) {
+          for(let v=0;v<cart.product.vipDisGroup.length;v++) {
+            if(data.user && data.user.authLevel == cart.product.vipDisGroup[v].vipLevel) {
+              vipNum = cart.product.vipDisGroup[v].vipNum;
+            }
+          }
+          cart.vipDiscount = true;
+        }else{
+          cart.vipDiscount = true;
+        }
+        cart.vipNum = vipNum
         let cartObj = {
           costId,
           orderId,
@@ -110,7 +123,7 @@ router
           uid: cart.uid,
           freightPrice: cart.freightPrice,
           productPrice: cart.productPrice,
-          singlePrice: cart.productParam.price
+          singlePrice: cart.productParam.price * (vipNum/100)
         };
         let shopCost = db.ShopCostRecordModel(cartObj);
         if(paramCert[cart.productParamId]) {

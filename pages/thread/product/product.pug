@@ -115,17 +115,26 @@ style.
       //-       li(style="margin:0px")!=`* ${attStr}`
       div.item(style="background:#c7fff8")
         div(style="padding:7px 0;color:#333")
-          if !data.user
+          if !product.productSettings.priceShowToVisit && !data.user
             p
               span.title 价格
-              span(style="color:orangered") 登陆可见
+              a(style="color:orangered" href="/login") 登陆可见
+          else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+            p
+              span.title 价格
+              span(style="color:orangered") 停售不可见
           else
             p
               span.title 价格
               span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
-            p
-              span.title 优惠价
-              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+            if data.vipDiscount
+              p
+                span.title 会员价
+                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price * (data.vipDisNum/100))}
+            else
+              p
+                span.title 优惠价
+                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
       div.item
         p
           span.title 快递
@@ -133,10 +142,14 @@ style.
           span.location(style="font-size:small;") 至
           input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
       div.item(style="border-bottom: 1px solid #e5e5e5")
-        if !data.user
+        if !product.productSettings.priceShowToVisit && !data.user
           p
             span.title 运费
-            span(style="color:orangered") 登陆可见
+            a(style="color:orangered" href="/login") 登陆可见
+        else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+          p
+            span.title 价格
+            span(style="color:orangered") 停售不可见
         else
           p
             span.title 运费

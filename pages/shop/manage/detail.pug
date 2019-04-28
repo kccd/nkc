@@ -251,7 +251,7 @@ block name
               td
                 a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
               td!=`${para.productParam.name}`
-              td #{numToFloatTwo(para.productParam.price)}
+              td #{numToFloatTwo(para.singlePrice)}
               td!=`${para.count}`
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')

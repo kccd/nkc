@@ -239,7 +239,7 @@ block shopAccountContent
               td
                 a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
               td!=`${para.productParam.name}`
-              td #{numToFloatTwo(para.productParam.price)}
+              td #{numToFloatTwo(para.singlePrice)}
               td!=`${para.count}`
               td
                 if para.product.uploadCert

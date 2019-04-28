@@ -132,6 +132,28 @@ block name
                     .input-group
                       input.form-control#stockQuantity(type='number', placeholder="Stock's Quantity", aria-describedby='stockQuantity' value=product.params.length==0?product.productParams[0].stocksSurplus:"")
                       span.input-group-addon 件
+              .form-group
+                label.col-sm-2.control-label 会员折扣
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#vipDiscount(type='checkbox' checked=product.vipDiscount?true:false)
+                      |  是否使用会员折扣
+              .form-group#vipDisDom(style=checked=product.vipDiscount?"":"display:none")
+                label.col-sm-2.control-label 折扣详情
+                .col-sm-5.col-sm-10
+                  .table-responsive
+                    table.table.table-condensed.table-responsive.margin-0(style="padding:0")
+                      thead
+                        tr
+                          th vip等级
+                          th 折扣率(%)
+                      tbody
+                        for vip,index in product.vipDisGroup
+                          tr.viptr
+                            td.viplevel(style="width:30%" vid=`${vip.vipLevel}`)!=`v${vip.vipLevel}`
+                            td(style="width:70%")
+                              input.vipnum(type="text" style="width:100%" value=`${vip.vipNum}`)
 
         .panel.panel-info
           .panel-heading
@@ -151,6 +173,25 @@ block name
                       input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock' checked=product.stockCostMethod=='payReduceStock'?true:false)
                       |     买家付款减库存
                       b(style="color:red")  （付款减库存，存在超卖风险）
+        .panel.panel-info
+          .panel-heading
+            | 显示设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 价格显示
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#priceShowToVisit(type='checkbox' checked=product.productSettings.priceShowToVisit?true:false)
+                      |  价格是否游客可见
+              .form-group
+                label.col-sm-2.control-label 
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#priceShowAfterStop(type='checkbox' checked=product.productSettings.priceShowAfterStop?true:false)
+                      |  停售以后，是否显示价格
         .panel.panel-info
           .panel-heading
             | 购买条件

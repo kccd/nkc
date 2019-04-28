@@ -33,6 +33,9 @@ shelfRouter
     // 取出全部商城类别专业
     shopForumTypes = await db.ForumModel.getAllShopForums(data.userRoles, data.userGrade, data.user);
     data.shopForumTypes = shopForumTypes;
+    // 取出全部vip等级
+    const grades = await db.UsersGradeModel.find({});
+    data.grades = grades;
 		ctx.template = 'shop/manage/shelf.pug';
 		await next();
 	})
@@ -56,7 +59,10 @@ shelfRouter
       productParams,
       singleParams,
       uploadCert,
-      uploadCertDescription
+      uploadCertDescription,
+      vipDiscount,
+      vipDisGroup,
+      productSettings,
     } = body.post;
     const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
@@ -148,7 +154,10 @@ shelfRouter
       freightPrice,     
       params: paramsInfo,
       uid: user.uid,
-      threadInfo: options
+      threadInfo: options,
+      vipDiscount,
+      vipDisGroup,
+      productSettings
     });
 
     // 存储多规格
