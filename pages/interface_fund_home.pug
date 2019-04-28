@@ -97,7 +97,7 @@ block content
                       tr
                         th 账号等级
                         th= 0
-                        th= user.grade._id
+                        th= user.grade?user.grade._id: 0
                       tr
                         th 注册天数
                         th= timeToRegister
