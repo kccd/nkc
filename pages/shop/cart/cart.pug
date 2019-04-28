@@ -19,7 +19,7 @@ block shopAccountContent
           img(:src="'/rt/' + c.product.imgMaster")
         .product-name 
           a(:href="'/shop/product/' + c.product.productId" target='_blank').name {{c.product.name}}
-          .param-name {{c.productParam.name.join('，')}}
+          .param-name {{c.productParam.name}}
         .product-price(v-if='c.productParam.useDiscount')
           .origin-price 原价 
             span(style='text-decoration: line-through') ￥{{c.productParam.originPrice/100}}

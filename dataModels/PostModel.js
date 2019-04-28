@@ -61,6 +61,11 @@ const postSchema = new Schema({
     type: String,
     default: ''
   },
+  // 关键词
+  keywords: {
+    type: String,
+    default: ''
+  },
   /* fid: {
     type: String,
     required: true,
@@ -658,7 +663,7 @@ postSchema.statics.newPost = async (options) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
   const {contentLength} = require('../tools/checkString');
-  const {title, content, uid, ip, abstract, tid} = options;
+  const {title, content, uid, ip, abstract, tid, keywords} = options;
   const thread = await ThreadModel.findOne({tid});
   if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
   if(thread.closed) throwErr(403, `文章已被关闭，暂不能发表回复`);
@@ -681,6 +686,7 @@ postSchema.statics.newPost = async (options) => {
     c: content,
     t: title,
     abstract,
+    keywords,
     ipoc: ip,
     iplm: ip,
     l: 'html',

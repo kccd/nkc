@@ -3,6 +3,7 @@ extends ./index.pug
 block name
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
   style.
     .padding-0 {
       padding: 0
@@ -13,25 +14,38 @@ block name
     .margin-right-10 {
       margin-right: 10px
     }
+    .pnameCla {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      display: inline-block;
+      padding: 4px 6px;
+      color: #555;
+      vertical-align: middle;
+      border-radius: 4px;
+      max-width: 100%;
+      line-height: 22px;
+      cursor: text;
+    }
   .row
     .col-md-12.col-sm-12.col-xs-12
       .panel.panel-info
         .panel-heading
           | 选择分类
         .panel-body
-          .col-md-5.col-sm-5
+          .col-md-12.col-sm-12
             .form-horizontal
               .form-group
-                label.col-sm-4.control-label 商品分类(必选)
-                .col-sm-7
-                  select#shopForums.form-control(style="width:auto")
+                label.col-sm-2.control-label 商品分类(必选)
+                .col-sm-8(style="padding:0")
+                  select#shopForums.form-control()
                     for shopForum in data.shopForumTypes
                       option(value=`${shopForum.fid}`)!=shopForum.displayName
-          .col-md-7.col-sm-7
+          .col-md-12.col-sm-12
             .form-horizontal
               .form-group
-                label.col-sm-4.control-label 辅助分类(选填)
-                .col-sm-7
+                label.col-sm-2.control-label 辅助分类(选填)
+                .col-sm-9
                   include ../../forumlist_dropdown
       .panel.panel-info
         .panel-heading
@@ -61,22 +75,32 @@ block name
           | 销售信息
         .panel-body
           .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 商品多规格
+              .col-sm-10
+                .checkbox
+                  label
+                    input#useparams(type='checkbox')
+                    |  自定义多规格
             #useParamsDom(style="display: none")
               .form-group
                 label.col-sm-2.control-label 自定义规格
                 .col-sm-10
                   .panel.panel-default
                     .panel-heading(style="padding:5px")
-                      span 规格列表
+                      span 商品属性列表
                       //- a.fa.fa-plus(style="float:right;cursor:pointer"  data-toggle="modal" data-target="#addProductParams") 添加
                       a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addNewParam()") 添加
                     .panel-body(style="padding:5px")
                       table.table.table-condensed.margin-0#paramsTable
                         thead
-                          tr
-                            th 规格名称
-                            th 属性值
-                            th 操作
+                          tr  
+                            th
+                            th 属性名称
+                            th 
+                              span 属性值
+                              span.text-danger &nbsp;(多个标记请使用回车;标记最多字数8;标记最大个数5)
+                            th 
                         tbody
               .form-group
                 label.col-sm-2.control-label 销售规格
@@ -86,18 +110,36 @@ block name
                       thead.panel-heading
                         tr
                           th 规格名称
+                          th 是否禁用
                           th 价格（元）
                           th 数量（件）
                           th 是否使用优惠
                           th 优惠后价格
-                      tbody.panel-body(contenteditable="true")
-            .form-group
-              label.col-sm-2.control-label 多规格商品自定义
-              .col-sm-10
-                .checkbox
-                  label
-                    input#useparams(type='checkbox')
-                    |  使用自定义规格
+                      tbody.panel-body()
+              .form-group
+                label.col-sm-2
+                .col-sm-10
+                  hr
+              .form-group
+                label.col-sm-2.control-label 独立规格
+                .col-sm-10
+                  .panel.panel-default
+                    .panel-heading(style="padding:5px")
+                      span 独立规格列表
+                      span.text-danger(style="font-size:10px") (如自定义规格不满足规格需求，可在此单独添加规格)
+                      a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addSingleParam()") 添加
+                    .panel-body(style="padding:5px")
+                      table.table.table-condensed.margin-0#singleParams
+                        thead
+                          tr
+                            th 规格名称
+                            th 价格（元）
+                            th 数量（件）
+                            th 是否适用优惠
+                            th 优惠后价格
+                            th 
+                        tbody
+
             #nouseParamsDom(style="display:block")
               .form-group
                 label.col-sm-2.control-label 商品价格
@@ -381,6 +423,7 @@ block manageScripts
   +includeJS("/jquery-ui-1.10.4.custom.js")
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   +includeJS("/module_forum_settings.js")
   +includeJS("/interface_common.js")
   +includeJS("/module_dropdown.js")

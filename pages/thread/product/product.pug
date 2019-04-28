@@ -94,12 +94,25 @@ style.
             img.etalage_source_image(src=`/r/${rid}`)
 
     .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;padding-left:65px")
-      p.item=`${post.abstract}`
-        //- a.btn.btn(href=`/shop/product/${product.productId}`) 前往商城
-      if product.attentions && product.attentions.length > 0
-        ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
-          for attStr in product.attentions
-            li(style="margin:0px")!=`* ${attStr}`
+      p.item 
+        span#showText #{cutContent(post.abstract,60)}
+        if post.abstract && post.abstract.length > 60
+          span#hideText(style="display:none")!=`${post.abstract}`
+          span 
+            a(onclick="showAbstract()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showAbstract") 展开
+            a(onclick="hideAbstract()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideAbstract") 收起
+      if product.keywords && product.keywords.length > 0
+        p(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+          span#showWords #{cutContent(post.keywords,25)}
+          if post.keywords && post.keywords.length > 25
+            span#hideWords(style="display:none")!=`${post.keywords}`
+            span 
+              a(onclick="showKeywords()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showKeywords") 展开
+              a(onclick="hideKeywords()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideKeywords") 收起
+      //- if product.attentions && product.attentions.length > 0
+      //-   ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+      //-     for attStr in product.attentions
+      //-       li(style="margin:0px")!=`* ${attStr}`
       div.item(style="background:#c7fff8")
         div(style="padding:7px 0;color:#333")
           if !data.user
@@ -150,7 +163,7 @@ style.
           span.col-xs-12(style="margin: 0 19px 0 10px;")
             for para in product.productParams
               span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
-                span=para.name.join()
+                span=para.name
       div.item
         if product.productStatus == "stopsale"
           p(style="text-align: center;background-color: tomato;padding:10px") 商品停售中
@@ -174,6 +187,7 @@ block scripts
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/external_pkgs/citySet/city.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
+  +includeJS('/thread/product/product.js')
   script.
     $(document).ready(function(){
       $('#etalage').etalage({

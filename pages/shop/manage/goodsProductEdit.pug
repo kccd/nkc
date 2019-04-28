@@ -2,6 +2,31 @@ extends ./index.pug
 block title
   -const product = data.product
 block name
+  .hidden#data= JSON.stringify({product: data.product})
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
+  style.
+    .padding-0 {
+      padding: 0
+    }
+    .margin-0 {
+      margin: 0
+    }
+    .margin-right-10 {
+      margin-right: 10px
+    }
+    .pnameCla {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      display: inline-block;
+      padding: 4px 6px;
+      color: #555;
+      vertical-align: middle;
+      border-radius: 4px;
+      max-width: 100%;
+      line-height: 22px;
+      cursor: text;
+    }
   .row    
     .col-xs-12.col-md-12
       .col-xs-12
@@ -14,6 +39,100 @@ block name
           span 商品名称：
           span!=`${product.name}`
       .col-xs-12
+        .panel.panel-info
+          .panel-heading
+            | 规格信息
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 商品多规格
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#useparams(type='checkbox' checked=product.params.length==0?false:true)
+                      |  自定义多规格
+              #useParamsDom(style=product.params.length==0?"display:none":"")
+                .form-group
+                  label.col-sm-2.control-label 自定义规格
+                  .col-sm-10
+                    .panel.panel-default
+                      .panel-heading(style="padding:5px")
+                        span 商品属性列表
+                        //- a.fa.fa-plus(style="float:right;cursor:pointer"  data-toggle="modal" data-target="#addProductParams") 添加
+                        a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addNewParam()") 添加
+                      .panel-body(style="padding:5px")
+                        table.table.table-condensed.margin-0#paramsTable
+                          thead
+                            tr
+                              th
+                              th 属性名称
+                              th 
+                                span 属性值
+                                span.text-danger &nbsp;(多个标记请使用回车;标记最多字数8;标记最大个数5)
+                              th 
+                          tbody
+                .form-group
+                  label.col-sm-2.control-label 销售规格
+                  .col-sm-10
+                    .table-responsive
+                      table#arrayTable.table.table-condensed.table-bordered.margin-0.panel.panel-info
+                        thead.panel-heading
+                          tr
+                            th 规格名称
+                            th 是否禁用
+                            th 价格（元）
+                            th 数量（件）
+                            th 是否使用优惠
+                            th 优惠后价格
+                        tbody.panel-body()
+                .form-group
+                  label.col-sm-2
+                  .col-sm-10
+                    hr
+                .form-group
+                  label.col-sm-2.control-label 独立规格
+                  .col-sm-10
+                    .panel.panel-default
+                      .panel-heading(style="padding:5px")
+                        span 独立规格列表
+                        span.text-danger(style="font-size:10px") (如自定义规格不满足规格需求，可在此单独添加规格)
+                        a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addSingleParam()") 添加
+                      .panel-body(style="padding:5px")
+                        table.table.table-condensed.margin-0#singleParams
+                          thead
+                            tr
+                              th 规格名称
+                              th 价格（元）
+                              th 数量（件）
+                              th 是否适用优惠
+                              th 优惠后价格
+                              th 
+                          tbody
+              #nouseParamsDom(style=product.params.length==0?"display:block":"display:none")
+                .form-group
+                  label.col-sm-2.control-label 商品价格
+                  .col-sm-5
+                    .input-group
+                      input.form-control#originalPrice(type='number', placeholder="Product's Price", aria-describedby='originalPrice' value=product.params.length==0?numToFloatTwo(product.productParams[0].originPrice):"")
+                      span.input-group-addon 元
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-5
+                    .checkbox
+                      label
+                        input#usedis(type='checkbox' checked=product.params.length==0&&product.productParams.length > 0&&product.productParams[0].useDiscount?true:false)
+                        |  是否使用优惠后价格
+                .form-group#disCostDom(style=product.params.length==0&&product.productParams.length > 0&&product.productParams[0].useDiscount?"":"display:none")
+                  label.col-sm-2.control-label 优惠后价格
+                  .col-sm-5
+                    input#afterDisCost.form-control(type="number", name="" value=product.params.length==0&&product.productParams.length > 0&&product.productParams[0].useDiscount?numToFloatTwo(product.productParams[0].price):"")
+                .form-group
+                  label.col-sm-2.control-label 库存数量
+                  .col-sm-5
+                    .input-group
+                      input.form-control#stockQuantity(type='number', placeholder="Stock's Quantity", aria-describedby='stockQuantity' value=product.params.length==0?product.productParams[0].stocksSurplus:"")
+                      span.input-group-addon 件
+
         .panel.panel-info
           .panel-heading
             | 销售信息
@@ -98,7 +217,9 @@ block name
               i.fa.fa-save
               | &nbsp;保存修改
 block manageScripts
+  +includeJS("/interface_commom.js")
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   +includeJS("/shop/manage/shelf.js")
   +includeJS("/shop/manage/goodslist.js")
