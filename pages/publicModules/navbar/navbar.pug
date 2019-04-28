@@ -76,7 +76,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                   span.pull-right.fa.fa-angle-right
               li
                 a(href='/message')
-                  span.fa.fa-comment-o &nbsp;订阅
+                  span.fa.fa-comment-o &nbsp;关注
                   span.pull-right.fa.fa-angle-right
               li
                 a(href='/message')
@@ -159,18 +159,20 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
     .collapse.navbar-collapse
       ul.nav.navbar-nav
         if data.user
+          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
+            a(href='/?t=subscribe') 关注
+          li(class=navbar_highlight === 'recommend' ? 'active' : '')
+            a(href='/?t=recommend') 推荐
           li(class=navbar_highlight === 'latest' ? 'active' : '')
-            a(href='/' title='扫一眼') 订阅
-          li(class=navbar_highlight === 'latest' ? 'active' : '')
-            a(href='/' title='扫一眼') 最新
+            a(href='/?t=latest') 最新
           li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
-            .nav-message-num.message-switch(class=!messageSum ? 'disabled' : '')= messageSum
+            .nav-message-num.message-switch(class=!messageSum ? 'disabled': '')= messageSum
             a(href=`/message` title='消息') 消息
         else
-          li(class=navbar_highlight==='latest'?'active':'')
-            a(href='/' title='扫一眼') 推荐
+          li(class=navbar_highlight==='recommend'?'active':'')
+            a(href='/?t=recommend') 推荐
           li(class=navbar_highlight === 'latest' ? 'active' : '')
-            a(href='/' title='扫一眼') 最新
+            a(href='/?t=latest') 最新
         li(class=navbar_highlight==='fund'?'active':'')
           a(href=`/fund` title='科创基金') 基金
       ul.nav.navbar-nav.navbar-right.nav-font-color

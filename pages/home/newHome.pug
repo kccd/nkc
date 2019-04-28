@@ -4,7 +4,6 @@ block title
   +includeCSS("/publicModules/thread_panel/thread_panel.css")
   +includeCSS("/swiper/dist/css/swiper.css")
   +includeCSS("/home/subscription.css")
-  include ../publicModules/vue_forums_nav/vue_forums_nav_css
   +includeCSS("/publicModules/vue_user_panel/vue_user_panel_float.css")
 
 block content
@@ -23,6 +22,7 @@ block content
             for thread in data.threads
               include ../publicModules/thread_panel/thread_panel
             -showPagingSortButton = false;
+            -showHomeButton = false;
             include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         include ../publicModules/canvas_logo

@@ -4,10 +4,13 @@
 -var query = '';
 if data.t
   -query = `&t=${data.t}`;
-if data.s
-  -query += `&s=${data.s}`;
 if data.c
   -query += `&c=${data.c}`;
+if data.d
+  -query += `&d=${data.d}`;
+//-if data.s
+//-  -query += `&s=${data.s}`;
+
 if pageCount > 1
   -const arr = [];
   -let n = 7;
@@ -34,17 +37,21 @@ if pageCount > 1
       -max = pageCount - 1;
   if showHomeButton
     .paging-button
-      a.radius-left.button(href=`/`) 订阅
-      a.button(href=`/`) 推荐
-      a.radius-right.button(href=`/`) 最新
+      if data.user
+        a.radius-left.button(href=`/?t=subscribe` class=data.t==="subscribe"?"active":"") 关注
+        a.button(href=`/?t=recommend` class=data.t==="recommend"?"active":"") 推荐
+      else
+        a.button.radius-left(href=`/?t=recommend` class=data.t==="recommend"?"active":"") 推荐
+      a.radius-right.button(href=`/?t=latest` class=data.t==="latest"?"active":"") 最新
   if showPagingDigestButton
     .paging-button
-      a.radius-left.button(href=`/`) 全部
-      a.radius-right.button(href=`/?d=true`) 精选
+      a.radius-left.button(href=`${state.url}` class=!data.d?"active": "") 全部
+      a.radius-right.button(href=`${state.url}?d=true` class=data.d?"active": "") 精选
   if showPagingSortButton
     .paging-button
-      a.radius-left.button(href=`/?s=tlm` class=data.s!=='toc'? "active": '') 最新回复
-      a.radius-right.button(href=`/?s=toc` class=data.s==="toc"?" active": "") 最新发表
+      a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '') 复序
+      a.radius-right.button(href=`?page=${page}${query}&s=toc` class=data.s==="toc"?" active": "") 帖序
+  -query += `&s=${data.s}`
   nav(aria-label='navigation').paging-nav
     ul(style='margin: 0')
       if min !== 0

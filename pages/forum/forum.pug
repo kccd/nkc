@@ -2,14 +2,53 @@ extends ../bootstrap_base
 block title
   title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
   +includeCSS("/publicModules/thread_panel/thread_panel.css")
-  include ../publicModules/vue_forums_nav/vue_forums_nav_css
   +includeCSS("/publicModules/vue_user_panel/vue_user_panel_float.css")
   +includeCSS("/forum/forum.css")
 block content
+  mixin forumPanel(header, forums)
+    .forum-panel
+      .forums-nav-header
+        +listHeader(header)
+      .home-topic-item-div
+        for f in forums
+          a(
+            href=`/f/${f.fid}`
+            target="_blank"
+            style=`background-color: ${f.color};`
+            title=f.description
+          ).topic-item
+            if f.iconFileName
+              img(
+                src=`/forum_avatar/${f.fid}`
+              )
+            span=f.displayName
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include ../publicModules/post_button
+        .forum-description
+          .forum-description-header 专业介绍
+          .forum-description-content=data.forum.description
+        .forum-count
+          .col-xs-6
+            .forum-count-number= data.forum.countThreads
+            .forum-count-title 文章
+          .col-xs-6
+            .forum-count-number= data.forum.countPosts
+            .forum-count-title 回复
+          .col-xs-6
+            .forum-count-number= data.subUsersCount
+            .forum-count-title 关注
+          .col-xs-6
+            .forum-count-number= data.forum.countPostsToday
+            .forum-count-title 今日更新
+        if data.forum.parentForums && data.forum.parentForums.length > 0
+          +forumPanel("上级专业", data.forum.parentForums)
+        if data.forum.childrenForums && data.forum.childrenForums.length > 0
+          +forumPanel("细分专业", data.forum.childrenForums)
+        if data.forum.childrenForums && data.forum.childrenForums.length > 0
+          +forumPanel("细分专业", data.forum.childrenForums)
+
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
@@ -25,6 +64,7 @@ block content
                     img(style=`background-color: ${data.forum.color}`)
                 .forum-info
                   .forum-name=data.forum.displayName
+                  .pull-right.m-r-1
                     if data.subscribed
                       button.btn-sm.forum-sub-btn.btn(
                         onclick=`subscribeForum("${data.forum.fid}", false)`
@@ -33,7 +73,8 @@ block content
                       button.btn-sm.forum-sub-btn.btn.success(
                         onclick=`subscribeForum("${data.forum.fid}", true)`
                       ) 关注
-                    .forum-abbr=data.forum.abbr
+                  .clearfix
+                  .forum-abbr=data.forum.brief
           .col-xs-12.col-md-12.m-t-1
             if data.threadTypes.length > 0
               //-.forum-category.m-b-2
@@ -41,6 +82,8 @@ block content
                 for threadType in data.threadTypes
                   a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
             .hidden-xs.hidden-sm
+              -let showPagingSortButton = true;
+              -let showPagingDigestButton = true;
               include ../publicModules/paging/paging
             if data.paging.page === 0 && data.toppedThreads.length > 0
               for thread in data.toppedThreads
@@ -48,6 +91,8 @@ block content
               div.topped-thread-header - 以上是置顶 -
             for thread in data.threads
               include ../publicModules/thread_panel/thread_panel
+            -showPagingSortButton = false;
+            -showPagingDigestButton = false;
             include ../publicModules/paging/paging
       .col-xs-12.col-md-3
         -let sideThreads = data.featuredThreads;
@@ -61,7 +106,6 @@ block content
 
 
 block scripts
-  include ../publicModules/vue_forums_nav/vue_forums_nav_js
   +includeJS("/forum/forum.js")
   include ../publicModules/vue_user_panel/vue_user_panel_float_js
 

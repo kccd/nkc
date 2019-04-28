@@ -288,6 +288,8 @@ router
     // 加载优秀的文章
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
+    // 获取用户关注的专业
+
     // 最新文章
     const latestFid = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
     latestFid.push(forum.fid);

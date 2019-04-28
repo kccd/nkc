@@ -936,4 +936,29 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
   return result;
 };
 
+/*
+* 获取用户关注的专业
+* @param {String} uid 用户ID
+* @param {[String]} fid 用户可从中获取文章的专业ID
+* @author pengxiguaa 2019-4-28
+* */
+forumSchema.statics.getUserSubForums = async (uid, fid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const ForumModel= mongoose.model('forums');
+  const sub = await SubscribeModel.find({uid, type: "forum"}).sort({toc: 1});
+  let fids = sub.map(s => s.fid);
+  fids = fids.filter(f => fid.includes(f));
+  const subForums = await ForumModel.find({
+    fid: {
+      $in: fids
+    }
+  });
+  const userSubForums = [];
+  subForums.map(forum => {
+    const index = fid.indexOf(forum.fid);
+    userSubForums[index] = forum;
+  });
+  return userSubForums;
+};
+
 module.exports = mongoose.model('forums', forumSchema);

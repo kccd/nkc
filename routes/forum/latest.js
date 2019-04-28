@@ -4,14 +4,14 @@ latestRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
     const {isModerator, forum} = data;
-		let {digest, page, sortby, cat} = query;
+		let {page, s, cat, d} = query;
 		page = page?parseInt(page): 0;
 		// 构建查询条件
 		const match = {};
 		// 获取加精文章
-		if(digest) {
+		if(d) {
 			match.digest = true;
-			data.digest = digest;
+			data.d = d;
 		}
 		// 加载某个类别的文章
 		if(cat) {
@@ -52,12 +52,12 @@ latestRouter
 		const limit = paging.perpage;
 		const skip = paging.start;
 		let sort;
-		if(sortby) {
-			sort = {toc: -1};
-			data.sortby = sortby;
-		} else {
-			sort = {tlm: -1};
-		}
+		if(s === "toc") {
+      sort = {toc: -1};
+    } else {
+      sort = {tlm: -1};
+    }
+    data.s = s;
 		const threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 
 		data.threads = await db.ThreadModel.extendThreads(threads, {

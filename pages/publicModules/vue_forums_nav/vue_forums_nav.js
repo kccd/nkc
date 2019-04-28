@@ -6,12 +6,14 @@ var vue_forums_Nav = new Vue({
     height: 0,
     forums: [],
     forumsList: [],
-    forumsIdList: []
+    forumsIdList: [],
+    subForums: []
   },
   mounted: function() {
     var data = this.$refs.vue_forums_nav_data;
     data = JSON.parse(data.innerHTML);
     this.forums = data.forums;
+    this.subForums = data.subForums;
     /*nkcAPI("/f", "GET")
       .then(function(data) {
         vue_forums_Nav.forums = data.forums;

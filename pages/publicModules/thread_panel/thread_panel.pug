@@ -49,13 +49,13 @@
     if thread.from
       .thread-panel-from
         if thread.from === 'own'
-          span 来自自己的文章
+          span 自己的文章
         else if thread.from === 'subForum'
-          span 来自关注的专业
+          span 关注的专业
         else if thread.from === 'subFriend'
-          span 来自好友
+          span 好友
         else if thread.from === "subThread"
-          span 来自关注的文章
+          span 关注的文章
     .thread-panel-reply
       a(href=`/u/${thread.lastPost.uid}` target="_blank"
         onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.lastPost.user)}')`

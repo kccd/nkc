@@ -4,11 +4,10 @@ const subscriptionRouter = require('./subscription');
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query} = ctx;
-    const {page = 0, s} = query;
+    let {page = 0, s, t, d} = query;
     const {user} = data;
 
     if(s) data.s = s;
-
     if(user) {
       // 日常登陆
       await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
@@ -76,25 +75,37 @@ router
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
+    if(user) {
+      data.subForums = await db.ForumModel.getUserSubForums(user.uid, fidOfCanGetThreads);
+    }
 
     let q = {};
     let threadListType;
-    if(!user) {
-      const {visitorThreadList} = homeSettings;
-      if(visitorThreadList === "latest") {
-        threadListType = "latest"
+    if(t) {
+      if(!["latest", "recommend", "subscribe"].includes(t)) t = '';
+      if(t === "subscribe" && !user) t = '';
+      threadListType =  t;
+    }
+    if(!t) {
+      if(!user) {
+        const {visitorThreadList} = homeSettings;
+        if(visitorThreadList === "latest") {
+          threadListType = "latest"
+        } else {
+          threadListType = "recommend"
+        }
       } else {
-        threadListType = "recommend"
-      }
-    } else {
-      const {homeThreadList} = user.generalSettings.displaySettings;
-      if(homeThreadList === "latest") {
-        threadListType = "latest";
-      } else {
-        threadListType = "subscribe";
+        const {homeThreadList} = user.generalSettings.displaySettings;
+        if(homeThreadList === "latest") {
+          threadListType = "latest";
+        } else {
+          threadListType = "subscribe";
+        }
       }
     }
 
+    data.t = threadListType;
+    data.navbar = {highlight: threadListType};
     // 关注的专业ID，关注的用户ID，关注的文章ID
     const subFid = [], subUid = [], subTid = [];
 
