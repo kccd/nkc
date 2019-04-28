@@ -79,6 +79,7 @@ router
       const certId = paramCert[paramId];
       const param = await db.ShopProductsParamModel.findOnly({_id: paramId});
       const product = await db.ShopGoodsModel.findOnly({productId: param.productId});
+      if(product.productStatus == "stopsale") ctx.throw(400, `商品id为(${product.productId})的商品停售，不可购买，请重新下单`);
       if(!product.uploadCert) continue;
       const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
       if(!cert) ctx.throw(400, "凭证上传错误，请重新上传");

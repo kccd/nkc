@@ -87,7 +87,9 @@ block content
                     div(style="float:left")
                       img(src=`/r/${cart.product.imgMaster}` style="width:60px;height:60px;margin-right:5px")
                     div
-                      a(href=`/shop/product/${cart.product.productId}` target="_blank")=cart.product.name 
+                      span 
+                        a(href=`/shop/product/${cart.product.productId}` target="_blank")=cart.product.name 
+                      span!=`(商品ID:${cart.product.productId})`
                   td(style="border-right:1px solid #f2f7ff")
                     span=cart.productParam.name
                   td(style="border-right:1px solid #f2f7ff")

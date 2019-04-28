@@ -378,14 +378,14 @@ function manageImageLoader(turn) {
   if(skip <= 0){
     skip = 0;
   }
-  var q = 24;
+  var q = 20;
   var type = "picture";
   var imageArray = [];
 
   nkcAPI('/me/media?quota='+q+'&skip='+skip+'&type='+type, 'get',{})
   .then(function(data) {
     for(var i in data.resources){
-      var imgDom = "<div class='col-sm-2' style='margin-bottom:20px;cursor: pointer;' onclick='insertImageToProduct("+data.resources[i].rid+")'><img class='img-thumbnail' style='width:100%;height:100px' src='/r/"+data.resources[i].rid+"'></div>";
+      var imgDom = "<div class='col-sm-3 col-xs-6' style='margin-bottom:20px;cursor: pointer;' onclick='insertImageToProduct("+data.resources[i].rid+")'><img class='img-thumbnail' style='width:100%;height:100px' src='/r/"+data.resources[i].rid+"'></div>";
       imageArray.push(imgDom);
     }
     skip = parseInt(data.skip);
@@ -772,6 +772,17 @@ function mulArrExchangeStr(arr) {
 }
 
 /**
+ * 取出商品属性组
+ */
+function getParaGroup() {
+  var paraArr = [];
+  $(".pname").each(function() {
+    paraArr.push($(this).val())
+  });
+  $("#paraGroup").text(paraArr)
+}
+
+/**
  * 将多维数组生成表格
  */
 function mulArrTurnTable() {
@@ -815,7 +826,8 @@ function mulArrTurnTable() {
       }
     }
   }
-  $("#arrayTable").find("tbody").html(trDom)
+  $("#arrayTable").find("tbody").html(trDom);
+  getParaGroup();
 }
 
 /**
