@@ -537,7 +537,10 @@ function onPost(that) {
     var desTypeId = $("#draftDelTypeId").html() || '';
     var did = $("#draftId").html() || '';
     var title = that.title.value.trim();
-    var abstract = $("#abstract").val().trim();
+    var abstract = "";
+    if(specialMark !== "old") {
+      abstract = $("#abstract").val().trim();
+    }
     var type = that.query.type;
     var cat = that.query.cat;
     var id;
