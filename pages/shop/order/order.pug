@@ -81,8 +81,11 @@ block shopAccountContent
                         p
                           a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
                       if order.orderStatus == "unSign" || order.orderStatus == "finish"
-                        p
-                          button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
+                        if !order.trackNumber || order.trackNumber == "no"
+                          p 该商品无需物流配送
+                        else
+                          p
+                            button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
                       if order.refundStatus == "ing"
                         p
                           a(href=`/shop/order/${order.orderId}/refund`) 退款详情

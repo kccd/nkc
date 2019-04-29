@@ -35,6 +35,30 @@ function sendGoods() {
   }) 
 }
 
+/**
+ * 无物流发货
+ */
+function sendGoodsNoLog() {
+  var sellUid = $("#newstoreid").val();
+  var orderId = $("#neworderid").val();
+  if(!orderId || !sellUid) {
+    $("#sendGoodsModal").modal("show");
+    return screenTopWarning("请重新点击发货");
+  }
+  var para = {
+    orderId: orderId
+  }
+  nkcAPI('/shop/manage/'+sellUid+'/order/sendGoodsNoLog', "PATCH", {post: para})
+  .then(function(data) {
+    screenTopAlert("订单发货成功");
+    $("#sendGoodsModal").modal("hide");
+    window.location.reload();
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error);
+  }) 
+}
+
 
 /**
  * 打开弹窗，填写运单号

@@ -2,43 +2,46 @@ const Router = require('koa-router');
 const productsRouter = new Router();
 productsRouter
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
-		// 取出待处理的开店申请
-		const applysDealing = await db.ShopApplyStoreModel.find({applyStatus: "dealing"}).sort({submitApplyToc:-1});
-		data.applysDealing = applysDealing;
-		ctx.template = "experimental/shop/applys.pug"
-		await next();
-	})
-	.post('/approve', async (ctx, next) => {
-		const {data, db, body} = ctx;
-		const {id} = body;
-		const {user} = data;
-		const apply = await db.ShopApplyStoreModel.findOne({_id:id});
-		if(!apply) ctx.throw(404, "找不到申请");
-		let nowStamp = new Date();
-		await apply.update({$set:{applyStatus: "approve", dealApplyToc:nowStamp, dealUid:user.uid}});
-		const storeId = await db.SettingModel.operateSystemID('stores', 1);
-		const userPersonal = await db.UsersPersonalModel.findOne({uid:user.uid});
-		if(!userPersonal || !userPersonal.mobile) ctx.throw(400, "该用户尚未绑定手机号,请驳回开店申请");
-		let newStoreInfo = {
-			storeId:storeId,
-			uid: apply.uid,
-			mobile: [userPersonal.mobile]
+		const {data, db, query, nkcModules} = ctx;
+		const {productType, page = 0} = query;
+		data.productType = productType;
+		// 取出全部商品贴
+		let queryMap = {
+			type: "product"
 		}
-		const newDecoration = new db.ShopDecorationsModel({storeId: storeId});
-		const newStore = new db.ShopStoresModel(newStoreInfo);
-		newDecoration.save();
-		newStore.save();
+		const count = await db.ThreadModel.count(queryMap);
+		const paging = nkcModules.apiFunction.paging(page, count);
+		data.paging = paging;
+		if(productType && productType == "adminBan") {
+			queryMap.adminBan = true;
+		}
+		const threads = await db.ThreadModel.find(queryMap).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
+		await Promise.all(threads.map(async thread => {
+			await thread.extendFirstPost();
+			await thread.extendUser();
+			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
+			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
+			thread.product = productArr[0];
+		}))
+		data.threads = threads;
+		ctx.template = "experimental/shop/products/products.pug"
 		await next();
 	})
-	.post('/reject', async (ctx, next) => {
-		const {data, db, body} = ctx;
-		const {id} = body;
-		const {user} = data;
-		const apply = await db.ShopApplyStoreModel.findOne({_id:id});
-		if(!apply) ctx.throw(404, "找不到申请");
-		let nowStamp = new Date();
-		await apply.update({$set:{applyStatus: "reject", dealApplyToc:nowStamp, dealUid:user.uid}});
+	.patch('/bansale', async(ctx, next) => {
+		const {data, db, params, body, nkcModules} = ctx;
+		const {productId} = body;
+		const product = await db.ShopGoodsModel.findOne({productId: productId});
+		if(product) {
+			await product.update({$set: {adminBan:true}});
+		}
 		await next();
+	})
+	.patch("/clearban", async(ctx, next) => {
+		const {data, db,params, body} = ctx;
+		const {productId} = body;
+		const product = await db.ShopGoodsModel.findOne({productId: productId});
+		if(product) {
+			await product.update({$set: {adminBan: false}})
+		}
 	})
 module.exports = productsRouter;

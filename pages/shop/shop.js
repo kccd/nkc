@@ -179,3 +179,20 @@ function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
 } 
+
+/**
+ * 管理员禁售商品
+ */
+function banSale(productId) {
+  var sureban = confirm("确定禁售该商品吗？");
+  if(sureban) {
+    nkcAPI("/e/settings/shop/products/bansale", "PATCH", {productId:productId})
+    .then(function(data) {
+      screenTopAlert("禁售成功");
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data)
+    })
+  }
+}
