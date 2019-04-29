@@ -176,6 +176,11 @@ const shopGoodsSchema = new Schema({
     default: Date.now,
     index: 1
   },
+  // 是否被管理员禁售
+  adminBan: {
+    type: Boolean,
+    default: false
+  },
   /**
    * 商品状态
    * @param notonshelf 未上架

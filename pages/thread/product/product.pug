@@ -86,6 +86,10 @@ style.
   }
 .row
   .col-xs-12.col-md-12(style="margin-bottom:5px")
+    if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts')) 
+      if !product.adminBan
+        .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
+          button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
     .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")
       ul#etalage
         -for(let rid of product.imgIntroductions)
@@ -178,13 +182,16 @@ style.
               span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                 span=para.name
       div.item
-        if product.productStatus == "stopsale"
-          p(style="text-align: center;background-color: tomato;padding:10px") 商品停售中
+        if product.adminBan
+          p(style="text-align: center; background-color:tomato;padding:10px") 该商品已被禁售
         else
-          div(style="display:none")#paraId!=`${paraId}`
-          a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-          a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
-            span.fa.fa-shopping-cart  加入购物车
+          if product.productStatus == "stopsale"
+            p(style="text-align: center;background-color: tomato;padding:10px") 商品已被卖家停售
+          else
+            div(style="display:none")#paraId!=`${paraId}`
+            a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+              span.fa.fa-shopping-cart  加入购物车
     .col-xs-1.col-md-1 
 
   .col-xs-12.col-md-12

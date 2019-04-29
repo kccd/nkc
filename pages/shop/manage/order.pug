@@ -111,8 +111,11 @@ block name
                         p
                           a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情
                       if order.orderStatus == "unSign" || order.orderStatus == "finish"
-                        p
-                          a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
+                        if !order.trackNumber || order.trackNumber == "no"
+                          p 该订单无物流
+                        else
+                          p
+                            a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
                       if order.orderStatus == "unShip" && order.closeStatus !== true
                         p
                           button(onclick=`openSendGoodsModal(${data.user.uid}, ${order.orderId})`) 发货
@@ -149,6 +152,7 @@ block name
           input#newstoreid(type="text" style="display:none")
           input#neworderid(type="text" style="display:none")
         .modal-footer(style="text-align:left")
+          button.btn.btn-info.btn-sm(type="button",onclick=`sendGoodsNoLog()` ) 无物流发货
           button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
           button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
 

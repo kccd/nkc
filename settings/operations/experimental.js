@@ -22,6 +22,15 @@ module.exports = {
           PATCH: "modifyShopRefundSettings"
         }
 			},
+			products: {
+				GET: "visitiShopProducts",
+				bansale:{
+					PATCH: "shopAdminBanProductSale"
+				},
+				clearban: {
+					PATCH: "shopAdminClearBanSale"
+				}
+			},
 			auth: {
 				GET: "visitShopAuth",
 				POST: "setShopAuth",

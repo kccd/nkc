@@ -14,6 +14,7 @@
 - var ip = data.ip;
 - var orderStatus = data.orderStatus;
 - var productStatus = data.productStatus;
+- var productType = data.productType;
 if paging
   - var pagingarray = []
   - var pageCount = paging.pageCount
@@ -35,13 +36,13 @@ if paging
     ul.pagination.NavigationPaging
       if start>0
         li()
-          a(href=`${toQueryString({page:0,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, type, t, q, r, orderStatus, productStatus})}`) 始
+          a(href=`${toQueryString({page:0,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, type, t, q, r, orderStatus, productStatus, productType})}`) 始
     
       each pagenum,index in pagingarray
         - var class_str = pagenum==paging.page?'active':''
         
         li(class=`${class_str}`)
-          a(href=`${toQueryString({page:pagenum,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r, orderStatus, productStatus})}`) #{pagenum + 1}
+          a(href=`${toQueryString({page:pagenum,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r, orderStatus, productStatus, productType})}`) #{pagenum + 1}
       if end<pageCount
         li()
-          a(href=`${toQueryString({page:pageCount-1,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r, orderStatus, productStatus})}`) 末
+          a(href=`${toQueryString({page:pageCount-1,fid,v, cat,sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r, orderStatus, productStatus, productType})}`) 末

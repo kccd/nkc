@@ -69,6 +69,9 @@ module.exports = {
         sendGoods: {
           PATCH: 'sendGoods'
         },
+        sendGoodsNoLog:{
+          PATCH: "sendGoodsNoLog"
+        },
         editOrder: {
           PATCH: 'editOrder'
         },      
