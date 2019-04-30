@@ -134,9 +134,12 @@ block name
                   button(onclick=`comfirmReceipt(${order.orderId})`) 提醒
                 span 买家确认收货
               li.orderPrompt 
-                span 点击查看商品的
-                span 
-                  a(onclick=`visitLogisticsInfo(${order.sellUid},${order.orderId})` style="cursor:pointer;") 物流信息
+                if !order.trackNumber || order.trackNumber == "no"
+                  span 该商品无须物流配送
+                else
+                  span 点击查看商品的
+                  span 
+                    a(onclick=`visitLogisticsInfo(${order.sellUid},${order.orderId})` style="cursor:pointer;") 物流信息
             if order.orderStatus == "finish"
               li.orderStatusLi
                 span.fa.fa-exclamation-circle.orderStatusMark
@@ -251,7 +254,7 @@ block name
               td
                 a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
               td!=`${para.productParam.name}`
-              td #{numToFloatTwo(para.productParam.price)}
+              td #{numToFloatTwo(para.singlePrice)}
               td!=`${para.count}`
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')

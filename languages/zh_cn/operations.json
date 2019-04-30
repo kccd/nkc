@@ -475,6 +475,7 @@
   "visitOrderLogistics": "[CO]查看订单物流",
   "confirmOrderReceipt": "[CO]确认收货",
   "sendGoods": "[CO]发货",
+  "sendGoodsNoLog": "[CO]无物流发货",
   "editOrder": "[CO]修改订单",
   "visitSingleOrderDetail": "[CO]用户查看订单详情",
   "visitStoreOrderDetail": "[CO]商家查看订单详情",
@@ -536,6 +537,9 @@
   "unSubThread": "取消关注文章",
   "visitUserSubThreads": "查看用户关注的文章",
   "visitRecycleMarkThreads": "查看等待修改的文章",
+  "visitiShopProducts": "[SY]商城后台商品管理列表",
+  "shopAdminBanProductSale": "[SY]商品禁售",
+  "shopAdminClearBanSale": "[SY]解除商品禁售",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

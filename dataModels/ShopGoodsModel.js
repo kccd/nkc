@@ -79,17 +79,20 @@ const shopGoodsSchema = new Schema({
     type: String,
     default: ''
   }, */
-  /**
-   * 特殊说明
-   */
-  attentions: {
-    type: Array,
-    default: []
-  },
   // 自定义商品参数(不参与搜索)
   params: {
     type: [],
     default: [],
+  },
+  // 规格id数组
+  paraIdArr: {
+    type: [],
+    default: []
+  },
+  // 独立规格数组
+  singleParaIdArr: {
+    type: [],
+    default: []
   },
   // 是否上传凭证
   uploadCert: {
@@ -138,6 +141,24 @@ const shopGoodsSchema = new Schema({
     type: String,
     default: "payReduceStock"
   },
+  // 是否使用会员折扣
+  vipDiscount: {
+    type: Boolean,
+    default: false
+  },
+  // 会员折扣列表
+  vipDisGroup: {
+    type: Array,
+    default: []
+  },
+  // 显示设置
+  productSettings: {
+    type: Schema.Types.Mixed,
+    default: {
+      priceShowToVisit: false,
+      priceShowAfterStop: false
+    }
+  },
   // 总评价数量
   evalTotalCount: {
     type: Number,
@@ -154,6 +175,11 @@ const shopGoodsSchema = new Schema({
     type: Date,
     default: Date.now,
     index: 1
+  },
+  // 是否被管理员禁售
+  adminBan: {
+    type: Boolean,
+    default: false
   },
   /**
    * 商品状态
@@ -283,14 +309,17 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
         product.name = post.t;
         product.description = post.c;
         product.abstract = post.abstract;
+        product.keywords = post.keywords;
       } else if(product.threadInfo) {
         product.name = product.threadInfo.title;
         product.description = product.threadInfo.description;
         product.abstract = product.threadInfo.abstract;
+        product.keywords = product.threadInfo.keywords;
       } else {
         product.name = "商品名称丢失";
         product.description = "商品描述丢失";
         product.abstract = "商品简介丢失";
+        product.keywords = "商品关键词丢失";
       }
     }
     if(o.thread) product.thread = threadObj[p.tid];

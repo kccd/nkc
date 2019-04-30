@@ -270,6 +270,20 @@ threadRouter
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
 			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
 			data.product = productArr[0];
+			// 判断是否使用会员价
+			let vipNum = 100;
+			if(data.product.vipDiscount) {
+				data.vipDiscount = true;
+				for(let v=0;v<data.product.vipDisGroup.length;v++) {
+					if(data.user && data.user.authLevel == data.product.vipDisGroup[v].vipLevel) {
+						vipNum = data.product.vipDisGroup[v].vipNum;
+					}
+				}
+				data.vipDisNum = vipNum;
+			}else{
+				data.vipDiscount = false;
+				data.vipDisNum = vipNum;
+			}
 			// 选定规格
 			let paId = 0;
 			for(let a=0;a<data.product.productParams.length;a++){

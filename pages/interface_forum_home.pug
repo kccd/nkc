@@ -147,9 +147,9 @@ block content
             span.fa.fa-edit &nbsp;发表文章
           if !data.forum.childrenForums || data.forum.childrenForums.length === 0
             if data.forum.followersId.includes(data.user.uid)
-              button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, false)`) 取关
+              button.btn.btn-block.btn-default(onclick=`subscribeForum('${data.forum.fid}', false)`) 取关
             else
-              button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
+              button.btn.btn-block.btn-default(onclick=`subscribeForum('${data.forum.fid}', true)`) 关注
         else
           a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
         if data.userOperationsId.includes('moveThread') && data.isModerator
@@ -210,9 +210,9 @@ block content
                 span.fa.fa-edit &nbsp;发表文章
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
                 if data.forum.followersId.includes(data.user.uid)
-                  button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, false)`) 取关
+                  button.btn.btn-block.btn-default(onclick=`subscribeForum('${data.forum.fid}', false)`) 取关
                 else
-                  button.btn.btn-block.btn-default(onclick=`subscribeForum(${data.forum.fid}, true)`) 关注
+                  button.btn.btn-block.btn-default(onclick=`subscribeForum('${data.forum.fid}', true)`) 关注
             else
               a.btn.btn-primary.btn-block(href=`/login`) 登录以发表
             if data.userOperationsId.includes('moveThread') && data.isModerator

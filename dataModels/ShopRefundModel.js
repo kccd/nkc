@@ -189,7 +189,7 @@ schema.methods.returnMoney = async function () {
   order = orders[0];
   let description = "";
   for(const p of order.params) {
-    description += `${p.count}x${p.product.name}x${p.productParam.name.join('+')}`;
+    description += `${p.count}x${p.product.name}x${p.productParam.name}`;
   }
   const {orderStatus, refundStatus, orderPrice} = order;
   if(refundStatus !=="ing" || !["unShip", "unSign"].includes(orderStatus)) throwErr(400, "订单状态已改变，请刷新");

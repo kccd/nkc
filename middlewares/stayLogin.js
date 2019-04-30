@@ -21,7 +21,7 @@ module.exports = async (ctx, next) => {
 		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
 	}
-	let userOperationsId = [], userRoles = [], userGrade = [], user;
+	let userOperationsId = [], userRoles = [], userGrade = {}, user;
 	if(userInfo) {
 		const {username, uid} = JSON.parse(decodeURI(userInfo));
 		user = await db.UserModel.findOne({uid});
@@ -123,7 +123,7 @@ module.exports = async (ctx, next) => {
 
 	data.userOperationsId = userOperationsId;
 	data.userRoles = userRoles;
-	data.userGrade = userGrade || {};
+	data.userGrade = userGrade;
   data.user = user;
 	await next();
 };

@@ -88,6 +88,13 @@ router
 		const {_id} = params;
 		const grade = await db.UsersGradeModel.findOnly({_id});
 		await grade.remove();
+		const grades = await db.UsersGradeModel.find().sort({_id: 1});
+		await db.UsersGradeModel.remove();
+		for(let i = 0; i < grades.length; i++) {
+		  const g_ = grades[i].toObject();
+		  g_._id = i;
+		  await db.UsersGradeModel(g_).save();
+    }
 		await next();
 	});
 module.exports = router;

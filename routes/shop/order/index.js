@@ -79,6 +79,7 @@ router
       const certId = paramCert[paramId];
       const param = await db.ShopProductsParamModel.findOnly({_id: paramId});
       const product = await db.ShopGoodsModel.findOnly({productId: param.productId});
+      if(product.productStatus == "stopsale") ctx.throw(400, `商品id为(${product.productId})的商品停售，不可购买，请重新下单`);
       if(!product.uploadCert) continue;
       const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
       if(!cert) ctx.throw(400, "凭证上传错误，请重新上传");
@@ -97,16 +98,32 @@ router
       // 添加购买记录
       for(let cart of post[bill].carts) {
         let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
+        let newProductParam = await db.ShopProductsParamModel.findOne({_id:cart.productParamId});
+        if(!newProductParam) ctx.throw(400, "商品规格已被商家修改，请重新下单")
+        // 取出会员折扣
+        let vipNum = 100;
+        if(cart.product.vipDiscount) {
+          for(let v=0;v<cart.product.vipDisGroup.length;v++) {
+            if(data.user && data.user.authLevel == cart.product.vipDisGroup[v].vipLevel) {
+              vipNum = cart.product.vipDisGroup[v].vipNum;
+            }
+          }
+          cart.vipDiscount = true;
+        }else{
+          cart.vipDiscount = true;
+        }
+        cart.vipNum = vipNum
         let cartObj = {
           costId,
           orderId,
           productId: cart.productId,
           productParamId: cart.productParamId,
+          productParam: newProductParam,
           count: cart.count,
           uid: cart.uid,
           freightPrice: cart.freightPrice,
           productPrice: cart.productPrice,
-          singlePrice: cart.productParam.price
+          singlePrice: cart.productParam.price * (vipNum/100)
         };
         let shopCost = db.ShopCostRecordModel(cartObj);
         if(paramCert[cart.productParamId]) {

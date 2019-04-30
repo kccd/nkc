@@ -98,16 +98,22 @@ block content
                 .forum-info
                   .forum-name=data.forum.displayName
                   .pull-right.m-r-1
+                    -let display = true;
                     if permission('visitForumInfoSettings') && data.isModerator
                       a.btn-sm.forum-sub-btn.btn.success(href=`/f/${data.forum.fid}/settings`) 设置
-                    if data.subscribed
-                      button.btn-sm.forum-sub-btn.btn(
-                        onclick=`subscribeForum("${data.forum.fid}", false)`
-                      ) 已关注
-                    else
-                      button.btn-sm.forum-sub-btn.btn.success(
-                        onclick=`subscribeForum("${data.forum.fid}", true)`
-                      ) 关注
+                      -display = false;
+                    if !data.forum.childrenForums || data.forum.childrenForums.length === 0
+                      if data.subscribed
+                        button.btn-sm.forum-sub-btn.btn(
+                          onclick=`subscribeForum("${data.forum.fid}", false)`
+                        ) 已关注
+                      else
+                        button.btn-sm.forum-sub-btn.btn.success(
+                          onclick=`subscribeForum("${data.forum.fid}", true)`
+                        ) 关注
+                      -display = false;
+                    if display
+                      div(style="height: 2rem;")
                   .clearfix
                   .forum-abbr=data.forum.brief
           if data.type === "latest"
@@ -193,30 +199,30 @@ block content
           -sideThreads = data.latestThreads;
           -sideThreadsHeader = "最新文章"
           include ../publicModules/side_thread_list
-        if data.recommendThreads.length > 0
+        if data.recommendThreads && data.recommendThreads.length > 0
           .m-t-1
             -let sideThreads = data.recommendThreads;
             -let sideThreadsHeader = "推荐文章"
             include ../publicModules/side_thread_list
         if data.user
-          if data.subThreads.length > 0
+          if data.subThreads && data.subThreads.length > 0
             .m-t-1
               -let sideThreads = data.subThreads;
               -let sideThreadsHeader = "关注的文章"
               include ../publicModules/side_thread_list
-          if data.userThreads.length > 0
+          if data.userThreads && data.userThreads.length > 0
             .m-t-1
               -let sideThreads = data.userThreads;
               -let sideThreadsHeader = "我的文章"
               include ../publicModules/side_thread_list
-        if data.subUsers.length > 0
+        if data.subUsers && data.subUsers.length > 0
           .m-t-1
             -let sideUsers = data.subUsers;
             -let sideUsersHeader= "关注者";
             include ../publicModules/side_users_list
             if data.subUsers.length > 8
               a.side-link(href=`/f/${data.forum.fid}/followers`) 查看更多
-        if data.users.length > 0
+        if data.users && data.users.length > 0
           .m-t-1
             -let sideUsers = data.users;
             -let sideUsersHeader= "今日来访";

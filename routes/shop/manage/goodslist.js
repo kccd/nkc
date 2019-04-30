@@ -71,10 +71,8 @@ goodslistRouter
   })
   // 提交商品修改信息
   .patch('/editProduct', async (ctx, next) => {
-    const {data, body, query, params, db} = ctx;
+    const {data, body, query, db} = ctx;
     const {user} = data;
-    const {uid} = params;
-    if(uid !== user.uid) ctx.throw(400, "您无权修改别人的商品");
     const {
       stockCostMethod,
       purchaseLimitCount,
@@ -82,11 +80,57 @@ goodslistRouter
       uploadCertDescription,
       isFreePost,
       freightPrice,
-      productId
+      productId,
+      params,
+      productParams,
+      singleParams,
+      vipDiscount,
+      vipDisGroup,
+      productSettings,
+      imgIntroductions,
+      imgMaster
     } = body;
     const product = await db.ShopGoodsModel.findOne({productId});
     if(user.uid !== product.uid) ctx.throw(400, "您无权修改别人的作品");
-    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice}})
+    // 删除旧的销售规格
+    let oldParaIdArr = [];
+    if(product.paraIdArr){
+      oldParaIdArr = product.paraIdArr;
+    }
+    await db.ShopProductsParamModel.remove({_id:{$in:oldParaIdArr}})
+    // 删除旧的独立规格
+    let oldSingleParaIdArr = [];
+    if(product.singleParaIdArr) {
+      oldSingleParaIdArr = product.singleParaIdArr;
+    }
+    await db.ShopProductsParamModel.remove({_id:{$in:oldSingleParaIdArr}});
+    // 添加新的销售规格
+    let paraIdArr = [];
+    for(const p of productParams) {
+      if(p.originPrice < 0) p.originPrice = 0;
+      p.productId = productId;
+      p.uid = user.uid;
+      p.stocksSurplus = p.stocksTotal;
+      p._id = await db.SettingModel.operateSystemID('shopProductsParams', 1);
+      paraIdArr.push(p._id);
+      const d = db.ShopProductsParamModel(p);
+      await d.save();
+    }
+    // 添加新的独立规格
+    let singleParaIdArr = [];
+    for(const s of singleParams) {
+      if(s.originPrice < 0) s.originPrice = 0;
+      s.productId = productId;
+      s.uid = user.uid;
+      s.type = "single";
+      s.stocksSurplus = s.stocksTotal;
+      s._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
+      singleParaIdArr.push(s._id);
+      const sd = db.ShopProductsParamModel(s);
+      await sd.save();
+    }
+    // 修改产品属性列表
+    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr,vipDiscount,vipDisGroup,productSettings,imgIntroductions,imgMaster}});
     await next();
   })
   // 立即上架

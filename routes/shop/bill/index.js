@@ -50,8 +50,21 @@ router
         freightPrice = cart.product.freightPrice.firstFreightPrice + (cart.product.freightPrice.addFreightPrice * (cart.count-1));
       }
       cart.freightPrice = freightPrice;
+      // 取出会员折扣
+      let vipNum = 100;
+			if(cart.product.vipDiscount) {
+				for(let v=0;v<cart.product.vipDisGroup.length;v++) {
+					if(data.user && data.user.authLevel == cart.product.vipDisGroup[v].vipLevel) {
+						vipNum = cart.product.vipDisGroup[v].vipNum;
+					}
+        }
+        cart.vipDiscount = true;
+      }else{
+        cart.vipDiscount = true;
+      }
+      cart.vipNum = vipNum
       // 计算商品价格合计(含运费)
-      let productPrice = cart.count * cart.productParam.price
+      let productPrice = cart.count * (cart.productParam.price * (vipNum / 100))
       cart.productPrice = productPrice;
       if(!newCartData[newCartDataUid]) {
         newCartData[newCartDataUid] = {

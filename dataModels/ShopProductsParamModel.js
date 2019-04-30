@@ -25,6 +25,26 @@ const schema = new Schema({
     default: '',
     index: 1
   },
+  // 规格名称
+  name: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  // 是否启用
+  isEnable: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
+  // 规格类型
+  // single 独立规格
+  // common 常规规格
+  type: {
+    type: String,
+    default: "common"
+  },
+  // 规格存入时间
   toc: {
     type: Date,
     default: Date.now,
@@ -106,18 +126,18 @@ schema.statics.extendParamsInfo = async (params, o) => {
       productParam: false
     };
     param.product = (await mongoose.model('shopGoods').extendProductsInfo([param.product], goodsOptions))[0];
-    if(o.name) {
-      const arr = p.index.split('-');
-      let name = [];
-      for(let i = 0; i < arr.length; i++) {
-        if(param.product.params.length !== 0){
-          name.push(param.product.params[i].values[arr[i]]);
-        }else{
-          name.push("默认规格");
-        }
-      }
-      param.name = name;
-    }
+    // if(o.name) {
+    //   const arr = p.index.split('-');
+    //   let name = [];
+    //   for(let i = 0; i < arr.length; i++) {
+    //     if(param.product.params.length !== 0){
+    //       name.push(param.product.params[i].values[arr[i]]);
+    //     }else{
+    //       name.push("默认规格");
+    //     }
+    //   }
+    //   param.name = name;
+    // }
     return param;
   }));
 };

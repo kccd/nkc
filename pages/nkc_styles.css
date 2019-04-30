@@ -1082,6 +1082,7 @@ color: #d66;
 .ResourceListItemThumb{
   display: inline-block;
   margin-right: 10px;
+  width: 60px;
 }
 .ResourceListItemText{
   display: inline-block;

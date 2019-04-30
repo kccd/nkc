@@ -126,9 +126,12 @@ block shopAccountContent
                 span 
                   a(href=`/shop/order`) 已买到的宝贝
               li.orderPrompt 
-                span 点击查看商品的
-                span 
-                  a(onclick=`visitLogisticsInfo(${order.orderId})` style="cursor:pointer;") 物流信息
+                if !order.trackNumber || order.trackNumber == "no"
+                  span 该商品无需物流配送
+                else
+                  span 点击查看商品的
+                  span 
+                    a(onclick=`visitLogisticsInfo(${order.orderId})` style="cursor:pointer;") 物流信息
             if order.orderStatus == "finish"
               li.orderStatusLi
                 span.fa.fa-exclamation-circle.orderStatusMark
@@ -239,7 +242,7 @@ block shopAccountContent
               td
                 a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
               td!=`${para.productParam.name}`
-              td #{numToFloatTwo(para.productParam.price)}
+              td #{numToFloatTwo(para.singlePrice)}
               td!=`${para.count}`
               td
                 if para.product.uploadCert

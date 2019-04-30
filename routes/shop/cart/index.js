@@ -9,8 +9,16 @@ router
       uid: user.uid
     }).sort({toc: -1});
     carts = await db.ShopCartModel.extendCartsInfo(carts);
+    let newCarts = [];
+    for(const c of carts) {
+      if(!c.productParam) {
+        await db.ShopCartModel.remove({_id: c._id});
+      }else{
+        newCarts.push(c);
+      }
+    }
     const productUsers = {};
-    for(const cart of carts) {
+    for(const cart of newCarts) {
       const productUserId = cart.product.uid;
       if(!productUsers[productUserId]) {
         productUsers[productUserId] = {

@@ -335,6 +335,23 @@ function objToStr(obj) {
   return encodeURIComponent(JSON.stringify(obj));
 }
 
+/**
+ * 省略字数，超过则用省略号
+ * @param num 字数
+ * @param str 字符串
+ */
+function cutContent(str,num) {
+	if(!num) num = 20;
+	let strNum = str.length;
+	if(strNum < num) {
+		return str
+	}else{
+		str = str.substr(0, num);
+		str += "......";
+		return str
+	}
+}
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -363,6 +380,7 @@ let pugRender = (template, data, state) => {
 		numToFloatTwo: numToFloatTwo,
 		calculateFreightPrice:calculateFreightPrice,
 		delAllCode: delAllCode,
+		cutContent:cutContent,
     // 翻译 type: 语言分类, words：关键字
     lang: (type, words) => {
       return language[type][words];

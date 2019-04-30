@@ -4,9 +4,8 @@ const subscriptionRouter = require('./subscription');
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query} = ctx;
-    let {page = 0, s, t, d} = query;
+    let {page = 0, s, t} = query;
     const {user} = data;
-
     if(s) data.s = s;
     if(user) {
       // 日常登陆
@@ -191,14 +190,12 @@ router
         }
       });
     }
-
-    if(user) {
+    /*if(user) {
       if(threadListType !== "subscribe") {
         // 加载关注的文章
         data.subscribeThreads = await db.ThreadModel.getUserSubThreads(user.uid, fidOfCanGetThreads);
       }
-    }
-
+    }*/
     if(threadListType !== "latest") {
       data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     }
