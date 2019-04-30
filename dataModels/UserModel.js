@@ -590,7 +590,7 @@ userSchema.statics.createUser = async (option) => {
 
 	const user = UserModel(userObj);
 	const userPersonal = UsersPersonalModel(userObj);
-	// const userSubscribe = UsersSubscribeModel(userObj);
+	const userSubscribe = UsersSubscribeModel(userObj);
 	const personalForum = PersonalForumModel(userObj);
 	const userGeneral = UsersGeneraModel({uid});
 
@@ -601,7 +601,7 @@ userSchema.statics.createUser = async (option) => {
 	try {
 		await user.save();
 		await userPersonal.save();
-		// await userSubscribe.save();
+		await userSubscribe.save();
 		await personalForum.save();
 		await userGeneral.save();
 		const allSystemMessages = await SmsModel.find({fromSystem: true});
@@ -624,7 +624,7 @@ userSchema.statics.createUser = async (option) => {
 	} catch (error) {
 		await UserModel.remove({uid});
 		await UsersPersonalModel.remove({uid});
-		// await UsersSubscribeModel.remove({uid});
+		await UsersSubscribeModel.remove({uid});
 		await PersonalForumModel.remove({uid});
 		await UsersGeneraModel.remove({uid});
 		await SystemInfoLogModel.remove({uid});
