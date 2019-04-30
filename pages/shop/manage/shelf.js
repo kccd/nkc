@@ -1096,6 +1096,15 @@ function editProductShelf(uid, productId) {
     freightPrice.firstFreightPrice = firstFreightPrice;
     freightPrice.addFreightPrice = addFreightPrice;
   }
+  // 获取全部商品图的id，存入一个数组
+  var imgIntroductions = [];
+  $("#productImages").find('img.picShow').each(function(){
+    imgIntroductions.push($(this).attr("imageId"));
+  })
+  if(imgIntroductions.length == 0){
+    throw("至少上传一张商品图")
+  }
+  var imgMaster = imgIntroductions[0];
   var params = tableTurnParams();
   var productParams = obtainProductPrice();
   var singleParams = getSingleParams();
@@ -1113,7 +1122,9 @@ function editProductShelf(uid, productId) {
     singleParams: singleParams,
     vipDiscount:vipDiscount,
     vipDisGroup: vipDisGroup,
-    productSettings: productSettings
+    productSettings: productSettings,
+    imgIntroductions: imgIntroductions,
+    imgMaster: imgMaster,
   }
   nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
   .then(function(data) {
