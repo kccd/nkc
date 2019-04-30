@@ -38,6 +38,11 @@ userRouter
     const {user} = data;
     const {uid} = params;
     if(user) {
+      const subForums = await db.SubscribeModel.find({
+        type: "forum",
+        uid: user.uid
+      });
+      data.subForumsId = subForums.map(s => s.fid);
 	    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
 	    data.subscribed = await db.SubscribeModel.findOne({
         type: "user",
@@ -77,12 +82,20 @@ userRouter
 
 		// --拿到关注的领域
 		const visibleFid = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
-	  let forumsId = [];
-	  for (let fid of targetUserSubscribe.subscribeForums) {
+	  // let forumsId = [];
+	  const sub = await db.SubscribeModel.find({
+      type: "forum",
+      fid: {
+        $in: visibleFid
+      },
+      uid: targetUser.uid
+    });
+	  const forumsId = sub.map(s => s.fid);
+	  /*for (let fid of targetUserSubscribe.subscribeForums) {
 		  if (visibleFid.includes(fid) && !forumsId.includes(fid)) {
 			  forumsId.push(fid);
 		  }
-	  }
+	  }*/
 	  /*const count = forumsId.length;
 	  paging = apiFunction.paging(page, count);
 	  forumsId.slice(paging.start, paging.start + paging.perpage);*/
