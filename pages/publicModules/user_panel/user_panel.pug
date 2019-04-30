@@ -1,0 +1,6 @@
+.module-user-panel
+  .module-user-panel-avatar
+    img(src=`/avatar/${targetUser.uid}`)
+  .module-user-panel-info
+    a(href=`/u/${targetUser.uid}` target="_blank").module-user-panel-name= targetUser.username
+    .module-user-panel-description=targetUser.description || "暂未填写个人简介"

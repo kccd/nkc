@@ -10,7 +10,7 @@ block title
       option(selected=(data.privacy[k] === 3) data=3) 对已登录用户显示
       option(selected=(data.privacy[k] === 4) data=4) 完全公开
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_user_settings

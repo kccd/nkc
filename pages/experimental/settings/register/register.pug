@@ -1,0 +1,40 @@
+extends ../../experimental
+block eTitle
+  title 注册设置
+  style.
+    .forum-span{
+      display: inline-block;
+      height: 3rem;
+      line-height: 3rem;
+      padding: 0 1rem;
+      font-size: 1.2rem;
+      color: #fff;
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+    .forum-span .fa{
+      margin-left: 0.5rem;
+    }
+block eContent
+  .container-fluid.max-width
+    include ../../../publicModules/selectForum/selectForum
+    .row
+      .hidden#data= objToStr({regSettings: data.regSettings, selectedForums: data.selectedForums})
+      .col-xs-12.col-md-12#app(v-cloak)
+        h4 注册设置
+        h5 注册用户默认关注的栏目
+        .m-t-1
+          .forum-span(v-for="forum in selectedForums" :style="'background-color: ' + forum.color" @click="remove(forum)")
+            span {{forum.displayName}}
+            span.fa.fa-remove
+          .forum-span(@click="select").btn-success
+            span 添加
+            span.fa.fa-plus
+        .m-t-2
+          h5.text-danger(v-if="error") {{error}}
+          h5.text-success(v-if="info") {{info}}
+          button.btn.btn-primary(@click='save') 保存
+
+block scripts
+  +includeJS("/publicModules/selectForum/selectForum.js")
+  +includeJS('/experimental/settings/register/register.js')

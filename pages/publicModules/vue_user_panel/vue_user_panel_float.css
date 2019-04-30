@@ -1,0 +1,80 @@
+#vue_user_panel_float .content{
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  height: 13rem;
+  z-index: 10000;
+  width: 25rem;
+  background-color: #fff;
+  box-shadow: 0 0 20px 0 rgba(0,0,0,0.3);
+  border-radius: 3px;
+  background-size: cover;
+  padding: 1rem;
+}
+#vue_user_panel_float .user_base{
+  height: 6rem;
+}
+#vue_user_panel_float .user_info{
+  margin-top: 1rem;
+  padding-top: 1rem;
+  font-size: 1rem;
+  height: 5rem;
+}
+#vue_user_panel_float .user_info .col-xs-3{
+  padding: 0;
+}
+#vue_user_panel_float .user_avatar{
+  height: 5rem;
+  width: 5rem;
+  display: inline-block;
+  vertical-align: top;
+}
+#vue_user_panel_float .user_avatar img{
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+#vue_user_panel_float .user_div{
+  padding: 0 0.5rem;
+  display: inline-block;
+  vertical-align: top;
+  width: 17rem;
+}
+#vue_user_panel_float .user_name{
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #3494da;
+}
+#vue_user_panel_float .user_description{
+  font-size: 1rem;
+  max-height: 3rem;
+  overflow: hidden;
+  color: #555;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+#vue_user_panel_float .user_cert{
+  margin-top: 0.3rem;
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+  color: #e85a71;
+}
+#vue_user_panel_float .user_info_count{
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-align: center;
+  color: #444;
+}
+#vue_user_panel_float .user_info_title{
+  font-size: 1rem;
+  color: #777;
+  text-align: center;
+}
+#vue_user_panel_float .user_id{
+  font-size: 1rem;
+  padding-top: 0.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: #555;
+}

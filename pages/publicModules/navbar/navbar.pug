@@ -1,0 +1,215 @@
+//- 链接背景高亮判断
+- var navbar = data.navbar || {}
+-var navbar_highlight = data.navbar_highlight||navbar.highlight
+if data.user
+  //- 新信息条数
+  -var newMessage = data.user.newMessage;
+  -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0);
+nav.navbar.navbar-default.navbar-fixed-top.nkcshade
+  .container-fluid.max-width
+    .navbar-header
+      button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false")
+        .newMessagePoint(style=messageSum > 0 ? 'display: block;': '')
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+      //- 手机屏幕 未登录状态时显示菜单按钮
+      //-if !data.user && 0
+        .hidden-md.hidden-lg.navbar-brand.fa.fa-bars(onclick="openNKCDrawer()")
+      a.navbar-brand(href="/" )= `${data.serverSettings?data.serverSettings.websiteName: '科创论坛'}`
+      if data.user
+        //- 已登录状态 显示头像
+        .navbar-brand.userInfo-m
+          .userInfo-m-point.message-switch(class=!messageSum?"disabled":"")=messageSum
+          img(
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            src=`/avatar/${data.user.uid}`
+            onclick="openNKCDrawer()"
+          )
+      else
+        .navbar-brand.userInfo-m
+          a(href='/login' title='还记得密码吗？') 登录
+          span &nbsp;&nbsp;&nbsp;
+          a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+
+
+      //- 侧滑抽屉
+      .nkc-drawer
+        .nkc-drawer-right(onclick="closeNKCDrawer()")
+        .nkc-drawer-body
+          if data.user
+            .nkc-drawer-header
+              a(href=`/u/${data.user.uid}/settings`).nkc-drawer-settings.nkc-drawer-link
+                .fa.fa-cog &nbsp;资料设置
+              a.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum?"disabled":"" href='/message') 新消息
+                span.message-switch(class=!messageSum?"disabled":"")=messageSum
+            .nkc-drawer-avatar
+              img(src=`/avatar/${data.user.uid}`)
+            .nkc-drawer-username= data.user.username
+            .nkc-drawer-certs= data.user.info.certsName
+            .nkc-drawer-count
+              .col-xs-3
+                .nkc-drawer-count-number=data.user.threadCount
+                .nkc-drawer-count-title 文章
+              .col-xs-3
+                .nkc-drawer-count-number=data.user.postCount
+                .nkc-drawer-count-title 回复
+              .col-xs-3
+                .nkc-drawer-count-number=data.user.xsf
+                .nkc-drawer-count-title 学术分
+              .col-xs-3
+                .nkc-drawer-count-number=data.user.kcb/100
+                .nkc-drawer-count-title 科创币
+          else
+            .nkc-drawer-header
+            .nkc-drawer-visitor
+              .col-xs-12
+                .fa.fa-user-circle
+              .col-xs-4.col-xs-offset-2
+                a(href="/login") 登录
+              .col-xs-4
+                a(href="/register") 注册
+          ul.nkc-drawer-list
+          if data.user
+            ul.nkc-drawer-list
+              li
+                a(href=`/u/${data.user.uid}`)
+                  span.fa.fa-user-circle-o &nbsp;个人名片
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/m/${data.user.uid}`)
+                  span.fa.fa-window-maximize &nbsp;专栏
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/u/${data.user.uid}/collections/unclassified`)
+                  span.fa.fa-folder-o &nbsp;收藏
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/u/${data.user.uid}/sub/t`)
+                  span.fa.fa-bookmark-o &nbsp;我的关注
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/u/${data.user.uid}/drafts`)
+                  span.fa.fa-inbox &nbsp;草稿箱
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/account/finance`)
+                  span.fa.fa-file-text-o &nbsp;账单
+                  span.pull-right.fa.fa-angle-right
+
+            ul.nkc-drawer-list
+              li
+                a(href=`/shop/order`)
+                  span.fa.fa-file-text-o &nbsp;我的订单
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/shop/manage`)
+                  span.fa.fa-archive &nbsp;我出售的
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/shop/cart`)
+                  span.fa.fa-shopping-cart &nbsp;购物车
+                  span.pull-right.fa.fa-angle-right
+
+
+            a(href="/logout").nkc-drawer-exit 退出登录
+
+
+
+    //- 电脑屏幕
+    .collapse.navbar-collapse#bs-example-navbar-collapse-1
+      ul.nav.navbar-nav
+        if data.user
+          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
+            a(href='/?t=subscribe') 关注
+          li(class=navbar_highlight === 'latest' ? 'active' : '')
+            a(href='/?t=latest') 最新
+          li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
+            .nav-message-num.message-switch(class=!messageSum ? 'disabled': '')= messageSum
+            a(href=`/message` title='消息') 消息
+        else
+          li(class=navbar_highlight === 'latest' ? 'active' : '')
+            a(href='/?t=latest') 最新
+        li(class=navbar_highlight==='fund'?'active':'')
+          a(href=`/fund` title='科创基金') 基金
+      ul.nav.navbar-nav.navbar-right.nav-font-color
+        if data.user
+          if data.userOperationsId.includes('visitExperimentalStatus')
+            li
+              a(href='/e')
+                span.fa.fa-cogs &nbsp;
+                span 管理
+          - var user = data.user
+          - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
+          li.dropdown.userInfo
+            img(src=`/avatar/${user.uid}`)
+            a.username(
+              href="#"
+              class="dropdown-toggle"
+              data-toggle="dropdown"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+            )
+              span(title=title)= user.username || `用户${user.uid}`
+              span.caret
+
+            //- 用户名下拉列表
+            ul.dropdown-menu
+              li
+                a(href=`/u/${user.uid}`)
+                  span.fa.fa-user-o &nbsp;个人名片
+              li
+                a(href=`/m/${user.uid}`)
+                  span.fa.fa-window-maximize &nbsp;专栏
+              li
+                a(href=`/message`)
+                  span.fa.fa-envelope-o &nbsp;消息
+              li
+                a(href=`/u/${user.uid}/collections/unclassified`)
+                  span.fa.fa-folder-o &nbsp;收藏
+              li
+                a(href=`/u/${user.uid}/sub/t`)
+                  span.fa.fa-bookmark-o &nbsp;我的关注
+              li
+                a(href=`/u/${user.uid}/drafts`)
+                  span.fa.fa-inbox &nbsp;草稿箱
+                  span.messageNumber.draftMessage= data.user.draftCount || ''
+              li
+                a(href=`/account/finance?t=all`)
+                  span.fa.fa-file-text-o &nbsp;账单
+              li
+                a(href=`/activity`)
+                  span.fa.fa-trophy &nbsp;活动
+              li.divider
+              li
+                a(href=`/u/${user.uid}/settings`)
+                  span.fa.fa-edit &nbsp;编辑资料
+              li.divider
+              li
+                a(href=`/shop/order`)
+                  span.fa.fa-file-text-o &nbsp;我的订单
+              li
+                a(href=`/shop/manage`)
+                  span.fa.fa-archive &nbsp;我出售的
+              li
+                a(href=`/shop/cart`)
+                  span.fa.fa-shopping-cart &nbsp;购物车
+              li.divider
+              li
+                a(href=`/logout` title='不，不要走！')
+                  span.fa.fa-sign-out &nbsp;退出
+        else
+          li.userInfo
+            a(href='/login' title='还记得密码吗？') 登录
+          li.userInfo
+            a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+      form.navbar-form.navbar-left(action='/search' method='GET')
+        .form-group
+          input.form-control(type='text' name='q' placeholder='关键词、文号、用户')
+        button.btn.btn-default(type='submit') 搜索

@@ -192,10 +192,10 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
       tid,
       fid
     });
+    await log.save();
     await user.update({$inc: q});
     user[key] += change;
     await user.calculateScore();
-    await log.save();
   }
 	/*const UserModel = mongoose.model('users');
 	const TypeOfScoreChange = mongoose.model('typesOfScoreChange');

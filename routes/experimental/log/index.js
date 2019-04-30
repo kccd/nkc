@@ -11,6 +11,7 @@ const xsfRouter = require('./xsf');
 const rechargeRouter = require("./recharge");
 const withdrawRouter = require("./withdraw");
 const examRouter = require("./exam");
+const recycleRouter = require("./recycle");
 logRouter
   .get('/', async (ctx, next) => {
     return ctx.redirect(`/e/log/public`);
@@ -23,6 +24,7 @@ logRouter
   .use('/public', publicRouter.routes(), publicRouter.allowedMethods())
   .use('/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/experimental', experimentalRouter.routes(), experimentalRouter.allowedMethods())
+  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
   .use('/secret', secretRouter.routes(), secretRouter.allowedMethods())
   .use('/behavior', behaviorRouter.routes(), behaviorRouter.allowedMethods())
   .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods());

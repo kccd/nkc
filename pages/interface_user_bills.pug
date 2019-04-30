@@ -4,7 +4,7 @@ block title
   link(rel='stylesheet' href='/fund.css')
 block content
   -const mainContainer1400 = true
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     mixin loadInfo(obj)
       if obj.type === 'fundPool'
         th= '资金池'

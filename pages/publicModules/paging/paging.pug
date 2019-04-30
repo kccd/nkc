@@ -1,0 +1,80 @@
+-var page = data.paging.page || 0;
+-var pageCount = data.paging.pageCount || 1;
+-var min, max;
+-var query = '';
+if data.t
+  -query = `&t=${data.t}`;
+if data.c
+  -query += `&c=${data.c}`;
+if data.d
+  -query += `&d=${data.d}`;
+if data.cat
+  -query += `&cat=${data.cat}`;
+//-if data.s
+//-  -query += `&s=${data.s}`;
+if showHomeButton
+  .paging-button
+    if data.user
+      a.radius-left.button(href=`/?t=subscribe` class=data.t==="subscribe"?"active":"") 关注
+      a.button(href=`/?t=recommend` class=data.t==="recommend"?"active":"") 推荐
+    else
+      a.button.radius-left(href=`/?t=recommend` class=data.t==="recommend"?"active":"") 推荐
+    a.radius-right.button(href=`/?t=latest` class=data.t==="latest"?"active":"") 最新
+if showPagingDigestButton
+  .paging-button
+    a.radius-left.button(href=`${state.url}` class=!data.d?"active": "") 全部
+    a.radius-right.button(href=`${state.url}?d=true` class=data.d?"active": "") 精选
+if showPagingSortButton
+  .paging-button
+    a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '') 复序
+    a.radius-right.button(href=`?page=${page}${query}&s=toc` class=data.s==="toc"?" active": "") 帖序
+if data.s
+  -query += `&s=${data.s}`
+if pageCount > 1
+  -const arr = [];
+  -let n = 7;
+  -let reduce1 = page-3;
+  -let reduce2 =  page+3;
+  if(reduce1 > 0)
+    if(reduce2 > pageCount)
+      -max = pageCount;
+      if(reduce1-(reduce2 - pageCount) < 0)
+        -min = 0;
+      else
+        -min = reduce1-(reduce2 - pageCount);
+    else
+      -max = reduce2;
+      -min = reduce1;
+  else
+    -min = 0;
+    if(reduce2 < pageCount)
+      if(pageCount < reduce2 - reduce1)
+        -max = pageCount;
+      else
+        -max = reduce2-reduce1;
+    else
+      -max = pageCount - 1;
+  nav(aria-label='navigation').paging-nav
+    ul(style='margin: 0')
+      if min !== 0
+        li
+          a(href=`${state.url}?page=${0}${skipId || ''}${query}`) 1
+        li ...
+      -for(let i = 0; i < pageCount; i++)
+        if i >= min && i <= max
+          -let active = '';
+          if(page === i)
+            -active = 'active';
+          li(class=active)
+            a(href=`${state.url}?page=${i}${skipId || ''}${query}`)= i+1
+      if max < pageCount - 1
+        li ...
+        li
+          a(href=`${state.url}?page=${pageCount - 1}${skipId || ''}${query}`)= pageCount
+      if showPagingInput && (max < pageCount - 1 || min !== 0)
+        li
+          | 跳转到
+          input(type="number" id="paging_nav_input")
+          |页
+          button(
+            onclick=`var newPage = Number($("#paging_nav_input").val());window.location.href='${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}'`) 确定

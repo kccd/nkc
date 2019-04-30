@@ -1,0 +1,67 @@
+.thread-panel
+  .thread-panel-author-info
+    a(href=`/u/${thread.uid}` target="_blank").thread-panel-author
+      img(src=`/avatar_small/${thread.uid}`)
+      span(
+        onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.firstPost.user)}')`
+        onmouseleave="vue_user_panel_float.close()"
+      )= thread.firstPost.user.username
+
+    .thread-panel-forum
+      if data.forum
+        -let displayForumNav = false;
+        for f in thread.forums
+          if f.fid !== data.forum.fid
+            -displayForumNav = true;
+            a(href=`/f/${f.fid}` title=f.description)= f.displayName
+        if !displayForumNav && thread.categories.length !== 0
+          for category in thread.categories
+            if data.threadTypesId.includes(category.cid)
+              a(href=`/f/${data.forum.fid}/latest?cat=${category.cid}`)= category.name
+      else
+        -let forum;
+        for f in thread.forums
+          -forum = f;
+          if f.forumType === 'topic'
+            -break;
+        a(href=`/f/${forum.fid}` title=forum.description)= forum.displayName
+
+    .thread-panel-time=fromNow(thread.toc)
+
+  a(href=`/t/${thread.tid}` class=thread.digest?"digest":"").thread-panel-title= thread.firstPost.t
+  .thread-panel-abstract
+    if thread.hasCover
+      .thread-panel-abstract-cover(
+        style=`background-image: url(/cover/${thread.tid})`
+      )
+    .thread-panel-abstract-content
+      a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
+      a(href=`/t/${thread.tid}?&last_page=true#${thread.lastPost.pid}`).text-right
+        p.thread-panel-abstract-reply=thread.lastPost.c.slice(0, 200)
+  .thread-panel-info
+    .thread-panel-button
+      if thread.firstPost.voteUp - thread.firstPost.voteDown
+        .fa.fa-thumbs-up=` ${thread.firstPost.voteUp - thread.firstPost.voteDown || ''}`
+      if thread.hits
+        .fa.fa-eye=` ${thread.hits}`
+      if thread.count - 1
+        .fa.fa-comment=` ${thread.count - 1}`
+    if thread.from
+      .thread-panel-from
+        if thread.from === 'own'
+          span 自己的文章
+        else if thread.from === 'subForum'
+          span 关注的专业
+        else if thread.from === 'subFriend'
+          span 好友
+        else if thread.from === "subThread"
+          span 关注的文章
+    .thread-panel-reply
+      a(href=`/u/${thread.lastPost.uid}` target="_blank"
+        onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.lastPost.user)}')`
+        onmouseleave="vue_user_panel_float.close()"
+      )= thread.lastPost.user.username
+      span=fromNow(thread.lastPost.toc)
+
+
+

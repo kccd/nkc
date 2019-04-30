@@ -1,7 +1,7 @@
 let io;
 const db = require('../../../dataModels');
 const Cookies = require('cookies-string-parse');
-const settings = require('../../../settings');
+const cookieConfig = require("../../../config/cookie");
 const util = require('../../util');
 const moment = require('moment');
 const thread = async (i) => {
@@ -15,7 +15,7 @@ const thread = async (i) => {
     const thread = await db.ThreadModel.findOne({tid});
     if(!thread) return next(new Error('thread not found'));
     const cookies = new Cookies(handshake.headers.cookie, {
-      keys: [settings.cookie.secret]
+      keys: [cookieConfig.secret]
     });
     const userInfo = cookies.get('userInfo', {
       signed: true

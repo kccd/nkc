@@ -10,15 +10,13 @@ subscribeRouter
 		}
 		data.targetUser = await db.UserModel.findOnly({uid});
 		const {dbFunction} = ctx.nkcModules;
-		// data.forumList = await dbFunction.getAvailableForums(ctx);
-		// data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
-		const options = {
-			gradeId: data.userGrade._id,
-			rolesId: data.userRoles.map(r => r._id),
-			uid
-		};
 		const forums = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
 		data.forums = await dbFunction.forumsListSort(forums);
+		const subForums = await db.SubscribeModel.find({
+      uid: data.user.uid,
+      type: "forum"
+    });
+		data.subFid = subForums.map(s => s.fid);
 		ctx.template = 'interface_user_subscribe.pug';
 		await next();
 	})
@@ -69,9 +67,23 @@ subscribeRouter
     let {db} = ctx;
     let {user} = ctx.data;
     if(user.uid === uid) ctx.throw(400, '关注自己干嘛？');
-    let subscribersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: uid}, {$addToSet: {subscribers: user.uid}});
-    let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$addToSet: {subscribeUsers: uid}});
-    if(subscribersOfDB.subscribers.indexOf(user.uid) > -1 && subscribeUsersOfDB.subscribeUsers.indexOf(uid) > -1) ctx.throw(400, '您之前已经关注过该用户了，没有必要重新关注');
+    await user.ensureSubLimit("user");
+    let sub = await db.SubscribeModel.findOne({
+      type: "user",
+      uid: user.uid,
+      tUid: uid
+    });
+    if(sub) ctx.throw(400, '您之前已经关注过该用户了，没有必要重新关注');
+
+    sub = db.SubscribeModel({
+      _id: await db.SettingModel.operateSystemID("subscribes", 1),
+      type: "user",
+      uid: user.uid,
+      tUid: uid
+    });
+
+    await sub.save();
+
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
     await db.KcbsRecordModel.insertSystemRecord('followed', ctx.data.targetUser, ctx);
     await next();
@@ -82,9 +94,15 @@ subscribeRouter
     if(!uid) ctx.throw(400, '参数不正确');
     let {db} = ctx;
     let {user} = ctx.data;
-    let subscribersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: uid}, {$pull: {subscribers: user.uid}});
-    let subscribeUsersOfDB = await db.UsersSubscribeModel.findOneAndUpdate({uid: user.uid}, {$pull: {subscribeUsers: uid}});
-    if(subscribersOfDB.subscribers.indexOf(user.uid) === -1 && subscribeUsersOfDB.subscribers.indexOf(uid) === -1) ctx.throw(400, '您之前没有关注过该用户，操作无效');
+    const sub = await db.SubscribeModel.findOne({
+      type: "user",
+      uid: user.uid,
+      tUid: uid
+    });
+    if(!sub) ctx.throw(400, '您之前没有关注过该用户，操作无效');
+
+    await sub.remove();
+
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
     await db.KcbsRecordModel.insertSystemRecord('unFollowed', ctx.data.targetUser, ctx);
     await next();

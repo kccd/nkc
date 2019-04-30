@@ -187,6 +187,15 @@ const forumSchema = new Schema({
     type: String,
     required: true,
     index: 1
+  },
+  // 关注类型
+  // force: 强制关注（关注后不可取消）
+  // free: 自由关注（可取消）
+  // unSub: 不可关注（已关注的可取消）
+  subType: {
+    type: String,
+    default: "free",
+    index: 1
   }
 }, {toObject: {
 		getters: true,
@@ -877,6 +886,81 @@ forumSchema.methods.extendRelatedForums = async function(fids) {
   }
   const relatedForums = await ForumModel.find({fid: {$in: relatedForumsId}});
   return this.relatedForums = relatedForums;
-}
+};
+
+/*
+* 加载专业列表，树形结构，并只保留了基本信息（fid，forumType, iconFileName, displayName, parentsId, color）
+* @param {[object]} userRoles 用户的证书对象所组成的数组
+* @param {object} userGrade 用户的等级对象
+* @param {object} user 用户对象
+* @author pengxiguaa 2019-4-18
+* @return {[object]} 专业对象所组成的数组
+* */
+forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
+    }
+  }, {
+    fid: 1,
+    displayName: 1,
+    forumType: 1,
+    color: 1,
+    parentsId: 1,
+    iconFileName: 1,
+    description: 1
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
+  });
+
+  for(let forum of forums) {
+    for(const fid of forum.parentsId) {
+      const parentForum = forumsObj[fid];
+      if(parentForum) {
+        parentForum.childrenForums.push(forum);
+      }
+    }
+  }
+  const result = [];
+  for(let forum of forums) {
+    if(forum.parentsId.length === 0) {
+      result.push(forum);
+    }
+  }
+  return result;
+};
+
+/*
+* 获取用户关注的专业
+* @param {String} uid 用户ID
+* @param {[String]} fid 用户可从中获取文章的专业ID
+* @author pengxiguaa 2019-4-28
+* */
+forumSchema.statics.getUserSubForums = async (uid, fid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const ForumModel= mongoose.model('forums');
+  const sub = await SubscribeModel.find({uid, type: "forum"}).sort({toc: 1});
+  let fids = sub.map(s => s.fid);
+  fids = fids.filter(f => fid.includes(f));
+  const subForums = await ForumModel.find({
+    fid: {
+      $in: fids
+    }
+  });
+  const userSubForums = [];
+  subForums.map(forum => {
+    const index = fid.indexOf(forum.fid);
+    userSubForums[index] = forum;
+  });
+  return userSubForums.filter(f => !!f);
+};
 
 module.exports = mongoose.model('forums', forumSchema);

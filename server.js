@@ -42,6 +42,7 @@ const jobsInit = async () => {
   jobs.shop();
   jobs.backupDatabase();
   jobs.checkKcbsRecords();
+  jobs.moveRecycleMarkThreads();
 };
 
 

@@ -2,7 +2,6 @@ const paging = require('../settings/paging');
 const moment = require('moment');
 const http = require("http");
 const aliAppCode = require("../config/aliAppCode");
-const db = require('../dataModels');
 const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 let {perpage} = paging;
@@ -427,6 +426,7 @@ fn.getIpAddress = async (ip) => {
 }
 
 fn.getTrackInfo = async (trackNumber, trackName) => {
+  const db = require('../dataModels');
   let objInfo;
   let cacheData = await db.ApiCacheDataModel.findOne({id:trackNumber});
   if(!cacheData) {
@@ -523,5 +523,4 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
 	}
   return freightPrice;
 }
-
 module.exports = fn;

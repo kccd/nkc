@@ -24,6 +24,7 @@ const userSchema = new Schema({
   },
   tlv: {
     type: Date,
+    index: 1,
     default: Date.now,
   },
   disabledPostsCount: {
@@ -104,6 +105,7 @@ const userSchema = new Schema({
   color: String,
   certs: {
     type: [String],
+    default: [],
     index: 1
   },
   postSign: String,
@@ -545,6 +547,7 @@ userSchema.statics.createUser = async (option) => {
 	const UsersPersonalModel = mongoose.model('usersPersonal');
 	const UsersSubscribeModel = mongoose.model('usersSubscribe');
 	const PersonalForumModel = mongoose.model('personalForums');
+	const SubscribeModel = mongoose.model("subscribes");
 	const SettingModel = mongoose.model('settings');
 	const UsersGeneraModel = mongoose.model('usersGeneral');
 	const MessageModel = mongoose.model('messages');
@@ -587,14 +590,18 @@ userSchema.statics.createUser = async (option) => {
 
 	const user = UserModel(userObj);
 	const userPersonal = UsersPersonalModel(userObj);
-	const userSubscribe = UsersSubscribeModel(userObj);
+	// const userSubscribe = UsersSubscribeModel(userObj);
 	const personalForum = PersonalForumModel(userObj);
 	const userGeneral = UsersGeneraModel({uid});
+
+	// 生成关注专业记录
+  const regSettings = await SettingModel.findById("register");
+  const {defaultSubscribeForumsId} = regSettings.c;
 
 	try {
 		await user.save();
 		await userPersonal.save();
-		await userSubscribe.save();
+		// await userSubscribe.save();
 		await personalForum.save();
 		await userGeneral.save();
 		const allSystemMessages = await SmsModel.find({fromSystem: true});
@@ -603,14 +610,30 @@ userSchema.statics.createUser = async (option) => {
 			viewedUsers.push(uid);
 			await sms.update({viewedUsers});
 		}
+
+		for(const fid of defaultSubscribeForumsId) {
+		  const sub = SubscribeModel({
+        _id: await SettingModel.operateSystemID("subscribes", 1),
+        uid,
+        type: "forum",
+        fid
+      });
+		  await sub.save();
+    }
+
 	} catch (error) {
 		await UserModel.remove({uid});
 		await UsersPersonalModel.remove({uid});
-		await UsersSubscribeModel.remove({uid});
+		// await UsersSubscribeModel.remove({uid});
 		await PersonalForumModel.remove({uid});
 		await UsersGeneraModel.remove({uid});
 		await SystemInfoLogModel.remove({uid});
-		const err = new Error(`新建用户出错: ${error}`);
+		await SubscribeModel.remove({
+      uid,
+      type: "forum",
+      fid: {$in: defaultSubscribeForumsId}
+    });
+		const err = new Error(`创建用户出错: ${error}`);
 		err.status = 500;
 		throw err;
 	}
@@ -804,7 +827,10 @@ userSchema.statics.extendUsersInfo = async (users) => {
   for(const personal of usersPersonal) {
     personalObj[personal.uid] = personal;
   }
-  await Promise.all(users.map(async user => {
+
+  const users_ = []; // 普通对象
+
+  for(const user of users) {
     let certs = user.certs.concat([]);
     // 若用户拥有“banned”证书，则忽略其他证书
     if(certs.includes('banned')) {
@@ -835,7 +861,9 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     info.certsName = info.certsName.join(' ');
     user.info = info;
-  }));
+    users_.push(user.toObject());
+  }
+  return users_;
 };
 
 userSchema.methods.extendAuthLevel = async function() {
@@ -925,4 +953,40 @@ userSchema.methods.updateKcb = async function() {
   const UserModel = mongoose.model("users");
   this.kcb = await UserModel.updateUserKcb(this.uid);
 };
+/*
+* 验证用户是否还能关注相应的内容
+* @param {String} type 关注的类型 user: 关注用户, forum: 关注专业, thread: 关注文章
+* @author pengxiguaa 2019-4-24
+* */
+userSchema.methods.ensureSubLimit = async function(type) {
+  const SubscribeModel = mongoose.model("subscribes");
+  const SettingModel = mongoose.model("settings");
+  const subSettings = await SettingModel.findById("subscribe");
+  const {subUserCountLimit, subForumCountLimit, subThreadCountLimit} = subSettings.c;
+  if(type === "user") {
+    if(subUserCountLimit <= 0) throwErr(400, "关注用户功能已关闭");
+    const userCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "user"
+    });
+    if(userCount >= subUserCountLimit) throwErr(400, "关注用户数量已达上限");
+  } else if(type === "forum") {
+    if(subForumCountLimit <= 0) throwErr(400, "关注专业已关闭");
+    const forumCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "forum"
+    });
+    if(forumCount >= subForumCountLimit) throwErr(400, "关注专业数量已达上限");
+  } else if(type === "thread") {
+    if(subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
+    const threadCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "thread"
+    });
+    if(threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
+  } else {
+    throwErr(500, `未知的type类型：${type}`);
+  }
+};
+
 module.exports = mongoose.model('users', userSchema);

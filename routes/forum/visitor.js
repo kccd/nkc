@@ -25,7 +25,9 @@ visitorRouter
 			}
     }
     await db.UserModel.extendUsersInfo(data.visitors);
-		//data.visitors = await Promise.all(uid.map(u => db.UserModel.findOne({uid: u})));
+    if(data.user) {
+      data.userSubUid = await db.SubscribeModel.getUserSubUid(data.user.uid);
+    }
 		data.type = 'visitors';
 		await next();
 	});
