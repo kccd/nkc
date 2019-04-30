@@ -45,9 +45,6 @@ block content
       .col-xs-12.col-md-2.hidden-sm.hidden-xs#leftDom
         include ../publicModules/post_button
         .forum-description
-          .col-xs-12
-            .row
-              .forum-description-content=data.forum.description
           .col-xs-6
             .forum-count-number= data.forum.countThreads
             .forum-count-title 文章
@@ -60,6 +57,9 @@ block content
           .col-xs-6
             .forum-count-number= data.forum.countPostsToday
             .forum-count-title 今日更新
+          .col-xs-12.m-t-1
+            .row
+              .forum-description-content=data.forum.description
           .col-xs-12
             .row
               if data.moderators && data.moderators.length > 0
@@ -230,7 +230,7 @@ block content
             if data.users.length > 8
               a.side-link(href=`/f/${data.forum.fid}/visitors`) 查看更多
 
-
+        include ../module_scrollTo
 
 block scripts
   include ../publicModules/vue_forums_nav/vue_forums_nav_js

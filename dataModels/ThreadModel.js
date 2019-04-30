@@ -920,7 +920,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
 * */
 threadSchema.statics.getLatestThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
-  const threads = await ThreadModel.find({mainForumsId: {$in: fid}}).sort({tlm: -1}).limit(10);
+  const threads = await ThreadModel.find({mainForumsId: {$in: fid}}).sort({toc: -1}).limit(10);
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
     category: false
@@ -1048,7 +1048,7 @@ threadSchema.statics.getUserSubThreads = async (uid, fid) => {
       }
     ]
   };
-  const threads = await ThreadModel.find(q).sort({tlm: -1}).limit(10);
+  const threads = await ThreadModel.find(q).sort({toc: -1}).limit(10);
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
     category: false
@@ -1061,7 +1061,7 @@ threadSchema.statics.getUserSubThreads = async (uid, fid) => {
 threadSchema.statics.getRecommendThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
   const match = await ThreadModel.getRecommendMatch(fid);
-  const threads = await ThreadModel.find(match).sort({toc: -1}).limit(10);
+  const threads = await ThreadModel.find(match).sort({tlm: -1}).limit(10);
   return await ThreadModel.extendThreads(threads, {
     category: false,
     lastPost: false

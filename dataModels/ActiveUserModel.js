@@ -55,8 +55,7 @@ activeUserSchema.statics.extendUsers = async function(activeUsers) {
     usersObj[user.uid] = user.toObject();
   });
   return await Promise.all(activeUsers.map(a => {
-    a.user = usersObj[a.uid];
-    return a;
+    return usersObj[a.uid];
   }));
 };
 
@@ -64,5 +63,4 @@ activeUserSchema.statics.getActiveUsers = async () => {
   const users = await mongoose.model('users').find({certs: {$ne: "banned"}}).sort({tlv: -1}).limit(12);
   return await mongoose.model("users").extendUsersInfo(users);
 };
-
 module.exports = mongoose.model('activeUsers', activeUserSchema, 'activeUsers');

@@ -206,7 +206,10 @@ router
     data.threads = threads;
     data.paging = paging;
 
+    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
+    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
+
     ctx.template = "home/newHome.pug";
     await next();
-  })
+  });
 module.exports = router;

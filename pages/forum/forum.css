@@ -172,9 +172,10 @@
 .forum-description-content{
   font-size: 1rem;
   color: #282c37;
+  padding: 0 7px;
   font-weight: 700;
   text-align: left;
-  padding-bottom: 1rem;
+  /*padding-bottom: 0.3rem;*/
 }
 .forum-panel{
   padding: 0;

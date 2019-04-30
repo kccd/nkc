@@ -40,7 +40,7 @@ jobs.updateActiveUsers = cronStr => {
         	if(p) postCount++;
         }
       }
-      const vitality = user.vitalityArithmetic(threadCount, postCount, targetUser.xsf);
+      const vitality = user.vitalityArithmetic(threadCount, postCount);
       const newActiveUser = new ActiveUserModel({
         lWThreadCount: threadCount,
         lWPostCount: postCount,
