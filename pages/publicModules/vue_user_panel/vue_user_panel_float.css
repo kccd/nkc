@@ -13,6 +13,7 @@
 }
 #vue_user_panel_float .user_base{
   height: 6rem;
+  position: relative;
 }
 #vue_user_panel_float .user_info{
   margin-top: 1rem;
@@ -43,7 +44,7 @@
 #vue_user_panel_float .user_name{
   font-size: 1.3rem;
   font-weight: 700;
-  color: #3494da;
+  color: #282c37;
 }
 #vue_user_panel_float .user_description{
   font-size: 1rem;
@@ -77,4 +78,16 @@
   text-align: center;
   font-weight: 700;
   color: #555;
+}
+#vue_user_panel_float .user-button{
+  position:absolute;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  cursor: pointer;
+  width: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  color: #000;
+  font-size: 1.4rem;
 }

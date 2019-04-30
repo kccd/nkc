@@ -14,7 +14,7 @@
             a(href=`/f/${fid}` title=description style='text-decoration: none;')
               span= displayName
             if data.user
-              if forum.followersId.includes(data.user.uid)
+              if data.subForumsId && data.subForumsId.includes(fid)
                 button.btn.btn-sm.cancel-subscribe-btn(style='padding: 0 10px;float: right;' onclick=`subscribeForum("${fid}", false)`) 取关
               else
                 button.btn.btn-sm.subscribe-btn(style='padding: 0 10px;float: right;' onclick=`subscribeForum("${fid}", true)`) 关注
