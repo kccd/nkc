@@ -9,6 +9,12 @@ module.exports = {
 		transaction: {
 			GET: 'visitUserTransaction'
 		},
+    // 用户关注的 专业、用户、文章
+    sub: {
+		  t: {
+		    GET: 'visitUserSubThreads'
+      }
+    },
 		settings: {
 			GET: 'visitUserAvatarSettings',
 			avatar: {

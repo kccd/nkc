@@ -18,9 +18,7 @@ var vue_user_panel_float = new Vue({
   },
   methods: {
     close: function() {
-      setTimeout(function() {
-        vue_user_panel_float.show = false;
-      }, 100);
+      vue_user_panel_float.show = false;
     },
 
     getMousePosition: function(event) {
@@ -36,8 +34,17 @@ var vue_user_panel_float = new Vue({
     loadUser: function(userString) {
       var user = strToObj(userString);
       var position = this.getMousePosition();
-      this.top = position.y+20;
-      this.left = position.x+20;
+      var maxX = $(window).width();
+      var maxY = $(window).height();
+
+      var top = position.y+20;
+      var left = position.x-20;
+      // console.log(maxX, maxY, top, left);
+
+      // if(maxX < left + 300) left = maxX - 320;
+      // if(maxY < top + 300) top = maxY - 320;
+      this.left = left;
+      this.top = top;
 
       if(this.usersObj[user.uid]) {
         this.user = this.usersObj[user.uid];

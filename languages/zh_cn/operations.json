@@ -531,6 +531,11 @@
   "getMediums": "[VI]获取中图640",
   "experimentalRegisterSettings": "后台管理-注册设置",
   "userDisplaySettings": "用户设置-显示设置",
+  "modifyForumBanner": "修改专业banner",
+  "subThread": "关注文章",
+  "unSubThread": "取消关注文章",
+  "visitUserSubThreads": "查看用户关注的文章",
+  "visitRecycleMarkThreads": "查看等待修改的文章",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

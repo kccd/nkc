@@ -107,9 +107,10 @@
   font-weight: 700;
 }
 .forum-category{
-  padding: 1rem 0.5rem;
+  padding: 0;
   background-color: #d9e1e8;
   border-radius: 3px;
+  text-align: left;
 }
 .forum-category a.active{
   color: #fff;
@@ -119,13 +120,13 @@
   display: inline-block;
   height: 2rem;
   line-height: 2rem;
-  padding: 0 0.3rem;
+  padding: 0 0.2rem;
   border-radius: 2px;
   text-decoration: none;
   margin-right: 0.3rem;
   color: #656565;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .forum-category a:hover{
   background-color: #9baec8;
@@ -134,7 +135,6 @@
 .forum-count{
   text-align: center;
   overflow: hidden;
-  margin-top: 1rem;
 }
 .forum-count>div{
   background-color: #d9e1e8;
@@ -156,10 +156,13 @@
 }
 .forum-description{
   margin-top: 1rem;
+  overflow: hidden;
+  border-radius: 3px;
   background-color: #d9e1e8;
-  padding: 0 0.5rem;
+  padding: 1rem 0.5rem 1rem 0.5rem;
+  text-align: center;
 }
-.forum-description-header, .forum-panel-header{
+.forum-description-header, .forum-panel-header, .forum-user-header{
   height: 3rem;
   line-height: 3rem;
   text-align: center;
@@ -170,11 +173,11 @@
   font-size: 1rem;
   color: #282c37;
   font-weight: 700;
+  text-align: left;
   padding-bottom: 1rem;
 }
 .forum-panel{
-  margin-top: 1rem;
-  padding: 0 0.5rem;
+  padding: 0;
 }
 .forum-panel-body{
   overflow: hidden;

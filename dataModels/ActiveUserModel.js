@@ -61,12 +61,8 @@ activeUserSchema.statics.extendUsers = async function(activeUsers) {
 };
 
 activeUserSchema.statics.getActiveUsers = async () => {
-  /*const ActiveUserModel = mongoose.model("activeUsers");
-  const users = await ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
-  return await ActiveUserModel.extendUsers(users);*/
   const users = await mongoose.model('users').find({certs: {$ne: "banned"}}).sort({tlv: -1}).limit(12);
-  await mongoose.model("users").extendUsersInfo(users);
-  return users.map(u => u.toObject());
+  return await mongoose.model("users").extendUsersInfo(users);
 };
 
 module.exports = mongoose.model('activeUsers', activeUserSchema, 'activeUsers');

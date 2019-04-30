@@ -1701,6 +1701,8 @@ function numToFloatTwo(str) {
 	return str;
 }
 
+var nkcDrawerBodyTop = 0;
+
 function openNKCDrawer() {
   $(".nkc-drawer").addClass("active");
   $(".nkc-drawer-body").addClass("active");
@@ -1723,7 +1725,6 @@ function toggleNKCDrawer() {
   }
 }
 
-var nkcDrawerBodyTop = 0;
 
 function stopBodyScroll (isFixed) {
   var bodyEl = document.body;
@@ -1738,11 +1739,80 @@ function stopBodyScroll (isFixed) {
   }
 }
 
-// 字符床转对象，对应pug渲染函数objToStr
+// 字符串转对象，对应pug渲染函数objToStr
 function strToObj(str) {
   return JSON.parse(decodeURIComponent(str));
 }
 // 通过dom元素id获取渲染页面时藏在dom中的数据
 function getDataById(id) {
   return strToObj(document.getElementById(id).innerHTML);
+}
+
+// 关注文章
+function subThread(tid) {
+  nkcAPI("/t/" + tid + "/subscribe", "POST", {})
+    .then(function() {
+      screenTopAlert("关注成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+// 取消关注文章
+function unSubThread(tid) {
+  nkcAPI("/t/" + tid + "/subscribe", "DELETE", {})
+    .then(function() {
+      screenTopAlert("取消关注成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    });
+}
+
+
+// 小屏幕 首页左右侧滑页面 可公用
+// 左侧将会复制#leftDom中的内容
+// 右侧将会复制#rightDom中的内容
+function openLeftDrawer() {
+  var nav = $(".drawer-dom .left");
+  var navDom = $("#leftDom");
+  var bnt = $(".drawer-fixed-button-left");
+  bnt.addClass('active');
+  bnt.find('.fa').removeClass('fa-angle-double-right');
+  bnt.find('.fa').addClass('fa-angle-double-left');
+  bnt.attr("onclick", "closeDrawer()");
+  nav.addClass('active');
+  nav.find(".dom").html(navDom.html());
+  $(".drawer-mask").addClass("active");
+  stopBodyScroll(true);
+}
+function openRightDrawer() {
+  var link = $(".drawer-dom .right");
+  var linkDom = $("#rightDom");
+  var bnt = $(".drawer-fixed-button-right");
+  bnt.addClass('active');
+  bnt.attr("onclick", "closeDrawer()");
+  bnt.find('.fa').removeClass('fa-angle-double-left');
+  bnt.find('.fa').addClass('fa-angle-double-right');
+  link.addClass('active');
+  link.find(".dom").html(linkDom.html());
+  $(".drawer-mask").addClass("active");
+  stopBodyScroll(true);
+}
+
+function closeDrawer() {
+  $(".drawer-dom .left").removeClass("active");
+  $(".drawer-dom .right").removeClass("active");
+  var bnt = $(".drawer-fixed-button-left");
+  bnt.removeClass('active');
+  bnt.find('.fa').removeClass('fa-angle-double-left');
+  bnt.find('.fa').addClass('fa-angle-double-right');
+  bnt.attr("onclick", "openLeftDrawer()");
+  var bnt2 = $(".drawer-fixed-button-right");
+  bnt2.removeClass('active');
+  bnt2.find('.fa').removeClass('fa-angle-double-right');
+  bnt2.find('.fa').addClass('fa-angle-double-left');
+  bnt2.attr("onclick", "openRightDrawer()");
+  $(".drawer-mask").removeClass("active");
+  stopBodyScroll(false);
 }

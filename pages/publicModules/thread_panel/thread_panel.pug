@@ -17,7 +17,7 @@
         if !displayForumNav && thread.categories.length !== 0
           for category in thread.categories
             if data.threadTypesId.includes(category.cid)
-              a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
+              a(href=`/f/${data.forum.fid}/latest?cat=${category.cid}`)= category.name
       else
         -let forum;
         for f in thread.forums
@@ -29,14 +29,14 @@
     .thread-panel-time=fromNow(thread.toc)
 
   a(href=`/t/${thread.tid}` class=thread.digest?"digest":"").thread-panel-title= thread.firstPost.t
-  a(href=`/t/${thread.tid}`).thread-panel-abstract
+  .thread-panel-abstract
     if thread.hasCover
       .thread-panel-abstract-cover(
         style=`background-image: url(/cover/${thread.tid})`
       )
     .thread-panel-abstract-content
-      .thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
-      .text-right
+      a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
+      a(href=`/t/${thread.tid}?&last_page=true#${thread.lastPost.pid}`).text-right
         p.thread-panel-abstract-reply=thread.lastPost.c.slice(0, 200)
   .thread-panel-info
     .thread-panel-button

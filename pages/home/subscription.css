@@ -9,6 +9,7 @@
   background-size: cover;
 }
 .swiper-title{
+  left: 0;
   position: absolute;
   top: 0;
   min-height: 4rem;
@@ -40,4 +41,3 @@
 .swiper-pagination{
   color: #ffffff;
 }
-

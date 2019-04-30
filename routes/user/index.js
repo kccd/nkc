@@ -11,6 +11,7 @@ const transactionRouter = require('./transaction');
 const bannerRouter = require('./banner');
 const friendsRouter = require('./friends');
 const kcbRouter = require('./kcb');
+const subRouter = require("./sub");
 const userRouter = new Router();
 
 
@@ -35,10 +36,15 @@ userRouter
   .get('/:uid', async (ctx, next) => {
     const {data, db, params,query} = ctx;
     const {user} = data;
+    const {uid} = params;
     if(user) {
 	    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
+	    data.subscribed = await db.SubscribeModel.findOne({
+        type: "user",
+        uid: user.uid,
+        tUid: uid
+      });
     }
-		const {uid} = params;
 		const {apiFunction} = ctx.nkcModules;
 		const targetUser = await db.UserModel.findOnly({uid});
     await targetUser.extendGrade();
@@ -92,19 +98,27 @@ userRouter
 
 
 		if (type === 'follow') {
-			let {subscribeUsers} = targetUserSubscribe;
-			const count = subscribeUsers.length;
-			paging = apiFunction.paging(page, count);
-			subscribeUsers.slice(paging.start, paging.start + paging.perpage);
-      data.targetUsers = await Promise.all(subscribeUsers.map(uid => db.UserModel.findOnly({uid})));
-      await db.UserModel.extendUsersInfo(data.targetUsers);
+		  const q = {
+        type: "user",
+        uid: targetUser.uid
+      };
+		  const count = await db.SubscribeModel.count(q);
+      paging = apiFunction.paging(page, count);
+		  const sub = await db.SubscribeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+		  const subUid = sub.map(s => s.tUid);
+		  const targetUsers = await db.UserModel.find({uid: {$in: subUid}});
+		  data.targetUsers = await db.UserModel.extendUsersInfo(targetUsers);
 		} else if (type === 'fans') {
-			let {subscribers} = targetUserSubscribe;
-			const count = subscribers.length;
-			paging = apiFunction.paging(page, count);
-			subscribers.slice(paging.start, paging.start + paging.perpage);
-      data.targetUsers = await Promise.all(subscribers.map(uid => db.UserModel.findOnly({uid})));
-      await db.UserModel.extendUsersInfo(data.targetUsers);
+      const q = {
+        type: "user",
+        tUid: targetUser.uid
+      };
+      const count = await db.SubscribeModel.count(q);
+      paging = apiFunction.paging(page, count);
+      const sub = await db.SubscribeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      const subUid = sub.map(s => s.uid);
+      const targetUsers = await db.UserModel.find({uid: {$in: subUid}});
+      data.targetUsers = await db.UserModel.extendUsersInfo(targetUsers);
 		} else {
 
       const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
@@ -153,14 +167,21 @@ userRouter
 		}
 
 	  // --拿到最新8个关注与最新8个粉丝
-	  targetUserSubscribe.subscribeUsers.reverse();
-	  targetUserSubscribe.subscribers.reverse();
-	  const newSubscribeUsersId = targetUserSubscribe.subscribeUsers.slice(0, 9);
-	  const newSubscribersId = targetUserSubscribe.subscribers.slice(0, 9);
-    data.newSubscribeUsers = await Promise.all(newSubscribeUsersId.map(async uid => await db.UserModel.findOnly({uid})));
-    data.newSubscribers = await Promise.all(newSubscribersId.map(async uid => await db.UserModel.findOnly({uid})));
-    await db.UserModel.extendUsersInfo(data.newSubscribeUsers);
-    await db.UserModel.extendUsersInfo(data.newSubscribers);
+    let subUsers = await db.SubscribeModel.find({
+      type: "user",
+      uid: targetUser.uid
+    });
+    let subUid = subUsers.map(s => s.tUid);
+    subUsers = await db.UserModel.find({uid: {$in: subUid}});
+    data.newSubscribeUsers = await db.UserModel.extendUsersInfo(subUsers);
+
+    subUsers = await db.SubscribeModel.find({
+      type: "user",
+      tUid: targetUser.uid
+    });
+    subUid = subUsers.map(s => s.tUid);
+    subUsers = await db.UserModel.find({uid: {$in: subUid}});
+    data.newSubscribers = await db.UserModel.extendUsersInfo(subUsers);
 	  // --------
 
 		data.type = type;
@@ -188,5 +209,6 @@ userRouter
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())
   .use('/:uid/friends', friendsRouter.routes(), friendsRouter.allowedMethods())
+  .use("/:uid/sub", subRouter.routes(), subRouter.allowedMethods())
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods());
 module.exports = userRouter;

@@ -48,6 +48,7 @@
   font-size: 1.5rem;
   color: #282c37;
   font-weight: 700;
+  word-break: break-all;
   text-decoration: none;
   border-bottom: rgba(0,0,0,0) solid 1px;
   transition: border-bottom 200ms;
@@ -76,6 +77,10 @@
   text-decoration: none;
   color: #555;
 }
+.thread-panel-abstract-content-div:hover, .thread-panel-abstract-content-div:link, .thread-panel-abstract-content-div:active, .thread-panel-abstract-content-div:visited{
+  text-decoration: none;
+  color: #555;
+}
 .thread-panel-abstract-content-div{
   max-height: 5rem;
   overflow: hidden;
@@ -83,6 +88,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   -webkit-flex-grow: 1;
+  color: #555;
 }
 .thread-panel-abstract-reply{
   height: 1.6rem;

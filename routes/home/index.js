@@ -56,8 +56,6 @@ router
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !fids.includes(fid));
     }
 
-
-
     data.homeSettings = homeSettings;
 
     // 加载专业列表
@@ -65,20 +63,15 @@ router
 
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
-
     // 网站公告
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
-
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsers();
-
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
-
     if(user) {
       data.subForums = await db.ForumModel.getUserSubForums(user.uid, fidOfCanGetThreads);
     }
-
     let q = {};
     let threadListType;
     if(t) {
@@ -199,11 +192,25 @@ router
       });
     }
 
+    if(user) {
+      if(threadListType !== "subscribe") {
+        // 加载关注的文章
+        data.subscribeThreads = await db.ThreadModel.getUserSubThreads(user.uid, fidOfCanGetThreads);
+      }
+    }
+
+    if(threadListType !== "latest") {
+      data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
+    }
+
+    if(threadListType !== "recommend") {
+      data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+    }
+
     data.threads = threads;
     data.paging = paging;
 
     ctx.template = "home/newHome.pug";
-
     await next();
   })
   .use('subscription', subscriptionRouter.routes(), subscriptionRouter.allowedMethods());

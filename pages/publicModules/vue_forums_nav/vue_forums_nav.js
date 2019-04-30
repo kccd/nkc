@@ -11,7 +11,7 @@ var vue_forums_Nav = new Vue({
   },
   mounted: function() {
     var data = this.$refs.vue_forums_nav_data;
-    data = JSON.parse(data.innerHTML);
+    data = strToObj(data.innerHTML);
     this.forums = data.forums;
     this.subForums = data.subForums;
     /*nkcAPI("/f", "GET")

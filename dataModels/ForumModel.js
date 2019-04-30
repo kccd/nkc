@@ -898,30 +898,32 @@ forumSchema.methods.extendRelatedForums = async function(fids) {
 * */
 forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
   const ForumModel = mongoose.model("forums");
-  let forums = await ForumModel.visibleForums(userRoles, userGrade, user);
-  forums = forums.map(f => {
-    return {
-      fid: f.fid,
-      displayName: f.displayName,
-      forumType: f.forumType,
-      color: f.color,
-      parentsId: f.parentsId,
-      iconFileName: f.iconFileName,
-      description: f.description,
-      childrenForums: []
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
     }
+  }, {
+    fid: 1,
+    displayName: 1,
+    forumType: 1,
+    color: 1,
+    parentsId: 1,
+    iconFileName: 1,
+    description: 1
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
   });
-  const getForumById = (fid) => {
-    if(!fid) return;
-    for(let forum of forums){
-      if(forum.fid === fid) {
-        return forum;
-      }
-    }
-  };
+
   for(let forum of forums) {
     for(const fid of forum.parentsId) {
-      const parentForum = getForumById(fid);
+      const parentForum = forumsObj[fid];
       if(parentForum) {
         parentForum.childrenForums.push(forum);
       }
@@ -958,7 +960,7 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
     const index = fid.indexOf(forum.fid);
     userSubForums[index] = forum;
   });
-  return userSubForums;
+  return userSubForums.filter(f => !!f);
 };
 
 module.exports = mongoose.model('forums', forumSchema);

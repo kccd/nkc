@@ -75,12 +75,16 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                   span.fa.fa-edit &nbsp;发表文章
                   span.pull-right.fa.fa-angle-right
               li
-                a(href='/message')
-                  span.fa.fa-comment-o &nbsp;关注
+                a(href='/?t=subscribe')
+                  span.fa.fa-bookmark-o &nbsp;关注
                   span.pull-right.fa.fa-angle-right
               li
-                a(href='/message')
-                  span.fa.fa-comment-o &nbsp;最新
+                a(href='/?t="recommend')
+                  span.fa.fa-fire &nbsp;推荐
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href='/?t=latest')
+                  span.fa.fa-clock-o &nbsp;最新
                   span.pull-right.fa.fa-angle-right
               li
                 a(href='/message')
@@ -88,12 +92,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                   span.pull-right.fa.fa-angle-right
             else
               li
-                a(href='/message')
-                  span.fa.fa-comment-o &nbsp;推荐
+                a(href='/?t="recommend')
+                  span.fa.fa-fire &nbsp;推荐
                   span.pull-right.fa.fa-angle-right
               li
-                a(href='/message')
-                  span.fa.fa-comment-o &nbsp;最新
+                a(href='/?t=latest')
+                  span.fa.fa-clock-o &nbsp;最新
                   span.pull-right.fa.fa-angle-right
             li
               a(href='/fund')
@@ -122,6 +126,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                   span.fa.fa-folder-o &nbsp;收藏
                   span.pull-right.fa.fa-angle-right
               li
+                a(href=`/u/${data.user.uid}/sub/t`)
+                  span.fa.fa-bookmark-o &nbsp;我的关注
+                  span.pull-right.fa.fa-angle-right
+              li
                 a(href=`/u/${data.user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.pull-right.fa.fa-angle-right
@@ -132,17 +140,18 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
 
             ul.nkc-drawer-list
               li
-                a(href=`/account/finance`)
-                  span.fa.fa-file-text-o &nbsp;购物车
-                  span.pull-right.fa.fa-angle-right
-              li
-                a(href=`/account/finance`)
+                a(href=`/shop/order`)
                   span.fa.fa-file-text-o &nbsp;我的订单
                   span.pull-right.fa.fa-angle-right
               li
-                a(href=`/account/finance`)
-                  span.fa.fa-file-text-o &nbsp;我出售的
+                a(href=`/shop/manage`)
+                  span.fa.fa-archive &nbsp;我出售的
                   span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/shop/cart`)
+                  span.fa.fa-shopping-cart &nbsp;购物车
+                  span.pull-right.fa.fa-angle-right
+
             if permission("visitExperimentalStatus")
               ul.nkc-drawer-list
                 li
@@ -212,6 +221,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                 a(href=`/u/${user.uid}/collections/unclassified`)
                   span.fa.fa-folder-o &nbsp;收藏
               li
+                a(href=`/u/${user.uid}/sub/t`)
+                  span.fa.fa-bookmark-o &nbsp;我的关注
+              li
                 a(href=`/u/${user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.messageNumber.draftMessage= data.user.draftCount || ''
@@ -225,6 +237,16 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
               li
                 a(href=`/u/${user.uid}/settings`)
                   span.fa.fa-edit &nbsp;编辑资料
+              li.divider
+              li
+                a(href=`/shop/order`)
+                  span.fa.fa-file-text-o &nbsp;我的订单
+              li
+                a(href=`/shop/manage`)
+                  span.fa.fa-archive &nbsp;我出售的
+              li
+                a(href=`/shop/cart`)
+                  span.fa.fa-shopping-cart &nbsp;购物车
               li.divider
               li
                 a(href=`/logout` title='不，不要走！')

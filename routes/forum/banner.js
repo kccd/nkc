@@ -17,5 +17,15 @@ router
     const tlm = await ctx.fs.stat(ctx.filePath);
     ctx.lastModified = new Date(tlm.mtime).toUTCString();
     await next();
+  })
+  .patch("/", async (ctx, next) => {
+    const {db, params, body, settings} = ctx;
+    const {files} = body;
+    const {path} = files.file;
+    const {fid} = params;
+    await db.ForumModel.findOnly({fid});
+    const targetFilePath = settings.upload.forumBannerPath + '/' + fid + '.jpg';
+    await ctx.fs.rename(path, targetFilePath);
+    await next();
   });
 module.exports = router;

@@ -19,9 +19,9 @@ script.
       width: 114,
       color: {
         dark: "#333333"
-      },
-      function(err) {
-        screenTopWarning(err);
       }
+    }, function (err, url) {
+      if(err)
+        screenTopWarning(err);
     });
   }

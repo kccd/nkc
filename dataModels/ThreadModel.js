@@ -976,5 +976,132 @@ threadSchema.statics.getRecommendMatch = async (fid) => {
   }
   return match;
 };
+/*
+* 加载用户发表的文章
+* @param {String} uid 用户ID
+* @param {[String]} fid 能够从中读取文章的专业ID
+* */
+threadSchema.statics.getUserThreads = async (uid, fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const threads = await ThreadModel.find({
+    mainForumsId: {
+      $in: fid
+    },
+    disabled: false,
+    recycleMark: {
+      $ne: true
+    },
+    uid
+  }).sort({toc: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  });
+};
+/*
+* 加载最新的10篇关注的文章
+* @param {String} uid 用户ID
+* @param {[String]} fid 能够从中读取文章的专业ID
+* */
+threadSchema.statics.getUserSubThreads = async (uid, fid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const ThreadModel = mongoose.model("threads");
+  const subs = await SubscribeModel.find({uid}, {
+    fid: 1,
+    tid: 1,
+    tUid: 1,
+    type: 1
+  }).sort({toc: -1});
+  const subFid = [], subTid = [], subUid = [];
+  subs.map(s => {
+    if(s.type === "forum") subFid.push(s.fid);
+    if(s.type === "thread") subTid.push(s.tid);
+    if(s.type === "user") subUid.push(s.tUid);
+  });
+
+  const q = {
+    mainForumsId: {
+      $in: fid
+    },
+    recycleMark: {
+      $ne: true
+    },
+    disabled: false,
+    $or: [
+      {
+        fid: {
+          $in: subFid
+        }
+      },
+      {
+        uid
+      },
+      {
+        uid: {
+          $in: subUid
+        }
+      },
+      {
+        tid: {
+          $in: subTid
+        }
+      }
+    ]
+  };
+  const threads = await ThreadModel.find(q).sort({toc: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  });
+};
+/*
+* 加载最新10篇推荐文章
+* @param {[String]} fid 能够从中读取文章的专业ID
+* */
+threadSchema.statics.getRecommendThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const match = await ThreadModel.getRecommendMatch(fid);
+  const threads = await ThreadModel.find(match).sort({toc: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    category: false,
+    lastPost: false
+  });
+};
+
+/*
+* 移动退修修改超时的文章到回收站
+* @author pengxiguaa 2019-4-29
+* */
+threadSchema.statics.moveRecycleMarkThreads = async () => {
+  const ThreadModel = mongoose.model("threads");
+  const DelPostLogModel = mongoose.model("delPostLog");
+  const UserModel = mongoose.model("users");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const PostModel = mongoose.model("posts");
+  const nkcModules = require("../nkcModules");
+  // 删除退修超时的帖子
+  // 取出全部被标记的帖子
+  const allMarkThreads = await ThreadModel.find({ "recycleMark": true, "mainForumsId": { "$nin": ["recycle"] } });
+  for (var i in allMarkThreads) {
+    const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
+    if(delThreadLog){
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"] })
+      await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
+      await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
+      const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});
+      const thread = await ThreadModel.findOne({tid: delThreadLog.threadId});
+      if(tUser && thread) {
+        await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
+          data: {
+            user: {},
+            thread
+          },
+          nkcModules,
+          db: require("./index")
+        });
+      }
+    }
+  }
+};
 
 module.exports = mongoose.model('threads', threadSchema);

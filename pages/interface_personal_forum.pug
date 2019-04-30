@@ -66,7 +66,7 @@ block content
                         if(data.user)
                           if(user.uid != data.user.uid)
                             -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
-                            if(subscribeUsers.indexOf(user.uid) > -1)
+                            if(data.subscribed)
                               div
                                 a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUser("${user.uid}", false);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
                             else

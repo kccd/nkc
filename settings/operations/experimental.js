@@ -210,6 +210,9 @@ module.exports = {
 	},
 	log: {
 		GET: 'visitPublicLogs',
+    recycle: {
+		  GET: 'visitRecycleMarkThreads'
+    },
 		public: {
 			GET: 'visitPublicLogs',
 			DELETE: 'deletePublicLogs'

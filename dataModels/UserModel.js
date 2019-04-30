@@ -24,6 +24,7 @@ const userSchema = new Schema({
   },
   tlv: {
     type: Date,
+    index: 1,
     default: Date.now,
   },
   disabledPostsCount: {
@@ -104,6 +105,7 @@ const userSchema = new Schema({
   color: String,
   certs: {
     type: [String],
+    default: [],
     index: 1
   },
   postSign: String,
@@ -825,7 +827,10 @@ userSchema.statics.extendUsersInfo = async (users) => {
   for(const personal of usersPersonal) {
     personalObj[personal.uid] = personal;
   }
-  await Promise.all(users.map(async user => {
+
+  const users_ = []; // 普通对象
+
+  for(const user of users) {
     let certs = user.certs.concat([]);
     // 若用户拥有“banned”证书，则忽略其他证书
     if(certs.includes('banned')) {
@@ -856,7 +861,9 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     info.certsName = info.certsName.join(' ');
     user.info = info;
-  }));
+    users_.push(user.toObject());
+  }
+  return users_;
 };
 
 userSchema.methods.extendAuthLevel = async function() {

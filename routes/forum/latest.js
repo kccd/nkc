@@ -21,30 +21,28 @@ latestRouter
 		// 拿到该专业下可从中拿文章的所有子专业id
 		let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
     fidOfCanGetThreads.push(forum.fid);
+
+    // 构建置顶文章查询条件
+    const toppedThreadMatch = {
+      topped: true,
+      mainForumsId: forum.fid,
+      disabled: false,
+      recycleMark: {$ne: true}
+    };
+    // 加载、拓展置顶文章
+    const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
+
+    data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads, {
+      htmlToText: true
+    });
+
+    const topThreadsId = toppedThreads.map(t => t.tid);
+
 		match.mainForumsId = {$in: fidOfCanGetThreads};
+		match.tid = {$nin: topThreadsId};
 		match.disabled = false;
 		match.recycleMark = {$ne: true};
-		// 专家可查看专业下所有文章
-		// 不是专家但具有displayRecycleMarkThreads操作权限的用户也能查看所有文章
-		// 已登录用户能查看专业下未被退回的文章、自己已被退回的文章
-		// 未登录用户只能查看未被退回的文章
-		/*if(!isModerator) {
-			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-				if(!data.user) {
-					match.recycleMark = {$ne: true};
-				} else {
-					match.$or = [
-						{
-							recycleMark: {$ne: true}
-						},
-						{
-							recycleMark: true,
-							uid: data.user.uid
-						}
-					]
-				}
-			}
-		}*/
+
 		const count = await db.ThreadModel.count(match);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count);
@@ -65,37 +63,7 @@ latestRouter
       htmlToText: true
     });
 
-		// 构建置顶文章查询条件
-		const toppedThreadMatch = {
-		  topped: true,
-      mainForumsId: forum.fid,
-      disabled: false,
-      recycleMark: {$ne: true}
-		};
-		/*if(!isModerator) {
-			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-				if(!data.user) {
-					toppedThreadMatch.recycleMark = {$ne: true};
-				} else {
-					toppedThreadMatch.$or = [
-						{
-							recycleMark: {$ne: true}
-						},
-						{
-							recycleMark: true,
-							uid: data.user.uid
-						}
-					]
-				}
-			}
-		}*/
-		// 加载、拓展置顶文章
-		const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
-		data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads);
-    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
-		data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-    data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
-    data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
+
 		data.type = 'latest';
     data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
 		await next();

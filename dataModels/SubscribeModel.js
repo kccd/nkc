@@ -21,7 +21,7 @@ const schema = new Schema({
     index: 1
   },
   // 详细类型
-  // thread类型 sub: 关注的文章, post: 自己发表的文章, replay: 回复过的文章, coll: 收藏的文章
+  // thread类型 sub: 关注的文章, post: 自己发表的文章, replay: 回复过的文章
   detail: {
     type: String,
     default: "",
@@ -54,6 +54,18 @@ const schema = new Schema({
 }, {
   collection: "subscribes"
 });
-
+/*
+* 获取用户专注的所有用户的ID
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-4-28
+* */
+schema.statics.getUserSubUid = async (uid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const sub = await SubscribeModel.find({
+    type: 'user',
+    uid
+  });
+  return sub.map(s => s.tUid);
+};
 
 module.exports = mongoose.model('subscribes', schema);

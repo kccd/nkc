@@ -6,7 +6,8 @@ module.exports = {
 		POST: 'postToForum', // 在专业中发表文章
 		DELETE: 'deleteForum', // 删除专业
     banner: {
-		  GET: 'visitForumBanner'
+		  GET: 'visitForumBanner',
+      PATCH: "modifyForumBanner"
     },
 		latest: {
 			GET: 'visitForumLatest' // 查看专业最新文章列表

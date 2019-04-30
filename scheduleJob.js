@@ -390,6 +390,13 @@ jobs.checkKcbsRecords = async () => {
     console.log(`所有用户科创币记录核对完成`);
   });
 };
+// 自动将退修未修改的文章移动到回收站
+jobs.moveRecycleMarkThreads = () => {
+  const ThreadModel = require("./dataModels/ThreadModel");
+  scheduleJob("0 * * * * *", async () => {
+    await ThreadModel.moveRecycleMarkThreads();
+  });
+};
 
 jobs.truncateUsersLoginToday = cronStr => {
 

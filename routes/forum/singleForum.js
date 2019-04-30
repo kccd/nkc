@@ -241,7 +241,7 @@ router
     await forum.extendRelatedForums(fidArr);
 		fidArr.push(fid);
 		// 拿到今天所有该专业下的用户浏览记录
-		/*const behaviors = await db.UsersBehaviorModel.find({
+		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: fidArr},
 			operationId: {$in: ['visitForumLatest', 'visitThread', 'visitForumFollowers', 'visitForumVisitors']}
@@ -260,17 +260,32 @@ router
 			if(data.users.length < 9) {
 				const targetUser = await db.UserModel.findOne({uid});
 				if(targetUser) {
-					data.users.push(targetUser);
+					data.users.push(targetUser); // 今日来访的用户
 				}
 			} else {
 				break;
 			}
     }
-    await db.UserModel.extendUsersInfo(data.users);*/
+    data.users = await db.UserModel.extendUsersInfo(data.users);
+
+		// 获取最新关注的用户
+		const subUsers = await db.SubscribeModel.find({
+      type: "forum",
+      fid: forum.fid
+    }).sort({toc: -1}).limit(9);
+
+		data.subUsers = await db.UserModel.find({
+      uid: {
+        $in: subUsers.map(s => s.uid)
+      }
+    });
+
+		data.subUsers = await db.UserModel.extendUsersInfo(data.subUsers);
 
     await forum.extendParentForums();
 		// 加载网站公告
 		await forum.extendNoticeThreads();
+
 
 		//版主
 		data.moderators = [];
@@ -289,6 +304,10 @@ router
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
     // 获取用户关注的专业
+    if(data.user) {
+      data.subForums = await db.ForumModel.getUserSubForums(data.user.uid, fidOfCanGetThreads);
+    }
+
 
     // 最新文章
     const latestFid = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
@@ -306,7 +325,8 @@ router
 			data.sameLevelForums = await parentForum.extendChildrenForums({fid: {$in: visibleFidArr}});
 		} else {
 			// 拿到能看到入口的所有专业id
-			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
+			let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
+      visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
@@ -319,7 +339,24 @@ router
         fid
       });
       data.subscribed = !!sub;
+
+      // 用户发表的文章
+      data.userThreads = await db.ThreadModel.getUserThreads(data.user.uid, fidOfCanGetThreads);
+
+      // 关注的文章
+      data.subThreads = await db.ThreadModel.getUserSubThreads(data.user.uid, fidOfCanGetThreads);
+
     }
+
+		// 推荐的文章
+    data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+
+		// 加载专业地图
+    data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+    // 加载文章分类
+    data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+    data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
+
 		ctx.template = 'forum/forum.pug';
 		await next();
 	})

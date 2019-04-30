@@ -9,46 +9,81 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-2
+      .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
         include ../publicModules/post_button
         include ../publicModules/vue_forums_nav/vue_forums_nav_dom
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
             .m-b-1
+              //- 手机导航 其他文章链接
+              .hidden-md.hidden-lg
+                .drawer-fixed-button-right(onclick="openRightDrawer()")
+                  .fa.fa-angle-double-left
+                .drawer-fixed-button-left(onclick="openLeftDrawer()")
+                  .fa.fa-angle-double-right
+                .drawer-dom
+                  .drawer-mask(onclick="closeDrawer()")
+                  .left
+                    .dom
+                  .right
+                    .dom
               -let showPagingSortButton = true;
               -let showHomeButton = true;
               include ../publicModules/paging/paging
+
             for thread in data.threads
               include ../publicModules/thread_panel/thread_panel
             -showPagingSortButton = false;
             -showHomeButton = false;
             include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
-        include ../publicModules/canvas_logo
-        .swiper-container.swiper-home
-          .swiper-wrapper
-            for thread in data.ads
-              a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                'background-image': `url(/cover/${thread.tid})`
-              })
-                .swiper-title= `${thread.firstPost.t}`
-          .swiper-pagination
-          .swiper-button-next.swiper-button(style='background-image: none;')
-            .fa.fa-angle-right
-          .swiper-button-prev.swiper-button(style='background-image: none;')
-            .fa.fa-angle-left
-        .m-t-1
-          -let sideThreads = data.noticeThreads
-          -let sideThreadsHideInfo = true;
-          -let sideThreadsHeader= "公告通知"
-          include ../publicModules/side_thread_list
-        .m-t-1
-          -sideThreads = data.featuredThreads
-          -sideThreadsHideInfo = false;
-          -sideThreadsHeader= "精选文章"
-          include ../publicModules/side_thread_list
-        include ../publicModules/active_users
+        .hidden-xs.hidden-sm#rightDom
+          .hidden-xs.hidden-sm
+            include ../publicModules/canvas_logo
+            .swiper-container.swiper-home
+              .swiper-wrapper
+                for thread in data.ads
+                  a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                    'background-image': `url(/cover/${thread.tid})`
+                  })
+                    .swiper-title= `${thread.firstPost.t}`
+              .swiper-pagination
+              .swiper-button-next.swiper-button(style='background-image: none;')
+                .fa.fa-angle-right
+              .swiper-button-prev.swiper-button(style='background-image: none;')
+                .fa.fa-angle-left
+          if data.noticeThreads && data.noticeThreads.length > 0
+            .m-t-1
+              -let sideThreads = data.noticeThreads
+              -let sideThreadsHideInfo = true;
+              -let sideThreadsHeader= "公告通知"
+              include ../publicModules/side_thread_list
+          if data.featuredThreads && data.featuredThreads.length > 0
+            .m-t-1
+              -let sideThreads = data.featuredThreads
+              -let sideThreadsHideInfo = false;
+              -let sideThreadsHeader= "精选文章"
+              include ../publicModules/side_thread_list
+          if data.subscribeThreads && data.subscribeThreads.length > 0
+            .m-t-1
+              -let sideThreads = data.subscribeThreads
+              -let sideThreadsHideInfo = false;
+              -let sideThreadsHeader= "我关注的"
+              include ../publicModules/side_thread_list
+          if data.latestThreads && data.latestThreads.length > 0
+            .m-t-1
+              -let sideThreads = data.latestThreads
+              -let sideThreadsHideInfo = false;
+              -let sideThreadsHeader= "最新文章"
+              include ../publicModules/side_thread_list
+          if data.recommendThreads && data.recommendThreads.length > 0
+            .m-t-1
+              -let sideThreads = data.recommendThreads
+              -let sideThreadsHideInfo = false;
+              -let sideThreadsHeader= "推荐文章"
+              include ../publicModules/side_thread_list
+          include ../publicModules/active_users
         //include ../publicModules/web_info_side.pug
 block footer
   include ../publicModules/footer/footer
@@ -57,5 +92,5 @@ block scripts
   include ../publicModules/vue_forums_nav/vue_forums_nav_js
   +includeJS("/home/newHome.js")
   include ../publicModules/vue_user_panel/vue_user_panel_float_js
-  +includeJS("/socket/homeSocket.js")
+  //- +includeJS("/socket/homeSocket.js")
 
