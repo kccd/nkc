@@ -90,14 +90,14 @@ style.
       if !product.adminBan
         .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
           button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")#productImageDom
       ul#etalage
         -for(let rid of product.imgIntroductions)
           li
             img.etalage_thumb_image(src=`/r/${rid}`)
             img.etalage_source_image(src=`/r/${rid}`)
 
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;padding-left:65px")
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
       p.item 
         span#showText #{cutContent(post.abstract,60)}
         if post.abstract && post.abstract.length > 60
@@ -227,3 +227,17 @@ block scripts
     $("s").click(function (e) {
       SelCity(document.getElementById("city"),e);
     });
+    
+    window.onresize=function(){  
+      if($(window).width() < 1350) {
+        $("#productImageDom").addClass("col-lg-12");
+        $("#productIntroDom").addClass("col-lg-12");
+        $("#productImageDom").removeClass("col-lg-6");
+        $("#productIntroDom").removeClass("col-lg-6");
+      }else{
+        $("#productImageDom").addClass("col-lg-6");
+        $("#productIntroDom").addClass("col-lg-6");
+        $("#productImageDom").removeClass("col-lg-12");
+        $("#productIntroDom").removeClass("col-lg-12");
+      }
+    } 

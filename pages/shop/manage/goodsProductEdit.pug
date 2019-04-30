@@ -4,6 +4,7 @@ block title
 block name
   .hidden#data= JSON.stringify({product: data.product})
   link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
+  link(href='/shop/manage/manage.css' media="screen" rel='stylesheet')
   style.
     .padding-0 {
       padding: 0
@@ -251,12 +252,64 @@ block name
                     input#addFreightPrice(type="text", name="", style="width:30px" value=product.isFreePost?"":numToFloatTwo(product.freightPrice.addFreightPrice))
                   span  元
                   //- p(style="color:red;font-size:11px") 注意:首重运费与增加运费应大于0
+        .panel.panel-info
+          .panel-heading
+            | 图文描述
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-1.control-label 商品图片
+                -let n = 0
+                .col-sm-8#productImages
+                  while n < 5
+                    .upload_image_item(id=`productImage${n+1}`)
+                      if product.imgIntroductions && product.imgIntroductions[n]
+                        .upload_image_item_border(onclick=`openImageManage('productImage${n+1}')` data-toggle="modal" data-target="#myModal" style="display:none")
+                          .upload_image_item_content
+                            i.upload_image_plus.fa.fa-plus
+                            p.upload_image_text 点击添加商品图
+                        .upload_image_card
+                          img(src=`/r/${product.imgIntroductions[n]}`)
+                          .upload_image-tools
+                            i.fa.fa-trash.upload_image_trash(onclick=`deleteImageInProduct('productImage${n+1}')`)
+                      else
+                        .upload_image_item_border(onclick=`openImageManage('productImage${n+1}')` data-toggle="modal" data-target="#myModal")
+                          .upload_image_item_content
+                            i.upload_image_plus.fa.fa-plus
+                            p.upload_image_text 点击添加商品图
+                        .upload_image_card(style="display:none")
+                          img(src="")
+                          .upload_image-tools
+                            i.fa.fa-trash.upload_image_trash(onclick=`deleteImageInProduct('productImage${n+1}')`)
+                    -n++
         .form-group
           label.col-sm-2.control-label
           .col-sm-8(style="text-align:center")
             button.btn.btn-primary.radius(onclick=`editProductShelf("${data.user.uid}","${product.productId}")`, type='submit')
               i.fa.fa-save
               | &nbsp;保存修改
+      #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+        .modal-dialog(role='document')
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal', aria-label='Close')
+                span(aria-hidden='true') ×
+              h4#myModalLabel.modal-title 图片管理器
+            .modal-body
+              .row#imageArrayDom()
+            .modal-footer
+              nav(aria-label='Page navigation')
+                ul.pagination(style="margin:0")  
+                  li
+                    a(href='javascript:void(0);', aria-label='Previous' onclick="prevPageManage()")
+                      span(aria-hidden='true') «
+                  li 
+                    b#currentSkip 
+                    b /
+                    b#maxSkip     
+                  li
+                    a(href='javascript:void(0);', aria-label='Next' onclick="nextPageManage()")
+                      span(aria-hidden='true') »     
 block manageScripts
   +includeJS("/interface_commom.js")
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
