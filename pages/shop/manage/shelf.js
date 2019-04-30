@@ -155,6 +155,13 @@ $(document).ready(function() {
       $("#disCostDom").css("display", "none");
     }
   })
+  $("#vipDiscount").change(function() {
+    if($("#vipDiscount").prop("checked")) {
+      $("#vipDisDom").css("display", "");
+    }else{
+      $("#vipDisDom").css("display", "none");
+    }
+  })
   $("#isPurchaseLimit").change(function() {
     if($("#isPurchaseLimit").prop("checked")) {
       $("#purchaseLimitDom").css("display", "");
@@ -201,6 +208,29 @@ function submitToShelf() {
   var productFinalPrice = $("#afterRebatePrice").text(); // 商品折后价格
   var stockTotalCount = $("#stockQuantity").val(); // 商品库存数量
   var stockCostMethod = $("input[name='stockCostMethod']:checked").val(); // 商品减库存方式
+
+  // 是否使用会员折扣价
+  var vipDiscount = $("#vipDiscount").prop("checked");
+  var vipDisGroup = [];
+  $(".viptr").each(function() {
+    var vipLevel = Number($(this).find(".viplevel").attr("vid"));
+    var vipNum = Number($(this).find(".vipnum").val());
+    if(!vipNum || isNaN(vipNum) || vipNum > 100) {
+      vipNum = 100;
+    }
+    var vipobj = {
+      vipLevel: vipLevel,
+      vipNum: vipNum
+    }
+    vipDisGroup.push(vipobj);
+  })
+  // 获取商品显示设置
+  var priceShowToVisit = $("#priceShowToVisit").prop("checked");
+  var priceShowAfterStop = $("#priceShowAfterStop").prop("checked");
+  var productSettings = {
+    priceShowToVisit: priceShowToVisit,
+    priceShowAfterStop: priceShowAfterStop,
+  }
   // 是否使用限购
   var isPurchaseLimit = $("#isPurchaseLimit").prop("checked");
   var purchaseLimitCount;
@@ -298,7 +328,10 @@ function submitToShelf() {
     productParams: productParams,
     singleParams: singleParams,
     attention: attention,
-    purchaseLimitCount:purchaseLimitCount
+    purchaseLimitCount:purchaseLimitCount,
+    vipDiscount:vipDiscount,
+    vipDisGroup: vipDisGroup,
+    productSettings: productSettings
   }
   return post;
 }
@@ -363,6 +396,21 @@ function openImageManage(id) {
   manageImageLoader();
 }
 
+function IsPC() {
+  var userAgentInfo = navigator.userAgent;
+  var Agents = ["Android", "iPhone",
+              "SymbianOS", "Windows Phone",
+              "iPad", "iPod"];
+  var flag = true;
+  for (var v = 0; v < Agents.length; v++) {
+      if (userAgentInfo.indexOf(Agents[v]) > 0) {
+          flag = false;
+          break;
+      }
+  }
+  return flag;
+}
+
 /**
  * 图片管理器加载图片
  * 
@@ -378,14 +426,15 @@ function manageImageLoader(turn) {
   if(skip <= 0){
     skip = 0;
   }
-  var q = 24;
+  var q = 20;
+  if(!IsPC()) q = 8;
   var type = "picture";
   var imageArray = [];
 
   nkcAPI('/me/media?quota='+q+'&skip='+skip+'&type='+type, 'get',{})
   .then(function(data) {
     for(var i in data.resources){
-      var imgDom = "<div class='col-sm-2' style='margin-bottom:20px;cursor: pointer;' onclick='insertImageToProduct("+data.resources[i].rid+")'><img class='img-thumbnail' style='width:100%;height:100px' src='/r/"+data.resources[i].rid+"'></div>";
+      var imgDom = "<div class='col-sm-3 col-xs-6' style='margin-bottom:20px;cursor: pointer;' onclick='insertImageToProduct("+data.resources[i].rid+")'><img class='img-thumbnail' style='width:100%;height:100px' src='/r/"+data.resources[i].rid+"'></div>";
       imageArray.push(imgDom);
     }
     skip = parseInt(data.skip);
@@ -772,6 +821,17 @@ function mulArrExchangeStr(arr) {
 }
 
 /**
+ * 取出商品属性组
+ */
+function getParaGroup() {
+  var paraArr = [];
+  $(".pname").each(function() {
+    paraArr.push($(this).val())
+  });
+  $("#paraGroup").text(paraArr)
+}
+
+/**
  * 将多维数组生成表格
  */
 function mulArrTurnTable() {
@@ -815,7 +875,8 @@ function mulArrTurnTable() {
       }
     }
   }
-  $("#arrayTable").find("tbody").html(trDom)
+  $("#arrayTable").find("tbody").html(trDom);
+  getParaGroup();
 }
 
 /**
@@ -988,6 +1049,28 @@ function editProductShelf(uid, productId) {
   }else{
     purchaseLimitCount = -1;
   }
+  // 是否使用会员折扣价
+  var vipDiscount = $("#vipDiscount").prop("checked");
+  var vipDisGroup = [];
+  $(".viptr").each(function() {
+    var vipLevel = Number($(this).find(".viplevel").attr("vid"));
+    var vipNum = Number($(this).find(".vipnum").val());
+    if(!vipNum || isNaN(vipNum) || vipNum > 100) {
+      vipNum = 100;
+    }
+    var vipobj = {
+      vipLevel: vipLevel,
+      vipNum: vipNum
+    }
+    vipDisGroup.push(vipobj);
+  })
+  // 获取商品显示设置
+  var priceShowToVisit = $("#priceShowToVisit").prop("checked");
+  var priceShowAfterStop = $("#priceShowAfterStop").prop("checked");
+  var productSettings = {
+    priceShowToVisit: priceShowToVisit,
+    priceShowAfterStop: priceShowAfterStop,
+  }
   // 是否需要上传购买凭证
   var isUploadCert = $("#isUploadCert").prop("checked");
   var uploadCertDescription;
@@ -1013,6 +1096,15 @@ function editProductShelf(uid, productId) {
     freightPrice.firstFreightPrice = firstFreightPrice;
     freightPrice.addFreightPrice = addFreightPrice;
   }
+  // 获取全部商品图的id，存入一个数组
+  var imgIntroductions = [];
+  $("#productImages").find('img.picShow').each(function(){
+    imgIntroductions.push($(this).attr("imageId"));
+  })
+  if(imgIntroductions.length == 0){
+    throw("至少上传一张商品图")
+  }
+  var imgMaster = imgIntroductions[0];
   var params = tableTurnParams();
   var productParams = obtainProductPrice();
   var singleParams = getSingleParams();
@@ -1027,7 +1119,12 @@ function editProductShelf(uid, productId) {
     productId:productId,
     params: params,
     productParams: productParams,
-    singleParams: singleParams
+    singleParams: singleParams,
+    vipDiscount:vipDiscount,
+    vipDisGroup: vipDisGroup,
+    productSettings: productSettings,
+    imgIntroductions: imgIntroductions,
+    imgMaster: imgMaster,
   }
   nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
   .then(function(data) {

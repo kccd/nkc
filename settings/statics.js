@@ -17,6 +17,7 @@ const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 const defaultUserBannerPath = defaultPath + '/default_user_banner.jpg';
 const defaultMessageFilePath = defaultPath + '/default_resource_image.jpg';
 const defaultVideoCoverPath = defaultPath + '/videoCover.jpg';
+const defaultForumBannerPath = defaultPath + "/forum_banner.jpg";
 
 const staticPath = path.resolve('public/statics');
 const defaultRoleIconPath = staticPath + '/role_icon';
@@ -39,5 +40,7 @@ module.exports = {
   defaultAdPath,
   defaultImageResourcePath,
   defaultMessageFilePath,
+  defaultForumBannerPath,
   defaultVideoCoverPath
+
 };

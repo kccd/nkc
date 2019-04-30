@@ -159,7 +159,7 @@ router
 			q: num
 		};
 		await post.update({$push: {credits: updateObjForPost}});
-
+    await thread.updateThreadEncourage();
 		await next();
 	});
 

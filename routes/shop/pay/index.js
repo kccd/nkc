@@ -28,6 +28,13 @@ router
     let {ordersId} = query;
     data.ordersId = ordersId;
     data.ordersInfo = await db.ShopOrdersModel.getOrdersInfo(data.orders);
+    data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(data.orders);
+    for(let order of data.orders) {
+      for(let a=0;a<order.params.length;a++) {
+        let product = order.params[a].product;
+        if(product.productStatus == "stopsale") ctx.throw(400, `商品id为(${product.productId})的商品停售，不可购买，请重新下单`)
+      }
+    }
     ctx.template = 'shop/pay/pay.pug';
     await next();
   })

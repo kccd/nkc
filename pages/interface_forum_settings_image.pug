@@ -5,7 +5,7 @@ block title
   -const forum = data.forum;
   link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_forum_settings
@@ -33,6 +33,13 @@ block content
                   div(style=`width: 92px;height: 92px;position: relative;overflow: hidden;`)
                     img#img_m(src=`/forum_avatar/${forum.fid}` title=forum.iconFileName?'':'暂无logo').user-settings-img
                   h5 92x92
+              .col-xs-12.col-md-12
+                h4 专业banner（width: 730px, height: 100px）
+                img(src=`/f/${forum.fid}/banner` style='max-width: 100%;')
+                .m-t-1
+                  input(type="file" accept="image/jpeg" name="banner")
+                .m-t-1
+                  button.btn.btn-default.btn-sm(onclick=`uploadBanner('${forum.fid}')`) 上传
             input#logo(type='file' accept="image/*").hidden
 
 block scripts

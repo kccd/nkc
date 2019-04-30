@@ -9,7 +9,7 @@ block title
   title 网站首页设置
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       include ../nav
       .col-xs-12.col-md-2
@@ -55,24 +55,59 @@ block content
               button.btn.btn-default(onclick='saveNotice()') 保存
 
         else if data.type === 'list'
-          -const homeSettings = data.homeSettings;
-          .row
+          .hidden#data=objToStr({homeSettings: data.homeSettings})
+          .row#app(v-cloak)
             .col-xs-12.col-md-12
-              h4 首页可显示文章的专业类型
-              .checkbox
-                span 话题
-                label
-                  if homeSettings.list && homeSettings.list.topic
-                    input(type='checkbox' name='list' checked=true)
-                  else   
-                    input(type='checkbox' name='list')
-                span 学科  
-                label
-                  if homeSettings.list && homeSettings.list.discipline
-                    input(type='checkbox' name='list' checked=true)
-                  else   
-                    input(type='checkbox' name='list')
-              button.btn.btn-primary(onclick='saveHomeListSettings()') 保存    
+              .form
+                .form-group
+                  h4 一、首页可显示文章的专业类型
+                  .checkbox
+                    span 话题
+                    label
+                      input(type='checkbox' value="topic" v-model="list")
+                    span 学科
+                    label
+                      input(type='checkbox' value="discipline" v-model="list")
+                .form-group
+                  h4 二、游客首页文章列表文章来源
+                  .radioBox
+                    span 最新
+                    label
+                      input(type='radio' value="latest" v-model="homeSettings.visitorThreadList")
+                    span.m-l-1 推荐
+                    label
+                      input(type='radio' value="recommend" v-model="homeSettings.visitorThreadList")
+                .form-group.form-inline
+                  h4 三、热门文章
+                  h5 回复数不低于：
+                    input.form-control(type="text" v-model.number="homeSettings.hotThreads.postCount")
+                  h5
+                    span 回复用户的总数(已去重)不低于：
+                    input.form-control(type="text" v-model.number="homeSettings.hotThreads.postUserCount")
+                .form-group.form-inline
+                  h4 四、推荐条件
+                  h5
+                    span 1、
+                    span 精选文章
+                    label
+                      input(type='checkbox' value="featuredThreads" v-model="recommend")
+                  h5
+                    span 2、热门文章
+                    label
+                      input(type='checkbox' value="hotThreads" v-model="recommend")
+                  h5
+                    span 3、点赞总数不低于
+                    input.form-control(type='text' v-model.number='homeSettings.recommend.voteUpTotal')
+                  h5
+                    span 4、独立点赞数不低于
+                    input.form-control(type='text' v-model.number='homeSettings.recommend.voteUpMax')
+                  h5
+                    span 5、鼓励次数不低于
+                    input.form-control(type='text' v-model.number='homeSettings.recommend.encourageTotal')
+                .form-group
+                  h5.text-danger(v-if="error") {{error}}
+                  h5.text-success(v-if="info") {{info}}
+                  button.btn.btn-primary(@click="save") 保存
 
         else
           .row

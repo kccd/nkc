@@ -1,7 +1,6 @@
 .notice.mdui-shadow-3.mdui-m-t-2.mdui-p-a-1
   .notice-header
-    <i class="mdui-icon material-icons">&#xe7f4;</i>
-    | 网站公告
+    +listHeader("网站公告")
   for thread, index in data.noticeThreads
     div
       a(href=`/t/${thread.tid}` target='_blank')= `${index + 1}. ${thread.firstPost.t}`

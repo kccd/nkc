@@ -5,7 +5,7 @@ block title
   title= `${data.targetUser.username} - 科创论坛`
   -const mainContainer1400 = true;
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
         .row
@@ -22,9 +22,9 @@ block content
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
                 if data.user && data.user.uid !== data.targetUser.uid
                   a(href=`/message?uid=${data.targetUser.uid}`).btn.btn-primary.btn-block 私信
-                  if data.userOperationsId.includes('subscribeUser') && data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
+                  if data.userOperationsId.includes('subscribeUser') && data.subscribed
                     button.btn.btn-block.btn-danger(onclick=`subscribeUser(${data.targetUser.uid}, false)`) 取关
-                  if data.userOperationsId.includes('unSubscribeUser') && !data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
+                  if data.userOperationsId.includes('unSubscribeUser') && !data.subscribed
                     button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
                 if data.userOperationsId.includes('visitUserTransaction')
                   a.btn.btn-block.btn-primary(href=`/u/${data.targetUser.uid}/transaction`) 更多信息

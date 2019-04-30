@@ -141,6 +141,24 @@ const shopGoodsSchema = new Schema({
     type: String,
     default: "payReduceStock"
   },
+  // 是否使用会员折扣
+  vipDiscount: {
+    type: Boolean,
+    default: false
+  },
+  // 会员折扣列表
+  vipDisGroup: {
+    type: Array,
+    default: []
+  },
+  // 显示设置
+  productSettings: {
+    type: Schema.Types.Mixed,
+    default: {
+      priceShowToVisit: false,
+      priceShowAfterStop: false
+    }
+  },
   // 总评价数量
   evalTotalCount: {
     type: Number,
@@ -157,6 +175,11 @@ const shopGoodsSchema = new Schema({
     type: Date,
     default: Date.now,
     index: 1
+  },
+  // 是否被管理员禁售
+  adminBan: {
+    type: Boolean,
+    default: false
   },
   /**
    * 商品状态

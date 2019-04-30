@@ -26,7 +26,9 @@ module.exports = async (ctx, next) => {
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
 	  ctx.redis = redis;
-    ctx.state = {};
+    ctx.state = {
+      url: ctx.url.replace(/\?.*/ig, "")
+    };
     ctx.settings = settings;
 	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;

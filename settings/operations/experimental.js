@@ -22,6 +22,15 @@ module.exports = {
           PATCH: "modifyShopRefundSettings"
         }
 			},
+			products: {
+				GET: "visitiShopProducts",
+				bansale:{
+					PATCH: "shopAdminBanProductSale"
+				},
+				clearban: {
+					PATCH: "shopAdminClearBanSale"
+				}
+			},
 			auth: {
 				GET: "visitShopAuth",
 				POST: "setShopAuth",
@@ -61,10 +70,6 @@ module.exports = {
 	  login: {
 	    GET:'visitLoginSettings',
       PATCH: 'modifyLoginSettings'
-    },
-    register: {
-      GET: 'visitRegisterSettings',
-      PATCH: 'modifyRegisterSettings'
     },
 		sms: {
 			GET: 'visitSmsSettings',
@@ -146,14 +151,6 @@ module.exports = {
 			GET: 'visitEForumSettings',
 			PATCH: 'modifyEForumSettings'
 		},
-		/*score: {
-			GET: 'visitScoreSettings',
-			PATCH: 'modifyScoreSettings'
-		},*/
-		/*download: {
-			GET: 'visitDownloadSettings',
-			PATCH: 'modifyDownloadSettings'
-		},*/
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',
@@ -203,6 +200,14 @@ module.exports = {
 			GET: 'visitEPostSettings',
 			PATCH: 'modifyEPostSettings'
 		},
+    sub: {
+      GET: "experimentalSubSettings",
+      PATCH: "experimentalSubSettings"
+    },
+    register: {
+      GET: "experimentalRegisterSettings",
+      PATCH: "experimentalRegisterSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'
@@ -214,6 +219,9 @@ module.exports = {
 	},
 	log: {
 		GET: 'visitPublicLogs',
+    recycle: {
+		  GET: 'visitRecycleMarkThreads'
+    },
 		public: {
 			GET: 'visitPublicLogs',
 			DELETE: 'deletePublicLogs'

@@ -4,6 +4,7 @@ const threadRouter = new Router();
 const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
+const subscribeRouter = require("./subscribe");
 
 
 threadRouter
@@ -269,6 +270,20 @@ threadRouter
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
 			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
 			data.product = productArr[0];
+			// 判断是否使用会员价
+			let vipNum = 100;
+			if(data.product.vipDiscount) {
+				data.vipDiscount = true;
+				for(let v=0;v<data.product.vipDisGroup.length;v++) {
+					if(data.user && data.user.authLevel == data.product.vipDisGroup[v].vipLevel) {
+						vipNum = data.product.vipDisGroup[v].vipNum;
+					}
+				}
+				data.vipDisNum = vipNum;
+			}else{
+				data.vipDiscount = false;
+				data.vipDisNum = vipNum;
+			}
 			// 选定规格
 			let paId = 0;
 			for(let a=0;a<data.product.productParams.length;a++){
@@ -305,11 +320,18 @@ threadRouter
     }
 		// 加载收藏
 		data.collected = false;
+		data.subscribed = false;
 		if(data.user) {
 			const collection = await db.CollectionModel.findOne({uid: data.user.uid, tid});
 			if(collection) {
 				data.collected = true;
 			}
+			const sub = await db.SubscribeModel.findOne({
+        type: "thread",
+        tid,
+        uid: data.user.uid
+      });
+			if(sub) data.subscribed = true;
 		}
 
 		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
@@ -504,6 +526,20 @@ threadRouter
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		//帖子曾经在草稿箱中，发表时，删除草稿
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
+
+		// 回复自动关注文章
+    const subQuery = {
+      type: "thread",
+      tid,
+      uid: data.user.uid
+    };
+    let sub = await db.SubscribeModel.findOne(subQuery);
+    if(!sub) {
+      subQuery.detail = "replay";
+      subQuery._id = await db.SettingModel.operateSystemID("subscribes", 1);
+      await db.SubscribeModel(subQuery).save();
+    }
+
     global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })
@@ -511,5 +547,6 @@ threadRouter
 	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
+  .use("/:tid/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

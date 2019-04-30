@@ -5,6 +5,10 @@ module.exports = {
 		GET: 'visitForumHome', // 查看专业主页
 		POST: 'postToForum', // 在专业中发表文章
 		DELETE: 'deleteForum', // 删除专业
+    banner: {
+		  GET: 'visitForumBanner',
+      PATCH: "modifyForumBanner"
+    },
 		latest: {
 			GET: 'visitForumLatest' // 查看专业最新文章列表
 		},

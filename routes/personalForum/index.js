@@ -9,6 +9,13 @@ router
     const perpage = settings.paging.perpage;
     const {uid} = params;
     const {user} = data;
+    if(user) {
+      data.subscribed = await db.SubscribeModel.findOne({
+        type: "user",
+        uid: user.uid,
+        tUid: uid
+      });
+    }
     const {
       PersonalForumModel,
       UserModel,

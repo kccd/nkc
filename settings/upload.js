@@ -37,7 +37,8 @@ const paths = {
   friendImagePath: 'resources/friend_image',
   posterPath: 'resources/poster',
   questionImagePath: 'resources/question_image',
-  shopCertsPath: 'resources/shop_certs'
+  shopCertsPath: 'resources/shop_certs',
+  forumBannerPath: "resources/forum_banner"
 };
 
 const pathsObj = {};

@@ -48,6 +48,18 @@ orderRouter
 		await order.update({$set: {trackName:trackName,trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
 		await next();
 	})
+	// 无物流发货
+	.patch('/sendGoodsNoLog', async(ctx, next) => {
+		const {data, db, params, query, body} = ctx;
+		const {orderId} = body.post;
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "订单无效");
+    var time = new Date();
+    const shopSettings = await db.SettingModel.findOnly({_id: "shop"});
+    const autoReceiveTime = Date.now() + shopSettings.c.refund.buyerReceive * 60 * 60 * 1000;
+		await order.update({$set: {trackName:"",trackNumber:"no", orderStatus:"unSign", shipToc:time, autoReceiveTime}});
+		await next();
+	})
   // 修改订单价格
   .patch('/editOrder', async(ctx, next) => {
     const {data, db, query, body} = ctx;

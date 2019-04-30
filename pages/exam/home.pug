@@ -64,7 +64,7 @@ block content
               else
                 | 试题审核          
         .p-t-2        
-        +listHeader('最新考试记录')      
+        +listHeader('考试记录')
         for paper in data.papers
           .m-t-1
             span=fromNow(paper.tlm)

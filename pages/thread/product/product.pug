@@ -86,14 +86,18 @@ style.
   }
 .row
   .col-xs-12.col-md-12(style="margin-bottom:5px")
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")
+    if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts')) 
+      if !product.adminBan
+        .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
+          button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")#productImageDom
       ul#etalage
         -for(let rid of product.imgIntroductions)
           li
             img.etalage_thumb_image(src=`/r/${rid}`)
             img.etalage_source_image(src=`/r/${rid}`)
 
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;padding-left:65px")
+    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
       p.item 
         span#showText #{cutContent(post.abstract,60)}
         if post.abstract && post.abstract.length > 60
@@ -115,17 +119,26 @@ style.
       //-       li(style="margin:0px")!=`* ${attStr}`
       div.item(style="background:#c7fff8")
         div(style="padding:7px 0;color:#333")
-          if !data.user
+          if !product.productSettings.priceShowToVisit && !data.user
             p
               span.title 价格
-              span(style="color:orangered") 登陆可见
+              a(style="color:orangered" href="/login") 登陆可见
+          else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+            p
+              span.title 价格
+              span(style="color:orangered") 停售不可见
           else
             p
               span.title 价格
               span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
-            p
-              span.title 优惠价
-              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+            if data.vipDiscount
+              p
+                span.title 会员价
+                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price * (data.vipDisNum/100))}
+            else
+              p
+                span.title 优惠价
+                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
       div.item
         p
           span.title 快递
@@ -133,10 +146,14 @@ style.
           span.location(style="font-size:small;") 至
           input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
       div.item(style="border-bottom: 1px solid #e5e5e5")
-        if !data.user
+        if !product.productSettings.priceShowToVisit && !data.user
           p
             span.title 运费
-            span(style="color:orangered") 登陆可见
+            a(style="color:orangered" href="/login") 登陆可见
+        else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+          p
+            span.title 价格
+            span(style="color:orangered") 停售不可见
         else
           p
             span.title 运费
@@ -165,13 +182,16 @@ style.
               span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
                 span=para.name
       div.item
-        if product.productStatus == "stopsale"
-          p(style="text-align: center;background-color: tomato;padding:10px") 商品停售中
+        if product.adminBan
+          p(style="text-align: center; background-color:tomato;padding:10px") 该商品已被禁售
         else
-          div(style="display:none")#paraId!=`${paraId}`
-          a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-          a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
-            span.fa.fa-shopping-cart  加入购物车
+          if product.productStatus == "stopsale"
+            p(style="text-align: center;background-color: tomato;padding:10px") 商品已被卖家停售
+          else
+            div(style="display:none")#paraId!=`${paraId}`
+            a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+              span.fa.fa-shopping-cart  加入购物车
     .col-xs-1.col-md-1 
 
   .col-xs-12.col-md-12
@@ -207,3 +227,17 @@ block scripts
     $("s").click(function (e) {
       SelCity(document.getElementById("city"),e);
     });
+    
+    window.onresize=function(){  
+      if($(window).width() < 1350) {
+        $("#productImageDom").addClass("col-lg-12");
+        $("#productIntroDom").addClass("col-lg-12");
+        $("#productImageDom").removeClass("col-lg-6");
+        $("#productIntroDom").removeClass("col-lg-6");
+      }else{
+        $("#productImageDom").addClass("col-lg-6");
+        $("#productIntroDom").addClass("col-lg-6");
+        $("#productImageDom").removeClass("col-lg-12");
+        $("#productIntroDom").removeClass("col-lg-12");
+      }
+    } 

@@ -84,6 +84,11 @@ goodslistRouter
       params,
       productParams,
       singleParams,
+      vipDiscount,
+      vipDisGroup,
+      productSettings,
+      imgIntroductions,
+      imgMaster
     } = body;
     const product = await db.ShopGoodsModel.findOne({productId});
     if(user.uid !== product.uid) ctx.throw(400, "您无权修改别人的作品");
@@ -125,7 +130,7 @@ goodslistRouter
       await sd.save();
     }
     // 修改产品属性列表
-    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr}});
+    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr,vipDiscount,vipDisGroup,productSettings,imgIntroductions,imgMaster}});
     await next();
   })
   // 立即上架

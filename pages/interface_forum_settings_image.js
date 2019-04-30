@@ -87,3 +87,19 @@ function submit(fid) {
 			screenTopWarning(JSON.parse(data.responseText).error);
 		})
 }
+
+function uploadBanner(fid) {
+  var input = $("input[name='banner']")[0];
+  var files = input.files;
+  if(!files || files.length === 0) return screenTopWarning("请选择banner图片");
+  var formData = new FormData();
+  formData.append("file", files[0]);
+  uploadFilePromise("/f/" + fid + "/banner", formData, function(){}, "PATCH")
+    .then(function() {
+      screenTopAlert('保存成功');
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+}
