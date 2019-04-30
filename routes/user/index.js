@@ -43,7 +43,7 @@ userRouter
         uid: user.uid
       });
       data.subForumsId = subForums.map(s => s.fid);
-	    data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
+	    // data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: user.uid});
 	    data.subscribed = await db.SubscribeModel.findOne({
         type: "user",
         uid: user.uid,
