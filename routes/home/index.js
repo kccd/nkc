@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const router = new Router();
-const subscriptionRouter = require('./subscription');
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query} = ctx;
@@ -210,5 +209,4 @@ router
     ctx.template = "home/newHome.pug";
     await next();
   })
-  .use('subscription', subscriptionRouter.routes(), subscriptionRouter.allowedMethods());
 module.exports = router;

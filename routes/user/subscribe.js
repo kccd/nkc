@@ -67,12 +67,7 @@ subscribeRouter
     let {db} = ctx;
     let {user} = ctx.data;
     if(user.uid === uid) ctx.throw(400, '关注自己干嘛？');
-    const subSettings = await db.SettingModel.findById("subscribe");
-    const count = await db.SubscribeModel.count({
-      type: 'user',
-      uid: user.uid
-    });
-    if(count >= subSettings.c.subUserCountLimit) ctx.throw(400, "关注用户数量已达上限");
+    await user.ensureSubLimit("user");
     let sub = await db.SubscribeModel.findOne({
       type: "user",
       uid: user.uid,

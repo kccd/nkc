@@ -16,6 +16,7 @@ router
     if(sub) {
       ctx.throw(400, "文章已关注，请刷新");
     } else {
+      await user.ensureSubLimit("thread");
       q.detail = "sub";
       q._id = await db.SettingModel.operateSystemID("subscribes", 1);
       await db.SubscribeModel(q).save();
