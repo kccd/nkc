@@ -136,7 +136,7 @@ router
         disabled: false,
         $or: [
           {
-            fid: {
+            mainForumsId: {
               $in: subFid
             }
           },
