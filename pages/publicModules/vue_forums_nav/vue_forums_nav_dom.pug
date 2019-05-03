@@ -7,7 +7,6 @@
       a(
         v-for="f in subForums"
         :href="'/f/' + f.fid"
-        target="_blank"
         :style="'background-color: '+f.color+';'"
         :title="f.description"
       ).topic-item
@@ -20,7 +19,7 @@
     +listHeader('话题')
   div(v-for="forum in forums" v-if='forum.forumType === "topic"' :title="forum.description")
     .home-topic-list-li
-      a(:href="'/f/' + forum.fid" target="_blank")
+      a(:href="'/f/' + forum.fid")
         img(:src="'/forum_avatar/' + forum.fid"
           v-if="forum.iconFileName"
         )
@@ -30,7 +29,6 @@
       a(
         v-for="f in forum.childrenForums"
         :href="'/f/' + f.fid"
-        target="_blank"
         :style="'background-color: '+f.color+';'"
         :title="f.description"
       ).topic-item
@@ -43,7 +41,7 @@
     +listHeader('学科')
   div(v-for="forum in forums" v-if='forum.forumType === "discipline"' :title="forum.description")
     .home-topic-list-li
-      a(:href="'/f/' + forum.fid" target="_blank")
+      a(:href="'/f/' + forum.fid")
         img(:src="'/forum_avatar/' + forum.fid"
           v-if="forum.iconFileName"
         )
@@ -53,7 +51,6 @@
       a(
         v-for="f in forum.childrenForums"
         :href="'/f/' + f.fid"
-        target="_blank"
         :style="'background-color: '+f.color+';'"
         :title="f.description"
       ).topic-item
