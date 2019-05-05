@@ -58,6 +58,13 @@ block title
             else
               a(href=`javascript: addColl('${thread.tid}')`)
                 span.fa.fa-folder-o &nbsp;加入收藏
+          li
+            if data.subscribed
+              a(href=`javascript: unSubThread('${thread.tid}')`)
+                span.fa.fa-bookmark-o &nbsp;取消关注
+            else
+              a(href=`javascript: subThread('${thread.tid}')`)
+                span.fa.fa-bookmark-o &nbsp;关注
         if addCredit
           li
             a(href=`javascript:credit('${post.pid}', 'xsf')`)

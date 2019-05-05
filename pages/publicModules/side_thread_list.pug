@@ -1,0 +1,10 @@
+.side-thread-list
+  .side-thread-header= sideThreadsHeader
+  for t in sideThreads
+    .side-thread
+      a(href=`/t/${t.tid}`).side-thread-title= t.firstPost.t
+      if !sideThreadsHideInfo
+        .side-thread-info
+          a(href=`/f/${t.forums[0].fid}`)= t.forums[0].displayName
+          a(href=`/u/${t.uid}`)= t.firstPost.user.username
+          span=fromNow(t.toc)

@@ -1,0 +1,12 @@
+.module-user-panel-md
+  .avatar
+    img(src=`/avatar/${targetUser.uid}`)
+  .info
+    a(href=`/u/${targetUser.uid}` target="_blank").name= targetUser.username
+    if data.user && data.user.uid !== targetUser.uid
+      if data.userSubUid.includes(targetUser.uid)
+        .button(onclick=`subscribeUser(${targetUser.uid}, false)`) 取关
+      else
+        .button(onclick=`subscribeUser(${targetUser.uid}, true)`) 关注
+    .cert=targetUser.info.certsName
+    .description=targetUser.description || "暂未填写个人简介"

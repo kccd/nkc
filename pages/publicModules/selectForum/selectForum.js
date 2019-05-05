@@ -2,7 +2,7 @@ var vueSelectForum = {};
 vueSelectForum.init = function(options) {
   var func = options.func;
   var canChooseParentForum = options.canChooseParentForum || false;
-  if(!func) throw 'callback function is required'
+  if(!func) throw 'callback function is required';
   $('#vueSelectForum').modal({show: false});
   vueSelectForum.app = new Vue({
     el: '#vueSelectForum2',
@@ -14,7 +14,7 @@ vueSelectForum.init = function(options) {
       childForums: function() {
         if(this.selectedForums.length === 0) {
           return this.forums;
-        };
+        }
         var forum = this.selectedForums[this.selectedForums.length - 1];
         return forum.childrenForums || [];
       }
@@ -26,7 +26,7 @@ vueSelectForum.init = function(options) {
       })
       .catch(function(data) {
         screenTopWarning(data);
-      })
+      });
       var this_ = this;
       $('#vueSelectForum').on('hidden.bs.modal', function (e) {
         this_.selectedForums = [];
@@ -64,4 +64,4 @@ vueSelectForum.init = function(options) {
       }
     }
   });
-}
+};

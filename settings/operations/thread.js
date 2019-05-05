@@ -38,6 +38,10 @@ module.exports = {
       POST: 'addThreadForum',
       DELETE: 'removeThreadForum',
       PATCH: 'patchThreadForum'
+    },
+    subscribe: {
+		  POST: "subThread",
+      DELETE: 'unSubThread'
     }
 	}
 };

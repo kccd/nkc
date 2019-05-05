@@ -1,0 +1,10 @@
+.side-user-list
+  .side-user-header= sideUsersHeader
+  .side-user-content
+    for u in sideUsers
+      .side-user(
+        onmouseover=`vue_user_panel_float.loadUser('${objToStr(u)}')`
+        onmouseleave="vue_user_panel_float.close()"
+      )
+        a(href=`/u/${u.uid}` target="_blank")
+          img(src=`/avatar/${u.uid}`)

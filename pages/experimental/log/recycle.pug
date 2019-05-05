@@ -1,0 +1,39 @@
+extends ../../bootstrap_base
+
+block title
+  title 等待修改的文章
+  +includeCSS('/experimental/index.css')
+  style.
+    tbody tr th {
+      max-width: 12rem;
+      font-size: 1rem;
+    }
+block content
+
+  .container-fluid.max-width
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        h4.text-danger 等待作者修改的文章
+        table.table
+          thead
+            tr
+              th 退修时间
+              th 作者
+              th 文章标题
+              th 退修原因
+              th 操作者
+          tbody
+            for thread in data.threads
+              tr
+                th=thread.markTime.toLocaleString()
+                th
+                  a(href=`/u/${thread.firstPost.user.uid}` target="_blank")=thread.firstPost.user.username
+                th
+                  a(href=`/t/${thread.tid}` target="_blank")= thread.firstPost.t
+                th=thread.markReason
+                th
+                  a(href=`/u/${thread.markUser.uid}` target="_blank")=thread.markUser.username
+block scripts
+  include ../../publicModules/moment
+  +includeJS("/experimental/log/recharge.js")

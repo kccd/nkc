@@ -142,6 +142,12 @@ const usersGeneralSchema = new Schema({
 	    type: Date,
       default: null
     }
+  },
+  displaySettings: {
+	  homeThreadList: {// subscribe, latest
+      type: String,
+      default: "subscribe"
+    }
   }
 }, {
 	collection: 'usersGeneral'

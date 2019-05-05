@@ -100,6 +100,9 @@ module.exports = {
         },
         editOrderPrice: {
           PATCH: "editOrderPrice"
+        },
+        orderListToExcel: {
+          GET: "orderListToExcel"
         }
       },
       goodslist: {

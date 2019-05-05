@@ -8,7 +8,7 @@ block title
   link(rel='stylesheet' href='/shop/manage/manage.css')
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
         if !data.dealInfo || !data.dealInfo.dataPerfect

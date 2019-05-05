@@ -14,6 +14,7 @@ const usernameRouter = require('./username');
 const waterRouter = require('./water');
 const alipayRouter = require("./alipay");
 const bankRouter = require("./bank");
+const displayRouter = require("./display");
 const redEnvelopeRouter = require('./redEnvelope');
 settingRouter
 	.use('/', async (ctx, next) => {
@@ -43,6 +44,7 @@ settingRouter
 	.use('/cert', certRouter.routes(), certRouter.allowedMethods())
 	.use('/photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+  .use("/display", displayRouter.routes(), displayRouter.allowedMethods())
   .use("/bank", bankRouter.routes(), bankRouter.allowedMethods())
 	.use('/water', waterRouter.routes(), waterRouter.allowedMethods());
 module.exports = settingRouter;

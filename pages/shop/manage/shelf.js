@@ -340,9 +340,11 @@ function submitToShelf() {
  * 商品上架
  */
 function productToShelf(uid) {
+  $("#saveProduct").attr("disabled",true);
   try{
     var productInfo = submitToShelf();
   }catch(err) {
+    $("#saveProduct").removeAttr("disabled");
     return screenTopWarning(err);
   }
   nkcAPI('/shop/manage/'+uid+'/shelf', "POST" ,{post:productInfo})
@@ -353,6 +355,7 @@ function productToShelf(uid) {
   })
   .catch(function(data){
     screenTopWarning(data.error || data);
+    $("#saveProduct").removeAttr("disabled");
   })
 }
 
@@ -1036,6 +1039,7 @@ function getShopForum() {
  * 
  */
 function editProductShelf(uid, productId) {
+  $("#resaveBtn").attr("disabled", true)
   var stockCostMethod = $("input[name='stockCostMethod']:checked").val(); // 商品减库存方式
   // 是否使用限购
   var isPurchaseLimit = $("#isPurchaseLimit").prop("checked");
@@ -1044,7 +1048,8 @@ function editProductShelf(uid, productId) {
     purchaseLimitCount = $("#purchaseLimitCount").val();
     purchaseLimitCount = Number(purchaseLimitCount);
     if(!purchaseLimitCount || isNaN(purchaseLimitCount) || purchaseLimitCount < 0){
-      throw("限购数量应该是正整数且不大于商品的库存数量");
+      return screenTopWarning("限购数量应该是正整数且不大于商品的库存数量");
+      $("#resaveBtn").removeAttr("disabled");
     }
   }else{
     purchaseLimitCount = -1;
@@ -1091,7 +1096,8 @@ function editProductShelf(uid, productId) {
   if(freightMethod !== "freePost") {
     isFreePost = false;
     if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice < 0) {
-      throw("请正确设置运费模板");
+      return screenTopWarning("请正确设置运费模板");
+      $("#resaveBtn").removeAttr("disabled");
     }
     freightPrice.firstFreightPrice = firstFreightPrice;
     freightPrice.addFreightPrice = addFreightPrice;
@@ -1102,7 +1108,8 @@ function editProductShelf(uid, productId) {
     imgIntroductions.push($(this).attr("imageId"));
   })
   if(imgIntroductions.length == 0){
-    throw("至少上传一张商品图")
+    return screenTopWarning("至少上传一张商品图");
+    $("#resaveBtn").removeAttr("disabled");
   }
   var imgMaster = imgIntroductions[0];
   var params = tableTurnParams();
@@ -1129,8 +1136,10 @@ function editProductShelf(uid, productId) {
   nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
   .then(function(data) {
     screenTopAlert("修改成功");
+    window.location.href = "/shop/manage/"+uid+"/goodslist";
   })
   .catch(function(data) {
-    screenTopWarning(data.error || data)
+    screenTopWarning(data.error || data);
+    $("#resaveBtn").removeAttr("disabled");
   })
 }

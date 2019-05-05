@@ -60,7 +60,8 @@ router
     let threads = await db.ThreadModel.find(
       q,
       {
-        uid: 1, tid: 1, toc: 1, oc: 1, lm: 1, tlm: 1, fid: 1, hasCover: 1
+        uid: 1, tid: 1, toc: 1, oc: 1, lm: 1, tlm: 1, fid: 1, hasCover: 1,
+        mainForumsId: 1
       }).skip(paging.start).limit(paging.perpage).sort({tlm: -1}
     );
     threads = await db.ThreadModel.extendThreads(threads, {
@@ -91,7 +92,7 @@ router
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     let forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
     forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
-    data.forums = forums.map(forum => forum.toObject());
+    data.forums = forums.map(forum => forum.toObject?forum.toObject(): forum);
     // 一周活跃用户
     const { home } = ctx.settings;
     const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(home.activeUsersLength);

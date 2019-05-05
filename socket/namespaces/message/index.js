@@ -1,6 +1,6 @@
 require('colors');
 const moment = require('moment');
-const settings = require('../../../settings');
+const cookieConfig = require("../../../config/cookie");
 const db = require('../../../dataModels');
 const Cookies = require('cookies-string-parse');
 const util = require('../../util');
@@ -26,7 +26,7 @@ const message = async (i) => {
     // 从cookie中获取用户信息
     const {handshake} = socket;
     const cookies = new Cookies(handshake.headers.cookie, {
-      keys: [settings.cookie.secret]
+      keys: [cookieConfig.secret]
     });
     const userInfo = cookies.get('userInfo', {
       signed: true

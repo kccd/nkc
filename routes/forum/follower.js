@@ -10,11 +10,20 @@ followerRouter
 		if(forum.childrenForums.length !== 0) {
 			ctx.throw(403, '权限不足');
 		}
-		const count = forum.followersId.length;
+		const q = {
+		  type: "forum",
+      fid: forum.fid
+    };
+		const count = await db.SubscribeModel.count(q);
 		const paging = apiFunction.paging(page, count);
 		data.paging = paging;
-    data.followers = await db.UserModel.find({uid: {$in: forum.followersId}}).sort({tlv: -1}).skip(paging.start).limit(paging.perpage);
+		const sub = await db.SubscribeModel.find(q);
+		const uid = sub.map(s => s.uid);
+    data.followers = await db.UserModel.find({uid: {$in: uid}}).sort({tlv: -1}).skip(paging.start).limit(paging.perpage);
     await db.UserModel.extendUsersInfo(data.followers);
+    if(data.user) {
+      data.userSubUid = await db.SubscribeModel.getUserSubUid(data.user.uid);
+    }
 		data.type = 'followers';
 		await next();
 	});
