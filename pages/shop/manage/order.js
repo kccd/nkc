@@ -1,6 +1,18 @@
-function test() {
-  alert("1")
+function initTime() {
+	if(!$('.time').length){
+		return;
+  }
+	$('.time').datetimepicker({
+		language:  'zh-CN',
+		format: 'yyyy-mm-dd hh:ii',
+		autoclose: true,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 0,
+		forceParse: 0
+	});
 }
+initTime();
 /**
  * 发货
  * 弹出窗口

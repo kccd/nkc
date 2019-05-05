@@ -1,6 +1,7 @@
 extends ./index.pug
 
 block name
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   .row
     .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
       ul.nav.nav-pills(style="border:1px solid #ddd")
@@ -20,6 +21,8 @@ block name
           a(href=`/shop/manage/${data.user.uid}/order?orderStatus=refunding`, data-toggle='url') 退款中的订单
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      a.btn.btn-primary.btn-sm(href=`/shop/manage/${data.user.uid}/order/orderListToExcel`) 订单导出
     .col-md-12.col-sm-12.col-xs-12  
       .table-responsive
         table.table.table-bordered
@@ -165,4 +168,6 @@ block manageScripts
       }
       $("#trackList").html(trackListDom)
     });
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
   +includeJS("/shop/manage/order.js")

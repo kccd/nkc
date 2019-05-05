@@ -269,7 +269,7 @@ block name
                             i.upload_image_plus.fa.fa-plus
                             p.upload_image_text 点击添加商品图
                         .upload_image_card
-                          img(src=`/r/${product.imgIntroductions[n]}`)
+                          img.picShow(src=`/r/${product.imgIntroductions[n]}` imageId=`${product.imgIntroductions[n]}`)
                           .upload_image-tools
                             i.fa.fa-trash.upload_image_trash(onclick=`deleteImageInProduct('productImage${n+1}')`)
                       else
@@ -285,7 +285,7 @@ block name
         .form-group
           label.col-sm-2.control-label
           .col-sm-8(style="text-align:center")
-            button.btn.btn-primary.radius(onclick=`editProductShelf("${data.user.uid}","${product.productId}")`, type='submit')
+            button#resaveBtn.btn.btn-primary.radius(onclick=`editProductShelf("${data.user.uid}","${product.productId}")`, type='submit')
               i.fa.fa-save
               | &nbsp;保存修改
       #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
