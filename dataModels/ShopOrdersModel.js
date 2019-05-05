@@ -632,6 +632,13 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   for(const p of order.params) {
     description += `${p.count}x${p.product.name}(${p.productParam.name}) `
   }
+  if(order.orderStatus === "unCost") {
+    await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+      closeToc: time,
+      closeStatus: true,
+      refundStatus: "success"
+    }});
+  }
   if(order.orderStatus === "unShip") {
     const refundRecord = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
