@@ -1,13 +1,14 @@
 .user-panel
-  .user-panel-avatar
-    img(src=`/avatar/${userPanel.uid}`)
-  .user-panel-username
-    a(href=`/u/${userPanel.uid}`)=userPanel.username
-  -const targetUser = userPanel
-  .user-panel-grade
-    include ../user/module_user_grade
+  .text-center
+    .user-panel-avatar
+      img(src=`/avatar/${userPanel.uid}`)
+    .user-panel-username
+      a(href=`/u/${userPanel.uid}`)=userPanel.username
+      -const targetUser = userPanel
+      .user-panel-grade
+        include ../user/module_user_grade
   .user-panel-cert=userPanel.info.certsName
-  .user-panel-number-div.row
+  .user-panel-number-div
     .col-xs-3
       .user-panel-number=userPanel.threadCount
       .user-panel-title 文章

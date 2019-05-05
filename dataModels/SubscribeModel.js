@@ -21,7 +21,7 @@ const schema = new Schema({
     index: 1
   },
   // 详细类型
-  // thread类型 sub: 关注的文章, post: 自己发表的文章, replay: 回复过的文章
+  // thread类型 sub: 关注的文章, replay: 回复过的文章 （post: 自己发表的文章）
   detail: {
     type: String,
     default: "",

@@ -6,7 +6,7 @@ router
     const {page = 0} = query;
     const {user} = data;
     const {uid} = params;
-    if(uid !== user.uid) ctx.throw(404, "权限不足");
+    if(uid !== user.uid) ctx.throw(403, "权限不足");
     const q = {
       type: "thread",
       uid: user.uid

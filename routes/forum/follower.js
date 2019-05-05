@@ -17,7 +17,7 @@ followerRouter
 		const count = await db.SubscribeModel.count(q);
 		const paging = apiFunction.paging(page, count);
 		data.paging = paging;
-		const sub = await db.SubscribeModel.find(q);
+		const sub = await db.SubscribeModel.find(q, {uid: 1});
 		const uid = sub.map(s => s.uid);
     data.followers = await db.UserModel.find({uid: {$in: uid}}).sort({tlv: -1}).skip(paging.start).limit(paging.perpage);
     await db.UserModel.extendUsersInfo(data.followers);

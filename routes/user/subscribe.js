@@ -27,25 +27,33 @@ subscribeRouter
 		const targetUser = await db.UserModel.findOnly({uid});
 		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
 		const {type} = body;
-		const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
+		// const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
 		// if(targetUserSubscribe.subscribeForums.length !== 0) ctx.throw(400, '您已选择过要关注的领域');
 		if(type === 'subscribeForums') {
 			const {subscribeForums} = body;
-			if(subscribeForums.length > 20) ctx.throw(400, '每个用户最多只能关注20个领域。');
-			const realFid = [];
+			const subSettings = await db.SettingModel.findById("subscribe");
+			const {subForumCountLimit} = subSettings.c;
+
+			if(subscribeForums.length >= subForumCountLimit) ctx.throw(400, `关注专业不能超过${subForumCountLimit}个`);
+
 			for(let fid of subscribeForums) {
 				const forum = await db.ForumModel.findOne({fid});
 				if(forum) {
-					const childrenForums = await forum.extendChildrenForums();
-					if(!childrenForums || childrenForums.length === 0) {
-						if(!realFid.includes(fid)) {
-							await forum.update({$addToSet: {followersId: targetUser.uid}});
-							realFid.push(fid);
-						}
-					}
+					let sub = await db.SubscribeModel.findOne({
+            type: "forum",
+            fid: forum.fid,
+            uid: user.uid
+          });
+					if(!sub) {
+            await db.SubscribeModel({
+              _id: await db.SettingModel.operateSystemID('subscribes', 1),
+              type: "forum",
+              fid: forum.fid,
+              uid: user.uid
+            }).save();
+          }
 				}
 			}
-			await targetUserSubscribe.update({subscribeForums: realFid});
 		}
 		const lastUrl = ctx.cookies.get('lastUrl', {
 			signed: true
@@ -67,6 +75,7 @@ subscribeRouter
     let {db} = ctx;
     let {user} = ctx.data;
     if(user.uid === uid) ctx.throw(400, '关注自己干嘛？');
+    await user.ensureSubLimit("user");
     let sub = await db.SubscribeModel.findOne({
       type: "user",
       uid: user.uid,

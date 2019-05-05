@@ -490,7 +490,7 @@ footer.footer ul li{
   color: #9baec8;
 }
 .footer-li-div{
-  min-height: 18.5rem;
+  min-height: 17.5rem;
 }
 .nkc-drawer{
   position: fixed;
@@ -924,7 +924,7 @@ footer.footer ul li{
 .topic-item{
   margin: 0 0.3rem 0.3rem 0;
   color: #fff;
-  padding: 2px 10px;
+  padding: 2px 8px;
   border-radius: 4px;
   display: inline-block;
   text-decoration: none;
@@ -939,6 +939,7 @@ footer.footer ul li{
 .user-panel-avatar{
   text-align: center;
   margin-bottom: 1rem;
+  display: inline-block;
 }
 .user-panel-avatar img{
   height: 5rem;
@@ -947,8 +948,10 @@ footer.footer ul li{
 }
 .user-panel-username{
   text-align: center;
+  vertical-align: bottom;
+  display: inline-block;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   margin-bottom: 0.5rem;
 }
 .user-panel-cert{
@@ -983,6 +986,7 @@ footer.footer ul li{
 }
 .user-panel-grade{
   text-align: center;
+  font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
 .user-panel-description{

@@ -344,7 +344,7 @@ router
       data.userThreads = await db.ThreadModel.getUserThreads(data.user.uid, fidOfCanGetThreads);
 
       // 关注的文章
-      data.subThreads = await db.ThreadModel.getUserSubThreads(data.user.uid, fidOfCanGetThreads);
+      // data.subThreads = await db.ThreadModel.getUserSubThreads(data.user.uid, fidOfCanGetThreads);
 
     }
 
