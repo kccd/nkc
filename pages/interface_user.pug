@@ -12,7 +12,8 @@ block content
           .col-xs-12.col-md-2
             .col-xs-12.col-md-12
               .row
-                img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
+                a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank")
+                  img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username || '用户' + data.targetUser.uid
                 .text-center
                   -const targetUser = data.targetUser;

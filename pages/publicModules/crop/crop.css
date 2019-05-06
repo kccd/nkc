@@ -1,0 +1,63 @@
+#module_crop{
+  position: fixed;
+  overflow: hidden;
+  display: none;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10000;
+}
+.crop-select-panel{
+  display: none;
+}
+.crop-content{
+  position: fixed;
+  height: 40rem;
+  border-radius: 3px;
+  width: 60rem;
+  max-width: 100%;
+  background-color: #fff;
+  padding: 0 0.5rem;
+  box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+  top: 0;
+  z-index: 100001;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: hidden;
+  margin: auto;
+}
+.crop-header, .crop-footer{
+  height: 4rem;
+  line-height: 4rem;
+}
+.crop-header .fa{
+  height: 2.5rem;
+  width: 3rem;
+  font-size: 1.4rem;
+  border-radius: 3px;
+  margin-top: 0.6rem;
+  cursor: pointer;
+  background-color: #fff;
+  color: #333;
+  text-align: center;
+  transition: color 300ms, background-color 300ms;
+  line-height: 2.5rem;
+}
+.crop-header .fa:hover{
+  background-color: #333;
+  color: #fff;
+}
+.crop-header span{
+  margin-left: 1rem;
+  font-size: 1rem;
+  color: #666;
+}
+.crop-image{
+  height: 32rem;
+  margin: 0;
+}
+.crop-image img{
+}

@@ -49,7 +49,7 @@ userRouter
         uid: user.uid,
         tUid: uid
       });
-	data.userSubUid = await db.SubscribeModel.getUserSubUid(user.uid);
+	    data.userSubUid = await db.SubscribeModel.getUserSubUid(user.uid);
     }
 		const {apiFunction} = ctx.nkcModules;
 		const targetUser = await db.UserModel.findOnly({uid});

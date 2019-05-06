@@ -1,17 +1,15 @@
 extends ../bootstrap_base
 block title
   title=`${data.serverSettings.websiteName} - ${data.serverSettings.brief}`
-  +includeCSS("/publicModules/thread_panel/thread_panel.css")
   +includeCSS("/swiper/dist/css/swiper.css")
   +includeCSS("/home/subscription.css")
-  +includeCSS("/publicModules/vue_user_panel/vue_user_panel_float.css")
 
 block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
         include ../publicModules/post_button
-        include ../publicModules/vue_forums_nav/vue_forums_nav_dom
+        include ../publicModules/forums_nav/forums_nav
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
@@ -90,8 +88,7 @@ block footer
   include ../publicModules/footer/footer
 block scripts
   +includeJS("/swiper/dist/js/swiper.js")
-  include ../publicModules/vue_forums_nav/vue_forums_nav_js
   +includeJS("/home/newHome.js")
-  include ../publicModules/vue_user_panel/vue_user_panel_float_js
+  include ../publicModules/vue_user_panel/vue_user_panel_float
   //- +includeJS("/socket/homeSocket.js")
 

@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const mime = require('mime');
 const {upload, statics} = require('../../settings');
-const {avatarPath} = upload;
+const {avatarPath, avatarSmallPath, avatarLargePath} = upload;
 const {defaultAvatarPath} = statics;
 router
   .get('/', async (ctx, next) => {
@@ -10,15 +10,27 @@ router
     await next()
   })
   .get('/:uid', async (ctx, next) => {
-    const {uid} = ctx.params;
-    const {fs} = ctx;
+    const {query, params, fs} = ctx;
+    const {uid} = params;
     let stat;
+    const {t} = query;
+    if(t === "sm") {
+      ctx.filePath = `${avatarSmallPath}/${uid}.jpg`;
+    } else if(t === "lg") {
+      ctx.filePath = `${avatarLargePath}/${uid}.jpg`;
+      try{
+        await fs.stat(ctx.filePath);
+      } catch(err) {
+        ctx.filePath = `${avatarPath}/${uid}.jpg`;
+      }
+    } else {
+      ctx.filePath = `${avatarPath}/${uid}.jpg`;
+    }
+
     try {
-      const url = `${avatarPath}/${uid}.jpg`;
-      stat = await fs.stat(url);
+      stat = await fs.stat(ctx.filePath);
       ctx.response.lastModified = stat.mtime.toUTCString();
       ctx.set('Cache-Control', 'public, no-cache');
-      ctx.filePath = url;
     } catch(e) {
       ctx.filePath = defaultAvatarPath;
       ctx.response.lastModified = new Date(1999, 9, 9);
@@ -36,7 +48,7 @@ router
 		const {file} = body.files;
 	  if(!file) ctx.throw(400, 'no file uploaded');
 	  const {path, type, size} = file;
-	  if(size > ctx.settings.upload.sizeLimit.photo) ctx.throw(400, '图片不能超过20M');
+	  if(size > 20*1024*1024) ctx.throw(400, '图片不能超过20M');
 	  let options = {};
 	  const extArr = ['jpg', 'jpeg', 'png'];
 	  const {imageMagick} = tools;
@@ -45,7 +57,8 @@ router
 		  ctx.throw(400, 'wrong mimetype for avatar...jpg, jpeg or png only.');
 	  }
 	  const saveName = uid + '.jpg';
-	  const {avatarPath, avatarSmallPath} = settings.upload;
+	  const {avatarPath, avatarSmallPath, avatarLargePath} = settings.upload;
+	  const targetLargeFile = avatarLargePath + '/' + saveName;
 	  const targetFile = avatarPath + '/' + saveName;
 	  const targetSmallFile = avatarSmallPath + '/' + saveName;
 	  if(position) {
@@ -56,9 +69,10 @@ router
 	  }
 
 	  options.path = path;
-	  options.targetPath = targetFile;
-	  await imageMagick.avatarify(options);
-	  await imageMagick.avatarSmallify(targetFile, targetSmallFile);
+	  options.targetPath = targetLargeFile;
+	  await imageMagick.avatarLargeify(options);
+    await imageMagick.avatarify(targetLargeFile, targetFile);
+	  await imageMagick.avatarSmallify(targetLargeFile, targetSmallFile);
 	  await fs.unlink(path);
 		await next();
   });

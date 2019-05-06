@@ -1,0 +1,24 @@
++includeCSS("/publicModules/crop/dist/cropper.css")
++includeCSS("/publicModules/crop/crop.css")
+
+#module_crop
+  .crop-content
+    .crop-header
+      input.hidden(type="file" accept="image/png, image/jpeg" id="module_crop_input" onchange="moduleCrop.selectedFile()")
+      .crop-select-panel
+        button.btn.btn-sm.btn-default(onclick="moduleCrop.selectFile()") 选择图片
+        span 支持的图片格式：jpg, jpeg, png
+      .fa.fa-remove.pull-right(onclick="moduleCrop.cancel()")
+    .crop-image
+      img(id="module_crop_image" style="max-width: 100%;")
+    .crop-footer
+      .row
+        .col-xs-6.text-left
+          button.btn.btn-sm.btn-default(onclick="moduleCrop.rotate('left')") 左旋
+          button.btn.btn-sm.btn-default(onclick="moduleCrop.rotate('right')") 右旋
+        .col-xs-6.text-right
+          button.btn.btn-sm.btn-success(onclick="moduleCrop.complete()") 确定
+
++includeJS("/publicModules/crop/dist/cropper.js")
++includeJS("/publicModules/crop/dist/jquery-cropper.js")
++includeJS("/publicModules/crop/crop.js")
