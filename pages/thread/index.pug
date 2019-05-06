@@ -133,10 +133,9 @@ block title
               a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
   
 block content
-  -const mainContainer1400 = true;
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
-    .container-fluid(style="max-width:1400px;")
+    .container-fluid.max-width
       .hidden#threadId= data.thread.tid
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})

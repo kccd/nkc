@@ -1029,7 +1029,7 @@ threadSchema.statics.getUserSubThreads = async (uid, fid) => {
     disabled: false,
     $or: [
       {
-        fid: {
+        mainForumsId: {
           $in: subFid
         }
       },

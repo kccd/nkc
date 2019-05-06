@@ -1,8 +1,6 @@
 extends ../bootstrap_base
 block title
   title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
-  +includeCSS("/publicModules/thread_panel/thread_panel.css")
-  +includeCSS("/publicModules/vue_user_panel/vue_user_panel_float.css")
   +includeCSS("/forum/forum.css")
 block content
   mixin forumPanel(header, forums)
@@ -80,7 +78,7 @@ block content
                 +forumPanel("同级专业", data.sameLevelForums)
               if data.forum.childrenForums && data.forum.childrenForums.length > 0
                 +forumPanel("细分专业", data.forum.childrenForums)
-        include ../publicModules/vue_forums_nav/vue_forums_nav_dom
+        include ../publicModules/forums_nav/forums_nav
 
       .col-xs-12.col-md-7
         .row
@@ -233,7 +231,6 @@ block content
         include ../module_scrollTo
 
 block scripts
-  include ../publicModules/vue_forums_nav/vue_forums_nav_js
-  include ../publicModules/vue_user_panel/vue_user_panel_float_js
+  include ../publicModules/vue_user_panel/vue_user_panel_float
 
 

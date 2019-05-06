@@ -182,14 +182,15 @@ const bannerify = path => {
   return spawnProcess('magick', ['convert', path, '-resize', `${banner.width}x${banner.height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${banner.width}x${banner.height}+0+0`, path]);
 };
 
-const avatarify = (options) => {
+const avatarLargeify = (options) => {
 	const {top, left, width, height, path, targetPath, needCrop} = options;
+  const avatarHeight = 600;
 	let arr;
 
 	if(needCrop) {
-		arr = [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath];
+		arr = [path, '-resize', `${width}x${height}^`, '-crop', `${avatarHeight}x${avatarHeight}+${left}+${top}`, targetPath];
 	} else {
-		arr = [path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-crop', `${avatarSize}x${avatarSize}+0+0`, targetPath];
+		arr = [path, '-resize', `${avatarHeight}x${avatarHeight}^`, '-crop', `${avatarHeight}x${avatarHeight}+0+0`, targetPath];
 	}
 	if(!linux) {
 		arr.unshift('convert');
@@ -200,6 +201,12 @@ const avatarify = (options) => {
 	return spawnProcess('magick', arr);
 };
 
+const avatarify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-resize', `${avatarSize}x${avatarSize}`, dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-resize', `${avatarSize}x${avatarSize}`, dest]);
+};
 
 const avatarSmallify = (path, dest) => {
   if(linux) {
@@ -405,6 +412,7 @@ module.exports = {
 	userBannerify,
   messageImageSMify,
   friendImageify,
+  avatarLargeify,
   firstFrameToImg,
   videoToH264,
   turnVideo,

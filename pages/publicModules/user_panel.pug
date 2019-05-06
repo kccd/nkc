@@ -1,6 +1,6 @@
 .user-panel
   .text-center
-    .user-panel-avatar
+    a(href=`/avatar/${userPanel.uid}?t=lg` target="_blank").user-panel-avatar
       img(src=`/avatar/${userPanel.uid}`)
     .user-panel-username
       a(href=`/u/${userPanel.uid}`)=userPanel.username

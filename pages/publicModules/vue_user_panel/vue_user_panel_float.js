@@ -2,6 +2,7 @@ var vue_user_panel_float = new Vue({
   el: "#vue_user_panel_float",
   data: {
     show: false,
+    panelSwitch: false,
     top: 0,
     left: 0,
     user: {
@@ -18,7 +19,20 @@ var vue_user_panel_float = new Vue({
   },
   methods: {
     close: function() {
-      vue_user_panel_float.show = false;
+      /*setTimeout(function() {
+        if(!vue_user_panel_float.panelSwitch) {
+          vue_user_panel_float.show = false;
+        }
+      }, 300);*/
+    },
+
+    onPanel: function() {
+      this.panelSwitch = true;
+    },
+
+    outPanel: function() {
+    /*  this.show = false;
+      this.panelSwitch = false;*/
     },
 
     getMousePosition: function(event) {

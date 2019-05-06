@@ -716,7 +716,13 @@ function uploadFilePromise(url, data, onprogress, method) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {
-      if(onprogress) onprogress(e);
+      if(onprogress) {
+        var num = (e.loaded/e.total)*100;
+        if(num >= 100) num = 100;
+        var percentage = (num).toFixed(1);
+        percentage = percentage + "%";
+        onprogress(e, percentage)
+      };
     };
     xhr.onreadystatechange=function()
     {
@@ -1815,4 +1821,34 @@ function closeDrawer() {
   bnt2.attr("onclick", "openRightDrawer()");
   $(".drawer-mask").removeClass("active");
   stopBodyScroll(false);
+}
+function base64ToFile(data, fileName) {
+  return blobToFile(base64ToBlob(data), fileName);
+}
+function base64ToBlob(data) {
+  var arr = data.split(','),
+  mime = arr[0].match(/:(.*?);/)[1],
+  bstr = atob(arr[1]),
+  n = bstr.length,
+  u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+function blobToFile(blob, fileName) {
+  blob.lastModifiedDate = new Date();
+  blob.name = fileName;
+  return blob;
+}
+
+function fileToUrl(file) {
+  return new Promise(function(resolve, reject) {
+    var reads = new FileReader();
+    reads.readAsDataURL(file);
+    reads.onload=function (e) {
+      resolve(this.result);
+    };
+  });
+
 }
