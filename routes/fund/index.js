@@ -173,15 +173,15 @@ fundRouter
   })
 	// 新建基金
 	.get('/add', async (ctx, next) => {
-		const {data} = ctx;
-		const {certificates} = ctx.settings.permission;
+		const {data, db} = ctx;
 		const fundCerts = [];
-		for (let cert in certificates) {
-			fundCerts.push({
-				cert: cert,
-				displayName: certificates[cert].displayName
-			});
-		}
+		const roles = await db.RoleModel.find().sort({toc: 1});
+		for(const role of roles) {
+		  fundCerts.push({
+        _id: role._id,
+        displayName: role.displayName
+      });
+    }
 		data.fundCerts = fundCerts;
 		ctx.template = 'interface_fund_setting.pug';
 		data.nav = '新建基金';
