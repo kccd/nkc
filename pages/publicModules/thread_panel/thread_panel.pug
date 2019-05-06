@@ -3,7 +3,8 @@
     .thread-panel-author
       a(href=`/u/${thread.uid}` target="_blank")
         img(src=`/avatar_small/${thread.uid}`)
-      a(href=`/u/${thread.uid}` target="_blank")(
+      a(
+        href=`/u/${thread.uid}` target="_blank"
         onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.firstPost.user)}')`
         onmouseleave="vue_user_panel_float.close()"
       )= thread.firstPost.user.username
@@ -36,7 +37,10 @@
         style=`background-image: url(/cover/${thread.tid})`
       )
     .thread-panel-abstract-content
-      a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
+      if thread.firstPost.abstract
+        a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.abstract.slice(0, 200)
+      else
+        a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
       a(href=`/t/${thread.tid}?&last_page=true#${thread.lastPost.pid}`).text-right
         p.thread-panel-abstract-reply=thread.lastPost.c.slice(0, 200)
   .thread-panel-info

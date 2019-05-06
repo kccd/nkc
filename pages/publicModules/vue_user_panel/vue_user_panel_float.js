@@ -15,24 +15,22 @@ var vue_user_panel_float = new Vue({
       postCount: 0,
       threadCount: 0
     },
-    usersObj: {}
+    usersObj: {},
+    timeout: ''
   },
   methods: {
     close: function() {
-      /*setTimeout(function() {
-        if(!vue_user_panel_float.panelSwitch) {
-          vue_user_panel_float.show = false;
-        }
-      }, 300);*/
+      this.timeout = setTimeout(function() {
+        vue_user_panel_float.show = false;
+      }, 200);
     },
 
     onPanel: function() {
-      this.panelSwitch = true;
+      clearTimeout(this.timeout)
     },
 
     outPanel: function() {
-    /*  this.show = false;
-      this.panelSwitch = false;*/
+      this.show = false;
     },
 
     getMousePosition: function(event) {
@@ -46,6 +44,7 @@ var vue_user_panel_float = new Vue({
     },
 
     loadUser: function(userString) {
+      clearTimeout(this.timeout)
       var user = strToObj(userString);
       var position = this.getMousePosition();
       var maxX = $(window).width();

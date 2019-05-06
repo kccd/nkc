@@ -49,7 +49,8 @@ module.exports = async (ctx, next) => {
 		  description: serverSettings.description,
 		  keywords: serverSettings.keywords,
 		  brief: serverSettings.brief,
-		  telephone: serverSettings.telephone
+		  telephone: serverSettings.telephone,
+      links: serverSettings.links
 	  };
 
 	  ctx.es = es;

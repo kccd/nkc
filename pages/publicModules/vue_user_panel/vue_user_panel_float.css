@@ -112,7 +112,7 @@
   text-align: center;
 }
 #vue_user_panel_float .user_id{
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   padding-top: 0.5rem;
   text-align: center;
   font-weight: 700;
@@ -127,6 +127,7 @@
   width: 2rem;
   text-align: center;
   line-height: 2rem;
+  z-index: 10030;
   color: #fff;
   font-size: 1.4rem;
 }
