@@ -11,6 +11,7 @@ const defaultAvatarSmallPath = defaultPath + '/default_avatar_small.gif';
 const defaultShopLogoPath = defaultPath + '/default_shopLogo.jpg';
 const defaultThumbnailPath = defaultPath + '/default_thumb_image.jpg';
 const defaultMediumPath = defaultPath + '/default_medium_image.jpg';
+const defaultOriginPath = defaultPath + '/default_origin_image.jpg';
 const siteSpecificPath = path.resolve('resources/site_specific');
 const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
@@ -34,6 +35,7 @@ module.exports = {
   defaultShopLogoPath,
   defaultThumbnailPath,
   defaultMediumPath,
+  defaultOriginPath,
 	defaultUserBannerPath,
   defaultPath,
   attachIconPath,

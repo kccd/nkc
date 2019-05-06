@@ -53,6 +53,9 @@ $(document).ready(function() {
       pictureInsert: function(rid, ext, name) {
         return pictureInsert(rid, ext, name);
       },
+      pictureRotate: function(rid) {
+        return pictureRotate(rid)
+      },
       videoInsert: function(rid, ext, name) {
         return videoInsert(rid, ext, name);
       },
@@ -172,6 +175,17 @@ function audioInsert(rid, ext, name) {
 // 附件插入编辑器
 function attachmentInsert(rid, ext, name) {
   edInsertContent('text-elem', '/r/'+rid, "", name)
+}
+
+// 旋转图片
+function pictureRotate(rid) {
+  nkcAPI('/rotate', "PATCH", {rid: rid})
+  .then(function(data) {
+    screenTopAlert("图片旋转成功");
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error)
+  })
 }
 
 // 选择文件

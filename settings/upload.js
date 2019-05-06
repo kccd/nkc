@@ -18,6 +18,7 @@ const paths = {
   avatarSmallPath: 'resources/newavatar_small',
   thumbnailPath: 'resources/thumbnails',
   mediumPath: 'resources/mediums',
+  originPath: 'resources/origins',
   adPath: 'resources/ad_posts',
   siteSpecificPath: 'resources/site_specific',
   qrCodePath: 'resources/qr',

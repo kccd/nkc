@@ -10,6 +10,7 @@ const {
 	r,
 	rt,
 	rm,
+	rotate,
 	cover,
 	frameImg,
 	appDownload,
@@ -94,6 +95,7 @@ operationObj.operationTree = {
 		r,// 资源
 		rt,
 		rm,
+		rotate,
 
 		default: resourceObj.default,
 		attachIcon: resourceObj.attachIcon,

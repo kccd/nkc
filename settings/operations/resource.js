@@ -38,7 +38,7 @@ module.exports = {
 		POST: 'uploadResources',
 		PARAMETER: {
 			GET: 'getResources'
-		}
+		},
 	},
 	rt: {
 		PARAMETER: {
@@ -49,6 +49,9 @@ module.exports = {
 		PARAMETER: {
 			GET: 'getMediums'
 		}
+	},
+	rotate: {
+		PATCH: 'pictureRotate'
 	},
 	cover: {// 文章封面图
 		PARAMETER: {

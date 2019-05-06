@@ -92,6 +92,11 @@ const allInfo = async path => {
   }
 }
 
+// 旋转图片
+const pictureRotate = async path => {
+  return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
+}
+
 const info = async path => {
   let back;
   if(linux) {
@@ -411,7 +416,8 @@ module.exports = {
   questionImageify,
   shopLogoify,
   shopCertImageify,
-  shopCertSmallImageify
+  shopCertSmallImageify,
+  pictureRotate
 };
 
 
