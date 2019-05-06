@@ -12,12 +12,19 @@ moduleCrop.init = function(callback, o) {
     viewMode:0,
     aspectRatio: 1,
     checkCrossOrigin: false,
-    movable: false
+    movable: false,
+    canSelectNewImage: true
   };
   if(o) {
     for(var i in o) {
       options[i] = o[i];
     }
+  }
+
+  if(options.canSelectNewImage) {
+    $(".crop-select-panel").css("display", "inline-block");
+  } else {
+    $(".crop-select-panel").css("display", "none");
   }
 
   var $image = $('#module_crop_image');
@@ -48,12 +55,25 @@ moduleCrop.init = function(callback, o) {
     var files = $("#module_crop_input").prop('files');
     fileToUrl(files[0])
       .then(function(url) {
-        moduleCrop.cropper.replace(url);
+        moduleCrop.replace(url);
       })
+  };
+
+  // 显示需要裁剪的图片
+  // @param {String} url 图片链接
+  moduleCrop.replace = function(url) {
+    moduleCrop.cropper.replace(url);
   };
 
   moduleCrop.cancel = function() {
     moduleCrop.hide();
     $("#module_crop_input").val("");
+  };
+  moduleCrop.rotate = function(type) {
+    if(type === "left") {
+      moduleCrop.cropper.rotate(-90);
+    } else {
+      moduleCrop.cropper.rotate(90);
+    }
   }
 };

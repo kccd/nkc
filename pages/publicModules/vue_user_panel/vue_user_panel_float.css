@@ -6,14 +6,22 @@
   z-index: 10000;
   width: 25rem;
   background-color: #fff;
-  box-shadow: 0 0 20px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 0 20px 0 rgba(0,0,0,0.5);
   border-radius: 3px;
   background-size: cover;
 }
 #vue_user_panel_float .user_base{
   height: 10rem;
   position: relative;
+}
+#vue_user_panel_float .user_banner{
+  position: absolute;
+  top: 0;
+  left:0;
+  width: 100%;
+  height: 100%;
   background-size: cover;
+  z-index: 10009;
 }
 #vue_user_panel_float .user_info{
   padding-top: 1rem;
@@ -25,44 +33,71 @@
 }
 #vue_user_panel_float .user_avatar{
   height: 10rem;
-  width: 8rem;
+  width: 10rem;
+  position: absolute;
   display: inline-block;
-  margin-left: 2rem;
   vertical-align: top;
+  z-index: 10020;
 }
 #vue_user_panel_float .user_mask{
   position: absolute;
+  z-index: 10010;
+  top: 0;
+  left: 0;
+  height:100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
 }
 #vue_user_panel_float .user_avatar img{
-  height: 9rem;
-  width: 9rem;
+  height: 8rem;
+  width: 8rem;
+  margin-left: 1rem;
   border-radius: 3px;
-  margin-top: -2rem;
+  margin-top: -1rem;
 }
 #vue_user_panel_float .user_div{
-  padding: 0 0.5rem;
+  position: absolute;
   display: inline-block;
   vertical-align: top;
-  width: 17rem;
+  z-index: 10020;
+  height: 10rem;
+  width: 14.5rem;
+
+  right: 0.5rem;
+  top: 0;
 }
 #vue_user_panel_float .user_name{
-  font-size: 1.3rem;
+  height: 2.3rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-height: 2.7rem;
+  -webkit-line-clamp: 1;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #2b90d9;
+  color: #fff;
+}
+#vue_user_panel_float .user_name:hover{
+  text-decoration: none;
 }
 #vue_user_panel_float .user_description{
   font-size: 1rem;
-  max-height: 3rem;
+  max-height: 4rem;
   overflow: hidden;
-  color: #555;
+  color: #ddd;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 #vue_user_panel_float .user_cert{
-  margin-top: 0.3rem;
-  margin-bottom: 0.2rem;
   font-size: 1rem;
+  font-weight: 700;
+  height: 1.8rem;
+  line-height: 1.8rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   color: #e85a71;
 }
 #vue_user_panel_float .user_info_count{
@@ -77,11 +112,11 @@
   text-align: center;
 }
 #vue_user_panel_float .user_id{
-  font-size: 1rem;
+  font-size: 1.3rem;
   padding-top: 0.5rem;
   text-align: center;
   font-weight: 700;
-  color: #555;
+  color: #fff;
 }
 #vue_user_panel_float .user-button{
   position:absolute;
@@ -92,6 +127,6 @@
   width: 2rem;
   text-align: center;
   line-height: 2rem;
-  color: #000;
+  color: #fff;
   font-size: 1.4rem;
 }

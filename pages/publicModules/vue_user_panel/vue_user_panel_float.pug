@@ -14,7 +14,8 @@
   transition(name="fade")
     div.content(v-if="show" :style="'top: ' + top+'px;left: ' + left + 'px;'")
 
-      .user_base(:style="'background-image: url(/u/' + user.uid + '/banner)'")
+      .user_base
+        .user_banner(:style="'background-image: url(/u/' + user.uid + '/banner)'")
         .user_mask
         .user-button
           .fa.fa-remove(@click="outPanel")

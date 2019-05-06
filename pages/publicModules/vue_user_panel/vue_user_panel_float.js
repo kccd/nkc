@@ -51,7 +51,7 @@ var vue_user_panel_float = new Vue({
       var maxX = $(window).width();
       var maxY = $(window).height();
 
-      var top = position.y+20;
+      var top = position.y+40;
       var left = position.x-20;
       // console.log(maxX, maxY, top, left);
 
