@@ -4,10 +4,10 @@ const {upload, statics, cache} = require('../../settings');
 const {originPath} = upload;
 const {defaultOriginPath} = statics;
 RoRouter
-  .get('/:rid', async (ctx, next) => {
-    const {rid} = ctx.params;
+  .get('/:originId', async (ctx, next) => {
+    const {originId} = ctx.params;
     const {db, fs} = ctx;
-    const targetResource = await db.ResourceModel.findOnly({rid});
+    const targetResource = await db.OriginImageModel.findOnly({originId});
     const extension = targetResource.ext;
     const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'];
     let url;

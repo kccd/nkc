@@ -13,7 +13,7 @@ moduleCrop.init = function(callback, o) {
     aspectRatio: 1,
     checkCrossOrigin: false,
     movable: false,
-    canSelectNewImage: true
+    canSelectNewImage: true,
   };
   if(o) {
     for(var i in o) {
@@ -34,10 +34,19 @@ moduleCrop.init = function(callback, o) {
   moduleCrop.cropper = $image.data('cropper');
 
   moduleCrop.complete = function() {
-    moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
-      moduleCrop.hide();
-      callback(blob);
-    });
+    try{
+      moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
+        moduleCrop.hide();
+        callback(blob);
+      });
+    }
+    catch(e)
+    {
+      if(options.errorInfo) {
+        moduleCrop.hide();
+        screenTopWarning(options.errorInfo)
+      }
+    }
   };
 
   // 显示裁剪框
@@ -74,6 +83,24 @@ moduleCrop.init = function(callback, o) {
       moduleCrop.cropper.rotate(-90);
     } else {
       moduleCrop.cropper.rotate(90);
+    }
+    if(options.resetCrop) {
+      // 获取图片位置信息
+      var imageData = moduleCrop.cropper.getImageData();
+      var height = imageData.height;
+      var top = imageData.top;
+      var left = imageData.left;
+      var width = imageData.width;
+      if(height < 0) height = 0;
+      if(top < 0) top = 0;
+      if(left < 0) left = 0;
+      if(width < 0) width = 0;
+      moduleCrop.cropper.setCropBoxData({
+        height: height,
+        width: width,
+        top: top,
+        left: left
+      })
     }
   }
 };

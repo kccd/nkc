@@ -50,8 +50,10 @@ module.exports = {
 			GET: 'getMediums'
 		}
 	},
-	rotate: {
-		PATCH: 'pictureRotate'
+	ro: {
+		PARAMETER: {
+			GET: 'getOrigins'
+		}
 	},
 	cover: {// 文章封面图
 		PARAMETER: {

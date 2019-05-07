@@ -541,6 +541,9 @@
   "visitUserSubThreads": "查看用户关注的文章",
   "visitRecycleMarkThreads": "查看等待修改的文章",
   "orderListToExcel": "[CO]订单表格导出至excel",
+  "getOrigins": "[CO]获取原图",
+  "getOringinId": "[CO]获取原图Id",
+  "saveNewEditPicture": "[CO]上传编辑好的新图片",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",
