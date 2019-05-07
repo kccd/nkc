@@ -1,3 +1,15 @@
+var originId = "";
+
+moduleCrop.init(function(data) {
+  saveNewEditPicture(data);
+}, {
+  canSelectNewImage: false,
+  aspectRatio:0,
+  viewMode:2,
+  errorInfo: "图片编辑失败",
+  resetCrop: true
+});
+
 var quota = 12; // 每页显示数量
 var skip = 0; // 当前页数
 var media;
@@ -70,7 +82,10 @@ $(document).ready(function() {
       },
       fileNameShrink: function(name, length) {
         return fileNameShrink(name, length);
-      }
+      },
+      pictureEdit: function(rid) {
+        return pictureEdit(rid)
+      },
     }
   })
   
@@ -387,4 +402,46 @@ function fileNameShrink(content,length){
 		content = content.substr(0,length) + "...";
 	}
 	return content
+}
+
+// 编辑图片
+function pictureEdit(rid) {
+  // 向服务器获取原图
+  nkcAPI("/imageEdit/getOriginId", "PATCH", {rid: rid})
+  .then(function(data) {
+    if(data.originId) {
+      moduleCrop.replace("/ro/"+data.originId)
+      originId = data.originId;
+    }else{
+      moduleCrop.replace("/r/"+rid)
+    }
+    moduleCrop.show();
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error)
+  })
+
+}
+
+
+// 保存新图片
+function saveNewEditPicture(data) {
+  var formData = new FormData();
+  formData.append("file", data);
+  formData.append("originId", originId);
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function(e) {
+    if(xhr.readyState == 4){
+      if(xhr.status >= 200 && xhr.status < 300){
+        screenTopAlert("修改成功");
+        loadMedia("picture", quota, skip, "not");
+        loadMedia("all", quota, skip, "not");
+      }else{
+        screenTopWarning("上传失败");
+      }
+    }
+  }
+  xhr.open("POST", '/imageEdit', true);
+  xhr.setRequestHeader("FROM", "nkcAPI");
+  xhr.send(formData);
 }

@@ -231,11 +231,10 @@ jobs.shop = () => {
       closeStatus: false,
       refundStatus: {$in: [null, "fail"]},
       orderStatus: "unCost",
-      toc: {
+      orderToc: {
         $lt: time - (shopSettings.refund.pay*60*60*1000)
       }
     }); 
-
     for(const order of orders) {
       try {
         await order.cancelOrder(

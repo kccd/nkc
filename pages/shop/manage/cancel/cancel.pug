@@ -18,7 +18,7 @@ block content
         div(v-for="p in params")
           img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
           div.display-i-b
-            a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name.join('+')}})
+            a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
             h5 商品ID：{{p.costId}}，商品总价：
               strong.text-danger {{p.productPrice/100}}
               | 元（{{p.count}}件）

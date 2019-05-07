@@ -1,64 +1,25 @@
 const Router = require('koa-router');
-const resourceRouter = new Router();
+const imageEditRouter = new Router();
 const pathModule = require('path');
 const util = require("util");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["wav", "amr"];
-resourceRouter
-  .get('/', async (ctx, next) => {
-    ctx.throw(501, 'a resource ID is required.');
-    await next()
-  })
-  .get('/:rid', async (ctx, next) => {
-    // const { rid } = ctx.params;
-    // const { data, db, fs, settings } = ctx;
-    // const { cache } = settings;
-    // const resource = await db.ResourceModel.findOnly({ rid });
-    // const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
-    // if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-    // // if (extArr.includes(resource.ext.toLowerCase()) && resource.references.length == 0 && (!data.user || data.user && data.user.uid !== resource.uid)) ctx.throw(403, '图片未发表在文章中，不可查看');
-    // const { path, ext } = resource;
-    // let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
-    // if (extArr.includes(resource.ext.toLowerCase())) {
-    //   try {
-    //     await fs.access(filePath);
-    //   } catch (e) {
-    //     filePath = ctx.settings.statics.defaultImageResourcePath;
-    //   }
-    //   ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
-    // }
-    // // 在resource中添加点击次数
-    // await resource.update({$inc:{hits:1}})
-    // ctx.filePath = filePath;
-    // ctx.resource = resource;
-    // ctx.type = ext;
-    // await next()
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
-    const { rid } = ctx.params;
-    const { data, db, fs, settings } = ctx;
-    const { cache } = settings;
-    const {mediaPath} = settings.upload;
-    const {mediaPicturePath, mediaVideoPath, mediaAudioPath, mediaAttachmentPath, selectDiskCharacterUp, selectDiskCharacterDown} = settings.mediaPath;
-    const resource = await db.ResourceModel.findOnly({ rid });
-    const { path, ext } = resource;
-    let filePath = selectDiskCharacterDown(resource);
-    filePath = filePath + path;
-    if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-    if (extArr.includes(resource.ext.toLowerCase())) {
-      try {
-        await fs.access(filePath);
-      } catch (e) {
-        filePath = ctx.settings.statics.defaultImageResourcePath;
-      }
-      ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
+const {upload, statics, cache} = require('../../settings');
+const {mediumPath, thumbnailPath} = upload;
+// const {defaultThumbnailPath} = statics;
+imageEditRouter
+  .patch('/getOriginId', async( ctx, next)=> {
+    // 获取图片的原图id
+    const {body, data, db} = ctx;
+    const {rid} = body;
+    const resource = await db.ResourceModel.findOne({rid: rid});
+    if(resource.originId) {
+      data.originId = resource.originId
+    }else{
+      data.originId = "";
     }
-    // 在resource中添加点击次数
-    await resource.update({$inc:{hits:1}})
-    ctx.filePath = filePath;
-    ctx.resource = resource;
-    ctx.type = ext;
-    await next()
+    await next();
   })
   .post('/', async (ctx, next) => {
     const { fs } = ctx;
@@ -70,10 +31,15 @@ resourceRouter
     
     let mediaRealPath;
     const file = ctx.body.files.file;
+    let originId = "";
+    if(ctx.body.fields && ctx.body.fields.originId) {
+      originId = ctx.body.fields.originId;
+    }
     if(!file) {
       ctx.throw(400, 'no file uploaded');
     }
-    let { name, size, path } = file;
+    let {size, path} = file;
+    let name = new Date().getTime() + ".jpg";
     // 获取文件格式 extension
     const extensionE = pathModule.extname(name).replace('.', '');
     let extension = extensionE.toLowerCase();
@@ -82,7 +48,6 @@ resourceRouter
     // 根据自增id定义文件新名称 saveName
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     let saveName = rid + '.' + extension;
-    let originId = "";
 
     // 根据上传类型确定文件保存路径
     // mediaRealPath
@@ -91,18 +56,6 @@ resourceRouter
       // mediaRealPath = mediaPath + "/picture";
       mediaRealPath = selectDiskCharacterUp("mediaPicture");
       mediaType = "mediaPicture";
-    }else if(videoExts.indexOf(extension.toLowerCase()) > -1) {
-      // mediaRealPath = mediaPath + "/video";
-      mediaRealPath = selectDiskCharacterUp("mediaVideo");
-      mediaType = "mediaVideo";
-    }else if(audioExts.indexOf(extension.toLowerCase()) > -1) {
-      // mediaRealPath = mediaPath + "/audio";
-      mediaRealPath = selectDiskCharacterUp("mediaAudio");
-      mediaType = "mediaAudio";
-    }else{
-      // mediaRealPath = mediaPath + "/attachment";
-      mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-      mediaType = "mediaAttachment";
     }
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
@@ -117,11 +70,6 @@ resourceRouter
       const descPathOfMedium = generateFolderName(mediumPath); // 中号图存放路径
       const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
       const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
-      // 获取原图id
-      const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
-      originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
-      let originSaveName = originId + '.' + extension;
-      const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
 
 
       // 图片自动旋转
@@ -150,21 +98,6 @@ resourceRouter
       }
       // 获取图片尺寸
       const { width, height } = await imageMagick.info(path);
-      // 生成无水印原图
-      if(width > 3840 || size > 5242880) {
-        await imageMagick.originify(path, originFilePath)
-      }else{
-        await fs.copyFile(path, originFilePath);
-      }
-      const ro = new ctx.db.OriginImageModel({
-        originId,
-        path: middlePath + originSaveName,
-        tpath: middlePath + originSaveName,
-        ext: extension,
-        uid: ctx.data.user.uid,
-        toc: Date.now()
-      });
-      ctx.data.ro = await ro.save();
       // 生成略缩图
       if(width > 150 || size > 51200) {
         await imageMagick.thumbnailify(path, thumbnailFilePath);
@@ -282,102 +215,7 @@ resourceRouter
       //   }
       // }
     }
-    // 视频压缩转码
-    if (videoExts.indexOf(extension.toLowerCase()) > -1) {
-      //
-      var timeStr = new Date().getTime();
-      // 输出视频路径
-      var newpath = pathModule.resolve();
-      var outputVideoPath = newpath + "/tmp/" + timeStr + ".mp4";
-      // 视频封面图路径
-      var videoImgPath = frameImgPath + "/" + rid + ".jpg";
-
-      try{
-        if(['3gp'].indexOf(extension.toLowerCase()) > -1){
-          await ffmpeg.video3GPTransMP4(path, outputVideoPath);
-        }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.videoMP4TransH264(path, outputVideoPath);
-        }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
-        }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.videoAVITransMP4(path, outputVideoPath);
-        }
-      }catch(e) {
-        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-        middlePath = generateFolderName(mediaRealPath);
-        mediaFilePath = mediaRealPath + middlePath + saveName;
-        await fs.copyFile(path, mediaFilePath);
-        await fs.unlink(path);
-        const r = new ctx.db.ResourceModel({
-          rid,
-          oname: name,
-          path: middlePath + saveName,
-          tpath: middlePath + saveName,
-          ext: extension,
-          size,
-          uid: ctx.data.user.uid,
-          toc: Date.now(),
-          mediaType: "mediaAttachment"
-        });
-        ctx.data.r = await r.save();
-        ctx.throw(400, "视频转码失败，已被放至附件")
-        return await next()
-      }
-
-      // 将元数据移动到视频的第一帧
-      // await ffmpeg.videoMoveMetaToFirstThumb(outputVideoPath, outputVideoPath);
-      // 移动已经转好码的视频文件再次移动到tmp临时文件夹下
-      await fs.rename(outputVideoPath, path);
-      // 生成视频封面图
-      await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
-      // 修改视频保存信息
-      let nameReg = new RegExp(extension, "igm");
-      name = name.replace(nameReg, "mp4");
-      extension = "mp4";
-      saveName = rid + "." + extension;
-      mediaFilePath = mediaFilePath.replace(nameReg, "mp4")
-    } 
-    // 音频转为mp3
-    if(audioExts.indexOf(extension.toLowerCase()) > -1) {
-      var timeStr = new Date().getTime();
-      //输出音频路径
-      var newpath = pathModule.resolve();
-      var outputVideoPath = newpath + "/tmp/" + timeStr + ".mp3";
-      try{
-        if(['wav'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
-        }else if(['amr'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.audioAMRTransMP3(path, outputVideoPath);
-        }
-      }catch(e) {
-        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-        middlePath = generateFolderName(mediaRealPath);
-        mediaFilePath = mediaRealPath + middlePath + saveName;
-        await fs.copyFile(path, mediaFilePath);
-        await fs.unlink(path);
-        const r = new ctx.db.ResourceModel({
-          rid,
-          oname: name,
-          path: middlePath + saveName,
-          tpath: middlePath + saveName,
-          ext: extension,
-          size,
-          uid: ctx.data.user.uid,
-          toc: Date.now(),
-          mediaType: "mediaAttachment"
-        });
-        ctx.data.r = await r.save();
-        ctx.throw(400, "音频转码失败，已被放至附件")
-        return await next()
-      }
-
-      await fs.rename(outputVideoPath, path);
-      let nameReg = new RegExp(extension, "igm");
-      name = name.replace(nameReg, "mp3");
-      extension = "mp3";
-      saveName = rid + "." + extension;
-      mediaFilePath = mediaFilePath.replace(nameReg, "mp3");
-    }
+    
     // await fs.rename(path, mediaFilePath);
     await fs.copyFile(path, mediaFilePath);
     await fs.unlink(path);
@@ -395,5 +233,5 @@ resourceRouter
     });
     ctx.data.r = await r.save();
     await next()
-  })
-module.exports = resourceRouter;
+  });
+module.exports = imageEditRouter;

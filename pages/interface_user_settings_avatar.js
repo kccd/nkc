@@ -104,7 +104,7 @@ function submit(uid) {
 moduleCrop.init(function(data) {
   var user = getDataById("data").user;
   var formData = new FormData();
-  formData.append("file", data);
+	formData.append("file", data);
   uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
     $(".upload-info").text('上传中...' + percentage);
     if(e.total === e.loaded) {

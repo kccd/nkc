@@ -162,6 +162,22 @@ orderRouter
 		await order.update({$set: {orderFreightPrice, orderPrice}})
 		await next();
 	})
+	// 订单导出
+	.get('/orderListToExcel', async (ctx, next) => {
+		const {data, body, db, query} = ctx;
+		const {user} = data;
+		const {orderStartStamp, orderEndStamp} = query;
+		let searchMap = {};
+		if(orderStartStamp && orderEndStamp) {
+			searchMap = {orderToc: {$gt:orderStartStamp, $lt: orderEndStamp}}
+		}
+		// 订单数据查询
+		let orderLists = await db.ShopOrdersModel.find(searchMap);
+		data.orderLists = await db.ShopOrdersModel.storeExtendOrdersInfo(orderLists);
+		data.orderLists = await db.ShopOrdersModel.translateOrderStatus(data.orderLists);
+		ctx.template = "/shop/manage/orderList.pug";
+		await next();
+	})
   .use("/cancel", cancelRouter.routes(), cancelRouter.allowedMethods())
   .use("/refund", refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = orderRouter;

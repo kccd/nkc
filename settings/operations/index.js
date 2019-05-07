@@ -10,6 +10,7 @@ const {
 	r,
 	rt,
 	rm,
+	ro,
 	cover,
 	frameImg,
 	appDownload,
@@ -54,6 +55,7 @@ const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
 const shop = require('./shop');
 const account = require('./account');
+const imageEdit = require('./imageEdit');
 const operationObj = {};
 
 
@@ -92,8 +94,9 @@ operationObj.operationTree = {
 		forum_avatar,// 专业logo
 
 		r,// 资源
-		rt,
-		rm,
+		rt, // 小号图 150
+		rm, // 中号图 640
+		ro, // 原图 3840
 
 		default: resourceObj.default,
 		attachIcon: resourceObj.attachIcon,
@@ -176,7 +179,9 @@ operationObj.operationTree = {
 
 		lottery, // 抽奖页
 
-    shop, //商城
+		shop, //商城
+		
+		imageEdit, // 编辑图片
     
     account, // 个人中心
 	}
