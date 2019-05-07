@@ -7,7 +7,20 @@ const {logger} = nkcModules;
 const fs = require('fs');
 const {promisify} = require('util');
 const redis = require('../redis');
-const path = require('path');
+const cookieConfig = require("../config/cookie");
+const fsSync = {
+  access: promisify(fs.access),
+  unlink: promisify(fs.unlink),
+  rename: promisify(fs.rename),
+  writeFile: promisify(fs.writeFile),
+  mkdir: promisify(fs.mkdir),
+  exists: promisify(fs.exists),
+  existsSync: fs.existsSync,
+  copyFile: promisify(fs.copyFile),
+  createReadStream: fs.createReadStream,
+  createWriteStream: fs.createWriteStream,
+  stat: promisify(fs.stat)
+};
 
 module.exports = async (ctx, next) => {
 	try {
@@ -55,23 +68,56 @@ module.exports = async (ctx, next) => {
 
 	  ctx.es = es;
 
-	  ctx.fs = {
-	    access: promisify(fs.access),
-	    unlink: promisify(fs.unlink),
-	    rename: promisify(fs.rename),
-	    writeFile: promisify(fs.writeFile),
-	    mkdir: promisify(fs.mkdir),
-      exists: promisify(fs.exists),
-      existsSync: fs.existsSync,
-	    copyFile: promisify(fs.copyFile),
-	    createReadStream: fs.createReadStream,
-	    createWriteStream: fs.createWriteStream,
-	    stat: promisify(fs.stat)
-	  };
+	  ctx.fs = fsSync;
 
+	  // 权限判断
+    // @param {String} o 操作名
 	  ctx.permission = (o) => {
 	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
 	    return ctx.data.userOperationsId.includes(o);
+    };
+
+	  // 设置cookie
+    // @param {String} key cookie名
+    // @param {Object} value cookie值
+    // @param {Object} o 自定义参数
+	  ctx.setCookie = (key, value, o) => {
+	    let options = {
+        signed: true,
+        httpOnly: true,
+        overwrite: true,
+        maxAge: cookieConfig.maxAge
+      };
+	    if(o) {
+        options = Object.assign(options, o);
+      }
+      let valueStr = JSON.stringify(value);
+      valueStr = Buffer.from(valueStr).toString("base64");
+      ctx.cookies.set(key, valueStr, options);
+    };
+
+    // 设置cookie
+    // @param {String} key cookie名
+    // @param {Object} o 自定义参数
+    // @return {Object} cookie值
+	  ctx.getCookie = (key, o) => {
+      let options = {
+        signed: true
+      };
+      if(o) {
+        options = Object.assign(options, o);
+      }
+      try {
+        let valueStr = ctx.cookies.get(key, options);
+        valueStr = Buffer.from(valueStr, "base64").toString();
+        value = JSON.parse(valueStr);
+        return value;
+      } catch(err) {
+        if(global.NKC.NODE_ENV !== "production") {
+          console.log(err);
+        }
+        return {}
+      }
     };
 
 		Object.defineProperty(ctx, 'template', {
