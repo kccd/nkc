@@ -17,9 +17,12 @@ module.exports = {
     },
 		settings: {
 			GET: 'visitUserAvatarSettings',
-			avatar: {
-				GET: 'visitUserAvatarSettings',
-			},
+      avatar: {
+        GET: 'visitUserAvatarSettings',
+      },
+      banner: {
+        GET: 'visitUserBannerSettings',
+      },
 			username: {
 				PATCH: 'modifyUsername'
 			},

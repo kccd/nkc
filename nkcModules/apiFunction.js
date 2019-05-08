@@ -218,6 +218,8 @@ fn.fromNow = (time) => {
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
   if(!content) return content;
+  content = content.replace(/&nbsp;/ig,"");
+  content = content.replace(/<blockquote.*?blockquote>/g,"");
   content = content.replace(/<[^>]+>/g,"");
   count = parseInt(count);
   if(reduce === true){

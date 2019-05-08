@@ -988,4 +988,71 @@ userSchema.methods.ensureSubLimit = async function(type) {
   }
 };
 
+userSchema.statics.getUserPostSummary = async (uid) => {
+  const PostModel = mongoose.model("posts");
+  const data = await PostModel.aggregate([
+    {
+      $match: {
+        mainForumsId: {
+          $nin: ["recycle"]
+        },
+        uid,
+        disabled: false
+      }
+    },
+    {
+      $unwind: "$mainForumsId"
+    },
+    {
+      $group: {
+        _id: "$mainForumsId",
+        count: {
+          $sum: 1
+        }
+      }
+    },
+    {
+      $sort: {
+        count: -1
+      }
+    }
+  ]);
+  const forumsId = data.map(d => d._id);
+  const forums = await mongoose.model("forums").find({fid: {$in: forumsId}}, {
+    displayName: 1,
+    fid: 1,
+    color: 1
+  });
+  const forumsObj = {};
+  for(const forum of forums) {
+    forumsObj[forum.fid] = forum;
+  }
+  const results = [];
+  let otherCount = 0;
+  for(const d of data) {
+    const forum = forumsObj[d._id];
+    if(!forum) continue;
+    // 超过10 则归为"其他"分类
+    if(results.length >= 20) {
+      otherCount += d.count;
+    } else {
+      results.push({
+        forumName: forum.displayName,
+        fid: forum.fid,
+        count: d.count,
+        color: forum.color || "#aaa"
+      });
+    }
+  }
+  if(otherCount > 0) {
+    results.push({
+      forumName: "其他",
+      fid: "",
+      count: otherCount,
+      color: "#aaa"
+    });
+  }
+  return results;
+};
+
 module.exports = mongoose.model('users', userSchema);

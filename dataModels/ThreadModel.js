@@ -530,12 +530,12 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   return _post
 };
  // 算post所在楼层
-threadSchema.methods.getStep = async function(obj) {
+threadSchema.statics.getPostStep = async (tid, obj) => {
   const PostModel = mongoose.model('posts');
   const {perpage} = require('../settings').paging;
   const pid = obj.pid;
   const q = {
-    tid: this.tid
+    tid
   };
   if(obj.disabled === false) q.disabled = false;
   const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
@@ -551,6 +551,9 @@ threadSchema.methods.getStep = async function(obj) {
     page,// 页数
     step // 楼层
   }
+};
+threadSchema.methods.getStep = async function(obj) {
+  return await mongoose.model("threads").getPostStep(this.tid, obj);
 };
 
 /* 拓展文章数组

@@ -1,0 +1,20 @@
+.single-post
+  .single-post-info
+    .post-time=fromNow(post.time)
+    if post.postType === "postToForum"
+      .post-type 发表文章
+      a(href=`/t/${post.tid}`).post-title=post.title
+    else
+      .post-type 在文章
+      a(href=`/t/${post.tid}`).post-title=post.title
+      .post-type 下发表回复
+  if post.postType === "postToThread" || !post.hasCover
+    a(href=post.link).single-post-content=post.abstract || post.content
+  else
+    .post-content-body
+      .post-cover
+        .post-cover-img(style=`background-image:url(/cover/${post.tid})`)
+      .post-content
+        a(href=post.link).single-post-content=post.abstract || post.content
+
+

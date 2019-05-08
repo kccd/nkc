@@ -4,25 +4,44 @@ block title
   +includeCSS("/user/user.css")
 block content
   .container-fluid.max-width
+    include ../publicModules/mobile_drawer/mobile_drawer
     .row
       .col-xs-12.col-md-2
-        .user-card-panel
+        .user-card-panel.m-b-2
           .user-image
+            .btn-ban
+              .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
+
+              <ul class="dropdown-menu">
+                if data.targetUser.certs.includes("banned")
+                  li
+                    a(href=`javascript: bannedUser("${data.targetUser.uid}", false)`) 解除封禁
+                else
+                  li
+                    a(href=`javascript: bannedUser("${data.targetUser.uid}", true)`) 封禁
+                <li role="separator" class="divider"></li>
+                <li><a href="#">删除头像</a></li>
+                <li><a href="#">删除背景</a></li>
+                <li><a href="#">删除用户名</a></li>
+                <li><a href="#">删除个人简介</a></li>
+              </ul>
             .user-banner-mask
-            .user-avatar
+            a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank").user-avatar
               img(src=`/avatar/${data.targetUser.uid}`)
             .user-banner(style=`background-image: url(/u/${data.targetUser.uid}/banner);`)
-          .user-name=data.targetUser.username
+          .user-name=data.targetUser.username || data.targetUser.uid
           .user-certs=data.targetUser.info.certsName
-          .user-button
-            a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
-            if data.user
-              if data.subUid.includes(data.targetUser.uid)
-                a(href=`javascript: alert("关注")`) 已关注
+          if !data.user || data.user.uid !== data.targetUser.uid
+            .user-button
+              if data.user
+                a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+                if data.userSubUid.includes(data.targetUser.uid)
+                  a(href=`javascript: subscribeUser("${data.targetUser.uid}", false)`) 已关注
+                else
+                  a(href=`javascript: subscribeUser("${data.targetUser.uid}", true)`) 关注
               else
-                a(href=`javascript: alert("关注")`) 关注
-            else
-              a(href=`/login`) 关注
+                a(href=`/login`) 私信
+                a(href=`/login`) 关注
           .user-number
             .col-xs-3
               .number=data.targetUser.threadCount
@@ -36,11 +55,70 @@ block content
             .col-xs-3(title=`科创币：${data.targetUser.kcb/100}`)
               .number=data.targetUser.kcb/100
               .title 科创币
-          .user-description!=markdown(data.targetUser.description)
+          .user-description!=markdown(data.targetUser.description || "")
           .user-register=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
-        include ../publicModules/share/user-card
+        #leftDom.hidden-sm.hidden-xs
+          .user-card-panel.m-b-2
+            .user-card-panel-header 关注的领域
+            -const forumsItem = data.targetUserSubForums;
+            .user-card-sub-div
+              include ../publicModules/forums_nav/forums_item
+          .m-b-1
+            include ../publicModules/share/user-card
       .col-xs-12.col-md-7
-        include ../publicModules/paging/user_card
-        for r in data.results
-          h4=r.operation
-      .col-xs-12.col-md-3
+        .post-panel.b-s-10.m-b-2
+          include ../publicModules/paging/user_card
+          include ../publicModules/paging/paging
+          if data.t === "thread" || !data.t
+            -let insert = false;
+            for post, index in data.posts
+              if index
+                hr
+              if data.paging.page === 0 && !data.t
+                if index > 2 && !insert
+                  -insert = true;
+                  include ./summary
+                  hr
+              include ./single_post
+            if data.paging.page === 0 && !data.t
+              if !insert
+                include ./summary
+          else
+            .row.p-t-1.p-b-1
+              for targetUser in data.users
+                .col-xs-12.col-md-6
+                  include ../publicModules/user_panel/user_panel_md
+          include ../publicModules/paging/paging_input
+      .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
+        if data.targetUserDigestThreads && data.targetUserDigestThreads.length > 0
+          .m-b-2
+            -let sideThreads = data.targetUserDigestThreads
+            -let sideThreadsHeader = "作者精选"
+            include ./side_thread_list
+        if data.featuredThreads && data.featuredThreads.length > 0
+          .m-b-2
+            -let sideThreads = data.featuredThreads
+            -let sideThreadsHeader = "推荐文章"
+            include ./side_thread_list
+        if data.recommendThreads && data.recommendThreads.length > 0
+          .m-b-2
+            -let sideThreads = data.recommendThreads
+            -let sideThreadsHeader = "全站精选"
+            include ./side_thread_list
+        if data.targetUserFans && data.targetUserFans.length > 0
+          .m-b-2
+            -let sideUsers = data.targetUserFans
+            -let sideUsersHeader = "粉丝"
+            -let sideUsersLink = `/u/${data.targetUser.uid}?t=fans`
+            include ./side_user_list
+        if data.targetUserFollowers && data.targetUserFollowers.length > 0
+          .m-b-2
+            -let sideUsers = data.targetUserFollowers
+            -let sideUsersHeader = "关注"
+            -let sideUsersLink = `/u/${data.targetUser.uid}?t=follow`
+            include ./side_user_list
+
+block scripts
+  include ../publicModules/vue_user_panel/vue_user_panel_float
+  +includeJS("/echarts/dist/echarts.min.js")
+  +includeJS("/user/summary.js")

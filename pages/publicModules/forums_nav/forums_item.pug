@@ -1,0 +1,10 @@
+.home-topic-item-div
+  for f in forumsItem
+    a(
+      href=`/f/${f.fid}`
+      style=`background-color: ${f.color || '#808080'}`
+      title=f.description
+    ).topic-item
+      if f.iconFileName
+        img(src=`/forum_avatar/${f.fid}`)
+      span=f.displayName

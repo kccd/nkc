@@ -152,6 +152,34 @@
   padding-right: 6rem;
 }
 
+.b-s-10{
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+.b-s-15{
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+.b-s-20{
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+.b-s-25{
+  box-shadow: 0 0 25px rgba(0,0,0,0.2);
+}
+.b-s-35{
+  box-shadow: 0 0 35px rgba(0,0,0,0.2);
+}
+.b-s-30{
+  box-shadow: 0 0 30px rgba(0,0,0,0.2);
+}
+.b-s-40{
+  box-shadow: 0 0 40px rgba(0,0,0,0.2);
+}
+.b-s-45{
+  box-shadow: 0 0 45px rgba(0,0,0,0.2);
+}
+.b-s-50{
+  box-shadow: 0 0 50px rgba(0,0,0,0.2);
+}
+
 .pointer{
   cursor: pointer;
 }
@@ -1047,6 +1075,7 @@ footer.footer ul li{
   height: 6rem;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
+  position: relative;
   border: 1px solid #eee;
   /*display: -webkit-flex;*/
 }
@@ -1070,6 +1099,7 @@ footer.footer ul li{
 .module-user-panel-md .name{
   height: 1.6rem;
   font-size: 1.3rem;
+  margin-right: 4rem;
   color: #2b90d9;
   display: inline-block;
   -webkit-box-orient: vertical;
@@ -1078,9 +1108,11 @@ footer.footer ul li{
 }
 .module-user-panel-md .button{
   height: 1.6rem;
-  margin-left: 1rem;
   padding: 0 1rem;
   line-height:1.6rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
   vertical-align: text-bottom;
   color: #fff;
   border-radius: 3px;

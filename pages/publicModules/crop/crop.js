@@ -1,11 +1,10 @@
-var moduleCrop = {};
-moduleCrop.cropper = {};
-
 /* 初始化图片裁剪工具
 * @param {Function} callback 回调函数 callback(data), data为裁剪后的图片数据
 * @param {Object} o 参数 详情https://github.com/fengyuanchen/cropperjs#options
 * @author pengxiguaa 2019-5-5
 * */
+var moduleCrop = {};
+moduleCrop.cropper = {};
 
 moduleCrop.init = function(callback, o) {
   var options = {
@@ -36,17 +35,16 @@ moduleCrop.init = function(callback, o) {
   moduleCrop.complete = function() {
     try{
       moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
-        moduleCrop.hide();
         callback(blob);
       });
     }
     catch(e)
     {
       if(options.errorInfo) {
-        moduleCrop.hide();
         screenTopWarning(options.errorInfo)
       }
     }
+    moduleCrop.cancel();
   };
 
   // 显示裁剪框
@@ -75,8 +73,9 @@ moduleCrop.init = function(callback, o) {
   };
 
   moduleCrop.cancel = function() {
-    moduleCrop.hide();
     $("#module_crop_input").val("");
+    moduleCrop.cropper.destroy();
+    moduleCrop.hide();
   };
   moduleCrop.rotate = function(type) {
     if(type === "left") {
