@@ -1,0 +1,17 @@
++includeCSS("/publicModules/share/share.css")
+.share
+  .share-icon(onclick=`shareToOther("${shareType}", "qq", "${shareTitle}", "${shareId}", "${shareDescription}")`)
+    img(src='/default/QQ.png')
+  .share-icon(onclick=`shareToOther("${shareType}", "qzone", "${shareTitle}", "${shareId}", "${shareDescription}")`)
+    img(src='/default/qzone.png')
+  .share-icon(onclick=`shareToOther("${shareType}", "weibo", "${shareTitle}", "${shareId}", "${shareDescription}")`)
+    img(src='/default/weibo.png')
+  .share-icon(onclick="shareShowWeChat()")
+    img(src='/default/weChat.png')
+  .share-icon(id="shareLinkButton")
+    div
+      .fa.fa-link
+  .weChat-image
+    canvas.qrcode-canvas
++includeJS("/clipboard/clipboard.min.js")
++includeJS("/publicModules/share/share.js")

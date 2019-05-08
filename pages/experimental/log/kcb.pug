@@ -63,6 +63,7 @@ block content
                   a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
                 th {{record.num>0?'+':''}}{{record.num/100}}
                 th {{record.description}}
+                  span.text-danger {{record.hideDescription?"【已屏蔽】":""}}
                 th
                   a(v-if="record.pid" :href="'/p/' + record.pid") {{record.pid}}
                 th {{record.ip}}:{{record.port}}

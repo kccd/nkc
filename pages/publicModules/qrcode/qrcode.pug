@@ -2,8 +2,8 @@
 
   页面上添加class为qrcode-canvas的canvas
   canvas的自定义属性值：
-    data-origin 默认当前页面origin
-    data-path 路径 不可为空
+    data-origin 默认为window.location.origin
+    data-path 路径 默认为window.location.pathname
 
 +includeJS("/qrcode/build/qrcode.js")
 script.
@@ -13,7 +13,7 @@ script.
     var path = dom.getAttribute("data-path");
     var origin = dom.getAttribute("data-origin");
     if(!origin) origin = window.location.origin;
-    if(!path) console.log("生成二维码时未检测到canvas上的链接，当前二维码未生成");
+    if(!path) path = window.location.pathname;
     QRCode.toCanvas(dom, origin+path, {
       margin: 1,
       width: 114,

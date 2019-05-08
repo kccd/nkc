@@ -1591,11 +1591,29 @@ function postsVote(pid, type) {
           }
         }
       }
-      numberIcon.innerHTML = number;
+      numberIcon.innerHTML = number || "";
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
     });
+}
+
+// 屏蔽鼓励原因
+function hideKcbRecordReason(pid, recordId, hide) {
+  nkcAPI("/p/" + pid + "/credit/kcb/" + recordId, "PATCH", {
+    hide: !!hide
+  })
+    .then(function() {
+      if(hide) {
+        screenTopAlert("屏蔽成功");
+      } else {
+        screenTopAlert("已取消屏蔽");
+      }
+
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
 }
 
 function lottery() {

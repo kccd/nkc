@@ -165,7 +165,7 @@
 .list-header>span{
   display: inline-block;
   position: absolute;
-  width: 8rem;;
+  width: 10rem;;
   font-size: 1.3rem;
   text-align: center;
   top: 0;
@@ -1164,6 +1164,7 @@ footer.footer ul li{
   left: 0;
   width: 1.2rem;
   background-color: #e85a71;
+  z-index: 1000;
   height: 3rem;
   transition: left 200ms;
   border-radius: 0 3px 3px 0;
@@ -1172,6 +1173,7 @@ footer.footer ul li{
   border-radius: 3px 0 0 3px;
   position: fixed;
   text-align: center;
+  z-index: 1000;
   line-height: 3rem;
   color: #fff;
   font-size: 1.2rem;

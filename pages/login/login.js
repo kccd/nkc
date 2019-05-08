@@ -112,6 +112,8 @@ $(function() {
 				}
 				nkcAPI('/login', 'POST', obj)
 					.then(function(data) {
+					  window.location.href = data.redirect;
+					  /*
 						if(
 							document.referrer.toString().indexOf('register')>=0 ||
 							document.referrer.toString().indexOf('logout')>=0 ||
@@ -128,7 +130,7 @@ $(function() {
 							}else{
 								location.href = document.referrer; //go back in history
 							}
-						}
+						}*/
 					})
 					.catch(function(data) {
 						app.warning.error = data.error || data;

@@ -129,10 +129,15 @@ block title
                 span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
             span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
             span.TPCReason #{c.description}
-            if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
+            if c.type === 'xsf' && data.user && permission('cancelXsf')
               a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
-  
+            if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
+              if !c.hideDescription
+                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, true)`) 屏蔽
+              else
+                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, false)`) 取消屏蔽
 block content
+  include ../publicModules/mobile_drawer/right_drawer
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
     .container-fluid.max-width
@@ -416,28 +421,29 @@ block content
                           想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
 
         .col-xs-12.col-md-3
-          -var user = data.thread.firstPost.user
-          if user
-            include ../interface_thread_userpatch.pug
-          if data.targetUserThreads && data.targetUserThreads.length !== 0
-            .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-              .thread-aside-header 作者最新文章
-              for thread, index in data.targetUserThreads
-                .thread-aside-title
-                  a(href=`/t/${thread.tid}`)
-                    span= index+1+'. '
-                    span= thread.firstPost.t
-          if data.sameThreads && data.sameThreads.length !== 0
-            .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-              .thread-aside-header 相似文章推荐
-              for thread, index in data.sameThreads
-                .thread-aside-title
-                  a(href=`/t/${thread.tid}`)
-                    span= index + 1 + '. '
-                    span= thread.firstPost.t
-          .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
-            ul.HomeFriendlyLink
-              include ../nkc_footer_links.pug
+          .hidden-xs.hidden-sm#rightDom
+            -var user = data.thread.firstPost.user
+            if user
+              include ../interface_thread_userpatch.pug
+            if data.targetUserThreads && data.targetUserThreads.length !== 0
+              .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+                .thread-aside-header 作者最新文章
+                for thread, index in data.targetUserThreads
+                  .thread-aside-title
+                    a(href=`/t/${thread.tid}`)
+                      span= index+1+'. '
+                      span= thread.firstPost.t
+            if data.sameThreads && data.sameThreads.length !== 0
+              .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+                .thread-aside-header 相似文章推荐
+                for thread, index in data.sameThreads
+                  .thread-aside-title
+                    a(href=`/t/${thread.tid}`)
+                      span= index + 1 + '. '
+                      span= thread.firstPost.t
+            .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
+              ul.HomeFriendlyLink
+                include ../nkc_footer_links.pug
           include ../module_scrollTo
 
 

@@ -1,58 +1,59 @@
 footer.footer
   .container-fluid.max-width
-    .col-xs-12.col-md-12
-      .row
-        .col-xs-6.col-md-2.footer-li-div
-          .footer-header 关于
-          ul.footer-link
-            for l in data.serverSettings.links.info
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-6.col-md-2.footer-li-div
+            .footer-header 关于
+            ul.footer-link
+              for l in data.serverSettings.links.info
+                li
+                  a(href=l.url target="_blank")=l.name
+          .col-xs-6.col-md-2.footer-li-div
+            .footer-header 应用
+            ul.footer-link
+              for l in data.serverSettings.links.app
+                li
+                  a(href=l.url target="_blank")=l.name
+          .col-xs-6.col-md-2.footer-li-div
+            .footer-header 友情链接
+            ul.footer-link
+              for l in data.serverSettings.links.other
+                li
+                  a(href=l.url target="_blank")=l.name
+          .col-xs-6.col-md-2.footer-li-div
+            .footer-header 其他
+            ul.footer-link
               li
-                a(href=l.url target="_blank")=l.name
-        .col-xs-6.col-md-2.footer-li-div
-          .footer-header 应用
-          ul.footer-link
-            for l in data.serverSettings.links.app
+                a(href="/problem/add")
+                  span(style="font-size: 1.4rem;").fa.fa-bug
+                  span(style="font-size: 1.2rem;") &nbsp;上报问题
               li
-                a(href=l.url target="_blank")=l.name
-        .col-xs-6.col-md-2.footer-li-div
-          .footer-header 友情链接
-          ul.footer-link
-            for l in data.serverSettings.links.other
+                a
+                  span(style="font-size: 1.5rem;").fa.fa-phone-square
+                  span(style="font-size: 1.2rem;")=` ${data.serverSettings.telephone}`
               li
-                a(href=l.url target="_blank")=l.name
-        .col-xs-6.col-md-2.footer-li-div
-          .footer-header 其他
-          ul.footer-link
-            li
-              a(href="/problem/add")
-                span(style="font-size: 1.4rem;").fa.fa-bug
-                span(style="font-size: 1.2rem;") &nbsp;上报问题
-            li
-              a
-                span(style="font-size: 1.5rem;").fa.fa-phone-square
-                span(style="font-size: 1.2rem;")=` ${data.serverSettings.telephone}`
-            li
-              a(href=data.serverSettings.github target="_blank")
-                span(style="font-size: 1.5rem;").fa.fa-github
-                span(style="font-size: 1.2rem;") &nbsp;Github
+                a(href=data.serverSettings.github target="_blank")
+                  span(style="font-size: 1.5rem;").fa.fa-github
+                  span(style="font-size: 1.2rem;") &nbsp;Github
 
-        .col-xs-6.col-md-2.footer-li-div
-          .footer-header.text-center 手机访问
-          ul.footer-link
-            li.text-center
-              canvas.qrcode-canvas(data-path="/")
-        .col-xs-6.col-md-2.footer-li-div
-          .footer-header.text-center 安卓客户端
-          ul.footer-link
-            li.text-center
-              a(href='/app')
-                canvas.qrcode-canvas(data-path="/app")
-                span(style='display: block;font-size: 1rem;color: #555555;margin-top: 0.3rem;') 点击下载
+          .col-xs-6.col-md-2.footer-li-div
+            .footer-header.text-center 手机访问
+            ul.footer-link
+              li.text-center
+                canvas.qrcode-canvas(data-path="/")
+          .col-xs-6.col-md-2.footer-li-div
+            .footer-header.text-center 安卓客户端
+            ul.footer-link
+              li.text-center
+                a(href='/app')
+                  canvas.qrcode-canvas(data-path="/app")
+                  span(style='display: block;font-size: 1rem;color: #555555;margin-top: 0.3rem;') 点击下载
 
-    .col-xs-12.col-md-12
-      .website-name
-        h5=`${data.serverSettings.brief}`
-        h5=`${data.serverSettings.copyright}`
-        h5=`${data.serverSettings.record}`
+      .col-xs-12.col-md-12
+        .website-name
+          h5=`${data.serverSettings.brief}`
+          h5=`${data.serverSettings.copyright}`
+          h5=`${data.serverSettings.record}`
 
-        //h5=`${data.serverSettings.websiteName}`
+          //h5=`${data.serverSettings.websiteName}`

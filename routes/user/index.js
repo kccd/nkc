@@ -32,8 +32,72 @@ userRouter
     data.targetUsers = targetUsers;
     await next();
   })
+  .get("/:uid", async (ctx, next) => {
+    const {params, db, data, query, nkcModules} = ctx;
+    const {uid} = params;
+    const {user} = data;
+    const targetUser = await db.UserModel.findOnly({uid});
+    await db.UserModel.extendUsersInfo([targetUser]);
+    if(user) {
+      const subUsers = await db.SubscribeModel.find({
+        type: "user",
+        uid: user.uid
+      }, {
+        tUid: 1
+      });
+      data.subUid = subUsers.map(s => s.tUid);
+    }
+    const {t, page=0} = query;
+    let paging;
+    if(!t) {
+      const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
+      const q = {
+        uid,
+        mainForumsId: {$in: accessibleFid},
+      };
+      const count = await db.PostModel.count(q);
+      paging = nkcModules.apiFunction.paging(page, count);
+      const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      const results = [];
+      const displayDisabledPosts = data.userOperationsId.includes('displayDisabledPosts');
+      for(const post of posts) {
+        if(post.disabled && !displayDisabledPosts) continue;
+        if(!post) continue;
+        await post.extendUser();
+        const thread = await post.extendThread();
+        if(thread.recycleMark && !data.userOperationsId.includes('displayRecycleThreads')) continue;
+        if(!thread) continue;
+        let firstPost;
+        let link;
+        if(thread.oc === post.pid) {
+          firstPost = post;
+          link = `/t/${thread.tid}#${thread.oc}`
+        } else {
+          firstPost = await thread.extendFirstPost();
+          await firstPost.extendUser();
+          const m = {pid: post.pid};
+          if(!displayDisabledPosts) {
+            m.disabled = false;
+          }
+          const obj = await thread.getStep(m);
+          link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+        }
+        results.push({
+          operation: thread.oc === post.pid?'postToForum': 'postToThread',
+          thread,
+          firstPost,
+          post,
+          link
+        });
+      }
+      data.results = results;
+    }
+    data.targetUser = targetUser;
+    ctx.template = "/user/user.pug";
+    await next();
+  })
 	//个人名片
-  .get('/:uid', async (ctx, next) => {
+  /*.get('/:uid', async (ctx, next) => {
     const {data, db, params,query} = ctx;
     const {user} = data;
     const {uid} = params;
@@ -92,14 +156,14 @@ userRouter
       uid: targetUser.uid
     });
 	  const forumsId = sub.map(s => s.fid);
-	  /*for (let fid of targetUserSubscribe.subscribeForums) {
+	  /!*for (let fid of targetUserSubscribe.subscribeForums) {
 		  if (visibleFid.includes(fid) && !forumsId.includes(fid)) {
 			  forumsId.push(fid);
 		  }
-	  }*/
-	  /*const count = forumsId.length;
+	  }*!/
+	  /!*const count = forumsId.length;
 	  paging = apiFunction.paging(page, count);
-	  forumsId.slice(paging.start, paging.start + paging.perpage);*/
+	  forumsId.slice(paging.start, paging.start + paging.perpage);*!/
 	  data.targetUserSubscribeforums = await Promise.all(forumsId.map(fid => db.ForumModel.findOnly({fid})));
 	  // --------
 
@@ -206,7 +270,7 @@ userRouter
 
 		ctx.template = 'interface_user.pug';
     await next();
-  })
+  })*/
   .post('/:uid/pop', async (ctx, next) => {
     const uid = ctx.params.uid;
     ctx.data.message = `推送/取消热门 用户: ${uid}`;

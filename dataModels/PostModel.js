@@ -554,6 +554,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   });
   if(o.credit) {
     const kcbsRecords = await KcbsRecordModel.find({type: 'creditKcb', pid: {$in: [...pid]}}).sort({toc: 1});
+    await KcbsRecordModel.hideSecretInfo(kcbsRecords);
     for(const r of kcbsRecords) {
       uid.add(r.from);
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];

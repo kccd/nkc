@@ -1,0 +1,46 @@
+extends ../bootstrap_base
+block title
+  title=`${data.targetUser.username} - ${data.serverSettings.websiteName}`
+  +includeCSS("/user/user.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        .user-card-panel
+          .user-image
+            .user-banner-mask
+            .user-avatar
+              img(src=`/avatar/${data.targetUser.uid}`)
+            .user-banner(style=`background-image: url(/u/${data.targetUser.uid}/banner);`)
+          .user-name=data.targetUser.username
+          .user-certs=data.targetUser.info.certsName
+          .user-button
+            a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+            if data.user
+              if data.subUid.includes(data.targetUser.uid)
+                a(href=`javascript: alert("关注")`) 已关注
+              else
+                a(href=`javascript: alert("关注")`) 关注
+            else
+              a(href=`/login`) 关注
+          .user-number
+            .col-xs-3
+              .number=data.targetUser.threadCount
+              .title 文章
+            .col-xs-3
+              .number=data.targetUser.postCount
+              .title 回复
+            .col-xs-3
+              .number=data.targetUser.xsf
+              .title 学术分
+            .col-xs-3(title=`科创币：${data.targetUser.kcb/100}`)
+              .number=data.targetUser.kcb/100
+              .title 科创币
+          .user-description!=markdown(data.targetUser.description)
+          .user-register=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
+        include ../publicModules/share/user-card
+      .col-xs-12.col-md-7
+        include ../publicModules/paging/user_card
+        for r in data.results
+          h4=r.operation
+      .col-xs-12.col-md-3

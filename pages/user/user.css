@@ -1,0 +1,131 @@
+body{
+  background-color: #fafafa;
+}
+.user-card-panel{
+  border-radius: 3px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  padding-bottom: 1rem;
+}
+.user-image{
+  width: 100%;
+  height: 8rem;
+  position: relative;
+  margin-bottom: 2rem;
+}
+.user-banner{
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+.user-avatar img{
+  height: 100%;
+  padding: 2px;
+  width: 100%;
+  border-radius: 50%;
+  background-color: #ffff;
+}
+.user-banner-mask{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  background-color: rgba(0,0,0,0.3);
+  z-index: 100;
+}
+
+.user-avatar{
+  height: 8rem;
+  width: 8rem;
+  position: absolute;
+  z-index: 110;
+  left: 0;
+  right: 0;
+  top: 2rem;
+  margin: auto;
+}
+.user-name{
+  font-size: 1.4rem;
+  text-align: center;
+  padding-top: 0.2rem;
+  padding-bottom: 0.3rem;
+  font-weight: 700;
+}
+.user-certs{
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0 0.2rem;
+  color: #e85a71;
+  text-align: center;
+}
+.user-button{
+  padding: 0.3rem 0;
+  margin: 0 0.5rem;
+  text-align: center;
+}
+.user-button>*{
+  height: 2.5rem;
+  width: 50%;
+  display: inline-block;
+  text-align: center;
+  line-height: 2.5rem;
+  background-color: #fff;
+  border-radius: 10px 0 0 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: background-color 200ms, color 200ms;
+  border: 1px solid #2b90d9;
+}
+.user-button>*:last-child{
+  border-radius: 0 10px 10px 0;
+  border-left: none;
+}
+.user-button>*:active, .user-button>*:visited, .user-button>*:link{
+  color: #2b90d9;
+  text-decoration: none;
+}
+.user-button>*:hover{
+  text-decoration: none;
+  background-color: #2b90d9;
+  color: #fff;
+}
+.user-number{
+  padding: 0.6rem 0.2rem 0.2rem 0.2rem;
+  overflow: hidden;
+}
+.user-number>div{
+  padding: 0;
+  text-align: center;
+}
+.user-number .title{
+  font-size: 1rem;
+  height:1.5rem;
+  color: #888;
+  line-height: 1.5rem;
+  width:100%;
+}
+.user-number .number{
+  width:100%;
+  height:1.5rem;
+  line-height: 1.5rem;
+  word-break: break-all;
+  font-size: 1rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  font-weight: 700;
+}
+.user-description{
+  font-size: 1.2rem;
+  color: #282c37;
+  /*background-color: #f5f5f5;*/
+  text-align: center;
+  padding: 0.5rem;
+}
+.user-register{
+  text-align: center;
+  font-weight: 700;
+  color: #9baec8;
+  font-size: 1rem;
+}

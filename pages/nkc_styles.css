@@ -3228,7 +3228,8 @@ img.emoji {
   height: 1.5rem;
   line-height: 1.3rem;
   font-size: 1.1rem;
-  width: 1.5rem;
+  min-width: 1.5rem;
+  padding: 0 0.6rem;
   cursor: pointer;
   text-align: center;
 }.posts-vote>div:last-child{
@@ -3239,7 +3240,7 @@ img.emoji {
   /*color: #3e9ef2;*/
   color: #555;
   border: 1px solid #aaa;
-  border-radius: 50%;
+  border-radius: 3px;
   transition: color 0.3s, background-color 0.3s;
 }
 /*.posts-vote-up:hover, .posts-vote-down:hover, .posts-vote-up.active, .posts-vote-down.active{*/
@@ -3248,8 +3249,12 @@ img.emoji {
   color: #fff;
   border: 1px solid rgba(0,0,0,0);
 }
+.posts-vote-up.active .posts-vote-number{
+  color: #fff;
+}
 .posts-vote .posts-vote-number{
   font-weight: 600;
+  display: inline;
   color: #607a91;
   max-width: 2.5rem;
   line-height: 1.5rem;

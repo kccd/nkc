@@ -544,6 +544,7 @@
   "getOrigins": "[CO]获取原图",
   "getOringinId": "[CO]获取原图Id",
   "saveNewEditPicture": "[CO]上传编辑好的新图片",
+  "modifyKcbRecordReason": "屏蔽/解除屏蔽 鼓励原因",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

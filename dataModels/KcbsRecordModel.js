@@ -38,6 +38,11 @@ const kcbsRecordSchema = new Schema({
     type: String,
     default: ''
   },
+  // 隐藏备注
+  hideDescription: {
+    type: Boolean,
+    default: false
+  },
   ip: {
     type: String,
     default: '0.0.0.0',
@@ -331,9 +336,10 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   return await alipay2.receipt(o);
 };
 
-kcbsRecordSchema.statics.hideAlipayInfo = async (records) => {
+kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
   for(const record of records) {
     record.c = "";
+    if(record.hideDescription) record.description = "【鼓励理由不符合论坛相关规定，已隐藏】";
   }
 };
 

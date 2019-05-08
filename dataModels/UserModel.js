@@ -865,7 +865,6 @@ userSchema.statics.extendUsersInfo = async (users) => {
   }
   return users_;
 };
-
 userSchema.methods.extendAuthLevel = async function() {
   const userPersonal = await mongoose.model('usersPersonal').findUsersPersonalById(this.uid);
   return this.authLevel = await userPersonal.getAuthLevel();

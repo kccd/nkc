@@ -47,9 +47,6 @@ module.exports = async (ctx, next) => {
 	  ctx.data.site = settings.site;
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
-		const logSettings = await db.SettingModel.findOne({_id: "log"});
-		let {operationsId} = logSettings.c;
-		ctx.data.logSetting = operationsId;
 	  // - 初始化网站设置
 		let serverSettings = await db.SettingModel.findOnly({_id: 'server'});
 		serverSettings = serverSettings.c;
@@ -116,7 +113,7 @@ module.exports = async (ctx, next) => {
         if(global.NKC.NODE_ENV !== "production") {
           console.log(err);
         }
-        return {}
+        return null
       }
     };
 

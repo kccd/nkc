@@ -55,17 +55,12 @@ subscribeRouter
 				}
 			}
 		}
-		const lastUrl = ctx.cookies.get('lastUrl', {
-			signed: true
-		});
-		ctx.cookies.set('lastUrl', '');
-		if(!lastUrl) {
-			data.url = `/u/${uid}`;
-		} else if(lastUrl.includes('kechuang') && !lastUrl.includes('logout') && !lastUrl.includes('login')) {
-			data.url = lastUrl;
-		} else{
-			data.url = '/';
-		}
+    const urls = ctx.getCookie("visitedUrls") || [];
+    if(urls.length === 0) {
+      data.redirect = '/';
+    } else {
+      data.redirect = urls[0];
+    }
 		await next();
 	})
   // 关注该用户
