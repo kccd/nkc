@@ -77,6 +77,7 @@ operationObj.defaultOperations = [
   'removeAllQuestion', // 可删除别人出的试题
   'superModerator', // 超级专家，所有专业的专家权限
   "getAnyBodyShopCert", // 可查看任何人的商城凭证
+  "viewUserAllFansAndFollowers" // 可查看用户的所有关注的人和粉丝
 ];
 
 

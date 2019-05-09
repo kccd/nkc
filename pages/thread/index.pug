@@ -167,7 +167,7 @@ block content
                         -let canManagement = false;
                         -for(let i = 0; i < data.userOperationsId.length; i++)
                           -const operationId = data.userOperationsId[i];
-                          if ['digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'].includes(operationId)
+                          if ['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'].includes(operationId)
                             -canManagement = true;
                             -break;
                         if data.isModerator && canManagement
@@ -242,9 +242,9 @@ block content
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                             if data.userOperationsId.includes('openThread') && thread.closed
                               button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
-                          if permission('addThreadForum') || permission('moveThread')
+                          if permission('addThreadForum') || permission("removeThreadForum") || permission('moveThread') || permission("moveDraft")
                             div
-                              if permission('addThreadForum')
+                              if permission('addThreadForum') || permission("removeThreadForum")
                                 div(v-if='forums.length !== 0')
                                   h5 已选择专业
                                   div
@@ -254,18 +254,10 @@ block content
                                 div(style='margin-top:0.5rem;').form-inline    
                                   include ../forumlist_dropdown.pug
                                   button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
-                              if permission('moveThread')    
+                              if permission('moveThread') || permission("moveDraft")
                                 div(style='margin-top:0.5rem;')      
                                   button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
-                            //-.form-inline(style='margin: 0.5rem 0')
-                              .form-group.form-group-sm
-                                include ../forumlist_dropdown.pug
-                                button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}
-                              if moveThread
-                                .form-group
-                                  //- button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
-                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
-                                  //- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button>
+
                 .col-xs-12.col-md-12
                   .row
                     .col-xs-12.col-md-12(style=`margin: 3rem 0 1rem 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)

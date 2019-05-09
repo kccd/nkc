@@ -59,7 +59,6 @@ router
 
     // 加载专业列表
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
-
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
     // 网站公告

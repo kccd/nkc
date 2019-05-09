@@ -1615,7 +1615,7 @@ function hideKcbRecordReason(pid, recordId, hide) {
       screenTopWarning(data);
     })
 }
-
+// 随机红包
 function lottery() {
   nkcAPI('/lottery', 'POST', {})
     .then(function(data) {

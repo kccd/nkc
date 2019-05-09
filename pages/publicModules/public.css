@@ -1299,10 +1299,8 @@ footer.footer ul li{
   color: #e85a71;
 }
 .thread-panel-abstract{
-  display: -webkit-flex;
-  display: flex;
   margin-top: 0.4rem;
-  max-height: 7rem;
+  /*max-height: 7rem;*/
   overflow: hidden;
   font-size: 1.2rem;
 }
@@ -1315,17 +1313,22 @@ footer.footer ul li{
   color: #555;
 }
 .thread-panel-abstract-content-div{
-  max-height: 5rem;
+  max-height: 5.3rem;
   overflow: hidden;
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   -webkit-flex-grow: 1;
   color: #555;
 }
+.thread-panel-abstract-reply:hover, .thread-panel-abstract-reply:link, .thread-panel-abstract-reply:visited, .thread-panel-abstract-reply:active{
+  color: #666;
+  text-decoration: none;
+}
 .thread-panel-abstract-reply{
   height: 1.6rem;
-  margin-top: 0.4rem;
+  margin-top: 0.1rem;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -1348,15 +1351,19 @@ footer.footer ul li{
   max-width: 100%;
   font-size: 1.25rem;
   height: 100%;
-  flex-grow: 1;
+  display: table-cell;
+  vertical-align: top;
 }
 .thread-panel-abstract-cover{
-  margin-right: 1rem;
-  -webkit-flex-grow: 0;
-  flex-grow: 0;
+  display: table-cell;
+  height: 6.9rem;
+  width: 11rem;
+  padding-right: 1rem;
+}
+.thread-panel-abstract-cover-image{
+  height: 6.7rem;
   margin-bottom: 0.5rem;
-  height: 6.5rem;
-  min-width: 10rem;
+  width: 10rem;
   border-radius: 3px;
   background-size: cover;
 }

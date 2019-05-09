@@ -219,8 +219,14 @@ fn.fromNow = (time) => {
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
   if(!content) return content;
+  // 过滤HTML空格
   content = content.replace(/&nbsp;/ig,"");
+  // 过滤HTML引用
   content = content.replace(/<blockquote.*?blockquote>/g,"");
+  // 过滤bbcode隐藏
+  content = content.replace(/\[hide=.*?][\s\S]*?\[\/hide]/ig, "");
+  // 过滤bbcode引用
+  content = content.replace(/\[quote.*?][\s\S]*?\[\/quote]/ig, "");
   content = content.replace(/<[^>]+>/g,"");
   count = parseInt(count);
   if(reduce === true){
@@ -230,7 +236,7 @@ fn.obtainPureText = (content, reduce, count) => {
     }
   }
   return content;
-}
+};
 
 // 将全部板块转为app可用json
 fn.forumsToJson = (fors) => {

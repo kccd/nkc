@@ -54,10 +54,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
             .nkc-drawer-certs= data.user.info.certsName
             .nkc-drawer-count
               .col-xs-3
-                .nkc-drawer-count-number=data.user.threadCount
+                .nkc-drawer-count-number=data.user.threadCount - data.user.disabledThreadsCount
                 .nkc-drawer-count-title 文章
               .col-xs-3
-                .nkc-drawer-count-number=data.user.postCount
+                .nkc-drawer-count-number=data.user.postCount - data.user.disabledPostsCount
                 .nkc-drawer-count-title 回复
               .col-xs-3
                 .nkc-drawer-count-number=data.user.xsf

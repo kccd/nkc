@@ -127,7 +127,7 @@ userRouter
     if(!t) {
       if(Number(page) === 0) {
         data.userPostSummary = await db.UserModel.getUserPostSummary(targetUser.uid);
-        nkcModules.apiFunction.shuffle(data.userPostSummary);
+        // nkcModules.apiFunction.shuffle(data.userPostSummary);
       }
       const q = {
         uid,
@@ -162,7 +162,7 @@ userRouter
         post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
         const thread = threadsObj[post.tid];
         if(!thread || thread.disabled || thread.recycleMark) continue;
-        let firstPost;
+        let firstPost = {};
         let link;
         if(thread.oc === post.pid) {
           firstPost = post;
@@ -222,7 +222,7 @@ userRouter
         htmlToText: true,
       });
       const results = [];
-      for(const thread of threads) {
+      for (const thread of threads) {
         results.push({
           postType: "postToForum",
           tid: thread.tid,
@@ -235,26 +235,46 @@ userRouter
         });
       }
       data.posts = results;
-    } else if(t === "follow") {
-      const q = {
-        uid: targetUser.uid,
-        type: "user"
-      };
-      const count = await db.SubscribeModel.count(q);
-      paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
-      const subs = await db.SubscribeModel.find(q, {tUid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      data.users = await db.UserModel.find({uid: {$in: subs.map(s => s.tUid)}});
-      await db.UserModel.extendUsersInfo(data.users);
     } else {
-      const q = {
-        tUid: targetUser.uid,
-        type: "user"
-      };
-      const count = await db.SubscribeModel.count(q);
-      paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
-      const subs = await db.SubscribeModel.find(q, {uid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      data.users = await db.UserModel.find({uid: {$in: subs.map(s => s.uid)}});
-      await db.UserModel.extendUsersInfo(data.users);
+      // 关注或粉丝
+      if(Number(page) >= 1) {
+        if(!ctx.permission("viewUserAllFansAndFollowers")) {
+          if(!user) {
+            data.noPromission = true;
+          } else {
+            if(user.uid !== targetUser.uid) {
+              const isFriend = await db.FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+              if(!isFriend) data.noPromission = true;
+            }
+          }
+        }
+      }
+
+      if(t === "follow") {
+        const q = {
+          uid: targetUser.uid,
+          type: "user"
+        };
+        const count = await db.SubscribeModel.count(q);
+        paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
+        if(!data.noPromission) {
+          const subs = await db.SubscribeModel.find(q, {tUid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+          data.users = await db.UserModel.find({uid: {$in: subs.map(s => s.tUid)}});
+          await db.UserModel.extendUsersInfo(data.users);
+        }
+      } else {
+        const q = {
+          tUid: targetUser.uid,
+          type: "user"
+        };
+        const count = await db.SubscribeModel.count(q);
+        paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
+        if(!data.noPromission) {
+          const subs = await db.SubscribeModel.find(q, {uid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+          data.users = await db.UserModel.find({uid: {$in: subs.map(s => s.uid)}});
+          await db.UserModel.extendUsersInfo(data.users);
+        }
+      }
     }
     data.paging = paging;
     data.targetUser = targetUser;

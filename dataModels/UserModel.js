@@ -1054,5 +1054,16 @@ userSchema.statics.getUserPostSummary = async (uid) => {
   }
   return results;
 };
+/*
+* 获取用户的信息好友ID
+* @param {String} uid 用户ID
+* @return {[String]} 好友ID数组
+* @author pengxiguaa 2019-5-9
+* */
+userSchema.statics.getUsersFriendsId = async (uid) => {
+  const FriendModel = mongoose.model("friends");
+  const friends = await FriendModel.find({uid});
+  return friends.map(c => c.tUid);
+};
 
 module.exports = mongoose.model('users', userSchema);

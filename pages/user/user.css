@@ -19,12 +19,23 @@ body{
   width: 100%;
   background-size: cover;
 }
-.user-avatar img{
-  height: 100%;
-  padding: 2px;
-  width: 100%;
+.user-avatar{
+  height: 96px;
+  width: 96px;
+  position: absolute;
+  z-index: 110;
+  left: 0;
+  right: 0;
+  top: 2rem;
+  margin: auto;
   border-radius: 50%;
-  background-color: #ffff;
+  background-color: #fff;
+}
+.user-avatar img{
+  height: 92px;
+  border-radius: 50%;
+  width: 92px;
+  margin: 2px 0 0 2px;
 }
 .user-banner-mask{
   height: 100%;
@@ -32,17 +43,6 @@ body{
   position: absolute;
   background-color: rgba(0,0,0,0.3);
   z-index: 100;
-}
-
-.user-avatar{
-  height: 8rem;
-  width: 8rem;
-  position: absolute;
-  z-index: 110;
-  left: 0;
-  right: 0;
-  top: 2rem;
-  margin: auto;
 }
 .user-name{
   font-size: 1.4rem;
@@ -110,6 +110,7 @@ body{
   line-height: 1.5rem;
   word-break: break-all;
   font-size: 1rem;
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -133,7 +134,7 @@ body{
   background-color: #fff;
   padding: 1rem;
   border-radius: 3px;
-  min-height: 35rem;
+  min-height: 26.5rem;
 }
 .single-post{
   padding: 1rem 0;
@@ -142,7 +143,7 @@ body{
   margin: 0 0.5rem;
 }
 .single-post-info>*{
-  display: inline-block;
+  display: inline;
 }
 .post-time{
   color: #e85a71;
@@ -173,6 +174,7 @@ body{
   overflow: hidden;
   font-weight: 700;
   /*background-color: #d9e1e8;*/
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -207,7 +209,7 @@ body{
   padding: 1rem 0;
 }
 #user_summary{
-  height: 20rem;
+  height: 25rem;
 }
 .user-card-panel-header{
   background-color: #9baec8;
@@ -274,5 +276,12 @@ body{
   width: 2rem;
   text-align: center;
 }
-.btn-ban .fa{
+.user-list-warning {
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.4rem;
+  height: 20rem;
+  line-height: 15rem;
+  color: #282c37;
+  font-weight: 700;
 }

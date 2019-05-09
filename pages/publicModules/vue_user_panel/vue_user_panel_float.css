@@ -69,6 +69,7 @@
 #vue_user_panel_float .user_name{
   height: 2.3rem;
   overflow: hidden;
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   line-height: 2.7rem;
@@ -85,6 +86,7 @@
   max-height: 4rem;
   overflow: hidden;
   color: #ddd;
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -95,6 +97,7 @@
   height: 1.8rem;
   line-height: 1.8rem;
   overflow: hidden;
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;

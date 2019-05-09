@@ -653,6 +653,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         description: 1,
         certs: 1,
         threadCount: 1,
+        disabledThreadsCount: 1,
+        disabledPostsCount: 1,
         postCount: 1
       });
       if(o.userInfo) {
@@ -1088,7 +1090,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   for (var i in allMarkThreads) {
     const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
     if(delThreadLog){
-      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"] })
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true });
       await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
       await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
       const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});

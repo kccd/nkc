@@ -84,11 +84,11 @@ module.exports = {
 			}
 		}
 	},
-	default: {// 默认图片
+	/*default: {// 默认图片
 		PARAMETER: {
 			GET: 'getDefaultImage'
 		}
-	},
+	},*/
 	attachIcon: {// 默认附件图标
 		PARAMETER: {
 			GET: 'getAttachmentIcon'

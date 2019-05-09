@@ -74,8 +74,8 @@ var vue_user_panel_float = new Vue({
         uid: targetUser.uid,
         kcb: targetUser.kcb,
         xsf: targetUser.xsf,
-        postCount: targetUser.postCount,
-        threadCount: targetUser.threadCount,
+        postCount: targetUser.postCount - targetUser.disabledPostsCount,
+        threadCount: targetUser.threadCount - targetUser.disabledThreadsCount,
         certsName: targetUser.info.certsName
       };
       vue_user_panel_float.user = vue_user_panel_float.usersObj[targetUser.uid];

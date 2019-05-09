@@ -49,10 +49,10 @@ block content
                 a(href=`/login`) 关注
           .user-number
             .col-xs-3
-              .number=data.targetUser.threadCount
+              .number=data.targetUser.threadCount - data.targetUser.disabledThreadsCount
               .title 文章
             .col-xs-3
-              .number=data.targetUser.postCount
+              .number=data.targetUser.postCount - data.targetUser.disabledPostsCount
               .title 回复
             .col-xs-3
               .number=data.targetUser.xsf
@@ -63,11 +63,12 @@ block content
           .user-description!=markdown(data.targetUser.description || "")
           .user-register=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
         #leftDom.hidden-sm.hidden-xs
-          .user-card-panel.m-b-2
-            .user-card-panel-header 关注的领域
-            -const forumsItem = data.targetUserSubForums;
-            .user-card-sub-div
-              include ../publicModules/forums_nav/forums_item
+          if data.targetUserSubForums && data.targetUserSubForums.length > 0
+            .user-card-panel.m-b-2
+              .user-card-panel-header 关注的领域
+              -const forumsItem = data.targetUserSubForums;
+              .user-card-sub-div
+                include ../publicModules/forums_nav/forums_item
           .m-b-1
             include ../publicModules/share/user-card
       .col-xs-12.col-md-7
@@ -75,24 +76,38 @@ block content
           include ../publicModules/paging/user_card
           include ../publicModules/paging/paging
           if data.t === "thread" || !data.t
-            -let insert = false;
-            for post, index in data.posts
-              if index
-                hr
-              if data.paging.page === 0 && !data.t
-                if index > 2 && !insert
-                  -insert = true;
-                  include ./summary
+            if data.posts.length === 0
+              .user-list-warning 用户似乎未发表过任何内容~
+            else
+              -let insert = false;
+              for post, index in data.posts
+                if index
                   hr
-              include ./single_post
-            if data.paging.page === 0 && !data.t
-              if !insert
-                include ./summary
+                if data.paging.page === 0 && !data.t
+                  if index > 2 && !insert
+                    -insert = true;
+                    include ./summary
+                    hr
+                include ./single_post
+              if data.paging.page === 0 && !data.t
+                if !insert
+                  include ./summary
           else
             .row.p-t-1.p-b-1
-              for targetUser in data.users
-                .col-xs-12.col-md-6
-                  include ../publicModules/user_panel/user_panel_md
+              if data.noPromission
+                .user-list-warning
+                  if !data.user
+                    | 登录后可查看更多
+                  else
+                    | 添加该用户为消息好友后可查看更多，
+                    a(href="/message" target="_blank") 去添加
+              else
+                if data.users.length === 0
+                  .user-list-warning 空空如也~
+                else
+                  for targetUser in data.users
+                    .col-xs-12.col-md-6
+                      include ../publicModules/user_panel/user_panel_md
           include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
         if data.targetUserDigestThreads && data.targetUserDigestThreads.length > 0

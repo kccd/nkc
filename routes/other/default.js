@@ -8,11 +8,10 @@ router
     await next()
   })
   .get('/:file', async (ctx, next) => {
-    const {file} = ctx.params;
+    const {file, fs} = ctx.params;
     ctx.filePath = `${defaultPath}/${file}`;
-    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
-    const [name, ext] = file;
-    ctx.type = ext;
+    console.log(ctx.filePath);
+    ctx.type = 'jpg';
     await next()
   });
 
