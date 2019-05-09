@@ -5,8 +5,10 @@ block title
   
   include MathJax.pug
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+  link(rel='stylesheet' href=`/tabPanel/tabPanel.css?v=${global.NKC.startTime}`)
 block content
   -var mainContainer1400 = true
+  .hidden#panelDatas= JSON.stringify(data.panelDatas)
   #ife.container-fluid(style='max-width:1400px')
     .col-xs-12.col-md-12
       if !data.user
@@ -21,70 +23,71 @@ block content
               include exam_notification.pug
 
           .row
-              .form-group
-                  input#title.form-control(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
-              .form-group
-                textarea#abstract(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
-                  //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
-              //- .form-group
-              //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-              //-     div(style='margin-top: 5px;')
-              //-     //- include forumlist_dropdown
-              //-     //select#parents.form-control(style='display: inline-block; width: auto;')
-              //-     //    option 选择一个学院
-              //-     //select#children.form-control(style='display: inline-block; width: auto;')
-              //-     //    option 选择一个专业
-              //-     //select#threadTypes.form-control(style='display: inline-block; width: auto;')
-              //-     //    option 无
-              //-     //select.form-control#lang(style='display: none; width: auto;')
-              //-     //    option html
-              input.hidden#lang(value=data.l)
-              if data.delReason 
-                .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
-              .form-group(style="background-color:#fff;line-height:1.5;")
-                  div#quoteContent
-              .form-group
-                div#quoteCancel(style='display: none')
-                  button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-              .form-group
-                  div#content_test
-              .form-group
-              //- .nkcpanel(id='file-uploading' target='/r')
-              //-     //uploader section
-              //-     include interface_attachment_uploader_uploader.pug
+            .form-group
+                input#title.form-control.tabPanel(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
+            .form-group
+              textarea#abstract(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
+                //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
+            //- .form-group
+            //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+            //-     div(style='margin-top: 5px;')
+            //-     //- include forumlist_dropdown
+            //-     //select#parents.form-control(style='display: inline-block; width: auto;')
+            //-     //    option 选择一个学院
+            //-     //select#children.form-control(style='display: inline-block; width: auto;')
+            //-     //    option 选择一个专业
+            //-     //select#threadTypes.form-control(style='display: inline-block; width: auto;')
+            //-     //    option 无
+            //-     //select.form-control#lang(style='display: none; width: auto;')
+            //-     //    option html
+            .form-group
+              input#tabPanel.form-control(type='text' placeholder='选择专业...' onclick="openPanel(this)")
+            input.hidden#lang(value=data.l)
+            if data.delReason 
+              .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
+            .form-group(style="background-color:#fff;line-height:1.5;")
+                div#quoteContent
+            .form-group
+              div#quoteCancel(style='display: none')
+                button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+            .form-group
+                div#content_test
+            .form-group
+            //- .nkcpanel(id='file-uploading' target='/r')
+            //-     //uploader section
+            //-     include interface_attachment_uploader_uploader.pug
 
-              include ./media/media_index.pug
+            include ./media/media_index.pug
 
-              if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-                include ./forum/forum_choice.pug
-
-              .form-inline
+            if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+              include ./forum/forum_choice.pug
+            .form-inline
+                .form-group
+                    input#parseURL(type='checkbox' checked)
+                    span &nbsp;处理URL&nbsp;
+                .form-group
+                    button#post.btn.btn-primary(type='submit') 发表
+                if !['forum_declare'].includes(data.type)
                   .form-group
-                      input#parseURL(type='checkbox' checked)
-                      span &nbsp;处理URL&nbsp;
+                  -if (!data.targetUser)
+                    button#draft.btn.btn-primary(type='submit') 保存草稿
+                  -else if(data.targetUser.uid === data.user.uid)
+                    button#draft.btn.btn-primary(type='submit') 保存草稿
+                  //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
+                    button#draft.btn.btn-primary(type='submit') 保存草稿
                   .form-group
-                      button#post.btn.btn-primary(type='submit') 发表
-                  if !['forum_declare'].includes(data.type)
-                    .form-group
-                    -if (!data.targetUser)
-                      button#draft.btn.btn-primary(type='submit') 保存草稿
-                    -else if(data.targetUser.uid === data.user.uid)
-                      button#draft.btn.btn-primary(type='submit') 保存草稿
-                    //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
-                      button#draft.btn.btn-primary(type='submit') 保存草稿
-                    .form-group
-                      if data.user
-                        a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
-              .form-group
-                //- input#parseURL(type='checkbox' checked)
-                //- span &nbsp;处理URL&nbsp;
-              .form-group
-                  div#disnoneplay(style='display:none')= data.content
-                  div#draftNowId(style='display:none')= data.content
-                  div#userNowId(style='display:none')= data.user.uid
-                  div#draftId(style='display:none')=`${data.did || ''}`
-                  div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
-                  div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
+                    if data.user
+                      a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
+            .form-group
+              //- input#parseURL(type='checkbox' checked)
+              //- span &nbsp;处理URL&nbsp;
+            .form-group
+                div#disnoneplay(style='display:none')= data.content
+                div#draftNowId(style='display:none')= data.content
+                div#userNowId(style='display:none')= data.user.uid
+                div#draftId(style='display:none')=`${data.did || ''}`
+                div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
+                div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
   
   include debug_output.pug
 block scripts
@@ -118,6 +121,8 @@ block scripts
   include ./publicModules/crop/crop
   script(src=`/media/media_index.js?v=${startTime}`)
   script(src=`/forum/forum_choice.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
   script.
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){

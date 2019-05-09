@@ -33,9 +33,9 @@ editorRouter
     data.navbar.highlight = 'editor';
     // type=post:重新编辑回复
     // 如果需要重新编辑html与语言的帖子，就使用新编辑器
-
     if(type !== 'application') {
 	    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
+      data.panelDatas = await db.ForumModel.getForumsNewTree(data.userRoles, data.userGrade, data.user);
 	    if(type === 'forum' && id) {
         const forum = await db.ForumModel.findOnly({fid: id});
         data.forumType = forum.forumType;

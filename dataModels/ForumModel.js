@@ -938,6 +938,65 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
   return result;
 };
 
+/**
+ * 获取新的专业树形结构
+ */
+forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  const ThreadTypeModel = mongoose.model("threadTypes");
+  const threadTypes = await ThreadTypeModel.find({});
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
+    }
+  }, {
+    fid: 1,
+    displayName: 1,
+    parentsId: 1,
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+
+    forum.id = forum.fid;
+    forum.name = forum.displayName;
+    forum.son = [];
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
+  });
+
+  for(let forum of forums) {
+    for(const fid of forum.parentsId) {
+      const parentForum = forumsObj[fid];
+      if(parentForum) {
+        parentForum.childrenForums.push(forum);
+        parentForum.son.push(forum);
+      }
+    }
+    if(forum.childrenForums.length == 0) {
+      for(const cate of threadTypes) {
+        if(cate.fid == forum.fid) {
+          forum.son.push({
+            id: "c"+cate.cid,
+            name: cate.name,
+            son:[]
+          })
+        }
+      }
+    }
+  }
+  const result = [];
+  for(let forum of forums) {
+    if(forum.parentsId.length === 0) {
+      result.push(forum);
+    }
+  }
+  return result;
+};
+
 /*
 * 获取用户关注的专业
 * @param {String} uid 用户ID

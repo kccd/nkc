@@ -265,7 +265,6 @@ postSchema.pre('save', async function(next) {
     const {c} = this;
     const atUsers = []; //user info {username, uid}
     const existedUsers = []; //real User mongoose data model
-    // 根据虎哥建议，重写@功能
     // 截取所有@起向后15字符的字符串
     var positions = [];
     // 引用的内容再次发布，不解析at
@@ -309,7 +308,7 @@ postSchema.pre('save', async function(next) {
       }
       for(var num = evePos.length;num >= 0;num--){
         var factName = await UserModel.findOne({usernameLowerCase:evePos.substr(0,num)});
-        if(factName){
+        if(factName && factName.username !== ""){
           // positions[i] = factName.username;
           positions[i] = positions[i].substr(0,num);
           break;

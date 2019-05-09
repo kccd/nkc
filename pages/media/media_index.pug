@@ -38,6 +38,7 @@ style.
       .mdui-row
         //- button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" :disabled="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? true : false") 上传
         button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" ) 上传
+        button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-red-600.mdui-ripple(onclick="uploadFile()" style="float:right;width:100%;margin-top: 5px;" v-bind:style="netWord == false ? 'display:block' : 'display:none'") 重新上传
       .mdui-row()
         .pastearea#paste-target(style="color:#000")
           p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。      
