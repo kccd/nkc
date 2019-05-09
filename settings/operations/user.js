@@ -2,6 +2,9 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
+    clear: {
+		  POST: "clearUserInfo"
+    },
 		banned: {
 			PATCH: 'unBannedUser',
 			DELETE: 'bannedUser'

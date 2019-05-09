@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const followerRouter = new Router();
 followerRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
-		let {page} = query;
+		const {data, db, query, state} = ctx;
+    const {pageSettings} = state;
+    let {page} = query;
 		page = page?parseInt(page): 0;
 		const {apiFunction} = ctx.nkcModules;
 		const {forum} = data;
@@ -15,7 +16,7 @@ followerRouter
       fid: forum.fid
     };
 		const count = await db.SubscribeModel.count(q);
-		const paging = apiFunction.paging(page, count);
+		const paging = apiFunction.paging(page, count, pageSettings.forumUserList);
 		data.paging = paging;
 		const sub = await db.SubscribeModel.find(q, {uid: 1});
 		const uid = sub.map(s => s.uid);

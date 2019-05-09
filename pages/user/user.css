@@ -248,6 +248,10 @@ body{
   color: #9baec8;
   transition: color;
 }
+.user-card-user-link:link, .user-card-user-link:visited, .user-card-user-link:active{
+  color: #9baec8;
+  text-decoration: none;
+}
 .user-card-user-link:hover{
   text-decoration: none;
   color: #282c37;

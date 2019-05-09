@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const latestRouter = new Router();
 latestRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
-    const {isModerator, forum} = data;
+		const {data, db, query, state} = ctx;
+		const {pageSettings} = state;
+    const {forum} = data;
 		let {page, s, cat, d} = query;
 		page = page?parseInt(page): 0;
 		// 构建查询条件
@@ -45,7 +46,7 @@ latestRouter
 
 		const count = await db.ThreadModel.count(match);
 		const {apiFunction} = ctx.nkcModules;
-		const paging = apiFunction.paging(page, count);
+		const paging = apiFunction.paging(page, count, pageSettings.forumThreadList);
 		data.paging = paging;
 		const limit = paging.perpage;
 		const skip = paging.start;

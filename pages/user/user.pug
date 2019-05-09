@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title=`${data.targetUser.username} - ${data.serverSettings.websiteName}`
+  title=`${data.targetUser.username || data.targetUser.uid} - ${data.serverSettings.websiteName}`
   +includeCSS("/user/user.css")
 block content
   .container-fluid.max-width
@@ -9,22 +9,27 @@ block content
       .col-xs-12.col-md-2
         .user-card-panel.m-b-2
           .user-image
-            .btn-ban
-              .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
+            if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
+              .btn-ban
+                .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
 
-              <ul class="dropdown-menu">
-                if data.targetUser.certs.includes("banned")
+                <ul class="dropdown-menu">
+                  if data.targetUser.certs.includes("banned")
+                    li
+                      a(href=`javascript: bannedUser("${data.targetUser.uid}", false)`) 解除封禁
+                  else
+                    li
+                      a(href=`javascript: bannedUser("${data.targetUser.uid}", true)`) 封禁
+                  <li role="separator" class="divider"></li>
                   li
-                    a(href=`javascript: bannedUser("${data.targetUser.uid}", false)`) 解除封禁
-                else
+                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "avatar")`) 删除头像
                   li
-                    a(href=`javascript: bannedUser("${data.targetUser.uid}", true)`) 封禁
-                <li role="separator" class="divider"></li>
-                <li><a href="#">删除头像</a></li>
-                <li><a href="#">删除背景</a></li>
-                <li><a href="#">删除用户名</a></li>
-                <li><a href="#">删除个人简介</a></li>
-              </ul>
+                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "banner")`) 删除背景
+                  li
+                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "username")`) 删除用户名
+                  li
+                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
+                </ul>
             .user-banner-mask
             a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank").user-avatar
               img(src=`/avatar/${data.targetUser.uid}`)

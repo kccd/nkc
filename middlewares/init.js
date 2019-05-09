@@ -24,6 +24,15 @@ const fsSync = {
 
 module.exports = async (ctx, next) => {
 	try {
+    ctx.data = Object.create(null);
+    Object.defineProperty(ctx, 'template', {
+      get: function() {
+        return './pages/' + this.__templateFile
+      },
+      set: function(fileName) {
+        this.__templateFile = fileName
+      }
+    });
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
     let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
@@ -40,19 +49,22 @@ module.exports = async (ctx, next) => {
 	  ctx.tools = tools;
 	  ctx.redis = redis;
     ctx.state = {
-      url: ctx.url.replace(/\?.*/ig, "")
+      url: ctx.url.replace(/\?.*/ig, ""),
     };
     ctx.settings = settings;
-	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
 	  // - 初始化网站设置
-		let serverSettings = await db.SettingModel.findOnly({_id: 'server'});
-		serverSettings = serverSettings.c;
+    const webSettings = await db.SettingModel.find({_id: {$in: ['server', 'page']}});
+    let serverSettings, pageSettings;
+    for(const s of webSettings) {
+      if(s._id === "server") serverSettings = s.c;
+      if(s._id === "page") pageSettings = s.c;
+    }
+    ctx.state.pageSettings = pageSettings;
 	  ctx.data.serverSettings = {
 			websiteName: serverSettings.websiteName,
-			// serverName: serverSettings.serverName.replace('$', global.NKC.NODE_ENV),
 		  github: serverSettings.github,
 		  copyright: serverSettings.copyright,
 		  record: serverSettings.record,
@@ -116,15 +128,6 @@ module.exports = async (ctx, next) => {
         return null
       }
     };
-
-		Object.defineProperty(ctx, 'template', {
-			get: function() {
-				return './pages/' + this.__templateFile
-			},
-			set: function(fileName) {
-				this.__templateFile = fileName
-			}
-		});
 
 		const reqType = ctx.request.get('REQTYPE');
 		if(reqType === 'app') {

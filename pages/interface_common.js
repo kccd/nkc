@@ -1870,3 +1870,20 @@ function fileToUrl(file) {
   });
 
 }
+
+/*
+* 清除用户信息
+* @param {String} uid 用户ID
+* @param {String} type 类型， 可选：avatar、banner、description、username
+* */
+function clearUserInfo(uid, type) {
+  nkcAPI("/u/" + uid + "/clear", "POST", {
+    type: type
+  })
+    .then(function() {
+      screenTopAlert("删除成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}

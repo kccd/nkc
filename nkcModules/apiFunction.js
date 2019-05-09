@@ -4,17 +4,18 @@ const http = require("http");
 const aliAppCode = require("../config/aliAppCode");
 const {appCode} = aliAppCode;
 moment.locale('zh-cn');
-let {perpage} = paging;
+const defaultPerpage = paging.perpage;
 let fn = {};
-fn.paging = (page, arrLength) => {
+fn.paging = (page, count, perpage) => {
   if(page === undefined) page = 0;
+  if(!perpage) perpage = defaultPerpage;
   return {
     page: parseInt(page),
     perpage: perpage,
     start: page*perpage,
-    count: 65,
-    pageCount: Math.ceil(arrLength/perpage),
-	  aggregate: arrLength
+    count: perpage,
+    pageCount: Math.ceil(count/perpage),
+	  aggregate: count
   }
 };
 
@@ -31,8 +32,8 @@ fn.getQueryObj = (query, match) => {
   else
     $sort.tlm = -1;
   let $skip, $limit;
-  $skip = page * perpage;
-  $limit = perpage;
+  $skip = page * defaultPerpage;
+  $limit = defaultPerpage;
   return {
     $match,
     $sort,
