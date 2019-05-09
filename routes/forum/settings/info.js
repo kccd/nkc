@@ -10,12 +10,12 @@ infoRouter
 		const {data, db, body} = ctx;
 		const {forum} = data;
 		let {operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
-		if(brief.length > 15) ctx.throw(400, "专业简介不能超过15个字");
 		if(operation && operation === 'updateDeclare') {
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
 			data.redirect = `/f/${forum.fid}/home`;
 		} else {
+			if(brief.length > 15) ctx.throw(400, "专业简介不能超过15个字");
 			if(!displayName) ctx.throw(400, '专业名称不能为空');
 			if(!abbr) ctx.throw(400, '专业简称不能为空');
 			// if(!brief) ctx.throw(400, '专业简介不能为空');
