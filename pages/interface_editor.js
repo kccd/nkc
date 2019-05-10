@@ -599,7 +599,7 @@ function onPost(that) {
       desType: desType,
       desTypeId: desTypeId
     };
-    if(type == "post") {
+    if(type == "post" || type == "thread" || type == "forum") {
       post.abstract = abstract
     };
     /*if (!that.blocked && (!that.childID)) {

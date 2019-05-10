@@ -54,10 +54,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
             .nkc-drawer-certs= data.user.info.certsName
             .nkc-drawer-count
               .col-xs-3
-                .nkc-drawer-count-number=data.user.threadCount
+                .nkc-drawer-count-number=data.user.threadCount - data.user.disabledThreadsCount
                 .nkc-drawer-count-title 文章
               .col-xs-3
-                .nkc-drawer-count-number=data.user.postCount
+                .nkc-drawer-count-number=data.user.postCount - data.user.disabledPostsCount
                 .nkc-drawer-count-title 回复
               .col-xs-3
                 .nkc-drawer-count-number=data.user.xsf
@@ -80,10 +80,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
               li
                 a(href=`/u/${data.user.uid}`)
                   span.fa.fa-user-circle-o &nbsp;个人名片
-                  span.pull-right.fa.fa-angle-right
-              li
-                a(href=`/m/${data.user.uid}`)
-                  span.fa.fa-window-maximize &nbsp;专栏
                   span.pull-right.fa.fa-angle-right
               li
                 a(href=`/u/${data.user.uid}/collections/unclassified`)
@@ -164,9 +160,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
               li
                 a(href=`/u/${user.uid}`)
                   span.fa.fa-user-o &nbsp;个人名片
-              li
-                a(href=`/m/${user.uid}`)
-                  span.fa.fa-window-maximize &nbsp;专栏
               li
                 a(href=`/message`)
                   span.fa.fa-envelope-o &nbsp;消息

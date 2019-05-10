@@ -2,7 +2,8 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {data, nkcModules, db, query} = ctx;
+    const {data, nkcModules, db, query, state} = ctx;
+    const {pageSettings} = state;
     let {page = 0, s, t} = query;
     const {user} = data;
     if(s) data.s = s;
@@ -58,7 +59,6 @@ router
 
     // 加载专业列表
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
-
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
     // 网站公告
@@ -160,7 +160,7 @@ router
     }
 
     const count = await db.ThreadModel.count(q);
-    const paging = nkcModules.apiFunction.paging(page, count);
+    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
 
     let sort = {tlm: -1};
     if(s === "toc") sort = {toc: -1};

@@ -716,7 +716,13 @@ function uploadFilePromise(url, data, onprogress, method) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {
-      if(onprogress) onprogress(e);
+      if(onprogress) {
+        var num = (e.loaded/e.total)*100;
+        if(num >= 100) num = 100;
+        var percentage = (num).toFixed(1);
+        percentage = percentage + "%";
+        onprogress(e, percentage)
+      };
     };
     xhr.onreadystatechange=function()
     {
@@ -1585,13 +1591,31 @@ function postsVote(pid, type) {
           }
         }
       }
-      numberIcon.innerHTML = number;
+      numberIcon.innerHTML = number || "";
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
     });
 }
 
+// 屏蔽鼓励原因
+function hideKcbRecordReason(pid, recordId, hide) {
+  nkcAPI("/p/" + pid + "/credit/kcb/" + recordId, "PATCH", {
+    hide: !!hide
+  })
+    .then(function() {
+      if(hide) {
+        screenTopAlert("屏蔽成功");
+      } else {
+        screenTopAlert("已取消屏蔽");
+      }
+
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+// 随机红包
 function lottery() {
   nkcAPI('/lottery', 'POST', {})
     .then(function(data) {
@@ -1815,4 +1839,51 @@ function closeDrawer() {
   bnt2.attr("onclick", "openRightDrawer()");
   $(".drawer-mask").removeClass("active");
   stopBodyScroll(false);
+}
+function base64ToFile(data, fileName) {
+  return blobToFile(base64ToBlob(data), fileName);
+}
+function base64ToBlob(data) {
+  var arr = data.split(','),
+  mime = arr[0].match(/:(.*?);/)[1],
+  bstr = atob(arr[1]),
+  n = bstr.length,
+  u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+function blobToFile(blob, fileName) {
+  blob.lastModifiedDate = new Date();
+  blob.name = fileName;
+  return blob;
+}
+
+function fileToUrl(file) {
+  return new Promise(function(resolve, reject) {
+    var reads = new FileReader();
+    reads.readAsDataURL(file);
+    reads.onload=function (e) {
+      resolve(this.result);
+    };
+  });
+
+}
+
+/*
+* 清除用户信息
+* @param {String} uid 用户ID
+* @param {String} type 类型， 可选：avatar、banner、description、username
+* */
+function clearUserInfo(uid, type) {
+  nkcAPI("/u/" + uid + "/clear", "POST", {
+    type: type
+  })
+    .then(function() {
+      screenTopAlert("删除成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
 }

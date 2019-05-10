@@ -161,6 +161,21 @@ router
 		await post.update({$push: {credits: updateObjForPost}});
     await thread.updateThreadEncourage();
 		await next();
-	});
+	})
+  .patch("/kcb/:recordId", async (ctx, next) => {
+    const {db, body, params} = ctx;
+    const {recordId, pid} = params;
+    const {hide} = body;
+    await db.KcbsRecordModel.updateOne({
+      _id: recordId,
+      pid,
+      type: "creditKcb"
+    }, {
+      $set: {
+        hideDescription: !!hide
+      }
+    });
+    await next();
+  });
 
 module.exports = router;

@@ -38,7 +38,7 @@ module.exports = {
 		POST: 'uploadResources',
 		PARAMETER: {
 			GET: 'getResources'
-		}
+		},
 	},
 	rt: {
 		PARAMETER: {
@@ -48,6 +48,11 @@ module.exports = {
 	rm: {
 		PARAMETER: {
 			GET: 'getMediums'
+		}
+	},
+	ro: {
+		PARAMETER: {
+			GET: 'getOrigins'
 		}
 	},
 	cover: {// 文章封面图

@@ -54,7 +54,6 @@ voteRouter
       }
     }
     await post.updatePostsVote();
-    post.voteUp = post.voteUp - post.voteDown;
     data.post = post;
     await next();
   })
@@ -84,7 +83,6 @@ voteRouter
       }
     }
     await post.updatePostsVote();
-    post.voteUp = post.voteUp - post.voteDown;
     data.post = post;
     await next();
   });

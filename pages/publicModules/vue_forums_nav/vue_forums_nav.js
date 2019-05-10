@@ -14,13 +14,6 @@ var vue_forums_Nav = new Vue({
     data = strToObj(data.innerHTML);
     this.forums = data.forums;
     this.subForums = data.subForums;
-    /*nkcAPI("/f", "GET")
-      .then(function(data) {
-        vue_forums_Nav.forums = data.forums;
-      })
-      .catch(function(data) {
-        screenTopWarning(data);
-      });*/
   },
   methods: {
     openForum: function(forum) {

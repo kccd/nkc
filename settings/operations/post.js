@@ -13,7 +13,10 @@ module.exports = {
         }
 			},
 			kcb: {
-				POST: 'creditKcb'
+				POST: 'creditKcb',
+        PARAMETER: {
+          PATCH: "modifyKcbRecordReason"
+        }
 			}
 		},
 		disabled: {

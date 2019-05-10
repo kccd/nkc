@@ -36,6 +36,7 @@ operationRouter
     await collection.remove();
     await next();
 	})
+  // 退修
 	.patch('/moveDraft', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
@@ -43,7 +44,16 @@ operationRouter
 		let {fid, cid, para} = ctx.body;
 		if(tid === undefined) ctx.throw(400, '参数不正确');
 		// 根据tid添加退回标记
-		let thread = await db.ThreadModel.findOne({tid})
+		let thread = await db.ThreadModel.findOne({tid});
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      const forums = await thread.extendForums(['mainForums']);
+      for(const f of forums) {
+        isModerator = await f.isModerator(user);
+        if(isModerator) break;
+      }
+    }
+    if(!isModerator) ctx.throw(403, '权限不足');
 		data.targetUser = await thread.extendUser();
 		if(thread.recycleMark === true || thread.fid === "recycle") ctx.throw(400, '该文章已经被退回')
 		await thread.update({recycleMark:true})
@@ -89,6 +99,7 @@ operationRouter
     await ctx.redis.pubMessage(message);
 		await next()
 	})
+  // 移动到回收站
 	.patch('/moveThread', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
@@ -224,7 +235,7 @@ operationRouter
     const {params, db, body} = ctx;
     const {fromFid, toFid, toCid} = body;
     const {tid} = params;
-    if(toFid === 'recycle') ctx.throw(400, '需移动文章到回收站请点击“送回收站”按钮');
+    if(toFid === 'recycle') ctx.throw(400, '如需移动文章到回收站请点击“送回收站”按钮');
     const thread = await db.ThreadModel.findOnly({tid});
     const fromForum = await db.ForumModel.findOnly({fid: fromFid});
     const childForumsCount = await db.ForumModel.count({parentsId: fromFid});
@@ -303,12 +314,19 @@ operationRouter
     const cids = threadTypes.map(t => t.cid);
     let {categoriesId} = thread;
     categoriesId = categoriesId.filter(cid => !cids.includes(cid));
-    await thread.update({$pull: {mainForumsId: fid}, categoriesId});
+    const updateObj = {
+      $pull: {mainForumsId: fid},
+      categoriesId
+    };
+    if(fid === "recycle") {
+      updateObj.disabled = false;
+    }
+    await thread.update(updateObj);
     await db.PostModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
     await db.InfoBehaviorModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
     await Promise.all(forums.map(async forum => {
       await forum.updateForumMessage();
-    }))
+    }));
     await next();
   })
 	.patch('/switchInPersonalForum', async (ctx, next) => {

@@ -25,6 +25,7 @@ const emailRouter = require('./email');
 const subRouter = require('./sub');
 const shopRouter = require('./shop');
 const registerRouter = require('./register');
+const safeRouter = require('./safe');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -55,6 +56,7 @@ settingRouter
   .use('/sub', subRouter.routes(), subRouter.allowedMethods())
   .use('/email', emailRouter.routes(), emailRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods())
+  .use('/safe', safeRouter.routes(), safeRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 module.exports = settingRouter;

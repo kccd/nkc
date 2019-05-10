@@ -12,7 +12,8 @@ block content
           .col-xs-12.col-md-2
             .col-xs-12.col-md-12
               .row
-                img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
+                a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank")
+                  img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username || '用户' + data.targetUser.uid
                 .text-center
                   -const targetUser = data.targetUser;
@@ -43,13 +44,13 @@ block content
                 .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
                   h5 文章
                   h4
-                    strong= data.targetUser.threadCount
+                    strong= data.targetUser.threadCount - data.targetUser.disabledThreadsCount
             .col-xs-6.col-md-6
               .row
                 .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
                   h5 回复
                   h4
-                    strong= data.targetUser.postCount
+                    strong= data.targetUser.postCount - data.targetUser.disabledPostsCount
             .col-xs-6.col-md-6
               .row
                 .text-center(style='border-right:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')

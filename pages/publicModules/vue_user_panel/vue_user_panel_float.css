@@ -2,22 +2,29 @@
   position: fixed;
   top: 100px;
   left: 100px;
-  height: 13rem;
+  height: 15rem;
   z-index: 10000;
   width: 25rem;
   background-color: #fff;
-  box-shadow: 0 0 20px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 0 20px 0 rgba(0,0,0,0.5);
   border-radius: 3px;
   background-size: cover;
-  padding: 1rem;
 }
 #vue_user_panel_float .user_base{
-  height: 6rem;
+  height: 10rem;
   position: relative;
 }
+#vue_user_panel_float .user_banner{
+  position: absolute;
+  top: 0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  z-index: 10009;
+}
 #vue_user_panel_float .user_info{
-  margin-top: 1rem;
-  padding-top: 1rem;
+  padding: 0.5rem 0;
   font-size: 1rem;
   height: 5rem;
 }
@@ -25,59 +32,113 @@
   padding: 0;
 }
 #vue_user_panel_float .user_avatar{
-  height: 5rem;
-  width: 5rem;
+  height: 10rem;
+  width: 10rem;
+  position: absolute;
   display: inline-block;
   vertical-align: top;
+  z-index: 10020;
+}
+#vue_user_panel_float .user_mask{
+  position: absolute;
+  z-index: 10010;
+  top: 0;
+  left: 0;
+  height:100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+#vue_user_panel_float .user_avatar a{
+  height: 8rem;
+  display: block;
+  width: 8rem;
+  margin-left: 1rem;
+  margin-top: -1rem;
+  background-color: #d9e1e8;
+  border-radius: 3px;
 }
 #vue_user_panel_float .user_avatar img{
-  height: 100%;
-  width: 100%;
-  border-radius: 50%;
+  height: 92px;
+  border-radius: 3px;
+  width: 92px;
+  margin: 2px 0 0 2px;
 }
 #vue_user_panel_float .user_div{
-  padding: 0 0.5rem;
+  position: absolute;
   display: inline-block;
   vertical-align: top;
-  width: 17rem;
+  z-index: 10020;
+  height: 10rem;
+  width: 14.5rem;
+
+  right: 0.5rem;
+  top: 0;
 }
 #vue_user_panel_float .user_name{
-  font-size: 1.3rem;
+  height: 2.3rem;
+  overflow: hidden;
+  display: inline-block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-height: 2.7rem;
+  -webkit-line-clamp: 1;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #282c37;
+  color: #fff;
+}
+#vue_user_panel_float .user_name:hover{
+  text-decoration: none;
 }
 #vue_user_panel_float .user_description{
   font-size: 1rem;
-  max-height: 3rem;
+  max-height: 4rem;
   overflow: hidden;
-  color: #555;
+  color: #ddd;
+  display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 #vue_user_panel_float .user_cert{
-  margin-top: 0.3rem;
-  margin-bottom: 0.2rem;
   font-size: 1rem;
+  font-weight: 700;
+  height: 1.8rem;
+  line-height: 1.8rem;
+  overflow: hidden;
+  display: inline-block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   color: #e85a71;
 }
 #vue_user_panel_float .user_info_count{
   font-weight: 700;
   font-size: 1.2rem;
+  height: 2rem;
+  overflow: hidden;
+  line-height: 2rem;
   text-align: center;
   color: #444;
+  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+  -webkit-line-clamp: 1;
 }
 #vue_user_panel_float .user_info_title{
   font-size: 1rem;
+  height: 2rem;
+  overflow: hidden;
+  line-height: 2rem;
   color: #777;
   text-align: center;
 }
 #vue_user_panel_float .user_id{
-  font-size: 1rem;
+  font-size: 1.2rem;
   padding-top: 0.5rem;
   text-align: center;
   font-weight: 700;
-  color: #555;
+  color: #fff;
 }
 #vue_user_panel_float .user-button{
   position:absolute;
@@ -88,6 +149,7 @@
   width: 2rem;
   text-align: center;
   line-height: 2rem;
-  color: #000;
+  z-index: 10030;
+  color: #fff;
   font-size: 1.4rem;
 }

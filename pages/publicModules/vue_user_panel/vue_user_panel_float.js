@@ -2,6 +2,7 @@ var vue_user_panel_float = new Vue({
   el: "#vue_user_panel_float",
   data: {
     show: false,
+    panelSwitch: false,
     top: 0,
     left: 0,
     user: {
@@ -14,11 +15,22 @@ var vue_user_panel_float = new Vue({
       postCount: 0,
       threadCount: 0
     },
-    usersObj: {}
+    usersObj: {},
+    timeout: ''
   },
   methods: {
     close: function() {
-      vue_user_panel_float.show = false;
+      this.timeout = setTimeout(function() {
+        vue_user_panel_float.show = false;
+      }, 100);
+    },
+
+    onPanel: function() {
+      clearTimeout(this.timeout)
+    },
+
+    outPanel: function() {
+      this.show = false;
     },
 
     getMousePosition: function(event) {
@@ -32,12 +44,13 @@ var vue_user_panel_float = new Vue({
     },
 
     loadUser: function(userString) {
+      clearTimeout(this.timeout)
       var user = strToObj(userString);
       var position = this.getMousePosition();
       var maxX = $(window).width();
       var maxY = $(window).height();
 
-      var top = position.y+20;
+      var top = position.y+40;
       var left = position.x-20;
       // console.log(maxX, maxY, top, left);
 
@@ -61,8 +74,8 @@ var vue_user_panel_float = new Vue({
         uid: targetUser.uid,
         kcb: targetUser.kcb,
         xsf: targetUser.xsf,
-        postCount: targetUser.postCount,
-        threadCount: targetUser.threadCount,
+        postCount: targetUser.postCount - targetUser.disabledPostsCount,
+        threadCount: targetUser.threadCount - targetUser.disabledThreadsCount,
         certsName: targetUser.info.certsName
       };
       vue_user_panel_float.user = vue_user_panel_float.usersObj[targetUser.uid];

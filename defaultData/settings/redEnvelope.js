@@ -3,6 +3,7 @@ module.exports = {
   c: {
     random: {
       close: true,
+      chance: 50,
       awards: [
         {
           "name" : "特等奖",

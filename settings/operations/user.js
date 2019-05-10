@@ -2,6 +2,9 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
+    clear: {
+		  POST: "clearUserInfo"
+    },
 		banned: {
 			PATCH: 'unBannedUser',
 			DELETE: 'bannedUser'
@@ -17,9 +20,12 @@ module.exports = {
     },
 		settings: {
 			GET: 'visitUserAvatarSettings',
-			avatar: {
-				GET: 'visitUserAvatarSettings',
-			},
+      avatar: {
+        GET: 'visitUserAvatarSettings',
+      },
+      banner: {
+        GET: 'visitUserBannerSettings',
+      },
 			username: {
 				PATCH: 'modifyUsername'
 			},

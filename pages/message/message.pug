@@ -177,10 +177,10 @@ block content
         .col-xs-12.col-md-10.col-md-offset-1
           .col-xs-3.col-md-3
             .friend-count-key 文章
-            .friend-count-value {{friend.targetUser.threadCount}}
+            .friend-count-value {{friend.targetUser.threadCount-friend.targetUser.disabledThreadsCount}}
           .col-xs-3.col-md-3
             .friend-count-key 回复
-            .friend-count-value {{friend.targetUser.postCount}}
+            .friend-count-value {{friend.targetUser.postCount - friend.targetUser.disabledPostsCount}}
           .col-xs-3.col-md-3
             .friend-count-key 学术分
             .friend-count-value {{friend.targetUser.xsf}}

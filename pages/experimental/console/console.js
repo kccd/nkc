@@ -67,7 +67,7 @@ var app = new Vue({
       vm.status = 'connect_timeout';
     });
     cs.on('message', function(data) {
-      if(vm.messages.length > 2000) {
+      if(vm.messages.length > 500) {
         vm.messages.splice(0, 1);
       }
       vm.messages.push(data);

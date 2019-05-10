@@ -2,7 +2,8 @@ const Router = require('koa-router');
 const visitorRouter = new Router();
 visitorRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
+		const {data, db, query, state} = ctx;
+		const {pageSettings} = state;
 		let {page} = query;
 		page = page?parseInt(page): 0;
 		let {behaviors} = data;
@@ -14,7 +15,7 @@ visitorRouter
 		}
 		const count = usersId.length;
 		const {apiFunction} = ctx.nkcModules;
-		const paging = apiFunction.paging(page, count);
+		const paging = apiFunction.paging(page, count, pageSettings.forumUserList);
 		data.paging = paging;
 		const uid = usersId.slice(paging.start, paging.start + paging.perpage);
 		data.visitors = [];

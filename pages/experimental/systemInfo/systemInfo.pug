@@ -4,21 +4,47 @@ block title
   -const mainContainer1400 = true;
   link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
   title 系统通知
+  style.
+    .info-panel-content{
+      margin-bottom: 3rem;
+    }
+    .info-panel-content span{
+      font-size: 1.2rem;
+      display: block;
+      padding: 1rem;
+      background-color: #d9e1e8;
+      margin-bottom: 0.5rem;
+    }
+    .info-panel-content textarea{
+      margin-bottom: 0.5rem;
+    }
 block content
-
-  .container-fluid.max-width#app
+  #data.hidden=objToStr({systemInfo: data.systemInfo})
+  .container-fluid.max-width
     .row
       include ../nav
-      .col-xs-12.col-md-5
-        h2 发送系统通知
-        .form
-          .form-group
-            textarea.form-control(v-model='text' rows=15 placeholder='请输入内容')
-          .form-group
-            button.btn.btn-primary.btn-block(@click='submit') 发送
-      .col-xs-12.col-md-7
-        h2 已发送的通知
-block scripts
+      .col-xs-12.col-md-12
+        .row#app(v-cloak)
+          .col-xs-12.col-md-5
+            h2 发送系统通知
+            .form
+              .form-group
+                textarea.form-control(v-model='text' rows=15 placeholder='请输入内容')
+              .form-group
+                button.btn.btn-primary.btn-block(@click='submit') 发送
+          .col-xs-12.col-md-7
+            h2 已发送的通知
+            div.info-panel(v-for="l in systemInfo")
+              div(style="font-size: 1.4rem;") {{format("YYYY/MM/DD HH:mm:ss", l.tc)}}
+              .info-panel-content.form-group
+                span(v-if="!l.modify") {{l.c}}
+                textarea.form-control(v-else v-model="l.c" rows="10")
+                div(v-if="l.modify")
+                  button.btn.btn-primary.btn-sm(@click="save(l)") 保存
+                  button.btn.btn-default.btn-sm(v-if="l.modify" @click="l.modify = false") 取消
+                div(v-else)
+                  button.btn.btn-default.btn-sm(@click="l.modify = !l.modify") 修改
 
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/systemInfo/systemInfo.js?v=${global.NKC.startTime}`)
+block scripts
+  include ../../publicModules/moment
+  +includeJS("/experimental/systemInfo/systemInfo.js")
