@@ -16,8 +16,8 @@ $(function() {
 // 指定图表的配置项和数据
   option = {
     title : {
-      text: '用户属性',
-      subtext: '根据用户发表的文章和回复所统计',
+      text: '社区贡献',
+      subtext: '根据用户发表的文章和回复统计',
       x:'left'
     },
     tooltip : {
