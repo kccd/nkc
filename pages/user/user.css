@@ -191,6 +191,7 @@ body{
   width: 8rem;
 }
 .post-cover-img{
+  background-size: cover;
   margin-top: 0.5rem;
   height: 5rem;
   border-radius: 3px;
