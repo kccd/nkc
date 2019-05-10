@@ -321,6 +321,42 @@ function APP_nkc_render(options){
     })
   }
 
+  render.hideContentByUser = function(content, user={xsf:0},from) {
+    if(content === null) return '';
+    var c1 = content.replace(/\[hide=([0-9]{1,3}).*]([\s\S]*)\[\/hide]/igm, function(c, number, content){
+      number = parseInt(number);
+      if(user.xsf >= number) {
+        if(from === 'thread') {
+          return c;
+        } else {
+          return content;
+        }
+      } else {
+        if(from === 'thread') {
+          return `[hide=${number}]内容已隐藏[/hide]`;
+        } else {
+          return '';
+        }
+      }
+    });
+    return c1.replace(/<div class="nkcHiddenBox"><div class="nkcHiddenNotes" contenteditable="false">浏览这段内容需要(.+?)学术分<\/div><div class="nkcHiddenContent">(.+?)<\/div><\/div>/igm, function(c, number, content){
+      number = parseInt(number);
+      if(user.xsf >= number) {
+        if(from === 'thread') {
+          return c;
+        } else {
+          return content;
+        }
+      } else {
+        if(from === 'thread') {
+          return `<div class="nkcHiddenBox"><div class="nkcHiddenNotes" contenteditable="false">浏览这段内容需要${number}学术分</div><div class="nkcHiddenContent">内容已隐藏</div></div>`;
+        } else {
+          return '';
+        }
+      }
+    });
+  };
+
   render.hiddenReplaceHTML = function(text){
     return text.replace(/\[hide=([0-9]{1,3}).*?]([^]*?)\[\/hide]/gm, //multiline match
     function(match,p1,p2,offset,string){
