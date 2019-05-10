@@ -1347,6 +1347,7 @@ footer.footer ul li{
 }
 .thread-panel-abstract-content{
   line-height: 1.8rem;
+  width: 1000px;
   word-break: break-all;
   max-height: 7rem;
   max-width: 100%;
