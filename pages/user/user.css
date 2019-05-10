@@ -204,6 +204,7 @@ body{
   vertical-align: top;
 }
 .post-content .single-post-content{
+  word-break: break-all;
 }
 .user-card-summary{
   padding: 1rem 0;
@@ -281,7 +282,7 @@ body{
   text-align: center;
   font-size: 1.4rem;
   height: 20rem;
-  line-height: 15rem;
+  padding-top: 8rem;
   color: #282c37;
   font-weight: 700;
 }
