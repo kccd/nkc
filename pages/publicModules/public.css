@@ -1272,7 +1272,8 @@ footer.footer ul li{
   display: inline-block;
 }
 .thread-panel-forum a{
-  color: #aaa;
+  color: #7e8da0;
+  font-weight: 700;
 }
 .thread-panel-forum a:hover, .thread-panel-forum a:active, .thread-panel-forum a:visited,.thread-panel-forum a:link{
   text-decoration: none;
