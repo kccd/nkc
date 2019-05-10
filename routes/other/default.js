@@ -8,9 +8,8 @@ router
     await next()
   })
   .get('/:file', async (ctx, next) => {
-    const {file, fs} = ctx.params;
+    const {file} = ctx.params;
     ctx.filePath = `${defaultPath}/${file}`;
-    console.log(ctx.filePath);
     ctx.type = 'jpg';
     await next()
   });

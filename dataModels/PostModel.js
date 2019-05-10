@@ -733,9 +733,13 @@ postSchema.statics.newPost = async (options) => {
   if(!user.generalSettings.lotterySettings.close) {
     const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
     if(!redEnvelopeSettings.c.random.close) {
-      const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
-      if(postCountToday === 1) {
-        await user.generalSettings.update({'lotterySettings.status': true});
+      const {chance} = redEnvelopeSettings.c.random;
+      const number = Math.ceil(Math.random()*100);
+      if(number <= chance) {
+        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+        if(postCountToday === 1) {
+          await user.generalSettings.update({'lotterySettings.status': true});
+        }
       }
     }
   }

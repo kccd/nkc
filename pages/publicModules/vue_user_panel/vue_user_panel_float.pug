@@ -29,17 +29,16 @@
           .user_cert {{user.certsName}}
           .user_description {{user.description}}
       .user_info
-        .row
-          .col-xs-3
-            .user_info_count {{user.threadCount}}
-            .user_info_title 文章
-          .col-xs-3
-            .user_info_count {{user.postCount}}
-            .user_info_title 回复
-          .col-xs-3
-            .user_info_count {{user.xsf}}
-            .user_info_title 学术分
-          .col-xs-3
-            .user_info_count {{user.kcb/100}}
-            .user_info_title 科创币
+        .col-xs-3
+          .user_info_count {{user.threadCount}}
+          .user_info_title 文章
+        .col-xs-3
+          .user_info_count {{user.postCount}}
+          .user_info_title 回复
+        .col-xs-3
+          .user_info_count {{user.xsf}}
+          .user_info_title 学术分
+        .col-xs-3
+          .user_info_count {{user.kcb/100}}
+          .user_info_title 科创币
 +includeJS("/publicModules/vue_user_panel/vue_user_panel_float.js")

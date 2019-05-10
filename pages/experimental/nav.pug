@@ -119,9 +119,9 @@
           if permission('visitRoleSettings')    
             li
               a(href='/e/settings/role') 证书
-          //-if permission('visitOperationSetting')     
+          if permission('experimentalSafeSettings')
             li
-              a(href='/e/settings/operation') 权限  
+              a(href='/e/settings/safe') 安全
           <li role="separator" class="divider"></li>    
           li
             a(href='/e/settings/home/top') 网站首页

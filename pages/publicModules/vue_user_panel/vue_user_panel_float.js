@@ -22,7 +22,7 @@ var vue_user_panel_float = new Vue({
     close: function() {
       this.timeout = setTimeout(function() {
         vue_user_panel_float.show = false;
-      }, 200);
+      }, 100);
     },
 
     onPanel: function() {
