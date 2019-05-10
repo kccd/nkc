@@ -14,21 +14,23 @@ block content
                 .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
 
                 <ul class="dropdown-menu">
-                  if data.targetUser.certs.includes("banned")
+                  if data.targetUser.certs.includes("banned") && permission("unBannedUser")
                     li
                       a(href=`javascript: bannedUser("${data.targetUser.uid}", false)`) 解除封禁
-                  else
+                    <li role="separator" class="divider"></li>
+                  if !data.targetUser.certs.includes("banned") && permission("bannedUser")
                     li
                       a(href=`javascript: bannedUser("${data.targetUser.uid}", true)`) 封禁
-                  <li role="separator" class="divider"></li>
-                  li
-                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "avatar")`) 删除头像
-                  li
-                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "banner")`) 删除背景
-                  li
-                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "username")`) 删除用户名
-                  li
-                    a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
+                    <li role="separator" class="divider"></li>
+                  if permission("clearUserInfo")
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "avatar")`) 删除头像
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "banner")`) 删除背景
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "username")`) 删除用户名
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
                 </ul>
             .user-banner-mask
             a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank").user-avatar
@@ -77,7 +79,7 @@ block content
           include ../publicModules/paging/paging
           if data.t === "thread" || !data.t
             if data.posts.length === 0
-              .user-list-warning 用户似乎未发表过任何内容~
+              .user-list-warning 用户貌似未发表过任何内容~
             else
               -let insert = false;
               for post, index in data.posts

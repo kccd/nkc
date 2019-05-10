@@ -30,6 +30,9 @@ latestRouter
       disabled: false,
       recycleMark: {$ne: true}
     };
+    if(forum.fid === "recycle") {
+      delete toppedThreadMatch.disabled;
+    }
     // 加载、拓展置顶文章
     const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
 
@@ -41,7 +44,9 @@ latestRouter
 
 		match.mainForumsId = {$in: fidOfCanGetThreads};
 		match.tid = {$nin: topThreadsId};
-		match.disabled = false;
+		if(forum.fid !== "recycle") {
+      match.disabled = false;
+    }
 		match.recycleMark = {$ne: true};
 
 		const count = await db.ThreadModel.count(match);

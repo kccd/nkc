@@ -1632,7 +1632,7 @@ function lottery() {
       var header = domOpen.getElementsByClassName('lottery-info-header');
       if(header.length === 0) return;
       if(!result) {
-        return header[0].innerText = '未中奖';
+        return header[0].innerText = '哈哈没中';
       }
       header[0].innerText = result.name;
       var content = domOpen.getElementsByClassName('lottery-info');
