@@ -85,70 +85,42 @@ style.
     text-decoration: line-through;
   }
 .row
-  .col-xs-12.col-md-12(style="margin-bottom:5px")
-    if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts')) 
-      if !product.adminBan
-        .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
-          button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")#productImageDom
-      ul#etalage
-        -for(let rid of product.imgIntroductions)
-          li
-            img.etalage_thumb_image(src=`/r/${rid}`)
-            img.etalage_source_image(src=`/r/${rid}`)
+  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts')) 
+    if !product.adminBan
+      .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
+        button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
+  .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")#productImageDom
+    ul#etalage
+      -for(let rid of product.imgIntroductions)
+        li
+          img.etalage_thumb_image(src=`/r/${rid}`)
+          img.etalage_source_image(src=`/r/${rid}`)
 
-    .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
-      p.item 
-        span#showText #{cutContent(post.abstract,60)}
-        if post.abstract && post.abstract.length > 60
-          span#hideText(style="display:none")!=`${post.abstract}`
+  .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
+    p.item 
+      span#showText #{cutContent(post.abstract,60)}
+      if post.abstract && post.abstract.length > 60
+        span#hideText(style="display:none")!=`${post.abstract}`
+        span 
+          a(onclick="showAbstract()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showAbstract") 展开
+          a(onclick="hideAbstract()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideAbstract") 收起
+    if product.keywords && product.keywords.length > 0
+      p(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+        span#showWords #{cutContent(post.keywords,25)}
+        if post.keywords && post.keywords.length > 25
+          span#hideWords(style="display:none")!=`${post.keywords}`
           span 
-            a(onclick="showAbstract()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showAbstract") 展开
-            a(onclick="hideAbstract()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideAbstract") 收起
-      if product.keywords && product.keywords.length > 0
-        p(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
-          span#showWords #{cutContent(post.keywords,25)}
-          if post.keywords && post.keywords.length > 25
-            span#hideWords(style="display:none")!=`${post.keywords}`
-            span 
-              a(onclick="showKeywords()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showKeywords") 展开
-              a(onclick="hideKeywords()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideKeywords") 收起
-      //- if product.attentions && product.attentions.length > 0
-      //-   ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
-      //-     for attStr in product.attentions
-      //-       li(style="margin:0px")!=`* ${attStr}`
-      div.item(style="background:#c7fff8")
-        div(style="padding:7px 0;color:#333")
-          if !product.productSettings.priceShowToVisit && !data.user
-            p
-              span.title 价格
-              a(style="color:orangered" href="/login") 登陆可见
-          else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
-            p
-              span.title 价格
-              span(style="color:orangered") 停售不可见
-          else
-            p
-              span.title 价格
-              span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
-            if data.vipDiscount
-              p
-                span.title 会员价
-                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price * (data.vipDisNum/100))}
-            else
-              p
-                span.title 优惠价
-                span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
-      div.item
-        p
-          span.title 快递
-          span.location(style="font-size:small") #{getProvinceCity(product.dealInfo.address)}
-          span.location(style="font-size:small;") 至
-          input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
-      div.item(style="border-bottom: 1px solid #e5e5e5")
+            a(onclick="showKeywords()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showKeywords") 展开
+            a(onclick="hideKeywords()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideKeywords") 收起
+    //- if product.attentions && product.attentions.length > 0
+    //-   ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+    //-     for attStr in product.attentions
+    //-       li(style="margin:0px")!=`* ${attStr}`
+    div.item(style="background:#c7fff8")
+      div(style="padding:7px 0;color:#333")
         if !product.productSettings.priceShowToVisit && !data.user
           p
-            span.title 运费
+            span.title 价格
             a(style="color:orangered" href="/login") 登陆可见
         else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
           p
@@ -156,52 +128,78 @@ style.
             span(style="color:orangered") 停售不可见
         else
           p
-            span.title 运费
-            if product.isFreePost
-              span#freightPrice 免邮
-              input#isFreePost(type="text" value="freePost" style="display:none")
-            else
-              span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
-              span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
-              input#isFreePost(type="text" value="payPost" style="display:none")
-      div.item
-        p
-          span.title 数量
-          span(style="display: inline-flex;margin-right:5px")
-            button(onclick=`delStock()`) -
-            input#buyCount(style='width: 3rem;' value="1")
-            button(onclick=`addStock()`) +
-          span.location(style="font-size:12px") 库存
-          span#stockCount=`${product.productParams[paId].stocksSurplus}`
-          span.location(style="font-size:12px") 件
-      .item
-        .row
-          span.title.col-xs-12(style="padding-right:0;margin-bottom:15px") 规格
-          span.col-xs-12(style="margin: 0 19px 0 10px;")
-            for para in product.productParams
-              span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
-                span=para.name
-      div.item
-        if product.adminBan
-          p(style="text-align: center; background-color:tomato;padding:10px") 该商品已被禁售
-        else
-          if product.productStatus == "stopsale"
-            p(style="text-align: center;background-color: tomato;padding:10px") 商品已被卖家停售
+            span.title 价格
+            span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
+          if data.vipDiscount
+            p
+              span.title 会员价
+              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price * (data.vipDisNum/100))}
           else
-            div(style="display:none")#paraId!=`${paraId}`
-            a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
-              span.fa.fa-shopping-cart  加入购物车
-    .col-xs-1.col-md-1 
+            p
+              span.title 优惠价
+              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+    div.item
+      p
+        span.title 快递
+        span.location(style="font-size:small") #{getProvinceCity(product.dealInfo.address)}
+        span.location(style="font-size:small;") 至
+        input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
+    div.item(style="border-bottom: 1px solid #e5e5e5")
+      if !product.productSettings.priceShowToVisit && !data.user
+        p
+          span.title 运费
+          a(style="color:orangered" href="/login") 登陆可见
+      else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+        p
+          span.title 价格
+          span(style="color:orangered") 停售不可见
+      else
+        p
+          span.title 运费
+          if product.isFreePost
+            span#freightPrice 免邮
+            input#isFreePost(type="text" value="freePost" style="display:none")
+          else
+            span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+            input#isFreePost(type="text" value="payPost" style="display:none")
+    div.item
+      p
+        span.title 数量
+        span(style="display: inline-flex;margin-right:5px")
+          button(onclick=`delStock()`) -
+          input#buyCount(style='width: 3rem;' value="1")
+          button(onclick=`addStock()`) +
+        span.location(style="font-size:12px") 库存
+        span#stockCount=`${product.productParams[paId].stocksSurplus}`
+        span.location(style="font-size:12px") 件
+    .item
+      .row
+        span.title.col-xs-12(style="padding-right:0;margin-bottom:15px") 规格
+        span.col-xs-12(style="margin: 0 19px 0 10px;")
+          for para in product.productParams
+            span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
+              span=para.name
+    div.item
+      if product.adminBan
+        p(style="text-align: center; background-color:tomato;padding:10px") 该商品已被禁售
+      else
+        if product.productStatus == "stopsale"
+          p(style="text-align: center;background-color: tomato;padding:10px") 商品已被卖家停售
+        else
+          div(style="display:none")#paraId!=`${paraId}`
+          a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+          a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+            span.fa.fa-shopping-cart  加入购物车
+  .col-xs-1.col-md-1 
 
+  if product.dealInfo.dealAnnouncement
+    .col-xs-12.col-md-12(style="margin-top:5px")
+      div(style="border:2px solid #bbe0e1;padding:5px")
+        p(style="font-size:15px") 公告
+        p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
   .col-xs-12.col-md-12
-    if product.dealInfo.dealAnnouncement
-      .col-xs-12.col-md-12
-        div(style="border:2px solid #bbe0e1;padding:5px")
-          p(style="font-size:15px") 公告
-          p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
-    .col-xs-12.col-md-12
-      div(style="padding:5px")!=experimental_render(post)
+    div!=experimental_render(post)
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
@@ -220,6 +218,12 @@ block scripts
         small_thumbs:5,
         autoplay: false
       });
+      $(".etalage").each(function() {
+        $(this).css("width", "100%")
+      })
+      $(".etalage_thumb_image").each(function() {
+        $(this).css("width", "100%")
+      })
     });
     $("#city").click(function (e) {
       SelCity(this,e);
