@@ -37,8 +37,8 @@ block content
           .row
             .form-group
                 input#title.form-control.tabPanel(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
-            .form-group
-              textarea#abstract.form-control(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
+            //- .form-group
+            //-   textarea#abstract.form-control(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
                 //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
             //- .form-group
             //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
@@ -70,9 +70,22 @@ block content
             include ./media/media_index.pug
             .form-horizontal
               .form-group
-                label.col-sm-1.control-label 专业分类
-                .col-sm-11
+                label.col-sm-12 专业分类
+                .col-sm-12
                   input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
+            include ./editor/paper.pug
+            //- .form-horizontal
+            //-   .form-group
+            //-     label.col-sm-12 文章摘要
+            //-     .col-sm-6
+            //-       textarea#abstract.form-control(name="", style="width:100%;resize: vertical;" rows="3" placeholder='中文摘要(选填)')!=`${data.abstract || ''}`
+            //-     .col-sm-6
+            //-       textarea#abstract.form-control(name="", style="width:100%;resize: vertical;" rows="3" placeholder='英文摘要(选填)')!=`${data.abstract || ''}`
+            //- .form-horizontal
+            //-   .form-group
+            //-     label.col-sm-12 关键词
+            //-     .col-sm-12
+            //-       input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
             //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
             //-   include ./forum/forum_choice.pug
             .tool_area_wrp

@@ -1,0 +1,23 @@
+//- 论文相关组件
+#abstract(style="display:none")
+  .form-horizontal
+    .form-group
+      label.col-sm-12 文章摘要
+      .col-sm-6
+        textarea#abstractCn.form-control(name="", style="width:100%;resize: vertical;" rows="3" placeholder='中文摘要(选填)')
+      .col-sm-6
+        textarea#abstractEn.form-control(name="", style="width:100%;resize: vertical;" rows="3" placeholder='英文摘要(选填)')
+.form-horizontal
+  .form-group
+    label.col-sm-12 关键词
+    .col-sm-12
+      input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
+.form-horizontal
+  .form-group
+    label.col-sm-12 作者信息
+    input#authName(type="text", name="")
+    input#contact(type="checkbox", name="")
+    input(type="text", name="")
+    input(type="text")
+
++includeJS("/editor/paper.js")

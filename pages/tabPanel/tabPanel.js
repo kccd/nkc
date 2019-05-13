@@ -20,6 +20,7 @@ var panelProto = {
         closeId: "panelClose", // 关闭按钮Id，如无必要，无需另传
         headerId: "panelHeader", // 头部Id，如无必要，无需另传
         contentWallId: "panelContentWall", // content内壁Id，如无必要，无需另传
+        headerText: "请选择专业(最多可选两个)",
         panelExist: false, // panel是否存在
         panelInit: false, // panel是否初始化
         tagsLast: {
@@ -107,7 +108,7 @@ var panelProto = {
 
         // 创建一个header
         var panelHeader = document.createElement("div");
-        panelHeader.innerHTML = "请选择专业";
+        panelHeader.innerHTML = panelProto.config.headerText;
         panelHeader.setAttribute("id", panelProto.config.headerId);
         panelHeader.className = "panelHeader";
         panelWall.appendChild(panelHeader)
