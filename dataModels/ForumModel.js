@@ -943,9 +943,11 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
  */
 forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
   const ForumModel = mongoose.model("forums");
+  const SubscribeModel = mongoose.model("subscribes");
   const ThreadTypeModel = mongoose.model("threadTypes");
   const threadTypes = await ThreadTypeModel.find({});
   let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  const subForums = await SubscribeModel.find({type: "forum", uid: user.uid});
   let forums = await ForumModel.find({
     fid: {
       $in: fid
@@ -988,11 +990,28 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
       }
     }
   }
+  // 我关注的
+  const mySubForums = {
+    id: "mySub",
+    name: "我关注的",
+    son:[]
+  }
+  for(let subf of subForums) {
+    for(let forum of forums) {
+      if(forum.fid == subf.fid){
+        mySubForums.son.push(forum)
+      }
+    }
+  }
+
   const result = [];
   for(let forum of forums) {
     if(forum.parentsId.length === 0) {
       result.push(forum);
     }
+  }
+  if(mySubForums.son.length > 0) {
+    result.unshift(mySubForums)
   }
   return result;
 };

@@ -327,7 +327,7 @@ function nkc_render(options){
     function(match,p1,p2,offset,string){
       var specified_xsf = parseInt(p1)
       var hidden_content = p2
-
+      
       //return '[hide='+specified_xsf+']'+hidden_content+'[/hide]'
 
       return '<div class="nkcHiddenBox">'
@@ -424,7 +424,7 @@ function nkc_render(options){
 
   var pwbb_experimental = function(post,isHTML){
     var content = post.c||''
-    
+
     var html = ''
 
     if(!isHTML){  //bbcode

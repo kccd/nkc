@@ -549,15 +549,23 @@ function onPost(that) {
 
 		var id = that.blocked ? that.query.id : that.childID;
 		if(type === 'forum' || !type || desType === 'forum') {
-			
-			try{
-        var obj = getFidAndCidResult();
-      }catch(e){
+      var panelObj = $("#tabPanel").tagsinput("items");
+      if(panelObj.length == 0) {
         screenTopWarning(e)
         return;
+      }else{
+        for(var po=0;po<panelObj.length;po++) {
+          if(fids.indexOf(panelObj[po].fid) == -1) {
+            fids.push(panelObj[po].fid)
+          }
+          if(panelObj[po].cid !== "") {
+            var dealCid = panelObj[po].cid.substr(1);
+            if(cids.indexOf(dealCid) == -1) {
+              cids.push(dealCid)
+            }
+          }
+        }
       }
-      if(obj.fids) fids = obj.fids;
-      if(obj.cids) cids = obj.cids;
       id = fids[0];
       cat = cids[0];
 			type = 'forum';
@@ -566,8 +574,6 @@ function onPost(that) {
 				id = that.query.id;
 			}
 		}
-
-
 
     var language = that.language?that.language.value.toLowerCase().trim():'html'
     if (content === '') {

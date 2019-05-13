@@ -16,8 +16,6 @@ editorRouter
     if(type && type === "forum"){
       existsFid = id;
     }
-    data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines(existsFid);
-    data.subscribeTopics = await userSubscribe.extendSubscribeTopics(existsFid);
     data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     const authLevel = await userPersonal.getAuthLevel();
 	  if((!user.volumeA || authLevel < 1) && type !== 'application') {

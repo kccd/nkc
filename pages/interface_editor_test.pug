@@ -6,7 +6,19 @@ block title
   include MathJax.pug
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
   link(rel='stylesheet' href=`/tabPanel/tabPanel.css?v=${global.NKC.startTime}`)
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
 block content
+  style.
+    .tool_area_wrp {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      background-color: #eee;
+      border-top: 1px solid #d9dadc;
+      min-width: 768px;
+    }
   -var mainContainer1400 = true
   .hidden#panelDatas= JSON.stringify(data.panelDatas)
   #ife.container-fluid(style='max-width:1400px')
@@ -26,7 +38,7 @@ block content
             .form-group
                 input#title.form-control.tabPanel(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
             .form-group
-              textarea#abstract(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
+              textarea#abstract.form-control(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
                 //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
             //- .form-group
             //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
@@ -40,8 +52,6 @@ block content
             //-     //    option 无
             //-     //select.form-control#lang(style='display: none; width: auto;')
             //-     //    option html
-            .form-group
-              input#tabPanel.form-control(type='text' placeholder='选择专业...' onclick="openPanel(this)")
             input.hidden#lang(value=data.l)
             if data.delReason 
               .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
@@ -58,10 +68,15 @@ block content
             //-     include interface_attachment_uploader_uploader.pug
 
             include ./media/media_index.pug
-
-            if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-              include ./forum/forum_choice.pug
-            .form-inline
+            .form-horizontal
+              .form-group
+                label.col-sm-1.control-label 专业分类
+                .col-sm-11
+                  input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
+            //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+            //-   include ./forum/forum_choice.pug
+            .tool_area_wrp
+              .form-inline(style="text-align:center;padding-bottom: 25px;padding-top: 25px;")
                 .form-group
                     input#parseURL(type='checkbox' checked)
                     span &nbsp;处理URL&nbsp;
@@ -97,6 +112,7 @@ block scripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src="/jquery-1.10.2.js")
   script(src="/jquery-ui-1.10.4.custom.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
@@ -129,3 +145,14 @@ block scripts
         return "离开前保存草稿了吗？"
       }
     }
+    $("#tabPanel").tagsinput({
+      maxChars: 15, // 单个标记最大字符数 
+      maxTags: 2, // 最大标签数
+      itemValue: 'id',
+      itemText: 'name'
+    })
+    $(".bootstrap-tagsinput").children("input").attr("readonly", true)
+    $(".bootstrap-tagsinput").css("background-color", "#eee")
+    $(".bootstrap-tagsinput").click(function () {
+      openPanel(this);
+    });

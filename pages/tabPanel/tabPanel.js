@@ -215,17 +215,18 @@ var panelProto = {
         panelProto.config.contentLast.id = dataId;
         panelProto.config.contentLast.name = dataName;
         // 点击即为选中，输出选中的id
-        panelProto.outputTagsLast();
         panelProto.outputContentLast();
     },
     // 输出选中的tags
     outputTagsLast: function() {
-        console.log("最终选中tags：", panelProto.config.tagsLast)
+        // console.log("最终选中tags：", panelProto.config.tagsLast)
+        $("#tabPanel").tagsinput('add', {id:panelProto.config.tagsLast.id,name:panelProto.config.tagsLast.name,fid:panelProto.config.tagsLast.id,cid:""})
         panelProto.close();
     },
     // 输出选中的content
     outputContentLast: function() {
-        console.log("最终选中content：", panelProto.config.contentLast)
+        // console.log("最终选中content：", panelProto.config.tagsLast.name+":"+panelProto.config.contentLast.name)
+        $("#tabPanel").tagsinput('add', {id:panelProto.config.tagsLast.id+":"+panelProto.config.contentLast.id,name:panelProto.config.tagsLast.name+":"+panelProto.config.contentLast.name,fid:panelProto.config.tagsLast.id,cid:panelProto.config.contentLast.id})
         panelProto.close();
     },
     // 给选中tags添加active

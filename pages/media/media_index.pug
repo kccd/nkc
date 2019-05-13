@@ -2,10 +2,10 @@ style.
   [v-vloak]{display:none}
 style.
   .pastearea {
-    border-color: #ACC585;
+    border-color: #9baec8;
     border-width: 2px;
     border-style: dashed;
-    background-color: #ECF3E2;
+    background-color: #d9e1e8;
     //height: 60px;
     //margin-top:10px;
     //margin-bottom:-15px;
@@ -23,6 +23,10 @@ style.
     height: 32px;
     min-width: 1px;
   }
+  .mdui-blue-color {
+    color: #fff !important;
+    background-color: #2b90d9 !important;
+  }
 .panel.panel-default#mediaList(v-cloak)
   .mdui-row(style="margin:0" v-if="isPc")
     .mdui-col-xs-2
@@ -36,8 +40,8 @@ style.
         button#mediaAudioLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('audio')" :class="mediaType == 'audio'?uploadButtonClass:''") 音频
         button#mediaAttachmentLists.mdui-col-xs-6.mdui-btn.mdui-btn-raised.mdui-ripple(style="" @click="buttonClick('attachment')" :class="mediaType == 'attachment'?uploadButtonClass:''") 附件
       .mdui-row
-        //- button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" :disabled="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? true : false") 上传
-        button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" ) 上传
+        //- button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-blue-color.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" :disabled="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? true : false") 上传
+        button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-blue-color.mdui-ripple(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" ) 上传
         button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-red-600.mdui-ripple(onclick="uploadFile()" style="float:right;width:100%;margin-top: 5px;" v-bind:style="netWord == false ? 'display:block' : 'display:none'") 重新上传
       .mdui-row()
         .pastearea#paste-target(style="color:#000")
@@ -180,7 +184,7 @@ style.
               //- .mdui-textfield(style="display:inline-flex;width:30px")
               input(type="text" v-model="appointSkip" style="width:40px")
               button.mdui-btn.mdui-ripple.mdui-ripple-black(style="min-width:5px" onclick="turnPage()") 跳转
-            div(style="font-size:10px;color:blue") 注:上传文件不大于200M.图片格式:jpg|jpeg|png|gif|svg|bmp.视频格式:mp4|mov|3gp|avi.音频格式:mp3|wav|amr.
+            div(style="font-size:10px;color:#9baec8") 注:上传文件不大于200M.图片格式:jpg|jpeg|png|gif|svg|bmp.视频格式:mp4|mov|3gp|avi.音频格式:mp3|wav|amr.
       // 翻页 prev next
       //- .panel-footer#pageTurnButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:block")
       //-   nav(aria-label="...")
@@ -252,7 +256,7 @@ style.
       .panel-footer(style="padding:0;background-color:#fff;border:0;padding-top:10px;")
         .mdui-row
           .mdui-col-xs-2
-            button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-color-green-600.mdui-ripple(onclick="clickButton()") 上传
+            button.mdui-btn.mdui-btn-raised.mdui-btn-dense.mdui-blue-color.mdui-ripple(onclick="clickButton()") 上传
           .mdui-col-xs-10
             div(style="float:right")
               button.mdui-btn.mdui-ripple.mdui-ripple-black#prevButton(onclick="prevPage()" style="min-width:5px")
