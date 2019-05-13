@@ -240,6 +240,11 @@ function SelCity(obj, e) {
         content: dal,
         width: "470"
     });
+    var ismobile = IsPC();
+    if(!ismobile) {
+        $("#PoPy").css("left", "0")
+        $("._citys").css("width", document.body.scrollWidth)
+    }
     $("#cColse").click(function() {
         Iput.colse()
     });
@@ -360,4 +365,19 @@ function getArea(obj) {
     }
     $("#_citysheng").html('请选择区县');
     return g
+}
+
+function IsPC() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = ["Android", "iPhone",
+                "SymbianOS", "Windows Phone",
+                "iPad", "iPod"];
+    var flag = true;
+    for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
 }
