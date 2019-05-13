@@ -1,0 +1,17 @@
+.error-icon=`400 Bad Request`
+.error-list.b-s-10
+  .error-header 抱歉！服务器无法理解您提交的参数，可能是因为：
+  .error-header
+  ul
+    li
+      .num 1
+      | 未输入参数或参数类型错误
+    li
+      .num 2
+      | 服务器在跟您开玩笑
+  .error-code
+    span message：
+    code= data.error
+  .error-info 请检查您输入的参数是否符合要求。若问题依然存在，请
+    a(href=`/problem/add?c=${data.error}`) 上报问题
+    | ，召唤网站工程师来解决掉这个bug。

@@ -21,10 +21,10 @@ router
 		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
 		const operation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
-		const modifyUsernameCount = await db.UsersScoreLogModel.count({
-			uid: user.uid,
-			operationId: 'modifyUsername',
-			type: 'kcb',
+		const modifyUsernameCount = await db.KcbsRecordModel.count({
+			from: user.uid,
+      to: "bank",
+			type: 'modifyUsername',
 			toc: {$gt: nkcModules.apiFunction.today()}
 		});
 		if(operation.count !== 0) {

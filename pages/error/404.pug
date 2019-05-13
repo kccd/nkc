@@ -1,0 +1,9 @@
+.error-icon=`404 Not Found`
+.error-list.b-s-10
+  .error-header 糟糕！您访问的页面迷路了，请检查链接。
+  .error-code
+    span URL：
+    code= data.url
+  .error-info 您还可以
+    a(href=`/problem/add?c=${data.url}`) 上报问题
+    | ，帮助页面找到回家的路~

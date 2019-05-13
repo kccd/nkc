@@ -1,0 +1,11 @@
+extends ../bootstrap_base
+block title
+  title= data.status
+  +includeCSS("/error/error.css")
+block content
+  .container-fluid.max-width
+    .error-content
+      block errorContent
+block scripts
+  +includeJS("/error/error.js")
+  block errorScripts

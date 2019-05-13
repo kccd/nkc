@@ -1,0 +1,9 @@
+.error-icon=`500 Internal Server Error`
+.error-list.b-s-10
+  .error-header 糟糕！服务器貌似出问题了~
+  .error-code
+    span message：
+    code= data.error
+  .error-info 您可以
+    a(href=`/problem/add?c=${data.error}`) 上报问题
+    | ，召唤网站工程师来解决掉这个bug。
