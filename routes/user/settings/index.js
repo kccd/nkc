@@ -27,10 +27,14 @@ settingRouter
 		data.authLevel = await userPersonal.getAuthLevel();
 		await next();
 	})
-	.get(['/', '/avatar'], async (ctx, next) => {
-		ctx.template = 'interface_user_settings_avatar.pug';
-		await next();
-	})
+  .get(['/', '/avatar'], async (ctx, next) => {
+    ctx.template = 'interface_user_settings_avatar.pug';
+    await next();
+  })
+  .get('/banner', async (ctx, next) => {
+    ctx.template = 'interface_user_settings_banner.pug';
+    await next();
+  })
   .use("/alipay", alipayRouter.routes(), alipayRouter.allowedMethods())
   .use('/red_envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
 	.use('/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())

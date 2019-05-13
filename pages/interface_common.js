@@ -1591,13 +1591,31 @@ function postsVote(pid, type) {
           }
         }
       }
-      numberIcon.innerHTML = number;
+      numberIcon.innerHTML = number || "";
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
     });
 }
 
+// 屏蔽鼓励原因
+function hideKcbRecordReason(pid, recordId, hide) {
+  nkcAPI("/p/" + pid + "/credit/kcb/" + recordId, "PATCH", {
+    hide: !!hide
+  })
+    .then(function() {
+      if(hide) {
+        screenTopAlert("屏蔽成功");
+      } else {
+        screenTopAlert("已取消屏蔽");
+      }
+
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+// 随机红包
 function lottery() {
   nkcAPI('/lottery', 'POST', {})
     .then(function(data) {
@@ -1614,7 +1632,7 @@ function lottery() {
       var header = domOpen.getElementsByClassName('lottery-info-header');
       if(header.length === 0) return;
       if(!result) {
-        return header[0].innerText = '未中奖';
+        return header[0].innerText = '哈哈没中';
       }
       header[0].innerText = result.name;
       var content = domOpen.getElementsByClassName('lottery-info');
@@ -1851,4 +1869,21 @@ function fileToUrl(file) {
     };
   });
 
+}
+
+/*
+* 清除用户信息
+* @param {String} uid 用户ID
+* @param {String} type 类型， 可选：avatar、banner、description、username
+* */
+function clearUserInfo(uid, type) {
+  nkcAPI("/u/" + uid + "/clear", "POST", {
+    type: type
+  })
+    .then(function() {
+      screenTopAlert("删除成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
 }

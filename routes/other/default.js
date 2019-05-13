@@ -10,9 +10,7 @@ router
   .get('/:file', async (ctx, next) => {
     const {file} = ctx.params;
     ctx.filePath = `${defaultPath}/${file}`;
-    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
-    const [name, ext] = file;
-    ctx.type = ext;
+    ctx.type = 'jpg';
     await next()
   });
 

@@ -1,12 +1,27 @@
-function savePage() {
-	var obj = {
-		homeThreadsFirstLoad: $('#homeThreadsFirstLoad').val()
-	};
-	nkcAPI('/e/settings/page', 'PATCH', obj)
-		.then(function() {
-			screenTopAlert('保存成功');
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error|| data);
-		})
-}
+var app = new Vue({
+  el: "#app",
+  data: {
+    pageSettings: "",
+    error: "",
+    info: ""
+  },
+  mounted: function() {
+    var data = getDataById("data");
+    this.pageSettings = data.pageSettings;
+  },
+  methods: {
+    save: function() {
+      this.error = "";
+      this.info = "";
+      nkcAPI("/e/settings/page", "PATCH", {
+        pageSettings: this.pageSettings
+      })
+        .then(function() {
+          app.info = "保存成功";
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        })
+    }
+  }
+});

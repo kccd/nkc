@@ -12,14 +12,6 @@ registerRouter
 		}
 		data.getCode = false;
 		ctx.template = 'register/register.pug';
-	  const lastUrl = ctx.req.headers['referer'];
-	  if(!lastUrl || !lastUrl.includes('register')) {
-		  ctx.cookies.set('lastUrl', lastUrl, {
-			  signed: true,
-			  maxAge: ctx.settings.cookie.life,
-			  httpOnly: true
-		  });
-	  }
 		await next();
   })
   .post('/', async (ctx, next) => { // 手机注册

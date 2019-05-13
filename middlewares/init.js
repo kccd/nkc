@@ -7,10 +7,32 @@ const {logger} = nkcModules;
 const fs = require('fs');
 const {promisify} = require('util');
 const redis = require('../redis');
-const path = require('path');
+const cookieConfig = require("../config/cookie");
+const fsSync = {
+  access: promisify(fs.access),
+  unlink: promisify(fs.unlink),
+  rename: promisify(fs.rename),
+  writeFile: promisify(fs.writeFile),
+  mkdir: promisify(fs.mkdir),
+  exists: promisify(fs.exists),
+  existsSync: fs.existsSync,
+  copyFile: promisify(fs.copyFile),
+  createReadStream: fs.createReadStream,
+  createWriteStream: fs.createWriteStream,
+  stat: promisify(fs.stat)
+};
 
 module.exports = async (ctx, next) => {
 	try {
+    ctx.data = Object.create(null);
+    Object.defineProperty(ctx, 'template', {
+      get: function() {
+        return './pages/' + this.__templateFile
+      },
+      set: function(fileName) {
+        this.__templateFile = fileName
+      }
+    });
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
     let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
@@ -27,60 +49,85 @@ module.exports = async (ctx, next) => {
 	  ctx.tools = tools;
 	  ctx.redis = redis;
     ctx.state = {
-      url: ctx.url.replace(/\?.*/ig, "")
+      url: ctx.url.replace(/\?.*/ig, ""),
     };
     ctx.settings = settings;
-	  ctx.data = Object.create(null);
 	  ctx.data.site = settings.site;
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
-		const logSettings = await db.SettingModel.findOne({_id: "log"});
-		let {operationsId} = logSettings.c;
-		ctx.data.logSetting = operationsId;
 	  // - 初始化网站设置
-		let serverSettings = await db.SettingModel.findOnly({_id: 'server'});
-		serverSettings = serverSettings.c;
+    const webSettings = await db.SettingModel.find({_id: {$in: ['server', 'page']}});
+    let serverSettings, pageSettings;
+    for(const s of webSettings) {
+      if(s._id === "server") serverSettings = s.c;
+      if(s._id === "page") pageSettings = s.c;
+    }
+    ctx.state.pageSettings = pageSettings;
 	  ctx.data.serverSettings = {
 			websiteName: serverSettings.websiteName,
-			// serverName: serverSettings.serverName.replace('$', global.NKC.NODE_ENV),
 		  github: serverSettings.github,
 		  copyright: serverSettings.copyright,
 		  record: serverSettings.record,
 		  description: serverSettings.description,
 		  keywords: serverSettings.keywords,
 		  brief: serverSettings.brief,
-		  telephone: serverSettings.telephone
+		  telephone: serverSettings.telephone,
+      links: serverSettings.links
 	  };
 
 	  ctx.es = es;
 
-	  ctx.fs = {
-	    access: promisify(fs.access),
-	    unlink: promisify(fs.unlink),
-	    rename: promisify(fs.rename),
-	    writeFile: promisify(fs.writeFile),
-	    mkdir: promisify(fs.mkdir),
-      exists: promisify(fs.exists),
-      existsSync: fs.existsSync,
-	    copyFile: promisify(fs.copyFile),
-	    createReadStream: fs.createReadStream,
-	    createWriteStream: fs.createWriteStream,
-	    stat: promisify(fs.stat)
-	  };
+	  ctx.fs = fsSync;
 
+	  // 权限判断
+    // @param {String} o 操作名
 	  ctx.permission = (o) => {
 	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
 	    return ctx.data.userOperationsId.includes(o);
     };
 
-		Object.defineProperty(ctx, 'template', {
-			get: function() {
-				return './pages/' + this.__templateFile
-			},
-			set: function(fileName) {
-				this.__templateFile = fileName
-			}
-		});
+	  // 设置cookie
+    // @param {String} key cookie名
+    // @param {Object} value cookie值
+    // @param {Object} o 自定义参数
+	  ctx.setCookie = (key, value, o) => {
+	    let options = {
+        signed: true,
+        httpOnly: true,
+        overwrite: true,
+        maxAge: cookieConfig.maxAge
+      };
+	    if(o) {
+        options = Object.assign(options, o);
+      }
+      let valueStr = JSON.stringify(value);
+      valueStr = Buffer.from(valueStr).toString("base64");
+      ctx.cookies.set(key, valueStr, options);
+    };
+
+    // 设置cookie
+    // @param {String} key cookie名
+    // @param {Object} o 自定义参数
+    // @return {Object} cookie值
+	  ctx.getCookie = (key, o) => {
+      let options = {
+        signed: true
+      };
+      if(o) {
+        options = Object.assign(options, o);
+      }
+      try {
+        let valueStr = ctx.cookies.get(key, options);
+        valueStr = Buffer.from(valueStr, "base64").toString();
+        value = JSON.parse(valueStr);
+        return value;
+      } catch(err) {
+        if(global.NKC.NODE_ENV !== "production") {
+          console.log(err);
+        }
+        return null
+      }
+    };
 
 		const reqType = ctx.request.get('REQTYPE');
 		if(reqType === 'app') {

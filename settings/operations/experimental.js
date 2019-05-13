@@ -1,5 +1,9 @@
 module.exports = {
 	GET: 'visitExperimentalStatus',
+  login: {
+	  GET: "experimentalLogin",
+    POST: "experimentalLogin"
+  },
 	status: {
 		GET: 'visitExperimentalStatus'
 	},
@@ -208,6 +212,10 @@ module.exports = {
       GET: "experimentalRegisterSettings",
       PATCH: "experimentalRegisterSettings"
     },
+    safe: {
+      GET: "experimentalSafeSettings",
+      PATCH: "experimentalSafeSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'
@@ -215,7 +223,8 @@ module.exports = {
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',
-		POST: 'sendSystemInfo'
+		POST: 'sendSystemInfo',
+    PATCH: "modifySystemInfo"
 	},
 	log: {
 		GET: 'visitPublicLogs',

@@ -28,32 +28,31 @@ luckRouter
       }
       n += award.chance;
     }
-    if(!result) {
-      return await next();
+    if(result) {
+      let floatRange = Math.round(Math.random()*result.float);
+      const symbol = Math.round(Math.random());
+      if(symbol === 0) floatRange = floatRange*-1;
+      let kcb = result.kcb + result.kcb*floatRange*0.01;
+      kcb = Math.round(kcb);
+
+      const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
+      const record = db.KcbsRecordModel({
+        _id,
+        from: 'bank',
+        type: 'lottery',
+        to: user.uid,
+        description: result.name,
+        ip: ctx.address,
+        port: ctx.port,
+        num: kcb
+      });
+      await record.save();
+
+      user.kcb = await db.UserModel.updateUserKcb(user.uid);
+
+      data.kcb = kcb;
+      data.result = result;
     }
-    let floatRange = Math.round(Math.random()*result.float);
-    const symbol = Math.round(Math.random());
-    if(symbol === 0) floatRange = floatRange*-1;
-    let kcb = result.kcb + result.kcb*floatRange*0.01;
-    kcb = Math.round(kcb);
-
-    const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
-    const record = db.KcbsRecordModel({
-      _id,
-      from: 'bank',
-      type: 'lottery',
-      to: user.uid,
-      description: result.name,
-      ip: ctx.address,
-      port: ctx.port,
-      num: kcb
-    });
-    await record.save();
-
-    user.kcb = await db.UserModel.updateUserKcb(user.uid);
-
-    data.kcb = kcb;
-    data.result = result;
     await user.generalSettings.update({'lotterySettings.status': false});
     await next();
   })

@@ -521,21 +521,25 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(!user.generalSettings.lotterySettings.close) {
     const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
     if(!redEnvelopeSettings.c.random.close) {
-      const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
-      if(postCountToday === 1) {
-        await user.generalSettings.update({'lotterySettings.status': true});
+      const {chance} = redEnvelopeSettings.c.random;
+      const number = Math.ceil(Math.random()*100);
+      if(number <= chance) {
+        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+        if(postCountToday === 1) {
+          await user.generalSettings.update({'lotterySettings.status': true});
+        }
       }
     }
   }
   return _post
 };
  // 算post所在楼层
-threadSchema.methods.getStep = async function(obj) {
+threadSchema.statics.getPostStep = async (tid, obj) => {
   const PostModel = mongoose.model('posts');
   const {perpage} = require('../settings').paging;
   const pid = obj.pid;
   const q = {
-    tid: this.tid
+    tid
   };
   if(obj.disabled === false) q.disabled = false;
   const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
@@ -551,6 +555,9 @@ threadSchema.methods.getStep = async function(obj) {
     page,// 页数
     step // 楼层
   }
+};
+threadSchema.methods.getStep = async function(obj) {
+  return await mongoose.model("threads").getPostStep(this.tid, obj);
 };
 
 /* 拓展文章数组
@@ -650,6 +657,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         description: 1,
         certs: 1,
         threadCount: 1,
+        disabledThreadsCount: 1,
+        disabledPostsCount: 1,
         postCount: 1
       });
       if(o.userInfo) {
@@ -1085,7 +1094,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   for (var i in allMarkThreads) {
     const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
     if(delThreadLog){
-      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"] })
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true });
       await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
       await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
       const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});

@@ -185,13 +185,12 @@ loginRouter
 			user
 		};
 
-		// const loginKey = await aesEncode(user.uid, userPersonal.password.hash);
-		// const loginUid = user.uid;
-		// ctx.data.loginKey = loginKey;
-		// ctx.data.loginUid = loginUid;
-		/*await ctx.generateUsersBehavior({
-			operation: 'dailyLogin'
-		});*/
+		const urls = ctx.getCookie("visitedUrls") || [];
+		if(urls.length === 0) {
+		  ctx.data.redirect = '/';
+    } else {
+		  ctx.data.redirect = urls[0];
+    }
 
 		await next();
 	});

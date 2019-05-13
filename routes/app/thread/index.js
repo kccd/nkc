@@ -32,7 +32,7 @@ theradRouter
 				continue;
 			}
 			posts[i] = posts[i].toObject();
-			posts[i].c = nkcModules.APP_nkc_render.hideContentByUser(posts[i].c, data.user, 'thread')
+      posts[i].c = nkcModules.APP_nkc_render.hideContentByUser(posts[i].c, data.user, 'thread');
 			posts[i].c = nkcModules.APP_nkc_render.experimental_render(posts[i]);
 			// posts[i].thumbCount = posts[i].recUsers.length;
 			posts[i].thumbCount = posts[i].voteUp;
@@ -47,8 +47,8 @@ theradRouter
 			await p.extendResources();
 		});
 		await thread.extendLastPost();
-		thread.firstPost.c = nkcModules.APP_nkc_render.hideContentByUser(thread.firstPost.c, data.user, 'thread')
-		thread.firstPost.c = nkcModules.APP_nkc_render.experimental_render(thread.firstPost)
+    thread.firstPost.c = nkcModules.APP_nkc_render.hideContentByUser(thread.firstPost.c, data.user, 'thread');
+		thread.firstPost.c = nkcModules.APP_nkc_render.experimental_render(thread.firstPost);
 		// console.log(thread.firstPost.c)
 		data.thread = thread;
 

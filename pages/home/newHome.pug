@@ -14,18 +14,7 @@ block content
         .row
           .col-xs-12.col-md-12
             .m-b-1
-              //- 手机导航 其他文章链接
-              .hidden-md.hidden-lg
-                .drawer-fixed-button-right(onclick="openRightDrawer()")
-                  .fa.fa-angle-double-left
-                .drawer-fixed-button-left(onclick="openLeftDrawer()")
-                  .fa.fa-angle-double-right
-                .drawer-dom
-                  .drawer-mask(onclick="closeDrawer()")
-                  .left
-                    .dom
-                  .right
-                    .dom
+              include ../publicModules/mobile_drawer/mobile_drawer
               -let showPagingSortButton = true;
               -let showHomeButton = true;
               include ../publicModules/paging/paging

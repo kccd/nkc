@@ -3,8 +3,9 @@
   @param {[Object]} data.forums 专业树状结构数组 通过方法ForumModel.getForumsTree获取
   @author pengxiguaa 2019-5-6
 
-if data.subForums && data.subForums.length >0
-  div
+
+div
+  if data.subForums && data.subForums.length >0
     .forums-nav-header
       +listHeader("我关注的")
     .home-topic-item-div
@@ -17,53 +18,53 @@ if data.subForums && data.subForums.length >0
           if f.iconFileName
             img(src=`/forum_avatar/${f.fid}`)
           span=f.displayName
-    .forums-nav-header
-      +listHeader("话题")
-    for pf in data.forums
-      if pf.forumType === "topic"
-        .home-topic-list-li
-          a(
-            href=`/f/${pf.fid}`
-            title=pf.description
-          )
-            if pf.iconFileName
-              img(src=`/forum_avatar/${pf.fid}`)
-            else
-              img(style=`background-color: ${pf.color || '#808080'};`)
-            span=pf.displayName
-        if pf.childrenForums && pf.childrenForums.length
-          .home-topic-item-div
-            for cf in pf.childrenForums
-              a(
-                href=`/f/${cf.fid}`
-                style=`background-color: ${cf.color || '#808080'}`
-                title=cf.description
-              ).topic-item
-                if cf.iconFileName
-                  img(src=`/forum_avatar/${cf.fid}`)
-                span=cf.displayName
-    .forums-nav-header
-      +listHeader("学科")
-    for pf in data.forums
-      if pf.forumType === "discipline"
-        .home-topic-list-li
-          a(
-            href=`/f/${pf.fid}`
-            title=pf.description
-          )
-            if pf.iconFileName
-              img(src=`/forum_avatar/${pf.fid}`)
-            else
-              img(style=`background-color: ${pf.color || '#808080'};`)
-            span=pf.displayName
-        if pf.childrenForums && pf.childrenForums.length
-          .home-topic-item-div
-            for cf in pf.childrenForums
-              a(
-                href=`/f/${cf.fid}`
-                style=`background-color: ${cf.color || '#808080'}`
-                title=cf.description
-              ).topic-item
-                if cf.iconFileName
-                  img(src=`/forum_avatar/${cf.fid}`)
-                span=cf.displayName
+  .forums-nav-header
+    +listHeader("话题")
+  for pf in data.forums
+    if pf.forumType === "topic"
+      .home-topic-list-li
+        a(
+          href=`/f/${pf.fid}`
+          title=pf.description
+        )
+          if pf.iconFileName
+            img(src=`/forum_avatar/${pf.fid}`)
+          else
+            img(style=`background-color: ${pf.color || '#808080'};`)
+          span=pf.displayName
+      if pf.childrenForums && pf.childrenForums.length
+        .home-topic-item-div
+          for cf in pf.childrenForums
+            a(
+              href=`/f/${cf.fid}`
+              style=`background-color: ${cf.color || '#808080'}`
+              title=cf.description
+            ).topic-item
+              if cf.iconFileName
+                img(src=`/forum_avatar/${cf.fid}`)
+              span=cf.displayName
+  .forums-nav-header
+    +listHeader("学科")
+  for pf in data.forums
+    if pf.forumType === "discipline"
+      .home-topic-list-li
+        a(
+          href=`/f/${pf.fid}`
+          title=pf.description
+        )
+          if pf.iconFileName
+            img(src=`/forum_avatar/${pf.fid}`)
+          else
+            img(style=`background-color: ${pf.color || '#808080'};`)
+          span=pf.displayName
+      if pf.childrenForums && pf.childrenForums.length
+        .home-topic-item-div
+          for cf in pf.childrenForums
+            a(
+              href=`/f/${cf.fid}`
+              style=`background-color: ${cf.color || '#808080'}`
+              title=cf.description
+            ).topic-item
+              if cf.iconFileName
+                img(src=`/forum_avatar/${cf.fid}`)
+              span=cf.displayName

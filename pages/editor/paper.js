@@ -5,7 +5,7 @@ var paperProto = {
   config: {
     enableAbstract: true, // 是否启用摘要
     enableKeyWords: true, // 是否启用关键词
-    enableAuthorInfo: false, // 是否启用作者信息
+    enableAuthorInfos: false, // 是否启用作者信息
     enableOriginState: false, // 是否启用原创声明
 
     abstractCN: "中文摘要", // 默认中文摘要
@@ -26,26 +26,28 @@ var paperProto = {
   },
   // 初始化摘要
   initAbstract: function() {
-    console.log("摘要初始化")
     if(paperProto.config.enableAbstract) {
       var abstractDom = paperProto.get("abstract");
-      console.log(abstractDom)
-      abstractDom.style.display = ""
+      abstractDom.style.display = "";
       // 初始化摘要文本
       var abstractCnDom = paperProto.get("abstractCn");
-      var abstractEnDom = paperProto.get("abstractEn");
-      // $("#abstractCn").val(paperProto.config.abstractCN)
-      // $("#abstractEn").val(paperProto.config.abstractEn)
       abstractCnDom.value = paperProto.config.abstractCN;
+      var abstractEnDom = paperProto.get("abstractEn");
       abstractEnDom.value = paperProto.config.abstractEn;
     }
   },
   // 初始化关键词
   initKeywords: function() {
+    if(paperProto.config.enableKeyWords) {
+      console.log("初始化关键词");
+      var keyWordsDom = paperProto.get("keyWords");
+      keyWordsDom.style.display = "";
+      // 初始化中英文关键词
 
+    }
   },
   // 初始化作者信息
-  initAuthorInfo: function() {
+  initAuthorInfos: function() {
 
   },
   // 初始化原创声明

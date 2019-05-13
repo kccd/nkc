@@ -9,4 +9,4 @@
       else
         .button(onclick=`subscribeUser(${targetUser.uid}, true)`) 关注
     .cert=targetUser.info.certsName
-    .description=targetUser.description || "暂未填写个人简介"
+    .description=(targetUser.description || "暂未填写个人简介")

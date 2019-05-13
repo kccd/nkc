@@ -2,12 +2,14 @@
 const nkcModules = require('../nkcModules');
 
 const logger = async (ctx, next) => {
-  const { db, address: ip, port } = ctx;
-    const processTime = ctx.processTime;
-    const {apiFunction} = nkcModules;
-    const { getOperationId } = nkcModules.permission;
-    ctx.data.operationId = getOperationId(ctx.url, ctx.method);
-    // 获取用户的个人基本信息
+  const { db, address: ip, port, url, method} = ctx;
+  const processTime = ctx.processTime;
+  const {apiFunction} = nkcModules;
+  const { getOperationId } = nkcModules.permission;
+  ctx.data.operationId = getOperationId(ctx.url, ctx.method);
+  const logSettings = await db.SettingModel.findOne({_id: "log"});
+  const {operationsId} = logSettings.c;
+  // 获取用户的个人基本信息
   if(ctx.data.user){
     let userPersonal;
     if(ctx.data.user){
@@ -192,11 +194,26 @@ const logger = async (ctx, next) => {
     // -----------------------------------------存入logs--------------------------------------------
     // 取出日志白名单，并在logs中记录日志
     let needLog = false;
-    if (ctx.data.logSetting && ctx.data.logSetting.indexOf(ctx.data.operationId) > -1) {
+    if (operationsId && operationsId.includes(ctx.data.operationId)) {
       needLog = true;
     }
     if (ctx.status !== 304 && needLog) {
       await new db.LogModel(log).save();
+      const excludeUrl = ["/login", "/register", "/register/mobile", "/logout"];
+      if(ctx.data.user) excludeUrl.push(`/u/${ctx.data.user.uid}/subscribe/register`);
+      if(
+        method === "GET" &&
+        !excludeUrl.includes(url)
+      ) {
+        // 将最近十次访问的url，写入cookie
+        const urls = ctx.getCookie("visitedUrls") || [];
+        if(urls.length >= 10) {
+          urls.splice(urls.length-1, 1);
+        }
+        urls.unshift(url);
+        ctx.setCookie("visitedUrls", urls);
+      }
+
     }
         
   }else{

@@ -1,11 +1,30 @@
-var moduleCrop = {};
-moduleCrop.cropper = {};
-
 /* 初始化图片裁剪工具
 * @param {Function} callback 回调函数 callback(data), data为裁剪后的图片数据
 * @param {Object} o 参数 详情https://github.com/fengyuanchen/cropperjs#options
 * @author pengxiguaa 2019-5-5
 * */
+
+// 兼容代码，部分浏览器canvas对象没有toBlob方法
+if (!HTMLCanvasElement.prototype.toBlob) {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+    value: function (callback, type, quality) {
+
+      var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
+        len = binStr.length,
+        arr = new Uint8Array(len);
+
+      for (var i=0; i<len; i++ ) {
+        arr[i] = binStr.charCodeAt(i);
+      }
+
+      callback( new Blob( [arr], {type: type || 'image/png'} ) );
+    }
+  });
+}
+
+
+var moduleCrop = {};
+moduleCrop.cropper = {};
 
 moduleCrop.init = function(callback, o) {
   var options = {
@@ -34,19 +53,20 @@ moduleCrop.init = function(callback, o) {
   moduleCrop.cropper = $image.data('cropper');
 
   moduleCrop.complete = function() {
+    console.log(moduleCrop.cropper.getCroppedCanvas());
     try{
       moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
-        moduleCrop.hide();
         callback(blob);
       });
     }
     catch(e)
     {
+      console.log(e);
       if(options.errorInfo) {
-        moduleCrop.hide();
         screenTopWarning(options.errorInfo)
       }
     }
+    moduleCrop.cancel();
   };
 
   // 显示裁剪框
@@ -75,8 +95,9 @@ moduleCrop.init = function(callback, o) {
   };
 
   moduleCrop.cancel = function() {
-    moduleCrop.hide();
     $("#module_crop_input").val("");
+    moduleCrop.cropper.destroy();
+    moduleCrop.hide();
   };
   moduleCrop.rotate = function(type) {
     if(type === "left") {

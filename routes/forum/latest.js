@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const latestRouter = new Router();
 latestRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
-    const {isModerator, forum} = data;
+		const {data, db, query, state} = ctx;
+		const {pageSettings} = state;
+    const {forum} = data;
 		let {page, s, cat, d} = query;
 		page = page?parseInt(page): 0;
 		// 构建查询条件
@@ -29,6 +30,9 @@ latestRouter
       disabled: false,
       recycleMark: {$ne: true}
     };
+    if(forum.fid === "recycle") {
+      delete toppedThreadMatch.disabled;
+    }
     // 加载、拓展置顶文章
     const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
 
@@ -40,12 +44,14 @@ latestRouter
 
 		match.mainForumsId = {$in: fidOfCanGetThreads};
 		match.tid = {$nin: topThreadsId};
-		match.disabled = false;
+		if(forum.fid !== "recycle") {
+      match.disabled = false;
+    }
 		match.recycleMark = {$ne: true};
 
 		const count = await db.ThreadModel.count(match);
 		const {apiFunction} = ctx.nkcModules;
-		const paging = apiFunction.paging(page, count);
+		const paging = apiFunction.paging(page, count, pageSettings.forumThreadList);
 		data.paging = paging;
 		const limit = paging.perpage;
 		const skip = paging.start;

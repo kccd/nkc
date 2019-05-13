@@ -12,6 +12,10 @@ redEnvelopeRouter
     const {random, draftFee, share} = body;
     // 随机红包
     let probability = 0;
+    if(random.chance > 0 &&random.chance <= 100){}
+    else {
+      ctx.throw(400, "随机红包的弹出几率设置错误，范围：(0, 100]");
+    }
     for(const award of random.awards) {
       if(award.kcb <= 0) ctx.throw(400, '奖金科创币得数量必须大于0');
       if(award.chance < 0) ctx.throw(400, '概率不能小于0');

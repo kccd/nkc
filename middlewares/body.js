@@ -4,7 +4,7 @@ const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
 module.exports = async (ctx, next) => {
-  const {filePath, fileName, resource, fs, type} = ctx;
+  const {filePath, fileName, resource, fs} = ctx;
   if(filePath && ctx.method === 'GET') {
 	  if(ctx.lastModified && ctx.fresh) {
       ctx.status = 304;
@@ -23,7 +23,7 @@ module.exports = async (ctx, next) => {
       name = basename;
     }
     let stats = fss.statSync(filePath);
-    if(ext == "mp4"){
+    if(ext === "mp4"){
       if(ctx.request.headers['range']){
         var range = utils.parseRange(ctx.request.headers["range"], stats.size);
         if(range){
@@ -44,13 +44,12 @@ module.exports = async (ctx, next) => {
           ctx.response.end();
         }
       }else{
-        var stream = fss.createReadStream(filePath);
+
         // ctx.response.writeHead('200', "Partial Content");
         ctx.status = 200;
-        ctx.body = stream
+        ctx.body = fss.createReadStream(filePath);
         // stream.pipe(ctx.response);
       }
-      var stream = fss.createReadStream(filePath);
     }else{
       if(extArr.includes(ext)) {
         ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);

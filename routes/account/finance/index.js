@@ -26,7 +26,7 @@ router
     const count = await db.KcbsRecordModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     let kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    await db.KcbsRecordModel.hideAlipayInfo(kcbsRecords);
+    await db.KcbsRecordModel.hideSecretInfo(kcbsRecords);
     data.kcbsRecords = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
     data.paging = paging;
     data.t = t;
