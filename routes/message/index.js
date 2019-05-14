@@ -17,9 +17,8 @@ messageRouter
     const {user} = ctx.data;
     // 判断用户是否已完善账号基本信息（username, avatar, banner）
     if(!await ctx.db.UserModel.checkUserBaseInfo(user)) {
-      ctx.throwError(403, "未完善账号基本信息", "userBaseInfo");
+      ctx.nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
     }
-    ctx.throw(400, "user.username is required");
     await next();
   })
   .get('/', async (ctx, next) => {

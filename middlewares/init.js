@@ -129,15 +129,6 @@ module.exports = async (ctx, next) => {
       }
     };
 
-	  // 抛出错误，指定前端错误页面模板
-    // @param {Number} status 状态码
-    // @param {String} message 错误信息
-    // @param {String} type 错误类型
-	  ctx.throwError = (status, message, type) => {
-      ctx.errorType = type;
-      ctx.throw(status, message);
-    };
-
 		const reqType = ctx.request.get('REQTYPE');
 		if(reqType === 'app') {
 			ctx.reqType = 'app';
@@ -161,6 +152,12 @@ module.exports = async (ctx, next) => {
 	  } else {
 		  error = err;
 	  }
+	  try{
+	    const errObj = JSON.parse(error);
+	    const {errorType, errorData} = errObj;
+	    error = errorData;
+	    ctx.errorType = errorType;
+    } catch(err) {}
 	  if(ctx.errorType) {
 	    ctx.template = `error/${ctx.errorType}.pug`;
     } else {

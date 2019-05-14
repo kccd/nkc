@@ -1,8 +1,8 @@
 extends ./errorBase
 block errorContent
-  .error-icon=`${data.status} 权限不足`
+  .error-icon=`${data.status} Forbidden`
   .error-list.b-s-10
-    .error-header 您无权访问该网页，可能的原因有：
+    .error-header 抱歉！您貌似无权访问该网页，可能的原因有：
     ul
       li
         .num 1
@@ -18,9 +18,9 @@ block errorContent
         | 未绑定手机号
 
 
-    .error-info 请前往&nbsp;
+    .error-info 请前往
       if data.user
         a(href=`/u/${data.user.uid}/settings`) 资料设置
       else
         a(href=`/login`) 资料设置
-      | &nbsp;页面完善相关账号信息。
+      | 页面完善账号相关信息。

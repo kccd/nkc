@@ -1749,7 +1749,10 @@ function toggleNKCDrawer() {
   }
 }
 
-
+/*
+* 禁止body滚动 显示悬浮div时可用
+* @author pengxiguaa 2019-5-14
+* */
 function stopBodyScroll (isFixed) {
   var bodyEl = document.body;
   if (isFixed) {
@@ -1877,6 +1880,7 @@ function fileToUrl(file) {
 * @param {String} type 类型， 可选：avatar、banner、description、username
 * */
 function clearUserInfo(uid, type) {
+  if(!confirm("该操作不可撤回，确定要执行？")) return;
   nkcAPI("/u/" + uid + "/clear", "POST", {
     type: type
   })

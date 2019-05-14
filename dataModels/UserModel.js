@@ -301,13 +301,20 @@ userSchema.virtual('newVoteUp')
   .set(function(newVoteUp) {
     this._newVoteUp = newVoteUp;
   });
-userSchema.virtual('info') 
+userSchema.virtual('info')
   .get(function() {
     return this._info;
   })
   .set(function(info) {
     this._info = info;
-  });  
+  });
+userSchema.virtual('user')
+  .get(function() {
+    return this._user;
+  })
+  .set(function(user) {
+    this._user = user;
+  });
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = mongoose.model('threads');

@@ -36,6 +36,33 @@ operationRouter
     await collection.remove();
     await next();
 	})
+  // 修改退修原因
+  .patch("/moveDraft/reason", async (ctx, next) => {
+    const {body, db, params} = ctx;
+    const {tid} = params;
+    const {reason} = body;
+    if(!reason) ctx.throw(400, "退修原因不能为空");
+    await db.DelPostLogModel.updateOne({
+      threadId: tid,
+      postType: "thread",
+      delType: "toDraft",
+      modifyType: false
+    }, {
+      $set: {
+        reason: reason
+      }
+    });
+    await db.MessageModel.updateOne({
+      ty: "STU",
+      "c.tid": tid,
+      "c.type": "threadWasReturned"
+    }, {
+      $set: {
+        "c.rea": reason
+      }
+    });
+    await next();
+  })
   // 退修
 	.patch('/moveDraft', async (ctx, next) => {
 		const {data, db} = ctx;

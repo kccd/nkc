@@ -740,10 +740,11 @@ forumSchema.statics.ensureForumsPermission = async (arr, userInfo) => {
 
 // 判断用户是否有权访问该版块
 forumSchema.methods.ensurePermission = async function(roles, grade, user) {
+  const throwError = require("../nkcModules/throwError");
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
   if(!fid.includes(this.fid)) {
-    throwErr(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`);
+    throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
   }
 };
 

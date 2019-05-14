@@ -296,8 +296,22 @@ threadSchema.methods.extendUser = async function() {
 
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
+  const throwError = require("../nkcMOdules/throwError");
   for(const forum of this.forums) {
-    await forum.ensurePermission(roles, grade, user);
+    try {
+      await forum.ensurePermission(roles, grade, user);
+    } catch(err) {
+      const status = err.status;
+      try{
+        err = JSON.parse(err.message || err);
+        err = err.errorData;
+      } catch(e) {}
+      let errorType = "noPermissionToReadThread";
+      if(forum.fid === "recycle") {
+        errorType = "threadHasBeenBanned";
+      }
+      throwError(status, err, errorType);
+    }
   }
 };
 

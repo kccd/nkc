@@ -1,0 +1,11 @@
+extends ./errorBase
+block errorContent
+  .error-icon=`${data.status} Forbidden`
+  .error-list.b-s-10
+    .error-header 抱歉！根据国家相关法律法规，文章未予显示。
+    .error-code
+      span message：
+      code=data.error
+    .error-info 想了解更多信息，请阅读论坛
+      a(href=`/t/66350`) 禁止事项
+      | 。

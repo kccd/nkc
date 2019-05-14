@@ -551,6 +551,9 @@
   "experimentalSafeSettings": "后台安全设置",
   "modifySystemInfo": "修改系统通知",
   "getOriginId": "[VI]获取原图ID",
+  "modifyReasonThreadReturn": "修改文章被退回的原因",
+  "complaintGet": "查看用户投诉列表",
+  "complaintPost": "用户投诉",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

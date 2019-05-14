@@ -76,7 +76,7 @@ threadRouter
 		const {data, params, db, query, nkcModules, body} = ctx;
 		const ip = ctx.address;
 		let {token, paraId} = query;
-		let {page = 0, pid, last_page, highlight, step} = query;
+		let {page = 0, pid, last_page, highlight, step, t} = query;
 		const {tid} = params;
 		data.highlight = highlight;
     const thread = await db.ThreadModel.findOnly({tid});
@@ -143,9 +143,13 @@ threadRouter
 		const match = {
 			tid
 		};
+		// 只看作者
+		if(t === "author") {
+		  data.t = t;
+		  match.uid = thread.uid
+    }
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
-
 		// 判断是否为该专业的专家
 		// 如果是该专业的专家，加载所有的post；如果不是，则判断有没有相应权限。
 		if(!isModerator) {

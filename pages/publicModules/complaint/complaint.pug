@@ -1,0 +1,26 @@
++includeCSS("/publicModules/complaint/complaint.css")
+#moduleComplaint(v-cloak)
+  .complaint-content
+    .complaint-header 投诉
+      .fa.fa-remove.complaint-close(@click="hide")
+    .complaint-body(v-if="!submitted")
+      h5 请选择违规类型：
+      div
+        span.complaint-reason(
+          v-for="reason in reasons"
+          :class="{'active': reasonType===reason.type}"
+          @click="selectReason(reason)"
+        ) {{reason.description}}
+      textarea.form-control.complaint-input(placeholder="简单说一下，他都干了啥坏事儿~" v-model='reasonDescription')
+      .complaint-button
+        button.btn.btn-block.btn-primary(v-if="reasonType" @click="submit") 提交
+        button.btn.btn-block.btn-primary(v-else disabled) 提交
+    .complaint-body(v-else)
+      .complaint-submitted
+        .complaint-title
+          .fa.fa-check
+          span 投诉成功！
+        .complaint-description 非常感谢您的反馈！我们会第一时间处理违规内容，给大家提供一个健康绿色的讨论环境。
+
+
++includeJS("/publicModules/complaint/complaint.js")
