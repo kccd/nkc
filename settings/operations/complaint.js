@@ -1,4 +1,7 @@
 module.exports = {
   GET: 'complaintGet',
-  POST: 'complaintPost'
+  POST: 'complaintPost',
+  resolve: {
+    POST: "complaintResolvePost"
+  }
 };

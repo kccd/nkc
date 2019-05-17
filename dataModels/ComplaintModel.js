@@ -45,7 +45,7 @@ const schema = new Schema({
   },
   // 处理人ID
   handlerId: {
-    type: Boolean,
+    type: String,
     default: "",
     index: 1
   },
@@ -135,10 +135,19 @@ schema.statics.extendComplaints = async (complaints) => {
     } else if(type === "thread"){
       r.content = threadObj[c.contentId];
     }
-    if(r.handlerId) r.handler = userObj[c.handlerId];
+    if(r.handlerId) {
+      r.handler = userObj[c.handlerId];
+    }
     results.push(r);
   }
   return results;
+};
+
+schema.statics.findById = async (_id) => {
+  const Model = mongoose.model("complaints");
+  const complaint = Model.findOne({_id});
+  if(!complaint) throwErr(404, `未找到ID为【${_id}】的投诉记录`);
+  return complaint;
 };
 
 module.exports = mongoose.model("complaints", schema);

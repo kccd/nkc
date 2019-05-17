@@ -188,8 +188,9 @@ threadRouter
 			if($and.length !== 0) match.$and = $and;
 		}
 		// 统计post总数，分页
+    const pageSettings = (await db.SettingModel.findOnly({_id: "page"})).c;
 		const count = await db.PostModel.count(match);
-		const paging_ = nkcModules.apiFunction.paging(page, count);
+		const paging_ = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		const {pageCount} = paging_;
 		// 删除退休超时的post
 		const postAll = await db.PostModel.find({tid:tid,toDraft:true});
@@ -215,10 +216,9 @@ threadRouter
 			page = pageCount -1;
 		}
 		// 查询该文章下的所有post
-		const paging = nkcModules.apiFunction.paging(page, count);
+		const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});

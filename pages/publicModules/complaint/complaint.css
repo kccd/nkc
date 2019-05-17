@@ -85,14 +85,15 @@
   border-color: #2b90d9;
 }
 .complaint-title{
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
   height: 3rem;
   line-height: 3rem;
-  font-size: 1.6rem;
-  text-align: center;
 }
 .complaint-title .fa{
   margin-right: 0.5rem;
-  margin-top: 2rem;
+  vertical-align: middle;
   height: 2.5rem;
   width: 2.5rem;
   text-align: center;

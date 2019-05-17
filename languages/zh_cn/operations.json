@@ -554,6 +554,7 @@
   "modifyReasonThreadReturn": "修改文章被退回的原因",
   "complaintGet": "查看用户投诉列表",
   "complaintPost": "用户投诉",
+  "complaintResolvePost": "标记投诉为已处理",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

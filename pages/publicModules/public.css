@@ -290,10 +290,12 @@
   background-color: #9baec8;
 }
 .paging-button a.radius-left{
-  border-radius: 2px 0 0 2px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
 }
 .paging-button a.radius-right{
-  border-radius: 0 2px 2px 0;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 .paging-button a:hover, .paging-button a:visited, .paging-button a:link, .paging-button a:active{
   text-decoration: none;
@@ -1397,4 +1399,8 @@ footer.footer ul li{
 .thread-panel-reply span{
   color: #9baec8;
   margin-left: 0.5rem;
+}
+.clear-a-style:hover, .clear-a-style:link, .clear-a-style:active, .clear-a-style:visited{
+  text-decoration: none;
+  color: #2b90d9;
 }

@@ -694,6 +694,12 @@ forumSchema.methods.getAllChildForumsId = async function() {
   return await client.smembersAsync(`forum:${this.fid}:allChildForumsId`);
 };
 
+forumSchema.statics.getAllChildForumsIdByFid = async function(fid) {
+  return await client.smembersAsync(`forum:${fid}:allChildForumsId`);
+};
+
+
+
 /* 
   获取专业下的全部专业
   @return 专业对象数组

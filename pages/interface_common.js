@@ -1891,3 +1891,28 @@ function clearUserInfo(uid, type) {
       screenTopWarning(data);
     })
 }
+
+
+/*
+* 根据年份和月份计算出当月的天数
+* @param {Number} year 年份
+* @param {Number} month 月份
+* @return {Number} 当月天数
+* */
+function getDayCountByYearMonth(year, month) {
+  year = parseInt(year);
+  month = parseInt(month);
+  var count;
+  if(month === 2) {
+    if((year%4 === 0 && year%100 != 0) || year%400 === 0) {
+      count = 29;
+    } else {
+      count = 28;
+    }
+  } else if([4,6,9,11].indexOf(month) !== -1) {
+    count = 30
+  } else {
+    count = 31
+  }
+  return count;
+}

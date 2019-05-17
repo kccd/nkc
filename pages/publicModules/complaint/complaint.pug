@@ -1,7 +1,7 @@
 +includeCSS("/publicModules/complaint/complaint.css")
 #moduleComplaint(v-cloak)
   .complaint-content
-    .complaint-header 投诉
+    .complaint-header {{submitted?"":"投诉"}}
       .fa.fa-remove.complaint-close(@click="hide")
     .complaint-body(v-if="!submitted")
       h5 请选择违规类型：

@@ -53,5 +53,44 @@ router
       contentId: id
     }).save();
     await next();
+  })
+  .post("/resolve", async (ctx, next) =>{
+    const {tools, data, db, body} = ctx;
+    const {result, _id, complaints} = body;
+    const time = Date.now();
+    const {user} = data;
+    if(_id) {
+      const complaint = await db.ComplaintModel.findById(_id);
+      if(complaint.resolved) ctx.throw(400, "投诉记录已处理，请勿重复提交");
+      await complaint.update({
+        $set: {
+          resolved: true,
+          handlerId: user.uid,
+          resolveTime: time,
+          result
+        }
+      });
+      data.complaint = (await db.ComplaintModel.findById(_id)).toObject();
+      data.complaint.handler = await db.UserModel.findOne({uid: data.complaint.handlerId}, {uid: 1, username: 1});
+    } else {
+      data.complaints = [];
+      for(const c of complaints) {
+        const {_id, result} = c;
+        const complaint = await db.ComplaintModel.findById(_id);
+        if(complaint.resolved) continue;
+        await complaint.update({
+          $set: {
+            resolved: true,
+            handlerId: user.uid,
+            resolveTime: time,
+            result
+          }
+        });
+        const complaint_ = (await db.ComplaintModel.findById(_id)).toObject();
+        complaint_.handler = await db.UserModel.findOne({uid: complaint_.handlerId}, {uid: 1, username: 1});
+        data.complaints.push(complaint_);
+      }
+    }
+    await next();
   });
 module.exports = router;

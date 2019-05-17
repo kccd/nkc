@@ -18,7 +18,6 @@ const rtRouter = require('./rt');
 const rmRouter = require('./rm');
 const roRouter = require('./ro');
 const qrCodeRouter = require('./qrcode');
-const searchRouter = require('./search');
 const photoRouter = require('./photo');
 const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
@@ -69,7 +68,6 @@ otherRouter
   .use('rm', rmRouter.routes(), rmRouter.allowedMethods())
   .use('ro', roRouter.routes(), roRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
-  .use('search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
   .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
   .use('attachIcon', attachIconRouter.routes(), attachIconRouter.allowedMethods())

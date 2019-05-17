@@ -73,6 +73,12 @@ block content
                 include ../publicModules/forums_nav/forums_item
           .m-b-1
             include ../publicModules/share/user-card
+          if data.user &&  data.user.uid !== data.targetUser.uid
+            .m-b-1
+              .user-card-complaint(
+                onclick=`moduleComplaint.open('user', '${data.targetUser.uid}')`
+                title="他真的有违法论坛规定么？"
+              ) 举报此人
       .col-xs-12.col-md-7
         .post-panel.b-s-10.m-b-2
           include ../publicModules/paging/user_card
@@ -142,5 +148,6 @@ block content
 
 block scripts
   include ../publicModules/vue_user_panel/vue_user_panel_float
+  include ../publicModules/complaint/complaint
   +includeJS("/echarts/dist/echarts.min.js")
   +includeJS("/user/summary.js")

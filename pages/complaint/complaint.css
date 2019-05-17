@@ -67,8 +67,15 @@ body{
 .complaint-button{
   color: #9baec8;
   cursor: pointer;
+  min-height: 3rem;
+  line-height: 3rem;
 }
 .complaint-other{
   background-color: #d9e1e8;
   padding: 0.5rem;
+  display: inline-block;
+}
+.complaint-input{
+  max-width: 30rem;
+  display: inline-block;
 }

@@ -13,6 +13,9 @@ block content
             a.radius-left.button(href='/complaint' class=!data.t?"active": "") 全部
             a.button(href='/complaint?t=unresolved' class=data.t==="unresolved"?"active":"") 未处理
             a.radius-right.button(href='/complaint?t=resolved' class=data.t==="resolved"?"active":"") 已处理
+          .paging-button
+            a.radius-left.button(href='javascript:app.selectAll()' ) 全选
+            a.radius-right.button(href='javascript:app.saveAll()'  v-if="selectedComplaintsId.length > 1") 处理已勾选
           include ../publicModules/paging/paging
           .complaint-single(v-for="c in complaints")
             .complaint-reason-type.success(v-if="c.resolved") 已处理
@@ -33,17 +36,23 @@ block content
               .complaint-info 所发表的文章
               a.complaint-link(:href="'/t/' + c.contentId" target="_blank") {{c.content.firstPost.t}}
             .complaint-content {{c.reasonDescription || "未填写违规详细信息"}}
-            span.complaint-button(@click="c.open = !c.open") 展开处理
-              .fa.fa-caret-down
-            .complaint-other(v-if="c.open")
-              label 处理说明：
-              div(v-if="c.resolved") {{c.result}}
-              .form(v-else)
-                .form-group
-                  textarea.form-control(rows=4 v-model="c.result")
-                .form-group
-                  button.btn.btn-primary.btn-sm(@click="save(c)") 保存
-                  button.btn.btn-default.btn-sm(@click="c.open = false") 取消
+            .complaint-button(v-if="c.resolved")
+              span(@click="c.open = !c.open") 查看详情
+                .fa.fa-caret-down
+              div(v-if="c.open")
+                label
+                  a(:href="'/u/' + c.handlerId" target="_blank") {{c.handler.username}}
+                  span(:title="format('YYYY-MM-DD HH:mm:ss', c.resolveTime)") &nbsp;{{fromNow(c.resolveTime)}} 处理说明：{{c.result || "未填写"}}
+            .complaint-button.form-inline(v-else)
+              .form-group
+                input(type="checkbox" v-model="selectedComplaintsId" :value="c._id")
+                label 处理
+              .form-group(v-if="selectedComplaintsId.indexOf(c._id) !== -1")
+                span &nbsp;&nbsp;处理说明：
+                input.complaint-input.btn-sm.form-control(v-model="c.result")
+              .form-group(v-if="selectedComplaintsId.indexOf(c._id) !== -1")
+                button.btn.btn-primary.btn-sm(@click="save(c)") 保存
+
           include ../publicModules/paging/paging_input
 block scripts
   include ../publicModules/moment

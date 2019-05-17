@@ -17,8 +17,10 @@ router
     });
     if(!urls || urls.length === 0) {
       data.redirect = "/e";
+    } else if(urls[0].indexOf("/e") === -1){
+      data.redirect = "/e";
     } else {
-      data.redirect = urls[0]
+      data.redirect = urls[0];
     }
     await next();
   });

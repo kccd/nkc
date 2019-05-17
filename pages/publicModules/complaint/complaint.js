@@ -50,6 +50,7 @@ var moduleComplaint = new Vue({
       stopBodyScroll(false);
     },
     show: function() {
+      closeDrawer();
       $("#moduleComplaint").show();
       this.submitted = false;
       this.reasonDescription = "";

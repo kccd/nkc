@@ -550,7 +550,9 @@ threadSchema.methods.newPost = async function(post, user, ip) {
  // 算post所在楼层
 threadSchema.statics.getPostStep = async (tid, obj) => {
   const PostModel = mongoose.model('posts');
-  const {perpage} = require('../settings').paging;
+  const SettingModel = mongoose.model("settings");
+  const pageSettings = await SettingModel.findOnly({_id: "page"});
+  const perpage = pageSettings.c.threadPostList;
   const pid = obj.pid;
   const q = {
     tid
@@ -901,18 +903,22 @@ threadSchema.statics.getNotice = async (fid) => {
   });
 };
 /*
-* 加载置顶专业内的精选文章 随机
+* 加载指定专业内的精选文章 随机
 * @param {[String]} fid 能够从中读取文章的专业ID
 * @author pengxiguaa 2019-4-26
 * */
 threadSchema.statics.getFeaturedThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
+  const time = Date.now() - 15379200000;// 半年
   const threads = await ThreadModel.aggregate([
     {
       $match: {
         digest: true,
         mainForumsId: {
           $in: fid
+        },
+        toc: {
+          $gte: new Date(time)
         }
       }
     },
@@ -927,11 +933,38 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 10
+        size: 6
       }
     }
   ]);
-  return await ThreadModel.extendThreads(threads, {
+  const threads_ = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid
+        },
+        toc: {
+          $lt: new Date(time)
+        }
+      }
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1
+      }
+    },
+    {
+      $sample: {
+        size: 4
+      }
+    }
+  ]);
+  return await ThreadModel.extendThreads(threads.concat(threads_), {
     lastPost: false,
     category: false
   })
