@@ -104,7 +104,7 @@ var paperProto = {
     keyWordsPanelShell.appendChild(keyWordsPanelWall)
     // 创建header
     var keyWordsPanelHeader = document.createElement("div");
-    keyWordsPanelHeader.innerHTML = "请填写关键词";
+    keyWordsPanelHeader.innerHTML = "添加关键词(每次添加一个)";
     keyWordsPanelHeader.setAttribute("id", "keyWordsPanelHeader");
     keyWordsPanelHeader.className = "keyWordsPanelHeader";
     keyWordsPanelWall.appendChild(keyWordsPanelHeader)
@@ -121,11 +121,12 @@ var paperProto = {
     // 创建中英文关键词输入框
     var keyWordsPanelCnDiv = document.createElement("div");
     keyWordsPanelCnDiv.setAttribute("id", "keyWordsPanelCnDiv");
-    var keyWordsPanelCnDom = "<span style='font-weight: bold;'>中文: </span>"+"<input type='text' id='keyWordsPanelCnInput'>";
+    keyWordsPanelCnDiv.style.marginBottom = "5px";
+    var keyWordsPanelCnDom = "<span style='font-weight: bold;'>中文: </span>"+"<input type='text' id='keyWordsPanelCnInput' placeholder='只接受中文字符'>";
     keyWordsPanelCnDiv.innerHTML = keyWordsPanelCnDom;
     var keyWordsPanelEnDiv = document.createElement("div");
     keyWordsPanelEnDiv.setAttribute("id", "keyWordsPanelEnDiv");
-    var keyWordsPanelEnDom = "<span style='font-weight: bold;'>英文: </span>"+"<input type='text' id='keyWordsPanelEnInput'>";
+    var keyWordsPanelEnDom = "<span style='font-weight: bold;'>英文: </span>"+"<input type='text' id='keyWordsPanelEnInput' placeholder='只接受英文字符'>";
     keyWordsPanelEnDiv.innerHTML = keyWordsPanelEnDom;
     keyWordsPanelWall.appendChild(keyWordsPanelCnDiv)
     keyWordsPanelWall.appendChild(keyWordsPanelEnDiv)
@@ -190,7 +191,7 @@ var paperProto = {
         for(var i=0;i < paperProto.config.authorInfos.length;i++) {
           if(paperProto.config.authorInfos[i].isContract) {
             authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="number" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td><input class="authorAgencyAdd" type="text" onclick="SelCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
-            authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登陆用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
+            authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
           }else{
             authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="number" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td><input class="authorAgencyAdd" type="text" onclick="SelCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
           }
@@ -398,7 +399,7 @@ function useContractAuthor(para) {
   if(!isContract) {
     var nextContractTr = $(para).parents("tr").next().remove();
   }else{
-    var nextContractTr = '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登陆用户可见)" class="contractEmail"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码" class="contractTel"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址" class="contractAdd"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode"/></span></td></tr>';
+    var nextContractTr = '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登陆用户可见)" class="contractEmail"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode"/></span></td></tr>';
     $(para).parents("tr").after(nextContractTr)
   }
 }
