@@ -1448,7 +1448,17 @@ footer.footer ul li{
 
 .originPanelWall {
   width: 300px;
-  max-width: 250px;
+  text-align: start;
+  display: inline-block;
+  border: 1px solid #eee;
+  padding: 5px 15px;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.originTextWall {
+  width: 300px;
   display: inline-block;
   border: 1px solid #eee;
   padding: 5px 15px;
@@ -1463,7 +1473,7 @@ footer.footer ul li{
   padding-left: 10px;
   padding-top: 2px;
   padding-bottom: 2px;
-  border-bottom: 5px solid #d9e1e8;
+  /* border-bottom: 5px solid #d9e1e8; */
   background: linear-gradient(to top,#3494da 4px,#3494da 0) 1px 5px no-repeat;
   background-size: 4px 14px;
   font-weight:bold;
