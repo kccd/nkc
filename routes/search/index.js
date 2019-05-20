@@ -66,7 +66,6 @@ router
       // 总匹配数
       data.total = results.hits.total;
       results = results.hits.hits.map(r => {
-        console.log(r._score)
         const resource = r._source;
         resource.highlight = r.highlight;
         return resource;

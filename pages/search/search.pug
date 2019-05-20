@@ -13,7 +13,7 @@ block content
               label 关键词：
               input.form-control.keywords-input(type='text' name='c' placeholder='多个关键词用空格分隔' v-model="c" @keyup.enter="search")
             .form-group
-              label 关键词关系：
+              label 多关键词关系：
               span.h5 或
                 input(type="radio" value="or" v-model="relation")
               span.h5 与
@@ -22,7 +22,6 @@ block content
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
-          .search-form.form-inline(v-if="t !== 'user'")
             .form-group
               label 专业筛选：
               .search-forum-div
@@ -63,13 +62,13 @@ block content
                 input(type="radio" value="" v-model="sortType")
               span.h5 &nbsp;&nbsp;发表时间
                 input(type="radio" value="time" v-model="sortType")
-          .search-form.form-inline(v-if="t !== 'user'")
             .form-group
               label 显示方式：
               span.h5 降序
                 input(type="radio" value="" v-model="sort")
               span.h5 &nbsp;&nbsp;升序
                 input(type="radio" value="asc" v-model="sort")
+
 
       .col-xs-12.col-md-3
         .search-form.form-inline
