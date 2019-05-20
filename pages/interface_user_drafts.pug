@@ -6,6 +6,9 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-9
+        .paging-button 
+          a.button(style="cursor:pointer" onclick=`removedraft("${data.user.uid}","all")`) 舍弃全部草稿
+      .col-xs-12.col-md-9
         if(data.drafts.length === 0)
           br
           br
@@ -25,7 +28,7 @@ block content
             span.time= fromNow(i.tlm)
             span &nbsp;~~
             a(href=`/editor?type=redit&did=${i.did}`).link 继续创作
-            a(style='float:right;' href="javascript:;" onclick=`removedraft("${i.uid}","${i.did}")`).link 舍弃
+            a(style='float:right;' href="javascript:;" onclick=`removedraft("${i.uid}","${i.did}")`) 舍弃
         include interface_navigation_paging
 block scripts
   script(src='/interface_common.js')

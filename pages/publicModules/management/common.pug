@@ -1,0 +1,5 @@
+if permissionsOr(["complaintGet"])
+  .management-panel
+    .side-thread-header 管理面板
+    if permission("complaintGet")
+      a.clear-a-style(href=`/complaint`) 投诉列表

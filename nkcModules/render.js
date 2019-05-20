@@ -352,6 +352,38 @@ function cutContent(str,num) {
 	}
 }
 
+/**
+ * 换行转换
+ */
+function LineFeedConversion(str) {
+	let strs = str.replace(new RegExp("\n", "gm"),'<br/>');
+	return strs
+}
+
+/**
+ * 获取声明等级
+ */
+function getOriginLevel(index) {
+	let obj = {
+		"0": "不声明",
+		"1": "普通转载",
+		"2": "获授权转载",
+		"3": "受托发表",
+		"4": "发表人参与原创(翻译)",
+		"5": "发表人是合作者之一",
+		"6": "发表人本人原创"
+	}
+	if(!index) {
+		return obj;
+	}else{
+		for(var i in obj) {
+			if(i == index) {
+				return obj[i]
+			}
+		}
+	}
+}
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -359,7 +391,9 @@ let pugRender = (template, data, state) => {
     markdown: render.commonmark_render,
     dateTimeString: dateTimeString,
     fromNow: fromNow,
-    format: format,
+		format: format,
+		LineFeedConversion: LineFeedConversion,
+		getOriginLevel: getOriginLevel,
     server: settings.server,
     plain:render.plain_render,
     experimental_render:render.experimental_render,
@@ -388,6 +422,17 @@ let pugRender = (template, data, state) => {
     // 验证用户是否具有执行该操作的权限
     permission: (operationId) => {
       return data.userOperationsId.includes(operationId);
+    },
+    permissionsOr: (operationsId) => {
+      for(const id of operationsId) {
+        if(data.userOperationsId.includes(id)) return true;
+      }
+    },
+    permissionsAnd: (operationsId) => {
+      for(const id of operationsId) {
+        if(!data.userOperationsId.includes(id)) return false;
+      }
+      return true;
     },
     state,
     ipUrl,

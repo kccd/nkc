@@ -35,6 +35,26 @@ block content
               .col-sm-3
                 input.form-control(type='text' v-model.number="pageSettings.userCardUserList")
             .form-group
+              label.col-sm-3.control-label 文章页回复列表
+              .col-sm-3
+                input.form-control(type='text' v-model.number="pageSettings.threadPostList")
+            .form-group
+              label.col-sm-3.control-label 搜索页文章列表
+              .col-sm-3
+                input.form-control(type='text' v-model.number="pageSettings.searchThreadList")
+            .form-group
+              label.col-sm-3.control-label 搜索页回复列表
+              .col-sm-3
+                input.form-control(type='text' v-model.number="pageSettings.searchPostList")
+            .form-group
+              label.col-sm-3.control-label 搜索页全部列表
+              .col-sm-3
+                input.form-control(type='text' v-model.number="pageSettings.searchAllList")
+            .form-group
+              label.col-sm-3.control-label 搜索页用户列表
+              .col-sm-3
+                input.form-control(type='text' v-model.number="pageSettings.searchUserList")
+            .form-group
               label.col-sm-3.control-label
               .col-sm-3
                 h5.text-danger(v-if="error") {{error}}

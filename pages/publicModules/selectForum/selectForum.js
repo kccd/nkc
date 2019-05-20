@@ -45,7 +45,7 @@ vueSelectForum.init = function(options) {
           }
         }
       },
-      secletForum: function(forum) {
+      selectForum: function(forum) {
         this.selectedForums.push(forum);
       },
       done: function() {
@@ -54,7 +54,9 @@ vueSelectForum.init = function(options) {
         if(!canChooseParentForum && this.childForums.length !== 0) return screenTopWarning('请选择下级专业');
         $('#vueSelectForum').modal('hide');
         func(selectedForums[selectedForums.length - 1]);
-        this.selectedForums = [];
+        setTimeout(function() {
+          vueSelectForum.app.selectedForums = [];
+        }, 500);
       },
       show: function() {
         $('#vueSelectForum').modal('show');

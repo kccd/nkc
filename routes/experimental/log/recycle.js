@@ -20,6 +20,9 @@ router
       category: false,
       lastPost: false
     });
+    data.threads.map(thread => {
+      thread.firstPost = thread.firstPost.toObject();
+    });
     ctx.template = "experimental/log/recycle.pug";
     await next();
   });

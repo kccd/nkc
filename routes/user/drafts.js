@@ -20,11 +20,17 @@ draftsRouter
       await next()
     })
     .del('/:did', async(ctx, next) => {
+        const {db, data} = ctx;
         const uid = ctx.query.uid;
         const did = ctx.query.did;
-        const db = ctx.db;
-        await db.DraftModel.remove({"uid":uid,"did":did})
-        const removeResult = db.DraftModel.find({"uid":uid,"did":did})
+        if(uid !== data.user.uid) ctx.throw(403, "抱歉，您没有资格删除别人的草稿");
+        const delMap = {
+            uid: uid
+        }
+        if(did !== "all") {
+            delMap.did = did
+        }
+        await db.DraftModel.remove(delMap)
         await next();
     })
     .post('/', async(ctx, next) => {

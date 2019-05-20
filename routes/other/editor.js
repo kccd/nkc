@@ -5,7 +5,10 @@ editorRouter
     const {data, db, query, nkcModules} = ctx;
     const {dbFunction} = nkcModules;
     const {user} = data;
-    if(!user.username) return ctx.redirect('/register');
+    // 判断用户是否已完善账号基本信息（username, avatar, banner）
+    if(!await db.UserModel.checkUserBaseInfo(user)) {
+      nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
+    }
     const {type, id, cat, title, content} = query;
     //发新帖，回复等使用新编辑器
     //重新编辑帖子使用旧版编辑器
@@ -16,8 +19,6 @@ editorRouter
     if(type && type === "forum"){
       existsFid = id;
     }
-    data.subscribeDisciplines = await userSubscribe.extendSubscribeDisciplines(existsFid);
-    data.subscribeTopics = await userSubscribe.extendSubscribeTopics(existsFid);
     data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     const authLevel = await userPersonal.getAuthLevel();
 	  if((!user.volumeA || authLevel < 1) && type !== 'application') {
@@ -33,9 +34,9 @@ editorRouter
     data.navbar.highlight = 'editor';
     // type=post:重新编辑回复
     // 如果需要重新编辑html与语言的帖子，就使用新编辑器
-
     if(type !== 'application') {
 	    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
+      data.panelDatas = await db.ForumModel.getForumsNewTree(data.userRoles, data.userGrade, data.user);
 	    if(type === 'forum' && id) {
         const forum = await db.ForumModel.findOnly({fid: id});
         data.forumType = forum.forumType;
@@ -77,6 +78,7 @@ editorRouter
         ctx.throw(403, '权限不足');
       }
       // if(targetPost.uid !== user.uid && !await targetThread.ensurePermissionOfModerators(ctx)) ctx.throw(403, '权限不足');
+      data.targetPost = targetPost;
       data.content = targetPost.c;  //回复内容
       data.title = targetPost.t;  //回复标题
       data.abstract = targetPost.abstract; // 文章摘要
@@ -115,9 +117,8 @@ editorRouter
     	const thread = await db.ThreadModel.findOnly({tid: id});
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
-    
-    const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
-    data.allForumList = allForumList;
+
+    data.allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     await next();
   });
 

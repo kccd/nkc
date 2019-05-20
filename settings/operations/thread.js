@@ -7,7 +7,10 @@ module.exports = {
 			PATCH: 'moveThread'
 		},
 		moveDraft: {
-			PATCH: 'moveDraft'
+			PATCH: 'moveDraft',
+      reason: {
+        PATCH: "modifyReasonThreadReturn"
+      }
 		},
 		addColl: {
 			POST: 'collectThread'

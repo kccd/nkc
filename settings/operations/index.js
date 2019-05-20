@@ -55,7 +55,9 @@ const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
 const shop = require('./shop');
 const account = require('./account');
+const complaint = require("./complaint");
 const imageEdit = require('./imageEdit');
+const protocol = require('./protocol');
 const operationObj = {};
 
 
@@ -183,8 +185,12 @@ operationObj.operationTree = {
 		shop, //商城
 		
 		imageEdit, // 编辑图片
+
+		protocol, // 论坛协议
     
     account, // 个人中心
+
+    complaint, // 用户投诉
 	}
 };
 module.exports = operationObj;

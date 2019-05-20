@@ -73,6 +73,11 @@ block content
                 include ../publicModules/forums_nav/forums_item
           .m-b-1
             include ../publicModules/share/user-card
+          if data.user &&  data.user.uid !== data.targetUser.uid
+            .m-b-1
+              .user-card-complaint(
+                onclick=`moduleComplaint.open('user', '${data.targetUser.uid}')`
+              ) 投诉
       .col-xs-12.col-md-7
         .post-panel.b-s-10.m-b-2
           include ../publicModules/paging/user_card
@@ -112,6 +117,7 @@ block content
                       include ../publicModules/user_panel/user_panel_md
           include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
+        include ../module_scrollTo
         if data.targetUserDigestThreads && data.targetUserDigestThreads.length > 0
           .m-b-2
             -let sideThreads = data.targetUserDigestThreads
@@ -142,5 +148,6 @@ block content
 
 block scripts
   include ../publicModules/vue_user_panel/vue_user_panel_float
+  include ../publicModules/complaint/complaint
   +includeJS("/echarts/dist/echarts.min.js")
   +includeJS("/user/summary.js")

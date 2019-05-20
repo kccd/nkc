@@ -296,8 +296,22 @@ threadSchema.methods.extendUser = async function() {
 
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
+  const throwError = require("../nkcMOdules/throwError");
   for(const forum of this.forums) {
-    await forum.ensurePermission(roles, grade, user);
+    try {
+      await forum.ensurePermission(roles, grade, user);
+    } catch(err) {
+      const status = err.status;
+      try{
+        err = JSON.parse(err.message || err);
+        err = err.errorData;
+      } catch(e) {}
+      let errorType = "noPermissionToReadThread";
+      if(forum.fid === "recycle") {
+        errorType = "threadHasBeenBanned";
+      }
+      throwError(status, err, errorType);
+    }
   }
 };
 
@@ -454,7 +468,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstract} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = post;
   const quote = await dbFn.getQuote(c);
   if(this.uid !== user.uid) {
     const replyWriteOfThread = new ReplyModel({
@@ -472,7 +486,12 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     pid,
     c,
     t,
-    abstract,
+    abstractCn,
+    abstractEn,
+    keyWordsCn,
+    keyWordsEn,
+    authorInfos,
+    originState,
     ipoc: ip,
     iplm: ip,
     l,
@@ -536,7 +555,9 @@ threadSchema.methods.newPost = async function(post, user, ip) {
  // 算post所在楼层
 threadSchema.statics.getPostStep = async (tid, obj) => {
   const PostModel = mongoose.model('posts');
-  const {perpage} = require('../settings').paging;
+  const SettingModel = mongoose.model("settings");
+  const pageSettings = await SettingModel.findOnly({_id: "page"});
+  const perpage = pageSettings.c.threadPostList;
   const pid = obj.pid;
   const q = {
     tid
@@ -887,18 +908,22 @@ threadSchema.statics.getNotice = async (fid) => {
   });
 };
 /*
-* 加载置顶专业内的精选文章 随机
+* 加载指定专业内的精选文章 随机
 * @param {[String]} fid 能够从中读取文章的专业ID
 * @author pengxiguaa 2019-4-26
 * */
 threadSchema.statics.getFeaturedThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
+  const time = Date.now() - 15379200000;// 半年
   const threads = await ThreadModel.aggregate([
     {
       $match: {
         digest: true,
         mainForumsId: {
           $in: fid
+        },
+        toc: {
+          $gte: new Date(time)
         }
       }
     },
@@ -913,11 +938,38 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 10
+        size: 6
       }
     }
   ]);
-  return await ThreadModel.extendThreads(threads, {
+  const threads_ = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid
+        },
+        toc: {
+          $lt: new Date(time)
+        }
+      }
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1
+      }
+    },
+    {
+      $sample: {
+        size: 4
+      }
+    }
+  ]);
+  return await ThreadModel.extendThreads(threads.concat(threads_), {
     lastPost: false,
     category: false
   })

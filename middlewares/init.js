@@ -152,10 +152,20 @@ module.exports = async (ctx, next) => {
 	  } else {
 		  error = err;
 	  }
-	  ctx.data.error = error;
+	  try{
+	    const errObj = JSON.parse(error);
+	    const {errorType, errorData} = errObj;
+	    error = errorData;
+	    ctx.errorType = errorType;
+    } catch(err) {}
+	  if(ctx.errorType) {
+	    ctx.template = `error/${ctx.errorType}.pug`;
+    } else {
+      ctx.template = 'error/error.pug';
+    }
+    ctx.data.error = error;
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
-	  ctx.template = 'error.pug';
 		ctx.type = ctx.type || 'application/json';
 	  await body(ctx, () => {});
   }

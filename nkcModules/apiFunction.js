@@ -231,7 +231,6 @@ fn.obtainPureText = (content, reduce, count) => {
   count = parseInt(count);
   if(reduce === true){
     if(content.length > count){
-      var lastContent = content.substr(content.length-count,content.length)
       content = content.substr(0,count) + "...";
     }
   }

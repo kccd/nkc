@@ -694,6 +694,12 @@ forumSchema.methods.getAllChildForumsId = async function() {
   return await client.smembersAsync(`forum:${this.fid}:allChildForumsId`);
 };
 
+forumSchema.statics.getAllChildForumsIdByFid = async function(fid) {
+  return await client.smembersAsync(`forum:${fid}:allChildForumsId`);
+};
+
+
+
 /* 
   获取专业下的全部专业
   @return 专业对象数组
@@ -740,10 +746,11 @@ forumSchema.statics.ensureForumsPermission = async (arr, userInfo) => {
 
 // 判断用户是否有权访问该版块
 forumSchema.methods.ensurePermission = async function(roles, grade, user) {
+  const throwError = require("../nkcModules/throwError");
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
   if(!fid.includes(this.fid)) {
-    throwErr(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`);
+    throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
   }
 };
 
@@ -934,6 +941,84 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     if(forum.parentsId.length === 0) {
       result.push(forum);
     }
+  }
+  return result;
+};
+
+/**
+ * 获取新的专业树形结构
+ */
+forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  const SubscribeModel = mongoose.model("subscribes");
+  const ThreadTypeModel = mongoose.model("threadTypes");
+  const threadTypes = await ThreadTypeModel.find({});
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  const subForums = await SubscribeModel.find({type: "forum", uid: user.uid});
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
+    }
+  }, {
+    fid: 1,
+    displayName: 1,
+    parentsId: 1,
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+
+    forum.id = forum.fid;
+    forum.name = forum.displayName;
+    forum.son = [];
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
+  });
+
+  for(let forum of forums) {
+    for(const fid of forum.parentsId) {
+      const parentForum = forumsObj[fid];
+      if(parentForum) {
+        parentForum.childrenForums.push(forum);
+        parentForum.son.push(forum);
+      }
+    }
+    if(forum.childrenForums.length == 0) {
+      for(const cate of threadTypes) {
+        if(cate.fid == forum.fid) {
+          forum.son.push({
+            id: "c"+cate.cid,
+            name: cate.name,
+            son:[]
+          })
+        }
+      }
+    }
+  }
+  // 我关注的
+  const mySubForums = {
+    id: "mySub",
+    name: "我关注的",
+    son:[]
+  }
+  for(let subf of subForums) {
+    for(let forum of forums) {
+      if(forum.fid == subf.fid){
+        mySubForums.son.push(forum)
+      }
+    }
+  }
+
+  const result = [];
+  for(let forum of forums) {
+    if(forum.parentsId.length === 0) {
+      result.push(forum);
+    }
+  }
+  if(mySubForums.son.length > 0) {
+    result.unshift(mySubForums)
   }
   return result;
 };

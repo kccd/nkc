@@ -23,6 +23,8 @@ module.exports = async (ctx, next) => {
       name = basename;
     }
     let stats = fss.statSync(filePath);
+    // 设置文件类型
+    ctx.type = ext;
     if(ext === "mp4"){
       if(ctx.request.headers['range']){
         var range = utils.parseRange(ctx.request.headers["range"], stats.size);
@@ -64,10 +66,7 @@ module.exports = async (ctx, next) => {
     ctx.logIt = true; // if the request is request to a content, log it;
     const type = ctx.request.accepts('json', 'html');
     const from = ctx.request.get('FROM');
-    if(from === 'htmlAPI'){
-	    ctx.data.html = ctx.nkcModules.render(path.resolve('./pages/' + ctx.localTemplate), ctx.data, ctx.state);
-	    ctx.body = ctx.data;
-    } else if(type === 'json' && from === 'nkcAPI') {
+    if(type === 'json' && from === 'nkcAPI') {
 	    ctx.type = 'json';
 	    if(ctx.data.user) ctx.data.user = ctx.data.user.toObject();
 	    ctx.body = ctx.data;

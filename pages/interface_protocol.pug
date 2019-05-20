@@ -1,0 +1,24 @@
+extends bootstrap_base
+
+block title
+
+  title 论坛协议
+  -const mainContainer1400 = true
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8
+        .p-t-2 
+        if data.protocol
+          div!=`${data.protocol.protocolContent}`
+      .col-xs-12.col-md-3.col-md-offset-1      
+        .p-t-2        
+        .list-header  
+          span 论坛协议列表
+          div.line
+        for pro in data.protocols
+          .m-t-1
+            a(href=`/protocol?type=${pro.protocolTypeId}`)
+              span 《
+              span!=`${pro.protocolName}`
+              span 》

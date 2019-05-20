@@ -139,9 +139,8 @@ router
         port: elasticSearch.port,
         username: elasticSearch.username || '',
         password: elasticSearch.password || '',
-        articlesIndex:elasticSearch.articlesIndex,
-        usersIndex: elasticSearch.usersIndex,
-        ChineseAnalyzer: 'ik_max_word'
+        analyzer: "ik_max_word",
+        searchAnalyzer: "ik_smart"
       }
     });
 

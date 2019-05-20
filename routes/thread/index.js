@@ -76,9 +76,10 @@ threadRouter
 		const {data, params, db, query, nkcModules, body} = ctx;
 		const ip = ctx.address;
 		let {token, paraId} = query;
-		let {page = 0, pid, last_page, highlight, step} = query;
+		let {page = 0, pid, last_page, highlight, step, t} = query;
 		const {tid} = params;
 		data.highlight = highlight;
+		data.complaintTypes = ctx.state.language.complaintTypes;
     const thread = await db.ThreadModel.findOnly({tid});
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
 		// 验证权限 - new
@@ -143,9 +144,13 @@ threadRouter
 		const match = {
 			tid
 		};
+		// 只看作者
+		if(t === "author") {
+		  data.t = t;
+		  match.uid = thread.uid
+    }
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
-
 		// 判断是否为该专业的专家
 		// 如果是该专业的专家，加载所有的post；如果不是，则判断有没有相应权限。
 		if(!isModerator) {
@@ -184,8 +189,9 @@ threadRouter
 			if($and.length !== 0) match.$and = $and;
 		}
 		// 统计post总数，分页
+    const pageSettings = (await db.SettingModel.findOnly({_id: "page"})).c;
 		const count = await db.PostModel.count(match);
-		const paging_ = nkcModules.apiFunction.paging(page, count);
+		const paging_ = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		const {pageCount} = paging_;
 		// 删除退休超时的post
 		const postAll = await db.PostModel.find({tid:tid,toDraft:true});
@@ -211,10 +217,9 @@ threadRouter
 			page = pageCount -1;
 		}
 		// 查询该文章下的所有post
-		const paging = nkcModules.apiFunction.paging(page, count);
+		const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
@@ -421,7 +426,7 @@ threadRouter
     if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复至少需要完成身份认证 ${authLevelMin}`);
     if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
       if(!status) ctx.throw(403, '权限不足，请提升账号等级');
-      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请明天再试。');
+      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请参加考试提升等级，或者明天再试。');
     }
 
     // 发表回复时间、条数限制

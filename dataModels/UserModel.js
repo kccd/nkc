@@ -301,13 +301,20 @@ userSchema.virtual('newVoteUp')
   .set(function(newVoteUp) {
     this._newVoteUp = newVoteUp;
   });
-userSchema.virtual('info') 
+userSchema.virtual('info')
   .get(function() {
     return this._info;
   })
   .set(function(info) {
     this._info = info;
-  });  
+  });
+userSchema.virtual('user')
+  .get(function() {
+    return this._user;
+  })
+  .set(function(user) {
+    this._user = user;
+  });
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = mongoose.model('threads');
@@ -1064,6 +1071,54 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
   const FriendModel = mongoose.model("friends");
   const friends = await FriendModel.find({uid});
   return friends.map(c => c.tUid);
+};
+
+/*
+* 判断用户是否上传了头像
+* @param {String} uid 用户id
+* @author pengxiguaa 2019-5-13
+* @return {Boolean} 是否上传
+* */
+userSchema.statics.uploadedAvatar = async (uid) => {
+  if(!uid) throwErr(500, "userSchema.uploadedAvatar: uid is required");
+  let {avatarPath} = require("../settings/upload");
+  const {existsSync} = require("../tools/fsSync");
+  avatarPath += `/${uid}.jpg`;
+  return existsSync(avatarPath);
+};
+/*
+* 判断用户是否上传了背景
+* @param {String} uid 用户id
+* @author pengxiguaa 2019-5-13
+* @return {Boolean} 是否上传
+* */
+userSchema.statics.uploadedBanner = async (uid) => {
+  if(!uid) throwErr(500, "userModel.uploadedBanner: uid is required");
+  let {userBannerPath} = require("../settings/upload");
+  const {existsSync} = require("../tools/fsSync");
+  userBannerPath += `/${uid}.jpg`;
+  return existsSync(userBannerPath);
+};
+
+/*
+* 验证用户是否已完善基本信息
+* 信息种类：用户名、头像、背景
+* @param {String/Object} uid 用户id/用户对象
+* @return {Boolean} 是否已完善
+* @author pengxiguaa 2019-5-13
+* */
+userSchema.statics.checkUserBaseInfo = async function(uid) {
+  let user;
+  const UserModel = mongoose.model("users");
+  if(uid instanceof String) {
+    user = await UserModel.findById(uid);
+  } else {
+    user = uid;
+  }
+  const {username} = user;
+  const uploadedAvatar = await UserModel.uploadedAvatar(user.uid);
+  const uploadedBanner = await UserModel.uploadedBanner(user.uid);
+  return username && uploadedAvatar && uploadedBanner;
 };
 
 module.exports = mongoose.model('users', userSchema);

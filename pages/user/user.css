@@ -287,3 +287,9 @@ body{
   color: #282c37;
   font-weight: 700;
 }
+.user-card-complaint{
+  text-align: center;
+  font-size: 1rem;
+  color: #9baec8;
+  cursor: pointer;
+}

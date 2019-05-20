@@ -58,6 +58,14 @@ usersSubscribeSchema.virtual('subscribeTopics')
     this._subscribeTopics = s;
   });
 
+usersSubscribeSchema.virtual('subscriberForums')
+  .get(function() {
+    return this._subscribeForums;
+  })
+  .set(function(s) {
+    this._subscribeForums = s;
+  })
+
 usersSubscribeSchema.methods.extendSubscribers = async function() {
   const UserModel = require('./UserModel');
   const subscribers = await Promise.all(this.subscribers.map(async uid => await UserModel.findOnly({uid})));
@@ -100,6 +108,19 @@ usersSubscribeSchema.methods.extendSubscribeTopics = async function(existsFid) {
     }
   }
   return this.subscribeTopics = subscribeTopics;
+}
+
+usersSubscribeSchema.methods.extendSubscribeForums = async function(existsFid) {
+  const ForumModel = require("./ForumModel");
+  const subscribeForums = [];
+  let eFid = "";
+  if(existsFid) eFid = existsFid;
+  var eIndex = this.subscribeForums.indexOf(existsFid);
+  for(let fid of this.subscribeForums) {
+    const forum = await ForumModel.findOne({fid: fid});
+    subscribeForums.push(forum)
+  }
+  return this.subscribeForums = subscribeForums;
 }
 
 module.exports = mongoose.model('usersSubscribe', usersSubscribeSchema, 'usersSubscribe');

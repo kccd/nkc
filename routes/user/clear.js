@@ -8,9 +8,6 @@ router
     const {type} = body;
     const time = Date.now();
     if(type === "avatar") {
-      const avatarSmallPath = `${settings.upload.avatarSmallPath}/${targetUser.uid}.jpg`;
-      const avatarLargePath = `${settings.upload.avatarLargePath}/${targetUser.uid}.jpg`;
-      const avatarPath = `${settings.upload.avatarPath}/${targetUser.uid}.jpg`;
       try{
         await ctx.fs.rename(
           `${settings.upload.avatarPath}/${targetUser.uid}.jpg`,
