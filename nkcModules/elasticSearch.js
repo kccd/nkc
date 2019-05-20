@@ -127,7 +127,7 @@ func.save = async (docType, document) => {
   // 唯一ID，存在测更新body，不存在则新建数据。
   let id;
 
-  if(docType === "user") {
+  if(docType === "thread") {
     id = `thread_${tid}`;
   } else if(docType === "post") {
     id = `post_${pid}`;
