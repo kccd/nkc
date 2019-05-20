@@ -1400,6 +1400,9 @@ footer.footer ul li{
   color: #9baec8;
   margin-left: 0.5rem;
 }
+.clear-a-style{
+  cursor: pointer;
+}
 .clear-a-style:hover, .clear-a-style:link, .clear-a-style:active, .clear-a-style:visited{
   text-decoration: none;
   color: #2b90d9;

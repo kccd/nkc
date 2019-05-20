@@ -50,7 +50,7 @@
   display: inline-block;
   cursor: pointer;
   height: 3rem;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   line-height: 3rem;
   font-size: 1.2rem;
   color: #282c37;
@@ -77,7 +77,7 @@
 }
 
 .search-result{
-  margin: 1rem 0 2rem 0;
+  margin: 1.5rem 0 1.5rem 0;
 }
 .search-result-title{
   color: #2b90d9;
@@ -162,4 +162,48 @@
 }
 .search-forum-div{
   display: inline-block;
+}
+.search-result-avatar{
+  display: table-cell;
+  padding-right: 1rem;
+}
+.search-result-avatar img{
+  height: 4rem;
+  width: 4rem;
+  border-radius: 50%;
+}
+.search-result-user-info{
+  display: table-cell;
+  vertical-align: top;
+  max-height: 6rem;
+}
+.search-result-username{
+  font-size: 1.4rem;
+  font-weight: 700;
+  overflow: hidden;
+}
+.search-result-certs{
+  line-height: 2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  overflow: hidden;
+  color: #282c37;
+}
+.search-result-description{
+  color: #282c37;
+  line-height: 2rem;
+  font-size: 1.2rem;
+}
+.search-button{
+  background-color: #2b90d9;
+  color: #fff;
+}
+.search-button:hover{
+  color: #fff;
+}
+.search-button:active{
+  color: #fff;
+}
+.search-button:focus{
+  color: #fff;
 }

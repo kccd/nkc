@@ -9,7 +9,7 @@ infoRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, body} = ctx;
+		const {data, body, nkcModules} = ctx;
 		const {user} = data;
 		let {description, postSign, color, operation} = body;
 		const {contentLength} = ctx.tools.checkString;
@@ -27,6 +27,7 @@ infoRouter
 		}
 		//适应搜索数据库，用save方法更新user信息
 		await user.save();
+    await nkcModules.elasticSearch.save("user", user);
 		await next();
 	});
 module.exports = infoRouter;

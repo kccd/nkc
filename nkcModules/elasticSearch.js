@@ -118,18 +118,33 @@ func.save = async (docType, document) => {
     digest = false,
     abstractEn = "", abstractCn = "", keyWordsEn = [], keyWordsCn = [],
     authorInfos = [],
-    voteUp =0, voteDown = 0,
-    description = ""
+    voteUp = 0, voteDown = 0,
+    description = "",
+    username = ""
 
   } = document;
+
+  // 唯一ID，存在测更新body，不存在则新建数据。
+  let id;
+
+  if(docType === "user") {
+    id = `thread_${tid}`;
+  } else if(docType === "post") {
+    id = `post_${pid}`;
+  } else {
+    id = `user_${uid}`;
+  }
+
   return await client.index({
     index: indexName,
     type: "documents",
+    id,
     body: {
       docType,
       toc,
       pid,
       description,
+      username,
       uid,
       tid,
       digest,
@@ -151,7 +166,6 @@ func.save = async (docType, document) => {
 func.search = async (t, c, options) => {
   const SettingModel = require("../dataModels/SettingModel");
   const UserModel = require("../dataModels/UserModel");
-  console.log(options);
   let {
     page=0, sortType,
     timeStart, timeEnd,
@@ -159,7 +173,8 @@ func.search = async (t, c, options) => {
     author, digest
   } = options;
 
-  relation = relation==="or"?"or":"and";
+  // 若只有一个关键词则默认or
+  relation = (relation==="or" || c.split(" ").length < 2)?"or":"and";
 
   let uid;
 
@@ -225,7 +240,7 @@ func.search = async (t, c, options) => {
                                 content: {
                                   query: c,
                                   operator: relation,
-                                  boost: 1,
+                                  boost: 2,
                                 }
                               }
                             }
@@ -352,7 +367,6 @@ func.search = async (t, c, options) => {
     }
     body.sort.push({_score});
   }
-  console.log(JSON.stringify(body, "", 2));
   return await client.search({
     index: indexName,
     type: "documents",

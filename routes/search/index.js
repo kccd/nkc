@@ -12,6 +12,7 @@ router
     data.d = d;
     let options;
 
+    // 高级搜索参数
     if(d) {
       try{
         options = JSON.parse(decodeURIComponent(Buffer.from(d, "base64").toString()));
@@ -58,13 +59,13 @@ router
     // 加载分页设置
     const {searchThreadList, searchAllList, searchPostList, searchUserList} = (await db.SettingModel.findById("page")).c;
 
+    // 用户输入了搜索的关键词，进入高级搜索。
     if(c) {
       // 搜索结果
       results = await nkcModules.elasticSearch.search(t, c, options);
       // 总匹配数
       data.total = results.hits.total;
       results = results.hits.hits.map(r => {
-        console.log(r._score);
         const resource = r._source;
         resource.highlight = r.highlight;
         return resource;
@@ -99,8 +100,8 @@ router
             highlightObj[r.pid + "_title"] = r.highlight.title;
             highlightObj[r.pid + "_content"] = r.highlight.content;
           } else if(r.docType === "user") {
-            highlightObj[r.pid + "_username"] = r.highlight.username;
-            highlightObj[r.pid + "_description"] = r.highlight.description;
+            highlightObj[r.uid + "_username"] = r.highlight.username;
+            highlightObj[r.uid + "_description"] = r.highlight.description;
           }
 
         }
@@ -138,65 +139,70 @@ router
         threadObj[thread.tid] = thread;
       });
 
-
       // 根据文档类型，拓展数据
-      for(const r of results) {
-        const {docType} = r;
-        if(docType === "thread" || docType === "post") {
-
-        } else if(docType === "user") {
-
-        }
-      }
-
-
       loop1:
-      for(const pid of [...pids]) {
-        const post = postObj[pid];
-        if(!post) continue;
-        const postUser = userObj[post.uid];
-        if(!postUser) continue;
-        const thread = threadObj[post.tid];
-        if(!thread) continue;
-        for(const fid of thread.mainForumsId) {
-          if(!fidOfCanGetThreads.includes(fid)) continue loop1;
-        }
-        let link;
-        if(thread.oc === post.pid) {
-          link = `/t/${thread.tid}`
+      for(const result of results) {
+        let r;
+        const {docType, pid, uid} = result;
+        if(["thread", "post"].includes(docType)) {
+          const post = postObj[pid];
+          if(!post) continue;
+          const postUser = userObj[post.uid];
+          if(!postUser) continue;
+          const thread = threadObj[post.tid];
+          if(!thread) continue;
+          for(const fid of thread.mainForumsId) {
+            if(!fidOfCanGetThreads.includes(fid)) continue loop1;
+          }
+          let link;
+          if(thread.oc === post.pid) {
+            link = `/t/${thread.tid}`
+          } else {
+            const m = {pid: post.pid};
+            if(!ctx.permission("displayDisabledPosts")) {
+              m.disabled = false;
+            }
+            const obj = await db.ThreadModel.getPostStep(thread.tid, m);
+            link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+          }
+
+          const forums = thread.forums.map(forum => {
+            return {
+              displayName: forum.displayName,
+              fid: forum.fid
+            }
+          });
+
+          r = {
+            docType,
+            link,
+            title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
+            abstract: highlightObj[`${pid}_content`] || post.abstract || post.c,
+            threadTime: thread.toc,
+            postTime: post.toc,
+            tid: thread.tid,
+            threadUser: {
+              uid: thread.firstPost.user.uid,
+              username: thread.firstPost.user.username
+            },
+            postUser: {
+              uid: postUser.uid,
+              username: postUser.username
+            },
+            forums
+          };
         } else {
-          const m = {pid: post.pid};
-          if(!ctx.permission("displayDisabledPosts")) {
-            m.disabled = false;
-          }
-          const obj = await db.ThreadModel.getPostStep(thread.tid, m);
-          link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+          const user = userObj[uid];
+          if(!user) continue;
+          await db.UserModel.extendUsersInfo([user]);
+          r = {
+            docType,
+            username: highlightObj[`${uid}_username`] || user.username,
+            description: highlightObj[`${uid}_description`] || user.description,
+            user
+          };
         }
-
-        const forums = thread.forums.map(forum => {
-          return {
-            displayName: forum.displayName,
-            fid: forum.fid
-          }
-        });
-
-        data.results.push({
-          title: highlightObj[post.pid + "_title"] || post.t || thread.firstPost.t,
-          link,
-          abstract: highlightObj[post.pid + "_content"] || post.abstract || post.c,
-          threadTime: thread.toc,
-          postTime: post.toc,
-          tid: thread.tid,
-          threadUser: {
-            uid: thread.firstPost.user.uid,
-            username: thread.firstPost.user.username
-          },
-          postUser: {
-            uid: postUser.uid,
-            username: postUser.username
-          },
-          forums,
-        });
+        data.results.push(r);
       }
     }
     data.time = Date.now() - time;
