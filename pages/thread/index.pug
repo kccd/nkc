@@ -290,7 +290,7 @@ block content
                         -}
                         .thread-info.text-center(style="color:#000;font-weight: bold;margin-top:1rem")
                           for auth,index in post.authorInfos
-                            span(style="margin-right:10px")!=`${auth.name}`
+                            span(style="margin-right:10px;cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
                               if auth.agencyIndex
                                 sup!=`${auth.agencyIndex}`
                               if auth.isContract

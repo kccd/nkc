@@ -859,3 +859,9 @@ function originPanelShow(para) {
 function originPanelClose() {
 	$("#originPanelShell").remove()
 }
+
+function turnUser(uid) {
+	if(uid) {
+		window.location.href = "/u/"+uid
+	}
+}
