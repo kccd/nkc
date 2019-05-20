@@ -20,7 +20,7 @@ var panelProto = {
         closeId: "panelClose", // 关闭按钮Id，如无必要，无需另传
         headerId: "panelHeader", // 头部Id，如无必要，无需另传
         contentWallId: "panelContentWall", // content内壁Id，如无必要，无需另传
-        headerText: "请选择专业(最多可选两个)",
+        headerText: "请选择专业",
         panelExist: false, // panel是否存在
         panelInit: false, // panel是否初始化
         tagsLast: {
@@ -222,13 +222,11 @@ var panelProto = {
     },
     // 输出选中的tags
     outputTagsLast: function() {
-        // console.log("最终选中tags：", panelProto.config.tagsLast)
         $("#tabPanel").tagsinput('add', {id:panelProto.config.tagsLast.id,name:panelProto.config.tagsLast.name,fid:panelProto.config.tagsLast.id,cid:""})
         panelProto.close();
     },
     // 输出选中的content
     outputContentLast: function() {
-        // console.log("最终选中content：", panelProto.config.tagsLast.name+":"+panelProto.config.contentLast.name)
         $("#tabPanel").tagsinput('add', {id:panelProto.config.tagsLast.id+":"+panelProto.config.contentLast.id,name:panelProto.config.tagsLast.name+":"+panelProto.config.contentLast.name,fid:panelProto.config.tagsLast.id,cid:panelProto.config.contentLast.id})
         panelProto.close();
     },
