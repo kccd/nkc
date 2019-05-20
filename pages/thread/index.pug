@@ -265,16 +265,70 @@ block content
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
                       .h3.thread-title.text-center= thread.firstPost.t
-                      .thread-info.text-center
+                      -const post = thread.firstPost;
+                      -post.c = hideContentByUser(post.c, data.user, 'thread')
+                      if post.authorInfos && post.authorInfos.length > 0
+                        -var agencyIndex = 1;
+                        -var agencyArray = [];
+                        -var agencyAddArray = [];
+                        -for(var i=0;i<post.authorInfos.length;i++) {
+                          -if(post.authorInfos[i].agency){
+                            -if(agencyArray.indexOf(post.authorInfos[i].agency) == -1){
+                              -agencyArray.push(post.authorInfos[i].agency);
+                              -if(post.authorInfos[i].agencyAdd.length > 0){
+                                -post.authorInfos[i].agencyAdd = post.authorInfos[i].agencyAdd.replace(/\//igm, " ");
+                                -agencyAddArray.push(post.authorInfos[i].agency+"，"+post.authorInfos[i].agencyAdd);
+                              -}else{
+                                -agencyAddArray.push(post.authorInfos[i].agency);
+                              -}
+                              -post.authorInfos[i].agencyIndex = agencyIndex;
+                              -agencyIndex++;
+                            -}else{
+                              -post.authorInfos[i].agencyIndex = agencyArray.indexOf(post.authorInfos[i].agency)+1;
+                            -}
+                          -}
+                        -}
+                        .thread-info.text-center(style="color:#000;font-weight: bold;margin-top:1rem")
+                          for auth,index in post.authorInfos
+                            span(style="margin-right:10px")!=`${auth.name}`
+                              if auth.agencyIndex
+                                sup!=`${auth.agencyIndex}`
+                              if auth.isContract
+                                span
+                                  span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                        .thread-info.text-center(style="color:#000;margin-top:1rem")
+                          for agad,index in agencyAddArray
+                            span(style="margin-right:10px")!=`${index+1}.${agad}`
+                      else
+                      .thread-info.text-center(style="margin-top:1rem")
                         a(href=`/u/${thread.uid}`)
                           img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                           span= ` ${thread.firstPost.user.username}`
                         span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleString()}`
                         if thread.firstPost.originState && thread.firstPost.originState !== "0"
                           -var levelText = getOriginLevel(thread.firstPost.originState);
-                          span(style="border:1px solid #9baec8;color:#9baec8")!=`${levelText}`
-                      -const post = thread.firstPost;
-                      -post.c = hideContentByUser(post.c, data.user, 'thread')
+                          if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                            span(style="color:#9baec8") 原创
+                          a()
+                            span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
+                      //- if post.authorInfos && post.authorInfos.length > 0
+                      //-   .panel.panel-default(style="border:0;margin-bottom:0")
+                      //-     .panel-heading.paperHeader 作者信息
+                      //-     .panel-body
+                      //-       ol(style="padding-left:20px")
+                      //-         for auth in post.authorInfos
+                      //-           if auth
+                      //-             li(style="font-weight:bold")
+                      //-               span!=`${auth.name}. `
+                      //-               if auth.kcid
+                      //-               if auth.agency
+                      //-                 span!=`${auth.agency}. `
+                      //-               if auth.agencyAdd
+                      //-                 span!=`${auth.agencyAdd}.   `
+
+                      //-               if auth.isContract
+                      //-                 span
+                      //-                   span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
                       if post.abstractCn.length !== 0 || post.abstractEn.length !== 0 
                         .abstract(style="margin-top:1rem;")
                           if post.abstractCn.length !== 0
@@ -314,24 +368,6 @@ block content
                           +postCredits(data.posts[0])
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
-                      if post.authorInfos && post.authorInfos.length > 0
-                        .panel.panel-default(style="border:0;margin-bottom:0")
-                          .panel-heading.paperHeader 作者信息
-                          .panel-body
-                            ol(style="padding-left:20px")
-                              for auth in post.authorInfos
-                                if auth
-                                  li(style="font-weight:bold")
-                                    span!=`${auth.name}. `
-                                    if auth.kcid
-                                    if auth.agency
-                                      span!=`${auth.agency}. `
-                                    if auth.agencyAdd
-                                      span!=`${auth.agencyAdd}.   `
-
-                                    if auth.isContract
-                                      span
-                                        span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
                       if post.disabled && disablePost
                         a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
           .fullwidthpanel.ThreadBox.nkcpanel

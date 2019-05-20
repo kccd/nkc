@@ -785,11 +785,41 @@ function addForum(tid) {
   })
 }
 
+// 查看原创说明
+function originTextShow(para) {
+	var parentDivDom = $(para).parent("a");
+	var paraRect = para.getBoundingClientRect();
+	// 创建一个外壳
+	var originPanelShell = document.createElement("span");
+	originPanelShell.setAttribute("id", "originPanelShell");
+	// 给外壳添加样式
+	originPanelShell.style.position = "absolute";
+	originPanelShell.style.background = "#eee";
+	originPanelShell.style.zIndex = "20000";
+	originPanelShell.style.width = paraRect.width + "px";
+	// 将外壳放入所在位置
+	$(parentDivDom).css("position", "relative");
+	$(parentDivDom).append(originPanelShell);
+	// 创建内壁
+	var originPanelWall = document.createElement("div");
+	originPanelWall.setAttribute("id", "originPanelWall");
+	originPanelWall.className = "originTextWall";
+	originPanelShell.appendChild(originPanelWall);
+	// 获取para中的通信信息
+	var contractDom = "<div>"+$(para).attr("data-text")+"</div>";
+	originPanelWall.innerHTML = contractDom
+}
+
+// 关闭原创声明查看
+function originTextClose() {
+	$("#originPanelShell").remove()
+}
+
 function originPanelShow(para) {
 	var parentDivDom = $(para).parent("span");
 	var paraRect = para.getBoundingClientRect();
 	// 创建一个外壳
-	var originPanelShell = document.createElement("div");
+	var originPanelShell = document.createElement("span");
 	originPanelShell.setAttribute("id", "originPanelShell");
 	// 给外壳添加样式
 	originPanelShell.style.position = "absolute";
