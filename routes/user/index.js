@@ -39,6 +39,8 @@ userRouter
     const {pageSettings} = state;
     const {user} = data;
 
+    data.complaintTypes = ctx.state.language.complaintTypes;
+
     const {t, page=0} = query;
     data.t = t;
 
