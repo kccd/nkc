@@ -239,6 +239,7 @@ function Editor() {
       this.draft.onclick = saveDraft(self);
       // 加入保存草稿的定时器，三分钟保存一次
       setInterval(saveDraft(self), 180000);
+      // setInterval(saveDraft(self), 10000);
 		}
 	  if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
 		  this.blocked = true;
@@ -537,10 +538,6 @@ function onPost(that) {
     var desTypeId = $("#draftDelTypeId").html() || '';
     var did = $("#draftId").html() || '';
     var title = that.title.value.trim();
-    var abstract = "";
-    if(specialMark !== "old") {
-      abstract = $("#abstract").val().trim();
-    }
     var type = that.query.type;
     var cat = that.query.cat;
     var id;
@@ -549,15 +546,23 @@ function onPost(that) {
 
 		var id = that.blocked ? that.query.id : that.childID;
 		if(type === 'forum' || !type || desType === 'forum') {
-			
-			try{
-        var obj = getFidAndCidResult();
-      }catch(e){
-        screenTopWarning(e)
+      var panelObj = $("#tabPanel").tagsinput("items");
+      if(panelObj.length == 0) {
+        screenTopWarning("请选择专业")
         return;
+      }else{
+        for(var po=0;po<panelObj.length;po++) {
+          if(fids.indexOf(panelObj[po].fid) == -1) {
+            fids.push(panelObj[po].fid)
+          }
+          if(panelObj[po].cid !== "") {
+            var dealCid = panelObj[po].cid.substr(1);
+            if(cids.indexOf(dealCid) == -1) {
+              cids.push(dealCid)
+            }
+          }
+        }
       }
-      if(obj.fids) fids = obj.fids;
-      if(obj.cids) cids = obj.cids;
       id = fids[0];
       cat = cids[0];
 			type = 'forum';
@@ -566,8 +571,6 @@ function onPost(that) {
 				id = that.query.id;
 			}
 		}
-
-
 
     var language = that.language?that.language.value.toLowerCase().trim():'html'
     if (content === '') {
@@ -600,8 +603,18 @@ function onPost(that) {
       desTypeId: desTypeId
     };
     if(type == "post" || type == "thread" || type == "forum") {
-      post.abstract = abstract
-    };
+      if(!specialMark || specialMark == "new") {
+        var paperObj;
+        try{
+          paperObj = paperProto.paperExport();
+        }catch(e) {
+          return screenTopWarning(e)
+        }
+        for(var i in paperObj) {
+          post[i] = paperObj[i]
+        }
+      }
+    }
     /*if (!that.blocked && (!that.childID)) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
       return;

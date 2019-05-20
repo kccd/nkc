@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const theradRouter = new Router();
 theradRouter
 	.get('/:tid', async (ctx, next) => {
-    const {data, params, db, query, nkcModules} = ctx;
+		const {data, params, db, query, nkcModules} = ctx;
 		let {page = 0, pid, last_page, highlight} = query;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});

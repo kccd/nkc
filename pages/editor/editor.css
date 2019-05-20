@@ -1,0 +1,108 @@
+.keyWordsPanelWall {
+  width: 300px;
+  display: inline-block;
+  border: 1px solid #eee;
+  padding: 5px 15px;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.keyWordsPanelHeader {
+  width: 95%;
+  height: 28px;
+  line-height: 28px;
+  display: inline-block;
+  border-bottom: 2px solid #2b90d9;
+  padding: 0px 5px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.keyWordsPanelClose {
+  color: #2b90d9;
+  height: 15px;
+  width: 15px;
+  line-height: 15px;
+  text-align: center;
+  border-radius: 3px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border: 1px solid #2b90d9;
+  cursor: pointer;
+}
+
+.keyWordsPanelSureBtn {
+  padding:0 10px;
+  background-color: #9baec8;
+  border-color: #9baec8;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.keyWordsPanelSureBtn:hover {
+  color: #FFF;
+  background-color: #2b90d9;
+}
+
+.keyTags{
+  margin-bottom: 5px;
+  margin-right:10px;
+  font-size: 13px;
+  padding: 5px 5px;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  background-color: #2b90d9;
+  display: inline-block;
+}
+
+.originBtn {
+  color: #2b90d9;
+  border-color: #2b90d9;
+  background-color: #fff;
+  display: inline-block;
+  overflow: visible;
+  padding: 0 22px;
+  height: 30px;
+  line-height: 30px;
+  vertical-align: middle;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  font-size: 14px;
+  border-width: 1px;
+  border-style: solid;
+  cursor: pointer;
+}
+
+.originBtn:hover {
+  color: #9baec8;
+  border-color: #9baec8;
+  text-decoration: none;
+}
+
+.originBtnActive {
+  background-color: #2b90d9;
+  color: #FFF;
+}
+
+.editorBtn {
+  padding:0 10px;
+  background-color: #9baec8;
+  border-color: #9baec8;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.editorBtn:hover {
+  color: #FFF;
+  background-color: #2b90d9;
+}

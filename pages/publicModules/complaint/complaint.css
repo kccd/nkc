@@ -35,10 +35,10 @@
   color: #fff;
 }
 .complaint-content{
-  width: 30rem;
+  width: 34rem;
   max-width: 100%;
   height: auto;
-  max-height: 33rem;
+  max-height: 40rem;
   border-radius: 0 0 3px 3px;
   border-top: 2px solid #2b90d9;
   position: absolute;
@@ -106,5 +106,6 @@
 .complaint-description{
   color: #282c37;
   font-size: 1.3rem;
+  line-height: 2rem;
   margin-top: 4rem;
 }

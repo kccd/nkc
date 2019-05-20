@@ -1,8 +1,13 @@
+
 {
-  "illegal": "违禁违法",
   "ad": "垃圾广告",
-  "sexy": "低俗色情",
-  "bloody": "血腥暴力",
-  "abuse": "人身攻击",
+  "lowQuality": "低质灌水",
+  "simpleQuestion": "简单提问",
+  "misleading": "误导钓鱼",
+  "Plagiarism": "抄袭剽窃",
+  "abuse": "攻击引战",
+  "illegal": "违禁物品",
+  "bloody": "低俗暴力",
+  "againstScience": "违背科学理性",
   "other": "其他"
 }

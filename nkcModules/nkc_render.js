@@ -327,7 +327,7 @@ function nkc_render(options){
     function(match,p1,p2,offset,string){
       var specified_xsf = parseInt(p1)
       var hidden_content = p2
-
+      
       //return '[hide='+specified_xsf+']'+hidden_content+'[/hide]'
 
       return '<div class="nkcHiddenBox">'
@@ -363,8 +363,10 @@ function nkc_render(options){
       case 'svg':
 
       case 'bmp': //for S.D.P's post
+      // if(!allthumbnail)replaced =
+      // '<a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>';
       if(!allthumbnail)replaced =
-      '<a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>'
+      '<img class="viewer img-responsive" alt="'+rid+'" src="/r/'+rid+'" /><br/>';
 
       if(allthumbnail){
         replaced =
@@ -424,7 +426,7 @@ function nkc_render(options){
 
   var pwbb_experimental = function(post,isHTML){
     var content = post.c||''
-    
+
     var html = ''
 
     if(!isHTML){  //bbcode
@@ -492,7 +494,8 @@ function nkc_render(options){
         html = html.replace(reg,r.oname+'<span class="PostResourceFileSize">'+fileSizeString+'</span><span class="PostResourceCounter">'+r.hits+'次下载</span>')
       }
     }
-    html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>')
+    // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
+    html = html.replace(/<img src="\/r(.+?)">/img,'<img class="viewer img-responsive" alt="pic" src="/r$1" />');
     return html
   }
 
@@ -551,7 +554,7 @@ function nkc_render(options){
       for(var i = 0; i < atUsers.length; i++) {
         var user = "@"+atUsers[i].username;
         var reg = new RegExp(user, 'gm');
-        renderedHTML = renderedHTML.replace(reg,'<a href="/m/' + atUsers[i].uid + '">' + user + '</a>')
+        renderedHTML = renderedHTML.replace(reg,'<a href="/u/' + atUsers[i].uid + '">' + user + '</a>')
       }
     }
     renderedHTML = blockDomHtml + renderedHTML;

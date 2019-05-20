@@ -555,6 +555,12 @@
   "complaintGet": "查看用户投诉列表",
   "complaintPost": "用户投诉",
   "complaintResolvePost": "标记投诉为已处理",
+  "visitProtocolSetting": "[SY]访问后台协议设置",
+  "postNewProtocol": "[SY]新建一个协议",
+  "visitProtocolType": "[SY]查看详细类型协议",
+  "updateProtocolType": "[SY]修改详细类型协议",
+  "deleteProtocolType": "[SY]删除详细类型协议",
+  "visitProtocol": "[CO]查看协议",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

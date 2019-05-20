@@ -2,15 +2,15 @@ extends ./errorBase
 block errorContent
   .error-icon=`${data.status} Forbidden`
   .error-list.b-s-10
-    .error-header 抱歉！您无权访问该专业，您可以通过以下方法获取权限：
+    .error-header 抱歉！本专业仅限下列专业用户参与：
     ul
       li
         .num 1
-        | 参加相关专业的考试并获得证书
+        | 必须通过至少一个专业的B卷考试
 
     .error-code
       span message：
       code= data.error
     .error-info 立即
       a(href=`/exam`) 参加考试
-      | ，获取更多权限。
+      | 获取专业证书。

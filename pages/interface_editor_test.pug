@@ -5,8 +5,24 @@ block title
   
   include MathJax.pug
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+  link(rel='stylesheet' href=`/tabPanel/tabPanel.css?v=${global.NKC.startTime}`)
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
+  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
+  link(href="/editor/editor.css" rel="stylesheet")
 block content
+  style.
+    .tool_area_wrp {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      background-color: #eee;
+      border-top: 1px solid #d9dadc;
+      min-width: 768px;
+    }
   -var mainContainer1400 = true
+  .hidden#panelDatas= JSON.stringify(data.panelDatas)
   #ife.container-fluid.max-width
     .col-xs-12.col-md-12
       if !data.user
@@ -21,70 +37,78 @@ block content
               include exam_notification.pug
 
           .row
-              .form-group
-                  input#title.form-control(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
-              .form-group
-                textarea#abstract.form-control(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
-                  //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
-              //- .form-group
-              //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-              //-     div(style='margin-top: 5px;')
-              //-     //- include forumlist_dropdown
-              //-     //select#parents.form-control(style='display: inline-block; width: auto;')
-              //-     //    option 选择一个学院
-              //-     //select#children.form-control(style='display: inline-block; width: auto;')
-              //-     //    option 选择一个专业
-              //-     //select#threadTypes.form-control(style='display: inline-block; width: auto;')
-              //-     //    option 无
-              //-     //select.form-control#lang(style='display: none; width: auto;')
-              //-     //    option html
-              input.hidden#lang(value=data.l)
-              if data.delReason 
-                .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
-              .form-group(style="background-color:#fff;line-height:1.5;")
-                  div#quoteContent
-              .form-group
-                div#quoteCancel(style='display: none')
-                  button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-              .form-group
-                  div#content_test
-              .form-group
-              //- .nkcpanel(id='file-uploading' target='/r')
-              //-     //uploader section
-              //-     include interface_attachment_uploader_uploader.pug
+            .form-group
+                input#title.form-control.tabPanel(type='text' placeholder='请输入标题...' value=`${data.title || ''}`)
+            //- .form-group
+            //-   textarea#abstract.form-control(name="", style="width:100%" rows="3" placeholder='文章摘要(选填)')!=`${data.abstract || ''}`
+                //- input#abstract.form-control(type='text' placeholder='文章摘要(选填)' value=`${data.abstract || ''}`)
+            //- .form-group
+            //-   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+            //-     div(style='margin-top: 5px;')
+            //-     //- include forumlist_dropdown
+            //-     //select#parents.form-control(style='display: inline-block; width: auto;')
+            //-     //    option 选择一个学院
+            //-     //select#children.form-control(style='display: inline-block; width: auto;')
+            //-     //    option 选择一个专业
+            //-     //select#threadTypes.form-control(style='display: inline-block; width: auto;')
+            //-     //    option 无
+            //-     //select.form-control#lang(style='display: none; width: auto;')
+            //-     //    option html
+            input.hidden#lang(value=data.l)
+            if data.delReason 
+              .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
+            .form-group(style="background-color:#fff;line-height:1.5;")
+                div#quoteContent
+            .form-group
+              div#quoteCancel(style='display: none')
+                button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+            .form-group
+                div#content_test
+            .form-group
+            //- .nkcpanel(id='file-uploading' target='/r')
+            //-     //uploader section
+            //-     include interface_attachment_uploader_uploader.pug
 
-              include ./media/media_index.pug
-
-              if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-                include ./forum/forum_choice.pug
-
-              .form-inline
-                  .form-group
-                      input#parseURL(type='checkbox' checked)
-                      span &nbsp;处理URL&nbsp;
-                  .form-group
-                      button#post.btn.btn-primary(type='submit') 发表
-                  if !['forum_declare'].includes(data.type)
-                    .form-group
-                    -if (!data.targetUser)
-                      button#draft.btn.btn-primary(type='submit') 保存草稿
-                    -else if(data.targetUser.uid === data.user.uid)
-                      button#draft.btn.btn-primary(type='submit') 保存草稿
-                    //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
-                      button#draft.btn.btn-primary(type='submit') 保存草稿
-                    .form-group
-                      if data.user
-                        a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
+            include ./media/media_index.pug
+            if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+              .form-horizontal
+                .form-group
+                  label.col-sm-12 专业分类
+                  .col-sm-12
+                    input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
+            if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post'
+              include ./editor/paper.pug
+            //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
+            //-   include ./forum/forum_choice.pug
+            //- .tool_area_wrp
+            //-   .form-inline(style="text-align:center;padding-bottom: 25px;padding-top: 25px;")
+            .form-inline
               .form-group
-                //- input#parseURL(type='checkbox' checked)
-                //- span &nbsp;处理URL&nbsp;
+                  input#parseURL(type='checkbox' checked)
+                  span &nbsp;处理URL&nbsp;
               .form-group
-                  div#disnoneplay(style='display:none')= data.content
-                  div#draftNowId(style='display:none')= data.content
-                  div#userNowId(style='display:none')= data.user.uid
-                  div#draftId(style='display:none')=`${data.did || ''}`
-                  div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
-                  div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
+                  button#post.btn.btn-primary(type='submit') 发表
+              if !['forum_declare'].includes(data.type)
+                .form-group
+                -if (!data.targetUser)
+                  button#draft.btn.btn-primary(type='submit') 保存草稿
+                -else if(data.targetUser.uid === data.user.uid)
+                  button#draft.btn.btn-primary(type='submit') 保存草稿
+                //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
+                  button#draft.btn.btn-primary(type='submit') 保存草稿
+                .form-group
+                  if data.user
+                    a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
+            .form-group
+              //- input#parseURL(type='checkbox' checked)
+              //- span &nbsp;处理URL&nbsp;
+            .form-group
+                div#disnoneplay(style='display:none')= data.content
+                div#draftNowId(style='display:none')= data.content
+                div#userNowId(style='display:none')= data.user.uid
+                div#draftId(style='display:none')=`${data.did || ''}`
+                div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
+                div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
   
   include debug_output.pug
 block scripts
@@ -94,6 +118,7 @@ block scripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src="/jquery-1.10.2.js")
   script(src="/jquery-ui-1.10.4.custom.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
@@ -103,6 +128,7 @@ block scripts
   script(src='/external_pkgs/react/JSXTransformer.js')
   script(src=`/interface_common.js?v=${startTime}`)
   script(src=`/nkc_render.js?v=${startTime}`)
+  +includeJS("/editor/paper.js")
   script(src=`/interface_editor.js?v=${startTime}`)
 
   if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
@@ -118,9 +144,24 @@ block scripts
   include ./publicModules/crop/crop
   script(src=`/media/media_index.js?v=${startTime}`)
   script(src=`/forum/forum_choice.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
+  +includeJS('/external_pkgs/citySet/city.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')
   script.
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){
         return "离开前保存草稿了吗？"
       }
     }
+    $("#tabPanel").tagsinput({
+      maxChars: 15, // 单个标记最大字符数 
+      maxTags: 2, // 最大标签数
+      itemValue: 'id',
+      itemText: 'name'
+    })
+    $(".bootstrap-tagsinput").children("input").attr("readonly", true)
+    $(".bootstrap-tagsinput").css("background-color", "#eee")
+    $(".bootstrap-tagsinput").click(function () {
+      openPanel(this);
+    });

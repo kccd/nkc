@@ -55,16 +55,6 @@ const postSchema = new Schema({
     type: String,
     default: ''
   },
-  // 摘要
-  abstract: {
-    type: String,
-    default: ''
-  },
-  // 关键词
-  keywords: {
-    type: String,
-    default: ''
-  },
   /* fid: {
     type: String,
     required: true,
@@ -138,6 +128,36 @@ const postSchema = new Schema({
   voteDown: {
     type: Number,
     default: 0
+  },
+  // 中文摘要
+  abstractCn: {
+    type: String,
+    default: ""
+  },
+  // 英文摘要
+  abstractEn: {
+    type: String,
+    default: ""
+  },
+  // 中文关键词
+  keyWordsCn: {
+    type: Array,
+    default: []
+  },
+  // 英文关键词
+  keyWordsEn: {
+    type: Array,
+    default: []
+  },
+  // 作者信息
+  authorInfos: {
+    type: Array,
+    default: []
+  },
+  // 原创声明
+  originState: {
+    type: String,
+    default: ""
   }
 }, {toObject: {
   getters: true,
@@ -264,7 +284,6 @@ postSchema.pre('save', async function(next) {
     const {c} = this;
     const atUsers = []; //user info {username, uid}
     const existedUsers = []; //real User mongoose data model
-    // 根据虎哥建议，重写@功能
     // 截取所有@起向后15字符的字符串
     var positions = [];
     // 引用的内容再次发布，不解析at
@@ -308,7 +327,7 @@ postSchema.pre('save', async function(next) {
       }
       for(var num = evePos.length;num >= 0;num--){
         var factName = await UserModel.findOne({usernameLowerCase:evePos.substr(0,num)});
-        if(factName){
+        if(factName && factName.username !== ""){
           // positions[i] = factName.username;
           positions[i] = positions[i].substr(0,num);
           break;
