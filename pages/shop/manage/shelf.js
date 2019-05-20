@@ -527,7 +527,7 @@ function addNewParam() {
   if($("#paramsTable tbody tr").length == 5) {
     return screenTopAlert("属性种类最大数量为5")
   }
-  var newParamDom = '<tr><td style="width:5%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td><td style="width:10%"><input type="text" class="pname pnameCla" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td>><td style="width:5%"><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
+  var newParamDom = '<tr><td style="width:5%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td><td style="width:10%"><input type="text" class="pname pnameCla" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td><td style="width:5%"><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
   $("#paramsTable").find("tbody").append(newParamDom)
   $(".pvalue").tagsinput({
     maxChars: 8, // 单个标记最大字符数 

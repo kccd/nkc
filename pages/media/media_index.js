@@ -192,11 +192,11 @@ function attachmentInsert(rid, ext, name) {
 // 选择文件
 function fileSelect(obj) {
   // media.uploadFileInfoArr = [];
-  if(!media.uploadFileList){
+  if(media.uploadFileList.length == 0){
     media.uploadFileList = fileListToArray(obj.files);
   }else{
     var newFileList = fileListToArray(obj.files)
-    for(var i in newFileList){
+    for(var i=0;i<newFileList.length;i++){
       media.uploadFileList.push(newFileList[i]);
     }
   }
@@ -273,6 +273,7 @@ function filePaste(e) {
 
 // 上传文件
 function uploadFile() {
+  // console.log(media.uploadFileList)
   media.netWord = true;
   var items = media.uploadFileList;
   if(items.length == 0) return console.log("暂未选择任何文件");
@@ -438,6 +439,14 @@ function pictureEdit(rid) {
 
 // 保存新图片
 function saveNewEditPicture(data) {
+  // 添加一张默认图片
+  var imgObj = {
+    dealStatus: "ing"
+  }
+  media.mediaAllLists.pop();
+  media.mediaAllLists.unshift(imgObj);
+  media.mediaPictureLists.pop();
+  media.mediaPictureLists.unshift(imgObj);
   var formData = new FormData();
   formData.append("file", data);
   formData.append("originId", originId);
@@ -445,7 +454,7 @@ function saveNewEditPicture(data) {
   xhr.onreadystatechange = function(e) {
     if(xhr.readyState == 4){
       if(xhr.status >= 200 && xhr.status < 300){
-        screenTopAlert("修改成功");
+        screenTopAlert("图片修改成功");
         loadMedia("picture", quota, skip, "not");
         loadMedia("all", quota, skip, "not");
       }else{

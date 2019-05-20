@@ -454,7 +454,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstract} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = post;
   const quote = await dbFn.getQuote(c);
   if(this.uid !== user.uid) {
     const replyWriteOfThread = new ReplyModel({
@@ -472,7 +472,12 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     pid,
     c,
     t,
-    abstract,
+    abstractCn,
+    abstractEn,
+    keyWordsCn,
+    keyWordsEn,
+    authorInfos,
+    originState,
     ipoc: ip,
     iplm: ip,
     l,

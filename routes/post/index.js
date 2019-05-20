@@ -109,7 +109,7 @@ postRouter
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {t, c, desType, desTypeId, abstract} = ctx.body.post;
+    const {t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = ctx.body.post;
     if(c.lenght < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db, fs} = ctx;
@@ -181,7 +181,12 @@ postRouter
     targetPost.iplm = ctx.address;
     targetPost.t = t;
     targetPost.c = c;
-    targetPost.abstract = abstract;
+    targetPost.abstractCn = abstractCn;
+    targetPost.abstractEn = abstractEn;
+    targetPost.keyWordsCn = keyWordsCn;
+    targetPost.keyWordsEn = keyWordsEn;
+    targetPost.authorInfos = authorInfos;
+    targetPost.originState = originState;
     targetPost.tlm = Date.now();
 	  if(targetThread.oc === pid) {
 			await targetThread.update({hasCover: true});

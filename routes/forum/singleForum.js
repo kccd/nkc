@@ -78,7 +78,7 @@ router
     if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');*/
 
 	  const {post} = body;
-		const {c, t, fids, cids, abstract} = post;
+		const {c, t, fids, cids} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     if(t === '') ctx.throw(400, '标题不能为空！');
 

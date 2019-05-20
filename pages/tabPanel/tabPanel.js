@@ -95,10 +95,6 @@ var panelProto = {
         // 将内壁放入外壳中
         panelShell.appendChild(panelWall)
 
-        // 创建header
-        var panelHeader = document.createElement("div");
-        panelHeader.className = "panelHeader";
-
         // 创建一个关闭按钮
         var panelClose = document.createElement("span");
         panelClose.innerHTML = "x";

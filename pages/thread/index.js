@@ -784,3 +784,48 @@ function addForum(tid) {
     screenTopWarning(data.error || data);
   })
 }
+
+function originPanelShow(para) {
+	var parentDivDom = $(para).parent("span");
+	var paraRect = para.getBoundingClientRect();
+	// 创建一个外壳
+	var originPanelShell = document.createElement("div");
+	originPanelShell.setAttribute("id", "originPanelShell");
+	// 给外壳添加样式
+	originPanelShell.style.position = "absolute";
+	originPanelShell.style.background = "#eee";
+	originPanelShell.style.zIndex = "20000";
+	originPanelShell.style.width = paraRect.width + "px";
+	// 将外壳放入所在位置
+	$(parentDivDom).css("position", "relative");
+	$(parentDivDom).append(originPanelShell);
+	// 创建内壁
+	var originPanelWall = document.createElement("div");
+	originPanelWall.setAttribute("id", "originPanelWall");
+	originPanelWall.className = "originPanelWall";
+	originPanelShell.appendChild(originPanelWall);
+	// 获取para中的通信信息
+	var contractEmail = $(para).attr("data-email");
+	var contractTel = $(para).attr("data-tel");
+	var contractAdd = $(para).attr("data-add");
+	var contractCode = $(para).attr("data-code");
+	//
+	var contractDom = "";
+	if(contractEmail){
+		contractDom += "<div>通信邮箱："+contractEmail+"</div>";
+	}
+	if(contractTel) {
+		contractDom += "<div>电话号码："+contractTel+"</div>";
+	}
+	if(contractAdd) {
+		contractDom += "<div>通信地址："+contractAdd+"</div>";
+	}
+	if(contractCode) {
+		contractDom += "<div>邮政编码："+contractCode+"</div>";
+	}
+	originPanelWall.innerHTML = contractDom
+}
+
+function originPanelClose() {
+	$("#originPanelShell").remove()
+}

@@ -56,16 +56,6 @@ const postSchema = new Schema({
     type: String,
     default: ''
   },
-  // 摘要
-  abstract: {
-    type: String,
-    default: ''
-  },
-  // 关键词
-  keywords: {
-    type: String,
-    default: ''
-  },
   /* fid: {
     type: String,
     required: true,
@@ -139,6 +129,36 @@ const postSchema = new Schema({
   voteDown: {
     type: Number,
     default: 0
+  },
+  // 中文摘要
+  abstractCn: {
+    type: String,
+    default: ""
+  },
+  // 英文摘要
+  abstractEn: {
+    type: String,
+    default: ""
+  },
+  // 中文关键词
+  keyWordsCn: {
+    type: Array,
+    default: []
+  },
+  // 英文关键词
+  keyWordsEn: {
+    type: Array,
+    default: []
+  },
+  // 作者信息
+  authorInfos: {
+    type: Array,
+    default: []
+  },
+  // 原创声明
+  originState: {
+    type: String,
+    default: ""
   }
 }, {toObject: {
   getters: true,

@@ -69,7 +69,7 @@ style.
         // 全部 all
         .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(all, index) in mediaAllLists")
-            .mdui-grid-tile(v-bind:title="all.oname")
+            .mdui-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
               img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
               .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
@@ -78,10 +78,15 @@ style.
                 .mdui-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1 ? 'display:block' : 'display:none'")
                   button.mdui-btn.mdui-btn-icon(@click="pictureEdit(all.rid)")
                     i.fa.fa-pencil-square-o
+            .mdui-grid-tile(v-else)
+              img(src="/default/imageDealing.jpg" style="height:90px;cursor: pointer")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") 正在处理中...
         // 图片 picture
         .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#picturesDom(v-bind:style="mediaType == 'picture' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(picture, index) in mediaPictureLists")
-            .mdui-grid-tile( v-bind:title="picture.oname")
+            .mdui-grid-tile( v-bind:title="picture.oname" v-if="!picture.dealStatus || picture.dealStatus !== 'ing'")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
               img(v-bind:src="'/rt/'+picture.rid" style="height:90px;cursor: pointer" @click="pictureInsert(picture.rid, picture.ext, picture.oname)")
               .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
@@ -90,7 +95,11 @@ style.
                 .mdui-grid-tile-buttons
                   button.mdui-btn.mdui-btn-icon(@click="pictureEdit(picture.rid)")
                     i.fa.fa-pencil-square-o
-
+            .mdui-grid-tile(v-else)
+              img(src="/default/imageDealing.jpg" style="height:90px;cursor: pointer")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") 正在处理中...
         // 视频 video
         .mdui-row-xs-3.mdui-row-sm-4.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#videosDom(v-bind:style="mediaType == 'video' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(video, index) in mediaVideoLists")
@@ -226,15 +235,29 @@ style.
         // 全部 all
         .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(all, index) in mediaAllLists")
-            .mdui-grid-tile(v-bind:title="all.rid")
+            .mdui-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
-              img(v-bind:src="'/rt/'+all.rid" style="height:60px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
-              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="all.oname")
+              img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
                 .mdui-grid-tile-text
                   .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
-                .mdui-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1? 'display:block' : 'display:none'")
+                .mdui-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1 ? 'display:block' : 'display:none'")
                   button.mdui-btn.mdui-btn-icon(@click="pictureEdit(all.rid)")
                     i.fa.fa-pencil-square-o
+            .mdui-grid-tile(v-else)
+              img(src="/default/imageDealing.jpg" style="height:90px;cursor: pointer")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .mdui-grid-tile-text
+                  .mdui-grid-tile-title(style="font-size:13px") 正在处理中...
+            //- .mdui-grid-tile(v-bind:title="all.rid")
+            //-   //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
+            //-   img(v-bind:src="'/rt/'+all.rid" style="height:60px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+            //-   .mdui-grid-tile-actions(style="max-height:30px;min-height:20px" v-bind:title="all.oname")
+            //-     .mdui-grid-tile-text
+            //-       .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
+            //-     .mdui-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1? 'display:block' : 'display:none'")
+            //-       button.mdui-btn.mdui-btn-icon(@click="pictureEdit(all.rid)")
+            //-         i.fa.fa-pencil-square-o
         // 上传 upload
         .mdui-row-xs-6.mdui-row-sm-6.mdui-row-md-12.mdui-row-lg-12.mdui-row-xl-12.mdui-grid-list#uploadDom(v-bind:style="mediaType == 'upload' ? 'display:block' : 'display:none'")
           .mdui-row

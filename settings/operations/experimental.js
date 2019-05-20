@@ -71,6 +71,15 @@ module.exports = {
 				}
 			}
 		},
+		protocol: {
+			GET: 'visitProtocolSetting',
+			POST: 'postNewProtocol',
+			PARAMETER: {
+				GET: "visitProtocolType",
+				PATCH: "updateProtocolType",
+				POST: "deleteProtocolType"
+			}
+		},
 	  login: {
 	    GET:'visitLoginSettings',
       PATCH: 'modifyLoginSettings'

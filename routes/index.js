@@ -30,6 +30,7 @@ const forgotPasswordRouter = routers.forgotPassword;
 const shopRouter = routers.shop;
 const accountRouter = routers.account;
 const imageEditRouter = routers.imageEdit;
+const protocolRouter = routers.protocol;
 
 
 // 所有请求先经过此中间件
@@ -101,4 +102,5 @@ router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRoute
 router.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
 router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
+router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = router;
