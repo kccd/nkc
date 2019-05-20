@@ -211,7 +211,7 @@ func.search = async (t, c, options) => {
   const body = {
     from: page*searchThreadList,
     size,
-    min_score: 10,
+    min_score: 1,
     sort: [],
     highlight: {
       pre_tags: ['<span style="color: #e85a71;">'],
@@ -236,24 +236,8 @@ func.search = async (t, c, options) => {
                       {
                         bool: {
                           should: [
-                            {
-                              match: {
-                                title: {
-                                  query: c,
-                                  operator: relation,
-                                  boost: 2,
-                                }
-                              }
-                            },
-                            {
-                              match: {
-                                content: {
-                                  query: c,
-                                  operator: relation,
-                                  boost: 2,
-                                }
-                              }
-                            }
+                            createMatch("title", c, 2, relation),
+                            createMatch("content", c, 2, relation),
                           ]
                         }
                       }
@@ -264,24 +248,8 @@ func.search = async (t, c, options) => {
                 {
                   bool: {
                     should: [
-                      {
-                        match: {
-                          username: {
-                            query: c,
-                            operator: relation,
-                            boost: 5
-                          }
-                        }
-                      },
-                      {
-                        match: {
-                          description: {
-                            query: c,
-                            operator: relation,
-                            boost: 2,
-                          }
-                        }
-                      }
+                      createMatch("username", c, 5, relation),
+                      createMatch("description", c, 2, relation),
                     ]
                   }
                 }
@@ -386,6 +354,23 @@ func.search = async (t, c, options) => {
 
 module.exports = func;
 
-(async () => {
-  await func.init();
-}) ();
+
+function createMatch(property, query, boost, relation) {
+  const keywords = (query || "").split(" ");
+  relation = relation==="or"?"should":"must";
+  const obj = {
+    bool: {}
+  };
+  const arr = [];
+  for(const key of keywords) {
+    const match = {};
+    match[property] = {
+      query: key,
+      operator: "and",
+      boost
+    };
+    arr.push({match});
+  }
+  obj.bool[relation] = arr;
+  return obj
+}
