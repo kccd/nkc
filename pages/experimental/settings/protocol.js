@@ -17,7 +17,11 @@ function test() {
 
 // 新增协议
 function addProtocol() {
-  var post = getProtocol();
+  try{
+    var post = getProtocol();
+  }catch(err) {
+    return screenTopWarning(err)
+  }
   nkcAPI("/e/settings/protocol", "POST", post)
   .then(function(data) {
     screenTopAlert("保存成功");
@@ -35,7 +39,11 @@ function turnProtocolUpdate(id) {
 
 // 修改协议
 function updateProtocol(id) {
-  var post = getProtocol();
+  try{
+    var post = getProtocol();
+  }catch(err) {
+    return screenTopWarning(err)
+  }
   post.id = id;
   nkcAPI("/e/settings/protocol/"+id, "PATCH", post)
   .then(function(data) {
@@ -66,11 +74,11 @@ function deleteProtocol(id) {
 // 获取当前协议
 function getProtocol() {
   var protocolName = $("#protocolName").val();
-  if(!protocolName) return screenTopWarning("请填写协议名称");
+  if(!protocolName) throw("请填写协议名称");
   var protocolTypeId = $("#protocolTypeId").val();
-  if(!protocolTypeId) return screenTopWarning("请使用小写英文填写协议类型ID");
+  if(!protocolTypeId) throw("请使用小写英文填写协议类型ID");
   var protocolTypeName = $("#protocolTypeName").val();
-  if(!protocolTypeName) return screenTopWarning("请使用中文填写协议类型名称");
+  if(!protocolTypeName) throw("请使用中文填写协议类型名称");
   var protocolContent = document.getElementById("text-elem").innerHTML;
   protocolContent = common.URLifyHTML(protocolContent);
   var post = {

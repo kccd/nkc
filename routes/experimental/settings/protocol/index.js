@@ -27,6 +27,10 @@ protocolRouter
   .patch('/:type', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {id, protocolName, protocolTypeId, protocolTypeName, protocolContent} = body;
+    if(!protocolName) ctx.throw(400, "未填写协议名称");
+    if(!protocolTypeId) ctx.throw(400, "未填写协议类型ID");
+    if(!protocolTypeName) ctx.throw(400, "未填写协议类型名称");
+    if(!protocolContent) ctx.throw(400, "未填写协议内容");
     const protocol = await db.ProtocolModel.findOne({protocolTypeId: id});
     await protocol.update({$set: {
       protocolName,
@@ -48,6 +52,10 @@ protocolRouter
   .post('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {protocolName, protocolTypeId, protocolTypeName, protocolContent} = body;
+    if(!protocolName) ctx.throw(400, "未填写协议名称");
+    if(!protocolTypeId) ctx.throw(400, "未填写协议类型ID");
+    if(!protocolTypeName) ctx.throw(400, "未填写协议类型名称");
+    if(!protocolContent) ctx.throw(400, "未填写协议内容");
     // 判断该类型是否已经存在
     let protocol = await db.ProtocolModel.findOne({protocolTypeId});
     if(protocol) ctx.throw("400", `类型为${protocolTypeId}的协议已存在`);

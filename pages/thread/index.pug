@@ -337,17 +337,18 @@ block content
                           .panel-body
                             ol(style="padding-left:20px")
                               for auth in post.authorInfos
-                                li(style="font-weight:bold")
-                                  span!=`${auth.name}. `
-                                  if auth.kcid
-                                  if auth.agency
-                                    span!=`${auth.agency}. `
-                                  if auth.agencyAdd
-                                    span!=`${auth.agencyAdd}.   `
+                                if auth
+                                  li(style="font-weight:bold")
+                                    span!=`${auth.name}. `
+                                    if auth.kcid
+                                    if auth.agency
+                                      span!=`${auth.agency}. `
+                                    if auth.agencyAdd
+                                      span!=`${auth.agencyAdd}.   `
 
-                                  if auth.isContract
-                                    span
-                                      span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                                    if auth.isContract
+                                      span
+                                        span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
                       if post.disabled && disablePost
                         a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
           .fullwidthpanel.ThreadBox.nkcpanel

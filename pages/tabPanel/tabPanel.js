@@ -93,7 +93,13 @@ var panelProto = {
         panelWall.className = "panelWall";
         // panelWall.style.height = "200px"
         // 将内壁放入外壳中
-        panelShell.appendChild(panelWall)
+        panelShell.appendChild(panelWall);
+
+        var isPc = IsPC();
+        if(!isPc) {
+            $("#panelShell").css("left", "0");
+            $("#panelWall").css("width", document.body.scrollWidth)
+        }
 
         // 创建一个关闭按钮
         var panelClose = document.createElement("span");
@@ -358,4 +364,21 @@ function getItemByDataId(dataId) {
         }
     }
     return item;
+}
+
+
+
+function IsPC() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = ["Android", "iPhone",
+                "SymbianOS", "Windows Phone",
+                "iPad", "iPod"];
+    var flag = true;
+    for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
 }

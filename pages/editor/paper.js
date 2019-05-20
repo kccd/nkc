@@ -204,7 +204,7 @@ var paperProto = {
   // 输出作者信息
   outputAuthorInfosList: function() {
     var authorInfos = [];
-    try{
+    // try{
       $(".authorClass").each(function(index, ele) {
         var name = $(ele).find(".authorName").val();
         if(!name) throw("有未填写完成的作者项");
@@ -237,9 +237,9 @@ var paperProto = {
         }
         authorInfos.push(infoObj)
       })
-    }catch(e){
-      return screenTopWarning(e)
-    }
+    // }catch(e){
+    //   return screenTopWarning(e)
+    // }
     return authorInfos;
   },
   // 初始化原创声明
