@@ -27,6 +27,8 @@ function submitOrders() {
   receiveName = receiveDom.next().find(".username").text();
   receiveMobile = receiveDom.next().find(".mobile").text();
   if(!receiveAddress) return screenTopWarning("请选择收货地址")
+  if(!receiveName) return screenTopWarning("收件人不得为空，请完善信息后提交订单");
+  if(!receiveMobile) return screenTopWarning("联系方式不得为空, 请完善信息后提交订单");
   var receInfo = {
     receiveAddress: receiveAddress,
     receiveName: receiveName,
