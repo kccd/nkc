@@ -608,7 +608,8 @@ function onPost(that) {
         try{
           paperObj = paperProto.paperExport();
         }catch(e) {
-          return screenTopWarning(e)
+          screenTopWarning(e);
+          return;
         }
         for(var i in paperObj) {
           post[i] = paperObj[i]
@@ -676,7 +677,7 @@ function onPost(that) {
         }
       })
       .catch(function (data) {
-        jwarning(data || data.error);
+        screenTopWarning(data || data.error);
         geid('post').disabled = false
       })
   }
