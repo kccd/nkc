@@ -9,7 +9,8 @@ require('./global');
 require('colors');
 const http = require('http'),
   app = require('./app'),
-  searchInit = require('./searchInit'),
+  // searchInit = require('./searchInit'),
+  elasticSearch = require("./nkcModules/elasticSearch"),
   settings = require('./settings'),
   serverConfig = require('./config/server'),
   cacheForums = require('./redis/cacheForums'),
@@ -54,7 +55,7 @@ const start = async () => {
       await upload.initFolders();
       await cacheForums();
     }
-    await searchInit();
+    await elasticSearch.init();
     console.log('ElasticSearch is ready...'.green);
 
     const port = serverConfig.port + global.NKC.processId;
