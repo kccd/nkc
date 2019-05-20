@@ -389,6 +389,17 @@ let pugRender = (template, data, state) => {
     permission: (operationId) => {
       return data.userOperationsId.includes(operationId);
     },
+    permissionsOr: (operationsId) => {
+      for(const id of operationsId) {
+        if(data.userOperationsId.includes(id)) return true;
+      }
+    },
+    permissionsAnd: (operationsId) => {
+      for(const id of operationsId) {
+        if(!data.userOperationsId.includes(id)) return false;
+      }
+      return true;
+    },
     state,
     ipUrl,
     objToStr

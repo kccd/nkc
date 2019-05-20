@@ -1,5 +1,6 @@
 +includeCSS("/publicModules/complaint/complaint.css")
 #moduleComplaint(v-cloak)
+  .hidden(ref="reasons")=objToStr({reasons: data.complaintTypes})
   .complaint-content
     .complaint-header {{submitted?"":"投诉"}}
       .fa.fa-remove.complaint-close(@click="hide")

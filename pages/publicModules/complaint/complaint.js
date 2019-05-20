@@ -14,32 +14,19 @@ var moduleComplaint = new Vue({
     submitted: false,
     type: "",
     id: "",
-    reasons: [
-      {
-        type: "illegal",
-        description: "违禁违法"
-      },
-      {
-        type: "ad",
-        description: "垃圾广告"
-      },
-      {
-        type: "sexy",
-        description: "低俗色情"
-      },
-      {
-        type: "bloody",
-        description: "血腥暴力"
-      },
-      {
-        type: "abuse",
-        description: "人身攻击"
-      },
-      {
-        type: "other",
-        description: "其他"
-      }
-    ]
+    reasons: []
+  },
+  mounted: function() {
+    var data = strToObj(this.$refs.reasons.innerHTML);
+    var reasons = [];
+    for(var reason in data.reasons) {
+      if(!data.reasons.hasOwnProperty(reason)) continue;
+      reasons.push({
+        type: reason,
+        description: data.reasons[reason]
+      })
+    }
+    this.reasons = reasons;
   },
   methods: {
     selectReason: function(r) {

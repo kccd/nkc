@@ -1407,3 +1407,13 @@ footer.footer ul li{
   text-decoration: none;
   color: #2b90d9;
 }
+.management-panel{
+  margin-top: 2rem;
+}
+.management-panel a{
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #282c37;
+  display: inline-block;
+  margin: 0 1rem 0.5rem 0;
+}

@@ -118,6 +118,7 @@ block content
                       include ../publicModules/user_panel/user_panel_md
           include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
+        include ../module_scrollTo
         if data.targetUserDigestThreads && data.targetUserDigestThreads.length > 0
           .m-b-2
             -let sideThreads = data.targetUserDigestThreads

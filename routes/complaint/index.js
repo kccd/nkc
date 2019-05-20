@@ -22,7 +22,13 @@ router
     const complaints = await db.ComplaintModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.complaints = await db.ComplaintModel.extendComplaints(complaints);
     data.complaints.map(c => {
-      c.type_ = ctx.state.lang("complaintTypes", c.type);
+      if(c.type === "user") {
+        c.type_ = "用户"
+      } else if(c.type === "post") {
+        c.type_ = "回复"
+      } else {
+        c.type_ = "文章"
+      }
       c.reasonType_ = ctx.state.lang("complaintTypes", c.reasonType);
     });
     data.paging = paging;

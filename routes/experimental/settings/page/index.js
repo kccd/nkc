@@ -15,8 +15,8 @@ router
       userCardUserList, forumUserList, searchThreadList, searchUserList
     } = pageSettings;
     homeThreadList = parseInt(homeThreadList);
-    homePostList = parseInt(homePostList);
-    homeAllList = parseInt(homeAllList);
+    searchPostList = parseInt(searchPostList);
+    searchAllList = parseInt(searchAllList);
     searchThreadList = parseInt(searchThreadList);
     searchUserList = parseInt(searchUserList);
     threadPostList = parseInt(threadPostList);

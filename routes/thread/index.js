@@ -79,6 +79,7 @@ threadRouter
 		let {page = 0, pid, last_page, highlight, step, t} = query;
 		const {tid} = params;
 		data.highlight = highlight;
+		data.complaintTypes = ctx.state.language.complaintTypes;
     const thread = await db.ThreadModel.findOnly({tid});
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
 		// 验证权限 - new

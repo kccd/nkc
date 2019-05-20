@@ -117,7 +117,7 @@ module.exports = async (ctx, next) => {
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
   ctx.state.lang = (type, operationId) => {
-    return ctx.state.language[type][operationId];
+    return ctx.state.language[type][operationId] || operationId;
   };
 
 	data.userOperationsId = userOperationsId;

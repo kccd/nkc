@@ -198,10 +198,20 @@ func.search = async (t, c, options) => {
     searchThreadList, searchPostList, searchAllList, searchUserList
   } = (await SettingModel.findById("page")).c;
 
+  let size;
+  if(t === "user") {
+    size = searchUserList;
+  } else if(t === "post") {
+    size = searchPostList;
+  } else if(t === "thread") {
+    size = searchThreadList;
+  } else {
+    size = searchAllList;
+  }
   const body = {
     from: page*searchThreadList,
-    size: searchThreadList,
-    min_score: 0.8,
+    size,
+    min_score: 10,
     sort: [],
     highlight: {
       pre_tags: ['<span style="color: #e85a71;">'],
@@ -259,7 +269,7 @@ func.search = async (t, c, options) => {
                           username: {
                             query: c,
                             operator: relation,
-                            boost: 3
+                            boost: 5
                           }
                         }
                       },
