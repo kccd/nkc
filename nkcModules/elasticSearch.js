@@ -176,13 +176,6 @@ func.search = async (t, c, options) => {
   // 若只有一个关键词则默认or
   relation = (relation==="or" || c.split(" ").length < 2)?"or":"and";
 
-  let uid;
-
-  if(author) {
-    const user = await UserModel.findOne({usernameLowerCase: (author || "").toLowerCase()});
-    if(user) uid = user.uid;
-  }
-
   if(timeStart) {
     const {year, month, day} = timeStart;
     timeStart = new Date(`${year}-${month}-${day} 00:00:00`);
@@ -295,12 +288,16 @@ func.search = async (t, c, options) => {
     };
     body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
   }
-  if(uid) {
+
+  if(author) {
+    let uid = "";
+    const user = await UserModel.findOne({usernameLowerCase: (author || "").toLowerCase()});
+    if(user) uid = user.uid;
     body.query.bool.must[0].bool.should[0].bool.must.push({
       match: {
         uid
       }
-    })
+    });
   }
 
   if(digest) {

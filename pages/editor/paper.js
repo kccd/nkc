@@ -19,9 +19,9 @@ var paperProto = {
     useOriginState: false, // 是否使用原创声明
   },
   // 初始化论文相关组件
-  init: function() {
+  init: function(para) {
     if($("#targetPost").length > 0) {
-      var targetPost = JSON.parse($("#targetPost").text());
+      var targetPost = para;
       if(targetPost){
         for(var i in targetPost) {
           for(var c in paperProto.config) {
@@ -167,6 +167,9 @@ var paperProto = {
   outputKeyWords: function() {
     var keyWordsPanelCnText = $("#keyWordsPanelCnInput").val();
     var keyWordsPanelEnText = $("#keyWordsPanelEnInput").val();
+    if(keyWordsPanelCnText.length > 50 || keyWordsPanelEnText.length > 50) {
+      return screenTopWarning("关键词字数不得超过50");
+    }
     // 检测中文
     var existEn = /[a-zA-Z]+/.test(keyWordsPanelCnText);
     if(!keyWordsPanelCnText) {
@@ -194,18 +197,24 @@ var paperProto = {
     if(paperProto.config.enableAuthorInfos) {
       var authorInfosDom = paperProto.get("authorInfos");
       authorInfosDom.style.display = "";
+      var selectDom = getCountryList();
       var authorTrs = "";
       if(paperProto.config.authorInfos.length > 0) {
         for(var i=0;i < paperProto.config.authorInfos.length;i++) {
+          selectDom = getCountryList(paperProto.config.authorInfos[i].agencyCountry)
+          var disStyle = "display:";
+          if(!paperProto.config.authorInfos[i].agencyCountry || paperProto.config.authorInfos[i].agencyCountry !== "中国") {
+            disStyle = "display:none"
+          }
           if(paperProto.config.authorInfos[i].isContract) {
-            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="number" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td><input class="authorAgencyAdd" type="text" onclick="SelCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
             authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
           }else{
-            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="number" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td><input class="authorAgencyAdd" type="text" onclick="SelCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
           }
         }
       }else{
-        authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" /></td><td><input class="authorKcid" type="number" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td><input class="authorAgencyAdd" type="text" onclick="SelCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+        authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" /></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
       }
       $("#authInfoList").find("tbody").html(authorTrs);
     }
@@ -219,8 +228,11 @@ var paperProto = {
         if(!name) throw("有未填写完成的作者项");
         var kcid = $(ele).find(".authorKcid").val();
         var agency = $(ele).find(".authorAgency").val();
+        var agencyCountry = $(ele).find(".authorCountry").val();
         var agencyAdd = $(ele).find(".authorAgencyAdd").val();
   
+        if(name.length > 30 || kcid.length > 30 || agencyAdd.length > 30) throw("姓名、kcid、机构地址字数不得大于30");
+        if(agency.length > 100) throw("机构名称字数不得大于100"); 
         var contractObj = {
           contractEmail:"",
           contractTel: "",
@@ -233,6 +245,7 @@ var paperProto = {
           contractObj.contractEmail = contractTr.find(".contractEmail").val();
           var isEmail = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(contractObj.contractEmail);
           if(!contractObj.contractEmail) throw("通信Email必须填写");
+          if(contractObj.contractEmail.length > 50) throw("Email字数不得大于50")
           if(!isEmail) throw("请输入正确格式的邮箱");
           contractObj.contractTel = contractTr.find(".contractTel").val();
           if(contractObj.contractTel.length > 0) {
@@ -240,17 +253,23 @@ var paperProto = {
             var isTelEn = /.*[\u4e00-\u9fa5]+.*$/.test(contractObj.contractTel);
             if(isTelCn || isTelEn) throw("请输入正确的电话号码");
           }
+          if(contractObj.contractTel.length > 30) throw("电话号码不得超过30字");
           contractObj.contractAdd = contractTr.find(".contractAdd").val();
+          if(contractObj.contractAdd.length > 100) throw("通信地址不得超过100字");
           contractObj.contractCode = contractTr.find(".contractCode").val();
           if(contractObj.contractCode.length > 0) {
             var isCode =  /^[0-9]*$/.test(contractObj.contractCode);
             if(!isCode) throw("请输入正确的邮政编码"); 
+          }
+          if(contractObj.contractCode.length > 15){
+            throw("邮政编码不得超过15个字")
           }
         }
         var infoObj = {
           name: name,
           kcid: kcid,
           agency: agency,
+          agencyCountry: agencyCountry,
           agencyAdd: agencyAdd,
           isContract: isContract,
           contractObj: contractObj,
@@ -295,9 +314,16 @@ var paperProto = {
       var abstractCn = $("#abstractCn").val();
       var abstractEn = $("#abstractEn").val();
       // 检测摘要填写
-
-      obj.abstractCn = abstractCn;
-      obj.abstractEn = abstractEn;
+      if(abstractCn) {
+        obj.abstractCn = abstractCn;
+      }else{
+        obj.abstractCn = "";
+      }
+      if(abstractEn) {
+        obj.abstractEn = abstractEn;
+      }else{
+        obj.abstractEn = "";
+      }
     }
     // 输出关键词
     if(paperProto.config.enableKeyWords) {
@@ -328,13 +354,16 @@ var paperProto = {
         throw("声明原创需仔细阅读并同意相关协议")
       }
       // 检测原创声明
-      obj.originState = originState;
+      if(originState){
+        obj.originState = originState;      
+      }else{
+        obj.originState = "0";
+      }
     }
     return obj;
   }
 }
 
-paperProto.init();
 
 // 打开关键词panel
 function openKeyWordsPanel(para) {
@@ -348,7 +377,8 @@ function removeOneKeyWords(para) {
 
 // 增加一条作者信息
 function addOneAuthorInfo() {
-  var authorAom = '<tr class="authorClass"><td><input class="authorName" type="text" /></td><td><input class="authorKcid" type="number" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td><input class="authorAgencyAdd" type="text" onclick="SelCity(this)"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+  var selectDom = getCountryList();
+  var authorAom = '<tr class="authorClass"><td><input class="authorName" type="text" /></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" style="height:22px" type="text" onclick="SetAgencyCity(this)"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
   $("#authInfoList").find("tbody").append(authorAom)
 }
 
@@ -431,4 +461,34 @@ function useContractAuthor(para) {
  */
 function testbtn() {
   paperProto.paperExport();
+}
+
+var countryArr = ["中国","阿尔巴尼亚","阿尔及利亚","阿富汗","阿根廷","阿拉伯联合酋长国","阿鲁巴","阿曼","阿塞拜疆","阿森松岛","埃及","埃塞俄比亚","爱尔兰","爱沙尼亚","安道尔","安哥拉","安圭拉","安提瓜岛和巴布达","澳大利亚","奥地利","奥兰群岛","巴巴多斯岛","巴布亚新几内亚","巴哈马","巴基斯坦","巴拉圭","巴勒斯坦","巴林","巴拿马","巴西","白俄罗斯","百慕大","保加利亚","北马里亚纳群岛","贝宁","比利时","冰岛","波多黎各","波兰","玻利维亚","波斯尼亚和黑塞哥维那","博茨瓦纳","伯利兹","不丹","布基纳法索","布隆迪","布韦岛","朝鲜","丹麦","德国","东帝汶","多哥","多米尼加","多米尼加共和国","俄罗斯","厄瓜多尔","厄立特里亚","法国","法罗群岛","法属波利尼西亚","法属圭亚那","法属南部领地","梵蒂冈","菲律宾","斐济","芬兰","佛得角","弗兰克群岛","冈比亚","刚果","刚果民主共和国","哥伦比亚","哥斯达黎加","格恩西岛","格林纳达","格陵兰","古巴","瓜德罗普","关岛","圭亚那","哈萨克斯坦","海地","韩国","荷兰","荷属安地列斯","赫德和麦克唐纳群岛","洪都拉斯","基里巴斯","吉布提","吉尔吉斯斯坦","几内亚","几内亚比绍","加拿大","加纳","加蓬","柬埔寨","捷克共和国","津巴布韦","喀麦隆","卡塔尔","开曼群岛","科科斯群岛","科摩罗","科特迪瓦","科威特","克罗地亚","肯尼亚","库克群岛","拉脱维亚","莱索托","老挝","黎巴嫩","利比里亚","利比亚","立陶宛","列支敦士登","留尼旺岛","卢森堡","卢旺达","罗马尼亚","马达加斯加","马尔代夫","马耳他","马拉维","马来西亚","马里","马其顿","马绍尔群岛","马提尼克","马约特岛","曼岛","毛里求斯","毛里塔尼亚","美国","美属萨摩亚","美属外岛","蒙古","蒙特塞拉特","孟加拉","密克罗尼西亚","秘鲁","缅甸","摩尔多瓦","摩洛哥","摩纳哥","莫桑比克","墨西哥","纳米比亚","南非","南极洲","南乔治亚和南桑德威奇群岛","瑙鲁","尼泊尔","尼加拉瓜","尼日尔","尼日利亚","纽埃","挪威","诺福克","帕劳群岛","皮特凯恩","葡萄牙","乔治亚","日本","瑞典","瑞士","萨尔瓦多","萨摩亚","塞拉利昂","塞内加尔","塞浦路斯","塞舌尔","沙特阿拉伯","圣诞岛","圣多美和普林西比","圣赫勒拿","圣基茨和尼维斯","圣卢西亚","圣马力诺","圣皮埃尔和米克隆群岛","圣文森特和格林纳丁斯","斯里兰卡","斯洛伐克","斯洛文尼亚","斯瓦尔巴和扬马廷","斯威士兰","苏丹","苏里南","所罗门群岛","索马里","塔吉克斯坦","泰国","坦桑尼亚","汤加","特克斯和凯克特斯群岛","特里斯坦达昆哈","特立尼达和多巴哥","突尼斯","图瓦卢","土耳其","土库曼斯坦","托克劳","瓦利斯和福图纳","瓦努阿图","危地马拉","维尔京群岛，美属","维尔京群岛，英属","委内瑞拉","文莱","乌干达","乌克兰","乌拉圭","乌兹别克斯坦","西班牙","希腊","新加坡","新喀里多尼亚","新西兰","匈牙利","叙利亚","牙买加","亚美尼亚","也门","伊拉克","伊朗","以色列","意大利","印度","印度尼西亚","英国","英属印度洋领地","约旦","越南","赞比亚","泽西岛","乍得","直布罗陀","智利","中非共和国"
+]
+
+/**
+ * 获取国家列表
+ */
+
+function getCountryList(country) {
+  var selectDom = "";
+  var optionDom = ""
+  for(var c=0;c<countryArr.length;c++) {
+    if(country && country == countryArr[c]) {
+      optionDom += "<option selected>"+countryArr[c]+"</option>";
+    }else{
+      optionDom += "<option>"+countryArr[c]+"</option>";
+    }
+  }
+  selectDom = "<select id='selectList' class='authorCountry' style='vertical-align:bottom;height:22px' onchange='changeCountry(this)'>"+optionDom+"</select>"
+  return selectDom;
+}
+
+function changeCountry(para) {
+  var country = $(para).val();
+  if(country == "中国") {
+    $(para).next().css("display", "")
+  }else{
+    $(para).next().css("display", "none")
+  }
 }
