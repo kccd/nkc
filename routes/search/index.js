@@ -193,7 +193,7 @@ router
           };
         } else {
           const user = userObj[uid];
-          if(!user) continue;
+          if(!user || user.certs.includes("banned")) continue;
           await db.UserModel.extendUsersInfo([user]);
           r = {
             docType,
