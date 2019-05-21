@@ -1,16 +1,41 @@
-extends ../../bootstrap_base
+extends ../../experimental
 
-block title
-  -const mainContainer1400 = true;
-  link(href='/experimental/index.css' rel='stylesheet')
+block eTitle
   title 聊天设置
-block content
-
+block eContent
   .container-fluid.max-width
-    .row
-      include ../nav
-      .col-xs-12.col-md-12
+    .hidden#data=objToStr({messageTypes: data.messageTypes, roles: data.roles, grades: data.grades, messageTypesLanguage: data.messageTypesLanguage})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.m-b-1
+        ul.nav.nav-tabs
+          li.pointer.active
+            a 模板设置
+          li.pointer
+            a 发表限制
+      .col-xs-12.col-md-12(v-if="type === 'template'")
+        .row
+          .col-xs-12.col-md-2
+            .panel.panel-default
+              .panel-heading 通知类型
+              .list-group(v-for="t in messageTypes")
+                a.list-group-item.pointer(:class='{"active": selectedMessageType === t}' @click="selectedMessageType = t") {{t.name}}
+          .col-xs-12.col-md-10(v-if="selectedMessageType")
+            div(v-for="template in selectedMessageType.templates").m-t-2
+              div 模板名：{{lang(template.type)}}
+              span 可用参数：
+              span.m-r-1(v-for="parameter in template.parameters") {{parameter}}({{lang(parameter)}})
+              div 具体信息：
+              textarea.form-control(rows=4)
+
+
+
+      .col-xs-12.col-md-12(v-else-if="type === 'limit'")
+
+      //-.col-xs-12.col-md-12
         .row#app(v-cloak)
+          ul.nav.nav-pills
+            li.active
+              a.cursor-pointer 模板设置
           .col-xs-12.col-md-6
             table.table.table-striped
               thead
@@ -48,6 +73,5 @@ block content
 
 
 block scripts
-
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/settings/message.js?v=${global.NKC.startTime}`)
+  +includeJS("/interface_common.js")
+  +includeJS("/experimental/settings/message/message.js")

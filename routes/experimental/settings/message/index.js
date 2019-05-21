@@ -2,14 +2,12 @@ const Router = require('koa-router');
 const messageRouter = new Router();
 messageRouter
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
-    const from = ctx.request.get('FROM');
-    if(from !== 'nkcAPI') {
-      ctx.template = 'experimental/settings/message.pug';
-      return await next();
-    }
+    const {data, db, state} = ctx;
+    data.messageTypes = await db.MessageTypeModel.find();
+    data.messageTypesLanguage = state.language.messageTypes;
     data.roles = await db.RoleModel.find().sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({toc: 1});
+    ctx.template = 'experimental/settings/message/message.pug';
     await next();
   })
   .patch('/', async (ctx, next) => {
