@@ -6,8 +6,17 @@ router
     const {db, data, query, nkcModules} = ctx;
     let {page=0, t, c, d} = query;
     const {user} = data;
-    if(c) c = decodeURIComponent(c);
-    data.c = c;
+    if(c) {
+      if(!d) {
+        data.c = Buffer.from(encodeURIComponent(c)).toString("base64");
+      } else {
+        data.c = c;
+        try{
+          c = decodeURIComponent(Buffer.from(c, "base64").toString());
+        }catch(err) {}
+
+      }
+    }
     data.t = t;
     data.d = d;
     let options;
@@ -193,7 +202,7 @@ router
           };
         } else {
           const user = userObj[uid];
-          if(!user) continue;
+          if(!user || user.certs.includes("banned")) continue;
           await db.UserModel.extendUsersInfo([user]);
           r = {
             docType,
