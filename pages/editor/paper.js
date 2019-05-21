@@ -178,20 +178,24 @@ var paperProto = {
       return screenTopWarning("关键词字数不得超过50");
     }
     // 检测中文
-    var existEn = /[a-zA-Z]+/.test(keyWordsPanelCnText);
-    // if(!keyWordsPanelCnText) {
-    //   return screenTopWarning("未输入中文关键词")
-    // }
-    if(existEn) {
-      return screenTopWarning("中文关键词中不可以包含英文");
+    if(keyWordsPanelCnText) {
+      var existEn = /.*[\u4e00-\u9fa5]+.*$/.test(keyWordsPanelCnText);
+      // if(!keyWordsPanelCnText) {
+      //   return screenTopWarning("未输入中文关键词")
+      // }
+      if(!existEn) {
+        return screenTopWarning("中文关键词中至少包含一个中文字符");
+      }
     }
     // 检测英文
-    var existCn = /.*[\u4e00-\u9fa5]+.*$/.test(keyWordsPanelEnText);
-    // if(!keyWordsPanelEnText) {
-    //   return screenTopWarning("未输入英文关键词")
-    // }
-    if(existCn) {
-      return screenTopWarning("英文关键词中不可以包含中文")
+    if(keyWordsPanelEnText) {
+      var existCn = /[a-zA-Z]+/.test(keyWordsPanelEnText);
+      // if(!keyWordsPanelEnText) {
+      //   return screenTopWarning("未输入英文关键词")
+      // }
+      if(!existCn) {
+        return screenTopWarning("英文关键词中至少包含一个英文字符")
+      }
     }
     if(keyWordsPanelCnText) {
       var keyTagDom = '<span class="keyTags"><span class="keyCn" kValue="'+keyWordsPanelCnText+'">'+keyWordsPanelCnText+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>';
@@ -220,14 +224,14 @@ var paperProto = {
             disStyle = "display:none"
           }
           if(paperProto.config.authorInfos[i].isContract) {
-            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
-            authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
+            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+            authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" style="width:300px" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" style="width:100px" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
           }else{
-            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
           }
         }
       }else{
-        authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" /></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+        authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
       }
       $("#authInfoList").find("tbody").html(authorTrs);
     }
@@ -391,7 +395,7 @@ function removeOneKeyWords(para) {
 // 增加一条作者信息
 function addOneAuthorInfo() {
   var selectDom = getCountryList();
-  var authorAom = '<tr class="authorClass"><td><input class="authorName" type="text" /></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" style="height:22px" type="text" onclick="SetAgencyCity(this)"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+  var authorAom = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" style="height:22px" type="text" onclick="SetAgencyCity(this)"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
   $("#authInfoList").find("tbody").append(authorAom)
 }
 
@@ -463,7 +467,7 @@ function useContractAuthor(para) {
   if(!isContract) {
     var nextContractTr = $(para).parents("tr").next().remove();
   }else{
-    var nextContractTr = '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode"/></span></td></tr>';
+    var nextContractTr = '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd" style="width:300px"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode" style="width:100px"/></span></td></tr>';
     $(para).parents("tr").after(nextContractTr)
   }
 }
