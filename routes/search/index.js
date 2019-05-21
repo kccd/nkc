@@ -6,8 +6,10 @@ router
     const {db, data, query, nkcModules} = ctx;
     let {page=0, t, c, d} = query;
     const {user} = data;
-    if(c) c = decodeURIComponent(c);
-    data.c = c;
+    if(c) {
+      c = decodeURIComponent(c);
+      data.c = encodeURIComponent(c);
+    }
     data.t = t;
     data.d = d;
     let options;

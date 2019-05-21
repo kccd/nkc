@@ -76,7 +76,7 @@ var app = new Vue({
   mounted: function() {
     vueSelectForum.init({func: this.addForum, canChooseParentForum: true});
     var data = getDataById("data");
-    this.c = data.c;
+    this.c = decodeURIComponent(data.c);
     this.t = data.t;
     this.selectedForums = data.selectedForums || [];
     var options = data.d;
