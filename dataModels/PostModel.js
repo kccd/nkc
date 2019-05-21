@@ -486,8 +486,14 @@ postSchema.pre('save', async function(next) {
   const elasticSearch = require("../nkcModules/elasticSearch");
   const ThreadModel = mongoose.model("threads");
   try{
-    const thread = await ThreadModel.findOne({oc: this.pid}, {_id: 1});
-    await elasticSearch.save(thread?"thread":"post", this);
+    const thread = await ThreadModel.findOne({tid: this.tid});
+    let docType;
+    if(!thread || !thread.oc || thread.oc === this.pid) {
+      docType = "thread";
+    } else {
+      docType = "post"
+    }
+    await elasticSearch.save(docType, this);
     return next();
   } catch(err) {
     return next(err);
