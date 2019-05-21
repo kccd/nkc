@@ -39,7 +39,10 @@ router
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 	  const {user} = data;
-    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
+    if(!await db.UserModel.checkUserBaseInfo(user)) {
+      ctx.throw(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：未设置用户名，未设置头像，未绑定手机号。`);
+    }
+    // if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
     const forums = await db.ForumModel.find({fid: {$in: body.post.fids}});
     forums.push(forum);
     for(const f of forums) {

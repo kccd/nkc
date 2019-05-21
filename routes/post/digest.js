@@ -39,6 +39,7 @@ router
 			}
 		}
 		const digestTime = Date.now();
+		post.digest = true;
 		await post.update({digest: true, digestTime});
 		const log = {
 			user: targetUser,
@@ -87,6 +88,7 @@ router
 				}
 			});
 			await message.save();
+			await nkcModules.elasticSearch.save("thread", post);
 		} else {
 			log.typeIdOfScoreChange = 'digestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
@@ -122,6 +124,7 @@ router
 				}
 			});
 			await message.save();
+      await nkcModules.elasticSearch.save("post", post);
 		}
 		if(!redEnvelopeSettings.c.draftFee.close) {
       await usersGeneralSettings.update({$inc: {'draftFeeSettings.kcb': num}});
@@ -132,7 +135,7 @@ router
 		await next();
 	})
 	.del('/', async (ctx, next) => {
-		const {db, params, data} = ctx;
+		const {db, params, data, nkcModules} = ctx;
 		const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
@@ -161,6 +164,7 @@ router
 		if(rewardLog) {
 		  additionalReward = rewardLog.num;
     }
+		post.digest = false;
 		await post.update({digest: false});
 		const log = {
 			user: targetUser,
@@ -179,6 +183,7 @@ router
 			log.change = -1;
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
+			await nkcModules.elasticSearch.save("thread", post);
 		} else {
 			log.typeIdOfScoreChange = 'unDigestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
@@ -187,6 +192,7 @@ router
 			log.change = -1;
 			log.type = 'score';
 			await db.UsersScoreLogModel.insertLog(log);
+      await nkcModules.elasticSearch.save("post", post);
 		}
 		await next();
 	});

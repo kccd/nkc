@@ -1,0 +1,108 @@
+extends ../bootstrap_base
+block title
+  title=`搜索 - ${data.serverSettings.websiteName}`
+  +includeCSS("/search/search.css")
+block content
+  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-9
+        .search-panel
+          .search-form.form-inline
+            .form-group
+              label 关键词：
+              input.form-control.keywords-input(type='text' name='c' placeholder='多个关键词用空格分隔' v-model="c" @keyup.enter="search")
+            .form-group
+              label 多关键词关系：
+              span.h5 或
+                input(type="radio" value="or" v-model="relation")
+              span.h5 与
+                input(type="radio" value="" v-model="relation")
+          .search-form.form-inline(v-if="t !== 'user'")
+            .form-group(v-if="t !== 'user'")
+              label 作者筛选：
+              input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
+            .form-group
+              label 专业筛选：
+              .search-forum-div
+                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}
+                  .fa.fa-remove
+                button.btn.btn-default.btn-sm(@click="selectForum") 添加
+          .search-form.form-inline(v-if="t !== 'user'")
+            .form-group
+              label 精选：
+              span.h5 全部文章
+                input(type="radio" :value="false" v-model="digest")
+              span.h5 &nbsp;&nbsp;只看精选
+                input(type="radio" :value="true" v-model="digest")
+          .search-form.form-inline(v-if="t !== 'user'")
+            .form-group
+              label 时间范围：
+              select(v-model="timeStart.year")
+                -for(var i = 2000; i < 2030; i++)
+                  option(value=i)=i
+              select(v-model="timeStart.month")
+                -for(var i = 1; i < 13; i++)
+                  option(value=i)=i
+              select(v-model="timeStart.day")
+                option(v-for="i in timeStartDay" :value="i") {{i}}
+              span 至
+              select(v-model="timeEnd.year")
+                -for(var i = 2000; i < 2030; i++)
+                  option(value=i)=i
+              select(v-model="timeEnd.month")
+                -for(var i = 1; i < 13; i++)
+                  option(value=i)=i
+              select(v-model="timeEnd.day")
+                option(v-for="i in timeEndDay" :value="i") {{i}}
+          .search-form.form-inline(v-if="t !== 'user'")
+            .form-group
+              label 排序方式：
+              span.h5 匹配程度
+                input(type="radio" value="" v-model="sortType")
+              span.h5 &nbsp;&nbsp;发表时间
+                input(type="radio" value="time" v-model="sortType")
+            .form-group
+              label 显示方式：
+              span.h5 降序
+                input(type="radio" value="" v-model="sort")
+              span.h5 &nbsp;&nbsp;升序
+                input(type="radio" value="asc" v-model="sort")
+
+
+      .col-xs-12.col-md-3
+        .search-form.form-inline
+          .form-group
+            button.search-button.btn(@click="search")
+              .fa.fa-search &nbsp;搜索
+      if data.c
+        .col-xs-12.col-md-12.search-nav
+          ul
+            li
+              a(class=!data.t? "active" : "" href="javascript:app.clickNav('all')") 全部
+            li
+              a(class=data.t === "thread" ? "active" : "" href="javascript:app.clickNav('thread')") 文章
+            li
+              a(class=data.t==="post"?"active":"" href="javascript:app.clickNav('post')") 回复
+            li
+              a(class=data.t==="user"?"active":"" href="javascript:app.clickNav('user')") 用户
+        .col-xs-12.col-md-7.search-results
+          if data.total > 0
+            h5=`约找到 ${data.total} 条结果，耗时 ${data.time/1000} 秒`
+            for result in data.results
+              include ./searchResult
+            include ../publicModules/paging/paging_input
+          else
+            h5=`啥也没有找到(ಥ_ʖಥ)，白白浪费 ${data.time/1000} 秒的时间~`
+    //else
+    //  .search-panel.search-panel-center
+    //    form.search-form.form-inline(action='/search' method='GET')
+    //      .form-group
+    //        .search-header=data.serverSettings.websiteName
+    //      .form-group
+    //        input.hidden(type='text' name='t' value=data.t)
+    //        input.form-control(class="input" type='text' name='c' placeholder='请输入关键词' value=data.c)
+    //      button.btn.btn-default(type='submit') 搜索
+block scripts
+  include ../publicModules/selectForum/selectForum
+  +includeJS("/search/search.js")

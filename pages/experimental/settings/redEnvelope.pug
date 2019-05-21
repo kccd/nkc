@@ -20,8 +20,8 @@ block content
             | 关
             input(type='radio' value='true' v-model='random.close')
         .col-xs-12.col-md-12
-          h5 弹出几率(%)：
-            input(type="text" v-model="random.chance")
+          h5 弹出概率(%)：
+            input(type="text" v-model.number="random.chance")
         .col-xs-12.col-md-12
           table.table.table-bordered
             //-(style='font-size:1rem;')

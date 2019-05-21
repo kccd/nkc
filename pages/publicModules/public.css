@@ -290,10 +290,12 @@
   background-color: #9baec8;
 }
 .paging-button a.radius-left{
-  border-radius: 2px 0 0 2px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
 }
 .paging-button a.radius-right{
-  border-radius: 0 2px 2px 0;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 .paging-button a:hover, .paging-button a:visited, .paging-button a:link, .paging-button a:active{
   text-decoration: none;
@@ -1398,6 +1400,23 @@ footer.footer ul li{
   color: #9baec8;
   margin-left: 0.5rem;
 }
+.clear-a-style{
+  cursor: pointer;
+}
+.clear-a-style:hover, .clear-a-style:link, .clear-a-style:active, .clear-a-style:visited{
+  text-decoration: none;
+  color: #2b90d9;
+}
+.management-panel{
+  margin-top: 2rem;
+}
+.management-panel a {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #282c37;
+  display: inline-block;
+  margin: 0 1rem 0.5rem 0;
+}
 
 .keyWordstagCn {
   margin-right: 3px;
@@ -1457,5 +1476,5 @@ footer.footer ul li{
   /* border-bottom: 5px solid #d9e1e8; */
   background: linear-gradient(to top,#3494da 4px,#3494da 0) 1px 5px no-repeat;
   background-size: 4px 14px;
-  font-weight:bold
+  font-weight:bold;
 }

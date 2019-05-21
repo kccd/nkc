@@ -1,0 +1,21 @@
+.search-result
+  if ["thread", "post"].includes(result.docType)
+    a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
+    .search-result-info
+      a.clear-a-style.search-result-author(href=`/u/${result.postUser.uid}`)
+        img(src=`/avatar/${result.postUser.uid}?t=sm`)
+        span=result.postUser.username
+      .search-result-time=fromNow(result.postTime)
+      span 发表于
+      for forum in result.forums
+        a.clear-a-style.search-result-forum(href=`/f/${forum.fid}`)=forum.displayName
+
+    .search-result-abstract!= result.abstract
+  else
+    .search-result-user-panel
+      a.search-result-avatar(href=`/u/${result.user.uid}` target="_blank")
+        img(src=`/avatar/${result.user.uid}`)
+      .search-result-user-info
+        a.clear-a-style(href=`/u/${result.user.uid}` target="_blank").search-result-username!=result.username
+        .search-result-certs=result.user.info.certsName
+        .search-result-description!=result.description

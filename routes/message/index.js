@@ -15,8 +15,10 @@ messageRouter
   .use('/', async (ctx, next) => {
     // 未完善资料的用户跳转到完善资料页
     const {user} = ctx.data;
-    if(!user) return ctx.redirect('/login');
-    if(user && !user.username) return ctx.redirect('/register');
+    // 判断用户是否已完善账号基本信息（username, avatar, banner）
+    if(!await ctx.db.UserModel.checkUserBaseInfo(user)) {
+      ctx.nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
+    }
     await next();
   })
   .get('/', async (ctx, next) => {

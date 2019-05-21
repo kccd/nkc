@@ -1,8 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const {Schema} = mongoose;
-const {indexPost, updatePost} = settings.elastic;
-
+// const {indexPost, updatePost} = settings.elastic;
 const postSchema = new Schema({
   pid: {
     type: String,
@@ -483,7 +482,18 @@ postSchema.pre('save', async function(next) {
 });
 
 postSchema.pre('save', async function(next) {
-  // handle the ElasticSearch index
+  // elasticSearch: insert/update data
+  const elasticSearch = require("../nkcModules/elasticSearch");
+  const ThreadModel = mongoose.model("threads");
+  try{
+    const thread = await ThreadModel.findOne({oc: this.pid}, {_id: 1});
+    await elasticSearch.save(thread?"thread":"post", this);
+    return next();
+  } catch(err) {
+    return next(err);
+  }
+
+  /*// handle the ElasticSearch index
   try {
     const {_initial_state_: initialState} = this;
     if (!initialState) {
@@ -499,7 +509,8 @@ postSchema.pre('save', async function(next) {
       return next()
   } catch(e) {
     return next(e)
-  }
+
+  }*/
 });
 
 postSchema.post('save', async function(doc, next) {

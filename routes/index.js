@@ -30,6 +30,8 @@ const forgotPasswordRouter = routers.forgotPassword;
 const shopRouter = routers.shop;
 const accountRouter = routers.account;
 const imageEditRouter = routers.imageEdit;
+const complaintRouter = routers.complaint;
+const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
 
 
@@ -75,6 +77,7 @@ router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
+router.use("/search", searchRouter.routes(), searchRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
 router.use('/me', meRouter.routes(), meRouter.allowedMethods());
 router.use('/t', threadRouter.routes(), threadRouter.allowedMethods());
@@ -94,7 +97,7 @@ router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
 router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
 router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
-
+router.use("/complaint" ,complaintRouter.routes(), complaintRouter.allowedMethods());
 //router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());

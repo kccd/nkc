@@ -72,10 +72,12 @@ moduleCrop.init = function(callback, o) {
   // 显示裁剪框
   moduleCrop.show = function() {
     $("#module_crop").show();
+    stopBodyScroll(true);
   };
   // 隐藏裁剪框
   moduleCrop.hide = function() {
     $("#module_crop").hide();
+    stopBodyScroll(false);
   };
   moduleCrop.selectFile = function() {
     $("#module_crop_input").click();

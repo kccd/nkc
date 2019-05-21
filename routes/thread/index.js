@@ -76,9 +76,10 @@ threadRouter
 		const {data, params, db, query, nkcModules, body} = ctx;
 		const ip = ctx.address;
 		let {token, paraId} = query;
-		let {page = 0, pid, last_page, highlight, step} = query;
+		let {page = 0, pid, last_page, highlight, step, t} = query;
 		const {tid} = params;
 		data.highlight = highlight;
+		data.complaintTypes = ctx.state.language.complaintTypes;
     const thread = await db.ThreadModel.findOnly({tid});
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
 		// 验证权限 - new
@@ -143,9 +144,13 @@ threadRouter
 		const match = {
 			tid
 		};
+		// 只看作者
+		if(t === "author") {
+		  data.t = t;
+		  match.uid = thread.uid
+    }
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
-
 		// 判断是否为该专业的专家
 		// 如果是该专业的专家，加载所有的post；如果不是，则判断有没有相应权限。
 		if(!isModerator) {
@@ -184,8 +189,9 @@ threadRouter
 			if($and.length !== 0) match.$and = $and;
 		}
 		// 统计post总数，分页
+    const pageSettings = (await db.SettingModel.findOnly({_id: "page"})).c;
 		const count = await db.PostModel.count(match);
-		const paging_ = nkcModules.apiFunction.paging(page, count);
+		const paging_ = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		const {pageCount} = paging_;
 		// 删除退休超时的post
 		const postAll = await db.PostModel.find({tid:tid,toDraft:true});
@@ -211,10 +217,9 @@ threadRouter
 			page = pageCount -1;
 		}
 		// 查询该文章下的所有post
-		const paging = nkcModules.apiFunction.paging(page, count);
+		const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
@@ -405,6 +410,11 @@ threadRouter
 			data, nkcModules, params, db, body, address: ip
 		} = ctx;
 		const {user} = data;
+
+		if(!await db.UserModel.checkUserBaseInfo(user)) {
+      ctx.throw(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：未设置用户名，未设置头像，未绑定手机号。`);
+    }
+
     // 根据发表设置，判断用户是否有权限发表文章
     // 1. 身份认证等级
     // 2. 考试
@@ -421,7 +431,7 @@ threadRouter
     if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复至少需要完成身份认证 ${authLevelMin}`);
     if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
       if(!status) ctx.throw(403, '权限不足，请提升账号等级');
-      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请明天再试。');
+      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请参加考试提升等级，或者明天再试。');
     }
 
     // 发表回复时间、条数限制
@@ -438,40 +448,9 @@ threadRouter
     const latestPost = await db.PostModel.findOne(q);
     if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
 
-
-		/*const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		// 获取认证等级
-		const authLevel = await userPersonal.getAuthLevel();
-		if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往资料设置处绑定手机号码。');
-		if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
-		// if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');*/
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
-
-		/*if(!user.volumeA) {
-			// -1: 无限制；0：不允许；正整数：相应条数
-			const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
-			const postCountOneDay = examSettings.c.volumeAFailedPostCountOneDay;
-			if(postCountOneDay !== -1) {
-				if(postCountOneDay === 0) {
-					ctx.throw(403, '未通过A卷考试的用户暂不能发表回复');
-				} else {
-					const today = nkcModules.apiFunction.today();
-					const postCountToday = await db.InfoBehaviorModel.count({uid: user.uid, toc: {$gte: today}, operationId: 'postToThread'});
-					if(postCountToday >= postCountOneDay) ctx.throw(403, `未通过A卷考试的用户每天仅能发表${postCountOneDay}条回复`);
-				}
-			}
-		}*/
-
-		/*// 发表回复时间、条数限制
-		const {postToThreadCountLimit, postToThreadTimeLimit} = await user.getPostLimit();
-		const today = nkcModules.apiFunction.today();
-		const postToThreadCount = await db.InfoBehaviorModel.count({toc: {$gt: today}, uid: user.uid, operationId: 'postToThread'});
-		if(postToThreadCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复，请明天再试。`);
-		const latestPostLog = await db.InfoBehaviorModel.findOne({uid: user.uid, operationId: 'postToThread', toc: {$gt: (Date.now() - postToThreadTimeLimit * 60 * 1000)}});
-		if(latestPostLog) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);*/
-
 
 		data.thread = thread;
 		await thread.extendForums(['mainForums', 'minorForums']);

@@ -10,8 +10,16 @@ router
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {pageSettings} = body;
-    let {homeThreadList, userCardThreadList, forumThreadList, userCardUserList, forumUserList} = pageSettings;
+    let {
+      homeThreadList, searchPostList, searchAllList, userCardThreadList, threadPostList, forumThreadList,
+      userCardUserList, forumUserList, searchThreadList, searchUserList
+    } = pageSettings;
     homeThreadList = parseInt(homeThreadList);
+    searchPostList = parseInt(searchPostList);
+    searchAllList = parseInt(searchAllList);
+    searchThreadList = parseInt(searchThreadList);
+    searchUserList = parseInt(searchUserList);
+    threadPostList = parseInt(threadPostList);
     userCardUserList = parseInt(userCardUserList);
     userCardThreadList = parseInt(userCardThreadList);
     forumThreadList = parseInt(forumThreadList);
@@ -21,8 +29,13 @@ router
         homeThreadList,
         userCardThreadList,
         userCardUserList,
+        searchThreadList,
+        searchPostList,
+        searchAllList,
+        searchUserList,
         forumThreadList,
-        forumUserList
+        forumUserList,
+        threadPostList
       }
 		});
 		await next();

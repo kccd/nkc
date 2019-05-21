@@ -46,8 +46,8 @@
 
   .thread-panel-info
     .thread-panel-button
-      if thread.firstPost.voteUp - thread.firstPost.voteDown
-        .fa.fa-thumbs-up=` ${thread.firstPost.voteUp - thread.firstPost.voteDown || ''}`
+      if thread.firstPost.voteUp
+        .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
       if thread.hits
         .fa.fa-eye=` ${thread.hits}`
       if thread.count - 1

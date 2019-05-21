@@ -59,7 +59,6 @@ module.exports = async (ctx, next) => {
     await db.UserModel.extendUsersInfo([user]);
 		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
-		// user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
     user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
     languageName = user.generalSettings.language;
@@ -118,7 +117,7 @@ module.exports = async (ctx, next) => {
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
   ctx.state.lang = (type, operationId) => {
-    return ctx.state.language[type][operationId];
+    return ctx.state.language[type][operationId] || operationId;
   };
 
 	data.userOperationsId = userOperationsId;
