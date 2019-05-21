@@ -72,7 +72,10 @@ var paperProto = {
       // 初始化中英文关键词
       var keySpan = "";
       for(var i=0;i < paperProto.config.keyWordsCn.length;i++) {
-        keySpan += '<span class="keyTags"><span class="keyCn" kValue="'+paperProto.config.keyWordsCn[i]+'">'+paperProto.config.keyWordsCn[i]+'</span><b> [</b><span class="keyEn" kValue="'+paperProto.config.keyWordsEn[i]+'">'+paperProto.config.keyWordsEn[i]+'</span><b>]</b><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
+        keySpan += '<span class="keyTags"><span class="keyCn" kValue="'+paperProto.config.keyWordsCn[i]+'">'+paperProto.config.keyWordsCn[i]+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
+      }
+      for(var c=0;c < paperProto.config.keyWordsEn.length;c++) {
+        keySpan += '<span class="keyTags"><span class="keyEn" kValue="'+paperProto.config.keyWordsEn[c]+'">'+paperProto.config.keyWordsEn[c]+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
       }
       if(keySpan.length > 0) {
         $("#keyWordsTags").html(keySpan)
@@ -167,27 +170,37 @@ var paperProto = {
   outputKeyWords: function() {
     var keyWordsPanelCnText = $("#keyWordsPanelCnInput").val();
     var keyWordsPanelEnText = $("#keyWordsPanelEnInput").val();
+    if(!keyWordsPanelCnText && !keyWordsPanelEnText) {
+      paperProto.keyWordsPanelClose();
+      return;
+    }
     if(keyWordsPanelCnText.length > 50 || keyWordsPanelEnText.length > 50) {
       return screenTopWarning("关键词字数不得超过50");
     }
     // 检测中文
     var existEn = /[a-zA-Z]+/.test(keyWordsPanelCnText);
-    if(!keyWordsPanelCnText) {
-      return screenTopWarning("未输入中文关键词")
-    }
+    // if(!keyWordsPanelCnText) {
+    //   return screenTopWarning("未输入中文关键词")
+    // }
     if(existEn) {
       return screenTopWarning("中文关键词中不可以包含英文");
     }
     // 检测英文
     var existCn = /.*[\u4e00-\u9fa5]+.*$/.test(keyWordsPanelEnText);
-    if(!keyWordsPanelEnText) {
-      return screenTopWarning("未输入英文关键词")
-    }
+    // if(!keyWordsPanelEnText) {
+    //   return screenTopWarning("未输入英文关键词")
+    // }
     if(existCn) {
       return screenTopWarning("英文关键词中不可以包含中文")
     }
-    var keyTagDom = '<span class="keyTags"><span class="keyCn" kValue="'+keyWordsPanelCnText+'">'+keyWordsPanelCnText+'</span><b> [</b><span class="keyEn" kValue="'+keyWordsPanelEnText+'">'+keyWordsPanelEnText+'</span><b>]</b><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>';
-    $("#keyWordsTags").append(keyTagDom);
+    if(keyWordsPanelCnText) {
+      var keyTagDom = '<span class="keyTags"><span class="keyCn" kValue="'+keyWordsPanelCnText+'">'+keyWordsPanelCnText+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>';
+      $("#keyWordsTags").append(keyTagDom);
+    }
+    if(keyWordsPanelEnText) {
+      var keyTagDom = '<span class="keyTags"><span class="keyEn" kValue="'+keyWordsPanelEnText+'">'+keyWordsPanelEnText+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>';
+      $("#keyWordsTags").append(keyTagDom);
+    }
     paperProto.keyWordsPanelClose();
     $("#keyWordsPanelCnInput").val("");
     $("#keyWordsPanelEnInput").val("");
@@ -336,7 +349,7 @@ var paperProto = {
         keyWordsEn.push($(this).attr("kValue"))
       })
       // 检测关键词填写
-      if(keyWordsCn.length > 50) {
+      if((keyWordsCn.length + keyWordsEn.length) > 50) {
         throw("关键词数量不得超过50个")
       }
       obj.keyWordsCn = keyWordsCn;
@@ -450,7 +463,7 @@ function useContractAuthor(para) {
   if(!isContract) {
     var nextContractTr = $(para).parents("tr").next().remove();
   }else{
-    var nextContractTr = '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登陆用户可见)" class="contractEmail"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode"/></span></td></tr>';
+    var nextContractTr = '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" class="contractAdd"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" class="contractCode"/></span></td></tr>';
     $(para).parents("tr").after(nextContractTr)
   }
 }

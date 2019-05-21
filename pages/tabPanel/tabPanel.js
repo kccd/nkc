@@ -31,6 +31,9 @@ var panelProto = {
             id: "",
             name: ""
         }, // 选中的content
+        editStatus: "", // 是否处于专业修改状态 ing
+        editTag: "", // 当前要修改的专业
+        totalTags: [], // 当前专业名称与id
     },
     // 初始化panel
     init: function(obj) {
@@ -222,12 +225,29 @@ var panelProto = {
     },
     // 输出选中的tags
     outputTagsLast: function() {
-        $("#tabPanel").tagsinput('add', {id:panelProto.config.tagsLast.id,name:panelProto.config.tagsLast.name,fid:panelProto.config.tagsLast.id,cid:""})
+        var obj = {id:panelProto.config.tagsLast.id,name:panelProto.config.tagsLast.name,fid:panelProto.config.tagsLast.id,cid:""};
+        $("#tabPanel").tagsinput('add', obj)
+        panelProto.config.totalTags.push(obj);        
         panelProto.close();
     },
     // 输出选中的content
     outputContentLast: function() {
-        $("#tabPanel").tagsinput('add', {id:panelProto.config.tagsLast.id+":"+panelProto.config.contentLast.id,name:panelProto.config.tagsLast.name+":"+panelProto.config.contentLast.name,fid:panelProto.config.tagsLast.id,cid:panelProto.config.contentLast.id})
+        var obj = {id:panelProto.config.tagsLast.id+":"+panelProto.config.contentLast.id,name:panelProto.config.tagsLast.name+":"+panelProto.config.contentLast.name,fid:panelProto.config.tagsLast.id,cid:panelProto.config.contentLast.id};
+        if(panelProto.config.editStatus == "ing") {
+            for(var i in panelProto.config.totalTags) {
+                if(panelProto.config.totalTags[i].name == panelProto.config.editTag) {
+                    $("#tabPanel").tagsinput('remove', panelProto.config.totalTags[i].id)
+                }
+            }
+        }
+        $("#tabPanel").tagsinput('add', obj)
+        panelProto.config.totalTags.push(obj);        
+        $(".label-info-tagsinput").each(function() {
+            $(this).unbind();
+            $(this).on('click',function() {
+                editTag($(this))
+            })
+        })
         panelProto.close();
     },
     // 给选中tags添加active
@@ -379,4 +399,9 @@ function IsPC() {
         }
     }
     return flag;
+}
+
+function editTag(para) {
+    panelProto.config.editStatus = "ing";
+    panelProto.config.editTag = $(para).text();
 }
