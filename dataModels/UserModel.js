@@ -1117,8 +1117,9 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
   }
   const {username} = user;
   const uploadedAvatar = await UserModel.uploadedAvatar(user.uid);
-  const uploadedBanner = await UserModel.uploadedBanner(user.uid);
-  return username && uploadedAvatar && uploadedBanner;
+  /*const uploadedBanner = await UserModel.uploadedBanner(user.uid);
+  return username && uploadedAvatar && uploadedBanner;*/
+  return username && uploadedAvatar;
 };
 
 module.exports = mongoose.model('users', userSchema);
