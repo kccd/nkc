@@ -42,10 +42,16 @@ var app = new Vue({
         sortType: this.sortType,
         relation: this.relation
       };
-      return window.btoa(encodeURIComponent(JSON.stringify(o)));
+      return this.strToBase64(JSON.stringify(o));
     }
   },
   methods: {
+    strToBase64: function(str) {
+      return window.btoa(encodeURIComponent(str));
+    },
+    base64ToStr: function(base64) {
+      return decodeURIComponent(window.atob(base64))
+    },
     addForum: function(data) {
       for(var i = 0; i < this.selectedForums.length; i++) {
         if(this.selectedForums[i].fid === data.fid) return;
@@ -65,24 +71,30 @@ var app = new Vue({
       if(type === "user") t = "&t=user";
       if(type === "thread") t = "&t=thread";
       if(type === "post") t = "&t=post";
-      window.location.href = "/search?c=" + encodeURIComponent(this.c || "") + t +"&d=" + this.options;
+      window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
     },
     // 搜索
     search: function() {
       if(!this.c) return screenTopWarning("请输入关键词");
-      window.location.href = "/search?c=" + encodeURIComponent(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
+      window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
     }
   },
   mounted: function() {
     vueSelectForum.init({func: this.addForum, canChooseParentForum: true});
     var data = getDataById("data");
-    this.c = decodeURIComponent(data.c);
+    try{
+      this.c = this.base64ToStr(data.c);
+    } catch(err) {
+      console.log(err);
+      this.c = data.c;
+    }
+
     this.t = data.t;
     this.selectedForums = data.selectedForums || [];
     var options = data.d;
     if(options) {
       try{
-        options = JSON.parse(decodeURIComponent(window.atob(options)));
+        options = JSON.parse(this.base64ToStr(options));
         if(options.timeStart) this.timeStart = options.timeStart;
         if(options.timeEnd) this.timeEnd = options.timeEnd;
         if(options.sort) this.sort = options.sort;

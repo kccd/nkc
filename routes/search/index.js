@@ -7,8 +7,15 @@ router
     let {page=0, t, c, d} = query;
     const {user} = data;
     if(c) {
-      c = decodeURIComponent(c);
-      data.c = encodeURIComponent(c);
+      if(!d) {
+        data.c = Buffer.from(encodeURIComponent(c)).toString("base64");
+      } else {
+        data.c = c;
+        try{
+          c = decodeURIComponent(Buffer.from(c, "base64").toString());
+        }catch(err) {}
+
+      }
     }
     data.t = t;
     data.d = d;
