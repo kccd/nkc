@@ -259,6 +259,7 @@ function SetAgencyCity(obj, e) {
     $("#_citys0 a").click(function() {
         var g = getAgencyCity($(this));
         $("#_citys1 a").remove();
+        if (g == '') Iput.colse();
         $("#_citys1").append(g);
         $("._citys1").hide();
         $("._citys1:eq(1)").show();
