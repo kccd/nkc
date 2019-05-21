@@ -55,7 +55,13 @@ draftsRouter
               uid: ctx.data.user.uid,
               did: newId,
               desType: body.desType,
-              desTypeId: body.desTypeId
+              desTypeId: body.desTypeId,
+              abstractCn: body.abstractCn,
+              abstractEn: body.abstractEn,
+              authorInfos: body.authorInfos,
+              keyWordsCn: body.keyWordsCn,
+              keyWordsEn: body.keyWordsEn,
+              originState: body.originState
             });
             await newDraft.save();
             data.status = "success"
@@ -63,7 +69,7 @@ draftsRouter
         }else{
             let datestr = Date.now()
             const toeditdraft = await db.DraftModel.findOnly({did:body.did});
-            await toeditdraft.update({t:body.t,c:body.c,tlm:datestr});
+            await toeditdraft.update({t:body.t,c:body.c,tlm:datestr,abstractCn: body.abstractCn, abstractEn: body.abstractEn, authorInfos:body.authorInfos, keyWordsCn: body.keyWordsCn, keyWordsEn: body.keyWordsEn, originState: body.originState});
             // await db.DraftModel.update({t:body.t},{$set: {c:body.c,toc:datestr}});
             data.status = "success";
             data.did = body.did

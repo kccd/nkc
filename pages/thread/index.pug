@@ -267,7 +267,7 @@ block content
                       .h3.thread-title.text-center= thread.firstPost.t
                       -const post = thread.firstPost;
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
-                      if post.authorInfos && post.authorInfos.length > 0
+                      if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
                         -var agencyIndex = 1;
                         -var agencyArray = [];
                         -var agencyAddArray = [];
@@ -275,9 +275,9 @@ block content
                           -if(post.authorInfos[i].agency){
                             -if(agencyArray.indexOf(post.authorInfos[i].agency) == -1){
                               -agencyArray.push(post.authorInfos[i].agency);
-                              -if(post.authorInfos[i].agencyAdd && post.authorInfos[i].agencyAdd.length > 0){
+                              -if(post.authorInfos[i].agencyCountry && post.authorInfos[i].agencyCountry.length > 0){
                                 -post.authorInfos[i].agencyAdd = post.authorInfos[i].agencyAdd.replace(/\//igm, " ");
-                                -agencyAddArray.push(post.authorInfos[i].agency+"，"+post.authorInfos[i].agencyAdd);
+                                -agencyAddArray.push(post.authorInfos[i].agency+"，"+post.authorInfos[i].agencyCountry+" "+post.authorInfos[i].agencyAdd);
                               -}else{
                                 -agencyAddArray.push(post.authorInfos[i].agency);
                               -}
@@ -290,9 +290,10 @@ block content
                         -}
                         .thread-info.text-center(style="color:#000;font-weight: bold;margin-top:1rem")
                           for auth,index in post.authorInfos
-                            span(style="margin-right:10px;cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
-                              if auth.agencyIndex
-                                sup!=`${auth.agencyIndex}`
+                            span(style="margin-right:10px;")
+                              span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                if auth.agencyIndex
+                                  sup!=`${auth.agencyIndex}`
                               if auth.isContract
                                 span
                                   span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
@@ -329,7 +330,7 @@ block content
                       //-               if auth.isContract
                       //-                 span
                       //-                   span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
-                      if post.abstractCn.length !== 0 || post.abstractEn.length !== 0 
+                      if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product" 
                         .abstract(style="margin-top:1rem;")
                           if post.abstractCn.length !== 0
                             .panel.panel-default(style="border:0;margin-bottom:0")
@@ -339,7 +340,7 @@ block content
                             .panel.panel-default(style="border:0;margin-bottom:0")
                               .panel-heading.paperHeader Summary
                               .panel-body!=LineFeedConversion(post.abstractEn)
-                      if post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0 
+                      if (post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0) && data.thread.type !== "product" 
                         .keyWords(style="margin-top:1rem;")
                           .panel.panel-default(style="border:0;margin-bottom:0")
                             .panel-heading.paperHeader 关键词

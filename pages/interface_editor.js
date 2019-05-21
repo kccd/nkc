@@ -13,6 +13,10 @@ $(function() {
 
 });
 
+if($("#targetPost").length > 0) {
+  paperProto.init(JSON.parse($("#targetPost").text()));
+}
+
 function dataURItoBlob (base64Data) {  
   var byteString;  
   if (base64Data.split(',')[0].indexOf('base64') >= 0)  
@@ -481,6 +485,16 @@ function saveDraft(that){
       desType: desType,
       desTypeId: desTypeId
     };
+    var paperObj = {};
+    try{
+      paperObj = paperProto.paperExport();
+    }catch(e) {
+      screenTopWarning(e);
+      return;
+    }
+    for(var i in paperObj) {
+      post[i] = paperObj[i]
+    } 
     mathfreshnew();
     var userId = $("#userNowId").html()
     var method = "POST";
@@ -571,7 +585,6 @@ function onPost(that) {
 				id = that.query.id;
 			}
 		}
-
     var language = that.language?that.language.value.toLowerCase().trim():'html'
     if (content === '') {
       screenTopWarning('请填写内容。');

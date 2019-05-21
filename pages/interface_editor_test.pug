@@ -58,7 +58,7 @@ block content
             if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
               .form-horizontal
                 .form-group
-                  label.col-sm-12 专业分类(最多可选两个)
+                  label.col-sm-12 专业分类(必选，最多可选两个)
                   .col-sm-12
                     input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
             if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post'
@@ -94,6 +94,7 @@ block content
                 div#draftId(style='display:none')=`${data.did || ''}`
                 div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
                 div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
+                div#singleDarft(style='display:none')= JSON.stringify(data.singleDarft)
   
   include debug_output.pug
 block scripts
@@ -131,7 +132,7 @@ block scripts
   script(src=`/forum/forum_choice.js?v=${startTime}`)
   script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
   script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
-  +includeJS('/external_pkgs/citySet/city.json.js')
+  +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   script.
     window.onbeforeunload = function() {

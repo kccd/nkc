@@ -98,9 +98,9 @@ style.
 
   .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
     p.item 
-      span#showText #{cutContent(post.abstract,60)}
-      if post.abstract && post.abstract.length > 60
-        span#hideText(style="display:none")!=`${post.abstract}`
+      span#showText #{cutContent(post.abstractCn,60)}
+      if post.abstractCn && post.abstractCn.length > 60
+        span#hideText(style="display:none")!=`${post.abstractCn}`
         span 
           a(onclick="showAbstract()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showAbstract") 展开
           a(onclick="hideAbstract()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideAbstract") 收起

@@ -821,7 +821,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
     ip: String 发表者ID
     title: String 标题
     content: String 内容
-    abstract: String 摘要
+    abstractCn: String 摘要
   @author pengxiguaa 2019/3/7  
 */
 threadSchema.statics.publishArticle = async (options) => {
@@ -829,7 +829,7 @@ threadSchema.statics.publishArticle = async (options) => {
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
-  const {uid, fids, cids, ip, title, content, abstract, type, keywords} = options;
+  const {uid, fids, cids, ip, title, content, abstractCn, type, keyWordsCn} = options;
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findById(uid);
   await ThreadModel.ensurePublishPermission(options);
@@ -846,8 +846,8 @@ threadSchema.statics.publishArticle = async (options) => {
   const post = await PostModel.newPost({
     title,
     content,
-    abstract,
-    keywords,
+    abstractCn,
+    keyWordsCn,
     ip,
     uid,
     tid

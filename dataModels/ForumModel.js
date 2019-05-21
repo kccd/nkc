@@ -989,6 +989,13 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
         }
       }
     }
+    if(forum.childrenForums.length == 0) {
+      forum.son.push({
+        id: "",
+        name: "不分类",
+        son: []
+      })
+    }
   }
   // 我关注的
   const mySubForums = {

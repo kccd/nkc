@@ -53,6 +53,30 @@ const draftSchema = new Schema({
     type: Date,
     default: Date.now,
     index: 1
+  },
+  abstractCn: {
+    type: String,
+    default: "",
+  },
+  abstractEn: {
+    type: String, 
+    default: "",
+  },
+  authorInfos: {
+    type: Array,
+    default: []
+  },
+  keyWordsCn: {
+    type: Array,
+    default: []
+  },
+  keyWordsEn: {
+    type: Array,
+    default: []
+  },
+  originState: {
+    type: String,
+    default: "0"
   }
 });
 
