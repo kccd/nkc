@@ -76,7 +76,6 @@ router
       data.total = results.hits.total;
       results = results.hits.hits.map(r => {
         const resource = r._source;
-        console.log(r._score);
         resource.highlight = r.highlight;
         return resource;
       });
