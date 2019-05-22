@@ -10,10 +10,10 @@ block content
         .search-panel
           .search-form.form-inline
             .form-group
-              label 关键词：
-              input.form-control.keywords-input(type='text' name='c' placeholder='多个关键词用空格分隔' v-model="c" @keyup.enter="search")
+              label 检索词：
+              input.form-control.keywords-input(type='text' name='c' placeholder='多个检索词用空格分隔' v-model="c" @keyup.enter="search")
             .form-group
-              label 多关键词关系：
+              label 多检索词关系：
               span.h5 或
                 input(type="radio" value="or" v-model="relation")
               span.h5 与

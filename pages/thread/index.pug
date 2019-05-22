@@ -374,7 +374,7 @@ block content
                               .panel-body!=LineFeedConversion(post.abstractCn)
                           if post.abstractEn.length !== 0
                             .panel.panel-default(style="border:0;margin-bottom:0")
-                              .panel-heading.paperHeader Summary
+                              .panel-heading.paperHeader Abstract
                               .panel-body!=LineFeedConversion(post.abstractEn)
                       if (post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0) && data.thread.type !== "product" 
                         .keyWords(style="margin-top:1rem;")
