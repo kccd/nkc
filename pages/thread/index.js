@@ -865,3 +865,10 @@ function turnUser(uid) {
 		window.location.href = "/u/"+uid
 	}
 }
+
+function turnSearch(text) {
+	if(text) {
+		var url = "/search?c="+text;
+		window.location.href = url;
+	}
+}

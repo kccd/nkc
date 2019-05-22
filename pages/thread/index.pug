@@ -309,7 +309,10 @@ block content
                           if post.authorInfos.length > 1
                             for auth,index in post.authorInfos
                               span(style="margin-right:10px;font-weight: bold;")
-                                span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                if auth.kcid.length > 0
+                                  span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                else
+                                  span!=`${auth.name}`
                                   if auth.agencyIndex
                                     sup!=`${auth.agencyIndex}`
                                 if auth.isContract
@@ -318,7 +321,10 @@ block content
                           else
                             for auth,index in post.authorInfos
                               span(style="margin-right:10px;font-weight: bold;")
-                                span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                if auth.kcid.length > 0
+                                  span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                else
+                                  span!=`${auth.name}`
                                 if auth.isContract
                                   span
                                     span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
@@ -384,11 +390,11 @@ block content
                               if post.keyWordsCn.length !== 0
                                 div
                                   for keyCn in post.keyWordsCn
-                                    span.keyWordstagCn!=keyCn
+                                    span.keyWordstagCn(style="cursor:pointer" onclick=`turnSearch("${keyCn}")`)!=keyCn
                               if post.keyWordsEn.length !== 0
                                 div(style="margin-top:5px")
                                   for keyEn in post.keyWordsEn
-                                    span.keyWordstagEn!=keyEn
+                                    span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
                         if data.thread.type == "article"
                           div.thread-content.ThreadPostBody!= experimental_render(post)
