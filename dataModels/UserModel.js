@@ -24,6 +24,7 @@ const userSchema = new Schema({
   },
   tlv: {
     type: Date,
+    index: 1,
     default: Date.now,
   },
   disabledPostsCount: {
@@ -104,6 +105,7 @@ const userSchema = new Schema({
   color: String,
   certs: {
     type: [String],
+    default: [],
     index: 1
   },
   postSign: String,
@@ -299,13 +301,20 @@ userSchema.virtual('newVoteUp')
   .set(function(newVoteUp) {
     this._newVoteUp = newVoteUp;
   });
-userSchema.virtual('info') 
+userSchema.virtual('info')
   .get(function() {
     return this._info;
   })
   .set(function(info) {
     this._info = info;
-  });  
+  });
+userSchema.virtual('user')
+  .get(function() {
+    return this._user;
+  })
+  .set(function(user) {
+    this._user = user;
+  });
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = mongoose.model('threads');
@@ -364,9 +373,19 @@ userSchema.methods.extend = async function(options) {
 };
 
 userSchema.methods.extendRoles = async function() {
-	const RoleModel = mongoose.model('roles');
-	const roles = [];
-	for(let cert of this.certs) {
+  const RoleModel = mongoose.model('roles');
+  let certs = [].concat(this.certs);
+  if(!certs.includes('default')) {
+    certs.push('default');
+  }
+  if(this.xsf > 0 && !certs.includes('scholar')) {
+    certs.push('scholar');
+  }
+  if(certs.includes('banned')) {
+    certs = ['banned'];
+  }
+  const roles = [];
+	for(let cert of certs) {
 		const role = await RoleModel.findOne({_id: cert});
 		if(role) roles.push(role);
 	}
@@ -535,6 +554,7 @@ userSchema.statics.createUser = async (option) => {
 	const UsersPersonalModel = mongoose.model('usersPersonal');
 	const UsersSubscribeModel = mongoose.model('usersSubscribe');
 	const PersonalForumModel = mongoose.model('personalForums');
+	const SubscribeModel = mongoose.model("subscribes");
 	const SettingModel = mongoose.model('settings');
 	const UsersGeneraModel = mongoose.model('usersGeneral');
 	const MessageModel = mongoose.model('messages');
@@ -581,6 +601,10 @@ userSchema.statics.createUser = async (option) => {
 	const personalForum = PersonalForumModel(userObj);
 	const userGeneral = UsersGeneraModel({uid});
 
+	// 生成关注专业记录
+  const regSettings = await SettingModel.findById("register");
+  const {defaultSubscribeForumsId} = regSettings.c;
+
 	try {
 		await user.save();
 		await userPersonal.save();
@@ -593,6 +617,17 @@ userSchema.statics.createUser = async (option) => {
 			viewedUsers.push(uid);
 			await sms.update({viewedUsers});
 		}
+
+		for(const fid of defaultSubscribeForumsId) {
+		  const sub = SubscribeModel({
+        _id: await SettingModel.operateSystemID("subscribes", 1),
+        uid,
+        type: "forum",
+        fid
+      });
+		  await sub.save();
+    }
+
 	} catch (error) {
 		await UserModel.remove({uid});
 		await UsersPersonalModel.remove({uid});
@@ -600,7 +635,12 @@ userSchema.statics.createUser = async (option) => {
 		await PersonalForumModel.remove({uid});
 		await UsersGeneraModel.remove({uid});
 		await SystemInfoLogModel.remove({uid});
-		const err = new Error(`新建用户出错: ${error}`);
+		await SubscribeModel.remove({
+      uid,
+      type: "forum",
+      fid: {$in: defaultSubscribeForumsId}
+    });
+		const err = new Error(`创建用户出错: ${error}`);
 		err.status = 500;
 		throw err;
 	}
@@ -675,6 +715,21 @@ userSchema.methods.extendGrade = async function() {
 	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
 	return this.grade = grade;
 };
+/* 
+  拓展全局设置
+  @author pengxiguaa 2019/3/6
+*/
+userSchema.methods.extendGeneralSettings = async function() {
+  return this.generalSettings = await mongoose.model('usersGeneral').findOnly({uid: this.uid});
+}
+/* 
+  验证用户是否完善资料，包括：用户名、密码
+  未完善则会抛出错误
+  @author pengxiguaa 2019/3/7
+*/
+userSchema.methods.ensureUserInfo = async function() {
+  if(!this.username) throwErr(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
+}
 
 userSchema.methods.getNewMessagesCount = async function() {
 	const MessageModel = mongoose.model('messages');
@@ -779,7 +834,10 @@ userSchema.statics.extendUsersInfo = async (users) => {
   for(const personal of usersPersonal) {
     personalObj[personal.uid] = personal;
   }
-  await Promise.all(users.map(async user => {
+
+  const users_ = []; // 普通对象
+
+  for(const user of users) {
     let certs = user.certs.concat([]);
     // 若用户拥有“banned”证书，则忽略其他证书
     if(certs.includes('banned')) {
@@ -801,14 +859,267 @@ userSchema.statics.extendUsersInfo = async (users) => {
         info.certsName.push(role.displayName);
       }
     }
-    const userPersonal = personalObj[user.uid];
-    // 若用户绑定了手机号，则临时添加“机友”标志
-    if(userPersonal.mobile && userPersonal.nationCode) info.certsName.push('机友');
-    // 若用户绑定了邮箱，则临时添加“笔友”标志
-    if(userPersonal.email) info.certsName.push('笔友');
+    if(!certs.includes('banned')) {
+      const userPersonal = personalObj[user.uid];
+      // 若用户绑定了手机号，则临时添加“机友”标志
+      if(userPersonal.mobile && userPersonal.nationCode) info.certsName.push('机友');
+      // 若用户绑定了邮箱，则临时添加“笔友”标志
+      if(userPersonal.email) info.certsName.push('笔友');
+    }
     info.certsName = info.certsName.join(' ');
     user.info = info;
-  }));
+    users_.push(user.toObject());
+  }
+  return users_;
+};
+userSchema.methods.extendAuthLevel = async function() {
+  const userPersonal = await mongoose.model('usersPersonal').findUsersPersonalById(this.uid);
+  return this.authLevel = await userPersonal.getAuthLevel();
+};
+
+/* 
+  通过uid查找单一用户
+  @param uid: 用户ID
+  @author pengxiguaa 2019/3/7 
+*/
+userSchema.statics.findById = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({uid});
+  if(!user) throwErr(404, `未找到ID为【${uid}】的用户`);
+  return user;
+};
+
+/*
+* 根据用户的kcb转账记录 计算用户的科创币总量 并将计算结果写到user.kcb
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-4-4
+* */
+userSchema.statics.updateUserKcb= async (uid) => {
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const fromRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        from: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const toRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        to: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const expenses = fromRecords.length? fromRecords[0].total: 0;
+  const income = toRecords.length? toRecords[0].total: 0;
+  const total = income - expenses;
+  if(uid === "bank") {
+    await SettingModel.update({_id: "kcb"}, {
+      $set: {
+        "c.totalMoney": total
+      }
+    });
+  } else {
+    await UserModel.update({
+      uid
+    }, {
+      $set: {
+        kcb: total
+      }
+    });
+  }
+  return total;
+};
+/*
+* 更新用户的kcb
+* 该方法位于user对象
+* @author pengxiguaa 2019-4-15
+* */
+userSchema.methods.updateKcb = async function() {
+  const UserModel = mongoose.model("users");
+  this.kcb = await UserModel.updateUserKcb(this.uid);
+};
+/*
+* 验证用户是否还能关注相应的内容
+* @param {String} type 关注的类型 user: 关注用户, forum: 关注专业, thread: 关注文章
+* @author pengxiguaa 2019-4-24
+* */
+userSchema.methods.ensureSubLimit = async function(type) {
+  const SubscribeModel = mongoose.model("subscribes");
+  const SettingModel = mongoose.model("settings");
+  const subSettings = await SettingModel.findById("subscribe");
+  const {subUserCountLimit, subForumCountLimit, subThreadCountLimit} = subSettings.c;
+  if(type === "user") {
+    if(subUserCountLimit <= 0) throwErr(400, "关注用户功能已关闭");
+    const userCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "user"
+    });
+    if(userCount >= subUserCountLimit) throwErr(400, "关注用户数量已达上限");
+  } else if(type === "forum") {
+    if(subForumCountLimit <= 0) throwErr(400, "关注专业已关闭");
+    const forumCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "forum"
+    });
+    if(forumCount >= subForumCountLimit) throwErr(400, "关注专业数量已达上限");
+  } else if(type === "thread") {
+    if(subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
+    const threadCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "thread"
+    });
+    if(threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
+  } else {
+    throwErr(500, `未知的type类型：${type}`);
+  }
+};
+
+userSchema.statics.getUserPostSummary = async (uid) => {
+  const PostModel = mongoose.model("posts");
+  const data = await PostModel.aggregate([
+    {
+      $match: {
+        mainForumsId: {
+          $nin: ["recycle"]
+        },
+        uid,
+        disabled: false
+      }
+    },
+    {
+      $unwind: "$mainForumsId"
+    },
+    {
+      $group: {
+        _id: "$mainForumsId",
+        count: {
+          $sum: 1
+        }
+      }
+    },
+    {
+      $sort: {
+        count: -1
+      }
+    }
+  ]);
+  const forumsId = data.map(d => d._id);
+  const forums = await mongoose.model("forums").find({fid: {$in: forumsId}}, {
+    displayName: 1,
+    fid: 1,
+    color: 1
+  });
+  const forumsObj = {};
+  for(const forum of forums) {
+    forumsObj[forum.fid] = forum;
+  }
+  const results = [];
+  let otherCount = 0;
+  for(const d of data) {
+    const forum = forumsObj[d._id];
+    if(!forum) continue;
+    // 超过10 则归为"其他"分类
+    if(results.length >= 20) {
+      otherCount += d.count;
+    } else {
+      results.push({
+        forumName: forum.displayName,
+        fid: forum.fid,
+        count: d.count,
+        color: forum.color || "#aaa"
+      });
+    }
+  }
+  if(otherCount > 0) {
+    results.push({
+      forumName: "其他",
+      fid: "",
+      count: otherCount,
+      color: "#aaa"
+    });
+  }
+  return results;
+};
+/*
+* 获取用户的信息好友ID
+* @param {String} uid 用户ID
+* @return {[String]} 好友ID数组
+* @author pengxiguaa 2019-5-9
+* */
+userSchema.statics.getUsersFriendsId = async (uid) => {
+  const FriendModel = mongoose.model("friends");
+  const friends = await FriendModel.find({uid});
+  return friends.map(c => c.tUid);
+};
+
+/*
+* 判断用户是否上传了头像
+* @param {String} uid 用户id
+* @author pengxiguaa 2019-5-13
+* @return {Boolean} 是否上传
+* */
+userSchema.statics.uploadedAvatar = async (uid) => {
+  if(!uid) throwErr(500, "userSchema.uploadedAvatar: uid is required");
+  let {avatarPath} = require("../settings/upload");
+  const {existsSync} = require("../tools/fsSync");
+  avatarPath += `/${uid}.jpg`;
+  return existsSync(avatarPath);
+};
+/*
+* 判断用户是否上传了背景
+* @param {String} uid 用户id
+* @author pengxiguaa 2019-5-13
+* @return {Boolean} 是否上传
+* */
+userSchema.statics.uploadedBanner = async (uid) => {
+  if(!uid) throwErr(500, "userModel.uploadedBanner: uid is required");
+  let {userBannerPath} = require("../settings/upload");
+  const {existsSync} = require("../tools/fsSync");
+  userBannerPath += `/${uid}.jpg`;
+  return existsSync(userBannerPath);
+};
+
+/*
+* 验证用户是否已完善基本信息
+* 信息种类：用户名、头像、背景
+* @param {String/Object} uid 用户id/用户对象
+* @return {Boolean} 是否已完善
+* @author pengxiguaa 2019-5-13
+* */
+userSchema.statics.checkUserBaseInfo = async function(uid) {
+  let user;
+  const UserModel = mongoose.model("users");
+  if(uid instanceof String) {
+    user = await UserModel.findById(uid);
+  } else {
+    user = uid;
+  }
+  const {username} = user;
+  const uploadedAvatar = await UserModel.uploadedAvatar(user.uid);
+  /*const uploadedBanner = await UserModel.uploadedBanner(user.uid);
+  return username && uploadedAvatar && uploadedBanner;*/
+  return username && uploadedAvatar;
 };
 
 module.exports = mongoose.model('users', userSchema);

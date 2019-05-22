@@ -9,15 +9,35 @@ router
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		const pageSettings = await db.SettingModel.findOnly({_id: 'page'});
-		let {homeThreadsFirstLoad} = body;
-		homeThreadsFirstLoad = parseInt(homeThreadsFirstLoad);
-		if(homeThreadsFirstLoad > 0) {
-
-		} else {
-			ctx.throw(400, '参数错误');
-		}
-		await pageSettings.update({'c.homeThreadsFirstLoad': homeThreadsFirstLoad});
+		const {pageSettings} = body;
+    let {
+      homeThreadList, searchPostList, searchAllList, userCardThreadList, threadPostList, forumThreadList,
+      userCardUserList, forumUserList, searchThreadList, searchUserList
+    } = pageSettings;
+    homeThreadList = parseInt(homeThreadList);
+    searchPostList = parseInt(searchPostList);
+    searchAllList = parseInt(searchAllList);
+    searchThreadList = parseInt(searchThreadList);
+    searchUserList = parseInt(searchUserList);
+    threadPostList = parseInt(threadPostList);
+    userCardUserList = parseInt(userCardUserList);
+    userCardThreadList = parseInt(userCardThreadList);
+    forumThreadList = parseInt(forumThreadList);
+    forumUserList = parseInt(forumUserList);
+		await db.SettingModel.updateOne({_id: "page"}, {
+      c: {
+        homeThreadList,
+        userCardThreadList,
+        userCardUserList,
+        searchThreadList,
+        searchPostList,
+        searchAllList,
+        searchUserList,
+        forumThreadList,
+        forumUserList,
+        threadPostList
+      }
+		});
 		await next();
 	});
 module.exports = router;

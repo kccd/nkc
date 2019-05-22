@@ -1,0 +1,12 @@
+extends ../shopBase
+block shopTitle
+  +includeCSS('/shop/account/account.css')
+  block shopAccountTitle
+block content
+  .container-fluid.max-width
+    //-include ../shopSearch.pug
+    .row
+      //-.col-xs-12.col-md-3
+        include ./left-link.pug
+      .col-xs-12.col-md-12
+        block shopAccountContent

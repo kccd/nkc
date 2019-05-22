@@ -3,11 +3,14 @@
 const resourceObj = require('./resource');
 const {
 	avatar,
+	shopLogo,
 	poster,
 	avatar_small,
 	forum_avatar,
 	r,
 	rt,
+	rm,
+	ro,
 	cover,
 	frameImg,
 	appDownload,
@@ -18,7 +21,7 @@ const {
 	fundBanner,
 	photo,
 	photo_small,
-	logo
+	logo,
 } = resourceObj;
 
 const auth = require('./auth');
@@ -50,6 +53,11 @@ const friend = require('./friend');
 const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
+const shop = require('./shop');
+const account = require('./account');
+const complaint = require("./complaint");
+const imageEdit = require('./imageEdit');
+const protocol = require('./protocol');
 const operationObj = {};
 
 
@@ -70,6 +78,8 @@ operationObj.defaultOperations = [
   'viewAllPaperRecords', // 可查看所有的考试记录
   'removeAllQuestion', // 可删除别人出的试题
   'superModerator', // 超级专家，所有专业的专家权限
+  "getAnyBodyShopCert", // 可查看任何人的商城凭证
+  "viewUserAllFansAndFollowers" // 可查看用户的所有关注的人和粉丝
 ];
 
 
@@ -82,11 +92,14 @@ operationObj.operationTree = {
 		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,
+		shopLogo, //店铺logo
 
 		forum_avatar,// 专业logo
 
 		r,// 资源
-		rt,
+		rt, // 小号图 150
+		rm, // 中号图 640
+		ro, // 原图 3840
 
 		default: resourceObj.default,
 		attachIcon: resourceObj.attachIcon,
@@ -168,6 +181,16 @@ operationObj.operationTree = {
     subscription, // 首页我的关注
 
 		lottery, // 抽奖页
+
+		shop, //商城
+		
+		imageEdit, // 编辑图片
+
+		protocol, // 论坛协议
+    
+    account, // 个人中心
+
+    complaint, // 用户投诉
 	}
 };
 module.exports = operationObj;

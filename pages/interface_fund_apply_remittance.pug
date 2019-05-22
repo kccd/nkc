@@ -7,7 +7,7 @@ block title
   title= `申请拨款-${applicationForm.project.t}`
   link(rel='stylesheet' href='/fund.css')
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     include interface_fund_nav
     .row
       .col-xs-12.col-md-8
@@ -92,8 +92,8 @@ block content
                     textarea.form-control#reportContent(rows=10 placeholder='项目的进展情况（建议200字左右）')
                     if remittance[0].needThreads
                       br
-                      span.redFontColor *管理员要求提交拨款申请必须要附带代表中期报告的帖子
-                    h5 已选择帖子的文号：
+                      span.redFontColor *管理员要求提交拨款申请必须要附带代表中期报告的文章
+                    h5 已选择文章的文号：
                     #selectedThread
                       span 暂未选择
                     br
@@ -101,7 +101,7 @@ block content
                       input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' )
                       input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
                       div#applicationFormId.hidden= applicationForm._id
-                    span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
+                    span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的文章
                     span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
                     .unselectedThreads
                       .blank(style='color: #aaa;') 暂无数据

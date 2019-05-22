@@ -1,11 +1,13 @@
-'use strict'
+'use strict';
 const subscribeRouter = require('./subscribe');
 const settingsRouter = require('./settings');
 const homeRouter = require('./home');
 const latestRouter = require('./latest');
 const followerRouter = require('./follower');
+const bannerRouter = require('./banner');
 const visitorRouter = require('./visitor');
 const Router = require('koa-router');
+const path = require('path');
 const router = new Router();
 router
   .get('/', async (ctx) => {
@@ -37,7 +39,10 @@ router
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 	  const {user} = data;
-    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
+    if(!await db.UserModel.checkUserBaseInfo(user)) {
+      ctx.throw(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：未设置用户名，未设置头像，未绑定手机号。`);
+    }
+    // if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
     const forums = await db.ForumModel.find({fid: {$in: body.post.fids}});
     forums.push(forum);
     for(const f of forums) {
@@ -181,7 +186,7 @@ router
       }
     ]});
     if(count > 0) {
-      ctx.throw(422, `该板块下仍有${count}个帖子, 请转移后再删除板块`);
+      ctx.throw(422, `该板块下仍有${count}个文章, 请转移后再删除板块`);
       return next()
     } else {
       await forum.remove()
@@ -258,33 +263,32 @@ router
 			if(data.users.length < 9) {
 				const targetUser = await db.UserModel.findOne({uid});
 				if(targetUser) {
-					data.users.push(targetUser);
+					data.users.push(targetUser); // 今日来访的用户
 				}
 			} else {
 				break;
 			}
     }
-    await db.UserModel.extendUsersInfo(data.users);
+    data.users = await db.UserModel.extendUsersInfo(data.users);
+
+		// 获取最新关注的用户
+		const subUsers = await db.SubscribeModel.find({
+      type: "forum",
+      fid: forum.fid
+    }).sort({toc: -1}).limit(9);
+
+		data.subUsers = await db.UserModel.find({
+      uid: {
+        $in: subUsers.map(s => s.uid)
+      }
+    });
+
+		data.subUsers = await db.UserModel.extendUsersInfo(data.subUsers);
 
     await forum.extendParentForums();
 		// 加载网站公告
 		await forum.extendNoticeThreads();
-		// 加载关注专业的用户
-		let followersId = forum.followersId;
-		followersId = followersId.reverse();
-		const followers = [];
-		for(let uid of followersId) {
-			if(followers.length < 9) {
-				const targetUser = await db.UserModel.findOne({uid});
-				if(targetUser) {
-					followers.push(targetUser);
-				}
-			} else {
-				break;
-			}
-    }
-    await db.UserModel.extendUsersInfo(followers);
-    forum.followers = followers;
+
 
 		//版主
 		data.moderators = [];
@@ -292,28 +296,27 @@ router
       data.moderators = await db.UserModel.find({uid: {$in: forum.moderators}});
     }
     await db.UserModel.extendUsersInfo(data.moderators);
-		if(data.user) {
-			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
-		}
 
-		const digestThreads = await db.ThreadModel.aggregate([
-			{
-				$match: {
-					mainForumsId: {$in: accessibleFid},
-					digest: true
-				}
-			},
-			{
-				$sample: {
-					size: 8
-				}
-			}
-		]);
+    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+      data.userRoles,
+      data.userGrade,
+      data.user
+    );
+
     // 加载优秀的文章
-    data.digestThreads = await db.ThreadModel.extendThreads(digestThreads, {
-      parentForum: false,
-      lastPost: false
-    });
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+
+    // 获取用户关注的专业
+    if(data.user) {
+      data.subForums = await db.ForumModel.getUserSubForums(data.user.uid, fidOfCanGetThreads);
+    }
+
+
+    // 最新文章
+    const latestFid = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
+    latestFid.push(forum.fid);
+    data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads.filter(fid => !latestFid.includes(fid)));
+
 		 // 加载同级的专业
     const parentForums = await forum.extendParentForums();
     let parentForum;
@@ -325,18 +328,46 @@ router
 			data.sameLevelForums = await parentForum.extendChildrenForums({fid: {$in: visibleFidArr}});
 		} else {
 			// 拿到能看到入口的所有专业id
-			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
+			let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
+      visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
-		} 
+		}
 
-		ctx.template = 'interface_forum_home.pug';
+		data.subUsersCount = await db.SubscribeModel.count({fid, type: "forum"});
+		if(data.user) {
+      const sub = await db.SubscribeModel.count({
+        uid: data.user.uid,
+        type: "forum",
+        fid
+      });
+      data.subscribed = !!sub;
+
+      // 用户发表的文章
+      data.userThreads = await db.ThreadModel.getUserThreads(data.user.uid, fidOfCanGetThreads);
+
+      // 关注的文章
+      // data.subThreads = await db.ThreadModel.getUserSubThreads(data.user.uid, fidOfCanGetThreads);
+
+    }
+
+		// 推荐的文章
+    data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+
+		// 加载专业地图
+    data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+    // 加载文章分类
+    data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+    data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
+
+		ctx.template = 'forum/forum.pug';
 		await next();
 	})
 	.use('/latest', latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
-	.use('/home', homeRouter.routes(), homeRouter.allowedMethods());
+	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
+  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods());
 module.exports = router;
 
 

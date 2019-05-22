@@ -1,0 +1,16 @@
+extends ../../bootstrap_base
+block title
+  title 我的关注
+  +includeCSS("/publicModules/thread_panel/thread_panel.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-7
+        ul.nav.nav-tabs
+          li.active
+            a(href=`/u/${data.user.uid}/sub/t`) 文章
+        .m-t-1
+          include ../../publicModules/paging/paging
+          for thread in data.threads
+            include ../../publicModules/thread_panel/thread_panel
+          include ../../publicModules/paging/paging_input

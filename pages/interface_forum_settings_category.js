@@ -369,3 +369,38 @@ function submit(fid) {
 		})
 
 }
+
+
+/**
+ * 专业添加类别
+ * @param {String} kindName 
+ */
+function saveKind(kindName) {
+	var kindName = $("#kinds").val();
+	nkcAPI("/f/"+fid+"/settings/kind", "PATCH", {kindName: kindName})
+	.then(function(data) {
+		screenTopAlert("类别设置成功");
+		window.location.reload();
+	})
+	.catch(function(data) {
+		screenTopWarning(data.error || data);
+	})
+}
+
+/**
+ * 专业清除类别
+ * @param {String} fid 
+ */
+function clearKind(fid) {
+	var sureClear = confirm("确定要清除当前专业的类别吗？");
+	if(sureClear) {
+		nkcAPI("/f/"+fid+"/settings/kind/clear", "PATCH", {})
+		.then(function(data) {
+			screenTopAlert("类别已清除");
+			window.location.reload();
+		})
+		.catch(function(data) {
+			screenTopWarning(data.error || data)
+		})
+	}
+}

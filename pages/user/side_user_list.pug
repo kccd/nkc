@@ -1,0 +1,17 @@
+.user-card-panel
+  .user-card-panel-header=sideUsersHeader
+  .user-card-user-list
+    for u, index in sideUsers
+      if index > 7
+        -continue;
+      .side-user(
+        onmouseover=`vue_user_panel_float.loadUser('${objToStr(u)}')`
+        onmouseleave="vue_user_panel_float.close()"
+      )
+        a(href=`/u/${u.uid}` target="_blank")
+          img(src=`/avatar/${u.uid}`)
+
+    if sideUsers.length > 8
+      a(href=sideUsersLink).user-card-user-link 查看更多
+
+

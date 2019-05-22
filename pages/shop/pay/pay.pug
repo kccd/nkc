@@ -1,0 +1,46 @@
+extend ../shopBase
+block shopTitle
+  title 付款
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h3 科创商城收银台
+        hr
+        h4=`商品：`
+        div(style="padding:5px")
+          for title in data.ordersInfo.description
+            p!=title
+           
+        h4 总计：
+          span.text-danger#totalPrice=data.ordersInfo.totalMoney/100
+          |&nbsp;元
+      .col-xs-12.col-md-12#info.hidden
+        h4.text-danger 请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。
+      .col-xs-12.col-md-12#success.hidden
+        h4.text-success 付款成功！正在前往我的订单...
+      .col-xs-12.col-md-7#kcbPayment
+        h5 使用科创币付款
+        h5=`我的科创币：`
+          span.text-danger=data.user.kcb/100
+        div.m-t-3
+          -let klass=''
+          if data.user.kcb < data.ordersInfo.totalMoney
+            -klass='hidden'
+            h4.text-danger 账户科创币不足，
+              a(href='/account/finance/recharge' target='_blank') 去充值
+              | 然后刷新当前页面或者选择其他支付方式完成付款。
+          .form(style='max-width: 20rem;' class=klass)
+            .form-group
+              h5 请输入登录密码
+              input.form-control(type='password')#password
+            .form-group
+              button.btn.btn-primary(onclick=`submit('${data.ordersId}')`) 确认支付  
+              button.btn.btn-info(onclick=`javascript :history.back(-1);`) 返回
+      .col-xs-12.col-md-4.col-md-offset-1#otherPayment
+        h5 使用其他支付方式付款
+        div.m-t-2
+          div(style='position:relative;height:48px;width:48px;overflow:hidden;' onclick=`alipay('${data.ordersId}')`).cp
+            img(src='/default/fund_pay.jpg' style='position:absolute;left:-96px;')
+block scripts    
+  +includeJS('/shop/pay/pay.js')

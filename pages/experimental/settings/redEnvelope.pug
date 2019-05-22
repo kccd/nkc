@@ -3,7 +3,7 @@ block title
   -const mainContainer1400 = true;
   title 奖励设置
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       include ../nav
       #app(v-cloak)
@@ -19,6 +19,9 @@ block content
             | &nbsp;&nbsp;&nbsp;
             | 关
             input(type='radio' value='true' v-model='random.close')
+        .col-xs-12.col-md-12
+          h5 弹出概率(%)：
+            input(type="text" v-model.number="random.chance")
         .col-xs-12.col-md-12
           table.table.table-bordered
             //-(style='font-size:1rem;')

@@ -4,79 +4,88 @@ function searchUser() {
 	var searchType = $('#searchType').val();
 	if(searchType === '用户名') {
 		searchType = 'username';
-	} else {
+	} else if(searchType === "UID") {
 		searchType = 'uid';
-	}
+	} else {
+	  searchType = "mobile";
+  }
 	nkcAPI('/e/settings/user?searchType='+searchType+'&content='+content, 'GET', {})
 		.then(function(data) {
-			if(!data.targetUser) return screenTopWarning('未找到用户');
-			createElement(data.targetUser);
+			if(!data.targetUsers || !data.targetUsers.length) return screenTopWarning('未找到用户');
+			for(var i = 0; i < data.targetUsers.length; i++) {
+        createElements(data.targetUsers);
+      }
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
 		})
 }
 
-function createElement(user) {
+function createElements(users) {
   var searchResult = $('#searchResult');
 	var tbody = searchResult.find('tbody');
 	tbody.html('');
-	if(!user) return;
-  var tr = newElement('tr', {}, {});
-  var th1 = newElement('th', {}, {});
-  var img = newElement('img', {
-    src: '/avatar/'+user.uid
-  }, {
-    width: '2rem',
-	  height: '2rem',
-	  'margin-right': '0.5rem',
-	  'border-radius': '50%'
-  });
-  var a = newElement('a', {href: '/u/'+user.uid}, {}).text(user.username);
-  th1.append(img, a);
+	if(!users) return;
+	for(var i = 0; i < users.length; i++) {
+	  var user = users[i];
+    if(!user) return;
+    var tr = newElement('tr', {}, {});
+    var th1 = newElement('th', {}, {});
+    var img = newElement('img', {
+      src: '/avatar/'+user.uid
+    }, {
+      width: '2rem',
+      height: '2rem',
+      'margin-right': '0.5rem',
+      'border-radius': '50%'
+    });
+    var a = newElement('a', {href: '/u/'+user.uid}, {}).text(user.username);
+    th1.append(img, a);
 
-  var th2 = newElement('th', {}, {}).text(user.threadCount);
-  var th3 = newElement('th', {}, {}).text(user.postCount);
-  var klass = 'text-danger';
-  var t = '未通过';
-  if(user.volumeA) {
-	  t = '通过';
-		klass = 'text-success';
+    var th2 = newElement('th', {}, {}).text(user.threadCount);
+    var th3 = newElement('th', {}, {}).text(user.postCount);
+    var klass = 'text-danger';
+    var t = '未通过';
+    if(user.volumeA) {
+      t = '通过';
+      klass = 'text-success';
+    }
+    var th31 = newElement('th', {class: klass}, {}).text(t);
+    var th33a, th331;
+    klass = 'text-danger';
+    if(user.volumeB) {
+      klass = 'text-success';
+      if(user.sheetB) {
+        th33a = newElement('a', {
+          'href': '/q/'+ user.sheetB.category,
+          'target': '_blank',
+          'class': klass
+        });
+        th331 = newElement('span', {}, {}).text('通过 - '+user.sheetB.category);
+        th33a.append(th331);
+      } else {
+        th331 = newElement('span', {}, {}).text('通过 - 试卷丢失');
+      }
+    } else {
+      th331 = newElement('span', {}, {}).text('未通过');
+    }
+    var th32 = newElement('th', {class: klass}, {});
+    if(th33a) {
+      th32.append(th33a);
+    } else {
+      th32.append(th331);
+    }
+    var th33 = newElement('th', {}, {}).text(user.registerType==='mobile'?'手机':'邮箱');
+    var th4 = newElement('th', {}, {}).text(NKC.methods.format("YYYY-MM-DD HH:mm:ss", user.toc));
+    var th5 = newElement('th', {}, {}).text(user.regIP + ' : ' + user.regPort);
+    var th6 = newElement('th', {}, {});
+    a = newElement('a', {href:'/e/settings/user/'+user.uid}, {}).text('编辑');
+    th6.append(a);
+
+    tr.append(th1, th2, th3, th31, th32, th33, th4, th5, th6);
+    tbody.append(tr);
   }
-	var th31 = newElement('th', {class: klass}, {}).text(t);
-	var th33a, th331;
-	klass = 'text-danger';
-	if(user.volumeB) {
-		klass = 'text-success';
-		if(user.sheetB) {
-			th33a = newElement('a', {
-				'href': '/q/'+ user.sheetB.category,
-				'target': '_blank',
-				'class': klass
-			});
-			th331 = newElement('span', {}, {}).text('通过 - '+user.sheetB.category);
-			th33a.append(th331);
-		} else {
-			th331 = newElement('span', {}, {}).text('通过 - 试卷丢失');
-		}
-	} else {
-		th331 = newElement('span', {}, {}).text('未通过');
-	}
-	var th32 = newElement('th', {class: klass}, {});
-	if(th33a) {
-		th32.append(th33a);
-	} else {
-		th32.append(th331);
-	}
-	var th33 = newElement('th', {}, {}).text(user.registerType==='mobile'?'手机':'邮箱');
-  var th4 = newElement('th', {}, {}).text(user.toc.toLocaleString());
-  var th5 = newElement('th', {}, {}).text(user.regIP + ' : ' + user.regPort);
-  var th6 = newElement('th', {}, {});
-  a = newElement('a', {href:'/e/settings/user/'+user.uid}, {}).text('编辑');
-	th6.append(a);
 
-  tr.append(th1, th2, th3, th31, th32, th33, th4, th5, th6);
-	tbody.append(tr);
 	searchResult.show();
 }
 

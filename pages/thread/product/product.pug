@@ -1,0 +1,247 @@
+-const product = data.product
+-let paraId = data.paraId;
+-if(!paraId) paraId = product.productParams[0]._id+""
+-const paId = data.paId;
+link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
+link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
+style.
+  .title {
+    text-align: left;
+    font-size: 12px;
+    margin: 0 19px 0 10px;
+    color: #999;
+  }
+  .location {
+    margin-right:6px
+  }
+  .buy {
+    overflow: hidden;
+    float: left;
+    width: auto;
+    border-radius: 2px;
+    background-color: #f8f7f3;
+    color: #22258c;
+    cursor: pointer;
+    border: 1px solid #22258c;
+    margin-right: 18px;
+  }
+  .addCart {
+    overflow: hidden;
+    float: left;
+    width: auto;
+    margin-top: -1px;
+    border-radius: 2px;
+    color: #fff;
+    cursor: pointer;
+    background-color: #22258c;
+  }
+  .item {
+    margin-bottom:15px
+  }
+  .shopdsr-item{
+    float: left;
+    color: #999;
+    width: 36px;
+    height: 36px;
+    margin: 5px 7px 0 0;
+    position: relative;
+  }
+  .shopdsr-title {
+    text-align: center;
+    font-family: "\5b8b\4f53";
+  }
+  .shopdsr-score.shopdsr-score-up-ctrl {
+    color: #ff0036;
+    padding-left: 5px;
+    height: 18px;
+    width: 31px;
+    position: relative;
+    overflow: hidden;
+  }
+  .shopdsr-score-up {
+    color: #ff0036;
+    background: 0 0;
+    text-decoration: none;
+    height: 9px;
+    width: 8px;
+    right: 2px;
+    top: 5px;
+    position: absolute;
+  }
+  .activeIndex {
+    padding: 2px 9px;
+    border: 2px solid #FF0036;
+    font-size:small;
+    cursor: pointer;
+    background: cornsilk;
+  }
+  .normalIndex {
+    padding: 2px 9px;
+    border: 2px solid #e2e1e3;
+    font-size:small;
+    cursor: pointer;
+  }
+  .del{
+    text-decoration: line-through;
+  }
+.row
+  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts')) 
+    if !product.adminBan
+      .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
+        button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
+  .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")#productImageDom
+    ul#etalage
+      -for(let rid of product.imgIntroductions)
+        li
+          img.etalage_thumb_image(src=`/r/${rid}`)
+          img.etalage_source_image(src=`/r/${rid}`)
+
+  .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
+    p.item 
+      span#showText #{cutContent(post.abstractCn,60)}
+      if post.abstractCn && post.abstractCn.length > 60
+        span#hideText(style="display:none")!=`${post.abstractCn}`
+        span 
+          a(onclick="showAbstract()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showAbstract") 展开
+          a(onclick="hideAbstract()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideAbstract") 收起
+    if product.keywords && product.keywords.length > 0
+      p(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+        span#showWords #{cutContent(post.keywords,25)}
+        if post.keywords && post.keywords.length > 25
+          span#hideWords(style="display:none")!=`${post.keywords}`
+          span 
+            a(onclick="showKeywords()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showKeywords") 展开
+            a(onclick="hideKeywords()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideKeywords") 收起
+    //- if product.attentions && product.attentions.length > 0
+    //-   ul(style="background-color: antiquewhite;list-style: none;padding:10px;color:red;font-size:11px")
+    //-     for attStr in product.attentions
+    //-       li(style="margin:0px")!=`* ${attStr}`
+    div.item(style="background:#c7fff8")
+      div(style="padding:7px 0;color:#333")
+        if !product.productSettings.priceShowToVisit && !data.user
+          p
+            span.title 价格
+            a(style="color:orangered" href="/login") 登陆可见
+        else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+          p
+            span.title 价格
+            span(style="color:orangered") 停售不可见
+        else
+          p
+            span.title 价格
+            span#originPrice.del #{numToFloatTwo(product.productParams[paId].originPrice)}
+          if data.vipDiscount
+            p
+              span.title 会员价
+              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price * (data.vipDisNum/100))}
+          else
+            p
+              span.title 优惠价
+              span#newPrice(style="color:orangered;font-size:x-large;font-family:fantasy") #{numToFloatTwo(product.productParams[paId].price)}
+    div.item
+      p
+        span.title 快递
+        span.location(style="font-size:small") #{getProvinceCity(product.dealInfo.address)}
+        span.location(style="font-size:small;") 至
+        input#city.input(name='', type='text', placeholder='请选择收货地址', autocomplete='off', readonly='true',value=`${data.userAddress}` )
+    div.item(style="border-bottom: 1px solid #e5e5e5")
+      if !product.productSettings.priceShowToVisit && !data.user
+        p
+          span.title 运费
+          a(style="color:orangered" href="/login") 登陆可见
+      else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
+        p
+          span.title 价格
+          span(style="color:orangered") 停售不可见
+      else
+        p
+          span.title 运费
+          if product.isFreePost
+            span#freightPrice 免邮
+            input#isFreePost(type="text" value="freePost" style="display:none")
+          else
+            span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+            input#isFreePost(type="text" value="payPost" style="display:none")
+    div.item
+      p
+        span.title 数量
+        span(style="display: inline-flex;margin-right:5px")
+          button(onclick=`delStock()`) -
+          input#buyCount(style='width: 3rem;' value="1")
+          button(onclick=`addStock()`) +
+        span.location(style="font-size:12px") 库存
+        span#stockCount=`${product.productParams[paId].stocksSurplus}`
+        span.location(style="font-size:12px") 件
+    .item
+      .row
+        span.title.col-xs-12(style="padding-right:0;margin-bottom:15px") 规格
+        span.col-xs-12(style="margin: 0 19px 0 10px;")
+          for para in product.productParams
+            span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
+              span=para.name
+    div.item
+      if product.adminBan
+        p(style="text-align: center; background-color:tomato;padding:10px") 该商品已被禁售
+      else
+        if product.productStatus == "stopsale"
+          p(style="text-align: center;background-color: tomato;padding:10px") 商品已被卖家停售
+        else
+          div(style="display:none")#paraId!=`${paraId}`
+          a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
+          a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+            span.fa.fa-shopping-cart  加入购物车
+  .col-xs-1.col-md-1 
+
+  if product.dealInfo.dealAnnouncement
+    .col-xs-12.col-md-12(style="margin-top:5px")
+      div(style="border:2px solid #bbe0e1;padding:5px")
+        p(style="font-size:15px") 公告
+        p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
+  .col-xs-12.col-md-12
+    div!=experimental_render(post)
+block scripts
+  +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
+  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/external_pkgs/citySet/city.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')
+  +includeJS('/thread/product/product.js')
+  script.
+    $(document).ready(function(){
+      $('#etalage').etalage({
+        thumb_image_width: 420,
+        thumb_image_height: 350,
+        source_image_width: 900,
+        source_image_height: 900,
+        zoom_area_width: 500,//放大镜的大小
+        zoom_area_height: 500,//放大镜的高度
+        small_thumbs:5,
+        autoplay: false
+      });
+      $(".etalage").each(function() {
+        $(this).css("width", "100%")
+      })
+      $(".etalage_thumb_image").each(function() {
+        $(this).css("width", "100%")
+      })
+    });
+    $("#city").click(function (e) {
+      SelCity(this,e);
+    });
+    $("s").click(function (e) {
+      SelCity(document.getElementById("city"),e);
+    });
+    
+    window.onresize=function(){  
+      if($(window).width() < 1350) {
+        $("#productImageDom").addClass("col-lg-12");
+        $("#productIntroDom").addClass("col-lg-12");
+        $("#productImageDom").removeClass("col-lg-6");
+        $("#productIntroDom").removeClass("col-lg-6");
+      }else{
+        $("#productImageDom").addClass("col-lg-6");
+        $("#productIntroDom").addClass("col-lg-6");
+        $("#productImageDom").removeClass("col-lg-12");
+        $("#productIntroDom").removeClass("col-lg-12");
+      }
+    } 

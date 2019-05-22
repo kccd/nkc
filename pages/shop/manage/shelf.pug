@@ -1,0 +1,507 @@
+extends ./index.pug
+
+block name
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
+  style.
+    .padding-0 {
+      padding: 0
+    }
+    .margin-0 {
+      margin: 0
+    }
+    .margin-right-10 {
+      margin-right: 10px
+    }
+    .pnameCla {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      display: inline-block;
+      padding: 4px 6px;
+      color: #555;
+      vertical-align: middle;
+      border-radius: 4px;
+      max-width: 100%;
+      line-height: 22px;
+      cursor: text;
+    }
+    .panel-info {
+      border-color: #fff;
+    }
+    .panel-body {
+      padding-top: 15px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  .row
+    .col-md-12.col-sm-12.col-xs-12(style="padding:0")
+      .panel.panel-info
+        .panel-heading
+          | 选择分类
+        .panel-body
+          .col-md-12.col-sm-12
+            .form-horizontal
+              .form-group
+                .col-sm-1.control-label
+                .col-sm-11(style="padding:0")
+                  p.text-danger 提示：商品分类为必选项，辅助分类为选填
+                label.col-sm-1.control-label 商品分类
+                .col-sm-8(style="padding:0")
+                  select#shopForums.form-control()
+                    for shopForum in data.shopForumTypes
+                      option(value=`${shopForum.fid}`)!=shopForum.displayName
+          .col-md-12.col-sm-12
+            .form-horizontal
+              .form-group
+                label.col-sm-1.control-label 辅助分类
+                .col-sm-9
+                  include ../../forumlist_dropdown
+      .panel.panel-info
+        .panel-heading
+          | 基本信息
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 商品标题
+              .col-sm-8
+                input.form-control#productName(type="text", name="productName" placeholder="最多允许输入30个字" maxlength="100")
+            .form-group
+              label.col-sm-1.control-label 商品描述
+              .col-sm-8
+                textarea.form-control#productDescription(name="productDescription" placeholder='请输入对商品的简单介绍' rows='3' maxlength='500')
+                p(style="color:#ccc") 
+                  span 最多
+                  span#productDescriptionNum 0 
+                  span /500个字
+            .form-group
+              label.col-sm-1.control-label 关键词
+              .col-sm-8.attentionList
+                input.attention.form-control(type="text" placeholder="关键词总字数不超过200")
+              //- .col-sm-1
+              //-   button(onclick="addAttention()") 添加
+      .panel.panel-info
+        .panel-heading
+          | 销售信息
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 商多规格
+              .col-sm-10
+                .checkbox
+                  label
+                    input#useparams(type='checkbox')
+                    |  是否使用自定义多规格
+            #useParamsDom(style="display: none")
+              .form-group
+                label.col-sm-1.control-label 自定义规格
+                .col-sm-10
+                  .panel.panel-default
+                    .panel-heading(style="padding:5px")
+                      span 商品属性列表
+                      //- a.fa.fa-plus(style="float:right;cursor:pointer"  data-toggle="modal" data-target="#addProductParams") 添加
+                      a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addNewParam()") 添加
+                    .panel-body(style="padding:5px")
+                      .table-responsive
+                        table.table.table-condensed.margin-0#paramsTable
+                          thead
+                            tr  
+                              th
+                              th 属性名称
+                              th 
+                                span 属性值
+                                span.text-danger &nbsp;(多个标记请使用回车;标记最多字数8;标记最大个数5)
+                              th 
+                          tbody
+              .form-group
+                label.col-sm-1.control-label 销售规格
+                .col-sm-11
+                  p.text-danger 
+                    span 当前规格名称组合为：
+                    span#paraGroup
+                label.col-sm-1.control-label
+                .col-sm-10
+                  .table-responsive
+                    table#arrayTable.table.table-condensed.table-bordered.margin-0.panel.panel-info
+                      thead.panel-heading
+                        tr
+                          th 规格名称
+                          th 是否禁用
+                          th 价格（元）
+                          th 数量（件）
+                          th 是否使用优惠
+                          th 优惠后价格
+                      tbody.panel-body()
+                .col-sm-1
+              .form-group
+                label.col-sm-1
+                .col-sm-10
+                  hr
+              .form-group
+                label.col-sm-1.control-label 独立规格
+                .col-sm-11
+                  p.text-danger(style="font-size:10px") (如自定义规格不满足规格需求，可在此单独添加规格)
+                label.col-sm-1
+                .col-sm-10
+                  .panel.panel-default
+                    .panel-heading(style="padding:5px")
+                      span 独立规格列表
+                      a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addSingleParam()") 添加
+                    .panel-body(style="padding:5px")
+                      .table-responsive
+                        table.table.table-condensed.margin-0#singleParams
+                          thead
+                            tr
+                              th 规格名称
+                              th 价格（元）
+                              th 数量（件）
+                              th 是否适用优惠
+                              th 优惠后价格
+                              th 
+                          tbody
+
+            #nouseParamsDom(style="display:block")
+              .form-group
+                label.col-sm-1.control-label 商品价格
+                .col-sm-5
+                  .input-group
+                    input.form-control#originalPrice(type='number', placeholder="Product's Price", aria-describedby='originalPrice')
+                    span.input-group-addon 元
+              .form-group
+                label.col-sm-1.control-label
+                .col-sm-5
+                  .checkbox
+                    label
+                      input#usedis(type='checkbox')
+                      |  是否使用优惠后价格
+              .form-group#disCostDom(style="display:none")
+                label.col-sm-1.control-label 优惠后价格
+                .col-sm-5
+                  input#afterDisCost.form-control(type="number", name="")
+              .form-group
+                label.col-sm-1.control-label 库存数量
+                .col-sm-5
+                  .input-group
+                    input.form-control#stockQuantity(type='number', placeholder="Stock's Quantity", aria-describedby='stockQuantity')
+                    span.input-group-addon 件
+            .form-group
+              label.col-sm-1.control-label 会员折扣
+              .col-sm-10
+                .checkbox
+                  label
+                    input#vipDiscount(type='checkbox')
+                    |  是否使用会员折扣
+            .form-group#vipDisDom(style="display:none")
+              label.col-sm-1.control-label 折扣详情
+              .col-sm-5.col-sm-10
+                .table-responsive
+                  table.table.table-condensed.table-responsive.margin-0(style="padding:0")
+                    thead
+                      tr
+                        th vip等级
+                        th 折扣率(%)
+                    tbody
+                      for grade,index in data.grades
+                        tr.viptr
+                          td.viplevel(style="width:30%" vid=`${index}`)!=`v${grade._id - 1}`
+                          td(style="width:70%")
+                            input.vipnum(type="text" style="width:100%" value="100")
+            .form-group
+              label.col-sm-1.control-label 库存计数
+              .col-sm-8
+                .radio
+                  label
+                    input#stockMethod1(type='radio', name='stockCostMethod', value='orderReduceStock', checked='true')
+                    |     买家拍下减库存
+                    b(style="color:red")  （拍下减库存，存在恶拍风险）
+                .radio
+                  label
+                    input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock')
+                    |     买家付款减库存
+                    b(style="color:red")  （付款减库存，存在超卖风险）
+            //- .form-group
+            //-   label.col-sm-1.control-label 购买限制
+            //-   .col-sm-10
+            //-     .checkbox
+            //-       label
+            //-         input#isPurchaseLimit(type='checkbox')
+            //-         |  是否限购
+            //- .form-group#purchaseLimitDom(style="display:none")
+            //-   label.col-sm-1.control-label 每人限购数量
+            //-   .col-sm-5
+            //-     input.form-control#purchaseLimitCount(type="number", name="")
+      .panel.panel-info
+        .panel-heading
+          | 购买条件
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 购买限制
+              .col-sm-10
+                .checkbox
+                  label
+                    input#isPurchaseLimit(type='checkbox')
+                    |  是否限购
+            .form-group#purchaseLimitDom(style="display:none")
+              label.col-sm-1.control-label 每人限购数量
+              .col-sm-8
+                input.form-control#purchaseLimitCount(type="number", name="")
+            .form-group
+              label.col-sm-1.control-label 购买凭证
+              .col-sm-10
+                .checkbox
+                  label
+                    input#isUploadCert(type='checkbox')
+                    |  是否需要上传购买凭证
+            .form-group#uploadCertDom(style="display:none")
+              label.col-sm-1.control-label 凭证说明
+              .col-sm-8
+                input.form-control#uploadCertDescription(type="text", name="" maxlength="50" placeholder="请简单说明买家需上传哪种凭证，不超过50字")
+      .panel.panel-info
+        .panel-heading
+          | 显示设置
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 价格显示
+              .col-sm-10
+                .checkbox
+                  label
+                    input#priceShowToVisit(type='checkbox')
+                    |  价格是否游客可见
+            .form-group
+              label.col-sm-1.control-label 
+              .col-sm-10
+                .checkbox
+                  label
+                    input#priceShowAfterStop(type='checkbox')
+                    |  停售以后，是否显示价格
+      .panel.panel-info
+        .panel-heading
+          | 运费物流
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 运费承担
+              .col-sm-8
+                label.radio-inline
+                  input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked)
+                  |  免邮费
+                label.radio-inline
+                  input#freightMethod2(type='radio', name='freightMethod', value='payPost')
+                  |  买家承担邮费
+            //- .form-group
+            //-   label.col-sm-1.control-label 首重价格
+            //-   .col-sm-5
+            //-     .input-group
+            //-       input.form-control#freightPrice(type='number', placeholder="总运费=单件运费价格*商品数量", aria-describedby='stockQuantity')
+            //-       span.input-group-addon 元
+            .form-group#freightPriceDom(style="display:none")
+              label.col-sm-1.control-label 
+              .col-sm-8
+                span 首件商品运费 
+                span 
+                  input#firstFreightPrice(type="text", name="", style="width:30px")
+                span  元，
+                span 每增加 1 件商品，增加运费 
+                span 
+                  input#addFreightPrice(type="text", name="", style="width:30px")
+                span  元
+                //- p(style="color:red;font-size:11px") 注意:首重运费与增加运费应大于0
+      .panel.panel-info
+        .panel-heading
+          | 定时上架
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 上架时间
+              .col-sm-8
+                label.radio-inline
+                  input#shelfMethod1(type='radio', name='shelfMethod', value='insale' checked)
+                  |  立即上架
+                label.radio-inline
+                  input#shelfMethod2(type='radio', name='shelfMethod', value='insaletime')
+                  |  定时上架
+                label.radio-inline
+                  input#shelfMethod3(type='radio', name='shelfMethod', value='notonshelf')
+                  |  放入仓库
+            .form-group#saleTimeDom(style="display:none")
+              label.col-sm-1.control-label 请选择时间
+              .col-sm-5
+                input.form-control.time#saleTime(readonly size="16" type="text")
+      .panel.panel-info
+        .panel-heading
+          | 图文描述
+        .panel-body
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 详细描述
+              .col-sm-10
+                div#ReplyContent
+                .checkbox-inline(style="display:none")
+                  label
+                    input#ParseURL(type='checkbox' checked)
+                    | 处理URL
+                button#showButton.btn.btn-primary.btn-xs(style="float:right;display:none" onclick="showAttachment()") 展开附件模块
+                button#hideButton.btn.btn-primary.btn-xs(style="float:right;display:block" onclick="hideAttachment()") 收起附件模块
+            .form-group
+              label.col-sm-1.control-label 商品图片
+              .col-sm-8#productImages
+                .upload_image_item#productImage1
+                  .upload_image_item_border(onclick="openImageManage('productImage1')" data-toggle="modal" data-target="#myModal")
+                    .upload_image_item_content
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage1')")
+                .upload_image_item#productImage2
+                  .upload_image_item_border(onclick="openImageManage('productImage2')" data-toggle="modal" data-target="#myModal")
+                    .upload_image_item_content
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage2')")
+                .upload_image_item#productImage3
+                  .upload_image_item_border(onclick="openImageManage('productImage3')" data-toggle="modal" data-target="#myModal")
+                    .upload_image_item_content
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage3')")
+                .upload_image_item#productImage4
+                  .upload_image_item_border(onclick="openImageManage('productImage4')" data-toggle="modal" data-target="#myModal")
+                    .upload_image_item_content
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage4')")
+                .upload_image_item#productImage5
+                  .upload_image_item_border(onclick="openImageManage('productImage5')" data-toggle="modal" data-target="#myModal")
+                    .upload_image_item_content
+                      i.upload_image_plus.fa.fa-plus
+                      p.upload_image_text 点击添加商品图
+                  .upload_image_card(style="display:none")
+                    img(src="")
+                    .upload_image-tools
+                      i.fa.fa-trash.upload_image_trash(onclick="deleteImageInProduct('productImage5')")
+            .form-group
+              .col-sm-1
+              .col-sm-8
+                p.text-danger 提示：请先在下方编辑器的附件模块上传商品图
+            .form-group#attachmentDom(style="display:block")
+              .col-sm-1
+              .col-sm-10
+               include ../../media/media_index.pug  
+            .form-group
+              label.col-sm-1.control-label
+              .col-sm-8
+                button#saveProduct.btn.btn-primary.radius(onclick=`productToShelf("${data.user.uid}")`, type='submit')
+                  i.fa.fa-save
+                  | &nbsp;发布商品
+                //- button.btn.btn-info.radius(onclick='test()', type='submit')
+                //-   i.fa.fa-eye
+                //-   | &nbsp;预览
+        //- .panel-footer
+        //-   | Panel Footer
+        //-   button.btn.btn-primary(onclick="autoCalcuPrice()") test
+      #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+        .modal-dialog(role='document')
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal', aria-label='Close')
+                span(aria-hidden='true') ×
+              h4#myModalLabel.modal-title 图片管理器
+            .modal-body
+              .row#imageArrayDom()
+            .modal-footer
+              nav(aria-label='Page navigation')
+                ul.pagination(style="margin:0")  
+                  li
+                    a(href='javascript:void(0);', aria-label='Previous' onclick="prevPageManage()")
+                      span(aria-hidden='true') «
+                  li 
+                    b#currentSkip 
+                    b /
+                    b#maxSkip     
+                  li
+                    a(href='javascript:void(0);', aria-label='Next' onclick="nextPageManage()")
+                      span(aria-hidden='true') »            
+  #addProductParams.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 定义新的商品规格
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-1.control-label 规格名称
+              .col-sm-8
+                input.form-control#paraName(type='text')
+            .form-group 
+              label.col-sm-1.control-label 属性
+              .col-sm-8
+                textarea.form-control#paraValue(name="", rows="5" placeholder="黄色,红褐色,蓝色")
+                p(style="color:red") 注意：请使用英文逗号分隔多个属性值
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`addParamTable()`) 添加
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+  #editProductParams.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 修改商品规格
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-1.control-label 规格名称
+              .col-sm-8
+                input.form-control#newName(type='text')
+            .form-group 
+              label.col-sm-1.control-label 属性
+              .col-sm-8
+                textarea.form-control#newValue(name="", rows="5" placeholder="黄色,红褐色,蓝色")
+                p(style="color:red") 注意：请使用英文逗号分隔多个属性值,请勿使用中文逗号
+          input#newIndex(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`editParamTable()`) 保存
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+
+block manageScripts
+  +includeJS("/mdui/js/mdui.min.js")
+  link(href="/jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  +includeJS("/jquery-ui-1.10.4.custom.js")
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
+  +includeJS("/module_forum_settings.js")
+  +includeJS("/interface_common.js")
+  +includeJS("/module_dropdown.js")
+  +includeJS("/commonmark/dist/commonmark.js")
+  +includeJS("/xbbcode-parser/xbbcode.js")
+  +includeJS("/xss/dist/xss.js")
+  +includeJS("/nkc_render.js")
+  +includeJS("/wangEditor.js")
+  +includeJS("/shop/manage/shelfEditor.js")
+  +includeJS("/shop/manage/shelf.js")
+  include ../../publicModules/crop/crop
+  +includeJS("/media/media_index.js")
+  script.
+    window.onunload = function(){
+      return "你确定要离开吗？"
+    }
+    window.onbeforeunload = function() {
+      return "你确定要离开吗？"
+    }

@@ -5,14 +5,15 @@ block title
   title= `${data.targetUser.username} - 科创论坛`
   -const mainContainer1400 = true;
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
         .row
           .col-xs-12.col-md-2
             .col-xs-12.col-md-12
               .row
-                img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
+                a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank")
+                  img.center-block.avatar(src=`/avatar/${data.targetUser.uid}` style='width: 8rem;height: 8rem;border-radius: 50%;')
                 h3.text-center= data.targetUser.username || '用户' + data.targetUser.uid
                 .text-center
                   -const targetUser = data.targetUser;
@@ -22,9 +23,9 @@ block content
                 a(href=`/m/${data.targetUser.uid}`).btn.btn-block.btn-primary 专栏
                 if data.user && data.user.uid !== data.targetUser.uid
                   a(href=`/message?uid=${data.targetUser.uid}`).btn.btn-primary.btn-block 私信
-                  if data.userOperationsId.includes('subscribeUser') && data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
+                  if data.userOperationsId.includes('subscribeUser') && data.subscribed
                     button.btn.btn-block.btn-danger(onclick=`subscribeUser(${data.targetUser.uid}, false)`) 取关
-                  if data.userOperationsId.includes('unSubscribeUser') && !data.userSubscribe.subscribeUsers.includes(data.targetUser.uid)
+                  if data.userOperationsId.includes('unSubscribeUser') && !data.subscribed
                     button.btn.btn-block.btn-primary(onclick=`subscribeUser(${data.targetUser.uid}, true)`) &nbsp;&nbsp;+ 关注&nbsp;&nbsp;
                 if data.userOperationsId.includes('visitUserTransaction')
                   a.btn.btn-block.btn-primary(href=`/u/${data.targetUser.uid}/transaction`) 更多信息
@@ -43,13 +44,13 @@ block content
                 .text-center(style='border-right:5px solid #fff; margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
                   h5 文章
                   h4
-                    strong= data.targetUser.threadCount
+                    strong= data.targetUser.threadCount - data.targetUser.disabledThreadsCount
             .col-xs-6.col-md-6
               .row
                 .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
                   h5 回复
                   h4
-                    strong= data.targetUser.postCount
+                    strong= data.targetUser.postCount - data.targetUser.disabledPostsCount
             .col-xs-6.col-md-6
               .row
                 .text-center(style='border-right:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
@@ -61,7 +62,7 @@ block content
                 .text-center(style='border-left:5px solid #fff;margin-bottom: 1rem;padding: 0.5rem 0;background-color: #f3f3f3;')
                   h5 科创币
                   h4
-                    strong= data.targetUser.kcb
+                    strong= data.targetUser.kcb/100
             .col-xs-6.col-md-6
               .row
                 a(href=`/u/${data.targetUser.uid}?type=fans` style='color: #000;text-decoration: none;')
@@ -98,8 +99,7 @@ block content
                 .text-center(style='margin-bottom: 1rem;padding: 0.5rem 0.2rem;background-color: #f3f3f3;')
                   h5 名片分享
                   .row
-                    .col-xs-2.col-md-2
-                    .col-xs-8.col-md-8
+                    .col-xs-10.col-md-10.col-xs-offset-1.col-md-offset-1
                       .col-xs-3.col-md-3(style="padding:0px")
                         a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('user', 'qq', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}', '${data.targetUser.uid}')`)
                           img(src="/default/QQ.png" style="")
@@ -112,7 +112,7 @@ block content
                       .col-xs-3.col-md-3(style="padding:0px")
                         a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('user', 'weChat', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}', '${data.targetUser.uid}')`)
                           img(src="/default/weChat.png" style="")
-                    .col-xs-12.col-md-12
+                    .col-xs-12.col-md-12.m-t-1
                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('user', 'link', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}', '${data.targetUser.uid}')`) 获取分享链接
                     .col-xs-12.col-md-12(id=`copyArea${data.targetUser.uid}` style="display:none")
                       input(type="text", id=`copyLink${data.targetUser.uid}`, name=`copyLink${data.targetUser.uid}` style="width:inherit")
@@ -120,8 +120,8 @@ block content
                       //- img(src="/default/QQ.png" style="width:20%" onclick=`shareTo('user', 'qq', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}')`)
                       //- img(src="/default/qzone.png" style="width:20%" onclick=`shareTo('user', 'qzone', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}')`)
                       //- img(src="/default/weibo.png" style="width:20%" onclick=`shareTo('user', 'weibo', window.location.origin+window.location.pathname, '科创名片：${data.targetUser.username || '用户' + data.targetUser.uid}')`)
-                    .col-xs-2.col-md-2
-                  canvas#userQrcode(style="display:none")
+                    .col-xs-12.col-md-12.m-t-1
+                      canvas#userQrcode(style="display:none")
           .col-xs-12.col-md-7
             ul.nav.nav-pills.user-info-nav
               li(role="presentation" class=!data.type?'active':'')
@@ -198,7 +198,7 @@ block content
                 br
                 h4.text-center 最新文章
                 if data.targetUserThreads.length === 0
-                  p.text-center 暂未发表任何帖子
+                  p.text-center 暂未发表任何文章
                 else
                   -for(let thread of data.targetUserThreads)
                     .col-xs-9.col-md-9
@@ -208,7 +208,8 @@ block content
                           -forum = f;
                           if f.forumType === 'topic' 
                             -break;
-                        a.ForumThreadHasImage(href=`/f/${forum.fid}` style=`font-size:inherit;padding: 0.2rem;margin-right: 0.5rem;color: #ffffff;background-color: ${forum.color};text-decoration: none;`)= forum.displayName
+                        if forum    
+                          a.ForumThreadHasImage(href=`/f/${forum.fid}` style=`font-size:inherit;padding: 0.2rem;margin-right: 0.5rem;color: #ffffff;background-color: ${forum.color};text-decoration: none;`)= forum.displayName
                         a(href=`/t/${thread.tid}` style='color: #777777;')= thread.firstPost.t
                     .col-xs-3.col-md-3
                       .row.text-right
@@ -227,7 +228,7 @@ block content
                         if i !== 8
                           -const user = data.newSubscribers[i];
                           -const navbarDesc = user.navbarDesc;
-                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
+                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribers.length > 8
@@ -249,7 +250,7 @@ block content
                         if i !== 8
                           -const user = data.newSubscribeUsers[i];
                           -const navbarDesc = user.navbarDesc;
-                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb}\n`+`${user.info.certsName}`;
+                          -const title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100 }\n`+`${user.info.certsName}`;
                           a(href=`/u/${user.uid}`)
                             img(src=`/avatar/${user.uid}` style='width: 5rem;height: 5rem;border-radius: 50%;margin: 0.2rem 0.5rem;' title=title)
                     if data.newSubscribeUsers.length > 8

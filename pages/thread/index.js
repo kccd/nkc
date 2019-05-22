@@ -436,7 +436,7 @@ function goEditor(){
 	window.localStorage.quoteHtml = document.getElementById("quoteContent").innerHTML;
 	window.localStorage.replyHtml = document.getElementById('text-elem').innerHTML;
 	//return console.log(window.localStorage)
-	window.location = '/editor?&type=thread&id='+replyTarget.trim().split('/')[1]
+	window.location = '/editor?&ver=ue&type=thread&id='+replyTarget.trim().split('/')[1]
 }
 
 function addColl(tid){
@@ -783,4 +783,85 @@ function addForum(tid) {
   .catch(function(data) {
     screenTopWarning(data.error || data);
   })
+}
+
+// 查看原创说明
+function originTextShow(para) {
+	var parentDivDom = $(para).parent("a");
+	var paraRect = para.getBoundingClientRect();
+	// 创建一个外壳
+	var originPanelShell = document.createElement("span");
+	originPanelShell.setAttribute("id", "originPanelShell");
+	// 给外壳添加样式
+	originPanelShell.style.position = "absolute";
+	originPanelShell.style.background = "#eee";
+	originPanelShell.style.zIndex = "20000";
+	originPanelShell.style.width = paraRect.width + "px";
+	// 将外壳放入所在位置
+	$(parentDivDom).css("position", "relative");
+	$(parentDivDom).append(originPanelShell);
+	// 创建内壁
+	var originPanelWall = document.createElement("div");
+	originPanelWall.setAttribute("id", "originPanelWall");
+	originPanelWall.className = "originTextWall";
+	originPanelShell.appendChild(originPanelWall);
+	// 获取para中的通信信息
+	var contractDom = "<div>"+$(para).attr("data-text")+"</div>";
+	originPanelWall.innerHTML = contractDom
+}
+
+// 关闭原创声明查看
+function originTextClose() {
+	$("#originPanelShell").remove()
+}
+
+function originPanelShow(para) {
+	var parentDivDom = $(para).parent("span");
+	var paraRect = para.getBoundingClientRect();
+	// 创建一个外壳
+	var originPanelShell = document.createElement("span");
+	originPanelShell.setAttribute("id", "originPanelShell");
+	// 给外壳添加样式
+	originPanelShell.style.position = "absolute";
+	originPanelShell.style.background = "#eee";
+	originPanelShell.style.zIndex = "20000";
+	originPanelShell.style.width = paraRect.width + "px";
+	// 将外壳放入所在位置
+	$(parentDivDom).css("position", "relative");
+	$(parentDivDom).append(originPanelShell);
+	// 创建内壁
+	var originPanelWall = document.createElement("div");
+	originPanelWall.setAttribute("id", "originPanelWall");
+	originPanelWall.className = "originPanelWall";
+	originPanelShell.appendChild(originPanelWall);
+	// 获取para中的通信信息
+	var contractEmail = $(para).attr("data-email");
+	var contractTel = $(para).attr("data-tel");
+	var contractAdd = $(para).attr("data-add");
+	var contractCode = $(para).attr("data-code");
+	//
+	var contractDom = "";
+	if(contractEmail){
+		contractDom += "<div>通信邮箱："+contractEmail+"</div>";
+	}
+	if(contractTel) {
+		contractDom += "<div>电话号码："+contractTel+"</div>";
+	}
+	if(contractAdd) {
+		contractDom += "<div>通信地址："+contractAdd+"</div>";
+	}
+	if(contractCode) {
+		contractDom += "<div>邮政编码："+contractCode+"</div>";
+	}
+	originPanelWall.innerHTML = contractDom
+}
+
+function originPanelClose() {
+	$("#originPanelShell").remove()
+}
+
+function turnUser(uid) {
+	if(uid) {
+		window.location.href = "/u/"+uid
+	}
 }

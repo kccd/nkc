@@ -22,6 +22,11 @@ const postRouter = require('./post');
 const xsfRouter = require('./xsf');
 const redEnvelopeRouter = require('./redEnvelope');
 const emailRouter = require('./email');
+const subRouter = require('./sub');
+const shopRouter = require('./shop');
+const registerRouter = require('./register');
+const safeRouter = require('./safe');
+const protocolRouter = require('./protocol');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -49,6 +54,11 @@ settingRouter
   .use('/log', logRouter.routes(), logRouter.allowedMethods())
 	.use('/user', userRouter.routes(), userRouter.allowedMethods())
 	.use('/exam', examRouter.routes(), examRouter.allowedMethods())
+  .use('/sub', subRouter.routes(), subRouter.allowedMethods())
   .use('/email', emailRouter.routes(), emailRouter.allowedMethods())
-	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods());
+	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods())
+  .use('/safe', safeRouter.routes(), safeRouter.allowedMethods())
+  .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
+  .use('/shop', shopRouter.routes(), shopRouter.allowedMethods())
+  .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

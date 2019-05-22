@@ -5,7 +5,7 @@ block title
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
 
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_user_settings
@@ -33,10 +33,10 @@ block content
                         else
                           if data.user.kcb < -1*data.modifyUsernameOperation.num
                             .form-group
-                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.num}个科创币，您当前的科创币不足。`
+                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.num/100}个科创币，您当前的科创币不足。`
                           else
                             .form-group
-                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.num}个科创币`
+                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.num/100}个科创币`
                               input.form-control#username(placeholder='请输入新的用户名')
                             .form-group
                               button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存

@@ -810,7 +810,7 @@ th {
 .glyphicon-floppy-open:before {
   content: "\e176";
 }
-.glyphicon-credit-card:before {
+.glyphicon--card:before {
   content: "\e177";
 }
 .glyphicon-transfer:before {
@@ -2274,7 +2274,7 @@ th {
 .table > tfoot > tr > td {
   padding: 8px;
   line-height: 1.42857143;
-  vertical-align: top;
+  vertical-align: middle;
   border-top: 1px solid #ddd;
 }
 .table > thead > tr > th {
@@ -4857,6 +4857,18 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   vertical-align: baseline;
   border-radius: .25em;
 }
+.label-tagsinput {
+  display: inline;
+  border-radius: 3px;
+  font-size: 13px;
+  padding: 2px 5px;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+}
 a.label:hover,
 a.label:focus {
   color: #fff;
@@ -4893,6 +4905,9 @@ a.label:focus {
 }
 .label-info {
   background-color: #5bc0de;
+}
+.label-info-tagsinput {
+  background-color: #2b90d9;
 }
 .label-info[href]:hover,
 .label-info[href]:focus {

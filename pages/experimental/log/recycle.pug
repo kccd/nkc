@@ -1,0 +1,76 @@
+extends ../../bootstrap_base
+
+block title
+  title 等待修改的文章
+  +includeCSS('/experimental/index.css')
+  style.
+    tbody tr th {
+      max-width: 12rem;
+      font-size: 1rem;
+    }
+block content
+
+  .container-fluid.max-width
+    .row
+      include ../nav
+      .hidden#data=objToStr({threads: data.threads})
+      .col-xs-12.col-md-12#app(v-cloak)
+        h4.text-danger 等待作者修改的文章
+        table.table
+          thead
+            tr
+              th 退修时间
+              th 作者
+              th 文章标题
+              th 退修原因
+              th 操作者
+          tbody
+            tr(v-for="thread in threads")
+              th {{format("YYYY-MM-DD HH:mm:ss", thread.markTime)}}
+              th
+                a(:href="'/u/' + thread.firstPost.user.uid" target="_blank") {{thread.firstPost.user.username}}
+              th
+                a(:href="'/t/' + thread.tid" target="_blank") {{thread.firstPost.t}}
+              th
+                div(v-if="!thread.modify")
+                  span {{thread.markReason}}
+                  button.btn.btn-xs.btn-default(@click="thread.modify = true") 修改
+                div(v-else)
+                  textarea.form-control(rows=4 v-model="thread.markReason")
+                  .m-t-1
+                    button.btn.btn-xs.btn-success(@click="save(thread)") 保存
+                    button.btn.btn-xs.btn-default(@click="thread.modify = false") 取消
+              th
+                a(href="'/u/' + thread.markUser.uid" target="_blank") {{thread.markUser.username}}
+block scripts
+  include ../../publicModules/moment
+  script.
+    var app = new Vue({
+      el: "#app",
+      data: {
+        threads: []
+      },
+      mounted: function() {
+        var data = getDataById("data");
+        for(var i = 0; i < data.threads.length; i++) {
+          data.threads[i].modify = false;
+        }
+        this.threads = data.threads;
+      },
+      methods: {
+        format: NKC.methods.format,
+        save: function(thread) {
+          const markReason = thread.markReason;
+          nkcAPI("/t/" + thread.tid + "/moveDraft/reason", "PATCH", {
+            reason: markReason
+          })
+            .then(function() {
+              screenTopAlert("保存成功");
+            })
+            .catch(function(data) {
+              screenTopWarning(data);
+            })
+        },
+
+      }
+    })

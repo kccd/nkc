@@ -5,6 +5,10 @@ module.exports = {
 		GET: 'visitForumHome', // 查看专业主页
 		POST: 'postToForum', // 在专业中发表文章
 		DELETE: 'deleteForum', // 删除专业
+    banner: {
+		  GET: 'visitForumBanner',
+      PATCH: "modifyForumBanner"
+    },
 		latest: {
 			GET: 'visitForumLatest' // 查看专业最新文章列表
 		},
@@ -29,6 +33,12 @@ module.exports = {
 			},
 			image: {
 				GET: 'visitForumImageSettings', // 查看专业头像设置
+			},
+			kind: {
+				PATCH: "addForumKind", // 添加专业类别
+				clear: {
+					PATCH: "delForumKind" // 清除专业类别
+				}
 			},
 			category: {
 				GET: 'visitForumCategorySettings', // 查看专业分类设置

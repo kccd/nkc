@@ -24,7 +24,7 @@ router
     if(!redEnvelopeSettings.c.draftFee.close) {
       if(!kcb) ctx.throw(400, '参数错误，请刷新');
       num = Number(kcb);
-      if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+      if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
       if(!redEnvelopeSettings.c.draftFee.close && (num < redEnvelopeSettings.c.draftFee.minCount || num > redEnvelopeSettings.c.draftFee.maxCount)) ctx.throw(400, '科创币数额不在范围内');
     }
 		data.targetUser = targetUser;
@@ -39,6 +39,7 @@ router
 			}
 		}
 		const digestTime = Date.now();
+		post.digest = true;
 		await post.update({digest: true, digestTime});
 		const log = {
 			user: targetUser,
@@ -68,9 +69,8 @@ router
           pid,
           tid: thread.tid
         });
-        await data.targetUser.update({$inc: {kcb: num}});
-        await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
         await record.save();
+        // data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
       }
       await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
 			log.type = 'score';
@@ -88,6 +88,7 @@ router
 				}
 			});
 			await message.save();
+			await nkcModules.elasticSearch.save("thread", post);
 		} else {
 			log.typeIdOfScoreChange = 'digestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
@@ -105,8 +106,6 @@ router
           pid,
           tid: thread.tid
         });
-        await data.targetUser.update({$inc: {kcb: num}});
-        await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*num}});
         await record.save();
       }
       await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);
@@ -125,6 +124,7 @@ router
 				}
 			});
 			await message.save();
+      await nkcModules.elasticSearch.save("post", post);
 		}
 		if(!redEnvelopeSettings.c.draftFee.close) {
       await usersGeneralSettings.update({$inc: {'draftFeeSettings.kcb': num}});
@@ -135,7 +135,7 @@ router
 		await next();
 	})
 	.del('/', async (ctx, next) => {
-		const {db, params, data} = ctx;
+		const {db, params, data, nkcModules} = ctx;
 		const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
@@ -164,6 +164,7 @@ router
 		if(rewardLog) {
 		  additionalReward = rewardLog.num;
     }
+		post.digest = false;
 		await post.update({digest: false});
 		const log = {
 			user: targetUser,
@@ -182,6 +183,7 @@ router
 			log.change = -1;
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
+			await nkcModules.elasticSearch.save("thread", post);
 		} else {
 			log.typeIdOfScoreChange = 'unDigestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
@@ -190,6 +192,7 @@ router
 			log.change = -1;
 			log.type = 'score';
 			await db.UsersScoreLogModel.insertLog(log);
+      await nkcModules.elasticSearch.save("post", post);
 		}
 		await next();
 	});

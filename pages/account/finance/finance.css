@@ -1,0 +1,77 @@
+.default-panel{
+  text-align: center;
+  border: 1px solid #eee;
+  height: 10rem;
+  position: relative;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+.default-panel>div{
+  height: 5rem;
+  line-height: 5rem;
+  cursor: pointer;
+}
+.default-panel .kcb{
+  border-bottom: 1px solid #eee;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #a94442;
+}
+.default-panel input{
+  height: 2rem;
+  font-size: 1.4rem;
+  max-width: 100%;
+  line-height: 0;
+}
+.default-panel .kcb-input{
+  line-height: 0;
+}
+.kcb-input h5{
+
+}
+.default-panel.active{
+  border: 1px solid #337ab7;
+}
+.default-panel .pointer, .payment-pannel .pointer{
+  position: absolute;
+  bottom: 0;
+  height: 2rem;
+  width: 2rem;
+  line-height: 2rem;
+  right: 0;
+  color: #fff;
+  background-color: #337ab7;
+}
+.payment-pannel{
+  border: 1px solid #eee;
+  min-height: 4rem;
+  line-height: 4rem;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+}
+.payment-pannel.active{
+  border: 1px solid #337ab7;
+}
+.pay{
+  text-align: center;
+  display: inline-block;
+  height: 4rem;
+  color: #fff;
+  width: 10rem;
+  font-size: 1.4rem;
+  border: 1px solid #eee;
+  background-color: #ffa500;
+  border-radius: 3px;
+}
+.default{
+  position: absolute;
+  width: 3rem;
+  text-align: center;
+  left: 0;
+  height: 1.8rem;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.8rem;
+  color: #a94442;
+}

@@ -18,12 +18,15 @@ postRouter
     await thread.extendFirstPost();
 	  const forums = await thread.extendForums(['mianForums', 'minorForums']);
     const {user} = data;
-    let isModerator;
-    for(const f of forums) {
-      isModerator = await f.isModerator(data.user?data.user.uid: '');
-      if(isModerator) break;
+    let isModerator = ctx.permission('superModerator');
+    if(!isModerator) {
+      for(const f of forums) {
+        isModerator = await f.isModerator(data.user?data.user.uid: '');
+        if(isModerator) break;
+      }
     }
     // 判断用户是否具有访问该post所在文章的权限
+    data.isModerator = isModerator;
     const options = {
     	roles: data.userRoles,
       grade: data.userGrade,
@@ -96,6 +99,7 @@ postRouter
     data.step = step;
     data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
     data.post.user = await db.UserModel.findOnly({uid: post.uid});
+    await db.UserModel.extendUsersInfo([data.post.user]);
     await data.post.user.extendGrade();
     data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
     data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
@@ -105,8 +109,8 @@ postRouter
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {t, c, desType, desTypeId} = ctx.body.post;
-    if(c.lenght < 6) ctx.throw(400, '内容太短，至少6个字节');
+    const {t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = ctx.body.post;
+    if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db, fs} = ctx;
     const {user} = data;
@@ -133,19 +137,27 @@ postRouter
     }
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();
-    // 修改回复的时间限制
-    let modifyPostTimeLimit = 0;
-    for(const r of data.userRoles) {
-			if(r.modifyPostTimeLimit === -1) {
-				modifyPostTimeLimit = -1;
-				break;
-			}
-			if(r.modifyPostTimeLimit > modifyPostTimeLimit) {
-				modifyPostTimeLimit = r.modifyPostTimeLimit;
-			}
+
+    if(targetThread.type !== "product") {
+
+      // 修改回复的时间限制
+      let modifyPostTimeLimit = 0;
+      for(const r of data.userRoles) {
+        if(r.modifyPostTimeLimit === -1) {
+          modifyPostTimeLimit = -1;
+          break;
+        }
+        if(r.modifyPostTimeLimit > modifyPostTimeLimit) {
+          modifyPostTimeLimit = r.modifyPostTimeLimit;
+        }
+      }
+      if(modifyPostTimeLimit !== -1 && (Date.now() - targetPost.toc.getTime() > modifyPostTimeLimit*60*60*1000))
+        ctx.throw(403, `您只能需改${modifyPostTimeLimit}小时前发表的内容`);
+
     }
-    if(modifyPostTimeLimit !== -1 && (Date.now() - targetPost.toc.getTime() > modifyPostTimeLimit*60*60*1000))
-    	ctx.throw(403, `您只能需改${modifyPostTimeLimit}小时前发表的内容`);
+
+
+
     const objOfPost = Object.assign(targetPost, {}).toObject();
     objOfPost._id = undefined;
     const histories = new db.HistoriesModel(objOfPost);
@@ -169,6 +181,12 @@ postRouter
     targetPost.iplm = ctx.address;
     targetPost.t = t;
     targetPost.c = c;
+    targetPost.abstractCn = abstractCn;
+    targetPost.abstractEn = abstractEn;
+    targetPost.keyWordsCn = keyWordsCn;
+    targetPost.keyWordsEn = keyWordsEn;
+    targetPost.authorInfos = authorInfos;
+    targetPost.originState = originState;
     targetPost.tlm = Date.now();
 	  if(targetThread.oc === pid) {
 			await targetThread.update({hasCover: true});

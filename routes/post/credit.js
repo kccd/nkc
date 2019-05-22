@@ -8,7 +8,7 @@ router
 		const {user} = data;
 		let {num, description} = body;
 		num = Number(num);
-    if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+    if(num%1 !== 0) ctx.throw(400, "学术分仅支持整数加减");
 		const post = await db.PostModel.findOnly({pid});
 		const targetUser = await db.UserModel.findOnly({uid: post.uid});
 		if(targetUser.uid === user.uid) ctx.throw(403, '不允许给自己加减学术分');
@@ -24,7 +24,7 @@ router
     if(!isModerator) ctx.throw(400, '权限不足');
     data.isModerator = isModerator;
 		if(thread.disabled || thread.disabled) {
-			ctx.throw(403,'无法给禁用的帖子或回复评学术分');
+			ctx.throw(403,'无法给禁用的文章或回复评学术分');
 		}
 		const xsfSettings = await db.SettingModel.findOnly({_id: 'xsf'});
 		const {addLimit, reduceLimit} = xsfSettings.c;
@@ -117,7 +117,7 @@ router
 		const {pid} = params;
 		let {num, description} = body;
 		num = Number(num);
-    if((num + '').indexOf('.') !== -1) ctx.throw(400, '仅支持整数');
+    if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
     const toUser = await db.UserModel.findOnly({uid: post.uid});
@@ -130,8 +130,9 @@ router
 		  ctx.throw(403, '回复已被封禁');
     }
 		const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
-		if(num < kcbSettings.c.minCount) ctx.throw(400, `科创币最少为${kcbSettings.c.minCount}`);
-		if(num > kcbSettings.c.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.c.maxCount}`);
+		if(num < kcbSettings.c.minCount) ctx.throw(400, `科创币最少为${kcbSettings.c.minCount/100}`);
+		if(num > kcbSettings.c.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.c.maxCount/100}`);
+		fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
 		if(fromUser.kcb < num) ctx.throw(400, '您的科创币不足');
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 60) ctx.throw(400, '理由不能超过60个字');
@@ -158,8 +159,23 @@ router
 			q: num
 		};
 		await post.update({$push: {credits: updateObjForPost}});
-
+    await thread.updateThreadEncourage();
 		await next();
-	});
+	})
+  .patch("/kcb/:recordId", async (ctx, next) => {
+    const {db, body, params} = ctx;
+    const {recordId, pid} = params;
+    const {hide} = body;
+    await db.KcbsRecordModel.updateOne({
+      _id: recordId,
+      pid,
+      type: "creditKcb"
+    }, {
+      $set: {
+        hideDescription: !!hide
+      }
+    });
+    await next();
+  });
 
 module.exports = router;

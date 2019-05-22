@@ -8,6 +8,10 @@ const resourceSchema = new Schema({
     unique: true,
     required: true
   },
+  originId: {
+    type: String,
+    default: ""
+  },
   ext: {
     type: String,
     default: ''

@@ -3,7 +3,7 @@ block title
   title= `${data.targetUser.username}的交易信息`
   -const mainContainer1400 = true;
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
         .col-xs-12.col-md-2
           .col-xs-12.col-md-12
@@ -22,7 +22,7 @@ block content
                     .form-group
                       label.col-sm-2.control-label 收货地址：
                       .col-sm-10
-                        h5= address.address
+                        h5= address.location+address.address
                     .form-group
                       label.col-sm-2.control-label 联系电话：
                       .col-sm-10

@@ -6,7 +6,6 @@
     v-cloak
     @mouseleave='forumsList = [];forumsIdList=[];'
   )
-    .hidden(ref='forums')= JSON.stringify(data.forums)
     li.mdui-list-item.mdui-ripple(
       v-for='forum in forums'
       @click='openForum(forum)'

@@ -11,6 +11,12 @@ module.exports = {
 			POST: 'uploadUserAvatar'
 		}
 	},
+	shopLogo: {
+		PARAMETER: {
+			GET: 'getShopLogo',
+			POST: 'uploadShopLogo'
+		}
+	},
 	poster: {// 活动海报
 		PARAMETER: {
 			GET: 'getActivityPoster'
@@ -32,11 +38,21 @@ module.exports = {
 		POST: 'uploadResources',
 		PARAMETER: {
 			GET: 'getResources'
-		}
+		},
 	},
 	rt: {
 		PARAMETER: {
-			GET: 'getResources'
+			GET: 'getThumbs'
+		}
+	},
+	rm: {
+		PARAMETER: {
+			GET: 'getMediums'
+		}
+	},
+	ro: {
+		PARAMETER: {
+			GET: 'getOrigins'
 		}
 	},
 	cover: {// 文章封面图

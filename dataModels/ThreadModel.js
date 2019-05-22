@@ -1,18 +1,20 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
+const apiFunction = require('../nkcModules/apiFunction');
+const {getQueryObj, obtainPureText} = apiFunction;
 const threadSchema = new Schema({
   tid: {
     type: String,
     unique: true,
     required:true
-  },/* 
-  cid: {
+  },
+  // 类型 article: 文章， product: 商城的商品
+  type: {
     type: String,
-    default:'',
+    default: 'article',
     index: 1
-  }, */
+  },
   count: {
     type: Number,
     default: 0
@@ -43,12 +45,7 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
-  },/* 
-  fid: {
-    type: String,
-    required: true,
-    index: 1
-  }, */
+  },
   hideInMid: {
     type: Boolean,
     default: false
@@ -114,28 +111,81 @@ const threadSchema = new Schema({
     default: [],
     index: 1
   },
+
   // 自定义分类
   customForumsId: {
     type: [String],
     default: [],
     index: 1
   },
+
   // cid的集合
   categoriesId: {
     type: [String],
     default: [],
     index: 1
   },
+
   uid: {
     type: String,
     required: true,
     index: 1
   },
+
+  // 文章是否关闭，关闭后不可回复
 	closed: {
   	type: Boolean,
 		default: false,
 		index: 1
-	}
+	},
+
+  // 首条回复的支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  // 首条回复的反对数
+  voteDown: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 所有回复的鼓励总数
+  encourageTotal: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 支持总数 所有回复支持之和
+  voteUpTotal: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  // 反对总数 所有回复反对之和
+  voteDownTotal: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 最大支持数 回复中最高的支持数
+  voteUpMax: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+
+  // 回复的用户数，已去重
+  replyUserCount: {
+    type: Number,
+    default: 0,
+    index: 1
+  }
+
 }, {toObject: {
   getters: true,
   virtuals: true
@@ -227,7 +277,7 @@ threadSchema.methods.extendForums = async function(types) {
   }
   const forums = await mongoose.model('forums').find({fid: {$in: fids}});
   return this.forums = forums;
-}
+};
 
 /* threadSchema.methods.extendForum = async function() {
   const ForumModel = mongoose.model('forums');
@@ -246,10 +296,26 @@ threadSchema.methods.extendUser = async function() {
 
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
+  const throwError = require("../nkcMOdules/throwError");
   for(const forum of this.forums) {
-    await forum.ensurePermission(roles, grade, user);
+    try {
+      await forum.ensurePermission(roles, grade, user);
+    } catch(err) {
+      const status = err.status;
+      try{
+        err = JSON.parse(err.message || err);
+        err = err.errorData;
+      } catch(e) {}
+      let errorType = "noPermissionToReadThread";
+      if(forum.fid === "recycle") {
+        errorType = "threadHasBeenBanned";
+      }
+      throwError(status, err, errorType);
+    }
   }
 };
+
+
 // ----------------------------------------------------------------------
 
 /*// 1、判断能否进入所在板块
@@ -275,7 +341,7 @@ threadSchema.methods.ensurePermissionOfModerators = async function(ctx) {
   if(ctx.data.userLevel > 4) {
     return true;
   } else {
-    const forum = await ctx.db.ForumModel.findOnly({fid: this.fid});
+    const forum = await ctx.ForumModel.findOnly({fid: this.fid});
     return ctx.data.user && forum.moderators.includes(ctx.data.user.uid);
   }
 };*/
@@ -292,6 +358,65 @@ threadSchema.methods.getPostByQuery = async function (query, macth) {
   return posts;
 };
 
+/*
+* 更新文章的支持、反对数量
+* 数据来源于文章下的post
+* */
+threadSchema.methods.updateThreadVote = async function() {
+  const PostModel = mongoose.model("posts");
+  const updateObj = {};
+  const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
+  updateObj.voteUp = oc.voteUp;
+  updateObj.voteDown = oc.voteDown;
+  let count = await PostModel.aggregate([
+    {
+      $match: {
+        tid: this.tid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$voteUp"
+        }
+      }
+    }
+  ]);
+  updateObj.voteUpTotal = count.length? count[0].total: 0;
+
+  count = await PostModel.aggregate([
+    {
+      $match: {
+        tid: this.tid
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$voteDown"
+        }
+      }
+    }
+  ]);
+  updateObj.voteDownTotal = count.length? count[0].total: 0;
+
+  const voteUpMax = await PostModel.findOne({tid: this.tid}).sort({voteUp: -1});
+  updateObj.voteUpMax = voteUpMax? voteUpMax.voteUp: 0;
+  await this.update(updateObj);
+};
+/*
+* 更新文章的鼓励数量
+* */
+threadSchema.methods.updateThreadEncourage = async function() {
+  const PostModel = mongoose.model('posts');
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const posts = await PostModel.find({tid: this.tid}, {pid: 1});
+  const pid = posts.map(p => p.pid);
+  const encourageTotal = await KcbsRecordModel.count({type: "creditKcb", pid: {$in: pid}});
+  await this.update({encourageTotal});
+};
 
 threadSchema.methods.updateThreadMessage = async function() {
   const PostModel = mongoose.model('posts');
@@ -300,22 +425,36 @@ threadSchema.methods.updateThreadMessage = async function() {
   const updateObj = {};
   const lm = await PostModel.findOne({tid: this.tid, disabled: false}).sort({toc: -1});
   const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
-  updateObj.tlm = lm.toc;
+  updateObj.tlm = lm?lm.toc:'';
   updateObj.toc = oc.toc;
-  updateObj.lm = lm.pid;
+  updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
   updateObj.count = await PostModel.count({tid: this.tid});
   updateObj.countToday = await PostModel.count({tid: this.tid, toc: {$gt: time}});
   updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
+
+  const userCount = await PostModel.aggregate([
+    {
+      $match: {
+        tid: this.tid
+      }
+    },
+    {
+      $group: {
+        _id: "$uid"
+      }
+    }
+  ]);
+  updateObj.replyUserCount = userCount.length - 1;
+
+
   await this.update(updateObj);
   await PostModel.updateMany({tid: this.tid}, {$set: {mainForumsId: this.mainForumsId}});
   const forums = await this.extendForums(['mainForums']);
   await Promise.all(forums.map(async forum => {
     await forum.updateForumMessage();
   }));
-  /*const user = await this.extendUser();
-  await user.updateUserMessage();*/
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
@@ -329,7 +468,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = post;
   const quote = await dbFn.getQuote(c);
   if(this.uid !== user.uid) {
     const replyWriteOfThread = new ReplyModel({
@@ -347,6 +486,12 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     pid,
     c,
     t,
+    abstractCn,
+    abstractEn,
+    keyWordsCn,
+    keyWordsEn,
+    authorInfos,
+    originState,
     ipoc: ip,
     iplm: ip,
     l,
@@ -395,21 +540,27 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(!user.generalSettings.lotterySettings.close) {
     const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
     if(!redEnvelopeSettings.c.random.close) {
-      const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
-      if(postCountToday === 1) {
-        await user.generalSettings.update({'lotterySettings.status': true});
+      const {chance} = redEnvelopeSettings.c.random;
+      const number = Math.ceil(Math.random()*100);
+      if(number <= chance) {
+        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+        if(postCountToday === 1) {
+          await user.generalSettings.update({'lotterySettings.status': true});
+        }
       }
     }
   }
   return _post
 };
  // 算post所在楼层
-threadSchema.methods.getStep = async function(obj) {
+threadSchema.statics.getPostStep = async (tid, obj) => {
   const PostModel = mongoose.model('posts');
-  const {perpage} = require('../settings').paging;
+  const SettingModel = mongoose.model("settings");
+  const pageSettings = await SettingModel.findOnly({_id: "page"});
+  const perpage = pageSettings.c.threadPostList;
   const pid = obj.pid;
   const q = {
-    tid: this.tid
+    tid
   };
   if(obj.disabled === false) q.disabled = false;
   const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
@@ -425,6 +576,9 @@ threadSchema.methods.getStep = async function(obj) {
     page,// 页数
     step // 楼层
   }
+};
+threadSchema.methods.getStep = async function(obj) {
+  return await mongoose.model("threads").getPostStep(this.tid, obj);
 };
 
 /* 拓展文章数组
@@ -485,11 +639,24 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(o.lastPost && thread.lm) postsId.add(thread.lm);
     if(thread.categoriesId && thread.categoriesId.length !== 0) {
       cid = cid.concat(thread.categoriesId);
-    };
+    }
   });
 
   if(o.firstPost || o.lastPost) {
-    const posts = await PostModel.find({pid: {$in: [...postsId]}});
+    const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
+      pid: 1,
+      t: 1,
+      c: 1,
+      abstract: 1,
+      uid: 1,
+      toc: 1,
+      tlm: 1,
+      l: 1,
+      tid: 1,
+      mainForumsId: 1,
+      voteUp: 1,
+      voteDown: 1
+    });
     posts.map(post => {
       if(o.htmlToText) {
         post.c = obtainPureText(post.c, true, o.count);
@@ -501,7 +668,20 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     });
 
     if(o.firstPostUser || o.lastPostUser) {
-      const users = await UserModel.find({uid: {$in: [...usersId]}});
+      const users = await UserModel.find({uid: {$in: [...usersId]}}, {
+        uid: 1,
+        toc: 1,
+        tlv: 1,
+        username: 1,
+        xsf: 1,
+        kcb: 1,
+        description: 1,
+        certs: 1,
+        threadCount: 1,
+        disabledThreadsCount: 1,
+        disabledPostsCount: 1,
+        postCount: 1
+      });
       if(o.userInfo) {
         await UserModel.extendUsersInfo(users);
       }
@@ -512,7 +692,16 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   }
 
   if(o.forum) {
-    let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
+    // let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
+    let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}}, {
+      fid: 1,
+      displayName: 1,
+      description: 1,
+      forumType: 1,
+      color: 1,
+      parentsId: 1,
+      iconFileName: 1
+    });
     /* forums.map(forum => {
       if(forum.parentId) {
         if(o.parentForum) {
@@ -573,6 +762,407 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
     return thread.toObject?thread.toObject():thread;
   }));
+};
+/* 
+  通过tid查找文章
+  @param tid: 文章id
+  @author pengxiguaa 2019/3/7
+*/
+threadSchema.statics.findThreadById = async (tid) => {
+  const ThreadModel = mongoose.model('threads');
+  const thread = await ThreadModel.findOne({tid});
+  if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
+  return thread;
+};
+
+
+/* 
+  发表时的权限判断，根据用户等级、证书和认证等级，获取发表文章的条数限制和时间限制
+  @param userInfo: 用户对象或uid
+  @author pengxiguaa 2019/3/7
+*/
+threadSchema.statics.ensurePublishPermission = async (options) => {
+  const UserModel = mongoose.model('users');
+  const ThreadModel = mongoose.model('threads');
+  const SettingModel = mongoose.model('settings');
+  const ForumModel = mongoose.model("forums");
+  const apiFunction = require('../nkcModules/apiFunction');
+  const {contentLength} = require("../tools/checkString");
+  const {uid, fids, title, content} = options;
+
+  if(!uid) throwErr(404, '用户ID不能为空');
+  const user = await UserModel.findById(uid);
+  await user.extendRoles();
+  await user.extendGrade();
+  const forums = await ForumModel.find({fid: {$in: fids}});
+  await Promise.all(forums.map(async forum => {
+    const childrenForums = await forum.extendChildrenForums();
+    if(childrenForums.length !== 0) {
+      throwErr(400, `专业【${forum.displayName}】下存在其他专业，请到下属属专业发表内容。`);
+    }
+  }));
+
+  await ForumModel.ensureForumsPermission(fids, user);
+  if(!title) throwErr(400, "标题不能为空");
+  if(contentLength(title) > 200) throwErr(400, "标题不能大于200字节");
+  if(!content) throwErr(400, "内容不能为空");
+  if(contentLength(content) < 6) throwErr(400, "内容不能小于6个字节");
+
+  // 验证是否完善过资料
+  await user.ensureUserInfo();
+  if(!user.authLevel) await user.extendAuthLevel();
+  const postSettings = await SettingModel.findOnly({_id: 'post'});
+  const {authLevelMin, exam} = postSettings.c.postToForum;
+  const {volumeA, volumeB, notPass} = exam;
+  const {status, countLimit, unlimited} = notPass;
+  const today = apiFunction.today();
+  const todayThreadCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+  if(authLevelMin > user.authLevel) throwErr(403,`身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
+  if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
+    if(!status) throwErr(403, '权限不足，请提升账号等级');
+    if(!unlimited && countLimit <= todayThreadCount) throwErr(403, '今日发表文章次数已用完，请明天再试。');
+  }
+  // 发表回复时间、条数限制
+  const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
+  if(todayThreadCount >= postToForumCountLimit) throwErr(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
+  const latestThread = await ThreadModel.findOne({uid: user.uid, toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
+  if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
+};
+/* 
+  发表文章接口，未完成
+  @param options
+    uid: string 发表者ID
+    fids: [String] 所著专业
+    cids: [String] 文章分类
+    ip: String 发表者ID
+    title: String 标题
+    content: String 内容
+    abstractCn: String 摘要
+  @author pengxiguaa 2019/3/7  
+*/
+threadSchema.statics.publishArticle = async (options) => {
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const {uid, fids, cids, ip, title, content, abstractCn, type, keyWordsCn} = options;
+  if(!uid) throwErr(404, '用户ID不能为空');
+  const user = await UserModel.findById(uid);
+  await ThreadModel.ensurePublishPermission(options);
+  const tid = await SettingModel.operateSystemID('threads', 1);
+  const thread = ThreadModel({
+    tid,
+    categoriesId: cids,
+    mainForumsId: fids,
+    mid: user.uid,
+    uid: user.uid,
+    type: type === 'product'?'product': 'article'
+  });
+  await thread.save();
+  const post = await PostModel.newPost({
+    title,
+    content,
+    abstractCn,
+    keyWordsCn,
+    ip,
+    uid,
+    tid
+  });
+  await thread.update({$set:{oc: post.pid, count: 1, hits: 1}});
+  return await ThreadModel.findThreadById(thread.tid);
+};
+/*
+* 加载首页轮播图
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getAds = async (fid) => {
+  let homeSettings = await mongoose.model("settings").findById("home");
+  const ThreadModel = mongoose.model("threads");
+  const ads = [];
+  for(const tid of homeSettings.c.ads) {
+    const thread = await ThreadModel.findOne({tid, mainForumsId: {$in: fid}});
+    if(thread) ads.push(thread);
+  }
+  return await ThreadModel.extendThreads(ads, {
+    forum: false,
+    lastPost: false
+  });
+};
+/*
+* 加载网站公告
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getNotice = async (fid) => {
+  let homeSettings = await mongoose.model("settings").findById("home");
+  const ThreadModel = mongoose.model("threads");
+  const notice = [];
+  for(const oc of homeSettings.c.noticeThreadsId) {
+    const thread = await ThreadModel.findOne({oc, mainForumsId: {$in: fid}});
+    if(thread) notice.push(thread);
+  }
+  return await ThreadModel.extendThreads(notice, {
+    forum: false,
+    lastPost: false
+  });
+};
+/*
+* 加载指定专业内的精选文章 随机
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getFeaturedThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const time = Date.now() - 15379200000;// 半年
+  const threads = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid
+        },
+        toc: {
+          $gte: new Date(time)
+        }
+      }
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1
+      }
+    },
+    {
+      $sample: {
+        size: 6
+      }
+    }
+  ]);
+  const threads_ = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid
+        },
+        toc: {
+          $lt: new Date(time)
+        }
+      }
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1
+      }
+    },
+    {
+      $sample: {
+        size: 4
+      }
+    }
+  ]);
+  return await ThreadModel.extendThreads(threads.concat(threads_), {
+    lastPost: false,
+    category: false
+  })
+};
+/*
+* 获取全站最新文章
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getLatestThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const threads = await ThreadModel.find({mainForumsId: {$in: fid}}).sort({toc: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  });
+};
+/*
+* 获取"推荐文章列表"的查询条件
+* @param {[String]} fid 能够从中读取文章的专业ID
+* @author pengxiguaa 2019-4-26
+* */
+threadSchema.statics.getRecommendMatch = async (fid) => {
+  const SettingModel = mongoose.model("settings");
+  const homeSettings = await SettingModel.findById('home');
+  const {featuredThreads, hotThreads, voteUpTotal, voteUpMax, encourageTotal} = homeSettings.c.recommend;
+
+  const match = {
+    disabled: false,
+    recycleMark: {$ne: true},
+    mainForumsId: {$in: fid},
+    $or: [
+      {
+        voteUpTotal: {
+          $gte: voteUpTotal
+        }
+      },
+      {
+        voteUpMax: {
+          $gte: voteUpMax
+        }
+      },
+      {
+        encourageTotal: {
+          $gte: encourageTotal
+        }
+      }
+    ]
+  };
+
+  if(hotThreads) {
+    match.$or.push({
+      count: {
+        $gte: homeSettings.c.hotThreads.postCount+1
+      },
+      replyUserCount: {
+        $gte: homeSettings.c.hotThreads.postUserCount+1
+      }
+    });
+  }
+
+  if(featuredThreads) {
+    match.$or.push({
+      digest: true
+    });
+  }
+  return match;
+};
+/*
+* 加载用户发表的文章
+* @param {String} uid 用户ID
+* @param {[String]} fid 能够从中读取文章的专业ID
+* */
+threadSchema.statics.getUserThreads = async (uid, fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const threads = await ThreadModel.find({
+    mainForumsId: {
+      $in: fid
+    },
+    disabled: false,
+    recycleMark: {
+      $ne: true
+    },
+    uid
+  }).sort({toc: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  });
+};
+/*
+* 加载最新的10篇关注的文章
+* @param {String} uid 用户ID
+* @param {[String]} fid 能够从中读取文章的专业ID
+* */
+threadSchema.statics.getUserSubThreads = async (uid, fid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const ThreadModel = mongoose.model("threads");
+  const subs = await SubscribeModel.find({uid}, {
+    fid: 1,
+    tid: 1,
+    tUid: 1,
+    type: 1
+  }).sort({toc: -1});
+  const subFid = [], subTid = [], subUid = [];
+  subs.map(s => {
+    if(s.type === "forum") subFid.push(s.fid);
+    if(s.type === "thread") subTid.push(s.tid);
+    if(s.type === "user") subUid.push(s.tUid);
+  });
+  const q = {
+    mainForumsId: {
+      $in: fid
+    },
+    recycleMark: {
+      $ne: true
+    },
+    disabled: false,
+    $or: [
+      {
+        mainForumsId: {
+          $in: subFid
+        }
+      },
+      {
+        uid
+      },
+      {
+        uid: {
+          $in: subUid
+        }
+      },
+      {
+        tid: {
+          $in: subTid
+        }
+      }
+    ]
+  };
+  const threads = await ThreadModel.find(q).sort({toc: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
+    category: false
+  });
+};
+/*
+* 加载最新10篇推荐文章
+* @param {[String]} fid 能够从中读取文章的专业ID
+* */
+threadSchema.statics.getRecommendThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const match = await ThreadModel.getRecommendMatch(fid);
+  const threads = await ThreadModel.find(match).sort({tlm: -1}).limit(10);
+  return await ThreadModel.extendThreads(threads, {
+    category: false,
+    lastPost: false
+  });
+};
+
+/*
+* 移动退修修改超时的文章到回收站
+* @author pengxiguaa 2019-4-29
+* */
+threadSchema.statics.moveRecycleMarkThreads = async () => {
+  const ThreadModel = mongoose.model("threads");
+  const DelPostLogModel = mongoose.model("delPostLog");
+  const UserModel = mongoose.model("users");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const PostModel = mongoose.model("posts");
+  const nkcModules = require("../nkcModules");
+  // 删除退修超时的帖子
+  // 取出全部被标记的帖子
+  const allMarkThreads = await ThreadModel.find({ "recycleMark": true, "mainForumsId": { "$nin": ["recycle"] } });
+  for (var i in allMarkThreads) {
+    const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
+    if(delThreadLog){
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true });
+      await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
+      await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
+      const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});
+      const thread = await ThreadModel.findOne({tid: delThreadLog.threadId});
+      if(tUser && thread) {
+        await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
+          data: {
+            user: {},
+            thread
+          },
+          nkcModules,
+          db: require("./index")
+        });
+      }
+    }
+  }
 };
 
 module.exports = mongoose.model('threads', threadSchema);

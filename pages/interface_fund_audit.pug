@@ -8,7 +8,7 @@ block title
   title= `科创基金-${fund.name}`
   link(rel='stylesheet' href='/fund.css')
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     include interface_fund_nav
     .row
       if type === 'project'
@@ -87,10 +87,10 @@ block content
                     br
                   div#projectContent!= experimental_render(project)
                   hr
-                  h4= `学术分类：${applicationForm.forum.displayName}`
+                  h4= `学科分类：${applicationForm.forum.displayName}`
                   h4= `研究周期：${applicationForm.projectCycle}天`
                   if applicationForm.threads.applying.length !== 0
-                    h4= `申请人曾今的技术帖：`
+                    h4= `申请人曾经的技术文章：`
                     .selectedThreads
                       -const disagreeUsers = [];
                       -const notModifiedUsers = [];
@@ -232,10 +232,10 @@ block content
                 br
               div#projectContent!= experimental_render(project)
               hr
-              h4= `学术分类：${applicationForm.forum.displayName}`
+              h4= `学科分类：${applicationForm.forum.displayName}`
               h4= `研究周期：${applicationForm.projectCycle}天`
               if applicationForm.threads.applying.length !== 0
-                h4= `申请人曾今的技术帖：`
+                h4= `申请人曾经的技术文章：`
                 .selectedThreads
                   -const disagreeUsers = [];
                   -const notModifiedUsers = [];
@@ -335,7 +335,7 @@ block content
                 #remittanceList
           .col-xs-12.col-md-4
             h3 拨款依据
-            span 附带帖子
+            span 附带文章
             label.radio-inline
               input(type='radio' name='needThreads' checked=true)
               h5 是

@@ -1,0 +1,53 @@
+extends ../index.pug
+block title
+  title 封禁商品上架 | 商城设置
+block shopSettings
+  .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;')
+    .row
+      .col-xs-12.col-md-12(style="margin-bottom:1rem")
+        ul.nav.nav-pills(style="border:1px solid #ddd")
+          li(class=!data.productType || data.productType == "all"?"active":"")
+            a(href=`/e/settings/shop/products?productType=all`, data-toggle='url') 全部商品
+          li(class=data.productType == "adminBan"?"active":"")
+            a(href=`/e/settings/shop/products?productType=adminBan`, data-toggle='url') 禁售商品
+      .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+        include ../../../interface_navigation_paging       
+      .col-md-12.col-sm-12.col-xs-12
+        .table-responsive
+          table.table.table-hover.table-condensed
+            thead
+              tr(style="background-color: whitesmoke;")
+                th 商品名称、TID
+                th 卖家昵称、ID
+                th 上架时间
+                th 商品状态
+            tbody
+              for thread in data.threads
+                tr
+                  td
+                    a(style="color:#000" href=`/t/${thread.tid}`)
+                      if thread.product
+                        span!=`${thread.product.name}、`
+                      span!=`${thread.tid}`
+                  td
+                    a(style="color:#000" href=`/u/${thread.uid}`)
+                      if thread.user
+                        span!=`${thread.user.username}、`
+                      span!=`${thread.uid}`
+                  td
+                    span= fromNow(thread.toc)
+                  td 
+                    if thread.product && thread.product.adminBan
+                      span 禁售
+                    else 
+                      span 正常销售
+                  if thread.product && thread.product.adminBan
+                    td
+                      if thread.product
+                        button(onclick=`clearBanSale(${thread.product.productId})`) 解禁
+                    //- a(href=`/e/settings/shop/refunds/refundDetail?orderId=${refund.orderId}`) 解禁
+      .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+        include ../../../interface_navigation_paging       
+
+block shopSettingScripts
+  +includeJS("/experimental/shop/products/products.js")

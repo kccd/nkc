@@ -1,0 +1,36 @@
+extends ../../experimental
+block eTitle
+  title 安全设置
+block eContent
+  .container-fluid.max-width
+    .row
+      .hidden#data= objToStr({safeSettings: data.safeSettings})
+      .col-xs-12.col-md-12#app(v-cloak)
+        h4 安全设置
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 后台二次密码验证
+            .col-sm-4.form-inline
+              .radio.m-r-2
+                | 开启
+                input(type="radio" :value="true" v-model="safeSettings.experimentalVerifyPassword")
+
+              .radio
+                | 关闭
+                input(type="radio" :value="false" v-model="safeSettings.experimentalVerifyPassword")
+
+          .form-group
+            label.col-sm-2.control-label 后台密码过期时间
+            .col-sm-4
+              input.form-control(type='text' v-model.number='safeSettings.experimentalTimeout')
+              h5.text-danger {{safeSettings.experimentalTimeout}}分钟内无任何操作，需重新进行密码验证。
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-4
+              h5.text-danger(v-if="error") {{error}}
+              h5.text-success(v-if="info") {{info}}
+              button.btn.btn-primary.btn-block(@click='save') 保存
+
+
+block scripts
+  +includeJS('/experimental/settings/safe/safe.js')

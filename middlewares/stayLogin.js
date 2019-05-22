@@ -21,7 +21,7 @@ module.exports = async (ctx, next) => {
 		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
 	}
-	let userOperationsId = [], userRoles = [], userGrade = [], user;
+	let userOperationsId = [], userRoles = [], userGrade = {}, user;
 	if(userInfo) {
 		const {username, uid} = JSON.parse(decodeURI(userInfo));
 		user = await db.UserModel.findOne({uid});
@@ -29,7 +29,7 @@ module.exports = async (ctx, next) => {
 			ctx.cookies.set('userInfo', '');
 			ctx.status = 401;
 			ctx.error = new Error('缓存验证失败');
-			return ctx.redirect('/login');
+      user = undefined;
 		}
 	}
   let languageName = 'zh_cn';
@@ -59,7 +59,6 @@ module.exports = async (ctx, next) => {
     await db.UserModel.extendUsersInfo([user]);
 		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
-		user.subscribeUsers = (await db.UsersSubscribeModel.findOne({uid: user.uid})).subscribeUsers;
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
     user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
     languageName = user.generalSettings.language;
@@ -104,7 +103,7 @@ module.exports = async (ctx, next) => {
       }
       // 根据用户的角色获取权限
       await Promise.all(user.certs.map(async cert => {
-        role = await db.RoleModel.extendRole(cert);
+        const role = await db.RoleModel.extendRole(cert);
         if(!role) return;
         userRoles.push(role);
         for(let operationId of role.operationsId) {
@@ -118,11 +117,12 @@ module.exports = async (ctx, next) => {
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
   ctx.state.lang = (type, operationId) => {
-    return ctx.state.language[type][operationId];
-  }
+    return ctx.state.language[type][operationId] || operationId;
+  };
+
 	data.userOperationsId = userOperationsId;
 	data.userRoles = userRoles;
-	data.userGrade = userGrade || {};
+	data.userGrade = userGrade;
   data.user = user;
 	await next();
 };

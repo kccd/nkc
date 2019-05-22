@@ -7,7 +7,10 @@ module.exports = {
 			PATCH: 'moveThread'
 		},
 		moveDraft: {
-			PATCH: 'moveDraft'
+			PATCH: 'moveDraft',
+      reason: {
+        PATCH: "modifyReasonThreadReturn"
+      }
 		},
 		addColl: {
 			POST: 'collectThread'
@@ -37,7 +40,11 @@ module.exports = {
     forum: {
       POST: 'addThreadForum',
       DELETE: 'removeThreadForum',
-      PATCH: 'patchThreadForum'
+      // PATCH: 'patchThreadForum'
+    },
+    subscribe: {
+		  POST: "subThread",
+      DELETE: 'unSubThread'
     }
 	}
 };

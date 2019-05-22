@@ -1,5 +1,5 @@
 .UserProfileSection2
-    a(href=`/m/${user.uid}`) 专栏
+    a(href=`/u/${user.uid}`) 名片
     a(href=`/u/${user.uid}/collections/unclassified`) 收藏夹
     a(href=`/message?uid=${user.uid}`) 发私信
 
@@ -10,7 +10,7 @@
 
     br
     span 学术分 #{user.xsf||0}
-    span 科创币 #{user.kcb||0}
+    span 科创币 #{user.kcb/100||0}
 
 
     span 总主题 #{user.threadCount||0} 帖

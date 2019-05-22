@@ -1,0 +1,173 @@
+extends ./index.pug
+
+block name
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  .row
+    .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
+      ul.nav.nav-pills(style="border:1px solid #ddd")
+        li(class=!data.orderStatus || data.orderStatus == "all"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=all`, data-toggle='url') 全部订单
+        li(class=data.orderStatus == "unCost"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=unCost`, data-toggle='url') 待付款
+        li(class=data.orderStatus == "unShip"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=unShip`, data-toggle='url') 待发货
+        li(class=data.orderStatus == "unSign"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=unSign`, data-toggle='url') 待收货
+        li(class=data.orderStatus == "finish"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=finish`, data-toggle='url') 完成的订单
+        li(class=data.orderStatus == "close"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=close`, data-toggle="url") 关闭的订单
+        li(class=data.orderStatus == "refunding"?"active":"")
+          a(href=`/shop/manage/${data.user.uid}/order?orderStatus=refunding`, data-toggle='url') 退款中的订单
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      include ../../interface_navigation_paging
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      a.btn.btn-primary.btn-sm(href=`/shop/manage/${data.user.uid}/order/orderListToExcel`) 订单导出
+    .col-md-12.col-sm-12.col-xs-12  
+      .table-responsive
+        table.table.table-bordered
+          thead
+            tr(style="background-color:silver")
+              th(style="width:300px") 商品名称
+              th 属性
+              th 商品单价
+              th 数量
+              th 实际收款
+              th 交易状态
+              th 操作
+          tbody
+            for order in data.orders
+              tr(style="background-color: #d3f2ff;border-top:2px solid black;") 
+                td(colspan="11") 
+                  p
+                    span(style="font-weight:800") 订单号:&nbsp;
+                    span=order.orderId
+                    span(style="margin-left:20px;font-weight:800") 创建时间:&nbsp;
+                    span=order.orderToc.toLocaleString()
+                    span(style="margin-left:20px;font-weight:800") 买家:&nbsp;
+                    span
+                      a(href=`/u/${order.buyUid}`)!=`${order.buyUser.username}`
+              for para,key in order.params
+                tr(style="min-height:100px")
+                  td
+                    div(style="float:left;margin-right:5px")
+                      img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
+                    div
+                      a(style="font-size:12px" href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
+                  td=para.productParam.name
+                  td
+                    p
+                      span(id=`productSinglePrice${para.costId}`) #{numToFloatTwo(para.singlePrice)}
+                      span(id=`productSingleDiff${para.costId}` style="display:none") 0
+                      if order.orderStatus == "unCost" && !order.closeStatus
+                        span 
+                          a(id=`editPriceBtn${para.costId}` style="cursor:pointer" onclick=`editProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para.costId})`) 修改
+                          a(id=`savePriceBtn${para.costId}` style="cursor:pointer;display:none" onclick=`saveProductSinglePrice(${order.sellUid}, ${order.orderId}, ${para.costId})`) 保存
+                    p(id=`productSinglePriceDom${para.costId}` style="display:none")
+                      span 折扣：
+                      span 
+                        input(id=`productSinglePriceValue${para.costId}` type="text" placeholder="10~999" style="width:20%")
+                      span %&nbsp;&nbsp;
+                      span 
+                      span(id=`productSinglePriceResult${para.costId}`) #{numToFloatTwo(para.productParam.price)}
+                  td
+                    span(id=`productSingleCount${para.costId}`)!=para.count
+                    span(id=`productSingleCountHis${para.costId}` style="display:none")!=para.count
+                    if order.orderStatus == "unCost" && !order.closeStatus
+                      span &nbsp;&nbsp;
+                      span
+                        a(onclick=`editOrderProductCount(${order.sellUid}, ${para.costId}, ${order.orderId})` id=`editCountBtn${para.costId}` style="cursor:pointer") 修改
+                        a(onclick=`saveOrderProductCount(${order.sellUid}, ${para.costId}, ${order.orderId})` id=`saveCountBtn${para.costId}` style="display:none;cursor:pointer") 保存
+                  if key == 0
+                    td(rowspan=`${order.params.length}`)  
+                      p 
+                        span 商品总价：
+                        span(id=`productTotalPrice${order.orderId}`) #{numToFloatTwo(order.orderPrice)}
+                      p 
+                        span 运费：
+                        span(id=`productFreightPrice${order.orderId}`) #{numToFloatTwo(order.orderFreightPrice)}
+                        if order.orderStatus == "unCost" && !order.closeStatus
+                          span &nbsp;&nbsp;
+                          span
+                            a(id=`editFreightBtn${order.orderId}` onclick=`editOrderFreightPrice(${order.sellUid}, ${order.orderId})` style="cursor:pointer") 修改
+                            a(id=`saveFreightBtn${order.orderId}` onclick=`saveOrderFreightPrice(${order.sellUid}, ${order.orderId})` style="display:none;cursor:pointer") 保存
+                      //- p
+                      //-   span 修改运费：&nbsp;&nbsp;
+                      //-   span 
+                      //-     input(type="text" style="width:15%")
+                      p 
+                        span 总计：
+                        span(id=`orderTotalPrice${order.orderId}`) #{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
+                    td(rowspan=`${order.params.length}`)= order.status  
+                      if order.refundStatus === "ing"
+                        span &nbsp;
+                        a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 去处理
+                      p 
+                        a(href=`/shop/manage/${data.user.uid}/order/detail?orderId=${order.orderId}`) 订单详情
+                    td(rowspan=`${order.params.length}`) 
+                      if !order.closeStatus && ["unCost", "unShip"].includes(order.orderStatus)
+                        a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
+                      //- if order.orderStatus == "unCost" && !order.closeStatus
+                      //-   p
+                      //-     button(onclick=`openEditOrderModal(${data.user.uid}, ${order.orderId})`) 修改价格
+                      if order.refundStatus == "ing"
+                        p
+                          a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情
+                      if order.orderStatus == "unSign" || order.orderStatus == "finish"
+                        if !order.trackNumber || order.trackNumber == "no"
+                          p 该订单无物流
+                        else
+                          p
+                            a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
+                      if order.orderStatus == "unShip" && order.closeStatus !== true
+                        p
+                          button(onclick=`openSendGoodsModal(${data.user.uid}, ${order.orderId})`) 发货
+                          //- button(onclick=`test()`) 发货
+              if order.buyMessage
+                tr
+                  td(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" colspan="7")!=`买家留言： ${order.buyMessage}`
+              //- if order.sellMessage
+              tr
+                td 卖家备注：
+                td(id=`sellMessage${order.orderId}` style="font-size: 12px;background-color: #eafff0;" colspan="5" contenteditable=true)!=`${order.sellMessage}`
+                td 
+                  button(onclick=`editSellMessage(${order.sellUid},${order.orderId})`) 保存备注
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
+      include ../../interface_navigation_paging            
+
+  #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 填写运单号
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-2.control-label 快递单号
+              .col-sm-8
+                input.form-control#newtracknumber(type='text')
+            .form-group
+              label.col-sm-2.control-label 快递列表
+              .col-sm-8
+                select.form-control#trackList(name="")
+          input#newstoreid(type="text" style="display:none")
+          input#neworderid(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-info.btn-sm(type="button",onclick=`sendGoodsNoLog()` ) 无物流发货
+          button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
+
+block manageScripts
+  script.
+    var trackListDom = "";
+    $.getJSON('/track.json',function(data){
+      for(var i in data){
+        trackListDom += "<option value='"+data[i]+"'>"+i+"</option>";
+      }
+      $("#trackList").html(trackListDom)
+    });
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/shop/manage/order.js")

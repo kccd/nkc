@@ -30,6 +30,10 @@ const forumSchema = new Schema({
     type: Number,
     default: 0
   },
+  kindName: {
+    type: String,
+    default: ""
+  },
   description: {
     type: String,
     default: '',
@@ -182,6 +186,15 @@ const forumSchema = new Schema({
   type: {
     type: String,
     required: true,
+    index: 1
+  },
+  // 关注类型
+  // force: 强制关注（关注后不可取消）
+  // free: 自由关注（可取消）
+  // unSub: 不可关注（已关注的可取消）
+  subType: {
+    type: String,
+    default: "free",
     index: 1
   }
 }, {toObject: {
@@ -681,6 +694,12 @@ forumSchema.methods.getAllChildForumsId = async function() {
   return await client.smembersAsync(`forum:${this.fid}:allChildForumsId`);
 };
 
+forumSchema.statics.getAllChildForumsIdByFid = async function(fid) {
+  return await client.smembersAsync(`forum:${fid}:allChildForumsId`);
+};
+
+
+
 /* 
   获取专业下的全部专业
   @return 专业对象数组
@@ -692,16 +711,46 @@ forumSchema.methods.getAllChildForums = async function() {
   const forums = await ForumModel.find({fid: {$in: allChildForumsId}});
   return this.allChildForums = forums;
 }
-
+/* 
+  验证多个专业的权限，只要有一个专业无权访问都会抛出403错误
+  @param arr: 专业对象数组[forum1, forums, ...]或专业id数组[fid1, fid2, ...]
+  @param userInfo: 用户对象或uid
+  @author pengixguaa 2019/3/7
+*/
+forumSchema.statics.ensureForumsPermission = async (arr, userInfo) => {
+  const ForumModel = mongoose.model('forums');
+  const UserModel = mongoose.model('users');
+  if(!arr) throwErr(500, 'arr is a required parameter in forum.statics method');
+  let forums = arr;
+  if(forums.length === 0) return;
+  if(forums[0].constructor === String) {
+    forums = await ForumModel.find({fid: {$in: forums}});
+  }
+  if(!userInfo) throwErr(500, `userInfo is a required parameter in forum.statics method`);
+  let user = userInfo;
+  if(userInfo.constructor === String) {
+    user = await UserModel.findById(uid);
+  }
+  if(!user.roles) {
+    await user.extendRoles();
+  }
+  if(!user.grade) {
+    await user.extendGrade();
+  }
+  const fid = await ForumModel.getAccessibleForumsId(user.roles, user.grade, user);
+  await Promise.all(forums.map(async forum => {
+    if(fid.includes(forum.fid)) return;
+    throwErr(403, `您没有权限访问专业【${forum.displayName}】，且无法在该专业下发表任何内容。`)
+  }));
+};
 
 // 判断用户是否有权访问该版块
 forumSchema.methods.ensurePermission = async function(roles, grade, user) {
+  const throwError = require("../nkcModules/throwError");
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
   if(!fid.includes(this.fid)) {
-    const err = new Error('权限不足');
-    err.status = 403;
-    throw err;
+    throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
   }
 };
 
@@ -736,6 +785,13 @@ forumSchema.statics.getAccessibleForums = async (roles, grade, user, baseFid) =>
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
   return await ForumModel.find({fid: {$in: fid}}).sort({order: 1});
+};
+
+// 获取全部商城类别专业
+forumSchema.statics.getAllShopForums = async (roles, grade, user, baseFid) => {
+  const ForumModel = mongoose.model('forums');
+  const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
+  return await ForumModel.find({fid: {$in:fid}, "kindName":"shop"}).sort({order: 1});
 };
 
 // 获取有权限访问的专业ID
@@ -837,6 +893,166 @@ forumSchema.methods.extendRelatedForums = async function(fids) {
   }
   const relatedForums = await ForumModel.find({fid: {$in: relatedForumsId}});
   return this.relatedForums = relatedForums;
-}
+};
+
+/*
+* 加载专业列表，树形结构，并只保留了基本信息（fid，forumType, iconFileName, displayName, parentsId, color）
+* @param {[object]} userRoles 用户的证书对象所组成的数组
+* @param {object} userGrade 用户的等级对象
+* @param {object} user 用户对象
+* @author pengxiguaa 2019-4-18
+* @return {[object]} 专业对象所组成的数组
+* */
+forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
+    }
+  }, {
+    fid: 1,
+    displayName: 1,
+    forumType: 1,
+    color: 1,
+    parentsId: 1,
+    iconFileName: 1,
+    description: 1
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
+  });
+
+  for(let forum of forums) {
+    for(const fid of forum.parentsId) {
+      const parentForum = forumsObj[fid];
+      if(parentForum) {
+        parentForum.childrenForums.push(forum);
+      }
+    }
+  }
+  const result = [];
+  for(let forum of forums) {
+    if(forum.parentsId.length === 0) {
+      result.push(forum);
+    }
+  }
+  return result;
+};
+
+/**
+ * 获取新的专业树形结构
+ */
+forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  const SubscribeModel = mongoose.model("subscribes");
+  const ThreadTypeModel = mongoose.model("threadTypes");
+  const threadTypes = await ThreadTypeModel.find({});
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  const subForums = await SubscribeModel.find({type: "forum", uid: user.uid});
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
+    }
+  }, {
+    fid: 1,
+    displayName: 1,
+    parentsId: 1,
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+
+    forum.id = forum.fid;
+    forum.name = forum.displayName;
+    forum.son = [];
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
+  });
+
+  for(let forum of forums) {
+    for(const fid of forum.parentsId) {
+      const parentForum = forumsObj[fid];
+      if(parentForum) {
+        parentForum.childrenForums.push(forum);
+        parentForum.son.push(forum);
+      }
+    }
+    if(forum.childrenForums.length == 0) {
+      for(const cate of threadTypes) {
+        if(cate.fid == forum.fid) {
+          forum.son.push({
+            id: "c"+cate.cid,
+            name: cate.name,
+            son:[]
+          })
+        }
+      }
+    }
+    if(forum.childrenForums.length == 0) {
+      forum.son.push({
+        id: "",
+        name: "不分类",
+        son: []
+      })
+    }
+  }
+  // 我关注的
+  const mySubForums = {
+    id: "mySub",
+    name: "我关注的",
+    son:[]
+  }
+  for(let subf of subForums) {
+    for(let forum of forums) {
+      if(forum.fid == subf.fid){
+        mySubForums.son.push(forum)
+      }
+    }
+  }
+
+  const result = [];
+  for(let forum of forums) {
+    if(forum.parentsId.length === 0) {
+      result.push(forum);
+    }
+  }
+  if(mySubForums.son.length > 0) {
+    result.unshift(mySubForums)
+  }
+  return result;
+};
+
+/*
+* 获取用户关注的专业
+* @param {String} uid 用户ID
+* @param {[String]} fid 用户可从中获取文章的专业ID
+* @author pengxiguaa 2019-4-28
+* */
+forumSchema.statics.getUserSubForums = async (uid, fid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const ForumModel= mongoose.model('forums');
+  const sub = await SubscribeModel.find({uid, type: "forum"}).sort({toc: 1});
+  let fids = sub.map(s => s.fid);
+  fids = fids.filter(f => fid.includes(f));
+  const subForums = await ForumModel.find({
+    fid: {
+      $in: fids
+    }
+  });
+  const userSubForums = [];
+  subForums.map(forum => {
+    const index = fid.indexOf(forum.fid);
+    userSubForums[index] = forum;
+  });
+  return userSubForums.filter(f => !!f);
+};
 
 module.exports = mongoose.model('forums', forumSchema);

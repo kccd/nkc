@@ -92,6 +92,11 @@ const allInfo = async path => {
   }
 }
 
+// 旋转图片
+const pictureRotate = async path => {
+  return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
+}
+
 const info = async path => {
   let back;
   if(linux) {
@@ -124,6 +129,27 @@ const thumbnailify = (path, dest) => {
     return spawnProcess('convert', [path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
   }
   return spawnProcess('magick', ['convert', path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+};
+
+const mediumify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+}
+
+const originify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '3840x3840', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '3840x3840', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+}
+
+const shopLogoify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-thumbnail', '100x100', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
 };
 
 const generateAdPost = async (path, name) => {
@@ -167,14 +193,15 @@ const bannerify = path => {
   return spawnProcess('magick', ['convert', path, '-resize', `${banner.width}x${banner.height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${banner.width}x${banner.height}+0+0`, path]);
 };
 
-const avatarify = (options) => {
+const avatarLargeify = (options) => {
 	const {top, left, width, height, path, targetPath, needCrop} = options;
+  const avatarHeight = 600;
 	let arr;
 
 	if(needCrop) {
-		arr = [path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${avatarSize}x${avatarSize}+${left}+${top}`, targetPath];
+		arr = [path, '-resize', `${width}x${height}^`, '-crop', `${avatarHeight}x${avatarHeight}+${left}+${top}`, targetPath];
 	} else {
-		arr = [path, '-strip', '-thumbnail', `${avatarSize}x${avatarSize}^`, '-crop', `${avatarSize}x${avatarSize}+0+0`, targetPath];
+		arr = [path, '-resize', `${avatarHeight}x${avatarHeight}^`, '-crop', `${avatarHeight}x${avatarHeight}+0+0`, targetPath];
 	}
 	if(!linux) {
 		arr.unshift('convert');
@@ -185,6 +212,12 @@ const avatarify = (options) => {
 	return spawnProcess('magick', arr);
 };
 
+const avatarify = (path, dest) => {
+  if(linux) {
+    return spawnProcess('convert', [path, '-resize', `${avatarSize}x${avatarSize}`, dest]);
+  }
+  return spawnProcess('magick', ['convert', path, '-resize', `${avatarSize}x${avatarSize}`, dest]);
+};
 
 const avatarSmallify = (path, dest) => {
   if(linux) {
@@ -286,6 +319,20 @@ const forumAvatarify = async (options) => {
 	return spawnProcess('magick', ['convert', path, '-strip', '-thumbnail', `${width}x${height}^`, '-crop', `${forumAvatarSize}x${forumAvatarSize}+${left}+${top}`, targetPath]);
 };
 
+const shopCertImageify = async (path, targetPath) => {
+	if(linux) {
+		return spawnProcess('convert', [path, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, targetPath]);
+};
+const shopCertSmallImageify = async (path, targetPath) => {
+  const width = 150, height = 150;
+	if(linux) {
+		return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath]);
+	}
+	return spawnProcess('magick', ['convert', path, '-resize', `${width}x${height}^`, '-gravity', 'Center', '-quality', '90', '-crop', `${width}x${height}+0+0`, targetPath]);
+};
+
 const webLogoify = async (path, targetPath) => {
 	if(linux) {
 		return spawnProcess('convert', [path, targetPath]);
@@ -357,6 +404,8 @@ module.exports = {
   waterInfo,
   allInfo,
   thumbnailify,
+  mediumify,
+  originify,
   generateAdPost,
   avatarSmallify,
   bannerify,
@@ -375,10 +424,15 @@ module.exports = {
 	userBannerify,
   messageImageSMify,
   friendImageify,
+  avatarLargeify,
   firstFrameToImg,
   videoToH264,
   turnVideo,
-  questionImageify
+  questionImageify,
+  shopLogoify,
+  shopCertImageify,
+  shopCertSmallImageify,
+  pictureRotate
 };
 
 

@@ -1,0 +1,22 @@
+extends ./errorBase
+block errorContent
+  .error-icon=`${data.status} Forbidden`
+  .error-list.b-s-10
+    .error-header 因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：
+    ul
+      li
+        .num 1
+        | 未设置用户名
+      li
+        .num 2
+        | 未设置头像
+      li
+        .num 3
+        | 未绑定手机号
+
+    .error-info 请前往
+      if data.user
+        a(href=`/u/${data.user.uid}/settings`) 资料设置
+      else
+        a(href=`/login`) 资料设置
+      | 页面完善相关信息。

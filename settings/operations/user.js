@@ -2,6 +2,9 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
+    clear: {
+		  POST: "clearUserInfo"
+    },
 		banned: {
 			PATCH: 'unBannedUser',
 			DELETE: 'bannedUser'
@@ -9,11 +12,20 @@ module.exports = {
 		transaction: {
 			GET: 'visitUserTransaction'
 		},
+    // 用户关注的 专业、用户、文章
+    sub: {
+		  t: {
+		    GET: 'visitUserSubThreads'
+      }
+    },
 		settings: {
 			GET: 'visitUserAvatarSettings',
-			avatar: {
-				GET: 'visitUserAvatarSettings',
-			},
+      avatar: {
+        GET: 'visitUserAvatarSettings',
+      },
+      banner: {
+        GET: 'visitUserBannerSettings',
+      },
 			username: {
 				PATCH: 'modifyUsername'
 			},
@@ -72,6 +84,18 @@ module.exports = {
       'red_envelope': {
 			  GET: 'visitUserRedEnvelopeSettings',
         PATCH: 'modifyUserRedEnvelopeSettings'
+      },
+      display: {
+			  GET: 'userDisplaySettings',
+        PATCH: 'userDisplaySettings'
+      },
+      alipay: {
+			  GET: "userBindAlipayAccounts",
+        POST: "userBindAlipayAccounts"
+      },
+      bank: {
+			  GET: 'userBindBankAccounts',
+        POST: 'userBindBankAccounts'
       }
 		},
 		auth: {

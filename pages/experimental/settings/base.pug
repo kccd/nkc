@@ -6,51 +6,82 @@ block title
   title 网站基本设置
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       include ../nav
-      .col-xs-12.col-md-12
-        .row#content
-          -const {telephone, websiteName, github, copyright, record, description, keywords, brief} = data.serverSettings || {};
-          .form-horizontal
-            .form-group
-              label.col-sm-2.control-label 网站名
-              .col-sm-8
-                input.form-control#websiteName(type='text' value=websiteName)
-            .form-group
-              label.col-sm-2.control-label github
-              .col-sm-8
-                input.form-control#github(type='text' value=github)
-            .form-group
-              label.col-sm-2.control-label 电话号码
-              .col-sm-8
-                input.form-control#telephone(type='text' value=telephone)
-            .form-group
-              label.col-sm-2.control-label 版权信息
-              .col-sm-8
-                input.form-control#copyright(type='text' value=copyright)
-            .form-group
-              label.col-sm-2.control-label 备案信息
-              .col-sm-8
-                textarea.form-control#record(rows=5)= record
-            .form-group
-              label.col-sm-2.control-label 网站简介
-              .col-sm-8
-                textarea.form-control#brief(rows=3)= brief
-            .form-group
-              label.col-sm-2.control-label 网站介绍
-              .col-sm-8
-                textarea.form-control#description(rows=5)= description
-            .form-group
-              label.col-sm-2.control-label 关键词
-              .col-sm-8
-                .text-danger 英文逗号 , 分隔
-                textarea.form-control#keywords(rows=5)= keywords ? keywords.join(',') : ''
-            .form-group
-              label.col-sm-2.control-label
-              .col-sm-8
-                button.btn.btn-primary(onclick='submitBase()') 保存
-
+      #data.hidden=objToStr({serverSettings: data.serverSettings})
+      .col-xs-12.col-md-12#app(v-cloak v-if="serverSettings")
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 网站名
+            .col-sm-8
+              input.form-control(type='text' v-model="serverSettings.websiteName")
+          .form-group
+            label.col-sm-2.control-label github
+            .col-sm-8
+              input.form-control(type='text' v-model="serverSettings.github")
+          .form-group
+            label.col-sm-2.control-label 电话号码
+            .col-sm-8
+              input.form-control(type='text' v-model="serverSettings.telephone")
+          .form-group
+            label.col-sm-2.control-label 版权信息
+            .col-sm-8
+              input.form-control(type='text' v-model="serverSettings.copyright")
+          .form-group
+            label.col-sm-2.control-label 备案信息
+            .col-sm-8
+              textarea.form-control(rows=5 v-model="serverSettings.record")
+          .form-group
+            label.col-sm-2.control-label 网站简介
+            .col-sm-8
+              textarea.form-control(rows=3 v-model="serverSettings.brief")
+          .form-group
+            label.col-sm-2.control-label 网站介绍
+            .col-sm-8
+              textarea.form-control(rows=5 v-model="serverSettings.description")
+          .form-group
+            label.col-sm-2.control-label 关键词
+            .col-sm-8
+              .text-danger 英文逗号 , 分隔
+              textarea.form-control(rows=5 v-model="keywords")
+          .form-group
+            label.col-sm-2.control-label 页脚链接
+            .col-sm-8
+              h4.text-danger 每种链接的数量最好不超过7（显示区域限制）
+              mixin linksTable(type, header)
+                -let links = `serverSettings.links.${type}`
+                h4=header
+                table.table.table-bordered
+                  thead
+                    tr
+                      th 名称
+                      th 链接地址
+                      th 其他
+                  tbody
+                    tr(v-for=`l, index in ${links}`)
+                      th
+                        input.form-control(v-model="l.name")
+                      th
+                        input.form-control(v-model="l.url")
+                      th
+                        button.btn.btn-success.btn-sm(@click=`add(${links}, index)`)
+                          .fa.fa-plus
+                        button.btn.btn-danger.btn-sm(@click=`remove(${links}, l)`)
+                          .fa.fa-remove
+                        button(v-if=`index !== ${links}.length - 1` @click=`moveDown(${links}, l)`).btn.btn-default.btn-sm
+                          .fa.fa-chevron-down
+                        button(v-if="index !== 0" @click=`moveUp(${links}, l)`).btn.btn-default.btn-sm
+                          .fa.fa-chevron-up
+              +linksTable("info", "关于")
+              +linksTable("app", "应用")
+              +linksTable("other", "友情链接")
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-8
+              h5.text-danger(v-if="error") {{error}}
+              h5.text-success(v-if="info") {{info}}
+              button.btn.btn-primary.btn-block(@click='save') 保存
 
 
 block scripts

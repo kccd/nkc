@@ -3,13 +3,14 @@ block title
   title= data.status
   -const mainContainer1400 = true
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       if data.status === 404
         .col-xs-12.col-md-12
           -const success = false, prompt = '资源未找到'
           include module_prompt
         .col-xs-12.col-md-8.col-md-offset-2.text-center
+          h4.text-center= data.error
           p!=`path <code>${data.url}</code> does not exist | can not be listed | is not available.`
           br
           img(src='/resources/site_specific/owl_bath.jpg' style='max-width: 100%;')

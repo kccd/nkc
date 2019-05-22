@@ -1,3 +1,14 @@
+var originId = "";
+moduleCrop.init(function(data) {
+  saveNewEditPicture(data);
+}, {
+  canSelectNewImage: false,
+  aspectRatio:0,
+  viewMode:2,
+  errorInfo: "图片编辑失败",
+  resetCrop: true
+});
+
 var quota = 12; // 每页显示数量
 var skip = 0; // 当前页数
 var media;
@@ -29,9 +40,10 @@ $(document).ready(function() {
       appointSkip: 1,
       maxSkip: 0,
       currentSkip: 1,
-      uploadFileList: "",
+      uploadFileList: [],
       uploadFileInfoArr: [],
-      haveFileFail: false
+      haveFileFail: false,
+      netWord: true
     },
     methods: {
       buttonClick: function(type) {
@@ -70,12 +82,15 @@ $(document).ready(function() {
       },
       fileNameShrink: function(name, length) {
         return fileNameShrink(name, length);
-      }
+      },
+      pictureEdit: function(rid) {
+        return pictureEdit(rid)
+      },
     }
   })
   
   loadMedia("all", quota, skip, "not");
-  media.uploadFileList = $("#fileList").files;
+  media.uploadFileList = fileListToArray($("#fileList").files);
   // document.getElementById("paste-target").addEventListener("paste", function(e) {
   //   console.log("粘贴事件");
   //   filePaste(e)
@@ -176,9 +191,16 @@ function attachmentInsert(rid, ext, name) {
 
 // 选择文件
 function fileSelect(obj) {
-  media.uploadFileInfoArr = [];
-  media.uploadFileList = obj.files;
-  var file = obj.files;
+  // media.uploadFileInfoArr = [];
+  if(media.uploadFileList.length == 0){
+    media.uploadFileList = fileListToArray(obj.files);
+  }else{
+    var newFileList = fileListToArray(obj.files)
+    for(var i=0;i<newFileList.length;i++){
+      media.uploadFileList.push(newFileList[i]);
+    }
+  }
+  var file = fileListToArray(obj.files);
   for(var f=0;f<file.length;f++){
     // 文件类型
     var startIndex = file[f].name.lastIndexOf(".");
@@ -251,16 +273,18 @@ function filePaste(e) {
 
 // 上传文件
 function uploadFile() {
+  // console.log(media.uploadFileList)
+  media.netWord = true;
   var items = media.uploadFileList;
   if(items.length == 0) return console.log("暂未选择任何文件");
-  if(items.length > 50) return console.log("队列中文件太多");
+  if(items.length > 50) return console.log("队列中文件数量不得超过50");
   sendFile();
   function sendFile() {
     if(j >= items.length){
       j=0;
       if(!media.haveFileFail){
-        media.uploadFileList = "";
-        media.uploadFileInfoArr = "";
+        media.uploadFileList = [];
+        media.uploadFileInfoArr = [];
       }
       return;
     }
@@ -319,6 +343,10 @@ function uploadFile() {
           }
         }
       }
+      xhr.onerror = function(e) {
+        screenTopWarning("网络错误，上传中断，请重试");
+        media.netWord = false;
+      };
       xhr.open("POST", '/r', true);
       xhr.setRequestHeader("FROM", "nkcAPI");
       xhr.send(formData);
@@ -328,9 +356,9 @@ function uploadFile() {
 
 // 点击选择文件按钮
 function clickButton() {
-  document.getElementById("fileList").value = "";
+  // document.getElementById("fileList").value = "";
   document.getElementById("fileList").click();
-  media.haveFileFail = false;
+  // media.haveFileFail = false;
 }
 
 // 文件大小格式化
@@ -387,4 +415,65 @@ function fileNameShrink(content,length){
 		content = content.substr(0,length) + "...";
 	}
 	return content
+}
+
+// 编辑图片
+function pictureEdit(rid) {
+  // 向服务器获取原图
+  nkcAPI("/imageEdit/getOriginId", "PATCH", {rid: rid})
+  .then(function(data) {
+    if(data.originId) {
+      moduleCrop.replace("/ro/"+data.originId)
+      originId = data.originId;
+    }else{
+      moduleCrop.replace("/r/"+rid)
+    }
+    moduleCrop.show();
+  })
+  .catch(function(data) {
+    screenTopWarning(data || data.error)
+  })
+
+}
+
+
+// 保存新图片
+function saveNewEditPicture(data) {
+  // 添加一张默认图片
+  var imgObj = {
+    dealStatus: "ing"
+  }
+  media.mediaAllLists.pop();
+  media.mediaAllLists.unshift(imgObj);
+  media.mediaPictureLists.pop();
+  media.mediaPictureLists.unshift(imgObj);
+  var formData = new FormData();
+  formData.append("file", data);
+  formData.append("originId", originId);
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function(e) {
+    if(xhr.readyState == 4){
+      if(xhr.status >= 200 && xhr.status < 300){
+        screenTopAlert("图片修改成功");
+        loadMedia("picture", quota, skip, "not");
+        loadMedia("all", quota, skip, "not");
+      }else{
+        screenTopWarning("上传失败");
+      }
+    }
+  }
+  xhr.open("POST", '/imageEdit', true);
+  xhr.setRequestHeader("FROM", "nkcAPI");
+  xhr.send(formData);
+}
+
+// 文件列表对象转数组
+function fileListToArray(list) {
+  var newFileArr = [];
+  for(var i in list) {
+    if(typeof(list[i]) == "object") {
+      newFileArr.push(list[i])
+    }
+  }
+  return newFileArr;
 }

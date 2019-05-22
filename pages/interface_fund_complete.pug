@@ -12,7 +12,7 @@ block content
         h3 请在浏览器新打开的窗口完成支付!
         p 若没有新窗口打开，请检查新窗口是否已被浏览器拦截。
         button(onclick='disappearMask()').btn.btn-default 确定
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     include interface_fund_nav
     .row
       .col-xs-12.col-md-12
@@ -21,7 +21,7 @@ block content
             .col-xs-12.col-md-8
               .panel.panel-default
                 .panel-body
-                  h2.text-center 结项审核
+                  h2.text-center 结题审核
                   h4=`项目名称：${project.t}`
                   h4=`项目ID：${code}`
                   h4= `申请人：`
@@ -34,13 +34,13 @@ block content
                   hr
                   h4 总体情况：
                     if applicationForm.status.successful === true
-                      span.greenFontColor 研究成功
+                      span.greenFontColor 研究完成
                     else if applicationForm.status.successful === false
-                      span.redFontColor 研究失败
+                      span.redFontColor 未完成
                     else
                       span.redFontColor (数据错误，请联系管理员)
                   br
-                  h4 结项报告：
+                  h4 结题报告：
                   p= data.report.c
                   br
                   if !applicationForm.fixedMoney
@@ -94,10 +94,10 @@ block content
                           .actualMoney= a.money
                           .actualTotal= total
                     -fact = fact || aggregate
-                    h3(style='margin-left: 0.5rem;')= `实际批准：${fact || aggregate}元，实际花费：${actualAggregate}元，应退金额：${fact >= actualAggregate?fact-actualAggregate: 0}元 `
+                    h4(style='margin-left: 0.5rem;')= `实际批准：${fact || aggregate}元，实际花费：${actualAggregate}元，应退金额：${fact >= actualAggregate?fact-actualAggregate: 0}元 `
                       span.fund-span(onclick=`window.open('/u/${applicationForm.uid}/bills?fundId=${applicationForm.fund._id.toLowerCase()}')`) 查看账单
                   br
-                  h4 附带帖子：
+                  h4 附带文章：
                   -for(let thread of threads.completed)
                     h4
                       a(href=`/t/${thread.tid}` target='_blank')= thread.firstPost.t
@@ -112,12 +112,12 @@ block content
               .panel.panel-default
                 .panel-body
                   if status.completed
-                    h3 该项目已结项
+                    h3 该项目已结题
                   else
                     if completedAudit
                       h3 结题申请已提交，等待专家审核。
                     else
-                      h2.text-center 结项
+                      h2.text-center 结题
                       h4=`项目名称：${project.t}`
                       h4=`项目ID：${code}`
                       if members && members.length !== 0
@@ -137,10 +137,10 @@ block content
                       span 总体情况：
                       label.radio-inline
                         input(type='radio' name='success' checked=!!status.successful)
-                        h5 研究成功
+                        h5 成功完成
                       label.radio-inline
                         input(type='radio' name='success' checked=!status.successful)
-                        h5 研究失败
+                        h5 未完成
                       textarea.form-control#content(rows=10 placeholder='项目完成情况简介（建议500字左右）')= data.completedReport?data.completedReport.c: ''
                       br
                       if !applicationForm.fixedMoney
@@ -213,7 +213,7 @@ block content
 
                       br
                       h3 结题报告（请在论坛发表，然后添加在下面）
-                      h5 已选择帖子的文号：
+                      h5 已选择文章的文号：
                         #selectedThread
                           span 暂未选择
                         br
@@ -222,7 +222,7 @@ block content
                           input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
                           div#applicationFormId.hidden= applicationForm._id
                           div#fundId.hidden= applicationForm.fund._id
-                        span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的帖子
+                        span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的文章
                         span.fund-span.transparent(style='margin-left: 0' onclick=`clearLog()`) 清空搜索
                         .unselectedThreads
                           .blank(style='color: #aaa;') 暂无数据

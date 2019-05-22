@@ -1,0 +1,119 @@
+extends ../../bootstrap_base
+block title
+  title 科创币提现
+  +includeCSS('/account/finance/finance.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        #data.hidden= JSON.stringify({countToday: data.countToday, withdrawSettings: data.withdrawSettings, user: data.user, alipayAccounts: data.alipayAccounts, bankAccounts: data.bankAccounts})
+        div#app(v-cloak)
+          .row(v-if="succeed").text-center.m-t-4
+            include ../../publicModules/icon-success
+            h3 提现成功
+            h5 您已成功提现
+              strong.text-danger &nbsp;{{succeedMoney/100}}&nbsp;
+              |个科创币，当前科创币剩余
+              strong.text-danger &nbsp;{{user.kcb/100}}&nbsp;
+              |个
+            a(href='/account/finance?t=payout').m-r-1 查看记录
+            a(href='/account/finance/withdraw') 再次提现
+          .row(v-else )
+            .col-xs-12.col-xs-12
+              include ./nav
+            .col-xs-12.col-xs-12.m-t-1
+              h5.text-danger 注意事项：
+              ul
+                li 可提现的时间段为
+                  strong.text-danger &nbsp;{{timeBegin}}&nbsp;
+                  |到
+                  strong.text-danger &nbsp;{{timeEnd}}&nbsp;
+                li 单笔提现金额不能低于
+                  strong.text-danger &nbsp;{{withdrawSettings.withdrawMin/100}}&nbsp;
+                  |元，不能超过
+                  strong.text-danger &nbsp;{{withdrawSettings.withdrawMax/100}}&nbsp;
+                  |元
+                li 每天有
+                  strong.text-danger &nbsp;{{withdrawSettings.withdrawCount}}&nbsp;
+                  |次提现机会，您今天还有
+                  strong.text-danger &nbsp;{{withdrawSettings.withdrawCount - countToday < 0?0:withdrawSettings.withdrawCount - countToday}}&nbsp;
+                  |次提现机会
+            .col-xs-12.col-xs-12.text-center.h4.m-t-5.m-b-5(v-if="!withdrawSettings.withdrawStatus") 暂时关闭
+            .col-xs-12.col-xs-12.text-center.h4.m-t-5.m-b-5(v-else-if="outTime")
+              span 暂未开放，允许提现的时间段为：
+                strong.text-danger {{timeBegin}} 到 {{timeEnd}}
+            .col-xs-12.col-xs-12.text-center.h4.m-t-5.m-b-5(v-else-if="count <= 0")
+              span 您今日的提现次数已用完，请明天再试
+            .col-xs-12.col-xs-12(v-else)
+              .m-t-1
+                h4 提现到
+                .row
+                  .col-xs-4.col-md-2
+                    .payment-pannel(:class="{'active': to === 'alipay'}")
+                      .pointer(v-if='to === "alipay"')
+                        .fa.fa-check
+                      span 支付宝
+                  //-.col-xs-4.col-md-2
+                    .payment-pannel
+                      //-.pointer
+                        .fa.fa-check
+                      span 银行
+              .m-t-1
+                h4 选择支付宝账户
+                h5.text-danger(v-if="!alipayAccounts.length") 您未添加支付宝账号，
+                  a(href=`/u/${data.user.uid}/settings/alipay` target="_blank") 去添加
+                .row(v-else)
+                  .col-xs-12.col-md-4.m-b-1(v-for="alipay in alipayAccounts" @click="selectAccount(alipay)")
+                    .payment-pannel(:class="{'active': selectedAccount.account === alipay.account}")
+                      .default(v-if="alipay.default") 默认
+                      .pointer(v-if='selectedAccount.account === alipay.account')
+                        .fa.fa-check
+                      span {{alipay.account}} {{alipay.name}}
+                  .col-xs-12.m-t-1
+                    a(href=`/u/${data.user.uid}/settings/alipay` target="_blank") 其他账号
+              .m-t-1
+                h4 输入科创币提现金额&nbsp;
+                  small 从您的账户最多可提现：
+                    strong.text-danger {{user.kcb/100}}&nbsp;
+                    | 元
+                .row
+                  .col-xs-12.col-md-12
+                    .row
+                      .col-xs-12.col-md-4
+                        input.form-control(type="text" v-model.number="money")
+                      .col-xs-12.col-md-12
+                        h5.text-danger(v-if="money") 因服务商（非科创）将收取
+                          strong.text-danger &nbsp;{{withdrawSettings.withdrawFee*100}}%&nbsp;
+                          |的手续费，您的账户实际将到账
+                          strong.text-danger &nbsp;{{realMoney}}&nbsp;
+                          |元
+              .m-t-1
+                h4 输入短信验证码
+                if data.user.authLevel < 1
+                  h5.text-danger 您未绑定手机号，
+                    a(href=`/u/${data.user.uid}/settings/mobile` target="_blank") 去绑定
+                else
+                  .row
+                    .col-xs-12.col-md-2
+                      input.form-control(type="text" v-model="code")
+                    .col-xs-12.col-md-3
+                      button.btn.btn-default(v-if="!timeLimit" @click="sendMessage") 发送验证码
+                      button(v-else).btn.btn-default.disabled 发送验证码({{timeLimit}})
+              .m-t-1
+                h4 输入登录密码
+                .row
+                  .col-xs-12.col-md-4
+                    input.form-control(type="password" v-model="password" autocomplete="new-password")
+              .m-t-1
+                hr
+                .text-center
+                  h4.text-danger(v-if='error') {{error}}
+                  h4.text-success(v-if='info') {{info}}
+                  button.pay.cp(@click='submit' v-if="!submitted") 提交
+                  button.pay.cp(v-else) 提交中...
+
+
+
+
+block scripts
+  +includeJS('/account/finance/withdraw.js')

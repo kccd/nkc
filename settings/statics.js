@@ -6,15 +6,19 @@ const fontTtf = path.resolve('resources/default_things/simsun.ttc');
 const banner = path.resolve('resources/site_specific/ad_default.jpg');
 const defaultPfBannerPath = defaultPath + '/default_pf_banner.jpg';
 const defaultPfAvatarPath = defaultPath + '/default_pf_avatar.jpg';
-const defaultAvatarPath = defaultPath + '/default_avatar.gif';
-const defaultAvatarSmallPath = defaultPath + '/default_avatar_small.gif';
-const defaultThumbnailPath = defaultPath + '/default_thumbnail2.png';
+const defaultAvatarPath = defaultPath + '/default_user_avatar.jpg';
+const defaultAvatarSmallPath = defaultPath + '/default_user_avatar.jpg';
+const defaultShopLogoPath = defaultPath + '/default_shopLogo.jpg';
+const defaultThumbnailPath = defaultPath + '/default_thumb_image.jpg';
+const defaultMediumPath = defaultPath + '/default_medium_image.jpg';
+const defaultOriginPath = defaultPath + '/default_origin_image.jpg';
 const siteSpecificPath = path.resolve('resources/site_specific');
 const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 const defaultUserBannerPath = defaultPath + '/default_user_banner.jpg';
 const defaultMessageFilePath = defaultPath + '/default_resource_image.jpg';
 const defaultVideoCoverPath = defaultPath + '/videoCover.jpg';
+const defaultForumBannerPath = defaultPath + "/forum_banner.jpg";
 
 const staticPath = path.resolve('public/statics');
 const defaultRoleIconPath = staticPath + '/role_icon';
@@ -28,12 +32,17 @@ module.exports = {
   defaultPfAvatarPath,
   defaultAvatarPath,
   defaultAvatarSmallPath,
+  defaultShopLogoPath,
   defaultThumbnailPath,
+  defaultMediumPath,
+  defaultOriginPath,
 	defaultUserBannerPath,
   defaultPath,
   attachIconPath,
   defaultAdPath,
   defaultImageResourcePath,
   defaultMessageFilePath,
+  defaultForumBannerPath,
   defaultVideoCoverPath
+
 };

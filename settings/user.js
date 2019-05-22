@@ -95,12 +95,10 @@ const scoreArithmetic = function(user, coeMap) {
   return arr.reduce((last, current) => last + current, 0)
 };
 
-const vitalityArithmetic = function(lWThreadCount, lWPostCount, xsf = 0) {
+const vitalityArithmetic = function(lWThreadCount, lWPostCount) {
   lWThreadCount = Number(lWThreadCount);
   lWPostCount = Number(lWPostCount);
-  let xsfResult = Math.round(Math.sqrt(Number(xsf + 1)));
-  if(xsfResult > 2) {xsfResult = 2}
-  return (lWThreadCount*3 + lWPostCount) * xsfResult;
+  return (lWThreadCount*3 + lWPostCount);
 };
 
 module.exports = {

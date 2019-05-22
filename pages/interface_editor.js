@@ -13,6 +13,12 @@ $(function() {
 
 });
 
+if($("#targetPost").length > 0) {
+  paperProto.init(JSON.parse($("#targetPost").text()));
+}else{
+  paperProto.init();
+}
+
 function dataURItoBlob (base64Data) {  
   var byteString;  
   if (base64Data.split(',')[0].indexOf('base64') >= 0)  
@@ -238,6 +244,7 @@ function Editor() {
       this.draft.onclick = saveDraft(self);
       // 加入保存草稿的定时器，三分钟保存一次
       setInterval(saveDraft(self), 180000);
+      // setInterval(saveDraft(self), 10000);
 		}
 	  if(this.query.type && this.query.type !== 'forum' && this.query.type !== 'redit') {
 		  this.blocked = true;
@@ -479,6 +486,16 @@ function saveDraft(that){
       desType: desType,
       desTypeId: desTypeId
     };
+    var paperObj = {};
+    try{
+      paperObj = paperProto.paperExport();
+    }catch(e) {
+      screenTopWarning(e);
+      return;
+    }
+    for(var i in paperObj) {
+      post[i] = paperObj[i]
+    } 
     mathfreshnew();
     var userId = $("#userNowId").html()
     var method = "POST";
@@ -544,15 +561,23 @@ function onPost(that) {
 
 		var id = that.blocked ? that.query.id : that.childID;
 		if(type === 'forum' || !type || desType === 'forum') {
-			
-			try{
-        var obj = getFidAndCidResult();
-      }catch(e){
-        screenTopWarning(e)
+      var panelObj = $("#tabPanel").tagsinput("items");
+      if(panelObj.length == 0) {
+        screenTopWarning("请选择专业")
         return;
+      }else{
+        for(var po=0;po<panelObj.length;po++) {
+          if(fids.indexOf(panelObj[po].fid) == -1) {
+            fids.push(panelObj[po].fid)
+          }
+          if(panelObj[po].cid !== "") {
+            var dealCid = panelObj[po].cid.substr(1);
+            if(cids.indexOf(dealCid) == -1) {
+              cids.push(dealCid)
+            }
+          }
+        }
       }
-      if(obj.fids) fids = obj.fids;
-      if(obj.cids) cids = obj.cids;
       id = fids[0];
       cat = cids[0];
 			type = 'forum';
@@ -561,9 +586,6 @@ function onPost(that) {
 				id = that.query.id;
 			}
 		}
-
-
-
     var language = that.language?that.language.value.toLowerCase().trim():'html'
     if (content === '') {
       screenTopWarning('请填写内容。');
@@ -594,6 +616,20 @@ function onPost(that) {
       desType: desType,
       desTypeId: desTypeId
     };
+    if(type == "post" || type == "thread" || type == "forum") {
+      if(!specialMark || specialMark == "new") {
+        var paperObj;
+        try{
+          paperObj = paperProto.paperExport();
+        }catch(e) {
+          screenTopWarning(e);
+          return;
+        }
+        for(var i in paperObj) {
+          post[i] = paperObj[i]
+        }
+      }
+    }
     /*if (!that.blocked && (!that.childID)) {
       screenTopWarning('未指定正确的发送目标, 请选择正确的学院 -> 专业');
       return;
@@ -655,7 +691,7 @@ function onPost(that) {
         }
       })
       .catch(function (data) {
-        jwarning(data || data.error);
+        screenTopWarning(data || data.error);
         geid('post').disabled = false
       })
   }

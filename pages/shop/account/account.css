@@ -1,0 +1,69 @@
+.shop-account-header{
+  background-color: #eee;
+  height: 3rem;
+  color: #999;
+  line-height: 3rem;
+  font-size: 1.2rem;
+  padding: 0 1rem;
+  cursor: pointer;
+}
+.shop-account-left-list ul{
+  padding-left: 0;
+  margin-bottom: 0;
+}
+.shop-account-left-list li{
+  list-style: none;
+}
+.shop-account-left-list li:first-child{
+  padding-top: 0.5rem;
+}
+.shop-account-left-list li:last-child{
+  padding-bottom: 0.5rem;
+}
+.shop-account-left-list a{
+  display: block;
+  color: #333;
+  padding: 0.2rem 1rem;
+  font-size: 1.2rem;
+}
+.shop-account-left-list a:hover{
+  color: #ff8c5c;
+  text-decoration: none;
+}
+.user-avatar{
+  height: 7rem;
+  width: 7rem;
+  border-radius: 50%;
+  vertical-align: top;
+}
+.user-base-info-name{
+  display: inline-block;
+  padding-left: 1rem;
+}
+.user-base-info .username{
+  font-size: 2rem;
+}
+.shop-goods{
+  display: flex;
+  display: -webkit-flex;
+  padding: 1rem 0;
+}
+.shop-goods-info{
+  flex-grow: 1;
+}
+.shop-goods-img{
+  flex-grow: 0;
+}
+.shop-goods-img img{
+  height: 7rem;
+  width: 7rem;
+}
+.shop-goods-option{
+  flex-grow: 0;
+}
+.shop-goods-info{
+  padding-left: 1rem;
+}
+.shop-goods-info .title{
+  font-size: 1.3rem;
+}

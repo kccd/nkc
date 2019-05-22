@@ -1,0 +1,44 @@
+//- 用户悬浮面板
+    在 block scripts 下引入
+    在需要显示面板的dom上添加如下两个属性
+      onmouseover=`vue_user_panel_float.loadUser('${objToStr(userObj)}')`
+      onmouseleave="vue_user_panel_float.close()"
+    @author pengxiguaa 2019-5-6
+
++includeCSS("/publicModules/vue_user_panel/vue_user_panel_float.css")
+
+#vue_user_panel_float(v-cloak
+  @mouseenter="onPanel"
+  @mouseleave="outPanel"
+)
+  transition(name="fade")
+    div.content(v-if="show" :style="'top: ' + top+'px;left: ' + left + 'px;'")
+
+      .user_base
+        .user_banner(:style="'background-image: url(/u/' + user.uid + '/banner)'")
+        .user_mask
+        .user-button
+          .fa.fa-remove(@click="outPanel")
+        .user_avatar
+          a(:href="'/avatar/' + user.uid + '?t=lg'" target="_blank")
+            img(:src="'/avatar/' + user.uid")
+          .user_id ID：{{user.uid}}
+        .user_div
+          a(:href="'/u/' + user.uid" target="_blank").user_name {{user.username}}
+
+          .user_cert {{user.certsName}}
+          .user_description {{user.description}}
+      .user_info
+        a.clear-a-style(:href="'/u/' + user.uid + '?t=thread'").col-xs-3
+          .user_info_count {{user.threadCount}}
+          .user_info_title 文章
+        a.clear-a-style(:href="'/u/' + user.uid").col-xs-3
+          .user_info_count {{user.postCount}}
+          .user_info_title 回复
+        .col-xs-3
+          .user_info_count {{user.xsf}}
+          .user_info_title 学术分
+        .col-xs-3
+          .user_info_count {{user.kcb/100}}
+          .user_info_title 科创币
++includeJS("/publicModules/vue_user_panel/vue_user_panel_float.js")

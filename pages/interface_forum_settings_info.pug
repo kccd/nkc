@@ -5,7 +5,7 @@ block title
   -const forum = data.forum;
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_forum_settings
@@ -28,7 +28,7 @@ block content
                 .col-sm-5
                   input.form-control.demo#color(type='text' value=forum.color || '' data-control='hue')
               .form-group
-                label.col-sm-2.control-label 专业简介
+                label.col-sm-2.control-label 专业简介（15字以内）
                 .col-sm-5
                   textarea.form-control#brief(placeholder='请输入专业简介（15字以内）' rows=2)= forum.brief || ''
               .form-group

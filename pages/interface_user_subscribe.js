@@ -17,7 +17,7 @@ function submit(id) {
 	nkcAPI('/u/'+id+'/subscribe/register', 'POST', obj)
 		.then(function(data) {
 			screenTopAlert('提交成功');
-			var url = data.url;
+			var url = data.redirect;
 			setTimeout(function() {
 				window.location.href = url;
 			}, 1500);

@@ -1,0 +1,153 @@
+extends ../bootstrap_base
+block title
+  title=`${data.targetUser.username || data.targetUser.uid} - ${data.serverSettings.websiteName}`
+  +includeCSS("/user/user.css")
+block content
+  .container-fluid.max-width
+    include ../publicModules/mobile_drawer/mobile_drawer
+    .row
+      .col-xs-12.col-md-2
+        .user-card-panel.m-b-2
+          .user-image
+            if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
+              .btn-ban
+                .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
+
+                <ul class="dropdown-menu">
+                  if data.targetUser.certs.includes("banned") && permission("unBannedUser")
+                    li
+                      a(href=`javascript: bannedUser("${data.targetUser.uid}", false)`) 解除封禁
+                    <li role="separator" class="divider"></li>
+                  if !data.targetUser.certs.includes("banned") && permission("bannedUser")
+                    li
+                      a(href=`javascript: bannedUser("${data.targetUser.uid}", true)`) 封禁
+                    <li role="separator" class="divider"></li>
+                  if permission("clearUserInfo")
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "avatar")`) 删除头像
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "banner")`) 删除背景
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "username")`) 删除用户名
+                    li
+                      a(href=`javascript: clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
+                </ul>
+            .user-banner-mask
+            a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank").user-avatar
+              img(src=`/avatar/${data.targetUser.uid}`)
+            .user-banner(style=`background-image: url(/u/${data.targetUser.uid}/banner);`)
+          .user-name=data.targetUser.username || data.targetUser.uid
+          .user-certs=data.targetUser.info.certsName
+          if !data.user || data.user.uid !== data.targetUser.uid
+            .user-button
+              if data.user
+                a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+                if data.userSubUid.includes(data.targetUser.uid)
+                  a(href=`javascript: subscribeUser("${data.targetUser.uid}", false)`) 已关注
+                else
+                  a(href=`javascript: subscribeUser("${data.targetUser.uid}", true)`) 关注
+              else
+                a(href=`/login`) 私信
+                a(href=`/login`) 关注
+          .user-number
+            .col-xs-3
+              .number=data.targetUser.threadCount - data.targetUser.disabledThreadsCount
+              .title 文章
+            .col-xs-3
+              .number=data.targetUser.postCount - data.targetUser.disabledPostsCount
+              .title 回复
+            .col-xs-3
+              .number=data.targetUser.xsf
+              .title 学术分
+            .col-xs-3(title=`科创币：${data.targetUser.kcb/100}`)
+              .number=data.targetUser.kcb/100
+              .title 科创币
+          .user-description!=markdown(data.targetUser.description || "")
+          .user-register=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
+        #leftDom.hidden-sm.hidden-xs
+          if data.targetUserSubForums && data.targetUserSubForums.length > 0
+            .user-card-panel.m-b-2
+              .user-card-panel-header 关注的领域
+              -const forumsItem = data.targetUserSubForums;
+              .user-card-sub-div
+                include ../publicModules/forums_nav/forums_item
+          .m-b-1
+            include ../publicModules/share/user-card
+          if data.user &&  data.user.uid !== data.targetUser.uid
+            .m-b-1
+              .user-card-complaint(
+                onclick=`moduleComplaint.open('user', '${data.targetUser.uid}')`
+              ) 投诉
+      .col-xs-12.col-md-7
+        .post-panel.b-s-10.m-b-2
+          include ../publicModules/paging/user_card
+          include ../publicModules/paging/paging
+          if data.t === "thread" || !data.t
+            if data.posts.length === 0
+              .user-list-warning 用户貌似未发表过任何内容~
+            else
+              -let insert = false;
+              for post, index in data.posts
+                if index
+                  hr
+                if data.paging.page === 0 && !data.t
+                  if index > 2 && !insert
+                    -insert = true;
+                    include ./summary
+                    hr
+                include ./single_post
+              if data.paging.page === 0 && !data.t
+                if !insert
+                  include ./summary
+          else
+            .row.p-t-1.p-b-1
+              if data.noPromission
+                .user-list-warning
+                  if !data.user
+                    | 登录后可查看更多
+                  else
+                    | 添加该用户为消息好友后可查看更多，
+                    a(href="/message" target="_blank") 去添加
+              else
+                if data.users.length === 0
+                  .user-list-warning 空空如也~
+                else
+                  for targetUser in data.users
+                    .col-xs-12.col-md-6
+                      include ../publicModules/user_panel/user_panel_md
+          include ../publicModules/paging/paging_input
+      .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
+        include ../module_scrollTo
+        if data.targetUserDigestThreads && data.targetUserDigestThreads.length > 0
+          .m-b-2
+            -let sideThreads = data.targetUserDigestThreads
+            -let sideThreadsHeader = "作者精选"
+            include ./side_thread_list
+        if data.featuredThreads && data.featuredThreads.length > 0
+          .m-b-2
+            -let sideThreads = data.featuredThreads
+            -let sideThreadsHeader = "推荐文章"
+            include ./side_thread_list
+        if data.recommendThreads && data.recommendThreads.length > 0
+          .m-b-2
+            -let sideThreads = data.recommendThreads
+            -let sideThreadsHeader = "全站精选"
+            include ./side_thread_list
+        if data.targetUserFans && data.targetUserFans.length > 0
+          .m-b-2
+            -let sideUsers = data.targetUserFans
+            -let sideUsersHeader = "粉丝"
+            -let sideUsersLink = `/u/${data.targetUser.uid}?t=fans`
+            include ./side_user_list
+        if data.targetUserFollowers && data.targetUserFollowers.length > 0
+          .m-b-2
+            -let sideUsers = data.targetUserFollowers
+            -let sideUsersHeader = "关注"
+            -let sideUsersLink = `/u/${data.targetUser.uid}?t=follow`
+            include ./side_user_list
+
+block scripts
+  include ../publicModules/vue_user_panel/vue_user_panel_float
+  include ../publicModules/complaint/complaint
+  +includeJS("/echarts/dist/echarts.min.js")
+  +includeJS("/user/summary.js")

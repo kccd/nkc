@@ -1,16 +1,88 @@
 module.exports = {
 	GET: 'visitExperimentalStatus',
+  login: {
+	  GET: "experimentalLogin",
+    POST: "experimentalLogin"
+  },
 	status: {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		shop: {
+			GET: 'visitShopSettings',
+			refunds: {
+				GET: 'visitShopRefundList',
+				refundDetail: {
+					GET: 'visitShopRefundDetail'
+				},
+				agree: {
+					POST: 'shopAgreeRefundApply'
+				},
+				disagree: {
+					POST: 'shopDisagreeRefundApply'
+        },
+        settings: {
+          GET: "visitShopRefundSettings",
+          PATCH: "modifyShopRefundSettings"
+        }
+			},
+			products: {
+				GET: "visitiShopProducts",
+				bansale:{
+					PATCH: "shopAdminBanProductSale"
+				},
+				clearban: {
+					PATCH: "shopAdminClearBanSale"
+				}
+			},
+			auth: {
+				GET: "visitShopAuth",
+				POST: "setShopAuth",
+				delban: {
+					PATCH: "delShelfAuth"
+				}
+			},
+			applys: {
+				GET: 'visitShopOpenStoreApplys',
+				approve: {
+					POST: 'approveApplyStore'
+				},
+				reject: {
+					POST: "rejectApplyStore"
+				}
+			},
+			homeSetting: {
+				carousel: {
+					GET: 'visitHomeSettingCarousel',
+					POST: 'changeHomeSettingCarousel',
+					PATCH: 'deleteHomeSettingCarousel'
+				},
+				featured: {
+					GET: 'visitHomeSettingFeatured',
+					POST: 'changeHomeSettingFeatured'
+				},
+				recommendation: {
+					GET: 'visitHomeSettingRecommendation',
+					POST: 'changeHomeSettingRecommendation'
+				},
+				popular: {
+					GET: 'visitHomeSettingPopular',
+					POST: 'changeHomeSettingPopular'
+				}
+			}
+		},
+		protocol: {
+			GET: 'visitProtocolSetting',
+			POST: 'postNewProtocol',
+			PARAMETER: {
+				GET: "visitProtocolType",
+				PATCH: "updateProtocolType",
+				POST: "deleteProtocolType"
+			}
+		},
 	  login: {
 	    GET:'visitLoginSettings',
       PATCH: 'modifyLoginSettings'
-    },
-    register: {
-      GET: 'visitRegisterSettings',
-      PATCH: 'modifyRegisterSettings'
     },
 		sms: {
 			GET: 'visitSmsSettings',
@@ -92,14 +164,6 @@ module.exports = {
 			GET: 'visitEForumSettings',
 			PATCH: 'modifyEForumSettings'
 		},
-		/*score: {
-			GET: 'visitScoreSettings',
-			PATCH: 'modifyScoreSettings'
-		},*/
-		/*download: {
-			GET: 'visitDownloadSettings',
-			PATCH: 'modifyDownloadSettings'
-		},*/
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',
@@ -116,7 +180,10 @@ module.exports = {
 		},
 		kcb: {
 			GET: 'visitKcbSettings',
-			PATCH: 'modifyKcbSettings'
+			PATCH: 'modifyKcbSettings',
+      record: {
+        PATCH: "modifyWithdrawRecord"
+      }
 		},
     xsf: {
 		  GET: 'visitXsfSettings',
@@ -146,17 +213,33 @@ module.exports = {
 			GET: 'visitEPostSettings',
 			PATCH: 'modifyEPostSettings'
 		},
+    sub: {
+      GET: "experimentalSubSettings",
+      PATCH: "experimentalSubSettings"
+    },
+    register: {
+      GET: "experimentalRegisterSettings",
+      PATCH: "experimentalRegisterSettings"
+    },
+    safe: {
+      GET: "experimentalSafeSettings",
+      PATCH: "experimentalSafeSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'
-    }
+    },
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',
-		POST: 'sendSystemInfo'
+		POST: 'sendSystemInfo',
+    PATCH: "modifySystemInfo"
 	},
 	log: {
 		GET: 'visitPublicLogs',
+    recycle: {
+		  GET: 'visitRecycleMarkThreads'
+    },
 		public: {
 			GET: 'visitPublicLogs',
 			DELETE: 'deletePublicLogs'
@@ -177,10 +260,23 @@ module.exports = {
 			GET: 'visitScoreLogs'
 		},
     kcb: {
-		  GET: 'visitExperimentalKcb'
+		  GET: 'visitExperimentalKcb',
+      diff: {
+		    GET: "visitExperimentalDiffKcb",
+        POST: "resetExperimentalDiffKcb"
+      }
     },
     xsf: {
 		  GET: 'visitExperimentalXsf'
+    },
+    recharge: {
+		  GET: "visitExperimentalRecharge"
+    },
+    withdraw: {
+		  GET: "visitExperimentalWithdraw"
+    },
+    exam: {
+		  GET: "visitExperimentalExam"
     }
 	},
   console: {

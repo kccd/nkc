@@ -65,7 +65,7 @@ resourceRouter
     const { imageMagick, ffmpeg } = ctx.tools;
     const settings = ctx.settings;
     const { largeImage, upload } = settings.upload.sizeLimit;
-    const { mediaPath, uploadPath, generateFolderName, thumbnailPath, frameImgPath} = settings.upload;
+    const { mediaPath, uploadPath, generateFolderName, thumbnailPath, mediumPath, originPath, frameImgPath} = settings.upload;
     const {selectDiskCharacterUp} = settings.mediaPath;
     
     let mediaRealPath;
@@ -82,6 +82,7 @@ resourceRouter
     // 根据自增id定义文件新名称 saveName
     const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
     let saveName = rid + '.' + extension;
+    let originId = "";
 
     // 根据上传类型确定文件保存路径
     // mediaRealPath
@@ -112,8 +113,16 @@ resourceRouter
     // 图片裁剪水印
     if (['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(extension.toLowerCase()) > -1) {
       // 如果格式满足则生成缩略图
-      const descPathOfThumbnail = generateFolderName(thumbnailPath); // 存放路径
-      const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 路径+名称
+      const descPathOfThumbnail = generateFolderName(thumbnailPath); // 略缩图存放路径
+      const descPathOfMedium = generateFolderName(mediumPath); // 中号图存放路径
+      const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
+      const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
+      // 获取原图id
+      const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
+      originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
+      let originSaveName = originId + '.' + extension;
+      const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
+
 
       // 图片自动旋转
       try{
@@ -139,9 +148,35 @@ resourceRouter
         ctx.throw(400, "图片上传失败，已被放至附件")
         return await next()
       }
-
+      // 获取图片尺寸
+      const { width, height } = await imageMagick.info(path);
+      // 生成无水印原图
+      if(width > 3840 || size > 5242880) {
+        await imageMagick.originify(path, originFilePath)
+      }else{
+        await fs.copyFile(path, originFilePath);
+      }
+      const ro = new ctx.db.OriginImageModel({
+        originId,
+        path: middlePath + originSaveName,
+        tpath: middlePath + originSaveName,
+        ext: extension,
+        uid: ctx.data.user.uid,
+        toc: Date.now()
+      });
+      ctx.data.ro = await ro.save();
       // 生成略缩图
-      await imageMagick.thumbnailify(path, thumbnailFilePath);
+      if(width > 150 || size > 51200) {
+        await imageMagick.thumbnailify(path, thumbnailFilePath);
+      }else{
+        await fs.copyFile(path, thumbnailFilePath);
+      }
+      // 生成中号图
+      if(width > 640 || size > 102400) {
+        await imageMagick.mediumify(path, mediumFilePath);
+      }else{
+        await fs.copyFile(path, mediumFilePath)
+      }
       // 获取个人水印设置
       const waterSetting = await ctx.db.UsersGeneralModel.findOne({uid: ctx.data.user.uid});
       const waterAdd = waterSetting?waterSetting.waterSetting.waterAdd : true;
@@ -212,12 +247,15 @@ resourceRouter
         logoCoor = "+0+0";
         userCoor = "+0+0"
       }
-      // 获取图片尺寸
-      const { width, height } = await imageMagick.info(path);
-      // 如果图片宽度大于1024，则将图片宽度缩为1024
-      if(width > 1920 && size > largeImage){
-        await imageMagick.imageNarrow(path)
+      // 如果图片宽度大于1920，则将图片宽度缩为1920
+      if(size > 500000) {
+        await imageMagick.imageNarrow(path);
+      }else if(width > 1920) {
+        await imageMagick.imageNarrow(path);
       }
+      // if(width > 1920 && size > largeImage){
+      //   await imageMagick.imageNarrow(path)
+      // }
       // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
       if(width > 600 && height > 200 && waterAdd === true){
         if(waterStyle === "siteLogo"){
@@ -350,6 +388,7 @@ resourceRouter
       tpath: middlePath + saveName,
       ext: extension,
       size,
+      originId,
       uid: ctx.data.user.uid,
       toc: Date.now(),
       mediaType: mediaType

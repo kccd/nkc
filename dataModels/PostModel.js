@@ -1,8 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const {Schema} = mongoose;
-const {indexPost, updatePost} = settings.elastic;
-
+// const {indexPost, updatePost} = settings.elastic;
 const postSchema = new Schema({
   pid: {
     type: String,
@@ -129,6 +128,36 @@ const postSchema = new Schema({
   voteDown: {
     type: Number,
     default: 0
+  },
+  // 中文摘要
+  abstractCn: {
+    type: String,
+    default: ""
+  },
+  // 英文摘要
+  abstractEn: {
+    type: String,
+    default: ""
+  },
+  // 中文关键词
+  keyWordsCn: {
+    type: Array,
+    default: []
+  },
+  // 英文关键词
+  keyWordsEn: {
+    type: Array,
+    default: []
+  },
+  // 作者信息
+  authorInfos: {
+    type: Array,
+    default: []
+  },
+  // 原创声明
+  originState: {
+    type: String,
+    default: ""
   }
 }, {toObject: {
   getters: true,
@@ -255,23 +284,25 @@ postSchema.pre('save', async function(next) {
     const {c} = this;
     const atUsers = []; //user info {username, uid}
     const existedUsers = []; //real User mongoose data model
-    // 根据虎哥建议，重写@功能
     // 截取所有@起向后15字符的字符串
     var positions = [];
-    var d = c.replace(/<[^>]+>/g,"");
+    // 引用的内容再次发布，不解析at
+    e = c.replace(/<blockquote.*?blockquote>/im,'')
+    var d = e.replace(/<[^>]+>/g,"");
     var pos = d.indexOf("@");
     while(pos > -1){
       positions.push(d.substr(pos+1, 30));
       pos = d.indexOf("@",pos+1)
     }
     // 验证每个@是否含有特殊字符
-    for(var i in positions){
+    for(var i=0;i<positions.length;i++){
       var atPos = positions[i].indexOf("@"); // @符号位置
       var semiPos = positions[i].indexOf(";"); // 分号位置
       var colonPos = positions[i].indexOf(":"); // 冒号位置
       var ltPos = positions[i].indexOf("<"); // 左尖括号位置
       var comPos = positions[i].indexOf("，"); // 逗号位置
       var perPos = positions[i].indexOf("。"); // 句号位置
+      var spacePos = positions[i].indexOf(" "); // 空格位置
       if(atPos > -1){
         positions[i] = positions[i].substr(0,atPos)
       }else if(semiPos > -1){
@@ -284,12 +315,19 @@ postSchema.pre('save', async function(next) {
         positions[i] = positions[i].substr(0,comPos)
       }else if(perPos > -1){
         positions[i] = positions[i].substr(0,perPos)
+      }else if(spacePos > -1) {
+        positions[i] = positions[i].substr(0,spacePos)
       }
       // 用户名从最后一个字符开始，逐个向前在数据库中查询
       var evePos = positions[i].toLowerCase();
+      // 用户名至少含有一个字符，不可以为空
+      if(evePos == "") {
+        positions.splice(i, 1);
+        break;
+      }
       for(var num = evePos.length;num >= 0;num--){
         var factName = await UserModel.findOne({usernameLowerCase:evePos.substr(0,num)});
-        if(factName){
+        if(factName && factName.username !== ""){
           // positions[i] = factName.username;
           positions[i] = positions[i].substr(0,num);
           break;
@@ -444,7 +482,24 @@ postSchema.pre('save', async function(next) {
 });
 
 postSchema.pre('save', async function(next) {
-  // handle the ElasticSearch index
+  // elasticSearch: insert/update data
+  const elasticSearch = require("../nkcModules/elasticSearch");
+  const ThreadModel = mongoose.model("threads");
+  try{
+    const thread = await ThreadModel.findOne({tid: this.tid});
+    let docType;
+    if(!thread || !thread.oc || thread.oc === this.pid) {
+      docType = "thread";
+    } else {
+      docType = "post"
+    }
+    await elasticSearch.save(docType, this);
+    return next();
+  } catch(err) {
+    return next(err);
+  }
+
+  /*// handle the ElasticSearch index
   try {
     const {_initial_state_: initialState} = this;
     if (!initialState) {
@@ -460,7 +515,8 @@ postSchema.pre('save', async function(next) {
       return next()
   } catch(e) {
     return next(e)
-  }
+
+  }*/
 });
 
 postSchema.post('save', async function(doc, next) {
@@ -534,6 +590,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   });
   if(o.credit) {
     const kcbsRecords = await KcbsRecordModel.find({type: 'creditKcb', pid: {$in: [...pid]}}).sort({toc: 1});
+    await KcbsRecordModel.hideSecretInfo(kcbsRecords);
     for(const r of kcbsRecords) {
       uid.add(r.from);
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
@@ -624,6 +681,105 @@ postSchema.methods.updatePostsVote = async function() {
   this.voteUp = upNum;
   this.voteDown = downNum;
   await this.update({voteUp: upNum, voteDown: downNum});
+};
+/* 
+  新建post
+  @param options
+    title: 标题
+    content: 内容
+    abstractCn: 摘要
+    ip: 用户ip地址
+    tid: 所属的文章ID
+  @return post对象
+  @author pengxiguaa 2019/3/7
+*/
+postSchema.statics.newPost = async (options) => {
+  const ForumModel = mongoose.model('forums');
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const {contentLength} = require('../tools/checkString');
+  const {title, content, uid, ip, abstractCn, tid, keyWordsCn} = options;
+  const thread = await ThreadModel.findOne({tid});
+  if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
+  if(thread.closed) throwErr(403, `文章已被关闭，暂不能发表回复`);
+  const user = await UserModel.findById(uid);
+  await ForumModel.ensureForumsPermission(thread.mainForumsId, user);
+  if(!title) throwErr(400, '标题不能为空');
+  if(contentLength(title) > 200) throwErr(400, '标题不能超过200字节');
+  if(!content) throwErr(400, '内容不能为空');
+  if(contentLength(content) < 6) throwErr(400, '内容太短了，至少6个字节');
+  const dbFn = require('../nkcModules/dbFunction');
+  const apiFn = require('../nkcModules/apiFunction');
+  const quote = await dbFn.getQuote(content);
+  let rpid = '';
+  if(quote && quote[2]) {
+    rpid = quote[2];
+  }
+  const pid = await SettingModel.operateSystemID('posts', 1);
+  const _post = await new PostModel({
+    pid,
+    c: content,
+    t: title,
+    abstractCn,
+    keyWordsCn,
+    ipoc: ip,
+    iplm: ip,
+    l: 'html',
+    mainForumsId: thread.mainForumsId,
+    minorForumsId: thread.minorForumsId,
+    tid,
+    uid,
+    uidlm: uid,
+    rpid
+  });
+  await _post.save();
+  await thread.update({
+    lm: pid,
+    tlm: Date.now()
+  });
+  await thread.updateThreadMessage();
+  if(quote && quote[2] !== this.oc) {
+    const username = quote[1];
+    const quPid = quote[2];
+    const quUser = await UserModel.findOne({username});
+    const quPost = await PostModel.findOne({pid: quPid});
+    if(quUser && quPost) {
+      const messageId = await SettingModel.operateSystemID('messages', 1);
+      const message = MessageModel({
+        _id: messageId,
+        r: quUser.uid,
+        ty: 'STU',
+        c: {
+          type: 'replyPost',
+          targetPid: pid+'',
+          pid: quPid+''
+        }
+      });
+
+      await message.save();
+
+      await redis.pubMessage(message);
+    }
+  }
+  if(!user.generalSettings) {
+    await user.extendGeneralSettings();
+  }
+  if(!user.generalSettings.lotterySettings.close) {
+    const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
+    if(!redEnvelopeSettings.c.random.close) {
+      const {chance} = redEnvelopeSettings.c.random;
+      const number = Math.ceil(Math.random()*100);
+      if(number <= chance) {
+        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+        if(postCountToday === 1) {
+          await user.generalSettings.update({'lotterySettings.status': true});
+        }
+      }
+    }
+  }
+  return _post
 };
 
 module.exports = mongoose.model('posts', postSchema);

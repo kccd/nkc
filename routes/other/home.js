@@ -2,15 +2,44 @@ const Router = require('koa-router');
 const homeRouter = new Router();
 homeRouter
 	.get('/', async (ctx, next) => {
+
 		const {data, db, query, nkcModules} = ctx;
+		// 日常登陆
+    await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
+
+    const {today} = nkcModules.apiFunction;
+    if(data.user) {
+      const time = today();
+      const dailyLogin = await db.UsersScoreLogModel.findOne({
+        uid: data.user.uid,
+        type: 'score',
+        operationId: 'dailyLogin',
+        toc: {
+          $gt: time
+        }
+      });
+      if(!dailyLogin) {
+        await db.UserModel.updateUserKcb(data.user.uid);
+        await db.UsersScoreLogModel.insertLog({
+          user: data.user,
+          type: 'score',
+          typeIdOfScoreChange: 'dailyLogin',
+          port: ctx.port,
+          ip: ctx.address,
+          key: 'dailyLoginCount'
+        });
+        await data.user.updateUserMessage();
+      }
+    }
+
 		// 删除退修超时的帖子
 		// 取出全部被标记的帖子
-		const allMarkThreads = await db.ThreadModel.find({ "recycleMark": true, "fid": { "$nin": ["recycle"] } });
+		const allMarkThreads = await db.ThreadModel.find({ "recycleMark": true, "mainForumsId": { "$nin": ["recycle"] } });
 		for (var i in allMarkThreads) {
 			const delThreadLog = await db.DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
 			if(delThreadLog){
-				await allMarkThreads[i].update({ "recycleMark": false, fid: "recycle" })
-				await db.PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"fid":"recycle"}})
+				await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"] })
+				await db.PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
 				await db.DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
         const tUser = await db.UserModel.findOne({uid: delThreadLog.delUserId});
         const thread = await db.ThreadModel.findOne({tid: delThreadLog.threadId});

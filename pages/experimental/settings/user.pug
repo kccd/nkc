@@ -9,7 +9,7 @@ block title
     title 用户管理  
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       include ../nav
       .col-xs-12.col-md-12
@@ -75,6 +75,7 @@ block content
                   select.form-control#searchType
                     option 用户名
                     option UID
+                    option 手机号
                 .form-group
                   input.form-control#searchInput(placeholder='请输入内容')
                 .form-group
@@ -119,7 +120,7 @@ block content
                     tr
                       th
                         img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
-                        a(href=`/u/${user.uid}` target='_blank')= user.username
+                        a(href=`/u/${user.uid}` target='_blank')= user.username || user.uid
                       th= user.threadCount
                       th= user.postCount
                       th
@@ -142,7 +143,7 @@ block content
                         a(href=`/e/settings/user/${user.uid}`) 编辑
               include ../../interface_navigation_paging
 block scripts
-
+  include ../../publicModules/moment
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/experimental/settings/user.js?v=${global.NKC.startTime}`)
 

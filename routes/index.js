@@ -27,50 +27,57 @@ const shareRouter = routers.share;
 const lotteryRouter = routers.lottery;
 const examRouter = routers.exam;
 const forgotPasswordRouter = routers.forgotPassword;
+const shopRouter = routers.shop;
+const accountRouter = routers.account;
+const imageEditRouter = routers.imageEdit;
+const complaintRouter = routers.complaint;
+const searchRouter = routers.search;
+const protocolRouter = routers.protocol;
 
 
 // 所有请求先经过此中间件
-// 日常登陆
-router.use('/', async (ctx, next) => {
-  await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
-  await next();
-});
-
-
-router.use('/', async (ctx, next)  => {
-	const {nkcModules, db, data} = ctx;
-	const {user} = data;
-	const {today} = nkcModules.apiFunction;
-	if(user) {
-		const toc = Date.now();
-		const time = today(toc);
-		const dailyLogin = await db.UsersScoreLogModel.findOne({
-			uid: user.uid,
-			type: 'score',
-			operationId: 'dailyLogin',
-			toc: {
-				$gt: time
-			}
-		});
-    if(!dailyLogin) {
-			await db.UsersScoreLogModel.insertLog({
-				user,
-				type: 'score',
-				typeIdOfScoreChange: 'dailyLogin',
-				port: ctx.port,
-				ip: ctx.address,
-				key: 'dailyLoginCount'
-			});
-			await user.updateUserMessage();
-		}
-	}
-  await next();
-});
+// // 日常登陆
+// router.use('/', async (ctx, next) => {
+//   await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
+//   await next();
+// });
+//
+//
+// router.use('/', async (ctx, next)  => {
+// 	const {nkcModules, db, data} = ctx;
+// 	const {user} = data;
+// 	const {today} = nkcModules.apiFunction;
+// 	if(user) {
+// 		const toc = Date.now();
+// 		const time = today(toc);
+// 		const dailyLogin = await db.UsersScoreLogModel.findOne({
+// 			uid: user.uid,
+// 			type: 'score',
+// 			operationId: 'dailyLogin',
+// 			toc: {
+// 				$gt: time
+// 			}
+// 		});
+//     if(!dailyLogin) {
+// 			await db.UsersScoreLogModel.insertLog({
+// 				user,
+// 				type: 'score',
+// 				typeIdOfScoreChange: 'dailyLogin',
+// 				port: ctx.port,
+// 				ip: ctx.address,
+// 				key: 'dailyLoginCount'
+// 			});
+// 			await user.updateUserMessage();
+// 		}
+// 	}
+//   await next();
+// });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
+router.use("/search", searchRouter.routes(), searchRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
 router.use('/me', meRouter.routes(), meRouter.allowedMethods());
 router.use('/t', threadRouter.routes(), threadRouter.allowedMethods());
@@ -90,9 +97,13 @@ router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
 router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
 router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
-
+router.use("/complaint" ,complaintRouter.routes(), complaintRouter.allowedMethods());
 //router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());
+router.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
+router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
+router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
+router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = router;

@@ -182,5 +182,24 @@ sendMessageRouter
 		await smsCode.save();
 		await sendMessage(smsCodeObj);
 		await next();
-	});
+	})
+  .post("/withdraw", async (ctx, next) => {
+    const {nkcModules, db, data} = ctx;
+    const {user} = data;
+    if(user.authLevel < 1) ctx.throw(400, "请先绑定手机号");
+    const usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const {nationCode, mobile} = usersPersonal;
+    const smsCodeObj = {
+      nationCode,
+      mobile,
+      type: "withdraw",
+      ip: ctx.address
+    };
+    await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+    smsCodeObj.code = nkcModules.apiFunction.random(6);
+    const smsCode = db.SmsCodeModel(smsCodeObj);
+    await smsCode.save();
+    await nkcModules.sendMessage(smsCodeObj);
+    await next();
+  });
 module.exports = sendMessageRouter;

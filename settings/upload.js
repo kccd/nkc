@@ -14,8 +14,12 @@ const paths = {
   pfBannerPath: 'resources/pf_banners',
   pfAvatarPath: 'resources/pf_avatars',
   avatarPath: 'resources/newavatar',
+  shopLogoPath: 'resources/shopLogo',
+  avatarLargePath: 'resources/newavatar_large',
   avatarSmallPath: 'resources/newavatar_small',
   thumbnailPath: 'resources/thumbnails',
+  mediumPath: 'resources/mediums',
+  originPath: 'resources/origins',
   adPath: 'resources/ad_posts',
   siteSpecificPath: 'resources/site_specific',
   qrCodePath: 'resources/qr',
@@ -34,7 +38,9 @@ const paths = {
   iosSavePath: 'resources/app/ios',
   friendImagePath: 'resources/friend_image',
   posterPath: 'resources/poster',
-  questionImagePath: 'resources/question_image'
+  questionImagePath: 'resources/question_image',
+  shopCertsPath: 'resources/shop_certs',
+  forumBannerPath: "resources/forum_banner"
 };
 
 const pathsObj = {};

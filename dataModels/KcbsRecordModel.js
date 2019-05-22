@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const serverConfig = require('../config/server.json');
+const alipay2 = require('../nkcModules/alipay2');
 const kcbsRecordSchema = new Schema({
   _id: Number,
   // 花费科创币用户的ID
@@ -36,6 +38,11 @@ const kcbsRecordSchema = new Schema({
     type: String,
     default: ''
   },
+  // 隐藏备注
+  hideDescription: {
+    type: Boolean,
+    default: false
+  },
   ip: {
     type: String,
     default: '0.0.0.0',
@@ -65,11 +72,39 @@ const kcbsRecordSchema = new Schema({
     default: '',
     index: 1
   },
+  ordersId: {
+    type: [String]
+  },
+  shareToken: {
+    type: String,
+    default: "",
+    index: 1
+  },
+  verify: {
+    type: Boolean,
+    index: 1,
+    default: true,
+  },
+  error: {
+    type: String,
+    default: ''
+  },
   c: {
     type: Schema.Types.Mixed,
-    default: {},
-    index: 1
+    default: {}
   }
+  /*
+  * c: {
+  *  alipayAccount: String,
+  *  alipayName: String,
+  *  alipayFee: Number,
+  *  alipayInterface: Boolean  // 调用阿里接口是否成功 null: 未知，false: 失败， true: 成功
+  *
+  * }
+  *
+  *
+  *
+  * */
 }, {
   collection: 'kcbsRecords',
   toObject: {
@@ -89,6 +124,7 @@ kcbsRecordSchema.virtual('fromUser')
 // 与银行间的交易记录
 kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
+  const UserModel = mongoose.model("users");
   const {nkcModules, address, port, data, db} = ctx;
   const {user} = data;
   if(!user || !u) return;
@@ -114,13 +150,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
           to: u.uid
         }
       ],
-      toc: {$gt: today}
+      toc: {$gte: today}
     });
     // 若次数已达上限则不做任何处理
     if(recordsCount >= kcbsType.count) return;
   }
   // 若kcbsType === -1则不限次数
-  const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
   const _id = await db.SettingModel.operateSystemID('kcbsRecords', 1);
   const newRecords = db.KcbsRecordModel({
     _id,
@@ -131,12 +166,10 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     ip: address,
     port
   });
-  let bankChange = -1*kcbsType.num;
   // 若该操作科创币为负，则由用户转给银行
   if(kcbsType.num < 0) {
     newRecords.from = u.uid;
     newRecords.to = 'bank';
-    bankChange = -1*kcbsType.num;
     newRecords.num = -1*newRecords.num;
   }
   if(data.targetUser) {
@@ -146,17 +179,12 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
       newRecords.tUid = data.targetUser.uid;
     }
   }
-  let thread, forum, post;
+  let thread, post;
   if(data.thread) {
     thread = data.thread;
   } else if (data.targetThread) {
     thread = data.targetThread;
   }
-  /* if(data.forum) {
-    forum = data.forum;
-  } else if (data.targetForum) {
-    forum = data.targetForum;
-  } */
   if(data.post) {
     post = data.post;
   } else if (data.targetPost) {
@@ -171,32 +199,21 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     newRecords.fid = post.fid;
     newRecords.tid = post.tid;
   }
-  // if(forum) newRecords.fid = forum.fid;
   if(data.problem) newRecords.problemId = data.problem._id;
-  try{
-    await newRecords.save();
-  } catch(err) {
-    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
-    ctx.throw(err);
-  }
-  try{
-    await kcbSettings.update({$inc: {'c.totalMoney': bankChange}});
-  } catch(err) {
-    await newRecords.remove();
-    // await db.SettingModel.operateSystemID('kcbsRecords', -1);
-  }
-
-  u.kcb += -1*bankChange;
-  await u.save();
+  // 写入交易记录，紧接着更新用户的kcb数据
+  await newRecords.save();
+  u.kcb = await UserModel.updateUserKcb(u.uid);
 };
 
 // 用户间转账记录
 kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model('settings');
   const {
     fromUser, toUser, num, description, post, ip, port
   } = options;
+  if(fromUser.uid === toUser.uid) throwErr(400, "无法对自己执行此操作");
   const _id = await SettingModel.operateSystemID('kcbsRecords', 1);
   const record = KcbsRecordModel({
     _id,
@@ -209,27 +226,9 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     port,
     type: 'creditKcb'
   });
-  let fromUsersKcb, toUsersKcb;
-  if(fromUser.uid !== toUser.uid) {
-    fromUsersKcb = fromUser.kcb;
-    toUsersKcb = toUser.kcb;
-    fromUser.kcb -= num;
-    toUser.kcb += num;
-  }
-  try{
-    await record.save();
-    await fromUser.save();
-    await toUser.save();
-  } catch(err) {
-    // await SettingModel.operateSystemID('kcbsRecords', 1);
-    if(fromUser.uid !== toUser.uid) {
-      fromUser.kcb = fromUsersKcb;
-      toUser.kcb = toUsersKcb;
-      await fromUser.save();
-      await toUser.save();
-    }
-    throw err;
-  }
+  await record.save();
+  fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
+  toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
 };
 
 
@@ -289,6 +288,59 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     r.kcbsType = typesObj[r.type];
     return r
   });
+};
+
+/* 
+  获取支付宝链接，去充值或付款。付款时需传递参数options.type = 'pay'
+  @param options
+    uid: 充值用户、付款用户
+    money: 金额，分
+    ip: 操作人IP地址,
+    port: 操作人端口，
+    title: 账单标题, 例如：科创币充值
+    notes: 账单说明，例如：充值23个科创币
+    backParams: 携带的参数，会原样返回
+  @return url: 返回链接
+  @author pengxiguaa 2019/3/13  
+*/
+kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
+  let {uid, money, ip, port, title, notes, backParams} = options;
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const SettingModel = mongoose.model('settings');
+  money = Number(money);
+  if(money > 0) {}
+  else {
+    throwErr(400, '金额必须大于0');
+  }
+  const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+  const record = KcbsRecordModel({
+    _id: kcbsRecordId,
+    from: 'bank',
+    to: uid,
+    type: 'recharge',
+    num: money,
+    ip,
+    port,
+    verify: false,
+    description: notes
+  });
+  await record.save();
+  const o = {
+    money: money/100,
+    id: kcbsRecordId,
+    title,
+    notes,
+    backParams,
+    returnUrl: serverConfig.domain + '/account/finance/recharge?type=back'
+  };
+  return await alipay2.receipt(o);
+};
+
+kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
+  for(const record of records) {
+    record.c = "";
+    if(record.hideDescription) record.description = "【鼓励理由不符合论坛相关规定，已隐藏】";
+  }
 };
 
 module.exports = mongoose.model('kcbsRecords', kcbsRecordSchema);

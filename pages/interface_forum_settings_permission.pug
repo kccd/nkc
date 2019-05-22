@@ -8,7 +8,7 @@ block title
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
   link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
 block content
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_forum_settings
@@ -22,7 +22,7 @@ block content
                 label.col-sm-3.control-label 总开关
                 .col-sm-5
                   span.fa-switch-icon.fa#accessible(class=forum.accessible?'fa-toggle-on': 'fa-toggle-off')
-                  p.text-danger *关闭后该板块、该板块下的所有帖子都将无法访问，并且会隐藏导航入口
+                  p.text-danger *关闭后该板块、该板块下的所有文章都将无法访问，并且会隐藏导航入口
               .form-group
                 label.col-sm-3.control-label 导航可见
                 .col-sm-5
@@ -91,8 +91,20 @@ block content
               .form-group
                 label.col-sm-3.control-label 主管专家
                 .col-sm-5
-                  input.form-control#moderators(placeholder='请输入uid' value=forum.moderators? forum.moderators.join(','): '')
-
+                  input.form-control#moderators(placeholder='请输入uid' value=forum.moderators ? forum.moderators.join(',') : '')
+              .form-group
+                label.col-sm-3.control-label 关注类型
+                .col-sm-5
+                  h5
+                    .m-b-1
+                      input(type='radio' name='subType' checked=forum.subType==="force")
+                      span.m-l-1 强制关注（未关注的可关注，关注后无法取消）
+                    .m-b-1
+                      input(type='radio' name='subType' checked=forum.subType==="free")
+                      span.m-l-1 自由关注（可随意关注或取消关注）
+                    .m-b-1
+                      input(type='radio' name='subType' checked=forum.subType==="unSub")
+                      span.m-l-1 不可关注（不可关注，已关注的可取消关注）
               .form-group
                 .col-sm-5.col-sm-offset-3
                   button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存

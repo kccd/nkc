@@ -7,6 +7,9 @@
     a.list-group-item(href=`/u/${data.user.uid}/settings/avatar`)
       span.fa.fa-user-circle &nbsp;&nbsp;
       span 头像设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/banner`)
+      span.fa.fa-picture-o &nbsp;&nbsp;
+      span 背景设置
     a.list-group-item(href=`/u/${data.user.uid}/settings/info`)
       span.fa.fa-list-alt &nbsp;&nbsp;
       span 基本资料设置
@@ -31,6 +34,9 @@
     a.list-group-item(href=`/u/${data.user.uid}/settings/red_envelope`)
       span.fa.fa-envelope-open &nbsp;&nbsp;
       span 红包设置
+    a.list-group-item(href=`/u/${data.user.uid}/settings/display`)
+      span.fa.fa-eye &nbsp;&nbsp;
+      span 显示设置
   .panel-heading
     span.panel-titlePanel 账号安全
   .list-group
@@ -43,6 +49,12 @@
     a.list-group-item(href=`/u/${data.user.uid}/settings/email`)
       span.fa.fa-envelope-o &nbsp;&nbsp;
       span 绑定邮箱
+    a.list-group-item(href=`/u/${data.user.uid}/settings/alipay`)
+      span.fa.fa-shopping-cart &nbsp;&nbsp;
+      span 添加支付宝
+    a.list-group-item(href=`/u/${data.user.uid}/settings/bank`)
+      span.fa.fa-university &nbsp;&nbsp;
+      span 添加银行卡
   .panel-heading
     span.panel-titlePanel 身份认证
   .list-group

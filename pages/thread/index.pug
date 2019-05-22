@@ -50,7 +50,13 @@ block title
           li
             a(href=`javascript:at('${post.user.username}')`)
               span.fa.fa-at= ` ${post.user.username}`
+        if targetThread && targetThread.oc === post.pid
+          li
+            a(href=`/t/${thread.tid}?t=author`)
+              .fa.fa-filter &nbsp;只看作者
+
         if targetThread && targetThread.oc === post.pid && data.user && data.userOperationsId.includes('collectThread')
+
           li
             if data.collected
               a(href=`javascript: addColl('${thread.tid}')`)
@@ -58,6 +64,13 @@ block title
             else
               a(href=`javascript: addColl('${thread.tid}')`)
                 span.fa.fa-folder-o &nbsp;加入收藏
+          li
+            if data.subscribed
+              a(href=`javascript: unSubThread('${thread.tid}')`)
+                span.fa.fa-bookmark-o &nbsp;取消关注
+            else
+              a(href=`javascript: subThread('${thread.tid}')`)
+                span.fa.fa-bookmark-o &nbsp;关注
         if addCredit
           li
             a(href=`javascript:credit('${post.pid}', 'xsf')`)
@@ -93,6 +106,16 @@ block title
             li
               a(href=`/p/${post.pid}/history`)
                 span.fa.fa-history &nbsp;历史版本
+        if data.user
+          li.divider
+            if targetThread && targetThread.oc === post.pid
+              li
+                a(href=`javascript:moduleComplaint.open("thread", "${thread.tid}")`)
+                  span.fa.fa-minus-circle &nbsp;投诉
+            else
+              li
+                a(href=`javascript:moduleComplaint.open("post", "${post.pid}")`)
+                  span.fa.fa-minus-circle &nbsp;投诉
         li.divider
         li
           a
@@ -102,6 +125,7 @@ block title
             -const ipoc = post.iplm || post.ipoc;
             a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
               span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
+
   mixin postEditTime(post)
     if post.toc.toLocaleString() !== post.tlm.toLocaleString()
       p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
@@ -112,6 +136,8 @@ block title
           -var username = c.fromUser.username
           -var profile = '/u/'+c.from
           .ThreadPostCreditItem
+            if c.type === "creditKcb"
+              -c.num = c.num/100;
             span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA
@@ -120,14 +146,18 @@ block title
                 span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
             span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
             span.TPCReason #{c.description}
-            if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
+            if c.type === 'xsf' && data.user && permission('cancelXsf')
               a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
-  
+            if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
+              if !c.hideDescription
+                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, true)`) 屏蔽
+              else
+                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, false)`) 取消屏蔽
 block content
-  -const mainContainer1400 = true;
+  include ../publicModules/mobile_drawer/right_drawer
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
-    .container-fluid(style="max-width:1400px;")
+    .container-fluid.max-width
       .hidden#threadId= data.thread.tid
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
@@ -154,7 +184,7 @@ block content
                         -let canManagement = false;
                         -for(let i = 0; i < data.userOperationsId.length; i++)
                           -const operationId = data.userOperationsId[i];
-                          if ['digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'].includes(operationId)
+                          if ['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'].includes(operationId)
                             -canManagement = true;
                             -break;
                         if data.isModerator && canManagement
@@ -229,9 +259,9 @@ block content
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                             if data.userOperationsId.includes('openThread') && thread.closed
                               button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
-                          if permission('addThreadForum') || permission('moveThread')
+                          if permission('addThreadForum') || permission("removeThreadForum") || permission('moveThread') || permission("moveDraft")
                             div
-                              if permission('addThreadForum')
+                              if permission('addThreadForum') || permission("removeThreadForum")
                                 div(v-if='forums.length !== 0')
                                   h5 已选择专业
                                   div
@@ -241,18 +271,10 @@ block content
                                 div(style='margin-top:0.5rem;').form-inline    
                                   include ../forumlist_dropdown.pug
                                   button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
-                              if permission('moveThread')    
+                              if permission('moveThread') || permission("moveDraft")
                                 div(style='margin-top:0.5rem;')      
                                   button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
-                            //-.form-inline(style='margin: 0.5rem 0')
-                              .form-group.form-group-sm
-                                include ../forumlist_dropdown.pug
-                                button.btn.btn-default.btn-sm(onclick=`moveThreads('${thread.tid}')`) #{moveThread? '移动' : '转发'}
-                              if moveThread
-                                .form-group
-                                  //- button#recyclebtn.btn.btn-sm.btn-danger(onclick=`moveThreadToRecycle('${data.thread.tid}')`) 送回收站
-                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
-                                  //- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button>
+
                 .col-xs-12.col-md-12
                   .row
                     .col-xs-12.col-md-12(style=`margin: 3rem 0 1rem 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
@@ -260,16 +282,100 @@ block content
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
                       .h3.thread-title.text-center= thread.firstPost.t
-                      .thread-info.text-center
-                        a(href=`/u/${thread.uid}`)
-                          img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-                          span= ` ${thread.firstPost.user.username}`
-                        span(style='color: #555555;')= ` ${thread.toc.toLocaleString()}`
-
                       -const post = thread.firstPost;
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
+                      if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
+                        -var agencyIndex = 1;
+                        -var agencyArray = [];
+                        -var agencyAddArray = [];
+                        -for(var i=0;i<post.authorInfos.length;i++) {
+                          -if(post.authorInfos[i].agency){
+                            -if(agencyArray.indexOf(post.authorInfos[i].agency) == -1){
+                              -agencyArray.push(post.authorInfos[i].agency);
+                              -if(post.authorInfos[i].agencyCountry && post.authorInfos[i].agencyCountry.length > 0){
+                                -post.authorInfos[i].agencyAdd = post.authorInfos[i].agencyAdd.replace(/\//igm, " ");
+                                -agencyAddArray.push(post.authorInfos[i].agency+"，"+post.authorInfos[i].agencyCountry+" "+post.authorInfos[i].agencyAdd);
+                              -}else{
+                                -agencyAddArray.push(post.authorInfos[i].agency);
+                              -}
+                              -post.authorInfos[i].agencyIndex = agencyIndex;
+                              -agencyIndex++;
+                            -}else{
+                              -post.authorInfos[i].agencyIndex = agencyArray.indexOf(post.authorInfos[i].agency)+1;
+                            -}
+                          -}
+                        -}
+                        .thread-info.text-center(style="color:#000;font-weight: bold;margin-top:1rem")
+                          for auth,index in post.authorInfos
+                            span(style="margin-right:10px;")
+                              span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                if auth.agencyIndex
+                                  sup!=`${auth.agencyIndex}`
+                              if auth.isContract
+                                span
+                                  span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                        .thread-info.text-center(style="color:#000;margin-top:1rem")
+                          for agad,index in agencyAddArray
+                            span(style="margin-right:10px")!=`${index+1}.${agad}`
+                      else
+                        .thread-info.text-center(style="margin-top:1rem")
+                          a(href=`/u/${thread.uid}`)
+                            img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                            span= ` ${thread.firstPost.user.username}`
+                          span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleString()}`
+                          if thread.firstPost.originState && thread.firstPost.originState !== "0"
+                            -var levelText = getOriginLevel(thread.firstPost.originState);
+                            if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                              span(style="color:#9baec8") 原创
+                            a()
+                              span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
+                      //- if post.authorInfos && post.authorInfos.length > 0
+                      //-   .panel.panel-default(style="border:0;margin-bottom:0")
+                      //-     .panel-heading.paperHeader 作者信息
+                      //-     .panel-body
+                      //-       ol(style="padding-left:20px")
+                      //-         for auth in post.authorInfos
+                      //-           if auth
+                      //-             li(style="font-weight:bold")
+                      //-               span!=`${auth.name}. `
+                      //-               if auth.kcid
+                      //-               if auth.agency
+                      //-                 span!=`${auth.agency}. `
+                      //-               if auth.agencyAdd
+                      //-                 span!=`${auth.agencyAdd}.   `
+
+                      //-               if auth.isContract
+                      //-                 span
+                      //-                   span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                      if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product" 
+                        .abstract(style="margin-top:1rem;")
+                          if post.abstractCn.length !== 0
+                            .panel.panel-default(style="border:0;margin-bottom:0")
+                              .panel-heading.paperHeader 中文摘要
+                              .panel-body!=LineFeedConversion(post.abstractCn)
+                          if post.abstractEn.length !== 0
+                            .panel.panel-default(style="border:0;margin-bottom:0")
+                              .panel-heading.paperHeader Abstract
+                              .panel-body!=LineFeedConversion(post.abstractEn)
+                      if (post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0) && data.thread.type !== "product" 
+                        .keyWords(style="margin-top:1rem;")
+                          .panel.panel-default(style="border:0;margin-bottom:0")
+                            .panel-heading.paperHeader 关键词
+                            .panel-body(style="padding:5px")
+                              if post.keyWordsCn.length !== 0
+                                div
+                                  for keyCn in post.keyWordsCn
+                                    span.keyWordstagCn!=keyCn
+                              if post.keyWordsEn.length !== 0
+                                div(style="margin-top:5px")
+                                  for keyEn in post.keyWordsEn
+                                    span.keyWordstagEn!=keyEn
                       if data.paging.page === 0
-                        div.thread-content.ThreadPostBody!= experimental_render(post)
+                        if data.thread.type == "article"
+                          div.thread-content.ThreadPostBody!= experimental_render(post)
+                        else if data.thread.type == "product"
+                          div.thread-content.ThreadPostBody
+                            include ./product/product.pug
                         +postEditTime(post)
                         +postCredits(data.posts[0])
                       else
@@ -289,6 +395,11 @@ block content
                   .row
                     .col-xs-12.col-md-12(style='margin-top: 1rem;')
                       include ../interface_navigation_paging
+                      ul.pagination.NavigationPaging
+                        li(class=data.t!=="author"?"active":"")
+                          a(href=`/t/${thread.tid}`) 全部
+                        li(class=data.t==="author"?"active":"")
+                          a(href=`/t/${thread.tid}?t=author`) 只看作者
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
@@ -404,30 +515,30 @@ block content
                           想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
 
         .col-xs-12.col-md-3
-          -var user = data.thread.firstPost.user
-          if user
-            include ../interface_thread_userpatch.pug
-          if data.targetUserThreads && data.targetUserThreads.length !== 0
-            .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-              .thread-aside-header 作者最新文章
-              for thread, index in data.targetUserThreads
-                .thread-aside-title
-                  a(href=`/t/${thread.tid}`)
-                    span= index+1+'. '
-                    span= thread.firstPost.t
-          if data.sameThreads && data.sameThreads.length !== 0
-            .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-              .thread-aside-header 相似文章推荐
-              for thread, index in data.sameThreads
-                .thread-aside-title
-                  a(href=`/t/${thread.tid}`)
-                    span= index + 1 + '. '
-                    span= thread.firstPost.t
-          .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
-            ul.HomeFriendlyLink
-              include ../nkc_footer_links.pug
+          .hidden-xs.hidden-sm#rightDom
+            -var user = data.thread.firstPost.user
+            if user
+              include ../interface_thread_userpatch.pug
+            if data.targetUserThreads && data.targetUserThreads.length !== 0
+              .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+                .thread-aside-header 作者最新文章
+                for thread, index in data.targetUserThreads
+                  .thread-aside-title
+                    a(href=`/t/${thread.tid}`)
+                      span= index+1+'. '
+                      span= thread.firstPost.t
+            if data.sameThreads && data.sameThreads.length !== 0
+              .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+                .thread-aside-header 相似文章推荐
+                for thread, index in data.sameThreads
+                  .thread-aside-title
+                    a(href=`/t/${thread.tid}`)
+                      span= index + 1 + '. '
+                      span= thread.firstPost.t
+            .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
+              ul.HomeFriendlyLink
+                include ../nkc_footer_links.pug
           include ../module_scrollTo
-
 
     include ../debug_output.pug
     include ../thread_to_recycle.pug
@@ -442,6 +553,7 @@ block scripts
   script(src='/module_dropdown.js?v=3')
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
+  +includeJS("/bootstrap/js/bootstrap.viewer.min.js")
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
@@ -455,5 +567,13 @@ block scripts
   //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
   script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
+  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/shop/shop.js')
+  include ../publicModules/complaint/complaint
+  include ../publicModules/crop/crop
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)
+  script.
+    $(function () {
+      $('.viewer').bootstrapViewer();
+    })

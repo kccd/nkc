@@ -716,7 +716,13 @@ function uploadFilePromise(url, data, onprogress, method) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {
-      if(onprogress) onprogress(e);
+      if(onprogress) {
+        var num = (e.loaded/e.total)*100;
+        if(num >= 100) num = 100;
+        var percentage = (num).toFixed(1);
+        percentage = percentage + "%";
+        onprogress(e, percentage)
+      };
     };
     xhr.onreadystatechange=function()
     {
@@ -797,10 +803,7 @@ function subscribeForum(fid, subscribe) {
 	}
 	nkcAPI(url, method, {})
 		.then(function() {
-			screenTopAlert(alertInfo);
-			setTimeout(function() {
-				window.location.reload();
-			}, 1000);
+      window.location.reload();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);
@@ -908,6 +911,8 @@ $(function () {
       show: false
     });
   }
+
+
 });
 
 
@@ -972,9 +977,9 @@ function credit(pid, type, kcb) {
           })
       } else if(type === 'kcb') {
 
-        if(num.value > kcb) return screenTopWarning('您的科创币不足');
+        if(num.value*100 > kcb) return screenTopWarning('您的科创币不足');
         var obj = {
-          num: num.value,
+          num: num.value*100,
           description: description.value
         };
         nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)
@@ -1291,6 +1296,9 @@ function digestPost(pid) {
     button[2].onclick = function() {
       var input = event.currentTarget.getElementsByTagName('input');
       var num = input[0].value;
+      num = Number(num);
+      num = num*100;
+      if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
       var obj = {kcb: num};
       post(obj);
     }
@@ -1446,25 +1454,19 @@ function shareTo(shareType, type, str, title, pid){
         var copyAreaId = "copyArea"+pid;
         var copyLinkId = "copyLink"+pid;
         var copyButton = "copyVutton"+pid;
-        // $("#"+copyAreaId).css("display", "block");
         document.getElementById(copyAreaId).style.display = "block";
         document.getElementById(copyLinkId).value = newUrl;
-        // $("#"+copyLinkId).val(newUrl);
         var obj = document.getElementById(copyLinkId);
         obj.select(); 
-        // copyLink();
       }
       if(type == "qq") {
         newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
-        // window.open('http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content'))
       }
       if(type == "qzone") {
         newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
-        // window.open('https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content')+'&desc=科创论坛 - 创客极客学术社区');
       }
       if(type == "weibo") {
         newLink.location='http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk;
-        // window.open('http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk);
       }
       if(type == "weChat") {
         var qrcode
@@ -1474,7 +1476,6 @@ function shareTo(shareType, type, str, title, pid){
         }else{
           if(shareType == "forum"){
             var otherCodes = document.getElementsByClassName('forumQrcode');
-            // var otherCodes = $(".forumQrcode");
             for(var i in otherCodes){
               var otherCode = otherCodes[i];
               if(otherCode && typeof(otherCode)=="object") {
@@ -1484,6 +1485,7 @@ function shareTo(shareType, type, str, title, pid){
                 QRCode.toCanvas(otherCode, path, {
                   scale: 3,
                   margin: 1,
+                  width: 150,
                   color: {dark: '#000000'}
                 }, function(err) {
                   if(err){
@@ -1496,8 +1498,6 @@ function shareTo(shareType, type, str, title, pid){
           var qrid = shareType+"Qrcode";
           qrcode = geid(qrid);
         }
-        // var qrid = shareType+"Qrcode";
-        // var qrcode = geid(qrid);
         qrcode.style.display = "inline-block"
         if(qrcode) {
           var path = newUrl;
@@ -1505,6 +1505,7 @@ function shareTo(shareType, type, str, title, pid){
           QRCode.toCanvas(qrcode, path, {
             scale: 3,
             margin: 1,
+            width: 150,
             color: {dark: '#000000'}
           }, function(err) {
             if(err){
@@ -1515,6 +1516,7 @@ function shareTo(shareType, type, str, title, pid){
       }
     })
     .catch(function(data) {
+      screenTopWarning(data || data.error)
       screenTopWarning("请登录")
     })
   }
@@ -1589,13 +1591,31 @@ function postsVote(pid, type) {
           }
         }
       }
-      numberIcon.innerHTML = number;
+      numberIcon.innerHTML = number || "";
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
     });
 }
 
+// 屏蔽鼓励原因
+function hideKcbRecordReason(pid, recordId, hide) {
+  nkcAPI("/p/" + pid + "/credit/kcb/" + recordId, "PATCH", {
+    hide: !!hide
+  })
+    .then(function() {
+      if(hide) {
+        screenTopAlert("屏蔽成功");
+      } else {
+        screenTopAlert("已取消屏蔽");
+      }
+
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+// 随机红包
 function lottery() {
   nkcAPI('/lottery', 'POST', {})
     .then(function(data) {
@@ -1612,12 +1632,12 @@ function lottery() {
       var header = domOpen.getElementsByClassName('lottery-info-header');
       if(header.length === 0) return;
       if(!result) {
-        return header[0].innerText = '未中奖';
+        return header[0].innerText = '哈哈没中';
       }
       header[0].innerText = result.name;
       var content = domOpen.getElementsByClassName('lottery-info');
       if(content.length === 0) return;
-      content[0].innerText = '获得' + kcb + '个科创币';
+      content[0].innerText = '获得' + numToFloatTwo(kcb) + '个科创币';
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
@@ -1698,4 +1718,201 @@ function moveThread(tid,fid,cid,para){
     .catch(function(data){
       screenTopWarning('移动失败：'+data.error);
     })
+}
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+}
+
+var nkcDrawerBodyTop = 0;
+
+function openNKCDrawer() {
+  $(".nkc-drawer").addClass("active");
+  $(".nkc-drawer-body").addClass("active");
+  $(".nkc-drawer-right").addClass("active");
+  stopBodyScroll(true);
+}
+function closeNKCDrawer() {
+  $(".nkc-drawer").removeClass("active");
+  $(".nkc-drawer-right").removeClass("active");
+  $(".nkc-drawer-body").removeClass("active");
+  stopBodyScroll(false);
+}
+
+function toggleNKCDrawer() {
+  var nkcDrawer = $(".nkc-drawer");
+  if(nkcDrawer.hasClass('active')) {
+    closeNKCDrawer();
+  } else {
+    openNKCDrawer();
+  }
+}
+
+/*
+* 禁止body滚动 显示悬浮div时可用
+* @author pengxiguaa 2019-5-14
+* */
+function stopBodyScroll (isFixed) {
+  var bodyEl = document.body;
+  if (isFixed) {
+    nkcDrawerBodyTop = window.scrollY;
+    bodyEl.style.position = 'fixed';
+    bodyEl.style.top = -nkcDrawerBodyTop + 'px'
+  } else {
+    bodyEl.style.position = '';
+    bodyEl.style.top = '';
+    window.scrollTo(0, nkcDrawerBodyTop) // 回到原先的top
+  }
+}
+
+// 字符串转对象，对应pug渲染函数objToStr
+function strToObj(str) {
+  return JSON.parse(decodeURIComponent(str));
+}
+// 通过dom元素id获取渲染页面时藏在dom中的数据
+function getDataById(id) {
+  return strToObj(document.getElementById(id).innerHTML);
+}
+
+// 关注文章
+function subThread(tid) {
+  nkcAPI("/t/" + tid + "/subscribe", "POST", {})
+    .then(function() {
+      screenTopAlert("关注成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+// 取消关注文章
+function unSubThread(tid) {
+  nkcAPI("/t/" + tid + "/subscribe", "DELETE", {})
+    .then(function() {
+      screenTopAlert("取消关注成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    });
+}
+
+
+// 小屏幕 首页左右侧滑页面 可公用
+// 左侧将会复制#leftDom中的内容
+// 右侧将会复制#rightDom中的内容
+function openLeftDrawer() {
+  var nav = $(".drawer-dom .left");
+  var navDom = $("#leftDom");
+  var bnt = $(".drawer-fixed-button-left");
+  bnt.addClass('active');
+  bnt.find('.fa').removeClass('fa-angle-double-right');
+  bnt.find('.fa').addClass('fa-angle-double-left');
+  bnt.attr("onclick", "closeDrawer()");
+  nav.addClass('active');
+  nav.find(".dom").html(navDom.html());
+  $(".drawer-mask").addClass("active");
+  stopBodyScroll(true);
+}
+function openRightDrawer() {
+  var link = $(".drawer-dom .right");
+  var linkDom = $("#rightDom");
+  var bnt = $(".drawer-fixed-button-right");
+  bnt.addClass('active');
+  bnt.attr("onclick", "closeDrawer()");
+  bnt.find('.fa').removeClass('fa-angle-double-left');
+  bnt.find('.fa').addClass('fa-angle-double-right');
+  link.addClass('active');
+  link.find(".dom").html(linkDom.html());
+  $(".drawer-mask").addClass("active");
+  stopBodyScroll(true);
+}
+
+function closeDrawer() {
+  $(".drawer-dom .left").removeClass("active");
+  $(".drawer-dom .right").removeClass("active");
+  var bnt = $(".drawer-fixed-button-left");
+  bnt.removeClass('active');
+  bnt.find('.fa').removeClass('fa-angle-double-left');
+  bnt.find('.fa').addClass('fa-angle-double-right');
+  bnt.attr("onclick", "openLeftDrawer()");
+  var bnt2 = $(".drawer-fixed-button-right");
+  bnt2.removeClass('active');
+  bnt2.find('.fa').removeClass('fa-angle-double-right');
+  bnt2.find('.fa').addClass('fa-angle-double-left');
+  bnt2.attr("onclick", "openRightDrawer()");
+  $(".drawer-mask").removeClass("active");
+  stopBodyScroll(false);
+}
+function base64ToFile(data, fileName) {
+  return blobToFile(base64ToBlob(data), fileName);
+}
+function base64ToBlob(data) {
+  var arr = data.split(','),
+  mime = arr[0].match(/:(.*?);/)[1],
+  bstr = atob(arr[1]),
+  n = bstr.length,
+  u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+function blobToFile(blob, fileName) {
+  blob.lastModifiedDate = new Date();
+  blob.name = fileName;
+  return blob;
+}
+
+function fileToUrl(file) {
+  return new Promise(function(resolve, reject) {
+    var reads = new FileReader();
+    reads.readAsDataURL(file);
+    reads.onload=function (e) {
+      resolve(this.result);
+    };
+  });
+
+}
+
+/*
+* 清除用户信息
+* @param {String} uid 用户ID
+* @param {String} type 类型， 可选：avatar、banner、description、username
+* */
+function clearUserInfo(uid, type) {
+  if(!confirm("该操作不可撤回，确定要执行？")) return;
+  nkcAPI("/u/" + uid + "/clear", "POST", {
+    type: type
+  })
+    .then(function() {
+      screenTopAlert("删除成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+
+
+/*
+* 根据年份和月份计算出当月的天数
+* @param {Number} year 年份
+* @param {Number} month 月份
+* @return {Number} 当月天数
+* */
+function getDayCountByYearMonth(year, month) {
+  year = parseInt(year);
+  month = parseInt(month);
+  var count;
+  if(month === 2) {
+    if((year%4 === 0 && year%100 != 0) || year%400 === 0) {
+      count = 29;
+    } else {
+      count = 28;
+    }
+  } else if([4,6,9,11].indexOf(month) !== -1) {
+    count = 30
+  } else {
+    count = 31
+  }
+  return count;
 }

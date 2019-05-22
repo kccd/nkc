@@ -20,11 +20,17 @@ draftsRouter
       await next()
     })
     .del('/:did', async(ctx, next) => {
+        const {db, data} = ctx;
         const uid = ctx.query.uid;
         const did = ctx.query.did;
-        const db = ctx.db;
-        await db.DraftModel.remove({"uid":uid,"did":did})
-        const removeResult = db.DraftModel.find({"uid":uid,"did":did})
+        if(uid !== data.user.uid) ctx.throw(403, "抱歉，您没有资格删除别人的草稿");
+        const delMap = {
+            uid: uid
+        }
+        if(did !== "all") {
+            delMap.did = did
+        }
+        await db.DraftModel.remove(delMap)
         await next();
     })
     .post('/', async(ctx, next) => {
@@ -49,7 +55,13 @@ draftsRouter
               uid: ctx.data.user.uid,
               did: newId,
               desType: body.desType,
-              desTypeId: body.desTypeId
+              desTypeId: body.desTypeId,
+              abstractCn: body.abstractCn,
+              abstractEn: body.abstractEn,
+              authorInfos: body.authorInfos,
+              keyWordsCn: body.keyWordsCn,
+              keyWordsEn: body.keyWordsEn,
+              originState: body.originState
             });
             await newDraft.save();
             data.status = "success"
@@ -57,7 +69,7 @@ draftsRouter
         }else{
             let datestr = Date.now()
             const toeditdraft = await db.DraftModel.findOnly({did:body.did});
-            await toeditdraft.update({t:body.t,c:body.c,tlm:datestr});
+            await toeditdraft.update({t:body.t,c:body.c,tlm:datestr,abstractCn: body.abstractCn, abstractEn: body.abstractEn, authorInfos:body.authorInfos, keyWordsCn: body.keyWordsCn, keyWordsEn: body.keyWordsEn, originState: body.originState});
             // await db.DraftModel.update({t:body.t},{$set: {c:body.c,toc:datestr}});
             data.status = "success";
             data.did = body.did

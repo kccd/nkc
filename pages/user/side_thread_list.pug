@@ -1,0 +1,10 @@
+.user-card-panel
+  .user-card-panel-header=sideThreadsHeader
+  .user-card-thread-list
+    for t in sideThreads
+      .user-card-thread
+        a(href=`/t/${t.tid}`).user-card-thread-title= t.firstPost.t
+        .user-card-thread-info
+          a(href=`/f/${t.forums[0].fid}`)= t.forums[0].displayName
+          a(href=`/u/${t.uid}`)= t.firstPost.user.username
+          span=fromNow(t.toc)

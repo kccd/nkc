@@ -116,6 +116,13 @@ if(["application", "forum_declare"].indexOf(type) !== -1){
 }
 
 
+var visitType = GetUrlParam("visitType");
+if(visitType == "update") {
+    var protocolHtml = $("#protocolHide").text();
+    editor.txt.html(protocolHtml)
+}
+
+
 //html解码
 function htmlDecode(text){
     //1.首先动态创建一个容器标签元素，如DIV

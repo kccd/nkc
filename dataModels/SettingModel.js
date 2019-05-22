@@ -100,4 +100,15 @@ settingSchema.methods.extendAds = async function() {
   }));
   return this.adThreads = adThreads;
 };
+/* 
+  通过系统设置的ID查找数据
+  @return setting
+  @author pengxiguaa 2019/3/7
+*/
+settingSchema.statics.findById = async (_id) => {
+  const SettingModel = mongoose.model('settings');
+  const setting = await SettingModel.findOne({_id});
+  if(!setting) throwErr(404, `未找到ID为【${_id}】的系统设置`);
+  return setting;
+};
 module.exports = mongoose.model('settings', settingSchema);

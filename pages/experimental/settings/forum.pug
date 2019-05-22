@@ -9,7 +9,7 @@ block title
   title 管理界面
 block content
 
-  .container-fluid(style='max-width: 1400px;')
+  .container-fluid.max-width
     .row
       include ../nav
       .col-xs-12.col-md-12
@@ -23,7 +23,7 @@ block content
               .hidden#data= JSON.stringify({forums: data.forums, fidArr: data.forums.map(f => f.fid)})
               div#forumsDiv
             button.btn.btn-primary(onclick='saveForumsOrder()') 保存
-
+      
 block scripts
 
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
@@ -40,7 +40,7 @@ block scripts
 //-   title 管理界面
 //- block content
 
-//-   .container-fluid(style='max-width: 1400px;')
+//-   .container-fluid.max-width
 //-     .row
 //-       include ../nav
 //-       .col-xs-12.col-md-12

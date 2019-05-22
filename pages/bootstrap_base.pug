@@ -20,13 +20,13 @@ block head
 block body
 
   block navbar
-    include nkc_navbar.pug
+    include ./publicModules/navbar/navbar.pug
 
   block content
     h1 hello world!
 
   block footer
-    include nkc_footer.pug
+    include ./publicModules/footer/footer
   if data.user
     //- 添加好友的窗口，原生js（待改）
     include module_add_Friend.pug
@@ -48,12 +48,14 @@ block body
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
   +includeJS('/axios/axios.min.js')
+  +includeJS('/publicModules/config.js')
   +includeJS('/moment/moment.js')
   +includeJS('/moment/locale/zh-cn.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
 
   if data.user
+    script!=`NKC.config.hasLogged = true;`
     //- 接入即时通信
     +includeJS('/socket.io-client/dist/socket.io.js')
     +includeJS('/message/socket.js')
@@ -67,10 +69,11 @@ block body
 
   block scripts
 
+
   :thru
     <link rel="stylesheet" href="/external_pkgs/highlight/styles/tomorrow.css">
     <script src="/external_pkgs/highlight/highlight.pack.js"></script>
-
+  include ./publicModules/qrcode/qrcode
   script.
     if(window.HighlightEverything){window.HighlightEverything()}
     //- var qrcode = geid('androidQrcode');

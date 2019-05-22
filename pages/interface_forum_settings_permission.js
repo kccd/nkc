@@ -1,4 +1,4 @@
-$('input[name="selectRole"], input[name="selectGrade"], input[name="selectRelation"]').iCheck({
+$('input[name="selectRole"], input[name="selectGrade"], input[name="selectRelation"], input[name="subType"]').iCheck({
 	checkboxClass: 'icheckbox_minimal-red',
 	radioClass: 'iradio_minimal-red',
 });
@@ -27,6 +27,16 @@ function submit(fid) {
 		}
 	}
 	relation = $('input[name="selectRelation"]').eq(0).prop('checked')?'and': 'or';
+	var subTypeDom = $("input[name='subType']");
+	var subType = '';
+	if(subTypeDom.eq(0).prop('checked')) {
+    subType = "force";
+  } else if(subTypeDom.eq(1).prop("checked")) {
+	  subType = "free";
+  } else if(subTypeDom.eq(2).prop("checked")) {
+	  subType = "unSub"
+  }
+	if(!subType) return screenTopWarning("请选择关注类型");
 	var obj = {
 		klass: $('#contentClass').val(),
 		accessible: switchStatus('accessible'),
@@ -38,7 +48,8 @@ function submit(fid) {
 		relation: relation,
     shareLimitCount: $('#shareLimitCount').val(),
     shareLimitTime: $('#shareLimitTime').val(),
-    moderators: $('#moderators').val()
+    moderators: $('#moderators').val(),
+    subType: subType
 	};
 	nkcAPI('/f/'+fid+'/settings/permission', 'PATCH', obj)
 		.then(function() {

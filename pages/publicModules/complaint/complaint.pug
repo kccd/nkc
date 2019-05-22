@@ -1,0 +1,33 @@
++includeCSS("/publicModules/complaint/complaint.css")
+#moduleComplaint(v-cloak)
+  .hidden(ref="reasons")=objToStr({reasons: data.complaintTypes})
+  .complaint-content
+    .complaint-header {{submitted?"":"投诉"}}
+      .fa.fa-remove.complaint-close(@click="hide")
+    .complaint-body(v-if="!submitted")
+      h5 请选择违规类型：
+      div
+        span.complaint-reason(
+          v-for="reason in reasons"
+          :class="{'active': reasonType===reason.type}"
+          @click="selectReason(reason)"
+        ) {{reason.description}}
+      textarea.form-control.complaint-input(placeholder="请清晰描述投诉的理由" v-model='reasonDescription')
+      .complaint-button
+        button.btn.btn-block.btn-primary(v-if="reasonType" @click="submit") 提交
+        button.btn.btn-block.btn-primary(v-else disabled) 提交
+    .complaint-body(v-else)
+      .complaint-submitted
+        .complaint-title
+          .fa.fa-check
+          span 投诉成功！
+        .complaint-description 感谢您的反馈！我们会第一时间查看和处理。
+          br
+          | 为避免骚扰，处理结果将不发送通知。
+          br
+          | 如果小编认为不需要处理，就不会处理。建议您继续观察，如果情况恶化，可以再次投诉。
+          br
+          | 请确保您的投诉是真实的、客观的，并对此负责。恶意投诉将受到处罚。
+
+
++includeJS("/publicModules/complaint/complaint.js")

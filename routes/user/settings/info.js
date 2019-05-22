@@ -9,7 +9,7 @@ infoRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, body} = ctx;
+		const {data, body, nkcModules} = ctx;
 		const {user} = data;
 		let {description, postSign, color, operation} = body;
 		const {contentLength} = ctx.tools.checkString;
@@ -18,7 +18,7 @@ infoRouter
 			user.description = description;
 		}
 		if(postSign) {
-			if(contentLength(postSign) > 1000) ctx.throw(400, '帖子签名不能超过500个字。');
+			if(contentLength(postSign) > 1000) ctx.throw(400, '文章签名不能超过500个字。');
 			user.postSign = postSign;
 		}
 		if(color) {
@@ -27,6 +27,7 @@ infoRouter
 		}
 		//适应搜索数据库，用save方法更新user信息
 		await user.save();
+    await nkcModules.elasticSearch.save("user", user);
 		await next();
 	});
 module.exports = infoRouter;

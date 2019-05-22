@@ -11,17 +11,29 @@ var app = new Vue({
       minCount: 1,
       maxCount: 5
     },
-    share: {}
+    share: {},
+    randomDemo: {},
+    draftFeeDemo: {},
+    shareDemo: {},
   },
   mounted: function() {
     // var data = document.getElementById('data');
     var data = this.$refs.data;
     data = JSON.parse(data.innerText);
+    // 处理随机红包
+    for(var ra in data.redEnvelopeSettings.random.awards) {
+      data.redEnvelopeSettings.random.awards[ra].kcb = numToFloatTwo(data.redEnvelopeSettings.random.awards[ra].kcb);
+    }
     this.random = data.redEnvelopeSettings.random;
+    // 处理精选稿费
+    data.redEnvelopeSettings.draftFee.defaultCount = numToFloatTwo(data.redEnvelopeSettings.draftFee.defaultCount);
+    data.redEnvelopeSettings.draftFee.minCount = numToFloatTwo(data.redEnvelopeSettings.draftFee.minCount);
+    data.redEnvelopeSettings.draftFee.maxCount = numToFloatTwo(data.redEnvelopeSettings.draftFee.maxCount);
     this.draftFee = data.redEnvelopeSettings.draftFee;
     var arr = [];
     var obj = {};
     var s;
+    // 处理分享奖励设置
     for(var key in data.redEnvelopeSettings.share) {
       if (!data.redEnvelopeSettings.share.hasOwnProperty(key)) continue;
       s = data.redEnvelopeSettings.share[key];
@@ -30,6 +42,8 @@ var app = new Vue({
     }
     for(var i = 0; i < arr.length; i++) {
       s = arr[i];
+      s.maxKcb = numToFloatTwo(s.maxKcb);
+      s.kcb = numToFloatTwo(s.kcb);
       obj[s.id] = s;
       delete s.id;
     }
@@ -69,10 +83,26 @@ var app = new Vue({
       if(this.draftFee.close === 'true') {
         this.draftFee.close = true;
       }
+      // 处理随机红包数额
+      this.randomDemo = JSON.parse(JSON.stringify(this.random));
+      for(var rad in this.randomDemo.awards){
+        this.randomDemo.awards[rad].kcb = this.randomDemo.awards[rad].kcb * 100;
+      }
+      // 处理精选稿费
+      this.draftFeeDemo = JSON.parse(JSON.stringify(this.draftFee));
+      this.draftFeeDemo.defaultCount = this.draftFeeDemo.defaultCount * 100;
+      this.draftFeeDemo.maxCount = this.draftFeeDemo.maxCount * 100;
+      this.draftFeeDemo.minCount = this.draftFeeDemo.minCount * 100;
+      // 处理分享奖励设置
+      this.shareDemo = JSON.parse(JSON.stringify(this.share));
+      for(var sd in this.shareDemo) {
+        this.shareDemo[sd].maxKcb = this.shareDemo[sd].maxKcb * 100;
+        this.shareDemo[sd].kcb = this.shareDemo[sd].kcb * 100;
+      }
       var data = {
-        random: this.random,
-        draftFee: this.draftFee,
-        share: this.share
+        random: this.randomDemo,
+        draftFee: this.draftFeeDemo,
+        share: this.shareDemo
       };
       nkcAPI('/e/settings/red-envelope',  'PATCH', data)
         .then(function() {
@@ -84,3 +114,8 @@ var app = new Vue({
     }
   }
 });
+
+function numToFloatTwo(str){
+  str = (str/100).toFixed(2);
+  return str;
+}

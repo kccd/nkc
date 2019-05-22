@@ -6,7 +6,7 @@ voteRouter
     const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
-    const forums = await thread.extendForums(['mainFourms', 'minorForums']);
+    const forums = await thread.extendForums(['mainForums', 'minorForums']);
     let isModerator;
     for(const f of forums) {
       isModerator = await f.isModerator(data.user);
@@ -24,6 +24,7 @@ voteRouter
     data.targetUser = await db.UserModel.findOnly({uid: post.uid});
     data.isModerator = isModerator;
     await next();
+    await thread.updateThreadVote();
   })
   .post('/up', async (ctx, next) => {
     const {data, db} = ctx;
@@ -53,7 +54,6 @@ voteRouter
       }
     }
     await post.updatePostsVote();
-    post.voteUp = post.voteUp - post.voteDown;
     data.post = post;
     await next();
   })
@@ -83,7 +83,6 @@ voteRouter
       }
     }
     await post.updatePostsVote();
-    post.voteUp = post.voteUp - post.voteDown;
     data.post = post;
     await next();
   });

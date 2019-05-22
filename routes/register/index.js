@@ -12,14 +12,6 @@ registerRouter
 		}
 		data.getCode = false;
 		ctx.template = 'register/register.pug';
-	  const lastUrl = ctx.req.headers['referer'];
-	  if(!lastUrl || !lastUrl.includes('register')) {
-		  ctx.cookies.set('lastUrl', lastUrl, {
-			  signed: true,
-			  maxAge: ctx.settings.cookie.life,
-			  httpOnly: true
-		  });
-	  }
 		await next();
   })
   .post('/', async (ctx, next) => { // 手机注册
@@ -92,7 +84,6 @@ registerRouter
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
-	    console.log(err);
       return await next();
     }
     const share = await db.ShareModel.findOnly({token: shareToken});
@@ -104,6 +95,7 @@ registerRouter
     if(!shareSettings.status) return await next();
     const {kcb, maxKcb} = shareSettings;
     const {registerKcbTotal} = share;
+    let addKcb;
     if(kcb + registerKcbTotal > maxKcb) {
       addKcb = maxKcb - registerKcbTotal;
     } else {
@@ -117,6 +109,7 @@ registerRouter
       to: targetUser.uid,
       type: 'shareRegister',
       description: '用户通过你分享的链接成功注册账号',
+      shareToken: shareToken,
       c: {
         token: shareToken
       },
@@ -125,8 +118,13 @@ registerRouter
       num: addKcb
     });
     await record.save();
-    await targetUser.update({$inc: {kcb: addKcb}});
-    await db.SettingModel.update({_id: 'kcb'}, {$inc: {'c.totalMoney': -1*addKcb}});
+    // 更新分享者以获得的kcb总数
+    await share.update({
+      $inc: {
+        registerKcbTotal: addKcb
+      }
+    });
+    targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
     ctx.cookies.set('share-token', '', {
       httpOnly: true,
       signed: true
@@ -142,7 +140,7 @@ registerRouter
 		const {contentLength, checkPass} = ctx.tools.checkString;
 		if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
 		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！')
+		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！');
 		const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 		if(targetUser) ctx.throw(400, '用户名已被注册。');
 		if(!password) ctx.throw(400, '请输入密码。');
@@ -197,83 +195,4 @@ registerRouter
 		ctx.processTime = passed.toString();
 		return ctx.body = buffer;
 	});
-  /*.get('/email', async (ctx, next) => {
-  	const {data, query} = ctx;
-  	const {code} = query;
-    if(code) {
-      data.regCode = code;
-    }
-    ctx.template = 'interface_user_register2.pug';
-    await next();
-  })
-  .post('/email', async (ctx, next) => { // 邮箱注册
-	  const {db, body} = ctx;
-	  const {username, password, regCode, email} = body;
-	  const regIP = ctx.address;
-	  const regPort = ctx.port;
-	  if(!regCode) ctx.throw(400, '请输入注册码。');
-	  const answerSheet = await db.AnswerSheetModel.ensureAnswerSheet(regCode);
-	  const isA = answerSheet.isA;
-	  if(!username) ctx.throw(400, '请输入用户名。');
-	  const {contentLength, checkPass, checkEmailFormat} = ctx.tools.checkString;
-	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
-	  const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
-	  if(user) ctx.throw(400, '用户名已被注册。');
-	  if(!email) ctx.throw(400, '请输入邮箱。');
-	  if(checkEmailFormat(email) === -1) ctx.throw(400, '邮箱格式不正确。');
-	  const userPersonal = await db.UsersPersonalModel.findOne({email});
-	  if(userPersonal) ctx.throw(400, '此邮箱已被其他用户注册。');
-	  await db.EmailRegisterModel.ensureSendPermission(email);
-	  if(!password) ctx.throw(400, '请输入密码。');
-	  if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
-	  if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
-	  const {apiFunction, sendEmail} = ctx.nkcModules;
-	  const ecode = apiFunction.random(14);
-	  const passwordObj = apiFunction.newPasswordObject(password);
-	  const userObj = {
-	  	username,
-		  email,
-		  regIP,
-		  regPort,
-		  regCode,
-		  ecode,
-		  isA,
-		  password: passwordObj.password,
-		  hashType: passwordObj.hashType
-	  };
-	  const emailRegister = db.EmailRegisterModel(userObj);
-	  await emailRegister.save();
-	  const text = `欢迎注册科创论坛，点击以下链接就可以激活您的账号：`;
-	  const href = `https://www.kechuang.org/register/email/verify?email=${email}&ecode=${ecode}`;
-	  const link = `<a href="${href}">${href}</a>`;
-	  await sendEmail({
-		  to: email,
-		  subject: `注册账户`,
-		  text: text + href,
-		  html: text + link
-	  });
-	  await next();
-  })
-  .get('/email/verify', async (ctx, next) => {
-  	const {data, query, db} = ctx;
-  	const {email, ecode} = query;
-	  const userPersonal = await db.UsersPersonalModel.findOne({email});
-	  if(userPersonal) ctx.throw(400, '此邮箱已被其他用户注册。');
-	  const {emailCodeTime} = ctx.settings.sendMessage;
-	  const emailRegister = await db.EmailRegisterModel.findOne({email, ecode, toc: {$gt: (Date.now() - emailCodeTime)}, used: false});
-	  if(!emailRegister) ctx.throw(400, '邮箱链接已失效，请重新注册。');
-	  emailRegister.used = true;
-	  await emailRegister.save();
-	  const userObj = emailRegister.toObject();
-		delete userObj._id;
-	  const answerSheet = await db.AnswerSheetModel.findOne({key: emailRegister.regCode});
-	  if(!answerSheet) ctx.throw(500, '抱歉！数据出错，请与管理员联系。');
-	  if(answerSheet.uid) ctx.throw(400, '注册码已失效，请重新参加考试。');
-		const newUser = await db.UserModel.createUser(userObj);
-		answerSheet.uid = newUser.uid;
-		await answerSheet.save();
-		data.activeInfo1 = `邮箱注册成功，赶紧登录吧~`;
-		ctx.template = 'interface_user_login.pug';
-		await next();
-  });*/
 module.exports = registerRouter;
