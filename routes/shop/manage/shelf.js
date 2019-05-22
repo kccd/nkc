@@ -127,8 +127,8 @@ shelfRouter
     // 发表商品文章
     const options = {
       title: productName,
-      abstract: productDescription,
-      keywords: attention,
+      abstractCn: productDescription,
+      keyWordsCn: attention,
       content: productDetails,
       uid: user.uid,
       fids: mainForumsId,

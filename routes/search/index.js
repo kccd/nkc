@@ -107,7 +107,21 @@ router
         if(r.highlight) {
           if(r.docType === "post" || r.docType === "thread") {
             highlightObj[r.pid + "_title"] = r.highlight.title;
-            highlightObj[r.pid + "_content"] = r.highlight.content;
+            if(r.highlight.content) {
+              highlightObj[r.pid + "_content"] = "内容：" + r.highlight.content;
+            }
+            if(r.highlight.keywordsEN) {
+              highlightObj[r.pid + "_keywordsEN"] = "关键词：" + r.highlight.keywordsEN;
+            }
+            if(r.highlight.keywordsCN) {
+              highlightObj[r.pid + "_keywordsCN"] = "关键词：" + r.highlight.keywordsCN;
+            }
+            if(r.highlight.abstractEN) {
+              highlightObj[r.pid + "_abstractEN"] = "Abstract：" + r.highlight.abstractEN;
+            }
+            if(r.highlight.abstractCN) {
+              highlightObj[r.pid + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
+            }
           } else if(r.docType === "user") {
             highlightObj[r.uid + "_username"] = r.highlight.username;
             highlightObj[r.uid + "_description"] = r.highlight.description;
@@ -155,7 +169,7 @@ router
         const {docType, pid, uid} = result;
         if(["thread", "post"].includes(docType)) {
           const post = postObj[pid];
-          if(!post) continue;
+          if(!post || post.disabled) continue;
           const postUser = userObj[post.uid];
           if(!postUser) continue;
           const thread = threadObj[post.tid];
@@ -186,7 +200,13 @@ router
             docType,
             link,
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
-            abstract: highlightObj[`${pid}_content`] || post.abstract || post.c,
+            abstract:
+              highlightObj[`${pid}_abstractEN`] ||
+              highlightObj[`${pid}_abstractCN`] ||
+              highlightObj[`${pid}_keywordsEN`] ||
+              highlightObj[`${pid}_keywordsCN`] ||
+              highlightObj[`${pid}_content`] ||
+              post.abstract || post.c,
             threadTime: thread.toc,
             postTime: post.toc,
             tid: thread.tid,

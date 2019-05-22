@@ -57,6 +57,7 @@ editorRouter
       data.did = singledraft.did;
       data.draftDelType = singledraft.desType; // 草稿来源类型
       data.draftDelTypeId = singledraft.desTypeId; // 草稿来源类型id
+      data.targetPost = singledraft;
       return await next();
     }
     if(type === 'post') {

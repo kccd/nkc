@@ -486,8 +486,14 @@ postSchema.pre('save', async function(next) {
   const elasticSearch = require("../nkcModules/elasticSearch");
   const ThreadModel = mongoose.model("threads");
   try{
-    const thread = await ThreadModel.findOne({oc: this.pid}, {_id: 1});
-    await elasticSearch.save(thread?"thread":"post", this);
+    const thread = await ThreadModel.findOne({tid: this.tid});
+    let docType;
+    if(!thread || !thread.oc || thread.oc === this.pid) {
+      docType = "thread";
+    } else {
+      docType = "post"
+    }
+    await elasticSearch.save(docType, this);
     return next();
   } catch(err) {
     return next(err);
@@ -681,7 +687,7 @@ postSchema.methods.updatePostsVote = async function() {
   @param options
     title: 标题
     content: 内容
-    abstract: 摘要
+    abstractCn: 摘要
     ip: 用户ip地址
     tid: 所属的文章ID
   @return post对象
@@ -694,7 +700,7 @@ postSchema.statics.newPost = async (options) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
   const {contentLength} = require('../tools/checkString');
-  const {title, content, uid, ip, abstract, tid, keywords} = options;
+  const {title, content, uid, ip, abstractCn, tid, keyWordsCn} = options;
   const thread = await ThreadModel.findOne({tid});
   if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
   if(thread.closed) throwErr(403, `文章已被关闭，暂不能发表回复`);
@@ -716,8 +722,8 @@ postSchema.statics.newPost = async (options) => {
     pid,
     c: content,
     t: title,
-    abstract,
-    keywords,
+    abstractCn,
+    keyWordsCn,
     ipoc: ip,
     iplm: ip,
     l: 'html',

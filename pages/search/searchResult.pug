@@ -6,7 +6,7 @@
         img(src=`/avatar/${result.postUser.uid}?t=sm`)
         span=result.postUser.username
       .search-result-time=fromNow(result.postTime)
-      span 发表于
+      span=result.docType==="thread"?"发表于":"回复于"
       for forum in result.forums
         a.clear-a-style.search-result-forum(href=`/f/${forum.fid}`)=forum.displayName
 

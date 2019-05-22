@@ -468,7 +468,19 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  let newAuthInfos = [];
+  for(let a = 0;a < authorInfos.length;a++) {
+    if(authorInfos[a].name.length > 0) {
+      newAuthInfos.push(authorInfos[a])
+    }else{
+      let kcUser = await UserModel.findOne({uid: authorInfos[a].kcid});
+      if(kcUser) {
+        authorInfos[a].name = kcUser.username;
+        newAuthInfos.push(authorInfos[a])
+      }
+    }
+  }
   const quote = await dbFn.getQuote(c);
   if(this.uid !== user.uid) {
     const replyWriteOfThread = new ReplyModel({
@@ -490,7 +502,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     abstractEn,
     keyWordsCn,
     keyWordsEn,
-    authorInfos,
+    authorInfos: newAuthInfos,
     originState,
     ipoc: ip,
     iplm: ip,
@@ -837,7 +849,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
     ip: String 发表者ID
     title: String 标题
     content: String 内容
-    abstract: String 摘要
+    abstractCn: String 摘要
   @author pengxiguaa 2019/3/7  
 */
 threadSchema.statics.publishArticle = async (options) => {
@@ -845,7 +857,7 @@ threadSchema.statics.publishArticle = async (options) => {
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
-  const {uid, fids, cids, ip, title, content, abstract, type, keywords} = options;
+  const {uid, fids, cids, ip, title, content, abstractCn, type, keyWordsCn} = options;
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findById(uid);
   await ThreadModel.ensurePublishPermission(options);
@@ -862,8 +874,8 @@ threadSchema.statics.publishArticle = async (options) => {
   const post = await PostModel.newPost({
     title,
     content,
-    abstract,
-    keywords,
+    abstractCn,
+    keyWordsCn,
     ip,
     uid,
     tid
