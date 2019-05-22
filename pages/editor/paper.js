@@ -46,39 +46,43 @@ var paperProto = {
   initAbstract: function() {
     if(paperProto.config.enableAbstract) {
       var abstractDom = paperProto.get("abstract");
-      abstractDom.style.display = "";
-      // 初始化摘要文本
-      var abstractCnDom = paperProto.get("abstractCn");
-      abstractCnDom.value = paperProto.config.abstractCn;
-      var abstractEnDom = paperProto.get("abstractEn");
-      abstractEnDom.value = paperProto.config.abstractEn;
-      // 初始化摘要字数
-      $("#abstractCnNum").text(paperProto.config.abstractCn.length)
-      $("#abstractEnNum").text(paperProto.config.abstractEn.length)
-      // 监听摘要字数
-      $("#abstractCn").on("input propertychange" ,function() {
-        $("#abstractCnNum").text($("#abstractCn").val().length)
-      })
-      $("#abstractEn").on("input propertychange" ,function() {
-        $("#abstractEnNum").text($("#abstractEn").val().length)
-      })
+      if(abstractDom) {
+        abstractDom.style.display = "";
+        // 初始化摘要文本
+        var abstractCnDom = paperProto.get("abstractCn");
+        abstractCnDom.value = paperProto.config.abstractCn;
+        var abstractEnDom = paperProto.get("abstractEn");
+        abstractEnDom.value = paperProto.config.abstractEn;
+        // 初始化摘要字数
+        $("#abstractCnNum").text(paperProto.config.abstractCn.length)
+        $("#abstractEnNum").text(paperProto.config.abstractEn.length)
+        // 监听摘要字数
+        $("#abstractCn").on("input propertychange" ,function() {
+          $("#abstractCnNum").text($("#abstractCn").val().length)
+        })
+        $("#abstractEn").on("input propertychange" ,function() {
+          $("#abstractEnNum").text($("#abstractEn").val().length)
+        })
+      }
     }
   },
   // 初始化关键词
   initKeywords: function() {
     if(paperProto.config.enableKeyWords) {
       var keyWordsDom = paperProto.get("keyWords");
-      keyWordsDom.style.display = "";
-      // 初始化中英文关键词
-      var keySpan = "";
-      for(var i=0;i < paperProto.config.keyWordsCn.length;i++) {
-        keySpan += '<span class="keyTags"><span class="keyCn" kValue="'+paperProto.config.keyWordsCn[i]+'">'+paperProto.config.keyWordsCn[i]+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
-      }
-      for(var c=0;c < paperProto.config.keyWordsEn.length;c++) {
-        keySpan += '<span class="keyTags"><span class="keyEn" kValue="'+paperProto.config.keyWordsEn[c]+'">'+paperProto.config.keyWordsEn[c]+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
-      }
-      if(keySpan.length > 0) {
-        $("#keyWordsTags").html(keySpan)
+      if(keyWordsDom) {
+        keyWordsDom.style.display = "";
+        // 初始化中英文关键词
+        var keySpan = "";
+        for(var i=0;i < paperProto.config.keyWordsCn.length;i++) {
+          keySpan += '<span class="keyTags"><span class="keyCn" kValue="'+paperProto.config.keyWordsCn[i]+'">'+paperProto.config.keyWordsCn[i]+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
+        }
+        for(var c=0;c < paperProto.config.keyWordsEn.length;c++) {
+          keySpan += '<span class="keyTags"><span class="keyEn" kValue="'+paperProto.config.keyWordsEn[c]+'">'+paperProto.config.keyWordsEn[c]+'</span><span class="fa fa-remove" style="margin-left:5px;cursor:pointer" onclick="removeOneKeyWords(this)"></span></span>'; 
+        }
+        if(keySpan.length > 0) {
+          $("#keyWordsTags").html(keySpan)
+        }
       }
     }
   },
@@ -213,28 +217,30 @@ var paperProto = {
   initAuthorInfos: function() {
     if(paperProto.config.enableAuthorInfos) {
       var authorInfosDom = paperProto.get("authorInfos");
-      authorInfosDom.style.display = "";
-      var selectDom = getCountryList();
-      var authorTrs = "";
-      if(paperProto.config.authorInfos.length > 0) {
-        for(var i=0;i < paperProto.config.authorInfos.length;i++) {
-          selectDom = getCountryList(paperProto.config.authorInfos[i].agencyCountry)
-          var disStyle = "display:";
-          if(!paperProto.config.authorInfos[i].agencyCountry || paperProto.config.authorInfos[i].agencyCountry !== "中国") {
-            disStyle = "display:none"
+      if(authorInfosDom) {
+        authorInfosDom.style.display = "";
+        var selectDom = getCountryList();
+        var authorTrs = "";
+        if(paperProto.config.authorInfos.length > 0) {
+          for(var i=0;i < paperProto.config.authorInfos.length;i++) {
+            selectDom = getCountryList(paperProto.config.authorInfos[i].agencyCountry)
+            var disStyle = "display:";
+            if(!paperProto.config.authorInfos[i].agencyCountry || paperProto.config.authorInfos[i].agencyCountry !== "中国") {
+              disStyle = "display:none"
+            }
+            if(paperProto.config.authorInfos[i].isContract) {
+              authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+              authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" style="width:300px" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" style="width:100px" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
+            }else{
+              authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+            }
           }
-          if(paperProto.config.authorInfos[i].isContract) {
-            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
-            authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" style="width:300px" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" style="width:100px" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
-          }else{
-            authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
-          }
+        }else{
+          authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
         }
-      }else{
-        authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+        $("#authInfoList").find("tbody").html(authorTrs);
       }
-      $("#authInfoList").find("tbody").html(authorTrs);
-    }
+      }
   },
   // 输出作者信息
   outputAuthorInfosList: function() {
@@ -242,7 +248,6 @@ var paperProto = {
     // try{
       $(".authorClass").each(function(index, ele) {
         var name = $(ele).find(".authorName").val();
-        if(!name) throw("有未填写完成的作者项");
         var kcid = $(ele).find(".authorKcid").val();
         var agency = $(ele).find(".authorAgency").val();
         var agencyCountry = $(ele).find(".authorCountry").val();
@@ -291,7 +296,9 @@ var paperProto = {
           isContract: isContract,
           contractObj: contractObj,
         }
-        authorInfos.push(infoObj)
+        if(name.length > 0 || kcid.length > 0) {
+          authorInfos.push(infoObj)
+        }
       })
     // }catch(e){
     //   return screenTopWarning(e)
@@ -302,9 +309,11 @@ var paperProto = {
   initOriginState: function() {
     if(paperProto.config.enableOriginState) {
       var originStateDom = paperProto.get("originState");
-      originStateDom.style.display = "";
-      if(paperProto.config.originState) {
-        $("#originStateText").val(paperProto.config.originState)
+      if(originStateDom) {
+        originStateDom.style.display = "";
+        if(paperProto.config.originState) {
+          $("#originStateText").val(paperProto.config.originState)
+        }
       }
     }
   },

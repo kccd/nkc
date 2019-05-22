@@ -61,7 +61,7 @@ block content
                   label.col-sm-12 专业分类(必选，最多可选两个)
                   .col-sm-12
                     input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
-            if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post'
+            if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post' || data.type === 'thread'
               include ./editor/paper.pug
             //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
             //-   include ./forum/forum_choice.pug
