@@ -59,7 +59,8 @@ if pageCount > 1
       if min !== 0
         li
           a(href=`${state.url}?page=${0}${skipId || ''}${query}`) 1
-        li ...
+        if min > 1
+          li ...
       -for(let i = 0; i < pageCount; i++)
         if i >= min && i <= max
           -let active = '';
@@ -68,7 +69,8 @@ if pageCount > 1
           li(class=active)
             a(href=`${state.url}?page=${i}${skipId || ''}${query}`)= i+1
       if max < pageCount - 1
-        li ...
+        if max < pageCount - 2
+          li ...
         li
           a(href=`${state.url}?page=${pageCount - 1}${skipId || ''}${query}`)= pageCount
       if showPagingInput && (max < pageCount - 1 || min !== 0)

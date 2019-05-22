@@ -23,9 +23,8 @@ block eContent
             div(v-for="template in selectedMessageType.templates").m-t-2
               h4
                 b {{lang(template.type)}}
-              span 可用参数：
-              span.m-r-1(v-for="parameter in template.parameters") {{parameter}}({{lang(parameter)}})
-              div 模板内容：
+              h5 可用参数：
+                span.m-r-1(v-for="parameter in template.parameters") {{parameter}}({{lang(parameter)}})
               textarea.form-control(rows=4 v-model="template.content")
 
             .m-t-1

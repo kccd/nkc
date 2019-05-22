@@ -6,7 +6,12 @@
   "postURL": "回复链接",
   "postID": "回复ID",
 
-  "replayThread": "文章被回复",
+  "replyPost": "回复被引用",
+  "replyThread": "文章被回复",
+  "threadWasReturned": "文章被退修",
+  "postWasReturned": "回复被退修",
+  "bannedThread": "文章被移动到回收站",
+  "bannedPost": "回复被屏蔽",
   "digestPost": "回复被加精",
   "digestThread": "文章被加精",
   "at": "at信息"
