@@ -213,6 +213,7 @@ func.search = async (t, c, options) => {
         title: {},
         content: {},
         username: {},
+        description: {},
         abstractCN: {},
         abstractEN: {},
         keywordsCN: {},
