@@ -305,18 +305,37 @@ block content
                             -}
                           -}
                         -}
-                        .thread-info.text-center(style="color:#000;font-weight: bold;margin-top:1rem")
-                          for auth,index in post.authorInfos
-                            span(style="margin-right:10px;")
-                              span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
-                                if auth.agencyIndex
-                                  sup!=`${auth.agencyIndex}`
-                              if auth.isContract
-                                span
-                                  span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
                         .thread-info.text-center(style="color:#000;margin-top:1rem")
-                          for agad,index in agencyAddArray
-                            span(style="margin-right:10px")!=`${index+1}.${agad}`
+                          if post.authorInfos.length > 1
+                            for auth,index in post.authorInfos
+                              span(style="margin-right:10px;font-weight: bold;")
+                                span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                  if auth.agencyIndex
+                                    sup!=`${auth.agencyIndex}`
+                                if auth.isContract
+                                  span
+                                    span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                          else
+                            for auth,index in post.authorInfos
+                              span(style="margin-right:10px;font-weight: bold;")
+                                span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                if auth.isContract
+                                  span
+                                    span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                          if thread.firstPost.originState && thread.firstPost.originState !== "0"
+                            -var levelText = getOriginLevel(thread.firstPost.originState);
+                            if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                              span(style="color:#9baec8;margin-right:3px") 原创
+                            a()
+                              span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
+                        .thread-info.text-center(style="color:#000;margin-top:1rem")
+                          if post.authorInfos.length > 1
+                            for agad,index in agencyAddArray
+                              span(style="margin-right:10px")!=`${index+1}.${agad}`
+                          else
+                            for agad,index in agencyAddArray
+                              span(style="margin-right:10px")!=`${agad}`
+
                       else
                         .thread-info.text-center(style="margin-top:1rem")
                           a(href=`/u/${thread.uid}`)
@@ -326,7 +345,7 @@ block content
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"
                             -var levelText = getOriginLevel(thread.firstPost.originState);
                             if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
-                              span(style="color:#9baec8") 原创
+                              span(style="color:#9baec8;margin-right:3px") 原创
                             a()
                               span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
                       //- if post.authorInfos && post.authorInfos.length > 0

@@ -110,7 +110,7 @@ postRouter
   })
   .patch('/:pid', async (ctx, next) => {
     const {t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos, originState} = ctx.body.post;
-    if(c.lenght < 6) ctx.throw(400, '内容太短，至少6个字节');
+    if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db, fs} = ctx;
     const {user} = data;
@@ -185,7 +185,19 @@ postRouter
     targetPost.abstractEn = abstractEn;
     targetPost.keyWordsCn = keyWordsCn;
     targetPost.keyWordsEn = keyWordsEn;
-    targetPost.authorInfos = authorInfos;
+    let newAuthInfos = [];
+    for(let a = 0;a < authorInfos.length;a++) {
+      if(authorInfos[a].name.length > 0) {
+        newAuthInfos.push(authorInfos[a])
+      }else{
+        let kcUser = await db.UserModel.findOne({uid: authorInfos[a].kcid});
+        if(kcUser) {
+          authorInfos[a].name = kcUser.username;
+          newAuthInfos.push(authorInfos[a])
+        }
+      }
+    }
+    targetPost.authorInfos = newAuthInfos;
     targetPost.originState = originState;
     targetPost.tlm = Date.now();
 	  if(targetThread.oc === pid) {
