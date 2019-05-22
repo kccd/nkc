@@ -126,6 +126,7 @@
   color: #282c37;
   max-height: 5rem;
   overflow: hidden;
+  word-break: break-all;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;

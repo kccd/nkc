@@ -213,7 +213,10 @@ func.search = async (t, c, options) => {
         title: {},
         content: {},
         username: {},
-        description: {}
+        abstractCN: {},
+        abstractEN: {},
+        keywordsCN: {},
+        keywordsEN: {},
       }
     },
     query: {
@@ -229,8 +232,12 @@ func.search = async (t, c, options) => {
                       {
                         bool: {
                           should: [
-                            createMatch("title", c, 2, relation),
+                            createMatch("title", c, 5, relation),
                             createMatch("content", c, 2, relation),
+                            createMatch("abstractEN", c, 50, relation),
+                            createMatch("abstractCN", c, 50, relation),
+                            createMatch("keywordsEN", c, 80, relation),
+                            createMatch("keywordsCN", c, 80, relation),
                           ]
                         }
                       }
@@ -241,8 +248,8 @@ func.search = async (t, c, options) => {
                 {
                   bool: {
                     should: [
-                      createMatch("username", c, 5, relation),
-                      createMatch("description", c, 2, relation),
+                      createMatch("username", c, 6, relation),
+                      createMatch("description", c, 3, relation),
                     ]
                   }
                 }
@@ -363,11 +370,11 @@ function createMatch(property, query, boost, relation) {
     const match = {};
     match[property] = {
       query: key,
-      operator: "and",
-      boost
+      operator: "and"
     };
     arr.push({match});
   }
   obj.bool[relation] = arr;
+  obj.bool.boost = boost;
   return obj
 }
