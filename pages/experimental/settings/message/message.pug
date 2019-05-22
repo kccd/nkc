@@ -18,17 +18,20 @@ block eContent
             .panel.panel-default
               .panel-heading 通知类型
               .list-group(v-for="t in messageTypes")
-                a.list-group-item.pointer(:class='{"active": selectedMessageType === t}' @click="selectedMessageType = t") {{t.name}}
-          .col-xs-12.col-md-10(v-if="selectedMessageType")
+                a.list-group-item.pointer(:class='{"active": selectedMessageType === t}' @click="selectType(t)") {{t.name}}
+          .col-xs-12.col-md-8.col-md-offset-1(v-if="selectedMessageType")
             div(v-for="template in selectedMessageType.templates").m-t-2
-              div 模板名：{{lang(template.type)}}
+              h4
+                b {{lang(template.type)}}
               span 可用参数：
               span.m-r-1(v-for="parameter in template.parameters") {{parameter}}({{lang(parameter)}})
-              div 具体信息：
-              textarea.form-control(rows=4)
+              div 模板内容：
+              textarea.form-control(rows=4 v-model="template.content")
 
-
-
+            .m-t-1
+              h5.text-danger(v-if="error") {{error}}
+              h5.text-success(v-if="info") {{info}}
+              button.btn.btn-block.btn-primary(@click="save(selectedMessageType)") 保存
       .col-xs-12.col-md-12(v-else-if="type === 'limit'")
 
       //-.col-xs-12.col-md-12

@@ -1,4 +1,11 @@
 {
+  "threadTitle": "文章标题",
+  "threadID": "文章ID",
+  "threadURL": "文章链接",
+  "postContent": "回复内容",
+  "postURL": "回复链接",
+  "postID": "回复ID",
+
   "replayThread": "文章被回复",
   "digestPost": "回复被加精",
   "digestThread": "文章被加精",

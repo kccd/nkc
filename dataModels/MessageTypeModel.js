@@ -15,6 +15,17 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
+  /* templates模板对象格式
+  {
+    type: "digestThread",
+    content: "您的文章[link=threadURL(threadTitle)]已被列入精选。",
+    parameters: [
+      "threadTitle",
+      "threadID",
+      "threadURL"
+    ]
+  }
+  * */
   templates: []
 }, {
   collection: "messageTypes"

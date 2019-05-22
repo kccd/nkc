@@ -6,11 +6,35 @@ var app = new Vue({
     selectedMessageType: "",
     messageTypesLanguage: {},
     roles: [],
-    grades: []
+    grades: [],
+
+    error: "",
+    info: ""
   },
   methods: {
     lang: function(k) {
       return this.messageTypesLanguage[k] || k;
+    },
+    selectType: function(type) {
+      this.selectedMessageType = type;
+      this.clearErrorInfo();
+    },
+    clearErrorInfo: function() {
+      this.error = "";
+      this.info = "";
+    },
+    save: function(type) {
+      this.clearErrorInfo();
+      nkcAPI("/e/settings/message", "PATCH", {
+        type: "modifyMessageType",
+        messageType: type
+      })
+        .then(function() {
+          app.info = "保存成功";
+        })
+        .catch(function(data) {
+          app.error = data.error || data;
+        });
     },
     submit: function() {
       var obj = {

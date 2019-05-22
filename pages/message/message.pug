@@ -308,6 +308,7 @@ block content
             span 《{{message.post.t}}》
           span 已被列入精选。
         div(v-else-if="message.c.type === 'digestPost'")
+        div(v-else-if="message.c.type === 'digestPost'")
           span 您的回复
             a.remind-link(:href="'/t/' + message.post.tid + '?page=' + message.post.page + '&highlight=' + message.post.pid + '#' + message.post.pid" target='_blank')
               span {{message.post.c}}

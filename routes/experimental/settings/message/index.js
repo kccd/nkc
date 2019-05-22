@@ -12,23 +12,46 @@ messageRouter
   })
   .patch('/', async (ctx, next) => {
     const {body, db} = ctx;
-    const {roles, grades} = body;
-    await Promise.all(roles.map(async role => {
-      await db.RoleModel.update({_id: role._id}, {
-        $set: {
-          messagePersonCountLimit: role.messagePersonCountLimit,
-          messageCountLimit: role.messageCountLimit
-        }
-      })
-    }));
-    await Promise.all(grades.map(async grade => {
-      await db.UsersGradeModel.update({_id: grade._id}, {
-        $set: {
-          messagePersonCountLimit: grade.messagePersonCountLimit,
-          messageCountLimit: grade.messageCountLimit
-        }
-      })
-    }));
+    const {roles, grades, type, messageType} = body;
+    if(type === "modifyMessageType") {
+      const {templates, _id} = messageType;
+      for(const template of templates) {
+        const {type, content} = template;
+        if(!content) ctx.throw(400, "模板内容不能为空");
+        console.log({
+          _id,
+          "templates.type": type
+        });
+        console.log({
+          "templates.content": content
+        });
+        await db.MessageTypeModel.updateOne({
+          _id,
+          "templates.type": type
+        }, {
+          $set: {
+            "templates.$.content": content
+          }
+        });
+      }
+    } else if(type === "modifySendLimit") {
+      await Promise.all(roles.map(async role => {
+        await db.RoleModel.update({_id: role._id}, {
+          $set: {
+            messagePersonCountLimit: role.messagePersonCountLimit,
+            messageCountLimit: role.messageCountLimit
+          }
+        })
+      }));
+      await Promise.all(grades.map(async grade => {
+        await db.UsersGradeModel.update({_id: grade._id}, {
+          $set: {
+            messagePersonCountLimit: grade.messagePersonCountLimit,
+            messageCountLimit: grade.messageCountLimit
+          }
+        })
+      }));
+    }
     await next();
   });
 module.exports = messageRouter;
