@@ -10,6 +10,7 @@ const withdrawnRouter = require('./withdrawn');
 const newMessageRouter = require('./newMessage');
 const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
+const dataRouter = require("./data");
 const searchRouter = require('./search');
 messageRouter
   .use('/', async (ctx, next) => {
@@ -32,6 +33,13 @@ messageRouter
       user.newMessage = {};
       ctx.template = 'message/message.pug';
       data.navbar = {highlight: 'message'};
+
+
+      // 测试start
+      data.templates = await db.MessageTypeModel.getTemplates("web");
+      // 测试end
+
+
       return await next();
     }
 
@@ -160,5 +168,6 @@ messageRouter
   .use('/newMessages', newMessageRouter.routes(), newMessageRouter.allowedMethods())
   .use('/chat', chatRouter.routes(), chatRouter.allowedMethods())
   .use('/search', searchRouter.routes(), searchRouter.allowedMethods())
-  .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods());
+  .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods())
+  .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;

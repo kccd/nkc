@@ -561,6 +561,7 @@
   "updateProtocolType": "[SY]修改详细类型协议",
   "deleteProtocolType": "[SY]删除详细类型协议",
   "visitProtocol": "[CO]查看协议",
+  "messageDataGet": "消息页面加载消息",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

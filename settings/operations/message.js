@@ -43,5 +43,8 @@ module.exports = {
   },
   search: {
     GET: 'messageSearchUser'
+  },
+  data: {
+    GET: "messageDataGet"
   }
 };

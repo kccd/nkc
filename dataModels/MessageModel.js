@@ -156,9 +156,98 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     if(onlyReceiveFromFriends) throwErr(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
   }
 
-}
+};
 
-messageSchema.statics.extendReminder = async (arr) => {
+messageSchema.statics.extendSTUMessages = async (arr) => {
+  const moment = require("moment");
+  const PostModel = mongoose.model("posts");
+  const UserModel = mongoose.model("users");
+  const ThreadModel = mongoose.model("threads");
+  const apiFunction = require("../nkcModules/apiFunction");
+  const results = [];
+
+  for(let r of arr) {
+    r = r.toObject();
+    const {type, pid, targetPid, targetUid, tid} = r.c;
+    if(type === "@") {
+      const post = await PostModel.findOne({pid: targetPid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const user = await UserModel.findOne({uid: targetUid});
+      if(!user) continue;
+      r.c.post = post;
+      r.c.thread = thread;
+    } else if(type === "digestPost") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      r.c.post = post;
+    } else if(type === "digestThread") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      const thread = await PostModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      r.c.thread = thread;
+    } else if(type === "bannedThread") {
+      const thread = await ThreadModel.findOne({tid});
+      if(!thread) continue;
+      r.c.thread = thread;
+    } else if(type === "bannedPost") {
+      const post = await ThreadModel.findOne({pid});
+      if(!post) continue;
+      r.c.post = post;
+    } else if(type === "threadWasReturned") {
+      const thread = await ThreadModel.findOne({tid});
+      if(!thread) continue;
+      r.c.thread = thread;
+    } else if(type === "postWasReturned") {
+      const post = await ThreadModel.findOne({pid});
+      if(!post) continue;
+      r.c.post = post;
+    } else if(type === "replyPost") {
+      const post = await PostModel.findOne({pid: targetPid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const user = await UserModel.findOne({uid: post.uid});
+      if(!user) continue;
+      r.c.user = user;
+      r.c.thread = thread;
+      r.c.post = post;
+    } else if(type === "replyThread") {
+      const post = await PostModel.findOne({pid: targetPid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const user = await UserModel.findOne({uid: post.uid});
+      if(!user) continue;
+      r.c.user = user;
+      r.c.thread = thread;
+      r.c.post = post;
+    }
+
+    if(r.c.thread) {
+      r.c.thread = (await ThreadModel.extendThreads([r.c.thread], {
+        forum: false,
+        category: false,
+        firstPost: true,
+        firstPostUser: false,
+        userInfo: false,
+        lastPost: false,
+        lastPostUser: false,
+        firstPostResource: false,
+        htmlToText: false,
+        count: 200
+      }))[0];
+    }
+    results.push(r);
+  }
+
+  return results;
+
+};
+
+/*messageSchema.statics.extendReminder = async (arr) => {
   const moment = require('moment');
   const PostModel = mongoose.model('posts');
   const UserModel = mongoose.model('users');
@@ -345,7 +434,8 @@ messageSchema.statics.extendReminder = async (arr) => {
     results.push(r_);
   }
   return results;
-};
+};*/
+
 messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const CreatedChatModel = mongoose.model('createdChat');
   const FriendModel = mongoose.model('friends');

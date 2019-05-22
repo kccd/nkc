@@ -1,12 +1,11 @@
 extends ../bootstrap_base
 block title
   title 信息
-  -const hiddenFooter = true;
   link(href=`/bootstrap/css/bootstrap-chinese-region.min.css?v=${global.NKC.startTime}` media="screen" rel='stylesheet')
   link(href=`/mdui/css/mdui.css?v=${startTime}`)
   link(rel='stylesheet' href=`/message/message.css?v=${global.NKC.startTime}`)
 block content
-
+  .hidden#templatesData=objToStr({templates: data.templates})
   // 私信内容
   mixin messageContent
     transition(name='fade')
@@ -614,19 +613,11 @@ block content
               div Chat v1.0.0
 
           // 选择的系统通知
-          div(v-if="target === 'notice'")
+          div(v-if="target === 'STE'")
             div(style="height: 100%;")
               .ms-header 系统通知
               .ms-notice(ref='content')
                 +noticeContent
-
-
-          // 选择的系统提醒
-          div(v-if="target === 'reminder'" )
-            div(style="height: 100%;")
-              .ms-header 系统提醒
-              .ms-notice(ref='content')
-                +reminderContent
 
           // 选择的新朋友
           div(v-if="target === 'newFriends'" style="height: 100%;")
@@ -645,7 +636,7 @@ block content
               +categoriesContent
 
           //- 选择了用户
-          div(v-if="target === 'user'")
+          div(v-if="target === 'UTU'")
             .ms-header(style="cursor: pointer;font-weight:700;color: #666666;" @click='selectFriend({targetUser: targetUser})') {{targetUser.friend && targetUser.friend.info.name?targetUser.friend.info.name: targetUser.username}}
             .ms-right-body.new-content-body(@click="showEmoji = false" ref='content')
               +messageContent
@@ -664,6 +655,17 @@ block content
                   span(style='margin-left: 2rem;font-size: 1.2rem;') ctrl+enter 快捷发送
                 .text-right(style='float: right;margin-right: 2rem;')
                   button.btn.btn-default.btn-sm(@click="sendToUser()") 发送
+
+          // 选择的系统提醒
+          //-div(v-if="target === 'STU'" )
+            div(style="height: 100%;")
+              .ms-header 系统提醒
+              .ms-notice(ref='content')
+                +reminderContent
+
+          //- 自定义内容。利用jquery根据后台配置的模板信息生成dom，然后启动vue渲染。
+          div.templates-dom
+
 
 
 

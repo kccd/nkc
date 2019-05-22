@@ -16,7 +16,7 @@ var mobile = winWidth < 1100;
 var pageName = 'message';
 
 if(mobile) {
-  document.getElementsByTagName('body')[0].style.backgroundColor = '#ffffff';
+  $("body").css("background-color", "#ffffff");
 }
 
 $(function() {
@@ -76,6 +76,35 @@ $(function() {
         stopLeft: "/default/stopLeft.png"
       },
 
+    },
+    beforeCreate: function() {
+      var templates = getDataById("templatesData").templates;
+      var templatesDom = $(".templates-dom");
+      for(var i = 0; i < templates.length; i++) {
+        var messageType = templates[i];
+        var typeDiv = $("<div v-if='target === \""+ messageType._id +"\"'></div>");
+        var typeBody = $("<div style='height: 100%'></div>");
+        typeBody.append($("<div class='ms-header'>"+messageType.name+"</div>"));
+        var templateBody = $("<div class='ms-notice' ref='content'></div>");
+        templateBody.append($("<transition name='fade'><div class='ms-loading-info'>{{info}}</div></transition>"));
+        var templateBodyContent = $("<div class='ms-notice-body' v-for='item in messages'><div class='ms-notice-time'>{{format('YYYY/MM/DD', item.tc)}}</div></div>");
+        var content = $("<div class='ms-notice-content'></div>");
+        for(var j = 0; j < messageType.templates.length; j++) {
+          var template = messageType.templates[j];
+          var type = template.type;
+          var dom = template.dom;
+          var div = $("<div v-if='item.c.type === \""+ type +"\"'>"+dom+"</div>");
+          content.append(div);
+        }
+        templateBodyContent.append(content);
+        templateBody.append(templateBodyContent);
+        typeBody.append(templateBody);
+        typeDiv.append(typeBody);
+        templatesDom.append(typeDiv);
+      }
+      console.log(templatesDom)
+
+      throw 234234234
     },
     watch: {
       messages: function() {
@@ -570,7 +599,7 @@ $(function() {
         this.friendImageProgress = '';
         this.friend = '';
         this.category = '';
-        this.selectCategoryFriendsId = [],
+        this.selectCategoryFriendsId = [];
         this.editCategory = false;
       },
 
@@ -579,20 +608,12 @@ $(function() {
         if(!app.canGetMessage) return Promise.reject();
         app.canGetMessage = false;
         app.info = '加载中~';
-        var url;
-        if(this.target === 'user') {
-          url = '/message/user/' + this.targetUser.uid;
-        } else if(this.target === 'notice') {
-          url = '/message/systemInfo';
-        } else if(this.target === 'reminder'){
-          url = '/message/remind'
-        } else if(this.target === 'newFriends') {
-          url = '/message/friendsApplication'
-        }
+        var uid = this.targetUser && this.targetUser.uid? this.targetUser.uid: "";
+        var url = "/message/data?type=" + this.target + (uid?"&uid="+uid: "");
         if(this.firstMessageId) {
-          url += '?firstMessageId=' + this.firstMessageId + '&t=' + Date.now();
+          url += '&firstMessageId=' + this.firstMessageId + '&t=' + Date.now();
         } else {
-          url += '?t=' + Date.now();
+          url += '&t=' + Date.now();
         }
         return nkcAPI(url, 'GET', {})
           .then(function(data) {
@@ -776,7 +797,7 @@ $(function() {
         this.initialization();
         addHistory(item.type);
         if(item.type === 'UTU') {
-          app.target = 'user';
+          app.target = item.type;
           app.targetUser = item.user;
           app.targetUser.friend = item.friend;
           this.getInputTextFromLocal();
@@ -820,7 +841,7 @@ $(function() {
               });
             }
         } else if(item.type === 'STE') {
-          app.target = 'notice';
+          app.target = item.type;
           this.getMessage()
             .then(function() {
               app.scrollToBottom();
@@ -839,7 +860,7 @@ $(function() {
 
             })
         } else if(item.type === 'STU'){
-          app.target = 'reminder';
+          app.target = item.type;
           this.getMessage()
             .then(function() {
               app.scrollToBottom();
