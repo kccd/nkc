@@ -117,7 +117,7 @@ router
               highlightObj[r.pid + "_keywordsCN"] = "关键词：" + r.highlight.keywordsCN;
             }
             if(r.highlight.abstractEN) {
-              highlightObj[r.pid + "_abstractEN"] = "摘要：" + r.highlight.abstractEN;
+              highlightObj[r.pid + "_abstractEN"] = "Abstract：" + r.highlight.abstractEN;
             }
             if(r.highlight.abstractCN) {
               highlightObj[r.pid + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
