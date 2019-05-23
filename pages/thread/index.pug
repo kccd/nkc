@@ -95,7 +95,7 @@ block title
           
           if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
             li
-              a(href=`/editor?type=post&id=${post.pid}`)
+              a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
                 span.fa.fa-edit &nbsp;编辑
         if disablePost && !targetThread
           li

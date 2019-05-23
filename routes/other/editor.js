@@ -5,6 +5,7 @@ editorRouter
     const {data, db, query, nkcModules} = ctx;
     const {dbFunction} = nkcModules;
     const {user} = data;
+    data.ver = query.ver;
     // 判断用户是否已完善账号基本信息（username, avatar, banner）
     if(!await db.UserModel.checkUserBaseInfo(user)) {
       nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
@@ -121,9 +122,6 @@ editorRouter
     
     const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     data.allForumList = allForumList;
-    
-    data.ver = query.ver;
-
     await next();
   });
 

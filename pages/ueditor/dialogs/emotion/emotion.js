@@ -3,7 +3,8 @@ window.onload = function () {
         emotionLocalization:false
     });
 
-    emotion.SmileyPath = editor.options.emotionLocalization === true ? 'images/' : "http://img.baidu.com/hi/";
+    // emotion.SmileyPath = editor.options.emotionLocalization === true ? 'images/' : "http://img.baidu.com/hi/";
+    emotion.SmileyPath = "/";
     emotion.SmileyBox = createTabList( emotion.tabNum );
     emotion.tabExist = createArr( emotion.tabNum );
 
@@ -115,6 +116,7 @@ function autoHeight( index ) {
 
 
 function createTab( tabName ) {
+    emotion.SmileyBox[tabName] = ["1f600.svg","1f601.svg","1f602.svg","1f603.svg","1f604.svg","1f605.svg","1f606.svg","1f607.svg","1f608.svg","1f609.svg","1f60a.svg","1f60b.svg","1f60c.svg","1f60d.svg","1f60e.svg","1f60f.svg","1f610.svg","1f611.svg","1f612.svg","1f613.svg","1f614.svg","1f615.svg","1f616.svg","1f617.svg","1f618.svg","1f619.svg","1f61a.svg","1f61b.svg","1f61c.svg","1f61d.svg","1f61e.svg","1f61f.svg","1f620.svg","1f621.svg","1f622.svg","1f623.svg","1f624.svg","1f625.svg","1f626.svg","1f627.svg","1f628.svg","1f629.svg","1f62a.svg","1f62b.svg","1f62c.svg","1f62d.svg","1f62e.svg","1f62f.svg","1f630.svg","1f631.svg","1f632.svg","1f633.svg","1f634.svg","1f635.svg","1f636.svg","1f637.svg","1f641.svg","1f642.svg","1f643.svg","1f644.svg","1f923.svg","2620.svg", "2622.svg", "2623.svg", "1f47f.svg","1f480.svg","1f47d.svg","1f47b.svg"];
     var faceVersion = "?v=1.1", //版本号
             tab = $G( tabName ), //获取将要生成的Div句柄
             imagePath = emotion.SmileyPath + emotion.imageFolders[tabName], //获取显示表情和预览表情的路径
@@ -126,7 +128,6 @@ function createTab( tabName ) {
             textHTML = ['<table class="smileytable">'],
             i = 0, imgNum = emotion.SmileyBox[tabName].length, imgColNum = 11, faceImage,
             sUrl, realUrl, posflag, offset, infor;
-
     for ( ; i < imgNum; ) {
         textHTML.push( '<tr>' );
         for ( var j = 0; j < imgColNum; j++, i++ ) {
@@ -137,10 +138,9 @@ function createTab( tabName ) {
                 posflag = j < positionLine ? 0 : 1;
                 offset = cssOffset * i * (-1) - 1;
                 infor = emotion.SmileyInfor[tabName][i];
-
                 textHTML.push( '<td  class="' + tableCss + '"   border="1" width="' + iColWidth + '%" style="border-collapse:collapse;" align="center"  bgcolor="transparent" onclick="InsertSmiley(\'' + realUrl.replace( /'/g, "\\'" ) + '\',event)" onmouseover="over(this,\'' + sUrl + '\',\'' + posflag + '\')" onmouseout="out(this)">' );
                 textHTML.push( '<span>' );
-                textHTML.push( '<img  style="background-position:left ' + offset + 'px;" title="' + infor + '" src="' + emotion.SmileyPath + (editor.options.emotionLocalization ? '0.gif" width="' : 'default/0.gif" width="') + iWidth + '" height="' + iHeight + '"></img>' );
+                textHTML.push( '<img class="emoji" title="' + infor + '" src="' + sUrl + iWidth + '" height="' + iHeight + '"></img>' );
                 textHTML.push( '</span>' );
             } else {
                 textHTML.push( '<td width="' + iColWidth + '%"   bgcolor="#FFFFFF">' );

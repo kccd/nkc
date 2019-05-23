@@ -434,7 +434,6 @@ function parentsOnChange(that) {
 //保存草稿
 function saveDraft(that){
   return function() {
-    //--获取编辑器的内容--
     $(".MathJax_Preview").each(function(){
       if($(this).next().next().length !== 0){
         if($(this).next().next().attr("type").length > 15){
@@ -525,7 +524,7 @@ function saveDraft(that){
 
 function onPost(that) {
   return function() {
-    //--获取编辑器的内容--
+    // start
     var specialMark = that.specialMark;
     $(".MathJax_Preview").each(function(){
       if($(this).next().next().length !== 0){
@@ -541,6 +540,8 @@ function onPost(that) {
         $(this).parent().remove()
       }
     })
+    // end
+
     var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''
 
     if(specialMark == "old"){

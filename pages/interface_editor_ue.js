@@ -1,10 +1,162 @@
+function articleTransfer() {
+  // 取出编辑器中的文章并放入转移区域
+  var transferDom = ue.getContent();
+  $("#transfer").html(transferDom);
+  // 在转移区域中化简公式
+  $("#transfer").find(".MathJax_Preview").each(function(){
+    if($(this).next().next().length !== 0){
+      if($(this).next().next().attr("type").length > 15){
+        var mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        var mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
+    }else{
+      $(this).parent().remove()
+    }
+  })
+  // 再取出转移区域中的文章内容，并返回
+  var transferHtml = $("#transfer").html();
+  return transferHtml;
+}
+
 /**
  * 提交回复
  */
 function onPost() {
+  // 获取url相关参数
+  var query = getSearchKV();
+  var queryType = query.type;
+  var queryId = query.id;
+  // 文章内容相关
   var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
-  var content = ue.getContent(); // 文章主体内容
-  console.log(quoteContent, content)
+  var transferContent = articleTransfer(); // 转移区内容
+  var content = quoteContent + transferContent; // 文章主体内容
+  if(content.length < 1) {
+    return screenTopWarning("请填写内容")
+  }
+  if(geid('parseURL').checked) {
+    content = common.URLifyHTML(content);
+  }
+  var title = geid('title').value.trim(); // 文章标题
+  if (queryType !== 'redit' && queryType !== 'thread' && queryType !== 'post' && queryType !== 'application' && title === '' && queryType !== 'forum_declare') {
+    return screenTopWarning('请填写标题');
+  }
+  if(title.length > 50) {
+    return screenTopWarning("文章标题50字以内");
+  }
+  // 草稿相关
+  var desType = $("#draftDelType").html() || ''; // 草稿类型
+  var desTypeId = $("#draftDelTypeId").html() || ''; // 草稿类型id
+  var did = $("#draftId").html() || ''; // 草稿id
+  // 获取专业与分类
+  var fids = [];
+  var cids = [];
+  if(!queryType || queryType == "forum" || desType == "forum") {
+    var panelObj = $("#tabPanel").tagsinput("items");
+    if(panelObj.length == 0) {
+      return screenTopWarning("请选择专业");
+    }else{
+      for(var po=0;po<panelObj.length;po++) {
+        if(fids.indexOf(panelObj[po].fid) == -1) {
+          fids.push(panelObj[po].fid)
+        }
+        if(panelObj[po].cid !== "") {
+          var dealCid = panelObj[po].cid.substr(1);
+          if(cids.indexOf(dealCid) == -1) {
+            cids.push(dealCid)
+          }
+        }
+      }
+    }
+    queryId = fids[0];
+    queryType = 'forum';
+  }
+  // 组装上传数据，如果是特殊类型，则将关键词摘要等放入post
+  var post = {
+    t: title,
+    c: content,
+    l: 'html',
+    did: did,
+    fids: fids,
+    cids: cids,
+    desType: desType,
+    desTypeId: desTypeId
+  }
+  if(queryType == "post" || queryType == "thread" || queryType == "forum") {
+    try{
+      var paperObj = paperProto.paperExport();
+    }catch(e) {
+      screenTopWarning(e);
+      return;
+    }
+    for(var i in paperObj) {
+      post[i] = paperObj[i]
+    }
+  }
+  // 将组装好的数据发送至目标路由
+  geid('post').disabled = true;
+  var method;
+  var url;
+  var data;
+  if (queryType === 'post') {
+    method = 'PATCH';
+    url = '/p/' + queryId;
+    data = {post: post};
+  } else if (queryType === 'forum') {
+    method = 'POST';
+    url = '/f/' + queryId;
+    data = {post: post};
+  } else if (queryType === 'thread') {
+    method = 'POST';
+    url = '/t/' + queryId;
+    data = {post: post};
+  } else if (queryType === 'application' && cat === 'p') { // 编辑项目内容
+    method = 'PATCH';
+    url = '/fund/a/' + queryId;
+    data = {project: post, s: 3}
+  } else if(queryType === 'application' && cat === 'c') { // 评论
+    method = 'POST';
+    url = '/fund/a/' + queryId + '/comment';
+    data = {comment: post}
+  } else if(queryType === 'application' && cat === 'r') { // 报告
+    method = 'POST';
+    url = '/fund/a/' + queryId + '/report';
+    data = {c: post.c, t: post.t, l: post.l}
+  } else if(queryType === 'redit'){
+    // 判断desType的类型，重新指定发表的url
+    if(desType === "thread"){
+      method = 'POST';
+      url = '/t/' + desTypeId;
+      data = {post: post};
+    }else if(desType === "post"){
+      method = 'PATCH';
+      url = '/p/' + desTypeId;
+      data = {post: post};
+    }
+  } else if(queryType === 'forum_declare') {
+    method = 'PATCH';
+    url = '/f/' + queryId + '/settings/info';
+    data = {declare: post.c, operation: 'updateDeclare'}
+  } else {
+    return screenTopWarning('未知的请求类型：'+queryType);
+  }
+  return nkcAPI(url, method, data)
+  .then(function (result) {
+    if(result.redirect) {
+      redirect(result.redirect)
+    } else {
+      if(queryType === 'post') {
+        redirect()
+      }
+    }
+  })
+  .catch(function (data) {
+    screenTopWarning(data || data.error);
+    geid('post').disabled = false
+  })
 }
 
 /**
@@ -31,18 +183,34 @@ function getSearchKV() {
   return result
 }
 
+/**
+ * 将上一页面中的编辑器主要内容、引用内容等放入当前页面的编辑器中
+ */
 var type = GetUrlParam("type");
 if(type == "post"){
-    var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
-    var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
-    if(quoteHtml){
-        document.getElementById("quoteContent").innerHTML = quoteHtml[0];
-        geid('quoteCancel').style.display = "inline";
-    }
-    disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
-    editor.txt.html(disnoneplayHtml)
+  var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+  var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
+  if(quoteHtml){
+      document.getElementById("quoteContent").innerHTML = quoteHtml[0];
+      geid('quoteCancel').style.display = "inline";
+  }
+  disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
+  ue.ready(function() {
+    ue.setContent(disnoneplayHtml);
+  })
 }
-
+if(type == "thread"){
+  var replyHtml = window.localStorage.replyHtml;
+  var quoteHtml = window.localStorage.quoteHtml;
+  ue.ready(function(){ 
+    ue.setContent(replyHtml);
+  })
+  if(quoteHtml){
+      document.getElementById("quoteContent").innerHTML = quoteHtml;
+      geid('quoteCancel').style.display = "inline";
+  }
+  window.localStorage.clear();
+}
 
 // 根据参数名称找到对应的参数值
 function GetUrlParam(paraName) {
@@ -62,3 +230,47 @@ function GetUrlParam(paraName) {
       return "";
   }
 }
+
+//html解码
+function htmlDecode(text){
+  //1.首先动态创建一个容器标签元素，如DIV
+  var temp = document.createElement("div");
+  //2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
+  temp.innerHTML = text;
+  //3.最后返回这个元素的innerText(ie支持)或者textContent(火狐，google支持)，即得到经过HTML解码的字符串了。
+  var output = temp.innerText || temp.textContent;
+  temp = null;
+  return output;
+}
+
+/**
+ * 资源插入到编辑器中
+ */
+function mediaInsertUE(srcStr, fileType, name) {
+  fileType = fileType.toLowerCase();
+  var codeResource = "";
+  if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
+    //codeResource = "<b>123456</b>"
+    codeResource = "<p><img src=" + srcStr + " width='640'></p>"
+  }else if(fileType === "mp4"){
+    codeResource = "<video src=" + srcStr + " controls style=width:640px;>video</video>"
+  }else if(fileType === "mp3"){
+    codeResource = "<audio src=" + srcStr + " controls>Your browser does not support the audio element</audio>";
+  }else{
+    codeResource = "<p><a href=" + srcStr + "><img src=" + "/default/default_thumbnail.png" + ">" + name + "</a></p>"
+  }
+  ue.execCommand('inserthtml', codeResource);
+}
+
+/**
+ * ue的公式渲染
+ */
+// function mathfreshnew(){
+//   console.log(document.getElementsByTagName('body'))
+//   if(MathJax){
+//     MathJax.Hub.PreProcess(document.getElementsByTagName('body'),function(){MathJax.Hub.Process(document.getElementsByTagName('body'))})
+//   }
+//   if(hljs){
+//     ReHighlightEverything() //interface_common code highlight
+//   }
+// }

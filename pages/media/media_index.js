@@ -166,27 +166,32 @@ function turnPage() {
 
 // 全部类型插入到编辑器
 function allInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 图片插入到编辑器
 function pictureInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 视频插入到编辑器
 function videoInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 音频插入编辑器
 function audioInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 附件插入编辑器
 function attachmentInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, "", name)
+  // edInsertContent('text-elem', '/r/'+rid, "", name)
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 选择文件

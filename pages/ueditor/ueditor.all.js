@@ -6925,6 +6925,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
+                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\'], [\'\\(\',\'\\)\']],displayMath: [[\'$$\',\'$$\'], [\'\\[\',\'\\]\']],ignoreClass:\'container\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}}})</script>'+
+                    '<script async=\'async\' src=\'/external_pkgs/MathJax-2.6-latest/MathJax.js\'></script>' +
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
                     'setTimeout(function(){editor = window.parent.UE.instants[\'ueditorInstant' + me.uid + '\'];editor._setup(document);},0);' +
@@ -7238,7 +7240,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
             me.fireEvent('beforegetcontent');
             var root = UE.htmlparser(me.body.innerHTML,ignoreBlank);
-            me.filterOutputRule(root);
+            // me.filterOutputRule(root);
             me.fireEvent('aftergetcontent', cmd,root);
             return  root.toHtml(formatter);
         },

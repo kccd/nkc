@@ -47,10 +47,14 @@ block content
             .form-group
               div#quoteCancel(style='display: none')
                 button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-            //- .form-group
-            //-     div#content_test                
-            .form-group
-                include ./ueditor/ueditor.pug
+            if data.ver == "ue"
+              .form-group
+                include ./ueditor/ueditor.pug     
+              .form-group
+                #transfer
+            else
+              .form-group
+                div#content_test   
             .form-group
             //- .nkcpanel(id='file-uploading' target='/r')
             //-     //uploader section
