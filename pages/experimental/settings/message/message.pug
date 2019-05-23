@@ -20,6 +20,14 @@ block eContent
               .list-group(v-for="t in messageTypes")
                 a.list-group-item.pointer(:class='{"active": selectedMessageType === t}' @click="selectType(t)") {{t.name}}
           .col-xs-12.col-md-8.col-md-offset-1(v-if="selectedMessageType")
+            .form
+              .form-group
+                label 类型名
+                input.form-control(v-model="selectedMessageType.name")
+              .form-group
+                label 简介
+                textarea.form-control(v-model="selectedMessageType.description")
+
             div(v-for="template in selectedMessageType.templates").m-t-2
               h4
                 b {{lang(template.type)}}

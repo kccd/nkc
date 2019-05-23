@@ -8,6 +8,10 @@
   "userID": "用户ID",
   "userURL": "用户主页",
   "username": "用户名",
+  "editThreadURL": "编辑文章链接",
+  "editPostURL": "编辑回复链接",
+  "deadline": "过期时间",
+  "reason": "理由",
 
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",

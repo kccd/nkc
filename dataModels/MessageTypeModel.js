@@ -45,7 +45,7 @@ const getDomByType = (t) => {
   } else if(t === "postContent") {
     return "item.c.post.c"
   } else if(t === "postURL") {
-    return "'/p/' + item.c.post.pid"
+    return "item.c.post.url"
   } else if(t === "postID") {
     return "item.c.post.pid"
   } else if(t === "reason") {
@@ -56,6 +56,12 @@ const getDomByType = (t) => {
     return "'/u/' + item.c.user.uid"
   } else if(t === "username") {
     return "item.c.user.username"
+  } else if(t === "editPostURL") {
+    return "'/editor?type=post&id=' + item.c.post.pid"
+  } else if(t === "editThreadURL") {
+    return "'/editor?type=post&id=' + item.c.thread.oc"
+  } else if(t === "deadline") {
+    return "item.c.deadline"
   }
 
 };
@@ -93,10 +99,11 @@ schema.statics.getTemplates = async (type) => {
   const messageTypes = await MessageTypeModel.find();
   const results = [];
   for(const messageType of messageTypes) {
-    const {_id, templates, name} = messageType;
+    const {_id, templates, description, name} = messageType;
     const obj = {
       _id,
       name,
+      description,
       templates: []
     };
     for(const t of templates) {

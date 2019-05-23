@@ -166,10 +166,12 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
 
+  const timeout = 72 * 60 * 60 * 1000;
+
   for(let r of arr) {
     r = r.toObject();
     const {type, pid, targetPid, targetUid, tid} = r.c;
-    if(type === "@") {
+    if(type === "at") {
       const post = await PostModel.findOne({pid: targetPid});
       if(!post) continue;
       const thread = await ThreadModel.findOne({tid: post.tid});
@@ -177,6 +179,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const user = await UserModel.findOne({uid: targetUid});
       if(!user) continue;
       r.c.post = post;
+      r.c.user = user;
       r.c.thread = thread;
     } else if(type === "digestPost") {
       const post = await PostModel.findOne({pid});
@@ -200,6 +203,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const thread = await ThreadModel.findOne({tid});
       if(!thread) continue;
       r.c.thread = thread;
+      r.c.deadline = moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss");
     } else if(type === "postWasReturned") {
       const post = await ThreadModel.findOne({pid});
       if(!post) continue;
@@ -239,6 +243,14 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
         htmlToText: false,
         count: 200
       }))[0];
+    }
+    if(r.c.post) {
+      r.c.post = r.c.post.toObject();
+      const step = await ThreadModel.getPostStep(r.c.post.tid, {
+        pid: r.c.post.pid,
+        disabled: false
+      });
+      r.c.post.url = `/t/${r.c.post.tid}?page=${step.page}&highlight=${r.c.post.pid}#${r.c.post.pid}`;
     }
     results.push(r);
   }

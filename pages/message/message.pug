@@ -422,7 +422,7 @@ block content
         .ms-list-title 系统通知
         .ms-list-content 这是系统通知
     //- 系统提醒
-    .ms-list-body.friend-list(@click="selectUser({type: 'STU'})")
+    //-.ms-list-body.friend-list(@click="selectUser({type: 'STU'})")
       .ms-list-left.remind
         .ms-list-img
           .ms-list-avatar.fa.fa-bell-o
@@ -438,6 +438,15 @@ block content
       .ms-list-center
         .ms-list-title 新朋友
         .ms-list-content 好友的添加申请
+
+
+    .ms-list-body.friend-list(v-for="t in messageTypes" @click="selectUser({type: t._id})")
+      .ms-list-left.remind
+        .ms-list-img
+          img.ms-list-avatar(:src="'/statics/message_type/' + t._id + '.jpg'")
+      .ms-list-center
+        .ms-list-title {{t.name}}
+        .ms-list-content {{t.description}}
 
 
     div(v-for="f in friendsByOrder")
@@ -487,7 +496,6 @@ block content
           .ms-list-time {{format('MM/DD HH:mm', item.time)}}
             .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
           .new-message-count(v-if='item.count > 0') {{item.count}}
-
       //- 系统通知
       .ms-list-body(v-else-if="item.type === 'STE'" :class="{'active': target === 'notice' && item.type === 'STE'}")
         .ms-list-left.notice
@@ -502,7 +510,7 @@ block content
           div.new-message-count(v-if='item.count > 0') {{item.count}}
 
       //- 系统提醒
-      .ms-list-body(v-else-if="item.type === 'STU'" :class="{'active': target === 'reminder' && item.type === 'STU'}")
+      //-.ms-list-body(v-else-if="item.type === 'STU'" :class="{'active': target === 'reminder' && item.type === 'STU'}")
         .ms-list-left.remind
           .ms-list-img
             .ms-list-avatar.fa.fa-bell-o
@@ -526,7 +534,18 @@ block content
           .ms-list-time {{format('MM/DD HH:mm', item.time)}}
             .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
           .new-message-count(v-if='item.count > 0') {{item.count}}
-
+      //- 动态生成的模板
+      .ms-list-body(v-else :class="{'active': target ===  item.type}")
+        .ms-list-left.notice
+          .ms-list-img
+            img.ms-list-avatar(:src="'/statics/message_type/' + item.type + '.jpg'")
+        .ms-list-center
+          .ms-list-title {{item.name}}
+          .ms-list-content {{item.content || '暂无消息'}}
+        .ms-list-right
+          .ms-list-time {{item.timeStr}}
+            .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
+          div.new-message-count(v-if='item.count > 0') {{item.count}}
   .hidden#data=JSON.stringify({targetUser: data.targetUser})
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak )#app
     //input.hidden#imgInput(type='file' multiple="multiple" accept="image/*" @change="uploadResource")

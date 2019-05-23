@@ -12,6 +12,7 @@ const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
 const dataRouter = require("./data");
 const searchRouter = require('./search');
+const moment = require("moment");
 messageRouter
   .use('/', async (ctx, next) => {
     // 未完善资料的用户跳转到完善资料页
@@ -42,6 +43,8 @@ messageRouter
 
       return await next();
     }
+
+    data.messageTypes = await db.MessageTypeModel.find().sort({toc: 1});
 
     const list = [];
     const userList = [];
@@ -96,11 +99,15 @@ messageRouter
     // 获取提醒
     if(chat.reminder) {
       message = await db.MessageModel.findOne({ty: 'STU', r: user.uid}).sort({tc: -1});
+      const messageType = await db.MessageTypeModel.findOnly({_id: "STU"});
       list.push({
-        time: message?message.tc: new Date('2000-1-1'),
+        time: message?message.tc:new Date("2000-1-1"),
+        name: messageType.name,
+        timeStr: message?moment(message.tc).format("MM/DD HH:mm"): new Date('2000-1-1'),
         type: 'STU',
         message,
-        count: user.newMessage.newReminderCount
+        count: user.newMessage.newReminderCount,
+        content: message?ctx.state.lang("messageTypes", message.c.type):""
       });
     }
 

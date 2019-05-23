@@ -5,6 +5,8 @@ var winWidth = $(window).width();
 var xss = window.filterXSS;
 
 var data = document.getElementById('data').innerText;
+var templates = getDataById("templatesData").templates;
+
 
 data = JSON.parse(data);
 
@@ -76,9 +78,10 @@ $(function() {
         stopLeft: "/default/stopLeft.png"
       },
 
+      messageTypes: templates
+
     },
     beforeCreate: function() {
-      var templates = getDataById("templatesData").templates;
       var templatesDom = $(".templates-dom");
       for(var i = 0; i < templates.length; i++) {
         var messageType = templates[i];
@@ -102,9 +105,6 @@ $(function() {
         typeDiv.append(typeBody);
         templatesDom.append(typeDiv);
       }
-      console.log(templatesDom)
-
-      throw 234234234
     },
     watch: {
       messages: function() {
