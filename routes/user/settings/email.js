@@ -5,6 +5,7 @@ emailRouter
 		const {data, db, query} = ctx;
 		const {user} = data;
 		let {email, token, operation} = query;
+		email = (email || "").toLowerCase();
 		data.operation = operation;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		data.userEmail = userPersonal.email;
@@ -78,7 +79,8 @@ emailRouter
 	.get('/bind', async (ctx, next) => {
 		const {data, db, query} = ctx;
 		const {user} = data;
-		const {email, token} = query;
+		let {email, token} = query;
+    email = (email || "").toLowerCase();
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const emailCode = await db.EmailCodeModel.ensureEmailCode({
 			email,
@@ -104,7 +106,8 @@ emailRouter
 	.get('/verify', async (ctx, next) => {
 		const {data, db, query} = ctx;
 		const {user} = data;
-		const {email, token, oldToken} = query;
+		let {email, token, oldToken} = query;
+    email = (email || "").toLowerCase();
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		let oldSmsCode, smsCode;
 		try {
@@ -146,6 +149,7 @@ emailRouter
 	.post('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {operation} = body;
+		if(body.email) body.email = (body.email || "").toLowerCase();
 		const {user} = data;
 		const {apiFunction, sendEmail} = ctx.nkcModules;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
@@ -244,16 +248,6 @@ emailRouter
         email,
         code: token
       })
-		/*	const text = `科创论坛账号绑定邮箱，点击以下链接或直接输入验证码完成邮箱验证。`;
-			const href = `https://www.kechuang.org/u/${user.uid}/settings/email/verify?email=${email}&token=${token}&oldToken=${oldToken}`;
-			const link = `<h3>链接：<strong><a href="${href}">${href}</a></strong></h3>`;
-			const h3 = `<h3>验证码：<strong>${token}</strong></h3>`;
-			await sendEmail({
-				to: email,
-				subject: '修改邮箱',
-				text,
-				html: text + link + h3
-			});*/
 
 		} else {
 			ctx.throw(400, '未知的操作类型');

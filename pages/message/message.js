@@ -35,6 +35,7 @@ $(function() {
       selectedUserListItem: "",
       socketStatus: '',
       messages: [],
+      blackListUid: [],
       sendFailedMessages: [],
       showEmoji: false,
       user: '',
@@ -386,25 +387,66 @@ $(function() {
       },
 
       // 删除好友
-      deleteFriend: function() {
-        if(confirm('确认要删除该好友？') === false) return;
+      deleteFriend: function(type) {
+        if(type !== true) {
+          if(confirm('确认要删除该好友？') === false) return;
+        }
         nkcAPI('/friend/' + app.friend.tUid, 'DELETE', {})
           .then(function(data) {
-            /*for(var i = 0; i < app.userList.length; i++) {
-              var li = app.userList[i];
-              if(li.type === 'UTU' && li.user.uid === app.friend.tUid) {
-                app.userList.splice(i, 1);
-                break;
-              }
-            }
-            var index = app.friends.indexOf(app.friend.friend);
-            app.friends.splice(index, 1);*/
             app.friend = {targetUser: app.friend.targetUser};
           })
           .catch(function(data) {
             screenTopWarning(data.error || data);
           })
       },
+
+      // 加入用户到黑名单列表
+      addToBlackList: function() {
+        if(confirm("确认要将好友加入黑名单？") === false) return;
+        var isFriend = true;
+        var tUid = app.friend.tUid;
+        if(!tUid) {
+          tUid = app.friend.targetUser.uid;
+          isFriend = false;
+        }
+        nkcAPI("/message/blackList", "POST", {
+          tUid: tUid,
+          type: "add"
+        })
+          .then(function(data) {
+            app.blackListUid = data.blackListUid;
+            for(var i = 0; i < app.userList.length; i++) {
+              var item = app.userList[i];
+              if(item.type === "UTU" && item.user && item.user.uid === tUid) {
+                app.removeChat(item);
+              }
+            }
+            if(isFriend) {
+              app.deleteFriend(true);
+            }
+            screenTopAlert("已将用户加入到黑名单，可在资料设置处查看黑名单列表。");
+          })
+          .catch(function(data) {
+            screenTopWarning(data);
+          })
+      },
+
+      // 将用户从黑名单列表中移除
+      removeFromBlackList: function() {
+        if(confirm("确认要将用户从黑名单中移除？") === false) return;
+        nkcAPI("/message/blackList", "POST", {
+          tUid: app.friend.tUid || app.friend.targetUser.uid,
+          type: "remove"
+        })
+          .then(function(data) {
+            app.blackListUid = data.blackListUid;
+            screenTopAlert("已将用户从黑名单中移除。");
+          })
+          .catch(function(data) {
+            screenTopWarning(data);
+          })
+      },
+
 
       // 从已创建的聊天列表中移除聊天
       removeChat: function(item) {
@@ -639,8 +681,10 @@ $(function() {
         } else {
           url += '&t=' + Date.now();
         }
+        var target = app.target;
         return nkcAPI(url, 'GET', {})
           .then(function(data) {
+            if(app.target !== target) return;
             if(data.messages.length === 0) {
               app.info = '没有了~';
               return Promise.reject();
@@ -740,7 +784,7 @@ $(function() {
             .then(function(data) {
               app.userList = data.userList;
               app.friends = data.usersFriends;
-
+              app.blackListUid = data.blackListUid;
               // 拓展好友
               for(var i = 0; i < data.categories.length; i++) {
                 data.categories[i] = app.extendCategoryFriends(data.categories[i]);

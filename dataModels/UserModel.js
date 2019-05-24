@@ -756,8 +756,12 @@ userSchema.methods.getNewMessagesCount = async function() {
       }
     ]);
     for(const log of systemInfoLog) {
-      if(log.count > 1) {
-        await SystemInfoLogModel.remove({mid: log._id, uid: this.uid}, {justOne: true});
+      if(log.count <= 1) continue;
+      const logs = await SystemInfoLogModel.find({mid: log._id, uid: this.uid});
+      for(let i = 0; i < logs.length; i++) {
+        if(i > 0) {
+          await logs[i].remove();
+        }
       }
     }
   }

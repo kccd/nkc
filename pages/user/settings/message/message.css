@@ -1,0 +1,33 @@
+.black-user{
+  display: inline-block;
+  height: 2rem;
+  background-color: #d9e1e8;
+  border-radius: 1rem;
+  font-size: 0;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+.black-user img{
+  height: 2rem;
+  vertical-align: top;
+  margin-right: 0.3rem;
+  width: 2rem;
+  border-radius: 50%;
+}
+.black-user a{
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1.2rem;
+  color: #282c37;
+}
+.black-user .fa{
+  cursor: pointer;
+  font-size: 1.2rem;
+  height: 2rem;
+  width: 2rem;
+  line-height: 2rem;
+  text-align: center;
+}
+hr{
+  margin: 0.3rem 0;
+}

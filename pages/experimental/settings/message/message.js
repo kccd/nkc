@@ -39,7 +39,8 @@ var app = new Vue({
     submit: function() {
       var obj = {
         roles: app.roles,
-        grades: app.grades
+        grades: app.grades,
+        type: "modifySendLimit"
       };
       nkcAPI('/e/settings/message', 'PATCH', obj)
         .then(function() {

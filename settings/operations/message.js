@@ -3,6 +3,9 @@ module.exports = {
   systemInfo: {
     GET: 'getSystemInfo'
   },
+  blackList: {
+    POST: "messageBlackList"
+  },
   remind: {
     GET: 'getRemind'
   },

@@ -25,6 +25,7 @@ const emailRouter = require('./email');
 const subRouter = require('./sub');
 const shopRouter = require('./shop');
 const registerRouter = require('./register');
+const authRouter = require("./auth");
 const safeRouter = require('./safe');
 const protocolRouter = require('./protocol');
 settingRouter
@@ -58,6 +59,7 @@ settingRouter
   .use('/email', emailRouter.routes(), emailRouter.allowedMethods())
 	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods())
   .use('/safe', safeRouter.routes(), safeRouter.allowedMethods())
+  .use("/auth", authRouter.routes(), authRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/shop', shopRouter.routes(), shopRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());

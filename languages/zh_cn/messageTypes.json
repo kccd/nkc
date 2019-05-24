@@ -12,7 +12,7 @@
   "editPostURL": "编辑回复链接",
   "deadline": "过期时间",
   "reason": "理由",
-  "userAuthURL": "用户身份认证链接",
+  "userAuthApplyURL": "用户身份认证链接",
 
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",
@@ -22,5 +22,6 @@
   "bannedPost": "回复被屏蔽",
   "digestPost": "回复被加精",
   "digestThread": "文章被加精",
-  "at": "at信息"
+  "at": "at信息",
+  "userAuthApply": "用户提交身份认证审核，给审核人员的通知"
 }

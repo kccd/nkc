@@ -262,10 +262,14 @@ block content
 
           div(style='margin-top: 2rem;')
             button.btn.btn-block.btn-default(@click='deleteFriend') 删除好友
+            button.btn.btn-block.btn-default(@click='addToBlackList' v-if="blackListUid.indexOf(friend.tUid) === -1") 加入黑名单
+            button.btn.btn-block.btn-default(@click='removeFromBlackList' v-else) 从黑名单中移除
       .ms-friend-information(v-else)
         .col-xs-12.col-md-10.col-md-offset-1
           button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息
           button.btn.btn-block.btn-success(@click='addFriend(friend.targetUser)') 加为好友
+          button.btn.btn-block.btn-default(@click='addToBlackList' v-if="blackListUid.indexOf(friend.targetUser.uid) === -1") 加入黑名单
+          button.btn.btn-block.btn-default(@click='removeFromBlackList' v-else) 从黑名单中移除
 
 
   // 系统通知内容
@@ -382,6 +386,22 @@ block content
         | &nbsp;是&nbsp;&nbsp;
         input(type="radio" value="false" v-model="onlyReceiveFromFriends")
         | &nbsp;否&nbsp;&nbsp;
+    //-.ms-settings-options
+      .ms-settings-options-name 非好友向我发消息的前提条件
+      .ms-settings-options-content
+        div(style="margin: 0.5rem;")
+          span 学数分最少：
+          input
+        div(style="margin: 0.5rem;")
+          span 精选文章最少：
+          input
+        div(style="margin: 0.5rem;")
+          span 用户等级最少：
+          input
+        div(style="margin: 0.5rem;")
+          span 用户等级：
+          for grade in data.grades
+            span=`${grade._id - 1}(${grade.displayName})，`
     .ms-settings-button
       button.btn.btn-default(@click='saveMessageSettings') 保存
   // 好友分组列表
@@ -473,7 +493,7 @@ block content
       .text-center(style='margin:1rem 0;color: #aaaaaa;') 空空如也~
     div(v-for="item in userList" @click="selectUser(item)")
       //- 私信
-      .ms-list-body(v-if="item.type === 'UTU'" :class="{'active': target === 'user' && item.user && item.user.uid === targetUser.uid}")
+      .ms-list-body(v-if="item.type === 'UTU'" :class="{'active': target === 'UTU' && item.user && item.user.uid === targetUser.uid}")
         .ms-list-left
           .ms-list-img
             .ms-point(:class="{online: item.user.online}")
@@ -497,7 +517,7 @@ block content
             .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
           .new-message-count(v-if='item.count > 0') {{item.count}}
       //- 系统通知
-      .ms-list-body(v-else-if="item.type === 'STE'" :class="{'active': target === 'notice' && item.type === 'STE'}")
+      .ms-list-body(v-else-if="item.type === 'STE'" :class="{'active': target === 'STE' && item.type === 'STE'}")
         .ms-list-left.notice
           .ms-list-img
             img.ms-list-avatar(:src="'/statics/message_type/' + item.type + '.jpg'")

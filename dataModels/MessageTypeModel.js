@@ -62,7 +62,9 @@ const getDomByType = (t, app) => {
     } else if(t === "editThreadURL") {
       return "openThread(item.c.thread.tid)";
     } else if(t === "deadline") {
-      return "item.c.deadline"
+      return "item.c.deadline";
+    } else if(t === "userAuthApplyURL") {
+      return "openUserHome(item.c.user.uid)";
     }
   } else {
     if(t === "threadTitle") {
@@ -91,6 +93,8 @@ const getDomByType = (t, app) => {
       return "'/editor?type=post&id=' + item.c.thread.oc"
     } else if(t === "deadline") {
       return "item.c.deadline"
+    } else if(t === "userAuthApplyURL") {
+      return "'/u/' + item.c.user.uid + '/auth'";
     }
   }
 

@@ -12,6 +12,7 @@ const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
 const dataRouter = require("./data");
 const searchRouter = require('./search');
+const blackRouter = require('./blackList');
 const moment = require("moment");
 messageRouter
   .use('/', async (ctx, next) => {
@@ -41,14 +42,19 @@ messageRouter
       user.newMessage = {};
       ctx.template = 'message/message.pug';
       data.navbar = {highlight: 'message'};
-
-
-
-
+      data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
       return await next();
     }
 
     data.messageTypes = await db.MessageTypeModel.find().sort({toc: 1});
+
+    const blackList = await db.MessageBlackListModel.find({
+      uid: user.uid
+    }, {
+      tUid: 1
+    });
+
+    data.blackListUid = blackList.map(b => b.tUid);
 
     const list = [];
     const userList = [];
@@ -107,7 +113,7 @@ messageRouter
       list.push({
         time: message?message.tc:new Date("2000-1-1"),
         name: messageType.name,
-        timeStr: message?moment(message.tc).format("MM/DD HH:mm"): new Date('2000-1-1'),
+        timeStr: message?moment(message.tc).format("MM/DD HH:mm"): moment().format("MM/DD HH:mm"),
         type: 'STU',
         message,
         count: user.newMessage.newReminderCount,
@@ -180,5 +186,6 @@ messageRouter
   .use('/chat', chatRouter.routes(), chatRouter.allowedMethods())
   .use('/search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods())
+  .use("/blackList", blackRouter.routes(), blackRouter.allowedMethods())
   .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;

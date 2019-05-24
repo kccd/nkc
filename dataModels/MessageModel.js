@@ -110,6 +110,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   const MessageModel = mongoose.model('messages');
   const FriendModel = mongoose.model('friends');
   const UsersGeneralModel = mongoose.model('usersGeneral');
+  const MessageBlackListModel = mongoose.model("messageBlackLists");
   const apiFunction = require('../nkcModules/apiFunction');
   const user = await UserModel.findOnly({uid: fromUid});
   const targetUser = await UserModel.findOnly({uid: toUid});
@@ -156,6 +157,18 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     if(onlyReceiveFromFriends) throwErr(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
   }
 
+  let blackList = await MessageBlackListModel.findOne({
+    uid: fromUid,
+    tUid: toUid
+  });
+  if(blackList) throwErr(403, "您已将对方添加到了消息黑名单中，无法发送消息。");
+  if(!sendToEveryOne) {
+    blackList = await MessageBlackListModel.findOne({
+      uid: toUid,
+      tUid: fromUid
+    });
+    if(blackList) throwErr(403, "对方已经您添加到了消息黑名单，无法发送消息。");
+  }
 };
 
 messageSchema.statics.extendSTUMessages = async (arr) => {
@@ -228,6 +241,10 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       r.c.user = user;
       r.c.thread = thread;
       r.c.post = post;
+    } else if(type === "userAuthApply") {
+      const user = await UserModel.findOne({uid: targetUid});
+      if(!user) continue;
+      r.c.user = user;
     }
 
     if(r.c.thread) {
