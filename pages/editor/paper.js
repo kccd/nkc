@@ -254,6 +254,9 @@ var paperProto = {
         var agencyAdd = $(ele).find(".authorAgencyAdd").val();
   
         if(name.length > 30 || kcid.length > 30 || agencyAdd.length > 30) throw("姓名、kcid、机构地址字数不得大于30");
+        var nameBlcCn = /.*[\u4e00-\u9fa5]+.*$/.test(name);
+        var nameBlcEn = /[a-zA-Z]+/.test(name);
+        if(!nameBlcCn && !nameBlcEn) throw("姓名不能没有中英文字符");
         if(agency.length > 100) throw("机构名称字数不得大于100"); 
         var contractObj = {
           contractEmail:"",
