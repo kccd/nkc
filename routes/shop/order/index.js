@@ -168,6 +168,22 @@ router
       let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
       await db.ShopProductsParamModel.productParamReduceStock(orders,'orderReduceStock');
       ordersId.push(order.orderId);
+
+      // 通知卖家有新的订单
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID("messages", 1),
+        r: order.sellUid,
+        ty: "STU",
+        c: {
+          type: "shopSellerNewOrder",
+          orderId: order.orderId,
+          sellerId: order.sellUid,
+          buyerId: order.buyUid
+        }
+      });
+      await message.save();
+      await ctx.redis.pubMessage(message);
+
     }
     data.ordersId = ordersId.join('-');
     await next();

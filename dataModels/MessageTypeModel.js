@@ -65,6 +65,12 @@ const getDomByType = (t, app) => {
       return "item.c.deadline";
     } else if(t === "userAuthApplyURL") {
       return "openUserHome(item.c.user.uid)";
+    } else if(t === "sellerOrderListURL") {
+      return "";
+    } else if(t === "buyerOrderURL") {
+      return "";
+    } else if(t === "orderID") {
+      return "";
     }
   } else {
     if(t === "threadTitle") {
@@ -95,10 +101,14 @@ const getDomByType = (t, app) => {
       return "item.c.deadline"
     } else if(t === "userAuthApplyURL") {
       return "'/u/' + item.c.user.uid + '/auth'";
+    } else if(t === "sellerOrderListURL") {
+      return "'/shop/manage/' + item.c.user.uid + '/order'";
+    } else if(t === "buyerOrderURL") {
+      return "'/shop/order/' + item.c.order.orderId + '/detail'";
+    } else if(t === "orderID") {
+      return "item.c.order.orderId";
     }
   }
-
-
 };
 const getAppVueDom = (template) => {
   let {content, parameters} = template;

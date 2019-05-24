@@ -13,7 +13,7 @@ const messageSchema = new Schema({
     // 系统-用户
     // 系统-所有人
     // 系统-房间
-    enum: ['UTU', 'UTR', 'STU', 'STE', 'STR'],
+    // enum: ['UTU', 'UTR', 'STU', 'STE', 'STR'],
     required: true,
     index: 1
   },
@@ -245,6 +245,16 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const user = await UserModel.findOne({uid: targetUid});
       if(!user) continue;
       r.c.user = user;
+    } else if(type === "shopSellerNewOrder") {
+      const user = await UserModel.findOne({uid: r.r});
+      if(!user) continue;
+      r.c.user = user;
+    } else if(type === "shopBuyerOrderChange") {
+      const user = await UserModel.findOne({uid: r.r});
+      if(!user) continue;
+      const order = await ShopOrdersModel.findOne({orderId: r.c.orderId});
+      if(!order) continue;
+      r.c.order = order;
     }
 
     if(r.c.thread) {

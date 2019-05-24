@@ -23,5 +23,7 @@
   "digestPost": "回复被加精",
   "digestThread": "文章被加精",
   "at": "at信息",
-  "userAuthApply": "用户提交身份认证审核，给审核人员的通知"
+  "userAuthApply": "用户提交身份认证审核，给审核人员的通知",
+  "shopBuyerOrderChange": "订单状态更新",
+  "shopSellerNewOrder": "新的订单"
 }
