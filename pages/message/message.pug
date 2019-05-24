@@ -417,7 +417,7 @@ block content
     .ms-list-body.friend-list(@click="selectUser({type: 'STE'})")
       .ms-list-left.notice
         .ms-list-img
-          .ms-list-avatar.fa.fa-bullhorn
+          img.ms-list-avatar(src="/statics/message_type/STE.jpg")
       .ms-list-center
         .ms-list-title 系统通知
         .ms-list-content 这是系统通知
@@ -434,13 +434,13 @@ block content
     .ms-list-body.friend-list(@click="selectUser({type: 'newFriends'})")
       .ms-list-left.remind
         .ms-list-img
-          .ms-list-avatar.fa.fa-heart(style='background-color: #fc7868;')
+          img.ms-list-avatar(src="/statics/message_type/newFriends.jpg")
       .ms-list-center
         .ms-list-title 新朋友
         .ms-list-content 好友的添加申请
 
 
-    .ms-list-body.friend-list(v-for="t in messageTypes" @click="selectUser({type: t._id})")
+    .ms-list-body.friend-list(v-for="t in messageTypes" @click="selectUser({type: t._id, name: t.name})")
       .ms-list-left.remind
         .ms-list-img
           img.ms-list-avatar(:src="'/statics/message_type/' + t._id + '.jpg'")
@@ -500,7 +500,7 @@ block content
       .ms-list-body(v-else-if="item.type === 'STE'" :class="{'active': target === 'notice' && item.type === 'STE'}")
         .ms-list-left.notice
           .ms-list-img
-            .ms-list-avatar.fa.fa-bullhorn
+            img.ms-list-avatar(:src="'/statics/message_type/' + item.type + '.jpg'")
         .ms-list-center
           .ms-list-title 系统通知
           .ms-list-content {{item.message?item.message.c: '暂无通知'}}
@@ -526,7 +526,7 @@ block content
       .ms-list-body(v-else-if="item.type === 'newFriends'" :class="{'active': target === 'newFriends' && item.type === 'newFriends'}")
         .ms-list-left.remind
           .ms-list-img
-            .ms-list-avatar.fa.fa-heart(style='background-color: #fc7868;')
+            img.ms-list-avatar(:src="'/statics/message_type/' + item.type + '.jpg'")
         .ms-list-center
           .ms-list-title 新朋友
           .ms-list-content {{item.targetUser.username}} 申请添加你为好友
@@ -659,7 +659,7 @@ block content
             .ms-header(style="cursor: pointer;font-weight:700;color: #666666;" @click='selectFriend({targetUser: targetUser})') {{targetUser.friend && targetUser.friend.info.name?targetUser.friend.info.name: targetUser.username}}
             .ms-right-body.new-content-body(@click="showEmoji = false" ref='content')
               +messageContent
-            .ms-right-input(v-if='target === "user"')
+            .ms-right-input(v-if='target === "UTU"')
               transition(name='fade')
                 .upload-info(v-if='uploadInfo') {{uploadInfo}}
               textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
@@ -735,15 +735,15 @@ block content
           // 聊天窗口 header
           .mobile-message-header
             div
-              span(v-if='target === "user"' style="cursor: pointer;font-weight:700;color: #666666;" @click='selectFriend({targetUser: targetUser})') {{targetUser.friend && targetUser.friend.info.name?targetUser.friend.info.name: targetUser.username}}
-              span(v-if='target === "reminder"') 系统提醒
-              span(v-if='target === "notice"') 系统通知
-              span(v-if='target === "friend"') 好友
-              span(v-if='target === "newFriends"') 新朋友
-              span(v-if='target === "category"') 好友分组
+              span(v-if='target === "UTU"' style="cursor: pointer;font-weight:700;color: #666666;" @click='selectFriend({targetUser: targetUser})') {{targetUser.friend && targetUser.friend.info.name?targetUser.friend.info.name: targetUser.username}}
+              span(v-else-if='target === "STE"') 系统通知
+              span(v-else-if='target === "friend"') 好友
+              span(v-else-if='target === "newFriends"') 新朋友
+              span(v-else-if='target === "category"') 好友分组
+              span(v-else) {{selectedUserListItem.name}}
               .left.fa.fa-angle-left(@click="initialization")
           // 聊天窗口 footer
-          .mobile-footer-input-div(v-if='target === "user"')
+          .mobile-footer-input-div(v-if='target === "UTU"')
             transition(name='fade')
               .upload-info(v-if='uploadInfo') {{uploadInfo}}
             .mobile-footer-button
@@ -761,17 +761,17 @@ block content
                 //textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
               .button
                 button(@click="sendToUser()") 发送
-          .mobile-messages-body(v-if="target === 'reminder'" ref='content')
+          //-.mobile-messages-body(v-if="target === 'reminder'" ref='content')
             .noSelectUser(v-if='messages.length === 0')
               .fa(style='font-size: 1.5rem;') 暂无系统提醒
             div(style='padding: 1rem;' v-else)
               +reminderContent
-          .mobile-messages-body(v-if="target === 'notice'" ref='content')
+          .mobile-messages-body(v-if="target === 'STE'" ref='content')
             .noSelectUser(v-if='messages.length === 0')
               .fa(style='font-size: 1.5rem;') 暂无系统通知
             div(style='padding: 1rem;' v-else)
               +noticeContent
-          .mobile-messages-body(v-if="target === 'user'" ref='content' @click='showEmoji = false')
+          .mobile-messages-body(v-if="target === 'UTU'" ref='content' @click='showEmoji = false')
             +messageContent
           .mobile-messages-body(v-if="target === 'friend'" ref='content')
             //.ms-header {{friend?friend.info.name||friend.targetUser.username: '加载中...'}}
@@ -783,6 +783,9 @@ block content
           .mobile-messages-body(v-if="target === 'category'")
             .ms-friends-applications(ref='content')
               +categoriesContent
+          //- 手机版 生成模板
+          .mobile-templates-dom(style="height: 100%;")
+
 block footer
 
 block scripts

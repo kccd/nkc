@@ -19,44 +19,22 @@ searchRouter.get('/', async(ctx, next) => {
     // 获取用户可以访问的板块
     const accessibleFid = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     // console.log(accessibleFid)
-    const searchResult = await searchPost(q, page, perpage);
+    const searchResult = await ctx(q, page, perpage);
     data.paging = apiFunction.paging(page, searchResult.hits.total);
     data.result = await Promise.all(searchResult.hits.hits.map(async r => {
       const pid = r._id;
       const post = await PostModel.findOne({pid, mainForumsId: {$in: accessibleFid}, disabled: false});
-      if(!post) return null;
-      post.t = r.highlight? r.highlight.t: r.t;
+      if (!post) return null;
+      post.t = r.highlight ? r.highlight.t : r.t;
       await post.extendUser();
       await post.extendThread();
       await post.thread.extendFirstPost();
       await post.thread.extendForums(['mainForums']);
       post.c = APP_nkc_render.experimental_render(post);
-      post.t = apiFunction.obtainPureText(post.t,true,20)
-      post.c = apiFunction.obtainPureText(post.c,true,200)
+      post.t = apiFunction.obtainPureText(post.t, true, 20)
+      post.c = apiFunction.obtainPureText(post.c, true, 200)
       return post.toObject()
-      // try {
-      //   const post = await PostModel.findOnly({pid, fid: {$in: accessibleFid}});
-      //   post.t = r.highlight? r.highlight.t: r.t;
-      //   await post.extendUser();
-      //   await post.extendThread();
-      //   await post.thread.extendFirstPost();
-      //   await post.thread.extendForum();
-      //   post.c = APP_nkc_render.experimental_render(post);
-      //   post.t = apiFunction.obtainPureText(post.t,true,20)
-      //   post.c = apiFunction.obtainPureText(post.c,true,200)
-      //   if(accessibleFid.includes(post.thread.fid)){
-      //     return post.toObject()
-      //   }else{
-      //     return null
-      //   }
-      // } catch(e) {
-      //   return null
-      // }
     }));
-    // console.log(data.result)
-    // console.log(searchResult)
-    // console.log(data.result.length)
-    // console.log(searchResult.hits.hits.length)
     return next()
   } else if(type === 'user') {
     const {UserModel} = db;

@@ -26,6 +26,13 @@ messageRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
+
+    if(ctx.reqType === "app") {
+      data.templates = await db.MessageTypeModel.getTemplates("app");
+    } else {
+      data.templates = await db.MessageTypeModel.getTemplates("web");
+    }
+
     const from = ctx.request.get('FROM');
     if(from !== 'nkcAPI') {
       if(query.uid) {
@@ -36,9 +43,6 @@ messageRouter
       data.navbar = {highlight: 'message'};
 
 
-      // 测试start
-      data.templates = await db.MessageTypeModel.getTemplates("web");
-      // 测试end
 
 
       return await next();

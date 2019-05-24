@@ -14,23 +14,20 @@ messageRouter
     const {body, db} = ctx;
     const {roles, grades, type, messageType} = body;
     if(type === "modifyMessageType") {
-      const {templates, _id} = messageType;
+      const {templates, _id, name, description} = messageType;
+      if(!name) ctx.throw(400, "类型名不能为空");
+      if(!description) ctx.throw(400, "类型简介不能为空");
       for(const template of templates) {
         const {type, content} = template;
         if(!content) ctx.throw(400, "模板内容不能为空");
-        console.log({
-          _id,
-          "templates.type": type
-        });
-        console.log({
-          "templates.content": content
-        });
         await db.MessageTypeModel.updateOne({
           _id,
           "templates.type": type
         }, {
           $set: {
-            "templates.$.content": content
+            "templates.$.content": content,
+            name,
+            description
           }
         });
       }

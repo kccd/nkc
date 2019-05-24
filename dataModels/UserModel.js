@@ -729,7 +729,7 @@ userSchema.methods.extendGeneralSettings = async function() {
 */
 userSchema.methods.ensureUserInfo = async function() {
   if(!this.username) throwErr(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
-}
+};
 
 userSchema.methods.getNewMessagesCount = async function() {
 	const MessageModel = mongoose.model('messages');
@@ -738,6 +738,29 @@ userSchema.methods.getNewMessagesCount = async function() {
   const allSystemInfoCount = await MessageModel.count({ty: 'STE'});
   const viewedSystemInfoCount = await SystemInfoLogModel.count({uid: this.uid});
   const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+  // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
+  if(newSystemInfoCount < 0) {
+    const systemInfoLog = await SystemInfoLogModel.aggregate([
+      {
+        $match: {
+          uid: this.uid
+        }
+      },
+      {
+        $group: {
+          _id: "$mid",
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]);
+    for(const log of systemInfoLog) {
+      if(log.count > 1) {
+        await SystemInfoLogModel.remove({mid: log._id, uid: this.uid}, {justOne: true});
+      }
+    }
+  }
 	// 系统提醒
   const newReminderCount = await MessageModel.count({ty: 'STU', r: this.uid, vd: false});
 	// 用户信息

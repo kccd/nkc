@@ -32,6 +32,7 @@ $(function() {
       userList: [],
       target: '',
       targetUser: '',
+      selectedUserListItem: "",
       socketStatus: '',
       messages: [],
       sendFailedMessages: [],
@@ -83,15 +84,26 @@ $(function() {
     },
     beforeCreate: function() {
       var templatesDom = $(".templates-dom");
+      var mobileTemplatesDom = $(".mobile-templates-dom");
       for(var i = 0; i < templates.length; i++) {
         var messageType = templates[i];
+
+        // 电脑屏幕
         var typeDiv = $("<div v-if='target === \""+ messageType._id +"\"'></div>");
         var typeBody = $("<div style='height: 100%'></div>");
         typeBody.append($("<div class='ms-header'>"+messageType.name+"</div>"));
         var templateBody = $("<div class='ms-notice' ref='content'></div>");
-        templateBody.append($("<transition name='fade'><div class='ms-loading-info'>{{info}}</div></transition>"));
-        var templateBodyContent = $("<div class='ms-notice-body' v-for='item in messages'><div class='ms-notice-time'>{{format('YYYY/MM/DD', item.tc)}}</div></div>");
+        var templateTran = $("<transition name='fade'><div class='ms-loading-info'>{{info}}</div></transition>");
+        templateBody.append(templateTran.clone());
+        var templateBodyContent = $("<div class='ms-notice-body' v-for='item in messages'><div class='ms-notice-time'>{{format('YYYY/MM/DD HH:mm:ss', item.tc)}}</div></div>");
         var content = $("<div class='ms-notice-content'></div>");
+
+        // 手机屏幕
+        var mobileMessageBody = $("<div class='mobile-messages-body' v-if='target === \""+messageType._id+"\"' ref='content'>" +
+          "<div class='noSelectUser' v-if='messages.length === 0'><div class='fa' style='font-size:1.5rem;'>暂无消息</div></div>" +
+        "</div>");
+        var mobileMessageBodyDiv = $("<div v-else style='padding: 1rem;'></div>");
+
         for(var j = 0; j < messageType.templates.length; j++) {
           var template = messageType.templates[j];
           var type = template.type;
@@ -99,11 +111,19 @@ $(function() {
           var div = $("<div v-if='item.c.type === \""+ type +"\"'>"+dom+"</div>");
           content.append(div);
         }
+
         templateBodyContent.append(content);
-        templateBody.append(templateBodyContent);
+        templateBody.append(templateBodyContent.clone());
         typeBody.append(templateBody);
         typeDiv.append(typeBody);
         templatesDom.append(typeDiv);
+
+
+        mobileMessageBodyDiv.append(templateTran);
+        mobileMessageBodyDiv.append(templateBodyContent);
+        mobileMessageBody.append(mobileMessageBodyDiv);
+        mobileTemplatesDom.append(mobileMessageBody);
+
       }
     },
     watch: {
@@ -529,9 +549,13 @@ $(function() {
               time: message.tc,
               count: 0
             };
+            if(message.ty === "STU") {
+              systemType.name = message.c.messageType.name;
+              systemType.content = message.c.messageType.content;
+            }
             app.userList.unshift(systemType);
           }
-          if(app.target === o[systemType.type]) {
+          if(app.target === systemType.type) {
             systemType.count = 0;
           } else {
             systemType.count ++;
@@ -748,7 +772,7 @@ $(function() {
       saveMessageSettings: function() {
         var beep = {
           usersMessage: false,
-          systemInfo: false,
+          STE: false,
           reminder: false
         };
         for(var i = 0; i < app.beep.length; i++) {
@@ -796,6 +820,7 @@ $(function() {
       selectUser: function(item) {
         this.initialization();
         addHistory(item.type);
+        this.selectedUserListItem = item;
         if(item.type === 'UTU') {
           app.target = item.type;
           app.targetUser = item.user;
@@ -806,7 +831,7 @@ $(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
               nkcAPI('/message/mark', 'PATCH', {
-                type: 'user',
+                type: 'UTU',
                 uid: app.targetUser.uid
               })
                 .then(function() {
@@ -847,7 +872,7 @@ $(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
               nkcAPI('/message/mark', 'PATCH', {
-                type: 'systemInfo'
+                type: 'STE'
               })
                 .then(function() {
                   item.count = 0;
@@ -859,7 +884,7 @@ $(function() {
             .catch(function() {
 
             })
-        } else if(item.type === 'STU'){
+        /*} else if(item.type === 'STU'){
           app.target = item.type;
           this.getMessage()
             .then(function() {
@@ -877,12 +902,31 @@ $(function() {
             })
             .catch(function() {
 
-            })
+            })*/
         } else if(item.type === 'newFriends'){
           app.target = 'newFriends';
           this.getMessage()
             .then(function() {
               app.scrollToBottom();
+            })
+            .catch(function() {
+
+            })
+        } else {
+          app.target = item.type;
+          this.getMessage()
+            .then(function() {
+              app.scrollToBottom();
+              if(item.count === 0) return;
+              nkcAPI('/message/mark', 'PATCH', {
+                type: item.type
+              })
+                .then(function() {
+                  item.count = 0;
+                })
+                .catch(function(data) {
+                  screenTopWarning(data.error || data);
+                });
             })
             .catch(function() {
 
@@ -1105,7 +1149,7 @@ $(function() {
           .then(function() {
             if(app.target) {
               var url = '/message/newMessages?target=' + app.target;
-              if(app.target === 'user' && app.targetUser) {
+              if(app.target === 'UTU' && app.targetUser) {
                 url += '&uid=' + app.targetUser.uid;
                 if(app.lastMessageId) {
                   url += '&lastMessageId=' + app.lastMessageId;
@@ -1115,17 +1159,11 @@ $(function() {
                 .then(function(data) {
                   var messages = data.messages;
                   if(messages.length === 0) return;
-                  var name = 'message';
-                  if(messages[0].ty === 'STU') {
-                    name = 'reminder';
-                  } else if(messages[0].ty === 'STE') {
-                    name = 'notice';
-                  }
-                  beep(name);
-                  if(app.target === 'user' && data.target === 'user' && app.targetUser.uid === data.targetUser.uid) {
+                  beep("notice");
+                  if(app.target === 'UTU' && data.target === 'UTU' && app.targetUser.uid === data.targetUser.uid) {
                     app.messages = app.messages.concat(messages);
                     nkcAPI('/message/mark', 'PATCH', {
-                      type: 'user',
+                      type: 'STU',
                       uid: app.targetUser.uid
                     })
                       .catch(function(data) {
@@ -1134,7 +1172,7 @@ $(function() {
                   } else if(app.target === data.target) {
                     app.messages = app.messages.concat(messages);
                     nkcAPI('/message/mark', 'PATCH', {
-                      type: app.target === 'notice'? 'systemInfo': 'remind'
+                      type: app.target
                     })
                       .catch(function(data) {
                         screenTopWarning(data.error || data);
@@ -1339,22 +1377,22 @@ $(function() {
         if(ty === 'STE') {
           beep('notice');
           app.updateUserList({message: message});
-          if(app.target === 'notice') {
+          if(app.target === 'STE') {
             app.messages.push(message);
             nkcAPI('/message/mark', 'PATCH', {
-              type: 'systemInfo'
+              type: 'STE'
             })
               .catch(function(data) {
                 screenTopWarning(data.error || data);
               })
           }
         } else if(ty === 'STU') {
-          beep('reminder');
+          beep('notice');
           app.updateUserList({message: message});
-          if(app.target === 'reminder') {
+          if(app.target === 'STU') {
             app.messages.push(message);
             nkcAPI('/message/mark', 'PATCH', {
-              type: 'remind'
+              type: 'STU'
             })
               .catch(function(data) {
                 screenTopWarning(data.error || data);
@@ -1366,10 +1404,10 @@ $(function() {
           if(socketId === socket.id) return;
 
           // 插入数据
-          if(app.target === 'user' && app.targetUser) {
+          if(app.target === 'UTU' && app.targetUser) {
             if(app.targetUser.uid === user.uid) {
               nkcAPI('/message/mark', 'PATCH', {
-                type: 'user',
+                type: 'UTU',
                 uid: app.targetUser.uid
               })
                 .catch(function(data) {
@@ -1468,7 +1506,7 @@ $(function() {
           for(var i = 0; i < app.userList.length; i++) {
             var li = app.userList[i];
             // 系统类型、用户
-            if((systemType && li.type === deletedId) || (li.user.uid === deletedId)) {
+            if((systemType && li.type === deletedId) || (li.user && li.user.uid === deletedId)) {
               app.userList.splice(i, 1);
               if(li.type === 'UTU' && deletedId === app.targetUser.uid) {
                 app.initialization();
@@ -1481,7 +1519,7 @@ $(function() {
           var uid = message.uid;
           if(app.user.uid !== uid) return;
           var messageType = message.messageType;
-          if(messageType === 'user') {
+          if(messageType === 'UTU') {
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
               if(li.type === 'UTU' && li.user.uid === targetUid) {
@@ -1489,7 +1527,7 @@ $(function() {
                 break;
               }
             }
-          } else if (messageType === 'systemInfo') {
+          } else if (messageType === 'STE') {
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
               if(li.type === 'STE') {
@@ -1497,10 +1535,10 @@ $(function() {
                 break;
               }
             }
-          } else if(messageType === 'remind') {
+          } else {
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
-              if(li.type === 'STU') {
+              if(li.type === messageType) {
                 li.count = 0;
                 break;
               }
