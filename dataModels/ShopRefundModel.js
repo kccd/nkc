@@ -379,6 +379,18 @@ schema.methods.platformAgreeRM = async function() {
     }
   });
   await this.returnMoney();
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopSellerRefundChange",
+    r: this.sellerId,
+    orderId: this.orderId,
+    refundId: this._id
+  });
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopBuyerRefundChange",
+    r: this.buyerId,
+    orderId: this.orderId,
+    refundId: this._id
+  })
 };
 
 /**
@@ -408,6 +420,12 @@ schema.methods.sellerAgreeRM = async function(reason) {
     }
   });
   await this.returnMoney();
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopBuyerRefundChange",
+    r: this.buyerId,
+    orderId: this.orderId,
+    refundId: this._id
+  });
 };
 
 /**
@@ -444,6 +462,13 @@ schema.methods.sellerDisagreeRM = async function(reason) {
     $set: {
       applyToPlatform: true
     }
+  });
+
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopBuyerRefundChange",
+    r: this.buyerId,
+    orderId: this.orderId,
+    refundId: this._id
   });
 };  
 
@@ -487,6 +512,12 @@ schema.methods.sellerAgreeRP = async function(reason, sellerInfo) {
       }
     }
   });
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopBuyerRefundChange",
+    r: this.buyerId,
+    orderId: this.orderId,
+    refundId: this._id
+  });
 };
 
 /**
@@ -511,6 +542,18 @@ schema.methods.platformDisagreeRM = async function(reason) {
     }
   });
   await this.refundFail();
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopBuyerRefundChange",
+    r: this.buyerId,
+    orderId: this.orderId,
+    refundId: this._id
+  });
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopSellerRefundChange",
+    r: this.sellerId,
+    orderId: this.orderId,
+    refundId: this._id
+  })
 };
 
 
@@ -539,6 +582,12 @@ schema.methods.sellerDisagreeRP = async function(reason) {
     }
   });
   await this.refundFail();
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopBuyerRefundChange",
+    r: this.buyerId,
+    orderId: this.orderId,
+    refundId: this._id
+  });
 };
 /**
  * 买家撤销申请 也可能是因为申请超时系统撤销
@@ -574,6 +623,12 @@ schema.methods.buyerGiveUp = async function(reason) {
     }
   });
   await this.refundFail();
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopSellerRefundChange",
+    r: this.sellerId,
+    orderId: this.orderId,
+    refundId: this._id
+  })
 };
 
 schema.methods.insertTrackNumber = async function(number) {
@@ -599,6 +654,12 @@ schema.methods.insertTrackNumber = async function(number) {
       }
     }
   });
+  await mongoose.model("messages").sendShopMessage({
+    type: "shopSellerRefundChange",
+    r: this.sellerId,
+    orderId: this.orderId,
+    refundId: this._id
+  })
 };
 /*
 * 退款申请被关闭或被驳回

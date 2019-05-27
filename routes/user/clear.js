@@ -34,6 +34,17 @@ router
         );
       } catch(err){}
     } else if(type === "username") {
+      await db.SecretBehaviorModel({
+        operationId: "modifyUsername",
+        type: "modifyUsername",
+        uid: targetUser.uid,
+        ip: ctx.address,
+        port: ctx.port,
+        oldUsername: targetUser.username,
+        oldUsernameLowerCase: targetUser.usernameLowerCase,
+        newUsername: "",
+        newUsernameLowerCase: ""
+      }).save();
       await db.UserModel.updateOne({uid}, {
         $set: {
           username: "",

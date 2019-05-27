@@ -96,6 +96,33 @@ const usersGeneralSchema = new Schema({
     onlyReceiveFromFriends: {
       type: Boolean,
       default: false
+    },
+    // 防骚扰设置
+    limit: {
+      status: {
+        type: Boolean,
+        default: false
+      },
+      // 时间限制>30天
+      timeLimit: {
+        type: Boolean,
+        default: false
+      },
+      // 学术分限制>1
+      xsfLimit: {
+        type: Boolean,
+        default: false
+      },
+      // 精选文章>1
+      digestLimit: {
+        type: Boolean,
+        default: false
+      },
+      // 最小用户等级
+      gradeLimit: {
+        type: Number,
+        default: 1
+      }
     }
   },
   lotterySettings: {

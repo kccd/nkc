@@ -33,6 +33,11 @@ messageRouter
     } else {
       data.templates = await db.MessageTypeModel.getTemplates("web");
     }
+    data.userDigestThreadCount = await db.ThreadModel.count({
+      digest: true,
+      uid: user.uid
+    });
+    data.messageSettings = (await db.SettingModel.findById("message")).c;
 
     const from = ctx.request.get('FROM');
     if(from !== 'nkcAPI') {
@@ -47,7 +52,6 @@ messageRouter
     }
 
     data.messageTypes = await db.MessageTypeModel.find().sort({toc: 1});
-
     const blackList = await db.MessageBlackListModel.find({
       uid: user.uid
     }, {
@@ -69,7 +73,9 @@ messageRouter
     const users = await db.UserModel.find({uid: {$in: [...uidArr]}});
     const messages = await db.MessageModel.find({_id: {$in: [...midArr]}});
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
-    for(const u of users) {
+    for(let u of users) {
+      await u.extendGrade();
+      u = u.toObject();
       userObj[u.uid] = u;
     }
     for(const m of messages) {

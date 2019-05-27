@@ -46,6 +46,11 @@ orderRouter
     const shopSettings = await db.SettingModel.findOnly({_id: "shop"});
     const autoReceiveTime = Date.now() + shopSettings.c.refund.buyerReceive * 60 * 60 * 1000;
 		await order.update({$set: {trackName:trackName,trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
+		await db.MessageModel.sendShopMessage({
+      type: "shopSellerShip",
+      r: order.buyUid,
+      orderId: order.orderId
+    });
 		await next();
 	})
 	// 无物流发货

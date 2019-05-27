@@ -108,6 +108,22 @@ router
       }
       const refundDB = db.ShopRefundModel(r);
       await refundDB.save();
+      if(!root) {
+        // 向卖家发送消息
+        await db.MessageModel.sendShopMessage({
+          type: "shopBuyerApplyRefund",
+          r: order.sellUid,
+          orderId: order.orderId,
+          refundId: refundDB._id
+        });
+      } else {
+        await db.MessageModel.sendShopMessage({
+          type: "shopSellerRefundChange",
+          r: order.sellUid,
+          orderId: order.orderId,
+          refundId: refundDB._id
+        });
+      }
       if(param) {
         await db.ShopCostRecordModel.update({costId: param.costId}, {
           $set: {

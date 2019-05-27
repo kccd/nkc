@@ -379,29 +379,37 @@ block content
         span &nbsp;系统通知&nbsp;&nbsp;
         input(type="checkbox" value="reminder" v-model="beep")
         span &nbsp;系统提醒&nbsp;&nbsp;
-    .ms-settings-options
+    //-.ms-settings-options
       .ms-settings-options-name 只接收好友聊天信息
       .ms-settings-options-content
         input(type="radio" value="true" v-model="onlyReceiveFromFriends")
         | &nbsp;是&nbsp;&nbsp;
         input(type="radio" value="false" v-model="onlyReceiveFromFriends")
         | &nbsp;否&nbsp;&nbsp;
-    //-.ms-settings-options
-      .ms-settings-options-name 非好友向我发消息的前提条件
-      .ms-settings-options-content
+    .ms-settings-options
+      .ms-settings-options-name 短消息防骚扰
+        span &nbsp;&nbsp;
+        input(type="radio" :value="true" v-model="messageLimit.status")
+        | 开启
+        input(type="radio" :value="false" v-model="messageLimit.status")
+        | 关闭
+      .ms-settings-options-content(v-if="messageLimit.status")
         div(style="margin: 0.5rem;")
-          span 学数分最少：
-          input
+          input(type="checkbox" v-model="messageLimitArr" value="time")
+          span &nbsp;注册时间大于30天
         div(style="margin: 0.5rem;")
-          span 精选文章最少：
-          input
+          input(type="checkbox" v-model="messageLimitArr" value="xsf")
+          span &nbsp;有学术分
         div(style="margin: 0.5rem;")
-          span 用户等级最少：
-          input
+          input(type="checkbox" v-model="messageLimitArr" value="digest")
+          span &nbsp;有精选文章
         div(style="margin: 0.5rem;")
-          span 用户等级：
-          for grade in data.grades
-            span=`${grade._id - 1}(${grade.displayName})，`
+          span 用户等级限制：
+          span(v-for="grade, index in grades")
+            span(v-if="index < 3")
+              input(type="radio" v-model="messageLimit.gradeLimit" :value="grade._id")
+              span {{index===0?"不限制":grade.displayName}}
+              span &nbsp;&nbsp;
     .ms-settings-button
       button.btn.btn-default(@click='saveMessageSettings') 保存
   // 好友分组列表
@@ -566,7 +574,7 @@ block content
           .ms-list-time {{item.timeStr}}
             .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
           div.new-message-count(v-if='item.count > 0') {{item.count}}
-  .hidden#data=JSON.stringify({targetUser: data.targetUser})
+  .hidden#data=JSON.stringify({targetUser: data.targetUser, grades: data.grades, messageSettings: data.messageSettings, userDigestThreadCount: data.userDigestThreadCount})
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak )#app
     //input.hidden#imgInput(type='file' multiple="multiple" accept="image/*" @change="uploadResource")
     input.hidden#fileInput(type='file' multiple="multiple" @change="uploadResource")
@@ -680,21 +688,25 @@ block content
             .ms-right-body.new-content-body(@click="showEmoji = false" ref='content')
               +messageContent
             .ms-right-input(v-if='target === "UTU"')
-              transition(name='fade')
-                .upload-info(v-if='uploadInfo') {{uploadInfo}}
-              textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
-              .ms-right-input-button
-                .expressions(v-show="showEmoji")
-                  a(v-for="tmj in twemoji")
-                    img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
-                .text-left
-                  .fa.fa-smile-o(title='发送表情' @click='showEmoji = !showEmoji')
-                  //.fa.fa-picture-o(title='发送图片' onclick='$("#imgInput").click();')
-                  .fa.fa-file-o(title='发送文件' onclick='$("#fileInput").val("");$("#fileInput").click();')
-                  span(style='margin-left: 2rem;font-size: 1.2rem;') ctrl+enter 快捷发送
-                .text-right(style='float: right;margin-right: 2rem;')
-                  button.btn.btn-default.btn-sm(@click="sendToUser()") 发送
-
+              div(v-if="showSystemLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.systemLimitInfo}}
+                .m-t-1.text-center
+                  button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意（系统防骚扰）
+              div(v-else-if="showCustomizeLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.customizeLimitInfo}}
+              div(v-else)
+                transition(name='fade')
+                  .upload-info(v-if='uploadInfo') {{uploadInfo}}
+                textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
+                .ms-right-input-button
+                  .expressions(v-show="showEmoji")
+                    a(v-for="tmj in twemoji")
+                      img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
+                  .text-left
+                    .fa.fa-smile-o(title='发送表情' @click='showEmoji = !showEmoji')
+                    //.fa.fa-picture-o(title='发送图片' onclick='$("#imgInput").click();')
+                    .fa.fa-file-o(title='发送文件' onclick='$("#fileInput").val("");$("#fileInput").click();')
+                    span(style='margin-left: 2rem;font-size: 1.2rem;') ctrl+enter 快捷发送
+                  .text-right(style='float: right;margin-right: 2rem;')
+                    button.btn.btn-default.btn-sm(@click="sendToUser()") 发送
           // 选择的系统提醒
           //-div(v-if="target === 'STU'" )
             div(style="height: 100%;")
@@ -764,23 +776,28 @@ block content
               .left.fa.fa-angle-left(@click="initialization")
           // 聊天窗口 footer
           .mobile-footer-input-div(v-if='target === "UTU"')
-            transition(name='fade')
-              .upload-info(v-if='uploadInfo') {{uploadInfo}}
-            .mobile-footer-button
-              .fa.fa-smile-o(title='发送表情' @click='showEmoji = !showEmoji')
-              //.fa.fa-picture-o(title='发送图片' onclick='$("#imgInput").click();')
-              .fa.fa-file-o(title='发送文件' onclick='$("#fileInput").val("");$("#fileInput").click();')
-            .mobile-footer-input
-              .expressions(v-show="showEmoji")
-                a(v-for="tmj in twemoji")
-                  img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
-              .input
-                <div class="mdui-textfield">
-                  textarea(class="mdui-textfield-input" placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
-                </div>
-                //textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
-              .button
-                button(@click="sendToUser()") 发送
+            div(v-if="showSystemLimitInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.systemLimitInfo}}
+              .m-t-1.text-center
+                button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意（系统防骚扰）
+            div(v-else-if="showCustomizeLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.customizeLimitInfo}}
+            div(v-else)
+              transition(name='fade')
+                .upload-info(v-if='uploadInfo') {{uploadInfo}}
+              .mobile-footer-button
+                .fa.fa-smile-o(title='发送表情' @click='showEmoji = !showEmoji')
+                //.fa.fa-picture-o(title='发送图片' onclick='$("#imgInput").click();')
+                .fa.fa-file-o(title='发送文件' onclick='$("#fileInput").val("");$("#fileInput").click();')
+              .mobile-footer-input
+                .expressions(v-show="showEmoji")
+                  a(v-for="tmj in twemoji")
+                    img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectExpression(tmj)")
+                .input
+                  <div class="mdui-textfield">
+                    textarea(class="mdui-textfield-input" placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
+                  </div>
+                  //textarea(placeholder='请输入聊天内容' @keyup.ctrl.enter='sendToUser()' @click='showEmoji = false' ref='input' v-model='userInput[targetUser.uid]' @input='saveUserInputToLocal')
+                .button
+                  button(@click="sendToUser()") 发送
           //-.mobile-messages-body(v-if="target === 'reminder'" ref='content')
             .noSelectUser(v-if='messages.length === 0')
               .fa(style='font-size: 1.5rem;') 暂无系统提醒

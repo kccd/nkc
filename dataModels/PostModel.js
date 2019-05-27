@@ -547,7 +547,7 @@ postSchema.post('save', async function(doc, next) {
         ty: 'STU',
         r: at.uid,
         c: {
-          type: '@',
+          type: 'at',
           targetPid: doc.pid,
           targetUid: doc.uid
         }

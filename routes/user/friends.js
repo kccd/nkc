@@ -14,7 +14,7 @@ friendsRouter
       tUid: user.uid,
       uid
     });
-    if(blackList) ctx.throw(403, "对方已将您添加到了消息黑名单，您无法添加该用户为好友。");
+    if(blackList) ctx.throw(403, "对方拒绝接收您的消息，您无法添加该用户为好友。");
 
     // 判断自己是否添加对方到消息黑名单，如果是则将对方从黑名单中移除
     blackList = await db.MessageBlackListModel.findOne({

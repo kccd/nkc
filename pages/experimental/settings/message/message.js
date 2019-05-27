@@ -1,7 +1,8 @@
 var app = new Vue({
   el: '#app',
   data: {
-    type: "template", // template, limit
+    type: "limit", // template, limit
+    messageSettings: "",
     messageTypes: [],
     selectedMessageType: "",
     messageTypesLanguage: {},
@@ -42,6 +43,8 @@ var app = new Vue({
         grades: app.grades,
         type: "modifySendLimit"
       };
+      obj.messageSettings = this.messageSettings;
+      if(!obj.messageSettings.systemLimitInfo ||!obj.messageSettings.customizeLimitInfo) return screenTopWarning("请输入受限提示");
       nkcAPI('/e/settings/message', 'PATCH', obj)
         .then(function() {
           screenTopAlert('保存成功');
@@ -57,6 +60,7 @@ var app = new Vue({
     this.grades = data.grades;
     this.roles = data.roles;
     this.messageTypes = data.messageTypes;
+    this.messageSettings = data.messageSettings;
     if(this.messageTypes.length > 0) {
       this.selectedMessageType = this.messageTypes[0];
     }

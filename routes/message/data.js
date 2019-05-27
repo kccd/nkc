@@ -29,9 +29,11 @@ router
       });
       data.messages = messages.reverse();
       data.targetUser = targetUser;
+      data.targetUserGrade = await targetUser.extendGrade();
       await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
       // 判断是否已创建聊天
       await db.CreatedChatModel.createChat(user.uid, uid);
+      data.targetUserSendLimit = (await db.UsersGeneralModel.findOnly({uid: targetUser.uid})).messageSettings.limit;
     } else if(type === "STE") {
       const q = {
         ty: 'STE'

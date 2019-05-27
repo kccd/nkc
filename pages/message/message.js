@@ -12,7 +12,11 @@ data = JSON.parse(data);
 
 var targetUser = data.targetUser;
 
+var grades = data.grades;
+var messageSettings = data.messageSettings;
+var userDigestThreadCount = data.userDigestThreadCount;
 var timeout;
+
 var mobile = winWidth < 1100;
 
 var pageName = 'message';
@@ -32,6 +36,11 @@ $(function() {
       userList: [],
       target: '',
       targetUser: '',
+      messageSettings: messageSettings,
+      userDigestThreadCount: userDigestThreadCount,
+      systemInfoViewed: false,
+      targetUserSendLimit: "",
+      targetUserGrade: "",
       selectedUserListItem: "",
       socketStatus: '',
       messages: [],
@@ -80,7 +89,14 @@ $(function() {
         stopLeft: "/default/stopLeft.png"
       },
 
-      messageTypes: templates
+      messageTypes: templates,
+      messageLimit: {
+        timeLimit: false,
+        xsfLimit: false,
+        digestLimit: false,
+        gradeLimit: 0
+      },
+      grades: grades
 
     },
     beforeCreate: function() {
@@ -154,6 +170,49 @@ $(function() {
       }
     },
     computed: {
+      showCustomizeLimitInfo: function() {
+        if(this.systemInfoViewed) return;
+        var targetUser = this.targetUser;
+        var targetUserSendLimit = this.targetUserSendLimit;
+        var targetUserGrade = this.targetUserGrade;
+        if(!targetUser || !targetUserGrade) return;
+        var isFriend = false;
+        for(var i = 0; i < this.friends.length; i++) {
+          if(this.friends[i].tUid === targetUser.uid) {
+            isFriend = true;
+            break;
+          }
+        }
+        if(isFriend) return;
+        if(!targetUserSendLimit.status) return;
+        if(
+          (targetUserSendLimit.timeLimit && new Date(this.user.toc).getTime() > Date.now() - 30*24*60*60*1000) ||
+          (targetUserSendLimit.digestLimit && this.userDigestThreadCount === 0) ||
+          (targetUserSendLimit.xsfLimit && this.user.xsf <= 0) ||
+          (targetUserSendLimit.gradeLimit > this.user.grade._id)
+        ) return true;
+      },
+      showSystemLimitInfo: function() {
+        if(this.systemInfoViewed) return;
+        var targetUser = this.targetUser;
+        var targetUserSendLimit = this.targetUserSendLimit;
+        var targetUserGrade = this.targetUserGrade;
+        var messageSettings = this.messageSettings;
+        if(!targetUser || !targetUserGrade) return;
+        var isFriend = false;
+        for(var i = 0; i < this.friends.length; i++) {
+          if(this.friends[i].tUid === targetUser.uid) {
+            isFriend = true;
+            break;
+          }
+        }
+        if(isFriend) return;
+        if(targetUserSendLimit.status) return;
+        if(
+          messageSettings.gradeLimit.indexOf(this.user.grade._id) !== -1 &&
+          messageSettings.gradeProtect.indexOf(targetUserGrade._id) !== -1
+        ) return true;
+      },
       friendsByOrder: function() {
         var str = '0123456789abcdefghijklmnopqrstuvwxyz*';
         var initials = str.split('');
@@ -402,7 +461,7 @@ $(function() {
 
       // 加入用户到黑名单列表
       addToBlackList: function() {
-        if(confirm("确认要将好友加入黑名单？") === false) return;
+        if(confirm("确认要将该用户加入黑名单？") === false) return;
         var isFriend = true;
         var tUid = app.friend.tUid;
         if(!tUid) {
@@ -667,6 +726,9 @@ $(function() {
         this.category = '';
         this.selectCategoryFriendsId = [];
         this.editCategory = false;
+        this.systemInfoViewed = false;
+        this.targetUserSendLimit = "";
+        this.targetUserGrade = "";
       },
 
       // 获取聊天记录
@@ -691,6 +753,8 @@ $(function() {
             }
             app.info = '';
             app.messages = data.messages.concat(app.messages);
+            app.targetUserSendLimit = data.targetUserSendLimit;
+            app.targetUserGrade = data.targetUserGrade;
             app.canGetMessage = true;
 
             var contentBody = app.$refs.content;
@@ -797,6 +861,17 @@ $(function() {
               var messageSettings = data.user.generalSettings.messageSettings;
               var beep = messageSettings.beep;
               app.onlyReceiveFromFriends = messageSettings.onlyReceiveFromFriends;
+              app.messageLimit = messageSettings.limit;
+              app.messageLimitArr = [];
+              if(app.messageLimit.timeLimit) {
+                app.messageLimitArr.push("time");
+              }
+              if(app.messageLimit.xsfLimit) {
+                app.messageLimitArr.push("xsf");
+              }
+              if(app.messageLimit.digestLimit) {
+                app.messageLimitArr.push("digest");
+              }
               app.beep = [];
               for(var key in beep) {
                 if(beep.hasOwnProperty(key) && beep[key]) {
@@ -822,9 +897,29 @@ $(function() {
         for(var i = 0; i < app.beep.length; i++) {
           beep[app.beep[i]] = true;
         }
+
+        // 短消息防骚扰
+        var messageLimit = this.messageLimit;
+        var messageLimitArr = this.messageLimitArr;
+
+        messageLimit.timeLimit = messageLimitArr.indexOf("time") !== -1;
+        messageLimit.digestLimit = messageLimitArr.indexOf("digest") !== -1;
+        messageLimit.xsfLimit = messageLimitArr.indexOf("xsf") !== -1;
+
+        if(
+          messageLimit.status &&
+          !messageLimit.timeLimit &&
+          !messageLimit.digestLimit &&
+          !messageLimit.xsfLimit &&
+          Number(messageLimit.gradeLimit) < 2
+        ) {
+          return screenTopWarning("请至少勾选一项防骚扰设置");
+        }
+
         nkcAPI('/message/settings', 'PATCH', {
           beep: beep,
-          onlyReceiveFromFriends: app.onlyReceiveFromFriends
+          onlyReceiveFromFriends: app.onlyReceiveFromFriends,
+          limit: messageLimit
         })
           .then(function() {
             updateBeep(beep);
