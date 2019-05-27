@@ -5,33 +5,16 @@ script(type='text/javascript', src='/ueditor/ueditor.config.js')
 // 编辑器源码文件
 script(type='text/javascript', src='/ueditor/ueditor.all.js')
 // 添加下拉框
-script(type='text/javascript', src='/ueditor/addCustomizeCombox.js')
+script(type='text/javascript', src='/ueditor/addMathFormulaDialog.js')
 //- script(type='text/javascript', src='/ueditor/ueditor.parse.js')
 // 实例化编辑器
 script(type='text/javascript').
-  //- // 配置公式渲染
-  //- MathJax.Hub.Config({
-  //-   jax: ["input/TeX","output/CommonHTML"],
-  //-   extensions: ["tex2jax.js","MathZoom.js"],
-  //-   tex2jax:{
-  //-       inlineMath:  [["$", "$"], ["\\(","\\)"]],
-  //-       displayMath: [["$$","$$"], ["\\[","\\]"]],
-  //-     ignoreClass:'container',
-  //-     processClass:"ThreadPostBody|QuestionText"
-  //-   },
-  //-   "CommonHTML":{
-  //-     showMathMenu:false,
-  //-     preferredFont:"STIX",
-  //-     scale: 100,
-  //-     minScaleAdjust: 50
-  //-   },
-  //-   TeX: {
-  //-     equationNumbers: {autoNumber: "AMS"}
-  //-   }
-  //- })
   // 获取header高度
   var ue = UE.getEditor('container', {
     toolbars: [
+      [
+        'mathformula'
+      ],
       [
         'fullscreen', 'source', '|', 'undo', 'redo', '|', 'blockquote', 'horizontal', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', '|','inserttable'
       ],
@@ -39,6 +22,9 @@ script(type='text/javascript').
         'bold', 'italic', 'underline', 'strikethrough', '|' ,'superscript', 'subscript', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
       ]
     ],
+    labelMap: {
+      'mathformula': '插入公式'
+    },
     maximumWords: 100000, // 最大字符数
     autoHeightEnabled:false, // 编辑器是否随着行数增加而自动长高
     //- scaleEnabled: true, // 是否允许拉长

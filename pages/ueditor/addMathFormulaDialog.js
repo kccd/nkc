@@ -1,15 +1,15 @@
-UE.registerUI('dialog',function(editor,uiName){
+UE.registerUI('mathFormula',function(editor,uiName){
 
-    //创建dialog
-    var dialog = new UE.ui.Dialog({
+    //创建mathFormulaDialog
+    var mathFormulaDialog = new UE.ui.Dialog({
         //指定弹出层中页面的路径，这里只能支持页面,因为跟addCustomizeDialog.js相同目录，所以无需加路径
-        iframeUrl:'customizeDialogPage.html',
+        iframeUrl:editor.options.UEDITOR_HOME_URL + 'dialogs/mathFormula/mathFormula.html',
         //需要指定当前的编辑器实例
         editor:editor,
         //指定dialog的名字
         name:uiName,
         //dialog的标题
-        title:"这是个测试浮层",
+        title:"插入公式",
 
         //指定dialog的外围样式
         cssRules:"width:600px;height:300px;",
@@ -20,14 +20,14 @@ UE.registerUI('dialog',function(editor,uiName){
                 className:'edui-okbutton',
                 label:'确定',
                 onclick:function () {
-                    dialog.close(true);
+                    mathFormulaDialog.close(true);
                 }
             },
             {
                 className:'edui-cancelbutton',
                 label:'取消',
                 onclick:function () {
-                    dialog.close(false);
+                    mathFormulaDialog.close(false);
                 }
             }
         ]});
@@ -40,10 +40,9 @@ UE.registerUI('dialog',function(editor,uiName){
         cssRules :'background-position: -500px 0;',
         onclick:function () {
             //渲染dialog
-            dialog.render();
-            dialog.open();
+            mathFormulaDialog.render();
+            mathFormulaDialog.open();
         }
     });
-
     return btn;
 }/*index 指定添加到工具栏上的那个位置，默认时追加到最后,editorId 指定这个UI是那个编辑器实例上的，默认是页面上所有的编辑器都会添加这个按钮*/);

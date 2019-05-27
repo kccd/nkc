@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>公式插入框</title>
+  <script src="../../MathJax-2.6-latest/MathJax.js"></script>
+  <script src="./mathformula.js"></script>
+  <style>
+    body {
+      font: 12px/1.5 sans-serif, "宋体", "Arial Narrow", HELVETICA;
+    }
+    .mathDiaFieldset {
+      border: 1px solid #ddd;
+      padding-left: 5px;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+    }
+  </style>
+</head>
+<body style="padding: 2px">
+  <div>
+    <fieldset class="mathDiaFieldset">
+        <legend>注意事项</legend>
+        <table>
+          <tbody>
+            <tr>
+              <td class="ignoreRender">1.正文显示(inline)：请使用$....$或\(....\)包裹代码</td>
+            </tr>
+            <tr>
+              <td class="ignoreRender">2.单独显示(display)：请使用$$....$$或\[....\]包裹代码</td>
+            </tr>
+          </tbody>
+        </table>
+    </fieldset>
+  </div>
+  <div>
+    <fieldset class="mathDiaFieldset">
+        <legend>公式输入</legend>
+        <textarea id="mathInput" style="width: 100%;border: 0;height: 30px;" value="$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$" class="ignoreRender" oninput="putTextToOutput()" onpropertychange="putTextToOutput()"></textarea>
+    </fieldset>
+  </div>
+  <div>
+    <fieldset class="mathDiaFieldset">
+        <legend>公式预览</legend>
+        <div id="mathOutput">$$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$$</div>
+    </fieldset>
+  </div>
+  <script type="text/javascript" src="../internal.js"></script>
+  <script src="./jquery-1.11.0.min.js"></script>
+  <script>
+      MathJax.Hub.Config({
+        jax: ["input/TeX","output/CommonHTML"],
+        extensions: ["tex2jax.js","MathZoom.js"],
+        tex2jax:{
+            inlineMath:  [["$", "$"], ["\\(","\\)"]],
+            displayMath: [["$$","$$"], ["\\[","\\]"]],
+          ignoreClass:'container|ignoreRender',
+          processClass:"ThreadPostBody|QuestionText"
+        },
+        "CommonHTML":{
+          showMathMenu:false,
+          preferredFont:"STIX",
+          scale: 100,
+          minScaleAdjust: 50
+        },
+        TeX: {
+          equationNumbers: {autoNumber: "AMS"}
+        }
+      });
+  </script>
+  <script>
+    dialog.onok = function(){
+      // 获取公式源代码
+      var formulaCodeText = $("#mathInput").val();
+      var formulaCode = formulaCodeText.substr(0, 2);
+      if(formulaCode == "$$") {
+          editor.execCommand('insertformulacode', '<span contenteditable="false" style="max-width:100%">'+formulaCodeText+'</span><span><br></span>');
+      }else {
+          editor.execCommand('insertformulacode', '<span contenteditable="false">'+formulaCodeText+'</span>&nbsp;');
+      }
+      dialog.close();
+      return false;
+    }
+  </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
+/**
+ * 公式化简
+ */
 function articleTransfer() {
-  // 取出编辑器中的文章并放入转移区域
-  var transferDom = ue.getContent();
-  $("#transfer").html(transferDom);
-  // 在转移区域中化简公式
-  $("#transfer").find(".MathJax_Preview").each(function(){
+  // 只保留公式源代码
+  $(ue.body).find(".MathJax_Preview").each(function(){
     if($(this).next().next().length !== 0){
       if($(this).next().next().attr("type").length > 15){
         var mathfur = "$$" + $(this).next().next().html() + "$$";
@@ -17,23 +17,23 @@ function articleTransfer() {
       $(this).parent().remove()
     }
   })
-  // 再取出转移区域中的文章内容，并返回
-  var transferHtml = $("#transfer").html();
-  return transferHtml;
+  // 删除多余的公式div
+  $(ue.body).find("#MathJax_Message").remove();
 }
 
 /**
  * 提交回复
  */
 function onPost() {
+  articleTransfer();
   // 获取url相关参数
   var query = getSearchKV();
   var queryType = query.type;
   var queryId = query.id;
   // 文章内容相关
   var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
-  var transferContent = articleTransfer(); // 转移区内容
-  var content = quoteContent + transferContent; // 文章主体内容
+  // var transferContent = ue.getContent(); // 转移区内容
+  var content = quoteContent + ue.getContent(); // 文章主体内容
   if(content.length < 1) {
     return screenTopWarning("请填写内容")
   }

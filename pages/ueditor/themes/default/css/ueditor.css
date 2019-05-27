@@ -651,6 +651,14 @@ div.edui-box {
     height: 20px !important;
 }
 
+.edui-default  .edui-for-mathformula .edui-icon {
+    /* background-position: -480px 0; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/sigma.png) !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+
 .edui-default  .edui-for-justifyjustify .edui-icon {
     background-position: -440px 0;
 }
