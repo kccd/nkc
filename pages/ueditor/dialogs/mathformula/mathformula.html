@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>公式插入框</title>
+  <script type="text/javascript" src="../internal.js"></script>
   <script src="../../MathJax-2.6-latest/MathJax.js"></script>
   <script src="./mathformula.js"></script>
   <style>
     body {
-      font: 12px/1.5 sans-serif, "宋体", "Arial Narrow", HELVETICA;
+      font: 12px/1.5 sans-serif, "宋体", "Arial Narrow", HELVETICA !important;
+      color: #000 !important;
     }
     .mathDiaFieldset {
       border: 1px solid #ddd;
+      padding:5px;
       padding-left: 5px;
+      margin: 10px;
       margin-bottom: 10px;
       padding-bottom: 5px;
     }
@@ -20,7 +24,7 @@
 <body style="padding: 2px">
   <div>
     <fieldset class="mathDiaFieldset">
-        <legend>注意事项</legend>
+        <legend>公式格式</legend>
         <table>
           <tbody>
             <tr>
@@ -36,7 +40,7 @@
   <div>
     <fieldset class="mathDiaFieldset">
         <legend>公式输入</legend>
-        <textarea id="mathInput" style="width: 100%;border: 0;height: 30px;" value="$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$" class="ignoreRender" oninput="putTextToOutput()" onpropertychange="putTextToOutput()"></textarea>
+        <textarea id="mathInput" style="width: 100%;border: 0;height: 50px;" placeholder="$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$" class="ignoreRender" oninput="putTextToOutput()" onpropertychange="putTextToOutput()"></textarea>
     </fieldset>
   </div>
   <div>
@@ -45,7 +49,6 @@
         <div id="mathOutput">$$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$$</div>
     </fieldset>
   </div>
-  <script type="text/javascript" src="../internal.js"></script>
   <script src="./jquery-1.11.0.min.js"></script>
   <script>
       MathJax.Hub.Config({

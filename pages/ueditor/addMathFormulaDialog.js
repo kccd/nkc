@@ -1,5 +1,9 @@
 UE.registerUI('mathFormula',function(editor,uiName){
-
+    var isPC = IsPC();
+    var dialogCSS = "width:600px;height:350px;";
+    if(!isPC) {
+        dialogCSS = "width:330px;height:350px;"
+    }
     //创建mathFormulaDialog
     var mathFormulaDialog = new UE.ui.Dialog({
         //指定弹出层中页面的路径，这里只能支持页面,因为跟addCustomizeDialog.js相同目录，所以无需加路径
@@ -12,7 +16,7 @@ UE.registerUI('mathFormula',function(editor,uiName){
         title:"插入公式",
 
         //指定dialog的外围样式
-        cssRules:"width:600px;height:300px;",
+        cssRules: dialogCSS,
 
         //如果给出了buttons就代表dialog有确定和取消
         buttons:[
@@ -34,10 +38,11 @@ UE.registerUI('mathFormula',function(editor,uiName){
 
     //参考addCustomizeButton.js
     var btn = new UE.ui.Button({
-        name:'dialogbutton' + uiName,
-        title:'dialogbutton' + uiName,
+        name:'dialogbutton',
+        title:'插入公式',
         //需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
-        cssRules :'background-position: -500px 0;',
+        // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
+        className: 'edui-default edui-for-mathformula edui-icon',
         onclick:function () {
             //渲染dialog
             mathFormulaDialog.render();
@@ -46,3 +51,19 @@ UE.registerUI('mathFormula',function(editor,uiName){
     });
     return btn;
 }/*index 指定添加到工具栏上的那个位置，默认时追加到最后,editorId 指定这个UI是那个编辑器实例上的，默认是页面上所有的编辑器都会添加这个按钮*/);
+
+// 判断是否为pc
+function IsPC() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = ["Android", "iPhone",
+                "SymbianOS", "Windows Phone",
+                "iPad", "iPod"];
+    var flag = true;
+    for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
+}

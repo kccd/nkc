@@ -10684,8 +10684,8 @@ UE.commands['insertformulacode'] = {
 
 
         setTimeout(function(){
-            if(MathJax){
-                MathJax.Hub.PreProcess(me.document.getElementById('view'),function(){MathJax.Hub.Process(me.document.getElementById('view'))})
+            if(document.getElementById('ueditor_0').contentWindow.MathJax){
+                document.getElementById('ueditor_0').contentWindow.MathJax.Hub.PreProcess(me.document.getElementById('view'),function(){document.getElementById('ueditor_0').contentWindow.MathJax.Hub.Process(me.document.getElementById('view'))})
             }
         },200);
     }
@@ -23074,14 +23074,6 @@ UE.plugins['formatmatch'] = function(){
 };
 
 
-/**
- * @description 插入公式
- * @author Kris
- */
-UE.plugin.register('mathformula', function() {
-    var me = this;
-})
-
 // plugins/searchreplace.js
 ///import core
 ///commands 查找替换
@@ -28083,7 +28075,7 @@ UE.ui = baidu.editor.ui = {};
         'blockquote', 'pasteplain', 'pagebreak',
         'selectall', 'print','horizontal', 'removeformat', 'time', 'date', 'unlink',
         'insertparagraphbeforetable', 'insertrow', 'insertcol', 'mergeright', 'mergedown', 'deleterow',
-        'deletecol', 'splittorows', 'splittocols', 'splittocells', 'mergecells', 'deletetable', 'drafts', 'mathformula'];
+        'deletecol', 'splittorows', 'splittocols', 'splittocells', 'mergecells', 'deletetable', 'drafts'];
 
     for (var i = 0, ci; ci = btnCmds[i++];) {
         ci = ci.toLowerCase();

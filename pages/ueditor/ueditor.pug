@@ -13,18 +13,12 @@ script(type='text/javascript').
   var ue = UE.getEditor('container', {
     toolbars: [
       [
-        'mathformula'
-      ],
-      [
         'fullscreen', 'source', '|', 'undo', 'redo', '|', 'blockquote', 'horizontal', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', '|','inserttable'
       ],
       [
         'bold', 'italic', 'underline', 'strikethrough', '|' ,'superscript', 'subscript', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
       ]
     ],
-    labelMap: {
-      'mathformula': '插入公式'
-    },
     maximumWords: 100000, // 最大字符数
     autoHeightEnabled:false, // 编辑器是否随着行数增加而自动长高
     //- scaleEnabled: true, // 是否允许拉长
