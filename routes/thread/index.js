@@ -479,7 +479,7 @@ threadRouter
 		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
 		// await db.UsersScoreLogModel.insertLog(obj);
 
-		if(thread.uid !== user.uid) {
+		if(!_post.hasQuote && thread.uid !== user.uid) {
       const messageId = await db.SettingModel.operateSystemID('messages', 1);
       const message = db.MessageModel({
         _id: messageId,
