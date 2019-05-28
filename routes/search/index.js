@@ -201,10 +201,10 @@ router
             link,
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
             abstract:
-              highlightObj[`${pid}_abstractEN`] ||
-              highlightObj[`${pid}_abstractCN`] ||
               highlightObj[`${pid}_keywordsEN`] ||
               highlightObj[`${pid}_keywordsCN`] ||
+              highlightObj[`${pid}_abstractEN`] ||
+              highlightObj[`${pid}_abstractCN`] ||
               highlightObj[`${pid}_content`] ||
               post.abstract || post.c,
             threadTime: thread.toc,

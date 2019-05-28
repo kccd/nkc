@@ -221,6 +221,9 @@ body, html{
 .ms-list-left.remind .ms-list-avatar.fa{
   background-color: #279d27;
 }
+.ms-list-left.notice img.ms-list-avatar{
+  display: inline-block;
+}
 
 .ms .ms-right{
   width: 75rem;

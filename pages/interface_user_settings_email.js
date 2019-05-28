@@ -30,6 +30,7 @@ function sendBindEmail(uid) {
 	if(obj.email === '') {
 		return screenTopWarning('请输入邮箱地址');
 	}
+	obj.email = obj.email.trim();
 	nkcAPI('/u/'+uid+'/settings/email', 'POST', obj)
 		.then(function() {
 			var url = obj.email.split('@')[1];
@@ -71,6 +72,7 @@ function sendNewEmail(uid) {
 	if(obj.email === '') {
 		return screenTopWarning('请输入新邮箱地址');
 	}
+  obj.email = obj.email.trim();
 	nkcAPI('/u/'+uid+'/settings/email', 'POST', obj)
 		.then(function() {
 			var url = obj.email.split('@')[1];

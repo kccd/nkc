@@ -122,6 +122,39 @@ authRouter
 		}
 		await targetUserPersonal.update({submittedAuth: false});
 		await next();
-	});
+	})
+  .use("/:_id", async (ctx, next) => {
+    const {method, data, db} = ctx;
+    const {user} = data;
+    if(method !== "POST") return await next();
+    const authSetting = (await db.SettingModel.findById("auth")).c;
+    const {auditorCerts, auditorId} = authSetting;
+    const users = await db.UserModel.find({uid: {$in: auditorId}}, {uid: 1});
+    let uidArr = new Set();
+    for(const u of users) {
+      uidArr.add(u.uid);
+    }
+    for(const certId of auditorCerts) {
+      const users = await db.UserModel.find({certs: certId}, {uid: 1});
+      for(const u of users) {
+        uidArr.add(u.uid)
+      }
+    }
+    uidArr = [...uidArr];
+    for(const uid of uidArr) {
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID("messages", 1),
+        r: uid,
+        ty: "STU",
+        c: {
+          type: "userAuthApply",
+          targetUid: user.uid
+        }
+      });
+      await message.save();
+      await ctx.redis.pubMessage(message);
+    }
+    await next();
+  });
 
 module.exports = authRouter;

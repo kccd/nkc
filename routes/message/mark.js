@@ -5,7 +5,19 @@ markRouter
     const {data, db, body, redis} = ctx;
     const {type, uid} = body;
     const {user} = data;
-    if(type === 'systemInfo') {
+    if(type === "UTU") {
+      await db.MessageModel.updateMany({
+        ty: 'UTU',
+        r: user.uid,
+        s: uid,
+        vd: false
+      }, {
+        $set: {
+          vd: true
+        }
+      });
+      await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}});
+    } else if(type === 'STE') {
       const allInfo = await db.MessageModel.find({ty: 'STE'}, {_id: 1});
       const allInfoLog = await db.SystemInfoLogModel.find({uid: user.uid}, {mid: 1});
       const allInfoId = [];
@@ -26,20 +38,8 @@ markRouter
           await log.save();
         }
       }
-    } else if(type === 'remind') {
-      await db.MessageModel.updateMany({ty: 'STU', r: user.uid, vd: false}, {$set: {vd: true}});
     } else {
-      await db.MessageModel.updateMany({
-        ty: 'UTU',
-        r: user.uid,
-        s: uid,
-        vd: false
-      }, {
-        $set: {
-          vd: true
-        }
-      });
-      await db.CreatedChatModel.updateMany({uid: user.uid, tUid: uid}, {$set: {unread: 0}});
+      await db.MessageModel.updateMany({ty: type, r: user.uid, vd: false}, {$set: {vd: true}});
     }
     await redis.pubMessage({
       ty: 'markAsRead',

@@ -12,17 +12,17 @@ router
     data.target = target;
     let messages = [];
     const {newSystemInfoCount, newReminderCount, newUsersMessagesCount} = user;
-    if(target === 'notice' && newSystemInfoCount !== 0) {
+    if(target === 'STE' && newSystemInfoCount !== 0) {
       const allLogs = await db.SystemInfoLogModel.find({uid: user.uid});
       const systemInfoId = allLogs.map(l => l.mid);
       messages = await db.MessageModel.find({ty: 'STE', _id: {$nin: systemInfoId}}).sort({tc: 1});
     }
-    if(target === 'reminder' && newReminderCount !== 0) {
+    if(target === 'STU' && newReminderCount !== 0) {
       const remind = await db.MessageModel.find({ty: 'STU', r: user.uid, vd: false}).sort({tc: 1});
       const newRemind = await db.MessageModel.extendReminder(remind);
       messages = messages.concat(newRemind);
     }
-    if(target === 'user' && uid && newUsersMessagesCount !== 0) {
+    if(target === 'UTU' && uid && newUsersMessagesCount !== 0) {
       const q = {
         ty: 'UTU',
         $or: [

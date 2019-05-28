@@ -37,6 +37,12 @@ body{
   width: 92px;
   margin: 2px 0 0 2px;
 }
+.user-grade{
+  text-align: center;
+  padding-bottom: 0.3rem;
+  font-size: 1rem;
+  padding-top: 0;
+}
 .user-banner-mask{
   height: 100%;
   width: 100%;
