@@ -2,7 +2,11 @@ div(data-type="" data-pid="" class="modal fade" id="module_post_warning" tabinde
   div(class="modal-dialog" role="document")
     .modal-content
       .modal-body
-        h5 请填写理由
+        .text-center(style="margin-top: 0;font-size: 2rem;")
+          b 发送修改建议
+        h4
+          b 请详细描述文章存在的问题，明确指出修改的要点。
+        h5 修改建议将通过系统通知发送给文章作者。
         textarea.form-control(rows=6)
         .m-t-1
           button.btn.btn-block.btn-primary(onclick="submitPostWarning()") 提交
