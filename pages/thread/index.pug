@@ -311,13 +311,31 @@ block content
                               span(style="margin-right:10px;font-weight: bold;")
                                 if auth.kcid.length > 0
                                   span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                  if auth.agencyIndex
+                                    sup!=`${auth.agencyIndex}`
                                 else
                                   span!=`${auth.name}`
                                   if auth.agencyIndex
                                     sup!=`${auth.agencyIndex}`
                                 if auth.isContract
-                                  span
-                                    span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                                  span(class="dropdown")
+                                    a(id="dropdown-up" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
+                                      span.fa.fa-envelope-open-o(style="color:#000")
+                                    ul.list-group.dropdown-menu(aria-labelledby='dropdown-up' style="padding:0")
+                                      li.list-group-item(style="padding:3px")
+                                        div 通信邮箱：
+                                        div!=`${auth.contractObj.contractEmail}`
+                                      li.list-group-item(style="padding:3px")
+                                        div 电话号码：
+                                        div!=`${auth.contractObj.contractTel}`
+                                      li.list-group-item(style="padding:3px")
+                                        div 通信地址：
+                                        div!=`${auth.contractObj.contractAdd}`
+                                      li.list-group-item(style="padding:3px")
+                                        div 邮政编码：
+                                        div!=`${auth.contractObj.contractCode}`
+                                  //- span
+                                  //-   span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
                           else
                             for auth,index in post.authorInfos
                               span(style="margin-right:10px;font-weight: bold;")
@@ -326,14 +344,30 @@ block content
                                 else
                                   span!=`${auth.name}`
                                 if auth.isContract
-                                  span
-                                    span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
-                          if thread.firstPost.originState && thread.firstPost.originState !== "0"
-                            -var levelText = getOriginLevel(thread.firstPost.originState);
-                            if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
-                              span(style="color:#9baec8;margin-right:3px") 原创
-                            a()
-                              span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
+                                  span(class="dropdown")
+                                    a(id="dropdown-up" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
+                                      span.fa.fa-envelope-open-o(style="color:#000")
+                                    ul.list-group.dropdown-menu(aria-labelledby='dropdown-up' style="padding:0")
+                                      li.list-group-item(style="padding:3px")
+                                        div 通信邮箱：
+                                        div!=`${auth.contractObj.contractEmail}`
+                                      li.list-group-item(style="padding:3px")
+                                        div 电话号码：
+                                        div!=`${auth.contractObj.contractTel}`
+                                      li.list-group-item(style="padding:3px")
+                                        div 通信地址：
+                                        div!=`${auth.contractObj.contractAdd}`
+                                      li.list-group-item(style="padding:3px")
+                                        div 邮政编码：
+                                        div!=`${auth.contractObj.contractCode}`
+                                  //- span
+                                  //-   span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                          //- if thread.firstPost.originState && thread.firstPost.originState !== "0"
+                          //-   -var levelText = getOriginLevel(thread.firstPost.originState);
+                          //-   if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                          //-     span(style="color:#9baec8;margin-right:3px") 原创
+                          //-   a()
+                          //-     span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
                         .thread-info.text-center(style="color:#000;margin-top:1rem")
                           if post.authorInfos.length > 1
                             for agad,index in agencyAddArray
@@ -342,18 +376,21 @@ block content
                             for agad,index in agencyAddArray
                               span(style="margin-right:10px")!=`${agad}`
 
-                      else
-                        .thread-info.text-center(style="margin-top:1rem")
-                          a(href=`/u/${thread.uid}`)
-                            img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-                            span= ` ${thread.firstPost.user.username}`
-                          span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleString()}`
-                          if thread.firstPost.originState && thread.firstPost.originState !== "0"
-                            -var levelText = getOriginLevel(thread.firstPost.originState);
-                            if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
-                              span(style="color:#9baec8;margin-right:3px") 原创
-                            a()
-                              span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
+                      .thread-info.text-center(style="margin-top:1rem")
+                        a(href=`/u/${thread.uid}`)
+                          img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                          span= ` ${thread.firstPost.user.username}`
+                        span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
+                        if thread.firstPost.originState && thread.firstPost.originState !== "0"
+                          -var levelText = getOriginLevel(thread.firstPost.originState);
+                          if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                            span(style="color:#9baec8;margin-right:3px") 原创
+                          span(class="dropdown")
+                            a(id="dropdown-level" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
+                              span.fa.fa-caret-square-o-down(style="color:#b5b4b4")
+                            .dropdown-menu(aria-labelledby='dropdown-level')
+                              span(style="padding:5px")!=`${levelText}`
+
                       //- if post.authorInfos && post.authorInfos.length > 0
                       //-   .panel.panel-default(style="border:0;margin-bottom:0")
                       //-     .panel-heading.paperHeader 作者信息
