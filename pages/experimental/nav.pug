@@ -122,6 +122,9 @@
           if permission('experimentalSafeSettings')
             li
               a(href='/e/settings/safe') 安全
+          if permission('experimentalUserAuth')
+            li
+              a(href='/e/settings/auth') 身份认证
           <li role="separator" class="divider"></li>    
           li
             a(href='/e/settings/home/top') 网站首页

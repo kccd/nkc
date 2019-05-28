@@ -4,16 +4,24 @@ settingsRouter
   .patch('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
-    const {beep, onlyReceiveFromFriends, messageSettings} = body;
+    const {beep, onlyReceiveFromFriends, messageSettings, limit} = body;
     const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
     if(messageSettings) {
       await usersGeneral.update({
         messageSettings
       });
     } else {
+      if(
+        limit.status &&
+        !limit.timeLimit &&
+        !limit.digestLimit &&
+        !limit.xsfLimit &&
+        Number(limit.gradeLimit) < 2
+      ) ctx.throw(400, "请至少勾选一项防骚扰设置");
       await usersGeneral.update({
         'messageSettings.beep': beep,
-        'messageSettings.onlyReceiveFromFriends': onlyReceiveFromFriends
+        'messageSettings.onlyReceiveFromFriends': onlyReceiveFromFriends,
+        "messageSettings.limit": limit
       });
     }
     await next();

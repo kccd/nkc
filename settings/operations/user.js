@@ -96,6 +96,10 @@ module.exports = {
       bank: {
 			  GET: 'userBindBankAccounts',
         POST: 'userBindBankAccounts'
+      },
+      message: {
+			  GET: "userMessageSettings",
+        PATCH: "userMessageSettings"
       }
 		},
 		auth: {

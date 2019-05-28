@@ -1,0 +1,27 @@
+extends ../../../bootstrap_base
+block title
+  title 消息设置
+  +includeCSS("/user/settings/message/message.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include ../../../module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-primary
+          .panel-heading
+            span 消息设置
+          .panel-body
+            h4 黑名单列表
+            hr
+            div.m-t-1
+              if data.blackListUsers.length > 0
+                for u in data.blackListUsers
+                  .black-user
+                    img(src=`/avatar/${u.uid}`)
+                    a(href=`/u/${u.uid}` target="_blank")=u.username
+                    .fa.fa-remove(onclick=`removeFromBlackList("${u.uid}")`)
+              else
+                h5 暂无用户
+block scripts
+  +includeJS("/user/settings/message/message.js")

@@ -8,6 +8,21 @@ friendsRouter
     const {uid} = params;
     const {user} = data;
     const {description = ''} = body;
+
+    // 判断自己是否已被对方加入到消息黑名单
+    let blackList = await db.MessageBlackListModel.findOne({
+      tUid: user.uid,
+      uid
+    });
+    if(blackList) ctx.throw(403, "对方拒绝接收您的消息，您无法添加该用户为好友。");
+
+    // 判断自己是否添加对方到消息黑名单，如果是则将对方从黑名单中移除
+    blackList = await db.MessageBlackListModel.findOne({
+      tUid: uid,
+      uid: user.uid
+    });
+    if(blackList) await blackList.remove();
+
     if(description.length > 100) ctx.throw(400, '验证信息不能超过100个字');
     const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
     if(friend) ctx.throw(400, '该用户已经成为您的好友，请勿重复添加');

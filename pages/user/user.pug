@@ -37,6 +37,9 @@ block content
               img(src=`/avatar/${data.targetUser.uid}`)
             .user-banner(style=`background-image: url(/u/${data.targetUser.uid}/banner);`)
           .user-name=data.targetUser.username || data.targetUser.uid
+          .user-grade
+            -const targetUser = data.targetUser
+            include ./module_user_grade
           .user-certs=data.targetUser.info.certsName
           if !data.user || data.user.uid !== data.targetUser.uid
             .user-button

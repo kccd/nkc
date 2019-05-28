@@ -121,6 +121,12 @@ router
           }
         }
       });
+      await db.MessageModel.sendShopMessage({
+        type: "shopBuyerRefundChange",
+        r: refund.buyerId,
+        orderId: refund.orderId,
+        refundId: refund._id
+      });
 
     } else if(type === "disagreeRP") {
       // 卖家拒绝退货

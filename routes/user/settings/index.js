@@ -10,6 +10,7 @@ const transactionRouter = require('./transaction');
 const photoRouter = require('./photo');
 const certRouter = require('./cert');
 const socialRouter = require('./social');
+const messageRouter = require("./message");
 const usernameRouter = require('./username');
 const waterRouter = require('./water');
 const alipayRouter = require("./alipay");
@@ -50,5 +51,6 @@ settingRouter
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use("/display", displayRouter.routes(), displayRouter.allowedMethods())
   .use("/bank", bankRouter.routes(), bankRouter.allowedMethods())
+  .use("/message", messageRouter.routes(), messageRouter.allowedMethods())
 	.use('/water', waterRouter.routes(), waterRouter.allowedMethods());
 module.exports = settingRouter;
