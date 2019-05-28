@@ -891,6 +891,8 @@ function deleteForum(fid) {
 
 var digestDom;
 var creditDom;
+var postWarningDom;
+
 $(function () {
 	var tooltipElements = $('[data-toggle="tooltip"]');
 	if(tooltipElements.length > 0) {
@@ -912,9 +914,42 @@ $(function () {
     });
   }
 
+  postWarningDom = $("#module_post_warning");
+  if(postWarningDom.length !== 0) {
+    postWarningDom.modal({
+      show: false
+    });
+  }
+
+
 
 });
 
+
+function openPostWarningDom(pid) {
+  var dom = $("#module_post_warning");
+  dom.attr("data-pid", pid).show();
+  dom.modal('show');
+}
+
+function submitPostWarning() {
+  var dom = $("#module_post_warning");
+  var pid = dom.attr("data-pid");
+  var text = $("#module_post_warning textarea");
+  var reason = text.val();
+  if(!reason) return screenTopWarning("理由不能为空");
+  nkcAPI("/p/" + pid + "/warning", "POST", {
+    reason: reason
+  })
+    .then(function() {
+      dom.modal('hide');
+      dom.attr("data-pid", "");
+      text.val("");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
 
 function cancelXsf(pid, id) {
   var reason = prompt('请输入撤销原因：');

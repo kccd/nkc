@@ -6,6 +6,7 @@ const disabled = require('./disabled');
 const recommend = require('./recommend');
 const digestRouter = require('./digest');
 const voteRouter = require('./vote');
+const warningRouter = require("./warning");
 const postRouter = new Router();
 
 postRouter
@@ -249,5 +250,6 @@ postRouter
   .use('/:pid/credit', credit.routes(), credit.allowedMethods())
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
+  .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
   .use('/:pid/quote', quote.routes(), quote.allowedMethods());
 module.exports = postRouter;

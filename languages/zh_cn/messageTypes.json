@@ -38,5 +38,7 @@
   "shopSellerCancelOrder": "【交易系统】卖家取消订单",
   "shopBuyerApplyRefund": "【交易系统】买家申请退款",
   "shopBuyerRefundChange": "【交易系统】订单退款状态更新",
-  "shopSellerRefundChange": "【交易系统】订单退款状态更新"
+  "shopSellerRefundChange": "【交易系统】订单退款状态更新",
+  "warningPost": "建议修改回复",
+  "warningThread": "建议修改文章"
 }

@@ -287,7 +287,7 @@ postSchema.pre('save', async function(next) {
     // 截取所有@起向后15字符的字符串
     var positions = [];
     // 引用的内容再次发布，不解析at
-    e = c.replace(/<blockquote.*?blockquote>/im,'')
+    const e = c.replace(/<blockquote.*?blockquote>/im,'');
     var d = e.replace(/<[^>]+>/g,"");
     var pos = d.indexOf("@");
     while(pos > -1){
