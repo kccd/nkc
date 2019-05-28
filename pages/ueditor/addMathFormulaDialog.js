@@ -34,13 +34,15 @@ UE.registerUI('mathFormula',function(editor,uiName){
                     mathFormulaDialog.close(false);
                 }
             }
-        ]});
+        ]
+    });
+    // 当点击编辑内容时，按钮要做的反射状态
 
     //参考addCustomizeButton.js
     var btn = new UE.ui.Button({
         name:'dialogbutton',
         title:'插入公式',
-        //需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
+        // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
         // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
         className: 'edui-default edui-for-mathformula edui-icon',
         onclick:function () {

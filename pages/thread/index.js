@@ -436,7 +436,7 @@ function goEditor(){
 	window.localStorage.quoteHtml = document.getElementById("quoteContent").innerHTML;
 	window.localStorage.replyHtml = document.getElementById('text-elem').innerHTML;
 	//return console.log(window.localStorage)
-	window.location = '/editor?&ver=ue&type=thread&id='+replyTarget.trim().split('/')[1]
+	window.location = '/editor?type=thread&id='+replyTarget.trim().split('/')[1]
 }
 
 function addColl(tid){

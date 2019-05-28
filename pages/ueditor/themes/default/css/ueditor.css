@@ -109,6 +109,14 @@ div.edui-box {
     text-decoration: underline;
 }
 
+.edui-default span.edui-clickableNew {
+    cursor: pointer;
+}
+
+.edui-default span.edui-clickableNew:hover {
+    background-color: #eee;
+}
+
 .edui-default span.edui-unclickable {
     color: gray;
     cursor: default;
@@ -249,19 +257,19 @@ div.edui-box {
 }
 
 .edui-default .edui-bubble .edui-popup-content {
-    border: 1px solid #DCAC6C;
-    background-color: #fff6d9;
+    border: 1px solid #2b90d8;
+    background-color: #ffffff;
     padding: 5px;
     font-size: 10pt;
     font-family: "宋体";
 }
 
-.edui-default .edui-bubble .edui-shadow {
+/* .edui-default .edui-bubble .edui-shadow { */
     /*box-shadow: 1px 1px 3px #818181;*/
     /*-webkit-box-shadow: 2px 2px 3px #818181;*/
     /*-moz-box-shadow: 2px 2px 3px #818181;*/
     /*filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius = '2', MakeShadow = 'true', ShadowOpacity = '0.5');*/
-}
+/* } */
 
 .edui-default .edui-editor-toolbarmsg {
     background-color: #FFF6D9;
@@ -386,8 +394,6 @@ div.edui-box {
     background: url("../images/sparator_v.png") repeat-y 25px;
 }
 
-.edui-default .edui-menuitem-body {
-}
 
 .edui-default .edui-menuitem {
     height: 20px;
@@ -695,8 +701,8 @@ div.edui-box {
     /* background-position: -500px 0; */
     background-repeat: no-repeat;
     background-image: url(../images/icon/link.png) !important;
-    width: 20px !important;
-    height: 20px !important;
+    /* width: 20px !important;
+    height: 20px !important; */
 }
 
 .edui-default  .edui-for-unlink .edui-icon {
@@ -1667,7 +1673,7 @@ div.edui-box {
     margin-right: 1px;
     font-size: 12px;
     line-height: 14px;
-    height: 14px;
+    height: 20px;
     border: 1px solid #333;
     padding: 3px 5px;
     cursor: pointer;

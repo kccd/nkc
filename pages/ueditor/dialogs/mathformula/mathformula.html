@@ -40,7 +40,7 @@
   <div>
     <fieldset class="mathDiaFieldset">
         <legend>公式输入</legend>
-        <textarea id="mathInput" style="width: 100%;border: 0;height: 50px;" placeholder="$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$" class="ignoreRender" oninput="putTextToOutput()" onpropertychange="putTextToOutput()"></textarea>
+        <textarea id="mathInput" style="width: 100%;border: 0;height: 50px;cursor: inherit;" placeholder="$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$" class="ignoreRender" oninput="putTextToOutput()" onpropertychange="putTextToOutput()"></textarea>
     </fieldset>
   </div>
   <div>
@@ -68,7 +68,8 @@
         },
         TeX: {
           equationNumbers: {autoNumber: "AMS"}
-        }
+        },
+        messageStyle: "none",
       });
   </script>
   <script>

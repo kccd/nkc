@@ -75,7 +75,7 @@ downloadRouter
         })
             
     };
-    
+
     let funcResult = await downloadImg(url, './tmp/upload_'+timeStr);
     
     //获得图片格式和尺寸
@@ -235,6 +235,8 @@ downloadRouter
       mediaType: mediaType
     });
     ctx.data.r = await r.save();
+    ctx.data.source = url;
+    ctx.data.state = "SUCCESS";
     await next()
 });
 

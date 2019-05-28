@@ -22,6 +22,77 @@ function articleTransfer() {
 }
 
 /**
+ * 保存草稿
+ */
+function saveDraft() {
+  articleTransfer();
+  // 获取url相关参数
+  var query = getSearchKV();
+  var queryType = query.type;
+  var queryId = query.id;
+  var draftId = $("#draftId").html();
+  // 文章内容相关
+  var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
+  // var transferContent = ue.getContent(); // 转移区内容
+  var content = quoteContent + ue.getContent(); // 文章主体内容
+  if(content.length < 1) {
+    return screenTopWarning("请填写内容")
+  }
+  if(geid('parseURL').checked) {
+    content = common.URLifyHTML(content);
+  }
+  var title = geid('title').value.trim(); // 文章标题
+  if (queryType !== 'redit' && queryType !== 'thread' && queryType !== 'post' && queryType !== 'application' && title === '' && queryType !== 'forum_declare') {
+    return screenTopWarning('请填写标题');
+  }
+  if(title.length > 50) {
+    return screenTopWarning("文章标题50字以内");
+  }
+  var post = {
+    t: title,
+    c: content,
+    l: 'html',
+    did: draftId,
+    desType: queryType,
+    desTypeId: queryId
+  }
+  if(queryType == "post" || queryType == "thread" || queryType == "forum") {
+    try{
+      var paperObj = paperProto.paperExport();
+    }catch(e) {
+      screenTopWarning(e);
+      return;
+    }
+    for(var i in paperObj) {
+      post[i] = paperObj[i]
+    }
+  }
+  var userId = $("#userNowId").html()
+  var method = "POST";
+  var url = "/u/"+userId+"/drafts";
+  var data = {post:post};
+  return nkcAPI(url, method, data)
+  .then(function (result) {
+    if(result.status == "success"){
+      // console.log(result.did)
+      $("#draftId").html(result.did)
+      screenTopAlert("保存成功！");
+    }
+    if(result.redirect) {
+      redirect(result.redirect)
+    } else {
+      if(that.type === 'post') {
+        redirect()
+      }
+    }
+  })
+  .catch(function (data) {
+    screenTopWarning(data.error);
+    geid('post').disabled = false
+  })
+}
+
+/**
  * 提交回复
  */
 function onPost() {

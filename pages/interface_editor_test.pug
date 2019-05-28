@@ -47,14 +47,14 @@ block content
             .form-group
               div#quoteCancel(style='display: none')
                 button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-            if data.ver == "ue"
-              .form-group
-                include ./ueditor/ueditor.pug     
-              .form-group
-                #transfer
-            else
-              .form-group
-                div#content_test   
+            //- if data.ver == "ue"
+            .form-group
+              include ./ueditor/ueditor.pug     
+            .form-group
+              #transfer
+            //- else
+            //-   .form-group
+            //-     div#content_test   
             .form-group
             //- .nkcpanel(id='file-uploading' target='/r')
             //-     //uploader section
@@ -82,9 +82,9 @@ block content
               if !['forum_declare'].includes(data.type)
                 .form-group
                 -if (!data.targetUser)
-                  button#draft.btn.btn-primary(type='submit') 保存草稿
+                  button#draft.btn.btn-primary(type='submit' onclick="saveDraft()") 保存草稿
                 -else if(data.targetUser.uid === data.user.uid)
-                  button#draft.btn.btn-primary(type='submit') 保存草稿
+                  button#draft.btn.btn-primary(type='submit' onclick="saveDraft()") 保存草稿
                 //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
                   button#draft.btn.btn-primary(type='submit') 保存草稿
                 .form-group
@@ -104,94 +104,84 @@ block content
   
   include debug_output.pug
 block scripts
-  if data.ver == "ue"
-    link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
-    script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-    script(src="/jquery-1.10.2.js")
-    script(src="/jquery-ui-1.10.4.custom.js")
-    +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
-    script(src='/commonmark/dist/commonmark.js')
-    script(src='/plain_escaper.js')
-    script(src='/xbbcode-parser/xbbcode.js')
-    script(src='/xss/dist/xss.js')
-    script(src='/external_pkgs/react/react.min.js')
-    script(src='/external_pkgs/react/JSXTransformer.js')
-    script(src=`/interface_common.js?v=${startTime}`)
-    script(src=`/nkc_render.js?v=${startTime}`)
-    +includeJS("/editor/paper.js")
-    script(src=`/interface_editor_ue.js?v=${startTime}`)
-    include ./publicModules/crop/crop
-
-    //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-    //-   script(src=`/forum/forumlist_dropdown1.js?v=${startTime}`)
-    //- script(src=`/interface_editor.js?v=${startTime}`)
-
-    //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-    //-   script(src=`/forum/forumlist_dropdown1.js?v=${startTime}`)
-    script(src=`/media/media_index.js?v=${startTime}`)
-    script(src=`/forum/forum_choice.js?v=${startTime}`)
-    script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
-    script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
-    +includeJS('/external_pkgs/citySet/agency.json.js')
-    +includeJS('/external_pkgs/citySet/citySet.js')
-    script.
-      window.onbeforeunload = function() {
-        if(document.getElementById("post").disabled === false){
-          return "离开前保存草稿了吗？"
-        }
+  //- if data.ver == "ue"
+  link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+  script(src="/jquery-1.10.2.js")
+  script(src="/jquery-ui-1.10.4.custom.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
+  script(src='/commonmark/dist/commonmark.js')
+  script(src='/plain_escaper.js')
+  script(src='/xbbcode-parser/xbbcode.js')
+  script(src='/xss/dist/xss.js')
+  script(src='/external_pkgs/react/react.min.js')
+  script(src='/external_pkgs/react/JSXTransformer.js')
+  script(src=`/interface_common.js?v=${startTime}`)
+  script(src=`/nkc_render.js?v=${startTime}`)
+  +includeJS("/editor/paper.js")
+  script(src=`/interface_editor_ue.js?v=${startTime}`)
+  include ./publicModules/crop/crop
+  script(src=`/media/media_index.js?v=${startTime}`)
+  script(src=`/forum/forum_choice.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
+  +includeJS('/external_pkgs/citySet/agency.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')
+  script.
+    window.onbeforeunload = function() {
+      if(document.getElementById("post").disabled === false){
+        return "离开前保存草稿了吗？"
       }
-      $("#tabPanel").tagsinput({
-        maxChars: 15, // 单个标记最大字符数 
-        maxTags: 2, // 最大标签数
-        itemValue: 'id',
-        itemText: 'name'
-      })
-      $(".bootstrap-tagsinput").children("input").attr("readonly", true)
-      $(".bootstrap-tagsinput").css("background-color", "#eee")
-      $(".bootstrap-tagsinput").click(function () {
-        openPanel(this);
-      });
-  else
-    link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
-    script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-    script(src="/jquery-1.10.2.js")
-    script(src="/jquery-ui-1.10.4.custom.js")
-    script(src='/commonmark/dist/commonmark.js')
-    script(src='/plain_escaper.js')
-    script(src='/xbbcode-parser/xbbcode.js')
-    script(src='/xss/dist/xss.js')
+    }
+    $("#tabPanel").tagsinput({
+      maxChars: 15, // 单个标记最大字符数 
+      maxTags: 2, // 最大标签数
+      itemValue: 'id',
+      itemText: 'name'
+    })
+    $(".bootstrap-tagsinput").children("input").attr("readonly", true)
+    $(".bootstrap-tagsinput").css("background-color", "#eee")
+    $(".bootstrap-tagsinput").click(function () {
+      openPanel(this);
+    });
+  //- else
+  //-   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
+  //-   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+  //-   script(src="/jquery-1.10.2.js")
+  //-   script(src="/jquery-ui-1.10.4.custom.js")
+  //-   script(src='/commonmark/dist/commonmark.js')
+  //-   script(src='/plain_escaper.js')
+  //-   script(src='/xbbcode-parser/xbbcode.js')
+  //-   script(src='/xss/dist/xss.js')
     
-    script(src='/external_pkgs/react/react.min.js')
-    script(src='/external_pkgs/react/JSXTransformer.js')
-    script(src=`/interface_common.js?v=${startTime}`)
-    script(src=`/nkc_render.js?v=${startTime}`)
-    script(src=`/interface_editor.js?v=${startTime}`)
-
-    //- script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
-    //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
-    script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
-    script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
-    include ./publicModules/crop/crop
-    script(src=`/media/media_index.js?v=${startTime}`)
-    script(src=`/forum/forum_choice.js?v=${startTime}`)
-    script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
-    script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
-    +includeJS('/external_pkgs/citySet/agency.json.js')
-    +includeJS('/external_pkgs/citySet/citySet.js')
-    script.
-      window.onbeforeunload = function() {
-        if(document.getElementById("post").disabled === false){
-          return "离开前保存草稿了吗？"
-        }
-      }
-      $("#tabPanel").tagsinput({
-        maxChars: 15, // 单个标记最大字符数 
-        maxTags: 2, // 最大标签数
-        itemValue: 'id',
-        itemText: 'name'
-      })
-      $(".bootstrap-tagsinput").children("input").attr("readonly", true)
-      $(".bootstrap-tagsinput").css("background-color", "#eee")
-      $(".bootstrap-tagsinput").click(function () {
-        openPanel(this);
-      });
+  //-   script(src='/external_pkgs/react/react.min.js')
+  //-   script(src='/external_pkgs/react/JSXTransformer.js')
+  //-   script(src=`/interface_common.js?v=${startTime}`)
+  //-   script(src=`/nkc_render.js?v=${startTime}`)
+  //-   script(src=`/interface_editor.js?v=${startTime}`)
+  //-   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
+  //-   script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
+  //-   include ./publicModules/crop/crop
+  //-   script(src=`/media/media_index.js?v=${startTime}`)
+  //-   script(src=`/forum/forum_choice.js?v=${startTime}`)
+  //-   script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
+  //-   script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
+  //-   +includeJS('/external_pkgs/citySet/agency.json.js')
+  //-   +includeJS('/external_pkgs/citySet/citySet.js')
+  //-   script.
+  //-     window.onbeforeunload = function() {
+  //-       if(document.getElementById("post").disabled === false){
+  //-         return "离开前保存草稿了吗？"
+  //-       }
+  //-     }
+  //-     $("#tabPanel").tagsinput({
+  //-       maxChars: 15, // 单个标记最大字符数 
+  //-       maxTags: 2, // 最大标签数
+  //-       itemValue: 'id',
+  //-       itemText: 'name'
+  //-     })
+  //-     $(".bootstrap-tagsinput").children("input").attr("readonly", true)
+  //-     $(".bootstrap-tagsinput").css("background-color", "#eee")
+  //-     $(".bootstrap-tagsinput").click(function () {
+  //-       openPanel(this);
+  //-     });

@@ -6748,7 +6748,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         me.setOpt(Editor.defaultOptions(me));
 
         /* 尝试异步加载后台配置 */
-        me.loadServerConfig();
+        // me.loadServerConfig();
 
         if(!utils.isEmptyObject(UE.I18N)){
             //修改默认的语言类型
@@ -6925,7 +6925,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
-                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\'], [\'\\(\',\'\\)\']],displayMath: [[\'$$\',\'$$\'], [\'\\[\',\'\\]\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}}})</script>'+
+                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\'], [\'\\(\',\'\\)\']],displayMath: [[\'$$\',\'$$\'], [\'\\[\',\'\\]\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
                     '<script async=\'async\' src=\'/ueditor/MathJax-2.6-latest/MathJax.js\'></script>' +
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
@@ -8244,6 +8244,7 @@ UE.ajax = function() {
         };
         if (method == "POST") {
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader("FROM","nkcAPI");
             xhr.send(submitStr);
         } else {
             xhr.send(null);
@@ -15114,10 +15115,10 @@ UE.plugins['pasteplain'] = function(){
                 },
                 ol: removeNode,
                 ul: removeNode,
-                dl:removeNode,
-                dt:removeNode,
-                dd:removeNode,
-                'li':removeNode,
+                dl: removeNode,
+                dt: removeNode,
+                dd: removeNode,
+                'li': removeNode,
                 'caption':transP,
                 'th':transP,
                 'tr':transP,
@@ -17169,7 +17170,7 @@ UE.plugins['fiximgclick'] = (function () {
                 resizer.id = me.editor.ui.id + '_imagescale';
                 resizer.className = 'edui-editor-imagescale';
                 resizer.innerHTML = hands.join('');
-                resizer.style.cssText += ';display:none;border:1px solid #3b77ff;z-index:' + (me.editor.options.zIndex) + ';';
+                resizer.style.cssText += ';display:none;border:1px solid #9baec8;z-index:' + (me.editor.options.zIndex) + ';';
 
                 me.editor.ui.getDom().appendChild(cover);
                 me.editor.ui.getDom().appendChild(resizer);
@@ -17178,8 +17179,8 @@ UE.plugins['fiximgclick'] = (function () {
                 me.initEvents();
             },
             initStyle: function () {
-                utils.cssRule('imagescale', '.edui-editor-imagescale{display:none;position:absolute;border:1px solid #38B2CE;cursor:hand;-webkit-box-sizing: content-box;-moz-box-sizing: content-box;box-sizing: content-box;}' +
-                    '.edui-editor-imagescale span{position:absolute;width:6px;height:6px;overflow:hidden;font-size:0px;display:block;background-color:#3C9DD0;}'
+                utils.cssRule('imagescale', '.edui-editor-imagescale{display:none;position:absolute;border:1px solid #9baec8;cursor:hand;-webkit-box-sizing: content-box;-moz-box-sizing: content-box;box-sizing: content-box;}' +
+                    '.edui-editor-imagescale span{position:absolute;width:6px;height:6px;overflow:hidden;font-size:0px;display:block;background-color:#9baec8;}'
                     + '.edui-editor-imagescale .edui-editor-imagescale-hand0{cursor:nw-resize;top:0;margin-top:-4px;left:0;margin-left:-4px;}'
                     + '.edui-editor-imagescale .edui-editor-imagescale-hand1{cursor:n-resize;top:0;margin-top:-4px;left:50%;margin-left:-4px;}'
                     + '.edui-editor-imagescale .edui-editor-imagescale-hand2{cursor:ne-resize;top:0;margin-top:-4px;left:100%;margin-left:-3px;}'
@@ -23445,7 +23446,6 @@ UE.plugins['catchremoteimage'] = function () {
             catcherActionUrl = me.getActionUrl(me.getOpt('catcherActionName')),
             catcherUrlPrefix = me.getOpt('catcherUrlPrefix'),
             catcherFieldName = me.getOpt('catcherFieldName');
-
         var remoteImages = [],
             imgs = domUtils.getElementsByTagName(me.document, "img"),
             test = function (src, urls) {
@@ -23461,17 +23461,31 @@ UE.plugins['catchremoteimage'] = function () {
                 }
                 return false;
             };
-
+        var isPc = IsPC();
+        var imgWidth = {
+            "width": "50%"
+        }
+        if(!isPc) {
+            imgWidth = {
+                "width": "100%"
+            }   
+        }
         for (var i = 0, ci; ci = imgs[i++];) {
+            domUtils.setAttributes(ci, imgWidth);
             if (ci.getAttribute("word_img")) {
                 continue;
             }
             var src = ci.getAttribute("_src") || ci.src || "";
             if (/^(https?|ftp):/i.test(src) && !test(src, catcherLocalDomain)) {
                 remoteImages.push(src);
+            }else{
+                // 如果是本站图片则去掉域名
+                domUtils.setAttributes(ci, {
+                    "src": GetUrlRelativePath(src),
+                    "_src": GetUrlRelativePath(src)
+                });
             }
         }
-
         if (remoteImages.length) {
             catchremoteimage(remoteImages, {
                 //成功抓取
@@ -23481,22 +23495,29 @@ UE.plugins['catchremoteimage'] = function () {
                     } catch (e) {
                         return;
                     }
-
                     /* 获取源路径和新路径 */
-                    var i, j, ci, cj, oldSrc, newSrc, list = info.list;
-
+                    // var i, j, ci, cj, oldSrc, newSrc, list = info.list;
+                    var i, j, ci, cj, oldSrc, newSrc;
                     for (i = 0; ci = imgs[i++];) {
                         oldSrc = ci.getAttribute("_src") || ci.src || "";
-                        for (j = 0; cj = list[j++];) {
-                            if (oldSrc == cj.source && cj.state == "SUCCESS") {  //抓取失败时不做替换处理
-                                newSrc = catcherUrlPrefix + cj.url;
-                                domUtils.setAttributes(ci, {
-                                    "src": newSrc,
-                                    "_src": newSrc
-                                });
-                                break;
-                            }
+                        if(oldSrc == info.source && info.state == "SUCCESS") {
+                            newSrc = "/r/" + info.r.rid;
+                            domUtils.setAttributes(ci, {
+                                "src": newSrc,
+                                "_src": newSrc
+                            });
+                            break;
                         }
+                        // for (j = 0; cj = list[j++];) {
+                        //     if (oldSrc == cj.source && cj.state == "SUCCESS") {  //抓取失败时不做替换处理
+                        //         newSrc = catcherUrlPrefix + cj.url;
+                        //         domUtils.setAttributes(ci, {
+                        //             "src": newSrc,
+                        //             "_src": newSrc
+                        //         });
+                        //         break;
+                        //     }
+                        // }
                     }
                     me.fireEvent('catchremotesuccess')
                 },
@@ -23508,7 +23529,8 @@ UE.plugins['catchremoteimage'] = function () {
         }
 
         function catchremoteimage(imgs, callbacks) {
-            var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
+            for(var im=0;im<imgs.length;im++) {
+                var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
                 url = utils.formatUrl(catcherActionUrl + (catcherActionUrl.indexOf('?') == -1 ? '?':'&') + params),
                 isJsonp = utils.isCrossDomainUrl(url),
                 opt = {
@@ -23518,10 +23540,25 @@ UE.plugins['catchremoteimage'] = function () {
                     'onsuccess': callbacks["success"],
                     'onerror': callbacks["error"]
                 };
-            opt[catcherFieldName] = imgs;
-            ajax.request(url, opt);
+                opt["loadsrc"] = imgs[im];
+                ajax.request(url, opt);
+            }
         }
 
+        // function catchremoteimage(imgs, callbacks) {
+        //     var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
+        //         url = utils.formatUrl(catcherActionUrl + (catcherActionUrl.indexOf('?') == -1 ? '?':'&') + params),
+        //         isJsonp = utils.isCrossDomainUrl(url),
+        //         opt = {
+        //             'method': 'POST',
+        //             'dataType': isJsonp ? 'jsonp':'',
+        //             'timeout': 60000, //单位：毫秒，回调请求超时设置。目标用户如果网速不是很快的话此处建议设置一个较大的数值
+        //             'onsuccess': callbacks["success"],
+        //             'onerror': callbacks["error"]
+        //         };
+        //     opt[catcherFieldName] = imgs;
+        //     ajax.request(url, opt);
+        // }
     });
 };
 
@@ -25838,6 +25875,7 @@ UE.ui = baidu.editor.ui = {};
         getHtmlTpl: function (){
             return genColorPicker(this.noColorText,this.editor);
         },
+        // 选中颜色
         _onTableClick: function (evt){
             var tgt = evt.target || evt.srcElement;
             var color = tgt.getAttribute('data-color');
@@ -29173,10 +29211,14 @@ UE.ui = baidu.editor.ui = {};
                             if (html) {
                                 html += '<div style="height:5px;"></div>'
                             }
+                            // html += popup.formatHtml(
+                            //     '<nobr>' + editor.getLang("anthorMsg") + ': <a target="_blank" href="' + url + '" title="' + url + '" >' + txt + '</a>' +
+                            //         ' <span class="edui-clickable" onclick="$$._onEditButtonClick();">' + editor.getLang("modify") + '</span>' +
+                            //         ' <span class="edui-clickable" onclick="$$._onRemoveButtonClick(\'unlink\');"> ' + editor.getLang("clear") + '</span></nobr>');
                             html += popup.formatHtml(
-                                '<nobr>' + editor.getLang("anthorMsg") + ': <a target="_blank" href="' + url + '" title="' + url + '" >' + txt + '</a>' +
-                                    ' <span class="edui-clickable" onclick="$$._onEditButtonClick();">' + editor.getLang("modify") + '</span>' +
-                                    ' <span class="edui-clickable" onclick="$$._onRemoveButtonClick(\'unlink\');"> ' + editor.getLang("clear") + '</span></nobr>');
+                                '<nobr><a target="_blank" href="' + url + '" title="' + url + '" >' + txt + '</a>' +
+                                    ' <span class="edui-clickableNew fa fa-edit" onclick="$$._onEditButtonClick();"></span>' +
+                                    ' <span class="edui-clickableNew fa fa-trash-o" onclick="$$._onRemoveButtonClick(\'unlink\');"></span></nobr>');
                             popup.showAnchor(link);
                         }
                     }
@@ -29809,3 +29851,30 @@ UE.registerUI('autosave', function(editor) {
 
 
 })();
+
+function GetUrlRelativePath(url){
+    // var url = document.location.toString();
+    var arrUrl = url.split("//");
+    var start = arrUrl[1].indexOf("/");
+    var relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
+    if(relUrl.indexOf("?") != -1){
+        relUrl = relUrl.split("?")[0];
+    }
+    return relUrl;
+}
+
+
+function IsPC() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = ["Android", "iPhone",
+                "SymbianOS", "Windows Phone",
+                "iPad", "iPod"];
+    var flag = true;
+    for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
+}

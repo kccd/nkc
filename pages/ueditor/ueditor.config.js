@@ -28,9 +28,10 @@
 
         //为编辑器实例添加一个路径，这个不能被注释
         UEDITOR_HOME_URL: URL
+        , imageUrl: "/download"
 
         // 服务器统一请求接口路径
-        , serverUrl: URL + "php/controller.php"
+        // , serverUrl: URL + "php/controller.php"
 
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的重新定义
         // , toolbars: [[
@@ -110,7 +111,7 @@
 
         //,fullscreen : false //是否开启初始化时即全屏，默认关闭
 
-        //,imagePopup:true      //图片操作的浮层开关，默认打开
+        // ,imagePopup:true      //图片操作的浮层开关，默认打开
 
         //,autoSyncData:true //自动同步编辑器要提交的数据
         //,emotionLocalization:false //是否开启表情本地化，默认关闭。若要开启请确保emotion文件夹下包含官网提供的images表情文件夹
