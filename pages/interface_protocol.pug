@@ -10,6 +10,8 @@ block content
       .col-xs-12.col-md-8
         .p-t-2 
         if data.protocol
+          p(style="text-align:center")
+            span(style="font-size:xx-large")!=`${data.protocol.protocolName}`
           div!=`${data.protocol.protocolContent}`
       .col-xs-12.col-md-3.col-md-offset-1      
         .p-t-2        
