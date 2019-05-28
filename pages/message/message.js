@@ -175,6 +175,7 @@ $(function() {
         var targetUser = this.targetUser;
         var targetUserSendLimit = this.targetUserSendLimit;
         var targetUserGrade = this.targetUserGrade;
+
         if(!targetUser || !targetUserGrade) return;
         var isFriend = false;
         for(var i = 0; i < this.friends.length; i++) {

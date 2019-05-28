@@ -233,7 +233,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
     } else if(type === "digestThread") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
-      const thread = await PostModel.findOne({tid: post.tid});
+      const thread = await ThreadModel.findOne({tid: post.tid});
       if(!thread) continue;
       r.c.thread = thread;
     } else if(type === "bannedThread") {
@@ -241,16 +241,19 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!thread) continue;
       r.c.thread = thread;
     } else if(type === "bannedPost") {
-      const post = await ThreadModel.findOne({pid});
+      const post = await PostModel.findOne({pid});
       if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
       r.c.post = post;
+      r.c.thread = thread;
     } else if(type === "threadWasReturned") {
       const thread = await ThreadModel.findOne({tid});
       if(!thread) continue;
       r.c.thread = thread;
       r.c.deadline = moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss");
     } else if(type === "postWasReturned") {
-      const post = await ThreadModel.findOne({pid});
+      const post = await PostModel.findOne({pid});
       if(!post) continue;
       r.c.post = post;
     } else if(type === "replyPost") {

@@ -690,7 +690,7 @@ block content
             .ms-right-input(v-if='target === "UTU"')
               div(v-if="showSystemLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.systemLimitInfo}}
                 .m-t-1.text-center
-                  button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意（系统防骚扰）
+                  button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意
               div(v-else-if="showCustomizeLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.customizeLimitInfo}}
               div(v-else)
                 transition(name='fade')
@@ -778,7 +778,7 @@ block content
           .mobile-footer-input-div(v-if='target === "UTU"')
             div(v-if="showSystemLimitInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.systemLimitInfo}}
               .m-t-1.text-center
-                button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意（系统防骚扰）
+                button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意
             div(v-else-if="showCustomizeLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.customizeLimitInfo}}
             div(v-else)
               transition(name='fade')

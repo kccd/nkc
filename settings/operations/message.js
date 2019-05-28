@@ -1,20 +1,20 @@
 module.exports = {
   GET: 'visitMessagePage',
   systemInfo: {
-    GET: 'getSystemInfo'
+    //GET: 'getSystemInfo'
   },
   blackList: {
     POST: "messageBlackList"
   },
   remind: {
-    GET: 'getRemind'
+    //GET: 'getRemind'
   },
   friendsApplication: {
     GET: 'getFriendsApplication'
   },
   user: {
     PARAMETER: {
-      GET: 'getUserMessage',
+      //GET: 'getUserMessage',
       POST: 'sendMessageToUser'
     }
   },
