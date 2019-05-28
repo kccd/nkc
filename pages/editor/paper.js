@@ -235,9 +235,11 @@ var paperProto = {
               authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
             }
           }
-        }else{
-          authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
         }
+        // else
+        // {
+        //   authorTrs = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" onclick="SetAgencyCity(this)" /></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+        // }
         $("#authInfoList").find("tbody").html(authorTrs);
       }
       }

@@ -470,14 +470,16 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
   let newAuthInfos = [];
-  for(let a = 0;a < authorInfos.length;a++) {
-    if(authorInfos[a].name.length > 0) {
-      newAuthInfos.push(authorInfos[a])
-    }else{
-      let kcUser = await UserModel.findOne({uid: authorInfos[a].kcid});
-      if(kcUser) {
-        authorInfos[a].name = kcUser.username;
+  if(authorInfos) {
+    for(let a = 0;a < authorInfos.length;a++) {
+      if(authorInfos[a].name.length > 0) {
         newAuthInfos.push(authorInfos[a])
+      }else{
+        let kcUser = await UserModel.findOne({uid: authorInfos[a].kcid});
+        if(kcUser) {
+          authorInfos[a].name = kcUser.username;
+          newAuthInfos.push(authorInfos[a])
+        }
       }
     }
   }
