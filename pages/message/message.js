@@ -5,18 +5,24 @@ var winWidth = $(window).width();
 var xss = window.filterXSS;
 
 var data = document.getElementById('data').innerText;
+var templates = getDataById("templatesData").templates;
+
 
 data = JSON.parse(data);
 
 var targetUser = data.targetUser;
 
+var grades = data.grades;
+var messageSettings = data.messageSettings;
+var userDigestThreadCount = data.userDigestThreadCount;
 var timeout;
+
 var mobile = winWidth < 1100;
 
 var pageName = 'message';
 
 if(mobile) {
-  document.getElementsByTagName('body')[0].style.backgroundColor = '#ffffff';
+  $("body").css("background-color", "#ffffff");
 }
 
 $(function() {
@@ -30,8 +36,15 @@ $(function() {
       userList: [],
       target: '',
       targetUser: '',
+      messageSettings: messageSettings,
+      userDigestThreadCount: userDigestThreadCount,
+      systemInfoViewed: false,
+      targetUserSendLimit: "",
+      targetUserGrade: "",
+      selectedUserListItem: "",
       socketStatus: '',
       messages: [],
+      blackListUid: [],
       sendFailedMessages: [],
       showEmoji: false,
       user: '',
@@ -76,6 +89,59 @@ $(function() {
         stopLeft: "/default/stopLeft.png"
       },
 
+      messageTypes: templates,
+      messageLimit: {
+        timeLimit: false,
+        xsfLimit: false,
+        digestLimit: false,
+        gradeLimit: 0
+      },
+      grades: grades
+
+    },
+    beforeCreate: function() {
+      var templatesDom = $(".templates-dom");
+      var mobileTemplatesDom = $(".mobile-templates-dom");
+      for(var i = 0; i < templates.length; i++) {
+        var messageType = templates[i];
+
+        // 电脑屏幕
+        var typeDiv = $("<div v-if='target === \""+ messageType._id +"\"'></div>");
+        var typeBody = $("<div style='height: 100%'></div>");
+        typeBody.append($("<div class='ms-header'>"+messageType.name+"</div>"));
+        var templateBody = $("<div class='ms-notice' ref='content'></div>");
+        var templateTran = $("<transition name='fade'><div class='ms-loading-info'>{{info}}</div></transition>");
+        templateBody.append(templateTran.clone());
+        var templateBodyContent = $("<div class='ms-notice-body' v-for='item in messages'><div class='ms-notice-time'>{{format('YYYY/MM/DD HH:mm:ss', item.tc)}}</div></div>");
+        var content = $("<div class='ms-notice-content'></div>");
+
+        // 手机屏幕
+        var mobileMessageBody = $("<div class='mobile-messages-body' v-if='target === \""+messageType._id+"\"' ref='content'>" +
+          "<div class='noSelectUser' v-if='messages.length === 0'><div class='fa' style='font-size:1.5rem;'>暂无消息</div></div>" +
+        "</div>");
+        var mobileMessageBodyDiv = $("<div v-else style='padding: 1rem;'></div>");
+
+        for(var j = 0; j < messageType.templates.length; j++) {
+          var template = messageType.templates[j];
+          var type = template.type;
+          var dom = template.dom;
+          var div = $("<div v-if='item.c.type === \""+ type +"\"'>"+dom+"</div>");
+          content.append(div);
+        }
+
+        templateBodyContent.append(content);
+        templateBody.append(templateBodyContent.clone());
+        typeBody.append(templateBody);
+        typeDiv.append(typeBody);
+        templatesDom.append(typeDiv);
+
+
+        mobileMessageBodyDiv.append(templateTran);
+        mobileMessageBodyDiv.append(templateBodyContent);
+        mobileMessageBody.append(mobileMessageBodyDiv);
+        mobileTemplatesDom.append(mobileMessageBody);
+
+      }
     },
     watch: {
       messages: function() {
@@ -104,6 +170,50 @@ $(function() {
       }
     },
     computed: {
+      showCustomizeLimitInfo: function() {
+        if(this.systemInfoViewed) return;
+        var targetUser = this.targetUser;
+        var targetUserSendLimit = this.targetUserSendLimit;
+        var targetUserGrade = this.targetUserGrade;
+
+        if(!targetUser || !targetUserGrade) return;
+        var isFriend = false;
+        for(var i = 0; i < this.friends.length; i++) {
+          if(this.friends[i].tUid === targetUser.uid) {
+            isFriend = true;
+            break;
+          }
+        }
+        if(isFriend) return;
+        if(!targetUserSendLimit.status) return;
+        if(
+          (targetUserSendLimit.timeLimit && new Date(this.user.toc).getTime() > Date.now() - 30*24*60*60*1000) ||
+          (targetUserSendLimit.digestLimit && this.userDigestThreadCount === 0) ||
+          (targetUserSendLimit.xsfLimit && this.user.xsf <= 0) ||
+          (targetUserSendLimit.gradeLimit > this.user.grade._id)
+        ) return true;
+      },
+      showSystemLimitInfo: function() {
+        if(this.systemInfoViewed) return;
+        var targetUser = this.targetUser;
+        var targetUserSendLimit = this.targetUserSendLimit;
+        var targetUserGrade = this.targetUserGrade;
+        var messageSettings = this.messageSettings;
+        if(!targetUser || !targetUserGrade) return;
+        var isFriend = false;
+        for(var i = 0; i < this.friends.length; i++) {
+          if(this.friends[i].tUid === targetUser.uid) {
+            isFriend = true;
+            break;
+          }
+        }
+        if(isFriend) return;
+        if(targetUserSendLimit.status) return;
+        if(
+          messageSettings.gradeLimit.indexOf(this.user.grade._id) !== -1 &&
+          messageSettings.gradeProtect.indexOf(targetUserGrade._id) !== -1
+        ) return true;
+      },
       friendsByOrder: function() {
         var str = '0123456789abcdefghijklmnopqrstuvwxyz*';
         var initials = str.split('');
@@ -337,25 +447,66 @@ $(function() {
       },
 
       // 删除好友
-      deleteFriend: function() {
-        if(confirm('确认要删除该好友？') === false) return;
+      deleteFriend: function(type) {
+        if(type !== true) {
+          if(confirm('确认要删除该好友？') === false) return;
+        }
         nkcAPI('/friend/' + app.friend.tUid, 'DELETE', {})
           .then(function(data) {
-            /*for(var i = 0; i < app.userList.length; i++) {
-              var li = app.userList[i];
-              if(li.type === 'UTU' && li.user.uid === app.friend.tUid) {
-                app.userList.splice(i, 1);
-                break;
-              }
-            }
-            var index = app.friends.indexOf(app.friend.friend);
-            app.friends.splice(index, 1);*/
             app.friend = {targetUser: app.friend.targetUser};
           })
           .catch(function(data) {
             screenTopWarning(data.error || data);
           })
       },
+
+      // 加入用户到黑名单列表
+      addToBlackList: function() {
+        if(confirm("确认要将该用户加入黑名单？") === false) return;
+        var isFriend = true;
+        var tUid = app.friend.tUid;
+        if(!tUid) {
+          tUid = app.friend.targetUser.uid;
+          isFriend = false;
+        }
+        nkcAPI("/message/blackList", "POST", {
+          tUid: tUid,
+          type: "add"
+        })
+          .then(function(data) {
+            app.blackListUid = data.blackListUid;
+            for(var i = 0; i < app.userList.length; i++) {
+              var item = app.userList[i];
+              if(item.type === "UTU" && item.user && item.user.uid === tUid) {
+                app.removeChat(item);
+              }
+            }
+            if(isFriend) {
+              app.deleteFriend(true);
+            }
+            screenTopAlert("已将用户加入到黑名单，可在资料设置处查看黑名单列表。");
+          })
+          .catch(function(data) {
+            screenTopWarning(data);
+          })
+      },
+
+      // 将用户从黑名单列表中移除
+      removeFromBlackList: function() {
+        if(confirm("确认要将用户从黑名单中移除？") === false) return;
+        nkcAPI("/message/blackList", "POST", {
+          tUid: app.friend.tUid || app.friend.targetUser.uid,
+          type: "remove"
+        })
+          .then(function(data) {
+            app.blackListUid = data.blackListUid;
+            screenTopAlert("已将用户从黑名单中移除。");
+          })
+          .catch(function(data) {
+            screenTopWarning(data);
+          })
+      },
+
 
       // 从已创建的聊天列表中移除聊天
       removeChat: function(item) {
@@ -500,9 +651,13 @@ $(function() {
               time: message.tc,
               count: 0
             };
+            if(message.ty === "STU") {
+              systemType.name = message.c.messageType.name;
+              systemType.content = message.c.messageType.content;
+            }
             app.userList.unshift(systemType);
           }
-          if(app.target === o[systemType.type]) {
+          if(app.target === systemType.type) {
             systemType.count = 0;
           } else {
             systemType.count ++;
@@ -570,8 +725,11 @@ $(function() {
         this.friendImageProgress = '';
         this.friend = '';
         this.category = '';
-        this.selectCategoryFriendsId = [],
+        this.selectCategoryFriendsId = [];
         this.editCategory = false;
+        this.systemInfoViewed = false;
+        this.targetUserSendLimit = "";
+        this.targetUserGrade = "";
       },
 
       // 获取聊天记录
@@ -579,29 +737,25 @@ $(function() {
         if(!app.canGetMessage) return Promise.reject();
         app.canGetMessage = false;
         app.info = '加载中~';
-        var url;
-        if(this.target === 'user') {
-          url = '/message/user/' + this.targetUser.uid;
-        } else if(this.target === 'notice') {
-          url = '/message/systemInfo';
-        } else if(this.target === 'reminder'){
-          url = '/message/remind'
-        } else if(this.target === 'newFriends') {
-          url = '/message/friendsApplication'
-        }
+        var uid = this.targetUser && this.targetUser.uid? this.targetUser.uid: "";
+        var url = "/message/data?type=" + this.target + (uid?"&uid="+uid: "");
         if(this.firstMessageId) {
-          url += '?firstMessageId=' + this.firstMessageId + '&t=' + Date.now();
+          url += '&firstMessageId=' + this.firstMessageId + '&t=' + Date.now();
         } else {
-          url += '?t=' + Date.now();
+          url += '&t=' + Date.now();
         }
+        var target = app.target;
         return nkcAPI(url, 'GET', {})
           .then(function(data) {
+            if(app.target !== target) return;
             if(data.messages.length === 0) {
               app.info = '没有了~';
               return Promise.reject();
             }
             app.info = '';
             app.messages = data.messages.concat(app.messages);
+            app.targetUserSendLimit = data.targetUserSendLimit;
+            app.targetUserGrade = data.targetUserGrade;
             app.canGetMessage = true;
 
             var contentBody = app.$refs.content;
@@ -695,7 +849,7 @@ $(function() {
             .then(function(data) {
               app.userList = data.userList;
               app.friends = data.usersFriends;
-
+              app.blackListUid = data.blackListUid;
               // 拓展好友
               for(var i = 0; i < data.categories.length; i++) {
                 data.categories[i] = app.extendCategoryFriends(data.categories[i]);
@@ -708,6 +862,17 @@ $(function() {
               var messageSettings = data.user.generalSettings.messageSettings;
               var beep = messageSettings.beep;
               app.onlyReceiveFromFriends = messageSettings.onlyReceiveFromFriends;
+              app.messageLimit = messageSettings.limit;
+              app.messageLimitArr = [];
+              if(app.messageLimit.timeLimit) {
+                app.messageLimitArr.push("time");
+              }
+              if(app.messageLimit.xsfLimit) {
+                app.messageLimitArr.push("xsf");
+              }
+              if(app.messageLimit.digestLimit) {
+                app.messageLimitArr.push("digest");
+              }
               app.beep = [];
               for(var key in beep) {
                 if(beep.hasOwnProperty(key) && beep[key]) {
@@ -727,15 +892,35 @@ $(function() {
       saveMessageSettings: function() {
         var beep = {
           usersMessage: false,
-          systemInfo: false,
+          STE: false,
           reminder: false
         };
         for(var i = 0; i < app.beep.length; i++) {
           beep[app.beep[i]] = true;
         }
+
+        // 短消息防骚扰
+        var messageLimit = this.messageLimit;
+        var messageLimitArr = this.messageLimitArr;
+
+        messageLimit.timeLimit = messageLimitArr.indexOf("time") !== -1;
+        messageLimit.digestLimit = messageLimitArr.indexOf("digest") !== -1;
+        messageLimit.xsfLimit = messageLimitArr.indexOf("xsf") !== -1;
+
+        if(
+          messageLimit.status &&
+          !messageLimit.timeLimit &&
+          !messageLimit.digestLimit &&
+          !messageLimit.xsfLimit &&
+          Number(messageLimit.gradeLimit) < 2
+        ) {
+          return screenTopWarning("请至少勾选一项防骚扰设置");
+        }
+
         nkcAPI('/message/settings', 'PATCH', {
           beep: beep,
-          onlyReceiveFromFriends: app.onlyReceiveFromFriends
+          onlyReceiveFromFriends: app.onlyReceiveFromFriends,
+          limit: messageLimit
         })
           .then(function() {
             updateBeep(beep);
@@ -775,8 +960,9 @@ $(function() {
       selectUser: function(item) {
         this.initialization();
         addHistory(item.type);
+        this.selectedUserListItem = item;
         if(item.type === 'UTU') {
-          app.target = 'user';
+          app.target = item.type;
           app.targetUser = item.user;
           app.targetUser.friend = item.friend;
           this.getInputTextFromLocal();
@@ -785,7 +971,7 @@ $(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
               nkcAPI('/message/mark', 'PATCH', {
-                type: 'user',
+                type: 'UTU',
                 uid: app.targetUser.uid
               })
                 .then(function() {
@@ -820,13 +1006,13 @@ $(function() {
               });
             }
         } else if(item.type === 'STE') {
-          app.target = 'notice';
+          app.target = item.type;
           this.getMessage()
             .then(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
               nkcAPI('/message/mark', 'PATCH', {
-                type: 'systemInfo'
+                type: 'STE'
               })
                 .then(function() {
                   item.count = 0;
@@ -838,8 +1024,8 @@ $(function() {
             .catch(function() {
 
             })
-        } else if(item.type === 'STU'){
-          app.target = 'reminder';
+        /*} else if(item.type === 'STU'){
+          app.target = item.type;
           this.getMessage()
             .then(function() {
               app.scrollToBottom();
@@ -856,12 +1042,31 @@ $(function() {
             })
             .catch(function() {
 
-            })
+            })*/
         } else if(item.type === 'newFriends'){
           app.target = 'newFriends';
           this.getMessage()
             .then(function() {
               app.scrollToBottom();
+            })
+            .catch(function() {
+
+            })
+        } else {
+          app.target = item.type;
+          this.getMessage()
+            .then(function() {
+              app.scrollToBottom();
+              if(item.count === 0) return;
+              nkcAPI('/message/mark', 'PATCH', {
+                type: item.type
+              })
+                .then(function() {
+                  item.count = 0;
+                })
+                .catch(function(data) {
+                  screenTopWarning(data.error || data);
+                });
             })
             .catch(function() {
 
@@ -1084,7 +1289,7 @@ $(function() {
           .then(function() {
             if(app.target) {
               var url = '/message/newMessages?target=' + app.target;
-              if(app.target === 'user' && app.targetUser) {
+              if(app.target === 'UTU' && app.targetUser) {
                 url += '&uid=' + app.targetUser.uid;
                 if(app.lastMessageId) {
                   url += '&lastMessageId=' + app.lastMessageId;
@@ -1094,17 +1299,11 @@ $(function() {
                 .then(function(data) {
                   var messages = data.messages;
                   if(messages.length === 0) return;
-                  var name = 'message';
-                  if(messages[0].ty === 'STU') {
-                    name = 'reminder';
-                  } else if(messages[0].ty === 'STE') {
-                    name = 'notice';
-                  }
-                  beep(name);
-                  if(app.target === 'user' && data.target === 'user' && app.targetUser.uid === data.targetUser.uid) {
+                  beep("notice");
+                  if(app.target === 'UTU' && data.target === 'UTU' && app.targetUser.uid === data.targetUser.uid) {
                     app.messages = app.messages.concat(messages);
                     nkcAPI('/message/mark', 'PATCH', {
-                      type: 'user',
+                      type: 'STU',
                       uid: app.targetUser.uid
                     })
                       .catch(function(data) {
@@ -1113,7 +1312,7 @@ $(function() {
                   } else if(app.target === data.target) {
                     app.messages = app.messages.concat(messages);
                     nkcAPI('/message/mark', 'PATCH', {
-                      type: app.target === 'notice'? 'systemInfo': 'remind'
+                      type: app.target
                     })
                       .catch(function(data) {
                         screenTopWarning(data.error || data);
@@ -1318,22 +1517,22 @@ $(function() {
         if(ty === 'STE') {
           beep('notice');
           app.updateUserList({message: message});
-          if(app.target === 'notice') {
+          if(app.target === 'STE') {
             app.messages.push(message);
             nkcAPI('/message/mark', 'PATCH', {
-              type: 'systemInfo'
+              type: 'STE'
             })
               .catch(function(data) {
                 screenTopWarning(data.error || data);
               })
           }
         } else if(ty === 'STU') {
-          beep('reminder');
+          beep('notice');
           app.updateUserList({message: message});
-          if(app.target === 'reminder') {
+          if(app.target === 'STU') {
             app.messages.push(message);
             nkcAPI('/message/mark', 'PATCH', {
-              type: 'remind'
+              type: 'STU'
             })
               .catch(function(data) {
                 screenTopWarning(data.error || data);
@@ -1345,10 +1544,10 @@ $(function() {
           if(socketId === socket.id) return;
 
           // 插入数据
-          if(app.target === 'user' && app.targetUser) {
+          if(app.target === 'UTU' && app.targetUser) {
             if(app.targetUser.uid === user.uid) {
               nkcAPI('/message/mark', 'PATCH', {
-                type: 'user',
+                type: 'UTU',
                 uid: app.targetUser.uid
               })
                 .catch(function(data) {
@@ -1447,7 +1646,7 @@ $(function() {
           for(var i = 0; i < app.userList.length; i++) {
             var li = app.userList[i];
             // 系统类型、用户
-            if((systemType && li.type === deletedId) || (li.user.uid === deletedId)) {
+            if((systemType && li.type === deletedId) || (li.user && li.user.uid === deletedId)) {
               app.userList.splice(i, 1);
               if(li.type === 'UTU' && deletedId === app.targetUser.uid) {
                 app.initialization();
@@ -1460,7 +1659,7 @@ $(function() {
           var uid = message.uid;
           if(app.user.uid !== uid) return;
           var messageType = message.messageType;
-          if(messageType === 'user') {
+          if(messageType === 'UTU') {
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
               if(li.type === 'UTU' && li.user.uid === targetUid) {
@@ -1468,7 +1667,7 @@ $(function() {
                 break;
               }
             }
-          } else if (messageType === 'systemInfo') {
+          } else if (messageType === 'STE') {
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
               if(li.type === 'STE') {
@@ -1476,10 +1675,10 @@ $(function() {
                 break;
               }
             }
-          } else if(messageType === 'remind') {
+          } else {
             for(var i = 0; i < app.userList.length; i++) {
               var li = app.userList[i];
-              if(li.type === 'STU') {
+              if(li.type === messageType) {
                 li.count = 0;
                 break;
               }

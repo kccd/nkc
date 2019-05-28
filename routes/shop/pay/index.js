@@ -103,6 +103,12 @@ router
         orderStatus: 'unShip',
         payToc: r.toc
       }});
+      // 给卖家发送付款成功消息
+      await db.MessageModel.sendShopMessage({
+        type: "shopBuyerPay",
+        r: order.sellUid,
+        orderId: order.orderId
+      });
     }
     // 拓展订单 并 付款减库存
     orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);

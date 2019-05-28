@@ -114,6 +114,12 @@ router
             orderStatus: 'unShip',
             payToc: r.toc
           }});
+          // 给卖家发送付款成功消息
+          await db.MessageModel.sendShopMessage({
+            type: "shopBuyerPay",
+            r: order.sellUid,
+            orderId: order.orderId
+          });
         }
 
         await record.update(updateObj);

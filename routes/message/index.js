@@ -10,7 +10,10 @@ const withdrawnRouter = require('./withdrawn');
 const newMessageRouter = require('./newMessage');
 const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
+const dataRouter = require("./data");
 const searchRouter = require('./search');
+const blackRouter = require('./blackList');
+const moment = require("moment");
 messageRouter
   .use('/', async (ctx, next) => {
     // 未完善资料的用户跳转到完善资料页
@@ -24,6 +27,18 @@ messageRouter
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
+
+    if(ctx.reqType === "app") {
+      data.templates = await db.MessageTypeModel.getTemplates("app");
+    } else {
+      data.templates = await db.MessageTypeModel.getTemplates("web");
+    }
+    data.userDigestThreadCount = await db.ThreadModel.count({
+      digest: true,
+      uid: user.uid
+    });
+    data.messageSettings = (await db.SettingModel.findById("message")).c;
+
     const from = ctx.request.get('FROM');
     if(from !== 'nkcAPI') {
       if(query.uid) {
@@ -32,8 +47,18 @@ messageRouter
       user.newMessage = {};
       ctx.template = 'message/message.pug';
       data.navbar = {highlight: 'message'};
+      data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
       return await next();
     }
+
+    data.messageTypes = await db.MessageTypeModel.find().sort({toc: 1});
+    const blackList = await db.MessageBlackListModel.find({
+      uid: user.uid
+    }, {
+      tUid: 1
+    });
+
+    data.blackListUid = blackList.map(b => b.tUid);
 
     const list = [];
     const userList = [];
@@ -48,7 +73,9 @@ messageRouter
     const users = await db.UserModel.find({uid: {$in: [...uidArr]}});
     const messages = await db.MessageModel.find({_id: {$in: [...midArr]}});
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
-    for(const u of users) {
+    for(let u of users) {
+      await u.extendGrade();
+      u = u.toObject();
       userObj[u.uid] = u;
     }
     for(const m of messages) {
@@ -88,11 +115,15 @@ messageRouter
     // 获取提醒
     if(chat.reminder) {
       message = await db.MessageModel.findOne({ty: 'STU', r: user.uid}).sort({tc: -1});
+      const messageType = await db.MessageTypeModel.findOnly({_id: "STU"});
       list.push({
-        time: message?message.tc: new Date('2000-1-1'),
+        time: message?message.tc:new Date("2000-1-1"),
+        name: messageType.name,
+        timeStr: message?moment(message.tc).format("MM/DD HH:mm"): moment().format("MM/DD HH:mm"),
         type: 'STU',
         message,
-        count: user.newMessage.newReminderCount
+        count: user.newMessage.newReminderCount,
+        content: message?ctx.state.lang("messageTypes", message.c.type):""
       });
     }
 
@@ -160,5 +191,7 @@ messageRouter
   .use('/newMessages', newMessageRouter.routes(), newMessageRouter.allowedMethods())
   .use('/chat', chatRouter.routes(), chatRouter.allowedMethods())
   .use('/search', searchRouter.routes(), searchRouter.allowedMethods())
-  .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods());
+  .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods())
+  .use("/blackList", blackRouter.routes(), blackRouter.allowedMethods())
+  .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;

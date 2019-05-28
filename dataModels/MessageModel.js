@@ -13,7 +13,7 @@ const messageSchema = new Schema({
     // 系统-用户
     // 系统-所有人
     // 系统-房间
-    enum: ['UTU', 'UTR', 'STU', 'STE', 'STR'],
+    // enum: ['UTU', 'UTR', 'STU', 'STE', 'STR'],
     required: true,
     index: 1
   },
@@ -110,6 +110,8 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   const MessageModel = mongoose.model('messages');
   const FriendModel = mongoose.model('friends');
   const UsersGeneralModel = mongoose.model('usersGeneral');
+  const MessageBlackListModel = mongoose.model("messageBlackLists");
+  const ThreadModel = mongoose.model("threads");
   const apiFunction = require('../nkcModules/apiFunction');
   const user = await UserModel.findOnly({uid: fromUid});
   const targetUser = await UserModel.findOnly({uid: toUid});
@@ -148,204 +150,233 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     }
   }
 
-  // 判断对方是否设置了“需要添加好友之后才能聊天”
-  const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+  // 判断对方是否设置了“需要添加好友之后才能聊天” 2019-5-27 移除该设置
+  /*const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
   if(!friendRelationship && !sendToEveryOne) {
     const targetUserGeneralSettings = await UsersGeneralModel.findOnly({uid: targetUser.uid});
     const onlyReceiveFromFriends = targetUserGeneralSettings.messageSettings.onlyReceiveFromFriends;
     if(onlyReceiveFromFriends) throwErr(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
+  }*/
+
+  // 黑名单判断
+  let blackList = await MessageBlackListModel.findOne({
+    uid: fromUid,
+    tUid: toUid
+  });
+  if(blackList) throwErr(403, "您已将对方添加到了消息黑名单中，无法发送消息。");
+  if(!sendToEveryOne) {
+    blackList = await MessageBlackListModel.findOne({
+      uid: toUid,
+      tUid: fromUid
+    });
+    if(blackList) throwErr(403, "对方拒绝接送您的消息。");
   }
 
-}
-
-messageSchema.statics.extendReminder = async (arr) => {
-  const moment = require('moment');
-  const PostModel = mongoose.model('posts');
-  const UserModel = mongoose.model('users');
-  const ThreadModel = mongoose.model('threads');
-  const apiFunction = require('../nkcModules/apiFunction');
-  const results = [];
-  for(const r of arr) {
-    const {c, tc} = r;
-    const {type} = c;
-    if(!type) continue;
-    const r_ = r.toObject();
-    if(type === 'replyThread') {
-      const {pid, targetPid} = c;
-      const post = await PostModel.findOne({pid});
-      const targetPost = await PostModel.findOne({pid: targetPid});
-      if(!post || !targetPost) continue;
-      const targetUser = await UserModel.findOne({uid: targetPost.uid});
-      const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!targetUser || !thread) continue;
-      const pageObj = await thread.getStep({pid: targetPid, disabled: false});
-      r_.targetUser = {
-        username: targetUser.username,
-        uid: targetUser.uid
-      };
-      r_.post = {
-        pid,
-        t: post.t,
-        tid: post.tid
-      };
-      r_.targetPost = {
-        pid: targetPid,
-        tid: post.tid,
-        c: apiFunction.obtainPureText(targetPost.c),
-        page: pageObj.page
-      };
-    } else if(type === 'digestThread') {
-      const {targetUid, pid} = c;
-      const targetUser = await UserModel.findOne({uid: targetUid});
-      const post = await PostModel.findOne({pid});
-      if(!post || !targetUser) continue;
-      const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!thread) continue;
-      r_.targetUser = {
-        username: targetUser.username,
-        uid: targetUser.uid
-      };
-      r_.post = {
-        tid: post.tid,
-        pid: post.pid,
-        t: post.t,
-        c: apiFunction.obtainPureText(post.c)
-      };
-    } else if(type === 'digestPost') {
-      const {targetUid, pid} = c;
-      const targetUser = await UserModel.findOne({uid: targetUid});
-      const post = await PostModel.findOne({pid});
-      if(!post || !targetUser) continue;
-      const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!thread) continue;
-      r_.targetUser = {
-        username: targetUser.username,
-        uid: targetUser.uid
-      };
-      const pageObj = await thread.getStep({pid, disabled: false});
-      r_.post = {
-        tid: post.tid,
-        pid: post.pid,
-        c: apiFunction.obtainPureText(post.c, true, 50),
-        page: pageObj.page
-      };
-    } else if(type === '@') {
-      const {targetUid, targetPid} = c;
-      const targetUser = await UserModel.findOne({uid: targetUid});
-      const targetPost = await PostModel.findOne({pid: targetPid});
-      if(!targetUser || !targetPost) continue;
-      const targetThread = await ThreadModel.findOne({tid: targetPost.tid});
-      if(!targetThread) continue;
-      const pageObj = await targetThread.getStep({pid: targetPid, disabled: false});
-      r_.targetPost = {
-        pid: targetPost.pid,
-        tid: targetPost.tid,
-        page: pageObj.page
-      };
-      r_.targetUser = {
-        uid: targetUser.uid,
-        username: targetUser.username
-      }
-    } else if(type === 'bannedPost') {
-      const {pid, rea} = c;
-      const post = await PostModel.findOne({pid});
-      if(!post) continue;
-      const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!thread) continue;
-      const firstPost = await thread.extendFirstPost();
-      r_.post = {
-        pid
-      };
-      r_.firstPost = {
-        t: firstPost.t,
-        tid: firstPost.tid,
-        pid: firstPost.pid
-      };
-      r_.reason = rea;
-    } else if(type === 'postWasReturned') {
-      const {pid, rea} = c;
-      const post = await PostModel.findOne({pid});
-      if(!post) continue;
-      const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!thread) continue;
-      const firstPost = await thread.extendFirstPost();
-      r_.post = {
-        pid,
-      };
-      r_.firstPost = {
-        t: firstPost.t,
-        tid: firstPost.tid,
-        pid: firstPost.pid
-      };
-      r_.reason = rea;
-      const t = new Date(tc).getTime() + 72*60*60*1000;
-      r_.timeLimit = moment(t).format('YYYY-MM-DD HH:mm:ss');
-    } else if(type === 'threadWasReturned') {
-      const {tid, rea} = c;
-      const thread = await ThreadModel.findOne({tid});
-      const firstPost = await thread.extendFirstPost();
-      if(!thread) continue;
-      r_.firstPost = {
-        t: firstPost.t,
-        tid: firstPost.tid,
-        pid: firstPost.pid
-      };
-      r_.reason = rea;
-      const t = new Date(tc).getTime() + 72*60*60*1000;
-      r_.timeLimit = moment(t).format('YYYY-MM-DD HH:mm:ss');
-    } else if(type === 'bannedThread') {
-      const {tid, rea} = c;
-      const thread = await ThreadModel.findOne({tid});
-      const firstPost = await thread.extendFirstPost();
-      if(!thread) continue;
-      r_.firstPost = {
-        t: firstPost.t,
-        tid: firstPost.tid,
-        pid: firstPost.pid
-      };
-      r_.reason = rea;
-    } else if(type === 'replyPost') {
-      const {targetPid, pid} = c;
-      const targetPost = await PostModel.findOne({pid: targetPid});
-      const post = await PostModel.findOne({pid});
-      if(!targetPost || !post) continue;
-      const targetUser = await UserModel.findOne({uid: targetPost.uid});
-      if(!targetUser) continue;
-      const thread = await ThreadModel.findOne({tid: targetPost.tid});
-      if(!thread) continue;
-      const firstPost = await PostModel.findOne({pid: thread.oc});
-      if(!firstPost) continue;
-      const pageObj = await thread.getStep({pid: targetPid + '', disabled: false});
-      r_.targetPost = {
-        pid: targetPost.pid,
-        c: apiFunction.obtainPureText(targetPost.c),
-        page: pageObj.page,
-        tid: targetPost.tid
-      };
-      r_.targetUser = {
-        uid: targetUser.uid,
-        username: targetUser.username,
-      };
-      r_.firstPost = {
-        t: firstPost.t,
-        tid: firstPost.tid
-      };
-    } else if(type === 'xsf') {
-      const {pid, num} = c;
-      const post = await PostModel.findOnly({pid});
-      r_.post = {
-        pid: post.pid
-      };
-      r_.num = num;
+  // 系统防骚扰
+  const messageSettings = (await mongoose.model("settings").findById("message")).c;
+  const {customizeLimitInfo} = messageSettings;
+  const userGeneral = await UsersGeneralModel.findOnly({uid: targetUser.uid});
+  const {status, timeLimit, digestLimit, xsfLimit, gradeLimit} = userGeneral.messageSettings.limit;
+  const throwLimitError = () => {
+    throwErr(403, customizeLimitInfo);
+  };
+  // 如果用户开启了自定义防骚扰
+  if(status) {
+    // 注册时间大于30天
+    if(timeLimit && user.toc > Date.now() - 30*24*60*60*1000) throwLimitError();
+    // 有加入精选的文章
+    if(digestLimit) {
+      const count = await ThreadModel.count({
+        digest: true,
+        uid: user.uid
+      });
+      if(count === 0) throwLimitError();
     }
-    r_.ty = 'STU';
-    r_.c = {
-      type: type
-    };
-    results.push(r_);
+    // 有学术分
+    if(xsfLimit && user.xsf <= 0) throwLimitError();
+    if(!user.grade) await user.extendGrade();
+    // 达到一定等级
+    if(Number(gradeLimit) > Number(user.grade._id)) throwLimitError();
   }
-  return results;
+
 };
+
+messageSchema.statics.extendSTUMessages = async (arr) => {
+  const moment = require("moment");
+  const PostModel = mongoose.model("posts");
+  const UserModel = mongoose.model("users");
+  const ThreadModel = mongoose.model("threads");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const ShopRefundModel = mongoose.model("shopRefunds");
+  const apiFunction = require("../nkcModules/apiFunction");
+  const results = [];
+
+  const timeout = 72 * 60 * 60 * 1000;
+
+  for(let r of arr) {
+    r = r.toObject();
+    const {type, pid, targetPid, targetUid, tid, orderId, refundId} = r.c;
+    if(type === "at") {
+      const post = await PostModel.findOne({pid: targetPid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const user = await UserModel.findOne({uid: targetUid});
+      if(!user) continue;
+      r.c.post = post;
+      r.c.user = user;
+      r.c.thread = thread;
+    } else if(type === "digestPost") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      r.c.post = post;
+    } else if(type === "digestThread") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      r.c.thread = thread;
+    } else if(type === "bannedThread") {
+      const thread = await ThreadModel.findOne({tid});
+      if(!thread) continue;
+      r.c.thread = thread;
+    } else if(type === "bannedPost") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      r.c.post = post;
+      r.c.thread = thread;
+    } else if(type === "threadWasReturned") {
+      const thread = await ThreadModel.findOne({tid});
+      if(!thread) continue;
+      r.c.thread = thread;
+      r.c.deadline = moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss");
+    } else if(type === "postWasReturned") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      r.c.post = post;
+      r.c.thread = thread;
+    } else if(type === "replyPost") {
+      const post = await PostModel.findOne({pid: targetPid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const user = await UserModel.findOne({uid: post.uid});
+      if(!user) continue;
+      r.c.user = user;
+      r.c.thread = thread;
+      r.c.post = post;
+    } else if(type === "replyThread") {
+      const post = await PostModel.findOne({pid: targetPid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const user = await UserModel.findOne({uid: post.uid});
+      if(!user) continue;
+      r.c.user = user;
+      r.c.thread = thread;
+      r.c.post = post;
+    } else if(type === "userAuthApply") {
+      const user = await UserModel.findOne({uid: targetUid});
+      if(!user) continue;
+      r.c.user = user;
+    } else if(type === "shopSellerNewOrder") {
+      const user = await UserModel.findOne({uid: r.r});
+      if(!user) continue;
+      r.c.user = user;
+    } else if(type === "shopBuyerOrderChange") {
+      const user = await UserModel.findOne({uid: r.r});
+      if(!user) continue;
+      const order = await ShopOrdersModel.findOne({orderId: r.c.orderId});
+      if(!order) continue;
+      r.c.order = order;
+    } else if(
+      [
+        "shopBuyerOrderChange",
+        "shopSellerNewOrder",
+        "shopBuyerPay",
+        "shopBuyerConfirmReceipt",
+        "shopSellerShip",
+        "shopSellerCancelOrder",
+        "shopBuyerApplyRefund",
+        "shopBuyerRefundChange",
+        "shopSellerRefundChange",
+      ].includes(type)
+    ) {
+      let order, refund;
+      if(orderId) {
+        order = await ShopOrdersModel.findOne({orderId});
+        if(!order) continue;
+      }
+      if(refundId) {
+        refund = await ShopRefundModel.findOne({_id: refundId});
+      }
+      const user = await UserModel.findOne({uid: r.r});
+      if(!user) continue;
+      r.c.user = user;
+      r.c.order = order;
+      r.c.refund = refund;
+    }
+
+    if(r.c.thread) {
+      r.c.thread = (await ThreadModel.extendThreads([r.c.thread], {
+        forum: false,
+        category: false,
+        firstPost: true,
+        firstPostUser: false,
+        userInfo: false,
+        lastPost: false,
+        lastPostUser: false,
+        firstPostResource: false,
+        htmlToText: false,
+        count: 200
+      }))[0];
+    }
+    if(r.c.post) {
+      r.c.post = r.c.post.toObject();
+      const step = await ThreadModel.getPostStep(r.c.post.tid, {
+        pid: r.c.post.pid,
+        disabled: false
+      });
+      r.c.post.url = `/t/${r.c.post.tid}?page=${step.page}&highlight=${r.c.post.pid}#${r.c.post.pid}`;
+    }
+    results.push(r);
+  }
+
+  return results;
+
+};
+/*
+* 发送应用提醒
+* @param {Object} options 参数
+*   type(String): 应用提醒类型
+*   rUid(String): 接受者ID
+*   orderId(String): 订单ID
+*   refundId(String): 退款申请ID
+* @author pengxiguaa 2019-5-27
+* */
+messageSchema.statics.sendShopMessage = async (options) => {
+  const {type, r, orderId, refundId} = options;
+  const MessageModel = mongoose.model("messages");
+  const SettingModel = mongoose.model("settings");
+  const redis = require("../redis");
+  const message = MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r,
+    ty: "STU",
+    c: {
+      type,
+      orderId,
+      refundId
+    }
+  });
+  await message.save();
+  await redis.pubMessage(message);
+};
+
 messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const CreatedChatModel = mongoose.model('createdChat');
   const FriendModel = mongoose.model('friends');
@@ -360,57 +391,6 @@ messageSchema.statics.getUsersFriendsUid = async (uid) => {
   });
   return [...uids];
 };
-/*messageSchema.statics.getUsersFriendsUid = async (uid) => {
-  const MessageModel = mongoose.model('messages');
-  let rList = await MessageModel.aggregate([
-    {
-      $match: {
-        s: uid,
-        r: {
-          $ne: ''
-        }
-      }
-    },
-    {
-      $sort: {
-        tc: -1
-      }
-    },
-    {
-      $group: {
-        _id: '$r'
-      }
-    }
-  ]);
-  let sList = await MessageModel.aggregate([
-    {
-      $match: {
-        r: uid,
-        s: {
-          $ne: ''
-        }
-      }
-    },
-    {
-      $sort: {
-        tc: -1
-      }
-    },
-    {
-      $group: {
-        _id: '$s'
-      }
-    }
-  ]);
-  const list = rList.concat(sList);
-  let uidList = [];
-  for(const o of list) {
-    if(o._id !== uid && !uidList.includes(o._id)) {
-      uidList.push(o._id);
-    }
-  }
-  return uidList;
-};*/
 
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;

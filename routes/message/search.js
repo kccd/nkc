@@ -28,7 +28,11 @@ router
       users = users.concat(u);
       data.paging = paging;
     }
-    data.users = users;
+    data.users = await Promise.all(users.map(async u => {
+      await u.extendGrade();
+      u = u.toObject();
+      return u;
+    }));
     await next();
   });
 

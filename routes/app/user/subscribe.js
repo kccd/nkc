@@ -5,13 +5,31 @@ subscribeRouter
 		const {data, db, params, query, nkcModules} = ctx;
 		const {uid} = params;
 		const {type} = query;
-		const subscribe = await db.UsersSubscribeModel.findOnly({uid});
-		if(type) {
+
+		if(["subscribers", "subscribeUsers"].includes(type)) {
 			const {page = 0} = query;
-			const count = subscribe[type];
+			let q;
+			if(type === "subscribers") {
+			  q = {
+          tUid: uid,
+          type: "user"
+        };
+      } else if(type === "subscribeUsers") {
+        q = {
+          uid: uid,
+          type: "user"
+        };
+      }
+      const count = await db.SubscribeModel.count(q);
 			const paging = nkcModules.apiFunction.paging(page, count);
-			let uidArr = subscribe[type].reverse();
-			uidArr = uidArr.slice(paging.start, paging.start + paging.perpage);
+      const subs = await db.SubscribeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+			let uidArr;
+			if(type === "subscribers") {
+        uidArr = subs.map(s => s.uid);
+      }
+			if(type === "subscribeUsers") {
+        uidArr = subs.map(s => s.tUid);
+      }
 			const targetUsers = [];
 			for(const uid of uidArr) {
 				const targetUser = await db.UserModel.findOne({uid});
@@ -28,13 +46,22 @@ subscribeRouter
 			data[type] = targetUsers;
 			data.paging = paging;
  		}
+    data.subscribeUsersCount = await db.SubscribeModel.count({
+      type: "user",
+      uid
+    });
+    data.subscribersCount = await db.SubscribeModel.count({
+      type: "user",
+      tUid: uid
+    });
 		data.subscribe = await db.UsersSubscribeModel.findOnly({uid});
 		let followIds = data.subscribe.subscribeForums;
 		data.targetUserSubscribeforums = await Promise.all(followIds.map(fid => db.ForumModel.findOnly({fid})));
-		data.isFuns = false;
-		if(data.user && data.subscribe.subscribers.includes(data.user.uid)){
-			data.isFuns = true;
-		}
+		data.isFuns = await db.SubscribeModel.count({
+      tUid: uid,
+      uid: data.user.uid,
+      type: 'user'
+    });
 		await next();
 	});
 module.exports = subscribeRouter;

@@ -561,6 +561,10 @@
   "updateProtocolType": "[SY]修改详细类型协议",
   "deleteProtocolType": "[SY]删除详细类型协议",
   "visitProtocol": "[CO]查看协议",
+  "messageDataGet": "加载短消息（用户短消息、系统通知、应用提醒）",
+  "experimentalUserAuth": "后台管理-身份认证设置",
+  "userMessageSettings": "用户消息设置",
+  "messageBlackList": "消息加入黑名单",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

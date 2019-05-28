@@ -34,8 +34,13 @@ obj.pubDisconnect = async (uid) => {
 obj.pubMessage = async (message) => {
   if(message.ty === 'STU') {
     await db.UsersGeneralModel.update({uid: message.r, 'messageSettings.chat.reminder': false}, {$set: {'messageSettings.chat.reminder': true}});
-    const messageArr = await db.MessageModel.extendReminder([message]);
+    const messageArr = await db.MessageModel.extendSTUMessages([message]);
     message = messageArr[0] || '';
+    const messageType = await db.MessageTypeModel.findOnly({_id: "STU"});
+    message.c.messageType = {
+      name: messageType.name,
+      content: '新消息'
+    }
   }
   pub.publish('message', JSON.stringify(message));
 };

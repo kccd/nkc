@@ -497,6 +497,7 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   const SettingModel = mongoose.model("settings");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const MessageModel = mongoose.model("messages");
   const {orderId, orderStatus, closeStatus, orderPrice, refundStatus} = this;
   let order = await ShopOrdersModel.findById(orderId);
   const orders = await ShopOrdersModel.userExtendOrdersInfo([order]);
@@ -529,6 +530,11 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   await UserModel.update({uid: order.sellUid}, {$inc: {
     kcb: orderPrice
   }});
+  await MessageModel.sendShopMessage({
+    type: "shopBuyerConfirmReceipt",
+    r: order.sellUid,
+    orderId: order.orderId
+  });
 };
 /**
  * 拓展订单的凭证
@@ -600,6 +606,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const MessageModel = mongoose.model("messages");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
   const {sellUid} = this;
@@ -668,6 +675,11 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     await UserModel.updateUserKcb(record.from);
     await UserModel.updateUserKcb(record.to);
   }
+  await MessageModel.sendShopMessage({
+    type: "shopSellerCancelOrder",
+    r: order.buyUid,
+    orderId: order.orderId
+  });
 };
 /*
 * 获取订单上指定ID的商品

@@ -45,6 +45,7 @@ userRouter
     data.t = t;
 
     const targetUser = await db.UserModel.findOnly({uid});
+    await targetUser.extendGrade();
     const targetUserSubForums = await db.SubscribeModel.find({
       uid: targetUser.uid,
       type: "forum"
