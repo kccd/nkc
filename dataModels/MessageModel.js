@@ -255,7 +255,10 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
     } else if(type === "postWasReturned") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
       r.c.post = post;
+      r.c.thread = thread;
     } else if(type === "replyPost") {
       const post = await PostModel.findOne({pid: targetPid});
       if(!post) continue;

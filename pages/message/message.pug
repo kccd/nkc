@@ -404,7 +404,7 @@ block content
           input(type="checkbox" v-model="messageLimitArr" value="digest")
           span &nbsp;有精选文章
         div(style="margin: 0.5rem;")
-          span 用户等级限制：
+          span 可以向我发短消息的最低用户等级&nbsp;&nbsp;
           span(v-for="grade, index in grades")
             span(v-if="index < 3")
               input(type="radio" v-model="messageLimit.gradeLimit" :value="grade._id")
@@ -690,7 +690,7 @@ block content
             .ms-right-input(v-if='target === "UTU"')
               div(v-if="showSystemLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.systemLimitInfo}}
                 .m-t-1.text-center
-                  button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意
+                  button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 确定
               div(v-else-if="showCustomizeLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.customizeLimitInfo}}
               div(v-else)
                 transition(name='fade')
@@ -778,7 +778,7 @@ block content
           .mobile-footer-input-div(v-if='target === "UTU"')
             div(v-if="showSystemLimitInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.systemLimitInfo}}
               .m-t-1.text-center
-                button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 同意
+                button.btn.btn-default.btn-sm(@click="systemInfoViewed = true") 确定
             div(v-else-if="showCustomizeLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.customizeLimitInfo}}
             div(v-else)
               transition(name='fade')
