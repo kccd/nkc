@@ -494,7 +494,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(quote && quote[2]) {
     rpid = quote[2];
   }
-  const _post = await new PostModel({
+  let _post = await new PostModel({
     pid,
     c,
     t,
@@ -515,6 +515,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     rpid
   });
   await _post.save();
+  // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
+  _post = _post.toObject();
   await this.update({
     lm: pid,
     tlm: Date.now()
@@ -546,6 +548,11 @@ threadSchema.methods.newPost = async function(post, user, ip) {
       await message.save();
 
       await redis.pubMessage(message);
+      // 如果引用作者的回复，则作者将只会收到 引用提醒
+      if(quPost.uid === this.uid) {
+        _post.hasQuote = true;
+      }
+
     }
   }
   await this.update({lm: pid});

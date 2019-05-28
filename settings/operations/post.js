@@ -46,6 +46,9 @@ module.exports = {
       down: {
 		    POST: 'post-vote-down'
       }
+    },
+    warning: {
+		  POST: "postWarningPost"
     }
 	}
 };
