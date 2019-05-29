@@ -7,6 +7,7 @@ router
     const q = {};
     const count = await db.PostWarningModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
+    data.paging = paging;
     const logs = await db.PostWarningModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     const uid = new Set(), pid = new Set(), tid = new Set();
     logs.map(log => {

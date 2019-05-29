@@ -937,7 +937,7 @@ function submitPostWarning() {
   var pid = dom.attr("data-pid");
   var text = $("#module_post_warning textarea");
   var reason = text.val();
-  if(!reason) return screenTopWarning("理由不能为空");
+  if(!reason) return screenTopWarning("请输入修改建议");
   nkcAPI("/p/" + pid + "/warning", "POST", {
     reason: reason
   })
