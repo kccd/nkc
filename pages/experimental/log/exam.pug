@@ -71,14 +71,17 @@ block content
                   if r.question.hasImage
                     div
                       img(src=`/exam/question/${r.question._id}/image` style="max-width: 100%;")
-                h5 原答案顺序：
-                for a, index in r.question.answer
-                  h5
-                    span=an[index] + "、"
-                    if index === 0
-                      span.text-success= a
-                    else
-                      span.text-danger= a
+                if r.question.answer.length === 1
+                  h5 答案：
+                    span.text-success=r.question.answer[0]
+                //-h5 原答案顺序：
+                  for a, index in r.question.answer
+                    h5
+                      span=an[index] + "、"
+                      if index === 0
+                        span.text-success= a
+                      else
+                        span.text-danger= a
                 if r.answerIndex
                   h5 试卷答案顺序：
                     for i, index in r.answerIndex
