@@ -9,7 +9,7 @@ router
     const post = await db.PostModel.findOnly({pid});
     const thread = await db.ThreadModel.findOnly({tid: post.tid});
     const type = thread.oc === pid? "warningThread": "warningPost";
-    await db.PostWarningModel({
+    const warning = await db.PostWarningModel({
       _id: await db.SettingModel.operateSystemID("postWarnings", 1),
       tUid: post.uid,
       type,
@@ -17,7 +17,8 @@ router
       tid: thread.tid,
       pid: post.pid,
       reason
-    }).save();
+    });
+    await warning.save();
     const message = db.MessageModel({
       _id: await db.SettingModel.operateSystemID("messages", 1),
       r: post.uid,
@@ -26,6 +27,7 @@ router
         type: type,
         pid,
         tid: post.tid,
+        warningId: warning._id,
         rea: reason
       }
     });
@@ -43,6 +45,14 @@ router
       reason,
       modifierId: user.uid,
       modifiedTime: new Date()
+    });
+    await db.MessageModel.updateOne({
+      ty: "STU",
+      "c.warningId": warningId
+    }, {
+      $set: {
+        "c.rea": reason
+      }
     });
     await next();
   });

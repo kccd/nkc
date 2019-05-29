@@ -4,8 +4,7 @@ const http = require("http");
 const aliAppCode = require("../config/aliAppCode");
 const {appCode} = aliAppCode;
 moment.locale('zh-cn');
-// const defaultPerpage = paging.perpage;
-const defaultPerpage = 1;
+const defaultPerpage = paging.perpage;
 let fn = {};
 fn.paging = (page, count, perpage) => {
   if(page === undefined) page = 0;
