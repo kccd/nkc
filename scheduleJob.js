@@ -74,7 +74,7 @@ jobs.backupDatabase = () => {
 				'--db',
 				backup.database,
 				'--out',
-				`${backup.out}${moment().format('YYYYMMDDHHmmss')}`,
+				`${backup.out}${moment().format('YYYYMMDD')}`,
 			]
 		);
 		process.stdout.on('data', (d) => {

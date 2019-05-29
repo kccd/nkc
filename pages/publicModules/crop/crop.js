@@ -53,7 +53,7 @@ moduleCrop.init = function(callback, o) {
   moduleCrop.cropper = $image.data('cropper');
 
   moduleCrop.complete = function() {
-    console.log(moduleCrop.cropper.getCroppedCanvas());
+    screenTopAlert("图片处理中，请稍后...");
     try{
       moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
         callback(blob);
