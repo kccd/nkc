@@ -33,8 +33,13 @@ function saveDraft() {
   var draftId = $("#draftId").html();
   // 文章内容相关
   var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
-  // var transferContent = ue.getContent(); // 转移区内容
-  var content = quoteContent + ue.getContent(); // 文章主体内容
+  var draftContent;
+  try{
+    draftContent = ue.getContent();
+  }catch(e){
+    draftContent = "";
+  }
+  var content = quoteContent + draftContent; // 文章主体内容
   if(content.length < 1) {
     return screenTopWarning("请填写内容")
   }
@@ -81,13 +86,13 @@ function saveDraft() {
     if(result.redirect) {
       redirect(result.redirect)
     } else {
-      if(that.type === 'post') {
+      if(queryType === 'post') {
         redirect()
       }
     }
   })
   .catch(function (data) {
-    screenTopWarning(data.error);
+    screenTopWarning(data || data.error);
     geid('post').disabled = false
   })
 }
@@ -101,6 +106,7 @@ function onPost() {
   var query = getSearchKV();
   var queryType = query.type;
   var queryId = query.id;
+  var queryCat = query.cat;
   // 文章内容相关
   var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
   // var transferContent = ue.getContent(); // 转移区内容
@@ -144,6 +150,7 @@ function onPost() {
     }
     queryId = fids[0];
     queryType = 'forum';
+    queryCat = cids[0];
   }
   // 组装上传数据，如果是特殊类型，则将关键词摘要等放入post
   var post = {
@@ -153,6 +160,7 @@ function onPost() {
     did: did,
     fids: fids,
     cids: cids,
+    cat: queryCat,
     desType: desType,
     desTypeId: desTypeId
   }
@@ -184,15 +192,15 @@ function onPost() {
     method = 'POST';
     url = '/t/' + queryId;
     data = {post: post};
-  } else if (queryType === 'application' && cat === 'p') { // 编辑项目内容
+  } else if (queryType === 'application' && queryCat === 'p') { // 编辑项目内容
     method = 'PATCH';
     url = '/fund/a/' + queryId;
     data = {project: post, s: 3}
-  } else if(queryType === 'application' && cat === 'c') { // 评论
+  } else if(queryType === 'application' && queryCat === 'c') { // 评论
     method = 'POST';
     url = '/fund/a/' + queryId + '/comment';
     data = {comment: post}
-  } else if(queryType === 'application' && cat === 'r') { // 报告
+  } else if(queryType === 'application' && queryCat === 'r') { // 报告
     method = 'POST';
     url = '/fund/a/' + queryId + '/report';
     data = {c: post.c, t: post.t, l: post.l}
@@ -282,7 +290,26 @@ if(type == "thread"){
   }
   window.localStorage.clear();
 }
-
+// 重新编辑
+if(type == "redit"){
+  var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+  var quoteHtml = disnoneplayHtml.match(/<blockquote cite.+?blockquote>/)
+  if(quoteHtml){
+      document.getElementById("quoteContent").innerHTML = quoteHtml[0];
+      geid('quoteCancel').style.display = "inline";
+  }
+  disnoneplayHtml = disnoneplayHtml.replace(/<blockquote cite.+?blockquote>/img, '')
+  ue.ready(function() {
+    ue.setContent(disnoneplayHtml);
+  })
+}
+// 基金与专业介绍
+if(["application", "forum_declare"].indexOf(type) !== -1){
+	var disnoneplayHtml = htmlDecode($("#disnoneplay").html());
+  ue.ready(function() {
+    ue.setContent(disnoneplayHtml);
+  })
+}
 // 根据参数名称找到对应的参数值
 function GetUrlParam(paraName) {
   var url = document.location.toString();

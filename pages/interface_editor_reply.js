@@ -72,7 +72,6 @@
               if(list)list.refresh()
             })
             .catch( function(err){
-              console.log(err)
               newimgstr.attr("src","")
               newimgstr.attr("srcs","")
               newimgstr.replaceWith("<img src='/resources/site_specific/picdefault.png'>")

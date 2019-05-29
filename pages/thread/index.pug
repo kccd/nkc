@@ -490,7 +490,8 @@ block content
                             div#quoteCancel(style='display: none')
                               button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
                           .form-group(style="background-color:#fff;")
-                            div#ReplyContent
+                            //- div#ReplyContent
+                            include ../ueditor/ueditor.pug
                           .form-group
                           //- .nkcpanel(id='file-uploading' target='/r')
                           //-   //uploader section

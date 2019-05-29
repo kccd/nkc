@@ -256,7 +256,7 @@ function cancelTopped(tid) {
 
 function assemblePostObject(){  //bbcode , markdown
 	var quoteHtml = document.getElementById('quoteContent').innerHTML;
-	var replyHtml = document.getElementById('text-elem').innerHTML;
+	var replyHtml = ue.getContent();
 	if(replyHtml.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
 	var replyContent = quoteHtml + replyHtml
 	var post = {
@@ -329,7 +329,6 @@ function saveDraft(threadId,userId){
 
 // 发表回复
 function submit(tid){
-
 	$("#ReplyContent").find(".MathJax_Preview").each(function(){
 		if($(this).next().next().length !== 0){
 			if($(this).next().next().attr("type").length > 15){
@@ -344,13 +343,12 @@ function submit(tid){
 			$(this).parent().remove()
 		}
 	})
-	try{
+	// try{
 		var post = assemblePostObject()
-		// return console.log(post.c)
 		if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
-	}catch(err){
-		return;
-	}
+	// }catch(err){
+	// 	return;
+	// }
 	
 	geid('ButtonReply').disabled=true;
 	return nkcAPI('/t/' + tid, 'POST', {
@@ -373,8 +371,8 @@ function cancelQuote(){
 
 // 点击引用
 function quotePost(pid, number, page){
-	geid("quoteCancel").style.display = "inline"
-	if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
+	geid("quoteCancel").style.display = "inline";
+	if(!ue) return screenTopAlert('权限不足');
 	nkcAPI('/p/'+pid+'/quote', 'GET',{})
 		.then(function(pc){
 			var strAuthor = "<a href='/m/"+pc.targetUser.uid+"'>"+pc.targetUser.username+"</a>&nbsp;" // 获取被引用的用户
@@ -415,7 +413,7 @@ function quotePost(pid, number, page){
 			str = '<blockquote cite='+pc.user.username+','+pc.pid+' display="none">'+'引用：'+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
 			geid('quoteContent').innerHTML = str
 			// geid('ReplyContent-elem').innerHTML = str
-			window.location.href='#ReplyContent'
+			window.location.href='#container'
 		})
 }
 
@@ -424,17 +422,14 @@ function dateTimeString(t){
 }
 
 function at(username) {
-	if(geid('ReplyContent') === null) return screenTopAlert('权限不足');
-	// geid('ReplyContent').value += '@'+username+' ';
-	// window.location.href='#ReplyContent';
-	insertHtmlAtCaret('@'+username);
-	window.location.href='#ReplyContent';
-	geid('text-elem').focus()
+	if(!ue) return screenTopAlert('权限不足');
+	ue.execCommand('inserthtml', '@'+username);
+	window.location.href = "#container";
 }
 
 function goEditor(){
 	window.localStorage.quoteHtml = document.getElementById("quoteContent").innerHTML;
-	window.localStorage.replyHtml = document.getElementById('text-elem').innerHTML;
+	window.localStorage.replyHtml = ue.getContent();
 	//return console.log(window.localStorage)
 	window.location = '/editor?type=thread&id='+replyTarget.trim().split('/')[1]
 }

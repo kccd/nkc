@@ -2,7 +2,7 @@
 /*************************************************Rest Start*************************************************/
 body{font:14px/1.5 "Microsoft YaHei","\5FAE\8F6F\96C5\9ED1,\9ED1\4F53","\5b8b\4f53",arial,Helvetica,Tahoma,sans-serif;margin:0 auto;color:#333;}
 p,ul,ol,dl,dt,dd,h1,h2,h3,h4,h5,h6,form,input,select,button,textarea,iframe{margin:0;padding:0;}
-img{border:0 none;vertical-align:top;}
+img{border:0 none;vertical-align:center;}
 ul,li,ol{list-style-type:none;}
 table{border-collapse:collapse;border-spacing:0;}
 i,em,address,caption,cite,code,dfn,var{font-style:normal;font-weight:normal;}

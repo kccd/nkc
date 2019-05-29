@@ -174,7 +174,8 @@ block content
                 .form-group
                   //- label.col-sm-2.control-label 活动详情：
                   //- .col-sm-8
-                  div#ReplyContent
+                  //- div#ReplyContent
+                  include ../ueditor/ueditor.pug   
                   .checkbox-inline(style="display:none")
                     label
                       input#ParseURL(type='checkbox' checked)
@@ -217,4 +218,5 @@ block scripts
   script(type="text/javascript" src=`./activityNewEditor.js?v=${global.NKC.startTime}`)
   script(src=`./activityRelease.js?v=${global.NKC.startTime}` charset="UTF-8")
   script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
+  include ../publicModules/crop/crop
   script(src=`../media/media_index.js?v=${startTime}`)

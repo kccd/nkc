@@ -482,3 +482,26 @@ function fileListToArray(list) {
   }
   return newFileArr;
 }
+
+/**
+ * 资源插入到编辑器中
+ */
+function mediaInsertUE(srcStr, fileType, name) {
+  fileType = fileType.toLowerCase();
+  var codeResource = "";
+  if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
+    //codeResource = "<b>123456</b>"
+    codeResource = "<p><img src=" + srcStr + " width='640'></p>"
+  }else if(fileType === "mp4"){
+    codeResource = "<video src=" + srcStr + " controls style=width:640px;>video</video>"
+  }else if(fileType === "mp3"){
+    codeResource = "<audio src=" + srcStr + " controls>Your browser does not support the audio element</audio>";
+  }else{
+    codeResource = "<p><a href=" + srcStr + "><img src=" + "/default/default_thumbnail.png" + ">" + name + "</a></p>"
+  }
+  try{
+    ue.execCommand('inserthtml', codeResource);
+  }catch(e) {
+    screenTopWarning("缺少编辑器")
+  }
+}

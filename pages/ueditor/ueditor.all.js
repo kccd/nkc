@@ -6895,19 +6895,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 container = document.getElementById(container);
             }
             if (container) {
-                if(options.initialFrameWidth){
-                    options.minFrameWidth = options.initialFrameWidth
-                }else{
-                    options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
-                }
+                // if(options.initialFrameWidth){
+                //     options.minFrameWidth = options.initialFrameWidth
+                // }else{
+                //     options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
+                // }
                 if(options.initialFrameHeight){
                     options.minFrameHeight = options.initialFrameHeight
                 }else{
                     options.initialFrameHeight = options.minFrameHeight = container.offsetHeight;
                 }
 
-                container.style.width = /%$/.test(options.initialFrameWidth) ?  '100%' : options.initialFrameWidth-
-                    getStyleValue("padding-left")- getStyleValue("padding-right") +'px';
+                // container.style.width = /%$/.test(options.initialFrameWidth) ?  '100%' : options.initialFrameWidth-
+                //     getStyleValue("padding-left")- getStyleValue("padding-right") +'px';
                 container.style.height = /%$/.test(options.initialFrameHeight) ?  '100%' : options.initialFrameHeight -
                     getStyleValue("padding-top")- getStyleValue("padding-bottom") +'px';
 
@@ -6945,7 +6945,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 //解决如果是给定的百分比，会导致高度算不对的问题
                 setTimeout(function(){
                     if( /%$/.test(options.initialFrameWidth)){
-                        options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
+                        // options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
                         //如果这里给定宽度，会导致ie在拖动窗口大小时，编辑区域不随着变化
 //                        container.style.width = options.initialFrameWidth + 'px';
                     }
@@ -19215,7 +19215,7 @@ UE.plugins['video'] = function (){
                     html.push('</tr>')
                 }
                 //禁止指定table-width
-                return '<table><tbody>' + html.join('') + '</tbody></table>'
+                return '<table border="1" width="100%" cellpadding="0" cellspacing="0"><tbody>' + html.join('') + '</tbody></table>'
             }
 
             if (!opt) {
@@ -28939,7 +28939,7 @@ UE.ui = baidu.editor.ui = {};
                     baidu.editor.ui.Popup.postHide(evt);
                 });
                 //提供编辑器实时宽高(全屏时宽高不变化)
-                editor.ui._actualFrameWidth = editor.options.initialFrameWidth;
+                // editor.ui._actualFrameWidth = editor.options.initialFrameWidth;
 
                 UE.browser.ie && UE.browser.version === 6 && editor.container.ownerDocument.execCommand("BackgroundImageCache", false, true);
 
@@ -29683,12 +29683,12 @@ UE.ui = baidu.editor.ui = {};
                         ci.style.display = 'block'
                     }
                     if (opt.initialFrameWidth) {
-                        opt.minFrameWidth = opt.initialFrameWidth;
+                        // opt.minFrameWidth = opt.initialFrameWidth;
                     } else {
                         opt.minFrameWidth = opt.initialFrameWidth = holder.offsetWidth;
                         var styleWidth = holder.style.width;
                         if(/%$/.test(styleWidth)) {
-                            opt.initialFrameWidth = styleWidth;
+                            // opt.initialFrameWidth = styleWidth;
                         }
                     }
                     if (opt.initialFrameHeight) {
@@ -29704,7 +29704,7 @@ UE.ui = baidu.editor.ui = {};
                     if(holder.style.height){
                         holder.style.height = ''
                     }
-                    editor.container.style.width = opt.initialFrameWidth + (/%$/.test(opt.initialFrameWidth) ? '' : 'px');
+                    // editor.container.style.width = opt.initialFrameWidth + (/%$/.test(opt.initialFrameWidth) ? '' : 'px');
                     editor.container.style.zIndex = opt.zIndex;
                     oldRender.call(editor, editor.ui.getDom('iframeholder'));
                     editor.fireEvent("afteruiready");
@@ -29832,18 +29832,19 @@ UE.registerUI('message', function(editor) {
 UE.registerUI('autosave', function(editor) {
     var timer = null,uid = null;
     editor.on('afterautosave',function(){
-        clearTimeout(timer);
+        // 本地保存不需要提示，保存即可
+        // clearTimeout(timer);
 
-        timer = setTimeout(function(){
-            if(uid){
-                editor.trigger('hidemessage',uid);
-            }
-            uid = editor.trigger('showmessage',{
-                content : editor.getLang('autosave.success'),
-                timeout : 2000
-            });
+        // timer = setTimeout(function(){
+        //     if(uid){
+        //         editor.trigger('hidemessage',uid);
+        //     }
+        //     uid = editor.trigger('showmessage',{
+        //         content : editor.getLang('autosave.success'),
+        //         timeout : 2000
+        //     });
 
-        },2000)
+        // },2000)
     })
 
 });

@@ -128,6 +128,7 @@ block scripts
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   script.
+    setInterval("saveDraft()", 20000)
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){
         return "离开前保存草稿了吗？"
