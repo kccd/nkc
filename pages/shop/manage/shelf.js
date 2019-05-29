@@ -264,7 +264,7 @@ function submitToShelf() {
   }
   var imgMaster = imgIntroductions[0];
   // 获取商品详细介绍
-  var productDetails = document.getElementById('text-elem').innerHTML;
+  var productDetails = ue.getContent();
   productDetails = common.URLifyHTML(productDetails);
   // 产品状态
   var productStatus;

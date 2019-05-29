@@ -5,6 +5,7 @@ editorRouter
     const {data, db, query, nkcModules} = ctx;
     const {dbFunction} = nkcModules;
     const {user} = data;
+    data.ver = query.ver;
     // 判断用户是否已完善账号基本信息（username, avatar, banner）
     if(!await db.UserModel.checkUserBaseInfo(user)) {
       nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
@@ -118,8 +119,9 @@ editorRouter
     	const thread = await db.ThreadModel.findOnly({tid: id});
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
-
-    data.allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
+    
+    const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
+    data.allForumList = allForumList;
     await next();
   });
 

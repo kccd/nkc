@@ -166,27 +166,32 @@ function turnPage() {
 
 // 全部类型插入到编辑器
 function allInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 图片插入到编辑器
 function pictureInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 视频插入到编辑器
 function videoInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 音频插入编辑器
 function audioInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, ext, name);
+  // edInsertContent('text-elem', '/r/'+rid, ext, name);
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 附件插入编辑器
 function attachmentInsert(rid, ext, name) {
-  edInsertContent('text-elem', '/r/'+rid, "", name)
+  // edInsertContent('text-elem', '/r/'+rid, "", name)
+  mediaInsertUE('/r/'+rid, ext, name)
 }
 
 // 选择文件
@@ -476,4 +481,27 @@ function fileListToArray(list) {
     }
   }
   return newFileArr;
+}
+
+/**
+ * 资源插入到编辑器中
+ */
+function mediaInsertUE(srcStr, fileType, name) {
+  fileType = fileType.toLowerCase();
+  var codeResource = "";
+  if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
+    //codeResource = "<b>123456</b>"
+    codeResource = "<p><img src=" + srcStr + " width='50%'></p>"
+  }else if(fileType === "mp4"){
+    codeResource = "<video src=" + srcStr + " controls style=width:50%;>video</video>"
+  }else if(fileType === "mp3"){
+    codeResource = "<audio src=" + srcStr + " controls>Your browser does not support the audio element</audio>";
+  }else{
+    codeResource = "<p><a href=" + srcStr + "><img src=" + "/default/default_thumbnail.png" + ">" + name + "</a></p>"
+  }
+  try{
+    ue.execCommand('inserthtml', codeResource);
+  }catch(e) {
+    screenTopWarning("缺少编辑器")
+  }
 }

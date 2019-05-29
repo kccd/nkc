@@ -122,7 +122,7 @@ router
 			if(!coverExists){
 				thread.hasCover = false;
 				await thread.save();
-				url = `${coverPath}/default.jpg`;
+				// url = `${coverPath}/default.jpg`;
 			}else{
 				await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
 				.catch(e => {

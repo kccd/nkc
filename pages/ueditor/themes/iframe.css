@@ -1,0 +1,11 @@
+/*可以在这里添加你自己的css*/
+blockquote {
+  font-size: 10pt;
+  max-height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 7px 10px;
+  background-color: #f8f8ee;
+  margin: 10px 0px;
+  border-left: 5px solid #ddd;
+}

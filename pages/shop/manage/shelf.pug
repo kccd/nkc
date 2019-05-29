@@ -338,7 +338,8 @@ block name
             .form-group
               label.col-sm-1.control-label 详细描述
               .col-sm-10
-                div#ReplyContent
+                //- div#ReplyContent
+                include ../../ueditor/ueditor.pug    
                 .checkbox-inline(style="display:none")
                   label
                     input#ParseURL(type='checkbox' checked)
@@ -493,8 +494,8 @@ block manageScripts
   +includeJS("/xbbcode-parser/xbbcode.js")
   +includeJS("/xss/dist/xss.js")
   +includeJS("/nkc_render.js")
-  +includeJS("/wangEditor.js")
-  +includeJS("/shop/manage/shelfEditor.js")
+  //- +includeJS("/wangEditor.js")
+  //- +includeJS("/shop/manage/shelfEditor.js")
   +includeJS("/shop/manage/shelf.js")
   include ../../publicModules/crop/crop
   +includeJS("/media/media_index.js")
