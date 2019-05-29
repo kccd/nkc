@@ -319,6 +319,13 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       r.c.user = user;
       r.c.order = order;
       r.c.refund = refund;
+    } else if(["warningPost", "warningThread"].includes(type)) {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      r.c.post = post;
+      r.c.thread = thread;
     }
 
     if(r.c.thread) {
@@ -342,6 +349,8 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
         disabled: false
       });
       r.c.post.url = `/t/${r.c.post.tid}?page=${step.page}&highlight=${r.c.post.pid}#${r.c.post.pid}`;
+
+      r.c.post.c = apiFunction.obtainPureText(r.c.post.c);
     }
     results.push(r);
   }

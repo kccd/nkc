@@ -77,6 +77,8 @@ const getDomByType = (t, app) => {
       return "";
     } else if(t === "sellerOrderRefundURL") {
       return ""
+    } else if(t === "postContent") {
+      return "item.c.post.c"
     }
   } else {
     if(t === "threadTitle") {
@@ -119,6 +121,8 @@ const getDomByType = (t, app) => {
       return "'/shop/order/' + item.c.order.orderId + '/refund'";
     } else if(t === "sellerOrderRefundURL") {
       return "'/shop/manage/' + item.c.user.uid + '/order/refund?orderId=' + item.c.order.orderId"
+    } else if(t === "postContent") {
+      return "item.c.post.c"
     }
   }
 };

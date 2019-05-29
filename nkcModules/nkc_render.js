@@ -368,7 +368,7 @@ function nkc_render(options){
       // if(!allthumbnail)replaced =
       // '<a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>';
       if(!allthumbnail)replaced =
-      '<img class="viewer img-responsive" alt="'+rid+'" src="/r/'+rid+'" /><br/>';
+      '<a data-magnify="gallery" data-group="g1" data-src="/r/'+rid+'" data-caption="'+rid+'"><img class="img-responsive" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>';
 
       if(allthumbnail){
         replaced =
@@ -497,7 +497,7 @@ function nkc_render(options){
       }
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
-    html = html.replace(/<img src="\/r(.+?)">/img,'<img class="viewer img-responsive" alt="pic" src="/r$1" />');
+    html = html.replace(/<img.*?src="\/r(.+?)".*?>/img,'<a data-magnify="gallery" data-group="g1" data-src="/r$1"><img class="img-responsive" alt="pic" src="/r$1" /></a>');
     return html
   }
 
