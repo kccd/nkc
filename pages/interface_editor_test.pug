@@ -130,8 +130,6 @@ block scripts
   include ./publicModules/crop/crop
   script(src=`/media/media_index.js?v=${startTime}`)
   script(src=`/forum/forum_choice.js?v=${startTime}`)
-  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
-  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   script.
@@ -151,3 +149,5 @@ block scripts
     $(".bootstrap-tagsinput").click(function () {
       openPanel(this);
     });
+  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
