@@ -106,7 +106,7 @@ block title
                 span.fa.fa-edit &nbsp;编辑
         if disablePost && !targetThread
           li
-            a(href=`###` onclick=`disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")` data-toggle="modal" data-target="#postRecycleModal" data-whatever="@mdo")
+            a(href=`javascript:disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
               span.fa.fa-eye-slash &nbsp;屏蔽
         if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
           if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
