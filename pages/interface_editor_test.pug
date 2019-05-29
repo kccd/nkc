@@ -123,12 +123,10 @@ block scripts
   include ./publicModules/crop/crop
   script(src=`/media/media_index.js?v=${startTime}`)
   script(src=`/forum/forum_choice.js?v=${startTime}`)
-  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
-  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   script.
-    setInterval("saveDraft()", 20000)
+    setInterval("saveDraft()", 300000)
     window.onbeforeunload = function() {
       if(document.getElementById("post").disabled === false){
         return "离开前保存草稿了吗？"
@@ -186,3 +184,5 @@ block scripts
   //-     $(".bootstrap-tagsinput").click(function () {
   //-       openPanel(this);
   //-     });
+  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
+  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)

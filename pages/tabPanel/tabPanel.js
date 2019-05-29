@@ -405,3 +405,14 @@ function editTag(para) {
     panelProto.config.editStatus = "ing";
     panelProto.config.editTag = $(para).text();
 }
+
+// 获取从专业传过来的fid
+var demoQuery = getSearchKV();
+if(demoQuery && demoQuery.type == "forum" && demoQuery.id){
+    for(var f=0;f<panelArr.length;f++) {
+        if(panelArr[f].id == demoQuery.id) {
+            var obj = {id:panelArr[f].id,name:panelArr[f].name,fid:panelArr[f].id,cid:""};
+            $("#tabPanel").tagsinput('add', obj)
+        }
+    }
+}

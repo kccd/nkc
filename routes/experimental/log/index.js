@@ -12,6 +12,7 @@ const rechargeRouter = require("./recharge");
 const withdrawRouter = require("./withdraw");
 const examRouter = require("./exam");
 const recycleRouter = require("./recycle");
+const warningRouter = require("./warning");
 logRouter
   .get('/', async (ctx, next) => {
     return ctx.redirect(`/e/log/public`);
@@ -26,6 +27,7 @@ logRouter
   .use('/experimental', experimentalRouter.routes(), experimentalRouter.allowedMethods())
   .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
   .use('/secret', secretRouter.routes(), secretRouter.allowedMethods())
+  .use("/warning", warningRouter.routes(), warningRouter.allowedMethods())
   .use('/behavior', behaviorRouter.routes(), behaviorRouter.allowedMethods())
   .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods());
 module.exports = logRouter;

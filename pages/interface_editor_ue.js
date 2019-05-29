@@ -83,13 +83,6 @@ function saveDraft() {
       $("#draftId").html(result.did)
       screenTopAlert("保存成功！");
     }
-    if(result.redirect) {
-      redirect(result.redirect)
-    } else {
-      if(queryType === 'post') {
-        redirect()
-      }
-    }
   })
   .catch(function (data) {
     screenTopWarning(data || data.error);

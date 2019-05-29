@@ -491,9 +491,9 @@ function mediaInsertUE(srcStr, fileType, name) {
   var codeResource = "";
   if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
     //codeResource = "<b>123456</b>"
-    codeResource = "<p><img src=" + srcStr + " width='640'></p>"
+    codeResource = "<p><img src=" + srcStr + " width='50%'></p>"
   }else if(fileType === "mp4"){
-    codeResource = "<video src=" + srcStr + " controls style=width:640px;>video</video>"
+    codeResource = "<video src=" + srcStr + " controls style=width:50%;>video</video>"
   }else if(fileType === "mp3"){
     codeResource = "<audio src=" + srcStr + " controls>Your browser does not support the audio element</audio>";
   }else{

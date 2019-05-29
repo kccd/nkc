@@ -2,7 +2,7 @@
 blockquote {
   font-size: 10pt;
   max-height: 200px;
-  overflow-y: hidden;
+  overflow-y: scroll;
   overflow-x: hidden;
   padding: 7px 10px;
   background-color: #f8f8ee;
