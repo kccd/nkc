@@ -1951,3 +1951,4 @@ function getDayCountByYearMonth(year, month) {
   }
   return count;
 }
+

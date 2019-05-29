@@ -1,4 +1,7 @@
 /* margin-top */
+.m-a-1{
+  margin: 1rem;
+}
 .m-t-1{
   margin-top: 1rem;
 }
@@ -76,6 +79,9 @@
 }
 
 /* padding-top */
+.p-a-1{
+  padding: 1rem;
+}
 .p-t-1{
   padding-top: 1rem;
 }
@@ -1283,6 +1289,7 @@ footer.footer ul li{
   font-size: 1.5rem;
   color: #282c37;
   font-weight: 700;
+  margin-right: 1rem;
   word-break: break-all;
   text-decoration: none;
   border-bottom: rgba(0,0,0,0) solid 1px;
@@ -1369,6 +1376,37 @@ footer.footer ul li{
   width: 10rem;
   border-radius: 3px;
   background-size: cover;
+}
+.thread-title-page{
+  height: 1.4rem;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  padding: 0 0.6rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  vertical-align: text-bottom;
+  display: inline-block;
+  text-align: center;
+  background-color: #8dbde0;
+  color: #fff;
+  transition: background-color 200ms;
+}
+a.thread-title-page:first-child{
+  margin-left: 1rem;
+}
+a.thread-title-page:focus{
+  text-decoration: none;
+  color: #fff;
+}
+a.thread-title-page:hover{
+  text-decoration: none;
+  background-color: #2b90d9;
+  color: #fff;
+}
+span.thread-title-page{
+  background-color: rgba(0,0,0,0);
+  color: #282c37;
+
 }
 .thread-panel-from{
   font-size: 1.2rem;

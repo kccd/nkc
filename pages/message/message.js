@@ -150,7 +150,7 @@ $(function() {
 
           message.canWithdrawn = (!message.withdrawn && !message.status && new Date(message.tc) > (Date.now() - 60*1000));
 
-          if(message.ty === 'UTU' && !message.c.ty) {
+          if((message.ty === 'UTU' || message.ty === "STE") && !message.c.ty) {
             message.html = xss(message.c, {
               whiteList: {}
             });

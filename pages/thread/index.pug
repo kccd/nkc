@@ -37,7 +37,8 @@ block title
         span.fa.fa-sliders
         if targetThread
           span &nbsp;操作
-      ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
+      //-ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
+      ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
         li
           a(href=`/p/${post.pid}`)
             span.fa.fa-newspaper-o &nbsp;

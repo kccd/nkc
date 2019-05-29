@@ -323,7 +323,7 @@ func.search = async (t, c, options) => {
       toc: {}
     };
     if(timeEnd) {
-      range.toc.lte = timeEnd;
+      range.toc.lt = new Date(new Date(timeEnd).getTime() + 1000);
     }
     if(timeStart) {
       range.toc.gte = timeStart;

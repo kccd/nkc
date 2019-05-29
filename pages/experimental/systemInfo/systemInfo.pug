@@ -37,7 +37,7 @@ block content
             div.info-panel(v-for="l in systemInfo")
               div(style="font-size: 1.4rem;") {{format("YYYY/MM/DD HH:mm:ss", l.tc)}}
               .info-panel-content.form-group
-                span(v-if="!l.modify") {{l.c}}
+                span(v-if="!l.modify" v-html="strToHTML(l.c)")
                 textarea.form-control(v-else v-model="l.c" rows="10")
                 div(v-if="l.modify")
                   button.btn.btn-primary.btn-sm(@click="save(l)") 保存
@@ -47,4 +47,5 @@ block content
 
 block scripts
   include ../../publicModules/moment
+  include ../../publicModules/strToHTML
   +includeJS("/experimental/systemInfo/systemInfo.js")

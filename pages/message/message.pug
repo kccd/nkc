@@ -278,7 +278,7 @@ block content
       .ms-loading-info {{info}}
     .ms-notice-body(v-for="message in messages")
       .ms-notice-time {{format('YYYY/MM/DD HH:mm:ss', message.tc)}}
-      .ms-notice-content {{message.c}}
+      .ms-notice-content(v-html="message.html")
 
   // 系统提醒内容
   mixin reminderContent

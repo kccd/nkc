@@ -243,6 +243,14 @@ threadRouter
 		// 若不是游客访问，加载用户的最新发表的文章
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
+			if(thread.uid === data.user.uid) {
+			  // 标记未读的回复提醒为已读状态
+        await db.MessageModel.clearMessageSTU({
+          type: "thread",
+          oc: thread.oc,
+          uid: thread.uid
+        });
+      }
 		}
 		// data.ads = (await db.SettingModel.findOnly({type: 'system'})).ads;
 		// 判断是否显示在专栏加精、置顶...按钮

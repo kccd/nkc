@@ -48,7 +48,8 @@ module.exports = {
       }
     },
     warning: {
-		  POST: "postWarningPost"
+		  POST: "postWarningPost",
+      PATCH: "postWarningPatch"
     }
 	}
 };
