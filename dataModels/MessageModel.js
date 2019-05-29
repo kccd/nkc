@@ -400,6 +400,30 @@ messageSchema.statics.getUsersFriendsUid = async (uid) => {
   });
   return [...uids];
 };
+/*
+* 打开相应页面后，将对应的提醒标记为已读状态。
+* @param {Object} options
+*   type {String} 打开的页面类型
+*   oc {String} 文章页内容id
+*   uid {String} 内容的作者
+* @author pengxiguaa 2019-5-29
+* */
+messageSchema.statics.clearMessageSTU = async (options) => {
+  const MessageModel = mongoose.model("messages");
+  const {type, oc, uid} = options;
+  if(type === "thread") {
+    await MessageModel.updateMany({
+      r: uid,
+      ty: "STU",
+      "c.type": "replyThread",
+      "c.pid": oc
+    }, {
+      $set: {
+        vd: true
+      }
+    });
+  }
+};
 
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;

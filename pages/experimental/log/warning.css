@@ -1,0 +1,29 @@
+.warning-time{
+  margin-right: 0.5rem;
+  color: #e85a71;
+  font-weight: 700;
+}
+.warning-handler a{
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+.warning-info{
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #555;
+}
+.warning-type{
+  font-weight: 700;
+  color: #282c37;
+}
+.warning-link{
+  height: 2.5rem;
+  padding-top: 0.5rem;
+}
+.warning-panel{
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+}
+.warning-panel:last-child{
+  border: none;
+}

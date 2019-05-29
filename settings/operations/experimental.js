@@ -281,6 +281,9 @@ module.exports = {
     },
     exam: {
 		  GET: "visitExperimentalExam"
+    },
+    warning: {
+		  GET: "experimentalWarningLog"
     }
 	},
   console: {

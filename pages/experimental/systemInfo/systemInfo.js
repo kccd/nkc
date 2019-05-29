@@ -16,6 +16,7 @@ $(function() {
     },
     methods: {
       format: NKC.methods.format,
+      strToHTML: NKC.methods.strToHTML,
       save: function(l) {
         nkcAPI("/e/systemInfo", "PATCH", {
           _id: l._id,
