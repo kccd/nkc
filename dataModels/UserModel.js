@@ -529,9 +529,10 @@ userSchema.virtual('navbarDesc').get(function() {
 
 
 userSchema.pre('save', async function(next) {
+  const elasticSearch = require("../nkcModules/elasticSearch");
   // handle the ElasticSearch index
   try {
-    const {_initial_state_: initialState} = this;
+    /*const {_initial_state_: initialState} = this;
     if (!initialState) { //this is a new user
       await indexUser(this);
       return next()
@@ -541,7 +542,9 @@ userSchema.pre('save', async function(next) {
       return next()
     } else {
       return next()
-    }
+    }*/
+    await elasticSearch.save("user", this);
+    await next();
   } catch(e) {
     return next(e)
   }
@@ -604,7 +607,6 @@ userSchema.statics.createUser = async (option) => {
 	// 生成关注专业记录
   const regSettings = await SettingModel.findById("register");
   const {defaultSubscribeForumsId} = regSettings.c;
-
 	try {
 		await user.save();
 		await userPersonal.save();
