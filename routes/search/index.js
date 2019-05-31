@@ -130,7 +130,7 @@ router
         }
 
       });
-      const posts = await db.PostModel.find({pid: {$in: [...pids]}});
+      const posts = await db.PostModel.find({pid: {$in: [...pids]}, reviewed: true});
 
       posts.map(post => {
         tids.add(post.tid);
@@ -144,7 +144,7 @@ router
         userObj[user.uid] = user;
       });
 
-      let threads = await db.ThreadModel.find({tid: {$in: [...tids]}});
+      let threads = await db.ThreadModel.find({tid: {$in: [...tids]}, reviewed: true});
       threads = await db.ThreadModel.extendThreads(threads, {
         forum: true,
         category: false,
