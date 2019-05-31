@@ -58,6 +58,7 @@ const account = require('./account');
 const complaint = require("./complaint");
 const imageEdit = require('./imageEdit');
 const protocol = require('./protocol');
+const review = require("./review");
 const operationObj = {};
 
 
@@ -191,6 +192,8 @@ operationObj.operationTree = {
     account, // 个人中心
 
     complaint, // 用户投诉
+
+    review, // 审核
 	}
 };
 module.exports = operationObj;

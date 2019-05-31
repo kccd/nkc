@@ -25,6 +25,7 @@ postsRouter
 
     const q = {
       uid,
+      reviewed: true,
       disabled: false,
       mainForumsId: {$in: accessibleFid}
     };
@@ -39,7 +40,7 @@ postsRouter
     const results = [];
     
     for(const post of infoLogs) {
-      const thread = await db.ThreadModel.findOne({tid: post.tid, recycleMark: {$ne: true}});
+      const thread = await db.ThreadModel.findOne({tid: post.tid, recycleMark: {$ne: true}, reviewed: true});
       if(!thread) continue;
       const result = {
         type: "post"

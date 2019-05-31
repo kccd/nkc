@@ -98,6 +98,20 @@ operationRouter
 			let uid = thread.uid;
 			const toUser = await db.UsersPersonalModel.findOnly({uid});
 			await toUser.increasePsnl('system', 1);
+
+      const mId = await db.SettingModel.operateSystemID('messages', 1);
+      const message = db.MessageModel({
+        _id: mId,
+        ty: 'STU',
+        r: thread.uid,
+        c: {
+          type: 'threadWasReturned',
+          tid: thread.tid,
+          rea: para.reason
+        }
+      });
+      await message.save();
+      await ctx.redis.pubMessage(message);
 		}
 		if(para && para.illegalType) {
 			await db.UsersScoreLogModel.insertLog({
@@ -111,19 +125,6 @@ operationRouter
 			});
       await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
 		}
-		const mId = await db.SettingModel.operateSystemID('messages', 1);
-		const message = db.MessageModel({
-			_id: mId,
-			ty: 'STU',
-			r: thread.uid,
-			c: {
-				type: 'threadWasReturned',
-				tid: thread.tid,
-				rea: para.reason
-			}
-		});
-		await message.save();
-    await ctx.redis.pubMessage(message);
 		await next()
 	})
   // 移动到回收站

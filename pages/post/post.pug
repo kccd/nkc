@@ -42,6 +42,8 @@ block content
     .row
       .col-xs-12.col-md-9
         .nkcpanel.fullwidthpanel.ThreadBox.post
+          if !post.reviewed
+            .thread-review-info 审核中
           .post-info
             .post-header
               .time

@@ -83,6 +83,7 @@ userRouter
       },
       uid: targetUser.uid,
       disabled: false,
+      reviewed: true,
       digest: true
     }).sort({toc: -1}).limit(10);
 
@@ -135,8 +136,21 @@ userRouter
       const q = {
         uid,
         disabled: false,
-        mainForumsId: {$in: accessibleFid},
+        mainForumsId: {$in: accessibleFid}
       };
+      if(user) {
+        q.$or = [
+          {
+            reviewed: true
+          },
+          {
+            reviewed: false,
+            uid: user.uid
+          }
+        ]
+      } else {
+        q.reviewed = true;
+      }
       const count = await db.PostModel.count(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
       const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -190,7 +204,8 @@ userRouter
           abstract: post.abstract,
           content: post.c,
           title: firstPost.t,
-          link
+          link,
+          reviewed: post.reviewed
         });
       }
       data.posts = results;
@@ -206,13 +221,27 @@ userRouter
           $in: accessibleFid
         }
       };
+      if(user) {
+        q.$or = [
+          {
+            reviewed: true
+          },
+          {
+            reviewed: false,
+            uid: user.uid
+          }
+        ]
+      } else {
+        q.reviewed = true;
+      }
       const count = await db.ThreadModel.count(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
       let threads = await db.ThreadModel.find(q, {
         tid: 1,
         hasCover: 1,
         oc: 1,
-        toc: 1
+        toc: 1,
+        reviewed: 1
       }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       threads = await db.ThreadModel.extendThreads(threads, {
         forum: false,
@@ -234,7 +263,8 @@ userRouter
           abstract: thread.firstPost.abstract,
           title: thread.firstPost.t,
           content: thread.firstPost.c,
-          link: `/t/${thread.tid}`
+          link: `/t/${thread.tid}`,
+          reviewed: thread.reviewed
         });
       }
       data.posts = results;

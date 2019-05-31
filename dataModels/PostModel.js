@@ -158,6 +158,12 @@ const postSchema = new Schema({
   originState: {
     type: String,
     default: ""
+  },
+  // 是否已经审核
+  reviewed: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {toObject: {
   getters: true,

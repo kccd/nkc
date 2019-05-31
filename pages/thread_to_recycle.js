@@ -43,7 +43,7 @@ function moveToRecycleBin(id){
     postId: '',
     noticeType: noticeType,
     illegalType: illegalType
-  }
+  };
   if(reason.length === 0){
     return screenTopWarning('未填写原因')
   }

@@ -184,6 +184,13 @@ const threadSchema = new Schema({
     type: Number,
     default: 0,
     index: 1
+  },
+
+  // 是否已经审核
+  reviewed: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 
 }, {toObject: {
@@ -890,6 +897,12 @@ threadSchema.statics.publishArticle = async (options) => {
     tid
   });
   await thread.update({$set:{oc: post.pid, count: 1, hits: 1}});
+  // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
+  const needReview = await UserModel.contentNeedReview(thread.uid, "thread");
+  if(!needReview) {
+    await PostModel.updateOne({pid: post.pid}, {$set: {reviewed: true}});
+    await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
+  }
   return await ThreadModel.findThreadById(thread.tid);
 };
 /*
@@ -902,7 +915,7 @@ threadSchema.statics.getAds = async (fid) => {
   const ThreadModel = mongoose.model("threads");
   const ads = [];
   for(const tid of homeSettings.c.ads) {
-    const thread = await ThreadModel.findOne({tid, mainForumsId: {$in: fid}});
+    const thread = await ThreadModel.findOne({tid, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
     if(thread) ads.push(thread);
   }
   return await ThreadModel.extendThreads(ads, {
@@ -920,7 +933,7 @@ threadSchema.statics.getNotice = async (fid) => {
   const ThreadModel = mongoose.model("threads");
   const notice = [];
   for(const oc of homeSettings.c.noticeThreadsId) {
-    const thread = await ThreadModel.findOne({oc, mainForumsId: {$in: fid}});
+    const thread = await ThreadModel.findOne({oc, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
     if(thread) notice.push(thread);
   }
   return await ThreadModel.extendThreads(notice, {
@@ -945,7 +958,9 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
         },
         toc: {
           $gte: new Date(time)
-        }
+        },
+        disabled: false,
+        reviewed: true
       }
     },
     {
@@ -972,7 +987,9 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
         },
         toc: {
           $lt: new Date(time)
-        }
+        },
+        disabled: false,
+        reviewed: true
       }
     },
     {
@@ -1002,7 +1019,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
 * */
 threadSchema.statics.getLatestThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
-  const threads = await ThreadModel.find({mainForumsId: {$in: fid}}).sort({toc: -1}).limit(10);
+  const threads = await ThreadModel.find({mainForumsId: {$in: fid}, disabled: false, reviewed: true}).sort({toc: -1}).limit(10);
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
     category: false
@@ -1020,6 +1037,7 @@ threadSchema.statics.getRecommendMatch = async (fid) => {
 
   const match = {
     disabled: false,
+    reviewed: true,
     recycleMark: {$ne: true},
     mainForumsId: {$in: fid},
     $or: [
@@ -1070,6 +1088,7 @@ threadSchema.statics.getUserThreads = async (uid, fid) => {
     mainForumsId: {
       $in: fid
     },
+    reviewed: true,
     disabled: false,
     recycleMark: {
       $ne: true
@@ -1109,6 +1128,7 @@ threadSchema.statics.getUserSubThreads = async (uid, fid) => {
       $ne: true
     },
     disabled: false,
+    reviewed: true,
     $or: [
       {
         mainForumsId: {

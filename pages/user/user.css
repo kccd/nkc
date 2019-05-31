@@ -145,6 +145,10 @@ body{
 .single-post{
   padding: 1rem 0;
 }
+.single-post.reviewed{
+  border: 1px solid #9baec8;
+  padding-top: 0;
+}
 .post-panel hr{
   margin: 0 0.5rem;
 }

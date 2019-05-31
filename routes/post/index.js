@@ -28,6 +28,14 @@ postRouter
     }
     // 判断用户是否具有访问该post所在文章的权限
     data.isModerator = isModerator;
+
+    if(!thread.reviewed) {
+      if(!data.user || (!isModerator && data.user.uid !== thread.uid)) ctx.throw(403, "文章还未通过审核，暂无法阅读");
+    }
+    if(!post.reviewed) {
+      if(!data.user || (!isModerator && data.user.uid !== post.uid)) ctx.throw(403, "回复还未通过审核，暂无法阅读");
+    }
+
     const options = {
     	roles: data.userRoles,
       grade: data.userGrade,

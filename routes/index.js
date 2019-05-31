@@ -33,6 +33,7 @@ const imageEditRouter = routers.imageEdit;
 const complaintRouter = routers.complaint;
 const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
+const reviewRouter = routers.review;
 
 
 // 所有请求先经过此中间件
@@ -104,6 +105,7 @@ router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());
 router.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
+router.use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
 router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
 router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = router;

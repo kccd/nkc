@@ -110,6 +110,24 @@ router
         },
         disabled: false
       };
+      if(user) {
+
+        // 临时处理：给编辑可以看到待审核文章的权限
+        if(!user.certs.includes("editor")) {
+          q.$or = [
+            {
+              reviewed: true
+            },
+            {
+              reviewed: false,
+              uid: user.uid
+            }
+          ]
+        }
+
+      } else {
+        q.reviewed = true;
+      }
     } else if(threadListType === "subscribe") {
       const subs = await db.SubscribeModel.find({
         uid: user.uid
@@ -136,22 +154,31 @@ router
         disabled: false,
         $or: [
           {
-            mainForumsId: {
-              $in: subFid
-            }
+            reviewed: true,
+            $or: [
+              {
+                mainForumsId: {
+                  $in: subFid
+                }
+              },
+              {
+                uid: user.uid
+              },
+              {
+                uid: {
+                  $in: subUid
+                }
+              },
+              {
+                tid: {
+                  $in: subTid
+                }
+              }
+            ]
           },
           {
+            reviewed: false,
             uid: user.uid
-          },
-          {
-            uid: {
-              $in: subUid
-            }
-          },
-          {
-            tid: {
-              $in: subTid
-            }
           }
         ]
       };
@@ -169,7 +196,7 @@ router
       uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
       tlm: 1, fid: 1, hasCover: 1,
       mainForumsId: 1, hits: 1, count: 1,
-      digest: 1
+      digest: 1, reviewed: 1
     }).skip(paging.start).limit(paging.perpage).sort(sort);
 
     threads = await db.ThreadModel.extendThreads(threads, {

@@ -9,6 +9,7 @@ router
 
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     const q = {
+      reviewed: true,
       recycleMark: {$ne: true},
       mainForumsId: {$in: fidOfCanGetThreads}
     };

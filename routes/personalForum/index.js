@@ -61,6 +61,7 @@ router
     if(tab === 'reply') {
 			const q = {
 				uid,
+        reviewed: true,
 				mainForumsId: {$in: fidOfCanGetThread}
 			};
 			if(digest) {
@@ -94,6 +95,7 @@ router
     }
     else if(tab === 'own') {
     	const q = {
+        reviewed: true,
     		mainForumsId: {
 		      $in: fidOfCanGetThread
 			  },
@@ -153,7 +155,7 @@ router
       let t = Date.now();
       const posts = await PostModel.find($postMatch, {_id: 0, tid: 1});
       const tidArr = posts.map(post => post.tid);
-      const threads = await ThreadModel.find({$and: [$matchThread, {tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
+      const threads = await ThreadModel.find({$and: [$matchThread, {reviewed: true},{tid: {$in: tidArr}}]}).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
           await p.extendUser();
@@ -216,6 +218,7 @@ router
         $and.splice(0, 0, {$or: [{digest: true}, {digestInMid: true}]});
       }
       const $USM = matchBase.set('$and', $and).toJS();
+      $USM.reviewed = true;
       const threads = await ThreadModel.find($USM).sort($sort).skip(page*perpage).limit(perpage);
       data.threads = await Promise.all(threads.map(async thread => {
         await thread.extendFirstPost().then(async p => {
@@ -279,7 +282,7 @@ router
     	const threads = [];
     	for(const log of infoLogs) {
     		const thread  = await db.ThreadModel.findOne({tid: log.tid});
-    		if(thread) {
+    		if(thread && thread.reviewed === true) {
     			if(thread.recycleMark && !displayRecycleMarkThreads) continue;
 					await thread.extendFirstPost().then(async p => {
             const u = await p.extendUser();
@@ -409,7 +412,7 @@ router
     	data.toppedThreads = [];
     	for(let tid of personalForum.toppedThreads) {
     		const thread = await ThreadModel.findOnly({tid});
-    		if(!fidOfCanGetThread.includes(thread.fid)) continue;
+    		if(!fidOfCanGetThread.includes(thread.fid) ||!thread.reviewed) continue;
         if(thread.fid === 'recycle') continue;
         // 过滤掉有退回标记的帖子
         if(thread.recycleMark && thread.recycleMark === true) continue;

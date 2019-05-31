@@ -48,6 +48,7 @@ forumRouter
 				}
 			}
 		}
+		match.reviewed = true;
 		const count = await db.ThreadModel.count(match);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count);

@@ -1157,4 +1157,97 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
   return username && uploadedAvatar;
 };
 
+/*
+* 判断用户发表的文章或回复是否需要审核
+* @param {String} uid 用户ID
+* @param {String} type 内容类型 post: 回复，thread: 文章
+* @return {Boolean} 是否需要审核
+* @author pengxiguaa 2019-5-31
+* */
+userSchema.statics.contentNeedReview = async (uid, type) => {
+  if(!["post", "thread"].includes(type)) throwErr(500, `未知的审核类型: ${type}`);
+  const UserModel = mongoose.model("users");
+  const ThreadModel = mongoose.model("threads");
+  const PostModel = mongoose.model("posts");
+  const UsersPersonalModel = mongoose.model("usersPersonal");
+  const SettingModel = mongoose.model("settings");
+
+  const user = await UserModel.findOne({uid});
+  if(!user) throwErr(500, "在判断内容是否需要审核的时候，发现未知的uid");
+  const reviewSettings = (await SettingModel.findById("review")).c;
+  const review = reviewSettings[type];
+
+  // 一、特殊限制
+  const {whitelistUid, blacklistUid} = review.special;
+  // 1. 白名单
+  if(whitelistUid.includes(uid)) {
+    return false
+  }
+  // 2. 黑名单
+  if(blacklistUid.includes(uid)) {
+    return true
+  }
+
+  // 二、白名单（用户证书和用户等级）
+  const {gradesId, certsId} = review.whitelist;
+  await user.extendGrade();
+  if(gradesId.includes(user.grade._id)) {
+    return false
+  }
+  await user.extendRoles();
+  for(const role of user.roles) {
+    if(certsId.includes(role._id)) {
+      return false
+    }
+  }
+
+  // 三、黑名单（海外手机号、未通过A卷和用户等级）
+  let passedCount = 0;
+  if(type === "post") {
+    passedCount = await PostModel.count({
+      disabled: false,
+      reviewed: true,
+      uid
+    });
+  } else {
+    passedCount = await ThreadModel.count({
+      disabled: false,
+      mainForumsId: {$ne: "recycle"},
+      uid
+    });
+  }
+  const {grades, notPassedA, foreign} = review.blacklist;
+  const userPersonal = await UsersPersonalModel.findOnly({uid});
+
+  // 开启了海外手机号用户发表需审核
+  // 用户绑定了海外手机号
+  // 用户通过审核的数量小于设置的数量
+  // 满足的用户所发表的文章 需要审核
+  if(foreign.status && userPersonal.nationCode !== "86") {
+    if(foreign.type === "all" || foreign.count > passedCount) return true;
+  }
+
+  // 开启了未通过A卷考试的用户发表需审核
+  // 用户没有通过A卷考试
+  // 用户通过审核的数量小于设置的数量
+  // 满足以上的用户所发表的文章 需要审核
+  if(notPassedA.status && !user.volumeA) {
+    if(notPassedA.type === "all" || notPassedA.count > passedCount) return true
+  }
+
+  let grade;
+  for(const g of grades) {
+    if(g.gradeId === user.grade._id) {
+      grade = g;
+    }
+  }
+  if(!grade) throwErr(500, "系统无法确定您账号的等级信息，请点击页脚下的报告问题，告知网站管理员。");
+  if(grade.status) {
+    // 目前调取的地方都在发表相应内容之后，所以用户已发表内容的数量需要-1
+    if(grade.type === "all" || grade.count > passedCount - 1) return true
+  }
+  return false
+};
+
+
 module.exports = mongoose.model('users', userSchema);

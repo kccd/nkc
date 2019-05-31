@@ -1,4 +1,6 @@
-.thread-panel
+.thread-panel(class=!thread.reviewed?"reviewed":"")
+  if !thread.reviewed
+    .thread-review-info 审核中
   .thread-panel-author-info
     .thread-panel-author
       a(href=`/u/${thread.uid}` target="_blank")
