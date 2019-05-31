@@ -1704,10 +1704,18 @@ function closeLottery() {
 }
 
 function scrollToBottom() {
+  $("html").css("height", "auto")
+  $("body").css("height", "auto")
   $("html,body").animate({scrollTop: document.body.offsetHeight}, 300)
+  $("html").css("height", "100%")
+  $("body").css("height", "100%")
 }
 function scrollToTop() {
+  $("html").css("height", "auto")
+  $("body").css("height", "auto")
   $("html,body").animate({scrollTop: 0}, 300)
+  $("html").css("height", "100%")
+  $("body").css("height", "100%")
 }
 
 

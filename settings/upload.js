@@ -49,6 +49,12 @@ for(const key in paths) {
   pathsObj[key] = path.resolve(paths[key]);
 }
 
+function extGetPath(ext) {
+  var originPath = "tmp/temporary.";
+  var finalPath = path.resolve(originPath + ext);
+  return finalPath;
+}
+
 function initFolders() {
   for(const key in pathsObj) {
     const realPath = pathsObj[key];
@@ -118,6 +124,7 @@ function generateFolderName(basePath) {
 const uploadSettings = {
   generateFolderName,
   initFolders,
+  extGetPath,
   koaBodySetting: {
     multipart: true,
     formidable: {
